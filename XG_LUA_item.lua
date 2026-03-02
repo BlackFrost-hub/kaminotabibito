@@ -15,7 +15,7 @@ obj=slk.item.ratc:new('I00V')
 	obj.stockRegen='0'
 	obj.class='Campaign'
 	obj.prio='100'
-	obj.selSize='2501111.0'
+	obj.selSize='250.0'
 	obj.oldLevel='1'
 table.insert(xG_item_luaObj,obj)
 obj=slk.item.azhr:new('I00E')
