@@ -1,0 +1,26 @@
+{
+  "filePath": "c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j",
+  "items": [
+    {
+      "symbolName": "GetHandleId",
+      "filePath": "c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j",
+      "content": "\n```jass\nnative GetHandleId takes handle h returns integer\n```\n\n\n---\n\n获取句柄ID\n\n获取任意句柄对象的唯一标识符\n\n示例: GetHandleId(GetTriggerUnit()) = 单位的唯一ID\n\n注意: 一般用于哈希表键值（hashtable key）\n\n**Parameters:**\n- **`h`**: 任意handle子类型（单位、物品、特效等）\n\n**Returns:** 句柄的唯一ID\n\n**文件:** `c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j`"
+    },
+    {
+      "symbolName": "SaveInteger",
+      "filePath": "c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j",
+      "content": "\n```jass\nnative SaveInteger takes hashtable table, integer parentKey, integer childKey, integer value returns nothing\n```\n\n\n---\n\n保存整数到哈希表 [C]\n\n@version 1.24\n\n**文件:** `c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j`"
+    },
+    {
+      "symbolName": "LoadMultiboardItemHandle",
+      "filePath": "c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j",
+      "content": "\n```jass\nnative LoadMultiboardItemHandle takes hashtable table, integer parentKey, integer childKey returns multiboarditem\n```\n\n\n---\n\n从哈希表提取多面板项目 [C]\n\n@version 1.24\n\n**文件:** `c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j`"
+    },
+    {
+      "symbolName": "GetUnitX",
+      "filePath": "c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j",
+      "content": "\n```jass\nconstant native GetUnitX takes unit whichUnit returns real\n```\n\n\n---\n\n获取指定单位 X 坐标 [R]\n\n获取单位X坐标\n\n获取指定单位的X坐标位置\n\n示例: set x = GetUnitX(u) // 获取单位u的X坐标\n\n**Parameters:**\n- **`whichUnit`**: 要获取坐标的单位\n\n**Returns:** 单位的X坐标\n\n**文件:** `c:\\Users\\Administrator\\.vscode\\extensions\\jass.jass-1.9.7\\static\\common.j`"
+    }
+  ],
+  "timestamp": 1772209837871
+}

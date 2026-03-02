@@ -1,0 +1,3435 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+  "items": [
+    {
+      "label": "LIBRARY_AttributeSpeed",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_AttributeSpeed\n```\n\n\n---\n\nglobals from AttributeSpeed:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_AttributeSpeed",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "AttributeSpeed___PERIOD",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant real AttributeSpeed___PERIOD\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_AttributeSpeed___PERIOD",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_MNXT",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_MNXT\n```\n\n\n---\n\nendglobals from AttributeSpeed\n\nglobals from MNXT:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_MNXT",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "csht",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nhashtable csht\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_csht",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_YDTriggerSaveLoadSystem",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_YDTriggerSaveLoadSystem\n```\n\n\n---\n\nendglobals from MNXT\n\nglobals from YDTriggerSaveLoadSystem:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_YDTriggerSaveLoadSystem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarLuaKey",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarLuaKey\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarLuaKey",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarBlockKey",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarBlockKey\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarBlockKey",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_LIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_LIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_LIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_SIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_SIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_SIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_LastSIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_LastSIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_LastSIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_LastLIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_LastLIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_LastLIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_SIndex3",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_SIndex3\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_SIndex3",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "G_SIndex4",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger G_SIndex4\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_G_SIndex4",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDHT",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nhashtable YDHT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDHT",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDLOC",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nhashtable YDLOC\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDLOC",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "SKey_PIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger SKey_PIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SKey_PIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "Star_PIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger Star_PIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_Star_PIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "SKey_Trigger",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger SKey_Trigger\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SKey_Trigger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_YDWEAbilityState",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEAbilityState\n```\n\n\n---\n\nendglobals from YDTriggerSaveLoadSystem\n\nglobals from YDWEAbilityState:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_YDWEAbilityState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_STATE_COOLDOWN",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_STATE_COOLDOWN\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_STATE_COOLDOWN",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_TARGS",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TARGS\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TARGS",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_CAST",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_CAST\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_CAST",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DUR",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DUR\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DUR",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_HERODUR",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_HERODUR\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_HERODUR",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_COST",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_COST\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_COST",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_COOL",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_COOL\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_COOL",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_AREA",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_AREA\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_AREA",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_RNG",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RNG\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RNG",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_A",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_A\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_A",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_B",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_B\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_B",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_C",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_C\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_C",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_D",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_D\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_D",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_E",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_E\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_E",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_F",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_F\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_F",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_G",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_G\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_G",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_H",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_H\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_H",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_DATA_I",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_I\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_I",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UNITID",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNITID\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNITID",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_HOTKET",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_HOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_HOTKET",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UNHOTKET",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNHOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNHOTKET",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_NAME",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_NAME\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_NAME",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_TARGET_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TARGET_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TARGET_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_CASTER_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_CASTER_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_CASTER_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_EFFECT_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_EFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_EFFECT_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_MISSILE_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_MISSILE_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_MISSILE_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_SPECIAL_ART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_SPECIAL_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_SPECIAL_ART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_BUFF_TIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_BUFF_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_BUFF_TIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_TIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UNTIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNTIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UBERTIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UBERTIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UNUBERTIP",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNUBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNUBERTIP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEAbilityState___ABILITY_DATA_UNART",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNART",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_YDWEBase",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEBase\n```\n\n\n---\n\nendglobals from YDWEAbilityState\n\nglobals from YDWEBase:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_YDWEBase",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_AllString",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nstring bj_AllString\n```\n\n\n---\n\nȫ�ֹ�ϣ��\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_AllString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastAbilityCastingUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit bj_lastAbilityCastingUnit\n```\n\n\n---\n\n全局系统变量\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastAbilityCastingUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastAbilityTargetUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit bj_lastAbilityTargetUnit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastAbilityTargetUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastPoolAbstractedUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit bj_lastPoolAbstractedUnit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastPoolAbstractedUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastCreatedUnitPool",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunitpool bj_lastCreatedUnitPool\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastCreatedUnitPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastPoolAbstractedItem",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nitem bj_lastPoolAbstractedItem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastPoolAbstractedItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastCreatedItemPool",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nitempool bj_lastCreatedItemPool\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastCreatedItemPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastSetAttackType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nattacktype bj_lastSetAttackType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastSetAttackType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastSetDamageType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ndamagetype bj_lastSetDamageType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastSetDamageType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "bj_lastSetWeaponType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nweapontype bj_lastSetWeaponType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_bj_lastSetWeaponType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "yd_MapMaxX",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal yd_MapMaxX\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_yd_MapMaxX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "yd_MapMinX",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal yd_MapMinX\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_yd_MapMinX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "yd_MapMaxY",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal yd_MapMaxY\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_yd_MapMaxY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "yd_MapMinY",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal yd_MapMinY\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_yd_MapMinY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEBase___yd_PlayerColor",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nstring array YDWEBase___yd_PlayerColor\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEBase___yd_PlayerColor",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEBase___AbilityCastingOverEventQueue",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger array YDWEBase___AbilityCastingOverEventQueue\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEBase___AbilityCastingOverEventQueue",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEBase___AbilityCastingOverEventType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array YDWEBase___AbilityCastingOverEventType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEBase___AbilityCastingOverEventType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "YDWEBase___AbilityCastingOverEventNumber",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger YDWEBase___AbilityCastingOverEventNumber\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEBase___AbilityCastingOverEventNumber",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_YDWEJapiUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEJapiUnit\n```\n\n\n---\n\nendglobals from YDWEBase\n\nglobals from YDWEJapiUnit:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_YDWEJapiUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "LIBRARY_CyaAttribute",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_CyaAttribute\n```\n\n\n---\n\nendglobals from YDWEJapiUnit\n\nglobals from CyaAttribute:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_CyaAttribute",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit udg_TempUnit\n```\n\n\n---\n\nendglobals from CyaAttribute\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempDmg",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempDmg\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempDmg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempStr",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempStr\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempStr",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempAgi",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempAgi\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempAgi",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempInt",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempInt\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempInt",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempHp",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempHp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempHp",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempArmor",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempArmor\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempArmor",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempIsAdd",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nboolean udg_TempIsAdd\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempIsAdd",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempMp",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempMp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempMp",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempAtkSpeed",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempAtkSpeed\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempAtkSpeed",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempMoveSpeed",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempMoveSpeed\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempMoveSpeed",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempAll",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempAll\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempAll",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "udg_TempcritRate",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal udg_TempcritRate\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempcritRate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg_ItemBonus",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg_ItemBonus\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg_ItemBonus",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________001",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________001",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________002",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________002",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "l__library_init",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger l__library_init\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_l__library_init",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "si__ModSpeed",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant integer si__ModSpeed\n```\n\n\n---\n\nJASSHelper struct globals:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_si__ModSpeed",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_recycle",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array s__ModSpeed_recycle\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_recycle",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_ic",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger s__ModSpeed_ic\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_ic",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_next",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array s__ModSpeed_next\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_next",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_prev",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array s__ModSpeed_prev\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_prev",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_sp",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal array s__ModSpeed_sp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_sp",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_u",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit array s__ModSpeed_u\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_u",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_x",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal array s__ModSpeed_x\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_x",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_y",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal array s__ModSpeed_y\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_y",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_s",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal array s__ModSpeed_s\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_s",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_tempx",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal s__ModSpeed_tempx\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_tempx",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_tempy",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal s__ModSpeed_tempy\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_tempy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_Incx",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal s__ModSpeed_Incx\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_Incx",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_Incy",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal s__ModSpeed_Incy\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_Incy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_IncDist",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal s__ModSpeed_IncDist\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__ModSpeed_IncDist",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "st__ModSpeed_destroy",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger st__ModSpeed_destroy\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st__ModSpeed_destroy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "st___prototype6",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger array st___prototype6\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st___prototype6",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "f__arg_this",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger f__arg_this\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_f__arg_this",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "EXGetUnitAbility",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetUnitAbility takes unit u, integer abilcode returns ability\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetUnitAbility",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetUnitAbilityByIndex",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetUnitAbilityByIndex takes unit u, integer index returns ability\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetUnitAbilityByIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetAbilityId",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetAbilityId takes ability abil returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetAbilityId",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetAbilityState",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetAbilityState takes ability abil, integer state_type returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetAbilityState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetAbilityState",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetAbilityState takes ability abil, integer state_type, real value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetAbilityState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetAbilityDataReal",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetAbilityDataReal takes ability abil, integer level, integer data_type returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetAbilityDataReal",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetAbilityDataReal",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetAbilityDataReal takes ability abil, integer level, integer data_type, real value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetAbilityDataReal",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetAbilityDataInteger",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetAbilityDataInteger takes ability abil, integer level, integer data_type returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetAbilityDataInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetAbilityDataInteger",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetAbilityDataInteger takes ability abil, integer level, integer data_type, integer value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetAbilityDataInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetAbilityDataString",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetAbilityDataString takes ability abil, integer level, integer data_type returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetAbilityDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetAbilityDataString",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetAbilityDataString takes ability abil, integer level, integer data_type, string value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetAbilityDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetAbilityAEmeDataA",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetAbilityAEmeDataA takes ability abil, integer unitid returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetAbilityAEmeDataA",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXGetItemDataString",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXGetItemDataString takes integer itemcode, integer data_type returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXGetItemDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetItemDataString",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetItemDataString takes integer itemcode, integer data_type, string value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetItemDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetUnitFacing",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetUnitFacing takes unit u, real angle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetUnitFacing",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXPauseUnit",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXPauseUnit takes unit u, boolean flag returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXPauseUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetUnitCollisionType",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetUnitCollisionType takes boolean enable, unit u, integer t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetUnitCollisionType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetUnitMoveType",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetUnitMoveType takes unit u, integer t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetUnitMoveType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "sc__ModSpeed_destroy",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction sc__ModSpeed_destroy takes integer this returns nothing\n```\n\n\n---\n\nGenerated method caller for ModSpeed.destroy\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc__ModSpeed_destroy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "sc___prototype6_execute",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction sc___prototype6_execute takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc___prototype6_execute",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "sc___prototype6_evaluate",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction sc___prototype6_evaluate takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc___prototype6_evaluate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_modifyAmount",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_modifyAmount takes integer this, real amount returns nothing\n```\n\n\n---\n\nlibrary AttributeSpeed:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_modifyAmount",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_register",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_register takes unit u returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_register",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed__staticgetindex",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed__staticgetindex takes unit u returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed__staticgetindex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_move",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_move takes integer t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_move",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_iterate",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_iterate takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_iterate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_destroy",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_destroy takes integer this returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_destroy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "s__ModSpeed_AttributeSpeed___O__onInit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction s__ModSpeed_AttributeSpeed___O__onInit takes nothing returns nothing\n```\n\n\n---\n\nImplemented from module AttributeSpeed___O:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__ModSpeed_AttributeSpeed___O__onInit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "GetUnitMoveSpeedEx",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetUnitMoveSpeedEx takes unit u returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetUnitMoveSpeedEx",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "SetUnitMoveSpeedEx",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction SetUnitMoveSpeedEx takes unit u, integer i, real s returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SetUnitMoveSpeedEx",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarYDGetIndex",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarYDGetIndex takes trigger trg returns integer\n```\n\n\n---\n\nlibrary AttributeSpeed ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary YDTriggerSaveLoadSystem:\n\n对应LOCALSET\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarYDGetIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDGetStep2",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDGetStep2 takes string str, integer step returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDGetStep2",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDGetStep",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDGetStep takes trigger trg, integer step returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDGetStep",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDTriggerSaveLoadSystem___Init",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDTriggerSaveLoadSystem___Init takes nothing returns nothing\n```\n\n\n---\n\n获取事件名的code(字符串哈希)\n\n重启当前计时器\n\n----------------------------------------------------------------\n\n转换StarType1Id到TypeName\n\n----------------------------------------------------------------\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDTriggerSaveLoadSystem___Init",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitAbilityState",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitAbilityState takes unit u, integer abilcode, integer state_type returns real\n```\n\n\n---\n\nlibrary YDTriggerSaveLoadSystem ends\n\nlibrary YDWEAbilityState:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitAbilityState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitAbilityDataInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitAbilityDataInteger takes unit u, integer abilcode, integer level, integer data_type returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitAbilityDataInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitAbilityDataReal",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitAbilityDataReal takes unit u, integer abilcode, integer level, integer data_type returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitAbilityDataReal",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitAbilityDataString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitAbilityDataString takes unit u, integer abilcode, integer level, integer data_type returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitAbilityDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetUnitAbilityState",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetUnitAbilityState takes unit u, integer abilcode, integer state_type, real value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetUnitAbilityState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetUnitAbilityDataInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetUnitAbilityDataInteger takes unit u, integer abilcode, integer level, integer data_type, integer value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetUnitAbilityDataInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetUnitAbilityDataReal",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetUnitAbilityDataReal takes unit u, integer abilcode, integer level, integer data_type, real value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetUnitAbilityDataReal",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetUnitAbilityDataString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetUnitAbilityDataString takes unit u, integer abilcode, integer level, integer data_type, string value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetUnitAbilityDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEUnitTransform",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEUnitTransform takes unit u, integer abilcode, integer targetid returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEUnitTransform",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetItemDataString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetItemDataString takes integer itemcode, integer data_type returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetItemDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetItemDataString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetItemDataString takes integer itemcode, integer data_type, string value returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetItemDataString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEH2I",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEH2I takes handle h returns integer\n```\n\n\n---\n\nlibrary YDWEAbilityState ends\n\nlibrary YDWEBase:\n\n===========================================================================\n\nHashTable\n\n===========================================================================\n\n===========================================================================\n\nReturn bug\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEH2I",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlushAllData",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlushAllData takes nothing returns nothing\n```\n\n\n---\n\n����\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlushAllData",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlushMissionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlushMissionByInteger takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlushMissionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlushMissionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlushMissionByString takes string s returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlushMissionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlushStoredIntegerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlushStoredIntegerByInteger takes integer i, integer j returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlushStoredIntegerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlushStoredIntegerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlushStoredIntegerByString takes string s1, string s2 returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlushStoredIntegerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEHaveSavedIntegerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEHaveSavedIntegerByInteger takes integer i, integer j returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEHaveSavedIntegerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEHaveSavedIntegerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEHaveSavedIntegerByString takes string s1, string s2 returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEHaveSavedIntegerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveIntegerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveIntegerByInteger takes integer pTable, integer pKey, integer i returns nothing\n```\n\n\n---\n\nstore and get integer\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveIntegerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveIntegerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveIntegerByString takes string pTable, string pKey, integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveIntegerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetIntegerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetIntegerByInteger takes integer pTable, integer pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetIntegerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetIntegerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetIntegerByString takes string pTable, string pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetIntegerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRealByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRealByInteger takes integer pTable, integer pKey, real r returns nothing\n```\n\n\n---\n\nstore and get real\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRealByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRealByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRealByString takes string pTable, string pKey, real r returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRealByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRealByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRealByInteger takes integer pTable, integer pKey returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRealByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRealByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRealByString takes string pTable, string pKey returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRealByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveStringByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveStringByInteger takes integer pTable, integer pKey, string s returns nothing\n```\n\n\n---\n\nstore and get string\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveStringByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveStringByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveStringByString takes string pTable, string pKey, string s returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveStringByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetStringByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetStringByInteger takes integer pTable, integer pKey returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetStringByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetStringByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetStringByString takes string pTable, string pKey returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetStringByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveBooleanByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveBooleanByInteger takes integer pTable, integer pKey, boolean b returns nothing\n```\n\n\n---\n\nstore and get boolean\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveBooleanByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveBooleanByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveBooleanByString takes string pTable, string pKey, boolean b returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveBooleanByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetBooleanByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetBooleanByInteger takes integer pTable, integer pKey returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetBooleanByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetBooleanByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetBooleanByString takes string pTable, string pKey returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetBooleanByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveUnitByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveUnitByInteger takes integer pTable, integer pKey, unit u returns nothing\n```\n\n\n---\n\nCovert Unit\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveUnitByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveUnitByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveUnitByString takes string pTable, string pKey, unit u returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveUnitByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitByInteger takes integer pTable, integer pKey returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitByString takes string pTable, string pKey returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveUnitIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveUnitIDByInteger takes integer pTable, integer pKey, integer uid returns nothing\n```\n\n\n---\n\nCovert UnitID\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveUnitIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveUnitIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveUnitIDByString takes string pTable, string pKey, integer uid returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveUnitIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitIDByInteger takes integer pTable, integer pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitIDByString takes string pTable, string pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveAbilityIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveAbilityIDByInteger takes integer pTable, integer pKey, integer abid returns nothing\n```\n\n\n---\n\nCovert AbilityID\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveAbilityIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveAbilityIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveAbilityIDByString takes string pTable, string pKey, integer abid returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveAbilityIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetAbilityIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetAbilityIDByInteger takes integer pTable, integer pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetAbilityIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetAbilityIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetAbilityIDByString takes string pTable, string pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetAbilityIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESavePlayerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESavePlayerByInteger takes integer pTable, integer pKey, player p returns nothing\n```\n\n\n---\n\nCovert Player\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESavePlayerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESavePlayerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESavePlayerByString takes string pTable, string pKey, player p returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESavePlayerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetPlayerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetPlayerByInteger takes integer pTable, integer pKey returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetPlayerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetPlayerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetPlayerByString takes string pTable, string pKey returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetPlayerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveItemByInteger takes integer pTable, integer pKey, item it returns nothing\n```\n\n\n---\n\nCovert Item\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveItemByString takes string pTable, string pKey, item it returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetItemByInteger takes integer pTable, integer pKey returns item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetItemByString takes string pTable, string pKey returns item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveItemIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveItemIDByInteger takes integer pTable, integer pKey, integer itid returns nothing\n```\n\n\n---\n\nCovert ItemID\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveItemIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveItemIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveItemIDByString takes string pTable, string pKey, integer itid returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveItemIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetItemIDByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetItemIDByInteger takes integer pTable, integer pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetItemIDByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetItemIDByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetItemIDByString takes string pTable, string pKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetItemIDByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTimerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTimerByInteger takes integer pTable, integer pKey, timer t returns nothing\n```\n\n\n---\n\nCovert Timer\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTimerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTimerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTimerByString takes string pTable, string pKey, timer t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTimerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTimerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTimerByInteger takes integer pTable, integer pKey returns timer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTimerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTimerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTimerByString takes string pTable, string pKey returns timer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTimerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerByInteger takes integer pTable, integer pKey, trigger trg returns nothing\n```\n\n\n---\n\nCovert Trigger\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerByString takes string pTable, string pKey, trigger trg returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerByInteger takes integer pTable, integer pKey returns trigger\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerByString takes string pTable, string pKey returns trigger\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLocationByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLocationByInteger takes integer pTable, integer pKey, location pt returns nothing\n```\n\n\n---\n\nCovert Location\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLocationByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLocationByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLocationByString takes string pTable, string pKey, location pt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLocationByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLocationByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLocationByInteger takes integer pTable, integer pKey returns location\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLocationByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLocationByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLocationByString takes string pTable, string pKey returns location\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLocationByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveGroupByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveGroupByInteger takes integer pTable, integer pKey, group g returns nothing\n```\n\n\n---\n\nCovert Group\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveGroupByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveGroupByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveGroupByString takes string pTable, string pKey, group g returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveGroupByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetGroupByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetGroupByInteger takes integer pTable, integer pKey returns group\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetGroupByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetGroupByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetGroupByString takes string pTable, string pKey returns group\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetGroupByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveMultiboardByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveMultiboardByInteger takes integer pTable, integer pKey, multiboard m returns nothing\n```\n\n\n---\n\nCovert Multiboard\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveMultiboardByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveMultiboardByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveMultiboardByString takes string pTable, string pKey, multiboard m returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveMultiboardByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetMultiboardByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetMultiboardByInteger takes integer pTable, integer pKey returns multiboard\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetMultiboardByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetMultiboardByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetMultiboardByString takes string pTable, string pKey returns multiboard\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetMultiboardByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveMultiboardItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveMultiboardItemByInteger takes integer pTable, integer pKey, multiboarditem mt returns nothing\n```\n\n\n---\n\nCovert MultiboardItem\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveMultiboardItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveMultiboardItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveMultiboardItemByString takes string pTable, string pKey, multiboarditem mt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveMultiboardItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetMultiboardItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetMultiboardItemByInteger takes integer pTable, integer pKey returns multiboarditem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetMultiboardItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetMultiboardItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetMultiboardItemByString takes string pTable, string pKey returns multiboarditem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetMultiboardItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTextTagByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTextTagByInteger takes integer pTable, integer pKey, texttag tt returns nothing\n```\n\n\n---\n\nCovert TextTag\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTextTagByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTextTagByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTextTagByString takes string pTable, string pKey, texttag tt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTextTagByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTextTagByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTextTagByInteger takes integer pTable, integer pKey returns texttag\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTextTagByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTextTagByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTextTagByString takes string pTable, string pKey returns texttag\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTextTagByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLightningByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLightningByInteger takes integer pTable, integer pKey, lightning ln returns nothing\n```\n\n\n---\n\nCovert Lightning\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLightningByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLightningByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLightningByString takes string pTable, string pKey, lightning ln returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLightningByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLightningByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLightningByInteger takes integer pTable, integer pKey returns lightning\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLightningByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLightningByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLightningByString takes string pTable, string pKey returns lightning\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLightningByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRegionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRegionByInteger takes integer pTable, integer pKey, region rn returns nothing\n```\n\n\n---\n\nCovert Region\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRegionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRegionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRegionByString takes string pTable, string pKey, region rt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRegionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRegionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRegionByInteger takes integer pTable, integer pKey returns region\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRegionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRegionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRegionByString takes string pTable, string pKey returns region\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRegionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRectByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRectByInteger takes integer pTable, integer pKey, rect rn returns nothing\n```\n\n\n---\n\nCovert Rect\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRectByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveRectByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveRectByString takes string pTable, string pKey, rect rt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveRectByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRectByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRectByInteger takes integer pTable, integer pKey returns rect\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRectByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRectByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRectByString takes string pTable, string pKey returns rect\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRectByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLeaderboardByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLeaderboardByInteger takes integer pTable, integer pKey, leaderboard lb returns nothing\n```\n\n\n---\n\nCovert Leaderboard\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLeaderboardByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveLeaderboardByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveLeaderboardByString takes string pTable, string pKey, leaderboard lb returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveLeaderboardByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLeaderboardByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLeaderboardByInteger takes integer pTable, integer pKey returns leaderboard\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLeaderboardByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLeaderboardByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLeaderboardByString takes string pTable, string pKey returns leaderboard\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLeaderboardByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveEffectByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveEffectByInteger takes integer pTable, integer pKey, effect e returns nothing\n```\n\n\n---\n\nCovert Effect\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveEffectByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveEffectByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveEffectByString takes string pTable, string pKey, effect e returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveEffectByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetEffectByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetEffectByInteger takes integer pTable, integer pKey returns effect\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetEffectByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetEffectByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetEffectByString takes string pTable, string pKey returns effect\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetEffectByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveDestructableByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveDestructableByInteger takes integer pTable, integer pKey, destructable da returns nothing\n```\n\n\n---\n\nCovert Destructable\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveDestructableByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveDestructableByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveDestructableByString takes string pTable, string pKey, destructable da returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveDestructableByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetDestructableByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetDestructableByInteger takes integer pTable, integer pKey returns destructable\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetDestructableByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetDestructableByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetDestructableByString takes string pTable, string pKey returns destructable\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetDestructableByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerConditionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerConditionByInteger takes integer pTable, integer pKey, triggercondition tc returns nothing\n```\n\n\n---\n\nCovert triggercondition\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerConditionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerConditionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerConditionByString takes string pTable, string pKey, triggercondition tc returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerConditionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerConditionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerConditionByInteger takes integer pTable, integer pKey returns triggercondition\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerConditionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerConditionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerConditionByString takes string pTable, string pKey returns triggercondition\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerConditionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerActionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerActionByInteger takes integer pTable, integer pKey, triggeraction ta returns nothing\n```\n\n\n---\n\nCovert triggeraction\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerActionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerActionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerActionByString takes string pTable, string pKey, triggeraction ta returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerActionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerActionByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerActionByInteger takes integer pTable, integer pKey returns triggeraction\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerActionByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerActionByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerActionByString takes string pTable, string pKey returns triggeraction\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerActionByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerEventByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerEventByInteger takes integer pTable, integer pKey, event et returns nothing\n```\n\n\n---\n\nCovert event\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerEventByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTriggerEventByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTriggerEventByString takes string pTable, string pKey, event et returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTriggerEventByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerEventByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerEventByInteger takes integer pTable, integer pKey returns event\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerEventByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTriggerEventByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTriggerEventByString takes string pTable, string pKey returns event\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTriggerEventByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveForceByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveForceByInteger takes integer pTable, integer pKey, force fc returns nothing\n```\n\n\n---\n\nCovert force\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveForceByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveForceByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveForceByString takes string pTable, string pKey, force fc returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveForceByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetForceByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetForceByInteger takes integer pTable, integer pKey returns force\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetForceByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetForceByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetForceByString takes string pTable, string pKey returns force\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetForceByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveBoolexprByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveBoolexprByInteger takes integer pTable, integer pKey, boolexpr be returns nothing\n```\n\n\n---\n\nCovert boolexpr\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveBoolexprByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveBoolexprByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveBoolexprByString takes string pTable, string pKey, boolexpr be returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveBoolexprByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetBoolexprByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetBoolexprByInteger takes integer pTable, integer pKey returns boolexpr\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetBoolexprByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetBoolexprByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetBoolexprByString takes string pTable, string pKey returns boolexpr\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetBoolexprByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveSoundByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveSoundByInteger takes integer pTable, integer pKey, sound sd returns nothing\n```\n\n\n---\n\nCovert sound\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveSoundByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveSoundByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveSoundByString takes string pTable, string pKey, sound sd returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveSoundByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetSoundByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetSoundByInteger takes integer pTable, integer pKey returns sound\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetSoundByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetSoundByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetSoundByString takes string pTable, string pKey returns sound\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetSoundByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTimerDialogByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTimerDialogByInteger takes integer pTable, integer pKey, timerdialog td returns nothing\n```\n\n\n---\n\nCovert timerdialog\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTimerDialogByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTimerDialogByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTimerDialogByString takes string pTable, string pKey, timerdialog td returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTimerDialogByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTimerDialogByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTimerDialogByInteger takes integer pTable, integer pKey returns timerdialog\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTimerDialogByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTimerDialogByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTimerDialogByString takes string pTable, string pKey returns timerdialog\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTimerDialogByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTrackableByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTrackableByInteger takes integer pTable, integer pKey, trackable ta returns nothing\n```\n\n\n---\n\nCovert trackable\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTrackableByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveTrackableByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveTrackableByString takes string pTable, string pKey, trackable ta returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveTrackableByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTrackableByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTrackableByInteger takes integer pTable, integer pKey returns trackable\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTrackableByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetTrackableByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetTrackableByString takes string pTable, string pKey returns trackable\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetTrackableByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveDialogByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveDialogByInteger takes integer pTable, integer pKey, dialog d returns nothing\n```\n\n\n---\n\nCovert dialog\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveDialogByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveDialogByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveDialogByString takes string pTable, string pKey, dialog d returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveDialogByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetDialogByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetDialogByInteger takes integer pTable, integer pKey returns dialog\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetDialogByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetDialogByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetDialogByString takes string pTable, string pKey returns dialog\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetDialogByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveButtonByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveButtonByInteger takes integer pTable, integer pKey, button bt returns nothing\n```\n\n\n---\n\nCovert button\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveButtonByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveButtonByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveButtonByString takes string pTable, string pKey, button bt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveButtonByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetButtonByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetButtonByInteger takes integer pTable, integer pKey returns button\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetButtonByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetButtonByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetButtonByString takes string pTable, string pKey returns button\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetButtonByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveQuestByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveQuestByInteger takes integer pTable, integer pKey, quest qt returns nothing\n```\n\n\n---\n\nCovert quest\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveQuestByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveQuestByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveQuestByString takes string pTable, string pKey, quest qt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveQuestByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetQuestByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetQuestByInteger takes integer pTable, integer pKey returns quest\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetQuestByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetQuestByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetQuestByString takes string pTable, string pKey returns quest\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetQuestByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveQuestItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveQuestItemByInteger takes integer pTable, integer pKey, questitem qi returns nothing\n```\n\n\n---\n\nCovert questitem\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveQuestItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveQuestItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveQuestItemByString takes string pTable, string pKey, questitem qi returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveQuestItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetQuestItemByInteger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetQuestItemByInteger takes integer pTable, integer pKey returns questitem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetQuestItemByInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetQuestItemByString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetQuestItemByString takes string pTable, string pKey returns questitem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetQuestItemByString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWES2I",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWES2I takes string s returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWES2I",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveAbilityHandleBJ",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveAbilityHandleBJ takes integer AbilityID, integer key, integer missionKey, hashtable table returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveAbilityHandleBJ",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESaveAbilityHandle",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESaveAbilityHandle takes hashtable table, integer parentKey, integer childKey, integer AbilityID returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESaveAbilityHandle",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWELoadAbilityHandleBJ",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWELoadAbilityHandleBJ takes integer key, integer missionKey, hashtable table returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWELoadAbilityHandleBJ",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWELoadAbilityHandle",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWELoadAbilityHandle takes hashtable table, integer parentKey, integer childKey returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWELoadAbilityHandle",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWECoordinateX",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWECoordinateX takes real x returns real\n```\n\n\n---\n\n===========================================================================\n\n返回参数\n\n===========================================================================\n\n地图边界判断\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWECoordinateX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWECoordinateY",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWECoordinateY takes real y returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWECoordinateY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEDistanceBetweenUnits",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEDistanceBetweenUnits takes unit a, unit b returns real\n```\n\n\n---\n\n两个单位之间的距离\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEDistanceBetweenUnits",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEAngleBetweenUnits",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEAngleBetweenUnits takes unit fromUnit, unit toUnit returns real\n```\n\n\n---\n\n两个单位之间的角度\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEAngleBetweenUnits",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetRect",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetRect takes real x, real y, real width, real height returns rect\n```\n\n\n---\n\n生成区域\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetRect",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEFlyEnable",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEFlyEnable takes unit u returns nothing\n```\n\n\n---\n\n===========================================================================\n\n设置单位可以飞行\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEFlyEnable",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEId2S",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEId2S takes integer value returns string\n```\n\n\n---\n\n===========================================================================\n\n字符窜与ID转换\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEId2S",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWES2Id",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWES2Id takes string targetstr returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWES2Id",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWES2UnitId",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWES2UnitId takes string targetstr returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWES2UnitId",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWES2ItemId",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWES2ItemId takes string targetstr returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWES2ItemId",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "GetLastAbilityCastingUnit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetLastAbilityCastingUnit takes nothing returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetLastAbilityCastingUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "GetLastAbilityTargetUnit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetLastAbilityTargetUnit takes nothing returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetLastAbilityTargetUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetMapLimitCoordinate",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetMapLimitCoordinate takes real MinX, real MaxX, real MinY, real MaxY returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetMapLimitCoordinate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESyStemAbilityCastingOverTriggerAction",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESyStemAbilityCastingOverTriggerAction takes unit hero, integer index returns nothing\n```\n\n\n---\n\n===========================================================================\n\n===========================================================================\n\n地图初始化\n\n===========================================================================\n\nYDWE特殊技能结束事件\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESyStemAbilityCastingOverTriggerAction",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESyStemAbilityCastingOverRegistTrigger",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESyStemAbilityCastingOverRegistTrigger takes trigger trg, integer index returns nothing\n```\n\n\n---\n\n===========================================================================\n\nYDWE技能捕捉事件\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESyStemAbilityCastingOverRegistTrigger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWECreateUnitPool",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWECreateUnitPool takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n系统函数完善\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWECreateUnitPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEPlaceRandomUnit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEPlaceRandomUnit takes unitpool up, player p, real x, real y, real face returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEPlaceRandomUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLastUnitPool",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLastUnitPool takes nothing returns unitpool\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLastUnitPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLastPoolAbstractedUnit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLastPoolAbstractedUnit takes nothing returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLastPoolAbstractedUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWECreateItemPool",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWECreateItemPool takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWECreateItemPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEPlaceRandomItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEPlaceRandomItem takes itempool ip, real x, real y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEPlaceRandomItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLastItemPool",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLastItemPool takes nothing returns itempool\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLastItemPool",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetLastPoolAbstractedItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetLastPoolAbstractedItem takes nothing returns item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetLastPoolAbstractedItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWESetAttackDamageWeaponType",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWESetAttackDamageWeaponType takes attacktype at, damagetype dt, weapontype wt returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWESetAttackDamageWeaponType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetPlayerColorString",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetPlayerColorString takes player p, string s returns string\n```\n\n\n---\n\nunitpool bj_lastCreatedPool=null\n\nunit bj_lastPoolAbstractedUnit=null\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetPlayerColorString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEGetUnitItemSoftId",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEGetUnitItemSoftId takes unit hero, item it returns integer\n```\n\n\n---\n\n===========================================================================\n\n===========================================================================\n\n系统函数补充\n\n===========================================================================\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEGetUnitItemSoftId",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEVersion_Display",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEVersion_Display takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\n===========================================================================\n\n地图初始化\n\n===========================================================================\n\n===========================================================================\n\n显示版本\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEVersion_Display",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEVersion_Init",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEVersion_Init takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEVersion_Init",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitializeYD",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitializeYD takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitializeYD",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEDistanceBetweenUnitAndPoint",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEDistanceBetweenUnitAndPoint takes unit a, location b returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEDistanceBetweenUnitAndPoint",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEUnitAddStun",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEUnitAddStun takes unit u returns nothing\n```\n\n\n---\n\nlibrary YDWEBase ends\n\nlibrary YDWEJapiUnit:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEUnitAddStun",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "YDWEUnitRemoveStun",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction YDWEUnitRemoveStun takes unit u returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDWEUnitRemoveStun",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "ALG",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction ALG takes integer i, real x, real v returns real\n```\n\n\n---\n\nlibrary YDWEJapiUnit ends\n\nlibrary CyaAttribute:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_ALG",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_HP",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_HP takes unit u, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_HP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_MP",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_MP takes unit u, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_MP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_ATK",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_ATK takes unit u, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_ATK",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_DEF",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_DEF takes unit u, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_DEF",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_ADSP",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_ADSP takes unit u, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_ADSP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_LL",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_LL takes unit u, integer i, real l, real m, real z returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_LL",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_MJ",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_MJ takes unit u, integer i, real l, real m, real z returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_MJ",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_ZL",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_ZL takes unit u, integer i, real l, real m, real z returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_ZL",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_State",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_State takes unit u, integer i, real l, real m, real z returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_State",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Cya_Attribute_SetState",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Cya_Attribute_SetState takes unit u, integer id, integer i, real v returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Cya_Attribute_SetState",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitGlobals",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitGlobals takes nothing returns nothing\n```\n\n\n---\n\nlibrary CyaAttribute ends\n\n===========================================================================\n\n*\n\n*  Global variables\n\n*\n\n===========================================================================\n\nStar\n\nif ydl_localvar_step>250000 then YDNL    //     set ydl_localvar_step = ydl_localvar_step - 250000 YDNL     // endif YDNL    // call YDHashSet(YDLOC, integer, YDHashH2I(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)           YDNL    // call YDHashSet(YDLOC, integer, YDHashH2I(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitGlobals",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitRandomGroups",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitRandomGroups takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitRandomGroups",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitSounds",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitSounds takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitSounds",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "CreateDestructables",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction CreateDestructables takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_CreateDestructables",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "CreateItems",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction CreateItems takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_CreateItems",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "CreateUnits",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction CreateUnits takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_CreateUnits",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "CreateRegions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction CreateRegions takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_CreateRegions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "CreateCameras",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction CreateCameras takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_CreateCameras",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "ApplyItemBonus",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction ApplyItemBonus takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=0\n\nTESH.alwaysfold=0\n\nTESH.scrollpos=0\n\nTESH.alwaysfold=0\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_ApplyItemBonus",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________001Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________001Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 001\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________001Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________001",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________001 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________001",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________002Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________002Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 002\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________002Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________002",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________002 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________002",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitCustomTriggers",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitCustomTriggers takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitCustomTriggers",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "RunInitializationTriggers",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction RunInitializationTriggers takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_RunInitializationTriggers",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitCustomPlayerSlots",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitCustomPlayerSlots takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitCustomPlayerSlots",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitCustomTeams",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitCustomTeams takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitCustomTeams",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitAllyPriorities",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitAllyPriorities takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitAllyPriorities",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarBlockInitTimerEvent",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarBlockInitTimerEvent takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n*\n\n*  Main Initialization\n\n*\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarBlockInitTimerEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarBlockInit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarBlockInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarBlockInit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "main",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction main takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_main",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "config",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction config takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n*\n\n*  Map Configuration\n\n*\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_config",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "sa__ModSpeed_destroy",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction sa__ModSpeed_destroy takes nothing returns boolean\n```\n\n\n---\n\nStruct method generated initializers/callers:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa__ModSpeed_destroy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "sa___prototype6_StarBlockInit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction sa___prototype6_StarBlockInit takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa___prototype6_StarBlockInit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "jasshelper__initstructs3147046",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs3147046 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs3147046",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    }
+  ],
+  "timestamp": 1772274169772
+}
