@@ -1,0 +1,15 @@
+{
+  "name": "map5",
+  "version": "1.0.0",
+  "description": "TS source for TSTL round-trip",
+  "scripts": {
+    "build": "tstl && node scripts/fix-lua-for-pack.js && node scripts/sync-lua-from-ts.js",
+    "build:full": "tstl && node scripts/fix-lua-for-pack.js && node scripts/sync-lua-from-ts.js",
+    "build:lua": "tstl",
+    "fix:pack": "node scripts/fix-lua-for-pack.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "typescript-to-lua": "^1.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "rootDir": "TS",
+    "outDir": "src",
+    "skipLibCheck": true
+  },
+  "include": ["TS/**/*.ts"],
+  "tstl": {
+    "luaTarget": "5.1"
+  }
+}

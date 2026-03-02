@@ -1,0 +1,66 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+  "items": [
+    {
+      "symbolName": "bj_lastPoolAbstractedUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nunit bj_lastPoolAbstractedUnit\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_prev",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\ninteger array s__ModSpeed_prev\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "EXSetAbilityDataInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nnative EXSetAbilityDataInteger takes ability abil, integer level, integer data_type, integer value returns boolean\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_recycle",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\ninteger array s__ModSpeed_recycle\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_next",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\ninteger array s__ModSpeed_next\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_Incy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nreal s__ModSpeed_Incy\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_u",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nunit array s__ModSpeed_u\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_x",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nreal array s__ModSpeed_x\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_IncDist",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nreal s__ModSpeed_IncDist\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_tempy",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nreal s__ModSpeed_tempy\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_tempx",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nreal s__ModSpeed_tempx\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "s__ModSpeed_move",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\map2\\.build\\war3map.j",
+      "content": "\n```jass\nfunction s__ModSpeed_move takes integer t returns nothing\n```\n\n\n**文件:** `.build/war3map.j`"
+    }
+  ],
+  "timestamp": 1772210009344
+}

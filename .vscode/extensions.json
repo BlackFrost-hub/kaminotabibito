@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "Dencer.warcraft-vscode",
+    "sumneko.lua",
+    "ms-vscode.vscode-typescript-next"
+  ],
+  "unwantedRecommendations": []
+}

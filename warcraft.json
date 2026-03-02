@@ -1,0 +1,19 @@
+{
+  "mapdir": "map.w3x",
+  "files": [
+    "src/main.lua",
+    "src/item_modules/equip_system.lua",
+    "src/item_modules/equip_data.lua"
+  ],
+  "lua": {
+    "package": {
+      "path": [
+        "./?.lua",
+        "./?/init.lua",
+        "./Override/?.lua",
+        "./lib/stdlib/?.lua",
+        "./lib/stdlib/?/init.lua"
+      ]
+    }
+  }
+}
