@@ -31,7 +31,7 @@ jassMain.TimerStart(
     false,
     function()
         _G.print("延迟加载装备系统...")
-        local success, result = pcall(function () return require("item_modules.equip_system") end
+        local success, result = pcall(function () return require("系统.装备.装备系统") end
             )
         if success then
             _G.print("装备系统加载完成")

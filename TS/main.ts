@@ -23,7 +23,7 @@ const timer = jassMain.CreateTimer();
 
 jassMain.TimerStart(timer, 0.5, false, () => {
   (globalThis as any).print("延迟加载装备系统...");
-  const [success, result] = pcall(() => require("item_modules.equip_system"));
+  const [success, result] = pcall(() => require("系统.装备.装备系统"));
   if (success) {
     (globalThis as any).print("装备系统加载完成");
   } else {

@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const luaPath = path.join(__dirname, "..", "src", "item_modules", "equip_data.lua");
-const tsPath = path.join(__dirname, "..", "TS", "item_modules", "equip_data.ts");
+const luaPath = path.join(__dirname, "..", "src", "系统", "装备", "装备数据.lua");
+const tsPath = path.join(__dirname, "..", "TS", "系统", "装备", "装备数据.ts");
 
 let content = fs.readFileSync(luaPath, "utf8");
 
@@ -24,7 +24,7 @@ content = content.replace(/^items\s*\[\s*['"]([^'"]+)['"]\s*\]\s*=\s*(\{[^}]+\})
 content = content.replace(/^\s*--.*$/gm, "");
 
 const header = [
-  "/** 物品属性表（由 equip_data.lua 转换） */",
+  "/** 物品属性表（由 装备数据.lua 转换） */",
   "interface ItemDataEntry {",
   "  name?: string;",
   "  level?: string;",

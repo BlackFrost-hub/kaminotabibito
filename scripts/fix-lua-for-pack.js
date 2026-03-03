@@ -57,8 +57,8 @@ function fixFile(filePath) {
 
   // 15. equip_data 使用 export default，返回 { default = items }，需取 .default 才是物品表（仅当还没有 .default 时添加）
   content = content.replace(
-    /local\s+items\s*=\s*require\s*\(\s*"item_modules\.equip_data"\s*\)(?!\s*\.default)/g,
-    "local items = require(\"item_modules.equip_data\").default"
+    /local\s+items\s*=\s*require\s*\(\s*"系统\.装备\.装备数据"\s*\)(?!\s*\.default)/g,
+    "local items = require(\"系统.装备.装备数据\").default"
   );
 
   if (content !== original) {
