@@ -3,7 +3,7 @@
 
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_TempUnit: any; udg_TempIsAdd: boolean; [key: string]: any };
-const items = (require("item_modules.equip_data") as { default: Record<string, ItemData> }).default;
+const items = (require("系统.装备.装备数据") as { default: Record<string, ItemData> }).default;
 
 function fourCCToString(fourcc: number): string {
   const c1 = string.char(fourcc % 256);

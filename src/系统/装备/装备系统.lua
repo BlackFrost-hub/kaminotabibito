@@ -4,7 +4,7 @@ local ____exports = {}
 _G.print("【调试】equip_system 开始加载")
 local jass = require("jass.common")
 local g = require("jass.globals")
-local items = require("item_modules.equip_data").default
+local items = require("系统.装备.装备数据").default
 local function fourCCToString(self, fourcc)
     local c1 = string.char(fourcc % 256)
     local c2 = string.char(math.floor(fourcc / 256) % 256)
