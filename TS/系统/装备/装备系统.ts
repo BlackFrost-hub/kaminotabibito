@@ -61,26 +61,25 @@ function initEvents(): void {
 
     const charges = jass.GetItemCharges(item);
     const mult = charges > 0 ? charges : 1;
-    const isAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
 
     g.udg_TempUnit = unit;
-    g.udg_TempIsAdd = isAdd;
-    g.udg_TempHp = (itemData.hp ?? 0) * mult;
-    g.udg_TempMp = (itemData.mp ?? 0) * mult;
-    g.udg_TempDmg = (itemData.dmg ?? 0) * mult;
-    g.udg_TempArmor = (itemData.armor ?? 0) * mult;
-    g.udg_TempAtkSpeed = (itemData.atkSpeed ?? 0) * mult;
-    g.udg_TempMoveSpeed = ((itemData as any).movespeed ?? itemData.moveSpeed ?? 0) * mult;
-    g.udg_TempStr = (itemData.str ?? 0) * mult;
-    g.udg_TempAgi = (itemData.agi ?? 0) * mult;
-    g.udg_TempInt = (itemData.int ?? 0) * mult;
-    g.udg_TempAll = (itemData.all ?? 0) * mult;
-    g.udg_TempcritRate = (itemData.critRate ?? 0) * mult;
-    g.udg_TempScore = itemData.score ?? 0;
+    g.udg_TempIsAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
+    g.udg_TempHp = itemData.hp ?? 0;
+    g.udg_TempMp = itemData.mp ?? 0;
+    g.udg_TempDmg = itemData.dmg ?? 0;
+    g.udg_TempArmor = itemData.armor ?? 0;
+    g.udg_TempAtkSpeed = itemData.atkSpeed ?? 0;
+    g.udg_TempMoveSpeed = itemData.moveSpeed ?? 0;
+    g.udg_TempStr = itemData.str ?? 0;
+    g.udg_TempAgi = itemData.agi ?? 0;
+    g.udg_TempInt = itemData.int ?? 0;
+    g.udg_TempAll = itemData.all ?? 0;
+    g.udg_TempScore = itemData.score ?? 0
 
 
 
     const playerStats: StatEntry[] = [];
+    const isAdd = g.udg_TempIsAdd;
 
     const addStat = (val: number | undefined, name: string) => {
       if (val == null || val === 0) return;
@@ -119,10 +118,10 @@ function initEvents(): void {
     addStat(itemData.skillResist, "技能抗性");
     addStat(itemData.magicDmg, "魔法伤害");
     addStat(itemData.physDmg, "物理伤害");
-    addStat(itemData.physResist, "物理伤害抗性");
+    addStat(itemData.physResist, "物理抗性");
     addStat(itemData.enhanceDmg, "强化伤害");
     addStat(itemData.atkDmg, "普攻伤害");
-    addStat(itemData.atkResist, "普攻伤害抗性");
+    addStat(itemData.atkResist, "普攻抗性");
     addStat(itemData.lightDmg, "光属性伤害");
     addStat(itemData.lightResist, "光属性抗性");
     addStat(itemData.darkDmg, "暗属性伤害");
@@ -162,6 +161,17 @@ function initEvents(): void {
       g.udg_TempAmount[i + 1] = playerStats[i].value;
     }
 
+    const owner = jass.GetOwningPlayer(g.udg_TempUnit);
+    const playerName = jass.GetPlayerName(owner);
+    const test5Parts: string[] = [];
+    for (const s of playerStats) {
+      const val = jass.YDUserDataGet2 ? jass.YDUserDataGet2("player", owner, s.name, 0) : s.value;
+      test5Parts.push(s.name + "为：" + tostring(Number(val)));
+    }
+    if (test5Parts.length > 0) {
+      jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "测试5：" + playerName + "的当前" + test5Parts.join("，"));
+    }
+
     const actionText = g.udg_TempIsAdd ? "获得" : "丢弃";
     const levelText = itemData.level || "";
     let levelColor: string;
@@ -186,25 +196,13 @@ function initEvents(): void {
     }
     jass.DisplayTimedTextToPlayer(player, 0, 0.01, 5, msg);
 
-    const unitOwner = jass.GetOwningPlayer(g.udg_TempUnit);
-    const isNeutral = unitOwner === jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE);
-    if (!isNeutral) {
-      const r2s = (n: number) => (jass.R2S ? jass.R2S(n) : tostring(n));
-      const op3 = jass.YDWEOperatorString3 || ((a: string, b: string, c: string) => a + b + c);
-      for (let i = 1; i <= g.udg_TempStatCount; i++) {
-        const statName = g.udg_TempString[i];
-        if (!statName) continue;
-        const val = jass.YDUserDataGet2 ? Number(jass.YDUserDataGet2("player", unitOwner, statName, "real")) : (g.udg_TempAmount[i] ?? 0);
-        const msg5 = "测试5：" + op3(jass.GetPlayerName(unitOwner), "的当前", op3(statName, "为：", r2s(val)));
-        if (jass.QuestMessageBJ) jass.QuestMessageBJ(jass.GetPlayersAll(), jass.bj_QUESTMESSAGE_UPDATED, msg5);
-        jass.DisplayTimedTextToPlayer(unitOwner, 0, 0.03, 5, msg5);
-      }
-    }
-
     jass.ExecuteFunc("ApplyItemBonus");
   });
+
+  (globalThis as any).print("【调试】事件监听器创建完成");
 }
 
 // 立即执行：注册拾取/丢弃物品事件（require 时整块执行，initEvents 会运行）
 initEvents();
+(globalThis as any).print("【调试】equip_system 加载完成");
 export { }; // 保持为模块，使 jass/g/items 等为 local，且 require() 会执行本文件
