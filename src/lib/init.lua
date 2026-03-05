@@ -1,4 +1,4 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-require("lib.native")
-require("lib.base")
-require("lib.oop")
+require(nil, "lib.native")
+require(nil, "lib.base")
+require(nil, "lib.oop")

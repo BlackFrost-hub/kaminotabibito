@@ -2,7 +2,6 @@
 const runtime = require("jass.runtime") as { console?: boolean };
 runtime.console = true;
 const jassConsole = require("jass.console") as { write: (s: string) => void };
-const originalPrint = (globalThis as any).print as (...args: any[]) => void;
 
 (globalThis as any).print = (...args: any[]) => {
   let str = "";
@@ -13,25 +12,7 @@ const originalPrint = (globalThis as any).print as (...args: any[]) => void;
   jassConsole.write(str + "\n");
 };
 
-(globalThis as any).print("hello world");
-(globalThis as any).print("hello world");
-(globalThis as any).print("hello world");
-(globalThis as any).print("hello world");
-
-const jassMain = require("jass.common") as JassCommon;
-const timer = jassMain.CreateTimer();
-
-jassMain.TimerStart(timer, 0.5, false, () => {
-  (globalThis as any).print("延迟加载装备系统...");
-  const [success, result] = pcall(() => require("系统.装备.装备系统"));
-  if (success) {
-    (globalThis as any).print("装备系统加载完成");
-  } else {
-    if (originalPrint) {
-      originalPrint("装备系统加载失败:", result);
-    }
-  }
-});
-
-(globalThis as any).print("main.lua Loading complete");
+require("系统.装备.装备提取");
+const [ok, err] = pcall(() => require("系统.装备.装备系统"));
+if (!ok) (globalThis as any).print("装备系统加载失败:", tostring(err));
 export {};

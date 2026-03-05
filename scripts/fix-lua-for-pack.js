@@ -33,8 +33,18 @@ function fixFile(filePath) {
   // 6. jass: -> jass.   JASS 原生函数第一个参数是 handle，不能用冒号
   content = content.replace(/\bjass:/g, "jass.");
 
+  // 6b. blizzard: -> blizzard.   模块调用用点号
+  content = content.replace(/\bblizzard:/g, "blizzard.");
+
+  // 6c. math: -> math.  os: -> os.
+  content = content.replace(/\bmath:/g, "math.");
+  content = content.replace(/\bos:/g, "os.");
+
   // 7. string:char( -> string.char(  Lua 标准库用点号
   content = content.replace(/string:char\s*\(/g, "string.char(");
+
+  // 7b. string:byte( -> string.byte(
+  content = content.replace(/string:byte\s*\(/g, "string.byte(");
 
   // 8. tostring(nil, x) -> tostring(x)
   content = content.replace(/tostring\s*\(\s*nil\s*,\s*/g, "tostring(");
@@ -54,6 +64,12 @@ function fixFile(filePath) {
   );
   // 去掉 pcall 后面的 ), 1, 2 ) 多行
   content = content.replace(/\),\s*\n\s*1\s*,\s*\n\s*2\s*\n\s*\)/g, ")");
+
+  // 14b. local x, y = unpack( pcall(...) ) -> local x, y = pcall(...)  pcall 直接返回多值无需 unpack
+  content = content.replace(
+    /local\s+(\w+)\s*,\s*(\w+)\s*=\s*unpack\s*\(\s*\n\s*pcall\s*\(/g,
+    "local $1, $2 = pcall("
+  );
 
   // 15. equip_data 使用 export default，返回 { default = items }，需取 .default 才是物品表（仅当还没有 .default 时添加）
   content = content.replace(

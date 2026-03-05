@@ -1,46 +1,36 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local runtime = require("jass.runtime")
+local runtime = require(nil, "jass.runtime")
 runtime.console = true
-local jassConsole = require("jass.console")
-local originalPrint = _G.print
-_G.print = function(...)
+local jassConsole = require(nil, "jass.console")
+_G.print = function(____, ...)
     local args = {...}
     local str = ""
     do
         local i = 0
         while i < #args do
-            str = str .. tostring(args[i + 1])
+            str = str .. tostring(nil, args[i + 1])
             if i < #args - 1 then
                 str = str .. "\t"
             end
             i = i + 1
         end
     end
-    jassConsole.write(str .. "\n")
+    jassConsole:write(str .. "\n")
 end
-_G.print("hello world")
-_G.print("hello world")
-_G.print("hello world")
-_G.print("hello world")
-local jassMain = require("jass.common")
-local timer = jassMain.CreateTimer()
-jassMain.TimerStart(
-    timer,
-    0.5,
-    false,
-    function()
-        _G.print("延迟加载装备系统...")
-        local success, result = pcall(function () return require("系统.装备.装备系统") end
-            )
-        if success then
-            _G.print("装备系统加载完成")
-        else
-            if originalPrint then
-                originalPrint("装备系统加载失败:", result)
-            end
-        end
-    end
+require(nil, "系统.装备.装备提取")
+local ok, err = unpack(
+    pcall(
+        nil,
+        function() return require(nil, "系统.装备.装备系统") end
+    ),
+    1,
+    2
 )
-_G.print("main.lua Loading complete")
+if not ok then
+    _G:print(
+        "装备系统加载失败:",
+        tostring(nil, err)
+    )
+end
 return ____exports
