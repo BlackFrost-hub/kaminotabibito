@@ -1,15 +1,8 @@
-// 装备提取.ts - 玩家输入 233 时创建装备，该玩家第一英雄拾取
+// 装备提取.ts - 玩家选择单位时创建 200-250 分随机装备并让英雄拾取
 const jass = require("jass.common") as JassCommon;
 const mod = require("系统.装备.装备数据") as { items?: Record<string, { score?: number; name?: string }>; default?: Record<string, { score?: number; name?: string }> };
 const itemsData = mod.items ?? mod.default ?? {};
-
-function getFirstHeroOfPlayer(p: any): any {
-  const g = jass.CreateGroup();
-  jass.GroupEnumUnitsOfPlayer(g, p, jass.Filter(() => jass.IsUnitType(jass.GetFilterUnit(), jass.UNIT_TYPE_HERO)));
-  const u = jass.FirstOfGroup(g);
-  jass.DestroyGroup(g);
-  return u;
-}
+let once = false;
 
 // FourCC 大端序：首字符为高字节。Lua 的 string.byte(s,1,4) 一次返回 4 个字节
 function stringToFourCC(s: string): number {
@@ -52,22 +45,22 @@ function createRandomItemInScoreRange(minScore: number, maxScore: number, x: num
   return jass.CreateItem(fourcc, x, y);
 }
 
-function onChat233(): void {
+function onUnitSelected(): void {
+  if (once) return;
+  once = true;
   math.randomseed(os.clock() * 1000000);
   const [ok, item] = pcall(() => createRandomItemInScoreRange(200, 250, 0, 0));
   if (ok && item) {
-    const player = jass.GetTriggerPlayer();
-    const hero = getFirstHeroOfPlayer(player);
-    if (hero) jass.IssueNeutralTargetOrder(player, hero, "smart", item);
-  } else if (!ok) (globalThis as any).print("【装备提取】错误:", tostring(item));
+    jass.IssueTargetOrder(jass.GetSelectedUnit(), "smart", item);
+  } else if (!ok) {
+    (globalThis as any).print("【装备提取】错误:", tostring(item));
+  }
 }
 
 function init(): void {
   const trig = jass.CreateTrigger();
-  for (let i = 0; i <= 11; i++) {
-    jass.TriggerRegisterPlayerChatEvent(trig, jass.Player(i), "233", true);
-  }
-  jass.TriggerAddAction(trig, onChat233);
+  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(0), jass.EVENT_PLAYER_UNIT_SELECTED, null);
+  jass.TriggerAddAction(trig, onUnitSelected);
 }
 init();
 export {};

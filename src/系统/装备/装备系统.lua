@@ -2,14 +2,14 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local jass = require(nil, "jass.common")
-local g = require(nil, "jass.globals")
-local items = require(nil, "系统.装备.装备数据").default
+local jass = require("jass.common")
+local g = require("jass.globals")
+local items = require("系统.装备.装备数据").default
 local function fourCCToString(self, fourcc)
-    local c1 = string:char(fourcc % 256)
-    local c2 = string:char(math.floor(fourcc / 256) % 256)
-    local c3 = string:char(math.floor(fourcc / 65536) % 256)
-    local c4 = string:char(math.floor(fourcc / 16777216) % 256)
+    local c1 = string.char(fourcc % 256)
+    local c2 = string.char(math.floor(fourcc / 256) % 256)
+    local c3 = string.char(math.floor(fourcc / 65536) % 256)
+    local c4 = string.char(math.floor(fourcc / 16777216) % 256)
     return ((c4 .. c3) .. c2) .. c1
 end
 local percentNames = {
@@ -28,51 +28,51 @@ local percentNames = {
     "攻速"
 }
 local function initEvents(self)
-    local trig = jass:CreateTrigger()
+    local trig = jass.CreateTrigger()
     do
         local i = 0
         while i <= 7 do
-            jass:TriggerRegisterPlayerUnitEvent(
+            jass.TriggerRegisterPlayerUnitEvent(
                 trig,
-                jass:Player(i),
+                jass.Player(i),
                 jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
                 nil
             )
-            jass:TriggerRegisterPlayerUnitEvent(
+            jass.TriggerRegisterPlayerUnitEvent(
                 trig,
-                jass:Player(i),
+                jass.Player(i),
                 jass.EVENT_PLAYER_UNIT_DROP_ITEM,
                 nil
             )
             i = i + 1
         end
     end
-    jass:TriggerRegisterPlayerUnitEvent(
+    jass.TriggerRegisterPlayerUnitEvent(
         trig,
-        jass:Player(12),
+        jass.Player(12),
         jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
         nil
     )
-    jass:TriggerRegisterPlayerUnitEvent(
+    jass.TriggerRegisterPlayerUnitEvent(
         trig,
-        jass:Player(12),
+        jass.Player(12),
         jass.EVENT_PLAYER_UNIT_DROP_ITEM,
         nil
     )
-    jass:TriggerAddAction(
+    jass.TriggerAddAction(
         trig,
         function()
-            local item = jass:GetManipulatedItem()
-            local unit = jass:GetManipulatingUnit()
-            local player = jass:GetOwningPlayer(unit)
-            local itemId = jass:GetItemTypeId(item)
-            local event = jass:GetTriggerEventId()
+            local item = jass.GetManipulatedItem()
+            local unit = jass.GetManipulatingUnit()
+            local player = jass.GetOwningPlayer(unit)
+            local itemId = jass.GetItemTypeId(item)
+            local event = jass.GetTriggerEventId()
             local idStr = fourCCToString(nil, itemId)
             local itemData = items[idStr]
             if not itemData then
                 return
             end
-            local charges = jass:GetItemCharges(item)
+            local charges = jass.GetItemCharges(item)
             local mult = charges > 0 and charges or 1
             local isAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
             g.udg_TempUnit = unit
@@ -117,7 +117,7 @@ local function initEvents(self)
             addStat(nil, itemData.dmg, "攻击力")
             addStat(nil, itemData.armor, "护甲")
             addStat(nil, itemData.atkSpeed, "攻速")
-            addStat(nil, itemData.movespeed, "移速")
+            addStat(nil, itemData.movespeed, "移动速度(可叠加)")
             addStat(nil, itemData.str, "力量")
             addStat(nil, itemData.agi, "敏捷")
             addStat(nil, itemData.int, "智力")
@@ -142,10 +142,10 @@ local function initEvents(self)
             addStat(nil, itemData.skillResist, "技能抗性")
             addStat(nil, itemData.magicDmg, "魔法伤害")
             addStat(nil, itemData.physDmg, "物理伤害")
-            addStat(nil, itemData.physResist, "物理伤害抗性")
+            addStat(nil, itemData.physResist, "物理抗性")
             addStat(nil, itemData.enhanceDmg, "强化伤害")
             addStat(nil, itemData.atkDmg, "普攻伤害")
-            addStat(nil, itemData.atkResist, "普攻伤害抗性")
+            addStat(nil, itemData.atkResist, "普攻抗性")
             addStat(nil, itemData.lightDmg, "光属性伤害")
             addStat(nil, itemData.lightResist, "光属性抗性")
             addStat(nil, itemData.darkDmg, "暗属性伤害")
@@ -215,18 +215,18 @@ local function initEvents(self)
                     msg = msg .. ((" " .. stat.name) .. sign) .. tostring(stat.value)
                 end
             end
-            jass:DisplayTimedTextToPlayer(
+            jass.DisplayTimedTextToPlayer(
                 player,
                 0,
                 0.01,
                 5,
                 msg
             )
-            local unitOwner = jass:GetOwningPlayer(g.udg_TempUnit)
-            local isNeutral = unitOwner == jass:Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+            local unitOwner = jass.GetOwningPlayer(g.udg_TempUnit)
+            local isNeutral = unitOwner == jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
             if not isNeutral then
                 local function r2s(____, n)
-                    return jass.R2S and jass:R2S(n) or tostring(nil, n)
+                    return jass.R2S and jass.R2S(n) or tostring(n)
                 end
                 local op3 = jass.YDWEOperatorString3 or (function(____, a, b, c) return (a .. b) .. c end)
                 do
@@ -242,7 +242,7 @@ local function initEvents(self)
                                 end
                                 local ____jass_YDUserDataGet2_4
                                 if jass.YDUserDataGet2 then
-                                    ____jass_YDUserDataGet2_4 = __TS__Number(jass:YDUserDataGet2("player", unitOwner, statName, "real"))
+                                    ____jass_YDUserDataGet2_4 = __TS__Number(jass.YDUserDataGet2("player", unitOwner, statName, "real"))
                                 else
                                     local ____g_udg_TempAmount_i_3 = g.udg_TempAmount[i]
                                     if ____g_udg_TempAmount_i_3 == nil then
@@ -253,7 +253,7 @@ local function initEvents(self)
                                 local val = ____jass_YDUserDataGet2_4
                                 local msg5 = "测试5：" .. op3(
                                     nil,
-                                    jass:GetPlayerName(unitOwner),
+                                    jass.GetPlayerName(unitOwner),
                                     "的当前",
                                     op3(
                                         nil,
@@ -263,13 +263,13 @@ local function initEvents(self)
                                     )
                                 )
                                 if jass.QuestMessageBJ then
-                                    jass:QuestMessageBJ(
-                                        jass:GetPlayersAll(),
+                                    jass.QuestMessageBJ(
+                                        jass.GetPlayersAll(),
                                         jass.bj_QUESTMESSAGE_UPDATED,
                                         msg5
                                     )
                                 end
-                                jass:DisplayTimedTextToPlayer(
+                                jass.DisplayTimedTextToPlayer(
                                     unitOwner,
                                     0,
                                     0.03,
@@ -286,7 +286,7 @@ local function initEvents(self)
                     end
                 end
             end
-            jass:ExecuteFunc("ApplyItemBonus")
+            jass.ExecuteFunc("ApplyItemBonus")
         end
     )
 end
