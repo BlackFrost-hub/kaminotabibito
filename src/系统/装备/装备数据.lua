@@ -6,8 +6,7 @@ ____exports.items.I00V = {
     goldPrice = 100,
     score = 216,
     level = "E-",
-    dmg = 8,
-    dmgBonus = 1000
+    dmg = 8
 }
 ____exports.items.I00E = {
     name = "生命树枝",
@@ -37,7 +36,8 @@ ____exports.items.I00P = {
     goldPrice = 100,
     score = 295,
     level = "E-",
-    dmg = 2
+    dmg = 2,
+    all = 2
 }
 ____exports.items.I01K = {
     name = "初心戒指",
@@ -75,7 +75,13 @@ ____exports.items.I01X = {
     magicResist = 0.2,
     armor = 5
 }
-____exports.items.I00C = {name = "树枝骨干", goldPrice = 200, score = 481, level = "E"}
+____exports.items.I00C = {
+    name = "树枝骨干",
+    goldPrice = 200,
+    score = 481,
+    level = "E",
+    all = 4
+}
 ____exports.items.I0CN = {
     name = "异端审查证",
     goldPrice = 1000,
@@ -119,7 +125,8 @@ ____exports.items.I00K = {
     goldPrice = 300,
     score = 675,
     level = "E+",
-    dmg = 4
+    dmg = 4,
+    all = 4
 }
 ____exports.items.I022 = {
     name = "地精长矛",
@@ -155,7 +162,8 @@ ____exports.items.I021 = {
     goldPrice = 100,
     score = 809,
     level = "E++",
-    hp = 100
+    hp = 100,
+    physResist = 0.1
 }
 ____exports.items.I01E = {
     name = "魔力雷锤",
@@ -188,14 +196,16 @@ ____exports.items.I00L = {
     goldPrice = 400,
     score = 875,
     level = "E++",
-    dmg = 6
+    dmg = 6,
+    all = 6
 }
 ____exports.items.I00M = {
     name = "树枝骨干+3",
     goldPrice = 500,
     score = 937,
     level = "E++",
-    dmg = 8
+    dmg = 8,
+    all = 6
 }
 ____exports.items.I01U = {
     name = "豺狼皮甲",
@@ -310,7 +320,13 @@ ____exports.items.I02D = {
     hp = 500
 }
 ____exports.items.I03U = {name = "血浴之母的第四条左腿", goldPrice = 100, score = 1181, level = "D-"}
-____exports.items.I03R = {name = "血浴之母的第三条右腿", goldPrice = 100, score = 1203, level = "D-"}
+____exports.items.I03R = {
+    name = "血浴之母的第三条右腿",
+    goldPrice = 100,
+    score = 1203,
+    level = "D-",
+    all = 10
+}
 ____exports.items.I02G = {
     name = "皮裤",
     goldPrice = 100,
@@ -393,7 +409,8 @@ ____exports.items.I00F = {
     goldPrice = 250,
     score = 1367,
     level = "D-",
-    dmg = 15
+    dmg = 15,
+    all = 8
 }
 ____exports.items.I02R = {
     name = "傀岩杖",
@@ -418,7 +435,8 @@ ____exports.items.I00N = {
     goldPrice = 600,
     score = 1413,
     level = "D-",
-    dmg = 10
+    dmg = 10,
+    all = 8
 }
 ____exports.items.I0CU = {
     name = "史莱姆瓶",
@@ -682,6 +700,7 @@ ____exports.items.I09U = {
     goldPrice = 1000,
     score = 2048,
     level = "D+",
+    all = 10,
     hpRegen = 30,
     mp = 250,
     mpRegen = 5
@@ -787,6 +806,7 @@ ____exports.items.I055 = {
     goldPrice = 1000,
     score = 2650,
     level = "D++",
+    all = 15,
     armor = 8,
     hp = 150,
     physResist = 0.15
@@ -803,6 +823,7 @@ ____exports.items.I0CK = {
     goldPrice = 1500,
     score = 2675,
     level = "D++",
+    all = 8,
     mpRegen = 10,
     cdReduction = 0.2
 }
@@ -836,6 +857,7 @@ ____exports.items.I089 = {
     goldPrice = 1000,
     score = 2745,
     level = "D++",
+    all = 6,
     hp = 300,
     hpRegen = 50,
     hpRegenEff = 0.25
@@ -1075,6 +1097,7 @@ ____exports.items.I05N = {
     goldPrice = 10000,
     score = 3566,
     level = "C",
+    all = 25,
     magicResist = 0.25,
     hp = 200,
     mp = 200
@@ -1214,6 +1237,7 @@ ____exports.items.I03B = {
     goldPrice = 8000,
     score = 3830,
     level = "C",
+    all = 25,
     hpRegenEff = 0.5,
     mpCost = -0.2,
     movespeed = 20
@@ -1414,6 +1438,7 @@ ____exports.items.I0C4 = {
     score = 4757,
     level = "C+",
     dmg = 25,
+    all = 25,
     armorPierce = 0.35
 }
 ____exports.items.I0C2 = {
@@ -1443,6 +1468,7 @@ ____exports.items.I0C6 = {
     armor = 15,
     hp = 1200,
     hpRegen = 100,
+    physResist = 0.1,
     woodResist = 0.1
 }
 ____exports.items.I0BH = {
@@ -1733,6 +1759,7 @@ ____exports.items.I063 = {
     goldPrice = 300,
     level = "E",
     dmg = 20,
+    all = 5,
     hpRegen = 20,
     mpRegen = 5,
     magicDmg = 0.05
@@ -1773,7 +1800,8 @@ ____exports.items.I06A = {
     dmg = 30,
     critRate = 0.1,
     critDmg = 0.15,
-    magicResist = 0.1
+    magicResist = 0.1,
+    physResist = 0.1
 }
 ____exports.items.I06B = {
     name = "安恶之鞋",
@@ -1884,6 +1912,7 @@ ____exports.items.I06O = {
     goldPrice = 2000,
     level = "D+",
     dmg = 50,
+    all = 10,
     hp = 1000
 }
 ____exports.items.I06P = {
@@ -1906,6 +1935,7 @@ ____exports.items.I06R = {
     goldPrice = 5000,
     level = "D+",
     dmg = 60,
+    all = 20,
     hp = -500,
     lifeSteal = 0.1
 }
@@ -2007,6 +2037,7 @@ ____exports.items.I077 = {
     name = "狱生面具",
     goldPrice = 1000,
     level = "D++",
+    all = 25,
     critDmg = -0.5,
     critDmgTaken = -0.5
 }
@@ -2014,6 +2045,7 @@ ____exports.items.I078 = {
     name = "狱生面具（强化）",
     goldPrice = 1500,
     level = "C-",
+    all = 25,
     critDmg = -0.5,
     critDmgTaken = -0.5
 }
@@ -2099,6 +2131,7 @@ ____exports.items.I07J = {
     goldPrice = 1500,
     level = "C-",
     dmg = 1,
+    all = 1,
     hpRegen = 1,
     mpRegen = 1,
     magicDmg = 0.45
@@ -2138,6 +2171,7 @@ ____exports.items.I07O = {
     name = "冥炎之裙",
     goldPrice = 1750,
     dmg = 40,
+    all = 15,
     hp = 1500,
     mp = 1000
 }
@@ -2247,7 +2281,7 @@ ____exports.items.I084 = {
     cdReduction = 0.2,
     dmgReduction = 100
 }
-____exports.items.I085 = {name = "焰虚宝珠", goldPrice = 1000, skillHeal = 0.35}
+____exports.items.I085 = {name = "焰虚宝珠", goldPrice = 1000, all = 40, skillHeal = 0.35}
 ____exports.items.I086 = {name = "统领之甲", goldPrice = 2000, armor = 25, hp = 2500}
 ____exports.items.I087 = {
     name = "|cff666699统领战盔|r",

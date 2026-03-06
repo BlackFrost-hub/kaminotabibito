@@ -26,6 +26,8 @@ interface JassCommon {
   TriggerRegisterPlayerUnitEvent: (trig: any, player: any, event: number, filter: any) => void;
   TriggerRegisterPlayerChatEvent: (trig: any, player: any, msg: string, exact: boolean) => void;
   TriggerAddAction: (trig: any, fn: () => void) => void;
+  STES_Register: (trg: any, eventName: string) => void;
+  STES_Trigger: (eventName: string) => void;
   GetTriggerPlayer: () => any;
   GetManipulatedItem: () => any;
   GetManipulatingUnit: () => any;

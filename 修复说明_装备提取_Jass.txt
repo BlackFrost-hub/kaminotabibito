@@ -1,0 +1,26 @@
+//===========================================================================
+// 装备提取：任意玩家输入任意聊天触发，按分数范围随机选1个写入 udg_TempItemType
+//===========================================================================
+//
+// 1. WE 中需有变量：udg_TempItemType(integer)、udg_TempItem(item)
+// 2. 调用前设置 udg_TempScoreMin、udg_TempScoreMax（如 200、250），未设置时默认 200-250
+// 3. 任意玩家输入任意聊天后，Lua 在范围内随机选1个物品写入 udg_TempItemType
+// 4. Jass 读取 udg_TempItemType 创建物品
+//===========================================================================
+
+function EquipExtract_CreateItem takes nothing returns nothing
+    local integer tid
+    local real x
+    local real y
+    set tid = udg_TempItemType
+    if tid <= 0 then
+        return
+    endif
+    set udg_TempItemType = 0
+    set x = (GetRandomReal(0.0, 1.0) - 0.5) * 50.0
+    set y = (GetRandomReal(0.0, 1.0) - 0.5) * 50.0
+    set udg_TempItem = CreateItem(tid, x, y)
+    if udg_TempUnit != null then
+        call UnitAddItem(udg_TempUnit, udg_TempItem)
+    endif
+endfunction

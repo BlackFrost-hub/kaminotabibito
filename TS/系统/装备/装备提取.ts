@@ -1,10 +1,12 @@
-// 装备提取.ts - 玩家选择单位时创建 200-250 分随机装备并让英雄拾取
+// 装备提取.ts - 聊天/拾取树枝触发，按 udg_TempScoreMin/Max 随机选1个物品写入 udg_TempItemType
 const jass = require("jass.common") as JassCommon;
-const mod = require("系统.装备.装备数据") as { items?: Record<string, { score?: number; name?: string }>; default?: Record<string, { score?: number; name?: string }> };
+const g = require("jass.globals") as { udg_TempItemType?: number; udg_TempScoreMin?: number; udg_TempScoreMax?: number; [key: string]: any };
+const mod = require("系统.装备.装备数据") as { items?: Record<string, { score?: number }>; default?: Record<string, { score?: number }> };
 const itemsData = mod.items ?? mod.default ?? {};
-let once = false;
+let _seedCnt = 0;
+const DEBUG = true;
+const ITEM_TRIGGER = "tret"; // 触发物品ID
 
-// FourCC 大端序：首字符为高字节。Lua 的 string.byte(s,1,4) 一次返回 4 个字节
 function stringToFourCC(s: string): number {
   const b1 = (string as any).byte(s, 1) as number;
   const b2 = (string as any).byte(s, 2) as number;
@@ -14,53 +16,72 @@ function stringToFourCC(s: string): number {
 }
 
 function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
+  const min = minScore ?? 0;
+  const max = maxScore ?? 0;
   const result: string[] = [];
   for (const id of Object.keys(itemsData)) {
     if (typeof id !== "string" || id.length !== 4) continue;
     const entry = itemsData[id];
     if (!entry) continue;
     const score = entry.score;
-    if (score != null && score >= minScore && score <= maxScore) {
-      result.push(id);
-    }
+    if (score != null && score >= min && score <= max) result.push(id);
   }
   return result;
 }
 
-function shuffleArray<T>(arr: T[]): T[] {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+function EquipExtract_CreateByLevel(): void {
+  _seedCnt++;
+  math.randomseed(_seedCnt);
+  let minS = Number(g.udg_TempScoreMin) || 0;
+  let maxS = Number(g.udg_TempScoreMax) || 0;
+  if (minS <= 0 && maxS <= 0) {
+    minS = 200;
+    maxS = 250;
   }
-  return a;
+  const candidates = getItemsByScoreRange(minS, maxS);
+  const player = (jass as any).STES_GetTriggerPlayer?.() ?? jass.GetTriggerPlayer?.() ?? jass.Player(0);
+  if (candidates.length === 0) {
+    g.udg_TempItemType = 0;
+    if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "TempItemType=0 无候选 min=" + minS + " max=" + maxS);
+    return;
+  }
+  const arr = candidates.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  const itemId = arr[0];
+  g.udg_TempItemType = typeof itemId === "string" && itemId.length === 4 ? stringToFourCC(itemId) : 0;
+  if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "TempItemType=" + g.udg_TempItemType + " itemId=" + itemId);
 }
 
-function createRandomItemInScoreRange(minScore: number, maxScore: number, x: number, y: number): any {
-  const candidates = shuffleArray(getItemsByScoreRange(minScore, maxScore));
-  if (candidates.length === 0) return null;
-  const itemId = candidates[0];
-  if (typeof itemId !== "string" || itemId.length !== 4) return null;
-  const fourcc = stringToFourCC(itemId);
-  return jass.CreateItem(fourcc, x, y);
+function dbg(msg: string): void {
+  if (DEBUG) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[装备提取] " + msg);
 }
 
-function onUnitSelected(): void {
-  if (once) return;
-  once = true;
-  math.randomseed(os.clock() * 1000000);
-  const [ok, item] = pcall(() => createRandomItemInScoreRange(200, 250, 0, 0));
-  if (ok && item) {
-    jass.IssueTargetOrder(jass.GetSelectedUnit(), "smart", item);
-  } else if (!ok) {
-    (globalThis as any).print("【装备提取】错误:", tostring(item));
+function onTrigger(): void {
+  const evt = jass.GetTriggerEventId();
+  const player = jass.GetTriggerPlayer?.() ?? jass.Player(0);
+  if (evt === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM) {
+    if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "拾取事件被触发");
+    const item = jass.GetManipulatedItem();
+    const tid = jass.GetItemTypeId(item);
+    if (tid !== stringToFourCC(ITEM_TRIGGER)) return; // 非 tret 不触发
+    if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "物品ID正确");
   }
+  EquipExtract_CreateByLevel();
 }
 
 function init(): void {
+  (globalThis as any).EquipExtract_CreateByLevel = EquipExtract_CreateByLevel;
   const trig = jass.CreateTrigger();
-  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(0), jass.EVENT_PLAYER_UNIT_SELECTED, null);
-  jass.TriggerAddAction(trig, onUnitSelected);
+
+  // 玩家1-4拾取物品
+  for (let i = 0; i < 4; i++) {
+    jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), jass.EVENT_PLAYER_UNIT_PICKUP_ITEM, undefined!);
+  }
+
+  jass.TriggerAddAction(trig, onTrigger);
 }
 init();
-export {};
+export { EquipExtract_CreateByLevel };

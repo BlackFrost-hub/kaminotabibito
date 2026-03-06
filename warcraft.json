@@ -2,6 +2,7 @@
   "mapdir": "map.w3x",
   "files": [
     "src/main.lua",
+    "src/jass/stes_expose.lua",
     "src/系统/装备/装备提取.lua",
     "src/系统/装备/装备系统.lua",
     "src/系统/装备/装备数据.lua"
