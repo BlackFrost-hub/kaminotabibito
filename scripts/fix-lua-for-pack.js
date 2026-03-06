@@ -55,6 +55,12 @@ function fixFile(filePath) {
   // 10. originalPrint(nil, -> originalPrint(
   content = content.replace(/originalPrint\s*\(\s*nil\s*,\s*/g, "originalPrint(");
 
+  // 10b. STES_Register 仅两参 (trig, eventName)，去掉 TSTL 多传的 nil
+  content = content.replace(/stesRegister\s*\(\s*nil\s*,\s*(\w+)\s*,\s*("([^"]*)"|'([^']*)')\s*\)/g, (m, trig, _q, dq, sq) => {
+    const ev = dq !== undefined ? dq : sq;
+    return "stesRegister(" + trig + ", " + JSON.stringify(ev) + ")";
+  });
+
   // 11~13. fourCCToString/addStat/initEvents 保留 (nil, ...) 因 TSTL 生成的是 (self, ...) 需要第一个参数
 
   // 14. unpack(pcall(...), 1, 2) -> pcall(...)   Lua 的 pcall 直接返回 (ok, result)

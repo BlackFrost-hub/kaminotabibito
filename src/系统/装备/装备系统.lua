@@ -1,6 +1,6 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__Number = ____lualib.__TS__Number
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
@@ -74,34 +74,25 @@ local function initEvents(self)
             end
             local charges = jass.GetItemCharges(item)
             local mult = charges > 0 and charges or 1
-            local isAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
             g.udg_TempUnit = unit
-            g.udg_TempIsAdd = isAdd
-            g.udg_TempHp = (itemData.hp or 0) * mult
-            g.udg_TempMp = (itemData.mp or 0) * mult
-            g.udg_TempDmg = (itemData.dmg or 0) * mult
-            g.udg_TempArmor = (itemData.armor or 0) * mult
-            g.udg_TempAtkSpeed = (itemData.atkSpeed or 0) * mult
-            local ____itemData_movespeed_0 = itemData.movespeed
-            if ____itemData_movespeed_0 == nil then
-                ____itemData_movespeed_0 = itemData.moveSpeed
+            g.udg_TempIsAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+            g.udg_TempHp = itemData.hp or 0
+            g.udg_TempMp = itemData.mp or 0
+            g.udg_TempDmg = itemData.dmg or 0
+            g.udg_TempArmor = itemData.armor or 0
+            g.udg_TempAtkSpeed = itemData.atkSpeed or 0
+            g.udg_TempMoveSpeed = itemData.moveSpeed or 0
+            g.udg_TempStr = itemData.str or 0
+            g.udg_TempAgi = itemData.agi or 0
+            g.udg_TempInt = itemData.int or 0
+            g.udg_TempAll = itemData.all or 0
+            local ____itemData_score_0 = itemData.score
+            if ____itemData_score_0 == nil then
+                ____itemData_score_0 = 0
             end
-            local ____itemData_movespeed_0_1 = ____itemData_movespeed_0
-            if ____itemData_movespeed_0_1 == nil then
-                ____itemData_movespeed_0_1 = 0
-            end
-            g.udg_TempMoveSpeed = ____itemData_movespeed_0_1 * mult
-            g.udg_TempStr = (itemData.str or 0) * mult
-            g.udg_TempAgi = (itemData.agi or 0) * mult
-            g.udg_TempInt = (itemData.int or 0) * mult
-            g.udg_TempAll = (itemData.all or 0) * mult
-            g.udg_TempcritRate = (itemData.critRate or 0) * mult
-            local ____itemData_score_2 = itemData.score
-            if ____itemData_score_2 == nil then
-                ____itemData_score_2 = 0
-            end
-            g.udg_TempScore = ____itemData_score_2
+            g.udg_TempScore = ____itemData_score_0
             local playerStats = {}
+            local isAdd = g.udg_TempIsAdd
             local function addStat(____, val, name)
                 if val == nil or val == 0 then
                     return
@@ -117,7 +108,7 @@ local function initEvents(self)
             addStat(nil, itemData.dmg, "攻击力")
             addStat(nil, itemData.armor, "护甲")
             addStat(nil, itemData.atkSpeed, "攻速")
-            addStat(nil, itemData.movespeed, "移动速度(可叠加)")
+            addStat(nil, itemData.movespeed, "移速")
             addStat(nil, itemData.str, "力量")
             addStat(nil, itemData.agi, "敏捷")
             addStat(nil, itemData.int, "智力")
@@ -186,6 +177,29 @@ local function initEvents(self)
                     i = i + 1
                 end
             end
+            local owner = jass.GetOwningPlayer(g.udg_TempUnit)
+            local playerName = jass.GetPlayerName(owner)
+            local test5Parts = {}
+            for ____, s in ipairs(playerStats) do
+                local ____jass_YDUserDataGet2_1
+                if jass.YDUserDataGet2 then
+                    ____jass_YDUserDataGet2_1 = jass.YDUserDataGet2("player", owner, s.name, 0)
+                else
+                    ____jass_YDUserDataGet2_1 = s.value
+                end
+                local val = ____jass_YDUserDataGet2_1
+                test5Parts[#test5Parts + 1] = (s.name .. "为：") .. tostring(__TS__Number(val)
+                )
+            end
+            if #test5Parts > 0 then
+                jass.DisplayTimedTextToPlayer(
+                    owner,
+                    0,
+                    0.02,
+                    5,
+                    (("测试5：" .. playerName) .. "的当前") .. table.concat(test5Parts, "，")
+                )
+            end
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"
             local levelText = itemData.level or ""
             local levelColor
@@ -222,73 +236,11 @@ local function initEvents(self)
                 5,
                 msg
             )
-            local unitOwner = jass.GetOwningPlayer(g.udg_TempUnit)
-            local isNeutral = unitOwner == jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
-            if not isNeutral then
-                local function r2s(____, n)
-                    return jass.R2S and jass.R2S(n) or tostring(n)
-                end
-                local op3 = jass.YDWEOperatorString3 or (function(____, a, b, c) return (a .. b) .. c end)
-                do
-                    local i = 1
-                    while i <= g.udg_TempStatCount do
-                        do
-                            local __continue28
-                            repeat
-                                local statName = g.udg_TempString[i]
-                                if not statName then
-                                    __continue28 = true
-                                    break
-                                end
-                                local ____jass_YDUserDataGet2_4
-                                if jass.YDUserDataGet2 then
-                                    ____jass_YDUserDataGet2_4 = __TS__Number(jass.YDUserDataGet2("player", unitOwner, statName, "real"))
-                                else
-                                    local ____g_udg_TempAmount_i_3 = g.udg_TempAmount[i]
-                                    if ____g_udg_TempAmount_i_3 == nil then
-                                        ____g_udg_TempAmount_i_3 = 0
-                                    end
-                                    ____jass_YDUserDataGet2_4 = ____g_udg_TempAmount_i_3
-                                end
-                                local val = ____jass_YDUserDataGet2_4
-                                local msg5 = "测试5：" .. op3(
-                                    nil,
-                                    jass.GetPlayerName(unitOwner),
-                                    "的当前",
-                                    op3(
-                                        nil,
-                                        statName,
-                                        "为：",
-                                        r2s(nil, val)
-                                    )
-                                )
-                                if jass.QuestMessageBJ then
-                                    jass.QuestMessageBJ(
-                                        jass.GetPlayersAll(),
-                                        jass.bj_QUESTMESSAGE_UPDATED,
-                                        msg5
-                                    )
-                                end
-                                jass.DisplayTimedTextToPlayer(
-                                    unitOwner,
-                                    0,
-                                    0.03,
-                                    5,
-                                    msg5
-                                )
-                                __continue28 = true
-                            until true
-                            if not __continue28 then
-                                break
-                            end
-                        end
-                        i = i + 1
-                    end
-                end
-            end
             jass.ExecuteFunc("ApplyItemBonus")
         end
     )
+    _G.print("【调试】事件监听器创建完成")
 end
 initEvents(nil)
+_G.print("【调试】equip_system 加载完成")
 return ____exports
