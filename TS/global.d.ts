@@ -56,7 +56,10 @@ interface JassCommon {
   YDWESyStemAnyUnitDamagedRegistTrigger?: (trg: any) => void;
   YDWEOperatorString3?: (a: string, b: string, c: string) => string;
   YDUserDataGet2?: (type: any, handle: any, name: string, kind: any) => any;
-  YDUserDataSet2?: (type: any, handle: any, name: string, kind: any, value: any) => void;
+  YDUserDataSet2?: (type: any, handle: any, name: string, kind: any, value: number) => void;
+  /** YDWESaveAnyTypeDataByUserData: 设置 [type] handle 的 name 为 value (kind=值类型) */
+  YDUserDataSet?: (type: string, handle: any, name: string, kind: string, value: any) => void;
+  /** YDWELoadAnyTypeDataByUserData: 获取 [type] handle 的 name，kind 为属性/返回值类型 */
   YDUserDataGet?: (type: string, handle: any, name: string, kind: string) => any;
   YDUserDataHas?: (type: string, handle: any, name: string, kind: string) => boolean;
   OperatorRealAdd?: (a: number, b: number) => number;
@@ -68,6 +71,10 @@ interface JassCommon {
   YDLocal1Release?: () => void;
   YDLocal2Set?: (ty: string, key: string, val: any) => void;
   YDLocal2Get?: (ty: string, key: string) => any;
+  YDLocal5Set?: (ty: string, key: string, val: any) => void;
+  YDLocal5Get?: (ty: string, key: string) => any;
+  YDLocal7Set?: (ty: string, key: string, val: any) => void;
+  YDLocal7Get?: (ty: string, key: string) => any;
   YDLocalInitialize?: () => void;
   YDWEIsEventDamageType?: (t: number) => boolean;
   YDWEIsEventAttackType?: (t: number) => boolean;
@@ -80,6 +87,8 @@ interface JassCommon {
   Condition?: (fn: () => boolean) => any;
   TriggerAddCondition?: (trg: any, cond: any) => void;
   ConvertUnitState?: (i: number) => number;
+  Ir_GetUnitAttackType?: (u: any) => number;
+  Ir_SetUnitAttackType?: (u: any, atp: number) => void;
   CreateTextTagLocBJ?: (s: string, loc: any, size: number, red: number, green: number, blue: number, trans: number) => any;
   SetTextTagVelocity?: (tt: any, speed: number, angle: number) => void;
   GetUnitLoc?: (u: any) => any;
@@ -125,6 +134,7 @@ interface BlizzardJass {
   jass: JassCommon;
 }
 
+/** jass.japi - 扩展 JASS 原生函数 (Blz* 等)，require 后注入到 jass.common */
 /** Lua global print - variadic */
 declare var print: (...args: any[]) => void;
 

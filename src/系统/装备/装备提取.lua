@@ -48,31 +48,48 @@ local function getItemsByScoreRange(self, minScore, maxScore)
     return result
 end
 local function EquipExtract_CreateByLevel(self)
+    local ____this_1
+    ____this_1 = _G
+    local ____opt_0 = ____this_1.print
+    if ____opt_0 ~= nil then
+        _G.print("[装备提取] EquipExtract_CreateByLevel 被调用")
+    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
+        0,
+        0,
+        10,
+        "[装备提取] 执行中"
+    )
     _seedCnt = _seedCnt + 1
     math.randomseed(_seedCnt)
-    local minS = __TS__Number(g.udg_TempScoreMin) or 0
-    local maxS = __TS__Number(g.udg_TempScoreMax) or 0
+    local ____opt_2 = jass.YDLocal1Get
+    local inputMin = ____opt_2 and ____opt_2(jass, "integer", "EquipExtract_MinScore")
+    local ____opt_4 = jass.YDLocal1Get
+    local inputMax = ____opt_4 and ____opt_4(jass, "integer", "EquipExtract_MaxScore")
+    local minS = type(inputMin) == "number" and inputMin or (__TS__Number(g.udg_TempScoreMin) or 0)
+    local maxS = type(inputMax) == "number" and inputMax or (__TS__Number(g.udg_TempScoreMax) or 0)
     if minS <= 0 and maxS <= 0 then
         minS = 200
         maxS = 250
     end
     local candidates = getItemsByScoreRange(nil, minS, maxS)
-    local ____this_1
-    ____this_1 = jass
-    local ____opt_0 = ____this_1.STES_GetTriggerPlayer
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0(____this_1)
+    local ____this_7
+    ____this_7 = jass
+    local ____opt_6 = ____this_7.STES_GetTriggerPlayer
+    if ____opt_6 ~= nil then
+        ____opt_6 = ____opt_6(____this_7)
     end
-    local ____opt_0_4 = ____opt_0
-    if ____opt_0_4 == nil then
-        local ____opt_2 = jass.GetTriggerPlayer
-        ____opt_0_4 = ____opt_2 and ____opt_2(jass)
+    local ____opt_6_10 = ____opt_6
+    if ____opt_6_10 == nil then
+        local ____opt_8 = jass.GetTriggerPlayer
+        ____opt_6_10 = ____opt_8 and ____opt_8(jass)
     end
-    local ____opt_0_4_5 = ____opt_0_4
-    if ____opt_0_4_5 == nil then
-        ____opt_0_4_5 = jass.Player(0)
+    local ____opt_6_10_11 = ____opt_6_10
+    if ____opt_6_10_11 == nil then
+        ____opt_6_10_11 = jass.Player(0)
     end
-    local player = ____opt_0_4_5
+    local player = ____opt_6_10_11
     if #candidates == 0 then
         g.udg_TempItemType = 0
         if DEBUG then
@@ -91,20 +108,29 @@ local function EquipExtract_CreateByLevel(self)
         local i = #arr - 1
         while i > 0 do
             local j = math.floor(math.random() * (i + 1))
-            local ____temp_6 = {arr[j + 1], arr[i + 1]}
-            arr[i + 1] = ____temp_6[1]
-            arr[j + 1] = ____temp_6[2]
+            local ____temp_12 = {arr[j + 1], arr[i + 1]}
+            arr[i + 1] = ____temp_12[1]
+            arr[j + 1] = ____temp_12[2]
             i = i - 1
         end
     end
     local itemId = arr[1]
     g.udg_TempItemType = type(itemId) == "string" and #itemId == 4 and stringToFourCC(nil, itemId) or 0
+    local ____this_14
+    ____this_14 = _G
+    local ____opt_13 = ____this_14.print
+    if ____opt_13 ~= nil then
+        ____opt_13(
+            ____this_14,
+            (("TempItemType=" .. tostring(g.udg_TempItemType)) .. " itemId=") .. itemId
+        )
+    end
     if DEBUG then
         jass.DisplayTimedTextToPlayer(
-            player,
+            jass.Player(0),
             0,
             0,
-            8,
+            10,
             (("TempItemType=" .. tostring(g.udg_TempItemType)) .. " itemId=") .. itemId
         )
     end
@@ -122,12 +148,12 @@ local function dbg(self, msg)
 end
 local function onTrigger(self)
     local evt = jass.GetTriggerEventId()
-    local ____opt_7 = jass.GetTriggerPlayer
-    local ____temp_9 = ____opt_7 and ____opt_7(jass)
-    if ____temp_9 == nil then
-        ____temp_9 = jass.Player(0)
+    local ____opt_15 = jass.GetTriggerPlayer
+    local ____temp_17 = ____opt_15 and ____opt_15(jass)
+    if ____temp_17 == nil then
+        ____temp_17 = jass.Player(0)
     end
-    local player = ____temp_9
+    local player = ____temp_17
     if evt == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
         if DEBUG then
             jass.DisplayTimedTextToPlayer(
@@ -171,6 +197,29 @@ local function init(self)
         end
     end
     jass.TriggerAddAction(trig, onTrigger)
+    local evtTrig = jass.CreateTrigger()
+    jass.TriggerAddAction(
+        evtTrig,
+        function() return EquipExtract_CreateByLevel(nil) end
+    )
+    local ____jass_STES_Register_18 = jass.STES_Register
+    if ____jass_STES_Register_18 == nil then
+        ____jass_STES_Register_18 = g.STES_Register
+    end
+    local ____jass_STES_Register_18_19 = ____jass_STES_Register_18
+    if ____jass_STES_Register_18_19 == nil then
+        ____jass_STES_Register_18_19 = _G.STES_Register
+    end
+    local STES_Reg = ____jass_STES_Register_18_19
+    if type(STES_Reg) == "function" then
+        STES_Reg(evtTrig, "提取物品事件")
+        dbg(nil, "已通过 STES_Register 注册事件 提取物品事件")
+    else
+        g.udg_RegTrigger = evtTrig
+        g.udg_RegEventStr = "提取物品事件"
+        jass.ExecuteFunc("Bridge_STES_Register")
+        dbg(nil, "已通过桥接注册 STES 事件 提取物品事件")
+    end
 end
 init(nil)
 ____exports.EquipExtract_CreateByLevel = EquipExtract_CreateByLevel
