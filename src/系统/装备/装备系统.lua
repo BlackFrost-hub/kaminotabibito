@@ -179,17 +179,20 @@ local function initEvents(self)
             end
             local owner = jass.GetOwningPlayer(g.udg_TempUnit)
             local playerName = jass.GetPlayerName(owner)
+            local tempRead = g.udg_TempReadValue
             local test5Parts = {}
-            for ____, s in ipairs(playerStats) do
-                local ____jass_YDUserDataGet2_1
-                if jass.YDUserDataGet2 then
-                    ____jass_YDUserDataGet2_1 = jass.YDUserDataGet2("player", owner, s.name, 0)
-                else
-                    ____jass_YDUserDataGet2_1 = s.value
+            do
+                local i = 0
+                while i < #playerStats do
+                    local idx = i + 1
+                    local statName = g.udg_TempString[idx]
+                    local val = tempRead ~= nil and tempRead[i + 1] ~= nil and tempRead[i + 1] or 0
+                    local displayVal = val + playerStats[i + 1].value
+                    local num = __TS__Number(displayVal)
+                    local valStr = tostring(num)
+                    test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
+                    i = i + 1
                 end
-                local val = ____jass_YDUserDataGet2_1
-                test5Parts[#test5Parts + 1] = (s.name .. "为：") .. tostring(__TS__Number(val)
-                )
             end
             if #test5Parts > 0 then
                 jass.DisplayTimedTextToPlayer(
@@ -197,7 +200,7 @@ local function initEvents(self)
                     0,
                     0.02,
                     5,
-                    (("测试5：" .. playerName) .. "的当前") .. table.concat(test5Parts, "，")
+                    (("系统测试：" .. playerName) .. "的当前装备属性") .. table.concat(test5Parts, "，")
                 )
             end
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"

@@ -163,13 +163,20 @@ function initEvents(): void {
 
     const owner = jass.GetOwningPlayer(g.udg_TempUnit);
     const playerName = jass.GetPlayerName(owner);
+    const tempRead = (g as any).udg_TempReadValue as number[] | undefined;
     const test5Parts: string[] = [];
-    for (const s of playerStats) {
-      const val = jass.YDUserDataGet2 ? jass.YDUserDataGet2("player", owner, s.name, 0) : s.value;
-      test5Parts.push(s.name + "为：" + tostring(Number(val)));
+    for (let i = 0; i < playerStats.length; i++) {
+      const idx = i + 1;
+      const statName = g.udg_TempString[idx];
+      const val = tempRead != null && tempRead[i] != null ? tempRead[i] : 0;
+      // 显示“本操作后”的累计值：当前存储值 + 本次装备的增减（第一次拾取时 val=0 也能显示正确）
+      const displayVal = val + playerStats[i].value;
+      const num = Number(displayVal);
+      const valStr = tostring(num);
+      test5Parts.push(statName + "为：" + valStr);
     }
     if (test5Parts.length > 0) {
-      jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "测试5：" + playerName + "的当前" + test5Parts.join("，"));
+      jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "系统测试：" + playerName + "的当前装备加成" + test5Parts.join("，"));
     }
 
     const actionText = g.udg_TempIsAdd ? "获得" : "丢弃";

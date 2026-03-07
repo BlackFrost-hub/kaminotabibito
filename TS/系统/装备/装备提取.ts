@@ -30,10 +30,15 @@ function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
 }
 
 function EquipExtract_CreateByLevel(): void {
+  (globalThis as any).print?.("[装备提取] EquipExtract_CreateByLevel 被调用");
+  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[装备提取] 执行中");
   _seedCnt++;
   math.randomseed(_seedCnt);
-  let minS = Number(g.udg_TempScoreMin) || 0;
-  let maxS = Number(g.udg_TempScoreMax) || 0;
+  // 优先从 YDLocal1Get 取入参，否则用 udg_TempScoreMin/Max
+  const inputMin = jass.YDLocal1Get?.("integer", "EquipExtract_MinScore");
+  const inputMax = jass.YDLocal1Get?.("integer", "EquipExtract_MaxScore");
+  let minS = typeof inputMin === "number" ? inputMin : Number(g.udg_TempScoreMin) || 0;
+  let maxS = typeof inputMax === "number" ? inputMax : Number(g.udg_TempScoreMax) || 0;
   if (minS <= 0 && maxS <= 0) {
     minS = 200;
     maxS = 250;
@@ -52,7 +57,8 @@ function EquipExtract_CreateByLevel(): void {
   }
   const itemId = arr[0];
   g.udg_TempItemType = typeof itemId === "string" && itemId.length === 4 ? stringToFourCC(itemId) : 0;
-  if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "TempItemType=" + g.udg_TempItemType + " itemId=" + itemId);
+  (globalThis as any).print?.("TempItemType=" + g.udg_TempItemType + " itemId=" + itemId);
+  if (DEBUG) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "TempItemType=" + g.udg_TempItemType + " itemId=" + itemId);
 }
 
 function dbg(msg: string): void {
@@ -82,6 +88,20 @@ function init(): void {
   }
 
   jass.TriggerAddAction(trig, onTrigger);
+
+  // 注册到 STES 事件 "提取物品事件"（参数同 GS：trigger, string），优先直接调用，否则走桥接
+  const evtTrig = jass.CreateTrigger();
+  jass.TriggerAddAction(evtTrig, () => EquipExtract_CreateByLevel());
+  const STES_Reg = (jass as any).STES_Register ?? (g as any).STES_Register ?? (globalThis as any).STES_Register;
+  if (typeof STES_Reg === "function") {
+    STES_Reg(evtTrig, "提取物品事件");
+    dbg("已通过 STES_Register 注册事件 提取物品事件");
+  } else {
+    (g as any).udg_RegTrigger = evtTrig;
+    (g as any).udg_RegEventStr = "提取物品事件";
+    jass.ExecuteFunc("Bridge_STES_Register");
+    dbg("已通过桥接注册 STES 事件 提取物品事件");
+  }
 }
 init();
 export { EquipExtract_CreateByLevel };

@@ -1,6 +1,11 @@
 /**
  * 修复 TSTL 生成的 Lua，使其在魔兽地图环境中可运行。
  * 在 tstl 编译后运行（npm run build:full 或 build 前先 run build:lua）。
+ *
+ * 常见 TSTL 坑：
+ * - 函数调用会多传 nil(self)，如 STES_Register(trig, name) -> X(nil, trig, name)，需 10b 修正。
+ * - (globalThis as any).print?.(x) 会变成 ____opt_0(____this_1, x)，需 10c 去掉 self。
+ * - 数组下标 arr[i] 会编译成 Lua 的 arr[i+1]，TS 里用 0-based 才能对应 JASS 的 1-based。
  */
 
 const fs = require("fs");
@@ -55,11 +60,16 @@ function fixFile(filePath) {
   // 10. originalPrint(nil, -> originalPrint(
   content = content.replace(/originalPrint\s*\(\s*nil\s*,\s*/g, "originalPrint(");
 
-  // 10b. STES_Register 仅两参 (trig, eventName)，去掉 TSTL 多传的 nil
-  content = content.replace(/stesRegister\s*\(\s*nil\s*,\s*(\w+)\s*,\s*("([^"]*)"|'([^']*)')\s*\)/g, (m, trig, _q, dq, sq) => {
-    const ev = dq !== undefined ? dq : sq;
-    return "stesRegister(" + trig + ", " + JSON.stringify(ev) + ")";
+  // 10b. STES_Register 仅两参 (trig, eventName)，去掉 TSTL 多传的 nil（任意变量名，第三参为含「事件」的字符串）
+  content = content.replace(/(\w+)\s*\(\s*nil\s*,\s*(\w+)\s*,\s*("([^"]*事件[^"]*)"|'([^']*事件[^']*)')\s*\)/g, (m, fn, trig, _q, dq, sq) => {
+    const ev = dq !== undefined ? '"' + dq + '"' : "'" + sq + "'";
+    return fn + "(" + trig + ", " + ev + ")";
   });
+
+  // 10c. _G.print?.(x) 被 TSTL 编译成 ____opt_N(____this_N, x)，仅当确认为 _G.print 时去掉 self
+  if (content.includes("____this_1 = _G") && content.includes(".print")) {
+    content = content.replace(/____opt_0\s*\(\s*____this_1\s*,\s*/g, "_G.print(");
+  }
 
   // 11~13. fourCCToString/addStat/initEvents 保留 (nil, ...) 因 TSTL 生成的是 (self, ...) 需要第一个参数
 
