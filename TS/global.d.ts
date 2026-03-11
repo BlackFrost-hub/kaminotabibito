@@ -1,4 +1,5 @@
 /** Global declarations for TSTL / Lua environment */
+declare var Itmeboolean: boolean; /* 装备限制开关（Jass 全局） */
 declare function require(mod: string): any;
 declare const pcall: <T>(f: () => T) => [boolean, T | string];
 declare const tostring: (v: any) => string;
@@ -137,6 +138,18 @@ interface BlizzardJass {
 /** jass.japi - 扩展 JASS 原生函数 (Blz* 等)，require 后注入到 jass.common */
 /** Lua global print - variadic */
 declare var print: (...args: any[]) => void;
+
+/** jass.slk - 运行时读取地图物编 (unit/item/ability/buff/...) */
+declare var slk: {
+  unit?: Record<string, Record<string, string>>;
+  item?: Record<string, Record<string, string>>;
+  destructable?: Record<string, Record<string, string>>;
+  doodad?: Record<string, Record<string, string>>;
+  ability?: Record<string, Record<string, string>>;
+  buff?: Record<string, Record<string, string>>;
+  upgrade?: Record<string, Record<string, string>>;
+  misc?: Record<string, Record<string, string>>;
+};
 
 /** Lua math / os */
 declare const math: { random: () => number; randomseed: (seed: number) => void; floor: (n: number) => number };

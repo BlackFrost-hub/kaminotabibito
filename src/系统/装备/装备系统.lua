@@ -64,9 +64,31 @@ local function initEvents(self)
         function()
             local item = jass.GetManipulatedItem()
             local unit = jass.GetManipulatingUnit()
+            if not unit or not item then
+                return
+            end
+            if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+                return
+            end
+            local IsUnitIllusion = jass.IsUnitIllusion
+            local IsUnitIllusionBJ = jass.IsUnitIllusionBJ
+            if type(IsUnitIllusionBJ) == "function" then
+                if IsUnitIllusionBJ(nil, unit) or IsUnitIllusionBJ(nil, jass, unit) or IsUnitIllusionBJ(nil, nil, unit) then
+                    return
+                end
+            elseif type(IsUnitIllusion) == "function" then
+                if IsUnitIllusion(nil, unit) or IsUnitIllusion(nil, jass, unit) or IsUnitIllusion(nil, nil, unit) then
+                    return
+                end
+            end
             local player = jass.GetOwningPlayer(unit)
             local itemId = jass.GetItemTypeId(item)
             local event = jass.GetTriggerEventId()
+            if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(jass.UnitHasItemOfTypeBJ) == "function" then
+                if not jass.UnitHasItemOfTypeBJ(unit, itemId) then
+                    return
+                end
+            end
             local idStr = fourCCToString(nil, itemId)
             local itemData = items[idStr]
             if not itemData then
@@ -108,7 +130,7 @@ local function initEvents(self)
             addStat(nil, itemData.dmg, "攻击力")
             addStat(nil, itemData.armor, "护甲")
             addStat(nil, itemData.atkSpeed, "攻速")
-            addStat(nil, itemData.movespeed, "移速")
+            addStat(nil, itemData.movespeed, "叠加移动速度")
             addStat(nil, itemData.str, "力量")
             addStat(nil, itemData.agi, "敏捷")
             addStat(nil, itemData.int, "智力")
@@ -200,7 +222,7 @@ local function initEvents(self)
                     0,
                     0.02,
                     5,
-                    (("系统测试：" .. playerName) .. "的当前装备属性") .. table.concat(test5Parts, "，")
+                    (("系统测试：" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
                 )
             end
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"

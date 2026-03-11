@@ -52,9 +52,22 @@ function initEvents(): void {
   jass.TriggerAddAction(trig, () => {
     const item = jass.GetManipulatedItem();
     const unit = jass.GetManipulatingUnit();
+    if (!unit || !item) return;
+    if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
+    const IsUnitIllusion = (jass as any).IsUnitIllusion;
+    const IsUnitIllusionBJ = (jass as any).IsUnitIllusionBJ;
+    if (typeof IsUnitIllusionBJ === "function") {
+      if (IsUnitIllusionBJ(unit) || IsUnitIllusionBJ(jass, unit) || IsUnitIllusionBJ(undefined as any, unit)) return;
+    } else if (typeof IsUnitIllusion === "function") {
+      if (IsUnitIllusion(unit) || IsUnitIllusion(jass, unit) || IsUnitIllusion(undefined as any, unit)) return;
+    }
     const player = jass.GetOwningPlayer(unit);
     const itemId = jass.GetItemTypeId(item);
     const event = jass.GetTriggerEventId();
+    // 若拾取后立刻被“装备限制”丢弃，这里不应再加属性/提示
+    if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM && typeof (jass as any).UnitHasItemOfTypeBJ === "function") {
+      if (!(jass as any).UnitHasItemOfTypeBJ(unit, itemId)) return;
+    }
     const idStr = fourCCToString(itemId);
     const itemData = items[idStr];
     if (!itemData) return;
@@ -93,7 +106,7 @@ function initEvents(): void {
     addStat(itemData.dmg, "攻击力");
     addStat(itemData.armor, "护甲");
     addStat(itemData.atkSpeed, "攻速");
-    addStat(itemData.movespeed, "移速");
+    addStat(itemData.movespeed, "叠加移动速度");
     addStat(itemData.str, "力量");
     addStat(itemData.agi, "敏捷");
     addStat(itemData.int, "智力");

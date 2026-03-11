@@ -6,6 +6,8 @@ local jassConsole = require("jass.console")
 require("jass.japi")
 local jass = require("jass.common")
 local g = require("jass.globals")
+local slk = require("jass.slk")
+_G.slk = slk
 if g.YDUserDataGet2 and not jass.YDUserDataGet2 then
     jass.YDUserDataGet2 = g.YDUserDataGet2
 end
@@ -34,7 +36,10 @@ _G.print = function(...)
     jassConsole.write(str .. "\n")
 end
 require("系统.装备.装备提取")
+require("系统.装备.装备掉落")
+require("系统.装备.装备限制")
 require("系统.测试.测试事件")
+require("系统.测试.测试233注册")
 local ok, err = pcall(function () return require("系统.装备.装备系统") end
     )
 if not ok then

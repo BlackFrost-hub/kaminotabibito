@@ -1,0 +1,62 @@
+---
+description: Warcraft3 + TypeScriptToLua + jass 绑定的常见坑与写法约束
+alwaysApply: true
+---
+
+# War3 + TSTL + jass 常见坑（必读）
+
+## 1) **禁止**对 jass API 使用可选链调用 `?.(...)`
+
+TSTL 会把 `obj.fn?.(x)` 编译成“取出函数后再用 self 调用”的形态，容易把 **table** 当成第一个参数传给需要 **jhandle_t** 的函数，导致：
+
+- `bad argument #1 ... (jhandle_t expected, got table)`
+
+**✅ 正确写法**
+
+- 先判断 `typeof (jass as any).Fn === "function"`，再直接 `(jass as any).Fn(arg)` 调用。
+
+## 2) **禁止**把 `jass.xxx` 赋给局部变量再调用
+
+例：`const f = (jass as any).GetOwningPlayer; f(unit)`  
+TSTL 可能编译成 `f(nil, unit)` 或 `f(jass, unit)` 之类，造成参数错位。
+
+**✅ 正确写法**
+
+- 直接调用：`(jass as any).GetOwningPlayer(unit)`
+
+## 3) Lua 真假值：`""` 在 Lua 里也为真
+
+TS 里常见写法：`if (!msg) ...`  
+编译到 Lua 后 `msg=""` 依然为真，逻辑会错。
+
+**✅ 正确写法**
+
+- 用 `msg === ""` / `msg !== ""` 判断空字符串。
+
+## 4) 遍历 Lua table：避免 `Object.keys(table)`
+
+Lua table 在 TSTL 环境中用 `for (const k in t)`（pairs）最稳。
+
+**✅ 正确写法**
+
+- `for (const k in itemsData) { ... }`
+
+## 5) 随机数：避免 `math.random()` 无参浮点假设
+
+不同环境下 `math.random()` 无参可能不返回 `[0,1)` 浮点。
+
+**✅ 正确写法**
+
+- `const idx = (math as any).random(1, list.length);`
+- `return (list as any)[idx];`
+
+## 6) 对“绑定签名不一致”的少数 API 才做兜底
+
+若确实存在“需要 self/不需要 self”差异，兜底顺序建议：
+
+1. 直接 `(jass as any).Fn(x, y)`
+2. 再尝试 `fn(jass, x, y)`
+3. 最后 `fn(undefined as any, x, y)`
+
+优先保证第一种能工作（最不容易被 TSTL 改写成 self 调用）。
+
