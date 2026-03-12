@@ -258,7 +258,7 @@ function initEvents(): void {
       const ms = equipMovespeed.getMaxMovespeed2Info(g.udg_TempUnit, isDrop ? item : undefined);
       if (ms.value > 0) test5Parts.push("移动速度为：" + tostring(ms.value));
       if (ms.value > 0 && ms.name !== "" && ms.count >= 2) {
-        jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统提示』：|r移速不叠加，当前只生效|cff00bfff『" + ms.name + "』|r");
+        jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" + ms.name + "』|r");
       }
     }
     if (test5Parts.length > 0) {
