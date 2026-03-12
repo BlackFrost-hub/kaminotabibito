@@ -4,7 +4,8 @@ const g = require("jass.globals") as { udg_TempItemType?: number; udg_TempScoreM
 const mod = require("系统.装备.装备数据") as { items?: Record<string, { score?: number }>; default?: Record<string, { score?: number }> };
 const itemsData = mod.items ?? mod.default ?? {};
 let _seedCnt = 0;
-const DEBUG = true;
+// const DEBUG = true;
+const DEBUG = false;
 const ITEM_TRIGGER = "tret"; // 触发物品ID
 
 function stringToFourCC(s: string): number {
@@ -69,7 +70,6 @@ function onTrigger(): void {
   const evt = jass.GetTriggerEventId();
   const player = jass.GetTriggerPlayer?.() ?? jass.Player(0);
   if (evt === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM) {
-    if (DEBUG) jass.DisplayTimedTextToPlayer(player, 0, 0, 8, "拾取事件被触发");
     const item = jass.GetManipulatedItem();
     const tid = jass.GetItemTypeId(item);
     if (tid !== stringToFourCC(ITEM_TRIGGER)) return; // 非 tret 不触发
@@ -100,7 +100,7 @@ function init(): void {
     (g as any).udg_RegTrigger = evtTrig;
     (g as any).udg_RegEventStr = "提取物品事件";
     jass.ExecuteFunc("Bridge_STES_Register");
-    dbg("已通过桥接注册 STES 事件 提取物品事件");
+    // dbg("已通过桥接注册 STES 事件 提取物品事件");
   }
 }
 init();

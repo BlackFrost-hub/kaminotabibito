@@ -1,4 +1,4 @@
-interface ItemDataEntry {
+﻿interface ItemDataEntry {
   name: string;
   type?: string;
   score?: number;
@@ -65,19 +65,21 @@ interface ItemDataEntry {
   finalDamageMultiplier?: number;
   dmgBonus?: number;
   expGainRate?: number;
+  maxDrops?: number;
+  hpPct?: number;
+  baseDmgPct?: number;
   onlyone?: boolean;
-  /** 自适应主属性：格式 "力量+7/敏捷+10/魔法伤害+5%"，按英雄主属性(力/敏/智)取对应一段 */
   primaryBonus?: string;
   [key: string]: string | number | boolean | undefined;
 }
 
 export const items: Record<string, ItemDataEntry> = {};
 
-items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8, primaryBonus: "力量+7/敏捷+10/智力+10"};
+items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8,primaryBonus: "力量+7/敏捷+10/智力+10"};
 items["I00E"] = {type: "道具/戒指/饰品", name: "生命树枝", goldPrice: 100, score: 220, level: "E-", hp: 200, hpRegen: 1};
 items["I00T"] = {type: "主武器", name: "小法杖", goldPrice: 100, score: 222, level: "E-", dmg: 6, int: 1};
 items["I00S"] = {type: "道具/戒指/饰品", name: "恢复指环", goldPrice: 50, score: 250, level: "E-", hp: 50};
-items["I00P"] = {type: "道具/戒指/饰品", name: "树枝", goldPrice: 100, score: 295, level: "E-", dmg: 2, all: 2, primaryBonus: "力量+7/敏捷+10/全属性+2"};
+items["I00P"] = {type: "道具/戒指/饰品", name: "树枝", goldPrice: 100, score: 295, level: "E-", dmg: 2, all: 2};
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};
 items["I06X"] = {type: "道具/戒指/饰品", name: "初始魔法药水", goldPrice: 50, score: 400, level: "E"};
 items["I06Y"] = {type: "道具/戒指/饰品", name: "初始生命药水", goldPrice: 50, score: 400, level: "E"};
@@ -89,8 +91,6 @@ items["I0CN"] = {type: "道具/戒指/饰品", name: "异端审查证", goldPric
 items["I070"] = {type: "道具/戒指/饰品", name: "元素能量碎片（水）", goldPrice: 240, score: 544, level: "E+", magicDmg: 0.3};
 items["I00O"] = {type: "道具/戒指/饰品", name: "狂暴树枝", goldPrice: 200, score: 551, level: "E+", dmg: 15};
 items["I01T"] = {type: "头盔", name: "狼皮帽", goldPrice: 200, score: 570, level: "E+", dmg: 10, hp: 100};
-items["bspd"] = {type: "鞋子", name: "速度之靴", goldPrice: 100, score: 585, level: "E++", movespeed2: 60};
-items["rde3"] = {type: "道具/戒指/饰品", name: "守护指环 +4", goldPrice: 100, score: 585, level: "E++", movespeed2: 100};
 items["I00U"] = {type: "鞋子", name: "速度之靴", goldPrice: 100, score: 585, level: "E++", movespeed2: 60};
 items["I00K"] = {type: "道具/戒指/饰品", name: "树枝骨干+1", goldPrice: 300, score: 675, level: "E+", dmg: 4, all: 4};
 items["I022"] = {type: "主武器", name: "地精长矛", goldPrice: 100, score: 710, level: "E+", dmg: 20, armorPierce: 0.2};
@@ -113,7 +113,7 @@ items["I00Q"] = {type: "副武器", name: "袖箭", goldPrice: 200, score: 1053,
 items["I01Z"] = {type: "衣服", name: "地精战衣", goldPrice: 500, score: 1072, level: "D-", dmg: 15, armor: 3, hp: 500};
 items["I02N"] = {type: "副武器", name: "蟹钳", goldPrice: 100, score: 1080, level: "D-", dmg: 25};
 items["I03N"] = {type: "道具/戒指/饰品", name: "血浴之母的第一条左腿", goldPrice: 100, score: 1080, level: "D-", dmg: 30};
-items["I04Y"] = {type: "道具/戒指/饰品", name: "毒囊道具", goldPrice: 350, score: 1120, level: "D-", dmg: 15, magicResist: 0.1, hp: 450, hpPct: 100};
+items["I04Y"] = {type: "道具/戒指/饰品", name: "毒囊道具", goldPrice: 350, score: 1120, level: "D-", dmg: 15, magicResist: 0.1, hp: 450};
 items["I01S"] = {type: "鞋子", name: "狼皮之鞋", goldPrice: 100, score: 1124, level: "D-", armor: 5, hp: 100, hpRegen: 5, movespeed2: 75};
 items["I00H"] = {type: "主武器", name: "树枝法杖（主武器）", goldPrice: 250, score: 1157, level: "D-", int: 15, mp: 300, mpRegen: 2};
 items["I01C"] = {type: "主武器", name: "首领大锤", goldPrice: 100, score: 1157, level: "D-", dmg: 25, str: 8};
@@ -183,9 +183,9 @@ items["I0CK"] = {type: "道具/戒指/饰品", name: "风暴狮角", goldPrice: 
 items["I05D"] = {type: "副武器", name: "风鸟之爪", goldPrice: 650, score: 2708, level: "D++", dmg: 65, agi: 15, magicPierce: 0.25};
 items["I04Z"] = {type: "道具/戒指/饰品", name: "风之饰品", goldPrice: 1000, score: 2718, level: "D++", agi: 20};
 items["I002"] = {type: "衣服", name: "首领护甲", goldPrice: 200, score: 2720, level: "D++", dmg: 20, armor: 10, hp: 1000};
-items["I089"] = {type: "道具/戒指/饰品", name: "|cffffcc99烈凯肩甲|r", goldPrice: 1000, score: 2745, level: "D++", all: 6, hp: 300, hpRegen: 50, hpRegenEff: 0.25};
+items["I089"] = {type: "道具/戒指/饰品", name: "|cffffcc99烈凯肩甲|r", goldPrice: 1000, score: 2745, level: "D++", str: 7, agi: 10, all: 6, hp: 300, hpRegen: 50, magicDmg: 0.05, primaryBonus: "力量+7/敏捷+10/魔法伤害+5%"};
 items["I0DD"] = {type: "鞋子", name: "|cffff9900沙漠光鞋|r", goldPrice: 10000, score: 2756, level: "C-", dmg: 40, critRate: 0.15, hp: 800, physDmg: 0.15, movespeed2: 55};
-items["I0D1"] = {type: "裤子", name: "|cffff9900烈魔之裤|r", goldPrice: 1500, score: 2764, level: "D++", magicResist: 0.25, armor: 15, hp: 1500};
+items["I0D1"] = {type: "裤子", name: "|cffff9900烈魔之裤|r", goldPrice: 1500, score: 2764, level: "D++", critRate: 0.1, magicResist: 0.25, armor: 15, hp: 1500, magicDmg: 0.1, primaryBonus: "暴击率+10%/暴击率+10%/魔法伤害+10%"};
 items["I048"] = {type: "副武器", name: "守护之盾", goldPrice: 5000, score: 2800, level: "C-", armor: 20, hp: 600};
 items["I046"] = {type: "副武器", name: "回沙之书", goldPrice: 5000, score: 2849, level: "C-", dmg: 75, magicDmg: 0.2};
 items["I05A"] = {type: "主武器", name: "狼人匕首", goldPrice: 1000, score: 2884, level: "C-", dmg: 35, agi: 20, armorPierce: 0.35};
@@ -215,7 +215,7 @@ items["I0B7"] = {type: "裤子", name: "|Cff9000FF幽暗沙裤|r", goldPrice: 15
 items["I0B6"] = {type: "裤子", name: "|CffFFFF00暴金沙裤|r", goldPrice: 1500, score: 3586, level: "C", str: 40, critRate: 0.2, critDmg: 0.3, armor: 15, hp: 500};
 items["I04A"] = {type: "主武器", name: "沙之猎弓", goldPrice: 5000, score: 3620, level: "C", dmg: 100, critRate: 0.3};
 items["I0DF"] = {type: "鞋子", name: "|cffff6600精粹沙鞋|r", goldPrice: 10000, score: 3701, level: "C", dmg: 75, critRate: 0.15, hp: 800, physDmg: 0.15, movespeed2: 55};
-items["I0DG"] = {type: "道具/戒指/饰品", name: "|cffff6600风土戒指|r", goldPrice: 10000, score: 3712, level: "C", dmg: 100, hp: 0.1, accuracy: 0.1, woodDmg: 0.2, fireDmg: 0.2, stunResist: 0.3, hpPct: 0.1};
+items["I0DG"] = {type: "道具/戒指/饰品", name: "|cffff6600风土戒指|r", goldPrice: 10000, score: 3712, level: "C", dmg: 100, accuracy: 0.1, woodDmg: 0.2, fireDmg: 0.2, stunResist: 0.3, hpPct: 0.1};
 items["I09W"] = {type: "道具/戒指/饰品", name: "远古巫术项链", goldPrice: 2500, score: 3726, level: "C", hpRegenPct: 0.04, skillHeal: 0.25, mp: 2000, mpRegenPct: 0.02};
 items["I042"] = {type: "主武器", name: "精致沙斧", goldPrice: 6500, score: 3744, level: "C", dmg: 40, str: 20};
 items["I038"] = {type: "衣服", name: "湖之袍", goldPrice: 5000, score: 3754, level: "C", armor: 30, hp: 1500, hpRegen: 35};
@@ -532,7 +532,7 @@ items["I0CE"] = {type: "鞋子", name: "精光中鞋", goldPrice: 30000, dmg: 25
 items["I0CF"] = {type: "衣服", name: "光精之甲", goldPrice: 30000, magicResist: 0.15, armor: 30, hp: 2500, hpRegen: 50, skillHeal: 0.15, accuracy: 0.1};
 items["I0CG"] = {type: "主武器", name: "齿轮符剑", goldPrice: 30000, dmg: 150, atkSpeed: 0.35, magicResist: -0.1, armor: 15};
 items["I0CH"] = {type: "主武器", name: "精粹法刺", goldPrice: 30000, dmg: 150, armor: -15, cdReduction: 15, accuracy: -0.15};
-items["I0CI"] = {type: "任务", name: "消失的笛子", goldPrice: 0, dmg: 12, baseDmgPct: 12};
+items["I0CI"] = {type: "任务", name: "消失的笛子", goldPrice: 0, dmg: 12};
 items["I0CJ"] = {type: "任务", name: "|cffff0000失踪的精灵村民（Boss战任务）|r", goldPrice: 0, critRate: 1, critDmg: 0.01};
 items["I0CM"] = {type: "任务", name: "|cffff9900协助异端调查|r（|cffff00008级精英战斗任务|r）", goldPrice: 0};
 items["I0CO"] = {type: "提升属性的物品", name: "学识书", goldPrice: 0};
@@ -546,7 +546,7 @@ items["I0CX"] = {type: "任务", name: "领悟暗之力", goldPrice: 2000};
 items["I0CY"] = {type: "材料", name: "荧光草", goldPrice: 0};
 items["I0D0"] = {type: "任务", name: "接受任务-|cffff0000狩猎食人魔（等级24）|r", goldPrice: 0};
 items["I0D2"] = {type: "道具/戒指/饰品", name: "|cffcc99ff黑暗猎人手套|r", goldPrice: 1000, dmg: 65, magicResist: 0.1, darkDmg: 0.25};
-items["I0D3"] = {type: "主武器", name: "|cffffcc99沙烈魔斧|r", goldPrice: 2000, level: "C", dmg: 75, critDmg: 0.2, accuracy: 0.1, stunResist: 0.2};
+items["I0D3"] = {type: "主武器", name: "|cffffcc99沙烈魔斧|r", goldPrice: 2000, level: "C", dmg: 75, str: 16, agi: 20, int: 20, critDmg: 0.2, accuracy: 0.1, primaryBonus: "力量+16/敏捷+20/智力+20"};
 items["I0D4"] = {type: "道具/戒指/饰品", name: "食人魔头颅", goldPrice: 1000};
 items["I0D5"] = {type: "材料", name: "|cff3366ff魔力源石|r", goldPrice: 50, mpRegenPct: 0.03};
 items["I0D6"] = {type: "材料", name: "|cff00ff00夜光翡翠|r", goldPrice: 50};
@@ -555,7 +555,7 @@ items["I0D8"] = {type: "图纸", name: "|cffffff00森灵圣枪|r|cff999999打造
 items["I0D9"] = {type: "主武器", name: "|cff339966自然魔书|r", goldPrice: 100, dmg: 75, hpRegen: 100, hpRegenEff: 0.3, mpRegen: 20, woodDmg: 0.15};
 items["I0DB"] = {type: "道具/戒指/饰品", name: "沙之饰品", goldPrice: 2000, armor: 10, hp: 800, cdReduction: 0.05, movespeed2: 45};
 items["I0DH"] = {type: "任务", name: "|cffffffcc交换：『聚灵花』换『精粹沙鞋』|r", goldPrice: 0, dmg: 75, critRate: 0.15, hp: 1000, physDmg: 0.15, movespeed2: 55};
-items["I0DI"] = {type: "任务", name: "|cffffffcc交换：『沙漠母虫尸体』和『蜘蛛女皇尸体』换『风土戒指』|r", goldPrice: 0, dmg: 100, hp: 0.1, accuracy: 0.1, stunResist: 0.3, hpPct: 0.1};
+items["I0DI"] = {type: "任务", name: "|cffffffcc交换：『沙漠母虫尸体』和『蜘蛛女皇尸体』换『风土戒指』|r", goldPrice: 0, dmg: 100, accuracy: 0.1, stunResist: 0.3, hpPct: 0.1};
 items["I0DJ"] = {type: "材料", name: "沙漠母虫尸体", goldPrice: 1000};
 items["I0DK"] = {type: "材料", name: "沙漠蜘蛛女皇尸体", goldPrice: 1000};
 items["I0DL"] = {type: "主武器", name: "|cff339966森灵圣枪|r", goldPrice: 10000, dmg: 150, int: 30, accuracy: 0.3, magicPierce: 0.5, magicDmg: 0.1};

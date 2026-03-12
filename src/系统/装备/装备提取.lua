@@ -8,7 +8,7 @@ local g = require("jass.globals")
 local mod = require("系统.装备.装备数据")
 local itemsData = mod.items or mod.default or ({})
 local _seedCnt = 0
-local DEBUG = true
+local DEBUG = false
 local ITEM_TRIGGER = "tret"
 local function stringToFourCC(self, s)
     local b1 = string.byte(s, 1)
@@ -155,15 +155,6 @@ local function onTrigger(self)
     end
     local player = ____temp_17
     if evt == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
-        if DEBUG then
-            jass.DisplayTimedTextToPlayer(
-                player,
-                0,
-                0,
-                8,
-                "拾取事件被触发"
-            )
-        end
         local item = jass.GetManipulatedItem()
         local tid = jass.GetItemTypeId(item)
         if tid ~= stringToFourCC(nil, ITEM_TRIGGER) then
@@ -218,7 +209,6 @@ local function init(self)
         g.udg_RegTrigger = evtTrig
         g.udg_RegEventStr = "提取物品事件"
         jass.ExecuteFunc("Bridge_STES_Register")
-        dbg(nil, "已通过桥接注册 STES 事件 提取物品事件")
     end
 end
 init(nil)

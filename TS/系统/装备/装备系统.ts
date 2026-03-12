@@ -1,7 +1,12 @@
 // equip_system.ts
+/** 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true */
+// if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP === undefined) (globalThis as any).DEBUG_EQUIP_SKIP_DROP = true;
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_TempUnit: any; udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
 const items = (require("系统.装备.装备数据") as { default: Record<string, ItemData> }).default;
+const equipLimit = require("系统.装备.装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean };
+const equipShared = require("系统.装备.装备共享") as { equipShared: { skipNextDrop: boolean } };
+const equipMovespeed = require("系统.装备.装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
 
 function fourCCToString(fourcc: number): string {
   const c1 = string.char(fourcc % 256);
@@ -34,10 +39,73 @@ interface StatEntry {
   value: number;
 }
 
+/** 属性配置：显示名 -> itemData key，udg 为 JASS 全局时填写。新增属性只需在此加一行，primaryBonus 即可用该显示名 */
+const STAT_CONFIG: { name: string; key: string; udg?: string }[] = [
+  { name: "生命值", key: "hp", udg: "udg_TempHp" }, { name: "魔法值", key: "mp", udg: "udg_TempMp" },
+  { name: "攻击力", key: "dmg", udg: "udg_TempDmg" }, { name: "护甲", key: "armor", udg: "udg_TempArmor" },
+  { name: "攻速", key: "atkSpeed", udg: "udg_TempAtkSpeed" }, { name: "叠加移动速度", key: "movespeed" },
+  { name: "力量", key: "str", udg: "udg_TempStr" }, { name: "敏捷", key: "agi", udg: "udg_TempAgi" },
+  { name: "智力", key: "int", udg: "udg_TempInt" }, { name: "全属性", key: "all", udg: "udg_TempAll" },
+  { name: "暴击率", key: "critRate" }, { name: "暴击伤害", key: "critDmg" }, { name: "魔抗", key: "magicResist" },
+  { name: "生命恢复", key: "hpRegen" }, { name: "生命恢复%", key: "hpRegenPct" }, { name: "生命恢复效率", key: "hpRegenEff" },
+  { name: "技能治疗率", key: "skillHeal" }, { name: "受到的治疗率", key: "healReceived" },
+  { name: "魔法恢复", key: "mpRegen" }, { name: "魔法恢复%", key: "mpRegenPct" }, { name: "魔法消耗", key: "mpCost" },
+  { name: "冷却缩减", key: "cdReduction" }, { name: "命中率", key: "accuracy" }, { name: "闪避率", key: "dodge" },
+  { name: "护甲穿透", key: "armorPierce" }, { name: "魔法穿透", key: "magicPierce" },
+  { name: "技能伤害", key: "skillDmg" }, { name: "技能抗性", key: "skillResist" }, { name: "魔法伤害", key: "magicDmg" },
+  { name: "物理伤害", key: "physDmg" }, { name: "物理抗性", key: "physResist" }, { name: "强化伤害", key: "enhanceDmg" },
+  { name: "普攻伤害", key: "atkDmg" }, { name: "普攻抗性", key: "atkResist" },
+  { name: "光属性伤害", key: "lightDmg" }, { name: "光属性抗性", key: "lightResist" },
+  { name: "暗属性伤害", key: "darkDmg" }, { name: "暗属性抗性", key: "darkResist" },
+  { name: "木属性伤害", key: "woodDmg" }, { name: "木属性抗性", key: "woodResist" },
+  { name: "火属性伤害", key: "fireDmg" }, { name: "火属性抗性", key: "fireResist" },
+  { name: "雷属性伤害", key: "thunderDmg" }, { name: "雷属性抗性", key: "thunderResist" },
+  { name: "水属性伤害", key: "waterDmg" }, { name: "水属性抗性", key: "waterResist" },
+  { name: "金属性抗性", key: "MetalResist" }, { name: "召唤物伤害", key: "summonDmg" }, { name: "召唤物抗性", key: "summonResist" },
+  { name: "伤害减少", key: "dmgReduction" }, { name: "伤害减少%", key: "dmgReductionPct" },
+  { name: "伤害吸血", key: "lifeSteal" }, { name: "魔法伤害吸血", key: "magicLifeSteal" }, { name: "普攻伤害吸血", key: "atkLifeSteal" },
+  { name: "被暴击率", key: "critRateTaken" }, { name: "被暴击伤害", key: "critDmgTaken" }, { name: "眩晕抗性", key: "stunResist" },
+  { name: "魔法普攻伤害", key: "magicAtkDmg" }, { name: "蝼蚁专精", key: "antMastery" }, { name: "移动速度", key: "movespeed2" },
+  { name: "伤害%", key: "dmgBonus" }, { name: "最终伤害%", key: "finalDmgBonus" }, { name: "经验获取率", key: "expGainRate" },
+  { name: "最大生命值%", key: "hpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }
+];
+const NAME_TO_KEY: Record<string, string> = {};
+for (const e of STAT_CONFIG) { NAME_TO_KEY[e.name] = e.key; }
+if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed"; // JASS TempMoveSpeed 用，不参与 addStat
+
+/** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 1/2/3 取对应段，段内可用逗号多属性。返回 key->数值 */
+function parsePrimaryBonus(s: string, mainAttr: number): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!s || mainAttr < 1 || mainAttr > 3) return out;
+  const segments = s.split("/");
+  const seg = (segments[mainAttr - 1] || "").trim();
+  if (!seg) return out;
+  const parts = seg.split(",");
+  for (const p of parts) {
+    const idx = p.indexOf("+");
+    if (idx < 0) continue;
+    const name = p.substring(0, idx).trim();
+    const valStr = p.substring(idx + 1).trim();
+    const key = NAME_TO_KEY[name];
+    if (!key) continue;
+    const isPct = valStr.indexOf("%") >= 0;
+    const num = parseFloat(valStr) || 0;
+    out[key] = (out[key] ?? 0) + (isPct ? num / 100 : num);
+  }
+  return out;
+}
+
 const percentNames = [
   "暴击率", "暴击伤害", "命中率", "护甲穿透", "魔法穿透", "技能伤害",
-  "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普通攻击吸血",
-  "攻速"
+  "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
+  "攻速",
+  "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗",
+  "技能抗性", "魔法伤害", "物理伤害", "物理抗性", "强化伤害", "普攻伤害", "普攻抗性",
+  "光属性伤害", "光属性抗性", "暗属性伤害", "暗属性抗性", "木属性伤害", "木属性抗性",
+  "火属性伤害", "火属性抗性", "雷属性伤害", "雷属性抗性", "水属性伤害", "水属性抗性",
+  "金属性抗性", "召唤物伤害", "召唤物抗性", "伤害减少%", "被暴击率", "被暴击伤害",
+  "眩晕抗性", "魔法普攻伤害", "蝼蚁专精", "伤害%", "最终伤害%", "经验获取率",
+  "最大生命值%", "基础攻击力%"
 ];
 
 function initEvents(): void {
@@ -46,8 +114,8 @@ function initEvents(): void {
     jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), jass.EVENT_PLAYER_UNIT_PICKUP_ITEM, undefined!);
     jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), jass.EVENT_PLAYER_UNIT_DROP_ITEM, undefined!);
   }
-  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(12), jass.EVENT_PLAYER_UNIT_PICKUP_ITEM, undefined!);
-  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(12), jass.EVENT_PLAYER_UNIT_DROP_ITEM, undefined!);
+  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(13), jass.EVENT_PLAYER_UNIT_PICKUP_ITEM, undefined!);
+  jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(13), jass.EVENT_PLAYER_UNIT_DROP_ITEM, undefined!);
 
   jass.TriggerAddAction(trig, () => {
     const item = jass.GetManipulatedItem();
@@ -64,106 +132,75 @@ function initEvents(): void {
     const player = jass.GetOwningPlayer(unit);
     const itemId = jass.GetItemTypeId(item);
     const event = jass.GetTriggerEventId();
-    // 若拾取后立刻被“装备限制”丢弃，这里不应再加属性/提示
-    if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM && typeof (jass as any).UnitHasItemOfTypeBJ === "function") {
-      if (!(jass as any).UnitHasItemOfTypeBJ(unit, itemId)) return;
+    const isDrop = event === jass.EVENT_PLAYER_UNIT_DROP_ITEM;
+    const skipFlag = equipShared.equipShared.skipNextDrop;
+    if (isDrop && skipFlag) {
+      equipShared.equipShared.skipNextDrop = false;
+      // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0.02, 6, "|cff87ceeb[装备调试]|r DROP 因 SkipNextDrop 已跳过");
+      return;
     }
+    // if (isDrop && (globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0.02, 6, "|cff87ceeb[装备调试]|r DROP 未跳过 SkipNextDrop=" + tostring(skipFlag));
     const idStr = fourCCToString(itemId);
     const itemData = items[idStr];
-    if (!itemData) return;
+    if (!itemData) {
+      if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM) {
+        const displayName = (typeof slk !== "undefined" && slk.item && (slk.item as Record<string, { name?: string }>)[idStr]?.name) || idStr;
+        const border = "|cff606060────────────────────────|r";
+        const msg = border + "\n|cffffff00『系统消息』：|r"+"检测到|cFF87CEEB【装备】|r"+"|cFFFFD700" + "『"+ displayName +"』" +"|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n" + border;
+        jass.DisplayTimedTextToPlayer(player, 0, 0.01, 10, msg);
+      }
+      return;
+    }
+    const skipType = (itemData as { type?: string }).type;
+    if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
+    // 拾取时：装备限制不通过则不加属性、不提示“获得”，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）
+    // 被拒时不设 skipNextDrop：只由装备限制在 UnitRemoveItem 前设置，避免误跳过后续玩家手动丢弃
+    if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM && typeof equipLimit.equipLimitWouldAllowPickup === "function" && !equipLimit.equipLimitWouldAllowPickup(unit, item)) {
+      // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0.02, 6, "|cff87ceeb[装备调试]|r PICKUP 被拒，不加属性");
+      return;
+    }
 
     const charges = jass.GetItemCharges(item);
     const mult = charges > 0 ? charges : 1;
 
     g.udg_TempUnit = unit;
     g.udg_TempIsAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
-    g.udg_TempHp = itemData.hp ?? 0;
-    g.udg_TempMp = itemData.mp ?? 0;
-    g.udg_TempDmg = itemData.dmg ?? 0;
-    g.udg_TempArmor = itemData.armor ?? 0;
-    g.udg_TempAtkSpeed = itemData.atkSpeed ?? 0;
-    g.udg_TempMoveSpeed = itemData.moveSpeed ?? 0;
-    g.udg_TempStr = itemData.str ?? 0;
-    g.udg_TempAgi = itemData.agi ?? 0;
-    g.udg_TempInt = itemData.int ?? 0;
-    g.udg_TempAll = itemData.all ?? 0;
-    g.udg_TempScore = itemData.score ?? 0
+    const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
+    let primary: Record<string, number> = {};
+    if (primaryBonus && typeof (jass as any).ExecuteFunc === "function") {
+      jass.ExecuteFunc("GetHeroMainAttribute");
+      const mainAttr = (g as any).udg_TempInteger ?? 0;
+      primary = parsePrimaryBonus(primaryBonus, mainAttr);
+    }
+    const merged: Record<string, number> = {};
+    for (const e of STAT_CONFIG) {
+      merged[e.key] = (itemData[e.key] ?? 0) + (primary[e.key] ?? 0);
+    }
+    merged["moveSpeed"] = (itemData.moveSpeed ?? 0) + (primary["moveSpeed"] ?? 0);
 
-
+    g.udg_TempHp = merged.hp ?? 0;
+    g.udg_TempMp = merged.mp ?? 0;
+    g.udg_TempDmg = merged.dmg ?? 0;
+    g.udg_TempArmor = merged.armor ?? 0;
+    g.udg_TempAtkSpeed = merged.atkSpeed ?? 0;
+    g.udg_TempMoveSpeed = merged.moveSpeed ?? 0;
+    g.udg_TempStr = merged.str ?? 0;
+    g.udg_TempAgi = merged.agi ?? 0;
+    g.udg_TempInt = merged.int ?? 0;
+    g.udg_TempAll = merged.all ?? 0;
+    g.udg_TempScore = itemData.score ?? 0;
 
     const playerStats: StatEntry[] = [];
     const isAdd = g.udg_TempIsAdd;
-
     const addStat = (val: number | undefined, name: string) => {
       if (val == null || val === 0) return;
       let value = val * mult;
       if (!isAdd) value = -value;
       playerStats.push({ name, value });
     };
-    //逆天自定义值动态的属性定义
-    addStat(itemData.hp, "生命值");
-    addStat(itemData.mp, "魔法值");
-    addStat(itemData.dmg, "攻击力");
-    addStat(itemData.armor, "护甲");
-    addStat(itemData.atkSpeed, "攻速");
-    addStat(itemData.movespeed, "叠加移动速度");
-    addStat(itemData.str, "力量");
-    addStat(itemData.agi, "敏捷");
-    addStat(itemData.int, "智力");
-    addStat(itemData.all, "全属性");
-    addStat(itemData.critRate, "暴击率");
-    addStat(itemData.critDmg, "暴击伤害");
-    addStat(itemData.magicResist, "魔抗");
-    addStat(itemData.hpRegen, "生命恢复");
-    addStat(itemData.hpRegenPct, "生命恢复%");
-    addStat(itemData.hpRegenEff, "生命恢复效率");
-    addStat(itemData.skillHeal, "技能治疗率");
-    addStat(itemData.healReceived, "受到的治疗率");
-    addStat(itemData.mpRegen, "魔法恢复");
-    addStat(itemData.mpRegenPct, "魔法恢复%");
-    addStat(itemData.mpCost, "魔法消耗");
-    addStat(itemData.cdReduction, "冷却缩减");
-    addStat(itemData.accuracy, "命中率");
-    addStat(itemData.dodge, "闪避率");
-    addStat(itemData.armorPierce, "护甲穿透");
-    addStat(itemData.magicPierce, "魔法穿透");
-    addStat(itemData.skillDmg, "技能伤害");
-    addStat(itemData.skillResist, "技能抗性");
-    addStat(itemData.magicDmg, "魔法伤害");
-    addStat(itemData.physDmg, "物理伤害");
-    addStat(itemData.physResist, "物理抗性");
-    addStat(itemData.enhanceDmg, "强化伤害");
-    addStat(itemData.atkDmg, "普攻伤害");
-    addStat(itemData.atkResist, "普攻抗性");
-    addStat(itemData.lightDmg, "光属性伤害");
-    addStat(itemData.lightResist, "光属性抗性");
-    addStat(itemData.darkDmg, "暗属性伤害");
-    addStat(itemData.darkResist, "暗属性抗性");
-    addStat(itemData.woodDmg, "木属性伤害");
-    addStat(itemData.woodResist, "木属性抗性");
-    addStat(itemData.fireDmg, "火属性伤害");
-    addStat(itemData.fireResist, "火属性抗性");
-    addStat(itemData.thunderDmg, "雷属性伤害");
-    addStat(itemData.thunderResist, "雷属性抗性");
-    addStat(itemData.waterDmg, "水属性伤害");
-    addStat(itemData.waterResist, "水属性抗性");
-    addStat(itemData.MetalResist, "金属性抗性");
-    addStat(itemData.summonDmg, "召唤物伤害");
-    addStat(itemData.summonResist, "召唤物抗性");
-    addStat(itemData.dmgReduction, "伤害减少");
-    addStat(itemData.dmgReductionPct, "伤害减少%");
-    addStat(itemData.lifeSteal, "伤害吸血");
-    addStat(itemData.magicLifeSteal, "魔法伤害吸血");
-    addStat(itemData.atkLifeSteal, "普攻伤害吸血");
-    addStat(itemData.critRateTaken, "被暴击率");
-    addStat(itemData.critDmgTaken, "被暴击伤害");
-    addStat(itemData.stunResist, "眩晕抗性");
-    addStat(itemData.magicAtkDmg, "魔法普攻伤害");
-    addStat(itemData.antMastery, "蝼蚁专精");
-    addStat(itemData.movespeed2, "移动速度");
-    addStat(itemData.dmgBonus, "伤害%");
-    addStat(itemData.finalDmgBonus, "最终伤害%");
-    addStat(itemData.expGainRate, "经验获取率");
+    for (const e of STAT_CONFIG) {
+      addStat(merged[e.key], e.name);
+    }
     //再保存到全局变量（此时 playerStats 已经有数据了）
     g.udg_TempString = {};
     g.udg_TempAmount = {};
@@ -176,21 +213,6 @@ function initEvents(): void {
 
     const owner = jass.GetOwningPlayer(g.udg_TempUnit);
     const playerName = jass.GetPlayerName(owner);
-    const tempRead = (g as any).udg_TempReadValue as number[] | undefined;
-    const test5Parts: string[] = [];
-    for (let i = 0; i < playerStats.length; i++) {
-      const idx = i + 1;
-      const statName = g.udg_TempString[idx];
-      const val = tempRead != null && tempRead[i] != null ? tempRead[i] : 0;
-      // 显示“本操作后”的累计值：当前存储值 + 本次装备的增减（第一次拾取时 val=0 也能显示正确）
-      const displayVal = val + playerStats[i].value;
-      const num = Number(displayVal);
-      const valStr = tostring(num);
-      test5Parts.push(statName + "为：" + valStr);
-    }
-    if (test5Parts.length > 0) {
-      jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "系统测试：" + playerName + "的当前装备加成" + test5Parts.join("，"));
-    }
 
     const actionText = g.udg_TempIsAdd ? "获得" : "丢弃";
     const levelText = itemData.level || "";
@@ -205,24 +227,49 @@ function initEvents(): void {
 
     const coloredLevel = levelColor + levelText + "|r";
     const coloredName = "|cFFFFD700" + (itemData.name || "未知") + "|r";
-    let msg = "|cFF87CEEB【装备】|r " + actionText + "[" + coloredLevel + "]" + "级" + "『" + coloredName + "』";
+    let msg = "|cffffff00『系统消息』：|r" +"|cFF87CEEB【装备】|r " + actionText + "[" + coloredLevel + "]" + "级" + "『" + coloredName + "』";
     for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
-      if (percentNames.indexOf(stat.name) >= 0) {
-        msg += " " + stat.name + sign + (stat.value * 100) + "%";
-      } else {
-        msg += " " + stat.name + sign + stat.value;
-      }
+      const isPct = percentNames.indexOf(stat.name) >= 0;
+      const v = isPct ? stat.value * 100 : stat.value;
+      const nearZero = v > -1e-6 && v < 1e-6;
+      const vStr = nearZero ? "0" : tostring(v);
+      msg += " " + stat.name + sign + vStr + (isPct ? "%" : "");
     }
     jass.DisplayTimedTextToPlayer(player, 0, 0.01, 5, msg);
 
     jass.ExecuteFunc("ApplyItemBonus");
+    const tempRead = (g as any).udg_TempReadValue as number[] | undefined;
+    const test5Parts: string[] = [];
+    for (let i = 0; i < playerStats.length; i++) {
+      const idx = i + 1;
+      const statName = g.udg_TempString[idx];
+      if (statName === "移动速度") continue; // 移速由下方从装备移速取数并显示
+      const val = tempRead != null && (tempRead as any)[idx] != null ? (tempRead as any)[idx] : 0;
+      const num = Number(val);
+      const isPct = percentNames.indexOf(statName) >= 0;
+      const nearZero = num > -1e-6 && num < 1e-6;
+      const valStr = isPct ? (nearZero ? "0%" : tostring(math.floor(num * 1000 + 0.5) / 10) + "%") : (nearZero ? "0" : tostring(num));
+      test5Parts.push(statName + "为：" + valStr);
+    }
+    // 仅当本次操作的装备带移速时才在「当前装备加成」里显示移速，且 DROP 时排除被丢物品再算
+    const hasMovespeed2 = (itemData as { movespeed2?: number }).movespeed2 != null;
+    if (hasMovespeed2 && g.udg_TempUnit && typeof equipMovespeed.getMaxMovespeed2Info === "function") {
+      const ms = equipMovespeed.getMaxMovespeed2Info(g.udg_TempUnit, isDrop ? item : undefined);
+      if (ms.value > 0) test5Parts.push("移动速度为：" + tostring(ms.value));
+      if (ms.value > 0 && ms.name !== "" && ms.count >= 2) {
+        jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统提示』：|r移速不叠加，当前只生效|cff00bfff『" + ms.name + "』|r");
+      }
+    }
+    if (test5Parts.length > 0) {
+      jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统消息』：|r" + playerName + "的当前装备加成" + test5Parts.join("，"));
+    }
   });
 
-  (globalThis as any).print("【调试】事件监听器创建完成");
+  // (globalThis as any).print("【调试】事件监听器创建完成");
 }
 
 // 立即执行：注册拾取/丢弃物品事件（require 时整块执行，initEvents 会运行）
 initEvents();
-(globalThis as any).print("【调试】equip_system 加载完成");
+// (globalThis as any).print("【调试】equip_system 加载完成");
 export { }; // 保持为模块，使 jass/g/items 等为 local，且 require() 会执行本文件

@@ -1,11 +1,13 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
 local jass = require("jass.common")
+local g = require("jass.globals")
 local itemsData = require("系统.装备.装备数据").default or ({})
+local equipShared = require("系统.装备.装备共享")
 local ONE_PER_SLOT = {
     "主武器",
     "副武器",
@@ -72,6 +74,104 @@ local function safeUnitItemInSlot(self, unit, slot)
     end
     return nil
 end
+--- 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
+-- 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。
+function ____exports.equipLimitWouldAllowPickup(self, unit, item)
+    if Itmeboolean then
+        return true
+    end
+    if not unit or not item then
+        return true
+    end
+    local pickedTypeId = safeGetItemTypeId(nil, item)
+    if pickedTypeId == nil then
+        return true
+    end
+    local entry = getEntry(nil, pickedTypeId)
+    if not entry then
+        return true
+    end
+    local pickedSlotType = entry.type
+    local onlyOne = entry.onlyone == true or entry.onlyone == "TRUE"
+    local sameIdCount = 0
+    local sameSlotTypeCount = 0
+    local hasTwoHanded = false
+    local hasMain = false
+    local hasSub = false
+    do
+        local i = 0
+        while i <= 5 do
+            do
+                local __continue20
+                repeat
+                    local it = safeUnitItemInSlot(nil, unit, i)
+                    if not it or it == item then
+                        __continue20 = true
+                        break
+                    end
+                    local itTypeId = safeGetItemTypeId(nil, it)
+                    if itTypeId == nil then
+                        __continue20 = true
+                        break
+                    end
+                    local e = getEntry(nil, itTypeId)
+                    if not e then
+                        __continue20 = true
+                        break
+                    end
+                    if itTypeId == pickedTypeId then
+                        sameIdCount = sameIdCount + 1
+                    end
+                    if pickedSlotType ~= nil and e.type == pickedSlotType then
+                        sameSlotTypeCount = sameSlotTypeCount + 1
+                    end
+                    if e.type == TWO_HANDED then
+                        hasTwoHanded = true
+                    end
+                    if e.type == "主武器" then
+                        hasMain = true
+                    end
+                    if e.type == "副武器" then
+                        hasSub = true
+                    end
+                    __continue20 = true
+                until true
+                if not __continue20 then
+                    break
+                end
+            end
+            i = i + 1
+        end
+    end
+    sameIdCount = sameIdCount + 1
+    sameSlotTypeCount = sameSlotTypeCount + 1
+    if pickedSlotType == "主武器" then
+        hasMain = true
+    end
+    if pickedSlotType == "副武器" then
+        hasSub = true
+    end
+    if pickedSlotType == TWO_HANDED then
+        hasTwoHanded = true
+    end
+    local msg = ""
+    if pickedSlotType == TWO_HANDED then
+        if hasMain or hasSub then
+            msg = "x"
+        end
+    elseif pickedSlotType and __TS__ArrayIndexOf(CONFLICT_WITH_TWO_HANDED, pickedSlotType) >= 0 then
+        if hasTwoHanded then
+            msg = "x"
+        end
+    end
+    if msg == "" and onlyOne and sameIdCount > 1 then
+        msg = "x"
+    end
+    if msg == "" and pickedSlotType and __TS__ArrayIndexOf(ONE_PER_SLOT, pickedSlotType) >= 0 and sameSlotTypeCount > 1 then
+        msg = "x"
+    end
+    return msg == ""
+end
 local function onPickup(self)
     if Itmeboolean then
         return
@@ -121,11 +221,11 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue26
+                local __continue50
                 repeat
                     if __TS__StringSubstring(s, i, i + 2) == "|r" then
                         i = i + 2
-                        __continue26 = true
+                        __continue50 = true
                         break
                     end
                     if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
@@ -144,15 +244,15 @@ local function onPickup(self)
                         end
                         if hex then
                             i = i + 10
-                            __continue26 = true
+                            __continue50 = true
                             break
                         end
                     end
                     out = out .. __TS__StringAccess(s, i)
                     i = i + 1
-                    __continue26 = true
+                    __continue50 = true
                 until true
-                if not __continue26 then
+                if not __continue50 then
                     break
                 end
             end
@@ -190,21 +290,21 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue37
+                local __continue61
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it then
-                        __continue37 = true
+                        __continue61 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue37 = true
+                        __continue61 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue37 = true
+                        __continue61 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -222,9 +322,9 @@ local function onPickup(self)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue37 = true
+                    __continue61 = true
                 until true
-                if not __continue37 then
+                if not __continue61 then
                     break
                 end
             end
@@ -258,6 +358,7 @@ local function onPickup(self)
     if msg == "" then
         return
     end
+    equipShared.equipShared.skipNextDrop = true
     if type(jass.UnitRemoveItem) == "function" then
         jass.UnitRemoveItem(unit, item)
     else

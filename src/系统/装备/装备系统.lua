@@ -1,16 +1,139 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Number = ____lualib.__TS__Number
+local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__StringTrim = ____lualib.__TS__StringTrim
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+--- 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true
 local jass = require("jass.common")
 local g = require("jass.globals")
 local items = require("系统.装备.装备数据").default
+local equipLimit = require("系统.装备.装备限制")
+local equipShared = require("系统.装备.装备共享")
+local equipMovespeed = require("系统.装备.装备移速")
 local function fourCCToString(self, fourcc)
     local c1 = string.char(fourcc % 256)
     local c2 = string.char(math.floor(fourcc / 256) % 256)
     local c3 = string.char(math.floor(fourcc / 65536) % 256)
     local c4 = string.char(math.floor(fourcc / 16777216) % 256)
     return ((c4 .. c3) .. c2) .. c1
+end
+--- 属性配置：显示名 -> itemData key，udg 为 JASS 全局时填写。新增属性只需在此加一行，primaryBonus 即可用该显示名
+local STAT_CONFIG = {
+    {name = "生命值", key = "hp", udg = "udg_TempHp"},
+    {name = "魔法值", key = "mp", udg = "udg_TempMp"},
+    {name = "攻击力", key = "dmg", udg = "udg_TempDmg"},
+    {name = "护甲", key = "armor", udg = "udg_TempArmor"},
+    {name = "攻速", key = "atkSpeed", udg = "udg_TempAtkSpeed"},
+    {name = "叠加移动速度", key = "movespeed"},
+    {name = "力量", key = "str", udg = "udg_TempStr"},
+    {name = "敏捷", key = "agi", udg = "udg_TempAgi"},
+    {name = "智力", key = "int", udg = "udg_TempInt"},
+    {name = "全属性", key = "all", udg = "udg_TempAll"},
+    {name = "暴击率", key = "critRate"},
+    {name = "暴击伤害", key = "critDmg"},
+    {name = "魔抗", key = "magicResist"},
+    {name = "生命恢复", key = "hpRegen"},
+    {name = "生命恢复%", key = "hpRegenPct"},
+    {name = "生命恢复效率", key = "hpRegenEff"},
+    {name = "技能治疗率", key = "skillHeal"},
+    {name = "受到的治疗率", key = "healReceived"},
+    {name = "魔法恢复", key = "mpRegen"},
+    {name = "魔法恢复%", key = "mpRegenPct"},
+    {name = "魔法消耗", key = "mpCost"},
+    {name = "冷却缩减", key = "cdReduction"},
+    {name = "命中率", key = "accuracy"},
+    {name = "闪避率", key = "dodge"},
+    {name = "护甲穿透", key = "armorPierce"},
+    {name = "魔法穿透", key = "magicPierce"},
+    {name = "技能伤害", key = "skillDmg"},
+    {name = "技能抗性", key = "skillResist"},
+    {name = "魔法伤害", key = "magicDmg"},
+    {name = "物理伤害", key = "physDmg"},
+    {name = "物理抗性", key = "physResist"},
+    {name = "强化伤害", key = "enhanceDmg"},
+    {name = "普攻伤害", key = "atkDmg"},
+    {name = "普攻抗性", key = "atkResist"},
+    {name = "光属性伤害", key = "lightDmg"},
+    {name = "光属性抗性", key = "lightResist"},
+    {name = "暗属性伤害", key = "darkDmg"},
+    {name = "暗属性抗性", key = "darkResist"},
+    {name = "木属性伤害", key = "woodDmg"},
+    {name = "木属性抗性", key = "woodResist"},
+    {name = "火属性伤害", key = "fireDmg"},
+    {name = "火属性抗性", key = "fireResist"},
+    {name = "雷属性伤害", key = "thunderDmg"},
+    {name = "雷属性抗性", key = "thunderResist"},
+    {name = "水属性伤害", key = "waterDmg"},
+    {name = "水属性抗性", key = "waterResist"},
+    {name = "金属性抗性", key = "MetalResist"},
+    {name = "召唤物伤害", key = "summonDmg"},
+    {name = "召唤物抗性", key = "summonResist"},
+    {name = "伤害减少", key = "dmgReduction"},
+    {name = "伤害减少%", key = "dmgReductionPct"},
+    {name = "伤害吸血", key = "lifeSteal"},
+    {name = "魔法伤害吸血", key = "magicLifeSteal"},
+    {name = "普攻伤害吸血", key = "atkLifeSteal"},
+    {name = "被暴击率", key = "critRateTaken"},
+    {name = "被暴击伤害", key = "critDmgTaken"},
+    {name = "眩晕抗性", key = "stunResist"},
+    {name = "魔法普攻伤害", key = "magicAtkDmg"},
+    {name = "蝼蚁专精", key = "antMastery"},
+    {name = "移动速度", key = "movespeed2"},
+    {name = "伤害%", key = "dmgBonus"},
+    {name = "最终伤害%", key = "finalDmgBonus"},
+    {name = "经验获取率", key = "expGainRate"},
+    {name = "最大生命值%", key = "hpPct"},
+    {name = "基础攻击力%", key = "baseDmgPct"}
+}
+local NAME_TO_KEY = {}
+for ____, e in ipairs(STAT_CONFIG) do
+    NAME_TO_KEY[e.name] = e.key
+end
+if not NAME_TO_KEY["移速"] then
+    NAME_TO_KEY["移速"] = "moveSpeed"
+end
+--- 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 1/2/3 取对应段，段内可用逗号多属性。返回 key->数值
+local function parsePrimaryBonus(self, s, mainAttr)
+    local out = {}
+    if not s or mainAttr < 1 or mainAttr > 3 then
+        return out
+    end
+    local segments = __TS__StringSplit(s, "/")
+    local seg = __TS__StringTrim(segments[mainAttr] or "")
+    if not seg then
+        return out
+    end
+    local parts = __TS__StringSplit(seg, ",")
+    for ____, p in ipairs(parts) do
+        do
+            local __continue9
+            repeat
+                local idx = (string.find(p, "+", nil, true) or 0) - 1
+                if idx < 0 then
+                    __continue9 = true
+                    break
+                end
+                local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
+                local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
+                local key = NAME_TO_KEY[name]
+                if not key then
+                    __continue9 = true
+                    break
+                end
+                local isPct = (string.find(valStr, "%", nil, true) or 0) - 1 >= 0
+                local num = __TS__ParseFloat(valStr) or 0
+                out[key] = (out[key] or 0) + (isPct and num / 100 or num)
+                __continue9 = true
+            until true
+            if not __continue9 then
+                break
+            end
+        end
+    end
+    return out
 end
 local percentNames = {
     "暴击率",
@@ -24,8 +147,46 @@ local percentNames = {
     "冷却缩减",
     "伤害吸血",
     "魔法伤害吸血",
-    "普通攻击吸血",
-    "攻速"
+    "普攻伤害吸血",
+    "攻速",
+    "生命恢复%",
+    "魔法恢复%",
+    "技能治疗率",
+    "受到的治疗率",
+    "魔法消耗",
+    "技能抗性",
+    "魔法伤害",
+    "物理伤害",
+    "物理抗性",
+    "强化伤害",
+    "普攻伤害",
+    "普攻抗性",
+    "光属性伤害",
+    "光属性抗性",
+    "暗属性伤害",
+    "暗属性抗性",
+    "木属性伤害",
+    "木属性抗性",
+    "火属性伤害",
+    "火属性抗性",
+    "雷属性伤害",
+    "雷属性抗性",
+    "水属性伤害",
+    "水属性抗性",
+    "金属性抗性",
+    "召唤物伤害",
+    "召唤物抗性",
+    "伤害减少%",
+    "被暴击率",
+    "被暴击伤害",
+    "眩晕抗性",
+    "魔法普攻伤害",
+    "蝼蚁专精",
+    "伤害%",
+    "最终伤害%",
+    "经验获取率",
+    "最大生命值%",
+    "基础攻击力%"
 }
 local function initEvents(self)
     local trig = jass.CreateTrigger()
@@ -49,13 +210,13 @@ local function initEvents(self)
     end
     jass.TriggerRegisterPlayerUnitEvent(
         trig,
-        jass.Player(12),
+        jass.Player(13),
         jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
         nil
     )
     jass.TriggerRegisterPlayerUnitEvent(
         trig,
-        jass.Player(12),
+        jass.Player(13),
         jass.EVENT_PLAYER_UNIT_DROP_ITEM,
         nil
     )
@@ -84,35 +245,81 @@ local function initEvents(self)
             local player = jass.GetOwningPlayer(unit)
             local itemId = jass.GetItemTypeId(item)
             local event = jass.GetTriggerEventId()
-            if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(jass.UnitHasItemOfTypeBJ) == "function" then
-                if not jass.UnitHasItemOfTypeBJ(unit, itemId) then
-                    return
-                end
+            local isDrop = event == jass.EVENT_PLAYER_UNIT_DROP_ITEM
+            local skipFlag = equipShared.equipShared.skipNextDrop
+            if isDrop and skipFlag then
+                equipShared.equipShared.skipNextDrop = false
+                return
             end
             local idStr = fourCCToString(nil, itemId)
             local itemData = items[idStr]
             if not itemData then
+                if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
+                    local ____temp_2 = type(slk) ~= "nil" and slk.item
+                    if ____temp_2 then
+                        local ____opt_0 = slk.item[idStr]
+                        ____temp_2 = ____opt_0 and ____opt_0.name
+                    end
+                    local displayName = ____temp_2 or idStr
+                    local border = "|cff606060────────────────────────|r"
+                    local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
+                    jass.DisplayTimedTextToPlayer(
+                        player,
+                        0,
+                        0.01,
+                        10,
+                        msg
+                    )
+                end
+                return
+            end
+            local skipType = itemData.type
+            if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
+                return
+            end
+            if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
                 return
             end
             local charges = jass.GetItemCharges(item)
             local mult = charges > 0 and charges or 1
             g.udg_TempUnit = unit
             g.udg_TempIsAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-            g.udg_TempHp = itemData.hp or 0
-            g.udg_TempMp = itemData.mp or 0
-            g.udg_TempDmg = itemData.dmg or 0
-            g.udg_TempArmor = itemData.armor or 0
-            g.udg_TempAtkSpeed = itemData.atkSpeed or 0
-            g.udg_TempMoveSpeed = itemData.moveSpeed or 0
-            g.udg_TempStr = itemData.str or 0
-            g.udg_TempAgi = itemData.agi or 0
-            g.udg_TempInt = itemData.int or 0
-            g.udg_TempAll = itemData.all or 0
-            local ____itemData_score_0 = itemData.score
-            if ____itemData_score_0 == nil then
-                ____itemData_score_0 = 0
+            local primaryBonus = itemData.primaryBonus
+            local primary = {}
+            if primaryBonus and type(jass.ExecuteFunc) == "function" then
+                jass.ExecuteFunc("GetHeroMainAttribute")
+                local ____g_udg_TempInteger_3 = g.udg_TempInteger
+                if ____g_udg_TempInteger_3 == nil then
+                    ____g_udg_TempInteger_3 = 0
+                end
+                local mainAttr = ____g_udg_TempInteger_3
+                primary = parsePrimaryBonus(nil, primaryBonus, mainAttr)
             end
-            g.udg_TempScore = ____itemData_score_0
+            local merged = {}
+            for ____, e in ipairs(STAT_CONFIG) do
+                local ____e_key_5 = e.key
+                local ____itemData_e_key_4 = itemData[e.key]
+                if ____itemData_e_key_4 == nil then
+                    ____itemData_e_key_4 = 0
+                end
+                merged[____e_key_5] = ____itemData_e_key_4 + (primary[e.key] or 0)
+            end
+            merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
+            g.udg_TempHp = merged.hp or 0
+            g.udg_TempMp = merged.mp or 0
+            g.udg_TempDmg = merged.dmg or 0
+            g.udg_TempArmor = merged.armor or 0
+            g.udg_TempAtkSpeed = merged.atkSpeed or 0
+            g.udg_TempMoveSpeed = merged.moveSpeed or 0
+            g.udg_TempStr = merged.str or 0
+            g.udg_TempAgi = merged.agi or 0
+            g.udg_TempInt = merged.int or 0
+            g.udg_TempAll = merged.all or 0
+            local ____itemData_score_6 = itemData.score
+            if ____itemData_score_6 == nil then
+                ____itemData_score_6 = 0
+            end
+            g.udg_TempScore = ____itemData_score_6
             local playerStats = {}
             local isAdd = g.udg_TempIsAdd
             local function addStat(____, val, name)
@@ -125,69 +332,9 @@ local function initEvents(self)
                 end
                 playerStats[#playerStats + 1] = {name = name, value = value}
             end
-            addStat(nil, itemData.hp, "生命值")
-            addStat(nil, itemData.mp, "魔法值")
-            addStat(nil, itemData.dmg, "攻击力")
-            addStat(nil, itemData.armor, "护甲")
-            addStat(nil, itemData.atkSpeed, "攻速")
-            addStat(nil, itemData.movespeed, "叠加移动速度")
-            addStat(nil, itemData.str, "力量")
-            addStat(nil, itemData.agi, "敏捷")
-            addStat(nil, itemData.int, "智力")
-            addStat(nil, itemData.all, "全属性")
-            addStat(nil, itemData.critRate, "暴击率")
-            addStat(nil, itemData.critDmg, "暴击伤害")
-            addStat(nil, itemData.magicResist, "魔抗")
-            addStat(nil, itemData.hpRegen, "生命恢复")
-            addStat(nil, itemData.hpRegenPct, "生命恢复%")
-            addStat(nil, itemData.hpRegenEff, "生命恢复效率")
-            addStat(nil, itemData.skillHeal, "技能治疗率")
-            addStat(nil, itemData.healReceived, "受到的治疗率")
-            addStat(nil, itemData.mpRegen, "魔法恢复")
-            addStat(nil, itemData.mpRegenPct, "魔法恢复%")
-            addStat(nil, itemData.mpCost, "魔法消耗")
-            addStat(nil, itemData.cdReduction, "冷却缩减")
-            addStat(nil, itemData.accuracy, "命中率")
-            addStat(nil, itemData.dodge, "闪避率")
-            addStat(nil, itemData.armorPierce, "护甲穿透")
-            addStat(nil, itemData.magicPierce, "魔法穿透")
-            addStat(nil, itemData.skillDmg, "技能伤害")
-            addStat(nil, itemData.skillResist, "技能抗性")
-            addStat(nil, itemData.magicDmg, "魔法伤害")
-            addStat(nil, itemData.physDmg, "物理伤害")
-            addStat(nil, itemData.physResist, "物理抗性")
-            addStat(nil, itemData.enhanceDmg, "强化伤害")
-            addStat(nil, itemData.atkDmg, "普攻伤害")
-            addStat(nil, itemData.atkResist, "普攻抗性")
-            addStat(nil, itemData.lightDmg, "光属性伤害")
-            addStat(nil, itemData.lightResist, "光属性抗性")
-            addStat(nil, itemData.darkDmg, "暗属性伤害")
-            addStat(nil, itemData.darkResist, "暗属性抗性")
-            addStat(nil, itemData.woodDmg, "木属性伤害")
-            addStat(nil, itemData.woodResist, "木属性抗性")
-            addStat(nil, itemData.fireDmg, "火属性伤害")
-            addStat(nil, itemData.fireResist, "火属性抗性")
-            addStat(nil, itemData.thunderDmg, "雷属性伤害")
-            addStat(nil, itemData.thunderResist, "雷属性抗性")
-            addStat(nil, itemData.waterDmg, "水属性伤害")
-            addStat(nil, itemData.waterResist, "水属性抗性")
-            addStat(nil, itemData.MetalResist, "金属性抗性")
-            addStat(nil, itemData.summonDmg, "召唤物伤害")
-            addStat(nil, itemData.summonResist, "召唤物抗性")
-            addStat(nil, itemData.dmgReduction, "伤害减少")
-            addStat(nil, itemData.dmgReductionPct, "伤害减少%")
-            addStat(nil, itemData.lifeSteal, "伤害吸血")
-            addStat(nil, itemData.magicLifeSteal, "魔法伤害吸血")
-            addStat(nil, itemData.atkLifeSteal, "普攻伤害吸血")
-            addStat(nil, itemData.critRateTaken, "被暴击率")
-            addStat(nil, itemData.critDmgTaken, "被暴击伤害")
-            addStat(nil, itemData.stunResist, "眩晕抗性")
-            addStat(nil, itemData.magicAtkDmg, "魔法普攻伤害")
-            addStat(nil, itemData.antMastery, "蝼蚁专精")
-            addStat(nil, itemData.movespeed2, "移动速度")
-            addStat(nil, itemData.dmgBonus, "伤害%")
-            addStat(nil, itemData.finalDmgBonus, "最终伤害%")
-            addStat(nil, itemData.expGainRate, "经验获取率")
+            for ____, e in ipairs(STAT_CONFIG) do
+                addStat(nil, merged[e.key], e.name)
+            end
             g.udg_TempString = {}
             g.udg_TempAmount = {}
             g.udg_TempStatCount = #playerStats
@@ -201,30 +348,6 @@ local function initEvents(self)
             end
             local owner = jass.GetOwningPlayer(g.udg_TempUnit)
             local playerName = jass.GetPlayerName(owner)
-            local tempRead = g.udg_TempReadValue
-            local test5Parts = {}
-            do
-                local i = 0
-                while i < #playerStats do
-                    local idx = i + 1
-                    local statName = g.udg_TempString[idx]
-                    local val = tempRead ~= nil and tempRead[i + 1] ~= nil and tempRead[i + 1] or 0
-                    local displayVal = val + playerStats[i + 1].value
-                    local num = __TS__Number(displayVal)
-                    local valStr = tostring(num)
-                    test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
-                    i = i + 1
-                end
-            end
-            if #test5Parts > 0 then
-                jass.DisplayTimedTextToPlayer(
-                    owner,
-                    0,
-                    0.02,
-                    5,
-                    (("系统测试：" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
-                )
-            end
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"
             local levelText = itemData.level or ""
             local levelColor
@@ -245,14 +368,14 @@ local function initEvents(self)
             end
             local coloredLevel = (levelColor .. levelText) .. "|r"
             local coloredName = ("|cFFFFD700" .. (itemData.name or "未知")) .. "|r"
-            local msg = ((((((("|cFF87CEEB【装备】|r " .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
+            local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
             for ____, stat in ipairs(playerStats) do
                 local sign = stat.value > 0 and "+" or ""
-                if __TS__ArrayIndexOf(percentNames, stat.name) >= 0 then
-                    msg = msg .. (((" " .. stat.name) .. sign) .. tostring(stat.value * 100)) .. "%"
-                else
-                    msg = msg .. ((" " .. stat.name) .. sign) .. tostring(stat.value)
-                end
+                local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
+                local v = isPct and stat.value * 100 or stat.value
+                local nearZero = v > -0.000001 and v < 0.000001
+                local vStr = nearZero and "0" or tostring(v)
+                msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
             end
             jass.DisplayTimedTextToPlayer(
                 player,
@@ -262,10 +385,77 @@ local function initEvents(self)
                 msg
             )
             jass.ExecuteFunc("ApplyItemBonus")
+            local tempRead = g.udg_TempReadValue
+            local test5Parts = {}
+            do
+                local i = 0
+                while i < #playerStats do
+                    do
+                        local __continue48
+                        repeat
+                            local idx = i + 1
+                            local statName = g.udg_TempString[idx]
+                            if statName == "移动速度" then
+                                __continue48 = true
+                                break
+                            end
+                            local ____temp_7
+                            if tempRead ~= nil and tempRead[idx] ~= nil then
+                                ____temp_7 = tempRead[idx]
+                            else
+                                ____temp_7 = 0
+                            end
+                            local val = ____temp_7
+                            local num = __TS__Number(val)
+                            local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
+                            local nearZero = num > -0.000001 and num < 0.000001
+                            local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
+                            ) .. "%") or (nearZero and "0" or tostring(num))
+                            test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
+                            __continue48 = true
+                        until true
+                        if not __continue48 then
+                            break
+                        end
+                    end
+                    i = i + 1
+                end
+            end
+            local hasMovespeed2 = itemData.movespeed2 ~= nil
+            if hasMovespeed2 and g.udg_TempUnit and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
+                local ____equipMovespeed_getMaxMovespeed2Info_10 = equipMovespeed.getMaxMovespeed2Info
+                local ____g_udg_TempUnit_9 = g.udg_TempUnit
+                local ____isDrop_8
+                if isDrop then
+                    ____isDrop_8 = item
+                else
+                    ____isDrop_8 = nil
+                end
+                local ms = ____equipMovespeed_getMaxMovespeed2Info_10(equipMovespeed, ____g_udg_TempUnit_9, ____isDrop_8)
+                if ms.value > 0 then
+                    test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
+                end
+                if ms.value > 0 and ms.name ~= "" and ms.count >= 2 then
+                    jass.DisplayTimedTextToPlayer(
+                        owner,
+                        0,
+                        0.02,
+                        5,
+                        ("|cffffff00『系统提示』：|r移速不叠加，当前只生效|cff00bfff『" .. ms.name) .. "』|r"
+                    )
+                end
+            end
+            if #test5Parts > 0 then
+                jass.DisplayTimedTextToPlayer(
+                    owner,
+                    0,
+                    0.02,
+                    5,
+                    (("|cffffff00『系统消息』：|r" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
+                )
+            end
         end
     )
-    _G.print("【调试】事件监听器创建完成")
 end
 initEvents(nil)
-_G.print("【调试】equip_system 加载完成")
 return ____exports

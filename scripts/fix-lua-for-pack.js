@@ -6,6 +6,7 @@
  * - 函数调用会多传 nil(self)，如 STES_Register(trig, name) -> X(nil, trig, name)，需 10b 修正。
  * - (globalThis as any).print?.(x) 会变成 ____opt_0(____this_1, x)，需 10c 去掉 self。
  * - 数组下标 arr[i] 会编译成 Lua 的 arr[i+1]，TS 里用 0-based 才能对应 JASS 的 1-based。
+ * - Lua 表 1-based：TS 里 random(1,n)+arr[idx-1] 编译后 arr[0]=nil，需在下方对具体文件把 [idx-1] 改为 [idx]。见 .cursor/rules/war3-tstl-jass-pitfalls.mdc 第 7 条。
  */
 
 const fs = require("fs");
@@ -92,6 +93,14 @@ function fixFile(filePath) {
     /local\s+items\s*=\s*require\s*\(\s*"系统\.装备\.装备数据"\s*\)(?!\s*\.default)/g,
     "local items = require(\"系统.装备.装备数据\").default"
   );
+
+  // 16. Lua 1-based 修复：TS 里 random(1,n) 配 arr[idx-1] 在 Lua 中 idx=1 时 arr[0]=nil。凡此类“从 1-based 表随机取”处改为 [idx]。规则见 .cursor/rules/war3-tstl-jass-pitfalls.mdc §7
+  if (filePath.includes("装备掉落")) {
+    content = content.replace(
+      /out\[#out \+ 1\]\s*=\s*nonAlwaysIds\[idx \- 1\]/g,
+      "out[#out + 1] = nonAlwaysIds[idx]"
+    );
+  }
 
   if (content !== original) {
     fs.writeFileSync(filePath, content, "utf8");

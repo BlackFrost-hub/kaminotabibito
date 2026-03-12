@@ -60,3 +60,14 @@ Lua table 在 TSTL 环境中用 `for (const k in t)`（pairs）最稳。
 
 优先保证第一种能工作（最不容易被 TSTL 改写成 self 调用）。
 
+## 7) Lua 表 1-based：`math.random(1, n)` 后不要用 `arr[idx - 1]`
+
+TS 里习惯写：`idx = math.random(1, arr.length)` 再 `arr[idx - 1]`（0-based）。TSTL 原样编译到 Lua 后，Lua 表是 **1-based**，`idx - 1` 在 idx=1 时为 0，`arr[0]` 为 **nil**，会导致漏项或报错。
+
+**✅ 正确做法二选一**
+
+- **写法 A（推荐）**：在 TS 里用 `(arr as any)[idx]`，并保证该处只给 Lua 用；在 `fix-lua-for-pack.js` 里对该文件做替换：`arrName[idx - 1]` → `arrName[idx]`（见规则 16）。
+- **写法 B**：避免“随机 1..n 再取 [idx-1]”。改用 `const i = (math as any).random(1, arr.length); return (arr as any)[i];` 且**仅在**该表在 Lua 中确认为 1-based 时，在 fix 脚本里把 `[i-1]` 改为 `[i]`。
+
+凡新增“用 random(1, len) 从 Lua 表里抽元素”的代码，要么走写法 A 并在 fix-lua-for-pack 加对应替换，要么用其他方式避免 0/1-based 混用。
+

@@ -37,6 +37,7 @@ _G.print = function(...)
 end
 require("系统.装备.装备提取")
 require("系统.装备.装备掉落")
+require("系统.单位.单位狂暴")
 require("系统.装备.装备限制")
 require("系统.测试.测试事件")
 require("系统.测试.测试233注册")
@@ -48,4 +49,5 @@ if not ok then
         tostring(err)
     )
 end
+require("系统.装备.装备移速")
 return ____exports

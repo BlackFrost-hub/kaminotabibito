@@ -1,8 +1,10 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
+const g = require("jass.globals") as { [key: string]: any };
 const itemsData = (require("系统.装备.装备数据") as {
   default?: Record<string, { type?: string; name?: string; onlyone?: boolean | string }>;
 }).default ?? {};
+const equipShared = require("系统.装备.装备共享") as { equipShared: { skipNextDrop: boolean } };
 
 const ONE_PER_SLOT: string[] = ["主武器", "副武器", "衣服", "鞋子", "裤子", "头盔", "灵魂"];
 const TWO_HANDED = "双手武器";
@@ -58,6 +60,51 @@ function safeUnitItemInSlot(unit: any, slot: number): any | undefined {
   return undefined;
 }
 
+/** 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
+ * 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。 */
+export function equipLimitWouldAllowPickup(unit: any, item: any): boolean {
+  if (Itmeboolean) return true;
+  if (!unit || !item) return true;
+  const pickedTypeId = safeGetItemTypeId(item);
+  if (pickedTypeId == null) return true;
+  const entry = getEntry(pickedTypeId);
+  if (!entry) return true;
+  const pickedSlotType = entry.type;
+  const onlyOne = entry.onlyone === true || entry.onlyone === "TRUE";
+  let sameIdCount = 0;
+  let sameSlotTypeCount = 0;
+  let hasTwoHanded = false;
+  let hasMain = false;
+  let hasSub = false;
+  for (let i = 0; i <= 5; i++) {
+    const it = safeUnitItemInSlot(unit, i);
+    if (!it || it === item) continue;
+    const itTypeId = safeGetItemTypeId(it);
+    if (itTypeId == null) continue;
+    const e = getEntry(itTypeId);
+    if (!e) continue;
+    if (itTypeId === pickedTypeId) sameIdCount++;
+    if (pickedSlotType != null && e.type === pickedSlotType) sameSlotTypeCount++;
+    if (e.type === TWO_HANDED) hasTwoHanded = true;
+    if (e.type === "主武器") hasMain = true;
+    if (e.type === "副武器") hasSub = true;
+  }
+  sameIdCount += 1;
+  sameSlotTypeCount += 1;
+  if (pickedSlotType === "主武器") hasMain = true;
+  if (pickedSlotType === "副武器") hasSub = true;
+  if (pickedSlotType === TWO_HANDED) hasTwoHanded = true;
+  let msg = "";
+  if (pickedSlotType === TWO_HANDED) {
+    if (hasMain || hasSub) msg = "x";
+  } else if (pickedSlotType && CONFLICT_WITH_TWO_HANDED.indexOf(pickedSlotType) >= 0) {
+    if (hasTwoHanded) msg = "x";
+  }
+  if (msg === "" && onlyOne && sameIdCount > 1) msg = "x";
+  if (msg === "" && pickedSlotType && ONE_PER_SLOT.indexOf(pickedSlotType) >= 0 && sameSlotTypeCount > 1) msg = "x";
+  return msg === "";
+}
+
 function onPickup(): void {
   if (Itmeboolean) return; /* 装备限制开关 */
   const unit = jass.GetManipulatingUnit?.() ?? jass.GetTriggerUnit?.();
@@ -108,7 +155,6 @@ function onPickup(): void {
     jass.DisplayTimedTextToPlayer(player, 0, 0.01, 8, PREFIX + DEBUG_COLOR + s + "|r");
   };
 
-  // 直接遍历 6 格，判断是否与“本次拾取 item”冲突（冲突就丢本次拾取这件）
   let sameIdCount = 0;
   let sameSlotTypeCount = 0;
   let hasTwoHanded = false;
@@ -120,7 +166,7 @@ function onPickup(): void {
     const itTypeId = safeGetItemTypeId(it);
     if (itTypeId == null) continue;
     const e = getEntry(itTypeId);
-    if (!e) continue; // 不在装备数据里的不参与限制
+    if (!e) continue;
     if (itTypeId === pickedTypeId) sameIdCount++;
     if (pickedSlotType != null && e.type === pickedSlotType) sameSlotTypeCount++;
     if (e.type === TWO_HANDED) hasTwoHanded = true;
@@ -168,7 +214,8 @@ function onPickup(): void {
   debug("结果：msg=" + (msg !== "" ? "有(将丢弃)" : "无(放行)"));
   if (msg === "") return;
 
-  // 关键：不要取局部函数再调用（TSTL 可能生成错误 self 调用导致无效）
+  equipShared.equipShared.skipNextDrop = true;
+  // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(player, 0, 0.02, 6, "|cff87ceeb[装备调试]|r 装备限制即将移除物品，已设 SkipNextDrop=true");
   if (typeof (jass as any).UnitRemoveItem === "function") {
     (jass as any).UnitRemoveItem(unit, item);
   } else {

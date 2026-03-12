@@ -7,7 +7,8 @@ ____exports.items.I00V = {
     goldPrice = 100,
     score = 216,
     level = "E-",
-    dmg = 8
+    dmg = 8,
+    primaryBonus = "力量+7/敏捷+10/智力+10"
 }
 ____exports.items.I00E = {
     type = "道具/戒指/饰品",
@@ -42,7 +43,8 @@ ____exports.items.I00P = {
     score = 295,
     level = "E-",
     dmg = 2,
-    all = 2
+    all = 2,
+    primaryBonus = "力量+7/敏捷+10/全属性+2"
 }
 ____exports.items.I01K = {
     type = "道具/戒指/饰品",
@@ -138,6 +140,22 @@ ____exports.items.I01T = {
     level = "E+",
     dmg = 10,
     hp = 100
+}
+____exports.items.bspd = {
+    type = "鞋子",
+    name = "速度之靴",
+    goldPrice = 100,
+    score = 585,
+    level = "E++",
+    movespeed2 = 60
+}
+____exports.items.rde3 = {
+    type = "道具/戒指/饰品",
+    name = "守护指环 +4",
+    goldPrice = 100,
+    score = 585,
+    level = "E++",
+    movespeed2 = 100
 }
 ____exports.items.I00U = {
     type = "鞋子",
@@ -340,7 +358,8 @@ ____exports.items.I04Y = {
     level = "D-",
     dmg = 15,
     magicResist = 0.1,
-    hp = 450
+    hp = 450,
+    hpPct = 100
 }
 ____exports.items.I01S = {
     type = "鞋子",
@@ -1321,9 +1340,12 @@ ____exports.items.I0DG = {
     score = 3712,
     level = "C",
     dmg = 100,
-    hp = 0.25,
+    hp = 0.1,
     accuracy = 0.1,
-    stunResist = 0.3
+    woodDmg = 0.2,
+    fireDmg = 0.2,
+    stunResist = 0.3,
+    hpPct = 0.1
 }
 ____exports.items.I09W = {
     type = "道具/戒指/饰品",
@@ -1583,7 +1605,9 @@ ____exports.items.I0DA = {
     score = 4418,
     level = "C+",
     dmg = 100,
-    accuracy = 0.15
+    armor = -25,
+    accuracy = 0.15,
+    baseDmgPct = 0.4
 }
 ____exports.items.I0BY = {
     type = "道具/戒指/饰品",
@@ -3117,7 +3141,13 @@ ____exports.items.I0CH = {
     cdReduction = 15,
     accuracy = -0.15
 }
-____exports.items.I0CI = {type = "任务", name = "消失的笛子", goldPrice = 0, dmg = 12}
+____exports.items.I0CI = {
+    type = "任务",
+    name = "消失的笛子",
+    goldPrice = 0,
+    dmg = 12,
+    baseDmgPct = 12
+}
 ____exports.items.I0CJ = {
     type = "任务",
     name = "|cffff0000失踪的精灵村民（Boss战任务）|r",
@@ -3172,7 +3202,8 @@ ____exports.items.I0D9 = {
     dmg = 75,
     hpRegen = 100,
     hpRegenEff = 0.3,
-    mpRegen = 20
+    mpRegen = 20,
+    woodDmg = 0.15
 }
 ____exports.items.I0DB = {
     type = "道具/戒指/饰品",
@@ -3198,9 +3229,10 @@ ____exports.items.I0DI = {
     name = "|cffffffcc交换：『沙漠母虫尸体』和『蜘蛛女皇尸体』换『风土戒指』|r",
     goldPrice = 0,
     dmg = 100,
-    hp = 0.25,
+    hp = 0.1,
     accuracy = 0.1,
-    stunResist = 0.3
+    stunResist = 0.3,
+    hpPct = 0.1
 }
 ____exports.items.I0DJ = {type = "材料", name = "沙漠母虫尸体", goldPrice = 1000}
 ____exports.items.I0DK = {type = "材料", name = "沙漠蜘蛛女皇尸体", goldPrice = 1000}
