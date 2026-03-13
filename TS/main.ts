@@ -30,4 +30,5 @@ require("系统.测试.测试233注册");
 const [ok, err] = pcall(() => require("系统.装备.装备系统"));
 if (!ok) (globalThis as any).print("装备系统加载失败:", tostring(err));
 require("系统.装备.装备移速");
+require("系统.装备.装备回复");
 export {};

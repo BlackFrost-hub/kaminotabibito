@@ -11,7 +11,7 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local items = require("系统.装备.装备数据").default
 local equipLimit = require("系统.装备.装备限制")
-local equipShared = require("系统.装备.装备共享")
+local equipShared = equipLimit.equipShared
 local equipMovespeed = require("系统.装备.装备移速")
 local function fourCCToString(self, fourcc)
     local c1 = string.char(fourcc % 256)
@@ -246,9 +246,9 @@ local function initEvents(self)
             local itemId = jass.GetItemTypeId(item)
             local event = jass.GetTriggerEventId()
             local isDrop = event == jass.EVENT_PLAYER_UNIT_DROP_ITEM
-            local skipFlag = equipShared.equipShared.skipNextDrop
+            local skipFlag = equipShared.skipNextDrop
             if isDrop and skipFlag then
-                equipShared.equipShared.skipNextDrop = false
+                equipShared.skipNextDrop = false
                 return
             end
             local idStr = fourCCToString(nil, itemId)
@@ -275,6 +275,9 @@ local function initEvents(self)
             end
             local skipType = itemData.type
             if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
+                return
+            end
+            if isDrop and itemData.hot then
                 return
             end
             if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
@@ -391,12 +394,12 @@ local function initEvents(self)
                 local i = 0
                 while i < #playerStats do
                     do
-                        local __continue48
+                        local __continue49
                         repeat
                             local idx = i + 1
                             local statName = g.udg_TempString[idx]
                             if statName == "移动速度" then
-                                __continue48 = true
+                                __continue49 = true
                                 break
                             end
                             local ____temp_7
@@ -412,9 +415,9 @@ local function initEvents(self)
                             local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
                             ) .. "%") or (nearZero and "0" or tostring(num))
                             test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
-                            __continue48 = true
+                            __continue49 = true
                         until true
-                        if not __continue48 then
+                        if not __continue49 then
                             break
                         end
                     end
@@ -441,7 +444,7 @@ local function initEvents(self)
                         0,
                         0.02,
                         5,
-                        ("|cffffff00『系统提示』：|r移速不叠加，当前只生效|cff00bfff『" .. ms.name) .. "』|r"
+                        ("|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" .. ms.name) .. "』|r"
                     )
                 end
             end

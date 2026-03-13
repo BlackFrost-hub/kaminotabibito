@@ -4,8 +4,8 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_TempUnit: any; udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
 const items = (require("系统.装备.装备数据") as { default: Record<string, ItemData> }).default;
-const equipLimit = require("系统.装备.装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean };
-const equipShared = require("系统.装备.装备共享") as { equipShared: { skipNextDrop: boolean } };
+const equipLimit = require("系统.装备.装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
+const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.装备.装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
 
 function fourCCToString(fourcc: number): string {
@@ -133,9 +133,9 @@ function initEvents(): void {
     const itemId = jass.GetItemTypeId(item);
     const event = jass.GetTriggerEventId();
     const isDrop = event === jass.EVENT_PLAYER_UNIT_DROP_ITEM;
-    const skipFlag = equipShared.equipShared.skipNextDrop;
+    const skipFlag = equipShared.skipNextDrop;
     if (isDrop && skipFlag) {
-      equipShared.equipShared.skipNextDrop = false;
+      equipShared.skipNextDrop = false;
       // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0.02, 6, "|cff87ceeb[装备调试]|r DROP 因 SkipNextDrop 已跳过");
       return;
     }
@@ -153,6 +153,8 @@ function initEvents(): void {
     }
     const skipType = (itemData as { type?: string }).type;
     if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
+    // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」
+    if (isDrop && (itemData as { hot?: string }).hot) return;
     // 拾取时：装备限制不通过则不加属性、不提示“获得”，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）
     // 被拒时不设 skipNextDrop：只由装备限制在 UnitRemoveItem 前设置，避免误跳过后续玩家手动丢弃
     if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM && typeof equipLimit.equipLimitWouldAllowPickup === "function" && !equipLimit.equipLimitWouldAllowPickup(unit, item)) {

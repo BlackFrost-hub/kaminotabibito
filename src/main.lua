@@ -50,4 +50,5 @@ if not ok then
     )
 end
 require("系统.装备.装备移速")
+require("系统.装备.装备回复")
 return ____exports

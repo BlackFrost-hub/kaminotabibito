@@ -7,7 +7,8 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.装备.装备数据").default or ({})
-local equipShared = require("系统.装备.装备共享")
+--- 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性
+____exports.equipShared = {skipNextDrop = false}
 local ONE_PER_SLOT = {
     "主武器",
     "副武器",
@@ -358,7 +359,7 @@ local function onPickup(self)
     if msg == "" then
         return
     end
-    equipShared.equipShared.skipNextDrop = true
+    ____exports.equipShared.skipNextDrop = true
     if type(jass.UnitRemoveItem) == "function" then
         jass.UnitRemoveItem(unit, item)
     else

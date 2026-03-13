@@ -4,7 +4,8 @@ const g = require("jass.globals") as { [key: string]: any };
 const itemsData = (require("系统.装备.装备数据") as {
   default?: Record<string, { type?: string; name?: string; onlyone?: boolean | string }>;
 }).default ?? {};
-const equipShared = require("系统.装备.装备共享") as { equipShared: { skipNextDrop: boolean } };
+/** 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性 */
+export const equipShared = { skipNextDrop: false };
 
 const ONE_PER_SLOT: string[] = ["主武器", "副武器", "衣服", "鞋子", "裤子", "头盔", "灵魂"];
 const TWO_HANDED = "双手武器";
@@ -214,7 +215,7 @@ function onPickup(): void {
   debug("结果：msg=" + (msg !== "" ? "有(将丢弃)" : "无(放行)"));
   if (msg === "") return;
 
-  equipShared.equipShared.skipNextDrop = true;
+  equipShared.skipNextDrop = true;
   // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(player, 0, 0.02, 6, "|cff87ceeb[装备调试]|r 装备限制即将移除物品，已设 SkipNextDrop=true");
   if (typeof (jass as any).UnitRemoveItem === "function") {
     (jass as any).UnitRemoveItem(unit, item);
