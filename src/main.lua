@@ -51,4 +51,8 @@ if not ok then
 end
 require("系统.装备.装备移速")
 require("系统.装备.装备回复")
+require("系统.装备.装备成长")
+require("系统.伤害.伤害事件")
+require("系统.伤害.伤害测试")
+require("系统.伤害.dot伤害")
 return ____exports

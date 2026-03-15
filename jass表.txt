@@ -1,0 +1,2438 @@
+[Logger] --- init success ---
+Install Load library hook.[23:01:55:653][装备提取] 已通过桥接注册 STES 事件 提取物品事件
+【调试】事件监听器创建完成
+
+【调试】equip_system 加载完成
+
+nil     ❌ 找不到: STES_Register
+
+nil     --- jass 全部 key ---
+
+nil     jass.SaveButtonHandle
+
+nil     jass.PlayThematicMusicEx
+
+nil     jass.SquareRoot
+
+nil     jass.ConvertUnitEvent
+
+nil     jass.Rad2Deg
+
+nil     jass.GetChangingUnit
+
+nil     jass.Deg2Rad
+
+nil     jass.ConvertPlayerUnitEvent
+
+nil     jass.GetUnitTurnSpeed
+
+nil     jass.Sin
+
+nil     jass.Cos
+
+nil     jass.PanCameraToWithZ
+
+nil     jass.Tan
+
+nil     jass.RemovePlayer
+
+nil     jass.IsQuestRequired
+
+nil     jass.IsNoDefeatCheat
+
+nil     jass.ConvertRacePref
+
+nil     jass.GetDyingUnit
+
+nil     jass.ConvertPlayerGameResult
+
+nil     jass.StoreBoolean
+
+nil     jass.DestroyFogModifier
+
+nil     jass.GetFoodUsed
+
+nil     jass.GetPlayerController
+
+nil     jass.S2R
+
+nil     jass.CameraSetupGetDestPositionX
+
+nil     jass.SetHeroStr
+
+nil     jass.RestartGame
+
+nil     jass.Location
+
+nil     jass.Asin
+
+nil     jass.IsUnit
+
+nil     jass.SuspendTimeOfDay
+
+nil     jass.SetCameraPosition
+
+nil     jass.IsUnitHidden
+
+nil     jass.Atan2
+
+nil     jass.SetCineFilterStartUV
+
+nil     jass.UnitPoolRemoveUnitType
+
+nil     jass.GetSpellAbility
+
+nil     jass.ConvertGameDifficulty
+
+nil     jass.SetCampaignMenuRace
+
+nil     jass.SaveQuestItemHandle
+
+nil     jass.GroupTargetOrderById
+
+nil     jass.Atan
+
+nil     jass.GetStartLocPrio
+
+nil     jass.MultiboardSetColumnCount
+
+nil     jass.ConvertItemType
+
+nil     jass.SaveFogModifierHandle
+
+nil     jass.GetCancelledStructure
+
+nil     jass.Acos
+
+nil     jass.TriggerWaitOnSleeps
+
+nil     jass.GetUnitRallyDestructable
+
+nil     jass.CreateCorpse
+
+nil     jass.RenameSaveDirectory
+
+nil     jass.Pow
+
+nil     jass.SetImageType
+
+nil     jass.LeaderboardAddItem
+
+nil     jass.VolumeGroupSetVolume
+
+nil     jass.ConvertStartLocPrio
+
+nil     jass.QuestSetEnabled
+
+nil     jass.I2R
+
+nil     jass.SetPlayerTechMaxAllowed
+
+nil     jass.Or
+
+nil     jass.ConvertVersion
+
+nil     jass.SetOpCinematicAvailable
+
+nil     jass.StringCase
+
+nil     jass.RecycleGuardPosition
+
+nil     jass.ConvertRarityControl
+
+nil     jass.IsMaskedToPlayer
+
+nil     jass.GetRandomReal
+
+nil     jass.FogMaskEnable
+
+nil     jass.R2I
+
+nil     jass.I2S
+
+nil     jass.R2S
+
+nil     jass.SaveDefeatConditionHandle
+
+nil     jass.GetPlayerSelectable
+
+nil     jass.SetItemDroppable
+
+nil     jass.IsUnitInGroup
+
+nil     jass.ConvertPlacement
+
+nil     jass.R2SW
+
+nil     jass.LoadAbilityHandle
+
+nil     jass.GroupImmediateOrder
+
+nil     jass.S2I
+
+nil     jass.ResumeTimer
+
+nil     jass.GetLocationY
+
+nil     jass.GetHandleId
+
+nil     jass.QueueDestructableAnimation
+
+nil     jass.GroupPointOrderLoc
+
+nil     jass.EndGame
+
+nil     jass.SubString
+
+nil     jass.StringHash
+
+nil     jass.GroupEnumUnitsInRange
+
+nil     jass.SetCustomCampaignButtonVisible
+
+nil     jass.DestroyForce
+
+nil     jass.StringLength
+
+nil     jass.IsItemPawnable
+
+nil     jass.SetDestructableOccluderHeight
+
+nil     jass.ConvertFogState
+
+nil     jass.LoadRectHandle
+
+nil     jass.ConvertPlayerScore
+
+nil     jass.TriggerRegisterPlayerEvent
+
+nil     jass.ConvertRace
+
+nil     jass.GetLocalizedString
+
+nil     jass.PreloadEndEx
+
+nil     jass.ConvertMapVisibility
+
+nil     jass.IsPointInRegion
+
+nil     jass.GetLocalizedHotkey
+
+nil     jass.SetTextTagSuspended
+
+nil     jass.ConvertAllianceType
+
+nil     jass.TriggerRegisterDialogButtonEvent
+
+nil     jass.ConvertIGameState
+
+nil     jass.SaveGameExists
+
+nil     jass.SetTextTagPermanent
+
+nil     jass.SetRectFromLoc
+
+nil     jass.ConvertFGameState
+
+nil     jass.GetAbilityEffect
+
+nil     jass.ConvertPlayerState
+
+nil     jass.LoadTriggerConditionHandle
+
+nil     jass.SetAllItemTypeSlots
+
+nil     jass.ConvertUnitState
+
+nil     jass.GetDestructableMaxLife
+
+nil     jass.ConvertAIDifficulty
+
+nil     jass.SetDestructableLife
+
+nil     jass.ConvertGameEvent
+
+nil     jass.IsUnitInRangeXY
+
+nil     jass.GetUnitState
+
+nil     jass.ConvertPlayerEvent
+
+nil     jass.SetUnitAnimationByIndex
+
+nil     jass.GetSoundIsPlaying
+
+nil     jass.ConvertAttackType
+
+nil     jass.ConvertWidgetEvent
+
+nil     jass.ConvertPlayerColor
+
+nil     jass.SaveTriggerActionHandle
+
+nil     jass.SetAltMinimapIcon
+
+nil     jass.ConvertMapFlag
+
+nil     jass.PauseCompAI
+
+nil     jass.ConvertDialogEvent
+
+nil     jass.ConvertLimitOp
+
+nil     jass.DestroyEffect
+
+nil     jass.GetUnitPropWindow
+
+nil     jass.GetDestructableY
+
+nil     jass.TerrainDeformStopAll
+
+nil     jass.ConvertUnitType
+
+nil     jass.QuestCreateItem
+
+nil     jass.ConvertVolumeGroup
+
+nil     jass.UnitUseItem
+
+nil     jass.MultiboardSetRowCount
+
+nil     jass.SetUnitScale
+
+nil     jass.ConvertGameSpeed
+
+nil     jass.IsSuspendedXP
+
+nil     jass.IssueNeutralTargetOrder
+
+nil     jass.SetUnitAnimationWithRarity
+
+nil     jass.ConvertMapSetting
+
+nil     jass.EnableUserControl
+
+nil     jass.DisplayTimedTextFromPlayer
+
+nil     jass.ConvertGameType
+
+nil     jass.SaveWidgetHandle
+
+nil     jass.CreateTimer
+
+nil     jass.ConvertMapDensity
+
+nil     jass.CreateDestructableZ
+
+nil     jass.IsQuestItemCompleted
+
+nil     jass.ConvertMapControl
+
+nil     jass.CreateFogModifierRadiusLoc
+
+nil     jass.MultiboardSetItemsWidth
+
+nil     jass.ConvertPlayerSlotState
+
+nil     jass.LeaderboardSetStyle
+
+nil     jass.SetUnitTurnSpeed
+
+nil     jass.ConvertCameraField
+
+nil     jass.MultiboardSetItemValueColor
+
+nil     jass.UnitMakeAbilityPermanent
+
+nil     jass.PlaceRandomUnit
+
+nil     jass.ConvertBlendMode
+
+nil     jass.IssuePointOrderByIdLoc
+
+nil     jass.ConvertTexMapFlags
+
+nil     jass.PlaceRandomItem
+
+nil     jass.OrderId2String
+
+nil     jass.LoadDefeatConditionHandle
+
+nil     jass.ConvertEffectType
+
+nil     jass.GroupEnumUnitsInRect
+
+nil     jass.ConvertDamageType
+
+nil     jass.SaveLocationHandle
+
+nil     jass.SetItemDropID
+
+nil     jass.LoadQuestItemHandle
+
+nil     jass.GetClickedButton
+
+nil     jass.IssueInstantTargetOrder
+
+nil     jass.IssueInstantTargetOrderById
+
+nil     jass.ConvertWeaponType
+
+nil     jass.GetLightningColorG
+
+nil     jass.SetTextTagAge
+
+nil     jass.SelectUnit
+
+nil     jass.ConvertSoundType
+
+nil     jass.SetItemUserData
+
+nil     jass.KillDestructable
+
+nil     jass.IsTriggerWaitOnSleeps
+
+nil     jass.IsUnitInRange
+
+nil     jass.ConvertPathingType
+
+nil     jass.GetEventGameState
+
+nil     jass.MultiboardDisplay
+
+nil     jass.GetEventUnitState
+
+nil     jass.SetMapName
+
+nil     jass.SetMapDescription
+
+nil     jass.GetPlayerRace
+
+nil     jass.SetTeams
+
+nil     jass.WaygateSetDestination
+
+nil     jass.SetPlayers
+
+nil     jass.SaveTextTagHandle
+
+nil     jass.SetUnitRescuable
+
+nil     jass.GetExpiredTimer
+
+nil     jass.SetGameTypeSupported
+
+nil     jass.DestroyQuest
+
+nil     jass.SetMapFlag
+
+nil     jass.SaveGroupHandle
+
+nil     jass.SetGameSpeed
+
+nil     jass.SetGamePlacement
+
+nil     jass.TimerDialogSetTitle
+
+nil     jass.SetUnitColor
+
+nil     jass.SetTextTagFadepoint
+
+nil     jass.SetGameDifficulty
+
+nil     jass.GroupEnumUnitsOfPlayer
+
+nil     jass.GroupClear
+
+nil     jass.SetResourceDensity
+
+nil     jass.GetBuyingUnit
+
+nil     jass.SetCreatureDensity
+
+nil     jass.IsUnitPaused
+
+nil     jass.ForceClear
+
+nil     jass.DefineStartLocation
+
+nil     jass.QuestSetDiscovered
+
+nil     jass.DefineStartLocationLoc
+
+nil     jass.GetFoodMade
+
+nil     jass.CreateImage
+
+nil     jass.IsMultiboardMinimized
+
+nil     jass.TriggerRegisterDialogEvent
+
+nil     jass.SetStartLocPrioCount
+
+nil     jass.SetStartLocPrio
+
+nil     jass.SaveImageHandle
+
+nil     jass.GetUnitDefaultAcquireRange
+
+nil     jass.SetItemInvulnerable
+
+nil     jass.ForceEnumAllies
+
+nil     jass.GetStartLocPrioSlot
+
+nil     jass.GetHeroSkillPoints
+
+nil     jass.GetTeams
+
+nil     jass.GetPlayers
+
+nil     jass.GetLocalPlayer
+
+nil     jass.GetUnitFacing
+
+nil     jass.GetTriggerExecCount
+
+nil     jass.IsGameTypeSupported
+
+nil     jass.SetBlightPoint
+
+nil     jass.UnitDropItemPoint
+
+nil     jass.IsMapFlagSet
+
+nil     jass.ClearTextMessages
+
+nil     jass.GetDestructableOccluderHeight
+
+nil     jass.SetPlayerTaxRate
+
+nil     jass.GetGameTypeSelected
+
+nil     jass.SaveLightningHandle
+
+nil     jass.CreateGroup
+
+nil     jass.IssuePointOrderLoc
+
+nil     jass.GetUnitAcquireRange
+
+nil     jass.GetGamePlacement
+
+nil     jass.GetGameSpeed
+
+nil     jass.KillSoundWhenDone
+
+nil     jass.GetLocationX
+
+nil     jass.GetGameDifficulty
+
+nil     jass.SaveAbilityHandle
+
+nil     jass.GetUnitLevel
+
+nil     jass.GetResourceDensity
+
+nil     jass.ShowUnit
+
+nil     jass.GetCreatureDensity
+
+nil     jass.GetStartLocationX
+
+nil     jass.GetWidgetLife
+
+nil     jass.GetStartLocationY
+
+nil     jass.FlushStoredMission
+
+nil     jass.GetStartLocationLoc
+
+nil     jass.GetLearnedSkill
+
+nil     jass.CreateCameraSetup
+
+nil     jass.AddSpellEffect
+
+nil     jass.SetPlayerTeam
+
+nil     jass.MultiboardGetRowCount
+
+nil     jass.SetPlayerStartLocation
+
+nil     jass.ForcePlayerStartLocation
+
+nil     jass.RemoveDestructable
+
+nil     jass.SetPlayerAlliance
+
+nil     jass.SetPlayerRacePreference
+
+nil     jass.DisplayTextToPlayer
+
+nil     jass.SetPlayerRaceSelectable
+
+nil     jass.IsLocationMaskedToPlayer
+
+nil     jass.ResetTerrainFog
+
+nil     jass.GetAllyColorFilterState
+
+nil     jass.FlushParentHashtable
+
+nil     jass.SetPlayerController
+
+nil     jass.SaveMultiboardItemHandle
+
+nil     jass.GetEventPlayerState
+
+nil     jass.DecUnitAbilityLevel
+
+nil     jass.PlayModelCinematic
+
+nil     jass.DestroyLightning
+
+nil     jass.CreateRegion
+
+nil     jass.SetPlayerColor
+
+nil     jass.ChooseRandomItemEx
+
+nil     jass.SetPlayerOnScoreScreen
+
+nil     jass.UnitUseItemPoint
+
+nil     jass.SetPlayerName
+
+nil     jass.GetPlayerTeam
+
+nil     jass.LeaderboardSetLabelColor
+
+nil     jass.SetRect
+
+nil     jass.GetPlayerName
+
+nil     jass.GetPlayerStartLocation
+
+nil     jass.IsItemOwned
+
+nil     jass.GetPlayerStartLocationX
+
+nil     jass.AddHeroXP
+
+nil     jass.GetPlayerStartLocationY
+
+nil     jass.DestroyItemPool
+
+nil     jass.ResetUbersplat
+
+nil     jass.LoadTextTagHandle
+
+nil     jass.GetPlayerColor
+
+nil     jass.GetPlayerSlotState
+
+nil     jass.GetSaveBasicFilename
+
+nil     jass.GetPlayerTaxRate
+
+nil     jass.DisableTrigger
+
+nil     jass.EndThematicMusic
+
+nil     jass.GetUnitDefaultFlyHeight
+
+nil     jass.IsPlayerRacePrefSet
+
+nil     jass.RemoveLocation
+
+nil     jass.MoveLocation
+
+nil     jass.GetLocationZ
+
+nil     jass.AddSpellEffectTargetById
+
+nil     jass.DestroyTimer
+
+nil     jass.TimerStart
+
+nil     jass.GetTriggeringTrackable
+
+nil     jass.ShowDestructable
+
+nil     jass.GroupPointOrder
+
+nil     jass.TimerGetTimeout
+
+nil     jass.CameraSetupGetDestPositionY
+
+nil     jass.SetItemPlayer
+
+nil     jass.IsHeroUnitId
+
+nil     jass.GetTournamentScore
+
+nil     jass.TimerGetElapsed
+
+nil     jass.DialogSetMessage
+
+nil     jass.GetHeroAgi
+
+nil     jass.TimerGetRemaining
+
+nil     jass.PauseTimer
+
+nil     jass.Condition
+
+nil     jass.GetTriggerEventId
+
+nil     jass.IsLocationFoggedToPlayer
+
+nil     jass.TriggerRegisterVariableEvent
+
+nil     jass.DestroyCondition
+
+nil     jass.Filter
+
+nil     jass.ForceEnumEnemies
+
+nil     jass.SetDestructableMaxLife
+
+nil     jass.DestroyFilter
+
+nil     jass.DestroyBoolExpr
+
+nil     jass.MultiboardSetItemValue
+
+nil     jass.And
+
+nil     jass.TriggerRegisterFilterUnitEvent
+
+nil     jass.Not
+
+nil     jass.RemoveRegion
+
+nil     jass.RegionAddRect
+
+nil     jass.UnitId
+
+nil     jass.RegionClearRect
+
+nil     jass.TriggerWaitForSound
+
+nil     jass.RegionAddCell
+
+nil     jass.LoadTimerHandle
+
+nil     jass.RegionAddCellAtLoc
+
+nil     jass.GetChangingUnitPrevOwner
+
+nil     jass.RegionClearCell
+
+nil     jass.RegionClearCellAtLoc
+
+nil     jass.IsUnitInRegion
+
+nil     jass.IsLocationInRegion
+
+nil     jass.GroupTargetOrder
+
+nil     jass.Rect
+
+nil     jass.SaveEffectHandle
+
+nil     jass.RectFromLoc
+
+nil     jass.ForceQuestDialogUpdate
+
+nil     jass.CreateUnit
+
+nil     jass.ShowInterface
+
+nil     jass.RemoveRect
+
+nil     jass.GetRectCenterX
+
+nil     jass.GetRectCenterY
+
+nil     jass.SetUnitLookAt
+
+nil     jass.MoveRectTo
+
+nil     jass.SetPlayerState
+
+nil     jass.SetItemPosition
+
+nil     jass.MoveRectToLoc
+
+nil     jass.GetRectMinX
+
+nil     jass.CameraSetupApplyWithZ
+
+nil     jass.TriggerClearConditions
+
+nil     jass.StoreReal
+
+nil     jass.GetIntegerGameState
+
+nil     jass.GetRectMinY
+
+nil     jass.DestroyUbersplat
+
+nil     jass.SetHeroXP
+
+nil     jass.LoadWidgetHandle
+
+nil     jass.TriggerRegisterUnitStateEvent
+
+nil     jass.GetRectMaxX
+
+nil     jass.GetUnitMoveSpeed
+
+nil     jass.GetRectMaxY
+
+nil     jass.IsDestructableInvulnerable
+
+nil     jass.CameraSetupGetDestPositionLoc
+
+nil     jass.GetOrderTarget
+
+nil     jass.LoadFogModifierHandle
+
+nil     jass.PreloadGenStart
+
+nil     jass.CachePlayerHeroData
+
+nil     jass.GetWorldBounds
+
+nil     jass.GetCameraEyePositionLoc
+
+nil     jass.SetFogStateRect
+
+nil     jass.SetFogStateRadius
+
+nil     jass.SetFogStateRadiusLoc
+
+nil     jass.IsFogMaskEnabled
+
+nil     jass.FogEnable
+
+nil     jass.StoreInteger
+
+nil     jass.AddSpecialEffectLoc
+
+nil     jass.IsFogEnabled
+
+nil     jass.SetUnitAcquireRange
+
+nil     jass.TriggerRegisterUnitInRange
+
+nil     jass.UnitRemoveItem
+
+nil     jass.CreateFogModifierRect
+
+nil     jass.SetWaterDeforms
+
+nil     jass.CreateFogModifierRadius
+
+nil     jass.GetDestructableName
+
+nil     jass.FogModifierStart
+
+nil     jass.LeaderboardSortItemsByValue
+
+nil     jass.MultiboardSetItemsValueColor
+
+nil     jass.IsUnitLoaded
+
+nil     jass.FogModifierStop
+
+nil     jass.CreateTrigger
+
+nil     jass.GetTerrainVariance
+
+nil     jass.AddSpellEffectById
+
+nil     jass.DestroyTrigger
+
+nil     jass.ResetTrigger
+
+nil     jass.EnableTrigger
+
+nil     jass.GetItemLevel
+
+nil     jass.IsTriggerEnabled
+
+nil     jass.SetSoundChannel
+
+nil     jass.TriggerRegisterTimerEvent
+
+nil     jass.TriggerRegisterTimerExpireEvent
+
+nil     jass.TriggerRegisterGameStateEvent
+
+nil     jass.GetClickedDialog
+
+nil     jass.GetDestructableLife
+
+nil     jass.GetTournamentFinishSoonTimeRemaining
+
+nil     jass.LoadRegionHandle
+
+nil     jass.SetResourceAmount
+
+nil     jass.GetTournamentFinishNowRule
+
+nil     jass.MultiboardClear
+
+nil     jass.FlushChildHashtable
+
+nil     jass.SetIntroShotText
+
+nil     jass.GroupPointOrderByIdLoc
+
+nil     jass.GetTournamentFinishNowPlayer
+
+nil     jass.IsUnitIllusion
+
+nil     jass.MultiboardSetItemIcon
+
+nil     jass.TriggerRegisterGameEvent
+
+nil     jass.SaveUnitHandle
+
+nil     jass.GetEventDamage
+
+nil     jass.GetLightningColorB
+
+nil     jass.GetWinningPlayer
+
+nil     jass.TriggerRegisterPlayerStateEvent
+
+nil     jass.SetTimeOfDayScale
+
+nil     jass.FirstOfGroup
+
+nil     jass.TriggerRegisterPlayerUnitEvent
+
+nil     jass.GetEventPlayerChatString
+
+nil     jass.GetAttacker
+
+nil     jass.GetResearchingUnit
+
+nil     jass.IssueNeutralImmediateOrderById
+
+nil     jass.GetRescuer
+
+nil     jass.QuestSetTitle
+
+nil     jass.GetFilterUnit
+
+nil     jass.LoadTriggerEventHandle
+
+nil     jass.TriggerExecuteWait
+
+nil     jass.GetKillingUnit
+
+nil     jass.GetDecayingUnit
+
+nil     jass.GroupEnumUnitsInRangeOfLocCounted
+
+nil     jass.MultiboardGetItem
+
+nil     jass.GetConstructingStructure
+
+nil     jass.LeaderboardDisplay
+
+nil     jass.GetCameraBoundMaxX
+
+nil     jass.GetConstructedStructure
+
+nil     jass.GetTrainedUnitType
+
+nil     jass.SetHeroLevel
+
+nil     jass.GetResearched
+
+nil     jass.IssueInstantPointOrderById
+
+nil     jass.TerrainDeformCrater
+
+nil     jass.TriggerRemoveCondition
+
+nil     jass.GetTrainedUnit
+
+nil     jass.GetSellingUnit
+
+nil     jass.GetPlayerUnitCount
+
+nil     jass.CreateDestructable
+
+nil     jass.GetSoldUnit
+
+nil     jass.SetUnitVertexColor
+
+nil     jass.LeaderboardRemovePlayerItem
+
+nil     jass.GetSoldItem
+
+nil     jass.GetDetectedUnit
+
+nil     jass.GetTimeOfDayScale
+
+nil     jass.DestroyDefeatCondition
+
+nil     jass.GetOrderedUnit
+
+nil     jass.SetCineFilterEndUV
+
+nil     jass.OrderId
+
+nil     jass.AbilityId
+
+nil     jass.AbilityId2String
+
+nil     jass.UnitId2String
+
+nil     jass.IsUnitType
+
+nil     jass.GetObjectName
+
+nil     jass.SetCineFilterTexture
+
+nil     jass.TriggerAddCondition
+
+nil     jass.GetSummonedUnit
+
+nil     jass.LoadTriggerActionHandle
+
+nil     jass.GetIssuedOrderId
+
+nil     jass.FlushGameCache
+
+nil     jass.PlayerGetLeaderboard
+
+nil     jass.AddSpecialEffectTarget
+
+nil     jass.LoadGame
+
+nil     jass.CameraSetupGetField
+
+nil     jass.GetOrderPointX
+
+nil     jass.StopSound
+
+nil     jass.ClearSelection
+
+nil     jass.GetUnitFoodMade
+
+nil     jass.CreateLeaderboard
+
+nil     jass.GetOrderPointY
+
+nil     jass.GetOrderPointLoc
+
+nil     jass.CripplePlayer
+
+nil     jass.GetItemCharges
+
+nil     jass.GetSpellTargetX
+
+nil     jass.SaveUbersplatHandle
+
+nil     jass.GetOrderTargetDestructable
+
+nil     jass.GetLearnedSkillLevel
+
+nil     jass.GetOrderTargetItem
+
+nil     jass.GetOrderTargetUnit
+
+nil     jass.ForceCampaignSelectScreen
+
+nil     jass.GetSoundDuration
+
+nil     jass.GroupRemoveUnit
+
+nil     jass.GetSpellAbilityUnit
+
+nil     jass.SetUnitRescueRange
+
+nil     jass.GetSpellAbilityId
+
+nil     jass.LeaderboardSetItemLabelColor
+
+nil     jass.GetSpellTargetLoc
+
+nil     jass.GetSpellTargetY
+
+nil     jass.ForceEnumPlayers
+
+nil     jass.GetSpellTargetDestructable
+
+nil     jass.TriggerEvaluate
+
+nil     jass.GetSpellTargetItem
+
+nil     jass.GetSpellTargetUnit
+
+nil     jass.LoadTimerDialogHandle
+
+nil     jass.IssueBuildOrderById
+
+nil     jass.GetLevelingUnit
+
+nil     jass.FlushStoredString
+
+nil     jass.GetUnitX
+
+nil     jass.TriggerClearActions
+
+nil     jass.GetLearningUnit
+
+nil     jass.SetDestructableAnimation
+
+nil     jass.GetRevivableUnit
+
+nil     jass.DestructableRestoreLife
+
+nil     jass.IsLeaderboardDisplayed
+
+nil     jass.CameraSetupSetField
+
+nil     jass.UnitItemInSlot
+
+nil     jass.GetTriggerUnit
+
+nil     jass.GetRevivingUnit
+
+nil     jass.LeaderboardGetPlayerIndex
+
+nil     jass.SetUnitX
+
+nil     jass.GetSummoningUnit
+
+nil     jass.GetTransportUnit
+
+nil     jass.GetLoadedUnit
+
+nil     jass.StoreUnit
+
+nil     jass.SetPlayerHandicap
+
+nil     jass.SetUnitState
+
+nil     jass.SaveGame
+
+nil     jass.GroupEnumUnitsInRangeCounted
+
+nil     jass.GetManipulatingUnit
+
+nil     jass.GetManipulatedItem
+
+nil     jass.HaveSavedReal
+
+nil     jass.ReloadGame
+
+nil     jass.TriggerRegisterPlayerAllianceChange
+
+nil     jass.TriggerRegisterPlayerChatEvent
+
+nil     jass.GetEventPlayerChatStringMatched
+
+nil     jass.TriggerRegisterDeathEvent
+
+nil     jass.GetTerrainType
+
+nil     jass.UnitRemoveItemFromSlot
+
+nil     jass.GetCameraEyePositionZ
+
+nil     jass.TriggerRegisterUnitEvent
+
+nil     jass.SyncStoredReal
+
+nil     jass.GetEventDamageSource
+
+nil     jass.GetDestructableX
+
+nil     jass.GetEventDetectingPlayer
+
+nil     jass.DoNotSaveReplay
+
+nil     jass.UnitHasItem
+
+nil     jass.SetItemVisible
+
+nil     jass.GetEventTargetUnit
+
+nil     jass.SetEdCinematicAvailable
+
+nil     jass.TriggerRegisterEnterRegion
+
+nil     jass.TriggerRegisterLeaveRegion
+
+nil     jass.GetTriggeringRegion
+
+nil     jass.GetEnteringUnit
+
+nil     jass.GetLeavingUnit
+
+nil     jass.CreateTrackable
+
+nil     jass.TriggerAddAction
+
+nil     jass.TriggerRemoveAction
+
+nil     jass.TriggerSleepAction
+
+nil     jass.CameraSetupSetDestPosition
+
+nil     jass.TriggerExecute
+
+nil     jass.UnitInventorySize
+
+nil     jass.TriggerSyncStart
+
+nil     jass.GetHeroXP
+
+nil     jass.ForForce
+
+nil     jass.TriggerSyncReady
+
+nil     jass.GetTriggerWidget
+
+nil     jass.SetRandomSeed
+
+nil     jass.GetTriggerDestructable
+
+nil     jass.SaveTriggerConditionHandle
+
+nil     jass.SetUbersplatRenderAlways
+
+nil     jass.UnitAddItemToSlotById
+
+nil     jass.GetTriggerPlayer
+
+nil     jass.GetTriggeringTrigger
+
+nil     jass.SelectHeroSkill
+
+nil     jass.GetTriggerEvalCount
+
+nil     jass.GetHeroStr
+
+nil     jass.GetEnumUnit
+
+nil     jass.TimerDialogDisplay
+
+nil     jass.SaveTimerHandle
+
+nil     jass.EnablePreSelect
+
+nil     jass.GetEnumPlayer
+
+nil     jass.GetFilterPlayer
+
+nil     jass.IsQuestFailed
+
+nil     jass.GetFilterDestructable
+
+nil     jass.GetEnumDestructable
+
+nil     jass.HaveStoredBoolean
+
+nil     jass.GetFilterItem
+
+nil     jass.ForceEnumPlayersCounted
+
+nil     jass.SyncSelections
+
+nil     jass.GetEnumItem
+
+nil     jass.DestroyGroup
+
+nil     jass.IsPlayerEnemy
+
+nil     jass.AddUnitToAllStock
+
+nil     jass.GroupAddUnit
+
+nil     jass.GroupEnumUnitsOfType
+
+nil     jass.GroupEnumUnitsOfTypeCounted
+
+nil     jass.GetCameraEyePositionY
+
+nil     jass.SetSoundVelocity
+
+nil     jass.LoadInteger
+
+nil     jass.UnitAddItem
+
+nil     jass.GetUnitAbilityLevel
+
+nil     jass.GroupEnumUnitsInRectCounted
+
+nil     jass.RemoveItemFromAllStock
+
+nil     jass.GroupEnumUnitsInRangeOfLoc
+
+nil     jass.AddIndicator
+
+nil     jass.PreloadGenClear
+
+nil     jass.GroupEnumUnitsSelected
+
+nil     jass.SetItemCharges
+
+nil     jass.SaveTimerDialogHandle
+
+nil     jass.LoadDialogHandle
+
+nil     jass.SetUnitFacing
+
+nil     jass.GroupImmediateOrderById
+
+nil     jass.TimerDialogSetTitleColor
+
+nil     jass.GroupPointOrderById
+
+nil     jass.KillUnit
+
+nil     jass.ForGroup
+
+nil     jass.TerrainDeformRandom
+
+nil     jass.CreateForce
+
+nil     jass.ForceAddPlayer
+
+nil     jass.ForceRemovePlayer
+
+nil     jass.SetWidgetLife
+
+nil     jass.LoadDestructableHandle
+
+nil     jass.GetWidgetX
+
+nil     jass.SaveRegionHandle
+
+nil     jass.GetWidgetY
+
+nil     jass.GetUnitUserData
+
+nil     jass.CreateDeadDestructable
+
+nil     jass.IsTerrainPathable
+
+nil     jass.CreateDeadDestructableZ
+
+nil     jass.SetDestructableInvulnerable
+
+nil     jass.ClearStackedSound
+
+nil     jass.EnumDestructablesInRect
+
+nil     jass.ChooseRandomCreep
+
+nil     jass.GetDestructableTypeId
+
+nil     jass.SetDestructableAnimationSpeed
+
+nil     jass.CreateUnitByName
+
+nil     jass.GetUnitFlyHeight
+
+nil     jass.HaveStoredReal
+
+nil     jass.GetHeroInt
+
+nil     jass.CreateUnitAtLoc
+
+nil     jass.CreateUnitAtLocByName
+
+nil     jass.UnitRemoveBuffsEx
+
+nil     jass.GetUnitCurrentOrder
+
+nil     jass.GetUnitFoodUsed
+
+nil     jass.LoadItemHandle
+
+nil     jass.UnitPauseTimedLife
+
+nil     jass.SetUnitUseFood
+
+nil     jass.GetUnitY
+
+nil     jass.GetUnitLoc
+
+nil     jass.GetCameraTargetPositionY
+
+nil     jass.GetUnitRallyPoint
+
+nil     jass.GetUnitRallyUnit
+
+nil     jass.LoadUnitHandle
+
+nil     jass.UnitAddItemById
+
+nil     jass.GetUnitDefaultMoveSpeed
+
+nil     jass.FlushStoredReal
+
+nil     jass.GetUnitTypeId
+
+nil     jass.GetStoredBoolean
+
+nil     jass.GetUnitRace
+
+nil     jass.SetLightningColor
+
+nil     jass.GetUnitName
+
+nil     jass.IsQuestEnabled
+
+nil     jass.LoadSoundHandle
+
+nil     jass.SetSoundParamsFromLabel
+
+nil     jass.GetUnitPointValue
+
+nil     jass.SetUnitCreepGuard
+
+nil     jass.LoadLightningHandle
+
+nil     jass.MultiboardGetTitleText
+
+nil     jass.UnitSetConstructionProgress
+
+nil     jass.GetUnitPointValueByType
+
+nil     jass.UnitHasBuffsEx
+
+nil     jass.SetUnitY
+
+nil     jass.GetCameraEyePositionX
+
+nil     jass.SetUnitPosition
+
+nil     jass.SetCameraField
+
+nil     jass.SetUnitPositionLoc
+
+nil     jass.SetUnitFacingTimed
+
+nil     jass.SetUnitFlyHeight
+
+nil     jass.GetHeroLevel
+
+nil     jass.LoadBoolean
+
+nil     jass.CameraSetTargetNoise
+
+nil     jass.SetUnitMoveSpeed
+
+nil     jass.SetUnitPropWindow
+
+nil     jass.GetItemX
+
+nil     jass.UnitDropItemTarget
+
+nil     jass.GetUnitDefaultTurnSpeed
+
+nil     jass.RemoveUnit
+
+nil     jass.GetUnitDefaultPropWindow
+
+nil     jass.SetUnitOwner
+
+nil     jass.QueueUnitAnimation
+
+nil     jass.SetUnitAnimation
+
+nil     jass.IsUnitDetected
+
+nil     jass.GetStoredString
+
+nil     jass.AddUnitAnimationProperties
+
+nil     jass.SetUnitTimeScale
+
+nil     jass.CameraSetupApplyForceDurationWithZ
+
+nil     jass.SetUnitBlendTime
+
+nil     jass.SetUnitPathing
+
+nil     jass.ResetUnitLookAt
+
+nil     jass.SetUnitExploded
+
+nil     jass.IsPlayerObserver
+
+nil     jass.SetHeroAgi
+
+nil     jass.IssuePointOrderById
+
+nil     jass.FlushStoredUnit
+
+nil     jass.SetHeroInt
+
+nil     jass.UnitStripHeroLevel
+
+nil     jass.UnitDropItemSlot
+
+nil     jass.WaygateIsActive
+
+nil     jass.UnitModifySkillPoints
+
+nil     jass.GetHeroProperName
+
+nil     jass.SuspendHeroXP
+
+nil     jass.GetCameraBoundMinY
+
+nil     jass.UnitResetCooldown
+
+nil     jass.FlushStoredInteger
+
+nil     jass.UnitUseItemTarget
+
+nil     jass.ReviveHero
+
+nil     jass.ReviveHeroLoc
+
+nil     jass.SetUnitInvulnerable
+
+nil     jass.SyncStoredUnit
+
+nil     jass.PauseUnit
+
+nil     jass.AddResourceAmount
+
+nil     jass.CreateItemPool
+
+nil     jass.GetResourceAmount
+
+nil     jass.HaveSavedString
+
+nil     jass.UnitAddIndicator
+
+nil     jass.IsUnitInForce
+
+nil     jass.IsUnitOwnedByPlayer
+
+nil     jass.LoadImageHandle
+
+nil     jass.IsUnitAlly
+
+nil     jass.IsUnitEnemy
+
+nil     jass.IsUnitVisible
+
+nil     jass.IsUnitInvisible
+
+nil     jass.MultiboardGetColumnCount
+
+nil     jass.IsUnitFogged
+
+nil     jass.IsUnitMasked
+
+nil     jass.IsUnitSelected
+
+nil     jass.LeaderboardHasPlayerItem
+
+nil     jass.IsUnitRace
+
+nil     jass.IsUnitInRangeLoc
+
+nil     jass.IsUnitInTransport
+
+nil     jass.IsUnitIdType
+
+nil     jass.GetOwningPlayer
+
+nil     jass.UnitShareVision
+
+nil     jass.UnitSuspendDecay
+
+nil     jass.UnitPoolAddUnitType
+
+nil     jass.UnitAddType
+
+nil     jass.IsNoVictoryCheat
+
+nil     jass.UnitRemoveType
+
+nil     jass.UnitAddAbility
+
+nil     jass.QuestItemSetDescription
+
+nil     jass.UnitRemoveAbility
+
+nil     jass.SetBlight
+
+nil     jass.UnitCountBuffsEx
+
+nil     jass.PlayerSetLeaderboard
+
+nil     jass.UnitRemoveBuffs
+
+nil     jass.UnitAddSleep
+
+nil     jass.UnitCanSleep
+
+nil     jass.UnitAddSleepPerm
+
+nil     jass.SetReservedLocalHeroButtons
+
+nil     jass.UnitCanSleepPerm
+
+nil     jass.UnitIsSleeping
+
+nil     jass.SaveUnitPoolHandle
+
+nil     jass.UnitWakeUp
+
+nil     jass.SaveInteger
+
+nil     jass.LoadItemPoolHandle
+
+nil     jass.UnitApplyTimedLife
+
+nil     jass.UnitIgnoreAlarm
+
+nil     jass.CreateTimerDialog
+
+nil     jass.GetCameraTargetPositionX
+
+nil     jass.UnitIgnoreAlarmToggled
+
+nil     jass.SetImageRender
+
+nil     jass.LeaderboardSetItemValue
+
+nil     jass.UnitDamagePoint
+
+nil     jass.UnitDamageTarget
+
+nil     jass.IncUnitAbilityLevel
+
+nil     jass.SetUnitAbilityLevel
+
+nil     jass.UnitSetUpgradeProgress
+
+nil     jass.ChooseRandomItem
+
+nil     jass.UnitSetUsesAltIcon
+
+nil     jass.IssueImmediateOrderById
+
+nil     jass.IssueTargetOrderById
+
+nil     jass.IssueNeutralPointOrderById
+
+nil     jass.IssueNeutralTargetOrderById
+
+nil     jass.WaygateActivate
+
+nil     jass.IssueImmediateOrder
+
+nil     jass.IssuePointOrder
+
+nil     jass.IssueTargetOrder
+
+nil     jass.QuestItemSetCompleted
+
+nil     jass.IssueInstantPointOrder
+
+nil     jass.IssueBuildOrder
+
+nil     jass.LoadMultiboardHandle
+
+nil     jass.SetTextTagPosUnit
+
+nil     jass.IssueNeutralImmediateOrder
+
+nil     jass.IssueNeutralPointOrder
+
+nil     jass.WaygateGetDestinationX
+
+nil     jass.AddPlayerTechResearched
+
+nil     jass.WaygateGetDestinationY
+
+nil     jass.LoadFogStateHandle
+
+nil     jass.AddItemToAllStock
+
+nil     jass.AddItemToStock
+
+nil     jass.SaveRectHandle
+
+nil     jass.AddUnitToStock
+
+nil     jass.RemoveItemFromStock
+
+nil     jass.GetPlayerTechMaxAllowed
+
+nil     jass.RemoveUnitFromAllStock
+
+nil     jass.PlayThematicMusic
+
+nil     jass.RemoveUnitFromStock
+
+nil     jass.SetAllUnitTypeSlots
+
+nil     jass.SetItemTypeSlots
+
+nil     jass.SetUnitTypeSlots
+
+nil     jass.SetUnitUserData
+
+nil     jass.CreateItem
+
+nil     jass.RemoveItem
+
+nil     jass.ChangeLevel
+
+nil     jass.GetItemPlayer
+
+nil     jass.GetItemTypeId
+
+nil     jass.GetItemY
+
+nil     jass.PlayMusic
+
+nil     jass.HaveSavedBoolean
+
+nil     jass.SetItemDropOnDeath
+
+nil     jass.SetItemPawnable
+
+nil     jass.IsItemInvulnerable
+
+nil     jass.SetCameraOrientController
+
+nil     jass.PingMinimap
+
+nil     jass.GetItemType
+
+nil     jass.RemoveSavedReal
+
+nil     jass.IsItemVisible
+
+nil     jass.EnumItemsInRect
+
+nil     jass.SaveHashtableHandle
+
+nil     jass.IsItemPowerup
+
+nil     jass.IsItemSellable
+
+nil     jass.TimerDialogSetTimeColor
+
+nil     jass.RemoveGuardPosition
+
+nil     jass.IsItemIdPowerup
+
+nil     jass.IsItemIdSellable
+
+nil     jass.IsItemIdPawnable
+
+nil     jass.GetItemName
+
+nil     jass.LeaderboardSetItemLabel
+
+nil     jass.GetItemUserData
+
+nil     jass.Player
+
+nil     jass.IsPlayerAlly
+
+nil     jass.LoadBooleanExprHandle
+
+nil     jass.CameraSetTargetNoiseEx
+
+nil     jass.IsPlayerInForce
+
+nil     jass.LoadPlayerHandle
+
+nil     jass.GetPlayerId
+
+nil     jass.SetPlayerTechResearched
+
+nil     jass.GetAbilitySoundById
+
+nil     jass.GetPlayerTechResearched
+
+nil     jass.GetPlayerTechCount
+
+nil     jass.SetPlayerAbilityAvailable
+
+nil     jass.GetPlayerTypedUnitCount
+
+nil     jass.LoadUnitPoolHandle
+
+nil     jass.EnableSelect
+
+nil     jass.GetPlayerStructureCount
+
+nil     jass.IsVisibleToPlayer
+
+nil     jass.IsLocationVisibleToPlayer
+
+nil     jass.PlayCinematic
+
+nil     jass.IsFoggedToPlayer
+
+nil     jass.GetPlayerState
+
+nil     jass.GetPlayerScore
+
+nil     jass.SetCineFilterTexMapFlags
+
+nil     jass.GetPlayerAlliance
+
+nil     jass.StopCamera
+
+nil     jass.GetPlayerHandicap
+
+nil     jass.GetPlayerHandicapXP
+
+nil     jass.MultiboardMinimize
+
+nil     jass.SetPlayerHandicapXP
+
+nil     jass.LeaderboardSetLabel
+
+nil     jass.SetPlayerUnitsOwner
+
+nil     jass.VersionGet
+
+nil     jass.LeaderboardClear
+
+nil     jass.VersionCompatible
+
+nil     jass.VersionSupported
+
+nil     jass.RemoveSaveDirectory
+
+nil     jass.CopySaveGame
+
+nil     jass.SetFloatGameState
+
+nil     jass.GetFloatGameState
+
+nil     jass.SetIntegerGameState
+
+nil     jass.DialogCreate
+
+nil     jass.DialogDestroy
+
+nil     jass.DialogSetAsync
+
+nil     jass.DialogClear
+
+nil     jass.DialogAddButton
+
+nil     jass.GetCameraTargetPositionZ
+
+nil     jass.DialogAddQuitButton
+
+nil     jass.DialogDisplay
+
+nil     jass.PanCameraToTimed
+
+nil     jass.InitGameCache
+
+nil     jass.SetMissionAvailable
+
+nil     jass.SetCampaignAvailable
+
+nil     jass.SetCampaignMenuRaceEx
+
+nil     jass.UnregisterStackedSound
+
+nil     jass.SetTutorialCleared
+
+nil     jass.GetDefaultDifficulty
+
+nil     jass.SetDefaultDifficulty
+
+nil     jass.SaveBooleanExprHandle
+
+nil     jass.SetCreepCampFilterState
+
+nil     jass.ReloadGameCachesFromDisk
+
+nil     jass.SaveDestructableHandle
+
+nil     jass.GetCustomCampaignButtonVisible
+
+nil     jass.SaveGameCache
+
+nil     jass.StoreString
+
+nil     jass.SaveReal
+
+nil     jass.SaveBoolean
+
+nil     jass.SaveStr
+
+nil     jass.SavePlayerHandle
+
+nil     jass.SaveItemHandle
+
+nil     jass.ChooseRandomNPBuilding
+
+nil     jass.SaveTriggerHandle
+
+nil     jass.CameraSetSourceNoiseEx
+
+nil     jass.SaveTriggerEventHandle
+
+nil     jass.CameraSetupApply
+
+nil     jass.SaveForceHandle
+
+nil     jass.LoadUbersplatHandle
+
+nil     jass.SaveSoundHandle
+
+nil     jass.SaveItemPoolHandle
+
+nil     jass.SaveQuestHandle
+
+nil     jass.SaveLeaderboardHandle
+
+nil     jass.SaveMultiboardHandle
+
+nil     jass.SaveTrackableHandle
+
+nil     jass.DefeatConditionSetDescription
+
+nil     jass.SaveDialogHandle
+
+nil     jass.SaveFogStateHandle
+
+nil     jass.DisplayTimedTextToPlayer
+
+nil     jass.SaveAgentHandle
+
+nil     jass.SyncStoredInteger
+
+nil     jass.SyncStoredBoolean
+
+nil     jass.SyncStoredString
+
+nil     jass.SetDoodadAnimation
+
+nil     jass.GetStoredInteger
+
+nil     jass.PanCameraTo
+
+nil     jass.GetStoredReal
+
+nil     jass.RestoreUnit
+
+nil     jass.HaveStoredInteger
+
+nil     jass.HaveStoredUnit
+
+nil     jass.HaveStoredString
+
+nil     jass.FlushStoredBoolean
+
+nil     jass.InitHashtable
+
+nil     jass.CreateUnitPool
+
+nil     jass.LoadReal
+
+nil     jass.LoadStr
+
+nil     jass.LoadTriggerHandle
+
+nil     jass.LoadHashtableHandle
+
+nil     jass.LoadTrackableHandle
+
+nil     jass.LoadForceHandle
+
+nil     jass.LoadGroupHandle
+
+nil     jass.LoadEffectHandle
+
+nil     jass.SetSoundDistanceCutoff
+
+nil     jass.LoadLocationHandle
+
+nil     jass.LoadQuestHandle
+
+nil     jass.EnableUserUI
+
+nil     jass.LoadLeaderboardHandle
+
+nil     jass.LoadMultiboardItemHandle
+
+nil     jass.LoadButtonHandle
+
+nil     jass.HaveSavedInteger
+
+nil     jass.HaveSavedHandle
+
+nil     jass.RemoveSavedInteger
+
+nil     jass.RemoveSavedBoolean
+
+nil     jass.PanCameraToTimedWithZ
+
+nil     jass.SetSoundConeOrientation
+
+nil     jass.RemoveSavedString
+
+nil     jass.RemoveSavedHandle
+
+nil     jass.GetRandomInt
+
+nil     jass.DestroyUnitPool
+
+nil     jass.ItemPoolAddItemType
+
+nil     jass.ItemPoolRemoveItemType
+
+nil     jass.DisableRestartMission
+
+nil     jass.SetIntroShotModel
+
+nil     jass.DestroyLeaderboard
+
+nil     jass.ForceUIKey
+
+nil     jass.ForceUICancel
+
+nil     jass.DisplayLoadDialog
+
+nil     jass.SetTerrainFog
+
+nil     jass.SetUnitFog
+
+nil     jass.MultiboardSetItemsStyle
+
+nil     jass.SetTerrainFogEx
+
+nil     jass.SetDayNightModels
+
+nil     jass.TimerDialogSetSpeed
+
+nil     jass.SetSkyModel
+
+nil     jass.PauseGame
+
+nil     jass.PingMinimapEx
+
+nil     jass.EnableOcclusion
+
+nil     jass.EnableWorldFogBoundary
+
+nil     jass.CreateTextTag
+
+nil     jass.DestroyTextTag
+
+nil     jass.SetImagePosition
+
+nil     jass.EnableWeatherEffect
+
+nil     jass.SetTextTagText
+
+nil     jass.SetTextTagPos
+
+nil     jass.SetTextTagColor
+
+nil     jass.SetTextTagVelocity
+
+nil     jass.AttachSoundToUnit
+
+nil     jass.SetTextTagVisibility
+
+nil     jass.SetTextTagLifespan
+
+nil     jass.SetAllyColorFilterState
+
+nil     jass.GetCreepCampFilterState
+
+nil     jass.EnableMinimapFilterButtons
+
+nil     jass.EnableDragSelect
+
+nil     jass.TriggerRegisterTrackableHitEvent
+
+nil     jass.TriggerRegisterTrackableTrackEvent
+
+nil     jass.CreateQuest
+
+nil     jass.QuestSetDescription
+
+nil     jass.QuestSetIconPath
+
+nil     jass.QuestSetRequired
+
+nil     jass.StopMusic
+
+nil     jass.QuestSetCompleted
+
+nil     jass.QuestSetFailed
+
+nil     jass.IsQuestCompleted
+
+nil     jass.IsQuestDiscovered
+
+nil     jass.MultiboardSetItemWidth
+
+nil     jass.CreateDefeatCondition
+
+nil     jass.FlashQuestDialogButton
+
+nil     jass.DestroyTimerDialog
+
+nil     jass.IsTimerDialogDisplayed
+
+nil     jass.TimerDialogSetRealTimeRemaining
+
+nil     jass.LeaderboardGetItemCount
+
+nil     jass.LeaderboardSetSizeByItemCount
+
+nil     jass.LeaderboardRemoveItem
+
+nil     jass.LeaderboardSortItemsByPlayer
+
+nil     jass.LeaderboardSortItemsByLabel
+
+nil     jass.LeaderboardGetLabelText
+
+nil     jass.LeaderboardSetValueColor
+
+nil     jass.LeaderboardSetItemStyle
+
+nil     jass.GetCameraBoundMinX
+
+nil     jass.LeaderboardSetItemValueColor
+
+nil     jass.CreateMultiboard
+
+nil     jass.DestroyMultiboard
+
+nil     jass.IsMultiboardDisplayed
+
+nil     jass.MultiboardSetTitleText
+
+nil     jass.MultiboardSetTitleTextColor
+
+nil     jass.MultiboardSetItemsValue
+
+nil     jass.MultiboardSetItemsIcon
+
+nil     jass.MultiboardReleaseItem
+
+nil     jass.DisplayCineFilter
+
+nil     jass.MultiboardSetItemStyle
+
+nil     jass.SetCameraBounds
+
+nil     jass.MultiboardSuppressDisplay
+
+nil     jass.SetCameraQuickPosition
+
+nil     jass.ResetToGameCamera
+
+nil     jass.SetCinematicCamera
+
+nil     jass.AdjustCameraField
+
+nil     jass.SetCameraTargetController
+
+nil     jass.SetCameraRotateMode
+
+nil     jass.CameraSetupApplyForceDuration
+
+nil     jass.CameraSetSourceNoise
+
+nil     jass.CameraSetSmoothingFactor
+
+nil     jass.GetCameraMargin
+
+nil     jass.GetCameraBoundMaxY
+
+nil     jass.GetCameraField
+
+nil     jass.GetCameraTargetPositionLoc
+
+nil     jass.SetCineFilterBlendMode
+
+nil     jass.PlayMusicEx
+
+nil     jass.SetCineFilterStartColor
+
+nil     jass.SetCineFilterEndColor
+
+nil     jass.SetCineFilterDuration
+
+nil     jass.IsCineFilterDisplayed
+
+nil     jass.SetCinematicScene
+
+nil     jass.EndCinematicScene
+
+nil     jass.ForceCinematicSubtitles
+
+nil     jass.NewSoundEnvironment
+
+nil     jass.CreateSound
+
+nil     jass.CreateSoundFilenameWithLabel
+
+nil     jass.CreateSoundFromLabel
+
+nil     jass.CreateMIDISound
+
+nil     jass.SetStackedSound
+
+nil     jass.SetStackedSoundRect
+
+nil     jass.ClearStackedSoundRect
+
+nil     jass.SetSoundVolume
+
+nil     jass.GetLightningColorR
+
+nil     jass.SetSoundPitch
+
+nil     jass.SetSoundPlayPosition
+
+nil     jass.RemoveWeatherEffect
+
+nil     jass.SetSoundDistances
+
+nil     jass.SetSoundConeAngles
+
+nil     jass.SetSoundPosition
+
+nil     jass.StartSound
+
+nil     jass.SetMapMusic
+
+nil     jass.ClearMapMusic
+
+nil     jass.ResumeMusic
+
+nil     jass.SetMusicVolume
+
+nil     jass.SetMusicPlayPosition
+
+nil     jass.SetThematicMusicPlayPosition
+
+nil     jass.SetSoundDuration
+
+nil     jass.GetSoundFileDuration
+
+nil     jass.VolumeGroupReset
+
+nil     jass.GetSoundIsLoading
+
+nil     jass.RegisterStackedSound
+
+nil     jass.AddWeatherEffect
+
+nil     jass.TerrainDeformRipple
+
+nil     jass.TerrainDeformWave
+
+nil     jass.TerrainDeformStop
+
+nil     jass.AddSpecialEffect
+
+nil     jass.AddSpellEffectLoc
+
+nil     jass.AddSpellEffectByIdLoc
+
+nil     jass.AddSpellEffectTarget
+
+nil     jass.AddLightning
+
+nil     jass.AddLightningEx
+
+nil     jass.GetLightningColorA
+
+nil     jass.MoveLightning
+
+nil     jass.MoveLightningEx
+
+nil     jass.GetAbilityEffectById
+
+nil     jass.GetAbilitySound
+
+nil     jass.GetTerrainCliffLevel
+
+nil     jass.SetWaterBaseColor
+
+nil     jass.SetTerrainType
+
+nil     jass.SetTerrainPathable
+
+nil     jass.DestroyImage
+
+nil     jass.ShowImage
+
+nil     jass.SetImageConstantHeight
+
+nil     jass.SetImageColor
+
+nil     jass.SetBlightLoc
+
+nil     jass.SetImageRenderAlways
+
+nil     jass.SetImageAboveWater
+
+nil     jass.CreateUbersplat
+
+nil     jass.FinishUbersplat
+
+nil     jass.ShowUbersplat
+
+nil     jass.SetUbersplatRender
+
+nil     jass.SetBlightRect
+
+nil     jass.CreateBlightedGoldmine
+
+nil     jass.IsPointBlighted
+
+nil     jass.SetDoodadAnimationRect
+
+nil     jass.StartMeleeAI
+
+nil     jass.StartCampaignAI
+
+nil     jass.CommandAI
+
+nil     jass.GetAIDifficulty
+
+nil     jass.RemoveAllGuardPositions
+
+nil     jass.ExecuteFunc
+
+nil     jass.Cheat
+
+nil     jass.Preload
+
+nil     jass.PreloadEnd
+
+nil     jass.PreloadStart
+
+nil     jass.PreloadRefresh
+
+nil     jass.PreloadGenEnd
+
+nil     jass.Preloader
+
+nil     --- _G 全部 key ---
+
+nil     _G.load
+
+nil     _G.geterrorhandler
+
+nil     _G.next
+
+nil     _G.main
+
+nil     _G.Condition
+
+nil     _G.setmetatable
+
+nil     _G.print
+
+nil     _G.ForForce
+
+nil     _G.rawset
+
+nil     _G.rawequal
+
+nil     _G.pairs
+
+nil     _G.package
+
+nil     _G.tonumber
+
+nil     _G.TriggerAddAction
+
+nil     _G.coroutine
+
+nil     _G.pcall
+
+nil     _G.type
+
+nil     _G.os
+
+nil     _G.collectgarbage
+
+nil     _G.table
+
+nil     _G.loadfile
+
+nil     _G.ForGroup
+
+nil     _G.rawget
+
+nil     _G.string
+
+nil     _G.rawlen
+
+nil     _G.require
+
+nil     _G.EquipExtract_CreateByLevel
+
+nil     _G.seterrorhandler
+
+nil     _G.EnumDestructablesInRect
+
+nil     _G.math
+
+nil     _G.debug
+
+nil     _G.TimerStart
+
+nil     _G.EnumItemsInRect
+
+nil     _G.dofile
+
+nil     _G.tostring
+
+nil     _G.utf8
+
+nil     _G.getmetatable
+
+nil     _G.Filter
+
+nil     _G.io
+
+nil     _G.error
+
+nil     _G._G
+
+nil     _G._VERSION
+
+nil     _G.select
+
+nil     _G.xpcall
+
+nil     _G.ipairs
+
+nil     _G.assert
+

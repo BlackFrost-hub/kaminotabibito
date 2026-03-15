@@ -102,6 +102,47 @@ function fixFile(filePath) {
     );
   }
 
+  // 17. 伤害事件.lua：TSTL 对 jass 调用多传 nil(self)，导致 GroupEnumUnitsInRect(nil,grp,bounds,cond) 等参数错位，去掉首参 nil
+  if (filePath.includes("伤害事件")) {
+    content = content.replace(/GroupEnumUnitsInRect\s*\(\s*nil\s*,\s*/g, "GroupEnumUnitsInRect(");
+    content = content.replace(/Condition\s*\(\s*nil\s*,\s*/g, "Condition(");
+    content = content.replace(/CreateTrigger\s*\(\s*nil\s*\)/g, "CreateTrigger()");
+    content = content.replace(/CreateRegion\s*\(\s*nil\s*\)/g, "CreateRegion()");
+    content = content.replace(/CreateGroup\s*\(\s*nil\s*\)/g, "CreateGroup()");
+    content = content.replace(/GetWorldBounds\s*\(\s*nil\s*\)/g, "GetWorldBounds()");
+    content = content.replace(/RegionAddRect\s*\(\s*nil\s*,\s*/g, "RegionAddRect(");
+    content = content.replace(/TriggerRegisterEnterRegion\s*\(\s*nil\s*,\s*/g, "TriggerRegisterEnterRegion(");
+    content = content.replace(/TriggerAddCondition\s*\(\s*nil\s*,\s*/g, "TriggerAddCondition(");
+    content = content.replace(/TriggerAddAction\s*\(\s*nil\s*,\s*/g, "TriggerAddAction(");
+    content = content.replace(/DestroyGroup\s*\(\s*nil\s*,\s*/g, "DestroyGroup(");
+    content = content.replace(/RegisterPlayerUnitEvent\s*\(\s*nil\s*,\s*/g, "RegisterPlayerUnitEvent(");
+    content = content.replace(/initEnumUnit\s*\(\s*nil\s*\)/g, "initEnumUnit()");
+    content = content.replace(/getEventUnitDamaged\s*\(\s*nil\s*\)/g, "getEventUnitDamaged()");
+    content = content.replace(/getUnitTypeHero\s*\(\s*nil\s*\)/g, "getUnitTypeHero()");
+    content = content.replace(/recreateDamageTrigger\s*\(\s*nil\s*\)/g, "recreateDamageTrigger()");
+    content = content.replace(/ConvertUnitEvent\s*\(\s*nil\s*,\s*/g, "ConvertUnitEvent(");
+    content = content.replace(/ConvertUnitType\s*\(\s*nil\s*,\s*/g, "ConvertUnitType(");
+    content = content.replace(/(____self_\d+_IsUnitType_\d+)\(\s*____self_\d+\s*,\s*(\w+)\s*,\s*([^)]+)\)/g, "$1($2, $3)");
+    // 回调：TSTL 编译成 cb(self, unit, damage, ...)，传 (nil, su, sd, ...) 使 unit=su；去掉多传的第二个 nil 即可
+    content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,");
+  }
+
+  // 18. 装备排泄.lua：去掉 jass 调用多传的 nil，保证 RemoveItem/DestroyTrigger 等参数正确
+  if (filePath.includes("装备排泄")) {
+    // 修复私有函数签名：TSTL 多加了 self 参数，导致调用时 item 被错位到 self
+    content = content.replace(
+      /function registerItemForCleanup\s*\(\s*self\s*,\s*item\s*\)/g,
+      "function registerItemForCleanup(item)"
+    );
+    content = content.replace(/CreateTrigger\s*\(\s*nil\s*\)/g, "CreateTrigger()");
+    content = content.replace(/TriggerRegisterDeathEvent\s*\(\s*nil\s*,\s*/g, "TriggerRegisterDeathEvent(");
+    content = content.replace(/TriggerAddAction\s*\(\s*nil\s*,\s*/g, "TriggerAddAction(");
+    content = content.replace(/RemoveItem\s*\(\s*nil\s*,\s*/g, "RemoveItem(");
+    content = content.replace(/TriggerRemoveAction\s*\(\s*nil\s*,\s*/g, "TriggerRemoveAction(");
+    content = content.replace(/DestroyTrigger\s*\(\s*nil\s*,\s*/g, "DestroyTrigger(");
+    content = content.replace(/registerItemForCleanup\s*\(\s*nil\s*,\s*/g, "registerItemForCleanup(");
+  }
+
   if (content !== original) {
     fs.writeFileSync(filePath, content, "utf8");
     return true;

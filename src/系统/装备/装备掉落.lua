@@ -16,24 +16,24 @@ function getItemsByScoreRange(self, minScore, maxScore)
     local result = {}
     for id in pairs(itemsData) do
         do
-            local __continue89
+            local __continue84
             repeat
                 if type(id) ~= "string" or #id ~= 4 then
-                    __continue89 = true
+                    __continue84 = true
                     break
                 end
                 local entry = itemsData[id]
                 local score = entry and entry.score
                 if type(score) ~= "number" then
-                    __continue89 = true
+                    __continue84 = true
                     break
                 end
                 if score >= minScore and score <= maxScore then
                     result[#result + 1] = id
                 end
-                __continue89 = true
+                __continue84 = true
             until true
-            if not __continue89 then
+            if not __continue84 then
                 break
             end
         end
@@ -41,33 +41,19 @@ function getItemsByScoreRange(self, minScore, maxScore)
     return result
 end
 --- 装备掉落表格式说明：
--- - picks：最多掉落多少件物品。
--- - itemIds 带百分数（如 I03Y:7%;I04R:7%）：每个物品独立按自身概率判定是否掉落，互不影响，但最终最多掉落 picks 件；always 表示必掉且仅掉一次（不参与重复抽取）。
--- - itemIds 纯权重（如 I02C:1.5;I01G:1）：按权重在池中随机抽取 picks 件。
--- - itemIds 无权重（如 I00C;I00E;I00D;I00G）：在池中随机选 picks 件（默认不重复）。
--- - isUniversal：为 true 时，若掉了专属掉落则不再参与通用掉落（如 1-10 级 3% 生命药水，待实现）。
--- - unitType：单位类型（normal/elite/Boss 等）。elite/Boss 在 T（玩家人数）>1 时，picks = round(basePicks×(1+0.334×(T-1)))。
--- - 全局掉落默认不重复；仅当 picks（含 T 提升后）> 池子大小时，多出的次数从非 always 物品中随机重复抽取。
+-- - picks：最多掉落多少件（不是必定掉满）。
+-- - itemIds 带百分数（如 I03Y:7%;I04R:7%）：每项独立按概率判定，不重复；最多 picks 件。仅当 picks > 物品种类数时，差额按权重再抽（可重复）。
+-- - itemIds 纯权重（如 I02C:1.5;I01G:1）：按权重在池中随机抽 picks 件。
+-- - itemIds 无权重（如 I00C;I00E;I00D;I00G）：从池中选 min(picks, 池大小) 件不重复；picks > 池大小时多出的可重复随机。
+-- - always：必掉且仅掉一次。
+-- - unitType 为 elite/Boss 且 T>1 时，picks = round(basePicks×(1+0.334×(T-1)))。
 local jass = require("jass.common")
 local g = require("jass.globals")
+local equipExcrete = require("系统.装备.装备排泄")
 local idData = require("系统.装备.装备掉落表").default or require("系统.装备.装备掉落表").idData or ({})
 itemsData = require("系统.装备.装备数据").default or ({})
 local _seed = 0
-local DEBUG_DROP = false
-local PREFIX = "|cffffff00『系统提示』：|r"
-local DEBUG_COLOR = "|cff87ceeb"
-local function ____debug(____, msg)
-    if not DEBUG_DROP then
-        return
-    end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0.02,
-        10,
-        ((PREFIX .. DEBUG_COLOR) .. msg) .. "|r"
-    )
-end;
+local PREFIX = "|cffffff00『系统提示』：|r";
 (function()
     local key = "__equip_drop_seeded"
     if _G[key] then
@@ -88,10 +74,6 @@ end;
     end
     _seed = h
     math.randomseed(_seed)
-    ____debug(
-        nil,
-        "装备掉落：seed=" .. tostring(_seed)
-    )
 end)(nil)
 local function stringToFourCC(self, s)
     local b1 = string.byte(s, 1)
@@ -129,11 +111,11 @@ local function parseItemPool(self, itemIdsStr)
     if hasColon then
         for ____, p in ipairs(parts) do
             do
-                local __continue20
+                local __continue18
                 repeat
                     local colon = (string.find(p, ":", nil, true) or 0) - 1
                     if colon < 0 then
-                        __continue20 = true
+                        __continue18 = true
                         break
                     end
                     local id = __TS__StringTrim(__TS__StringSubstring(p, 0, colon))
@@ -155,9 +137,9 @@ local function parseItemPool(self, itemIdsStr)
                             always = always
                         }
                     end
-                    __continue20 = true
+                    __continue18 = true
                 until true
-                if not __continue20 then
+                if not __continue18 then
                     break
                 end
             end
@@ -211,9 +193,8 @@ local function weightedPickOne(self, pool)
     end
     return pool[#pool].id
 end
---- 权重池：默认不重复（每个池内物品至多掉一次）。
--- picks=1 抽 1 个；picks>1 每项独立按概率 roll，always 必掉且仅掉一次；最多 picks 件。
--- 当 picks > 池子大小时，多出的次数从非 always 物品中随机重复抽取；always 永不重复。
+--- 权重/百分比池：最多 picks 件；首轮每项独立按概率 roll，不重复。
+-- 仅当 picks > 池子物品种类数时，差额按权重再抽（可重复掉落）。
 local function pickFromWeightedPool(self, pool, picks)
     if #pool == 0 then
         return {}
@@ -224,7 +205,7 @@ local function pickFromWeightedPool(self, pool, picks)
     end
     local out = {}
     for ____, p in ipairs(pool) do
-        if p.weight >= 1 then
+        if p.weight >= 1 or p.always then
             out[#out + 1] = p.id
         else
             local r = math.random(1, 10000) / 10000
@@ -252,45 +233,45 @@ local function pickFromWeightedPool(self, pool, picks)
     if needMore <= 0 then
         return out
     end
-    local nonAlwaysIds = {}
-    for ____, p in ipairs(pool) do
-        if not p.always then
-            nonAlwaysIds[#nonAlwaysIds + 1] = p.id
-        end
-    end
-    if #nonAlwaysIds == 0 then
+    if picks <= #pool then
         return out
     end
     do
         local i = 0
         while i < needMore do
-            local idx = math.random(1, #nonAlwaysIds)
-            out[#out + 1] = nonAlwaysIds[idx]
+            local one = weightedPickOne(nil, pool)
+            if one ~= nil then
+                out[#out + 1] = one
+            end
             i = i + 1
         end
     end
     return out
 end
---- 无权重池（I00C;I00E;I00D;I00G）：随机选 picks 个；默认不重复，仅当 picks > 池大小时才允许重复
+--- 无权重池（I00C;I00E;I00D;I00G）：从池中选 min(picks, 池大小) 件不重复；若 picks > 池大小，多出的按池内随机再抽（可重复）
 local function pickFromEqualPool(self, ids, picks)
     if #ids == 0 or picks <= 0 then
         return {}
     end
-    local allowRepeat = picks > #ids
     local out = {}
     local list = __TS__ArraySlice(ids)
+    local firstPicks = picks <= #list and picks or #list
     do
         local i = 0
-        while i < picks do
-            if #list == 0 and not allowRepeat then
-                break
-            end
+        while i < firstPicks do
             local idx = math.random(1, #list)
             local id = list[idx - 1]
             out[#out + 1] = id
-            if not allowRepeat then
-                __TS__ArraySplice(list, idx - 1, 1)
-            end
+            __TS__ArraySplice(list, idx - 1, 1)
+            i = i + 1
+        end
+    end
+    local needMore = picks - #out
+    do
+        local i = 0
+        while i < needMore do
+            local idx = math.random(1, #ids)
+            out[#out + 1] = ids[idx - 1]
             i = i + 1
         end
     end
@@ -303,14 +284,14 @@ local function createItemAtUnit(self, unit, itemId)
         loc = jass.GetUnitLoc(unit)
     end
     if loc and type(jass.CreateItemLoc) == "function" then
-        jass.CreateItemLoc(four, loc)
-        if type(jass.RemoveLocation) == "function" then
-            jass.RemoveLocation(loc)
-        end
+        equipExcrete:setLastCreatedItem(jass.CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
         local x = jass.GetUnitX(unit)
         local y = jass.GetUnitY(unit)
-        jass.CreateItem(four, x, y)
+        equipExcrete:setLastCreatedItem(jass.CreateItem(four, x, y))
+    end
+    if loc and type(jass.RemoveLocation) == "function" then
+        jass.RemoveLocation(loc)
     end
 end
 local function onUnitDeath(self)
@@ -349,31 +330,25 @@ local function onUnitDeath(self)
         for ____, id in ipairs(toDrop) do
             createItemAtUnit(nil, unit, id)
         end
-        if DEBUG_DROP and #toDrop > 0 then
-            ____debug(
-                nil,
-                (((("总表掉落：" .. tostring(unitId)) .. " x") .. tostring(#toDrop)) .. " ") .. table.concat(toDrop, ",")
-            )
-        end
         return
     end
     local DROP_RULES = {{unitId = "hfoo", minScore = 150, maxScore = 250, proc = 1}}
     for ____, rule in ipairs(DROP_RULES) do
         do
-            local __continue82
+            local __continue77
             repeat
                 if typeId ~= stringToFourCC(nil, rule.unitId) then
-                    __continue82 = true
+                    __continue77 = true
                     break
                 end
                 local r = math.random(1, 10000)
                 if r > rule.proc * 10000 then
-                    __continue82 = true
+                    __continue77 = true
                     break
                 end
                 local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
                 if #list == 0 then
-                    __continue82 = true
+                    __continue77 = true
                     break
                 end
                 local idx = math.random(1, #list)
@@ -383,7 +358,7 @@ local function onUnitDeath(self)
                 end
                 break
             until true
-            if not __continue82 then
+            if not __continue77 then
                 break
             end
         end
@@ -457,14 +432,6 @@ local function init(self)
         )
     end
     jass.TriggerAddAction(trig, onUnitDeath)
-    local cnt = 0
-    for _k in pairs(idData) do
-        cnt = cnt + 1
-    end
-    ____debug(
-        nil,
-        "装备掉落：init 完成 单位数=" .. tostring(cnt)
-    )
 end
 init(nil)
 return ____exports

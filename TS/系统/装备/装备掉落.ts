@@ -2,16 +2,16 @@
 // 自动生成 - 单位数据表
 /**
  * 装备掉落表格式说明：
- * - picks：最多掉落多少件物品。
- * - itemIds 带百分数（如 I03Y:7%;I04R:7%）：每个物品独立按自身概率判定是否掉落，互不影响，但最终最多掉落 picks 件；always 表示必掉且仅掉一次（不参与重复抽取）。
- * - itemIds 纯权重（如 I02C:1.5;I01G:1）：按权重在池中随机抽取 picks 件。
- * - itemIds 无权重（如 I00C;I00E;I00D;I00G）：在池中随机选 picks 件（默认不重复）。
- * - isUniversal：为 true 时，若掉了专属掉落则不再参与通用掉落（如 1-10 级 3% 生命药水，待实现）。
- * - unitType：单位类型（normal/elite/Boss 等）。elite/Boss 在 T（玩家人数）>1 时，picks = round(basePicks×(1+0.334×(T-1)))。
- * - 全局掉落默认不重复；仅当 picks（含 T 提升后）> 池子大小时，多出的次数从非 always 物品中随机重复抽取。
+ * - picks：最多掉落多少件（不是必定掉满）。
+ * - itemIds 带百分数（如 I03Y:7%;I04R:7%）：每项独立按概率判定，不重复；最多 picks 件。仅当 picks > 物品种类数时，差额按权重再抽（可重复）。
+ * - itemIds 纯权重（如 I02C:1.5;I01G:1）：按权重在池中随机抽 picks 件。
+ * - itemIds 无权重（如 I00C;I00E;I00D;I00G）：从池中选 min(picks, 池大小) 件不重复；picks > 池大小时多出的可重复随机。
+ * - always：必掉且仅掉一次。
+ * - unitType 为 elite/Boss 且 T>1 时，picks = round(basePicks×(1+0.334×(T-1)))。
  */
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [key: string]: any };
+const equipExcrete = require("系统.装备.装备排泄") as { setLastCreatedItem: (item: any) => void };
 const idData =
   (require("系统.装备.装备掉落表") as { default?: Record<string, UnitDataEntry> }).default ??
   (require("系统.装备.装备掉落表") as { idData?: Record<string, UnitDataEntry> }).idData ??
@@ -29,14 +29,7 @@ interface UnitDataEntry {
   [k: string]: string | number | undefined;
 }
 
-// const DEBUG_DROP = true;
-const DEBUG_DROP = false;
 const PREFIX = "|cffffff00『系统提示』：|r";
-const DEBUG_COLOR = "|cff87ceeb";
-const debug = (msg: string) => {
-  if (!DEBUG_DROP) return;
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0.02, 10, PREFIX + DEBUG_COLOR + msg + "|r");
-};
 
 (() => {
   const key = "__equip_drop_seeded";
@@ -48,7 +41,6 @@ const debug = (msg: string) => {
   if (h <= 0) h = 12345;
   _seed = h;
   math.randomseed(_seed);
-  debug("装备掉落：seed=" + tostring(_seed));
 })();
 
 function stringToFourCC(s: string): number {
@@ -126,9 +118,8 @@ function weightedPickOne(pool: { id: string; weight: number }[]): string | undef
 }
 
 /**
- * 权重池：默认不重复（每个池内物品至多掉一次）。
- * picks=1 抽 1 个；picks>1 每项独立按概率 roll，always 必掉且仅掉一次；最多 picks 件。
- * 当 picks > 池子大小时，多出的次数从非 always 物品中随机重复抽取；always 永不重复。
+ * 权重/百分比池：最多 picks 件；首轮每项独立按概率 roll，不重复。
+ * 仅当 picks > 池子物品种类数时，差额按权重再抽（可重复掉落）。
  */
 function pickFromWeightedPool(
   pool: { id: string; weight: number; always?: boolean }[],
@@ -141,7 +132,7 @@ function pickFromWeightedPool(
   }
   const out: string[] = [];
   for (const p of pool) {
-    if (p.weight >= 1) {
+    if (p.weight >= 1 || p.always) {
       out.push(p.id);
     } else {
       const r = (math as any).random(1, 10000) as number / 10000;
@@ -159,30 +150,30 @@ function pickFromWeightedPool(
   }
   const needMore = picks - out.length;
   if (needMore <= 0) return out;
-  const nonAlwaysIds: string[] = [];
-  for (const p of pool) {
-    if (!p.always) nonAlwaysIds.push(p.id);
-  }
-  if (nonAlwaysIds.length === 0) return out;
+  if (picks <= pool.length) return out;
   for (let i = 0; i < needMore; i++) {
-    const idx = (math as any).random(1, nonAlwaysIds.length) as number;
-    out.push((nonAlwaysIds as any)[idx - 1] as string);
+    const one = weightedPickOne(pool);
+    if (one != null) out.push(one);
   }
   return out;
 }
 
-/** 无权重池（I00C;I00E;I00D;I00G）：随机选 picks 个；默认不重复，仅当 picks > 池大小时才允许重复 */
+/** 无权重池（I00C;I00E;I00D;I00G）：从池中选 min(picks, 池大小) 件不重复；若 picks > 池大小，多出的按池内随机再抽（可重复） */
 function pickFromEqualPool(ids: string[], picks: number): string[] {
   if (ids.length === 0 || picks <= 0) return [];
-  const allowRepeat = picks > ids.length;
   const out: string[] = [];
   const list = ids.slice();
-  for (let i = 0; i < picks; i++) {
-    if (list.length === 0 && !allowRepeat) break;
+  const firstPicks = picks <= list.length ? picks : list.length;
+  for (let i = 0; i < firstPicks; i++) {
     const idx = (math as any).random(1, list.length) as number;
     const id = (list as any)[idx - 1] as string;
     out.push(id);
-    if (!allowRepeat) list.splice(idx - 1, 1);
+    list.splice(idx - 1, 1);
+  }
+  const needMore = picks - out.length;
+  for (let i = 0; i < needMore; i++) {
+    const idx = (math as any).random(1, ids.length) as number;
+    out.push((ids as any)[idx - 1] as string);
   }
   return out;
 }
@@ -192,13 +183,13 @@ function createItemAtUnit(unit: any, itemId: string): void {
   let loc: any = undefined;
   if (typeof (jass as any).GetUnitLoc === "function") loc = (jass as any).GetUnitLoc(unit);
   if (loc && typeof (jass as any).CreateItemLoc === "function") {
-    (jass as any).CreateItemLoc(four, loc);
-    if (typeof (jass as any).RemoveLocation === "function") (jass as any).RemoveLocation(loc);
+    equipExcrete.setLastCreatedItem((jass as any).CreateItemLoc(four, loc));
   } else if ((jass as any).GetUnitX != null) {
     const x = (jass as any).GetUnitX(unit);
     const y = (jass as any).GetUnitY(unit);
-    jass.CreateItem(four, x, y);
+    equipExcrete.setLastCreatedItem((jass as any).CreateItem(four, x, y));
   }
+  if (loc && typeof (jass as any).RemoveLocation === "function") (jass as any).RemoveLocation(loc);
 }
 
 function onUnitDeath(): void {
@@ -225,7 +216,6 @@ function onUnitDeath(): void {
       ? pickFromEqualPool(ids, picksNum)
       : pickFromWeightedPool(pool, picksNum);
     for (const id of toDrop) createItemAtUnit(unit, id);
-    if (DEBUG_DROP && toDrop.length > 0) debug("总表掉落：" + unitId + " x" + tostring(toDrop.length) + " " + toDrop.join(","));
     return;
   }
 
@@ -279,9 +269,6 @@ function init(): void {
   const cond = (jass as any).Condition;
   if (typeof cond === "function") (jass as any).TriggerAddCondition(trig, cond(condition));
   jass.TriggerAddAction(trig, onUnitDeath);
-  let cnt = 0;
-  for (const _k in idData) cnt++;
-  debug("装备掉落：init 完成 单位数=" + tostring(cnt));
 }
 
 init();

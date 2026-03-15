@@ -3,14 +3,7 @@
  * SGSS_SetState(unit, 9, value)；减速需传负数，故先减掉旧值再加新值。
  */
 const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as { udg_TempUnit?: any; udg_TempReal?: number; [k: string]: any };
 const itemsData = (require("系统.装备.装备数据") as { default: Record<string, { movespeed2?: number; name?: string; type?: string }> }).default;
-// 调试开关（需要排查再改成 true）
-const DEBUG_MS2 = false;
-const debug = (...args: any[]) => {
-  if (!DEBUG_MS2) return;
-  (globalThis as any).print("[ms2]", ...args);
-};
 
 function fourCCToString(fourcc: number): string {
   const c1 = string.char(fourcc % 256);
@@ -38,14 +31,8 @@ function getMaxMovespeed2Info(unit: any, ignoreItem?: any): { value: number; nam
   let max = 0;
   let name = "";
   let count = 0;
-  if (typeof (jass as any).UnitItemInSlot !== "function") {
-    debug("no UnitItemInSlot");
-    return { value: 0, name: "", count: 0 };
-  }
-  if (typeof (jass as any).GetItemTypeId !== "function") {
-    debug("no GetItemTypeId");
-    return { value: 0, name: "", count: 0 };
-  }
+  if (typeof (jass as any).UnitItemInSlot !== "function") return { value: 0, name: "", count: 0 };
+  if (typeof (jass as any).GetItemTypeId !== "function") return { value: 0, name: "", count: 0 };
   for (let slot = 0; slot <= 5; slot++) {
     const item = (jass as any).UnitItemInSlot(unit, slot);
     if (!item) continue;
@@ -69,16 +56,13 @@ function applyMovespeed2(unit: any, newSpeed: number): void {
   const key = getUnitKey(unit);
   const oldSpeed = applied[key] != null ? applied[key] : 0;
   if (newSpeed === oldSpeed) return;
-  debug("apply", "key=" + key, "old=" + tostring(oldSpeed), "new=" + tostring(newSpeed));
-  g.udg_TempUnit = unit;
+  (jass as any).udg_TempUnit[1] = unit;
   if (oldSpeed !== 0) {
-    g.udg_TempReal = -oldSpeed;
-    debug("ExecuteFunc movespeed2", "delta=" + tostring(-oldSpeed));
+    (jass as any).udg_TempReal[1] = -oldSpeed;
     jass.ExecuteFunc("movespeed2");
   }
   if (newSpeed !== 0) {
-    g.udg_TempReal = newSpeed;
-    debug("ExecuteFunc movespeed2", "delta=" + tostring(newSpeed));
+    (jass as any).udg_TempReal[1] = newSpeed;
     jass.ExecuteFunc("movespeed2");
   }
   applied[key] = newSpeed;
@@ -88,10 +72,7 @@ function onItemChange(): void {
   const unit = jass.GetManipulatingUnit();
   if (!unit) return;
   if (typeof (jass as any).IsUnitType === "function" && jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  const IsUnitIllusionBJ = (jass as any).IsUnitIllusionBJ;
-  if (typeof IsUnitIllusionBJ === "function") {
-    if (IsUnitIllusionBJ(unit) || IsUnitIllusionBJ(jass, unit) || IsUnitIllusionBJ(undefined as any, unit)) return;
-  }
+  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
   const eventId = jass.GetTriggerEventId();
   const isPickup = eventId === ((jass as any).EVENT_PLAYER_UNIT_PICKUP_ITEM ?? 38);
   const isDrop = eventId === ((jass as any).EVENT_PLAYER_UNIT_DROP_ITEM ?? 39);
@@ -99,11 +80,7 @@ function onItemChange(): void {
   const newSpeed = isDrop ? getMaxMovespeed2(unit, manipulated) : getMaxMovespeed2(unit);
   const key = getUnitKey(unit);
   const cur = applied[key] != null ? applied[key] : 0;
-  debug("evt", isPickup ? "pickup" : "drop", "key=" + key, "cur=" + tostring(cur), "calc=" + tostring(newSpeed));
-  if (isPickup && newSpeed <= cur) {
-    debug("skip pickup (<=cur)");
-    return;
-  }
+  if (isPickup && newSpeed <= cur) return;
   applyMovespeed2(unit, newSpeed);
 }
 

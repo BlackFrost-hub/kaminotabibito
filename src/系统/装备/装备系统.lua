@@ -40,6 +40,7 @@ local STAT_CONFIG = {
     {name = "生命恢复效率", key = "hpRegenEff"},
     {name = "技能治疗率", key = "skillHeal"},
     {name = "受到的治疗率", key = "healReceived"},
+    {name = "重伤", key = "wound"},
     {name = "魔法恢复", key = "mpRegen"},
     {name = "魔法恢复%", key = "mpRegenPct"},
     {name = "魔法消耗", key = "mpCost"},
@@ -154,6 +155,7 @@ local percentNames = {
     "技能治疗率",
     "受到的治疗率",
     "魔法消耗",
+    "重伤",
     "技能抗性",
     "魔法伤害",
     "物理伤害",
@@ -231,16 +233,11 @@ local function initEvents(self)
             if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
                 return
             end
-            local IsUnitIllusion = jass.IsUnitIllusion
-            local IsUnitIllusionBJ = jass.IsUnitIllusionBJ
-            if type(IsUnitIllusionBJ) == "function" then
-                if IsUnitIllusionBJ(nil, unit) or IsUnitIllusionBJ(nil, jass, unit) or IsUnitIllusionBJ(nil, nil, unit) then
-                    return
-                end
-            elseif type(IsUnitIllusion) == "function" then
-                if IsUnitIllusion(nil, unit) or IsUnitIllusion(nil, jass, unit) or IsUnitIllusion(nil, nil, unit) then
-                    return
-                end
+            if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
+                return
+            end
+            if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+                return
             end
             local player = jass.GetOwningPlayer(unit)
             local itemId = jass.GetItemTypeId(item)
@@ -285,17 +282,19 @@ local function initEvents(self)
             end
             local charges = jass.GetItemCharges(item)
             local mult = charges > 0 and charges or 1
-            g.udg_TempUnit = unit
+            jass.udg_TempUnit[1] = unit
             g.udg_TempIsAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
             local primaryBonus = itemData.primaryBonus
             local primary = {}
             if primaryBonus and type(jass.ExecuteFunc) == "function" then
                 jass.ExecuteFunc("GetHeroMainAttribute")
-                local ____g_udg_TempInteger_3 = g.udg_TempInteger
-                if ____g_udg_TempInteger_3 == nil then
-                    ____g_udg_TempInteger_3 = 0
+                local ____temp_3
+                if g.udg_TempInteger ~= nil and g.udg_TempInteger[1] ~= nil then
+                    ____temp_3 = g.udg_TempInteger[1]
+                else
+                    ____temp_3 = 0
                 end
-                local mainAttr = ____g_udg_TempInteger_3
+                local mainAttr = ____temp_3
                 primary = parsePrimaryBonus(nil, primaryBonus, mainAttr)
             end
             local merged = {}
@@ -349,8 +348,18 @@ local function initEvents(self)
                     i = i + 1
                 end
             end
-            local owner = jass.GetOwningPlayer(g.udg_TempUnit)
-            local playerName = jass.GetPlayerName(owner)
+            local owner = jass.GetOwningPlayer(unit)
+            local ____temp_7
+            if type(jass.GetPlayerName) == "function" then
+                ____temp_7 = jass.GetPlayerName(owner)
+            else
+                ____temp_7 = ""
+            end
+            local ____temp_7_8 = ____temp_7
+            if ____temp_7_8 == nil then
+                ____temp_7_8 = ""
+            end
+            local playerName = ____temp_7_8
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"
             local levelText = itemData.level or ""
             local levelColor
@@ -394,30 +403,30 @@ local function initEvents(self)
                 local i = 0
                 while i < #playerStats do
                     do
-                        local __continue49
+                        local __continue47
                         repeat
                             local idx = i + 1
                             local statName = g.udg_TempString[idx]
                             if statName == "移动速度" then
-                                __continue49 = true
+                                __continue47 = true
                                 break
                             end
-                            local ____temp_7
+                            local ____temp_9
                             if tempRead ~= nil and tempRead[idx] ~= nil then
-                                ____temp_7 = tempRead[idx]
+                                ____temp_9 = tempRead[idx]
                             else
-                                ____temp_7 = 0
+                                ____temp_9 = 0
                             end
-                            local val = ____temp_7
+                            local val = ____temp_9
                             local num = __TS__Number(val)
                             local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
                             local nearZero = num > -0.000001 and num < 0.000001
                             local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
                             ) .. "%") or (nearZero and "0" or tostring(num))
                             test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
-                            __continue49 = true
+                            __continue47 = true
                         until true
-                        if not __continue49 then
+                        if not __continue47 then
                             break
                         end
                     end
@@ -425,16 +434,15 @@ local function initEvents(self)
                 end
             end
             local hasMovespeed2 = itemData.movespeed2 ~= nil
-            if hasMovespeed2 and g.udg_TempUnit and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-                local ____equipMovespeed_getMaxMovespeed2Info_10 = equipMovespeed.getMaxMovespeed2Info
-                local ____g_udg_TempUnit_9 = g.udg_TempUnit
-                local ____isDrop_8
+            if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
+                local ____equipMovespeed_getMaxMovespeed2Info_11 = equipMovespeed.getMaxMovespeed2Info
+                local ____isDrop_10
                 if isDrop then
-                    ____isDrop_8 = item
+                    ____isDrop_10 = item
                 else
-                    ____isDrop_8 = nil
+                    ____isDrop_10 = nil
                 end
-                local ms = ____equipMovespeed_getMaxMovespeed2Info_10(equipMovespeed, ____g_udg_TempUnit_9, ____isDrop_8)
+                local ms = ____equipMovespeed_getMaxMovespeed2Info_11(equipMovespeed, unit, ____isDrop_10)
                 if ms.value > 0 then
                     test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
                 end
@@ -454,7 +462,7 @@ local function initEvents(self)
                     0,
                     0.02,
                     5,
-                    (("|cffffff00『系统消息』：|r" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
+                    (("|cffffff00『系统消息』：|r" .. tostring(playerName)) .. "的当前装备加成") .. table.concat(test5Parts, "，")
                 )
             end
         end

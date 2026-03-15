@@ -31,4 +31,8 @@ const [ok, err] = pcall(() => require("系统.装备.装备系统"));
 if (!ok) (globalThis as any).print("装备系统加载失败:", tostring(err));
 require("系统.装备.装备移速");
 require("系统.装备.装备回复");
+require("系统.装备.装备成长");
+require("系统.伤害.伤害事件");
+require("系统.伤害.伤害测试");
+require("系统.伤害.dot伤害");
 export {};

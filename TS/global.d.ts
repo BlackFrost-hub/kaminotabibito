@@ -1,5 +1,7 @@
 /** Global declarations for TSTL / Lua environment */
 declare var Itmeboolean: boolean; /* 装备限制开关（Jass 全局） */
+/** @noSelf */
+declare function GetUnitState(unit: any, state: any): number;
 declare function require(mod: string): any;
 declare const pcall: <T>(f: () => T) => [boolean, T | string];
 declare const tostring: (v: any) => string;

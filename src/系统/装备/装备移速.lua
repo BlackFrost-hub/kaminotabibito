@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
-local fourCCToString, getMaxMovespeed2Info, jass, itemsData, ____debug
+local fourCCToString, getMaxMovespeed2Info, jass, itemsData
 function fourCCToString(self, fourcc)
     local c1 = string.char(fourcc % 256)
     local c2 = string.char(math.floor(fourcc / 256) % 256)
@@ -14,26 +14,24 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
     local name = ""
     local count = 0
     if type(jass.UnitItemInSlot) ~= "function" then
-        ____debug(nil, "no UnitItemInSlot")
         return {value = 0, name = "", count = 0}
     end
     if type(jass.GetItemTypeId) ~= "function" then
-        ____debug(nil, "no GetItemTypeId")
         return {value = 0, name = "", count = 0}
     end
     do
         local slot = 0
         while slot <= 5 do
             do
-                local __continue11
+                local __continue9
                 repeat
                     local item = jass.UnitItemInSlot(unit, slot)
                     if not item then
-                        __continue11 = true
+                        __continue9 = true
                         break
                     end
                     if ignoreItem and item == ignoreItem then
-                        __continue11 = true
+                        __continue9 = true
                         break
                     end
                     local tid = jass.GetItemTypeId(item)
@@ -41,7 +39,7 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
                     local entry = itemsData[idStr]
                     local typ = entry and entry.type
                     if typ == "任务" or typ == "药剂" or typ == "食品" then
-                        __continue11 = true
+                        __continue9 = true
                         break
                     end
                     local v = entry and entry.movespeed2
@@ -52,9 +50,9 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
                         max = v
                         name = (entry and entry.name) ~= nil and __TS__StringTrim(tostring(entry.name)) or "" or "未知"
                     end
-                    __continue11 = true
+                    __continue9 = true
                 until true
-                if not __continue11 then
+                if not __continue9 then
                     break
                 end
             end
@@ -64,15 +62,7 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
     return {value = max, name = name, count = count}
 end
 jass = require("jass.common")
-local g = require("jass.globals")
 itemsData = require("系统.装备.装备数据").default
-local DEBUG_MS2 = false
-____debug = function(____, ...)
-    if not DEBUG_MS2 then
-        return
-    end
-    _G.print("[ms2]", ...)
-end
 --- 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加）
 local applied = {}
 local function getUnitKey(self, unit)
@@ -88,30 +78,13 @@ local function applyMovespeed2(self, unit, newSpeed)
     if newSpeed == oldSpeed then
         return
     end
-    ____debug(
-        nil,
-        "apply",
-        "key=" .. key,
-        "old=" .. tostring(oldSpeed),
-        "new=" .. tostring(newSpeed)
-    )
-    g.udg_TempUnit = unit
+    jass.udg_TempUnit[1] = unit
     if oldSpeed ~= 0 then
-        g.udg_TempReal = -oldSpeed
-        ____debug(
-            nil,
-            "ExecuteFunc movespeed2",
-            "delta=" .. tostring(-oldSpeed)
-        )
+        jass.udg_TempReal[1] = -oldSpeed
         jass.ExecuteFunc("movespeed2")
     end
     if newSpeed ~= 0 then
-        g.udg_TempReal = newSpeed
-        ____debug(
-            nil,
-            "ExecuteFunc movespeed2",
-            "delta=" .. tostring(newSpeed)
-        )
+        jass.udg_TempReal[1] = newSpeed
         jass.ExecuteFunc("movespeed2")
     end
     applied[key] = newSpeed
@@ -124,11 +97,8 @@ local function onItemChange(self)
     if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
-    local IsUnitIllusionBJ = jass.IsUnitIllusionBJ
-    if type(IsUnitIllusionBJ) == "function" then
-        if IsUnitIllusionBJ(nil, unit) or IsUnitIllusionBJ(nil, jass, unit) or IsUnitIllusionBJ(nil, nil, unit) then
-            return
-        end
+    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
+        return
     end
     local eventId = jass.GetTriggerEventId()
     local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_6 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
@@ -151,16 +121,7 @@ local function onItemChange(self)
     local newSpeed = isDrop and getMaxMovespeed2(nil, unit, manipulated) or getMaxMovespeed2(nil, unit)
     local key = getUnitKey(nil, unit)
     local cur = applied[key] ~= nil and applied[key] or 0
-    ____debug(
-        nil,
-        "evt",
-        isPickup and "pickup" or "drop",
-        "key=" .. key,
-        "cur=" .. tostring(cur),
-        "calc=" .. tostring(newSpeed)
-    )
     if isPickup and newSpeed <= cur then
-        ____debug(nil, "skip pickup (<=cur)")
         return
     end
     applyMovespeed2(nil, unit, newSpeed)

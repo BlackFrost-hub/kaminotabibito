@@ -1,24 +1,18 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
-local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__ParseFloat = ____lualib.__TS__ParseFloat
+local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local ____exports = {}
---- 装备回复：单位使用物品时，若装备数据有 hot 且 abilList 为 A08C/A0LF/A002/A015/A0B8 之一，则设 udg_TempReal/udg_TempReal2/udg_TempUnit/udg_TempString(匹配的技能 id) 并执行 gg_trg_HealItemEffect
--- 仅对玩家1-7(Player0-6)和中立敌对(Player13)生效
--- 经验：引擎会对一次使用物品派发两次 USE_ITEM 事件，防重须用 globalThis 存 key，详见 .cursor/rules/equip-heal-use-item.md
+--- 装备回复：单位使用物品时解析 hot 字段，支持多段（+分隔）、百分比(%hp/%hpLost/%mp)、固定值、wait延迟。
+-- 规则详见 .cursor/rules/equip-heal-hot-format.md
+-- 防重复事件见 .cursor/rules/equip-heal-use-item.md
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.装备.装备数据").default
-local HEAL_ABIL_IDS = {
-    "A08C",
-    "A0LF",
-    "A002",
-    "A015",
-    "A0B8"
-}
 local function fourCCToString(self, fourcc)
     local c1 = string.char(fourcc % 256)
     local c2 = string.char(math.floor(fourcc / 256) % 256)
@@ -26,97 +20,185 @@ local function fourCCToString(self, fourcc)
     local c4 = string.char(math.floor(fourcc / 16777216) % 256)
     return ((c4 .. c3) .. c2) .. c1
 end
-local function parseHot(self, hotStr)
+--- 解析 hot 字符串和 abilList，返回每段的信息
+local function parseSegments(self, hotStr, abilList)
+    local segments = __TS__StringSplit(hotStr, "+")
+    local abilIds = __TS__ArrayMap(
+        __TS__StringSplit(abilList, ","),
+        function(____, x) return __TS__StringTrim(x) end
+    )
+    local result = {}
+    do
+        local i = 0
+        while i < #segments do
+            do
+                local __continue6
+                repeat
+                    local seg = __TS__StringTrim(segments[i + 1])
+                    if seg == "" then
+                        __continue6 = true
+                        break
+                    end
+                    local tokens = __TS__ArrayFilter(
+                        __TS__ArrayMap(
+                            __TS__StringSplit(seg, ";"),
+                            function(____, x) return __TS__StringTrim(x) end
+                        ),
+                        function(____, x) return x ~= "" end
+                    )
+                    local waitSec = 0
+                    for ____, t in ipairs(tokens) do
+                        local waitIdx = (string.find(t, ":wait", nil, true) or 0) - 1
+                        if waitIdx >= 0 then
+                            local w = __TS__ParseFloat(__TS__StringSubstring(t, waitIdx + 5)) or 0
+                            if w > waitSec then
+                                waitSec = w
+                            end
+                        end
+                    end
+                    result[#result + 1] = {tokens = tokens, abilId = abilIds[i + 1] or "", waitSec = waitSec}
+                    __continue6 = true
+                until true
+                if not __continue6 then
+                    break
+                end
+            end
+            i = i + 1
+        end
+    end
+    return result
+end
+--- 根据 token 列表和单位，计算 TempReal[1]=HP、TempReal[2]=MP，token 中 :waitN 后缀在此忽略（已提取）
+local function calcHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local parts = __TS__StringSplit(hotStr, ";")
-    for ____, p in ipairs(parts) do
-        local s = __TS__StringTrim(p)
-        local sl = #s
-        if sl >= 3 and (__TS__StringSubstring(s, sl - 2, sl) == "hp" or __TS__StringSubstring(s, sl - 2, sl) == "HP") then
-            local n = __TS__ParseInt(
-                __TS__StringSubstring(s, 0, sl - 2),
-                10
-            ) or 0
-            hp = hp + n
-        elseif sl >= 3 and (__TS__StringSubstring(s, sl - 2, sl) == "mp" or __TS__StringSubstring(s, sl - 2, sl) == "MP") then
-            local n = __TS__ParseInt(
-                __TS__StringSubstring(s, 0, sl - 2),
-                10
-            ) or 0
-            mp = mp + n
+    local ____temp_0
+    if type(jass.GetUnitState) == "function" then
+        ____temp_0 = jass.GetUnitState(
+            unit,
+            jass.ConvertUnitState(1)
+        )
+    else
+        ____temp_0 = 0
+    end
+    local maxHp = ____temp_0
+    local ____temp_1
+    if type(jass.GetWidgetLife) == "function" then
+        ____temp_1 = jass.GetWidgetLife(unit)
+    else
+        ____temp_1 = 0
+    end
+    local curHp = ____temp_1
+    local ____temp_2
+    if type(jass.GetUnitState) == "function" then
+        ____temp_2 = jass.GetUnitState(
+            unit,
+            jass.ConvertUnitState(3)
+        )
+    else
+        ____temp_2 = 0
+    end
+    local maxMp = ____temp_2
+    local lostHp = maxHp - curHp
+    for ____, rawToken in ipairs(tokens) do
+        local waitIdx = (string.find(rawToken, ":wait", nil, true) or 0) - 1
+        local t = __TS__StringTrim(waitIdx >= 0 and __TS__StringSubstring(rawToken, 0, waitIdx) or rawToken)
+        local tl = string.lower(t)
+        if __TS__StringEndsWith(tl, "hplost") then
+            local prefix = __TS__StringSubstring(t, 0, #t - 6)
+            if __TS__StringEndsWith(prefix, "%") then
+                local pct = __TS__ParseFloat(__TS__StringSubstring(prefix, 0, #prefix - 1)) / 100
+                hp = hp + lostHp * pct
+            else
+                hp = hp + (__TS__ParseFloat(prefix) or 0)
+            end
+        elseif __TS__StringEndsWith(tl, "hp") then
+            local prefix = __TS__StringSubstring(t, 0, #t - 2)
+            if __TS__StringEndsWith(prefix, "%") then
+                local pct = __TS__ParseFloat(__TS__StringSubstring(prefix, 0, #prefix - 1)) / 100
+                hp = hp + maxHp * pct
+            else
+                hp = hp + (__TS__ParseFloat(prefix) or 0)
+            end
+        elseif __TS__StringEndsWith(tl, "mp") then
+            local prefix = __TS__StringSubstring(t, 0, #t - 2)
+            if __TS__StringEndsWith(prefix, "%") then
+                local pct = __TS__ParseFloat(__TS__StringSubstring(prefix, 0, #prefix - 1)) / 100
+                mp = mp + maxMp * pct
+            else
+                mp = mp + (__TS__ParseFloat(prefix) or 0)
+            end
         end
     end
     return {hp = hp, mp = mp}
 end
---- 返回 abilList 中第一个匹配的 HEAL_ABIL_IDS 项，否则返回 ""
-local function getMatchedHealAbilId(self, abilList)
-    if not abilList or type(abilList) ~= "string" then
-        return ""
+--- 立即执行一段的赋值+TriggerExecute
+local function executeSegment(self, unit, seg)
+    local ____calcHpMp_result_3 = calcHpMp(nil, seg.tokens, unit)
+    local hp = ____calcHpMp_result_3.hp
+    local mp = ____calcHpMp_result_3.mp
+    local ____temp_5
+    if g.udg_TempReal ~= nil then
+        ____temp_5 = g.udg_TempReal
+    else
+        local ____temp_4 = {}
+        g.udg_TempReal = ____temp_4
+        ____temp_5 = ____temp_4
     end
-    local list = __TS__ArrayMap(
-        __TS__StringSplit(abilList, ","),
-        function(____, x) return __TS__StringTrim(x) end
-    )
-    for ____, id in ipairs(HEAL_ABIL_IDS) do
-        if __TS__ArrayIndexOf(list, id) >= 0 then
-            return id
-        end
+    local tr = ____temp_5
+    tr[1] = hp
+    tr[2] = mp
+    jass.udg_TempUnit[1] = unit
+    g.udg_TempString[0] = seg.abilId
+    local trig = g.gg_trg_HealItemEffect
+    if trig and type(jass.TriggerExecute) == "function" then
+        jass.TriggerExecute(trig)
     end
-    return ""
 end
 local function onUseItem(self)
-    local ____this_1
-    ____this_1 = jass
-    local ____opt_0 = ____this_1.GetManipulatingUnit
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0(____this_1)
+    local ____this_7
+    ____this_7 = jass
+    local ____opt_6 = ____this_7.GetManipulatingUnit
+    if ____opt_6 ~= nil then
+        ____opt_6 = ____opt_6(____this_7)
     end
-    local ____opt_0_4 = ____opt_0
-    if ____opt_0_4 == nil then
-        local ____this_3
-        ____this_3 = jass
-        local ____opt_2 = ____this_3.GetTriggerUnit
-        if ____opt_2 ~= nil then
-            ____opt_2 = ____opt_2(____this_3)
+    local ____opt_6_10 = ____opt_6
+    if ____opt_6_10 == nil then
+        local ____this_9
+        ____this_9 = jass
+        local ____opt_8 = ____this_9.GetTriggerUnit
+        if ____opt_8 ~= nil then
+            ____opt_8 = ____opt_8(____this_9)
         end
-        ____opt_0_4 = ____opt_2
+        ____opt_6_10 = ____opt_8
     end
-    local unit = ____opt_0_4
-    local ____this_6
-    ____this_6 = jass
-    local ____opt_5 = ____this_6.GetManipulatedItem
-    if ____opt_5 ~= nil then
-        ____opt_5 = ____opt_5(____this_6)
+    local unit = ____opt_6_10
+    local ____this_12
+    ____this_12 = jass
+    local ____opt_11 = ____this_12.GetManipulatedItem
+    if ____opt_11 ~= nil then
+        ____opt_11 = ____opt_11(____this_12)
     end
-    local item = ____opt_5
+    local item = ____opt_11
     if not unit or not item then
         return
     end
     if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
-    local IsUnitIllusionBJ = jass.IsUnitIllusionBJ
-    if type(IsUnitIllusionBJ) == "function" and IsUnitIllusionBJ(nil, unit) then
+    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
         return
     end
-    local ____temp_7
+    local ____temp_13
     if type(jass.GetItemTypeId) == "function" then
-        ____temp_7 = jass.GetItemTypeId(item)
+        ____temp_13 = jass.GetItemTypeId(item)
     else
-        ____temp_7 = 0
+        ____temp_13 = 0
     end
-    local itemId = ____temp_7
+    local itemId = ____temp_13
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
-    local matchedAbilId = getMatchedHealAbilId(nil, entry.abilList)
-    if not entry or not entry.hot or not matchedAbilId then
-        return
-    end
-    local ____parseHot_result_8 = parseHot(nil, entry.hot)
-    local hp = ____parseHot_result_8.hp
-    local mp = ____parseHot_result_8.mp
-    if hp <= 0 and mp <= 0 then
+    if not entry or not entry.hot or not entry.abilList then
         return
     end
     local glob = _G
@@ -125,30 +207,69 @@ local function onUseItem(self)
         return
     end
     glob.__EquipHealExecutedKey = key
-    local ____this_10
-    ____this_10 = jass
-    local ____opt_9 = ____this_10.CreateTimer
-    if ____opt_9 ~= nil then
-        ____opt_9 = ____opt_9(____this_10)
+    local ____this_15
+    ____this_15 = jass
+    local ____opt_14 = ____this_15.CreateTimer
+    if ____opt_14 ~= nil then
+        ____opt_14 = ____opt_14(____this_15)
     end
-    local timer = ____opt_9
-    if timer and type(jass.TimerStart) == "function" then
+    local clearTimer = ____opt_14
+    if clearTimer and type(jass.TimerStart) == "function" then
+        local ct = clearTimer
         jass.TimerStart(
-            timer,
+            ct,
             0.5,
             false,
             function()
                 glob.__EquipHealExecutedKey = nil
+                if type(jass.DestroyTimer) == "function" then
+                    jass.DestroyTimer(ct)
+                end
             end
         )
     end
-    g.udg_TempReal = hp
-    g.udg_TempReal2 = mp
-    g.udg_TempUnit = unit
-    g.udg_TempString[0] = matchedAbilId
-    local trig = g.gg_trg_HealItemEffect
-    if trig and type(jass.TriggerExecute) == "function" then
-        jass.TriggerExecute(trig)
+    local segments = parseSegments(nil, entry.hot, entry.abilList)
+    for ____, seg in ipairs(segments) do
+        do
+            local __continue37
+            repeat
+                if seg.abilId == "" then
+                    __continue37 = true
+                    break
+                end
+                if seg.waitSec <= 0 then
+                    executeSegment(nil, unit, seg)
+                else
+                    local ____this_17
+                    ____this_17 = jass
+                    local ____opt_16 = ____this_17.CreateTimer
+                    if ____opt_16 ~= nil then
+                        ____opt_16 = ____opt_16(____this_17)
+                    end
+                    local delayTimer = ____opt_16
+                    if delayTimer and type(jass.TimerStart) == "function" then
+                        local dt = delayTimer
+                        local capturedSeg = seg
+                        local capturedUnit = unit
+                        jass.TimerStart(
+                            dt,
+                            seg.waitSec,
+                            false,
+                            function()
+                                executeSegment(nil, capturedUnit, capturedSeg)
+                                if type(jass.DestroyTimer) == "function" then
+                                    jass.DestroyTimer(dt)
+                                end
+                            end
+                        )
+                    end
+                end
+                __continue37 = true
+            until true
+            if not __continue37 then
+                break
+            end
+        end
     end
 end
 local INIT_KEY = "__EquipHealInited"
@@ -157,11 +278,11 @@ local function init(self)
         return
     end
     g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_11 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_11 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_11 = 35
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 = 35
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_11
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -175,13 +296,13 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_13
-    ____this_13 = jass
-    local ____opt_12 = ____this_13.Player
-    if ____opt_12 ~= nil then
-        ____opt_12 = ____opt_12(____this_13, 13)
+    local ____this_20
+    ____this_20 = jass
+    local ____opt_19 = ____this_20.Player
+    if ____opt_19 ~= nil then
+        ____opt_19 = ____opt_19(____this_20, 13)
     end
-    local p13 = ____opt_12
+    local p13 = ____opt_19
     if p13 ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
     end

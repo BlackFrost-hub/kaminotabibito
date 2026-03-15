@@ -3,9 +3,6 @@ const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_RegTrigger?: any; udg_RegEventStr?: string; gg_unit_Hamg_0002?: any; [key: string]: any };
 
 function onTestEvent(): void {
-  (globalThis as any).print?.("2222 [TestEvent] step2");
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "2222");
-  jass.QuestMessageBJ(jass.GetPlayersAll(), jass.bj_QUESTMESSAGE_UPDATED, "2222");
   // 在 trigger 回调里访问 g/jass 可能不返回，用 Timer 延后到下一帧执行
   const t = (jass as any).CreateTimer();
   (jass as any).TimerStart(t, 0, false, () => {

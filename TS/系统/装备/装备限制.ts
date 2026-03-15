@@ -16,10 +16,6 @@ const COLOR_TYPE = "|cff00ff00";  // 类型名 绿
 const COLOR_NAME = "|cff00bfff";  // 物品名 蓝
 const COLOR_ERR = "|cffff0000";   // 错误/强调 红
 
-// 调试开关：需要排查时改成 true
-const DEBUG_EQUIP_LIMIT = false;
-const DEBUG_COLOR = "|cff87ceeb"; // 浅蓝
-
 function fourCCToString(four: number): string {
   const a = math.floor(four / 16777216) % 256;
   const b = math.floor(four / 65536) % 256;
@@ -113,13 +109,8 @@ function onPickup(): void {
   if (!unit || !item) return;
   if (!jass.IsUnitType(unit, (jass as any).UNIT_TYPE_HERO)) return;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  const IsUnitIllusion = (jass as any).IsUnitIllusion;
-  const IsUnitIllusionBJ = (jass as any).IsUnitIllusionBJ;
-  if (typeof IsUnitIllusionBJ === "function") {
-    if (IsUnitIllusionBJ(unit) || IsUnitIllusionBJ(jass, unit) || IsUnitIllusionBJ(undefined as any, unit)) return;
-  } else if (typeof IsUnitIllusion === "function") {
-    if (IsUnitIllusion(unit) || IsUnitIllusion(jass, unit) || IsUnitIllusion(undefined as any, unit)) return;
-  }
+  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
+  if (typeof (jass as any).IsUnitIllusion === "function" && (jass as any).IsUnitIllusion(unit)) return;
   const pickedTypeId = safeGetItemTypeId(item);
   if (pickedTypeId == null) return;
   const entry = getEntry(pickedTypeId);
@@ -151,11 +142,6 @@ function onPickup(): void {
     const p = (jass as any).GetOwningPlayer(unit);
     if (p) player = p;
   }
-  const debug = (s: string) => {
-    if (!DEBUG_EQUIP_LIMIT) return;
-    jass.DisplayTimedTextToPlayer(player, 0, 0.01, 8, PREFIX + DEBUG_COLOR + s + "|r");
-  };
-
   let sameIdCount = 0;
   let sameSlotTypeCount = 0;
   let hasTwoHanded = false;
@@ -175,29 +161,6 @@ function onPickup(): void {
     if (e.type === "副武器") hasSub = true;
   }
 
-  debug(
-    "DEBUG 装备限制：拾取=" +
-      fourCCToString(pickedTypeId) +
-      " type=" +
-      (pickedSlotType ?? "无") +
-      " onlyone=" +
-      tostring(onlyOne) +
-      " name=" +
-      name
-  );
-  debug(
-    "统计：sameId=" +
-      tostring(sameIdCount) +
-      " sameType=" +
-      tostring(sameSlotTypeCount) +
-      " hasTwoHand=" +
-      tostring(hasTwoHanded) +
-      " hasMain=" +
-      tostring(hasMain) +
-      " hasSub=" +
-      tostring(hasSub)
-  );
-
   if (pickedSlotType === TWO_HANDED) {
     if (hasMain || hasSub) msg = PREFIX + COLOR_ERR + "双手武器与主武器/副武器不能同时装备！|r";
   } else if (pickedSlotType && CONFLICT_WITH_TWO_HANDED.indexOf(pickedSlotType) >= 0) {
@@ -212,11 +175,9 @@ function onPickup(): void {
     msg = PREFIX + COLOR_TYPE + pickedSlotType + "|r物品：" + nameColored + COLOR_ERR + "只能装备一件！|r";
   }
 
-  debug("结果：msg=" + (msg !== "" ? "有(将丢弃)" : "无(放行)"));
   if (msg === "") return;
 
   equipShared.skipNextDrop = true;
-  // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP) jass.DisplayTimedTextToPlayer(player, 0, 0.02, 6, "|cff87ceeb[装备调试]|r 装备限制即将移除物品，已设 SkipNextDrop=true");
   if (typeof (jass as any).UnitRemoveItem === "function") {
     (jass as any).UnitRemoveItem(unit, item);
   } else {

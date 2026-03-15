@@ -1,9 +1,8 @@
 /**
  * 单位狂暴：装备掉落表里 berserk 非空的单位死亡时，按默认 6.25% 概率在原地创建指定单位、继承面向，并震动击杀者镜头。
- * 面向与镜头震动通过 JASS 全局 udg_TempUnit/udg_TempReal/udg_TempPlayer 调用 SetUnitFacingAndCameraNoise。
+ * 面向与镜头震动通过 JASS 全局 udg_TempUnit[1]/udg_TempReal[1]/udg_TempPlayer 调用 UnitBerserk。
  */
 const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as { udg_TempUnit?: any; udg_TempReal?: number; udg_TempPlayer?: any; [k: string]: any };
 const idData =
   (require("系统.装备.装备掉落表") as { default?: Record<string, { berserk?: string | number }> }).default ?? {};
 
@@ -60,9 +59,9 @@ function onDeath(): void {
   const killer = typeof (jass as any).GetKillingUnit === "function" ? (jass as any).GetKillingUnit() : undefined;
   const killerPlayer = killer && typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
-    g.udg_TempUnit = created;
-    g.udg_TempFacing = facingDeg;
-    g.udg_TempPlayer = killerPlayer;
+    (jass as any).udg_TempUnit[1] = created;
+    (jass as any).udg_TempReal[1] = facingDeg;
+    (jass as any).udg_TempPlayer[1] = killerPlayer;
     jass.ExecuteFunc("UnitBerserk");
   }
 }

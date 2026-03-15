@@ -3,9 +3,8 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 --- 单位狂暴：装备掉落表里 berserk 非空的单位死亡时，按默认 6.25% 概率在原地创建指定单位、继承面向，并震动击杀者镜头。
--- 面向与镜头震动通过 JASS 全局 udg_TempUnit/udg_TempReal/udg_TempPlayer 调用 SetUnitFacingAndCameraNoise。
+-- 面向与镜头震动通过 JASS 全局 udg_TempUnit[1]/udg_TempReal[1]/udg_TempPlayer 调用 UnitBerserk。
 local jass = require("jass.common")
-local g = require("jass.globals")
 local idData = require("系统.装备.装备掉落表").default or ({})
 local function stringToFourCC(self, s)
     local b1 = string.byte(s, 1)
@@ -93,9 +92,9 @@ local function onDeath(self)
     end
     local killerPlayer = ____temp_4
     if created and killerPlayer then
-        g.udg_TempUnit = created
-        g.udg_TempFacing = facingDeg
-        g.udg_TempPlayer = killerPlayer
+        jass.udg_TempUnit[1] = created
+        jass.udg_TempReal[1] = facingDeg
+        jass.udg_TempPlayer[1] = killerPlayer
         jass.ExecuteFunc("UnitBerserk")
     end
 end

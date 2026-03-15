@@ -24,8 +24,6 @@ local PREFIX = "|cffffff00『系统提示』：|r"
 local COLOR_TYPE = "|cff00ff00"
 local COLOR_NAME = "|cff00bfff"
 local COLOR_ERR = "|cffff0000"
-local DEBUG_EQUIP_LIMIT = false
-local DEBUG_COLOR = "|cff87ceeb"
 local function fourCCToString(self, four)
     local a = math.floor(four / 16777216) % 256
     local b = math.floor(four / 65536) % 256
@@ -195,16 +193,11 @@ local function onPickup(self)
     if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
-    local IsUnitIllusion = jass.IsUnitIllusion
-    local IsUnitIllusionBJ = jass.IsUnitIllusionBJ
-    if type(IsUnitIllusionBJ) == "function" then
-        if IsUnitIllusionBJ(nil, unit) or IsUnitIllusionBJ(nil, jass, unit) or IsUnitIllusionBJ(nil, nil, unit) then
-            return
-        end
-    elseif type(IsUnitIllusion) == "function" then
-        if IsUnitIllusion(nil, unit) or IsUnitIllusion(nil, jass, unit) or IsUnitIllusion(nil, nil, unit) then
-            return
-        end
+    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
+        return
+    end
+    if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+        return
     end
     local pickedTypeId = safeGetItemTypeId(nil, item)
     if pickedTypeId == nil then
@@ -222,11 +215,11 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue50
+                local __continue48
                 repeat
                     if __TS__StringSubstring(s, i, i + 2) == "|r" then
                         i = i + 2
-                        __continue50 = true
+                        __continue48 = true
                         break
                     end
                     if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
@@ -245,15 +238,15 @@ local function onPickup(self)
                         end
                         if hex then
                             i = i + 10
-                            __continue50 = true
+                            __continue48 = true
                             break
                         end
                     end
                     out = out .. __TS__StringAccess(s, i)
                     i = i + 1
-                    __continue50 = true
+                    __continue48 = true
                 until true
-                if not __continue50 then
+                if not __continue48 then
                     break
                 end
             end
@@ -270,18 +263,6 @@ local function onPickup(self)
             player = p
         end
     end
-    local function ____debug(____, s)
-        if not DEBUG_EQUIP_LIMIT then
-            return
-        end
-        jass.DisplayTimedTextToPlayer(
-            player,
-            0,
-            0.01,
-            8,
-            ((PREFIX .. DEBUG_COLOR) .. s) .. "|r"
-        )
-    end
     local sameIdCount = 0
     local sameSlotTypeCount = 0
     local hasTwoHanded = false
@@ -291,21 +272,21 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue61
+                local __continue57
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it then
-                        __continue61 = true
+                        __continue57 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue61 = true
+                        __continue57 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue61 = true
+                        __continue57 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -323,23 +304,15 @@ local function onPickup(self)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue61 = true
+                    __continue57 = true
                 until true
-                if not __continue61 then
+                if not __continue57 then
                     break
                 end
             end
             i = i + 1
         end
     end
-    ____debug(
-        nil,
-        (((((("DEBUG 装备限制：拾取=" .. fourCCToString(nil, pickedTypeId)) .. " type=") .. (pickedSlotType or "无")) .. " onlyone=") .. tostring(onlyOne)) .. " name=") .. name
-    )
-    ____debug(
-        nil,
-        (((((((("统计：sameId=" .. tostring(sameIdCount)) .. " sameType=") .. tostring(sameSlotTypeCount)) .. " hasTwoHand=") .. tostring(hasTwoHanded)) .. " hasMain=") .. tostring(hasMain)) .. " hasSub=") .. tostring(hasSub)
-    )
     if pickedSlotType == TWO_HANDED then
         if hasMain or hasSub then
             msg = (PREFIX .. COLOR_ERR) .. "双手武器与主武器/副武器不能同时装备！|r"
@@ -355,7 +328,6 @@ local function onPickup(self)
     if msg == "" and pickedSlotType and __TS__ArrayIndexOf(ONE_PER_SLOT, pickedSlotType) >= 0 and sameSlotTypeCount > 1 then
         msg = (((((PREFIX .. COLOR_TYPE) .. pickedSlotType) .. "|r物品：") .. nameColored) .. COLOR_ERR) .. "只能装备一件！|r"
     end
-    ____debug(nil, "结果：msg=" .. (msg ~= "" and "有(将丢弃)" or "无(放行)"))
     if msg == "" then
         return
     end

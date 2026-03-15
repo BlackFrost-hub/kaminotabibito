@@ -3,24 +3,6 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local function onTestEvent(self)
-    local ____this_1
-    ____this_1 = _G
-    local ____opt_0 = ____this_1.print
-    if ____opt_0 ~= nil then
-        _G.print("2222 [TestEvent] step2")
-    end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        8,
-        "2222"
-    )
-    jass.QuestMessageBJ(
-        jass.GetPlayersAll(),
-        jass.bj_QUESTMESSAGE_UPDATED,
-        "2222"
-    )
     local t = jass.CreateTimer()
     jass.TimerStart(
         t,
@@ -34,21 +16,21 @@ local function onTestEvent(self)
                         out = (("u=" .. tostring(not not u)) .. " hasSet=") .. tostring(hasSet)
                         if u and hasSet then
                             local hasGet = not not jass.Ir_GetUnitAttackType
-                            local ____hasGet_2
+                            local ____hasGet_0
                             if hasGet then
-                                ____hasGet_2 = jass.Ir_GetUnitAttackType(u)
+                                ____hasGet_0 = jass.Ir_GetUnitAttackType(u)
                             else
-                                ____hasGet_2 = -1
+                                ____hasGet_0 = -1
                             end
-                            local before = ____hasGet_2
+                            local before = ____hasGet_0
                             jass.Ir_SetUnitAttackType(u, 5)
-                            local ____hasGet_3
+                            local ____hasGet_1
                             if hasGet then
-                                ____hasGet_3 = jass.Ir_GetUnitAttackType(u)
+                                ____hasGet_1 = jass.Ir_GetUnitAttackType(u)
                             else
-                                ____hasGet_3 = -1
+                                ____hasGet_1 = -1
                             end
-                            local after = ____hasGet_3
+                            local after = ____hasGet_1
                             out = (("before=" .. tostring(before)) .. " after=") .. tostring(after)
                         end
                     end
@@ -57,11 +39,11 @@ local function onTestEvent(self)
                 out = "pcall err: " .. tostring(err)
             end
             local line = "[TestEvent] " .. out
-            local ____this_5
-            ____this_5 = _G
-            local ____opt_4 = ____this_5.print
-            if ____opt_4 ~= nil then
-                ____opt_4(____this_5, line)
+            local ____this_3
+            ____this_3 = _G
+            local ____opt_2 = ____this_3.print
+            if ____opt_2 ~= nil then
+                ____opt_2(____this_3, line)
             end
             jass.DisplayTimedTextToPlayer(
                 jass.Player(0),
@@ -76,15 +58,15 @@ end
 local function init(self)
     local evtTrig = jass.CreateTrigger()
     jass.TriggerAddAction(evtTrig, onTestEvent)
-    local ____jass_STES_Register_6 = jass.STES_Register
-    if ____jass_STES_Register_6 == nil then
-        ____jass_STES_Register_6 = g.STES_Register
+    local ____jass_STES_Register_4 = jass.STES_Register
+    if ____jass_STES_Register_4 == nil then
+        ____jass_STES_Register_4 = g.STES_Register
     end
-    local ____jass_STES_Register_6_7 = ____jass_STES_Register_6
-    if ____jass_STES_Register_6_7 == nil then
-        ____jass_STES_Register_6_7 = _G.STES_Register
+    local ____jass_STES_Register_4_5 = ____jass_STES_Register_4
+    if ____jass_STES_Register_4_5 == nil then
+        ____jass_STES_Register_4_5 = _G.STES_Register
     end
-    local STES_Reg = ____jass_STES_Register_6_7
+    local STES_Reg = ____jass_STES_Register_4_5
     if type(STES_Reg) == "function" then
         STES_Reg(evtTrig, "测试事件")
     else

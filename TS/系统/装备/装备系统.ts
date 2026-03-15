@@ -2,7 +2,7 @@
 /** 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true */
 // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP === undefined) (globalThis as any).DEBUG_EQUIP_SKIP_DROP = true;
 const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as { udg_TempUnit: any; udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
+const g = require("jass.globals") as { udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
 const items = (require("系统.装备.装备数据") as { default: Record<string, ItemData> }).default;
 const equipLimit = require("系统.装备.装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
@@ -49,6 +49,7 @@ const STAT_CONFIG: { name: string; key: string; udg?: string }[] = [
   { name: "暴击率", key: "critRate" }, { name: "暴击伤害", key: "critDmg" }, { name: "魔抗", key: "magicResist" },
   { name: "生命恢复", key: "hpRegen" }, { name: "生命恢复%", key: "hpRegenPct" }, { name: "生命恢复效率", key: "hpRegenEff" },
   { name: "技能治疗率", key: "skillHeal" }, { name: "受到的治疗率", key: "healReceived" },
+  { name: "重伤", key: "wound" },
   { name: "魔法恢复", key: "mpRegen" }, { name: "魔法恢复%", key: "mpRegenPct" }, { name: "魔法消耗", key: "mpCost" },
   { name: "冷却缩减", key: "cdReduction" }, { name: "命中率", key: "accuracy" }, { name: "闪避率", key: "dodge" },
   { name: "护甲穿透", key: "armorPierce" }, { name: "魔法穿透", key: "magicPierce" },
@@ -99,7 +100,7 @@ const percentNames = [
   "暴击率", "暴击伤害", "命中率", "护甲穿透", "魔法穿透", "技能伤害",
   "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
   "攻速",
-  "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗",
+  "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗", "重伤",
   "技能抗性", "魔法伤害", "物理伤害", "物理抗性", "强化伤害", "普攻伤害", "普攻抗性",
   "光属性伤害", "光属性抗性", "暗属性伤害", "暗属性抗性", "木属性伤害", "木属性抗性",
   "火属性伤害", "火属性抗性", "雷属性伤害", "雷属性抗性", "水属性伤害", "水属性抗性",
@@ -122,13 +123,8 @@ function initEvents(): void {
     const unit = jass.GetManipulatingUnit();
     if (!unit || !item) return;
     if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-    const IsUnitIllusion = (jass as any).IsUnitIllusion;
-    const IsUnitIllusionBJ = (jass as any).IsUnitIllusionBJ;
-    if (typeof IsUnitIllusionBJ === "function") {
-      if (IsUnitIllusionBJ(unit) || IsUnitIllusionBJ(jass, unit) || IsUnitIllusionBJ(undefined as any, unit)) return;
-    } else if (typeof IsUnitIllusion === "function") {
-      if (IsUnitIllusion(unit) || IsUnitIllusion(jass, unit) || IsUnitIllusion(undefined as any, unit)) return;
-    }
+    if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
+    if (typeof (jass as any).IsUnitIllusion === "function" && (jass as any).IsUnitIllusion(unit)) return;
     const player = jass.GetOwningPlayer(unit);
     const itemId = jass.GetItemTypeId(item);
     const event = jass.GetTriggerEventId();
@@ -165,13 +161,13 @@ function initEvents(): void {
     const charges = jass.GetItemCharges(item);
     const mult = charges > 0 ? charges : 1;
 
-    g.udg_TempUnit = unit;
+    (jass as any).udg_TempUnit[1] = unit;
     g.udg_TempIsAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
     const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
     let primary: Record<string, number> = {};
     if (primaryBonus && typeof (jass as any).ExecuteFunc === "function") {
       jass.ExecuteFunc("GetHeroMainAttribute");
-      const mainAttr = (g as any).udg_TempInteger ?? 0;
+      const mainAttr = ((g as any).udg_TempInteger != null && (g as any).udg_TempInteger[1] != null) ? (g as any).udg_TempInteger[1] : 0;
       primary = parsePrimaryBonus(primaryBonus, mainAttr);
     }
     const merged: Record<string, number> = {};
@@ -213,8 +209,8 @@ function initEvents(): void {
       g.udg_TempAmount[i + 1] = playerStats[i].value;
     }
 
-    const owner = jass.GetOwningPlayer(g.udg_TempUnit);
-    const playerName = jass.GetPlayerName(owner);
+    const owner = jass.GetOwningPlayer(unit);
+    const playerName = (typeof (jass as any).GetPlayerName === "function" ? (jass as any).GetPlayerName(owner) : "") ?? "";
 
     const actionText = g.udg_TempIsAdd ? "获得" : "丢弃";
     const levelText = itemData.level || "";
@@ -256,8 +252,8 @@ function initEvents(): void {
     }
     // 仅当本次操作的装备带移速时才在「当前装备加成」里显示移速，且 DROP 时排除被丢物品再算
     const hasMovespeed2 = (itemData as { movespeed2?: number }).movespeed2 != null;
-    if (hasMovespeed2 && g.udg_TempUnit && typeof equipMovespeed.getMaxMovespeed2Info === "function") {
-      const ms = equipMovespeed.getMaxMovespeed2Info(g.udg_TempUnit, isDrop ? item : undefined);
+    if (hasMovespeed2 && unit != null && typeof equipMovespeed.getMaxMovespeed2Info === "function") {
+      const ms = equipMovespeed.getMaxMovespeed2Info(unit, isDrop ? item : undefined);
       if (ms.value > 0) test5Parts.push("移动速度为：" + tostring(ms.value));
       if (ms.value > 0 && ms.name !== "" && ms.count >= 2) {
         jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" + ms.name + "』|r");
