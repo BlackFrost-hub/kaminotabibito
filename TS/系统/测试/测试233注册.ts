@@ -1,87 +1,143 @@
-// 输入 233 时：findFunction 查找 STES_Register，并注册事件 LuaEvent_GetItem
-const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as { [key: string]: any };
+// 输入 233 时：打印 jass.japi keys，并附带键盘事件/类型测试
+const jass = require("jass.common") as any;
 
-function dumpAllKeys(): void {
-  const pr = (globalThis as any).print as (s: string) => void;
+function dumpJapiKeys(): void {
+  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
   if (!pr) return;
-  const j = jass as any;
-  const g = globalThis as any;
-  pr("--- jass 全部 key ---");
-  for (const k in j) pr("jass." + k);
-  pr("--- _G 全部 key ---");
-  for (const k in g) pr("_G." + k);
-}
-
-function listAllCustomJassFunctions(): void {
-  const pr = (globalThis as any).print as (s: string) => void;
-  if (!pr) return;
-  const g = globalThis as any;
-  let count = 0;
-  pr("=== 所有自定义Jass函数(_G中,非jass) ===");
-  for (const k in g) {
-    if (typeof g[k] === "function" && k !== "_G" && k.indexOf("jass") !== 0) {
-      pr(k);
-      count++;
-      if (count > 50) break;
+  try {
+    const japi = require("jass.japi") as any;
+    pr("[japi] typeof=" + tostring(typeof japi));
+    const keys: string[] = [];
+    for (const k in japi) {
+      if (typeof k === "string") keys.push(k);
     }
+    pr("[japi] keys=" + tostring(keys.length));
+    pr("[japi] list=" + keys.join(", "));
+  } catch (e) {
+    (globalThis as any).print?.("[japi] require failed: " + tostring(e));
   }
-  pr("总共找到 " + tostring(count) + "+ 个自定义函数");
 }
 
-function listCounts(): void {
-  const pr = (globalThis as any).print as (s: string) => void;
+function dumpDzKeyEventTrgType(): void {
+  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
   if (!pr) return;
-  const j = jass as any;
   const g = globalThis as any;
-  let jassCount = 0;
-  let globalCount = 0;
-  for (const k in j) {
-    if (typeof j[k] === "function") jassCount++;
-  }
-  for (const k in g) {
-    if (typeof g[k] === "function" && k !== "_G" && k.indexOf("jass") !== 0) globalCount++;
-  }
-  pr("---");
-  pr("找到 jass 函数 " + tostring(jassCount) + " 个, 全局函数 " + tostring(globalCount) + " 个");
+  let t0 = "nil";
+  let t1 = "nil";
+  let t2 = "nil";
+  let tP0 = "nil";
+  let tP1 = "nil";
+  let tBy0 = "nil";
+  let tBy1 = "nil";
+  let tBy2 = "nil";
+  try {
+    t0 = tostring(typeof g.DzTriggerRegisterKeyEventTrg);
+  } catch (_e) {}
+  try {
+    t1 = tostring(typeof (require("jass.common") as any).DzTriggerRegisterKeyEventTrg);
+  } catch (_e) {}
+  try {
+    t2 = tostring(typeof (require("jass.globals") as any).DzTriggerRegisterKeyEventTrg);
+  } catch (_e) {}
+  pr("[type] _G.DzTriggerRegisterKeyEventTrg=" + t0);
+  pr("[type] jass.common.DzTriggerRegisterKeyEventTrg=" + t1);
+  pr("[type] jass.globals.DzTriggerRegisterKeyEventTrg=" + t2);
+
+  try {
+    tP0 = tostring(typeof (require("jass.common") as any).DzGetTriggerKeyPlayer);
+  } catch (_e) {}
+  try {
+    tP1 = tostring(typeof (require("jass.japi") as any).DzGetTriggerKeyPlayer);
+  } catch (_e) {}
+  pr("[type] jass.common.DzGetTriggerKeyPlayer=" + tP0);
+  pr("[type] jass.japi.DzGetTriggerKeyPlayer=" + tP1);
+
+  try {
+    tBy0 = tostring(typeof g.DzTriggerRegisterKeyEventByCode);
+  } catch (_e) {}
+  try {
+    tBy1 = tostring(typeof (require("jass.common") as any).DzTriggerRegisterKeyEventByCode);
+  } catch (_e) {}
+  try {
+    tBy2 = tostring(typeof (require("jass.japi") as any).DzTriggerRegisterKeyEventByCode);
+  } catch (_e) {}
+  pr("[type] _G.DzTriggerRegisterKeyEventByCode=" + tBy0);
+  pr("[type] jass.common.DzTriggerRegisterKeyEventByCode=" + tBy1);
+  pr("[type] jass.japi.DzTriggerRegisterKeyEventByCode=" + tBy2);
+
+  // Dz 鼠标：对比 _G vs jass.japi
+  let tMx0 = "nil";
+  let tMx1 = "nil";
+  try {
+    tMx0 = tostring(typeof g.DzGetMouseX);
+  } catch (_e) {}
+  try {
+    tMx1 = tostring(typeof (require("jass.japi") as any).DzGetMouseX);
+  } catch (_e) {}
+  pr("[type] _G.DzGetMouseX=" + tMx0);
+  pr("[type] jass.japi.DzGetMouseX=" + tMx1);
 }
 
-function findFunction(funcName: string): ((trig: any, name: string) => void) | undefined {
-  const j = jass as any;
-  const glob = globalThis as any;
-  const pr = glob.print as (s: string) => void;
-  if (j[funcName]) {
-    pr?.("✅ 在 jass 表里: jass." + funcName);
-    return j[funcName];
+function bindKeyBN_once_min(): void {
+  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
+  if (!pr) return;
+  const g = globalThis as any;
+  if (g.__keytest_bound) {
+    pr("[keytest] already bound");
+    return;
   }
-  if (glob[funcName]) {
-    pr?.("✅ 在全局环境: _G." + funcName);
-    return glob[funcName];
+  g.__keytest_bound = true;
+
+  const japi = require("jass.japi") as any;
+  if (
+    typeof (jass as any).CreateTrigger !== "function" ||
+    typeof (jass as any).DisplayTimedTextToPlayer !== "function" ||
+    typeof (jass as any).Player !== "function"
+  ) {
+    pr("[keytest] missing basic jass funcs");
+    return;
   }
-  pr?.("❌ 找不到: " + funcName);
-  dumpAllKeys();
-  return undefined;
+
+  const f = japi.DzTriggerRegisterKeyEventByCode as ((trig: any, key: number, status: number, sync: boolean, cb: () => void) => void) | undefined;
+  if (typeof f !== "function") {
+    pr("[keytest] DzTriggerRegisterKeyEventByCode not function");
+    return;
+  }
+
+  const bind = (key: number, label: string) => {
+    const trig = (jass as any).CreateTrigger();
+    f(trig, key, 1, false, () => {
+      const msg = `[KEYOK] ${label} key=${tostring(key)} sync=false`;
+      for (let i = 0; i < 12; i++) {
+        (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 5, msg);
+      }
+    });
+  };
+
+  pr("[keytest] bind B/N (sync=false, key=66/78)");
+  bind(66, "B");
+  bind(78, "N");
 }
 
 function onChat233(): void {
-  const STES_Register = findFunction("STES_Register");
-  if (STES_Register) {
-    const trig = jass.CreateTrigger();
-    jass.TriggerAddAction(trig, () => {
-      (globalThis as any).print?.("LuaEvent_GetItem 触发");
-      jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "LuaEvent_GetItem 触发");
-    });
-    STES_Register(trig, "LuaEvent_GetItem");
-    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "已注册 LuaEvent_GetItem");
+  dumpJapiKeys();
+  dumpDzKeyEventTrgType();
+  bindKeyBN_once_min();
+  if (typeof (jass as any).DisplayTimedTextToPlayer === "function" && typeof (jass as any).Player === "function") {
+    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 6, "[japi] 已打印 jass.japi keys");
   }
-  listAllCustomJassFunctions();
-  listCounts();
 }
 
 function init(): void {
-  const tr = jass.CreateTrigger();
-  jass.TriggerRegisterPlayerChatEvent(tr, jass.Player(0), "233", true);
-  jass.TriggerAddAction(tr, onChat233);
+  if (
+    typeof (jass as any).CreateTrigger !== "function" ||
+    typeof (jass as any).TriggerAddAction !== "function" ||
+    typeof (jass as any).TriggerRegisterPlayerChatEvent !== "function" ||
+    typeof (jass as any).Player !== "function"
+  ) return;
+  const tr = (jass as any).CreateTrigger();
+  (jass as any).TriggerRegisterPlayerChatEvent(tr, (jass as any).Player(0), "233", true);
+  (jass as any).TriggerAddAction(tr, onChat233);
 }
 
 init();

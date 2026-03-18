@@ -4,6 +4,7 @@ const g = require("jass.globals") as { udg_RegTrigger?: any; udg_RegEventStr?: s
 
 function onTestEvent(): void {
   // 在 trigger 回调里访问 g/jass 可能不返回，用 Timer 延后到下一帧执行
+  
   const t = (jass as any).CreateTimer();
   (jass as any).TimerStart(t, 0, false, () => {
     let out = "";
@@ -25,6 +26,7 @@ function onTestEvent(): void {
     jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 15, line);
   });
 }
+
 
 function init(): void {
   const evtTrig = jass.CreateTrigger();

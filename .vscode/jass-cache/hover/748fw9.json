@@ -30,7 +30,12 @@
       "symbolName": "Star_TargetUnit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\神隐之旅\\.build\\war3map.j",
       "content": "\n```jass\nunit Star_TargetUnit\n```\n\n\n**文件:** `.build/war3map.j`"
+    },
+    {
+      "symbolName": "EXExecuteScript",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\神隐之旅\\.build\\war3map.j",
+      "content": "\n```jass\nnative EXExecuteScript takes string script returns string\n```\n\n\n**文件:** `.build/war3map.j`"
     }
   ],
-  "timestamp": 1772895622739
+  "timestamp": 1773764752408
 }

@@ -7,8 +7,7 @@ ____exports.items.I00V = {
     goldPrice = 100,
     score = 216,
     level = "E-",
-    dmg = 8,
-    Buff = "Buff:dmg:AntiHeal200%;time3"
+    dmg = 8
 }
 ____exports.items.I00E = {
     type = "道具/戒指/饰品",
@@ -73,26 +72,6 @@ ____exports.items.I06Y = {
     hot = "200hp",
     abilList = "A08C"
 }
-____exports.items.pres = {
-    type = "道具/戒指/饰品",
-    name = "恢复药水",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 75,
-    PowerUP = "50%int;time3",
-    abilList = "A08C"
-}
-____exports.items.rde3 = {
-    type = "道具/戒指/饰品",
-    name = "守护指环 +4",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 150
-}
 ____exports.items.I00D = {
     type = "道具/戒指/饰品",
     name = "魔力树枝",
@@ -146,7 +125,6 @@ ____exports.items.I070 = {
     score = 544,
     level = "E+",
     magicDmg = 0.3,
-    PowerUP = "3%magicDmg",
     abilList = "A0LH"
 }
 ____exports.items.I00O = {
@@ -156,7 +134,6 @@ ____exports.items.I00O = {
     score = 551,
     level = "E+",
     dmg = 15,
-    PowerUP = "50%atkSpeed;time3",
     abilList = "A03J"
 }
 ____exports.items.I01T = {
@@ -1922,9 +1899,27 @@ ____exports.items.I01I = {
     magicLifeSteal = 0.05,
     onlyone = true
 }
-____exports.items.I01L = {type = "神符", name = "金币+200", goldPrice = 0, abilList = "A03O"}
-____exports.items.I01M = {type = "神符", name = "金币+400", goldPrice = 0, abilList = "A03P"}
-____exports.items.I01N = {type = "神符", name = "金币+600", goldPrice = 0, abilList = "A03Q"}
+____exports.items.I01L = {
+    type = "神符",
+    name = "金币+200",
+    goldPrice = 0,
+    PowerUP = "200gold",
+    abilList = "A03O"
+}
+____exports.items.I01M = {
+    type = "神符",
+    name = "金币+400",
+    goldPrice = 0,
+    PowerUP = "400gold",
+    abilList = "A03P"
+}
+____exports.items.I01N = {
+    type = "神符",
+    name = "金币+600",
+    goldPrice = 0,
+    PowerUP = "600gold",
+    abilList = "A03Q"
+}
 ____exports.items.I01O = {type = "材料", name = "豺狼皮", goldPrice = 50}
 ____exports.items.I01P = {type = "材料", name = "炸药粉", goldPrice = 50}
 ____exports.items.I023 = {type = "材料", name = "铁块", goldPrice = 500}
@@ -1949,6 +1944,7 @@ ____exports.items.I02H = {
     name = "螃蟹肉（生）",
     goldPrice = 50,
     hot = "200hp",
+    recipe = "h00C:10->I02H*2:5",
     abilList = "A002"
 }
 ____exports.items.I02I = {
@@ -1963,10 +1959,10 @@ ____exports.items.I02K = {type = "材料", name = "螃蟹壳", goldPrice = 50}
 ____exports.items.I02M = {type = "道具/戒指/饰品", name = "篝火", goldPrice = 0, abilList = "A049"}
 ____exports.items.I02W = {type = "材料", name = "淡水鱼（普通）", goldPrice = 100}
 ____exports.items.I02X = {type = "材料", name = "淡水鱼（小）", goldPrice = 50}
-____exports.items.I02Y = {type = "材料", name = "淡水鱼（大）", goldPrice = 200}
-____exports.items.I02Z = {type = "材料", name = "淡水鱼（超大）", goldPrice = 200}
-____exports.items.I030 = {type = "材料", name = "白鳍鱼", goldPrice = 50}
-____exports.items.I031 = {type = "材料", name = "黄金鱼", goldPrice = 50}
+____exports.items.I02Y = {type = "材料", name = "淡水鱼（大）", goldPrice = 200, recipe = "h00C:10->I032*1:5"}
+____exports.items.I02Z = {type = "材料", name = "淡水鱼（超大）", goldPrice = 200, recipe = "h00C:10->I032*2:5"}
+____exports.items.I030 = {type = "材料", name = "白鳍鱼", goldPrice = 50, recipe = "h00C:10->I033*1:5"}
+____exports.items.I031 = {type = "材料", name = "黄金鱼", goldPrice = 50, recipe = "h00C:20->I034*1;20%I036*1:5"}
 ____exports.items.I032 = {
     type = "药剂/食品",
     name = "烤鱼",
@@ -1989,7 +1985,6 @@ ____exports.items.I034 = {
     goldPrice = 50,
     level = "E",
     hot = "50%hpLost;50%mpLost",
-    PowerUP = "1%gold;time10",
     abilList = "A015,A08C"
 }
 ____exports.items.I035 = {
@@ -2028,7 +2023,7 @@ ____exports.items.I03X = {
     abilList = "A0LH"
 }
 ____exports.items.I03Y = {type = "材料", name = "蝎壳", goldPrice = 50}
-____exports.items.I03Z = {type = "材料", name = "蝎肉", goldPrice = 50}
+____exports.items.I03Z = {type = "材料", name = "蝎肉", goldPrice = 50, recipe = "h00C:10->I0AB*1:5"}
 ____exports.items.I04C = {type = "任务", name = "情报", goldPrice = 300}
 ____exports.items.I04D = {type = "药剂/食品", name = "抗毒药水", goldPrice = 1000, abilList = "A060"}
 ____exports.items.I04E = {
@@ -3012,19 +3007,18 @@ ____exports.items.I08T = {
     type = "衣服",
     name = "熔亡之拥",
     goldPrice = 1000,
-    int = 30,
-    magicResist = 0.15,
-    armor = 20,
-    hp = 1800,
-    mp = 1000
+    int = 60,
+    mpRegen = 25,
+    magicPierce = 0.35,
+    magicDmg = 0.25,
+    wound = 0.35
 }
 ____exports.items.I08U = {
     type = "道具/戒指/饰品",
     name = "熔墓之戒",
     goldPrice = 1000,
     hp = 1200,
-    magicDmg = 0.25,
-    Buff = "dmg:AntiHeal200%;time3"
+    magicDmg = 0.25
 }
 ____exports.items.I08V = {
     type = "道具/戒指/饰品",
@@ -3149,8 +3143,7 @@ ____exports.items.I09G = {
     name = "亡墓恶戒",
     goldPrice = 3000,
     dmg = 80,
-    hp = 1500,
-    Buff = "dmg:AntiHeal100%;time3"
+    hp = 1500
 }
 ____exports.items.I09H = {
     type = "道具/戒指/饰品",
@@ -3303,7 +3296,13 @@ ____exports.items.I0B3 = {
     PowerUP = "3all",
     abilList = "A0LH"
 }
-____exports.items.I0B4 = {type = "神符", name = "金币+5000", goldPrice = 0, abilList = "A0F1"}
+____exports.items.I0B4 = {
+    type = "神符",
+    name = "金币+5000",
+    goldPrice = 0,
+    PowerUP = "5000gold",
+    abilList = "A0F1"
+}
 ____exports.items.I0B8 = {type = "其他", name = "阅读描述的内容（其三）|cffff0000LV45|r", goldPrice = 0}
 ____exports.items.I0B9 = {type = "其他", name = "阅读描述的内容（其四）|cffff0000LV55|r", goldPrice = 0}
 ____exports.items.I0BA = {type = "其他", name = "阅读描述的内容（其一）|cffff0000LV25|r", goldPrice = 0}
@@ -3442,7 +3441,7 @@ ____exports.items.I0CO = {
     type = "提升属性的物品",
     name = "学识书",
     goldPrice = 0,
-    PowerUP = "(level*900)exp;2dmg",
+    PowerUP = "900exp;2dmg",
     abilList = "A0LH"
 }
 ____exports.items.I0CP = {type = "任务", name = "|cffff00ff暗狱之书|r|cffffff00（寻找物品任务）|r", goldPrice = 0}
@@ -3557,7 +3556,7 @@ ____exports.items.ches = {
     abilList = "A0LH"
 }
 ____exports.items.gmfr = {type = "货币", name = "帝国货币", goldPrice = 1000}
-____exports.items.gold = {type = "神符", name = "金币", goldPrice = 0}
+____exports.items.gold = {type = "神符", name = "金币", goldPrice = 0, PowerUP = "500-7500gold"}
 ____exports.items.manh = {type = "道具/戒指/饰品", name = "生命手册", goldPrice = 0, PowerUP = "50hp"}
 ____exports.items.rdis = {type = "神符", name = "盗贼神符（护甲）", goldPrice = 0, PowerUP = "15armor;time10"}
 ____exports.items.rump = {

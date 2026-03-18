@@ -143,6 +143,30 @@ function fixFile(filePath) {
     content = content.replace(/registerItemForCleanup\s*\(\s*nil\s*,\s*/g, "registerItemForCleanup(");
   }
 
+  // 19. 硬件函数.lua：TSTL 可能给 native 多传 nil/self，导致参数错位甚至直接崩溃（AV）
+  // 典型：fTrg(nil, trig, status, key) 应为 fTrg(trig, status, key)
+  if (filePath.includes("硬件函数")) {
+    // 常见：局部变量调用时多传 nil
+    content = content.replace(/\bfTrg\s*\(\s*nil\s*,\s*/g, "fTrg(");
+    content = content.replace(/\bfByCode\s*\(\s*nil\s*,\s*/g, "fByCode(");
+    content = content.replace(/\bfStr\s*\(\s*nil\s*,\s*/g, "fStr(");
+    // 通用：f(nil, ...) / f(nil)（本文件里多为 Dz* 无 self 的 native）
+    content = content.replace(/\bf\s*\(\s*nil\s*,\s*/g, "f(");
+    content = content.replace(/\bf\s*\(\s*nil\s*\)/g, "f()");
+    // japiFn 返回的 getter 也可能被多传 nil
+    content = content.replace(/\bgetP\s*\(\s*nil\s*\)/g, "getP()");
+    content = content.replace(/\bgetK\s*\(\s*nil\s*\)/g, "getK()");
+    // 少数情况：_G.DzXxx(_G, ...) 这种“把全局表当 self”也去掉
+    content = content.replace(/\bDzTriggerRegisterKeyEventTrg\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEventTrg(");
+    content = content.replace(/\bDzTriggerRegisterKeyEventByCode\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEventByCode(");
+    content = content.replace(/\bDzTriggerRegisterKeyEvent\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEvent(");
+  }
+
+  // 20. 测试233注册.lua：历史上也出现过 f(nil, trig, ...) 的多传 nil 问题
+  if (filePath.includes("测试233注册")) {
+    content = content.replace(/\bf\s*\(\s*nil\s*,\s*/g, "f(");
+  }
+
   if (content !== original) {
     fs.writeFileSync(filePath, content, "utf8");
     return true;

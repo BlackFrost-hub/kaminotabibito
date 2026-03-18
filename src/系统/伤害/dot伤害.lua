@@ -22,6 +22,12 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local damageEventModule = require("系统.伤害.伤害事件")
+local leakCore = require("系统.00_核心.泄露审计")
+local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
+if ____leakCore_LeakWatcher_0 == nil then
+    ____leakCore_LeakWatcher_0 = leakCore
+end
+local LeakWatcher = ____leakCore_LeakWatcher_0
 local TICK = 0.25
 --- 伤害类型位：2048=技能 256=精神，用于 Lua 造成的伤害在事件里显示正确文案
 local DAMAGE_TYPE_SKILL = 2048
@@ -82,13 +88,13 @@ local function isSourceHeroPlayer1to4(self, unit)
     if playerIdx < 0 or playerIdx > 3 then
         return false
     end
-    local ____temp_0
+    local ____temp_1
     if jass.ConvertUnitType and jass.UNIT_TYPE_HERO ~= nil then
-        ____temp_0 = jass.ConvertUnitType(jass.UNIT_TYPE_HERO)
+        ____temp_1 = jass.ConvertUnitType(jass.UNIT_TYPE_HERO)
     else
-        ____temp_0 = nil
+        ____temp_1 = nil
     end
-    local utHero = ____temp_0
+    local utHero = ____temp_1
     if utHero == nil then
         return true
     end
@@ -162,8 +168,8 @@ local function tick(self)
             end
         end
     end
-    if not hasAny and tickTimer ~= nil and type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(tickTimer)
+    if not hasAny and tickTimer ~= nil then
+        LeakWatcher:destroyTimer(tickTimer)
         tickTimer = nil
     end
 end
@@ -182,8 +188,8 @@ local function addDotEffectOnUnit(self, unit, model, duration)
     end
     local ticks = math.ceil(duration / EFFECT_RECYCLE_INTERVAL)
     effectRecycleList[#effectRecycleList + 1] = {eff = eff, ticksLeft = ticks}
-    if effectRecycleTimer == nil and type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-        effectRecycleTimer = jass.CreateTimer()
+    if effectRecycleTimer == nil and type(jass.TimerStart) == "function" then
+        effectRecycleTimer = LeakWatcher:createTimer("dot_effectRecycle")
         jass.TimerStart(
             effectRecycleTimer,
             EFFECT_RECYCLE_INTERVAL,
@@ -203,8 +209,8 @@ local function addDotEffectOnUnit(self, unit, model, duration)
                         i = i - 1
                     end
                 end
-                if #effectRecycleList == 0 and effectRecycleTimer ~= nil and type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(effectRecycleTimer)
+                if #effectRecycleList == 0 and effectRecycleTimer ~= nil then
+                    LeakWatcher:destroyTimer(effectRecycleTimer)
                     effectRecycleTimer = nil
                 end
             end
@@ -261,13 +267,13 @@ local function dotTickRun(self)
                 dotTypes,
                 function(____, c) return c.id == e.typeId end
             )
-            local ____temp_1
+            local ____temp_2
             if stateByType[e.typeId] ~= nil then
-                ____temp_1 = stateByType[e.typeId][e.target]
+                ____temp_2 = stateByType[e.typeId][e.target]
             else
-                ____temp_1 = nil
+                ____temp_2 = nil
             end
-            local state = ____temp_1
+            local state = ____temp_2
             if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
                 cfg:onTick(e.target, state)
             end
@@ -278,8 +284,8 @@ local function dotTickRun(self)
             i = i - 1
         end
     end
-    if #dotTicks == 0 and dotTimer ~= nil and type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(dotTimer)
+    if #dotTicks == 0 and dotTimer ~= nil then
+        LeakWatcher:destroyTimer(dotTimer)
         dotTimer = nil
     end
 end
@@ -288,13 +294,13 @@ local function onDamage(self, target, damage, damageType)
         return
     end
     local j = jass
-    local ____temp_2
+    local ____temp_3
     if j.udg_TempUnit ~= nil and j.udg_TempUnit[6] ~= nil then
-        ____temp_2 = j.udg_TempUnit[6]
+        ____temp_3 = j.udg_TempUnit[6]
     else
-        ____temp_2 = nil
+        ____temp_3 = nil
     end
-    local source = ____temp_2
+    local source = ____temp_3
     if not source then
         return
     end
@@ -361,12 +367,12 @@ local function onDamage(self, target, damage, damageType)
                         effectModel = cfg.effectModel,
                         effectDuration = cfg.effectDuration
                     }
-                    if dotTimer == nil and type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-                        dotTimer = jass.CreateTimer()
+                    if dotTimer == nil and type(jass.TimerStart) == "function" then
+                        dotTimer = LeakWatcher:createTimer("dot_tick")
                         jass.TimerStart(dotTimer, 1, true, dotTickRun)
                     end
-                    if tickTimer == nil and type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-                        tickTimer = jass.CreateTimer()
+                    if tickTimer == nil and type(jass.TimerStart) == "function" then
+                        tickTimer = LeakWatcher:createTimer("dot_state")
                         jass.TimerStart(tickTimer, TICK, true, tick)
                     end
                     __continue61 = true
@@ -463,13 +469,13 @@ local function getBestAntiHealFromUnit(self, unit)
                         getItemTypeId(nil, item)
                     )
                     local entry = itemsData[idStr]
-                    local ____temp_5
+                    local ____temp_6
                     if (entry and entry.Buff) ~= nil then
-                        ____temp_5 = parseAntiHealBuff(nil, entry.Buff)
+                        ____temp_6 = parseAntiHealBuff(nil, entry.Buff)
                     else
-                        ____temp_5 = nil
+                        ____temp_6 = nil
                     end
-                    local parsed = ____temp_5
+                    local parsed = ____temp_6
                     if not parsed then
                         __continue92 = true
                         break
@@ -517,17 +523,17 @@ end
 --- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
 function ____exports.getUnitAntiHeal(self, unit)
     local tab = stateByType.antiHeal
-    local ____temp_7
+    local ____temp_8
     if tab ~= nil then
-        local ____tab_unit_6 = tab[unit]
-        if ____tab_unit_6 == nil then
-            ____tab_unit_6 = nil
+        local ____tab_unit_7 = tab[unit]
+        if ____tab_unit_7 == nil then
+            ____tab_unit_7 = nil
         end
-        ____temp_7 = ____tab_unit_6
+        ____temp_8 = ____tab_unit_7
     else
-        ____temp_7 = nil
+        ____temp_8 = nil
     end
-    return ____temp_7
+    return ____temp_8
 end
 --- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。来源/目标由 dealDamageForType 写入 udg_TempUnit[4]/[3] 供 JASS 读
 function ____exports.dealSpiritDamage(self, source, target, amount)

@@ -12,6 +12,8 @@
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 const damageEventModule = require("系统.伤害.伤害事件") as { setNextDamageTypeOverride: (n: number) => void; registerDamageCallback: (cb: (u: any, d: number, t: number, f: boolean, l: boolean) => void, interval?: number) => void };
+const leakCore = require("系统.00_核心.泄露审计") as { LeakWatcher?: any };
+const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 
 const TICK = 0.25;
 /** 伤害类型位：2048=技能 256=精神，用于 Lua 造成的伤害在事件里显示正确文案 */
@@ -128,8 +130,8 @@ function tick(): void {
     for (const _ in tab) { hasAny = true; break; }
     if (hasAny) break;
   }
-  if (!hasAny && tickTimer != null && typeof (jass as any).DestroyTimer === "function") {
-    (jass as any).DestroyTimer(tickTimer);
+  if (!hasAny && tickTimer != null) {
+    LeakWatcher.destroyTimer(tickTimer);
     tickTimer = undefined;
   }
 }
@@ -145,8 +147,8 @@ function addDotEffectOnUnit(unit: any, model: string, duration: number): void {
   }
   const ticks = Math.ceil(duration / EFFECT_RECYCLE_INTERVAL);
   effectRecycleList.push({ eff, ticksLeft: ticks });
-  if (effectRecycleTimer == null && typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
-    effectRecycleTimer = (jass as any).CreateTimer();
+  if (effectRecycleTimer == null && typeof (jass as any).TimerStart === "function") {
+    effectRecycleTimer = LeakWatcher.createTimer("dot_effectRecycle");
     (jass as any).TimerStart(effectRecycleTimer, EFFECT_RECYCLE_INTERVAL, true, () => {
       for (let i = effectRecycleList.length - 1; i >= 0; i--) {
         const x = effectRecycleList[i];
@@ -156,8 +158,8 @@ function addDotEffectOnUnit(unit: any, model: string, duration: number): void {
           effectRecycleList.splice(i, 1);
         }
       }
-      if (effectRecycleList.length === 0 && effectRecycleTimer != null && typeof (jass as any).DestroyTimer === "function") {
-        (jass as any).DestroyTimer(effectRecycleTimer);
+      if (effectRecycleList.length === 0 && effectRecycleTimer != null) {
+        LeakWatcher.destroyTimer(effectRecycleTimer);
         effectRecycleTimer = undefined;
       }
     });
@@ -192,8 +194,8 @@ function dotTickRun(): void {
     e.ticksLeft = e.ticksLeft - 1;
     if (e.ticksLeft <= 0) dotTicks.splice(i, 1);
   }
-  if (dotTicks.length === 0 && dotTimer != null && typeof (jass as any).DestroyTimer === "function") {
-    (jass as any).DestroyTimer(dotTimer);
+  if (dotTicks.length === 0 && dotTimer != null) {
+    LeakWatcher.destroyTimer(dotTimer);
     dotTimer = undefined;
   }
 }
@@ -244,12 +246,12 @@ function onDamage(target: any, damage: number, damageType: number): void {
       effectModel: cfg.effectModel,
       effectDuration: cfg.effectDuration,
     });
-    if (dotTimer == null && typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
-      dotTimer = (jass as any).CreateTimer();
+    if (dotTimer == null && typeof (jass as any).TimerStart === "function") {
+      dotTimer = LeakWatcher.createTimer("dot_tick");
       (jass as any).TimerStart(dotTimer, 1, true, dotTickRun);
     }
-    if (tickTimer == null && typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
-      tickTimer = (jass as any).CreateTimer();
+    if (tickTimer == null && typeof (jass as any).TimerStart === "function") {
+      tickTimer = LeakWatcher.createTimer("dot_state");
       (jass as any).TimerStart(tickTimer, TICK, true, tick);
     }
   }

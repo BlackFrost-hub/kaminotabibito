@@ -7,6 +7,7 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [k: string]: any };
 const itemsData = (require("系统.装备.装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
+const { AddGoldWithFeedback } = require("系统.00_核心.封装函数") as { AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void };
 
 /** key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致） */
 const KEY_TO_NAME: Record<string, string> = {
@@ -60,6 +61,8 @@ interface Effect {
   isPct: boolean;
   value: number;       // 固定值或 level*N 里的 N
   isLevelMult: boolean; // true = (level*N) 语法
+  min?: number;        // gold 固定/范围：min
+  max?: number;        // gold 固定/范围：max（无则等于 min）
 }
 
 interface Segment {
@@ -87,6 +90,31 @@ function parsePowerUP(powerUpStr: string): Segment[] {
     }
     const effects: Effect[] = [];
     for (const t of effectTokens) {
+      // gold 特判：支持 "500gold" / "500-7500gold" / "10%gold"
+      const tl0 = t.toLowerCase();
+      if (tl0.endsWith("gold")) {
+        // 百分比：10%gold
+        if (tl0.indexOf("%gold") >= 0) {
+          const pctStr = t.substring(0, tl0.indexOf("%")).trim();
+          const pctNum = parseFloat(pctStr) || 0;
+          effects.push({ type: "gold", isPct: true, value: pctNum / 100, isLevelMult: false });
+          continue;
+        }
+        // 固定/范围：500gold / 500-7500gold
+        const core = t.substring(0, t.length - 4).trim(); // 去掉 gold
+        const dash = core.indexOf("-");
+        if (dash >= 0) {
+          const a = parseFloat(core.substring(0, dash).trim()) || 0;
+          const b = parseFloat(core.substring(dash + 1).trim()) || 0;
+          const mn = a < b ? a : b;
+          const mx = a < b ? b : a;
+          effects.push({ type: "gold", isPct: false, value: 0, isLevelMult: false, min: mn, max: mx });
+        } else {
+          const v = parseFloat(core) || 0;
+          effects.push({ type: "gold", isPct: false, value: 0, isLevelMult: false, min: v, max: v });
+        }
+        continue;
+      }
       // (level*N)key 语法
       if (t.indexOf("(level*") === 0) {
         const closeIdx = t.indexOf(")");
@@ -126,8 +154,9 @@ function parsePowerUP(powerUpStr: string): Segment[] {
       } else if (kl === "level") {
         effects.push({ type: "level", isPct: false, value: num, isLevelMult: false });
       } else if (kl === "gold") {
-        // N%gold：每秒增减玩家 N% 金币
-        effects.push({ type: "gold", isPct: true, value: num / 100, isLevelMult: false });
+        // 兼容旧写法：N%gold 走百分比；Ngold 走固定（但不支持范围，这里只当固定）
+        if (isPct) effects.push({ type: "gold", isPct: true, value: num / 100, isLevelMult: false });
+        else effects.push({ type: "gold", isPct: false, value: 0, isLevelMult: false, min: num, max: num });
       } else {
         const ak = findStatKey(rawKey);
         if (ak !== "") effects.push({ type: "stat", key: ak, isPct, value: isPct ? num / 100 : num, isLevelMult: false });
@@ -223,10 +252,16 @@ function applyGoldPct(unit: any, pct: number): void {
 function executeSegment(unit: any, seg: Segment): void {
   const statEffects: { name: string; key: string; value: number }[] = [];
   let goldPct = 0;
+  const goldFixed: { min: number; max: number }[] = [];
 
   for (const eff of seg.effects) {
     if (eff.type === "gold") {
-      goldPct += eff.value;
+      if (eff.isPct) goldPct += eff.value;
+      else {
+        const mn = typeof eff.min === "number" ? eff.min : 0;
+        const mx = typeof eff.max === "number" ? eff.max : mn;
+        goldFixed.push({ min: mn, max: mx });
+      }
     } else if (eff.type === "exp") {
       const amount = eff.isLevelMult
         ? Math.floor(getHeroLevel(unit) * eff.value)
@@ -272,6 +307,21 @@ function executeSegment(unit: any, seg: Segment): void {
           }
         });
       }
+    }
+  }
+
+  // 固定/范围金币：使用封装函数（单位：漂浮字 + 1500 范围音效）
+  if (goldFixed.length > 0) {
+    for (let i = 0; i < goldFixed.length; i++) {
+      const mn = Math.floor(goldFixed[i].min);
+      const mx = Math.floor(goldFixed[i].max);
+      let delta = mn;
+      if (mx !== mn) {
+        const a = mn < mx ? mn : mx;
+        const b = mn < mx ? mx : mn;
+        delta = (math as any).random(a, b);
+      }
+      if (delta !== 0) AddGoldWithFeedback({ delta, unit });
     }
   }
 

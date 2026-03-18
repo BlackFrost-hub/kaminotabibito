@@ -1,4 +1,4 @@
-interface ItemDataEntry {
+﻿interface ItemDataEntry {
   name: string;
   type?: string;
   score?: number;
@@ -73,6 +73,7 @@ interface ItemDataEntry {
   primaryBonus?: string;
   hot?: string;
   Buff?: string;
+  recipe?: string;
   PowerUP?: string;
   abilList?: string;
   [key: string]: string | number | boolean | undefined;
@@ -80,7 +81,7 @@ interface ItemDataEntry {
 
 export const items: Record<string, ItemDataEntry> = {};
 
-items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8, Buff: "Buff:dmg:AntiHeal200%;time3"};
+items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8};
 items["I00E"] = {type: "道具/戒指/饰品", name: "生命树枝", goldPrice: 100, score: 220, level: "E-", hp: 200, hpRegen: 1};
 items["I00T"] = {type: "主武器", name: "小法杖", goldPrice: 100, score: 222, level: "E-", dmg: 6, int: 1};
 items["I00S"] = {type: "道具/戒指/饰品", name: "恢复指环", goldPrice: 50, score: 250, level: "E-", hp: 50};
@@ -88,15 +89,13 @@ items["I00P"] = {type: "道具/戒指/饰品", name: "树枝", goldPrice: 100, s
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};
 items["I06X"] = {type: "道具/戒指/饰品", name: "初始魔法药水", goldPrice: 50, score: 400, level: "E", hot: "100mp", abilList: "A08C"};
 items["I06Y"] = {type: "道具/戒指/饰品", name: "初始生命药水", goldPrice: 50, score: 400, level: "E", hot: "200hp", abilList: "A08C"};
-items["pres"] = {type: "道具/戒指/饰品", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 75,PowerUP: "50%int;time3", abilList: "A08C"};
-items["rde3"] = {type: "道具/戒指/饰品", name: "守护指环 +4", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 150};
 items["I00D"] = {type: "道具/戒指/饰品", name: "魔力树枝", goldPrice: 100, score: 414, level: "E-", int: 5, mp: 150, mpRegen: 0.5};
 items["I027"] = {type: "副武器", name: "小盾牌", goldPrice: 250, score: 417, level: "E", armor: 3, hp: 100};
 items["I01X"] = {type: "头盔", name: "地精防炸帽", goldPrice: 100, score: 425, level: "E", magicResist: 0.2, armor: 5};
 items["I00C"] = {type: "道具/戒指/饰品", name: "树枝骨干", goldPrice: 200, score: 481, level: "E", all: 4};
 items["I0CN"] = {type: "道具/戒指/饰品", name: "异端审查证", goldPrice: 1000, score: 489, level: "E-", hp: 200, accuracy: 0.1, stunResist: 0.2};
-items["I070"] = {type: "道具/戒指/饰品", name: "元素能量碎片（水）", goldPrice: 240, score: 544, level: "E+", magicDmg: 0.3, PowerUP: "3%magicDmg", abilList: "A0LH"};
-items["I00O"] = {type: "道具/戒指/饰品", name: "狂暴树枝", goldPrice: 200, score: 551, level: "E+", dmg: 15, PowerUP: "50%atkSpeed;time3", abilList: "A03J"};
+items["I070"] = {type: "道具/戒指/饰品", name: "元素能量碎片（水）", goldPrice: 240, score: 544, level: "E+", magicDmg: 0.3, abilList: "A0LH"};
+items["I00O"] = {type: "道具/戒指/饰品", name: "狂暴树枝", goldPrice: 200, score: 551, level: "E+", dmg: 15, abilList: "A03J"};
 items["I01T"] = {type: "头盔", name: "狼皮帽", goldPrice: 200, score: 570, level: "E+", dmg: 10, hp: 100};
 items["I00U"] = {type: "鞋子", name: "速度之靴", goldPrice: 100, score: 585, level: "E++", movespeed2: 60};
 items["I00K"] = {type: "道具/戒指/饰品", name: "树枝骨干+1", goldPrice: 300, score: 675, level: "E+", dmg: 4, all: 4};
@@ -292,9 +291,9 @@ items["I019"] = {type: "主武器", name: "蛇包剑", goldPrice: 0};
 items["I01A"] = {type: "材料", name: "合成|打造", goldPrice: 0};
 items["I01B"] = {type: "神符", name: "盗贼神符（魔抗）", goldPrice: 0};
 items["I01I"] = {type: "灵魂", name: "邪恶之心（死亡掉落）", goldPrice: 1000, level: "D", dmg: 40, hp: 1500, lifeSteal: 0.05, magicLifeSteal: 0.05, onlyone: true};
-items["I01L"] = {type: "神符", name: "金币+200", goldPrice: 0, abilList: "A03O"};
-items["I01M"] = {type: "神符", name: "金币+400", goldPrice: 0, abilList: "A03P"};
-items["I01N"] = {type: "神符", name: "金币+600", goldPrice: 0, abilList: "A03Q"};
+items["I01L"] = {type: "神符", name: "金币+200", goldPrice: 0, PowerUP: "200gold", abilList: "A03O"};
+items["I01M"] = {type: "神符", name: "金币+400", goldPrice: 0, PowerUP: "400gold", abilList: "A03P"};
+items["I01N"] = {type: "神符", name: "金币+600", goldPrice: 0, PowerUP: "600gold", abilList: "A03Q"};
 items["I01O"] = {type: "材料", name: "豺狼皮", goldPrice: 50};
 items["I01P"] = {type: "材料", name: "炸药粉", goldPrice: 50};
 items["I023"] = {type: "材料", name: "铁块", goldPrice: 500};
@@ -302,20 +301,20 @@ items["I024"] = {type: "材料", name: "木材", goldPrice: 150};
 items["I028"] = {type: "图纸", name: "精致木盾", goldPrice: 300, armor: 5, hp: 500};
 items["I029"] = {type: "图纸", name: "火药弓图纸", goldPrice: 400, dmg: 35};
 items["I02A"] = {type: "图纸", name: "铁矛图纸", goldPrice: 400, dmg: 25, armorPierce: 0.5};
-items["I02H"] = {type: "材料", name: "螃蟹肉（生）", goldPrice: 50, hot: "200hp", abilList: "A002"};
+items["I02H"] = {type: "材料", name: "螃蟹肉（生）", goldPrice: 50, hot: "200hp", recipe: "h00C:10->I02H*2:5", abilList: "A002"};
 items["I02I"] = {type: "药剂/食品", name: "螃蟹肉", goldPrice: 50, hot: "1500hp", abilList: "A002"};
 items["I02J"] = {type: "材料", name: "石头", goldPrice: 50};
 items["I02K"] = {type: "材料", name: "螃蟹壳", goldPrice: 50};
 items["I02M"] = {type: "道具/戒指/饰品", name: "篝火", goldPrice: 0, abilList: "A049"};
 items["I02W"] = {type: "材料", name: "淡水鱼（普通）", goldPrice: 100};
 items["I02X"] = {type: "材料", name: "淡水鱼（小）", goldPrice: 50};
-items["I02Y"] = {type: "材料", name: "淡水鱼（大）", goldPrice: 200};
-items["I02Z"] = {type: "材料", name: "淡水鱼（超大）", goldPrice: 200};
-items["I030"] = {type: "材料", name: "白鳍鱼", goldPrice: 50};
-items["I031"] = {type: "材料", name: "黄金鱼", goldPrice: 50};
+items["I02Y"] = {type: "材料", name: "淡水鱼（大）", goldPrice: 200, recipe: "h00C:10->I032*1:5"};
+items["I02Z"] = {type: "材料", name: "淡水鱼（超大）", goldPrice: 200, recipe: "h00C:10->I032*2:5"};
+items["I030"] = {type: "材料", name: "白鳍鱼", goldPrice: 50, recipe: "h00C:10->I033*1:5"};
+items["I031"] = {type: "材料", name: "黄金鱼", goldPrice: 50, recipe: "h00C:20->I034*1;20%I036*1:5"};
 items["I032"] = {type: "药剂/食品", name: "烤鱼", goldPrice: 50, level: "E", hot: "30%hp;300mp+300mp", abilList: "A015,A08C"};
 items["I033"] = {type: "药剂/食品", name: "烤白鳍鱼", goldPrice: 50, level: "E", hot: "50%hp;600mp+600mp", abilList: "A015,A08C"};
-items["I034"] = {type: "药剂/食品", name: "烤黄金鱼", goldPrice: 50, level: "E", hot: "50%hpLost;50%mpLost", PowerUP: "1%gold;time10", abilList: "A015,A08C"};
+items["I034"] = {type: "药剂/食品", name: "烤黄金鱼", goldPrice: 50, level: "E", hot: "50%hpLost;50%mpLost", abilList: "A015,A08C"};
 items["I035"] = {type: "鞋子", name: "元素灵鞋", goldPrice: 100, level: "G++", magicResist: 0.15, hp: 300, mp: 300, movespeed2: 45};
 items["I036"] = {type: "材料", name: "金块", goldPrice: 10000};
 items["I03I"] = {type: "任务", name: "获取蜘蛛毒液", goldPrice: 0};
@@ -325,7 +324,7 @@ items["I03V"] = {type: "提升属性的物品", name: "赛坦之果", goldPrice:
 items["I03W"] = {type: "提升属性的物品", name: "伊达之果", goldPrice: 1000, PowerUP: "3all", abilList: "A0LH"};
 items["I03X"] = {type: "提升属性的物品", name: "斯托之果", goldPrice: 500, PowerUP: "50mp", abilList: "A0LH"};
 items["I03Y"] = {type: "材料", name: "蝎壳", goldPrice: 50};
-items["I03Z"] = {type: "材料", name: "蝎肉", goldPrice: 50};
+items["I03Z"] = {type: "材料", name: "蝎肉", goldPrice: 50, recipe: "h00C:10->I0AB*1:5"};
 items["I04C"] = {type: "任务", name: "情报", goldPrice: 300};
 items["I04D"] = {type: "药剂/食品", name: "抗毒药水", goldPrice: 1000, abilList: "A060"};
 items["I04E"] = {type: "道具/戒指/饰品", name: "魔法药水（中）", goldPrice: 300, level: "D", hot: "600mp", abilList: "A08C"};
@@ -455,8 +454,8 @@ items["I08P"] = {type: "主武器", name: "|cff333399虚空猎锤|r", goldPrice:
 items["I08Q"] = {type: "主武器", name: "|cff339966熔亡权杖|r", goldPrice: 3000, int: 60, mpRegen: 25, magicPierce: 0.35, magicDmg: 0.25, wound: 0.35};
 items["I08R"] = {type: "衣服", name: "熔亡法袍", goldPrice: 1250, int: 40, magicResist: 0.2, armor: 20, hp: 2000};
 items["I08S"] = {type: "鞋子", name: "|cff993366亡灵魔鞋|r", goldPrice: 2000, magicResist: 0.1, armor: 5, magicDmg: 0.2, movespeed2: 80, abilList: "A0EK"};
-items["I08T"] = {type: "衣服", name: "熔亡之拥", goldPrice: 1000, int: 30, magicResist: 0.15, armor: 20, hp: 1800, mp: 1000};
-items["I08U"] = {type: "道具/戒指/饰品", name: "熔墓之戒", goldPrice: 1000, hp: 1200, magicDmg: 0.25, Buff: "dmg:AntiHeal200%;time3"};
+items["I08T"] = {type: "衣服", name: "熔亡之拥", goldPrice: 1000, int: 60, mpRegen: 25, magicPierce: 0.35, magicDmg: 0.25, wound: 0.35};
+items["I08U"] = {type: "道具/戒指/饰品", name: "熔墓之戒", goldPrice: 1000, hp: 1200, magicDmg: 0.25};
 items["I08V"] = {type: "道具/戒指/饰品", name: "灵墓之戒", goldPrice: 2000, int: 25, mp: 500, mpRegenPct: 0.02, cdReduction: 0.15};
 items["I08W"] = {type: "道具/戒指/饰品", name: "|cff800080熔墓守卫护符|r", goldPrice: 2000, magicDmg: 0.2, darkDmg: 0.25};
 items["I08X"] = {type: "主武器", name: "|cff339966守墓人亡杖|r", goldPrice: 2500, int: 50, mpRegen: 25, cdReduction: 0.05, magicDmg: 0.2, abilList: "A09K"};
@@ -477,7 +476,7 @@ items["I09C"] = {type: "道具/戒指/饰品", name: "熔颅护肩（唯一）",
 items["I09D"] = {type: "衣服", name: "|cffff0000浴灵魔披（唯一）|r", goldPrice: 55000, agi: 75, hpRegen: 100, lifeSteal: 0.15, atkLifeSteal: 0.15};
 items["I09E"] = {type: "道具/戒指/饰品", name: "熔狱头骷", goldPrice: 3000, dmg: 80, hp: 1500, lifeSteal: 0.2, atkLifeSteal: 0.2};
 items["I09F"] = {type: "衣服", name: "虚空装甲", goldPrice: 2500, critDmg: -0.3, magicResist: 0.25, armor: 50, hp: 3500, critDmgTaken: -0.3, movespeed2: -0.15, abilList: "A0BB"};
-items["I09G"] = {type: "道具/戒指/饰品", name: "亡墓恶戒", goldPrice: 3000, dmg: 80, hp: 1500, Buff: "dmg:AntiHeal100%;time3"};
+items["I09G"] = {type: "道具/戒指/饰品", name: "亡墓恶戒", goldPrice: 3000, dmg: 80, hp: 1500};
 items["I09H"] = {type: "道具/戒指/饰品", name: "陨石之球", goldPrice: 3000, dmg: 40, hp: 1500, magicDmg: 0.25, fireDmg: 0.25, abilList: "A0BC"};
 items["I09I"] = {type: "道具/戒指/饰品", name: "浴魔药剂", goldPrice: 1000, hot: "1250mp", abilList: "A0B8"};
 items["I09J"] = {type: "道具/戒指/饰品", name: "浴血药剂", goldPrice: 1000, hot: "2500hp", abilList: "A002"};
@@ -516,7 +515,7 @@ items["I0AU"] = {type: "材料", name: "|CffFF8000熔岩食鱼|r", goldPrice: 50
 items["I0AV"] = {type: "材料", name: "|CffFF8000熔岩灵鱼|r", goldPrice: 50};
 items["I0AW"] = {type: "材料", name: "|CffFF8000熔岩焰鱼|r", goldPrice: 50};
 items["I0B3"] = {type: "提升属性的物品", name: "能力卡牌", goldPrice: 500, PowerUP: "3all", abilList: "A0LH"};
-items["I0B4"] = {type: "神符", name: "金币+5000", goldPrice: 0, abilList: "A0F1"};
+items["I0B4"] = {type: "神符", name: "金币+5000", goldPrice: 0, PowerUP: "5000gold", abilList: "A0F1"};
 items["I0B8"] = {type: "其他", name: "阅读描述的内容（其三）|cffff0000LV45|r", goldPrice: 0};
 items["I0B9"] = {type: "其他", name: "阅读描述的内容（其四）|cffff0000LV55|r", goldPrice: 0};
 items["I0BA"] = {type: "其他", name: "阅读描述的内容（其一）|cffff0000LV25|r", goldPrice: 0};
@@ -542,7 +541,7 @@ items["I0CH"] = {type: "主武器", name: "精粹法刺", goldPrice: 30000, dmg:
 items["I0CI"] = {type: "任务", name: "消失的笛子", goldPrice: 0, dmg: 12};
 items["I0CJ"] = {type: "任务", name: "|cffff0000失踪的精灵村民（Boss战任务）|r", goldPrice: 0, critRate: 1, critDmg: 0.01};
 items["I0CM"] = {type: "任务", name: "|cffff9900协助异端调查|r（|cffff00008级精英战斗任务|r）", goldPrice: 0};
-items["I0CO"] = {type: "提升属性的物品", name: "学识书", goldPrice: 0, PowerUP: "(level*900)exp;2dmg", abilList: "A0LH"};
+items["I0CO"] = {type: "提升属性的物品", name: "学识书", goldPrice: 0, PowerUP: "900exp;2dmg", abilList: "A0LH"};
 items["I0CP"] = {type: "任务", name: "|cffff00ff暗狱之书|r|cffffff00（寻找物品任务）|r", goldPrice: 0};
 items["I0CQ"] = {type: "任务", name: "|cffcc99ff暗狱之书|r", goldPrice: 0};
 items["I0CR"] = {type: "任务", name: "收集|cff99cc00有毒杂草|r", goldPrice: 0};
@@ -571,7 +570,7 @@ items["I0DN"] = {type: "提升属性的物品", name: "经验之书（等级+1�
 items["azhr"] = {type: "道具/戒指/饰品", name: "火把", goldPrice: 200, abilList: "A0HC"};
 items["ches"] = {type: "药剂/食品", name: "奶酪", goldPrice: 0, level: "C+", PowerUP: "10all", abilList: "A0LH"};
 items["gmfr"] = {type: "货币", name: "帝国货币", goldPrice: 1000};
-items["gold"] = {type: "神符", name: "金币", goldPrice: 0};
+items["gold"] = {type: "神符", name: "金币", goldPrice: 0, PowerUP: "500-7500gold"};
 items["manh"] = {type: "道具/戒指/饰品", name: "生命手册", goldPrice: 0, PowerUP: "50hp"};
 items["rdis"] = {type: "神符", name: "盗贼神符（护甲）", goldPrice: 0, PowerUP: "15armor;time10"};
 items["rump"] = {type: "副武器", name: "|cffffcc99沙漠矿铲|r", goldPrice: 100, dmg: 35, abilList: "A0EU,A02L"};
