@@ -39,10 +39,13 @@ function fixFile(filePath) {
   // 6. jass: -> jass.   JASS 原生函数第一个参数是 handle，不能用冒号
   content = content.replace(/\bjass:/g, "jass.");
 
-  // 6b. blizzard: -> blizzard.   模块调用用点号
+  // 6b. japi:DzXxx( -> japi.DzXxx(  DzAPI 函数不是方法，不能用冒号（会多传 japi 表当首参）
+  content = content.replace(/\bjapi:Dz/g, "japi.Dz");
+
+  // 6d. blizzard: -> blizzard.   模块调用用点号
   content = content.replace(/\bblizzard:/g, "blizzard.");
 
-  // 6c. math: -> math.  os: -> os.
+  // 6e. math: -> math.  os: -> os.
   content = content.replace(/\bmath:/g, "math.");
   content = content.replace(/\bos:/g, "os.");
 
@@ -165,6 +168,35 @@ function fixFile(filePath) {
   // 20. 测试233注册.lua：历史上也出现过 f(nil, trig, ...) 的多传 nil 问题
   if (filePath.includes("测试233注册")) {
     content = content.replace(/\bf\s*\(\s*nil\s*,\s*/g, "f(");
+  }
+
+  // 21. 基础UI.lua：japi:DzXxx 会多传 japi 当首参；disp(nil, pl, ...) 去掉 nil 否则 player 错位
+  if (filePath.includes("基础UI")) {
+    content = content.replace(/\bjapi:/g, "japi.");
+    content = content.replace(/getGameUI\s*\(\s*nil\s*\)/g, "getGameUI()");
+    content = content.replace(/disp\s*\(\s*\n\s*nil\s*,\s*\n\s*pl\s*,/g, "disp(pl,");
+  }
+
+  // 22. pr(nil, "msg") -> pr("msg")  TSTL 把 _G.print 当方法生成 pr(nil, ...)，需去掉 nil
+  content = content.replace(/\bpr\s*\(\s*nil\s*,\s*/g, "pr(");
+
+  // 23. ____opt_XX(self, ...) -> ____opt_XX(...)  TSTL optional chaining ?.() 编译时多传了 self
+  // 如 self.config.onClick?.(questId) -> ____opt_N(self, questId) 实际应为 ____opt_N(questId)
+  content = content.replace(/(____opt_\d+)\s*\(\s*self\s*,\s*/g, "$1(");
+
+  // 24. getPid(nil, player) -> getPid(player)  TSTL 把全局函数当方法多传 nil
+  content = content.replace(/\bgetPid\s*\(\s*nil\s*,\s*/g, "getPid(");
+
+  // 25. 任务UI 所有点击回调：pcall 捕获崩溃错误并 DisplayTextToPlayer 显示（调试用）
+  if (filePath.includes("任务UI")) {
+    const wrapErr = (inner) =>
+      `function() local ok, err = pcall(${inner}) if not ok then local j = require("jass.common") if type(j) == "table" and type(j.DisplayTextToPlayer) == "function" then local p = j.Player(0) if p then j.DisplayTextToPlayer(p, 0, 0, "TaskUI err: " .. tostring(err)) end end end end`;
+    content = content.replace(/function\s*\(\)\s*return\s*self:togglePanel\(\)\s*end/g, wrapErr("function() return self:togglePanel() end"));
+    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.MAIN\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.MAIN) end"));
+    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.SIDE\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.SIDE) end"));
+    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.DAILY\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.DAILY) end"));
+    content = content.replace(/function\s*\(\)\s*return\s*self:hide\(\)\s*end/g, wrapErr("function() return self:hide() end"));
+    content = content.replace(/function\s*\(\)\s*return\s*self:selectQuest\(quest\.id\)\s*end/g, wrapErr("function() return self:selectQuest(quest.id) end"));
   }
 
   if (content !== original) {

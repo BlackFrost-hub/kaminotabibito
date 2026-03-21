@@ -5,11 +5,12 @@
  * - 通过包装常见“容易泄露”的 API（计时器 / 单位组 / 触发器 / 特效 / 矩形 / 雾修正器）
  * - 记录：创建次数、销毁次数、当前存活数量
  * - 每个资源可以带一个 tag（来源标记，例如 "dot伤害" / "装备系统"）
- * - 玩家 0 输入 "-leak" 或按 ESC 跳过动画时，打印当前统计信息
+ * - 玩家 0 输入 "-leak" 打印当前统计信息（见 initLeakWatcherTriggers）
  *
  * 注意：
  * - 只能统计“通过本工具包装创建 / 销毁”的资源，旧代码直接调用 JASS 原生的不会被统计到。
- * - 建议先在你最怀疑泄露的系统里尝试用这些包装函数。
+ * - 与「jass.debug 遍历句柄 / 火凌之凤 泄露检测」不是同一套数据：那边是引擎里**所有** +snd/+tmr 等；
+ *   这里是**仅**走 LeakWatcher 的创建/销毁记账，数值不应与 debug 脚本逐条对比。
  */
 
 const jass = require("jass.common") as Record<string, unknown>;
@@ -38,17 +39,34 @@ const stats: Record<LeakType, { created: number; destroyed: number }> = {
   texttag: { created: 0, destroyed: 0 },
 };
 
+/**
+ * Lua 里同一句柄可能以不同引用传入；用 leakType+GetHandleId 作键，避免 delete 对不上导致假 alive。
+ * 禁止 `local j=jass; j.GetHandleId(h)`：TSTL 会编成 `j:GetHandleId(h)`，self 传成 jass 表会崩 → 只用 `(jass as any).GetHandleId(h)`。
+ * CreateSound 等若返回 table 包装，GetHandleId 会报错 → 用 table 引用当 key（track/untrack 同一对象即可）。
+ * 用 TS 的 typeof：Lua 里 table→__TS__TypeOf 为 "object"，userdata 为 "userdata"，不会误判。
+ */
+function leakKey(leakType: LeakType, handle: any): any {
+  if (handle == null) return handle;
+  if (typeof handle === "object" && handle !== null) {
+    return handle;
+  }
+  if (typeof (jass as any).GetHandleId === "function") {
+    return `${leakType}:${(jass as any).GetHandleId(handle)}`;
+  }
+  return handle;
+}
+
 function track(type: LeakType, handle: any, tag: string): void {
   if (!handle) return;
   const s = stats[type];
   s.created++;
-  alive.set(handle, { type, tag, createdIndex: s.created });
+  alive.set(leakKey(type, handle), { type, tag, createdIndex: s.created });
 }
 
 function untrack(type: LeakType, handle: any): void {
   if (!handle) return;
   const s = stats[type];
-  if (alive.delete(handle)) {
+  if (alive.delete(leakKey(type, handle))) {
     s.destroyed++;
   }
 }
@@ -152,6 +170,14 @@ export const LeakWatcher = {
     untrack("sound", s);
   },
 
+  /**
+   * 仅取消 sound 的审计计数（句柄已由 KillSoundWhenDone/DestroySound 等处理时使用）。
+   * 用于 `音效函数` 中「LeakWatcher.createSound + 非 killSoundWhenDone 分支」避免漏 untrack。
+   */
+  releaseSound(s: any): void {
+    untrack("sound", s);
+  },
+
   /** 立刻停止并销毁（更激进，适合需要马上释放时） */
   stopSoundAndKill(s: any, killWhenDone: boolean = true, fadeOut: boolean = false): void {
     if (!s) return;
@@ -188,7 +214,7 @@ export const LeakWatcher = {
       (jass as any).DisplayTimedTextToPlayer(p0, 0, 0, 15, msg);
     };
 
-    printLine("=== 泄露审计 (仅统计使用 LeakWatcher 的资源) ===");
+    printLine("=== LeakWatcher 记账 (非 jass.debug 句柄表) ===");
     for (const tp of types) {
       const s = stats[tp];
       const aliveCount = s.created - s.destroyed;

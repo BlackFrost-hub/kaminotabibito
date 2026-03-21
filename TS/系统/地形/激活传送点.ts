@@ -19,15 +19,11 @@ interface RuntimeEntry {
 // Region -> 配置 + Rect 的映射
 const regionMap = new Map<any, RuntimeEntry>();
 
-function dbg(msg: string): void {
-  if (
-    typeof (jass as any).Player !== "function" ||
-    typeof (jass as any).DisplayTimedTextToPlayer !== "function"
-  ) {
-    return;
-  }
-  (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 10, "[激活传送点] " + msg);
-}
+// function dbg(msg: string): void {
+//   if (typeof (jass as any).Player !== "function" || typeof (jass as any).DisplayTimedTextToPlayer !== "function") return;
+//   (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 10, "[激活传送点] " + msg);
+// }
+function dbg(_msg: string): void {}
 
 function initActivationPointsInternal(): void {
   if (
@@ -35,7 +31,7 @@ function initActivationPointsInternal(): void {
     typeof (jass as any).CreateRegion !== "function" ||
     typeof (jass as any).Rect !== "function"
   ) {
-    dbg("缺少基础 API，初始化终止");
+    // dbg("缺少基础 API，初始化终止");
     return;
   }
 
@@ -137,7 +133,7 @@ function initActivationPointsInternal(): void {
     }
   }
 
-  dbg("已注册激活传送点: " + tostring(enabledCount));
+  // dbg("已注册激活传送点: " + tostring(enabledCount));
 }
 
 /** 在地图初始化时调用（建议用 0.00 秒计时器） */

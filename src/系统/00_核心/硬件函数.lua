@@ -56,6 +56,35 @@ ____exports.KEY_F = {
     F11 = 122,
     F12 = 123
 }
+--- 字母键
+____exports.KEY_LETTER = {
+    A = 65,
+    B = 66,
+    C = 67,
+    D = 68,
+    E = 69,
+    F = 70,
+    G = 71,
+    H = 72,
+    I = 73,
+    J = 74,
+    K = 75,
+    L = 76,
+    M = 77,
+    N = 78,
+    O = 79,
+    P = 80,
+    Q = 81,
+    R = 82,
+    S = 83,
+    T = 84,
+    U = 85,
+    V = 86,
+    W = 87,
+    X = 88,
+    Y = 89,
+    Z = 90
+}
 --- 0-9
 ____exports.KEY_NUM = {
     K0 = 48,
@@ -417,8 +446,19 @@ function ____exports.frameFindByName(self, name, id)
     end
     return ____f_23
 end
---- UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...）
-function ____exports.frameSetScriptByCode(self, frame, eventId, sync, action)
+--- 获取鼠标当前悬停的帧
+function ____exports.getMouseFocus(self)
+    local f = japiFn(nil, "DzGetMouseFocus")
+    local ____f_24
+    if f then
+        ____f_24 = f()
+    else
+        ____f_24 = 0
+    end
+    return ____f_24
+end
+--- UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...），参数顺序与原生一致
+function ____exports.frameSetScriptByCode(self, frame, eventId, action, sync)
     local f = japiFn(nil, "DzFrameSetScriptByCode")
     if f then
         f(frame,
@@ -442,13 +482,13 @@ local function initTestKeyB(self)
     -- 这里改用 DzIsKeyDown(keyCode) 做“边沿检测”：
     -- - last=true 且 down=false 时，判定为“从按下→松开”，只触发一次。
     local lastDownByPid = {}
-    local ____temp_24
+    local ____temp_25
     if type(jass.GetPlayerId) == "function" then
-        ____temp_24 = jass.GetPlayerId
+        ____temp_25 = jass.GetPlayerId
     else
-        ____temp_24 = nil
+        ____temp_25 = nil
     end
-    local getPid = ____temp_24
+    local getPid = ____temp_25
     local function hook(____, st)
         registerKeyEventRawStatus(
             nil,
@@ -457,20 +497,20 @@ local function initTestKeyB(self)
             false,
             function()
                 local getP = japiFn(nil, "DzGetTriggerKeyPlayer")
-                local ____getP_25
+                local ____getP_26
                 if getP then
-                    ____getP_25 = getP()
+                    ____getP_26 = getP()
                 else
-                    ____getP_25 = nil
+                    ____getP_26 = nil
                 end
-                local p = ____getP_25
-                local ____temp_26
+                local p = ____getP_26
+                local ____temp_27
                 if getPid and p then
-                    ____temp_26 = getPid(nil, p)
+                    ____temp_27 = getPid(p)
                 else
-                    ____temp_26 = 0
+                    ____temp_27 = 0
                 end
-                local pid = ____temp_26
+                local pid = ____temp_27
                 local down = ____exports.isKeyDown(nil, ____exports.KEY.B)
                 local last = not not lastDownByPid[pid]
                 lastDownByPid[pid] = down

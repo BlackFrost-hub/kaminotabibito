@@ -93,6 +93,7 @@ require("系统.00_核心.硬件函数")
 require("系统.00_核心.泄露审计")
 require("系统.07_任务.任务接受")
 require("系统.07_任务.任务完成")
+require("系统.07_任务.任务目标更新")
 require("系统.测试.测试事件")
 require("系统.测试.测试事件2")
 require("系统.测试.测试233注册")
@@ -119,4 +120,16 @@ local _____6FC0_6D3B_4F20_9001_70B9 = require("系统.地形.激活传送点")
 if type(_____6FC0_6D3B_4F20_9001_70B9["init激活传送点"]) == "function" then
     _____6FC0_6D3B_4F20_9001_70B9["init激活传送点"](_____6FC0_6D3B_4F20_9001_70B9)
 end
+local _____4EFB_52A1_7BA1_7406_5668 = require("系统.07_任务.任务管理器")
+if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
+    _____4EFB_52A1_7BA1_7406_5668:init()
+end
+local _____4EFB_52A1UI = require("系统.07_任务.任务UI")
+if type(_____4EFB_52A1UI.init) == "function" then
+    _____4EFB_52A1UI:init()
+end
+if type(_____4EFB_52A1UI.registerHotkey) == "function" then
+    _____4EFB_52A1UI:registerHotkey()
+end
+require("系统.测试.任务测试")
 return ____exports

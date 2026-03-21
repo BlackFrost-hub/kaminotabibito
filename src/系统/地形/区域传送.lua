@@ -17,18 +17,7 @@ local panCameraToTimedForPlayer = _____955C_5934_7CFB_7EDF.panCameraToTimedForPl
 -- - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
 local jass = require("jass.common")
 local regionMap = __TS__New(Map)
-local function dbg(self, msg)
-    if type(jass.Player) ~= "function" or type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
-    local p0 = jass.Player(0)
-    jass.DisplayTimedTextToPlayer(
-        p0,
-        0,
-        0,
-        15,
-        msg
-    )
+local function dbg(self, _msg)
 end
 local function checkRegionCondition(self, cond, _unit)
     if not cond or cond == "always" then
@@ -45,23 +34,23 @@ local function runRegionRule(self, rule, unit, owner)
     local totalWeight = 0
     for ____, raw in ipairs(parts) do
         do
-            local __continue8
+            local __continue7
             repeat
                 local s = __TS__StringTrim(raw)
                 if not s then
-                    __continue8 = true
+                    __continue7 = true
                     break
                 end
                 local percentIdx = (string.find(s, "%", nil, true) or 0) - 1
                 if percentIdx <= 0 then
-                    __continue8 = true
+                    __continue7 = true
                     break
                 end
                 local weightStr = __TS__StringTrim(__TS__StringSubstring(s, 0, percentIdx))
                 local rest = __TS__StringTrim(__TS__StringSubstring(s, percentIdx + 1))
                 local weight = __TS__Number(weightStr)
                 if not weight or not __TS__NumberIsFinite(__TS__Number(weight)) or weight <= 0 then
-                    __continue8 = true
+                    __continue7 = true
                     break
                 end
                 local colonIdx = (string.find(rest, ":", nil, true) or 0) - 1
@@ -81,9 +70,9 @@ local function runRegionRule(self, rule, unit, owner)
                         end
                     end
                 end
-                __continue8 = true
+                __continue7 = true
             until true
-            if not __continue8 then
+            if not __continue7 then
                 break
             end
         end
@@ -175,29 +164,23 @@ local function initRegionTeleport(self)
         if enabled then
             enabledCount = enabledCount + 1
         end
-        dbg(nil, (((("配置[" .. k) .. "] 区域ID=") .. (cfg ~= nil and cfg.id or "?")) .. " 是否启用=") .. (enabled and "true" or "false"))
     end
-    dbg(
-        nil,
-        ((("【区域传送】共 " .. tostring(total)) .. " 个配置，启用 ") .. tostring(enabledCount)) .. " 个"
-    )
     for k in pairs(_____533A_57DF_4F20_9001_914D_7F6E) do
         do
-            local __continue39
+            local __continue38
             repeat
                 local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
                 if cfg == nil or not cfg.enabled then
-                    __continue39 = true
+                    __continue38 = true
                     break
                 end
                 if type(jass.CreateRegion) ~= "function" then
-                    __continue39 = true
+                    __continue38 = true
                     break
                 end
                 local region = jass.CreateRegion()
-                dbg(nil, "已创建区域: " .. cfg.id)
                 if type(jass.Rect) ~= "function" then
-                    __continue39 = true
+                    __continue38 = true
                     break
                 end
                 local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -207,11 +190,10 @@ local function initRegionTeleport(self)
                 if type(jass.TriggerRegisterEnterRegion) == "function" then
                     jass.TriggerRegisterEnterRegion(trig, region, nil)
                 end
-                dbg(nil, "已注册区域: " .. cfg.id)
                 regionMap:set(region, cfg)
-                __continue39 = true
+                __continue38 = true
             until true
-            if not __continue39 then
+            if not __continue38 then
                 break
             end
         end
@@ -231,8 +213,6 @@ local function initRegionTeleport(self)
             ____temp_2 = nil
         end
         local region = ____temp_2
-        local regionId = region ~= nil and "(handle)" or "null"
-        dbg(nil, "单位进入区域，region=" .. regionId)
         if unit == nil or region == nil then
             return
         end
@@ -250,7 +230,6 @@ local function initRegionTeleport(self)
             end
         end
         local cfg = regionMap:get(region)
-        dbg(nil, "从 Map 读取配置: " .. (cfg ~= nil and "成功 区域ID=" .. cfg.id or "失败"))
         if cfg == nil then
             return
         end
@@ -262,17 +241,12 @@ local function initRegionTeleport(self)
             runRegionRule(nil, cfg.rule, unit, owner)
             return
         end
-        dbg(
-            nil,
-            (("准备传送至: " .. tostring(cfg.teleportX)) .. ",") .. tostring(cfg.teleportY)
-        )
         if type(jass.SetUnitPosition) == "function" then
             jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
         end
         if type(jass.IssueImmediateOrder) == "function" then
             jass.IssueImmediateOrder(unit, "stop")
         end
-        dbg(nil, "传送完成")
         local player = owner
         if player ~= nil then
             panCameraToTimedForPlayer(
@@ -299,7 +273,6 @@ local function initRegionTeleport(self)
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function(self)
-    dbg(nil, "【区域传送】初始化开始")
     if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
         local t = jass.CreateTimer()
         jass.TimerStart(

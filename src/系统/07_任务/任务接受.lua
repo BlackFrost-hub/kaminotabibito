@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____4EFB_52A1_7BA1_7406_5668 = require("系统.07_任务.任务管理器")
+local handleQuestAccepted = _____4EFB_52A1_7BA1_7406_5668.handleQuestAccepted
 --- 任务系统 - “接受任务”事件桥接（预备版）
 -- 
 -- 设计目标：
@@ -21,19 +23,6 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 --- 简单的调试输出，方便验证管道是否通畅
 local function debugPrint(self, msg)
-    local pr = _G.print
-    if pr ~= nil then
-        pr(nil, "[QuestAccept] " .. msg)
-    end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            8,
-            "[任务接受] " .. msg
-        )
-    end
 end
 --- 使用 Bridge_STES_Register 注册一个自定义事件。
 -- 
@@ -52,15 +41,21 @@ local function registerQuestAcceptedEvent(self)
     jass.TriggerAddAction(
         trig,
         function()
-            local ____temp_2
-            if type(jass.GetTriggerPlayer) == "function" then
-                ____temp_2 = jass.GetTriggerPlayer()
-            else
-                ____temp_2 = nil
+            debugPrint(nil, "任务接受事件触发，调用任务管理器...")
+            do
+                local function ____catch(____error)
+                    debugPrint(
+                        nil,
+                        "处理任务接受事件时出错: " .. tostring(____error)
+                    )
+                end
+                local ____try, ____hasReturned = pcall(function()
+                    handleQuestAccepted(nil)
+                end)
+                if not ____try then
+                    ____catch(____hasReturned)
+                end
             end
-            local p = ____temp_2
-            local playerName = p and type(jass.GetPlayerName) == "function" and jass.GetPlayerName(p) or "未知玩家"
-            debugPrint(nil, ("玩家接受任务事件触发: " .. playerName) .. "（具体任务ID等信息将来从全局变量读取）")
         end
     )
     g.udg_RegTrigger = trig

@@ -18,23 +18,14 @@
  *   本文件会从 jass.globals 里读取这些全局变量来判断“接受的是哪个任务”。
  */
 
-const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as {
-  udg_RegTrigger?: any;
-  udg_RegEventStr?: string;
-  // 预留：未来可在 JASS 里定义全局变量，例如：
-  // udg_QuestPlayer?: any;
-  // udg_QuestId?: number;
-  [key: string]: any;
-};
+const jass = require("jass.common") as any;
+const g = require("jass.globals") as any;
+
+import { handleQuestAccepted } from "./任务管理器";
 
 /** 简单的调试输出，方便验证管道是否通畅 */
 function debugPrint(msg: string): void {
-  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
-  pr?.("[QuestAccept] " + msg);
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "[任务接受] " + msg);
-  }
+  // debugPrint 暂时静音：只用于开发阶段
 }
 
 /**
@@ -59,25 +50,14 @@ function registerQuestAcceptedEvent(): void {
 
   const trig = jass.CreateTrigger();
 
-  // 触发时的 Lua 回调：未来可根据全局变量读取“玩家/任务ID”等信息
+  // 触发时的 Lua 回调：调用任务管理器处理任务接受事件
   jass.TriggerAddAction(trig, () => {
-    const p =
-      typeof jass.GetTriggerPlayer === "function"
-        ? jass.GetTriggerPlayer()
-        : null;
-    const playerName =
-      p && typeof jass.GetPlayerName === "function"
-        ? jass.GetPlayerName(p)
-        : "未知玩家";
-
-    // 预留：从全局变量里取任务 ID（JASS 端在触发前写入）：
-    // const questId = (g as any).udg_QuestId as number | undefined;
-
-    debugPrint(
-      "玩家接受任务事件触发: " +
-        playerName +
-        "（具体任务ID等信息将来从全局变量读取）",
-    );
+    debugPrint("任务接受事件触发，调用任务管理器...");
+    try {
+      handleQuestAccepted();
+    } catch (error) {
+      debugPrint(`处理任务接受事件时出错: ${error}`);
+    }
   });
 
   // 按 Bridge_STES_Register 的约定设置全局变量

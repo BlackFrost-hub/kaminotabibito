@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____4EFB_52A1_7BA1_7406_5668 = require("系统.07_任务.任务管理器")
+local handleQuestCompleted = _____4EFB_52A1_7BA1_7406_5668.handleQuestCompleted
 --- 任务系统 - “完成任务”事件桥接（预备版）
 -- 
 -- 设计目标：
@@ -16,19 +18,6 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local function debugPrint(self, msg)
-    local pr = _G.print
-    if pr ~= nil then
-        pr(nil, "[QuestComplete] " .. msg)
-    end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            8,
-            "[任务完成] " .. msg
-        )
-    end
 end
 local function registerQuestCompletedEvent(self)
     if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.ExecuteFunc) ~= "function" then
@@ -39,15 +28,21 @@ local function registerQuestCompletedEvent(self)
     jass.TriggerAddAction(
         trig,
         function()
-            local ____temp_2
-            if type(jass.GetTriggerPlayer) == "function" then
-                ____temp_2 = jass.GetTriggerPlayer()
-            else
-                ____temp_2 = nil
+            debugPrint(nil, "任务完成事件触发，调用任务管理器...")
+            do
+                local function ____catch(____error)
+                    debugPrint(
+                        nil,
+                        "处理任务完成事件时出错: " .. tostring(____error)
+                    )
+                end
+                local ____try, ____hasReturned = pcall(function()
+                    handleQuestCompleted(nil)
+                end)
+                if not ____try then
+                    ____catch(____hasReturned)
+                end
             end
-            local p = ____temp_2
-            local playerName = p and type(jass.GetPlayerName) == "function" and jass.GetPlayerName(p) or "未知玩家"
-            debugPrint(nil, ("玩家完成任务事件触发: " .. playerName) .. "（具体任务ID等信息将来从全局变量读取）")
         end
     )
     g.udg_RegTrigger = trig

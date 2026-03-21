@@ -1,0 +1,102 @@
+---
+description: DzAPI UI Frame 类型与避坑（1.27e）
+globs: TS/**/表现/**/*.ts, TS/**/*UI*.ts
+alwaysApply: false
+---
+
+# DzAPI UI Frame 类型与避坑
+
+## 支持的 Frame 类型（DzCreateFrameByTagName）
+
+| 类型 | 用途 |
+|------|------|
+| BACKDROP | 背景 |
+| TEXT | 文本 |
+| TEXTAREA | 文字框 |
+| GLUETEXTBUTTON | 按钮 |
+| GLUECHECKBOX | 复选框 |
+| POPUPMENU | 弹出菜单 |
+| SCROLLBAR | 滚动条 |
+| SPRITE | 电影肖像/小精灵 |
+| SLIDER | 滑块 |
+| BUTTON | 按钮 |
+| EDITBOX | 编辑框/文本框 |
+| HIGHLIGHT | 高光模板 |
+| MENU | 菜单 |
+| DIALOG | 对话框 |
+| SIMPLEFRAME | 简单框架 |
+| SIMPLESTATUSBAR | 简易工具栏 |
+| SIMPLECHECKBOX | 简单复选框 |
+
+## 避坑
+
+1. **SPRITE 可能崩溃**：DzAPI 静态文档仅列出 BACKDROP/TEXT/BUTTON/GLUEBUTTON/GLUETEXTBUTTON/FRAME，SPRITE 实测可能导致游戏崩溃。优先用 **BACKDROP + DzFrameSetTexture** 显示头像/图标。
+
+2. **BACKDROP 不接收点击**：BACKDROP 是纯背景，DzFrameSetScriptByCode 点击无效。可点击需用 **BUTTON** 或 **GLUETEXTBUTTON**，再用 DzFrameSetTexture 设贴图。
+
+3. **Layer "ARTWORK" 进游戏直接崩溃**：不要使用。
+
+4. **BUTTON 贴图**：`DzFrameSetTexture(frame, "path.blp", 0)` 可设置按钮贴图。需 `DzFrameSetEnable(frame, true)` 启用。
+
+5. **TSTL 编译**：`japi.XXX` 会编译成 `japi:XXX`，需在 fix-lua-for-pack.js 中把 `japi:` 改为 `japi.`，否则多传 japi 当首参导致参数错位。
+
+6. **template 参数**：DzCreateFrameByTagName 第 4 参用 `"template"` 非 `""`，否则可能创建失败。
+
+7. **GLUETEXTBUTTON + BACKDROP 父子**：BACKDROP 作父，GLUETEXTBUTTON 作子可生效。用 DzFrameSetAllPoints(btn, backdrop) 让按钮覆盖背景。
+
+8. **定位**：DzFrameSetAbsolutePoint(frame, 4, x, y) 绝对坐标，4=CENTER。
+
+**`DzFrameSetScript` / `DzFrameSetScriptByCode` 的 `eventId`（与 `TS/系统/表现/UI工具.ts` 的 `EventType` 一致）**
+
+| 事件 | ID |
+|------|-----|
+| 鼠标点击 | 1 |
+| 鼠标进入 | 2 |
+| 鼠标离开 | 3 |
+| 鼠标释放（抬起） | 4 |
+| 鼠标按下 | 5 |
+| 鼠标滚轮 | 6 |
+| Slider 值变化 | 11 |
+| 鼠标双击 | 12 |
+
+9. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），需用 `DzFrameSetScriptByCode` + 直接传函数。
+
+10. **为 Frame 注册回调（含本机“异步”、即时 UI）**：一律用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。最后一参 **`sync`**：多数 **本机 UI 反馈** 用 **`false`**（本地即时）；需要 **同步到全房** 时用 **`true`**（按需求选，勿与“必须用 ByCode”混淆）。
+
+11. **【UI 回调 + DisplayTextToPlayer】**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，sync=true 或 sync=false 均可。照搬 JASS 单动作模式即可，无需 TriggerExecute。
+
+## 滚动条 / 自定义滑块（thumb）教训（1.27e）
+
+1. **轨道若是 BACKDROP**：不要对它 **`DzFrameSetMinMaxValue` / `DzFrameSetValue`**（易崩）。数值滚动用 **`scrollOffset` 变量** + 列表偏移；需要原生 Slider 时用 **SCROLLBAR/SLIDER** 隐藏层单独管 value。
+
+2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。
+
+3. **thumb 位置与「跟手」拖拽**：`syncScrollThumb` 里用的 **竖直可移动行程**（如 `LIST_VIEW_H - thumbSize ± 补偿` 的 **safeRange 归一化高度**）必须与 **拖拽时 `dy`→`scrollOffset` 用的轨道像素高度** 同源；换算：  
+   **`trackPx ≈ DzGetClientHeight() * safeRangeNorm / 0.6`**（与工程里竖向 **0.6** UI 坐标一致，同 `PY` 思路）。**禁止**用 `windowHeight * 随意常数`（如 `0.35`）当轨道高，否则会与滑块不同步。
+
+4. **全局鼠标注册（拖拽）**：`DzTriggerRegisterMouseEventByCode` **必须** `japi.DzTriggerRegisterMouseEventByCode(trig, …)` **直接调用**，禁止 `const reg = japi.xxx; reg(trig,…)`（TSTL 易编成 **`reg(nil, trig,…)`** → `key=0` / `errjhw(333)`）。参数顺序与 `war3map.j` 里 **`DzTriggerRegisterMouseEventTrg(trg, status, btn)` → 原生 `(btn, status)`** 一致；左键按下 **`(1,1)`**，左键释放 **`(1,0)`**（以本图 JASS 为准）。
+
+5. **Frame 脚本 eventId**：拖拽起点用 **`MOUSE_DOWN`（工程里常量为 `5`）**，不是 **`MOUSE_CLICK`（`1`）**。参考 `TS/系统/表现/UI工具.ts` 的 `EventType`。
+
+## 你这次补充的关键记忆（Frame 系统）
+
+1. **Frame 组与 SimpleFrame 组不要混父子**
+   - SimpleFrames：`SIMPLEFRAME/SIMPLEBUTTON/SIMPLECHECKBOX/SIMPLESTATUSBAR`。
+   - 这两组在父子关系上不稳定，混用常导致“创建成功但行为异常”或直接创建失败。
+   - 任务 UI 这条链（`TaskMainPanel -> TaskListContainer -> Tab/Scroll`）统一用 Frame 组更稳。
+
+2. **FrameLevel 规则不同**
+   - Frame 组：只和同级 siblings 竞争；子帧在父帧层内排序。
+   - SimpleFrame 组：更像全局同层竞争，父子关系影响弱很多。
+   - 结论：重叠问题优先先统一组别，再调 `DzFrameSetLevel`。
+
+3. **父子关系的实际效果**
+   - 子帧可见性依赖父帧可见性。
+   - 子帧默认拷贝父帧的 alpha/scale/level（创建时）。
+   - Functional child（FDF 内定义的功能子帧，如 ButtonText/ControlBackdrop）和 Loose child（代码额外创建）行为不同，前者更依赖模板链。
+
+4. **FDF 语法与定位要点**
+   - 行注释 `//` 与块注释 `/*...*/` 可用。
+   - 非 block action 末尾需逗号。
+   - 路径使用单反斜杠（如 `UI\TaskUI.fdf`）。
+   - `SetPoint` 规则遵循 0.8x0.6 UI 坐标系；Frame 组默认受 4:3 区域约束，超界会形变。

@@ -155,4 +155,4 @@ declare var slk: {
 
 /** Lua math / os */
 declare const math: { random: () => number; randomseed: (seed: number) => void; floor: (n: number) => number };
-declare const os: { clock: () => number };
+declare const os: { clock: () => number; time: () => number };

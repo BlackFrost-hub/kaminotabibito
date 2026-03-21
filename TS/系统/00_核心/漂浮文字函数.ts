@@ -194,7 +194,11 @@ export function CreateFloatTextAtPoint(
  * 销毁漂浮文字
  */
 export function DestroyFloatText(textTag: any): void {
-  if (textTag) {
+  if (!textTag) return;
+
+  if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") {
+    LeakWatcher.destroyTextTag(textTag);
+  } else if (typeof (jass as any).DestroyTextTag === "function") {
     (jass as any).DestroyTextTag(textTag);
   }
 }

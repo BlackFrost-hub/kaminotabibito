@@ -11,11 +11,12 @@ local ____exports = {}
 -- - 通过包装常见“容易泄露”的 API（计时器 / 单位组 / 触发器 / 特效 / 矩形 / 雾修正器）
 -- - 记录：创建次数、销毁次数、当前存活数量
 -- - 每个资源可以带一个 tag（来源标记，例如 "dot伤害" / "装备系统"）
--- - 玩家 0 输入 "-leak" 或按 ESC 跳过动画时，打印当前统计信息
+-- - 玩家 0 输入 "-leak" 打印当前统计信息（见 initLeakWatcherTriggers）
 -- 
 -- 注意：
 -- - 只能统计“通过本工具包装创建 / 销毁”的资源，旧代码直接调用 JASS 原生的不会被统计到。
--- - 建议先在你最怀疑泄露的系统里尝试用这些包装函数。
+-- - 与「jass.debug 遍历句柄 / 火凌之凤 泄露检测」不是同一套数据：那边是引擎里**所有** +snd/+tmr 等；
+--   这里是**仅**走 LeakWatcher 的创建/销毁记账，数值不应与 debug 脚本逐条对比。
 local jass = require("jass.common")
 local alive = __TS__New(Map)
 local types = {
@@ -36,20 +37,39 @@ local stats = {
     sound = {created = 0, destroyed = 0},
     texttag = {created = 0, destroyed = 0}
 }
+--- Lua 里同一句柄可能以不同引用传入；用 leakType+GetHandleId 作键，避免 delete 对不上导致假 alive。
+-- 禁止 `local j=jass; j.GetHandleId(h)`：TSTL 会编成 `j:GetHandleId(h)`，self 传成 jass 表会崩 → 只用 `(jass as any).GetHandleId(h)`。
+-- CreateSound 等若返回 table 包装，GetHandleId 会报错 → 用 table 引用当 key（track/untrack 同一对象即可）。
+-- 用 TS 的 typeof：Lua 里 table→__TS__TypeOf 为 "object"，userdata 为 "userdata"，不会误判。
+local function leakKey(self, leakType, handle)
+    if handle == nil then
+        return handle
+    end
+    if type(handle) == "table" and handle ~= nil then
+        return handle
+    end
+    if type(jass.GetHandleId) == "function" then
+        return (leakType .. ":") .. tostring(jass.GetHandleId(handle))
+    end
+    return handle
+end
 local function track(self, ____type, handle, tag)
     if not handle then
         return
     end
     local s = stats[____type]
     s.created = s.created + 1
-    alive:set(handle, {type = ____type, tag = tag, createdIndex = s.created})
+    alive:set(
+        leakKey(nil, ____type, handle),
+        {type = ____type, tag = tag, createdIndex = s.created}
+    )
 end
 local function untrack(self, ____type, handle)
     if not handle then
         return
     end
     local s = stats[____type]
-    if alive:delete(handle) then
+    if alive:delete(leakKey(nil, ____type, handle)) then
         s.destroyed = s.destroyed + 1
     end
 end
@@ -145,6 +165,9 @@ ____exports.LeakWatcher = {
         end
         untrack(nil, "sound", s)
     end,
+    releaseSound = function(self, s)
+        untrack(nil, "sound", s)
+    end,
     stopSoundAndKill = function(self, s, killWhenDone, fadeOut)
         if killWhenDone == nil then
             killWhenDone = true
@@ -202,7 +225,7 @@ ____exports.LeakWatcher = {
                 msg
             )
         end
-        printLine(nil, "=== 泄露审计 (仅统计使用 LeakWatcher 的资源) ===")
+        printLine(nil, "=== LeakWatcher 记账 (非 jass.debug 句柄表) ===")
         for ____, tp in ipairs(types) do
             local s = stats[tp]
             local aliveCount = s.created - s.destroyed

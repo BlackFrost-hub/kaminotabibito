@@ -13,31 +13,20 @@ local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = _____6FC0_6D3B_4F20_9001_70B9_91
 local jass = require("jass.common")
 local g = require("jass.globals")
 local regionMap = __TS__New(Map)
-local function dbg(self, msg)
-    if type(jass.Player) ~= "function" or type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        10,
-        "[激活传送点] " .. msg
-    )
+local function dbg(self, _msg)
 end
 local function initActivationPointsInternal(self)
     if type(jass.CreateTrigger) ~= "function" or type(jass.CreateRegion) ~= "function" or type(jass.Rect) ~= "function" then
-        dbg(nil, "缺少基础 API，初始化终止")
         return
     end
     local enabledCount = 0
     for key in pairs(_____6FC0_6D3B_4F20_9001_70B9_914D_7F6E) do
         do
-            local __continue6
+            local __continue5
             repeat
                 local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
                 if not cfg or not cfg.enabled then
-                    __continue6 = true
+                    __continue5 = true
                     break
                 end
                 enabledCount = enabledCount + 1
@@ -117,17 +106,13 @@ local function initActivationPointsInternal(self)
                         end
                     )
                 end
-                __continue6 = true
+                __continue5 = true
             until true
-            if not __continue6 then
+            if not __continue5 then
                 break
             end
         end
     end
-    dbg(
-        nil,
-        "已注册激活传送点: " .. tostring(enabledCount)
-    )
 end
 --- 在地图初始化时调用（建议用 0.00 秒计时器）
 ____exports["init激活传送点"] = function(self)

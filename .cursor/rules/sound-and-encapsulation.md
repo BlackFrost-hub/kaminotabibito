@@ -8,8 +8,19 @@ description: 播放音效用 00_核心/音效函数.ts，测试用 测试/测试
 
 - **需要播放音效时**：使用 `TS/系统/00_核心/音效函数.ts` 提供的 API。
   - 3D/坐标/单位/点：`Sound3DII_CooPlay`、`Sound3DII_UnitPlay`、`Sound3DII_LocPlay`
-  - 仅指定玩家听到（如 UI 音效）：`Sound3DII_Mp3Play(path, whichPlayer)`
-- **测试用入口**：`TS/系统/测试/测试事件2.ts`（如聊天 222 触发加金币+收金币音效）。
+  - 仅指定玩家听到（如 UI 音效）：`Sound3DII_Mp3Play(path, whichPlayer)`（内部 CreateSound 后 `KillSoundWhenDone` / 泄露审计 `killSoundWhenDone`，无则定时 `DestroySound` 兜底）
+  - **同路径高频重复**（1 秒内多连同一 wav）：`Sound3DII_Mp3PlayReuse(path, whichPlayer)` — **单句柄** Stop+Start，不每遍 CreateSound；dbg **常驻 +1/path**（非每遍 +1）
+  - **UI 按钮/面板点击**：`SoundUI_ClickPlay(path?)` — 内部即 `Sound3DII_Mp3PlayReuse`。`initSound3DII` 会 **`prewarmUiClickSound`**，开局 +snd **多 1**（故意）
+- **魔兽 1.27e（经典）**：原版注释指**同一路径多实例「同时叠放」**（多路 `CreateSound` / 池化同时起播）约 **4 路**上限；**不是**「每秒只能响 4 声」。**`Sound3DII_Mp3PlayReuse`** 为**单句柄串行** Stop+Start，**实测** 1s 内可听满 **≥12 声**（与聊天 **555** 一致）。
+- **测试用入口**：`TS/系统/测试/测试事件2.ts`
+  - **2222**：**1s 内 4×+1000 + 4 条「+1000」漂浮字**（各 `duration` 回收），收金币音 **复用**，间隔 **0.25s**
+  - **555**：**1s 内 12×+1000 + 12 条漂浮字 + 12 次音**，间隔 **1/11s**；**首次**聊天可能**少听 1 声**（冷启动）
+
+### 误解：「每种音效第一次播都会泄露？」
+
+- **不是**。`Sound3DII_Mp3Play`：**每次** Create，播完 `KillSoundWhenDone` 收句柄，**不会**为「每个 path 第一次」永久多占一个 +snd；**叠放**时只是**同时**存在多个句柄，播完会落下去。
+- **`Sound3DII_Mp3PlayReuse`**：**每个 path 只 Create 一次**，后面 Stop+Start，句柄**关图前一直存在** → dbg 里相当于 **每个用过的 path 常驻 +1**（**设计取舍**，不是「每播一次 +1」）。
+- **若不想**为很多种音效各常驻 +1：别对大量不同 wav 用 **Reuse**，改用 **`Mp3Play`**；**Reuse** 只给**少数**真正高频、同 path 的（UI 点击、金币连播等）。
 
 ## 漂浮文字
 
@@ -27,6 +38,6 @@ description: 播放音效用 00_核心/音效函数.ts，测试用 测试/测试
 
 ## 引用方式
 
-- 音效：`import { Sound3DII_Mp3Play, initSound3DII } from "系统.00_核心.音效函数"`
+- 音效：`import { Sound3DII_Mp3Play, Sound3DII_Mp3PlayReuse, SoundUI_ClickPlay, initSound3DII } from "系统.00_核心.音效函数"`
 - 漂浮文字：`import { CreateFloatTextOnUnit, CreateFloatTextAtPoint } from "系统.00_核心.漂浮文字函数"`
 - 封装：`import { AdjustPlayerStateBJ, AddGoldWithFeedback } from "系统.00_核心.封装函数"`

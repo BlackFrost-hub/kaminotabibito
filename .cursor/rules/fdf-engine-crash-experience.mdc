@@ -1,0 +1,28 @@
+---
+description: FDF + DzCreateFrame 引擎崩溃排查经验（1.27e）
+globs: TS/**/任务UI*.ts, TS/**/表现/**.ts
+alwaysApply: false
+---
+
+# FDF 引擎崩溃经验（你这次的二分结论）
+
+## 结论（最重要）
+1. 即使 `DzLoadToc("UI\\xxx.toc")` 能成功，`DzCreateFrame` 创建某些 FDF 帧也可能在客户端**绘制/交互阶段触发引擎级 crash**。
+2. 这类 crash 不是普通 Lua error，**`pcall` 也拦不住**（所以“止血 pcall”不一定有效）。
+
+## 你这次定位到的具体点
+- 在任务 UI 里：启用 FDF 创建 `TaskScrollBar`（以及当时相关的滚动条帧组合）会导致**进图加载阶段崩溃**。
+- 将 `TaskScrollBar`/滚动条相关帧切回代码创建（或干脆不从 FDF 创建该帧）后，崩溃消失。
+
+## 正确排查方法（推荐固定套路）
+1. 把所有要从 FDF 创建的帧分组（例如：A 容器/Entry，B Tab/Close 交互，C 滚动条）。
+2. 每次只打开其中一组：确认“开一半不崩”后再逐步扩大。
+3. 精确到帧名后：
+   - 继续用 FDF 的帧：保留它们
+   - 会崩的帧：改为 fallback（代码 `createFrame(...)` / 或不创建该控件）
+
+## 实用模板（代码层面的安全策略）
+- `DzLoadToc`：只负责加载资源，用 `pcall` 包住
+- `DzCreateFrame`：即使 `pcall`，也只能防 Lua 层异常；**引擎级 crash 仍不可控**
+- 所以必须有“fallback + 白名单/二分开关”
+

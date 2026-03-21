@@ -19,9 +19,7 @@ local function dumpJapiKeys(self)
         end
         local ____try, ____hasReturned = pcall(function()
             local japi = require("jass.japi")
-            pr(
-                nil,
-                "[japi] typeof=" .. tostring(__TS__TypeOf(japi)
+            pr("[japi] typeof=" .. tostring(__TS__TypeOf(japi)
                 )
             )
             local keys = {}
@@ -30,13 +28,9 @@ local function dumpJapiKeys(self)
                     keys[#keys + 1] = k
                 end
             end
-            pr(
-                nil,
-                "[japi] keys=" .. tostring(#keys)
+            pr("[japi] keys=" .. tostring(#keys)
             )
-            pr(
-                nil,
-                "[japi] list=" .. table.concat(keys, ", ")
+            pr("[japi] list=" .. table.concat(keys, ", ")
             )
         end)
         if not ____try then
@@ -76,9 +70,9 @@ local function dumpDzKeyEventTrgType(self)
             )
         end)
     end
-    pr(nil, "[type] _G.DzTriggerRegisterKeyEventTrg=" .. t0)
-    pr(nil, "[type] jass.common.DzTriggerRegisterKeyEventTrg=" .. t1)
-    pr(nil, "[type] jass.globals.DzTriggerRegisterKeyEventTrg=" .. t2)
+    pr("[type] _G.DzTriggerRegisterKeyEventTrg=" .. t0)
+    pr("[type] jass.common.DzTriggerRegisterKeyEventTrg=" .. t1)
+    pr("[type] jass.globals.DzTriggerRegisterKeyEventTrg=" .. t2)
     do
         pcall(function()
             tP0 = tostring(__TS__TypeOf(require("jass.common").DzGetTriggerKeyPlayer)
@@ -91,8 +85,8 @@ local function dumpDzKeyEventTrgType(self)
             )
         end)
     end
-    pr(nil, "[type] jass.common.DzGetTriggerKeyPlayer=" .. tP0)
-    pr(nil, "[type] jass.japi.DzGetTriggerKeyPlayer=" .. tP1)
+    pr("[type] jass.common.DzGetTriggerKeyPlayer=" .. tP0)
+    pr("[type] jass.japi.DzGetTriggerKeyPlayer=" .. tP1)
     do
         pcall(function()
             tBy0 = tostring(__TS__TypeOf(g.DzTriggerRegisterKeyEventByCode)
@@ -111,9 +105,9 @@ local function dumpDzKeyEventTrgType(self)
             )
         end)
     end
-    pr(nil, "[type] _G.DzTriggerRegisterKeyEventByCode=" .. tBy0)
-    pr(nil, "[type] jass.common.DzTriggerRegisterKeyEventByCode=" .. tBy1)
-    pr(nil, "[type] jass.japi.DzTriggerRegisterKeyEventByCode=" .. tBy2)
+    pr("[type] _G.DzTriggerRegisterKeyEventByCode=" .. tBy0)
+    pr("[type] jass.common.DzTriggerRegisterKeyEventByCode=" .. tBy1)
+    pr("[type] jass.japi.DzTriggerRegisterKeyEventByCode=" .. tBy2)
     local tMx0 = "nil"
     local tMx1 = "nil"
     do
@@ -128,8 +122,8 @@ local function dumpDzKeyEventTrgType(self)
             )
         end)
     end
-    pr(nil, "[type] _G.DzGetMouseX=" .. tMx0)
-    pr(nil, "[type] jass.japi.DzGetMouseX=" .. tMx1)
+    pr("[type] _G.DzGetMouseX=" .. tMx0)
+    pr("[type] jass.japi.DzGetMouseX=" .. tMx1)
 end
 local function bindKeyBN_once_min(self)
     local pr = _G.print
@@ -138,18 +132,18 @@ local function bindKeyBN_once_min(self)
     end
     local g = _G
     if g.__keytest_bound then
-        pr(nil, "[keytest] already bound")
+        pr("[keytest] already bound")
         return
     end
     g.__keytest_bound = true
     local japi = require("jass.japi")
     if type(jass.CreateTrigger) ~= "function" or type(jass.DisplayTimedTextToPlayer) ~= "function" or type(jass.Player) ~= "function" then
-        pr(nil, "[keytest] missing basic jass funcs")
+        pr("[keytest] missing basic jass funcs")
         return
     end
     local f = japi.DzTriggerRegisterKeyEventByCode
     if type(f) ~= "function" then
-        pr(nil, "[keytest] DzTriggerRegisterKeyEventByCode not function")
+        pr("[keytest] DzTriggerRegisterKeyEventByCode not function")
         return
     end
     local function bind(____, key, label)
@@ -176,7 +170,7 @@ local function bindKeyBN_once_min(self)
             end
         )
     end
-    pr(nil, "[keytest] bind B/N (sync=false, key=66/78)")
+    pr("[keytest] bind B/N (sync=false, key=66/78)")
     bind(nil, 66, "B")
     bind(nil, 78, "N")
 end

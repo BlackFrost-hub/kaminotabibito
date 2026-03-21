@@ -1,0 +1,12 @@
+Frame "BACKDROP" "MagePortraitBackdrop" {
+    DecorateFileNames 1,
+    BackdropBackground "ReplaceableTextures\CommandButtons\BTNHeroArchMage.blp",
+    Width 0.08,
+    Height 0.08
+}
+
+Frame "GLUETEXTBUTTON" "MagePortraitButton" {
+    Width 0.08,
+    Height 0.08,
+    Alpha 0
+}

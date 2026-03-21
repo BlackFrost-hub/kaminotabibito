@@ -13,11 +13,12 @@ import { panCameraToTimedForPlayer } from "./镜头系统";
 const regionMap = new Map<any, RegionConfig>();
 
 // 简易调试输出：把关键信息打到玩家 0 屏幕上，便于排查区域是否创建/触发
-function dbg(msg: string): void {
-  if (typeof (jass as any).Player !== "function" || typeof (jass as any).DisplayTimedTextToPlayer !== "function") return;
-  const p0 = (jass as any).Player(0);
-  (jass as any).DisplayTimedTextToPlayer(p0, 0, 0, 15, msg);
-}
+// function dbg(msg: string): void {
+//   if (typeof (jass as any).Player !== "function" || typeof (jass as any).DisplayTimedTextToPlayer !== "function") return;
+//   const p0 = (jass as any).Player(0);
+//   (jass as any).DisplayTimedTextToPlayer(p0, 0, 0, 15, msg);
+// }
+function dbg(_msg: string): void {}
 
 // 解析并判断区域传送的 condition；目前仅支持：
 // - "" 或 "always"：无条件允许
@@ -127,15 +128,15 @@ function initRegionTeleport(): void {
 
   let total = 0;
   let enabledCount = 0;
-  // 先扫一遍，只做统计 & 调试输出（方便确认配置是否读到）
+  // 先扫一遍，只做统计（调试输出已注释）
   for (const k in 区域传送配置) {
     total++;
     const cfg = (区域传送配置 as Record<string, RegionConfig>)[k];
     const enabled = cfg != null && cfg.enabled;
     if (enabled) enabledCount++;
-    dbg("配置[" + k + "] 区域ID=" + (cfg != null ? cfg.id : "?") + " 是否启用=" + (enabled ? "true" : "false"));
+    // dbg("配置[" + k + "] 区域ID=" + (cfg != null ? cfg.id : "?") + " 是否启用=" + (enabled ? "true" : "false"));
   }
-  dbg("【区域传送】共 " + total + " 个配置，启用 " + enabledCount + " 个");
+  // dbg("【区域传送】共 " + total + " 个配置，启用 " + enabledCount + " 个");
 
   // 实际创建 Region 并注册进入事件
   for (const k in 区域传送配置) {
@@ -144,7 +145,7 @@ function initRegionTeleport(): void {
 
     if (typeof (jass as any).CreateRegion !== "function") continue;
     const region = (jass as any).CreateRegion();
-    dbg("已创建区域: " + cfg.id);
+    // dbg("已创建区域: " + cfg.id);
 
     if (typeof (jass as any).Rect !== "function") continue;
     const rect = (jass as any).Rect(cfg.left, cfg.bottom, cfg.right, cfg.top);
@@ -154,7 +155,7 @@ function initRegionTeleport(): void {
     if (typeof (jass as any).TriggerRegisterEnterRegion === "function") {
       (jass as any).TriggerRegisterEnterRegion(trig, region, null);
     }
-    dbg("已注册区域: " + cfg.id);
+    // dbg("已注册区域: " + cfg.id);
     regionMap.set(region, cfg);
   }
 
@@ -167,8 +168,7 @@ function initRegionTeleport(): void {
       typeof (jass as any).GetTriggeringRegion === "function"
         ? (jass as any).GetTriggeringRegion()
         : null;
-    const regionId = region != null ? "(handle)" : "null";
-    dbg("单位进入区域，region=" + regionId);
+    // dbg("单位进入区域，region=" + (region != null ? "(handle)" : "null"));
     if (unit == null || region == null) return;
     // 前置条件：不处理中立敌对单位
     const owner =
@@ -186,7 +186,7 @@ function initRegionTeleport(): void {
       if (owner === neutralAgg) return;
     }
     const cfg = regionMap.get(region);
-    dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
+    // dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
     if (cfg == null) return;
 
     // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
@@ -198,14 +198,14 @@ function initRegionTeleport(): void {
       runRegionRule(cfg.rule as string, unit, owner);
       return;
     }
-    dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
+    // dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
     if (typeof (jass as any).SetUnitPosition === "function") {
       (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
     }
     if (typeof (jass as any).IssueImmediateOrder === "function") {
       (jass as any).IssueImmediateOrder(unit, "stop");
     }
-    dbg("传送完成");
+    // dbg("传送完成");
     const player = owner;
     if (player != null) {
       panCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
@@ -228,7 +228,7 @@ function initRegionTeleport(): void {
 
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */
 export function init区域传送(): void {
-  dbg("【区域传送】初始化开始");
+  // dbg("【区域传送】初始化开始");
   if (typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
     const t = (jass as any).CreateTimer();
     (jass as any).TimerStart(t, 0.00, false, (): void => {

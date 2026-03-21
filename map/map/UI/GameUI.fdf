@@ -1,0 +1,111 @@
+// -- INCLUDE FILES 引用控件模板文件---------------------------------------------------------
+IncludeFile "UI\FrameDef\Glue\BattleNetTemplates.fdf",
+IncludeFile "UI\FrameDef\UI\EscMenuTemplates.fdf",
+IncludeFile "UI\FrameDef\Glue\StandardTemplates.fdf",
+//******************************
+//*
+//* MAIN MENU BUTTONS
+//*
+//******
+
+// 游戏界面
+Frame "BACKDROP" "GameUI" {
+        BackdropBlendAll, //Blend，开启透明通道
+
+}
+Frame "TEXT" "ButtonText" INHERITS "BattleNetButtonTextTemplate" {
+    
+      		//背景
+    		ControlBackdrop "TextBG",
+   		Frame "BACKDROP" "TextBG" {
+   			BackdropBackground  "war3mapImported\StarUI_ItemEmpty.tga",
+     			BackdropBlendAll,
+    		}
+	Text "文本",
+
+}
+	Frame "TEXTBUTTON" "BPK1" {
+		Height 0.03,
+  		Width 0.028,
+  		ControlStyle "AUTOTRACK|HIGHLIGHTONMOUSEOVER",
+  		ButtonPushedTextOffset -0.001f -0.0015f,
+		SetPoint TOPLEFT, "BAG", TOPLEFT, 0.0174, -0.039,
+	
+      		//背景
+    		ControlBackdrop "BPK1UP",
+   		Frame "BACKDROP" "BPK1UP" {
+   			BackdropBackground  "war3mapImported\StarUI_ItemEmpty.tga",
+     			BackdropBlendAll,
+    		}
+
+			
+    		//禁用
+    		ControlDisabledBackdrop "BPK1DIS",
+    		Frame "BACKDROP" "BPK1DIS" {
+        		BackdropBackground  "war3mapImported\StarUI_ItemEmpty.tga",
+        		BackdropBlendAll,
+    		}
+    		//高亮
+    		ControlMouseOverHighlight "BPK1LIGHT",
+    		Frame "HIGHLIGHT" "BPK1LIGHT" {
+        		HighlightType "FILETEXTURE",
+        		HighlightAlphaFile "war3mapImported\StarUI_ItemLight.tga",
+        		HighlightAlphaMode "ADD",
+    		}
+	}
+
+    Frame "Text" "GameText" {
+        FrameFont "x.ttf", 0.012, "",
+       FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+    Frame "Text" "GameTextpx" {
+        FrameFont "x.ttf", 0.008, "",
+        FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+
+	
+    Frame "Text" "GameTextBG" {
+        FrameFont "x.ttf", 0.008, "",
+        FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+	  FontColor 0.63 0.63 0.0 1.0,
+    }
+	
+    Frame "Text" "GameTextBG1" {
+        FrameFont "x.ttf", 0.008, "",
+        FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+	  FontColor 1.0 0.5 0.0 1.0,
+    }
+	
+    Frame "Text" "GameTextBGs" {
+        FrameFont "x.ttf", 0.004, "",
+        FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+	  FontColor 1.0 1.0 1.0 1.0,
+    }
+	    Frame "Text" "GameTextpxR" {
+        FrameFont "x.ttf", 0.008, "",
+        FontJustificationH JUSTIFYRIGHT, //右边对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+        Frame "Text" "GameTextpxL" {
+        FrameFont "x.ttf", 0.010, "",
+        //FontJustificationH JUSTIFYLIFT, //左边对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+// 设置图标
+Frame "BACKDROP" "GameUI_Icon" {
+        BackdropBlendAll, //Blend，开启透明通道
+}
+
+    // 设置模型
+    Frame "SPRITE" "GameUI_Model" {
+    }
+
+    // 设置按钮
+    Frame "GLUETEXTBUTTON" "GameUI_Button" INHERITS WITHCHILDREN "BlankButtonTemplate" {
+        SetAllPoints, //尺寸与锚点全部附加在父控件MallItem上
+    }

@@ -36,6 +36,14 @@ export const KEY_F = {
   F9: 120, F10: 121, F11: 122, F12: 123,
 } as const;
 
+/** 字母键 */
+export const KEY_LETTER = {
+  A: 65, B: 66, C: 67, D: 68, E: 69, F: 70, G: 71,
+  H: 72, I: 73, J: 74, K: 75, L: 76, M: 77, N: 78,
+  O: 79, P: 80, Q: 81, R: 82, S: 83, T: 84,
+  U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90,
+} as const;
+
 /** 0-9 */
 export const KEY_NUM = {
   K0: 48, K1: 49, K2: 50, K3: 51, K4: 52,
@@ -249,8 +257,14 @@ export function frameFindByName(name: string, id: number): number {
   return f ? f(name, id) : 0;
 }
 
-/** UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...） */
-export function frameSetScriptByCode(frame: number, eventId: number, sync: boolean, action: () => void): void {
+/** 获取鼠标当前悬停的帧 */
+export function getMouseFocus(): number {
+  const f = japiFn("DzGetMouseFocus");
+  return f ? f() : 0;
+}
+
+/** UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...），参数顺序与原生一致 */
+export function frameSetScriptByCode(frame: number, eventId: number, action: () => void, sync: boolean): void {
   const f = japiFn("DzFrameSetScriptByCode");
   if (f) f(frame, eventId, action, sync);
 }

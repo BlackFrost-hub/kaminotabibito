@@ -14,22 +14,13 @@
  *   4) jass.ExecuteFunc("Bridge_STES_Register") 交给 JASS 侧调用 STES_Register。
  */
 
-const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as {
-  udg_RegTrigger?: any;
-  udg_RegEventStr?: string;
-  // 预留：未来可在 JASS 里定义任务相关全局变量，例如：
-  // udg_QuestPlayer?: any;
-  // udg_QuestId?: number;
-  [key: string]: any;
-};
+const jass = require("jass.common") as any;
+const g = require("jass.globals") as any;
+
+import { handleQuestCompleted } from "./任务管理器";
 
 function debugPrint(msg: string): void {
-  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
-  pr?.("[QuestComplete] " + msg);
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "[任务完成] " + msg);
-  }
+  // debugPrint 暂时静音：只用于开发阶段
 }
 
 function registerQuestCompletedEvent(): void {
@@ -45,23 +36,12 @@ function registerQuestCompletedEvent(): void {
   const trig = jass.CreateTrigger();
 
   jass.TriggerAddAction(trig, () => {
-    const p =
-      typeof jass.GetTriggerPlayer === "function"
-        ? jass.GetTriggerPlayer()
-        : null;
-    const playerName =
-      p && typeof jass.GetPlayerName === "function"
-        ? jass.GetPlayerName(p)
-        : "未知玩家";
-
-    // 预留：从全局变量里取任务 ID（JASS 在触发前写入）：
-    // const questId = (g as any).udg_QuestId as number | undefined;
-
-    debugPrint(
-      "玩家完成任务事件触发: " +
-        playerName +
-        "（具体任务ID等信息将来从全局变量读取）",
-    );
+    debugPrint("任务完成事件触发，调用任务管理器...");
+    try {
+      handleQuestCompleted();
+    } catch (error) {
+      debugPrint(`处理任务完成事件时出错: ${error}`);
+    }
   });
 
   g.udg_RegTrigger = trig;

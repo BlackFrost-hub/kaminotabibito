@@ -205,7 +205,12 @@ function ____exports.CreateFloatTextAtPoint(self, x, y, text, options)
 end
 --- 销毁漂浮文字
 function ____exports.DestroyFloatText(self, textTag)
-    if textTag then
+    if not textTag then
+        return
+    end
+    if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
+        LeakWatcher:destroyTextTag(textTag)
+    elseif type(jass.DestroyTextTag) == "function" then
         jass.DestroyTextTag(textTag)
     end
 end

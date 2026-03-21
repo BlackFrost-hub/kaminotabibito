@@ -1,0 +1,59 @@
+﻿// -- INCLUDE FILES 引用控件模板文件---------------------------------------------------------
+IncludeFile "UI\FrameDef\Glue\StandardTemplates.fdf",
+
+//******************************
+//*
+//* MAIN MENU BUTTONS
+//*
+//******
+    //做背景图
+    //    类型      名字  ---> 背景  BACKDROP无法响应，但可以设计背景图
+
+
+Frame "BACKDROP" "Background" {
+    BackdropTileBackground, //平铺模式
+    BackdropBackground "UI\Widgets\ToolTips\Human\human-tooltip-background.blp", //背景
+    BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R", // Flags
+    BackdropCornerSize  0.012, //边界大小
+    BackdropEdgeFile "UI\Widgets\BattleNet\bnet-inputbox-border.blp", //背景边缘文件
+    BackdropBlendAll, //Blend，开启透明通道
+
+    //单独的字体
+    //     类型   名字  ---> 文本
+    Frame "Text" "Name" {
+        FrameFont "fonts.ttf", 0.012, "",
+        FontJustificationH JUSTIFYCENTER, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+
+//单独的图片
+    //     类型         名字  ---> 图标
+
+    Frame "BACKDROP" "Icon" {
+    }
+
+    //     类型    名字  --> 文本1
+    Frame "Text" "Text_inf1" {
+        FrameFont "fonts.ttf", 0.011, "", //字体路径 大小
+        FontJustificationH JUSTIFYLEFT, //居中对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }
+
+   //     类型    名字  --> 文本2
+    Frame "Text" "Text_inf2" {
+        FrameFont "fonts.ttf", 0.011, "", //字体路径 大小
+        FontJustificationH JUSTIFYLEFT, //左端对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }	
+   //     类型    名字  --> 文本2
+    Frame "Text" "gold" {
+        FrameFont "fonts.ttf", 0.008, "", //字体路径 大小
+        FontJustificationH JUSTIFYLEFT, //左端对齐
+        FontJustificationV JUSTIFYTOP, //字体对齐V
+    }	
+        
+    //按钮，叠加背景做技能
+    //                类型    名字  --> //设置按钮，用于响应鼠标移动事件、点击事件等等
+    Frame "GLUETEXTBUTTON" "Button" INHERITS WITHCHILDREN "BlankButtonTemplate" {
+        SetAllPoints, //尺寸与锚点全部附加在父控件上
+}

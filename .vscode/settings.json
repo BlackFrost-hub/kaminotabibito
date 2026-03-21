@@ -1,3 +1,4 @@
 {
-    "warcraft.warcraftVersion": "Classic"
+    "warcraft.warcraftVersion": "Classic",
+    "chatgpt.openOnStartup": true
 }

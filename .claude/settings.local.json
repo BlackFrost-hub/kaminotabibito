@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(ls -la *.json)",
+      "WebSearch",
+      "Bash(ls -la imports/UI/scrollbar-*.tga)",
+      "Bash(xxd \"C:/Users/Administrator/Desktop/syzl/imports/war3mapImported/scrollbar-track-gold.tga\")",
+      "Bash(xxd \"C:/Users/Administrator/Desktop/syzl/imports/war3mapImported/scrollbar-thumb-blue.tga\")",
+      "Bash(xxd \"C:/Users/Administrator/Desktop/syzl/map/resource/UI/scrollbar-track-gold.tga\")",
+      "Bash(cp \"C:/Users/Administrator/Desktop/syzl/imports/war3mapImported/scrollbar-track-gold.tga\" \"C:/Users/Administrator/Desktop/syzl/map/resource/war3mapImported/\")",
+      "Bash(cp \"C:/Users/Administrator/Desktop/syzl/imports/war3mapImported/scrollbar-thumb-blue.tga\" \"C:/Users/Administrator/Desktop/syzl/map/resource/war3mapImported/\")",
+      "Bash(ls -la \"C:/Users/Administrator/Desktop/syzl/map/resource/war3mapImported/scrollbar-\"*)",
+      "Bash(ls -la \"C:/Users/Administrator/Desktop/syzl/imports/war3mapImported/scrollbar-\"* \"C:/Users/Administrator/Desktop/syzl/map/resource/war3mapImported/scrollbar-\"*)",
+      "Bash(ls:*)",
+      "Bash(python3 -c \"from PIL import Image; print\\(''PIL ok''\\)\")",
+      "Bash(python -c \"from PIL import Image; print\\(''PIL ok''\\)\")",
+      "Bash(convert --version)",
+      "Bash(magick --version)",
+      "Bash(xxd \".build/_warcraft_vscode_test/resource/war3mapImported/scrollbar-track-gold.blp\")"
+    ]
+  }
+}

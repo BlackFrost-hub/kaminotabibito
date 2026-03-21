@@ -335,6 +335,32 @@ export function Sound3DII_LocPlay(
 }
 
 /**
+ * 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积（极少见环境）。
+ */
+function scheduleDestroySoundIfNeeded(sound: any): void {
+  if (!sound) return;
+  if (typeof (jass as any).DestroySound !== "function" || typeof (jass as any).TimerStart !== "function") return;
+  const Leak = require("系统.00_核心.泄露审计") as { LeakWatcher?: any };
+  const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
+  const t =
+    LW && typeof LW.createTimer === "function"
+      ? LW.createTimer("sound_ui_fallback_destroy")
+      : typeof (jass as any).CreateTimer === "function"
+        ? (jass as any).CreateTimer()
+        : null;
+  if (!t) return;
+  (jass as any).TimerStart(t, 0.55, false, () => {
+    const expired = (jass as any).GetExpiredTimer();
+    (jass as any).DestroySound(sound);
+    if (LW && typeof LW.destroyTimer === "function") {
+      LW.destroyTimer(expired);
+    } else if (typeof (jass as any).DestroyTimer === "function") {
+      (jass as any).DestroyTimer(expired);
+    }
+  });
+}
+
+/**
  * 播放MP3音效（可指定玩家）
  * @param path 音效路径
  * @param player 指定玩家（为null时所有玩家都能听到）
@@ -345,36 +371,36 @@ export function Sound3DII_Mp3Play(
   player: any = null,
   model: SoundModel = defaultSoundModel
 ): any {
-  // 1.27 下 UI 音效频繁播放容易触发“池/通道限制”。这里改为：每次新建 sound，并 KillSoundWhenDone，
+  // 1.27 下 UI 音效频繁播放容易触发“池/通道限制”。这里改为：每次新建 sound，并 KillSoundWhenDone（或兜底 DestroySound），
   // 不依赖 GetSoundFileDuration/计时器/池复用，确保持续多次触发也能响。
-  if (
-    typeof (jass as any).CreateSound === "function" &&
-    typeof (jass as any).StartSound === "function" &&
-    typeof (jass as any).KillSoundWhenDone === "function"
-  ) {
+  if (typeof (jass as any).CreateSound === "function" && typeof (jass as any).StartSound === "function") {
     const Leak = require("系统.00_核心.泄露审计") as { LeakWatcher?: any };
     const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
-    const s =
-      LW && typeof LW.createSound === "function"
-        ? LW.createSound(
-            "sound_mp3",
-            path,
-            false,
-            false,
-            false,
-            model.fadeInRate,
-            model.fadeOutRate,
-            model.soundType
-          )
-        : (jass as any).CreateSound(
-            path,
-            false,
-            false,
-            false,
-            model.fadeInRate,
-            model.fadeOutRate,
-            model.soundType
-          );
+    let trackedByLeak = false;
+    let s: any = null;
+    if (LW && typeof LW.createSound === "function") {
+      s = LW.createSound(
+        "sound_mp3",
+        path,
+        false,
+        false,
+        false,
+        model.fadeInRate,
+        model.fadeOutRate,
+        model.soundType
+      );
+      if (s) trackedByLeak = true;
+    } else {
+      s = (jass as any).CreateSound(
+        path,
+        false,
+        false,
+        false,
+        model.fadeInRate,
+        model.fadeOutRate,
+        model.soundType
+      );
+    }
     if (s) {
       // 应用部分参数（非 3D）
       if (typeof (jass as any).SetSoundChannel === "function") (jass as any).SetSoundChannel(s, model.channel);
@@ -387,10 +413,19 @@ export function Sound3DII_Mp3Play(
       if (shouldPlay) (jass as any).StartSound(s);
 
       // 无论是否本地播放，都标记为“播完销毁”，避免句柄堆积
+      // 经 LeakWatcher.createSound 的必须在审计里 untrack；仅走 killSoundWhenDone 一条链最稳
       if (LW && typeof LW.killSoundWhenDone === "function") {
         LW.killSoundWhenDone(s);
-      } else {
+      } else if (typeof (jass as any).KillSoundWhenDone === "function") {
         (jass as any).KillSoundWhenDone(s);
+        if (trackedByLeak && LW && typeof LW.releaseSound === "function") {
+          LW.releaseSound(s);
+        }
+      } else {
+        scheduleDestroySoundIfNeeded(s);
+        if (trackedByLeak && LW && typeof LW.releaseSound === "function") {
+          LW.releaseSound(s);
+        }
       }
 
       lastPlayedSound = s;
@@ -430,6 +465,84 @@ export function Sound3DII_Mp3Play(
   }
   
   return sound;
+}
+
+// ==================== UI 音效统一封装 ====================
+// 默认按钮点击音效：与魔兽原生 UI 保持一致
+export const DEFAULT_UI_CLICK_SOUND = "Sound\\Interface\\BigButtonClick.wav";
+
+/** 每 path 一个常驻句柄（不经 LeakWatcher）；高频重复同一 wav 用此路径，不每遍 CreateSound（dbg 不会每遍 +snd） */
+const soundReuseByPath: Record<string, any> = {};
+/** 该 path 是否已成功 StartSound 过；首击前勿 StopSound，否则 1.27 下易出现首击无声 */
+const soundReuseHadStartedByPath: Record<string, boolean> = {};
+
+function getOrCreateReuseSound(path: string): any {
+  const cache = soundReuseByPath as any;
+  const hit = cache[path];
+  if (hit) return hit;
+  if (typeof (jass as any).CreateSound !== "function") return null;
+  const m = defaultSoundModel;
+  const s = (jass as any).CreateSound(
+    path,
+    false,
+    false,
+    false,
+    m.fadeInRate,
+    m.fadeOutRate,
+    m.soundType
+  );
+  if (s) cache[path] = s;
+  return s;
+}
+
+/**
+ * 地图加载时预创建默认 UI 点击句柄，首击即可 StartSound（仍走「无 Stop」首击分支）。
+ * 不播放、不占通道；仅 CreateSound。
+ */
+export function prewarmUiClickSound(path: string = DEFAULT_UI_CLICK_SOUND): void {
+  getOrCreateReuseSound(path);
+}
+
+/**
+ * 同一路径重复播放（UI 点击、1 秒内多连同一 wav）：**单句柄** + Stop+Start，不每遍 CreateSound + KillSoundWhenDone。
+ * dbg 常驻 +1/path（非每遍 +1）；与 `Sound3DII_Mp3Play` 按次创建二选一。
+ */
+export function Sound3DII_Mp3PlayReuse(
+  path: string,
+  player: any = null,
+  model: SoundModel = defaultSoundModel
+): void {
+  const p = player === 0 ? null : player;
+  const s = getOrCreateReuseSound(path);
+  if (!s) return;
+  if (typeof (jass as any).SetSoundChannel === "function") (jass as any).SetSoundChannel(s, model.channel);
+  if (typeof (jass as any).SetSoundVolume === "function") (jass as any).SetSoundVolume(s, model.volume);
+  if (typeof (jass as any).SetSoundPitch === "function") (jass as any).SetSoundPitch(s, model.pitch);
+  const shouldPlay =
+    !p ||
+    (typeof (jass as any).GetLocalPlayer === "function" && (jass as any).GetLocalPlayer() === p);
+  if (shouldPlay) {
+    const started = soundReuseHadStartedByPath as any;
+    if (started[path]) {
+      if (typeof (jass as any).StopSound === "function") {
+        (jass as any).StopSound(s, false, false);
+      }
+    } else {
+      started[path] = true;
+    }
+    (jass as any).StartSound(s);
+  }
+  lastPlayedSound = s;
+}
+
+/**
+ * UI 键盘/点击的统一音效入口。
+ * - 默认对所有玩家都能听到（whichPlayer 传 null）。
+ * - 内部走 `Sound3DII_Mp3PlayReuse`（常驻 +1/path）。
+ */
+export function SoundUI_ClickPlay(soundPath: string = DEFAULT_UI_CLICK_SOUND, whichPlayer: any = null): void {
+  const p = whichPlayer === 0 ? null : whichPlayer;
+  Sound3DII_Mp3PlayReuse(soundPath, p);
 }
 
 // ==================== 参数设置函数 ====================
@@ -515,6 +628,7 @@ export function Sound3DII_GetLastPlayedSound(): any {
  */
 export function initSound3DII(): void {
   defaultSoundModel = SoundModel.create();
+  prewarmUiClickSound(DEFAULT_UI_CLICK_SOUND);
 }
 
 // 自动初始化

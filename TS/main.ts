@@ -52,6 +52,7 @@ require("系统.00_核心.硬件函数");
 require("系统.00_核心.泄露审计");
 require("系统.07_任务.任务接受");
 require("系统.07_任务.任务完成");
+require("系统.07_任务.任务目标更新");
 require("系统.测试.测试事件");
 require("系统.测试.测试事件2");
 require("系统.测试.测试233注册");
@@ -68,4 +69,16 @@ const 区域传送 = require("系统.地形.区域传送") as { init区域传送
 if (typeof 区域传送.init区域传送 === "function") 区域传送.init区域传送();
 const 激活传送点 = require("系统.地形.激活传送点") as { init激活传送点: () => void };
 if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.init激活传送点();
+
+// 任务系统初始化
+const 任务管理器 = require("系统.07_任务.任务管理器") as { init: () => void };
+if (typeof 任务管理器.init === "function") 任务管理器.init();
+
+const 任务UI = require("系统.07_任务.任务UI") as { init: () => void; registerHotkey: () => void };
+if (typeof 任务UI.init === "function") 任务UI.init();
+if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
+
+// 任务测试（F10运行测试）
+require("系统.测试.任务测试");
+
 export {};
