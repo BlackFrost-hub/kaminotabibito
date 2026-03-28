@@ -251,6 +251,7 @@ local AUTO_METHODS = {
     "FrameTag",
     "DzCreateSimpleFrame",
     "DzDestroyFrame",
+    "DzF2I",
     "DzDestructablePosition",
     "DzEnableWideScreen",
     "DzExecuteFunc",

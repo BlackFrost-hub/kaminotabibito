@@ -93,12 +93,12 @@ function fixFile(filePath) {
 
   // 15. equip_data 使用 export default，返回 { default = items }，需取 .default 才是物品表（仅当还没有 .default 时添加）
   content = content.replace(
-    /local\s+items\s*=\s*require\s*\(\s*"系统\.装备\.装备数据"\s*\)(?!\s*\.default)/g,
-    "local items = require(\"系统.装备.装备数据\").default"
+    /local\s+items\s*=\s*require\s*\(\s*"系统\.02．物品系统\.01．装备数据"\s*\)(?!\s*\.default)/g,
+    "local items = require(\"系统.02．物品系统.01．装备数据\").default"
   );
 
   // 16. Lua 1-based 修复：TS 里 random(1,n) 配 arr[idx-1] 在 Lua 中 idx=1 时 arr[0]=nil。凡此类“从 1-based 表随机取”处改为 [idx]。规则见 .cursor/rules/war3-tstl-jass-pitfalls.mdc §7
-  if (filePath.includes("装备掉落")) {
+  if (filePath.includes("05．装备掉落")) {
     content = content.replace(
       /out\[#out \+ 1\]\s*=\s*nonAlwaysIds\[idx \- 1\]/g,
       "out[#out + 1] = nonAlwaysIds[idx]"
@@ -131,7 +131,7 @@ function fixFile(filePath) {
   }
 
   // 18. 装备排泄.lua：去掉 jass 调用多传的 nil，保证 RemoveItem/DestroyTrigger 等参数正确
-  if (filePath.includes("装备排泄")) {
+  if (filePath.includes("09．装备排泄")) {
     // 修复私有函数签名：TSTL 多加了 self 参数，导致调用时 item 被错位到 self
     content = content.replace(
       /function registerItemForCleanup\s*\(\s*self\s*,\s*item\s*\)/g,
@@ -187,17 +187,25 @@ function fixFile(filePath) {
   // 24. getPid(nil, player) -> getPid(player)  TSTL 把全局函数当方法多传 nil
   content = content.replace(/\bgetPid\s*\(\s*nil\s*,\s*/g, "getPid(");
 
-  // 25. 任务UI 所有点击回调：pcall 捕获崩溃错误并 DisplayTextToPlayer 显示（调试用）
-  if (filePath.includes("任务UI")) {
-    const wrapErr = (inner) =>
-      `function() local ok, err = pcall(${inner}) if not ok then local j = require("jass.common") if type(j) == "table" and type(j.DisplayTextToPlayer) == "function" then local p = j.Player(0) if p then j.DisplayTextToPlayer(p, 0, 0, "TaskUI err: " .. tostring(err)) end end end end`;
-    content = content.replace(/function\s*\(\)\s*return\s*self:togglePanel\(\)\s*end/g, wrapErr("function() return self:togglePanel() end"));
-    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.MAIN\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.MAIN) end"));
-    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.SIDE\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.SIDE) end"));
-    content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.DAILY\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.DAILY) end"));
-    content = content.replace(/function\s*\(\)\s*return\s*self:hide\(\)\s*end/g, wrapErr("function() return self:hide() end"));
-    content = content.replace(/function\s*\(\)\s*return\s*self:selectQuest\(quest\.id\)\s*end/g, wrapErr("function() return self:selectQuest(quest.id) end"));
+  // 26. dot伤害.lua：TSTL 将 jass.ConvertUnitType 编成局部再 (jass, idx) 调用，首参错位；改为 jass.ConvertUnitType(idx)
+  if (filePath.includes("dot伤害")) {
+    content = content.replace(
+      /____self_(\d+)_ConvertUnitType_(\d+)\(\s*____self_\1\s*,\s*([^)]+)\s*\)/g,
+      "jass.ConvertUnitType($3)"
+    );
   }
+
+  // 25. 任务UI：曾用 pcall + DisplayTextToPlayer 包点击回调便于看 Lua 错；与 DOT 等屏幕调试冲突时保持关闭
+  // if (filePath.includes("任务UI")) {
+  //   const wrapErr = (inner) =>
+  //     `function() local ok, err = pcall(${inner}) if not ok then local j = require("jass.common") if type(j) == "table" and type(j.DisplayTextToPlayer) == "function" then local p = j.Player(0) if p then j.DisplayTextToPlayer(p, 0, 0, "TaskUI err: " .. tostring(err)) end end end end`;
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:togglePanel\(\)\s*end/g, wrapErr("function() return self:togglePanel() end"));
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.MAIN\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.MAIN) end"));
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.SIDE\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.SIDE) end"));
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:switchCategory\(QuestType\.DAILY\)\s*end/g, wrapErr("function() return self:switchCategory(QuestType.DAILY) end"));
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:hide\(\)\s*end/g, wrapErr("function() return self:hide() end"));
+  //   content = content.replace(/function\s*\(\)\s*return\s*self:selectQuest\(quest\.id\)\s*end/g, wrapErr("function() return self:selectQuest(quest.id) end"));
+  // }
 
   if (content !== original) {
     fs.writeFileSync(filePath, content, "utf8");

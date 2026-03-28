@@ -1,18 +1,18 @@
 ---
-description: 播放音效用 00_核心/音效函数.ts，测试用 测试/测试事件2；加金币等封装写在 00_核心/封装函数.ts
+description: 播放音效用 00．核心系统/音效函数.ts，测试用 12．测试系统/测试事件2；加金币等封装写在 00．核心系统/封装函数.ts
 ---
 
 # 音效与封装函数约定
 
 ## 音效
 
-- **需要播放音效时**：使用 `TS/系统/00_核心/音效函数.ts` 提供的 API。
+- **需要播放音效时**：使用 `TS/系统/00．核心系统/音效函数.ts` 提供的 API。
   - 3D/坐标/单位/点：`Sound3DII_CooPlay`、`Sound3DII_UnitPlay`、`Sound3DII_LocPlay`
   - 仅指定玩家听到（如 UI 音效）：`Sound3DII_Mp3Play(path, whichPlayer)`（内部 CreateSound 后 `KillSoundWhenDone` / 泄露审计 `killSoundWhenDone`，无则定时 `DestroySound` 兜底）
   - **同路径高频重复**（1 秒内多连同一 wav）：`Sound3DII_Mp3PlayReuse(path, whichPlayer)` — **单句柄** Stop+Start，不每遍 CreateSound；dbg **常驻 +1/path**（非每遍 +1）
   - **UI 按钮/面板点击**：`SoundUI_ClickPlay(path?)` — 内部即 `Sound3DII_Mp3PlayReuse`。`initSound3DII` 会 **`prewarmUiClickSound`**，开局 +snd **多 1**（故意）
 - **魔兽 1.27e（经典）**：原版注释指**同一路径多实例「同时叠放」**（多路 `CreateSound` / 池化同时起播）约 **4 路**上限；**不是**「每秒只能响 4 声」。**`Sound3DII_Mp3PlayReuse`** 为**单句柄串行** Stop+Start，**实测** 1s 内可听满 **≥12 声**（与聊天 **555** 一致）。
-- **测试用入口**：`TS/系统/测试/测试事件2.ts`
+- **测试用入口**：`TS/系统/12．测试系统/测试事件2.ts`
   - **2222**：**1s 内 4×+1000 + 4 条「+1000」漂浮字**（各 `duration` 回收），收金币音 **复用**，间隔 **0.25s**
   - **555**：**1s 内 12×+1000 + 12 条漂浮字 + 12 次音**，间隔 **1/11s**；**首次**聊天可能**少听 1 声**（冷启动）
 
@@ -24,13 +24,13 @@ description: 播放音效用 00_核心/音效函数.ts，测试用 测试/测试
 
 ## 漂浮文字
 
-- **需要创建漂浮文字时**：使用 `TS/系统/00_核心/漂浮文字函数.ts` 提供的 API。
+- **需要创建漂浮文字时**：使用 `TS/系统/00．核心系统/漂浮文字函数.ts` 提供的 API。
   - 单位：`CreateFloatTextOnUnit(unit, text, options?)`
   - 坐标：`CreateFloatTextAtPoint(x, y, text, options?)`
 
 ## 封装函数
 
-- **加金币、改资源等通用 JASS 封装**：写在 `TS/系统/00_核心/封装函数.ts`。
+- **加金币、改资源等通用 JASS 封装**：写在 `TS/系统/00．核心系统/封装函数.ts`。
   - **金币（推荐）**：`AddGoldWithFeedback({ delta, player? | unit? })`
     - 传 `player`：仅该玩家播放收金币音效，不出漂浮字
     - 传 `unit`：单位头顶出金色漂浮字（±金币），并在单位附近 1500 范围播放收金币音效
@@ -38,6 +38,6 @@ description: 播放音效用 00_核心/音效函数.ts，测试用 测试/测试
 
 ## 引用方式
 
-- 音效：`import { Sound3DII_Mp3Play, Sound3DII_Mp3PlayReuse, SoundUI_ClickPlay, initSound3DII } from "系统.00_核心.音效函数"`
-- 漂浮文字：`import { CreateFloatTextOnUnit, CreateFloatTextAtPoint } from "系统.00_核心.漂浮文字函数"`
-- 封装：`import { AdjustPlayerStateBJ, AddGoldWithFeedback } from "系统.00_核心.封装函数"`
+- 音效：`import { Sound3DII_Mp3Play, Sound3DII_Mp3PlayReuse, SoundUI_ClickPlay, initSound3DII } from "系统.00．核心系统.音效函数"`
+- 漂浮文字：`import { CreateFloatTextOnUnit, CreateFloatTextAtPoint } from "系统.00．核心系统.漂浮文字函数"`
+- 封装：`import { AdjustPlayerStateBJ, AddGoldWithFeedback } from "系统.00．核心系统.封装函数"`

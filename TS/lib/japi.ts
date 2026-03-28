@@ -317,6 +317,7 @@ const AUTO_METHODS: string[] = [
   "FrameTag",
   "DzCreateSimpleFrame",
   "DzDestroyFrame",
+  "DzF2I",
   "DzDestructablePosition",
   "DzEnableWideScreen",
   "DzExecuteFunc",

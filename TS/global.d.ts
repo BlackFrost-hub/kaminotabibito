@@ -35,7 +35,8 @@ interface JassCommon {
   GetManipulatedItem: () => any;
   GetManipulatingUnit: () => any;
   GetTriggerUnit: () => any;
-  GetSelectedUnit: () => any;
+  /** 原生：某单位是否在该玩家当前选中内 */
+  IsUnitSelected: (unit: any, whichPlayer: any) => boolean;
   GetOwningPlayer: (unit: any) => any;
   GetItemTypeId: (item: any) => number;
   GetItemCharges: (item: any) => number;

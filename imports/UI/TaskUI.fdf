@@ -32,25 +32,17 @@ Frame "BACKDROP" "TaskMainPanel" {
     BackdropEdgeFile "UI\Widgets\EscMenu\Human\human-options-menu-border.blp",
     Width 0.35,
     Height 0.5,
-    SetPoint CENTER, "GameUI", CENTER, 0, 0       // 屏幕居中
+    // 与 TS 中 PANEL_REL_TO_ENTRY_* 一致；运行时 ClearAllPoints + setFramePointRelative 覆盖
+    SetPoint TOPLEFT, "TaskEntryIcon", TOPLEFT, 0, -0.02
 }
 
 //---------------------------------------------------------------------------
-// 任务列表容器（在主面板内部）
-// 用来承载具体的任务列表项，可以附加滚动条
+// 任务列表容器：仅布局/裁剪层级，无背景无边框（避免与 TaskMainPanel 形成「双层框」）
+// 最终位置由 TS setFramePointRelative 覆盖；此处尺寸供 FDF 预览
 //---------------------------------------------------------------------------
-Frame "BACKDROP" "TaskListContainer" {
-    BackdropBackground "UI\Widgets\EscMenu\Human\human-options-menu-background.blp",
-    BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
-    BackdropCornerSize 0.04,
-    // 列表容器原始：CornerSize 0.015 -> Insets 0.015 (约 1:1)
-    // 与主面板保持一致，避免嵌套 Backdrop 角部露出/不连贯
-    BackdropBackgroundInsets 0.015 0.015 0.015 0.015,
-    BackdropEdgeFile "UI\Widgets\EscMenu\Human\human-options-menu-border.blp",
+Frame "FRAME" "TaskListContainer" {
     Width 0.32,
     Height 0.4,
-    // 任务列表容器相对主面板底边的留白会在 CornerSize 被放大后露出
-    // 这里把 y 下移 0.04，让底边贴合主面板底边，消除固定位置的缝。
     SetPoint TOPLEFT, "TaskMainPanel", TOPLEFT, 0.015, -0.10
 }
 

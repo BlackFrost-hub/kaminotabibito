@@ -28,6 +28,26 @@ alwaysApply: false
 | SIMPLESTATUSBAR | 简易工具栏 |
 | SIMPLECHECKBOX | 简单复选框 |
 
+## 最小「提示框 / 文本框底」：只建一个 BACKDROP（本图约定，避免乱叠层）
+
+**目标**：提示框、简单边框底图 → **仅一个 `BACKDROP`**，不要默认套 EscMenu 金边切片、不要多条细边拼框（易错位），除非你明确要复杂样式。
+
+**JASS 参考（父级 `DzGetGameUI()` + 绝对点 + 尺寸 + 贴图）：**
+
+```jass
+call YDLocal1Set(frame, "主线任务", DzCreateFrameByTagName("BACKDROP", "主线任务", DzGetGameUI(), "template", 0))
+call DzFrameSetAbsolutePoint(YDLocal1Get(frame, "主线任务"), 4, 0.20, 0.5573046)
+call DzFrameSetSize(YDLocal1Get(frame, "主线任务"), 0.03, 0.03)
+call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wenbenkuang.blp", 0)
+```
+
+- **`DzFrameSetAbsolutePoint(..., 4, x, y)`**：`4` = CENTER（与工程里 `FramePoint.CENTER` 一致）。  
+- **边框/底图一体**：用地图已导入的 **`war3mapImported\wenbenkuang.blp`** 一张贴图即可（路径与 `DzFrameSetTexture(..., 0)` 一致）。
+
+**TS 等价流程（`TS/系统/09．表现系统/UI工具.ts`）**：`createFrame({ type: BACKDROP, parent, template: "template" })` → `setFramePosition` 或 `setFramePointRelative`（相对父级时用）→ `setFrameSize` → `setFrameTexture(path)`（内部即 `DzFrameSetTexture`）。需要文字时再 **单独** `createTextLabel` 叠在子级，勿把 `human-options-menu-border` 等 **Edge 切片**当整图拉伸。
+
+**工程示例**：`TS/系统/05．Buff系统/02．BuffUI.ts` 中 Buff 提示框（单 BACKDROP + `wenbenkuang`）。
+
 ## 避坑
 
 1. **SPRITE 可能崩溃**：DzAPI 静态文档仅列出 BACKDROP/TEXT/BUTTON/GLUEBUTTON/GLUETEXTBUTTON/FRAME，SPRITE 实测可能导致游戏崩溃。优先用 **BACKDROP + DzFrameSetTexture** 显示头像/图标。
@@ -46,7 +66,15 @@ alwaysApply: false
 
 8. **定位**：DzFrameSetAbsolutePoint(frame, 4, x, y) 绝对坐标，4=CENTER。
 
-**`DzFrameSetScript` / `DzFrameSetScriptByCode` 的 `eventId`（与 `TS/系统/表现/UI工具.ts` 的 `EventType` 一致）**
+9. **`DzFrameSetTextAlignment(frame, align)`（创建 TEXT / 文本类 UI 时必查，勿搞混）**  
+   - **参数 `0` = 左对齐**（本图实测记录）。  
+     **参数 `1` = 居中**（本图实测记录）。
+   - 其它取值（如居中/右对齐）以当前平台 **DzAPI / YDWE** 文档为准；未确认前不要凭猜测把 `0` 当成居中。
+
+10. **`DzFrameSetTooltip(hostFrame, tooltipFrameInt)`**（`japi.lua`：第二参为 **integer**）  
+   - 第二参是 **提示用 Frame 的整型 id**，不是 `|cff...|r` 字符串。常见：`DzFrameSetTooltip(宿主, DzF2I(提示框Frame))`；无 `DzF2I` 时可尝试直接传提示框句柄数值。勿与「字符串 tooltip」用法混用。
+
+**`DzFrameSetScript` / `DzFrameSetScriptByCode` 的 `eventId`（与 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType` 一致）**
 
 | 事件 | ID |
 |------|-----|
@@ -59,11 +87,11 @@ alwaysApply: false
 | Slider 值变化 | 11 |
 | 鼠标双击 | 12 |
 
-9. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），需用 `DzFrameSetScriptByCode` + 直接传函数。
+11. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），需用 `DzFrameSetScriptByCode` + 直接传函数。
 
-10. **为 Frame 注册回调（含本机“异步”、即时 UI）**：一律用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。最后一参 **`sync`**：多数 **本机 UI 反馈** 用 **`false`**（本地即时）；需要 **同步到全房** 时用 **`true`**（按需求选，勿与“必须用 ByCode”混淆）。
+12. **为 Frame 注册回调（含本机“异步”、即时 UI）**：一律用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。最后一参 **`sync`**：多数 **本机 UI 反馈** 用 **`false`**（本地即时）；需要 **同步到全房** 时用 **`true`**（按需求选，勿与“必须用 ByCode”混淆）。
 
-11. **【UI 回调 + DisplayTextToPlayer】**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，sync=true 或 sync=false 均可。照搬 JASS 单动作模式即可，无需 TriggerExecute。
+13. **【UI 回调 + DisplayTextToPlayer】**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，sync=true 或 sync=false 均可。照搬 JASS 单动作模式即可，无需 TriggerExecute。
 
 ## 滚动条 / 自定义滑块（thumb）教训（1.27e）
 
@@ -76,7 +104,7 @@ alwaysApply: false
 
 4. **全局鼠标注册（拖拽）**：`DzTriggerRegisterMouseEventByCode` **必须** `japi.DzTriggerRegisterMouseEventByCode(trig, …)` **直接调用**，禁止 `const reg = japi.xxx; reg(trig,…)`（TSTL 易编成 **`reg(nil, trig,…)`** → `key=0` / `errjhw(333)`）。参数顺序与 `war3map.j` 里 **`DzTriggerRegisterMouseEventTrg(trg, status, btn)` → 原生 `(btn, status)`** 一致；左键按下 **`(1,1)`**，左键释放 **`(1,0)`**（以本图 JASS 为准）。
 
-5. **Frame 脚本 eventId**：拖拽起点用 **`MOUSE_DOWN`（工程里常量为 `5`）**，不是 **`MOUSE_CLICK`（`1`）**。参考 `TS/系统/表现/UI工具.ts` 的 `EventType`。
+5. **Frame 脚本 eventId**：拖拽起点用 **`MOUSE_DOWN`（工程里常量为 `5`）**，不是 **`MOUSE_CLICK`（`1`）**。参考 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType`。
 
 ## 你这次补充的关键记忆（Frame 系统）
 

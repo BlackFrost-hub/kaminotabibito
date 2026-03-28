@@ -82,22 +82,22 @@ _G.print = function(...)
     end
     jassConsole.write(str .. "\n")
 end
-require("系统.装备.装备提取")
-require("系统.装备.装备掉落")
-require("系统.单位.单位狂暴")
-require("系统.装备.装备限制")
-require("系统.00_核心.封装函数")
-require("系统.00_核心.音效函数")
-require("系统.00_核心.漂浮文字函数")
-require("系统.00_核心.硬件函数")
-require("系统.00_核心.泄露审计")
-require("系统.07_任务.任务接受")
-require("系统.07_任务.任务完成")
-require("系统.07_任务.任务目标更新")
-require("系统.测试.测试事件")
-require("系统.测试.测试事件2")
-require("系统.测试.测试233注册")
-local ok, err = pcall(function () return require("系统.装备.装备系统") end
+require("系统.02．物品系统.07．装备提取")
+require("系统.02．物品系统.05．装备掉落")
+require("系统.01．单位系统.单位狂暴")
+require("系统.02．物品系统.10．装备限制")
+require("系统.00．核心系统.封装函数")
+require("系统.00．核心系统.音效函数")
+require("系统.00．核心系统.漂浮文字函数")
+require("系统.00．核心系统.硬件函数")
+require("系统.00．核心系统.泄露审计")
+require("系统.08．任务系统.任务接受")
+require("系统.08．任务系统.任务完成")
+require("系统.08．任务系统.任务目标更新")
+require("系统.12．测试系统.测试事件")
+require("系统.12．测试系统.测试事件2")
+require("系统.12．测试系统.测试233注册")
+local ok, err = pcall(function () return require("系统.02．物品系统.11．装备系统") end
     )
 if not ok then
     _G.print(
@@ -105,31 +105,39 @@ if not ok then
         tostring(err)
     )
 end
-require("系统.装备.装备移速")
-require("系统.装备.装备回复")
-require("系统.装备.装备成长")
-require("系统.装备.物品加工")
-require("系统.伤害.伤害事件")
-require("系统.伤害.伤害测试")
-require("系统.伤害.dot伤害")
-local _____533A_57DF_4F20_9001 = require("系统.地形.区域传送")
+require("系统.02．物品系统.08．装备移速")
+require("系统.02．物品系统.06．装备回复")
+require("系统.02．物品系统.04．装备成长")
+require("系统.02．物品系统.03．物品加工")
+require("系统.04．伤害系统.伤害事件")
+require("系统.04．伤害系统.伤害测试")
+local buffPoolCore = require("系统.05．Buff系统.Buff系统")
+if type(buffPoolCore.initBuffSystem) == "function" then
+    buffPoolCore:initBuffSystem()
+end
+require("系统.04．伤害系统.dot伤害")
+local _____533A_57DF_4F20_9001 = require("系统.07．地形系统.区域传送")
 if type(_____533A_57DF_4F20_9001["init区域传送"]) == "function" then
     _____533A_57DF_4F20_9001["init区域传送"](_____533A_57DF_4F20_9001)
 end
-local _____6FC0_6D3B_4F20_9001_70B9 = require("系统.地形.激活传送点")
+local _____6FC0_6D3B_4F20_9001_70B9 = require("系统.07．地形系统.激活传送点")
 if type(_____6FC0_6D3B_4F20_9001_70B9["init激活传送点"]) == "function" then
     _____6FC0_6D3B_4F20_9001_70B9["init激活传送点"](_____6FC0_6D3B_4F20_9001_70B9)
 end
-local _____4EFB_52A1_7BA1_7406_5668 = require("系统.07_任务.任务管理器")
+local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.任务管理器")
 if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
     _____4EFB_52A1_7BA1_7406_5668:init()
 end
-local _____4EFB_52A1UI = require("系统.07_任务.任务UI")
+local _____4EFB_52A1UI = require("系统.08．任务系统.任务UI")
 if type(_____4EFB_52A1UI.init) == "function" then
     _____4EFB_52A1UI:init()
 end
 if type(_____4EFB_52A1UI.registerHotkey) == "function" then
     _____4EFB_52A1UI:registerHotkey()
 end
-require("系统.测试.任务测试")
+require("系统.12．测试系统.任务测试")
+local buffUI = require("系统.05．Buff系统.02．BuffUI")
+if type(buffUI.init) == "function" then
+    buffUI:init()
+end
 return ____exports
