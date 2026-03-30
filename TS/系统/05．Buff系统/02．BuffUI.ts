@@ -30,14 +30,20 @@ import {
   showFrame,
 } from "../09．表现系统/UI工具";
 
-const dotMod = require("系统.04．伤害系统.dot伤害") as {
-  getUnitAntiHeal: (u: any) => { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null;
-  getUnitBurn: (u: any) => { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null;
-};
-const buffPoolMod = require("系统.05．Buff系统.Buff系统") as {
+const buffPoolMod = require("系统.05．Buff系统.00．Buff系统") as {
   isUnitInBuffPool: (u: any) => boolean;
   getBuffIdsOnUnit: (u: any) => string[];
-  getBuffRuntime: (u: any, buffID: string) => { effect: number; remaining: number } | null;
+  getBuffRuntime: (
+    u: any,
+    buffID: string
+  ) => {
+    effect: number;
+    remaining: number;
+    sourceName?: string;
+    _dotParsedDuration?: number;
+    iconOverride?: string;
+  } | null;
+  getDotIconDisplayRemaining: (u: any, buffID: string, realRemaining: number) => number;
 };
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
   buffs: Record<string, { icon: string; tooltip: string; priority: number; buffName: string; interval: number }>;
@@ -48,8 +54,16 @@ type BuffRowId = string;
 
 interface BuffBarRow {
   id: BuffRowId;
-  /** remaining：逻辑剩余秒；_dotParsedDuration：表意「持续总时长」（如 time3→3），提示文案用其固定显示，不随计时刷新 */
-  state: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number };
+  /** remaining：逻辑剩余秒；iconRemaining：与 remaining 一致（由 dot 读数）；_dotParsedDuration：提示里固定总时长 */
+  state: {
+    effect: number;
+    remaining: number;
+    iconRemaining: number;
+    sourceName?: string;
+    _dotParsedDuration?: number;
+  };
+  /** JASS 桥接等写入池的图标覆盖；优先于 01 表 */
+  iconOverride?: string;
 }
 
 /** 原生 Buff 区：左下肖像上方偏右，横向排列（归一化坐标，相对 GameUI） */
@@ -60,6 +74,8 @@ const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
 const MAX_SLOTS = 20;
+/** Buff 条定时刷新间隔（秒），用于图标上剩余时间等 */
+const BUFF_BAR_REFRESH_SEC = 0.1;
 
 const TIP_BOX_TEX = "war3mapImported\\wenbenkuang.blp";
 const TIP_W = 0.22;
@@ -77,6 +93,12 @@ const TIP_COLOR_SOURCE = "|cffffd700";
 function tooltipIntStr(n: number): string {
   if (typeof n !== "number" || !isFinite(n)) return "0";
   return `${Math.floor(Math.max(0, n))}`;
+}
+
+/** 图标底部：剩余时间，一位小数（与逻辑 remaining 同步，由 BUFF_BAR_REFRESH_SEC 刷新） */
+function formatBuffRemainOneDecimal(rem: number): string {
+  if (typeof rem !== "number" || !isFinite(rem)) return "0.0";
+  return Math.max(0, rem).toFixed(1);
 }
 
 function formatDotTooltip(
@@ -114,17 +136,23 @@ function tryDzFrameSetTooltipF2i(hostFrame: number, tooltipFrame: number): void 
 
 interface SlotFrames {
   root: number;
+  /** 图标底部剩余时间（一位小数），在 hit 之下创建以免挡交互 */
+  remainText: number;
   hit: number;
   tipBox: number;
   tipText: number;
 }
 
 const slots: SlotFrames[] = [];
-/** 与槽位一一对应，仅当提示文案变化时才 DzFrameSetText，避免 0.5s 定时器无意义刷新 */
+/** 与槽位一一对应，仅当提示文案变化时才 DzFrameSetText */
 const lastTipStrBySlot: string[] = [];
+/** 与槽位一一对应，仅当剩余时间字符串变化时才更新图标底字 */
+const lastRemainStrBySlot: string[] = [];
 /** 鼠标是否仍悬停在该槽 hit 上；定时 syncBuffBar 不可强行 hideFrame 提示，否则会误关 tooltip */
 const slotHovering: boolean[] = [];
 let refreshTimer: any = undefined;
+/** 防止重复 init：重复创建帧会泄漏、重复注册触发器会导致多次刷新 */
+let buffUiInitialized = false;
 
 /** 为 true 时向本地玩家刷诊断文字（选中数量、handleId、Buff 池、DOT 读数）。 */
 export let BUFF_UI_DEBUG = false;
@@ -179,39 +207,59 @@ function getSoleSelectedUnitForPlayer(p: any): any {
   return sole;
 }
 
+/** 避免对已移除/无效 unit 句柄读 DOT/Buff（句柄复用异次元） */
+function isUnitRefLikelyValid(u: any): boolean {
+  if (u == null || u === 0) return false;
+  if (typeof (jass as any).GetUnitTypeId !== "function") return true;
+  const tid = (jass as any).GetUnitTypeId(u) as number;
+  return tid != null && tid !== 0;
+}
+
 function collectBuffRows(unit: any): BuffBarRow[] {
   const rows: BuffBarRow[] = [];
   if (!buffPoolMod.isUnitInBuffPool(unit)) return rows;
   const ids = buffPoolMod.getBuffIdsOnUnit(unit);
   for (let i = 0; i < ids.length; i++) {
     const bid = ids[i];
-    if (bid === "D001") {
-      const ah = dotMod.getUnitAntiHeal(unit);
-      if (ah != null)
+    if (bid === "D001" || bid === "D002" || bid === "D003" || bid === "D004") {
+      const rt = buffPoolMod.getBuffRuntime(unit, bid);
+      if (rt != null) {
+        const real = rt.remaining;
+        const iconRem =
+          typeof buffPoolMod.getDotIconDisplayRemaining === "function"
+            ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
+            : real;
         rows.push({
-          id: "D001",
+          id: bid,
           state: {
-            effect: ah.effect,
-            remaining: ah.remaining,
-            sourceName: ah.sourceName,
-            _dotParsedDuration: ah._dotParsedDuration,
+            effect: rt.effect,
+            remaining: real,
+            iconRemaining: iconRem,
+            sourceName: rt.sourceName,
+            _dotParsedDuration: rt._dotParsedDuration,
           },
+          iconOverride: rt.iconOverride,
         });
-    } else if (bid === "D002") {
-      const br = dotMod.getUnitBurn(unit);
-      if (br != null)
-        rows.push({
-          id: "D002",
-          state: {
-            effect: br.effect,
-            remaining: br.remaining,
-            sourceName: br.sourceName,
-            _dotParsedDuration: br._dotParsedDuration,
-          },
-        });
+      }
     } else {
       const rt = buffPoolMod.getBuffRuntime(unit, bid);
-      if (rt != null) rows.push({ id: bid, state: { effect: rt.effect, remaining: rt.remaining } });
+      if (rt != null) {
+        const real = rt.remaining;
+        const iconRem =
+          typeof buffPoolMod.getDotIconDisplayRemaining === "function"
+            ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
+            : real;
+        rows.push({
+          id: bid,
+          state: {
+            effect: rt.effect,
+            remaining: real,
+            iconRemaining: iconRem,
+            sourceName: rt.sourceName,
+          },
+          iconOverride: rt.iconOverride,
+        });
+      }
     }
   }
   const buffs = buffTableMod.buffs;
@@ -229,6 +277,7 @@ function hideSlot(i: number): void {
   if (s == null) return;
   slotHovering[i] = false;
   lastTipStrBySlot[i] = "";
+  lastRemainStrBySlot[i] = "";
   if (s.tipText !== 0) hideFrame(s.tipText);
   if (s.tipBox !== 0) hideFrame(s.tipBox);
   if (s.hit !== 0) hideFrame(s.hit);
@@ -250,20 +299,22 @@ function syncBuffBar(): void {
     sole != null && sole !== 0 && typeof (jass as any).GetHandleId === "function"
       ? ((jass as any).GetHandleId(sole) as number)
       : 0;
-  const inPool = sole != null && sole !== 0 && buffPoolMod.isUnitInBuffPool(sole);
-  const ah = sole != null && sole !== 0 ? dotMod.getUnitAntiHeal(sole) : null;
-  const br = sole != null && sole !== 0 ? dotMod.getUnitBurn(sole) : null;
+  const soleOk = sole != null && sole !== 0 && isUnitRefLikelyValid(sole);
+  const inPool = soleOk && buffPoolMod.isUnitInBuffPool(sole);
+  const rtD001 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D001") : null;
+  const rtD002 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D002") : null;
+  const rtD003 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D003") : null;
   if (BUFF_UI_DEBUG) {
-    const rowsProbe = sole != null && sole !== 0 && selN === 1 ? collectBuffRows(sole) : [];
-    const key = `${selN}|${hid}|${inPool}|${ah != null}|${br != null}|${rowsProbe.length}`;
+    const rowsProbe = soleOk && selN === 1 ? collectBuffRows(sole) : [];
+    const key = `${selN}|${hid}|${inPool}|${rtD001 != null}|${rtD002 != null}|${rtD003 != null}|${rowsProbe.length}`;
     if (key !== lastBuffUiDbgKey) {
       lastBuffUiDbgKey = key;
       debugBuffUi(
-        `sel=${selN} hid=${hid} pool=${inPool ? 1 : 0} dotAH=${ah != null ? 1 : 0} dotBr=${br != null ? 1 : 0} rows=${rowsProbe.length}`
+        `sel=${selN} hid=${hid} pool=${inPool ? 1 : 0} D001=${rtD001 != null ? 1 : 0} D002=${rtD002 != null ? 1 : 0} D003=${rtD003 != null ? 1 : 0} rows=${rowsProbe.length}`
       );
     }
   }
-  if (!sole || selN !== 1) {
+  if (!soleOk || selN !== 1) {
     hideAllSlots();
     return;
   }
@@ -277,18 +328,45 @@ function syncBuffBar(): void {
     const row = rows[i];
     const meta = buffs[row.id];
     const slot = slots[i];
-    if (!meta || !slot) continue;
+    if (!slot) continue;
+    const iconTex =
+      row.iconOverride !== undefined && row.iconOverride !== ""
+        ? row.iconOverride
+        : meta != null
+          ? meta.icon
+          : "";
+    if (iconTex === "") continue;
     const pd = row.state._dotParsedDuration;
     const durationForTip =
       typeof pd === "number" && isFinite(pd) && pd > 0 ? pd : row.state.remaining;
-    const tipStr = formatDotTooltip(
-      meta.tooltip,
-      durationForTip,
-      row.state.effect,
-      row.state.sourceName,
-      meta.interval
-    );
-    setFrameTexture(slot.root, meta.icon);
+    const tipStr =
+      meta != null
+        ? formatDotTooltip(
+            meta.tooltip,
+            durationForTip,
+            row.state.effect,
+            row.state.sourceName,
+            meta.interval
+          )
+        : TIP_COLOR_BODY +
+          row.id +
+          " 剩余 " +
+          tooltipIntStr(row.state.remaining) +
+          " 秒，伤害/秒 " +
+          tooltipIntStr(row.state.effect) +
+          "|r\n" +
+          TIP_COLOR_SOURCE +
+          "buff来源为「" +
+          (row.state.sourceName !== undefined && row.state.sourceName !== "" ? row.state.sourceName : "未知") +
+          "」|r";
+    setFrameTexture(slot.root, iconTex);
+    const remStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
+    if (slot.remainText && slot.remainText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
+      if (lastRemainStrBySlot[i] !== remStr) {
+        lastRemainStrBySlot[i] = remStr;
+        (japi as any).DzFrameSetText(slot.remainText, "|cffffffff" + remStr + "|r");
+      }
+    }
     if (slot.tipText && slot.tipText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
       if (lastTipStrBySlot[i] !== tipStr) {
         lastTipStrBySlot[i] = tipStr;
@@ -325,6 +403,29 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
   setFrameSize(bd, { width: ICON_W, height: ICON_H });
   setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp");
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(bd, 180);
+
+  const remainText =
+    createTextLabel(
+      "BuffUIBarRemain" + index,
+      bd,
+      "|cffffffff0.0|r",
+      {
+        relativeTo: bd,
+        point: FramePoint.BOTTOM,
+        relativePoint: FramePoint.BOTTOM,
+        x: 0,
+        y: 0.001,
+      },
+      { width: ICON_W, height: 0.014 }
+    ) || 0;
+  if (remainText && remainText !== 0) {
+    if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
+      (pcall as any)(() => {
+        (japi as any).DzFrameSetTextAlignment(remainText, FramePoint.CENTER);
+      });
+    }
+    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(remainText, 182);
+  }
 
   const hit =
     createFrame({
@@ -407,7 +508,13 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
   if (hit !== 0 && tipBox !== 0) tryDzFrameSetTooltipF2i(hit, tipBox);
 
   hideFrame(bd);
-  return { root: bd, hit: hit || 0, tipBox: tipBox || 0, tipText: tipText || 0 };
+  return {
+    root: bd,
+    remainText: remainText || 0,
+    hit: hit || 0,
+    tipBox: tipBox || 0,
+    tipText: tipText || 0,
+  };
 }
 
 function createUi(): void {
@@ -415,6 +522,7 @@ function createUi(): void {
   if (parent === 0 || parent == null) return;
   for (let j = 0; j < MAX_SLOTS; j++) {
     lastTipStrBySlot[j] = "";
+    lastRemainStrBySlot[j] = "";
     slotHovering[j] = false;
   }
   for (let i = 0; i < MAX_SLOTS; i++) {
@@ -441,12 +549,14 @@ function startRefreshTimer(): void {
   if (refreshTimer != null) return;
   if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") return;
   refreshTimer = jass.CreateTimer();
-  jass.TimerStart(refreshTimer, 0.5, true, () => {
+  jass.TimerStart(refreshTimer, BUFF_BAR_REFRESH_SEC, true, () => {
     syncBuffBar();
   });
 }
 
 export function init(): void {
+  if (buffUiInitialized) return;
+  buffUiInitialized = true;
   createUi();
   registerTriggers();
   startRefreshTimer();

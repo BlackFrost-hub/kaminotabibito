@@ -18,7 +18,12 @@
       "Bash(python -c \"from PIL import Image; print\\(''PIL ok''\\)\")",
       "Bash(convert --version)",
       "Bash(magick --version)",
-      "Bash(xxd \".build/_warcraft_vscode_test/resource/war3mapImported/scrollbar-track-gold.blp\")"
+      "Bash(xxd \".build/_warcraft_vscode_test/resource/war3mapImported/scrollbar-track-gold.blp\")",
+      "Bash(mv \"镜头系统.ts\" \"01．镜头系统.ts\")",
+      "Bash(mv \"区域传送配置.ts\" \"02．区域传送配置.ts\")",
+      "Bash(mv \"区域传送.ts\" \"03．区域传送.ts\")",
+      "Bash(mv \"激活传送点配置.ts\" \"04．激活传送点配置.ts\")",
+      "Bash(mv \"激活传送点.ts\" \"05．激活传送点.ts\")"
     ]
   }
 }

@@ -3,41 +3,62 @@
  *
  * 设计说明（给后续维护或 AI 参考）：
  * - 每种 DOT 通过 registerDotType(config) 注册，配置里包含：解析装备 Buff、取“最强”参数、算每秒伤害、伤害类型、特效模型等。
- * - 覆盖规则：新效果×新持续 > 当前效果×当前剩余 才覆盖；同一次或自己 DOT 触发的伤害不会重复施加（通过 ignoredTargetByType 忽略）。
- * - 共用一套计时器：tickTimer 每 TICK 秒减 remaining；dotTimer 每 1 秒按条目的 amount 造成伤害并播特效；effectRecycleTimer 统一回收特效，无单次计时器泄漏。
+ * - **普攻/远程普攻（8192/16384）**：视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
+ * - **非普攻伤害**（技能等）：仍用「同解析 time → 刷新」或「新乘积更大 → 换条」；DOT 秒跳自伤靠 ignoredTargetByType 整轮跳过，batch 仅挡无普攻位的回调。
+ * - **剩余秒数**：由 `05．Buff系统.00．Buff系统` 的 Buff 池以 `BUFF_POOL_TICK`（0.1s）递减；本模块每 tick 末 `syncDotRemainingFromBuffPool` 把池内 remaining/effect 写回 `stateByType`。
+ * - **dotTimer**：每 1 秒按条目的 amount 造成伤害并播特效；到期以池为准移除条目；effectRecycleTimer 统一回收特效。
  * - 若某 DOT 需要“附加效果”（如 10 秒内减 50 攻），可在 config 里提供 onApply/onTick/onEnd 回调，在施加/每跳/结束时执行。
  *
- * 与 `01．Buff表.ts` 对应：D001「反恢复」、D002「燃烧」。
+ * 与 `01．Buff表.ts` 对应：D001「反恢复」、D002「燃烧」、D003「中毒」、D004「巨魔头颅诅咒」等（`effect` 行与表同步）。
+ * **图标与每跳特效模型**：只改 `01．Buff表.ts` 的 `icon` / `effect`，勿在本文件写死路径。
  * - 反恢复：装备 `Buff:dmg:AntiHeal200%;time3` → 精神伤害，每秒 regenHP×200%，持续 time 秒。
  * - 燃烧：装备 `Buff:dmg:Burn50;time5` → 火焰伤害，每秒固定 damage 点，持续 time 秒（数值由解析结果决定）。
  */
+import type { BuffData } from "../05．Buff系统/01．Buff表";
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 const damageEventModule = require("系统.04．伤害系统.伤害事件") as {
   setNextDamageTypeOverride: (n: number) => void;
   markNextPendingDamageAsDotTickBatch: () => void;
-  registerDamageCallback: (cb: (u: any, d: number, t: number, f: boolean, l: boolean) => void, interval?: number) => void;
+  registerDamageCallback: (
+    cb: (unit: any, d: number, t: number, f: boolean, l: boolean, fromDotTickBatch?: boolean) => void,
+    interval?: number
+  ) => void;
+  hasBit: (v: number, bit: number) => boolean;
+  damageTypeLooksLikeWeaponHitForGearDot: (t: number) => boolean;
 };
+const hasBit = damageEventModule.hasBit;
 const leakCore = require("系统.00．核心系统.泄露审计") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
-const debuffMod = require("系统.05．Buff系统.01．Buff表") as { buffs: Record<string, { buffID?: string }> };
+const debuffMod = require("系统.05．Buff系统.01．Buff表") as { buffs: Record<string, BuffData> };
 const debuffBuffs = debuffMod.buffs;
 
-/** 与 Buff表 D001「反恢复」、D002「燃烧」buffID 对齐，供 UI/其它系统引用 */
+/** DOT 每跳 `AddSpecialEffectTarget` 的模型路径，与同 ID 行的 `effect` 一致 */
+function dotEffectModelFromBuffRow(rowId: "D001" | "D002" | "D003" | "D004"): string {
+  const row = debuffBuffs[rowId];
+  return row != null && typeof row.effect === "string" && row.effect !== "" ? row.effect : "";
+}
+
+/** 与 Buff表 buffID 对齐，供 UI/其它系统引用（新增 Debuff 时在表内加行并在此补键） */
 export const DOT_DEBUFF_IDS = {
   antiHeal: debuffBuffs["D001"]?.buffID ?? "D001",
   burn: debuffBuffs["D002"]?.buffID ?? "D002",
+  poison: debuffBuffs["D003"]?.buffID ?? "D003",
+  trollCurse: debuffBuffs["D004"]?.buffID ?? "D004",
 } as const;
 
-const TICK = 0.25;
 /** 伤害类型位：2048=技能 256=精神，用于 Lua 造成的伤害在事件里显示正确文案 */
 const DAMAGE_TYPE_SKILL = 2048;
 const DAMAGE_TYPE_MIND = 256;
+/** 金属性/酸性在「伤害事件展示位」里的 bit，与 伤害测试 attr 表一致：bit 32 = 金属性 */
+const DAMAGE_TYPE_METAL_UI_BITS_FOR_DISPLAY = 32;
 /**
  * 火焰在「伤害事件展示位」里与 伤害测试 里 attr 表一致：bit4 = 火属性（勿用 common.j 的 32，否则会被显示成「金属性」）。
  * UnitDamageTarget 第 7 参仍传 jass.DAMAGE_TYPE_FIRE（句柄）。
  */
 const DAMAGE_TYPE_FIRE_UI_BITS_FOR_DISPLAY = 4;
+/** 与伤害事件展示一致：4096 = 物理 */
+const DAMAGE_TYPE_PHYSICAL_UI_BITS_FOR_DISPLAY = 4096;
 
 // ========== 通用 DOT 类型配置与注册 ==========
 /** 单种 DOT 的配置：解析 Buff、取装备最强、算伤害、伤害类型、特效、可选附加效果回调 */
@@ -66,6 +87,11 @@ export interface DotTypeConfig {
   onTick?: (target: any, state: any) => void;
   /** 可选：持续结束或被覆盖时调用，用于移除附加效果 */
   onEnd?: (target: any, state: any) => void;
+  /**
+   * 可选：为 true 时，只有攻击伤害（普攻 8192 或技能攻击 2048+8192/16384）才能触发本类 DOT。
+   * 对应装备 Buff 前缀 "Buff:attack:"。
+   */
+  attackOnlyTrigger?: boolean;
 }
 
 const dotTypes: DotTypeConfig[] = [];
@@ -81,27 +107,39 @@ export interface DotState {
   remaining: number;
   /** 施加时来源单位名字（GetUnitName），供 Buff UI 第二行 */
   sourceName?: string;
-  /**
-   * 解析得到的持续秒数（如 time3→3）。用于判定「同档装备反复普攻」时不覆盖，
-   * 否则 newProduct=效果×满持续 恒大于 当前 effect×剩余，会每次都刷新 remaining/ticksLeft，DOT 跳数远超 time。
-   */
+  /** 解析得到的持续秒数（如 time3→3）。用于判定「同档」：再次命中时整段重置为该 time，不与更强装备混淆。 */
   _dotParsedDuration?: number;
   [key: string]: any;
 }
 
-/** Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.Buff系统 */
+/** Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统 */
 function notifyBuffPool(typeId: string, target: any, state: DotState | null): void {
   (pcall as any)(() => {
-    const m = require("系统.05．Buff系统.Buff系统") as { syncDotBuff?: (tid: string, u: any, s: { effect: number; remaining: number } | null) => void };
+    const m = require("系统.05．Buff系统.00．Buff系统") as {
+      syncDotBuff?: (
+        tid: string,
+        u: any,
+        s: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
+      ) => void;
+    };
     if (m != null && typeof m.syncDotBuff === "function") m.syncDotBuff(typeId, target, state);
   });
 }
 
 /** 按类型、再按目标存状态。stateByType[typeId][GetHandleId(target)] = { effect, remaining, _dotUnitRef?, ... } */
 const stateByType: Record<string, Record<any, DotState>> = {};
-/** 每 1 秒执行一次的伤害条：typeId、来源、目标、每跳伤害、剩余跳数、特效用模型与时长 */
-interface DotTickEntry { typeId: string; source: any; target: any; amount: number; ticksLeft: number; effectModel: string; effectDuration: number }
+/** 每 1 秒执行一次的伤害条：typeId、来源、目标、每跳伤害、特效用模型与时长（是否仍持续以 Buff 池 remaining 为准） */
+interface DotTickEntry { typeId: string; source: any; target: any; amount: number; effectModel: string; effectDuration: number }
 const dotTicks: DotTickEntry[] = [];
+
+/** Buff 池 buffID → dot typeId（与 00．Buff系统 DOT_TYPE_TO_BUFF_ID 互逆） */
+function dotTypeIdFromBuffId(buffID: string): string | null {
+  if (buffID === "D001") return "antiHeal";
+  if (buffID === "D002") return "burn";
+  if (buffID === "D003") return "poison";
+  if (buffID === "D004") return "trollCurse";
+  return null;
+}
 /** 刚被我们「某类型」伤害打到的单位，下一帧伤害回调里跳过对该类型施加，避免 DOT 触发的伤害再次叠 DOT */
 const ignoredTargetByType: Record<string, Record<any, boolean>> = {};
 /** 一次 dotTickRun 内可能多次 UnitDamageTarget，ignored 被前一次 onDamage 清空后后续 DOT 仍会进 apply；本表在整轮 tick 内抑制对该目标的装备叠层 */
@@ -109,7 +147,6 @@ let dotTickBatchTargetHids: Record<number, boolean> | null = null;
 /** 与 dotTickBatchTargetHids 同步快照，供 notify 时比对；秒跳批次数清依赖 伤害事件 延后回调而非 Timer(0) */
 let dotBatchSnapForClear: Record<number, boolean> | null = null;
 let dotBatchDeferredRemaining = 0;
-let tickTimer: any = undefined;
 let dotTimer: any = undefined;
 
 /** 特效回收：每 0.2s 检查，到期 DestroyEffect；只用一个周期计时器，不创建单次计时器 */
@@ -128,13 +165,44 @@ function unitHid(u: any): number {
   return (jass as any).GetHandleId(u) as number;
 }
 
-/** 该目标上本类 DOT 是否仍有未执行的秒级跳数（与 state.remaining 不同步时作兜底） */
-function hasPendingDotTick(typeId: string, hid: number): boolean {
-  for (let i = 0; i < dotTicks.length; i++) {
+function removeDotTicksForTargetHid(typeId: string, tgtHid: number): void {
+  for (let i = dotTicks.length - 1; i >= 0; i--) {
     const e = dotTicks[i];
-    if (e.typeId === typeId && unitHid(e.target) === hid && e.ticksLeft > 0) return true;
+    if (e.typeId === typeId && unitHid(e.target) === tgtHid) dotTicks.splice(i, 1);
   }
-  return false;
+}
+
+/** pairs 迭代可能混用 number / string 键，不合并会导致「同目标两行状态」或 onDamage 读不到 cur、乘积误判。 */
+function tabRowForHid(tab: Record<any, any>, hid: number): any {
+  if (hid === 0) return null;
+  const n = tab[hid];
+  if (n != null) return n;
+  return (tab as any)[`${hid}`];
+}
+
+function tabSetHid(tab: Record<any, any>, hid: number, state: DotState): void {
+  if (hid === 0) return;
+  delete (tab as any)[`${hid}`];
+  tab[hid] = state;
+}
+
+function tabDeleteHid(tab: Record<any, any>, hid: number): void {
+  if (hid === 0) return;
+  delete tab[hid];
+  delete (tab as any)[`${hid}`];
+}
+
+function collectHidsInTab(tab: Record<any, any>): number[] {
+  const seen: Record<number, boolean> = {};
+  const out: number[] = [];
+  for (const k in tab) {
+    const kn = typeof k === "number" ? (k as number) : parseInt(`${k}`, 10);
+    if (isNaN(kn) || kn === 0) continue;
+    if (seen[kn]) continue;
+    seen[kn] = true;
+    out.push(kn);
+  }
+  return out;
 }
 
 function getDotSourceDisplayName(u: any): string {
@@ -144,21 +212,6 @@ function getDotSourceDisplayName(u: any): string {
     if (n !== undefined && n !== null && `${n}` !== "") return `${n}`;
   }
   return "未知";
-}
-
-/** 为 true 时在屏幕刷 [DOT] 诊断（tick 序号、ticksLeft、施加/跳过原因）。排查完改回 false。 */
-export let DOT_DAMAGE_DEBUG = false;
-let dotDbgTickSeq = 0;
-
-function dotDbg(msg: string): void {
-  if (!DOT_DAMAGE_DEBUG) return;
-  const pr = (globalThis as any).print;
-  if (typeof pr === "function") pr("[DOT] " + msg);
-  if (typeof (jass as any).DisplayTextToPlayer !== "function") return;
-  for (let pi = 0; pi <= 3; pi++) {
-    const p = (jass as any).Player(pi);
-    if (p != null) (jass as any).DisplayTextToPlayer(p, 0, 0, "[DOT] " + msg);
-  }
 }
 
 /**
@@ -248,46 +301,100 @@ function isValidDotStateRow(v: any): boolean {
   return v != null && typeof v === "object" && typeof (v as DotState).remaining === "number" && typeof (v as DotState).effect === "number";
 }
 
-// ========== 通用：remaining 递减；无状态时回收 tickTimer ==========
-function tick(): void {
+/**
+ * Buff 池每 0.1s 递减后调用：把池内 remaining/effect 写回 `stateByType`；池已无行则清理逻辑层与秒跳队列。
+ */
+export function syncDotRemainingFromBuffPool(): void {
+  const buffM = require("系统.05．Buff系统.00．Buff系统") as {
+    getBuffRuntimeByHid?: (hid: number, buffID: string) => { remaining: number; effect: number; sourceName?: string; _dotParsedDuration?: number } | null;
+    DOT_TYPE_TO_BUFF_ID?: Record<string, string>;
+  };
+  const map = buffM.DOT_TYPE_TO_BUFF_ID;
+  if (map == null || typeof buffM.getBuffRuntimeByHid !== "function") return;
+
   for (const typeId in stateByType) {
-    const tab = stateByType[typeId];
+    const tab = (stateByType as any)[typeId];
     if (tab == null) continue;
-    for (const k in tab) {
-      const v = tab[k];
-      if (v == null) continue;
-      if (!isValidDotStateRow(v)) {
-        delete tab[k];
+    const buffID = (map as any)[typeId] as string | undefined;
+    if (buffID == null || buffID === "") continue;
+    const hids = collectHidsInTab(tab);
+    for (let hi = 0; hi < hids.length; hi++) {
+      const kn = hids[hi];
+      const v = tabRowForHid(tab, kn);
+      if (v == null || !isValidDotStateRow(v)) {
+        tabDeleteHid(tab, kn);
         continue;
       }
-      v.remaining = v.remaining - TICK;
-      if (v.remaining <= 0) {
+      const rt = buffM.getBuffRuntimeByHid(kn, buffID);
+      if (rt == null || rt.remaining <= 0) {
         const cfg = dotTypes.find(c => c.id === typeId);
         if (cfg != null && typeof cfg.onEnd === "function") {
           const uref = (v as any)._dotUnitRef;
-          (cfg as any).onEnd(uref != null ? uref : k, v);
+          (cfg as any).onEnd(uref != null ? uref : kn, v);
         }
-        notifyBuffPool(typeId, k, null);
-        delete tab[k];
+        notifyBuffPool(typeId, kn, null);
+        tabDeleteHid(tab, kn);
+        removeDotTicksForTargetHid(typeId, kn);
+        continue;
       }
+      v.remaining = rt.remaining;
+      v.effect = rt.effect;
+      if (rt.sourceName !== undefined) v.sourceName = rt.sourceName;
+      if (rt._dotParsedDuration !== undefined) v._dotParsedDuration = rt._dotParsedDuration;
     }
   }
-  let hasAny = false;
-  for (const typeId in stateByType) {
-    const tab = stateByType[typeId];
-    if (tab == null) continue;
-    for (const _ in tab) { hasAny = true; break; }
-    if (hasAny) break;
+}
+
+/** Buff 池判定某 DOT 到期时调用（池行已删，勿再 syncDotBuff null） */
+export function clearDotByBuffPoolExpire(buffID: string, hid: number): void {
+  const typeId = dotTypeIdFromBuffId(buffID);
+  if (typeId == null || hid === 0) return;
+  const tab = (stateByType as any)[typeId];
+  if (tab == null) return;
+  const v = tabRowForHid(tab, hid);
+  if (v != null && isValidDotStateRow(v)) {
+    const cfg = dotTypes.find(c => c.id === typeId);
+    if (cfg != null && typeof cfg.onEnd === "function") {
+      const uref = (v as any)._dotUnitRef;
+      (cfg as any).onEnd(uref != null ? uref : hid, v);
+    }
   }
-  if (!hasAny && tickTimer != null) {
-    LeakWatcher.destroyTimer(tickTimer);
-    tickTimer = undefined;
+  tabDeleteHid(tab, hid);
+  removeDotTicksForTargetHid(typeId, hid);
+}
+
+/**
+ * 伤害事件延后展示前调用：用**整段** `udg_TempDamageType` 判定普攻位，每刀只叠一次装备 DOT，避免多段伤害丢 8192/16384。
+ * 与 `onDamage` 内普攻分支互斥：回调里 `isAttackHitForDot` 为真时不再叠层。
+ */
+export function tryApplyHeroAttackGearDots(source: any, target: any, _damage: number): void {
+  if (!target || !source) return;
+  if (!isSourceHeroPlayer1to4(source)) return;
+  const tgtHid = unitHid(target);
+  for (let t = 0; t < dotTypes.length; t++) {
+    const cfg = dotTypes[t];
+    const typeId = cfg.id;
+    if (cfg.debuffDotEnemyNoStructure === true && !isDebuffDotTargetOk(source, target)) {
+      continue;
+    }
+    const best = cfg.getBestFromUnit(source);
+    if (best == null) continue;
+    const amount = cfg.computeAmount(target, best);
+    if (amount <= 0) continue;
+    if ((stateByType as any)[typeId] == null) (stateByType as any)[typeId] = {};
+    const tab = (stateByType as any)[typeId];
+    const curRaw = tabRowForHid(tab, tgtHid);
+    let cur: DotState | null = isValidDotStateRow(curRaw) ? (curRaw as DotState) : null;
+    if (curRaw != null && cur == null) {
+      tabDeleteHid(tab, tgtHid);
+    }
+    applyEquipmentDotOnHeroAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
   }
 }
 
 /** 在目标身上挂特效，model/duration 由调用方传入；回收走统一列表 */
 function addDotEffectOnUnit(unit: any, model: string, duration: number): void {
-  if (!unit || typeof (jass as any).AddSpecialEffectTarget !== "function") return;
+  if (!unit || !model || model === "" || typeof (jass as any).AddSpecialEffectTarget !== "function") return;
   const eff = (jass as any).AddSpecialEffectTarget(model, unit, "origin");
   if (eff == null) return;
   if (typeof (jass as any).YDWETimerDestroyEffect === "function") {
@@ -352,10 +459,155 @@ export function notifyDotTickBatchDamageDisplayed(): void {
   }
 }
 
-// ========== 每 1 秒：按条造成伤害、挂特效、扣剩余跳数 ==========
+/** 判定「同一件装备解析出的 time」是否与当前状态一致（仅用于非普攻叠层） */
+const DURATION_TIER_EPS = 0.05;
+
+function sameDurationTier(cur: DotState, bestDuration: number): boolean {
+  return cur._dotParsedDuration != null && Math.abs(bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS;
+}
+
+function ensureDotTimers(): void {
+  /** 禁止 `const j = jass; j.TimerStart(...)`：TSTL 会编成 `j:TimerStart` 导致 bad self（jhandle_t expected, got table） */
+  if (dotTimer == null && typeof (jass as any).TimerStart === "function") {
+    dotTimer = LeakWatcher.createTimer("dot_tick");
+    (jass as any).TimerStart(dotTimer, 1, true, dotTickRun);
+  }
+}
+
+function pushDotTickForTarget(
+  typeId: string,
+  source: any,
+  target: any,
+  tgtHid: number,
+  amount: number,
+  duration: number,
+  cfg: DotTypeConfig
+): void {
+  for (let i = dotTicks.length - 1; i >= 0; i--) {
+    const e = dotTicks[i];
+    if (e.typeId === typeId && unitHid(e.target) === tgtHid) dotTicks.splice(i, 1);
+  }
+  dotTicks.push({
+    typeId,
+    source,
+    target,
+    amount,
+    effectModel: cfg.effectModel,
+    effectDuration: cfg.effectDuration,
+  });
+}
+
+function fillDotStateRow(cur: DotState, target: any, source: any, amount: number, bestDuration: number): void {
+  cur.effect = amount;
+  cur.remaining = bestDuration;
+  cur._dotParsedDuration = bestDuration;
+  cur._dotUnitRef = target;
+  cur.sourceName = getDotSourceDisplayName(source);
+}
+
+/**
+ * 普攻/弩命中：始终以当前背包 `best` 写满持续时间（有条刷新、无条新建），不再走乘积分支。
+ */
+function applyEquipmentDotOnHeroAttack(
+  typeId: string,
+  cfg: DotTypeConfig,
+  tab: Record<any, any>,
+  tgtHid: number,
+  target: any,
+  source: any,
+  amount: number,
+  bestDuration: number,
+  cur: DotState | null
+): void {
+  if (cur != null) {
+    fillDotStateRow(cur, target, source, amount, bestDuration);
+    pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
+    notifyBuffPool(typeId, target, cur);
+  } else {
+    const state: DotState = {
+      effect: amount,
+      remaining: bestDuration,
+      _dotUnitRef: target,
+      sourceName: getDotSourceDisplayName(source),
+      _dotParsedDuration: bestDuration,
+    };
+    tabSetHid(tab, tgtHid, state);
+    pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
+    notifyBuffPool(typeId, target, state);
+    if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
+  }
+  ensureDotTimers();
+}
+
+/** 技能等非普攻伤害：同档刷新或乘积更强时换条 */
+function applyEquipmentDotOnNonAttack(
+  typeId: string,
+  cfg: DotTypeConfig,
+  tab: Record<any, any>,
+  tgtHid: number,
+  target: any,
+  source: any,
+  amount: number,
+  bestDuration: number,
+  cur: DotState | null
+): void {
+  if (cur == null) {
+    const state: DotState = {
+      effect: amount,
+      remaining: bestDuration,
+      _dotUnitRef: target,
+      sourceName: getDotSourceDisplayName(source),
+      _dotParsedDuration: bestDuration,
+    };
+    tabSetHid(tab, tgtHid, state);
+    pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
+    notifyBuffPool(typeId, target, state);
+    if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
+    ensureDotTimers();
+    return;
+  }
+  if (sameDurationTier(cur, bestDuration)) {
+    fillDotStateRow(cur, target, source, amount, bestDuration);
+    pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
+    notifyBuffPool(typeId, target, cur);
+    ensureDotTimers();
+    return;
+  }
+  const currentProduct = cur.effect * cur.remaining;
+  const newProduct = amount * bestDuration;
+  if (newProduct <= currentProduct) return;
+  if (typeof cfg.onEnd === "function") (cfg as any).onEnd(target, cur);
+  const state: DotState = {
+    effect: amount,
+    remaining: bestDuration,
+    _dotUnitRef: target,
+    sourceName: getDotSourceDisplayName(source),
+    _dotParsedDuration: bestDuration,
+  };
+  tabSetHid(tab, tgtHid, state);
+  pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
+  notifyBuffPool(typeId, target, state);
+  if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
+  ensureDotTimers();
+}
+
+// ========== 每 1 秒：按条造成伤害、挂特效；是否仍持续以 Buff 池 remaining 为准 ==========
 function dotTickRun(): void {
-  dotDbgTickSeq = dotDbgTickSeq + 1;
-  dotDbg(`dotTick#${dotDbgTickSeq} entries=${dotTicks.length}`);
+  const buffM = require("系统.05．Buff系统.00．Buff系统") as {
+    getBuffRuntimeByHid?: (hid: number, buffID: string) => { remaining: number } | null;
+    DOT_TYPE_TO_BUFF_ID?: Record<string, string>;
+  };
+  for (let i = dotTicks.length - 1; i >= 0; i--) {
+    const e = dotTicks[i];
+    const eh = unitHid(e.target);
+    const bid =
+      buffM.DOT_TYPE_TO_BUFF_ID != null ? ((buffM.DOT_TYPE_TO_BUFF_ID as any)[e.typeId] as string | undefined) : undefined;
+    const rt =
+      bid != null && bid !== "" && typeof buffM.getBuffRuntimeByHid === "function"
+        ? buffM.getBuffRuntimeByHid(eh, bid)
+        : null;
+    if (rt == null || rt.remaining <= 0.001) dotTicks.splice(i, 1);
+  }
   const batch: Record<number, boolean> = {};
   for (let bi = dotTicks.length - 1; bi >= 0; bi--) {
     const bh = unitHid(dotTicks[bi].target);
@@ -368,19 +620,14 @@ function dotTickRun(): void {
   dotBatchDeferredRemaining = nDeals;
   for (let i = dotTicks.length - 1; i >= 0; i--) {
     const e = dotTicks[i];
-    dotDbg(
-      `deal ${e.typeId} hid=${unitHid(e.target)} ticksLeft=${e.ticksLeft} amt=${e.amount}`
-    );
+    const eh = unitHid(e.target);
     dealDamageForType(e.typeId, e.source, e.target, e.amount);
     addDotEffectOnUnit(e.target, e.effectModel, e.effectDuration);
     const cfg = dotTypes.find(c => c.id === e.typeId);
     const stTab = (stateByType as any)[e.typeId];
-    const stateRaw =
-      stTab != null ? (stTab as any)[unitHid(e.target)] ?? (stTab as any)[e.target] : null;
+    const stateRaw = stTab != null ? tabRowForHid(stTab, eh) ?? (stTab as any)[e.target] : null;
     const state = isValidDotStateRow(stateRaw) ? (stateRaw as DotState) : null;
     if (cfg != null && typeof (cfg as any).onTick === "function" && state != null) (cfg as any).onTick(e.target, state);
-    e.ticksLeft = e.ticksLeft - 1;
-    if (e.ticksLeft <= 0) dotTicks.splice(i, 1);
   }
   /** batch 清空改由 伤害事件 在 deferred 展示回调里 notifyDotTickBatchDamageDisplayed（Timer(0) 会早于 afterRead 注册的 deferred，导致 skipApply 失效） */
   if (nDeals <= 0) {
@@ -394,141 +641,71 @@ function dotTickRun(): void {
   }
 }
 
-// ========== 伤害回调：按类型尝试施加/覆盖 ==========
-function onDamage(target: any, damage: number, damageType: number): void {
-  if (!target || damage <= 0) return;
-  /** 禁止 const j=jass 再 j.GetUnitName / j.IsUnitType，TSTL 会编成 j:GetXxx 导致 bad self */
+// ========== 伤害回调：装备 DOT 施加（普攻与其它伤害分流） ==========
+/**
+ * - `ignoredTargetByType`：DOT 自伤一轮内各类型各清一次并跳过叠层。
+ * - `suppressDotApplyForBatch`：秒跳批内且无普攻位时跳过（普攻永远可走 `applyEquipmentDotOnHeroAttack`）。
+ */
+function onDamage(target: any, damage: number, damageType: number, fromDotTickBatch?: boolean): void {
+  if (!target) return;
+  const isAttackHitForDot = damageEventModule.damageTypeLooksLikeWeaponHitForGearDot(damageType);
+  if (damage <= 0 && !isAttackHitForDot) return;
   const ju = jass as any;
-  const tgtName =
-    typeof ju.GetUnitName === "function" ? `${(jass as any).GetUnitName(target)}` : "?";
-  const tgtHidEarly = unitHid(target);
   const source = ju.udg_TempUnit != null && ju.udg_TempUnit[6] != null ? ju.udg_TempUnit[6] : null;
-  const srcName =
-    source != null && typeof ju.GetUnitName === "function" ? `${(jass as any).GetUnitName(source)}` : "?";
-  const srcHid = source != null ? unitHid(source) : 0;
-  if (DOT_DAMAGE_DEBUG) {
-    dotDbg(`hit dmg=${damage} dt=${damageType} tgt=${tgtName}[${tgtHidEarly}] src=${srcName}[${srcHid}] u6=${source != null}`);
-  }
-  if (!source) {
-    dotDbg("abort: udg_TempUnit[6] nil (伤害事件未写攻击者)");
-    return;
-  }
-  const utHeroDbg = heroUnitTypeForIsUnitType();
-  const isHeroUnit =
-    typeof (jass as any).IsUnitType === "function" && utHeroDbg != null
-      ? (jass as any).IsUnitType(source, utHeroDbg) === true
-      : false;
-  const heroLv = typeof (jass as any).GetHeroLevel === "function" ? (jass as any).GetHeroLevel(source) : -1;
-  const heroGate = isSourceHeroPlayer1to4(source);
-  if (DOT_DAMAGE_DEBUG) {
-    const uj = (jass as any).UNIT_TYPE_HERO;
-    const ug = (g as any).UNIT_TYPE_HERO;
-    dotDbg(
-      `heroGate=${heroGate} IsUT=${isHeroUnit} heroLv=${heroLv} utJ=${uj != null ? "yes" : "nil"} utG=${ug != null ? "yes" : "nil"} fb=${uj == null && ug == null ? "yes" : "no"} debuffOk=${isDebuffDotTargetOk(source, target)}`
-    );
-  }
-  if (!heroGate) {
-    dotDbg("abort: need P1-4 hero attacker");
-    return;
-  }
+  if (!source) return;
+  if (!isSourceHeroPlayer1to4(source)) return;
+
+  const tgtHid = unitHid(target);
+  const suppressDotApplyForBatch =
+    fromDotTickBatch === true &&
+    dotTickBatchTargetHids != null &&
+    dotTickBatchTargetHids[tgtHid] === true &&
+    !isAttackHitForDot;
 
   for (let t = 0; t < dotTypes.length; t++) {
     const cfg = dotTypes[t];
     const typeId = cfg.id;
-    const tgtHid = unitHid(target);
     if ((ignoredTargetByType as any)[typeId] != null && (ignoredTargetByType as any)[typeId][tgtHid] === true) {
       delete (ignoredTargetByType as any)[typeId][tgtHid];
-      dotDbg(`ignored ${typeId} hid=${tgtHid}`);
       continue;
     }
-    if (dotTickBatchTargetHids != null && dotTickBatchTargetHids[tgtHid] === true) {
-      dotDbg(`skipApplyDotTickBatch ${typeId} hid=${tgtHid}`);
+    if (suppressDotApplyForBatch) {
+      continue;
+    }
+    /** 普攻/弩的装备叠层由 `伤害事件` 延后阶段 `tryApplyHeroAttackGearDots` 统一处理，避免多段 mergedType 丢普攻位 */
+    if (isAttackHitForDot) {
       continue;
     }
     if (cfg.debuffDotEnemyNoStructure === true && !isDebuffDotTargetOk(source, target)) {
-      dotDbg(`skipDebuffTarget ${typeId} hid=${tgtHid} (need enemy, not structure)`);
       continue;
     }
     const best = cfg.getBestFromUnit(source);
     if (best == null) {
-      dotDbg(`noBest ${typeId} (装备栏无本类 Buff 段)`);
       continue;
+    }
+    if ((best as any).attackOnly === true || cfg.attackOnlyTrigger === true) {
+      if (!isAttackHitForDot) {
+        continue;
+      }
     }
 
     const amount = cfg.computeAmount(target, best);
     if (amount <= 0) {
-      dotDbg(`noAmount ${typeId} amt=${amount}`);
       continue;
     }
 
     if ((stateByType as any)[typeId] == null) (stateByType as any)[typeId] = {};
     const tab = (stateByType as any)[typeId];
-    const curRaw = tab[tgtHid];
+    const curRaw = tabRowForHid(tab, tgtHid);
     let cur: DotState | null = isValidDotStateRow(curRaw) ? (curRaw as DotState) : null;
     if (curRaw != null && cur == null) {
-      delete tab[tgtHid];
-      dotDbg(`dropCorruptState ${typeId} hid=${tgtHid}`);
-    }
-    /**
-     * 同解析持续 + 每跳强度接近 + 效果尚未结束：不因后续伤害事件再叠一层「满 time」。
-     * 反恢复等会有浮点抖动，eps 过严会失败；若仅用 amount×满持续 与 effect×剩余 比乘积，剩余变短时必「假更强」而刷新，总时长会超过 timeN（如一次普攻打出 5 秒跳）。
-     */
-    const durNear =
-      cur != null &&
-      cur._dotParsedDuration != null &&
-      Math.abs(best.duration - cur._dotParsedDuration) < 0.05;
-    const amtNear = cur != null && Math.abs(amount - cur.effect) < 1.0;
-    if (cur != null && durNear && amtNear && cur.remaining > 0.01) {
-      dotDbg(`skipSameBuffActive ${typeId} hid=${tgtHid} rem=${cur.remaining.toFixed(2)}`);
-      continue;
-    }
-    /** state.remaining 已接近 0 但 dotTicks 仍有跳数时，不刷新 */
-    if (cur != null && durNear && amtNear && hasPendingDotTick(typeId, tgtHid)) {
-      dotDbg(`skipWhileTicksPending ${typeId} hid=${tgtHid}`);
-      continue;
-    }
-    const currentProduct = cur != null ? cur.effect * cur.remaining : 0;
-    const newProduct = amount * best.duration;
-    if (newProduct <= currentProduct) {
-      dotDbg(`skipWeak ${typeId} hid=${tgtHid} newP=${newProduct} curP=${currentProduct}`);
-      continue;
+      tabDeleteHid(tab, tgtHid);
     }
 
-    if (cur != null && typeof cfg.onEnd === "function") (cfg as any).onEnd(target, cur);
-
-    dotDbg(`apply ${typeId} hid=${tgtHid} dur=${best.duration} amt=${amount} ticks=${best.duration}`);
-
-    const state: DotState = {
-      effect: amount,
-      remaining: best.duration,
-      _dotUnitRef: target,
-      sourceName: getDotSourceDisplayName(source),
-      _dotParsedDuration: best.duration,
-    };
-    tab[tgtHid] = state;
-    notifyBuffPool(typeId, target, state);
-    if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
-
-    for (let i = dotTicks.length - 1; i >= 0; i--) {
-      const e = dotTicks[i];
-      if (e.typeId === typeId && unitHid(e.target) === tgtHid) dotTicks.splice(i, 1);
-    }
-    dotTicks.push({
-      typeId,
-      source,
-      target,
-      amount,
-      ticksLeft: best.duration,
-      effectModel: cfg.effectModel,
-      effectDuration: cfg.effectDuration,
-    });
-    if (dotTimer == null && typeof (jass as any).TimerStart === "function") {
-      dotTimer = LeakWatcher.createTimer("dot_tick");
-      (jass as any).TimerStart(dotTimer, 1, true, dotTickRun);
-    }
-    if (tickTimer == null && typeof (jass as any).TimerStart === "function") {
-      tickTimer = LeakWatcher.createTimer("dot_state");
-      (jass as any).TimerStart(tickTimer, TICK, true, tick);
+    if (isAttackHitForDot) {
+      applyEquipmentDotOnHeroAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
+    } else {
+      applyEquipmentDotOnNonAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
     }
   }
 }
@@ -546,11 +723,16 @@ function splitItemBuffSegments(buff: string): string[] {
 }
 
 // ========== 反恢复：解析 Buff、取装备最强、算伤害（regenHP×effectPct%） ==========
-function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: number } | null {
+function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: number; attackOnly: boolean } | null {
   if (!buffStr || typeof buffStr !== "string") return null;
   const s = buffStr.trim();
-  if (s.indexOf("Buff:dmg:") !== 0) return null;
-  const rest = s.substring(9);
+  let attackOnly = false;
+  if (s.indexOf("Buff:attack:") === 0) {
+    attackOnly = true;
+  } else if (s.indexOf("Buff:dmg:") !== 0) {
+    return null;
+  }
+  const rest = s.substring(attackOnly ? 12 : 9);
   const antiIdx = rest.indexOf("AntiHeal");
   if (antiIdx < 0) return null;
   let numEnd = antiIdx + 8;
@@ -568,7 +750,31 @@ function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: numb
   }
   const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
   if (duration <= 0) return null;
-  return { effectPct, duration };
+  return { effectPct, duration, attackOnly };
+}
+
+/**
+ * 目标最大生命（诅咒 DOT 按 %MaxHP 结算）。
+ * 1.27 等环境 `jass.UNIT_STATE_MAX_LIFE` 常为 nil，需与 `装备回复` 一致用 `ConvertUnitState(1)` 取最大生命。
+ * **禁止**用 `globalThis["GetUnitState"](u,s)`：TSTL 会编成 `gt:GetUnitState`，Lua 里变成 `(gt,u,s)` 参数错位，恒得 0。
+ */
+function getUnitMaxHp(targetUnit: any): number {
+  if (!targetUnit) return 0;
+  if (typeof (jass as any).BlzGetUnitMaxHP === "function") {
+    const m = (jass as any).BlzGetUnitMaxHP(targetUnit);
+    if (typeof m === "number" && isFinite(m) && m > 0) return m;
+  }
+  if (typeof (jass as any).GetUnitState !== "function") return 0;
+  const jc = jass as any;
+  const gg = g as any;
+  let maxLifeState: any = null;
+  if (jc.UNIT_STATE_MAX_LIFE != null) maxLifeState = jc.UNIT_STATE_MAX_LIFE;
+  else if (gg.UNIT_STATE_MAX_LIFE != null) maxLifeState = gg.UNIT_STATE_MAX_LIFE;
+  else if (typeof (jass as any).ConvertUnitState === "function")
+    maxLifeState = (jass as any).ConvertUnitState(1);
+  if (maxLifeState == null) return 0;
+  const v = (jass as any).GetUnitState(targetUnit, maxLifeState);
+  return typeof v === "number" && isFinite(v) && v > 0 ? v : 0;
 }
 
 function getTargetRegenHP(targetUnit: any): number {
@@ -584,8 +790,8 @@ function getTargetRegenHP(targetUnit: any): number {
   return typeof n === "number" && !isNaN(n) ? n : 0;
 }
 
-function getBestAntiHealFromUnit(unit: any): { effectPct: number; duration: number } | null {
-  let best: { effectPct: number; duration: number; product: number } | null = null;
+function getBestAntiHealFromUnit(unit: any): { effectPct: number; duration: number; attackOnly: boolean } | null {
+  let best: { effectPct: number; duration: number; product: number; attackOnly: boolean } | null = null;
   for (let slot = 0; slot <= 5; slot++) {
     const item = unitItemInSlot(unit, slot);
     if (!item) continue;
@@ -597,19 +803,24 @@ function getBestAntiHealFromUnit(unit: any): { effectPct: number; duration: numb
       if (!parsed) continue;
       const product = parsed.effectPct * parsed.duration;
       if (best == null || product > best.product) {
-        best = { effectPct: parsed.effectPct, duration: parsed.duration, product };
+        best = { effectPct: parsed.effectPct, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
       }
     }
   }
-  return best != null ? { effectPct: best.effectPct, duration: best.duration } : null;
+  return best != null ? { effectPct: best.effectPct, duration: best.duration, attackOnly: best.attackOnly } : null;
 }
 
 // ========== 燃烧：Buff:dmg:Burn50;time5 → 每秒 50 点火焰伤害，持续 5 秒（与 Buff表 D002 文案一致） ==========
-function parseBurnBuff(buffStr: string): { damagePerSec: number; duration: number } | null {
+function parseBurnBuff(buffStr: string): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
   if (!buffStr || typeof buffStr !== "string") return null;
   const s = buffStr.trim();
-  if (s.indexOf("Buff:dmg:") !== 0) return null;
-  const rest = s.substring(9);
+  let attackOnly = false;
+  if (s.indexOf("Buff:attack:") === 0) {
+    attackOnly = true;
+  } else if (s.indexOf("Buff:dmg:") !== 0) {
+    return null;
+  }
+  const rest = s.substring(attackOnly ? 12 : 9);
   const burnIdx = rest.indexOf("Burn");
   if (burnIdx < 0) return null;
   let numEnd = burnIdx + 4;
@@ -627,11 +838,11 @@ function parseBurnBuff(buffStr: string): { damagePerSec: number; duration: numbe
   }
   const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
   if (duration <= 0 || damagePerSec <= 0) return null;
-  return { damagePerSec, duration };
+  return { damagePerSec, duration, attackOnly };
 }
 
-function getBestBurnFromUnit(unit: any): { damagePerSec: number; duration: number } | null {
-  let best: { damagePerSec: number; duration: number; product: number } | null = null;
+function getBestBurnFromUnit(unit: any): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
+  let best: { damagePerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
   for (let slot = 0; slot <= 5; slot++) {
     const item = unitItemInSlot(unit, slot);
     if (!item) continue;
@@ -643,11 +854,11 @@ function getBestBurnFromUnit(unit: any): { damagePerSec: number; duration: numbe
       if (!parsed) continue;
       const product = parsed.damagePerSec * parsed.duration;
       if (best == null || product > best.product) {
-        best = { damagePerSec: parsed.damagePerSec, duration: parsed.duration, product };
+        best = { damagePerSec: parsed.damagePerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
       }
     }
   }
-  return best != null ? { damagePerSec: best.damagePerSec, duration: best.duration } : null;
+  return best != null ? { damagePerSec: best.damagePerSec, duration: best.duration, attackOnly: best.attackOnly } : null;
 }
 
 // ========== 注册：反恢复、燃烧 ==========
@@ -661,7 +872,7 @@ registerDotType({
     return regenHP * ((parsed.effectPct as number) / 100);
   },
   damageType: (jass as any).DAMAGE_TYPE_MIND,
-  effectModel: "Abilities\\Spells\\NightElf\\CorrosiveBreath\\ChimaeraAcidTargetArt.mdl",
+  effectModel: dotEffectModelFromBuffRow("D001"),
   effectDuration: 0.8,
 });
 
@@ -673,18 +884,159 @@ registerDotType({
   computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
   damageType: (jass as any).DAMAGE_TYPE_FIRE,
   nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_FIRE_UI_BITS_FOR_DISPLAY,
-  effectModel: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeDamageTarget.mdl",
+  effectModel: dotEffectModelFromBuffRow("D002"),
   effectDuration: 0.75,
+});
+
+// ========== 中毒：Buff:attack:Poison{N};time{N} → 每秒 N 点金属性（酸性）伤害，仅攻击触发 ==========
+function parsePoisonBuff(buffStr: string): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
+  if (!buffStr || typeof buffStr !== "string") return null;
+  const s = buffStr.trim();
+  let attackOnly = false;
+  if (s.indexOf("attack:poison") === 0) {
+    attackOnly = true;
+  } else if (s.indexOf("dmg:poison") !== 0) {
+    return null;
+  }
+  // 格式：attack:poison10;time10  或  dmg:poison10;time10
+  const rest = s.substring(attackOnly ? 13 : 10); // "attack:poison" = 13, "dmg:poison" = 10
+  let numEnd = 0;
+  while (numEnd < rest.length) {
+    const c = rest.charAt(numEnd);
+    if (c >= "0" && c <= "9") numEnd++; else break;
+  }
+  const damagePerSec = numEnd > 0 ? parseInt(rest.substring(0, numEnd), 10) || 0 : 0;
+  const timeIdx = rest.indexOf("time");
+  if (timeIdx < 0) return null;
+  let tEnd = timeIdx + 4;
+  while (tEnd < rest.length) {
+    const c = rest.charAt(tEnd);
+    if (c >= "0" && c <= "9") tEnd++; else break;
+  }
+  const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
+  if (duration <= 0 || damagePerSec <= 0) return null;
+  return { damagePerSec, duration, attackOnly };
+}
+
+function getBestPoisonFromUnit(unit: any): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
+  let best: { damagePerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
+  for (let slot = 0; slot <= 5; slot++) {
+    const item = unitItemInSlot(unit, slot);
+    if (!item) continue;
+    const idStr = fourCCToString(getItemTypeId(item));
+    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
+    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
+    for (let si = 0; si < segments.length; si++) {
+      const parsed = parsePoisonBuff(segments[si]);
+      if (!parsed) continue;
+      const product = parsed.damagePerSec * parsed.duration;
+      if (best == null || product > best.product) {
+        best = { damagePerSec: parsed.damagePerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
+      }
+    }
+  }
+  return best != null ? { damagePerSec: best.damagePerSec, duration: best.duration, attackOnly: best.attackOnly } : null;
+}
+
+registerDotType({
+  id: "poison",
+  debuffDotEnemyNoStructure: true,
+  parseBuff: parsePoisonBuff,
+  getBestFromUnit: getBestPoisonFromUnit,
+  computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
+  damageType: (jass as any).DAMAGE_TYPE_ACID,
+  nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_METAL_UI_BITS_FOR_DISPLAY,
+  effectModel: dotEffectModelFromBuffRow("D003"),
+  effectDuration: 0.8,
+});
+
+// ========== 巨魔头颅诅咒：dmg:curse{N}%MaxHP;time{N} / attack:curse… → 每秒目标最大生命 N% 的物理伤害，对齐 Buff 表 D004 ==========
+function parseTrollCurseBuff(buffStr: string): { pctMaxHpPerSec: number; duration: number; attackOnly: boolean } | null {
+  if (!buffStr || typeof buffStr !== "string") return null;
+  let s = buffStr.trim();
+  if (s.indexOf("Buff:") === 0) s = s.substring(5);
+  let attackOnly = false;
+  let rest: string;
+  if (s.indexOf("attack:curse") === 0) {
+    attackOnly = true;
+    rest = s.substring(13);
+  } else if (s.indexOf("dmg:curse") === 0) {
+    rest = s.substring(9);
+  } else {
+    return null;
+  }
+  let numEnd = 0;
+  while (numEnd < rest.length) {
+    const c = rest.charAt(numEnd);
+    if (c >= "0" && c <= "9") numEnd++;
+    else break;
+  }
+  const pctMaxHpPerSec = numEnd > 0 ? parseInt(rest.substring(0, numEnd), 10) || 0 : 0;
+  const pctPos = rest.indexOf("%MaxHP");
+  if (pctPos < 0 || pctPos !== numEnd) return null;
+  const timeIdx = rest.indexOf("time");
+  if (timeIdx < 0) return null;
+  let tEnd = timeIdx + 4;
+  while (tEnd < rest.length) {
+    const c = rest.charAt(tEnd);
+    if (c >= "0" && c <= "9") tEnd++;
+    else break;
+  }
+  const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
+  if (duration <= 0 || pctMaxHpPerSec <= 0) return null;
+  return { pctMaxHpPerSec, duration, attackOnly };
+}
+
+function getBestTrollCurseFromUnit(unit: any): { pctMaxHpPerSec: number; duration: number; attackOnly: boolean } | null {
+  let best: { pctMaxHpPerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
+  for (let slot = 0; slot <= 5; slot++) {
+    const item = unitItemInSlot(unit, slot);
+    if (!item) continue;
+    const idStr = fourCCToString(getItemTypeId(item));
+    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
+    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
+    for (let si = 0; si < segments.length; si++) {
+      const parsed = parseTrollCurseBuff(segments[si]);
+      if (!parsed) continue;
+      const product = parsed.pctMaxHpPerSec * parsed.duration;
+      if (best == null || product > best.product) {
+        best = { pctMaxHpPerSec: parsed.pctMaxHpPerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
+      }
+    }
+  }
+  return best != null
+    ? { pctMaxHpPerSec: best.pctMaxHpPerSec, duration: best.duration, attackOnly: best.attackOnly }
+    : null;
+}
+
+registerDotType({
+  id: "trollCurse",
+  debuffDotEnemyNoStructure: true,
+  parseBuff: parseTrollCurseBuff,
+  getBestFromUnit: getBestTrollCurseFromUnit,
+  computeAmount: (target: any, parsed: any) => {
+    const maxHp = getUnitMaxHp(target);
+    return maxHp * ((parsed.pctMaxHpPerSec as number) / 100);
+  },
+  damageType: (jass as any).DAMAGE_TYPE_NORMAL,
+  nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_PHYSICAL_UI_BITS_FOR_DISPLAY,
+  effectModel: dotEffectModelFromBuffRow("D004"),
+  effectDuration: 0.8,
 });
 
 // ========== 初始化与导出 ==========
 let registered = false;
 
-function init(damageEvent: { registerDamageCallback: (cb: (u: any, d: number, t: number, f: boolean, l: boolean) => void, interval?: number) => void }): void {
+function init(damageEvent: {
+  registerDamageCallback: (
+    cb: (unit: any, d: number, t: number, f: boolean, l: boolean, fromDotTickBatch?: boolean) => void,
+    interval?: number
+  ) => void;
+}): void {
   if (registered) return;
   registered = true;
-  damageEvent.registerDamageCallback((unit: any, damage: number, dmgType: number) => {
-    onDamage(unit, damage, dmgType);
+  damageEvent.registerDamageCallback((unit: any, damage: number, dmgType: number, _f: boolean, _l: boolean, fromDotTickBatch?: boolean) => {
+    onDamage(unit, damage, dmgType, fromDotTickBatch);
   });
 }
 
@@ -693,7 +1045,8 @@ export function getUnitAntiHeal(unit: any): DotState | null {
   const tab = (stateByType as any)["antiHeal"];
   if (tab == null || unit == null || unit === 0) return null;
   const h = unitHid(unit);
-  if (h !== 0 && tab[h] != null) return isValidDotStateRow(tab[h]) ? (tab[h] as DotState) : null;
+  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
+  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
   const u = tab[unit];
   return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
 }
@@ -703,7 +1056,30 @@ export function getUnitBurn(unit: any): DotState | null {
   const tab = (stateByType as any)["burn"];
   if (tab == null || unit == null || unit === 0) return null;
   const h = unitHid(unit);
-  if (h !== 0 && tab[h] != null) return isValidDotStateRow(tab[h]) ? (tab[h] as DotState) : null;
+  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
+  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
+  const u = tab[unit];
+  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+}
+
+/** 供 UI 等读取：单位当前中毒 DOT 状态，无则返回 null */
+export function getUnitPoison(unit: any): DotState | null {
+  const tab = (stateByType as any)["poison"];
+  if (tab == null || unit == null || unit === 0) return null;
+  const h = unitHid(unit);
+  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
+  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
+  const u = tab[unit];
+  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+}
+
+/** 供 UI 等读取：D004 巨魔头颅诅咒（`registerDotType` id `trollCurse` 注册后才有状态） */
+export function getUnitTrollCurse(unit: any): DotState | null {
+  const tab = (stateByType as any)["trollCurse"];
+  if (tab == null || unit == null || unit === 0) return null;
+  const h = unitHid(unit);
+  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
+  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
   const u = tab[unit];
   return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
 }

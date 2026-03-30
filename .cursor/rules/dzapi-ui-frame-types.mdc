@@ -66,12 +66,30 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 8. **定位**：DzFrameSetAbsolutePoint(frame, 4, x, y) 绝对坐标，4=CENTER。
 
-9. **`DzFrameSetTextAlignment(frame, align)`（创建 TEXT / 文本类 UI 时必查，勿搞混）**  
-   - **参数 `0` = 左对齐**（本图实测记录）。  
-     **参数 `1` = 居中**（本图实测记录）。
-   - 其它取值（如居中/右对齐）以当前平台 **DzAPI / YDWE** 文档为准；未确认前不要凭猜测把 `0` 当成居中。
+9. **`DzFrameSetTextAlignment(frame, integer)` — 文本对齐（以本表为准，勿与旧「0 左、1 居中」混用）**
 
-10. **`DzFrameSetTooltip(hostFrame, tooltipFrameInt)`**（`japi.lua`：第二参为 **integer**）  
+   | 对齐 | 整数值 |
+   |------|--------|
+   | 左上 | `0` / `1` |
+   | 上 | `16` |
+   | 右上 | `32` |
+   | 左 | `2` |
+   | **居中** | **`18`** |
+   | 右 | `34` |
+   | 左下 | `4` |
+   | 下 | `20` |
+   | 右下 | `36` |
+
+   **改对齐前必须先重置**：再次改变同一 frame 的对齐方式前，须先 `DzFrameSetTextAlignment(frame, -1)`，再设目标值；否则新值会与旧状态**叠加**（类似「科技改护甲」类叠加），出现偏移（例如先 `20` 再设 `32` 理论右上却变右下）。**`-1` 会强制回到等价左上基准（0）**，再设表内值才可预期。
+
+   **TEXT 与底图**：实践中宜先给 **TEXT 与父 BACKDROP（或占位区）设好相同或匹配的 `DzFrameSetSize`**，再 `DzFrameSetPoint` / 对齐，再 `DzFrameSetText` / `DzFrameSetFont`，避免只靠锚点而字号区域与底图不一致。
+
+10. **`DzFrameSetFont(frame, path, fontSize, flag)`**
+
+   - 第三参在本图/部分环境下为**小实数**，实测**有效量级上限约 `0.02`**；写 `0.8`、`3` 等与 UI 坐标混淆时**常看不出字号变化或表现异常**。微调可在 `0.001`～`0.02` 间试。
+   - 与 **`DzFrameSetSize`** 的关系：TEXT 字形常会随**文本框宽高**适配；**不要**与 **`DzFrameSetScale` 叠在同一目标上重复缩放**（同属尺度，易把字缩没或难调）。
+
+12. **`DzFrameSetTooltip(hostFrame, tooltipFrameInt)`**（`japi.lua`：第二参为 **integer**）  
    - 第二参是 **提示用 Frame 的整型 id**，不是 `|cff...|r` 字符串。常见：`DzFrameSetTooltip(宿主, DzF2I(提示框Frame))`；无 `DzF2I` 时可尝试直接传提示框句柄数值。勿与「字符串 tooltip」用法混用。
 
 **`DzFrameSetScript` / `DzFrameSetScriptByCode` 的 `eventId`（与 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType` 一致）**
@@ -85,13 +103,13 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 | 鼠标按下 | 5 |
 | 鼠标滚轮 | 6 |
 | Slider 值变化 | 11 |
-| 鼠标双击 | 12 |
+| 鼠标双击 | 12 |（这个有同行告诉我是无效事件，还没验证过，2026年3月30日17:51:12）
 
-11. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），需用 `DzFrameSetScriptByCode` + 直接传函数。
+13. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），需用 `DzFrameSetScriptByCode` + 直接传函数。
 
-12. **为 Frame 注册回调（含本机“异步”、即时 UI）**：一律用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。最后一参 **`sync`**：多数 **本机 UI 反馈** 用 **`false`**（本地即时）；需要 **同步到全房** 时用 **`true`**（按需求选，勿与“必须用 ByCode”混淆）。
+14. **为 Frame 注册回调（含本机“异步”、即时 UI）**：一律用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。最后一参 **`sync`**：多数 **本机 UI 反馈** 用 **`false`**（本地即时）；需要 **同步到全房** 时用 **`true`**（按需求选，勿与“必须用 ByCode”混淆）。
 
-13. **【UI 回调 + DisplayTextToPlayer】**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，sync=true 或 sync=false 均可。照搬 JASS 单动作模式即可，无需 TriggerExecute。
+15. **【UI 回调 + DisplayTextToPlayer】**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，sync=true 或 sync=false 均可。照搬 JASS 单动作模式即可，无需 TriggerExecute。
 
 ## 滚动条 / 自定义滑块（thumb）教训（1.27e）
 

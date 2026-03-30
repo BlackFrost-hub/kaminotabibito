@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
+local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
@@ -42,8 +43,7 @@ else
     ____temp_2 = ____temp_1
 end
 local EV_UNIT_DESELECTED = ____temp_2
-local dotMod = require("系统.04．伤害系统.dot伤害")
-local buffPoolMod = require("系统.05．Buff系统.Buff系统")
+local buffPoolMod = require("系统.05．Buff系统.00．Buff系统")
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
 --- 原生 Buff 区：左下肖像上方偏右，横向排列（归一化坐标，相对 GameUI）
 local BUFF_BAR_X0 = 0.204
@@ -53,6 +53,8 @@ local ICON_W = 0.02
 local ICON_H = 16 / 600
 local ICON_GAP = 0.0005
 local MAX_SLOTS = 20
+--- Buff 条定时刷新间隔（秒），用于图标上剩余时间等
+local BUFF_BAR_REFRESH_SEC = 0.1
 local TIP_BOX_TEX = "war3mapImported\\wenbenkuang.blp"
 local TIP_W = 0.22
 --- 两行说明（表文案 + 来源行）略增高
@@ -70,6 +72,16 @@ local function tooltipIntStr(self, n)
         return "0"
     end
     return tostring(math.floor(math.max(0, n)))
+end
+--- 图标底部：剩余时间，一位小数（与逻辑 remaining 同步，由 BUFF_BAR_REFRESH_SEC 刷新）
+local function formatBuffRemainOneDecimal(self, rem)
+    if type(rem) ~= "number" or not __TS__NumberIsFinite(__TS__Number(rem)) then
+        return "0.0"
+    end
+    return __TS__NumberToFixed(
+        math.max(0, rem),
+        1
+    )
 end
 local function formatDotTooltip(self, template, durationForDisplay, dps, sourceName, intervalSec)
     local rem = type(durationForDisplay) == "number" and __TS__NumberIsFinite(__TS__Number(durationForDisplay)) and math.max(0, durationForDisplay) or 0
@@ -116,11 +128,15 @@ local function tryDzFrameSetTooltipF2i(self, hostFrame, tooltipFrame)
     )
 end
 local slots = {}
---- 与槽位一一对应，仅当提示文案变化时才 DzFrameSetText，避免 0.5s 定时器无意义刷新
+--- 与槽位一一对应，仅当提示文案变化时才 DzFrameSetText
 local lastTipStrBySlot = {}
+--- 与槽位一一对应，仅当剩余时间字符串变化时才更新图标底字
+local lastRemainStrBySlot = {}
 --- 鼠标是否仍悬停在该槽 hit 上；定时 syncBuffBar 不可强行 hideFrame 提示，否则会误关 tooltip
 local slotHovering = {}
 local refreshTimer = nil
+--- 防止重复 init：重复创建帧会泄漏、重复注册触发器会导致多次刷新
+local buffUiInitialized = false
 --- 为 true 时向本地玩家刷诊断文字（选中数量、handleId、Buff 池、DOT 读数）。
 ____exports.BUFF_UI_DEBUG = false
 local lastBuffUiDbgKey = ""
@@ -162,7 +178,7 @@ local function countSelectedForPlayer(self, p)
     local sole = nil
     while true do
         do
-            local __continue18
+            local __continue20
             repeat
                 local u = jass.FirstOfGroup(g)
                 if not u or u == 0 then
@@ -170,16 +186,16 @@ local function countSelectedForPlayer(self, p)
                 end
                 jass.GroupRemoveUnit(g, u)
                 if not useSelectedNative and not jass.IsUnitSelected(u, p) then
-                    __continue18 = true
+                    __continue20 = true
                     break
                 end
                 n = n + 1
                 if sole == nil then
                     sole = u
                 end
-                __continue18 = true
+                __continue20 = true
             until true
-            if not __continue18 then
+            if not __continue20 then
                 break
             end
         end
@@ -196,6 +212,17 @@ local function getSoleSelectedUnitForPlayer(self, p)
     end
     return sole
 end
+--- 避免对已移除/无效 unit 句柄读 DOT/Buff（句柄复用异次元）
+local function isUnitRefLikelyValid(self, u)
+    if u == nil or u == 0 then
+        return false
+    end
+    if type(jass.GetUnitTypeId) ~= "function" then
+        return true
+    end
+    local tid = jass.GetUnitTypeId(u)
+    return tid ~= nil and tid ~= 0
+end
 local function collectBuffRows(self, unit)
     local rows = {}
     if not buffPoolMod:isUnitInBuffPool(unit) then
@@ -206,20 +233,25 @@ local function collectBuffRows(self, unit)
         local i = 0
         while i < #ids do
             local bid = ids[i + 1]
-            if bid == "D001" then
-                local ah = dotMod:getUnitAntiHeal(unit)
-                if ah ~= nil then
-                    rows[#rows + 1] = {id = "D001", state = {effect = ah.effect, remaining = ah.remaining, sourceName = ah.sourceName, _dotParsedDuration = ah._dotParsedDuration}}
-                end
-            elseif bid == "D002" then
-                local br = dotMod:getUnitBurn(unit)
-                if br ~= nil then
-                    rows[#rows + 1] = {id = "D002", state = {effect = br.effect, remaining = br.remaining, sourceName = br.sourceName, _dotParsedDuration = br._dotParsedDuration}}
+            if bid == "D001" or bid == "D002" or bid == "D003" or bid == "D004" then
+                local rt = buffPoolMod:getBuffRuntime(unit, bid)
+                if rt ~= nil then
+                    local real = rt.remaining
+                    local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
+                    rows[#rows + 1] = {id = bid, state = {
+                        effect = rt.effect,
+                        remaining = real,
+                        iconRemaining = iconRem,
+                        sourceName = rt.sourceName,
+                        _dotParsedDuration = rt._dotParsedDuration
+                    }, iconOverride = rt.iconOverride}
                 end
             else
                 local rt = buffPoolMod:getBuffRuntime(unit, bid)
                 if rt ~= nil then
-                    rows[#rows + 1] = {id = bid, state = {effect = rt.effect, remaining = rt.remaining}}
+                    local real = rt.remaining
+                    local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
+                    rows[#rows + 1] = {id = bid, state = {effect = rt.effect, remaining = real, iconRemaining = iconRem, sourceName = rt.sourceName}, iconOverride = rt.iconOverride}
                 end
             end
             i = i + 1
@@ -246,6 +278,7 @@ local function hideSlot(self, i)
     end
     slotHovering[i + 1] = false
     lastTipStrBySlot[i + 1] = ""
+    lastRemainStrBySlot[i + 1] = ""
     if s.tipText ~= 0 then
         hideFrame(nil, s.tipText)
     end
@@ -278,33 +311,41 @@ local function syncBuffBar(self)
     local selN = ____countSelectedForPlayer_result_5.n
     local sole = ____countSelectedForPlayer_result_5.sole
     local hid = sole ~= nil and sole ~= 0 and type(jass.GetHandleId) == "function" and jass.GetHandleId(sole) or 0
-    local inPool = sole ~= nil and sole ~= 0 and buffPoolMod:isUnitInBuffPool(sole)
-    local ____temp_6
-    if sole ~= nil and sole ~= 0 then
-        ____temp_6 = dotMod:getUnitAntiHeal(sole)
+    local soleOk = sole ~= nil and sole ~= 0 and isUnitRefLikelyValid(nil, sole)
+    local inPool = soleOk and buffPoolMod:isUnitInBuffPool(sole)
+    local ____soleOk_6
+    if soleOk then
+        ____soleOk_6 = buffPoolMod:getBuffRuntime(sole, "D001")
     else
-        ____temp_6 = nil
+        ____soleOk_6 = nil
     end
-    local ah = ____temp_6
-    local ____temp_7
-    if sole ~= nil and sole ~= 0 then
-        ____temp_7 = dotMod:getUnitBurn(sole)
+    local rtD001 = ____soleOk_6
+    local ____soleOk_7
+    if soleOk then
+        ____soleOk_7 = buffPoolMod:getBuffRuntime(sole, "D002")
     else
-        ____temp_7 = nil
+        ____soleOk_7 = nil
     end
-    local br = ____temp_7
+    local rtD002 = ____soleOk_7
+    local ____soleOk_8
+    if soleOk then
+        ____soleOk_8 = buffPoolMod:getBuffRuntime(sole, "D003")
+    else
+        ____soleOk_8 = nil
+    end
+    local rtD003 = ____soleOk_8
     if ____exports.BUFF_UI_DEBUG then
-        local rowsProbe = sole ~= nil and sole ~= 0 and selN == 1 and collectBuffRows(nil, sole) or ({})
-        local key = (((((((((tostring(selN) .. "|") .. tostring(hid)) .. "|") .. tostring(inPool)) .. "|") .. tostring(ah ~= nil)) .. "|") .. tostring(br ~= nil)) .. "|") .. tostring(#rowsProbe)
+        local rowsProbe = soleOk and selN == 1 and collectBuffRows(nil, sole) or ({})
+        local key = (((((((((((tostring(selN) .. "|") .. tostring(hid)) .. "|") .. tostring(inPool)) .. "|") .. tostring(rtD001 ~= nil)) .. "|") .. tostring(rtD002 ~= nil)) .. "|") .. tostring(rtD003 ~= nil)) .. "|") .. tostring(#rowsProbe)
         if key ~= lastBuffUiDbgKey then
             lastBuffUiDbgKey = key
             debugBuffUi(
                 nil,
-                (((((((((("sel=" .. tostring(selN)) .. " hid=") .. tostring(hid)) .. " pool=") .. tostring(inPool and 1 or 0)) .. " dotAH=") .. tostring(ah ~= nil and 1 or 0)) .. " dotBr=") .. tostring(br ~= nil and 1 or 0)) .. " rows=") .. tostring(#rowsProbe)
+                (((((((((((("sel=" .. tostring(selN)) .. " hid=") .. tostring(hid)) .. " pool=") .. tostring(inPool and 1 or 0)) .. " D001=") .. tostring(rtD001 ~= nil and 1 or 0)) .. " D002=") .. tostring(rtD002 ~= nil and 1 or 0)) .. " D003=") .. tostring(rtD003 ~= nil and 1 or 0)) .. " rows=") .. tostring(#rowsProbe)
             )
         end
     end
-    if not sole or selN ~= 1 then
+    if not soleOk or selN ~= 1 then
         hideAllSlots(nil)
         return
     end
@@ -314,31 +355,43 @@ local function syncBuffBar(self)
         local i = 0
         while i < MAX_SLOTS do
             do
-                local __continue51
+                local __continue54
                 repeat
                     if i >= #rows then
                         hideSlot(nil, i)
-                        __continue51 = true
+                        __continue54 = true
                         break
                     end
                     local row = rows[i + 1]
                     local meta = buffs[row.id]
                     local slot = slots[i + 1]
-                    if not meta or not slot then
-                        __continue51 = true
+                    if not slot then
+                        __continue54 = true
+                        break
+                    end
+                    local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
+                    if iconTex == "" then
+                        __continue54 = true
                         break
                     end
                     local pd = row.state._dotParsedDuration
                     local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
-                    local tipStr = formatDotTooltip(
+                    local tipStr = meta ~= nil and formatDotTooltip(
                         nil,
                         meta.tooltip,
                         durationForTip,
                         row.state.effect,
                         row.state.sourceName,
                         meta.interval
-                    )
-                    setFrameTexture(nil, slot.root, meta.icon)
+                    ) or (((((((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. tooltipIntStr(nil, row.state.remaining)) .. " 秒，伤害/秒 ") .. tooltipIntStr(nil, row.state.effect)) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「") .. (row.state.sourceName ~= nil and row.state.sourceName ~= "" and row.state.sourceName or "未知")) .. "」|r"
+                    setFrameTexture(nil, slot.root, iconTex)
+                    local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
+                    if slot.remainText and slot.remainText ~= 0 and type(japi.DzFrameSetText) == "function" then
+                        if lastRemainStrBySlot[i + 1] ~= remStr then
+                            lastRemainStrBySlot[i + 1] = remStr
+                            japi.DzFrameSetText(slot.remainText, ("|cffffffff" .. remStr) .. "|r")
+                        end
+                    end
                     if slot.tipText and slot.tipText ~= 0 and type(japi.DzFrameSetText) == "function" then
                         if lastTipStrBySlot[i + 1] ~= tipStr then
                             lastTipStrBySlot[i + 1] = tipStr
@@ -357,9 +410,9 @@ local function syncBuffBar(self)
                             hideFrame(nil, slot.tipText)
                         end
                     end
-                    __continue51 = true
+                    __continue54 = true
                 until true
-                if not __continue51 then
+                if not __continue54 then
                     break
                 end
             end
@@ -396,6 +449,31 @@ local function createOneSlot(self, index, parent)
     setFrameTexture(nil, bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp")
     if type(japi.DzFrameSetLevel) == "function" then
         japi.DzFrameSetLevel(bd, 180)
+    end
+    local remainText = createTextLabel(
+        nil,
+        "BuffUIBarRemain" .. tostring(index),
+        bd,
+        "|cffffffff0.0|r",
+        {
+            relativeTo = bd,
+            point = FramePoint.BOTTOM,
+            relativePoint = FramePoint.BOTTOM,
+            x = 0,
+            y = 0.001
+        },
+        {width = ICON_W, height = 0.014}
+    ) or 0
+    if remainText and remainText ~= 0 then
+        if type(japi.DzFrameSetTextAlignment) == "function" then
+            pcall(function ()
+                    japi.DzFrameSetTextAlignment(remainText, FramePoint.CENTER)
+                end
+            )
+        end
+        if type(japi.DzFrameSetLevel) == "function" then
+            japi.DzFrameSetLevel(remainText, 182)
+        end
     end
     local hit = createFrame(
         nil,
@@ -506,7 +584,13 @@ local function createOneSlot(self, index, parent)
         tryDzFrameSetTooltipF2i(nil, hit, tipBox)
     end
     hideFrame(nil, bd)
-    return {root = bd, hit = hit or 0, tipBox = tipBox or 0, tipText = tipText or 0}
+    return {
+        root = bd,
+        remainText = remainText or 0,
+        hit = hit or 0,
+        tipBox = tipBox or 0,
+        tipText = tipText or 0
+    }
 end
 local function createUi(self)
     local parent = getGameUI(nil)
@@ -517,6 +601,7 @@ local function createUi(self)
         local j = 0
         while j < MAX_SLOTS do
             lastTipStrBySlot[j + 1] = ""
+            lastRemainStrBySlot[j + 1] = ""
             slotHovering[j + 1] = false
             j = j + 1
         end
@@ -533,13 +618,13 @@ local function createUi(self)
     end
 end
 local function registerTriggers(self)
-    local ____temp_8
+    local ____temp_9
     if type(jass.CreateTrigger) == "function" then
-        ____temp_8 = jass.CreateTrigger()
+        ____temp_9 = jass.CreateTrigger()
     else
-        ____temp_8 = nil
+        ____temp_9 = nil
     end
-    local trig = ____temp_8
+    local trig = ____temp_9
     if not trig then
         return
     end
@@ -577,7 +662,7 @@ local function startRefreshTimer(self)
     refreshTimer = jass.CreateTimer()
     jass.TimerStart(
         refreshTimer,
-        0.5,
+        BUFF_BAR_REFRESH_SEC,
         true,
         function()
             syncBuffBar(nil)
@@ -585,6 +670,10 @@ local function startRefreshTimer(self)
     )
 end
 function ____exports.init(self)
+    if buffUiInitialized then
+        return
+    end
+    buffUiInitialized = true
     createUi(nil)
     registerTriggers(nil)
     startRefreshTimer(nil)

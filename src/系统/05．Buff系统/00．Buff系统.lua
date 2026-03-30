@@ -3,8 +3,9 @@ local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local toHid, pruneEmptyHid, syncDotSnapshots, tickManualAndSyncDot, ensureSyncTimer, maybeStopSyncTimer, jass, LeakWatcher, TICK, unitToBuffs, syncTimer
+local toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, LeakWatcher, unitToBuffs, syncTimer
 function toHid(self, u)
     if u == nil or u == 0 then
         return 0
@@ -35,108 +36,91 @@ function pruneEmptyHid(self, hid)
         __TS__Delete(unitToBuffs, hid)
     end
 end
-function syncDotSnapshots(self)
-    local dotMod = require("系统.04．伤害系统.dot伤害")
-    for hidKey in pairs(unitToBuffs) do
-        do
-            local __continue43
-            repeat
-                local hid = toHid(nil, hidKey)
-                if hid == 0 then
-                    __continue43 = true
-                    break
-                end
-                local entry = unitToBuffs[hid]
-                if entry == nil then
-                    __continue43 = true
-                    break
-                end
-                local unit = entry.lastRef
-                local tab = entry.buffs
-                if tab.D001 ~= nil and tab.D001.source == "dot" then
-                    local ____temp_1
-                    if unit ~= nil and dotMod.getUnitAntiHeal ~= nil then
-                        ____temp_1 = dotMod:getUnitAntiHeal(unit)
-                    else
-                        ____temp_1 = nil
-                    end
-                    local st = ____temp_1
-                    if st == nil then
-                        __TS__Delete(tab, "D001")
-                    else
-                        tab.D001.remaining = st.remaining
-                        tab.D001.effect = st.effect
-                    end
-                end
-                if tab.D002 ~= nil and tab.D002.source == "dot" then
-                    local ____temp_2
-                    if unit ~= nil and dotMod.getUnitBurn ~= nil then
-                        ____temp_2 = dotMod:getUnitBurn(unit)
-                    else
-                        ____temp_2 = nil
-                    end
-                    local st = ____temp_2
-                    if st == nil then
-                        __TS__Delete(tab, "D002")
-                    else
-                        tab.D002.remaining = st.remaining
-                        tab.D002.effect = st.effect
-                    end
-                end
-                pruneEmptyHid(nil, hid)
-                __continue43 = true
-            until true
-            if not __continue43 then
-                break
+function notifyDotBuffExpiredFromPool(self, buffID, hid)
+    pcall(function ()
+            local m = require("系统.04．伤害系统.dot伤害")
+            if m ~= nil and type(m.clearDotByBuffPoolExpire) == "function" then
+                m:clearDotByBuffPoolExpire(buffID, hid)
             end
         end
-    end
+    )
 end
-function tickManualAndSyncDot(self)
-    syncDotSnapshots(nil)
+function syncDotFromPoolTick(self)
+    pcall(function ()
+            local m = require("系统.04．伤害系统.dot伤害")
+            if m ~= nil and type(m.syncDotRemainingFromBuffPool) == "function" then
+                m:syncDotRemainingFromBuffPool()
+            end
+        end
+    )
+end
+function ____exports.getBuffRuntimeByHid(self, hid, buffID)
+    if hid == 0 then
+        return nil
+    end
+    local e = unitToBuffs[hid]
+    if e == nil then
+        return nil
+    end
+    local r = e.buffs[buffID]
+    return r ~= nil and r or nil
+end
+function tickBuffPool(self)
     for hidKey in pairs(unitToBuffs) do
         do
-            local __continue54
+            local __continue56
             repeat
                 local hid = toHid(nil, hidKey)
                 if hid == 0 then
-                    __continue54 = true
+                    __continue56 = true
                     break
                 end
                 local entry = unitToBuffs[hid]
                 if entry == nil then
-                    __continue54 = true
+                    __continue56 = true
                     break
                 end
                 local tab = entry.buffs
+                local expired = {}
                 for bid in pairs(tab) do
                     do
-                        local __continue57
+                        local __continue59
                         repeat
                             local row = tab[bid]
-                            if row == nil or row.source ~= "manual" then
-                                __continue57 = true
+                            if row == nil then
+                                __continue59 = true
                                 break
                             end
-                            row.remaining = row.remaining - TICK
+                            row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
                             if row.remaining <= 0 then
-                                __TS__Delete(tab, bid)
+                                if row.source == "dot" then
+                                    notifyDotBuffExpiredFromPool(nil, bid, hid)
+                                end
+                                expired[#expired + 1] = bid
                             end
-                            __continue57 = true
+                            __continue59 = true
                         until true
-                        if not __continue57 then
+                        if not __continue59 then
                             break
                         end
                     end
                 end
+                do
+                    local ei = 0
+                    while ei < #expired do
+                        __TS__Delete(tab, expired[ei + 1])
+                        ei = ei + 1
+                    end
+                end
                 pruneEmptyHid(nil, hid)
-                __continue54 = true
+                __continue56 = true
             until true
-            if not __continue54 then
+            if not __continue56 then
                 break
             end
         end
     end
+    syncDotFromPoolTick(nil)
     maybeStopSyncTimer(nil)
 end
 function ensureSyncTimer(self)
@@ -146,8 +130,8 @@ function ensureSyncTimer(self)
     if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
         return
     end
-    syncTimer = LeakWatcher:createTimer("buff_pool_sync")
-    jass.TimerStart(syncTimer, TICK, true, tickManualAndSyncDot)
+    syncTimer = LeakWatcher:createTimer("buff_pool_tick")
+    jass.TimerStart(syncTimer, ____exports.BUFF_POOL_TICK, true, tickBuffPool)
 end
 function maybeStopSyncTimer(self)
     local hasAny = false
@@ -167,9 +151,10 @@ if ____leakCore_LeakWatcher_0 == nil then
     ____leakCore_LeakWatcher_0 = leakCore
 end
 LeakWatcher = ____leakCore_LeakWatcher_0
-TICK = 0.5
+--- Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s）
+____exports.BUFF_POOL_TICK = 0.1
 --- dot伤害 里的 typeId → 01．Buff表 buffID
-____exports.DOT_TYPE_TO_BUFF_ID = {antiHeal = "D001", burn = "D002"}
+____exports.DOT_TYPE_TO_BUFF_ID = {antiHeal = "D001", burn = "D002", poison = "D003", trollCurse = "D004"}
 unitToBuffs = {}
 syncTimer = nil
 local function ensureEntry(self, u)
@@ -185,7 +170,7 @@ local function ensureEntry(self, u)
     return unitToBuffs[hid]
 end
 --- 由 dot伤害 调用：施加、覆盖或到期清除。
--- target 可为单位或 **GetHandleId**（tick 里到期时只传 id）。
+-- target 可为单位或 **GetHandleId**。
 -- state 为 null 表示该 DOT 类型在该单位上已结束。
 function ____exports.syncDotBuff(self, typeId, target, state)
     local buffID = ____exports.DOT_TYPE_TO_BUFF_ID[typeId]
@@ -210,13 +195,20 @@ function ____exports.syncDotBuff(self, typeId, target, state)
     if entry == nil then
         return
     end
-    entry.buffs[buffID] = {buffID = buffID, remaining = state.remaining, effect = state.effect, source = "dot"}
+    entry.buffs[buffID] = {
+        buffID = buffID,
+        remaining = state.remaining,
+        effect = state.effect,
+        source = "dot",
+        sourceName = state.sourceName,
+        _dotParsedDuration = state._dotParsedDuration
+    }
     if type(target) ~= "number" then
         entry.lastRef = target
     end
     ensureSyncTimer(nil)
 end
-function ____exports.registerManualBuff(self, target, buffID, durationSec, effectValue)
+function ____exports.registerManualBuff(self, target, buffID, durationSec, effectValue, extras)
     if target == nil or target == 0 or not buffID or durationSec <= 0 then
         return
     end
@@ -224,7 +216,19 @@ function ____exports.registerManualBuff(self, target, buffID, durationSec, effec
     if entry == nil then
         return
     end
-    entry.buffs[buffID] = {buffID = buffID, remaining = durationSec, effect = effectValue, source = "manual"}
+    local row = {buffID = buffID, remaining = durationSec, effect = effectValue, source = "manual"}
+    if extras ~= nil then
+        if extras.sourceName ~= nil and extras.sourceName ~= "" then
+            row.sourceName = extras.sourceName
+        end
+        if extras.iconOverride ~= nil and extras.iconOverride ~= "" then
+            row.iconOverride = extras.iconOverride
+        end
+        if extras.effectModelOverride ~= nil and extras.effectModelOverride ~= "" then
+            row.effectModelOverride = extras.effectModelOverride
+        end
+    end
+    entry.buffs[buffID] = row
     ensureSyncTimer(nil)
 end
 function ____exports.removeBuffById(self, target, buffID)
@@ -276,12 +280,11 @@ function ____exports.getBuffIdsOnUnit(self, unit)
 end
 function ____exports.getBuffRuntime(self, unit, buffID)
     local hid = toHid(nil, unit)
-    local e = hid ~= 0 and unitToBuffs[hid] or nil
-    if e == nil then
-        return nil
-    end
-    local r = e.buffs[buffID]
-    return r ~= nil and r or nil
+    return ____exports.getBuffRuntimeByHid(nil, hid, buffID)
+end
+--- 图标底部剩余秒数：与池内 `remaining` 一致（无假层）
+function ____exports.getDotIconDisplayRemaining(self, _unit, _buffID, realRemaining)
+    return type(realRemaining) == "number" and __TS__NumberIsFinite(__TS__Number(realRemaining)) and realRemaining or 0
 end
 function ____exports.initBuffSystem(self)
 end

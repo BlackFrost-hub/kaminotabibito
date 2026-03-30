@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local ____exports = {}
-local getEventUnitDamaged, lowestSetBit, onAnyUnitDamagedAction, runDeferredDamageDisplay, recreateDamageTrigger, jass, g, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, UnitGroup, damagePendingQueue, dotBatchMarkQueue, damageTypeOverrideQueue, remainingType, remainingHigh, ATTR_BITS
+local getEventUnitDamaged, tempDamageTypeRowUsesZeroBasedIndex, tempDamageTypeRowIndexTrue, clearUdgTempDamageType, syncEventIsAttackDamageFromEngine, syncEventIsRangedDamageFromEngine, applyEngineRangedBitToNumericSnap, combineGearDotAttackRefreshHint, lowestSetBit, onAnyUnitDamagedAction, runDeferredDamageDisplay, recreateDamageTrigger, jass, g, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, UnitGroup, damagePendingQueue, dotBatchMarkQueue, damageTypeOverrideQueue, remainingType, remainingHigh, ATTR_BITS
 function getEventUnitDamaged(self)
     if type(jass.ConvertUnitEvent) == "function" then
         return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
@@ -12,6 +12,157 @@ end
 --- 检测位标志（Lua5.1 无 & 运算符）
 function ____exports.hasBit(self, v, ____bit)
     return math.floor(v / ____bit) % 2 >= 1
+end
+function tempDamageTypeRowUsesZeroBasedIndex(self, row)
+    local z = row[0]
+    return z ~= nil and z ~= nil
+end
+function tempDamageTypeRowIndexTrue(self, row, logicalIndex)
+    local idx = tempDamageTypeRowUsesZeroBasedIndex(nil, row) and logicalIndex or logicalIndex + 1
+    local v = row[idx]
+    return v == true or v == 1
+end
+function ____exports.mergeUdgTempDamageTypeToNumeric(self, udgVal)
+    if udgVal == nil then
+        return 0
+    end
+    if type(udgVal) == "number" then
+        return udgVal
+    end
+    if type(udgVal) ~= "table" then
+        return 0
+    end
+    local n = 0
+    do
+        local i = 0
+        while i <= 10 do
+            if tempDamageTypeRowIndexTrue(nil, udgVal, i) then
+                n = n + ATTR_BITS[i + 1]
+            end
+            i = i + 1
+        end
+    end
+    if tempDamageTypeRowIndexTrue(nil, udgVal, 11) then
+        n = n + 2048
+    end
+    if tempDamageTypeRowIndexTrue(nil, udgVal, 12) then
+        n = n + 4096
+    end
+    if tempDamageTypeRowIndexTrue(nil, udgVal, 13) then
+        n = n + 8192
+    end
+    if tempDamageTypeRowIndexTrue(nil, udgVal, 14) then
+        n = n + 16384
+    end
+    return n
+end
+function clearUdgTempDamageType(self, gu)
+    local row = gu.udg_TempDamageType
+    if row == nil then
+        return
+    end
+    if type(row) == "number" then
+        gu.udg_TempDamageType = 0
+        return
+    end
+    local z = tempDamageTypeRowUsesZeroBasedIndex(nil, row)
+    do
+        local logical = 0
+        while logical <= 14 do
+            local idx = z and logical or logical + 1
+            row[idx] = false
+            logical = logical + 1
+        end
+    end
+end
+--- 与 dot伤害.onDamage 共用：带 4096 且无 2048 的合并类型视为「普攻类武器伤害」（地图未置 8192/16384 时）
+function ____exports.damageTypeLooksLikeWeaponHitForGearDot(self, t)
+    if ____exports.hasBit(nil, t, 8192) or ____exports.hasBit(nil, t, 16384) then
+        return true
+    end
+    return ____exports.hasBit(nil, t, 4096) and not ____exports.hasBit(nil, t, 2048)
+end
+function syncEventIsAttackDamageFromEngine(self)
+    local j = jass
+    if type(j.YDWEIsEventAttackDamage) == "function" then
+        local hit = false
+        pcall(function ()
+                if j:YDWEIsEventAttackDamage() == true then
+                    hit = true
+                end
+            end
+        )
+        if hit then
+            return true
+        end
+    end
+    if type(j.BlzGetEventIsAttack) == "function" then
+        local hit = false
+        pcall(function ()
+                if j:BlzGetEventIsAttack() == true then
+                    hit = true
+                end
+            end
+        )
+        if hit then
+            return true
+        end
+    end
+    local hitJ = false
+    pcall(function ()
+            local jm = require("jass.japi")
+            if jm ~= nil and type(jm.IsEventAttackDamage) == "function" and jm:IsEventAttackDamage() == true then
+                hitJ = true
+            end
+        end
+    )
+    return hitJ
+end
+function syncEventIsRangedDamageFromEngine(self)
+    local j = jass
+    if type(j.YDWEIsEventRangedDamage) == "function" then
+        local hit = false
+        pcall(function ()
+                if j:YDWEIsEventRangedDamage() == true then
+                    hit = true
+                end
+            end
+        )
+        if hit then
+            return true
+        end
+    end
+    local hitJ = false
+    pcall(function ()
+            local jm = require("jass.japi")
+            if jm ~= nil and type(jm.IsEventRangedDamage) == "function" and jm:IsEventRangedDamage() == true then
+                hitJ = true
+            end
+        end
+    )
+    return hitJ
+end
+function applyEngineRangedBitToNumericSnap(self, snap, fromDotTickBatch, attackEngineHintSync, rangedEngineHintSync)
+    if fromDotTickBatch == true then
+        return snap
+    end
+    local n = snap
+    if n == 0 and attackEngineHintSync then
+        n = 8192
+    end
+    if attackEngineHintSync and rangedEngineHintSync and ____exports.hasBit(nil, n, 8192) and not ____exports.hasBit(nil, n, 16384) then
+        n = n + 16384
+    end
+    return n
+end
+function combineGearDotAttackRefreshHint(self, fromDotTickBatch, numericSnap, attackEngineHintSync)
+    if fromDotTickBatch == true then
+        return false
+    end
+    if ____exports.damageTypeLooksLikeWeaponHitForGearDot(nil, numericSnap) then
+        return true
+    end
+    return attackEngineHintSync
 end
 function lowestSetBit(self, v)
     do
@@ -50,11 +201,16 @@ function onAnyUnitDamagedAction(self)
     end
     local savedDamage = ____temp_6
     local savedSource = nil
-    if type(g.GetEventDamageSource) == "function" then
-        savedSource = g:GetEventDamageSource()
+    --- 优先 `jass` 表上的 `GetEventDamageSource`（Lua require 后 common 原生会挂在此，与 JASS 侧一致）
+    local jassGetSrc = jass.GetEventDamageSource
+    if type(jassGetSrc) == "function" then
+        savedSource = jassGetSrc()
     end
-    if savedSource == nil and type(jass.GetEventDamageSource) == "function" then
-        savedSource = jass.GetEventDamageSource()
+    if savedSource == nil then
+        local gGetSrc = _G.GetEventDamageSource
+        if type(gGetSrc) == "function" then
+            savedSource = gGetSrc()
+        end
     end
     if savedSource == nil and type(jass.BlzGetEventDamageSource) == "function" then
         savedSource = jass.BlzGetEventDamageSource()
@@ -83,20 +239,61 @@ function onAnyUnitDamagedAction(self)
         end
         i = i + 1
     end
+    local ____temp_7
+    if #damageTypeOverrideQueue > 0 then
+        ____temp_7 = table.remove(damageTypeOverrideQueue, 1)
+    else
+        ____temp_7 = nil
+    end
+    --- 与本次受伤事件成对消费（同步顺序 = UnitDamageTarget / 普攻触发顺序）；类型覆盖队列同理，避免与 dot 标记错配
+    local damageTypeOverrideForEvent = ____temp_7
+    local ____temp_8
+    if #dotBatchMarkQueue > 0 then
+        ____temp_8 = table.remove(dotBatchMarkQueue, 1) == true
+    else
+        ____temp_8 = false
+    end
+    local fromDotTickBatchForEvent = ____temp_8
+    local ____fromDotTickBatchForEvent_9
+    if fromDotTickBatchForEvent then
+        ____fromDotTickBatchForEvent_9 = false
+    else
+        ____fromDotTickBatchForEvent_9 = syncEventIsAttackDamageFromEngine(nil)
+    end
+    --- `udg_TempDamageType` 布尔槽由 JASS GetDmgType 写入；若 Lua 本回调早于该 JASS，同步 merge 会得到 0。
+    -- 故 merge+clear 放到与 `TempReal[10]` 相同的 Timer(0) 里；此处仅快照引擎「攻击/远程」（仅同步有效）。
+    local attackEngineHintSync = ____fromDotTickBatchForEvent_9
+    local ____fromDotTickBatchForEvent_10
+    if fromDotTickBatchForEvent then
+        ____fromDotTickBatchForEvent_10 = false
+    else
+        ____fromDotTickBatchForEvent_10 = syncEventIsRangedDamageFromEngine(nil)
+    end
+    local rangedEngineHintSync = ____fromDotTickBatchForEvent_10
     if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
         local tRead = jass.CreateTimer()
         local function afterRead()
             if type(jass.DestroyTimer) == "function" then
                 jass.DestroyTimer(tRead)
             end
+            local merged = ____exports.mergeUdgTempDamageTypeToNumeric(nil, gu.udg_TempDamageType)
+            clearUdgTempDamageType(nil, gu)
+            merged = applyEngineRangedBitToNumericSnap(
+                nil,
+                merged,
+                fromDotTickBatchForEvent,
+                attackEngineHintSync,
+                rangedEngineHintSync
+            )
+            local gearDotAttackRefreshHint = combineGearDotAttackRefreshHint(nil, fromDotTickBatchForEvent, merged, attackEngineHintSync)
             local jrAfter = jass.udg_TempReal
-            local ____temp_7
+            local ____temp_11
             if jrAfter ~= nil then
-                ____temp_7 = jrAfter[10]
+                ____temp_11 = jrAfter[10]
             else
-                ____temp_7 = nil
+                ____temp_11 = nil
             end
-            local tr10 = ____temp_7
+            local tr10 = ____temp_11
             if jrAfter ~= nil then
                 jrAfter[10] = 0
             end
@@ -107,39 +304,37 @@ function onAnyUnitDamagedAction(self)
             if jr ~= nil then
                 jr[1] = finalDamage
             end
-            local ____temp_8
-            if #damageTypeOverrideQueue > 0 then
-                ____temp_8 = table.remove(damageTypeOverrideQueue, 1)
-            else
-                ____temp_8 = nil
-            end
-            local override = ____temp_8
-            local ____temp_9
-            if #dotBatchMarkQueue > 0 then
-                ____temp_9 = table.remove(dotBatchMarkQueue, 1) == true
-            else
-                ____temp_9 = false
-            end
-            local fromDotTickBatch = ____temp_9
             damagePendingQueue[#damagePendingQueue + 1] = {
                 unit = savedUnit,
                 damage = finalDamage,
                 source = savedSource,
-                damageTypeOverride = type(override) == "number" and override or nil,
-                fromDotTickBatch = fromDotTickBatch
+                damageTypeOverride = type(damageTypeOverrideForEvent) == "number" and damageTypeOverrideForEvent or nil,
+                fromDotTickBatch = fromDotTickBatchForEvent,
+                udgDamageTypeNumericSnap = merged,
+                gearDotAttackRefreshHint = gearDotAttackRefreshHint
             }
             runDeferredDamageDisplay(nil)
         end
         jass.TimerStart(tRead, 0, false, afterRead)
     else
+        local merged = ____exports.mergeUdgTempDamageTypeToNumeric(nil, gu.udg_TempDamageType)
+        clearUdgTempDamageType(nil, gu)
+        merged = applyEngineRangedBitToNumericSnap(
+            nil,
+            merged,
+            fromDotTickBatchForEvent,
+            attackEngineHintSync,
+            rangedEngineHintSync
+        )
+        local gearDotAttackRefreshHint = combineGearDotAttackRefreshHint(nil, fromDotTickBatchForEvent, merged, attackEngineHintSync)
         local jrAfter = jass.udg_TempReal
-        local ____temp_10
+        local ____temp_12
         if jrAfter ~= nil then
-            ____temp_10 = jrAfter[10]
+            ____temp_12 = jrAfter[10]
         else
-            ____temp_10 = nil
+            ____temp_12 = nil
         end
-        local tr10 = ____temp_10
+        local tr10 = ____temp_12
         if jrAfter ~= nil then
             jrAfter[10] = 0
         end
@@ -150,26 +345,14 @@ function onAnyUnitDamagedAction(self)
         if jr ~= nil then
             jr[1] = finalDamage
         end
-        local ____temp_11
-        if #damageTypeOverrideQueue > 0 then
-            ____temp_11 = table.remove(damageTypeOverrideQueue, 1)
-        else
-            ____temp_11 = nil
-        end
-        local override = ____temp_11
-        local ____temp_12
-        if #dotBatchMarkQueue > 0 then
-            ____temp_12 = table.remove(dotBatchMarkQueue, 1) == true
-        else
-            ____temp_12 = false
-        end
-        local fromDotTickBatch = ____temp_12
         damagePendingQueue[#damagePendingQueue + 1] = {
             unit = savedUnit,
             damage = finalDamage,
             source = savedSource,
-            damageTypeOverride = type(override) == "number" and override or nil,
-            fromDotTickBatch = fromDotTickBatch
+            damageTypeOverride = type(damageTypeOverrideForEvent) == "number" and damageTypeOverrideForEvent or nil,
+            fromDotTickBatch = fromDotTickBatchForEvent,
+            udgDamageTypeNumericSnap = merged,
+            gearDotAttackRefreshHint = gearDotAttackRefreshHint
         }
         runDeferredDamageDisplay(nil)
     end
@@ -188,76 +371,148 @@ function runDeferredDamageDisplay(self)
             end
             local su = entry.unit
             local sd = entry.damage
-            local j = jass
-            if j.udg_TempUnit ~= nil then
-                j.udg_TempUnit[5] = su
-                local ____j_udg_TempUnit_14 = j.udg_TempUnit
+            if jass.udg_TempUnit ~= nil then
+                jass.udg_TempUnit[5] = su
+                local ____jass_udg_TempUnit_14 = jass.udg_TempUnit
                 local ____temp_13
                 if entry.source ~= nil then
                     ____temp_13 = entry.source
                 else
-                    ____temp_13 = j.udg_TempUnit[6]
+                    ____temp_13 = jass.udg_TempUnit[6]
                 end
-                ____j_udg_TempUnit_14[6] = ____temp_13
+                ____jass_udg_TempUnit_14[6] = ____temp_13
             end
-            local mergedType
-            local isFirstInBatch = false
-            local isLastInBatch = false
             if entry.damageTypeOverride ~= nil and type(entry.damageTypeOverride) == "number" then
-                mergedType = entry.damageTypeOverride
-                isFirstInBatch = true
-                isLastInBatch = true
-            else
+                local mergedType = entry.damageTypeOverride
+                ____exports.currentDamageType = mergedType
+                local isDotTickDamage = entry.fromDotTickBatch == true
+                do
+                    local c = 0
+                    while c < #DamageCallbacks do
+                        local cb = DamageCallbacks[c + 1]
+                        if type(cb) == "function" then
+                            cb(
+                                nil,
+                                su,
+                                sd,
+                                mergedType,
+                                true,
+                                true,
+                                isDotTickDamage
+                            )
+                        end
+                        c = c + 1
+                    end
+                end
+                if entry.fromDotTickBatch == true then
+                    pcall(function ()
+                            local m = require("系统.04．伤害系统.dot伤害")
+                            if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
+                                m:notifyDotTickBatchDamageDisplayed()
+                            end
+                        end
+                    )
+                end
+                return
+            end
+            do
+                local rawNumPeek = entry.udgDamageTypeNumericSnap
+                if entry.gearDotAttackRefreshHint == true or ____exports.damageTypeLooksLikeWeaponHitForGearDot(nil, rawNumPeek) then
+                    pcall(function ()
+                            local dm = require("系统.04．伤害系统.dot伤害")
+                            if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
+                                local ____temp_16
+                                if entry.source ~= nil then
+                                    ____temp_16 = entry.source
+                                else
+                                    local ____temp_15
+                                    if jass.udg_TempUnit ~= nil then
+                                        ____temp_15 = jass.udg_TempUnit[6]
+                                    else
+                                        ____temp_15 = nil
+                                    end
+                                    ____temp_16 = ____temp_15
+                                end
+                                local src = ____temp_16
+                                dm:tryApplyHeroAttackGearDots(src, su, sd)
+                            end
+                        end
+                    )
+                end
+            end
+            remainingType = 0
+            remainingHigh = 0
+            local segmentIndex = 0
+            while true do
                 if remainingType <= 0 then
-                    isFirstInBatch = true
                     remainingHigh = 0
-                    local raw = gu.udg_TempDamageType
-                    local rawNum = type(raw) == "number" and raw or (raw == nil and 0 or __TS__Number(raw))
+                    local ____temp_18
+                    if segmentIndex == 0 then
+                        ____temp_18 = entry.udgDamageTypeNumericSnap
+                    else
+                        local ____temp_17
+                        if type(gu.udg_TempDamageType) == "number" then
+                            ____temp_17 = gu.udg_TempDamageType
+                        else
+                            ____temp_17 = 0
+                        end
+                        ____temp_18 = ____temp_17
+                    end
+                    local rawNum = ____temp_18
                     remainingType = rawNum - 2048 * math.floor(rawNum / 2048)
                     if remainingType < 0 then
                         remainingType = remainingType + 2048
                     end
                     remainingHigh = (____exports.hasBit(nil, rawNum, 2048) and 2048 or 0) + (____exports.hasBit(nil, rawNum, 4096) and 4096 or 0) + (____exports.hasBit(nil, rawNum, 8192) and 8192 or 0) + (____exports.hasBit(nil, rawNum, 16384) and 16384 or 0)
-                    gu.udg_TempDamageType = 0
+                    if segmentIndex == 0 and type(gu.udg_TempDamageType) == "number" then
+                        gu.udg_TempDamageType = 0
+                    end
                 end
                 local oneBit = lowestSetBit(nil, remainingType)
                 remainingType = remainingType - oneBit
-                mergedType = oneBit + remainingHigh
-                if remainingType <= 0 then
+                local mergedType = oneBit + remainingHigh
+                local willEnd = remainingType <= 0
+                if willEnd then
                     remainingHigh = 0
-                    gu.udg_TempDamageType = 0
-                end
-                isFirstInBatch = remainingType <= 0
-                isLastInBatch = remainingType <= 0
-            end
-            if remainingType <= 0 and entry.damageTypeOverride == nil then
-                remainingHigh = 0
-                gu.udg_TempDamageType = 0
-            end
-            ____exports.currentDamageType = mergedType
-            do
-                local c = 0
-                while c < #DamageCallbacks do
-                    local cb = DamageCallbacks[c + 1]
-                    if type(cb) == "function" then
-                        cb(nil, su,
-                            sd,
-                            mergedType,
-                            isFirstInBatch,
-                            isLastInBatch
-                        )
+                    if type(gu.udg_TempDamageType) == "number" then
+                        gu.udg_TempDamageType = 0
                     end
-                    c = c + 1
                 end
-            end
-            if entry.fromDotTickBatch == true then
-                pcall(function ()
-                        local m = require("系统.04．伤害系统.dot伤害")
-                        if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
-                            m:notifyDotTickBatchDamageDisplayed()
+                local isFirstInBatch = segmentIndex == 0
+                local isLastInBatch = willEnd
+                ____exports.currentDamageType = mergedType
+                local isDotTickDamage = entry.fromDotTickBatch == true
+                do
+                    local c = 0
+                    while c < #DamageCallbacks do
+                        local cb = DamageCallbacks[c + 1]
+                        if type(cb) == "function" then
+                            cb(
+                                nil,
+                                su,
+                                sd,
+                                mergedType,
+                                isFirstInBatch,
+                                isLastInBatch,
+                                isDotTickDamage
+                            )
                         end
+                        c = c + 1
                     end
-                )
+                end
+                if entry.fromDotTickBatch == true and isLastInBatch then
+                    pcall(function ()
+                            local m = require("系统.04．伤害系统.dot伤害")
+                            if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
+                                m:notifyDotTickBatchDamageDisplayed()
+                            end
+                        end
+                    )
+                end
+                segmentIndex = segmentIndex + 1
+                if willEnd then
+                    break
+                end
             end
         end
         jass.TimerStart(t, 0, false, deferred)
@@ -298,7 +553,7 @@ EVENT_UNIT_DAMAGED_ID = 52
 DamageEventQueue = {}
 DamageCallbacks = {}
 DamageEventNumber = 0
---- 本次伤害的类型标志位（由 JASS udg_TempDamageType 读取后立即清零），供外部模块直接读取
+--- 本次伤害合并类型位（由回调传入的 `mergedType` 同步），供外部模块直接读取
 ____exports.currentDamageType = 0
 MNDamageEventTrigger = nil
 ta = nil
@@ -386,23 +641,23 @@ local function unitDeathAction(self)
     recreateDamageTrigger()
 end
 local function anyUnitDamagedFilter(self)
-    local ____temp_15
+    local ____temp_19
     if type(jass.GetFilterUnit) == "function" then
-        ____temp_15 = jass.GetFilterUnit()
+        ____temp_19 = jass.GetFilterUnit()
     else
-        ____temp_15 = nil
+        ____temp_19 = nil
     end
-    local u = ____temp_15
+    local u = ____temp_19
     if not u then
         return false
     end
-    local ____temp_16
+    local ____temp_20
     if type(jass.GetUnitAbilityLevel) == "function" then
-        ____temp_16 = jass.GetUnitAbilityLevel(u, ALOC)
+        ____temp_20 = jass.GetUnitAbilityLevel(u, ALOC)
     else
-        ____temp_16 = 0
+        ____temp_20 = 0
     end
-    local lvl = ____temp_16
+    local lvl = ____temp_20
     if lvl > 0 then
         return false
     end
@@ -430,41 +685,41 @@ local function initEnumUnit(self)
     local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
     local DestroyGroup = jass.DestroyGroup
     local RegisterPlayerUnitEvent = jass.TriggerRegisterPlayerUnitEvent
-    local ____jass_EVENT_PLAYER_UNIT_DEATH_17 = jass.EVENT_PLAYER_UNIT_DEATH
-    if ____jass_EVENT_PLAYER_UNIT_DEATH_17 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DEATH_17 = 52
+    local ____jass_EVENT_PLAYER_UNIT_DEATH_21 = jass.EVENT_PLAYER_UNIT_DEATH
+    if ____jass_EVENT_PLAYER_UNIT_DEATH_21 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DEATH_21 = 52
     end
-    local evDeath = ____jass_EVENT_PLAYER_UNIT_DEATH_17
+    local evDeath = ____jass_EVENT_PLAYER_UNIT_DEATH_21
     if type(CreateTrigger) ~= "function" or type(CreateRegion) ~= "function" then
         return
     end
     local t = CreateTrigger()
     local r = CreateRegion()
-    local ____temp_18
+    local ____temp_22
     if type(CreateGroup) == "function" then
-        ____temp_18 = CreateGroup()
+        ____temp_22 = CreateGroup()
     else
-        ____temp_18 = nil
+        ____temp_22 = nil
     end
-    local grp = ____temp_18
-    local ____temp_19
+    local grp = ____temp_22
+    local ____temp_23
     if type(GetWorldBounds) == "function" then
-        ____temp_19 = GetWorldBounds()
+        ____temp_23 = GetWorldBounds()
     else
-        ____temp_19 = nil
+        ____temp_23 = nil
     end
-    local bounds = ____temp_19
+    local bounds = ____temp_23
     if bounds and type(RegionAddRect) == "function" then
         RegionAddRect(r, bounds)
     end
     if type(TriggerRegisterEnterRegion) == "function" then
-        local ____temp_20
+        local ____temp_24
         if type(Condition) == "function" then
-            ____temp_20 = Condition(anyUnitDamagedFilter)
+            ____temp_24 = Condition(anyUnitDamagedFilter)
         else
-            ____temp_20 = nil
+            ____temp_24 = nil
         end
-        TriggerRegisterEnterRegion(t, r, ____temp_20)
+        TriggerRegisterEnterRegion(t, r, ____temp_24)
     end
     if grp and bounds and type(GroupEnumUnitsInRect) == "function" and type(Condition) == "function" then
         local function alwaysTrue()
@@ -482,13 +737,13 @@ local function initEnumUnit(self)
                     if not u then
                         return
                     end
-                    local ____temp_21
+                    local ____temp_25
                     if type(jass.GetUnitAbilityLevel) == "function" then
-                        ____temp_21 = jass.GetUnitAbilityLevel(u, ALOC)
+                        ____temp_25 = jass.GetUnitAbilityLevel(u, ALOC)
                     else
-                        ____temp_21 = 0
+                        ____temp_25 = 0
                     end
-                    local lvl = ____temp_21
+                    local lvl = ____temp_25
                     if lvl > 0 then
                         return
                     end

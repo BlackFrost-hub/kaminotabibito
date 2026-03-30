@@ -68,6 +68,8 @@ export interface QuestData {
   updatedAt: number; // 最后更新时间戳
   nativeHandle?: number; // War3原生任务句柄（CreateQuest返回值）
   startTime?: number; // 任务开始时间戳（用于计时任务）
+  /** 已注册但不在任务面板列出（日后启用） */
+  uiReserved?: boolean;
 }
 
 /**
@@ -136,6 +138,7 @@ export class QuestDatabase {
 
     const source = type ? this.getQuestsByType(type) : this.getAllQuests();
     return source.filter(quest => {
+      if (quest.uiReserved) return false;
       if (playerData.quests.has(quest.id) ||
           playerData.completedQuests.has(quest.id) ||
           playerData.failedQuests.has(quest.id)) {
@@ -176,7 +179,7 @@ export class QuestDatabase {
    */
   public acceptQuest(playerId: number, questId: string): boolean {
     const quest = this.getQuest(questId);
-    if (!quest) return false;
+    if (!quest || quest.uiReserved) return false;
 
     const playerData = this.getPlayerData(playerId);
     if (!playerData) return false;
@@ -417,6 +420,43 @@ export function createTestQuests(): void {
     requiredQuests: ["main_001"],
     zone: "矿山",
     icon: "ReplaceableTextures\\CommandButtons\\BTNIronForge.blp",
+    createdAt: now(),
+    updatedAt: now()
+  });
+
+  // 占位：支线 / 小任务各一条，结构与主线列表行一致（`side_`/`daily_` + 001–020 带图标）；日后去掉 `uiReserved` 即可启用
+  db.registerQuest({
+    id: "side_003",
+    type: QuestType.SIDE,
+    title: "（占位）支线任务",
+    description: "日后启用",
+    objectives: [
+      { id: "obj1", description: "占位目标", current: 0, required: 1, completed: false }
+    ],
+    rewards: [{ type: "gold", value: 0, description: "" }],
+    status: QuestStatus.UNDISCOVERED,
+    requiredLevel: 1,
+    zone: "",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNFootman.blp",
+    uiReserved: true,
+    createdAt: now(),
+    updatedAt: now()
+  });
+
+  db.registerQuest({
+    id: "daily_002",
+    type: QuestType.DAILY,
+    title: "（占位）小任务",
+    description: "日后启用",
+    objectives: [
+      { id: "obj1", description: "占位目标", current: 0, required: 1, completed: false }
+    ],
+    rewards: [{ type: "gold", value: 0, description: "" }],
+    status: QuestStatus.UNDISCOVERED,
+    requiredLevel: 1,
+    zone: "",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNPeon.blp",
+    uiReserved: true,
     createdAt: now(),
     updatedAt: now()
   });

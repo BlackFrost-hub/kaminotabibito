@@ -7,11 +7,13 @@ local _____786C_4EF6_51FD_6570 = require("系统.00．核心系统.硬件函数"
 local getMouseFocus = _____786C_4EF6_51FD_6570.getMouseFocus
 local getMouseY = _____786C_4EF6_51FD_6570.getMouseY
 local getWindowHeight = _____786C_4EF6_51FD_6570.getWindowHeight
+local frameSetScriptByCode = _____786C_4EF6_51FD_6570.frameSetScriptByCode
 local ____UI_5DE5_5177 = require("系统.09．表现系统.UI工具")
 local createFrame = ____UI_5DE5_5177.createFrame
 local setFramePointRelative = ____UI_5DE5_5177.setFramePointRelative
 local FrameType = ____UI_5DE5_5177.FrameType
 local FramePoint = ____UI_5DE5_5177.FramePoint
+local EventType = ____UI_5DE5_5177.EventType
 --- 垂直滚动条轨道（BACKDROP 轨道 + 圆形 thumb + 透明 GLUETEXTBUTTON 命中）
 -- - 全局左键按下/抬起 + getMouseFocus 判定本轨道（1.27e 下帧 MOUSE_DOWN 常不可靠）
 -- - 多实例：模块内只注册一次全局鼠标，分发给所有 VerticalScrollbarTrack
@@ -73,6 +75,13 @@ function VerticalScrollbarTrack.prototype.attach(self)
     if type(japi.DzFrameSetLevel) == "function" then
         japi.DzFrameSetLevel(self.hitBtn, 121)
     end
+    frameSetScriptByCode(
+        nil,
+        self.hitBtn,
+        EventType.MOUSE_DOWN,
+        function() return self:forceBeginDragFromHit() end,
+        false
+    )
     local ____exports_VerticalScrollbarTrack_instances_1 = ____exports.VerticalScrollbarTrack.instances
     ____exports_VerticalScrollbarTrack_instances_1[#____exports_VerticalScrollbarTrack_instances_1 + 1] = self
     ____exports.VerticalScrollbarTrack:ensureGlobalMouseHooks()
@@ -121,6 +130,19 @@ function VerticalScrollbarTrack.prototype.getMaxScroll(self)
     local lv = self.opt.listViewHeightNorm
     return math.max(0, h - lv)
 end
+function VerticalScrollbarTrack.prototype.forceBeginDragFromHit(self)
+    if not self.opt:isInteractionEnabled() or not self.hitBtn then
+        return
+    end
+    local maxScroll = self:getMaxScroll()
+    if maxScroll <= 0 then
+        return
+    end
+    if self.dragging then
+        return
+    end
+    self:startDrag()
+end
 function VerticalScrollbarTrack.prototype.tryBeginDrag(self)
     if not self.opt:isInteractionEnabled() or not self.hitBtn then
         return
@@ -164,6 +186,9 @@ function VerticalScrollbarTrack.prototype.tryBeginDrag(self)
     )
 end
 function VerticalScrollbarTrack.prototype.startDrag(self)
+    if self.dragging then
+        return
+    end
     local maxScroll = self:getMaxScroll()
     if maxScroll <= 0 then
         return

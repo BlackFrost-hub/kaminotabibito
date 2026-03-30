@@ -5,9 +5,9 @@
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
-import 区域传送配置 from "./区域传送配置";
-import type { RegionConfig } from "./区域传送配置";
-import { panCameraToTimedForPlayer } from "./镜头系统";
+import 区域传送配置 from "./02．区域传送配置";
+import type { RegionConfig } from "./02．区域传送配置";
+import { panCameraToTimedForPlayer } from "./01．镜头系统";
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
 const regionMap = new Map<any, RegionConfig>();

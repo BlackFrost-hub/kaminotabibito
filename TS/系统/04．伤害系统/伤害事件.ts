@@ -18,10 +18,18 @@ function getEventUnitDamaged(): any {
 }
 
 const DamageEventQueue: any[] = [];
-const DamageCallbacks: ((unit: any, damage: number, damageType: number, isFirstInBatch: boolean, isLastInBatch: boolean) => void)[] = [];
+/** 第 6 参仅当本次入队来自 dot 秒跳 `UnitDamageTarget` 时为 true（见 `damagePendingQueue[].fromDotTickBatch`） */
+const DamageCallbacks: ((
+  unit: any,
+  damage: number,
+  damageType: number,
+  isFirstInBatch: boolean,
+  isLastInBatch: boolean,
+  fromDotTickBatch?: boolean
+) => void)[] = [];
 let DamageEventNumber = 0;
 
-/** 本次伤害的类型标志位（由 JASS udg_TempDamageType 读取后立即清零），供外部模块直接读取 */
+/** 本次伤害合并类型位（由回调传入的 `mergedType` 同步），供外部模块直接读取 */
 export let currentDamageType = 0;
 
 /** 检测位标志（Lua5.1 无 & 运算符） */
@@ -34,13 +42,29 @@ let TimerHandle: any = undefined;
 let UnitGroup: any = undefined;
 
 /**
- * 【同帧多段伤害】采用「模数按位提取」方案，勿改为槽位/数组等其它实现。
- * JASS 端用 OperatorIntegerAdd 对 udg_TempDamageType 累加（如 8+16+32=56）；
- * 此处队列存 (unit,damage)，0 秒计时器回调里每次 pop 一个，从剩余值中按位取最低位（1,2,4,8...）消费，
- * 保证同帧冰/雷/金属性等多段伤害能正确一一对应显示。
+ * 【伤害类型】JASS `Trig_GetDmgType` 写入 `udg_TempDamageType[0..14]` 布尔槽。Lua 在 **Timer(0) afterRead** 与读 `TempReal[10]` 同时
+ * `mergeUdgTempDamageTypeToNumeric` 并 `clearUdgTempDamageType`，避免同步回调早于 JASS 时读到全 false（类型显示为 0）。
+ * 同步阶段仅读 `YDWEIsEventAttackDamage` / `YDWEIsEventRangedDamage`；若槽里已有 8192 无 16384 且引擎为远程则补 16384（大法师远程普攻）。
+ * 【兼容】`udg_TempDamageType` 为单个 number 时按原样 merge。
  */
-const damagePendingQueue: { unit: any; damage: number; source?: any; damageTypeOverride?: number; fromDotTickBatch?: boolean }[] = [];
-/** 与 damagePendingQueue 对齐：dot伤害 在 UnitDamageTarget 前 push，一次受伤入队消费一条 */
+const damagePendingQueue: {
+  unit: any;
+  damage: number;
+  source?: any;
+  damageTypeOverride?: number;
+  fromDotTickBatch?: boolean;
+  /** 受伤同步阶段从 udg 合成并快照，延后展示不再读 udg（避免被下一刀覆盖） */
+  udgDamageTypeNumericSnap: number;
+  /**
+   * 在 EVENT_UNIT_DAMAGED **同步**阶段计算，供延后 `tryApplyHeroAttackGearDots`；合成值已含 [13] 攻击 / [14] 远程 对应位。
+   */
+  gearDotAttackRefreshHint?: boolean;
+}[] = [];
+/**
+ * 与 damagePendingQueue 对齐：dot伤害 在 UnitDamageTarget 前 push。
+ * **必须在 EVENT_UNIT_DAMAGED 同步回调里 shift**，不能放到 Timer(0) 的 afterRead：多段 0s 计时器执行顺序不定，
+ * 普攻的延后回调会错拿「DOT 秒跳」的标记，导致袖箭等整段被 fromDotTickBatch 跳过。
+ */
 const dotBatchMarkQueue: boolean[] = [];
 /** 由 dot伤害.dealDamageForType 调用：标记「下一次因伤入队」来自本帧 DOT 秒跳，便于延后清空 dotTickBatchTargetHids */
 export function markNextPendingDamageAsDotTickBatch(): void {
@@ -53,10 +77,134 @@ export function setNextDamageTypeOverride(mergedType: number): void {
   damageTypeOverrideQueue.push(mergedType);
 }
 let remainingType = 0;
-/** 本段伤害的高位：2048 技能 + 4096 物理 + 8192 普攻 + 16384 远程，从 udg_TempDamageType 首次读取时取出 */
+/** 本段伤害的高位：2048 技能 + 4096 物理 + 8192 普攻 + 16384 远程，从快照首次解析时取出 */
 let remainingHigh = 0;
 
 const ATTR_BITS = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+
+/**
+ * JASS 槽位 → 与旧「按位累加」方案一致的合成值（供拆段与 dot伤害 判断）：
+ * [0..10] → ATTR_BITS；[11] ATTACK_TYPE_NORMAL→2048；[12] 物理→4096；[13] 攻击伤害→8192；[14] 远程→16384。
+ * Lua 表：常见为 JASS[i] → `row[i+1]`（1 基）；若 `row[0]` 已定义（含 false）则按 0 基读 `row[i]`。
+ */
+function tempDamageTypeRowUsesZeroBasedIndex(row: any): boolean {
+  const z = (row as any)[0];
+  return z !== undefined && z !== null;
+}
+
+function tempDamageTypeRowIndexTrue(row: any, logicalIndex: number): boolean {
+  const idx = tempDamageTypeRowUsesZeroBasedIndex(row) ? logicalIndex : logicalIndex + 1;
+  const v = (row as any)[idx];
+  return v === true || v === 1;
+}
+
+export function mergeUdgTempDamageTypeToNumeric(udgVal: any): number {
+  if (udgVal == null) return 0;
+  if (typeof udgVal === "number") return udgVal;
+  if (typeof udgVal !== "object") return 0;
+  let n = 0;
+  for (let i = 0; i <= 10; i++) {
+    if (tempDamageTypeRowIndexTrue(udgVal, i)) n = n + ATTR_BITS[i];
+  }
+  if (tempDamageTypeRowIndexTrue(udgVal, 11)) n = n + 2048;
+  if (tempDamageTypeRowIndexTrue(udgVal, 12)) n = n + 4096;
+  if (tempDamageTypeRowIndexTrue(udgVal, 13)) n = n + 8192;
+  if (tempDamageTypeRowIndexTrue(udgVal, 14)) n = n + 16384;
+  return n;
+}
+
+function clearUdgTempDamageType(gu: any): void {
+  const row = gu.udg_TempDamageType;
+  if (row == null) return;
+  if (typeof row === "number") {
+    gu.udg_TempDamageType = 0;
+    return;
+  }
+  const z = tempDamageTypeRowUsesZeroBasedIndex(row);
+  for (let logical = 0; logical <= 14; logical++) {
+    const idx = z ? logical : logical + 1;
+    (row as any)[idx] = false;
+  }
+}
+
+/** 与 dot伤害.onDamage 共用：带 4096 且无 2048 的合并类型视为「普攻类武器伤害」（地图未置 8192/16384 时） */
+export function damageTypeLooksLikeWeaponHitForGearDot(t: number): boolean {
+  if (hasBit(t, 8192) || hasBit(t, 16384)) return true;
+  return hasBit(t, 4096) && !hasBit(t, 2048);
+}
+
+/** 仅在受伤事件同步回调内有效；勿在 Timer 延后里调用 */
+function syncEventIsAttackDamageFromEngine(): boolean {
+  const j = jass as any;
+  if (typeof j.YDWEIsEventAttackDamage === "function") {
+    let hit = false;
+    (pcall as any)(() => {
+      if (j.YDWEIsEventAttackDamage() === true) hit = true;
+    });
+    if (hit) return true;
+  }
+  if (typeof j.BlzGetEventIsAttack === "function") {
+    let hit = false;
+    (pcall as any)(() => {
+      if (j.BlzGetEventIsAttack() === true) hit = true;
+    });
+    if (hit) return true;
+  }
+  let hitJ = false;
+  (pcall as any)(() => {
+    const jm = require("jass.japi") as { IsEventAttackDamage?: () => boolean };
+    if (jm != null && typeof jm.IsEventAttackDamage === "function" && jm.IsEventAttackDamage() === true) hitJ = true;
+  });
+  return hitJ;
+}
+
+/** 仅在受伤事件同步回调内有效 */
+function syncEventIsRangedDamageFromEngine(): boolean {
+  const j = jass as any;
+  if (typeof j.YDWEIsEventRangedDamage === "function") {
+    let hit = false;
+    (pcall as any)(() => {
+      if (j.YDWEIsEventRangedDamage() === true) hit = true;
+    });
+    if (hit) return true;
+  }
+  let hitJ = false;
+  (pcall as any)(() => {
+    const jm = require("jass.japi") as { IsEventRangedDamage?: () => boolean };
+    if (jm != null && typeof jm.IsEventRangedDamage === "function" && jm.IsEventRangedDamage() === true) hitJ = true;
+  });
+  return hitJ;
+}
+
+/**
+ * `udg` 布尔槽在 Timer(0) 内 merge 之后调用：用同步阶段保存的引擎远程标记补 16384（大法师远程普攻有时 JASS [14] 未置位）。
+ */
+function applyEngineRangedBitToNumericSnap(
+  snap: number,
+  fromDotTickBatch: boolean,
+  attackEngineHintSync: boolean,
+  rangedEngineHintSync: boolean
+): number {
+  if (fromDotTickBatch === true) return snap;
+  let n = snap;
+  if (n === 0 && attackEngineHintSync) {
+    n = 8192;
+  }
+  if (attackEngineHintSync && rangedEngineHintSync && hasBit(n, 8192) && !hasBit(n, 16384)) {
+    n = n + 16384;
+  }
+  return n;
+}
+
+function combineGearDotAttackRefreshHint(
+  fromDotTickBatch: boolean,
+  numericSnap: number,
+  attackEngineHintSync: boolean
+): boolean {
+  if (fromDotTickBatch === true) return false;
+  if (damageTypeLooksLikeWeaponHitForGearDot(numericSnap)) return true;
+  return attackEngineHintSync;
+}
 
 /** 模数按位提取：从累加值中取最低的一个置位（Lua5.1 无 & 故用 hasBit 从低到高扫）。 */
 function lowestSetBit(v: number): number {
@@ -100,9 +248,16 @@ function onAnyUnitDamagedAction(): void {
   const jr = (jass as any).udg_TempReal;
   let savedDamage = typeof (jass as any).GetEventDamage === "function" ? (jass as any).GetEventDamage() : (jr != null && typeof jr[1] === "number" ? jr[1] : 0);
   let savedSource: any = null;
-  if (typeof (g as any).GetEventDamageSource === "function") savedSource = (g as any).GetEventDamageSource();
-  if (savedSource == null && typeof (jass as any).GetEventDamageSource === "function") savedSource = (jass as any).GetEventDamageSource();
-  if (savedSource == null && typeof (jass as any).BlzGetEventDamageSource === "function") savedSource = (jass as any).BlzGetEventDamageSource();
+  /** 优先 `jass` 表上的 `GetEventDamageSource`（Lua require 后 common 原生会挂在此，与 JASS 侧一致） */
+  const jassGetSrc = (jass as any)["GetEventDamageSource"] as (() => any) | undefined;
+  if (typeof jassGetSrc === "function") savedSource = jassGetSrc();
+  if (savedSource == null) {
+    const gGetSrc = (globalThis as any)["GetEventDamageSource"] as (() => any) | undefined;
+    if (typeof gGetSrc === "function") savedSource = gGetSrc();
+  }
+  if (savedSource == null && typeof (jass as any).BlzGetEventDamageSource === "function") {
+    savedSource = (jass as any).BlzGetEventDamageSource();
+  }
   if (savedSource == null && j.udg_TempUnit != null && j.udg_TempUnit[6] != null) savedSource = j.udg_TempUnit[6];
   if (j.udg_TempUnit != null) {
     j.udg_TempUnit[5] = savedUnit;
@@ -119,44 +274,80 @@ function onAnyUnitDamagedAction(): void {
     }
     i = i + 1;
   }
+  /** 与本次受伤事件成对消费（同步顺序 = UnitDamageTarget / 普攻触发顺序）；类型覆盖队列同理，避免与 dot 标记错配 */
+  const damageTypeOverrideForEvent =
+    damageTypeOverrideQueue.length > 0 ? damageTypeOverrideQueue.shift() : undefined;
+  const fromDotTickBatchForEvent = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
+  /**
+   * `udg_TempDamageType` 布尔槽由 JASS GetDmgType 写入；若 Lua 本回调早于该 JASS，同步 merge 会得到 0。
+   * 故 merge+clear 放到与 `TempReal[10]` 相同的 Timer(0) 里；此处仅快照引擎「攻击/远程」（仅同步有效）。
+   */
+  const attackEngineHintSync = fromDotTickBatchForEvent ? false : syncEventIsAttackDamageFromEngine();
+  const rangedEngineHintSync = fromDotTickBatchForEvent ? false : syncEventIsRangedDamageFromEngine();
   /** 必须用 0.00s 计时器延后读 [10]，同帧内 Lua 拿不到 JASS 刚写的 udg_TempReal[10] */
   if (typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
     const tRead = (jass as any).CreateTimer();
     const afterRead = (): void => {
       if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(tRead);
+      let merged = mergeUdgTempDamageTypeToNumeric(gu.udg_TempDamageType);
+      clearUdgTempDamageType(gu);
+      merged = applyEngineRangedBitToNumericSnap(
+        merged,
+        fromDotTickBatchForEvent,
+        attackEngineHintSync,
+        rangedEngineHintSync
+      );
+      const gearDotAttackRefreshHint = combineGearDotAttackRefreshHint(
+        fromDotTickBatchForEvent,
+        merged,
+        attackEngineHintSync
+      );
       const jrAfter = (jass as any).udg_TempReal;
       const tr10 = jrAfter != null ? jrAfter[10] : undefined;
       if (jrAfter != null) jrAfter[10] = 0;
       let finalDamage = savedDamage;
       if (typeof tr10 === "number" && !isNaN(tr10) && tr10 > 0) finalDamage = tr10;
       if (jr != null) jr[1] = finalDamage;
-      const override = damageTypeOverrideQueue.length > 0 ? damageTypeOverrideQueue.shift() : undefined;
-      const fromDotTickBatch = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
       damagePendingQueue.push({
         unit: savedUnit,
         damage: finalDamage,
         source: savedSource,
-        damageTypeOverride: typeof override === "number" ? override : undefined,
-        fromDotTickBatch,
+        damageTypeOverride: typeof damageTypeOverrideForEvent === "number" ? damageTypeOverrideForEvent : undefined,
+        fromDotTickBatch: fromDotTickBatchForEvent,
+        udgDamageTypeNumericSnap: merged,
+        gearDotAttackRefreshHint,
       });
       runDeferredDamageDisplay();
     };
     (jass as any).TimerStart(tRead, 0.00, false, afterRead);
   } else {
+    let merged = mergeUdgTempDamageTypeToNumeric(gu.udg_TempDamageType);
+    clearUdgTempDamageType(gu);
+    merged = applyEngineRangedBitToNumericSnap(
+      merged,
+      fromDotTickBatchForEvent,
+      attackEngineHintSync,
+      rangedEngineHintSync
+    );
+    const gearDotAttackRefreshHint = combineGearDotAttackRefreshHint(
+      fromDotTickBatchForEvent,
+      merged,
+      attackEngineHintSync
+    );
     const jrAfter = (jass as any).udg_TempReal;
     const tr10 = jrAfter != null ? jrAfter[10] : undefined;
     if (jrAfter != null) jrAfter[10] = 0;
     let finalDamage = savedDamage;
     if (typeof tr10 === "number" && !isNaN(tr10) && tr10 > 0) finalDamage = tr10;
     if (jr != null) jr[1] = finalDamage;
-    const override = damageTypeOverrideQueue.length > 0 ? damageTypeOverrideQueue.shift() : undefined;
-    const fromDotTickBatch = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
     damagePendingQueue.push({
       unit: savedUnit,
       damage: finalDamage,
       source: savedSource,
-      damageTypeOverride: typeof override === "number" ? override : undefined,
-      fromDotTickBatch,
+      damageTypeOverride: typeof damageTypeOverrideForEvent === "number" ? damageTypeOverrideForEvent : undefined,
+      fromDotTickBatch: fromDotTickBatchForEvent,
+      udgDamageTypeNumericSnap: merged,
+      gearDotAttackRefreshHint,
     });
     runDeferredDamageDisplay();
   }
@@ -172,54 +363,93 @@ function runDeferredDamageDisplay(): void {
       if (entry == null) return;
       const su = entry.unit;
       const sd = entry.damage;
-      const j = jass as any;
-      if (j.udg_TempUnit != null) {
-        j.udg_TempUnit[5] = su;
-        j.udg_TempUnit[6] = entry.source != null ? entry.source : j.udg_TempUnit[6];
+      if ((jass as any).udg_TempUnit != null) {
+        (jass as any).udg_TempUnit[5] = su;
+        (jass as any).udg_TempUnit[6] =
+          entry.source != null ? entry.source : (jass as any).udg_TempUnit[6];
       }
-      let mergedType: number;
-      let isFirstInBatch = false;
-      let isLastInBatch = false;
       if (entry.damageTypeOverride != null && typeof entry.damageTypeOverride === "number") {
-        mergedType = entry.damageTypeOverride;
-        isFirstInBatch = true;
-        isLastInBatch = true;
-      } else {
+        const mergedType = entry.damageTypeOverride;
+        currentDamageType = mergedType;
+        const isDotTickDamage = entry.fromDotTickBatch === true;
+        for (let c = 0; c < DamageCallbacks.length; c++) {
+          const cb = DamageCallbacks[c];
+          if (typeof cb === "function") (cb as any)(su, sd, mergedType, true, true, isDotTickDamage);
+        }
+        if (entry.fromDotTickBatch === true) {
+          (pcall as any)(() => {
+            const m = require("系统.04．伤害系统.dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
+            if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
+          });
+        }
+        return;
+      }
+      /** 在拆段前判定「本刀是否应按普攻刷新装备 DOT」：使用同步快照（含 JASS 布尔槽合成的 8192/16384） */
+      {
+        const rawNumPeek = entry.udgDamageTypeNumericSnap;
+        if (entry.gearDotAttackRefreshHint === true || damageTypeLooksLikeWeaponHitForGearDot(rawNumPeek)) {
+          (pcall as any)(() => {
+            const dm = require("系统.04．伤害系统.dot伤害") as {
+              tryApplyHeroAttackGearDots?: (src: any, tgt: any, dmg: number) => void;
+            };
+            if (dm != null && typeof dm.tryApplyHeroAttackGearDots === "function") {
+              const src =
+                entry.source != null
+                  ? entry.source
+                  : (jass as any).udg_TempUnit != null
+                    ? (jass as any).udg_TempUnit[6]
+                    : null;
+              dm.tryApplyHeroAttackGearDots(src, su, sd);
+            }
+          });
+        }
+      }
+      /** 新一条 queue 必须重新从 udg 读类型，禁止沿用上一刀未消费完的 remainingType（会错绑目标/丢 8192 位） */
+      remainingType = 0;
+      remainingHigh = 0;
+      let segmentIndex = 0;
+      while (true) {
         if (remainingType <= 0) {
-          isFirstInBatch = true;
           remainingHigh = 0;
-          const raw = gu.udg_TempDamageType;
-          const rawNum = typeof raw === "number" ? raw : (raw == null ? 0 : Number(raw));
+          const rawNum =
+            segmentIndex === 0
+              ? entry.udgDamageTypeNumericSnap
+              : typeof gu.udg_TempDamageType === "number"
+                ? gu.udg_TempDamageType
+                : 0;
           remainingType = rawNum - 2048 * Math.floor(rawNum / 2048);
           if (remainingType < 0) remainingType = remainingType + 2048;
-          // JASS 已把 2048/4096/8192/16384 加进同一 udg_TempDamageType，直接按位取
-          remainingHigh = (hasBit(rawNum, 2048) ? 2048 : 0) + (hasBit(rawNum, 4096) ? 4096 : 0) + (hasBit(rawNum, 8192) ? 8192 : 0) + (hasBit(rawNum, 16384) ? 16384 : 0);
-          gu.udg_TempDamageType = 0;
+          remainingHigh =
+            (hasBit(rawNum, 2048) ? 2048 : 0) +
+            (hasBit(rawNum, 4096) ? 4096 : 0) +
+            (hasBit(rawNum, 8192) ? 8192 : 0) +
+            (hasBit(rawNum, 16384) ? 16384 : 0);
+          if (segmentIndex === 0 && typeof gu.udg_TempDamageType === "number") gu.udg_TempDamageType = 0;
         }
         const oneBit = lowestSetBit(remainingType);
         remainingType = remainingType - oneBit;
-        mergedType = oneBit + remainingHigh;
-        if (remainingType <= 0) {
+        const mergedType = oneBit + remainingHigh;
+        const willEnd = remainingType <= 0;
+        if (willEnd) {
           remainingHigh = 0;
-          gu.udg_TempDamageType = 0;
+          if (typeof gu.udg_TempDamageType === "number") gu.udg_TempDamageType = 0;
         }
-        isFirstInBatch = remainingType <= 0;
-        isLastInBatch = remainingType <= 0;
-      }
-      if (remainingType <= 0 && entry.damageTypeOverride == null) {
-        remainingHigh = 0;
-        gu.udg_TempDamageType = 0;
-      }
-      currentDamageType = mergedType;
-      for (let c = 0; c < DamageCallbacks.length; c++) {
-        const cb = DamageCallbacks[c];
-        if (typeof cb === "function") (cb as any)(null, su, sd, mergedType, isFirstInBatch, isLastInBatch);
-      }
-      if (entry.fromDotTickBatch === true) {
-        (pcall as any)(() => {
-          const m = require("系统.04．伤害系统.dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
-          if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
-        });
+        const isFirstInBatch = segmentIndex === 0;
+        const isLastInBatch = willEnd;
+        currentDamageType = mergedType;
+        const isDotTickDamage = entry.fromDotTickBatch === true;
+        for (let c = 0; c < DamageCallbacks.length; c++) {
+          const cb = DamageCallbacks[c];
+          if (typeof cb === "function") (cb as any)(su, sd, mergedType, isFirstInBatch, isLastInBatch, isDotTickDamage);
+        }
+        if (entry.fromDotTickBatch === true && isLastInBatch) {
+          (pcall as any)(() => {
+            const m = require("系统.04．伤害系统.dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
+            if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
+          });
+        }
+        segmentIndex++;
+        if (willEnd) break;
       }
     };
     (jass as any).TimerStart(t, 0, false, deferred);
@@ -365,7 +595,17 @@ export function MNAnyUnitDamaged(trg: any, intervalSeconds: number): void {
 }
 
 /** 注册 Lua 回调：单位受伤时直接调用，不依赖 TriggerExecute（引擎可能不执行 Lua 动作） */
-export function registerDamageCallback(cb: (unit: any, damage: number, damageType: number, isFirstInBatch: boolean, isLastInBatch: boolean) => void, intervalSeconds?: number): void {
+export function registerDamageCallback(
+  cb: (
+    unit: any,
+    damage: number,
+    damageType: number,
+    isFirstInBatch: boolean,
+    isLastInBatch: boolean,
+    fromDotTickBatch?: boolean
+  ) => void,
+  intervalSeconds?: number
+): void {
   if (typeof cb !== "function") return;
   if (MNDamageEventTrigger == null) {
     if (typeof (jass as any).CreateTrigger === "function") MNDamageEventTrigger = (jass as any).CreateTrigger();

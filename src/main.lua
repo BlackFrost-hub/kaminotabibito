@@ -94,6 +94,7 @@ require("系统.00．核心系统.泄露审计")
 require("系统.08．任务系统.任务接受")
 require("系统.08．任务系统.任务完成")
 require("系统.08．任务系统.任务目标更新")
+require("系统.08．任务系统.任务STES桥接")
 require("系统.12．测试系统.测试事件")
 require("系统.12．测试系统.测试事件2")
 require("系统.12．测试系统.测试233注册")
@@ -111,16 +112,17 @@ require("系统.02．物品系统.04．装备成长")
 require("系统.02．物品系统.03．物品加工")
 require("系统.04．伤害系统.伤害事件")
 require("系统.04．伤害系统.伤害测试")
-local buffPoolCore = require("系统.05．Buff系统.Buff系统")
+local buffPoolCore = require("系统.05．Buff系统.00．Buff系统")
 if type(buffPoolCore.initBuffSystem) == "function" then
     buffPoolCore:initBuffSystem()
 end
+require("系统.05．Buff系统.03．BuffJASS桥接")
 require("系统.04．伤害系统.dot伤害")
-local _____533A_57DF_4F20_9001 = require("系统.07．地形系统.区域传送")
+local _____533A_57DF_4F20_9001 = require("系统.07．地形系统.03．区域传送")
 if type(_____533A_57DF_4F20_9001["init区域传送"]) == "function" then
     _____533A_57DF_4F20_9001["init区域传送"](_____533A_57DF_4F20_9001)
 end
-local _____6FC0_6D3B_4F20_9001_70B9 = require("系统.07．地形系统.激活传送点")
+local _____6FC0_6D3B_4F20_9001_70B9 = require("系统.07．地形系统.05．激活传送点")
 if type(_____6FC0_6D3B_4F20_9001_70B9["init激活传送点"]) == "function" then
     _____6FC0_6D3B_4F20_9001_70B9["init激活传送点"](_____6FC0_6D3B_4F20_9001_70B9)
 end
@@ -140,4 +142,9 @@ local buffUI = require("系统.05．Buff系统.02．BuffUI")
 if type(buffUI.init) == "function" then
     buffUI:init()
 end
+local _____5BF9_8BDD_6846UI = require("系统.09．表现系统.对话框UI")
+if type(_____5BF9_8BDD_6846UI.initDialogSystem) == "function" then
+    _____5BF9_8BDD_6846UI:initDialogSystem()
+end
+require("系统.12．测试系统.玩家1选择")
 return ____exports

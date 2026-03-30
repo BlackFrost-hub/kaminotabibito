@@ -7,7 +7,15 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-import { getGameUI, registerKeyDown, KEY_LETTER, KEY_NUM, frameSetScriptByCode, getWheelDelta, getMouseFocus } from "../00．核心系统/硬件函数";
+import {
+  getGameUI,
+  registerKeyDown,
+  KEY_LETTER,
+  KEY_NUM,
+  getWheelDelta,
+  getMouseFocus,
+  registerMouseWheel,
+} from "../00．核心系统/硬件函数";
 import {
   createFrame,
   setFramePosition,
@@ -19,19 +27,24 @@ import {
   setFrameHoverEvents,
   createTextLabel,
   loadTocOnce,
-  tryCreateFromFdfSafe,
   FrameType,
   FramePoint,
-  EventType,
-  type SizeConfig,
+  type RelativePositionConfig,
   hideFrame,
   showFrame,
 } from "../09．表现系统/UI工具";
 import { VerticalScrollbarTrack } from "../09．表现系统/垂直滚动条轨道";
-
 import { questManager } from "./任务管理器";
 import { questDB, QuestType, QuestStatus, QuestData } from "./任务数据";
 import { SoundUI_ClickPlay } from "../00．核心系统/音效函数";
+import {
+  DZ_TEXT_ALIGN_CENTER,
+  DZ_TEXT_ALIGN_LEFT,
+  applyDzTextFontAndAlignment,
+  applyDzTextFontAndCenterAlignment,
+  createTabLabelTextOnBackdrop,
+  setupTransparentGlueHitLayer,
+} from "../00．核心系统/UI函数";
 
 const TASK_UI_TOC_PATHS = ["UI\\TaskUI.toc"];
 const TASK_UI_TOC_LOAD_KEY = "TaskUI";
@@ -41,26 +54,25 @@ const ENABLE_FDF_B = true;
 const ENABLE_FDF_SCROLLBAR = true;
 const ENABLE_FDF_SCROLLBAR_BORDER = false;
 const ENABLE_FDF_SCROLLBAR_THUMB = false;
-// 滚动条轨道视觉：先做自建 BACKDROP，并直接贴你确认过的原生 slider 纹理
-const USE_NATIVE_SCROLLBAR_TRACK = false;
-// 先只做轨道视觉，不创建原生滚动输入层（EscMenuScrollBarTemplate）
-const ENABLE_SCROLL_INPUT = false;
-const ENABLE_WHEEL_OVERLAY = false;
-// 现在需要滚轮滑动：恢复 clickBtn 的 MOUSE_WHEEL 绑定
 const ENABLE_MOUSE_WHEEL_SCROLL = true;
 /** 主任务口尺寸与 TOPLEFT 绝对坐标（左下原点，y 向上） */
 const ENTRY_W = 0.059 * 1.3;
 const ENTRY_H = 0.0156 * 1.4;
 const ENTRY_X = 0.005;
 const ENTRY_Y = 0.60;
+const ENTRY_TITLE_TEXT_BOX_W = 0.82;
+const ENTRY_TITLE_TEXT_BOX_H = 0.46;
 const PANEL_W = 0.35;
 const PANEL_H = 0.5;
-const TAB_TEXT_Y_NUDGE = -0.01;
+/** Tab 背景与 GLUETEXTBUTTON 同宽同高（与背景框对齐，避免字偏） */
+const TAB_FRAME_W = 0.04;
+const TAB_FRAME_H = 0.035;
+/** 顶部 Tab「主线/支线/小任务」：`DzFrameSetFont` 第三参（配合与 BACKDROP 同大的 `TEXT`） */
+const TAB_CATEGORY_FONT_SCALE = 0.012;
 const LIST_ITEM_H = 0.12;
 const BG_TEX = "UI\\Widgets\\EscMenu\\Human\\human-options-menu-background.blp";
-const BORDER_TEX = "UI\\Widgets\\EscMenu\\Human\\human-options-menu-border.blp";
 
-// 布局基准（旧版绝对布局，用于推导相对量；改 ENTRY 后不必再改这些）
+// 布局基准（改 ENTRY_* 时与 PANEL_REL_* 联动）
 const PANEL_TOP = 0.46;
 const PANEL_TOP_UP = 0.015;
 const LEGACY_ENTRY_X_REF = 0.06;
@@ -112,13 +124,24 @@ const QUEST_ROW_ICON_HEIGHT_FACTOR = 0.84;
 const QUEST_ROW_ICON_PAD_LEFT = 0.003;
 /** 图标右缘与标题文字之间的空隙 */
 const QUEST_ROW_TEXT_GAP_AFTER_ICON = 0.006;
-/** 主线 01/02 左侧头像相对行顶 TOPLEFT 的纵向偏移（越大越往下，避免顶到行上边框） */
-const QUEST_ROW_ICON_MAIN0102_Y_OFFSET = 0.004;
+/** 带行图标时左侧图标相对行顶 TOPLEFT 的纵向偏移（越大越往下，避免顶到行上边框） */
+const QUEST_ROW_ICON_Y_OFFSET = 0.004;
 
-function debugPrint(_msg: string): void {
-  // 暂时静音：避免与 DOT 等调试刷屏混淆；需要排查 TaskUI 时再打开 print
-  // const pr = (globalThis as any).print;
-  // if (typeof pr === "function") pr("[TaskUI] " + _msg);
+/** `main_`/`side_`/`daily_` + 三位序号 001–020：左侧任务图标 + 文本左对齐（与主线一致） */
+function questIdTailInRange01to20(id: string, prefix: string): boolean {
+  if (id.length !== prefix.length + 3) return false;
+  if (id.substring(0, prefix.length) !== prefix) return false;
+  const tail = id.substring(prefix.length);
+  if (tail.length !== 3) return false;
+  return tail >= "001" && tail <= "020";
+}
+
+function isQuestWithRowIconLayout(quest: QuestData): boolean {
+  const id = quest.id;
+  if (quest.type === QuestType.MAIN) return questIdTailInRange01to20(id, "main_");
+  if (quest.type === QuestType.SIDE) return questIdTailInRange01to20(id, "side_");
+  if (quest.type === QuestType.DAILY) return questIdTailInRange01to20(id, "daily_");
+  return false;
 }
 
 function isFdfFrameEnabled(frameName: string): boolean {
@@ -139,16 +162,6 @@ function isFdfFrameEnabled(frameName: string): boolean {
   return false;
 }
 
-function tryCreateFromFdf(name: string, parent: number, fallback: () => number | null): number | null {
-  if (!isFdfFrameEnabled(name)) return fallback();
-  loadTocOnce(TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI");
-  return tryCreateFromFdfSafe(name, parent, fallback, {
-    tocLoadKey: TASK_UI_TOC_LOAD_KEY,
-    tocPaths: TASK_UI_TOC_PATHS,
-    debugPrefix: "TaskUI",
-  });
-}
-
 function tryCreateFromFdfWithSource(
   name: string,
   parent: number,
@@ -167,11 +180,7 @@ function tryCreateFromFdfWithSource(
 
 function tryCreateFromFdfOnly(name: string, parent: number): number | null {
   const res = tryCreateFromFdfWithSource(name, parent, () => null);
-  if (res.fromFdf && res.frame && res.frame !== 0) {
-    debugPrint("FDF创建成功: " + name);
-    return res.frame;
-  }
-  debugPrint("FDF创建失败: " + name);
+  if (res.fromFdf && res.frame && res.frame !== 0) return res.frame;
   return null;
 }
 
@@ -189,13 +198,13 @@ function getStatusText(status: QuestStatus): string {
 
 /** 获取任务列表（进行中 + 已完成，保留历史） */
 function getQuestsForUI(playerId: number, type: QuestType): QuestData[] {
-  const active = questManager.getPlayerQuests(playerId, type);
+  const active = questManager.getPlayerQuests(playerId, type).filter(q => !q.uiReserved);
   const completedIds = questDB.getPlayerCompletedQuests(playerId);
   const result: QuestData[] = active.slice();
 
   for (const id of completedIds) {
     const template = questDB.getQuest(id);
-    if (!template || template.type !== type) continue;
+    if (!template || template.type !== type || template.uiReserved) continue;
     if (active.some(q => q.id === id)) continue;
     result.push({
       ...template,
@@ -233,10 +242,9 @@ class TaskUI {
   private scrollThumbHitBtn: number | null = null;
   /** 封装：全局鼠标 + focus 判定 + thumb 同步（见 `垂直滚动条轨道.ts`） */
   private vScrollTrack: VerticalScrollbarTrack | null = null;
-  private scrollInputFrame: number | null = null;
-  private wheelOverlay: number | null = null;
+  /** 列表区域滚轮：用全局滚轮 + 父链判定，避免只绑在行 clickBtn 上时 TEXT/子帧抢焦点导致滚轮无效 */
+  private taskListWheelTrig: unknown = null;
   private scrollOffset = 0;
-  private _updatingScrollBar = false;
   private totalContentHeight = 0;
   private expandedQuestIds = new Set<string>();
   private isVisible = false;
@@ -248,20 +256,52 @@ class TaskUI {
   private clickBtnByQuestId = new Map<string, number>();
   private objFrameByKey = new Map<string, number>();   // questId|objectiveId
   private failFrameByQuestId = new Map<string, number>();
-  /** 主线 001/002 行左侧图标（BACKDROP） */
   private rowIconByQuestId = new Map<string, number>();
 
   public init(): void {
     const gameUI = getGameUI();
-    if (!gameUI) {
-      debugPrint("无法获取游戏UI");
-      return;
-    }
+    if (!gameUI) return;
 
     this.createEntryIcon(gameUI);
     this.createMainPanel(gameUI);
+    this.registerTaskListWheel();
     this.hide();
-    debugPrint("任务UI初始化完成");
+  }
+
+  /** 从 frame 沿父链向上，是否落在 ancestor 子树内 */
+  private isDescendantOf(frame: number, ancestor: number): boolean {
+    if (!frame || frame === 0 || !ancestor || ancestor === 0) return false;
+    let cur: number = frame;
+    for (let i = 0; i < 64; i++) {
+      if (cur === ancestor) return true;
+      const p =
+        typeof (japi as any).DzFrameGetParent === "function" ? (japi as any).DzFrameGetParent(cur) : 0;
+      if (!p || p === 0) return false;
+      cur = p;
+    }
+    return false;
+  }
+
+  /** 滚轮是否应作用在任务列表（列表容器、滚动条轨道、滑块及其子帧） */
+  private isWheelTargetForTaskList(): boolean {
+    if (!this.mainPanel) return false;
+    const f = typeof getMouseFocus === "function" ? getMouseFocus() : 0;
+    if (!f || f === 0) return false;
+    if (this.listContainer && (f === this.listContainer || this.isDescendantOf(f, this.listContainer))) return true;
+    if (this.scrollBarFrame && (f === this.scrollBarFrame || this.isDescendantOf(f, this.scrollBarFrame))) return true;
+    if (this.scrollThumbFrame && (f === this.scrollThumbFrame || this.isDescendantOf(f, this.scrollThumbFrame))) return true;
+    if (this.scrollThumbHitBtn && f === this.scrollThumbHitBtn) return true;
+    return false;
+  }
+
+  private registerTaskListWheel(): void {
+    if (!ENABLE_MOUSE_WHEEL_SCROLL) return;
+    if (this.taskListWheelTrig) return;
+    this.taskListWheelTrig = registerMouseWheel(false, () => {
+      if (!this.isVisible) return;
+      if (!this.isWheelTargetForTaskList()) return;
+      this.onListWheel();
+    });
   }
 
   private createEntryIcon(parent: number): void {
@@ -270,10 +310,36 @@ class TaskUI {
 
     setFramePosition(this.entryFrame, { point: FramePoint.TOPLEFT, x: ENTRY_X, y: ENTRY_Y });
     setFrameSize(this.entryFrame, { width: ENTRY_W, height: ENTRY_H });
-    this.entryText = createTextLabel("TaskEntryText", this.entryFrame, "|cffffcc00任务(J)|r",
-      { relativeTo: this.entryFrame, point: FramePoint.CENTER, relativePoint: FramePoint.CENTER, x: 0, y: 0 },
-      { width: ENTRY_W, height: ENTRY_H * 0.92 }
-    );
+    const tw = ENTRY_W * ENTRY_TITLE_TEXT_BOX_W;
+    const th = ENTRY_H * ENTRY_TITLE_TEXT_BOX_H;
+    const titleRel: RelativePositionConfig = {
+      relativeTo: this.entryFrame,
+      point: FramePoint.CENTER,
+      relativePoint: FramePoint.CENTER,
+      x: 0,
+      y: 0,
+    };
+    /** 强制 TEXT：`DzFrameSetFont` 主要对 TEXT 生效；`createTextLabel` 失败时会退回 GLUETEXTBUTTON，字体 native 常无效 */
+    const textFrame = createFrame({
+      type: FrameType.TEXT,
+      name: "TaskEntryText",
+      parent: this.entryFrame,
+      template: "template",
+      visible: true,
+    });
+    if (textFrame != null && textFrame !== 0) {
+      this.entryText = textFrame;
+      setFramePointRelative(textFrame, titleRel.point, titleRel.relativeTo, titleRel.relativePoint, titleRel.x, titleRel.y);
+      setFrameSize(textFrame, { width: tw, height: th });
+    } else {
+      this.entryText = createTextLabel("TaskEntryText", this.entryFrame, "", titleRel, { width: tw, height: th });
+    }
+    if (this.entryText != null && this.entryText !== 0) {
+      if (typeof (japi as any).DzFrameSetText === "function") {
+        (japi as any).DzFrameSetText(this.entryText, "|cffffcc00任务(J)|r");
+      }
+      applyDzTextFontAndCenterAlignment(this.entryText);
+    }
     this.entryHint = createTextLabel("TaskEntryHint", this.entryFrame, "|cff888888按J打开|r",
       { relativeTo: this.entryFrame, point: FramePoint.TOP, relativePoint: FramePoint.BOTTOM, x: 0, y: -0.005 },
       { width: ENTRY_W, height: 0.014 }
@@ -318,7 +384,6 @@ class TaskUI {
         PANEL_REL_TO_ENTRY_Y
       );
     } else {
-      debugPrint("createMainPanel: 无 entryFrame，主面板用 ENTRY+相对偏移 绝对坐标兜底");
       setFramePosition(this.mainPanel, {
         point: FramePoint.TOPLEFT,
         x: ENTRY_X + PANEL_REL_TO_ENTRY_X,
@@ -349,19 +414,33 @@ class TaskUI {
     if (this.tabMainBg) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabMainBg);
       setFramePointRelative(this.tabMainBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.02, TAB_REL_Y);
-      setFrameSize(this.tabMainBg, { width: 0.04, height: 0.035 });
+      setFrameSize(this.tabMainBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabMainBg, true));
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabMainBg, 7);
+    }
+
+    if (this.tabMainBg) {
+      const tabLabel = createTabLabelTextOnBackdrop(this.tabMainBg, "TaskTabMainLabel", "|cffffcc00主线(1)|r", TAB_CATEGORY_FONT_SCALE);
+      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
     }
 
     this.tabMain = tryCreateFromFdfOnly("TaskTabMain", tabParent);
     if (this.tabMain) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabMain);
-      setFramePointRelative(this.tabMain, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.02, TAB_REL_Y + TAB_TEXT_Y_NUDGE);
-      setFrameSize(this.tabMain, { width: 0.04, height: 0.035 });
+      if (this.tabMainBg) {
+        setupTransparentGlueHitLayer(this.tabMainBg, this.tabMain);
+      } else {
+        setFramePointRelative(this.tabMain, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.02, TAB_REL_Y);
+        setFrameSize(this.tabMain, { width: TAB_FRAME_W, height: TAB_FRAME_H });
+      }
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabMain, true));
-      setButtonText(this.tabMain, "|cffffcc00主线(1)|r");
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabMain, 8);
+      if (!this.tabMainBg) {
+        setButtonText(this.tabMain, "");
+        if (typeof (japi as any).DzFrameSetAlpha === "function") {
+          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabMain, 0));
+        }
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabMain, 9);
       setFrameClickEvent(this.tabMain, () => {
         SoundUI_ClickPlay();
         this.switchCategory(QuestType.MAIN);
@@ -373,19 +452,33 @@ class TaskUI {
     if (this.tabSideBg) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabSideBg);
       setFramePointRelative(this.tabSideBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.135, TAB_REL_Y);
-      setFrameSize(this.tabSideBg, { width: 0.04, height: 0.035 });
+      setFrameSize(this.tabSideBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabSideBg, true));
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabSideBg, 7);
+    }
+
+    if (this.tabSideBg) {
+      const tabLabel = createTabLabelTextOnBackdrop(this.tabSideBg, "TaskTabSideLabel", "|cffffcc00支线(2)|r", TAB_CATEGORY_FONT_SCALE);
+      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
     }
 
     this.tabSide = tryCreateFromFdfOnly("TaskTabSide", tabParent);
     if (this.tabSide) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabSide);
-      setFramePointRelative(this.tabSide, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.135, TAB_REL_Y + TAB_TEXT_Y_NUDGE);
-      setFrameSize(this.tabSide, { width: 0.04, height: 0.035 });
+      if (this.tabSideBg) {
+        setupTransparentGlueHitLayer(this.tabSideBg, this.tabSide);
+      } else {
+        setFramePointRelative(this.tabSide, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.135, TAB_REL_Y);
+        setFrameSize(this.tabSide, { width: TAB_FRAME_W, height: TAB_FRAME_H });
+      }
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabSide, true));
-      setButtonText(this.tabSide, "|cffffcc00支线(2)|r");
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabSide, 8);
+      if (!this.tabSideBg) {
+        setButtonText(this.tabSide, "");
+        if (typeof (japi as any).DzFrameSetAlpha === "function") {
+          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabSide, 0));
+        }
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabSide, 9);
       setFrameClickEvent(this.tabSide, () => {
         SoundUI_ClickPlay();
         this.switchCategory(QuestType.SIDE);
@@ -397,19 +490,33 @@ class TaskUI {
     if (this.tabDailyBg) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabDailyBg);
       setFramePointRelative(this.tabDailyBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.25, TAB_REL_Y);
-      setFrameSize(this.tabDailyBg, { width: 0.04, height: 0.035 });
+      setFrameSize(this.tabDailyBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabDailyBg, true));
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabDailyBg, 7);
+    }
+
+    if (this.tabDailyBg) {
+      const tabLabel = createTabLabelTextOnBackdrop(this.tabDailyBg, "TaskTabDailyLabel", "|cffffcc00小任务(3)|r", TAB_CATEGORY_FONT_SCALE);
+      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
     }
 
     this.tabDaily = tryCreateFromFdfOnly("TaskTabDaily", tabParent);
     if (this.tabDaily) {
       if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabDaily);
-      setFramePointRelative(this.tabDaily, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.25, TAB_REL_Y + TAB_TEXT_Y_NUDGE);
-      setFrameSize(this.tabDaily, { width: 0.04, height: 0.035 });
+      if (this.tabDailyBg) {
+        setupTransparentGlueHitLayer(this.tabDailyBg, this.tabDaily);
+      } else {
+        setFramePointRelative(this.tabDaily, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.25, TAB_REL_Y);
+        setFrameSize(this.tabDaily, { width: TAB_FRAME_W, height: TAB_FRAME_H });
+      }
       if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabDaily, true));
-      setButtonText(this.tabDaily, "|cffffcc00小任务(3)|r");
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabDaily, 8);
+      if (!this.tabDailyBg) {
+        setButtonText(this.tabDaily, "");
+        if (typeof (japi as any).DzFrameSetAlpha === "function") {
+          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabDaily, 0));
+        }
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabDaily, 9);
       setFrameClickEvent(this.tabDaily, () => {
         SoundUI_ClickPlay();
         this.switchCategory(QuestType.DAILY);
@@ -418,98 +525,35 @@ class TaskUI {
     }
 
     if (this.mainPanel !== null) {
-      // 轨道阶段优先使用原生 ESC Menu 模板，避免你看到的“绿色轨道”（来自自建 BACKDROP template）
-      if (!USE_NATIVE_SCROLLBAR_TRACK) {
-        const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", this.mainPanel, () => {
-          const f = createFrame({ type: FrameType.BACKDROP, name: "TaskScrollBarBtn", parent: this.mainPanel!, template: "template", visible: true });
-          return f ?? 0;
-        });
-        this.scrollBarFrame = sbSrc.frame;
-        debugPrint("scrollBar=" + tostring(this.scrollBarFrame) + " fromFdf=" + sbSrc.fromFdf);
-        if (this.scrollBarFrame && this.scrollBarFrame !== 0 && this.mainPanel) {
-          if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(this.scrollBarFrame, true);
-          // 无论从 FDF 还是 fallback 创建，都统一“清点-对齐-设尺寸”，避免 slider-border 的切片参数被错误模板影响
-          if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.scrollBarFrame);
-          setFramePointRelative(this.scrollBarFrame, FramePoint.TOPRIGHT, this.mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
-          setFramePointRelative(this.scrollBarFrame, FramePoint.BOTTOMRIGHT, this.mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
-          setFrameSize(this.scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
-          if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollBarFrame, 30);
-          // 纹理/边框由 TaskUI.fdf 的 BackdropBackground + BackdropEdgeFile 负责：
-          // 不要在 TS 里再 DzFrameSetTexture 覆盖，否则会让边缘切片（slider-border）丢失/变黑。
-        }
-
-        // 仅保留“轨道”：滑块 thumb 不创建。
-        // thumb 视觉现在由 TaskScrollThumb（圆形 knob）提供，并在 refreshList() 同步位置
-        if (ENABLE_FDF_SCROLLBAR_THUMB && this.mainPanel !== null) {
-          this.scrollThumbFrame = tryCreateFromFdfOnly("TaskScrollThumb", this.mainPanel);
-          if (this.scrollThumbFrame && this.scrollThumbFrame !== 0) {
-            if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(this.scrollThumbFrame, true);
-            if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollThumbFrame, 31);
-          }
-        } else if (this.mainPanel !== null) {
-          // 1.27e 下该 thumb 用 FDF 有概率不渲染：改为 TS 动态 BACKDROP 直贴纹理
-          this.scrollThumbFrame = createFrame({
-            type: FrameType.BACKDROP,
-            name: "TaskScrollThumbDyn",
-            parent: this.mainPanel,
-            template: "template",
-            visible: true,
-          });
-          if (this.scrollThumbFrame && this.scrollThumbFrame !== 0) {
-            setFrameTexture(this.scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
-            setFrameSize(this.scrollThumbFrame, { width: SCROLL_THUMB_SIZE, height: SCROLL_THUMB_SIZE });
-            if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollThumbFrame, 120);
-            if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(this.scrollThumbFrame, true);
-            debugPrint("TS创建滚动滑块成功: TaskScrollThumbDyn");
-          } else {
-            debugPrint("TS创建滚动滑块失败: TaskScrollThumbDyn");
-          }
-        }
-        if (this.scrollThumbFrame && this.scrollThumbFrame !== 0) {
-          this.setupThumbDrag();
-        }
+      const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", this.mainPanel, () => {
+        const f = createFrame({ type: FrameType.BACKDROP, name: "TaskScrollBarBtn", parent: this.mainPanel!, template: "template", visible: true });
+        return f ?? 0;
+      });
+      this.scrollBarFrame = sbSrc.frame;
+      if (this.scrollBarFrame && this.scrollBarFrame !== 0 && this.mainPanel) {
+        if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(this.scrollBarFrame, true);
+        if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.scrollBarFrame);
+        setFramePointRelative(this.scrollBarFrame, FramePoint.TOPRIGHT, this.mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
+        setFramePointRelative(this.scrollBarFrame, FramePoint.BOTTOMRIGHT, this.mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
+        setFrameSize(this.scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
+        if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollBarFrame, 30);
       }
 
-      // 滚轮输入层后续再加：当前只创建“可见原生轨道”
-      if (ENABLE_SCROLL_INPUT) {
-        // 隐藏输入层：优先原生 SCROLLBAR（支持点击+拖拽），失败再回退 SLIDER
-        this.scrollInputFrame = createFrame({
-          type: FrameType.SCROLLBAR,
-          name: "TaskScrollInput",
-          parent: this.mainPanel,
-          template: "EscMenuScrollBarTemplate",
-          visible: true,
-          enable: true,
-          // 视觉隐藏：轨道/滑块由 scrollBarFrame/scrollThumbFrame 负责
-          alpha: 1,
-        });
-        if (!this.scrollInputFrame || this.scrollInputFrame === 0) {
-          this.scrollInputFrame = createFrame({
-            type: FrameType.SLIDER,
-            name: "TaskScrollInput",
-            parent: this.mainPanel,
-            template: "template",
-            visible: true,
-            enable: true,
-            alpha: 1,
-          });
-        }
-        if (this.scrollInputFrame && this.scrollInputFrame !== 0) {
-          if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.scrollInputFrame);
-          setFramePointRelative(this.scrollInputFrame, FramePoint.TOPRIGHT, this.mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
-          setFramePointRelative(this.scrollInputFrame, FramePoint.BOTTOMRIGHT, this.mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
-          setFrameSize(this.scrollInputFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
-          if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollInputFrame, 32);
-          // 仅用于拖拽时同步 value
-          frameSetScriptByCode(this.scrollInputFrame, EventType.SLIDER_VALUE_CHANGED, () => this.onScrollBarChange(), false);
-        }
-
-        if (ENABLE_WHEEL_OVERLAY) {
-          this.wheelOverlay = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "TaskWheelOverlay", parent: this.mainPanel, template: "template", visible: true, enable: true, alpha: 0 });
-          if (this.wheelOverlay && this.listContainer && typeof (japi as any).DzFrameSetAllPoints === "function") {
-            (japi as any).DzFrameSetAllPoints(this.wheelOverlay, this.listContainer);
-          }
-        }
+      this.scrollThumbFrame = createFrame({
+        type: FrameType.BACKDROP,
+        name: "TaskScrollThumbDyn",
+        parent: this.mainPanel,
+        template: "template",
+        visible: true,
+      });
+      if (this.scrollThumbFrame && this.scrollThumbFrame !== 0) {
+        setFrameTexture(this.scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
+        setFrameSize(this.scrollThumbFrame, { width: SCROLL_THUMB_SIZE, height: SCROLL_THUMB_SIZE });
+        if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.scrollThumbFrame, 120);
+        if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(this.scrollThumbFrame, true);
+      }
+      if (this.scrollThumbFrame && this.scrollThumbFrame !== 0) {
+        this.setupThumbDrag();
       }
     }
   }
@@ -524,62 +568,7 @@ class TaskUI {
     } else if (delta < 0) {
       this.scrollOffset = Math.min(maxScroll, this.scrollOffset + step);
     }
-    this.syncScrollBarValue();
     this.refreshList();
-  }
-
-  private processWheel(delta: number): void {
-    const step = LIST_ITEM_H + 0.01;
-    const maxScroll = Math.max(0, this.totalContentHeight - LIST_VIEW_H);
-    if (delta > 0) {
-      this.scrollOffset = Math.max(0, this.scrollOffset - step);
-    } else if (delta < 0) {
-      this.scrollOffset = Math.min(maxScroll, this.scrollOffset + step);
-    }
-    this.syncScrollBarValue();
-    this.refreshList();
-  }
-
-  /** 检查鼠标是否在任务面板区域内 */
-  private isMouseOverPanel(): boolean {
-    const focused = getMouseFocus();
-    if (!focused || focused === 0) return false;
-    // 静态帧
-    if (focused === this.mainPanel || focused === this.listContainer
-      || focused === this.scrollBarFrame
-      || focused === this.scrollThumbHitBtn
-      || focused === this.scrollInputFrame || focused === this.wheelOverlay
-      || focused === this.tabMain || focused === this.tabSide || focused === this.tabDaily) {
-      return true;
-    }
-    // 动态创建的任务项按钮
-    for (const f of this.listItemFrames) {
-      if (focused === f) return true;
-    }
-    return false;
-  }
-
-  private onScrollBarChange(): void {
-    if (this._updatingScrollBar) return;
-    const getVal = (japi as any).DzFrameGetValue;
-    if (typeof getVal !== "function") return;
-    // 只有真实的 scrollInputFrame（SCROLLBAR/SLIDER）才允许读 value
-    if (this.scrollInputFrame && this.scrollInputFrame !== 0) {
-      this.scrollOffset = getVal(this.scrollInputFrame);
-    } else {
-      return;
-    }
-    this.refreshList();
-  }
-
-  private syncScrollBarValue(): void {
-    const setVal = (japi as any).DzFrameSetValue;
-    // 轨道 TaskScrollBar 是 BACKDROP：只同步 scrollInputFrame 的 value（避免 1.27e 引擎崩溃）
-    if (typeof setVal === "function" && this.scrollInputFrame && this.scrollInputFrame !== 0) {
-      this._updatingScrollBar = true;
-      setVal(this.scrollInputFrame, this.scrollOffset);
-      this._updatingScrollBar = false;
-    }
   }
 
   /** 手动同步圆形 thumb + 全局鼠标拖拽（逻辑在 `垂直滚动条轨道.ts`） */
@@ -604,10 +593,9 @@ class TaskUI {
       },
       isInteractionEnabled: () => this.isVisible,
       onScrollChanged: () => {
-        this.syncScrollBarValue();
         this.refreshList();
       },
-      skipManualThumbSync: () => ENABLE_SCROLL_INPUT && this.scrollInputFrame !== null && this.scrollInputFrame !== 0,
+      skipManualThumbSync: () => false,
     });
     this.vScrollTrack.attach();
     this.scrollThumbHitBtn = this.vScrollTrack.getHitButtonFrame();
@@ -615,9 +603,7 @@ class TaskUI {
 
   private syncScrollThumb(maxScroll: number): void {
     if (!this.vScrollTrack) return;
-    debugPrint("syncScrollThumb start maxScroll=" + maxScroll + " scrollOffset=" + this.scrollOffset);
     this.vScrollTrack.syncThumbVisual(maxScroll);
-    debugPrint("syncScrollThumb end");
   }
 
   /** 内容不足一屏时隐藏轨道与滑块，避免多余滚动条 */
@@ -635,17 +621,9 @@ class TaskUI {
 
   private clearList(): void {
     for (const f of this.listItemFrames) {
-      // 诊断性止血：先不要 DzDestroyFrame（你当前点击/滚轮必崩很像引擎在销毁帧时崩）。
-      // 用隐藏替代，保证刷新链路先跑通。
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(f, false);
     }
-
-    // 关键：由于我们对 obj/fail 使用了“复用缓存”，
-    // 当某个任务从 expanded->collapsed（或因可视裁剪没被重新创建/推入 listItemFrames）时，
-    // 这些旧的 objective/fail 帧不会自动被 hide。
-    // 因此这里统一把缓存的 objective/fail 全部隐藏，确保不会出现“残影/小错误”。
     if (typeof (japi as any).DzFrameShow === "function") {
-      // row/title/click 也同样需要隐藏，否则可视裁剪跳过创建时会残留上一轮可见帧
       for (const f of this.rowBackdropByQuestId.values()) {
         if (f !== 0) (japi as any).DzFrameShow(f, false);
       }
@@ -698,7 +676,6 @@ class TaskUI {
     if (quests.length === 0) {
       this.totalContentHeight = 0;
       this.scrollOffset = 0;
-      debugPrint("refreshList empty: category=" + this.currentCategory);
       const empty = createTextLabel("TaskEmpty", this.listContainer, EMPTY_TEXTS[this.currentCategory],
         {
           relativeTo: this.listContainer,
@@ -709,8 +686,10 @@ class TaskUI {
         },
         { width: LIST_CONTAINER_W * 0.85, height: 0.08 }
       );
-      if (empty) this.listItemFrames.push(empty);
-      // 空列表：maxScroll=0，thumb 置于轨道顶部
+      if (empty) {
+        this.listItemFrames.push(empty);
+        applyDzTextFontAndCenterAlignment(empty);
+      }
       this.syncScrollThumb(0);
       this.updateScrollBarVisibility(0);
       return;
@@ -729,19 +708,6 @@ class TaskUI {
     this.totalContentHeight = totalH;
     const maxScroll = Math.max(0, totalH - LIST_VIEW_H);
     this.scrollOffset = Math.min(maxScroll, this.scrollOffset);
-    debugPrint("refreshList compute: quests=" + quests.length + " maxScroll=" + maxScroll + " offset=" + this.scrollOffset);
-
-    const setMinMax = (japi as any).DzFrameSetMinMaxValue;
-    const setVal = (japi as any).DzFrameSetValue;
-    if (typeof setMinMax === "function" && typeof setVal === "function" && this.scrollInputFrame && this.scrollInputFrame !== 0) {
-      debugPrint("refreshList set slider value: maxScroll=" + maxScroll + " offset=" + this.scrollOffset);
-      setMinMax(this.scrollInputFrame, 0, Math.max(1, maxScroll));
-      this._updatingScrollBar = true;
-      setVal(this.scrollInputFrame, this.scrollOffset);
-      this._updatingScrollBar = false;
-    }
-
-    // 视觉滑块 thumb：跟随 scrollOffset
     this.syncScrollThumb(maxScroll);
     this.updateScrollBarVisibility(maxScroll);
     // 列表可视区域：相对 listContainer TOPLEFT（与行坐标同一空间）
@@ -772,32 +738,25 @@ class TaskUI {
     const listParent = this.listContainer;
     if (!this.mainPanel || !listParent) return null;
 
-    debugPrint(
-      "createListItem questId=" + quest.id +
-      " expanded=" + expanded +
-      " rowTopRel=" + rowTopRel +
-      " title=" + quest.title
-    );
-
     const itemH = expanded
       ? LIST_ITEM_H + quest.objectives.length * 0.03 + (quest.timeLimit && quest.timeLimit > 0 ? 0.02 : 0)
       : LIST_ITEM_H * 0.4;
 
     const statusText = getStatusText(quest.status);
 
-    // 所有任务行（主线/支线/小任务）边框宽度缩小（edgefile 区域要严格匹配你的红框）
     const rowWidth = LIST_CONTAINER_W * 0.9;
     const rowLeftRel = LIST_CONTENT_LEFT_INSET;
-    const isMain0102Icon = quest.id === "main_001" || quest.id === "main_002";
+    const showMainRowIcon = isQuestWithRowIconLayout(quest);
     /** 与未展开主线行同高（或小 2%），展开后行变高也不放大图标 */
     const collapsedMainRowH = LIST_ITEM_H * 0.4;
-    const iconHLayout = isMain0102Icon
+    const iconHLayout = showMainRowIcon
       ? collapsedMainRowH * QUEST_ROW_ICON_HEIGHT_FACTOR
       : 0;
     // 有图标时：标题/子行整体右移，避免与图标重叠
-    const textXRel = isMain0102Icon
+    const textXRel = showMainRowIcon
       ? rowLeftRel + QUEST_ROW_ICON_PAD_LEFT + iconHLayout + QUEST_ROW_TEXT_GAP_AFTER_ICON
       : rowLeftRel + 0.03;
+    const listTextAlign = showMainRowIcon ? DZ_TEXT_ALIGN_LEFT : DZ_TEXT_ALIGN_CENTER;
     const rowTitleRightInset = 0.01;
     const textW = rowWidth - (textXRel - rowLeftRel) - rowTitleRightInset;
 
@@ -827,7 +786,6 @@ class TaskUI {
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(rowBackdrop, 1);
     showFrame(rowBackdrop);
     this.listItemFrames.push(rowBackdrop);
-    debugPrint("createListItem rowBackdrop ok questId=" + quest.id);
 
     // 标题文字（TEXT）：复用 titleFrame，更新位置/尺寸/文本
     const titleText = quest.title + " [" + statusText + "]";
@@ -854,10 +812,10 @@ class TaskUI {
       setFrameSize(titleFrame, { width: textW, height: LIST_ITEM_H * 0.38 });
       if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(titleFrame, titleText);
     }
+    applyDzTextFontAndAlignment(titleFrame, listTextAlign);
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(titleFrame, 3);
     showFrame(titleFrame);
     this.listItemFrames.push(titleFrame);
-    debugPrint("createListItem title ok questId=" + quest.id);
 
     // 交互层：复用 clickBtn，更新点击与滚轮行为
     let clickBtn = this.clickBtnByQuestId.get(quest.id) || 0;
@@ -880,16 +838,12 @@ class TaskUI {
       SoundUI_ClickPlay();
       this.toggleExpand(quest.id);
     }, false);
-    if (ENABLE_MOUSE_WHEEL_SCROLL) {
-      frameSetScriptByCode(clickBtn, EventType.MOUSE_WHEEL, () => this.onListWheel(), false);
-    }
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
     showFrame(clickBtn);
     this.listItemFrames.push(clickBtn);
-    debugPrint("createListItem clickBtn ok questId=" + quest.id);
 
-    // 主线任务 001/002：行左侧图标（textX 已在上方为图标让位）
-    if (isMain0102Icon) {
+    // 主线 01–20：行左侧任务图标（textX 已在上方为图标让位；标题/目标左对齐）
+    if (showMainRowIcon) {
       const iconPath =
         quest.icon && quest.icon !== ""
           ? quest.icon
@@ -920,7 +874,7 @@ class TaskUI {
           listParent,
           FramePoint.TOPLEFT,
           rowLeftRel + QUEST_ROW_ICON_PAD_LEFT,
-          rowTopRel - QUEST_ROW_ICON_MAIN0102_Y_OFFSET
+          rowTopRel - QUEST_ROW_ICON_Y_OFFSET
         );
         setFrameSize(iconFr, { width: iconW, height: iconH });
         if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(iconFr, 5);
@@ -953,6 +907,7 @@ class TaskUI {
           setFrameSize(objFrame, { width: textW, height: LIST_ITEM_H * 0.25 });
           if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(objFrame, txt);
         }
+        applyDzTextFontAndAlignment(objFrame, listTextAlign);
         if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(objFrame, 3);
         showFrame(objFrame);
         this.listItemFrames.push(objFrame);
@@ -980,15 +935,13 @@ class TaskUI {
           setFrameSize(failFrame, { width: textW, height: LIST_ITEM_H * 0.2 });
           if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(failFrame, failText);
         }
+        applyDzTextFontAndAlignment(failFrame, listTextAlign);
         if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(failFrame, 3);
         showFrame(failFrame);
         this.listItemFrames.push(failFrame);
       }
     }
 
-    // 返回 null，避免 refreshList() 再次把同一帧 push 到 listItemFrames 里，
-    // 造成同一个 frame 被重复 DzDestroyFrame 从而引擎崩溃。
-    debugPrint("createListItem end questId=" + quest.id);
     return null;
   }
 
@@ -1002,20 +955,15 @@ class TaskUI {
     if (!this.mainPanel) return;
     this.currentPlayerId = playerId;
     this.isVisible = true;
-    debugPrint("show(): before showFrame mainPanel=" + this.mainPanel);
     showFrame(this.mainPanel);
-    debugPrint("show(): after showFrame mainPanel, playerId=" + playerId + ", category=" + this.currentCategory);
     this.refreshList();
-    debugPrint("任务UI显示完成，玩家ID: " + playerId);
   }
 
   public hide(): void {
     if (!this.mainPanel) return;
     this.vScrollTrack?.cancelDrag();
     this.isVisible = false;
-    debugPrint("hide(): before showFrame mainPanel=" + this.mainPanel);
     hideFrame(this.mainPanel);
-    debugPrint("hide(): after showFrame mainPanel");
   }
 
   public registerHotkey(): void {
@@ -1045,7 +993,6 @@ class TaskUI {
       SoundUI_ClickPlay();
       this.switchCategory(QuestType.DAILY);
     });
-    debugPrint("已注册 J 打开任务，1/2/3 切换标签");
   }
 }
 

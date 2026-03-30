@@ -3,15 +3,6 @@ local ____exports = {}
 ____exports["装备掉落表"] = {
     n012 = {id = "n012", name = "森林野猪", level = 1, unitType = "normal"},
     nwlt = {id = "nwlt", name = "森林之狼", level = 1, unitType = "normal"},
-    hfoo = {
-        id = "hfoo",
-        name = "步兵",
-        level = 2,
-        itemIds = "I03U:50%;I00S:50%",
-        picks = 2,
-        isUniversal = "TRUE",
-        unitType = "normal"
-    },
     n009 = {
         id = "n009",
         name = "普通地精",
@@ -28,6 +19,7 @@ ____exports["装备掉落表"] = {
         itemIds = "I00B:10%;I010:6%",
         picks = 2,
         isUniversal = "FALSE",
+        berserkUnit = "n01F",
         unitType = "normal"
     },
     n002 = {
@@ -37,6 +29,7 @@ ____exports["装备掉落表"] = {
         itemIds = "I00B:10%;I010:6%",
         picks = 2,
         isUniversal = "FALSE",
+        berserkUnit = "n01F",
         unitType = "normal"
     },
     ngna = {
@@ -122,7 +115,7 @@ ____exports["装备掉落表"] = {
     },
     nane = {
         id = "nane",
-        name = "阿卡那瑟德掘地者 ",
+        name = "阿卡那瑟德掘地者",
         level = 8,
         itemIds = "I03Y:7%;I04R:7%",
         picks = 2,
@@ -188,7 +181,13 @@ ____exports["装备掉落表"] = {
         isUniversal = "FALSE",
         unitType = "normal"
     },
-    n013 = {id = "n013", name = "熔岩蝎子", level = 17, unitType = "normal"},
+    n013 = {
+        id = "n013",
+        name = "熔岩蝎子",
+        level = 17,
+        berserkUnit = "n035",
+        unitType = "normal"
+    },
     nsko = {
         id = "nsko",
         name = "有毒杂草",
@@ -403,7 +402,7 @@ ____exports["装备掉落表"] = {
         itemIds = "I00C:1;I00O:1",
         picks = 2,
         isUniversal = "FALSE",
-        unitType = "berserk\t"
+        unitType = "berserk"
     },
     nwld = {
         id = "nwld",
@@ -542,6 +541,7 @@ ____exports["装备掉落表"] = {
         name = "火焰狼蛛",
         level = 17,
         isUniversal = "FALSE",
+        berserkUnit = "n034",
         unitType = "elite"
     },
     n04J = {
@@ -588,7 +588,7 @@ ____exports["装备掉落表"] = {
         itemIds = "I05V:1;I05W:1",
         picks = 2,
         isUniversal = "FALSE",
-        unitType = "berserk\t"
+        unitType = "berserk"
     },
     n035 = {
         id = "n035",
@@ -597,7 +597,7 @@ ____exports["装备掉落表"] = {
         itemIds = "I05V:1;I05W:1",
         picks = 2,
         isUniversal = "FALSE",
-        unitType = "berserk\t"
+        unitType = "berserk"
     },
     n02S = {
         id = "n02S",

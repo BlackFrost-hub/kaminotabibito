@@ -7,10 +7,10 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local _____533A_57DF_4F20_9001_914D_7F6E = require("系统.07．地形系统.区域传送配置")
-local _____533A_57DF_4F20_9001_914D_7F6E = _____533A_57DF_4F20_9001_914D_7F6E.default
-local _____955C_5934_7CFB_7EDF = require("系统.07．地形系统.镜头系统")
-local panCameraToTimedForPlayer = _____955C_5934_7CFB_7EDF.panCameraToTimedForPlayer
+local ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E = require("系统.07．地形系统.02．区域传送配置")
+local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E.default
+local ____01_FF0E_955C_5934_7CFB_7EDF = require("系统.07．地形系统.01．镜头系统")
+local panCameraToTimedForPlayer = ____01_FF0E_955C_5934_7CFB_7EDF.panCameraToTimedForPlayer
 --- 区域传送：
 -- - 开局按 `区域传送配置` 批量创建 Region 并注册进入事件
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字

@@ -71,6 +71,8 @@ local function onDamage(self, unit, damage, damageType, isFirstInBatch, isLastIn
         end
         if (isAttack or isRanged) and (isFirstInBatch or isLastInBatch) then
             msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能攻击伤害") .. detail
+        elseif isPhysical then
+            msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能物理伤害") .. detail
         else
             msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能伤害") .. detail
         end
@@ -104,5 +106,17 @@ local function onDamage(self, unit, damage, damageType, isFirstInBatch, isLastIn
         ((msg .. " [类型:") .. tostring(damageType)) .. "]"
     )
 end
-damageEvent:registerDamageCallback(onDamage, 60)
+damageEvent:registerDamageCallback(
+    function(____, unit, damage, damageType, isFirstInBatch, isLastInBatch, _fromDotTickBatch)
+        onDamage(
+            nil,
+            unit,
+            damage,
+            damageType,
+            isFirstInBatch,
+            isLastInBatch
+        )
+    end,
+    60
+)
 return ____exports

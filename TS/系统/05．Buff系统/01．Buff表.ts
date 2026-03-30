@@ -1,5 +1,5 @@
 // 自动生成 - Buff数据表
-// 生成时间: 2026/3/28 19:59:38
+// 生成时间: 2026/3/29 17:41:20
 
 /**
  * stackRule（同类型 Buff 并存时的规则）——表意与实现需一致：
@@ -13,7 +13,6 @@ export interface BuffData {
   icon: string;
   effect: string;
   type: string;
-  /** DOT/周期效果的伤害或检测间隔，单位：秒（如 1 表示每 1 秒一跳，需与 dot伤害 等逻辑一致） */
   interval: number;
   maxStack: number;
   /** 同类型并存规则，见文件顶部说明 */
@@ -38,9 +37,9 @@ export const buffs: Record<string, BuffData> = {
     stackRule: 'highest',
     stackRefresh: true,
     dispelLevel: 1,
-    priority: 6,
+    priority: 7,
     canPurge: true,
-    tooltip: "该单位受到了『反恢复』，在持续时间秒内每interval秒造成damage点精神伤害。"
+    tooltip: "该单位受到了『反恢复』，在持续时间秒内每1秒造成damage点精神伤害。"
   },
   "D002": {
     buffID: "D002",
@@ -53,9 +52,39 @@ export const buffs: Record<string, BuffData> = {
     stackRule: 'highest',
     stackRefresh: true,
     dispelLevel: 1,
-    priority: 6,
+    priority: 5,
     canPurge: true,
-    tooltip: "该单位受到了『燃烧』，在持续时间秒内每interval秒造成damage点火属性伤害。"
+    tooltip: "该单位受到了『燃烧』，在持续时间秒内每1秒造成damage点火属性伤害。"
+  },
+  "D003": {
+    buffID: "D003",
+    buffName: "中毒",
+    icon: "BuffIcon\\Dotzhongdu.blp",
+    effect: "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdl",
+    type: "Debuff:dot",
+    interval: 1,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 5,
+    canPurge: true,
+    tooltip: "该单位受到了『中毒』，在持续时间秒内每1秒造成damage点金属性伤害。"
+  },
+  "D004": {
+    buffID: "D004",
+    buffName: "巨魔头颅诅咒",
+    icon: "BuffIcon\\Dot3jumotoulu.blp",
+    effect: "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdl",
+    type: "Debuff:dot",
+    interval: 1,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 5,
+    canPurge: true,
+    tooltip: "该单位受到了『巨魔头颅诅咒』，在持续时间秒内每1秒造成damage点物理伤害。"
   },
 };
 

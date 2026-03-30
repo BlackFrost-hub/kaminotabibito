@@ -9,8 +9,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-import { getMouseFocus, getMouseY, getWindowHeight } from "../00．核心系统/硬件函数";
-import { createFrame, setFramePointRelative, FrameType, FramePoint } from "./UI工具";
+import { getMouseFocus, getMouseY, getWindowHeight, frameSetScriptByCode } from "../00．核心系统/硬件函数";
+import { createFrame, setFramePointRelative, FrameType, FramePoint, EventType } from "./UI工具";
 
 /** thumb 竖直可移动行程（归一化 UI 高度），与 syncThumb 使用同一公式 */
 export function getScrollbarThumbTravelNorm(
@@ -111,6 +111,9 @@ export class VerticalScrollbarTrack {
       (japi as any).DzFrameSetLevel(this.hitBtn, 121);
     }
 
+    /** 帧上直接按下：避免仅依赖全局 MOUSE_DOWN + DzGetMouseFocus 时 focus 未落到透明 GLUETEXTBUTTON 导致无法 startDrag */
+    frameSetScriptByCode(this.hitBtn, EventType.MOUSE_DOWN, () => this.forceBeginDragFromHit(), false);
+
     VerticalScrollbarTrack.instances.push(this);
     VerticalScrollbarTrack.ensureGlobalMouseHooks();
   }
@@ -155,6 +158,15 @@ export class VerticalScrollbarTrack {
     return Math.max(0, h - lv);
   }
 
+  /** 透明命中键回调：不依赖 getMouseFocus，与 tryBeginDrag 条件一致 */
+  private forceBeginDragFromHit(): void {
+    if (!this.opt.isInteractionEnabled() || !this.hitBtn) return;
+    const maxScroll = this.getMaxScroll();
+    if (maxScroll <= 0) return;
+    if (this.dragging) return;
+    this.startDrag();
+  }
+
   private tryBeginDrag(): void {
     if (!this.opt.isInteractionEnabled() || !this.hitBtn) return;
     const maxScroll = this.getMaxScroll();
@@ -174,6 +186,7 @@ export class VerticalScrollbarTrack {
   }
 
   private startDrag(): void {
+    if (this.dragging) return;
     const maxScroll = this.getMaxScroll();
     if (maxScroll <= 0) return;
     this.dragging = true;

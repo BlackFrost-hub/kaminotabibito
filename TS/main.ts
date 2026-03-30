@@ -53,6 +53,7 @@ require("系统.00．核心系统.泄露审计");
 require("系统.08．任务系统.任务接受");
 require("系统.08．任务系统.任务完成");
 require("系统.08．任务系统.任务目标更新");
+require("系统.08．任务系统.任务STES桥接");
 require("系统.12．测试系统.测试事件");
 require("系统.12．测试系统.测试事件2");
 require("系统.12．测试系统.测试233注册");
@@ -64,16 +65,13 @@ require("系统.02．物品系统.04．装备成长");
 require("系统.02．物品系统.03．物品加工");
 require("系统.04．伤害系统.伤害事件");
 require("系统.04．伤害系统.伤害测试");
-const buffPoolCore = require("系统.05．Buff系统.Buff系统") as { initBuffSystem?: () => void };
+const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { initBuffSystem?: () => void };
 if (typeof buffPoolCore.initBuffSystem === "function") buffPoolCore.initBuffSystem();
+require("系统.05．Buff系统.03．BuffJASS桥接");
 require("系统.04．伤害系统.dot伤害");
-// {
-//   const dotMod = require("系统.04．伤害系统.dot伤害") as { DOT_DAMAGE_DEBUG?: boolean };
-//   if (dotMod && typeof dotMod.DOT_DAMAGE_DEBUG === "boolean") dotMod.DOT_DAMAGE_DEBUG = true;
-// }
-const 区域传送 = require("系统.07．地形系统.区域传送") as { init区域传送: () => void };
+const 区域传送 = require("系统.07．地形系统.03．区域传送") as { init区域传送: () => void };
 if (typeof 区域传送.init区域传送 === "function") 区域传送.init区域传送();
-const 激活传送点 = require("系统.07．地形系统.激活传送点") as { init激活传送点: () => void };
+const 激活传送点 = require("系统.07．地形系统.05．激活传送点") as { init激活传送点: () => void };
 if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.init激活传送点();
 
 // 任务系统初始化
@@ -89,5 +87,12 @@ require("系统.12．测试系统.任务测试");
 
 const buffUI = require("系统.05．Buff系统.02．BuffUI") as { init?: () => void };
 if (typeof buffUI.init === "function") buffUI.init();
+
+// 对话框UI系统初始化
+const 对话框UI = require("系统.09．表现系统.对话框UI") as { initDialogSystem: () => void };
+if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
+
+// 测试系统
+require("系统.12．测试系统.玩家1选择");
 
 export {};

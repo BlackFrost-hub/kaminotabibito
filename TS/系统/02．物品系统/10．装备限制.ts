@@ -1,6 +1,13 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
-const g = require("jass.globals") as { [key: string]: any };
+/** 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`） */
+const g = require("jass.globals") as { udg_Itmeboolean?: boolean | number; [key: string]: any };
+
+/** 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制 */
+function isEquipLimitDisabledByJass(): boolean {
+  const v = g.udg_Itmeboolean;
+  return v === true || v === 1;
+}
 const itemsData = (require("系统.02．物品系统.01．装备数据") as {
   default?: Record<string, { type?: string; name?: string; onlyone?: boolean | string }>;
 }).default ?? {};
@@ -60,7 +67,7 @@ function safeUnitItemInSlot(unit: any, slot: number): any | undefined {
 /** 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
  * 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。 */
 export function equipLimitWouldAllowPickup(unit: any, item: any): boolean {
-  if (Itmeboolean) return true;
+  if (isEquipLimitDisabledByJass()) return true;
   if (!unit || !item) return true;
   const pickedTypeId = safeGetItemTypeId(item);
   if (pickedTypeId == null) return true;
@@ -103,7 +110,7 @@ export function equipLimitWouldAllowPickup(unit: any, item: any): boolean {
 }
 
 function onPickup(): void {
-  if (Itmeboolean) return; /* 装备限制开关 */
+  if (isEquipLimitDisabledByJass()) return;
   const unit = jass.GetManipulatingUnit?.() ?? jass.GetTriggerUnit?.();
   const item = jass.GetManipulatedItem?.();
   if (!unit || !item) return;

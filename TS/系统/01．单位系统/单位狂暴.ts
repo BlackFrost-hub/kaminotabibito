@@ -1,10 +1,11 @@
 /**
- * 单位狂暴：装备掉落表里 berserk 非空的单位死亡时，按默认 6.25% 概率在原地创建指定单位、继承面向，并震动击杀者镜头。
+ * 单位狂暴：装备掉落表里 `berserkUnit`（旧名 `berserk`）非空的单位死亡时，按默认 6.25% 概率在原地创建该四码单位、继承面向，并震动击杀者镜头。
  * 面向与镜头震动通过 JASS 全局 udg_TempUnit[1]/udg_TempReal[1]/udg_TempPlayer 调用 UnitBerserk。
  */
 const jass = require("jass.common") as JassCommon;
+type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
-  (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, { berserk?: string | number }> }).default ?? {};
+  (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, DropBerserkEntry> }).default ?? {};
 
 function stringToFourCC(s: string): number {
   const b1 = (string as any).byte(s, 1) as number;
@@ -27,11 +28,11 @@ function onDeath(): void {
   if (typeof (jass as any).GetUnitTypeId !== "function") return;
   const typeId = (jass as any).GetUnitTypeId(dying) as number;
   const unitId = typeIdToUnitId(typeId);
-  const entry = unitId ? (idData as Record<string, { berserk?: string | number }>)[unitId] : undefined;
-  const berserkRaw = entry?.berserk;
-  if (berserkRaw == null) return;
-  const berserkId = String(berserkRaw).trim();
-  if (berserkId === "") return;
+  const entry = unitId ? (idData as Record<string, DropBerserkEntry>)[unitId] : undefined;
+  const spawnRaw = entry?.berserkUnit ?? entry?.berserk;
+  if (spawnRaw == null) return;
+  const spawnUnitId = String(spawnRaw).trim();
+  if (spawnUnitId === "") return;
 
   const BERSERK_PROC = 0.0625;
   if ((math as any).random(1, 10000) as number > BERSERK_PROC * 10000) return;
@@ -50,7 +51,7 @@ function onDeath(): void {
     facingDeg = ((jass as any).GetUnitFacing(dying) as number) * (180 / 3.14159265359);
   }
 
-  const four = stringToFourCC(berserkId.substring(0, 4));
+  const four = stringToFourCC(spawnUnitId.substring(0, 4));
   const owner = typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(dying) : (jass as any).Player(15);
   let created: any = undefined;
   if (typeof (jass as any).CreateUnit === "function") {

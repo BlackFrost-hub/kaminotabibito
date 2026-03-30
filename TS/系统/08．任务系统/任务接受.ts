@@ -16,6 +16,10 @@
  * 未来扩展：
  * - 你可以在 JASS 里在触发事件前，写入更多全局变量（如 udg_QuestId、udg_QuestState 等），
  *   本文件会从 jass.globals 里读取这些全局变量来判断“接受的是哪个任务”。
+ *
+ * 相关模块（对照填表 / STES 多事件）：
+ * - 任务STES配置表.ts + 任务STES桥接.ts：按「事件名字符串」批量注册 STES，驱动目标进度，
+ *   与「单事件 LuaEvent_QuestAccepted」互补；Excel 列说明写在配置表头注释里。
  */
 
 const jass = require("jass.common") as any;

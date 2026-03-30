@@ -5,7 +5,13 @@ local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
 local jass = require("jass.common")
+--- 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`）
 local g = require("jass.globals")
+--- 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制
+local function isEquipLimitDisabledByJass(self)
+    local v = g.udg_Itmeboolean
+    return v == true or v == 1
+end
 local itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
 --- 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性
 ____exports.equipShared = {skipNextDrop = false}
@@ -76,7 +82,7 @@ end
 --- 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
 -- 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。
 function ____exports.equipLimitWouldAllowPickup(self, unit, item)
-    if Itmeboolean then
+    if isEquipLimitDisabledByJass(nil) then
         return true
     end
     if not unit or not item then
@@ -101,21 +107,21 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
         local i = 0
         while i <= 5 do
             do
-                local __continue20
+                local __continue21
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it or it == item then
-                        __continue20 = true
+                        __continue21 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue20 = true
+                        __continue21 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue20 = true
+                        __continue21 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -133,9 +139,9 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue20 = true
+                    __continue21 = true
                 until true
-                if not __continue20 then
+                if not __continue21 then
                     break
                 end
             end
@@ -172,7 +178,7 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
     return msg == ""
 end
 local function onPickup(self)
-    if Itmeboolean then
+    if isEquipLimitDisabledByJass(nil) then
         return
     end
     local ____opt_0 = jass.GetManipulatingUnit
@@ -215,11 +221,11 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue48
+                local __continue49
                 repeat
                     if __TS__StringSubstring(s, i, i + 2) == "|r" then
                         i = i + 2
-                        __continue48 = true
+                        __continue49 = true
                         break
                     end
                     if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
@@ -238,15 +244,15 @@ local function onPickup(self)
                         end
                         if hex then
                             i = i + 10
-                            __continue48 = true
+                            __continue49 = true
                             break
                         end
                     end
                     out = out .. __TS__StringAccess(s, i)
                     i = i + 1
-                    __continue48 = true
+                    __continue49 = true
                 until true
-                if not __continue48 then
+                if not __continue49 then
                     break
                 end
             end
@@ -272,21 +278,21 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue57
+                local __continue58
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it then
-                        __continue57 = true
+                        __continue58 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue57 = true
+                        __continue58 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue57 = true
+                        __continue58 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -304,9 +310,9 @@ local function onPickup(self)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue57 = true
+                    __continue58 = true
                 until true
-                if not __continue57 then
+                if not __continue58 then
                     break
                 end
             end

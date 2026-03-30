@@ -42,8 +42,7 @@ ____exports.items.I00P = {
     score = 295,
     level = "E-",
     dmg = 2,
-    all = 2,
-    Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
+    all = 2
 }
 ____exports.items.I01K = {
     type = "道具/戒指/饰品",
@@ -316,7 +315,9 @@ ____exports.items.I00Q = {
     goldPrice = 200,
     score = 1053,
     level = "D-",
-    agi = 15
+    agi = 15,
+    atkSpeed = 0.15,
+    Buff = "attack:poison10;time10"
 }
 ____exports.items.I01Z = {
     type = "衣服",
@@ -400,7 +401,8 @@ ____exports.items.I03U = {
     name = "血浴之母的第四条左腿",
     goldPrice = 100,
     score = 1181,
-    level = "D-"
+    level = "D-",
+    atkSpeed = 0.2
 }
 ____exports.items.I03R = {
     type = "道具/戒指/饰品",
@@ -457,6 +459,7 @@ ____exports.items.I02E = {
     score = 1253,
     level = "D-",
     dmg = 6,
+    atkSpeed = 0.25,
     hp = 450,
     hpRegen = 5
 }
@@ -476,6 +479,7 @@ ____exports.items.I00J = {
     goldPrice = 600,
     score = 1300,
     level = "D-",
+    atkSpeed = 0.25,
     armor = 5,
     abilList = "A03I"
 }
@@ -624,6 +628,7 @@ ____exports.items.I02F = {
     score = 1452,
     level = "D-",
     dmg = 4,
+    atkSpeed = 0.2,
     armor = 10,
     hp = 450
 }
@@ -809,6 +814,7 @@ ____exports.items.I03H = {
     score = 1824,
     level = "D+",
     dmg = 25,
+    atkSpeed = 0.25,
     hp = 450,
     abilList = "A03A"
 }
@@ -873,7 +879,8 @@ ____exports.items.I09X = {
     goldPrice = 1000,
     score = 2390,
     level = "D++",
-    agi = 15
+    agi = 15,
+    atkSpeed = 0.4
 }
 ____exports.items.I09O = {
     type = "道具/戒指/饰品",
@@ -1005,7 +1012,8 @@ ____exports.items.I04Z = {
     goldPrice = 1000,
     score = 2718,
     level = "D++",
-    agi = 20
+    agi = 20,
+    atkSpeed = 0.5
 }
 ____exports.items.I002 = {
     type = "衣服",
@@ -1124,6 +1132,7 @@ ____exports.items.I04M = {
     goldPrice = 1800,
     score = 3062,
     level = "C-",
+    atkSpeed = 0.4,
     armor = 20,
     hp = 1200,
     dodge = 0.1,
@@ -1235,6 +1244,7 @@ ____exports.items.I053 = {
     score = 3414,
     level = "C-",
     int = 15,
+    atkSpeed = 0.4,
     abilList = "A06T,A06R"
 }
 ____exports.items.I0A6 = {
@@ -1560,6 +1570,7 @@ ____exports.items.I0BZ = {
     score = 4121,
     level = "C",
     int = 40,
+    atkSpeed = 0.4,
     skillHeal = 0.2,
     healReceived = 0.2,
     accuracy = 0.15
@@ -1703,6 +1714,7 @@ ____exports.items.I0C2 = {
     score = 4861,
     level = "C++",
     agi = 45,
+    atkSpeed = 0.25,
     armor = 10,
     hp = 1150
 }
@@ -1832,7 +1844,8 @@ ____exports.items.I0C7 = {
     dmg = 100,
     critRate = 0.1,
     hp = 800,
-    physDmg = 0.2
+    physDmg = 0.2,
+    Buff = "dmg:curse1%MaxHP;time3"
 }
 ____exports.items.I011 = {
     type = "道具/戒指/饰品",
@@ -2059,6 +2072,7 @@ ____exports.items.I04P = {
     name = "矮人火枪风衣图纸",
     goldPrice = 2000,
     level = "F",
+    atkSpeed = 0.25,
     armor = 20,
     hp = 1200,
     dodge = 0.1
@@ -2235,7 +2249,8 @@ ____exports.items.I06C = {
     name = "瑟尔之弓",
     goldPrice = 2000,
     dmg = 65,
-    critRate = 0.25
+    critRate = 0.25,
+    atkSpeed = 0.5
 }
 ____exports.items.I06D = {
     type = "主武器",
@@ -2912,6 +2927,7 @@ ____exports.items.I08I = {
     goldPrice = 1000,
     dmg = 50,
     agi = 35,
+    atkSpeed = 1,
     accuracy = 0.1
 }
 ____exports.items.I08J = {
@@ -3019,7 +3035,8 @@ ____exports.items.I08U = {
     name = "熔墓之戒",
     goldPrice = 1000,
     hp = 1200,
-    magicDmg = 0.25
+    magicDmg = 0.25,
+    Buff = "dmg:antiHeal200%;time3"
 }
 ____exports.items.I08V = {
     type = "道具/戒指/饰品",
@@ -3114,6 +3131,7 @@ ____exports.items.I09D = {
     name = "|cffff0000浴灵魔披（唯一）|r",
     goldPrice = 55000,
     agi = 75,
+    atkSpeed = 0.4,
     hpRegen = 100,
     lifeSteal = 0.15,
     atkLifeSteal = 0.15
@@ -3446,7 +3464,7 @@ ____exports.items.I0CO = {
     abilList = "A0LH"
 }
 ____exports.items.I0CP = {type = "任务", name = "|cffff00ff暗狱之书|r|cffffff00（寻找物品任务）|r", goldPrice = 0}
-____exports.items.I0CQ = {type = "任务", name = "|cffcc99ff暗狱之书|r", goldPrice = 0}
+____exports.items.I0CQ = {type = "任务", name = "|cffcc99ff暗狱之书|r", goldPrice = 0, maxDrops = 1}
 ____exports.items.I0CR = {type = "任务", name = "收集|cff99cc00有毒杂草|r", goldPrice = 0}
 ____exports.items.I0CS = {type = "材料", name = "有毒杂草", goldPrice = 150}
 ____exports.items.I0CT = {

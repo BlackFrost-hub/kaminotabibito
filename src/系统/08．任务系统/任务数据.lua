@@ -65,6 +65,9 @@ function QuestDatabase.prototype.getAvailableQuests(self, playerId, ____type)
     return __TS__ArrayFilter(
         source,
         function(____, quest)
+            if quest.uiReserved then
+                return false
+            end
             if playerData.quests:has(quest.id) or playerData.completedQuests:has(quest.id) or playerData.failedQuests:has(quest.id) then
                 return false
             end
@@ -97,7 +100,7 @@ function QuestDatabase.prototype.getPlayerData(self, playerId)
 end
 function QuestDatabase.prototype.acceptQuest(self, playerId, questId)
     local quest = self:getQuest(questId)
-    if not quest then
+    if not quest or quest.uiReserved then
         return false
     end
     local playerData = self:getPlayerData(playerId)
@@ -321,6 +324,48 @@ function ____exports.createTestQuests(self)
         requiredQuests = {"main_001"},
         zone = "矿山",
         icon = "ReplaceableTextures\\CommandButtons\\BTNIronForge.blp",
+        createdAt = now(nil),
+        updatedAt = now(nil)
+    })
+    db:registerQuest({
+        id = "side_003",
+        type = ____exports.QuestType.SIDE,
+        title = "（占位）支线任务",
+        description = "日后启用",
+        objectives = {{
+            id = "obj1",
+            description = "占位目标",
+            current = 0,
+            required = 1,
+            completed = false
+        }},
+        rewards = {{type = "gold", value = 0, description = ""}},
+        status = ____exports.QuestStatus.UNDISCOVERED,
+        requiredLevel = 1,
+        zone = "",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNFootman.blp",
+        uiReserved = true,
+        createdAt = now(nil),
+        updatedAt = now(nil)
+    })
+    db:registerQuest({
+        id = "daily_002",
+        type = ____exports.QuestType.DAILY,
+        title = "（占位）小任务",
+        description = "日后启用",
+        objectives = {{
+            id = "obj1",
+            description = "占位目标",
+            current = 0,
+            required = 1,
+            completed = false
+        }},
+        rewards = {{type = "gold", value = 0, description = ""}},
+        status = ____exports.QuestStatus.UNDISCOVERED,
+        requiredLevel = 1,
+        zone = "",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNPeon.blp",
+        uiReserved = true,
         createdAt = now(nil),
         updatedAt = now(nil)
     })

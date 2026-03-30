@@ -1,22 +1,25 @@
 /**
- * Buff 池 / Buff 系统框架
+ * Buff 池 / Buff 系统框架（`00` 前缀便于在 `05．Buff系统` 目录内统一排序管理）
  *
- * - 记录「单位 → 当前拥有的 Buff 表 buffID」及快照（剩余时间、每跳强度等）。
- * - 键统一为 GetHandleId(unit)，避免 Lua 里「伤害回调里的 target」与「选中枚举的 sole」不是同一 userdata 导致查不到表。
- * - DOT 类由 dot伤害 在施加/覆盖/到期时调用 syncDotBuff；到期自动从池中移除。
- * - 非 DOT 类可调用 registerManualBuff，由本模块计时并在到期时清除。
+ * - **DOT（D001–D004）剩余时间由本模块以固定步长递减**；`dot伤害` 施加/刷新时 `syncDotBuff` 写入满额 remaining，不在此用 `getUnitPoison` 回写覆盖。
+ * - 非 DOT 的 `manual` 条同样由本计时器递减。
+ * - 每 tick 末调用 `dot伤害.syncDotRemainingFromBuffPool`，使逻辑层 `stateByType` 与池一致。
  */
 
 const jass = require("jass.common") as Record<string, unknown>;
 const leakCore = require("系统.00．核心系统.泄露审计") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 
-const TICK = 0.5;
+/** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */
+export const BUFF_POOL_TICK = 0.1;
 
 /** dot伤害 里的 typeId → 01．Buff表 buffID */
 export const DOT_TYPE_TO_BUFF_ID: Record<string, string> = {
   antiHeal: "D001",
   burn: "D002",
+  poison: "D003",
+  /** 与 `01．Buff表` D004 对应；`dot伤害` 注册同名 typeId 后 syncDotBuff 才会写入 */
+  trollCurse: "D004",
 };
 
 export interface BuffRuntime {
@@ -24,10 +27,16 @@ export interface BuffRuntime {
   remaining: number;
   effect: number;
   source: "dot" | "manual";
+  /** 与 dot 施加时解析的满额秒数一致，供提示条 */
+  sourceName?: string;
+  _dotParsedDuration?: number;
+  /** JASS 桥接：覆盖 01．Buff表 图标（非空则 Buff 条用此路径） */
+  iconOverride?: string;
+  /** 预留：与桥接传入的特效路径一致（可用于后续挂点逻辑） */
+  effectModelOverride?: string;
 }
 
 interface UnitBuffEntry {
-  /** 最近一次同步时的单位引用，供从 dot 刷新 D001/D002（与 hid 对应） */
   lastRef: any;
   buffs: Record<string, BuffRuntime>;
 }
@@ -66,12 +75,30 @@ function pruneEmptyHid(hid: number): void {
   if (n === 0) delete unitToBuffs[hid];
 }
 
+function notifyDotBuffExpiredFromPool(buffID: string, hid: number): void {
+  (pcall as any)(() => {
+    const m = require("系统.04．伤害系统.dot伤害") as { clearDotByBuffPoolExpire?: (bid: string, h: number) => void };
+    if (m != null && typeof m.clearDotByBuffPoolExpire === "function") m.clearDotByBuffPoolExpire(buffID, hid);
+  });
+}
+
+function syncDotFromPoolTick(): void {
+  (pcall as any)(() => {
+    const m = require("系统.04．伤害系统.dot伤害") as { syncDotRemainingFromBuffPool?: () => void };
+    if (m != null && typeof m.syncDotRemainingFromBuffPool === "function") m.syncDotRemainingFromBuffPool();
+  });
+}
+
 /**
  * 由 dot伤害 调用：施加、覆盖或到期清除。
- * target 可为单位或 **GetHandleId**（tick 里到期时只传 id）。
+ * target 可为单位或 **GetHandleId**。
  * state 为 null 表示该 DOT 类型在该单位上已结束。
  */
-export function syncDotBuff(typeId: string, target: any, state: { effect: number; remaining: number } | null): void {
+export function syncDotBuff(
+  typeId: string,
+  target: any,
+  state: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
+): void {
   const buffID = DOT_TYPE_TO_BUFF_ID[typeId];
   if (!buffID) return;
   const hid = toHid(target);
@@ -86,16 +113,43 @@ export function syncDotBuff(typeId: string, target: any, state: { effect: number
   }
   const entry = ensureEntry(target);
   if (entry == null) return;
-  entry.buffs[buffID] = { buffID, remaining: state.remaining, effect: state.effect, source: "dot" };
+  entry.buffs[buffID] = {
+    buffID,
+    remaining: state.remaining,
+    effect: state.effect,
+    source: "dot",
+    sourceName: state.sourceName,
+    _dotParsedDuration: state._dotParsedDuration,
+  };
   if (typeof target !== "number") entry.lastRef = target;
   ensureSyncTimer();
 }
 
-export function registerManualBuff(target: any, buffID: string, durationSec: number, effectValue: number): void {
+/** 手动 Buff 的可选展示字段（JASS 桥接、技能脚本） */
+export interface RegisterManualBuffExtras {
+  sourceName?: string;
+  iconOverride?: string;
+  effectModelOverride?: string;
+}
+
+export function registerManualBuff(
+  target: any,
+  buffID: string,
+  durationSec: number,
+  effectValue: number,
+  extras?: RegisterManualBuffExtras
+): void {
   if (target == null || target === 0 || !buffID || durationSec <= 0) return;
   const entry = ensureEntry(target);
   if (entry == null) return;
-  entry.buffs[buffID] = { buffID, remaining: durationSec, effect: effectValue, source: "manual" };
+  const row: BuffRuntime = { buffID, remaining: durationSec, effect: effectValue, source: "manual" };
+  if (extras != null) {
+    if (extras.sourceName !== undefined && extras.sourceName !== "") row.sourceName = extras.sourceName;
+    if (extras.iconOverride !== undefined && extras.iconOverride !== "") row.iconOverride = extras.iconOverride;
+    if (extras.effectModelOverride !== undefined && extras.effectModelOverride !== "")
+      row.effectModelOverride = extras.effectModelOverride;
+  }
+  entry.buffs[buffID] = row;
   ensureSyncTimer();
 }
 
@@ -136,70 +190,51 @@ export function getBuffIdsOnUnit(unit: any): string[] {
 
 export function getBuffRuntime(unit: any, buffID: string): BuffRuntime | null {
   const hid = toHid(unit);
-  const e = hid !== 0 ? unitToBuffs[hid] : null;
+  return getBuffRuntimeByHid(hid, buffID);
+}
+
+export function getBuffRuntimeByHid(hid: number, buffID: string): BuffRuntime | null {
+  if (hid === 0) return null;
+  const e = unitToBuffs[hid];
   if (e == null) return null;
   const r = e.buffs[buffID];
   return r != null ? r : null;
 }
 
-function syncDotSnapshots(): void {
-  const dotMod = require("系统.04．伤害系统.dot伤害") as {
-    getUnitAntiHeal?: (u: any) => { effect: number; remaining: number } | null;
-    getUnitBurn?: (u: any) => { effect: number; remaining: number } | null;
-  };
-  for (const hidKey in unitToBuffs) {
-    const hid = toHid(hidKey);
-    if (hid === 0) continue;
-    const entry = unitToBuffs[hid];
-    if (entry == null) continue;
-    const unit = entry.lastRef;
-    const tab = entry.buffs;
-    if (tab["D001"] != null && tab["D001"].source === "dot") {
-      const st = unit != null && dotMod.getUnitAntiHeal != null ? dotMod.getUnitAntiHeal(unit) : null;
-      if (st == null) {
-        delete tab["D001"];
-      } else {
-        tab["D001"].remaining = st.remaining;
-        tab["D001"].effect = st.effect;
-      }
-    }
-    if (tab["D002"] != null && tab["D002"].source === "dot") {
-      const st = unit != null && dotMod.getUnitBurn != null ? dotMod.getUnitBurn(unit) : null;
-      if (st == null) {
-        delete tab["D002"];
-      } else {
-        tab["D002"].remaining = st.remaining;
-        tab["D002"].effect = st.effect;
-      }
-    }
-    pruneEmptyHid(hid);
-  }
+/** 图标底部剩余秒数：与池内 `remaining` 一致（无假层） */
+export function getDotIconDisplayRemaining(_unit: any, _buffID: string, realRemaining: number): number {
+  return typeof realRemaining === "number" && isFinite(realRemaining) ? realRemaining : 0;
 }
 
-function tickManualAndSyncDot(): void {
-  syncDotSnapshots();
+function tickBuffPool(): void {
   for (const hidKey in unitToBuffs) {
     const hid = toHid(hidKey);
     if (hid === 0) continue;
     const entry = unitToBuffs[hid];
     if (entry == null) continue;
     const tab = entry.buffs;
+    const expired: string[] = [];
     for (const bid in tab) {
       const row = tab[bid];
-      if (row == null || row.source !== "manual") continue;
-      row.remaining = row.remaining - TICK;
-      if (row.remaining <= 0) delete tab[bid];
+      if (row == null) continue;
+      row.remaining = row.remaining - BUFF_POOL_TICK;
+      if (row.remaining <= 0) {
+        if (row.source === "dot") notifyDotBuffExpiredFromPool(bid, hid);
+        expired.push(bid);
+      }
     }
+    for (let ei = 0; ei < expired.length; ei++) delete tab[expired[ei]];
     pruneEmptyHid(hid);
   }
+  syncDotFromPoolTick();
   maybeStopSyncTimer();
 }
 
 function ensureSyncTimer(): void {
   if (syncTimer != null) return;
   if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
-  syncTimer = LeakWatcher.createTimer("buff_pool_sync");
-  (jass as any).TimerStart(syncTimer, TICK, true, tickManualAndSyncDot);
+  syncTimer = LeakWatcher.createTimer("buff_pool_tick");
+  (jass as any).TimerStart(syncTimer, BUFF_POOL_TICK, true, tickBuffPool);
 }
 
 function maybeStopSyncTimer(): void {

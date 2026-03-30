@@ -5,7 +5,17 @@
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 const damageEvent = require("系统.04．伤害系统.伤害事件") as {
-  registerDamageCallback: (cb: (unit: any, damage: number, damageType: number, isFirstInBatch: boolean, isLastInBatch: boolean) => void, interval?: number) => void;
+  registerDamageCallback: (
+    cb: (
+      unit: any,
+      damage: number,
+      damageType: number,
+      isFirstInBatch: boolean,
+      isLastInBatch: boolean,
+      fromDotTickBatch?: boolean
+    ) => void,
+    interval?: number
+  ) => void;
   hasBit: (v: number, bit: number) => boolean;
 };
 
@@ -37,6 +47,9 @@ function onDamage(unit: any, damage: number, damageType: number, isFirstInBatch:
     }
     if ((isAttack || isRanged) && (isFirstInBatch || isLastInBatch)) {
       msg = name + "受到了" + damageStr + "点技能攻击伤害" + detail;
+    } else if (isPhysical) {
+      /** 与 dot伤害 `nextDamageTypeOverride` 的 4096 展示位一致：如诅咒 DOT（2048+4096） */
+      msg = name + "受到了" + damageStr + "点技能物理伤害" + detail;
     } else {
       msg = name + "受到了" + damageStr + "点技能伤害" + detail;
     }
@@ -60,5 +73,17 @@ function onDamage(unit: any, damage: number, damageType: number, isFirstInBatch:
   sendMsg(msg + " [类型:" + damageType + "]");
 }
 
-damageEvent.registerDamageCallback(onDamage, 60);
+damageEvent.registerDamageCallback(
+  (
+    unit: any,
+    damage: number,
+    damageType: number,
+    isFirstInBatch: boolean,
+    isLastInBatch: boolean,
+    _fromDotTickBatch?: boolean
+  ) => {
+    onDamage(unit, damage, damageType, isFirstInBatch, isLastInBatch);
+  },
+  60
+);
 export {};

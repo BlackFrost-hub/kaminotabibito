@@ -1,4 +1,4 @@
-// 自动生成 - 单位数据表
+﻿// 自动生成 - 单位数据表
 export interface UnitData {
   id: string;
   name: string;
@@ -7,17 +7,16 @@ export interface UnitData {
   picks?: string | number;
   isUniversal?: string | number;
   priority?: string | number;
+  berserkUnit?: string | number;
   unitType?: string | number;
-  berserk?: string | number;
 }
 
 export const 装备掉落表: Record<string, UnitData> = {
   "n012": { id: "n012", name: "森林野猪", level: 1, unitType: "normal" },
   "nwlt": { id: "nwlt", name: "森林之狼", level: 1, unitType: "normal" },
-  "hfoo": { id: "hfoo", name: "步兵", level: 2, itemIds: "I03U:50%;I00S:50%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
   "n009": { id: "n009", name: "普通地精", level: 2, itemIds: "I01X:6%;I01P:6%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
-  "n000": { id: "n000", name: "蓝色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
-  "n002": { id: "n002", name: "绿色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
+  "n000": { id: "n000", name: "蓝色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", berserkUnit: "n01F", unitType: "normal" },
+  "n002": { id: "n002", name: "绿色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", berserkUnit: "n01F", unitType: "normal" },
   "ngna": { id: "ngna", name: "豺狼偷猎者", level: 3, itemIds: "I01O:10%;I01S:5%;I01T:5%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
   "ngns": { id: "ngns", name: "豺狼刺客", level: 3, itemIds: "I01O:10%;I01S:5%;I01T:5%;I00Q:6%;I01F:6%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "nsc2": { id: "nsc2", name: "蜘蛛螃蟹", level: 4, itemIds: "I02H:12.5%;I02K:6.25%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
@@ -27,7 +26,7 @@ export const 装备掉落表: Record<string, UnitData> = {
   "ngst": { id: "ngst", name: "岩石傀儡", level: 6, itemIds: "I02J:10%", picks: 1, isUniversal: "FALSE", unitType: "normal" },
   "nssp": { id: "nssp", name: "沙漠蜘蛛", level: 7, itemIds: "I03L:21%;I04R:15%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "nanb": { id: "nanb", name: "阿卡那瑟德刺人", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
-  "nane": { id: "nane", name: "阿卡那瑟德掘地者 ", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
+  "nane": { id: "nane", name: "阿卡那瑟德掘地者", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "nanw": { id: "nanw", name: "阿卡那瑟德战士", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "n001": { id: "n001", name: "史莱姆", level: 10, unitType: "normal" },
   "n01Z": { id: "n01Z", name: "小蛇", level: 10, unitType: "normal" },
@@ -39,7 +38,7 @@ export const 装备掉落表: Record<string, UnitData> = {
   "nhrw": { id: "nhrw", name: "鹰身女妖巫婆", level: 14, itemIds: "I04S:19%;I04Q:19%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
   "n01A": { id: "n01A", name: "水底水母", level: 15, unitType: "normal" },
   "n003": { id: "n003", name: "狼人骑士", level: 16, itemIds: "I057:6%;I04T:6%", picks: 1, isUniversal: "FALSE", unitType: "normal" },
-  "n013": { id: "n013", name: "熔岩蝎子", level: 17, unitType: "normal" },
+  "n013": { id: "n013", name: "熔岩蝎子", level: 17, berserkUnit: "n035", unitType: "normal" },
   "nsko": { id: "nsko", name: "有毒杂草", level: 17, itemIds: "I0CS:14%", picks: 1, isUniversal: "FALSE", unitType: "normal" },
   "n04G": { id: "n04G", name: "咆哮之熊", level: 18, unitType: "normal" },
   "nslr": { id: "nslr", name: "蜥蜴怪物", level: 18, unitType: "normal" },
@@ -76,7 +75,7 @@ export const 装备掉落表: Record<string, UnitData> = {
   "n04E": { id: "n04E", name: "恶魔使魔", unitType: "normal" },
   "nnwl": { id: "nnwl", name: "火焰蜘蛛", unitType: "normal" },
   "nass": { id: "nass", name: "沙漠神秘刺客", unitType: "normal" },
-  "n01F": { id: "n01F", name: "狂暴史莱姆", level: 3, itemIds: "I00C:1;I00O:1", picks: 2, isUniversal: "FALSE", unitType: "berserk	" },
+  "n01F": { id: "n01F", name: "狂暴史莱姆", level: 3, itemIds: "I00C:1;I00O:1", picks: 2, isUniversal: "FALSE", unitType: "berserk" },
   "nwld": { id: "nwld", name: "森林狼王", level: 3, isUniversal: "FALSE", unitType: "elite" },
   "n049": { id: "n049", name: "|cff00ffff水触须|r|cffff0000（头目LV4）|r", level: 4, isUniversal: "FALSE", unitType: "elite" },
   "n00I": { id: "n00I", name: "神秘刺客", level: 4, isUniversal: "FALSE", unitType: "elite" },
@@ -95,14 +94,14 @@ export const 装备掉落表: Record<string, UnitData> = {
   "u00G": { id: "u00G", name: "|cff993366邪尸鬼|r-（|cffff0000治疗量降低|r）", level: 15, isUniversal: "FALSE", unitType: "elite" },
   "nbds": { id: "nbds", name: "蛇之看守者(精英)", level: 16, isUniversal: "FALSE", unitType: "elite" },
   "nano": { id: "nano", name: "沙漠蝎王", level: 17, itemIds: "I05E:1;I05G:1;I04W:1;I03Y:1;I04R:1", picks: 4, isUniversal: "FALSE", unitType: "elite" },
-  "n00Z": { id: "n00Z", name: "火焰狼蛛", level: 17, isUniversal: "FALSE", unitType: "elite" },
+  "n00Z": { id: "n00Z", name: "火焰狼蛛", level: 17, isUniversal: "FALSE", berserkUnit: "n034", unitType: "elite" },
   "n04J": { id: "n04J", name: "食人花", level: 18, isUniversal: "FALSE", unitType: "elite" },
   "n005": { id: "n005", name: "狼人魔法师", level: 20, itemIds: "I051:1;I050:1;I052:1;I054:0.8;I056:0.5", picks: 2, isUniversal: "FALSE", unitType: "elite" },
   "nanc": { id: "nanc", name: "|cff99cc00变异蝎子|r|cffff0000（头目LV20）|r", level: 20, isUniversal: "FALSE", unitType: "elite" },
   "n04T": { id: "n04T", name: "战斗者暴斯", level: 20, isUniversal: "FALSE", unitType: "elite" },
   "n02R": { id: "n02R", name: "两栖鱼人|cffff0000（精英，给予额外经验）|r", level: 20, isUniversal: "FALSE", unitType: "elite" },
-  "n034": { id: "n034", name: "狂暴火焰狼蛛", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk	" },
-  "n035": { id: "n035", name: "狂暴熔岩蝎子", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk	" },
+  "n034": { id: "n034", name: "狂暴火焰狼蛛", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk" },
+  "n035": { id: "n035", name: "狂暴熔岩蝎子", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk" },
   "n02S": { id: "n02S", name: "|cff00ccff湖底元素|r|cffff0000(头目)LV22|r", level: 22, isUniversal: "FALSE", unitType: "elite" },
   "n02U": { id: "n02U", name: "|cff00ffff龙虾守卫|r|cffff0000（挑战Boss）LV22|r", level: 22, isUniversal: "FALSE", unitType: "elite" },
   "n04H": { id: "n04H", name: "狂啸熊王", level: 23, itemIds: "I0BR:1;I0BQ:1;I0BS:1", picks: 2, isUniversal: "FALSE", unitType: "elite" },

@@ -1,7 +1,10 @@
 /** Global declarations for TSTL / Lua environment */
-declare var Itmeboolean: boolean; /* 装备限制开关（Jass 全局） */
 /** @noSelf */
 declare function GetUnitState(unit: any, state: any): number;
+/** 伤害事件内同步读取；勿用 g:GetEventDamageSource（TSTL 会编成冒号调用） */
+declare function GetEventDamageSource(): any;
+/** 1.29+ 最大生命，无 UNIT_STATE_MAX_LIFE 时可用 */
+declare function BlzGetUnitMaxHP(unit: any): number;
 declare function require(mod: string): any;
 declare const pcall: <T>(f: () => T) => [boolean, T | string];
 declare const tostring: (v: any) => string;
@@ -83,6 +86,7 @@ interface JassCommon {
   YDWEIsEventDamageType?: (t: number) => boolean;
   YDWEIsEventAttackType?: (t: number) => boolean;
   YDWEIsEventAttackDamage?: () => boolean;
+  YDWEIsEventRangedDamage?: () => boolean;
   YDWEIsEventPhysicalDamage?: () => boolean;
   YDWESetEventDamage?: (dmg: number) => void;
   YDWETimerDestroyTextTag?: (dur: number, tt: any) => void;

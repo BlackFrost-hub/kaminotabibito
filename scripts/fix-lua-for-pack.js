@@ -38,6 +38,16 @@ function fixFile(filePath) {
 
   // 6. jass: -> jass.   JASS 原生函数第一个参数是 handle，不能用冒号
   content = content.replace(/\bjass:/g, "jass.");
+  // 6a. g:GetEventDamageSource 等同上，g 表被误当 self
+  content = content.replace(/\bg:GetEventDamageSource\s*\(/g, "g.GetEventDamageSource(");
+  // 6c. TSTL 对全局原生误生成 GetEventDamageSource(nil) / BlzGetUnitMaxHP(nil, u)
+  content = content.replace(/GetEventDamageSource\s*\(\s*nil\s*\)/g, "GetEventDamageSource()");
+  content = content.replace(/BlzGetUnitMaxHP\s*\(\s*nil\s*,\s*/g, "BlzGetUnitMaxHP(");
+  content = content.replace(/\bjassGetSrc\s*\(\s*nil\s*\)/g, "jassGetSrc()");
+  content = content.replace(/\bgGetSrc\s*\(\s*nil\s*\)/g, "gGetSrc()");
+  // 6d. dot伤害 getUnitMaxHp：TSTL 把 _G 当 self 传入 gt.BlzGetUnitMaxHP(gt, u) / gt.GetUnitState(gt, u, s)
+  content = content.replace(/gt\.BlzGetUnitMaxHP\s*\(\s*gt\s*,\s*targetUnit\s*\)/g, "BlzGetUnitMaxHP(targetUnit)");
+  content = content.replace(/gt\.GetUnitState\s*\(\s*gt\s*,\s*targetUnit\s*,\s*maxLife\s*\)/g, "GetUnitState(targetUnit, maxLife)");
 
   // 6b. japi:DzXxx( -> japi.DzXxx(  DzAPI 函数不是方法，不能用冒号（会多传 japi 表当首参）
   content = content.replace(/\bjapi:Dz/g, "japi.Dz");
