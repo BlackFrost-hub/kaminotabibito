@@ -3,7 +3,7 @@
  *
  * 设计说明（给后续维护或 AI 参考）：
  * - 每种 DOT 通过 registerDotType(config) 注册，配置里包含：解析装备 Buff、取“最强”参数、算每秒伤害、伤害类型、特效模型等。
- * - **普攻/远程普攻（8192/16384）**：视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
+ * - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，经 `registerDamageCallback` 第 6 参传入；装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
  * - **非普攻伤害**（技能等）：仍用「同解析 time → 刷新」或「新乘积更大 → 换条」；DOT 秒跳自伤靠 ignoredTargetByType 整轮跳过，batch 仅挡无普攻位的回调。
  * - **剩余秒数**：由 `05．Buff系统.00．Buff系统` 的 Buff 池以 `BUFF_POOL_TICK`（0.1s）递减；本模块每 tick 末 `syncDotRemainingFromBuffPool` 把池内 remaining/effect 写回 `stateByType`。
  * - **dotTimer**：每 1 秒按条目的 amount 造成伤害并播特效；到期以池为准移除条目；effectRecycleTimer 统一回收特效。
@@ -18,16 +18,12 @@ import type { BuffData } from "../05．Buff系统/01．Buff表";
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as {
-  setNextDamageTypeOverride: (n: number) => void;
   markNextPendingDamageAsDotTickBatch: () => void;
   registerDamageCallback: (
-    cb: (unit: any, d: number, t: number, f: boolean, l: boolean, fromDotTickBatch?: boolean) => void,
+    cb: (unit: any, d: number, t: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void,
     interval?: number
   ) => void;
-  hasBit: (v: number, bit: number) => boolean;
-  damageTypeLooksLikeWeaponHitForGearDot: (t: number) => boolean;
 };
-const hasBit = damageEventModule.hasBit;
 const leakCore = require("系统.00．核心系统.05．泄露审计") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 const debuffMod = require("系统.05．Buff系统.01．Buff表") as { buffs: Record<string, BuffData> };
@@ -47,19 +43,6 @@ export const DOT_DEBUFF_IDS = {
   trollCurse: debuffBuffs["D004"]?.buffID ?? "D004",
 } as const;
 
-/** 伤害类型位：2048=技能 256=精神，用于 Lua 造成的伤害在事件里显示正确文案 */
-const DAMAGE_TYPE_SKILL = 2048;
-const DAMAGE_TYPE_MIND = 256;
-/** 金属性/酸性在「伤害事件展示位」里的 bit，与 伤害测试 attr 表一致：bit 32 = 金属性 */
-const DAMAGE_TYPE_METAL_UI_BITS_FOR_DISPLAY = 32;
-/**
- * 火焰在「伤害事件展示位」里与 伤害测试 里 attr 表一致：bit4 = 火属性（勿用 common.j 的 32，否则会被显示成「金属性」）。
- * UnitDamageTarget 第 7 参仍传 jass.DAMAGE_TYPE_FIRE（句柄）。
- */
-const DAMAGE_TYPE_FIRE_UI_BITS_FOR_DISPLAY = 4;
-/** 与伤害事件展示一致：4096 = 物理 */
-const DAMAGE_TYPE_PHYSICAL_UI_BITS_FOR_DISPLAY = 4096;
-
 // ========== 通用 DOT 类型配置与注册 ==========
 /** 单种 DOT 的配置：解析 Buff、取装备最强、算伤害、伤害类型、特效、可选附加效果回调 */
 export interface DotTypeConfig {
@@ -75,8 +58,6 @@ export interface DotTypeConfig {
   computeAmount: (target: any, parsed: any) => number;
   /** JASS 伤害类型常量，如 DAMAGE_TYPE_MIND、DAMAGE_TYPE_FIRE */
   damageType: any;
-  /** 传给伤害事件的类型位覆盖（如 2048+256 精神、2048+火焰）；缺省为 技能+精神 */
-  nextDamageTypeOverride?: number;
   /** 挂点特效模型路径，如 "Abilities\\Spells\\NightElf\\CorrosiveBreath\\ChimaeraAcidTargetArt.mdl" */
   effectModel: string;
   /** 特效挂载后保留秒数，到期后统一回收 */
@@ -88,8 +69,8 @@ export interface DotTypeConfig {
   /** 可选：持续结束或被覆盖时调用，用于移除附加效果 */
   onEnd?: (target: any, state: any) => void;
   /**
-   * 可选：为 true 时，只有攻击伤害（普攻 8192 或技能攻击 2048+8192/16384）才能触发本类 DOT。
-   * 对应装备 Buff 前缀 "Buff:attack:"。
+   * 可选：为 true 时，仅当伤害事件传入的「普攻命中」快照为真时才能触发本类 DOT（与 `01．伤害事件.ts` 第 6 参一致）。
+   * 对应装备 Buff 前缀 "Buff:attack:"；普攻装备叠层走 `tryApplyHeroAttackGearDots` 等路径。
    */
   attackOnlyTrigger?: boolean;
 }
@@ -133,12 +114,14 @@ interface DotTickEntry { typeId: string; source: any; target: any; amount: numbe
 const dotTicks: DotTickEntry[] = [];
 
 /** Buff 池 buffID → dot typeId（与 00．Buff系统 DOT_TYPE_TO_BUFF_ID 互逆） */
+const BUFF_ID_TO_DOT_TYPE: Record<string, string> = {
+  D001: "antiHeal",
+  D002: "burn",
+  D003: "poison",
+  D004: "trollCurse",
+};
 function dotTypeIdFromBuffId(buffID: string): string | null {
-  if (buffID === "D001") return "antiHeal";
-  if (buffID === "D002") return "burn";
-  if (buffID === "D003") return "poison";
-  if (buffID === "D004") return "trollCurse";
-  return null;
+  return BUFF_ID_TO_DOT_TYPE[buffID] ?? null;
 }
 /** 刚被我们「某类型」伤害打到的单位，下一帧伤害回调里跳过对该类型施加，避免 DOT 触发的伤害再次叠 DOT */
 const ignoredTargetByType: Record<string, Record<any, boolean>> = {};
@@ -154,9 +137,11 @@ const EFFECT_RECYCLE_INTERVAL = 0.2;
 const effectRecycleList: { eff: any; ticksLeft: number }[] = [];
 let effectRecycleTimer: any = undefined;
 
-const itemsData = (require("系统.02．物品系统.01．装备数据") as { items?: Record<string, { Buff?: string }>; default?: Record<string, { Buff?: string }> }).items
-  ?? (require("系统.02．物品系统.01．装备数据") as { default?: Record<string, { Buff?: string }> }).default
-  ?? {};
+const equipDataMod = require("系统.02．物品系统.01．装备数据") as {
+  items?: Record<string, { Buff?: string }>;
+  default?: Record<string, { Buff?: string }>;
+};
+const itemsData = equipDataMod.items ?? equipDataMod.default ?? {};
 
 /** Lua 下单位作表键时，伤害回调的 target 与选中枚举的 sole 可能不是同一 userdata；统一用 GetHandleId 作键。 */
 function unitHid(u: any): number {
@@ -364,7 +349,7 @@ export function clearDotByBuffPoolExpire(buffID: string, hid: number): void {
 }
 
 /**
- * 伤害事件延后展示前调用：用**整段** `udg_TempDamageType` 判定普攻位，每刀只叠一次装备 DOT，避免多段伤害丢 8192/16384。
+ * 伤害事件延后展示前调用：用 entry.gearDotAttackRefreshHint 判定普攻位（已在事件同步阶段快照，不依赖 jass 全局），每刀只叠一次装备 DOT，避免多段伤害丢 8192/16384。
  * 与 `onDamage` 内普攻分支互斥：回调里 `isAttackHitForDot` 为真时不再叠层。
  */
 export function tryApplyHeroAttackGearDots(source: any, target: any, _damage: number): void {
@@ -422,7 +407,11 @@ function addDotEffectOnUnit(unit: any, model: string, duration: number): void {
   }
 }
 
-/** 造成指定类型的 DOT 伤害，并标记该目标为本类型“自伤”，避免回调里再次施加。来源/目标写入 udg_TempUnit[4]/[3] 供 JASS 读 */
+/**
+ * 造成指定类型的 DOT 伤害，并标记该目标为本类型“自伤”，避免回调里再次施加。
+ * udg_TempUnit[3]=target / [4]=source：JASS/GUI 触发器约定槽位（与 BuffJASS桥接同协议），
+ * 此处是向 JASS 端输出，不是从 JASS 读取输入，不可删除。
+ */
 function dealDamageForType(typeId: string, source: any, target: any, amount: number): void {
   if (typeof (jass as any).UnitDamageTarget !== "function") return;
   const cfg = dotTypes.find(c => c.id === typeId);
@@ -439,9 +428,6 @@ function dealDamageForType(typeId: string, source: any, target: any, amount: num
     if ((ignoredTargetByType as any)[tid] == null) (ignoredTargetByType as any)[tid] = {};
     (ignoredTargetByType as any)[tid][dh] = true;
   }
-  const typeBits =
-    cfg.nextDamageTypeOverride != null ? cfg.nextDamageTypeOverride : DAMAGE_TYPE_SKILL + DAMAGE_TYPE_MIND;
-  damageEventModule.setNextDamageTypeOverride(typeBits);
   if (typeof damageEventModule.markNextPendingDamageAsDotTickBatch === "function") {
     damageEventModule.markNextPendingDamageAsDotTickBatch();
   }
@@ -646,12 +632,10 @@ function dotTickRun(): void {
  * - `ignoredTargetByType`：DOT 自伤一轮内各类型各清一次并跳过叠层。
  * - `suppressDotApplyForBatch`：秒跳批内且无普攻位时跳过（普攻永远可走 `applyEquipmentDotOnHeroAttack`）。
  */
-function onDamage(target: any, damage: number, damageType: number, fromDotTickBatch?: boolean): void {
+function onDamage(target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttackHit?: boolean): void {
   if (!target) return;
-  const isAttackHitForDot = damageEventModule.damageTypeLooksLikeWeaponHitForGearDot(damageType);
+  const isAttackHitForDot = isNormalAttackHit === true;
   if (damage <= 0 && !isAttackHitForDot) return;
-  const ju = jass as any;
-  const source = ju.udg_TempUnit != null && ju.udg_TempUnit[6] != null ? ju.udg_TempUnit[6] : null;
   if (!source) return;
   if (!isSourceHeroPlayer1to4(source)) return;
 
@@ -883,7 +867,6 @@ registerDotType({
   getBestFromUnit: getBestBurnFromUnit,
   computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
   damageType: (jass as any).DAMAGE_TYPE_FIRE,
-  nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_FIRE_UI_BITS_FOR_DISPLAY,
   effectModel: dotEffectModelFromBuffRow("D002"),
   effectDuration: 0.75,
 });
@@ -945,7 +928,6 @@ registerDotType({
   getBestFromUnit: getBestPoisonFromUnit,
   computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
   damageType: (jass as any).DAMAGE_TYPE_ACID,
-  nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_METAL_UI_BITS_FOR_DISPLAY,
   effectModel: dotEffectModelFromBuffRow("D003"),
   effectDuration: 0.8,
 });
@@ -1019,7 +1001,6 @@ registerDotType({
     return maxHp * ((parsed.pctMaxHpPerSec as number) / 100);
   },
   damageType: (jass as any).DAMAGE_TYPE_NORMAL,
-  nextDamageTypeOverride: DAMAGE_TYPE_SKILL + DAMAGE_TYPE_PHYSICAL_UI_BITS_FOR_DISPLAY,
   effectModel: dotEffectModelFromBuffRow("D004"),
   effectDuration: 0.8,
 });
@@ -1027,64 +1008,37 @@ registerDotType({
 // ========== 初始化与导出 ==========
 let registered = false;
 
-function init(damageEvent: {
-  registerDamageCallback: (
-    cb: (unit: any, d: number, t: number, f: boolean, l: boolean, fromDotTickBatch?: boolean) => void,
-    interval?: number
-  ) => void;
-}): void {
-  if (registered) return;
-  registered = true;
-  damageEvent.registerDamageCallback((unit: any, damage: number, dmgType: number, _f: boolean, _l: boolean, fromDotTickBatch?: boolean) => {
-    onDamage(unit, damage, dmgType, fromDotTickBatch);
-  });
+function getDotStateByTypeId(typeId: string, unit: any): DotState | null {
+  const tab = (stateByType as any)[typeId];
+  if (tab == null || unit == null || unit === 0) return null;
+  const h = unitHid(unit);
+  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
+  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
+  const u = tab[unit];
+  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
 }
 
 /** 供治疗等系统读取：单位当前反恢复状态，无则返回 null */
 export function getUnitAntiHeal(unit: any): DotState | null {
-  const tab = (stateByType as any)["antiHeal"];
-  if (tab == null || unit == null || unit === 0) return null;
-  const h = unitHid(unit);
-  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
-  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
-  const u = tab[unit];
-  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+  return getDotStateByTypeId("antiHeal", unit);
 }
 
 /** 供 UI 等读取：单位当前燃烧 DOT 状态，无则返回 null */
 export function getUnitBurn(unit: any): DotState | null {
-  const tab = (stateByType as any)["burn"];
-  if (tab == null || unit == null || unit === 0) return null;
-  const h = unitHid(unit);
-  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
-  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
-  const u = tab[unit];
-  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+  return getDotStateByTypeId("burn", unit);
 }
 
 /** 供 UI 等读取：单位当前中毒 DOT 状态，无则返回 null */
 export function getUnitPoison(unit: any): DotState | null {
-  const tab = (stateByType as any)["poison"];
-  if (tab == null || unit == null || unit === 0) return null;
-  const h = unitHid(unit);
-  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
-  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
-  const u = tab[unit];
-  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+  return getDotStateByTypeId("poison", unit);
 }
 
 /** 供 UI 等读取：D004 巨魔头颅诅咒（`registerDotType` id `trollCurse` 注册后才有状态） */
 export function getUnitTrollCurse(unit: any): DotState | null {
-  const tab = (stateByType as any)["trollCurse"];
-  if (tab == null || unit == null || unit === 0) return null;
-  const h = unitHid(unit);
-  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
-  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
-  const u = tab[unit];
-  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+  return getDotStateByTypeId("trollCurse", unit);
 }
 
-/** 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。来源/目标由 dealDamageForType 写入 udg_TempUnit[4]/[3] 供 JASS 读 */
+/** 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。udg_TempUnit[3]/[4] 由 dealDamageForType 写入（JASS约定输出槽，不可删） */
 export function dealSpiritDamage(source: any, target: any, amount: number): void {
   dealDamageForType("antiHeal", source, target, amount);
 }
@@ -1094,4 +1048,7 @@ export function dealBurnDamage(source: any, target: any, amount: number): void {
   dealDamageForType("burn", source, target, amount);
 }
 
-init(damageEventModule);
+if (!registered) {
+  registered = true;
+  damageEventModule.registerDamageCallback(onDamage);
+}

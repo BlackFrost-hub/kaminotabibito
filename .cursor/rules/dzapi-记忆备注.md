@@ -34,4 +34,3 @@ endfunction
 ### 差异点
 
 - 上面封装把 `sync` 固定成 `true`，但平台实测键盘事件需要 `sync=false` 才派发到回调。
-

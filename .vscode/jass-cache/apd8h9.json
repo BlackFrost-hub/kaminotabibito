@@ -128,29 +128,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___HT",
+      "label": "SLInteger__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLInteger___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___HT",
+      "documentation": "\n```jass\nhashtable SLInteger__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___IntegerLists",
+      "label": "SLInteger__IntegerLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLInteger___IntegerLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___IntegerLists",
+      "documentation": "\n```jass\ninteger SLInteger__IntegerLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__IntegerLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___K_Count",
+      "label": "SLInteger__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLInteger___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___K_Count",
+      "documentation": "\n```jass\ninteger SLInteger__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -191,29 +191,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___HT",
+      "label": "SLReal__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLReal___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___HT",
+      "documentation": "\n```jass\nhashtable SLReal__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___RealLists",
+      "label": "SLReal__RealLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLReal___RealLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___RealLists",
+      "documentation": "\n```jass\ninteger SLReal__RealLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__RealLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___K_Count",
+      "label": "SLReal__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLReal___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___K_Count",
+      "documentation": "\n```jass\ninteger SLReal__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -254,29 +254,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___HT",
+      "label": "SLStr__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLStr___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___HT",
+      "documentation": "\n```jass\nhashtable SLStr__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___StrLists",
+      "label": "SLStr__StrLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLStr___StrLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___StrLists",
+      "documentation": "\n```jass\ninteger SLStr__StrLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__StrLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___K_Count",
+      "label": "SLStr__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLStr___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___K_Count",
+      "documentation": "\n```jass\ninteger SLStr__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -398,56 +398,56 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___MAX_RANGE",
+      "label": "X__MAX_RANGE",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant real X___MAX_RANGE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___MAX_RANGE",
+      "documentation": "\n```jass\nconstant real X__MAX_RANGE\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__MAX_RANGE",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___DUMMY_ITEM_ID",
+      "label": "X__DUMMY_ITEM_ID",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer X___DUMMY_ITEM_ID\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___DUMMY_ITEM_ID",
+      "documentation": "\n```jass\nconstant integer X__DUMMY_ITEM_ID\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__DUMMY_ITEM_ID",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Item",
+      "label": "X__Item",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nitem X___Item\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Item",
+      "documentation": "\n```jass\nitem X__Item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Item",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Find",
+      "label": "X__Find",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nrect X___Find\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Find",
+      "documentation": "\n```jass\nrect X__Find\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Find",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Hid",
+      "label": "X__Hid",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nitem array X___Hid\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Hid",
+      "documentation": "\n```jass\nitem array X__Hid\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Hid",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___HidMax",
+      "label": "X__HidMax",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger X___HidMax\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___HidMax",
+      "documentation": "\n```jass\ninteger X__HidMax\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__HidMax",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1136,20 +1136,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarBase___trig",
+      "label": "StarBase__trig",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarBase___trig\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarBase___trig",
+      "documentation": "\n```jass\ntrigger StarBase__trig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarBase__trig",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarBase___ta",
+      "label": "StarBase__ta",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntriggeraction StarBase___ta\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarBase___ta",
+      "documentation": "\n```jass\ntriggeraction StarBase__ta\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarBase__ta",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1451,11 +1451,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "STES___HT",
+      "label": "STES__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable STES___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_STES___HT",
+      "documentation": "\n```jass\nhashtable STES__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_STES__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -2054,15 +2054,6 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "udg_TempDamageType",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean array udg_TempDamageType\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_udg_TempDamageType",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "udg_JSQ",
       "kind": 5,
       "detail": "Global Variable",
@@ -2095,15 +2086,6 @@
       "detail": "Global Variable",
       "documentation": "\n```jass\ntrigger gg_trg__________u\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_gg_trg__________u",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "gg_trg_GetDmgType",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg_GetDmgType\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg_GetDmgType",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -2162,6 +2144,24 @@
       "statementType": "VariableDeclaration"
     },
     {
+      "label": "gg_trg____________________002",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________002",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________001",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________001",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
       "label": "gg_trg_HealItemEffect",
       "kind": 5,
       "detail": "Global Variable",
@@ -2198,11 +2198,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "gg_trg____________________002",
+      "label": "gg_unit_ngme_0005",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________002",
+      "documentation": "\n```jass\nunit gg_unit_ngme_0005\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_unit_ngme_0005",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________003",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________003\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________003",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -5915,11 +5924,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLInteger___SLInteger_InitList",
+      "label": "SLInteger__SLInteger_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLInteger___SLInteger_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLInteger___SLInteger_InitList",
+      "documentation": "\n```jass\nfunction SLInteger__SLInteger_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLInteger__SLInteger_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6140,11 +6149,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLInteger___onInit",
+      "label": "SLInteger__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLInteger___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLInteger___onInit",
+      "documentation": "\n```jass\nfunction SLInteger__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLInteger__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6167,11 +6176,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLReal___SLReal_InitList",
+      "label": "SLReal__SLReal_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLReal___SLReal_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLReal___SLReal_InitList",
+      "documentation": "\n```jass\nfunction SLReal__SLReal_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLReal__SLReal_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6392,11 +6401,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLReal___onInit",
+      "label": "SLReal__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLReal___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLReal___onInit",
+      "documentation": "\n```jass\nfunction SLReal__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLReal__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6419,11 +6428,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLStr___SLStr_InitList",
+      "label": "SLStr__SLStr_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLStr___SLStr_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLStr___SLStr_InitList",
+      "documentation": "\n```jass\nfunction SLStr__SLStr_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLStr__SLStr_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6635,11 +6644,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLStr___onInit",
+      "label": "SLStr__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLStr___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLStr___onInit",
+      "documentation": "\n```jass\nfunction SLStr__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLStr__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -9461,11 +9470,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarEvent___onInit",
+      "label": "StarEvent__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarEvent___onInit takes nothing returns nothing\n```\n\n\n---\n\npublic:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarEvent___onInit",
+      "documentation": "\n```jass\nfunction StarEvent__onInit takes nothing returns nothing\n```\n\n\n---\n\npublic:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarEvent__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10154,11 +10163,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "X___HideItem",
+      "label": "X__HideItem",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction X___HideItem takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_X___HideItem",
+      "documentation": "\n```jass\nfunction X__HideItem takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_X__HideItem",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10235,11 +10244,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "X___Init",
+      "label": "X__Init",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction X___Init takes nothing returns nothing\n```\n\n\n---\n\n碰撞检测初始化\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_X___Init",
+      "documentation": "\n```jass\nfunction X__Init takes nothing returns nothing\n```\n\n\n---\n\n碰撞检测初始化\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_X__Init",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10676,11 +10685,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarBase___onInit",
+      "label": "StarBase__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarBase___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarBase___onInit",
+      "documentation": "\n```jass\nfunction StarBase__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarBase__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11360,11 +11369,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "STES___onInit",
+      "label": "STES__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction STES___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_STES___onInit",
+      "documentation": "\n```jass\nfunction STES__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_STES__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12071,28 +12080,10 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "Trig_GetDmgTypeActions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig_GetDmgTypeActions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: GetDmgType\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig_GetDmgTypeActions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "InitTrig_GetDmgType",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction InitTrig_GetDmgType takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_InitTrig_GetDmgType",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
       "label": "ApplyItemBonus",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction ApplyItemBonus takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=0\n\nTESH.alwaysfold=0\n\n这里的所有函数是配合ts→lua的调用\n\n===========================================================================\n\n装备系统 - SGSS属性修改 (ID 1-10) + 玩家属性修改，lua实现\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction ApplyItemBonus takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=122\n\nTESH.alwaysfold=0\n\n这里的所有函数是配合ts→lua的调用\n\n===========================================================================\n\n装备系统 - SGSS属性修改 (ID 1-10) + 玩家属性修改，lua实现\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_ApplyItemBonus",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -12206,6 +12197,33 @@
       "statementType": "FunctionDeclaration"
     },
     {
+      "label": "Trig____________________003Conditions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________003Conditions takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 003\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________003Conditions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________003Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________003Actions takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________003Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________003",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________003 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________003",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
       "label": "Trig____________________002Actions",
       "kind": 2,
       "detail": "Function",
@@ -12220,6 +12238,33 @@
       "detail": "Function",
       "documentation": "\n```jass\nfunction InitTrig____________________002 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_InitTrig____________________002",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________001Conditions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________001Conditions takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 001\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________001Conditions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________001Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________001Actions takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________001Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________001",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________001 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________001",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12548,14 +12593,14 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "jasshelper__initstructs25562140",
+      "label": "jasshelper__initstructs14779625",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction jasshelper__initstructs25562140 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_jasshelper__initstructs25562140",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs14779625 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs14779625",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     }
   ],
-  "timestamp": 1774987735878
+  "timestamp": 1775045998858
 }

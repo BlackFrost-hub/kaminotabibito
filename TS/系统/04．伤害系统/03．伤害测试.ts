@@ -1,22 +1,20 @@
-/**
- * 伤害事件测试：任意单位受到伤害时发送「XX单位受到了XX伤害」
- * 若 JASS 里 YDWEIsEventDamageType(COLD) 将 udg_TempInteger[1] 置为 1，伤害事件在 JASS 后立即读出并传入 tempInteger，此处置 0 并发送 111。
- */
-const jass = require("jass.common") as Record<string, unknown>;
-const g = require("jass.globals") as Record<string, unknown>;
-const damageEvent = require("系统.04．伤害系统.01．伤害事件") as {
-  registerDamageCallback: (
-    cb: (
-      unit: any,
-      damage: number,
-      damageType: number,
-      isFirstInBatch: boolean,
-      isLastInBatch: boolean,
-      fromDotTickBatch?: boolean
-    ) => void,
-    interval?: number
-  ) => void;
-  hasBit: (v: number, bit: number) => boolean;
+const jass = require("jass.common") as any;
+const 伤害事件 = require("系统.04．伤害系统.01．伤害事件") as {
+  MNAnyUnitDamaged: (trg: any, interval: number) => void;
+};
+const 伤害函数 = require("系统.00．核心系统.08．伤害函数") as {
+  YDWEIsEventDamageType: (damageType: any) => boolean;
+  YDWEIsEventPhysicalDamage: () => boolean;
+  YDWEIsEventAttackDamage: () => boolean;
+  YDWEIsEventRangedDamage: () => boolean;
+  YDWEIsEventAttackType: (attackType: any) => boolean;
+  isMagicDamage: () => boolean;
+  isEnhancedDamage: () => boolean;
+  isTrueDamage: () => boolean;
+  isNormalAttack: () => boolean;
+  isSkillAttack: () => boolean;
+  isSkillDamage: () => boolean;
+  isPhysicalDamage: () => boolean;
 };
 
 function sendMsg(msg: string): void {
@@ -27,63 +25,118 @@ function sendMsg(msg: string): void {
   }
 }
 
-function onDamage(unit: any, damage: number, damageType: number, isFirstInBatch: boolean, isLastInBatch: boolean): void {
+function TrigActions(): void {
+  const unit = jass.GetTriggerUnit();
+  const damage = jass.GetEventDamage();
   if (!unit) return;
-  const hb = damageEvent.hasBit;
+
   const name = typeof (jass as any).GetUnitName === "function" ? (jass as any).GetUnitName(unit) : "单位";
   const damageStr = typeof (jass as any).R2S === "function" ? (jass as any).R2S(damage) : tostring(damage);
 
-  const isSkill   = hb(damageType, 2048);
-  const isPhysical = hb(damageType, 4096);
-  const isAttack  = hb(damageType, 8192);
-  const isRanged  = hb(damageType, 16384);
+  let damageTypeParts: string[] = [];
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_FIRE)) {
+    damageTypeParts.push("火");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_COLD)) {
+    damageTypeParts.push("冰");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_LIGHTNING)) {
+    damageTypeParts.push("雷");
+  }
+  if (
+    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_POISON) ||
+    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DISEASE) ||
+    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SLOW_POISON)
+  ) {
+    damageTypeParts.push("毒");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DIVINE)) {
+    damageTypeParts.push("光");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC)) {
+    damageTypeParts.push("魔法");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_PLANT)) {
+    damageTypeParts.push("风");
+  }
+  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SHADOW_STRIKE)) {
+    damageTypeParts.push("暗");
+  }
+  if (伤害函数.isPhysicalDamage()) {
+    damageTypeParts.push("物理");
+  }
+
+  let typeText = "";
+  if (damageTypeParts.length > 0) {
+    typeText = damageTypeParts.join("");
+    if (伤害函数.isMagicDamage()) {
+      typeText = typeText + "魔法";
+    }
+  }
+
+  const isEnhanced = 伤害函数.isEnhancedDamage();
+  const isTrue = 伤害函数.isTrueDamage();
+  let prefix = "";
+  if (伤害函数.isNormalAttack()) {
+    prefix = "普攻";
+  } else if (伤害函数.isSkillAttack()) {
+    prefix = "技能攻击";
+  } else if (伤害函数.isSkillDamage()) {
+    prefix = "技能";
+  }
+  
+  if (isEnhanced && prefix !== "") {
+    prefix = prefix + "强化";
+  }
+  if (isTrue && prefix !== "") {
+    prefix = prefix + "真实";
+  }
 
   let msg: string;
-  if (isSkill) {
-    const attrNames: [number, string][] = [[1, "普通"], [2, "强化"], [4, "火属性"], [8, "冰属性"], [16, "雷属性"], [32, "金属性"], [64, "光属性"], [128, "魔法"], [256, "精神"], [512, "风属性"], [1024, "暗属性"]];
-    let detail = "";
-    for (let a = 0; a < attrNames.length; a++) {
-      if (hb(damageType, attrNames[a][0])) { detail = "（" + attrNames[a][1] + "）"; break; }
-    }
-    if ((isAttack || isRanged) && (isFirstInBatch || isLastInBatch)) {
-      msg = name + "受到了" + damageStr + "点技能攻击伤害" + detail;
-    } else if (isPhysical) {
-      /** 与 dot伤害 `nextDamageTypeOverride` 的 4096 展示位一致：如诅咒 DOT（2048+4096） */
-      msg = name + "受到了" + damageStr + "点技能物理伤害" + detail;
-    } else {
-      msg = name + "受到了" + damageStr + "点技能伤害" + detail;
-    }
-  } else if (isRanged) {
-    msg = name + "受到了" + damageStr + "点远程普攻" + (isPhysical ? "（物理）" : "");
-  } else if (isAttack) {
-    msg = name + "受到了" + damageStr + "点普攻伤害" + (isPhysical ? "（物理）" : "");
-  } else if (hb(damageType, 256)) {
-    msg = name + "受到了" + damageStr + "点精神伤害";
-  } else if (hb(damageType, 4)) {
-    msg = name + "受到了" + damageStr + "点火属性伤害";
+  if (prefix !== "" && typeText !== "") {
+    msg = name + "受到了" + damageStr + "点" + prefix + typeText + "伤害";
+  } else if (prefix !== "") {
+    msg = name + "受到了" + damageStr + "点" + prefix + "伤害";
+  } else if (typeText !== "") {
+    msg = name + "受到了" + damageStr + "点" + typeText + "伤害";
   } else {
     msg = name + "受到了" + damageStr + "点伤害";
   }
-  const j = jass as any;
-  const source = j.udg_TempUnit != null && j.udg_TempUnit[6] != null ? j.udg_TempUnit[6] : null;
+
+  if (伤害函数.YDWEIsEventRangedDamage()) {
+    msg = msg + "（远程）";
+  }
+
+  let source: any = null;
+  if (typeof (jass as any).GetEventDamageSource === "function") {
+    (pcall as any)(() => { source = (jass as any).GetEventDamageSource(); });
+  }
+  if (source == null) {
+    (pcall as any)(() => { source = GetEventDamageSource(); });
+  }
   if (source != null && typeof (jass as any).GetUnitName === "function") {
     const sourceName = (jass as any).GetUnitName(source);
     if (sourceName != null && sourceName !== "") msg = msg + " 伤害来源：" + sourceName;
   }
-  sendMsg(msg + " [类型:" + damageType + "]");
+
+  sendMsg(msg);
 }
 
-damageEvent.registerDamageCallback(
-  (
-    unit: any,
-    damage: number,
-    damageType: number,
-    isFirstInBatch: boolean,
-    isLastInBatch: boolean,
-    _fromDotTickBatch?: boolean
-  ) => {
-    onDamage(unit, damage, damageType, isFirstInBatch, isLastInBatch);
-  },
-  60
-);
+function TrigConditions(): boolean {
+  return true;
+}
+
+function init(): void {
+  const trg = jass.CreateTrigger();
+  if (typeof jass.TriggerAddCondition === "function" && typeof jass.Condition === "function") {
+    jass.TriggerAddCondition(trg, jass.Condition(TrigConditions));
+  }
+  伤害事件.MNAnyUnitDamaged(trg, 60);
+  if (typeof jass.TriggerAddAction === "function") {
+    jass.TriggerAddAction(trg, TrigActions);
+  }
+}
+
+init();
+
 export {};

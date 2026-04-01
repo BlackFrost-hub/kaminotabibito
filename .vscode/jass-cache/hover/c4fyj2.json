@@ -1,0 +1,16 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\TS\\系统\\00．核心系统\\YDWEAbilityState.j",
+  "items": [
+    {
+      "symbolName": "ABILITY_DATA_UNITID",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\TS\\系统\\00．核心系统\\YDWEAbilityState.j",
+      "content": "\n```jass\nconstant integer ABILITY_DATA_UNITID\n```\n\n\n**文件:** `TS/系统/00．核心系统/YDWEAbilityState.j`"
+    },
+    {
+      "symbolName": "ABILITY_DATA_LIGHTNING_EFFECT",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\TS\\系统\\00．核心系统\\YDWEAbilityState.j",
+      "content": "\n```jass\nconstant integer ABILITY_DATA_LIGHTNING_EFFECT\n```\n\n\n**文件:** `TS/系统/00．核心系统/YDWEAbilityState.j`"
+    }
+  ],
+  "timestamp": 1775034067538
+}

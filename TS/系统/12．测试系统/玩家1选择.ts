@@ -67,3 +67,5 @@ jass.TriggerAddAction(trg, () => {
 
   openNpcDialog(redPlayer, VILLAGE_CHIEF_DIALOG);
 });
+
+export {};

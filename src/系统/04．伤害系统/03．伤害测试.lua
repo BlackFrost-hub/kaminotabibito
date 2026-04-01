@@ -1,10 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 伤害事件测试：任意单位受到伤害时发送「XX单位受到了XX伤害」
--- 若 JASS 里 YDWEIsEventDamageType(COLD) 将 udg_TempInteger[1] 置为 1，伤害事件在 JASS 后立即读出并传入 tempInteger，此处置 0 并发送 111。
 local jass = require("jass.common")
-local g = require("jass.globals")
-local damageEvent = require("系统.04．伤害系统.01．伤害事件")
+local _____4F24_5BB3_4E8B_4EF6 = require("系统.04．伤害系统.01．伤害事件")
+local _____4F24_5BB3_51FD_6570 = require("系统.00．核心系统.08．伤害函数")
 local function sendMsg(self, msg)
     if type(jass.DisplayTextToPlayer) ~= "function" then
         return
@@ -20,11 +18,12 @@ local function sendMsg(self, msg)
         end
     end
 end
-local function onDamage(self, unit, damage, damageType, isFirstInBatch, isLastInBatch)
+local function TrigActions(self)
+    local unit = jass.GetTriggerUnit()
+    local damage = jass.GetEventDamage()
     if not unit then
         return
     end
-    local hb = damageEvent.hasBit
     local ____temp_0
     if type(jass.GetUnitName) == "function" then
         ____temp_0 = jass.GetUnitName(unit)
@@ -39,84 +38,106 @@ local function onDamage(self, unit, damage, damageType, isFirstInBatch, isLastIn
         ____temp_1 = tostring(damage)
     end
     local damageStr = ____temp_1
-    local isSkill = hb(nil, damageType, 2048)
-    local isPhysical = hb(nil, damageType, 4096)
-    local isAttack = hb(nil, damageType, 8192)
-    local isRanged = hb(nil, damageType, 16384)
+    local damageTypeParts = {}
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_FIRE) then
+        damageTypeParts[#damageTypeParts + 1] = "火"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_COLD) then
+        damageTypeParts[#damageTypeParts + 1] = "冰"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_LIGHTNING) then
+        damageTypeParts[#damageTypeParts + 1] = "雷"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_POISON) or _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DISEASE) or _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SLOW_POISON) then
+        damageTypeParts[#damageTypeParts + 1] = "毒"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DIVINE) then
+        damageTypeParts[#damageTypeParts + 1] = "光"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC) then
+        damageTypeParts[#damageTypeParts + 1] = "魔法"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_PLANT) then
+        damageTypeParts[#damageTypeParts + 1] = "风"
+    end
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SHADOW_STRIKE) then
+        damageTypeParts[#damageTypeParts + 1] = "暗"
+    end
+    if _____4F24_5BB3_51FD_6570.isPhysicalDamage() then
+        damageTypeParts[#damageTypeParts + 1] = "物理"
+    end
+    local typeText = ""
+    if #damageTypeParts > 0 then
+        typeText = table.concat(damageTypeParts, "")
+        if _____4F24_5BB3_51FD_6570.isMagicDamage() then
+            typeText = typeText .. "魔法"
+        end
+    end
+    local isEnhanced = _____4F24_5BB3_51FD_6570.isEnhancedDamage()
+    local isTrue = _____4F24_5BB3_51FD_6570.isTrueDamage()
+    local prefix = ""
+    if _____4F24_5BB3_51FD_6570.isNormalAttack() then
+        prefix = "普攻"
+    elseif _____4F24_5BB3_51FD_6570.isSkillAttack() then
+        prefix = "技能攻击"
+    elseif _____4F24_5BB3_51FD_6570.isSkillDamage() then
+        prefix = "技能"
+    end
+    if isEnhanced and prefix ~= "" then
+        prefix = prefix .. "强化"
+    end
+    if isTrue and prefix ~= "" then
+        prefix = prefix .. "真实"
+    end
     local msg
-    if isSkill then
-        local attrNames = {
-            {1, "普通"},
-            {2, "强化"},
-            {4, "火属性"},
-            {8, "冰属性"},
-            {16, "雷属性"},
-            {32, "金属性"},
-            {64, "光属性"},
-            {128, "魔法"},
-            {256, "精神"},
-            {512, "风属性"},
-            {1024, "暗属性"}
-        }
-        local detail = ""
-        do
-            local a = 0
-            while a < #attrNames do
-                if hb(nil, damageType, attrNames[a + 1][1]) then
-                    detail = ("（" .. attrNames[a + 1][2]) .. "）"
-                    break
-                end
-                a = a + 1
-            end
-        end
-        if (isAttack or isRanged) and (isFirstInBatch or isLastInBatch) then
-            msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能攻击伤害") .. detail
-        elseif isPhysical then
-            msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能物理伤害") .. detail
-        else
-            msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点技能伤害") .. detail
-        end
-    elseif isRanged then
-        msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点远程普攻") .. (isPhysical and "（物理）" or "")
-    elseif isAttack then
-        msg = (((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点普攻伤害") .. (isPhysical and "（物理）" or "")
-    elseif hb(nil, damageType, 256) then
-        msg = ((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点精神伤害"
-    elseif hb(nil, damageType, 4) then
-        msg = ((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点火属性伤害"
+    if prefix ~= "" and typeText ~= "" then
+        msg = (((((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点") .. prefix) .. typeText) .. "伤害"
+    elseif prefix ~= "" then
+        msg = ((((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点") .. prefix) .. "伤害"
+    elseif typeText ~= "" then
+        msg = ((((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点") .. typeText) .. "伤害"
     else
         msg = ((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点伤害"
     end
-    local j = jass
-    local ____temp_2
-    if j.udg_TempUnit ~= nil and j.udg_TempUnit[6] ~= nil then
-        ____temp_2 = j.udg_TempUnit[6]
-    else
-        ____temp_2 = nil
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventRangedDamage() then
+        msg = msg .. "（远程）"
     end
-    local source = ____temp_2
+    local source = nil
+    if type(jass.GetEventDamageSource) == "function" then
+        pcall(function ()
+                source = jass.GetEventDamageSource()
+            end
+        )
+    end
+    if source == nil then
+        pcall(function ()
+                source = GetEventDamageSource()
+            end
+        )
+    end
     if source ~= nil and type(jass.GetUnitName) == "function" then
         local sourceName = jass.GetUnitName(source)
         if sourceName ~= nil and sourceName ~= "" then
             msg = (msg .. " 伤害来源：") .. tostring(sourceName)
         end
     end
-    sendMsg(
-        nil,
-        ((msg .. " [类型:") .. tostring(damageType)) .. "]"
-    )
+    sendMsg(nil, msg)
 end
-damageEvent:registerDamageCallback(
-    function(____, unit, damage, damageType, isFirstInBatch, isLastInBatch, _fromDotTickBatch)
-        onDamage(
-            nil,
-            unit,
-            damage,
-            damageType,
-            isFirstInBatch,
-            isLastInBatch
+local function TrigConditions(self)
+    return true
+end
+local function init(self)
+    local trg = jass.CreateTrigger()
+    if type(jass.TriggerAddCondition) == "function" and type(jass.Condition) == "function" then
+        jass.TriggerAddCondition(
+            trg,
+            jass.Condition(TrigConditions)
         )
-    end,
-    60
-)
+    end
+    _____4F24_5BB3_4E8B_4EF6:MNAnyUnitDamaged(trg, 60)
+    if type(jass.TriggerAddAction) == "function" then
+        jass.TriggerAddAction(trg, TrigActions)
+    end
+end
+init(nil)
 return ____exports

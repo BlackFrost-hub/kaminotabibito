@@ -49,8 +49,25 @@ function fixFile(filePath) {
   content = content.replace(/gt\.BlzGetUnitMaxHP\s*\(\s*gt\s*,\s*targetUnit\s*\)/g, "BlzGetUnitMaxHP(targetUnit)");
   content = content.replace(/gt\.GetUnitState\s*\(\s*gt\s*,\s*targetUnit\s*,\s*maxLife\s*\)/g, "GetUnitState(targetUnit, maxLife)");
 
-  // 6b. japi:DzXxx( -> japi.DzXxx(  DzAPI 函数不是方法，不能用冒号（会多传 japi 表当首参）
-  content = content.replace(/\bjapi:Dz/g, "japi.Dz");
+  // 6b. japi: -> japi.  japi 的所有函数（DzXxx / EXXxx 等）都是普通函数，不是方法，
+  //     冒号调用会把 japi 表当 self 传入导致参数全部错位，统一改为点号。
+  content = content.replace(/\bjapi:/g, "japi.");
+
+  // 6g. 07．技能函数 / 08．伤害函数：这两个模块的导出函数都是普通函数，TSTL 生成了 (self, ...) 签名。
+  //     外部用点号调用时 self 会吃掉第一个实参，导致参数全部错位，需去掉 self。
+  if (filePath.includes("07．技能函数") || filePath.includes("08．伤害函数")) {
+    // 去掉有参函数签名里的 self
+    content = content.replace(/function (____exports\.\w+)\(self,\s*/g, "function $1(");
+    // 去掉无参函数签名里的 self
+    content = content.replace(/function (____exports\.\w+)\(self\)/g, "function $1()");
+    // 去掉内部互调时多传的 nil（self 占位）
+    content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
+    content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
+  }
+
+  // 6h. 调用方对 08．伤害函数 模块（TSTL 编码为 _____4F24_5BB3_51FD_6570）的残余冒号调用改为点号。
+  //     配合 6g 去掉 self 后，点号调用参数对齐。
+  content = content.replace(/_____4F24_5BB3_51FD_6570:/g, "_____4F24_5BB3_51FD_6570.");
 
   // 6d. blizzard: -> blizzard.   模块调用用点号
   content = content.replace(/\bblizzard:/g, "blizzard.");

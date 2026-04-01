@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## 1) **禁止**对 jass API 使用可选链调用 `?.(...)`
 
-TSTL 会把 `obj.fn?.(x)` 编译成“取出函数后再用 self 调用”的形态，容易把 **table** 当成第一个参数传给需要 **jhandle_t** 的函数，导致：
+TSTL 会把 `obj.fn?.(x)` 编译成"取出函数后再用 self 调用"的形态，容易把 **table** 当成第一个参数传给需要 **jhandle_t** 的函数，导致：
 
 - `bad argument #1 ... (jhandle_t expected, got table)`
 
@@ -50,24 +50,99 @@ Lua table 在 TSTL 环境中用 `for (const k in t)`（pairs）最稳。
 - `const idx = (math as any).random(1, list.length);`
 - `return (list as any)[idx];`
 
-## 6) 对“绑定签名不一致”的少数 API 才做兜底
-
-若确实存在“需要 self/不需要 self”差异，兜底顺序建议：
-
-1. 直接 `(jass as any).Fn(x, y)`
-2. 再尝试 `fn(jass, x, y)`
-3. 最后 `fn(undefined as any, x, y)`
-
-优先保证第一种能工作（最不容易被 TSTL 改写成 self 调用）。
-
-## 7) Lua 表 1-based：`math.random(1, n)` 后不要用 `arr[idx - 1]`
+## 6) Lua 表 1-based：`math.random(1, n)` 后不要用 `arr[idx - 1]`
 
 TS 里习惯写：`idx = math.random(1, arr.length)` 再 `arr[idx - 1]`（0-based）。TSTL 原样编译到 Lua 后，Lua 表是 **1-based**，`idx - 1` 在 idx=1 时为 0，`arr[0]` 为 **nil**，会导致漏项或报错。
 
-**✅ 正确做法二选一**
+**✅ 正确做法**
 
-- **写法 A（推荐）**：在 TS 里用 `(arr as any)[idx]`，并保证该处只给 Lua 用；在 `fix-lua-for-pack.js` 里对该文件做替换：`arrName[idx - 1]` → `arrName[idx]`（见规则 16）。
-- **写法 B**：避免“随机 1..n 再取 [idx-1]”。改用 `const i = (math as any).random(1, arr.length); return (arr as any)[i];` 且**仅在**该表在 Lua 中确认为 1-based 时，在 fix 脚本里把 `[i-1]` 改为 `[i]`。
+- 在 TS 里用 `(arr as any)[idx]`，并在 `fix-lua-for-pack.js` 里对该文件加替换：`arrName[idx - 1]` → `arrName[idx]`。
 
-凡新增“用 random(1, len) 从 Lua 表里抽元素”的代码，要么走写法 A 并在 fix-lua-for-pack 加对应替换，要么用其他方式避免 0/1-based 混用。
+## 7) 回调注册：禁止用冒号调用模块导出的函数
 
+**❌ 错误写法**
+```typescript
+damageEvent:registerDamageCallback(callback);
+```
+TSTL 编译后会把模块表本身当成第一个 self 参数传给注册函数，导致回调列表里存的是模块表而不是回调函数，调用时报错 `attempt to call a table value`。
+
+**✅ 正确写法**
+```typescript
+damageEvent.registerDamageCallback(callback);
+```
+
+## 8) 回调验证：不要对 TSTL 编译后的回调做 `typeof === "function"` 检查
+
+**❌ 错误写法**
+```typescript
+if (typeof cb !== "function") return;
+```
+TSTL 编译后的 Lua 回调是一个带 `__call` 元方法的 table，`type()` 返回 `"table"` 而非 `"function"`，这个检查会把有效回调挡掉。
+
+**✅ 正确写法**
+```typescript
+if (cb == null) return;
+```
+
+## 9) 导出函数的 self 参数坑：TSTL 给所有导出函数加 `(self, ...)` 签名
+
+TSTL 把每个 `export function foo(x)` 编译成 `function ____exports.foo(self, x)`。  
+后果：
+
+- **内部互调**：`____exports.foo(x)` 会编译成 `____exports.foo(nil, x)`，`self=nil` 占掉第一参，`x` 收到正确值——内部调用没问题。  
+- **外部用点号调用** `mod.foo(x)`：Lua 点号调用**不自动传 self**，所以 `self=x`，真正的参数变成 `nil`，判断永远失败。  
+- **外部用冒号调用** `mod:foo(x)`：Lua 冒号调用自动把 `mod` 当 `self` 传入，`self=mod`，`x` 收到正确值——但这样会把模块表当 self 传入，语义错误且在有参数的情况下仍然正确（歪打正着）。
+
+**实际案例**：`08．伤害函数.ts`（以及同模式的 `07．技能函数.ts`）里所有 `export function` 被外部用点号调用时，第一个实参会被当成 `self`，真正参数变成 `nil`，伤害类型/技能数据判断全部失效。
+
+**✅ 正确修法（在 `fix-lua-for-pack.js` 规则 6g 里）**
+
+对 **`07．技能函数.lua` 与 `08．伤害函数.lua`** 去掉导出函数签名里的 `self`，并去掉内部 `____exports.XXX(nil, ...)` 的多余 `nil`：
+
+```javascript
+if (filePath.includes("07．技能函数") || filePath.includes("08．伤害函数")) {
+  content = content.replace(/function (____exports\.\w+)\(self,\s*/g, "function $1(");
+  content = content.replace(/function (____exports\.\w+)\(self\)/g, "function $1()");
+  content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
+  content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
+}
+```
+
+去掉 `self` 后，外部点号调用 `mod.foo(x)` 参数才对齐。
+
+## 10) japi / 外部 API 的冒号调用坑：TSTL 对 require 进来的模块生成冒号调用
+
+TSTL 对 `japi.EXGetEventDamageData(edd_type)` 可能编译成 `japi:EXGetEventDamageData(edd_type)`（冒号），Lua 冒号语法把 `japi` 表作为第一参数传入，`edd_type` 实际收到的是 `japi` 表，函数参数完全错位。
+
+同理，外部对本模块用冒号调用（`mod:YDWEIsEventDamageType(dt)`）也会把模块表当 self 吃掉。
+
+**✅ 修复方案（在 `fix-lua-for-pack.js` 规则 6b 里）**
+
+对 **整个 `japi` 表**统一把冒号调用改成点号（`DzXxx`、`EXXxx` 等都会中招）：
+
+```javascript
+content = content.replace(/\bjapi:/g, "japi.");
+```
+
+若仍有对某模块的 `编码名:` 冒号调用，再按文件单独替换为 `编码名.`（例如规则 6h 对 `08．伤害函数` 编译名的处理）。仅改冒号**不够**时，还须配合规则 9 去掉被调模块导出函数签名里的 `self`。
+
+## 11) 回调调用：TSTL 对回调变量调用可能多传 self / nil
+
+**现象**：依编译形态不同，可能出现 `cb(nil, su, sd, ...)` 或 `cb(nil, nil, su, sd, ...)` 等，使 `unit`/`damage` 等参数错位。
+
+**✅ 修复方案**：在 `fix-lua-for-pack.js` 里按文件处理。例如 `01．伤害事件.lua`（规则 17）对 DamageCallbacks 的调用会去掉多余的第二个 `nil`：
+
+```javascript
+content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,");
+```
+
+若其它文件出现同类错位，需对照生成 Lua 增删对应替换，不可假设全局只有一种 `cb(nil, …)` 形态。
+
+## 12) `jass.xxx` 常量/全局变量：不依赖 `udg_*` 全局，改从事件入参传递
+
+`udg_TempUnit[6]`、`udg_TempDamageType` 等 JASS 全局在 Lua 里虽可访问，但伤害事件同步阶段结束后会被下一次事件覆盖；伤害流水线**不应**再依赖它们表示「当前这段伤害的来源」。
+
+**✅ 正确写法（与本项目 `01．伤害事件.ts` 一致）**
+
+- **来源单位**：在 `EVENT_UNIT_DAMAGED` 同步回调里立刻用 `GetEventDamageSource()`（或 `jass.GetEventDamageSource` 等，勿赋局部再调，见规则 2）快照为 `entry.source`，经 `registerDamageCallback` 的第 5 个参数传给后续逻辑。
+- **是否普攻**：在同步回调里用 `伤害函数.isNormalAttack()`（`pcall` 包裹）快照为 `entry.isNormalAttack`，经回调第 6 个参数传递；**不要**在 Timer 延后里再调 `isNormalAttack()` / `EXGetEventDamageData`，也不要用旧的 merged 位运算推断普攻。
