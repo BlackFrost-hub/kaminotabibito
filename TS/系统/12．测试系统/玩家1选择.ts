@@ -6,7 +6,16 @@
  */
 
 const jass = require("jass.common") as any;
-import { openNpcDialog, NpcDialogData } from "../00．核心系统/UI函数";
+const UI函数 = require("系统.00．核心系统.06．UI函数") as {
+  openNpcDialog: (player: any, data: any) => void;
+  NpcDialogData: any;
+};
+const 便捷函数 = require("系统.00．核心系统.11．便捷函数（偶尔用）") as {
+  getPlayerFirstHero: (player: any) => any;
+};
+
+const { openNpcDialog } = UI函数;
+type NpcDialogData = any;
 
 // 手动计算 FourCC("ngme")
 // n=110, g=103, m=109, e=101  →  110*16777216 + 103*65536 + 109*256 + 101
@@ -51,6 +60,10 @@ jass.TriggerAddAction(trg, () => {
   const u = jass.GetTriggerUnit();
   if (!u) return;
   if (jass.GetUnitTypeId(u) !== UNIT_ID_NGME) return;
+  
+  const hero = 便捷函数.getPlayerFirstHero(redPlayer);
+  if (!hero) return;
+  if (!jass.IsUnitInRange(hero, u, 350)) return;
 
   openNpcDialog(redPlayer, VILLAGE_CHIEF_DIALOG);
 });

@@ -38,7 +38,7 @@ function pruneEmptyHid(self, hid)
 end
 function notifyDotBuffExpiredFromPool(self, buffID, hid)
     pcall(function ()
-            local m = require("系统.04．伤害系统.dot伤害")
+            local m = require("系统.04．伤害系统.02．dot伤害")
             if m ~= nil and type(m.clearDotByBuffPoolExpire) == "function" then
                 m:clearDotByBuffPoolExpire(buffID, hid)
             end
@@ -47,7 +47,7 @@ function notifyDotBuffExpiredFromPool(self, buffID, hid)
 end
 function syncDotFromPoolTick(self)
     pcall(function ()
-            local m = require("系统.04．伤害系统.dot伤害")
+            local m = require("系统.04．伤害系统.02．dot伤害")
             if m ~= nil and type(m.syncDotRemainingFromBuffPool) == "function" then
                 m:syncDotRemainingFromBuffPool()
             end
@@ -145,7 +145,7 @@ function maybeStopSyncTimer(self)
     end
 end
 jass = require("jass.common")
-local leakCore = require("系统.00．核心系统.泄露审计")
+local leakCore = require("系统.00．核心系统.05．泄露审计")
 local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_0 == nil then
     ____leakCore_LeakWatcher_0 = leakCore

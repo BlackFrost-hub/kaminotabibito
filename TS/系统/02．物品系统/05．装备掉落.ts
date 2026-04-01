@@ -18,8 +18,6 @@ const idData =
   {};
 const itemsData =
   (require("系统.02．物品系统.01．装备数据") as { default?: Record<string, { score?: number }> }).default ?? {};
-let _seed = 0;
-
 interface UnitDataEntry {
   id: string;
   itemIds?: string | number;
@@ -31,16 +29,16 @@ interface UnitDataEntry {
 
 const PREFIX = "|cffffff00『系统提示』：|r";
 
+// 安全初始化随机种子（只执行一次，所有玩家一致）
 (() => {
-  const key = "__equip_drop_seeded";
+  const key = "__equip_drop_rand_init";
   if ((globalThis as any)[key]) return;
   (globalThis as any)[key] = true;
-  const s = tostring({});
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) % 2147483647;
-  if (h <= 0) h = 12345;
-  _seed = h;
-  math.randomseed(_seed);
+  // 使用固定种子初始化，所有玩家一样
+  // 魔兽引擎会自动管理后续随机数序列的同步
+  math.randomseed(123456789);
+  // 预先消耗一些随机数，确保随机性
+  for (let i = 0; i < 10; i++) math.random();
 })();
 
 function stringToFourCC(s: string): number {
@@ -133,9 +131,11 @@ function pickFromWeightedPool(
   const out: string[] = [];
   for (const p of pool) {
     if (p.weight >= 1 || p.always) {
+      (globalThis as any).print?.("[装备掉落] 必掉物品:", p.id, p.weight);
       out.push(p.id);
     } else {
       const r = (math as any).random(1, 10000) as number / 10000;
+      (globalThis as any).print?.("[装备掉落] 概率判定:", p.id, "weight:", p.weight, "r:", r, "命中:", r < p.weight);
       if (r < p.weight) out.push(p.id);
     }
   }
@@ -200,7 +200,10 @@ function onUnitDeath(): void {
   const unitId = typeIdToUnitId(typeId);
   const entry = unitId ? (idData as Record<string, UnitDataEntry>)[unitId] : undefined;
 
+  (globalThis as any).print?.("[装备掉落] 单位死亡 typeId:", typeId, "unitId:", unitId, "entry:", entry?.name);
+
   if (entry && entry.itemIds != null) {
+    (globalThis as any).print?.("[装备掉落] 找到掉落表 itemIds:", entry.itemIds);
     const dropProc = entry.dropProc != null ? Number(entry.dropProc) : 1;
     const r = (math as any).random(1, 10000) as number;
     if (r > dropProc * 10000) return;

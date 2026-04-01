@@ -7,7 +7,7 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [k: string]: any };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
-const { AddGoldWithFeedback } = require("系统.00．核心系统.封装函数") as { AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void };
+const { AddGoldWithFeedback } = require("系统.00．核心系统.01．封装函数") as { AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void };
 
 /** key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致） */
 const KEY_TO_NAME: Record<string, string> = {

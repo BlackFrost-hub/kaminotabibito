@@ -1,15 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.任务管理器")
-local questManager = _____4EFB_52A1_7BA1_7406_5668.questManager
-local _____4EFB_52A1UI = require("系统.08．任务系统.任务UI")
-local taskUI = _____4EFB_52A1UI.taskUI
-local _____4EFB_52A1_6570_636E = require("系统.08．任务系统.任务数据")
-local questDB = _____4EFB_52A1_6570_636E.questDB
-local QuestType = _____4EFB_52A1_6570_636E.QuestType
-local _____786C_4EF6_51FD_6570 = require("系统.00．核心系统.硬件函数")
-local registerKeyDown = _____786C_4EF6_51FD_6570.registerKeyDown
-local KEY_LETTER = _____786C_4EF6_51FD_6570.KEY_LETTER
+local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
+local ____03_FF0E_4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
+local taskUI = ____03_FF0E_4EFB_52A1UI.taskUI
+local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
+local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
+local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
+local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
+local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
+local KEY_LETTER = ____04_FF0E_786C_4EF6_51FD_6570.KEY_LETTER
 --- 任务系统测试
 local jass = require("jass.common")
 local function debugPrint(self, msg)
@@ -73,8 +73,18 @@ end
 --- 测试UI显示
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
-    taskUI:show(0)
-    debugPrint(nil, "任务UI已显示")
+    pcall(function ()
+            if type(jass.GetLocalPlayer) ~= "function" then
+                return
+            end
+            local lp = jass.GetLocalPlayer()
+            if lp == nil or lp == 0 then
+                return
+            end
+            taskUI:show(0)
+            debugPrint(nil, "任务UI已显示")
+        end
+    )
     if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
         local timer = jass.CreateTimer()
         jass.TimerStart(
@@ -82,8 +92,18 @@ function ____exports.testUI(self)
             3,
             false,
             function()
-                taskUI:hide()
-                debugPrint(nil, "任务UI已隐藏")
+                pcall(function ()
+                        if type(jass.GetLocalPlayer) ~= "function" then
+                            return
+                        end
+                        local lp = jass.GetLocalPlayer()
+                        if lp == nil or lp == 0 then
+                            return
+                        end
+                        taskUI:hide()
+                        debugPrint(nil, "任务UI已隐藏")
+                    end
+                )
                 if type(jass.DestroyTimer) == "function" then
                     jass.DestroyTimer(timer)
                 end
@@ -159,7 +179,9 @@ function ____exports.registerTestCommand(self)
                 end
                 local playerId = ____temp_3
                 if playerId == 0 then
-                    ____exports.runAllTests(nil)
+                    ____exports.testQuestData(nil)
+                    ____exports.testQuestAcceptComplete(nil)
+                    ____exports.testUI(nil)
                 end
             end
         )

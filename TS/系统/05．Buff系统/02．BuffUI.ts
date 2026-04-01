@@ -1,34 +1,20 @@
-/**
- * 类原生 Buff 条：单选单位时，在屏幕固定区域横向展示 Debuff 图标（与 Buff 表 priority 排序）。
- * 依赖 dot伤害 已施加的反恢复/燃烧；英雄带「树枝」等装备攻击即可叠 DOT，选中目标后显示。
- */
-
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const EV_UNIT_SELECTED =
-  jass.EVENT_PLAYER_UNIT_SELECTED != null ? jass.EVENT_PLAYER_UNIT_SELECTED : 58;
-const EV_UNIT_DESELECTED =
-  jass.EVENT_PLAYER_UNIT_DESELECTED != null
-    ? jass.EVENT_PLAYER_UNIT_DESELECTED
-    : jass.EVENT_PLAYER_UNIT_DESELECT_ALL != null
-      ? jass.EVENT_PLAYER_UNIT_DESELECT_ALL
-      : 59;
-
-import { getGameUI } from "../00．核心系统/硬件函数";
-import {
-  createFrame,
-  setFramePosition,
-  setFrameSize,
-  setFrameTexture,
-  setFrameHoverEvents,
-  setFramePointRelative,
-  createTextLabel,
-  FrameType,
-  FramePoint,
-  hideFrame,
-  showFrame,
-} from "../09．表现系统/UI工具";
+const 硬件函数 = require("系统.00．核心系统.04．硬件函数") as { getGameUI: () => number };
+const UI工具 = require("系统.09．表现系统.01．UI工具") as {
+  createFrame: (options: any) => number;
+  setFramePosition: (frame: number, options: any) => void;
+  setFrameSize: (frame: number, options: any) => void;
+  setFrameTexture: (frame: number, texture: string) => void;
+  setFrameHoverEvents: (frame: number, onHover: () => void, onUnhover: () => void, enable: boolean) => void;
+  setFramePointRelative: (frame: number, point: number, relativeTo: number, relativePoint: number, x: number, y: number) => void;
+  createTextLabel: (name: string, parent: number, text: string, position: any, size: any) => number;
+  FrameType: { BACKDROP: number; GLUETEXTBUTTON: number };
+  FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number };
+  hideFrame: (frame: number) => void;
+  showFrame: (frame: number) => void;
+};
 
 const buffPoolMod = require("系统.05．Buff系统.00．Buff系统") as {
   isUnitInBuffPool: (u: any) => boolean;
@@ -49,12 +35,10 @@ const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
   buffs: Record<string, { icon: string; tooltip: string; priority: number; buffName: string; interval: number }>;
 };
 
-/** 与 Buff 表 buffID 一致（可扩展其它表内 id） */
 type BuffRowId = string;
 
 interface BuffBarRow {
   id: BuffRowId;
-  /** remaining：逻辑剩余秒；iconRemaining：与 remaining 一致（由 dot 读数）；_dotParsedDuration：提示里固定总时长 */
   state: {
     effect: number;
     remaining: number;
@@ -62,40 +46,30 @@ interface BuffBarRow {
     sourceName?: string;
     _dotParsedDuration?: number;
   };
-  /** JASS 桥接等写入池的图标覆盖；优先于 01 表 */
   iconOverride?: string;
 }
 
-/** 原生 Buff 区：左下肖像上方偏右，横向排列（归一化坐标，相对 GameUI） */
 const BUFF_BAR_X0 = 0.204;
-/** 相对初始 0.128 再上移 0.03（本坐标系 y 增大为往上） */
 const BUFF_BAR_Y = 0.1655;
 const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
 const MAX_SLOTS = 20;
-/** Buff 条定时刷新间隔（秒），用于图标上剩余时间等 */
 const BUFF_BAR_REFRESH_SEC = 0.1;
 
 const TIP_BOX_TEX = "war3mapImported\\wenbenkuang.blp";
 const TIP_W = 0.22;
-/** 两行说明（表文案 + 来源行）略增高 */
 const TIP_H = 0.056;
 const TIP_PAD = 0.005;
-/** 提示框相对 Buff 图标顶边的纵向偏移（本坐标系 y 增大为往上） */
 const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
-/** 提示第一行：偏暖的浅米色，在棕色底上易读 */
 const TIP_COLOR_BODY = "|cfffff2d9";
-/** 提示第二行（来源）：金色，与正文区分且更醒目 */
 const TIP_COLOR_SOURCE = "|cffffd700";
 
-/** 提示文案内数值一律去小数，向下取整为整数显示 */
 function tooltipIntStr(n: number): string {
   if (typeof n !== "number" || !isFinite(n)) return "0";
   return `${Math.floor(Math.max(0, n))}`;
 }
 
-/** 图标底部：剩余时间，一位小数（与逻辑 remaining 同步，由 BUFF_BAR_REFRESH_SEC 刷新） */
 function formatBuffRemainOneDecimal(rem: number): string {
   if (typeof rem !== "number" || !isFinite(rem)) return "0.0";
   return Math.max(0, rem).toFixed(1);
@@ -103,7 +77,6 @@ function formatBuffRemainOneDecimal(rem: number): string {
 
 function formatDotTooltip(
   template: string,
-  /** 提示里「持续时间」占位：优先用装备解析总时长（固定），否则用剩余秒数（非 DOT 等兜底） */
   durationForDisplay: number,
   dps: number,
   sourceName: string | undefined,
@@ -136,7 +109,6 @@ function tryDzFrameSetTooltipF2i(hostFrame: number, tooltipFrame: number): void 
 
 interface SlotFrames {
   root: number;
-  /** 图标底部剩余时间（一位小数），在 hit 之下创建以免挡交互 */
   remainText: number;
   hit: number;
   tipBox: number;
@@ -144,17 +116,12 @@ interface SlotFrames {
 }
 
 const slots: SlotFrames[] = [];
-/** 与槽位一一对应，仅当提示文案变化时才 DzFrameSetText */
 const lastTipStrBySlot: string[] = [];
-/** 与槽位一一对应，仅当剩余时间字符串变化时才更新图标底字 */
 const lastRemainStrBySlot: string[] = [];
-/** 鼠标是否仍悬停在该槽 hit 上；定时 syncBuffBar 不可强行 hideFrame 提示，否则会误关 tooltip */
 const slotHovering: boolean[] = [];
 let refreshTimer: any = undefined;
-/** 防止重复 init：重复创建帧会泄漏、重复注册触发器会导致多次刷新 */
 let buffUiInitialized = false;
 
-/** 为 true 时向本地玩家刷诊断文字（选中数量、handleId、Buff 池、DOT 读数）。 */
 export let BUFF_UI_DEBUG = false;
 let lastBuffUiDbgKey = "";
 
@@ -165,10 +132,6 @@ function debugBuffUi(msg: string): void {
   (jass as any).DisplayTextToPlayer(p, 0, 0, "[BuffUI] " + msg);
 }
 
-/**
- * 当前玩家选中单位数量 + 第一个选中（含敌方）。勿用 GroupEnumUnitsOfPlayer。
- * 优先 GroupEnumUnitsSelected；无则全图矩形枚举 + IsUnitSelected。
- */
 function countSelectedForPlayer(p: any): { n: number; sole: any } {
   if (!p || p === 0) return { n: 0, sole: null };
   if (typeof (jass as any).CreateGroup !== "function") return { n: 0, sole: null };
@@ -207,7 +170,6 @@ function getSoleSelectedUnitForPlayer(p: any): any {
   return sole;
 }
 
-/** 避免对已移除/无效 unit 句柄读 DOT/Buff（句柄复用异次元） */
 function isUnitRefLikelyValid(u: any): boolean {
   if (u == null || u === 0) return false;
   if (typeof (jass as any).GetUnitTypeId !== "function") return true;
@@ -278,10 +240,10 @@ function hideSlot(i: number): void {
   slotHovering[i] = false;
   lastTipStrBySlot[i] = "";
   lastRemainStrBySlot[i] = "";
-  if (s.tipText !== 0) hideFrame(s.tipText);
-  if (s.tipBox !== 0) hideFrame(s.tipBox);
-  if (s.hit !== 0) hideFrame(s.hit);
-  if (s.root !== 0) hideFrame(s.root);
+  if (s.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipText));
+  if (s.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipBox));
+  if (s.hit !== 0) (pcall as any)(() => UI工具.hideFrame(s.hit));
+  if (s.root !== 0) (pcall as any)(() => UI工具.hideFrame(s.root));
 }
 
 function hideAllSlots(): void {
@@ -289,275 +251,292 @@ function hideAllSlots(): void {
 }
 
 function syncBuffBar(): void {
-  if (typeof jass.GetLocalPlayer !== "function") {
-    hideAllSlots();
-    return;
-  }
-  const lp = jass.GetLocalPlayer();
-  const { n: selN, sole } = countSelectedForPlayer(lp);
-  const hid =
-    sole != null && sole !== 0 && typeof (jass as any).GetHandleId === "function"
-      ? ((jass as any).GetHandleId(sole) as number)
-      : 0;
-  const soleOk = sole != null && sole !== 0 && isUnitRefLikelyValid(sole);
-  const inPool = soleOk && buffPoolMod.isUnitInBuffPool(sole);
-  const rtD001 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D001") : null;
-  const rtD002 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D002") : null;
-  const rtD003 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D003") : null;
-  if (BUFF_UI_DEBUG) {
-    const rowsProbe = soleOk && selN === 1 ? collectBuffRows(sole) : [];
-    const key = `${selN}|${hid}|${inPool}|${rtD001 != null}|${rtD002 != null}|${rtD003 != null}|${rowsProbe.length}`;
-    if (key !== lastBuffUiDbgKey) {
-      lastBuffUiDbgKey = key;
-      debugBuffUi(
-        `sel=${selN} hid=${hid} pool=${inPool ? 1 : 0} D001=${rtD001 != null ? 1 : 0} D002=${rtD002 != null ? 1 : 0} D003=${rtD003 != null ? 1 : 0} rows=${rowsProbe.length}`
-      );
+  (pcall as any)(() => {
+    if (typeof jass.GetLocalPlayer !== "function") {
+      hideAllSlots();
+      return;
     }
-  }
-  if (!soleOk || selN !== 1) {
-    hideAllSlots();
-    return;
-  }
-  const rows = collectBuffRows(sole);
-  const buffs = buffTableMod.buffs;
-  for (let i = 0; i < MAX_SLOTS; i++) {
-    if (i >= rows.length) {
-      hideSlot(i);
-      continue;
-    }
-    const row = rows[i];
-    const meta = buffs[row.id];
-    const slot = slots[i];
-    if (!slot) continue;
-    const iconTex =
-      row.iconOverride !== undefined && row.iconOverride !== ""
-        ? row.iconOverride
-        : meta != null
-          ? meta.icon
-          : "";
-    if (iconTex === "") continue;
-    const pd = row.state._dotParsedDuration;
-    const durationForTip =
-      typeof pd === "number" && isFinite(pd) && pd > 0 ? pd : row.state.remaining;
-    const tipStr =
-      meta != null
-        ? formatDotTooltip(
-            meta.tooltip,
-            durationForTip,
-            row.state.effect,
-            row.state.sourceName,
-            meta.interval
-          )
-        : TIP_COLOR_BODY +
-          row.id +
-          " 剩余 " +
-          tooltipIntStr(row.state.remaining) +
-          " 秒，伤害/秒 " +
-          tooltipIntStr(row.state.effect) +
-          "|r\n" +
-          TIP_COLOR_SOURCE +
-          "buff来源为「" +
-          (row.state.sourceName !== undefined && row.state.sourceName !== "" ? row.state.sourceName : "未知") +
-          "」|r";
-    setFrameTexture(slot.root, iconTex);
-    const remStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
-    if (slot.remainText && slot.remainText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
-      if (lastRemainStrBySlot[i] !== remStr) {
-        lastRemainStrBySlot[i] = remStr;
-        (japi as any).DzFrameSetText(slot.remainText, "|cffffffff" + remStr + "|r");
-      }
-    }
-    if (slot.tipText && slot.tipText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
-      if (lastTipStrBySlot[i] !== tipStr) {
-        lastTipStrBySlot[i] = tipStr;
-        (japi as any).DzFrameSetText(slot.tipText, tipStr);
-      }
-    }
-    showFrame(slot.root);
-    if (slot.hit !== 0) showFrame(slot.hit);
-    if (!slotHovering[i]) {
-      if (slot.tipBox !== 0) hideFrame(slot.tipBox);
-      if (slot.tipText !== 0) hideFrame(slot.tipText);
-    }
-  }
-}
+    const lp = jass.GetLocalPlayer();
+    if (lp == null || lp === 0) return;
 
-function onSelectionChanged(): void {
-  if (typeof jass.GetLocalPlayer !== "function" || typeof jass.GetTriggerPlayer !== "function") return;
-  if (jass.GetLocalPlayer() !== jass.GetTriggerPlayer()) return;
-  syncBuffBar();
+    const { n: selN, sole } = countSelectedForPlayer(lp);
+    const hid =
+      sole != null && sole !== 0 && typeof (jass as any).GetHandleId === "function"
+        ? ((jass as any).GetHandleId(sole) as number)
+        : 0;
+    const soleOk = sole != null && sole !== 0 && isUnitRefLikelyValid(sole);
+    const inPool = soleOk && buffPoolMod.isUnitInBuffPool(sole);
+    const rtD001 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D001") : null;
+    const rtD002 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D002") : null;
+    const rtD003 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D003") : null;
+    if (BUFF_UI_DEBUG) {
+      const rowsProbe = soleOk && selN === 1 ? collectBuffRows(sole) : [];
+      const key = `${selN}|${hid}|${inPool}|${rtD001 != null}|${rtD002 != null}|${rtD003 != null}|${rowsProbe.length}`;
+      if (key !== lastBuffUiDbgKey) {
+        lastBuffUiDbgKey = key;
+        debugBuffUi(
+          `sel=${selN} hid=${hid} pool=${inPool ? 1 : 0} D001=${rtD001 != null ? 1 : 0} D002=${rtD002 != null ? 1 : 0} D003=${rtD003 != null ? 1 : 0} rows=${rowsProbe.length}`
+        );
+      }
+    }
+    if (!soleOk || selN !== 1) {
+      hideAllSlots();
+      return;
+    }
+    const rows = collectBuffRows(sole);
+    const buffs = buffTableMod.buffs;
+    for (let i = 0; i < MAX_SLOTS; i++) {
+      if (i >= rows.length) {
+        hideSlot(i);
+        continue;
+      }
+      const row = rows[i];
+      const meta = buffs[row.id];
+      const slot = slots[i];
+      if (!slot) continue;
+      const iconTex =
+        row.iconOverride !== undefined && row.iconOverride !== ""
+          ? row.iconOverride
+          : meta != null
+            ? meta.icon
+            : "";
+      if (iconTex === "") continue;
+      const pd = row.state._dotParsedDuration;
+      const durationForTip =
+        typeof pd === "number" && isFinite(pd) && pd > 0 ? pd : row.state.remaining;
+      const tipStr =
+        meta != null
+          ? formatDotTooltip(
+              meta.tooltip,
+              durationForTip,
+              row.state.effect,
+              row.state.sourceName,
+              meta.interval
+            )
+          : TIP_COLOR_BODY +
+            row.id +
+            " 剩余 " +
+            tooltipIntStr(row.state.remaining) +
+            " 秒，伤害/秒 " +
+            tooltipIntStr(row.state.effect) +
+            "|r\n" +
+            TIP_COLOR_SOURCE +
+            "buff来源为「" +
+            (row.state.sourceName !== undefined && row.state.sourceName !== "" ? row.state.sourceName : "未知") +
+            "」|r";
+      (pcall as any)(() => UI工具.setFrameTexture(slot.root, iconTex));
+      const remStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
+      if (slot.remainText && slot.remainText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
+        if (lastRemainStrBySlot[i] !== remStr) {
+          lastRemainStrBySlot[i] = remStr;
+          (pcall as any)(() => (japi as any).DzFrameSetText(slot.remainText, "|cffffffff" + remStr + "|r"));
+        }
+      }
+      if (slot.tipText && slot.tipText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
+        if (lastTipStrBySlot[i] !== tipStr) {
+          lastTipStrBySlot[i] = tipStr;
+          (pcall as any)(() => (japi as any).DzFrameSetText(slot.tipText, tipStr));
+        }
+      }
+      (pcall as any)(() => UI工具.showFrame(slot.root));
+      if (slot.hit !== 0) (pcall as any)(() => UI工具.showFrame(slot.hit));
+      if (!slotHovering[i]) {
+        if (slot.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(slot.tipBox));
+        if (slot.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(slot.tipText));
+      }
+    }
+  });
 }
 
 function createOneSlot(index: number, parent: number): SlotFrames | null {
-  const x = BUFF_BAR_X0 + index * (ICON_W + ICON_GAP);
-  const bd =
-    createFrame({
-      type: FrameType.BACKDROP,
-      name: "BuffUIBarIcon" + index,
-      parent,
-      template: "template",
-      visible: false,
-    }) || 0;
-  if (!bd || bd === 0) return null;
-  setFramePosition(bd, { point: FramePoint.TOPLEFT, x, y: BUFF_BAR_Y });
-  setFrameSize(bd, { width: ICON_W, height: ICON_H });
-  setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp");
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(bd, 180);
+  try {
+    const x = BUFF_BAR_X0 + index * (ICON_W + ICON_GAP);
+    const bd =
+      UI工具.createFrame({
+        type: UI工具.FrameType.BACKDROP,
+        name: "BuffUIBarIcon" + index,
+        parent,
+        template: "template",
+        visible: false,
+      }) || 0;
+    if (!bd || bd === 0) return null;
+    (pcall as any)(() => UI工具.setFramePosition(bd, { point: UI工具.FramePoint.TOPLEFT, x, y: BUFF_BAR_Y }));
+    (pcall as any)(() => UI工具.setFrameSize(bd, { width: ICON_W, height: ICON_H }));
+    (pcall as any)(() => UI工具.setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp"));
+    if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(bd, 180));
 
-  const remainText =
-    createTextLabel(
-      "BuffUIBarRemain" + index,
-      bd,
-      "|cffffffff0.0|r",
-      {
-        relativeTo: bd,
-        point: FramePoint.BOTTOM,
-        relativePoint: FramePoint.BOTTOM,
-        x: 0,
-        y: 0.001,
-      },
-      { width: ICON_W, height: 0.014 }
-    ) || 0;
-  if (remainText && remainText !== 0) {
-    if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
-      (pcall as any)(() => {
-        (japi as any).DzFrameSetTextAlignment(remainText, FramePoint.CENTER);
-      });
+    const remainText =
+      UI工具.createTextLabel(
+        "BuffUIBarRemain" + index,
+        bd,
+        "|cffffffff0.0|r",
+        {
+          relativeTo: bd,
+          point: UI工具.FramePoint.BOTTOM,
+          relativePoint: UI工具.FramePoint.BOTTOM,
+          x: 0,
+          y: 0.001,
+        },
+        { width: ICON_W, height: 0.014 }
+      ) || 0;
+    if (remainText && remainText !== 0) {
+      if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
+        (pcall as any)(() => {
+          (japi as any).DzFrameSetTextAlignment(remainText, UI工具.FramePoint.CENTER);
+        });
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(remainText, 182));
     }
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(remainText, 182);
-  }
 
-  const hit =
-    createFrame({
-      type: FrameType.GLUETEXTBUTTON,
-      name: "BuffUIBarHit" + index,
-      parent: bd,
-      template: "template",
-      visible: false,
-      enable: true,
-      alpha: 0,
-    }) || 0;
-  if (hit && hit !== 0 && typeof (japi as any).DzFrameSetAllPoints === "function") {
-    (japi as any).DzFrameSetAllPoints(hit, bd);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(hit, 181);
-    setFrameHoverEvents(
-      hit,
-      () => {
-        slotHovering[index] = true;
-        const s = slots[index];
-        if (s != null && s.tipBox !== 0) showFrame(s.tipBox);
-        if (s != null && s.tipText !== 0) showFrame(s.tipText);
-      },
-      () => {
-        slotHovering[index] = false;
-        const s = slots[index];
-        if (s != null && s.tipText !== 0) hideFrame(s.tipText);
-        if (s != null && s.tipBox !== 0) hideFrame(s.tipBox);
-      },
-      false
-    );
-  }
-
-  const boxW = TIP_W + TIP_PAD * 2;
-  const boxH = TIP_H + TIP_PAD * 2;
-  /** 挂在 GameUI 上并提高 Level，避免被右侧相邻图标挡住 */
-  const tipBox =
-    createFrame({
-      type: FrameType.BACKDROP,
-      name: "BuffUIBarTip" + index,
-      parent,
-      template: "template",
-      visible: false,
-    }) || 0;
-  if (tipBox && tipBox !== 0) {
-    setFramePointRelative(
-      tipBox,
-      FramePoint.TOPLEFT,
-      bd,
-      FramePoint.TOPRIGHT,
-      0.002,
-      TIP_OFFSET_Y_FROM_ICON_TOP
-    );
-    setFrameSize(tipBox, { width: boxW, height: boxH });
-    setFrameTexture(tipBox, TIP_BOX_TEX);
-    // DzFrame：Level 越小越靠前。任务 UI 等常用 1～8，原先 70 会被盖住；与图标(180/181)分离即可
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tipBox, 0);
-    hideFrame(tipBox);
-  }
-
-  const tipText =
-    createTextLabel(
-      "BuffUIBarTipTxt" + index,
-      tipBox && tipBox !== 0 ? tipBox : bd,
-      "",
-      tipBox && tipBox !== 0
-        ? { relativeTo: tipBox, point: FramePoint.CENTER, relativePoint: FramePoint.CENTER, x: 0, y: 0 }
-        : { relativeTo: bd, point: FramePoint.TOPLEFT, relativePoint: FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP },
-      { width: boxW * 0.92, height: boxH * 0.88 }
-    ) || 0;
-  if (tipText && tipText !== 0) {
-    if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
-      (pcall as any)(() => {
-        (japi as any).DzFrameSetTextAlignment(tipText, 0);
-      });
+    const hit =
+      UI工具.createFrame({
+        type: UI工具.FrameType.GLUETEXTBUTTON,
+        name: "BuffUIBarHit" + index,
+        parent: bd,
+        template: "template",
+        visible: false,
+        enable: true,
+        alpha: 0,
+      }) || 0;
+    if (hit && hit !== 0 && typeof (japi as any).DzFrameSetAllPoints === "function") {
+      (pcall as any)(() => (japi as any).DzFrameSetAllPoints(hit, bd));
+      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(hit, 181));
+      (pcall as any)(() => UI工具.setFrameHoverEvents(
+        hit,
+        () => {
+          slotHovering[index] = true;
+          const s = slots[index];
+          if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.showFrame(s.tipBox));
+          if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.showFrame(s.tipText));
+        },
+        () => {
+          slotHovering[index] = false;
+          const s = slots[index];
+          if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipText));
+          if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipBox));
+        },
+        false
+      ));
     }
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tipText, 0);
-    hideFrame(tipText);
+
+    const boxW = TIP_W + TIP_PAD * 2;
+    const boxH = TIP_H + TIP_PAD * 2;
+    const tipBox =
+      UI工具.createFrame({
+        type: UI工具.FrameType.BACKDROP,
+        name: "BuffUIBarTip" + index,
+        parent,
+        template: "template",
+        visible: false,
+      }) || 0;
+    if (tipBox && tipBox !== 0) {
+      (pcall as any)(() => UI工具.setFramePointRelative(
+        tipBox,
+        UI工具.FramePoint.TOPLEFT,
+        bd,
+        UI工具.FramePoint.TOPRIGHT,
+        0.002,
+        TIP_OFFSET_Y_FROM_ICON_TOP
+      ));
+      (pcall as any)(() => UI工具.setFrameSize(tipBox, { width: boxW, height: boxH }));
+      (pcall as any)(() => UI工具.setFrameTexture(tipBox, TIP_BOX_TEX));
+      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(tipBox, 0));
+      (pcall as any)(() => UI工具.hideFrame(tipBox));
+    }
+
+    const tipText =
+      UI工具.createTextLabel(
+        "BuffUIBarTipTxt" + index,
+        tipBox && tipBox !== 0 ? tipBox : bd,
+        "",
+        tipBox && tipBox !== 0
+          ? { relativeTo: tipBox, point: UI工具.FramePoint.CENTER, relativePoint: UI工具.FramePoint.CENTER, x: 0, y: 0 }
+          : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP },
+        { width: boxW * 0.92, height: boxH * 0.88 }
+      ) || 0;
+    if (tipText && tipText !== 0) {
+      if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
+        (pcall as any)(() => {
+          (japi as any).DzFrameSetTextAlignment(tipText, 0);
+        });
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(tipText, 0));
+      (pcall as any)(() => UI工具.hideFrame(tipText));
+    }
+
+    if (hit !== 0 && tipBox !== 0) tryDzFrameSetTooltipF2i(hit, tipBox);
+
+    (pcall as any)(() => UI工具.hideFrame(bd));
+    return {
+      root: bd,
+      remainText: remainText || 0,
+      hit: hit || 0,
+      tipBox: tipBox || 0,
+      tipText: tipText || 0,
+    };
+  } catch (e) {
+    return null;
   }
-
-  if (hit !== 0 && tipBox !== 0) tryDzFrameSetTooltipF2i(hit, tipBox);
-
-  hideFrame(bd);
-  return {
-    root: bd,
-    remainText: remainText || 0,
-    hit: hit || 0,
-    tipBox: tipBox || 0,
-    tipText: tipText || 0,
-  };
 }
 
 function createUi(): void {
-  const parent = getGameUI();
-  if (parent === 0 || parent == null) return;
-  for (let j = 0; j < MAX_SLOTS; j++) {
-    lastTipStrBySlot[j] = "";
-    lastRemainStrBySlot[j] = "";
-    slotHovering[j] = false;
-  }
-  for (let i = 0; i < MAX_SLOTS; i++) {
-    const s = createOneSlot(i, parent);
-    if (s != null) slots[i] = s;
-  }
-}
-
-function registerTriggers(): void {
-  const trig = typeof jass.CreateTrigger === "function" ? jass.CreateTrigger() : null;
-  if (!trig) return;
-  for (let i = 0; i < 16; i++) {
-    if (typeof jass.TriggerRegisterPlayerUnitEvent === "function") {
-      jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), EV_UNIT_SELECTED, undefined!);
-      jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), EV_UNIT_DESELECTED, undefined!);
+  (pcall as any)(() => {
+    if (typeof jass.GetLocalPlayer !== "function") return;
+    const lp = jass.GetLocalPlayer();
+    if (lp == null || lp === 0) return;
+    const parent = 硬件函数.getGameUI();
+    if (parent === 0 || parent == null) return;
+    for (let j = 0; j < MAX_SLOTS; j++) {
+      lastTipStrBySlot[j] = "";
+      lastRemainStrBySlot[j] = "";
+      slotHovering[j] = false;
     }
-  }
-  if (typeof jass.TriggerAddAction === "function") {
-    jass.TriggerAddAction(trig, onSelectionChanged);
-  }
+    for (let i = 0; i < MAX_SLOTS; i++) {
+      const s = createOneSlot(i, parent);
+      if (s != null) slots[i] = s;
+    }
+  });
 }
 
 function startRefreshTimer(): void {
-  if (refreshTimer != null) return;
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") return;
-  refreshTimer = jass.CreateTimer();
-  jass.TimerStart(refreshTimer, BUFF_BAR_REFRESH_SEC, true, () => {
-    syncBuffBar();
+  (pcall as any)(() => {
+    if (refreshTimer != null) return;
+    if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") return;
+    refreshTimer = jass.CreateTimer();
+    jass.TimerStart(refreshTimer, BUFF_BAR_REFRESH_SEC, true, () => {
+      (pcall as any)(() => {
+        if (typeof jass.GetLocalPlayer !== "function") return;
+        const lp = jass.GetLocalPlayer();
+        if (lp == null || lp === 0) return;
+        syncBuffBar();
+      });
+    });
   });
 }
 
 export function init(): void {
   if (buffUiInitialized) return;
   buffUiInitialized = true;
-  createUi();
-  registerTriggers();
-  startRefreshTimer();
+  
+  (pcall as any)(() => {
+    if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
+      const delayTimer = jass.CreateTimer();
+      jass.TimerStart(delayTimer, 1.0, false, () => {
+        (pcall as any)(() => {
+          if (typeof jass.GetLocalPlayer !== "function") {
+            if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(delayTimer);
+            return;
+          }
+          const lp = jass.GetLocalPlayer();
+          if (lp != null && lp !== 0) {
+            createUi();
+          }
+          startRefreshTimer();
+          if (typeof jass.DestroyTimer === "function") {
+            jass.DestroyTimer(delayTimer);
+          }
+        });
+      });
+    }
+  });
 }

@@ -14,7 +14,7 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.封装函数")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local AddGoldWithFeedback = ____require_result_0.AddGoldWithFeedback
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
 local KEY_TO_NAME = {

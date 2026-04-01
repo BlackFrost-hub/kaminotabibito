@@ -18,8 +18,8 @@
 
 const jass = require("jass.common") as any;
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { recipe?: string }> }).default;
-const { LeakWatcher } = require("系统.00．核心系统.泄露审计") as { LeakWatcher: any };
-const { CreateFloatTextAtPoint } = require("系统.00．核心系统.漂浮文字函数") as {
+const { LeakWatcher } = require("系统.00．核心系统.05．泄露审计") as { LeakWatcher: any };
+const { CreateFloatTextAtPoint } = require("系统.00．核心系统.03．漂浮文字函数") as {
   CreateFloatTextAtPoint: (x: number, y: number, text: string, options?: any) => any;
 };
 

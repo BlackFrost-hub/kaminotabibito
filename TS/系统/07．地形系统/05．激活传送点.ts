@@ -8,7 +8,7 @@
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
-const { Sound3DII_Mp3Play } = require("系统.00．核心系统.音效函数") as {
+const { Sound3DII_Mp3Play } = require("系统.00．核心系统.02．音效函数") as {
   Sound3DII_Mp3Play: (path: string, player?: any) => void;
 };
 

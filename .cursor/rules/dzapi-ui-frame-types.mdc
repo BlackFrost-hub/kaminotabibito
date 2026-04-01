@@ -146,3 +146,81 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
    - 非 block action 末尾需逗号。
    - 路径使用单反斜杠（如 `UI\TaskUI.fdf`）。
    - `SetPoint` 规则遵循 0.8x0.6 UI 坐标系；Frame 组默认受 4:3 区域约束，超界会形变。
+
+---
+
+## UI 异步掉线避坑（2026-04-01 BuffUI 修复记录）
+
+### ⚠️ 最关键：计时器必须在所有玩家上启动！
+定时器创建	在所有玩家执行 ✅
+定时器启动	在所有玩家执行 ✅
+定时器回调	在所有玩家执行 ✅
+回调内本地判断	if  GetLocalPlayer()✅
+计时器在所有玩家创建启动，回调内用 GetLocalPlayer() 隔离✅
+UI 操作	只在本地玩家执行 ✅
+
+#### ❌ 错误的做法（会导致 desync）
+不要在本地玩家检查内创建和启动计时器 ❌
+
+```typescript
+export function init(): void {
+  const delayTimer = jass.CreateTimer();
+  jass.TimerStart(delayTimer, 1.0, false, () => {
+    const lp = jass.GetLocalPlayer();
+    if (lp != null && lp !== 0) {
+      createUi();
+      // ❌ 只在本地玩家启动计时器！
+      startRefreshTimer();  
+    }
+  });
+}
+```
+**后果：**
+- 本地玩家：定时器运行 → `syncBuffBar()` 每 0.1 秒执行
+- 其他玩家：没有定时器 → `syncBuffBar()` 从不执行
+- **不同玩家的执行次数不同 → desync**
+
+#### ✅ 正确的做法（完全同步）
+```typescript
+export function init(): void {
+  const delayTimer = jass.CreateTimer();
+  jass.TimerStart(delayTimer, 1.0, false, () => {
+    const lp = jass.GetLocalPlayer();
+    if (lp != null && lp !== 0) {
+      createUi(); // ✅ UI 创建只在本地玩家执行
+    }
+    startRefreshTimer(); // ✅ 计时器必须在所有玩家上启动！
+  });
+}
+
+function startRefreshTimer(): void {
+  const refreshTimer = jass.CreateTimer();
+  jass.TimerStart(refreshTimer, 0.1, true, () => {
+    // ✅ 计时器回调内部用 GetLocalPlayer() 隔离 UI 操作
+    const lp = jass.GetLocalPlayer();
+    if (lp == null || lp === 0) return;
+    syncBuffBar();
+  });
+}
+```
+
+### 📌 核心规则
+1. **本机 UI 操作**（创建、显示、隐藏、设置纹理/文本）只在 `GetLocalPlayer()` 上执行
+2. **同步操作**（创建定时器、触发器注册等）要在**所有玩家**上执行
+3. **计时器必须在所有玩家上启动！但回调内部用 `GetLocalPlayer()` 隔离 UI 操作！**
+4. 如果有定时器在定期刷新 UI，**直接在定时器里查询选择状态**即可，不需要选择事件触发器（这个可以优化）
+5. 在魔兽地图中，任何可能在不同玩家产生不同执行次数/结果的代码，都必须用 GetLocalPlayer() 隔离 UI 操作，或者直接用定时器轮询替代事件触发
+### 简单版：
+## 异步掉线（Desync）避坑
+
+### 事件 vs 定时器
+- ❌ 不要用选中/取消选中事件来触发 UI 刷新
+- ✅ 用 0.1 秒定时器轮询选中状态 + `GetLocalPlayer()` 隔离 UI 操作
+- 原因：事件在不同玩家触发时机可能不同，导致 UI 状态不同步
+
+### UI 操作规则
+- ✅ Frame 创建、显示、隐藏必须用 `GetLocalPlayer()` 隔离
+- ✅ 定时器回调中操作 UI 前必须判断 `GetLocalPlayer()`
+- ✅ 定时器本身要在所有玩家上启动（引擎保证同步）
+## 核心原则
+**所有玩家必须执行相同次数、相同路径的代码；UI 操作只在本地玩家执行。**

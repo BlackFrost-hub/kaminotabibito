@@ -29,9 +29,9 @@ local ____exports = {}
 --   - h00C:20->I034*1;20%I036*1:5
 local jass = require("jass.common")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.泄露审计")
+local ____require_result_0 = require("系统.00．核心系统.05．泄露审计")
 local LeakWatcher = ____require_result_0.LeakWatcher
-local ____require_result_1 = require("系统.00．核心系统.漂浮文字函数")
+local ____require_result_1 = require("系统.00．核心系统.03．漂浮文字函数")
 local CreateFloatTextAtPoint = ____require_result_1.CreateFloatTextAtPoint
 local CAMPFIRE_ID = 1747988547
 local EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"

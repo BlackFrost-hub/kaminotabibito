@@ -4,10 +4,10 @@
 
 const jass = require("jass.common") as any;
 
-import { questManager } from "../08．任务系统/任务管理器";
-import { taskUI } from "../08．任务系统/任务UI";
-import { questDB, QuestType } from "../08．任务系统/任务数据";
-import { registerKeyDown, KEY_LETTER } from "../00．核心系统/硬件函数";
+import { questManager } from "../08．任务系统/02．任务管理器";
+import { taskUI } from "../08．任务系统/03．任务UI";
+import { questDB, QuestType } from "../08．任务系统/01．任务数据";
+import { registerKeyDown, KEY_LETTER } from "../00．核心系统/04．硬件函数";
 
 function debugPrint(msg: string): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;
@@ -65,15 +65,27 @@ export function testUI(): void {
   debugPrint("测试任务UI...");
 
   // 显示UI
-  taskUI.show(0);
-  debugPrint("任务UI已显示");
+  (pcall as any)(() => {
+    if (typeof jass.GetLocalPlayer !== "function") return;
+    const lp = jass.GetLocalPlayer();
+    if (lp == null || lp === 0) return;
+
+    taskUI.show(0);
+    debugPrint("任务UI已显示");
+  });
 
   // 等待3秒后隐藏
   if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
     const timer = jass.CreateTimer();
     jass.TimerStart(timer, 3, false, () => {
-      taskUI.hide();
-      debugPrint("任务UI已隐藏");
+      (pcall as any)(() => {
+        if (typeof jass.GetLocalPlayer !== "function") return;
+        const lp = jass.GetLocalPlayer();
+        if (lp == null || lp === 0) return;
+
+        taskUI.hide();
+        debugPrint("任务UI已隐藏");
+      });
       if (typeof jass.DestroyTimer === "function") {
         jass.DestroyTimer(timer);
       }
@@ -129,8 +141,13 @@ export function registerTestCommand(): void {
       const getPid = typeof jass.GetPlayerId === "function" ? jass.GetPlayerId : null;
       const playerId = getPid && player ? getPid(player) : 0;
 
-      if (playerId === 0) { // 只允许玩家1运行测试
-        runAllTests();
+      if (playerId === 0) { // 只有玩家1触发，但所有玩家都执行任务数据操作
+        // 任务数据操作（全局同步，所有玩家都要执行）
+        testQuestData();
+        testQuestAcceptComplete();
+        
+        // UI操作（只在本地玩家执行）
+        testUI();
       }
     });
 

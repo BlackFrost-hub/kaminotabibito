@@ -3,11 +3,11 @@ local ____exports = {}
 local GOLD_R, GOLD_G, GOLD_B
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.封装函数")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local AdjustPlayerStateBJ = ____require_result_0.AdjustPlayerStateBJ
-local ____require_result_1 = require("系统.00．核心系统.音效函数")
+local ____require_result_1 = require("系统.00．核心系统.02．音效函数")
 local Sound3DII_Mp3PlayReuse = ____require_result_1.Sound3DII_Mp3PlayReuse
-local ____require_result_2 = require("系统.00．核心系统.漂浮文字函数")
+local ____require_result_2 = require("系统.00．核心系统.03．漂浮文字函数")
 local CreateFloatTextOnUnit = ____require_result_2.CreateFloatTextOnUnit
 --- 每条 +1000 各一条漂浮字；duration>0 入队，到期 DestroyTextTag（排泄）
 local GOLD_FLOAT_DURATION_SEC = 1.25

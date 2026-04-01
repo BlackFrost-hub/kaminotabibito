@@ -42,7 +42,8 @@ ____exports.items.I00P = {
     score = 295,
     level = "E-",
     dmg = 2,
-    all = 2
+    all = 2,
+    Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
 }
 ____exports.items.I01K = {
     type = "道具/戒指/饰品",
