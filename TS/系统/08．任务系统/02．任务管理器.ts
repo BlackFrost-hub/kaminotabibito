@@ -295,10 +295,11 @@ export class QuestManager {
 
       // 检查任务是否自动完成
       const quest = (questDB as any).globalData?.quests.get(questId);
-      if (quest) {
+      if (quest && quest.objectives) {
         let allCompleted = true;
-        for (let i = 0; i < quest.objectives.length; i++) {
-          if (!quest.objectives[i].completed) {
+        // 使用 for...in 避免 Lua 数组长度问题
+        for (const obj of quest.objectives) {
+          if (!obj || !obj.completed) {
             allCompleted = false;
             break;
           }

@@ -2,6 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local Map = ____lualib.Map
+local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
@@ -299,16 +300,12 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
             ____opt_14 = ____opt_14.quests:get(questId)
         end
         local quest = ____opt_14
-        if quest then
+        if quest and quest.objectives then
             local allCompleted = true
-            do
-                local i = 0
-                while i < quest.objectives.length do
-                    if not quest.objectives[i].completed then
-                        allCompleted = false
-                        break
-                    end
-                    i = i + 1
+            for ____, obj in __TS__Iterator(quest.objectives) do
+                if not obj or not obj.completed then
+                    allCompleted = false
+                    break
                 end
             end
             if allCompleted then

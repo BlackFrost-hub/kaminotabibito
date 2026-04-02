@@ -14,7 +14,7 @@ local ____exports = {}
 local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
 local getGameUI = ____04_FF0E_786C_4EF6_51FD_6570.getGameUI
 local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
-local KEY_LETTER = ____04_FF0E_786C_4EF6_51FD_6570.KEY_LETTER
+local KEY = ____04_FF0E_786C_4EF6_51FD_6570.KEY
 local KEY_NUM = ____04_FF0E_786C_4EF6_51FD_6570.KEY_NUM
 local getWheelDelta = ____04_FF0E_786C_4EF6_51FD_6570.getWheelDelta
 local getMouseFocus = ____04_FF0E_786C_4EF6_51FD_6570.getMouseFocus
@@ -1507,7 +1507,7 @@ function TaskUI.prototype.registerHotkey(self)
     end
     registerKeyDown(
         nil,
-        KEY_LETTER.J,
+        KEY.J,
         function(____, player)
             pcall(function ()
                     if type(jass.GetLocalPlayer) ~= "function" then

@@ -18,7 +18,7 @@ function dzPlayer(index: number): any {
 import {
   getGameUI,
   registerKeyDown,
-  KEY_LETTER,
+  KEY,
   KEY_NUM,
   getWheelDelta,
   getMouseFocus,
@@ -1047,7 +1047,7 @@ class TaskUI {
     // 关键：J 切换时要基于“触发按键的玩家”更新 currentPlayerId
     // 否则如果按了 Y 运行测试（内部会调用 taskUI.show(0)），会把 currentPlayerId 污染成 0，
     // 导致后续按 J 显示错误玩家的数据。
-    registerKeyDown(KEY_LETTER.J, (player: any) => {
+    registerKeyDown(KEY.J, (player: any) => {
       (pcall as any)(() => {
         if (typeof jass.GetLocalPlayer !== "function") return;
         const lp = jass.GetLocalPlayer();

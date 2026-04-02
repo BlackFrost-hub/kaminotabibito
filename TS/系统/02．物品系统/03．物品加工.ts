@@ -22,6 +22,10 @@ const { LeakWatcher } = require("系统.00．核心系统.05．泄露审计") as
 const { CreateFloatTextAtPoint } = require("系统.00．核心系统.03．漂浮文字函数") as {
   CreateFloatTextAtPoint: (x: number, y: number, text: string, options?: any) => any;
 };
+const { stringToFourCC, fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  stringToFourCC: (s: string) => number;
+  fourCCToString: (fourcc: number) => string;
+};
 
 const CAMPFIRE_ID = 0x68303043; // 'h00C'
 const EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl";
@@ -43,25 +47,15 @@ function isCampfire(u: any): boolean {
   return typeof (jass as any).GetUnitTypeId === "function" && (jass as any).GetUnitTypeId(u) === CAMPFIRE_ID;
 }
 
+/** 使用 01．封装函数.ts 中的 stringToFourCC */
 function fourCCToInt(id: string): number {
-  if (!id || id.length !== 4) return 0;
-  const c1 = id.charCodeAt(0);
-  const c2 = id.charCodeAt(1);
-  const c3 = id.charCodeAt(2);
-  const c4 = id.charCodeAt(3);
-  // JASS FourCC: 'ABCD' -> 0x41424344
-  // Lua 5.1 目标禁用位运算，用乘法拼整数
-  return c1 * 16777216 + c2 * 65536 + c3 * 256 + c4;
+  return stringToFourCC(id);
 }
 
+/** 使用 01．封装函数.ts 中的 fourCCToString */
 function getItemIdStr(item: any): string {
   const itemId = typeof (jass as any).GetItemTypeId === "function" ? (jass as any).GetItemTypeId(item) : 0;
-  // 复用装备成长的写法（整数 -> 4 字符）
-  const c1 = string.char(itemId % 256);
-  const c2 = string.char(Math.floor(itemId / 256) % 256);
-  const c3 = string.char(Math.floor(itemId / 65536) % 256);
-  const c4 = string.char(Math.floor(itemId / 16777216) % 256);
-  return c4 + c3 + c2 + c1;
+  return fourCCToString(itemId);
 }
 
 function getItemNameSafe(item: any): string {

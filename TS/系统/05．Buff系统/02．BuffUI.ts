@@ -57,7 +57,7 @@ const ICON_GAP = 0.0005;
 const MAX_SLOTS = 20;
 const BUFF_BAR_REFRESH_SEC = 0.1;
 
-const TIP_BOX_TEX = "war3mapImported\\wenbenkuang.blp";
+const TIP_BOX_TEX = "UI\\wenbenkuang.blp";
 const TIP_W = 0.22;
 const TIP_H = 0.056;
 const TIP_PAD = 0.005;

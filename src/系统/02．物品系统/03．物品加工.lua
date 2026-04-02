@@ -33,6 +33,9 @@ local ____require_result_0 = require("系统.00．核心系统.05．泄露审计
 local LeakWatcher = ____require_result_0.LeakWatcher
 local ____require_result_1 = require("系统.00．核心系统.03．漂浮文字函数")
 local CreateFloatTextAtPoint = ____require_result_1.CreateFloatTextAtPoint
+local ____require_result_2 = require("系统.00．核心系统.01．封装函数")
+local stringToFourCC = ____require_result_2.stringToFourCC
+local fourCCToString = ____require_result_2.fourCCToString
 local CAMPFIRE_ID = 1747988547
 local EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
 local itemState = __TS__New(Map)
@@ -40,49 +43,40 @@ local campfireItems = __TS__New(Map)
 local function isCampfire(self, u)
     return type(jass.GetUnitTypeId) == "function" and jass.GetUnitTypeId(u) == CAMPFIRE_ID
 end
+--- 使用 01．封装函数.ts 中的 stringToFourCC
 local function fourCCToInt(self, id)
-    if not id or #id ~= 4 then
-        return 0
-    end
-    local c1 = string.byte(id, 1) or 0 / 0
-    local c2 = string.byte(id, 2) or 0 / 0
-    local c3 = string.byte(id, 3) or 0 / 0
-    local c4 = string.byte(id, 4) or 0 / 0
-    return c1 * 16777216 + c2 * 65536 + c3 * 256 + c4
+    return stringToFourCC(nil, id)
 end
+--- 使用 01．封装函数.ts 中的 fourCCToString
 local function getItemIdStr(self, item)
-    local ____temp_2
+    local ____temp_3
     if type(jass.GetItemTypeId) == "function" then
-        ____temp_2 = jass.GetItemTypeId(item)
+        ____temp_3 = jass.GetItemTypeId(item)
     else
-        ____temp_2 = 0
+        ____temp_3 = 0
     end
-    local itemId = ____temp_2
-    local c1 = string.char(itemId % 256)
-    local c2 = string.char(math.floor(itemId / 256) % 256)
-    local c3 = string.char(math.floor(itemId / 65536) % 256)
-    local c4 = string.char(math.floor(itemId / 16777216) % 256)
-    return ((c4 .. c3) .. c2) .. c1
+    local itemId = ____temp_3
+    return fourCCToString(nil, itemId)
 end
 local function getItemNameSafe(self, item)
-    local ____temp_3
+    local ____temp_4
     if type(jass.GetItemName) == "function" then
-        ____temp_3 = jass.GetItemName(item)
+        ____temp_4 = jass.GetItemName(item)
     else
-        ____temp_3 = "物品"
+        ____temp_4 = "物品"
     end
-    return ____temp_3
+    return ____temp_4
 end
 local function getItemChargesSafe(self, item)
     if type(jass.GetItemCharges) ~= "function" then
         return 1
     end
     local n = jass.GetItemCharges(item)
-    local ____TS__Number_result_4 = __TS__Number(n)
-    if ____TS__Number_result_4 == nil then
-        ____TS__Number_result_4 = 0
+    local ____TS__Number_result_5 = __TS__Number(n)
+    if ____TS__Number_result_5 == nil then
+        ____TS__Number_result_5 = 0
     end
-    local v = math.floor(____TS__Number_result_4) or 0
+    local v = math.floor(____TS__Number_result_5) or 0
     return v > 0 and v or 1
 end
 local function setItemChargesSafe(self, item, n)
@@ -96,26 +90,26 @@ local function setItemChargesSafe(self, item, n)
     jass.SetItemCharges(item, v > 0 and v or 1)
 end
 local function getUnitXY(self, u)
-    local ____temp_5
-    if type(jass.GetUnitX) == "function" then
-        ____temp_5 = jass.GetUnitX(u)
-    else
-        ____temp_5 = 0
-    end
-    local x = ____temp_5
     local ____temp_6
-    if type(jass.GetUnitY) == "function" then
-        ____temp_6 = jass.GetUnitY(u)
+    if type(jass.GetUnitX) == "function" then
+        ____temp_6 = jass.GetUnitX(u)
     else
         ____temp_6 = 0
     end
-    local y = ____temp_6
+    local x = ____temp_6
+    local ____temp_7
+    if type(jass.GetUnitY) == "function" then
+        ____temp_7 = jass.GetUnitY(u)
+    else
+        ____temp_7 = 0
+    end
+    local y = ____temp_7
     return {x = x, y = y}
 end
 local function floatBurnText(self, campfire, itemName)
-    local ____getUnitXY_result_7 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_7.x
-    local y = ____getUnitXY_result_7.y
+    local ____getUnitXY_result_8 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_8.x
+    local y = ____getUnitXY_result_8.y
     CreateFloatTextAtPoint(
         nil,
         x,
@@ -137,9 +131,9 @@ local function playFinishEffect(self, campfire)
     if type(jass.AddSpecialEffect) ~= "function" then
         return
     end
-    local ____getUnitXY_result_8 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_8.x
-    local y = ____getUnitXY_result_8.y
+    local ____getUnitXY_result_9 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_9.x
+    local y = ____getUnitXY_result_9.y
     local eff = jass.AddSpecialEffect(EFFECT_FIREBOMB, x, y)
     if eff then
         LeakWatcher:trackEffect("craft_firebomb", eff)
@@ -275,9 +269,9 @@ local function pickResult(self, results)
     return results[#results]
 end
 local function createItemAtCampfire(self, campfire, itemId)
-    local ____getUnitXY_result_9 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_9.x
-    local y = ____getUnitXY_result_9.y
+    local ____getUnitXY_result_10 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_10.x
+    local y = ____getUnitXY_result_10.y
     if type(jass.CreateItem) ~= "function" then
         return nil
     end
@@ -402,20 +396,20 @@ local function startCookTimer(self, item, campfire, recipe)
     )
 end
 local function onAnyPickup(self)
-    local ____temp_10
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_10 = jass.GetTriggerUnit()
-    else
-        ____temp_10 = nil
-    end
-    local u = ____temp_10
     local ____temp_11
-    if type(jass.GetManipulatedItem) == "function" then
-        ____temp_11 = jass.GetManipulatedItem()
+    if type(jass.GetTriggerUnit) == "function" then
+        ____temp_11 = jass.GetTriggerUnit()
     else
         ____temp_11 = nil
     end
-    local item = ____temp_11
+    local u = ____temp_11
+    local ____temp_12
+    if type(jass.GetManipulatedItem) == "function" then
+        ____temp_12 = jass.GetManipulatedItem()
+    else
+        ____temp_12 = nil
+    end
+    local item = ____temp_12
     if not u or not item then
         return
     end
@@ -444,13 +438,13 @@ local function onAnyPickup(self)
     end
 end
 local function onAnyDeath(self)
-    local ____temp_12
+    local ____temp_13
     if type(jass.GetTriggerUnit) == "function" then
-        ____temp_12 = jass.GetTriggerUnit()
+        ____temp_13 = jass.GetTriggerUnit()
     else
-        ____temp_12 = nil
+        ____temp_13 = nil
     end
-    local u = ____temp_12
+    local u = ____temp_13
     if not u or not isCampfire(nil, u) then
         return
     end
@@ -467,11 +461,11 @@ ____exports["init物品加工"] = function(self)
     if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.Player) ~= "function" then
         return
     end
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_13 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_13 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_13 = 18
+    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 == nil then
+        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 = 18
     end
-    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_13
+    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14
     local trigPick = jass.CreateTrigger()
     do
         local i = 0
@@ -488,11 +482,11 @@ ____exports["init物品加工"] = function(self)
         end
     end
     jass.TriggerAddAction(trigPick, onAnyPickup)
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_14 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_14 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_14 = 19
+    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 = 19
     end
-    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_14
+    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15
     local trigDrop = jass.CreateTrigger()
     do
         local i = 0
@@ -511,20 +505,20 @@ ____exports["init物品加工"] = function(self)
     jass.TriggerAddAction(
         trigDrop,
         function()
-            local ____temp_15
-            if type(jass.GetManipulatingUnit) == "function" then
-                ____temp_15 = jass.GetManipulatingUnit()
-            else
-                ____temp_15 = nil
-            end
-            local unit = ____temp_15
             local ____temp_16
-            if type(jass.GetManipulatedItem) == "function" then
-                ____temp_16 = jass.GetManipulatedItem()
+            if type(jass.GetManipulatingUnit) == "function" then
+                ____temp_16 = jass.GetManipulatingUnit()
             else
                 ____temp_16 = nil
             end
-            local item = ____temp_16
+            local unit = ____temp_16
+            local ____temp_17
+            if type(jass.GetManipulatedItem) == "function" then
+                ____temp_17 = jass.GetManipulatedItem()
+            else
+                ____temp_17 = nil
+            end
+            local item = ____temp_17
             if unit and item and isCampfire(nil, unit) and itemState:has(item) then
                 untrackItem(nil, item)
             end
@@ -532,11 +526,11 @@ ____exports["init物品加工"] = function(self)
     )
     local trigDeath = jass.CreateTrigger()
     if type(jass.TriggerRegisterPlayerUnitEvent) == "function" then
-        local ____jass_EVENT_PLAYER_UNIT_DEATH_17 = jass.EVENT_PLAYER_UNIT_DEATH
-        if ____jass_EVENT_PLAYER_UNIT_DEATH_17 == nil then
-            ____jass_EVENT_PLAYER_UNIT_DEATH_17 = 56
+        local ____jass_EVENT_PLAYER_UNIT_DEATH_18 = jass.EVENT_PLAYER_UNIT_DEATH
+        if ____jass_EVENT_PLAYER_UNIT_DEATH_18 == nil then
+            ____jass_EVENT_PLAYER_UNIT_DEATH_18 = 56
         end
-        local ev = ____jass_EVENT_PLAYER_UNIT_DEATH_17
+        local ev = ____jass_EVENT_PLAYER_UNIT_DEATH_18
         do
             local i = 0
             while i < 16 do
