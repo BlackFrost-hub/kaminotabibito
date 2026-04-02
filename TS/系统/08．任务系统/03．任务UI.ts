@@ -233,7 +233,6 @@ const EMPTY_TEXTS: Record<QuestType, string> = {
 class TaskUI {
   private entryFrame: number | null = null;
   private entryText: number | null = null;
-  private entryHint: number | null = null;
   private mainPanel: number | null = null;
   private listContainer: number | null = null;
   private tabMain: number | null = null;
@@ -360,10 +359,6 @@ class TaskUI {
       }
       applyDzTextFontAndCenterAlignment(this.entryText);
     }
-    this.entryHint = createTextLabel("TaskEntryHint", this.entryFrame, "|cff888888按J打开|r",
-      { relativeTo: this.entryFrame, point: FramePoint.TOP, relativePoint: FramePoint.BOTTOM, x: 0, y: -0.005 },
-      { width: ENTRY_W, height: 0.014 }
-    );
 
     const btn = createFrame({
       type: FrameType.GLUETEXTBUTTON,

@@ -7,6 +7,7 @@
  * - 这里的函数尽量保持：无复杂状态、易复用、参数清晰
  */
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav";
 
@@ -81,4 +82,16 @@ export function fourCCToString(fourcc: number): string {
   const c3 = string.char(Math.floor(fourcc / 65536) % 256);
   const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
   return c4 + c3 + c2 + c1;
+}
+
+/**
+ * 获取单位的攻击类型（Attack Type）
+ * 单位状态0x23对应攻击类型，使用ConvertUnitState转换
+ */
+export function Ir_GetUnitAttackType(u: any): number {
+  return (jass as any).R2I(japi.GetUnitState(u, (jass as any).ConvertUnitState(0x23)));
+}
+
+export function Ir_SetUnitAttackType(u: any, atp: number): void {
+  japi.SetUnitState(u, (jass as any).ConvertUnitState(0x23), atp);
 }

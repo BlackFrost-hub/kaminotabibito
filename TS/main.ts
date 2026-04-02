@@ -26,10 +26,6 @@ const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
 const slk = require("jass.slk") as Record<string, Record<string, Record<string, string>>>;
 (globalThis as any).slk = slk;
-if (g.YDUserDataGet2 && !jass.YDUserDataGet2) jass.YDUserDataGet2 = g.YDUserDataGet2;
-if (g.YDUserDataGet && !jass.YDUserDataGet) jass.YDUserDataGet = g.YDUserDataGet;
-if (g.Ir_GetUnitAttackType && !(jass as any).Ir_GetUnitAttackType) (jass as any).Ir_GetUnitAttackType = g.Ir_GetUnitAttackType;
-if (g.Ir_SetUnitAttackType && !(jass as any).Ir_SetUnitAttackType) (jass as any).Ir_SetUnitAttackType = g.Ir_SetUnitAttackType;
 
 (globalThis as any).print = (...args: any[]) => {
   let str = "";
@@ -90,6 +86,8 @@ require("系统.08．任务系统.07．任务完成");
 require("系统.08．任务系统.08．任务目标更新");
 
 // ---------- UI系统 ----------
+const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
+if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
 require("系统.00．核心系统.06．UI函数");
 require("系统.00．核心系统.11．便捷函数（偶尔用）");
 require("系统.09．表现系统.01．UI工具");

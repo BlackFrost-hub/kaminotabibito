@@ -7,6 +7,7 @@ local ____exports = {}
 -- - 若某类功能已经演化成完整系统（例如 音效函数/漂浮文字/泄露审计），应放到对应模块，不要继续堆在这里
 -- - 这里的函数尽量保持：无复杂状态、易复用、参数清晰
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav"
 --- 调整玩家状态（如金币、木材），在原有基础上增加 delta。
 function ____exports.AdjustPlayerStateBJ(self, delta, whichPlayer, whichPlayerState)
@@ -69,5 +70,20 @@ function ____exports.fourCCToString(self, fourcc)
     local c3 = string.char(math.floor(fourcc / 65536) % 256)
     local c4 = string.char(math.floor(fourcc / 16777216) % 256)
     return ((c4 .. c3) .. c2) .. c1
+end
+--- 获取单位的攻击类型（Attack Type）
+-- 单位状态0x23对应攻击类型，使用ConvertUnitState转换
+function ____exports.Ir_GetUnitAttackType(self, u)
+    return jass.R2I(japi.GetUnitState(
+        u,
+        jass.ConvertUnitState(35)
+    ))
+end
+function ____exports.Ir_SetUnitAttackType(self, u, atp)
+    japi.SetUnitState(
+        u,
+        jass.ConvertUnitState(35),
+        atp
+    )
 end
 return ____exports

@@ -297,7 +297,6 @@ TaskUI.name = "TaskUI"
 function TaskUI.prototype.____constructor(self)
     self.entryFrame = nil
     self.entryText = nil
-    self.entryHint = nil
     self.mainPanel = nil
     self.listContainer = nil
     self.tabMain = nil
@@ -477,20 +476,6 @@ function TaskUI.prototype.createEntryIcon(self, parent)
         end
         applyDzTextFontAndCenterAlignment(nil, self.entryText)
     end
-    self.entryHint = createTextLabel(
-        nil,
-        "TaskEntryHint",
-        self.entryFrame,
-        "|cff888888按J打开|r",
-        {
-            relativeTo = self.entryFrame,
-            point = FramePoint.TOP,
-            relativePoint = FramePoint.BOTTOM,
-            x = 0,
-            y = -0.005
-        },
-        {width = ENTRY_W, height = 0.014}
-    )
     local btn = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
         name = "TaskEntryBtn",
