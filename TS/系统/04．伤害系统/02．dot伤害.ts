@@ -17,6 +17,9 @@
 import type { BuffData } from "../05．Buff系统/01．Buff表";
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
+const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  fourCCToString: (four: number) => string;
+};
 const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as {
   markNextPendingDamageAsDotTickBatch: () => void;
   registerDamageCallback: (
@@ -230,14 +233,6 @@ function isDebuffDotTargetOk(source: any, target: any): boolean {
     if (tp != null) return (jass as any).IsPlayerEnemy(srcP, tp) === true;
   }
   return false;
-}
-
-function fourCCToString(fourcc: number): string {
-  const c1 = string.char(fourcc % 256);
-  const c2 = string.char(Math.floor(fourcc / 256) % 256);
-  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
-  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
-  return c4 + c3 + c2 + c1;
 }
 
 function unitItemInSlot(unit: any, slot: number): any {

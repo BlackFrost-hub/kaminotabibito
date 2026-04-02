@@ -2,19 +2,14 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_TempItemType?: number; udg_TempScoreMin?: number; udg_TempScoreMax?: number; [key: string]: any };
 const mod = require("系统.02．物品系统.01．装备数据") as { items?: Record<string, { score?: number }>; default?: Record<string, { score?: number }> };
+const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+  stringToFourCC: (s: string) => number;
+};
 const itemsData = mod.items ?? mod.default ?? {};
 let _seedCnt = 0;
 // const DEBUG = true;
 const DEBUG = false;
 const ITEM_TRIGGER = "tret"; // 触发物品ID
-
-function stringToFourCC(s: string): number {
-  const b1 = (string as any).byte(s, 1) as number;
-  const b2 = (string as any).byte(s, 2) as number;
-  const b3 = (string as any).byte(s, 3) as number;
-  const b4 = (string as any).byte(s, 4) as number;
-  return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
-}
 
 function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
   const min = minScore ?? 0;

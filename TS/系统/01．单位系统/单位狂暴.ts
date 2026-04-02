@@ -3,17 +3,12 @@
  * 面向与镜头震动通过 JASS 全局 udg_TempUnit[1]/udg_TempReal[1]/udg_TempPlayer 调用 UnitBerserk。
  */
 const jass = require("jass.common") as JassCommon;
+const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+  stringToFourCC: (s: string) => number;
+};
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, DropBerserkEntry> }).default ?? {};
-
-function stringToFourCC(s: string): number {
-  const b1 = (string as any).byte(s, 1) as number;
-  const b2 = (string as any).byte(s, 2) as number;
-  const b3 = (string as any).byte(s, 3) as number;
-  const b4 = (string as any).byte(s, 4) as number;
-  return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
-}
 
 function typeIdToUnitId(typeId: number): string | undefined {
   for (const id in idData) {

@@ -4,14 +4,9 @@
  */
 const jass = require("jass.common") as JassCommon;
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { movespeed2?: number; name?: string; type?: string }> }).default;
-
-function fourCCToString(fourcc: number): string {
-  const c1 = string.char(fourcc % 256);
-  const c2 = string.char(Math.floor(fourcc / 256) % 256);
-  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
-  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
-  return c4 + c3 + c2 + c1;
-}
+const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  fourCCToString: (four: number) => string;
+};
 
 /** 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加） */
 const applied: Record<string, number> = {};

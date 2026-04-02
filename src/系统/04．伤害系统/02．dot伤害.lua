@@ -239,20 +239,20 @@ function dotTickRun(self)
         while i >= 0 do
             local e = dotTicks[i + 1]
             local eh = unitHid(nil, e.target)
-            local ____temp_20
-            if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
-                ____temp_20 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
-            else
-                ____temp_20 = nil
-            end
-            local bid = ____temp_20
             local ____temp_21
-            if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
-                ____temp_21 = buffM:getBuffRuntimeByHid(eh, bid)
+            if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
+                ____temp_21 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
             else
                 ____temp_21 = nil
             end
-            local rt = ____temp_21
+            local bid = ____temp_21
+            local ____temp_22
+            if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
+                ____temp_22 = buffM:getBuffRuntimeByHid(eh, bid)
+            else
+                ____temp_22 = nil
+            end
+            local rt = ____temp_22
             if rt == nil or rt.remaining <= 0.001 then
                 __TS__ArraySplice(dotTicks, i, 1)
             end
@@ -293,17 +293,17 @@ function dotTickRun(self)
                 function(____, c) return c.id == e.typeId end
             )
             local stTab = stateByType[e.typeId]
-            local ____temp_23
+            local ____temp_24
             if stTab ~= nil then
-                local ____tabRowForHid_result_22 = tabRowForHid(nil, stTab, eh)
-                if ____tabRowForHid_result_22 == nil then
-                    ____tabRowForHid_result_22 = stTab[e.target]
+                local ____tabRowForHid_result_23 = tabRowForHid(nil, stTab, eh)
+                if ____tabRowForHid_result_23 == nil then
+                    ____tabRowForHid_result_23 = stTab[e.target]
                 end
-                ____temp_23 = ____tabRowForHid_result_22
+                ____temp_24 = ____tabRowForHid_result_23
             else
-                ____temp_23 = nil
+                ____temp_24 = nil
             end
-            local stateRaw = ____temp_23
+            local stateRaw = ____temp_24
             local state = isValidDotStateRow(nil, stateRaw) and stateRaw or nil
             if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
                 cfg:onTick(e.target, state)
@@ -323,13 +323,15 @@ function dotTickRun(self)
 end
 jass = require("jass.common")
 local g = require("jass.globals")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local fourCCToString = ____require_result_0.fourCCToString
 damageEventModule = require("系统.04．伤害系统.01．伤害事件")
 local leakCore = require("系统.00．核心系统.05．泄露审计")
-local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
-if ____leakCore_LeakWatcher_0 == nil then
-    ____leakCore_LeakWatcher_0 = leakCore
+local ____leakCore_LeakWatcher_1 = leakCore.LeakWatcher
+if ____leakCore_LeakWatcher_1 == nil then
+    ____leakCore_LeakWatcher_1 = leakCore
 end
-LeakWatcher = ____leakCore_LeakWatcher_0
+LeakWatcher = ____leakCore_LeakWatcher_1
 local debuffMod = require("系统.05．Buff系统.01．Buff表")
 local debuffBuffs = debuffMod.buffs
 --- DOT 每跳 `AddSpecialEffectTarget` 的模型路径，与同 ID 行的 `effect` 一致
@@ -337,15 +339,15 @@ local function dotEffectModelFromBuffRow(self, rowId)
     local row = debuffBuffs[rowId]
     return row ~= nil and type(row.effect) == "string" and row.effect ~= "" and row.effect or ""
 end
-local ____opt_1 = debuffBuffs.D001
-local ____temp_9 = ____opt_1 and ____opt_1.buffID or "D001"
-local ____opt_3 = debuffBuffs.D002
-local ____temp_10 = ____opt_3 and ____opt_3.buffID or "D002"
-local ____opt_5 = debuffBuffs.D003
-local ____temp_11 = ____opt_5 and ____opt_5.buffID or "D003"
-local ____opt_7 = debuffBuffs.D004
+local ____opt_2 = debuffBuffs.D001
+local ____temp_10 = ____opt_2 and ____opt_2.buffID or "D001"
+local ____opt_4 = debuffBuffs.D002
+local ____temp_11 = ____opt_4 and ____opt_4.buffID or "D002"
+local ____opt_6 = debuffBuffs.D003
+local ____temp_12 = ____opt_6 and ____opt_6.buffID or "D003"
+local ____opt_8 = debuffBuffs.D004
 --- 与 Buff表 buffID 对齐，供 UI/其它系统引用（新增 Debuff 时在表内加行并在此补键）
-____exports.DOT_DEBUFF_IDS = {antiHeal = ____temp_9, burn = ____temp_10, poison = ____temp_11, trollCurse = ____opt_7 and ____opt_7.buffID or "D004"}
+____exports.DOT_DEBUFF_IDS = {antiHeal = ____temp_10, burn = ____temp_11, poison = ____temp_12, trollCurse = ____opt_8 and ____opt_8.buffID or "D004"}
 dotTypes = {}
 --- 注册一种 DOT，后续伤害回调会按配置解析装备并施加/覆盖
 function ____exports.registerDotType(self, config)
@@ -421,11 +423,11 @@ end
 local function getStructureUnitTypeHandle(self)
     local jc = jass
     local gg = g
-    local ____jc_UNIT_TYPE_STRUCTURE_12 = jc.UNIT_TYPE_STRUCTURE
-    if ____jc_UNIT_TYPE_STRUCTURE_12 == nil then
-        ____jc_UNIT_TYPE_STRUCTURE_12 = gg.UNIT_TYPE_STRUCTURE
+    local ____jc_UNIT_TYPE_STRUCTURE_13 = jc.UNIT_TYPE_STRUCTURE
+    if ____jc_UNIT_TYPE_STRUCTURE_13 == nil then
+        ____jc_UNIT_TYPE_STRUCTURE_13 = gg.UNIT_TYPE_STRUCTURE
     end
-    local direct = ____jc_UNIT_TYPE_STRUCTURE_12
+    local direct = ____jc_UNIT_TYPE_STRUCTURE_13
     if direct ~= nil then
         return direct
     end
@@ -463,13 +465,6 @@ local function isDebuffDotTargetOk(self, source, target)
     end
     return false
 end
-local function fourCCToString(self, fourcc)
-    local c1 = string.char(fourcc % 256)
-    local c2 = string.char(math.floor(fourcc / 256) % 256)
-    local c3 = string.char(math.floor(fourcc / 65536) % 256)
-    local c4 = string.char(math.floor(fourcc / 16777216) % 256)
-    return ((c4 .. c3) .. c2) .. c1
-end
 local function unitItemInSlot(self, unit, slot)
     if type(jass.UnitItemInSlot) ~= "function" then
         return nil
@@ -486,11 +481,11 @@ end
 -- 同 `装备限制` / `任务管理器` 的 `jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)`，不要对常量再套一层 `ConvertUnitType`。
 -- 仅当 jass 与 `jass.globals` 都未注入该常量时，用 `ConvertUnitType(2)` 兜底（common.j 里 HERO=$02）。
 local function heroUnitTypeForIsUnitType(self)
-    local ____jass_UNIT_TYPE_HERO_13 = jass.UNIT_TYPE_HERO
-    if ____jass_UNIT_TYPE_HERO_13 == nil then
-        ____jass_UNIT_TYPE_HERO_13 = g.UNIT_TYPE_HERO
+    local ____jass_UNIT_TYPE_HERO_14 = jass.UNIT_TYPE_HERO
+    if ____jass_UNIT_TYPE_HERO_14 == nil then
+        ____jass_UNIT_TYPE_HERO_14 = g.UNIT_TYPE_HERO
     end
-    local direct = ____jass_UNIT_TYPE_HERO_13
+    local direct = ____jass_UNIT_TYPE_HERO_14
     if direct ~= nil then
         return direct
     end
@@ -542,16 +537,16 @@ function ____exports.syncDotRemainingFromBuffPool(self)
     end
     for typeId in pairs(stateByType) do
         do
-            local __continue63
+            local __continue62
             repeat
                 local tab = stateByType[typeId]
                 if tab == nil then
-                    __continue63 = true
+                    __continue62 = true
                     break
                 end
                 local buffID = map[typeId]
                 if buffID == nil or buffID == "" then
-                    __continue63 = true
+                    __continue62 = true
                     break
                 end
                 local hids = collectHidsInTab(nil, tab)
@@ -559,13 +554,13 @@ function ____exports.syncDotRemainingFromBuffPool(self)
                     local hi = 0
                     while hi < #hids do
                         do
-                            local __continue67
+                            local __continue66
                             repeat
                                 local kn = hids[hi + 1]
                                 local v = tabRowForHid(nil, tab, kn)
                                 if v == nil or not isValidDotStateRow(nil, v) then
                                     tabDeleteHid(nil, tab, kn)
-                                    __continue67 = true
+                                    __continue66 = true
                                     break
                                 end
                                 local rt = buffM:getBuffRuntimeByHid(kn, buffID)
@@ -576,20 +571,20 @@ function ____exports.syncDotRemainingFromBuffPool(self)
                                     )
                                     if cfg ~= nil and type(cfg.onEnd) == "function" then
                                         local uref = v._dotUnitRef
-                                        local ____self_15 = cfg
-                                        local ____self_15_onEnd_16 = ____self_15.onEnd
-                                        local ____temp_14
+                                        local ____self_16 = cfg
+                                        local ____self_16_onEnd_17 = ____self_16.onEnd
+                                        local ____temp_15
                                         if uref ~= nil then
-                                            ____temp_14 = uref
+                                            ____temp_15 = uref
                                         else
-                                            ____temp_14 = kn
+                                            ____temp_15 = kn
                                         end
-                                        ____self_15_onEnd_16(____self_15, ____temp_14, v)
+                                        ____self_16_onEnd_17(____self_16, ____temp_15, v)
                                     end
                                     notifyBuffPool(nil, typeId, kn, nil)
                                     tabDeleteHid(nil, tab, kn)
                                     removeDotTicksForTargetHid(nil, typeId, kn)
-                                    __continue67 = true
+                                    __continue66 = true
                                     break
                                 end
                                 v.remaining = rt.remaining
@@ -600,18 +595,18 @@ function ____exports.syncDotRemainingFromBuffPool(self)
                                 if rt._dotParsedDuration ~= nil then
                                     v._dotParsedDuration = rt._dotParsedDuration
                                 end
-                                __continue67 = true
+                                __continue66 = true
                             until true
-                            if not __continue67 then
+                            if not __continue66 then
                                 break
                             end
                         end
                         hi = hi + 1
                     end
                 end
-                __continue63 = true
+                __continue62 = true
             until true
-            if not __continue63 then
+            if not __continue62 then
                 break
             end
         end
@@ -635,15 +630,15 @@ function ____exports.clearDotByBuffPoolExpire(self, buffID, hid)
         )
         if cfg ~= nil and type(cfg.onEnd) == "function" then
             local uref = v._dotUnitRef
-            local ____self_18 = cfg
-            local ____self_18_onEnd_19 = ____self_18.onEnd
-            local ____temp_17
+            local ____self_19 = cfg
+            local ____self_19_onEnd_20 = ____self_19.onEnd
+            local ____temp_18
             if uref ~= nil then
-                ____temp_17 = uref
+                ____temp_18 = uref
             else
-                ____temp_17 = hid
+                ____temp_18 = hid
             end
-            ____self_18_onEnd_19(____self_18, ____temp_17, v)
+            ____self_19_onEnd_20(____self_19, ____temp_18, v)
         end
     end
     tabDeleteHid(nil, tab, hid)
@@ -663,22 +658,22 @@ function ____exports.tryApplyHeroAttackGearDots(self, source, target, _damage)
         local t = 0
         while t < #dotTypes do
             do
-                local __continue85
+                local __continue84
                 repeat
                     local cfg = dotTypes[t + 1]
                     local typeId = cfg.id
                     if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
-                        __continue85 = true
+                        __continue84 = true
                         break
                     end
                     local best = cfg:getBestFromUnit(source)
                     if best == nil then
-                        __continue85 = true
+                        __continue84 = true
                         break
                     end
                     local amount = cfg:computeAmount(target, best)
                     if amount <= 0 then
-                        __continue85 = true
+                        __continue84 = true
                         break
                     end
                     if stateByType[typeId] == nil then
@@ -702,9 +697,9 @@ function ____exports.tryApplyHeroAttackGearDots(self, source, target, _damage)
                         best.duration,
                         cur
                     )
-                    __continue85 = true
+                    __continue84 = true
                 until true
-                if not __continue85 then
+                if not __continue84 then
                     break
                 end
             end
@@ -836,41 +831,41 @@ local function onDamage(self, target, damage, damageType, fromDotTickBatch, sour
         local t = 0
         while t < #dotTypes do
             do
-                local __continue153
+                local __continue152
                 repeat
                     local cfg = dotTypes[t + 1]
                     local typeId = cfg.id
                     if ignoredTargetByType[typeId] ~= nil and ignoredTargetByType[typeId][tgtHid] == true then
                         __TS__Delete(ignoredTargetByType[typeId], tgtHid)
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     if suppressDotApplyForBatch then
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     if isAttackHitForDot then
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     local best = cfg:getBestFromUnit(source)
                     if best == nil then
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     if best.attackOnly == true or cfg.attackOnlyTrigger == true then
                         if not isAttackHitForDot then
-                            __continue153 = true
+                            __continue152 = true
                             break
                         end
                     end
                     local amount = cfg:computeAmount(target, best)
                     if amount <= 0 then
-                        __continue153 = true
+                        __continue152 = true
                         break
                     end
                     if stateByType[typeId] == nil then
@@ -909,9 +904,9 @@ local function onDamage(self, target, damage, damageType, fromDotTickBatch, sour
                             cur
                         )
                     end
-                    __continue153 = true
+                    __continue152 = true
                 until true
-                if not __continue153 then
+                if not __continue152 then
                     break
                 end
             end
@@ -1045,11 +1040,11 @@ local function getBestAntiHealFromUnit(self, unit)
         local slot = 0
         while slot <= 5 do
             do
-                local __continue199
+                local __continue198
                 repeat
                     local item = unitItemInSlot(nil, unit, slot)
                     if not item then
-                        __continue199 = true
+                        __continue198 = true
                         break
                     end
                     local idStr = fourCCToString(
@@ -1062,29 +1057,29 @@ local function getBestAntiHealFromUnit(self, unit)
                         local si = 0
                         while si < #segments do
                             do
-                                local __continue202
+                                local __continue201
                                 repeat
                                     local parsed = parseAntiHealBuff(nil, segments[si + 1])
                                     if not parsed then
-                                        __continue202 = true
+                                        __continue201 = true
                                         break
                                     end
                                     local product = parsed.effectPct * parsed.duration
                                     if best == nil or product > best.product then
                                         best = {effectPct = parsed.effectPct, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
                                     end
-                                    __continue202 = true
+                                    __continue201 = true
                                 until true
-                                if not __continue202 then
+                                if not __continue201 then
                                     break
                                 end
                             end
                             si = si + 1
                         end
                     end
-                    __continue199 = true
+                    __continue198 = true
                 until true
-                if not __continue199 then
+                if not __continue198 then
                     break
                 end
             end
@@ -1150,11 +1145,11 @@ local function getBestBurnFromUnit(self, unit)
         local slot = 0
         while slot <= 5 do
             do
-                local __continue220
+                local __continue219
                 repeat
                     local item = unitItemInSlot(nil, unit, slot)
                     if not item then
-                        __continue220 = true
+                        __continue219 = true
                         break
                     end
                     local idStr = fourCCToString(
@@ -1167,29 +1162,29 @@ local function getBestBurnFromUnit(self, unit)
                         local si = 0
                         while si < #segments do
                             do
-                                local __continue223
+                                local __continue222
                                 repeat
                                     local parsed = parseBurnBuff(nil, segments[si + 1])
                                     if not parsed then
-                                        __continue223 = true
+                                        __continue222 = true
                                         break
                                     end
                                     local product = parsed.damagePerSec * parsed.duration
                                     if best == nil or product > best.product then
                                         best = {damagePerSec = parsed.damagePerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
                                     end
-                                    __continue223 = true
+                                    __continue222 = true
                                 until true
-                                if not __continue223 then
+                                if not __continue222 then
                                     break
                                 end
                             end
                             si = si + 1
                         end
                     end
-                    __continue220 = true
+                    __continue219 = true
                 until true
-                if not __continue220 then
+                if not __continue219 then
                     break
                 end
             end
@@ -1280,11 +1275,11 @@ local function getBestPoisonFromUnit(self, unit)
         local slot = 0
         while slot <= 5 do
             do
-                local __continue242
+                local __continue241
                 repeat
                     local item = unitItemInSlot(nil, unit, slot)
                     if not item then
-                        __continue242 = true
+                        __continue241 = true
                         break
                     end
                     local idStr = fourCCToString(
@@ -1297,29 +1292,29 @@ local function getBestPoisonFromUnit(self, unit)
                         local si = 0
                         while si < #segments do
                             do
-                                local __continue245
+                                local __continue244
                                 repeat
                                     local parsed = parsePoisonBuff(nil, segments[si + 1])
                                     if not parsed then
-                                        __continue245 = true
+                                        __continue244 = true
                                         break
                                     end
                                     local product = parsed.damagePerSec * parsed.duration
                                     if best == nil or product > best.product then
                                         best = {damagePerSec = parsed.damagePerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
                                     end
-                                    __continue245 = true
+                                    __continue244 = true
                                 until true
-                                if not __continue245 then
+                                if not __continue244 then
                                     break
                                 end
                             end
                             si = si + 1
                         end
                     end
-                    __continue242 = true
+                    __continue241 = true
                 until true
-                if not __continue242 then
+                if not __continue241 then
                     break
                 end
             end
@@ -1404,11 +1399,11 @@ local function getBestTrollCurseFromUnit(self, unit)
         local slot = 0
         while slot <= 5 do
             do
-                local __continue266
+                local __continue265
                 repeat
                     local item = unitItemInSlot(nil, unit, slot)
                     if not item then
-                        __continue266 = true
+                        __continue265 = true
                         break
                     end
                     local idStr = fourCCToString(
@@ -1421,29 +1416,29 @@ local function getBestTrollCurseFromUnit(self, unit)
                         local si = 0
                         while si < #segments do
                             do
-                                local __continue269
+                                local __continue268
                                 repeat
                                     local parsed = parseTrollCurseBuff(nil, segments[si + 1])
                                     if not parsed then
-                                        __continue269 = true
+                                        __continue268 = true
                                         break
                                     end
                                     local product = parsed.pctMaxHpPerSec * parsed.duration
                                     if best == nil or product > best.product then
                                         best = {pctMaxHpPerSec = parsed.pctMaxHpPerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
                                     end
-                                    __continue269 = true
+                                    __continue268 = true
                                 until true
-                                if not __continue269 then
+                                if not __continue268 then
                                     break
                                 end
                             end
                             si = si + 1
                         end
                     end
-                    __continue266 = true
+                    __continue265 = true
                 until true
-                if not __continue266 then
+                if not __continue265 then
                     break
                 end
             end
@@ -1475,13 +1470,13 @@ local function getDotStateByTypeId(self, typeId, unit)
         return nil
     end
     local h = unitHid(nil, unit)
-    local ____temp_32
+    local ____temp_33
     if h ~= 0 then
-        ____temp_32 = tabRowForHid(nil, tab, h)
+        ____temp_33 = tabRowForHid(nil, tab, h)
     else
-        ____temp_32 = nil
+        ____temp_33 = nil
     end
-    local raw = ____temp_32
+    local raw = ____temp_33
     if raw ~= nil then
         return isValidDotStateRow(nil, raw) and raw or nil
     end

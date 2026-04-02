@@ -13,8 +13,10 @@ local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = ____04_FF0E_6FC0_6D3B_4F20_9001_
 -- - 首次有**任意单位**进入范围：将传送点单位交给玩家 7、若有 reveal 则 **SetFogStateRect(Player(0), FOG_OF_WAR_VISIBLE, rect, true)**（单份矩形雾，不创建多份修饰器）、**仅玩家 1～4** 显示提示文本；**DestroyTrigger** 排泄事件，不保留检测。
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.02．音效函数")
-local Sound3DII_Mp3Play = ____require_result_0.Sound3DII_Mp3Play
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local stringToFourCC = ____require_result_0.stringToFourCC
+local ____require_result_1 = require("系统.00．核心系统.02．音效函数")
+local Sound3DII_Mp3Play = ____require_result_1.Sound3DII_Mp3Play
 local ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
 -- 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
@@ -27,13 +29,13 @@ local function neutralPassivePlayer(self)
     if type(jass.Player) ~= "function" then
         return nil
     end
-    local ____temp_1
+    local ____temp_2
     if jass.PLAYER_NEUTRAL_PASSIVE ~= nil then
-        ____temp_1 = jass.PLAYER_NEUTRAL_PASSIVE
+        ____temp_2 = jass.PLAYER_NEUTRAL_PASSIVE
     else
-        ____temp_1 = 15
+        ____temp_2 = 15
     end
-    local pid = ____temp_1
+    local pid = ____temp_2
     return jass.Player(pid)
 end
 local function dbg(self, _msg)
@@ -132,16 +134,6 @@ local function scheduleDebugGgUnitHtow0030(self)
         end
     )
 end
-local function stringToFourCC(self, s)
-    if s == nil or #s < 4 then
-        return 0
-    end
-    local b1 = string.byte(s, 1) or 0 / 0
-    local b2 = string.byte(s, 2) or 0 / 0
-    local b3 = string.byte(s, 3) or 0 / 0
-    local b4 = string.byte(s, 4) or 0 / 0
-    return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4
-end
 local function parseCoord(self, v)
     if v == nil or v == nil then
         return nil
@@ -172,13 +164,13 @@ local function resolveWatchUnit(self, cfg)
         if passive == nil or type(jass.CreateUnit) ~= "function" then
             return nil
         end
-        local ____temp_2
+        local ____temp_3
         if type(jass.bj_UNIT_FACING) == "number" then
-            ____temp_2 = jass.bj_UNIT_FACING
+            ____temp_3 = jass.bj_UNIT_FACING
         else
-            ____temp_2 = 270
+            ____temp_3 = 270
         end
-        local face = ____temp_2
+        local face = ____temp_3
         local u = jass.CreateUnit(
             passive,
             four,
@@ -186,13 +178,13 @@ local function resolveWatchUnit(self, cfg)
             ty,
             face
         )
-        local ____temp_3
+        local ____temp_4
         if u ~= nil and u ~= 0 then
-            ____temp_3 = u
+            ____temp_4 = u
         else
-            ____temp_3 = nil
+            ____temp_4 = nil
         end
-        return ____temp_3
+        return ____temp_4
     end
     if cfg.UnitID ~= nil and (string.find(cfg.UnitID, "gg_", nil, true) or 0) - 1 == 0 then
         return resolveGgUnitByKey(nil, cfg.UnitID)
@@ -270,13 +262,13 @@ local function registerOnePoint(self, cfg, key)
             if fired then
                 return
             end
-            local ____temp_4
+            local ____temp_5
             if type(jass.GetTriggerUnit) == "function" then
-                ____temp_4 = jass.GetTriggerUnit()
+                ____temp_5 = jass.GetTriggerUnit()
             else
-                ____temp_4 = nil
+                ____temp_5 = nil
             end
-            local enterer = ____temp_4
+            local enterer = ____temp_5
             if enterer == nil or enterer == 0 then
                 return
             end
@@ -292,18 +284,18 @@ local function initActivationPointsInternal(self)
     local count = 0
     for key in pairs(_____6FC0_6D3B_4F20_9001_70B9_914D_7F6E) do
         do
-            local __continue57
+            local __continue55
             repeat
                 local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
                 if not cfg or cfg.enabled == false then
-                    __continue57 = true
+                    __continue55 = true
                     break
                 end
                 registerOnePoint(nil, cfg, key)
                 count = count + 1
-                __continue57 = true
+                __continue55 = true
             until true
-            if not __continue57 then
+            if not __continue55 then
                 break
             end
         end

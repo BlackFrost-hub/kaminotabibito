@@ -5,6 +5,8 @@ local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local fourCCToString = ____require_result_0.fourCCToString
 --- 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`）
 local g = require("jass.globals")
 --- 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制
@@ -30,13 +32,6 @@ local PREFIX = "|cffffff00『系统提示』：|r"
 local COLOR_TYPE = "|cff00ff00"
 local COLOR_NAME = "|cff00bfff"
 local COLOR_ERR = "|cffff0000"
-local function fourCCToString(self, four)
-    local a = math.floor(four / 16777216) % 256
-    local b = math.floor(four / 65536) % 256
-    local c = math.floor(four / 256) % 256
-    local d = four % 256
-    return string.char(a, b, c, d)
-end
 local function getEntry(self, itemTypeId)
     local id = fourCCToString(nil, itemTypeId)
     return itemsData[id]
@@ -107,21 +102,21 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
         local i = 0
         while i <= 5 do
             do
-                local __continue21
+                local __continue20
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it or it == item then
-                        __continue21 = true
+                        __continue20 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue21 = true
+                        __continue20 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue21 = true
+                        __continue20 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -139,9 +134,9 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue21 = true
+                    __continue20 = true
                 until true
-                if not __continue21 then
+                if not __continue20 then
                     break
                 end
             end
@@ -181,15 +176,15 @@ local function onPickup(self)
     if isEquipLimitDisabledByJass(nil) then
         return
     end
-    local ____opt_0 = jass.GetManipulatingUnit
-    local ____temp_4 = ____opt_0 and ____opt_0(jass)
-    if ____temp_4 == nil then
-        local ____opt_2 = jass.GetTriggerUnit
-        ____temp_4 = ____opt_2 and ____opt_2(jass)
+    local ____opt_1 = jass.GetManipulatingUnit
+    local ____temp_5 = ____opt_1 and ____opt_1(jass)
+    if ____temp_5 == nil then
+        local ____opt_3 = jass.GetTriggerUnit
+        ____temp_5 = ____opt_3 and ____opt_3(jass)
     end
-    local unit = ____temp_4
-    local ____opt_5 = jass.GetManipulatedItem
-    local item = ____opt_5 and ____opt_5(jass)
+    local unit = ____temp_5
+    local ____opt_6 = jass.GetManipulatedItem
+    local item = ____opt_6 and ____opt_6(jass)
     if not unit or not item then
         return
     end
@@ -221,11 +216,11 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue49
+                local __continue48
                 repeat
                     if __TS__StringSubstring(s, i, i + 2) == "|r" then
                         i = i + 2
-                        __continue49 = true
+                        __continue48 = true
                         break
                     end
                     if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
@@ -244,15 +239,15 @@ local function onPickup(self)
                         end
                         if hex then
                             i = i + 10
-                            __continue49 = true
+                            __continue48 = true
                             break
                         end
                     end
                     out = out .. __TS__StringAccess(s, i)
                     i = i + 1
-                    __continue49 = true
+                    __continue48 = true
                 until true
-                if not __continue49 then
+                if not __continue48 then
                     break
                 end
             end
@@ -278,21 +273,21 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue58
+                local __continue57
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it then
-                        __continue58 = true
+                        __continue57 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue58 = true
+                        __continue57 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue58 = true
+                        __continue57 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -310,9 +305,9 @@ local function onPickup(self)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue58 = true
+                    __continue57 = true
                 until true
-                if not __continue58 then
+                if not __continue57 then
                     break
                 end
             end
@@ -363,18 +358,18 @@ local function onPickup(self)
     )
 end
 local function isHeroCond(self)
-    local ____opt_7 = jass.GetTriggerUnit
-    local ____temp_11 = ____opt_7 and ____opt_7(jass)
-    if ____temp_11 == nil then
-        local ____this_10
-        ____this_10 = jass
-        local ____opt_9 = ____this_10.GetManipulatingUnit
-        if ____opt_9 ~= nil then
-            ____opt_9 = ____opt_9(____this_10)
+    local ____opt_8 = jass.GetTriggerUnit
+    local ____temp_12 = ____opt_8 and ____opt_8(jass)
+    if ____temp_12 == nil then
+        local ____this_11
+        ____this_11 = jass
+        local ____opt_10 = ____this_11.GetManipulatingUnit
+        if ____opt_10 ~= nil then
+            ____opt_10 = ____opt_10(____this_11)
         end
-        ____temp_11 = ____opt_9
+        ____temp_12 = ____opt_10
     end
-    local u = ____temp_11
+    local u = ____temp_12
     return u ~= nil and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
 end
 local function init(self)

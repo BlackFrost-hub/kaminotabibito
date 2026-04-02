@@ -15,24 +15,24 @@ function getItemsByScoreRange(self, minScore, maxScore)
     local result = {}
     for id in pairs(itemsData) do
         do
-            local __continue83
+            local __continue82
             repeat
                 if type(id) ~= "string" or #id ~= 4 then
-                    __continue83 = true
+                    __continue82 = true
                     break
                 end
                 local entry = itemsData[id]
                 local score = entry and entry.score
                 if type(score) ~= "number" then
-                    __continue83 = true
+                    __continue82 = true
                     break
                 end
                 if score >= minScore and score <= maxScore then
                     result[#result + 1] = id
                 end
-                __continue83 = true
+                __continue82 = true
             until true
-            if not __continue83 then
+            if not __continue82 then
                 break
             end
         end
@@ -49,6 +49,8 @@ end
 local jass = require("jass.common")
 local g = require("jass.globals")
 local equipExcrete = require("系统.02．物品系统.09．装备排泄")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local stringToFourCC = ____require_result_0.stringToFourCC
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})
 itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
 local PREFIX = "|cffffff00『系统提示』：|r";
@@ -67,13 +69,6 @@ local PREFIX = "|cffffff00『系统提示』：|r";
         end
     end
 end)(nil)
-local function stringToFourCC(self, s)
-    local b1 = string.byte(s, 1)
-    local b2 = string.byte(s, 2)
-    local b3 = string.byte(s, 3)
-    local b4 = string.byte(s, 4)
-    return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4
-end
 local function typeIdToUnitId(self, typeId)
     for id in pairs(idData) do
         if stringToFourCC(nil, id) == typeId then
@@ -103,11 +98,11 @@ local function parseItemPool(self, itemIdsStr)
     if hasColon then
         for ____, p in ipairs(parts) do
             do
-                local __continue17
+                local __continue16
                 repeat
                     local colon = (string.find(p, ":", nil, true) or 0) - 1
                     if colon < 0 then
-                        __continue17 = true
+                        __continue16 = true
                         break
                     end
                     local id = __TS__StringTrim(__TS__StringSubstring(p, 0, colon))
@@ -129,9 +124,9 @@ local function parseItemPool(self, itemIdsStr)
                             always = always
                         }
                     end
-                    __continue17 = true
+                    __continue16 = true
                 until true
-                if not __continue17 then
+                if not __continue16 then
                     break
                 end
             end
@@ -169,11 +164,11 @@ local function weightedPickOne(self, pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_0 = pool[math.random(1, #pool)]
-        if ____opt_0 ~= nil then
-            ____opt_0 = ____opt_0.id
+        local ____opt_1 = pool[math.random(1, #pool)]
+        if ____opt_1 ~= nil then
+            ____opt_1 = ____opt_1.id
         end
-        return ____opt_0
+        return ____opt_1
     end
     local r = math.random(1, 10000) / 10000 * sum
     local acc = 0
@@ -198,21 +193,21 @@ local function pickFromWeightedPool(self, pool, picks)
     local out = {}
     for ____, p in ipairs(pool) do
         if p.weight >= 1 or p.always then
-            local ____this_3
-            ____this_3 = _G
-            local ____opt_2 = ____this_3.print
-            if ____opt_2 ~= nil then
-                ____opt_2(____this_3, "[装备掉落] 必掉物品:", p.id, p.weight)
+            local ____this_4
+            ____this_4 = _G
+            local ____opt_3 = ____this_4.print
+            if ____opt_3 ~= nil then
+                ____opt_3(____this_4, "[装备掉落] 必掉物品:", p.id, p.weight)
             end
             out[#out + 1] = p.id
         else
             local r = math.random(1, 10000) / 10000
-            local ____this_5
-            ____this_5 = _G
-            local ____opt_4 = ____this_5.print
-            if ____opt_4 ~= nil then
-                ____opt_4(
-                    ____this_5,
+            local ____this_6
+            ____this_6 = _G
+            local ____opt_5 = ____this_6.print
+            if ____opt_5 ~= nil then
+                ____opt_5(
+                    ____this_6,
                     "[装备掉落] 概率判定:",
                     p.id,
                     "weight:",
@@ -319,12 +314,12 @@ local function onUnitDeath(self)
     local typeId = jass.GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(nil, typeId)
     local entry = unitId and idData[unitId] or nil
-    local ____this_9
-    ____this_9 = _G
-    local ____opt_6 = ____this_9.print
-    if ____opt_6 ~= nil then
-        ____opt_6(
-            ____this_9,
+    local ____this_10
+    ____this_10 = _G
+    local ____opt_7 = ____this_10.print
+    if ____opt_7 ~= nil then
+        ____opt_7(
+            ____this_10,
             "[装备掉落] 单位死亡 typeId:",
             typeId,
             "unitId:",
@@ -334,11 +329,11 @@ local function onUnitDeath(self)
         )
     end
     if entry and entry.itemIds ~= nil then
-        local ____this_11
-        ____this_11 = _G
-        local ____opt_10 = ____this_11.print
-        if ____opt_10 ~= nil then
-            ____opt_10(____this_11, "[装备掉落] 找到掉落表 itemIds:", entry.itemIds)
+        local ____this_12
+        ____this_12 = _G
+        local ____opt_11 = ____this_12.print
+        if ____opt_11 ~= nil then
+            ____opt_11(____this_12, "[装备掉落] 找到掉落表 itemIds:", entry.itemIds)
         end
         local dropProc = entry.dropProc ~= nil and __TS__Number(entry.dropProc) or 1
         local r = math.random(1, 10000)
@@ -369,20 +364,20 @@ local function onUnitDeath(self)
     local DROP_RULES = {{unitId = "hfoo", minScore = 150, maxScore = 250, proc = 1}}
     for ____, rule in ipairs(DROP_RULES) do
         do
-            local __continue76
+            local __continue75
             repeat
                 if typeId ~= stringToFourCC(nil, rule.unitId) then
-                    __continue76 = true
+                    __continue75 = true
                     break
                 end
                 local r = math.random(1, 10000)
                 if r > rule.proc * 10000 then
-                    __continue76 = true
+                    __continue75 = true
                     break
                 end
                 local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
                 if #list == 0 then
-                    __continue76 = true
+                    __continue75 = true
                     break
                 end
                 local idx = math.random(1, #list)
@@ -392,7 +387,7 @@ local function onUnitDeath(self)
                 end
                 break
             until true
-            if not __continue76 then
+            if not __continue75 then
                 break
             end
         end
@@ -413,11 +408,11 @@ local function condition(self)
 end
 local function init(self)
     local trig = jass.CreateTrigger()
-    local ____jass_EVENT_PLAYER_UNIT_DEATH_14 = jass.EVENT_PLAYER_UNIT_DEATH
-    if ____jass_EVENT_PLAYER_UNIT_DEATH_14 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DEATH_14 = 52
+    local ____jass_EVENT_PLAYER_UNIT_DEATH_15 = jass.EVENT_PLAYER_UNIT_DEATH
+    if ____jass_EVENT_PLAYER_UNIT_DEATH_15 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DEATH_15 = 52
     end
-    local eventId = ____jass_EVENT_PLAYER_UNIT_DEATH_14
+    local eventId = ____jass_EVENT_PLAYER_UNIT_DEATH_15
     do
         local i = 0
         while i < 16 do
@@ -430,31 +425,31 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_17
-    ____this_17 = jass
-    local ____opt_15 = ____this_17.Player
-    if ____opt_15 ~= nil then
-        local ____jass_PLAYER_NEUTRAL_AGGRESSIVE_16 = jass.PLAYER_NEUTRAL_AGGRESSIVE
-        if ____jass_PLAYER_NEUTRAL_AGGRESSIVE_16 == nil then
-            ____jass_PLAYER_NEUTRAL_AGGRESSIVE_16 = 13
+    local ____this_18
+    ____this_18 = jass
+    local ____opt_16 = ____this_18.Player
+    if ____opt_16 ~= nil then
+        local ____jass_PLAYER_NEUTRAL_AGGRESSIVE_17 = jass.PLAYER_NEUTRAL_AGGRESSIVE
+        if ____jass_PLAYER_NEUTRAL_AGGRESSIVE_17 == nil then
+            ____jass_PLAYER_NEUTRAL_AGGRESSIVE_17 = 13
         end
-        ____opt_15 = ____opt_15(____this_17, ____jass_PLAYER_NEUTRAL_AGGRESSIVE_16)
+        ____opt_16 = ____opt_16(____this_18, ____jass_PLAYER_NEUTRAL_AGGRESSIVE_17)
     end
-    local neutral = ____opt_15
+    local neutral = ____opt_16
     if neutral ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, neutral, eventId, nil)
     end
-    local ____this_20
-    ____this_20 = jass
-    local ____opt_18 = ____this_20.Player
-    if ____opt_18 ~= nil then
-        local ____jass_PLAYER_NEUTRAL_PASSIVE_19 = jass.PLAYER_NEUTRAL_PASSIVE
-        if ____jass_PLAYER_NEUTRAL_PASSIVE_19 == nil then
-            ____jass_PLAYER_NEUTRAL_PASSIVE_19 = 15
+    local ____this_21
+    ____this_21 = jass
+    local ____opt_19 = ____this_21.Player
+    if ____opt_19 ~= nil then
+        local ____jass_PLAYER_NEUTRAL_PASSIVE_20 = jass.PLAYER_NEUTRAL_PASSIVE
+        if ____jass_PLAYER_NEUTRAL_PASSIVE_20 == nil then
+            ____jass_PLAYER_NEUTRAL_PASSIVE_20 = 15
         end
-        ____opt_18 = ____opt_18(____this_20, ____jass_PLAYER_NEUTRAL_PASSIVE_19)
+        ____opt_19 = ____opt_19(____this_21, ____jass_PLAYER_NEUTRAL_PASSIVE_20)
     end
-    local neutralPassive = ____opt_18
+    local neutralPassive = ____opt_19
     if neutralPassive ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, neutralPassive, eventId, nil)
     end

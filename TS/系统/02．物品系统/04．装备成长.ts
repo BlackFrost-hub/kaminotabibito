@@ -7,7 +7,10 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [k: string]: any };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
-const { AddGoldWithFeedback } = require("系统.00．核心系统.01．封装函数") as { AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void };
+const { AddGoldWithFeedback, fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
+  fourCCToString: (four: number) => string;
+};
 
 /** key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致） */
 const KEY_TO_NAME: Record<string, string> = {
@@ -36,14 +39,6 @@ const KEY_TO_NAME: Record<string, string> = {
   dmgBonus: "伤害%", finalDamageMultiplier: "最终伤害%", expGainRate: "经验获取率",
   hpPct: "最大生命值%", baseDmgPct: "基础攻击力%",
 };
-
-function fourCCToString(fourcc: number): string {
-  const c1 = string.char(fourcc % 256);
-  const c2 = string.char(Math.floor(fourcc / 256) % 256);
-  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
-  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
-  return c4 + c3 + c2 + c1;
-}
 
 /** 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key */
 function findStatKey(raw: string): string {

@@ -60,3 +60,25 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
     Sound3DII_Mp3Play(SOUND_GOLD, p);
   }
 }
+
+/**
+ * 将 4 字符字符串转换为 FourCC 数字（用于物品/单位 ID）
+ */
+export function stringToFourCC(s: string): number {
+  const b1 = (string as any).byte(s, 1) as number;
+  const b2 = (string as any).byte(s, 2) as number;
+  const b3 = (string as any).byte(s, 3) as number;
+  const b4 = (string as any).byte(s, 4) as number;
+  return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
+}
+
+/**
+ * 将 FourCC 数字转换为 4 字符字符串
+ */
+export function fourCCToString(fourcc: number): string {
+  const c1 = string.char(fourcc % 256);
+  const c2 = string.char(Math.floor(fourcc / 256) % 256);
+  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
+  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
+  return c4 + c3 + c2 + c1;
+}

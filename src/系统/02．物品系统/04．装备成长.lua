@@ -16,6 +16,7 @@ local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local AddGoldWithFeedback = ____require_result_0.AddGoldWithFeedback
+local fourCCToString = ____require_result_0.fourCCToString
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
 local KEY_TO_NAME = {
     hp = "生命值",
@@ -84,13 +85,6 @@ local KEY_TO_NAME = {
     hpPct = "最大生命值%",
     baseDmgPct = "基础攻击力%"
 }
-local function fourCCToString(self, fourcc)
-    local c1 = string.char(fourcc % 256)
-    local c2 = string.char(math.floor(fourcc / 256) % 256)
-    local c3 = string.char(math.floor(fourcc / 65536) % 256)
-    local c4 = string.char(math.floor(fourcc / 16777216) % 256)
-    return ((c4 .. c3) .. c2) .. c1
-end
 --- 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key
 local function findStatKey(self, raw)
     if KEY_TO_NAME[raw] ~= nil then
@@ -111,11 +105,11 @@ local function parsePowerUP(self, powerUpStr)
         local si = 0
         while si < #rawSegs do
             do
-                local __continue10
+                local __continue9
                 repeat
                     local rawSeg = __TS__StringTrim(rawSegs[si + 1])
                     if rawSeg == "" then
-                        __continue10 = true
+                        __continue9 = true
                         break
                     end
                     local tokens = __TS__ArrayFilter(
@@ -141,7 +135,7 @@ local function parsePowerUP(self, powerUpStr)
                     local effects = {}
                     for ____, t in ipairs(effectTokens) do
                         do
-                            local __continue19
+                            local __continue18
                             repeat
                                 local tl0 = string.lower(t)
                                 if __TS__StringEndsWith(tl0, "gold") then
@@ -153,7 +147,7 @@ local function parsePowerUP(self, powerUpStr)
                                         ))
                                         local pctNum = __TS__ParseFloat(pctStr) or 0
                                         effects[#effects + 1] = {type = "gold", isPct = true, value = pctNum / 100, isLevelMult = false}
-                                        __continue19 = true
+                                        __continue18 = true
                                         break
                                     end
                                     local core = __TS__StringTrim(__TS__StringSubstring(t, 0, #t - 4))
@@ -182,13 +176,13 @@ local function parsePowerUP(self, powerUpStr)
                                             max = v
                                         }
                                     end
-                                    __continue19 = true
+                                    __continue18 = true
                                     break
                                 end
                                 if (string.find(t, "(level*", nil, true) or 0) - 1 == 0 then
                                     local closeIdx = (string.find(t, ")", nil, true) or 0) - 1
                                     if closeIdx < 0 then
-                                        __continue19 = true
+                                        __continue18 = true
                                         break
                                     end
                                     local mult = __TS__ParseFloat(__TS__StringSubstring(t, 7, closeIdx)) or 0
@@ -210,7 +204,7 @@ local function parsePowerUP(self, powerUpStr)
                                             }
                                         end
                                     end
-                                    __continue19 = true
+                                    __continue18 = true
                                     break
                                 end
                                 local pctIdx = (string.find(t, "%", nil, true) or 0) - 1
@@ -257,9 +251,9 @@ local function parsePowerUP(self, powerUpStr)
                                         }
                                     end
                                 end
-                                __continue19 = true
+                                __continue18 = true
                             until true
-                            if not __continue19 then
+                            if not __continue18 then
                                 break
                             end
                         end
@@ -267,9 +261,9 @@ local function parsePowerUP(self, powerUpStr)
                     if #effects > 0 then
                         segments[#segments + 1] = {effects = effects, timeSec = timeSec}
                     end
-                    __continue10 = true
+                    __continue9 = true
                 until true
-                if not __continue10 then
+                if not __continue9 then
                     break
                 end
             end
@@ -473,7 +467,7 @@ local function executeSegment(self, unit, seg)
     local goldFixed = {}
     for ____, eff in ipairs(seg.effects) do
         do
-            local __continue70
+            local __continue69
             repeat
                 if eff.type == "gold" then
                     if eff.isPct then
@@ -495,7 +489,7 @@ local function executeSegment(self, unit, seg)
                 elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                     local name = KEY_TO_NAME[eff.key]
                     if name == nil then
-                        __continue70 = true
+                        __continue69 = true
                         break
                     end
                     local val
@@ -508,9 +502,9 @@ local function executeSegment(self, unit, seg)
                     end
                     statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
                 end
-                __continue70 = true
+                __continue69 = true
             until true
-            if not __continue70 then
+            if not __continue69 then
                 break
             end
         end

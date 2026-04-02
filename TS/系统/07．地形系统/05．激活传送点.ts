@@ -7,6 +7,9 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
+const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+  stringToFourCC: (s: string) => number;
+};
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3Play } = require("系统.00．核心系统.02．音效函数") as {
   Sound3DII_Mp3Play: (path: string, player?: any) => void;
@@ -100,15 +103,6 @@ function scheduleDebugGgUnitHtow0030(): void {
     if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(tm1);
     runSnapshot("1s");
   });
-}
-
-function stringToFourCC(s: string): number {
-  if (s == null || s.length < 4) return 0;
-  const b1 = s.charCodeAt(0);
-  const b2 = s.charCodeAt(1);
-  const b3 = s.charCodeAt(2);
-  const b4 = s.charCodeAt(3);
-  return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
 }
 
 function parseCoord(v: string | number | undefined): number | null {

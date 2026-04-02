@@ -7,14 +7,9 @@ const items = (require("系统.02．物品系统.01．装备数据") as { defaul
 const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
-
-function fourCCToString(fourcc: number): string {
-  const c1 = string.char(fourcc % 256);
-  const c2 = string.char(Math.floor(fourcc / 256) % 256);
-  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
-  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
-  return c4 + c3 + c2 + c1;
-}
+const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  fourCCToString: (four: number) => string;
+};
 
 interface ItemData {
   name?: string;

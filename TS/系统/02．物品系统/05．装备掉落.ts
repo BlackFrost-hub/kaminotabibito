@@ -12,6 +12,9 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [key: string]: any };
 const equipExcrete = require("系统.02．物品系统.09．装备排泄") as { setLastCreatedItem: (item: any) => void };
+const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+  stringToFourCC: (s: string) => number;
+};
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, UnitDataEntry> }).default ??
   (require("系统.02．物品系统.02．装备掉落表") as { idData?: Record<string, UnitDataEntry> }).idData ??
@@ -40,14 +43,6 @@ const PREFIX = "|cffffff00『系统提示』：|r";
   // 预先消耗一些随机数，确保随机性
   for (let i = 0; i < 10; i++) math.random();
 })();
-
-function stringToFourCC(s: string): number {
-  const b1 = (string as any).byte(s, 1) as number;
-  const b2 = (string as any).byte(s, 2) as number;
-  const b3 = (string as any).byte(s, 3) as number;
-  const b4 = (string as any).byte(s, 4) as number;
-  return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
-}
 
 function typeIdToUnitId(typeId: number): string | undefined {
   for (const id in idData) {

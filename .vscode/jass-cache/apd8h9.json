@@ -29,73 +29,10 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "LIBRARY_MNEVENT",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_MNEVENT\n```\n\n\n---\n\nendglobals from IrAttackType\n\nglobals from MNEVENT:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_LIBRARY_MNEVENT",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___MNDamageEventTrigger",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger MNEVENT___MNDamageEventTrigger\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___MNDamageEventTrigger",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___DamageEventQueue",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array MNEVENT___DamageEventQueue\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___DamageEventQueue",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___DamageEventNumber",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger MNEVENT___DamageEventNumber\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___DamageEventNumber",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___time",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntimer MNEVENT___time\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___time",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___UnitGroup",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ngroup MNEVENT___UnitGroup\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___UnitGroup",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "MNEVENT___ta",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntriggeraction MNEVENT___ta\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_MNEVENT___ta",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "LIBRARY_MNXT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_MNXT\n```\n\n\n---\n\nendglobals from MNEVENT\n\nglobals from MNXT:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_MNXT\n```\n\n\n---\n\nendglobals from IrAttackType\n\nglobals from MNXT:\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_LIBRARY_MNXT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
@@ -965,82 +902,10 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "LIBRARY_YDWEEventDamageData",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEEventDamageData\n```\n\n\n---\n\nendglobals from YDWEAbilityState\n\nglobals from YDWEEventDamageData:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_LIBRARY_YDWEEventDamageData",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_VAILD",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_VAILD\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_VAILD",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_PHYSICAL",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_PHYSICAL\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_PHYSICAL",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_ATTACK",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_ATTACK\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_ATTACK",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_RANGED",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_RANGED\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_RANGED",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_DAMAGE_TYPE",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_DAMAGE_TYPE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_DAMAGE_TYPE",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_WEAPON_TYPE",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_WEAPON_TYPE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_WEAPON_TYPE",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "YDWEEventDamageData___EVENT_DAMAGE_DATA_ATTACK_TYPE",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEEventDamageData___EVENT_DAMAGE_DATA_ATTACK_TYPE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEEventDamageData___EVENT_DAMAGE_DATA_ATTACK_TYPE",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "LIBRARY_YDWEJapiEffect",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEJapiEffect\n```\n\n\n---\n\nendglobals from YDWEEventDamageData\n\nglobals from YDWEJapiEffect:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_YDWEJapiEffect\n```\n\n\n---\n\nendglobals from YDWEAbilityState\n\nglobals from YDWEJapiEffect:\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_LIBRARY_YDWEJapiEffect",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
@@ -1289,11 +1154,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___HT",
+      "label": "StarUnit__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable StarUnit___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___HT",
+      "documentation": "\n```jass\nhashtable StarUnit__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1316,20 +1181,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_ItemAbilityTrig",
+      "label": "StarUnit__su_ItemAbilityTrig",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarUnit___su_ItemAbilityTrig\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_ItemAbilityTrig",
+      "documentation": "\n```jass\ntrigger StarUnit__su_ItemAbilityTrig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_ItemAbilityTrig",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_ItemAbilityTrig2",
+      "label": "StarUnit__su_ItemAbilityTrig2",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarUnit___su_ItemAbilityTrig2\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_ItemAbilityTrig2",
+      "documentation": "\n```jass\ntrigger StarUnit__su_ItemAbilityTrig2\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_ItemAbilityTrig2",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1370,20 +1235,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_iatList",
+      "label": "StarUnit__su_iatList",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array StarUnit___su_iatList\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_iatList",
+      "documentation": "\n```jass\ntrigger array StarUnit__su_iatList\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_iatList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_iatIndex",
+      "label": "StarUnit__su_iatIndex",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarUnit___su_iatIndex\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_iatIndex",
+      "documentation": "\n```jass\ninteger StarUnit__su_iatIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_iatIndex",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1577,20 +1442,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SUTriggerList___key_Count",
+      "label": "SUTriggerList__key_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SUTriggerList___key_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SUTriggerList___key_Count",
+      "documentation": "\n```jass\ninteger SUTriggerList__key_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SUTriggerList__key_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SUTriggerList___ht",
+      "label": "SUTriggerList__ht",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SUTriggerList___ht\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SUTriggerList___ht",
+      "documentation": "\n```jass\nhashtable SUTriggerList__ht\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SUTriggerList__ht",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -2081,6 +1946,15 @@
       "statementType": "VariableDeclaration"
     },
     {
+      "label": "udg_TempDamageType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nboolean array udg_TempDamageType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_udg_TempDamageType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
       "label": "gg_trg__________u",
       "kind": 5,
       "detail": "Global Variable",
@@ -2144,24 +2018,6 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "gg_trg____________________002",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________002",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "gg_trg____________________001",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________001",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "gg_trg_HealItemEffect",
       "kind": 5,
       "detail": "Global Variable",
@@ -2194,24 +2050,6 @@
       "detail": "Global Variable",
       "documentation": "\n```jass\nunit gg_unit_hfoo_0019\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_gg_unit_hfoo_0019",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "gg_unit_ngme_0005",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\nunit gg_unit_ngme_0005\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_unit_ngme_0005",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "gg_trg____________________003",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________003\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________003",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -5078,24 +4916,6 @@
       "statementType": "NativeDeclaration"
     },
     {
-      "label": "EXGetEventDamageData",
-      "kind": 2,
-      "detail": "Native Function",
-      "documentation": "\n```jass\nnative EXGetEventDamageData takes integer edd_type returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_native_EXGetEventDamageData",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "NativeDeclaration"
-    },
-    {
-      "label": "EXSetEventDamage",
-      "kind": 2,
-      "detail": "Native Function",
-      "documentation": "\n```jass\nnative EXSetEventDamage takes real amount returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_native_EXSetEventDamage",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "NativeDeclaration"
-    },
-    {
       "label": "EXGetEffectX",
       "kind": 2,
       "detail": "Native Function",
@@ -5825,82 +5645,10 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "MNEVENT___UnitDeathconditions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___UnitDeathconditions takes nothing returns boolean\n```\n\n\n---\n\nlibrary IrAttackType ends\n\nlibrary MNEVENT:\n\n===========================================================================\n\n任意单位伤害事件\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___UnitDeathconditions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___UnitDeathAction",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___UnitDeathAction takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___UnitDeathAction",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___enumunitdamaged",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___enumunitdamaged takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___enumunitdamaged",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___MNAnyUnitDamagedAction",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___MNAnyUnitDamagedAction takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___MNAnyUnitDamagedAction",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___MNAnyUnitDamagedFilter",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___MNAnyUnitDamagedFilter takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___MNAnyUnitDamagedFilter",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___MNAnyUnitDamagedEnumUnit",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___MNAnyUnitDamagedEnumUnit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___MNAnyUnitDamagedEnumUnit",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNEVENT___timeout",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNEVENT___timeout takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNEVENT___timeout",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "MNAnyUnitDamaged",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction MNAnyUnitDamaged takes trigger trg, real miao returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_MNAnyUnitDamaged",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
       "label": "SLDebugLib___luainit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLDebugLib___luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary MNEVENT ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction SLDebugLib___luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary IrAttackType ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_SLDebugLib___luainit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -10388,73 +10136,10 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "YDWEIsEventPhysicalDamage",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventPhysicalDamage takes nothing returns boolean\n```\n\n\n---\n\nlibrary YDWEAbilityState ends\n\nlibrary YDWEEventDamageData:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventPhysicalDamage",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWEIsEventAttackDamage",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventAttackDamage takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventAttackDamage",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWEIsEventRangedDamage",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventRangedDamage takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventRangedDamage",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWEIsEventDamageType",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventDamageType takes damagetype damageType returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventDamageType",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWEIsEventWeaponType",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventWeaponType takes weapontype weaponType returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventWeaponType",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWEIsEventAttackType",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWEIsEventAttackType takes attacktype attackType returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWEIsEventAttackType",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "YDWESetEventDamage",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWESetEventDamage takes real amount returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDWESetEventDamage",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
       "label": "YDWESetEffectLoc",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction YDWESetEffectLoc takes effect e, location loc returns nothing\n```\n\n\n---\n\nlibrary YDWEEventDamageData ends\n\nlibrary YDWEJapiEffect:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction YDWESetEffectLoc takes effect e, location loc returns nothing\n```\n\n\n---\n\nlibrary YDWEAbilityState ends\n\nlibrary YDWEJapiEffect:\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_YDWESetEffectLoc",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -11099,38 +10784,38 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__0",
+      "label": "StarUnit__anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__0",
+      "documentation": "\n```jass\nfunction StarUnit__anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__1",
+      "label": "StarUnit__anon__1",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__1",
+      "documentation": "\n```jass\nfunction StarUnit__anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__1",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__2",
+      "label": "StarUnit__anon__2",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__2 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__2",
+      "documentation": "\n```jass\nfunction StarUnit__anon__2 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__2",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___UnitDieListener",
+      "label": "StarUnit__UnitDieListener",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___UnitDieListener takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___UnitDieListener",
+      "documentation": "\n```jass\nfunction StarUnit__UnitDieListener takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__UnitDieListener",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11207,11 +10892,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___onInit",
+      "label": "StarUnit__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___onInit",
+      "documentation": "\n```jass\nfunction StarUnit__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11594,11 +11279,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SUTriggerList___onInit",
+      "label": "SUTriggerList__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SUTriggerList___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SUTriggerList___onInit",
+      "documentation": "\n```jass\nfunction SUTriggerList__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SUTriggerList__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12083,7 +11768,7 @@
       "label": "ApplyItemBonus",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction ApplyItemBonus takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=122\n\nTESH.alwaysfold=0\n\n这里的所有函数是配合ts→lua的调用\n\n===========================================================================\n\n装备系统 - SGSS属性修改 (ID 1-10) + 玩家属性修改，lua实现\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction ApplyItemBonus takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=20\n\nTESH.alwaysfold=0\n\n这里的所有函数是配合ts→lua的调用\n\n===========================================================================\n\n装备系统 - SGSS属性修改 (ID 1-10) + 玩家属性修改，lua实现\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_ApplyItemBonus",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -12197,78 +11882,6 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "Trig____________________003Conditions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig____________________003Conditions takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 003\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig____________________003Conditions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "Trig____________________003Actions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig____________________003Actions takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig____________________003Actions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "InitTrig____________________003",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction InitTrig____________________003 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_InitTrig____________________003",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "Trig____________________002Actions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig____________________002Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 002\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig____________________002Actions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "InitTrig____________________002",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction InitTrig____________________002 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_InitTrig____________________002",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "Trig____________________001Conditions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig____________________001Conditions takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 001\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig____________________001Conditions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "Trig____________________001Actions",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig____________________001Actions takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Trig____________________001Actions",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
-      "label": "InitTrig____________________001",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction InitTrig____________________001 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_InitTrig____________________001",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
       "label": "Trig_HealItemEffectActions",
       "kind": 2,
       "detail": "Function",
@@ -12283,6 +11896,24 @@
       "detail": "Function",
       "documentation": "\n```jass\nfunction InitTrig_HealItemEffect takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_InitTrig_HealItemEffect",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_JM10Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_JM10Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: JM10\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig_JM10Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig_JM10",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig_JM10 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig_JM10",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12593,14 +12224,14 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "jasshelper__initstructs14779625",
+      "label": "jasshelper__initstructs38301625",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction jasshelper__initstructs14779625 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_jasshelper__initstructs14779625",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs38301625 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs38301625",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     }
   ],
-  "timestamp": 1775045998858
+  "timestamp": 1775120724180
 }

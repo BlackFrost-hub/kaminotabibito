@@ -13,13 +13,8 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local function fourCCToString(self, fourcc)
-    local c1 = string.char(fourcc % 256)
-    local c2 = string.char(math.floor(fourcc / 256) % 256)
-    local c3 = string.char(math.floor(fourcc / 65536) % 256)
-    local c4 = string.char(math.floor(fourcc / 16777216) % 256)
-    return ((c4 .. c3) .. c2) .. c1
-end
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local fourCCToString = ____require_result_0.fourCCToString
 --- 解析 hot 字符串和 abilList，返回每段的信息
 local function parseSegments(self, hotStr, abilList)
     local segments = __TS__StringSplit(hotStr, "+")
@@ -32,11 +27,11 @@ local function parseSegments(self, hotStr, abilList)
         local i = 0
         while i < #segments do
             do
-                local __continue6
+                local __continue5
                 repeat
                     local seg = __TS__StringTrim(segments[i + 1])
                     if seg == "" then
-                        __continue6 = true
+                        __continue5 = true
                         break
                     end
                     local tokens = __TS__ArrayFilter(
@@ -57,9 +52,9 @@ local function parseSegments(self, hotStr, abilList)
                         end
                     end
                     result[#result + 1] = {tokens = tokens, abilId = abilIds[i + 1] or "", waitSec = waitSec}
-                    __continue6 = true
+                    __continue5 = true
                 until true
-                if not __continue6 then
+                if not __continue5 then
                     break
                 end
             end
@@ -72,33 +67,33 @@ end
 local function calcHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local ____temp_0
+    local ____temp_1
     if type(jass.GetUnitState) == "function" then
-        ____temp_0 = jass.GetUnitState(
+        ____temp_1 = jass.GetUnitState(
             unit,
             jass.ConvertUnitState(1)
         )
     else
-        ____temp_0 = 0
-    end
-    local maxHp = ____temp_0
-    local ____temp_1
-    if type(jass.GetWidgetLife) == "function" then
-        ____temp_1 = jass.GetWidgetLife(unit)
-    else
         ____temp_1 = 0
     end
-    local curHp = ____temp_1
+    local maxHp = ____temp_1
     local ____temp_2
+    if type(jass.GetWidgetLife) == "function" then
+        ____temp_2 = jass.GetWidgetLife(unit)
+    else
+        ____temp_2 = 0
+    end
+    local curHp = ____temp_2
+    local ____temp_3
     if type(jass.GetUnitState) == "function" then
-        ____temp_2 = jass.GetUnitState(
+        ____temp_3 = jass.GetUnitState(
             unit,
             jass.ConvertUnitState(3)
         )
     else
-        ____temp_2 = 0
+        ____temp_3 = 0
     end
-    local maxMp = ____temp_2
+    local maxMp = ____temp_3
     local lostHp = maxHp - curHp
     for ____, rawToken in ipairs(tokens) do
         local waitIdx = (string.find(rawToken, ":wait", nil, true) or 0) - 1
@@ -134,18 +129,18 @@ local function calcHpMp(self, tokens, unit)
 end
 --- 立即执行一段的赋值+TriggerExecute
 local function executeSegment(self, unit, seg)
-    local ____calcHpMp_result_3 = calcHpMp(nil, seg.tokens, unit)
-    local hp = ____calcHpMp_result_3.hp
-    local mp = ____calcHpMp_result_3.mp
-    local ____temp_5
+    local ____calcHpMp_result_4 = calcHpMp(nil, seg.tokens, unit)
+    local hp = ____calcHpMp_result_4.hp
+    local mp = ____calcHpMp_result_4.mp
+    local ____temp_6
     if g.udg_TempReal ~= nil then
-        ____temp_5 = g.udg_TempReal
+        ____temp_6 = g.udg_TempReal
     else
-        local ____temp_4 = {}
-        g.udg_TempReal = ____temp_4
-        ____temp_5 = ____temp_4
+        local ____temp_5 = {}
+        g.udg_TempReal = ____temp_5
+        ____temp_6 = ____temp_5
     end
-    local tr = ____temp_5
+    local tr = ____temp_6
     tr[1] = hp
     tr[2] = mp
     jass.udg_TempUnit[1] = unit
@@ -156,30 +151,30 @@ local function executeSegment(self, unit, seg)
     end
 end
 local function onUseItem(self)
-    local ____this_7
-    ____this_7 = jass
-    local ____opt_6 = ____this_7.GetManipulatingUnit
-    if ____opt_6 ~= nil then
-        ____opt_6 = ____opt_6(____this_7)
+    local ____this_8
+    ____this_8 = jass
+    local ____opt_7 = ____this_8.GetManipulatingUnit
+    if ____opt_7 ~= nil then
+        ____opt_7 = ____opt_7(____this_8)
     end
-    local ____opt_6_10 = ____opt_6
-    if ____opt_6_10 == nil then
-        local ____this_9
-        ____this_9 = jass
-        local ____opt_8 = ____this_9.GetTriggerUnit
-        if ____opt_8 ~= nil then
-            ____opt_8 = ____opt_8(____this_9)
+    local ____opt_7_11 = ____opt_7
+    if ____opt_7_11 == nil then
+        local ____this_10
+        ____this_10 = jass
+        local ____opt_9 = ____this_10.GetTriggerUnit
+        if ____opt_9 ~= nil then
+            ____opt_9 = ____opt_9(____this_10)
         end
-        ____opt_6_10 = ____opt_8
+        ____opt_7_11 = ____opt_9
     end
-    local unit = ____opt_6_10
-    local ____this_12
-    ____this_12 = jass
-    local ____opt_11 = ____this_12.GetManipulatedItem
-    if ____opt_11 ~= nil then
-        ____opt_11 = ____opt_11(____this_12)
+    local unit = ____opt_7_11
+    local ____this_13
+    ____this_13 = jass
+    local ____opt_12 = ____this_13.GetManipulatedItem
+    if ____opt_12 ~= nil then
+        ____opt_12 = ____opt_12(____this_13)
     end
-    local item = ____opt_11
+    local item = ____opt_12
     if not unit or not item then
         return
     end
@@ -189,13 +184,13 @@ local function onUseItem(self)
     if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
         return
     end
-    local ____temp_13
+    local ____temp_14
     if type(jass.GetItemTypeId) == "function" then
-        ____temp_13 = jass.GetItemTypeId(item)
+        ____temp_14 = jass.GetItemTypeId(item)
     else
-        ____temp_13 = 0
+        ____temp_14 = 0
     end
-    local itemId = ____temp_13
+    local itemId = ____temp_14
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
@@ -207,13 +202,13 @@ local function onUseItem(self)
         return
     end
     glob.__EquipHealExecutedKey = key
-    local ____this_15
-    ____this_15 = jass
-    local ____opt_14 = ____this_15.CreateTimer
-    if ____opt_14 ~= nil then
-        ____opt_14 = ____opt_14(____this_15)
+    local ____this_16
+    ____this_16 = jass
+    local ____opt_15 = ____this_16.CreateTimer
+    if ____opt_15 ~= nil then
+        ____opt_15 = ____opt_15(____this_16)
     end
-    local clearTimer = ____opt_14
+    local clearTimer = ____opt_15
     if clearTimer and type(jass.TimerStart) == "function" then
         local ct = clearTimer
         jass.TimerStart(
@@ -231,22 +226,22 @@ local function onUseItem(self)
     local segments = parseSegments(nil, entry.hot, entry.abilList)
     for ____, seg in ipairs(segments) do
         do
-            local __continue37
+            local __continue36
             repeat
                 if seg.abilId == "" then
-                    __continue37 = true
+                    __continue36 = true
                     break
                 end
                 if seg.waitSec <= 0 then
                     executeSegment(nil, unit, seg)
                 else
-                    local ____this_17
-                    ____this_17 = jass
-                    local ____opt_16 = ____this_17.CreateTimer
-                    if ____opt_16 ~= nil then
-                        ____opt_16 = ____opt_16(____this_17)
+                    local ____this_18
+                    ____this_18 = jass
+                    local ____opt_17 = ____this_18.CreateTimer
+                    if ____opt_17 ~= nil then
+                        ____opt_17 = ____opt_17(____this_18)
                     end
-                    local delayTimer = ____opt_16
+                    local delayTimer = ____opt_17
                     if delayTimer and type(jass.TimerStart) == "function" then
                         local dt = delayTimer
                         local capturedSeg = seg
@@ -264,9 +259,9 @@ local function onUseItem(self)
                         )
                     end
                 end
-                __continue37 = true
+                __continue36 = true
             until true
-            if not __continue37 then
+            if not __continue36 then
                 break
             end
         end
@@ -278,11 +273,11 @@ local function init(self)
         return
     end
     g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18 = 35
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 = 35
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_18
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -296,13 +291,13 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_20
-    ____this_20 = jass
-    local ____opt_19 = ____this_20.Player
-    if ____opt_19 ~= nil then
-        ____opt_19 = ____opt_19(____this_20, 13)
+    local ____this_21
+    ____this_21 = jass
+    local ____opt_20 = ____this_21.Player
+    if ____opt_20 ~= nil then
+        ____opt_20 = ____opt_20(____this_21, 13)
     end
-    local p13 = ____opt_19
+    local p13 = ____opt_20
     if p13 ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
     end

@@ -1,5 +1,8 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
+const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+  fourCCToString: (four: number) => string;
+};
 /** 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`） */
 const g = require("jass.globals") as { udg_Itmeboolean?: boolean | number; [key: string]: any };
 
@@ -22,14 +25,6 @@ const PREFIX = "|cffffff00『系统提示』：|r";
 const COLOR_TYPE = "|cff00ff00";  // 类型名 绿
 const COLOR_NAME = "|cff00bfff";  // 物品名 蓝
 const COLOR_ERR = "|cffff0000";   // 错误/强调 红
-
-function fourCCToString(four: number): string {
-  const a = math.floor(four / 16777216) % 256;
-  const b = math.floor(four / 65536) % 256;
-  const c = math.floor(four / 256) % 256;
-  const d = four % 256;
-  return string.char(a, b, c, d);
-}
 
 function getEntry(itemTypeId: number): { type?: string; name?: string; onlyone?: boolean | string } | undefined {
   const id = fourCCToString(itemTypeId);
