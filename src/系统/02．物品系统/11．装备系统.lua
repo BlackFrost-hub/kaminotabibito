@@ -15,6 +15,9 @@ local equipShared = equipLimit.equipShared
 local equipMovespeed = require("系统.02．物品系统.08．装备移速")
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local fourCCToString = ____require_result_0.fourCCToString
+local ____require_result_1 = require("系统.00．核心系统.12．YDWE函数")
+local getObjectProperty = ____require_result_1.getObjectProperty
+local ObjectType = ____require_result_1.ObjectType
 --- 属性配置：显示名 -> itemData key，udg 为 JASS 全局时填写。新增属性只需在此加一行，primaryBonus 即可用该显示名
 local STAT_CONFIG = {
     {name = "生命值", key = "hp", udg = "udg_TempHp"},
@@ -91,14 +94,16 @@ end
 if not NAME_TO_KEY["移速"] then
     NAME_TO_KEY["移速"] = "moveSpeed"
 end
---- 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 1/2/3 取对应段，段内可用逗号多属性。返回 key->数值
-local function parsePrimaryBonus(self, s, mainAttr)
+--- 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值
+local function parsePrimaryBonus(self, s, primaryStr)
     local out = {}
-    if not s or mainAttr < 1 or mainAttr > 3 then
+    local attrIndex = {STR = 0, AGI = 1, INT = 2}
+    local idx = attrIndex[primaryStr]
+    if not s or idx == nil then
         return out
     end
     local segments = __TS__StringSplit(s, "/")
-    local seg = __TS__StringTrim(segments[mainAttr] or "")
+    local seg = __TS__StringTrim(segments[idx + 1] or "")
     if not seg then
         return out
     end
@@ -247,12 +252,12 @@ local function initEvents(self)
             local itemData = items[idStr]
             if not itemData then
                 if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
-                    local ____temp_3 = type(slk) ~= "nil" and slk.item
-                    if ____temp_3 then
-                        local ____opt_1 = slk.item[idStr]
-                        ____temp_3 = ____opt_1 and ____opt_1.name
+                    local ____temp_4 = type(slk) ~= "nil" and slk.item
+                    if ____temp_4 then
+                        local ____opt_2 = slk.item[idStr]
+                        ____temp_4 = ____opt_2 and ____opt_2.name
                     end
-                    local displayName = ____temp_3 or idStr
+                    local displayName = ____temp_4 or idStr
                     local border = "|cff606060────────────────────────|r"
                     local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
                     jass.DisplayTimedTextToPlayer(
@@ -281,25 +286,26 @@ local function initEvents(self)
             g.udg_TempIsAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
             local primaryBonus = itemData.primaryBonus
             local primary = {}
-            if primaryBonus and type(jass.ExecuteFunc) == "function" then
-                jass.ExecuteFunc("GetHeroMainAttribute")
-                local ____temp_4
-                if g.udg_TempInteger ~= nil and g.udg_TempInteger[1] ~= nil then
-                    ____temp_4 = g.udg_TempInteger[1]
+            if primaryBonus then
+                local ____temp_5
+                if type(jass.GetUnitTypeId) == "function" then
+                    ____temp_5 = jass.GetUnitTypeId(unit)
                 else
-                    ____temp_4 = 0
+                    ____temp_5 = 0
                 end
-                local mainAttr = ____temp_4
-                primary = parsePrimaryBonus(nil, primaryBonus, mainAttr)
+                local typeId = ____temp_5
+                local unitId = typeId and fourCCToString(nil, typeId) or ""
+                local primaryStr = unitId and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
+                primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
             end
             local merged = {}
             for ____, e in ipairs(STAT_CONFIG) do
-                local ____e_key_6 = e.key
-                local ____itemData_e_key_5 = itemData[e.key]
-                if ____itemData_e_key_5 == nil then
-                    ____itemData_e_key_5 = 0
+                local ____e_key_7 = e.key
+                local ____itemData_e_key_6 = itemData[e.key]
+                if ____itemData_e_key_6 == nil then
+                    ____itemData_e_key_6 = 0
                 end
-                merged[____e_key_6] = ____itemData_e_key_5 + (primary[e.key] or 0)
+                merged[____e_key_7] = ____itemData_e_key_6 + (primary[e.key] or 0)
             end
             merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
             g.udg_TempHp = merged.hp or 0
@@ -312,11 +318,11 @@ local function initEvents(self)
             g.udg_TempAgi = merged.agi or 0
             g.udg_TempInt = merged.int or 0
             g.udg_TempAll = merged.all or 0
-            local ____itemData_score_7 = itemData.score
-            if ____itemData_score_7 == nil then
-                ____itemData_score_7 = 0
+            local ____itemData_score_8 = itemData.score
+            if ____itemData_score_8 == nil then
+                ____itemData_score_8 = 0
             end
-            g.udg_TempScore = ____itemData_score_7
+            g.udg_TempScore = ____itemData_score_8
             local playerStats = {}
             local isAdd = g.udg_TempIsAdd
             local function addStat(____, val, name)
@@ -344,17 +350,17 @@ local function initEvents(self)
                 end
             end
             local owner = jass.GetOwningPlayer(unit)
-            local ____temp_8
+            local ____temp_9
             if type(jass.GetPlayerName) == "function" then
-                ____temp_8 = jass.GetPlayerName(owner)
+                ____temp_9 = jass.GetPlayerName(owner)
             else
-                ____temp_8 = ""
+                ____temp_9 = ""
             end
-            local ____temp_8_9 = ____temp_8
-            if ____temp_8_9 == nil then
-                ____temp_8_9 = ""
+            local ____temp_9_10 = ____temp_9
+            if ____temp_9_10 == nil then
+                ____temp_9_10 = ""
             end
-            local playerName = ____temp_8_9
+            local playerName = ____temp_9_10
             local actionText = g.udg_TempIsAdd and "获得" or "丢弃"
             local levelText = itemData.level or ""
             local levelColor
@@ -406,13 +412,13 @@ local function initEvents(self)
                                 __continue46 = true
                                 break
                             end
-                            local ____temp_10
+                            local ____temp_11
                             if tempRead ~= nil and tempRead[idx] ~= nil then
-                                ____temp_10 = tempRead[idx]
+                                ____temp_11 = tempRead[idx]
                             else
-                                ____temp_10 = 0
+                                ____temp_11 = 0
                             end
-                            local val = ____temp_10
+                            local val = ____temp_11
                             local num = __TS__Number(val)
                             local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
                             local nearZero = num > -0.000001 and num < 0.000001
@@ -430,14 +436,14 @@ local function initEvents(self)
             end
             local hasMovespeed2 = itemData.movespeed2 ~= nil
             if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-                local ____equipMovespeed_getMaxMovespeed2Info_12 = equipMovespeed.getMaxMovespeed2Info
-                local ____isDrop_11
+                local ____equipMovespeed_getMaxMovespeed2Info_13 = equipMovespeed.getMaxMovespeed2Info
+                local ____isDrop_12
                 if isDrop then
-                    ____isDrop_11 = item
+                    ____isDrop_12 = item
                 else
-                    ____isDrop_11 = nil
+                    ____isDrop_12 = nil
                 end
-                local ms = ____equipMovespeed_getMaxMovespeed2Info_12(equipMovespeed, unit, ____isDrop_11)
+                local ms = ____equipMovespeed_getMaxMovespeed2Info_13(equipMovespeed, unit, ____isDrop_12)
                 if ms.value > 0 then
                     test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
                 end

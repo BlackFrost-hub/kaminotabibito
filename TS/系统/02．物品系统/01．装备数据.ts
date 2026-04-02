@@ -94,6 +94,7 @@ items["I00P"] = {
   dmg: 2,
   all: 2,
   Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
+  primaryBonus: "力量+16/敏捷+20/智力+20",
 };
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};
 items["I06X"] = {type: "道具/戒指/饰品", name: "初始魔法药水", goldPrice: 50, score: 400, level: "E", hot: "100mp", abilList: "A08C"};

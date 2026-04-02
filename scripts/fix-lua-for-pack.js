@@ -53,14 +53,11 @@ function fixFile(filePath) {
   //     冒号调用会把 japi 表当 self 传入导致参数全部错位，统一改为点号。
   content = content.replace(/\bjapi:/g, "japi.");
 
-  // 6g. 07．技能函数 / 08．伤害函数：这两个模块的导出函数都是普通函数，TSTL 生成了 (self, ...) 签名。
-  //     外部用点号调用时 self 会吃掉第一个实参，导致参数全部错位，需去掉 self。
+  // 6g. 07．技能函数 / 08．伤害函数：
   if (filePath.includes("07．技能函数") || filePath.includes("08．伤害函数")) {
-    // 去掉有参函数签名里的 self
-    content = content.replace(/function (____exports\.\w+)\(self,\s*/g, "function $1(");
-    // 去掉无参函数签名里的 self
-    content = content.replace(/function (____exports\.\w+)\(self\)/g, "function $1()");
-    // 去掉内部互调时多传的 nil（self 占位）
+    // 07．技能函数 / 08．伤害函数：去掉 self/____self 参数
+    content = content.replace(/function (____exports\.\w+)\((self|____self),\s*/g, "function $1(");
+    content = content.replace(/function (____exports\.\w+)\((self|____self)\)/g, "function $1()");
     content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
     content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
   }
@@ -124,7 +121,7 @@ function fixFile(filePath) {
     "local items = require(\"系统.02．物品系统.01．装备数据\").default"
   );
 
-  // 16. Lua 1-based 修复：TS 里 random(1,n) 配 arr[idx-1] 在 Lua 中 idx=1 时 arr[0]=nil。凡此类“从 1-based 表随机取”处改为 [idx]。规则见 .cursor/rules/war3-tstl-jass-pitfalls.mdc §7
+  // 16. Lua 1-based 修复：TS 里 random(1,n) 配 arr[idx-1] 在 Lua 中 idx=1 时 arr[0]=nil。凡此类"从 1-based 表随机取"处改为 [idx]。规则见 .cursor/rules/war3-tstl-jass-pitfalls.mdc §7
   if (filePath.includes("05．装备掉落")) {
     content = content.replace(
       /out\[#out \+ 1\]\s*=\s*nonAlwaysIds\[idx \- 1\]/g,
@@ -186,7 +183,7 @@ function fixFile(filePath) {
     // japiFn 返回的 getter 也可能被多传 nil
     content = content.replace(/\bgetP\s*\(\s*nil\s*\)/g, "getP()");
     content = content.replace(/\bgetK\s*\(\s*nil\s*\)/g, "getK()");
-    // 少数情况：_G.DzXxx(_G, ...) 这种“把全局表当 self”也去掉
+    // 少数情况：_G.DzXxx(_G, ...) 这种"把全局表当 self"也去掉
     content = content.replace(/\bDzTriggerRegisterKeyEventTrg\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEventTrg(");
     content = content.replace(/\bDzTriggerRegisterKeyEventByCode\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEventByCode(");
     content = content.replace(/\bDzTriggerRegisterKeyEvent\s*\(\s*_G\s*,\s*/g, "DzTriggerRegisterKeyEvent(");

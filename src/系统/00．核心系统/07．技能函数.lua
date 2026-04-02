@@ -42,124 +42,97 @@ ____exports.ABILITY_DATA_RESEARCH_UBERTIP = 217
 ____exports.ABILITY_DATA_UBERTIP = 218
 ____exports.ABILITY_DATA_UNUBERTIP = 219
 ____exports.ABILITY_DATA_UNART = 220
-function ____exports.EXGetUnitAbility(u, abilcode)
+function ____exports.EXGetUnitAbility(____self, u, abilcode)
     return japi.EXGetUnitAbility(u, abilcode)
 end
-function ____exports.EXGetUnitAbilityByIndex(u, index)
+function ____exports.EXGetUnitAbilityByIndex(____self, u, index)
     return japi.EXGetUnitAbilityByIndex(u, index)
 end
-function ____exports.EXGetAbilityId(abil)
+function ____exports.EXGetAbilityId(____self, abil)
     return japi.EXGetAbilityId(abil)
 end
-function ____exports.EXGetAbilityState(abil, state_type)
+function ____exports.EXGetAbilityState(____self, abil, state_type)
     return japi.EXGetAbilityState(abil, state_type)
 end
-function ____exports.EXSetAbilityState(abil, state_type, value)
+function ____exports.EXSetAbilityState(____self, abil, state_type, value)
     return japi.EXSetAbilityState(abil, state_type, value)
 end
-function ____exports.EXGetAbilityDataReal(abil, level, data_type)
+function ____exports.EXGetAbilityDataReal(____self, abil, level, data_type)
     return japi.EXGetAbilityDataReal(abil, level, data_type)
 end
-function ____exports.EXSetAbilityDataReal(abil, level, data_type, value)
+function ____exports.EXSetAbilityDataReal(____self, abil, level, data_type, value)
     return japi.EXSetAbilityDataReal(abil, level, data_type, value)
 end
-function ____exports.EXGetAbilityDataInteger(abil, level, data_type)
+function ____exports.EXGetAbilityDataInteger(____self, abil, level, data_type)
     return japi.EXGetAbilityDataInteger(abil, level, data_type)
 end
-function ____exports.EXSetAbilityDataInteger(abil, level, data_type, value)
+function ____exports.EXSetAbilityDataInteger(____self, abil, level, data_type, value)
     return japi.EXSetAbilityDataInteger(abil, level, data_type, value)
 end
-function ____exports.EXGetAbilityDataString(abil, level, data_type)
+function ____exports.EXGetAbilityDataString(____self, abil, level, data_type)
     return japi.EXGetAbilityDataString(abil, level, data_type)
 end
-function ____exports.EXSetAbilityDataString(abil, level, data_type, value)
+function ____exports.EXSetAbilityDataString(____self, abil, level, data_type, value)
     return japi.EXSetAbilityDataString(abil, level, data_type, value)
 end
-function ____exports.YDWEGetUnitAbilityState(u, abilcode, state_type)
-    return japi.EXGetAbilityState(
-        japi.EXGetUnitAbility(u, abilcode),
-        state_type
-    )
-end
-function ____exports.YDWEGetUnitAbilityDataInteger(u, abilcode, level, data_type)
-    return japi.EXGetAbilityDataInteger(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type
-    )
-end
-function ____exports.YDWEGetUnitAbilityDataReal(u, abilcode, level, data_type)
-    return japi.EXGetAbilityDataReal(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type
-    )
-end
-function ____exports.YDWEGetUnitAbilityDataString(u, abilcode, level, data_type)
-    return japi.EXGetAbilityDataString(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type
-    )
-end
-function ____exports.YDWESetUnitAbilityState(u, abilcode, state_type, value)
-    return japi.EXSetAbilityState(
-        japi.EXGetUnitAbility(u, abilcode),
-        state_type,
-        value
-    )
-end
-function ____exports.YDWESetUnitAbilityDataInteger(u, abilcode, level, data_type, value)
-    return japi.EXSetAbilityDataInteger(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type,
-        value
-    )
-end
-function ____exports.YDWESetUnitAbilityDataReal(u, abilcode, level, data_type, value)
-    return japi.EXSetAbilityDataReal(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type,
-        value
-    )
-end
-function ____exports.YDWESetUnitAbilityDataString(u, abilcode, level, data_type, value)
-    return japi.EXSetAbilityDataString(
-        japi.EXGetUnitAbility(u, abilcode),
-        level,
-        data_type,
-        value
-    )
-end
-function ____exports.EXSetAbilityAEmeDataA(abil, unitid)
+function ____exports.EXSetAbilityAEmeDataA(____self, abil, unitid)
     return japi.EXSetAbilityAEmeDataA(abil, unitid)
 end
-function ____exports.YDWEUnitTransform(u, abilcode, targetid)
+function ____exports.YDWEGetUnitAbilityState(____self, u, abilcode, state_type)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXGetAbilityState(a, state_type)
+end
+function ____exports.YDWEGetUnitAbilityDataInteger(____self, u, abilcode, level, data_type)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXGetAbilityDataInteger(a, level, data_type)
+end
+function ____exports.YDWEGetUnitAbilityDataReal(____self, u, abilcode, level, data_type)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXGetAbilityDataReal(a, level, data_type)
+end
+function ____exports.YDWEGetUnitAbilityDataString(____self, u, abilcode, level, data_type)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXGetAbilityDataString(a, level, data_type)
+end
+function ____exports.YDWESetUnitAbilityState(____self, u, abilcode, state_type, value)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXSetAbilityState(a, state_type, value)
+end
+function ____exports.YDWESetUnitAbilityDataInteger(____self, u, abilcode, level, data_type, value)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXSetAbilityDataInteger(a, level, data_type, value)
+end
+function ____exports.YDWESetUnitAbilityDataReal(____self, u, abilcode, level, data_type, value)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXSetAbilityDataReal(a, level, data_type, value)
+end
+function ____exports.YDWESetUnitAbilityDataString(____self, u, abilcode, level, data_type, value)
+    local a = japi.EXGetUnitAbility(u, abilcode)
+    return japi.EXSetAbilityDataString(a, level, data_type, value)
+end
+function ____exports.YDWEUnitTransform(____self, u, abilcode, targetid)
     jass.UnitAddAbility(u, abilcode)
+    local a = japi.EXGetUnitAbility(u, abilcode)
     japi.EXSetAbilityDataInteger(
-        japi.EXGetUnitAbility(u, abilcode),
+        a,
         1,
         ____exports.ABILITY_DATA_UNITID,
         jass.GetUnitTypeId(u)
     )
     japi.EXSetAbilityAEmeDataA(
-        japi.EXGetUnitAbility(u, abilcode),
+        a,
         jass.GetUnitTypeId(u)
     )
     jass.UnitRemoveAbility(u, abilcode)
     jass.UnitAddAbility(u, abilcode)
-    japi.EXSetAbilityAEmeDataA(
-        japi.EXGetUnitAbility(u, abilcode),
-        targetid
-    )
+    local a2 = japi.EXGetUnitAbility(u, abilcode)
+    japi.EXSetAbilityAEmeDataA(a2, targetid)
     jass.UnitRemoveAbility(u, abilcode)
 end
-function ____exports.YDWEGetItemDataString(itemcode, data_type)
+function ____exports.YDWEGetItemDataString(____self, itemcode, data_type)
     return japi.EXGetItemDataString(itemcode, data_type)
 end
-function ____exports.YDWESetItemDataString(itemcode, data_type, value)
+function ____exports.YDWESetItemDataString(____self, itemcode, data_type, value)
     return japi.EXSetItemDataString(itemcode, data_type, value)
 end
 return ____exports

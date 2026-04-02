@@ -86,29 +86,30 @@ if (cb == null) return;
 
 ## 9) 导出函数的 self 参数坑：TSTL 给所有导出函数加 `(self, ...)` 签名
 
-TSTL 把每个 `export function foo(x)` 编译成 `function ____exports.foo(self, x)`。  
-后果：
+TSTL 把每个 `export function foo(x)` 编译成 `function ____exports.foo(self, x)`，外部调用时参数会错位。
 
-- **内部互调**：`____exports.foo(x)` 会编译成 `____exports.foo(nil, x)`，`self=nil` 占掉第一参，`x` 收到正确值——内部调用没问题。  
-- **外部用点号调用** `mod.foo(x)`：Lua 点号调用**不自动传 self**，所以 `self=x`，真正的参数变成 `nil`，判断永远失败。  
-- **外部用冒号调用** `mod:foo(x)`：Lua 冒号调用自动把 `mod` 当 `self` 传入，`self=mod`，`x` 收到正确值——但这样会把模块表当 self 传入，语义错误且在有参数的情况下仍然正确（歪打正着）。
+**✅ 解决方案**
 
-**实际案例**：`08．伤害函数.ts`（以及同模式的 `07．技能函数.ts`）里所有 `export function` 被外部用点号调用时，第一个实参会被当成 `self`，真正参数变成 `nil`，伤害类型/技能数据判断全部失效。
+### TypeScript 端（07．技能函数.ts / 08．伤害函数.ts）
+所有导出函数都加 `self` 作为第一个参数，内部直接调用 japi：
 
-**✅ 正确修法（在 `fix-lua-for-pack.js` 规则 6g 里）**
+```typescript
+export function EXGetUnitAbility(self: any, u: any, abilcode: number): any {
+  return japi.EXGetUnitAbility(u, abilcode);
+}
 
-对 **`07．技能函数.lua` 与 `08．伤害函数.lua`** 去掉导出函数签名里的 `self`，并去掉内部 `____exports.XXX(nil, ...)` 的多余 `nil`：
-
-```javascript
-if (filePath.includes("07．技能函数") || filePath.includes("08．伤害函数")) {
-  content = content.replace(/function (____exports\.\w+)\(self,\s*/g, "function $1(");
-  content = content.replace(/function (____exports\.\w+)\(self\)/g, "function $1()");
-  content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
-  content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
+export function YDWESetUnitAbilityDataString(self: any, u: any, abilcode: number, level: number, data_type: number, value: string): boolean {
+  const a = EXGetUnitAbility(self, u, abilcode);
+  return EXSetAbilityDataString(self, a, level, data_type, value);
 }
 ```
 
-去掉 `self` 后，外部点号调用 `mod.foo(x)` 参数才对齐。
+### fix-lua-for-pack.js 端
+已内置规则 6g 会自动清理：
+- 去掉导出函数签名里的 `self/____self`
+- 去掉调用时传递的 `nil`
+
+这样既保证性能（不使用 EXExecuteScript），又正确处理了参数错位。
 
 ## 10) japi / 外部 API 的冒号调用坑：TSTL 对 require 进来的模块生成冒号调用
 

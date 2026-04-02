@@ -1,5 +1,7 @@
 const jass = require("jass.common") as any;
 
+
+//取得玩家的第一个英雄
 export function getPlayerFirstHero(player: any): any {
   const g = jass.CreateGroup();
   jass.GroupEnumUnitsOfPlayer(g, player, null);

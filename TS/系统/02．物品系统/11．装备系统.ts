@@ -10,6 +10,10 @@ const equipMovespeed = require("系统.02．物品系统.08．装备移速") as 
 const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
 };
+const { getObjectProperty, ObjectType } = require("系统.00．核心系统.12．YDWE函数") as {
+  getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
+  ObjectType: { UNIT: number };
+};
 
 interface ItemData {
   name?: string;
@@ -69,12 +73,14 @@ const NAME_TO_KEY: Record<string, string> = {};
 for (const e of STAT_CONFIG) { NAME_TO_KEY[e.name] = e.key; }
 if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed"; // JASS TempMoveSpeed 用，不参与 addStat
 
-/** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 1/2/3 取对应段，段内可用逗号多属性。返回 key->数值 */
-function parsePrimaryBonus(s: string, mainAttr: number): Record<string, number> {
+/** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值 */
+function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number> {
   const out: Record<string, number> = {};
-  if (!s || mainAttr < 1 || mainAttr > 3) return out;
+  const attrIndex: Record<string, number> = { STR: 0, AGI: 1, INT: 2 };
+  const idx = attrIndex[primaryStr];
+  if (!s || idx == null) return out;
   const segments = s.split("/");
-  const seg = (segments[mainAttr - 1] || "").trim();
+  const seg = (segments[idx] || "").trim();
   if (!seg) return out;
   const parts = seg.split(",");
   for (const p of parts) {
@@ -160,10 +166,11 @@ function initEvents(): void {
     g.udg_TempIsAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
     const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
     let primary: Record<string, number> = {};
-    if (primaryBonus && typeof (jass as any).ExecuteFunc === "function") {
-      jass.ExecuteFunc("GetHeroMainAttribute");
-      const mainAttr = ((g as any).udg_TempInteger != null && (g as any).udg_TempInteger[1] != null) ? (g as any).udg_TempInteger[1] : 0;
-      primary = parsePrimaryBonus(primaryBonus, mainAttr);
+    if (primaryBonus) {
+      const typeId = typeof (jass as any).GetUnitTypeId === "function" ? (jass as any).GetUnitTypeId(unit) : 0;
+      const unitId = typeId ? fourCCToString(typeId) : "";
+      const primaryStr = unitId ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
+      primary = parsePrimaryBonus(primaryBonus, primaryStr);
     }
     const merged: Record<string, number> = {};
     for (const e of STAT_CONFIG) {

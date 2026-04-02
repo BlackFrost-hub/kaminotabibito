@@ -1,10 +1,15 @@
 /**
  * 单位狂暴：装备掉落表里 `berserkUnit`（旧名 `berserk`）非空的单位死亡时，按默认 6.25% 概率在原地创建该四码单位、继承面向，并震动击杀者镜头。
- * 面向与镜头震动通过 JASS 全局 udg_TempUnit[1]/udg_TempReal[1]/udg_TempPlayer 调用 UnitBerserk。
  */
 const jass = require("jass.common") as JassCommon;
 const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
   stringToFourCC: (s: string) => number;
+};
+const { EXSetUnitFacing } = require("系统.00．核心系统.12．YDWE函数") as {
+  EXSetUnitFacing: (u: any, angle: number) => void;
+};
+const { CameraShakeForPlayer } = require("系统.00．核心系统.13．镜头函数") as {
+  CameraShakeForPlayer: (p: any, magnitude: number, duration: number) => void;
 };
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
@@ -29,7 +34,7 @@ function onDeath(): void {
   const spawnUnitId = String(spawnRaw).trim();
   if (spawnUnitId === "") return;
 
-  const BERSERK_PROC = 0.0625;
+  const BERSERK_PROC = 1; // 100% for test
   if ((math as any).random(1, 10000) as number > BERSERK_PROC * 10000) return;
 
   // 先记录死亡单位的位置和面向（死亡瞬间仍有效），再创建单位并设成同一角度
@@ -55,10 +60,8 @@ function onDeath(): void {
   const killer = typeof (jass as any).GetKillingUnit === "function" ? (jass as any).GetKillingUnit() : undefined;
   const killerPlayer = killer && typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
-    (jass as any).udg_TempUnit[1] = created;
-    (jass as any).udg_TempReal[1] = facingDeg;
-    (jass as any).udg_TempPlayer[1] = killerPlayer;
-    jass.ExecuteFunc("UnitBerserk");
+    EXSetUnitFacing(created, facingDeg);
+    CameraShakeForPlayer(killerPlayer, 20, 3.0);
   }
 }
 

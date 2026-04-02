@@ -14,6 +14,7 @@ export interface UnitData {
 export const 装备掉落表: Record<string, UnitData> = {
   "n012": { id: "n012", name: "森林野猪", level: 1, unitType: "normal" },
   "nwlt": { id: "nwlt", name: "森林之狼", level: 1, unitType: "normal" },
+  "hfoo": { id: "hfoo", name: "步兵", level: 2, itemIds: "lgdh:1;gcel:1", picks: 1, isUniversal: "TRUE", berserkUnit: "hkni",unitType: "normal" },
   "n009": { id: "n009", name: "普通地精", level: 2, itemIds: "I01X:6%;I01P:6%", picks: 2, isUniversal: "TRUE", unitType: "normal" },
   "n000": { id: "n000", name: "蓝色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", berserkUnit: "n01F", unitType: "normal" },
   "n002": { id: "n002", name: "绿色史莱姆", level: 2, itemIds: "I00B:10%;I010:6%", picks: 2, isUniversal: "FALSE", berserkUnit: "n01F", unitType: "normal" },
