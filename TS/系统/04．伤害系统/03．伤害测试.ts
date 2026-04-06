@@ -89,7 +89,7 @@ function TrigActions(): void {
     prefix = prefix + "强化";
   }
   if (isTrue && prefix !== "") {
-    prefix = prefix + "真实";
+    prefix = prefix + "精神";
   }
 
   let msg: string;

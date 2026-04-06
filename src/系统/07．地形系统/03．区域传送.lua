@@ -16,6 +16,8 @@ local panCameraToTimedForPlayer = ____01_FF0E_955C_5934_7CFB_7EDF.panCameraToTim
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
 -- - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local withTimer = ____require_result_0.withTimer
 local regionMap = __TS__New(Map)
 local function dbg(self, _msg)
 end
@@ -85,13 +87,13 @@ local function runRegionRule(self, rule, unit, owner)
         r = jass.GetRandomInt(1, totalWeight)
     else
         local m = math
-        local ____temp_0
+        local ____temp_1
         if type(m.random) == "function" then
-            ____temp_0 = m:random(1, totalWeight)
+            ____temp_1 = m:random(1, totalWeight)
         else
-            ____temp_0 = 1
+            ____temp_1 = 1
         end
-        r = ____temp_0
+        r = ____temp_1
     end
     local chosen
     for ____, it in ipairs(items) do
@@ -199,30 +201,30 @@ local function initRegionTeleport(self)
         end
     end
     local function onEnter()
-        local ____temp_1
-        if type(jass.GetTriggerUnit) == "function" then
-            ____temp_1 = jass.GetTriggerUnit()
-        else
-            ____temp_1 = nil
-        end
-        local unit = ____temp_1
         local ____temp_2
-        if type(jass.GetTriggeringRegion) == "function" then
-            ____temp_2 = jass.GetTriggeringRegion()
+        if type(jass.GetTriggerUnit) == "function" then
+            ____temp_2 = jass.GetTriggerUnit()
         else
             ____temp_2 = nil
         end
-        local region = ____temp_2
-        if unit == nil or region == nil then
-            return
-        end
+        local unit = ____temp_2
         local ____temp_3
-        if type(jass.GetOwningPlayer) == "function" then
-            ____temp_3 = jass.GetOwningPlayer(unit)
+        if type(jass.GetTriggeringRegion) == "function" then
+            ____temp_3 = jass.GetTriggeringRegion()
         else
             ____temp_3 = nil
         end
-        local owner = ____temp_3
+        local region = ____temp_3
+        if unit == nil or region == nil then
+            return
+        end
+        local ____temp_4
+        if type(jass.GetOwningPlayer) == "function" then
+            ____temp_4 = jass.GetOwningPlayer(unit)
+        else
+            ____temp_4 = nil
+        end
+        local owner = ____temp_4
         if owner ~= nil and type(jass.Player) == "function" and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
             local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
             if owner == neutralAgg then
@@ -273,21 +275,12 @@ local function initRegionTeleport(self)
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function(self)
-    if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-        local t = jass.CreateTimer()
-        jass.TimerStart(
-            t,
-            0,
-            false,
-            function()
-                if type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(t)
-                end
-                initRegionTeleport(nil)
-            end
-        )
-    else
-        initRegionTeleport(nil)
-    end
+    withTimer(
+        nil,
+        0,
+        function()
+            initRegionTeleport(nil)
+        end
+    )
 end
 return ____exports

@@ -130,17 +130,6 @@ local function EquipExtract_CreateByLevel(self)
         )
     end
 end
-local function dbg(self, msg)
-    if DEBUG then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            10,
-            "[装备提取] " .. msg
-        )
-    end
-end
 local function onTrigger(self)
     local evt = jass.GetTriggerEventId()
     local ____opt_16 = jass.GetTriggerPlayer
@@ -199,7 +188,15 @@ local function init(self)
     local STES_Reg = ____jass_STES_Register_19_20
     if type(STES_Reg) == "function" then
         STES_Reg(evtTrig, "提取物品事件")
-        dbg(nil, "已通过 STES_Register 注册事件 提取物品事件")
+        if DEBUG then
+            jass.DisplayTimedTextToPlayer(
+                jass.Player(0),
+                0,
+                0,
+                10,
+                "[装备提取] 已通过 STES_Register 注册事件 提取物品事件"
+            )
+        end
     else
         g.udg_RegTrigger = evtTrig
         g.udg_RegEventStr = "提取物品事件"

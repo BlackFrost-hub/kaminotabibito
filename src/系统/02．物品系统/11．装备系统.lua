@@ -15,7 +15,8 @@ local equipShared = equipLimit.equipShared
 local equipMovespeed = require("系统.02．物品系统.08．装备移速")
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local fourCCToString = ____require_result_0.fourCCToString
-local ____require_result_1 = require("系统.00．核心系统.12．YDWE函数")
+local isSpecialUnit = ____require_result_0.isSpecialUnit
+local ____require_result_1 = require("lib.扩展函数.02．YDWE函数")
 local getObjectProperty = ____require_result_1.getObjectProperty
 local ObjectType = ____require_result_1.ObjectType
 --- 属性配置：显示名 -> itemData key，udg 为 JASS 全局时填写。新增属性只需在此加一行，primaryBonus 即可用该显示名
@@ -230,13 +231,7 @@ local function initEvents(self)
             if not unit or not item then
                 return
             end
-            if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
-                return
-            end
-            if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
-                return
-            end
-            if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+            if isSpecialUnit(nil, unit) then
                 return
             end
             local player = jass.GetOwningPlayer(unit)
@@ -294,8 +289,8 @@ local function initEvents(self)
                     ____temp_5 = 0
                 end
                 local typeId = ____temp_5
-                local unitId = typeId and fourCCToString(nil, typeId) or ""
-                local primaryStr = unitId and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
+                local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
+                local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
                 primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
             end
             local merged = {}
@@ -404,12 +399,12 @@ local function initEvents(self)
                 local i = 0
                 while i < #playerStats do
                     do
-                        local __continue46
+                        local __continue44
                         repeat
                             local idx = i + 1
                             local statName = g.udg_TempString[idx]
                             if statName == "移动速度" then
-                                __continue46 = true
+                                __continue44 = true
                                 break
                             end
                             local ____temp_11
@@ -425,9 +420,9 @@ local function initEvents(self)
                             local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
                             ) .. "%") or (nearZero and "0" or tostring(num))
                             test5Parts[#test5Parts + 1] = (tostring(statName) .. "为：") .. valStr
-                            __continue46 = true
+                            __continue44 = true
                         until true
-                        if not __continue46 then
+                        if not __continue44 then
                             break
                         end
                     end

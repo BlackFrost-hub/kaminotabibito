@@ -5,6 +5,9 @@
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
+const { withTimer } = require("系统.00．核心系统.01．封装函数") as {
+  withTimer: (delaySec: number, callback: () => void) => void;
+};
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
 import { panCameraToTimedForPlayer } from "./01．镜头系统";
@@ -229,15 +232,7 @@ function initRegionTeleport(): void {
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */
 export function init区域传送(): void {
   // dbg("【区域传送】初始化开始");
-  if (typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
-    const t = (jass as any).CreateTimer();
-    (jass as any).TimerStart(t, 0.00, false, (): void => {
-      if (typeof (jass as any).DestroyTimer === "function") {
-        (jass as any).DestroyTimer(t);
-      }
-      initRegionTeleport();
-    });
-  } else {
+  withTimer(0.00, () => {
     initRegionTeleport();
-  }
+  });
 }

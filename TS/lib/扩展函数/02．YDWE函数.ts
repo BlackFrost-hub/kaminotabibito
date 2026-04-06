@@ -63,22 +63,22 @@ export function EXDisableUnitCollision(u: any, t: number = 0): void {
 export function EXEnableUnitCollision(u: any, t: number = 0): void {
   EXSetUnitCollisionType(true, u, t);
 }
+
 //==========================================================================================
-// 系统/00．核心系统/SLK读取.ts
+// SLK读取
 
 export const ObjectType = {
-    ABILITY: 0,
-    BUFF: 1,
-    UNIT: 2,
-    ITEM: 3,
-    UPGRADE: 4,
-    DOODAD: 5,
-    DESTRUCTABLE: 6,
+  ABILITY: 0,
+  BUFF: 1,
+  UNIT: 2,
+  ITEM: 3,
+  UPGRADE: 4,
+  DOODAD: 5,
+  DESTRUCTABLE: 6,
 } as const;
 
 const typeNames = ["ability", "buff", "unit", "item", "upgrade", "doodad", "destructable"];
 
-// 读取物体编辑器属性（字符串）
 /**
  * 读取物体编辑器数据（SLK）
  * @param objectType 物体类型（0-6），使用 ObjectType 常量
@@ -86,21 +86,21 @@ const typeNames = ["ability", "buff", "unit", "item", "upgrade", "doodad", "dest
  * @param property 属性名（如 "Name", "Primary"）
  */
 export function getObjectProperty(objectType: number, objectId: number | string, property: string): string {
-    const script = "(require'jass.slk')." + typeNames[objectType] + "['" + objectId + "']." + property;
-    const result = japi.EXExecuteScript(script);
-    return result || "";
+  const script = "(require'jass.slk')." + typeNames[objectType] + "['" + objectId + "']." + property;
+  const result = japi.EXExecuteScript(script);
+  return result || "";
 }
 
 // 读取物体编辑器属性（整数）
 export function getObjectPropertyInteger(objectType: number, objectId: number | string, property: string): number {
-    const str = getObjectProperty(objectType, objectId, property);
-    return parseInt(str) || 0;
+  const str = getObjectProperty(objectType, objectId, property);
+  return parseInt(str) || 0;
 }
 
 // 读取物体编辑器属性（实数）
 export function getObjectPropertyReal(objectType: number, objectId: number | string, property: string): number {
-    const str = getObjectProperty(objectType, objectId, property);
-    return parseFloat(str) || 0;
+  const str = getObjectProperty(objectType, objectId, property);
+  return parseFloat(str) || 0;
 }
 
 // ============================================
@@ -109,29 +109,31 @@ export function getObjectPropertyReal(objectType: number, objectId: number | str
 
 // 获取技能名称
 export function getAbilityName(abilityId: number | string): string {
-    return getObjectProperty(ObjectType.ABILITY, abilityId, "Name");
+  return getObjectProperty(ObjectType.ABILITY, abilityId, "Name");
 }
 
 // 获取单位名称
 export function getUnitName(unitId: number | string): string {
-    return getObjectProperty(ObjectType.UNIT, unitId, "Name");
+  return getObjectProperty(ObjectType.UNIT, unitId, "Name");
 }
 
 // 获取物品名称
 export function getItemName(itemId: number | string): string {
-    return getObjectProperty(ObjectType.ITEM, itemId, "Name");
+  return getObjectProperty(ObjectType.ITEM, itemId, "Name");
 }
 
 // 获取技能Data值（field="A"/"B"/"C"/"D"...）
 export function getAbilityData(abilityId: number | string, field: string, level: number): number {
-    return getObjectPropertyInteger(ObjectType.ABILITY, abilityId, `Data${field}${level}`);
+  return getObjectPropertyInteger(ObjectType.ABILITY, abilityId, `Data${field}${level}`);
 }
 
 // 获取技能DataA值（快捷）
 export function getAbilityDataA(abilityId: number | string, level: number): number {
-    return getAbilityData(abilityId, "A", level);
+  return getAbilityData(abilityId, "A", level);
 }
+
 export function EXExecuteScript(script: string): string {
-    return japi.EXExecuteScript(script);
+  return japi.EXExecuteScript(script);
 }
+
 export {};

@@ -74,6 +74,17 @@ ____exports.items.I06Y = {
     hot = "200hp",
     abilList = "A08C"
 }
+____exports.items.pres = {
+    type = "道具/戒指/饰品",
+    name = "恢复药水",
+    goldPrice = 50,
+    score = 400,
+    level = "E",
+    hot = "200hp",
+    movespeed2 = 75,
+    PowerUP = "50%int;time3",
+    abilList = "A08C"
+}
 ____exports.items.I00D = {
     type = "道具/戒指/饰品",
     name = "魔力树枝",

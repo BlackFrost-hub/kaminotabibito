@@ -7,8 +7,10 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__ObjectRest = ____lualib.__TS__ObjectRest
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local ____exports = {}
@@ -933,7 +935,27 @@ local function splitItemBuffSegments(self, buff)
     end
     return out
 end
-local function parseAntiHealBuff(self, buffStr)
+--- 从字符串中读取从 startIdx 开始的连续数字
+local function readNumberFromString(self, s, startIdx)
+    local numEnd = startIdx
+    while numEnd < #s do
+        local c = __TS__StringCharAt(s, numEnd)
+        if c >= "0" and c <= "9" then
+            numEnd = numEnd + 1
+        else
+            break
+        end
+    end
+    return numEnd > startIdx and (__TS__ParseInt(
+        __TS__StringSubstring(s, startIdx, numEnd),
+        10
+    ) or 0) or 0
+end
+--- 通用的标准 DOT Buff 解析（适用于 AntiHeal、Burn、Poison）
+local function parseStandardDotBuff(self, buffStr, keyword, createResult, requireValuePositive)
+    if requireValuePositive == nil then
+        requireValuePositive = true
+    end
     if not buffStr or type(buffStr) ~= "string" then
         return nil
     end
@@ -945,44 +967,94 @@ local function parseAntiHealBuff(self, buffStr)
         return nil
     end
     local rest = __TS__StringSubstring(s, attackOnly and 12 or 9)
-    local antiIdx = (string.find(rest, "AntiHeal", nil, true) or 0) - 1
-    if antiIdx < 0 then
+    local keywordIdx = (string.find(rest, keyword, nil, true) or 0) - 1
+    if keywordIdx < 0 then
         return nil
     end
-    local numEnd = antiIdx + 8
-    while numEnd < #rest do
-        local c = __TS__StringCharAt(rest, numEnd)
-        if c >= "0" and c <= "9" then
-            numEnd = numEnd + 1
-        else
-            break
-        end
-    end
-    local effectPct = numEnd > antiIdx + 8 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, antiIdx + 8, numEnd),
-        10
-    ) or 0) or 0
+    local valueStartIdx = keywordIdx + #keyword
+    local value = readNumberFromString(nil, rest, valueStartIdx)
     local timeIdx = (string.find(rest, "time", nil, true) or 0) - 1
     if timeIdx < 0 then
         return nil
     end
-    local tEnd = timeIdx + 4
-    while tEnd < #rest do
-        local c = __TS__StringCharAt(rest, tEnd)
-        if c >= "0" and c <= "9" then
-            tEnd = tEnd + 1
-        else
-            break
-        end
-    end
-    local duration = tEnd > timeIdx + 4 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, timeIdx + 4, tEnd),
-        10
-    ) or 0) or 0
+    local duration = readNumberFromString(nil, rest, timeIdx + 4)
     if duration <= 0 then
         return nil
     end
-    return {effectPct = effectPct, duration = duration, attackOnly = attackOnly}
+    if requireValuePositive and value <= 0 then
+        return nil
+    end
+    return createResult(nil, value, duration, attackOnly)
+end
+--- 通用的从单位装备中取最强 DOT 的函数
+local function getBestDotFromUnit(self, unit, parseBuff, getProduct)
+    local best = nil
+    do
+        local slot = 0
+        while slot <= 5 do
+            do
+                local __continue184
+                repeat
+                    local item = unitItemInSlot(nil, unit, slot)
+                    if not item then
+                        __continue184 = true
+                        break
+                    end
+                    local idStr = fourCCToString(
+                        nil,
+                        getItemTypeId(nil, item)
+                    )
+                    local entry = itemsData[idStr]
+                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
+                    do
+                        local si = 0
+                        while si < #segments do
+                            do
+                                local __continue187
+                                repeat
+                                    local parsed = parseBuff(nil, segments[si + 1])
+                                    if not parsed then
+                                        __continue187 = true
+                                        break
+                                    end
+                                    local product = getProduct(nil, parsed)
+                                    if best == nil or product > best.product then
+                                        best = __TS__ObjectAssign({}, parsed, {product = product})
+                                    end
+                                    __continue187 = true
+                                until true
+                                if not __continue187 then
+                                    break
+                                end
+                            end
+                            si = si + 1
+                        end
+                    end
+                    __continue184 = true
+                until true
+                if not __continue184 then
+                    break
+                end
+            end
+            slot = slot + 1
+        end
+    end
+    if best == nil then
+        return nil
+    end
+    local ____best_27 = best
+    local product = ____best_27.product
+    local result = __TS__ObjectRest(____best_27, {product = true})
+    return result
+end
+local function parseAntiHealBuff(self, buffStr)
+    return parseStandardDotBuff(
+        nil,
+        buffStr,
+        "AntiHeal",
+        function(____, effectPct, duration, attackOnly) return {effectPct = effectPct, duration = duration, attackOnly = attackOnly} end,
+        false
+    )
 end
 --- 目标最大生命（诅咒 DOT 按 %MaxHP 结算）。
 -- 1.27 等环境 `jass.UNIT_STATE_MAX_LIFE` 常为 nil，需与 `装备回复` 一致用 `ConvertUnitState(1)` 取最大生命。
@@ -1035,163 +1107,29 @@ local function getTargetRegenHP(self, targetUnit)
     return type(n) == "number" and not __TS__NumberIsNaN(__TS__Number(n)) and n or 0
 end
 local function getBestAntiHealFromUnit(self, unit)
-    local best = nil
-    do
-        local slot = 0
-        while slot <= 5 do
-            do
-                local __continue198
-                repeat
-                    local item = unitItemInSlot(nil, unit, slot)
-                    if not item then
-                        __continue198 = true
-                        break
-                    end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
-                    local entry = itemsData[idStr]
-                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                    do
-                        local si = 0
-                        while si < #segments do
-                            do
-                                local __continue201
-                                repeat
-                                    local parsed = parseAntiHealBuff(nil, segments[si + 1])
-                                    if not parsed then
-                                        __continue201 = true
-                                        break
-                                    end
-                                    local product = parsed.effectPct * parsed.duration
-                                    if best == nil or product > best.product then
-                                        best = {effectPct = parsed.effectPct, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
-                                    end
-                                    __continue201 = true
-                                until true
-                                if not __continue201 then
-                                    break
-                                end
-                            end
-                            si = si + 1
-                        end
-                    end
-                    __continue198 = true
-                until true
-                if not __continue198 then
-                    break
-                end
-            end
-            slot = slot + 1
-        end
-    end
-    return best ~= nil and ({effectPct = best.effectPct, duration = best.duration, attackOnly = best.attackOnly}) or nil
+    return getBestDotFromUnit(
+        nil,
+        unit,
+        parseAntiHealBuff,
+        function(____, parsed) return parsed.effectPct * parsed.duration end
+    )
 end
 local function parseBurnBuff(self, buffStr)
-    if not buffStr or type(buffStr) ~= "string" then
-        return nil
-    end
-    local s = __TS__StringTrim(buffStr)
-    local attackOnly = false
-    if (string.find(s, "Buff:attack:", nil, true) or 0) - 1 == 0 then
-        attackOnly = true
-    elseif (string.find(s, "Buff:dmg:", nil, true) or 0) - 1 ~= 0 then
-        return nil
-    end
-    local rest = __TS__StringSubstring(s, attackOnly and 12 or 9)
-    local burnIdx = (string.find(rest, "Burn", nil, true) or 0) - 1
-    if burnIdx < 0 then
-        return nil
-    end
-    local numEnd = burnIdx + 4
-    while numEnd < #rest do
-        local c = __TS__StringCharAt(rest, numEnd)
-        if c >= "0" and c <= "9" then
-            numEnd = numEnd + 1
-        else
-            break
-        end
-    end
-    local damagePerSec = numEnd > burnIdx + 4 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, burnIdx + 4, numEnd),
-        10
-    ) or 0) or 0
-    local timeIdx = (string.find(rest, "time", nil, true) or 0) - 1
-    if timeIdx < 0 then
-        return nil
-    end
-    local tEnd = timeIdx + 4
-    while tEnd < #rest do
-        local c = __TS__StringCharAt(rest, tEnd)
-        if c >= "0" and c <= "9" then
-            tEnd = tEnd + 1
-        else
-            break
-        end
-    end
-    local duration = tEnd > timeIdx + 4 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, timeIdx + 4, tEnd),
-        10
-    ) or 0) or 0
-    if duration <= 0 or damagePerSec <= 0 then
-        return nil
-    end
-    return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly}
+    return parseStandardDotBuff(
+        nil,
+        buffStr,
+        "Burn",
+        function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
+        true
+    )
 end
 local function getBestBurnFromUnit(self, unit)
-    local best = nil
-    do
-        local slot = 0
-        while slot <= 5 do
-            do
-                local __continue219
-                repeat
-                    local item = unitItemInSlot(nil, unit, slot)
-                    if not item then
-                        __continue219 = true
-                        break
-                    end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
-                    local entry = itemsData[idStr]
-                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                    do
-                        local si = 0
-                        while si < #segments do
-                            do
-                                local __continue222
-                                repeat
-                                    local parsed = parseBurnBuff(nil, segments[si + 1])
-                                    if not parsed then
-                                        __continue222 = true
-                                        break
-                                    end
-                                    local product = parsed.damagePerSec * parsed.duration
-                                    if best == nil or product > best.product then
-                                        best = {damagePerSec = parsed.damagePerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
-                                    end
-                                    __continue222 = true
-                                until true
-                                if not __continue222 then
-                                    break
-                                end
-                            end
-                            si = si + 1
-                        end
-                    end
-                    __continue219 = true
-                until true
-                if not __continue219 then
-                    break
-                end
-            end
-            slot = slot + 1
-        end
-    end
-    return best ~= nil and ({damagePerSec = best.damagePerSec, duration = best.duration, attackOnly = best.attackOnly}) or nil
+    return getBestDotFromUnit(
+        nil,
+        unit,
+        parseBurnBuff,
+        function(____, parsed) return parsed.damagePerSec * parsed.duration end
+    )
 end
 ____exports.registerDotType(
     nil,
@@ -1223,105 +1161,21 @@ ____exports.registerDotType(
     }
 )
 local function parsePoisonBuff(self, buffStr)
-    if not buffStr or type(buffStr) ~= "string" then
-        return nil
-    end
-    local s = __TS__StringTrim(buffStr)
-    local attackOnly = false
-    if (string.find(s, "attack:poison", nil, true) or 0) - 1 == 0 then
-        attackOnly = true
-    elseif (string.find(s, "dmg:poison", nil, true) or 0) - 1 ~= 0 then
-        return nil
-    end
-    local rest = __TS__StringSubstring(s, attackOnly and 13 or 10)
-    local numEnd = 0
-    while numEnd < #rest do
-        local c = __TS__StringCharAt(rest, numEnd)
-        if c >= "0" and c <= "9" then
-            numEnd = numEnd + 1
-        else
-            break
-        end
-    end
-    local damagePerSec = numEnd > 0 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, 0, numEnd),
-        10
-    ) or 0) or 0
-    local timeIdx = (string.find(rest, "time", nil, true) or 0) - 1
-    if timeIdx < 0 then
-        return nil
-    end
-    local tEnd = timeIdx + 4
-    while tEnd < #rest do
-        local c = __TS__StringCharAt(rest, tEnd)
-        if c >= "0" and c <= "9" then
-            tEnd = tEnd + 1
-        else
-            break
-        end
-    end
-    local duration = tEnd > timeIdx + 4 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, timeIdx + 4, tEnd),
-        10
-    ) or 0) or 0
-    if duration <= 0 or damagePerSec <= 0 then
-        return nil
-    end
-    return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly}
+    return parseStandardDotBuff(
+        nil,
+        buffStr,
+        "Poison",
+        function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
+        true
+    )
 end
 local function getBestPoisonFromUnit(self, unit)
-    local best = nil
-    do
-        local slot = 0
-        while slot <= 5 do
-            do
-                local __continue241
-                repeat
-                    local item = unitItemInSlot(nil, unit, slot)
-                    if not item then
-                        __continue241 = true
-                        break
-                    end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
-                    local entry = itemsData[idStr]
-                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                    do
-                        local si = 0
-                        while si < #segments do
-                            do
-                                local __continue244
-                                repeat
-                                    local parsed = parsePoisonBuff(nil, segments[si + 1])
-                                    if not parsed then
-                                        __continue244 = true
-                                        break
-                                    end
-                                    local product = parsed.damagePerSec * parsed.duration
-                                    if best == nil or product > best.product then
-                                        best = {damagePerSec = parsed.damagePerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
-                                    end
-                                    __continue244 = true
-                                until true
-                                if not __continue244 then
-                                    break
-                                end
-                            end
-                            si = si + 1
-                        end
-                    end
-                    __continue241 = true
-                until true
-                if not __continue241 then
-                    break
-                end
-            end
-            slot = slot + 1
-        end
-    end
-    return best ~= nil and ({damagePerSec = best.damagePerSec, duration = best.duration, attackOnly = best.attackOnly}) or nil
+    return getBestDotFromUnit(
+        nil,
+        unit,
+        parsePoisonBuff,
+        function(____, parsed) return parsed.damagePerSec * parsed.duration end
+    )
 end
 ____exports.registerDotType(
     nil,
@@ -1394,58 +1248,12 @@ local function parseTrollCurseBuff(self, buffStr)
     return {pctMaxHpPerSec = pctMaxHpPerSec, duration = duration, attackOnly = attackOnly}
 end
 local function getBestTrollCurseFromUnit(self, unit)
-    local best = nil
-    do
-        local slot = 0
-        while slot <= 5 do
-            do
-                local __continue265
-                repeat
-                    local item = unitItemInSlot(nil, unit, slot)
-                    if not item then
-                        __continue265 = true
-                        break
-                    end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
-                    local entry = itemsData[idStr]
-                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                    do
-                        local si = 0
-                        while si < #segments do
-                            do
-                                local __continue268
-                                repeat
-                                    local parsed = parseTrollCurseBuff(nil, segments[si + 1])
-                                    if not parsed then
-                                        __continue268 = true
-                                        break
-                                    end
-                                    local product = parsed.pctMaxHpPerSec * parsed.duration
-                                    if best == nil or product > best.product then
-                                        best = {pctMaxHpPerSec = parsed.pctMaxHpPerSec, duration = parsed.duration, product = product, attackOnly = parsed.attackOnly}
-                                    end
-                                    __continue268 = true
-                                until true
-                                if not __continue268 then
-                                    break
-                                end
-                            end
-                            si = si + 1
-                        end
-                    end
-                    __continue265 = true
-                until true
-                if not __continue265 then
-                    break
-                end
-            end
-            slot = slot + 1
-        end
-    end
-    return best ~= nil and ({pctMaxHpPerSec = best.pctMaxHpPerSec, duration = best.duration, attackOnly = best.attackOnly}) or nil
+    return getBestDotFromUnit(
+        nil,
+        unit,
+        parseTrollCurseBuff,
+        function(____, parsed) return parsed.pctMaxHpPerSec * parsed.duration end
+    )
 end
 ____exports.registerDotType(
     nil,
@@ -1470,13 +1278,13 @@ local function getDotStateByTypeId(self, typeId, unit)
         return nil
     end
     local h = unitHid(nil, unit)
-    local ____temp_33
+    local ____temp_28
     if h ~= 0 then
-        ____temp_33 = tabRowForHid(nil, tab, h)
+        ____temp_28 = tabRowForHid(nil, tab, h)
     else
-        ____temp_33 = nil
+        ____temp_28 = nil
     end
-    local raw = ____temp_33
+    local raw = ____temp_28
     if raw ~= nil then
         return isValidDotStateRow(nil, raw) and raw or nil
     end

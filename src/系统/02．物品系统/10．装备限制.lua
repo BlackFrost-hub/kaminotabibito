@@ -7,6 +7,8 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local fourCCToString = ____require_result_0.fourCCToString
+local isHeroUnit = ____require_result_0.isHeroUnit
+local isSpecialUnit = ____require_result_0.isSpecialUnit
 --- 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`）
 local g = require("jass.globals")
 --- 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制
@@ -188,16 +190,10 @@ local function onPickup(self)
     if not unit or not item then
         return
     end
-    if not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) then
+    if not isHeroUnit(nil, unit) then
         return
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
-        return
-    end
-    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
-        return
-    end
-    if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+    if isSpecialUnit(nil, unit) then
         return
     end
     local pickedTypeId = safeGetItemTypeId(nil, item)
@@ -216,11 +212,11 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue48
+                local __continue46
                 repeat
                     if __TS__StringSubstring(s, i, i + 2) == "|r" then
                         i = i + 2
-                        __continue48 = true
+                        __continue46 = true
                         break
                     end
                     if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
@@ -239,15 +235,15 @@ local function onPickup(self)
                         end
                         if hex then
                             i = i + 10
-                            __continue48 = true
+                            __continue46 = true
                             break
                         end
                     end
                     out = out .. __TS__StringAccess(s, i)
                     i = i + 1
-                    __continue48 = true
+                    __continue46 = true
                 until true
-                if not __continue48 then
+                if not __continue46 then
                     break
                 end
             end
@@ -273,21 +269,21 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue57
+                local __continue55
                 repeat
                     local it = safeUnitItemInSlot(nil, unit, i)
                     if not it then
-                        __continue57 = true
+                        __continue55 = true
                         break
                     end
                     local itTypeId = safeGetItemTypeId(nil, it)
                     if itTypeId == nil then
-                        __continue57 = true
+                        __continue55 = true
                         break
                     end
                     local e = getEntry(nil, itTypeId)
                     if not e then
-                        __continue57 = true
+                        __continue55 = true
                         break
                     end
                     if itTypeId == pickedTypeId then
@@ -305,9 +301,9 @@ local function onPickup(self)
                     if e.type == "副武器" then
                         hasSub = true
                     end
-                    __continue57 = true
+                    __continue55 = true
                 until true
-                if not __continue57 then
+                if not __continue55 then
                     break
                 end
             end
@@ -370,7 +366,7 @@ local function isHeroCond(self)
         ____temp_12 = ____opt_10
     end
     local u = ____temp_12
-    return u ~= nil and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
+    return isHeroUnit(nil, u)
 end
 local function init(self)
     local trig = jass.CreateTrigger()

@@ -29,8 +29,10 @@ local ____exports = {}
 --   - h00C:20->I034*1;20%I036*1:5
 local jass = require("jass.common")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.05．泄露审计")
-local LeakWatcher = ____require_result_0.LeakWatcher
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local withTimer = ____require_result_0.withTimer
+local stopTimer = ____require_result_0.stopTimer
+local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("系统.00．核心系统.03．漂浮文字函数")
 local CreateFloatTextAtPoint = ____require_result_1.CreateFloatTextAtPoint
 local ____require_result_2 = require("系统.00．核心系统.01．封装函数")
@@ -134,24 +136,14 @@ local function playFinishEffect(self, campfire)
     local ____getUnitXY_result_9 = getUnitXY(nil, campfire)
     local x = ____getUnitXY_result_9.x
     local y = ____getUnitXY_result_9.y
-    local eff = jass.AddSpecialEffect(EFFECT_FIREBOMB, x, y)
-    if eff then
-        LeakWatcher:trackEffect("craft_firebomb", eff)
-    end
-    local t = LeakWatcher:createTimer("craft_firebomb")
-    if t and type(jass.TimerStart) == "function" then
-        jass.TimerStart(
-            t,
-            2,
-            false,
-            function()
-                if eff then
-                    LeakWatcher:destroyEffect(eff)
-                end
-                LeakWatcher:destroyTimer(t)
-            end
-        )
-    end
+    createTimedEffect(
+        nil,
+        EFFECT_FIREBOMB,
+        x,
+        y,
+        0,
+        2
+    )
 end
 local function getRecipeForItem(self, item)
     local idStr = getItemIdStr(nil, item)
@@ -290,7 +282,7 @@ local function stopAndDestroyTimer(self, t)
     if not t then
         return
     end
-    LeakWatcher:destroyTimer(t)
+    stopTimer(nil, t)
 end
 local function untrackItem(self, item)
     local st = itemState:get(item)
@@ -313,7 +305,13 @@ local function untrackItem(self, item)
     end
 end
 local function startBurnTimer(self, item, campfire, sec)
-    local t = LeakWatcher:createTimer("craft_burn")
+    local ____this_12
+    ____this_12 = jass
+    local ____opt_11 = ____this_12.CreateTimer
+    if ____opt_11 ~= nil then
+        ____opt_11 = ____opt_11(____this_12)
+    end
+    local t = ____opt_11
     if not t or type(jass.TimerStart) ~= "function" then
         return
     end
@@ -327,7 +325,6 @@ local function startBurnTimer(self, item, campfire, sec)
         false,
         function()
             if not itemState:has(item) then
-                LeakWatcher:destroyTimer(t)
                 return
             end
             local name = getItemNameSafe(nil, item)
@@ -340,7 +337,13 @@ local function startBurnTimer(self, item, campfire, sec)
     )
 end
 local function startCookTimer(self, item, campfire, recipe)
-    local t = LeakWatcher:createTimer("craft_cook")
+    local ____this_14
+    ____this_14 = jass
+    local ____opt_13 = ____this_14.CreateTimer
+    if ____opt_13 ~= nil then
+        ____opt_13 = ____opt_13(____this_14)
+    end
+    local t = ____opt_13
     if not t or type(jass.TimerStart) ~= "function" then
         return
     end
@@ -354,7 +357,6 @@ local function startCookTimer(self, item, campfire, recipe)
         false,
         function()
             if not itemState:has(item) then
-                LeakWatcher:destroyTimer(t)
                 return
             end
             playFinishEffect(nil, campfire)
@@ -396,20 +398,20 @@ local function startCookTimer(self, item, campfire, recipe)
     )
 end
 local function onAnyPickup(self)
-    local ____temp_11
+    local ____temp_15
     if type(jass.GetTriggerUnit) == "function" then
-        ____temp_11 = jass.GetTriggerUnit()
+        ____temp_15 = jass.GetTriggerUnit()
     else
-        ____temp_11 = nil
+        ____temp_15 = nil
     end
-    local u = ____temp_11
-    local ____temp_12
+    local u = ____temp_15
+    local ____temp_16
     if type(jass.GetManipulatedItem) == "function" then
-        ____temp_12 = jass.GetManipulatedItem()
+        ____temp_16 = jass.GetManipulatedItem()
     else
-        ____temp_12 = nil
+        ____temp_16 = nil
     end
-    local item = ____temp_12
+    local item = ____temp_16
     if not u or not item then
         return
     end
@@ -438,13 +440,13 @@ local function onAnyPickup(self)
     end
 end
 local function onAnyDeath(self)
-    local ____temp_13
+    local ____temp_17
     if type(jass.GetTriggerUnit) == "function" then
-        ____temp_13 = jass.GetTriggerUnit()
+        ____temp_17 = jass.GetTriggerUnit()
     else
-        ____temp_13 = nil
+        ____temp_17 = nil
     end
-    local u = ____temp_13
+    local u = ____temp_17
     if not u or not isCampfire(nil, u) then
         return
     end
@@ -461,11 +463,11 @@ ____exports["init物品加工"] = function(self)
     if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.Player) ~= "function" then
         return
     end
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14 = 18
+    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_18 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_18 == nil then
+        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_18 = 18
     end
-    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_14
+    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_18
     local trigPick = jass.CreateTrigger()
     do
         local i = 0
@@ -482,11 +484,11 @@ ____exports["init物品加工"] = function(self)
         end
     end
     jass.TriggerAddAction(trigPick, onAnyPickup)
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15 = 19
+    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_19 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_19 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_19 = 19
     end
-    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_15
+    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_19
     local trigDrop = jass.CreateTrigger()
     do
         local i = 0
@@ -505,20 +507,20 @@ ____exports["init物品加工"] = function(self)
     jass.TriggerAddAction(
         trigDrop,
         function()
-            local ____temp_16
+            local ____temp_20
             if type(jass.GetManipulatingUnit) == "function" then
-                ____temp_16 = jass.GetManipulatingUnit()
+                ____temp_20 = jass.GetManipulatingUnit()
             else
-                ____temp_16 = nil
+                ____temp_20 = nil
             end
-            local unit = ____temp_16
-            local ____temp_17
+            local unit = ____temp_20
+            local ____temp_21
             if type(jass.GetManipulatedItem) == "function" then
-                ____temp_17 = jass.GetManipulatedItem()
+                ____temp_21 = jass.GetManipulatedItem()
             else
-                ____temp_17 = nil
+                ____temp_21 = nil
             end
-            local item = ____temp_17
+            local item = ____temp_21
             if unit and item and isCampfire(nil, unit) and itemState:has(item) then
                 untrackItem(nil, item)
             end
@@ -526,11 +528,11 @@ ____exports["init物品加工"] = function(self)
     )
     local trigDeath = jass.CreateTrigger()
     if type(jass.TriggerRegisterPlayerUnitEvent) == "function" then
-        local ____jass_EVENT_PLAYER_UNIT_DEATH_18 = jass.EVENT_PLAYER_UNIT_DEATH
-        if ____jass_EVENT_PLAYER_UNIT_DEATH_18 == nil then
-            ____jass_EVENT_PLAYER_UNIT_DEATH_18 = 56
+        local ____jass_EVENT_PLAYER_UNIT_DEATH_22 = jass.EVENT_PLAYER_UNIT_DEATH
+        if ____jass_EVENT_PLAYER_UNIT_DEATH_22 == nil then
+            ____jass_EVENT_PLAYER_UNIT_DEATH_22 = 56
         end
-        local ev = ____jass_EVENT_PLAYER_UNIT_DEATH_18
+        local ev = ____jass_EVENT_PLAYER_UNIT_DEATH_22
         do
             local i = 0
             while i < 16 do

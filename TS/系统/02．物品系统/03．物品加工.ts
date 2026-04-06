@@ -18,7 +18,11 @@
 
 const jass = require("jass.common") as any;
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { recipe?: string }> }).default;
-const { LeakWatcher } = require("系统.00．核心系统.05．泄露审计") as { LeakWatcher: any };
+const { withTimer, stopTimer, createTimedEffect } = require("系统.00．核心系统.01．封装函数") as {
+  withTimer: (delaySec: number, callback: () => void) => any;
+  stopTimer: (t: any) => void;
+  createTimedEffect: (modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+};
 const { CreateFloatTextAtPoint } = require("系统.00．核心系统.03．漂浮文字函数") as {
   CreateFloatTextAtPoint: (x: number, y: number, text: string, options?: any) => any;
 };
@@ -99,15 +103,7 @@ function floatBurnText(campfire: any, itemName: string): void {
 function playFinishEffect(campfire: any): void {
   if (typeof (jass as any).AddSpecialEffect !== "function") return;
   const { x, y } = getUnitXY(campfire);
-  const eff = (jass as any).AddSpecialEffect(EFFECT_FIREBOMB, x, y);
-  if (eff) LeakWatcher.trackEffect("craft_firebomb", eff);
-  const t = LeakWatcher.createTimer("craft_firebomb");
-  if (t && typeof (jass as any).TimerStart === "function") {
-    (jass as any).TimerStart(t, 2.0, false, () => {
-      if (eff) LeakWatcher.destroyEffect(eff);
-      LeakWatcher.destroyTimer(t);
-    });
-  }
+  createTimedEffect(EFFECT_FIREBOMB, x, y, 0, 2.0);
 }
 
 function getRecipeForItem(item: any): RecipeParsed | null {
@@ -208,7 +204,7 @@ function tryGiveItemToCampfire(campfire: any, item: any): boolean {
 
 function stopAndDestroyTimer(t: any): void {
   if (!t) return;
-  LeakWatcher.destroyTimer(t);
+  stopTimer(t);
 }
 
 function untrackItem(item: any): void {
@@ -226,32 +222,28 @@ function untrackItem(item: any): void {
 }
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
-  const t = LeakWatcher.createTimer("craft_burn");
+  const t = (jass as any).CreateTimer?.();
   if (!t || typeof (jass as any).TimerStart !== "function") return;
   const st = itemState.get(item);
   if (st) st.burnTimer = t;
   (jass as any).TimerStart(t, sec, false, () => {
-    // 还在系统追踪里，视为仍在篝火/未取回
     if (!itemState.has(item)) {
-      LeakWatcher.destroyTimer(t);
       return;
     }
     const name = getItemNameSafe(item);
     floatBurnText(campfire, name);
     if (typeof (jass as any).RemoveItem === "function") (jass as any).RemoveItem(item);
     untrackItem(item);
-    // t 已在 untrackItem 中 destroy
   });
 }
 
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
-  const t = LeakWatcher.createTimer("craft_cook");
+  const t = (jass as any).CreateTimer?.();
   if (!t || typeof (jass as any).TimerStart !== "function") return;
   const st = itemState.get(item);
   if (st) st.cookTimer = t;
   (jass as any).TimerStart(t, recipe.cookSec, false, () => {
     if (!itemState.has(item)) {
-      LeakWatcher.destroyTimer(t);
       return;
     }
     // 加工完成：替换物品

@@ -4,6 +4,9 @@
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
+const { findHeroOfPlayer } = require("系统.00．核心系统.01．封装函数") as {
+  findHeroOfPlayer: (playerId: number) => any;
+};
 
 import { questDB, QuestType, QuestStatus, QuestData, createTestQuests } from "./01．任务数据";
 
@@ -63,22 +66,7 @@ export class QuestManager {
    * 获取玩家的英雄单位
    */
   private getPlayerHero(playerId: number): any {
-    if (typeof jass.FirstOfGroup !== "function" ||
-        typeof jass.CreateGroup !== "function" ||
-        typeof jass.GroupEnumUnitsOfPlayer !== "function" ||
-        typeof jass.DestroyGroup !== "function") {
-      return null;
-    }
-
-    const group = jass.CreateGroup();
-    jass.GroupEnumUnitsOfPlayer(group, jass.Player(playerId), null);
-    let hero = null;
-    const unit = jass.FirstOfGroup(group);
-    if (unit && typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)) {
-      hero = unit;
-    }
-    jass.DestroyGroup(group);
-    return hero;
+    return findHeroOfPlayer(playerId);
   }
 
   /**

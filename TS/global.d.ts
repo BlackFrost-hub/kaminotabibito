@@ -135,13 +135,6 @@ interface JassCommon {
   GetUnitName: (unit: any) => string;
 }
 
-/** blizzard.j 封装接口（jass.blizzard 模块） */
-interface BlizzardJass {
-  TriggerRegisterTimerEventSingle: (trig: any, timeout: number) => any;
-  TriggerRegisterTimerEventPeriodic: (trig: any, timeout: number) => any;
-  jass: JassCommon;
-}
-
 /** jass.japi - 扩展 JASS 原生函数 (Blz* 等)，require 后注入到 jass.common */
 /** Lua global print - variadic */
 declare var print: (...args: any[]) => void;

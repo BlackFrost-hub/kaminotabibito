@@ -183,45 +183,27 @@ function collectBuffRows(unit: any): BuffBarRow[] {
   const ids = buffPoolMod.getBuffIdsOnUnit(unit);
   for (let i = 0; i < ids.length; i++) {
     const bid = ids[i];
-    if (bid === "D001" || bid === "D002" || bid === "D003" || bid === "D004") {
-      const rt = buffPoolMod.getBuffRuntime(unit, bid);
-      if (rt != null) {
-        const real = rt.remaining;
-        const iconRem =
-          typeof buffPoolMod.getDotIconDisplayRemaining === "function"
-            ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
-            : real;
-        rows.push({
-          id: bid,
-          state: {
-            effect: rt.effect,
-            remaining: real,
-            iconRemaining: iconRem,
-            sourceName: rt.sourceName,
-            _dotParsedDuration: rt._dotParsedDuration,
-          },
-          iconOverride: rt.iconOverride,
-        });
+    const rt = buffPoolMod.getBuffRuntime(unit, bid);
+    if (rt != null) {
+      const real = rt.remaining;
+      const iconRem =
+        typeof buffPoolMod.getDotIconDisplayRemaining === "function"
+          ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
+          : real;
+      const row: BuffBarRow = {
+        id: bid,
+        state: {
+          effect: rt.effect,
+          remaining: real,
+          iconRemaining: iconRem,
+          sourceName: rt.sourceName,
+        },
+        iconOverride: rt.iconOverride,
+      };
+      if (bid === "D001" || bid === "D002" || bid === "D003" || bid === "D004") {
+        row.state._dotParsedDuration = rt._dotParsedDuration;
       }
-    } else {
-      const rt = buffPoolMod.getBuffRuntime(unit, bid);
-      if (rt != null) {
-        const real = rt.remaining;
-        const iconRem =
-          typeof buffPoolMod.getDotIconDisplayRemaining === "function"
-            ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
-            : real;
-        rows.push({
-          id: bid,
-          state: {
-            effect: rt.effect,
-            remaining: real,
-            iconRemaining: iconRem,
-            sourceName: rt.sourceName,
-          },
-          iconOverride: rt.iconOverride,
-        });
-      }
+      rows.push(row);
     }
   }
   const buffs = buffTableMod.buffs;

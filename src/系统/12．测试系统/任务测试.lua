@@ -12,6 +12,8 @@ local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
 local KEY_LETTER = ____04_FF0E_786C_4EF6_51FD_6570.KEY_LETTER
 --- 任务系统测试
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local withTimer = ____require_result_0.withTimer
 local function debugPrint(self, msg)
     local pr = _G.print
     if pr ~= nil then
@@ -85,31 +87,24 @@ function ____exports.testUI(self)
             debugPrint(nil, "任务UI已显示")
         end
     )
-    if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-        local timer = jass.CreateTimer()
-        jass.TimerStart(
-            timer,
-            3,
-            false,
-            function()
-                pcall(function ()
-                        if type(jass.GetLocalPlayer) ~= "function" then
-                            return
-                        end
-                        local lp = jass.GetLocalPlayer()
-                        if lp == nil or lp == 0 then
-                            return
-                        end
-                        taskUI:hide()
-                        debugPrint(nil, "任务UI已隐藏")
+    withTimer(
+        nil,
+        3,
+        function()
+            pcall(function ()
+                    if type(jass.GetLocalPlayer) ~= "function" then
+                        return
                     end
-                )
-                if type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(timer)
+                    local lp = jass.GetLocalPlayer()
+                    if lp == nil or lp == 0 then
+                        return
+                    end
+                    taskUI:hide()
+                    debugPrint(nil, "任务UI已隐藏")
                 end
-            end
-        )
-    end
+            )
+        end
+    )
 end
 --- 测试任务数据
 function ____exports.testQuestData(self)
@@ -164,20 +159,20 @@ function ____exports.registerTestCommand(self)
             nil,
             KEY_LETTER.Y,
             function(____, player, key)
-                local ____temp_2
-                if type(jass.GetPlayerId) == "function" then
-                    ____temp_2 = jass.GetPlayerId
-                else
-                    ____temp_2 = nil
-                end
-                local getPid = ____temp_2
                 local ____temp_3
-                if getPid and player then
-                    ____temp_3 = getPid(player)
+                if type(jass.GetPlayerId) == "function" then
+                    ____temp_3 = jass.GetPlayerId
                 else
-                    ____temp_3 = 0
+                    ____temp_3 = nil
                 end
-                local playerId = ____temp_3
+                local getPid = ____temp_3
+                local ____temp_4
+                if getPid and player then
+                    ____temp_4 = getPid(player)
+                else
+                    ____temp_4 = 0
+                end
+                local playerId = ____temp_4
                 if playerId == 0 then
                     ____exports.testQuestData(nil)
                     ____exports.testQuestAcceptComplete(nil)

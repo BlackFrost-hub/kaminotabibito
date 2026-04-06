@@ -4,6 +4,10 @@
 
 const jass = require("jass.common") as any;
 
+const { withTimer } = require("系统.00．核心系统.01．封装函数") as {
+  withTimer: (delaySec: number, callback: () => void) => any;
+};
+
 import { questManager } from "../08．任务系统/02．任务管理器";
 import { taskUI } from "../08．任务系统/03．任务UI";
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
@@ -75,22 +79,16 @@ export function testUI(): void {
   });
 
   // 等待3秒后隐藏
-  if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
-    const timer = jass.CreateTimer();
-    jass.TimerStart(timer, 3, false, () => {
-      (pcall as any)(() => {
-        if (typeof jass.GetLocalPlayer !== "function") return;
-        const lp = jass.GetLocalPlayer();
-        if (lp == null || lp === 0) return;
+  withTimer(3, () => {
+    (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
+      const lp = jass.GetLocalPlayer();
+      if (lp == null || lp === 0) return;
 
-        taskUI.hide();
-        debugPrint("任务UI已隐藏");
-      });
-      if (typeof jass.DestroyTimer === "function") {
-        jass.DestroyTimer(timer);
-      }
+      taskUI.hide();
+      debugPrint("任务UI已隐藏");
     });
-  }
+  });
 }
 
 /**

@@ -75,9 +75,11 @@ require("系统.00．核心系统.02．音效函数")
 require("系统.00．核心系统.03．漂浮文字函数")
 require("系统.00．核心系统.04．硬件函数")
 require("系统.00．核心系统.05．泄露审计")
-require("系统.00．核心系统.12．YDWE函数")
+require("lib.扩展函数.02．YDWE函数")
 require("系统.00．核心系统.13．镜头函数")
 require("系统.00．核心系统.14．颜色常量")
+require("lib.扩展函数.00．条件判断函数")
+require("lib.扩展函数.03．BJ函数")
 require("系统.01．单位系统.单位狂暴")
 require("系统.02．物品系统.03．物品加工")
 require("系统.02．物品系统.04．装备成长")
@@ -93,6 +95,10 @@ if not ok then
         "装备系统加载失败:",
         tostring(err)
     )
+end
+local _____663E_793A_6280_80FD_540D_5B57 = require("系统.03．技能系统.01．显示技能名字")
+if type(_____663E_793A_6280_80FD_540D_5B57.initShowSkillName) == "function" then
+    _____663E_793A_6280_80FD_540D_5B57:initShowSkillName()
 end
 require("系统.04．伤害系统.01．伤害事件")
 require("系统.04．伤害系统.02．dot伤害")
@@ -115,8 +121,7 @@ if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
     _____4EFB_52A1_7BA1_7406_5668:init()
 end
 require("系统.08．任务系统.05．任务STES桥接")
-require("系统.08．任务系统.06．任务接受")
-require("系统.08．任务系统.07．任务完成")
+require("系统.08．任务系统.06．任务事件桥接")
 require("系统.08．任务系统.08．任务目标更新")
 local _____539F_751FUI = require("系统.09．表现系统.00．初始化UI")
 if type(_____539F_751FUI.initNativeUI) == "function" then

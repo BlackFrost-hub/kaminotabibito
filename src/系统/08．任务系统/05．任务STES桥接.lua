@@ -22,6 +22,42 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local function debugPrint(self, _msg)
 end
+--- 注册简单的 STES 桥接事件（用于任务接受/完成等单事件）
+-- 
+-- @param eventName STES 事件名
+-- @param onEvent 事件回调
+-- @param debugMsg 调试信息前缀
+function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, debugMsg)
+    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.ExecuteFunc) ~= "function" then
+        debugPrint(nil, ("JASS API 不完整，无法注册" .. debugMsg) .. "事件")
+        return
+    end
+    local trig = jass.CreateTrigger()
+    jass.TriggerAddAction(
+        trig,
+        function()
+            debugPrint(nil, debugMsg .. "事件触发...")
+            do
+                local function ____catch(____error)
+                    debugPrint(
+                        nil,
+                        (("处理" .. debugMsg) .. "事件时出错: ") .. tostring(____error)
+                    )
+                end
+                local ____try, ____hasReturned = pcall(function()
+                    onEvent(nil)
+                end)
+                if not ____try then
+                    ____catch(____hasReturned)
+                end
+            end
+        end
+    )
+    g.udg_RegTrigger = trig
+    g.udg_RegEventStr = eventName
+    jass.ExecuteFunc("Bridge_STES_Register")
+    debugPrint(nil, "已通过 Bridge_STES_Register 注册 " .. eventName)
+end
 --- 与装备提取一致：优先直接 STES_Register，否则走全局桥接（每次一对 trigger+string）。
 local function registerOneStesEvent(self, trigger, eventName)
     local ____jass_STES_Register_0 = jass.STES_Register
@@ -119,11 +155,11 @@ local function init(self)
     end
     for eventKey in pairs(QUEST_STES_OBJECTIVE_ROWS) do
         do
-            local __continue26
+            local __continue31
             repeat
                 local row = QUEST_STES_OBJECTIVE_ROWS[eventKey]
                 if not row then
-                    __continue26 = true
+                    __continue31 = true
                     break
                 end
                 local trig = jass.CreateTrigger()
@@ -135,9 +171,9 @@ local function init(self)
                     end
                 )
                 registerOneStesEvent(nil, trig, key)
-                __continue26 = true
+                __continue31 = true
             until true
-            if not __continue26 then
+            if not __continue31 then
                 break
             end
         end

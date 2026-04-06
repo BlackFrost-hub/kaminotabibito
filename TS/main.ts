@@ -43,9 +43,13 @@ require("系统.00．核心系统.02．音效函数");
 require("系统.00．核心系统.03．漂浮文字函数");
 require("系统.00．核心系统.04．硬件函数");
 require("系统.00．核心系统.05．泄露审计");
-require("系统.00．核心系统.12．YDWE函数");
+require("lib.扩展函数.02．YDWE函数");
 require("系统.00．核心系统.13．镜头函数");
 require("系统.00．核心系统.14．颜色常量");
+
+// ---------- 扩展函数 ----------
+require("lib.扩展函数.00．条件判断函数");
+require("lib.扩展函数.03．BJ函数");
 
 // ---------- 01．单位系统 ----------
 require("系统.01．单位系统.单位狂暴");
@@ -60,6 +64,10 @@ require("系统.02．物品系统.08．装备移速");
 require("系统.02．物品系统.10．装备限制");
 const [ok, err] = pcall(() => require("系统.02．物品系统.11．装备系统"));
 if (!ok) (globalThis as any).print("装备系统加载失败:", tostring(err));
+
+// ---------- 03．技能系统 ----------
+const 显示技能名字 = require("系统.03．技能系统.01．显示技能名字") as { initShowSkillName: () => void };
+if (typeof 显示技能名字.initShowSkillName === "function") 显示技能名字.initShowSkillName();
 
 // ---------- 04．伤害系统 ----------
 require("系统.04．伤害系统.01．伤害事件");
@@ -82,8 +90,7 @@ if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.i
 const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init: () => void };
 if (typeof 任务管理器.init === "function") 任务管理器.init();
 require("系统.08．任务系统.05．任务STES桥接");
-require("系统.08．任务系统.06．任务接受");
-require("系统.08．任务系统.07．任务完成");
+require("系统.08．任务系统.06．任务事件桥接");
 require("系统.08．任务系统.08．任务目标更新");
 
 // ---------- UI系统 ----------

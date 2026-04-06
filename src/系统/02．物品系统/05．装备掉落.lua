@@ -51,6 +51,7 @@ local g = require("jass.globals")
 local equipExcrete = require("系统.02．物品系统.09．装备排泄")
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local stringToFourCC = ____require_result_0.stringToFourCC
+local isSpecialUnit = ____require_result_0.isSpecialUnit
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})
 itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
 local PREFIX = "|cffffff00『系统提示』：|r";
@@ -398,10 +399,7 @@ local function condition(self)
     if not u then
         return false
     end
-    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(u) then
-        return false
-    end
-    if jass.IsUnitType(u, jass.UNIT_TYPE_SUMMONED) then
+    if isSpecialUnit(nil, u) then
         return false
     end
     return true

@@ -7,10 +7,11 @@ const items = (require("系统.02．物品系统.01．装备数据") as { defaul
 const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
-const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
+  isSpecialUnit: (unit: any) => boolean;
 };
-const { getObjectProperty, ObjectType } = require("系统.00．核心系统.12．YDWE函数") as {
+const { getObjectProperty, ObjectType } = require("lib.扩展函数.02．YDWE函数") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
 };
@@ -123,9 +124,7 @@ function initEvents(): void {
     const item = jass.GetManipulatedItem();
     const unit = jass.GetManipulatingUnit();
     if (!unit || !item) return;
-    if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-    if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
-    if (typeof (jass as any).IsUnitIllusion === "function" && (jass as any).IsUnitIllusion(unit)) return;
+    if (isSpecialUnit(unit)) return;
     const player = jass.GetOwningPlayer(unit);
     const itemId = jass.GetItemTypeId(item);
     const event = jass.GetTriggerEventId();
@@ -168,8 +167,8 @@ function initEvents(): void {
     let primary: Record<string, number> = {};
     if (primaryBonus) {
       const typeId = typeof (jass as any).GetUnitTypeId === "function" ? (jass as any).GetUnitTypeId(unit) : 0;
-      const unitId = typeId ? fourCCToString(typeId) : "";
-      const primaryStr = unitId ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
+      const unitId = typeId !== 0 ? fourCCToString(typeId) : "";
+      const primaryStr = unitId !== "" ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
       primary = parsePrimaryBonus(primaryBonus, primaryStr);
     }
     const merged: Record<string, number> = {};

@@ -382,6 +382,57 @@ class TaskUI {
     }
   }
 
+  private createTaskTab(
+    tabParent: number,
+    bgName: string,
+    tabName: string,
+    labelName: string,
+    x: number,
+    labelText: string,
+    category: QuestType,
+    tooltip: string
+  ): { bg: number | null; tab: number | null } {
+    const bg = tryCreateFromFdfOnly(bgName, tabParent);
+    if (bg) {
+      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
+      setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
+      setFrameSize(bg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
+      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(bg, true));
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(bg, 7);
+    }
+
+    if (bg) {
+      const tabLabel = createTabLabelTextOnBackdrop(bg, labelName, labelText, TAB_CATEGORY_FONT_SCALE);
+      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
+    }
+
+    const tab = tryCreateFromFdfOnly(tabName, tabParent);
+    if (tab) {
+      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(tab);
+      if (bg) {
+        setupTransparentGlueHitLayer(bg, tab);
+      } else {
+        setFramePointRelative(tab, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
+        setFrameSize(tab, { width: TAB_FRAME_W, height: TAB_FRAME_H });
+      }
+      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(tab, true));
+      if (!bg) {
+        setButtonText(tab, "");
+        if (typeof (japi as any).DzFrameSetAlpha === "function") {
+          (pcall as any)(() => (japi as any).DzFrameSetAlpha(tab, 0));
+        }
+      }
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tab, 9);
+      setFrameClickEvent(tab, () => {
+        SoundUI_ClickPlay();
+        this.switchCategory(category);
+      }, false);
+      setFrameHoverEvents(tab, () => this.showTabTooltip(tooltip), () => { }, false);
+    }
+
+    return { bg, tab };
+  }
+
   private createMainPanel(parent: number): void {
     this.mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
     if (!this.mainPanel) return;
@@ -426,119 +477,44 @@ class TaskUI {
     }
 
     const tabParent = this.mainPanel!;
-    this.tabMainBg = tryCreateFromFdfOnly("TaskTabMainBg", tabParent);
-    if (this.tabMainBg) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabMainBg);
-      setFramePointRelative(this.tabMainBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.02, TAB_REL_Y);
-      setFrameSize(this.tabMainBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabMainBg, true));
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabMainBg, 7);
-    }
+    const mainResult = this.createTaskTab(
+      tabParent,
+      "TaskTabMainBg",
+      "TaskTabMain",
+      "TaskTabMainLabel",
+      0.02,
+      "|cffffcc00主线(1)|r",
+      QuestType.MAIN,
+      "按 1 切换主线任务"
+    );
+    this.tabMainBg = mainResult.bg;
+    this.tabMain = mainResult.tab;
 
-    if (this.tabMainBg) {
-      const tabLabel = createTabLabelTextOnBackdrop(this.tabMainBg, "TaskTabMainLabel", "|cffffcc00主线(1)|r", TAB_CATEGORY_FONT_SCALE);
-      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
-    }
+    const sideResult = this.createTaskTab(
+      tabParent,
+      "TaskTabSideBg",
+      "TaskTabSide",
+      "TaskTabSideLabel",
+      0.135,
+      "|cffffcc00支线(2)|r",
+      QuestType.SIDE,
+      "按 2 切换支线任务"
+    );
+    this.tabSideBg = sideResult.bg;
+    this.tabSide = sideResult.tab;
 
-    this.tabMain = tryCreateFromFdfOnly("TaskTabMain", tabParent);
-    if (this.tabMain) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabMain);
-      if (this.tabMainBg) {
-        setupTransparentGlueHitLayer(this.tabMainBg, this.tabMain);
-      } else {
-        setFramePointRelative(this.tabMain, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.02, TAB_REL_Y);
-        setFrameSize(this.tabMain, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      }
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabMain, true));
-      if (!this.tabMainBg) {
-        setButtonText(this.tabMain, "");
-        if (typeof (japi as any).DzFrameSetAlpha === "function") {
-          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabMain, 0));
-        }
-      }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabMain, 9);
-      setFrameClickEvent(this.tabMain, () => {
-        SoundUI_ClickPlay();
-        this.switchCategory(QuestType.MAIN);
-      }, false);
-      setFrameHoverEvents(this.tabMain, () => this.showTabTooltip("按 1 切换主线任务"), () => { }, false);
-    }
-
-    this.tabSideBg = tryCreateFromFdfOnly("TaskTabSideBg", tabParent);
-    if (this.tabSideBg) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabSideBg);
-      setFramePointRelative(this.tabSideBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.135, TAB_REL_Y);
-      setFrameSize(this.tabSideBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabSideBg, true));
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabSideBg, 7);
-    }
-
-    if (this.tabSideBg) {
-      const tabLabel = createTabLabelTextOnBackdrop(this.tabSideBg, "TaskTabSideLabel", "|cffffcc00支线(2)|r", TAB_CATEGORY_FONT_SCALE);
-      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
-    }
-
-    this.tabSide = tryCreateFromFdfOnly("TaskTabSide", tabParent);
-    if (this.tabSide) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabSide);
-      if (this.tabSideBg) {
-        setupTransparentGlueHitLayer(this.tabSideBg, this.tabSide);
-      } else {
-        setFramePointRelative(this.tabSide, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.135, TAB_REL_Y);
-        setFrameSize(this.tabSide, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      }
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabSide, true));
-      if (!this.tabSideBg) {
-        setButtonText(this.tabSide, "");
-        if (typeof (japi as any).DzFrameSetAlpha === "function") {
-          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabSide, 0));
-        }
-      }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabSide, 9);
-      setFrameClickEvent(this.tabSide, () => {
-        SoundUI_ClickPlay();
-        this.switchCategory(QuestType.SIDE);
-      }, false);
-      setFrameHoverEvents(this.tabSide, () => this.showTabTooltip("按 2 切换支线任务"), () => { }, false);
-    }
-
-    this.tabDailyBg = tryCreateFromFdfOnly("TaskTabDailyBg", tabParent);
-    if (this.tabDailyBg) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabDailyBg);
-      setFramePointRelative(this.tabDailyBg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.25, TAB_REL_Y);
-      setFrameSize(this.tabDailyBg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabDailyBg, true));
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabDailyBg, 7);
-    }
-
-    if (this.tabDailyBg) {
-      const tabLabel = createTabLabelTextOnBackdrop(this.tabDailyBg, "TaskTabDailyLabel", "|cffffcc00小任务(3)|r", TAB_CATEGORY_FONT_SCALE);
-      if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
-    }
-
-    this.tabDaily = tryCreateFromFdfOnly("TaskTabDaily", tabParent);
-    if (this.tabDaily) {
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(this.tabDaily);
-      if (this.tabDailyBg) {
-        setupTransparentGlueHitLayer(this.tabDailyBg, this.tabDaily);
-      } else {
-        setFramePointRelative(this.tabDaily, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, 0.25, TAB_REL_Y);
-        setFrameSize(this.tabDaily, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-      }
-      if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(this.tabDaily, true));
-      if (!this.tabDailyBg) {
-        setButtonText(this.tabDaily, "");
-        if (typeof (japi as any).DzFrameSetAlpha === "function") {
-          (pcall as any)(() => (japi as any).DzFrameSetAlpha(this.tabDaily, 0));
-        }
-      }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(this.tabDaily, 9);
-      setFrameClickEvent(this.tabDaily, () => {
-        SoundUI_ClickPlay();
-        this.switchCategory(QuestType.DAILY);
-      }, false);
-      setFrameHoverEvents(this.tabDaily, () => this.showTabTooltip("按 3 切换小任务"), () => { }, false);
-    }
+    const dailyResult = this.createTaskTab(
+      tabParent,
+      "TaskTabDailyBg",
+      "TaskTabDaily",
+      "TaskTabDailyLabel",
+      0.25,
+      "|cffffcc00小任务(3)|r",
+      QuestType.DAILY,
+      "按 3 切换小任务"
+    );
+    this.tabDailyBg = dailyResult.bg;
+    this.tabDaily = dailyResult.tab;
 
     if (this.mainPanel !== null) {
       const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", this.mainPanel, () => {

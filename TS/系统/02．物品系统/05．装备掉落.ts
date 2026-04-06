@@ -12,8 +12,9 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [key: string]: any };
 const equipExcrete = require("系统.02．物品系统.09．装备排泄") as { setLastCreatedItem: (item: any) => void };
-const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
   stringToFourCC: (s: string) => number;
+  isSpecialUnit: (unit: any) => boolean;
 };
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, UnitDataEntry> }).default ??
@@ -249,8 +250,7 @@ function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
 function condition(): boolean {
   const u = jass.GetTriggerUnit();
   if (!u) return false;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(u)) return false;
-  if (jass.IsUnitType(u, (jass as any).UNIT_TYPE_SUMMONED)) return false;
+  if (isSpecialUnit(u)) return false;
   return true;
 }
 

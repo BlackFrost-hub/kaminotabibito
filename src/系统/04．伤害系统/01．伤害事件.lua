@@ -1,46 +1,24 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, getUnitTypeHero, unitDeathCondition, unitDeathAction, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, g, _____4F24_5BB3_51FD_6570, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
+local getEventUnitDamaged, unitDeathCondition, unitDeathAction, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
 function getEventUnitDamaged(self)
     if type(jass.ConvertUnitEvent) == "function" then
         return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
     end
     return nil
 end
-function getUnitTypeHero(self)
-    local ____jass_UNIT_TYPE_HERO_0 = jass.UNIT_TYPE_HERO
-    if ____jass_UNIT_TYPE_HERO_0 == nil then
-        ____jass_UNIT_TYPE_HERO_0 = g.UNIT_TYPE_HERO
-    end
-    local direct = ____jass_UNIT_TYPE_HERO_0
-    if direct ~= nil then
-        return direct
-    end
-    if type(jass.ConvertUnitType) ~= "function" then
-        return nil
-    end
-    return jass.ConvertUnitType(2)
-end
 function unitDeathCondition(self)
-    local ____temp_1
+    local ____temp_2
     if type(jass.GetTriggerUnit) == "function" then
-        ____temp_1 = jass.GetTriggerUnit()
+        ____temp_2 = jass.GetTriggerUnit()
     else
-        ____temp_1 = nil
+        ____temp_2 = nil
     end
-    local u = ____temp_1
+    local u = ____temp_2
     if not u then
         return false
     end
-    local utHero = getUnitTypeHero()
-    local ____temp_2
-    if utHero ~= nil and type(jass.IsUnitType) == "function" then
-        ____temp_2 = jass.IsUnitType(u, utHero)
-    else
-        ____temp_2 = false
-    end
-    local isHero = ____temp_2
-    return isHero ~= true
+    return not isHeroUnit(nil, u)
 end
 function unitDeathAction(self)
     if not UnitGroup then
@@ -403,8 +381,10 @@ function initDamageEventOnce(self, intervalSeconds)
     end
 end
 jass = require("jass.common")
-g = require("jass.globals")
+local g = require("jass.globals")
 _____4F24_5BB3_51FD_6570 = require("系统.00．核心系统.08．伤害函数")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+isHeroUnit = ____require_result_0.isHeroUnit
 ALOC = 1097625443
 EVENT_UNIT_DAMAGED_ID = 52
 DamageEventQueue = {}
@@ -420,6 +400,21 @@ dotBatchMarkQueue = {}
 --- 由 dot伤害.dealDamageForType 调用：标记「下一次因伤入队」来自本帧 DOT 秒跳，便于延后清空 dotTickBatchTargetHids
 function ____exports.markNextPendingDamageAsDotTickBatch(self)
     dotBatchMarkQueue[#dotBatchMarkQueue + 1] = true
+end
+--- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致，优先 jass/globals 的 unittype 常量
+local function getUnitTypeHero(self)
+    local ____jass_UNIT_TYPE_HERO_1 = jass.UNIT_TYPE_HERO
+    if ____jass_UNIT_TYPE_HERO_1 == nil then
+        ____jass_UNIT_TYPE_HERO_1 = g.UNIT_TYPE_HERO
+    end
+    local direct = ____jass_UNIT_TYPE_HERO_1
+    if direct ~= nil then
+        return direct
+    end
+    if type(jass.ConvertUnitType) ~= "function" then
+        return nil
+    end
+    return jass.ConvertUnitType(2)
 end
 --- 注册一个触发器：当任意单位受到伤害时，若该触发器启用且条件通过则执行。
 -- 

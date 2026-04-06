@@ -15,6 +15,8 @@ local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local fourCCToString = ____require_result_0.fourCCToString
+local isSpecialUnit = ____require_result_0.isSpecialUnit
+local withTimer = ____require_result_0.withTimer
 --- 解析 hot 字符串和 abilList，返回每段的信息
 local function parseSegments(self, hotStr, abilList)
     local segments = __TS__StringSplit(hotStr, "+")
@@ -178,10 +180,7 @@ local function onUseItem(self)
     if not unit or not item then
         return
     end
-    if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
-        return
-    end
-    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
+    if isSpecialUnit(nil, unit) then
         return
     end
     local ____temp_14
@@ -202,66 +201,38 @@ local function onUseItem(self)
         return
     end
     glob.__EquipHealExecutedKey = key
-    local ____this_16
-    ____this_16 = jass
-    local ____opt_15 = ____this_16.CreateTimer
-    if ____opt_15 ~= nil then
-        ____opt_15 = ____opt_15(____this_16)
-    end
-    local clearTimer = ____opt_15
-    if clearTimer and type(jass.TimerStart) == "function" then
-        local ct = clearTimer
-        jass.TimerStart(
-            ct,
-            0.5,
-            false,
-            function()
-                glob.__EquipHealExecutedKey = nil
-                if type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(ct)
-                end
-            end
-        )
-    end
+    withTimer(
+        nil,
+        0.5,
+        function()
+            glob.__EquipHealExecutedKey = nil
+        end
+    )
     local segments = parseSegments(nil, entry.hot, entry.abilList)
     for ____, seg in ipairs(segments) do
         do
-            local __continue36
+            local __continue33
             repeat
                 if seg.abilId == "" then
-                    __continue36 = true
+                    __continue33 = true
                     break
                 end
                 if seg.waitSec <= 0 then
                     executeSegment(nil, unit, seg)
                 else
-                    local ____this_18
-                    ____this_18 = jass
-                    local ____opt_17 = ____this_18.CreateTimer
-                    if ____opt_17 ~= nil then
-                        ____opt_17 = ____opt_17(____this_18)
-                    end
-                    local delayTimer = ____opt_17
-                    if delayTimer and type(jass.TimerStart) == "function" then
-                        local dt = delayTimer
-                        local capturedSeg = seg
-                        local capturedUnit = unit
-                        jass.TimerStart(
-                            dt,
-                            seg.waitSec,
-                            false,
-                            function()
-                                executeSegment(nil, capturedUnit, capturedSeg)
-                                if type(jass.DestroyTimer) == "function" then
-                                    jass.DestroyTimer(dt)
-                                end
-                            end
-                        )
-                    end
+                    local capturedSeg = seg
+                    local capturedUnit = unit
+                    withTimer(
+                        nil,
+                        seg.waitSec,
+                        function()
+                            executeSegment(nil, capturedUnit, capturedSeg)
+                        end
+                    )
                 end
-                __continue36 = true
+                __continue33 = true
             until true
-            if not __continue36 then
+            if not __continue33 then
                 break
             end
         end
@@ -273,11 +244,11 @@ local function init(self)
         return
     end
     g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19 = 35
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 = 35
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_19
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -291,13 +262,13 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_21
-    ____this_21 = jass
-    local ____opt_20 = ____this_21.Player
-    if ____opt_20 ~= nil then
-        ____opt_20 = ____opt_20(____this_21, 13)
+    local ____this_17
+    ____this_17 = jass
+    local ____opt_16 = ____this_17.Player
+    if ____opt_16 ~= nil then
+        ____opt_16 = ____opt_16(____this_17, 13)
     end
-    local p13 = ____opt_20
+    local p13 = ____opt_16
     if p13 ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
     end

@@ -49,23 +49,25 @@ const VILLAGE_CHIEF_DIALOG: NpcDialogData = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const trg = jass.CreateTrigger();
-const redPlayer = jass.Player(0);
-jass.TriggerRegisterPlayerUnitEvent(
-  trg,
-  redPlayer,
-  jass.EVENT_PLAYER_UNIT_SELECTED,
-  null
-);
+for (let i = 0; i < 4; i++) {
+  jass.TriggerRegisterPlayerUnitEvent(
+    trg,
+    jass.Player(i),
+    jass.EVENT_PLAYER_UNIT_SELECTED,
+    null
+  );
+}
 jass.TriggerAddAction(trg, () => {
   const u = jass.GetTriggerUnit();
   if (!u) return;
   if (jass.GetUnitTypeId(u) !== UNIT_ID_NGME) return;
-  
-  const hero = 便捷函数.getPlayerFirstHero(redPlayer);
+
+  const triggerPlayer = jass.GetTriggerPlayer();
+  const hero = 便捷函数.getPlayerFirstHero(triggerPlayer);
   if (!hero) return;
   if (!jass.IsUnitInRange(hero, u, 350)) return;
 
-  openNpcDialog(redPlayer, VILLAGE_CHIEF_DIALOG);
+  openNpcDialog(triggerPlayer, { ...VILLAGE_CHIEF_DIALOG, npcUnit: u });
 });
 
 export {};

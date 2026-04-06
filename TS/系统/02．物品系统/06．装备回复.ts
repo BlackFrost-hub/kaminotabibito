@@ -6,8 +6,10 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { udg_TempReal?: { [k: number]: number }; [k: string]: any };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
-const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString, isSpecialUnit, withTimer } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
+  isSpecialUnit: (unit: any) => boolean;
+  withTimer: (delaySec: number, callback: () => void) => void;
 };
 
 interface SegmentInfo {
@@ -99,8 +101,7 @@ function onUseItem(): void {
   const unit = (jass as any).GetManipulatingUnit?.() ?? (jass as any).GetTriggerUnit?.();
   const item = (jass as any).GetManipulatedItem?.();
   if (!unit || !item) return;
-  if (typeof (jass as any).IsUnitType === "function" && jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
+  if (isSpecialUnit(unit)) return;
   const itemId = typeof (jass as any).GetItemTypeId === "function" ? (jass as any).GetItemTypeId(item) : 0;
   const idStr = fourCCToString(itemId);
   const entry = (itemsData as Record<string, { hot?: string; abilList?: string }>)[idStr];
@@ -110,14 +111,9 @@ function onUseItem(): void {
   const key = tostring(unit) + "_" + idStr;
   if (glob.__EquipHealExecutedKey === key) return;
   glob.__EquipHealExecutedKey = key;
-  const clearTimer = (jass as any).CreateTimer?.();
-  if (clearTimer && typeof (jass as any).TimerStart === "function") {
-    const ct = clearTimer;
-    (jass as any).TimerStart(ct, 0.5, false, () => {
-      glob.__EquipHealExecutedKey = undefined;
-      if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(ct);
-    });
-  }
+  withTimer(0.5, () => {
+    glob.__EquipHealExecutedKey = undefined;
+  });
 
   const segments = parseSegments(entry.hot, entry.abilList);
   for (const seg of segments) {
@@ -125,16 +121,11 @@ function onUseItem(): void {
     if (seg.waitSec <= 0) {
       executeSegment(unit, seg);
     } else {
-      const delayTimer = (jass as any).CreateTimer?.();
-      if (delayTimer && typeof (jass as any).TimerStart === "function") {
-        const dt = delayTimer;
-        const capturedSeg = seg;
-        const capturedUnit = unit;
-        (jass as any).TimerStart(dt, seg.waitSec, false, () => {
-          executeSegment(capturedUnit, capturedSeg);
-          if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(dt);
-        });
-      }
+      const capturedSeg = seg;
+      const capturedUnit = unit;
+      withTimer(seg.waitSec, () => {
+        executeSegment(capturedUnit, capturedSeg);
+      });
     }
   }
 }

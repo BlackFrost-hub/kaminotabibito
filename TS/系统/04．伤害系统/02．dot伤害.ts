@@ -701,8 +701,24 @@ function splitItemBuffSegments(buff: string): string[] {
   return out;
 }
 
-// ========== 反恢复：解析 Buff、取装备最强、算伤害（regenHP×effectPct%） ==========
-function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: number; attackOnly: boolean } | null {
+/** 从字符串中读取从 startIdx 开始的连续数字 */
+function readNumberFromString(s: string, startIdx: number): number {
+  let numEnd = startIdx;
+  while (numEnd < s.length) {
+    const c = s.charAt(numEnd);
+    if (c >= "0" && c <= "9") numEnd++;
+    else break;
+  }
+  return numEnd > startIdx ? parseInt(s.substring(startIdx, numEnd), 10) || 0 : 0;
+}
+
+/** 通用的标准 DOT Buff 解析（适用于 AntiHeal、Burn、Poison） */
+function parseStandardDotBuff<T>(
+  buffStr: string,
+  keyword: string,
+  createResult: (value: number, duration: number, attackOnly: boolean) => T,
+  requireValuePositive: boolean = true
+): T | null {
   if (!buffStr || typeof buffStr !== "string") return null;
   const s = buffStr.trim();
   let attackOnly = false;
@@ -712,24 +728,53 @@ function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: numb
     return null;
   }
   const rest = s.substring(attackOnly ? 12 : 9);
-  const antiIdx = rest.indexOf("AntiHeal");
-  if (antiIdx < 0) return null;
-  let numEnd = antiIdx + 8;
-  while (numEnd < rest.length) {
-    const c = rest.charAt(numEnd);
-    if (c >= "0" && c <= "9") numEnd++; else break;
-  }
-  const effectPct = numEnd > antiIdx + 8 ? parseInt(rest.substring(antiIdx + 8, numEnd), 10) || 0 : 0;
+  const keywordIdx = rest.indexOf(keyword);
+  if (keywordIdx < 0) return null;
+  const valueStartIdx = keywordIdx + keyword.length;
+  const value = readNumberFromString(rest, valueStartIdx);
   const timeIdx = rest.indexOf("time");
   if (timeIdx < 0) return null;
-  let tEnd = timeIdx + 4;
-  while (tEnd < rest.length) {
-    const c = rest.charAt(tEnd);
-    if (c >= "0" && c <= "9") tEnd++; else break;
-  }
-  const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
+  const duration = readNumberFromString(rest, timeIdx + 4);
   if (duration <= 0) return null;
-  return { effectPct, duration, attackOnly };
+  if (requireValuePositive && value <= 0) return null;
+  return createResult(value, duration, attackOnly);
+}
+
+/** 通用的从单位装备中取最强 DOT 的函数 */
+function getBestDotFromUnit<T extends { duration: number; attackOnly: boolean }>(
+  unit: any,
+  parseBuff: (s: string) => T | null,
+  getProduct: (parsed: T) => number
+): T | null {
+  let best: (T & { product: number }) | null = null;
+  for (let slot = 0; slot <= 5; slot++) {
+    const item = unitItemInSlot(unit, slot);
+    if (!item) continue;
+    const idStr = fourCCToString(getItemTypeId(item));
+    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
+    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
+    for (let si = 0; si < segments.length; si++) {
+      const parsed = parseBuff(segments[si]);
+      if (!parsed) continue;
+      const product = getProduct(parsed);
+      if (best == null || product > best.product) {
+        best = { ...parsed, product };
+      }
+    }
+  }
+  if (best == null) return null;
+  const { product, ...result } = best;
+  return result as unknown as T;
+}
+
+// ========== 反恢复：解析 Buff、取装备最强、算伤害（regenHP×effectPct%） ==========
+function parseAntiHealBuff(buffStr: string): { effectPct: number; duration: number; attackOnly: boolean } | null {
+  return parseStandardDotBuff(
+    buffStr,
+    "AntiHeal",
+    (effectPct, duration, attackOnly) => ({ effectPct, duration, attackOnly }),
+    false
+  );
 }
 
 /**
@@ -770,74 +815,21 @@ function getTargetRegenHP(targetUnit: any): number {
 }
 
 function getBestAntiHealFromUnit(unit: any): { effectPct: number; duration: number; attackOnly: boolean } | null {
-  let best: { effectPct: number; duration: number; product: number; attackOnly: boolean } | null = null;
-  for (let slot = 0; slot <= 5; slot++) {
-    const item = unitItemInSlot(unit, slot);
-    if (!item) continue;
-    const idStr = fourCCToString(getItemTypeId(item));
-    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
-    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
-    for (let si = 0; si < segments.length; si++) {
-      const parsed = parseAntiHealBuff(segments[si]);
-      if (!parsed) continue;
-      const product = parsed.effectPct * parsed.duration;
-      if (best == null || product > best.product) {
-        best = { effectPct: parsed.effectPct, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
-      }
-    }
-  }
-  return best != null ? { effectPct: best.effectPct, duration: best.duration, attackOnly: best.attackOnly } : null;
+  return getBestDotFromUnit(unit, parseAntiHealBuff, (parsed) => parsed.effectPct * parsed.duration);
 }
 
 // ========== 燃烧：Buff:dmg:Burn50;time5 → 每秒 50 点火焰伤害，持续 5 秒（与 Buff表 D002 文案一致） ==========
 function parseBurnBuff(buffStr: string): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
-  if (!buffStr || typeof buffStr !== "string") return null;
-  const s = buffStr.trim();
-  let attackOnly = false;
-  if (s.indexOf("Buff:attack:") === 0) {
-    attackOnly = true;
-  } else if (s.indexOf("Buff:dmg:") !== 0) {
-    return null;
-  }
-  const rest = s.substring(attackOnly ? 12 : 9);
-  const burnIdx = rest.indexOf("Burn");
-  if (burnIdx < 0) return null;
-  let numEnd = burnIdx + 4;
-  while (numEnd < rest.length) {
-    const c = rest.charAt(numEnd);
-    if (c >= "0" && c <= "9") numEnd++; else break;
-  }
-  const damagePerSec = numEnd > burnIdx + 4 ? parseInt(rest.substring(burnIdx + 4, numEnd), 10) || 0 : 0;
-  const timeIdx = rest.indexOf("time");
-  if (timeIdx < 0) return null;
-  let tEnd = timeIdx + 4;
-  while (tEnd < rest.length) {
-    const c = rest.charAt(tEnd);
-    if (c >= "0" && c <= "9") tEnd++; else break;
-  }
-  const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
-  if (duration <= 0 || damagePerSec <= 0) return null;
-  return { damagePerSec, duration, attackOnly };
+  return parseStandardDotBuff(
+    buffStr,
+    "Burn",
+    (damagePerSec, duration, attackOnly) => ({ damagePerSec, duration, attackOnly }),
+    true
+  );
 }
 
 function getBestBurnFromUnit(unit: any): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
-  let best: { damagePerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
-  for (let slot = 0; slot <= 5; slot++) {
-    const item = unitItemInSlot(unit, slot);
-    if (!item) continue;
-    const idStr = fourCCToString(getItemTypeId(item));
-    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
-    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
-    for (let si = 0; si < segments.length; si++) {
-      const parsed = parseBurnBuff(segments[si]);
-      if (!parsed) continue;
-      const product = parsed.damagePerSec * parsed.duration;
-      if (best == null || product > best.product) {
-        best = { damagePerSec: parsed.damagePerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
-      }
-    }
-  }
-  return best != null ? { damagePerSec: best.damagePerSec, duration: best.duration, attackOnly: best.attackOnly } : null;
+  return getBestDotFromUnit(unit, parseBurnBuff, (parsed) => parsed.damagePerSec * parsed.duration);
 }
 
 // ========== 注册：反恢复、燃烧 ==========
@@ -868,52 +860,16 @@ registerDotType({
 
 // ========== 中毒：Buff:attack:Poison{N};time{N} → 每秒 N 点金属性（酸性）伤害，仅攻击触发 ==========
 function parsePoisonBuff(buffStr: string): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
-  if (!buffStr || typeof buffStr !== "string") return null;
-  const s = buffStr.trim();
-  let attackOnly = false;
-  if (s.indexOf("attack:poison") === 0) {
-    attackOnly = true;
-  } else if (s.indexOf("dmg:poison") !== 0) {
-    return null;
-  }
-  // 格式：attack:poison10;time10  或  dmg:poison10;time10
-  const rest = s.substring(attackOnly ? 13 : 10); // "attack:poison" = 13, "dmg:poison" = 10
-  let numEnd = 0;
-  while (numEnd < rest.length) {
-    const c = rest.charAt(numEnd);
-    if (c >= "0" && c <= "9") numEnd++; else break;
-  }
-  const damagePerSec = numEnd > 0 ? parseInt(rest.substring(0, numEnd), 10) || 0 : 0;
-  const timeIdx = rest.indexOf("time");
-  if (timeIdx < 0) return null;
-  let tEnd = timeIdx + 4;
-  while (tEnd < rest.length) {
-    const c = rest.charAt(tEnd);
-    if (c >= "0" && c <= "9") tEnd++; else break;
-  }
-  const duration = tEnd > timeIdx + 4 ? parseInt(rest.substring(timeIdx + 4, tEnd), 10) || 0 : 0;
-  if (duration <= 0 || damagePerSec <= 0) return null;
-  return { damagePerSec, duration, attackOnly };
+  return parseStandardDotBuff(
+    buffStr,
+    "Poison",
+    (damagePerSec, duration, attackOnly) => ({ damagePerSec, duration, attackOnly }),
+    true
+  );
 }
 
 function getBestPoisonFromUnit(unit: any): { damagePerSec: number; duration: number; attackOnly: boolean } | null {
-  let best: { damagePerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
-  for (let slot = 0; slot <= 5; slot++) {
-    const item = unitItemInSlot(unit, slot);
-    if (!item) continue;
-    const idStr = fourCCToString(getItemTypeId(item));
-    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
-    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
-    for (let si = 0; si < segments.length; si++) {
-      const parsed = parsePoisonBuff(segments[si]);
-      if (!parsed) continue;
-      const product = parsed.damagePerSec * parsed.duration;
-      if (best == null || product > best.product) {
-        best = { damagePerSec: parsed.damagePerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
-      }
-    }
-  }
-  return best != null ? { damagePerSec: best.damagePerSec, duration: best.duration, attackOnly: best.attackOnly } : null;
+  return getBestDotFromUnit(unit, parsePoisonBuff, (parsed) => parsed.damagePerSec * parsed.duration);
 }
 
 registerDotType({
@@ -965,25 +921,7 @@ function parseTrollCurseBuff(buffStr: string): { pctMaxHpPerSec: number; duratio
 }
 
 function getBestTrollCurseFromUnit(unit: any): { pctMaxHpPerSec: number; duration: number; attackOnly: boolean } | null {
-  let best: { pctMaxHpPerSec: number; duration: number; product: number; attackOnly: boolean } | null = null;
-  for (let slot = 0; slot <= 5; slot++) {
-    const item = unitItemInSlot(unit, slot);
-    if (!item) continue;
-    const idStr = fourCCToString(getItemTypeId(item));
-    const entry = (itemsData as Record<string, { Buff?: string }>)[idStr];
-    const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
-    for (let si = 0; si < segments.length; si++) {
-      const parsed = parseTrollCurseBuff(segments[si]);
-      if (!parsed) continue;
-      const product = parsed.pctMaxHpPerSec * parsed.duration;
-      if (best == null || product > best.product) {
-        best = { pctMaxHpPerSec: parsed.pctMaxHpPerSec, duration: parsed.duration, product, attackOnly: parsed.attackOnly };
-      }
-    }
-  }
-  return best != null
-    ? { pctMaxHpPerSec: best.pctMaxHpPerSec, duration: best.duration, attackOnly: best.attackOnly }
-    : null;
+  return getBestDotFromUnit(unit, parseTrollCurseBuff, (parsed) => parsed.pctMaxHpPerSec * parsed.duration);
 }
 
 registerDotType({

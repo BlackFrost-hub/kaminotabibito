@@ -8,6 +8,9 @@ const g = require("jass.globals") as Record<string, unknown>;
 const 伤害函数 = require("系统.00．核心系统.08．伤害函数") as {
   isNormalAttack: () => boolean;
 };
+const { isHeroUnit } = require("系统.00．核心系统.01．封装函数") as {
+  isHeroUnit: (unit: any) => boolean;
+};
 
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
 const EVENT_UNIT_DAMAGED_ID = 52;
@@ -66,10 +69,7 @@ function getUnitTypeHero(): any {
 function unitDeathCondition(): boolean {
   const u = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
   if (!u) return false;
-  const utHero = getUnitTypeHero();
-  const isHero = utHero != null && typeof (jass as any).IsUnitType === "function"
-    ? (jass as any).IsUnitType(u, utHero) : false;
-  return isHero !== true;
+  return !isHeroUnit(u);
 }
 
 function unitDeathAction(): void {

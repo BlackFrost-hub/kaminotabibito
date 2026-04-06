@@ -13,6 +13,8 @@ local createTestQuests = ____01_FF0E_4EFB_52A1_6570_636E.createTestQuests
 --- 任务系统 - 任务管理器和事件处理
 local jass = require("jass.common")
 local g = require("jass.globals")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local findHeroOfPlayer = ____require_result_0.findHeroOfPlayer
 local function debugPrint(self, msg)
 end
 --- 任务管理器类
@@ -56,32 +58,17 @@ function QuestManager.prototype.initialize(self)
     debugPrint(nil, "任务系统初始化完成")
 end
 function QuestManager.prototype.getPlayerHero(self, playerId)
-    if type(jass.FirstOfGroup) ~= "function" or type(jass.CreateGroup) ~= "function" or type(jass.GroupEnumUnitsOfPlayer) ~= "function" or type(jass.DestroyGroup) ~= "function" then
-        return nil
-    end
-    local group = jass.CreateGroup()
-    jass.GroupEnumUnitsOfPlayer(
-        group,
-        jass.Player(playerId),
-        nil
-    )
-    local hero = nil
-    local unit = jass.FirstOfGroup(group)
-    if unit and type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) then
-        hero = unit
-    end
-    jass.DestroyGroup(group)
-    return hero
+    return findHeroOfPlayer(nil, playerId)
 end
 function QuestManager.prototype.setupWar3QuestSync(self)
     debugPrint(nil, "War3原生任务同步已就绪")
 end
 function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
-    local ____opt_0 = questDB.globalData
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0.quests:get(questId)
+    local ____opt_1 = questDB.globalData
+    if ____opt_1 ~= nil then
+        ____opt_1 = ____opt_1.quests:get(questId)
     end
-    local quest = ____opt_0
+    local quest = ____opt_1
     if not quest or not quest.timeLimit or quest.timeLimit <= 0 then
         return
     end
@@ -93,13 +80,13 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
     if not timer then
         return
     end
-    local ____G___questTimers_3 = _G.__questTimers
-    if not ____G___questTimers_3 then
-        local ____TS__New_result_2 = __TS__New(Map)
-        _G.__questTimers = ____TS__New_result_2
-        ____G___questTimers_3 = ____TS__New_result_2
+    local ____G___questTimers_4 = _G.__questTimers
+    if not ____G___questTimers_4 then
+        local ____TS__New_result_3 = __TS__New(Map)
+        _G.__questTimers = ____TS__New_result_3
+        ____G___questTimers_4 = ____TS__New_result_3
     end
-    local timerData = ____G___questTimers_3
+    local timerData = ____G___questTimers_4
     timerData:set(timer, {playerId = playerId, questId = questId})
     jass.TimerStart(
         timer,
@@ -107,11 +94,11 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
         false,
         function()
             local expired = jass.GetExpiredTimer()
-            local ____opt_4 = _G.__questTimers
-            if ____opt_4 ~= nil then
-                ____opt_4 = ____opt_4:get(expired)
+            local ____opt_5 = _G.__questTimers
+            if ____opt_5 ~= nil then
+                ____opt_5 = ____opt_5:get(expired)
             end
-            local data = ____opt_4
+            local data = ____opt_5
             if data then
                 debugPrint(
                     nil,
@@ -155,15 +142,15 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
         nil,
         (("玩家 " .. tostring(playerId)) .. " 放弃任务 ") .. questId
     )
-    local ____opt_8 = questDB.globalData
-    if ____opt_8 ~= nil then
-        ____opt_8 = ____opt_8.quests:get(questId)
+    local ____opt_9 = questDB.globalData
+    if ____opt_9 ~= nil then
+        ____opt_9 = ____opt_9.quests:get(questId)
     end
-    local ____opt_result_10
-    if ____opt_8 ~= nil then
-        ____opt_result_10 = ____opt_8.nativeHandle
+    local ____opt_result_11
+    if ____opt_9 ~= nil then
+        ____opt_result_11 = ____opt_9.nativeHandle
     end
-    local nativeHandle = ____opt_result_10
+    local nativeHandle = ____opt_result_11
     local success = questDB:abandonQuest(playerId, questId)
     if success then
         if nativeHandle and type(jass.DestroyQuest) == "function" then
@@ -191,11 +178,11 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     return success
 end
 function QuestManager.prototype.toggleQuestTracking(self, playerId, questId)
-    local ____opt_11 = questDB.globalData
-    if ____opt_11 ~= nil then
-        ____opt_11 = ____opt_11.quests:get(questId)
+    local ____opt_12 = questDB.globalData
+    if ____opt_12 ~= nil then
+        ____opt_12 = ____opt_12.quests:get(questId)
     end
-    local questData = ____opt_11
+    local questData = ____opt_12
     if not questData then
         return false
     end
@@ -234,8 +221,8 @@ function QuestManager.prototype.showQuestFailedMessage(self, playerId, questId)
     end
 end
 function QuestManager.prototype.registerUIRefreshCallback(self, callback)
-    local ____self_uiRefreshCallbacks_13 = self.uiRefreshCallbacks
-    ____self_uiRefreshCallbacks_13[#____self_uiRefreshCallbacks_13 + 1] = callback
+    local ____self_uiRefreshCallbacks_14 = self.uiRefreshCallbacks
+    ____self_uiRefreshCallbacks_14[#____self_uiRefreshCallbacks_14 + 1] = callback
 end
 function QuestManager.prototype.triggerUIRefresh(self, playerId, questId)
     for ____, callback in ipairs(self.uiRefreshCallbacks) do
@@ -295,11 +282,11 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
     local success = questDB:updateObjective(playerId, questId, objectiveId, progress)
     if success then
         self:triggerUIRefresh(playerId, questId)
-        local ____opt_14 = questDB.globalData
-        if ____opt_14 ~= nil then
-            ____opt_14 = ____opt_14.quests:get(questId)
+        local ____opt_15 = questDB.globalData
+        if ____opt_15 ~= nil then
+            ____opt_15 = ____opt_15.quests:get(questId)
         end
-        local quest = ____opt_14
+        local quest = ____opt_15
         if quest and quest.objectives then
             local allCompleted = true
             for ____, obj in __TS__Iterator(quest.objectives) do
@@ -338,11 +325,11 @@ function QuestManager.prototype.syncToWar3Quest(self, playerId, questId)
     if type(jass.CreateQuest) ~= "function" then
         return
     end
-    local ____opt_16 = questDB.globalData
-    if ____opt_16 ~= nil then
-        ____opt_16 = ____opt_16.quests:get(questId)
+    local ____opt_17 = questDB.globalData
+    if ____opt_17 ~= nil then
+        ____opt_17 = ____opt_17.quests:get(questId)
     end
-    local questData = ____opt_16
+    local questData = ____opt_17
     if not questData then
         return
     end
@@ -367,23 +354,23 @@ function QuestManager.prototype.syncToWar3Quest(self, playerId, questId)
         jass.QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
     end
     repeat
-        local ____switch74 = questData.status
-        local ____cond74 = ____switch74 == QuestStatus.IN_PROGRESS
-        if ____cond74 then
+        local ____switch72 = questData.status
+        local ____cond72 = ____switch72 == QuestStatus.IN_PROGRESS
+        if ____cond72 then
             if type(jass.QuestSetDiscovered) == "function" then
                 jass.QuestSetDiscovered(nativeQuest, true)
             end
             break
         end
-        ____cond74 = ____cond74 or ____switch74 == QuestStatus.COMPLETED
-        if ____cond74 then
+        ____cond72 = ____cond72 or ____switch72 == QuestStatus.COMPLETED
+        if ____cond72 then
             if type(jass.QuestSetCompleted) == "function" then
                 jass.QuestSetCompleted(nativeQuest, true)
             end
             break
         end
-        ____cond74 = ____cond74 or ____switch74 == QuestStatus.FAILED
-        if ____cond74 then
+        ____cond72 = ____cond72 or ____switch72 == QuestStatus.FAILED
+        if ____cond72 then
             if type(jass.QuestSetFailed) == "function" then
                 jass.QuestSetFailed(nativeQuest, true)
             end
@@ -404,9 +391,9 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
     local hero = self:getPlayerHero(playerId)
     for ____, reward in ipairs(quest.rewards) do
         repeat
-            local ____switch82 = reward.type
-            local ____cond82 = ____switch82 == "experience"
-            if ____cond82 then
+            local ____switch80 = reward.type
+            local ____cond80 = ____switch80 == "experience"
+            if ____cond80 then
                 if hero and type(jass.AddHeroXP) == "function" then
                     jass.AddHeroXP(hero, reward.value, true)
                     debugPrint(
@@ -418,8 +405,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond82 = ____cond82 or ____switch82 == "gold"
-            if ____cond82 then
+            ____cond80 = ____cond80 or ____switch80 == "gold"
+            if ____cond80 then
                 if type(jass.SetPlayerState) == "function" and type(jass.GetPlayerState) == "function" then
                     local currentGold = jass.GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
                     jass.SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value)
@@ -430,8 +417,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond82 = ____cond82 or ____switch82 == "item"
-            if ____cond82 then
+            ____cond80 = ____cond80 or ____switch80 == "item"
+            if ____cond80 then
                 if hero and type(jass.CreateItem) == "function" and type(jass.UnitAddItemById) == "function" and reward.itemId then
                     local itemTypeId = jass.FourCC(reward.itemId)
                     jass.UnitAddItemById(hero, itemTypeId)
@@ -444,8 +431,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond82 = ____cond82 or ____switch82 == "attribute"
-            if ____cond82 then
+            ____cond80 = ____cond80 or ____switch80 == "attribute"
+            if ____cond80 then
                 if hero and type(jass.SetHeroStr) == "function" and type(jass.SetHeroAgi) == "function" and type(jass.SetHeroInt) == "function" then
                     jass.SetHeroStr(
                         hero,

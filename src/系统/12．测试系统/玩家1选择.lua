@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 --- 测试：红色玩家（Player 0）选择指定单位时触发对话框
 -- 
@@ -35,8 +36,18 @@ local VILLAGE_CHIEF_DIALOG = {
     }
 }
 local trg = jass.CreateTrigger()
-local redPlayer = jass.Player(0)
-jass.TriggerRegisterPlayerUnitEvent(trg, redPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
+do
+    local i = 0
+    while i < 4 do
+        jass.TriggerRegisterPlayerUnitEvent(
+            trg,
+            jass.Player(i),
+            jass.EVENT_PLAYER_UNIT_SELECTED,
+            nil
+        )
+        i = i + 1
+    end
+end
 jass.TriggerAddAction(
     trg,
     function()
@@ -47,14 +58,19 @@ jass.TriggerAddAction(
         if jass.GetUnitTypeId(u) ~= UNIT_ID_NGME then
             return
         end
-        local hero = _____4FBF_6377_51FD_6570:getPlayerFirstHero(redPlayer)
+        local triggerPlayer = jass.GetTriggerPlayer()
+        local hero = _____4FBF_6377_51FD_6570:getPlayerFirstHero(triggerPlayer)
         if not hero then
             return
         end
         if not jass.IsUnitInRange(hero, u, 350) then
             return
         end
-        openNpcDialog(nil, redPlayer, VILLAGE_CHIEF_DIALOG)
+        openNpcDialog(
+            nil,
+            triggerPlayer,
+            __TS__ObjectAssign({}, VILLAGE_CHIEF_DIALOG, {npcUnit = u})
+        )
     end
 )
 return ____exports

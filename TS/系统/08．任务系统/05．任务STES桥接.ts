@@ -25,6 +25,45 @@ function debugPrint(_msg: string): void {
 }
 
 /**
+ * 注册简单的 STES 桥接事件（用于任务接受/完成等单事件）
+ * @param eventName STES 事件名
+ * @param onEvent 事件回调
+ * @param debugMsg 调试信息前缀
+ */
+export function registerSimpleSTESBridgeEvent(
+  eventName: string,
+  onEvent: () => void,
+  debugMsg: string
+): void {
+  if (
+    typeof jass.CreateTrigger !== "function" ||
+    typeof jass.TriggerAddAction !== "function" ||
+    typeof jass.ExecuteFunc !== "function"
+  ) {
+    debugPrint(`JASS API 不完整，无法注册${debugMsg}事件`);
+    return;
+  }
+
+  const trig = jass.CreateTrigger();
+
+  jass.TriggerAddAction(trig, () => {
+    debugPrint(`${debugMsg}事件触发...`);
+    try {
+      onEvent();
+    } catch (error) {
+      debugPrint(`处理${debugMsg}事件时出错: ${error}`);
+    }
+  });
+
+  g.udg_RegTrigger = trig;
+  g.udg_RegEventStr = eventName;
+
+  jass.ExecuteFunc("Bridge_STES_Register");
+
+  debugPrint(`已通过 Bridge_STES_Register 注册 ${eventName}`);
+}
+
+/**
  * 与装备提取一致：优先直接 STES_Register，否则走全局桥接（每次一对 trigger+string）。
  */
 function registerOneStesEvent(trigger: any, eventName: string): void {

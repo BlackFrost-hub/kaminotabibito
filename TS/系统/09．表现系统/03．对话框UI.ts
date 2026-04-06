@@ -30,6 +30,10 @@ const jass = require("jass.common") as any;
 
 import { createFrame, FrameType } from "../09．表现系统/01．UI工具";
 import { frameSetScriptByCode } from "../00．核心系统/04．硬件函数";
+import { Sound3DII_Mp3PlayReuse } from "../00．核心系统/02．音效函数";
+
+/** 对话框首次展开时的提示音效 */
+const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
 
 // ────────────────────────────────────────────────
 // 类型别名
@@ -586,6 +590,10 @@ function clearState(state: PlayerDialogState): void {
 
 function playEntry(state: PlayerDialogState): void {
   if (state.queue.length === 0) return;
+
+  // 首次展开检测：对话框从关闭状态变为激活状态时才播放音效
+  const isFirstOpen = !state.isActive;
+
   state.isActive = true;
   state.waitingClick = false;
   state.clickCooldown = true; // 对话框刚弹出，屏蔽第一次点击（防止点NPC穿透到背景层）
@@ -602,6 +610,11 @@ function playEntry(state: PlayerDialogState): void {
   }
 
   showDialogFrames(state, true);
+
+  // 首次展开时播放提示音效（仅对目标玩家，Sound3DII_Mp3PlayReuse 内部处理本地判断，不会异步）
+  if (isFirstOpen) {
+    Sound3DII_Mp3PlayReuse(DIALOG_OPEN_SOUND, targetPlayer);
+  }
 
   if (!isLocal) {
     // 非本地：跳过所有 UI 操作，只走定时器逻辑让队列推进

@@ -87,7 +87,7 @@ local function TrigActions(self)
         prefix = prefix .. "强化"
     end
     if isTrue and prefix ~= "" then
-        prefix = prefix .. "真实"
+        prefix = prefix .. "精神"
     end
     local msg
     if prefix ~= "" and typeText ~= "" then

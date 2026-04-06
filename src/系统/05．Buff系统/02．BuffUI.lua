@@ -182,26 +182,15 @@ local function collectBuffRows(self, unit)
         local i = 0
         while i < #ids do
             local bid = ids[i + 1]
-            if bid == "D001" or bid == "D002" or bid == "D003" or bid == "D004" then
-                local rt = buffPoolMod:getBuffRuntime(unit, bid)
-                if rt ~= nil then
-                    local real = rt.remaining
-                    local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
-                    rows[#rows + 1] = {id = bid, state = {
-                        effect = rt.effect,
-                        remaining = real,
-                        iconRemaining = iconRem,
-                        sourceName = rt.sourceName,
-                        _dotParsedDuration = rt._dotParsedDuration
-                    }, iconOverride = rt.iconOverride}
+            local rt = buffPoolMod:getBuffRuntime(unit, bid)
+            if rt ~= nil then
+                local real = rt.remaining
+                local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
+                local row = {id = bid, state = {effect = rt.effect, remaining = real, iconRemaining = iconRem, sourceName = rt.sourceName}, iconOverride = rt.iconOverride}
+                if bid == "D001" or bid == "D002" or bid == "D003" or bid == "D004" then
+                    row.state._dotParsedDuration = rt._dotParsedDuration
                 end
-            else
-                local rt = buffPoolMod:getBuffRuntime(unit, bid)
-                if rt ~= nil then
-                    local real = rt.remaining
-                    local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
-                    rows[#rows + 1] = {id = bid, state = {effect = rt.effect, remaining = real, iconRemaining = iconRem, sourceName = rt.sourceName}, iconOverride = rt.iconOverride}
-                end
+                rows[#rows + 1] = row
             end
             i = i + 1
         end
@@ -312,23 +301,23 @@ local function syncBuffBar(self)
                 local i = 0
                 while i < MAX_SLOTS do
                     do
-                        local __continue60
+                        local __continue58
                         repeat
                             if i >= #rows then
                                 hideSlot(nil, i)
-                                __continue60 = true
+                                __continue58 = true
                                 break
                             end
                             local row = rows[i + 1]
                             local meta = buffs[row.id]
                             local slot = slots[i + 1]
                             if not slot then
-                                __continue60 = true
+                                __continue58 = true
                                 break
                             end
                             local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
                             if iconTex == "" then
-                                __continue60 = true
+                                __continue58 = true
                                 break
                             end
                             local pd = row.state._dotParsedDuration
@@ -374,9 +363,9 @@ local function syncBuffBar(self)
                                     )
                                 end
                             end
-                            __continue60 = true
+                            __continue58 = true
                         until true
-                        if not __continue60 then
+                        if not __continue58 then
                             break
                         end
                     end

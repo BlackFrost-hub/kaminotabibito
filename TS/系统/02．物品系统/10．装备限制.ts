@@ -1,7 +1,9 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
-const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString, isHeroUnit, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
+  isHeroUnit: (unit: any) => boolean;
+  isSpecialUnit: (unit: any) => boolean;
 };
 /** 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`） */
 const g = require("jass.globals") as { udg_Itmeboolean?: boolean | number; [key: string]: any };
@@ -109,10 +111,8 @@ function onPickup(): void {
   const unit = jass.GetManipulatingUnit?.() ?? jass.GetTriggerUnit?.();
   const item = jass.GetManipulatedItem?.();
   if (!unit || !item) return;
-  if (!jass.IsUnitType(unit, (jass as any).UNIT_TYPE_HERO)) return;
-  if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
-  if (typeof (jass as any).IsUnitIllusion === "function" && (jass as any).IsUnitIllusion(unit)) return;
+  if (!isHeroUnit(unit)) return;
+  if (isSpecialUnit(unit)) return;
   const pickedTypeId = safeGetItemTypeId(item);
   if (pickedTypeId == null) return;
   const entry = getEntry(pickedTypeId);
@@ -195,7 +195,7 @@ function onPickup(): void {
 
 function isHeroCond(): boolean {
   const u = jass.GetTriggerUnit?.() ?? (jass as any).GetManipulatingUnit?.();
-  return u != null && jass.IsUnitType(u, (jass as any).UNIT_TYPE_HERO);
+  return isHeroUnit(u);
 }
 
 function init(): void {

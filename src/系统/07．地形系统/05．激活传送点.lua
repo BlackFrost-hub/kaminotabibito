@@ -15,6 +15,7 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 local stringToFourCC = ____require_result_0.stringToFourCC
+local withTimer = ____require_result_0.withTimer
 local ____require_result_1 = require("系统.00．核心系统.02．音效函数")
 local Sound3DII_Mp3Play = ____require_result_1.Sound3DII_Mp3Play
 local ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
@@ -109,27 +110,17 @@ local function scheduleDebugGgUnitHtow0030(self)
             pr(msg)
         end
     end
-    local tm0 = jass.CreateTimer()
-    jass.TimerStart(
-        tm0,
+    withTimer(
+        nil,
         0,
-        false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(tm0)
-            end
             runSnapshot(nil, "0s")
         end
     )
-    local tm1 = jass.CreateTimer()
-    jass.TimerStart(
-        tm1,
+    withTimer(
+        nil,
         1,
-        false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(tm1)
-            end
             runSnapshot(nil, "1s")
         end
     )
@@ -284,18 +275,18 @@ local function initActivationPointsInternal(self)
     local count = 0
     for key in pairs(_____6FC0_6D3B_4F20_9001_70B9_914D_7F6E) do
         do
-            local __continue55
+            local __continue53
             repeat
                 local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
                 if not cfg or cfg.enabled == false then
-                    __continue55 = true
+                    __continue53 = true
                     break
                 end
                 registerOnePoint(nil, cfg, key)
                 count = count + 1
-                __continue55 = true
+                __continue53 = true
             until true
-            if not __continue55 then
+            if not __continue53 then
                 break
             end
         end
@@ -308,21 +299,12 @@ end
 --- 在地图初始化时调用（建议用 0.00 秒计时器）
 ____exports["init激活传送点"] = function(self)
     scheduleDebugGgUnitHtow0030(nil)
-    if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-        local t = jass.CreateTimer()
-        jass.TimerStart(
-            t,
-            0,
-            false,
-            function()
-                if type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(t)
-                end
-                initActivationPointsInternal(nil)
-            end
-        )
-    else
-        initActivationPointsInternal(nil)
-    end
+    withTimer(
+        nil,
+        0,
+        function()
+            initActivationPointsInternal(nil)
+        end
+    )
 end
 return ____exports

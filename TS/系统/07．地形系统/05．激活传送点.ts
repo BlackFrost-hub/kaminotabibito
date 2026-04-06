@@ -7,8 +7,9 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
-const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC, withTimer } = require("系统.00．核心系统.01．封装函数") as {
   stringToFourCC: (s: string) => number;
+  withTimer: (delaySec: number, callback: () => void) => void;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3Play } = require("系统.00．核心系统.02．音效函数") as {
@@ -93,14 +94,10 @@ function scheduleDebugGgUnitHtow0030(): void {
     const pr = (globalThis as any).print;
     if (typeof pr === "function") pr(msg);
   };
-  const tm0 = (jass as any).CreateTimer();
-  (jass as any).TimerStart(tm0, 0.0, false, () => {
-    if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(tm0);
+  withTimer(0.0, () => {
     runSnapshot("0s");
   });
-  const tm1 = (jass as any).CreateTimer();
-  (jass as any).TimerStart(tm1, 1.0, false, () => {
-    if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(tm1);
+  withTimer(1.0, () => {
     runSnapshot("1s");
   });
 }
@@ -228,15 +225,7 @@ function initActivationPointsInternal(): void {
 /** 在地图初始化时调用（建议用 0.00 秒计时器） */
 export function init激活传送点(): void {
   scheduleDebugGgUnitHtow0030();
-  if (typeof (jass as any).CreateTimer === "function" && typeof (jass as any).TimerStart === "function") {
-    const t = (jass as any).CreateTimer();
-    (jass as any).TimerStart(t, 0.0, false, () => {
-      if (typeof (jass as any).DestroyTimer === "function") {
-        (jass as any).DestroyTimer(t);
-      }
-      initActivationPointsInternal();
-    });
-  } else {
+  withTimer(0.0, () => {
     initActivationPointsInternal();
-  }
+  });
 }

@@ -1,11 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, japi, jass, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_tocLoaded
+local dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, japi, jass, DIALOG_OPEN_SOUND, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_tocLoaded
 local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具")
 local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
 local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
 local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
 local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
+local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
+local Sound3DII_Mp3PlayReuse = ____02_FF0E_97F3_6548_51FD_6570.Sound3DII_Mp3PlayReuse
 function dzShow(self, f, b)
     if f and f ~= 0 and type(japi.DzFrameShow) == "function" then
         japi.DzFrameShow(f, b)
@@ -493,6 +495,7 @@ function playEntry(self, state)
     if #state.queue == 0 then
         return
     end
+    local isFirstOpen = not state.isActive
     state.isActive = true
     state.waitingClick = false
     state.clickCooldown = true
@@ -505,6 +508,9 @@ function playEntry(self, state)
         state.initialized = true
     end
     showDialogFrames(nil, state, true)
+    if isFirstOpen then
+        Sound3DII_Mp3PlayReuse(nil, DIALOG_OPEN_SOUND, targetPlayer)
+    end
     if not isLocal then
         local entry = state.queue[1]
         state.strLen = dzStringLength(nil, entry.text)
@@ -686,6 +692,7 @@ function showQuestButtons(self, state, visible)
 end
 japi = require("jass.japi")
 jass = require("jass.common")
+DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
 MAX_PLAYERS = 28
 STEP_LEN = 2
 TICK = 0.03

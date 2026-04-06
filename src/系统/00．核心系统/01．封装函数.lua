@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 --- 通用 JASS 封装工具箱（会逐步堆很多“小而散”的 helper）。
 -- 
@@ -85,5 +87,266 @@ function ____exports.Ir_SetUnitAttackType(self, u, atp)
         jass.ConvertUnitState(35),
         atp
     )
+end
+--- 向指定玩家显示屏幕消息（仅该玩家可见）
+-- 
+-- @param player 玩家句柄（可用 jass.Player(index) 获取）
+-- @param msg 消息内容
+-- @param duration 显示时长（秒），默认6秒
+function ____exports.printToPlayer(self, player, msg, duration)
+    if duration == nil then
+        duration = 6
+    end
+    if not player then
+        return
+    end
+    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
+        return
+    end
+    jass.DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        duration,
+        msg
+    )
+end
+--- 向多个玩家显示屏幕消息
+-- 
+-- @param players 玩家数组
+-- @param msg 消息内容
+-- @param duration 显示时长（秒），默认6秒
+function ____exports.printToPlayers(self, players, msg, duration)
+    if duration == nil then
+        duration = 6
+    end
+    for ____, p in ipairs(players) do
+        ____exports.printToPlayer(nil, p, msg, duration)
+    end
+end
+--- 判断单位是否为"特殊单位"（召唤物/幻象），这些单位通常不触发装备等功能
+function ____exports.isSpecialUnit(self, unit)
+    if not unit then
+        return true
+    end
+    if jass.UNIT_TYPE_SUMMONED ~= nil and jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+        return true
+    end
+    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
+        return true
+    end
+    if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+        return true
+    end
+    return false
+end
+local g = require("jass.globals")
+--- 判断单位是否为英雄单位
+function ____exports.isHeroUnit(self, unit)
+    if not unit then
+        return false
+    end
+    local ____jass_UNIT_TYPE_HERO_5 = jass.UNIT_TYPE_HERO
+    if ____jass_UNIT_TYPE_HERO_5 == nil then
+        ____jass_UNIT_TYPE_HERO_5 = g.UNIT_TYPE_HERO
+    end
+    local utHero = ____jass_UNIT_TYPE_HERO_5
+    if utHero ~= nil and type(jass.IsUnitType) == "function" then
+        return jass.IsUnitType(unit, utHero) == true
+    end
+    if type(jass.GetHeroLevel) == "function" then
+        return jass.GetHeroLevel(unit) > 0
+    end
+    return false
+end
+--- 延迟执行回调（自动创建/销毁计时器）
+-- 
+-- @param delaySec 延迟秒数
+-- @param callback 回调函数
+-- @param periodic 是否重复执行（默认 false）
+-- @param name 调试用名称（可选）
+-- @returns 计时器句柄（periodic=true 时可用，用于停止），不需要可忽略
+function ____exports.withTimer(self, delaySec, callback, periodic, name)
+    if periodic == nil then
+        periodic = false
+    end
+    local ____this_7
+    ____this_7 = jass
+    local ____opt_6 = ____this_7.CreateTimer
+    if ____opt_6 ~= nil then
+        ____opt_6 = ____opt_6(____this_7)
+    end
+    local t = ____opt_6
+    if not t then
+        callback(nil)
+        return nil
+    end
+    if type(jass.TimerStart) ~= "function" then
+        callback(nil)
+        return nil
+    end
+    if periodic then
+        jass.TimerStart(
+            t,
+            delaySec,
+            true,
+            function()
+                callback(nil)
+            end
+        )
+    else
+        jass.TimerStart(
+            t,
+            delaySec,
+            false,
+            function()
+                callback(nil)
+                if type(jass.DestroyTimer) == "function" then
+                    jass.DestroyTimer(t)
+                end
+            end
+        )
+    end
+    return t
+end
+--- 停止并销毁指定的周期性计时器
+-- 
+-- @param t 计时器句柄（withTimer 返回的）
+function ____exports.stopTimer(self, t)
+    if not t then
+        return
+    end
+    if type(jass.PauseTimer) == "function" then
+        jass.PauseTimer(t)
+    end
+    if type(jass.DestroyTimer) == "function" then
+        jass.DestroyTimer(t)
+    end
+end
+--- 创建特效并在指定时间后自动销毁（自动处理 1.27 兼容）
+-- 
+-- @param modelPath 特效模型路径
+-- @param x x坐标
+-- @param y y坐标
+-- @param z z坐标（可选，默认0）
+-- @param duration 持续时间秒数（默认2秒）
+-- @returns 特效句柄
+function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
+    if z == nil then
+        z = 0
+    end
+    if duration == nil then
+        duration = 2
+    end
+    local eff
+    if type(jass.AddSpecialEffectZ) == "function" then
+        eff = jass.AddSpecialEffectZ(modelPath, x, y, z)
+    elseif type(jass.AddSpecialEffect) == "function" then
+        eff = jass.AddSpecialEffect(modelPath, x, y)
+    end
+    if not eff then
+        return nil
+    end
+    ____exports.withTimer(
+        nil,
+        duration,
+        function()
+            if type(jass.DestroyEffect) == "function" then
+                jass.DestroyEffect(eff)
+            end
+        end
+    )
+    return eff
+end
+--- 查找指定玩家的英雄单位
+-- 
+-- @param playerId 玩家索引（0-15）
+-- @returns 英雄单位，如果没有找到返回 null
+function ____exports.findHeroOfPlayer(self, playerId)
+    if type(jass.CreateGroup) ~= "function" or type(jass.GroupEnumUnitsOfPlayer) ~= "function" then
+        return nil
+    end
+    local group = jass.CreateGroup()
+    jass.GroupEnumUnitsOfPlayer(
+        group,
+        jass.Player(playerId),
+        nil
+    )
+    local unit = jass.FirstOfGroup(group)
+    jass.DestroyGroup(group)
+    if unit and ____exports.isHeroUnit(nil, unit) then
+        return unit
+    end
+    return nil
+end
+--- 存储单位绑定的特效（key: 单位句柄ID, value: 特效句柄）
+local unitEffectMap = __TS__New(Map)
+--- 在单位上创建绑定特效
+-- 
+-- @param unit 目标单位
+-- @param attachPoint 绑定点（如 "overhead", "origin", "chest" 等）
+-- @param modelPath 特效模型路径
+-- @param duration 持续时间（秒），不传则永久存在直到手动销毁
+-- @returns 是否创建成功
+function ____exports.createUnitEffect(self, unit, attachPoint, modelPath, duration)
+    if not unit then
+        return false
+    end
+    local ____japi_DzGetUnitObjectId_8
+    if japi.DzGetUnitObjectId then
+        ____japi_DzGetUnitObjectId_8 = japi.DzGetUnitObjectId(unit)
+    else
+        ____japi_DzGetUnitObjectId_8 = 0
+    end
+    local handleId = ____japi_DzGetUnitObjectId_8
+    if not handleId then
+        return false
+    end
+    local existingEffect = unitEffectMap:get(handleId)
+    if existingEffect and type(jass.DestroyEffect) == "function" then
+        jass.DestroyEffect(existingEffect)
+    end
+    local effect = jass.AddSpecialEffectTarget(modelPath, unit, attachPoint)
+    if not effect then
+        return false
+    end
+    unitEffectMap:set(handleId, effect)
+    if duration ~= nil and duration > 0 then
+        ____exports.withTimer(
+            nil,
+            duration,
+            function()
+                local currentEffect = unitEffectMap:get(handleId)
+                if currentEffect == effect and type(jass.DestroyEffect) == "function" then
+                    jass.DestroyEffect(effect)
+                    unitEffectMap:delete(handleId)
+                end
+            end
+        )
+    end
+    return true
+end
+--- 销毁单位上的绑定特效
+-- 
+-- @param unit 目标单位
+function ____exports.destroyUnitEffect(self, unit)
+    if not unit then
+        return
+    end
+    local ____japi_DzGetUnitObjectId_9
+    if japi.DzGetUnitObjectId then
+        ____japi_DzGetUnitObjectId_9 = japi.DzGetUnitObjectId(unit)
+    else
+        ____japi_DzGetUnitObjectId_9 = 0
+    end
+    local handleId = ____japi_DzGetUnitObjectId_9
+    if not handleId then
+        return
+    end
+    local effect = unitEffectMap:get(handleId)
+    if effect and type(jass.DestroyEffect) == "function" then
+        jass.DestroyEffect(effect)
+    end
+    unitEffectMap:delete(handleId)
 end
 return ____exports

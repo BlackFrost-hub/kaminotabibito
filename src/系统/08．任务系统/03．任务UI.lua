@@ -498,6 +498,95 @@ function TaskUI.prototype.createEntryIcon(self, parent)
         )
     end
 end
+function TaskUI.prototype.createTaskTab(self, tabParent, bgName, tabName, labelName, x, labelText, category, tooltip)
+    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent)
+    if bg then
+        if type(japi.DzFrameClearAllPoints) == "function" then
+            japi.DzFrameClearAllPoints(bg)
+        end
+        setFramePointRelative(
+            nil,
+            bg,
+            FramePoint.TOPLEFT,
+            tabParent,
+            FramePoint.TOPLEFT,
+            x,
+            TAB_REL_Y
+        )
+        setFrameSize(nil, bg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
+        if type(japi.DzFrameShow) == "function" then
+            pcall(function () return japi.DzFrameShow(bg, true) end
+            )
+        end
+        if type(japi.DzFrameSetLevel) == "function" then
+            japi.DzFrameSetLevel(bg, 7)
+        end
+    end
+    if bg then
+        local tabLabel = createTabLabelTextOnBackdrop(
+            nil,
+            bg,
+            labelName,
+            labelText,
+            TAB_CATEGORY_FONT_SCALE
+        )
+        if tabLabel and type(japi.DzFrameSetLevel) == "function" then
+            japi.DzFrameSetLevel(tabLabel, 8)
+        end
+    end
+    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent)
+    if tab then
+        if type(japi.DzFrameClearAllPoints) == "function" then
+            japi.DzFrameClearAllPoints(tab)
+        end
+        if bg then
+            setupTransparentGlueHitLayer(nil, bg, tab)
+        else
+            setFramePointRelative(
+                nil,
+                tab,
+                FramePoint.TOPLEFT,
+                tabParent,
+                FramePoint.TOPLEFT,
+                x,
+                TAB_REL_Y
+            )
+            setFrameSize(nil, tab, {width = TAB_FRAME_W, height = TAB_FRAME_H})
+        end
+        if type(japi.DzFrameShow) == "function" then
+            pcall(function () return japi.DzFrameShow(tab, true) end
+            )
+        end
+        if not bg then
+            setButtonText(nil, tab, "")
+            if type(japi.DzFrameSetAlpha) == "function" then
+                pcall(function () return japi.DzFrameSetAlpha(tab, 0) end
+                )
+            end
+        end
+        if type(japi.DzFrameSetLevel) == "function" then
+            japi.DzFrameSetLevel(tab, 9)
+        end
+        setFrameClickEvent(
+            nil,
+            tab,
+            function()
+                SoundUI_ClickPlay(nil)
+                self:switchCategory(category)
+            end,
+            false
+        )
+        setFrameHoverEvents(
+            nil,
+            tab,
+            function() return self:showTabTooltip(tooltip) end,
+            function()
+            end,
+            false
+        )
+    end
+    return {bg = bg, tab = tab}
+end
 function TaskUI.prototype.createMainPanel(self, parent)
     self.mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
     if not self.mainPanel then
@@ -540,264 +629,42 @@ function TaskUI.prototype.createMainPanel(self, parent)
         )
     end
     local tabParent = self.mainPanel
-    self.tabMainBg = tryCreateFromFdfOnly(nil, "TaskTabMainBg", tabParent)
-    if self.tabMainBg then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabMainBg)
-        end
-        setFramePointRelative(
-            nil,
-            self.tabMainBg,
-            FramePoint.TOPLEFT,
-            tabParent,
-            FramePoint.TOPLEFT,
-            0.02,
-            TAB_REL_Y
-        )
-        setFrameSize(nil, self.tabMainBg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabMainBg, true) end
-            )
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabMainBg, 7)
-        end
-    end
-    if self.tabMainBg then
-        local tabLabel = createTabLabelTextOnBackdrop(
-            nil,
-            self.tabMainBg,
-            "TaskTabMainLabel",
-            "|cffffcc00主线(1)|r",
-            TAB_CATEGORY_FONT_SCALE
-        )
-        if tabLabel and type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(tabLabel, 8)
-        end
-    end
-    self.tabMain = tryCreateFromFdfOnly(nil, "TaskTabMain", tabParent)
-    if self.tabMain then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabMain)
-        end
-        if self.tabMainBg then
-            setupTransparentGlueHitLayer(nil, self.tabMainBg, self.tabMain)
-        else
-            setFramePointRelative(
-                nil,
-                self.tabMain,
-                FramePoint.TOPLEFT,
-                tabParent,
-                FramePoint.TOPLEFT,
-                0.02,
-                TAB_REL_Y
-            )
-            setFrameSize(nil, self.tabMain, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        end
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabMain, true) end
-            )
-        end
-        if not self.tabMainBg then
-            setButtonText(nil, self.tabMain, "")
-            if type(japi.DzFrameSetAlpha) == "function" then
-                pcall(function () return japi.DzFrameSetAlpha(self.tabMain, 0) end
-                )
-            end
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabMain, 9)
-        end
-        setFrameClickEvent(
-            nil,
-            self.tabMain,
-            function()
-                SoundUI_ClickPlay(nil)
-                self:switchCategory(QuestType.MAIN)
-            end,
-            false
-        )
-        setFrameHoverEvents(
-            nil,
-            self.tabMain,
-            function() return self:showTabTooltip("按 1 切换主线任务") end,
-            function()
-            end,
-            false
-        )
-    end
-    self.tabSideBg = tryCreateFromFdfOnly(nil, "TaskTabSideBg", tabParent)
-    if self.tabSideBg then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabSideBg)
-        end
-        setFramePointRelative(
-            nil,
-            self.tabSideBg,
-            FramePoint.TOPLEFT,
-            tabParent,
-            FramePoint.TOPLEFT,
-            0.135,
-            TAB_REL_Y
-        )
-        setFrameSize(nil, self.tabSideBg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabSideBg, true) end
-            )
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabSideBg, 7)
-        end
-    end
-    if self.tabSideBg then
-        local tabLabel = createTabLabelTextOnBackdrop(
-            nil,
-            self.tabSideBg,
-            "TaskTabSideLabel",
-            "|cffffcc00支线(2)|r",
-            TAB_CATEGORY_FONT_SCALE
-        )
-        if tabLabel and type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(tabLabel, 8)
-        end
-    end
-    self.tabSide = tryCreateFromFdfOnly(nil, "TaskTabSide", tabParent)
-    if self.tabSide then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabSide)
-        end
-        if self.tabSideBg then
-            setupTransparentGlueHitLayer(nil, self.tabSideBg, self.tabSide)
-        else
-            setFramePointRelative(
-                nil,
-                self.tabSide,
-                FramePoint.TOPLEFT,
-                tabParent,
-                FramePoint.TOPLEFT,
-                0.135,
-                TAB_REL_Y
-            )
-            setFrameSize(nil, self.tabSide, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        end
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabSide, true) end
-            )
-        end
-        if not self.tabSideBg then
-            setButtonText(nil, self.tabSide, "")
-            if type(japi.DzFrameSetAlpha) == "function" then
-                pcall(function () return japi.DzFrameSetAlpha(self.tabSide, 0) end
-                )
-            end
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabSide, 9)
-        end
-        setFrameClickEvent(
-            nil,
-            self.tabSide,
-            function()
-                SoundUI_ClickPlay(nil)
-                self:switchCategory(QuestType.SIDE)
-            end,
-            false
-        )
-        setFrameHoverEvents(
-            nil,
-            self.tabSide,
-            function() return self:showTabTooltip("按 2 切换支线任务") end,
-            function()
-            end,
-            false
-        )
-    end
-    self.tabDailyBg = tryCreateFromFdfOnly(nil, "TaskTabDailyBg", tabParent)
-    if self.tabDailyBg then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabDailyBg)
-        end
-        setFramePointRelative(
-            nil,
-            self.tabDailyBg,
-            FramePoint.TOPLEFT,
-            tabParent,
-            FramePoint.TOPLEFT,
-            0.25,
-            TAB_REL_Y
-        )
-        setFrameSize(nil, self.tabDailyBg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabDailyBg, true) end
-            )
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabDailyBg, 7)
-        end
-    end
-    if self.tabDailyBg then
-        local tabLabel = createTabLabelTextOnBackdrop(
-            nil,
-            self.tabDailyBg,
-            "TaskTabDailyLabel",
-            "|cffffcc00小任务(3)|r",
-            TAB_CATEGORY_FONT_SCALE
-        )
-        if tabLabel and type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(tabLabel, 8)
-        end
-    end
-    self.tabDaily = tryCreateFromFdfOnly(nil, "TaskTabDaily", tabParent)
-    if self.tabDaily then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(self.tabDaily)
-        end
-        if self.tabDailyBg then
-            setupTransparentGlueHitLayer(nil, self.tabDailyBg, self.tabDaily)
-        else
-            setFramePointRelative(
-                nil,
-                self.tabDaily,
-                FramePoint.TOPLEFT,
-                tabParent,
-                FramePoint.TOPLEFT,
-                0.25,
-                TAB_REL_Y
-            )
-            setFrameSize(nil, self.tabDaily, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        end
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(self.tabDaily, true) end
-            )
-        end
-        if not self.tabDailyBg then
-            setButtonText(nil, self.tabDaily, "")
-            if type(japi.DzFrameSetAlpha) == "function" then
-                pcall(function () return japi.DzFrameSetAlpha(self.tabDaily, 0) end
-                )
-            end
-        end
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(self.tabDaily, 9)
-        end
-        setFrameClickEvent(
-            nil,
-            self.tabDaily,
-            function()
-                SoundUI_ClickPlay(nil)
-                self:switchCategory(QuestType.DAILY)
-            end,
-            false
-        )
-        setFrameHoverEvents(
-            nil,
-            self.tabDaily,
-            function() return self:showTabTooltip("按 3 切换小任务") end,
-            function()
-            end,
-            false
-        )
-    end
+    local mainResult = self:createTaskTab(
+        tabParent,
+        "TaskTabMainBg",
+        "TaskTabMain",
+        "TaskTabMainLabel",
+        0.02,
+        "|cffffcc00主线(1)|r",
+        QuestType.MAIN,
+        "按 1 切换主线任务"
+    )
+    self.tabMainBg = mainResult.bg
+    self.tabMain = mainResult.tab
+    local sideResult = self:createTaskTab(
+        tabParent,
+        "TaskTabSideBg",
+        "TaskTabSide",
+        "TaskTabSideLabel",
+        0.135,
+        "|cffffcc00支线(2)|r",
+        QuestType.SIDE,
+        "按 2 切换支线任务"
+    )
+    self.tabSideBg = sideResult.bg
+    self.tabSide = sideResult.tab
+    local dailyResult = self:createTaskTab(
+        tabParent,
+        "TaskTabDailyBg",
+        "TaskTabDaily",
+        "TaskTabDailyLabel",
+        0.25,
+        "|cffffcc00小任务(3)|r",
+        QuestType.DAILY,
+        "按 3 切换小任务"
+    )
+    self.tabDailyBg = dailyResult.bg
+    self.tabDaily = dailyResult.tab
     if self.mainPanel ~= nil then
         local sbSrc = tryCreateFromFdfWithSource(
             nil,
@@ -1097,19 +964,19 @@ function TaskUI.prototype.refreshList(self)
                 local i = 0
                 while i < #quests do
                     do
-                        local __continue219
+                        local __continue180
                         repeat
                             local q = quests[i + 1]
                             if not q then
-                                __continue219 = true
+                                __continue180 = true
                                 break
                             end
                             local expanded = self.expandedQuestIds:has(q.id)
                             local itemH = expanded and LIST_ITEM_H + #q.objectives * 0.03 + (q.timeLimit and q.timeLimit > 0 and 0.02 or 0) or LIST_ITEM_H * 0.4
                             totalH = totalH + (itemH + 0.01)
-                            __continue219 = true
+                            __continue180 = true
                         until true
-                        if not __continue219 then
+                        if not __continue180 then
                             break
                         end
                     end
@@ -1129,11 +996,11 @@ function TaskUI.prototype.refreshList(self)
                 local i = 0
                 while i < #quests do
                     do
-                        local __continue222
+                        local __continue183
                         repeat
                             local q = quests[i + 1]
                             if not q then
-                                __continue222 = true
+                                __continue183 = true
                                 break
                             end
                             local expanded = self.expandedQuestIds:has(q.id)
@@ -1145,9 +1012,9 @@ function TaskUI.prototype.refreshList(self)
                                 self:createListItem(q, rowTopRel, expanded)
                             end
                             rowTopRel = rowTopRel - (itemH + 0.01)
-                            __continue222 = true
+                            __continue183 = true
                         until true
-                        if not __continue222 then
+                        if not __continue183 then
                             break
                         end
                     end
@@ -1340,7 +1207,7 @@ function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
         local objYRel = rowTopRel - LIST_ITEM_H * 0.35
         for ____, obj in ipairs(quest.objectives) do
             do
-                local __continue249
+                local __continue210
                 repeat
                     local txt = ((((((obj.completed and "[v] " or "[ ] ") .. obj.description) .. " (") .. tostring(obj.current)) .. "/") .. tostring(obj.required)) .. ")"
                     local objKey = (quest.id .. "|") .. obj.id
@@ -1361,7 +1228,7 @@ function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
                             {width = textW, height = LIST_ITEM_H * 0.25}
                         ) or 0
                         if objFrame == 0 then
-                            __continue249 = true
+                            __continue210 = true
                             break
                         end
                         self.objFrameByKey:set(objKey, objFrame)
@@ -1388,9 +1255,9 @@ function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
                     local ____self_listItemFrames_12 = self.listItemFrames
                     ____self_listItemFrames_12[#____self_listItemFrames_12 + 1] = objFrame
                     objYRel = objYRel - LIST_ITEM_H * 0.25
-                    __continue249 = true
+                    __continue210 = true
                 until true
-                if not __continue249 then
+                if not __continue210 then
                     break
                 end
             end
