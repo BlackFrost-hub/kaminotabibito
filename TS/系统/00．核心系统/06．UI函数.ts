@@ -13,7 +13,8 @@
 const japi = require("jass.japi") as any;
 
 import { createFrame, setButtonText, FrameType } from "../09．表现系统/01．UI工具";
-import { displayText, displayQuest, isDialogActive } from "../09．表现系统/03．对话框UI";
+import { displayText, displayQuest, isDialogActive, setDialogNpcUnit, tryOccupyNpc } from "../09．表现系统/01．对话框系统/00．对话框UI入口";
+import { isNpcOccupied } from "../09．表现系统/04．NPC对话状态池";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 对话框入口封装
@@ -43,6 +44,8 @@ export interface NpcDialogData {
   lines: NpcDialogLine[];
   /** 末尾的任务对话（可选，没有则纯对白结束） */
   quest?: NpcDialogQuest;
+  /** NPC单位（用于显示气泡特效） */
+  npcUnit?: any;
 }
 
 /**
@@ -51,9 +54,19 @@ export interface NpcDialogData {
  * - 若该玩家对话框空闲（`isDialogActive(p) === false`），按 data 顺序入队播放。
  * - 文本数据由调用方传入，函数本身不硬编码任何内容。
  * - 每个玩家状态独立，互不影响。
+ * - 如果NPC已被其他玩家占用，直接返回 false。
+ * @returns 成功开始对话返回 true，否则返回 false
  */
-export function openNpcDialog(p: any, data: NpcDialogData): void {
-  if (isDialogActive(p)) return; // 该玩家对话框正在播放 → 忽略
+export function openNpcDialog(p: any, data: NpcDialogData): boolean {
+  if (isDialogActive(p)) return false; // 该玩家对话框正在播放 → 忽略
+
+  // 尝试占用NPC，如果已被其他玩家占用则返回 false
+  if (data.npcUnit) {
+    if (!tryOccupyNpc(p, data.npcUnit)) {
+      return false; // NPC已被其他玩家占用
+    }
+    setDialogNpcUnit(p, data.npcUnit);
+  }
 
   for (const line of data.lines) {
     displayText(p, line.title, line.text, line.duration);
@@ -63,6 +76,8 @@ export function openNpcDialog(p: any, data: NpcDialogData): void {
     const q = data.quest;
     displayQuest(p, q.title, q.text, q.onAccept, q.onReject);
   }
+
+  return true;
 }
 
 /** `DzFrameSetTextAlignment`：改对齐前重置，避免叠加 */

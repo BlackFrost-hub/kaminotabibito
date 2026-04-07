@@ -71,6 +71,15 @@ if (typeof 显示技能名字.initShowSkillName === "function") 显示技能名�
 
 // ---------- 04．伤害系统 ----------
 require("系统.04．伤害系统.01．伤害事件");
+// DOT 定义（显式加载，便于打包与排查）
+require("系统.04．伤害系统.02．DOT定义.01．DOT配置");
+require("系统.04．伤害系统.02．DOT定义.02．DOT解析");
+require("系统.04．伤害系统.02．DOT定义.03．DOT类型定义");
+require("系统.04．伤害系统.02．DOT定义.04．DOT工具");
+require("系统.04．伤害系统.02．DOT定义.05．DOT状态同步");
+require("系统.04．伤害系统.02．DOT定义.06．DOT执行器");
+require("系统.04．伤害系统.02．DOT定义.07．DOT施加策略");
+require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具");
 require("系统.04．伤害系统.02．dot伤害");
 require("系统.04．伤害系统.03．伤害测试");
 
@@ -100,8 +109,15 @@ require("系统.00．核心系统.06．UI函数");
 require("系统.00．核心系统.11．便捷函数（偶尔用）");
 require("系统.09．表现系统.01．UI工具");
 require("系统.09．表现系统.02．垂直滚动条轨道");
-const 对话框UI = require("系统.09．表现系统.03．对话框UI") as { initDialogSystem: () => void };
+require("系统.09．表现系统.04．NPC对话状态池");
+const 对话框UI = require("系统.09．表现系统.01．对话框系统.00．对话框UI入口") as { initDialogSystem: () => void };
 if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
+// 任务 UI 拆分模块（显式加载，便于打包与排查）
+require("系统.08．任务系统.03．任务UI拆分.00．配置常量");
+require("系统.08．任务系统.03．任务UI拆分.01．通用工具");
+require("系统.08．任务系统.03．任务UI拆分.02．列表逻辑");
+require("系统.08．任务系统.03．任务UI拆分.03．交互控制");
+require("系统.08．任务系统.03．任务UI拆分.04．界面构建");
 const 任务UI = require("系统.08．任务系统.03．任务UI") as { init: () => void; registerHotkey: () => void };
 if (typeof 任务UI.init === "function") 任务UI.init();
 if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
