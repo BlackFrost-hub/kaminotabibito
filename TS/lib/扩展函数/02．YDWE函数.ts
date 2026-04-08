@@ -86,7 +86,7 @@ const typeNames = ["ability", "buff", "unit", "item", "upgrade", "doodad", "dest
  * @param property 属性名（如 "Name", "Primary"）
  */
 export function getObjectProperty(objectType: number, objectId: number | string, property: string): string {
-  const script = "(require'jass.slk')." + typeNames[objectType] + "['" + objectId + "']." + property;
+  const script = "(function() local _t=(require'jass.slk')." + typeNames[objectType] + "; local _u=_t and _t['" + objectId + "']; if _u then return _u." + property + " else return '' end end)()";
   const result = japi.EXExecuteScript(script);
   return result || "";
 }

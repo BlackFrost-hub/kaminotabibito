@@ -74,7 +74,7 @@ local typeNames = {
 -- @param objectId 物体ID，传字符串四字码（如 'Hamg'）或 FourCC 整数
 -- @param property 属性名（如 "Name", "Primary"）
 function ____exports.getObjectProperty(self, objectType, objectId, property)
-    local script = (((("(require'jass.slk')." .. typeNames[objectType + 1]) .. "['") .. tostring(objectId)) .. "'].") .. property
+    local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t['") .. tostring(objectId)) .. "']; if _u then return _u.") .. property) .. " else return '' end end)()"
     local result = japi.EXExecuteScript(script)
     return result or ""
 end

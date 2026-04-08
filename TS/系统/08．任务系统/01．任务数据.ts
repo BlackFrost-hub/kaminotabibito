@@ -70,6 +70,10 @@ export interface QuestData {
   startTime?: number; // 任务开始时间戳（用于计时任务）
   /** 已注册但不在任务面板列出（日后启用） */
   uiReserved?: boolean;
+  /** 接受者名称 */
+  accepterName?: string;
+  /** 完成者名称 */
+  completerName?: string;
 }
 
 /**

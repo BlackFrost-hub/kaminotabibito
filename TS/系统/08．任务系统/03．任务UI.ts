@@ -393,7 +393,7 @@ class TaskUI {
     });
   }
 
-  private refreshList(): void {
+  refreshList(): void {
     (pcall as any)(() => {
       if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
