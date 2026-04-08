@@ -4,10 +4,12 @@ local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具"
 local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
 local setButtonText = ____01_FF0EUI_5DE5_5177.setButtonText
 local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
-local ____03_FF0E_5BF9_8BDD_6846UI = require("系统.09．表现系统.03．对话框UI")
-local displayText = ____03_FF0E_5BF9_8BDD_6846UI.displayText
-local displayQuest = ____03_FF0E_5BF9_8BDD_6846UI.displayQuest
-local isDialogActive = ____03_FF0E_5BF9_8BDD_6846UI.isDialogActive
+local ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3 = require("系统.09．表现系统.01．对话框系统.00．对话框UI入口")
+local displayText = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayText
+local displayQuest = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayQuest
+local isDialogActive = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.isDialogActive
+local setDialogNpcUnit = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.setDialogNpcUnit
+local tryOccupyNpc = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.tryOccupyNpc
 --- 全图通用 UI 辅助（DzAPI / Frame）。
 -- 
 -- **联机与 desync**
@@ -23,9 +25,18 @@ local japi = require("jass.japi")
 -- - 若该玩家对话框空闲（`isDialogActive(p) === false`），按 data 顺序入队播放。
 -- - 文本数据由调用方传入，函数本身不硬编码任何内容。
 -- - 每个玩家状态独立，互不影响。
+-- - 如果NPC已被其他玩家占用，直接返回 false。
+-- 
+-- @returns 成功开始对话返回 true，否则返回 false
 function ____exports.openNpcDialog(self, p, data)
     if isDialogActive(nil, p) then
-        return
+        return false
+    end
+    if data.npcUnit then
+        if not tryOccupyNpc(nil, p, data.npcUnit) then
+            return false
+        end
+        setDialogNpcUnit(nil, p, data.npcUnit)
     end
     for ____, line in ipairs(data.lines) do
         displayText(
@@ -47,6 +58,7 @@ function ____exports.openNpcDialog(self, p, data)
             q.onReject
         )
     end
+    return true
 end
 --- `DzFrameSetTextAlignment`：改对齐前重置，避免叠加
 ____exports.DZ_TEXT_ALIGN_RESET = -1

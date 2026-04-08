@@ -28,7 +28,11 @@
       "Bash(npx tstl:*)",
       "Bash(mkdir -p .claude)",
       "Bash(cmd.exe:*)",
-      "Bash(powershell.exe:*)"
+      "Bash(powershell.exe:*)",
+      "Bash(wc -l \"TS/系统/09．表现系统/01．对话框UI系统/\"*.ts \"TS/系统/09．表现系统/01．对话框UI系统.ts\")",
+      "Bash(wc -l \"TS/系统/09．表现系统/01．对话框UI系统/\"*.ts)",
+      "Bash(npx tsc:*)",
+      "Bash(wc -l \"TS/系统/09．表现系统/01．对话框系统/\"*.ts)"
     ]
   }
 }

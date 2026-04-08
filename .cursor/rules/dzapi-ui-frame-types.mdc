@@ -219,7 +219,7 @@ function startRefreshTimer(): void {
 - 原因：事件在不同玩家触发时机可能不同，导致 UI 状态不同步
 
 ### UI 操作规则
-- ✅ Frame 创建、显示、隐藏必须用 `GetLocalPlayer()` 隔离
+- ✅ Frame 创建、显示、隐藏等UI操作必须用 `GetLocalPlayer()` 隔离
 - ✅ 定时器回调中操作 UI 前必须判断 `GetLocalPlayer()`
 - ✅ 定时器本身要在所有玩家上启动（引擎保证同步）
 ## 核心原则
