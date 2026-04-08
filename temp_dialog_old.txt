@@ -1,0 +1,964 @@
+﻿/**
+ * 瀵硅瘽妗哢I绯荤粺锛圫tarGameDialog TS鐗堬級
+ *
+ * 鐗规€э細
+ * - 姣忎釜鐜╁鐙珛鐨勫璇濋槦鍒?+ 鐙珛璁℃椂鍣紝浜掍笉骞叉壈
+ * - 鎵€鏈?UI 鎿嶄綔閫氳繃 GetLocalPlayer() 鏈湴鍒ゆ柇锛岄槻姝?desync
+ * - 鏀寔鎵撳瓧鏈洪€愬瓧鏁堟灉銆佸乏/涓?鍙充笁浣嶇珛缁樸€佽嚜瀹氫箟鑳屾櫙/鏍囬璐村浘
+ * - 涓?TSTL 鍏煎锛堟棤 class 绉佹湁鎴愬憳 #銆佹棤 Symbol銆佹棤 WeakMap锛? *
+ * 甯х储寮曡鑼冿細
+ *   [0]   鑳屾櫙 BACKDROP
+ *   [1]   鏍囬鏍忚儗鏅紙GameUI锛? *   [2]   鍚嶅瓧鏂囧瓧锛圙ameText锛? *   [3]   姝ｆ枃鏂囧瓧锛圙ameTextpxL锛? *   [4]   鑳屾櫙閫忔槑鐐瑰嚮灞傦紙GLUETEXTBUTTON锛岄摵婊0]锛? *   [5]   鎺ュ彈鎸夐挳搴曞浘锛圔ACKDROP锛屼换鍔℃ā寮忥級
+ *   [6]   鎺ュ彈鎸夐挳鍛戒腑灞傦紙GLUETEXTBUTTON锛岄摵婊5]锛? *   [7]   鎷掔粷鎸夐挳搴曞浘锛圔ACKDROP锛屼换鍔℃ā寮忥級
+ *   [8]   鎷掔粷鎸夐挳鍛戒腑灞傦紙GLUETEXTBUTTON锛岄摵婊7]锛? *   [9]   鎺ュ彈鎸夐挳鏂囧瓧鏍囩锛圱EXT锛屽彔鍦╗5]涓婏級
+ *   [10]  鎷掔粷鎸夐挳鏂囧瓧鏍囩锛圱EXT锛屽彔鍦╗7]涓婏級
+ *   [11]  "鐐瑰嚮浠ョ户缁?鈻? 鎻愮ず鏍囩锛圱EXT锛岃儗鏅彸涓嬭锛屾墦瀛楀畬鎴愬悗鏄剧ず锛? *   [101] 宸︾珛缁橈紙GameUI锛? *   [102] 涓珛缁橈紙GameUI锛? *   [103] 鍙崇珛缁橈紙GameUI锛? */
+
+const japi = require("jass.japi") as any;
+const jass = require("jass.common") as any;
+
+import { createFrame, FrameType } from "../09锛庤〃鐜扮郴缁?01锛嶶I宸ュ叿";
+import { frameSetScriptByCode } from "../00锛庢牳蹇冪郴缁?04锛庣‖浠跺嚱鏁?;
+import { Sound3DII_Mp3PlayReuse } from "../00锛庢牳蹇冪郴缁?02锛庨煶鏁堝嚱鏁?;
+
+/** 瀵硅瘽妗嗛娆″睍寮€鏃剁殑鎻愮ず闊虫晥 */
+const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 绫诲瀷鍒悕
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/** WC3 player 鍙ユ焺锛圠ua 涓嬩负 userdata锛孴S 渚х敤 any锛?*/
+type Player = any;
+/** WC3 timer 鍙ユ焺 */
+type Timer = any;
+/** Dz 甯у彞鏌勶紙鏁存暟锛?*/
+type Frame = number;
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 甯搁噺
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/** 鏈€澶ф敮鎸佺帺瀹舵暟 */
+const MAX_PLAYERS = 28;
+
+/** 鎵撳瓧鏈烘瘡甯ф杩涳紙瀛楃鏁帮級*/
+const STEP_LEN = 2;
+
+/** 鎵撳瓧鏈哄抚闂撮殧锛堢锛?/
+const TICK = 0.03;
+
+/** TOC 鍔犺浇璺緞 */
+const TOC_PATH = "ui\\StarGameUI.toc";
+
+/** 瀵硅瘽妗嗗抚鏍囩璧峰 ID锛堝師鐗堝搴?tag=1024锛?/
+const TAG_BASE_MAIN = 1024;
+const TAG_BASE_PORTRAIT = 1125;
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 榛樿璧勬簮璺緞锛堟湭鎸囧畾鏃朵娇鐢級
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/** 榛樿瀛椾綋璺緞 */
+const DEFAULT_FONT = "UI\\uizt.ttf";
+/** 榛樿鏍囬瀛椾綋澶у皬 */
+const DEFAULT_TITLE_FONT_SIZE = 0.018;
+/** 榛樿姝ｆ枃瀛椾綋澶у皬 */
+const DEFAULT_BODY_FONT_SIZE = 0.012;
+/** 榛樿鑳屾櫙璐村浘锛堟枃鏈妗嗘灦锛?*/
+const DEFAULT_BG_TEX = "UI\\wenbenkuang.blp";
+/** 榛樿鏍囬鏍忚创鍥?*/
+const DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp";
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 姣忔潯瀵硅瘽鏉＄洰
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+interface DialogEntry {
+  title: string;
+  text: string;
+  waitTime: number;
+  leftTex: string;
+  midTex: string;
+  rightTex: string;
+  titleFontSize: number;
+  bodyFontSize: number;
+  /** 鏄惁涓轰换鍔″璇濓紙鏄剧ず鎺ュ彈/鎷掔粷鎸夐挳锛屼笉鑷姩鎺ㄨ繘锛?*/
+  isQuest: boolean;
+  /** 浠诲姟鍥炶皟锛坕sQuest=true 鏃舵湁鏁堬級 */
+  questCallbacks?: {
+    onAccept: () => void;
+    onReject: () => void;
+  };
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 姣忎釜鐜╁鐙珛鐨勫璇濇鐘舵€?// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+interface PlayerDialogState {
+  /** 鐜╁绱㈠紩 0-based */
+  playerId: number;
+  /** 瀵硅瘽闃熷垪锛堝厛杩涘厛鍑猴級 */
+  queue: DialogEntry[];
+  /** 鎵撳瓧鏈鸿鏃跺櫒锛堥€愬瓧锛?*/
+  tickTimer: Timer;
+  /** 7涓抚鍙ユ焺锛歔0..10] 涓讳綋鎸夐挳, [101..103] 绔嬬粯 */
+  frames: Frame[];
+  /** 褰撳墠姝ｆ枃宸叉樉绀哄瓧绗︽暟 */
+  strNow: number;
+  /** 褰撳墠姝ｆ枃鎬诲瓧绗︽暟 */
+  strLen: number;
+  /** 鏄惁鍏佽鏄剧ず锛堟湰鍦扮帺瀹跺紑鍏筹級 */
+  canShow: boolean;
+  /** 绯荤粺鏄惁宸插垵濮嬪寲甯?*/
+  initialized: boolean;
+  /** 瀵硅瘽妗嗘槸鍚︽鍦ㄦ椿璺冩挱鏀撅紙鐢ㄤ簬鎷掔粷閲嶅瑙﹀彂锛?*/
+  isActive: boolean;
+  /** 瀵硅瘽妗嗗垰寮瑰嚭鐨勭偣鍑诲喎鍗达紙闃叉鐐筃PC鍚屾椂鍛戒腑鑳屾櫙灞傦級 */
+  clickCooldown: boolean;
+  /** 鏂囧瓧宸插叏閮ㄦ樉绀猴紝绛夊緟鐜╁鐐瑰嚮鎵嶆帹杩涳紙鑰岄潪鑷姩璁℃椂锛?*/
+  waitingClick: boolean;
+  /** 瀵硅瘽闃熷垪鍏ㄩ儴鎾畬鍚庣殑鍥炶皟锛堣皟鐢ㄦ柟鐢ㄦ潵閲嶇疆鑷韩鐘舵€侀攣锛?*/
+  onFinish?: () => void;
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍏ㄥ眬鐘舵€佽〃锛堟寜鐜╁ ID 绱㈠紩锛?// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+const g_states: PlayerDialogState[] = [];
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// Dz API 瀹夊叏璋冪敤灏佽
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function dzShow(f: Frame, b: boolean): void {
+  if (f && f !== 0 && typeof japi.DzFrameShow === "function") {
+    japi.DzFrameShow(f, b);
+  }
+}
+
+function dzSetText(f: Frame, s: string): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(f, s);
+  }
+}
+
+function dzSetTexture(f: Frame, path: string): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetTexture === "function") {
+    japi.DzFrameSetTexture(f, path, 0);
+  }
+}
+
+function dzSetAlpha(f: Frame, a: number): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetAlpha === "function") {
+    japi.DzFrameSetAlpha(f, a);
+  }
+}
+
+function dzSetAbsPoint(f: Frame, point: number, x: number, y: number): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetAbsolutePoint === "function") {
+    japi.DzFrameSetAbsolutePoint(f, point, x, y);
+  }
+}
+
+function dzSetSize(f: Frame, w: number, h: number): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetSize === "function") {
+    japi.DzFrameSetSize(f, w, h);
+  }
+}
+
+function dzClearPoints(f: Frame): void {
+  if (f && f !== 0 && typeof japi.DzFrameClearAllPoints === "function") {
+    japi.DzFrameClearAllPoints(f);
+  }
+}
+
+function dzSetEnable(f: Frame, b: boolean): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetEnable === "function") {
+    japi.DzFrameSetEnable(f, b);
+  }
+}
+
+function dzSetFont(f: Frame, font: string, size: number): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetFont === "function") {
+    japi.DzFrameSetFont(f, font, size, 0);
+  }
+}
+
+function dzCreate(template: string, tag: number): Frame {
+  const gameUI = typeof japi.DzGetGameUI === "function" ? japi.DzGetGameUI() : 0;
+  if (!gameUI || gameUI === 0) return 0;
+  if (typeof japi.DzCreateFrame !== "function") return 0;
+  return japi.DzCreateFrame(template, gameUI, tag) as Frame;
+}
+
+
+function dzSubString(s: string, start: number, end: number): string {
+  if (typeof jass.SubString === "function") return jass.SubString(s, start, end) as string;
+  // fallback锛歀ua string.sub锛?-based锛岃浆鎹級
+  return (s as any).sub(start + 1, end) as string;
+}
+
+function dzStringLength(s: string): number {
+  if (typeof jass.StringLength === "function") return jass.StringLength(s) as number;
+  return s.length;
+}
+
+function dzGetLocalPlayer(): Player {
+  return typeof jass.GetLocalPlayer === "function" ? jass.GetLocalPlayer() : null;
+}
+
+function dzGetPlayerId(p: Player): number {
+  return typeof jass.GetPlayerId === "function" ? (jass.GetPlayerId(p) as number) : -1;
+}
+
+function dzPlayer(index: number): Player {
+  return typeof jass.Player === "function" ? jass.Player(index) : null;
+}
+
+function dzTimerCreate(): Timer {
+  return typeof jass.CreateTimer === "function" ? jass.CreateTimer() : null;
+}
+
+function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void {
+  if (t && typeof jass.TimerStart === "function") {
+    jass.TimerStart(t, timeout, periodic, cb);
+  }
+}
+
+function dzTimerPause(t: Timer): void {
+  if (t && typeof jass.PauseTimer === "function") {
+    jass.PauseTimer(t);
+  }
+}
+
+function dzLoadToc(): void {
+  if (typeof japi.DzLoadToc === "function") {
+    japi.DzLoadToc(TOC_PATH);
+  }
+}
+
+/** TOC 鏄惁宸插姞杞借繃锛堝叏灞€鍙渶涓€娆★級 */
+let g_tocLoaded = false;
+
+function dzLoadTocOnce(): void {
+  if (g_tocLoaded) return;
+  g_tocLoaded = true;
+  dzLoadToc();
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氬垱寤烘煇涓帺瀹剁殑甯х粍
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/**
+ * 涓烘寚瀹氱帺瀹跺垱寤哄璇濇甯э紙鍙湁鏈湴鐜╁鎵嶇湡姝ｆ墽琛屽垱寤猴級
+ * 杩斿洖甯ф暟缁勶紙闈炴湰鍦扮帺瀹惰繑鍥炲叏0鏁扮粍锛岄伩鍏?desync锛? */
+function createDialogFrames(): Frame[] {
+  // 鍙垵濮嬪寲瀹為檯浣跨敤鐨勬Ы浣嶏細[0..11] 涓讳綋锛孾101..103] 绔嬬粯
+  const frames: Frame[] = [];
+  for (let i = 0; i <= 11; i++) frames[i] = 0;
+  frames[101] = 0; frames[102] = 0; frames[103] = 0;
+
+  // 绔嬬粯甯?[101] [102] [103]
+  const portraits = [
+    { idx: 101, tag: TAG_BASE_PORTRAIT,     x: 0.24,                    y: 0.1421 + 0.2 },
+    { idx: 102, tag: TAG_BASE_PORTRAIT + 1, x: 0.24 + 0.377 / 3,        y: 0.1421 + 0.2 },
+    { idx: 103, tag: TAG_BASE_PORTRAIT + 2, x: 0.24 + 0.377 / 1.5,      y: 0.1421 + 0.2 },
+  ];
+  for (const p of portraits) {
+    const f = dzCreate("GameUI", p.tag);
+    frames[p.idx] = f;
+    dzShow(f, false);
+    dzClearPoints(f);
+    dzSetAbsPoint(f, 3, p.x, p.y);
+    dzSetSize(f, 0.367 / 3, 0.231);
+    dzSetAlpha(f, 255);
+    dzSetTexture(f, "");
+  }
+
+  // [0] 鑳屾櫙 BACKDROP
+  const gameUI = typeof japi.DzGetGameUI === "function" ? japi.DzGetGameUI() : 0;
+  const bg = createFrame({ type: FrameType.BACKDROP, name: "DialogBG", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[0] = bg;
+  dzClearPoints(bg);
+  dzSetAbsPoint(bg, 3, 0.23, 0.2421);
+  dzSetSize(bg, 0.377, 0.131);
+  dzSetAlpha(bg, 255);
+  dzSetTexture(bg, DEFAULT_BG_TEX);
+
+  // [4] 閫忔槑 GLUETEXTBUTTON 閾烘弧鑳屾櫙锛屼綔涓虹偣鍑诲懡涓眰
+  const bgBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogBGBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[4] = bgBtn;
+  // 鍐呰仈 setupTransparentGlueHitLayer锛氭妸 bgBtn 鎸傚埌 bg 涓嬪苟閾烘弧锛屾枃瀛楁竻绌猴紝alpha=0
+  if (bgBtn !== 0) {
+    if (typeof japi.DzFrameSetParent === "function") {
+      (pcall as any)(() => japi.DzFrameSetParent(bgBtn, bg));
+    }
+    if (typeof japi.DzFrameClearAllPoints === "function") {
+      (pcall as any)(() => japi.DzFrameClearAllPoints(bgBtn));
+    }
+    if (typeof japi.DzFrameSetAllPoints === "function") {
+      (pcall as any)(() => japi.DzFrameSetAllPoints(bgBtn, bg));
+    }
+    if (typeof japi.DzFrameSetText === "function") {
+      japi.DzFrameSetText(bgBtn, "");
+    }
+    if (typeof japi.DzFrameSetAlpha === "function") {
+      (pcall as any)(() => japi.DzFrameSetAlpha(bgBtn, 0));
+    }
+  }
+  // 鐐瑰嚮锛氭墦瀛椾腑鈫掕烦杩囨墦瀛楁満锛涘畬鏁存枃鏈笖闈炰换鍔♀啋鎺ㄨ繘闃熷垪
+  frameSetScriptByCode(bgBtn, 1, () => {
+    let found = false;
+    for (let i = 0; i < MAX_PLAYERS; i++) {
+      const s = g_states[i];
+      if (s && s.frames[0] === bg) {
+        // 鍐峰嵈涓紙瀵硅瘽妗嗗垰寮瑰嚭锛夛紝蹇界暐鏈鐐瑰嚮锛岄槻姝㈢偣NPC绌块€忓埌鑳屾櫙灞?        if (s.clickCooldown) {
+          // 浠€涔堥兘涓嶅仛
+        } else if (s.strNow < s.strLen) {
+          // 鎵撳瓧鏈鸿繕鍦ㄨ窇锛氳烦杩囨墦瀛楁満锛屾樉绀哄畬鏁存枃鏈紝鐒跺悗绛夊緟鍐嶆鐐瑰嚮
+          skipTyping(s);
+        } else if (s.waitingClick && s.queue.length > 0 && !s.queue[0].isQuest) {
+          // 鏂囧瓧宸插叏閮ㄦ樉绀猴紝鐜╁鐐瑰嚮鎺ㄨ繘鍒颁笅涓€鏉℃垨缁撴潫
+          s.waitingClick = false;
+          advanceDialog(s);
+        }
+        // 浠诲姟妯″紡涓旀枃瀛楀凡瀹屾暣锛氱偣鍑昏儗鏅棤鏁堬紝蹇呴』鐐规寜閽?        found = true;
+        break;
+      }
+    }
+  }, false);
+
+  // [1] 鏍囬鏍忚儗鏅?  const titleBg = dzCreate("GameUI", TAG_BASE_MAIN + 2);
+  frames[1] = titleBg;
+  dzShow(titleBg, false);
+  dzClearPoints(titleBg);
+  dzSetAbsPoint(titleBg, 3, 0.24, 0.3083);
+  dzSetSize(titleBg, 0.107, 0.0328);
+  dzSetAlpha(titleBg, 255);
+  dzSetTexture(titleBg, DEFAULT_TITLE_TEX);
+
+  // [2] 鍚嶅瓧鏂囧瓧
+  const nameText = dzCreate("GameText", TAG_BASE_MAIN + 3);
+  frames[2] = nameText;
+  dzShow(nameText, false);
+  dzClearPoints(nameText);
+  if (nameText !== 0 && typeof japi.DzFrameSetAllPoints === "function") {
+    (pcall as any)(() => japi.DzFrameSetAllPoints(nameText, titleBg));
+  }
+  dzSetText(nameText, "");
+  dzSetFont(nameText, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE);
+  dzSetEnable(nameText, false);
+  if (nameText !== 0 && typeof japi.DzFrameSetTextAlignment === "function") {
+    (pcall as any)(() => {
+      japi.DzFrameSetTextAlignment(nameText, -1);
+      japi.DzFrameSetTextAlignment(nameText, 18);
+    });
+  }
+
+  // [3] 姝ｆ枃鏂囧瓧
+  const bodyText = dzCreate("GameTextpxL", TAG_BASE_MAIN + 4);
+  frames[3] = bodyText;
+  dzShow(bodyText, false);
+  dzClearPoints(bodyText);
+  dzSetAbsPoint(bodyText, 0, 0.24, 0.28);
+  dzSetSize(bodyText, 0.35, 0.22);
+  dzSetText(bodyText, "");
+  dzSetFont(bodyText, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE);
+  dzSetEnable(bodyText, false);
+
+  // [5] 鎺ュ彈鎸夐挳搴曞浘 BACKDROP锛堟壙杞借创鍥撅級
+  const acceptBg = createFrame({ type: FrameType.BACKDROP, name: "DialogAcceptBg", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[5] = acceptBg;
+  if (acceptBg !== 0 && typeof japi.DzFrameSetAbsolutePoint === "function") {
+    japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.1800);
+  }
+  if (acceptBg !== 0 && typeof japi.DzFrameSetSize === "function") {
+    japi.DzFrameSetSize(acceptBg, 0.08, 0.022);
+  }
+  if (acceptBg !== 0 && typeof japi.DzFrameSetTexture === "function") {
+    japi.DzFrameSetTexture(acceptBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
+  }
+  // 鎺ュ彈鎸夐挳鏂囧瓧锛堝彔鍦ㄥ簳鍥句笂锛岀櫧鑹诧級瀛樺叆 frames[9] 渚?showQuestButtons 鎺у埗鍙鎬?  const acceptLabel = createFrame({ type: FrameType.TEXT, name: "DialogAcceptLabel", parent: acceptBg, template: "template", visible: false }) ?? 0;
+  frames[9] = acceptLabel;
+  if (acceptLabel !== 0 && typeof japi.DzFrameSetAllPoints === "function") {
+    japi.DzFrameSetAllPoints(acceptLabel, acceptBg);
+  }
+  if (acceptLabel !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(acceptLabel, "鎺ュ彈浠诲姟");
+  }
+  if (acceptLabel !== 0 && typeof japi.DzFrameSetTextColor === "function") {
+    japi.DzFrameSetTextColor(acceptLabel, 255, 255, 255, 255);
+  }
+  if (acceptLabel !== 0 && typeof japi.DzFrameSetFont === "function") {
+    japi.DzFrameSetFont(acceptLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0);
+  }
+  if (acceptLabel !== 0 && typeof japi.DzFrameSetTextAlignment === "function") {
+    japi.DzFrameSetTextAlignment(acceptLabel, 18); // 灞呬腑
+  }
+
+  // [6] 鎺ュ彈鎸夐挳鍛戒腑灞?GLUETEXTBUTTON锛堥摵婊5]锛屾帴鏀剁偣鍑伙紝alpha=0 閫忔槑锛?  const acceptBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogAcceptBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[6] = acceptBtn;
+  if (acceptBtn !== 0 && typeof japi.DzFrameSetAllPoints === "function") {
+    japi.DzFrameSetAllPoints(acceptBtn, acceptBg);
+  }
+  if (acceptBtn !== 0 && typeof japi.DzFrameSetAlpha === "function") {
+    japi.DzFrameSetAlpha(acceptBtn, 0);
+  }
+  if (acceptBtn !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(acceptBtn, "");
+  }
+
+  // [7] 鎷掔粷鎸夐挳搴曞浘 BACKDROP锛堟壙杞借创鍥撅級
+  const rejectBg = createFrame({ type: FrameType.BACKDROP, name: "DialogRejectBg", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[7] = rejectBg;
+  if (rejectBg !== 0 && typeof japi.DzFrameSetAbsolutePoint === "function") {
+    japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.1800);
+  }
+  if (rejectBg !== 0 && typeof japi.DzFrameSetSize === "function") {
+    japi.DzFrameSetSize(rejectBg, 0.08, 0.022);
+  }
+  if (rejectBg !== 0 && typeof japi.DzFrameSetTexture === "function") {
+    japi.DzFrameSetTexture(rejectBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
+  }
+  // 鎷掔粷鎸夐挳鏂囧瓧锛堝彔鍦ㄥ簳鍥句笂锛岀櫧鑹诧級瀛樺叆 frames[10] 渚?showQuestButtons 鎺у埗鍙鎬?  const rejectLabel = createFrame({ type: FrameType.TEXT, name: "DialogRejectLabel", parent: rejectBg, template: "template", visible: false }) ?? 0;
+  frames[10] = rejectLabel;
+  if (rejectLabel !== 0 && typeof japi.DzFrameSetAllPoints === "function") {
+    japi.DzFrameSetAllPoints(rejectLabel, rejectBg);
+  }
+  if (rejectLabel !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(rejectLabel, "鎷掔粷浠诲姟");
+  }
+  if (rejectLabel !== 0 && typeof japi.DzFrameSetTextColor === "function") {
+    japi.DzFrameSetTextColor(rejectLabel, 255, 255, 255, 255);
+  }
+  if (rejectLabel !== 0 && typeof japi.DzFrameSetFont === "function") {
+    japi.DzFrameSetFont(rejectLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0);
+  }
+  if (rejectLabel !== 0 && typeof japi.DzFrameSetTextAlignment === "function") {
+    japi.DzFrameSetTextAlignment(rejectLabel, 18); // 灞呬腑
+  }
+
+  // [8] 鎷掔粷鎸夐挳鍛戒腑灞?GLUETEXTBUTTON锛堥摵婊7]锛屾帴鏀剁偣鍑伙紝alpha=0 閫忔槑锛?  const rejectBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogRejectBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[8] = rejectBtn;
+  if (rejectBtn !== 0 && typeof japi.DzFrameSetAllPoints === "function") {
+    japi.DzFrameSetAllPoints(rejectBtn, rejectBg);
+  }
+  if (rejectBtn !== 0 && typeof japi.DzFrameSetAlpha === "function") {
+    japi.DzFrameSetAlpha(rejectBtn, 0);
+  }
+  if (rejectBtn !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(rejectBtn, "");
+  }
+
+  // [11] "鐐瑰嚮浠ョ户缁?鈻? 鎻愮ず鏂囧瓧锛岄敋瀹氬湪鑳屾櫙鍙充笅瑙掞紝鎵撳瓧瀹屾垚鍚庢樉绀?  const hintLabel = createFrame({ type: FrameType.TEXT, name: "DialogHintLabel", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[11] = hintLabel;
+  if (hintLabel !== 0) {
+    // 鍙充笅瑙掞細point=8(BOTTOMRIGHT), bg 鍙充笅瑙掑唴缂╀竴鐐圭偣
+    if (typeof japi.DzFrameSetPoint === "function") {
+      // 鐩稿 bg 鐨?BOTTOMRIGHT锛屽悜宸﹀亸绉?0.008锛屽悜涓婂亸绉?0.008
+      (pcall as any)(() => japi.DzFrameSetPoint(hintLabel, 8, bg, 8, -0.008, 0.008));
+    }
+    if (typeof japi.DzFrameSetSize === "function") {
+      japi.DzFrameSetSize(hintLabel, 0.12, 0.018);
+    }
+    if (typeof japi.DzFrameSetText === "function") {
+      japi.DzFrameSetText(hintLabel, "|cff333333[鐐瑰嚮浠ョ户缁璢 鈫搢r");
+    }
+    if (typeof japi.DzFrameSetFont === "function") {
+      japi.DzFrameSetFont(hintLabel, DEFAULT_FONT, 0.016, 0);
+    }
+    if (typeof japi.DzFrameSetTextAlignment === "function") {
+      // 鍙冲榻?      japi.DzFrameSetTextAlignment(hintLabel, -1);
+      japi.DzFrameSetTextAlignment(hintLabel, 5);
+    }
+  }
+
+  return frames;
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氬垵濮嬪寲鍗曚釜鐜╁鐨勭姸鎬?// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function ensureState(playerId: number): PlayerDialogState {
+  if (g_states[playerId]) return g_states[playerId];
+
+  const state: PlayerDialogState = {
+    playerId,
+    queue: [],
+    tickTimer: dzTimerCreate(),
+    frames: [],
+    strNow: 0,
+    strLen: 0,
+    canShow: true,
+    initialized: false,
+    isActive: false,
+    clickCooldown: false,
+    waitingClick: false,
+  };
+  g_states[playerId] = state;
+  return state;
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氭樉绀?闅愯棌甯х粍锛堟湰鍦板垽鏂級
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function showDialogFrames(state: PlayerDialogState, visible: boolean): void {
+  // 闈炴湰鍦扮帺瀹讹細瀹屽叏涓嶆搷浣?UI锛岄槻姝?desync
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer !== targetPlayer) return;
+
+  if (!state.canShow) {
+    // canShow=false 鏃跺己鍒堕殣钘?    for (let i = 0; i < 9; i++) {
+      dzShow(state.frames[i], false);
+    }
+    for (let i = 101; i < 104; i++) {
+      dzShow(state.frames[i], false);
+    }
+    return;
+  }
+
+  // [5]~[8] 浠诲姟鎸夐挳鐢?showQuestButtons 鍗曠嫭鎺у埗锛岃繖閲屽彧鎺у埗涓讳綋甯?  for (let i = 0; i < 5; i++) {
+    dzShow(state.frames[i], visible);
+  }
+  if (!visible) {
+    dzShow(state.frames[5], false);
+    dzShow(state.frames[6], false);
+    dzShow(state.frames[7], false);
+    dzShow(state.frames[8], false);
+    dzShow(state.frames[9], false);
+    dzShow(state.frames[10], false);
+    dzShow(state.frames[11], false); // "鐐瑰嚮浠ョ户缁?鈻? 鎻愮ず
+  }
+  if (visible) {
+    dzSetAlpha(state.frames[0], 155);
+  }
+  for (let i = 101; i < 104; i++) {
+    dzShow(state.frames[i], visible);
+  }
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氭竻绌洪槦鍒楀苟闅愯棌
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function clearState(state: PlayerDialogState): void {
+  dzTimerPause(state.tickTimer);
+  state.queue = [];
+  state.isActive = false;
+  state.waitingClick = false;
+  state.clickCooldown = false;
+  showDialogFrames(state, false);
+  // 閫氱煡璋冪敤鏂瑰璇濆凡缁撴潫锛堝己鍒舵竻闄ゆ椂涔熻Е鍙戯級
+  const cb = state.onFinish;
+  state.onFinish = undefined;
+  if (cb) cb();
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氬紑濮嬫樉绀洪槦鍒楃涓€鏉?// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function playEntry(state: PlayerDialogState): void {
+  if (state.queue.length === 0) return;
+
+  // 棣栨灞曞紑妫€娴嬶細瀵硅瘽妗嗕粠鍏抽棴鐘舵€佸彉涓烘縺娲荤姸鎬佹椂鎵嶆挱鏀鹃煶鏁?  const isFirstOpen = !state.isActive;
+
+  state.isActive = true;
+  state.waitingClick = false;
+  state.clickCooldown = true; // 瀵硅瘽妗嗗垰寮瑰嚭锛屽睆钄界涓€娆＄偣鍑伙紙闃叉鐐筃PC绌块€忓埌鑳屾櫙灞傦級
+
+  // 纭繚甯у凡鍒涘缓锛堟湰鍦板垽鏂湪 createDialogFrames 澶栧眰鍋氾級
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  const isLocal = localPlayer === targetPlayer;
+
+  if (isLocal && !state.initialized) {
+    dzLoadTocOnce();
+    state.frames = createDialogFrames();
+    state.initialized = true;
+  }
+
+  showDialogFrames(state, true);
+
+  // 棣栨灞曞紑鏃舵挱鏀炬彁绀洪煶鏁堬紙浠呭鐩爣鐜╁锛孲ound3DII_Mp3PlayReuse 鍐呴儴澶勭悊鏈湴鍒ゆ柇锛屼笉浼氬紓姝ワ級
+  if (isFirstOpen) {
+    Sound3DII_Mp3PlayReuse(DIALOG_OPEN_SOUND, targetPlayer);
+  }
+
+  if (!isLocal) {
+    // 闈炴湰鍦帮細璺宠繃鎵€鏈?UI 鎿嶄綔锛屽彧璧板畾鏃跺櫒閫昏緫璁╅槦鍒楁帹杩?    // 鎵撳瓧鏈鸿窇瀹屽悗鐩存帴 advanceDialog锛堟湰鍦扮帺瀹堕潬鐐瑰嚮鎺ㄨ繘锛岄潪鏈湴鏃犵偣鍑讳簨浠讹級
+    const entry = state.queue[0];
+    state.strLen = dzStringLength(entry.text);
+    state.strNow = 0;
+    dzTimerStart(state.tickTimer, TICK, true, () => {
+      if (state.queue.length === 0) { dzTimerPause(state.tickTimer); return; }
+      state.strNow += STEP_LEN;
+      state.clickCooldown = false;
+      if (state.strNow >= state.strLen) {
+        dzTimerPause(state.tickTimer);
+        if (!state.queue[0].isQuest) {
+          // 鏅€氬鐧斤細鑷姩鎺ㄨ繘锛堥潪鏈湴娌℃湁鐐瑰嚮锛?          advanceDialog(state);
+        }
+        // 浠诲姟瀵硅瘽锛氶潪鏈湴鐜╁涓嶅鐞嗭紝绛夊緟鏈湴鐜╁鐐瑰嚮鎸夐挳瑙﹀彂鍥炶皟
+      }
+    });
+    return;
+  }
+
+  const entry = state.queue[0];
+
+  // 璁剧疆鏍囬涓庢竻绌烘鏂?  dzSetFont(state.frames[2], DEFAULT_FONT, entry.titleFontSize);
+  dzSetFont(state.frames[3], DEFAULT_FONT, entry.bodyFontSize);
+  dzSetText(state.frames[2], entry.title);
+  dzSetText(state.frames[3], "");
+
+  // 绔嬬粯锛氬乏
+  if (entry.leftTex !== "") {
+    dzSetTexture(state.frames[101], entry.leftTex);
+    dzShow(state.frames[101], true);
+  } else {
+    dzShow(state.frames[101], false);
+  }
+  // 绔嬬粯锛氫腑
+  if (entry.midTex !== "") {
+    dzSetTexture(state.frames[102], entry.midTex);
+    dzShow(state.frames[102], true);
+  } else {
+    dzShow(state.frames[102], false);
+  }
+  // 绔嬬粯锛氬彸
+  if (entry.rightTex !== "") {
+    dzSetTexture(state.frames[103], entry.rightTex);
+    dzShow(state.frames[103], true);
+  } else {
+    dzShow(state.frames[103], false);
+  }
+
+  state.strNow = 0;
+  state.strLen = dzStringLength(entry.text);
+
+  // 浠诲姟妯″紡锛氶娉ㄥ唽鎺ュ彈/鎷掔粷鎸夐挳鍥炶皟
+  if (entry.isQuest && entry.questCallbacks) {
+    const cb = entry.questCallbacks;
+    frameSetScriptByCode(state.frames[6], 1, () => {
+      showQuestButtons(state, false);
+      showDialogFrames(state, false);
+      state.queue.shift();
+      state.isActive = false;
+      cb.onAccept();
+    }, false);
+    frameSetScriptByCode(state.frames[8], 1, () => {
+      showQuestButtons(state, false);
+      showDialogFrames(state, false);
+      state.queue.shift();
+      state.isActive = false;
+      cb.onReject();
+    }, false);
+  }
+
+  startTyping(state);
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氳烦杩囨墦瀛楁満锛岀洿鎺ユ樉绀哄畬鏁存枃鏈?// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function skipTyping(state: PlayerDialogState): void {
+  if (state.queue.length === 0) return;
+  // 鍙湁鎵撳瓧鏈鸿繕鍦ㄨ窇鏃舵墠璺宠繃锛坰trNow < strLen锛?  if (state.strNow >= state.strLen) return;
+  dzTimerPause(state.tickTimer);
+  state.strNow = state.strLen;
+  const entry = state.queue[0];
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer === targetPlayer) {
+    dzSetText(state.frames[3], entry.text);
+  }
+  if (entry.isQuest) {
+    // 浠诲姟妯″紡锛氭樉绀烘帴鍙?鎷掔粷鎸夐挳锛屼笉鏄剧ず"鐐瑰嚮浠ョ户缁?鎻愮ず
+    showQuestButtons(state, true);
+  } else {
+    // 鏂囧瓧宸插叏閮ㄦ樉绀猴紝绛夊緟鐜╁鐐瑰嚮鑳屾櫙鎵嶆帹杩?    state.waitingClick = true;
+    dzShow(state.frames[11], true); // 鏄剧ず"鐐瑰嚮浠ョ户缁?鈻?
+  }
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氭墦瀛楁満閫愬瓧鏄剧ず
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function startTyping(state: PlayerDialogState): void {
+  dzTimerStart(state.tickTimer, TICK, true, () => {
+    onTypingTick(state);
+  });
+}
+
+function onTypingTick(state: PlayerDialogState): void {
+  if (state.queue.length === 0) {
+    dzTimerPause(state.tickTimer);
+    return;
+  }
+
+  state.strNow += STEP_LEN;
+  state.clickCooldown = false; // 鎵撳瓧鏈哄凡璺戣捣鏉ワ紝瑙ｉ櫎鐐瑰嚮鍐峰嵈
+  const entry = state.queue[0];
+  if (!entry) { dzTimerPause(state.tickTimer); return; }
+
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  const isLocal = localPlayer === targetPlayer;
+
+  if (state.strNow >= state.strLen) {
+    // 鏂囧瓧宸插叏閮ㄦ樉绀?    if (isLocal) {
+      dzSetText(state.frames[3], entry.text);
+    }
+    dzTimerPause(state.tickTimer);
+
+    if (entry.isQuest) {
+      // 浠诲姟妯″紡锛氭樉绀烘帴鍙?鎷掔粷鎸夐挳锛屼笉鏄剧ず"鐐瑰嚮浠ョ户缁?鎻愮ず
+      showQuestButtons(state, true);
+    } else {
+      // 鏂囧瓧宸插叏閮ㄦ樉绀猴紝绛夊緟鐜╁鐐瑰嚮鑳屾櫙鎵嶆帹杩?      state.waitingClick = true;
+      dzShow(state.frames[11], true); // 鏄剧ず"鐐瑰嚮浠ョ户缁?鈻?
+    }
+  } else {
+    // 浠嶅湪鎵撳瓧涓?    if (isLocal) {
+      const partial = dzSubString(entry.text, 0, state.strNow);
+      dzSetText(state.frames[3], partial);
+    }
+  }
+}
+
+function advanceDialog(state: PlayerDialogState): void {
+  // 闅愯棌浠诲姟鎸夐挳鍜?鐐瑰嚮浠ョ户缁?鎻愮ず
+  showQuestButtons(state, false);
+  dzShow(state.frames[11], false);
+  // 鍑洪槦
+  state.queue.shift();
+
+  if (state.queue.length === 0) {
+    state.isActive = false;
+    state.waitingClick = false;
+    state.clickCooldown = false;
+    showDialogFrames(state, false);
+    // 閫氱煡璋冪敤鏂瑰璇濆凡鍏ㄩ儴缁撴潫锛岃鍏堕噸缃嚜韬姸鎬侀攣
+    const cb = state.onFinish;
+    state.onFinish = undefined;
+    if (cb) cb();
+  } else {
+    playEntry(state);
+  }
+}
+
+/** 鏄剧ず/闅愯棌浠诲姟鎺ュ彈鎷掔粷鎸夐挳锛堝簳鍥?+ 鍛戒腑灞?+ 鏂囧瓧鏍囩锛?*/
+function showQuestButtons(state: PlayerDialogState, visible: boolean): void {
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer !== targetPlayer) return;
+  dzShow(state.frames[5], visible);  // 鎺ュ彈搴曞浘
+  dzShow(state.frames[6], visible);  // 鎺ュ彈鍛戒腑灞?  dzShow(state.frames[9], visible);  // 鎺ュ彈鏂囧瓧鏍囩
+  dzShow(state.frames[7], visible);  // 鎷掔粷搴曞浘
+  dzShow(state.frames[8], visible);  // 鎷掔粷鍛戒腑灞?  dzShow(state.frames[10], visible); // 鎷掔粷鏂囧瓧鏍囩
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍐呴儴锛氬叆闃熷苟鍦ㄩ娆″叆闃熸椂瑙﹀彂鎾斁
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function enqueue(
+  state: PlayerDialogState,
+  title: string,
+  text: string,
+  waitTime: number,
+  leftTex: string,
+  midTex: string,
+  rightTex: string,
+  titleFontSize: number,
+  bodyFontSize: number,
+): void {
+  const entry: DialogEntry = { title, text, waitTime, leftTex, midTex, rightTex, titleFontSize, bodyFontSize, isQuest: false };
+  const wasEmpty = state.queue.length === 0;
+  state.queue.push(entry);
+  if (wasEmpty) {
+    playEntry(state);
+  }
+}
+
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// 鍏叡 API
+// 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/**
+ * 鍒濆鍖栧璇濇绯荤粺锛堜负鍏ㄩ儴鐜╁棰勫垱寤虹姸鎬侊紝涓嶅垱寤哄抚锛? * 鍙湪鍦板浘鍒濆鍖栨椂璋冪敤锛屼篃鍙互涓嶈皟鐢紙棣栨 display 鏃舵噿鍒濆鍖栵級
+ */
+export function initDialogSystem(): void {
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    ensureState(i);
+  }
+}
+
+/**
+ * 涓烘寚瀹氱帺瀹舵坊鍔犱竴鏉″璇濓紙鏃犵珛缁橈級
+ * @param p              鐩爣鐜╁
+ * @param title          鏍囬锛堣璇濅汉鍚嶅瓧锛? * @param text           姝ｆ枃
+ * @param duration       姝ｆ枃鎵撳畬鍚庡仠鐣欐椂闂达紙绉掞級锛屾渶灏?1
+ * @param titleFontSize  鏍囬瀛椾綋澶у皬锛堥粯璁?DEFAULT_TITLE_FONT_SIZE锛? * @param bodyFontSize   姝ｆ枃瀛椾綋澶у皬锛堥粯璁?DEFAULT_BODY_FONT_SIZE锛? */
+export function displayText(
+  p: Player,
+  title: string,
+  text: string,
+  duration: number,
+  titleFontSize?: number,
+  bodyFontSize?: number,
+): void {
+  if (duration <= 0) duration = 1;
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = ensureState(pid);
+  enqueue(state, title, text, duration, "", "", "",
+    titleFontSize ?? DEFAULT_TITLE_FONT_SIZE,
+    bodyFontSize ?? DEFAULT_BODY_FONT_SIZE,
+  );
+}
+
+/**
+ * 涓烘寚瀹氱帺瀹舵坊鍔犱竴鏉″璇濓紙甯︾珛缁橈級
+ * @param p              鐩爣鐜╁
+ * @param title          鏍囬
+ * @param text           姝ｆ枃
+ * @param duration       鍋滅暀鏃堕棿锛堢锛? * @param leftPortrait   宸︿晶绔嬬粯璺緞锛?"=涓嶆樉绀猴級
+ * @param midPortrait    涓棿绔嬬粯璺緞
+ * @param rightPortrait  鍙充晶绔嬬粯璺緞
+ * @param titleFontSize  鏍囬瀛椾綋澶у皬锛堥粯璁?DEFAULT_TITLE_FONT_SIZE锛? * @param bodyFontSize   姝ｆ枃瀛椾綋澶у皬锛堥粯璁?DEFAULT_BODY_FONT_SIZE锛? */
+export function displayTextEx(
+  p: Player,
+  title: string,
+  text: string,
+  duration: number,
+  leftPortrait: string,
+  midPortrait: string,
+  rightPortrait: string,
+  titleFontSize?: number,
+  bodyFontSize?: number,
+): void {
+  if (duration <= 0) duration = 1;
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = ensureState(pid);
+  enqueue(state, title, text, duration, leftPortrait, midPortrait, rightPortrait,
+    titleFontSize ?? DEFAULT_TITLE_FONT_SIZE,
+    bodyFontSize ?? DEFAULT_BODY_FONT_SIZE,
+  );
+}
+
+/**
+ * 娓呴櫎鎸囧畾鐜╁鐨勫叏閮ㄥ璇濋槦鍒楀苟绔嬪嵆闅愯棌瀵硅瘽妗? */
+export function clearDialog(p: Player): void {
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = g_states[pid];
+  if (!state) return;
+  clearState(state);
+}
+
+/**
+ * 璁剧疆鎸囧畾鐜╁鏄惁鏄剧ず瀵硅瘽妗? * 鐢ㄦ湰鍦板垽鏂細浠呮湰鍦扮帺瀹剁敓鏁堬紝涓嶈Е鍙?desync
+ */
+export function setDialogShowable(p: Player, visible: boolean): void {
+  const localPlayer = dzGetLocalPlayer();
+  if (localPlayer !== p) return; // 鏈湴鍒ゆ柇锛屽彧鏀硅嚜宸?  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = ensureState(pid);
+  state.canShow = visible;
+  if (!visible && state.initialized) {
+    // 绔嬪嵆闅愯棌甯э紙宸叉槸鏈湴鐜╁锛岀洿鎺ユ搷浣滀笉浼?desync锛?    for (let i = 0; i < 9; i++) dzShow(state.frames[i], false);
+    for (let i = 101; i < 104; i++) dzShow(state.frames[i], false);
+  }
+}
+
+/**
+ * 璁剧疆鎸囧畾鐜╁鐨勫璇濇鑳屾櫙璐村浘
+ * 蹇呴』鍦ㄦ湰鍦板垽鏂唴璋冪敤锛岄槻姝?desync
+ */
+export function setDialogBGTexture(p: Player, path: string): void {
+  const localPlayer = dzGetLocalPlayer();
+  if (localPlayer !== p) return;
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = g_states[pid];
+  if (!state || !state.initialized) return;
+  dzSetTexture(state.frames[0], path);
+}
+
+/**
+ * 璁剧疆鎸囧畾鐜╁鐨勫璇濇鏍囬鏍忚创鍥? * 蹇呴』鍦ㄦ湰鍦板垽鏂唴璋冪敤锛岄槻姝?desync
+ */
+export function setDialogTitleTexture(p: Player, path: string): void {
+  const localPlayer = dzGetLocalPlayer();
+  if (localPlayer !== p) return;
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = g_states[pid];
+  if (!state || !state.initialized) return;
+  dzSetTexture(state.frames[1], path);
+}
+
+/**
+ * 鏌ヨ鎸囧畾鐜╁鐨勫璇濇鏄惁姝ｅ湪鏄剧ず
+ * 璋冪敤鏂瑰彲鐢ㄦ鍑芥暟鍐冲畾鏄惁鍏佽鍐嶆瑙﹀彂瀵硅瘽锛堥槻姝㈤噸澶嶇偣鍑籒PC锛? */
+export function isDialogActive(p: Player): boolean {
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return false;
+  const state = g_states[pid];
+  if (!state) return false;
+  return state.isActive;
+}
+
+/**
+ * 娉ㄥ唽瀵硅瘽闃熷垪鍏ㄩ儴鎾畬鍚庣殑鍥炶皟
+ * 鐢ㄤ簬NPC浜や簰閫昏緫鍦ㄥ璇濈粨鏉熷悗閲嶇疆鑷韩鐨?瀵硅瘽涓?鐘舵€侀攣
+ * 姣忔瀵硅瘽缁撴潫鍚庡洖璋冧細鑷姩娓呴櫎锛屼笅娆￠渶瑕侀噸鏂版敞鍐? * @param p        鐩爣鐜╁
+ * @param callback 瀵硅瘽鍏ㄩ儴缁撴潫鏃惰皟鐢? */
+export function setDialogFinishCallback(p: Player, callback: () => void): void {
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = ensureState(pid);
+  state.onFinish = callback;
+}
+
+/**
+ * 涓烘寚瀹氱帺瀹舵樉绀轰换鍔″璇濇
+ * 鎵撳瓧瀹屾垚鍚庢樉绀恒€愭帴鍙椾换鍔°€戙€愭嫆缁濅换鍔°€戞寜閽紝绛夊緟鐜╁閫夋嫨
+ * @param p         鐩爣鐜╁
+ * @param title     璇磋瘽浜哄悕瀛? * @param text      浠诲姟鎻忚堪鏂囨湰
+ * @param onAccept  鐐瑰嚮鎺ュ彈浠诲姟鐨勫洖璋? * @param onReject  鐐瑰嚮鎷掔粷浠诲姟鐨勫洖璋? */
+export function displayQuest(
+  p: Player,
+  title: string,
+  text: string,
+  onAccept: () => void,
+  onReject: () => void,
+): void {
+  const pid = dzGetPlayerId(p);
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  const state = ensureState(pid);
+  const entry: DialogEntry = {
+    title,
+    text,
+    waitTime: 0,
+    leftTex: "",
+    midTex: "",
+    rightTex: "",
+    titleFontSize: DEFAULT_TITLE_FONT_SIZE,
+    bodyFontSize: DEFAULT_BODY_FONT_SIZE,
+    isQuest: true,
+    questCallbacks: { onAccept, onReject },
+  };
+  const wasEmpty = state.queue.length === 0;
+  state.queue.push(entry);
+  if (wasEmpty) {
+    playEntry(state);
+  }
+}

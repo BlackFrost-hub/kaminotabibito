@@ -109,7 +109,9 @@ require("系统.00．核心系统.06．UI函数");
 require("系统.00．核心系统.11．便捷函数（偶尔用）");
 require("系统.09．表现系统.01．UI工具");
 require("系统.09．表现系统.02．垂直滚动条轨道");
-require("系统.09．表现系统.03．对话框UI");
+require("系统.09．表现系统.04．NPC对话状态池");
+const 对话框UI = require("系统.09．表现系统.03．对话框UI") as { initDialogSystem: () => void };
+if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
 // 任务 UI 模块（显式加载，便于打包与排查）
 require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量");
 require("系统.08．任务系统.03．任务UI拆分.02．任务UI辅助");

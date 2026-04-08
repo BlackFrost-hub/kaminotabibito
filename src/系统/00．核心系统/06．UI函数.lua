@@ -4,12 +4,13 @@ local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具"
 local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
 local setButtonText = ____01_FF0EUI_5DE5_5177.setButtonText
 local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
-local ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3 = require("系统.09．表现系统.01．对话框系统.00．对话框UI入口")
-local displayText = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayText
-local displayQuest = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayQuest
-local isDialogActive = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.isDialogActive
-local setDialogNpcUnit = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.setDialogNpcUnit
-local tryOccupyNpc = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.tryOccupyNpc
+local ____03_FF0E_5BF9_8BDD_6846UI = require("系统.09．表现系统.03．对话框UI")
+local displayText = ____03_FF0E_5BF9_8BDD_6846UI.displayText
+local displayQuest = ____03_FF0E_5BF9_8BDD_6846UI.displayQuest
+local isDialogActive = ____03_FF0E_5BF9_8BDD_6846UI.isDialogActive
+local ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60 = require("系统.09．表现系统.04．NPC对话状态池")
+local setDialogNpcUnit = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.setDialogNpcUnit
+local tryOccupyNpc = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.tryOccupyNpc
 --- 全图通用 UI 辅助（DzAPI / Frame）。
 -- 
 -- **联机与 desync**

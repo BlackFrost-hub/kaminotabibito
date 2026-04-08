@@ -49,6 +49,8 @@ local hideFrame = ____01_FF0EUI_5DE5_5177.hideFrame
 local showFrame = ____01_FF0EUI_5DE5_5177.showFrame
 local ____02_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053 = require("系统.09．表现系统.02．垂直滚动条轨道")
 local VerticalScrollbarTrack = ____02_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053.VerticalScrollbarTrack
+local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
@@ -111,9 +113,28 @@ function TaskUI.prototype.init(self)
             self:createEntryIcon(gameUI)
             self:createMainPanel(gameUI)
             self:registerTaskListWheel()
+            self:registerRefreshCallback()
             self:hide()
         end
     )
+end
+function TaskUI.prototype.registerRefreshCallback(self)
+    questManager:registerUIRefreshCallback(function(____, _playerId, _questId)
+        pcall(function ()
+                if type(jass.GetLocalPlayer) ~= "function" then
+                    return
+                end
+                local lp = jass.GetLocalPlayer()
+                if lp == nil then
+                    return
+                end
+                if not self.isVisible then
+                    return
+                end
+                self:refreshList()
+            end
+        )
+    end)
 end
 function TaskUI.prototype.isDescendantOf(self, frame, ancestor)
     return isDescendantOfByJapi(nil, japi, frame, ancestor)

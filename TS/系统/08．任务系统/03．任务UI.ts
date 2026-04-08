@@ -164,7 +164,21 @@ class TaskUI {
       this.createEntryIcon(gameUI);
       this.createMainPanel(gameUI);
       this.registerTaskListWheel();
+      this.registerRefreshCallback();
       this.hide();
+    });
+  }
+
+  private registerRefreshCallback(): void {
+    questManager.registerUIRefreshCallback((_playerId: number, _questId?: string) => {
+      (pcall as any)(() => {
+        if (typeof jass.GetLocalPlayer !== "function") return;
+        const lp = jass.GetLocalPlayer();
+        if (lp == null) return;
+
+        if (!this.isVisible) return;
+        this.refreshList();
+      });
     });
   }
 

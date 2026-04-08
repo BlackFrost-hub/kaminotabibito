@@ -17,36 +17,42 @@ const 便捷函数 = require("系统.00．核心系统.11．便捷函数（偶�
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
 
-// 手动计算 FourCC("ngme")
-// n=110, g=103, m=109, e=101  →  110*16777216 + 103*65536 + 109*256 + 101
-const UNIT_ID_NGME = 110 * 16777216 + 103 * 65536 + 109 * 256 + 101; // "ngme"
+const UNIT_ID_NGME = 110 * 16777216 + 103 * 65536 + 109 * 256 + 101;
 
-// ─── 村长对话数据（未来从表格读取，替换此处即可）─────────────────────────────
-const VILLAGE_CHIEF_DIALOG: NpcDialogData = {
-  lines: [
-    {
+function buildVillageChiefDialog(dialogOwnerId: number): NpcDialogData {
+  return {
+    lines: [
+      {
+        title: "村长",
+        text: "年轻人，我们村子最近遭到了哥布林的袭击，损失惨重……",
+        duration: 4,
+      },
+      {
+        title: "村长",
+        text: "听说你武艺高强，能否帮我们解决这个麻烦？",
+        duration: 3,
+      },
+    ],
+    quest: {
       title: "村长",
-      text: "年轻人，我们村子最近遭到了哥布林的袭击，损失惨重……",
-      duration: 4,
+      text: "【讨伐哥布林】\n\n哥布林巢穴就在村子东边的森林里，请消灭首领。\n\n奖励：金币 500 + 经验 1000",
+      onAccept: () => {
+        const dialogOwner = jass.Player(dialogOwnerId);
+        const acceptedLines = [
+          { title: "村长", text: "多谢帮忙..我会在此地等候的", duration: 4 },
+        ];
+        openNpcDialog(dialogOwner, { lines: acceptedLines });
+      },
+      onReject: () => {
+        const localPlayer = jass.GetLocalPlayer();
+        const triggerPlayer = jass.Player(dialogOwnerId);
+        if (localPlayer === triggerPlayer) {
+          jass.DisplayTimedTextToPlayer(localPlayer, 0, 0, 5, "|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『讨伐哥布林』|r");
+        }
+      },
     },
-    {
-      title: "村长",
-      text: "听说你武艺高强，能否帮我们解决这个麻烦？",
-      duration: 3,
-    },
-  ],
-  quest: {
-    title: "村长",
-    text: "【讨伐哥布林】\n\n哥布林巢穴就在村子东边的森林里，请消灭首领。\n\n奖励：金币 500 + 经验 1000",
-    onAccept: () => {
-      jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cff00ff00[任务] 已接受：讨伐哥布林|r");
-    },
-    onReject: () => {
-      jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cffff4444[任务] 已拒绝：讨伐哥布林|r");
-    },
-  },
-};
-// ─────────────────────────────────────────────────────────────────────────────
+  };
+}
 
 const trg = jass.CreateTrigger();
 for (let i = 0; i < 4; i++) {
@@ -67,7 +73,7 @@ jass.TriggerAddAction(trg, () => {
   if (!hero) return;
   if (!jass.IsUnitInRange(hero, u, 350)) return;
 
-  openNpcDialog(triggerPlayer, { ...VILLAGE_CHIEF_DIALOG, npcUnit: u });
+  openNpcDialog(triggerPlayer, { ...buildVillageChiefDialog(jass.GetPlayerId(triggerPlayer)), npcUnit: u });
 });
 
 export {};

@@ -139,7 +139,11 @@ require("系统.00．核心系统.06．UI函数")
 require("系统.00．核心系统.11．便捷函数（偶尔用）")
 require("系统.09．表现系统.01．UI工具")
 require("系统.09．表现系统.02．垂直滚动条轨道")
-require("系统.09．表现系统.03．对话框UI")
+require("系统.09．表现系统.04．NPC对话状态池")
+local _____5BF9_8BDD_6846UI = require("系统.09．表现系统.03．对话框UI")
+if type(_____5BF9_8BDD_6846UI.initDialogSystem) == "function" then
+    _____5BF9_8BDD_6846UI:initDialogSystem()
+end
 require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量")
 require("系统.08．任务系统.03．任务UI拆分.02．任务UI辅助")
 require("系统.08．任务系统.03．任务UI拆分.03．任务UI列表与滚动")
