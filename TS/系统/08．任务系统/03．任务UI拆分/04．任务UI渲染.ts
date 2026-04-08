@@ -60,13 +60,77 @@ export function resolveQuestRowIconPath(icon: string | undefined): string {
 const EXPANDED_OBJECTIVE_START_OFFSET = LIST_ITEM_H * 0.35;
 const EXPANDED_OBJECTIVE_ROW_HEIGHT = LIST_ITEM_H * 0.25;
 const EXPANDED_FAIL_ROW_HEIGHT = LIST_ITEM_H * 0.2;
+const EXPANDED_DETAIL_ROW_HEIGHT = LIST_ITEM_H * 0.22;
+
+const detailFrameByQuestId = new Map<string, number[]>();
+
+function getOrCreateDetailFrame(
+  questId: string,
+  index: number,
+  listParent: number,
+  text: string,
+  textXRel: number,
+  yRel: number,
+  textW: number,
+  FramePoint: any,
+  createTextLabel: any,
+  setFramePointRelative: any,
+  setFrameSize: any,
+  applyDzTextFontAndAlignment: any,
+  showFrame: any,
+  japi: any,
+  listItemFrames: number[],
+): number {
+  const key = questId + "|" + index;
+  let frames = detailFrameByQuestId.get(questId);
+  let fr = 0;
+  if (frames && frames.length > index) {
+    fr = frames[index] || 0;
+  }
+  if (fr === 0) {
+    fr =
+      createTextLabel(
+        "TaskDetail_" + key,
+        listParent,
+        text,
+        {
+          relativeTo: listParent,
+          point: FramePoint.TOPLEFT,
+          relativePoint: FramePoint.TOPLEFT,
+          x: textXRel,
+          y: yRel,
+        },
+        { width: textW, height: EXPANDED_DETAIL_ROW_HEIGHT }
+      ) || 0;
+    if (fr !== 0) {
+      if (!frames) {
+        frames = [];
+        detailFrameByQuestId.set(questId, frames);
+      }
+      while (frames.length <= index) frames.push(0);
+      frames[index] = fr;
+    }
+  } else {
+    setFramePointRelative(fr, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, yRel);
+    setFrameSize(fr, { width: textW, height: EXPANDED_DETAIL_ROW_HEIGHT });
+    if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(fr, text);
+  }
+  if (fr !== 0) {
+    applyDzTextFontAndAlignment(fr, DZ_TEXT_ALIGN_LEFT);
+    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(fr, 3);
+    showFrame(fr);
+    listItemFrames.push(fr);
+  }
+  return fr;
+}
 
 function buildObjectiveText(completed: boolean, description: string, current: number, required: number): string {
-  return (completed ? "[v] " : "[ ] ") + description + " (" + current + "/" + required + ")";
+  const mark = completed ? "|cffffcc00√|r" : "|cffffcc00×|r";
+  return mark + " " + description + " (" + current + "/" + required + ")";
 }
 
 function buildFailText(timeLimit: number): string {
-  return "失败: 时间限制 " + timeLimit + "秒";
+  return "|cffff4444失败:|r 时间限制 " + timeLimit + "秒";
 }
 
 export function renderExpandedQuestDetails(opts: {
@@ -172,6 +236,54 @@ export function renderExpandedQuestDetails(opts: {
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(failFrame, 3);
     showFrame(failFrame);
     listItemFrames.push(failFrame);
+    objYRel -= EXPANDED_FAIL_ROW_HEIGHT;
+  }
+
+  let detailIdx = 0;
+
+  if (quest.description && quest.description !== "") {
+    getOrCreateDetailFrame(
+      quest.id, detailIdx, listParent,
+      "|cffcccccc任务详情：|r" + quest.description,
+      textXRel, objYRel, textW,
+      FramePoint, createTextLabel, setFramePointRelative, setFrameSize,
+      applyDzTextFontAndAlignment, showFrame, japi, listItemFrames,
+    );
+    detailIdx++;
+    objYRel -= EXPANDED_DETAIL_ROW_HEIGHT;
+  }
+
+  const rewardDesc = quest.rewards && quest.rewards.length > 0
+    ? quest.rewards.map(r => r.description).filter(d => d && d !== "").join("、")
+    : "";
+  if (rewardDesc !== "") {
+    getOrCreateDetailFrame(
+      quest.id, detailIdx, listParent,
+      "|cffff9900任务奖励：|r|cffffcc00" + rewardDesc + "|r",
+      textXRel, objYRel, textW,
+      FramePoint, createTextLabel, setFramePointRelative, setFrameSize,
+      applyDzTextFontAndAlignment, showFrame, japi, listItemFrames,
+    );
+    detailIdx++;
+    objYRel -= EXPANDED_DETAIL_ROW_HEIGHT;
+  }
+
+  const accepter = quest.accepterName;
+  const completer = quest.completerName;
+  if (accepter || completer) {
+    let infoLine = "";
+    if (accepter) infoLine += "接受者:|cff00ccff『" + accepter + "』|r";
+    if (accepter && completer) infoLine += "|";
+    if (completer) infoLine += "完成者:|cff00ff66『" + completer + "』|r";
+    getOrCreateDetailFrame(
+      quest.id, detailIdx, listParent,
+      infoLine,
+      textXRel, objYRel, textW,
+      FramePoint, createTextLabel, setFramePointRelative, setFrameSize,
+      applyDzTextFontAndAlignment, showFrame, japi, listItemFrames,
+    );
+    detailIdx++;
+    objYRel -= EXPANDED_DETAIL_ROW_HEIGHT;
   }
 
   return true;
@@ -263,7 +375,8 @@ export function renderQuestRow(opts: {
   showFrame(rowBackdrop);
   listItemFrames.push(rowBackdrop);
 
-  const titleText = quest.title + " [" + statusText + "]";
+  const npcName = quest.startNpc || "未知";
+  const titleText = "|cffffff00『" + quest.title + "』|r→发布NPC:|cff00ccff『" + npcName + "』|r [" + statusText + "]";
   let titleFrame = titleByQuestId.get(quest.id) || 0;
   if (titleFrame === 0) {
     titleFrame =

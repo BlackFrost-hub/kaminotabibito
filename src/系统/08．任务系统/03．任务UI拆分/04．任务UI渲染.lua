@@ -1,5 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量")
 local LIST_ITEM_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_ITEM_H
@@ -46,11 +49,71 @@ end
 local EXPANDED_OBJECTIVE_START_OFFSET = LIST_ITEM_H * 0.35
 local EXPANDED_OBJECTIVE_ROW_HEIGHT = LIST_ITEM_H * 0.25
 local EXPANDED_FAIL_ROW_HEIGHT = LIST_ITEM_H * 0.2
+local EXPANDED_DETAIL_ROW_HEIGHT = LIST_ITEM_H * 0.22
+local detailFrameByQuestId = __TS__New(Map)
+local function getOrCreateDetailFrame(self, questId, index, listParent, text, textXRel, yRel, textW, FramePoint, createTextLabel, setFramePointRelative, setFrameSize, applyDzTextFontAndAlignment, showFrame, japi, listItemFrames)
+    local key = (questId .. "|") .. tostring(index)
+    local frames = detailFrameByQuestId:get(questId)
+    local fr = 0
+    if frames and #frames > index then
+        fr = frames[index + 1] or 0
+    end
+    if fr == 0 then
+        fr = createTextLabel(
+            nil,
+            "TaskDetail_" .. key,
+            listParent,
+            text,
+            {
+                relativeTo = listParent,
+                point = FramePoint.TOPLEFT,
+                relativePoint = FramePoint.TOPLEFT,
+                x = textXRel,
+                y = yRel
+            },
+            {width = textW, height = EXPANDED_DETAIL_ROW_HEIGHT}
+        ) or 0
+        if fr ~= 0 then
+            if not frames then
+                frames = {}
+                detailFrameByQuestId:set(questId, frames)
+            end
+            while #frames <= index do
+                frames[#frames + 1] = 0
+            end
+            frames[index + 1] = fr
+        end
+    else
+        setFramePointRelative(
+            nil,
+            fr,
+            FramePoint.TOPLEFT,
+            listParent,
+            FramePoint.TOPLEFT,
+            textXRel,
+            yRel
+        )
+        setFrameSize(nil, fr, {width = textW, height = EXPANDED_DETAIL_ROW_HEIGHT})
+        if type(japi.DzFrameSetText) == "function" then
+            japi.DzFrameSetText(fr, text)
+        end
+    end
+    if fr ~= 0 then
+        applyDzTextFontAndAlignment(nil, fr, DZ_TEXT_ALIGN_LEFT)
+        if type(japi.DzFrameSetLevel) == "function" then
+            japi.DzFrameSetLevel(fr, 3)
+        end
+        showFrame(nil, fr)
+        listItemFrames[#listItemFrames + 1] = fr
+    end
+    return fr
+end
 local function buildObjectiveText(self, completed, description, current, required)
-    return ((((((completed and "[v] " or "[ ] ") .. description) .. " (") .. tostring(current)) .. "/") .. tostring(required)) .. ")"
+    local mark = completed and "|cffffcc00√|r" or "|cffffcc00×|r"
+    return ((((((mark .. " ") .. description) .. " (") .. tostring(current)) .. "/") .. tostring(required)) .. ")"
 end
 local function buildFailText(self, timeLimit)
-    return ("失败: 时间限制 " .. tostring(timeLimit)) .. "秒"
+    return ("|cffff4444失败:|r 时间限制 " .. tostring(timeLimit)) .. "秒"
 end
 function ____exports.renderExpandedQuestDetails(self, opts)
     local ____opts_0 = opts
@@ -73,7 +136,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
     local objYRel = rowTopRel - EXPANDED_OBJECTIVE_START_OFFSET
     for ____, obj in ipairs(quest.objectives) do
         do
-            local __continue8
+            local __continue18
             repeat
                 local txt = buildObjectiveText(
                     nil,
@@ -101,7 +164,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                     ) or 0
                     if objFrame == 0 then
                         objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                        __continue8 = true
+                        __continue18 = true
                         break
                     end
                     objFrameByKey:set(objKey, objFrame)
@@ -127,9 +190,9 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                 showFrame(nil, objFrame)
                 listItemFrames[#listItemFrames + 1] = objFrame
                 objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                __continue8 = true
+                __continue18 = true
             until true
-            if not __continue8 then
+            if not __continue18 then
                 break
             end
         end
@@ -177,6 +240,96 @@ function ____exports.renderExpandedQuestDetails(self, opts)
         end
         showFrame(nil, failFrame)
         listItemFrames[#listItemFrames + 1] = failFrame
+        objYRel = objYRel - EXPANDED_FAIL_ROW_HEIGHT
+    end
+    local detailIdx = 0
+    if quest.description and quest.description ~= "" then
+        getOrCreateDetailFrame(
+            nil,
+            quest.id,
+            detailIdx,
+            listParent,
+            "|cffcccccc任务详情：|r" .. quest.description,
+            textXRel,
+            objYRel,
+            textW,
+            FramePoint,
+            createTextLabel,
+            setFramePointRelative,
+            setFrameSize,
+            applyDzTextFontAndAlignment,
+            showFrame,
+            japi,
+            listItemFrames
+        )
+        detailIdx = detailIdx + 1
+        objYRel = objYRel - EXPANDED_DETAIL_ROW_HEIGHT
+    end
+    local rewardDesc = quest.rewards and #quest.rewards > 0 and table.concat(
+        __TS__ArrayFilter(
+            __TS__ArrayMap(
+                quest.rewards,
+                function(____, r) return r.description end
+            ),
+            function(____, d) return d and d ~= "" end
+        ),
+        "、"
+    ) or ""
+    if rewardDesc ~= "" then
+        getOrCreateDetailFrame(
+            nil,
+            quest.id,
+            detailIdx,
+            listParent,
+            ("|cffff9900任务奖励：|r|cffffcc00" .. rewardDesc) .. "|r",
+            textXRel,
+            objYRel,
+            textW,
+            FramePoint,
+            createTextLabel,
+            setFramePointRelative,
+            setFrameSize,
+            applyDzTextFontAndAlignment,
+            showFrame,
+            japi,
+            listItemFrames
+        )
+        detailIdx = detailIdx + 1
+        objYRel = objYRel - EXPANDED_DETAIL_ROW_HEIGHT
+    end
+    local accepter = quest.accepterName
+    local completer = quest.completerName
+    if accepter or completer then
+        local infoLine = ""
+        if accepter then
+            infoLine = infoLine .. ("接受者:|cff00ccff『" .. accepter) .. "』|r"
+        end
+        if accepter and completer then
+            infoLine = infoLine .. "|"
+        end
+        if completer then
+            infoLine = infoLine .. ("完成者:|cff00ff66『" .. completer) .. "』|r"
+        end
+        getOrCreateDetailFrame(
+            nil,
+            quest.id,
+            detailIdx,
+            listParent,
+            infoLine,
+            textXRel,
+            objYRel,
+            textW,
+            FramePoint,
+            createTextLabel,
+            setFramePointRelative,
+            setFrameSize,
+            applyDzTextFontAndAlignment,
+            showFrame,
+            japi,
+            listItemFrames
+        )
+        detailIdx = detailIdx + 1
+        objYRel = objYRel - EXPANDED_DETAIL_ROW_HEIGHT
     end
     return true
 end
@@ -254,7 +407,8 @@ function ____exports.renderQuestRow(self, opts)
     end
     showFrame(nil, rowBackdrop)
     listItemFrames[#listItemFrames + 1] = rowBackdrop
-    local titleText = ((quest.title .. " [") .. statusText) .. "]"
+    local npcName = quest.startNpc or "未知"
+    local titleText = ((((("|cffffff00『" .. quest.title) .. "』|r→发布NPC:|cff00ccff『") .. npcName) .. "』|r [") .. statusText) .. "]"
     local titleFrame = titleByQuestId:get(quest.id) or 0
     if titleFrame == 0 then
         titleFrame = createTextLabel(

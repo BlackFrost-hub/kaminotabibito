@@ -31,6 +31,7 @@ export function questIdTailInRange01to20(id: string, prefix: string): boolean {
 }
 
 export function isQuestWithRowIconLayout(quest: QuestData): boolean {
+  if (quest.icon && quest.icon !== "") return true;
   const id = quest.id;
   if (quest.type === QuestType.MAIN) return questIdTailInRange01to20(id, "main_");
   if (quest.type === QuestType.SIDE) return questIdTailInRange01to20(id, "side_");

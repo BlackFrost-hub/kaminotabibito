@@ -1,4 +1,6 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local Set = ____lualib.Set
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量")
@@ -13,7 +15,27 @@ function ____exports.getQuestItemHeight(self, quest, expanded)
     if not expanded then
         return LIST_ITEM_H * 0.4
     end
-    return LIST_ITEM_H + #quest.objectives * 0.03 + (quest.timeLimit and quest.timeLimit > 0 and 0.02 or 0)
+    local h = LIST_ITEM_H + #quest.objectives * 0.03 + (quest.timeLimit and quest.timeLimit > 0 and 0.02 or 0)
+    if quest.description and quest.description ~= "" then
+        h = h + 0.025
+    end
+    local rewardDesc = quest.rewards and #quest.rewards > 0 and table.concat(
+        __TS__ArrayFilter(
+            __TS__ArrayMap(
+                quest.rewards,
+                function(____, r) return r.description end
+            ),
+            function(____, d) return d and d ~= "" end
+        ),
+        "、"
+    ) or ""
+    if rewardDesc ~= "" then
+        h = h + 0.025
+    end
+    if quest.accepterName or quest.completerName then
+        h = h + 0.025
+    end
+    return h
 end
 function ____exports.calcTotalContentHeight(self, quests, isExpanded)
     local totalH = 0
@@ -21,11 +43,11 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
         local i = 0
         while i < #quests do
             do
-                local __continue6
+                local __continue11
                 repeat
                     local q = quests[i + 1]
                     if not q then
-                        __continue6 = true
+                        __continue11 = true
                         break
                     end
                     totalH = totalH + (____exports.getQuestItemHeight(
@@ -33,9 +55,9 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
                         q,
                         isExpanded(nil, q.id)
                     ) + 0.01)
-                    __continue6 = true
+                    __continue11 = true
                 until true
-                if not __continue6 then
+                if not __continue11 then
                     break
                 end
             end
@@ -142,11 +164,11 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
         local i = 0
         while i < #quests do
             do
-                local __continue35
+                local __continue40
                 repeat
                     local q = quests[i + 1]
                     if not q then
-                        __continue35 = true
+                        __continue40 = true
                         break
                     end
                     local expanded = isExpanded(nil, q.id)
@@ -163,9 +185,9 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                         visibleRows[#visibleRows + 1] = {quest = q, expanded = expanded, rowTopRel = rowTopRel, itemHeight = itemHeight}
                     end
                     rowTopRel = rowTopRel - (itemHeight + 0.01)
-                    __continue35 = true
+                    __continue40 = true
                 until true
-                if not __continue35 then
+                if not __continue40 then
                     break
                 end
             end
@@ -237,17 +259,17 @@ function ____exports.refreshTaskUIList(self, opts)
         local i = 0
         while i < #visibleRows do
             do
-                local __continue44
+                local __continue49
                 repeat
                     local row = visibleRows[i + 1]
                     if not row then
-                        __continue44 = true
+                        __continue49 = true
                         break
                     end
                     createListItem(nil, row.quest, row.rowTopRel, row.expanded)
-                    __continue44 = true
+                    __continue49 = true
                 until true
-                if not __continue44 then
+                if not __continue49 then
                     break
                 end
             end

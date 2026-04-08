@@ -56,6 +56,9 @@ function ____exports.questIdTailInRange01to20(self, id, prefix)
     return tail >= "001" and tail <= "020"
 end
 function ____exports.isQuestWithRowIconLayout(self, quest)
+    if quest.icon and quest.icon ~= "" then
+        return true
+    end
     local id = quest.id
     if quest.type == QuestType.MAIN then
         return ____exports.questIdTailInRange01to20(nil, id, "main_")
@@ -146,18 +149,18 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
     local result = __TS__ArraySlice(active)
     for ____, id in ipairs(completedIds) do
         do
-            local __continue29
+            local __continue30
             repeat
                 local template = questDB:getQuest(id)
                 if not template or template.type ~= ____type or template.uiReserved then
-                    __continue29 = true
+                    __continue30 = true
                     break
                 end
                 if __TS__ArraySome(
                     active,
                     function(____, q) return q.id == id end
                 ) then
-                    __continue29 = true
+                    __continue30 = true
                     break
                 end
                 result[#result + 1] = __TS__ObjectAssign(
@@ -171,9 +174,9 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
                         )
                     }
                 )
-                __continue29 = true
+                __continue30 = true
             until true
-            if not __continue29 then
+            if not __continue30 then
                 break
             end
         end

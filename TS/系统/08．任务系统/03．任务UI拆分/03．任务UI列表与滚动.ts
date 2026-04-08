@@ -13,7 +13,14 @@ import { EMPTY_TEXTS, getQuestsForUI } from "./02．任务UI辅助";
 
 export function getQuestItemHeight(quest: QuestData, expanded: boolean): number {
   if (!expanded) return LIST_ITEM_H * 0.4;
-  return LIST_ITEM_H + quest.objectives.length * 0.03 + (quest.timeLimit && quest.timeLimit > 0 ? 0.02 : 0);
+  let h = LIST_ITEM_H + quest.objectives.length * 0.03 + (quest.timeLimit && quest.timeLimit > 0 ? 0.02 : 0);
+  if (quest.description && quest.description !== "") h += 0.025;
+  const rewardDesc = quest.rewards && quest.rewards.length > 0
+    ? quest.rewards.map(r => r.description).filter(d => d && d !== "").join("、")
+    : "";
+  if (rewardDesc !== "") h += 0.025;
+  if (quest.accepterName || quest.completerName) h += 0.025;
+  return h;
 }
 
 export function calcTotalContentHeight(
