@@ -50,6 +50,7 @@ require("系统.00．核心系统.14．颜色常量");
 // ---------- 扩展函数 ----------
 require("lib.扩展函数.00．条件判断函数");
 require("lib.扩展函数.03．BJ函数");
+require("lib.扩展函数.自定义扩展函数.00．单位相关");
 
 // ---------- 01．单位系统 ----------
 require("系统.01．单位系统.单位狂暴");
@@ -95,6 +96,10 @@ const 激活传送点 = require("系统.07．地形系统.05．激活传送点")
 if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.init激活传送点();
 
 // ---------- 08．任务系统 ----------
+// NPC生成器初始化（必须在任务系统之前，创建NPC单位）
+const NPC生成器 = require("系统.08．任务系统.00．配置表.04．NPC生成器") as { init: () => void };
+if (typeof NPC生成器.init === "function") NPC生成器.init();
+
 // 任务系统初始化
 const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init: () => void };
 if (typeof 任务管理器.init === "function") 任务管理器.init();
@@ -107,15 +112,23 @@ const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initN
 if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
 require("系统.00．核心系统.06．UI函数");
 require("系统.00．核心系统.11．便捷函数（偶尔用）");
-require("系统.09．表现系统.01．UI工具");
+// ---------- 01．UI工具（拆分子模块，显式加载） ----------
+require("系统.09．表现系统.01．UI工具.00．类型定义");
+require("系统.09．表现系统.01．UI工具.01．帧创建");
+require("系统.09．表现系统.01．UI工具.02．位置尺寸");
+require("系统.09．表现系统.01．UI工具.03．内容设置");
+require("系统.09．表现系统.01．UI工具.04．复合组件");
+require("系统.09．表现系统.01．UI工具.05．帧控制");
 require("系统.09．表现系统.02．垂直滚动条轨道");
-require("系统.09．表现系统.03．对话框UI");
-// 任务 UI 模块（显式加载，便于打包与排查）
-require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量");
-require("系统.08．任务系统.03．任务UI拆分.02．任务UI辅助");
-require("系统.08．任务系统.03．任务UI拆分.03．任务UI列表与滚动");
-require("系统.08．任务系统.03．任务UI拆分.04．任务UI渲染");
-require("系统.08．任务系统.03．任务UI拆分.05．任务UI构建与热键");
+require("系统.09．表现系统.04．NPC对话状态池");
+const 对话框UI = require("系统.09．表现系统.01．对话框系统.00．对话框UI入口") as { initDialogSystem: () => void };
+if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
+// 任务 UI 拆分模块（显式加载，便于打包与排查）
+require("系统.08．任务系统.03．任务UI拆分.00．配置常量");
+require("系统.08．任务系统.03．任务UI拆分.01．通用工具");
+require("系统.08．任务系统.03．任务UI拆分.02．列表逻辑");
+require("系统.08．任务系统.03．任务UI拆分.03．交互控制");
+require("系统.08．任务系统.03．任务UI拆分.04．界面构建");
 const 任务UI = require("系统.08．任务系统.03．任务UI") as { init: () => void; registerHotkey: () => void };
 if (typeof 任务UI.init === "function") 任务UI.init();
 if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();

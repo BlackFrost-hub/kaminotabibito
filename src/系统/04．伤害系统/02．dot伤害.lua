@@ -1,21 +1,57 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__Delete = ____lualib.__TS__Delete
-local __TS__ParseInt = ____lualib.__TS__ParseInt
-local __TS__Number = ____lualib.__TS__Number
-local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
-local __TS__ArrayFind = ____lualib.__TS__ArrayFind
-local __TS__StringSplit = ____lualib.__TS__StringSplit
-local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__StringCharAt = ____lualib.__TS__StringCharAt
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__ObjectRest = ____lualib.__TS__ObjectRest
-local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
-local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local ____exports = {}
-local notifyBuffPool, unitHid, tabRowForHid, tabSetHid, getDotSourceDisplayName, isValidDotStateRow, addDotEffectOnUnit, dealDamageForType, ensureDotTimers, pushDotTickForTarget, fillDotStateRow, applyEquipmentDotOnHeroAttack, dotTickRun, jass, damageEventModule, LeakWatcher, dotTypes, stateByType, dotTicks, ignoredTargetByType, dotTickBatchTargetHids, dotBatchSnapForClear, dotBatchDeferredRemaining, dotTimer, EFFECT_RECYCLE_INTERVAL, effectRecycleList, effectRecycleTimer
-function notifyBuffPool(self, typeId, target, state)
+local ____01_FF0EDOT_914D_7F6E = require("系统.04．伤害系统.02．DOT定义.01．DOT配置")
+local dotEffectModelFromBuffRow = ____01_FF0EDOT_914D_7F6E.dotEffectModelFromBuffRow
+local ____03_FF0EDOT_7C7B_578B_5B9A_4E49 = require("系统.04．伤害系统.02．DOT定义.03．DOT类型定义")
+local registerBuiltInDotTypes = ____03_FF0EDOT_7C7B_578B_5B9A_4E49.registerBuiltInDotTypes
+local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.02．DOT定义.04．DOT工具")
+local getDotSourceDisplayName = ____04_FF0EDOT_5DE5_5177.getDotSourceDisplayName
+local isValidDotStateRow = ____04_FF0EDOT_5DE5_5177.isValidDotStateRow
+local tabDeleteHid = ____04_FF0EDOT_5DE5_5177.tabDeleteHid
+local tabRowForHid = ____04_FF0EDOT_5DE5_5177.tabRowForHid
+local tabSetHid = ____04_FF0EDOT_5DE5_5177.tabSetHid
+local unitHid = ____04_FF0EDOT_5DE5_5177.unitHid
+local ____05_FF0EDOT_72B6_6001_540C_6B65 = require("系统.04．伤害系统.02．DOT定义.05．DOT状态同步")
+local createDotStateSync = ____05_FF0EDOT_72B6_6001_540C_6B65.createDotStateSync
+local ____06_FF0EDOT_6267_884C_5668 = require("系统.04．伤害系统.02．DOT定义.06．DOT执行器")
+local createDotExecutor = ____06_FF0EDOT_6267_884C_5668.createDotExecutor
+local ____07_FF0EDOT_65BD_52A0_7B56_7565 = require("系统.04．伤害系统.02．DOT定义.07．DOT施加策略")
+local createDotApplyStrategy = ____07_FF0EDOT_65BD_52A0_7B56_7565.createDotApplyStrategy
+local ____08_FF0EDOT_57FA_7840_5DE5_5177 = require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具")
+local createDotBaseUtils = ____08_FF0EDOT_57FA_7840_5DE5_5177.createDotBaseUtils
+--- 【通用 DOT 框架】持续伤害/减益（如反恢复、燃烧、中毒等）统一在此注册与驱动。
+-- 
+-- 设计说明（给后续维护或 AI 参考）：
+-- - 每种 DOT 通过 registerDotType(config) 注册，配置里包含：解析装备 Buff、取“最强”参数、算每秒伤害、伤害类型、特效模型等。
+-- - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，经 `registerDamageCallback` 第 6 参传入；装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
+-- - **非普攻伤害**（技能等）：仍用「同解析 time → 刷新」或「新乘积更大 → 换条」；DOT 秒跳自伤靠 ignoredTargetByType 整轮跳过，batch 仅挡无普攻位的回调。
+-- - **剩余秒数**：由 `05．Buff系统.00．Buff系统` 的 Buff 池以 `BUFF_POOL_TICK`（0.1s）递减；本模块每 tick 末 `syncDotRemainingFromBuffPool` 把池内 remaining/effect 写回 `stateByType`。
+-- - **dotTimer**：每 1 秒按条目的 amount 造成伤害并播特效；到期以池为准移除条目；effectRecycleTimer 统一回收特效。
+-- - 若某 DOT 需要“附加效果”（如 10 秒内减 50 攻），可在 config 里提供 onApply/onTick/onEnd 回调，在施加/每跳/结束时执行。
+-- 
+-- 与 `01．Buff表.ts` 对应：D001「反恢复」、D002「燃烧」、D003「中毒」、D004「巨魔头颅诅咒」等（`effect` 行与表同步）。
+-- **图标与每跳特效模型**：只改 `01．Buff表.ts` 的 `icon` / `effect`，勿在本文件写死路径。
+-- - 反恢复：装备 `Buff:dmg:AntiHeal200%;time3` → 精神伤害，每秒 regenHP×200%，持续 time 秒。
+-- - 燃烧：装备 `Buff:dmg:Burn50;time5` → 火焰伤害，每秒固定 damage 点，持续 time 秒（数值由解析结果决定）。
+local jass = require("jass.common")
+local g = require("jass.globals")
+local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local fourCCToString = ____require_result_0.fourCCToString
+local damageEventModule = require("系统.04．伤害系统.01．伤害事件")
+local leakCore = require("系统.00．核心系统.05．泄露审计")
+local ____leakCore_LeakWatcher_1 = leakCore.LeakWatcher
+if ____leakCore_LeakWatcher_1 == nil then
+    ____leakCore_LeakWatcher_1 = leakCore
+end
+local LeakWatcher = ____leakCore_LeakWatcher_1
+local dotTypes = {}
+--- 注册一种 DOT，后续伤害回调会按配置解析装备并施加/覆盖
+function ____exports.registerDotType(self, config)
+    dotTypes[#dotTypes + 1] = config
+end
+--- Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统
+local function notifyBuffPool(self, typeId, target, state)
     pcall(function ()
             local m = require("系统.05．Buff系统.00．Buff系统")
             if m ~= nil and type(m.syncDotBuff) == "function" then
@@ -24,354 +60,14 @@ function notifyBuffPool(self, typeId, target, state)
         end
     )
 end
-function unitHid(self, u)
-    if u == nil or u == 0 then
-        return 0
-    end
-    if type(jass.GetHandleId) ~= "function" then
-        return 0
-    end
-    return jass.GetHandleId(u)
-end
-function tabRowForHid(self, tab, hid)
-    if hid == 0 then
-        return nil
-    end
-    local n = tab[hid]
-    if n ~= nil then
-        return n
-    end
-    return tab[tostring(hid)]
-end
-function tabSetHid(self, tab, hid, state)
-    if hid == 0 then
-        return
-    end
-    __TS__Delete(
-        tab,
-        tostring(hid)
-    )
-    tab[hid] = state
-end
-function getDotSourceDisplayName(self, u)
-    if u == nil or u == 0 then
-        return "未知"
-    end
-    if type(jass.GetUnitName) == "function" then
-        local n = jass.GetUnitName(u)
-        if n ~= nil and n ~= nil and tostring(n) ~= "" then
-            return tostring(n)
-        end
-    end
-    return "未知"
-end
-function isValidDotStateRow(self, v)
-    return v ~= nil and type(v) == "table" and type(v.remaining) == "number" and type(v.effect) == "number"
-end
-function addDotEffectOnUnit(self, unit, model, duration)
-    if not unit or not model or model == "" or type(jass.AddSpecialEffectTarget) ~= "function" then
-        return
-    end
-    local eff = jass.AddSpecialEffectTarget(model, unit, "origin")
-    if eff == nil then
-        return
-    end
-    if type(jass.YDWETimerDestroyEffect) == "function" then
-        jass.YDWETimerDestroyEffect(duration, eff)
-        return
-    end
-    local ticks = math.ceil(duration / EFFECT_RECYCLE_INTERVAL)
-    effectRecycleList[#effectRecycleList + 1] = {eff = eff, ticksLeft = ticks}
-    if effectRecycleTimer == nil and type(jass.TimerStart) == "function" then
-        effectRecycleTimer = LeakWatcher:createTimer("dot_effectRecycle")
-        jass.TimerStart(
-            effectRecycleTimer,
-            EFFECT_RECYCLE_INTERVAL,
-            true,
-            function()
-                do
-                    local i = #effectRecycleList - 1
-                    while i >= 0 do
-                        local x = effectRecycleList[i + 1]
-                        x.ticksLeft = x.ticksLeft - 1
-                        if x.ticksLeft <= 0 then
-                            if x.eff ~= nil and type(jass.DestroyEffect) == "function" then
-                                jass.DestroyEffect(x.eff)
-                            end
-                            __TS__ArraySplice(effectRecycleList, i, 1)
-                        end
-                        i = i - 1
-                    end
-                end
-                if #effectRecycleList == 0 and effectRecycleTimer ~= nil then
-                    LeakWatcher:destroyTimer(effectRecycleTimer)
-                    effectRecycleTimer = nil
-                end
-            end
-        )
-    end
-end
-function dealDamageForType(self, typeId, source, target, amount)
-    if type(jass.UnitDamageTarget) ~= "function" then
-        return
-    end
-    local cfg = __TS__ArrayFind(
-        dotTypes,
-        function(____, c) return c.id == typeId end
-    )
-    if cfg == nil then
-        return
-    end
-    local j = jass
-    if j.udg_TempUnit ~= nil then
-        j.udg_TempUnit[3] = target
-        j.udg_TempUnit[4] = source
-    end
-    --- 本次伤害由本模块 DOT 造成：须让 onDamage 里「所有」装备 DOT 类型都跳过施加，否则会只忽略当前 type，另一类型仍走 newProduct>effect*remaining 把剩余时间刷新满，导致跳数远超 time（如 3 秒变 5+ 跳）。
-    local dh = unitHid(nil, target)
-    do
-        local di = 0
-        while di < #dotTypes do
-            local tid = dotTypes[di + 1].id
-            if ignoredTargetByType[tid] == nil then
-                ignoredTargetByType[tid] = {}
-            end
-            ignoredTargetByType[tid][dh] = true
-            di = di + 1
-        end
-    end
-    if type(damageEventModule.markNextPendingDamageAsDotTickBatch) == "function" then
-        damageEventModule:markNextPendingDamageAsDotTickBatch()
-    end
-    jass.UnitDamageTarget(
-        source,
-        target,
-        amount,
-        false,
-        false,
-        jass.ATTACK_TYPE_NORMAL,
-        cfg.damageType,
-        jass.WEAPON_TYPE_WHOKNOWS
-    )
-end
-function ensureDotTimers(self)
-    if dotTimer == nil and type(jass.TimerStart) == "function" then
-        dotTimer = LeakWatcher:createTimer("dot_tick")
-        jass.TimerStart(dotTimer, 1, true, dotTickRun)
-    end
-end
-function pushDotTickForTarget(self, typeId, source, target, tgtHid, amount, duration, cfg)
-    do
-        local i = #dotTicks - 1
-        while i >= 0 do
-            local e = dotTicks[i + 1]
-            if e.typeId == typeId and unitHid(nil, e.target) == tgtHid then
-                __TS__ArraySplice(dotTicks, i, 1)
-            end
-            i = i - 1
-        end
-    end
-    dotTicks[#dotTicks + 1] = {
-        typeId = typeId,
-        source = source,
-        target = target,
-        amount = amount,
-        effectModel = cfg.effectModel,
-        effectDuration = cfg.effectDuration
-    }
-end
-function fillDotStateRow(self, cur, target, source, amount, bestDuration)
-    cur.effect = amount
-    cur.remaining = bestDuration
-    cur._dotParsedDuration = bestDuration
-    cur._dotUnitRef = target
-    cur.sourceName = getDotSourceDisplayName(nil, source)
-end
-function applyEquipmentDotOnHeroAttack(self, typeId, cfg, tab, tgtHid, target, source, amount, bestDuration, cur)
-    if cur ~= nil then
-        fillDotStateRow(
-            nil,
-            cur,
-            target,
-            source,
-            amount,
-            bestDuration
-        )
-        pushDotTickForTarget(
-            nil,
-            typeId,
-            source,
-            target,
-            tgtHid,
-            amount,
-            bestDuration,
-            cfg
-        )
-        notifyBuffPool(nil, typeId, target, cur)
-    else
-        local state = {
-            effect = amount,
-            remaining = bestDuration,
-            _dotUnitRef = target,
-            sourceName = getDotSourceDisplayName(nil, source),
-            _dotParsedDuration = bestDuration
-        }
-        tabSetHid(nil, tab, tgtHid, state)
-        pushDotTickForTarget(
-            nil,
-            typeId,
-            source,
-            target,
-            tgtHid,
-            amount,
-            bestDuration,
-            cfg
-        )
-        notifyBuffPool(nil, typeId, target, state)
-        if type(cfg.onApply) == "function" then
-            cfg:onApply(target, state)
-        end
-    end
-    ensureDotTimers(nil)
-end
-function dotTickRun(self)
-    local buffM = require("系统.05．Buff系统.00．Buff系统")
-    do
-        local i = #dotTicks - 1
-        while i >= 0 do
-            local e = dotTicks[i + 1]
-            local eh = unitHid(nil, e.target)
-            local ____temp_21
-            if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
-                ____temp_21 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
-            else
-                ____temp_21 = nil
-            end
-            local bid = ____temp_21
-            local ____temp_22
-            if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
-                ____temp_22 = buffM:getBuffRuntimeByHid(eh, bid)
-            else
-                ____temp_22 = nil
-            end
-            local rt = ____temp_22
-            if rt == nil or rt.remaining <= 0.001 then
-                __TS__ArraySplice(dotTicks, i, 1)
-            end
-            i = i - 1
-        end
-    end
-    local batch = {}
-    do
-        local bi = #dotTicks - 1
-        while bi >= 0 do
-            local bh = unitHid(nil, dotTicks[bi + 1].target)
-            if bh ~= 0 then
-                batch[bh] = true
-            end
-            bi = bi - 1
-        end
-    end
-    local batchSnap = batch
-    dotTickBatchTargetHids = batchSnap
-    local nDeals = #dotTicks
-    dotBatchSnapForClear = batchSnap
-    dotBatchDeferredRemaining = nDeals
-    do
-        local i = #dotTicks - 1
-        while i >= 0 do
-            local e = dotTicks[i + 1]
-            local eh = unitHid(nil, e.target)
-            dealDamageForType(
-                nil,
-                e.typeId,
-                e.source,
-                e.target,
-                e.amount
-            )
-            addDotEffectOnUnit(nil, e.target, e.effectModel, e.effectDuration)
-            local cfg = __TS__ArrayFind(
-                dotTypes,
-                function(____, c) return c.id == e.typeId end
-            )
-            local stTab = stateByType[e.typeId]
-            local ____temp_24
-            if stTab ~= nil then
-                local ____tabRowForHid_result_23 = tabRowForHid(nil, stTab, eh)
-                if ____tabRowForHid_result_23 == nil then
-                    ____tabRowForHid_result_23 = stTab[e.target]
-                end
-                ____temp_24 = ____tabRowForHid_result_23
-            else
-                ____temp_24 = nil
-            end
-            local stateRaw = ____temp_24
-            local state = isValidDotStateRow(nil, stateRaw) and stateRaw or nil
-            if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
-                cfg:onTick(e.target, state)
-            end
-            i = i - 1
-        end
-    end
-    if nDeals <= 0 then
-        dotTickBatchTargetHids = nil
-        dotBatchSnapForClear = nil
-        dotBatchDeferredRemaining = 0
-    end
-    if #dotTicks == 0 and dotTimer ~= nil then
-        LeakWatcher:destroyTimer(dotTimer)
-        dotTimer = nil
-    end
-end
-jass = require("jass.common")
-local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
-local fourCCToString = ____require_result_0.fourCCToString
-damageEventModule = require("系统.04．伤害系统.01．伤害事件")
-local leakCore = require("系统.00．核心系统.05．泄露审计")
-local ____leakCore_LeakWatcher_1 = leakCore.LeakWatcher
-if ____leakCore_LeakWatcher_1 == nil then
-    ____leakCore_LeakWatcher_1 = leakCore
-end
-LeakWatcher = ____leakCore_LeakWatcher_1
-local debuffMod = require("系统.05．Buff系统.01．Buff表")
-local debuffBuffs = debuffMod.buffs
---- DOT 每跳 `AddSpecialEffectTarget` 的模型路径，与同 ID 行的 `effect` 一致
-local function dotEffectModelFromBuffRow(self, rowId)
-    local row = debuffBuffs[rowId]
-    return row ~= nil and type(row.effect) == "string" and row.effect ~= "" and row.effect or ""
-end
-local ____opt_2 = debuffBuffs.D001
-local ____temp_10 = ____opt_2 and ____opt_2.buffID or "D001"
-local ____opt_4 = debuffBuffs.D002
-local ____temp_11 = ____opt_4 and ____opt_4.buffID or "D002"
-local ____opt_6 = debuffBuffs.D003
-local ____temp_12 = ____opt_6 and ____opt_6.buffID or "D003"
-local ____opt_8 = debuffBuffs.D004
---- 与 Buff表 buffID 对齐，供 UI/其它系统引用（新增 Debuff 时在表内加行并在此补键）
-____exports.DOT_DEBUFF_IDS = {antiHeal = ____temp_10, burn = ____temp_11, poison = ____temp_12, trollCurse = ____opt_8 and ____opt_8.buffID or "D004"}
-dotTypes = {}
---- 注册一种 DOT，后续伤害回调会按配置解析装备并施加/覆盖
-function ____exports.registerDotType(self, config)
-    dotTypes[#dotTypes + 1] = config
-end
-stateByType = {}
-dotTicks = {}
---- Buff 池 buffID → dot typeId（与 00．Buff系统 DOT_TYPE_TO_BUFF_ID 互逆）
-local BUFF_ID_TO_DOT_TYPE = {D001 = "antiHeal", D002 = "burn", D003 = "poison", D004 = "trollCurse"}
-local function dotTypeIdFromBuffId(self, buffID)
-    return BUFF_ID_TO_DOT_TYPE[buffID] or nil
-end
-ignoredTargetByType = {}
-dotTickBatchTargetHids = nil
-dotBatchSnapForClear = nil
-dotBatchDeferredRemaining = 0
-dotTimer = nil
-EFFECT_RECYCLE_INTERVAL = 0.2
-effectRecycleList = {}
-effectRecycleTimer = nil
+--- 按类型、再按目标存状态。stateByType[typeId][GetHandleId(target)] = { effect, remaining, _dotUnitRef?, ... }
+local stateByType = {}
+local dotTicks = {}
+--- 刚被我们「某类型」伤害打到的单位，下一帧伤害回调里跳过对该类型施加，避免 DOT 触发的伤害再次叠 DOT
+local ignoredTargetByType = {}
 local equipDataMod = require("系统.02．物品系统.01．装备数据")
 local itemsData = equipDataMod.items or equipDataMod.default or ({})
+local dotBaseUtils = createDotBaseUtils(nil, {jass = jass, g = g, itemsData = itemsData, fourCCToString = fourCCToString})
 local function removeDotTicksForTargetHid(self, typeId, tgtHid)
     do
         local i = #dotTicks - 1
@@ -384,893 +80,76 @@ local function removeDotTicksForTargetHid(self, typeId, tgtHid)
         end
     end
 end
-local function tabDeleteHid(self, tab, hid)
-    if hid == 0 then
-        return
-    end
-    __TS__Delete(tab, hid)
-    __TS__Delete(
-        tab,
-        tostring(hid)
-    )
-end
-local function collectHidsInTab(self, tab)
-    local seen = {}
-    local out = {}
-    for k in pairs(tab) do
-        do
-            local __continue23
-            repeat
-                local kn = type(k) == "number" and k or __TS__ParseInt(k, 10)
-                if __TS__NumberIsNaN(__TS__Number(kn)) or kn == 0 then
-                    __continue23 = true
-                    break
-                end
-                if seen[kn] then
-                    __continue23 = true
-                    break
-                end
-                seen[kn] = true
-                out[#out + 1] = kn
-                __continue23 = true
-            until true
-            if not __continue23 then
-                break
-            end
-        end
-    end
-    return out
-end
---- `IsUnitType` 第二参为 unittype。common.j 里 `UNIT_TYPE_STRUCTURE` 已是 unittype，不可再 `ConvertUnitType(UNIT_TYPE_STRUCTURE)`（该 native 只吃整数索引，如 64）。
-local function getStructureUnitTypeHandle(self)
-    local jc = jass
-    local gg = g
-    local ____jc_UNIT_TYPE_STRUCTURE_13 = jc.UNIT_TYPE_STRUCTURE
-    if ____jc_UNIT_TYPE_STRUCTURE_13 == nil then
-        ____jc_UNIT_TYPE_STRUCTURE_13 = gg.UNIT_TYPE_STRUCTURE
-    end
-    local direct = ____jc_UNIT_TYPE_STRUCTURE_13
-    if direct ~= nil then
-        return direct
-    end
-    if type(jass.ConvertUnitType) == "function" then
-        return jass.ConvertUnitType(64)
-    end
-    return nil
-end
---- 禁止用局部变量承接 jass API 再调用，TSTL 会编成 `j:Fn()` 导致 bad self
-local function isDebuffDotTargetOk(self, source, target)
-    if source == nil or target == nil or target == 0 then
-        return false
-    end
-    local utStruct = getStructureUnitTypeHandle(nil)
-    if type(jass.IsUnitType) == "function" and utStruct ~= nil then
-        if jass.IsUnitType(target, utStruct) == true then
-            return false
-        end
-    end
-    if type(jass.GetOwningPlayer) ~= "function" then
-        return false
-    end
-    local srcP = jass.GetOwningPlayer(source)
-    if srcP == nil then
-        return false
-    end
-    if type(jass.IsUnitEnemy) == "function" then
-        return jass.IsUnitEnemy(target, srcP) == true
-    end
-    if type(jass.IsPlayerEnemy) == "function" then
-        local tp = jass.GetOwningPlayer(target)
-        if tp ~= nil then
-            return jass.IsPlayerEnemy(srcP, tp) == true
-        end
-    end
-    return false
-end
-local function unitItemInSlot(self, unit, slot)
-    if type(jass.UnitItemInSlot) ~= "function" then
-        return nil
-    end
-    return jass.UnitItemInSlot(unit, slot)
-end
-local function getItemTypeId(self, item)
-    if type(jass.GetItemTypeId) ~= "function" then
-        return 0
-    end
-    return jass.GetItemTypeId(item)
-end
---- 与 JASS `return IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO)` 一致：第二参为全局 `UNIT_TYPE_HERO`（unittype），
--- 同 `装备限制` / `任务管理器` 的 `jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)`，不要对常量再套一层 `ConvertUnitType`。
--- 仅当 jass 与 `jass.globals` 都未注入该常量时，用 `ConvertUnitType(2)` 兜底（common.j 里 HERO=$02）。
-local function heroUnitTypeForIsUnitType(self)
-    local ____jass_UNIT_TYPE_HERO_14 = jass.UNIT_TYPE_HERO
-    if ____jass_UNIT_TYPE_HERO_14 == nil then
-        ____jass_UNIT_TYPE_HERO_14 = g.UNIT_TYPE_HERO
-    end
-    local direct = ____jass_UNIT_TYPE_HERO_14
-    if direct ~= nil then
-        return direct
-    end
-    if type(jass.ConvertUnitType) ~= "function" then
-        return nil
-    end
-    return jass.ConvertUnitType(2)
-end
---- 来源是否为玩家 1–4 的英雄（当前仅这类来源会触发装备 DOT）
-local function isSourceHeroPlayer1to4(self, unit)
-    if not unit or type(jass.GetOwningPlayer) ~= "function" then
-        return false
-    end
-    local hasIsUnitType = type(jass.IsUnitType) == "function"
-    local hasHeroLevel = type(jass.GetHeroLevel) == "function"
-    if not hasIsUnitType and not hasHeroLevel then
-        return false
-    end
-    local owner = jass.GetOwningPlayer(unit)
-    local playerIdx = -1
-    do
-        local i = 0
-        while i <= 15 do
-            if jass.Player(i) == owner then
-                playerIdx = i
-                break
-            end
-            i = i + 1
-        end
-    end
-    if playerIdx < 0 or playerIdx > 3 then
-        return false
-    end
-    local utHero = heroUnitTypeForIsUnitType(nil)
-    if hasIsUnitType and utHero ~= nil and jass.IsUnitType(unit, utHero) == true then
-        return true
-    end
-    if hasHeroLevel and jass.GetHeroLevel(unit) > 0 then
-        return true
-    end
-    return false
-end
+local dotStateSync = createDotStateSync(nil, {stateByType = stateByType, dotTypes = dotTypes, removeDotTicksForTargetHid = removeDotTicksForTargetHid, notifyBuffPool = notifyBuffPool})
+local dotExecutor = createDotExecutor(nil, {
+    jass = jass,
+    LeakWatcher = LeakWatcher,
+    dotTypes = dotTypes,
+    dotTicks = dotTicks,
+    stateByType = stateByType,
+    ignoredTargetByType = ignoredTargetByType,
+    damageEventModule = damageEventModule,
+    unitHid = unitHid,
+    tabRowForHid = tabRowForHid,
+    isValidDotStateRow = isValidDotStateRow
+})
+local dotApplyStrategy = createDotApplyStrategy(
+    nil,
+    {
+        dotTypes = dotTypes,
+        stateByType = stateByType,
+        dotTicks = dotTicks,
+        ignoredTargetByType = ignoredTargetByType,
+        unitHid = unitHid,
+        isSourceHeroPlayer1to4 = dotBaseUtils.isSourceHeroPlayer1to4,
+        isDebuffDotTargetOk = dotBaseUtils.isDebuffDotTargetOk,
+        tabRowForHid = tabRowForHid,
+        tabSetHid = tabSetHid,
+        tabDeleteHid = tabDeleteHid,
+        isValidDotStateRow = isValidDotStateRow,
+        getDotSourceDisplayName = getDotSourceDisplayName,
+        notifyBuffPool = notifyBuffPool,
+        ensureDotTimers = function() return dotExecutor:ensureDotTimers() end,
+        getDotTickBatchTargetHids = function() return dotExecutor:getDotTickBatchTargetHids() end
+    }
+)
 --- Buff 池每 0.1s 递减后调用：把池内 remaining/effect 写回 `stateByType`；池已无行则清理逻辑层与秒跳队列。
 function ____exports.syncDotRemainingFromBuffPool(self)
-    local buffM = require("系统.05．Buff系统.00．Buff系统")
-    local map = buffM.DOT_TYPE_TO_BUFF_ID
-    if map == nil or type(buffM.getBuffRuntimeByHid) ~= "function" then
-        return
-    end
-    for typeId in pairs(stateByType) do
-        do
-            local __continue62
-            repeat
-                local tab = stateByType[typeId]
-                if tab == nil then
-                    __continue62 = true
-                    break
-                end
-                local buffID = map[typeId]
-                if buffID == nil or buffID == "" then
-                    __continue62 = true
-                    break
-                end
-                local hids = collectHidsInTab(nil, tab)
-                do
-                    local hi = 0
-                    while hi < #hids do
-                        do
-                            local __continue66
-                            repeat
-                                local kn = hids[hi + 1]
-                                local v = tabRowForHid(nil, tab, kn)
-                                if v == nil or not isValidDotStateRow(nil, v) then
-                                    tabDeleteHid(nil, tab, kn)
-                                    __continue66 = true
-                                    break
-                                end
-                                local rt = buffM:getBuffRuntimeByHid(kn, buffID)
-                                if rt == nil or rt.remaining <= 0 then
-                                    local cfg = __TS__ArrayFind(
-                                        dotTypes,
-                                        function(____, c) return c.id == typeId end
-                                    )
-                                    if cfg ~= nil and type(cfg.onEnd) == "function" then
-                                        local uref = v._dotUnitRef
-                                        local ____self_16 = cfg
-                                        local ____self_16_onEnd_17 = ____self_16.onEnd
-                                        local ____temp_15
-                                        if uref ~= nil then
-                                            ____temp_15 = uref
-                                        else
-                                            ____temp_15 = kn
-                                        end
-                                        ____self_16_onEnd_17(____self_16, ____temp_15, v)
-                                    end
-                                    notifyBuffPool(nil, typeId, kn, nil)
-                                    tabDeleteHid(nil, tab, kn)
-                                    removeDotTicksForTargetHid(nil, typeId, kn)
-                                    __continue66 = true
-                                    break
-                                end
-                                v.remaining = rt.remaining
-                                v.effect = rt.effect
-                                if rt.sourceName ~= nil then
-                                    v.sourceName = rt.sourceName
-                                end
-                                if rt._dotParsedDuration ~= nil then
-                                    v._dotParsedDuration = rt._dotParsedDuration
-                                end
-                                __continue66 = true
-                            until true
-                            if not __continue66 then
-                                break
-                            end
-                        end
-                        hi = hi + 1
-                    end
-                end
-                __continue62 = true
-            until true
-            if not __continue62 then
-                break
-            end
-        end
-    end
+    dotStateSync:syncDotRemainingFromBuffPool()
 end
 --- Buff 池判定某 DOT 到期时调用（池行已删，勿再 syncDotBuff null）
 function ____exports.clearDotByBuffPoolExpire(self, buffID, hid)
-    local typeId = dotTypeIdFromBuffId(nil, buffID)
-    if typeId == nil or hid == 0 then
-        return
-    end
-    local tab = stateByType[typeId]
-    if tab == nil then
-        return
-    end
-    local v = tabRowForHid(nil, tab, hid)
-    if v ~= nil and isValidDotStateRow(nil, v) then
-        local cfg = __TS__ArrayFind(
-            dotTypes,
-            function(____, c) return c.id == typeId end
-        )
-        if cfg ~= nil and type(cfg.onEnd) == "function" then
-            local uref = v._dotUnitRef
-            local ____self_19 = cfg
-            local ____self_19_onEnd_20 = ____self_19.onEnd
-            local ____temp_18
-            if uref ~= nil then
-                ____temp_18 = uref
-            else
-                ____temp_18 = hid
-            end
-            ____self_19_onEnd_20(____self_19, ____temp_18, v)
-        end
-    end
-    tabDeleteHid(nil, tab, hid)
-    removeDotTicksForTargetHid(nil, typeId, hid)
+    dotStateSync:clearDotByBuffPoolExpire(buffID, hid)
 end
 --- 伤害事件延后展示前调用：用 entry.gearDotAttackRefreshHint 判定普攻位（已在事件同步阶段快照，不依赖 jass 全局），每刀只叠一次装备 DOT，避免多段伤害丢 8192/16384。
 -- 与 `onDamage` 内普攻分支互斥：回调里 `isAttackHitForDot` 为真时不再叠层。
 function ____exports.tryApplyHeroAttackGearDots(self, source, target, _damage)
-    if not target or not source then
-        return
-    end
-    if not isSourceHeroPlayer1to4(nil, source) then
-        return
-    end
-    local tgtHid = unitHid(nil, target)
-    do
-        local t = 0
-        while t < #dotTypes do
-            do
-                local __continue84
-                repeat
-                    local cfg = dotTypes[t + 1]
-                    local typeId = cfg.id
-                    if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
-                        __continue84 = true
-                        break
-                    end
-                    local best = cfg:getBestFromUnit(source)
-                    if best == nil then
-                        __continue84 = true
-                        break
-                    end
-                    local amount = cfg:computeAmount(target, best)
-                    if amount <= 0 then
-                        __continue84 = true
-                        break
-                    end
-                    if stateByType[typeId] == nil then
-                        stateByType[typeId] = {}
-                    end
-                    local tab = stateByType[typeId]
-                    local curRaw = tabRowForHid(nil, tab, tgtHid)
-                    local cur = isValidDotStateRow(nil, curRaw) and curRaw or nil
-                    if curRaw ~= nil and cur == nil then
-                        tabDeleteHid(nil, tab, tgtHid)
-                    end
-                    applyEquipmentDotOnHeroAttack(
-                        nil,
-                        typeId,
-                        cfg,
-                        tab,
-                        tgtHid,
-                        target,
-                        source,
-                        amount,
-                        best.duration,
-                        cur
-                    )
-                    __continue84 = true
-                until true
-                if not __continue84 then
-                    break
-                end
-            end
-            t = t + 1
-        end
-    end
+    dotApplyStrategy:tryApplyHeroAttackGearDots(source, target, _damage)
 end
 --- 由 伤害事件.runDeferredDamageDisplay 在每段 DOT 伤害展示回调结束后调用，替代 Timer(0) 清空 batch（避免早于 deferred onDamage）
 function ____exports.notifyDotTickBatchDamageDisplayed(self)
-    if dotBatchDeferredRemaining <= 0 then
-        return
-    end
-    dotBatchDeferredRemaining = dotBatchDeferredRemaining - 1
-    if dotBatchDeferredRemaining <= 0 then
-        if dotTickBatchTargetHids ~= nil and dotTickBatchTargetHids == dotBatchSnapForClear then
-            dotTickBatchTargetHids = nil
-        end
-        dotBatchSnapForClear = nil
-        dotBatchDeferredRemaining = 0
-    end
+    dotExecutor:notifyDotTickBatchDamageDisplayed()
 end
---- 判定「同一件装备解析出的 time」是否与当前状态一致（仅用于非普攻叠层）
-local DURATION_TIER_EPS = 0.05
-local function sameDurationTier(self, cur, bestDuration)
-    return cur._dotParsedDuration ~= nil and math.abs(bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS
-end
---- 技能等非普攻伤害：同档刷新或乘积更强时换条
-local function applyEquipmentDotOnNonAttack(self, typeId, cfg, tab, tgtHid, target, source, amount, bestDuration, cur)
-    if cur == nil then
-        local state = {
-            effect = amount,
-            remaining = bestDuration,
-            _dotUnitRef = target,
-            sourceName = getDotSourceDisplayName(nil, source),
-            _dotParsedDuration = bestDuration
-        }
-        tabSetHid(nil, tab, tgtHid, state)
-        pushDotTickForTarget(
-            nil,
-            typeId,
-            source,
-            target,
-            tgtHid,
-            amount,
-            bestDuration,
-            cfg
-        )
-        notifyBuffPool(nil, typeId, target, state)
-        if type(cfg.onApply) == "function" then
-            cfg:onApply(target, state)
-        end
-        ensureDotTimers(nil)
-        return
-    end
-    if sameDurationTier(nil, cur, bestDuration) then
-        fillDotStateRow(
-            nil,
-            cur,
-            target,
-            source,
-            amount,
-            bestDuration
-        )
-        pushDotTickForTarget(
-            nil,
-            typeId,
-            source,
-            target,
-            tgtHid,
-            amount,
-            bestDuration,
-            cfg
-        )
-        notifyBuffPool(nil, typeId, target, cur)
-        ensureDotTimers(nil)
-        return
-    end
-    local currentProduct = cur.effect * cur.remaining
-    local newProduct = amount * bestDuration
-    if newProduct <= currentProduct then
-        return
-    end
-    if type(cfg.onEnd) == "function" then
-        cfg:onEnd(target, cur)
-    end
-    local state = {
-        effect = amount,
-        remaining = bestDuration,
-        _dotUnitRef = target,
-        sourceName = getDotSourceDisplayName(nil, source),
-        _dotParsedDuration = bestDuration
-    }
-    tabSetHid(nil, tab, tgtHid, state)
-    pushDotTickForTarget(
-        nil,
-        typeId,
-        source,
-        target,
-        tgtHid,
-        amount,
-        bestDuration,
-        cfg
-    )
-    notifyBuffPool(nil, typeId, target, state)
-    if type(cfg.onApply) == "function" then
-        cfg:onApply(target, state)
-    end
-    ensureDotTimers(nil)
-end
---- - `ignoredTargetByType`：DOT 自伤一轮内各类型各清一次并跳过叠层。
--- - `suppressDotApplyForBatch`：秒跳批内且无普攻位时跳过（普攻永远可走 `applyEquipmentDotOnHeroAttack`）。
 local function onDamage(self, target, damage, damageType, fromDotTickBatch, source, isNormalAttackHit)
-    if not target then
-        return
-    end
-    local isAttackHitForDot = isNormalAttackHit == true
-    if damage <= 0 and not isAttackHitForDot then
-        return
-    end
-    if not source then
-        return
-    end
-    if not isSourceHeroPlayer1to4(nil, source) then
-        return
-    end
-    local tgtHid = unitHid(nil, target)
-    local suppressDotApplyForBatch = fromDotTickBatch == true and dotTickBatchTargetHids ~= nil and dotTickBatchTargetHids[tgtHid] == true and not isAttackHitForDot
-    do
-        local t = 0
-        while t < #dotTypes do
-            do
-                local __continue152
-                repeat
-                    local cfg = dotTypes[t + 1]
-                    local typeId = cfg.id
-                    if ignoredTargetByType[typeId] ~= nil and ignoredTargetByType[typeId][tgtHid] == true then
-                        __TS__Delete(ignoredTargetByType[typeId], tgtHid)
-                        __continue152 = true
-                        break
-                    end
-                    if suppressDotApplyForBatch then
-                        __continue152 = true
-                        break
-                    end
-                    if isAttackHitForDot then
-                        __continue152 = true
-                        break
-                    end
-                    if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
-                        __continue152 = true
-                        break
-                    end
-                    local best = cfg:getBestFromUnit(source)
-                    if best == nil then
-                        __continue152 = true
-                        break
-                    end
-                    if best.attackOnly == true or cfg.attackOnlyTrigger == true then
-                        if not isAttackHitForDot then
-                            __continue152 = true
-                            break
-                        end
-                    end
-                    local amount = cfg:computeAmount(target, best)
-                    if amount <= 0 then
-                        __continue152 = true
-                        break
-                    end
-                    if stateByType[typeId] == nil then
-                        stateByType[typeId] = {}
-                    end
-                    local tab = stateByType[typeId]
-                    local curRaw = tabRowForHid(nil, tab, tgtHid)
-                    local cur = isValidDotStateRow(nil, curRaw) and curRaw or nil
-                    if curRaw ~= nil and cur == nil then
-                        tabDeleteHid(nil, tab, tgtHid)
-                    end
-                    if isAttackHitForDot then
-                        applyEquipmentDotOnHeroAttack(
-                            nil,
-                            typeId,
-                            cfg,
-                            tab,
-                            tgtHid,
-                            target,
-                            source,
-                            amount,
-                            best.duration,
-                            cur
-                        )
-                    else
-                        applyEquipmentDotOnNonAttack(
-                            nil,
-                            typeId,
-                            cfg,
-                            tab,
-                            tgtHid,
-                            target,
-                            source,
-                            amount,
-                            best.duration,
-                            cur
-                        )
-                    end
-                    __continue152 = true
-                until true
-                if not __continue152 then
-                    break
-                end
-            end
-            t = t + 1
-        end
-    end
-end
---- 装备 `Buff` 可多段，用 `+` 连接，例如：`Buff:dmg:...;timeN+Buff:dmg:...;timeN`
-local function splitItemBuffSegments(self, buff)
-    if not buff or type(buff) ~= "string" then
-        return {}
-    end
-    local parts = __TS__StringSplit(buff, "+")
-    local out = {}
-    do
-        local i = 0
-        while i < #parts do
-            local t = __TS__StringTrim(parts[i + 1])
-            if t ~= "" then
-                out[#out + 1] = t
-            end
-            i = i + 1
-        end
-    end
-    return out
-end
---- 从字符串中读取从 startIdx 开始的连续数字
-local function readNumberFromString(self, s, startIdx)
-    local numEnd = startIdx
-    while numEnd < #s do
-        local c = __TS__StringCharAt(s, numEnd)
-        if c >= "0" and c <= "9" then
-            numEnd = numEnd + 1
-        else
-            break
-        end
-    end
-    return numEnd > startIdx and (__TS__ParseInt(
-        __TS__StringSubstring(s, startIdx, numEnd),
-        10
-    ) or 0) or 0
-end
---- 通用的标准 DOT Buff 解析（适用于 AntiHeal、Burn、Poison）
-local function parseStandardDotBuff(self, buffStr, keyword, createResult, requireValuePositive)
-    if requireValuePositive == nil then
-        requireValuePositive = true
-    end
-    if not buffStr or type(buffStr) ~= "string" then
-        return nil
-    end
-    local s = __TS__StringTrim(buffStr)
-    local attackOnly = false
-    if (string.find(s, "Buff:attack:", nil, true) or 0) - 1 == 0 then
-        attackOnly = true
-    elseif (string.find(s, "Buff:dmg:", nil, true) or 0) - 1 ~= 0 then
-        return nil
-    end
-    local rest = __TS__StringSubstring(s, attackOnly and 12 or 9)
-    local keywordIdx = (string.find(rest, keyword, nil, true) or 0) - 1
-    if keywordIdx < 0 then
-        return nil
-    end
-    local valueStartIdx = keywordIdx + #keyword
-    local value = readNumberFromString(nil, rest, valueStartIdx)
-    local timeIdx = (string.find(rest, "time", nil, true) or 0) - 1
-    if timeIdx < 0 then
-        return nil
-    end
-    local duration = readNumberFromString(nil, rest, timeIdx + 4)
-    if duration <= 0 then
-        return nil
-    end
-    if requireValuePositive and value <= 0 then
-        return nil
-    end
-    return createResult(nil, value, duration, attackOnly)
-end
---- 通用的从单位装备中取最强 DOT 的函数
-local function getBestDotFromUnit(self, unit, parseBuff, getProduct)
-    local best = nil
-    do
-        local slot = 0
-        while slot <= 5 do
-            do
-                local __continue184
-                repeat
-                    local item = unitItemInSlot(nil, unit, slot)
-                    if not item then
-                        __continue184 = true
-                        break
-                    end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
-                    local entry = itemsData[idStr]
-                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                    do
-                        local si = 0
-                        while si < #segments do
-                            do
-                                local __continue187
-                                repeat
-                                    local parsed = parseBuff(nil, segments[si + 1])
-                                    if not parsed then
-                                        __continue187 = true
-                                        break
-                                    end
-                                    local product = getProduct(nil, parsed)
-                                    if best == nil or product > best.product then
-                                        best = __TS__ObjectAssign({}, parsed, {product = product})
-                                    end
-                                    __continue187 = true
-                                until true
-                                if not __continue187 then
-                                    break
-                                end
-                            end
-                            si = si + 1
-                        end
-                    end
-                    __continue184 = true
-                until true
-                if not __continue184 then
-                    break
-                end
-            end
-            slot = slot + 1
-        end
-    end
-    if best == nil then
-        return nil
-    end
-    local ____best_27 = best
-    local product = ____best_27.product
-    local result = __TS__ObjectRest(____best_27, {product = true})
-    return result
-end
-local function parseAntiHealBuff(self, buffStr)
-    return parseStandardDotBuff(
-        nil,
-        buffStr,
-        "AntiHeal",
-        function(____, effectPct, duration, attackOnly) return {effectPct = effectPct, duration = duration, attackOnly = attackOnly} end,
-        false
+    dotApplyStrategy:onDamage(
+        target,
+        damage,
+        damageType,
+        fromDotTickBatch,
+        source,
+        isNormalAttackHit
     )
 end
---- 目标最大生命（诅咒 DOT 按 %MaxHP 结算）。
--- 1.27 等环境 `jass.UNIT_STATE_MAX_LIFE` 常为 nil，需与 `装备回复` 一致用 `ConvertUnitState(1)` 取最大生命。
--- **禁止**用 `globalThis["GetUnitState"](u,s)`：TSTL 会编成 `gt:GetUnitState`，Lua 里变成 `(gt,u,s)` 参数错位，恒得 0。
-local function getUnitMaxHp(self, targetUnit)
-    if not targetUnit then
-        return 0
-    end
-    if type(jass.BlzGetUnitMaxHP) == "function" then
-        local m = jass.BlzGetUnitMaxHP(targetUnit)
-        if type(m) == "number" and __TS__NumberIsFinite(__TS__Number(m)) and m > 0 then
-            return m
-        end
-    end
-    if type(jass.GetUnitState) ~= "function" then
-        return 0
-    end
-    local jc = jass
-    local gg = g
-    local maxLifeState = nil
-    if jc.UNIT_STATE_MAX_LIFE ~= nil then
-        maxLifeState = jc.UNIT_STATE_MAX_LIFE
-    elseif gg.UNIT_STATE_MAX_LIFE ~= nil then
-        maxLifeState = gg.UNIT_STATE_MAX_LIFE
-    elseif type(jass.ConvertUnitState) == "function" then
-        maxLifeState = jass.ConvertUnitState(1)
-    end
-    if maxLifeState == nil then
-        return 0
-    end
-    local v = jass.GetUnitState(targetUnit, maxLifeState)
-    return type(v) == "number" and __TS__NumberIsFinite(__TS__Number(v)) and v > 0 and v or 0
-end
-local function getTargetRegenHP(self, targetUnit)
-    if type(jass.GetUnitTypeId) ~= "function" or not targetUnit then
-        return 0
-    end
-    local typeId = jass.GetUnitTypeId(targetUnit)
-    local idStr = fourCCToString(nil, typeId)
-    local slk = _G.slk
-    local slkUnit = slk ~= nil and slk.unit and slk.unit[idStr] or nil
-    if slkUnit == nil then
-        return 0
-    end
-    local regenStr = slkUnit.regenHP or slkUnit.regenHP
-    if regenStr == nil or type(regenStr) ~= "string" then
-        return 0
-    end
-    local n = __TS__ParseFloat(regenStr)
-    return type(n) == "number" and not __TS__NumberIsNaN(__TS__Number(n)) and n or 0
-end
-local function getBestAntiHealFromUnit(self, unit)
-    return getBestDotFromUnit(
-        nil,
-        unit,
-        parseAntiHealBuff,
-        function(____, parsed) return parsed.effectPct * parsed.duration end
-    )
-end
-local function parseBurnBuff(self, buffStr)
-    return parseStandardDotBuff(
-        nil,
-        buffStr,
-        "Burn",
-        function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
-        true
-    )
-end
-local function getBestBurnFromUnit(self, unit)
-    return getBestDotFromUnit(
-        nil,
-        unit,
-        parseBurnBuff,
-        function(____, parsed) return parsed.damagePerSec * parsed.duration end
-    )
-end
-____exports.registerDotType(
-    nil,
-    {
-        id = "antiHeal",
-        debuffDotEnemyNoStructure = true,
-        parseBuff = parseAntiHealBuff,
-        getBestFromUnit = getBestAntiHealFromUnit,
-        computeAmount = function(____, target, parsed)
-            local regenHP = getTargetRegenHP(nil, target)
-            return regenHP * (parsed.effectPct / 100)
-        end,
-        damageType = jass.DAMAGE_TYPE_MIND,
-        effectModel = dotEffectModelFromBuffRow(nil, "D001"),
-        effectDuration = 0.8
-    }
-)
-____exports.registerDotType(
-    nil,
-    {
-        id = "burn",
-        debuffDotEnemyNoStructure = true,
-        parseBuff = parseBurnBuff,
-        getBestFromUnit = getBestBurnFromUnit,
-        computeAmount = function(____, _target, parsed) return parsed.damagePerSec or 0 end,
-        damageType = jass.DAMAGE_TYPE_FIRE,
-        effectModel = dotEffectModelFromBuffRow(nil, "D002"),
-        effectDuration = 0.75
-    }
-)
-local function parsePoisonBuff(self, buffStr)
-    return parseStandardDotBuff(
-        nil,
-        buffStr,
-        "Poison",
-        function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
-        true
-    )
-end
-local function getBestPoisonFromUnit(self, unit)
-    return getBestDotFromUnit(
-        nil,
-        unit,
-        parsePoisonBuff,
-        function(____, parsed) return parsed.damagePerSec * parsed.duration end
-    )
-end
-____exports.registerDotType(
-    nil,
-    {
-        id = "poison",
-        debuffDotEnemyNoStructure = true,
-        parseBuff = parsePoisonBuff,
-        getBestFromUnit = getBestPoisonFromUnit,
-        computeAmount = function(____, _target, parsed) return parsed.damagePerSec or 0 end,
-        damageType = jass.DAMAGE_TYPE_ACID,
-        effectModel = dotEffectModelFromBuffRow(nil, "D003"),
-        effectDuration = 0.8
-    }
-)
-local function parseTrollCurseBuff(self, buffStr)
-    if not buffStr or type(buffStr) ~= "string" then
-        return nil
-    end
-    local s = __TS__StringTrim(buffStr)
-    if (string.find(s, "Buff:", nil, true) or 0) - 1 == 0 then
-        s = __TS__StringSubstring(s, 5)
-    end
-    local attackOnly = false
-    local rest
-    if (string.find(s, "attack:curse", nil, true) or 0) - 1 == 0 then
-        attackOnly = true
-        rest = __TS__StringSubstring(s, 13)
-    elseif (string.find(s, "dmg:curse", nil, true) or 0) - 1 == 0 then
-        rest = __TS__StringSubstring(s, 9)
-    else
-        return nil
-    end
-    local numEnd = 0
-    while numEnd < #rest do
-        local c = __TS__StringCharAt(rest, numEnd)
-        if c >= "0" and c <= "9" then
-            numEnd = numEnd + 1
-        else
-            break
-        end
-    end
-    local pctMaxHpPerSec = numEnd > 0 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, 0, numEnd),
-        10
-    ) or 0) or 0
-    local pctPos = (string.find(rest, "%MaxHP", nil, true) or 0) - 1
-    if pctPos < 0 or pctPos ~= numEnd then
-        return nil
-    end
-    local timeIdx = (string.find(rest, "time", nil, true) or 0) - 1
-    if timeIdx < 0 then
-        return nil
-    end
-    local tEnd = timeIdx + 4
-    while tEnd < #rest do
-        local c = __TS__StringCharAt(rest, tEnd)
-        if c >= "0" and c <= "9" then
-            tEnd = tEnd + 1
-        else
-            break
-        end
-    end
-    local duration = tEnd > timeIdx + 4 and (__TS__ParseInt(
-        __TS__StringSubstring(rest, timeIdx + 4, tEnd),
-        10
-    ) or 0) or 0
-    if duration <= 0 or pctMaxHpPerSec <= 0 then
-        return nil
-    end
-    return {pctMaxHpPerSec = pctMaxHpPerSec, duration = duration, attackOnly = attackOnly}
-end
-local function getBestTrollCurseFromUnit(self, unit)
-    return getBestDotFromUnit(
-        nil,
-        unit,
-        parseTrollCurseBuff,
-        function(____, parsed) return parsed.pctMaxHpPerSec * parsed.duration end
-    )
-end
-____exports.registerDotType(
-    nil,
-    {
-        id = "trollCurse",
-        debuffDotEnemyNoStructure = true,
-        parseBuff = parseTrollCurseBuff,
-        getBestFromUnit = getBestTrollCurseFromUnit,
-        computeAmount = function(____, target, parsed)
-            local maxHp = getUnitMaxHp(nil, target)
-            return maxHp * (parsed.pctMaxHpPerSec / 100)
-        end,
-        damageType = jass.DAMAGE_TYPE_NORMAL,
-        effectModel = dotEffectModelFromBuffRow(nil, "D004"),
-        effectDuration = 0.8
-    }
-)
+local getBestDotFromUnit = dotBaseUtils.getBestDotFromUnit
+local getUnitMaxHp = dotBaseUtils.getUnitMaxHp
+local getTargetRegenHP = dotBaseUtils.getTargetRegenHP
+registerBuiltInDotTypes(nil, {
+    registerDotType = ____exports.registerDotType,
+    getBestDotFromUnit = getBestDotFromUnit,
+    getTargetRegenHP = getTargetRegenHP,
+    getUnitMaxHp = getUnitMaxHp,
+    dotEffectModelFromBuffRow = dotEffectModelFromBuffRow
+})
 local registered = false
 local function getDotStateByTypeId(self, typeId, unit)
     local tab = stateByType[typeId]
@@ -1278,13 +157,13 @@ local function getDotStateByTypeId(self, typeId, unit)
         return nil
     end
     local h = unitHid(nil, unit)
-    local ____temp_28
+    local ____temp_2
     if h ~= 0 then
-        ____temp_28 = tabRowForHid(nil, tab, h)
+        ____temp_2 = tabRowForHid(nil, tab, h)
     else
-        ____temp_28 = nil
+        ____temp_2 = nil
     end
-    local raw = ____temp_28
+    local raw = ____temp_2
     if raw ~= nil then
         return isValidDotStateRow(nil, raw) and raw or nil
     end
@@ -1309,23 +188,11 @@ function ____exports.getUnitTrollCurse(self, unit)
 end
 --- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。udg_TempUnit[3]/[4] 由 dealDamageForType 写入（JASS约定输出槽，不可删）
 function ____exports.dealSpiritDamage(self, source, target, amount)
-    dealDamageForType(
-        nil,
-        "antiHeal",
-        source,
-        target,
-        amount
-    )
+    dotExecutor:dealDamageForType("antiHeal", source, target, amount)
 end
 --- 造成火焰伤害（外部技能与 burn DOT 同源类型时可调用）
 function ____exports.dealBurnDamage(self, source, target, amount)
-    dealDamageForType(
-        nil,
-        "burn",
-        source,
-        target,
-        amount
-    )
+    dotExecutor:dealDamageForType("burn", source, target, amount)
 end
 if not registered then
     registered = true

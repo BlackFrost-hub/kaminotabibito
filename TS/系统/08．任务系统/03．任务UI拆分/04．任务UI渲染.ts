@@ -1,0 +1,384 @@
+import { QuestData } from "../01．任务数据";
+import {
+  LIST_ITEM_H,
+  LIST_CONTAINER_W,
+  LIST_CONTENT_LEFT_INSET,
+  QUEST_ROW_ICON_HEIGHT_FACTOR,
+  QUEST_ROW_ICON_PAD_LEFT,
+  QUEST_ROW_TEXT_GAP_AFTER_ICON,
+  QUEST_ROW_ICON_Y_OFFSET,
+  BG_TEX,
+} from "./01．任务UI常量";
+import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系统/06．UI函数";
+import { getStatusText, isQuestWithRowIconLayout, tryCreateFromFdfOnly } from "./02．任务UI辅助";
+import { getQuestItemHeight } from "./03．任务UI列表与滚动";
+
+// ────────────────────────────────────────────────
+// 行布局计算
+// ────────────────────────────────────────────────
+
+export interface TaskListItemLayout {
+  rowWidth: number;
+  rowLeftRel: number;
+  iconHLayout: number;
+  textXRel: number;
+  listTextAlign: number;
+  textW: number;
+}
+
+export function calcTaskListItemLayout(showMainRowIcon: boolean): TaskListItemLayout {
+  const rowWidth = LIST_CONTAINER_W * 0.9;
+  const rowLeftRel = LIST_CONTENT_LEFT_INSET;
+  const collapsedMainRowH = LIST_ITEM_H * 0.4;
+  const iconHLayout = showMainRowIcon ? collapsedMainRowH * QUEST_ROW_ICON_HEIGHT_FACTOR : 0;
+  const textXRel = showMainRowIcon
+    ? rowLeftRel + QUEST_ROW_ICON_PAD_LEFT + iconHLayout + QUEST_ROW_TEXT_GAP_AFTER_ICON
+    : rowLeftRel + 0.03;
+  const listTextAlign = showMainRowIcon ? DZ_TEXT_ALIGN_LEFT : DZ_TEXT_ALIGN_CENTER;
+  const rowTitleRightInset = 0.01;
+  const textW = rowWidth - (textXRel - rowLeftRel) - rowTitleRightInset;
+
+  return {
+    rowWidth,
+    rowLeftRel,
+    iconHLayout,
+    textXRel,
+    listTextAlign,
+    textW,
+  };
+}
+
+export function resolveQuestRowIconPath(icon: string | undefined): string {
+  if (icon && icon !== "") return icon;
+  return "ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp";
+}
+
+// ────────────────────────────────────────────────
+// 展开内容渲染
+// ────────────────────────────────────────────────
+
+const EXPANDED_OBJECTIVE_START_OFFSET = LIST_ITEM_H * 0.35;
+const EXPANDED_OBJECTIVE_ROW_HEIGHT = LIST_ITEM_H * 0.25;
+const EXPANDED_FAIL_ROW_HEIGHT = LIST_ITEM_H * 0.2;
+
+function buildObjectiveText(completed: boolean, description: string, current: number, required: number): string {
+  return (completed ? "[v] " : "[ ] ") + description + " (" + current + "/" + required + ")";
+}
+
+function buildFailText(timeLimit: number): string {
+  return "失败: 时间限制 " + timeLimit + "秒";
+}
+
+export function renderExpandedQuestDetails(opts: {
+  japi: any;
+  quest: QuestData;
+  listParent: number;
+  rowTopRel: number;
+  textXRel: number;
+  textW: number;
+  listTextAlign: number;
+  FramePoint: any;
+  createTextLabel: any;
+  setFramePointRelative: any;
+  setFrameSize: any;
+  applyDzTextFontAndAlignment: any;
+  showFrame: any;
+  objFrameByKey: Map<string, number>;
+  failFrameByQuestId: Map<string, number>;
+  listItemFrames: number[];
+}): boolean {
+  const {
+    japi,
+    quest,
+    listParent,
+    rowTopRel,
+    textXRel,
+    textW,
+    listTextAlign,
+    FramePoint,
+    createTextLabel,
+    setFramePointRelative,
+    setFrameSize,
+    applyDzTextFontAndAlignment,
+    showFrame,
+    objFrameByKey,
+    failFrameByQuestId,
+    listItemFrames,
+  } = opts;
+
+  let objYRel = rowTopRel - EXPANDED_OBJECTIVE_START_OFFSET;
+  for (const obj of quest.objectives) {
+    const txt = buildObjectiveText(obj.completed, obj.description, obj.current, obj.required);
+    const objKey = quest.id + "|" + obj.id;
+    let objFrame = objFrameByKey.get(objKey) || 0;
+    if (objFrame === 0) {
+      objFrame =
+        createTextLabel(
+          "TaskObj_" + quest.id + "_" + obj.id,
+          listParent,
+          txt,
+          {
+            relativeTo: listParent,
+            point: FramePoint.TOPLEFT,
+            relativePoint: FramePoint.TOPLEFT,
+            x: textXRel,
+            y: objYRel,
+          },
+          { width: textW, height: EXPANDED_OBJECTIVE_ROW_HEIGHT }
+        ) || 0;
+      if (objFrame === 0) {
+        objYRel -= EXPANDED_OBJECTIVE_ROW_HEIGHT;
+        continue;
+      }
+      objFrameByKey.set(objKey, objFrame);
+    } else {
+      setFramePointRelative(objFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, objYRel);
+      setFrameSize(objFrame, { width: textW, height: EXPANDED_OBJECTIVE_ROW_HEIGHT });
+      if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(objFrame, txt);
+    }
+    applyDzTextFontAndAlignment(objFrame, listTextAlign);
+    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(objFrame, 3);
+    showFrame(objFrame);
+    listItemFrames.push(objFrame);
+    objYRel -= EXPANDED_OBJECTIVE_ROW_HEIGHT;
+  }
+
+  if (quest.timeLimit && quest.timeLimit > 0) {
+    let failFrame = failFrameByQuestId.get(quest.id) || 0;
+    const failText = buildFailText(quest.timeLimit);
+    if (failFrame === 0) {
+      failFrame =
+        createTextLabel(
+          "TaskFail_" + quest.id,
+          listParent,
+          failText,
+          {
+            relativeTo: listParent,
+            point: FramePoint.TOPLEFT,
+            relativePoint: FramePoint.TOPLEFT,
+            x: textXRel,
+            y: objYRel,
+          },
+          { width: textW, height: EXPANDED_FAIL_ROW_HEIGHT }
+        ) || 0;
+      if (failFrame === 0) return false;
+      failFrameByQuestId.set(quest.id, failFrame);
+    } else {
+      setFramePointRelative(failFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, objYRel);
+      setFrameSize(failFrame, { width: textW, height: EXPANDED_FAIL_ROW_HEIGHT });
+      if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(failFrame, failText);
+    }
+    applyDzTextFontAndAlignment(failFrame, listTextAlign);
+    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(failFrame, 3);
+    showFrame(failFrame);
+    listItemFrames.push(failFrame);
+  }
+
+  return true;
+}
+
+// ────────────────────────────────────────────────
+// 行渲染入口
+// ────────────────────────────────────────────────
+
+export function renderQuestRow(opts: {
+  japi: any;
+  quest: QuestData;
+  rowTopRel: number;
+  expanded: boolean;
+  listParent: number;
+  FrameType: any;
+  FramePoint: any;
+  createFrame: any;
+  createTextLabel: any;
+  setFrameTexture: any;
+  setFramePointRelative: any;
+  setFrameSize: any;
+  setFrameClickEvent: any;
+  showFrame: any;
+  applyDzTextFontAndAlignment: any;
+  onToggleExpand: (questId: string) => void;
+  onClickSound: () => void;
+  rowBackdropByQuestId: Map<string, number>;
+  titleByQuestId: Map<string, number>;
+  clickBtnByQuestId: Map<string, number>;
+  objFrameByKey: Map<string, number>;
+  failFrameByQuestId: Map<string, number>;
+  rowIconByQuestId: Map<string, number>;
+  listItemFrames: number[];
+}): boolean {
+  const {
+    japi,
+    quest,
+    rowTopRel,
+    expanded,
+    listParent,
+    FrameType,
+    FramePoint,
+    createFrame,
+    createTextLabel,
+    setFrameTexture,
+    setFramePointRelative,
+    setFrameSize,
+    setFrameClickEvent,
+    showFrame,
+    applyDzTextFontAndAlignment,
+    onToggleExpand,
+    onClickSound,
+    rowBackdropByQuestId,
+    titleByQuestId,
+    clickBtnByQuestId,
+    objFrameByKey,
+    failFrameByQuestId,
+    rowIconByQuestId,
+    listItemFrames,
+  } = opts;
+
+  const itemH = getQuestItemHeight(quest, expanded);
+  const statusText = getStatusText(quest.status);
+  const showMainRowIcon = isQuestWithRowIconLayout(quest);
+  const { rowWidth, rowLeftRel, iconHLayout, textXRel, listTextAlign, textW } = calcTaskListItemLayout(showMainRowIcon);
+
+  let rowBackdrop = rowBackdropByQuestId.get(quest.id) || 0;
+  if (rowBackdrop === 0) {
+    rowBackdrop = tryCreateFromFdfOnly("TaskButtonBackdrop", listParent) || 0;
+    if (rowBackdrop === 0) {
+      const bgFrame =
+        createFrame({
+          type: FrameType.BACKDROP,
+          name: "TaskItemBg_" + quest.id,
+          parent: listParent,
+          template: "template",
+          visible: true,
+        }) || 0;
+      rowBackdrop = bgFrame || 0;
+      if (rowBackdrop !== 0) setFrameTexture(rowBackdrop, BG_TEX);
+    }
+    if (rowBackdrop !== 0) rowBackdropByQuestId.set(quest.id, rowBackdrop);
+  }
+  if (rowBackdrop === 0) return false;
+  setFramePointRelative(rowBackdrop, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
+  setFrameSize(rowBackdrop, { width: rowWidth, height: itemH });
+  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(rowBackdrop, 1);
+  showFrame(rowBackdrop);
+  listItemFrames.push(rowBackdrop);
+
+  const titleText = quest.title + " [" + statusText + "]";
+  let titleFrame = titleByQuestId.get(quest.id) || 0;
+  if (titleFrame === 0) {
+    titleFrame =
+      createTextLabel(
+        "TaskItem_" + quest.id,
+        listParent,
+        titleText,
+        {
+          relativeTo: listParent,
+          point: FramePoint.TOPLEFT,
+          relativePoint: FramePoint.TOPLEFT,
+          x: textXRel,
+          y: rowTopRel - 0.005,
+        },
+        { width: textW, height: LIST_ITEM_H * 0.38 }
+      ) || 0;
+    if (titleFrame === 0) return false;
+    titleByQuestId.set(quest.id, titleFrame);
+  } else {
+    setFramePointRelative(titleFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, rowTopRel - 0.005);
+    setFrameSize(titleFrame, { width: textW, height: LIST_ITEM_H * 0.38 });
+    if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(titleFrame, titleText);
+  }
+  applyDzTextFontAndAlignment(titleFrame, listTextAlign);
+  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(titleFrame, 3);
+  showFrame(titleFrame);
+  listItemFrames.push(titleFrame);
+
+  let clickBtn = clickBtnByQuestId.get(quest.id) || 0;
+  if (clickBtn === 0) {
+    clickBtn =
+      createFrame({
+        type: FrameType.GLUETEXTBUTTON,
+        name: "TaskItemClick_" + quest.id,
+        parent: listParent,
+        template: "template",
+        visible: true,
+        enable: true,
+        alpha: 0,
+      }) || 0;
+    if (clickBtn === 0) return false;
+    clickBtnByQuestId.set(quest.id, clickBtn);
+  }
+  setFramePointRelative(clickBtn, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
+  setFrameSize(clickBtn, { width: rowWidth, height: itemH });
+  setFrameClickEvent(
+    clickBtn,
+    () => {
+      onClickSound();
+      onToggleExpand(quest.id);
+    },
+    false
+  );
+  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
+  showFrame(clickBtn);
+  listItemFrames.push(clickBtn);
+
+  if (showMainRowIcon) {
+    const iconPath = resolveQuestRowIconPath(quest.icon);
+    let iconFr = rowIconByQuestId.get(quest.id) || 0;
+    if (iconFr === 0) {
+      iconFr =
+        createFrame({
+          type: FrameType.BACKDROP,
+          name: "TaskQuestRowIcon_" + quest.id,
+          parent: listParent,
+          template: "template",
+          visible: true,
+        }) || 0;
+      if (iconFr !== 0) {
+        setFrameTexture(iconFr, iconPath);
+        rowIconByQuestId.set(quest.id, iconFr);
+      }
+    } else {
+      setFrameTexture(iconFr, iconPath);
+    }
+    if (iconFr !== 0) {
+      const iconH = iconHLayout;
+      const iconW = iconH;
+      setFramePointRelative(
+        iconFr,
+        FramePoint.TOPLEFT,
+        listParent,
+        FramePoint.TOPLEFT,
+        rowLeftRel + QUEST_ROW_ICON_PAD_LEFT,
+        rowTopRel - QUEST_ROW_ICON_Y_OFFSET
+      );
+      setFrameSize(iconFr, { width: iconW, height: iconH });
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(iconFr, 5);
+      showFrame(iconFr);
+      listItemFrames.push(iconFr);
+    }
+  }
+
+  if (expanded) {
+    const ok = renderExpandedQuestDetails({
+      japi,
+      quest,
+      listParent,
+      rowTopRel,
+      textXRel,
+      textW,
+      listTextAlign,
+      FramePoint,
+      createTextLabel,
+      setFramePointRelative,
+      setFrameSize,
+      applyDzTextFontAndAlignment,
+      showFrame,
+      objFrameByKey,
+      failFrameByQuestId,
+      listItemFrames,
+    });
+    if (!ok) return false;
+  }
+
+  return true;
+}

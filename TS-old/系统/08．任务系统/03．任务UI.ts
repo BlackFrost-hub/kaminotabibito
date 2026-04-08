@@ -51,7 +51,7 @@ import {
   QUEST_ROW_ICON_PAD_LEFT,
   QUEST_ROW_TEXT_GAP_AFTER_ICON,
   QUEST_ROW_ICON_Y_OFFSET,
-} from "./03．任务UI拆分/01．任务UI常量";
+} from "./03．任务UI拆分/00．配置常量";
 import {
   dzGetLocalPlayer,
   dzPlayer,
@@ -62,21 +62,23 @@ import {
   getStatusText,
   getQuestsForUI,
   EMPTY_TEXTS,
-} from "./03．任务UI拆分/02．任务UI辅助";
+} from "./03．任务UI拆分/01．通用工具";
 import {
   getQuestItemHeight,
   calcTotalContentHeight,
   getMaxScroll,
   clampScrollOffset,
+} from "./03．任务UI拆分/01．通用工具";
+import {
   isDescendantOf as isDescendantOfByJapi,
   isWheelTargetForTaskList as isWheelTargetForTaskListByJapi,
   computeNextScrollOffsetByWheel,
   updateScrollBarVisibility as updateScrollBarVisibilityByJapi,
-  calcVisibleQuestRows,
-  refreshTaskUIList,
-} from "./03．任务UI拆分/03．任务UI列表与滚动";
-import { renderQuestRow } from "./03．任务UI拆分/04．任务UI渲染";
-import { registerTaskUIHotkeys, buildTaskMainPanel, buildTaskEntryIcon } from "./03．任务UI拆分/05．任务UI构建与热键";
+} from "./03．任务UI拆分/03．交互控制";
+import { calcVisibleQuestRows } from "./03．任务UI拆分/01．通用工具";
+import { renderQuestRow, refreshTaskUIList } from "./03．任务UI拆分/02．列表逻辑";
+import { registerTaskUIHotkeys } from "./03．任务UI拆分/03．交互控制";
+import { buildTaskMainPanel, buildTaskEntryIcon } from "./03．任务UI拆分/04．界面构建";
 
 import {
   getGameUI,
@@ -379,7 +381,7 @@ class TaskUI {
     });
   }
 
-  private refreshList(): void {
+  public refreshList(): void {
     (pcall as any)(() => {
       if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
