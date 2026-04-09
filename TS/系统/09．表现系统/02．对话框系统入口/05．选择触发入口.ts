@@ -39,7 +39,7 @@ export function initDialogEntrySelectionTrigger(): void {
 
     const npcName = npcConfig?.NPCrequireName || npcConfig?.NpcNameID;
     if (npcConfig && npcName) {
-      const acceptedQuest = findAcceptedQuestBySubmitNpc(npcName);
+      const acceptedQuest = findAcceptedQuestBySubmitNpc(npcName, playerId);
       if (acceptedQuest && acceptedQuest.requireID) {
         const acceptedDialog = buildQuestInProgressDialog(acceptedQuest, npcName, playerId, u);
         openNpcDialog(triggerPlayer, { ...acceptedDialog, npcUnit: u });

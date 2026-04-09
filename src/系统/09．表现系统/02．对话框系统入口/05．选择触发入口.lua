@@ -54,7 +54,7 @@ function ____exports.initDialogEntrySelectionTrigger(self)
             local npcConfig = findNpcConfigByUnitName(nil, unitName)
             local npcName = npcConfig and npcConfig.NPCrequireName or npcConfig and npcConfig.NpcNameID
             if npcConfig and npcName then
-                local acceptedQuest = findAcceptedQuestBySubmitNpc(nil, npcName)
+                local acceptedQuest = findAcceptedQuestBySubmitNpc(nil, npcName, playerId)
                 if acceptedQuest and acceptedQuest.requireID then
                     local acceptedDialog = buildQuestInProgressDialog(
                         nil,

@@ -28,7 +28,7 @@ function tryConsumeRequiredResources(player: any, requiredResources?: string, re
   const cost = normalizeRequireCount(requireCount);
   if (typeof jass.GetPlayerState !== "function" || typeof jass.SetPlayerState !== "function") return false;
   const key = requiredResources.toLowerCase();
-  if (key === "wood" || key === "lumber") {
+  if (key === "wood" || key === "lumber" || requiredResources === "能量碎片") {
     const state = jass.PLAYER_STATE_RESOURCE_LUMBER;
     const current = jass.GetPlayerState(player, state) || 0;
     if (current < cost) return false;
@@ -45,8 +45,8 @@ function tryConsumeRequiredResources(player: any, requiredResources?: string, re
   return false;
 }
 
-function isKillQuestObjectiveCompleted(questId: string, requireCount: number): boolean {
-  const active = questDB.getPlayerActiveQuests(0);
+function isKillQuestObjectiveCompleted(playerId: number, questId: string, requireCount: number): boolean {
+  const active = questDB.getPlayerActiveQuests(playerId);
   for (const q of active) {
     if (!q || q.id !== questId) continue;
     if (!q.objectives || q.objectives.length === 0) return false;
@@ -172,7 +172,7 @@ export function handleQuestSubmit(params: {
   const useGenericGiveFailHint = shouldUseGenericGiveFailHint(quest);
 
   if (quest.type === "击杀" || quest.type === "目标击杀") {
-    const done = isKillQuestObjectiveCompleted(questId, requireCount);
+    const done = isKillQuestObjectiveCompleted(dialogOwnerId, questId, requireCount);
     if (!done) {
       showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务目标尚未完成，无法提交。");
       return;

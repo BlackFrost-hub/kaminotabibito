@@ -14,12 +14,12 @@ export function resolveQuestEndNpc(quest: QuestConfig): string {
   return endNpc;
 }
 
-export function findAcceptedQuestBySubmitNpc(npcName: string): QuestConfig | undefined {
+export function findAcceptedQuestBySubmitNpc(npcName: string, playerId: number): QuestConfig | undefined {
   return QUEST_CONFIGS.find(quest => {
     if (quest.enabled !== true) return false;
     if (!quest.requireID) return false;
     const questId = quest.requireID.toString();
-    if (!hasPlayerAcceptedQuest(0, questId)) return false;
+    if (!hasPlayerAcceptedQuest(playerId, questId)) return false;
     return resolveQuestEndNpc(quest) === npcName;
   });
 }

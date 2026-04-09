@@ -22,7 +22,7 @@ function ____exports.resolveQuestEndNpc(self, quest)
     end
     return endNpc
 end
-function ____exports.findAcceptedQuestBySubmitNpc(self, npcName)
+function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId)
     return __TS__ArrayFind(
         QUEST_CONFIGS,
         function(____, quest)
@@ -33,7 +33,7 @@ function ____exports.findAcceptedQuestBySubmitNpc(self, npcName)
                 return false
             end
             local questId = tostring(quest.requireID)
-            if not hasPlayerAcceptedQuest(nil, 0, questId) then
+            if not hasPlayerAcceptedQuest(nil, playerId, questId) then
                 return false
             end
             return ____exports.resolveQuestEndNpc(nil, quest) == npcName

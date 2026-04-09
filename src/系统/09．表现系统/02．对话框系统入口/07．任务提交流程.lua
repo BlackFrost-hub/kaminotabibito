@@ -43,7 +43,7 @@ local function tryConsumeRequiredResources(self, player, requiredResources, requ
         return false
     end
     local key = string.lower(requiredResources)
-    if key == "wood" or key == "lumber" then
+    if key == "wood" or key == "lumber" or requiredResources == "能量碎片" then
         local state = jass.PLAYER_STATE_RESOURCE_LUMBER
         local current = jass.GetPlayerState(player, state) or 0
         if current < cost then
@@ -63,8 +63,8 @@ local function tryConsumeRequiredResources(self, player, requiredResources, requ
     end
     return false
 end
-local function isKillQuestObjectiveCompleted(self, questId, requireCount)
-    local active = questDB:getPlayerActiveQuests(0)
+local function isKillQuestObjectiveCompleted(self, playerId, questId, requireCount)
+    local active = questDB:getPlayerActiveQuests(playerId)
     for ____, q in ipairs(active) do
         do
             local __continue11
@@ -288,7 +288,7 @@ function ____exports.handleQuestSubmit(self, params)
     local rewardBranchIndex = -1
     local useGenericGiveFailHint = shouldUseGenericGiveFailHint(nil, quest)
     if quest.type == "击杀" or quest.type == "目标击杀" then
-        local done = isKillQuestObjectiveCompleted(nil, questId, requireCount)
+        local done = isKillQuestObjectiveCompleted(nil, dialogOwnerId, questId, requireCount)
         if not done then
             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r任务目标尚未完成，无法提交。")
             return
