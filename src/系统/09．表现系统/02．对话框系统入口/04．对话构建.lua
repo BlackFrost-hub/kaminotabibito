@@ -28,16 +28,30 @@ local jass = require("jass.common")
 local ____UI_51FD_6570 = require("系统.00．核心系统.06．UI函数")
 local _____4FBF_6377_51FD_6570 = require("系统.00．核心系统.11．便捷函数（偶尔用）")
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
+local function refreshTaskUIForAllClientsSoon(self)
+    local t = jass.CreateTimer()
+    jass.TimerStart(
+        t,
+        0.03,
+        false,
+        function()
+            pcall(function () return taskUI:refreshList() end
+            )
+            jass.PauseTimer(t)
+            jass.DestroyTimer(t)
+        end
+    )
+end
 function ____exports.parseDialogText(self, raw, npcName, heroName)
     local lines = {}
     local parts = __TS__StringSplit(raw, "\n")
     for ____, part in ipairs(parts) do
         do
-            local __continue3
+            local __continue6
             repeat
                 local trimmed = __TS__StringTrim(part)
                 if not trimmed then
-                    __continue3 = true
+                    __continue6 = true
                     break
                 end
                 local dotIndex = (string.find(trimmed, ".", nil, true) or 0) - 1
@@ -49,14 +63,14 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
                         local text = __TS__StringSubstring(rest, colonIndex + 1)
                         local title = speaker == "NPC" and npcName or (speaker == "Player" and heroName or speaker)
                         lines[#lines + 1] = {title = title, text = text, duration = 4}
-                        __continue3 = true
+                        __continue6 = true
                         break
                     end
                 end
                 lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
-                __continue3 = true
+                __continue6 = true
             until true
-            if not __continue3 then
+            if not __continue6 then
                 break
             end
         end
@@ -111,6 +125,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
                 if not hasPlayerAcceptedQuest(nil, 0, questId) then
                     local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
                     setQuestState(nil, questId, 1, playerName)
+                    refreshTaskUIForAllClientsSoon(nil)
                 end
                 local acceptedRaw = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
                 local acceptedLines = ____exports.parseDialogText(nil, acceptedRaw, npcName, heroName)
@@ -220,21 +235,7 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
                 end
                 local function onComplete(self)
                     broadcastQuestComplete(nil)
-                    local t = jass.CreateTimer()
-                    jass.TimerStart(
-                        t,
-                        0.1,
-                        false,
-                        function()
-                            local lp = jass.GetLocalPlayer()
-                            if lp ~= nil then
-                                pcall(function () return taskUI:refreshList() end
-                                )
-                            end
-                            jass.PauseTimer(t)
-                            jass.DestroyTimer(t)
-                        end
-                    )
+                    refreshTaskUIForAllClientsSoon(nil)
                     if quest.NpcCompleteText then
                         local completeLines = ____exports.parseDialogText(nil, quest.NpcCompleteText, npcName, heroName)
                         openNpcDialog(

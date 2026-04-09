@@ -25,7 +25,7 @@ const DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp";
 const g_states: PlayerDialogState[] = [];
 const g_questCallbacksByPlayer: Array<{ onAccept: () => void; onReject: () => void } | undefined> = [];
 
-// ========== 虚拟分区：DzAPI薄封装 ==========
+// ========== 虚拟分区：工具 ==========
 function dzShow(f: Frame, b: boolean): void { if (f && f !== 0 && typeof japi.DzFrameShow === "function") japi.DzFrameShow(f, b); }
 function dzSetText(f: Frame, s: string): void { if (f && f !== 0 && typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(f, s); }
 function dzSetTexture(f: Frame, path: string): void { if (f && f !== 0 && typeof japi.DzFrameSetTexture === "function") japi.DzFrameSetTexture(f, path, 0); }
@@ -52,7 +52,7 @@ function dzLoadToc(): void { if (typeof japi.DzLoadToc === "function") japi.DzLo
 let g_tocLoaded = false;
 function dzLoadTocOnce(): void { if (g_tocLoaded) return; g_tocLoaded = true; dzLoadToc(); }
 
-// ========== 虚拟分区：任务按钮回调解析 ==========
+// ========== 虚拟分区：回调流程 ==========
 function resolveQuestCallbackByTriggerPlayer(): { state: PlayerDialogState; onAccept: () => void; onReject: () => void } | undefined {
   let pid = getActivePlayerId();
   if (pid < 0 || pid >= MAX_PLAYERS) {
@@ -75,7 +75,7 @@ function questAcceptCallback(): void {
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue.shift();
-  state.isActive = false;
+  onDialogFinished(state);
   const localPlayer = dzGetLocalPlayer();
   const targetPlayer = dzPlayer(state.playerId);
   if (localPlayer === targetPlayer) {
@@ -92,7 +92,7 @@ function questRejectCallback(): void {
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue.shift();
-  state.isActive = false;
+  onDialogFinished(state);
   const localPlayer = dzGetLocalPlayer();
   const targetPlayer = dzPlayer(state.playerId);
   if (localPlayer === targetPlayer) {
@@ -105,7 +105,7 @@ function questRejectCallback(): void {
 (globalThis as any).QuestAcceptCallback = questAcceptCallback;
 (globalThis as any).QuestRejectCallback = questRejectCallback;
 
-// ========== 虚拟分区：UI创建 ==========
+// ========== 虚拟分区：初始化 ==========
 function createDialogFrames(): Frame[] {
   const frames: Frame[] = [];
   for (let i = 0; i <= 11; i++) frames[i] = 0;
@@ -339,7 +339,7 @@ function enqueue(state: PlayerDialogState, entry: DialogEntry): void {
   if (wasEmpty) playEntry(state);
 }
 
-// ========== 虚拟分区：对外API ==========
+// ========== 虚拟分区：API ==========
 export function initDialogSystem(): void {
   dzLoadTocOnce();
   for (let i = 0; i < MAX_PLAYERS; i++) {

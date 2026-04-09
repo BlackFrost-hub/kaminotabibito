@@ -8,7 +8,10 @@ local ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3 = require("系统.09．表现系统
 local displayText = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayText
 local displayQuest = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.displayQuest
 local isDialogActive = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.isDialogActive
+local setDialogFinishCallback = ____00_FF0E_5BF9_8BDD_6846UI_5165_53E3.setDialogFinishCallback
 local ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60 = require("系统.09．表现系统.04．NPC对话状态池")
+local destroyBubbleEffect = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.destroyBubbleEffect
+local releaseNpcOccupation = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.releaseNpcOccupation
 local setDialogNpcUnit = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.setDialogNpcUnit
 local tryOccupyNpc = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.tryOccupyNpc
 --- 全图通用 UI 辅助（DzAPI / Frame）。
@@ -28,6 +31,7 @@ local tryOccupyNpc = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.tryOccupyNpc
 -- 
 -- 详细避坑经验见 `.cursor/rules/dzapi-ui-frame-types.mdc`。
 local japi = require("jass.japi")
+local jass = require("jass.common")
 --- 通用 NPC 对话框入口。
 -- - 若该玩家对话框正在播放（`isDialogActive(p) === true`），直接返回，不重复展开。
 -- - 若该玩家对话框空闲（`isDialogActive(p) === false`），按 data 顺序入队播放。
@@ -45,6 +49,20 @@ function ____exports.openNpcDialog(self, p, data)
             return false
         end
         setDialogNpcUnit(nil, p, data.npcUnit)
+        setDialogFinishCallback(
+            nil,
+            p,
+            function()
+                releaseNpcOccupation(
+                    nil,
+                    jass.GetPlayerId(p)
+                )
+                destroyBubbleEffect(
+                    nil,
+                    jass.GetPlayerId(p)
+                )
+            end
+        )
     end
     for ____, line in ipairs(data.lines) do
         displayText(

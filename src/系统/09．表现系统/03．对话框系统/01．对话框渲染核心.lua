@@ -170,7 +170,7 @@ function questAcceptCallback(self)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     table.remove(state.queue, 1)
-    state.isActive = false
+    onDialogFinished(nil, state)
     local localPlayer = dzGetLocalPlayer(nil)
     local targetPlayer = dzPlayer(nil, state.playerId)
     if localPlayer == targetPlayer then
@@ -196,7 +196,7 @@ function questRejectCallback(self)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     table.remove(state.queue, 1)
-    state.isActive = false
+    onDialogFinished(nil, state)
     local localPlayer = dzGetLocalPlayer(nil)
     local targetPlayer = dzPlayer(nil, state.playerId)
     if localPlayer == targetPlayer then

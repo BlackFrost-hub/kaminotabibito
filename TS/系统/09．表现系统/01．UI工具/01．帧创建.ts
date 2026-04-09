@@ -30,7 +30,7 @@ export function createFrame(config: FrameConfig): number | null {
 
 const __tocLoadedOnce: Record<string, boolean> = {};
 
-// ========== 虚拟分区：TOC加载 ==========
+// ========== 虚拟分区：初始化 ==========
 export function loadTocOnce(
   tocLoadKey: string,
   tocPaths: string[],

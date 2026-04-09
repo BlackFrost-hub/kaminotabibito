@@ -18,10 +18,11 @@
  */
 
 const japi = require("jass.japi") as any;
+const jass = require("jass.common") as any;
 
 import { createFrame, setButtonText, FrameType } from "../09．表现系统/01．UI工具/index";
-import { displayText, displayQuest, isDialogActive } from "../09．表现系统/03．对话框系统/00．对话框UI入口";
-import { isNpcOccupied, setDialogNpcUnit, tryOccupyNpc } from "../09．表现系统/04．NPC对话状态池";
+import { displayText, displayQuest, isDialogActive, setDialogFinishCallback } from "../09．表现系统/03．对话框系统/00．对话框UI入口";
+import { destroyBubbleEffect, releaseNpcOccupation, setDialogNpcUnit, tryOccupyNpc } from "../09．表现系统/04．NPC对话状态池";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 对话框入口封装
@@ -68,14 +69,18 @@ export interface NpcDialogData {
  * @returns 成功开始对话返回 true，否则返回 false
  */
 export function openNpcDialog(p: any, data: NpcDialogData): boolean {
-  if (isDialogActive(p)) return false; // 该玩家对话框正在播放 → 忽略
+  // 该玩家对话进行中时，禁止开启新对话（必须走完当前完整流程）
+  if (isDialogActive(p)) return false;
 
-  // 尝试占用NPC，如果已被其他玩家占用则返回 false
+  // NPC 占用互斥：同一时刻仅允许一个玩家与同一 NPC 对话
   if (data.npcUnit) {
-    if (!tryOccupyNpc(p, data.npcUnit)) {
-      return false; // NPC已被其他玩家占用
-    }
+    if (!tryOccupyNpc(p, data.npcUnit)) return false;
     setDialogNpcUnit(p, data.npcUnit);
+    setDialogFinishCallback(p, () => {
+      // 对话完整结束后释放占用与气泡
+      releaseNpcOccupation((jass as any).GetPlayerId(p));
+      destroyBubbleEffect((jass as any).GetPlayerId(p));
+    });
   }
 
   for (const line of data.lines) {

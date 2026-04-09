@@ -17,6 +17,15 @@ import { hasPlayerAcceptedQuest, setQuestState } from "./02．任务状态";
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
 
+function refreshTaskUIForAllClientsSoon(): void {
+  const t = jass.CreateTimer();
+  jass.TimerStart(t, 0.03, false, () => {
+    (pcall as any)(() => taskUI.refreshList());
+    jass.PauseTimer(t);
+    jass.DestroyTimer(t);
+  });
+}
+
 // ========== 虚拟分区：文本解析 ==========
 export function parseDialogText(raw: string, npcName: string, heroName: string): Array<{ title: string; text: string; duration: number }> {
   const lines: Array<{ title: string; text: string; duration: number }> = [];
@@ -76,6 +85,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         if (!hasPlayerAcceptedQuest(0, questId)) {
           const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
           setQuestState(questId, 1, playerName);
+          refreshTaskUIForAllClientsSoon();
         }
         const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
@@ -146,15 +156,7 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
 
         function onComplete(): void {
           broadcastQuestComplete();
-          const t = jass.CreateTimer();
-          jass.TimerStart(t, 0.1, false, () => {
-            const lp = jass.GetLocalPlayer();
-            if (lp != null) {
-              (pcall as any)(() => taskUI.refreshList());
-            }
-            jass.PauseTimer(t);
-            jass.DestroyTimer(t);
-          });
+          refreshTaskUIForAllClientsSoon();
           if (quest.NpcCompleteText) {
             const completeLines = parseDialogText(quest.NpcCompleteText, npcName, heroName);
             openNpcDialog(jass.Player(dialogOwnerId), { lines: completeLines });
