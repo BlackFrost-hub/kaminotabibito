@@ -137,10 +137,11 @@ if type(_____539F_751FUI.initNativeUI) == "function" then
 end
 require("系统.00．核心系统.06．UI函数")
 require("系统.00．核心系统.11．便捷函数（偶尔用）")
-require("系统.09．表现系统.01．UI工具")
+require("系统.09．表现系统.01．UI工具.index")
 require("系统.09．表现系统.02．垂直滚动条轨道")
+require("系统.09．表现系统.02．对话框系统入口.index")
 require("系统.09．表现系统.04．NPC对话状态池")
-local _____5BF9_8BDD_6846UI = require("系统.09．表现系统.03．对话框UI")
+local _____5BF9_8BDD_6846UI = require("系统.09．表现系统.03．对话框系统.00．对话框UI入口")
 if type(_____5BF9_8BDD_6846UI.initDialogSystem) == "function" then
     _____5BF9_8BDD_6846UI:initDialogSystem()
 end
@@ -164,6 +165,5 @@ require("系统.12．测试系统.测试事件")
 require("系统.12．测试系统.测试事件2")
 require("系统.12．测试系统.测试233注册")
 require("系统.12．测试系统.任务测试")
-require("系统.12．测试系统.玩家1选择")
 require("系统.12．测试系统.任意测试")
 return ____exports

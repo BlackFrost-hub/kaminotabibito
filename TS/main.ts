@@ -107,10 +107,11 @@ const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initN
 if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
 require("系统.00．核心系统.06．UI函数");
 require("系统.00．核心系统.11．便捷函数（偶尔用）");
-require("系统.09．表现系统.01．UI工具");
+require("系统.09．表现系统.01．UI工具.index");
 require("系统.09．表现系统.02．垂直滚动条轨道");
+require("系统.09．表现系统.02．对话框系统入口.index");
 require("系统.09．表现系统.04．NPC对话状态池");
-const 对话框UI = require("系统.09．表现系统.03．对话框UI") as { initDialogSystem: () => void };
+const 对话框UI = require("系统.09．表现系统.03．对话框系统.00．对话框UI入口") as { initDialogSystem: () => void };
 if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
 // 任务 UI 模块（显式加载，便于打包与排查）
 require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量");
@@ -129,7 +130,6 @@ require("系统.12．测试系统.测试事件");
 require("系统.12．测试系统.测试事件2");
 require("系统.12．测试系统.测试233注册");
 require("系统.12．测试系统.任务测试");
-require("系统.12．测试系统.玩家1选择");
 require("系统.12．测试系统.任意测试");
 
 export {};

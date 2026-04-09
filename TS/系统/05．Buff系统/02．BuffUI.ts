@@ -2,7 +2,7 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 const 硬件函数 = require("系统.00．核心系统.04．硬件函数") as { getGameUI: () => number };
-const UI工具 = require("系统.09．表现系统.01．UI工具") as {
+const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
   createFrame: (options: any) => number;
   setFramePosition: (frame: number, options: any) => void;
   setFrameSize: (frame: number, options: any) => void;

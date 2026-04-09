@@ -6,12 +6,12 @@ local getMouseFocus = ____04_FF0E_786C_4EF6_51FD_6570.getMouseFocus
 local getMouseY = ____04_FF0E_786C_4EF6_51FD_6570.getMouseY
 local getWindowHeight = ____04_FF0E_786C_4EF6_51FD_6570.getWindowHeight
 local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
-local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具")
-local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
-local setFramePointRelative = ____01_FF0EUI_5DE5_5177.setFramePointRelative
-local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
-local FramePoint = ____01_FF0EUI_5DE5_5177.FramePoint
-local EventType = ____01_FF0EUI_5DE5_5177.EventType
+local ____index = require("系统.09．表现系统.01．UI工具.index")
+local createFrame = ____index.createFrame
+local setFramePointRelative = ____index.setFramePointRelative
+local FrameType = ____index.FrameType
+local FramePoint = ____index.FramePoint
+local EventType = ____index.EventType
 --- 垂直滚动条轨道（BACKDROP 轨道 + 圆形 thumb + 透明 GLUETEXTBUTTON 命中）
 -- - 全局左键按下/抬起 + getMouseFocus 判定本轨道（1.27e 下帧 MOUSE_DOWN 常不可靠）
 -- - 多实例：模块内只注册一次全局鼠标，分发给所有 VerticalScrollbarTrack

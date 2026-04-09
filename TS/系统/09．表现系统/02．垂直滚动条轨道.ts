@@ -10,7 +10,7 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { getMouseFocus, getMouseY, getWindowHeight, frameSetScriptByCode } from "../00．核心系统/04．硬件函数";
-import { createFrame, setFramePointRelative, FrameType, FramePoint, EventType } from "./01．UI工具";
+import { createFrame, setFramePointRelative, FrameType, FramePoint, EventType } from "./01．UI工具/index";
 
 /** thumb 竖直可移动行程（归一化 UI 高度），与 syncThumb 使用同一公式 */
 export function getScrollbarThumbTravelNorm(

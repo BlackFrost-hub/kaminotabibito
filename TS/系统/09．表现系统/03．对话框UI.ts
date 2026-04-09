@@ -1,4 +1,8 @@
 /**
+ * 兼容层：保留旧路径，转发到拆分后的对话框系统入口。
+ */
+export * from "./03．对话框系统/00．对话框UI入口";
+/**
  * 对话框UI系统（StarGameDialog TS版）
  *
  * 特性：
@@ -28,7 +32,7 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 
-import { createFrame, FrameType } from "../09．表现系统/01．UI工具";
+import { createFrame, FrameType } from "../09．表现系统/01．UI工具/index";
 import { frameSetScriptByCode } from "../00．核心系统/04．硬件函数";
 import { Sound3DII_Mp3PlayReuse } from "../00．核心系统/02．音效函数";
 import { getActivePlayerId, resetActivePlayerIdIfMatch, setActivePlayerId } from "./04．NPC对话状态池";

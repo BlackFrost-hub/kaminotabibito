@@ -19,8 +19,8 @@
 
 const japi = require("jass.japi") as any;
 
-import { createFrame, setButtonText, FrameType } from "../09．表现系统/01．UI工具";
-import { displayText, displayQuest, isDialogActive } from "../09．表现系统/03．对话框UI";
+import { createFrame, setButtonText, FrameType } from "../09．表现系统/01．UI工具/index";
+import { displayText, displayQuest, isDialogActive } from "../09．表现系统/03．对话框系统/00．对话框UI入口";
 import { isNpcOccupied, setDialogNpcUnit, tryOccupyNpc } from "../09．表现系统/04．NPC对话状态池";
 
 // ─────────────────────────────────────────────────────────────────────────────

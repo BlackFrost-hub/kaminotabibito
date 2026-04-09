@@ -102,7 +102,7 @@ import {
   FramePoint,
   hideFrame,
   showFrame,
-} from "../09．表现系统/01．UI工具";
+} from "../09．表现系统/01．UI工具/index";
 import { VerticalScrollbarTrack } from "../09．表现系统/02．垂直滚动条轨道";
 import { questManager } from "./02．任务管理器";
 import { questDB, QuestType, QuestStatus, QuestData } from "./01．任务数据";
