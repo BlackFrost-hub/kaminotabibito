@@ -230,27 +230,25 @@ function buildQuestOfferDialog(quest: QuestConfig, npcName: string, hero: any, d
         const questId = quest.requireID?.toString() || "";
         // 游戏状态操作（全局执行）
         if (!hasPlayerAcceptedQuest(0, questId)) {
-          const triggerPlayer = japi.DzGetTriggerUIEventPlayer();
-          const playerName = triggerPlayer ? (jass.GetPlayerName(triggerPlayer) || "冒险者") : "冒险者";
+          // 使用 dialogOwnerId 获取玩家名，确保所有客户端一致
+          const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
           setQuestState(questId, 1, playerName);
         }
         // openNpcDialog 必须在所有客户端调用（内部已用 isLocal 隔离 UI）
-        // 用捕获的 dialogOwnerId 构造玩家对象，确保所有客户端都能正确调用
         const dialogOwner = jass.Player(dialogOwnerId);
         const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
         openNpcDialog(dialogOwner, { lines: acceptedLines });
         // 本地提示：已接受时只提示本地玩家
         const localPlayer = jass.GetLocalPlayer();
-        const localTrigger = japi.DzGetTriggerUIEventPlayer();
-        if (localTrigger && localPlayer === localTrigger && hasPlayerAcceptedQuest(jass.GetPlayerId(localPlayer), questId)) {
+        if (localPlayer === jass.Player(dialogOwnerId) && hasPlayerAcceptedQuest(jass.GetPlayerId(localPlayer), questId)) {
           jass.DisplayTimedTextToPlayer(localPlayer, 0, 0, 5, `|cffffff00『系统提示』：|r该任务已经接受过了`);
         }
       },
       onReject: () => {
         const localPlayer = jass.GetLocalPlayer();
-        const triggerPlayer = japi.DzGetTriggerUIEventPlayer();
-        if (triggerPlayer && localPlayer === triggerPlayer) {
+        // 使用 dialogOwnerId 判断，确保所有客户端一致
+        if (localPlayer === jass.Player(dialogOwnerId)) {
           jass.DisplayTimedTextToPlayer(localPlayer, 0, 0, 5, `|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『${quest.name}』|r`);
         }
       },
@@ -311,7 +309,10 @@ function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, player:
             ` 完成了 |cffffcc00『${quest.name}』|r，` +
             `${targetLabel} 获得了奖励：|cffff9900${cleanReward}|r`;
           for (let i = 0; i < 4; i++) {
-            jass.DisplayTimedTextToPlayer(jass.Player(i), 0, 0, 10, msg);
+            const p = jass.Player(i);
+            if (p != null && jass.GetPlayerController(p) === jass.MAP_CONTROL_USER) {
+              jass.DisplayTimedTextToPlayer(p, 0, 0, 10, msg);
+            }
           }
         }
 

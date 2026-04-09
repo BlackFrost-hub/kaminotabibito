@@ -15,11 +15,18 @@ local tryOccupyNpc = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.tryOccupyNpc
 -- 
 -- **联机与 desync**
 -- - 本文件内均为 **本地帧操作**（`DzFrameSetFont` / `DzFrameSetTextAlignment` / `DzFrameSetParent` 等），**不**经网络同步。
--- - 需要注册 **点击/滚轮** 时，务必使用 **`DzFrameSetScriptByCode` + `sync: false`**（见 `硬件函数.frameSetScriptByCode`），
---   勿用会走 `ExecuteFunc` 的 `DzFrameSetScript` 同步字符串去驱动 Lua 逻辑。
+-- - 需要注册 **点击/滚轮** 时，**强烈建议都用 `sync=true`**，但必须严格遵守以下规则：
+--   - ✅ **按钮帧必须在所有玩家上创建**（不能在本地玩家判断内创建）
+--   - ✅ **回调必须在所有玩家上注册**（不能在本地玩家判断内注册）
+--   - ✅ **回调必须是全局函数**（不能是匿名闭包，闭包会导致 desync！）
+--   - ✅ **回调内部严格区分操作类型**：
+--     - 全局同步操作（游戏状态修改等）：必须在本地玩家判断之外执行
+--     - 异步操作（UI 操作、音效等）：必须在本地玩家判断之内执行
+--     - ⚠️ 不可以互相混淆！非常严格！
+-- - 勿用会走 `ExecuteFunc` 的 `DzFrameSetScript` 同步字符串去驱动 Lua 逻辑。
 -- - 若 UI 回调里要 **发同步数据**，应走项目既有 **Sync** 封装，勿在帧回调里直接改游戏状态而不同步。
 -- 
--- 对齐表与「先 `-1` 再设值」见 `.cursor/rules/dzapi-ui-frame-types.mdc`。
+-- 详细避坑经验见 `.cursor/rules/dzapi-ui-frame-types.mdc`。
 local japi = require("jass.japi")
 --- 通用 NPC 对话框入口。
 -- - 若该玩家对话框正在播放（`isDialogActive(p) === true`），直接返回，不重复展开。

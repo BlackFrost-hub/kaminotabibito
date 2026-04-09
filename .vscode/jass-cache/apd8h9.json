@@ -2,10 +2,19 @@
   "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
   "items": [
     {
+      "label": "LIBRARY_BzAPI",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_BzAPI\n```\n\n\n---\n\nglobals from BzAPI:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_BzAPI",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
       "label": "LIBRARY_MNXT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_MNXT\n```\n\n\n---\n\nglobals from MNXT:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_MNXT\n```\n\n\n---\n\nendglobals from BzAPI\n\nglobals from MNXT:\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_LIBRARY_MNXT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
@@ -38,29 +47,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___HT",
+      "label": "SLInteger__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLInteger___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___HT",
+      "documentation": "\n```jass\nhashtable SLInteger__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___IntegerLists",
+      "label": "SLInteger__IntegerLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLInteger___IntegerLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___IntegerLists",
+      "documentation": "\n```jass\ninteger SLInteger__IntegerLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__IntegerLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLInteger___K_Count",
+      "label": "SLInteger__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLInteger___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLInteger___K_Count",
+      "documentation": "\n```jass\ninteger SLInteger__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLInteger__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -164,29 +173,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___HT",
+      "label": "SLStr__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLStr___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___HT",
+      "documentation": "\n```jass\nhashtable SLStr__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___StrLists",
+      "label": "SLStr__StrLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLStr___StrLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___StrLists",
+      "documentation": "\n```jass\ninteger SLStr__StrLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__StrLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLStr___K_Count",
+      "label": "SLStr__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLStr___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLStr___K_Count",
+      "documentation": "\n```jass\ninteger SLStr__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLStr__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1109,10 +1118,217 @@
       "statementType": "VariableDeclaration"
     },
     {
+      "label": "LIBRARY_StarItem",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_StarItem\n```\n\n\n---\n\nendglobals from StarBase\n\nglobals from StarItem:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_LIBRARY_StarItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___HT",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nhashtable StarItem___HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___HT",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "CallBackItem",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nitem CallBackItem\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_CallBackItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StackStatus",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nboolean StarItem___StackStatus\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StackStatus",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StackRegd",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nboolean StarItem___StackRegd\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StackRegd",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___ItemRange",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nreal StarItem___ItemRange\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___ItemRange",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_TryPickUpTrigs",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger array StarItem___StarItem_TryPickUpTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_TryPickUpTrigs",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_TryPickUpTrig_Index",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___StarItem_TryPickUpTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_TryPickUpTrig_Index",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_TryPickUp_item",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nitem StarItem___StarItem_TryPickUp_item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_TryPickUp_item",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_bagLoc",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___StarItem_bagLoc\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_bagLoc",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_MoveItemTrigs",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger array StarItem___StarItem_MoveItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_MoveItemTrigs",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_MoveItemTrig_Index",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___StarItem_MoveItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_MoveItemTrig_Index",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_StackItemTrigs",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger array StarItem___StarItem_StackItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_StackItemTrigs",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_StackItemTrig_Index",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___StarItem_StackItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_StackItemTrig_Index",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___StarItem_CallBackUnit",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nunit StarItem___StarItem_CallBackUnit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___StarItem_CallBackUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___temp_trig",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger StarItem___temp_trig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___temp_trig",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___SI_TargetType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array StarItem___SI_TargetType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___SI_TargetType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___SI_NeedType",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array StarItem___SI_NeedType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___SI_NeedType",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___SI_NeddCount",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger array StarItem___SI_NeddCount\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___SI_NeddCount",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___SI_ItemSIndex",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___SI_ItemSIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___SI_ItemSIndex",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___skips",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\nboolean array StarItem___skips\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___skips",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "StarItem___loopi",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger StarItem___loopi\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem___loopi",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "Key_Index",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ninteger Key_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_Key_Index",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
       "label": "LIBRARY_StarOverSpeed",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant boolean LIBRARY_StarOverSpeed\n```\n\n\n---\n\nendglobals from StarBase\n\nglobals from StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nconstant boolean LIBRARY_StarOverSpeed\n```\n\n\n---\n\nendglobals from StarItem\n\nglobals from StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_LIBRARY_StarOverSpeed",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
@@ -1244,38 +1460,38 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty__max",
+      "label": "ItmeProperty___max",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger ItmeProperty__max\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty__max",
+      "documentation": "\n```jass\ninteger ItmeProperty___max\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty___max",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty__UnitPtyEvent",
+      "label": "ItmeProperty___UnitPtyEvent",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nunit ItmeProperty__UnitPtyEvent\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty__UnitPtyEvent",
+      "documentation": "\n```jass\nunit ItmeProperty___UnitPtyEvent\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty___UnitPtyEvent",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty__HS",
+      "label": "ItmeProperty___HS",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable ItmeProperty__HS\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty__HS",
+      "documentation": "\n```jass\nhashtable ItmeProperty___HS\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty___HS",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty__HS_EVE",
+      "label": "ItmeProperty___HS_EVE",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable ItmeProperty__HS_EVE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty__HS_EVE",
+      "documentation": "\n```jass\nhashtable ItmeProperty___HS_EVE\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty___HS_EVE",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1451,137 +1667,137 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_str",
+      "label": "StarGSS__key_str",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_str\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_str",
+      "documentation": "\n```jass\ninteger StarGSS__key_str\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_str",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_agi",
+      "label": "StarGSS__key_agi",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_agi\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_agi",
+      "documentation": "\n```jass\ninteger StarGSS__key_agi\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_agi",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_int",
+      "label": "StarGSS__key_int",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_int\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_int",
+      "documentation": "\n```jass\ninteger StarGSS__key_int\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_int",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_atk",
+      "label": "StarGSS__key_atk",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_atk\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_atk",
+      "documentation": "\n```jass\ninteger StarGSS__key_atk\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_atk",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_amr",
+      "label": "StarGSS__key_amr",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_amr\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_amr",
+      "documentation": "\n```jass\ninteger StarGSS__key_amr\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_amr",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_hp",
+      "label": "StarGSS__key_hp",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_hp\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_hp",
+      "documentation": "\n```jass\ninteger StarGSS__key_hp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_hp",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_mp",
+      "label": "StarGSS__key_mp",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_mp\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_mp",
+      "documentation": "\n```jass\ninteger StarGSS__key_mp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_mp",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_ms",
+      "label": "StarGSS__key_ms",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_ms\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_ms",
+      "documentation": "\n```jass\ninteger StarGSS__key_ms\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_ms",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_as",
+      "label": "StarGSS__key_as",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_as\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_as",
+      "documentation": "\n```jass\ninteger StarGSS__key_as\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_as",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_rhp",
+      "label": "StarGSS__key_rhp",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_rhp\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_rhp",
+      "documentation": "\n```jass\ninteger StarGSS__key_rhp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_rhp",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___key_rmp",
+      "label": "StarGSS__key_rmp",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___key_rmp\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___key_rmp",
+      "documentation": "\n```jass\ninteger StarGSS__key_rmp\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__key_rmp",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___t",
+      "label": "StarGSS__t",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntimer StarGSS___t\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___t",
+      "documentation": "\n```jass\ntimer StarGSS__t\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__t",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___index",
+      "label": "StarGSS__index",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarGSS___index\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___index",
+      "documentation": "\n```jass\ninteger StarGSS__index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__index",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___list",
+      "label": "StarGSS__list",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nunit array StarGSS___list\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___list",
+      "documentation": "\n```jass\nunit array StarGSS__list\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__list",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarGSS___xiaolv",
+      "label": "StarGSS__xiaolv",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal StarGSS___xiaolv\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarGSS___xiaolv",
+      "documentation": "\n```jass\nreal StarGSS__xiaolv\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarGSS__xiaolv",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1951,6 +2167,24 @@
       "detail": "Global Variable",
       "documentation": "\n```jass\ntrigger gg_trg_JM10\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_gg_trg_JM10",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________001",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________001",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________002",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________002",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -3368,11 +3602,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "st___prototype1",
+      "label": "st___prototype6",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array st___prototype1\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_st___prototype1",
+      "documentation": "\n```jass\ntrigger array st___prototype6\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st___prototype6",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -3474,6 +3708,1041 @@
       "sortText": "2_var_f__result_string",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "DzGetMouseTerrainX",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseTerrainX takes nothing returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseTerrainX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseTerrainY",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseTerrainY takes nothing returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseTerrainY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseTerrainZ",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseTerrainZ takes nothing returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseTerrainZ",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzIsMouseOverUI",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzIsMouseOverUI takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzIsMouseOverUI",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseX",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseX takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseY",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseY takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseXRelative",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseXRelative takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseXRelative",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseYRelative",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseYRelative takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseYRelative",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetMousePos",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetMousePos takes integer x, integer y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetMousePos",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseEvent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseEvent takes trigger trig, integer btn, integer status, boolean sync, string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseEventByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseEventByCode takes trigger trig, integer btn, integer status, boolean sync, code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseEventByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterKeyEvent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterKeyEvent takes trigger trig, integer key, integer status, boolean sync, string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterKeyEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterKeyEventByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterKeyEventByCode takes trigger trig, integer key, integer status, boolean sync, code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterKeyEventByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseWheelEvent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseWheelEvent takes trigger trig, boolean sync, string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseWheelEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseWheelEventByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseWheelEventByCode takes trigger trig, boolean sync, code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseWheelEventByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseMoveEvent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseMoveEvent takes trigger trig, boolean sync, string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseMoveEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseMoveEventByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterMouseMoveEventByCode takes trigger trig, boolean sync, code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterMouseMoveEventByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerKey",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerKey takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerKey",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetWheelDelta",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetWheelDelta takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetWheelDelta",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzIsKeyDown",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzIsKeyDown takes integer iKey returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzIsKeyDown",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerKeyPlayer",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerKeyPlayer takes nothing returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerKeyPlayer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetWindowWidth",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetWindowWidth takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetWindowWidth",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetWindowHeight",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetWindowHeight takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetWindowHeight",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetWindowX",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetWindowX takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetWindowX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetWindowY",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetWindowY takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetWindowY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterWindowResizeEvent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterWindowResizeEvent takes trigger trig, boolean sync, string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterWindowResizeEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterWindowResizeEventByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterWindowResizeEventByCode takes trigger trig, boolean sync, code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterWindowResizeEventByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzIsWindowActive",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzIsWindowActive takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzIsWindowActive",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzDestructablePosition",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzDestructablePosition takes destructable d, real x, real y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzDestructablePosition",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetUnitPosition",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetUnitPosition takes unit whichUnit, real x, real y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetUnitPosition",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzExecuteFunc",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzExecuteFunc takes string funcName returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzExecuteFunc",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetUnitUnderMouse",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetUnitUnderMouse takes nothing returns unit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetUnitUnderMouse",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetUnitTexture",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetUnitTexture takes unit whichUnit, string path, integer texId returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetUnitTexture",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetMemory",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetMemory takes integer address, real value returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetMemory",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetUnitID",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetUnitID takes unit whichUnit, integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetUnitID",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetUnitModel",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetUnitModel takes unit whichUnit, string path returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetUnitModel",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetWar3MapMap",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetWar3MapMap takes string map returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetWar3MapMap",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetLocale",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetLocale takes nothing returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetLocale",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetUnitNeededXP",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetUnitNeededXP takes unit whichUnit, integer level returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetUnitNeededXP",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterSyncData",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzTriggerRegisterSyncData takes trigger trig, string prefix, boolean server returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzTriggerRegisterSyncData",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSyncData",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSyncData takes string prefix, string data returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSyncData",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerSyncData",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerSyncData takes nothing returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerSyncData",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerSyncPlayer",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerSyncPlayer takes nothing returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerSyncPlayer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameHideInterface",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameHideInterface takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameHideInterface",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameEditBlackBorders",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameEditBlackBorders takes real upperHeight, real bottomHeight returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameEditBlackBorders",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetPortrait",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetPortrait takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetPortrait",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetMinimap",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetMinimap takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetMinimap",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetCommandBarButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetCommandBarButton takes integer row, integer column returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetCommandBarButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetHeroBarButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetHeroBarButton takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetHeroBarButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetHeroHPBar",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetHeroHPBar takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetHeroHPBar",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetHeroManaBar",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetHeroManaBar takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetHeroManaBar",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetItemBarButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetItemBarButton takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetItemBarButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetMinimapButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetMinimapButton takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetMinimapButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetUpperButtonBarButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetUpperButtonBarButton takes integer buttonId returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetUpperButtonBarButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetTooltip",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetTooltip takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetTooltip",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetChatMessage",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetChatMessage takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetChatMessage",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetUnitMessage",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetUnitMessage takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetUnitMessage",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetTopMessage",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetTopMessage takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetTopMessage",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetColor",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetColor takes integer r, integer g, integer b, integer a returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetColor",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetUpdateCallback",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetUpdateCallback takes string func returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetUpdateCallback",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetUpdateCallbackByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetUpdateCallbackByCode takes code funcHandle returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetUpdateCallbackByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameShow",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameShow takes integer frame, boolean enable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameShow",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzCreateFrame",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzCreateFrame takes string frame, integer parent, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzCreateFrame",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzCreateSimpleFrame",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzCreateSimpleFrame takes string frame, integer parent, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzCreateSimpleFrame",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzDestroyFrame",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzDestroyFrame takes integer frame returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzDestroyFrame",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzLoadToc",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzLoadToc takes string fileName returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzLoadToc",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetPoint",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetPoint takes integer frame, integer point, integer relativeFrame, integer relativePoint, real x, real y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetPoint",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetAbsolutePoint",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetAbsolutePoint takes integer frame, integer point, real x, real y returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetAbsolutePoint",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameClearAllPoints",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameClearAllPoints takes integer frame returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameClearAllPoints",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetEnable",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetEnable takes integer name, boolean enable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetEnable",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetScript",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetScript takes integer frame, integer eventId, string func, boolean sync returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetScript",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetScriptByCode",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetScriptByCode takes integer frame, integer eventId, code funcHandle, boolean sync returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetScriptByCode",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerUIEventPlayer",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerUIEventPlayer takes nothing returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerUIEventPlayer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetTriggerUIEventFrame",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerUIEventFrame takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerUIEventFrame",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameFindByName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameFindByName takes string name, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameFindByName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSimpleFrameFindByName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSimpleFrameFindByName takes string name, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSimpleFrameFindByName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSimpleFontStringFindByName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSimpleFontStringFindByName takes string name, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSimpleFontStringFindByName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSimpleTextureFindByName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSimpleTextureFindByName takes string name, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSimpleTextureFindByName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetGameUI",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetGameUI takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetGameUI",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzClickFrame",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzClickFrame takes integer frame returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzClickFrame",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetCustomFovFix",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetCustomFovFix takes real value returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetCustomFovFix",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzEnableWideScreen",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzEnableWideScreen takes boolean enable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzEnableWideScreen",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetText",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetText takes integer frame, string text returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetText",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetText",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetText takes integer frame returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetText",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetTextSizeLimit",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetTextSizeLimit takes integer frame, integer size returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetTextSizeLimit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetTextSizeLimit",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetTextSizeLimit takes integer frame returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetTextSizeLimit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetTextColor",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetTextColor takes integer frame, integer color returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetTextColor",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMouseFocus",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMouseFocus takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMouseFocus",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetAllPoints",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetAllPoints takes integer frame, integer relativeFrame returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetAllPoints",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetFocus",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetFocus takes integer frame, boolean enable returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetFocus",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetModel",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetModel takes integer frame, string modelFile, integer modelType, integer flag returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetModel",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetEnable",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetEnable takes integer frame returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetEnable",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetAlpha",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetAlpha takes integer frame, integer alpha returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetAlpha",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetAlpha",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetAlpha takes integer frame returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetAlpha",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetAnimate",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetAnimate takes integer frame, integer animId, boolean autocast returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetAnimate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetAnimateOffset",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetAnimateOffset takes integer frame, real offset returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetAnimateOffset",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetTexture",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetTexture takes integer frame, string texture, integer flag returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetTexture",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetScale",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetScale takes integer frame, real scale returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetScale",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetTooltip",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetTooltip takes integer frame, integer tooltip returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetTooltip",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameCageMouse",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameCageMouse takes integer frame, boolean enable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameCageMouse",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetValue",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetValue takes integer frame returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetValue",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetMinMaxValue",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetMinMaxValue takes integer frame, real minValue, real maxValue returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetMinMaxValue",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetStepValue",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetStepValue takes integer frame, real step returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetStepValue",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetValue",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetValue takes integer frame, real value returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetValue",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetSize",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetSize takes integer frame, real w, real h returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetSize",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzCreateFrameByTagName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzCreateFrameByTagName takes string frameType, string name, integer parent, string template, integer id returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzCreateFrameByTagName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetVertexColor",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetVertexColor takes integer frame, integer color returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetVertexColor",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzOriginalUIAutoResetPoint",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzOriginalUIAutoResetPoint takes boolean enable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzOriginalUIAutoResetPoint",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetPriority",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetPriority takes integer frame, integer priority returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetPriority",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetParent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetParent takes integer frame, integer parent returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetParent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetHeight",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetHeight takes integer frame returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetHeight",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetFont",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetFont takes integer frame, string fileName, real height, integer flag returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetFont",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetParent",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetParent takes integer frame returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetParent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameSetTextAlignment",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameSetTextAlignment takes integer frame, integer align returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameSetTextAlignment",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameGetName",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameGetName takes integer frame returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameGetName",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
     },
     {
       "label": "EXGetUnitAbility",
@@ -4169,20 +5438,128 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc___prototype1_execute",
+      "label": "sc___prototype6_execute",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc___prototype1_execute takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc___prototype1_execute",
+      "documentation": "\n```jass\nfunction sc___prototype6_execute takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc___prototype6_execute",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc___prototype1_evaluate",
+      "label": "sc___prototype6_evaluate",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc___prototype1_evaluate takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc___prototype1_evaluate",
+      "documentation": "\n```jass\nfunction sc___prototype6_evaluate takes integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc___prototype6_evaluate",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseEventTrg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterMouseEventTrg takes trigger trg, integer status, integer btn returns nothing\n```\n\n\n---\n\nlibrary BzAPI:\n\nhardware\n\nplus\n\nsync\n\ngui\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterMouseEventTrg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterKeyEventTrg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterKeyEventTrg takes trigger trg, integer status, integer btn returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterKeyEventTrg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseMoveEventTrg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterMouseMoveEventTrg takes trigger trg returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterMouseMoveEventTrg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMouseWheelEventTrg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterMouseWheelEventTrg takes trigger trg returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterMouseWheelEventTrg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterWindowResizeEventTrg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterWindowResizeEventTrg takes trigger trg returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterWindowResizeEventTrg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzF2I",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzF2I takes integer i returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzF2I",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzI2F",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzI2F takes integer i returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzI2F",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzK2I",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzK2I takes integer i returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzK2I",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzI2K",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzI2K takes integer i returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzI2K",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzTriggerRegisterMallItemSyncData",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterMallItemSyncData takes trigger trig returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzTriggerRegisterMallItemSyncData",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzGetTriggerMallItemPlayer",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzGetTriggerMallItemPlayer takes nothing returns player\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzGetTriggerMallItemPlayer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "DzGetTriggerMallItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction DzGetTriggerMallItem takes nothing returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_DzGetTriggerMallItem",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -4190,7 +5567,7 @@
       "label": "SLDebugLib___luainit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLDebugLib___luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction SLDebugLib___luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary BzAPI ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_SLDebugLib___luainit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -4214,11 +5591,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLInteger___SLInteger_InitList",
+      "label": "SLInteger__SLInteger_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLInteger___SLInteger_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLInteger___SLInteger_InitList",
+      "documentation": "\n```jass\nfunction SLInteger__SLInteger_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLInteger__SLInteger_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -4439,11 +5816,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLInteger___onInit",
+      "label": "SLInteger__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLInteger___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLInteger___onInit",
+      "documentation": "\n```jass\nfunction SLInteger__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLInteger__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -4718,11 +6095,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLStr___SLStr_InitList",
+      "label": "SLStr__SLStr_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLStr___SLStr_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLStr___SLStr_InitList",
+      "documentation": "\n```jass\nfunction SLStr__SLStr_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLStr__SLStr_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -4934,11 +6311,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLStr___onInit",
+      "label": "SLStr__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLStr___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLStr___onInit",
+      "documentation": "\n```jass\nfunction SLStr__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLStr__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -8399,11 +9776,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarLoadAny___anon__0",
+      "label": "StarLoadAny__anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarLoadAny___anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarLoadAny___anon__0",
+      "documentation": "\n```jass\nfunction StarLoadAny__anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarLoadAny__anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -8921,10 +10298,226 @@
       "statementType": "FunctionDeclaration"
     },
     {
+      "label": "GetItemUnderMouse",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetItemUnderMouse takes nothing returns item\n```\n\n\n---\n\nlibrary StarBase ends\n\nlibrary StarItem:\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetItemUnderMouse",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "GetItemByHandle",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetItemByHandle takes integer i returns item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetItemByHandle",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_GetTriggerUnit",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_GetTriggerUnit takes nothing returns unit\n```\n\n\n---\n\nprivate:  //     call FlushChildHashtable(YDLOC,0) //     call SaveFogStateHandle(YDLOC,0,1,ConvertFogState(i) ) //     return LoadTriggerHandle(YDLOC,0,1) //     endfunction //是否打开物品叠加\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_GetTriggerUnit",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem___ItemStacked",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem___ItemStacked takes nothing returns nothing\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem___ItemStacked",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem___ItemStack_Act3",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem___ItemStack_Act3 takes item wp, unit u returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem___ItemStack_Act3",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem___CheakPickUp",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem___CheakPickUp takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem___CheakPickUp",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemStack_Act2",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemStack_Act2 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemStack_Act2",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemStack_Act",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemStack_Act takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemStack_Act",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_IsItemInRange",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_IsItemInRange takes unit u, item ite, real r returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_IsItemInRange",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_UnitMoveItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_UnitMoveItem takes trigger t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_UnitMoveItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemStack_Cond",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemStack_Cond takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemStack_Cond",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_GetTriggerItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_GetTriggerItem takes nothing returns item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_GetTriggerItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_GetItemLocOnBag",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_GetItemLocOnBag takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_GetItemLocOnBag",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_TryPickUpItem",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_TryPickUpItem takes trigger t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_TryPickUpItem",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "GetUnitHaveItemLoc",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction GetUnitHaveItemLoc takes unit u, integer wplx returns integer\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_GetUnitHaveItemLoc",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemSynthesis_Act",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemSynthesis_Act takes unit u, item wp, boolean needcheck returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemSynthesis_Act",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem___CheakSynthesis",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem___CheakSynthesis takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem___CheakSynthesis",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemSynthesis_IsPickupable",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemSynthesis_IsPickupable takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemSynthesis_IsPickupable",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemSynthesis_Reg",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemSynthesis_Reg takes integer i1, integer i2, integer i3, integer i4, integer i5, integer i6, integer i7 returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemSynthesis_Reg",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_null",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_null takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_null",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_ItemStack_Cond2",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_ItemStack_Cond2 takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_ItemStack_Cond2",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_OpenStack",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_OpenStack takes real r returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_OpenStack",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_TriggerAddItemStackedEvent",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_TriggerAddItemStackedEvent takes trigger t returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_TriggerAddItemStackedEvent",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "StarItem_CloseStack",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction StarItem_CloseStack takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem_CloseStack",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
       "label": "s__StarOverSpeed___StarOverSpeedGenerator_anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_anon__0 takes nothing returns nothing\n```\n\n\n---\n\nlibrary StarBase ends\n\nlibrary StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_anon__0 takes nothing returns nothing\n```\n\n\n---\n\nlibrary StarItem ends\n\nlibrary StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -10010,11 +11603,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarGSS___anon__0",
+      "label": "StarGSS__anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarGSS___anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarGSS___anon__0",
+      "documentation": "\n```jass\nfunction StarGSS__anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarGSS__anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10028,11 +11621,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarGSS___anon__1",
+      "label": "StarGSS__anon__1",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarGSS___anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarGSS___anon__1",
+      "documentation": "\n```jass\nfunction StarGSS__anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarGSS__anon__1",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10190,20 +11783,20 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarGSS___initVar",
+      "label": "StarGSS__initVar",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarGSS___initVar takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarGSS___initVar",
+      "documentation": "\n```jass\nfunction StarGSS__initVar takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarGSS__initVar",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarGSS___onInit",
+      "label": "StarGSS__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarGSS___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarGSS___onInit",
+      "documentation": "\n```jass\nfunction StarGSS__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarGSS__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10402,6 +11995,42 @@
       "detail": "Function",
       "documentation": "\n```jass\nfunction InitTrig__________jass______u takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_InitTrig__________jass______u",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________001Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________001Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 001\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________001Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________001",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________001 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________001",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig____________________002Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig____________________002Actions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 未命名触发器 002\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_Trig____________________002Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig____________________002",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig____________________002 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_InitTrig____________________002",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10694,32 +12323,32 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sa___prototype1_StarGSS___initVar",
+      "label": "sa___prototype6_StarGSS__initVar",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sa___prototype1_StarGSS___initVar takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sa___prototype1_StarGSS___initVar",
+      "documentation": "\n```jass\nfunction sa___prototype6_StarGSS__initVar takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa___prototype6_StarGSS__initVar",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sa___prototype1_StarBlockInit",
+      "label": "sa___prototype6_StarBlockInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sa___prototype1_StarBlockInit takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sa___prototype1_StarBlockInit",
+      "documentation": "\n```jass\nfunction sa___prototype6_StarBlockInit takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa___prototype6_StarBlockInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "jasshelper__initstructs8260906",
+      "label": "jasshelper__initstructs53775812",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction jasshelper__initstructs8260906 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_jasshelper__initstructs8260906",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs53775812 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs53775812",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     }
   ],
-  "timestamp": 1775314182900
+  "timestamp": 1775691288010
 }

@@ -224,3 +224,100 @@ function startRefreshTimer(): void {
 - ✅ 定时器本身要在所有玩家上启动（引擎保证同步）
 ## 核心原则
 **所有玩家必须执行相同次数、相同路径的代码；UI 操作只在本地玩家执行。**
+**如果是true，那么它们内部的回调函数全局操作的必须在本地玩家判断之外，异步的操作需要在本地玩家判断内，不可以互相混淆，非常严格**
+
+---
+
+## 【关键新增】frameSetScriptByCode sync=true 避坑经验（2026-04-09 对话框UI修复）
+
+### 问题现象
+玩家1点击接受/拒绝任务按钮时，玩家2立即掉线（desync）
+
+### 问题根源
+当使用 `frameSetScriptByCode(..., sync=true)` 时，必须确保：
+1. ✅ **按钮帧必须在所有玩家上创建**（不能在本地玩家判断内创建）
+2. ✅ **回调必须在所有玩家上注册**（不能在本地玩家判断内注册）
+3. ✅ **回调函数必须是全局函数**（不能是匿名闭包，闭包会导致 desync！）
+
+### ❌ 错误的做法（会导致 desync）
+```typescript
+const isLocal = localPlayer === targetPlayer;
+
+// ❌ 只在本地玩家创建帧
+if (isLocal && !state.initialized) {
+  state.frames = createDialogFrames();
+  state.initialized = true;
+}
+
+// ❌ 只在本地玩家注册回调（后面的代码在 isLocal 判断之后）
+if (entry.isQuest && entry.questCallbacks) {
+  // 这里只在本地玩家执行！
+  frameSetScriptByCode(state.frames[6], 1, () => { /* 闭包 */ }, true);
+}
+```
+**后果**：
+- 本地玩家：有帧，有回调 → 按钮点击触发回调
+- 其他玩家：没有帧，没有回调 → 平台尝试同步回调时找不到 → desync
+
+### ✅ 正确的做法（完全同步）
+```typescript
+const isLocal = localPlayer === targetPlayer;
+
+// ✅ 所有玩家都创建帧
+if (!state.initialized) {
+  state.frames = createDialogFrames();
+  state.initialized = true;
+}
+
+// ✅ 所有玩家都注册回调（放在本地玩家判断之外）
+if (entry.isQuest && entry.questCallbacks) {
+  // 所有玩家都执行！
+  frameSetScriptByCode(state.frames[6], 1, questAcceptCallback, true); // 全局函数
+  frameSetScriptByCode(state.frames[8], 1, questRejectCallback, true); // 全局函数
+}
+
+// ✅ 回调内部用本地玩家判断隔离 UI 操作
+function questAcceptCallback(): void {
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  
+  // 全局操作：所有玩家执行
+  state.queue.shift();
+  state.isActive = false;
+  
+  // UI 操作：只在本地玩家执行
+  if (localPlayer === targetPlayer) {
+    showQuestButtons(state, false);
+    showDialogFrames(state, false);
+  }
+  
+  // 游戏状态修改：所有玩家执行
+  onAccept();
+}
+```
+
+### 📌 核心规则
+**强烈建议：以后最好都用 `sync=true`！**
+
+使用 `sync=true` 时必须严格遵守以下规则：
+1. **`sync=true` 时，按钮帧必须在所有玩家上创建**（**不能**在本地玩家判断内创建）
+2. **`sync=true` 时，回调必须在所有玩家上注册**（**不能**在本地玩家判断内注册）
+3. **回调必须是全局函数**（不能是匿名闭包，闭包会导致 desync！）
+4. **回调内部严格区分操作类型**：
+   - ✅ **全局同步操作**（游戏状态修改等）：**必须在本地玩家判断之外**执行
+   - ✅ **异步操作**（UI 操作、音效等）：**必须在本地玩家判断之内**执行
+   - ⚠️ **不可以互相混淆！非常严格！**
+   ## frameSetScriptByCode sync=true 的正确用法
+
+**核心规则：sync=true 的回调必须在所有玩家上注册，且依赖的帧必须在所有玩家上创建。**
+
+❌ 错误：
+if (isLocal) {
+    createFrame();
+    frameSetScriptByCode(frame, event, callback, true);
+}
+
+✅ 正确：
+createFrame();  // 所有玩家创建
+frameSetScriptByCode(frame, event, callback, true);  // 所有玩家注册
+// callback 内部用 GetLocalPlayer() 隔离 UI 操作

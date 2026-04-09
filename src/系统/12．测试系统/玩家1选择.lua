@@ -264,14 +264,7 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
                 local ____opt_8 = quest.requireID
                 local questId = ____opt_8 and tostring(quest.requireID) or ""
                 if not hasPlayerAcceptedQuest(nil, 0, questId) then
-                    local triggerPlayer = japi.DzGetTriggerUIEventPlayer()
-                    local ____triggerPlayer_10
-                    if triggerPlayer then
-                        ____triggerPlayer_10 = jass.GetPlayerName(triggerPlayer) or "冒险者"
-                    else
-                        ____triggerPlayer_10 = "冒险者"
-                    end
-                    local playerName = ____triggerPlayer_10
+                    local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
                     setQuestState(nil, questId, 1, playerName)
                 end
                 local dialogOwner = jass.Player(dialogOwnerId)
@@ -279,8 +272,7 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
                 local acceptedLines = parseDialogText(nil, acceptedRaw, npcName, heroName)
                 openNpcDialog(nil, dialogOwner, {lines = acceptedLines})
                 local localPlayer = jass.GetLocalPlayer()
-                local localTrigger = japi.DzGetTriggerUIEventPlayer()
-                if localTrigger and localPlayer == localTrigger and hasPlayerAcceptedQuest(
+                if localPlayer == jass.Player(dialogOwnerId) and hasPlayerAcceptedQuest(
                     nil,
                     jass.GetPlayerId(localPlayer),
                     questId
@@ -296,8 +288,7 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
             end,
             onReject = function()
                 local localPlayer = jass.GetLocalPlayer()
-                local triggerPlayer = japi.DzGetTriggerUIEventPlayer()
-                if triggerPlayer and localPlayer == triggerPlayer then
+                if localPlayer == jass.Player(dialogOwnerId) then
                     jass.DisplayTimedTextToPlayer(
                         localPlayer,
                         0,
@@ -311,17 +302,17 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
     }
 end
 local function buildQuestInProgressDialog(self, quest, npcName, player, hero, dialogOwnerId)
-    local ____hero_11
+    local ____hero_10
     if hero then
-        ____hero_11 = jass.GetUnitName(hero)
+        ____hero_10 = jass.GetUnitName(hero)
     else
-        ____hero_11 = "你"
+        ____hero_10 = "你"
     end
-    local heroName = ____hero_11
+    local heroName = ____hero_10
     local msg = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
     local playerId = jass.GetPlayerId(player)
-    local ____opt_12 = quest.requireID
-    local questId = ____opt_12 and tostring(quest.requireID) or ""
+    local ____opt_11 = quest.requireID
+    local questId = ____opt_11 and tostring(quest.requireID) or ""
     local questDesc = quest.desc or quest.name or ""
     local rewardText = quest.reward or "无"
     return {
@@ -367,13 +358,16 @@ local function buildQuestInProgressDialog(self, quest, npcName, player, hero, di
                     do
                         local i = 0
                         while i < 4 do
-                            jass.DisplayTimedTextToPlayer(
-                                jass.Player(i),
-                                0,
-                                0,
-                                10,
-                                msg
-                            )
+                            local p = jass.Player(i)
+                            if p ~= nil and jass.GetPlayerController(p) == jass.MAP_CONTROL_USER then
+                                jass.DisplayTimedTextToPlayer(
+                                    p,
+                                    0,
+                                    0,
+                                    10,
+                                    msg
+                                )
+                            end
                             i = i + 1
                         end
                     end
@@ -594,13 +588,13 @@ jass.TriggerAddAction(
                     return
                 end
             end
-            local ____hero_14
+            local ____hero_13
             if hero then
-                ____hero_14 = jass.GetUnitName(hero)
+                ____hero_13 = jass.GetUnitName(hero)
             else
-                ____hero_14 = "你"
+                ____hero_13 = "你"
             end
-            local heroName = ____hero_14
+            local heroName = ____hero_13
             local dialogData = buildDialogData(nil, npcConfig.NpcName, heroName)
             if dialogData then
                 openNpcDialog(

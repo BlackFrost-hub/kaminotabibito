@@ -141,6 +141,57 @@ interface PlayerDialogState {
 const g_states: PlayerDialogState[] = [];
 
 // ────────────────────────────────────────────────
+// 全局临时存储区（用于 sync=true 的回调）
+// ────────────────────────────────────────────────
+
+interface QuestCallbackStore {
+  state: PlayerDialogState;
+  onAccept: () => void;
+  onReject: () => void;
+}
+
+let g_questCallbackStore: QuestCallbackStore | undefined = undefined;
+
+// ────────────────────────────────────────────────
+// 全局回调函数（直接作为 frameSetScriptByCode 的回调参数）
+// ────────────────────────────────────────────────
+
+function questAcceptCallback(): void {
+  if (g_questCallbackStore) {
+    const { state, onAccept } = g_questCallbackStore;
+    state.queue.shift();
+    state.isActive = false;
+    const localPlayer = dzGetLocalPlayer();
+    const targetPlayer = dzPlayer(state.playerId);
+    if (localPlayer === targetPlayer) {
+      showQuestButtons(state, false);
+      showDialogFrames(state, false);
+    }
+    onAccept();
+  }
+}
+
+function questRejectCallback(): void {
+  if (g_questCallbackStore) {
+    const { state, onReject } = g_questCallbackStore;
+    state.queue.shift();
+    state.isActive = false;
+    const localPlayer = dzGetLocalPlayer();
+    const targetPlayer = dzPlayer(state.playerId);
+    if (localPlayer === targetPlayer) {
+      showQuestButtons(state, false);
+      showDialogFrames(state, false);
+    }
+    onReject();
+  }
+}
+
+// 把函数注册到全局 _G 上
+const _G = (globalThis as any) as { [key: string]: any };
+_G.QuestAcceptCallback = questAcceptCallback;
+_G.QuestRejectCallback = questRejectCallback;
+
+// ────────────────────────────────────────────────
 // Dz API 安全调用封装
 // ────────────────────────────────────────────────
 
@@ -598,12 +649,12 @@ function playEntry(state: PlayerDialogState): void {
   state.waitingClick = false;
   state.clickCooldown = true; // 对话框刚弹出，屏蔽第一次点击（防止点NPC穿透到背景层）
 
-  // 确保帧已创建（本地判断在 createDialogFrames 外层做）
+  // 确保帧已创建（所有玩家都创建，确保 sync=true 能正常工作）
   const localPlayer = dzGetLocalPlayer();
   const targetPlayer = dzPlayer(state.playerId);
   const isLocal = localPlayer === targetPlayer;
 
-  if (isLocal && !state.initialized) {
+  if (!state.initialized) {
     dzLoadTocOnce();
     state.frames = createDialogFrames();
     state.initialized = true;
@@ -616,10 +667,20 @@ function playEntry(state: PlayerDialogState): void {
     Sound3DII_Mp3PlayReuse(DIALOG_OPEN_SOUND, targetPlayer);
   }
 
+  // 任务模式：预注册接受/拒绝按钮回调（所有玩家都执行，确保 sync=true 能正常工作）
+  const entry = state.queue[0];
+  if (entry.isQuest && entry.questCallbacks) {
+    const cb = entry.questCallbacks;
+    // 先保存状态和回调到全局存储区
+    g_questCallbackStore = { state, onAccept: cb.onAccept, onReject: cb.onReject };
+    // 必须用全局函数引用（sync=true），闭包会导致 desync！
+    frameSetScriptByCode(state.frames[6], 1, questAcceptCallback, true);
+    frameSetScriptByCode(state.frames[8], 1, questRejectCallback, true);
+  }
+
   if (!isLocal) {
     // 非本地：跳过所有 UI 操作，只走定时器逻辑让队列推进
     // 打字机跑完后直接 advanceDialog（本地玩家靠点击推进，非本地无点击事件）
-    const entry = state.queue[0];
     state.strLen = dzStringLength(entry.text);
     state.strNow = 0;
     dzTimerStart(state.tickTimer, TICK, true, () => {
@@ -637,8 +698,6 @@ function playEntry(state: PlayerDialogState): void {
     });
     return;
   }
-
-  const entry = state.queue[0];
 
   // 设置标题与清空正文
   dzSetFont(state.frames[2], DEFAULT_FONT, entry.titleFontSize);
@@ -670,25 +729,6 @@ function playEntry(state: PlayerDialogState): void {
 
   state.strNow = 0;
   state.strLen = dzStringLength(entry.text);
-
-  // 任务模式：预注册接受/拒绝按钮回调
-  if (entry.isQuest && entry.questCallbacks) {
-    const cb = entry.questCallbacks;
-    frameSetScriptByCode(state.frames[6], 1, () => {
-      showQuestButtons(state, false);
-      showDialogFrames(state, false);
-      state.queue.shift();
-      state.isActive = false;
-      cb.onAccept();
-    }, false);
-    frameSetScriptByCode(state.frames[8], 1, () => {
-      showQuestButtons(state, false);
-      showDialogFrames(state, false);
-      state.queue.shift();
-      state.isActive = false;
-      cb.onReject();
-    }, false);
-  }
 
   startTyping(state);
 }

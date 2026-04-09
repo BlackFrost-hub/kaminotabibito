@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, japi, jass, DIALOG_OPEN_SOUND, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_tocLoaded
+local questAcceptCallback, questRejectCallback, dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, japi, jass, DIALOG_OPEN_SOUND, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_questCallbackStore, g_tocLoaded
 local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具")
 local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
 local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
@@ -8,6 +8,38 @@ local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．�
 local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
 local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
 local Sound3DII_Mp3PlayReuse = ____02_FF0E_97F3_6548_51FD_6570.Sound3DII_Mp3PlayReuse
+function questAcceptCallback(self)
+    if g_questCallbackStore then
+        local ____g_questCallbackStore_0 = g_questCallbackStore
+        local state = ____g_questCallbackStore_0.state
+        local onAccept = ____g_questCallbackStore_0.onAccept
+        table.remove(state.queue, 1)
+        state.isActive = false
+        local localPlayer = dzGetLocalPlayer(nil)
+        local targetPlayer = dzPlayer(nil, state.playerId)
+        if localPlayer == targetPlayer then
+            showQuestButtons(nil, state, false)
+            showDialogFrames(nil, state, false)
+        end
+        onAccept(nil)
+    end
+end
+function questRejectCallback(self)
+    if g_questCallbackStore then
+        local ____g_questCallbackStore_1 = g_questCallbackStore
+        local state = ____g_questCallbackStore_1.state
+        local onReject = ____g_questCallbackStore_1.onReject
+        table.remove(state.queue, 1)
+        state.isActive = false
+        local localPlayer = dzGetLocalPlayer(nil)
+        local targetPlayer = dzPlayer(nil, state.playerId)
+        if localPlayer == targetPlayer then
+            showQuestButtons(nil, state, false)
+            showDialogFrames(nil, state, false)
+        end
+        onReject(nil)
+    end
+end
 function dzShow(self, f, b)
     if f and f ~= 0 and type(japi.DzFrameShow) == "function" then
         japi.DzFrameShow(f, b)
@@ -54,13 +86,13 @@ function dzSetFont(self, f, font, size)
     end
 end
 function dzCreate(self, template, tag)
-    local ____temp_0
+    local ____temp_2
     if type(japi.DzGetGameUI) == "function" then
-        ____temp_0 = japi.DzGetGameUI()
+        ____temp_2 = japi.DzGetGameUI()
     else
-        ____temp_0 = 0
+        ____temp_2 = 0
     end
-    local gameUI = ____temp_0
+    local gameUI = ____temp_2
     if not gameUI or gameUI == 0 then
         return 0
     end
@@ -82,22 +114,22 @@ function dzStringLength(self, s)
     return #s
 end
 function dzGetLocalPlayer(self)
-    local ____temp_1
+    local ____temp_3
     if type(jass.GetLocalPlayer) == "function" then
-        ____temp_1 = jass.GetLocalPlayer()
+        ____temp_3 = jass.GetLocalPlayer()
     else
-        ____temp_1 = nil
+        ____temp_3 = nil
     end
-    return ____temp_1
+    return ____temp_3
 end
 function dzPlayer(self, index)
-    local ____temp_2
+    local ____temp_4
     if type(jass.Player) == "function" then
-        ____temp_2 = jass.Player(index)
+        ____temp_4 = jass.Player(index)
     else
-        ____temp_2 = nil
+        ____temp_4 = nil
     end
-    return ____temp_2
+    return ____temp_4
 end
 function dzTimerStart(self, t, timeout, periodic, cb)
     if t and type(jass.TimerStart) == "function" then
@@ -150,13 +182,13 @@ function createDialogFrames(self)
         dzSetAlpha(nil, f, 255)
         dzSetTexture(nil, f, "")
     end
-    local ____temp_4
+    local ____temp_6
     if type(japi.DzGetGameUI) == "function" then
-        ____temp_4 = japi.DzGetGameUI()
+        ____temp_6 = japi.DzGetGameUI()
     else
-        ____temp_4 = 0
+        ____temp_6 = 0
     end
-    local gameUI = ____temp_4
+    local gameUI = ____temp_6
     local bg = createFrame(nil, {
         type = FrameType.BACKDROP,
         name = "DialogBG",
@@ -502,7 +534,7 @@ function playEntry(self, state)
     local localPlayer = dzGetLocalPlayer(nil)
     local targetPlayer = dzPlayer(nil, state.playerId)
     local isLocal = localPlayer == targetPlayer
-    if isLocal and not state.initialized then
+    if not state.initialized then
         dzLoadTocOnce(nil)
         state.frames = createDialogFrames(nil)
         state.initialized = true
@@ -511,8 +543,26 @@ function playEntry(self, state)
     if isFirstOpen then
         Sound3DII_Mp3PlayReuse(nil, DIALOG_OPEN_SOUND, targetPlayer)
     end
+    local entry = state.queue[1]
+    if entry.isQuest and entry.questCallbacks then
+        local cb = entry.questCallbacks
+        g_questCallbackStore = {state = state, onAccept = cb.onAccept, onReject = cb.onReject}
+        frameSetScriptByCode(
+            nil,
+            state.frames[7],
+            1,
+            questAcceptCallback,
+            true
+        )
+        frameSetScriptByCode(
+            nil,
+            state.frames[9],
+            1,
+            questRejectCallback,
+            true
+        )
+    end
     if not isLocal then
-        local entry = state.queue[1]
         state.strLen = dzStringLength(nil, entry.text)
         state.strNow = 0
         dzTimerStart(
@@ -537,7 +587,6 @@ function playEntry(self, state)
         )
         return
     end
-    local entry = state.queue[1]
     dzSetFont(nil, state.frames[3], DEFAULT_FONT, entry.titleFontSize)
     dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize)
     dzSetText(nil, state.frames[3], entry.title)
@@ -562,35 +611,6 @@ function playEntry(self, state)
     end
     state.strNow = 0
     state.strLen = dzStringLength(nil, entry.text)
-    if entry.isQuest and entry.questCallbacks then
-        local cb = entry.questCallbacks
-        frameSetScriptByCode(
-            nil,
-            state.frames[7],
-            1,
-            function()
-                showQuestButtons(nil, state, false)
-                showDialogFrames(nil, state, false)
-                table.remove(state.queue, 1)
-                state.isActive = false
-                cb:onAccept()
-            end,
-            false
-        )
-        frameSetScriptByCode(
-            nil,
-            state.frames[9],
-            1,
-            function()
-                showQuestButtons(nil, state, false)
-                showDialogFrames(nil, state, false)
-                table.remove(state.queue, 1)
-                state.isActive = false
-                cb:onReject()
-            end,
-            false
-        )
-    end
     startTyping(nil, state)
 end
 function skipTyping(self, state)
@@ -705,17 +725,21 @@ DEFAULT_BODY_FONT_SIZE = 0.012
 DEFAULT_BG_TEX = "UI\\wenbenkuang.blp"
 DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp"
 g_states = {}
+g_questCallbackStore = nil
+local _____G = _G
+_____G.QuestAcceptCallback = questAcceptCallback
+_____G.QuestRejectCallback = questRejectCallback
 local function dzGetPlayerId(self, p)
     return type(jass.GetPlayerId) == "function" and jass.GetPlayerId(p) or -1
 end
 local function dzTimerCreate(self)
-    local ____temp_3
+    local ____temp_5
     if type(jass.CreateTimer) == "function" then
-        ____temp_3 = jass.CreateTimer()
+        ____temp_5 = jass.CreateTimer()
     else
-        ____temp_3 = nil
+        ____temp_5 = nil
     end
-    return ____temp_3
+    return ____temp_5
 end
 g_tocLoaded = false
 local function ensureState(self, playerId)
@@ -764,8 +788,8 @@ local function enqueue(self, state, title, text, waitTime, leftTex, midTex, righ
         isQuest = false
     }
     local wasEmpty = #state.queue == 0
-    local ____state_queue_5 = state.queue
-    ____state_queue_5[#____state_queue_5 + 1] = entry
+    local ____state_queue_7 = state.queue
+    ____state_queue_7[#____state_queue_7 + 1] = entry
     if wasEmpty then
         playEntry(nil, state)
     end
@@ -974,8 +998,8 @@ function ____exports.displayQuest(self, p, title, text, onAccept, onReject)
         questCallbacks = {onAccept = onAccept, onReject = onReject}
     }
     local wasEmpty = #state.queue == 0
-    local ____state_queue_6 = state.queue
-    ____state_queue_6[#____state_queue_6 + 1] = entry
+    local ____state_queue_8 = state.queue
+    ____state_queue_8[#____state_queue_8 + 1] = entry
     if wasEmpty then
         playEntry(nil, state)
     end
