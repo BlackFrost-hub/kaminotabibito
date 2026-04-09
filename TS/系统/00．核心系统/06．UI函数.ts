@@ -43,6 +43,9 @@ export interface NpcDialogQuest {
   text: string;
   onAccept: () => void;
   onReject: () => void;
+  /** 任务按钮文案（可选） */
+  acceptText?: string;
+  rejectText?: string;
 }
 
 /** 传给 openNpcDialog 的完整数据 */
@@ -81,7 +84,7 @@ export function openNpcDialog(p: any, data: NpcDialogData): boolean {
 
   if (data.quest) {
     const q = data.quest;
-    displayQuest(p, q.title, q.text, q.onAccept, q.onReject);
+    displayQuest(p, q.title, q.text, q.onAccept, q.onReject, q.acceptText, q.rejectText);
   }
 
   return true;

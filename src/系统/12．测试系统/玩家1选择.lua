@@ -240,14 +240,22 @@ local function parseDialogText(self, raw, npcName, heroName)
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end
-local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
-    local ____hero_7
-    if hero then
-        ____hero_7 = jass.GetUnitName(hero)
+local function buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
+    local dialogOwner = jass.Player(dialogOwnerId)
+    local ____dialogOwner_7
+    if dialogOwner then
+        ____dialogOwner_7 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(dialogOwner)
     else
-        ____hero_7 = "你"
+        ____dialogOwner_7 = nil
     end
-    local heroName = ____hero_7
+    local ownerHero = ____dialogOwner_7
+    local ____ownerHero_8
+    if ownerHero then
+        ____ownerHero_8 = jass.GetUnitName(ownerHero)
+    else
+        ____ownerHero_8 = "你"
+    end
+    local heroName = ____ownerHero_8
     local questDesc = quest.desc or quest.name or "未知任务"
     local rewardText = quest.reward or "无"
     local startLines = quest.NpcStartText and parseDialogText(nil, quest.NpcStartText, npcName, heroName) or ({{
@@ -261,8 +269,8 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
             title = npcName,
             text = (((("【" .. tostring(quest.name)) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
             onAccept = function()
-                local ____opt_8 = quest.requireID
-                local questId = ____opt_8 and tostring(quest.requireID) or ""
+                local ____opt_9 = quest.requireID
+                local questId = ____opt_9 and tostring(quest.requireID) or ""
                 if not hasPlayerAcceptedQuest(nil, 0, questId) then
                     local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
                     setQuestState(nil, questId, 1, playerName)
@@ -301,18 +309,32 @@ local function buildQuestOfferDialog(self, quest, npcName, hero, dialogOwnerId)
         }
     }
 end
-local function buildQuestInProgressDialog(self, quest, npcName, player, hero, dialogOwnerId)
-    local ____hero_10
-    if hero then
-        ____hero_10 = jass.GetUnitName(hero)
+local function buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId)
+    local dialogOwner = jass.Player(dialogOwnerId)
+    local ____dialogOwner_11
+    if dialogOwner then
+        ____dialogOwner_11 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(dialogOwner)
     else
-        ____hero_10 = "你"
+        ____dialogOwner_11 = nil
     end
-    local heroName = ____hero_10
+    local ownerHero = ____dialogOwner_11
+    local ____ownerHero_12
+    if ownerHero then
+        ____ownerHero_12 = jass.GetUnitName(ownerHero)
+    else
+        ____ownerHero_12 = "你"
+    end
+    local heroName = ____ownerHero_12
     local msg = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
-    local playerId = jass.GetPlayerId(player)
-    local ____opt_11 = quest.requireID
-    local questId = ____opt_11 and tostring(quest.requireID) or ""
+    local ____dialogOwner_13
+    if dialogOwner then
+        ____dialogOwner_13 = jass.GetPlayerId(dialogOwner)
+    else
+        ____dialogOwner_13 = dialogOwnerId
+    end
+    local playerId = ____dialogOwner_13
+    local ____opt_14 = quest.requireID
+    local questId = ____opt_14 and tostring(quest.requireID) or ""
     local questDesc = quest.desc or quest.name or ""
     local rewardText = quest.reward or "无"
     return {
@@ -323,6 +345,14 @@ local function buildQuestInProgressDialog(self, quest, npcName, player, hero, di
             acceptText = "提交任务",
             rejectText = "暂时忽略",
             onAccept = function()
+                local callbackOwner = jass.Player(dialogOwnerId)
+                local ____callbackOwner_16
+                if callbackOwner then
+                    ____callbackOwner_16 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(callbackOwner)
+                else
+                    ____callbackOwner_16 = nil
+                end
+                local hero = ____callbackOwner_16
                 local requireItem = quest.requireItem
                 local requireCount = quest.requireCount or 1
                 local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
@@ -558,14 +588,7 @@ jass.TriggerAddAction(
                     return
                 end
                 if hasPlayerAcceptedQuest(nil, playerId, questIdStr) then
-                    local dialogData = buildQuestInProgressDialog(
-                        nil,
-                        quest,
-                        npcConfig.NpcName,
-                        triggerPlayer,
-                        hero,
-                        playerId
-                    )
+                    local dialogData = buildQuestInProgressDialog(nil, quest, npcConfig.NpcName, playerId)
                     openNpcDialog(
                         nil,
                         triggerPlayer,
@@ -573,13 +596,7 @@ jass.TriggerAddAction(
                     )
                     return
                 else
-                    local dialogData = buildQuestOfferDialog(
-                        nil,
-                        quest,
-                        npcConfig.NpcName,
-                        hero,
-                        playerId
-                    )
+                    local dialogData = buildQuestOfferDialog(nil, quest, npcConfig.NpcName, playerId)
                     openNpcDialog(
                         nil,
                         triggerPlayer,
@@ -588,13 +605,13 @@ jass.TriggerAddAction(
                     return
                 end
             end
-            local ____hero_13
+            local ____hero_17
             if hero then
-                ____hero_13 = jass.GetUnitName(hero)
+                ____hero_17 = jass.GetUnitName(hero)
             else
-                ____hero_13 = "你"
+                ____hero_17 = "你"
             end
-            local heroName = ____hero_13
+            local heroName = ____hero_17
             local dialogData = buildDialogData(nil, npcConfig.NpcName, heroName)
             if dialogData then
                 openNpcDialog(

@@ -211,8 +211,10 @@ function parseDialogText(raw: string, npcName: string, heroName: string): Array<
 }
 
 // 构建任务接取对话框
-function buildQuestOfferDialog(quest: QuestConfig, npcName: string, hero: any, dialogOwnerId: number): NpcDialogData {
-  const heroName = hero ? jass.GetUnitName(hero) : "你";
+function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number): NpcDialogData {
+  const dialogOwner = jass.Player(dialogOwnerId);
+  const ownerHero = dialogOwner ? 便捷函数.getPlayerFirstHero(dialogOwner) : null;
+  const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
   const questDesc = quest.desc || quest.name || "未知任务";
   const rewardText = quest.reward || "无";
 
@@ -257,10 +259,12 @@ function buildQuestOfferDialog(quest: QuestConfig, npcName: string, hero: any, d
 }
 
 // 构建任务已接受后的对话框（显示提交/忽略按钮）
-function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, player: any, hero: any, dialogOwnerId: number): NpcDialogData {
-  const heroName = hero ? jass.GetUnitName(hero) : "你";
+function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number): NpcDialogData {
+  const dialogOwner = jass.Player(dialogOwnerId);
+  const ownerHero = dialogOwner ? 便捷函数.getPlayerFirstHero(dialogOwner) : null;
+  const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
   const msg = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
-  const playerId = jass.GetPlayerId(player);
+  const playerId = dialogOwner ? jass.GetPlayerId(dialogOwner) : dialogOwnerId;
   const questId = quest.requireID?.toString() || "";
 
   const questDesc = quest.desc || quest.name || "";
@@ -277,7 +281,9 @@ function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, player:
         // ── 关键设计：sync=true 回调在所有客户端都执行 ──
         // 所有游戏状态写操作（SetPlayerState, RemoveItem, AddHeroXP 等）
         // 必须在所有客户端以相同方式执行，否则 desync。
-        // 单位 handle（hero, npcUnit）在构建时捕获，在所有客户端均有效（WC3 游戏对象全局共享）。
+        // 英雄句柄在回调内按 dialogOwnerId 重新获取，避免依赖选择事件闭包上下文。
+        const callbackOwner = jass.Player(dialogOwnerId);
+        const hero = callbackOwner ? 便捷函数.getPlayerFirstHero(callbackOwner) : null;
 
         const requireItem = quest.requireItem;
         const requireCount = quest.requireCount || 1;
@@ -340,9 +346,6 @@ function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, player:
         }
 
         if (requireItem) {
-          // hero 是在 TriggerAddAction（本地上下文）中捕获的单位 handle。
-          // WC3 单位 handle 在所有客户端均有效（游戏对象全局共享），
-          // 所以可以在 sync=true 回调中直接使用。
           if (!hero) {
             // hero 为 null 说明玩家没有英雄，只在本地触发玩家处提示
             const localPlayer = jass.GetLocalPlayer();
@@ -513,12 +516,12 @@ jass.TriggerAddAction(trg, () => {
       // 检查玩家是否已接受此任务
       if (hasPlayerAcceptedQuest(playerId, questIdStr)) {
         // 已接受任务，显示任务进行中对话框
-        const dialogData = buildQuestInProgressDialog(quest, npcConfig.NpcName, triggerPlayer, hero, playerId);
+        const dialogData = buildQuestInProgressDialog(quest, npcConfig.NpcName, playerId);
         openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
         return;
       } else {
         // 未接受任务，显示任务接取对话框
-        const dialogData = buildQuestOfferDialog(quest, npcConfig.NpcName, hero, playerId);
+        const dialogData = buildQuestOfferDialog(quest, npcConfig.NpcName, playerId);
         openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
         return;
       }

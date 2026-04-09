@@ -63,7 +63,9 @@ function ____exports.openNpcDialog(self, p, data)
             q.title,
             q.text,
             q.onAccept,
-            q.onReject
+            q.onReject,
+            q.acceptText,
+            q.rejectText
         )
     end
     return true

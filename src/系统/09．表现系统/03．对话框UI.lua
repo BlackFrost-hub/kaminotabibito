@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local questAcceptCallback, questRejectCallback, dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, japi, jass, DIALOG_OPEN_SOUND, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_questCallbackStore, g_tocLoaded
+local resolveQuestCallbackByTriggerPlayer, questAcceptCallback, questRejectCallback, dzShow, dzSetText, dzSetTexture, dzSetAlpha, dzSetPriority, dzSetAbsPoint, dzSetSize, dzClearPoints, dzSetEnable, dzSetFont, dzCreate, dzSubString, dzStringLength, dzGetLocalPlayer, dzGetPlayerId, dzPlayer, dzTimerStart, dzTimerPause, dzLoadToc, dzLoadTocOnce, createDialogFrames, bindQuestSyncHandlers, showDialogFrames, playEntry, skipTyping, startTyping, onTypingTick, advanceDialog, showQuestButtons, setQuestButtonTexts, japi, jass, DIALOG_OPEN_SOUND, MAX_PLAYERS, STEP_LEN, TICK, TOC_PATH, TAG_BASE_MAIN, TAG_BASE_PORTRAIT, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE, DEFAULT_BODY_FONT_SIZE, DEFAULT_BG_TEX, DEFAULT_TITLE_TEX, g_states, g_questCallbacksByPlayer, g_tocLoaded
 local ____01_FF0EUI_5DE5_5177 = require("系统.09．表现系统.01．UI工具")
 local createFrame = ____01_FF0EUI_5DE5_5177.createFrame
 local FrameType = ____01_FF0EUI_5DE5_5177.FrameType
@@ -8,37 +8,69 @@ local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．�
 local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
 local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
 local Sound3DII_Mp3PlayReuse = ____02_FF0E_97F3_6548_51FD_6570.Sound3DII_Mp3PlayReuse
-function questAcceptCallback(self)
-    if g_questCallbackStore then
-        local ____g_questCallbackStore_0 = g_questCallbackStore
-        local state = ____g_questCallbackStore_0.state
-        local onAccept = ____g_questCallbackStore_0.onAccept
-        table.remove(state.queue, 1)
-        state.isActive = false
-        local localPlayer = dzGetLocalPlayer(nil)
-        local targetPlayer = dzPlayer(nil, state.playerId)
-        if localPlayer == targetPlayer then
-            showQuestButtons(nil, state, false)
-            showDialogFrames(nil, state, false)
+local ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60 = require("系统.09．表现系统.04．NPC对话状态池")
+local getActivePlayerId = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.getActivePlayerId
+local resetActivePlayerIdIfMatch = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.resetActivePlayerIdIfMatch
+local setActivePlayerId = ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60.setActivePlayerId
+function resolveQuestCallbackByTriggerPlayer(self)
+    local pid = getActivePlayerId(nil)
+    if pid < 0 or pid >= MAX_PLAYERS then
+        if type(japi.DzGetTriggerUIEventPlayer) ~= "function" then
+            return nil
         end
-        onAccept(nil)
+        local triggerPlayer = japi.DzGetTriggerUIEventPlayer()
+        pid = dzGetPlayerId(nil, triggerPlayer)
     end
+    if pid < 0 or pid >= MAX_PLAYERS then
+        return nil
+    end
+    local state = g_states[pid + 1]
+    if not state then
+        return nil
+    end
+    local cb = g_questCallbacksByPlayer[pid + 1]
+    if not cb then
+        return nil
+    end
+    return {state = state, onAccept = cb.onAccept, onReject = cb.onReject}
+end
+function questAcceptCallback(self)
+    local ctx = resolveQuestCallbackByTriggerPlayer(nil)
+    if not ctx then
+        return
+    end
+    local state = ctx.state
+    local onAccept = ctx.onAccept
+    resetActivePlayerIdIfMatch(nil, state.playerId)
+    g_questCallbacksByPlayer[state.playerId + 1] = nil
+    table.remove(state.queue, 1)
+    state.isActive = false
+    local localPlayer = dzGetLocalPlayer(nil)
+    local targetPlayer = dzPlayer(nil, state.playerId)
+    if localPlayer == targetPlayer then
+        showQuestButtons(nil, state, false)
+        showDialogFrames(nil, state, false)
+    end
+    onAccept(nil)
 end
 function questRejectCallback(self)
-    if g_questCallbackStore then
-        local ____g_questCallbackStore_1 = g_questCallbackStore
-        local state = ____g_questCallbackStore_1.state
-        local onReject = ____g_questCallbackStore_1.onReject
-        table.remove(state.queue, 1)
-        state.isActive = false
-        local localPlayer = dzGetLocalPlayer(nil)
-        local targetPlayer = dzPlayer(nil, state.playerId)
-        if localPlayer == targetPlayer then
-            showQuestButtons(nil, state, false)
-            showDialogFrames(nil, state, false)
-        end
-        onReject(nil)
+    local ctx = resolveQuestCallbackByTriggerPlayer(nil)
+    if not ctx then
+        return
     end
+    local state = ctx.state
+    local onReject = ctx.onReject
+    resetActivePlayerIdIfMatch(nil, state.playerId)
+    g_questCallbacksByPlayer[state.playerId + 1] = nil
+    table.remove(state.queue, 1)
+    state.isActive = false
+    local localPlayer = dzGetLocalPlayer(nil)
+    local targetPlayer = dzPlayer(nil, state.playerId)
+    if localPlayer == targetPlayer then
+        showQuestButtons(nil, state, false)
+        showDialogFrames(nil, state, false)
+    end
+    onReject(nil)
 end
 function dzShow(self, f, b)
     if f and f ~= 0 and type(japi.DzFrameShow) == "function" then
@@ -58,6 +90,12 @@ end
 function dzSetAlpha(self, f, a)
     if f and f ~= 0 and type(japi.DzFrameSetAlpha) == "function" then
         japi.DzFrameSetAlpha(f, a)
+    end
+end
+function dzSetPriority(self, f, p)
+    if f and f ~= 0 and type(japi.DzFrameSetPriority) == "function" then
+        pcall(function () return japi.DzFrameSetPriority(f, p) end
+        )
     end
 end
 function dzSetAbsPoint(self, f, point, x, y)
@@ -86,13 +124,13 @@ function dzSetFont(self, f, font, size)
     end
 end
 function dzCreate(self, template, tag)
-    local ____temp_2
+    local ____temp_0
     if type(japi.DzGetGameUI) == "function" then
-        ____temp_2 = japi.DzGetGameUI()
+        ____temp_0 = japi.DzGetGameUI()
     else
-        ____temp_2 = 0
+        ____temp_0 = 0
     end
-    local gameUI = ____temp_2
+    local gameUI = ____temp_0
     if not gameUI or gameUI == 0 then
         return 0
     end
@@ -114,22 +152,25 @@ function dzStringLength(self, s)
     return #s
 end
 function dzGetLocalPlayer(self)
-    local ____temp_3
+    local ____temp_1
     if type(jass.GetLocalPlayer) == "function" then
-        ____temp_3 = jass.GetLocalPlayer()
+        ____temp_1 = jass.GetLocalPlayer()
     else
-        ____temp_3 = nil
+        ____temp_1 = nil
     end
-    return ____temp_3
+    return ____temp_1
+end
+function dzGetPlayerId(self, p)
+    return type(jass.GetPlayerId) == "function" and jass.GetPlayerId(p) or -1
 end
 function dzPlayer(self, index)
-    local ____temp_4
+    local ____temp_2
     if type(jass.Player) == "function" then
-        ____temp_4 = jass.Player(index)
+        ____temp_2 = jass.Player(index)
     else
-        ____temp_4 = nil
+        ____temp_2 = nil
     end
-    return ____temp_4
+    return ____temp_2
 end
 function dzTimerStart(self, t, timeout, periodic, cb)
     if t and type(jass.TimerStart) == "function" then
@@ -182,13 +223,13 @@ function createDialogFrames(self)
         dzSetAlpha(nil, f, 255)
         dzSetTexture(nil, f, "")
     end
-    local ____temp_6
+    local ____temp_4
     if type(japi.DzGetGameUI) == "function" then
-        ____temp_6 = japi.DzGetGameUI()
+        ____temp_4 = japi.DzGetGameUI()
     else
-        ____temp_6 = 0
+        ____temp_4 = 0
     end
-    local gameUI = ____temp_6
+    local gameUI = ____temp_4
     local bg = createFrame(nil, {
         type = FrameType.BACKDROP,
         name = "DialogBG",
@@ -471,7 +512,46 @@ function createDialogFrames(self)
             japi.DzFrameSetTextAlignment(hintLabel, 5)
         end
     end
+    local dialogPriority = 180
+    dzSetPriority(nil, frames[1], dialogPriority)
+    dzSetPriority(nil, frames[2], dialogPriority)
+    dzSetPriority(nil, frames[3], dialogPriority)
+    dzSetPriority(nil, frames[4], dialogPriority)
+    dzSetPriority(nil, frames[5], dialogPriority)
+    dzSetPriority(nil, frames[6], dialogPriority)
+    dzSetPriority(nil, frames[7], dialogPriority)
+    dzSetPriority(nil, frames[8], dialogPriority)
+    dzSetPriority(nil, frames[9], dialogPriority)
+    dzSetPriority(nil, frames[10], dialogPriority)
+    dzSetPriority(nil, frames[11], dialogPriority)
+    dzSetPriority(nil, frames[12], dialogPriority)
+    dzSetPriority(nil, frames[102], dialogPriority)
+    dzSetPriority(nil, frames[103], dialogPriority)
+    dzSetPriority(nil, frames[104], dialogPriority)
     return frames
+end
+function bindQuestSyncHandlers(self, state)
+    if state.questSyncHandlersBound then
+        return
+    end
+    if not state.frames or #state.frames == 0 then
+        return
+    end
+    frameSetScriptByCode(
+        nil,
+        state.frames[7],
+        1,
+        questAcceptCallback,
+        true
+    )
+    frameSetScriptByCode(
+        nil,
+        state.frames[9],
+        1,
+        questRejectCallback,
+        true
+    )
+    state.questSyncHandlersBound = true
 end
 function showDialogFrames(self, state, visible)
     local localPlayer = dzGetLocalPlayer(nil)
@@ -538,6 +618,7 @@ function playEntry(self, state)
         dzLoadTocOnce(nil)
         state.frames = createDialogFrames(nil)
         state.initialized = true
+        bindQuestSyncHandlers(nil, state)
     end
     showDialogFrames(nil, state, true)
     if isFirstOpen then
@@ -545,22 +626,9 @@ function playEntry(self, state)
     end
     local entry = state.queue[1]
     if entry.isQuest and entry.questCallbacks then
-        local cb = entry.questCallbacks
-        g_questCallbackStore = {state = state, onAccept = cb.onAccept, onReject = cb.onReject}
-        frameSetScriptByCode(
-            nil,
-            state.frames[7],
-            1,
-            questAcceptCallback,
-            true
-        )
-        frameSetScriptByCode(
-            nil,
-            state.frames[9],
-            1,
-            questRejectCallback,
-            true
-        )
+        setActivePlayerId(nil, state.playerId)
+        g_questCallbacksByPlayer[state.playerId + 1] = {onAccept = entry.questCallbacks.onAccept, onReject = entry.questCallbacks.onReject}
+        setQuestButtonTexts(nil, state, entry.acceptText and entry.acceptText ~= "" and entry.acceptText or "接受任务", entry.rejectText and entry.rejectText ~= "" and entry.rejectText or "拒绝任务")
     end
     if not isLocal then
         state.strLen = dzStringLength(nil, entry.text)
@@ -710,6 +778,19 @@ function showQuestButtons(self, state, visible)
     dzShow(nil, state.frames[9], visible)
     dzShow(nil, state.frames[11], visible)
 end
+function setQuestButtonTexts(self, state, acceptText, rejectText)
+    local localPlayer = dzGetLocalPlayer(nil)
+    local targetPlayer = dzPlayer(nil, state.playerId)
+    if localPlayer ~= targetPlayer then
+        return
+    end
+    if state.frames[10] and state.frames[10] ~= 0 and type(japi.DzFrameSetText) == "function" then
+        japi.DzFrameSetText(state.frames[10], acceptText)
+    end
+    if state.frames[11] and state.frames[11] ~= 0 and type(japi.DzFrameSetText) == "function" then
+        japi.DzFrameSetText(state.frames[11], rejectText)
+    end
+end
 japi = require("jass.japi")
 jass = require("jass.common")
 DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
@@ -725,21 +806,18 @@ DEFAULT_BODY_FONT_SIZE = 0.012
 DEFAULT_BG_TEX = "UI\\wenbenkuang.blp"
 DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp"
 g_states = {}
-g_questCallbackStore = nil
+g_questCallbacksByPlayer = {}
 local _____G = _G
 _____G.QuestAcceptCallback = questAcceptCallback
 _____G.QuestRejectCallback = questRejectCallback
-local function dzGetPlayerId(self, p)
-    return type(jass.GetPlayerId) == "function" and jass.GetPlayerId(p) or -1
-end
 local function dzTimerCreate(self)
-    local ____temp_5
+    local ____temp_3
     if type(jass.CreateTimer) == "function" then
-        ____temp_5 = jass.CreateTimer()
+        ____temp_3 = jass.CreateTimer()
     else
-        ____temp_5 = nil
+        ____temp_3 = nil
     end
-    return ____temp_5
+    return ____temp_3
 end
 g_tocLoaded = false
 local function ensureState(self, playerId)
@@ -755,6 +833,7 @@ local function ensureState(self, playerId)
         strLen = 0,
         canShow = true,
         initialized = false,
+        questSyncHandlersBound = false,
         isActive = false,
         clickCooldown = false,
         waitingClick = false
@@ -764,6 +843,8 @@ local function ensureState(self, playerId)
 end
 local function clearState(self, state)
     dzTimerPause(nil, state.tickTimer)
+    resetActivePlayerIdIfMatch(nil, state.playerId)
+    g_questCallbacksByPlayer[state.playerId + 1] = nil
     state.queue = {}
     state.isActive = false
     state.waitingClick = false
@@ -788,19 +869,25 @@ local function enqueue(self, state, title, text, waitTime, leftTex, midTex, righ
         isQuest = false
     }
     local wasEmpty = #state.queue == 0
-    local ____state_queue_7 = state.queue
-    ____state_queue_7[#____state_queue_7 + 1] = entry
+    local ____state_queue_5 = state.queue
+    ____state_queue_5[#____state_queue_5 + 1] = entry
     if wasEmpty then
         playEntry(nil, state)
     end
 end
---- 初始化对话框系统（为全部玩家预创建状态，不创建帧）
--- 可在地图初始化时调用，也可以不调用（首次 display 时懒初始化）
+--- 初始化对话框系统（为全部玩家预创建状态与帧）
+-- 必须尽早调用，确保 sync=true 按钮帧句柄在各客户端一致。
 function ____exports.initDialogSystem(self)
+    dzLoadTocOnce(nil)
     do
         local i = 0
         while i < MAX_PLAYERS do
-            ensureState(nil, i)
+            local state = ensureState(nil, i)
+            if not state.initialized then
+                state.frames = createDialogFrames(nil)
+                state.initialized = true
+            end
+            bindQuestSyncHandlers(nil, state)
             i = i + 1
         end
     end
@@ -979,7 +1066,7 @@ end
 -- @param text 任务描述文本
 -- @param onAccept 点击接受任务的回调
 -- @param onReject 点击拒绝任务的回调
-function ____exports.displayQuest(self, p, title, text, onAccept, onReject)
+function ____exports.displayQuest(self, p, title, text, onAccept, onReject, acceptText, rejectText)
     local pid = dzGetPlayerId(nil, p)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
@@ -995,11 +1082,13 @@ function ____exports.displayQuest(self, p, title, text, onAccept, onReject)
         titleFontSize = DEFAULT_TITLE_FONT_SIZE,
         bodyFontSize = DEFAULT_BODY_FONT_SIZE,
         isQuest = true,
-        questCallbacks = {onAccept = onAccept, onReject = onReject}
+        questCallbacks = {onAccept = onAccept, onReject = onReject},
+        acceptText = acceptText,
+        rejectText = rejectText
     }
     local wasEmpty = #state.queue == 0
-    local ____state_queue_8 = state.queue
-    ____state_queue_8[#____state_queue_8 + 1] = entry
+    local ____state_queue_6 = state.queue
+    ____state_queue_6[#____state_queue_6 + 1] = entry
     if wasEmpty then
         playEntry(nil, state)
     end

@@ -31,6 +31,7 @@ const jass = require("jass.common") as any;
 import { createFrame, FrameType } from "../09．表现系统/01．UI工具";
 import { frameSetScriptByCode } from "../00．核心系统/04．硬件函数";
 import { Sound3DII_Mp3PlayReuse } from "../00．核心系统/02．音效函数";
+import { getActivePlayerId, resetActivePlayerIdIfMatch, setActivePlayerId } from "./04．NPC对话状态池";
 
 /** 对话框首次展开时的提示音效 */
 const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
@@ -101,6 +102,9 @@ interface DialogEntry {
     onAccept: () => void;
     onReject: () => void;
   };
+  /** 任务按钮文案（isQuest=true 时可选，默认 接受任务/拒绝任务） */
+  acceptText?: string;
+  rejectText?: string;
 }
 
 // ────────────────────────────────────────────────
@@ -124,6 +128,8 @@ interface PlayerDialogState {
   canShow: boolean;
   /** 系统是否已初始化帧 */
   initialized: boolean;
+  /** 任务按钮 sync=true 回调是否已绑定 */
+  questSyncHandlersBound: boolean;
   /** 对话框是否正在活跃播放（用于拒绝重复触发） */
   isActive: boolean;
   /** 对话框刚弹出的点击冷却（防止点NPC同时命中背景层） */
@@ -139,51 +145,59 @@ interface PlayerDialogState {
 // ────────────────────────────────────────────────
 
 const g_states: PlayerDialogState[] = [];
-
-// ────────────────────────────────────────────────
-// 全局临时存储区（用于 sync=true 的回调）
-// ────────────────────────────────────────────────
-
-interface QuestCallbackStore {
-  state: PlayerDialogState;
-  onAccept: () => void;
-  onReject: () => void;
-}
-
-let g_questCallbackStore: QuestCallbackStore | undefined = undefined;
+const g_questCallbacksByPlayer: Array<{ onAccept: () => void; onReject: () => void } | undefined> = [];
 
 // ────────────────────────────────────────────────
 // 全局回调函数（直接作为 frameSetScriptByCode 的回调参数）
 // ────────────────────────────────────────────────
 
-function questAcceptCallback(): void {
-  if (g_questCallbackStore) {
-    const { state, onAccept } = g_questCallbackStore;
-    state.queue.shift();
-    state.isActive = false;
-    const localPlayer = dzGetLocalPlayer();
-    const targetPlayer = dzPlayer(state.playerId);
-    if (localPlayer === targetPlayer) {
-      showQuestButtons(state, false);
-      showDialogFrames(state, false);
-    }
-    onAccept();
+function resolveQuestCallbackByTriggerPlayer(): { state: PlayerDialogState; onAccept: () => void; onReject: () => void } | undefined {
+  let pid = getActivePlayerId();
+  if (pid < 0 || pid >= MAX_PLAYERS) {
+    if (typeof japi.DzGetTriggerUIEventPlayer !== "function") return undefined;
+    const triggerPlayer = japi.DzGetTriggerUIEventPlayer();
+    pid = dzGetPlayerId(triggerPlayer);
   }
+  if (pid < 0 || pid >= MAX_PLAYERS) return undefined;
+  const state = g_states[pid];
+  if (!state) return undefined;
+  const cb = g_questCallbacksByPlayer[pid];
+  if (!cb) return undefined;
+  return { state, onAccept: cb.onAccept, onReject: cb.onReject };
+}
+
+function questAcceptCallback(): void {
+  const ctx = resolveQuestCallbackByTriggerPlayer();
+  if (!ctx) return;
+  const { state, onAccept } = ctx;
+  resetActivePlayerIdIfMatch(state.playerId);
+  g_questCallbacksByPlayer[state.playerId] = undefined;
+  state.queue.shift();
+  state.isActive = false;
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer === targetPlayer) {
+    showQuestButtons(state, false);
+    showDialogFrames(state, false);
+  }
+  onAccept();
 }
 
 function questRejectCallback(): void {
-  if (g_questCallbackStore) {
-    const { state, onReject } = g_questCallbackStore;
-    state.queue.shift();
-    state.isActive = false;
-    const localPlayer = dzGetLocalPlayer();
-    const targetPlayer = dzPlayer(state.playerId);
-    if (localPlayer === targetPlayer) {
-      showQuestButtons(state, false);
-      showDialogFrames(state, false);
-    }
-    onReject();
+  const ctx = resolveQuestCallbackByTriggerPlayer();
+  if (!ctx) return;
+  const { state, onReject } = ctx;
+  resetActivePlayerIdIfMatch(state.playerId);
+  g_questCallbacksByPlayer[state.playerId] = undefined;
+  state.queue.shift();
+  state.isActive = false;
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer === targetPlayer) {
+    showQuestButtons(state, false);
+    showDialogFrames(state, false);
   }
+  onReject();
 }
 
 // 把函数注册到全局 _G 上
@@ -216,6 +230,12 @@ function dzSetTexture(f: Frame, path: string): void {
 function dzSetAlpha(f: Frame, a: number): void {
   if (f && f !== 0 && typeof japi.DzFrameSetAlpha === "function") {
     japi.DzFrameSetAlpha(f, a);
+  }
+}
+
+function dzSetPriority(f: Frame, p: number): void {
+  if (f && f !== 0 && typeof japi.DzFrameSetPriority === "function") {
+    (pcall as any)(() => japi.DzFrameSetPriority(f, p));
   }
 }
 
@@ -549,6 +569,25 @@ function createDialogFrames(): Frame[] {
     }
   }
 
+  // 把对话框整体抬到较高优先级，避免被任务面板（J）覆盖
+  // 任务面板当前使用到较高层级（如滚动条/滑块）；这里统一给对话框主相关帧更高 priority。
+  const dialogPriority = 180;
+  dzSetPriority(frames[0], dialogPriority);
+  dzSetPriority(frames[1], dialogPriority);
+  dzSetPriority(frames[2], dialogPriority);
+  dzSetPriority(frames[3], dialogPriority);
+  dzSetPriority(frames[4], dialogPriority);
+  dzSetPriority(frames[5], dialogPriority);
+  dzSetPriority(frames[6], dialogPriority);
+  dzSetPriority(frames[7], dialogPriority);
+  dzSetPriority(frames[8], dialogPriority);
+  dzSetPriority(frames[9], dialogPriority);
+  dzSetPriority(frames[10], dialogPriority);
+  dzSetPriority(frames[11], dialogPriority);
+  dzSetPriority(frames[101], dialogPriority);
+  dzSetPriority(frames[102], dialogPriority);
+  dzSetPriority(frames[103], dialogPriority);
+
   return frames;
 }
 
@@ -568,12 +607,22 @@ function ensureState(playerId: number): PlayerDialogState {
     strLen: 0,
     canShow: true,
     initialized: false,
+    questSyncHandlersBound: false,
     isActive: false,
     clickCooldown: false,
     waitingClick: false,
   };
   g_states[playerId] = state;
   return state;
+}
+
+function bindQuestSyncHandlers(state: PlayerDialogState): void {
+  if (state.questSyncHandlersBound) return;
+  if (!state.frames || state.frames.length === 0) return;
+  // sync=true 回调必须在全端一致链路里绑定；优先在 initDialogSystem() 统一绑定
+  frameSetScriptByCode(state.frames[6], 1, questAcceptCallback, true);
+  frameSetScriptByCode(state.frames[8], 1, questRejectCallback, true);
+  state.questSyncHandlersBound = true;
 }
 
 // ────────────────────────────────────────────────
@@ -624,6 +673,8 @@ function showDialogFrames(state: PlayerDialogState, visible: boolean): void {
 
 function clearState(state: PlayerDialogState): void {
   dzTimerPause(state.tickTimer);
+  resetActivePlayerIdIfMatch(state.playerId);
+  g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue = [];
   state.isActive = false;
   state.waitingClick = false;
@@ -658,6 +709,7 @@ function playEntry(state: PlayerDialogState): void {
     dzLoadTocOnce();
     state.frames = createDialogFrames();
     state.initialized = true;
+    bindQuestSyncHandlers(state);
   }
 
   showDialogFrames(state, true);
@@ -670,12 +722,16 @@ function playEntry(state: PlayerDialogState): void {
   // 任务模式：预注册接受/拒绝按钮回调（所有玩家都执行，确保 sync=true 能正常工作）
   const entry = state.queue[0];
   if (entry.isQuest && entry.questCallbacks) {
-    const cb = entry.questCallbacks;
-    // 先保存状态和回调到全局存储区
-    g_questCallbackStore = { state, onAccept: cb.onAccept, onReject: cb.onReject };
-    // 必须用全局函数引用（sync=true），闭包会导致 desync！
-    frameSetScriptByCode(state.frames[6], 1, questAcceptCallback, true);
-    frameSetScriptByCode(state.frames[8], 1, questRejectCallback, true);
+    setActivePlayerId(state.playerId);
+    g_questCallbacksByPlayer[state.playerId] = {
+      onAccept: entry.questCallbacks.onAccept,
+      onReject: entry.questCallbacks.onReject,
+    };
+    setQuestButtonTexts(
+      state,
+      entry.acceptText && entry.acceptText !== "" ? entry.acceptText : "接受任务",
+      entry.rejectText && entry.rejectText !== "" ? entry.rejectText : "拒绝任务",
+    );
   }
 
   if (!isLocal) {
@@ -842,6 +898,18 @@ function showQuestButtons(state: PlayerDialogState, visible: boolean): void {
   dzShow(state.frames[10], visible); // 拒绝文字标签
 }
 
+function setQuestButtonTexts(state: PlayerDialogState, acceptText: string, rejectText: string): void {
+  const localPlayer = dzGetLocalPlayer();
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer !== targetPlayer) return;
+  if (state.frames[9] && state.frames[9] !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(state.frames[9], acceptText);
+  }
+  if (state.frames[10] && state.frames[10] !== 0 && typeof japi.DzFrameSetText === "function") {
+    japi.DzFrameSetText(state.frames[10], rejectText);
+  }
+}
+
 // ────────────────────────────────────────────────
 // 内部：入队并在首次入队时触发播放
 // ────────────────────────────────────────────────
@@ -870,12 +938,18 @@ function enqueue(
 // ────────────────────────────────────────────────
 
 /**
- * 初始化对话框系统（为全部玩家预创建状态，不创建帧）
- * 可在地图初始化时调用，也可以不调用（首次 display 时懒初始化）
+ * 初始化对话框系统（为全部玩家预创建状态与帧）
+ * 必须尽早调用，确保 sync=true 按钮帧句柄在各客户端一致。
  */
 export function initDialogSystem(): void {
+  dzLoadTocOnce();
   for (let i = 0; i < MAX_PLAYERS; i++) {
-    ensureState(i);
+    const state = ensureState(i);
+    if (!state.initialized) {
+      state.frames = createDialogFrames();
+      state.initialized = true;
+    }
+    bindQuestSyncHandlers(state);
   }
 }
 
@@ -1037,6 +1111,8 @@ export function displayQuest(
   text: string,
   onAccept: () => void,
   onReject: () => void,
+  acceptText?: string,
+  rejectText?: string,
 ): void {
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return;
@@ -1052,6 +1128,8 @@ export function displayQuest(
     bodyFontSize: DEFAULT_BODY_FONT_SIZE,
     isQuest: true,
     questCallbacks: { onAccept, onReject },
+    acceptText,
+    rejectText,
   };
   const wasEmpty = state.queue.length === 0;
   state.queue.push(entry);
