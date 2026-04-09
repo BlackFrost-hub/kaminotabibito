@@ -4,6 +4,8 @@ local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____03_FF0ENPC_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.03．NPC配置表")
 local NPC_CONFIGS = ____03_FF0ENPC_914D_7F6E_8868.NPC_CONFIGS
+local ____00_FF0E_5355_4F4D_76F8_5173 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local createUnitWithOptions = ____00_FF0E_5355_4F4D_76F8_5173.createUnitWithOptions
 --- NPC生成器 - 根据NPC配置表统一创建NPC
 local jass = require("jass.common")
 local _print = _G.print
@@ -12,49 +14,44 @@ local _print = _G.print
 -- @param npcConfig NPC配置数据
 -- @returns 创建的单位，失败返回null
 local function createSingleNPC(self, npcConfig)
-    if not npcConfig.unitCode or not npcConfig.X or not npcConfig.Y then
+    if not npcConfig.unitcode or npcConfig.X == nil or npcConfig.Y == nil then
         _print(
             nil,
-            "[NPC生成器] 配置不完整，跳过: " .. tostring(npcConfig.NpcName)
+            "[NPC生成器] 配置不完整，跳过: " .. tostring(npcConfig.NpcNameID)
         )
         return nil
     end
-    local unitCode = npcConfig.unitCode
+    local unitCode = npcConfig.unitcode
     if #unitCode ~= 4 then
         _print(nil, "[NPC生成器] 单位代码无效: " .. unitCode)
         return nil
     end
-    local bytes = {
-        string.byte(unitCode, 1) or 0 / 0,
-        string.byte(unitCode, 2) or 0 / 0,
-        string.byte(unitCode, 3) or 0 / 0,
-        string.byte(unitCode, 4) or 0 / 0
-    }
-    local unitId = bytes[1] * 16777216 + bytes[2] * 65536 + bytes[3] * 256 + bytes[4]
-    local neutralPlayer = jass.Player(15)
-    local unit = jass.CreateUnit(
-        neutralPlayer,
-        unitId,
+    local facingDeg = npcConfig.Facing or 270
+    local facingRad = facingDeg * math.pi / 180
+    local unit = createUnitWithOptions(
+        nil,
+        15,
+        unitCode,
         npcConfig.X,
         npcConfig.Y,
-        npcConfig.Facing or 270
+        facingRad
     )
     if not unit then
         _print(
             nil,
-            ((("[NPC生成器] 创建单位失败: " .. tostring(npcConfig.NpcName)) .. " (") .. unitCode) .. ")"
+            ((("[NPC生成器] 创建单位失败: " .. tostring(npcConfig.NpcNameID)) .. " (") .. unitCode) .. ")"
         )
         return nil
     end
-    if npcConfig.NpcName and type(jass.SetUnitName) == "function" then
-        jass.SetUnitName(unit, npcConfig.NpcName)
+    if npcConfig.NPCrequireName and type(jass.SetUnitName) == "function" then
+        jass.SetUnitName(unit, npcConfig.NPCrequireName)
     end
     if npcConfig.modelFIle and type(jass.SetUnitModel) == "function" then
         jass.SetUnitModel(unit, npcConfig.modelFIle)
     end
     _print(
         nil,
-        ((((("[NPC生成器] 成功创建NPC: " .. tostring(npcConfig.NpcName)) .. " at (") .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"
+        ((((("[NPC生成器] 成功创建NPC: " .. tostring(npcConfig.NpcNameID)) .. " at (") .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"
     )
     return unit
 end
@@ -86,7 +83,7 @@ end
 function ____exports.createNPCByName(self, npcName)
     local npcConfig = __TS__ArrayFind(
         NPC_CONFIGS,
-        function(____, npc) return npc.NpcName == npcName end
+        function(____, npc) return npc.NpcNameID == npcName or npc.NPCrequireName == npcName end
     )
     if not npcConfig then
         _print(nil, "[NPC生成器] 未找到NPC配置: " .. npcName)
@@ -117,7 +114,7 @@ function ____exports.createNPCByQuestId(self, requireID)
     if npcConfig.enabled ~= true then
         _print(
             nil,
-            ((("[NPC生成器] NPC未启用: " .. tostring(npcConfig.NpcName)) .. " (任务ID: ") .. tostring(requireID)) .. ")"
+            ((("[NPC生成器] NPC未启用: " .. tostring(npcConfig.NpcNameID)) .. " (任务ID: ") .. tostring(requireID)) .. ")"
         )
         return nil
     end

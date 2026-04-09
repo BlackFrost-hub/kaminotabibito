@@ -82,7 +82,7 @@ function ____exports.buildDialogData(self, npcName, heroName)
     if not dialogConfig then
         return {lines = {{title = npcName, text = "你好，有什么可以帮你的吗？", duration = 3}}}
     end
-    return {lines = ____exports.parseDialogText(nil, dialogConfig.text or "", npcName, heroName)}
+    return {lines = ____exports.parseDialogText(nil, dialogConfig.Text or "", npcName, heroName)}
 end
 function ____exports.buildQuestCompletedDialog(self, quest, npcName)
     local msg = quest.afterCompleteDialog or quest.NpcCompleteText or DEFAULT_AFTER_COMPLETE_MSG
@@ -286,8 +286,8 @@ function ____exports.getVillageChiefDialog(self)
         config = findDialogConfig(nil, "精灵村NPC001")
     end
     if config then
-        local npcName = config.npc or "NPC"
-        return {lines = ____exports.parseDialogText(nil, config.text or "", npcName, "你")}
+        local npcName = config.NPC or "NPC"
+        return {lines = ____exports.parseDialogText(nil, config.Text or "", npcName, "你")}
     end
     return {
         lines = {{title = "村长", text = "年轻人，我们村子最近遭到了哥布林的袭击……", duration = 4}, {title = "村长", text = "听说你武艺高强，能否帮我们解决这个麻烦？", duration = 3}},

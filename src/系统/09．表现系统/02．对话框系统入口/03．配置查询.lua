@@ -16,12 +16,12 @@ end
 function ____exports.findDialogConfig(self, npcName)
     return __TS__ArrayFind(
         DIALOG_NPC_CONFIGS,
-        function(____, config) return config.npc == npcName end
+        function(____, config) return config.NPC == npcName end
     )
 end
 function ____exports.findNpcConfigByUnitName(self, unitName)
     for ____, npc in ipairs(NPC_CONFIGS) do
-        if npc.NpcName == unitName then
+        if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
             return npc
         end
     end

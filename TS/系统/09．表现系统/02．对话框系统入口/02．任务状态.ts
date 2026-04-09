@@ -16,9 +16,9 @@ export function ensureQuestConfigsRegistered(): void {
 
     let iconPath = "";
     if (cfg.startNpc) {
-      const npcCfg = NPC_CONFIGS.find(n => n.NpcName === cfg.startNpc);
-      if (npcCfg && npcCfg.unitCode) {
-        iconPath = getObjectProperty(ObjectType.UNIT, npcCfg.unitCode, "Art");
+      const npcCfg = NPC_CONFIGS.find(n => n.NPCrequireName === cfg.startNpc || n.NpcNameID === cfg.startNpc);
+      if (npcCfg && npcCfg.unitcode) {
+        iconPath = getObjectProperty(ObjectType.UNIT, npcCfg.unitcode, "Art");
       }
     }
 

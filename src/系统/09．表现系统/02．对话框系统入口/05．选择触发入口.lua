@@ -54,12 +54,13 @@ function ____exports.initDialogEntrySelectionTrigger(self)
             end
             local unitName = jass.GetUnitName(u)
             local npcConfig = findNpcConfigByUnitName(nil, unitName)
-            if npcConfig and npcConfig.NpcName then
-                local quest = findQuestByNpc(nil, npcConfig.NpcName)
+            local npcName = npcConfig and npcConfig.NPCrequireName or npcConfig and npcConfig.NpcNameID
+            if npcConfig and npcName then
+                local quest = findQuestByNpc(nil, npcName)
                 if quest and quest.requireID then
                     local questIdStr = tostring(quest.requireID)
                     if hasPlayerCompletedQuest(nil, playerId, questIdStr) and not quest.repeatable then
-                        local dialogData = buildQuestCompletedDialog(nil, quest, npcConfig.NpcName)
+                        local dialogData = buildQuestCompletedDialog(nil, quest, npcName)
                         openNpcDialog(
                             nil,
                             triggerPlayer,
@@ -68,7 +69,7 @@ function ____exports.initDialogEntrySelectionTrigger(self)
                         return
                     end
                     if hasPlayerAcceptedQuest(nil, playerId, questIdStr) then
-                        local dialogData = buildQuestInProgressDialog(nil, quest, npcConfig.NpcName, playerId)
+                        local dialogData = buildQuestInProgressDialog(nil, quest, npcName, playerId)
                         openNpcDialog(
                             nil,
                             triggerPlayer,
@@ -76,7 +77,7 @@ function ____exports.initDialogEntrySelectionTrigger(self)
                         )
                         return
                     end
-                    local dialogData = buildQuestOfferDialog(nil, quest, npcConfig.NpcName, playerId)
+                    local dialogData = buildQuestOfferDialog(nil, quest, npcName, playerId)
                     openNpcDialog(
                         nil,
                         triggerPlayer,
@@ -85,7 +86,7 @@ function ____exports.initDialogEntrySelectionTrigger(self)
                     return
                 end
                 local heroName = jass.GetUnitName(hero)
-                local dialogData = buildDialogData(nil, npcConfig.NpcName, heroName)
+                local dialogData = buildDialogData(nil, npcName, heroName)
                 if dialogData then
                     openNpcDialog(
                         nil,

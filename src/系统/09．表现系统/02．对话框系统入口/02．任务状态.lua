@@ -36,10 +36,10 @@ function ____exports.ensureQuestConfigsRegistered(self)
                 if cfg.startNpc then
                     local npcCfg = __TS__ArrayFind(
                         NPC_CONFIGS,
-                        function(____, n) return n.NpcName == cfg.startNpc end
+                        function(____, n) return n.NPCrequireName == cfg.startNpc or n.NpcNameID == cfg.startNpc end
                     )
-                    if npcCfg and npcCfg.unitCode then
-                        iconPath = getObjectProperty(nil, ObjectType.UNIT, npcCfg.unitCode, "Art")
+                    if npcCfg and npcCfg.unitcode then
+                        iconPath = getObjectProperty(nil, ObjectType.UNIT, npcCfg.unitcode, "Art")
                     end
                 end
                 questDB:registerQuest({

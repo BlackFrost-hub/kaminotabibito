@@ -8,12 +8,12 @@ export function findQuestByNpc(npcName: string): QuestConfig | undefined {
 }
 
 export function findDialogConfig(npcName: string): DialogNPCData | undefined {
-  return DIALOG_NPC_CONFIGS.find(config => config.npc === npcName);
+  return DIALOG_NPC_CONFIGS.find(config => config.NPC === npcName);
 }
 
 export function findNpcConfigByUnitName(unitName: string): NPCData | null {
   for (const npc of NPC_CONFIGS) {
-    if (npc.NpcName === unitName) return npc;
+    if (npc.NPCrequireName === unitName || npc.NpcNameID === unitName) return npc;
   }
   return null;
 }

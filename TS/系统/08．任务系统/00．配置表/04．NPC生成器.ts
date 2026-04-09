@@ -6,6 +6,7 @@ const jass = require("jass.common") as any;
 
 // 引入NPC配置表
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
+import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
 
 // 获取全局print函数
 const _print = (globalThis as any).print as (...args: any[]) => void;
@@ -16,39 +17,31 @@ const _print = (globalThis as any).print as (...args: any[]) => void;
  * @returns 创建的单位，失败返回null
  */
 function createSingleNPC(npcConfig: NPCData): any {
-  if (!npcConfig.unitCode || !npcConfig.X || !npcConfig.Y) {
-    _print("[NPC生成器] 配置不完整，跳过: " + tostring(npcConfig.NpcName));
+  if (!npcConfig.unitcode || npcConfig.X == null || npcConfig.Y == null) {
+    _print("[NPC生成器] 配置不完整，跳过: " + tostring(npcConfig.NpcNameID));
     return null;
   }
 
   // 计算FourCC
-  const unitCode = npcConfig.unitCode;
+  const unitCode = npcConfig.unitcode;
   if (unitCode.length !== 4) {
     _print("[NPC生成器] 单位代码无效: " + unitCode);
     return null;
   }
 
-  const bytes = [
-    unitCode.charCodeAt(0),
-    unitCode.charCodeAt(1),
-    unitCode.charCodeAt(2),
-    unitCode.charCodeAt(3),
-  ];
-  const unitId = bytes[0] * 16777216 + bytes[1] * 65536 + bytes[2] * 256 + bytes[3];
-
-  // 创建单位 (使用中立被动玩家 Player 15)
-  // 所有生成的NPC默认为中立被动阵营，不会主动攻击玩家或被玩家攻击
-  const neutralPlayer = jass.Player(15);
-  const unit = jass.CreateUnit(neutralPlayer, unitId, npcConfig.X, npcConfig.Y, npcConfig.Facing || 270);
+  // 使用统一扩展函数创建：按配置坐标与朝向生成（函数朝向参数为弧度）
+  const facingDeg = npcConfig.Facing ?? 270;
+  const facingRad = facingDeg * Math.PI / 180;
+  const unit = createUnitWithOptions(15, unitCode, npcConfig.X, npcConfig.Y, facingRad);
 
   if (!unit) {
-    _print("[NPC生成器] 创建单位失败: " + tostring(npcConfig.NpcName) + " (" + unitCode + ")");
+    _print("[NPC生成器] 创建单位失败: " + tostring(npcConfig.NpcNameID) + " (" + unitCode + ")");
     return null;
   }
 
   // 设置单位名称
-  if (npcConfig.NpcName && typeof jass.SetUnitName === "function") {
-    jass.SetUnitName(unit, npcConfig.NpcName);
+  if (npcConfig.NPCrequireName && typeof jass.SetUnitName === "function") {
+    jass.SetUnitName(unit, npcConfig.NPCrequireName);
   }
 
   // 设置模型文件（如果配置了）
@@ -56,7 +49,7 @@ function createSingleNPC(npcConfig: NPCData): any {
     jass.SetUnitModel(unit, npcConfig.modelFIle);
   }
 
-  _print("[NPC生成器] 成功创建NPC: " + tostring(npcConfig.NpcName) + " at (" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")");
+  _print("[NPC生成器] 成功创建NPC: " + tostring(npcConfig.NpcNameID) + " at (" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")");
   return unit;
 }
 
@@ -91,7 +84,7 @@ export function initializeNPCs(): void {
  * @returns 创建的单位，失败返回null
  */
 export function createNPCByName(npcName: string): any {
-  const npcConfig = NPC_CONFIGS.find(npc => npc.NpcName === npcName);
+  const npcConfig = NPC_CONFIGS.find(npc => npc.NpcNameID === npcName || npc.NPCrequireName === npcName);
 
   if (!npcConfig) {
     _print("[NPC生成器] 未找到NPC配置: " + npcName);
@@ -120,7 +113,7 @@ export function createNPCByQuestId(requireID: number): any {
   }
 
   if (npcConfig.enabled !== true) {
-    _print("[NPC生成器] NPC未启用: " + tostring(npcConfig.NpcName) + " (任务ID: " + tostring(requireID) + ")");
+    _print("[NPC生成器] NPC未启用: " + tostring(npcConfig.NpcNameID) + " (任务ID: " + tostring(requireID) + ")");
     return null;
   }
 

@@ -42,27 +42,28 @@ export function initDialogEntrySelectionTrigger(): void {
     const unitName = jass.GetUnitName(u);
     const npcConfig = findNpcConfigByUnitName(unitName);
 
-    if (npcConfig && npcConfig.NpcName) {
-      const quest = findQuestByNpc(npcConfig.NpcName);
+    const npcName = npcConfig?.NPCrequireName || npcConfig?.NpcNameID;
+    if (npcConfig && npcName) {
+      const quest = findQuestByNpc(npcName);
       if (quest && quest.requireID) {
         const questIdStr = quest.requireID.toString();
         if (hasPlayerCompletedQuest(playerId, questIdStr) && !quest.repeatable) {
-          const dialogData = buildQuestCompletedDialog(quest, npcConfig.NpcName);
+          const dialogData = buildQuestCompletedDialog(quest, npcName);
           openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
           return;
         }
         if (hasPlayerAcceptedQuest(playerId, questIdStr)) {
-          const dialogData = buildQuestInProgressDialog(quest, npcConfig.NpcName, playerId);
+          const dialogData = buildQuestInProgressDialog(quest, npcName, playerId);
           openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
           return;
         }
-        const dialogData = buildQuestOfferDialog(quest, npcConfig.NpcName, playerId);
+        const dialogData = buildQuestOfferDialog(quest, npcName, playerId);
         openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
         return;
       }
 
       const heroName = jass.GetUnitName(hero);
-      const dialogData = buildDialogData(npcConfig.NpcName, heroName);
+      const dialogData = buildDialogData(npcName, heroName);
       if (dialogData) {
         openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
         return;

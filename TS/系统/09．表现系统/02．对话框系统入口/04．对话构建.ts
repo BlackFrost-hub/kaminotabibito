@@ -56,7 +56,7 @@ export function buildDialogData(npcName: string, heroName: string): NpcDialogDat
   if (!dialogConfig) {
     return { lines: [{ title: npcName, text: "你好，有什么可以帮你的吗？", duration: 3 }] };
   }
-  return { lines: parseDialogText(dialogConfig.text || "", npcName, heroName) };
+  return { lines: parseDialogText(dialogConfig.Text || "", npcName, heroName) };
 }
 
 export function buildQuestCompletedDialog(quest: QuestConfig, npcName: string): NpcDialogData {
@@ -203,8 +203,8 @@ export function getVillageChiefDialog(): NpcDialogData {
   let config = findDialogConfig("村长");
   if (!config) config = findDialogConfig("精灵村NPC001");
   if (config) {
-    const npcName = config.npc || "NPC";
-    return { lines: parseDialogText(config.text || "", npcName, "你") };
+    const npcName = config.NPC || "NPC";
+    return { lines: parseDialogText(config.Text || "", npcName, "你") };
   }
   return {
     lines: [
