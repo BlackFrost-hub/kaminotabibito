@@ -2,19 +2,15 @@ const jass = require("jass.common") as any;
 const UI函数 = require("系统.00．核心系统.06．UI函数") as {
   openNpcDialog: (player: any, data: any) => void;
 };
-const 便捷函数 = require("系统.00．核心系统.11．便捷函数（偶尔用）") as {
-  getPlayerFirstHero: (player: any) => any;
-};
 
-import { UNIT_ID_NGME } from "./01．常量与工具";
 import { ensureQuestConfigsRegistered, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./02．任务状态";
-import { findNpcConfigByUnitName, findQuestByNpc } from "./03．配置查询";
+import { findAcceptedQuestBySubmitNpc, findNpcConfigByUnitName, findQuestByNpc } from "./03．配置查询";
+import { getPlayerFirstHero } from "./08．任务奖励执行";
 import {
   buildDialogData,
   buildQuestCompletedDialog,
   buildQuestInProgressDialog,
   buildQuestOfferDialog,
-  getVillageChiefDialog,
 } from "./04．对话构建";
 
 const { openNpcDialog } = UI函数;
@@ -32,10 +28,9 @@ export function initDialogEntrySelectionTrigger(): void {
     const u = jass.GetTriggerUnit();
     if (!u) return;
 
-    const unitTypeId = jass.GetUnitTypeId(u);
     const triggerPlayer = jass.GetTriggerPlayer();
     const playerId = jass.GetPlayerId(triggerPlayer);
-    const hero = 便捷函数.getPlayerFirstHero(triggerPlayer);
+    const hero = getPlayerFirstHero(triggerPlayer);
     if (!hero) return;
     if (!jass.IsUnitInRange(hero, u, 350)) return;
 
@@ -44,6 +39,13 @@ export function initDialogEntrySelectionTrigger(): void {
 
     const npcName = npcConfig?.NPCrequireName || npcConfig?.NpcNameID;
     if (npcConfig && npcName) {
+      const acceptedQuest = findAcceptedQuestBySubmitNpc(npcName);
+      if (acceptedQuest && acceptedQuest.requireID) {
+        const acceptedDialog = buildQuestInProgressDialog(acceptedQuest, npcName, playerId, u);
+        openNpcDialog(triggerPlayer, { ...acceptedDialog, npcUnit: u });
+        return;
+      }
+
       const quest = findQuestByNpc(npcName);
       if (quest && quest.requireID) {
         const questIdStr = quest.requireID.toString();
@@ -53,7 +55,7 @@ export function initDialogEntrySelectionTrigger(): void {
           return;
         }
         if (hasPlayerAcceptedQuest(playerId, questIdStr)) {
-          const dialogData = buildQuestInProgressDialog(quest, npcName, playerId);
+          const dialogData = buildQuestInProgressDialog(quest, npcName, playerId, u);
           openNpcDialog(triggerPlayer, { ...dialogData, npcUnit: u });
           return;
         }
@@ -70,8 +72,6 @@ export function initDialogEntrySelectionTrigger(): void {
       }
     }
 
-    if (unitTypeId !== UNIT_ID_NGME) return;
-    openNpcDialog(triggerPlayer, { ...getVillageChiefDialog(), npcUnit: u });
   });
 }
 

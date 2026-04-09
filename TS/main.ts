@@ -46,10 +46,12 @@ require("系统.00．核心系统.05．泄露审计");
 require("lib.扩展函数.02．YDWE函数");
 require("系统.00．核心系统.13．镜头函数");
 require("系统.00．核心系统.14．颜色常量");
+require("系统.00．核心系统.15．数学函数");
 
 // ---------- 扩展函数 ----------
 require("lib.扩展函数.00．条件判断函数");
 require("lib.扩展函数.03．BJ函数");
+require("lib.扩展函数.物品相关函数.物品函数入口");
 
 // ---------- 01．单位系统 ----------
 require("系统.01．单位系统.单位狂暴");
@@ -106,13 +108,9 @@ require("系统.08．任务系统.08．任务目标更新");
 const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
 if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
 require("系统.00．核心系统.06．UI函数");
-require("系统.00．核心系统.11．便捷函数（偶尔用）");
 require("系统.09．表现系统.01．UI工具.index");
 require("系统.09．表现系统.02．垂直滚动条轨道");
-require("系统.09．表现系统.02．对话框系统入口.index");
-require("系统.09．表现系统.04．NPC对话状态池");
-const 对话框UI = require("系统.09．表现系统.03．对话框系统.00．对话框UI入口") as { initDialogSystem: () => void };
-if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
+require("系统.09．表现系统.02．对话框系统入口.00．对话框系统入口");
 // 任务 UI 模块（显式加载，便于打包与排查）
 require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量");
 require("系统.08．任务系统.03．任务UI拆分.02．任务UI辅助");

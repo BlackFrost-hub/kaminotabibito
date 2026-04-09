@@ -2,32 +2,33 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
-local __TS__StringStartsWith = ____lualib.__TS__StringStartsWith
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__StringCharAt = ____lualib.__TS__StringCharAt
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local ____03_FF0EBJ_51FD_6570 = require("lib.扩展函数.03．BJ函数")
-local GetItemTypeCountInUnitBJ = ____03_FF0EBJ_51FD_6570.GetItemTypeCountInUnitBJ
-local RemoveItemTypeFromUnitBJ = ____03_FF0EBJ_51FD_6570.RemoveItemTypeFromUnitBJ
-local ____02_FF0EYDWE_51FD_6570 = require("lib.扩展函数.02．YDWE函数")
-local getItemName = ____02_FF0EYDWE_51FD_6570.getItemName
 local ____03_FF0E_4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
 local taskUI = ____03_FF0E_4EFB_52A1UI.taskUI
 local ____01_FF0E_5E38_91CF_4E0E_5DE5_5177 = require("系统.09．表现系统.02．对话框系统入口.01．常量与工具")
 local DEFAULT_AFTER_COMPLETE_MSG = ____01_FF0E_5E38_91CF_4E0E_5DE5_5177.DEFAULT_AFTER_COMPLETE_MSG
 local DEFAULT_QUEST_ACCEPTED_MSG = ____01_FF0E_5E38_91CF_4E0E_5DE5_5177.DEFAULT_QUEST_ACCEPTED_MSG
 local calculateFourCC = ____01_FF0E_5E38_91CF_4E0E_5DE5_5177.calculateFourCC
-local giveQuestReward = ____01_FF0E_5E38_91CF_4E0E_5DE5_5177.giveQuestReward
 local showLocalHint = ____01_FF0E_5E38_91CF_4E0E_5DE5_5177.showLocalHint
 local ____03_FF0E_914D_7F6E_67E5_8BE2 = require("系统.09．表现系统.02．对话框系统入口.03．配置查询")
 local findDialogConfig = ____03_FF0E_914D_7F6E_67E5_8BE2.findDialogConfig
 local ____02_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统入口.02．任务状态")
 local hasPlayerAcceptedQuest = ____02_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
 local setQuestState = ____02_FF0E_4EFB_52A1_72B6_6001.setQuestState
+local ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C = require("系统.09．表现系统.02．对话框系统入口.08．任务奖励执行")
+local getPlayerFirstHero = ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C.getPlayerFirstHero
+local ____07_FF0E_4EFB_52A1_63D0_4EA4_6D41_7A0B = require("系统.09．表现系统.02．对话框系统入口.07．任务提交流程")
+local handleQuestSubmit = ____07_FF0E_4EFB_52A1_63D0_4EA4_6D41_7A0B.handleQuestSubmit
+local ____09_FF0E_4EFB_52A1_5C55_793A_6587_6848 = require("系统.09．表现系统.02．对话框系统入口.09．任务展示文案")
+local resolveRewardDisplayText = ____09_FF0E_4EFB_52A1_5C55_793A_6587_6848.resolveRewardDisplayText
 local jass = require("jass.common")
 local ____UI_51FD_6570 = require("系统.00．核心系统.06．UI函数")
-local _____4FBF_6377_51FD_6570 = require("系统.00．核心系统.11．便捷函数（偶尔用）")
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
+local function normalizeRequireCount(self, count)
+    return count ~= nil and count > 1 and count or 1
+end
 local function refreshTaskUIForAllClientsSoon(self)
     local t = jass.CreateTimer()
     jass.TimerStart(
@@ -42,35 +43,135 @@ local function refreshTaskUIForAllClientsSoon(self)
         end
     )
 end
+local function grantQuestItems(self, hero, questItems)
+    if not hero or not questItems or questItems == "" then
+        return
+    end
+    if type(jass.UnitAddItemById) ~= "function" then
+        return
+    end
+    local items = __TS__StringSplit(questItems, "|")
+    for ____, raw in ipairs(items) do
+        do
+            local __continue9
+            repeat
+                local itemCode = __TS__StringTrim(raw)
+                if #itemCode ~= 4 then
+                    __continue9 = true
+                    break
+                end
+                local itemId = calculateFourCC(nil, itemCode)
+                if itemId == 0 then
+                    __continue9 = true
+                    break
+                end
+                jass.UnitAddItemById(hero, itemId)
+                __continue9 = true
+            until true
+            if not __continue9 then
+                break
+            end
+        end
+    end
+end
+local function canAcceptQuestByRequirements(self, quest, hero)
+    local req = quest.requirements
+    if not req or req == "" then
+        return true
+    end
+    local markerA = "英雄等级<"
+    local markerB = "英雄等级＜"
+    local pos = (string.find(req, markerA, nil, true) or 0) - 1
+    local offset = #markerA
+    if pos < 0 then
+        pos = (string.find(req, markerB, nil, true) or 0) - 1
+        offset = #markerB
+    end
+    if pos < 0 then
+        return true
+    end
+    local raw = __TS__StringTrim(__TS__StringSubstring(req, pos + offset))
+    local digits = ""
+    do
+        local i = 0
+        while i < #raw do
+            local ch = __TS__StringCharAt(raw, i)
+            if ch >= "0" and ch <= "9" then
+                digits = digits .. ch
+            else
+                break
+            end
+            i = i + 1
+        end
+    end
+    if digits == "" then
+        return true
+    end
+    local limit = __TS__Number(digits)
+    if not hero or type(jass.GetHeroLevel) ~= "function" then
+        return false
+    end
+    local level = jass.GetHeroLevel(hero)
+    return level < limit
+end
+local function getQuestRewardDisplayText(self, quest)
+    return resolveRewardDisplayText(nil, quest)
+end
 function ____exports.parseDialogText(self, raw, npcName, heroName)
     local lines = {}
     local parts = __TS__StringSplit(raw, "\n")
+    local function trimOrderedPrefix(self, s)
+        local i = 0
+        while i < #s do
+            local ch = __TS__StringCharAt(s, i)
+            if ch < "0" or ch > "9" then
+                break
+            end
+            i = i + 1
+        end
+        if i > 0 and i < #s and __TS__StringCharAt(s, i) == "." then
+            return __TS__StringTrim(__TS__StringSubstring(s, i + 1))
+        end
+        return s
+    end
+    local function tryParseSpeakerLine(self, s)
+        local colonIdx = (string.find(s, "：", nil, true) or 0) - 1 >= 0 and (string.find(s, "：", nil, true) or 0) - 1 or (string.find(s, ":", nil, true) or 0) - 1
+        if colonIdx <= 0 then
+            return nil
+        end
+        local speakerRaw = __TS__StringTrim(__TS__StringSubstring(s, 0, colonIdx))
+        local textRaw = __TS__StringTrim(__TS__StringSubstring(s, colonIdx + 1))
+        if textRaw == "" then
+            return nil
+        end
+        if speakerRaw == "NPC" then
+            return {title = npcName, text = textRaw}
+        end
+        if speakerRaw == "Player" then
+            return {title = heroName, text = textRaw}
+        end
+        return {title = speakerRaw, text = textRaw}
+    end
     for ____, part in ipairs(parts) do
         do
-            local __continue6
+            local __continue34
             repeat
                 local trimmed = __TS__StringTrim(part)
                 if not trimmed then
-                    __continue6 = true
+                    __continue34 = true
                     break
                 end
-                local dotIndex = (string.find(trimmed, ".", nil, true) or 0) - 1
-                if dotIndex > 0 then
-                    local rest = __TS__StringSubstring(trimmed, dotIndex + 1)
-                    local colonIndex = (string.find(rest, "：", nil, true) or 0) - 1
-                    if colonIndex > 0 then
-                        local speaker = __TS__StringSubstring(rest, 0, colonIndex)
-                        local text = __TS__StringSubstring(rest, colonIndex + 1)
-                        local title = speaker == "NPC" and npcName or (speaker == "Player" and heroName or speaker)
-                        lines[#lines + 1] = {title = title, text = text, duration = 4}
-                        __continue6 = true
-                        break
-                    end
+                local withoutOrder = trimOrderedPrefix(nil, trimmed)
+                local parsed = tryParseSpeakerLine(nil, withoutOrder)
+                if parsed then
+                    lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
+                    __continue34 = true
+                    break
                 end
                 lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
-                __continue6 = true
+                __continue34 = true
             until true
-            if not __continue6 then
+            if not __continue34 then
                 break
             end
         end
@@ -95,7 +196,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
     local dialogOwner = jass.Player(dialogOwnerId)
     local ____dialogOwner_0
     if dialogOwner then
-        ____dialogOwner_0 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(dialogOwner)
+        ____dialogOwner_0 = getPlayerFirstHero(nil, dialogOwner)
     else
         ____dialogOwner_0 = nil
     end
@@ -108,7 +209,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
     end
     local heroName = ____ownerHero_1
     local questDesc = quest.desc or quest.name or "未知任务"
-    local rewardText = quest.reward or "无"
+    local rewardText = getQuestRewardDisplayText(nil, quest)
     local startLines = quest.NpcStartText and ____exports.parseDialogText(nil, quest.NpcStartText, npcName, heroName) or ({{
         title = npcName,
         text = "我有任务要交给你：" .. tostring(quest.name),
@@ -122,9 +223,27 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
             onAccept = function()
                 local ____opt_2 = quest.requireID
                 local questId = ____opt_2 and tostring(quest.requireID) or ""
+                local playerObj = jass.Player(dialogOwnerId)
+                local ____playerObj_4
+                if playerObj then
+                    ____playerObj_4 = getPlayerFirstHero(nil, playerObj)
+                else
+                    ____playerObj_4 = nil
+                end
+                local hero = ____playerObj_4
+                if not canAcceptQuestByRequirements(nil, quest, hero) then
+                    local failRaw = quest.AcceptFailedText or "当前条件不满足，无法接受该任务。"
+                    openNpcDialog(
+                        nil,
+                        playerObj,
+                        {lines = ____exports.parseDialogText(nil, failRaw, npcName, heroName)}
+                    )
+                    return
+                end
                 if not hasPlayerAcceptedQuest(nil, 0, questId) then
-                    local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
+                    local playerName = jass.GetPlayerName(playerObj) or "冒险者"
                     setQuestState(nil, questId, 1, playerName)
+                    grantQuestItems(nil, hero, quest.questItems)
                     refreshTaskUIForAllClientsSoon(nil)
                 end
                 local acceptedRaw = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
@@ -148,169 +267,45 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId)
         }
     }
 end
-function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId)
+function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_4
+    local ____dialogOwner_5
     if dialogOwner then
-        ____dialogOwner_4 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(dialogOwner)
+        ____dialogOwner_5 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_4 = nil
+        ____dialogOwner_5 = nil
     end
-    local ownerHero = ____dialogOwner_4
-    local ____ownerHero_5
+    local ownerHero = ____dialogOwner_5
+    local ____ownerHero_6
     if ownerHero then
-        ____ownerHero_5 = jass.GetUnitName(ownerHero)
+        ____ownerHero_6 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_5 = "你"
+        ____ownerHero_6 = "你"
     end
-    local heroName = ____ownerHero_5
-    local ____opt_6 = quest.requireID
-    local questId = ____opt_6 and tostring(quest.requireID) or ""
+    local heroName = ____ownerHero_6
     local questDesc = quest.desc or quest.name or ""
-    local rewardText = quest.reward or "无"
+    local rewardText = getQuestRewardDisplayText(nil, quest)
+    local requireCount = normalizeRequireCount(nil, quest.requireCount)
     return {
         lines = {},
         quest = {
             title = npcName,
-            text = (((((("【" .. tostring(quest.name)) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n进度：0/") .. tostring(quest.requireCount or 1)) .. "\n\n奖励：") .. rewardText,
+            text = (((((("【" .. tostring(quest.name)) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n进度：0/") .. tostring(requireCount)) .. "\n\n奖励：") .. rewardText,
             acceptText = "提交任务",
             rejectText = "暂时忽略",
             onAccept = function()
-                local callbackOwner = jass.Player(dialogOwnerId)
-                local ____callbackOwner_8
-                if callbackOwner then
-                    ____callbackOwner_8 = _____4FBF_6377_51FD_6570:getPlayerFirstHero(callbackOwner)
-                else
-                    ____callbackOwner_8 = nil
-                end
-                local hero = ____callbackOwner_8
-                local requireItem = quest.requireItem
-                local requireCount = quest.requireCount or 1
-                local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
-                local function broadcastQuestComplete(self)
-                    local rewardStr = quest.reward or "无"
-                    local isAll = not rewardStr or (string.find(rewardStr, "所有玩家", nil, true) or 0) - 1 ~= -1 or (string.find(rewardStr, "all", nil, true) or 0) - 1 ~= -1 or (string.find(rewardStr, "完成任务的玩家", nil, true) or 0) - 1 == -1 and (string.find(rewardStr, "Player", nil, true) or 0) - 1 == -1
-                    local targetLabel = isAll and "|cffffcc00所有玩家|r" or ("|cff00ccff" .. tostring(playerName)) .. "|r"
-                    local TARGET_PREFIXES = {"所有玩家", "完成任务的玩家", "Player"}
-                    local cleanReward = table.concat(
-                        __TS__ArrayFilter(
-                            __TS__ArrayMap(
-                                __TS__StringSplit(rewardStr, ";"),
-                                function(____, seg)
-                                    local s = __TS__StringTrim(seg)
-                                    for ____, prefix in ipairs(TARGET_PREFIXES) do
-                                        if __TS__StringStartsWith(s, prefix) then
-                                            s = __TS__StringSubstring(s, #prefix)
-                                            while string.sub(s, 1, 1) == "+" or string.sub(s, 1, 1) == "＋" do
-                                                s = __TS__StringSubstring(s, 1)
-                                            end
-                                            s = __TS__StringTrim(s)
-                                            break
-                                        end
-                                    end
-                                    return s
-                                end
-                            ),
-                            function(____, s) return #s > 0 end
-                        ),
-                        "、"
-                    )
-                    local msg = (("|cffffff00『系统提示』：|r" .. ("|cff00ff66" .. tostring(playerName)) .. "|r") .. (" 完成了 |cffffcc00『" .. tostring(quest.name)) .. "』|r，") .. ((targetLabel .. " 获得了奖励：|cffff9900") .. cleanReward) .. "|r"
-                    do
-                        local i = 0
-                        while i < 4 do
-                            local p = jass.Player(i)
-                            if p ~= nil and jass.GetPlayerController(p) == jass.MAP_CONTROL_USER then
-                                jass.DisplayTimedTextToPlayer(
-                                    p,
-                                    0,
-                                    0,
-                                    10,
-                                    msg
-                                )
-                            end
-                            i = i + 1
-                        end
-                    end
-                end
-                local function onComplete(self)
-                    broadcastQuestComplete(nil)
-                    refreshTaskUIForAllClientsSoon(nil)
-                    if quest.NpcCompleteText then
-                        local completeLines = ____exports.parseDialogText(nil, quest.NpcCompleteText, npcName, heroName)
-                        openNpcDialog(
-                            nil,
-                            jass.Player(dialogOwnerId),
-                            {lines = completeLines}
-                        )
-                    end
-                end
-                if requireItem then
-                    if not hero then
-                        showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r")
-                        return
-                    end
-                    local itemId = calculateFourCC(nil, requireItem)
-                    local itemCount = GetItemTypeCountInUnitBJ(nil, hero, itemId)
-                    if itemCount >= requireCount then
-                        local removed = RemoveItemTypeFromUnitBJ(nil, hero, itemId, requireCount)
-                        if removed >= requireCount then
-                            setQuestState(nil, questId, 2, playerName)
-                            giveQuestReward(nil, quest.reward or "", dialogOwnerId)
-                            onComplete(nil)
-                        else
-                            showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444物品扣除失败，请重试|r")
-                        end
-                    else
-                        local itemDisplayName = getItemName(nil, requireItem) or requireItem
-                        showLocalHint(
-                            nil,
-                            dialogOwnerId,
-                            ((((("|cffffff00『系统提示』：|r你只有 |cffff9900" .. tostring(itemCount)) .. "|r 个 |cffffcc00") .. itemDisplayName) .. "|r，还需要 |cffff4444") .. tostring(requireCount - itemCount)) .. "|r 个"
-                        )
-                    end
-                    return
-                end
-                setQuestState(nil, questId, 2, playerName)
-                giveQuestReward(nil, quest.reward or "", dialogOwnerId)
-                onComplete(nil)
+                handleQuestSubmit(nil, {
+                    quest = quest,
+                    npcName = npcName,
+                    heroName = heroName,
+                    dialogOwnerId = dialogOwnerId,
+                    npcUnit = npcUnit,
+                    parseDialogText = ____exports.parseDialogText,
+                    openDialog = openNpcDialog,
+                    refreshTaskUIForAllClientsSoon = refreshTaskUIForAllClientsSoon
+                })
             end,
             onReject = function()
-            end
-        }
-    }
-end
-function ____exports.getVillageChiefDialog(self)
-    local config = findDialogConfig(nil, "村长")
-    if not config then
-        config = findDialogConfig(nil, "精灵村NPC001")
-    end
-    if config then
-        local npcName = config.NPC or "NPC"
-        return {lines = ____exports.parseDialogText(nil, config.Text or "", npcName, "你")}
-    end
-    return {
-        lines = {{title = "村长", text = "年轻人，我们村子最近遭到了哥布林的袭击……", duration = 4}, {title = "村长", text = "听说你武艺高强，能否帮我们解决这个麻烦？", duration = 3}},
-        quest = {
-            title = "村长",
-            text = "【讨伐哥布林】\n\n哥布林巢穴就在村子东边的森林里。\n\n奖励：金币 500 + 经验 1000",
-            onAccept = function()
-                jass.DisplayTimedTextToPlayer(
-                    jass.Player(0),
-                    0,
-                    0,
-                    5,
-                    "|cffffff00『系统提示』：|r|cff00ff66已接受任务 『讨伐哥布林』|r"
-                )
-            end,
-            onReject = function()
-                jass.DisplayTimedTextToPlayer(
-                    jass.Player(0),
-                    0,
-                    0,
-                    5,
-                    "|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『讨伐哥布林』|r"
-                )
             end
         }
     }

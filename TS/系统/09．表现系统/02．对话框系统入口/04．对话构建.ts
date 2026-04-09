@@ -2,20 +2,25 @@ const jass = require("jass.common") as any;
 const UI函数 = require("系统.00．核心系统.06．UI函数") as {
   openNpcDialog: (player: any, data: any) => void;
 };
-const 便捷函数 = require("系统.00．核心系统.11．便捷函数（偶尔用）") as {
-  getPlayerFirstHero: (player: any) => any;
-};
 
 import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib/扩展函数/03．BJ函数";
 import { getItemName } from "../../../lib/扩展函数/02．YDWE函数";
+import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { taskUI } from "../../08．任务系统/03．任务UI";
 import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, calculateFourCC, giveQuestReward, showLocalHint } from "./01．常量与工具";
 import { findDialogConfig } from "./03．配置查询";
 import { hasPlayerAcceptedQuest, setQuestState } from "./02．任务状态";
+import { getPlayerFirstHero } from "./08．任务奖励执行";
+import { handleQuestSubmit } from "./07．任务提交流程";
+import { resolveRewardDisplayText } from "./09．任务展示文案";
 
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
+
+function normalizeRequireCount(count?: number): number {
+  return count != null && count > 1 ? count : 1;
+}
 
 function refreshTaskUIForAllClientsSoon(): void {
   const t = jass.CreateTimer();
@@ -26,25 +31,91 @@ function refreshTaskUIForAllClientsSoon(): void {
   });
 }
 
+function grantQuestItems(hero: any, questItems?: string): void {
+  if (!hero || !questItems || questItems === "") return;
+  if (typeof jass.UnitAddItemById !== "function") return;
+  const items = questItems.split("|");
+  for (const raw of items) {
+    const itemCode = raw.trim();
+    if (itemCode.length !== 4) continue;
+    const itemId = calculateFourCC(itemCode);
+    if (itemId === 0) continue;
+    jass.UnitAddItemById(hero, itemId);
+  }
+}
+
+function canAcceptQuestByRequirements(quest: QuestConfig, hero: any): boolean {
+  const req = quest.requirements;
+  if (!req || req === "") return true;
+  // 当前仅实现：英雄等级＜N（不用正则，兼容 TSTL）
+  const markerA = "英雄等级<";
+  const markerB = "英雄等级＜";
+  let pos = req.indexOf(markerA);
+  let offset = markerA.length;
+  if (pos < 0) {
+    pos = req.indexOf(markerB);
+    offset = markerB.length;
+  }
+  if (pos < 0) return true;
+  const raw = req.substring(pos + offset).trim();
+  let digits = "";
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw.charAt(i);
+    if (ch >= "0" && ch <= "9") digits += ch;
+    else break;
+  }
+  if (digits === "") return true;
+  const limit = Number(digits);
+  if (!hero || typeof jass.GetHeroLevel !== "function") return false;
+  const level = jass.GetHeroLevel(hero) as number;
+  return level < limit;
+}
+
+function getQuestRewardDisplayText(quest: QuestConfig): string {
+  return resolveRewardDisplayText(quest);
+}
+
 // ========== 虚拟分区：文本解析 ==========
 export function parseDialogText(raw: string, npcName: string, heroName: string): Array<{ title: string; text: string; duration: number }> {
   const lines: Array<{ title: string; text: string; duration: number }> = [];
   const parts = raw.split("\n");
+
+  function trimOrderedPrefix(s: string): string {
+    // 支持 "1.xxx" / "2.xxx" / "10.xxx" 等顺序前缀
+    let i = 0;
+    while (i < s.length) {
+      const ch = s.charAt(i);
+      if (ch < "0" || ch > "9") break;
+      i++;
+    }
+    if (i > 0 && i < s.length && s.charAt(i) === ".") {
+      return s.substring(i + 1).trim();
+    }
+    return s;
+  }
+
+  function tryParseSpeakerLine(s: string): { title: string; text: string } | null {
+    const colonIdx = s.indexOf("：") >= 0 ? s.indexOf("：") : s.indexOf(":");
+    if (colonIdx <= 0) return null;
+    const speakerRaw = s.substring(0, colonIdx).trim();
+    const textRaw = s.substring(colonIdx + 1).trim();
+    if (textRaw === "") return null;
+    if (speakerRaw === "NPC") return { title: npcName, text: textRaw };
+    if (speakerRaw === "Player") return { title: heroName, text: textRaw };
+    return { title: speakerRaw, text: textRaw };
+  }
+
   for (const part of parts) {
     const trimmed = part.trim();
     if (!trimmed) continue;
-    const dotIndex = trimmed.indexOf(".");
-    if (dotIndex > 0) {
-      const rest = trimmed.substring(dotIndex + 1);
-      const colonIndex = rest.indexOf("：");
-      if (colonIndex > 0) {
-        const speaker = rest.substring(0, colonIndex);
-        const text = rest.substring(colonIndex + 1);
-        const title = speaker === "NPC" ? npcName : speaker === "Player" ? heroName : speaker;
-        lines.push({ title, text, duration: 4 });
-        continue;
-      }
+
+    const withoutOrder = trimOrderedPrefix(trimmed);
+    const parsed = tryParseSpeakerLine(withoutOrder);
+    if (parsed) {
+      lines.push({ title: parsed.title, text: parsed.text, duration: 4 });
+      continue;
     }
+
     lines.push({ title: npcName, text: trimmed, duration: 4 });
   }
   return lines.length > 0 ? lines : [{ title: npcName, text: raw, duration: 4 }];
@@ -67,10 +138,10 @@ export function buildQuestCompletedDialog(quest: QuestConfig, npcName: string): 
 
 export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number): NpcDialogData {
   const dialogOwner = jass.Player(dialogOwnerId);
-  const ownerHero = dialogOwner ? 便捷函数.getPlayerFirstHero(dialogOwner) : null;
+  const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
   const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
   const questDesc = quest.desc || quest.name || "未知任务";
-  const rewardText = quest.reward || "无";
+  const rewardText = getQuestRewardDisplayText(quest);
   const startLines = quest.NpcStartText
     ? parseDialogText(quest.NpcStartText, npcName, heroName)
     : [{ title: npcName, text: `我有任务要交给你：${quest.name}`, duration: 4 }];
@@ -82,9 +153,17 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
       text: `【${quest.name}】\n\n${questDesc}\n\n奖励：${rewardText}`,
       onAccept: () => {
         const questId = quest.requireID?.toString() || "";
+        const playerObj = jass.Player(dialogOwnerId);
+        const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
+        if (!canAcceptQuestByRequirements(quest, hero)) {
+          const failRaw = quest.AcceptFailedText || "当前条件不满足，无法接受该任务。";
+          openNpcDialog(playerObj, { lines: parseDialogText(failRaw, npcName, heroName) });
+          return;
+        }
         if (!hasPlayerAcceptedQuest(0, questId)) {
-          const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
+          const playerName = jass.GetPlayerName(playerObj) || "冒险者";
           setQuestState(questId, 1, playerName);
+          grantQuestItems(hero, quest.questItems);
           refreshTaskUIForAllClientsSoon();
         }
         const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
@@ -101,124 +180,34 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
   };
 }
 
-export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number): NpcDialogData {
+export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number, npcUnit?: any): NpcDialogData {
   const dialogOwner = jass.Player(dialogOwnerId);
-  const ownerHero = dialogOwner ? 便捷函数.getPlayerFirstHero(dialogOwner) : null;
+  const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
   const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
-  const questId = quest.requireID?.toString() || "";
   const questDesc = quest.desc || quest.name || "";
-  const rewardText = quest.reward || "无";
+  const rewardText = getQuestRewardDisplayText(quest);
+  const requireCount = normalizeRequireCount(quest.requireCount);
 
   return {
     lines: [],
     quest: {
       title: npcName,
-      text: `【${quest.name}】进行中...\n\n任务目标：${questDesc}\n进度：0/${quest.requireCount || 1}\n\n奖励：${rewardText}`,
+      text: `【${quest.name}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
       acceptText: "提交任务",
       rejectText: "暂时忽略",
       onAccept: () => {
-        const callbackOwner = jass.Player(dialogOwnerId);
-        const hero = callbackOwner ? 便捷函数.getPlayerFirstHero(callbackOwner) : null;
-        const requireItem = quest.requireItem;
-        const requireCount = quest.requireCount || 1;
-        const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
-
-        function broadcastQuestComplete(): void {
-          const rewardStr = quest.reward || "无";
-          const isAll = !rewardStr || rewardStr.indexOf("所有玩家") !== -1 || rewardStr.indexOf("all") !== -1
-            || (rewardStr.indexOf("完成任务的玩家") === -1 && rewardStr.indexOf("Player") === -1);
-          const targetLabel = isAll ? "|cffffcc00所有玩家|r" : `|cff00ccff${playerName}|r`;
-          const TARGET_PREFIXES = ["所有玩家", "完成任务的玩家", "Player"];
-          const cleanReward = rewardStr.split(";").map(seg => {
-            let s = seg.trim();
-            for (const prefix of TARGET_PREFIXES) {
-              if (s.startsWith(prefix)) {
-                s = s.substring(prefix.length);
-                while (s.charAt(0) === "+" || s.charAt(0) === "＋") s = s.substring(1);
-                s = s.trim();
-                break;
-              }
-            }
-            return s;
-          }).filter(s => s.length > 0).join("、");
-          const msg =
-            `|cffffff00『系统提示』：|r` +
-            `|cff00ff66${playerName}|r` +
-            ` 完成了 |cffffcc00『${quest.name}』|r，` +
-            `${targetLabel} 获得了奖励：|cffff9900${cleanReward}|r`;
-          for (let i = 0; i < 4; i++) {
-            const p = jass.Player(i);
-            if (p != null && jass.GetPlayerController(p) === jass.MAP_CONTROL_USER) {
-              jass.DisplayTimedTextToPlayer(p, 0, 0, 10, msg);
-            }
-          }
-        }
-
-        function onComplete(): void {
-          broadcastQuestComplete();
-          refreshTaskUIForAllClientsSoon();
-          if (quest.NpcCompleteText) {
-            const completeLines = parseDialogText(quest.NpcCompleteText, npcName, heroName);
-            openNpcDialog(jass.Player(dialogOwnerId), { lines: completeLines });
-          }
-        }
-
-        if (requireItem) {
-          if (!hero) {
-            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r");
-            return;
-          }
-          const itemId = calculateFourCC(requireItem);
-          const itemCount = GetItemTypeCountInUnitBJ(hero, itemId);
-          if (itemCount >= requireCount) {
-            const removed = RemoveItemTypeFromUnitBJ(hero, itemId, requireCount);
-            if (removed >= requireCount) {
-              setQuestState(questId, 2, playerName);
-              giveQuestReward(quest.reward || "", dialogOwnerId);
-              onComplete();
-            } else {
-              showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444物品扣除失败，请重试|r");
-            }
-          } else {
-            const itemDisplayName = getItemName(requireItem) || requireItem;
-            showLocalHint(
-              dialogOwnerId,
-              `|cffffff00『系统提示』：|r你只有 |cffff9900${itemCount}|r 个 |cffffcc00${itemDisplayName}|r，还需要 |cffff4444${requireCount - itemCount}|r 个`
-            );
-          }
-          return;
-        }
-
-        setQuestState(questId, 2, playerName);
-        giveQuestReward(quest.reward || "", dialogOwnerId);
-        onComplete();
+        handleQuestSubmit({
+          quest,
+          npcName,
+          heroName,
+          dialogOwnerId,
+          npcUnit,
+          parseDialogText,
+          openDialog: openNpcDialog,
+          refreshTaskUIForAllClientsSoon,
+        });
       },
       onReject: () => {
-      },
-    },
-  };
-}
-
-export function getVillageChiefDialog(): NpcDialogData {
-  let config = findDialogConfig("村长");
-  if (!config) config = findDialogConfig("精灵村NPC001");
-  if (config) {
-    const npcName = config.NPC || "NPC";
-    return { lines: parseDialogText(config.Text || "", npcName, "你") };
-  }
-  return {
-    lines: [
-      { title: "村长", text: "年轻人，我们村子最近遭到了哥布林的袭击……", duration: 4 },
-      { title: "村长", text: "听说你武艺高强，能否帮我们解决这个麻烦？", duration: 3 },
-    ],
-    quest: {
-      title: "村长",
-      text: "【讨伐哥布林】\n\n哥布林巢穴就在村子东边的森林里。\n\n奖励：金币 500 + 经验 1000",
-      onAccept: () => {
-        jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cffffff00『系统提示』：|r|cff00ff66已接受任务 『讨伐哥布林』|r");
-      },
-      onReject: () => {
-        jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『讨伐哥布林』|r");
       },
     },
   };

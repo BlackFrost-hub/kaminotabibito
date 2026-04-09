@@ -1,6 +1,6 @@
 const jass = require("jass.common") as any;
 
-import { giveRewardToPlayers } from "../../00．核心系统/11．便捷函数（偶尔用）";
+import { giveRewardToPlayers } from "./08．任务奖励执行";
 
 // ========== 虚拟分区：常量 ==========
 export const UNIT_ID_NGME = 110 * 16777216 + 103 * 65536 + 109 * 256 + 101; // "ngme"

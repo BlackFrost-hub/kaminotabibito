@@ -17,9 +17,24 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     if type(jass.CreateUnit) ~= "function" then
         return nil
     end
+    local unitTypeId = nil
+    if type(unitId) == "number" then
+        unitTypeId = unitId
+    elseif type(unitId) == "string" and #unitId == 4 then
+        local bytes = {
+            string.byte(unitId, 1) or 0 / 0,
+            string.byte(unitId, 2) or 0 / 0,
+            string.byte(unitId, 3) or 0 / 0,
+            string.byte(unitId, 4) or 0 / 0
+        }
+        unitTypeId = bytes[1] * 16777216 + bytes[2] * 65536 + bytes[3] * 256 + bytes[4]
+    end
+    if unitTypeId == nil then
+        return nil
+    end
     local unit = jass.CreateUnit(
         jass.Player(playerId),
-        unitId,
+        unitTypeId,
         x,
         y,
         0

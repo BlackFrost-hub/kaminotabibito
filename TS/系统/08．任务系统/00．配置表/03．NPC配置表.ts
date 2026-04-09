@@ -1,5 +1,5 @@
 ﻿// NPC配置数据 - 自动生成
-// 生成时间: 2026-04-09 20:23:55
+// 生成时间: 2026-04-09 20:39:08
 
 export interface NPCData {
   NPCrequireName?: string;
@@ -16,9 +16,9 @@ export interface NPCData {
 
 export const NPC_CONFIGS: NPCData[] = [
   {
-    NPCrequireName: "人类猎人",
+    NPCrequireName: "人类农民",
     requireID: 1000,
-    NpcNameID: "人类农民",
+    NpcNameID: "收集豺狼皮2",
     unitcode: "hpea",
     requireType: "任务",
     X: -327.9,

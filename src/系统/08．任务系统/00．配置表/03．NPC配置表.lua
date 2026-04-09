@@ -2,9 +2,9 @@
 local ____exports = {}
 ____exports.NPC_CONFIGS = {
     {
-        NPCrequireName = "人类猎人",
+        NPCrequireName = "人类农民",
         requireID = 1000,
-        NpcNameID = "人类农民",
+        NpcNameID = "收集豺狼皮2",
         unitcode = "hpea",
         requireType = "任务",
         X = -327.9,

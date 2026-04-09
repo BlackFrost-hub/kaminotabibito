@@ -18,7 +18,7 @@ const jass = require("jass.common") as any;
  */
 export function createUnitWithOptions(
     playerId: number,
-    unitId: string,
+    unitId: string | number,
     x: number,
     y: number,
     facing?: number,
@@ -30,7 +30,21 @@ export function createUnitWithOptions(
         return null;
     }
 
-    const unit = jass.CreateUnit(jass.Player(playerId), unitId, x, y, 0);
+    let unitTypeId: number | null = null;
+    if (typeof unitId === "number") {
+        unitTypeId = unitId;
+    } else if (typeof unitId === "string" && unitId.length === 4) {
+        const bytes = [
+            unitId.charCodeAt(0),
+            unitId.charCodeAt(1),
+            unitId.charCodeAt(2),
+            unitId.charCodeAt(3),
+        ];
+        unitTypeId = bytes[0] * 16777216 + bytes[1] * 65536 + bytes[2] * 256 + bytes[3];
+    }
+    if (unitTypeId == null) return null;
+
+    const unit = jass.CreateUnit(jass.Player(playerId), unitTypeId, x, y, 0);
 
     if (!unit) {
         return null;

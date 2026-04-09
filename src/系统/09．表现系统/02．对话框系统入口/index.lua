@@ -42,5 +42,37 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.09．表现系统.02．对话框系统入口.06．任务奖励解析")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.09．表现系统.02．对话框系统入口.07．任务提交流程")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.09．表现系统.02．对话框系统入口.08．任务奖励执行")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.09．表现系统.02．对话框系统入口.09．任务展示文案")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 initDialogEntrySelectionTrigger(nil)
 return ____exports

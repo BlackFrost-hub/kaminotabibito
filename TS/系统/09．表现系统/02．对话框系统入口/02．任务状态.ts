@@ -2,6 +2,11 @@ import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/02．YD
 import { NPC_CONFIGS } from "../../08．任务系统/00．配置表/03．NPC配置表";
 import { QUEST_CONFIGS } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．任务数据";
+import { resolveRewardDisplayText } from "./09．任务展示文案";
+
+function normalizeRequireCount(count?: number): number {
+  return count != null && count > 1 ? count : 1;
+}
 
 // ========== 虚拟分区：任务注册 ==========
 export function ensureQuestConfigsRegistered(): void {
@@ -10,6 +15,7 @@ export function ensureQuestConfigsRegistered(): void {
   g.__questConfigsRegistered = true;
 
   for (const cfg of QUEST_CONFIGS) {
+    if (cfg.enabled !== true) continue;
     if (!cfg.requireID) continue;
     const questId = cfg.requireID.toString();
     if (questDB.getQuest(questId)) continue;
@@ -31,10 +37,10 @@ export function ensureQuestConfigsRegistered(): void {
         id: "obj1",
         description: cfg.desc || cfg.name || "",
         current: 0,
-        required: cfg.requireCount || 1,
+        required: normalizeRequireCount(cfg.requireCount),
         completed: false,
       }] : [],
-      rewards: [{ type: "gold", value: 0, description: cfg.reward || "" }],
+      rewards: [{ type: "gold", value: 0, description: resolveRewardDisplayText(cfg) }],
       status: QuestStatus.UNDISCOVERED,
       startNpc: cfg.startNpc,
       icon: iconPath || undefined,

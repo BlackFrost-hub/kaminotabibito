@@ -13,6 +13,11 @@ local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．�
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
+local ____09_FF0E_4EFB_52A1_5C55_793A_6587_6848 = require("系统.09．表现系统.02．对话框系统入口.09．任务展示文案")
+local resolveRewardDisplayText = ____09_FF0E_4EFB_52A1_5C55_793A_6587_6848.resolveRewardDisplayText
+local function normalizeRequireCount(self, count)
+    return count ~= nil and count > 1 and count or 1
+end
 function ____exports.ensureQuestConfigsRegistered(self)
     local g = _G
     if g.__questConfigsRegistered then
@@ -21,15 +26,19 @@ function ____exports.ensureQuestConfigsRegistered(self)
     g.__questConfigsRegistered = true
     for ____, cfg in ipairs(QUEST_CONFIGS) do
         do
-            local __continue4
+            local __continue5
             repeat
+                if cfg.enabled ~= true then
+                    __continue5 = true
+                    break
+                end
                 if not cfg.requireID then
-                    __continue4 = true
+                    __continue5 = true
                     break
                 end
                 local questId = tostring(cfg.requireID)
                 if questDB:getQuest(questId) then
-                    __continue4 = true
+                    __continue5 = true
                     break
                 end
                 local iconPath = ""
@@ -51,19 +60,23 @@ function ____exports.ensureQuestConfigsRegistered(self)
                         id = "obj1",
                         description = cfg.desc or cfg.name or "",
                         current = 0,
-                        required = cfg.requireCount or 1,
+                        required = normalizeRequireCount(nil, cfg.requireCount),
                         completed = false
                     }}) or ({}),
-                    rewards = {{type = "gold", value = 0, description = cfg.reward or ""}},
+                    rewards = {{
+                        type = "gold",
+                        value = 0,
+                        description = resolveRewardDisplayText(nil, cfg)
+                    }},
                     status = QuestStatus.UNDISCOVERED,
                     startNpc = cfg.startNpc,
                     icon = iconPath or nil,
                     createdAt = 0,
                     updatedAt = 0
                 })
-                __continue4 = true
+                __continue5 = true
             until true
-            if not __continue4 then
+            if not __continue5 then
                 break
             end
         end

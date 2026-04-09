@@ -13,7 +13,7 @@ ____exports.QUEST_CONFIGS = {
         progressText = "击杀豺狼人N/10",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = true
+        enabled = false
     },
     {
         requireID = 10002,
@@ -26,7 +26,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "前往史莱姆草原采集3颗荧光草",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = true
+        enabled = false
     },
     {
         requireID = 10003,
@@ -39,7 +39,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集10份蜘蛛毒液",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = true
+        enabled = false
     },
     {
         requireID = 10004,
@@ -52,22 +52,23 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集3分熔岩能量",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = true
+        enabled = false
     },
     {
         requireID = 1000,
-        name = "收集豺狼皮",
+        name = "收集豺狼皮2",
         type = "收集",
         startNpc = "人类农民",
         requireItem = "I01O",
         requireCount = 5,
         reward = "所有玩家+700经验;400金币",
-        desc = "收集3张豺狼皮",
-        QuestAcceptedMsg = "NPC：多谢帮忙..我会在此地等候的",
-        NpcCompleteText = "1.NPC：这是说好的报酬多谢\n2.没想到你真的完成了",
+        desc = "收集5张豺狼皮",
+        NpcStartText = "NPC：你好冒险家，我目前急需一些豺狼皮。\nNPC：你愿意帮助我吗?我会给你报酬。",
+        QuestAcceptedMsg = "Player：好的，有时间我会帮助你\nNPC：多谢帮忙..我会在此地等候的",
+        NpcCompleteText = "NPC：这是说好的报酬多谢\n没想到你真的完成了",
         afterCompleteDialog = "默认",
-        repeatable = true,
-        enabled = false
+        repeatable = false,
+        enabled = true
     },
     {
         requireID = 10005,
@@ -77,7 +78,7 @@ ____exports.QUEST_CONFIGS = {
         requireItem = "I01O",
         requireCount = 5,
         reward = "所有玩家+700经验;400金币",
-        desc = "收集3张豺狼皮",
+        desc = "收集5张豺狼皮",
         afterCompleteDialog = "默认",
         repeatable = false,
         enabled = false
@@ -131,7 +132,7 @@ ____exports.QUEST_CONFIGS = {
         requireCount = 1,
         reward = "所有玩家+IMaxBJ(20000-(等级-20)*1000, 10000)",
         failText = "完成了|Cffff00ff『寻找聚灵花』|r任务，所有玩家|Cffffcc99英雄经验+20000（根据等级会有所减少)|r，|Cffffff00金币+10000|r",
-        NpcCompleteText = "1.NPC：哇，居然真的是聚灵花，太好了，这下事情有着落了。",
+        NpcCompleteText = "NPC：哇，居然真的是聚灵花，太好了，这下事情有着落了。",
         afterCompleteDialog = "默认",
         repeatable = false,
         enabled = false
@@ -147,7 +148,7 @@ ____exports.QUEST_CONFIGS = {
         requireCount = 1,
         reward = "所有玩家+10000经验",
         desc = "将信件送往恶魔城的某人",
-        NpcCompleteText = "1.Player：请问这封信你认识吗？\n2.NPC：....没错，一眼就认出来了，这确实是我朋友的信，多谢。\n3.NPC：这是信封上写的报酬，我就替我朋友交付了。\n4.Player：好的。",
+        NpcCompleteText = "Player：请问这封信你认识吗？\nNPC：....没错，一眼就认出来了，这确实是我朋友的信，多谢。\nNPC：这是信封上写的报酬，我就替我朋友交付了。\nPlayer：好的。",
         afterCompleteDialog = "默认",
         repeatable = false,
         enabled = false
@@ -200,7 +201,7 @@ ____exports.QUEST_CONFIGS = {
         reward = "完成任务的玩家+r25000金币;1能量碎片;魔法伤害+2%",
         NpcStartText = "NPC：这本|cffffcc99『精灵族远古历史』|r写到上古时期精灵族曾经有族人异端化，但是更为详细资料没有了,如果有更详细的资料就好了",
         QuestAcceptedMsg = "NPC：多谢帮忙..我会在此地等候的",
-        NpcCompleteText = "1.NPC：居然真的被你找到了暗狱之书，这是说好的报酬！多谢！\n2.NPC：....原来是这样，但上面的一些内容还是有些模糊，好像是和帝国相关..",
+        NpcCompleteText = "NPC：居然真的被你找到了暗狱之书，这是说好的报酬！多谢！\nNPC：....原来是这样，但上面的一些内容还是有些模糊，好像是和帝国相关..",
         afterCompleteDialog = "默认",
         repeatable = false,
         enabled = false
@@ -269,7 +270,7 @@ ____exports.QUEST_CONFIGS = {
         reward = "英雄等级≤17:所有玩家+10000金币;暴击伤害+1%;暴击率+1%\n英雄等级＞17:所有玩家+5000金币;暴击伤害+1%",
         desc = "调查精灵人员为何失踪\n|cffffff00『系统提示』：|r|cffff0000此任务难度特别高，推荐等级：17|r",
         NpcStartText = "NPC：最近精灵村陆续失踪一些人员，根据我们目前的线索，|cffffff00初始之森（玩家出生地）|r可能有点踪迹，你愿意帮助我们吗？",
-        QuestAcceptedMsg = "1.NPC：感谢你们，有你们的帮助这件事我想一定会有眉目。\n2.Player：长老，可以介绍下具体情况吗\n3.NPC：嗯..就是精灵村最近1个月开始陆陆续续有村民失踪\n4.NPC：根据哨手来报，精灵村的空气中混杂着一丝血液，很明显，这件事是人为，不是自然发生的。\n5.Player：居然是血案..\n6.NPC：来着恐怕不凡，估计是针对我们精灵族而来，目前的踪迹全部指向精灵初始森\n7.NPC：去哪里调查一下吧，我想会有线索的..\n8.Player：好的，精灵族也是我的朋友..这件事我会当做自己的事情处理..",
+        QuestAcceptedMsg = "NPC：感谢你们，有你们的帮助这件事我想一定会有眉目。\nPlayer：长老，可以介绍下具体情况吗\nNPC：嗯..就是精灵村最近1个月开始陆陆续续有村民失踪\nNPC：根据哨手来报，精灵村的空气中混杂着一丝血液，很明显，这件事是人为，不是自然发生的。\nPlayer：居然是血案..\nNPC：来着恐怕不凡，估计是针对我们精灵族而来，目前的踪迹全部指向精灵初始森\nNPC：去哪里调查一下吧，我想会有线索的..\nPlayer：好的，精灵族也是我的朋友..这件事我会当做自己的事情处理..",
         afterCompleteDialog = "默认",
         repeatable = false,
         enabled = false
