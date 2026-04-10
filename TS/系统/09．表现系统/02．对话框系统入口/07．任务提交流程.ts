@@ -3,7 +3,7 @@ const 封装函数 = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
 };
 
-import { getItemName } from "../../../lib/扩展函数/02．YDWE函数";
+import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import {
   ConsumeItemTypeCountByChargesBJ,
   GetItemTypeTotalCountByChargesBJ,

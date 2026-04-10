@@ -44,14 +44,6 @@ function QuestManager.prototype.initialize(self)
             i = i + 1
         end
     end
-    do
-        local i = 1
-        while i <= 20 do
-            local id = "main_" .. (i < 10 and "00" .. tostring(i) or (i < 100 and "0" .. tostring(i) or "" .. tostring(i)))
-            questDB:acceptQuest(0, id)
-            i = i + 1
-        end
-    end
     questDB:acceptQuest(0, "side_002")
     self:setupWar3QuestSync()
     self.isInitialized = true
@@ -354,23 +346,23 @@ function QuestManager.prototype.syncToWar3Quest(self, playerId, questId)
         jass.QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
     end
     repeat
-        local ____switch72 = questData.status
-        local ____cond72 = ____switch72 == QuestStatus.IN_PROGRESS
-        if ____cond72 then
+        local ____switch70 = questData.status
+        local ____cond70 = ____switch70 == QuestStatus.IN_PROGRESS
+        if ____cond70 then
             if type(jass.QuestSetDiscovered) == "function" then
                 jass.QuestSetDiscovered(nativeQuest, true)
             end
             break
         end
-        ____cond72 = ____cond72 or ____switch72 == QuestStatus.COMPLETED
-        if ____cond72 then
+        ____cond70 = ____cond70 or ____switch70 == QuestStatus.COMPLETED
+        if ____cond70 then
             if type(jass.QuestSetCompleted) == "function" then
                 jass.QuestSetCompleted(nativeQuest, true)
             end
             break
         end
-        ____cond72 = ____cond72 or ____switch72 == QuestStatus.FAILED
-        if ____cond72 then
+        ____cond70 = ____cond70 or ____switch70 == QuestStatus.FAILED
+        if ____cond70 then
             if type(jass.QuestSetFailed) == "function" then
                 jass.QuestSetFailed(nativeQuest, true)
             end
@@ -391,9 +383,9 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
     local hero = self:getPlayerHero(playerId)
     for ____, reward in ipairs(quest.rewards) do
         repeat
-            local ____switch80 = reward.type
-            local ____cond80 = ____switch80 == "experience"
-            if ____cond80 then
+            local ____switch78 = reward.type
+            local ____cond78 = ____switch78 == "experience"
+            if ____cond78 then
                 if hero and type(jass.AddHeroXP) == "function" then
                     jass.AddHeroXP(hero, reward.value, true)
                     debugPrint(
@@ -405,8 +397,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond80 = ____cond80 or ____switch80 == "gold"
-            if ____cond80 then
+            ____cond78 = ____cond78 or ____switch78 == "gold"
+            if ____cond78 then
                 if type(jass.SetPlayerState) == "function" and type(jass.GetPlayerState) == "function" then
                     local currentGold = jass.GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
                     jass.SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value)
@@ -417,8 +409,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond80 = ____cond80 or ____switch80 == "item"
-            if ____cond80 then
+            ____cond78 = ____cond78 or ____switch78 == "item"
+            if ____cond78 then
                 if hero and type(jass.CreateItem) == "function" and type(jass.UnitAddItemById) == "function" and reward.itemId then
                     local itemTypeId = jass.FourCC(reward.itemId)
                     jass.UnitAddItemById(hero, itemTypeId)
@@ -431,8 +423,8 @@ function QuestManager.prototype.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond80 = ____cond80 or ____switch80 == "attribute"
-            if ____cond80 then
+            ____cond78 = ____cond78 or ____switch78 == "attribute"
+            if ____cond78 then
                 if hero and type(jass.SetHeroStr) == "function" and type(jass.SetHeroAgi) == "function" and type(jass.SetHeroInt) == "function" then
                     jass.SetHeroStr(
                         hero,

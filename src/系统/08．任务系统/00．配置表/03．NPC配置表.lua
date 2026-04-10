@@ -58,6 +58,7 @@ ____exports.NPC_CONFIGS = {
         Y = -20945.1,
         Facing = 270,
         modelFIle = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower",
+        initAction = "RemoveItemFromStockBJ:itemId(I0AG|I0AH|I0AI);random1",
         enabled = false
     },
     {

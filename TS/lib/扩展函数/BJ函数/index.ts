@@ -1,0 +1,83 @@
+export * from "./01．触发与事件";
+export * from "./02．单位与英雄";
+export * from "./03．物品与库存";
+export * from "./04．矩形与区域";
+export * from "./05A．电影函数";
+export * from "./05B．音效函数";
+export * from "./06．任务消息";
+export * from "./07．杂项";
+
+import * as trigEvent from "./01．触发与事件";
+import * as unitHero from "./02．单位与英雄";
+import * as itemInv from "./03．物品与库存";
+import * as rectArea from "./04．矩形与区域";
+import * as cine from "./05A．电影函数";
+import * as sound from "./05B．音效函数";
+import * as questMsg from "./06．任务消息";
+import * as misc from "./07．杂项";
+
+function expose(name: string, fn: any): void {
+  if (typeof fn !== "function") return;
+  const g = globalThis as any;
+  if (typeof g[name] === "function") return;
+  g[name] = fn;
+}
+
+export function registerBridge(): void {
+  expose("TriggerRegisterAnyUnitEventBJ", trigEvent.TriggerRegisterAnyUnitEventBJ);
+  expose("GetUnitCurrentOrder", unitHero.GetUnitCurrentOrder);
+  expose("IsUnitDeadBJ", unitHero.IsUnitDeadBJ);
+  expose("IsUnitAliveBJ", unitHero.IsUnitAliveBJ);
+  expose("GetHeroStatBJ", unitHero.GetHeroStatBJ);
+  expose("ModifyHeroStat", unitHero.ModifyHeroStat);
+  expose("SetUnitFacingToFaceUnitTimed", unitHero.SetUnitFacingToFaceUnitTimed);
+  expose("RemoveItemFromStockBJ", itemInv.RemoveItemFromStockBJ);
+  expose("AddItemToStockBJ", itemInv.AddItemToStockBJ);
+  expose("GetInventoryIndexOfItemTypeBJ", itemInv.GetInventoryIndexOfItemTypeBJ);
+  expose("GetItemOfTypeFromUnitBJ", itemInv.GetItemOfTypeFromUnitBJ);
+  expose("GetItemTypeCountInUnitBJ", itemInv.GetItemTypeCountInUnitBJ);
+  expose("RemoveItemTypeFromUnitBJ", itemInv.RemoveItemTypeFromUnitBJ);
+  expose("RectContainsCoords", rectArea.RectContainsCoords);
+  expose("RectContainsLoc", rectArea.RectContainsLoc);
+  expose("RectContainsUnit", rectArea.RectContainsUnit);
+  expose("SetStackedSoundBJ", rectArea.SetStackedSoundBJ);
+  expose("TriggerRegisterUnitInRangeSimple", trigEvent.TriggerRegisterUnitInRangeSimple);
+  expose("ConditionalTriggerExecute", trigEvent.ConditionalTriggerExecute);
+  expose("AbortCinematicFadeBJ", cine.AbortCinematicFadeBJ);
+  expose("RMaxBJ", sound.RMaxBJ);
+  expose("PlaySoundBJ", sound.PlaySoundBJ);
+  expose("SetCinematicSceneBJ", cine.SetCinematicSceneBJ);
+  expose("DoTransmissionBasicsXYBJ", cine.DoTransmissionBasicsXYBJ);
+  expose("TryInitCinematicBehaviorBJ", cine.TryInitCinematicBehaviorBJ);
+  expose("TransmissionFromUnitWithNameBJ", cine.TransmissionFromUnitWithNameBJ);
+  expose("PercentToInt", sound.PercentToInt);
+  expose("PercentTo255", sound.PercentTo255);
+  expose("CinematicModeExBJ", cine.CinematicModeExBJ);
+  expose("CinematicModeBJ", cine.CinematicModeBJ);
+  expose("CinematicFilterGenericBJ", cine.CinematicFilterGenericBJ);
+  expose("StopSoundBJ", sound.StopSoundBJ);
+  expose("CancelCineSceneBJ", sound.CancelCineSceneBJ);
+  expose("CameraResetSmoothingFactorBJ", sound.CameraResetSmoothingFactorBJ);
+  expose("SetCineModeVolumeGroupsImmediateBJ", sound.SetCineModeVolumeGroupsImmediateBJ);
+  expose("SetCineModeVolumeGroupsBJ", sound.SetCineModeVolumeGroupsBJ);
+  expose("GetSoundDurationBJ", sound.GetSoundDurationBJ);
+  expose("GetTransmissionDuration", sound.GetTransmissionDuration);
+  expose("WaitForSoundBJ", sound.WaitForSoundBJ);
+  expose("WaitTransmissionDuration", sound.WaitTransmissionDuration);
+  expose("EnableDawnDusk", sound.EnableDawnDusk);
+  expose("IsDawnDuskEnabled", sound.IsDawnDuskEnabled);
+  expose("QuestMessageBJ", questMsg.QuestMessageBJ);
+  expose("ModifyGateBJ", misc.ModifyGateBJ);
+  expose("GetUnitsInRectMatching", misc.GetUnitsInRectMatching);
+  expose("ForGroupBJ", misc.ForGroupBJ);
+  expose("GetPlayersAll", misc.GetPlayersAll);
+  expose("GetRandomDirectionDeg", misc.GetRandomDirectionDeg);
+  expose("GetSpellAbilityId", misc.GetSpellAbilityId);
+  expose("OrderIdToString", misc.OrderIdToString);
+  expose("AddSpecialEffectTargetUnitBJ", misc.AddSpecialEffectTargetUnitBJ);
+  expose("OperatorDegreeMultiply", misc.OperatorDegreeMultiply);
+  expose("OperatorRealAdd", misc.OperatorRealAdd);
+  expose("OperatorRealMultiply", misc.OperatorRealMultiply);
+  expose("IMaxBJ", misc.IMaxBJ);
+  expose("IMinBJ", misc.IMinBJ);
+}

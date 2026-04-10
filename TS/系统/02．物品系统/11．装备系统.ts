@@ -7,11 +7,14 @@ const items = (require("系统.02．物品系统.01．装备数据") as { defaul
 const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
+const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
+  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
+};
 const { fourCCToString, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
 };
-const { getObjectProperty, ObjectType } = require("lib.扩展函数.02．YDWE函数") as {
+const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
 };
@@ -39,13 +42,13 @@ interface StatEntry {
   value: number;
 }
 
-/** 属性配置：显示名 -> itemData key，udg 为 JASS 全局时填写。新增属性只需在此加一行，primaryBonus 即可用该显示名 */
-const STAT_CONFIG: { name: string; key: string; udg?: string }[] = [
-  { name: "生命值", key: "hp", udg: "udg_TempHp" }, { name: "魔法值", key: "mp", udg: "udg_TempMp" },
-  { name: "攻击力", key: "dmg", udg: "udg_TempDmg" }, { name: "护甲", key: "armor", udg: "udg_TempArmor" },
-  { name: "攻速", key: "atkSpeed", udg: "udg_TempAtkSpeed" }, { name: "叠加移动速度", key: "movespeed" },
-  { name: "力量", key: "str", udg: "udg_TempStr" }, { name: "敏捷", key: "agi", udg: "udg_TempAgi" },
-  { name: "智力", key: "int", udg: "udg_TempInt" }, { name: "全属性", key: "all", udg: "udg_TempAll" },
+/** 属性配置：显示名 -> itemData key。新增属性只需在此加一行，primaryBonus 即可用该显示名 */
+const STAT_CONFIG: { name: string; key: string }[] = [
+  { name: "生命值", key: "hp" }, { name: "魔法值", key: "mp" },
+  { name: "攻击力", key: "dmg" }, { name: "护甲", key: "armor" },
+  { name: "攻速", key: "atkSpeed" }, { name: "叠加移动速度", key: "movespeed" },
+  { name: "力量", key: "str" }, { name: "敏捷", key: "agi" },
+  { name: "智力", key: "int" }, { name: "全属性", key: "all" },
   { name: "暴击率", key: "critRate" }, { name: "暴击伤害", key: "critDmg" }, { name: "魔抗", key: "magicResist" },
   { name: "生命恢复", key: "hpRegen" }, { name: "生命恢复%", key: "hpRegenPct" }, { name: "生命恢复效率", key: "hpRegenEff" },
   { name: "技能治疗率", key: "skillHeal" }, { name: "受到的治疗率", key: "healReceived" },
@@ -68,11 +71,13 @@ const STAT_CONFIG: { name: string; key: string; udg?: string }[] = [
   { name: "被暴击率", key: "critRateTaken" }, { name: "被暴击伤害", key: "critDmgTaken" }, { name: "眩晕抗性", key: "stunResist" },
   { name: "魔法普攻伤害", key: "magicAtkDmg" }, { name: "蝼蚁专精", key: "antMastery" }, { name: "移动速度", key: "movespeed2" },
   { name: "伤害%", key: "dmgBonus" }, { name: "最终伤害%", key: "finalDmgBonus" }, { name: "经验获取率", key: "expGainRate" },
-  { name: "最大生命值%", key: "hpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }
+  { name: "最大生命值%", key: "hpPct" }, { name: "最大法力值%", key: "mpPct" },
+  { name: "基础生命值%", key: "baseHpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }, { name: "基础护甲%", key: "baseArmorPct" },
+  { name: "生命值%", key: "hpPercent" }, { name: "法力值%", key: "mpPercent" }, { name: "攻击力%", key: "dmgPercent" }, { name: "护甲%", key: "armorPercent" }
 ];
 const NAME_TO_KEY: Record<string, string> = {};
 for (const e of STAT_CONFIG) { NAME_TO_KEY[e.name] = e.key; }
-if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed"; // JASS TempMoveSpeed 用，不参与 addStat
+if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed"; // 移速字段映射，不参与 addStat
 
 /** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值 */
 function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number> {
@@ -108,7 +113,8 @@ const percentNames = [
   "火属性伤害", "火属性抗性", "雷属性伤害", "雷属性抗性", "水属性伤害", "水属性抗性",
   "金属性抗性", "召唤物伤害", "召唤物抗性", "伤害减少%", "被暴击率", "被暴击伤害",
   "眩晕抗性", "魔法普攻伤害", "蝼蚁专精", "伤害%", "最终伤害%", "经验获取率",
-  "最大生命值%", "基础攻击力%"
+  "最大生命值%", "最大法力值%", "基础生命值%", "基础攻击力%", "基础护甲%",
+  "生命值%", "法力值%", "攻击力%", "护甲%"
 ];
 
 function initEvents(): void {
@@ -161,8 +167,7 @@ function initEvents(): void {
     const charges = jass.GetItemCharges(item);
     const mult = charges > 0 ? charges : 1;
 
-    (jass as any).udg_TempUnit[1] = unit;
-    g.udg_TempIsAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
+    const isAdd = event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
     const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
     let primary: Record<string, number> = {};
     if (primaryBonus) {
@@ -177,20 +182,7 @@ function initEvents(): void {
     }
     merged["moveSpeed"] = (itemData.moveSpeed ?? 0) + (primary["moveSpeed"] ?? 0);
 
-    g.udg_TempHp = merged.hp ?? 0;
-    g.udg_TempMp = merged.mp ?? 0;
-    g.udg_TempDmg = merged.dmg ?? 0;
-    g.udg_TempArmor = merged.armor ?? 0;
-    g.udg_TempAtkSpeed = merged.atkSpeed ?? 0;
-    g.udg_TempMoveSpeed = merged.moveSpeed ?? 0;
-    g.udg_TempStr = merged.str ?? 0;
-    g.udg_TempAgi = merged.agi ?? 0;
-    g.udg_TempInt = merged.int ?? 0;
-    g.udg_TempAll = merged.all ?? 0;
-    g.udg_TempScore = itemData.score ?? 0;
-
     const playerStats: StatEntry[] = [];
-    const isAdd = g.udg_TempIsAdd;
     const addStat = (val: number | undefined, name: string) => {
       if (val == null || val === 0) return;
       let value = val * mult;
@@ -200,20 +192,10 @@ function initEvents(): void {
     for (const e of STAT_CONFIG) {
       addStat(merged[e.key], e.name);
     }
-    //再保存到全局变量（此时 playerStats 已经有数据了）
-    g.udg_TempString = {};
-    g.udg_TempAmount = {};
-    g.udg_TempStatCount = playerStats.length;
-
-    for (let i = 0; i < playerStats.length; i++) {
-      g.udg_TempString[i + 1] = playerStats[i].name;
-      g.udg_TempAmount[i + 1] = playerStats[i].value;
-    }
-
     const owner = jass.GetOwningPlayer(unit);
     const playerName = (typeof (jass as any).GetPlayerName === "function" ? (jass as any).GetPlayerName(owner) : "") ?? "";
 
-    const actionText = g.udg_TempIsAdd ? "获得" : "丢弃";
+    const actionText = isAdd ? "获得" : "丢弃";
     const levelText = itemData.level || "";
     let levelColor: string;
     if (levelText === "E-" || levelText === "E") levelColor = "|cFF808080";
@@ -237,14 +219,12 @@ function initEvents(): void {
     }
     jass.DisplayTimedTextToPlayer(player, 0, 0.01, 5, msg);
 
-    jass.ExecuteFunc("ApplyItemBonus");
-    const tempRead = (g as any).udg_TempReadValue as number[] | undefined;
+    const tempReadMap = applyEquipStatsTS(unit, playerStats);
     const test5Parts: string[] = [];
     for (let i = 0; i < playerStats.length; i++) {
-      const idx = i + 1;
-      const statName = g.udg_TempString[idx];
+      const statName = playerStats[i].name;
       if (statName === "移动速度") continue; // 移速由下方从装备移速取数并显示
-      const val = tempRead != null && (tempRead as any)[idx] != null ? (tempRead as any)[idx] : 0;
+      const val = tempReadMap[statName] != null ? tempReadMap[statName] : 0;
       const num = Number(val);
       const isPct = percentNames.indexOf(statName) >= 0;
       const nearZero = num > -1e-6 && num < 1e-6;

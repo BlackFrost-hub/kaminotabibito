@@ -1,0 +1,51 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local rangeQuery = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local conditionCheck = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+do
+    local ____export = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+local function expose(self, name, fn)
+    if type(fn) ~= "function" then
+        return
+    end
+    local g = _G
+    if type(g[name]) == "function" then
+        return
+    end
+    g[name] = fn
+end
+function ____exports.registerBridge(self)
+    expose(nil, "createUnitWithOptions", unitRelated.createUnitWithOptions)
+    expose(nil, "getUnitsInRangeOfUnit", rangeQuery.getUnitsInRangeOfUnit)
+    expose(nil, "getUnitsInRange", rangeQuery.getUnitsInRange)
+    expose(nil, "getEnemyUnitsInRangeOfUnit", rangeQuery.getEnemyUnitsInRangeOfUnit)
+    expose(nil, "getEnemyUnitsInRange", rangeQuery.getEnemyUnitsInRange)
+    expose(nil, "isValidUnit", conditionCheck.isValidUnit)
+    expose(nil, "isUnitEnemy", conditionCheck.isUnitEnemy)
+    expose(nil, "isValidEnemyUnit", conditionCheck.isValidEnemyUnit)
+    expose(nil, "isNotUsingInventoryItem", conditionCheck.isNotUsingInventoryItem)
+end
+return ____exports

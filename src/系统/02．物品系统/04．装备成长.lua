@@ -6,6 +6,7 @@ local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 --- 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
 -- 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
@@ -14,9 +15,11 @@ local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
-local AddGoldWithFeedback = ____require_result_0.AddGoldWithFeedback
-local fourCCToString = ____require_result_0.fourCCToString
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
+local ____require_result_1 = require("系统.00．核心系统.01．封装函数")
+local AddGoldWithFeedback = ____require_result_1.AddGoldWithFeedback
+local fourCCToString = ____require_result_1.fourCCToString
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
 local KEY_TO_NAME = {
     hp = "生命值",
@@ -272,61 +275,16 @@ local function parsePowerUP(self, powerUpStr)
     end
     return segments
 end
---- key → ApplyItemBonus 读取的固定全局变量名
-local KEY_TO_UDG = {
-    hp = "udg_TempHp",
-    mp = "udg_TempMp",
-    dmg = "udg_TempDmg",
-    armor = "udg_TempArmor",
-    atkSpeed = "udg_TempAtkSpeed",
-    movespeed = "udg_TempMoveSpeed",
-    str = "udg_TempStr",
-    agi = "udg_TempAgi",
-    int = "udg_TempInt",
-    all = "udg_TempAll"
-}
---- 通过 ApplyItemBonus 批量加/减属性
--- value 永远传正数；isAdd 控制加/减方向（固定全局由 TempIsAdd 控制符号；TempAmount 需带符号用于数据追踪）
+--- 通过 TS 装备属性应用器批量加/减属性
 local function applyStats(self, unit, statEffects, isAdd)
     if #statEffects == 0 then
         return
     end
-    g.udg_TempHp = 0
-    g.udg_TempMp = 0
-    g.udg_TempDmg = 0
-    g.udg_TempArmor = 0
-    g.udg_TempAtkSpeed = 0
-    g.udg_TempMoveSpeed = 0
-    g.udg_TempStr = 0
-    g.udg_TempAgi = 0
-    g.udg_TempInt = 0
-    g.udg_TempAll = 0
-    do
-        local i = 0
-        while i < #statEffects do
-            local udgKey = KEY_TO_UDG[statEffects[i + 1].key]
-            if udgKey ~= nil then
-                g[udgKey] = statEffects[i + 1].value
-            end
-            i = i + 1
-        end
-    end
-    jass.udg_TempUnit[1] = unit
-    g.udg_TempIsAdd = isAdd
-    g.udg_TempStatCount = #statEffects
-    g.udg_TempString = {}
-    g.udg_TempAmount = {}
-    do
-        local i = 0
-        while i < #statEffects do
-            g.udg_TempString[i + 1] = statEffects[i + 1].name
-            g.udg_TempAmount[i + 1] = isAdd and statEffects[i + 1].value or -statEffects[i + 1].value
-            i = i + 1
-        end
-    end
-    if type(jass.ExecuteFunc) == "function" then
-        jass.ExecuteFunc("ApplyItemBonus")
-    end
+    local payload = isAdd and statEffects or __TS__ArrayMap(
+        statEffects,
+        function(____, x) return __TS__ObjectAssign({}, x, {value = -x.value}) end
+    )
+    applyEquipStatsTS(nil, unit, payload)
 end
 --- 分 10 份给经验，避免跳级触发不到
 local function addHeroXP(self, unit, amount)
@@ -349,92 +307,92 @@ local function addHeroXP(self, unit, amount)
     end
 end
 local function getHeroLevel(self, unit)
-    local ____temp_1
+    local ____temp_2
     if type(jass.GetHeroLevel) == "function" then
-        ____temp_1 = jass.GetHeroLevel(unit)
+        ____temp_2 = jass.GetHeroLevel(unit)
     else
-        ____temp_1 = 1
+        ____temp_2 = 1
     end
-    return ____temp_1
+    return ____temp_2
 end
 --- 获取单位当前属性的绝对值，用于百分比计算。
 -- str/agi/int 用 GetHeroStr/Agi/Int；hp/mp 用 GetUnitState+ConvertUnitState；
 -- dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
 local function getPctStatValue(self, unit, key)
     if key == "int" then
-        local ____temp_2
-        if type(jass.GetHeroInt) == "function" then
-            ____temp_2 = jass.GetHeroInt(unit, true)
-        else
-            ____temp_2 = 0
-        end
-        return ____temp_2
-    end
-    if key == "str" then
         local ____temp_3
-        if type(jass.GetHeroStr) == "function" then
-            ____temp_3 = jass.GetHeroStr(unit, true)
+        if type(jass.GetHeroInt) == "function" then
+            ____temp_3 = jass.GetHeroInt(unit, true)
         else
             ____temp_3 = 0
         end
         return ____temp_3
     end
-    if key == "agi" then
+    if key == "str" then
         local ____temp_4
-        if type(jass.GetHeroAgi) == "function" then
-            ____temp_4 = jass.GetHeroAgi(unit, true)
+        if type(jass.GetHeroStr) == "function" then
+            ____temp_4 = jass.GetHeroStr(unit, true)
         else
             ____temp_4 = 0
         end
         return ____temp_4
     end
-    if key == "hp" then
+    if key == "agi" then
         local ____temp_5
-        if type(jass.GetUnitState) == "function" then
-            ____temp_5 = jass.GetUnitState(
-                unit,
-                jass.ConvertUnitState(1)
-            )
+        if type(jass.GetHeroAgi) == "function" then
+            ____temp_5 = jass.GetHeroAgi(unit, true)
         else
             ____temp_5 = 0
         end
         return ____temp_5
     end
-    if key == "mp" then
+    if key == "hp" then
         local ____temp_6
         if type(jass.GetUnitState) == "function" then
             ____temp_6 = jass.GetUnitState(
                 unit,
-                jass.ConvertUnitState(3)
+                jass.ConvertUnitState(1)
             )
         else
             ____temp_6 = 0
         end
         return ____temp_6
     end
-    if key == "dmg" then
+    if key == "mp" then
         local ____temp_7
         if type(jass.GetUnitState) == "function" then
             ____temp_7 = jass.GetUnitState(
                 unit,
-                jass.ConvertUnitState(21)
+                jass.ConvertUnitState(3)
             )
         else
             ____temp_7 = 0
         end
         return ____temp_7
     end
-    if key == "armor" then
+    if key == "dmg" then
         local ____temp_8
         if type(jass.GetUnitState) == "function" then
             ____temp_8 = jass.GetUnitState(
                 unit,
-                jass.ConvertUnitState(32)
+                jass.ConvertUnitState(21)
             )
         else
             ____temp_8 = 0
         end
         return ____temp_8
+    end
+    if key == "armor" then
+        local ____temp_9
+        if type(jass.GetUnitState) == "function" then
+            ____temp_9 = jass.GetUnitState(
+                unit,
+                jass.ConvertUnitState(32)
+            )
+        else
+            ____temp_9 = 0
+        end
+        return ____temp_9
     end
     return 0
 end
@@ -448,13 +406,13 @@ local function applyGoldPct(self, unit, pct)
         return
     end
     local stateGold = jass.ConvertPlayerState(1)
-    local ____temp_9
+    local ____temp_10
     if type(jass.GetPlayerState) == "function" then
-        ____temp_9 = jass.GetPlayerState(player, stateGold)
+        ____temp_10 = jass.GetPlayerState(player, stateGold)
     else
-        ____temp_9 = 0
+        ____temp_10 = 0
     end
-    local cur = ____temp_9
+    local cur = ____temp_10
     local delta = math.floor(cur * pct + 0.5)
     local newVal = cur + delta < 0 and 0 or cur + delta
     if type(jass.SetPlayerState) == "function" then
@@ -467,7 +425,7 @@ local function executeSegment(self, unit, seg)
     local goldFixed = {}
     for ____, eff in ipairs(seg.effects) do
         do
-            local __continue69
+            local __continue64
             repeat
                 if eff.type == "gold" then
                     if eff.isPct then
@@ -489,7 +447,7 @@ local function executeSegment(self, unit, seg)
                 elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                     local name = KEY_TO_NAME[eff.key]
                     if name == nil then
-                        __continue69 = true
+                        __continue64 = true
                         break
                     end
                     local val
@@ -502,9 +460,9 @@ local function executeSegment(self, unit, seg)
                     end
                     statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
                 end
-                __continue69 = true
+                __continue64 = true
             until true
-            if not __continue69 then
+            if not __continue64 then
                 break
             end
         end
@@ -516,13 +474,13 @@ local function executeSegment(self, unit, seg)
             local capturedUnit = unit
             local capturedPct = goldPct
             local remaining = math.floor(seg.timeSec)
-            local ____temp_10
+            local ____temp_11
             if type(jass.CreateTimer) == "function" then
-                ____temp_10 = jass.CreateTimer()
+                ____temp_11 = jass.CreateTimer()
             else
-                ____temp_10 = nil
+                ____temp_11 = nil
             end
-            local dt = ____temp_10
+            local dt = ____temp_11
             if dt and type(jass.TimerStart) == "function" then
                 local t = dt
                 jass.TimerStart(
@@ -566,13 +524,13 @@ local function executeSegment(self, unit, seg)
         if seg.timeSec > 0 then
             local capturedStats = statEffects
             local capturedUnit = unit
-            local ____temp_11
+            local ____temp_12
             if type(jass.CreateTimer) == "function" then
-                ____temp_11 = jass.CreateTimer()
+                ____temp_12 = jass.CreateTimer()
             else
-                ____temp_11 = nil
+                ____temp_12 = nil
             end
-            local dt = ____temp_11
+            local dt = ____temp_12
             if dt and type(jass.TimerStart) == "function" then
                 local t = dt
                 jass.TimerStart(
@@ -591,20 +549,20 @@ local function executeSegment(self, unit, seg)
     end
 end
 local function onUseItem(self)
-    local ____temp_12
-    if type(jass.GetManipulatingUnit) == "function" then
-        ____temp_12 = jass.GetManipulatingUnit()
-    else
-        ____temp_12 = nil
-    end
-    local unit = ____temp_12
     local ____temp_13
-    if type(jass.GetManipulatedItem) == "function" then
-        ____temp_13 = jass.GetManipulatedItem()
+    if type(jass.GetManipulatingUnit) == "function" then
+        ____temp_13 = jass.GetManipulatingUnit()
     else
         ____temp_13 = nil
     end
-    local item = ____temp_13
+    local unit = ____temp_13
+    local ____temp_14
+    if type(jass.GetManipulatedItem) == "function" then
+        ____temp_14 = jass.GetManipulatedItem()
+    else
+        ____temp_14 = nil
+    end
+    local item = ____temp_14
     if not unit or not item then
         return
     end
@@ -614,13 +572,13 @@ local function onUseItem(self)
     if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
         return
     end
-    local ____temp_14
+    local ____temp_15
     if type(jass.GetItemTypeId) == "function" then
-        ____temp_14 = jass.GetItemTypeId(item)
+        ____temp_15 = jass.GetItemTypeId(item)
     else
-        ____temp_14 = 0
+        ____temp_15 = 0
     end
-    local itemId = ____temp_14
+    local itemId = ____temp_15
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.PowerUP then
@@ -632,13 +590,13 @@ local function onUseItem(self)
         return
     end
     glob[key] = true
-    local ____temp_15
+    local ____temp_16
     if type(jass.CreateTimer) == "function" then
-        ____temp_15 = jass.CreateTimer()
+        ____temp_16 = jass.CreateTimer()
     else
-        ____temp_15 = nil
+        ____temp_16 = nil
     end
-    local ct = ____temp_15
+    local ct = ____temp_16
     if ct and type(jass.TimerStart) == "function" then
         local t = ct
         jass.TimerStart(
@@ -664,11 +622,11 @@ local function init(self)
         return
     end
     g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_16 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_16 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_16 = 35
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_17 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_17 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_17 = 35
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_16
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_17
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -682,13 +640,13 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_18
-    ____this_18 = jass
-    local ____opt_17 = ____this_18.Player
-    if ____opt_17 ~= nil then
-        ____opt_17 = ____opt_17(____this_18, 13)
+    local ____this_19
+    ____this_19 = jass
+    local ____opt_18 = ____this_19.Player
+    if ____opt_18 ~= nil then
+        ____opt_18 = ____opt_18(____this_19, 13)
     end
-    local p13 = ____opt_17
+    local p13 = ____opt_18
     if p13 ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
     end

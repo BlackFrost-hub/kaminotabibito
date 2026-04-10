@@ -1,4 +1,4 @@
-import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/02．YDWE函数";
+import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { NPC_CONFIGS } from "../../08．任务系统/00．配置表/03．NPC配置表";
 import { QUEST_CONFIGS } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．任务数据";

@@ -5,7 +5,7 @@ const jass = require("jass.common") as JassCommon;
 const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
   stringToFourCC: (s: string) => number;
 };
-const { EXSetUnitFacing } = require("lib.扩展函数.02．YDWE函数") as {
+const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.index") as {
   EXSetUnitFacing: (u: any, angle: number) => void;
 };
 const { CameraShakeForPlayer } = require("系统.00．核心系统.13．镜头函数") as {

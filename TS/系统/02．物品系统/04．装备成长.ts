@@ -7,6 +7,9 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [k: string]: any };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
+const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
+  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => void;
+};
 const { AddGoldWithFeedback, fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
   AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
   fourCCToString: (four: number) => string;
@@ -162,38 +165,13 @@ function parsePowerUP(powerUpStr: string): Segment[] {
   return segments;
 }
 
-/** key → ApplyItemBonus 读取的固定全局变量名 */
-const KEY_TO_UDG: Record<string, string> = {
-  hp: "udg_TempHp", mp: "udg_TempMp", dmg: "udg_TempDmg", armor: "udg_TempArmor",
-  atkSpeed: "udg_TempAtkSpeed", movespeed: "udg_TempMoveSpeed",
-  str: "udg_TempStr", agi: "udg_TempAgi", int: "udg_TempInt", all: "udg_TempAll",
-};
-
-/** 通过 ApplyItemBonus 批量加/减属性
- *  value 永远传正数；isAdd 控制加/减方向（固定全局由 TempIsAdd 控制符号；TempAmount 需带符号用于数据追踪）
- */
+/** 通过 TS 装备属性应用器批量加/减属性 */
 function applyStats(unit: any, statEffects: { name: string; key: string; value: number }[], isAdd: boolean): void {
   if (statEffects.length === 0) return;
-  // 重置所有固定全局
-  g.udg_TempHp = 0; g.udg_TempMp = 0; g.udg_TempDmg = 0; g.udg_TempArmor = 0;
-  g.udg_TempAtkSpeed = 0; g.udg_TempMoveSpeed = 0;
-  g.udg_TempStr = 0; g.udg_TempAgi = 0; g.udg_TempInt = 0; g.udg_TempAll = 0;
-  // 设置基础属性的固定全局（始终正数，TempIsAdd 控制符号）
-  for (let i = 0; i < statEffects.length; i++) {
-    const udgKey = KEY_TO_UDG[statEffects[i].key];
-    if (udgKey !== undefined) g[udgKey] = statEffects[i].value;
-  }
-  (jass as any).udg_TempUnit[1] = unit;
-  g.udg_TempIsAdd = isAdd;
-  g.udg_TempStatCount = statEffects.length;
-  g.udg_TempString = {};
-  g.udg_TempAmount = {};
-  for (let i = 0; i < statEffects.length; i++) {
-    g.udg_TempString[i + 1] = statEffects[i].name;
-    // TempAmount 用于数据追踪：加时正，撤销时负
-    g.udg_TempAmount[i + 1] = isAdd ? statEffects[i].value : -statEffects[i].value;
-  }
-  if (typeof (jass as any).ExecuteFunc === "function") (jass as any).ExecuteFunc("ApplyItemBonus");
+  const payload = isAdd
+    ? statEffects
+    : statEffects.map((x) => ({ ...x, value: -x.value }));
+  applyEquipStatsTS(unit, payload);
 }
 
 /** 分 10 份给经验，避免跳级触发不到 */

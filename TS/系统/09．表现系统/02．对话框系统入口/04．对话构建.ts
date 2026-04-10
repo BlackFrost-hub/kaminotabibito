@@ -3,8 +3,8 @@ const UI函数 = require("系统.00．核心系统.06．UI函数") as {
   openNpcDialog: (player: any, data: any) => void;
 };
 
-import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib/扩展函数/03．BJ函数";
-import { getItemName } from "../../../lib/扩展函数/02．YDWE函数";
+import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib/扩展函数/BJ函数/03．物品与库存";
+import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { taskUI } from "../../08．任务系统/03．任务UI";

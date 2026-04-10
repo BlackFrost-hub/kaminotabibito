@@ -1,0 +1,78 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+  "items": [
+    {
+      "label": "Trig_SRZ_________002Conditions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Conditions takes nothing returns boolean\n```\n\n\n---\n\n===========================================================================\n\nTrigger: SRZ蛇人族002\n\n===========================================================================\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Conditions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Func002Func014A",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Func002Func014A takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Func002Func014A",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Func004Func015T",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Func004Func015T takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Func004Func015T",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Func005Func002T",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Func005Func002T takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Func005Func002T",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Func005Func004A",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Func005Func004A takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Func005Func004A",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Func005Func041T",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Func005Func041T takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Func005Func041T",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "Trig_SRZ_________002Actions",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction Trig_SRZ_________002Actions takes nothing returns nothing\n```\n\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_Trig_SRZ_________002Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    },
+    {
+      "label": "InitTrig_SRZ_________002",
+      "kind": 2,
+      "detail": "Function",
+      "documentation": "\n```jass\nfunction InitTrig_SRZ_________002 takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\n**_>:** `JASS/2.j`",
+      "sortText": "1_func_InitTrig_SRZ_________002",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\2.j",
+      "statementType": "FunctionDeclaration"
+    }
+  ],
+  "timestamp": 1775852790901
+}

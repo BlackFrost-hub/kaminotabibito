@@ -5,7 +5,7 @@ local ____exports = {}
 -- 功能：当单位发动技能效果时触发
 -- 事件：EVENT_PLAYER_UNIT_SPELL_EFFECT（发动技能效果）
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.03．BJ函数")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
 --- 发动技能效果的触发动作
 local function onSpellEffect(self)

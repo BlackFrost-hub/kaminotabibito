@@ -1,133 +1,59 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 任意测试文件
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
-local fourCCToString = ____require_result_0.fourCCToString
-local printToPlayer = ____require_result_0.printToPlayer
-local ____require_result_1 = require("lib.扩展函数.03．BJ函数")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_1.TriggerRegisterAnyUnitEventBJ
-local OrderIdToString = ____require_result_1.OrderIdToString
---- 测试技能命令ID捕获
--- 监听所有玩家使用技能事件，捕获命令ID
-local function testSpellOrderCapture(self)
-    local ____temp_2
-    if type(jass.CreateTrigger) == "function" then
-        ____temp_2 = jass.CreateTrigger()
-    else
-        ____temp_2 = nil
+local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_0.STES_Register
+local STES_GetTable = ____require_result_0.STES_GetTable
+local STES_Fire = ____require_result_0.STES_Fire
+local _print = _G.print
+local function resolveGgTrgByKey(self, key)
+    local a = jglobals[key]
+    if a ~= nil and a ~= 0 then
+        return a
     end
-    local trig = ____temp_2
-    if not trig then
-        return
+    local b = jass[key]
+    if b ~= nil and b ~= 0 then
+        return b
     end
-    local ev = jass.EVENT_PLAYER_UNIT_SPELL_EFFECT
-    if not ev then
-        return
+    local c = _G[key]
+    if c ~= nil and c ~= 0 then
+        return c
     end
-    TriggerRegisterAnyUnitEventBJ(nil, trig, ev)
-    jass.TriggerAddAction(
-        trig,
+    return nil
+end
+local key = "gg_trg____________________001"
+if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
+    local tm = jass.CreateTimer()
+    jass.TimerStart(
+        tm,
+        1,
+        false,
         function()
-            local ____temp_3
-            if type(jass.GetTriggerUnit) == "function" then
-                ____temp_3 = jass.GetTriggerUnit()
-            else
-                ____temp_3 = nil
-            end
-            local triggerUnit = ____temp_3
-            if not triggerUnit then
-                return
-            end
-            local ____temp_4
-            if type(jass.GetUnitCurrentOrder) == "function" then
-                ____temp_4 = jass.GetUnitCurrentOrder(triggerUnit)
-            else
-                ____temp_4 = 0
-            end
-            local orderId = ____temp_4
-            local orderIdStr = OrderIdToString(nil, orderId)
-            local ____temp_5
-            if type(jass.GetSpellAbilityId) == "function" then
-                ____temp_5 = jass.GetSpellAbilityId()
-            else
-                ____temp_5 = 0
-            end
-            local abilityId = ____temp_5
-            local abilityIdStr = fourCCToString(nil, abilityId)
-            local ____temp_6
-            if type(jass.GetUnitName) == "function" then
-                ____temp_6 = jass.GetUnitName(triggerUnit)
-            else
-                ____temp_6 = "未知单位"
-            end
-            local unitName = ____temp_6
-            local ITEM_USE_MIN = 852008
-            local ITEM_USE_MAX = 852013
-            local isUsingItem = orderId >= ITEM_USE_MIN and orderId <= ITEM_USE_MAX
-            local msg = (((((((((("使用技能! 单位: " .. tostring(unitName)) .. " 命令ID: ") .. tostring(orderId)) .. " (") .. orderIdStr) .. ") 技能ID: ") .. tostring(abilityId)) .. " (") .. abilityIdStr) .. ") ") .. (isUsingItem and "【使用物品】" or "")
-            printToPlayer(
+            _print(
                 nil,
-                jass.Player(0),
-                msg,
-                5
+                (((((("[任意测试] 延迟1s查找 " .. key) .. " | jglobals=") .. tostring(jglobals[key] or "nil")) .. " | jass=") .. tostring(jass[key] or "nil")) .. " | globalThis=") .. tostring(_G[key] or "nil")
             )
+            local trg = resolveGgTrgByKey(nil, key)
+            if trg then
+                STES_Register(nil, trg, "测试")
+                local ht = STES_GetTable(nil)
+                _print(
+                    nil,
+                    (("STES_Register 成功 | HT=" .. tostring(ht or "nil")) .. " | trg=") .. tostring(trg or "nil")
+                )
+                _print(nil, "STES_Fire 开始触发事件 '测试' ...")
+                STES_Fire(nil, "测试")
+                _print(nil, "STES_Fire 执行完毕")
+            else
+                _print(nil, ("STES_Register 失败: " .. key) .. " 在三处来源均为 nil")
+            end
+            if type(jass.DestroyTimer) == "function" then
+                jass.DestroyTimer(tm)
+            end
         end
     )
+else
+    _print(nil, "[任意测试] CreateTimer/TimerStart 不可用")
 end
-testSpellOrderCapture(nil)
-local t = jass.CreateTimer()
-jass.TimerStart(
-    t,
-    1,
-    false,
-    function()
-        local u = jass.gg_unit_Hamg_0002
-        if u then
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(0),
-                0,
-                0,
-                10,
-                "单位存在! Hamg Primary: " .. tostring(jass.GetUnitName(u))
-            )
-        else
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(0),
-                0,
-                0,
-                10,
-                "gg_unit_Hamg_0002 不存在!"
-            )
-        end
-        jass.DestroyTimer(t)
-    end
-)
-local t2 = jass.CreateTimer()
-jass.TimerStart(
-    t2,
-    1,
-    false,
-    function()
-        local u = jass.gg_unit_htow_0030
-        if u then
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(0),
-                0,
-                0,
-                10,
-                "gg_unit_htow_0030 存在!"
-            )
-        else
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(0),
-                0,
-                0,
-                10,
-                "gg_unit_htow_0030 不存在!"
-            )
-        end
-        jass.DestroyTimer(t2)
-    end
-)
 return ____exports

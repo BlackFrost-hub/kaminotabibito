@@ -1,6 +1,6 @@
 const jass = require("jass.common") as any;
 
-import { IMaxBJ } from "../../00．核心系统/15．数学函数";
+import { IMaxBJ } from "../../../lib/扩展函数/BJ函数/index";
 import {
   bindRewardParseHeroResolver,
   isConditionMatchedWithContext,

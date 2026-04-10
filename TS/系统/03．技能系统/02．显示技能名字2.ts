@@ -6,7 +6,7 @@
  */
 
 const jass = require("jass.common") as any;
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.03．BJ函数") as {
+const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
   TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: number) => void;
 };
 

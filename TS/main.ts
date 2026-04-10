@@ -23,7 +23,7 @@ require("jass.japi"); // 扩展 JASS 原生 (Blz* 等)
   }
 })();
 const jass = require("jass.common") as Record<string, unknown>;
-const g = require("jass.globals") as Record<string, unknown>;
+const jglobals = require("jass.globals") as Record<string, unknown>;
 const slk = require("jass.slk") as Record<string, Record<string, Record<string, string>>>;
 (globalThis as any).slk = slk;
 
@@ -39,13 +39,10 @@ const slk = require("jass.slk") as Record<string, Record<string, Record<string, 
 
 // ---------- 00．核心系统 ----------
 require("系统.00．核心系统.00．核心系统入口");
-require("lib.扩展函数.02．YDWE函数");
 require("系统.00．核心系统.06．UI函数");
 
 // ---------- 扩展函数 ----------
-require("lib.扩展函数.00．条件判断函数");
-require("lib.扩展函数.03．BJ函数");
-require("lib.扩展函数.物品相关函数.物品函数入口");
+require("lib.扩展函数.00．扩展函数入口");
 
 // ---------- 01．单位系统 ----------
 require("系统.01．单位系统.单位狂暴");
@@ -64,44 +61,45 @@ require("系统.04．伤害系统.02．DOT定义.00．DOT定义入口");
 require("系统.04．伤害系统.02．dot伤害");
 require("系统.04．伤害系统.03．伤害测试");
 
-// ---------- 05．Buff系统 ----------
+// // ---------- 05．Buff系统 ----------
 const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { initBuffSystem?: () => void };
-if (typeof buffPoolCore.initBuffSystem === "function") buffPoolCore.initBuffSystem();
-require("系统.05．Buff系统.03．BuffJASS桥接");
+ if (typeof buffPoolCore.initBuffSystem === "function") buffPoolCore.initBuffSystem();
+ require("系统.05．Buff系统.03．BuffJASS桥接");
 
-// ---------- 07．地形系统 ----------
-const 区域传送 = require("系统.07．地形系统.03．区域传送") as { init区域传送: () => void };
-if (typeof 区域传送.init区域传送 === "function") 区域传送.init区域传送();
-const 激活传送点 = require("系统.07．地形系统.05．激活传送点") as { init激活传送点: () => void };
-if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.init激活传送点();
+// // ---------- 07．地形系统 ----------
+ const 区域传送 = require("系统.07．地形系统.03．区域传送") as { init区域传送: () => void };
+ if (typeof 区域传送.init区域传送 === "function") 区域传送.init区域传送();
+ const 激活传送点 = require("系统.07．地形系统.05．激活传送点") as { init激活传送点: () => void };
+ if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.init激活传送点();
 
-// ---------- 08．任务系统 ----------
-// 任务系统初始化
-const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init: () => void };
-if (typeof 任务管理器.init === "function") 任务管理器.init();
-require("系统.08．任务系统.05．任务STES桥接");
-require("系统.08．任务系统.06．任务事件桥接");
-require("系统.08．任务系统.08．任务目标更新");
+// // ---------- 08．任务系统 ----------
+// // 任务系统初始化
+ const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init: () => void };
+ if (typeof 任务管理器.init === "function") 任务管理器.init();
+ require("系统.08．任务系统.05．任务STES桥接");
+ require("系统.08．任务系统.06．任务事件桥接");
+ require("系统.08．任务系统.08．任务目标更新");
+ require("系统.08．任务系统.10．主线配置驱动");
 
-// ---------- UI系统 ----------
-const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
-if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
-require("系统.09．表现系统.01．UI工具.index");
-require("系统.09．表现系统.02．垂直滚动条轨道");
-require("系统.09．表现系统.02．对话框系统入口.00．对话框系统入口");
-// 任务 UI 模块（通过入口文件统一加载）
-require("系统.08．任务系统.03．任务UI拆分.00．任务UI拆分入口");
-const 任务UI = require("系统.08．任务系统.03．任务UI") as { init: () => void; registerHotkey: () => void };
-if (typeof 任务UI.init === "function") 任务UI.init();
-if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
-const buffUI = require("系统.05．Buff系统.02．BuffUI") as { init?: () => void };
-if (typeof buffUI.init === "function") buffUI.init();
+// // ---------- UI系统 ----------
+ const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
+ if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
+ require("系统.09．表现系统.01．UI工具.index");
+ require("系统.09．表现系统.02．垂直滚动条轨道");
+ require("系统.09．表现系统.02．对话框系统入口.00．对话框系统入口");
+/// 任务 UI 模块（通过入口文件统一加载）
+ require("系统.08．任务系统.03．任务UI拆分.00．任务UI拆分入口");
+ const 任务UI = require("系统.08．任务系统.03．任务UI") as { init: () => void; registerHotkey: () => void };
+ if (typeof 任务UI.init === "function") 任务UI.init();
+ if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
+ const buffUI = require("系统.05．Buff系统.02．BuffUI") as { init?: () => void };
+ if (typeof buffUI.init === "function") buffUI.init();
 
-// ---------- 12．测试系统 ----------
-require("系统.12．测试系统.测试事件");
-require("系统.12．测试系统.测试事件2");
-require("系统.12．测试系统.测试233注册");
-require("系统.12．测试系统.任务测试");
-require("系统.12．测试系统.任意测试");
+// // ---------- 12．测试系统 ----------
+ require("系统.12．测试系统.测试事件");
+ require("系统.12．测试系统.测试事件2");
+ require("系统.12．测试系统.测试233注册");
+ require("系统.12．测试系统.任务测试");
+ require("系统.12．测试系统.任意测试");
 
 export {};

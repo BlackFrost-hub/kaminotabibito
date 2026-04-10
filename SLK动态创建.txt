@@ -1,0 +1,34 @@
+<?local slk = require 'slk' ?>
+<? local a1 = slk.ability.AItg:new 'ASG1' ?>
+    <?
+    a1.Name = "[系统]攻击力增加"
+    a1.DataA1 = 0
+?>
+<? local a1 = slk.ability.AId1:new 'ASG2' ?>
+    <?
+    a1.Name = "[系统]护甲增加"
+    a1.DataA1 = 0
+?>
+<? local a1 = slk.ability.Aamk:new 'ASG3' ?>
+    <?
+    a1.Name = "[系统]属性增加"
+    a1.DataA1 = 0
+    a1.DataB1 = 0
+    a1.DataC1 = 0
+    a1.Art = ""
+    a1.hero = "0"
+    a1.race = "unknow"
+    a1.levels = 1
+    a1.DataD1 = 1
+    a1.item = 1
+?>
+<? local a1 = slk.ability.AIms:new 'ASG6' ?>
+    <?
+    a1.Name = "[系统]移动速度增加"
+    a1.DataA1 = 0
+?>
+<? local a1 = slk.ability.AIsx:new 'ASG7' ?>
+    <?
+    a1.Name = "[系统]攻击速度增加"
+    a1.DataA1 = 0
+?>

@@ -24,6 +24,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.08．任务系统.10．主线配置驱动")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.init(self)
     local ____require_result_0 = require("./02．任务管理器")
     local questManager = ____require_result_0.questManager

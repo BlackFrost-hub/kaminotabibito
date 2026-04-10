@@ -48,11 +48,7 @@ export class QuestManager {
       questDB.initPlayerData(i);
     }
 
-    // 测试：为玩家0自动接受主线001-020和支线击杀步兵
-    for (let i = 1; i <= 20; i++) {
-      const id = "main_" + (i < 10 ? "00" + i : i < 100 ? "0" + i : "" + i);
-      questDB.acceptQuest(0, id);
-    }
+    // 测试：为玩家0自动接受支线击杀步兵
     questDB.acceptQuest(0, "side_002");
 
     // 注册原生War3任务同步（如果需要）

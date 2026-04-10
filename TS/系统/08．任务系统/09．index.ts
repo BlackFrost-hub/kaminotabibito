@@ -10,6 +10,7 @@ export * from "./02．任务管理器";
 
 // 导出任务UI
 export * from "./03．任务UI";
+export * from "./10．主线配置驱动";
 
 // 初始化函数
 export function init(): void {

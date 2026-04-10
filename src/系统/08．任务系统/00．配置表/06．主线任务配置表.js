@@ -1,0 +1,989 @@
+// 主线任务配置表 - 基于 JASS/1.J + 2.j + 3.j + 111.wts 自动提取
+// 生成时间: 2026-04-10
+//
+// 注意：以下 BJ 函数不建议使用，请使用替代方案：
+// - CreateQuestBJ: 
+// - GetLastCreatedQuestBJ: 
+// - 用我们自己的任务UI替代
+export const MAIN_STORY_QUEST_CONFIGS = [
+    {
+        requireID: 300001,
+        triggerName: "JLC精灵村001",
+        fromStage: "*",
+        condition: "RectContainsLoc( gg_rct______________077, YDLocal1Get(location, \"单位位置\")) == true)",
+        keyActions: "自动提取阶段块",
+        questMsgText: "|cffffff00『系统提示』：|r|cffff0000前往长老房间与长老对话！（小地图闪光处）|r",
+        dialogPreview: `
+    1. 自然守护者：站住，说出来意，已经很久没有生灵从正门来村子了。
+    2. 玩家：我们是奥斯特利|cffffff00『帝国调查军团』|r，受命前来面见精灵族西里尔一脉族长，希望能够放行，这是|cffffff00『帝国特派勋章』|r
+    3. 自然守护者：确实是帝国勋章，与典籍中所绘的一样。见过帝国使者，我马上开门，各位请进，族长的房子就在|cffffff00村子北部|r
+    `,
+        actionTimeline: `
+    0. StopMusic( false)
+    0. RemoveRect( gg_rct______________077)
+    0. YDLocal1Set(unit, "演员单位", GetTriggerUnit())
+    0. YDLocal1Set(group, "单位组", GetUnitsInRectMatching( gg_rct________________QY, Condition(function Trig_JLC_________001Func008Func005003002)))
+    0. ForGroupBJ( YDLocal1Get(group, "单位组"),function Trig_JLC_________001Func008Func006A)
+    0. DestroyGroup( YDLocal1Get(group, "单位组"))
+    3. ModifyGateBJ( bj_GATEOPERATION_OPEN, gg_dest_LTe3_0298)
+    3. StopMusic( false)
+    3. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『系统提示』：|r|cffff0000前往长老房间与长老对话！（小地图闪光处）|r")
+    3. PingMinimap( -29109.70, -27625.60, 10.00)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300002,
+        triggerName: "JLC精灵村001",
+        fromStage: "1",
+        toStage: 1,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) < 1) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"精灵村长老\", unit), 800.00) == true) and (IsUnitInGroup( GetTriggerUnit(), YDUserDataGet(string, \"玩家英雄\",\"单位组\", group)) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "前往北方『地精领地』查明事情真相",
+        questMsgText: "|cffffff00『系统提示』：|r|cffff0000前往村子北方地精处！（小地图信号位置）|r",
+        dialogPreview: `
+    1. 精灵村长老：各位帝国的使者，欢迎你们光顾西里尔村，不远千里前来，我就开门见山的问了，各位有什么需求呢。我等虽然落魄，但仍遵循着先祖的教导，会全力协助各位的。
+    2. 玩家：多谢族长，那我等就直说了。想必族长身在此处也能察觉到世界的变化，自那之后各种危机不断，我等为了确保地底封印的位置与状况，特来寻求西里尔一脉的帮助，希望族长将钥匙借于我们并告诉当年|cffffff00『地底封印』|r的位置
+    3. 精灵村长老：果然是因此事，老朽也预感帝国会派人前来调查。各位可否把|cffffff00『帝国勋章』|r借我查验一下真假，事关重大，不得不小心这种动荡时代不安分之人
+    4. 玩家：那是自然，这是勋章
+    5. 精灵村长老：赛利尔救世者的光辉，在此交相呼应展现光芒。
+    6. 精灵村长老：.....我已经用血脉咒语验证过，勋章确实与我们所存信物相呼应
+    7. 玩家：那还请族长....
+    8. 精灵族长老：实不相瞒各位，现在西里尔虽然全力帮助各位，但是实在|cffff0000缺少必要的条件|r
+    9. 玩家：族长请讲。
+    10. 精灵族长老：十分抱歉各位，西里尔一脉如今人脉凋零的太过严重，不然也不会迁居如此偏远的地方。如今族内已经没有能不依靠外力就解除钥匙封印的人了，在下已经是族内对于精灵术法最强的人了，即使如此也需要借助|cff99ccff『魔力源石』|r才能打开封印。此物只有在|cffff6600『东部沙漠』|r中可以开采出来。并且如今西里尔村也有很多麻烦，最近附近的|cffff0000『地精一族』|r实力莫名其妙的增长，频频袭击我们的采集队伍。我们也实在没有精力再去购买|cff99ccff『魔力源石』|r
+    11. 精灵族长老：地底封印的位置我族也没有强大的祭祀可以算出，如今只有克林姆德一脉可以做到了。
+    12. 玩家：哦？莫名其妙增长，是什么意思，魔力源石我们可以帮忙解决，地精的事情能否描述一下。
+    13. 精灵族长老：|cffff0000『地精一族』|r是很久以前就与我们共同居住在森林的种族，一直和睦共处也互不侵犯，最近不知为何，地精一族十分狂暴，并且总体实力也上升了不少。我们之间的实力平衡完全被打破，我们最近只有加强村子的防守，根本无法出去采集物资。可笑我们西里尔一脉当年身为精灵族两大王族，如今沦落至此，实在是愧对先祖
+    14. 玩家：原来是这样，精灵族自古与帝国是坚定的同盟，我们会去地精那里调查明白原因的，请给我们一定时间，我们会帮朋友解决这2个问题的。
+    15. 精灵族长老：各位愿意帮我们解决生存问题，实在是感激不尽，这里有附近森林的地图与一些补给，就赠与各位。东部地区的森林有一些史莱姆，可以掉落很多装备制造的材料，我们如今没有精力去收集材料，各位如果有的话，可以给我们村里的铁匠打造一些装备。。祝你们顺利。
+    `,
+        actionTimeline: `
+    0. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func010Func001A)
+    0. SetUnitOwner( gg_unit_n025_0372, Player(6), true)
+    0. RemoveLocation( udg_FHD)
+    0. set udg_FHD = Location( -26218.60, -28632.40)
+    0. YDLocal1Set(real, "X", OperatorRealAdd( -10112.90, GetRandomReal( -1800.00, 1800.00)))
+    0. YDLocal1Set(real, "Y", OperatorRealAdd( -26327.30, GetRandomReal( -1800.00, 1800.00)))
+    0. CreateItem( 'I09S', YDLocal1Get(real, "X"), YDLocal1Get(real, "Y"))
+    0. YDLocal1Set(unit, "精灵村长老", YDUserDataGet(string, "主线NPC","精灵村长老", unit))
+    0. StopMusic( false)
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 1)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. SetUnitFacingToFaceUnitTimed( GetTriggerUnit(), YDLocal1Get(unit, "精灵村长老"), 1.00)
+    0. SetUnitOwner( YDLocal1Get(unit, "精灵村长老"), Player(6), true)
+    0. SetUnitFacingTimed( YDLocal1Get(unit, "精灵村长老"), YDWEAngleBetweenUnits( YDLocal1Get(unit, "精灵村长老"), GetTriggerUnit()), 1.00)
+    4. EC_CreateEffect( "Abilities\\Spells\\Other\\Awaken\\Awaken.mdl", GetUnitX( GetTriggerUnit()), GetUnitY( GetTriggerUnit()), 0.0, 270.0, 4.00, 1.0, 3.00)
+    5. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_ITEMACQUIRED, (GetUnitName( GetTriggerUnit()) + "受到了远古波动！（|cffff99cc全属性+3|r）"))
+    5. ModifyHeroStat( bj_HEROSTAT_STR, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 3)
+    5. ModifyHeroStat( bj_HEROSTAT_AGI, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 3)
+    5. ModifyHeroStat( bj_HEROSTAT_INT, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 3)
+    15. CreateItem( 'I00X', GetUnitX( YDLocal1Get(unit, "精灵族长老")), GetUnitY( YDLocal1Get(unit, "精灵村长老")))
+    15. CreateItem( 'I04E', GetUnitX( YDLocal1Get(unit, "精灵族长老")), GetUnitY( YDLocal1Get(unit, "精灵村长老")))
+    15. QuestSetDescription( udg_ZX[1], "前往北方『地精领地』查明事情真相")
+    15. PingMinimap( -29392.70, -20049.20, 20.00)
+    15. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『系统提示』：|r|cffff0000前往村子北方地精处！（小地图信号位置）|r")
+    15. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func010Func041A)
+    15. StopMusic( false)
+    15. YDUserDataSet(string, "Boss","地精巫师", unit, CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'N00C', -26032.40, -13789.50, 270.00))
+    15. PauseUnit( YDUserDataGet(string, "Boss","地精巫师", unit), true)
+    15. SetUnitInvulnerable( YDUserDataGet(string, "Boss","地精巫师", unit), true)
+    15. SetUnitOwner( YDLocal1Get(unit, "精灵族长老"), Player(6), true)
+    15. TriggerRegisterUnitInRangeSimple(gg_trg_JLC_________001, 750.00, YDUserDataGet(string, "Boss","地精巫师", unit))
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300003,
+        triggerName: "JLC精灵村001",
+        fromStage: "1",
+        toStage: 2,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 1) and (RectContainsLoc( gg_rct______________020, YDLocal1Get(location, \"单位位置\")) == true)",
+        keyActions: "自动提取阶段块",
+        dialogPreview: `
+    1. 系统：在地精洞窟深处....（5秒按ESC可跳过）
+    2. 地精祭祀：精灵族美味的鲜血..
+    3. 地精祭祀：叽叽叽叽，有这等力量我们地精一族必将统治这片森林！
+    4. 地精祭祀：感谢创造吾之一族的造物主，感谢您赐予的力量！！
+    `,
+        actionTimeline: `
+    0. YDLocal1Set(unit, "15", YDUserDataGet(string, "Boss","地精巫师", unit))
+    0. SetTimeOfDay( 0.00)
+    0. ForGroupBJ( YDUserDataGet(string, "玩家英雄","单位组", group),function Trig_JLC_________001Func011Func003A)
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 2)
+    0. CinematicModeBJ( true, GetPlayersAll())
+    0. CinematicFilterGenericBJ( 2.00, BLEND_MODE_BLEND, "ReplaceableTextures\\CameraMasks\\Black_mask.blp", 50.00, 50.00, 50.00, 50.00, 0, 0, 0, 0)
+    1. DisplayCineFilter( false)
+    1. SetStackedSoundBJ( false, gg_snd_JQBGM01, gg_rct______________102)
+    1. SetStackedSoundBJ( true, gg_snd_BGM002, gg_rct______________025)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300004,
+        triggerName: "JLC精灵村001",
+        fromStage: "2",
+        toStage: 3,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 2) and (GetOwningPlayer( YDUserDataGet(string, \"Boss\",\"地精巫师\", unit)) == Player(PLAYER_NEUTRAL_PASSIVE)) and (IsUnitAliveBJ( YDUserDataGet(string, \"Boss\",\"地精巫师\", unit)) == true) and (IsUnitInGroup( GetTriggerUnit(), YDUserDataGet(string, \"玩家英雄\",\"单位组\", group)) == true) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"Boss\",\"地精巫师\", unit), 755.00) == true)",
+        keyActions: "自动提取阶段块",
+        dialogPreview: `
+    1. 系统：哦？居然有其他种族的人进来了
+    2. 玩家：这是？原来如此...我明白了
+    3. 玩家：地精一族之所以突然变得如此之强，全部都是因为你这家伙在作祟啊..
+    4. 地精巫师：嘶嘶哈哈，哪有如何，你也会成为我的祭品！
+    5. 玩家：哼..
+    `,
+        actionTimeline: `
+    0. YDLocal1Set(rect, "地点", gg_rct______________111)
+    0. set ydl_timer = CreateTimer()
+    0. set G_SIndex = GetHandleId(ydl_timer)
+    0. YDLocalSet(ydl_timer, rect, "地点", YDLocal1Get(rect, "地点"))
+    0. set G_SIndex = G_LIndex
+    0. TimerStart(ydl_timer, 0.00, false, function Trig_JLC_________001Func013Func002T)
+    0. SDR_DebugTimer(ydl_timer, 0.00, false," function Trig_JLC_________001Func013Func002T","JLC精灵村001")
+    0. GroupAddUnit( YDUserDataGet(string, "血条Boss","单位组", group), YDUserDataGet(string, "Boss","地精巫师", unit))
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 3)
+    0. YDLocal1Set(unit, "地精巫师", YDUserDataGet(string, "Boss","地精巫师", unit))
+    0. SetUnitOwner( YDLocal1Get(unit, "地精巫师"), Player(PLAYER_NEUTRAL_AGGRESSIVE), true)
+    0. PauseUnit( YDLocal1Get(unit, "地精巫师"), true)
+    0. SetUnitInvulnerable( YDLocal1Get(unit, "地精巫师"), true)
+    1. ModifyGateBJ( bj_GATEOPERATION_CLOSE, gg_dest_DTg5_9811)
+    5. TriggerRegisterUnitEvent(gg_trg_______Boss001, YDLocal1Get(unit, "地精巫师"), EVENT_UNIT_SPELL_EFFECT)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"魔抗", real, 0.30)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"减少控制时间", real, 0.30)
+    5. YDUserDataSet(string, "Boss战","绑定单位", unit, YDLocal1Get(unit, "地精巫师"))
+    5. YDUserDataSet(string, "Boss战","触发玩家", unit, GetTriggerUnit())
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"技能数量", integer, 0)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"转换场景", boolean, true)
+    5. YDUserDataSet(string, "Boss战","BS移动X轴", real, 25203.00)
+    5. YDUserDataSet(string, "Boss战","BS移动Y轴", real, 13203.70)
+    5. YDUserDataSet(string, "Boss战","玩家移动X轴", real, 23808.30)
+    5. YDUserDataSet(string, "Boss战","玩家移动Y轴", real, 12449.70)
+    5. YDUserDataSet(string, "Boss战","战斗音乐", sound, gg_snd_Bossbattle001)
+    5. YDUserDataSet(string, "Boss战","胜利音乐", sound, gg_snd_shengliBgm)
+    5. YDUserDataSet(string, "Boss战","地点", rect, gg_rct______________111)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"弱点数量", integer, udg_R/*弱点数量*/)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"天生弱点数", integer, 2)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"短剑弱", boolean, true)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"光弱", boolean, true)
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"器弱伤害需求", real, OperatorRealMultiply( GetUnitState( YDLocal1Get(unit, "Boss"), UNIT_STATE_MAX_LIFE), 0.03))
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"护盾值", integer, R2I( (5.00 + (2.00 * udg_N))))
+    5. YDUserDataSet(unit, YDLocal1Get(unit, "地精巫师"),"原始护盾值", integer, R2I( (5.00 + (2.00 * udg_N))))
+    5. ConditionalTriggerExecute( gg_trg_Boss____________u)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300005,
+        triggerName: "JLC精灵村001",
+        fromStage: "4",
+        toStage: 5,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 4) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"精灵村长老\", unit), 800.00) == true) and (IsUnitInGroup( GetTriggerUnit(), YDUserDataGet(string, \"玩家英雄\",\"单位组\", group)) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "穿过东部巨石山谷前往沙漠寻找能源水晶",
+        questMsgText: "|cffffff00『系统提示』：|r穿过东部|cffff9900『巨石山谷』|r前往沙漠寻找|cffcc99ff『魔力源泉』|r（小地图信号位置）",
+        dialogPreview: `
+    1. 玩家：族长，我们已经查明事情了，事出有因，地精一族是被一神秘人所控制，如今我们已经击败了地精首领，想来不久他们就会来进行和谈了。
+    2. 精灵村长老：多谢各位帝国使者，这样我们暂时不会有灭族之祸了，各位救我族于水火之中，不管各位使者因何而来，西里尔一族也要在此献上一份报答之礼。此物是我族当年穿行沙漠地区所用的宝物，可在沙漠中获得强大的环境亲和力，可惜如今我族虽有此物，但是实力实在不允许去沙漠冒险了，就当做礼物赠与各位把。
+    3. 玩家：族长客气了，既然能够让我们的行程变得更加顺利，那我们就笑纳了。我们即刻动身前往沙漠寻找|cffcc99ff『魔力源石』|r吧。
+    `,
+        actionTimeline: `
+    0. YDLocal1Set(unit, "精灵村长老", YDUserDataGet(string, "主线NPC","精灵村长老", unit))
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 5)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. SetUnitFacingToFaceUnitTimed( GetTriggerUnit(), YDLocal1Get(unit, "精灵村长老"), 1.00)
+    0. SetUnitFacingTimed( YDLocal1Get(unit, "精灵村长老"), YDWEAngleBetweenUnits( YDLocal1Get(unit, "精灵村长老"), GetTriggerUnit()), 1.00)
+    2. UnitAddItem( GetTriggerUnit(), CreateItem( 'I03J', 0.00, 0))
+    3. QuestSetDescription( udg_ZX[1], "穿过东部巨石山谷前往沙漠寻找能源水晶")
+    3. PingMinimap( -16003.40, -24617.30, 20.00)
+    3. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『系统提示』：|r穿过东部|cffff9900『巨石山谷』|r前往沙漠寻找|cffcc99ff『魔力源泉』|r（小地图信号位置）")
+    3. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func014Func014A)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300006,
+        triggerName: "JLC精灵村001",
+        fromStage: "5",
+        toStage: 6,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 5) and (RectContainsUnit( gg_rct______________098, GetTriggerUnit()) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：在聚集地中寻找魔力源石的消息",
+        questMsgText: "|cffffff00『系统提示』：|主线目标，在聚集地中寻找|cffcc99ff『魔力源石』|r的消息",
+        dialogPreview: `
+    1. 玩家：真是不容易，没想到如今沙漠的魔物如此之多。事不宜迟，休息一下马上寻找魔力源石的消息吧。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 6)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    1. QuestSetDescription( udg_ZX[1], "主线目标：在聚集地中寻找魔力源石的消息")
+    1. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『系统提示』：|主线目标，在聚集地中寻找|cffcc99ff『魔力源石』|r的消息")
+    1. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func015Func009A)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300007,
+        triggerName: "JLC精灵村001",
+        fromStage: "6",
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 6) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"沙漠年轻佣兵\", unit), 450.00) == true) and (GetOwningPlayer( YDUserDataGet(string, \"主线NPC\",\"沙漠年轻佣兵\", unit)) != Player(6))",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：继续在聚集地中寻找|cffcc99ff『魔力源石』|r的消息",
+        questMsgText: "|cffffff00『主线目标』：|r在聚集地中寻找|cffcc99ff『魔力源石』|r的消息",
+        dialogPreview: `
+    1. 玩家：对不起，打扰一下，请问您知道沙漠中特产的|cffcc99ff『魔力源石』|r怎么才能拿到？
+    2. 年轻佣兵：|cffcc99ff『魔力源石』|r？哦，，好像是有这种东西，但是我也从来没有见过啊，毕竟我到这里也没有几年，如今这东西好像越来越稀有了
+    3. 玩家：那我们再打听一下，多谢了。
+    `,
+        actionTimeline: `
+    0. SetUnitOwner( YDUserDataGet(string, "主线NPC","沙漠年轻佣兵", unit), Player(6), true)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    3. QuestSetDescription( udg_ZX[1], "主线目标：继续在聚集地中寻找|cffcc99ff『魔力源石』|r的消息")
+    3. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r在聚集地中寻找|cffcc99ff『魔力源石』|r的消息")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300008,
+        triggerName: "JLC精灵村001",
+        fromStage: "6",
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 6) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"沙漠年长者\", unit), 450.00) == true) and (GetOwningPlayer( YDUserDataGet(string, \"主线NPC\",\"沙漠年长者\", unit)) != Player(6))",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：前往聚集地东南部寻找情报商人",
+        questMsgText: "|cffffff00『主线目标』：|r前往|cffff0000聚集地东南部|r寻找|cffffff00『黑商』|r（小地图信号处）",
+        dialogPreview: `
+    1. 玩家：长辈您好，请问您听说过|cffcc99ff『魔力源石』|r吗？
+    2. 年长者：|cffcc99ff『魔力源石』|r啊，十几年前我刚接手我父亲的生意的时候还经常遇到的，如今沙漠魔物横行，很多|cffcc99ff『魔力源石』|r早就被消耗掉了，采集也越来越不容易，已经很久没有见到了，不过你可以去问问|cffffff00『情报商人』|r，他干|cffffff00卖情报|r的活，毕竟稀罕玩意的情报，总能卖个好价钱。他就在|cffff0000聚集地东南部|r摆摊呢
+    3. 玩家：多谢。
+    `,
+        actionTimeline: `
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. SetUnitOwner( YDUserDataGet(string, "主线NPC","沙漠年长者", unit), Player(6), true)
+    3. PingMinimap( -7139.30, -26096.70, 20.00)
+    3. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func017Func010A)
+    3. QuestSetDescription( udg_ZX[1], "主线目标：前往聚集地东南部寻找情报商人")
+    3. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往|cffff0000聚集地东南部|r寻找|cffffff00『黑商』|r（小地图信号处）")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300009,
+        triggerName: "JLC精灵村001",
+        fromStage: "6",
+        toStage: 7,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 6) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"沙漠情报商人\", unit), 450.00) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：前往|cffff9900『蛇人族领地』|r询问|cff00ff00『夜光翡翠』|r消息。",
+        questMsgText: "|cffffff00『主线目标』：|r前往|cffff9900『蛇人族领地』|r询问|cff00ff00『夜光翡翠』|r消息。（小地图信号处）",
+        dialogPreview: `
+    1. 玩家：您好，我们想问问有没有|cffcc99ff『魔力源石』|r的情报
+    2. 情报商人：嘿嘿，几位的穿着不像是长居沙漠的人吧，各位有所不知，|cffcc99ff『魔力源石』|r，现在可是稀罕货啊，别说在市面上看到了，很多近些年来聚集地的年轻人恐怕都只是听说而已喽。怎么，各位急需这东西？
+    3. 玩家：只是刚好听说，来顺路看看而已。听你这意思，有|cffcc99ff『魔力源石』|r的情报？
+    4. 情报商人：各位不用掩饰了，你们打探的时候我的眼线已经注意到了，现在沙漠的魔物数量，肯从外面来，还只是为了打听这种东西的，恐怕不只是顺路吧....不过我也不瞒各位了，|cffcc99ff『魔力源石』|r，我恰好知道来路，各位不知是否有意啊。
+    5. 玩家：哦？ 你知道消息？报个价先来听听。
+    6. 情报商人：各位只要拿一块同样大小的|cff00ff00『夜光翡翠』|r来和我换就行了。据我所知，|cffff0000沙漠东北部|r的|cffff9900『蛇人族』|r刚好有。如果各位能拿来，我马上就能让人找到|cffcc99ff『魔力源石』|r来交换怎么样
+    7. 玩家：|cff00ff00『夜光翡翠』|r？好像听说过这东西，曾经帝都出现过几次半个巴掌大的|cff00ff00『夜光翡翠』|r可是卖出了天价，你这一块|cffcc99ff『魔力源石』|r就想换|cff00ff00『夜光翡翠』|r，未免太贪心了吧。
+    8. 情报商人：各位有所不知道，如今这|cffcc99ff『魔力源石』|r当真是稀罕物，这代|cffff9900『蛇人族』|r出了一个绝世强者，为了让血脉与实力更进一步，那可是抢了沙漠中几乎所有的|cffcc99ff『魔力源石』|r储存，并且以当时的|cffcc99ff『魔力源石』|r矿脉为引布置了十分强大的阵法想要强行进化本体，就是不知结果怎样。反正如今的|cffff9900『蛇人族』|r已经低调了很多，那位高手再也没出现过，要不是|cffff9900『蛇人族』|r本身实力不差，其他人早就把他们的地盘掀了。但是就因为这事，沙漠中|cffcc99ff『魔力源石』|r近乎绝迹，偶尔才能挖到一点，要|cff00ff00『夜光翡翠』|r，也不算亏待你。
+    9. 玩家：如果你说的是实话，那也可以理解，但是你怎么就肯定我们能拿到这|cff00ff00『夜光翡翠』|r，我们可不想节外生枝招惹|cffff9900『蛇人族』|r。
+    10. 情报商人：嘿嘿，各位可能想错了。|cff00ff00『夜光翡翠』|r嘛，|cffff9900『蛇人族』|r又不是仅此一块，他们也算古老的种族了，族内积攒的财富不会只有这点的，并且我曾经与|cffff9900『蛇人族』|r进行交易，得知如果付出对应的价值，他们也是愿意交易|cff00ff00『夜光翡翠』|r的，不过当时我是没有那个能力喽。各位怎么弄到我不管，想要|cffcc99ff『魔力源石』|r，就拿|cff00ff00『夜光翡翠』|r来换吧。
+    11. 玩家：好，真如你所说的话，我们就先去|cffff9900『蛇人族』|r打探一下情况，阁下的话，不会反悔吧？
+    12. 情报商人：各位放心，我的名声，别说聚集地，整个沙漠的种族都是放心与我交易的，我就等各位的结果了
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 7)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    12. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func018Func017A)
+    12. PingMinimap( 1455.70, -21980.00, 20.00)
+    12. QuestSetDescription( udg_ZX[1], "主线目标：前往|cffff9900『蛇人族领地』|r询问|cff00ff00『夜光翡翠』|r消息。")
+    12. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往|cffff9900『蛇人族领地』|r询问|cff00ff00『夜光翡翠』|r消息。（小地图信号处）")
+    12. RemoveDestructable( gg_dest_Dofw_15095)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300010,
+        triggerName: "JLC精灵村001",
+        fromStage: "15",
+        toStage: 16,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 15) and (UnitHasItemOfTypeBJ( GetTriggerUnit(), 'I0D6') == true) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"沙漠情报商人\", unit), 450.00) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：回到|cffffffcc『西里尔精灵村』|r打开钥匙的封印。",
+        questMsgText: "|cffffff00『主线目标』：|r回到|cffffffcc『西里尔精灵村』（村口）|r打开钥匙的封印。",
+        dialogPreview: `
+    1. 玩家：你要的|cff00ff00『夜光翡翠』|r，我拿到了。
+    2. 情报商人：让我看看，黑夜中发出如彩虹一般的光亮。。没错，此物不假。真是如传闻一般的美丽啊，各位是如何从|cffff6800『蛇人族』|r换得的
+    3. 玩家：这你就不需要知道了，我们需要的|cff00ccff『魔力源石』|r，是否也该拿出来了呢？
+    4. 情报商人：没问题没问题，这就是|cff00ccff『魔力源石』|r。你们查验一下。
+    5. 玩家：没想到这么贵重的东西你真带在身边，就不怕在聚集地被抢走呢。（注入魔力）....不错，这种庞大的中性魔力想必没错了
+    6. 情报商人：嘿嘿，我想各位不会这么做的。。。那我们的交易就算完成了，如何。
+    7. 玩家：好，成交，那我们告辞。
+    8. 玩家：（既然|cff00ccff『魔力源石』|r已经拿到，马上回去找|cffff99cc『族长』|r解开封印吧。）
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 16)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. RemoveItem( GetItemOfTypeFromUnitBJ( GetTriggerUnit(), 'I0D6'))
+    4. UnitAddItem( GetTriggerUnit(), CreateItem( 'I0D5', 0, 0))
+    4. EC_CreateEffect( "war3mapImported\\BlueBalllight.mdl", GetUnitX( GetTriggerUnit()), GetUnitY( GetTriggerUnit()), 0.0, 270.0, 5.00, 1.0, 1.25)
+    8. QuestSetDescription( udg_ZX[1], "主线目标：回到|cffffffcc『西里尔精灵村』|r打开钥匙的封印。")
+    8. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r回到|cffffffcc『西里尔精灵村』（村口）|r打开钥匙的封印。")
+    8. YDLocal1Set(group, "DWZ", GetUnitsInRectMatching( gg_rct________________QY, Condition(function Trig_JLC_________001Func019Func020003002)))
+    8. ForGroupBJ( YDLocal1Get(group, "DWZ"),function Trig_JLC_________001Func019Func021A)
+    8. DestroyGroup( YDLocal1Get(group, "DWZ"))
+    8. YDUserDataSet(string, "ZXCS","DW", unit, CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'e06W', -27182.10, -25485.20, 0))
+    8. TriggerRegisterUnitInRangeSimple(gg_trg_JLC_________001, 300.00, YDUserDataGet(string, "ZXCS","DW", unit))
+    8. YDUserDataSet(string, "ZXCS2","DW", unit, CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'e06W', -24123.40, -26338.80, 0))
+    8. TriggerRegisterUnitInRangeSimple(gg_trg_JLC_________001, 300.00, YDUserDataGet(string, "ZXCS2","DW", unit))
+    8. set ydl_timer = CreateTimer()
+    8. set G_SIndex = GetHandleId(ydl_timer)
+    8. YDLocalSet(ydl_timer, unit, "GetTriggerUnit", GetTriggerUnit())
+    8. set G_SIndex = G_LIndex
+    8. TimerStart(ydl_timer, 4.00, false, function Trig_JLC_________001Func019Func027T)
+    8. SDR_DebugTimer(ydl_timer, 4.00, false," function Trig_JLC_________001Func019Func027T","JLC精灵村001")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300011,
+        triggerName: "JLC精灵村001",
+        fromStage: "16",
+        toStage: 17,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 16) and ((IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZXCS\",\"DW\", unit), 300.00) == true) or (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZXCS2\",\"DW\", unit), 300.00) == true))",
+        keyActions: "自动提取阶段块",
+        dialogPreview: `
+    1. 玩家：嗯？气氛有些不对，怎么没有见到村子的哨兵。大家小心可能有意外发生。
+    2. 玩家：这是....发生了什么事情
+    3. 玩家：那是！...族长！
+    4. 系统：老东西，别不识好歹，告诉我你们存放|cffffffcc『钥匙』|r的地方。不然，我掀了你这村子，照样找得到。
+    5. 族长：西里尔一脉虽然凋零，但也不是你等宵小可以侮辱的，我族既已发出誓言保护|cffffffcc『钥匙』|r，就绝不会把他交到你们这种人手里。
+    6. 系统：誓言誓言，你们这群西里尔族的人就是顽固不化，不然也不会落得现在这个下场，你就和你的族人|cffff0000在地下遵循你的誓言吧。。|r
+    7. 玩家：你休想！
+    8. 系统：！...你们怎么回来这么快，罢了，上次赶时间没收拾你们，你们来这里也只是为了他们保管的|cffffffcc『钥匙』|r吧，哼，这种迂腐的种族有什么可帮的。这次就|cffff0000让我亲自教训一下你们这群帝国的狗再办正事。|r
+    9. 玩家：那就看谁的拳头更硬吧！
+    10. 系统：找死！！！
+    11. 蒙面人（剧情对话）：你们..确定要与我为敌？
+    12. 玩家：那不然呢？难道你自己投降？
+    13. 蒙面人（剧情对话）：呵呵..果然是帝国的忠实仆犬，和精灵族一样迂腐！
+    14. 蒙面人（剧情对话）：也罢，就让你们见识一下吾等|cffcc99ff『魔法』|r的伟力吧！
+    15. 蒙面人（剧情）：（较远处的声音）各位，事态紧急，老朽有一事必须告明。此人所使用的魔法为|cffff00ff禁忌魔法|r|cffcc99ff『黑魔法』|r，带有神圣性质的|cffffff00『光属性魔法』|r|cffff0000一向是此等魔法的天敌|r，另外，一些带有审判性质的，�
+    16. 蒙面人（剧情对话）：老头，你说话难道我听不见吗？
+    17. 蒙面人（剧情对话）：呵呵..实话告诉你，确实如此，但那又如何？对付你们几个帝国废物罢了！
+    18. 精灵族长：（较远处的声音）各位，老朽有一事告明，此人所使用的魔法为|cffff00ff禁忌魔法|r|cffcc99ff『黑魔法』|r，带有神圣性质的|cffffff00『光属性魔法』|r|cffff0000一向是此等魔法的天敌|r，另外，一些带有审判性质的，如|cffff0000『火属
+    19. 精灵族长：（无视蒙面人）另外，据古籍记载，此等魔法代价极大，一般需要通过|cffff0000消耗自身生命力进行发动|r，而补充代价的方式就是|cffff0000掠夺他人生命力|r。因此各位需小心躲避！
+    20. 精灵族长：我族的存亡就拜托各位了..
+    21. 蒙面人（剧情对话）：呵呵.....不愧是历史悠久的古老种族。
+    22. 玩家：（族长....）放心交给我们吧！
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 17)
+    0. RemoveUnit( YDUserDataGet(string, "ZXCS","DW", unit))
+    0. RemoveUnit( YDUserDataGet(string, "ZXCS2","DW", unit))
+    0. YDUserDataClearTable(string, "ZXCS")
+    0. YDUserDataClearTable(string, "ZXCS2")
+    0. ForGroupBJ( YDUserDataGet(string, "玩家英雄","单位组", group),function Trig_JLC_________001Func020Func008A)
+    0. SetStackedSoundBJ( false, gg_snd_JQBGM03, gg_rct________________QY)
+    0. YDLocal1Set(group, "DWZ", GetUnitsInRectMatching( gg_rct________________QY, Condition(function Trig_JLC_________001Func020Func010003002)))
+    0. ForGroupBJ( YDLocal1Get(group, "DWZ"),function Trig_JLC_________001Func020Func011A)
+    0. YDLocal1Set(unit, "族长", YDUserDataGet(string, "主线NPC","精灵村长老", unit))
+    0. SetUnitPosition( YDLocal1Get(unit, "族长"), -26114.40, -28671.30)
+    1. SetStackedSoundBJ( true, gg_snd_JQBGM04, gg_rct________________QY)
+    1. CinematicModeBJ( true, GetPlayersAll())
+    1. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_HINT, "|cffffff00『系统提示』：|r这段剧情在『测试版本』是无法跳过的")
+    1. SetUnitFacing( YDLocal1Get(unit, "族长"), 180.00)
+    1. YDLocal1Set(unit, "0", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'n05H', -26755.10, -28618.60, 0.00))
+    1. YDLocal1Set(unit, "1", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'nhef', -25907.10, -28413.00, 178.00))
+    1. YDLocal1Set(unit, "2", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'nhef', -25888.10, -28937.10, 185.47))
+    1. YDLocal1Set(unit, "3", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'n01H', -26119.90, -28926.50, 123.70))
+    1. YDLocal1Set(unit, "4", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'n01H', -25965.70, -29021.40, 180.00))
+    1. YDLocal1Set(unit, "5", CreateUnit( Player(PLAYER_NEUTRAL_PASSIVE), 'n01H', -26065.80, -28460.50, 180.00))
+    1. set udg_DXZSW/*剧情*/[0] = DzDoodadCreate( 'YOtf', 1, -27676.50, -26406.00, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[1] = DzDoodadCreate( 'YOtf', 1, -27008.70, -26384.50, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[2] = DzDoodadCreate( 'YOtf', 1, -26437.10, -27038.10, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[3] = DzDoodadCreate( 'YOtf', 1, -27524.20, -27604.20, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[4] = DzDoodadCreate( 'YOtf', 1, -27404.80, -28326.70, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[5] = DzDoodadCreate( 'YOtf', 1, -26557.10, -28108.30, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[6] = DzDoodadCreate( 'YOtf', 1, -24975.30, -28808.40, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[7] = DzDoodadCreate( 'YOtf', 1, -25385.30, -27834.40, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[8] = DzDoodadCreate( 'YOtf', 1, -23911.90, -29142.20, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[9] = DzDoodadCreate( 'YOtf', 1, -22237.80, -28776.70, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[10] = DzDoodadCreate( 'YOtf', 1, -22255.90, -28312.70, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[11] = DzDoodadCreate( 'YOtf', 1, -24574.10, -27746.70, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[12] = DzDoodadCreate( 'YOtf', 1, -23911.90, -29142.20, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[13] = DzDoodadCreate( 'YOtf', 1, -23963.10, -27718.00, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[14] = DzDoodadCreate( 'YOtf', 1, -23632.00, -27698.70, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[15] = DzDoodadCreate( 'YOtf', 1, -25487.60, -26993.60, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[16] = DzDoodadCreate( 'YOtf', 1, -24839.60, -26980.80, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[17] = DzDoodadCreate( 'YOtf', 1, -23963.10, -27718.00, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[18] = DzDoodadCreate( 'YOtf', 1, -24464.30, -26590.10, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[19] = DzDoodadCreate( 'YOtf', 1, -23681.30, -26604.50, 0, GetRandomDirectionDeg(), 1.00)
+    1. set udg_DXZSW/*剧情*/[20] = DzDoodadCreate( 'YOtf', 1, -23665.10, -27128.50, 0, GetRandomDirectionDeg(), 1.00)
+    1. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func020Func046A)
+    2. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func020Func048A)
+    6. ForGroupBJ( YDUserDataGet(string, "玩家英雄","单位组", group),function Trig_JLC_________001Func020Func053A)
+    7. EXSetUnitFacing( YDLocal1Get(unit, "0"), 90.00)
+    9. ForGroupBJ( YDUserDataGet(string, "玩家英雄","单位组", group),function Trig_JLC_________001Func020Func058A)
+    9. EC_CreateEffect( "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl", GetUnitX( YDLocal1Get(unit, "0")), GetUnitY( YDLocal1Get(unit, "0")), 0.0, 270.0, 1.50, 1.0, 1.00)
+    10. CinematicModeBJ( false, GetPlayersAll())
+    10. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________001Func020Func062A)
+    10. SetStackedSoundBJ( false, gg_snd_JQBGM04, gg_rct________________QY)
+    10. YDLocal1Set(integer, "随机整数", GetRandomInt( 1, 2))
+    10. PauseUnit( YDLocal1Get(unit, "BS"), true)
+    10. SetUnitInvulnerable( YDLocal1Get(unit, "BS"), true)
+    10. YDUserDataSet(string, "Boss战","绑定单位", unit, YDLocal1Get(unit, "BS"))
+    10. YDUserDataSet(string, "Boss战","触发玩家", unit, GetTriggerUnit())
+    10. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"转换场景", boolean, true)
+    10. YDUserDataSet(string, "Boss战","BS移动X轴", real, GetUnitX( YDLocal1Get(unit, "BS")))
+    10. YDUserDataSet(string, "Boss战","BS移动Y轴", real, GetUnitY( YDLocal1Get(unit, "BS")))
+    10. YDUserDataSet(string, "Boss战","玩家移动X轴", real, 26760.30)
+    10. YDUserDataSet(string, "Boss战","玩家移动Y轴", real, 17338.30)
+    10. YDUserDataSet(string, "Boss战","战斗音乐", sound, gg_snd_battleBosszuizhong01)
+    10. YDUserDataSet(string, "Boss战","胜利音乐", sound, gg_snd_shengliBgm)
+    10. YDUserDataSet(string, "Boss战","地点", rect, gg_rct______________1522)
+    10. ConditionalTriggerExecute( gg_trg_Boss____________u)
+    10. set ydl_timer = CreateTimer()
+    10. set G_SIndex = GetHandleId(ydl_timer)
+    10. YDLocalSet(ydl_timer, unit, "1", YDLocal1Get(unit, "1"))
+    10. YDLocalSet(ydl_timer, unit, "2", YDLocal1Get(unit, "2"))
+    10. YDLocalSet(ydl_timer, unit, "3", YDLocal1Get(unit, "3"))
+    10. YDLocalSet(ydl_timer, unit, "4", YDLocal1Get(unit, "4"))
+    10. YDLocalSet(ydl_timer, unit, "5", YDLocal1Get(unit, "5"))
+    10. YDLocalSet(ydl_timer, unit, "BS", YDLocal1Get(unit, "BS"))
+    10. YDLocalSet(ydl_timer, group, "DWZ", YDLocal1Get(group, "DWZ"))
+    10. set G_SIndex = G_LIndex
+    10. TimerStart(ydl_timer, 1.00, true, function Trig_JLC_________001Func020Func079T)
+    10. SDR_DebugTimer(ydl_timer, 1.00, true," function Trig_JLC_________001Func020Func079T","JLC精灵村001")
+    11. RemoveUnit( YDLocal1Get(unit, "0"))
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300012,
+        triggerName: "JLC精灵村001",
+        fromStage: "18",
+        toStage: 19,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 18) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"精灵村长老\", unit), 850.00) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r使用|cffff99cc『森林传送阵』（在传送阵附近使用『环境交互』）|r前往|cffffcc99『克林山谷』|r寻找|cffff9900『克林姆德一脉』（|r|cffffffcc小地图信号处）。|r",
+        questMsgText: "|cffffff00『主线目标』：|r使用|cffff99cc『森林传送阵』（在传送阵附近使用『环境交互』）|r前往|cffffcc99『克林山谷』|r寻找|cffff9900『克林姆德一脉』（|r|cffffffcc小地图信号处）。|r",
+        dialogPreview: `
+    1. 精灵族长：赛利尔救世者的当代继承人在此，吾等血脉仍在流淌，吾等荣誉仍在延续，请先祖之力打开封印，让我族再次为大陆稳定而奉献.....
+    2. 精灵族长：这就是我族的钥匙存放处了，在此交于各位。过段时间我族便打算搬离此处了。只是可惜了我族的精灵树，已经无法再次搬离了。没有了精灵树，我族再也无法诞生魔法使用者难道西里尔一脉真的要归为凡尘了嘛。
+    3. 玩家：族长如果有困难，可以求助|cffffcc99『奥斯特利帝国』|r，我们一定会保护西里尔一族的
+    4. 精灵族长：多谢各位帝国使者。我等会考虑的。各位接下来要去|cffffcc99克林姆德一族|r那里吧，我族在森林之中隐藏有前往克林姆德一脉居住地克林山谷的传送阵，|cffff0000|cffffff00各位可以凭这枚令牌开启迅速前往|r|r，
+    5. 玩家：多谢族长，那我等就立刻出发了。
+    6. 玩家：（|cffffcc99西里尔一脉|r的钥匙已经拿到，接下来便是前往|cffffcc99克林姆德一脉|r获取钥匙与封印之地的位置了，|cffffcc99克林姆德一脉并|r未衰落，但是目标也很明显啊，现在还有|cffcc99ff分离教派|r参与其中，恐怕此行不会顺利_
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 19)
+    0. YDLocal1Set(unit, "族长", YDUserDataGet(string, "主线NPC","精灵族长老", unit))
+    1. EC_CreateEffect( "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX( YDLocal1Get(unit, "族长")), GetUnitY( YDLocal1Get(unit, "族长")), 0.0, 270.0, 2.00, 1.0, 1.50)
+    1. ShowDestructable( gg_dest_B00X_0013, false)
+    6. QuestSetDescription( udg_ZX[1], "|cffffff00『主线目标』：|r使用|cffff99cc『森林传送阵』（在传送阵附近使用『环境交互』）|r前往|cffffcc99『克林山谷』|r寻找|cffff9900『克林姆德一脉』（|r|cffffffcc小地图信号处）。|r")
+    6. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r使用|cffff99cc『森林传送阵』（在传送阵附近使用『环境交互』）|r前往|cffffcc99『克林山谷』|r寻找|cffff9900『克林姆德一脉』（|r|cffffffcc小地图信号处）。|r")
+    6. SetUnitOwner( gg_unit_n025_0033, Player(6), true)
+    6. PingMinimap( -23154.70, -14847.90, 20.00)
+    6. QuestSetCompleted( udg_ZX[1], true)
+    6. CreateQuestBJ( bj_QUESTTYPE_REQ_DISCOVERED, "第二幕：旧怨与战火", "TRIGSTR_10790", "ReplaceableTextures\\CommandButtons\\BTNRavenForm.blp")
+    6. set udg_ZX[2] = GetLastCreatedQuestBJ()
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300013,
+        triggerName: "SRZ蛇人族002",
+        fromStage: "7",
+        toStage: 8,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 7) and (RectContainsUnit( gg_rct______________106, GetTriggerUnit()) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "主线目标：前往|cffff9900『东边藏品处』|r询问|cff00ff00『夜光翡翠』|r消息。",
+        questMsgText: "|cffffff00『主线目标』：|r前往|cffff9900『东边藏品处』|r询问|cff00ff00『夜光翡翠』|r消息。（小地图信号处）",
+        dialogPreview: `
+    1. 守卫：人类？不是熟面孔，你们是从外面来的吧，来我们蛇人族想干什么。
+    2. 玩家：二位大哥真是好眼力，我等确实从外面而来，想要和贵族进行一笔交易，可否麻烦引荐一下。这是一点小意思..
+    3. 守卫：嗯。。。。那好吧，看你们不是常来的几个人族商人，也罢，这是人族的标识令牌，带好别丢了，可以在蛇人族内不被驱逐。我族的藏品商会就在东部的王宫前面，你们过去找管理人就是。
+    4. 玩家：多谢二位大哥。
+    `,
+        actionTimeline: `
+    0. RemoveRect( gg_rct______________106)
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 8)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. PauseUnit( GetTriggerUnit(), true)
+    3. PauseUnit( GetTriggerUnit(), false)
+    4. AdjustPlayerStateBJ( -233, GetOwningPlayer( GetTriggerUnit()), PLAYER_STATE_RESOURCE_GOLD)
+    4. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_SRZ_________002Func002Func014A)
+    4. PingMinimap( -20880.70, 3186.40, 20.00)
+    4. QuestSetDescription( udg_ZX[1], "主线目标：前往|cffff9900『东边藏品处』|r询问|cff00ff00『夜光翡翠』|r消息。")
+    4. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往|cffff9900『东边藏品处』|r询问|cff00ff00『夜光翡翠』|r消息。（小地图信号处）")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300014,
+        triggerName: "SRZ蛇人族002",
+        fromStage: "8",
+        toStage: 9,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"蛇人族藏品管家\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 8)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r|cffff6800『蛇人族』|r让我们帮他们狩猎一头|cffff0000『食人魔』|r，看来并不简单，考虑好后再作决定吧（考虑清楚后选择|cffffffcc『藏品管家』|r后点击接受任务）",
+        questMsgText: "|cffffff00『主线目标』：|r|cffff6800『蛇人族』|r让我们帮他们狩猎一头|cffff0000『食人魔』|r，看来并不简单，考虑好后再作决定吧（考虑清楚后选择|cffffffcc『藏品管家』|r后点击接受任务）",
+        dialogPreview: `
+    1. 宝藏管事：欢迎欢迎，几位人族朋友远道而来不知相中了我族什么商品呀
+    2. 玩家：据说蛇人一族能够生产十分稀少的|cff00ff00『夜光翡翠』|r，不知现在可否有货啊？
+    3. 宝藏管事：哦？各位居然看中了|cff00ff00『夜光翡翠』|r，不瞒各位，货嘛，确实是有。只是这|cff00ff00『夜光翡翠』|r想必各位也清楚它的价值吧，不知各位愿意用什么交换呀。
+    4. 玩家：自然知晓，不知贵族愿意接受怎样的交换呢。
+    5. 宝藏管事：这样吧，既然各位了解行情，那我直说了，看各位的装扮想必实力不弱。我族最近发现了一头|cffff0000沙漠食人魔|r，一直蚕食沙漠的任何生灵。你将他击杀也正好除害，这头食人魔的头部非常有价值。我族想要将其击杀拿到他的材料
+    6. 玩家：好吧，让我思考一下再做决定。
+    7. 宝藏管事：没问题，各位想好了来找我。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 9)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    7. QuestSetDescription( udg_ZX[1], "|cffffff00『主线目标』：|r|cffff6800『蛇人族』|r让我们帮他们狩猎一头|cffff0000『食人魔』|r，看来并不简单，考虑好后再作决定吧（考虑清楚后选择|cffffffcc『藏品管家』|r后点击接受任务）")
+    7. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r|cffff6800『蛇人族』|r让我们帮他们狩猎一头|cffff0000『食人魔』|r，看来并不简单，考虑好后再作决定吧（考虑清楚后选择|cffffffcc『藏品管家』|r后点击接受任务）")
+    7. AddItemToStockBJ( 'I0D0', YDUserDataGet(string, "主线NPC","蛇人族藏品管家", unit), 1, 1)
+    7. set ydl_timer = CreateTimer()
+    7. set G_SIndex = GetHandleId(ydl_timer)
+    7. set G_SIndex = G_LIndex
+    7. TimerStart(ydl_timer, 2.00, false, function Trig_SRZ_________002Func004Func015T)
+    7. SDR_DebugTimer(ydl_timer, 2.00, false," function Trig_SRZ_________002Func004Func015T","SRZ蛇人族002")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300015,
+        triggerName: "SRZ蛇人族002",
+        fromStage: "10",
+        toStage: 11,
+        condition: "YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 10) and (GetOwningPlayer( YDUserDataGet(string, \"Boss\",\"沙漠食人魔\", unit)) == Player(PLAYER_NEUTRAL_PASSIVE)) and (IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"Boss\",\"沙漠食人魔\", unit), 1000.00) == true)",
+        keyActions: "自动提取阶段块",
+        dialogPreview: `
+    1. 玩家：！！！应该就是你了，沙漠食人魔..
+    2. 沙漠食人魔：活着的东西...杀..
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 11)
+    0. set ydl_timer = CreateTimer()
+    0. set G_SIndex = GetHandleId(ydl_timer)
+    0. YDLocalSet(ydl_timer, rect, "地点", YDLocal1Get(rect, "地点"))
+    0. set G_SIndex = G_LIndex
+    0. TimerStart(ydl_timer, 0.00, false, function Trig_SRZ_________002Func005Func002T)
+    0. SDR_DebugTimer(ydl_timer, 0.00, false," function Trig_SRZ_________002Func005Func002T","SRZ蛇人族002")
+    0. GroupAddUnit( YDUserDataGet(string, "血条Boss","单位组", group), YDUserDataGet(string, "Boss","沙漠食人魔", unit))
+    0. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_SRZ_________002Func005Func004A)
+    0. YDLocal1Set(unit, "沙漠食人魔", YDUserDataGet(string, "Boss","沙漠食人魔", unit))
+    0. YDLocal1Set(unit, "BS", YDLocal1Get(unit, "沙漠食人魔"))
+    0. SetUnitOwner( YDLocal1Get(unit, "沙漠食人魔"), Player(PLAYER_NEUTRAL_AGGRESSIVE), true)
+    0. PauseUnit( YDLocal1Get(unit, "沙漠食人魔"), true)
+    0. SetUnitInvulnerable( YDLocal1Get(unit, "沙漠食人魔"), true)
+    0. StarOther_PanCameraToTimedUnitForPlayer( GetOwningPlayer( GetTriggerUnit()), YDLocal1Get(unit, "沙漠食人魔"), 0.75)
+    1. YDLocal1Set(degree, "角度", YDWEAngleBetweenUnits( YDLocal1Get(unit, "沙漠食人魔"), GetTriggerUnit()))
+    1. SetUnitFacing( YDLocal1Get(unit, "沙漠食人魔"), YDLocal1Get(degree, "角度"))
+    3. EC_CreateEffect( "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl", GetUnitX( YDLocal1Get(unit, "沙漠食人魔")), GetUnitY( YDLocal1Get(unit, "沙漠食人魔")), 0.0, 270.0, 2.50, 1.0, 1.00)
+    3. set ydul_A = 1
+    3. YDLocal1Set(location, "D", GS_PolarProjectionBJ( GetUnitLoc( YDLocal1Get(unit, "沙漠食人魔")), 150.00, OperatorDegreeMultiply( 60.00, I2R( ydul_A))))
+    3. EC_CreateEffect( "war3mapImported\\blood2022720203813.mdl", GetLocationX( YDLocal1Get(location, "D")), GetLocationY( YDLocal1Get(location, "D")), 0.0, 270.0, 2.00, 1.0, 1.00)
+    3. RemoveLocation( YDLocal1Get(location, "D"))
+    3. set ydul_A = ydul_A + 1
+    3. PlaySoundBJ( gg_snd_GWSY05)
+    3. IssuePointOrder( YDLocal1Get(unit, "沙漠食人魔"), "patrol", 0, 0)
+    3. SetUnitInvulnerable( YDLocal1Get(unit, "沙漠食人魔"), false)
+    3. PauseUnit( YDLocal1Get(unit, "沙漠食人魔"), false)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"魔抗", real, 0.30)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"暴击率", real, 0.20)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"暴击伤害", real, 0.25)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"减少控制时间", real, 0.30)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"命中率", real, 0.05)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"闪避率", real, 0.05)
+    3. YDUserDataSet(string, "Boss战","绑定单位", unit, YDLocal1Get(unit, "沙漠食人魔"))
+    3. YDUserDataSet(string, "Boss战","战斗音乐", sound, gg_snd_Bossbattle001)
+    3. YDUserDataSet(string, "Boss战","胜利音乐", sound, gg_snd_shengliBgm)
+    3. YDUserDataSet(string, "Boss战","地点", rect, gg_rct______________047)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"弱点数量", integer, udg_R/*弱点数量*/)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"天生弱点数", integer, 2)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"弓弱", boolean, true)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"暗弱", boolean, true)
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"器弱伤害需求", real, OperatorRealMultiply( GetUnitState( YDLocal1Get(unit, "BS"), UNIT_STATE_MAX_LIFE), 0.03))
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"护盾值", integer, R2I( (7.00 + (2.00 * udg_N))))
+    3. YDUserDataSet(unit, YDLocal1Get(unit, "BS"),"原始护盾值", integer, R2I( (7.00 + (2.00 * udg_N))))
+    3. set ydl_timer = CreateTimer()
+    3. set G_SIndex = GetHandleId(ydl_timer)
+    3. YDLocalSet(ydl_timer, unit, "BS", YDLocal1Get(unit, "BS"))
+    3. YDLocalSet(ydl_timer, group, "DWZ", YDLocal1Get(group, "DWZ"))
+    3. YDLocalSet(ydl_timer, integer, "ZS", YDLocal1Get(integer, "ZS"))
+    3. YDLocalSet(ydl_timer, unit, "玩家", YDLocal1Get(unit, "玩家"))
+    3. set G_SIndex = G_LIndex
+    3. TimerStart(ydl_timer, 2.50, true, function Trig_SRZ_________002Func005Func041T)
+    3. SDR_DebugTimer(ydl_timer, 2.50, true," function Trig_SRZ_________002Func005Func041T","SRZ蛇人族002")
+    3. ConditionalTriggerExecute( gg_trg_Boss____________u)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300016,
+        triggerName: "SRZ蛇人族002",
+        fromStage: "13",
+        toStage: 14,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"蛇人族藏品管家\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 13) and (UnitHasItemOfTypeBJ( GetTriggerUnit(), 'I0D4') == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "『主线目标』：与队长|cffff0000切磋|r，血量削减至10%让其认可实力。|cffffffcc(使用英雄天生技能『异界能力』中的『挑战』对队长使用后开始Boss战决斗)|r",
+        questMsgText: "『主线目标』：与队长|cffff0000切磋|r，血量削减至10%让其认可实力。|cffffffcc(使用英雄天生技能『异界能力』中的『挑战』对队长使用后开始Boss战决斗)|r",
+        dialogPreview: `
+    1. 玩家：|cffff0000『食人魔』|r已经被我们解决了，请问我们要的东西准备好了吗？
+    2. 宝藏管事：让我们查验一下.......果然是食人魔的首级，真是制作顶级道具的利器，既然各位已经拿来了。那|cff00ff00『夜光翡翠』|r上奉上。
+    3. 玩家：对了，管事，请问你知不知道......（叙说了遭遇的事情）
+    4. 宝藏管事：......这件事情我知道了，交给我族就好，你们不需要操心了。
+    5. 玩家：好，既然交易已经完成，那我们先告辞了。
+    6. 宝藏管事：感谢您对我族的信任。希望下次还可以顺利交易。
+    7. 玩家：（既然已经拿到|cff00ff00『夜光翡翠』|r，马上返回聚集地换取|cff00ccff『魔力源石』|r吧）
+    8. 系统：（远处传来的声音）切慢，|cffff0000几位恐怕需要等一下了。|r
+    9. 玩家：谁在外面打算阻拦我等离开，管事，这是怎么回事？
+    10. 宝藏管事：原来是|cffffcc99『利尔队长』|r，诸位，这位是我们|cffff6600『蛇人族』|r的皇家卫队队长。|cffffcc99『利尔阁下』|r，这几位人族朋友刚与我们商会进行完交易，不知发生了什么事情
+    11. 蛇人族皇家卫队队长：就在前不久，我族发现镇族之宝|cffff00ff『美杜莎之瞳』|r被盗，门口卫兵说几位不久之前刚到我族，既非我族之人，自然需要前来调查一番。
+    12. 宝藏管事：几位人族朋友刚刚助商会击败了沙漠食人魔，他们的实力毋庸置疑的，而且一来我族就立刻来找我，我认为无需做这种偷鸡摸狗之事。
+    13. 蛇人族皇家卫队队长：哦？你是这么认为的？好，既然你说他们实力超群，那我就来验证一下，|cffff0000正面击败我，就放你们走|r，不然。。。就留下来等我们查明你们的身份再说吧。
+    14. 玩家：（事已至此，只能先击败他了），既然队长这么说了，几位恭敬不如从命了，我们就点到为止。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 14)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. PauseUnit( GetTriggerUnit(), true)
+    1. RemoveItem( GetItemOfTypeFromUnitBJ( GetTriggerUnit(), 'I0D4'))
+    4. UnitAddItem( GetTriggerUnit(), CreateItem( 'I0D6', 0, 0))
+    6. SetStackedSoundBJ( false, gg_snd_BGM019, gg_rct______________107)
+    7. YDUserDataSet(string, "主线NPC","蛇人族卫队长", unit, CreateUnit( Player(6), 'h01D', -22935.90, 3154.30, 0))
+    7. YDLocal1Set(unit, "队长", YDUserDataGet(string, "主线NPC","蛇人族卫队长", unit))
+    7. IssuePointOrderById( YDLocal1Get(unit, "队长"), 851971, -21023.40, 3259.50)
+    7. SetStackedSoundBJ( true, gg_snd_JQBGM02, gg_rct______________107)
+    8. SetUnitFacing( GetTriggerUnit(), 200.00)
+    13. PauseUnit( GetTriggerUnit(), false)
+    13. SetUnitOwner( YDLocal1Get(unit, "队长"), Player(PLAYER_NEUTRAL_PASSIVE), true)
+    13. SetUnitPosition( YDLocal1Get(unit, "队长"), -21023.40, 3259.50)
+    14. QuestSetDescription( udg_ZX[1], "『主线目标』：与队长|cffff0000切磋|r，血量削减至10%让其认可实力。|cffffffcc(使用英雄天生技能『异界能力』中的『挑战』对队长使用后开始Boss战决斗)|r")
+    14. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "『主线目标』：与队长|cffff0000切磋|r，血量削减至10%让其认可实力。|cffffffcc(使用英雄天生技能『异界能力』中的『挑战』对队长使用后开始Boss战决斗)|r")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300017,
+        triggerName: "JLC精灵城003",
+        fromStage: "*",
+        toStage: 21,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"阿尔文\", unit), 400.00) == true)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r穿过|cffff9900『克林山谷』|r前往|cffff9900『克林姆德城』|r",
+        questMsgText: "|cffffff00『主线目标』：|r穿过|cffff9900『克林山谷』|r前往|cffff9900『克林姆德城』|r（小地图信号处）",
+        dialogPreview: `
+    1. 玩家：您就是阿尔文阁下吧。我等是奥斯特里帝国异端调查团，特来觐见|cffffcc99『克林姆德王』|r。此乃帝国勋章。
+    2. 阿尔文：..既是帝国使者，我等自当引见，各位稍后片刻，容我验证一下勋章。
+    3. 阿尔文：塞利尔救世者的光辉，在此交相呼应展现光芒”，没错此乃货真价实的帝国勋章。
+    4. 阿尔文：各位帝国使者，最近局势确实有些动荡，原本应由我亲自带路的，但是如今有|cffff0000宵小之辈|r伺机而动，我等需要时刻警戒。实在是无法一同前往，万分抱歉。
+    5. 阿尔文：我会将门扉之引投影到几位的手上，|cffffffcc此印可引导各位前往克林姆德城门|r。信息我已经刻印在其中，|cffffffcc各位交予守卫查验一番便可通行。|r
+    6. 玩家：阁下既有职责所在，那我等便自行前往。
+    7. 阿尔文：多谢各位使者体谅。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 21)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. YDLocal1Set(unit, "aew", YDUserDataGet(string, "主线NPC","阿尔文", unit))
+    3. EC_CreateEffect( "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX( YDLocal1Get(unit, "aew")), GetUnitY( YDLocal1Get(unit, "aew")), 0.0, 270.0, 2.00, 1.0, 1.50)
+    7. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r穿过|cffff9900『克林山谷』|r前往|cffff9900『克林姆德城』|r")
+    7. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r穿过|cffff9900『克林山谷』|r前往|cffff9900『克林姆德城』|r（小地图信号处）")
+    7. PingMinimap( -6997.40, -13110.90, 20.00)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300018,
+        triggerName: "JLC精灵城003",
+        fromStage: "21",
+        toStage: 22,
+        condition: "IsUnitInRange( GetTriggerUnit(), gg_unit_n04R_0048, 999.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 21)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德王』|r|n。",
+        questMsgText: "|cffffff00『主线目标』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德王』|r|n。",
+        dialogPreview: `
+    1. 玩家：我等是奥斯特里帝国异端调查团，这是克林山谷看守者阿尔文阁下给予的门扉之印。
+    2. 塔上的看守者：确实是阿尔文大人的门扉之印术式，几位帝国使者请进，|cffffffcc殿下的居所就在城左侧门口有两盏很大的精灵灯笼便是|r，几位持门扉之印前往即可。
+    3. 玩家：多谢告知，我等立刻前往觐见
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 22)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    1. set ydl_timer = CreateTimer()
+    1. set G_SIndex = GetHandleId(ydl_timer)
+    1. set G_SIndex = G_LIndex
+    1. TimerStart(ydl_timer, 2.50, false, function Trig_JLC_________003Func003Func006T)
+    1. SDR_DebugTimer(ydl_timer, 2.50, false," function Trig_JLC_________003Func003Func006T","JLC精灵城003")
+    2. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________003Func003Func008A)
+    3. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德王』|r|n。")
+    3. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德王』|r|n。")
+    3. PingMinimap( -10900.60, -10601.80, 20.00)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300019,
+        triggerName: "JLC精灵城003",
+        fromStage: "22",
+        toStage: 23,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"jl禁军门卫\", unit), 999.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 22)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r觐见|cffff99cc『克林姆德王』|r|n。",
+        questMsgText: "|cffffff00『主线目标』：觐见|cffff99cc『克林姆德王』|r|n。",
+        dialogPreview: `
+    1. 玩家：克林姆德一脉传承数百年未见衰败，这宫殿想必是当年八位神明之一的|cffffcc99初代克林姆德王|r所建。面积随不及我国王殿，但建造技术无可挑剔
+    2. 精灵禁军：诸位就是帝国的使者吧，门口守卫已经通过术法将消息告知。各位出示一下门扉之印便可通行了。
+    3. 玩家：门扉之印在此。请查验。
+    4. 精灵禁军：印记没有问题，|cffffff00王上的主殿就在初代之王雕像的右方|r，各位门扉之印的讯息我已经传递给王上的贴身侍卫。
+    5. 玩家：辛苦二位了。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 23)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________003Func004Func005A)
+    5. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r觐见|cffff99cc『克林姆德王』|r|n。")
+    5. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：觐见|cffff99cc『克林姆德王』|r|n。")
+    5. PingMinimap( 18924.90, -24399.80, 20.00)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300020,
+        triggerName: "JLC精灵城003",
+        fromStage: "23",
+        toStage: 24,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"主线NPC\",\"jl禁军门卫2\", unit), 600.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 23)",
+        keyActions: "自动提取阶段块",
+        dialogPreview: `
+    1. 玩家：这便是初代克林姆德王的雕像，传说中的八位神明之一，仅从雕像中便能感受到无比强大的力量，这应该是初代克林姆德王在世之时所建造的才对。帝国之中对于这位初代精灵王之一也没有多少记载，也许有时间的话可以去|cffffcc99『克林姆德书库』|r增长一下见识。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 24)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    1. QuestSetDiscovered( udg_RW[8], true)
+    1. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "|cffffff00『发现新任务』：神明的故事（暂未制作）")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300021,
+        triggerName: "JLC精灵城003",
+        fromStage: "23",
+        toStage: 25,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZX\",\"克林姆德王\", unit), 999.00) == true) and ((YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 23) or (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 24))",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r",
+        questMsgText: "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r（小地图信号处）",
+        dialogPreview: `
+    1. 玩家：奥斯特里帝国所属异端审判团，参见|cffff6800『克林姆德王』|r
+    2. |cffff6800克林姆德王|r：各位使者远道而来辛苦了，吾同奥斯特利六世也有十数年未见，不知他如今可还安好。如此突然前来，想必是有要事商议吧
+    3. 玩家：如今陛下一切安好，此次前来有要紧之事需要与王上商议
+    4. |cffff6800克林姆德王|r：诸位请讲。我族与贵国是一直以来的盟友，定会尽力支持。
+    5. 玩家：谢王上，事情是这样，不久前大陆变动事件发生。自那之后各种危机不断，我等为了确保地底封印的位置与状况，特来寻求帮助，希望确认地底封印的位置并重新拿出钥匙打开封印之门查看封印的状况。
+    6. |cffff6800克林姆德王|r：此非小事啊，|cffffffcc钥匙我族可以随时取出，|r只是诸位可能已经知道，自从大陆哀鸣之后，各种反动势力蠢蠢欲动，他们以|cffff0000某个神秘组织为首企图推翻原有的秩序|r。最近我族城池之内也是抓到了不少|cffff0000间谍|r，各个种族均有人参与其中，|cffff0000他们的目的疑似也是为了夺取我族的钥匙。如今情形确是不妙啊。|r
+    7. 玩家：王上所说|cffffcc99神秘组织|r可是|cffff00ff『分离教派』|r？
+    8. |cffff6800克林姆德王|r：你们怎么会知道这个组织？！在座的各位都是克林姆德一族的最高层，告诉诸位也无妨，不错，根据他们使用的术式与参与人员的类别，有很大可能是许久没有风声的|cffff00ff『分离教派』|r正因如此，形式才会到这种地步。|cffff00ff『分离教派』|r|cffff0000的整体实力，恐怕不是克林姆德一脉如今能抗衡的。|r
+    9. 玩家：我等之前去过西里尔一脉的隐居之所，遇到了疑似|cffff00ff『分离教派』|r的主教，恕我直言王上，西里尔族长虽告知了我们|cffff00ff『分离教派』|r的历史，|cffffffcc但他们的实力当年好像并比不过如今的三大帝国，|r|cffff0000难道如今分离教派的实力已经到了如此地步嘛。|r
+    10. |cffff6800克林姆德王|r：诸位有所不知，既然是|cffffcc99奥斯特里六世|r亲自下令的任务，我就告诉诸位。现在哪里还是以前那种三大帝国鼎立的时期，自从500年前以后，我族的高手就在不断减少，仿佛失去了与这个世界的联系一般，难以达到500年前那种高手频出的时代了。据我所知，北部的|cffffcc99莱雅斯特一族|r同样如此，我们两族都是单一种族所创立的帝国，|cffff0000如今恐怕只有奥斯特里帝国广罗天下人才，才有正面击败分离教派的实力了。我族如今只能被动防守罢了。|r
+    11. 玩家：没想到如今的形式已经糟糕到这种地步了，我等既是为了重新保持大陆的稳定，面对|cffff00ff『分离教派』|r这种组织必会全力抗击。不知如今有什么我们可以帮助的地方，希望能尽快稳住局势来查看封印的状况。
+    12. |cffff6800克林姆德王|r：如今我族大部分高手与兵力都在防守外来势力的渗入。|cffffff00东南部的巨魔一族|r实在是没有精力继续监视他们的动向，|cffff0000就在前几天抓获的一名间谍口中巨魔一族疑似与分离教派进行了联系。|r|cffffffcc如今十分担心巨魔一族趁虚而入，我族非常需要巨魔一族如今的情报。|r
+    13. 玩家：此事便交予我等，为稳定局势我等会全力相助。
+    14. |cffff6800克林姆德王|r：多谢诸位鼎力相助|cffffffcc，我族也有很多优质的锻造技术与魔法装备，诸位可以到旁边的商会与魔法协会购买一些我族特质的装备，|r|cffffff00这些金币就给予诸位了，|r|cffffffcc希望能够让诸位平添一份实力。另外我族也有贵国公会设立的分会，很多我族的人民会在那里发布一些奖励十分丰厚的委托。|r
+    15. 玩家：多谢王上，我们整装待发后，便先告退了。
+    `,
+        actionTimeline: `
+    0. YDUserDataClear(string, "主线NPC","jl禁军门卫", unit)
+    0. YDUserDataClear(string, "主线NPC","jl禁军门卫", unit)
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 25)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. SetUnitInvulnerable( YDUserDataGet(string, "jq","npc", unit), true)
+    0. PauseUnit( YDUserDataGet(string, "jq","npc", unit), true)
+    0. SetUnitOwner( YDUserDataGet(string, "主线NPC","jlw", unit), Player(6), true)
+    5. SetStackedSoundBJ( true, gg_snd_JQBGM02, gg_rct______________121)
+    14. ForForce( YDUserDataGet(string, "玩家","玩家组", force),function Trig_JLC_________003Func006Func025A)
+    14. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cffffff00『系统提示』：|r所有英雄收到了|cffffff0015000金币！|r")
+    15. SetStackedSoundBJ( false, gg_snd_JQBGM02, gg_rct______________121)
+    15. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r")
+    15. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r（小地图信号处）")
+    15. PingMinimap( -2906.20, -14099.80, 20.00)
+    15. YDUserDataSet(string, "jq","npc", unit, CreateUnit( Player(PLAYER_NEUTRAL_AGGRESSIVE), 'ohun', -2823.10, -14119.80, 180.00))
+    15. RemoveDestructable( gg_dest_Dofw_5490)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300022,
+        triggerName: "JLC精灵城003",
+        fromStage: "25",
+        toStage: 26,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"jq\",\"npc\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 25)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r闯入巨魔腹地，击败巨魔王！",
+        questMsgText: "|cffffff00『主线目标』：|r闯入巨魔腹地，击败巨魔王！",
+        dialogPreview: `
+    1. 巨魔：嘎嘎，人类，不许通行，杀掉杀掉
+    2. 玩家：且慢，我等代表奥斯特利帝国前来调查，并无恶意。
+    3. 巨魔：王上有令，人类通通杀掉。
+    4. 玩家：看来只能强行突破了
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 26)
+    0. YDLocal1Set(unit, "npc", YDUserDataGet(string, "jq","npc", unit))
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. PauseUnit( GetTriggerUnit(), true)
+    3. PauseUnit( GetTriggerUnit(), false)
+    3. SetUnitInvulnerable( YDUserDataGet(string, "jq","npc", unit), false)
+    3. PauseUnit( YDUserDataGet(string, "jq","npc", unit), false)
+    4. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r闯入巨魔腹地，击败巨魔王！")
+    4. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r闯入巨魔腹地，击败巨魔王！")
+    4. YDUserDataClear(string, "jq","npc", unit)
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300023,
+        triggerName: "JLC精灵城003",
+        fromStage: "26",
+        toStage: 27,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"巨魔首领\",\"Boss\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 26)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r击败巨魔王！",
+        questMsgText: "|cffffff00『主线目标』：|r击败巨魔王！",
+        dialogPreview: `
+    1. 巨魔：人类，以本王看你是在找死！
+    2. 玩家：且慢，我等代表奥斯特利帝国前来调查，并无恶意。
+    3. 巨魔：奥斯特利帝国是吗？那又怎么样，去死吧！
+    4. 玩家：且慢，我等代表奥斯特利帝国前来调查，并无恶意。
+    5. 玩家：...（怎么如此暴躁）
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 27)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    0. PauseUnit( GetTriggerUnit(), true)
+    4. PauseUnit( GetTriggerUnit(), false)
+    5. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r击败巨魔王！")
+    5. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r击败巨魔王！")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300024,
+        triggerName: "JLC精灵城003",
+        fromStage: "29",
+        toStage: 30,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZX\",\"克林姆德王\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 29)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r前往术法协会解读魔法信件.",
+        questMsgText: "|cffffff00『主线目标』：|r前往术法协会解读魔法信件。",
+        dialogPreview: `
+    1. 克林姆德王：各位使者辛苦了，请问调查结果如何。
+    2. 玩家：已经可以确定巨魔族与其他势力进行了联络，结合当前形势不难推测出应该是分离教派。可惜我们慢了一步，被巨魔王销毁了情报，只留下了这封残缺的魔法信件。
+    3. 克林姆德王：（看过信件后。）此信件确实有极高的魔法控制能力才能写出。看这信的内容，分离教派应该是想要巨魔一族传说中的祖传圣物——万化图腾，传说此物有足够魔力驱动的话，可以幻化成一切接触过禁制并且完全解析。
+    4. 克林姆德王：我猜分离教派是想凭此物读取我精灵族王城的防御核心禁制，来破坏我们的防御力量。我即刻下令启动战时准备，烦请各位持此信件前往我族的术法协会，通过解析这里面的魔力成分，可以通过我族秘法进行反向探查。事后我们会议室见。
+    5. 玩家：事已至此，我等马上前去，定尽全力协助精灵族渡过难关。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 30)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    5. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r前往术法协会解读魔法信件.")
+    5. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往术法协会解读魔法信件。")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300025,
+        triggerName: "JLC精灵城003",
+        fromStage: "30",
+        toStage: 31,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZX\",\"赫克提尔\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 30)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r前往会议室。",
+        questMsgText: "|cffffff00『主线目标』：|r前往会议室。",
+        dialogPreview: `
+    1. 赫克提尔：诸位便是帝国的使者吧，老夫第二代首席术法长老，赫克提尔·克林姆德
+    2. 玩家：见过长老。我等受克林姆德王之托前来破译魔法信件。
+    3. 赫克提尔：国王已派人魔法传信通知于我，时间紧急，我立刻进行破译。
+    4. 玩家：那就拜托长老了。
+    5. 系统：几分钟后....
+    6. 赫克提尔：这，这魔法信件所用魔力本质，竟与我族出自同源。这怎么会呢，我族有如此魔力者屈指可数，但这魔力绝不是他们几人其中之一。并且此魔力本源蕴含了第六法，也就是当年的死神一脉的正统法力传承。怎么可能呢，难道说。。是他？
+    7. 玩家：怎么，长老已经知晓此信作者？
+    8. 赫克提尔：虽然没有明确证据，但是大致可以确定了。没想到他居然回来了。
+    9. 『魔法通讯』：不好了，各位使者，赫克提尔长老，敌人部队突然出现在城外，数量极多。陛下已经召开紧急会议，请各位火速前去。
+    10. 赫克提尔：诸位，没想到敌人这么快就出现了，此等危机时刻，我们先到会议室再说。
+    11. 玩家：明白了。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 31)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    8. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_WARNING, "TRIGSTR_5362")
+    11. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r前往会议室。")
+    11. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往会议室。")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300026,
+        triggerName: "JLC精灵城003",
+        fromStage: "31",
+        toStage: 32,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZX\",\"克林姆德王\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 31)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r前往会议室。",
+        questMsgText: "|cffffff00『主线目标』：|r前往会议室。",
+        dialogPreview: `
+    1. 克林姆德王：诸位都到齐了，我便直接进入正题了，不出意外，分离教派已经获得了巨魔族的万化图腾。极有可能在最近就对我族发起进攻，我等要做好万全准备，另外，赫克提尔长老通过帝国使者带回的信件也得到了重要情报。
+    2. 赫克提尔：根据我对魔法信件的分析，得出了一个结论，此次进攻，应该有当年的里科特王子参与。
+    3. 里凡特：大哥？他终于回来了嘛。
+    4. 耶提尔：没想到如今的里克特王子已经能带领部队进攻自己的家乡了吗？真有意思。
+    5. 克林姆德王：诸位，根据赫克提尔长老的分析，我这个逆子如今的魔法水平已经不在他之下，并且有极大可能获得了死神一脉的正统传承。诸位不要掉以轻心，也不用因为曾经他是王子心慈手软，诸位发表一下各自的情报信息，我们要全力备战渡过难关。
+    6. 赫克提尔：王城全部魔法武器已经充能完毕，可以全面覆盖城墙。魔法防御大阵核心已经检查，目前并未发现敌人入侵迹象，已经严加防守。
+    7. 丝费里德：部队拨款已经发放，财力足够支撑武器的更新。
+    8. 艾伦：王族及重要人员的家属已经完成保护。
+    9. 耶提尔：各部队已经调整至最佳状态，根据哨兵的情报分析这次来的应该是他们（分离教派）的第二军团，看我把菲利斯那老东西打的落花流水。
+    10. 本·莱尔：既然我国已派使者前来，帝国公会自当全力支援此次战役。
+    11. 克林姆德王：诸位，敌人实力强劲，不仅有分离教派不说，况且还有对我们精灵族内部十分了解的人存在，需要万分小心，此战。让我们全力以赴同仇敌忾击溃敌人。
+    12. 众人：是！
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 32)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    12. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r前往会议室。")
+    12. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r前往会议室。")
+    `,
+        enabled: true,
+    },
+    {
+        requireID: 300027,
+        triggerName: "JLC精灵城003",
+        fromStage: "33",
+        toStage: 34,
+        condition: "IsUnitInRange( GetTriggerUnit(), YDUserDataGet(string, \"ZX\",\"克林姆德王\", unit), 400.00) == true) and (YDUserDataGet(string, \"剧情进度\",\"整数\", integer) == 33)",
+        keyActions: "自动提取阶段块",
+        questDescText: "|cffffff00『主线目标』：|r击败里科特",
+        questMsgText: "|cffffff00『主线目标』：|r击败里科特",
+        dialogPreview: `
+    1. 耶提尔：这是怎么回事，有人杀入了王宫？！陛下呢。
+    2. 艾伦：老伙计，诸位帝国的使者。刚才里科特王子不知道用了什么术法，竟然冲破了王宫禁制，凭借他的血脉之力打开了传承密室大门。
+    3. 耶提尔：什么？那陛下呢？赫克提尔呢？
+    4. 艾伦：陛下与赫克提尔长老本就想到了里科特是想要精灵族的传承圣物，于是计划在传承密室中设下埋伏阵法来抓住里科特王子，可是这已经有段时间了。陛下和赫克提尔长老传出一声支援消息后再也没有回复我们。我已经带里凡特王子前来打开大门，可我们的高端战力不是去抗击敌人，就是在密室中设下埋伏。保险起见，只能等各位回来才进去一探究竟了。。。
+    5. 里凡斯：诸位帝国的使者，耶提尔叔叔。事不宜迟，拜托各位与我一同进入密室查看情况可否。
+    6. 众人：我等自然不会推辞。现在就出发吧。
+    7. 里凡斯：初代克林姆德王里特菲尔·克林姆德。您的直系后代，里凡特·克林姆德，以血脉之力相印证，打开同向起源的大门。
+    8. 耶提尔：里克特！！你这小子干了什么。
+    9. 里克特：耶提尔叔叔，我只是回来取一下我的东西而已。
+    10. 耶提尔：你，你这个克林姆德族的败类、叛徒！你还有有脸说什么你的东西！
+    11. 里克特：这几位想必就是帝国的使者了吧，在下里科特，如今就任分离教派第六主教。哦，差点忘了，还有我那不争气的弟弟，就你这水平也配第一王子了嘛，真是搞笑。
+    12. 里凡特：哥哥，我配不配是由各位长辈与父王决定的，你马上交出圣物与钥匙，还有缓合的余地。
+    13. 玩家：里克特，交出东西。
+    14. 里克特：算了，你们这些人，看来不让你们见识一下真正的力量你们是不会闭嘴了。我就小小的陪你们玩一会吧。
+    `,
+        actionTimeline: `
+    0. YDUserDataSet(string, "剧情进度","整数", integer, 34)
+    0. IssueImmediateOrder( GetTriggerUnit(), "stop")
+    14. QuestSetDescription( udg_ZX[2], "|cffffff00『主线目标』：|r击败里科特")
+    14. QuestMessageBJ( GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "|cffffff00『主线目标』：|r击败里科特")
+    `,
+        enabled: true,
+    },
+];
+export default MAIN_STORY_QUEST_CONFIGS;

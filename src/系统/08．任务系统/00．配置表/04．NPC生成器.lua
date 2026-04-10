@@ -6,6 +6,8 @@ local ____03_FF0ENPC_914D_7F6E_8868 = require("系统.08．任务系统.00．配
 local NPC_CONFIGS = ____03_FF0ENPC_914D_7F6E_8868.NPC_CONFIGS
 local ____00_FF0E_5355_4F4D_76F8_5173 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
 local createUnitWithOptions = ____00_FF0E_5355_4F4D_76F8_5173.createUnitWithOptions
+local ____05_FF0ENPC_521D_59CB_5316_52A8_4F5C = require("系统.08．任务系统.00．配置表.05．NPC初始化动作")
+local runNpcInitAction = ____05_FF0ENPC_521D_59CB_5316_52A8_4F5C.runNpcInitAction
 --- NPC生成器 - 根据NPC配置表统一创建NPC
 local jass = require("jass.common")
 local _print = _G.print
@@ -49,6 +51,7 @@ local function createSingleNPC(self, npcConfig)
     if npcConfig.modelFIle and type(jass.SetUnitModel) == "function" then
         jass.SetUnitModel(unit, npcConfig.modelFIle)
     end
+    runNpcInitAction(nil, unit, npcConfig.initAction)
     _print(
         nil,
         ((((("[NPC生成器] 成功创建NPC: " .. tostring(npcConfig.NpcNameID)) .. " at (") .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"

@@ -52,7 +52,7 @@ require("jass.japi");
     end
 end)(nil)
 local jass = require("jass.common")
-local g = require("jass.globals")
+local jglobals = require("jass.globals")
 local slk = require("jass.slk")
 _G.slk = slk
 _G.print = function(...)
@@ -71,11 +71,8 @@ _G.print = function(...)
     jassConsole.write(str .. "\n")
 end
 require("系统.00．核心系统.00．核心系统入口")
-require("lib.扩展函数.02．YDWE函数")
 require("系统.00．核心系统.06．UI函数")
-require("lib.扩展函数.00．条件判断函数")
-require("lib.扩展函数.03．BJ函数")
-require("lib.扩展函数.物品相关函数.物品函数入口")
+require("lib.扩展函数.00．扩展函数入口")
 require("系统.01．单位系统.单位狂暴")
 require("系统.02．物品系统.00．物品系统入口")
 local _____663E_793A_6280_80FD_540D_5B57 = require("系统.03．技能系统.01．显示技能名字")
@@ -106,6 +103,7 @@ end
 require("系统.08．任务系统.05．任务STES桥接")
 require("系统.08．任务系统.06．任务事件桥接")
 require("系统.08．任务系统.08．任务目标更新")
+require("系统.08．任务系统.10．主线配置驱动")
 local _____539F_751FUI = require("系统.09．表现系统.00．初始化UI")
 if type(_____539F_751FUI.initNativeUI) == "function" then
     _____539F_751FUI:initNativeUI()

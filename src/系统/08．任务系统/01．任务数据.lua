@@ -215,40 +215,6 @@ end
 ____exports.questDB = ____exports.QuestDatabase:getInstance()
 function ____exports.createTestQuests(self)
     local db = ____exports.QuestDatabase:getInstance()
-    do
-        local i = 1
-        while i <= 99 do
-            local id = "main_" .. (i < 10 and "00" .. tostring(i) or (i < 100 and "0" .. tostring(i) or "" .. tostring(i)))
-            local title = "主线任务" .. (i < 10 and "00" .. tostring(i) or (i < 100 and "0" .. tostring(i) or "" .. tostring(i)))
-            db:registerQuest({
-                id = id,
-                type = ____exports.QuestType.MAIN,
-                title = title,
-                description = "完成基础训练，了解游戏操作",
-                objectives = {{
-                    id = "obj1",
-                    description = "击败训练假人",
-                    current = 0,
-                    required = 5,
-                    completed = false
-                }, {
-                    id = "obj2",
-                    description = "学习技能",
-                    current = 0,
-                    required = 1,
-                    completed = false
-                }},
-                rewards = {{type = "experience", value = 100, description = "100经验"}, {type = "gold", value = 50, description = "50金币"}},
-                status = ____exports.QuestStatus.UNDISCOVERED,
-                requiredLevel = 1,
-                zone = "新手村",
-                icon = i == 2 and "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp" or "ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp",
-                createdAt = now(nil),
-                updatedAt = now(nil)
-            })
-            i = i + 1
-        end
-    end
     db:registerQuest({
         id = "side_002",
         type = ____exports.QuestType.SIDE,

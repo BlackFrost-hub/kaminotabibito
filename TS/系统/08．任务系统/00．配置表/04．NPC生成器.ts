@@ -7,6 +7,7 @@ const jass = require("jass.common") as any;
 // 引入NPC配置表
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
 import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
+import { runNpcInitAction } from "./05．NPC初始化动作";
 
 // 获取全局print函数
 const _print = (globalThis as any).print as (...args: any[]) => void;
@@ -48,6 +49,9 @@ function createSingleNPC(npcConfig: NPCData): any {
   if (npcConfig.modelFIle && typeof jass.SetUnitModel === "function") {
     jass.SetUnitModel(unit, npcConfig.modelFIle);
   }
+
+  // 初始化动作（例如商店物品池调整）
+  runNpcInitAction(unit, npcConfig.initAction);
 
   _print("[NPC生成器] 成功创建NPC: " + tostring(npcConfig.NpcNameID) + " at (" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")");
   return unit;

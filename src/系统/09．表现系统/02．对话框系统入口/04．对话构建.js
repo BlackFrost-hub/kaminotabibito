@@ -1,0 +1,205 @@
+const jass = require("jass.common");
+const UI函数 = require("系统.00．核心系统.06．UI函数");
+import { taskUI } from "../../08．任务系统/03．任务UI";
+import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, calculateFourCC, showLocalHint } from "./01．常量与工具";
+import { findDialogConfig } from "./03．配置查询";
+import { hasPlayerAcceptedQuest, setQuestState } from "./02．任务状态";
+import { getPlayerFirstHero } from "./08．任务奖励执行";
+import { handleQuestSubmit } from "./07．任务提交流程";
+import { resolveRewardDisplayText } from "./09．任务展示文案";
+const { openNpcDialog } = UI函数;
+function normalizeRequireCount(count) {
+    return count != null && count > 1 ? count : 1;
+}
+function refreshTaskUIForAllClientsSoon() {
+    const t = jass.CreateTimer();
+    jass.TimerStart(t, 0.03, false, () => {
+        pcall(() => taskUI.refreshList());
+        jass.PauseTimer(t);
+        jass.DestroyTimer(t);
+    });
+}
+function grantQuestItems(hero, questItems) {
+    if (!hero || !questItems || questItems === "")
+        return;
+    if (typeof jass.UnitAddItemById !== "function")
+        return;
+    const items = questItems.split("|");
+    for (const raw of items) {
+        const itemCode = raw.trim();
+        if (itemCode.length !== 4)
+            continue;
+        const itemId = calculateFourCC(itemCode);
+        if (itemId === 0)
+            continue;
+        jass.UnitAddItemById(hero, itemId);
+    }
+}
+function canAcceptQuestByRequirements(quest, hero) {
+    const req = quest.requirements;
+    if (!req || req === "")
+        return true;
+    // 当前仅实现：英雄等级＜N（不用正则，兼容 TSTL）
+    const markerA = "英雄等级<";
+    const markerB = "英雄等级＜";
+    let pos = req.indexOf(markerA);
+    let offset = markerA.length;
+    if (pos < 0) {
+        pos = req.indexOf(markerB);
+        offset = markerB.length;
+    }
+    if (pos < 0)
+        return true;
+    const raw = req.substring(pos + offset).trim();
+    let digits = "";
+    for (let i = 0; i < raw.length; i++) {
+        const ch = raw.charAt(i);
+        if (ch >= "0" && ch <= "9")
+            digits += ch;
+        else
+            break;
+    }
+    if (digits === "")
+        return true;
+    const limit = Number(digits);
+    if (!hero || typeof jass.GetHeroLevel !== "function")
+        return false;
+    const level = jass.GetHeroLevel(hero);
+    return level < limit;
+}
+function getQuestRewardDisplayText(quest) {
+    return resolveRewardDisplayText(quest);
+}
+// ========== 虚拟分区：文本解析 ==========
+export function parseDialogText(raw, npcName, heroName) {
+    const lines = [];
+    const parts = raw.split("\n");
+    function trimOrderedPrefix(s) {
+        // 支持 "1.xxx" / "2.xxx" / "10.xxx" 等顺序前缀
+        let i = 0;
+        while (i < s.length) {
+            const ch = s.charAt(i);
+            if (ch < "0" || ch > "9")
+                break;
+            i++;
+        }
+        if (i > 0 && i < s.length && s.charAt(i) === ".") {
+            return s.substring(i + 1).trim();
+        }
+        return s;
+    }
+    function tryParseSpeakerLine(s) {
+        const colonIdx = s.indexOf("：") >= 0 ? s.indexOf("：") : s.indexOf(":");
+        if (colonIdx <= 0)
+            return null;
+        const speakerRaw = s.substring(0, colonIdx).trim();
+        const textRaw = s.substring(colonIdx + 1).trim();
+        if (textRaw === "")
+            return null;
+        if (speakerRaw === "NPC")
+            return { title: npcName, text: textRaw };
+        if (speakerRaw === "Player")
+            return { title: heroName, text: textRaw };
+        return { title: speakerRaw, text: textRaw };
+    }
+    for (const part of parts) {
+        const trimmed = part.trim();
+        if (!trimmed)
+            continue;
+        const withoutOrder = trimOrderedPrefix(trimmed);
+        const parsed = tryParseSpeakerLine(withoutOrder);
+        if (parsed) {
+            lines.push({ title: parsed.title, text: parsed.text, duration: 4 });
+            continue;
+        }
+        lines.push({ title: npcName, text: trimmed, duration: 4 });
+    }
+    return lines.length > 0 ? lines : [{ title: npcName, text: raw, duration: 4 }];
+}
+// ========== 虚拟分区：通用对话 ==========
+export function buildDialogData(npcName, heroName) {
+    const dialogConfig = findDialogConfig(npcName);
+    if (!dialogConfig) {
+        return { lines: [{ title: npcName, text: "你好，有什么可以帮你的吗？", duration: 3 }] };
+    }
+    return { lines: parseDialogText(dialogConfig.Text || "", npcName, heroName) };
+}
+export function buildQuestCompletedDialog(quest, npcName) {
+    let msg = quest.afterCompleteDialog || quest.NpcCompleteText || DEFAULT_AFTER_COMPLETE_MSG;
+    if (msg === "默认")
+        msg = DEFAULT_AFTER_COMPLETE_MSG;
+    return { lines: [{ title: npcName, text: msg, duration: 4 }] };
+}
+export function buildQuestOfferDialog(quest, npcName, dialogOwnerId) {
+    const dialogOwner = jass.Player(dialogOwnerId);
+    const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
+    const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
+    const questDesc = quest.desc || quest.name || "未知任务";
+    const rewardText = getQuestRewardDisplayText(quest);
+    const startLines = quest.NpcStartText
+        ? parseDialogText(quest.NpcStartText, npcName, heroName)
+        : [{ title: npcName, text: `我有任务要交给你：${quest.name}`, duration: 4 }];
+    return {
+        lines: startLines,
+        quest: {
+            title: npcName,
+            text: `【${quest.name}】\n\n${questDesc}\n\n奖励：${rewardText}`,
+            onAccept: () => {
+                const questId = quest.requireID?.toString() || "";
+                const playerObj = jass.Player(dialogOwnerId);
+                const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
+                if (!canAcceptQuestByRequirements(quest, hero)) {
+                    const failRaw = quest.AcceptFailedText || "当前条件不满足，无法接受该任务。";
+                    openNpcDialog(playerObj, { lines: parseDialogText(failRaw, npcName, heroName) });
+                    return;
+                }
+                if (!hasPlayerAcceptedQuest(0, questId)) {
+                    const playerName = jass.GetPlayerName(playerObj) || "冒险者";
+                    setQuestState(questId, 1, playerName);
+                    grantQuestItems(hero, quest.questItems);
+                    refreshTaskUIForAllClientsSoon();
+                }
+                const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
+                const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
+                openNpcDialog(jass.Player(dialogOwnerId), { lines: acceptedLines });
+                if (hasPlayerAcceptedQuest(dialogOwnerId, questId)) {
+                    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r该任务已经接受过了");
+                }
+            },
+            onReject: () => {
+                showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『${quest.name}』|r`);
+            },
+        },
+    };
+}
+export function buildQuestInProgressDialog(quest, npcName, dialogOwnerId, npcUnit) {
+    const dialogOwner = jass.Player(dialogOwnerId);
+    const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
+    const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
+    const questDesc = quest.desc || quest.name || "";
+    const rewardText = getQuestRewardDisplayText(quest);
+    const requireCount = normalizeRequireCount(quest.requireCount);
+    return {
+        lines: [],
+        quest: {
+            title: npcName,
+            text: `【${quest.name}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
+            acceptText: "提交任务",
+            rejectText: "暂时忽略",
+            onAccept: () => {
+                handleQuestSubmit({
+                    quest,
+                    npcName,
+                    heroName,
+                    dialogOwnerId,
+                    npcUnit,
+                    parseDialogText,
+                    openDialog: openNpcDialog,
+                    refreshTaskUIForAllClientsSoon,
+                });
+            },
+            onReject: () => {
+            },
+        },
+    };
+}

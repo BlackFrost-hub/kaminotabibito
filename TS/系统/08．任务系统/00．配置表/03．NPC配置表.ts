@@ -1,5 +1,5 @@
 ﻿// NPC配置数据 - 自动生成
-// 生成时间: 2026-04-09 20:39:08
+// 生成时间: 2026-04-10 14:35:19
 
 export interface NPCData {
   NPCrequireName?: string;
@@ -11,6 +11,7 @@ export interface NPCData {
   Y?: number;
   Facing?: number;
   modelFIle?: string;
+  initAction?: string;
   enabled?: boolean;
 }
 
@@ -72,6 +73,7 @@ export const NPC_CONFIGS: NPCData[] = [
     Y: -20945.1,
     Facing: 270,
     modelFIle: "units\\creeps\\BanditSpearThrower\\BanditSpearThrower",
+    initAction: "RemoveItemFromStockBJ:itemId(I0AG|I0AH|I0AI);random1",
     enabled: false,
   },
   {

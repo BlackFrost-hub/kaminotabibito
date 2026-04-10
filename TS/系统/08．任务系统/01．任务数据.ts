@@ -330,34 +330,6 @@ export const questDB = QuestDatabase.getInstance();
 export function createTestQuests(): void {
   const db = QuestDatabase.getInstance();
 
-  for (let i = 1; i <= 99; i++) {
-    const id = "main_" + (i < 10 ? "00" + i : i < 100 ? "0" + i : "" + i);
-    const title = "主线任务" + (i < 10 ? "00" + i : i < 100 ? "0" + i : "" + i);
-    db.registerQuest({
-      id,
-      type: QuestType.MAIN,
-      title,
-      description: "完成基础训练，了解游戏操作",
-      objectives: [
-        { id: "obj1", description: "击败训练假人", current: 0, required: 5, completed: false },
-        { id: "obj2", description: "学习技能", current: 0, required: 1, completed: false }
-      ],
-      rewards: [
-        { type: "experience", value: 100, description: "100经验" },
-        { type: "gold", value: 50, description: "50金币" }
-      ],
-      status: QuestStatus.UNDISCOVERED,
-      requiredLevel: 1,
-      zone: "新手村",
-      icon:
-        i === 2
-          ? "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp"
-          : "ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp",
-      createdAt: now(),
-      updatedAt: now()
-    });
-  }
-
   // 支线任务：击杀步兵
   db.registerQuest({
     id: "side_002",
