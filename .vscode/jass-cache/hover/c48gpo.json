@@ -1,0 +1,11 @@
+{
+  "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\DzAPI.j",
+  "items": [
+    {
+      "symbolName": "DzFrameShow",
+      "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\DzAPI.j",
+      "content": "\n```jass\nnative DzFrameShow takes integer frame, boolean enable returns nothing\n```\n\n\n---\n\n显示/隐藏窗体\n\n**Parameters:**\n- **`enable`**: [true: 显示| false: 隐藏]\n\n**文件:** `c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\DzAPI.j`"
+    }
+  ],
+  "timestamp": 1775750242610
+}

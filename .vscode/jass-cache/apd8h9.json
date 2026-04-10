@@ -110,29 +110,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___HT",
+      "label": "SLReal__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SLReal___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___HT",
+      "documentation": "\n```jass\nhashtable SLReal__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___RealLists",
+      "label": "SLReal__RealLists",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLReal___RealLists\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___RealLists",
+      "documentation": "\n```jass\ninteger SLReal__RealLists\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__RealLists",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SLReal___K_Count",
+      "label": "SLReal__K_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SLReal___K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SLReal___K_Count",
+      "documentation": "\n```jass\ninteger SLReal__K_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SLReal__K_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -317,56 +317,56 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___MAX_RANGE",
+      "label": "X__MAX_RANGE",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant real X___MAX_RANGE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___MAX_RANGE",
+      "documentation": "\n```jass\nconstant real X__MAX_RANGE\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__MAX_RANGE",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___DUMMY_ITEM_ID",
+      "label": "X__DUMMY_ITEM_ID",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer X___DUMMY_ITEM_ID\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___DUMMY_ITEM_ID",
+      "documentation": "\n```jass\nconstant integer X__DUMMY_ITEM_ID\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__DUMMY_ITEM_ID",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Item",
+      "label": "X__Item",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nitem X___Item\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Item",
+      "documentation": "\n```jass\nitem X__Item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Item",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Find",
+      "label": "X__Find",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nrect X___Find\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Find",
+      "documentation": "\n```jass\nrect X__Find\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Find",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___Hid",
+      "label": "X__Hid",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nitem array X___Hid\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___Hid",
+      "documentation": "\n```jass\nitem array X__Hid\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__Hid",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "X___HidMax",
+      "label": "X__HidMax",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger X___HidMax\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_X___HidMax",
+      "documentation": "\n```jass\ninteger X__HidMax\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_X__HidMax",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -524,362 +524,362 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_STATE_COOLDOWN",
+      "label": "YDWEAbilityState__ABILITY_STATE_COOLDOWN",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_STATE_COOLDOWN\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_STATE_COOLDOWN",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_STATE_COOLDOWN\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_STATE_COOLDOWN",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_TARGS",
+      "label": "YDWEAbilityState__ABILITY_DATA_TARGS",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TARGS\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TARGS",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_TARGS\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_TARGS",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_CAST",
+      "label": "YDWEAbilityState__ABILITY_DATA_CAST",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_CAST\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_CAST",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_CAST\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_CAST",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DUR",
+      "label": "YDWEAbilityState__ABILITY_DATA_DUR",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DUR\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DUR",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DUR\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DUR",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_HERODUR",
+      "label": "YDWEAbilityState__ABILITY_DATA_HERODUR",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_HERODUR\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_HERODUR",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_HERODUR\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_HERODUR",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_COST",
+      "label": "YDWEAbilityState__ABILITY_DATA_COST",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_COST\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_COST",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_COST\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_COST",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_COOL",
+      "label": "YDWEAbilityState__ABILITY_DATA_COOL",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_COOL\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_COOL",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_COOL\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_COOL",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_AREA",
+      "label": "YDWEAbilityState__ABILITY_DATA_AREA",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_AREA\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_AREA",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_AREA\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_AREA",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_RNG",
+      "label": "YDWEAbilityState__ABILITY_DATA_RNG",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RNG\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RNG",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_RNG\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_RNG",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_A",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_A",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_A\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_A",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_A\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_A",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_B",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_B",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_B\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_B",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_B\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_B",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_C",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_C",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_C\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_C",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_C\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_C",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_D",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_D",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_D\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_D",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_D\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_D",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_E",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_E",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_E\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_E",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_E\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_E",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_F",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_F",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_F\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_F",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_F\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_F",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_G",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_G",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_G\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_G",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_G\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_G",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_H",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_H",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_H\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_H",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_H\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_H",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_DATA_I",
+      "label": "YDWEAbilityState__ABILITY_DATA_DATA_I",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_DATA_I\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_DATA_I",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_DATA_I\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_DATA_I",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UNITID",
+      "label": "YDWEAbilityState__ABILITY_DATA_UNITID",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNITID\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNITID",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UNITID\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UNITID",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_HOTKET",
+      "label": "YDWEAbilityState__ABILITY_DATA_HOTKET",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_HOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_HOTKET",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_HOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_HOTKET",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UNHOTKET",
+      "label": "YDWEAbilityState__ABILITY_DATA_UNHOTKET",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNHOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNHOTKET",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UNHOTKET\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UNHOTKET",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY",
+      "label": "YDWEAbilityState__ABILITY_DATA_RESEARCH_HOTKEY",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_HOTKEY",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_RESEARCH_HOTKEY\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_RESEARCH_HOTKEY",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_NAME",
+      "label": "YDWEAbilityState__ABILITY_DATA_NAME",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_NAME\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_NAME",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_NAME\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_NAME",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_TARGET_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_TARGET_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TARGET_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TARGET_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_TARGET_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_TARGET_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_CASTER_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_CASTER_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_CASTER_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_CASTER_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_CASTER_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_CASTER_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_EFFECT_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_EFFECT_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_EFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_EFFECT_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_EFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_EFFECT_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_AREAEFFECT_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_AREAEFFECT_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_AREAEFFECT_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_AREAEFFECT_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_MISSILE_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_MISSILE_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_MISSILE_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_MISSILE_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_MISSILE_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_MISSILE_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_SPECIAL_ART",
+      "label": "YDWEAbilityState__ABILITY_DATA_SPECIAL_ART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_SPECIAL_ART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_SPECIAL_ART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_SPECIAL_ART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_SPECIAL_ART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT",
+      "label": "YDWEAbilityState__ABILITY_DATA_LIGHTNING_EFFECT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_LIGHTNING_EFFECT",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_LIGHTNING_EFFECT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_LIGHTNING_EFFECT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_BUFF_TIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_BUFF_TIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_BUFF_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_BUFF_TIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_BUFF_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_BUFF_TIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_BUFF_UBERTIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_BUFF_UBERTIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_BUFF_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_BUFF_UBERTIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_RESEARCH_TIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_TIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_RESEARCH_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_RESEARCH_TIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_TIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_TIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_TIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_TIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_TIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UNTIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_UNTIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNTIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNTIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UNTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UNTIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_RESEARCH_UBERTIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_RESEARCH_UBERTIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_RESEARCH_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_RESEARCH_UBERTIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UBERTIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_UBERTIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UBERTIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UBERTIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UNUBERTIP",
+      "label": "YDWEAbilityState__ABILITY_DATA_UNUBERTIP",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNUBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNUBERTIP",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UNUBERTIP\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UNUBERTIP",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "YDWEAbilityState___ABILITY_DATA_UNART",
+      "label": "YDWEAbilityState__ABILITY_DATA_UNART",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer YDWEAbilityState___ABILITY_DATA_UNART\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_YDWEAbilityState___ABILITY_DATA_UNART",
+      "documentation": "\n```jass\nconstant integer YDWEAbilityState__ABILITY_DATA_UNART\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_YDWEAbilityState__ABILITY_DATA_UNART",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -983,20 +983,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarBase___trig",
+      "label": "StarBase__trig",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarBase___trig\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarBase___trig",
+      "documentation": "\n```jass\ntrigger StarBase__trig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarBase__trig",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarBase___ta",
+      "label": "StarBase__ta",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntriggeraction StarBase___ta\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarBase___ta",
+      "documentation": "\n```jass\ntriggeraction StarBase__ta\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarBase__ta",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1127,11 +1127,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___HT",
+      "label": "StarItem__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable StarItem___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___HT",
+      "documentation": "\n```jass\nhashtable StarItem__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1145,173 +1145,173 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StackStatus",
+      "label": "StarItem__StackStatus",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean StarItem___StackStatus\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StackStatus",
+      "documentation": "\n```jass\nboolean StarItem__StackStatus\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StackStatus",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StackRegd",
+      "label": "StarItem__StackRegd",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean StarItem___StackRegd\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StackRegd",
+      "documentation": "\n```jass\nboolean StarItem__StackRegd\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StackRegd",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___ItemRange",
+      "label": "StarItem__ItemRange",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal StarItem___ItemRange\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___ItemRange",
+      "documentation": "\n```jass\nreal StarItem__ItemRange\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__ItemRange",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_TryPickUpTrigs",
+      "label": "StarItem__StarItem_TryPickUpTrigs",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array StarItem___StarItem_TryPickUpTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_TryPickUpTrigs",
+      "documentation": "\n```jass\ntrigger array StarItem__StarItem_TryPickUpTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_TryPickUpTrigs",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_TryPickUpTrig_Index",
+      "label": "StarItem__StarItem_TryPickUpTrig_Index",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___StarItem_TryPickUpTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_TryPickUpTrig_Index",
+      "documentation": "\n```jass\ninteger StarItem__StarItem_TryPickUpTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_TryPickUpTrig_Index",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_TryPickUp_item",
+      "label": "StarItem__StarItem_TryPickUp_item",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nitem StarItem___StarItem_TryPickUp_item\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_TryPickUp_item",
+      "documentation": "\n```jass\nitem StarItem__StarItem_TryPickUp_item\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_TryPickUp_item",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_bagLoc",
+      "label": "StarItem__StarItem_bagLoc",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___StarItem_bagLoc\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_bagLoc",
+      "documentation": "\n```jass\ninteger StarItem__StarItem_bagLoc\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_bagLoc",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_MoveItemTrigs",
+      "label": "StarItem__StarItem_MoveItemTrigs",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array StarItem___StarItem_MoveItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_MoveItemTrigs",
+      "documentation": "\n```jass\ntrigger array StarItem__StarItem_MoveItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_MoveItemTrigs",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_MoveItemTrig_Index",
+      "label": "StarItem__StarItem_MoveItemTrig_Index",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___StarItem_MoveItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_MoveItemTrig_Index",
+      "documentation": "\n```jass\ninteger StarItem__StarItem_MoveItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_MoveItemTrig_Index",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_StackItemTrigs",
+      "label": "StarItem__StarItem_StackItemTrigs",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array StarItem___StarItem_StackItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_StackItemTrigs",
+      "documentation": "\n```jass\ntrigger array StarItem__StarItem_StackItemTrigs\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_StackItemTrigs",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_StackItemTrig_Index",
+      "label": "StarItem__StarItem_StackItemTrig_Index",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___StarItem_StackItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_StackItemTrig_Index",
+      "documentation": "\n```jass\ninteger StarItem__StarItem_StackItemTrig_Index\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_StackItemTrig_Index",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___StarItem_CallBackUnit",
+      "label": "StarItem__StarItem_CallBackUnit",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nunit StarItem___StarItem_CallBackUnit\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___StarItem_CallBackUnit",
+      "documentation": "\n```jass\nunit StarItem__StarItem_CallBackUnit\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__StarItem_CallBackUnit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___temp_trig",
+      "label": "StarItem__temp_trig",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarItem___temp_trig\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___temp_trig",
+      "documentation": "\n```jass\ntrigger StarItem__temp_trig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__temp_trig",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___SI_TargetType",
+      "label": "StarItem__SI_TargetType",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger array StarItem___SI_TargetType\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___SI_TargetType",
+      "documentation": "\n```jass\ninteger array StarItem__SI_TargetType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__SI_TargetType",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___SI_NeedType",
+      "label": "StarItem__SI_NeedType",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger array StarItem___SI_NeedType\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___SI_NeedType",
+      "documentation": "\n```jass\ninteger array StarItem__SI_NeedType\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__SI_NeedType",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___SI_NeddCount",
+      "label": "StarItem__SI_NeddCount",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger array StarItem___SI_NeddCount\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___SI_NeddCount",
+      "documentation": "\n```jass\ninteger array StarItem__SI_NeddCount\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__SI_NeddCount",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___SI_ItemSIndex",
+      "label": "StarItem__SI_ItemSIndex",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___SI_ItemSIndex\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___SI_ItemSIndex",
+      "documentation": "\n```jass\ninteger StarItem__SI_ItemSIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__SI_ItemSIndex",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___skips",
+      "label": "StarItem__skips",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean array StarItem___skips\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___skips",
+      "documentation": "\n```jass\nboolean array StarItem__skips\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__skips",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarItem___loopi",
+      "label": "StarItem__loopi",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarItem___loopi\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarItem___loopi",
+      "documentation": "\n```jass\ninteger StarItem__loopi\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarItem__loopi",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1343,11 +1343,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___HT",
+      "label": "StarUnit__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable StarUnit___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___HT",
+      "documentation": "\n```jass\nhashtable StarUnit__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1370,20 +1370,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_ItemAbilityTrig",
+      "label": "StarUnit__su_ItemAbilityTrig",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarUnit___su_ItemAbilityTrig\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_ItemAbilityTrig",
+      "documentation": "\n```jass\ntrigger StarUnit__su_ItemAbilityTrig\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_ItemAbilityTrig",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_ItemAbilityTrig2",
+      "label": "StarUnit__su_ItemAbilityTrig2",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger StarUnit___su_ItemAbilityTrig2\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_ItemAbilityTrig2",
+      "documentation": "\n```jass\ntrigger StarUnit__su_ItemAbilityTrig2\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_ItemAbilityTrig2",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1424,20 +1424,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_iatList",
+      "label": "StarUnit__su_iatList",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array StarUnit___su_iatList\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_iatList",
+      "documentation": "\n```jass\ntrigger array StarUnit__su_iatList\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_iatList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarUnit___su_iatIndex",
+      "label": "StarUnit__su_iatIndex",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger StarUnit___su_iatIndex\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarUnit___su_iatIndex",
+      "documentation": "\n```jass\ninteger StarUnit__su_iatIndex\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarUnit__su_iatIndex",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1460,38 +1460,38 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty___max",
+      "label": "ItmeProperty__max",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger ItmeProperty___max\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty___max",
+      "documentation": "\n```jass\ninteger ItmeProperty__max\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty__max",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty___UnitPtyEvent",
+      "label": "ItmeProperty__UnitPtyEvent",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nunit ItmeProperty___UnitPtyEvent\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty___UnitPtyEvent",
+      "documentation": "\n```jass\nunit ItmeProperty__UnitPtyEvent\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty__UnitPtyEvent",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty___HS",
+      "label": "ItmeProperty__HS",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable ItmeProperty___HS\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty___HS",
+      "documentation": "\n```jass\nhashtable ItmeProperty__HS\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty__HS",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "ItmeProperty___HS_EVE",
+      "label": "ItmeProperty__HS_EVE",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable ItmeProperty___HS_EVE\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_ItmeProperty___HS_EVE",
+      "documentation": "\n```jass\nhashtable ItmeProperty__HS_EVE\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_ItmeProperty__HS_EVE",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1505,11 +1505,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "STES___HT",
+      "label": "STES__HT",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable STES___HT\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_STES___HT",
+      "documentation": "\n```jass\nhashtable STES__HT\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_STES__HT",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1559,11 +1559,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "StarDebugger___ht",
+      "label": "StarDebugger__ht",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable StarDebugger___ht\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_StarDebugger___ht",
+      "documentation": "\n```jass\nhashtable StarDebugger__ht\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_StarDebugger__ht",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1631,20 +1631,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SUTriggerList___key_Count",
+      "label": "SUTriggerList__key_Count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger SUTriggerList___key_Count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SUTriggerList___key_Count",
+      "documentation": "\n```jass\ninteger SUTriggerList__key_Count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SUTriggerList__key_Count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "SUTriggerList___ht",
+      "label": "SUTriggerList__ht",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nhashtable SUTriggerList___ht\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_SUTriggerList___ht",
+      "documentation": "\n```jass\nhashtable SUTriggerList__ht\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_SUTriggerList__ht",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -3188,209 +3188,209 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "si__StarOverSpeed___StarOverSpeedGenerator",
+      "label": "si__StarOverSpeed__StarOverSpeedGenerator",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nconstant integer si__StarOverSpeed___StarOverSpeedGenerator\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_si__StarOverSpeed___StarOverSpeedGenerator",
+      "documentation": "\n```jass\nconstant integer si__StarOverSpeed__StarOverSpeedGenerator\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_si__StarOverSpeed__StarOverSpeedGenerator",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "si__StarOverSpeed___StarOverSpeedGenerator_F",
+      "label": "si__StarOverSpeed__StarOverSpeedGenerator_F",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger si__StarOverSpeed___StarOverSpeedGenerator_F\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_si__StarOverSpeed___StarOverSpeedGenerator_F",
+      "documentation": "\n```jass\ninteger si__StarOverSpeed__StarOverSpeedGenerator_F\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_si__StarOverSpeed__StarOverSpeedGenerator_F",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "si__StarOverSpeed___StarOverSpeedGenerator_I",
+      "label": "si__StarOverSpeed__StarOverSpeedGenerator_I",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger si__StarOverSpeed___StarOverSpeedGenerator_I\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_si__StarOverSpeed___StarOverSpeedGenerator_I",
+      "documentation": "\n```jass\ninteger si__StarOverSpeed__StarOverSpeedGenerator_I\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_si__StarOverSpeed__StarOverSpeedGenerator_I",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "si__StarOverSpeed___StarOverSpeedGenerator_V",
+      "label": "si__StarOverSpeed__StarOverSpeedGenerator_V",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger array si__StarOverSpeed___StarOverSpeedGenerator_V\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_si__StarOverSpeed___StarOverSpeedGenerator_V",
+      "documentation": "\n```jass\ninteger array si__StarOverSpeed__StarOverSpeedGenerator_V\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_si__StarOverSpeed__StarOverSpeedGenerator_V",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_Timer",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_Timer",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntimer s__StarOverSpeed___StarOverSpeedGenerator_Timer\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_Timer",
+      "documentation": "\n```jass\ntimer s__StarOverSpeed__StarOverSpeedGenerator_Timer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_Timer",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_IsRun",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_IsRun",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean s__StarOverSpeed___StarOverSpeedGenerator_IsRun\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_IsRun",
+      "documentation": "\n```jass\nboolean s__StarOverSpeed__StarOverSpeedGenerator_IsRun\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_IsRun",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_count",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_count",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger s__StarOverSpeed___StarOverSpeedGenerator_count\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_count",
+      "documentation": "\n```jass\ninteger s__StarOverSpeed__StarOverSpeedGenerator_count\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_count",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_now",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_now",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger s__StarOverSpeed___StarOverSpeedGenerator_now\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_now",
+      "documentation": "\n```jass\ninteger s__StarOverSpeed__StarOverSpeedGenerator_now\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_now",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_skip",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_skip",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean s__StarOverSpeed___StarOverSpeedGenerator_skip\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_skip",
+      "documentation": "\n```jass\nboolean s__StarOverSpeed__StarOverSpeedGenerator_skip\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_skip",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_list",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_list",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger array s__StarOverSpeed___StarOverSpeedGenerator_list\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_list",
+      "documentation": "\n```jass\ninteger array s__StarOverSpeed__StarOverSpeedGenerator_list\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_list",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_EventID",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_EventID",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger s__StarOverSpeed___StarOverSpeedGenerator_EventID\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_EventID",
+      "documentation": "\n```jass\ninteger s__StarOverSpeed__StarOverSpeedGenerator_EventID\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_EventID",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_hashkey",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_hashkey",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ninteger s__StarOverSpeed___StarOverSpeedGenerator_hashkey\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_hashkey",
+      "documentation": "\n```jass\ninteger s__StarOverSpeed__StarOverSpeedGenerator_hashkey\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_hashkey",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_speed",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_speed",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_speed\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_speed",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_speed\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_speed",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_u",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_u",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nunit array s__StarOverSpeed___StarOverSpeedGenerator_u\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_u",
+      "documentation": "\n```jass\nunit array s__StarOverSpeed__StarOverSpeedGenerator_u\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_u",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_t",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_t",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array s__StarOverSpeed___StarOverSpeedGenerator_t\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_t",
+      "documentation": "\n```jass\ntrigger array s__StarOverSpeed__StarOverSpeedGenerator_t\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_t",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_cb",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_cb",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger array s__StarOverSpeed___StarOverSpeedGenerator_cb\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_cb",
+      "documentation": "\n```jass\ntrigger array s__StarOverSpeed__StarOverSpeedGenerator_cb\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_cb",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_tx",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_tx",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_tx\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_tx",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_tx\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_tx",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_ty",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_ty",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_ty\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_ty",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_ty\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_ty",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_lx",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_lx",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_lx\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_lx",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_lx\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_lx",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_ly",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_ly",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_ly\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_ly",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_ly\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_ly",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_lf",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_lf",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nreal array s__StarOverSpeed___StarOverSpeedGenerator_lf\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_lf",
+      "documentation": "\n```jass\nreal array s__StarOverSpeed__StarOverSpeedGenerator_lf\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_lf",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_movementsync",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_movementsync",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean array s__StarOverSpeed___StarOverSpeedGenerator_movementsync\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_movementsync",
+      "documentation": "\n```jass\nboolean array s__StarOverSpeed__StarOverSpeedGenerator_movementsync\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_movementsync",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_b",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_b",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\nboolean array s__StarOverSpeed___StarOverSpeedGenerator_b\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_s__StarOverSpeed___StarOverSpeedGenerator_b",
+      "documentation": "\n```jass\nboolean array s__StarOverSpeed__StarOverSpeedGenerator_b\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_s__StarOverSpeed__StarOverSpeedGenerator_b",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -3575,29 +3575,29 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "st__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "label": "st__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger st__StarOverSpeed___StarOverSpeedGenerator_onDestroy\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_st__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "documentation": "\n```jass\ntrigger st__StarOverSpeed__StarOverSpeedGenerator_onDestroy\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "st__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "label": "st__StarOverSpeed__StarOverSpeedGenerator_Start",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger st__StarOverSpeed___StarOverSpeedGenerator_Start\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_st__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "documentation": "\n```jass\ntrigger st__StarOverSpeed__StarOverSpeedGenerator_Start\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st__StarOverSpeed__StarOverSpeedGenerator_Start",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "st__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "label": "st__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "kind": 5,
       "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger st__StarOverSpeed___StarOverSpeedGenerator_Stop\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_st__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "documentation": "\n```jass\ntrigger st__StarOverSpeed__StarOverSpeedGenerator_Stop\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_st__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -4079,6 +4079,15 @@
       "statementType": "NativeDeclaration"
     },
     {
+      "label": "DzGetTriggerSyncPrefix",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetTriggerSyncPrefix takes nothing returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetTriggerSyncPrefix",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
       "label": "DzGetTriggerSyncData",
       "kind": 2,
       "detail": "Native Function",
@@ -4093,6 +4102,24 @@
       "detail": "Native Function",
       "documentation": "\n```jass\nnative DzGetTriggerSyncPlayer takes nothing returns player\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_native_DzGetTriggerSyncPlayer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSyncBuffer",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSyncBuffer takes string prefix, string data, integer dataLen returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSyncBuffer",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSyncDataImmediately",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSyncDataImmediately takes string prefix, string data returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSyncDataImmediately",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "NativeDeclaration"
     },
@@ -4745,6 +4772,186 @@
       "statementType": "NativeDeclaration"
     },
     {
+      "label": "EXSetUnitArrayString",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetUnitArrayString takes integer uid, integer id, integer n, string name returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetUnitArrayString",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "EXSetUnitInteger",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative EXSetUnitInteger takes integer uid, integer id, integer n returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_EXSetUnitInteger",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetClientWidth",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetClientWidth takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetClientWidth",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetClientHeight",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetClientHeight takes nothing returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetClientHeight",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameIsVisible",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameIsVisible takes integer frame returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameIsVisible",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzFrameAddText",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzFrameAddText takes integer frame, string text returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzFrameAddText",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitSilence",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitSilence takes unit whichUnit, boolean disable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitSilence",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitDisableAttack",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitDisableAttack takes unit whichUnit, boolean disable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitDisableAttack",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitDisableInventory",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitDisableInventory takes unit whichUnit, boolean disable returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitDisableInventory",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUpdateMinimap",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUpdateMinimap takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUpdateMinimap",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitChangeAlpha",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitChangeAlpha takes unit whichUnit, integer alpha, boolean forceUpdate returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitChangeAlpha",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitSetCanSelect",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitSetCanSelect takes unit whichUnit, boolean state returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitSetCanSelect",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzUnitSetTargetable",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzUnitSetTargetable takes unit whichUnit, boolean state returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzUnitSetTargetable",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSaveMemoryCache",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSaveMemoryCache takes string cache returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSaveMemoryCache",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetMemoryCache",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetMemoryCache takes nothing returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetMemoryCache",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzSetSpeed",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzSetSpeed takes real ratio returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzSetSpeed",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzConvertWorldPosition",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzConvertWorldPosition takes real x, real y, real z, code callback returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzConvertWorldPosition",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetConvertWorldPositionX",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetConvertWorldPositionX takes nothing returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetConvertWorldPositionX",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzGetConvertWorldPositionY",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzGetConvertWorldPositionY takes nothing returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzGetConvertWorldPositionY",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
+      "label": "DzCreateCommandButton",
+      "kind": 2,
+      "detail": "Native Function",
+      "documentation": "\n```jass\nnative DzCreateCommandButton takes integer parent, string icon, string name, string desc returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_native_DzCreateCommandButton",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "NativeDeclaration"
+    },
+    {
       "label": "EXGetUnitAbility",
       "kind": 2,
       "detail": "Native Function",
@@ -5051,47 +5258,47 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "label": "sc__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc__StarOverSpeed___StarOverSpeedGenerator_onDestroy takes integer this returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed___StarOverSpeedGenerator.onDestroy\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "documentation": "\n```jass\nfunction sc__StarOverSpeed__StarOverSpeedGenerator_onDestroy takes integer this returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed__StarOverSpeedGenerator.onDestroy\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "label": "sc__StarOverSpeed__StarOverSpeedGenerator_Start",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc__StarOverSpeed___StarOverSpeedGenerator_Start takes nothing returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed___StarOverSpeedGenerator.Start\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "documentation": "\n```jass\nfunction sc__StarOverSpeed__StarOverSpeedGenerator_Start takes nothing returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed__StarOverSpeedGenerator.Start\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc__StarOverSpeed__StarOverSpeedGenerator_Start",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "label": "sc__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc__StarOverSpeed___StarOverSpeedGenerator_Stop takes nothing returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed___StarOverSpeedGenerator.Stop\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "documentation": "\n```jass\nfunction sc__StarOverSpeed__StarOverSpeedGenerator_Stop takes nothing returns nothing\n```\n\n\n---\n\nGenerated method caller for StarOverSpeed__StarOverSpeedGenerator.Stop\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator__allocate",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator__allocate",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator__allocate takes nothing returns integer\n```\n\n\n---\n\nGenerated allocator of StarOverSpeed___StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator__allocate",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator__allocate takes nothing returns integer\n```\n\n\n---\n\nGenerated allocator of StarOverSpeed__StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator__allocate",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sc__StarOverSpeed___StarOverSpeedGenerator_deallocate",
+      "label": "sc__StarOverSpeed__StarOverSpeedGenerator_deallocate",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sc__StarOverSpeed___StarOverSpeedGenerator_deallocate takes integer this returns nothing\n```\n\n\n---\n\nGenerated destructor of StarOverSpeed___StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sc__StarOverSpeed___StarOverSpeedGenerator_deallocate",
+      "documentation": "\n```jass\nfunction sc__StarOverSpeed__StarOverSpeedGenerator_deallocate takes integer this returns nothing\n```\n\n\n---\n\nGenerated destructor of StarOverSpeed__StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sc__StarOverSpeed__StarOverSpeedGenerator_deallocate",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -5459,7 +5666,7 @@
       "label": "DzTriggerRegisterMouseEventTrg",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction DzTriggerRegisterMouseEventTrg takes trigger trg, integer status, integer btn returns nothing\n```\n\n\n---\n\nlibrary BzAPI:\n\nhardware\n\nplus\n\nsync\n\ngui\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction DzTriggerRegisterMouseEventTrg takes trigger trg, integer status, integer btn returns nothing\n```\n\n\n---\n\nlibrary BzAPI:\n\nhardware\n\nplus\n\nsync\n\nnative DzGetPushContext takes nothing returns string\n\ngui\n\n显示/隐藏SimpleFrame\n\nnative DzSimpleFrameShow takes integer frame, boolean enable returns nothing\n\n追加文字（支持TextArea）\n\n沉默单位-禁用技能\n\n禁用攻击\n\n禁用道具\n\n刷新小地图\n\n修改单位alpha\n\n设置单位是否可以选中\n\n修改单位是否可以被设置为目标\n\n保存内存数据\n\n读取内存数据\n\n设置加速倍率\n\n转换世界坐标为屏幕坐标-异步\n\n转换世界坐标为屏幕坐标-获取转换后的X坐标\n\n转换世界坐标为屏幕坐标-获取转换后的Y坐标\n\n创建command button\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_DzTriggerRegisterMouseEventTrg",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -5564,11 +5771,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLDebugLib___luainit",
+      "label": "SLDebugLib__luainit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLDebugLib___luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary BzAPI ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLDebugLib___luainit",
+      "documentation": "\n```jass\nfunction SLDebugLib__luainit takes nothing returns nothing\n```\n\n\n---\n\nlibrary BzAPI ends\n\nlibrary MNXT:\n\nlibrary MNXT ends\n\nlibrary SLDebugLib:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLDebugLib__luainit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -5843,11 +6050,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLReal___SLReal_InitList",
+      "label": "SLReal__SLReal_InitList",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLReal___SLReal_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLReal___SLReal_InitList",
+      "documentation": "\n```jass\nfunction SLReal__SLReal_InitList takes integer id returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLReal__SLReal_InitList",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6068,11 +6275,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SLReal___onInit",
+      "label": "SLReal__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SLReal___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SLReal___onInit",
+      "documentation": "\n```jass\nfunction SLReal__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SLReal__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -6383,83 +6590,83 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___getRandomInt",
+      "label": "StarCommon__getRandomInt",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___getRandomInt takes integer low, integer high returns integer\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___getRandomInt",
+      "documentation": "\n```jass\nfunction StarCommon__getRandomInt takes integer low, integer high returns integer\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__getRandomInt",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___getRandomReal",
+      "label": "StarCommon__getRandomReal",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___getRandomReal takes real low, real high returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___getRandomReal",
+      "documentation": "\n```jass\nfunction StarCommon__getRandomReal takes real low, real high returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__getRandomReal",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___sin",
+      "label": "StarCommon__sin",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___sin takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___sin",
+      "documentation": "\n```jass\nfunction StarCommon__sin takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__sin",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___cos",
+      "label": "StarCommon__cos",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___cos takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___cos",
+      "documentation": "\n```jass\nfunction StarCommon__cos takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__cos",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___tan",
+      "label": "StarCommon__tan",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___tan takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___tan",
+      "documentation": "\n```jass\nfunction StarCommon__tan takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__tan",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___asin",
+      "label": "StarCommon__asin",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___asin takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___asin",
+      "documentation": "\n```jass\nfunction StarCommon__asin takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__asin",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___acos",
+      "label": "StarCommon__acos",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___acos takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___acos",
+      "documentation": "\n```jass\nfunction StarCommon__acos takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__acos",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___atan",
+      "label": "StarCommon__atan",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___atan takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___atan",
+      "documentation": "\n```jass\nfunction StarCommon__atan takes real r returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__atan",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___atan2",
+      "label": "StarCommon__atan2",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___atan2 takes real y, real x returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___atan2",
+      "documentation": "\n```jass\nfunction StarCommon__atan2 takes real y, real x returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__atan2",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -7058,11 +7265,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___subString",
+      "label": "StarCommon__subString",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___subString takes string source, integer start, integer end returns string\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___subString",
+      "documentation": "\n```jass\nfunction StarCommon__subString takes string source, integer start, integer end returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__subString",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -7292,56 +7499,56 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___i2R",
+      "label": "StarCommon__i2R",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___i2R takes integer i returns real\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___i2R",
+      "documentation": "\n```jass\nfunction StarCommon__i2R takes integer i returns real\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__i2R",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___i2S",
+      "label": "StarCommon__i2S",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___i2S takes integer i returns string\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___i2S",
+      "documentation": "\n```jass\nfunction StarCommon__i2S takes integer i returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__i2S",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___r2I",
+      "label": "StarCommon__r2I",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___r2I takes real r returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___r2I",
+      "documentation": "\n```jass\nfunction StarCommon__r2I takes real r returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__r2I",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___r2S",
+      "label": "StarCommon__r2S",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___r2S takes real r returns string\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___r2S",
+      "documentation": "\n```jass\nfunction StarCommon__r2S takes real r returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__r2S",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___s2I",
+      "label": "StarCommon__s2I",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___s2I takes string s returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___s2I",
+      "documentation": "\n```jass\nfunction StarCommon__s2I takes string s returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__s2I",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___s2R",
+      "label": "StarCommon__s2R",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___s2R takes string s returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___s2R",
+      "documentation": "\n```jass\nfunction StarCommon__s2R takes string s returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__s2R",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -7535,20 +7742,20 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___Savereal",
+      "label": "StarCommon__Savereal",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___Savereal takes hashtable ht, integer pk, integer ck, real value returns nothing\n```\n\n\n---\n\nprivate:  //#include \"Common\\\\List.j\" //#include \"Common\\\\Tree.j\"\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___Savereal",
+      "documentation": "\n```jass\nfunction StarCommon__Savereal takes hashtable ht, integer pk, integer ck, real value returns nothing\n```\n\n\n---\n\nprivate:  //#include \"Common\\\\List.j\" //#include \"Common\\\\Tree.j\"\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__Savereal",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarCommon___Loadreal",
+      "label": "StarCommon__Loadreal",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarCommon___Loadreal takes hashtable ht, integer pk, integer ck returns real\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarCommon___Loadreal",
+      "documentation": "\n```jass\nfunction StarCommon__Loadreal takes hashtable ht, integer pk, integer ck returns real\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarCommon__Loadreal",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -9137,11 +9344,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarEvent___onInit",
+      "label": "StarEvent__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarEvent___onInit takes nothing returns nothing\n```\n\n\n---\n\npublic:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarEvent___onInit",
+      "documentation": "\n```jass\nfunction StarEvent__onInit takes nothing returns nothing\n```\n\n\n---\n\npublic:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarEvent__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -9830,11 +10037,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "X___HideItem",
+      "label": "X__HideItem",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction X___HideItem takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_X___HideItem",
+      "documentation": "\n```jass\nfunction X__HideItem takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_X__HideItem",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -9911,11 +10118,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "X___Init",
+      "label": "X__Init",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction X___Init takes nothing returns nothing\n```\n\n\n---\n\n碰撞检测初始化\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_X___Init",
+      "documentation": "\n```jass\nfunction X__Init takes nothing returns nothing\n```\n\n\n---\n\n碰撞检测初始化\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_X__Init",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -9947,11 +10154,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "YDTriggerSaveLoadSystem___Init",
+      "label": "YDTriggerSaveLoadSystem__Init",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction YDTriggerSaveLoadSystem___Init takes nothing returns nothing\n```\n\n\n---\n\n获取事件名的code(字符串哈希)\n\n重启当前计时器\n\n----------------------------------------------------------------\n\n转换StarType1Id到TypeName\n\n----------------------------------------------------------------\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_YDTriggerSaveLoadSystem___Init",
+      "documentation": "\n```jass\nfunction YDTriggerSaveLoadSystem__Init takes nothing returns nothing\n```\n\n\n---\n\n获取事件名的code(字符串哈希)\n\n重启当前计时器\n\n----------------------------------------------------------------\n\n转换StarType1Id到TypeName\n\n----------------------------------------------------------------\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_YDTriggerSaveLoadSystem__Init",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10289,11 +10496,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarBase___onInit",
+      "label": "StarBase__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarBase___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarBase___onInit",
+      "documentation": "\n```jass\nfunction StarBase__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarBase__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10325,29 +10532,29 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarItem___ItemStacked",
+      "label": "StarItem__ItemStacked",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarItem___ItemStacked takes nothing returns nothing\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarItem___ItemStacked",
+      "documentation": "\n```jass\nfunction StarItem__ItemStacked takes nothing returns nothing\n```\n\n\n---\n\nprivate:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem__ItemStacked",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarItem___ItemStack_Act3",
+      "label": "StarItem__ItemStack_Act3",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarItem___ItemStack_Act3 takes item wp, unit u returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarItem___ItemStack_Act3",
+      "documentation": "\n```jass\nfunction StarItem__ItemStack_Act3 takes item wp, unit u returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem__ItemStack_Act3",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarItem___CheakPickUp",
+      "label": "StarItem__CheakPickUp",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarItem___CheakPickUp takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarItem___CheakPickUp",
+      "documentation": "\n```jass\nfunction StarItem__CheakPickUp takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem__CheakPickUp",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10442,11 +10649,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarItem___CheakSynthesis",
+      "label": "StarItem__CheakSynthesis",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarItem___CheakSynthesis takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarItem___CheakSynthesis",
+      "documentation": "\n```jass\nfunction StarItem__CheakSynthesis takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarItem__CheakSynthesis",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10514,83 +10721,83 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_anon__0",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_anon__0 takes nothing returns nothing\n```\n\n\n---\n\nlibrary StarItem ends\n\nlibrary StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_anon__0",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_anon__0 takes nothing returns nothing\n```\n\n\n---\n\nlibrary StarItem ends\n\nlibrary StarOverSpeed:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_create",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_create",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_create takes unit u, real s, boolean b returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_create",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_create takes unit u, real s, boolean b returns integer\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_create",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_doEvent",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_doEvent",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_doEvent takes integer this, integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_doEvent",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_doEvent takes integer this, integer i returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_doEvent",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_onDestroy takes integer this returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_onDestroy takes integer this returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_deallocate",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_deallocate",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_deallocate takes integer this returns nothing\n```\n\n\n---\n\nGenerated destructor of StarOverSpeed___StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_deallocate",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_deallocate takes integer this returns nothing\n```\n\n\n---\n\nGenerated destructor of StarOverSpeed__StarOverSpeedGenerator\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_deallocate",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_anon__1",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_anon__1",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_anon__1",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_anon__1",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_Start",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_Start takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_Start takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_Start",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_Stop takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_Stop takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "s__StarOverSpeed___StarOverSpeedGenerator_onInit",
+      "label": "s__StarOverSpeed__StarOverSpeedGenerator_onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction s__StarOverSpeed___StarOverSpeedGenerator_onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_s__StarOverSpeed___StarOverSpeedGenerator_onInit",
+      "documentation": "\n```jass\nfunction s__StarOverSpeed__StarOverSpeedGenerator_onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_s__StarOverSpeed__StarOverSpeedGenerator_onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -10919,38 +11126,38 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__0",
+      "label": "StarUnit__anon__0",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__0",
+      "documentation": "\n```jass\nfunction StarUnit__anon__0 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__0",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__1",
+      "label": "StarUnit__anon__1",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__1",
+      "documentation": "\n```jass\nfunction StarUnit__anon__1 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__1",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___anon__2",
+      "label": "StarUnit__anon__2",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___anon__2 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___anon__2",
+      "documentation": "\n```jass\nfunction StarUnit__anon__2 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__anon__2",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___UnitDieListener",
+      "label": "StarUnit__UnitDieListener",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___UnitDieListener takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___UnitDieListener",
+      "documentation": "\n```jass\nfunction StarUnit__UnitDieListener takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__UnitDieListener",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11027,11 +11234,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarUnit___onInit",
+      "label": "StarUnit__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarUnit___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarUnit___onInit",
+      "documentation": "\n```jass\nfunction StarUnit__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarUnit__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11189,20 +11396,20 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "STES___onInit",
+      "label": "STES__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction STES___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_STES___onInit",
+      "documentation": "\n```jass\nfunction STES__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_STES__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarDebugger___Print",
+      "label": "StarDebugger__Print",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarDebugger___Print takes string text returns nothing\n```\n\n\n---\n\nlibrary STES ends\n\nlibrary StarDebugger:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarDebugger___Print",
+      "documentation": "\n```jass\nfunction StarDebugger__Print takes string text returns nothing\n```\n\n\n---\n\nlibrary STES ends\n\nlibrary StarDebugger:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarDebugger__Print",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11234,11 +11441,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarDebugger___SDR_B2I",
+      "label": "StarDebugger__SDR_B2I",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarDebugger___SDR_B2I takes boolean b returns string\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarDebugger___SDR_B2I",
+      "documentation": "\n```jass\nfunction StarDebugger__SDR_B2I takes boolean b returns string\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarDebugger__SDR_B2I",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11252,11 +11459,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarDebugger___onInit",
+      "label": "StarDebugger__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarDebugger___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarDebugger___onInit",
+      "documentation": "\n```jass\nfunction StarDebugger__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarDebugger__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11351,11 +11558,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "StarString___onInit",
+      "label": "StarString__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction StarString___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_StarString___onInit",
+      "documentation": "\n```jass\nfunction StarString__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_StarString__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -11414,11 +11621,11 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "SUTriggerList___onInit",
+      "label": "SUTriggerList__onInit",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction SUTriggerList___onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_SUTriggerList___onInit",
+      "documentation": "\n```jass\nfunction SUTriggerList__onInit takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_SUTriggerList__onInit",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12116,29 +12323,29 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sa__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "label": "sa__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sa__StarOverSpeed___StarOverSpeedGenerator_onDestroy takes nothing returns boolean\n```\n\n\n---\n\nStruct method generated initializers/callers:\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sa__StarOverSpeed___StarOverSpeedGenerator_onDestroy",
+      "documentation": "\n```jass\nfunction sa__StarOverSpeed__StarOverSpeedGenerator_onDestroy takes nothing returns boolean\n```\n\n\n---\n\nStruct method generated initializers/callers:\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa__StarOverSpeed__StarOverSpeedGenerator_onDestroy",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sa__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "label": "sa__StarOverSpeed__StarOverSpeedGenerator_Start",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sa__StarOverSpeed___StarOverSpeedGenerator_Start takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sa__StarOverSpeed___StarOverSpeedGenerator_Start",
+      "documentation": "\n```jass\nfunction sa__StarOverSpeed__StarOverSpeedGenerator_Start takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa__StarOverSpeed__StarOverSpeedGenerator_Start",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "sa__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "label": "sa__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction sa__StarOverSpeed___StarOverSpeedGenerator_Stop takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_sa__StarOverSpeed___StarOverSpeedGenerator_Stop",
+      "documentation": "\n```jass\nfunction sa__StarOverSpeed__StarOverSpeedGenerator_Stop takes nothing returns boolean\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_sa__StarOverSpeed__StarOverSpeedGenerator_Stop",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     },
@@ -12341,14 +12548,14 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "jasshelper__initstructs53775812",
+      "label": "jasshelper__initstructs12044031",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction jasshelper__initstructs53775812 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_jasshelper__initstructs53775812",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs12044031 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs12044031",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     }
   ],
-  "timestamp": 1775691288010
+  "timestamp": 1775750242481
 }

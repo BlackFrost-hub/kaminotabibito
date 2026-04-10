@@ -38,15 +38,9 @@ const slk = require("jass.slk") as Record<string, Record<string, Record<string, 
 
 
 // ---------- 00．核心系统 ----------
-require("系统.00．核心系统.01．封装函数");
-require("系统.00．核心系统.02．音效函数");
-require("系统.00．核心系统.03．漂浮文字函数");
-require("系统.00．核心系统.04．硬件函数");
-require("系统.00．核心系统.05．泄露审计");
+require("系统.00．核心系统.00．核心系统入口");
 require("lib.扩展函数.02．YDWE函数");
-require("系统.00．核心系统.13．镜头函数");
-require("系统.00．核心系统.14．颜色常量");
-require("系统.00．核心系统.15．数学函数");
+require("系统.00．核心系统.06．UI函数");
 
 // ---------- 扩展函数 ----------
 require("lib.扩展函数.00．条件判断函数");
@@ -57,15 +51,7 @@ require("lib.扩展函数.物品相关函数.物品函数入口");
 require("系统.01．单位系统.单位狂暴");
 
 // ---------- 02．物品系统 ----------
-require("系统.02．物品系统.03．物品加工");
-require("系统.02．物品系统.04．装备成长");
-require("系统.02．物品系统.05．装备掉落");
-require("系统.02．物品系统.06．装备回复");
-require("系统.02．物品系统.07．装备提取");
-require("系统.02．物品系统.08．装备移速");
-require("系统.02．物品系统.10．装备限制");
-const [ok, err] = pcall(() => require("系统.02．物品系统.11．装备系统"));
-if (!ok) (globalThis as any).print("装备系统加载失败:", tostring(err));
+require("系统.02．物品系统.00．物品系统入口");
 
 // ---------- 03．技能系统 ----------
 const 显示技能名字 = require("系统.03．技能系统.01．显示技能名字") as { initShowSkillName: () => void };
@@ -73,15 +59,8 @@ if (typeof 显示技能名字.initShowSkillName === "function") 显示技能名�
 
 // ---------- 04．伤害系统 ----------
 require("系统.04．伤害系统.01．伤害事件");
-// DOT 定义（显式加载，便于打包与排查）
-require("系统.04．伤害系统.02．DOT定义.01．DOT配置");
-require("系统.04．伤害系统.02．DOT定义.02．DOT解析");
-require("系统.04．伤害系统.02．DOT定义.03．DOT类型定义");
-require("系统.04．伤害系统.02．DOT定义.04．DOT工具");
-require("系统.04．伤害系统.02．DOT定义.05．DOT状态同步");
-require("系统.04．伤害系统.02．DOT定义.06．DOT执行器");
-require("系统.04．伤害系统.02．DOT定义.07．DOT施加策略");
-require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具");
+// DOT 定义（通过入口文件统一加载）
+require("系统.04．伤害系统.02．DOT定义.00．DOT定义入口");
 require("系统.04．伤害系统.02．dot伤害");
 require("系统.04．伤害系统.03．伤害测试");
 
@@ -107,16 +86,11 @@ require("系统.08．任务系统.08．任务目标更新");
 // ---------- UI系统 ----------
 const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
 if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
-require("系统.00．核心系统.06．UI函数");
 require("系统.09．表现系统.01．UI工具.index");
 require("系统.09．表现系统.02．垂直滚动条轨道");
 require("系统.09．表现系统.02．对话框系统入口.00．对话框系统入口");
-// 任务 UI 模块（显式加载，便于打包与排查）
-require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量");
-require("系统.08．任务系统.03．任务UI拆分.02．任务UI辅助");
-require("系统.08．任务系统.03．任务UI拆分.03．任务UI列表与滚动");
-require("系统.08．任务系统.03．任务UI拆分.04．任务UI渲染");
-require("系统.08．任务系统.03．任务UI拆分.05．任务UI构建与热键");
+// 任务 UI 模块（通过入口文件统一加载）
+require("系统.08．任务系统.03．任务UI拆分.00．任务UI拆分入口");
 const 任务UI = require("系统.08．任务系统.03．任务UI") as { init: () => void; registerHotkey: () => void };
 if (typeof 任务UI.init === "function") 任务UI.init();
 if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();

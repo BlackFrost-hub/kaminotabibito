@@ -1,0 +1,11 @@
+{
+  "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\common.j",
+  "items": [
+    {
+      "symbolName": "PauseTimer",
+      "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\common.j",
+      "content": "\n```jass\nnative PauseTimer takes timer whichTimer returns nothing\n```\n\n\n---\n\n暂停计时器(计时) [R]\n\n**文件:** `c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\common.j`"
+    }
+  ],
+  "timestamp": 1775750242612
+}

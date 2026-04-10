@@ -1,0 +1,11 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+  "items": [
+    {
+      "symbolName": "DzFrameShow",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "content": "\n```jass\nnative DzFrameShow takes integer frame, boolean enable returns nothing\n```\n\n\n**文件:** `.build/war3map.j`"
+    }
+  ],
+  "timestamp": 1775750242611
+}
