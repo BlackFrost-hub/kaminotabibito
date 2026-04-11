@@ -80,6 +80,7 @@ interface JassCommon {
   YDLocal2Get?: (ty: string, key: string) => any;
   YDLocal5Set?: (ty: string, key: string, val: any) => void;
   YDLocal5Get?: (ty: string, key: string) => any;
+  flushYDLocal5ParamPage?: () => void;
   YDLocal7Set?: (ty: string, key: string, val: any) => void;
   YDLocal7Get?: (ty: string, key: string) => any;
   YDLocalInitialize?: () => void;

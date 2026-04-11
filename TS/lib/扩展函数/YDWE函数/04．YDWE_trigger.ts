@@ -1,7 +1,28 @@
+/**
+ * YDWE 触发器执行相关函数
+ * - YDLocalExecuteTrigger: 计算子触发器的 ydl_triggerstep
+ * - YDTriggerExecuteTrigger: 执行触发器
+ * - saveParentIndex: 保存父索引到 YDHT（用于返回值）
+ *
+ * 对应 Hash.h 宏:
+ *   YDLocalExecuteTrigger(trg)
+ *   YDTriggerExecuteTrigger(trg, flag)
+ *   SaveInteger(YDHT, GetHandleId(trg), SKey_PIndex, StarIndex1)
+ */
+
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-
-const STEP_KEY = 0xCFDE6C76;
+const { getSKey_PIndex, getSKey_Trigger, STEP_KEY, ydlocHandle, ydhtHandle, getG_SIndex } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
+  getSKey_PIndex: () => number;
+  getSKey_Trigger: () => number;
+  STEP_KEY: number;
+  ydlocHandle: () => any;
+  ydhtHandle: () => any;
+  getG_SIndex: () => number;
+};
+const { ConditionalTriggerExecute } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
+  ConditionalTriggerExecute: (trig: any) => void;
+};
 
 function findYDLOC(): any {
     const g = globalThis as any;
@@ -18,18 +39,43 @@ function findYDLOC(): any {
         ?? pick("udg_YDHT");
 }
 
+function findYDHT(): any {
+    const g = globalThis as any;
+    const pick = (name: string): any => {
+        if (g[name] != null) return g[name];
+        if (jglobals && jglobals[name] != null) return jglobals[name];
+        if (jass && jass[name] != null) return jass[name];
+        return null;
+    };
+    return pick("YDHT")
+        ?? pick("YDHASH_HANDLE")
+        ?? pick("udg_YDHT")
+        ?? pick("udg_YDHASH_HANDLE");
+}
+
 /**
  * 设置触发器的局部变量上下文（YDWE 传参索引）
  * 对应 JASS 宏 YDLocalExecuteTrigger(trg)
+ *
+ * 逻辑：
+ *   1. 检查目标触发器是否为逆天触发器（YDLOC 中有 SKey_Trigger 标记）
+ *      - 是：ydl_triggerstep = GetHandleId(trg)（逆天触发器自管理局部变量）
+ *   2. 否则：ydl_triggerstep = GetHandleId(trg) * (LoadInteger(YDLOC, hd, STEP_KEY) + 3)
+ *
  * @param trg 目标触发器
  */
 export function YDLocalExecuteTrigger(trg: any): void {
     if (!trg) return;
     if (typeof jass.GetHandleId !== "function") return;
     const YDLOC = findYDLOC();
-    if (!YDLOC) return;
     const hd = jass.GetHandleId(trg);
-    const step = jass.LoadInteger(YDLOC, hd, STEP_KEY);
+
+    if (YDLOC && typeof jass.HaveSavedInteger === "function" && jass.HaveSavedInteger(YDLOC, hd, getSKey_Trigger())) {
+        (globalThis as any).ydl_triggerstep = hd;
+        return;
+    }
+
+    const step = YDLOC ? (typeof jass.LoadInteger === "function" ? jass.LoadInteger(YDLOC, hd, STEP_KEY) : 0) : 0;
     (globalThis as any).ydl_triggerstep = hd * (step + 3);
 }
 
@@ -42,9 +88,7 @@ export function YDLocalExecuteTrigger(trg: any): void {
 export function YDTriggerExecuteTrigger(trg: any, flag: boolean): void {
     if (!trg) return;
     if (flag) {
-        if (typeof jass.ConditionalTriggerExecute === "function") {
-            jass.ConditionalTriggerExecute(trg);
-        }
+        ConditionalTriggerExecute(trg);
     } else {
         if (typeof jass.TriggerExecute === "function") {
             jass.TriggerExecute(trg);
@@ -52,4 +96,42 @@ export function YDTriggerExecuteTrigger(trg: any, flag: boolean): void {
     }
 }
 
-export {};
+/**
+ * 保存父索引到 YDHT，使子触发器可以通过 YDLocal7Set 写返回值
+ * 对应 JASS: SaveInteger(YDHT, GetHandleId(trg), SKey_PIndex, StarIndex1)
+ *
+ * StarIndex1 = GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step
+ * 在我们的实现中 = 当前 G_SIndex
+ *
+ * @param trg 子触发器
+ */
+export function saveParentIndex(trg: any): void {
+    if (!trg) return;
+    const YDHT = findYDHT();
+    if (!YDHT) return;
+    if (typeof jass.GetHandleId !== "function") return;
+    if (typeof jass.SaveInteger !== "function") return;
+
+    const childHd = jass.GetHandleId(trg);
+    const parentIndex = getG_SIndex();
+    jass.SaveInteger(YDHT, childHd, getSKey_PIndex(), parentIndex);
+}
+
+/**
+ * 清除子触发器上的父索引
+ * 对应 JASS: RemoveSavedInteger(YDHT, GetHandleId(trg), SKey_PIndex)
+ *
+ * @param trg 子触发器
+ */
+export function removeParentIndex(trg: any): void {
+    if (!trg) return;
+    const YDHT = findYDHT();
+    if (!YDHT) return;
+    if (typeof jass.GetHandleId !== "function") return;
+    if (typeof jass.RemoveSavedInteger !== "function") return;
+
+    const childHd = jass.GetHandleId(trg);
+    jass.RemoveSavedInteger(YDHT, childHd, getSKey_PIndex());
+}
+
+export { findYDHT };

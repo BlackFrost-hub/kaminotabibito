@@ -34,7 +34,9 @@ export const ABILITY_DATA_DATA_G = 114;
 export const ABILITY_DATA_DATA_H = 115;
 export const ABILITY_DATA_DATA_I = 116;
 export const ABILITY_DATA_UNITID = 117;
-export const ABILITY_DATA_HOTKET = 200;
+export const ABILITY_DATA_HOTKEY = 200;
+/** @deprecated 拼写错误保留别名，请用 ABILITY_DATA_HOTKEY */
+export const ABILITY_DATA_HOTKET = ABILITY_DATA_HOTKEY;
 export const ABILITY_DATA_UNHOTKET = 201;
 export const ABILITY_DATA_RESEARCH_HOTKEY = 202;
 export const ABILITY_DATA_NAME = 203;

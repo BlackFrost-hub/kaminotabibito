@@ -3,7 +3,7 @@
  * 在 tstl 编译后运行（npm run build:full 或 build 前先 run build:lua）。
  *
  * 常见 TSTL 坑：
- * - 函数调用会多传 nil(self)，如 STES_Register(trig, name) -> X(nil, trig, name)，需 10b 修正。
+ * - 函数调用会多传 nil(self)，如 STES_Register(trig, name) -> X(nil, trig, name)；10b 仅匹配事件名含「事件」字面量，其余由 10d 统一去掉首参 nil。
  * - (globalThis as any).print?.(x) 会变成 ____opt_0(____this_1, x)，需 10c 去掉 self。
  * - 数组下标 arr[i] 会编译成 Lua 的 arr[i+1]，TS 里用 0-based 才能对应 JASS 的 1-based。
  * - Lua 表 1-based：TS 里 random(1,n)+arr[idx-1] 编译后 arr[0]=nil，需在下方对具体文件把 [idx-1] 改为 [idx]。见 .cursor/rules/war3-tstl-jass-pitfalls.mdc 第 7 条。
@@ -53,14 +53,25 @@ function fixFile(filePath) {
   //     冒号调用会把 japi 表当 self 传入导致参数全部错位，统一改为点号。
   content = content.replace(/\bjapi:/g, "japi.");
 
-  // 6g. 07．技能函数 / 08．伤害函数：
-  if (filePath.includes("07．技能函数") || filePath.includes("08．伤害函数")) {
-    // 07．技能函数 / 08．伤害函数：去掉 self/____self 参数
+  // 6g. 07．技能函数 / 08．伤害函数 / 02．Star自定义事件（STES_*）：
+  //     TSTL 导出函数会多一层 self；外部用 stesMod.STES_Register(trig, name) 点号调用只传两参，
+  //     若不剥离则 self=trig、a=事件名、t=nil，注册静默失败、计数恒为 0。
+  if (
+    filePath.includes("07．技能函数") ||
+    filePath.includes("08．伤害函数") ||
+    filePath.includes("Star自定义事件")
+  ) {
+    // 去掉 self/____self 参数
     content = content.replace(/function (____exports\.\w+)\((self|____self),\s*/g, "function $1(");
     content = content.replace(/function (____exports\.\w+)\((self|____self)\)/g, "function $1()");
     content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
     content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
   }
+
+  // 6i. STES_* 导出：与 6g 相同语义；按函数名处理，避免仅依赖路径 includes 时在部分环境下不命中，
+  //     导致 stesMod.STES_Register(trig,name) 仍错位、注册静默失败。
+  content = content.replace(/function (____exports\.STES_\w+)\((self|____self),\s*/g, "function $1(");
+  content = content.replace(/function (____exports\.STES_\w+)\((self|____self)\)/g, "function $1()");
 
   // 6h. 调用方对 08．伤害函数 模块（TSTL 编码为 _____4F24_5BB3_51FD_6570）的残余冒号调用改为点号。
   //     配合 6g 去掉 self 后，点号调用参数对齐。
@@ -93,6 +104,9 @@ function fixFile(filePath) {
     const ev = dq !== undefined ? '"' + dq + '"' : "'" + sq + "'";
     return fn + "(" + trig + ", " + ev + ")";
   });
+
+  // 10d. STES_Register(nil, trig, name) 任意第三参（变量或字符串），与 10b 互补；避免「击杀步兵」「添加Buff」等未命中 10b 时注册静默失败
+  content = content.replace(/STES_Register\s*\(\s*nil\s*,\s*(\w+)\s*,\s*([^)]+)\s*\)/g, "STES_Register($1, $2)");
 
   // 10c. _G.print?.(x) 被 TSTL 编译成 ____opt_N(____this_N, x)，仅当确认为 _G.print 时去掉 self
   if (content.includes("____this_1 = _G") && content.includes(".print")) {
@@ -203,6 +217,12 @@ function fixFile(filePath) {
 
   // 22. pr(nil, "msg") -> pr("msg")  TSTL 把 _G.print 当方法生成 pr(nil, ...)，需去掉 nil
   content = content.replace(/\bpr\s*\(\s*nil\s*,\s*/g, "pr(");
+
+  // 22b. 任意测试2.lua：局部 p=_G.print 时 TSTL 仍生成 p(nil,msg)；stesMod:STES_* 需点号（与 pitfalls 规则 7 一致）
+  if (filePath.includes("任意测试2")) {
+    content = content.replace(/\bp\s*\(\s*nil\s*,\s*/g, "p(");
+    content = content.replace(/\bstesMod:/g, "stesMod.");
+  }
 
   // 23. ____opt_XX(self, ...) -> ____opt_XX(...)  TSTL optional chaining ?.() 编译时多传了 self
   // 如 self.config.onClick?.(questId) -> ____opt_N(self, questId) 实际应为 ____opt_N(questId)

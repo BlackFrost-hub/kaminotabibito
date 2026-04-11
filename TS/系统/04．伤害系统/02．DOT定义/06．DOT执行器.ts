@@ -72,10 +72,6 @@ export function createDotExecutor(deps: {
     if (typeof deps.jass.UnitDamageTarget !== "function") return;
     const cfg = deps.dotTypes.find(c => c.id === typeId);
     if (cfg == null) return;
-    if (deps.jass.udg_TempUnit != null) {
-      deps.jass.udg_TempUnit[3] = target;
-      deps.jass.udg_TempUnit[4] = source;
-    }
     const dh = deps.unitHid(target);
     for (let di = 0; di < deps.dotTypes.length; di++) {
       const tid = deps.dotTypes[di].id;

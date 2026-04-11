@@ -64,10 +64,6 @@ function ____exports.createDotExecutor(self, deps)
         if cfg == nil then
             return
         end
-        if deps.jass.udg_TempUnit ~= nil then
-            deps.jass.udg_TempUnit[3] = target
-            deps.jass.udg_TempUnit[4] = source
-        end
         local dh = deps:unitHid(target)
         do
             local di = 0

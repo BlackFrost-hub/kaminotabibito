@@ -1,0 +1,114 @@
+---
+description: STES 自定义事件（注册/触发/与 JASS 对齐）+ YDLocal 传参与返回值；含装备提取/Buff 桥接实战坑
+globs: TS/lib/扩展函数/Star扩展函数/Star扩展库/02．Star自定义事件.ts, TS/lib/扩展函数/Star扩展函数/Star扩展库/index.ts, TS/lib/扩展函数/YDWE函数/02．YDLocal兼容.ts, TS/系统/02．物品系统/07．装备提取.ts, TS/系统/05．Buff系统/03．BuffJASS桥接.ts, TS/系统/12．测试系统/任意测试2.ts, TS/系统/08．任务系统/*STES*.ts, scripts/fix-lua-for-pack.js
+alwaysApply: false
+---
+
+# STES 自定义事件 + YDLocal 返回值
+
+## STES 是什么
+- 地图 **library STES / StarBase** 用一张 **hashtable**（JASS 里 `STES___HT` / `STES_GetTable()`）按 **事件名字符串** 挂多个 **trigger**。
+- Lua/TS 侧 `02．Star自定义事件.ts` **绑定同一张表**（`resolveStesHashtable` 读 `jglobals.STES___HT` 等），**禁止**用 `InitHashtable` 覆盖 JASS 已绑定的全局表，否则 JASS 注册与 Lua 读写不一致、`LoadInteger` 计数恒 0。
+- 事件名与 JASS `StringHash(事件名)` 一致；子键 `skey_index` 等与 zinc 编译的 STES 一致（Lua 会同步 `STES_skey_index` 等到 `jass.globals` / `_G`）。
+
+## API 一览（`lib/.../02．Star自定义事件`）
+| 函数 | 作用 |
+|------|------|
+| `STES_GetTable()` | 取当前 STES 用 hashtable；会先 `init`/`refreshStesBinding`。 |
+| `STES_Register(trig, eventName)` | 把触发器注册到事件名（参数顺序也支持 `(eventName, trig)`，实现里按类型区分）。 |
+| `STES_Fire(eventName)` | **逆天链**：`YDLocalExecuteTrigger` → `saveParentIndex` → `YDTriggerExecuteTrigger(trig, false)`，与 GUI 里常见 STES 触发方式一致。 |
+| `STES_FireWithReal11Step(eventName, realParamKey)` | 每轮子触发前 **`YDLocal5Set(real, realParamKey, 0)`** 再 `STES_Fire` 同款 Execute；`realParamKey` **必填**，须与地图 YDLocal 变量名一致（见下文 YDLocal）。 |
+| `STES_Execute(eventName)` | 与 JASS `STES_Execute`：**先 `TriggerEvaluate`，通过才 `TriggerExecute`**（与 `STES_Fire` 不同）。 |
+| `STES_RegisterEx(funcName, eventName)` | 函数字符串 ↔ 事件名，走 `skey_indexEx` 槽位，与 zinc `STES_RegisterEx` 一致。 |
+| `STES_GetUnitEvent(u, name)` | `I2S(GetHandleId(u)) + name`，与 JASS 一致。 |
+| `STES_RemoveEvent(trig, eventName)` / `STES_Remove(trig)` | 从 STES 表卸绑定。 |
+
+全局桥接（可选）：`Star扩展库/index.ts` 的 `registerBridge()` 会把部分 `STES_*` `expose` 到 `_G`，供 JASS/外部名调用。
+
+## 典型用法（Lua / TS）
+1. **确保地图已加载 STES 表**（`STES_GetTable()` 非 `null`）；若仍空，说明 JASS 初始化顺序或库未进图。
+2. **注册**：`CreateTrigger` + `TriggerAddAction(...)` + **`STES_GetTable()`** 后再 **`STES_Register(trig, "我的事件名")`**（**点号**调用模块导出函数，勿用 `stesMod:STES_Register`，见 `war3-tstl-jass-pitfalls` 规则 7）。
+3. **触发**：业务里 **`stesMod.STES_Fire("我的事件名")`**；需要与 GUI 一样先给子触发塞 `YDLocal5Set(real, key, 0)` 时用 **`STES_FireWithReal11Step("我的事件名", key)`**。
+4. **测试模块启动**：若 `require` 早于 JASS 绑表，可用 **单次短延时定时器**（如 `任意测试2.ts` 的 `ENTRY_DELAY_SEC`）再 `GetTable` / `LoadInteger` / `STES_Fire`，避免长轮询。
+
+## JASS ↔ Lua 同表互调
+- JASS `STES_Register` / `STES_Fire` 与 Lua `STES_Register` / `STES_Fire` 使用 **同一 `STES___HT`** 时，**聊天/触发器遍历** 与 **Lua 只写事件名** 可以互相触发。
+- 事件名字符串 **必须与对方完全一致**（含中文）。
+
+## TSTL + `STES_Register` 生成 Lua（必记，曾导致「聊天无反应」）
+- 从模块 **`require` 出来的 `STES_Register`**，TSTL 常生成 **`STES_Register(nil, trig, eventName)`**：多出来的 **`nil` 相当于错误的 self**，会把 **trigger / 事件名整体错位**，表现为 **注册静默失败**、JASS 侧 `LoadInteger(STES___HT, StringHash(事件名), skey_index)` **计数恒 0**。
+- **`scripts/fix-lua-for-pack.js`**：
+  - **10b**：仅当第三参为**字符串字面量且含「事件」二字**时改写为两参（例如 `"装备提取事件"`）。
+  - **10d**：**任意**第三参（变量名或任意字符串字面量）统一 **`STES_Register(nil, trig, x)` → `STES_Register(trig, x)`**，覆盖 **`击杀步兵`**、**`添加Buff`**、**`任务目标更新`** 等未命中 10b 的情况。
+- 改 STES 相关 TS 或 fix 脚本后务必 **`npm run build`** 并检查生成 Lua 里是否为 **`STES_Register(trig, name)`** 两参。
+- 导出定义另见：`02．Star自定义事件.ts` 的 **`self` 首参** + fix 规则 **6i**（`____exports.STES_*` 剥离 self）。
+
+## Lua 早于 JASS 绑表时注册进「自用表」
+- 若首次 `STES_Register` 时 JASS 尚未把 **`STES___HT`** 绑好，`refreshStesBinding` 可能暂时落到 **纯 Lua 自用 hashtable**，与地图 STES **不是同一张表**：表现为 Lua 自认为已注册，JASS 遍历事件 **监听数仍为 0**。
+- **装备提取**做法：`STES_GetTable()` + `STES_Register` 后，在 **`jass.globals.STES___HT`**（及 `udg_*` 等候选）上用 **`LoadInteger(ht, StringHash(事件名), STES_skey_index)`** 校验；**小于 1 则短定时器重试**（有上限），直到与 JASS 同表或放弃。其它 STES 桥接至少应 **`STES_GetTable()` 紧挨在 `STES_Register` 之前**。
+
+---
+
+## YDLocal 返回值（父触发读子触发写回）
+
+### 何时算成功
+- 子触发（含 Lua `TriggerAddAction`）里对某变量名做了 **`YDLocal7Set(类型, "名字", 值)`**（不限 real，**integer** 写物品 rawcode 等同样成立）。
+- 父触发在 **`YDLocal1Release()` 之前** 用 **`YDLocal1Get(类型, "名字")`** 读到同一变量。
+- 示例：`YDLocal5Get(real,"实数")=0` → 子写回后父侧显示与 Lua 一致，即链路通。
+
+### YDLocal 变量名
+- 名字是 **字符串**，须与 GUI/JASS/Lua **完全一致**（支持数字、英文、中文等）；**没有库级默认名**，谁在地图里写 `YDLocal5Set(real, "xxx", …)`，TS/Lua 就用同一个 `"xxx"`。
+
+### JASS 父触发（聊天 333 一类）推荐骨架
+1. `YDLocalInitialize()`
+2. `loop`：`LoadTriggerHandle(STES_GetTable(), …)`  
+   - `YDLocalExecuteTrigger(ydl_trigger)`  
+   - `SaveInteger(YDHT, GetHandleId(ydl_trigger), SKey_PIndex, StarIndex1)`（与 GUI 一致即可）  
+   - `YDLocal5Set(real, "你的变量名", 0.00)`（或你要传入子触发的初值）  
+   - `YDTriggerExecuteTrigger(ydl_trigger, false)`
+3. `endloop` 后：`YDLocal1Get(real, "你的变量名")` 拼任务/调试文本  
+4. `YDLocal1Release()`
+
+**要点**：父要读的变量名 = 子 **`YDLocal7Set`** 写的变量名；子读参用 **`YDLocal5Get`**（类型、名字与父写入的子触发传参区一致）。
+
+### 子触发 Lua 内：`ydl_triggerstep` 必须先对齐（装备提取核心坑）
+- **`YDLocal5Get` / `YDLocal5Set` 使用全局 `ydl_triggerstep` 作为 YDLOC 子页**。JASS 在进子触发前会设置它；若 Lua **`TriggerAddAction` 入口**里该值未与 **`GetTriggeringTrigger()`** 同步，读参会落在 **错误页**，典型现象：**`YDLocal5Get("real", …)` 全是 0**、调试像「没传参」。
+- **修复**：在任意 **`YDLocal5Get` 之前**调用（与 `07．装备提取.ts` 一致）：
+  - `YDLocalExecuteTrigger(GetTriggeringTrigger())`（`GetTriggeringTrigger` 用 **`jass.GetTriggeringTrigger()`** 直接调，勿赋局部再调，见 `war3-tstl-jass-pitfalls` 规则 2）。
+- Buff 桥接等凡从 **YDLocal5** 读参的子触发，都应遵守同一步骤。
+
+### 子触发结束后：恢复父 YDLOC 页再 `clearStar_PIndex`（父读 `YDLocal1Get` 为 0 的坑）
+- 子触发跑完后若 **`G_SIndex` / `G_LIndex` 仍停在子传参页**，父触发用 **`YDLocal1Get(integer, "ItemType")`**（等）会读到 **错误槽 → 常表现为 0**。
+- **修复**（与 `07．装备提取.ts`、`03．BuffJASS桥接.ts` 一致）：在 **`clearStar_PIndex()` 之前**（或 `finally` 中与之配套）：
+  - `page = getParentYdlocPageForReturnValue()`（`02．YDLocal兼容.ts` 导出，与 **`YDLocal7Set` 使用的父页**一致）；
+  - 若 `page > 0`，则 **`setG_SIndex(page)`、`setG_LIndex(page)`**。
+- 然后再 **`clearStar_PIndex()`**，与 YDWE 子触发收尾一致。
+
+### 父侧该用哪类 `YDLocal1Get`
+- 父在 **子传参页**上通过 **`YDLocal5Set` 写入的 real/string**（如 `ScoreMin`/`ScoreMax`），子用 **`YDLocal5Get`** 读；父若在自己 **`G_LIndex`** 页上去 **`YDLocal1Get(real, "ScoreMin")`**，往往仍是 **0.0**（页不对），易误判「Lua 没写参」。
+- **返回值**（给父后续逻辑用）应依赖子 **`YDLocal7Set`** 写到父页的变量，例如装备提取：**`YDLocal7Set("integer", "ItemType", rawcode)`**，父 **`YDLocal1Get(integer, "ItemType")`**。
+
+### Lua 子触发模板（参考 `任意测试2.ts` / `07．装备提取.ts`）
+1. `YDLocalExecuteTrigger(GetTriggeringTrigger())`  
+2. 读参：`YDLocal5Get("real"|"string"|"unit"|…, "变量名")`  
+3. 业务逻辑  
+4. 写回父页：`YDLocal7Set("integer"|"real"|…, "与父约定名", 值)`  
+5. `finally`：**恢复父页**（`getParentYdlocPageForReturnValue` + `setG_SIndex`/`setG_LIndex`）→ **`clearStar_PIndex()`**
+
+### `STES_Fire` vs `STES_FireWithReal11Step`
+- **`STES_Fire`**：只走逆天 Execute 链，**不**自动 `YDLocal5Set`。  
+- **`STES_FireWithReal11Step(name, realParamKey)`**：每轮子触发前 **`YDLocal5Set(real, realParamKey, 0)`**，用于 Lua 侧 **模拟** 与 GUI 父循环相同的传参顺序；**不替代**地图里已写好的 JASS 遍历。
+
+### 常见失败（速查）
+- 子触发里 **未先 `YDLocalExecuteTrigger(GetTriggeringTrigger())`** → **`YDLocal5Get` 全 0 / 乱值**。  
+- 子 **未 `YDLocal7Set` 到父约定名**，或父用 **`YDLocal1Get(real, 子传参名)`** 读 Score 等 → **父始终 0**。  
+- 子结束 **未恢复 `G_SIndex`/`G_LIndex` 就 `clearStar_PIndex`** → **父 `YDLocal1Get(integer, …)` 为 0**。  
+- **`STES_Register(nil, trig, name)` 未过 fix** → **注册失败、聊天无反应**。  
+- Lua **`STES_Register` 早于 JASS 绑表** → 写进 **自用表**；JASS **监听数恒 0**（需 GetTable + 校验/重试）。  
+- 父读 `YDLocal1Get(real, "A")`，子写 `YDLocal7Set(real, "B", …)` → 永远读到 0 或旧值。  
+- 子不写回父同名槽，或漏 **`clearStar_PIndex`** / 父过早 **`YDLocal1Release`**。
+
+### 参考实现路径
+- **`TS/系统/02．物品系统/07．装备提取.ts`**：STES 注册校验与重试、`ydl_triggerstep` 同步、区间读参、`YDLocal7Set(integer, ItemType)`、父页恢复。  
+- **`TS/系统/05．Buff系统/03．BuffJASS桥接.ts`**：YDLocal5 中文变量名传参、同步 + `try/finally` 收尾。  
+- **`TS/lib/扩展函数/YDWE函数/02．YDLocal兼容.ts`**：`getParentYdlocPageForReturnValue` 等。

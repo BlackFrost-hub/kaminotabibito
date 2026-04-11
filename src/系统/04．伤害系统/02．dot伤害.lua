@@ -186,7 +186,7 @@ end
 function ____exports.getUnitTrollCurse(self, unit)
     return getDotStateByTypeId(nil, "trollCurse", unit)
 end
---- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。udg_TempUnit[3]/[4] 由 dealDamageForType 写入（JASS约定输出槽，不可删）
+--- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。
 function ____exports.dealSpiritDamage(self, source, target, amount)
     dotExecutor:dealDamageForType("antiHeal", source, target, amount)
 end

@@ -1,208 +1,243 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
-local __TS__Number = ____lualib.__TS__Number
-local __TS__ArraySlice = ____lualib.__TS__ArraySlice
+local __TS__TypeOf = ____lualib.__TS__TypeOf
 local ____exports = {}
+--- 装备提取 — STES「装备提取事件」子触发：YDLocal5(ScoreMin/Max) → YDLocal7Set(integer, "ItemType", …)
+-- 
+-- 规则：读 YDLocal5 的 ScoreMin/ScoreMax，在闭区间内枚举带 score 的 4 字 id，`math.random` 抽一件；无候选则 ItemType=0。
+-- 
+-- 须与地图 JASS 一致：StringHash("装备提取事件")、ItemType。
+-- 
+-- 注册时用 **jass.globals 的 STES___HT** 上 LoadInteger 校验监听数；若为 0 或表尚未绑定则延迟重试，
+-- 避免早先 STES_Register 写入「Lua 自用表」后仍置 REG_GUARD，导致 JASS 遍历计数恒为 0、聊天无任何反应。
 local jass = require("jass.common")
-local g = require("jass.globals")
-local mod = require("系统.02．物品系统.01．装备数据")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
-local stringToFourCC = ____require_result_0.stringToFourCC
-local itemsData = mod.items or mod.default or ({})
-local _seedCnt = 0
-local DEBUG = false
-local ITEM_TRIGGER = "tret"
-local function getItemsByScoreRange(self, minScore, maxScore)
-    local min = minScore or 0
-    local max = maxScore or 0
-    local result = {}
-    for ____, id in ipairs(__TS__ObjectKeys(itemsData)) do
+local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_0.STES_Register
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_1.YDLocal5Get
+local YDLocal7Set = ____require_result_1.YDLocal7Set
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
+local ydlStes_coerceOptionalNumber = ____require_result_2.ydlStes_coerceOptionalNumber
+local ydlStes_skeyIndex = ____require_result_2.ydlStes_skeyIndex
+local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
+local dataMod = require("系统.02．物品系统.01．装备数据")
+local ____require_result_3 = require("系统.00．核心系统.01．封装函数")
+local stringToFourCC = ____require_result_3.stringToFourCC
+local ITEM_TYPE_KEY = "ItemType"
+local REG_GUARD = "__syzl_equipExtract_registered"
+local TRIG_KEY = "__syzl_equipExtract_trig"
+local ATTEMPT_KEY = "__syzl_equipRegAttempt"
+local MAX_REG_ATTEMPTS = 30
+local RETRY_SEC = 0.1
+local itemsTable = dataMod.items or dataMod.default or ({})
+local function log(msg)
+    local p = _G.print
+    if type(p) == "function" then
+        p(nil, msg)
+    end
+end
+local function formatDbgVal(v)
+    if v == nil then
+        return "nil"
+    end
+    return (__TS__TypeOf(v) .. ":") .. tostring(v)
+end
+--- 仅使用 JASS 传入的 ScoreMin/ScoreMax（转成数字后取闭区间）；任一端读不到有效数字则视为失败
+local function readScoreBounds()
+    local minS = ydlStes_coerceOptionalNumber(
+        nil,
+        nil,
+        YDLocal5Get(nil, "real", "ScoreMin")
+    )
+    local maxS = ydlStes_coerceOptionalNumber(
+        nil,
+        nil,
+        YDLocal5Get(nil, "real", "ScoreMax")
+    )
+    if minS == nil or maxS == nil then
+        return {ok = false, lo = 0, hi = 0}
+    end
+    local lo = minS <= maxS and minS or maxS
+    local hi = minS <= maxS and maxS or minS
+    return {ok = true, lo = lo, hi = hi}
+end
+--- 与 02．Star自定义事件 resolveStesHashtable 候选一致，在 JASS 实际用的表上读监听数
+local function jassStesHashtable()
+    local jg = jglobals
+    local cands = {jg.STES___HT, jg.STES_HT, jg.udg_STES___HT, jg.udg_STES_HT}
+    do
+        local i = 0
+        while i < #cands do
+            local t = cands[i + 1]
+            if t ~= nil and t ~= 0 then
+                return t
+            end
+            i = i + 1
+        end
+    end
+    return nil
+end
+--- -1 表示尚未找到任何 STES 全局表句柄
+local function countOnJassStesTable(eventName)
+    local ht = jassStesHashtable()
+    if ht == nil or ht == 0 then
+        return -1
+    end
+    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
+        return -1
+    end
+    local h = jass.StringHash(eventName)
+    return jass.LoadInteger(
+        ht,
+        h,
+        ydlStes_skeyIndex(nil, nil)
+    )
+end
+--- 列出闭区间 [lo, hi] 内**所有**带有效 score 的 4 字 id（score 用 coerceNumber，避免 Lua 表里为 string 时漏掉）
+local function collectAllIdsInScoreInterval(lo, hi)
+    local a = lo <= hi and lo or hi
+    local b = lo <= hi and hi or lo
+    local out = {}
+    for id in pairs(itemsTable) do
         do
-            local __continue3
+            local __continue16
             repeat
                 if type(id) ~= "string" or #id ~= 4 then
-                    __continue3 = true
+                    __continue16 = true
                     break
                 end
-                local entry = itemsData[id]
-                if not entry then
-                    __continue3 = true
+                local ____ydlStes_coerceOptionalNumber_6 = ydlStes_coerceOptionalNumber
+                local ____opt_4 = itemsTable[id]
+                if ____opt_4 ~= nil then
+                    ____opt_4 = ____opt_4.score
+                end
+                local sc = ____ydlStes_coerceOptionalNumber_6(nil, nil, ____opt_4)
+                if sc == nil then
+                    __continue16 = true
                     break
                 end
-                local score = entry.score
-                if score ~= nil and score >= min and score <= max then
-                    result[#result + 1] = id
+                if sc >= a and sc <= b then
+                    out[#out + 1] = id
                 end
-                __continue3 = true
+                __continue16 = true
             until true
-            if not __continue3 then
+            if not __continue16 then
                 break
             end
         end
     end
-    return result
+    return out
 end
-local function EquipExtract_CreateByLevel(self)
-    local ____this_2
-    ____this_2 = _G
-    local ____opt_1 = ____this_2.print
-    if ____opt_1 ~= nil then
-        ____opt_1(____this_2, "[装备提取] EquipExtract_CreateByLevel 被调用")
+local function pickFromScorePool(ids)
+    if #ids == 0 then
+        return {raw = 0, id = ""}
     end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        10,
-        "[装备提取] 执行中"
-    )
-    _seedCnt = _seedCnt + 1
-    math.randomseed(_seedCnt)
-    local ____opt_3 = jass.YDLocal1Get
-    local inputMin = ____opt_3 and ____opt_3(jass, "integer", "EquipExtract_MinScore")
-    local ____opt_5 = jass.YDLocal1Get
-    local inputMax = ____opt_5 and ____opt_5(jass, "integer", "EquipExtract_MaxScore")
-    local minS = type(inputMin) == "number" and inputMin or (__TS__Number(g.udg_TempScoreMin) or 0)
-    local maxS = type(inputMax) == "number" and inputMax or (__TS__Number(g.udg_TempScoreMax) or 0)
-    if minS <= 0 and maxS <= 0 then
-        minS = 200
-        maxS = 250
+    local idx = math.random(1, #ids)
+    local id = ids[idx]
+    if type(id) ~= "string" or #id ~= 4 then
+        return {raw = 0, id = ""}
     end
-    local candidates = getItemsByScoreRange(nil, minS, maxS)
-    local ____this_8
-    ____this_8 = jass
-    local ____opt_7 = ____this_8.STES_GetTriggerPlayer
-    if ____opt_7 ~= nil then
-        ____opt_7 = ____opt_7(____this_8)
-    end
-    local ____opt_7_11 = ____opt_7
-    if ____opt_7_11 == nil then
-        local ____opt_9 = jass.GetTriggerPlayer
-        ____opt_7_11 = ____opt_9 and ____opt_9(jass)
-    end
-    local ____opt_7_11_12 = ____opt_7_11
-    if ____opt_7_11_12 == nil then
-        ____opt_7_11_12 = jass.Player(0)
-    end
-    local player = ____opt_7_11_12
-    if #candidates == 0 then
-        g.udg_TempItemType = 0
-        if DEBUG then
-            jass.DisplayTimedTextToPlayer(
-                player,
-                0,
-                0,
-                8,
-                (("TempItemType=0 无候选 min=" .. tostring(minS)) .. " max=") .. tostring(maxS)
-            )
-        end
+    return {
+        raw = stringToFourCC(nil, id),
+        id = id
+    }
+end
+local function runEquipExtract()
+    ydlStes_syncTriggerStep(nil, nil)
+    local rawMin = YDLocal5Get(nil, "real", "ScoreMin")
+    local rawMax = YDLocal5Get(nil, "real", "ScoreMax")
+    local bounds = readScoreBounds()
+    if not bounds.ok then
+        YDLocal7Set(nil, "integer", ITEM_TYPE_KEY, 0)
+        ydlStes_finishChildCleanup(nil, nil)
+        log(((("[装备提取] 读参失败 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → ItemType=0")
         return
     end
-    local arr = __TS__ArraySlice(candidates)
-    do
-        local i = #arr - 1
-        while i > 0 do
-            local j = math.floor(math.random() * (i + 1))
-            local ____temp_13 = {arr[j + 1], arr[i + 1]}
-            arr[i + 1] = ____temp_13[1]
-            arr[j + 1] = ____temp_13[2]
-            i = i - 1
-        end
+    local lo = bounds.lo
+    local hi = bounds.hi
+    local pool = collectAllIdsInScoreInterval(lo, hi)
+    if #pool == 0 then
+        YDLocal7Set(nil, "integer", ITEM_TYPE_KEY, 0)
+        ydlStes_finishChildCleanup(nil, nil)
+        log(((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选0件 → ItemType=0")
+        return
     end
-    local itemId = arr[1]
-    g.udg_TempItemType = type(itemId) == "string" and #itemId == 4 and stringToFourCC(nil, itemId) or 0
-    local ____this_15
-    ____this_15 = _G
-    local ____opt_14 = ____this_15.print
-    if ____opt_14 ~= nil then
-        ____opt_14(
-            ____this_15,
-            (("TempItemType=" .. tostring(g.udg_TempItemType)) .. " itemId=") .. itemId
-        )
-    end
-    if DEBUG then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            10,
-            (("TempItemType=" .. tostring(g.udg_TempItemType)) .. " itemId=") .. itemId
-        )
-    end
+    local ____pickFromScorePool_result_7 = pickFromScorePool(pool)
+    local raw = ____pickFromScorePool_result_7.raw
+    local pickedId = ____pickFromScorePool_result_7.id
+    YDLocal7Set(nil, "integer", ITEM_TYPE_KEY, raw)
+    ydlStes_finishChildCleanup(nil, nil)
+    log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
-local function onTrigger(self)
-    local evt = jass.GetTriggerEventId()
-    local ____opt_16 = jass.GetTriggerPlayer
-    local ____temp_18 = ____opt_16 and ____opt_16(jass)
-    if ____temp_18 == nil then
-        ____temp_18 = jass.Player(0)
+local function scheduleRetry(fn)
+    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
+        fn(nil)
+        return
     end
-    local player = ____temp_18
-    if evt == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
-        local item = jass.GetManipulatedItem()
-        local tid = jass.GetItemTypeId(item)
-        if tid ~= stringToFourCC(nil, ITEM_TRIGGER) then
-            return
+    local tm = jass.CreateTimer()
+    jass.TimerStart(
+        tm,
+        RETRY_SEC,
+        false,
+        function()
+            if type(jass.DestroyTimer) == "function" then
+                jass.DestroyTimer(tm)
+            end
+            fn(nil)
         end
-        if DEBUG then
-            jass.DisplayTimedTextToPlayer(
-                player,
-                0,
-                0,
-                8,
-                "物品ID正确"
-            )
-        end
-    end
-    EquipExtract_CreateByLevel(nil)
-end
-local function init(self)
-    _G.EquipExtract_CreateByLevel = EquipExtract_CreateByLevel
-    local trig = jass.CreateTrigger()
-    do
-        local i = 0
-        while i < 4 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    jass.TriggerAddAction(trig, onTrigger)
-    local evtTrig = jass.CreateTrigger()
-    jass.TriggerAddAction(
-        evtTrig,
-        function() return EquipExtract_CreateByLevel(nil) end
     )
-    local ____jass_STES_Register_19 = jass.STES_Register
-    if ____jass_STES_Register_19 == nil then
-        ____jass_STES_Register_19 = g.STES_Register
-    end
-    local ____jass_STES_Register_19_20 = ____jass_STES_Register_19
-    if ____jass_STES_Register_19_20 == nil then
-        ____jass_STES_Register_19_20 = _G.STES_Register
-    end
-    local STES_Reg = ____jass_STES_Register_19_20
-    if type(STES_Reg) == "function" then
-        STES_Reg(evtTrig, "提取物品事件")
-        if DEBUG then
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(0),
-                0,
-                0,
-                10,
-                "[装备提取] 已通过 STES_Register 注册事件 提取物品事件"
-            )
-        end
-    else
-        g.udg_RegTrigger = evtTrig
-        g.udg_RegEventStr = "提取物品事件"
-        jass.ExecuteFunc("Bridge_STES_Register")
-    end
 end
-init(nil)
-____exports.EquipExtract_CreateByLevel = EquipExtract_CreateByLevel
+--- 反复 STES_GetTable + Register，直到 **JASS 全局表** 上该事件监听数 >= 1，或超出次数。
+-- 字面量事件名供 fix-lua-for-pack 10b 去掉多余 nil。
+local function tryRegisterEquipStes()
+    local g = _G
+    if g[REG_GUARD] then
+        return
+    end
+    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
+        g[REG_GUARD] = true
+        return
+    end
+    if STES_Register == nil then
+        g[REG_GUARD] = true
+        return
+    end
+    if g[TRIG_KEY] == nil then
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(
+            trig,
+            function()
+                runEquipExtract()
+            end
+        )
+        g[TRIG_KEY] = trig
+    end
+    local trig = g[TRIG_KEY]
+    ydlStes_registerAfterGetTable(nil, nil, trig, "装备提取事件")
+    local jCount = countOnJassStesTable("装备提取事件")
+    local attempt = g[ATTEMPT_KEY] or 0
+    g[ATTEMPT_KEY] = attempt + 1
+    if jCount >= 1 then
+        g[REG_GUARD] = true
+        g.EquipExtract_CreateByLevel = runEquipExtract
+        return
+    end
+    if g[ATTEMPT_KEY] >= MAX_REG_ATTEMPTS then
+        log(((("[装备提取] STES 注册失败（已重试" .. tostring(MAX_REG_ATTEMPTS)) .. "次，JASS 表上监听数=") .. tostring(jCount)) .. "）。请确认地图 STES 与事件名「装备提取事件」一致。")
+        g[REG_GUARD] = true
+        return
+    end
+    scheduleRetry(function()
+        tryRegisterEquipStes()
+    end)
+end
+local function boot()
+    tryRegisterEquipStes()
+end
+boot()
+function ____exports.EquipExtract_CreateByLevel(self, _self)
+    runEquipExtract()
+end
 return ____exports

@@ -31,7 +31,10 @@ ____exports.ABILITY_DATA_DATA_G = 114
 ____exports.ABILITY_DATA_DATA_H = 115
 ____exports.ABILITY_DATA_DATA_I = 116
 ____exports.ABILITY_DATA_UNITID = 117
-____exports.ABILITY_DATA_HOTKET = 200
+____exports.ABILITY_DATA_HOTKEY = 200
+---
+-- @deprecated 拼写错误保留别名，请用 ABILITY_DATA_HOTKEY
+____exports.ABILITY_DATA_HOTKET = ____exports.ABILITY_DATA_HOTKEY
 ____exports.ABILITY_DATA_UNHOTKET = 201
 ____exports.ABILITY_DATA_RESEARCH_HOTKEY = 202
 ____exports.ABILITY_DATA_NAME = 203

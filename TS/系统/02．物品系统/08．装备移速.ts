@@ -1,11 +1,14 @@
 /**
- * 装备移速（movespeed2）：不叠加，取当前装备中 movespeed2 最大值，通过 ExecuteFunc("movespeed2") 调用
- * SGSS_SetState(unit, 9, value)；减速需传负数，故先减掉旧值再加新值。
+ * 装备移速（movespeed2）：不叠加，取当前装备中 movespeed2 最大值
+ * 直接调用 TS 端 SGSS_SetState(unit, 9, value)；减速需传负数，故先减掉旧值再加新值。
  */
 const jass = require("jass.common") as JassCommon;
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { movespeed2?: number; name?: string; type?: string }> }).default;
 const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
   fourCCToString: (four: number) => string;
+};
+const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
+  SGSS_SetState: (u: any, id: number, v: number) => void;
 };
 
 /** 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加） */
@@ -51,14 +54,11 @@ function applyMovespeed2(unit: any, newSpeed: number): void {
   const key = getUnitKey(unit);
   const oldSpeed = applied[key] != null ? applied[key] : 0;
   if (newSpeed === oldSpeed) return;
-  (jass as any).udg_TempUnit[1] = unit;
   if (oldSpeed !== 0) {
-    (jass as any).udg_TempReal[1] = -oldSpeed;
-    jass.ExecuteFunc("movespeed2");
+    SGSS_SetState(unit, 9, -oldSpeed);
   }
   if (newSpeed !== 0) {
-    (jass as any).udg_TempReal[1] = newSpeed;
-    jass.ExecuteFunc("movespeed2");
+    SGSS_SetState(unit, 9, newSpeed);
   }
   applied[key] = newSpeed;
 }

@@ -3,6 +3,7 @@ export * from "./01．YDUserData兼容";
 export * from "./02．YDLocal兼容";
 export * from "./03．YDWE_Base";
 export * from "./04．YDWE_trigger";
+export * from "./05．STES子触发公共工具";
 
 import * as ydweFunc from "./00．YDWE函数";
 import * as ydCompat from "./01．YDUserData兼容";
@@ -28,9 +29,19 @@ export function registerBridge(): void {
   expose("YDUserDataClearTable", ydCompat.YDUserDataClearTable);
   expose("YDUserDataClear", ydCompat.YDUserDataClear);
 
+  expose("YDLocalInitialize", ydLocal.YDLocalInitialize);
+  expose("YDLocal1Release", ydLocal.YDLocal1Release);
   expose("YDLocal1Get", ydLocal.YDLocal1Get);
   expose("YDLocal1Set", ydLocal.YDLocal1Set);
   expose("YDLocalSet", ydLocal.YDLocalSet);
+  expose("YDLocal5Set", ydLocal.YDLocal5Set);
+  expose("YDLocal5Get", ydLocal.YDLocal5Get);
+  expose("flushYDLocal5ParamPage", ydLocal.flushYDLocal5ParamPage);
+  expose("YDLocal7Set", ydLocal.YDLocal7Set);
+  expose("YDLocal7Get", ydLocal.YDLocal7Get);
+  expose("clearStar_PIndex", ydLocal.clearStar_PIndex);
+  expose("getSKey_PIndex", ydLocal.getSKey_PIndex);
+  expose("getSKey_Trigger", ydLocal.getSKey_Trigger);
 
   expose("OperatorDegreeAdd", ydweMacro.OperatorDegreeAdd);
   expose("OperatorDegreeSubtract", ydweMacro.OperatorDegreeSubtract);
@@ -99,6 +110,8 @@ export function registerBridge(): void {
   expose("YDWENOrderId2OrderId", ydweMacro.YDWENOrderId2OrderId);
   expose("YDLocalExecuteTrigger", ydTrigger.YDLocalExecuteTrigger);
   expose("YDTriggerExecuteTrigger", ydTrigger.YDTriggerExecuteTrigger);
+  expose("saveParentIndex", ydTrigger.saveParentIndex);
+  expose("removeParentIndex", ydTrigger.removeParentIndex);
 
   expose("YDWEI2UnitId", ydweMacro.YDWEI2UnitId);
   expose("YDWEI2ItemId", ydweMacro.YDWEI2ItemId);

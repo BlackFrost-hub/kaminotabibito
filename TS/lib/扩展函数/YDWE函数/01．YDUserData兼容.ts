@@ -334,14 +334,14 @@ export function YDUserDataSet2(
 export function YDUserDataClearTable(tableTypeName: string, tableKey: any): void {
   const h = hashHandle();
   const p = tableId(tableTypeName, tableKey);
-  if (typeof jass.FlushParentHashtable === "function") {
+  if (typeof jass.FlushChildHashtable === "function") {
     jass.FlushChildHashtable(h, p);
   }
 }
 
 /**
  * YDUserDataClear - 清除指定属性
- * 对应宏: YDHashClear(YDHASH_HANDLE, value_type, YDHashAny2I(table_type, table), StringHash(attribute))
+ * 对应宏: YDHashClear（按值类型选用 RemoveSaved*）
  */
 export function YDUserDataClear(
   tableTypeName: string,
@@ -352,9 +352,48 @@ export function YDUserDataClear(
   const h = hashHandle();
   const p = tableId(tableTypeName, tableKey);
   const c = sh(attr);
-  // 根据类型调用对应的 RemoveSaved* 函数
-  if (typeof jass.RemoveSavedInteger === "function") {
-    jass.RemoveSavedInteger(h, p, c);
+  const rmInt = jass.RemoveSavedInteger;
+  const rmReal = jass.RemoveSavedReal;
+  const rmBool = jass.RemoveSavedBoolean;
+  const rmStr = jass.RemoveSavedString;
+  const rmHandle = (jass as any).RemoveSavedHandle;
+
+  switch (valueTypeName) {
+    case "integer":
+    case "unitcode":
+    case "itemcode":
+    case "abilcode":
+    case "frame":
+    case "hashtable":
+    case "effectGroup":
+    case "lightningGroup":
+    case "StarStrPool":
+    case "starCircle":
+    case "Srrounder":
+    case "StarIntPool":
+    case "terraintype":
+    case "doodad":
+      if (typeof rmInt === "function") rmInt(h, p, c);
+      return;
+    case "real":
+    case "radian":
+    case "degree":
+      if (typeof rmReal === "function") rmReal(h, p, c);
+      return;
+    case "boolean":
+      if (typeof rmBool === "function") rmBool(h, p, c);
+      return;
+    case "string":
+    case "imagefile":
+    case "modelfile":
+      if (typeof rmStr === "function") rmStr(h, p, c);
+      return;
+    default:
+      if (typeof rmHandle === "function") {
+        rmHandle(h, p, c);
+      } else if (typeof rmInt === "function") {
+        rmInt(h, p, c);
+      }
   }
 }
 

@@ -1,4 +1,15 @@
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
+
+function bjDegToRad(): number {
+  const v = (jglobals as any).bj_DEGTORAD;
+  return typeof v === "number" ? v : Math.PI / 180;
+}
+
+function bjRadToDeg(): number {
+  const v = (jglobals as any).bj_RADTODEG;
+  return typeof v === "number" ? v : 180 / Math.PI;
+}
 
 export function OperatorDegreeAdd(a: number, b: number): number {
     return a + b;
@@ -90,20 +101,24 @@ export function YDWEOperatorString3(a1: string, a2: string, a3: string): string 
     return a1 + a2 + a3;
 }
 
+/** 将「以度为单位的实数」转为弧度（与常见 YDWE 角度语义一致） */
 export function YDWER2Rad(a: number): number {
-    return a;
+  return a * bjDegToRad();
 }
 
+/** 将「以弧度为单位的实数」转为度 */
 export function YDWER2Deg(a: number): number {
-    return a;
+  return a * bjRadToDeg();
 }
 
-export function YDWEDeg2R(a: number): number {
-    return a;
+/** 度 → 弧度（实数） */
+export function YDWEDeg2R(deg: number): number {
+  return deg * bjDegToRad();
 }
 
-export function YDWERad2R(a: number): number {
-    return a;
+/** 弧度（已是实数形式）原样返回；与 GUI「弧度型 real」透传一致 */
+export function YDWERad2R(rad: number): number {
+  return rad;
 }
 
 export function YDWEInitHashtable(): any {

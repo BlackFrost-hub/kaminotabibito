@@ -100,6 +100,7 @@ const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { init
  require("系统.12．测试系统.测试事件2");
  require("系统.12．测试系统.测试233注册");
  require("系统.12．测试系统.任务测试");
- require("系统.12．测试系统.任意测试");
+require("系统.12．测试系统.任意测试");
+require("系统.12．测试系统.任意测试2");
 
 export {};

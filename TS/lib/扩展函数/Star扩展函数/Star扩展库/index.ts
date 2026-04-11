@@ -17,6 +17,12 @@ export function registerBridge(): void {
   expose("PanCameraToTimedUnitForPlayer", cameraFunc.PanCameraToTimedUnitForPlayer);
   expose("SDR_DebugTimer", sdrDebug.SDR_DebugTimer);
   expose("STES_Register", starEvent.STES_Register);
+  expose("STES_RegisterEx", starEvent.STES_RegisterEx);
   expose("STES_GetTable", starEvent.STES_GetTable);
   expose("STES_Fire", starEvent.STES_Fire);
+  expose("STES_FireWithReal11Step", starEvent.STES_FireWithReal11Step);
+  expose("STES_Execute", starEvent.STES_Execute);
+  expose("STES_GetUnitEvent", starEvent.STES_GetUnitEvent);
+  expose("STES_RemoveEvent", starEvent.STES_RemoveEvent);
+  expose("STES_Remove", starEvent.STES_Remove);
 }

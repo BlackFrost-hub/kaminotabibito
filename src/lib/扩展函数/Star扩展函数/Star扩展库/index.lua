@@ -41,7 +41,13 @@ function ____exports.registerBridge(self)
     expose(nil, "PanCameraToTimedUnitForPlayer", cameraFunc.PanCameraToTimedUnitForPlayer)
     expose(nil, "SDR_DebugTimer", sdrDebug.SDR_DebugTimer)
     expose(nil, "STES_Register", starEvent.STES_Register)
+    expose(nil, "STES_RegisterEx", starEvent.STES_RegisterEx)
     expose(nil, "STES_GetTable", starEvent.STES_GetTable)
     expose(nil, "STES_Fire", starEvent.STES_Fire)
+    expose(nil, "STES_FireWithReal11Step", starEvent.STES_FireWithReal11Step)
+    expose(nil, "STES_Execute", starEvent.STES_Execute)
+    expose(nil, "STES_GetUnitEvent", starEvent.STES_GetUnitEvent)
+    expose(nil, "STES_RemoveEvent", starEvent.STES_RemoveEvent)
+    expose(nil, "STES_Remove", starEvent.STES_Remove)
 end
 return ____exports

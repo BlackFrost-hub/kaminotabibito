@@ -7,12 +7,12 @@ import { registerSimpleSTESBridgeEvent } from "./05．任务STES桥接";
 
 function init(): void {
   registerSimpleSTESBridgeEvent(
-    "LuaEvent_QuestAccepted",
+    "任务接受事件",
     handleQuestAccepted,
     "任务接受"
   );
   registerSimpleSTESBridgeEvent(
-    "LuaEvent_QuestCompleted",
+    "任务完成事件",
     handleQuestCompleted,
     "任务完成"
   );

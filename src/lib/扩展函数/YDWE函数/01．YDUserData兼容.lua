@@ -944,18 +944,58 @@ end
 function ____exports.YDUserDataClearTable(self, tableTypeName, tableKey)
     local h = hashHandle(nil)
     local p = tableId(nil, tableTypeName, tableKey)
-    if type(jass.FlushParentHashtable) == "function" then
+    if type(jass.FlushChildHashtable) == "function" then
         jass.FlushChildHashtable(h, p)
     end
 end
 --- YDUserDataClear - 清除指定属性
--- 对应宏: YDHashClear(YDHASH_HANDLE, value_type, YDHashAny2I(table_type, table), StringHash(attribute))
+-- 对应宏: YDHashClear（按值类型选用 RemoveSaved*）
 function ____exports.YDUserDataClear(self, tableTypeName, tableKey, attr, valueTypeName)
     local h = hashHandle(nil)
     local p = tableId(nil, tableTypeName, tableKey)
     local c = sh(nil, attr)
-    if type(jass.RemoveSavedInteger) == "function" then
-        jass.RemoveSavedInteger(h, p, c)
-    end
+    local rmInt = jass.RemoveSavedInteger
+    local rmReal = jass.RemoveSavedReal
+    local rmBool = jass.RemoveSavedBoolean
+    local rmStr = jass.RemoveSavedString
+    local rmHandle = jass.RemoveSavedHandle
+    repeat
+        local ____switch63 = valueTypeName
+        local ____cond63 = ____switch63 == "integer" or ____switch63 == "unitcode" or ____switch63 == "itemcode" or ____switch63 == "abilcode" or ____switch63 == "frame" or ____switch63 == "hashtable" or ____switch63 == "effectGroup" or ____switch63 == "lightningGroup" or ____switch63 == "StarStrPool" or ____switch63 == "starCircle" or ____switch63 == "Srrounder" or ____switch63 == "StarIntPool" or ____switch63 == "terraintype" or ____switch63 == "doodad"
+        if ____cond63 then
+            if type(rmInt) == "function" then
+                rmInt(nil, h, p, c)
+            end
+            return
+        end
+        ____cond63 = ____cond63 or (____switch63 == "real" or ____switch63 == "radian" or ____switch63 == "degree")
+        if ____cond63 then
+            if type(rmReal) == "function" then
+                rmReal(nil, h, p, c)
+            end
+            return
+        end
+        ____cond63 = ____cond63 or ____switch63 == "boolean"
+        if ____cond63 then
+            if type(rmBool) == "function" then
+                rmBool(nil, h, p, c)
+            end
+            return
+        end
+        ____cond63 = ____cond63 or (____switch63 == "string" or ____switch63 == "imagefile" or ____switch63 == "modelfile")
+        if ____cond63 then
+            if type(rmStr) == "function" then
+                rmStr(nil, h, p, c)
+            end
+            return
+        end
+        do
+            if type(rmHandle) == "function" then
+                rmHandle(nil, h, p, c)
+            elseif type(rmInt) == "function" then
+                rmInt(nil, h, p, c)
+            end
+        end
+    until true
 end
 return ____exports

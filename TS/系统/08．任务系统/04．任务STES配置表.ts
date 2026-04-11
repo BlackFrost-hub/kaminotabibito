@@ -34,11 +34,6 @@
  *   一类与 STES 强绑定的配置驱动逻辑。
  *
  * =============================================================================
- * 四、与 装备提取.ts 的相同点
- * =============================================================================
- * - 每个 STES 事件名对应一次 STES_Register(trigger, "事件字符串")（或经 Bridge_STES_Register）。
- * - 若 jass 上存在 STES_Register 则直接调；否则写 udg_RegTrigger + udg_RegEventStr 后 ExecuteFunc。
- */
 
 /** 单行配置：由 Excel 一行导出为一项（key 为 STES 事件名，不要放进对象里重复一份，除非你们导出工具要求） */
 export interface QuestStesObjectiveRow {

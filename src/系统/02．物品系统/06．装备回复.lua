@@ -7,17 +7,161 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local ____exports = {}
---- 装备回复：单位使用物品时解析 hot 字段，支持多段（+分隔）、百分比(%hp/%hpLost/%mp)、固定值、wait延迟。
--- 规则详见 .cursor/rules/equip-heal-hot-format.md
--- 防重复事件见 .cursor/rules/equip-heal-use-item.md
+--- 装备回复：使用物品时解析 hot/abilList，按段通过 **STES「物品治疗事件」** 分发（与 JASS `Trig_HealItemEffectActions` 同语义）。
+-- 
+-- **父（本文件 `fireItemHealEvent`）** 每轮子触发：
+-- `YDLocalExecuteTrigger` → `saveParentIndex` →
+-- `YDLocal5Set(unit,"ItemHealUnit")` / `real,"ItemHealHP"|"ItemHealMP"` / `item,"Item"` / `string,"物品技能标识"` → `YDTriggerExecuteTrigger(false)`。
+-- 
+-- **子（本文件注册的 Lua Action）** 内：`YDLocalExecuteTrigger(GetTriggeringTrigger())` 后 `YDLocal5Get`，
+-- 对治疗单位加减生命/魔法，再 **`YDLocal7Set` 写回父可读**（与 JASS `YDLocal1Get` 同名）：
+-- - `real` **ItemHealHP** / **ItemHealMP**
+-- - `item` **物品**（供父 `GetItemName(YDLocal1Get(item,"物品"))`）
+-- - `unit` **ItemHealUnit**
+-- 
+-- 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
+-- 
+-- 规则：equip-heal-hot-format.md / equip-heal-use-item.md
 local jass = require("jass.common")
-local g = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_0.STES_Register
+local STES_GetTable = ____require_result_0.STES_GetTable
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_1.YDLocal5Get
+local YDLocal5Set = ____require_result_1.YDLocal5Set
+local YDLocal7Set = ____require_result_1.YDLocal7Set
+local getG_SIndex = ____require_result_1.getG_SIndex
+local setG_SIndex = ____require_result_1.setG_SIndex
+local setG_LIndex = ____require_result_1.setG_LIndex
+local _indexStack = ____require_result_1._indexStack
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
+local ydlStes_readString5 = ____require_result_2.ydlStes_readString5
+local ydlStes_readReal5 = ____require_result_2.ydlStes_readReal5
+local ydlStes_skeyIndex = ____require_result_2.ydlStes_skeyIndex
+local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
+local YDLocalExecuteTrigger = ____require_result_3.YDLocalExecuteTrigger
+local YDTriggerExecuteTrigger = ____require_result_3.YDTriggerExecuteTrigger
+local saveParentIndex = ____require_result_3.saveParentIndex
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
-local fourCCToString = ____require_result_0.fourCCToString
-local isSpecialUnit = ____require_result_0.isSpecialUnit
-local withTimer = ____require_result_0.withTimer
---- 解析 hot 字符串和 abilList，返回每段的信息
+local ____require_result_4 = require("系统.00．核心系统.01．封装函数")
+local fourCCToString = ____require_result_4.fourCCToString
+local isSpecialUnit = ____require_result_4.isSpecialUnit
+local withTimer = ____require_result_4.withTimer
+--- 与地图 STES / JASS `StringHash` 一致
+____exports.ITEM_HEAL_STES_EVENT = "物品治疗事件"
+--- YDLocal5 入参名（与 JASS `YDLocal5Set` 一致）
+local YL5_UNIT = "ItemHealUnit"
+local YL5_HP = "ItemHealHP"
+local YL5_MP = "ItemHealMP"
+local YL5_ITEM = "Item"
+local YL5_ABIL = "物品技能标识"
+--- YDLocal7 写回父侧 `YDLocal1Get` 的键
+local YL7_HP = "ItemHealHP"
+local YL7_MP = "ItemHealMP"
+local YL7_ITEM = "物品"
+local YL7_UNIT = "ItemHealUnit"
+--- 对生命/魔法做加法并封顶（不写技能表现，技能可由地图另挂 STES 或 GUI）
+local function applyHpMpToUnit(unit, hp, mp)
+    if unit == nil or unit == 0 then
+        return
+    end
+    if type(jass.GetUnitState) ~= "function" or type(jass.SetUnitState) ~= "function" then
+        return
+    end
+    if hp > 0 and jass.UNIT_STATE_LIFE ~= nil and jass.UNIT_STATE_MAX_LIFE ~= nil then
+        local cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+        local maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+        jass.SetUnitState(
+            unit,
+            jass.UNIT_STATE_LIFE,
+            math.min(maxL, cur + hp)
+        )
+    end
+    if mp > 0 and jass.UNIT_STATE_MANA ~= nil and jass.UNIT_STATE_MAX_MANA ~= nil then
+        local curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
+        local maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+        jass.SetUnitState(
+            unit,
+            jass.UNIT_STATE_MANA,
+            math.min(maxM, curM + mp)
+        )
+    end
+end
+--- 与 JASS 遍历 `物品治疗事件` 等价：对每张注册的子触发器写入 YDLocal5 后 Execute。
+local function fireItemHealEvent(unit, item, hp, mp, abilId)
+    local stesHT = STES_GetTable(nil)
+    if stesHT == nil or stesHT == 0 then
+        return
+    end
+    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
+        return
+    end
+    if type(jass.LoadTriggerHandle) ~= "function" then
+        return
+    end
+    local hash = jass.StringHash(____exports.ITEM_HEAL_STES_EVENT)
+    local loopIndex = jass.LoadInteger(
+        stesHT,
+        hash,
+        ydlStes_skeyIndex(nil, nil)
+    )
+    _indexStack[#_indexStack + 1] = getG_SIndex(nil)
+    do
+        local i = 0
+        while i < loopIndex do
+            do
+                local __continue12
+                repeat
+                    local trg = jass.LoadTriggerHandle(stesHT, hash, i)
+                    if trg == nil or trg == 0 then
+                        __continue12 = true
+                        break
+                    end
+                    YDLocalExecuteTrigger(nil, trg)
+                    saveParentIndex(nil, trg)
+                    YDLocal5Set(nil, "unit", YL5_UNIT, unit)
+                    YDLocal5Set(nil, "real", YL5_HP, hp)
+                    YDLocal5Set(nil, "real", YL5_MP, mp)
+                    YDLocal5Set(nil, "item", YL5_ITEM, item)
+                    YDLocal5Set(nil, "string", YL5_ABIL, abilId)
+                    YDTriggerExecuteTrigger(nil, trg, false)
+                    __continue12 = true
+                until true
+                if not __continue12 then
+                    break
+                end
+            end
+            i = i + 1
+        end
+    end
+    local prev = #_indexStack > 0 and table.remove(_indexStack) or 0
+    setG_SIndex(nil, prev)
+    setG_LIndex(nil, prev)
+end
+--- STES 子触发：读参 → 治疗 → 四路 YDLocal7 写回父
+local function onItemHealStesChild()
+    do
+        pcall(function()
+            ydlStes_syncTriggerStep(nil, nil)
+            local unit = YDLocal5Get(nil, "unit", YL5_UNIT)
+            local hp = ydlStes_readReal5(nil, nil, YL5_HP)
+            local mp = ydlStes_readReal5(nil, nil, YL5_MP)
+            local item = YDLocal5Get(nil, "item", YL5_ITEM)
+            ydlStes_readString5(nil, nil, YL5_ABIL)
+            applyHpMpToUnit(unit, hp, mp)
+            YDLocal7Set(nil, "real", YL7_HP, hp)
+            YDLocal7Set(nil, "real", YL7_MP, mp)
+            YDLocal7Set(nil, "item", YL7_ITEM, item)
+            YDLocal7Set(nil, "unit", YL7_UNIT, unit)
+        end)
+        do
+            ydlStes_finishChildCleanup(nil, nil)
+        end
+    end
+end
 local function parseSegments(self, hotStr, abilList)
     local segments = __TS__StringSplit(hotStr, "+")
     local abilIds = __TS__ArrayMap(
@@ -29,11 +173,11 @@ local function parseSegments(self, hotStr, abilList)
         local i = 0
         while i < #segments do
             do
-                local __continue5
+                local __continue20
                 repeat
                     local seg = __TS__StringTrim(segments[i + 1])
                     if seg == "" then
-                        __continue5 = true
+                        __continue20 = true
                         break
                     end
                     local tokens = __TS__ArrayFilter(
@@ -54,9 +198,9 @@ local function parseSegments(self, hotStr, abilList)
                         end
                     end
                     result[#result + 1] = {tokens = tokens, abilId = abilIds[i + 1] or "", waitSec = waitSec}
-                    __continue5 = true
+                    __continue20 = true
                 until true
-                if not __continue5 then
+                if not __continue20 then
                     break
                 end
             end
@@ -65,37 +209,18 @@ local function parseSegments(self, hotStr, abilList)
     end
     return result
 end
---- 根据 token 列表和单位，计算 TempReal[1]=HP、TempReal[2]=MP，token 中 :waitN 后缀在此忽略（已提取）
 local function calcHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local ____temp_1
-    if type(jass.GetUnitState) == "function" then
-        ____temp_1 = jass.GetUnitState(
-            unit,
-            jass.ConvertUnitState(1)
-        )
-    else
-        ____temp_1 = 0
-    end
-    local maxHp = ____temp_1
-    local ____temp_2
-    if type(jass.GetWidgetLife) == "function" then
-        ____temp_2 = jass.GetWidgetLife(unit)
-    else
-        ____temp_2 = 0
-    end
-    local curHp = ____temp_2
-    local ____temp_3
-    if type(jass.GetUnitState) == "function" then
-        ____temp_3 = jass.GetUnitState(
-            unit,
-            jass.ConvertUnitState(3)
-        )
-    else
-        ____temp_3 = 0
-    end
-    local maxMp = ____temp_3
+    local maxHp = type(jass.GetUnitState) == "function" and jass.GetUnitState(
+        unit,
+        jass.ConvertUnitState(1)
+    ) or 0
+    local curHp = type(jass.GetWidgetLife) == "function" and jass.GetWidgetLife(unit) or 0
+    local maxMp = type(jass.GetUnitState) == "function" and jass.GetUnitState(
+        unit,
+        jass.ConvertUnitState(3)
+    ) or 0
     local lostHp = maxHp - curHp
     for ____, rawToken in ipairs(tokens) do
         local waitIdx = (string.find(rawToken, ":wait", nil, true) or 0) - 1
@@ -129,67 +254,43 @@ local function calcHpMp(self, tokens, unit)
     end
     return {hp = hp, mp = mp}
 end
---- 立即执行一段的赋值+TriggerExecute
-local function executeSegment(self, unit, seg)
-    local ____calcHpMp_result_4 = calcHpMp(nil, seg.tokens, unit)
-    local hp = ____calcHpMp_result_4.hp
-    local mp = ____calcHpMp_result_4.mp
-    local ____temp_6
-    if g.udg_TempReal ~= nil then
-        ____temp_6 = g.udg_TempReal
-    else
-        local ____temp_5 = {}
-        g.udg_TempReal = ____temp_5
-        ____temp_6 = ____temp_5
-    end
-    local tr = ____temp_6
-    tr[1] = hp
-    tr[2] = mp
-    jass.udg_TempUnit[1] = unit
-    g.udg_TempString[0] = seg.abilId
-    local trig = g.gg_trg_HealItemEffect
-    if trig and type(jass.TriggerExecute) == "function" then
-        jass.TriggerExecute(trig)
-    end
+local function executeSegment(self, unit, item, seg)
+    local ____calcHpMp_result_5 = calcHpMp(nil, seg.tokens, unit)
+    local hp = ____calcHpMp_result_5.hp
+    local mp = ____calcHpMp_result_5.mp
+    fireItemHealEvent(
+        unit,
+        item,
+        hp,
+        mp,
+        seg.abilId
+    )
 end
-local function onUseItem(self)
-    local ____this_8
-    ____this_8 = jass
-    local ____opt_7 = ____this_8.GetManipulatingUnit
-    if ____opt_7 ~= nil then
-        ____opt_7 = ____opt_7(____this_8)
+local function onUseItem()
+    local unit = nil
+    if type(jass.GetManipulatingUnit) == "function" then
+        unit = jass.GetManipulatingUnit()
     end
-    local ____opt_7_11 = ____opt_7
-    if ____opt_7_11 == nil then
-        local ____this_10
-        ____this_10 = jass
-        local ____opt_9 = ____this_10.GetTriggerUnit
-        if ____opt_9 ~= nil then
-            ____opt_9 = ____opt_9(____this_10)
-        end
-        ____opt_7_11 = ____opt_9
+    if unit == nil and type(jass.GetTriggerUnit) == "function" then
+        unit = jass.GetTriggerUnit()
     end
-    local unit = ____opt_7_11
-    local ____this_13
-    ____this_13 = jass
-    local ____opt_12 = ____this_13.GetManipulatedItem
-    if ____opt_12 ~= nil then
-        ____opt_12 = ____opt_12(____this_13)
+    local item = nil
+    if type(jass.GetManipulatedItem) == "function" then
+        item = jass.GetManipulatedItem()
     end
-    local item = ____opt_12
     if not unit or not item then
         return
     end
     if isSpecialUnit(nil, unit) then
         return
     end
-    local ____temp_14
+    local ____temp_6
     if type(jass.GetItemTypeId) == "function" then
-        ____temp_14 = jass.GetItemTypeId(item)
+        ____temp_6 = jass.GetItemTypeId(item)
     else
-        ____temp_14 = 0
+        ____temp_6 = 0
     end
-    local itemId = ____temp_14
+    local itemId = ____temp_6
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
@@ -211,44 +312,61 @@ local function onUseItem(self)
     local segments = parseSegments(nil, entry.hot, entry.abilList)
     for ____, seg in ipairs(segments) do
         do
-            local __continue33
+            local __continue50
             repeat
                 if seg.abilId == "" then
-                    __continue33 = true
+                    __continue50 = true
                     break
                 end
                 if seg.waitSec <= 0 then
-                    executeSegment(nil, unit, seg)
+                    executeSegment(nil, unit, item, seg)
                 else
                     local capturedSeg = seg
                     local capturedUnit = unit
+                    local capturedItem = item
                     withTimer(
                         nil,
                         seg.waitSec,
                         function()
-                            executeSegment(nil, capturedUnit, capturedSeg)
+                            executeSegment(nil, capturedUnit, capturedItem, capturedSeg)
                         end
                     )
                 end
-                __continue33 = true
+                __continue50 = true
             until true
-            if not __continue33 then
+            if not __continue50 then
                 break
             end
         end
     end
 end
 local INIT_KEY = "__EquipHealInited"
-local function init(self)
-    if g[INIT_KEY] then
+local STES_REG_KEY = "__EquipHealStesRegistered"
+local function init()
+    local glob = _G
+    if glob[INIT_KEY] then
         return
     end
-    g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15 = 35
+    glob[INIT_KEY] = true
+    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
+        return
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_15
+    if not glob[STES_REG_KEY] and STES_Register ~= nil then
+        local stesTrig = jass.CreateTrigger()
+        jass.TriggerAddAction(
+            stesTrig,
+            function()
+                onItemHealStesChild()
+            end
+        )
+        ydlStes_registerAfterGetTable(nil, nil, stesTrig, ____exports.ITEM_HEAL_STES_EVENT)
+        glob[STES_REG_KEY] = true
+    end
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_7 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_7 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_7 = 35
+    end
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_7
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -262,17 +380,18 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_17
-    ____this_17 = jass
-    local ____opt_16 = ____this_17.Player
-    if ____opt_16 ~= nil then
-        ____opt_16 = ____opt_16(____this_17, 13)
+    if type(jass.Player) == "function" then
+        local p13 = jass.Player(13)
+        if p13 ~= nil then
+            jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
+        end
     end
-    local p13 = ____opt_16
-    if p13 ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
-    end
-    jass.TriggerAddAction(trig, onUseItem)
+    jass.TriggerAddAction(
+        trig,
+        function()
+            onUseItem()
+        end
+    )
 end
-init(nil)
+init()
 return ____exports

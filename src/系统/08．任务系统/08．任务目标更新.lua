@@ -5,28 +5,22 @@ local handleObjectiveUpdated = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.handleObject
 --- 任务系统 - "目标更新"事件桥接
 -- 
 -- 设计目标：
--- - JASS 端在"任务目标进度更新"时，通过 STES + Bridge_STES_Register 触发一个自定义事件；
--- - TS / Lua 端在这里统一接收事件，根据全局变量更新任务目标进度。
+-- - 直接调用 STES_Register 注册自定义事件 Quest.ObjectiveUpdate
+-- - TS / Lua 端在这里统一接收事件，更新任务目标进度
 -- 
--- 约定：
--- - 只能调用：STES_Register(udg_RegTrigger, udg_RegEventStr)
--- - Lua 侧流程：
---   1) 创建 Trigger 并设置回调；
---   2) 写入 jass.globals.udg_RegTrigger = trig；
---   3) 写入 jass.globals.udg_RegEventStr = "LuaEvent_QuestObjectiveUpdate"；
---   4) jass.ExecuteFunc("Bridge_STES_Register") 交给 JASS 侧调用 STES_Register。
--- 
--- 触发前需设置的全局变量：
+-- 触发时通过全局变量传递参数：
 -- - udg_QuestPlayerId: 玩家ID
 -- - udg_QuestId: 任务ID字符串
 -- - udg_ObjectiveId: 目标ID字符串
 -- - udg_Progress: 当前进度值
 local jass = require("jass.common")
 local g = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_0.STES_Register
 local function debugPrint(self, msg)
 end
 local function registerObjectiveUpdateEvent(self)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.ExecuteFunc) ~= "function" then
+    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
         debugPrint(nil, "JASS API 不完整，无法注册目标更新事件")
         return
     end
@@ -51,10 +45,8 @@ local function registerObjectiveUpdateEvent(self)
             end
         end
     )
-    g.udg_RegTrigger = trig
-    g.udg_RegEventStr = "LuaEvent_QuestObjectiveUpdate"
-    jass.ExecuteFunc("Bridge_STES_Register")
-    debugPrint(nil, "已通过 Bridge_STES_Register 注册 LuaEvent_QuestObjectiveUpdate")
+    STES_Register(trig, "任务目标更新")
+    debugPrint(nil, "已注册 任务目标更新 事件")
 end
 local function init(self)
     registerObjectiveUpdateEvent(nil)

@@ -58,6 +58,8 @@ jass = require("jass.common")
 itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
 fourCCToString = ____require_result_0.fourCCToString
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
+local SGSS_SetState = ____require_result_1.SGSS_SetState
 --- 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加）
 local applied = {}
 local function getUnitKey(self, unit)
@@ -73,14 +75,11 @@ local function applyMovespeed2(self, unit, newSpeed)
     if newSpeed == oldSpeed then
         return
     end
-    jass.udg_TempUnit[1] = unit
     if oldSpeed ~= 0 then
-        jass.udg_TempReal[1] = -oldSpeed
-        jass.ExecuteFunc("movespeed2")
+        SGSS_SetState(nil, unit, 9, -oldSpeed)
     end
     if newSpeed ~= 0 then
-        jass.udg_TempReal[1] = newSpeed
-        jass.ExecuteFunc("movespeed2")
+        SGSS_SetState(nil, unit, 9, newSpeed)
     end
     applied[key] = newSpeed
 end
@@ -96,23 +95,23 @@ local function onItemChange(self)
         return
     end
     local eventId = jass.GetTriggerEventId()
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_7 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_7 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_7 = 38
+    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 == nil then
+        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 = 38
     end
-    local isPickup = eventId == ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_7
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_8 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_8 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_8 = 39
+    local isPickup = eventId == ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8
+    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 = 39
     end
-    local isDrop = eventId == ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_8
-    local ____temp_9
+    local isDrop = eventId == ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9
+    local ____temp_10
     if type(jass.GetManipulatedItem) == "function" then
-        ____temp_9 = jass.GetManipulatedItem()
+        ____temp_10 = jass.GetManipulatedItem()
     else
-        ____temp_9 = nil
+        ____temp_10 = nil
     end
-    local manipulated = ____temp_9
+    local manipulated = ____temp_10
     local newSpeed = isDrop and getMaxMovespeed2(nil, unit, manipulated) or getMaxMovespeed2(nil, unit)
     local key = getUnitKey(nil, unit)
     local cur = applied[key] ~= nil and applied[key] or 0
@@ -123,16 +122,16 @@ local function onItemChange(self)
 end
 local function init(self)
     local trig = jass.CreateTrigger()
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 = 38
+    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 == nil then
+        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 = 38
     end
-    local pickup = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 = 39
+    local pickup = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11
+    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 = 39
     end
-    local drop = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11
+    local drop = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12
     do
         local i = 0
         while i <= 7 do
@@ -151,13 +150,13 @@ local function init(self)
             i = i + 1
         end
     end
-    local ____this_13
-    ____this_13 = jass
-    local ____opt_12 = ____this_13.Player
-    if ____opt_12 ~= nil then
-        ____opt_12 = ____opt_12(____this_13, 13)
+    local ____this_14
+    ____this_14 = jass
+    local ____opt_13 = ____this_14.Player
+    if ____opt_13 ~= nil then
+        ____opt_13 = ____opt_13(____this_14, 13)
     end
-    local p13 = ____opt_12
+    local p13 = ____opt_13
     if p13 ~= nil then
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, pickup, nil)
         jass.TriggerRegisterPlayerUnitEvent(trig, p13, drop, nil)

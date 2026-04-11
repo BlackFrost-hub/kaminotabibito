@@ -1,6 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
+local function bjDegToRad(self)
+    local v = jglobals.bj_DEGTORAD
+    return type(v) == "number" and v or math.pi / 180
+end
+local function bjRadToDeg(self)
+    local v = jglobals.bj_RADTODEG
+    return type(v) == "number" and v or 180 / math.pi
+end
 function ____exports.OperatorDegreeAdd(self, a, b)
     return a + b
 end
@@ -99,17 +108,21 @@ end
 function ____exports.YDWEOperatorString3(self, a1, a2, a3)
     return (a1 .. a2) .. a3
 end
+--- 将「以度为单位的实数」转为弧度（与常见 YDWE 角度语义一致）
 function ____exports.YDWER2Rad(self, a)
-    return a
+    return a * bjDegToRad(nil)
 end
+--- 将「以弧度为单位的实数」转为度
 function ____exports.YDWER2Deg(self, a)
-    return a
+    return a * bjRadToDeg(nil)
 end
-function ____exports.YDWEDeg2R(self, a)
-    return a
+--- 度 → 弧度（实数）
+function ____exports.YDWEDeg2R(self, deg)
+    return deg * bjDegToRad(nil)
 end
-function ____exports.YDWERad2R(self, a)
-    return a
+--- 弧度（已是实数形式）原样返回；与 GUI「弧度型 real」透传一致
+function ____exports.YDWERad2R(self, rad)
+    return rad
 end
 function ____exports.YDWEInitHashtable(self)
     return jass.InitHashtable()
