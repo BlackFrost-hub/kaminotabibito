@@ -2,7 +2,7 @@ const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 
 import { createFrame, FrameType } from "../01．UI工具/index";
-import { frameSetScriptByCode } from "../../00．核心系统/04．硬件函数";
+import { frameSetScriptByCode, registerKeyDown, isKeyDown } from "../../00．核心系统/04．硬件函数";
 import { Sound3DII_Mp3PlayReuse } from "../../00．核心系统/02．音效函数";
 import { getActivePlayerId, resetActivePlayerIdIfMatch, setActivePlayerId } from "../04．NPC对话状态池";
 import { STEP_LEN, TICK, nextTypingProgress, stringLengthCompat, substringCompat } from "./02．打字机效果";
@@ -20,6 +20,7 @@ const DEFAULT_TITLE_FONT_SIZE = 0.018;
 const DEFAULT_BODY_FONT_SIZE = 0.012;
 const DEFAULT_BG_TEX = "UI\\wenbenkuang.blp";
 const DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp";
+const KEY_SKIP_DIALOG = 192; // ~ 键（波浪号/反引号，数字键盘左边ESC下面）
 
 // ========== 虚拟分区：运行时状态 ==========
 const g_states: PlayerDialogState[] = [];
@@ -202,10 +203,22 @@ function createDialogFrames(): Frame[] {
     if (typeof japi.DzFrameSetTextAlignment === "function") { japi.DzFrameSetTextAlignment(hintLabel, -1); japi.DzFrameSetTextAlignment(hintLabel, 5); }
   }
 
+  // 跳过提示文本（在说话人标题下方）
+  const skipHintLabel = createFrame({ type: FrameType.TEXT, name: "DialogSkipHint", parent: gameUI, template: "template", visible: false }) ?? 0;
+  frames[12] = skipHintLabel;
+  if (skipHintLabel !== 0) {
+    // 锚定到标题背景的左下角，往下偏移一点
+    if (typeof japi.DzFrameSetPoint === "function") (pcall as any)(() => japi.DzFrameSetPoint(skipHintLabel, 0, titleBg, 2, 0.005, -0.022));
+    if (typeof japi.DzFrameSetSize === "function") japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018);
+    if (typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r");
+    if (typeof japi.DzFrameSetFont === "function") japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0);
+    if (typeof japi.DzFrameSetTextAlignment === "function") { japi.DzFrameSetTextAlignment(skipHintLabel, -1); japi.DzFrameSetTextAlignment(skipHintLabel, 4); }
+  }
+
   const p = 180;
   dzSetPriority(frames[0], p); dzSetPriority(frames[1], p); dzSetPriority(frames[2], p); dzSetPriority(frames[3], p); dzSetPriority(frames[4], p);
   dzSetPriority(frames[5], p); dzSetPriority(frames[6], p); dzSetPriority(frames[7], p); dzSetPriority(frames[8], p); dzSetPriority(frames[9], p); dzSetPriority(frames[10], p);
-  dzSetPriority(frames[11], p); dzSetPriority(frames[101], p); dzSetPriority(frames[102], p); dzSetPriority(frames[103], p);
+  dzSetPriority(frames[11], p); dzSetPriority(frames[12], p); dzSetPriority(frames[101], p); dzSetPriority(frames[102], p); dzSetPriority(frames[103], p);
   return frames;
 }
 
@@ -233,9 +246,12 @@ function showDialogFrames(state: PlayerDialogState, visible: boolean): void {
   }
   for (let i = 0; i < 5; i++) dzShow(state.frames[i], visible);
   if (!visible) {
-    dzShow(state.frames[5], false); dzShow(state.frames[6], false); dzShow(state.frames[7], false); dzShow(state.frames[8], false); dzShow(state.frames[9], false); dzShow(state.frames[10], false); dzShow(state.frames[11], false);
+    dzShow(state.frames[5], false); dzShow(state.frames[6], false); dzShow(state.frames[7], false); dzShow(state.frames[8], false); dzShow(state.frames[9], false); dzShow(state.frames[10], false); dzShow(state.frames[11], false); dzShow(state.frames[12], false);
   }
-  if (visible) dzSetAlpha(state.frames[0], 155);
+  if (visible) {
+    dzSetAlpha(state.frames[0], 155);
+    dzShow(state.frames[12], true);
+  }
   for (let i = 101; i < 104; i++) dzShow(state.frames[i], visible);
 }
 function clearState(state: PlayerDialogState): void {
@@ -245,6 +261,69 @@ function clearState(state: PlayerDialogState): void {
   state.queue = [];
   onDialogFinished(state);
   showDialogFrames(state, false);
+}
+
+// ========== 虚拟分区：跳过整个对话 ==========
+/**
+ * 跳过指定玩家的所有非任务对话
+ * 只跳过 NpcStartText、NpcCompleteText、afterCompleteDialog、Text 等普通文本对话
+ * 任务对话不跳过整个对话框，但会跳过打字机效果直接显示完整文本
+ */
+function skipAllDialogForPlayer(targetPlayer: any): void {
+  const targetPid = dzGetPlayerId(targetPlayer);
+  if (targetPid < 0 || targetPid >= MAX_PLAYERS) return;
+
+  const state = g_states[targetPid];
+  if (!state || !state.isActive) return;
+
+  // 检查当前对话是否是任务对话（需要玩家选择）
+  const currentEntry = state.queue.length > 0 ? state.queue[0] : null;
+  if (currentEntry && currentEntry.isQuest) {
+    // 任务对话不跳过整个对话框，但跳过打字机效果
+    skipTyping(state);
+    return;
+  }
+
+  // 清空所有非任务对话，保留任务对话
+  const newQueue: DialogEntry[] = [];
+  for (const entry of state.queue) {
+    if (entry.isQuest) {
+      newQueue.push(entry);
+    }
+  }
+
+  if (newQueue.length === state.queue.length) {
+    // 没有可跳过的对话
+    return;
+  }
+
+  // 如果清空后还有任务对话，保留它们并直接显示（跳过打字机）
+  if (newQueue.length > 0) {
+    state.queue = newQueue;
+    // 播放下一个（任务对话），然后立即跳过打字机
+    playEntry(state);
+    // 直接跳过任务对话的打字机效果
+    skipTyping(state);
+  } else {
+    // 完全清空
+    clearState(state);
+  }
+}
+
+// 初始化跳过键监听
+let g_skipKeyInitialized = false;
+function initSkipKeyListener(): void {
+  if (g_skipKeyInitialized) return;
+  g_skipKeyInitialized = true;
+  
+  registerKeyDown(KEY_SKIP_DIALOG, (player: any, key: number) => {
+    // 只响应本地玩家
+    const localPlayer = dzGetLocalPlayer();
+    if (player !== localPlayer) return;
+    
+    // 只跳过按键玩家自己的对话框
+    skipAllDialogForPlayer(localPlayer);
+  });
 }
 
 // ========== 虚拟分区：播放流程 ==========
@@ -295,15 +374,25 @@ function playEntry(state: PlayerDialogState): void {
 }
 
 function skipTyping(state: PlayerDialogState): void {
-  if (state.queue.length === 0 || state.strNow >= state.strLen) return;
-  dzTimerPause(state.tickTimer);
-  state.strNow = state.strLen;
+  if (state.queue.length === 0) return;
   const entry = state.queue[0];
   const localPlayer = dzGetLocalPlayer();
   const targetPlayer = dzPlayer(state.playerId);
-  if (localPlayer === targetPlayer) dzSetText(state.frames[3], entry.text);
-  if (entry.isQuest) showQuestButtons(state, true, dzGetLocalPlayer, dzPlayer, dzShow);
-  else { state.waitingClick = true; dzShow(state.frames[11], true); }
+  
+  // 如果正在打字，先停止计时器并显示完整文本
+  if (state.strNow < state.strLen) {
+    dzTimerPause(state.tickTimer);
+    state.strNow = state.strLen;
+    if (localPlayer === targetPlayer) dzSetText(state.frames[3], entry.text);
+  }
+  
+  // 对于任务对话框，确保按钮显示（即使打字已经完成）
+  if (entry.isQuest) {
+    showQuestButtons(state, true, dzGetLocalPlayer, dzPlayer, dzShow);
+  } else { 
+    state.waitingClick = true; 
+    dzShow(state.frames[11], true); 
+  }
 }
 
 function startTyping(state: PlayerDialogState): void {
@@ -347,6 +436,7 @@ export function initDialogSystem(): void {
     if (!state.initialized) { state.frames = createDialogFrames(); state.initialized = true; }
     bindQuestSyncHandlers(state);
   }
+  initSkipKeyListener();
 }
 export function displayText(p: Player, title: string, text: string, duration: number, titleFontSize?: number, bodyFontSize?: number): void {
   if (duration <= 0) duration = 1;

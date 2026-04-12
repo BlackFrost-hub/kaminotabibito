@@ -1271,29 +1271,11 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "gg_trg____________________001",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________001",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "gg_trg_JM10",
       "kind": 5,
       "detail": "Global Variable",
       "documentation": "\n```jass\ntrigger gg_trg_JM10\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_gg_trg_JM10",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
-      "label": "gg_trg_LuaFunction",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg_LuaFunction\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg_LuaFunction",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -1334,20 +1316,20 @@
       "statementType": "VariableDeclaration"
     },
     {
-      "label": "gg_trg____________________002",
-      "kind": 5,
-      "detail": "Global Variable",
-      "documentation": "\n```jass\ntrigger gg_trg____________________002\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "2_var_gg_trg____________________002",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "VariableDeclaration"
-    },
-    {
       "label": "gg_item_I00Q_0003",
       "kind": 5,
       "detail": "Global Variable",
       "documentation": "\n```jass\nitem gg_item_I00Q_0003\n```\n\n\n**_>:** `.build/war3map.j`",
       "sortText": "2_var_gg_item_I00Q_0003",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
+      "statementType": "VariableDeclaration"
+    },
+    {
+      "label": "gg_trg____________________001",
+      "kind": 5,
+      "detail": "Global Variable",
+      "documentation": "\n```jass\ntrigger gg_trg____________________001\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "2_var_gg_trg____________________001",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "VariableDeclaration"
     },
@@ -9119,19 +9101,10 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "Bridge_STES_Register",
-      "kind": 2,
-      "detail": "Function",
-      "documentation": "\n```jass\nfunction Bridge_STES_Register takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=0\n\nTESH.alwaysfold=0\n\nBase.j require\n\n基础库\n\nList库\n\n在自定义代码区顶部输入 #include \"Star\\\\StarList.j\" 来引用List\n\nnew List 例如 integer list = SCreateList(location)\n\nList.Count 例如 integer count = SGetCount(location,1) 读取ID为1的List<location>\n\nList.Remove 例如 SRemoveAny(location,l,1) 把点 l 从 ID为1 的 List<location> 中移除\n\nList.Add  例如 SAddAny(location,l,1) 把点 l 从 添加至 ID为1 的 List<location> 中\n\nList.Destroy 例如 SRemoveList(location,1) 摧毁 ID为1 的List<location>\n\nList.Clear 例如 SClearList(location,1) 清空 ID为1 的List<location>\n\nList.First 例如 location p = SFirstOfList(location,1) 获取 ID为1 的List<location>中第一个location\n\nforlist t = Trigger\n\nforlist t = function name\n\n在ForList中用于获取选取的成员\n\n事件监听库\n\n事件.j\n\n为单位注册添加事件响应 参数 单位 事件名 触发器 禁止重复添加\n\n为单位移除事件响应 参数 单位 事件名 触发器 禁止重复添加\n\n#include \"Star\\\\StarGreenStateSystem.j\"\n\n#include\"Star\\\\StarTJ.j\"\n\n=========================================\n\n==========================================\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_Bridge_STES_Register",
-      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
-      "statementType": "FunctionDeclaration"
-    },
-    {
       "label": "Trig__________uActions",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction Trig__________uActions takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: 初始化\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
+      "documentation": "\n```jass\nfunction Trig__________uActions takes nothing returns nothing\n```\n\n\n---\n\nTESH.scrollpos=0\n\nTESH.alwaysfold=0\n\nBase.j require\n\n基础库\n\nList库\n\n在自定义代码区顶部输入 #include \"Star\\\\StarList.j\" 来引用List\n\nnew List 例如 integer list = SCreateList(location)\n\nList.Count 例如 integer count = SGetCount(location,1) 读取ID为1的List<location>\n\nList.Remove 例如 SRemoveAny(location,l,1) 把点 l 从 ID为1 的 List<location> 中移除\n\nList.Add  例如 SAddAny(location,l,1) 把点 l 从 添加至 ID为1 的 List<location> 中\n\nList.Destroy 例如 SRemoveList(location,1) 摧毁 ID为1 的List<location>\n\nList.Clear 例如 SClearList(location,1) 清空 ID为1 的List<location>\n\nList.First 例如 location p = SFirstOfList(location,1) 获取 ID为1 的List<location>中第一个location\n\nforlist t = Trigger\n\nforlist t = function name\n\n在ForList中用于获取选取的成员\n\n事件监听库\n\n事件.j\n\n为单位注册添加事件响应 参数 单位 事件名 触发器 禁止重复添加\n\n为单位移除事件响应 参数 单位 事件名 触发器 禁止重复添加\n\n#include \"Star\\\\StarGreenStateSystem.j\"\n\n#include\"Star\\\\StarTJ.j\"\n\n=========================================\n\n==========================================\n\n===========================================================================\n\nTrigger: 初始化\n\n===========================================================================\n\n**_>:** `.build/war3map.j`",
       "sortText": "1_func_Trig__________uActions",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
@@ -9506,14 +9479,14 @@
       "statementType": "FunctionDeclaration"
     },
     {
-      "label": "jasshelper__initstructs10585796",
+      "label": "jasshelper__initstructs11436734",
       "kind": 2,
       "detail": "Function",
-      "documentation": "\n```jass\nfunction jasshelper__initstructs10585796 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
-      "sortText": "1_func_jasshelper__initstructs10585796",
+      "documentation": "\n```jass\nfunction jasshelper__initstructs11436734 takes nothing returns nothing\n```\n\n\n**_>:** `.build/war3map.j`",
+      "sortText": "1_func_jasshelper__initstructs11436734",
       "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\.build\\war3map.j",
       "statementType": "FunctionDeclaration"
     }
   ],
-  "timestamp": 1775984443234
+  "timestamp": 1775989988587
 }

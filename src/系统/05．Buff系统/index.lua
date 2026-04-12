@@ -37,7 +37,10 @@ if type(buffPoolCore.initBuffSystem) == "function" then
     buffPoolCore:initBuffSystem()
 end
 require("系统.05．Buff系统.01．Buff表")
-require("系统.05．Buff系统.02．BuffUI")
+local buffUIMod = require("系统.05．Buff系统.02．BuffUI")
+if type(buffUIMod.init) == "function" then
+    buffUIMod:init()
+end
 require("系统.05．Buff系统.03．BuffJASS桥接")
 --- 初始化Buff系统
 function ____exports.init(self)

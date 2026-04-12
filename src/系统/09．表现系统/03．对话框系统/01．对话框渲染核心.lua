@@ -6,6 +6,7 @@ local createFrame = ____index.createFrame
 local FrameType = ____index.FrameType
 local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
 local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
+local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
 local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
 local Sound3DII_Mp3PlayReuse = ____02_FF0E_97F3_6548_51FD_6570.Sound3DII_Mp3PlayReuse
 local ____04_FF0ENPC_5BF9_8BDD_72B6_6001_6C60 = require("系统.09．表现系统.04．NPC对话状态池")
@@ -530,6 +531,40 @@ function createDialogFrames(self)
             japi.DzFrameSetTextAlignment(hintLabel, 5)
         end
     end
+    local skipHintLabel = createFrame(nil, {
+        type = FrameType.TEXT,
+        name = "DialogSkipHint",
+        parent = gameUI,
+        template = "template",
+        visible = false
+    }) or 0
+    frames[13] = skipHintLabel
+    if skipHintLabel ~= 0 then
+        if type(japi.DzFrameSetPoint) == "function" then
+            pcall(function () return japi.DzFrameSetPoint(
+                    skipHintLabel,
+                    0,
+                    titleBg,
+                    2,
+                    0.005,
+                    -0.022
+                ) end
+            )
+        end
+        if type(japi.DzFrameSetSize) == "function" then
+            japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018)
+        end
+        if type(japi.DzFrameSetText) == "function" then
+            japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r")
+        end
+        if type(japi.DzFrameSetFont) == "function" then
+            japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0)
+        end
+        if type(japi.DzFrameSetTextAlignment) == "function" then
+            japi.DzFrameSetTextAlignment(skipHintLabel, -1)
+            japi.DzFrameSetTextAlignment(skipHintLabel, 4)
+        end
+    end
     local p = 180
     dzSetPriority(nil, frames[1], p)
     dzSetPriority(nil, frames[2], p)
@@ -543,6 +578,7 @@ function createDialogFrames(self)
     dzSetPriority(nil, frames[10], p)
     dzSetPriority(nil, frames[11], p)
     dzSetPriority(nil, frames[12], p)
+    dzSetPriority(nil, frames[13], p)
     dzSetPriority(nil, frames[102], p)
     dzSetPriority(nil, frames[103], p)
     dzSetPriority(nil, frames[104], p)
@@ -606,9 +642,11 @@ function showDialogFrames(self, state, visible)
         dzShow(nil, state.frames[10], false)
         dzShow(nil, state.frames[11], false)
         dzShow(nil, state.frames[12], false)
+        dzShow(nil, state.frames[13], false)
     end
     if visible then
         dzSetAlpha(nil, state.frames[1], 155)
+        dzShow(nil, state.frames[13], true)
     end
     do
         local i = 101
@@ -694,16 +732,18 @@ function playEntry(self, state)
     startTyping(nil, state)
 end
 function skipTyping(self, state)
-    if #state.queue == 0 or state.strNow >= state.strLen then
+    if #state.queue == 0 then
         return
     end
-    dzTimerPause(nil, state.tickTimer)
-    state.strNow = state.strLen
     local entry = state.queue[1]
     local localPlayer = dzGetLocalPlayer(nil)
     local targetPlayer = dzPlayer(nil, state.playerId)
-    if localPlayer == targetPlayer then
-        dzSetText(nil, state.frames[4], entry.text)
+    if state.strNow < state.strLen then
+        dzTimerPause(nil, state.tickTimer)
+        state.strNow = state.strLen
+        if localPlayer == targetPlayer then
+            dzSetText(nil, state.frames[4], entry.text)
+        end
     end
     if entry.isQuest then
         showQuestButtons(
@@ -799,6 +839,7 @@ DEFAULT_TITLE_FONT_SIZE = 0.018
 DEFAULT_BODY_FONT_SIZE = 0.012
 DEFAULT_BG_TEX = "UI\\wenbenkuang.blp"
 DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp"
+local KEY_SKIP_DIALOG = 192
 g_states = {}
 g_questCallbacksByPlayer = {}
 local function dzTimerCreate(self)
@@ -842,6 +883,58 @@ local function clearState(self, state)
     onDialogFinished(nil, state)
     showDialogFrames(nil, state, false)
 end
+--- 跳过指定玩家的所有非任务对话
+-- 只跳过 NpcStartText、NpcCompleteText、afterCompleteDialog、Text 等普通文本对话
+-- 任务对话不跳过整个对话框，但会跳过打字机效果直接显示完整文本
+local function skipAllDialogForPlayer(self, targetPlayer)
+    local targetPid = dzGetPlayerId(nil, targetPlayer)
+    if targetPid < 0 or targetPid >= MAX_PLAYERS then
+        return
+    end
+    local state = g_states[targetPid + 1]
+    if not state or not state.isActive then
+        return
+    end
+    local currentEntry = #state.queue > 0 and state.queue[1] or nil
+    if currentEntry and currentEntry.isQuest then
+        skipTyping(nil, state)
+        return
+    end
+    local newQueue = {}
+    for ____, entry in ipairs(state.queue) do
+        if entry.isQuest then
+            newQueue[#newQueue + 1] = entry
+        end
+    end
+    if #newQueue == #state.queue then
+        return
+    end
+    if #newQueue > 0 then
+        state.queue = newQueue
+        playEntry(nil, state)
+        skipTyping(nil, state)
+    else
+        clearState(nil, state)
+    end
+end
+local g_skipKeyInitialized = false
+local function initSkipKeyListener(self)
+    if g_skipKeyInitialized then
+        return
+    end
+    g_skipKeyInitialized = true
+    registerKeyDown(
+        nil,
+        KEY_SKIP_DIALOG,
+        function(____, player, key)
+            local localPlayer = dzGetLocalPlayer(nil)
+            if player ~= localPlayer then
+                return
+            end
+            skipAllDialogForPlayer(nil, localPlayer)
+        end
+    )
+end
 local function enqueue(self, state, entry)
     local wasEmpty = #state.queue == 0
     local ____state_queue_5 = state.queue
@@ -864,6 +957,7 @@ function ____exports.initDialogSystem(self)
             i = i + 1
         end
     end
+    initSkipKeyListener(nil)
 end
 function ____exports.displayText(self, p, title, text, duration, titleFontSize, bodyFontSize)
     if duration <= 0 then

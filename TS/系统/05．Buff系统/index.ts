@@ -12,7 +12,8 @@ export * from "./03．BuffJASS桥接";
 const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { initBuffSystem?: () => void };
 if (typeof buffPoolCore.initBuffSystem === "function") buffPoolCore.initBuffSystem();
 require("系统.05．Buff系统.01．Buff表");
-require("系统.05．Buff系统.02．BuffUI");
+const buffUIMod = require("系统.05．Buff系统.02．BuffUI") as { init?: () => void };
+if (typeof buffUIMod.init === "function") buffUIMod.init();
 require("系统.05．Buff系统.03．BuffJASS桥接");
 
 /**
