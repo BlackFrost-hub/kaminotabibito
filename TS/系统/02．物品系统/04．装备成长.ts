@@ -273,6 +273,13 @@ function executeSegment(unit: any, seg: Segment): void {
       if (dt && typeof (jass as any).TimerStart === "function") {
         const t = dt;
         (jass as any).TimerStart(t, 1.0, true, () => {
+          // 检查单位是否死亡，死亡则销毁计时器
+          if (capturedUnit && typeof (jass as any).IsUnitType === "function") {
+            if ((jass as any).IsUnitType(capturedUnit, (jass as any).UNIT_TYPE_DEAD)) {
+              if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+              return;
+            }
+          }
           applyGoldPct(capturedUnit, capturedPct);
           remaining = remaining - 1;
           if (remaining <= 0) {

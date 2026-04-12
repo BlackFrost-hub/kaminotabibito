@@ -92,8 +92,8 @@ function parseDialogLines(dialogPreview?: string): Array<{ speaker: string; text
 
 function calcDialogDuration(text: string): number {
   const n = text.length;
-  // 基础 1.0 秒，每 6 个字符 +1.0 秒；下限 2 秒，上限 12 秒
-  const t = 1 + math.floor(n / 6);
+  // 基础 1.0 秒，每 10 个字符 +1.0 秒；下限 2 秒，上限 12 秒
+  const t = 1 + math.floor(n / 10);
   if (t < 2) return 2;
   if (t > 12) return 12;
   return t;
@@ -161,11 +161,13 @@ function parseTimelineEntries(timeline?: string): Array<{ delay: number; code: s
 
 function createEvalEnv(triggerUnit: any): any {
   const gAny = globalThis as any;
+  let cachedLoc: any = null;
   const local1GetFallback = (ty: string, key: string): any => {
     if (typeof gAny.YDLocal1Get === "function") return gAny.YDLocal1Get(ty, key);
     // 条件里最常见是 YDLocal1Get(location, "单位位置")
     if (ty === "location" && key === "单位位置" && triggerUnit && typeof jass.GetUnitLoc === "function") {
-      return jass.GetUnitLoc(triggerUnit);
+      if (!cachedLoc) cachedLoc = jass.GetUnitLoc(triggerUnit);
+      return cachedLoc;
     }
     return null;
   };
@@ -244,19 +246,15 @@ function runActionTimeline(timeline: string | undefined, triggerUnit: any): void
 
 function getHeroes(): any[] {
   const group = typeof YDGet === "function" ? YDGet("string", "玩家英雄", "单位组", "group") : null;
-  if (!group || typeof jass.FirstOfGroup !== "function" || typeof jass.GroupRemoveUnit !== "function" || typeof jass.GroupAddUnit !== "function") {
+  if (!group || typeof jass.ForGroup !== "function") {
     return [];
   }
   const arr: any[] = [];
-  const temp: any[] = [];
-  while (true) {
-    const u = jass.FirstOfGroup(group);
-    if (!u) break;
-    arr.push(u);
-    temp.push(u);
-    jass.GroupRemoveUnit(group, u);
-  }
-  for (const u of temp) jass.GroupAddUnit(group, u);
+  const cb = (g: any) => {
+    const u = jass.FirstOfGroup(g);
+    if (u) arr.push(u);
+  };
+  jass.ForGroup(group, cb);
   return arr;
 }
 
@@ -274,15 +272,15 @@ function tick(): void {
     if (cfg.enabled === false) continue;
     if (!cfg.condition || cfg.condition === "") continue;
     if (!hitFromStage(cfg, stage)) continue;
-    let matched = false;
+    let matchedHero: any = null;
     for (const hero of heroes) {
       if (evalCondition(cfg.condition, hero)) {
-        matched = true;
+        matchedHero = hero;
         break;
       }
     }
-    if (!matched) continue;
-    const triggerUnit = heroes.length > 0 ? heroes[0] : null;
+    if (!matchedHero) continue;
+    const triggerUnit = matchedHero;
     if (typeof cfg.toStage === "number") setStage(cfg.toStage);
     runActionTimeline(cfg.actionTimeline, triggerUnit);
     playDialog(cfg.dialogPreview);

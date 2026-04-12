@@ -1,0 +1,29 @@
+/**
+ * Buff系统 - 统一导出和初始化入口
+ */
+
+// 导出核心模块
+export * from "./00．Buff系统";
+export * from "./01．Buff表";
+export * from "./02．BuffUI";
+export * from "./03．BuffJASS桥接";
+
+// 加载所有子模块
+const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { initBuffSystem?: () => void };
+if (typeof buffPoolCore.initBuffSystem === "function") buffPoolCore.initBuffSystem();
+require("系统.05．Buff系统.01．Buff表");
+require("系统.05．Buff系统.02．BuffUI");
+require("系统.05．Buff系统.03．BuffJASS桥接");
+
+/**
+ * 初始化Buff系统
+ */
+export function init(): void {
+  const p = (globalThis as any).print;
+  if (typeof p === "function") {
+    p("[Buff系统] 初始化完成");
+  }
+}
+
+// 自动初始化（可选）
+// init();

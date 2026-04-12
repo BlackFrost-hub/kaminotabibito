@@ -283,6 +283,9 @@ local function stopAndDestroyTimer(self, t)
         return
     end
     stopTimer(nil, t)
+    if type(jass.DestroyTimer) == "function" then
+        jass.DestroyTimer(t)
+    end
 end
 local function untrackItem(self, item)
     local st = itemState:get(item)

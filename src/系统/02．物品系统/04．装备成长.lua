@@ -488,6 +488,14 @@ local function executeSegment(self, unit, seg)
                     1,
                     true,
                     function()
+                        if capturedUnit and type(jass.IsUnitType) == "function" then
+                            if jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
+                                if type(jass.DestroyTimer) == "function" then
+                                    jass.DestroyTimer(t)
+                                end
+                                return
+                            end
+                        end
                         applyGoldPct(nil, capturedUnit, capturedPct)
                         remaining = remaining - 1
                         if remaining <= 0 then

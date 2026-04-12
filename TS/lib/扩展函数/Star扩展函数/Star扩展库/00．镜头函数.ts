@@ -6,7 +6,7 @@ const jass = require("jass.common") as any;
  * @param u 目标单位
  * @param duration 平移时间
  */
-export function PanCameraToTimedUnitForPlayer(
+export function StarOther_PanCameraToTimedUnitForPlayer(
   whichPlayer: any,
   u: any,
   duration: number

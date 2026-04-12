@@ -82,7 +82,7 @@ function ____exports.registerBridge(self)
     expose(nil, "EC_GetPointZ", ecExt.EC_GetPointZ)
     expose(nil, "EC_CreateEffect", ecExt.EC_CreateEffect)
     expose(nil, "GS_PolarProjectionBJ", gsExt.GS_PolarProjectionBJ)
-    expose(nil, "PanCameraToTimedUnitForPlayer", starLib.PanCameraToTimedUnitForPlayer)
+    expose(nil, "StarOther_PanCameraToTimedUnitForPlayer", starLib.StarOther_PanCameraToTimedUnitForPlayer)
     expose(nil, "SDR_DebugTimer", starLib.SDR_DebugTimer)
 end
 return ____exports

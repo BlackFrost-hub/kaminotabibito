@@ -1,0 +1,21 @@
+{
+  "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\3.j",
+  "items": [
+    {
+      "symbolName": "Trig_JLC_________003Func003Func006T",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\3.j",
+      "content": "\n```jass\nfunction Trig_JLC_________003Func003Func006T takes nothing returns nothing\n```\n\n\n---\n\n===========================================================================\n\nTrigger: JLC精灵城003\n\n===========================================================================\n\n**文件:** `JASS/3.j`"
+    },
+    {
+      "symbolName": "Trig_JLC_________003Actions",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\3.j",
+      "content": "\n```jass\nfunction Trig_JLC_________003Actions takes nothing returns nothing\n```\n\n\n**文件:** `JASS/3.j`"
+    },
+    {
+      "symbolName": "Trig_JLC_________003Func004Func005A",
+      "filePath": "c:\\Users\\Administrator\\Desktop\\syzl\\JASS\\3.j",
+      "content": "\n```jass\nfunction Trig_JLC_________003Func004Func005A takes nothing returns nothing\n```\n\n\n**文件:** `JASS/3.j`"
+    }
+  ],
+  "timestamp": 1775984556674
+}

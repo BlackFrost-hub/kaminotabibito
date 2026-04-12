@@ -1,18 +1,16 @@
 /**
- * 装备回复：使用物品时解析 hot/abilList，按段通过 **STES「物品治疗事件」** 分发（与 JASS `Trig_HealItemEffectActions` 同语义）。
+ * 装备回复：使用物品时解析 hot/abilList，按段 **STES「物品治疗事件」** 分发。
  *
- * **父（本文件 `fireItemHealEvent`）** 每轮子触发：
- * `YDLocalExecuteTrigger` → `saveParentIndex` →
- * `YDLocal5Set(unit,"ItemHealUnit")` / `real,"ItemHealHP"|"ItemHealMP"` / `item,"Item"` / `string,"物品技能标识"` → `YDTriggerExecuteTrigger(false)`。
+ * 逆天约定（传参与返回值**同时支持**，不互斥）：
+ * - **传参 `YDLocal5Set` → 子 `YDLocal5Get`**（父在 `YDLocalExecuteTrigger` 之后写入 `ydl_triggerstep`）：
+ *   `unit` **ItemHealUnit**，`real` **ItemHealHP** / **ItemHealMP**，`item` **Item**，`string` **物品技能标识**。
+ * - **返回值 子 `YDLocal7Set` → 父 `YDLocal1Get`**（须先 `SaveInteger(YDHT,子,SKey_PIndex,父页)`，与 STES_Fire / `fireItemHealEvent` 一致）：
+ *   键名与上列对应：**ItemHealHP**、**ItemHealMP**、**Item**、**ItemHealUnit**。
+ *   HP/MP：父传参 **非全 0** 时 7 为**实际加上的量**；**双 0** 且能从使用物品事件 + 装备表推算时 7 为**推算总量**（便于父 `QuestMessage`）。**Item/Unit** 先读 5，缺则回退 `GetManipulatedItem` / `GetManipulatingUnit`（`GetTriggerUnit`）再写回 7。
  *
- * **子（本文件注册的 Lua Action）** 内：`YDLocalExecuteTrigger(GetTriggeringTrigger())` 后 `YDLocal5Get`，
- * 对治疗单位加减生命/魔法，再 **`YDLocal7Set` 写回父可读**（与 JASS `YDLocal1Get` 同名）：
- * - `real` **ItemHealHP** / **ItemHealMP**
- * - `item` **物品**（供父 `GetItemName(YDLocal1Get(item,"物品"))`）
- * - `unit` **ItemHealUnit**
+ * 父遍历子触发须：`YDLocalExecuteTrigger` → `saveParentIndex` → `YDLocal5Set…` → `YDTriggerExecuteTrigger(false)`。
  *
  * 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
- *
  * 规则：equip-heal-hot-format.md / equip-heal-use-item.md
  */
 
@@ -70,21 +68,30 @@ const { fourCCToString, isSpecialUnit, withTimer } = require("系统.00．核心
   withTimer: (delaySec: number, callback: () => void) => void;
 };
 
+const {
+  parseEquipHealSegments,
+  calcEquipHealHpMp,
+  sumHealFromItemData,
+} = require("系统.02．物品系统.06．装备回复_hot") as {
+  parseEquipHealSegments: (hot: string, abil: string) => { tokens: string[]; abilId: string; waitSec: number }[];
+  calcEquipHealHpMp: (tokens: string[], unit: any) => { hp: number; mp: number };
+  sumHealFromItemData: (
+    unit: any,
+    item: any,
+    data: Record<string, { hot?: string; abilList?: string }>,
+    fourCC: (n: number) => string,
+  ) => { hp: number; mp: number; ok: boolean };
+};
+
 /** 与地图 STES / JASS `StringHash` 一致 */
 export const ITEM_HEAL_STES_EVENT = "物品治疗事件";
 
-/** YDLocal5 入参名（与 JASS `YDLocal5Set` 一致） */
-const YL5_UNIT = "ItemHealUnit";
-const YL5_HP = "ItemHealHP";
-const YL5_MP = "ItemHealMP";
-const YL5_ITEM = "Item";
-const YL5_ABIL = "物品技能标识";
-
-/** YDLocal7 写回父侧 `YDLocal1Get` 的键 */
-const YL7_HP = "ItemHealHP";
-const YL7_MP = "ItemHealMP";
-const YL7_ITEM = "物品";
-const YL7_UNIT = "ItemHealUnit";
+/** YDLocal5 / YDLocal7 同名键（5=传参，7=返回值） */
+const YL_UNIT = "ItemHealUnit";
+const YL_HP = "ItemHealHP";
+const YL_MP = "ItemHealMP";
+const YL_ITEM = "Item";
+const YL_ABIL = "物品技能标识";
 
 /** 对生命/魔法做加法并封顶（不写技能表现，技能可由地图另挂 STES 或 GUI） */
 function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
@@ -101,6 +108,29 @@ function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
     const maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA) as number;
     jass.SetUnitState(unit, jass.UNIT_STATE_MANA, Math.min(maxM, curM + mp));
   }
+}
+
+/** 治疗前后差值，供 YDLocal7 与父 `YDLocal1Get(real,…)` 对齐手写 JASS 子触发的「有效回复量」语义 */
+function applyHpMpToUnitAndGetApplied(this: void, unit: any, hp: number, mp: number): { hpApplied: number; mpApplied: number } {
+  if (unit == null || unit === 0) return { hpApplied: 0, mpApplied: 0 };
+  if (typeof jass.GetUnitState !== "function") return { hpApplied: 0, mpApplied: 0 };
+
+  let lifeBefore = 0;
+  let manaBefore = 0;
+  if (jass.UNIT_STATE_LIFE != null) lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
+  if (jass.UNIT_STATE_MANA != null) manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
+
+  applyHpMpToUnit(unit, hp, mp);
+
+  let lifeAfter = lifeBefore;
+  let manaAfter = manaBefore;
+  if (jass.UNIT_STATE_LIFE != null) lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
+  if (jass.UNIT_STATE_MANA != null) manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
+
+  return {
+    hpApplied: Math.max(0, lifeAfter - lifeBefore),
+    mpApplied: Math.max(0, manaAfter - manaBefore),
+  };
 }
 
 /**
@@ -122,11 +152,11 @@ function fireItemHealEvent(this: void, unit: any, item: any, hp: number, mp: num
     if (trg == null || trg === 0) continue;
     YDLocalExecuteTrigger(trg);
     saveParentIndex(trg);
-    YDLocal5Set("unit", YL5_UNIT, unit);
-    YDLocal5Set("real", YL5_HP, hp);
-    YDLocal5Set("real", YL5_MP, mp);
-    YDLocal5Set("item", YL5_ITEM, item);
-    YDLocal5Set("string", YL5_ABIL, abilId);
+    YDLocal5Set("unit", YL_UNIT, unit);
+    YDLocal5Set("real", YL_HP, hp);
+    YDLocal5Set("real", YL_MP, mp);
+    YDLocal5Set("item", YL_ITEM, item);
+    YDLocal5Set("string", YL_ABIL, abilId);
     YDTriggerExecuteTrigger(trg, false);
   }
 
@@ -135,100 +165,56 @@ function fireItemHealEvent(this: void, unit: any, item: any, hp: number, mp: num
   setG_LIndex(prev);
 }
 
-/** STES 子触发：读参 → 治疗 → 四路 YDLocal7 写回父 */
+/** STES 子触发：读参 →（缺参则从使用物品事件 / 装备表补全）→ 治疗 → 四路 YDLocal7 写回父 */
 function onItemHealStesChild(this: void): void {
   try {
     ydlStes_syncTriggerStep(undefined);
 
-    const unit = YDLocal5Get("unit", YL5_UNIT);
-    const hp = ydlStes_readReal5(undefined, YL5_HP);
-    const mp = ydlStes_readReal5(undefined, YL5_MP);
-    const item = YDLocal5Get("item", YL5_ITEM);
-    void ydlStes_readString5(undefined, YL5_ABIL);
+    const rawHp = ydlStes_readReal5(undefined, YL_HP);
+    const rawMp = ydlStes_readReal5(undefined, YL_MP);
+    let unit: any = YDLocal5Get("unit", YL_UNIT);
+    let item: any = YDLocal5Get("item", YL_ITEM);
+    void ydlStes_readString5(undefined, YL_ABIL);
 
-    applyHpMpToUnit(unit, hp, mp);
+    if (unit == null || unit === 0) {
+      if (typeof jass.GetManipulatingUnit === "function") unit = jass.GetManipulatingUnit();
+      if ((unit == null || unit === 0) && typeof jass.GetTriggerUnit === "function") unit = jass.GetTriggerUnit();
+    }
+    if (item == null || item === 0) {
+      if (typeof jass.GetManipulatedItem === "function") item = jass.GetManipulatedItem();
+    }
 
-    YDLocal7Set("real", YL7_HP, hp);
-    YDLocal7Set("real", YL7_MP, mp);
-    YDLocal7Set("item", YL7_ITEM, item);
-    YDLocal7Set("unit", YL7_UNIT, unit);
+    let hp = rawHp;
+    let mp = rawMp;
+    let filledFromItemData = false;
+    if (rawHp === 0 && rawMp === 0 && !isSpecialUnit(unit)) {
+      const inf = sumHealFromItemData(unit, item, itemsData as Record<string, { hot?: string; abilList?: string }>, fourCCToString);
+      if (inf.ok) {
+        hp = inf.hp;
+        mp = inf.mp;
+        filledFromItemData = true;
+      }
+    }
+
+    const { hpApplied, mpApplied } = applyHpMpToUnitAndGetApplied(unit, hp, mp);
+
+    const hp7 = filledFromItemData ? hp : hpApplied;
+    const mp7 = filledFromItemData ? mp : mpApplied;
+    YDLocal7Set("real", YL_HP, hp7);
+    YDLocal7Set("real", YL_MP, mp7);
+    YDLocal7Set("item", YL_ITEM, item);
+    YDLocal7Set("unit", YL_UNIT, unit);
   } finally {
     ydlStes_finishChildCleanup(undefined);
   }
 }
 
-interface SegmentInfo {
-  tokens: string[];
-  abilId: string;
-  waitSec: number;
-}
-
-function parseSegments(hotStr: string, abilList: string): SegmentInfo[] {
-  const segments = hotStr.split("+");
-  const abilIds = abilList.split(",").map((x) => x.trim());
-  const result: SegmentInfo[] = [];
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i].trim();
-    if (seg === "") continue;
-    const tokens = seg.split(";").map((x) => x.trim()).filter((x) => x !== "");
-    let waitSec = 0;
-    for (const t of tokens) {
-      const waitIdx = t.indexOf(":wait");
-      if (waitIdx >= 0) {
-        const w = parseFloat(t.substring(waitIdx + 5)) || 0;
-        if (w > waitSec) waitSec = w;
-      }
-    }
-    result.push({ tokens, abilId: abilIds[i] ?? "", waitSec });
-  }
-  return result;
-}
-
-function calcHpMp(tokens: string[], unit: any): { hp: number; mp: number } {
-  let hp = 0;
-  let mp = 0;
-  const maxHp: number =
-    typeof jass.GetUnitState === "function" ? (jass.GetUnitState(unit, jass.ConvertUnitState(1)) as number) : 0;
-  const curHp: number = typeof jass.GetWidgetLife === "function" ? (jass.GetWidgetLife(unit) as number) : 0;
-  const maxMp: number =
-    typeof jass.GetUnitState === "function" ? (jass.GetUnitState(unit, jass.ConvertUnitState(3)) as number) : 0;
-  const lostHp = maxHp - curHp;
-
-  for (const rawToken of tokens) {
-    const waitIdx = rawToken.indexOf(":wait");
-    const t = (waitIdx >= 0 ? rawToken.substring(0, waitIdx) : rawToken).trim();
-    const tl = t.toLowerCase();
-    if (tl.endsWith("hplost")) {
-      const prefix = t.substring(0, t.length - 6);
-      if (prefix.endsWith("%")) {
-        const pct = parseFloat(prefix.substring(0, prefix.length - 1)) / 100;
-        hp += lostHp * pct;
-      } else {
-        hp += parseFloat(prefix) || 0;
-      }
-    } else if (tl.endsWith("hp")) {
-      const prefix = t.substring(0, t.length - 2);
-      if (prefix.endsWith("%")) {
-        const pct = parseFloat(prefix.substring(0, prefix.length - 1)) / 100;
-        hp += maxHp * pct;
-      } else {
-        hp += parseFloat(prefix) || 0;
-      }
-    } else if (tl.endsWith("mp")) {
-      const prefix = t.substring(0, t.length - 2);
-      if (prefix.endsWith("%")) {
-        const pct = parseFloat(prefix.substring(0, prefix.length - 1)) / 100;
-        mp += maxMp * pct;
-      } else {
-        mp += parseFloat(prefix) || 0;
-      }
-    }
-  }
-  return { hp, mp };
-}
-
-function executeSegment(unit: any, item: any, seg: SegmentInfo): void {
-  const { hp, mp } = calcHpMp(seg.tokens, unit);
+function executeSegment(
+  unit: any,
+  item: any,
+  seg: { tokens: string[]; abilId: string; waitSec: number },
+): void {
+  const { hp, mp } = calcEquipHealHpMp(seg.tokens, unit);
   fireItemHealEvent(unit, item, hp, mp, seg.abilId);
 }
 
@@ -253,7 +239,7 @@ function onUseItem(this: void): void {
     glob.__EquipHealExecutedKey = undefined;
   });
 
-  const segments = parseSegments(entry.hot, entry.abilList);
+  const segments = parseEquipHealSegments(entry.hot, entry.abilList);
   for (const seg of segments) {
     if (seg.abilId === "") continue;
     if (seg.waitSec <= 0) {

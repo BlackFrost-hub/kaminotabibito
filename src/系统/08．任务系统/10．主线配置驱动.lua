@@ -152,7 +152,7 @@ local function parseDialogLines(self, dialogPreview)
 end
 local function calcDialogDuration(self, text)
     local n = #text
-    local t = 1 + math.floor(n / 6)
+    local t = 1 + math.floor(n / 10)
     if t < 2 then
         return 2
     end
@@ -262,12 +262,16 @@ local function parseTimelineEntries(self, timeline)
 end
 local function createEvalEnv(self, triggerUnit)
     local gAny = _G
+    local cachedLoc = nil
     local function local1GetFallback(____, ty, key)
         if type(gAny.YDLocal1Get) == "function" then
             return gAny:YDLocal1Get(ty, key)
         end
         if ty == "location" and key == "单位位置" and triggerUnit and type(jass.GetUnitLoc) == "function" then
-            return jass.GetUnitLoc(triggerUnit)
+            if not cachedLoc then
+                cachedLoc = jass.GetUnitLoc(triggerUnit)
+            end
+            return cachedLoc
         end
         return nil
     end
@@ -350,11 +354,11 @@ local function runActionTimeline(self, timeline, triggerUnit)
     local entries = parseTimelineEntries(nil, timeline)
     for ____, e in ipairs(entries) do
         do
-            local __continue65
+            local __continue66
             repeat
                 if e.delay <= 0 or type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
                     executeActionCode(nil, e.code, triggerUnit)
-                    __continue65 = true
+                    __continue66 = true
                     break
                 end
                 local t = jass.CreateTimer()
@@ -369,9 +373,9 @@ local function runActionTimeline(self, timeline, triggerUnit)
                         end
                     end
                 )
-                __continue65 = true
+                __continue66 = true
             until true
-            if not __continue65 then
+            if not __continue66 then
                 break
             end
         end
@@ -391,23 +395,17 @@ local function getHeroes(self)
         ____temp_8 = nil
     end
     local group = ____temp_8
-    if not group or type(jass.FirstOfGroup) ~= "function" or type(jass.GroupRemoveUnit) ~= "function" or type(jass.GroupAddUnit) ~= "function" then
+    if not group or type(jass.ForGroup) ~= "function" then
         return {}
     end
     local arr = {}
-    local temp = {}
-    while true do
-        local u = jass.FirstOfGroup(group)
-        if not u then
-            break
+    local function cb(____, g)
+        local u = jass.FirstOfGroup(g)
+        if u then
+            arr[#arr + 1] = u
         end
-        arr[#arr + 1] = u
-        temp[#temp + 1] = u
-        jass.GroupRemoveUnit(group, u)
     end
-    for ____, u in ipairs(temp) do
-        jass.GroupAddUnit(group, u)
-    end
+    jass.ForGroup(group, cb)
     return arr
 end
 local function hitFromStage(self, cfg, stage)
@@ -425,38 +423,32 @@ local function tick(self)
     local heroes = getHeroes(nil)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
-            local __continue80
+            local __continue79
             repeat
                 if cfg.enabled == false then
-                    __continue80 = true
+                    __continue79 = true
                     break
                 end
                 if not cfg.condition or cfg.condition == "" then
-                    __continue80 = true
+                    __continue79 = true
                     break
                 end
                 if not hitFromStage(nil, cfg, stage) then
-                    __continue80 = true
+                    __continue79 = true
                     break
                 end
-                local matched = false
+                local matchedHero = nil
                 for ____, hero in ipairs(heroes) do
                     if evalCondition(nil, cfg.condition, hero) then
-                        matched = true
+                        matchedHero = hero
                         break
                     end
                 end
-                if not matched then
-                    __continue80 = true
+                if not matchedHero then
+                    __continue79 = true
                     break
                 end
-                local ____temp_9
-                if #heroes > 0 then
-                    ____temp_9 = heroes[1]
-                else
-                    ____temp_9 = nil
-                end
-                local triggerUnit = ____temp_9
+                local triggerUnit = matchedHero
                 if type(cfg.toStage) == "number" then
                     setStage(nil, cfg.toStage)
                 end
@@ -465,7 +457,7 @@ local function tick(self)
                 refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
                 break
             until true
-            if not __continue80 then
+            if not __continue79 then
                 break
             end
         end
@@ -478,13 +470,13 @@ local function extractFunctionNames(self, text)
     local i = 0
     while i < n do
         do
-            local __continue91
+            local __continue90
             repeat
                 local ch = __TS__StringCharCodeAt(text, i)
                 local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
                 if not isStart then
                     i = i + 1
-                    __continue91 = true
+                    __continue90 = true
                     break
                 end
                 local start = i
@@ -504,9 +496,9 @@ local function extractFunctionNames(self, text)
                 if j < n and __TS__StringCharAt(text, j) == "(" then
                     names[#names + 1] = __TS__StringSubstring(text, start, i)
                 end
-                __continue91 = true
+                __continue90 = true
             until true
-            if not __continue91 then
+            if not __continue90 then
                 break
             end
         end

@@ -6,7 +6,7 @@ local jass = require("jass.common")
 -- @param whichPlayer 目标玩家
 -- @param u 目标单位
 -- @param duration 平移时间
-function ____exports.PanCameraToTimedUnitForPlayer(self, whichPlayer, u, duration)
+function ____exports.StarOther_PanCameraToTimedUnitForPlayer(self, whichPlayer, u, duration)
     if type(jass.GetLocalPlayer) ~= "function" then
         return
     end

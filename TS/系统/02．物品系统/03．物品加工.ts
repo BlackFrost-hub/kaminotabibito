@@ -205,6 +205,9 @@ function tryGiveItemToCampfire(campfire: any, item: any): boolean {
 function stopAndDestroyTimer(t: any): void {
   if (!t) return;
   stopTimer(t);
+  if (typeof (jass as any).DestroyTimer === "function") {
+    (jass as any).DestroyTimer(t);
+  }
 }
 
 function untrackItem(item: any): void {

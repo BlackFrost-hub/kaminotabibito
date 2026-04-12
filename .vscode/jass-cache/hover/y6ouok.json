@@ -1,0 +1,11 @@
+{
+  "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\blizzard.j",
+  "items": [
+    {
+      "symbolName": "GetPlayersAll",
+      "filePath": "c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\blizzard.j",
+      "content": "\n```jass\nfunction GetPlayersAll takes nothing returns force\n```\n\n\n---\n\n获取所有玩家\n\n以玩家组形式返回\n\n**文件:** `c:\\Users\\Administrator\\.trae-cn\\extensions\\jass.jass-1.9.7\\static\\blizzard.j`"
+    }
+  ],
+  "timestamp": 1775984488736
+}
