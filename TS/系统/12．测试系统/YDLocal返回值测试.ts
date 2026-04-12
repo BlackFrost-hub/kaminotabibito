@@ -1,3 +1,6 @@
+/** 开关：设为 true 启用测试，false 禁用 */
+const ENABLED = false;
+
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const {
@@ -68,7 +71,7 @@ function testYDLocalReturn(): void {
     _print("===== 测试结束 =====");
 }
 
-if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
+if (ENABLED && typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
     const tm = jass.CreateTimer();
     jass.TimerStart(tm, 1.0, false, () => {
         testYDLocalReturn();

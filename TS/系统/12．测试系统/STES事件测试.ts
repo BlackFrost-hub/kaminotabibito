@@ -1,5 +1,5 @@
 /**
- * 任意测试2 — Lua 仅通过事件名 STES_Fire，与 JASS STES_Register 共用 STES___HT
+ * STES事件测试 — Lua 仅通过事件名 STES_Fire，与 JASS STES_Register 共用 STES___HT
  *
  * 调试输出：遵循 `.cursor/rules/feedback_debug_output.md`，用 print（经 log）而非 DisplayTimedTextToPlayer。
  *
@@ -10,6 +10,9 @@
  * TSTL：模块内局部函数默认带隐式 self，会编成 log(nil,msg)、_print(nil,msg)。
  * 为所有本地函数加 `this: void`，避免多余 nil 与冒号调用错位。
  */
+
+/** 开关：设为 true 启用测试，false 禁用 */
+const ENABLED = false;
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -35,8 +38,8 @@ const TEST_EVENT = "测试";
 // /** 秒；Lua 早于 JASS 绑表时可启用下方 TimerStart */
 // const ENTRY_DELAY_SEC = 0.03;
 
-const BOOT_GUARD_KEY = "__syzl_anyTest2_booted";
-const LUA_STES_REG_KEY = "__syzl_anyTest2_luaStesReg";
+const BOOT_GUARD_KEY = "__syzl_stesTest_booted";
+const LUA_STES_REG_KEY = "__syzl_stesTest_luaStesReg";
 
 function skeyIndex(this: void): number {
     const jg = jglobals as any;
@@ -69,7 +72,7 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
     g[LUA_STES_REG_KEY] = true;
 
     if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-        log("[任意测试2] 无法 CreateTrigger，跳过 Lua STES 监听注册");
+        log("[STES事件测试] 无法 CreateTrigger，跳过 Lua STES 监听注册");
         return;
     }
 
@@ -83,7 +86,7 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
             const ret = quad + root - Math.min(b, 5) * 0.5 + 3.14159;
             YDLocal7Set("real", YD_LOCAL_REAL_KEY, ret);
             log(
-                "[任意测试2-Lua] YDLocal5Get(real,\"" +
+                "[STES事件测试-Lua] YDLocal5Get(real,\"" +
                     YD_LOCAL_REAL_KEY +
                     "\")=" +
                     b +
@@ -99,7 +102,7 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
     stesMod.STES_Register(trig, TEST_EVENT);
 
     log(
-        "[任意测试2] 已向「" + TEST_EVENT + "」STES_Register Lua 触发器；与 JASS 注册共用同一张表，输入 333 可测 JASS→Lua",
+        "[STES事件测试] 已向「" + TEST_EVENT + "」STES_Register Lua 触发器；与 JASS 注册共用同一张表，输入 333 可测 JASS→Lua",
     );
 }
 
@@ -108,7 +111,7 @@ function runAfterDelay(this: void): void {
     const ht = stesMod.STES_GetTable();
     if (ht == null || ht === 0) {
         log(
-            "[任意测试2] STES_GetTable() 仍为空（当前无延迟；若绑表晚于 require 可恢复 boot 内定时器）",
+            "[STES事件测试] STES_GetTable() 仍为空（当前无延迟；若绑表晚于 require 可恢复 boot 内定时器）",
         );
         return;
     }
@@ -121,7 +124,7 @@ function runAfterDelay(this: void): void {
         typeof jass.LoadInteger === "function" ? jass.LoadInteger(ht, hash, sk) : 0;
 
     log(
-        "[任意测试2] 表=" +
+        "[STES事件测试] 表=" +
             String(ht) +
             " 事件「" +
             TEST_EVENT +
@@ -133,7 +136,7 @@ function runAfterDelay(this: void): void {
 
     if (count <= 0) {
         log(
-            "[任意测试2] 计数为 0：事件「" +
+            "[STES事件测试] 计数为 0：事件「" +
                 TEST_EVENT +
                 "」尚无 STES 注册（检查 JASS 是否已 Register、事件名是否一致）",
         );
@@ -141,20 +144,21 @@ function runAfterDelay(this: void): void {
     }
 
     log(
-        "[任意测试2] 执行 STES_FireWithReal11Step，realParamKey=\"" +
+        "[STES事件测试] 执行 STES_FireWithReal11Step，realParamKey=\"" +
             YD_LOCAL_REAL_KEY +
             "\"（与 GUI 333）",
     );
     stesMod.STES_FireWithReal11Step(TEST_EVENT, YD_LOCAL_REAL_KEY);
-    log("[任意测试2] STES_FireWithReal11Step 已返回");
+    log("[STES事件测试] STES_FireWithReal11Step 已返回");
 }
 
 function boot(this: void): void {
+    if (!ENABLED) return;
     const g = globalThis as any;
     if (g[BOOT_GUARD_KEY]) return;
     g[BOOT_GUARD_KEY] = true;
 
-    log("[任意测试2] 无延迟立即执行 STES 测试");
+    log("[STES事件测试] 无延迟立即执行 STES 测试");
     runAfterDelay();
 
     // const timer = jass.CreateTimer();

@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- 开关：设为 true 启用测试，false 禁用
+local ENABLED = false
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
@@ -107,7 +109,7 @@ local function testYDLocalReturn(self)
     end
     _print(nil, "===== 测试结束 =====")
 end
-if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
+if ENABLED and type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
     local tm = jass.CreateTimer()
     jass.TimerStart(
         tm,
