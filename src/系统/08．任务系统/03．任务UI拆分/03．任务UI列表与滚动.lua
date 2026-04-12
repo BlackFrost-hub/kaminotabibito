@@ -141,15 +141,16 @@ function ____exports.computeNextScrollOffsetByWheel(self, getWheelDelta, current
     end
     return currentOffset
 end
-function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames)
-    local vis = maxScroll > 0
-    local fn = japi.DzFrameShow
-    if type(fn) ~= "function" then
+--- 滚动条显隐：内容不足一屏时 maxScroll 为 0，但仍应显示轨道与滑块（滑块贴顶/不可用），否则用户以为滚动条坏了。
+-- 仅当当前分类下没有任何任务行（空列表占位）时隐藏。
+function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames, hasQuestRows)
+    local vis = hasQuestRows
+    if type(japi.DzFrameShow) ~= "function" then
         return
     end
     for ____, f in ipairs(frames) do
         if f and f ~= 0 then
-            pcall(function () return fn(nil, f, vis) end
+            pcall(function () return japi.DzFrameShow(f, vis) end
             )
         end
     end
@@ -235,7 +236,7 @@ function ____exports.refreshTaskUIList(self, opts)
             applyDzTextFontAndCenterAlignment(nil, empty)
         end
         syncScrollThumb(nil, 0)
-        updateScrollBarVis(nil, 0)
+        updateScrollBarVis(nil, 0, false)
         return
     end
     local totalH = ____exports.calcTotalContentHeight(
@@ -248,7 +249,7 @@ function ____exports.refreshTaskUIList(self, opts)
     local clamped = ____exports.clampScrollOffset(nil, scrollOffset, maxScroll)
     setScrollOffset(nil, clamped)
     syncScrollThumb(nil, maxScroll)
-    updateScrollBarVis(nil, maxScroll)
+    updateScrollBarVis(nil, maxScroll, true)
     local visibleRows = ____exports.calcVisibleQuestRows(
         nil,
         quests,

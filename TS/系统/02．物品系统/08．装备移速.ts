@@ -4,7 +4,7 @@
  */
 const jass = require("jass.common") as JassCommon;
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { movespeed2?: number; name?: string; type?: string }> }).default;
-const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
 };
 const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {

@@ -7,7 +7,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { CreateFloatTextOnUnit } = require("系统.00．核心系统.03．漂浮文字函数") as {
+const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
 };
 const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {

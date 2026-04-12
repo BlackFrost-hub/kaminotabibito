@@ -10,7 +10,7 @@ const itemsData = (require("系统.02．物品系统.01．装备数据") as { de
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
   applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => void;
 };
-const { AddGoldWithFeedback, fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
   fourCCToString: (four: number) => string;
 };

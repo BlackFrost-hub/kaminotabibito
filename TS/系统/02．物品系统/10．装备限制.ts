@@ -1,6 +1,6 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
-const { fourCCToString, isHeroUnit, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString, isHeroUnit, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
   isHeroUnit: (unit: any) => boolean;
   isSpecialUnit: (unit: any) => boolean;

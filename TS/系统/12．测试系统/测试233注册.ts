@@ -98,15 +98,14 @@ function bindKeyBN_once_min(): void {
     return;
   }
 
-  const f = japi.DzTriggerRegisterKeyEventByCode as ((trig: any, key: number, status: number, sync: boolean, cb: () => void) => void) | undefined;
-  if (typeof f !== "function") {
+  if (typeof japi.DzTriggerRegisterKeyEventByCode !== "function") {
     pr("[keytest] DzTriggerRegisterKeyEventByCode not function");
     return;
   }
 
   const bind = (key: number, label: string) => {
     const trig = (jass as any).CreateTrigger();
-    f(trig, key, 1, false, () => {
+    japi.DzTriggerRegisterKeyEventByCode(trig, key, 1, false, () => {
       const msg = `[KEYOK] ${label} key=${tostring(key)} sync=false`;
       for (let i = 0; i < 12; i++) {
         (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 5, msg);

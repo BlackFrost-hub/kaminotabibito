@@ -2,13 +2,13 @@
  * 单位狂暴：装备掉落表里 `berserkUnit`（旧名 `berserk`）非空的单位死亡时，按默认 6.25% 概率在原地创建该四码单位、继承面向，并震动击杀者镜头。
  */
 const jass = require("jass.common") as JassCommon;
-const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
 const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.index") as {
   EXSetUnitFacing: (u: any, angle: number) => void;
 };
-const { CameraShakeForPlayer } = require("系统.00．核心系统.13．镜头函数") as {
+const { CameraShakeForPlayer } = require("lib.扩展函数.封装函数.07．镜头函数.index") as {
   CameraShakeForPlayer: (p: any, magnitude: number, duration: number) => void;
 };
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };

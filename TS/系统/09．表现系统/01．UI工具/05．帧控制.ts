@@ -1,6 +1,6 @@
 const japi = require("jass.japi") as any;
 
-import { getGameUI } from "../../00．核心系统/04．硬件函数";
+import { getGameUI } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 
 // ========== 虚拟分区：销毁 ==========
 export function destroyFrame(frame: number): boolean {

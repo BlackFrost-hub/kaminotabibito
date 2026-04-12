@@ -1,7 +1,7 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const 硬件函数 = require("系统.00．核心系统.04．硬件函数") as { getGameUI: () => number };
+const 硬件函数 = require("lib.扩展函数.封装函数.04．硬件输入.index") as { getGameUI: () => number };
 const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
   createFrame: (options: any) => number;
   setFramePosition: (frame: number, options: any) => void;
@@ -98,12 +98,10 @@ function formatDotTooltip(
 
 function tryDzFrameSetTooltipF2i(hostFrame: number, tooltipFrame: number): void {
   if (!hostFrame || hostFrame === 0 || !tooltipFrame || tooltipFrame === 0) return;
-  const setTip = (japi as any).DzFrameSetTooltip;
-  if (typeof setTip !== "function") return;
-  const f2i = (japi as any).DzF2I;
+  if (typeof (japi as any).DzFrameSetTooltip !== "function") return;
   (pcall as any)(() => {
-    const tipId = typeof f2i === "function" ? f2i(tooltipFrame) : tooltipFrame;
-    setTip(hostFrame, tipId);
+    const tipId = typeof (japi as any).DzF2I === "function" ? (japi as any).DzF2I(tooltipFrame) : tooltipFrame;
+    (japi as any).DzFrameSetTooltip(hostFrame, tipId);
   });
 }
 

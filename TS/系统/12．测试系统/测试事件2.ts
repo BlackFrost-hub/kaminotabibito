@@ -2,11 +2,11 @@
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
-const { AdjustPlayerStateBJ } = require("系统.00．核心系统.01．封装函数") as { AdjustPlayerStateBJ: (delta: number, whichPlayer: any, whichPlayerState: any) => void };
-const { Sound3DII_Mp3PlayReuse } = require("系统.00．核心系统.02．音效函数") as {
+const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通用工具.index") as { AdjustPlayerStateBJ: (delta: number, whichPlayer: any, whichPlayerState: any) => void };
+const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3PlayReuse: (path: string, player?: any) => void;
 };
-const { CreateFloatTextOnUnit } = require("系统.00．核心系统.03．漂浮文字函数") as {
+const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
 };
 

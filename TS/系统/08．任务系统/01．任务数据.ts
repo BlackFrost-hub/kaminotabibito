@@ -365,7 +365,6 @@ export function createTestQuests(): void {
     ],
     status: QuestStatus.UNDISCOVERED,
     requiredLevel: 3,
-    requiredQuests: ["main_001"],
     zone: "矿山",
     icon: "ReplaceableTextures\\CommandButtons\\BTNIronForge.blp",
     createdAt: now(),

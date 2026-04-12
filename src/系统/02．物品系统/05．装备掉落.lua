@@ -49,7 +49,7 @@ end
 local jass = require("jass.common")
 local g = require("jass.globals")
 local equipExcrete = require("系统.02．物品系统.09．装备排泄")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 local isSpecialUnit = ____require_result_0.isSpecialUnit
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})

@@ -7,7 +7,7 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local _____786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
+local _____786C_4EF6_51FD_6570 = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local ____UI_5DE5_5177 = require("系统.09．表现系统.01．UI工具.index")
 local buffPoolMod = require("系统.05．Buff系统.00．Buff系统")
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
@@ -67,20 +67,18 @@ local function tryDzFrameSetTooltipF2i(self, hostFrame, tooltipFrame)
     if not hostFrame or hostFrame == 0 or not tooltipFrame or tooltipFrame == 0 then
         return
     end
-    local setTip = japi.DzFrameSetTooltip
-    if type(setTip) ~= "function" then
+    if type(japi.DzFrameSetTooltip) ~= "function" then
         return
     end
-    local f2i = japi.DzF2I
     pcall(function ()
             local ____temp_0
-            if type(f2i) == "function" then
-                ____temp_0 = f2i(nil, tooltipFrame)
+            if type(japi.DzF2I) == "function" then
+                ____temp_0 = japi.DzF2I(tooltipFrame)
             else
                 ____temp_0 = tooltipFrame
             end
             local tipId = ____temp_0
-            setTip(nil, hostFrame, tipId)
+            japi.DzFrameSetTooltip(hostFrame, tipId)
         end
     )
 end

@@ -36,10 +36,10 @@ local createDotBaseUtils = ____08_FF0EDOT_57FA_7840_5DE5_5177.createDotBaseUtils
 -- - 燃烧：装备 `Buff:dmg:Burn50;time5` → 火焰伤害，每秒固定 damage 点，持续 time 秒（数值由解析结果决定）。
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local damageEventModule = require("系统.04．伤害系统.01．伤害事件")
-local leakCore = require("系统.00．核心系统.05．泄露审计")
+local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
 local ____leakCore_LeakWatcher_1 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_1 == nil then
     ____leakCore_LeakWatcher_1 = leakCore

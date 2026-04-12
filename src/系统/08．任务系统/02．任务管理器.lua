@@ -13,7 +13,7 @@ local createTestQuests = ____01_FF0E_4EFB_52A1_6570_636E.createTestQuests
 --- 任务系统 - 任务管理器和事件处理
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local findHeroOfPlayer = ____require_result_0.findHeroOfPlayer
 local function debugPrint(self, msg)
 end

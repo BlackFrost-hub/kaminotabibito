@@ -5,10 +5,10 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
-const 伤害函数 = require("系统.00．核心系统.08．伤害函数") as {
+const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   isNormalAttack: () => boolean;
 };
-const { isHeroUnit } = require("系统.00．核心系统.01．封装函数") as {
+const { isHeroUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
 };
 

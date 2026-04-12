@@ -8,7 +8,7 @@ local ____exports = {}
 -- 排除：机械单位、古树单位、使用物品（物品栏命令ID 852008-852013, 852622）
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.00．核心系统.03．漂浮文字函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
 local CreateFloatTextOnUnit = ____require_result_0.CreateFloatTextOnUnit
 local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_1.TriggerRegisterAnyUnitEventBJ

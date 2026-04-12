@@ -382,8 +382,8 @@ function initDamageEventOnce(self, intervalSeconds)
 end
 jass = require("jass.common")
 local g = require("jass.globals")
-_____4F24_5BB3_51FD_6570 = require("系统.00．核心系统.08．伤害函数")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+_____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 isHeroUnit = ____require_result_0.isHeroUnit
 ALOC = 1097625443
 EVENT_UNIT_DAMAGED_ID = 52

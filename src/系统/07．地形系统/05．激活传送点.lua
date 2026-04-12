@@ -13,10 +13,10 @@ local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = ____04_FF0E_6FC0_6D3B_4F20_9001_
 -- - 首次有**任意单位**进入范围：将传送点单位交给玩家 7、若有 reveal 则 **SetFogStateRect(Player(0), FOG_OF_WAR_VISIBLE, rect, true)**（单份矩形雾，不创建多份修饰器）、**仅玩家 1～4** 显示提示文本；**DestroyTrigger** 排泄事件，不保留检测。
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 local withTimer = ____require_result_0.withTimer
-local ____require_result_1 = require("系统.00．核心系统.02．音效函数")
+local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3Play = ____require_result_1.Sound3DII_Mp3Play
 local ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。

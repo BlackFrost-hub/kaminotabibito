@@ -2,7 +2,7 @@
 local ____exports = {}
 local jass = require("jass.common")
 local _____4F24_5BB3_4E8B_4EF6 = require("系统.04．伤害系统.01．伤害事件")
-local _____4F24_5BB3_51FD_6570 = require("系统.00．核心系统.08．伤害函数")
+local _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local function sendMsg(self, msg)
     if type(jass.DisplayTextToPlayer) ~= "function" then
         return

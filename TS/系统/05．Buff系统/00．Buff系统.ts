@@ -7,7 +7,7 @@
  */
 
 const jass = require("jass.common") as Record<string, unknown>;
-const leakCore = require("系统.00．核心系统.05．泄露审计") as { LeakWatcher?: any };
+const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 
 /** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */

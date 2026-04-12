@@ -4,7 +4,7 @@
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
-const { findHeroOfPlayer } = require("系统.00．核心系统.01．封装函数") as {
+const { findHeroOfPlayer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   findHeroOfPlayer: (playerId: number) => any;
 };
 

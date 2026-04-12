@@ -1,5 +1,5 @@
 const jass = require("jass.common") as any;
-// const { Ir_SetUnitAttackType, Ir_GetUnitAttackType } = require("系统.00．核心系统.01．封装函数") as {
+// const { Ir_SetUnitAttackType, Ir_GetUnitAttackType } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
 //   Ir_SetUnitAttackType: (u: any, atp: number) => void;
 //   Ir_GetUnitAttackType: (u: any) => number;
 // };

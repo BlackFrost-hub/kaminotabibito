@@ -62,7 +62,7 @@ const { YDLocalExecuteTrigger, YDTriggerExecuteTrigger, saveParentIndex } = requ
 };
 
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
-const { fourCCToString, isSpecialUnit, withTimer } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString, isSpecialUnit, withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
   withTimer: (delaySec: number, callback: () => void) => void;

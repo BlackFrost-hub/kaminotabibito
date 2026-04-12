@@ -39,7 +39,7 @@ const dataMod = require("系统.02．物品系统.01．装备数据") as {
   items?: Record<string, { score?: number }>;
   default?: Record<string, { score?: number }>;
 };
-const { stringToFourCC } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
 

@@ -28,7 +28,7 @@ import {
   THUMB_DRAG_SENSITIVITY,
 } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource } from "./02．任务UI辅助";
-import { VerticalScrollbarTrack } from "../../09．表现系统/02．垂直滚动条轨道";
+import { VerticalScrollbarTrack } from "../../09．表现系统/03．垂直滚动条轨道";
 
 const jass = require("jass.common") as any;
 

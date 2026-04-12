@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
-local getGameUI = ____04_FF0E_786C_4EF6_51FD_6570.getGameUI
+local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local getGameUI = ____index.getGameUI
 local japi = require("jass.japi")
 function ____exports.destroyFrame(self, frame)
     if not frame or type(japi.DzDestroyFrame) ~= "function" then

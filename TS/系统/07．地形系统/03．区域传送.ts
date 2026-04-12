@@ -5,7 +5,7 @@
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
-const { withTimer } = require("系统.00．核心系统.01．封装函数") as {
+const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   withTimer: (delaySec: number, callback: () => void) => void;
 };
 import 区域传送配置 from "./02．区域传送配置";

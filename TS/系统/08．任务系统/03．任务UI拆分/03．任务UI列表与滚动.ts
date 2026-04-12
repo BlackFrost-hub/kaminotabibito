@@ -120,12 +120,20 @@ export function computeNextScrollOffsetByWheel(
 // 滚动条显隐
 // ────────────────────────────────────────────────
 
-export function updateScrollBarVisibility(japi: any, maxScroll: number, frames: Array<number | null>): void {
-  const vis = maxScroll > 0;
-  const fn = (japi as any).DzFrameShow;
-  if (typeof fn !== "function") return;
+/**
+ * 滚动条显隐：内容不足一屏时 maxScroll 为 0，但仍应显示轨道与滑块（滑块贴顶/不可用），否则用户以为滚动条坏了。
+ * 仅当当前分类下没有任何任务行（空列表占位）时隐藏。
+ */
+export function updateScrollBarVisibility(
+  japi: any,
+  maxScroll: number,
+  frames: Array<number | null>,
+  hasQuestRows: boolean
+): void {
+  const vis = hasQuestRows;
+  if (typeof japi.DzFrameShow !== "function") return;
   for (const f of frames) {
-    if (f && f !== 0) (pcall as any)(() => fn(f, vis));
+    if (f && f !== 0) (pcall as any)(() => japi.DzFrameShow(f, vis));
   }
 }
 
@@ -187,7 +195,7 @@ export function refreshTaskUIList(opts: {
   applyDzTextFontAndCenterAlignment: any;
   pushListItemFrame: (f: number) => void;
   syncScrollThumb: (maxScroll: number) => void;
-  updateScrollBarVisibility: (maxScroll: number) => void;
+  updateScrollBarVisibility: (maxScroll: number, hasQuestRows: boolean) => void;
   createListItem: (quest: any, rowTopRel: number, expanded: boolean) => void;
 }): void {
   const {
@@ -229,7 +237,7 @@ export function refreshTaskUIList(opts: {
       applyDzTextFontAndCenterAlignment(empty);
     }
     syncScrollThumb(0);
-    updateScrollBarVis(0);
+    updateScrollBarVis(0, false);
     return;
   }
 
@@ -239,7 +247,7 @@ export function refreshTaskUIList(opts: {
   const clamped = clampScrollOffset(scrollOffset, maxScroll);
   setScrollOffset(clamped);
   syncScrollThumb(maxScroll);
-  updateScrollBarVis(maxScroll);
+  updateScrollBarVis(maxScroll, true);
 
   const visibleRows = calcVisibleQuestRows(quests, clamped, (questId: string) => expandedQuestIds.has(questId));
   for (let i = 0; i < visibleRows.length; i++) {

@@ -4,11 +4,11 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 --- 单位狂暴：装备掉落表里 `berserkUnit`（旧名 `berserk`）非空的单位死亡时，按默认 6.25% 概率在原地创建该四码单位、继承面向，并震动击杀者镜头。
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 local EXSetUnitFacing = ____require_result_1.EXSetUnitFacing
-local ____require_result_2 = require("系统.00．核心系统.13．镜头函数")
+local ____require_result_2 = require("lib.扩展函数.封装函数.07．镜头函数.index")
 local CameraShakeForPlayer = ____require_result_2.CameraShakeForPlayer
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
 local function typeIdToUnitId(self, typeId)

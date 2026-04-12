@@ -32,7 +32,16 @@
       "Bash(wc -l \"TS/系统/09．表现系统/01．对话框UI系统/\"*.ts \"TS/系统/09．表现系统/01．对话框UI系统.ts\")",
       "Bash(wc -l \"TS/系统/09．表现系统/01．对话框UI系统/\"*.ts)",
       "Bash(npx tsc:*)",
-      "Bash(wc -l \"TS/系统/09．表现系统/01．对话框系统/\"*.ts)"
+      "Bash(wc -l \"TS/系统/09．表现系统/01．对话框系统/\"*.ts)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.01．封装函数/lib.扩展函数.封装函数.01．通用工具.index/g' {} \\\\;)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.03．漂浮文字函数/lib.扩展函数.封装函数.03．漂浮文字.index/g' {} \\\\;)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.04．硬件函数/lib.扩展函数.封装函数.04．硬件输入.index/g' {} \\\\;)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.05．泄露审计/lib.扩展函数.封装函数.05．泄露审计.index/g' {} \\\\;)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.08．伤害函数/lib.扩展函数.封装函数.06．伤害函数.index/g' {} \\\\;)",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.13．镜头函数/lib.扩展函数.封装函数.07．镜头函数.index/g' {} \\\\;)",
+      "Bash(mv \"TS/系统/00．核心系统/06．UI函数.ts\" \"TS/系统/00．核心系统/01．UI函数.ts\")",
+      "Bash(mv \"TS/系统/00．核心系统/14．颜色常量.ts\" \"TS/系统/00．核心系统/02．颜色常量.ts\")",
+      "Bash(find 系统 -name \"*.ts\" -type f -exec sed -i 's/系统\\\\.00．核心系统\\\\.06．UI函数/系统.00．核心系统.01．UI函数/g' {} \\\\;)"
     ]
   }
 }

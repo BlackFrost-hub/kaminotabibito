@@ -7,12 +7,12 @@ local taskUI = ____03_FF0E_4EFB_52A1UI.taskUI
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
-local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
-local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
-local KEY_LETTER = ____04_FF0E_786C_4EF6_51FD_6570.KEY_LETTER
+local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local registerKeyDown = ____index.registerKeyDown
+local KEY_LETTER = ____index.KEY_LETTER
 --- 任务系统测试
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
 local function debugPrint(self, msg)
     local pr = _G.print

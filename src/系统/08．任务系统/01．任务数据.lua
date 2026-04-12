@@ -250,7 +250,6 @@ function ____exports.createTestQuests(self)
         rewards = {{type = "item", value = 0, itemId = "item_iron_sword", description = "铁剑"}, {type = "gold", value = 30, description = "30金币"}},
         status = ____exports.QuestStatus.UNDISCOVERED,
         requiredLevel = 3,
-        requiredQuests = {"main_001"},
         zone = "矿山",
         icon = "ReplaceableTextures\\CommandButtons\\BTNIronForge.blp",
         createdAt = now(nil),

@@ -86,7 +86,7 @@ import {
   getWheelDelta,
   getMouseFocus,
   registerMouseWheel,
-} from "../00．核心系统/04．硬件函数";
+} from "../../lib/扩展函数/封装函数/04．硬件输入/index";
 import {
   createFrame,
   setFramePosition,
@@ -103,17 +103,17 @@ import {
   hideFrame,
   showFrame,
 } from "../09．表现系统/01．UI工具/index";
-import { VerticalScrollbarTrack } from "../09．表现系统/02．垂直滚动条轨道";
+import { VerticalScrollbarTrack } from "../09．表现系统/03．垂直滚动条轨道";
 import { questManager } from "./02．任务管理器";
 import { questDB, QuestType, QuestStatus, QuestData } from "./01．任务数据";
-import { SoundUI_ClickPlay } from "../00．核心系统/02．音效函数";
+import { SoundUI_ClickPlay } from "../../lib/扩展函数/封装函数/02．音效系统/index";
 import {
   DZ_TEXT_ALIGN_CENTER,
   applyDzTextFontAndAlignment,
   applyDzTextFontAndCenterAlignment,
   createTabLabelTextOnBackdrop,
   setupTransparentGlueHitLayer,
-} from "../00．核心系统/06．UI函数";
+} from "../00．核心系统/01．UI函数";
 
 // （以上常量/辅助函数已拆分到 `03．任务UI拆分/*`）
 
@@ -327,9 +327,9 @@ class TaskUI {
     this.vScrollTrack.syncThumbVisual(maxScroll);
   }
 
-  /** 内容不足一屏时隐藏轨道与滑块，避免多余滚动条 */
-  private updateScrollBarVisibility(maxScroll: number): void {
-    updateScrollBarVisibilityByJapi(japi, maxScroll, [this.scrollBarFrame, this.scrollThumbFrame, this.scrollThumbHitBtn]);
+  /** 无任务时隐藏轨道；有任务时始终显示轨道与滑块（内容不满一屏时滑块贴顶） */
+  private updateScrollBarVisibility(maxScroll: number, hasQuestRows: boolean): void {
+    updateScrollBarVisibilityByJapi(japi, maxScroll, [this.scrollBarFrame, this.scrollThumbFrame, this.scrollThumbHitBtn], hasQuestRows);
   }
 
   private clearList(): void {
@@ -418,7 +418,8 @@ class TaskUI {
         applyDzTextFontAndCenterAlignment,
         pushListItemFrame: (f: number) => this.listItemFrames.push(f),
         syncScrollThumb: (maxScroll: number) => this.syncScrollThumb(maxScroll),
-        updateScrollBarVisibility: (maxScroll: number) => this.updateScrollBarVisibility(maxScroll),
+        updateScrollBarVisibility: (maxScroll: number, hasQuestRows: boolean) =>
+          this.updateScrollBarVisibility(maxScroll, hasQuestRows),
         createListItem: (quest: any, rowTopRel: number, expanded: boolean) => this.createListItem(quest, rowTopRel, expanded),
       });
     });

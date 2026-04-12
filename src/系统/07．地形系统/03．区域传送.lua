@@ -16,7 +16,7 @@ local panCameraToTimedForPlayer = ____01_FF0E_955C_5934_7CFB_7EDF.panCameraToTim
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
 -- - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
 local regionMap = __TS__New(Map)
 local function dbg(self, _msg)

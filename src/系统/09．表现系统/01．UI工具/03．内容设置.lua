@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
-local frameSetScriptByCode = ____04_FF0E_786C_4EF6_51FD_6570.frameSetScriptByCode
+local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local frameSetScriptByCode = ____index.frameSetScriptByCode
 local ____00_FF0E_7C7B_578B_5B9A_4E49 = require("系统.09．表现系统.01．UI工具.00．类型定义")
 local EventType = ____00_FF0E_7C7B_578B_5B9A_4E49.EventType
 local japi = require("jass.japi")

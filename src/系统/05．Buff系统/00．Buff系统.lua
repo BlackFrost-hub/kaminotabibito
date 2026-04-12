@@ -145,7 +145,7 @@ function maybeStopSyncTimer(self)
     end
 end
 jass = require("jass.common")
-local leakCore = require("系统.00．核心系统.05．泄露审计")
+local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
 local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_0 == nil then
     ____leakCore_LeakWatcher_0 = leakCore

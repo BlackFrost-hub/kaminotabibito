@@ -8,6 +8,7 @@ const jass = require("jass.common") as any;
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
 import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
 import { runNpcInitAction } from "./05．NPC初始化动作";
+import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/15．NPC头顶与气泡特效";
 
 // 获取全局print函数
 const _print = (globalThis as any).print as (...args: any[]) => void;
@@ -52,6 +53,8 @@ function createSingleNPC(npcConfig: NPCData): any {
 
   // 初始化动作（例如商店物品池调整）
   runNpcInitAction(unit, npcConfig.initAction);
+
+  tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
 
   _print("[NPC生成器] 成功创建NPC: " + tostring(npcConfig.NpcNameID) + " at (" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")");
   return unit;

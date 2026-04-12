@@ -7,12 +7,12 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
-const { stringToFourCC, withTimer } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC, withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
   withTimer: (delaySec: number, callback: () => void) => void;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
-const { Sound3DII_Mp3Play } = require("系统.00．核心系统.02．音效函数") as {
+const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3Play: (path: string, player?: any) => void;
 };
 

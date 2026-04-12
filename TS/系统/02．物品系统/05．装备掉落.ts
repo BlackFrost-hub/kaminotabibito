@@ -12,7 +12,7 @@
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [key: string]: any };
 const equipExcrete = require("系统.02．物品系统.09．装备排泄") as { setLastCreatedItem: (item: any) => void };
-const { stringToFourCC, isSpecialUnit } = require("系统.00．核心系统.01．封装函数") as {
+const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
   isSpecialUnit: (unit: any) => boolean;
 };

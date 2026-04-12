@@ -29,13 +29,13 @@ local ____exports = {}
 --   - h00C:20->I034*1;20%I036*1:5
 local jass = require("jass.common")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
 local stopTimer = ____require_result_0.stopTimer
 local createTimedEffect = ____require_result_0.createTimedEffect
-local ____require_result_1 = require("系统.00．核心系统.03．漂浮文字函数")
+local ____require_result_1 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
 local CreateFloatTextAtPoint = ____require_result_1.CreateFloatTextAtPoint
-local ____require_result_2 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_2.stringToFourCC
 local fourCCToString = ____require_result_2.fourCCToString
 local CAMPFIRE_ID = 1747988547

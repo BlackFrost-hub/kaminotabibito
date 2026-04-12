@@ -1,0 +1,37 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * 硬件输入 - 内部工具
+ */
+
+const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+
+// -------------------- 内部工具：注入/查找 --------------------
+
+/**
+ * @deprecated 仅保留给历史兼容；新代码禁止用：TSTL 会对「取出再调」编成 f(nil,...) 导致 JAPI 参数错位。
+ * 请改用 `const japi = require("jass.japi"); japi.DzXxx(...)` 直接点号调用。
+ */
+export function japiFn(name: string): ((...args: any[]) => any) | null {
+  const f = (japi as any)[name];
+  return typeof f === "function" ? f : null;
+}
+
+// -------------------- 存在性检查 --------------------
+
+export function has(name: string): boolean {
+  return typeof (japi as any)[name] === "function";
+}
+
+export function isHardwareAPIAvailable(): boolean {
+  return (
+    typeof (japi as any).DzIsKeyDown === "function" &&
+    typeof (japi as any).DzGetMouseX === "function" &&
+    typeof (japi as any).DzGetMouseY === "function"
+  );
+}
+
+export function createTriggerOrNull(): any {
+  if (typeof (jass as any).CreateTrigger !== "function") return null;
+  return (jass as any).CreateTrigger();
+}

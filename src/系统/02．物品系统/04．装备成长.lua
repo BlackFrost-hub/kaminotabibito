@@ -17,7 +17,7 @@ local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
 local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
-local ____require_result_1 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local AddGoldWithFeedback = ____require_result_1.AddGoldWithFeedback
 local fourCCToString = ____require_result_1.fourCCToString
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）

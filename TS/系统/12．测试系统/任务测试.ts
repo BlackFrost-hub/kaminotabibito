@@ -4,14 +4,14 @@
 
 const jass = require("jass.common") as any;
 
-const { withTimer } = require("系统.00．核心系统.01．封装函数") as {
+const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   withTimer: (delaySec: number, callback: () => void) => any;
 };
 
 import { questManager } from "../08．任务系统/02．任务管理器";
 import { taskUI } from "../08．任务系统/03．任务UI";
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
-import { registerKeyDown, KEY_LETTER } from "../00．核心系统/04．硬件函数";
+import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数/04．硬件输入/index";
 
 function debugPrint(msg: string): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;

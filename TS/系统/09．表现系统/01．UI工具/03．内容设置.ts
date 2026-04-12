@@ -1,6 +1,6 @@
 const japi = require("jass.japi") as any;
 
-import { frameSetScriptByCode } from "../../00．核心系统/04．硬件函数";
+import { frameSetScriptByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { EventType } from "./00．类型定义";
 
 // ========== 虚拟分区：视觉内容 ==========

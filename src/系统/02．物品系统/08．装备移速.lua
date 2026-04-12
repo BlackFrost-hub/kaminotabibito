@@ -56,7 +56,7 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
 end
 jass = require("jass.common")
 itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("系统.00．核心系统.01．封装函数")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 fourCCToString = ____require_result_0.fourCCToString
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
 local SGSS_SetState = ____require_result_1.SGSS_SetState

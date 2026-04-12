@@ -9,7 +9,7 @@ import {
   QUEST_ROW_ICON_Y_OFFSET,
   BG_TEX,
 } from "./01．任务UI常量";
-import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系统/06．UI函数";
+import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系统/01．UI函数";
 import { getStatusText, isQuestWithRowIconLayout, tryCreateFromFdfOnly } from "./02．任务UI辅助";
 import { getQuestItemHeight } from "./03．任务UI列表与滚动";
 

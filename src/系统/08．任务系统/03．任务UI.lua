@@ -25,14 +25,14 @@ local ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E = require("系统.08．�
 local registerTaskUIHotkeys = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.registerTaskUIHotkeys
 local buildTaskMainPanel = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.buildTaskMainPanel
 local buildTaskEntryIcon = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.buildTaskEntryIcon
-local ____04_FF0E_786C_4EF6_51FD_6570 = require("系统.00．核心系统.04．硬件函数")
-local getGameUI = ____04_FF0E_786C_4EF6_51FD_6570.getGameUI
-local registerKeyDown = ____04_FF0E_786C_4EF6_51FD_6570.registerKeyDown
-local KEY = ____04_FF0E_786C_4EF6_51FD_6570.KEY
-local KEY_NUM = ____04_FF0E_786C_4EF6_51FD_6570.KEY_NUM
-local getWheelDelta = ____04_FF0E_786C_4EF6_51FD_6570.getWheelDelta
-local getMouseFocus = ____04_FF0E_786C_4EF6_51FD_6570.getMouseFocus
-local registerMouseWheel = ____04_FF0E_786C_4EF6_51FD_6570.registerMouseWheel
+local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local getGameUI = ____index.getGameUI
+local registerKeyDown = ____index.registerKeyDown
+local KEY = ____index.KEY
+local KEY_NUM = ____index.KEY_NUM
+local getWheelDelta = ____index.getWheelDelta
+local getMouseFocus = ____index.getMouseFocus
+local registerMouseWheel = ____index.registerMouseWheel
 local ____index = require("系统.09．表现系统.01．UI工具.index")
 local createFrame = ____index.createFrame
 local setFramePosition = ____index.setFramePosition
@@ -47,19 +47,19 @@ local FrameType = ____index.FrameType
 local FramePoint = ____index.FramePoint
 local hideFrame = ____index.hideFrame
 local showFrame = ____index.showFrame
-local ____02_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053 = require("系统.09．表现系统.02．垂直滚动条轨道")
-local VerticalScrollbarTrack = ____02_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053.VerticalScrollbarTrack
+local ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053 = require("系统.09．表现系统.03．垂直滚动条轨道")
+local VerticalScrollbarTrack = ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053.VerticalScrollbarTrack
 local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
 local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
-local ____02_FF0E_97F3_6548_51FD_6570 = require("系统.00．核心系统.02．音效函数")
-local SoundUI_ClickPlay = ____02_FF0E_97F3_6548_51FD_6570.SoundUI_ClickPlay
-local ____06_FF0EUI_51FD_6570 = require("系统.00．核心系统.06．UI函数")
-local applyDzTextFontAndAlignment = ____06_FF0EUI_51FD_6570.applyDzTextFontAndAlignment
-local applyDzTextFontAndCenterAlignment = ____06_FF0EUI_51FD_6570.applyDzTextFontAndCenterAlignment
-local createTabLabelTextOnBackdrop = ____06_FF0EUI_51FD_6570.createTabLabelTextOnBackdrop
-local setupTransparentGlueHitLayer = ____06_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
+local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
+local SoundUI_ClickPlay = ____index.SoundUI_ClickPlay
+local ____01_FF0EUI_51FD_6570 = require("系统.00．核心系统.01．UI函数")
+local applyDzTextFontAndAlignment = ____01_FF0EUI_51FD_6570.applyDzTextFontAndAlignment
+local applyDzTextFontAndCenterAlignment = ____01_FF0EUI_51FD_6570.applyDzTextFontAndCenterAlignment
+local createTabLabelTextOnBackdrop = ____01_FF0EUI_51FD_6570.createTabLabelTextOnBackdrop
+local setupTransparentGlueHitLayer = ____01_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
 --- 任务系统 - 全新任务 UI（魔兽原生风格）
 -- 层级：GameUI → TaskEntryIcon（绝对 ENTRY_X/Y）→ 点击；TaskMainPanel（TOPLEFT 相对入口 TOPLEFT：PANEL_REL_TO_ENTRY_*）→ 标签/滚动条/listContainer；
 -- listContainer 内：任务行/标题/目标/空列表（全部相对 listContainer，与装饰框对齐）。
@@ -310,8 +310,14 @@ function TaskUI.prototype.syncScrollThumb(self, maxScroll)
     end
     self.vScrollTrack:syncThumbVisual(maxScroll)
 end
-function TaskUI.prototype.updateScrollBarVisibility(self, maxScroll)
-    updateScrollBarVisibilityByJapi(nil, japi, maxScroll, {self.scrollBarFrame, self.scrollThumbFrame, self.scrollThumbHitBtn})
+function TaskUI.prototype.updateScrollBarVisibility(self, maxScroll, hasQuestRows)
+    updateScrollBarVisibilityByJapi(
+        nil,
+        japi,
+        maxScroll,
+        {self.scrollBarFrame, self.scrollThumbFrame, self.scrollThumbHitBtn},
+        hasQuestRows
+    )
 end
 function TaskUI.prototype.clearList(self)
     for ____, f in ipairs(self.listItemFrames) do
@@ -433,7 +439,7 @@ function TaskUI.prototype.refreshList(self)
                         return ____temp_5
                     end,
                     syncScrollThumb = function(____, maxScroll) return self:syncScrollThumb(maxScroll) end,
-                    updateScrollBarVisibility = function(____, maxScroll) return self:updateScrollBarVisibility(maxScroll) end,
+                    updateScrollBarVisibility = function(____, maxScroll, hasQuestRows) return self:updateScrollBarVisibility(maxScroll, hasQuestRows) end,
                     createListItem = function(____, quest, rowTopRel, expanded) return self:createListItem(quest, rowTopRel, expanded) end
                 }
             )

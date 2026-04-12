@@ -10,8 +10,8 @@ local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
 local ____03_FF0E_7269_54C1_4E0E_5E93_5B58 = require("lib.扩展函数.BJ函数.03．物品与库存")
 local RemoveItemFromStockBJ = ____03_FF0E_7269_54C1_4E0E_5E93_5B58.RemoveItemFromStockBJ
-local ____01_FF0E_5C01_88C5_51FD_6570 = require("系统.00．核心系统.01．封装函数")
-local stringToFourCC = ____01_FF0E_5C01_88C5_51FD_6570.stringToFourCC
+local ____index = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____index.stringToFourCC
 local function readFirstInt(self, text)
     local found = false
     local n = 0

@@ -1,6 +1,5 @@
 const jass = require("jass.common") as any;
 import { createUnitWithOptions } from "../../../../lib/扩展函数/自定义扩展函数/00．单位相关";
-
 export interface MainStoryNpcMap {
   自然守护者?: any;
   八云紫?: any;

@@ -39,7 +39,7 @@ import { createDotApplyStrategy } from "./02．DOT定义/07．DOT施加策略";
 import { createDotBaseUtils } from "./02．DOT定义/08．DOT基础工具";
 
 // ========== 虚拟分区：其它依赖 ==========
-const { fourCCToString } = require("系统.00．核心系统.01．封装函数") as {
+const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
 };
 const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as {
@@ -49,7 +49,7 @@ const damageEventModule = require("系统.04．伤害系统.01．伤害事件") 
     interval?: number
   ) => void;
 };
-const leakCore = require("系统.00．核心系统.05．泄露审计") as { LeakWatcher?: any };
+const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 
 // ========== 虚拟分区：DOT 类型配置与注册 ==========

@@ -141,14 +141,14 @@ local function bindKeyBN_once_min(self)
         pr("[keytest] missing basic jass funcs")
         return
     end
-    local f = japi.DzTriggerRegisterKeyEventByCode
-    if type(f) ~= "function" then
+    if type(japi.DzTriggerRegisterKeyEventByCode) ~= "function" then
         pr("[keytest] DzTriggerRegisterKeyEventByCode not function")
         return
     end
     local function bind(____, key, label)
         local trig = jass.CreateTrigger()
-        f(trig,
+        japi.DzTriggerRegisterKeyEventByCode(
+            trig,
             key,
             1,
             false,

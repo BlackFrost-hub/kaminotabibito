@@ -1,5 +1,5 @@
 import { RemoveItemFromStockBJ } from "../../../lib/扩展函数/BJ函数/03．物品与库存";
-import { stringToFourCC } from "../../00．核心系统/01．封装函数";
+import { stringToFourCC } from "../../../lib/扩展函数/封装函数/01．通用工具/index";
 
 // ========== 虚拟分区：基础解析 ==========
 function readFirstInt(text: string): number {

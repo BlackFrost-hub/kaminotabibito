@@ -2,7 +2,7 @@ const jass = require("jass.common") as any;
 const 伤害事件 = require("系统.04．伤害系统.01．伤害事件") as {
   MNAnyUnitDamaged: (trg: any, interval: number) => void;
 };
-const 伤害函数 = require("系统.00．核心系统.08．伤害函数") as {
+const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   YDWEIsEventDamageType: (damageType: any) => boolean;
   YDWEIsEventPhysicalDamage: () => boolean;
   YDWEIsEventAttackDamage: () => boolean;
