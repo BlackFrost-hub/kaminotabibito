@@ -9,5 +9,6 @@
 | [`equipment/`](equipment/) | 装备回复 `hot` 字段、`USE_ITEM` 双触发防重 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参/返回值、`YDLocal1Release` |
 | [`tooling/`](tooling/) | 调试输出、`print`、音效/漂浮字路径约定 |
+| [`agent-shared/`](agent-shared/) | 跨代理入口：约定先看本索引；Codex 等非 Cursor 代理同时参考根目录 `AGENTS.md` |
 
 带 YAML frontmatter 的 `.mdc` 仍可使用 `description`、`globs`、`alwaysApply` 控制是否自动注入上下文。

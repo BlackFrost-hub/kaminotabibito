@@ -8,75 +8,27 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import {
-  TASK_UI_TOC_PATHS,
-  TASK_UI_TOC_LOAD_KEY,
-  ENABLE_FDF_A,
-  ENABLE_FDF_B,
-  ENABLE_FDF_SCROLLBAR,
-  ENABLE_FDF_SCROLLBAR_BORDER,
-  ENABLE_FDF_SCROLLBAR_THUMB,
-  ENABLE_MOUSE_WHEEL_SCROLL,
-  ENTRY_W,
-  ENTRY_H,
-  ENTRY_X,
-  ENTRY_Y,
-  ENTRY_TITLE_TEXT_BOX_W,
-  ENTRY_TITLE_TEXT_BOX_H,
-  PANEL_W,
-  PANEL_H,
-  TAB_FRAME_W,
-  TAB_FRAME_H,
-  TAB_CATEGORY_FONT_SCALE,
-  LIST_ITEM_H,
-  BG_TEX,
-  PANEL_REL_TO_ENTRY_X,
-  PANEL_REL_TO_ENTRY_Y,
-  TAB_REL_Y,
-  LIST_VIEW_H,
-  SCROLLBAR_BOTTOM_INSET,
-  SCROLLBAR_TOP_INSET,
-  LIST_CONTAINER_REL_TO_PANEL_X,
-  LIST_CONTAINER_REL_TO_PANEL_Y,
-  LIST_CONTENT_LEFT_INSET,
-  LIST_CONTENT_TOP_INSET,
-  LIST_CONTAINER_W,
-  SCROLLBAR_W,
-  SCROLLBAR_REL_X,
-  SCROLL_THUMB_SIZE,
-  SCROLL_THUMB_TOP_COMPENSATION,
-  SCROLL_THUMB_BOTTOM_COMPENSATION,
-  THUMB_DRAG_TICK,
-  THUMB_DRAG_SENSITIVITY,
-  QUEST_ROW_ICON_HEIGHT_FACTOR,
-  QUEST_ROW_ICON_PAD_LEFT,
-  QUEST_ROW_TEXT_GAP_AFTER_ICON,
-  QUEST_ROW_ICON_Y_OFFSET,
-} from "./03．任务UI拆分/01．任务UI常量";
+  refreshTaskUIFacadeList,
+  createTaskUIListItem,
+  clearTaskUIList,
+} from "./04．任务UI拆分/09．任务UI列表控制";
 import {
-  dzGetLocalPlayer,
-  dzPlayer,
-  isQuestWithRowIconLayout,
-  isFdfFrameEnabled,
-  tryCreateFromFdfWithSource,
-  tryCreateFromFdfOnly,
-  getStatusText,
-  getQuestsForUI,
-  EMPTY_TEXTS,
-} from "./03．任务UI拆分/02．任务UI辅助";
+  registerTaskUIListWheel,
+  handleTaskUIListWheel,
+  syncTaskUIScrollThumb,
+  updateTaskUIScrollBarVisibility,
+} from "./04．任务UI拆分/10．任务UI滚动与滚轮";
 import {
-  getQuestItemHeight,
-  calcTotalContentHeight,
-  getMaxScroll,
-  clampScrollOffset,
-  isDescendantOf as isDescendantOfByJapi,
-  isWheelTargetForTaskList as isWheelTargetForTaskListByJapi,
-  computeNextScrollOffsetByWheel,
-  updateScrollBarVisibility as updateScrollBarVisibilityByJapi,
-  calcVisibleQuestRows,
-  refreshTaskUIList,
-} from "./03．任务UI拆分/03．任务UI列表与滚动";
-import { renderQuestRow } from "./03．任务UI拆分/04．任务UI渲染";
-import { registerTaskUIHotkeys, buildTaskMainPanel, buildTaskEntryIcon } from "./03．任务UI拆分/05．任务UI构建与热键";
+  registerTaskUIRefreshCallback,
+  showTaskUITabTooltip,
+  switchTaskUICategory,
+  toggleTaskUIPanel,
+  showTaskUIPanel,
+  hideTaskUIPanel,
+} from "./04．任务UI拆分/11．任务UI面板控制";
+import { registerTaskUIHotkeys } from "./04．任务UI拆分/05．任务UI热键";
+import { buildTaskEntryIcon } from "./04．任务UI拆分/06．任务UI入口图标";
+import { buildTaskMainPanel } from "./04．任务UI拆分/08．任务UI主面板与滚动";
 
 import {
   getGameUI,
@@ -97,29 +49,27 @@ import {
   setFramePointRelative,
   setFrameHoverEvents,
   createTextLabel,
-  loadTocOnce,
   FrameType,
   FramePoint,
   hideFrame,
   showFrame,
 } from "../09．表现系统/01．UI工具/index";
 import { VerticalScrollbarTrack } from "../09．表现系统/03．垂直滚动条轨道";
-import { questManager } from "./02．任务管理器";
-import { questDB, QuestType, QuestStatus, QuestData } from "./01．任务数据";
+import { questManager } from "./02．任务管理器/index";
+import { QuestType, QuestData } from "./01．任务数据";
 import { SoundUI_ClickPlay } from "../../lib/扩展函数/封装函数/02．音效系统/index";
 import {
-  DZ_TEXT_ALIGN_CENTER,
   applyDzTextFontAndAlignment,
   applyDzTextFontAndCenterAlignment,
   createTabLabelTextOnBackdrop,
   setupTransparentGlueHitLayer,
-} from "../00．核心系统/01．UI函数";
+} from "../00．核心系统/03．UI函数";
 
-// （以上常量/辅助函数已拆分到 `03．任务UI拆分/*`）
+// （以上常量/辅助函数已拆分到 `04．任务UI拆分/*`）
 
 class TaskUI {
   private entryFrame: number | null = null;
-  private entryText: number | null = null;
+private entryText: number | null = null;
   private mainPanel: number | null = null;
   private listContainer: number | null = null;
   private tabMain: number | null = null;
@@ -170,50 +120,11 @@ class TaskUI {
   }
 
   private registerRefreshCallback(): void {
-    questManager.registerUIRefreshCallback((_playerId: number, _questId?: string) => {
-      (pcall as any)(() => {
-        if (typeof jass.GetLocalPlayer !== "function") return;
-        const lp = jass.GetLocalPlayer();
-        if (lp == null) return;
-
-        if (!this.isVisible) return;
-        this.refreshList();
-      });
-    });
-  }
-
-  /** 从 frame 沿父链向上，是否落在 ancestor 子树内 */
-  private isDescendantOf(frame: number, ancestor: number): boolean {
-    return isDescendantOfByJapi(japi, frame, ancestor);
-  }
-
-  /** 滚轮是否应作用在任务列表（列表容器、滚动条轨道、滑块及其子帧） */
-  private isWheelTargetForTaskList(): boolean {
-    if (!this.mainPanel) return false;
-    return isWheelTargetForTaskListByJapi(
-      japi,
-      typeof getMouseFocus === "function" ? getMouseFocus : undefined,
-      this.listContainer,
-      this.scrollBarFrame,
-      this.scrollThumbFrame,
-      this.scrollThumbHitBtn
-    );
+    registerTaskUIRefreshCallback(this.getPanelControlContext(), () => this.refreshList());
   }
 
   private registerTaskListWheel(): void {
-    if (!ENABLE_MOUSE_WHEEL_SCROLL) return;
-    if (this.taskListWheelTrig) return;
-    this.taskListWheelTrig = registerMouseWheel(false, () => {
-      (pcall as any)(() => {
-        if (typeof jass.GetLocalPlayer !== "function") return;
-        const lp = jass.GetLocalPlayer();
-        if (lp == null) return;
-
-        if (!this.isVisible) return;
-        if (!this.isWheelTargetForTaskList()) return;
-        this.onListWheel();
-      });
-    });
+    this.taskListWheelTrig = registerTaskUIListWheel(this.getScrollContext(), () => this.refreshList());
   }
 
   private createEntryIcon(parent: number): void {
@@ -281,220 +192,58 @@ class TaskUI {
   }
 
   private onListWheel(): void {
-    const next = computeNextScrollOffsetByWheel(
-      typeof getWheelDelta === "function" ? getWheelDelta : undefined,
-      this.scrollOffset,
-      this.totalContentHeight,
-      LIST_VIEW_H
-    );
-    if (next === this.scrollOffset) return;
-    this.scrollOffset = next;
-    this.refreshList();
-  }
-
-  /** 手动同步圆形 thumb + 全局鼠标拖拽（逻辑在 `垂直滚动条轨道.ts`） */
-  private setupThumbDrag(): void {
-    if (!this.scrollThumbFrame || this.scrollThumbFrame === 0 || !this.mainPanel || !this.scrollBarFrame) return;
-    this.vScrollTrack?.destroy();
-    this.vScrollTrack = new VerticalScrollbarTrack({
-      trackFrame: this.scrollBarFrame,
-      thumbFrame: this.scrollThumbFrame,
-      hitButtonName: "TaskScrollThumbHit",
-      listViewHeightNorm: LIST_VIEW_H,
-      trackHeightNorm: LIST_VIEW_H,
-      thumbSizeNorm: SCROLL_THUMB_SIZE,
-      topCompensation: SCROLL_THUMB_TOP_COMPENSATION,
-      bottomCompensation: SCROLL_THUMB_BOTTOM_COMPENSATION,
-      dragTick: THUMB_DRAG_TICK,
-      sensitivity: THUMB_DRAG_SENSITIVITY,
-      getTotalContentHeight: () => this.totalContentHeight,
-      getScrollOffset: () => this.scrollOffset,
-      setScrollOffset: (v) => {
-        this.scrollOffset = v;
-      },
-      isInteractionEnabled: () => this.isVisible,
-      onScrollChanged: () => {
-        this.refreshList();
-      },
-      skipManualThumbSync: () => false,
-    });
-    this.vScrollTrack.attach();
-    this.scrollThumbHitBtn = this.vScrollTrack.getHitButtonFrame();
+    handleTaskUIListWheel(this.getScrollContext(), () => this.refreshList());
   }
 
   private syncScrollThumb(maxScroll: number): void {
-    if (!this.vScrollTrack) return;
-    this.vScrollTrack.syncThumbVisual(maxScroll);
+    syncTaskUIScrollThumb(this.getScrollContext(), maxScroll);
   }
 
   /** 无任务时隐藏轨道；有任务时始终显示轨道与滑块（内容不满一屏时滑块贴顶） */
   private updateScrollBarVisibility(maxScroll: number, hasQuestRows: boolean): void {
-    updateScrollBarVisibilityByJapi(japi, maxScroll, [this.scrollBarFrame, this.scrollThumbFrame, this.scrollThumbHitBtn], hasQuestRows);
+    updateTaskUIScrollBarVisibility(this.getScrollContext(), maxScroll, hasQuestRows);
   }
 
   private clearList(): void {
-    for (const f of this.listItemFrames) {
-      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(f, false);
-    }
-    if (typeof (japi as any).DzFrameShow === "function") {
-      for (const f of this.rowBackdropByQuestId.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-      for (const f of this.titleByQuestId.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-      for (const f of this.clickBtnByQuestId.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-      for (const f of this.objFrameByKey.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-      for (const f of this.failFrameByQuestId.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-      for (const f of this.rowIconByQuestId.values()) {
-        if (f !== 0) (japi as any).DzFrameShow(f, false);
-      }
-    }
-    this.listItemFrames = [];
+    clearTaskUIList(this.getListControlContext());
   }
 
   private showTabTooltip(msg: string): void {
-    if (typeof (japi as any).DzGetTriggerUIEventPlayer !== "function" || typeof (jass as any).DisplayTextToPlayer !== "function") return;
-    const p = (japi as any).DzGetTriggerUIEventPlayer();
-    if (p) (jass as any).DisplayTextToPlayer(p, 0, 0, msg);
+    showTaskUITabTooltip(msg);
   }
 
   private switchCategory(type: QuestType): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      this.currentCategory = type;
-      this.expandedQuestIds.clear();
-      this.scrollOffset = 0;
-      this.refreshList();
-    });
+    switchTaskUICategory(this.getPanelControlContext(), type, () => this.refreshList());
   }
 
   private toggleExpand(questId: string): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      if (this.expandedQuestIds.has(questId)) {
-        this.expandedQuestIds.delete(questId);
-      } else {
-        this.expandedQuestIds.add(questId);
-      }
-      this.refreshList();
-    });
+    const ctx = this.getListControlContext();
+    if (ctx.expandedQuestIds.has(questId)) {
+      ctx.expandedQuestIds.delete(questId);
+    } else {
+      ctx.expandedQuestIds.add(questId);
+    }
+    this.refreshList();
   }
 
   refreshList(): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      if (!this.mainPanel || !this.listContainer) return;
-      this.clearList();
-      refreshTaskUIList({
-        currentPlayerId: this.currentPlayerId,
-        currentCategory: this.currentCategory,
-        scrollOffset: this.scrollOffset,
-        setScrollOffset: (v: number) => {
-          this.scrollOffset = v;
-        },
-        setTotalContentHeight: (v: number) => {
-          this.totalContentHeight = v;
-        },
-        listContainer: this.listContainer,
-        expandedQuestIds: this.expandedQuestIds,
-        createTextLabel,
-        FramePoint,
-        applyDzTextFontAndCenterAlignment,
-        pushListItemFrame: (f: number) => this.listItemFrames.push(f),
-        syncScrollThumb: (maxScroll: number) => this.syncScrollThumb(maxScroll),
-        updateScrollBarVisibility: (maxScroll: number, hasQuestRows: boolean) =>
-          this.updateScrollBarVisibility(maxScroll, hasQuestRows),
-        createListItem: (quest: any, rowTopRel: number, expanded: boolean) => this.createListItem(quest, rowTopRel, expanded),
-      });
-    });
+    refreshTaskUIFacadeList(this.getListControlContext(), () => this.refreshList());
   }
 
   private createListItem(quest: QuestData, rowTopRel: number, expanded: boolean): number | null {
-    const listParent = this.listContainer;
-    if (!this.mainPanel || !listParent) return null;
-    const ok = renderQuestRow({
-      japi,
-      quest,
-      rowTopRel,
-      expanded,
-      listParent,
-      FrameType,
-      FramePoint,
-      createFrame,
-      createTextLabel,
-      setFrameTexture,
-      setFramePointRelative,
-      setFrameSize,
-      setFrameClickEvent,
-      showFrame,
-      applyDzTextFontAndAlignment,
-      onToggleExpand: (questId: string) => this.toggleExpand(questId),
-      onClickSound: () => SoundUI_ClickPlay(),
-      rowBackdropByQuestId: this.rowBackdropByQuestId,
-      titleByQuestId: this.titleByQuestId,
-      clickBtnByQuestId: this.clickBtnByQuestId,
-      objFrameByKey: this.objFrameByKey,
-      failFrameByQuestId: this.failFrameByQuestId,
-      rowIconByQuestId: this.rowIconByQuestId,
-      listItemFrames: this.listItemFrames,
-    });
-    if (!ok) return null;
-    return 0;
+    return createTaskUIListItem(this.getListControlContext(), quest, rowTopRel, expanded, () => this.refreshList());
   }
 
   private togglePanel(): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      this.isVisible = !this.isVisible;
-      if (this.isVisible) this.show(this.currentPlayerId);
-      else this.hide();
-    });
+    toggleTaskUIPanel(this.getPanelControlContext(), (playerId: number) => this.show(playerId), () => this.hide());
   }
 
   public show(playerId: number): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      if (!this.mainPanel) return;
-      this.currentPlayerId = playerId;
-      this.isVisible = true;
-      showFrame(this.mainPanel);
-      this.refreshList();
-    });
+    showTaskUIPanel(this.getPanelControlContext(), playerId, () => this.refreshList());
   }
 
   public hide(): void {
-    (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
-      if (!this.mainPanel) return;
-      this.vScrollTrack?.cancelDrag();
-      this.isVisible = false;
-      hideFrame(this.mainPanel);
-    });
+    hideTaskUIPanel(this.getPanelControlContext());
   }
 
   public registerHotkey(): void {
@@ -510,6 +259,97 @@ class TaskUI {
         this.currentPlayerId = pid;
       },
     });
+  }
+
+  /** 把门面类的字段包装成“列表控制模块”可消费的上下文，避免拆分文件直接持有 `this`。 */
+  private getListControlContext() {
+    return {
+      mainPanel: this.mainPanel,
+      listContainer: this.listContainer,
+      currentPlayerId: this.currentPlayerId,
+      currentCategory: this.currentCategory,
+      expandedQuestIds: this.expandedQuestIds,
+      listItemFrames: this.listItemFrames,
+      rowBackdropByQuestId: this.rowBackdropByQuestId,
+      titleByQuestId: this.titleByQuestId,
+      clickBtnByQuestId: this.clickBtnByQuestId,
+      objFrameByKey: this.objFrameByKey,
+      failFrameByQuestId: this.failFrameByQuestId,
+      rowIconByQuestId: this.rowIconByQuestId,
+      createTextLabel,
+      FramePoint,
+      FrameType,
+      createFrame,
+      setFrameTexture,
+      setFramePointRelative,
+      setFrameSize,
+      setFrameClickEvent,
+      showFrame,
+      applyDzTextFontAndCenterAlignment,
+      applyDzTextFontAndAlignment,
+      syncScrollThumb: (maxScroll: number) => this.syncScrollThumb(maxScroll),
+      updateScrollBarVisibility: (maxScroll: number, hasQuestRows: boolean) =>
+        this.updateScrollBarVisibility(maxScroll, hasQuestRows),
+      toggleExpand: (questId: string) => this.toggleExpand(questId),
+      getScrollOffset: () => this.scrollOffset,
+      setScrollOffset: (v: number) => {
+        this.scrollOffset = v;
+      },
+      getTotalContentHeight: () => this.totalContentHeight,
+      setTotalContentHeight: (v: number) => {
+        this.totalContentHeight = v;
+      },
+    };
+  }
+
+  /** 滚动模块只拿它真正关心的滚动状态与输入函数，降低耦合面。 */
+  private getScrollContext() {
+    return {
+      mainPanel: this.mainPanel,
+      listContainer: this.listContainer,
+      scrollBarFrame: this.scrollBarFrame,
+      scrollThumbFrame: this.scrollThumbFrame,
+      scrollThumbHitBtn: this.scrollThumbHitBtn,
+      taskListWheelTrig: this.taskListWheelTrig,
+      getMouseFocus: typeof getMouseFocus === "function" ? getMouseFocus : undefined,
+      getWheelDelta: typeof getWheelDelta === "function" ? getWheelDelta : undefined,
+      registerMouseWheel,
+      vScrollTrack: this.vScrollTrack,
+      isVisible: () => this.isVisible,
+      getScrollOffset: () => this.scrollOffset,
+      setScrollOffset: (v: number) => {
+        this.scrollOffset = v;
+      },
+      getTotalContentHeight: () => this.totalContentHeight,
+    };
+  }
+
+  /** 面板控制模块通过显式 getter/setter 读写状态，兼容 typescript-to-lua。 */
+  private getPanelControlContext() {
+    return {
+      mainPanel: this.mainPanel,
+      expandedQuestIds: this.expandedQuestIds,
+      vScrollTrack: this.vScrollTrack,
+      showFrame,
+      hideFrame,
+      questManager,
+      getCurrentCategory: () => this.currentCategory,
+      setCurrentCategory: (type: QuestType) => {
+        this.currentCategory = type;
+      },
+      getScrollOffset: () => this.scrollOffset,
+      setScrollOffset: (v: number) => {
+        this.scrollOffset = v;
+      },
+      isVisible: () => this.isVisible,
+      setVisible: (v: boolean) => {
+        this.isVisible = v;
+      },
+      getCurrentPlayerId: () => this.currentPlayerId,
+      setCurrentPlayerId: (v: number) => {
+        this.currentPlayerId = v;
+      },
+    };
   }
 }
 

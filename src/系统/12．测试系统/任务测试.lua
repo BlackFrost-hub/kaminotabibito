@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
+local ____index = require("系统.08．任务系统.02．任务管理器.index")
+local questManager = ____index.questManager
 local ____03_FF0E_4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
 local taskUI = ____03_FF0E_4EFB_52A1UI.taskUI
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")

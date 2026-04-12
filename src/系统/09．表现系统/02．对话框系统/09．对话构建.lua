@@ -28,7 +28,7 @@ local ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548 = require("系统.09．�
 local scheduleGrayQuestMarkerAfterBubbleFade = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleGrayQuestMarkerAfterBubbleFade
 local scheduleYellowQuestMarkerAfterBubbleFade = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleYellowQuestMarkerAfterBubbleFade
 local jass = require("jass.common")
-local ____UI_51FD_6570 = require("系统.00．核心系统.01．UI函数")
+local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1

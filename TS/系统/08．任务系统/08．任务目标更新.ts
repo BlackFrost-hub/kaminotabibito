@@ -18,7 +18,7 @@ const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展�
   STES_Register: (t: any, name: string) => void;
 };
 
-import { handleObjectiveUpdated } from "./02．任务管理器";
+import { handleObjectiveUpdated } from "./02．任务管理器/index";
 
 function debugPrint(msg: string): void {
   // debugPrint 暂时静音：只用于开发阶段

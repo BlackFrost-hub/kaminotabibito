@@ -51,7 +51,7 @@ const 地形系统 = require("系统.07．地形系统.index") as { init?: () =>
 if (typeof 地形系统.init === "function") 地形系统.init();
 
 // // ---------- 08．任务系统 ----------
-const 任务系统 = require("系统.08．任务系统.09．index") as { init?: () => void };
+const 任务系统 = require("系统.08．任务系统.10．index") as { init?: () => void };
 if (typeof 任务系统.init === "function") 任务系统.init();
 
 // // ---------- 09．表现系统 ----------

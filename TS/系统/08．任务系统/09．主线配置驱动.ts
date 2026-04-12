@@ -14,7 +14,7 @@ const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配�
   }>;
 };
 const { questDB, QuestType, QuestStatus } = require("系统.08．任务系统.01．任务数据") as any;
-const { questManager } = require("系统.08．任务系统.02．任务管理器") as any;
+const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as any;
 
 const YDGet = (globalThis as any).YDUserDataGet as ((t1: any, k1: any, k2: any, t2: any) => any) | undefined;
 const YDSet = (globalThis as any).YDUserDataSet as ((t1: any, k1: any, k2: any, t2: any, val: any) => void) | undefined;

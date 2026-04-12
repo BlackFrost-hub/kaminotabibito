@@ -2,8 +2,8 @@
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
-local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
+local ____index = require("系统.08．任务系统.02．任务管理器.index")
+local questManager = ____index.questManager
 local ____04_FF0E_4EFB_52A1STES_914D_7F6E_8868 = require("系统.08．任务系统.04．任务STES配置表")
 local QUEST_STES_OBJECTIVE_ROWS = ____04_FF0E_4EFB_52A1STES_914D_7F6E_8868.QUEST_STES_OBJECTIVE_ROWS
 --- 任务系统 — STES 多事件注册与回调（配置见 `04．任务STES配置表.ts`）

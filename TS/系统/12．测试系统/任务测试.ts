@@ -8,7 +8,7 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
   withTimer: (delaySec: number, callback: () => void) => any;
 };
 
-import { questManager } from "../08．任务系统/02．任务管理器";
+import { questManager } from "../08．任务系统/02．任务管理器/index";
 import { taskUI } from "../08．任务系统/03．任务UI";
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
 import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数/04．硬件输入/index";
@@ -44,7 +44,7 @@ export function testQuestAcceptComplete(): void {
   // 2) 只完成 03->02->01：这样 UI 里 01 会最底部，符合你之前的需求
   const completeOrder = ["main_003", "main_002", "main_001"];
   for (const questId of completeOrder) {
-    // obj1 required=5, obj2 required=1（与 createTestQuests 保持一致）
+    // obj1 required=5, obj2 required=1（与当前主线测试配置保持一致）
     questManager.updateQuestObjective(playerId, questId, "obj1", 5);
     questManager.updateQuestObjective(playerId, questId, "obj2", 1);
 

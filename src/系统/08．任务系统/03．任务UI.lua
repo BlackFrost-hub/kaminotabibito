@@ -3,28 +3,29 @@ local __TS__Class = ____lualib.__TS__Class
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local Map = ____lualib.Map
-local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.03．任务UI拆分.01．任务UI常量")
-local ENABLE_MOUSE_WHEEL_SCROLL = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_MOUSE_WHEEL_SCROLL
-local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
-local SCROLL_THUMB_SIZE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_SIZE
-local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_TOP_COMPENSATION
-local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
-local THUMB_DRAG_TICK = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_TICK
-local THUMB_DRAG_SENSITIVITY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_SENSITIVITY
-local ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8 = require("系统.08．任务系统.03．任务UI拆分.03．任务UI列表与滚动")
-local isDescendantOfByJapi = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.isDescendantOf
-local isWheelTargetForTaskListByJapi = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.isWheelTargetForTaskList
-local computeNextScrollOffsetByWheel = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.computeNextScrollOffsetByWheel
-local updateScrollBarVisibilityByJapi = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.updateScrollBarVisibility
-local refreshTaskUIList = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.refreshTaskUIList
-local ____04_FF0E_4EFB_52A1UI_6E32_67D3 = require("系统.08．任务系统.03．任务UI拆分.04．任务UI渲染")
-local renderQuestRow = ____04_FF0E_4EFB_52A1UI_6E32_67D3.renderQuestRow
-local ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E = require("系统.08．任务系统.03．任务UI拆分.05．任务UI构建与热键")
-local registerTaskUIHotkeys = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.registerTaskUIHotkeys
-local buildTaskMainPanel = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.buildTaskMainPanel
-local buildTaskEntryIcon = ____05_FF0E_4EFB_52A1UI_6784_5EFA_4E0E_70ED_952E.buildTaskEntryIcon
+local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.03．任务UI拆分.09．任务UI列表控制")
+local refreshTaskUIFacadeList = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.refreshTaskUIFacadeList
+local createTaskUIListItem = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.createTaskUIListItem
+local clearTaskUIList = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.clearTaskUIList
+local ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E = require("系统.08．任务系统.03．任务UI拆分.10．任务UI滚动与滚轮")
+local registerTaskUIListWheel = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.registerTaskUIListWheel
+local handleTaskUIListWheel = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.handleTaskUIListWheel
+local syncTaskUIScrollThumb = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.syncTaskUIScrollThumb
+local updateTaskUIScrollBarVisibility = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.updateTaskUIScrollBarVisibility
+local ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236 = require("系统.08．任务系统.03．任务UI拆分.11．任务UI面板控制")
+local registerTaskUIRefreshCallback = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.registerTaskUIRefreshCallback
+local showTaskUITabTooltip = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.showTaskUITabTooltip
+local switchTaskUICategory = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.switchTaskUICategory
+local toggleTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.toggleTaskUIPanel
+local showTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.showTaskUIPanel
+local hideTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.hideTaskUIPanel
+local ____05_FF0E_4EFB_52A1UI_70ED_952E = require("系统.08．任务系统.03．任务UI拆分.05．任务UI热键")
+local registerTaskUIHotkeys = ____05_FF0E_4EFB_52A1UI_70ED_952E.registerTaskUIHotkeys
+local ____06_FF0E_4EFB_52A1UI_5165_53E3_56FE_6807 = require("系统.08．任务系统.03．任务UI拆分.06．任务UI入口图标")
+local buildTaskEntryIcon = ____06_FF0E_4EFB_52A1UI_5165_53E3_56FE_6807.buildTaskEntryIcon
+local ____08_FF0E_4EFB_52A1UI_4E3B_9762_677F_4E0E_6EDA_52A8 = require("系统.08．任务系统.03．任务UI拆分.08．任务UI主面板与滚动")
+local buildTaskMainPanel = ____08_FF0E_4EFB_52A1UI_4E3B_9762_677F_4E0E_6EDA_52A8.buildTaskMainPanel
 local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local getGameUI = ____index.getGameUI
 local registerKeyDown = ____index.registerKeyDown
@@ -47,19 +48,17 @@ local FrameType = ____index.FrameType
 local FramePoint = ____index.FramePoint
 local hideFrame = ____index.hideFrame
 local showFrame = ____index.showFrame
-local ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053 = require("系统.09．表现系统.03．垂直滚动条轨道")
-local VerticalScrollbarTrack = ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053.VerticalScrollbarTrack
-local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
+local ____index = require("系统.08．任务系统.02．任务管理器.index")
+local questManager = ____index.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
 local SoundUI_ClickPlay = ____index.SoundUI_ClickPlay
-local ____01_FF0EUI_51FD_6570 = require("系统.00．核心系统.01．UI函数")
-local applyDzTextFontAndAlignment = ____01_FF0EUI_51FD_6570.applyDzTextFontAndAlignment
-local applyDzTextFontAndCenterAlignment = ____01_FF0EUI_51FD_6570.applyDzTextFontAndCenterAlignment
-local createTabLabelTextOnBackdrop = ____01_FF0EUI_51FD_6570.createTabLabelTextOnBackdrop
-local setupTransparentGlueHitLayer = ____01_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
+local ____03_FF0EUI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
+local applyDzTextFontAndAlignment = ____03_FF0EUI_51FD_6570.applyDzTextFontAndAlignment
+local applyDzTextFontAndCenterAlignment = ____03_FF0EUI_51FD_6570.applyDzTextFontAndCenterAlignment
+local createTabLabelTextOnBackdrop = ____03_FF0EUI_51FD_6570.createTabLabelTextOnBackdrop
+local setupTransparentGlueHitLayer = ____03_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
 --- 任务系统 - 全新任务 UI（魔兽原生风格）
 -- 层级：GameUI → TaskEntryIcon（绝对 ENTRY_X/Y）→ 点击；TaskMainPanel（TOPLEFT 相对入口 TOPLEFT：PANEL_REL_TO_ENTRY_*）→ 标签/滚动条/listContainer；
 -- listContainer 内：任务行/标题/目标/空列表（全部相对 listContainer，与装饰框对齐）。
@@ -119,69 +118,17 @@ function TaskUI.prototype.init(self)
     )
 end
 function TaskUI.prototype.registerRefreshCallback(self)
-    questManager:registerUIRefreshCallback(function(____, _playerId, _questId)
-        pcall(function ()
-                if type(jass.GetLocalPlayer) ~= "function" then
-                    return
-                end
-                local lp = jass.GetLocalPlayer()
-                if lp == nil then
-                    return
-                end
-                if not self.isVisible then
-                    return
-                end
-                self:refreshList()
-            end
-        )
-    end)
-end
-function TaskUI.prototype.isDescendantOf(self, frame, ancestor)
-    return isDescendantOfByJapi(nil, japi, frame, ancestor)
-end
-function TaskUI.prototype.isWheelTargetForTaskList(self)
-    if not self.mainPanel then
-        return false
-    end
-    return isWheelTargetForTaskListByJapi(
+    registerTaskUIRefreshCallback(
         nil,
-        japi,
-        type(getMouseFocus) == "function" and getMouseFocus or nil,
-        self.listContainer,
-        self.scrollBarFrame,
-        self.scrollThumbFrame,
-        self.scrollThumbHitBtn
+        self:getPanelControlContext(),
+        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.registerTaskListWheel(self)
-    if not ENABLE_MOUSE_WHEEL_SCROLL then
-        return
-    end
-    if self.taskListWheelTrig then
-        return
-    end
-    self.taskListWheelTrig = registerMouseWheel(
+    self.taskListWheelTrig = registerTaskUIListWheel(
         nil,
-        false,
-        function()
-            pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil then
-                        return
-                    end
-                    if not self.isVisible then
-                        return
-                    end
-                    if not self:isWheelTargetForTaskList() then
-                        return
-                    end
-                    self:onListWheel()
-                end
-            )
-        end
+        self:getScrollContext(),
+        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.createEntryIcon(self, parent)
@@ -255,292 +202,90 @@ function TaskUI.prototype.createMainPanel(self, parent)
     self.vScrollTrack = res.vScrollTrack
 end
 function TaskUI.prototype.onListWheel(self)
-    local next = computeNextScrollOffsetByWheel(
+    handleTaskUIListWheel(
         nil,
-        type(getWheelDelta) == "function" and getWheelDelta or nil,
-        self.scrollOffset,
-        self.totalContentHeight,
-        LIST_VIEW_H
+        self:getScrollContext(),
+        function() return self:refreshList() end
     )
-    if next == self.scrollOffset then
-        return
-    end
-    self.scrollOffset = next
-    self:refreshList()
-end
-function TaskUI.prototype.setupThumbDrag(self)
-    if not self.scrollThumbFrame or self.scrollThumbFrame == 0 or not self.mainPanel or not self.scrollBarFrame then
-        return
-    end
-    local ____opt_2 = self.vScrollTrack
-    if ____opt_2 ~= nil then
-        ____opt_2:destroy()
-    end
-    self.vScrollTrack = __TS__New(
-        VerticalScrollbarTrack,
-        {
-            trackFrame = self.scrollBarFrame,
-            thumbFrame = self.scrollThumbFrame,
-            hitButtonName = "TaskScrollThumbHit",
-            listViewHeightNorm = LIST_VIEW_H,
-            trackHeightNorm = LIST_VIEW_H,
-            thumbSizeNorm = SCROLL_THUMB_SIZE,
-            topCompensation = SCROLL_THUMB_TOP_COMPENSATION,
-            bottomCompensation = SCROLL_THUMB_BOTTOM_COMPENSATION,
-            dragTick = THUMB_DRAG_TICK,
-            sensitivity = THUMB_DRAG_SENSITIVITY,
-            getTotalContentHeight = function() return self.totalContentHeight end,
-            getScrollOffset = function() return self.scrollOffset end,
-            setScrollOffset = function(____, v)
-                self.scrollOffset = v
-            end,
-            isInteractionEnabled = function() return self.isVisible end,
-            onScrollChanged = function()
-                self:refreshList()
-            end,
-            skipManualThumbSync = function() return false end
-        }
-    )
-    self.vScrollTrack:attach()
-    self.scrollThumbHitBtn = self.vScrollTrack:getHitButtonFrame()
 end
 function TaskUI.prototype.syncScrollThumb(self, maxScroll)
-    if not self.vScrollTrack then
-        return
-    end
-    self.vScrollTrack:syncThumbVisual(maxScroll)
+    syncTaskUIScrollThumb(
+        nil,
+        self:getScrollContext(),
+        maxScroll
+    )
 end
 function TaskUI.prototype.updateScrollBarVisibility(self, maxScroll, hasQuestRows)
-    updateScrollBarVisibilityByJapi(
+    updateTaskUIScrollBarVisibility(
         nil,
-        japi,
+        self:getScrollContext(),
         maxScroll,
-        {self.scrollBarFrame, self.scrollThumbFrame, self.scrollThumbHitBtn},
         hasQuestRows
     )
 end
 function TaskUI.prototype.clearList(self)
-    for ____, f in ipairs(self.listItemFrames) do
-        if type(japi.DzFrameShow) == "function" then
-            japi.DzFrameShow(f, false)
-        end
-    end
-    if type(japi.DzFrameShow) == "function" then
-        for ____, f in __TS__Iterator(self.rowBackdropByQuestId:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-        for ____, f in __TS__Iterator(self.titleByQuestId:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-        for ____, f in __TS__Iterator(self.clickBtnByQuestId:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-        for ____, f in __TS__Iterator(self.objFrameByKey:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-        for ____, f in __TS__Iterator(self.failFrameByQuestId:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-        for ____, f in __TS__Iterator(self.rowIconByQuestId:values()) do
-            if f ~= 0 then
-                japi.DzFrameShow(f, false)
-            end
-        end
-    end
-    self.listItemFrames = {}
+    clearTaskUIList(
+        nil,
+        self:getListControlContext()
+    )
 end
 function TaskUI.prototype.showTabTooltip(self, msg)
-    if type(japi.DzGetTriggerUIEventPlayer) ~= "function" or type(jass.DisplayTextToPlayer) ~= "function" then
-        return
-    end
-    local p = japi.DzGetTriggerUIEventPlayer()
-    if p then
-        jass.DisplayTextToPlayer(p, 0, 0, msg)
-    end
+    showTaskUITabTooltip(nil, msg)
 end
 function TaskUI.prototype.switchCategory(self, ____type)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            self.currentCategory = ____type
-            self.expandedQuestIds:clear()
-            self.scrollOffset = 0
-            self:refreshList()
-        end
+    switchTaskUICategory(
+        nil,
+        self:getPanelControlContext(),
+        ____type,
+        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.toggleExpand(self, questId)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            if self.expandedQuestIds:has(questId) then
-                self.expandedQuestIds:delete(questId)
-            else
-                self.expandedQuestIds:add(questId)
-            end
-            self:refreshList()
-        end
-    )
+    local ctx = self:getListControlContext()
+    if ctx.expandedQuestIds:has(questId) then
+        ctx.expandedQuestIds:delete(questId)
+    else
+        ctx.expandedQuestIds:add(questId)
+    end
+    self:refreshList()
 end
 function TaskUI.prototype.refreshList(self)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            if not self.mainPanel or not self.listContainer then
-                return
-            end
-            self:clearList()
-            refreshTaskUIList(
-                nil,
-                {
-                    currentPlayerId = self.currentPlayerId,
-                    currentCategory = self.currentCategory,
-                    scrollOffset = self.scrollOffset,
-                    setScrollOffset = function(____, v)
-                        self.scrollOffset = v
-                    end,
-                    setTotalContentHeight = function(____, v)
-                        self.totalContentHeight = v
-                    end,
-                    listContainer = self.listContainer,
-                    expandedQuestIds = self.expandedQuestIds,
-                    createTextLabel = createTextLabel,
-                    FramePoint = FramePoint,
-                    applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
-                    pushListItemFrame = function(____, f)
-                        local ____self_listItemFrames_4 = self.listItemFrames
-                        local ____temp_5 = #____self_listItemFrames_4 + 1
-                        ____self_listItemFrames_4[____temp_5] = f
-                        return ____temp_5
-                    end,
-                    syncScrollThumb = function(____, maxScroll) return self:syncScrollThumb(maxScroll) end,
-                    updateScrollBarVisibility = function(____, maxScroll, hasQuestRows) return self:updateScrollBarVisibility(maxScroll, hasQuestRows) end,
-                    createListItem = function(____, quest, rowTopRel, expanded) return self:createListItem(quest, rowTopRel, expanded) end
-                }
-            )
-        end
+    refreshTaskUIFacadeList(
+        nil,
+        self:getListControlContext(),
+        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
-    local listParent = self.listContainer
-    if not self.mainPanel or not listParent then
-        return nil
-    end
-    local ok = renderQuestRow(
+    return createTaskUIListItem(
         nil,
-        {
-            japi = japi,
-            quest = quest,
-            rowTopRel = rowTopRel,
-            expanded = expanded,
-            listParent = listParent,
-            FrameType = FrameType,
-            FramePoint = FramePoint,
-            createFrame = createFrame,
-            createTextLabel = createTextLabel,
-            setFrameTexture = setFrameTexture,
-            setFramePointRelative = setFramePointRelative,
-            setFrameSize = setFrameSize,
-            setFrameClickEvent = setFrameClickEvent,
-            showFrame = showFrame,
-            applyDzTextFontAndAlignment = applyDzTextFontAndAlignment,
-            onToggleExpand = function(____, questId) return self:toggleExpand(questId) end,
-            onClickSound = function() return SoundUI_ClickPlay(nil) end,
-            rowBackdropByQuestId = self.rowBackdropByQuestId,
-            titleByQuestId = self.titleByQuestId,
-            clickBtnByQuestId = self.clickBtnByQuestId,
-            objFrameByKey = self.objFrameByKey,
-            failFrameByQuestId = self.failFrameByQuestId,
-            rowIconByQuestId = self.rowIconByQuestId,
-            listItemFrames = self.listItemFrames
-        }
+        self:getListControlContext(),
+        quest,
+        rowTopRel,
+        expanded,
+        function() return self:refreshList() end
     )
-    if not ok then
-        return nil
-    end
-    return 0
 end
 function TaskUI.prototype.togglePanel(self)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            self.isVisible = not self.isVisible
-            if self.isVisible then
-                self:show(self.currentPlayerId)
-            else
-                self:hide()
-            end
-        end
+    toggleTaskUIPanel(
+        nil,
+        self:getPanelControlContext(),
+        function(____, playerId) return self:show(playerId) end,
+        function() return self:hide() end
     )
 end
 function TaskUI.prototype.show(self, playerId)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            if not self.mainPanel then
-                return
-            end
-            self.currentPlayerId = playerId
-            self.isVisible = true
-            showFrame(nil, self.mainPanel)
-            self:refreshList()
-        end
+    showTaskUIPanel(
+        nil,
+        self:getPanelControlContext(),
+        playerId,
+        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.hide(self)
-    pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
-            if not self.mainPanel then
-                return
-            end
-            local ____opt_6 = self.vScrollTrack
-            if ____opt_6 ~= nil then
-                ____opt_6:cancelDrag()
-            end
-            self.isVisible = false
-            hideFrame(nil, self.mainPanel)
-        end
+    hideTaskUIPanel(
+        nil,
+        self:getPanelControlContext()
     )
 end
 function TaskUI.prototype.registerHotkey(self)
@@ -559,6 +304,90 @@ function TaskUI.prototype.registerHotkey(self)
             end
         }
     )
+end
+function TaskUI.prototype.getListControlContext(self)
+    return {
+        mainPanel = self.mainPanel,
+        listContainer = self.listContainer,
+        currentPlayerId = self.currentPlayerId,
+        currentCategory = self.currentCategory,
+        expandedQuestIds = self.expandedQuestIds,
+        listItemFrames = self.listItemFrames,
+        rowBackdropByQuestId = self.rowBackdropByQuestId,
+        titleByQuestId = self.titleByQuestId,
+        clickBtnByQuestId = self.clickBtnByQuestId,
+        objFrameByKey = self.objFrameByKey,
+        failFrameByQuestId = self.failFrameByQuestId,
+        rowIconByQuestId = self.rowIconByQuestId,
+        createTextLabel = createTextLabel,
+        FramePoint = FramePoint,
+        FrameType = FrameType,
+        createFrame = createFrame,
+        setFrameTexture = setFrameTexture,
+        setFramePointRelative = setFramePointRelative,
+        setFrameSize = setFrameSize,
+        setFrameClickEvent = setFrameClickEvent,
+        showFrame = showFrame,
+        applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
+        applyDzTextFontAndAlignment = applyDzTextFontAndAlignment,
+        syncScrollThumb = function(____, maxScroll) return self:syncScrollThumb(maxScroll) end,
+        updateScrollBarVisibility = function(____, maxScroll, hasQuestRows) return self:updateScrollBarVisibility(maxScroll, hasQuestRows) end,
+        toggleExpand = function(____, questId) return self:toggleExpand(questId) end,
+        getScrollOffset = function() return self.scrollOffset end,
+        setScrollOffset = function(____, v)
+            self.scrollOffset = v
+        end,
+        getTotalContentHeight = function() return self.totalContentHeight end,
+        setTotalContentHeight = function(____, v)
+            self.totalContentHeight = v
+        end
+    }
+end
+function TaskUI.prototype.getScrollContext(self)
+    return {
+        mainPanel = self.mainPanel,
+        listContainer = self.listContainer,
+        scrollBarFrame = self.scrollBarFrame,
+        scrollThumbFrame = self.scrollThumbFrame,
+        scrollThumbHitBtn = self.scrollThumbHitBtn,
+        taskListWheelTrig = self.taskListWheelTrig,
+        getMouseFocus = type(getMouseFocus) == "function" and getMouseFocus or nil,
+        getWheelDelta = type(getWheelDelta) == "function" and getWheelDelta or nil,
+        registerMouseWheel = registerMouseWheel,
+        vScrollTrack = self.vScrollTrack,
+        isVisible = function() return self.isVisible end,
+        getScrollOffset = function() return self.scrollOffset end,
+        setScrollOffset = function(____, v)
+            self.scrollOffset = v
+        end,
+        getTotalContentHeight = function() return self.totalContentHeight end
+    }
+end
+function TaskUI.prototype.getPanelControlContext(self)
+    return {
+        mainPanel = self.mainPanel,
+        expandedQuestIds = self.expandedQuestIds,
+        vScrollTrack = self.vScrollTrack,
+        showFrame = showFrame,
+        hideFrame = hideFrame,
+        questManager = questManager,
+        getCurrentCategory = function() return self.currentCategory end,
+        setCurrentCategory = function(____, ____type)
+            self.currentCategory = ____type
+        end,
+        getScrollOffset = function() return self.scrollOffset end,
+        setScrollOffset = function(____, v)
+            self.scrollOffset = v
+        end,
+        isVisible = function() return self.isVisible end,
+        setVisible = function(____, v)
+            self.isVisible = v
+        end,
+        getCurrentPlayerId = function() return self.currentPlayerId end,
+        setCurrentPlayerId = function(____, v)
+            self.currentPlayerId = v
+        end
+    }
 end
 ____exports.taskUI = __TS__New(TaskUI)
 function ____exports.init(self)

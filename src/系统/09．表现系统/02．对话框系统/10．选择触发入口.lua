@@ -17,7 +17,7 @@ local buildQuestCompletedDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestComp
 local buildQuestInProgressDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
 local buildQuestOfferDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
 local jass = require("jass.common")
-local ____UI_51FD_6570 = require("系统.00．核心系统.01．UI函数")
+local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
 function ____exports.initDialogEntrySelectionTrigger(self)
     ensureQuestConfigsRegistered(nil)

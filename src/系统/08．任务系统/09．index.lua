@@ -18,7 +18,7 @@ do
     end
 end
 do
-    local ____export = require("系统.08．任务系统.02．任务管理器")
+    local ____export = require("系统.08．任务系统.02．任务管理器.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -74,7 +74,7 @@ do
     end
 end
 require("系统.08．任务系统.01．任务数据")
-local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器.index")
 if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
     _____4EFB_52A1_7BA1_7406_5668:init()
 end

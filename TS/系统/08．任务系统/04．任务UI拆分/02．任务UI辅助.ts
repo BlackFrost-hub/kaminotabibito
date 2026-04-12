@@ -8,7 +8,7 @@ import {
   ENABLE_FDF_SCROLLBAR_THUMB,
 } from "./01．任务UI常量";
 import { loadTocOnce } from "../../09．表现系统/01．UI工具/index";
-import { questManager } from "../02．任务管理器";
+import { questManager } from "../02．任务管理器/index";
 import { questDB, QuestType, QuestStatus, QuestData } from "../01．任务数据";
 
 const jass = require("jass.common") as any;

@@ -1,5 +1,5 @@
 /**
- * 任务系统 — STES 多事件注册与回调（配置见 `04．任务STES配置表.ts`）
+ * 任务系统 — STES 多事件注册与回调（配置见 `05．任务STES配置表.ts`）
  *
  * =============================================================================
  * 传参方式（与 `05．BuffJASS桥接` / `07．装备提取` 一致：YDLocal5 子触发、中文变量名）
@@ -45,8 +45,8 @@ const {
 
 import type { QuestData, QuestObjective } from "./01．任务数据";
 import { questDB } from "./01．任务数据";
-import { questManager } from "./02．任务管理器";
-import { QUEST_STES_OBJECTIVE_ROWS, type QuestStesObjectiveRow } from "./04．任务STES配置表";
+import { questManager } from "./02．任务管理器/index";
+import { QUEST_STES_OBJECTIVE_ROWS, type QuestStesObjectiveRow } from "./05．任务STES配置表";
 
 /** 与地图 YDLocal5Set 对齐 */
 const YL_BOOL_USE_PRESET_PLAYER = "任务使用预设玩家编号";

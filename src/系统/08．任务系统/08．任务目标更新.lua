@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
-local handleObjectiveUpdated = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.handleObjectiveUpdated
+local ____index = require("系统.08．任务系统.02．任务管理器.index")
+local handleObjectiveUpdated = ____index.handleObjectiveUpdated
 --- 任务系统 - "目标更新"事件桥接
 -- 
 -- 设计目标：

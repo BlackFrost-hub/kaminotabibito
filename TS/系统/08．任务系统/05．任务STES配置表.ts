@@ -54,11 +54,6 @@ export interface QuestStesObjectiveRow {
  * 后续可用脚本从 Excel 生成/合并进此对象；AI 修改时请保持键与 JASS 侧一致。
  */
 export const QUEST_STES_OBJECTIVE_ROWS: Record<string, QuestStesObjectiveRow> = {
-  /**
-   * 示例（可删）：与 createTestQuests 里 side_002「击杀步兵」对应。
-   * 地图 STES 里写事件名「击杀步兵」时，会推进 side_002 / obj1。
-   */
-  击杀步兵: { questId: "side_002", objectiveId: "obj1", mode: "add", amount: 1 },
   // 在 Excel 增加一行并在导出后在此添加，例如：
   // 击杀豺狼人: { questId: "你的任务id", objectiveId: "obj1", mode: "add", amount: 1 },
 };

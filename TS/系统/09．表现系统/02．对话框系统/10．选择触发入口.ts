@@ -1,5 +1,5 @@
 const jass = require("jass.common") as any;
-const UI函数 = require("系统.00．核心系统.01．UI函数") as {
+const UI函数 = require("系统.00．核心系统.03．UI函数") as {
   openNpcDialog: (player: any, data: any) => void;
 };
 
