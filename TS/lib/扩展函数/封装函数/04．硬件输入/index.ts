@@ -18,4 +18,4 @@ export * from "./06．窗口函数";
 export * from "./07．Frame函数";
 
 // 测试按键模块会自动初始化
-import "./08．测试按键";
+

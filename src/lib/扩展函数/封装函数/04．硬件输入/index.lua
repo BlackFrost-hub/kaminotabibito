@@ -1,6 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-require("lib.扩展函数.封装函数.04．硬件输入.08．测试按键")
 do
     local ____export = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
     for ____exportKey, ____exportValue in pairs(____export) do
