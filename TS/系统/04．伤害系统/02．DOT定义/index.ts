@@ -28,8 +28,4 @@ require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具");
  * 初始化DOT定义模块
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[DOT定义] 初始化完成");
-  }
 }

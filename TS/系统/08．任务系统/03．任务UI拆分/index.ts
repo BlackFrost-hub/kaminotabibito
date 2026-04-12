@@ -25,8 +25,4 @@ require("系统.08．任务系统.03．任务UI拆分.05．任务UI构建与热�
  * 初始化任务UI拆分模块
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[任务UI拆分] 初始化完成");
-  }
 }

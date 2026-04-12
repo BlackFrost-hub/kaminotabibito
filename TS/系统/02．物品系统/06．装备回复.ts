@@ -11,7 +11,7 @@
  * 父遍历子触发须：`YDLocalExecuteTrigger` → `saveParentIndex` → `YDLocal5Set…` → `YDTriggerExecuteTrigger(false)`。
  *
  * 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
- * 规则：equip-heal-hot-format.md / equip-heal-use-item.md
+ * 规则：`.cursor/rules/equipment/heal-hot-format.md` / `heal-use-item.md`
  */
 
 const jass = require("jass.common") as any;

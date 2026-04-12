@@ -47,7 +47,6 @@ function QuestManager.prototype.initialize(self)
     questDB:acceptQuest(0, "side_002")
     self:setupWar3QuestSync()
     self.isInitialized = true
-    debugPrint(nil, "任务系统初始化完成")
 end
 function QuestManager.prototype.getPlayerHero(self, playerId)
     return findHeroOfPlayer(nil, playerId)

@@ -93,9 +93,5 @@ require("系统.08．任务系统.08．任务目标更新")
 require("系统.08．任务系统.10．主线配置驱动")
 --- 初始化任务系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[任务系统] 初始化完成")
-    end
 end
 return ____exports

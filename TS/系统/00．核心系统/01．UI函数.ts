@@ -14,7 +14,7 @@
  * - 勿用会走 `ExecuteFunc` 的 `DzFrameSetScript` 同步字符串去驱动 Lua 逻辑。
  * - 若 UI 回调里要 **发同步数据**，应走项目既有 **Sync** 封装，勿在帧回调里直接改游戏状态而不同步。
  *
- * 详细避坑经验见 `.cursor/rules/dzapi-ui-frame-types.mdc`。
+ * 详细避坑经验见 `.cursor/rules/dzapi/ui-frame-types.mdc`。
  */
 
 const japi = require("jass.japi") as any;

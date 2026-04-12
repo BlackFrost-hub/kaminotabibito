@@ -59,9 +59,5 @@ require("系统.08．任务系统.00．配置表.05．NPC初始化动作")
 require("系统.08．任务系统.00．配置表.06．主线任务配置表")
 --- 初始化任务系统配置表
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[任务系统配置表] 初始化完成")
-    end
 end
 return ____exports

@@ -149,9 +149,5 @@ if type(initDialogEntrySelectionTrigger) == "function" then
 end
 --- 初始化对话框系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[对话框系统] 初始化完成")
-    end
 end
 return ____exports

@@ -27,8 +27,4 @@ require("系统.09．表现系统.02．对话框系统.index");
  * 初始化表现系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[表现系统] 初始化完成");
-  }
 }

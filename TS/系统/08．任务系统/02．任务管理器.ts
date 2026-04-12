@@ -55,7 +55,7 @@ export class QuestManager {
     this.setupWar3QuestSync();
 
     this.isInitialized = true;
-    debugPrint("任务系统初始化完成");
+
   }
 
   /**

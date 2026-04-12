@@ -15,10 +15,6 @@ export function init(): void {
   if (typeof initMainStoryNPCsWithDelay === "function") {
     initMainStoryNPCsWithDelay(1.0);
   }
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[主线NPC] 初始化完成");
-  }
 }
 
 // 兼容旧入口

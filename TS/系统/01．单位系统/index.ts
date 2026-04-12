@@ -19,10 +19,6 @@ require("系统.01．单位系统.单位狂暴");
  * 初始化单位系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[单位系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）

@@ -59,4 +59,4 @@ abilList: "ID1,ID2,..."
 - `jass.GetUnitState(unit, UNIT_STATE_LIFE)` 取当前生命值
 - `jass.GetUnitState(unit, UNIT_STATE_MAX_MANA)` 取最大魔法值
 - 已损失HP = maxHP - currentHP
-- 防重 key 使用 globalThis（见 equip-heal-use-item.md）
+- 防重 key 使用 globalThis（见同目录 `heal-use-item.md`）

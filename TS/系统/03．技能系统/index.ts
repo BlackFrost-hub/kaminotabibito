@@ -21,10 +21,6 @@ if (typeof 显示技能名字2.initShowSkillName2 === "function") 显示技能�
  * 初始化技能系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[技能系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）

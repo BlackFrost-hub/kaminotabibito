@@ -25,8 +25,4 @@ require("lib.扩展函数.自定义扩展函数.index");
  * 初始化扩展函数
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[扩展函数] 初始化完成");
-  }
 }

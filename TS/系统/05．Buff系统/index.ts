@@ -20,10 +20,6 @@ require("系统.05．Buff系统.03．BuffJASS桥接");
  * 初始化Buff系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[Buff系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）

@@ -13,8 +13,4 @@ if (typeof 主线NPC.init === "function") 主线NPC.init();
  * 初始化单位创建
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[单位初始化创建] 初始化完成");
-  }
 }

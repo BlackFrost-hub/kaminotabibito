@@ -52,8 +52,4 @@ require("系统.08．任务系统.10．主线配置驱动");
  * 初始化任务系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[任务系统] 初始化完成");
-  }
 }

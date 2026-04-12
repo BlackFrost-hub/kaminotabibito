@@ -122,9 +122,5 @@ require("系统.02．物品系统.10．装备限制")
 --- 初始化物品系统
 -- 在 main.ts 中调用以确保所有模块已加载
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[物品系统] 初始化完成")
-    end
 end
 return ____exports

@@ -77,10 +77,6 @@ function ____exports.initializeNPCs(self)
             skippedCount = skippedCount + 1
         end
     end
-    _print(
-        nil,
-        ((("[NPC生成器] 初始化完成: 创建了 " .. tostring(createdCount)) .. " 个NPC, 跳过了 ") .. tostring(skippedCount)) .. " 个未启用的NPC"
-    )
 end
 --- 根据NPC名称查找并创建特定NPC（用于测试）
 -- 

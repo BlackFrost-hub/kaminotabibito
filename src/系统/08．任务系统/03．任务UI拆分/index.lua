@@ -47,9 +47,5 @@ require("系统.08．任务系统.03．任务UI拆分.04．任务UI渲染")
 require("系统.08．任务系统.03．任务UI拆分.05．任务UI构建与热键")
 --- 初始化任务UI拆分模块
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[任务UI拆分] 初始化完成")
-    end
 end
 return ____exports

@@ -28,9 +28,5 @@ require("系统.00．核心系统.01．UI函数")
 require("系统.00．核心系统.02．颜色常量")
 --- 初始化核心系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[核心系统] 初始化完成")
-    end
 end
 return ____exports

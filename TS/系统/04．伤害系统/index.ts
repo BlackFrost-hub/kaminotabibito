@@ -21,10 +21,6 @@ require("系统.04．伤害系统.03．伤害测试");
  * 初始化伤害系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[伤害系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）

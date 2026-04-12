@@ -23,8 +23,4 @@ require("系统.00．核心系统.02．颜色常量");
  * 初始化核心系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[核心系统] 初始化完成");
-  }
 }

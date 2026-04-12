@@ -15,10 +15,6 @@ function ____exports.init(self)
     if type(initMainStoryNPCsWithDelay) == "function" then
         initMainStoryNPCsWithDelay(nil, 1)
     end
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[主线NPC] 初始化完成")
-    end
 end
 function ____exports.initMainStoryNpcEntry(self)
     ____exports.init(nil)

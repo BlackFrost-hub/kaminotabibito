@@ -12,7 +12,7 @@ local ____exports = {}
 -- 父遍历子触发须：`YDLocalExecuteTrigger` → `saveParentIndex` → `YDLocal5Set…` → `YDTriggerExecuteTrigger(false)`。
 -- 
 -- 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
--- 规则：equip-heal-hot-format.md / equip-heal-use-item.md
+-- 规则：`.cursor/rules/equipment/heal-hot-format.md` / `heal-use-item.md`
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
 local STES_Register = ____require_result_0.STES_Register

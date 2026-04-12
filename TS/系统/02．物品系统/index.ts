@@ -56,12 +56,6 @@ require("系统.02．物品系统.10．装备限制");
  * 在 main.ts 中调用以确保所有模块已加载
  */
 export function init(): void {
-  // 物品系统通过模块加载自动初始化
-  // 此函数供外部显式调用以确保加载完成
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[物品系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）

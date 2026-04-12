@@ -74,9 +74,5 @@ require("系统.04．伤害系统.02．DOT定义.07．DOT施加策略")
 require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具")
 --- 初始化DOT定义模块
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[DOT定义] 初始化完成")
-    end
 end
 return ____exports

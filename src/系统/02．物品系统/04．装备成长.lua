@@ -11,7 +11,7 @@ local ____exports = {}
 --- 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
 -- 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
 -- 效果类型：Nstat / N%stat / Nexp / Nlevel / (level*N)stat / (level*N)exp
--- 规则详见 .cursor/rules/equip-heal-hot-format.md
+-- 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
 local jass = require("jass.common")
 local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default

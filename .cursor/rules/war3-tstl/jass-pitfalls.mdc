@@ -141,9 +141,3 @@ content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,"
 
 ## 12) `jass.xxx` 常量/全局变量：不依赖 `udg_*` 全局，改从事件入参传递
 
-`udg_TempUnit[6]`、`udg_TempDamageType` 等 JASS 全局在 Lua 里虽可访问，但伤害事件同步阶段结束后会被下一次事件覆盖；伤害流水线**不应**再依赖它们表示「当前这段伤害的来源」。
-
-**✅ 正确写法（与本项目 `01．伤害事件.ts` 一致）**
-
-- **来源单位**：在 `EVENT_UNIT_DAMAGED` 同步回调里立刻用 `GetEventDamageSource()`（或 `jass.GetEventDamageSource` 等，勿赋局部再调，见规则 2）快照为 `entry.source`，经 `registerDamageCallback` 的第 5 个参数传给后续逻辑。
-- **是否普攻**：在同步回调里用 `伤害函数.isNormalAttack()`（`pcall` 包裹）快照为 `entry.isNormalAttack`，经回调第 6 个参数传递；**不要**在 Timer 延后里再调 `isNormalAttack()` / `EXGetEventDamageData`，也不要用旧的 merged 位运算推断普攻。

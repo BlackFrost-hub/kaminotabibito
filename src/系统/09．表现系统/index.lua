@@ -49,9 +49,5 @@ require("系统.09．表现系统.03．垂直滚动条轨道")
 require("系统.09．表现系统.02．对话框系统.index")
 --- 初始化表现系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[表现系统] 初始化完成")
-    end
 end
 return ____exports

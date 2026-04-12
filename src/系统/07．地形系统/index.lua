@@ -53,9 +53,5 @@ if type(_____6FC0_6D3B_4F20_9001_70B9["init激活传送点"]) == "function" then
 end
 --- 初始化地形系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[地形系统] 初始化完成")
-    end
 end
 return ____exports

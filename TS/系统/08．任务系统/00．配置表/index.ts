@@ -27,8 +27,4 @@ require("系统.08．任务系统.00．配置表.06．主线任务配置表");
  * 初始化任务系统配置表
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[任务系统配置表] 初始化完成");
-  }
 }

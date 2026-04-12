@@ -27,7 +27,7 @@ alwaysApply: false
 
 ## 典型用法（Lua / TS）
 1. **确保地图已加载 STES 表**（`STES_GetTable()` 非 `null`）；若仍空，说明 JASS 初始化顺序或库未进图。
-2. **注册**：`CreateTrigger` + `TriggerAddAction(...)` + **`STES_GetTable()`** 后再 **`STES_Register(trig, "我的事件名")`**（**点号**调用模块导出函数，勿用 `stesMod:STES_Register`，见 `war3-tstl-jass-pitfalls` 规则 7）。
+2. **注册**：`CreateTrigger` + `TriggerAddAction(...)` + **`STES_GetTable()`** 后再 **`STES_Register(trig, "我的事件名")`**（**点号**调用模块导出函数，勿用 `stesMod:STES_Register`，见 `war3-tstl/jass-pitfalls.mdc` 规则 7）。
 3. **触发**：业务里 **`stesMod.STES_Fire("我的事件名")`**；需要与 GUI 一样先给子触发塞 `YDLocal5Set(real, key, 0)` 时用 **`STES_FireWithReal11Step("我的事件名", key)`**。
 4. **测试模块启动**：若 `require` 早于 JASS 绑表，可用 **单次短延时定时器**（如 `任意测试2.ts` 的 `ENTRY_DELAY_SEC`）再 `GetTable` / `LoadInteger` / `STES_Fire`，避免长轮询。
 
@@ -74,7 +74,7 @@ alwaysApply: false
 ### 子触发 Lua 内：`ydl_triggerstep` 必须先对齐（装备提取核心坑）
 - **`YDLocal5Get` / `YDLocal5Set` 使用全局 `ydl_triggerstep` 作为 YDLOC 子页**。JASS 在进子触发前会设置它；若 Lua **`TriggerAddAction` 入口**里该值未与 **`GetTriggeringTrigger()`** 同步，读参会落在 **错误页**，典型现象：**`YDLocal5Get("real", …)` 全是 0**、调试像「没传参」。
 - **修复**：在任意 **`YDLocal5Get` 之前**调用（与 `07．装备提取.ts` 一致）：
-  - `YDLocalExecuteTrigger(GetTriggeringTrigger())`（`GetTriggeringTrigger` 用 **`jass.GetTriggeringTrigger()`** 直接调，勿赋局部再调，见 `war3-tstl-jass-pitfalls` 规则 2）。
+  - `YDLocalExecuteTrigger(GetTriggeringTrigger())`（`GetTriggeringTrigger` 用 **`jass.GetTriggeringTrigger()`** 直接调，勿赋局部再调，见 `war3-tstl/jass-pitfalls.mdc` 规则 2）。
 - Buff 桥接等凡从 **YDLocal5** 读参的子触发，都应遵守同一步骤。
 
 ### 子触发结束后：恢复父 YDLOC 页再 `clearStar_PIndex`（父读 `YDLocal1Get` 为 0 的坑）

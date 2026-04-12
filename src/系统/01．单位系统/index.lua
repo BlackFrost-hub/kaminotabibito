@@ -20,9 +20,5 @@ require("系统.01．单位系统.00．单位初始化创建.index")
 require("系统.01．单位系统.单位狂暴")
 --- 初始化单位系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[单位系统] 初始化完成")
-    end
 end
 return ____exports

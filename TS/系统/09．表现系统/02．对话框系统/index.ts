@@ -38,8 +38,4 @@ if (typeof initDialogEntrySelectionTrigger === "function") initDialogEntrySelect
  * 初始化对话框系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[对话框系统] 初始化完成");
-  }
 }

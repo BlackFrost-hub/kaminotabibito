@@ -38,9 +38,5 @@ require("系统.04．伤害系统.02．DOT定义.index")
 require("系统.04．伤害系统.03．伤害测试")
 --- 初始化伤害系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[伤害系统] 初始化完成")
-    end
 end
 return ____exports

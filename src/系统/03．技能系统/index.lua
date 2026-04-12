@@ -26,9 +26,5 @@ if type(_____663E_793A_6280_80FD_540D_5B572.initShowSkillName2) == "function" th
 end
 --- 初始化技能系统
 function ____exports.init(self)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[技能系统] 初始化完成")
-    end
 end
 return ____exports

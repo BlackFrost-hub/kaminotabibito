@@ -25,10 +25,6 @@ if (typeof 激活传送点.init激活传送点 === "function") 激活传送点.i
  * 初始化地形系统
  */
 export function init(): void {
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[地形系统] 初始化完成");
-  }
 }
 
 // 自动初始化（可选）
