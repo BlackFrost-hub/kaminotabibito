@@ -2,3 +2,7 @@
 /.def
 *.w3x
 ~$*
+
+# local editor / assistant cache
+.vscode/jass-cache/
+.claude/settings.local.json
