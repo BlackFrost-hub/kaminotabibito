@@ -55,7 +55,7 @@ local _____5730_5F62_7CFB_7EDF = require("系统.07．地形系统.index")
 if type(_____5730_5F62_7CFB_7EDF.init) == "function" then
     _____5730_5F62_7CFB_7EDF:init()
 end
-local _____4EFB_52A1_7CFB_7EDF = require("系统.08．任务系统.09．index")
+local _____4EFB_52A1_7CFB_7EDF = require("系统.08．任务系统.10．index")
 if type(_____4EFB_52A1_7CFB_7EDF.init) == "function" then
     _____4EFB_52A1_7CFB_7EDF:init()
 end

@@ -1,6 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local starLocation = nil
 --- 获取坐标点地形高度（对齐 EC_GetPointZ）
 function ____exports.EC_GetPointZ(self, x, y)
@@ -34,11 +35,11 @@ function ____exports.EC_CreateEffect(self, path, x, y, z, fac, size, s, time)
     if not eff then
         return nil
     end
-    if type(jass.EXSetEffectSize) == "function" then
-        jass.EXSetEffectSize(eff, size)
+    if type(japi.EXSetEffectSize) == "function" then
+        japi.EXSetEffectSize(eff, size)
     end
-    if type(jass.EXSetEffectZ) == "function" then
-        jass.EXSetEffectZ(
+    if type(japi.EXSetEffectZ) == "function" then
+        japi.EXSetEffectZ(
             eff,
             ____exports.EC_GetPointZ(nil, x, y) + z
         )
@@ -52,11 +53,11 @@ function ____exports.EC_CreateEffect(self, path, x, y, z, fac, size, s, time)
             jass.DestroyEffect(eff)
         end
     end
-    if type(jass.EXEffectMatRotateZ) == "function" then
-        jass.EXEffectMatRotateZ(eff, fac)
+    if type(japi.EXEffectMatRotateZ) == "function" then
+        japi.EXEffectMatRotateZ(eff, fac)
     end
-    if type(jass.EXSetEffectSpeed) == "function" then
-        jass.EXSetEffectSpeed(eff, s)
+    if type(japi.EXSetEffectSpeed) == "function" then
+        japi.EXSetEffectSpeed(eff, s)
     end
     return eff
 end

@@ -77,6 +77,6 @@ export function Sound3DII_SetFadeOutRate(rate: number): void {
  * 获取最后播放的音效
  */
 export function Sound3DII_GetLastPlayedSound(): any {
-  const { lastPlayedSound } = require("./03．3D音效播放") as { lastPlayedSound: any };
+  const { lastPlayedSound } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as { lastPlayedSound: any };
   return lastPlayedSound;
 }

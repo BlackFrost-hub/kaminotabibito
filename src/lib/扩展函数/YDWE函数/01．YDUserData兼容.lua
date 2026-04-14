@@ -998,4 +998,42 @@ function ____exports.YDUserDataClear(self, tableTypeName, tableKey, attr, valueT
         end
     until true
 end
+function ____exports.YDUserDataClear2(self, tableTypeName, tableKey, valueTypeName, attr)
+    ____exports.YDUserDataClear(
+        nil,
+        tableTypeName,
+        tableKey,
+        attr,
+        valueTypeName
+    )
+end
+local function hasByHash(self, ____type, p, c)
+    local h = hashHandle(nil)
+    if type(jass.HaveSavedInteger) == "function" and jass.HaveSavedInteger(h, p, c) then
+        return true
+    end
+    if type(jass.HaveSavedReal) == "function" and jass.HaveSavedReal(h, p, c) then
+        return true
+    end
+    if type(jass.HaveSavedBoolean) == "function" and jass.HaveSavedBoolean(h, p, c) then
+        return true
+    end
+    if type(jass.HaveSavedString) == "function" and jass.HaveSavedString(h, p, c) then
+        return true
+    end
+    if type(jass.HaveSavedHandle) == "function" and jass.HaveSavedHandle(h, p, c) then
+        return true
+    end
+    return false
+end
+function ____exports.YDUserDataHas(self, tableTypeName, tableKey, attr, valueTypeName)
+    local p = tableId(nil, tableTypeName, tableKey)
+    local c = sh(nil, attr)
+    return hasByHash(nil, valueTypeName, p, c)
+end
+function ____exports.YDUserDataHas2(self, tableTypeName, tableKey, valueTypeName, attr)
+    local p = tableId(nil, tableTypeName, tableKey)
+    local c = sh(nil, attr)
+    return hasByHash(nil, valueTypeName, p, c)
+end
 return ____exports

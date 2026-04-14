@@ -39,6 +39,7 @@ local function expose(self, name, fn)
 end
 function ____exports.registerBridge(self)
     expose(nil, "createUnitWithOptions", unitRelated.createUnitWithOptions)
+    expose(nil, "getPlayerFirstHero", unitRelated.getPlayerFirstHero)
     expose(nil, "getUnitsInRangeOfUnit", rangeQuery.getUnitsInRangeOfUnit)
     expose(nil, "getUnitsInRange", rangeQuery.getUnitsInRange)
     expose(nil, "getEnemyUnitsInRangeOfUnit", rangeQuery.getEnemyUnitsInRangeOfUnit)

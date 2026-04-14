@@ -37,11 +37,11 @@ import {
     GetSoundDurationBJ,
     PercentToInt,
     PercentTo255,
-    RMaxBJ,
     GetTransmissionDuration,
     SetCineModeVolumeGroupsBJ,
     CameraResetSmoothingFactorBJ,
 } from "./05B．音效函数";
+import { RMaxBJ } from "./07．杂项";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -232,8 +232,7 @@ export function CinematicFilterGenericBJ(
     blue1: number,
     trans1: number
 ): void {
-    if (typeof jass.AbortCinematicFadeBJ === "function") {
-    }
+    AbortCinematicFadeBJ();
     if (typeof jass.SetCineFilterTexture === "function") jass.SetCineFilterTexture(tex);
     if (typeof jass.SetCineFilterBlendMode === "function") jass.SetCineFilterBlendMode(bmode);
     if (typeof jass.SetCineFilterTexMapFlags === "function") jass.SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE);

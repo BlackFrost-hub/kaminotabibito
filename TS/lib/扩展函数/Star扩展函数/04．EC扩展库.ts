@@ -1,4 +1,5 @@
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 let starLocation: any = null;
 
@@ -45,11 +46,11 @@ export function EC_CreateEffect(
   g.bj_lastCreatedEffect = eff;
   if (!eff) return null;
 
-  if (typeof jass.EXSetEffectSize === "function") {
-    jass.EXSetEffectSize(eff, size);
+  if (typeof japi.EXSetEffectSize === "function") {
+    japi.EXSetEffectSize(eff, size);
   }
-  if (typeof jass.EXSetEffectZ === "function") {
-    jass.EXSetEffectZ(eff, EC_GetPointZ(x, y) + z);
+  if (typeof japi.EXSetEffectZ === "function") {
+    japi.EXSetEffectZ(eff, EC_GetPointZ(x, y) + z);
   }
 
   if (time >= 0) {
@@ -62,11 +63,11 @@ export function EC_CreateEffect(
     }
   }
 
-  if (typeof jass.EXEffectMatRotateZ === "function") {
-    jass.EXEffectMatRotateZ(eff, fac);
+  if (typeof japi.EXEffectMatRotateZ === "function") {
+    japi.EXEffectMatRotateZ(eff, fac);
   }
-  if (typeof jass.EXSetEffectSpeed === "function") {
-    jass.EXSetEffectSpeed(eff, s);
+  if (typeof japi.EXSetEffectSpeed === "function") {
+    japi.EXSetEffectSpeed(eff, s);
   }
 
   return eff;

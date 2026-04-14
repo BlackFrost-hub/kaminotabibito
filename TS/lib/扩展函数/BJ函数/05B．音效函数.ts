@@ -166,8 +166,4 @@ export function PercentTo255(percentage: number): number {
     return PercentToInt(percentage, 255);
 }
 
-export function RMaxBJ(a: number, b: number): number {
-    return a < b ? b : a;
-}
-
 export {};

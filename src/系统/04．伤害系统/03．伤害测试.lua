@@ -39,28 +39,28 @@ local function TrigActions(self)
     end
     local damageStr = ____temp_1
     local damageTypeParts = {}
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_FIRE) then
+    if _____4F24_5BB3_51FD_6570.isFireDamage() then
         damageTypeParts[#damageTypeParts + 1] = "火"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_COLD) then
+    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
         damageTypeParts[#damageTypeParts + 1] = "冰"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_LIGHTNING) then
+    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
         damageTypeParts[#damageTypeParts + 1] = "雷"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_POISON) or _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DISEASE) or _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SLOW_POISON) then
+    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
         damageTypeParts[#damageTypeParts + 1] = "毒"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DIVINE) then
+    if _____4F24_5BB3_51FD_6570.isLightDamage() then
         damageTypeParts[#damageTypeParts + 1] = "光"
     end
     if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC) then
         damageTypeParts[#damageTypeParts + 1] = "魔法"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_PLANT) then
+    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
         damageTypeParts[#damageTypeParts + 1] = "风"
     end
-    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SHADOW_STRIKE) then
+    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
         damageTypeParts[#damageTypeParts + 1] = "暗"
     end
     if _____4F24_5BB3_51FD_6570.isPhysicalDamage() then

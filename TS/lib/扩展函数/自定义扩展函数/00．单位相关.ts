@@ -65,4 +65,27 @@ export function createUnitWithOptions(
     return unit;
 }
 
+/**
+ * 获取玩家的第一个英雄
+ * @param player 玩家对象
+ * @returns 玩家的第一个英雄单位，如果没有则返回null
+ */
+export function getPlayerFirstHero(player: any): any {
+    if (!player || typeof jass.CreateGroup !== "function") return null;
+    const g = jass.CreateGroup();
+    jass.GroupEnumUnitsOfPlayer(g, player, null);
+    let hero: any = null;
+    let u = jass.FirstOfGroup(g);
+    while (u) {
+        if (jass.IsUnitType(u, jass.UNIT_TYPE_HERO)) {
+            hero = u;
+            break;
+        }
+        jass.GroupRemoveUnit(g, u);
+        u = jass.FirstOfGroup(g);
+    }
+    jass.DestroyGroup(g);
+    return hero;
+}
+
 export {};

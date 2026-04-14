@@ -23,6 +23,33 @@ function ____exports.isHeroUnit(self, unit)
     end
     return false
 end
+--- 判断单位是否为玩家英雄（玩家0-7）
+-- 用于区分玩家单位和敌对单位
+-- 
+-- @param unit 目标单位
+-- @returns 是否为玩家英雄
+function ____exports.isPlayerUnit(self, unit)
+    if unit == nil then
+        return false
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    if owner == nil then
+        return false
+    end
+    local playerId = jass.GetPlayerId(owner)
+    return playerId >= 0 and playerId <= 7
+end
+--- 判断单位是否为马甲单位（古老单位）
+-- 马甲单位造成的伤害，吸血/吸魔效果转给玩家英雄
+-- 
+-- @param unit 目标单位
+-- @returns 是否为马甲单位
+function ____exports.isAncientUnit(self, unit)
+    if unit == nil then
+        return false
+    end
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
+end
 --- 判断单位是否为"特殊单位"（召唤物/幻象），这些单位通常不触发装备等功能
 function ____exports.isSpecialUnit(self, unit)
     if not unit then

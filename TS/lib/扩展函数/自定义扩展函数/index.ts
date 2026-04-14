@@ -15,6 +15,7 @@ function expose(name: string, fn: any): void {
 
 export function registerBridge(): void {
     expose("createUnitWithOptions", unitRelated.createUnitWithOptions);
+    expose("getPlayerFirstHero", unitRelated.getPlayerFirstHero);
     expose("getUnitsInRangeOfUnit", rangeQuery.getUnitsInRangeOfUnit);
     expose("getUnitsInRange", rangeQuery.getUnitsInRange);
     expose("getEnemyUnitsInRangeOfUnit", rangeQuery.getEnemyUnitsInRangeOfUnit);

@@ -397,4 +397,45 @@ export function YDUserDataClear(
   }
 }
 
+export function YDUserDataClear2(
+  tableTypeName: string,
+  tableKey: any,
+  valueTypeName: YDTypeName,
+  attr: string
+): void {
+  YDUserDataClear(tableTypeName, tableKey, attr, valueTypeName);
+}
+
+function hasByHash(type: YDTypeName, p: number, c: number): boolean {
+  const h = hashHandle();
+  if (typeof jass.HaveSavedInteger === "function" && jass.HaveSavedInteger(h, p, c)) return true;
+  if (typeof jass.HaveSavedReal === "function" && jass.HaveSavedReal(h, p, c)) return true;
+  if (typeof jass.HaveSavedBoolean === "function" && jass.HaveSavedBoolean(h, p, c)) return true;
+  if (typeof jass.HaveSavedString === "function" && jass.HaveSavedString(h, p, c)) return true;
+  if (typeof (jass as any).HaveSavedHandle === "function" && (jass as any).HaveSavedHandle(h, p, c)) return true;
+  return false;
+}
+
+export function YDUserDataHas(
+  tableTypeName: string,
+  tableKey: any,
+  attr: string,
+  valueTypeName: YDTypeName
+): boolean {
+  const p = tableId(tableTypeName, tableKey);
+  const c = sh(attr);
+  return hasByHash(valueTypeName, p, c);
+}
+
+export function YDUserDataHas2(
+  tableTypeName: string,
+  tableKey: any,
+  valueTypeName: YDTypeName,
+  attr: string
+): boolean {
+  const p = tableId(tableTypeName, tableKey);
+  const c = sh(attr);
+  return hasByHash(valueTypeName, p, c);
+}
+
 export {};

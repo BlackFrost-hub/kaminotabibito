@@ -320,7 +320,4 @@ end
 function ____exports.PercentTo255(self, percentage)
     return ____exports.PercentToInt(nil, percentage, 255)
 end
-function ____exports.RMaxBJ(self, a, b)
-    return a < b and b or a
-end
 return ____exports

@@ -1,5 +1,18 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const {
+  SetUnitLifePercentBJ,
+  SetUnitManaPercentBJ,
+  GetUnitLifePercent,
+  GetUnitManaPercent,
+  ModifyHeroStat
+} = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
+  SetUnitLifePercentBJ: (whichUnit: any, percent: number) => void;
+  SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
+  GetUnitLifePercent: (whichUnit: any) => number;
+  GetUnitManaPercent: (whichUnit: any) => number;
+  ModifyHeroStat: (whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
+};
 
 const HS = typeof jass.InitHashtable === "function" ? jass.InitHashtable() : null;
 
@@ -38,15 +51,15 @@ export function GS_Unit_Pry_change(u: any, i: number, r: number): void {
   let hp = 0;
 
   if (i === 0) {
-    hp = (jass.GetUnitLifePercent(u) as number) || 0;
+    hp = GetUnitLifePercent(u) || 0;
     jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, (jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) as number) + (r * (1 + loadReal(HS, uid, 15))));
-    if (typeof jass.SetUnitLifePercentBJ === "function") jass.SetUnitLifePercentBJ(u, hp);
+    SetUnitLifePercentBJ(u, hp);
     return;
   }
   if (i === 1) {
-    hp = (jass.GetUnitManaPercent(u) as number) || 0;
+    hp = GetUnitManaPercent(u) || 0;
     jass.SetUnitState(u, jass.UNIT_STATE_MAX_MANA, (jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) as number) + r);
-    if (typeof jass.SetUnitManaPercentBJ === "function") jass.SetUnitManaPercentBJ(u, hp);
+    SetUnitManaPercentBJ(u, hp);
     return;
   }
   if (i === 2) {
@@ -68,11 +81,11 @@ export function GS_Unit_Pry_change(u: any, i: number, r: number): void {
     return;
   }
   if (i === 13) {
-    hp = (jass.GetUnitLifePercent(u) as number) || 0;
+    hp = GetUnitLifePercent(u) || 0;
     jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE,
       ((jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) as number) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
     );
-    if (typeof jass.SetUnitLifePercentBJ === "function") jass.SetUnitLifePercentBJ(u, hp);
+    SetUnitLifePercentBJ(u, hp);
     saveReal(HS, uid, i, loadReal(HS, uid, i) + r);
     return;
   }
@@ -97,24 +110,18 @@ export function GS_Unit_Pry_change(u: any, i: number, r: number): void {
     return;
   }
   if (i === 16) {
-    if (typeof jass.ModifyHeroStat === "function") {
-      jass.ModifyHeroStat(jglobals.bj_HEROSTAT_STR, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
-    }
+    ModifyHeroStat(jglobals.bj_HEROSTAT_STR, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
     GS_Unit_Pry_change(u, 0, r * 5);
     return;
   }
   if (i === 17) {
-    if (typeof jass.ModifyHeroStat === "function") {
-      jass.ModifyHeroStat(jglobals.bj_HEROSTAT_AGI, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
-    }
+    ModifyHeroStat(jglobals.bj_HEROSTAT_AGI, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
     GS_Unit_Pry_change(u, 2, r * 0.3);
     GS_Unit_Pry_change(u, 3, r);
     return;
   }
   if (i === 18) {
-    if (typeof jass.ModifyHeroStat === "function") {
-      jass.ModifyHeroStat(jglobals.bj_HEROSTAT_INT, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
-    }
+    ModifyHeroStat(jglobals.bj_HEROSTAT_INT, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
     GS_Unit_Pry_change(u, 5, r * 0.5);
     return;
   }

@@ -4,6 +4,7 @@ export * from "./02．YDLocal兼容";
 export * from "./03．YDWE_Base";
 export * from "./04．YDWE_trigger";
 export * from "./05．STES子触发公共工具";
+export * from "./06．护甲获取";
 
 import * as ydweFunc from "./00．YDWE函数";
 import * as ydCompat from "./01．YDUserData兼容";
@@ -28,6 +29,9 @@ export function registerBridge(): void {
   expose("YDUserDataSet2", ydCompat.YDUserDataSet2);
   expose("YDUserDataClearTable", ydCompat.YDUserDataClearTable);
   expose("YDUserDataClear", ydCompat.YDUserDataClear);
+  expose("YDUserDataClear2", ydCompat.YDUserDataClear2);
+  expose("YDUserDataHas", ydCompat.YDUserDataHas);
+  expose("YDUserDataHas2", ydCompat.YDUserDataHas2);
 
   expose("YDLocalInitialize", ydLocal.YDLocalInitialize);
   expose("YDLocal1Release", ydLocal.YDLocal1Release);

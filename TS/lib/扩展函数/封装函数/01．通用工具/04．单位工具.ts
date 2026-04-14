@@ -24,6 +24,33 @@ export function isHeroUnit(unit: any): boolean {
 }
 
 /**
+ * 判断单位是否为玩家英雄（玩家0-7）
+ * 用于区分玩家单位和敌对单位
+ *
+ * @param unit 目标单位
+ * @returns 是否为玩家英雄
+ */
+export function isPlayerUnit(unit: any): boolean {
+  if (unit == null) return false;
+  const owner = jass.GetOwningPlayer(unit);
+  if (owner == null) return false;
+  const playerId = jass.GetPlayerId(owner);
+  return playerId >= 0 && playerId <= 7;
+}
+
+/**
+ * 判断单位是否为马甲单位（古老单位）
+ * 马甲单位造成的伤害，吸血/吸魔效果转给玩家英雄
+ *
+ * @param unit 目标单位
+ * @returns 是否为马甲单位
+ */
+export function isAncientUnit(unit: any): boolean {
+  if (unit == null) return false;
+  return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT);
+}
+
+/**
  * 判断单位是否为"特殊单位"（召唤物/幻象），这些单位通常不触发装备等功能
  */
 export function isSpecialUnit(unit: any): boolean {

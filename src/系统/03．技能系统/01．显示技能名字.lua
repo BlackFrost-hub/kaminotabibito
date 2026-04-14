@@ -12,6 +12,8 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.03．漂浮�
 local CreateFloatTextOnUnit = ____require_result_0.CreateFloatTextOnUnit
 local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_1.TriggerRegisterAnyUnitEventBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetSpellAbilityId = ____require_result_2.GetSpellAbilityId
 local ABILITY_DATA_TIP = 215
 local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852008,
@@ -33,7 +35,7 @@ end
 --- 显示技能名字的触发动作
 local function onSpellChannel(self)
     local unit = jass.GetTriggerUnit()
-    local abilityId = jass.GetSpellAbilityId()
+    local abilityId = GetSpellAbilityId(nil)
     if jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
         return
     end

@@ -72,7 +72,7 @@ function ____exports.handleQuestAbandoned(self)
     end
     questManager:onQuestAbandoned(playerId, questId)
 end
---- 地图加载流程中调用一次即可（`09．index` 里已 require `02．任务管理器.index` 后执行）。
+--- 地图加载流程中调用一次即可（`10．index` 里已 require `02．任务管理器.index` 后执行）。
 function ____exports.init(self)
     questManager:initialize()
 end

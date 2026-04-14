@@ -7,10 +7,12 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
+local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
 --- 发动技能效果的触发动作
 local function onSpellEffect(self)
     local unit = jass.GetTriggerUnit()
-    local abilityId = jass.GetSpellAbilityId()
+    local abilityId = GetSpellAbilityId(nil)
 end
 --- 初始化
 function ____exports.initShowSkillName2(self)

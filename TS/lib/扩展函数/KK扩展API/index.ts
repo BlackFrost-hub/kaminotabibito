@@ -1,6 +1,8 @@
 export * from "./00．KK扩展API";
+export * from "./01．事件注册函数";
 
 import * as kkApi from "./00．KK扩展API";
+import * as eventApi from "./01．事件注册函数";
 
 function expose(name: string, fn: any): void {
   if (typeof fn !== "function") return;
@@ -30,4 +32,17 @@ export function registerBridge(): void {
   expose("DzDoodadGetAnimationCount", kkApi.DzDoodadGetAnimationCount);
   expose("DzDoodadGetAnimationName", kkApi.DzDoodadGetAnimationName);
   expose("DzDoodadGetAnimationTime", kkApi.DzDoodadGetAnimationTime);
+
+  expose("DzTriggerRegisterMouseEventTrg", eventApi.DzTriggerRegisterMouseEventTrg);
+  expose("DzTriggerRegisterKeyEventTrg", eventApi.DzTriggerRegisterKeyEventTrg);
+  expose("DzTriggerRegisterMouseMoveEventTrg", eventApi.DzTriggerRegisterMouseMoveEventTrg);
+  expose("DzTriggerRegisterMouseWheelEventTrg", eventApi.DzTriggerRegisterMouseWheelEventTrg);
+  expose("DzTriggerRegisterWindowResizeEventTrg", eventApi.DzTriggerRegisterWindowResizeEventTrg);
+  expose("DzF2I", eventApi.DzF2I);
+  expose("DzI2F", eventApi.DzI2F);
+  expose("DzK2I", eventApi.DzK2I);
+  expose("DzI2K", eventApi.DzI2K);
+  expose("DzTriggerRegisterMallItemSyncData", eventApi.DzTriggerRegisterMallItemSyncData);
+  expose("DzGetTriggerMallItemPlayer", eventApi.DzGetTriggerMallItemPlayer);
+  expose("DzGetTriggerMallItem", eventApi.DzGetTriggerMallItem);
 }

@@ -112,4 +112,12 @@ export function IMinBJ(a: number, b: number): number {
     return a <= b ? a : b;
 }
 
+export function RMaxBJ(a: number, b: number): number {
+    return a < b ? b : a;
+}
+
+export function RMinBJ(a: number, b: number): number {
+    return a < b ? a : b;
+}
+
 export {};

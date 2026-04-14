@@ -181,11 +181,4 @@ function ____exports.ReturnItemToHeroOrDropBJ(self, item, fromUnit, hero)
     jass.SetItemPosition(item, x, y)
     return "dropped"
 end
-function ____exports.UnitRemoveItemSwapped(self, whichItem, whichHero)
-    if not whichItem or not whichHero or type(jass.UnitRemoveItem) ~= "function" then
-        return
-    end
-    _G.bj_lastRemovedItem = whichItem
-    jass.UnitRemoveItem(whichHero, whichItem)
-end
 return ____exports

@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local jass, jglobals
 local ____05B_FF0E_97F3_6548_51FD_6570 = require("lib.扩展函数.BJ函数.05B．音效函数")
 local bj_CINEMODE_GAMESPEED = ____05B_FF0E_97F3_6548_51FD_6570.bj_CINEMODE_GAMESPEED
 local bj_CINEMODE_INTERFACEFADE = ____05B_FF0E_97F3_6548_51FD_6570.bj_CINEMODE_INTERFACEFADE
@@ -19,12 +20,23 @@ local WaitTransmissionDuration = ____05B_FF0E_97F3_6548_51FD_6570.WaitTransmissi
 local EnableDawnDusk = ____05B_FF0E_97F3_6548_51FD_6570.EnableDawnDusk
 local IsDawnDuskEnabled = ____05B_FF0E_97F3_6548_51FD_6570.IsDawnDuskEnabled
 local PercentTo255 = ____05B_FF0E_97F3_6548_51FD_6570.PercentTo255
-local RMaxBJ = ____05B_FF0E_97F3_6548_51FD_6570.RMaxBJ
 local GetTransmissionDuration = ____05B_FF0E_97F3_6548_51FD_6570.GetTransmissionDuration
 local SetCineModeVolumeGroupsBJ = ____05B_FF0E_97F3_6548_51FD_6570.SetCineModeVolumeGroupsBJ
 local CameraResetSmoothingFactorBJ = ____05B_FF0E_97F3_6548_51FD_6570.CameraResetSmoothingFactorBJ
-local jass = require("jass.common")
-local jglobals = require("jass.globals")
+local ____07_FF0E_6742_9879 = require("lib.扩展函数.BJ函数.07．杂项")
+local RMaxBJ = ____07_FF0E_6742_9879.RMaxBJ
+function ____exports.AbortCinematicFadeBJ(self)
+    local t1 = jglobals.bj_cineFadeContinueTimer
+    local t2 = jglobals.bj_cineFadeFinishTimer
+    if t1 ~= nil and type(jass.DestroyTimer) == "function" then
+        jass.DestroyTimer(t1)
+    end
+    if t2 ~= nil and type(jass.DestroyTimer) == "function" then
+        jass.DestroyTimer(t2)
+    end
+end
+jass = require("jass.common")
+jglobals = require("jass.globals")
 function ____exports.SetCinematicSceneBJ(self, soundHandle, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
     jglobals.bj_cineSceneLastSound = soundHandle
     PlaySoundBJ(nil, soundHandle)
@@ -276,8 +288,7 @@ function ____exports.CinematicModeBJ(self, cineMode, forForce)
     ____exports.CinematicModeExBJ(nil, cineMode, forForce, bj_CINEMODE_INTERFACEFADE)
 end
 function ____exports.CinematicFilterGenericBJ(self, duration, bmode, tex, red0, green0, blue0, trans0, red1, green1, blue1, trans1)
-    if type(jass.AbortCinematicFadeBJ) == "function" then
-    end
+    ____exports.AbortCinematicFadeBJ(nil)
     if type(jass.SetCineFilterTexture) == "function" then
         jass.SetCineFilterTexture(tex)
     end
@@ -314,16 +325,6 @@ function ____exports.CinematicFilterGenericBJ(self, duration, bmode, tex, red0, 
     end
     if type(jass.DisplayCineFilter) == "function" then
         jass.DisplayCineFilter(true)
-    end
-end
-function ____exports.AbortCinematicFadeBJ(self)
-    local t1 = jglobals.bj_cineFadeContinueTimer
-    local t2 = jglobals.bj_cineFadeFinishTimer
-    if t1 ~= nil and type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(t1)
-    end
-    if t2 ~= nil and type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(t2)
     end
 end
 return ____exports

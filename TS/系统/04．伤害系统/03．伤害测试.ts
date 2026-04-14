@@ -15,6 +15,13 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
   isSkillAttack: () => boolean;
   isSkillDamage: () => boolean;
   isPhysicalDamage: () => boolean;
+  isMetalDamage: () => boolean;
+  isWoodDamage: () => boolean;
+  isWaterDamage: () => boolean;
+  isFireDamage: () => boolean;
+  isThunderDamage: () => boolean;
+  isLightDamage: () => boolean;
+  isDarkDamage: () => boolean;
 };
 
 function sendMsg(msg: string): void {
@@ -34,32 +41,28 @@ function TrigActions(): void {
   const damageStr = typeof (jass as any).R2S === "function" ? (jass as any).R2S(damage) : tostring(damage);
 
   let damageTypeParts: string[] = [];
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_FIRE)) {
+  if (伤害函数.isFireDamage()) {
     damageTypeParts.push("火");
   }
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_COLD)) {
+  if (伤害函数.isWaterDamage()) {
     damageTypeParts.push("冰");
   }
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_LIGHTNING)) {
+  if (伤害函数.isThunderDamage()) {
     damageTypeParts.push("雷");
   }
-  if (
-    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_POISON) ||
-    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DISEASE) ||
-    伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SLOW_POISON)
-  ) {
+  if (伤害函数.isMetalDamage()) {
     damageTypeParts.push("毒");
   }
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_DIVINE)) {
+  if (伤害函数.isLightDamage()) {
     damageTypeParts.push("光");
   }
   if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC)) {
     damageTypeParts.push("魔法");
   }
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_PLANT)) {
+  if (伤害函数.isWoodDamage()) {
     damageTypeParts.push("风");
   }
-  if (伤害函数.YDWEIsEventDamageType(jass.DAMAGE_TYPE_SHADOW_STRIKE)) {
+  if (伤害函数.isDarkDamage()) {
     damageTypeParts.push("暗");
   }
   if (伤害函数.isPhysicalDamage()) {

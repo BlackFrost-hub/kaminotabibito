@@ -13,6 +13,9 @@ const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．�
 const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
   TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: number) => void;
 };
+const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetSpellAbilityId: () => number;
+};
 
 // ABILITY_DATA_TIP = 215，获取技能提示名
 const ABILITY_DATA_TIP = 215;
@@ -42,7 +45,7 @@ function getAbilityName(unit: any, abilityId: number, level: number): string {
  */
 function onSpellChannel(): void {
   const unit = jass.GetTriggerUnit();
-  const abilityId = jass.GetSpellAbilityId();
+  const abilityId = GetSpellAbilityId();
 
   // 排除机械单位
   if (jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL)) {

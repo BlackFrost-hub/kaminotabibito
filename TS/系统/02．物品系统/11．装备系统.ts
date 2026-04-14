@@ -65,7 +65,7 @@ const STAT_CONFIG: { name: string; key: string }[] = [
   { name: "火属性伤害", key: "fireDmg" }, { name: "火属性抗性", key: "fireResist" },
   { name: "雷属性伤害", key: "thunderDmg" }, { name: "雷属性抗性", key: "thunderResist" },
   { name: "水属性伤害", key: "waterDmg" }, { name: "水属性抗性", key: "waterResist" },
-  { name: "金属性抗性", key: "MetalResist" }, { name: "召唤物伤害", key: "summonDmg" }, { name: "召唤物抗性", key: "summonResist" },
+  { name: "金属性抗性", key: "metalResist" }, { name: "金属性伤害", key: "metalDmg" }, { name: "召唤物伤害", key: "summonDmg" }, { name: "召唤物抗性", key: "summonResist" },
   { name: "伤害减少", key: "dmgReduction" }, { name: "伤害减少%", key: "dmgReductionPct" },
   { name: "伤害吸血", key: "lifeSteal" }, { name: "魔法伤害吸血", key: "magicLifeSteal" }, { name: "普攻伤害吸血", key: "atkLifeSteal" },
   { name: "被暴击率", key: "critRateTaken" }, { name: "被暴击伤害", key: "critDmgTaken" }, { name: "眩晕抗性", key: "stunResist" },

@@ -2,13 +2,19 @@
 local ____exports = {}
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____temp_0
+local ____require_result_0 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitLifePercentBJ = ____require_result_0.SetUnitLifePercentBJ
+local SetUnitManaPercentBJ = ____require_result_0.SetUnitManaPercentBJ
+local GetUnitLifePercent = ____require_result_0.GetUnitLifePercent
+local GetUnitManaPercent = ____require_result_0.GetUnitManaPercent
+local ModifyHeroStat = ____require_result_0.ModifyHeroStat
+local ____temp_1
 if type(jass.InitHashtable) == "function" then
-    ____temp_0 = jass.InitHashtable()
+    ____temp_1 = jass.InitHashtable()
 else
-    ____temp_0 = nil
+    ____temp_1 = nil
 end
-local HS = ____temp_0
+local HS = ____temp_1
 local function hid(self, h)
     return type(jass.GetHandleId) == "function" and (jass.GetHandleId(h) or 0) or 0
 end
@@ -72,27 +78,23 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
     local uid = hid(nil, u)
     local hp = 0
     if i == 0 then
-        hp = jass.GetUnitLifePercent(u) or 0
+        hp = GetUnitLifePercent(nil, u) or 0
         jass.SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
             jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) + r * (1 + loadReal(nil, HS, uid, 15))
         )
-        if type(jass.SetUnitLifePercentBJ) == "function" then
-            jass.SetUnitLifePercentBJ(u, hp)
-        end
+        SetUnitLifePercentBJ(nil, u, hp)
         return
     end
     if i == 1 then
-        hp = jass.GetUnitManaPercent(u) or 0
+        hp = GetUnitManaPercent(nil, u) or 0
         jass.SetUnitState(
             u,
             jass.UNIT_STATE_MAX_MANA,
             jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) + r
         )
-        if type(jass.SetUnitManaPercentBJ) == "function" then
-            jass.SetUnitManaPercentBJ(u, hp)
-        end
+        SetUnitManaPercentBJ(nil, u, hp)
         return
     end
     if i == 2 then
@@ -144,15 +146,13 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
         return
     end
     if i == 13 then
-        hp = jass.GetUnitLifePercent(u) or 0
+        hp = GetUnitLifePercent(nil, u) or 0
         jass.SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
             jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r)
         )
-        if type(jass.SetUnitLifePercentBJ) == "function" then
-            jass.SetUnitLifePercentBJ(u, hp)
-        end
+        SetUnitLifePercentBJ(nil, u, hp)
         saveReal(
             nil,
             HS,
@@ -210,39 +210,36 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
         return
     end
     if i == 16 then
-        if type(jass.ModifyHeroStat) == "function" then
-            jass.ModifyHeroStat(
-                jglobals.bj_HEROSTAT_STR,
-                u,
-                jglobals.bj_MODIFYMETHOD_ADD,
-                math.floor(r)
-            )
-        end
+        ModifyHeroStat(
+            nil,
+            jglobals.bj_HEROSTAT_STR,
+            u,
+            jglobals.bj_MODIFYMETHOD_ADD,
+            math.floor(r)
+        )
         ____exports.GS_Unit_Pry_change(nil, u, 0, r * 5)
         return
     end
     if i == 17 then
-        if type(jass.ModifyHeroStat) == "function" then
-            jass.ModifyHeroStat(
-                jglobals.bj_HEROSTAT_AGI,
-                u,
-                jglobals.bj_MODIFYMETHOD_ADD,
-                math.floor(r)
-            )
-        end
+        ModifyHeroStat(
+            nil,
+            jglobals.bj_HEROSTAT_AGI,
+            u,
+            jglobals.bj_MODIFYMETHOD_ADD,
+            math.floor(r)
+        )
         ____exports.GS_Unit_Pry_change(nil, u, 2, r * 0.3)
         ____exports.GS_Unit_Pry_change(nil, u, 3, r)
         return
     end
     if i == 18 then
-        if type(jass.ModifyHeroStat) == "function" then
-            jass.ModifyHeroStat(
-                jglobals.bj_HEROSTAT_INT,
-                u,
-                jglobals.bj_MODIFYMETHOD_ADD,
-                math.floor(r)
-            )
-        end
+        ModifyHeroStat(
+            nil,
+            jglobals.bj_HEROSTAT_INT,
+            u,
+            jglobals.bj_MODIFYMETHOD_ADD,
+            math.floor(r)
+        )
         ____exports.GS_Unit_Pry_change(nil, u, 5, r * 0.5)
         return
     end

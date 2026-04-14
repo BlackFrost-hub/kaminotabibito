@@ -27,7 +27,7 @@ export interface BuffRuntime {
   remaining: number;
   effect: number;
   source: "dot" | "manual";
-  /** 与 dot 施加时解析的满额秒数一致，供提示条 */
+  /** 来源单位名称 */
   sourceName?: string;
   _dotParsedDuration?: number;
   /** JASS 桥接：覆盖 01．Buff表 图标（非空则 Buff 条用此路径） */

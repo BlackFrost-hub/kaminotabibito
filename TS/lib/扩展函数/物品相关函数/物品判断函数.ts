@@ -102,11 +102,4 @@ export function ReturnItemToHeroOrDropBJ(item: any, fromUnit: any, hero: any): "
   return "dropped";
 }
 
-// 兼容 BJ：记录 bj_lastRemovedItem 并将物品从单位背包移除。
-export function UnitRemoveItemSwapped(whichItem: any, whichHero: any): void {
-  if (!whichItem || !whichHero || typeof jass.UnitRemoveItem !== "function") return;
-  (globalThis as any).bj_lastRemovedItem = whichItem;
-  jass.UnitRemoveItem(whichHero, whichItem);
-}
-
 export {};

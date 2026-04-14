@@ -53,6 +53,14 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.YDWE函数.06．护甲获取")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return
@@ -72,6 +80,9 @@ function ____exports.registerBridge(self)
     expose(nil, "YDUserDataSet2", ydCompat.YDUserDataSet2)
     expose(nil, "YDUserDataClearTable", ydCompat.YDUserDataClearTable)
     expose(nil, "YDUserDataClear", ydCompat.YDUserDataClear)
+    expose(nil, "YDUserDataClear2", ydCompat.YDUserDataClear2)
+    expose(nil, "YDUserDataHas", ydCompat.YDUserDataHas)
+    expose(nil, "YDUserDataHas2", ydCompat.YDUserDataHas2)
     expose(nil, "YDLocalInitialize", ydLocal.YDLocalInitialize)
     expose(nil, "YDLocal1Release", ydLocal.YDLocal1Release)
     expose(nil, "YDLocal1Get", ydLocal.YDLocal1Get)

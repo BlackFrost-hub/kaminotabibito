@@ -1,6 +1,30 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
+    local ____export = require("系统.03．技能系统.01．技能冷却.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.02．技能消耗.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.04．快捷键技能.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.01．显示技能名字")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -15,6 +39,16 @@ do
             ____exports[____exportKey] = ____exportValue
         end
     end
+end
+require("系统.03．技能系统.01．技能冷却.index")
+require("系统.03．技能系统.02．技能消耗.index")
+local bbTeleportMod = require("系统.03．技能系统.04．快捷键技能.index")
+if type(bbTeleportMod.initBBTeleport) == "function" then
+    bbTeleportMod:initBBTeleport()
+end
+local switchBagMod = require("系统.03．技能系统.04．快捷键技能.index")
+if type(switchBagMod.initSwitchBag) == "function" then
+    switchBagMod:initSwitchBag()
 end
 local _____663E_793A_6280_80FD_540D_5B57 = require("系统.03．技能系统.01．显示技能名字")
 if type(_____663E_793A_6280_80FD_540D_5B57.initShowSkillName) == "function" then

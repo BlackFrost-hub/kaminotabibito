@@ -9,13 +9,16 @@ const jass = require("jass.common") as any;
 const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
   TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: number) => void;
 };
+const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetSpellAbilityId: () => number;
+};
 
 /**
  * 发动技能效果的触发动作
  */
 function onSpellEffect(): void {
   const unit = jass.GetTriggerUnit();
-  const abilityId = jass.GetSpellAbilityId();
+  const abilityId = GetSpellAbilityId();
 
   // TODO: 具体效果待实现
 }

@@ -2,6 +2,16 @@
 local ____exports = {}
 local jass = require("jass.common")
 local bj_MAX_INVENTORY = 6
+--- 默认当前库存（常见填表：1）
+____exports.bj_STOCK_DEFAULT_CURRENT = 1
+--- 默认最大库存（单格单件上架时常用 1）
+____exports.bj_STOCK_DEFAULT_MAX = 1
+--- 获取单位物品栏物品（1-based索引）
+-- 对应JASS: UnitItemInSlotBJ
+-- 将0-based转换为1-based索引
+function ____exports.UnitItemInSlotBJ(self, whichUnit, itemSlot)
+    return jass.UnitItemInSlot(whichUnit, itemSlot - 1)
+end
 function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
     do
         local index = 0
@@ -68,14 +78,40 @@ function ____exports.RemoveItemTypeFromUnitBJ(self, whichUnit, itemId, count)
     end
     return removedCount
 end
+--- 对齐 Blizzard.j：
+-- function RemoveItemFromStockBJ takes integer itemId, unit whichUnit returns nothing
+--     call RemoveItemFromStock(whichUnit, itemId)
+-- endfunction
 function ____exports.RemoveItemFromStockBJ(self, itemId, whichUnit)
     if type(jass.RemoveItemFromStock) == "function" then
         jass.RemoveItemFromStock(whichUnit, itemId)
     end
 end
+--- 对齐 Blizzard.j：
+-- function AddItemToStockBJ takes integer itemId, unit whichUnit, integer currentStock, integer stockMax returns nothing
+--     call AddItemToStock(whichUnit, itemId, currentStock, stockMax)
+-- endfunction
 function ____exports.AddItemToStockBJ(self, itemId, whichUnit, currentStock, stockMax)
     if type(jass.AddItemToStock) == "function" then
         jass.AddItemToStock(whichUnit, itemId, currentStock, stockMax)
+    end
+end
+--- 对齐 Blizzard.j：
+-- function AddUnitToStockBJ takes integer unitId, unit whichUnit, integer currentStock, integer stockMax returns nothing
+--     call AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
+-- endfunction
+function ____exports.AddUnitToStockBJ(self, unitId, whichUnit, currentStock, stockMax)
+    if type(jass.AddUnitToStock) == "function" then
+        jass.AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
+    end
+end
+--- 对齐 Blizzard.j：
+-- function RemoveUnitFromStockBJ takes integer unitId, unit whichUnit returns nothing
+--     call RemoveUnitFromStock(whichUnit, unitId)
+-- endfunction
+function ____exports.RemoveUnitFromStockBJ(self, unitId, whichUnit)
+    if type(jass.RemoveUnitFromStock) == "function" then
+        jass.RemoveUnitFromStock(whichUnit, unitId)
     end
 end
 return ____exports

@@ -53,4 +53,27 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     end
     return unit
 end
+--- 获取玩家的第一个英雄
+-- 
+-- @param player 玩家对象
+-- @returns 玩家的第一个英雄单位，如果没有则返回null
+function ____exports.getPlayerFirstHero(self, player)
+    if not player or type(jass.CreateGroup) ~= "function" then
+        return nil
+    end
+    local g = jass.CreateGroup()
+    jass.GroupEnumUnitsOfPlayer(g, player, nil)
+    local hero = nil
+    local u = jass.FirstOfGroup(g)
+    while u do
+        if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
+            hero = u
+            break
+        end
+        jass.GroupRemoveUnit(g, u)
+        u = jass.FirstOfGroup(g)
+    end
+    jass.DestroyGroup(g)
+    return hero
+end
 return ____exports

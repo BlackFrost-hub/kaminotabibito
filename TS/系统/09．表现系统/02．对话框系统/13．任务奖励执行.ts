@@ -1,6 +1,7 @@
 const jass = require("jass.common") as any;
 
 import { IMaxBJ } from "../../../lib/扩展函数/BJ函数/index";
+import { getPlayerFirstHero } from "../../../lib/扩展函数/自定义扩展函数/index";
 import {
   bindRewardParseHeroResolver,
   isConditionMatchedWithContext,
@@ -17,23 +18,6 @@ function getUserPlayers(): any[] {
   return out;
 }
 
-export function getPlayerFirstHero(player: any): any {
-  if (!player || typeof jass.CreateGroup !== "function") return null;
-  const g = jass.CreateGroup();
-  jass.GroupEnumUnitsOfPlayer(g, player, null);
-  let hero: any = null;
-  let u = jass.FirstOfGroup(g);
-  while (u) {
-    if (jass.IsUnitType(u, jass.UNIT_TYPE_HERO)) {
-      hero = u;
-      break;
-    }
-    jass.GroupRemoveUnit(g, u);
-    u = jass.FirstOfGroup(g);
-  }
-  jass.DestroyGroup(g);
-  return hero;
-}
 bindRewardParseHeroResolver(getPlayerFirstHero);
 
 function gainGold(players: any[], value: number): void {
@@ -206,5 +190,5 @@ export function giveRewardToPlayers(rewardRaw: string, triggerPlayerId?: number)
   applyRewardWithContext(rewardRaw, { triggerPlayerId });
 }
 
-export {};
+export { getPlayerFirstHero };
 

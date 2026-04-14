@@ -53,7 +53,7 @@ function ____exports.Sound3DII_SetFadeOutRate(self, rate)
 end
 --- 获取最后播放的音效
 function ____exports.Sound3DII_GetLastPlayedSound(self)
-    local ____require_result_0 = require("./03．3D音效播放")
+    local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
     local lastPlayedSound = ____require_result_0.lastPlayedSound
     return lastPlayedSound
 end

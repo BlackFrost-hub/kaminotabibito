@@ -6,6 +6,8 @@ local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____index = require("lib.扩展函数.BJ函数.index")
 local IMaxBJ = ____index.IMaxBJ
+local ____index = require("lib.扩展函数.自定义扩展函数.index")
+local getPlayerFirstHero = ____index.getPlayerFirstHero
 local ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790 = require("系统.09．表现系统.02．对话框系统.11．任务奖励解析")
 local bindRewardParseHeroResolver = ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790.bindRewardParseHeroResolver
 local isConditionMatchedWithContext = ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790.isConditionMatchedWithContext
@@ -24,26 +26,7 @@ local function getUserPlayers(self)
     end
     return out
 end
-function ____exports.getPlayerFirstHero(self, player)
-    if not player or type(jass.CreateGroup) ~= "function" then
-        return nil
-    end
-    local g = jass.CreateGroup()
-    jass.GroupEnumUnitsOfPlayer(g, player, nil)
-    local hero = nil
-    local u = jass.FirstOfGroup(g)
-    while u do
-        if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
-            hero = u
-            break
-        end
-        jass.GroupRemoveUnit(g, u)
-        u = jass.FirstOfGroup(g)
-    end
-    jass.DestroyGroup(g)
-    return hero
-end
-bindRewardParseHeroResolver(nil, ____exports.getPlayerFirstHero)
+bindRewardParseHeroResolver(nil, getPlayerFirstHero)
 local function gainGold(self, players, value)
     for ____, p in ipairs(players) do
         local cur = jass.GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
@@ -58,7 +41,7 @@ local function gainLumber(self, players, value)
 end
 local function gainExp(self, players, value)
     for ____, p in ipairs(players) do
-        local hero = ____exports.getPlayerFirstHero(nil, p)
+        local hero = getPlayerFirstHero(nil, p)
         if hero and type(jass.AddHeroXP) == "function" then
             jass.AddHeroXP(hero, value, true)
         end
@@ -66,7 +49,7 @@ local function gainExp(self, players, value)
 end
 local function gainLevel(self, players, value)
     for ____, p in ipairs(players) do
-        local hero = ____exports.getPlayerFirstHero(nil, p)
+        local hero = getPlayerFirstHero(nil, p)
         if hero and type(jass.SetHeroLevel) == "function" then
             local lv = jass.GetHeroLevel(hero)
             jass.SetHeroLevel(hero, lv + value, false)
@@ -76,11 +59,11 @@ end
 local function gainHeroStat(self, players, statName, value)
     for ____, p in ipairs(players) do
         do
-            local __continue25
+            local __continue21
             repeat
-                local hero = ____exports.getPlayerFirstHero(nil, p)
+                local hero = getPlayerFirstHero(nil, p)
                 if not hero then
-                    __continue25 = true
+                    __continue21 = true
                     break
                 end
                 if statName == "力量" and type(jass.SetHeroStr) == "function" then
@@ -102,9 +85,9 @@ local function gainHeroStat(self, players, statName, value)
                         true
                     )
                 end
-                __continue25 = true
+                __continue21 = true
             until true
-            if not __continue25 then
+            if not __continue21 then
                 break
             end
         end
@@ -140,7 +123,7 @@ local function resolveAmountExpr(self, expr, triggerPlayerId)
         local player = ____temp_0
         local ____player_1
         if player then
-            ____player_1 = ____exports.getPlayerFirstHero(nil, player)
+            ____player_1 = getPlayerFirstHero(nil, player)
         else
             ____player_1 = nil
         end
@@ -229,11 +212,11 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
         local lineIdx = 0
         while lineIdx < #lines do
             do
-                local __continue61
+                local __continue57
                 repeat
                     local line = __TS__StringTrim(lines[lineIdx + 1])
                     if line == "" then
-                        __continue61 = true
+                        __continue57 = true
                         break
                     end
                     local colon = (string.find(line, ":", nil, true) or 0) - 1
@@ -241,7 +224,7 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
                         local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
                         local expr = __TS__StringTrim(__TS__StringSubstring(line, colon + 1))
                         if not isConditionMatchedWithContext(nil, cond, ctx) then
-                            __continue61 = true
+                            __continue57 = true
                             break
                         end
                         local parts = __TS__StringSplit(expr, ";")
@@ -256,9 +239,9 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
                     for ____, p in ipairs(parts) do
                         executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
                     end
-                    __continue61 = true
+                    __continue57 = true
                 until true
-                if not __continue61 then
+                if not __continue57 then
                     break
                 end
             end
@@ -276,25 +259,25 @@ function ____exports.previewRewardMatchWithContext(self, rewardRaw, ctx)
         local lineIdx = 0
         while lineIdx < #lines do
             do
-                local __continue72
+                local __continue68
                 repeat
                     local line = __TS__StringTrim(lines[lineIdx + 1])
                     if line == "" then
-                        __continue72 = true
+                        __continue68 = true
                         break
                     end
                     local colon = (string.find(line, ":", nil, true) or 0) - 1
                     if colon <= 0 then
-                        __continue72 = true
+                        __continue68 = true
                         break
                     end
                     local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
                     if isConditionMatchedWithContext(nil, cond, ctx) then
                         return {matchedRuleIndex = lineIdx, matchedCondition = cond}
                     end
-                    __continue72 = true
+                    __continue68 = true
                 until true
-                if not __continue72 then
+                if not __continue68 then
                     break
                 end
             end
@@ -306,4 +289,5 @@ end
 function ____exports.giveRewardToPlayers(self, rewardRaw, triggerPlayerId)
     ____exports.applyRewardWithContext(nil, rewardRaw, {triggerPlayerId = triggerPlayerId})
 end
+____exports.getPlayerFirstHero = getPlayerFirstHero
 return ____exports

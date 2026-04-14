@@ -1,5 +1,23 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
+const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
+  QuestMessageBJ: (f: any, messageType: number, message: string) => void;
+};
+const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
+  TransmissionFromUnitWithNameBJ: (
+    toForce: any,
+    whichUnit: any,
+    unitName: string,
+    soundHandle: any,
+    message: string,
+    timeType: number,
+    timeVal: number,
+    wait: boolean
+  ) => void;
+};
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: () => any;
+};
 const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配置表.06．主线任务配置表") as {
   MAIN_STORY_QUEST_CONFIGS: Array<{
     requireID?: number;
@@ -62,8 +80,8 @@ function refreshQuestUI(desc?: string, msg?: string): void {
   if (typeof triggerUIRefresh === "function") {
     triggerUIRefresh.call(questManager, 0, RUNTIME_QUEST_ID);
   }
-  if (typeof msg === "string" && msg !== "" && typeof jass.QuestMessageBJ === "function" && typeof jass.GetPlayersAll === "function") {
-    jass.QuestMessageBJ(jass.GetPlayersAll(), jass.bj_QUESTMESSAGE_UPDATED, msg);
+  if (typeof msg === "string" && msg !== "") {
+    QuestMessageBJ(GetPlayersAll(), g.bj_QUESTMESSAGE_UPDATED, msg);
   }
 }
 
@@ -100,16 +118,15 @@ function calcDialogDuration(text: string): number {
 }
 
 function playDialog(dialogPreview?: string): void {
-  if (typeof jass.TransmissionFromUnitWithNameBJ !== "function" || typeof jass.GetPlayersAll !== "function") return;
   const lines = parseDialogLines(dialogPreview);
   for (const line of lines) {
-    jass.TransmissionFromUnitWithNameBJ(
-      jass.GetPlayersAll(),
+    TransmissionFromUnitWithNameBJ(
+      GetPlayersAll(),
       null,
       line.speaker,
       null,
       line.text,
-      jass.bj_TIMETYPE_SET,
+      g.bj_TIMETYPE_SET,
       calcDialogDuration(line.text),
       true
     );
