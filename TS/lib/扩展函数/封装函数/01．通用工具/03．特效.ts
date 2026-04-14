@@ -7,14 +7,15 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { withTimer } from "./02．计时器";
+import { DzUnbindEffect } from "../../KK扩展API/index";
 
 /**
- * 创建特效并在指定时间后自动销毁（自动处理 1.27 兼容）
+ * 创建特效并在指定时间后自动销毁
  * @param modelPath 特效模型路径
  * @param x x坐标
  * @param y y坐标
- * @param z z坐标（可选，默认0）
- * @param duration 持续时间秒数（默认2秒）
+ * @param z z坐标，可选，默认 0
+ * @param duration 持续时间秒数，默认 2 秒
  * @returns 特效句柄
  */
 export function createTimedEffect(
@@ -25,75 +26,97 @@ export function createTimedEffect(
   duration: number = 2
 ): any {
   let eff: any;
-  if (typeof (jass as any).AddSpecialEffectZ === "function") {
-    eff = (jass as any).AddSpecialEffectZ(modelPath, x, y, z);
-  } else if (typeof (jass as any).AddSpecialEffect === "function") {
-    eff = (jass as any).AddSpecialEffect(modelPath, x, y);
+  if (typeof jass.AddSpecialEffectZ === "function") {
+    eff = jass.AddSpecialEffectZ(modelPath, x, y, z);
+  } else if (typeof jass.AddSpecialEffect === "function") {
+    eff = jass.AddSpecialEffect(modelPath, x, y);
   }
   if (!eff) return null;
 
   withTimer(duration, () => {
-    if (typeof (jass as any).DestroyEffect === "function") {
-      (jass as any).DestroyEffect(eff);
+    if (typeof jass.DestroyEffect === "function") {
+      jass.DestroyEffect(eff);
     }
   });
   return eff;
 }
 
-/** 存储单位绑定的特效（key: 单位句柄ID, value: 特效句柄） */
-const unitEffectMap: Map<number, any> = new Map();
+const unitEffectMap: Map<string, any> = new Map();
+
+function getUnitEffectHandleId(unit: any): number {
+  if (!unit) return 0;
+  if (typeof japi.DzGetUnitObjectId === "function") {
+    const handleId = japi.DzGetUnitObjectId(unit);
+    if (handleId) return handleId;
+  }
+  if (typeof jass.GetHandleId === "function") {
+    return jass.GetHandleId(unit);
+  }
+  return 0;
+}
+
+function getUnitEffectKey(unit: any, effectKey: string): string {
+  const handleId = getUnitEffectHandleId(unit);
+  if (!handleId) return "";
+  return `${handleId}:${effectKey}`;
+}
+
+function destroyBoundEffect(effect: any): void {
+  if (!effect || typeof jass.DestroyEffect !== "function") return;
+  DzUnbindEffect(effect);
+  jass.DestroyEffect(effect);
+}
 
 /**
  * 在单位上创建绑定特效
  * @param unit 目标单位
- * @param attachPoint 绑定点（如 "overhead", "origin", "chest" 等）
+ * @param attachPoint 绑定点，如 "overhead"、"origin"、"chest"
  * @param modelPath 特效模型路径
- * @param duration 持续时间（秒），不传则永久存在直到手动销毁
- * @returns 是否创建成功
+ * @param duration 持续时间；不传则常驻，直到手动销毁
+ * @returns 特效句柄；创建失败返回 null
  */
-export function createUnitEffect(unit: any, attachPoint: string, modelPath: string, duration?: number): boolean {
-  if (!unit) return false;
-  const handleId = japi.DzGetUnitObjectId ? japi.DzGetUnitObjectId(unit) : 0;
-  if (!handleId) return false;
-
-  // 如果已有特效，先销毁
-  const existingEffect = unitEffectMap.get(handleId);
-  if (existingEffect && typeof jass.DestroyEffect === "function") {
-    jass.DestroyEffect(existingEffect);
+export function createUnitEffect(unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey: string = "default"): any {
+  if (!unit) return null;
+  const key = getUnitEffectKey(unit, effectKey);
+  if (key === "") return null;
+  if (typeof jass.AddSpecialEffectTarget !== "function") {
+    return null;
   }
 
-  // 创建新特效
+  const existingEffect = unitEffectMap.get(key);
+  if (existingEffect) {
+    destroyBoundEffect(existingEffect);
+  }
+
   const effect = jass.AddSpecialEffectTarget(modelPath, unit, attachPoint);
-  if (!effect) return false;
+  if (!effect) return null;
+  unitEffectMap.set(key, effect);
 
-  unitEffectMap.set(handleId, effect);
-
-  // 如果指定了持续时间，定时销毁
   if (duration != null && duration > 0) {
     withTimer(duration, () => {
-      const currentEffect = unitEffectMap.get(handleId);
-      if (currentEffect === effect && typeof jass.DestroyEffect === "function") {
-        jass.DestroyEffect(effect);
-        unitEffectMap.delete(handleId);
+      const currentEffect = unitEffectMap.get(key);
+      if (currentEffect === effect) {
+        destroyBoundEffect(effect);
+        unitEffectMap.delete(key);
       }
     });
   }
 
-  return true;
+  return effect;
 }
 
 /**
  * 销毁单位上的绑定特效
  * @param unit 目标单位
  */
-export function destroyUnitEffect(unit: any): void {
+export function destroyUnitEffect(unit: any, effectKey: string = "default"): void {
   if (!unit) return;
-  const handleId = japi.DzGetUnitObjectId ? japi.DzGetUnitObjectId(unit) : 0;
-  if (!handleId) return;
+  const key = getUnitEffectKey(unit, effectKey);
+  if (key === "") return;
 
-  const effect = unitEffectMap.get(handleId);
-  if (effect && typeof jass.DestroyEffect === "function") {
-    jass.DestroyEffect(effect);
+  const effect = unitEffectMap.get(key);
+  if (effect) {
+    destroyBoundEffect(effect);
   }
-  unitEffectMap.delete(handleId);
+  unitEffectMap.delete(key);
 }

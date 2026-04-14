@@ -54,10 +54,10 @@ function ____exports.openNpcDialog(self, p, data)
             return false
         end
         setDialogNpcUnit(nil, p, data.npcUnit)
-        removeQuestMarkerAfterNpcTriggered(nil, data.npcUnit)
+        local removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(nil, data.npcUnit)
         local pid = jass.GetPlayerId(p)
         --- 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync
-        local waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen == true
+        local waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen == true and removedOverheadMarker
         if not shouldSkipNewBubbleSchedule(nil, pid, data.npcUnit) then
             scheduleBubbleEffectAfterOverheadClear(nil, pid, data.npcUnit, waitQipaoAfterOverheadClear)
         end

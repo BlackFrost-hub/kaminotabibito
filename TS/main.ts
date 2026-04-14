@@ -65,5 +65,6 @@ if (typeof 表现系统.init === "function") 表现系统.init();
  require("系统.12．测试系统.任务测试");
 require("系统.12．测试系统.YDLocal返回值测试");
 require("系统.12．测试系统.STES事件测试");
+require("系统.12．测试系统.dz函数测试");
 
 export {};

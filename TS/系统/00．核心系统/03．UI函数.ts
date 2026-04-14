@@ -100,10 +100,10 @@ export function openNpcDialog(p: any, data: NpcDialogData): boolean {
   if (data.npcUnit) {
     if (!tryOccupyNpc(p, data.npcUnit)) return false;
     setDialogNpcUnit(p, data.npcUnit);
-    removeQuestMarkerAfterNpcTriggered(data.npcUnit);
+    const removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(data.npcUnit);
     const pid = (jass as any).GetPlayerId(p);
     /** 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync */
-    const waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen === true;
+    const waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen === true && removedOverheadMarker;
     if (!shouldSkipNewBubbleSchedule(pid, data.npcUnit)) {
       scheduleBubbleEffectAfterOverheadClear(pid, data.npcUnit, waitQipaoAfterOverheadClear);
     }

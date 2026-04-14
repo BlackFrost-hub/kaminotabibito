@@ -3,11 +3,14 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local ____exports = {}
-local cancelBubbleEffectSchedule, jass, MAX_PLAYERS, BUBBLE_EFFECT_PATH, g_bubbleEffects, g_bubbleScheduleTimers, g_npcUnits
+local cancelBubbleEffectSchedule, jass, MAX_PLAYERS, BUBBLE_EFFECT_PATH, NPC_BUBBLE_EFFECT_KEY, g_bubbleEffects, g_bubbleScheduleTimers, g_npcUnits
 local ____01_FF0E_5BF9_8BDD_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.01．对话配置表")
 local DIALOG_NPC_CONFIGS = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868.DIALOG_NPC_CONFIGS
 local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.02．任务配置表")
 local QUEST_CONFIGS = ____02_FF0E_4EFB_52A1_914D_7F6E_8868.QUEST_CONFIGS
+local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____03_FF0E_7279_6548.createUnitEffect
+local destroyUnitEffect = ____03_FF0E_7279_6548.destroyUnitEffect
 function cancelBubbleEffectSchedule(self, playerId)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return
@@ -23,16 +26,25 @@ function ____exports.createBubbleEffect(self, playerId, npcUnit)
     cancelBubbleEffectSchedule(nil, playerId)
     ____exports.destroyBubbleEffect(nil, playerId)
     g_npcUnits[playerId + 1] = npcUnit
-    if npcUnit and type(jass.AddSpecialEffectTarget) == "function" then
-        local effect = jass.AddSpecialEffectTarget(BUBBLE_EFFECT_PATH, npcUnit, "overhead")
-        g_bubbleEffects[playerId + 1] = effect
+    if not npcUnit then
+        return
+    end
+    if createUnitEffect(
+        nil,
+        npcUnit,
+        "overhead",
+        BUBBLE_EFFECT_PATH,
+        nil,
+        NPC_BUBBLE_EFFECT_KEY
+    ) then
+        g_bubbleEffects[playerId + 1] = npcUnit
     end
 end
 function ____exports.destroyBubbleEffect(self, playerId)
     cancelBubbleEffectSchedule(nil, playerId)
-    local effect = g_bubbleEffects[playerId + 1]
-    if effect and type(jass.DestroyEffect) == "function" then
-        jass.DestroyEffect(effect)
+    local bubbleUnit = g_bubbleEffects[playerId + 1]
+    if bubbleUnit then
+        destroyUnitEffect(nil, bubbleUnit, NPC_BUBBLE_EFFECT_KEY)
     end
     g_bubbleEffects[playerId + 1] = nil
 end
@@ -43,6 +55,8 @@ BUBBLE_EFFECT_PATH = "resource\\models\\qipao.mdx"
 local NPC_OVERHEAD_BLUE_EXCL = "resource\\models\\exclamation\\bluetanhao.mdx"
 local NPC_OVERHEAD_YELLOW_EXCL = "resource\\models\\exclamation\\yellowtanhao.mdx"
 local NPC_OVERHEAD_GRAY_QUESTION = "resource\\models\\exclamation\\huisewenhao.mdx"
+local NPC_PROMPT_EFFECT_KEY = "npc_prompt"
+NPC_BUBBLE_EFFECT_KEY = "npc_bubble"
 g_bubbleEffects = {}
 g_bubbleScheduleTimers = {}
 g_npcUnits = {}
@@ -95,7 +109,6 @@ local function cancelPendingYellowMarkerTimerForHandle(self, key)
         g_pendingYellowMarkerTimerByHandle:delete(key)
     end
 end
---- 取消该 NPC 上所有「延迟挂灰/黄」的待定计时器（不改变当前已挂模型；任务完成/重开对话前常配合 remove 使用）。
 function ____exports.cancelPendingNpcMarkerSchedules(self, npcUnit)
     local key = npcPromptHandleKey(nil, npcUnit)
     if key == 0 then
@@ -104,23 +117,18 @@ function ____exports.cancelPendingNpcMarkerSchedules(self, npcUnit)
     cancelPendingGrayMarkerTimerForHandle(nil, key)
     cancelPendingYellowMarkerTimerForHandle(nil, key)
 end
----
--- @returns 是否曾挂有叹号/问号等非 qipao 头顶特效并已销毁
 local function destroyNpcPromptEffectInternal(self, unit)
     local key = npcPromptHandleKey(nil, unit)
     if key == 0 then
         return false
     end
-    local eff = g_npcPromptEffectByHandle:get(key)
-    local hadQuestMarker = eff ~= nil
-    if eff and type(jass.DestroyEffect) == "function" then
-        jass.DestroyEffect(eff)
-    end
+    local hadQuestMarker = g_npcPromptEffectByHandle:get(key) == true
+    destroyUnitEffect(nil, unit, NPC_PROMPT_EFFECT_KEY)
     g_npcPromptEffectByHandle:delete(key)
     return hadQuestMarker
 end
 local function attachNpcPromptEffect(self, unit, modelPath)
-    if not unit or modelPath == "" or type(jass.AddSpecialEffectTarget) ~= "function" then
+    if not unit or modelPath == "" then
         return
     end
     local key = npcPromptHandleKey(nil, unit)
@@ -128,9 +136,15 @@ local function attachNpcPromptEffect(self, unit, modelPath)
         return
     end
     destroyNpcPromptEffectInternal(nil, unit)
-    local eff = jass.AddSpecialEffectTarget(modelPath, unit, "overhead")
-    if eff then
-        g_npcPromptEffectByHandle:set(key, eff)
+    if createUnitEffect(
+        nil,
+        unit,
+        "overhead",
+        modelPath,
+        nil,
+        NPC_PROMPT_EFFECT_KEY
+    ) then
+        g_npcPromptEffectByHandle:set(key, true)
     end
 end
 local function npcConfigQualifiesForQuestMarker(self, npc)
@@ -179,9 +193,7 @@ function ____exports.setNpcQuestPromptAcceptedState(self, npcUnit)
     end
     attachNpcPromptEffect(nil, npcUnit, NPC_OVERHEAD_GRAY_QUESTION)
 end
---- 仅当本次确实移除了叹号/问号等头顶提示时，再延迟该时长挂 qipao；头顶本来就没有这类特效时则立刻挂 qipao
 ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY = 0.85
-____exports.NPC_OVERHEAD_MARKER_AFTER_BUBBLE_DELAY = 4.9
 function ____exports.scheduleGrayQuestMarkerAfterBubbleFade(self, npcUnit)
     if not npcUnit then
         return
@@ -191,21 +203,7 @@ function ____exports.scheduleGrayQuestMarkerAfterBubbleFade(self, npcUnit)
         return
     end
     cancelPendingGrayMarkerTimerForHandle(nil, key)
-    local t = jass.CreateTimer()
-    g_pendingGrayMarkerTimerByHandle:set(key, t)
-    jass.TimerStart(
-        t,
-        ____exports.NPC_OVERHEAD_MARKER_AFTER_BUBBLE_DELAY,
-        false,
-        function()
-            if g_pendingGrayMarkerTimerByHandle:get(key) ~= t then
-                return
-            end
-            g_pendingGrayMarkerTimerByHandle:delete(key)
-            cancelTimerHandle(nil, t)
-            ____exports.setNpcQuestPromptAcceptedState(nil, npcUnit)
-        end
-    )
+    ____exports.setNpcQuestPromptAcceptedState(nil, npcUnit)
 end
 function ____exports.scheduleYellowQuestMarkerAfterBubbleFade(self, npcUnit)
     if not npcUnit then
@@ -216,30 +214,12 @@ function ____exports.scheduleYellowQuestMarkerAfterBubbleFade(self, npcUnit)
         return
     end
     cancelPendingYellowMarkerTimerForHandle(nil, key)
-    local t = jass.CreateTimer()
-    g_pendingYellowMarkerTimerByHandle:set(key, t)
-    jass.TimerStart(
-        t,
-        ____exports.NPC_OVERHEAD_MARKER_AFTER_BUBBLE_DELAY,
-        false,
-        function()
-            if g_pendingYellowMarkerTimerByHandle:get(key) ~= t then
-                return
-            end
-            g_pendingYellowMarkerTimerByHandle:delete(key)
-            cancelTimerHandle(nil, t)
-            ____exports.attachQuestMarkerToUnit(nil, npcUnit)
-        end
-    )
+    ____exports.attachQuestMarkerToUnit(nil, npcUnit)
 end
---- 移除头顶叹号/问号等（非 qipao）并取消待定灰/黄计时。
--- 
--- @returns 是否**实际存在并已移除**叹号/问号特效（用于决定是否使用 0.85s 后再挂 qipao）
 function ____exports.removeQuestMarkerAfterNpcTriggered(self, npcUnit)
     ____exports.cancelPendingNpcMarkerSchedules(nil, npcUnit)
     return destroyNpcPromptEffectInternal(nil, npcUnit)
 end
---- Lua 下同一单位多次取引用可能不是同一 table，用 HandleId 对齐
 local function npcUnitsSameForBubble(self, a, b)
     if a == b then
         return true
@@ -256,7 +236,6 @@ local function npcUnitsSameForBubble(self, a, b)
     end
     return false
 end
---- 同玩家、同 NPC 链式对白：已有气泡或已排程延迟创建时不再排程，避免叠两层；应用 HandleId 判断，避免 `!==` 误判导致日后谈等场景不挂气泡。
 function ____exports.shouldSkipNewBubbleSchedule(self, playerId, npcUnit)
     if playerId < 0 or playerId >= MAX_PLAYERS or not npcUnit then
         return false
@@ -272,9 +251,6 @@ function ____exports.shouldSkipNewBubbleSchedule(self, playerId, npcUnit)
     end
     return false
 end
----
--- @param waitForOverheadClearDelay 为 true：刚移除了叹号/问号，等 `BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY` 再挂 qipao；
--- 为 false：头顶本无此类特效，立刻挂 qipao。
 function ____exports.scheduleBubbleEffectAfterOverheadClear(self, playerId, npcUnit, waitForOverheadClearDelay)
     if playerId < 0 or playerId >= MAX_PLAYERS or not npcUnit then
         return

@@ -32,6 +32,9 @@ export function registerBridge(): void {
   expose("DzDoodadGetAnimationCount", kkApi.DzDoodadGetAnimationCount);
   expose("DzDoodadGetAnimationName", kkApi.DzDoodadGetAnimationName);
   expose("DzDoodadGetAnimationTime", kkApi.DzDoodadGetAnimationTime);
+  expose("DzBindEffect", kkApi.DzBindEffect);
+  expose("DzUnbindEffect", kkApi.DzUnbindEffect);
+  expose("DzSetEffectScale", kkApi.DzSetEffectScale);
 
   expose("DzTriggerRegisterMouseEventTrg", eventApi.DzTriggerRegisterMouseEventTrg);
   expose("DzTriggerRegisterKeyEventTrg", eventApi.DzTriggerRegisterKeyEventTrg);

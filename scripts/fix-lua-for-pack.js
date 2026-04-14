@@ -26,6 +26,8 @@ function fixFile(filePath) {
 
   // 2. _G:print( -> _G.print(  Lua 全局调用用点号
   content = content.replace(/_G:print\s*\(/g, "_G.print(");
+  content = content.replace(/_G:DzBindEffect\s*\(/g, "_G.DzBindEffect(");
+  content = content.replace(/_G:DzUnbindEffect\s*\(/g, "_G.DzUnbindEffect(");
 
   // 3. _G.print = function(____, ...) -> _G.print = function(...)  去掉多余的 self 参数
   content = content.replace(/_G\.print\s*=\s*function\s*\(\s*____\s*,\s*\.\.\.\s*\)/g, "_G.print = function(...)");
