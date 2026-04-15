@@ -1,7 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
-local bj_MAX_INVENTORY = 6
+local jglobals = require("jass.globals")
+local ____jglobals_bj_MAX_INVENTORY_0 = jglobals.bj_MAX_INVENTORY
+if ____jglobals_bj_MAX_INVENTORY_0 == nil then
+    ____jglobals_bj_MAX_INVENTORY_0 = 6
+end
+____exports.bj_MAX_INVENTORY = ____jglobals_bj_MAX_INVENTORY_0
 --- 默认当前库存（常见填表：1）
 ____exports.bj_STOCK_DEFAULT_CURRENT = 1
 --- 默认最大库存（单格单件上架时常用 1）
@@ -15,7 +20,7 @@ end
 function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
     do
         local index = 0
-        while index < bj_MAX_INVENTORY do
+        while index < ____exports.bj_MAX_INVENTORY do
             local indexItem = jass.UnitItemInSlot(whichUnit, index)
             if indexItem ~= nil and jass.GetItemTypeId(indexItem) == itemId then
                 return index
@@ -36,17 +41,17 @@ function ____exports.GetItemTypeCountInUnitBJ(self, whichUnit, itemId)
     local totalCount = 0
     do
         local index = 0
-        while index < bj_MAX_INVENTORY do
+        while index < ____exports.bj_MAX_INVENTORY do
             local indexItem = jass.UnitItemInSlot(whichUnit, index)
             if indexItem ~= nil and jass.GetItemTypeId(indexItem) == itemId then
                 local charges = jass.GetItemCharges(indexItem)
-                local ____temp_0
+                local ____temp_1
                 if charges > 0 then
-                    ____temp_0 = charges
+                    ____temp_1 = charges
                 else
-                    ____temp_0 = 1
+                    ____temp_1 = 1
                 end
-                totalCount = totalCount + ____temp_0
+                totalCount = totalCount + ____temp_1
             end
             index = index + 1
         end
@@ -113,5 +118,136 @@ function ____exports.RemoveUnitFromStockBJ(self, unitId, whichUnit)
     if type(jass.RemoveUnitFromStock) == "function" then
         jass.RemoveUnitFromStock(whichUnit, unitId)
     end
+end
+--- 获取物品位置（坐标）
+-- 对应JASS: GetItemLoc
+function ____exports.GetItemLoc(self, whichItem)
+    if whichItem == nil or whichItem == 0 then
+        return nil
+    end
+    if type(jass.GetItemX) == "function" and type(jass.GetItemY) == "function" then
+        local x = jass.GetItemX(whichItem)
+        local y = jass.GetItemY(whichItem)
+        if type(jass.Location) == "function" then
+            return jass.Location(x, y)
+        end
+    end
+    return nil
+end
+--- 在指定位置创建物品
+-- 对应JASS: CreateItemLoc
+function ____exports.CreateItemLoc(self, itemId, loc)
+    if loc == nil or loc == 0 then
+        return nil
+    end
+    if type(jass.CreateItem) ~= "function" then
+        return nil
+    end
+    local ____temp_2
+    if type(jass.GetLocationX) == "function" then
+        ____temp_2 = jass.GetLocationX(loc)
+    else
+        ____temp_2 = 0
+    end
+    local x = ____temp_2
+    local ____temp_3
+    if type(jass.GetLocationY) == "function" then
+        ____temp_3 = jass.GetLocationY(loc)
+    else
+        ____temp_3 = 0
+    end
+    local y = ____temp_3
+    return jass.CreateItem(itemId, x, y)
+end
+--- 设置物品位置
+-- 对应JASS: SetItemPositionLoc
+function ____exports.SetItemPositionLoc(self, whichItem, loc)
+    if whichItem == nil or whichItem == 0 then
+        return
+    end
+    if loc == nil or loc == 0 then
+        return
+    end
+    if type(jass.SetItemPosition) ~= "function" then
+        return
+    end
+    local ____temp_4
+    if type(jass.GetLocationX) == "function" then
+        ____temp_4 = jass.GetLocationX(loc)
+    else
+        ____temp_4 = 0
+    end
+    local x = ____temp_4
+    local ____temp_5
+    if type(jass.GetLocationY) == "function" then
+        ____temp_5 = jass.GetLocationY(loc)
+    else
+        ____temp_5 = 0
+    end
+    local y = ____temp_5
+    jass.SetItemPosition(whichItem, x, y)
+end
+--- 单位在指定坐标丢弃物品
+-- 对应JASS: UnitDropItemPointLoc
+function ____exports.UnitDropItemPointLoc(self, whichUnit, whichItem, loc)
+    if whichUnit == nil or whichUnit == 0 then
+        return false
+    end
+    if whichItem == nil or whichItem == 0 then
+        return false
+    end
+    if loc == nil or loc == 0 then
+        return false
+    end
+    if type(jass.UnitDropItemPoint) ~= "function" then
+        return false
+    end
+    local ____temp_6
+    if type(jass.GetLocationX) == "function" then
+        ____temp_6 = jass.GetLocationX(loc)
+    else
+        ____temp_6 = 0
+    end
+    local x = ____temp_6
+    local ____temp_7
+    if type(jass.GetLocationY) == "function" then
+        ____temp_7 = jass.GetLocationY(loc)
+    else
+        ____temp_7 = 0
+    end
+    local y = ____temp_7
+    return jass.UnitDropItemPoint(whichUnit, whichItem, x, y)
+end
+--- 单位在指定坐标使用物品
+-- 对应JASS: UnitUseItemPointLoc
+function ____exports.UnitUseItemPointLoc(self, whichUnit, whichItem, loc)
+    if whichUnit == nil or whichUnit == 0 then
+        return false
+    end
+    if whichItem == nil or whichItem == 0 then
+        return false
+    end
+    if loc == nil or loc == 0 then
+        return false
+    end
+    if type(jass.UnitUseItemPoint) ~= "function" then
+        return false
+    end
+    local ____temp_8
+    if type(jass.GetLocationX) == "function" then
+        ____temp_8 = jass.GetLocationX(loc)
+    else
+        ____temp_8 = 0
+    end
+    local x = ____temp_8
+    local ____temp_9
+    if type(jass.GetLocationY) == "function" then
+        ____temp_9 = jass.GetLocationY(loc)
+    else
+        ____temp_9 = 0
+    end
+    local y = ____temp_9
+    jass.UnitUseItemPoint(whichUnit, whichItem, x, y)
+    return true
 end
 return ____exports

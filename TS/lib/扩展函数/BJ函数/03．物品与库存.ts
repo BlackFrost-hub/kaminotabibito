@@ -1,6 +1,10 @@
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
-const bj_MAX_INVENTORY = 6;
+// ===========================================================================
+// 物品栏常量（Blizzard.j）
+// ===========================================================================
+export const bj_MAX_INVENTORY = jglobals.bj_MAX_INVENTORY ?? 6;
 
 // ===========================================================================
 // 商店库存（Blizzard.j）：默认上架数量，供脚本与 `AddItemToStockBJ` / `AddUnitToStockBJ` 缺省参数使用
@@ -127,6 +131,76 @@ export function RemoveUnitFromStockBJ(unitId: number, whichUnit: any): void {
     if (typeof jass.RemoveUnitFromStock === "function") {
         jass.RemoveUnitFromStock(whichUnit, unitId);
     }
+}
+
+/**
+ * 获取物品位置（坐标）
+ * 对应JASS: GetItemLoc
+ */
+export function GetItemLoc(whichItem: any): any {
+    if (whichItem == null || whichItem === 0) return null;
+    if (typeof jass.GetItemX === "function" && typeof jass.GetItemY === "function") {
+        const x = jass.GetItemX(whichItem);
+        const y = jass.GetItemY(whichItem);
+        if (typeof jass.Location === "function") {
+            return jass.Location(x, y);
+        }
+    }
+    return null;
+}
+
+/**
+ * 在指定位置创建物品
+ * 对应JASS: CreateItemLoc
+ */
+export function CreateItemLoc(itemId: number, loc: any): any {
+    if (loc == null || loc === 0) return null;
+    if (typeof jass.CreateItem !== "function") return null;
+    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
+    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    return jass.CreateItem(itemId, x, y);
+}
+
+/**
+ * 设置物品位置
+ * 对应JASS: SetItemPositionLoc
+ */
+export function SetItemPositionLoc(whichItem: any, loc: any): void {
+    if (whichItem == null || whichItem === 0) return;
+    if (loc == null || loc === 0) return;
+    if (typeof jass.SetItemPosition !== "function") return;
+    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
+    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    jass.SetItemPosition(whichItem, x, y);
+}
+
+/**
+ * 单位在指定坐标丢弃物品
+ * 对应JASS: UnitDropItemPointLoc
+ */
+export function UnitDropItemPointLoc(whichUnit: any, whichItem: any, loc: any): boolean {
+    if (whichUnit == null || whichUnit === 0) return false;
+    if (whichItem == null || whichItem === 0) return false;
+    if (loc == null || loc === 0) return false;
+    if (typeof jass.UnitDropItemPoint !== "function") return false;
+    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
+    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    return jass.UnitDropItemPoint(whichUnit, whichItem, x, y);
+}
+
+/**
+ * 单位在指定坐标使用物品
+ * 对应JASS: UnitUseItemPointLoc
+ */
+export function UnitUseItemPointLoc(whichUnit: any, whichItem: any, loc: any): boolean {
+    if (whichUnit == null || whichUnit === 0) return false;
+    if (whichItem == null || whichItem === 0) return false;
+    if (loc == null || loc === 0) return false;
+    if (typeof jass.UnitUseItemPoint !== "function") return false;
+    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
+    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    jass.UnitUseItemPoint(whichUnit, whichItem, x, y);
+    return true;
 }
 
 export {};

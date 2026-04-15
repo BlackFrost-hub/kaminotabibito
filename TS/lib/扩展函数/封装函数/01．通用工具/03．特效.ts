@@ -7,7 +7,7 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { withTimer } from "./02．计时器";
-import { DzUnbindEffect } from "../../KK扩展API/index";
+const { DzUnbindEffect } = require("lib.扩展函数.KK扩展API.index") as { DzUnbindEffect: (whichEffect: any) => boolean };
 
 /**
  * 创建特效并在指定时间后自动销毁

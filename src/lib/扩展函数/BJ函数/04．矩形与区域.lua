@@ -1,6 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+--- 获取整个地图区域
+-- 对应JASS: GetEntireMapRect
+-- 实现: return GetWorldBounds()
+function ____exports.GetEntireMapRect(self)
+    if type(jass.GetWorldBounds) == "function" then
+        return jass.GetWorldBounds()
+    end
+    return nil
+end
 function ____exports.RectContainsCoords(self, r, x, y)
     if not r then
         return false

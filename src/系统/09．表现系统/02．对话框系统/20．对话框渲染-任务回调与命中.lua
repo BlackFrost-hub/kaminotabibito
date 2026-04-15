@@ -324,7 +324,7 @@ local function skipDialogLocal(self)
         if state.strNow < state.strLen then
             state.strNow = state.strLen
             local head = state.queue[1]
-            if head then
+            if head ~= nil then
                 dzSetText(nil, state.frames[4], head.text)
             end
         end

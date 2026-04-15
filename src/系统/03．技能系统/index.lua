@@ -25,6 +25,22 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.05．动态技能说明.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.01．显示技能名字")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -57,6 +73,14 @@ end
 local _____663E_793A_6280_80FD_540D_5B572 = require("系统.03．技能系统.02．显示技能名字2")
 if type(_____663E_793A_6280_80FD_540D_5B572.initShowSkillName2) == "function" then
     _____663E_793A_6280_80FD_540D_5B572:initShowSkillName2()
+end
+local dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index")
+if type(dynamicSkillTip.init) == "function" then
+    dynamicSkillTip:init()
+end
+local aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index")
+if type(aiSkillSystem.init) == "function" then
+    aiSkillSystem:init()
 end
 --- 初始化技能系统
 function ____exports.init(self)

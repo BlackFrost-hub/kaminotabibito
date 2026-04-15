@@ -1,7 +1,33 @@
-import { RMaxBJ } from "./07．杂项";
+import { RMaxBJ } from "./12．数学函数";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+
+//=============================================================================
+// 英雄属性常量（Blizzard.j）
+//=============================================================================
+
+/** 英雄属性 - 力量 */
+export const bj_HEROSTAT_STR = (jglobals as any).bj_HEROSTAT_STR ?? 0;
+
+/** 英雄属性 - 敏捷 */
+export const bj_HEROSTAT_AGI = (jglobals as any).bj_HEROSTAT_AGI ?? 1;
+
+/** 英雄属性 - 智力 */
+export const bj_HEROSTAT_INT = (jglobals as any).bj_HEROSTAT_INT ?? 2;
+
+//=============================================================================
+// 修改方式常量（Blizzard.j）
+//=============================================================================
+
+/** 修改方式 - 增加 */
+export const bj_MODIFYMETHOD_ADD = (jglobals as any).bj_MODIFYMETHOD_ADD ?? 0;
+
+/** 修改方式 - 减少 */
+export const bj_MODIFYMETHOD_SUB = (jglobals as any).bj_MODIFYMETHOD_SUB ?? 1;
+
+/** 修改方式 - 设置 */
+export const bj_MODIFYMETHOD_SET = (jglobals as any).bj_MODIFYMETHOD_SET ?? 2;
 
 /**
  * 为指定玩家选中单位（本地操作，避免同步问题）
@@ -102,6 +128,82 @@ export function SetUnitLifeBJ(whichUnit: any, value: number): void {
 /** 对齐 Blizzard.j：`SetUnitState(MANA, RMaxBJ(0, value))` */
 export function SetUnitManaBJ(whichUnit: any, value: number): void {
     jass.SetUnitState(whichUnit, jass.UNIT_STATE_MANA, RMaxBJ(0, value));
+}
+
+/**
+ * 设置英雄等级（可选择是否显示升级动画）
+ * 对应JASS: SetHeroLevelBJ
+ */
+export function SetHeroLevelBJ(whichHero: any, level: number, showEyeCandy: boolean): void {
+    if (whichHero == null || whichHero === 0) return;
+    if (level < 1) level = 1;
+    jass.SetHeroLevel(whichHero, level, showEyeCandy);
+}
+
+/**
+ * 增加英雄经验值
+ * 对应JASS: AddHeroXPSwapped
+ */
+export function AddHeroXPSwapped(amount: number, whichHero: any, shareGolden: boolean): void {
+    if (whichHero == null || whichHero === 0) return;
+    jass.AddHeroXP(whichHero, amount, shareGolden);
+}
+
+/**
+ * 暂停/恢复英雄经验获取
+ * 对应JASS: SuspendHeroXPBJ
+ */
+export function SuspendHeroXPBJ(pause: boolean, whichHero: any): void {
+    if (whichHero == null || whichHero === 0) return;
+    jass.SuspendHeroXP(whichHero, pause);
+}
+
+/**
+ * 判断英雄经验是否暂停
+ * 对应JASS: IsSuspendedXPBJ
+ */
+export function IsSuspendedXPBJ(whichHero: any): boolean {
+    if (whichHero == null || whichHero === 0) return false;
+    return jass.IsSuspendedXP(whichHero);
+}
+
+/**
+ * 修改英雄技能点数
+ * 对应JASS: ModifyHeroSkillPoints
+ */
+export function ModifyHeroSkillPoints(whichHero: any, whichStat: number, modifyMethod: number, value: number): boolean {
+    if (whichHero == null || whichHero === 0) return false;
+    if (typeof jass.ModifyHeroSkillPoints !== "function") return false;
+    return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value);
+}
+
+/**
+ * 判断单位是否拥有指定buff
+ * 对应JASS: UnitHasBuffBJ
+ */
+export function UnitHasBuffBJ(whichUnit: any, buffId: number): boolean {
+    if (whichUnit == null || whichUnit === 0) return false;
+    return jass.UnitHasBuff(whichUnit, buffId);
+}
+
+/**
+ * 移除单位所有指定类型的buff
+ * 对应JASS: UnitRemoveBuffBJ
+ */
+export function UnitRemoveBuffBJ(buffId: number, whichUnit: any): void {
+    if (whichUnit == null || whichUnit === 0) return;
+    jass.UnitRemoveBuff(whichUnit, buffId);
+}
+
+/**
+ * 获取刚学会的技能ID
+ * 对应JASS: GetLearnedSkillBJ
+ */
+export function GetLearnedSkillBJ(): number {
+    if (typeof jass.GetLearnedSkill === "function") {
+        return jass.GetLearnedSkill();
+    }
+    return 0;
 }
 
 export {};

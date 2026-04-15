@@ -1,5 +1,17 @@
 const jass = require("jass.common") as any;
 
+/**
+ * 获取整个地图区域
+ * 对应JASS: GetEntireMapRect
+ * 实现: return GetWorldBounds()
+ */
+export function GetEntireMapRect(): any {
+  if (typeof jass.GetWorldBounds === "function") {
+    return jass.GetWorldBounds();
+  }
+  return null;
+}
+
 export function RectContainsCoords(r: any, x: number, y: number): boolean {
     if (!r) return false;
     if (

@@ -4,12 +4,12 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____02_FF0E_8BA1_65F6_5668 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
 local withTimer = ____02_FF0E_8BA1_65F6_5668.withTimer
-local ____index = require("lib.扩展函数.KK扩展API.index")
-local DzUnbindEffect = ____index.DzUnbindEffect
 --- 特效封装函数
 -- 创建和管理特效
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
+local DzUnbindEffect = ____require_result_0.DzUnbindEffect
 --- 创建特效并在指定时间后自动销毁
 -- 
 -- @param modelPath 特效模型路径

@@ -9,6 +9,10 @@ local sound = require("lib.扩展函数.BJ函数.05B．音效函数")
 local questMsg = require("lib.扩展函数.BJ函数.06．任务消息")
 local misc = require("lib.扩展函数.BJ函数.07．杂项")
 local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local imageBj = require("lib.扩展函数.BJ函数.10．图像函数")
+local ubersplatBj = require("lib.扩展函数.BJ函数.11．贴图函数")
+local mathBj = require("lib.扩展函数.BJ函数.12．数学函数")
+local multiboardBj = require("lib.扩展函数.BJ函数.13．多面板函数")
 do
     local ____export = require("lib.扩展函数.BJ函数.00．BJ全局兜底")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -97,6 +101,46 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.BJ函数.10．图像函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.BJ函数.11．贴图函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.BJ函数.12．数学函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.BJ函数.12．数学函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.BJ函数.13．多面板函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return
@@ -135,6 +179,7 @@ function ____exports.registerBridge(self)
     expose(nil, "RectContainsLoc", rectArea.RectContainsLoc)
     expose(nil, "RectContainsUnit", rectArea.RectContainsUnit)
     expose(nil, "SetStackedSoundBJ", rectArea.SetStackedSoundBJ)
+    expose(nil, "GetEntireMapRect", rectArea.GetEntireMapRect)
     expose(nil, "TriggerRegisterUnitInRangeSimple", trigEvent.TriggerRegisterUnitInRangeSimple)
     expose(nil, "GetAttackedUnitBJ", trigEvent.GetAttackedUnitBJ)
     expose(nil, "ConditionalTriggerExecute", trigEvent.ConditionalTriggerExecute)
@@ -144,8 +189,8 @@ function ____exports.registerBridge(self)
     expose(nil, "DoTransmissionBasicsXYBJ", cine.DoTransmissionBasicsXYBJ)
     expose(nil, "TryInitCinematicBehaviorBJ", cine.TryInitCinematicBehaviorBJ)
     expose(nil, "TransmissionFromUnitWithNameBJ", cine.TransmissionFromUnitWithNameBJ)
-    expose(nil, "PercentToInt", sound.PercentToInt)
-    expose(nil, "PercentTo255", sound.PercentTo255)
+    expose(nil, "PercentToInt", mathBj.PercentToInt)
+    expose(nil, "PercentTo255", mathBj.PercentTo255)
     expose(nil, "CinematicModeExBJ", cine.CinematicModeExBJ)
     expose(nil, "CinematicModeBJ", cine.CinematicModeBJ)
     expose(nil, "CinematicFilterGenericBJ", cine.CinematicFilterGenericBJ)
@@ -172,10 +217,10 @@ function ____exports.registerBridge(self)
     expose(nil, "OperatorDegreeMultiply", misc.OperatorDegreeMultiply)
     expose(nil, "OperatorRealAdd", misc.OperatorRealAdd)
     expose(nil, "OperatorRealMultiply", misc.OperatorRealMultiply)
-    expose(nil, "IMaxBJ", misc.IMaxBJ)
-    expose(nil, "IMinBJ", misc.IMinBJ)
-    expose(nil, "RMaxBJ", misc.RMaxBJ)
-    expose(nil, "RMinBJ", misc.RMinBJ)
+    expose(nil, "IMaxBJ", mathBj.IMaxBJ)
+    expose(nil, "IMinBJ", mathBj.IMinBJ)
+    expose(nil, "RMaxBJ", mathBj.RMaxBJ)
+    expose(nil, "RMinBJ", mathBj.RMinBJ)
     expose(nil, "String2UnitIdBJ", unitBjExt.String2UnitIdBJ)
     expose(nil, "GetIssuedOrderIdBJ", unitBjExt.GetIssuedOrderIdBJ)
     expose(nil, "GetKillingUnitBJ", unitBjExt.GetKillingUnitBJ)
@@ -223,5 +268,55 @@ function ____exports.registerBridge(self)
     expose(nil, "GetLastReplacedUnitBJ", unitBjExt.GetLastReplacedUnitBJ)
     expose(nil, "DoesUnitGenerateAlarms", unitBjExt.DoesUnitGenerateAlarms)
     expose(nil, "GetUnitPropWindowBJ", unitBjExt.GetUnitPropWindowBJ)
+    expose(nil, "CreateImageBJ", imageBj.CreateImageBJ)
+    expose(nil, "ShowImageBJ", imageBj.ShowImageBJ)
+    expose(nil, "SetImagePositionBJ", imageBj.SetImagePositionBJ)
+    expose(nil, "SetImageColorBJ", imageBj.SetImageColorBJ)
+    expose(nil, "GetLastCreatedImage", imageBj.GetLastCreatedImage)
+    expose(nil, "CosBJ", mathBj.CosBJ)
+    expose(nil, "SinBJ", mathBj.SinBJ)
+    expose(nil, "TanBJ", mathBj.TanBJ)
+    expose(nil, "AcosBJ", mathBj.AcosBJ)
+    expose(nil, "AsinBJ", mathBj.AsinBJ)
+    expose(nil, "AtanBJ", mathBj.AtanBJ)
+    expose(nil, "Atan2BJ", mathBj.Atan2BJ)
+    expose(nil, "RAbsBJ", mathBj.RAbsBJ)
+    expose(nil, "RSignBJ", mathBj.RSignBJ)
+    expose(nil, "IAbsBJ", mathBj.IAbsBJ)
+    expose(nil, "ISignBJ", mathBj.ISignBJ)
+    expose(nil, "GetRandomPercentageBJ", mathBj.GetRandomPercentageBJ)
+    expose(nil, "ModuloInteger", mathBj.ModuloInteger)
+    expose(nil, "ModuloReal", mathBj.ModuloReal)
+    expose(nil, "AngleBetweenPoints", mathBj.AngleBetweenPoints)
+    expose(nil, "DistanceBetweenPoints", mathBj.DistanceBetweenPoints)
+    expose(nil, "SetHeroLevelBJ", unitHero.SetHeroLevelBJ)
+    expose(nil, "AddHeroXPSwapped", unitHero.AddHeroXPSwapped)
+    expose(nil, "SuspendHeroXPBJ", unitHero.SuspendHeroXPBJ)
+    expose(nil, "IsSuspendedXPBJ", unitHero.IsSuspendedXPBJ)
+    expose(nil, "ModifyHeroSkillPoints", unitHero.ModifyHeroSkillPoints)
+    expose(nil, "UnitHasBuffBJ", unitHero.UnitHasBuffBJ)
+    expose(nil, "UnitRemoveBuffBJ", unitHero.UnitRemoveBuffBJ)
+    expose(nil, "GetLearnedSkillBJ", unitHero.GetLearnedSkillBJ)
+    expose(nil, "GetItemLoc", itemInv.GetItemLoc)
+    expose(nil, "CreateItemLoc", itemInv.CreateItemLoc)
+    expose(nil, "SetItemPositionLoc", itemInv.SetItemPositionLoc)
+    expose(nil, "UnitDropItemPointLoc", itemInv.UnitDropItemPointLoc)
+    expose(nil, "UnitUseItemPointLoc", itemInv.UnitUseItemPointLoc)
+    expose(nil, "CreateUbersplatBJ", ubersplatBj.CreateUbersplatBJ)
+    expose(nil, "ShowUbersplatBJ", ubersplatBj.ShowUbersplatBJ)
+    expose(nil, "GetLastCreatedUbersplat", ubersplatBj.GetLastCreatedUbersplat)
+    expose(nil, "CreateMultiboardBJ", multiboardBj.CreateMultiboardBJ)
+    expose(nil, "DestroyMultiboardBJ", multiboardBj.DestroyMultiboardBJ)
+    expose(nil, "GetLastCreatedMultiboard", multiboardBj.GetLastCreatedMultiboard)
+    expose(nil, "MultiboardDisplayBJ", multiboardBj.MultiboardDisplayBJ)
+    expose(nil, "MultiboardMinimizeBJ", multiboardBj.MultiboardMinimizeBJ)
+    expose(nil, "MultiboardSetTitleTextColorBJ", multiboardBj.MultiboardSetTitleTextColorBJ)
+    expose(nil, "MultiboardAllowDisplayBJ", multiboardBj.MultiboardAllowDisplayBJ)
+    expose(nil, "MultiboardSetItemStyleBJ", multiboardBj.MultiboardSetItemStyleBJ)
+    expose(nil, "MultiboardSetItemValueBJ", multiboardBj.MultiboardSetItemValueBJ)
+    expose(nil, "MultiboardSetItemColorBJ", multiboardBj.MultiboardSetItemColorBJ)
+    expose(nil, "MultiboardSetItemWidthBJ", multiboardBj.MultiboardSetItemWidthBJ)
+    expose(nil, "MultiboardSetItemIconBJ", multiboardBj.MultiboardSetItemIconBJ)
+    expose(nil, "GetLastCreatedMultiboardItem", multiboardBj.GetLastCreatedMultiboardItem)
 end
 return ____exports

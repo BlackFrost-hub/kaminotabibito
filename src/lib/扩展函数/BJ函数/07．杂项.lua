@@ -99,16 +99,4 @@ end
 function ____exports.OperatorRealMultiply(self, a, b)
     return a * b
 end
-function ____exports.IMaxBJ(self, a, b)
-    return a >= b and a or b
-end
-function ____exports.IMinBJ(self, a, b)
-    return a <= b and a or b
-end
-function ____exports.RMaxBJ(self, a, b)
-    return a < b and b or a
-end
-function ____exports.RMinBJ(self, a, b)
-    return a < b and a or b
-end
 return ____exports

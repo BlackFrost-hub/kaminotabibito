@@ -155,15 +155,4 @@ export function PlaySoundBJ(soundHandle: any): void {
     }
 }
 
-export function PercentToInt(percentage: number, max: number): number {
-    if (typeof jass.R2I === "function") {
-        return jass.R2I(percentage * 0.01 * max);
-    }
-    return Math.floor(percentage * 0.01 * max);
-}
-
-export function PercentTo255(percentage: number): number {
-    return PercentToInt(percentage, 255);
-}
-
 export {};

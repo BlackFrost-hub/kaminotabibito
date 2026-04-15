@@ -1,23 +1,46 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local kkApi = require("lib.扩展函数.KK扩展API.00．KK扩展API")
-local eventApi = require("lib.扩展函数.KK扩展API.01．事件注册函数")
-do
-    local ____export = require("lib.扩展函数.KK扩展API.00．KK扩展API")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lib.扩展函数.KK扩展API.01．事件注册函数")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
+local doodadApi = require("lib.扩展函数.KK扩展API.00．装饰物函数")
+local effectApi = require("lib.扩展函数.KK扩展API.01．特效函数")
+local eventApi = require("lib.扩展函数.KK扩展API.02．事件注册函数")
+local utilApi = require("lib.扩展函数.KK扩展API.03．工具函数")
+____exports.DzDoodadCreate = doodadApi.DzDoodadCreate
+____exports.DzDoodadGetTypeId = doodadApi.DzDoodadGetTypeId
+____exports.DzDoodadSetModel = doodadApi.DzDoodadSetModel
+____exports.DzDoodadSetTeamColor = doodadApi.DzDoodadSetTeamColor
+____exports.DzDoodadSetColor = doodadApi.DzDoodadSetColor
+____exports.DzDoodadGetX = doodadApi.DzDoodadGetX
+____exports.DzDoodadGetY = doodadApi.DzDoodadGetY
+____exports.DzDoodadGetZ = doodadApi.DzDoodadGetZ
+____exports.DzDoodadSetPosition = doodadApi.DzDoodadSetPosition
+____exports.DzDoodadSetOrientMatrixRotate = doodadApi.DzDoodadSetOrientMatrixRotate
+____exports.DzDoodadSetOrientMatrixScale = doodadApi.DzDoodadSetOrientMatrixScale
+____exports.DzDoodadSetOrientMatrixResize = doodadApi.DzDoodadSetOrientMatrixResize
+____exports.DzDoodadSetVisible = doodadApi.DzDoodadSetVisible
+____exports.DzDoodadSetAnimation = doodadApi.DzDoodadSetAnimation
+____exports.DzDoodadSetTimeScale = doodadApi.DzDoodadSetTimeScale
+____exports.DzDoodadGetTimeScale = doodadApi.DzDoodadGetTimeScale
+____exports.DzDoodadGetCurrentAnimationIndex = doodadApi.DzDoodadGetCurrentAnimationIndex
+____exports.DzDoodadGetAnimationCount = doodadApi.DzDoodadGetAnimationCount
+____exports.DzDoodadGetAnimationName = doodadApi.DzDoodadGetAnimationName
+____exports.DzDoodadGetAnimationTime = doodadApi.DzDoodadGetAnimationTime
+____exports.DzBindEffect = effectApi.DzBindEffect
+____exports.DzUnbindEffect = effectApi.DzUnbindEffect
+____exports.DzSetEffectScale = effectApi.DzSetEffectScale
+____exports.DzTriggerRegisterMouseEventTrg = eventApi.DzTriggerRegisterMouseEventTrg
+____exports.DzTriggerRegisterKeyEventTrg = eventApi.DzTriggerRegisterKeyEventTrg
+____exports.DzTriggerRegisterMouseMoveEventTrg = eventApi.DzTriggerRegisterMouseMoveEventTrg
+____exports.DzTriggerRegisterMouseWheelEventTrg = eventApi.DzTriggerRegisterMouseWheelEventTrg
+____exports.DzTriggerRegisterWindowResizeEventTrg = eventApi.DzTriggerRegisterWindowResizeEventTrg
+____exports.DzF2I = eventApi.DzF2I
+____exports.DzI2F = eventApi.DzI2F
+____exports.DzK2I = eventApi.DzK2I
+____exports.DzI2K = eventApi.DzI2K
+____exports.DzTriggerRegisterMallItemSyncData = eventApi.DzTriggerRegisterMallItemSyncData
+____exports.DzGetTriggerMallItemPlayer = eventApi.DzGetTriggerMallItemPlayer
+____exports.DzGetTriggerMallItem = eventApi.DzGetTriggerMallItem
+____exports.DzGetColor2 = utilApi.DzGetColor2
+____exports.DzOpenQQGroupUrl = utilApi.DzOpenQQGroupUrl
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return
@@ -29,29 +52,29 @@ local function expose(self, name, fn)
     g[name] = fn
 end
 function ____exports.registerBridge(self)
-    expose(nil, "DzDoodadCreate", kkApi.DzDoodadCreate)
-    expose(nil, "DzDoodadGetTypeId", kkApi.DzDoodadGetTypeId)
-    expose(nil, "DzDoodadSetModel", kkApi.DzDoodadSetModel)
-    expose(nil, "DzDoodadSetTeamColor", kkApi.DzDoodadSetTeamColor)
-    expose(nil, "DzDoodadSetColor", kkApi.DzDoodadSetColor)
-    expose(nil, "DzDoodadGetX", kkApi.DzDoodadGetX)
-    expose(nil, "DzDoodadGetY", kkApi.DzDoodadGetY)
-    expose(nil, "DzDoodadGetZ", kkApi.DzDoodadGetZ)
-    expose(nil, "DzDoodadSetPosition", kkApi.DzDoodadSetPosition)
-    expose(nil, "DzDoodadSetOrientMatrixRotate", kkApi.DzDoodadSetOrientMatrixRotate)
-    expose(nil, "DzDoodadSetOrientMatrixScale", kkApi.DzDoodadSetOrientMatrixScale)
-    expose(nil, "DzDoodadSetOrientMatrixResize", kkApi.DzDoodadSetOrientMatrixResize)
-    expose(nil, "DzDoodadSetVisible", kkApi.DzDoodadSetVisible)
-    expose(nil, "DzDoodadSetAnimation", kkApi.DzDoodadSetAnimation)
-    expose(nil, "DzDoodadSetTimeScale", kkApi.DzDoodadSetTimeScale)
-    expose(nil, "DzDoodadGetTimeScale", kkApi.DzDoodadGetTimeScale)
-    expose(nil, "DzDoodadGetCurrentAnimationIndex", kkApi.DzDoodadGetCurrentAnimationIndex)
-    expose(nil, "DzDoodadGetAnimationCount", kkApi.DzDoodadGetAnimationCount)
-    expose(nil, "DzDoodadGetAnimationName", kkApi.DzDoodadGetAnimationName)
-    expose(nil, "DzDoodadGetAnimationTime", kkApi.DzDoodadGetAnimationTime)
-    expose(nil, "DzBindEffect", kkApi.DzBindEffect)
-    expose(nil, "DzUnbindEffect", kkApi.DzUnbindEffect)
-    expose(nil, "DzSetEffectScale", kkApi.DzSetEffectScale)
+    expose(nil, "DzDoodadCreate", doodadApi.DzDoodadCreate)
+    expose(nil, "DzDoodadGetTypeId", doodadApi.DzDoodadGetTypeId)
+    expose(nil, "DzDoodadSetModel", doodadApi.DzDoodadSetModel)
+    expose(nil, "DzDoodadSetTeamColor", doodadApi.DzDoodadSetTeamColor)
+    expose(nil, "DzDoodadSetColor", doodadApi.DzDoodadSetColor)
+    expose(nil, "DzDoodadGetX", doodadApi.DzDoodadGetX)
+    expose(nil, "DzDoodadGetY", doodadApi.DzDoodadGetY)
+    expose(nil, "DzDoodadGetZ", doodadApi.DzDoodadGetZ)
+    expose(nil, "DzDoodadSetPosition", doodadApi.DzDoodadSetPosition)
+    expose(nil, "DzDoodadSetOrientMatrixRotate", doodadApi.DzDoodadSetOrientMatrixRotate)
+    expose(nil, "DzDoodadSetOrientMatrixScale", doodadApi.DzDoodadSetOrientMatrixScale)
+    expose(nil, "DzDoodadSetOrientMatrixResize", doodadApi.DzDoodadSetOrientMatrixResize)
+    expose(nil, "DzDoodadSetVisible", doodadApi.DzDoodadSetVisible)
+    expose(nil, "DzDoodadSetAnimation", doodadApi.DzDoodadSetAnimation)
+    expose(nil, "DzDoodadSetTimeScale", doodadApi.DzDoodadSetTimeScale)
+    expose(nil, "DzDoodadGetTimeScale", doodadApi.DzDoodadGetTimeScale)
+    expose(nil, "DzDoodadGetCurrentAnimationIndex", doodadApi.DzDoodadGetCurrentAnimationIndex)
+    expose(nil, "DzDoodadGetAnimationCount", doodadApi.DzDoodadGetAnimationCount)
+    expose(nil, "DzDoodadGetAnimationName", doodadApi.DzDoodadGetAnimationName)
+    expose(nil, "DzDoodadGetAnimationTime", doodadApi.DzDoodadGetAnimationTime)
+    expose(nil, "DzBindEffect", effectApi.DzBindEffect)
+    expose(nil, "DzUnbindEffect", effectApi.DzUnbindEffect)
+    expose(nil, "DzSetEffectScale", effectApi.DzSetEffectScale)
     expose(nil, "DzTriggerRegisterMouseEventTrg", eventApi.DzTriggerRegisterMouseEventTrg)
     expose(nil, "DzTriggerRegisterKeyEventTrg", eventApi.DzTriggerRegisterKeyEventTrg)
     expose(nil, "DzTriggerRegisterMouseMoveEventTrg", eventApi.DzTriggerRegisterMouseMoveEventTrg)
@@ -64,5 +87,7 @@ function ____exports.registerBridge(self)
     expose(nil, "DzTriggerRegisterMallItemSyncData", eventApi.DzTriggerRegisterMallItemSyncData)
     expose(nil, "DzGetTriggerMallItemPlayer", eventApi.DzGetTriggerMallItemPlayer)
     expose(nil, "DzGetTriggerMallItem", eventApi.DzGetTriggerMallItem)
+    expose(nil, "DzGetColor2", utilApi.DzGetColor2)
+    expose(nil, "DzOpenQQGroupUrl", utilApi.DzOpenQQGroupUrl)
 end
 return ____exports

@@ -35,13 +35,11 @@ import {
     EnableDawnDusk,
     IsDawnDuskEnabled,
     GetSoundDurationBJ,
-    PercentToInt,
-    PercentTo255,
     GetTransmissionDuration,
     SetCineModeVolumeGroupsBJ,
     CameraResetSmoothingFactorBJ,
 } from "./05B．音效函数";
-import { RMaxBJ } from "./07．杂项";
+import { RMaxBJ, PercentToInt, PercentTo255 } from "./12．数学函数";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;

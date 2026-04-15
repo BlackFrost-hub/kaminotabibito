@@ -19,12 +19,12 @@ local PlaySoundBJ = ____05B_FF0E_97F3_6548_51FD_6570.PlaySoundBJ
 local WaitTransmissionDuration = ____05B_FF0E_97F3_6548_51FD_6570.WaitTransmissionDuration
 local EnableDawnDusk = ____05B_FF0E_97F3_6548_51FD_6570.EnableDawnDusk
 local IsDawnDuskEnabled = ____05B_FF0E_97F3_6548_51FD_6570.IsDawnDuskEnabled
-local PercentTo255 = ____05B_FF0E_97F3_6548_51FD_6570.PercentTo255
 local GetTransmissionDuration = ____05B_FF0E_97F3_6548_51FD_6570.GetTransmissionDuration
 local SetCineModeVolumeGroupsBJ = ____05B_FF0E_97F3_6548_51FD_6570.SetCineModeVolumeGroupsBJ
 local CameraResetSmoothingFactorBJ = ____05B_FF0E_97F3_6548_51FD_6570.CameraResetSmoothingFactorBJ
-local ____07_FF0E_6742_9879 = require("lib.扩展函数.BJ函数.07．杂项")
-local RMaxBJ = ____07_FF0E_6742_9879.RMaxBJ
+local ____12_FF0E_6570_5B66_51FD_6570 = require("lib.扩展函数.BJ函数.12．数学函数")
+local RMaxBJ = ____12_FF0E_6570_5B66_51FD_6570.RMaxBJ
+local PercentTo255 = ____12_FF0E_6570_5B66_51FD_6570.PercentTo255
 function ____exports.AbortCinematicFadeBJ(self)
     local t1 = jglobals.bj_cineFadeContinueTimer
     local t2 = jglobals.bj_cineFadeFinishTimer

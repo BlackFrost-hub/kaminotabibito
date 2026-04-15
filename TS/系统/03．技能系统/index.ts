@@ -6,6 +6,8 @@
 export * from "./01．技能冷却/index";
 export * from "./02．技能消耗/index";
 export * from "./04．快捷键技能/index";
+export * from "./05．动态技能说明/index";
+export * from "./06．AI自动使用技能/index";
 
 // ========== 功能模块导出 ==========
 export * from "./01．显示技能名字";
@@ -35,6 +37,14 @@ const 显示技能名字2 = require("系统.03．技能系统.02．显示技能�
 if (typeof 显示技能名字2.initShowSkillName2 === "function") 显示技能名字2.initShowSkillName2();
 
 // require("系统.03．技能系统.03．技能台词");
+
+// 动态技能说明系统
+const dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index") as { init?: () => void };
+if (typeof dynamicSkillTip.init === "function") dynamicSkillTip.init();
+
+// AI自动使用技能系统
+const aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index") as { init?: () => void };
+if (typeof aiSkillSystem.init === "function") aiSkillSystem.init();
 
 /**
  * 初始化技能系统

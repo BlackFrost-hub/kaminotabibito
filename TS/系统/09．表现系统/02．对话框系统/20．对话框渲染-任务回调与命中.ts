@@ -210,7 +210,7 @@ function skipDialogLocal(): void {
     if (state.strNow < state.strLen) {
       state.strNow = state.strLen;
       const head = state.queue[0];
-      if (head) dzSetText(state.frames[3], head.text);
+      if (head !== undefined) dzSetText(state.frames[3], head.text);
     }
     const questEntry = state.queue[questIdx];
     dzSetFont(state.frames[2], DEFAULT_FONT, questEntry.titleFontSize);

@@ -9,6 +9,9 @@ export * from "./06．任务消息";
 export * from "./07．杂项";
 export * from "./08．单位BJ扩展";
 export * from "./09．物品操作";
+export * from "./10．图像函数";
+export * from "./11．贴图函数";
+export * from "./12．数学函数";
 
 import * as trigEvent from "./01．触发与事件";
 import * as unitHero from "./02．单位与英雄";
@@ -19,6 +22,14 @@ import * as sound from "./05B．音效函数";
 import * as questMsg from "./06．任务消息";
 import * as misc from "./07．杂项";
 import * as unitBjExt from "./08．单位BJ扩展";
+import * as imageBj from "./10．图像函数";
+import * as ubersplatBj from "./11．贴图函数";
+export * from "./12．数学函数";
+export * from "./13．多面板函数";
+
+import * as mathBj from "./12．数学函数";
+import * as multiboardBj from "./13．多面板函数";
+import * as bjGlobal from "./00．BJ全局兜底";
 
 function expose(name: string, fn: any): void {
   if (typeof fn !== "function") return;
@@ -55,6 +66,7 @@ export function registerBridge(): void {
   expose("RectContainsLoc", rectArea.RectContainsLoc);
   expose("RectContainsUnit", rectArea.RectContainsUnit);
   expose("SetStackedSoundBJ", rectArea.SetStackedSoundBJ);
+  expose("GetEntireMapRect", rectArea.GetEntireMapRect);
   expose("TriggerRegisterUnitInRangeSimple", trigEvent.TriggerRegisterUnitInRangeSimple);
   expose("GetAttackedUnitBJ", trigEvent.GetAttackedUnitBJ);
   expose("ConditionalTriggerExecute", trigEvent.ConditionalTriggerExecute);
@@ -64,8 +76,8 @@ export function registerBridge(): void {
   expose("DoTransmissionBasicsXYBJ", cine.DoTransmissionBasicsXYBJ);
   expose("TryInitCinematicBehaviorBJ", cine.TryInitCinematicBehaviorBJ);
   expose("TransmissionFromUnitWithNameBJ", cine.TransmissionFromUnitWithNameBJ);
-  expose("PercentToInt", sound.PercentToInt);
-  expose("PercentTo255", sound.PercentTo255);
+  expose("PercentToInt", mathBj.PercentToInt);
+  expose("PercentTo255", mathBj.PercentTo255);
   expose("CinematicModeExBJ", cine.CinematicModeExBJ);
   expose("CinematicModeBJ", cine.CinematicModeBJ);
   expose("CinematicFilterGenericBJ", cine.CinematicFilterGenericBJ);
@@ -92,10 +104,10 @@ export function registerBridge(): void {
   expose("OperatorDegreeMultiply", misc.OperatorDegreeMultiply);
   expose("OperatorRealAdd", misc.OperatorRealAdd);
   expose("OperatorRealMultiply", misc.OperatorRealMultiply);
-  expose("IMaxBJ", misc.IMaxBJ);
-  expose("IMinBJ", misc.IMinBJ);
-  expose("RMaxBJ", misc.RMaxBJ);
-  expose("RMinBJ", misc.RMinBJ);
+  expose("IMaxBJ", mathBj.IMaxBJ);
+  expose("IMinBJ", mathBj.IMinBJ);
+  expose("RMaxBJ", mathBj.RMaxBJ);
+  expose("RMinBJ", mathBj.RMinBJ);
 
   expose("String2UnitIdBJ", unitBjExt.String2UnitIdBJ);
   expose("GetIssuedOrderIdBJ", unitBjExt.GetIssuedOrderIdBJ);
@@ -144,4 +156,61 @@ export function registerBridge(): void {
   expose("GetLastReplacedUnitBJ", unitBjExt.GetLastReplacedUnitBJ);
   expose("DoesUnitGenerateAlarms", unitBjExt.DoesUnitGenerateAlarms);
   expose("GetUnitPropWindowBJ", unitBjExt.GetUnitPropWindowBJ);
+  // 图像函数
+  expose("CreateImageBJ", imageBj.CreateImageBJ);
+  expose("ShowImageBJ", imageBj.ShowImageBJ);
+  expose("SetImagePositionBJ", imageBj.SetImagePositionBJ);
+  expose("SetImageColorBJ", imageBj.SetImageColorBJ);
+  expose("GetLastCreatedImage", imageBj.GetLastCreatedImage);
+  // 三角函数（角度版本）
+  expose("CosBJ", mathBj.CosBJ);
+  expose("SinBJ", mathBj.SinBJ);
+  expose("TanBJ", mathBj.TanBJ);
+  expose("AcosBJ", mathBj.AcosBJ);
+  expose("AsinBJ", mathBj.AsinBJ);
+  expose("AtanBJ", mathBj.AtanBJ);
+  expose("Atan2BJ", mathBj.Atan2BJ);
+  // 数学函数
+  expose("RAbsBJ", mathBj.RAbsBJ);
+  expose("RSignBJ", mathBj.RSignBJ);
+  expose("IAbsBJ", mathBj.IAbsBJ);
+  expose("ISignBJ", mathBj.ISignBJ);
+  expose("GetRandomPercentageBJ", mathBj.GetRandomPercentageBJ);
+  expose("ModuloInteger", mathBj.ModuloInteger);
+  expose("ModuloReal", mathBj.ModuloReal);
+  expose("AngleBetweenPoints", mathBj.AngleBetweenPoints);
+  expose("DistanceBetweenPoints", mathBj.DistanceBetweenPoints);
+  // 英雄相关BJ函数
+  expose("SetHeroLevelBJ", unitHero.SetHeroLevelBJ);
+  expose("AddHeroXPSwapped", unitHero.AddHeroXPSwapped);
+  expose("SuspendHeroXPBJ", unitHero.SuspendHeroXPBJ);
+  expose("IsSuspendedXPBJ", unitHero.IsSuspendedXPBJ);
+  expose("ModifyHeroSkillPoints", unitHero.ModifyHeroSkillPoints);
+  expose("UnitHasBuffBJ", unitHero.UnitHasBuffBJ);
+  expose("UnitRemoveBuffBJ", unitHero.UnitRemoveBuffBJ);
+  expose("GetLearnedSkillBJ", unitHero.GetLearnedSkillBJ);
+  // 物品位置相关BJ函数
+  expose("GetItemLoc", itemInv.GetItemLoc);
+  expose("CreateItemLoc", itemInv.CreateItemLoc);
+  expose("SetItemPositionLoc", itemInv.SetItemPositionLoc);
+  expose("UnitDropItemPointLoc", itemInv.UnitDropItemPointLoc);
+  expose("UnitUseItemPointLoc", itemInv.UnitUseItemPointLoc);
+  // 贴图(Ubersplat)BJ函数
+  expose("CreateUbersplatBJ", ubersplatBj.CreateUbersplatBJ);
+  expose("ShowUbersplatBJ", ubersplatBj.ShowUbersplatBJ);
+  expose("GetLastCreatedUbersplat", ubersplatBj.GetLastCreatedUbersplat);
+  // 多面板BJ函数
+  expose("CreateMultiboardBJ", multiboardBj.CreateMultiboardBJ);
+  expose("DestroyMultiboardBJ", multiboardBj.DestroyMultiboardBJ);
+  expose("GetLastCreatedMultiboard", multiboardBj.GetLastCreatedMultiboard);
+  expose("MultiboardDisplayBJ", multiboardBj.MultiboardDisplayBJ);
+  expose("MultiboardMinimizeBJ", multiboardBj.MultiboardMinimizeBJ);
+  expose("MultiboardSetTitleTextColorBJ", multiboardBj.MultiboardSetTitleTextColorBJ);
+  expose("MultiboardAllowDisplayBJ", multiboardBj.MultiboardAllowDisplayBJ);
+  expose("MultiboardSetItemStyleBJ", multiboardBj.MultiboardSetItemStyleBJ);
+  expose("MultiboardSetItemValueBJ", multiboardBj.MultiboardSetItemValueBJ);
+  expose("MultiboardSetItemColorBJ", multiboardBj.MultiboardSetItemColorBJ);
+  expose("MultiboardSetItemWidthBJ", multiboardBj.MultiboardSetItemWidthBJ);
+  expose("MultiboardSetItemIconBJ", multiboardBj.MultiboardSetItemIconBJ);
+  expose("GetLastCreatedMultiboardItem", multiboardBj.GetLastCreatedMultiboardItem);
 }

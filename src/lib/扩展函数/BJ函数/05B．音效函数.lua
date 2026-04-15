@@ -311,13 +311,4 @@ function ____exports.PlaySoundBJ(self, soundHandle)
         jass.StartSound(soundHandle)
     end
 end
-function ____exports.PercentToInt(self, percentage, max)
-    if type(jass.R2I) == "function" then
-        return jass.R2I(percentage * 0.01 * max)
-    end
-    return math.floor(percentage * 0.01 * max)
-end
-function ____exports.PercentTo255(self, percentage)
-    return ____exports.PercentToInt(nil, percentage, 255)
-end
 return ____exports
