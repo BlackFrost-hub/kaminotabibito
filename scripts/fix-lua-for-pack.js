@@ -55,9 +55,10 @@ function fixFile(filePath) {
   //     冒号调用会把 japi 表当 self 传入导致参数全部错位，统一改为点号。
   content = content.replace(/\bjapi:/g, "japi.");
 
-  // 6g. 07．技能函数 / 08．伤害函数 / 02．Star自定义事件（STES_*）：
+  // 6g. 07．技能函数 / 08．伤害函数 / Star自定义事件（STES_*）：
   //     TSTL 导出函数会多一层 self；外部用 stesMod.STES_Register(trig, name) 点号调用只传两参，
   //     若不剥离则 self=trig、a=事件名、t=nil，注册静默失败、计数恒为 0。
+  //     封装函数 06．伤害函数：已在 TS 源文件首行使用 @noSelfInFile，不再在此剥 self（见 jass-pitfalls 第 13 条）。
   if (
     filePath.includes("07．技能函数") ||
     filePath.includes("08．伤害函数") ||
@@ -68,6 +69,13 @@ function fixFile(filePath) {
     content = content.replace(/function (____exports\.\w+)\((self|____self)\)/g, "function $1()");
     content = content.replace(/____exports\.(\w+)\(nil,\s*/g, "____exports.$1(");
     content = content.replace(/____exports\.(\w+)\(nil\)/g, "____exports.$1()");
+  }
+
+  // 6k. 伤害修正：调用方导出仍带 self，从 @noSelfInFile 的 06．伤害函数 解构出的函数，TSTL 仍会生成
+  //     calcArmorReduction(nil, armor)。必须去 nil（见 jass-pitfalls 第 13 条「跨模块解构」）。
+  if (filePath.includes("02．伤害修正")) {
+    content = content.replace(/\bcalcArmorReduction\(nil,\s*/g, "calcArmorReduction(");
+    content = content.replace(/\bcalcPiercedArmorReduction\(nil,\s*/g, "calcPiercedArmorReduction(");
   }
 
   // 6i. STES_* 导出：与 6g 相同语义；按函数名处理，避免仅依赖路径 includes 时在部分环境下不命中，

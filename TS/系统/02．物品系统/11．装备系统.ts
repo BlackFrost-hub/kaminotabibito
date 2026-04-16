@@ -155,8 +155,8 @@ function initEvents(): void {
     }
     const skipType = (itemData as { type?: string }).type;
     if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
-    // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」
-    if (isDrop && (itemData as { hot?: string }).hot) return;
+    // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」，但仍需计算属性
+    const isConsumable = isDrop && (itemData as { hot?: string }).hot != null;
     // 拾取时：装备限制不通过则不加属性、不提示“获得”，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）
     // 被拒时不设 skipNextDrop：只由装备限制在 UnitRemoveItem 前设置，避免误跳过后续玩家手动丢弃
     if (event === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM && typeof equipLimit.equipLimitWouldAllowPickup === "function" && !equipLimit.equipLimitWouldAllowPickup(unit, item)) {
@@ -208,16 +208,19 @@ function initEvents(): void {
 
     const coloredLevel = levelColor + levelText + "|r";
     const coloredName = "|cFFFFD700" + (itemData.name || "未知") + "|r";
-    let msg = "|cffffff00『系统消息』：|r" +"|cFF87CEEB【装备】|r " + actionText + "[" + coloredLevel + "]" + "级" + "『" + coloredName + "』";
-    for (const stat of playerStats) {
-      const sign = stat.value > 0 ? "+" : "";
-      const isPct = percentNames.indexOf(stat.name) >= 0;
-      const v = isPct ? stat.value * 100 : stat.value;
-      const nearZero = v > -1e-6 && v < 1e-6;
-      const vStr = nearZero ? "0" : tostring(v);
-      msg += " " + stat.name + sign + vStr + (isPct ? "%" : "");
+    // 消耗品丢弃不显示消息，但仍计算属性
+    if (!isConsumable) {
+      let msg = "|cffffff00『系统消息』：|r" +"|cFF87CEEB【装备】|r " + actionText + "[" + coloredLevel + "]" + "级" + "『" + coloredName + "』";
+      for (const stat of playerStats) {
+        const sign = stat.value > 0 ? "+" : "";
+        const isPct = percentNames.indexOf(stat.name) >= 0;
+        const v = isPct ? stat.value * 100 : stat.value;
+        const nearZero = v > -1e-6 && v < 1e-6;
+        const vStr = nearZero ? "0" : tostring(v);
+        msg += " " + stat.name + sign + vStr + (isPct ? "%" : "");
+      }
+      jass.DisplayTimedTextToPlayer(player, 0, 0.01, 5, msg);
     }
-    jass.DisplayTimedTextToPlayer(player, 0, 0.01, 5, msg);
 
     const tempReadMap = applyEquipStatsTS(unit, playerStats);
     const test5Parts: string[] = [];

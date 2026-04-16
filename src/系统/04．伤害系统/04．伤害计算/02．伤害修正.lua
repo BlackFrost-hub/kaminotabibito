@@ -32,8 +32,8 @@ function ____exports.applyArmorPenetration(self, damage, target, attacker)
     end
     local armorPierce = getAttackerArmorPierce(nil, attacker)
     local ignoreArmor = isIgnoreArmor(nil, attacker)
-    local originalReduction = calcArmorReduction(nil, originalArmor)
-    local piercedReduction = calcPiercedArmorReduction(nil, originalArmor, armorPierce, ignoreArmor)
+    local originalReduction = calcArmorReduction(originalArmor)
+    local piercedReduction = calcPiercedArmorReduction(originalArmor, armorPierce, ignoreArmor)
     local baseDamage = damage / (1 - originalReduction)
     return baseDamage * (1 - piercedReduction)
 end
@@ -116,6 +116,23 @@ end
 --- 获取魔法伤害修正
 function ____exports.getMagicDamageModifier(self, attacker)
     local magicDmg = getRealAttr(nil, attacker, "魔法伤害", 0)
+    if attacker and magicDmg ~= 0 then
+        local j = require("jass.common")
+        do
+            pcall(function()
+                local owner = j:GetOwningPlayer(attacker)
+                if owner then
+                    j:DisplayTimedTextToPlayer(
+                        owner,
+                        0,
+                        0,
+                        5,
+                        "|cffff0000[调试]|r getMagicDamageModifier: magicDmg=" .. tostring(magicDmg)
+                    )
+                end
+            end)
+        end
+    end
     return magicDmg
 end
 --- 获取强化伤害修正

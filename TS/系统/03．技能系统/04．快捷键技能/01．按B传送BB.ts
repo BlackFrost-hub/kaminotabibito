@@ -40,11 +40,14 @@ function onBKeyTeleport(): void {
   const mouseX = japi.DzGetMouseTerrainX();
   const mouseY = japi.DzGetMouseTerrainY();
 
-  // 获取技能命令ID
-  const orderId = japi.YDWEAbilityId2OrderId(BB_TELEPORT_ABILITY, "Order");
+  // 直接发布点目标命令，使用技能ID
+  // 对于传送类技能，直接使用技能ID作为orderId
+  const abilityId = jass.FourCC(BB_TELEPORT_ABILITY);
+  jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY);
 
-  // 发送命令让BB传送
-  jass.IssueNeutralPointOrderById(player, bbUnit, orderId, mouseX, mouseY);
+  // 注：YDWEAbilityId2OrderId 是YDWE宏定义，非标准JAPI函数
+  // const orderId = japi.YDWEAbilityId2OrderId(BB_TELEPORT_ABILITY, "Order");
+  // jass.IssueNeutralPointOrderById(player, bbUnit, orderId, mouseX, mouseY);
 
   // 选中BB单位
   SelectUnitForPlayerSingle(bbUnit, player);

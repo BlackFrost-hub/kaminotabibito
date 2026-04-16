@@ -98,6 +98,18 @@ function onAnyUnitDamagedAction(): void {
   if (savedSource == null && typeof (jass as any).BlzGetEventDamageSource === "function") {
     (pcall as any)(() => { savedSource = (jass as any).BlzGetEventDamageSource(); });
   }
+
+  // 在TriggerExecute之前先执行伤害计算（确保YDWESetEventDamage在同步阶段生效）
+  const fromDotTickBatchForEvent = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
+  if (!fromDotTickBatchForEvent && savedUnit != null && savedDamage > 0.1) {
+    (pcall as any)(() => {
+      const dmgCalc = require("系统.04．伤害系统.04．伤害计算.04．主计算流程") as { onDamageEvent?: (target: any, attacker: any, baseDamage: number) => void };
+      if (dmgCalc != null && typeof dmgCalc.onDamageEvent === "function") {
+        dmgCalc.onDamageEvent(savedUnit, savedSource, savedDamage);
+      }
+    });
+  }
+
   let i = 0;
   while (i < DamageEventNumber) {
     const trg = DamageEventQueue[i];
@@ -126,7 +138,6 @@ function onAnyUnitDamagedAction(): void {
     }
     i = i + 1;
   }
-  const fromDotTickBatchForEvent = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
 
   let isNormalAttackSnap = false;
   if (!fromDotTickBatchForEvent) {
@@ -160,10 +171,16 @@ function processDamageEntry(entry: any): void {
     });
   }
 
+  // 注意：伤害计算已经在TriggerExecute之前通过onDamageEvent执行过了
+  // 这里只执行其他回调（如DOT伤害等）
   for (let c = 0; c < DamageCallbacks.length; c++) {
     const cb = DamageCallbacks[c];
     if (cb != null) {
-      (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
+      // 跳过伤害计算回调（已经在前面执行过了）
+      const cbStr = tostring(cb);
+      if (cbStr.indexOf("damageCallback") === -1 && cbStr.indexOf("damageCalculation") === -1) {
+        (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
+      }
     }
   }
 

@@ -286,9 +286,7 @@ local function initEvents(self)
             if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
                 return
             end
-            if isDrop and itemData.hot then
-                return
-            end
+            local isConsumable = isDrop and itemData.hot ~= nil
             if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
                 return
             end
@@ -365,22 +363,24 @@ local function initEvents(self)
             end
             local coloredLevel = (levelColor .. levelText) .. "|r"
             local coloredName = ("|cFFFFD700" .. (itemData.name or "未知")) .. "|r"
-            local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
-            for ____, stat in ipairs(playerStats) do
-                local sign = stat.value > 0 and "+" or ""
-                local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
-                local v = isPct and stat.value * 100 or stat.value
-                local nearZero = v > -0.000001 and v < 0.000001
-                local vStr = nearZero and "0" or tostring(v)
-                msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
+            if not isConsumable then
+                local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
+                for ____, stat in ipairs(playerStats) do
+                    local sign = stat.value > 0 and "+" or ""
+                    local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
+                    local v = isPct and stat.value * 100 or stat.value
+                    local nearZero = v > -0.000001 and v < 0.000001
+                    local vStr = nearZero and "0" or tostring(v)
+                    msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
+                end
+                jass.DisplayTimedTextToPlayer(
+                    player,
+                    0,
+                    0.01,
+                    5,
+                    msg
+                )
             end
-            jass.DisplayTimedTextToPlayer(
-                player,
-                0,
-                0.01,
-                5,
-                msg
-            )
             local tempReadMap = applyEquipStatsTS(nil, unit, playerStats)
             local test5Parts = {}
             do

@@ -9,7 +9,7 @@ local ARMOR_FACTOR = 0.06
 -- 
 -- @param armor 护甲值
 -- @returns 减伤比例（0~1）
-function ____exports.calcArmorReduction(self, armor)
+function ____exports.calcArmorReduction(armor)
     if armor <= 0 then
         return 0
     end
@@ -21,21 +21,21 @@ end
 -- @param armorPierce 护甲穿透比例（0~1）
 -- @param ignoreArmor 是否无视护甲
 -- @returns 减伤比例
-function ____exports.calcPiercedArmorReduction(self, originalArmor, armorPierce, ignoreArmor)
+function ____exports.calcPiercedArmorReduction(originalArmor, armorPierce, ignoreArmor)
     if ignoreArmor then
-        return ____exports.calcArmorReduction(nil, 0.01)
+        return ____exports.calcArmorReduction(0.01)
     end
     local effectiveArmor = originalArmor
     if armorPierce > 0 then
         effectiveArmor = originalArmor * (1 - armorPierce)
     end
-    return ____exports.calcArmorReduction(nil, effectiveArmor)
+    return ____exports.calcArmorReduction(effectiveArmor)
 end
 --- 根据减伤比例反算护甲值
 -- 
 -- @param reduction 减伤比例（0~1）
 -- @returns 护甲值
-function ____exports.calcArmorFromReduction(self, reduction)
+function ____exports.calcArmorFromReduction(reduction)
     if reduction <= 0 then
         return 0
     end

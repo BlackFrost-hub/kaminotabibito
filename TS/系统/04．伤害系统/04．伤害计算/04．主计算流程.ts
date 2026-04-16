@@ -370,6 +370,18 @@ export function onDamageEvent(
   // 计算最终伤害
   const result = calculateDamage(target, attacker, baseDamage);
 
+  // 调试输出
+  if (attacker) {
+    try {
+      const owner = jass.GetOwningPlayer(attacker);
+      if (owner) {
+        jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cff0000ff[调试]|r onDamageEvent: base=" + baseDamage + ", final=" + result.finalDamage + ", immune=" + tostring(result.immune));
+      }
+    } catch (_e) {
+      // 忽略错误
+    }
+  }
+
   // 免疫
   if (result.immune) {
     伤害函数.YDWESetEventDamage(0);
@@ -382,7 +394,33 @@ export function onDamageEvent(
 
   // 设置最终伤害
   if (result.finalDamage !== baseDamage) {
-    伤害函数.YDWESetEventDamage(result.finalDamage);
+    const success = 伤害函数.YDWESetEventDamage(result.finalDamage);
+    // 调试输出
+    if (attacker) {
+      try {
+        const owner = jass.GetOwningPlayer(attacker);
+        if (owner) {
+          jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cff00ff00[调试]|r YDWESetEventDamage(" + result.finalDamage + ") = " + tostring(success));
+        }
+      } catch (_e) {
+        // 忽略错误
+      }
+    }
+  }
+
+  // 调试：显示实际伤害信息
+  if (attacker && target) {
+    try {
+      const owner = jass.GetOwningPlayer(attacker);
+      if (owner) {
+        const targetName = jass.GetUnitName(target);
+        const targetHp = jass.GetUnitState(target, jass.UNIT_STATE_LIFE);
+        const targetHid = (target as any).handle ?? target;
+        jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cffffff00[调试]|r 目标:" + targetName + ", handle:" + tostring(targetHid) + ", 最终伤害:" + result.finalDamage + ", 目标当前HP:" + targetHp);
+      }
+    } catch (_e) {
+      // 忽略错误
+    }
   }
 
   // 吸血吸魔

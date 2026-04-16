@@ -74,6 +74,22 @@ function onAnyUnitDamagedAction(self)
             end
         )
     end
+    local ____temp_6
+    if #dotBatchMarkQueue > 0 then
+        ____temp_6 = table.remove(dotBatchMarkQueue, 1) == true
+    else
+        ____temp_6 = false
+    end
+    local fromDotTickBatchForEvent = ____temp_6
+    if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
+        pcall(function ()
+                local dmgCalc = require("系统.04．伤害系统.04．伤害计算.04．主计算流程")
+                if dmgCalc ~= nil and type(dmgCalc.onDamageEvent) == "function" then
+                    dmgCalc:onDamageEvent(savedUnit, savedSource, savedDamage)
+                end
+            end
+        )
+    end
     local i = 0
     while i < DamageEventNumber do
         local trg = DamageEventQueue[i + 1]
@@ -109,13 +125,6 @@ function onAnyUnitDamagedAction(self)
         end
         i = i + 1
     end
-    local ____temp_6
-    if #dotBatchMarkQueue > 0 then
-        ____temp_6 = table.remove(dotBatchMarkQueue, 1) == true
-    else
-        ____temp_6 = false
-    end
-    local fromDotTickBatchForEvent = ____temp_6
     local isNormalAttackSnap = false
     if not fromDotTickBatchForEvent then
         pcall(function ()
@@ -159,15 +168,18 @@ function processDamageEntry(self, entry)
         while c < #DamageCallbacks do
             local cb = DamageCallbacks[c + 1]
             if cb ~= nil then
-                cb(
-                    nil,
-                    su,
-                    sd,
-                    0,
-                    isDotTickDamage,
-                    entry.source,
-                    entry.isNormalAttack
-                )
+                local cbStr = tostring(cb)
+                if (string.find(cbStr, "damageCallback", nil, true) or 0) - 1 == -1 and (string.find(cbStr, "damageCalculation", nil, true) or 0) - 1 == -1 then
+                    cb(
+                        nil,
+                        su,
+                        sd,
+                        0,
+                        isDotTickDamage,
+                        entry.source,
+                        entry.isNormalAttack
+                    )
+                end
             end
             c = c + 1
         end

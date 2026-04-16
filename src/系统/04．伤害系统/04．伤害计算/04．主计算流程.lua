@@ -224,6 +224,22 @@ function ____exports.onDamageEvent(self, target, attacker, baseDamage)
         return
     end
     local result = ____exports.calculateDamage(nil, target, attacker, baseDamage)
+    if attacker then
+        do
+            pcall(function()
+                local owner = jass.GetOwningPlayer(attacker)
+                if owner then
+                    jass.DisplayTimedTextToPlayer(
+                        owner,
+                        0,
+                        0,
+                        5,
+                        (((("|cff0000ff[调试]|r onDamageEvent: base=" .. tostring(baseDamage)) .. ", final=") .. tostring(result.finalDamage)) .. ", immune=") .. tostring(result.immune)
+                    )
+                end
+            end)
+        end
+    end
     if result.immune then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
         if result.showDodge then
@@ -231,7 +247,46 @@ function ____exports.onDamageEvent(self, target, attacker, baseDamage)
         return
     end
     if result.finalDamage ~= baseDamage then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(result.finalDamage)
+        local success = _____4F24_5BB3_51FD_6570.YDWESetEventDamage(result.finalDamage)
+        if attacker then
+            do
+                pcall(function()
+                    local owner = jass.GetOwningPlayer(attacker)
+                    if owner then
+                        jass.DisplayTimedTextToPlayer(
+                            owner,
+                            0,
+                            0,
+                            5,
+                            (("|cff00ff00[调试]|r YDWESetEventDamage(" .. tostring(result.finalDamage)) .. ") = ") .. tostring(success)
+                        )
+                    end
+                end)
+            end
+        end
+    end
+    if attacker and target then
+        do
+            pcall(function()
+                local owner = jass.GetOwningPlayer(attacker)
+                if owner then
+                    local targetName = jass.GetUnitName(target)
+                    local targetHp = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+                    local ____target_handle_3 = target.handle
+                    if ____target_handle_3 == nil then
+                        ____target_handle_3 = target
+                    end
+                    local targetHid = ____target_handle_3
+                    jass.DisplayTimedTextToPlayer(
+                        owner,
+                        0,
+                        0,
+                        5,
+                        (((((("|cffffff00[调试]|r 目标:" .. tostring(targetName)) .. ", handle:") .. tostring(targetHid)) .. ", 最终伤害:") .. tostring(result.finalDamage)) .. ", 目标当前HP:") .. tostring(targetHp)
+                    )
+                end
+            end)
+        end
     end
     local isMagic = _____4F24_5BB3_51FD_6570.isMagicDamage()
     local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()

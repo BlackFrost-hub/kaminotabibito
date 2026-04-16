@@ -141,3 +141,17 @@ content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,"
 
 ## 12) `jass.xxx` 常量/全局变量：不依赖 `udg_*` 全局，改从事件入参传递
 
+## 13) 减少 `fix-lua-for-pack.js`：`self` 从源头消掉
+
+**现象**：TSTL 默认给模块导出函数生成 Lua 首参 `self`，点号单参调用时与 JAPI 期望错位（如 `YDWESetEventDamage(65)` → `EXSetEventDamage(nil)`），靠打包脚本「事后修」会越来越臃肿。
+
+**更稳的长期做法（按投入递增）**
+
+1. **单文件**：在纯工具模块首行加 `/** @noSelfInFile */`（须在首条语句之前），该文件内导出不再带 `self`，与点号调用一致。见 [The Self Parameter](https://typescripttolua.github.io/docs/the-self-parameter/)。
+2. **全项目**：`tsconfig.json` 里 `"tstl": { "noImplicitSelf": true }`，等价于所有实现文件都带 `@noSelfInFile`。需配合 `strict` / `noImplicitThis` 处理「把方法当回调」处：用箭头包一层，或把接口里的回调声明为 `this: void`，否则 TSTL 报 `Unable to convert function with a 'this' parameter...`。
+3. **`fix-lua` 仍会保留**：`jass:` / `japi:` 冒号、多传 `nil`、Lua 1-based 随机下标、STES 注册等**引擎与 TSTL 缝隙**往往仍要脚本或自定义 TSTL 插件处理；目标是**把「self 剥离」类规则收进编译期**，脚本只留环境特化。
+
+**跨模块解构边角**：若 A 文件为默认导出（Lua 带 `self`），`const { f } = require("B")` 且 B 已 `@noSelfInFile`，TSTL 仍可能对 `f(x)` 生成 `f(nil, x)`。本仓库例：`02．伤害修正` → `06．伤害函数` 的 `calcArmorReduction`，由 `fix-lua-for-pack.js` 规则 **6k** 去掉多余 `nil`；或给 A 也加 `@noSelfInFile`（需无隐式 `this`），或避免解构、改用 `require("B").f(x)` 并确认生成 Lua 为点号而非冒号。
+
+**工程组织**：若脚本过长，可按主题拆成 `scripts/fix-lua/rules/*.js`，由入口遍历 `src` 串行应用，逻辑不变、可维护性更好。
+

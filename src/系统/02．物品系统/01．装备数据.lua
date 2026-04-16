@@ -94,7 +94,8 @@ ____exports.items.rde3 = {
     level = "E",
     hot = "200hp",
     movespeed2 = 150,
-    abilList = "A08C"
+    abilList = "A08C",
+    magicDmg = 0.3
 }
 ____exports.items.pres = {
     type = "道具/戒指/饰品",

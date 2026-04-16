@@ -34,14 +34,8 @@ local function onBKeyTeleport(self)
     end
     local mouseX = japi.DzGetMouseTerrainX()
     local mouseY = japi.DzGetMouseTerrainY()
-    local orderId = japi.YDWEAbilityId2OrderId(BB_TELEPORT_ABILITY, "Order")
-    jass.IssueNeutralPointOrderById(
-        player,
-        bbUnit,
-        orderId,
-        mouseX,
-        mouseY
-    )
+    local abilityId = jass.FourCC(BB_TELEPORT_ABILITY)
+    jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY)
     SelectUnitForPlayerSingle(nil, bbUnit, player)
 end
 --- 初始化按B传送BB功能

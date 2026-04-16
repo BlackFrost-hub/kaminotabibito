@@ -123,6 +123,15 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
                         next
                     )
                     readBack[name] = next
+                    if name == "魔法伤害" then
+                        jass.DisplayTimedTextToPlayer(
+                            owner,
+                            0,
+                            0,
+                            5,
+                            (((("|cff00ff00[调试]|r 魔法伤害: cur=" .. tostring(cur)) .. ", value=") .. tostring(value)) .. ", next=") .. tostring(next)
+                        )
+                    end
                 end
                 if applyDynamicPercentProperty(nil, unit, name, value) then
                 elseif name == "经验获取率" and owner and type(jass.SetPlayerHandicapXP) == "function" then
