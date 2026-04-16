@@ -2,17 +2,20 @@
  * 技能吟唱条系统 - 核心功能
  *
  * 功能：创建并显示吟唱进度条UI，支持多种颜色主题
- * 不依赖YDLocal，使用Map存储数据，使用中心计时器
+ * 不依赖YDLocal存储数据，使用Map存储数据，使用中心计时器
  *
- * 调用方式：通过STES事件「注册吟唱条」触发
- * 传参（YDLocal1Set）兼容旧接口：
+ * STES子触发模式（与装备提取一致）：
+ *   JASS端通过 STES_Fire("注册吟唱条") 触发，Lua端作为子触发读取参数：
  *   - 颜色ID (integer): 1-7 对应不同颜色
  *   - sj (real): 吟唱总时间（秒）
  *   - string (string): 自定义提示文本（可选）
+ *
+ * 也可通过 showCastBar() 直接从Lua端调用
  */
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
 const {
   CAST_BAR_ENABLED,
@@ -32,7 +35,6 @@ const {
   DEFAULT_CAST_TEXT,
   DEFAULT_TIP_TEXT,
   EVENT_NAME_CAST_BAR,
-  YDLOCAL_KEYS,
 } = require("系统.03．技能系统.07．技能吟唱条.00．常量定义") as {
   CAST_BAR_ENABLED: boolean;
   UPDATE_INTERVAL: number;
@@ -51,21 +53,30 @@ const {
   DEFAULT_CAST_TEXT: string;
   DEFAULT_TIP_TEXT: string;
   EVENT_NAME_CAST_BAR: string;
-  YDLOCAL_KEYS: Record<string, string>;
-};
-
-const {
-  YDLocalInitialize,
-  YDLocal1Release,
-  YDLocal1Get,
-} = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocalInitialize: () => void;
-  YDLocal1Release: () => void;
-  YDLocal1Get: (type: string, name: string) => any;
 };
 
 const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_Register: (t: any, name: string) => void;
+};
+
+const {
+  ydlStes_syncTriggerStep,
+  ydlStes_finishChildCleanup,
+  ydlStes_coerceOptionalNumber,
+  ydlStes_skeyIndex,
+  ydlStes_registerAfterGetTable,
+  ydlStes_readInteger5,
+  ydlStes_readReal5,
+  ydlStes_readString5,
+} = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
+  ydlStes_syncTriggerStep: (self: any) => void;
+  ydlStes_finishChildCleanup: (self: any) => void;
+  ydlStes_coerceOptionalNumber: (self: any, v: any) => number | undefined;
+  ydlStes_skeyIndex: (self: any) => number;
+  ydlStes_registerAfterGetTable: (self: any, trig: any, eventName: string) => void;
+  ydlStes_readInteger5: (self: any, name: string) => number;
+  ydlStes_readReal5: (self: any, name: string) => number;
+  ydlStes_readString5: (self: any, name: string) => string;
 };
 
 // ==========================================================================================
@@ -396,26 +407,98 @@ function ensureRegisteredToCenterTimer(this: void): void {
 }
 
 // ==========================================================================================
-// STES事件处理
+// STES子触发事件处理（与装备提取模式一致）
 // ==========================================================================================
 
-/**
- * STES事件处理函数
- */
+const REG_GUARD = "__syzl_castBar_registered";
+const TRIG_KEY = "__syzl_castBar_trig";
+const ATTEMPT_KEY = "__syzl_castBarRegAttempt";
+const MAX_REG_ATTEMPTS = 30;
+const RETRY_SEC = 0.1;
+
 function onCastBarEvent(this: void): void {
   if (!CAST_BAR_ENABLED) return;
 
-  YDLocalInitialize();
+  ydlStes_syncTriggerStep(undefined);
 
-  // 读取参数（兼容旧接口）
-  const colorId = YDLocal1Get("integer", YDLOCAL_KEYS.COLOR_ID) || DEFAULT_COLOR_ID;
-  const totalTime = YDLocal1Get("real", YDLOCAL_KEYS.TOTAL_TIME) || 1.0;
-  const customString = YDLocal1Get("string", YDLOCAL_KEYS.CUSTOM_STRING) || "";
+  const colorId = ydlStes_readInteger5(undefined, "颜色ID") || DEFAULT_COLOR_ID;
+  const totalTime = ydlStes_readReal5(undefined, "sj") || 1.0;
+  const customString = ydlStes_readString5(undefined, "string") || "";
 
-  YDLocal1Release();
+  ydlStes_finishChildCleanup(undefined);
 
-  // 启动吟唱条
   startCastBar(colorId, totalTime, customString);
+}
+
+function jassStesHashtable(this: void): any {
+  const jg = jglobals as any;
+  const cands = [jg.STES___HT, jg.STES_HT, jg.udg_STES___HT, jg.udg_STES_HT];
+  for (let i = 0; i < cands.length; i++) {
+    const t = cands[i];
+    if (t != null && t !== 0) return t;
+  }
+  return null;
+}
+
+function countOnJassStesTable(this: void, eventName: string): number {
+  const ht = jassStesHashtable();
+  if (ht == null || ht === 0) return -1;
+  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return -1;
+  const h = jass.StringHash(eventName);
+  return jass.LoadInteger(ht, h, ydlStes_skeyIndex(undefined));
+}
+
+function scheduleRetry(this: void, fn: () => void): void {
+  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
+    fn();
+    return;
+  }
+  const tm = jass.CreateTimer();
+  jass.TimerStart(tm, RETRY_SEC, false, () => {
+    if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(tm);
+    fn();
+  });
+}
+
+function tryRegisterCastBarStes(this: void): void {
+  const g = globalThis as any;
+  if (g[REG_GUARD]) return;
+
+  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
+    g[REG_GUARD] = true;
+    return;
+  }
+  if (STES_Register == null) {
+    g[REG_GUARD] = true;
+    return;
+  }
+
+  if (g[TRIG_KEY] == null) {
+    const trig = jass.CreateTrigger();
+    jass.TriggerAddAction(trig, onCastBarEvent);
+    g[TRIG_KEY] = trig;
+  }
+
+  const trig = g[TRIG_KEY];
+  ydlStes_registerAfterGetTable(undefined, trig, EVENT_NAME_CAST_BAR);
+
+  const jCount = countOnJassStesTable(EVENT_NAME_CAST_BAR);
+  const attempt = (g[ATTEMPT_KEY] as number) || 0;
+  g[ATTEMPT_KEY] = attempt + 1;
+
+  if (jCount >= 1) {
+    g[REG_GUARD] = true;
+    return;
+  }
+
+  if (g[ATTEMPT_KEY] >= MAX_REG_ATTEMPTS) {
+    g[REG_GUARD] = true;
+    return;
+  }
+
+  scheduleRetry(() => {
+    tryRegisterCastBarStes();
+  });
 }
 
 // ==========================================================================================
@@ -431,15 +514,8 @@ export function init(this: void): void {
   if (_initialized) return;
   if (!CAST_BAR_ENABLED) return;
 
-  if (typeof jass.CreateTrigger !== "function") return;
-  if (typeof jass.TriggerAddAction !== "function") return;
-
-  const trig = jass.CreateTrigger();
-  jass.TriggerAddAction(trig, onCastBarEvent);
-
-  STES_Register(trig, EVENT_NAME_CAST_BAR);
-
   _initialized = true;
+  tryRegisterCastBarStes();
 }
 
 /**

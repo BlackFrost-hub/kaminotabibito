@@ -10,67 +10,34 @@ const japi = require("jass.japi") as any;
 const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
 };
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: number) => void;
-};
-const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  GetSpellAbilityId: () => number;
+const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellChannelListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
-// ABILITY_DATA_TIP = 215，获取技能提示名
 const ABILITY_DATA_TIP = 215;
 
-// 物品栏使用命令ID（使用物品时不显示技能名）
 const ITEM_USE_ORDER_IDS = new Set([
-  852008, // 物品栏第1格
-  852009, // 物品栏第2格
-  852010, // 物品栏第3格
-  852011, // 物品栏第4格
-  852012, // 物品栏第5格
-  852013, // 物品栏第6格
-  852622, // 物品使用
+  852008, 852009, 852010, 852011, 852012, 852013, 852622,
 ]);
 
-/**
- * 获取技能名称（直接调用japi）
- */
 function getAbilityName(unit: any, abilityId: number, level: number): string {
   const abil = japi.EXGetUnitAbility(unit, abilityId);
   if (!abil) return "";
   return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) || "";
 }
 
-/**
- * 显示技能名字的触发动作
- */
-function onSpellChannel(): void {
-  const unit = jass.GetTriggerUnit();
-  const abilityId = GetSpellAbilityId();
+function onSpellChannel(castingUnit: any, spellAbilityId: number): void {
+  if (jass.IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL)) return;
+  if (jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT)) return;
 
-  // 排除机械单位
-  if (jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL)) {
-    return;
-  }
-  // 排除古树单位
-  if (jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)) {
-    return;
-  }
+  const orderId = jass.GetUnitCurrentOrder(castingUnit);
+  if (ITEM_USE_ORDER_IDS.has(orderId)) return;
 
-  // 排除使用物品
-  const orderId = jass.GetUnitCurrentOrder(unit);
-  if (ITEM_USE_ORDER_IDS.has(orderId)) {
-    return;
-  }
+  const level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId);
+  const skillName = getAbilityName(castingUnit, spellAbilityId, level);
+  if (!skillName) return;
 
-  // 获取技能名称
-  const level = jass.GetUnitAbilityLevel(unit, abilityId);
-  const skillName = getAbilityName(unit, abilityId, level);
-  if (!skillName) {
-    return;
-  }
-
-  // 创建漂浮文字
-  CreateFloatTextOnUnit(unit, skillName, {
+  CreateFloatTextOnUnit(castingUnit, skillName, {
     size: 9,
     red: 255,
     green: 255,
@@ -83,11 +50,6 @@ function onSpellChannel(): void {
   });
 }
 
-/**
- * 初始化显示技能名字系统
- */
-export function initShowSkillName(): void {
-  const trig = jass.CreateTrigger();
-  TriggerRegisterAnyUnitEventBJ(trig, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL);
-  jass.TriggerAddAction(trig, onSpellChannel);
-}
+registerSpellChannelListener(onSpellChannel);
+
+export {};

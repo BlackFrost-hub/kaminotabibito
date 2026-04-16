@@ -6,6 +6,8 @@
 export * from "./00．单位初始化创建/index";
 export * from "./01．多面板属性/index";
 export * from "./02．恢复系统/index";
+export * from "./03．单位死亡事件/index";
+export * from "./04．多杀检测系统/index";
 
 // ========== 核心模块导出 ==========
 export * from "./单位狂暴";
@@ -19,6 +21,12 @@ require("系统.01．单位系统.01．多面板属性.index");
 
 // 恢复系统
 require("系统.01．单位系统.02．恢复系统.index");
+
+// 单位死亡事件系统
+require("系统.01．单位系统.03．单位死亡事件.index");
+
+// 多杀检测系统
+require("系统.01．单位系统.04．多杀检测系统.index");
 
 // 单位狂暴
 require("系统.01．单位系统.单位狂暴");

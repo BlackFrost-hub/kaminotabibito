@@ -15,9 +15,6 @@ local evaluateFormula, processTemplate, updateSkillTip, EXGetUnitAbility, EXSetA
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.05．动态技能说明.00．常量定义")
 local DYNAMIC_SKILL_TIP_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.DYNAMIC_SKILL_TIP_ENABLED
 local EVENT_ID_HERO_LEVEL = ____00_FF0E_5E38_91CF_5B9A_4E49.EVENT_ID_HERO_LEVEL
-local EVENT_ID_UNIT_DEATH = ____00_FF0E_5E38_91CF_5B9A_4E49.EVENT_ID_UNIT_DEATH
-local PLAYER_NEUTRAL_AGGRESSIVE = ____00_FF0E_5E38_91CF_5B9A_4E49.PLAYER_NEUTRAL_AGGRESSIVE
-local PLAYER_NEUTRAL_PASSIVE = ____00_FF0E_5E38_91CF_5B9A_4E49.PLAYER_NEUTRAL_PASSIVE
 local PLAYER_COUNT = ____00_FF0E_5E38_91CF_5B9A_4E49.PLAYER_COUNT
 local UNIT_STATE_ATTACK1_BASE = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BASE
 local UNIT_STATE_ATTACK1_BONUS = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BONUS
@@ -337,18 +334,19 @@ function ____exports.registerSkillTips(self, unit, abilityId, tipTemplate, ubert
     return success1 or success2
 end
 local levelUpTrigger = nil
-local deathTrigger = nil
+local ____require_result_3 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_3.registerDeathListener
 function ____exports.initDynamicSkillTipSystem(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
     if not levelUpTrigger then
         levelUpTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_HERO_LEVEL_3 = jass.EVENT_PLAYER_HERO_LEVEL
-        if ____jass_EVENT_PLAYER_HERO_LEVEL_3 == nil then
-            ____jass_EVENT_PLAYER_HERO_LEVEL_3 = EVENT_ID_HERO_LEVEL
+        local ____jass_EVENT_PLAYER_HERO_LEVEL_4 = jass.EVENT_PLAYER_HERO_LEVEL
+        if ____jass_EVENT_PLAYER_HERO_LEVEL_4 == nil then
+            ____jass_EVENT_PLAYER_HERO_LEVEL_4 = EVENT_ID_HERO_LEVEL
         end
-        local levelEventId = ____jass_EVENT_PLAYER_HERO_LEVEL_3
+        local levelEventId = ____jass_EVENT_PLAYER_HERO_LEVEL_4
         do
             local i = 0
             while i < PLAYER_COUNT do
@@ -369,53 +367,12 @@ function ____exports.initDynamicSkillTipSystem(self)
             end
         )
     end
-    if not deathTrigger then
-        deathTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_DEATH_4 = jass.EVENT_PLAYER_UNIT_DEATH
-        if ____jass_EVENT_PLAYER_UNIT_DEATH_4 == nil then
-            ____jass_EVENT_PLAYER_UNIT_DEATH_4 = EVENT_ID_UNIT_DEATH
+    registerDeathListener(
+        nil,
+        function(____, dyingUnit)
+            ____exports.unregisterDynamicSkillTip(nil, dyingUnit)
         end
-        local deathEventId = ____jass_EVENT_PLAYER_UNIT_DEATH_4
-        do
-            local i = 0
-            while i < PLAYER_COUNT do
-                jass.TriggerRegisterPlayerUnitEvent(
-                    deathTrigger,
-                    jass.Player(i),
-                    deathEventId,
-                    nil
-                )
-                i = i + 1
-            end
-        end
-        local ____this_6
-        ____this_6 = jass
-        local ____opt_5 = ____this_6.Player
-        if ____opt_5 ~= nil then
-            ____opt_5 = ____opt_5(____this_6, PLAYER_NEUTRAL_AGGRESSIVE)
-        end
-        local neutralAggressive = ____opt_5
-        if neutralAggressive ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralAggressive, deathEventId, nil)
-        end
-        local ____this_8
-        ____this_8 = jass
-        local ____opt_7 = ____this_8.Player
-        if ____opt_7 ~= nil then
-            ____opt_7 = ____opt_7(____this_8, PLAYER_NEUTRAL_PASSIVE)
-        end
-        local neutralPassive = ____opt_7
-        if neutralPassive ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralPassive, deathEventId, nil)
-        end
-        jass.TriggerAddAction(
-            deathTrigger,
-            function()
-                local unit = jass.GetTriggerUnit()
-                ____exports.unregisterDynamicSkillTip(nil, unit)
-            end
-        )
-    end
+    )
 end
 function ____exports.registerAttributeGetter(self, attrName, getter)
     attributeGetters[attrName] = getter

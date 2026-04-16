@@ -142,21 +142,43 @@ function playHealEffect(target: any, effectPath?: string): void {
   if (eff != null) jass.DestroyEffect(eff);
 }
 
-/** 触发数值显示事件 */
-function fireShowDamageEvent(target: any, amount: number): void {
+/**
+ * 触发数值显示事件
+ * 供Lua端/JASS端调用，显示治疗/伤害数值
+ *
+ * @param target 目标单位
+ * @param amount 数值
+ * @param red 红色分量（可选，默认治疗颜色）
+ * @param green 绿色分量（可选）
+ * @param blue 蓝色分量（可选）
+ */
+export function fireShowDamageEvent(
+  target: any,
+  amount: number,
+  red?: number,
+  green?: number,
+  blue?: number
+): void {
   YDLocal5Set("real", "伤害值", amount);
   YDLocal5Set("unit", "目标单位", target);
-  YDLocal5Set("integer", "红色", HEAL_TEXT_COLOR.red);
-  YDLocal5Set("integer", "绿色", HEAL_TEXT_COLOR.green);
-  YDLocal5Set("integer", "蓝色", HEAL_TEXT_COLOR.blue);
+  YDLocal5Set("integer", "红色", red ?? HEAL_TEXT_COLOR.red);
+  YDLocal5Set("integer", "绿色", green ?? HEAL_TEXT_COLOR.green);
+  YDLocal5Set("integer", "蓝色", blue ?? HEAL_TEXT_COLOR.blue);
   STES_Fire(null, HEAL_EVENTS.SHOW_DAMAGE);
 }
 
-/** 触发任意单位被治疗事件 */
-function fireHealEvent(source: any, target: any, amount: number): void {
-  YDLocal5Set("real", "治疗量", amount);
-  YDLocal5Set("unit", "治疗目标", target);
-  YDLocal5Set("unit", "治疗来源", source);
+/**
+ * 触发"任意单位被治疗"事件
+ * 供Lua端/JASS端调用
+ *
+ * @param source 治疗来源
+ * @param target 治疗目标
+ * @param amount 治疗量
+ */
+export function fireHealEvent(source: any, target: any, amount: number): void {
+  YDLocal5Set("real", "HealAmount", amount);
+  YDLocal5Set("unit", "HealUnit", target);
+  YDLocal5Set("unit", "HealSource", source);
   STES_Fire(null, HEAL_EVENTS.HEAL);
 }
 

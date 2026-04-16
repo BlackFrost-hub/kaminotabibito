@@ -3,6 +3,7 @@
  */
 
 // ========== 子系统导出 ==========
+export * from "./00．技能事件/index";
 export * from "./01．技能冷却/index";
 export * from "./02．技能消耗/index";
 export * from "./04．快捷键技能/index";
@@ -13,10 +14,11 @@ export * from "./07．技能吟唱条/index";
 // ========== 功能模块导出 ==========
 export * from "./01．显示技能名字";
 export * from "./02．显示技能名字2";
-// 03．技能台词.ts 当前为空文件，暂不导出
-// export * from "./03．技能台词";
 
 // ========== 初始化 ==========
+// 技能事件系统（通过index自动加载，内部注册SPELL_CHANNEL和SPELL_EFFECT触发器）
+require("系统.03．技能系统.00．技能事件.index");
+
 // 技能冷却系统
 require("系统.03．技能系统.01．技能冷却.index");
 
@@ -30,14 +32,11 @@ if (typeof bbTeleportMod.initBBTeleport === "function") bbTeleportMod.initBBTele
 const switchBagMod = require("系统.03．技能系统.04．快捷键技能.index") as { initSwitchBag?: () => void };
 if (typeof switchBagMod.initSwitchBag === "function") switchBagMod.initSwitchBag();
 
-// 显示技能名字
-const 显示技能名字 = require("系统.03．技能系统.01．显示技能名字") as { initShowSkillName?: () => void };
-if (typeof 显示技能名字.initShowSkillName === "function") 显示技能名字.initShowSkillName();
+// 显示技能名字（通过registerSpellChannelListener自动注册，无需手动init）
+require("系统.03．技能系统.01．显示技能名字");
 
-const 显示技能名字2 = require("系统.03．技能系统.02．显示技能名字2") as { initShowSkillName2?: () => void };
-if (typeof 显示技能名字2.initShowSkillName2 === "function") 显示技能名字2.initShowSkillName2();
-
-// require("系统.03．技能系统.03．技能台词");
+// 显示技能名字2（通过registerSpellEffectListener自动注册，无需手动init）
+require("系统.03．技能系统.02．显示技能名字2");
 
 // 动态技能说明系统
 const dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index") as { init?: () => void };

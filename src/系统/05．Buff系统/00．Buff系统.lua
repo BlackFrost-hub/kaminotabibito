@@ -5,7 +5,22 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitToBuffs, _registeredToCenterTimer, _tickCounter
+local isBuffPoolUnitPaused, toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitBjExt, unitToBuffs, _registeredToCenterTimer, _tickCounter
+function isBuffPoolUnitPaused(self, u)
+    if u == nil or u == 0 then
+        return false
+    end
+    local fn = unitBjExt.IsUnitPausedBJ
+    if fn == nil then
+        return false
+    end
+    local paused = false
+    pcall(function ()
+            paused = fn(nil, u) == true
+        end
+    )
+    return paused
+end
 function toHid(self, u)
     if u == nil or u == 0 then
         return 0
@@ -68,27 +83,31 @@ end
 function tickBuffPool(self)
     for hidKey in pairs(unitToBuffs) do
         do
-            local __continue56
+            local __continue60
             repeat
                 local hid = toHid(nil, hidKey)
                 if hid == 0 then
-                    __continue56 = true
+                    __continue60 = true
                     break
                 end
                 local entry = unitToBuffs[hid]
                 if entry == nil then
-                    __continue56 = true
+                    __continue60 = true
+                    break
+                end
+                if isBuffPoolUnitPaused(nil, entry.lastRef) then
+                    __continue60 = true
                     break
                 end
                 local tab = entry.buffs
                 local expired = {}
                 for bid in pairs(tab) do
                     do
-                        local __continue59
+                        local __continue64
                         repeat
                             local row = tab[bid]
                             if row == nil then
-                                __continue59 = true
+                                __continue64 = true
                                 break
                             end
                             row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
@@ -98,9 +117,9 @@ function tickBuffPool(self)
                                 end
                                 expired[#expired + 1] = bid
                             end
-                            __continue59 = true
+                            __continue64 = true
                         until true
-                        if not __continue59 then
+                        if not __continue64 then
                             break
                         end
                     end
@@ -113,9 +132,9 @@ function tickBuffPool(self)
                     end
                 end
                 pruneEmptyHid(nil, hid)
-                __continue56 = true
+                __continue60 = true
             until true
-            if not __continue56 then
+            if not __continue60 then
                 break
             end
         end
@@ -144,6 +163,7 @@ end
 function maybeStopSyncTimer(self)
 end
 jass = require("jass.common")
+unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
 local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_0 == nil then

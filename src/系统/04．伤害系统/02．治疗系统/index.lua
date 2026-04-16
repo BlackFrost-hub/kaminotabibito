@@ -16,7 +16,47 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.02．治疗事件_旧版")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.03．持续治疗效果")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.04．物品治疗效果")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.05．魔法恢复")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 --- 初始化治疗系统
 function ____exports.init(self)
+    local healEventOld = require("系统.04．伤害系统.02．治疗系统.02．治疗事件_旧版")
+    if type(healEventOld.initHealEventOld) == "function" then
+        healEventOld:initHealEventOld()
+    end
+    local hotSystem = require("系统.04．伤害系统.02．治疗系统.03．持续治疗效果")
+    if type(hotSystem.initHotSystem) == "function" then
+        hotSystem:initHotSystem()
+    end
 end
 return ____exports

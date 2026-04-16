@@ -84,15 +84,18 @@ end
 --- 技能吟唱条系统 - 核心功能
 -- 
 -- 功能：创建并显示吟唱进度条UI，支持多种颜色主题
--- 不依赖YDLocal，使用Map存储数据，使用中心计时器
+-- 不依赖YDLocal存储数据，使用Map存储数据，使用中心计时器
 -- 
--- 调用方式：通过STES事件「注册吟唱条」触发
--- 传参（YDLocal1Set）兼容旧接口：
+-- STES子触发模式（与装备提取一致）：
+--   JASS端通过 STES_Fire("注册吟唱条") 触发，Lua端作为子触发读取参数：
 --   - 颜色ID (integer): 1-7 对应不同颜色
 --   - sj (real): 吟唱总时间（秒）
 --   - string (string): 自定义提示文本（可选）
+-- 
+-- 也可通过 showCastBar() 直接从Lua端调用
 local jass = require("jass.common")
 japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
 local CAST_BAR_ENABLED = ____require_result_0.CAST_BAR_ENABLED
 UPDATE_INTERVAL = ____require_result_0.UPDATE_INTERVAL
@@ -111,13 +114,17 @@ local BACKGROUND_MODELS = ____require_result_0.BACKGROUND_MODELS
 local DEFAULT_CAST_TEXT = ____require_result_0.DEFAULT_CAST_TEXT
 local DEFAULT_TIP_TEXT = ____require_result_0.DEFAULT_TIP_TEXT
 local EVENT_NAME_CAST_BAR = ____require_result_0.EVENT_NAME_CAST_BAR
-local YDLOCAL_KEYS = ____require_result_0.YDLOCAL_KEYS
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocalInitialize = ____require_result_1.YDLocalInitialize
-local YDLocal1Release = ____require_result_1.YDLocal1Release
-local YDLocal1Get = ____require_result_1.YDLocal1Get
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_2.STES_Register
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_1.STES_Register
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
+local ydlStes_coerceOptionalNumber = ____require_result_2.ydlStes_coerceOptionalNumber
+local ydlStes_skeyIndex = ____require_result_2.ydlStes_skeyIndex
+local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
+local ydlStes_readInteger5 = ____require_result_2.ydlStes_readInteger5
+local ydlStes_readReal5 = ____require_result_2.ydlStes_readReal5
+local ydlStes_readString5 = ____require_result_2.ydlStes_readString5
 castBarDataMap = __TS__New(Map)
 --- 获取下一个可用的句柄ID
 local nextHandleId = 1
@@ -287,17 +294,104 @@ end
 _registeredToCenterTimer = false
 _tickCounter = 0
 CENTER_TIMER_TICKS = math.ceil(UPDATE_INTERVAL / 0.01)
---- STES事件处理函数
+local REG_GUARD = "__syzl_castBar_registered"
+local TRIG_KEY = "__syzl_castBar_trig"
+local ATTEMPT_KEY = "__syzl_castBarRegAttempt"
+local MAX_REG_ATTEMPTS = 30
+local RETRY_SEC = 0.1
 local function onCastBarEvent()
     if not CAST_BAR_ENABLED then
         return
     end
-    YDLocalInitialize(nil)
-    local colorId = YDLocal1Get(nil, "integer", YDLOCAL_KEYS.COLOR_ID) or DEFAULT_COLOR_ID
-    local totalTime = YDLocal1Get(nil, "real", YDLOCAL_KEYS.TOTAL_TIME) or 1
-    local customString = YDLocal1Get(nil, "string", YDLOCAL_KEYS.CUSTOM_STRING) or ""
-    YDLocal1Release(nil)
+    ydlStes_syncTriggerStep(nil, nil)
+    local colorId = ydlStes_readInteger5(nil, nil, "颜色ID") or DEFAULT_COLOR_ID
+    local totalTime = ydlStes_readReal5(nil, nil, "sj") or 1
+    local customString = ydlStes_readString5(nil, nil, "string") or ""
+    ydlStes_finishChildCleanup(nil, nil)
     startCastBar(colorId, totalTime, customString)
+end
+local function jassStesHashtable()
+    local jg = jglobals
+    local cands = {jg.STES___HT, jg.STES_HT, jg.udg_STES___HT, jg.udg_STES_HT}
+    do
+        local i = 0
+        while i < #cands do
+            local t = cands[i + 1]
+            if t ~= nil and t ~= 0 then
+                return t
+            end
+            i = i + 1
+        end
+    end
+    return nil
+end
+local function countOnJassStesTable(eventName)
+    local ht = jassStesHashtable()
+    if ht == nil or ht == 0 then
+        return -1
+    end
+    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
+        return -1
+    end
+    local h = jass.StringHash(eventName)
+    return jass.LoadInteger(
+        ht,
+        h,
+        ydlStes_skeyIndex(nil, nil)
+    )
+end
+local function scheduleRetry(fn)
+    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
+        fn(nil)
+        return
+    end
+    local tm = jass.CreateTimer()
+    jass.TimerStart(
+        tm,
+        RETRY_SEC,
+        false,
+        function()
+            if type(jass.DestroyTimer) == "function" then
+                jass.DestroyTimer(tm)
+            end
+            fn(nil)
+        end
+    )
+end
+local function tryRegisterCastBarStes()
+    local g = _G
+    if g[REG_GUARD] then
+        return
+    end
+    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
+        g[REG_GUARD] = true
+        return
+    end
+    if STES_Register == nil then
+        g[REG_GUARD] = true
+        return
+    end
+    if g[TRIG_KEY] == nil then
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onCastBarEvent)
+        g[TRIG_KEY] = trig
+    end
+    local trig = g[TRIG_KEY]
+    ydlStes_registerAfterGetTable(nil, nil, trig, EVENT_NAME_CAST_BAR)
+    local jCount = countOnJassStesTable(EVENT_NAME_CAST_BAR)
+    local attempt = g[ATTEMPT_KEY] or 0
+    g[ATTEMPT_KEY] = attempt + 1
+    if jCount >= 1 then
+        g[REG_GUARD] = true
+        return
+    end
+    if g[ATTEMPT_KEY] >= MAX_REG_ATTEMPTS then
+        g[REG_GUARD] = true
+        return
+    end
+    scheduleRetry(function()
+        tryRegisterCastBarStes()
+    end)
 end
 local _initialized = false
 --- 初始化技能吟唱条系统
@@ -308,16 +402,8 @@ function ____exports.init()
     if not CAST_BAR_ENABLED then
         return
     end
-    if type(jass.CreateTrigger) ~= "function" then
-        return
-    end
-    if type(jass.TriggerAddAction) ~= "function" then
-        return
-    end
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(trig, onCastBarEvent)
-    STES_Register(trig, EVENT_NAME_CAST_BAR)
     _initialized = true
+    tryRegisterCastBarStes()
 end
 --- 手动触发吟唱条（供Lua/TS直接调用）
 -- 

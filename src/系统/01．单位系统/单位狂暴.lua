@@ -10,6 +10,8 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 local EXSetUnitFacing = ____require_result_1.EXSetUnitFacing
 local ____require_result_2 = require("lib.扩展函数.封装函数.07．镜头函数.index")
 local CameraShakeForPlayer = ____require_result_2.CameraShakeForPlayer
+local ____require_result_3 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_3.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
 local function typeIdToUnitId(self, typeId)
     for id in pairs(idData) do
@@ -19,9 +21,8 @@ local function typeIdToUnitId(self, typeId)
     end
     return nil
 end
-local function onDeath(self)
-    local dying = jass.GetTriggerUnit()
-    if not dying then
+local function onDeath(self, dying, killer)
+    if dying == nil then
         return
     end
     if type(jass.GetUnitTypeId) ~= "function" then
@@ -58,13 +59,13 @@ local function onDeath(self)
         nil,
         __TS__StringSubstring(spawnUnitId, 0, 4)
     )
-    local ____temp_7
+    local ____temp_8
     if type(jass.GetOwningPlayer) == "function" then
-        ____temp_7 = jass.GetOwningPlayer(dying)
+        ____temp_8 = jass.GetOwningPlayer(dying)
     else
-        ____temp_7 = jass.Player(15)
+        ____temp_8 = jass.Player(15)
     end
-    local owner = ____temp_7
+    local owner = ____temp_8
     local created = nil
     if type(jass.CreateUnit) == "function" then
         created = jass.CreateUnit(
@@ -75,13 +76,6 @@ local function onDeath(self)
             facingDeg
         )
     end
-    local ____temp_8
-    if type(jass.GetKillingUnit) == "function" then
-        ____temp_8 = jass.GetKillingUnit()
-    else
-        ____temp_8 = nil
-    end
-    local killer = ____temp_8
     local ____temp_9
     if killer and type(jass.GetOwningPlayer) == "function" then
         ____temp_9 = jass.GetOwningPlayer(killer)
@@ -94,54 +88,5 @@ local function onDeath(self)
         CameraShakeForPlayer(nil, killerPlayer, 20, 3)
     end
 end
-local function init(self)
-    local trig = jass.CreateTrigger()
-    local ____jass_EVENT_PLAYER_UNIT_DEATH_10 = jass.EVENT_PLAYER_UNIT_DEATH
-    if ____jass_EVENT_PLAYER_UNIT_DEATH_10 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DEATH_10 = 52
-    end
-    local eventId = ____jass_EVENT_PLAYER_UNIT_DEATH_10
-    do
-        local i = 0
-        while i < 16 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                eventId,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    local ____this_13
-    ____this_13 = jass
-    local ____opt_11 = ____this_13.Player
-    if ____opt_11 ~= nil then
-        local ____jass_PLAYER_NEUTRAL_AGGRESSIVE_12 = jass.PLAYER_NEUTRAL_AGGRESSIVE
-        if ____jass_PLAYER_NEUTRAL_AGGRESSIVE_12 == nil then
-            ____jass_PLAYER_NEUTRAL_AGGRESSIVE_12 = 12
-        end
-        ____opt_11 = ____opt_11(____this_13, ____jass_PLAYER_NEUTRAL_AGGRESSIVE_12)
-    end
-    local neutral = ____opt_11
-    if neutral ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, neutral, eventId, nil)
-    end
-    local ____this_16
-    ____this_16 = jass
-    local ____opt_14 = ____this_16.Player
-    if ____opt_14 ~= nil then
-        local ____jass_PLAYER_NEUTRAL_PASSIVE_15 = jass.PLAYER_NEUTRAL_PASSIVE
-        if ____jass_PLAYER_NEUTRAL_PASSIVE_15 == nil then
-            ____jass_PLAYER_NEUTRAL_PASSIVE_15 = 15
-        end
-        ____opt_14 = ____opt_14(____this_16, ____jass_PLAYER_NEUTRAL_PASSIVE_15)
-    end
-    local neutralPassive = ____opt_14
-    if neutralPassive ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, neutralPassive, eventId, nil)
-    end
-    jass.TriggerAddAction(trig, onDeath)
-end
-init(nil)
+registerDeathListener(nil, onDeath)
 return ____exports

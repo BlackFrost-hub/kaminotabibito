@@ -1,0 +1,58 @@
+/**
+ * 多杀检测系统 - STES事件触发
+ *
+ * 功能：触发JASS端监听的STES事件
+ *
+ * 后续接手者注意：
+ * 1. 此文件专门用于触发JASS端的STES事件
+ * 2. 参数名须与JASS端监听器一致
+ */
+
+import { MULTI_KILL_EFFECT_EVENT } from "./00．常量定义";
+
+const { STES_Fire } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+  STES_Fire: (self: any, name: string) => void;
+};
+
+const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
+  YDLocal5Set: (ty: string, name: string, value: any) => void;
+};
+
+// ==========================================================================================
+// 类型定义
+// ==========================================================================================
+
+export interface EffectEventParams {
+  effectID: number;
+  healAmount: number;
+  healTarget: any;
+  healSource: any;
+  diyEvent?: boolean;
+  diyEventString?: string;
+}
+
+// ==========================================================================================
+// STES事件触发函数
+// ==========================================================================================
+
+/**
+ * 触发 OnMultiKillEffectID 事件
+ * JASS端监听器会读取以下参数：
+ * - EffectID (integer): 效果ID
+ * - HealAmount (real): 治疗量
+ * - HealTarget (unit): 治疗目标
+ * - HealSource (unit): 治疗来源
+ */
+export function fireMultiKillEffectEvent(params: EffectEventParams): void {
+  YDLocal5Set("integer", "EffectID", params.effectID);
+  YDLocal5Set("real", "HealAmount", params.healAmount);
+  YDLocal5Set("unit", "HealTarget", params.healTarget);
+  YDLocal5Set("unit", "HealSource", params.healSource);
+  STES_Fire(null, MULTI_KILL_EFFECT_EVENT);
+
+  if (params.diyEvent && params.diyEventString) {
+    STES_Fire(null, params.diyEventString);
+  }
+}
+
+export {};

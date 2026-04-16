@@ -2,32 +2,17 @@
  * 显示技能名字系统2
  *
  * 功能：当单位发动技能效果时触发
- * 事件：EVENT_PLAYER_UNIT_SPELL_EFFECT（发动技能效果）
+ * 事件：SPELL_EFFECT（发动技能效果）
  */
 
-const jass = require("jass.common") as any;
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: number) => void;
-};
-const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  GetSpellAbilityId: () => number;
+const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
-/**
- * 发动技能效果的触发动作
- */
-function onSpellEffect(): void {
-  const unit = jass.GetTriggerUnit();
-  const abilityId = GetSpellAbilityId();
-
+function onSpellEffect(castingUnit: any, spellAbilityId: number): void {
   // TODO: 具体效果待实现
 }
 
-/**
- * 初始化
- */
-export function initShowSkillName2(): void {
-  const trig = jass.CreateTrigger();
-  TriggerRegisterAnyUnitEventBJ(trig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
-  jass.TriggerAddAction(trig, onSpellEffect);
-}
+registerSpellEffectListener(onSpellEffect);
+
+export {};

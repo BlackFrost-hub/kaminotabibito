@@ -66,7 +66,6 @@ type AIUnitRegistry = Map<number, UnitAIInfo>;
 
 const aiUnitRegistry: AIUnitRegistry = new Map();
 let aiCheckTimer: any = null;
-let deathTrigger: any = null;
 let unitCreatedTrigger: any = null;
 
 // ==========================================================================================
@@ -223,6 +222,10 @@ function onAICheck(): void {
 // 系统初始化
 // ==========================================================================================
 
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+};
+
 export function initAISkillSystem(): void {
   if (!AI_SKILL_SYSTEM_ENABLED) return;
 
@@ -231,27 +234,9 @@ export function initAISkillSystem(): void {
     jass.TimerStart(aiCheckTimer, AI_CHECK_INTERVAL, true, onAICheck);
   }
 
-  if (!deathTrigger) {
-    deathTrigger = jass.CreateTrigger();
-    const deathEventId = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? AI_EVENT_ID_UNIT_DEATH;
-
-    for (let i = 0; i < AI_PLAYER_COUNT; i++) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, jass.Player(i), deathEventId, undefined!);
-    }
-
-    const neutralAggressive = (jass as any).Player?.(AI_PLAYER_NEUTRAL_AGGRESSIVE);
-    if (neutralAggressive != null) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralAggressive, deathEventId, undefined!);
-    }
-    const neutralPassive = (jass as any).Player?.(AI_PLAYER_NEUTRAL_PASSIVE);
-    if (neutralPassive != null) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralPassive, deathEventId, undefined!);
-    }
-
-    jass.TriggerAddAction(deathTrigger, () => {
-      unregisterAIUnit(jass.GetTriggerUnit());
-    });
-  }
+  registerDeathListener((dyingUnit) => {
+    unregisterAIUnit(dyingUnit);
+  });
 
   initAutoRegister();
 }

@@ -129,19 +129,31 @@ local function playHealEffect(self, target, effectPath)
     end
 end
 --- 触发数值显示事件
-local function fireShowDamageEvent(self, target, amount)
+-- 供Lua端/JASS端调用，显示治疗/伤害数值
+-- 
+-- @param target 目标单位
+-- @param amount 数值
+-- @param red 红色分量（可选，默认治疗颜色）
+-- @param green 绿色分量（可选）
+-- @param blue 蓝色分量（可选）
+function ____exports.fireShowDamageEvent(self, target, amount, red, green, blue)
     YDLocal5Set(nil, "real", "伤害值", amount)
     YDLocal5Set(nil, "unit", "目标单位", target)
-    YDLocal5Set(nil, "integer", "红色", HEAL_TEXT_COLOR.red)
-    YDLocal5Set(nil, "integer", "绿色", HEAL_TEXT_COLOR.green)
-    YDLocal5Set(nil, "integer", "蓝色", HEAL_TEXT_COLOR.blue)
+    YDLocal5Set(nil, "integer", "红色", red or HEAL_TEXT_COLOR.red)
+    YDLocal5Set(nil, "integer", "绿色", green or HEAL_TEXT_COLOR.green)
+    YDLocal5Set(nil, "integer", "蓝色", blue or HEAL_TEXT_COLOR.blue)
     STES_Fire(nil, nil, HEAL_EVENTS.SHOW_DAMAGE)
 end
---- 触发任意单位被治疗事件
-local function fireHealEvent(self, source, target, amount)
-    YDLocal5Set(nil, "real", "治疗量", amount)
-    YDLocal5Set(nil, "unit", "治疗目标", target)
-    YDLocal5Set(nil, "unit", "治疗来源", source)
+--- 触发"任意单位被治疗"事件
+-- 供Lua端/JASS端调用
+-- 
+-- @param source 治疗来源
+-- @param target 治疗目标
+-- @param amount 治疗量
+function ____exports.fireHealEvent(self, source, target, amount)
+    YDLocal5Set(nil, "real", "HealAmount", amount)
+    YDLocal5Set(nil, "unit", "HealUnit", target)
+    YDLocal5Set(nil, "unit", "HealSource", source)
     STES_Fire(nil, nil, HEAL_EVENTS.HEAL)
 end
 --- 累计治疗统计
@@ -208,8 +220,8 @@ function ____exports.doHeal(self, params)
     if HealEffect then
         playHealEffect(nil, HealTarget, HealEffectPath)
     end
-    fireShowDamageEvent(nil, HealTarget, actualHeal)
-    fireHealEvent(nil, HealSource, HealTarget, actualHeal)
+    ____exports.fireShowDamageEvent(nil, HealTarget, actualHeal)
+    ____exports.fireHealEvent(nil, HealSource, HealTarget, actualHeal)
     addHealStats(nil, HealTarget, actualHeal)
     for ____, listener in ipairs(healEventListeners) do
         do

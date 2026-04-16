@@ -16,6 +16,9 @@ const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数
   stringToFourCC: (s: string) => number;
   isSpecialUnit: (unit: any) => boolean;
 };
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+};
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, UnitDataEntry> }).default ??
   (require("系统.02．物品系统.02．装备掉落表") as { idData?: Record<string, UnitDataEntry> }).idData ??
@@ -188,9 +191,9 @@ function createItemAtUnit(unit: any, itemId: string): void {
   if (loc && typeof (jass as any).RemoveLocation === "function") (jass as any).RemoveLocation(loc);
 }
 
-function onUnitDeath(): void {
-  const unit = jass.GetTriggerUnit();
+function onUnitDeath(unit: any, _killer: any): void {
   if (!unit) return;
+  if (isSpecialUnit(unit)) return;
   if (typeof (jass as any).GetUnitTypeId !== "function") return;
   const typeId = (jass as any).GetUnitTypeId(unit) as number;
   const unitId = typeIdToUnitId(typeId);
@@ -247,27 +250,6 @@ function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
   return result;
 }
 
-function condition(): boolean {
-  const u = jass.GetTriggerUnit();
-  if (!u) return false;
-  if (isSpecialUnit(u)) return false;
-  return true;
-}
+registerDeathListener(onUnitDeath);
 
-function init(): void {
-  const trig = jass.CreateTrigger();
-  const eventId = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? 52;
-  for (let i = 0; i < 16; i++) {
-    jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), eventId, undefined!);
-  }
-  const neutral = (jass as any).Player?.((jass as any).PLAYER_NEUTRAL_AGGRESSIVE ?? 13);
-  if (neutral != null) jass.TriggerRegisterPlayerUnitEvent(trig, neutral, eventId, undefined!);
-  const neutralPassive = (jass as any).Player?.((jass as any).PLAYER_NEUTRAL_PASSIVE ?? 15);
-  if (neutralPassive != null) jass.TriggerRegisterPlayerUnitEvent(trig, neutralPassive, eventId, undefined!);
-  const cond = (jass as any).Condition;
-  if (typeof cond === "function") (jass as any).TriggerAddCondition(trig, cond(condition));
-  jass.TriggerAddAction(trig, onUnitDeath);
-}
-
-init();
 export {};

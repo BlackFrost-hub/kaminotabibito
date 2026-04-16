@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 系统启用开关，true启用，false禁用
-____exports.CAST_BAR_ENABLED = false
+____exports.CAST_BAR_ENABLED = true
 --- 吟唱条更新间隔（秒）
 ____exports.UPDATE_INTERVAL = 0.02
 --- 吟唱条X坐标（屏幕比例 0-1）

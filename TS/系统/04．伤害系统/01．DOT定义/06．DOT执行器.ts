@@ -1,5 +1,19 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 
+const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
+
+/** DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致） */
+function isDotTargetPaused(u: any): boolean {
+  if (u == null || u === 0) return false;
+  const fn = unitBjExt.IsUnitPausedBJ;
+  if (fn == null) return false;
+  let paused = false;
+  (pcall as any)(() => {
+    paused = fn(u) === true;
+  });
+  return paused;
+}
+
 // ========== 虚拟分区：类型 ==========
 interface DotTickEntry {
   typeId: string;
@@ -69,6 +83,7 @@ export function createDotExecutor(deps: {
 
   // ========== 虚拟分区：造成 DOT 伤害 ==========
   function dealDamageForType(typeId: string, source: any, target: any, amount: number): void {
+    if (isDotTargetPaused(target)) return;
     if (typeof deps.jass.UnitDamageTarget !== "function") return;
     const cfg = deps.dotTypes.find(c => c.id === typeId);
     if (cfg == null) return;
@@ -108,18 +123,23 @@ export function createDotExecutor(deps: {
         bid != null && bid !== "" && typeof buffM.getBuffRuntimeByHid === "function" ? buffM.getBuffRuntimeByHid(eh, bid) : null;
       if (rt == null || rt.remaining <= 0.001) deps.dotTicks.splice(i, 1);
     }
+    const toRun: DotTickEntry[] = [];
+    for (let i = deps.dotTicks.length - 1; i >= 0; i--) {
+      const e = deps.dotTicks[i];
+      if (!isDotTargetPaused(e.target)) toRun.push(e);
+    }
     const batch: Record<number, boolean> = {};
-    for (let bi = deps.dotTicks.length - 1; bi >= 0; bi--) {
-      const bh = deps.unitHid(deps.dotTicks[bi].target);
+    for (let bi = 0; bi < toRun.length; bi++) {
+      const bh = deps.unitHid(toRun[bi].target);
       if (bh !== 0) batch[bh] = true;
     }
     const batchSnap = batch;
     dotTickBatchTargetHids = batchSnap;
-    const nDeals = deps.dotTicks.length;
+    const nDeals = toRun.length;
     dotBatchSnapForClear = batchSnap;
     dotBatchDeferredRemaining = nDeals;
-    for (let i = deps.dotTicks.length - 1; i >= 0; i--) {
-      const e = deps.dotTicks[i];
+    for (let ri = 0; ri < toRun.length; ri++) {
+      const e = toRun[ri];
       const eh = deps.unitHid(e.target);
       dealDamageForType(e.typeId, e.source, e.target, e.amount);
       addDotEffectOnUnit(e.target, e.effectModel, e.effectDuration);

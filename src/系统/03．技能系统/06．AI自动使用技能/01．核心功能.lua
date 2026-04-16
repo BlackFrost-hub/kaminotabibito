@@ -9,10 +9,8 @@ local initAutoRegister, jass, aiUnitRegistry, unitCreatedTrigger
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.00．常量定义")
 local AI_SKILL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_SKILL_SYSTEM_ENABLED
 local AI_CHECK_INTERVAL = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_CHECK_INTERVAL
-local AI_EVENT_ID_UNIT_DEATH = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_EVENT_ID_UNIT_DEATH
 local AI_PLAYER_COUNT = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_PLAYER_COUNT
 local AI_PLAYER_NEUTRAL_AGGRESSIVE = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_PLAYER_NEUTRAL_AGGRESSIVE
-local AI_PLAYER_NEUTRAL_PASSIVE = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_PLAYER_NEUTRAL_PASSIVE
 local TARGET_TYPE_NONE = ____00_FF0E_5E38_91CF_5B9A_4E49.TARGET_TYPE_NONE
 local TARGET_TYPE_POINT = ____00_FF0E_5E38_91CF_5B9A_4E49.TARGET_TYPE_POINT
 local TARGET_TYPE_UNIT = ____00_FF0E_5E38_91CF_5B9A_4E49.TARGET_TYPE_UNIT
@@ -47,20 +45,20 @@ function ____exports.autoRegisterNeutralAggressive(self, unit)
     if not unit then
         return
     end
-    local ____temp_9
+    local ____temp_5
     if type(jass.GetOwningPlayer) == "function" then
-        ____temp_9 = jass.GetOwningPlayer(unit)
+        ____temp_5 = jass.GetOwningPlayer(unit)
     else
-        ____temp_9 = nil
+        ____temp_5 = nil
     end
-    local owner = ____temp_9
-    local ____this_11
-    ____this_11 = jass
-    local ____opt_10 = ____this_11.Player
-    if ____opt_10 ~= nil then
-        ____opt_10 = ____opt_10(____this_11, AI_PLAYER_NEUTRAL_AGGRESSIVE)
+    local owner = ____temp_5
+    local ____this_7
+    ____this_7 = jass
+    local ____opt_6 = ____this_7.Player
+    if ____opt_6 ~= nil then
+        ____opt_6 = ____opt_6(____this_7, AI_PLAYER_NEUTRAL_AGGRESSIVE)
     end
-    local neutralAggressive = ____opt_10
+    local neutralAggressive = ____opt_6
     if owner == neutralAggressive then
         local isHero = type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
         if not isHero then
@@ -71,11 +69,11 @@ end
 function initAutoRegister(self)
     if not unitCreatedTrigger then
         unitCreatedTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_SUMMON_12 = jass.EVENT_PLAYER_UNIT_SUMMON
-        if ____jass_EVENT_PLAYER_UNIT_SUMMON_12 == nil then
-            ____jass_EVENT_PLAYER_UNIT_SUMMON_12 = 89
+        local ____jass_EVENT_PLAYER_UNIT_SUMMON_8 = jass.EVENT_PLAYER_UNIT_SUMMON
+        if ____jass_EVENT_PLAYER_UNIT_SUMMON_8 == nil then
+            ____jass_EVENT_PLAYER_UNIT_SUMMON_8 = 89
         end
-        local enterRegionEvent = ____jass_EVENT_PLAYER_UNIT_SUMMON_12
+        local enterRegionEvent = ____jass_EVENT_PLAYER_UNIT_SUMMON_8
         do
             local i = 0
             while i < AI_PLAYER_COUNT do
@@ -88,13 +86,13 @@ function initAutoRegister(self)
                 i = i + 1
             end
         end
-        local ____this_14
-        ____this_14 = jass
-        local ____opt_13 = ____this_14.Player
-        if ____opt_13 ~= nil then
-            ____opt_13 = ____opt_13(____this_14, AI_PLAYER_NEUTRAL_AGGRESSIVE)
+        local ____this_10
+        ____this_10 = jass
+        local ____opt_9 = ____this_10.Player
+        if ____opt_9 ~= nil then
+            ____opt_9 = ____opt_9(____this_10, AI_PLAYER_NEUTRAL_AGGRESSIVE)
         end
-        local neutralAggressive = ____opt_13
+        local neutralAggressive = ____opt_9
         if neutralAggressive ~= nil then
             jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, nil)
         end
@@ -112,7 +110,6 @@ end
 jass = require("jass.common")
 aiUnitRegistry = __TS__New(Map)
 local aiCheckTimer = nil
-local deathTrigger = nil
 unitCreatedTrigger = nil
 function ____exports.registerAISkill(self, unit, config)
     if not unit or not config.abilityId then
@@ -278,6 +275,8 @@ local function onAICheck(self)
         updateAIUnit(nil, unitInfo)
     end
 end
+local ____require_result_4 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_4.registerDeathListener
 function ____exports.initAISkillSystem(self)
     if not AI_SKILL_SYSTEM_ENABLED then
         return
@@ -286,55 +285,12 @@ function ____exports.initAISkillSystem(self)
         aiCheckTimer = jass.CreateTimer()
         jass.TimerStart(aiCheckTimer, AI_CHECK_INTERVAL, true, onAICheck)
     end
-    if not deathTrigger then
-        deathTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_DEATH_4 = jass.EVENT_PLAYER_UNIT_DEATH
-        if ____jass_EVENT_PLAYER_UNIT_DEATH_4 == nil then
-            ____jass_EVENT_PLAYER_UNIT_DEATH_4 = AI_EVENT_ID_UNIT_DEATH
+    registerDeathListener(
+        nil,
+        function(____, dyingUnit)
+            ____exports.unregisterAIUnit(nil, dyingUnit)
         end
-        local deathEventId = ____jass_EVENT_PLAYER_UNIT_DEATH_4
-        do
-            local i = 0
-            while i < AI_PLAYER_COUNT do
-                jass.TriggerRegisterPlayerUnitEvent(
-                    deathTrigger,
-                    jass.Player(i),
-                    deathEventId,
-                    nil
-                )
-                i = i + 1
-            end
-        end
-        local ____this_6
-        ____this_6 = jass
-        local ____opt_5 = ____this_6.Player
-        if ____opt_5 ~= nil then
-            ____opt_5 = ____opt_5(____this_6, AI_PLAYER_NEUTRAL_AGGRESSIVE)
-        end
-        local neutralAggressive = ____opt_5
-        if neutralAggressive ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralAggressive, deathEventId, nil)
-        end
-        local ____this_8
-        ____this_8 = jass
-        local ____opt_7 = ____this_8.Player
-        if ____opt_7 ~= nil then
-            ____opt_7 = ____opt_7(____this_8, AI_PLAYER_NEUTRAL_PASSIVE)
-        end
-        local neutralPassive = ____opt_7
-        if neutralPassive ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralPassive, deathEventId, nil)
-        end
-        jass.TriggerAddAction(
-            deathTrigger,
-            function()
-                ____exports.unregisterAIUnit(
-                    nil,
-                    jass.GetTriggerUnit()
-                )
-            end
-        )
-    end
+    )
     initAutoRegister(nil)
 end
 function ____exports.getAIUnitCount(self)

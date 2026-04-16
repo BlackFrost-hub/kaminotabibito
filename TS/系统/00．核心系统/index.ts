@@ -4,6 +4,7 @@
  * 说明：
  * - 封装函数已迁移到 lib/扩展函数/封装函数/
  * - 这里仅保留 颜色常量、硬件函数 和 UI函数
+ * - 治疗事件已迁移到 04．伤害系统/02．治疗系统/
  */
 
 // ========== 从封装函数重新导出 ==========
@@ -12,7 +13,6 @@ export * from "../../lib/扩展函数/封装函数/index";
 // ========== 核心模块导出 ==========
 export * from "./01．颜色常量";
 export * from "./03．UI函数";
-export * from "./04．治疗事件";
 export * from "./05．中心计时器";
 
 // ========== 初始化 ==========
@@ -21,10 +21,6 @@ export * from "./05．中心计时器";
 require("系统.00．核心系统.01．颜色常量");
 require("系统.00．核心系统.02．硬件函数");
 require("系统.00．核心系统.03．UI函数");
-
-// 治疗事件系统
-const healEventMod = require("系统.00．核心系统.04．治疗事件") as { initHealEvent?: () => void };
-if (typeof healEventMod.initHealEvent === "function") healEventMod.initHealEvent();
 
 // 中心计时器（自动初始化）
 require("系统.00．核心系统.05．中心计时器");

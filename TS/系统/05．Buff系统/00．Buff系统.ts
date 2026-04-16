@@ -4,9 +4,11 @@
  * - **DOT（D001–D004）剩余时间由本模块以固定步长递减**；`dot伤害` 施加/刷新时 `syncDotBuff` 写入满额 remaining，不在此用 `getUnitPoison` 回写覆盖。
  * - 非 DOT 的 `manual` 条同样由本计时器递减。
  * - 每 tick 末调用 `dot伤害.syncDotRemainingFromBuffPool`，使逻辑层 `stateByType` 与池一致。
+ * - **单位被 `PauseUnit` 暂停时**（`IsUnitPausedBJ`）：该单位在池内所有 Buff **不扣** `remaining`，与引擎时间冻结一致；恢复暂停后照常递减。
  */
 
 const jass = require("jass.common") as Record<string, unknown>;
+const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 
@@ -44,6 +46,18 @@ interface UnitBuffEntry {
 /** GetHandleId → 数据（Lua 下勿直接用 unit 作键） */
 const unitToBuffs: Record<number, UnitBuffEntry> = {};
 let syncTimer: any = undefined;
+
+/** 与 `PauseUnit` 一致：暂停中的单位 Buff 池不计时（由中心计时器驱动，见 `tickBuffPool`） */
+function isBuffPoolUnitPaused(u: any): boolean {
+  if (u == null || u === 0) return false;
+  const fn = unitBjExt.IsUnitPausedBJ;
+  if (fn == null) return false;
+  let paused = false;
+  (pcall as any)(() => {
+    paused = fn(u) === true;
+  });
+  return paused;
+}
 
 function toHid(u: any): number {
   if (u == null || u === 0) return 0;
@@ -212,6 +226,7 @@ function tickBuffPool(): void {
     if (hid === 0) continue;
     const entry = unitToBuffs[hid];
     if (entry == null) continue;
+    if (isBuffPoolUnitPaused(entry.lastRef)) continue;
     const tab = entry.buffs;
     const expired: string[] = [];
     for (const bid in tab) {

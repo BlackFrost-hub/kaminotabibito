@@ -288,7 +288,10 @@ export function registerSkillTips(
 // ==========================================================================================
 
 let levelUpTrigger: any = null;
-let deathTrigger: any = null;
+
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+};
 
 export function initDynamicSkillTipSystem(): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
@@ -305,25 +308,9 @@ export function initDynamicSkillTipSystem(): void {
     });
   }
 
-  if (!deathTrigger) {
-    deathTrigger = jass.CreateTrigger();
-    const deathEventId = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? EVENT_ID_UNIT_DEATH;
-    for (let i = 0; i < PLAYER_COUNT; i++) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, jass.Player(i), deathEventId, undefined!);
-    }
-    const neutralAggressive = (jass as any).Player?.(PLAYER_NEUTRAL_AGGRESSIVE);
-    if (neutralAggressive != null) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralAggressive, deathEventId, undefined!);
-    }
-    const neutralPassive = (jass as any).Player?.(PLAYER_NEUTRAL_PASSIVE);
-    if (neutralPassive != null) {
-      jass.TriggerRegisterPlayerUnitEvent(deathTrigger, neutralPassive, deathEventId, undefined!);
-    }
-    jass.TriggerAddAction(deathTrigger, () => {
-      const unit = jass.GetTriggerUnit();
-      unregisterDynamicSkillTip(unit);
-    });
-  }
+  registerDeathListener((dyingUnit) => {
+    unregisterDynamicSkillTip(dyingUnit);
+  });
 }
 
 // ==========================================================================================

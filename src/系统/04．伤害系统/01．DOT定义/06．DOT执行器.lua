@@ -2,6 +2,23 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local ____exports = {}
+local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+--- DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致）
+local function isDotTargetPaused(self, u)
+    if u == nil or u == 0 then
+        return false
+    end
+    local fn = unitBjExt.IsUnitPausedBJ
+    if fn == nil then
+        return false
+    end
+    local paused = false
+    pcall(function ()
+            paused = fn(nil, u) == true
+        end
+    )
+    return paused
+end
 function ____exports.createDotExecutor(self, deps)
     local EFFECT_RECYCLE_INTERVAL = 0.2
     local effectRecycleList = {}
@@ -54,6 +71,9 @@ function ____exports.createDotExecutor(self, deps)
         end
     end
     local function dealDamageForType(self, typeId, source, target, amount)
+        if isDotTargetPaused(nil, target) then
+            return
+        end
         if type(deps.jass.UnitDamageTarget) ~= "function" then
             return
         end
@@ -117,26 +137,37 @@ function ____exports.createDotExecutor(self, deps)
                 i = i - 1
             end
         end
-        local batch = {}
-        do
-            local bi = #deps.dotTicks - 1
-            while bi >= 0 do
-                local bh = deps:unitHid(deps.dotTicks[bi + 1].target)
-                if bh ~= 0 then
-                    batch[bh] = true
-                end
-                bi = bi - 1
-            end
-        end
-        local batchSnap = batch
-        dotTickBatchTargetHids = batchSnap
-        local nDeals = #deps.dotTicks
-        dotBatchSnapForClear = batchSnap
-        dotBatchDeferredRemaining = nDeals
+        local toRun = {}
         do
             local i = #deps.dotTicks - 1
             while i >= 0 do
                 local e = deps.dotTicks[i + 1]
+                if not isDotTargetPaused(nil, e.target) then
+                    toRun[#toRun + 1] = e
+                end
+                i = i - 1
+            end
+        end
+        local batch = {}
+        do
+            local bi = 0
+            while bi < #toRun do
+                local bh = deps:unitHid(toRun[bi + 1].target)
+                if bh ~= 0 then
+                    batch[bh] = true
+                end
+                bi = bi + 1
+            end
+        end
+        local batchSnap = batch
+        dotTickBatchTargetHids = batchSnap
+        local nDeals = #toRun
+        dotBatchSnapForClear = batchSnap
+        dotBatchDeferredRemaining = nDeals
+        do
+            local ri = 0
+            while ri < #toRun do
+                local e = toRun[ri + 1]
                 local eh = deps:unitHid(e.target)
                 dealDamageForType(
                     nil,
@@ -166,7 +197,7 @@ function ____exports.createDotExecutor(self, deps)
                 if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
                     cfg:onTick(e.target, state)
                 end
-                i = i - 1
+                ri = ri + 1
             end
         end
         if nDeals <= 0 then

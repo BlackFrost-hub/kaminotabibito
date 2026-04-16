@@ -11,6 +11,9 @@ const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.index") as {
 const { CameraShakeForPlayer } = require("lib.扩展函数.封装函数.07．镜头函数.index") as {
   CameraShakeForPlayer: (p: any, magnitude: number, duration: number) => void;
 };
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+};
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, DropBerserkEntry> }).default ?? {};
@@ -22,9 +25,8 @@ function typeIdToUnitId(typeId: number): string | undefined {
   return undefined;
 }
 
-function onDeath(): void {
-  const dying = jass.GetTriggerUnit();
-  if (!dying) return;
+function onDeath(dying: any, killer: any): void {
+  if (dying == null) return;
   if (typeof (jass as any).GetUnitTypeId !== "function") return;
   const typeId = (jass as any).GetUnitTypeId(dying) as number;
   const unitId = typeIdToUnitId(typeId);
@@ -37,7 +39,6 @@ function onDeath(): void {
   const BERSERK_PROC = 1; // 100% for test
   if ((math as any).random(1, 10000) as number > BERSERK_PROC * 10000) return;
 
-  // 先记录死亡单位的位置和面向（死亡瞬间仍有效），再创建单位并设成同一角度
   let x = 0;
   let y = 0;
   let facingDeg = 270;
@@ -57,7 +58,6 @@ function onDeath(): void {
   if (typeof (jass as any).CreateUnit === "function") {
     created = (jass as any).CreateUnit(owner, four, x, y, facingDeg);
   }
-  const killer = typeof (jass as any).GetKillingUnit === "function" ? (jass as any).GetKillingUnit() : undefined;
   const killerPlayer = killer && typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
     EXSetUnitFacing(created, facingDeg);
@@ -65,18 +65,6 @@ function onDeath(): void {
   }
 }
 
-function init(): void {
-  const trig = jass.CreateTrigger();
-  const eventId = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? 52;
-  for (let i = 0; i < 16; i++) {
-    jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), eventId, undefined!);
-  }
-  const neutral = (jass as any).Player?.((jass as any).PLAYER_NEUTRAL_AGGRESSIVE ?? 12);
-  if (neutral != null) jass.TriggerRegisterPlayerUnitEvent(trig, neutral, eventId, undefined!);
-  const neutralPassive = (jass as any).Player?.((jass as any).PLAYER_NEUTRAL_PASSIVE ?? 15);
-  if (neutralPassive != null) jass.TriggerRegisterPlayerUnitEvent(trig, neutralPassive, eventId, undefined!);
-  jass.TriggerAddAction(trig, onDeath);
-}
+registerDeathListener(onDeath);
 
-init();
 export {};
