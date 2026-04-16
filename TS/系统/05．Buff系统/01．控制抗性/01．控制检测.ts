@@ -9,7 +9,7 @@ const japi = require("jass.japi") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
-const { EXCLUDED_UNIT_TYPES } = require("系统.05．Buff系统.04．控制抗性.00．控制抗性常量") as {
+const { EXCLUDED_UNIT_TYPES } = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量") as {
   EXCLUDED_UNIT_TYPES: string[];
 };
 

@@ -11,7 +11,7 @@ const { TriggerRegisterPlayerUnitEventSimple } = require("lib.扩展函数.BJ函
 const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetSpellAbilityId: () => number;
 };
-const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.04．控制抗性.01．控制检测") as {
+const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
   isExcludedFromControlResist: (unit: any) => boolean;
   isControlAbility: (abilityId: number) => boolean;
   isUnitControlled: (unit: any) => boolean;

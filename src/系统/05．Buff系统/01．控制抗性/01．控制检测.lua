@@ -8,7 +8,7 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.05．Buff系统.04．控制抗性.00．控制抗性常量")
+local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量")
 local EXCLUDED_UNIT_TYPES = ____require_result_1.EXCLUDED_UNIT_TYPES
 --- 检查单位是否被排除
 function ____exports.isExcludedFromControlResist(self, unit)

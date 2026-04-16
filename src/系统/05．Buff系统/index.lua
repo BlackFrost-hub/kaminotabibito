@@ -33,7 +33,7 @@ do
     end
 end
 do
-    local ____export = require("系统.05．Buff系统.04．控制抗性.index")
+    local ____export = require("系统.05．Buff系统.01．控制抗性.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -50,7 +50,7 @@ if type(buffUIMod.init) == "function" then
     buffUIMod:init()
 end
 require("系统.05．Buff系统.03．BuffJASS桥接")
-local controlResistMod = require("系统.05．Buff系统.04．控制抗性.index")
+local controlResistMod = require("系统.05．Buff系统.01．控制抗性.index")
 if type(controlResistMod.initControlResist) == "function" then
     controlResistMod:initControlResist()
 end
