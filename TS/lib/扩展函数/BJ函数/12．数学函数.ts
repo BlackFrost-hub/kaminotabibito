@@ -50,7 +50,7 @@ export function AtanBJ(value: number): number {
 
 /** 反正切2（返回角度） */
 export function Atan2BJ(y: number, x: number): number {
-  return Math.atan2(y, x) * BJ_RADTODEG;
+  return jass.Atan2(y, x) * BJ_RADTODEG;
 }
 
 // ===========================================================================
@@ -117,7 +117,7 @@ export function AngleBetweenPoints(locA: any, locB: any): number {
   if (typeof jass.GetLocationX !== "function" || typeof jass.GetLocationY !== "function") return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
-  return Math.atan2(dy, dx) * BJ_RADTODEG;
+  return jass.Atan2(dy, dx) * BJ_RADTODEG;
 }
 
 /**

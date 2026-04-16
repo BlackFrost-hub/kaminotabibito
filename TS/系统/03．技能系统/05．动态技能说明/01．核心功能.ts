@@ -295,7 +295,7 @@ export function initDynamicSkillTipSystem(): void {
 
   if (!levelUpTrigger) {
     levelUpTrigger = jass.CreateTrigger();
-    const levelEventId = (jass as any).EVENT_PLAYER_UNIT_HERO_LEVEL ?? EVENT_ID_HERO_LEVEL;
+    const levelEventId = (jass as any).EVENT_PLAYER_HERO_LEVEL ?? EVENT_ID_HERO_LEVEL;
     for (let i = 0; i < PLAYER_COUNT; i++) {
       jass.TriggerRegisterPlayerUnitEvent(levelUpTrigger, jass.Player(i), levelEventId, undefined!);
     }

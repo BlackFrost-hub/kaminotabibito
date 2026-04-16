@@ -19,7 +19,7 @@ const { CosBJ, BJ_DEGTORAD } = require("lib.扩展函数.BJ函数.00．BJ全局�
  * 对应 JASS: Math.GAFC / X_GAFC
  */
 function GAFC(x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD;
+  return jass.Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD;
 }
 
 /**

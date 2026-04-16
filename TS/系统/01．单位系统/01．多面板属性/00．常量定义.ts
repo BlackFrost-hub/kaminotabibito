@@ -9,10 +9,10 @@
 // ==========================================================================================
 
 /** 系统启用开关，true启用，false禁用 */
-export const MULTIBOARD_SYSTEM_ENABLED = false;
+export const MULTIBOARD_SYSTEM_ENABLED = true;
 
 /** 多面板刷新间隔（秒） */
-export const MULTIBOARD_REFRESH_INTERVAL = 4.0;
+export const MULTIBOARD_REFRESH_INTERVAL = 3.0;
 
 /** 多面板行列数 */
 export const MULTIBOARD_ROWS = 11;

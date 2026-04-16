@@ -106,16 +106,14 @@ function ____exports.getBoolAttr(self, unit, attrName, defaultValue)
     if defaultValue == nil then
         defaultValue = false
     end
-    return Boolean(
+    local value = ____exports.getUnitAttr(
         nil,
-        ____exports.getUnitAttr(
-            nil,
-            unit,
-            attrName,
-            "boolean",
-            defaultValue
-        )
+        unit,
+        attrName,
+        "boolean",
+        defaultValue
     )
+    return value == true or value == 1
 end
 --- 读取属性并应用玩家上下限
 -- 

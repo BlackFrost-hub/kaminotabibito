@@ -102,7 +102,8 @@ export function getRealAttr(unit: any, attrName: string, defaultValue: number = 
  * 读取布尔属性
  */
 export function getBoolAttr(unit: any, attrName: string, defaultValue: boolean = false): boolean {
-  return Boolean(getUnitAttr(unit, attrName, "boolean", defaultValue));
+  const value = getUnitAttr(unit, attrName, "boolean", defaultValue);
+  return value === true || value === 1;
 }
 
 //=============================================================================

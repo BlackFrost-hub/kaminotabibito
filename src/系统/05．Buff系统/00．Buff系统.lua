@@ -5,7 +5,7 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, LeakWatcher, unitToBuffs, syncTimer
+local toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitToBuffs, _registeredToCenterTimer, _tickCounter
 function toHid(self, u)
     if u == nil or u == 0 then
         return 0
@@ -124,25 +124,24 @@ function tickBuffPool(self)
     maybeStopSyncTimer(nil)
 end
 function ensureSyncTimer(self)
-    if syncTimer ~= nil then
+    if _registeredToCenterTimer then
         return
     end
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        return
-    end
-    syncTimer = LeakWatcher:createTimer("buff_pool_tick")
-    jass.TimerStart(syncTimer, ____exports.BUFF_POOL_TICK, true, tickBuffPool)
+    _registeredToCenterTimer = true
+    local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+    local onTick10ms = ____require_result_1.onTick10ms
+    onTick10ms(
+        nil,
+        function()
+            _tickCounter = _tickCounter + 1
+            if _tickCounter >= 10 then
+                _tickCounter = 0
+                tickBuffPool(nil)
+            end
+        end
+    )
 end
 function maybeStopSyncTimer(self)
-    local hasAny = false
-    for _u in pairs(unitToBuffs) do
-        hasAny = true
-        break
-    end
-    if not hasAny and syncTimer ~= nil then
-        LeakWatcher:destroyTimer(syncTimer)
-        syncTimer = nil
-    end
 end
 jass = require("jass.common")
 local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
@@ -150,13 +149,13 @@ local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_0 == nil then
     ____leakCore_LeakWatcher_0 = leakCore
 end
-LeakWatcher = ____leakCore_LeakWatcher_0
+local LeakWatcher = ____leakCore_LeakWatcher_0
 --- Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s）
 ____exports.BUFF_POOL_TICK = 0.1
 --- dot伤害 里的 typeId → 01．Buff表 buffID
 ____exports.DOT_TYPE_TO_BUFF_ID = {antiHeal = "D001", burn = "D002", poison = "D003", trollCurse = "D004"}
 unitToBuffs = {}
-syncTimer = nil
+local syncTimer = nil
 local function ensureEntry(self, u)
     local hid = toHid(nil, u)
     if hid == 0 then
@@ -286,6 +285,8 @@ end
 function ____exports.getDotIconDisplayRemaining(self, _unit, _buffID, realRemaining)
     return type(realRemaining) == "number" and __TS__NumberIsFinite(__TS__Number(realRemaining)) and realRemaining or 0
 end
+_registeredToCenterTimer = false
+_tickCounter = 0
 function ____exports.initBuffSystem(self)
 end
 return ____exports

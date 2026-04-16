@@ -590,31 +590,36 @@ local function createUi(self)
         end
     )
 end
+--- 刷新计数器（每10个10毫秒=0.1秒刷新一次）
+local _refreshCounter = 0
+--- 是否已注册到中心计时器
+local _registeredToCenterTimer = false
 local function startRefreshTimer(self)
     pcall(function ()
-            if refreshTimer ~= nil then
+            if _registeredToCenterTimer then
                 return
             end
-            if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-                return
-            end
-            refreshTimer = jass.CreateTimer()
-            jass.TimerStart(
-                refreshTimer,
-                BUFF_BAR_REFRESH_SEC,
-                true,
+            _registeredToCenterTimer = true
+            local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+            local onTick10ms = ____require_result_6.onTick10ms
+            onTick10ms(
+                nil,
                 function()
-                    pcall(function ()
-                            if type(jass.GetLocalPlayer) ~= "function" then
-                                return
+                    _refreshCounter = _refreshCounter + 1
+                    if _refreshCounter >= 10 then
+                        _refreshCounter = 0
+                        pcall(function ()
+                                if type(jass.GetLocalPlayer) ~= "function" then
+                                    return
+                                end
+                                local lp = jass.GetLocalPlayer()
+                                if lp == nil or lp == 0 then
+                                    return
+                                end
+                                syncBuffBar(nil)
                             end
-                            local lp = jass.GetLocalPlayer()
-                            if lp == nil or lp == 0 then
-                                return
-                            end
-                            syncBuffBar(nil)
-                        end
-                    )
+                        )
+                    end
                 end
             )
         end

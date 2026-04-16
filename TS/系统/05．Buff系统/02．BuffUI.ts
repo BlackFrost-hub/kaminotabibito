@@ -478,18 +478,32 @@ function createUi(): void {
   });
 }
 
+/** 刷新计数器（每10个10毫秒=0.1秒刷新一次） */
+let _refreshCounter = 0;
+/** 是否已注册到中心计时器 */
+let _registeredToCenterTimer = false;
+
 function startRefreshTimer(): void {
   (pcall as any)(() => {
-    if (refreshTimer != null) return;
-    if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") return;
-    refreshTimer = jass.CreateTimer();
-    jass.TimerStart(refreshTimer, BUFF_BAR_REFRESH_SEC, true, () => {
-      (pcall as any)(() => {
-        if (typeof jass.GetLocalPlayer !== "function") return;
-        const lp = jass.GetLocalPlayer();
-        if (lp == null || lp === 0) return;
-        syncBuffBar();
-      });
+    if (_registeredToCenterTimer) return;
+    _registeredToCenterTimer = true;
+
+    // 使用中心计时器的每10毫秒回调
+    const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+      onTick10ms: (callback: () => void) => void;
+    };
+
+    onTick10ms(() => {
+      _refreshCounter = _refreshCounter + 1;
+      if (_refreshCounter >= 10) {  // 10 * 10ms = 100ms = 0.1秒
+        _refreshCounter = 0;
+        (pcall as any)(() => {
+          if (typeof jass.GetLocalPlayer !== "function") return;
+          const lp = jass.GetLocalPlayer();
+          if (lp == null || lp === 0) return;
+          syncBuffBar();
+        });
+      }
     });
   });
 }

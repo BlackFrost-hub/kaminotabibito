@@ -93,6 +93,7 @@ items["I00P"] = {
   level: "E-",
   dmg: 2,
   all: 2,
+  magicDmg: 0.3,
   Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
   primaryBonus: "力量+16/敏捷+20/智力+20",
 };

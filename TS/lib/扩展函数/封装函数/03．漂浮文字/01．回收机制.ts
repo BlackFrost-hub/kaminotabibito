@@ -8,37 +8,42 @@ const { LeakWatcher } = require("lib.扩展函数.封装函数.05．泄露审计
 // 回收队列：避免"每个 texttag 一个 timer"在高频创建时丢回调导致不销毁
 type FloatTextItem = { tt: any; ticksLeft: number };
 export const floatTextQueue: FloatTextItem[] = [];
-export let floatTextRecycleTimer: any = null;
+/** 是否已注册到中心计时器 */
+let _registeredToCenterTimer = false;
+/** tick计数器（每5个10毫秒=0.05秒执行一次） */
+let _tickCounter = 0;
 export const RECYCLE_TICK = 0.05; // 20Hz 足够平滑且开销低
 
 export function ensureFloatTextRecycleTimer(): void {
-  if (floatTextRecycleTimer != null) return;
-  if (typeof (jass as any).TimerStart !== "function") return;
-  floatTextRecycleTimer =
-    LeakWatcher && typeof LeakWatcher.createTimer === "function"
-      ? LeakWatcher.createTimer("float_text_recycle")
-      : (jass as any).CreateTimer?.();
-  if (floatTextRecycleTimer == null) return;
-  (jass as any).TimerStart(floatTextRecycleTimer, RECYCLE_TICK, true, () => {
-    // 倒序遍历，便于删除
-    for (let i = floatTextQueue.length - 1; i >= 0; i--) {
-      const it = floatTextQueue[i];
-      it.ticksLeft--;
-      if (it.ticksLeft <= 0) {
-        const tt = it.tt;
-        if (tt) {
-          if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") LeakWatcher.destroyTextTag(tt);
-          else if (typeof (jass as any).DestroyTextTag === "function") (jass as any).DestroyTextTag(tt);
+  if (_registeredToCenterTimer) return;
+  _registeredToCenterTimer = true;
+
+  // 使用中心计时器的每10毫秒回调
+  const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+    onTick10ms: (callback: () => void) => void;
+  };
+
+  onTick10ms(() => {
+    if (floatTextQueue.length === 0) return;
+
+    _tickCounter = _tickCounter + 1;
+    if (_tickCounter >= 5) {  // 5 * 10ms = 50ms = 0.05秒
+      _tickCounter = 0;
+
+      // 倒序遍历，便于删除
+      for (let i = floatTextQueue.length - 1; i >= 0; i--) {
+        const it = floatTextQueue[i];
+        it.ticksLeft--;
+        if (it.ticksLeft <= 0) {
+          const tt = it.tt;
+          if (tt) {
+            if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") LeakWatcher.destroyTextTag(tt);
+            else if (typeof (jass as any).DestroyTextTag === "function") (jass as any).DestroyTextTag(tt);
+          }
+          floatTextQueue.splice(i, 1);
         }
-        floatTextQueue.splice(i, 1);
       }
-    }
-    if (floatTextQueue.length === 0) {
-      // 停掉并销毁回收 timer
-      const t = floatTextRecycleTimer;
-      floatTextRecycleTimer = null;
-      if (LeakWatcher && typeof LeakWatcher.destroyTimer === "function") LeakWatcher.destroyTimer(t);
-      else if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+      // 使用中心计时器后无法停止，但如果没有item会跳过逻辑
     }
   });
 }

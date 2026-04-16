@@ -1,17 +1,18 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local stopTimer, jass, systemTimer, isRunning
-function stopTimer(self)
-    if not isRunning then
-        return
-    end
-    if systemTimer and type(jass.PauseTimer) == "function" then
-        jass.PauseTimer(systemTimer)
-    end
-    isRunning = false
-end
-jass = require("jass.common")
+--- Star扩展库 - 移动速度突破系统
+-- 
+-- 突破魔兽争霸3的522移动速度上限。
+-- 通过每0.02秒的周期计时器，计算单位实际移动速度与引擎速度的差值，
+-- 手动将单位向目标点方向位移，实现超522的移动效果。
+-- 
+-- 公开接口：
+--   SOS_SetUnitSpeed(u, speed)          - 设置单位突破速度（永久）
+--   SOS_SetUnitSpeedTemp(u, speed, dur) - 设置单位突破速度（临时，持续dur秒后恢复）
+--   SOS_GetUnitSpeed(u)                 - 获取单位突破速度
+--   SOS_UnSetUnitSpeed(u)               - 取消单位速度突破
+local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 local X_GDBC = ____require_result_0.X_GDBC
 local X_GAFC = ____require_result_0.X_GAFC
@@ -22,9 +23,13 @@ local ORDER_MOVE = 851971
 local ORDER_SMART = 851986
 local TIMER_INTERVAL = 0.02
 local TICKS_PER_SEC = 1 / TIMER_INTERVAL
+--- 中心计时器每10毫秒tick一次，每2次tick执行一次移动速度更新
+local CENTER_TIMER_TICKS = 2
 local SPEED_MIN = 1
 local SPEED_MAX = 2000
 local ENGINE_SPEED_LIMIT = 522
+--- 移动速度突破特效模型路径
+local SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx"
 local function hid(self, h)
     return type(jass.GetHandleId) == "function" and (jass.GetHandleId(h) or 0) or 0
 end
@@ -51,8 +56,31 @@ local function clampSpeed(self, speed)
 end
 local entryMap = {}
 local entryList = {}
-systemTimer = nil
-isRunning = false
+local systemTimer = nil
+local isRunning = false
+--- 为单位添加移动速度突破特效
+local function addSpeedEffect(self, u)
+    if not u then
+        return nil
+    end
+    local ____temp_1
+    if type(jass.AddSpecialEffectTarget) == "function" then
+        ____temp_1 = jass.AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin")
+    else
+        ____temp_1 = nil
+    end
+    local effect = ____temp_1
+    return effect
+end
+--- 删除移动速度突破特效
+local function removeSpeedEffect(self, effect)
+    if not effect then
+        return
+    end
+    if type(jass.DestroyEffect) == "function" then
+        jass.DestroyEffect(effect)
+    end
+end
 local function doEvent(self, entry)
     local u = entry.u
     if u == nil or u == 0 then
@@ -64,13 +92,13 @@ local function doEvent(self, entry)
         entry.lf = getUnitFacing(nil, u)
         return
     end
-    local ____temp_1
+    local ____temp_2
     if type(jass.GetUnitCurrentOrder) == "function" then
-        ____temp_1 = jass.GetUnitCurrentOrder(u)
+        ____temp_2 = jass.GetUnitCurrentOrder(u)
     else
-        ____temp_1 = 0
+        ____temp_2 = 0
     end
-    local currentOrder = ____temp_1
+    local currentOrder = ____temp_2
     if currentOrder ~= ORDER_MOVE and currentOrder ~= ORDER_SMART then
         entry.lx = getUnitX(nil, u)
         entry.ly = getUnitY(nil, u)
@@ -78,51 +106,56 @@ local function doEvent(self, entry)
     end
     local x = getUnitX(nil, u)
     local y = getUnitY(nil, u)
-    local engineSpeed = getUnitMoveSpeed(nil, u)
-    local extraSpeed = entry.speed - engineSpeed
-    local extraSpeedPerTick = extraSpeed / TICKS_PER_SEC
-    local dis = X_GDBC(
-        nil,
-        x,
-        y,
-        entry.lx,
-        entry.ly
-    )
-    local dis2 = X_GDBC(
+    local f = getUnitFacing(nil, u)
+    local dx = entry.tx - x
+    local dy = entry.ty - y
+    local dist = X_GDBC(
         nil,
         x,
         y,
         entry.tx,
         entry.ty
     )
-    local f = getUnitFacing(nil, u)
-    if dis > engineSpeed / 60 then
-        if math.abs(f) - math.abs(entry.lf) < 2 then
-            if dis2 > extraSpeedPerTick then
-                local d = X_GAFC(
-                    nil,
-                    entry.lx,
-                    entry.ly,
-                    x,
-                    y
-                )
-                local nx = x + math.cos(d * (math.pi / 180)) * extraSpeedPerTick
-                local ny = y + math.sin(d * (math.pi / 180)) * extraSpeedPerTick
-                if not X_IsTerrainWalkable(nil, nx, ny) then
-                    nx = X_GetAbleX(nil)
-                    ny = X_GetAbleY(nil)
+    if dist > 10 then
+        local angle = X_GAFC(
+            nil,
+            x,
+            y,
+            entry.tx,
+            entry.ty
+        )
+        local engineSpeed = getUnitMoveSpeed(nil, u)
+        local speedDiff = entry.speed - engineSpeed
+        if speedDiff > 0 then
+            local moveDist = speedDiff * TIMER_INTERVAL
+            local rad = angle * (math.pi / 180)
+            local nx = x + moveDist * math.cos(rad)
+            local ny = y + moveDist * math.sin(rad)
+            if X_IsTerrainWalkable(nil, nx, ny) then
+                if type(jass.SetUnitX) == "function" then
+                    jass.SetUnitX(u, nx)
+                end
+                if type(jass.SetUnitY) == "function" then
+                    jass.SetUnitY(u, ny)
                 end
                 entry.lx = nx
                 entry.ly = ny
             else
-                entry.lx = entry.tx
-                entry.ly = entry.ty
-            end
-            if type(jass.SetUnitX) == "function" then
-                jass.SetUnitX(u, entry.lx)
-            end
-            if type(jass.SetUnitY) == "function" then
-                jass.SetUnitY(u, entry.ly)
+                local ableX = X_GetAbleX(nil)
+                local ableY = X_GetAbleY(nil)
+                if ableX ~= 0 or ableY ~= 0 then
+                    if type(jass.SetUnitX) == "function" then
+                        jass.SetUnitX(u, ableX)
+                    end
+                    if type(jass.SetUnitY) == "function" then
+                        jass.SetUnitY(u, ableY)
+                    end
+                    entry.lx = ableX
+                    entry.ly = ableY
+                else
+                    entry.lx = x
+                    entry.ly = y
+                end
             end
         else
             entry.lx = x
@@ -134,49 +167,56 @@ local function doEvent(self, entry)
     end
     entry.lf = f
 end
+--- 是否已注册到中心计时器
+local _registeredToCenterTimer = false
+--- tick计数器
+local _tickCounter = 0
 local function startTimer(self)
     if isRunning then
         return
     end
-    if not systemTimer then
-        local ____temp_2
-        if type(jass.CreateTimer) == "function" then
-            ____temp_2 = jass.CreateTimer()
-        else
-            ____temp_2 = nil
-        end
-        systemTimer = ____temp_2
-    end
-    if not systemTimer then
+    isRunning = true
+    if _registeredToCenterTimer then
         return
     end
-    isRunning = true
-    jass.TimerStart(
-        systemTimer,
-        TIMER_INTERVAL,
-        true,
+    _registeredToCenterTimer = true
+    local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+    local onTick10ms = ____require_result_3.onTick10ms
+    onTick10ms(
+        nil,
         function()
-            local count = #entryList
-            do
-                local i = 0
-                while i < count do
-                    local entry = entryList[i + 1]
-                    if entry and entryMap[entry.uid] == entry then
-                        doEvent(nil, entry)
-                    end
-                    i = i + 1
-                end
+            if not isRunning then
+                return
             end
-            if #entryList == 0 then
-                stopTimer(nil)
+            _tickCounter = _tickCounter + 1
+            if _tickCounter >= CENTER_TIMER_TICKS then
+                _tickCounter = 0
+                local count = #entryList
+                do
+                    local i = 0
+                    while i < count do
+                        local entry = entryList[i + 1]
+                        if entry and entryMap[entry.uid] == entry then
+                            doEvent(nil, entry)
+                        end
+                        i = i + 1
+                    end
+                end
             end
         end
     )
+end
+local function stopTimer(self)
+    isRunning = false
 end
 local function removeEntry(self, uid)
     local entry = entryMap[uid]
     if entry == nil then
         return
+    end
+    if entry.effect then
+        removeSpeedEffect(nil, entry.effect)
+        entry.effect = nil
     end
     if entry.tempTimer and type(jass.DestroyTimer) == "function" then
         jass.DestroyTimer(entry.tempTimer)
@@ -198,13 +238,13 @@ local function removeEntry(self, uid)
     __TS__Delete(entryMap, uid)
 end
 local function createTriggerForEntry(self, entry)
-    local ____temp_3
+    local ____temp_4
     if type(jass.CreateTrigger) == "function" then
-        ____temp_3 = jass.CreateTrigger()
+        ____temp_4 = jass.CreateTrigger()
     else
-        ____temp_3 = nil
+        ____temp_4 = nil
     end
-    local t = ____temp_3
+    local t = ____temp_4
     entry.t = t
     if t == nil then
         return
@@ -229,6 +269,7 @@ local function createTriggerForEntry(self, entry)
 end
 --- 设置单位移动速度突破（永久）
 -- 若单位已在系统中（含临时加速中），取消临时计时器并覆盖为永久速度
+-- 若速度未超过522，自动取消注册
 -- 
 -- @param u 目标单位
 -- @param speed 目标移动速度（限制在1~2000）
@@ -250,6 +291,9 @@ function ____exports.SOS_SetUnitSpeed(self, u, speed)
         end
         existing.speed = speed
         existing.originalSpeed = speed
+        if not existing.effect then
+            existing.effect = addSpeedEffect(nil, u)
+        end
         return
     end
     local entry = {
@@ -264,7 +308,8 @@ function ____exports.SOS_SetUnitSpeed(self, u, speed)
         ly = getUnitY(nil, u),
         lf = getUnitFacing(nil, u),
         tempTimer = nil,
-        listIndex = #entryList
+        listIndex = #entryList,
+        effect = addSpeedEffect(nil, u)
     }
     createTriggerForEntry(nil, entry)
     entryMap[uid] = entry
@@ -300,6 +345,9 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
         end
         existing.speed = speed
         existing.originalSpeed = savedOriginal
+        if not existing.effect then
+            existing.effect = addSpeedEffect(nil, u)
+        end
     else
         local entry = {
             speed = speed,
@@ -313,7 +361,8 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
             ly = getUnitY(nil, u),
             lf = getUnitFacing(nil, u),
             tempTimer = nil,
-            listIndex = #entryList
+            listIndex = #entryList,
+            effect = addSpeedEffect(nil, u)
         }
         createTriggerForEntry(nil, entry)
         entryMap[uid] = entry
@@ -324,13 +373,13 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
     if current == nil then
         return
     end
-    local ____temp_4
+    local ____temp_5
     if type(jass.CreateTimer) == "function" then
-        ____temp_4 = jass.CreateTimer()
+        ____temp_5 = jass.CreateTimer()
     else
-        ____temp_4 = nil
+        ____temp_5 = nil
     end
-    local tempT = ____temp_4
+    local tempT = ____temp_5
     current.tempTimer = tempT
     if tempT then
         jass.TimerStart(

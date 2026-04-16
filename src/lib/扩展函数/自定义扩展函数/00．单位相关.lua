@@ -1,5 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0EYDUserData_517C_5BB9 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataGet = ____01_FF0EYDUserData_517C_5BB9.YDUserDataGet
+local ____07_FF0E_6742_9879 = require("lib.扩展函数.BJ函数.07．杂项")
+local ForGroupBJ = ____07_FF0E_6742_9879.ForGroupBJ
 --- 单位相关扩展函数
 local jass = require("jass.common")
 --- 创建单位并设置尺寸和角度
@@ -58,22 +62,41 @@ end
 -- @param player 玩家对象
 -- @returns 玩家的第一个英雄单位，如果没有则返回null
 function ____exports.getPlayerFirstHero(self, player)
-    if not player or type(jass.CreateGroup) ~= "function" then
+    if not player then
         return nil
     end
-    local g = jass.CreateGroup()
-    jass.GroupEnumUnitsOfPlayer(g, player, nil)
-    local hero = nil
-    local u = jass.FirstOfGroup(g)
-    while u do
-        if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
-            hero = u
-            break
-        end
-        jass.GroupRemoveUnit(g, u)
-        u = jass.FirstOfGroup(g)
+    local heroGroup = YDUserDataGet(
+        nil,
+        "string",
+        "玩家英雄",
+        "单位组",
+        "group"
+    )
+    if not heroGroup or type(jass.GetEnumUnit) ~= "function" or type(jass.GetOwningPlayer) ~= "function" then
+        return nil
     end
-    jass.DestroyGroup(g)
+    local hero = nil
+    ForGroupBJ(
+        nil,
+        heroGroup,
+        function()
+            local u = jass.GetEnumUnit()
+            if hero ~= nil then
+                return
+            end
+            if jass.GetOwningPlayer(u) == player then
+                local ____temp_0
+                if type(jass.IsUnitType) == "function" then
+                    ____temp_0 = jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
+                else
+                    ____temp_0 = true
+                end
+                if ____temp_0 then
+                    hero = u
+                end
+            end
+        end
+    )
     return hero
 end
 return ____exports

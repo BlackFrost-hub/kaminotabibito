@@ -8,6 +8,7 @@ export * from "./02．技能消耗/index";
 export * from "./04．快捷键技能/index";
 export * from "./05．动态技能说明/index";
 export * from "./06．AI自动使用技能/index";
+export * from "./07．技能吟唱条/index";
 
 // ========== 功能模块导出 ==========
 export * from "./01．显示技能名字";
@@ -46,11 +47,12 @@ if (typeof dynamicSkillTip.init === "function") dynamicSkillTip.init();
 const aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index") as { init?: () => void };
 if (typeof aiSkillSystem.init === "function") aiSkillSystem.init();
 
+// 技能吟唱条系统
+const castBarSystem = require("系统.03．技能系统.07．技能吟唱条.index") as { init?: () => void };
+if (typeof castBarSystem.init === "function") castBarSystem.init();
+
 /**
  * 初始化技能系统
  */
 export function init(): void {
 }
-
-// 自动初始化（可选）
-// init();

@@ -1,20 +1,20 @@
-# Agent Guide
+# 智能体指南
 
-This repository keeps its project-specific engineering rules in `.cursor/rules/`.
+本仓库将项目特定的工程规则存放在 `.cursor/rules/` 目录中。
 
-For Codex and other non-Cursor agents:
+适用于 Codex 及其他非 Cursor 智能体：
 
-1. Start with `.cursor/rules/README.md`.
-2. Treat `.cursor/rules/` as the project rule source of truth for domain conventions, engine pitfalls, and tooling constraints.
-3. Before editing code, read the rule files that match the area you are touching.
-4. When multiple rules apply, prefer the more specific rule for the subsystem you are changing.
+1. 首先阅读 `.cursor/rules/README.md`。
+2. 将 `.cursor/rules/` 视为领域约定、引擎陷阱和工具约束的规则来源。
+3. 在编辑代码之前，阅读与你所修改区域相关的规则文件。
+4. 当多个规则适用时，优先使用针对你所修改子系统的更具体规则。
 
-Current rule areas include:
+当前规则领域包括：
 
-- `war3-tstl/`: TSTL, Lua, JASS, callback, and random-number pitfalls.
-- `dzapi/`: DzAPI UI frame usage, sync behavior, and FDF/UI pitfalls.
-- `equipment/`: equipment-related data and trigger conventions.
-- `stes-ydlocal/`: STES and YDLocal usage constraints.
-- `tooling/`: debug output, sound, and encapsulation conventions.
+- `war3-tstl/`：TSTL、Lua、JASS、回调和随机数陷阱。
+- `dzapi/`：DzAPI UI 框架使用、同步行为和 FDF/UI 陷阱。
+- `equipment/`：装备相关数据和触发器约定。
+- `stes-ydlocal/`：STES 和 YDLocal 使用约束。
+- `tooling/`：调试输出、声音和封装约定。
 
-If you add new project rules, register them in `.cursor/rules/README.md` so every agent can discover them quickly.
+如果你添加了新的项目规则，请在 `.cursor/rules/README.md` 中注册，以便每个智能体都能快速发现它们。

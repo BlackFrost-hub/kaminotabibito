@@ -29,7 +29,7 @@ export * from "./13．多面板函数";
 
 import * as mathBj from "./12．数学函数";
 import * as multiboardBj from "./13．多面板函数";
-import * as bjGlobal from "./00．BJ全局兜底";
+import * as bjGlobal from "./00．BJ全局兜底"; 
 
 function expose(name: string, fn: any): void {
   if (typeof fn !== "function") return;

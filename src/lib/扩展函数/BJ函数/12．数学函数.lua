@@ -33,7 +33,7 @@ function ____exports.AtanBJ(self, value)
 end
 --- 反正切2（返回角度）
 function ____exports.Atan2BJ(self, y, x)
-    return math.atan2(y, x) * BJ_RADTODEG
+    return jass.Atan2(y, x) * BJ_RADTODEG
 end
 --- 实数绝对值 - RAbsBJ
 function ____exports.RAbsBJ(self, a)
@@ -82,7 +82,7 @@ function ____exports.AngleBetweenPoints(self, locA, locB)
     end
     local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
     local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
-    return math.atan2(dy, dx) * BJ_RADTODEG
+    return jass.Atan2(dy, dx) * BJ_RADTODEG
 end
 --- 两点之间距离 - DistanceBetweenPoints
 -- 对应 Blizzard.j: DistanceBetweenPoints

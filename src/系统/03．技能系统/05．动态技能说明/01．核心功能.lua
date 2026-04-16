@@ -344,11 +344,11 @@ function ____exports.initDynamicSkillTipSystem(self)
     end
     if not levelUpTrigger then
         levelUpTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_HERO_LEVEL_3 = jass.EVENT_PLAYER_UNIT_HERO_LEVEL
-        if ____jass_EVENT_PLAYER_UNIT_HERO_LEVEL_3 == nil then
-            ____jass_EVENT_PLAYER_UNIT_HERO_LEVEL_3 = EVENT_ID_HERO_LEVEL
+        local ____jass_EVENT_PLAYER_HERO_LEVEL_3 = jass.EVENT_PLAYER_HERO_LEVEL
+        if ____jass_EVENT_PLAYER_HERO_LEVEL_3 == nil then
+            ____jass_EVENT_PLAYER_HERO_LEVEL_3 = EVENT_ID_HERO_LEVEL
         end
-        local levelEventId = ____jass_EVENT_PLAYER_UNIT_HERO_LEVEL_3
+        local levelEventId = ____jass_EVENT_PLAYER_HERO_LEVEL_3
         do
             local i = 0
             while i < PLAYER_COUNT do

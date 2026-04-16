@@ -13,6 +13,7 @@ export * from "../../lib/扩展函数/封装函数/index";
 export * from "./01．颜色常量";
 export * from "./03．UI函数";
 export * from "./04．治疗事件";
+export * from "./05．中心计时器";
 
 // ========== 初始化 ==========
 // 封装函数由 lib/扩展函数/index.ts 统一加载
@@ -24,6 +25,9 @@ require("系统.00．核心系统.03．UI函数");
 // 治疗事件系统
 const healEventMod = require("系统.00．核心系统.04．治疗事件") as { initHealEvent?: () => void };
 if (typeof healEventMod.initHealEvent === "function") healEventMod.initHealEvent();
+
+// 中心计时器（自动初始化）
+require("系统.00．核心系统.05．中心计时器");
 
 /**
  * 初始化核心系统

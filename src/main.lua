@@ -63,11 +63,5 @@ local _____8868_73B0_7CFB_7EDF = require("系统.09．表现系统.index")
 if type(_____8868_73B0_7CFB_7EDF.init) == "function" then
     _____8868_73B0_7CFB_7EDF:init()
 end
-require("系统.12．测试系统.测试事件")
-require("系统.12．测试系统.测试事件2")
-require("系统.12．测试系统.测试233注册")
-require("系统.12．测试系统.任务测试")
-require("系统.12．测试系统.YDLocal返回值测试")
-require("系统.12．测试系统.STES事件测试")
-require("系统.12．测试系统.dz函数测试")
+require("系统.12．测试系统.index")
 return ____exports

@@ -41,6 +41,14 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.07．技能吟唱条.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.01．显示技能名字")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -81,6 +89,10 @@ end
 local aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index")
 if type(aiSkillSystem.init) == "function" then
     aiSkillSystem:init()
+end
+local castBarSystem = require("系统.03．技能系统.07．技能吟唱条.index")
+if type(castBarSystem.init) == "function" then
+    castBarSystem:init()
 end
 --- 初始化技能系统
 function ____exports.init(self)

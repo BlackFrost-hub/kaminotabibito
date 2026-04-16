@@ -59,12 +59,7 @@ const 表现系统 = require("系统.09．表现系统.index") as { init?: () =>
 if (typeof 表现系统.init === "function") 表现系统.init();
 
 // // ---------- 12．测试系统 ----------
- require("系统.12．测试系统.测试事件");
- require("系统.12．测试系统.测试事件2");
- require("系统.12．测试系统.测试233注册");
- require("系统.12．测试系统.任务测试");
-require("系统.12．测试系统.YDLocal返回值测试");
-require("系统.12．测试系统.STES事件测试");
-require("系统.12．测试系统.dz函数测试");
+// 通过统一的 index.ts 入口加载测试，在 系统.12．测试系统.index 中配置开关
+require("系统.12．测试系统.index");
 
 export {};

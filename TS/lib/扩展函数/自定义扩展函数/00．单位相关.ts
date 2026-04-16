@@ -4,6 +4,9 @@
 
 const jass = require("jass.common") as any;
 
+import { YDUserDataGet } from "../YDWE函数/01．YDUserData兼容";
+import { ForGroupBJ } from "../BJ函数/07．杂项";
+
 /**
  * 创建单位并设置尺寸和角度
  * @param playerId 玩家ID (0-15)
@@ -71,20 +74,26 @@ export function createUnitWithOptions(
  * @returns 玩家的第一个英雄单位，如果没有则返回null
  */
 export function getPlayerFirstHero(player: any): any {
-    if (!player || typeof jass.CreateGroup !== "function") return null;
-    const g = jass.CreateGroup();
-    jass.GroupEnumUnitsOfPlayer(g, player, null);
+    if (!player) return null;
+
+    // 通过 YDUserData 获取“玩家英雄-单位组”后遍历，避免整图枚举
+    const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group") as any;
+    if (!heroGroup || typeof jass.GetEnumUnit !== "function" || typeof jass.GetOwningPlayer !== "function") return null;
+
     let hero: any = null;
-    let u = jass.FirstOfGroup(g);
-    while (u) {
-        if (jass.IsUnitType(u, jass.UNIT_TYPE_HERO)) {
-            hero = u;
-            break;
+    ForGroupBJ(heroGroup, () => {
+        const u = jass.GetEnumUnit();
+        if (hero != null) return; // 已找到第一个则不再覆写
+
+        // 对齐你给的 JASS：if GetOwningPlayer(GetEnumUnit()) == Player(x)
+        if (jass.GetOwningPlayer(u) === player) {
+            // 保险起见仍检查英雄类型（按存表语义理论上应全是英雄）
+            if (typeof jass.IsUnitType === "function" ? jass.IsUnitType(u, jass.UNIT_TYPE_HERO) : true) {
+                hero = u;
+            }
         }
-        jass.GroupRemoveUnit(g, u);
-        u = jass.FirstOfGroup(g);
-    }
-    jass.DestroyGroup(g);
+    });
+
     return hero;
 }
 

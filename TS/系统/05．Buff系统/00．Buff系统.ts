@@ -230,23 +230,32 @@ function tickBuffPool(): void {
   maybeStopSyncTimer();
 }
 
+/** 是否已注册到中心计时器 */
+let _registeredToCenterTimer = false;
+/** tick计数器（每10个10毫秒=0.1秒执行一次） */
+let _tickCounter = 0;
+
 function ensureSyncTimer(): void {
-  if (syncTimer != null) return;
-  if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
-  syncTimer = LeakWatcher.createTimer("buff_pool_tick");
-  (jass as any).TimerStart(syncTimer, BUFF_POOL_TICK, true, tickBuffPool);
+  if (_registeredToCenterTimer) return;
+  _registeredToCenterTimer = true;
+
+  // 使用中心计时器的每10毫秒回调
+  const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+    onTick10ms: (callback: () => void) => void;
+  };
+
+  onTick10ms(() => {
+    _tickCounter = _tickCounter + 1;
+    if (_tickCounter >= 10) {  // 10 * 10ms = 100ms = 0.1秒
+      _tickCounter = 0;
+      tickBuffPool();
+    }
+  });
 }
 
 function maybeStopSyncTimer(): void {
-  let hasAny = false;
-  for (const _u in unitToBuffs) {
-    hasAny = true;
-    break;
-  }
-  if (!hasAny && syncTimer != null) {
-    LeakWatcher.destroyTimer(syncTimer);
-    syncTimer = undefined;
-  }
+  // 使用中心计时器后无法停止，但可以通过检查是否有buff来决定是否执行逻辑
+  // 这个函数保留用于兼容性
 }
 
 export function initBuffSystem(): void {}

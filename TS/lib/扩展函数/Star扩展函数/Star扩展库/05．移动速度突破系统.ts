@@ -23,11 +23,16 @@ const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require(
 
 const ORDER_MOVE = 851971;
 const ORDER_SMART = 851986;
-const TIMER_INTERVAL = 0.02;
+const TIMER_INTERVAL = 0.02;  // 0.02秒 = 20毫秒
 const TICKS_PER_SEC = 1 / TIMER_INTERVAL;
+/** 中心计时器每10毫秒tick一次，每2次tick执行一次移动速度更新 */
+const CENTER_TIMER_TICKS = 2;
 const SPEED_MIN = 1;
 const SPEED_MAX = 2000;
 const ENGINE_SPEED_LIMIT = 522;
+
+/** 移动速度突破特效模型路径 */
+const SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx";
 
 function hid(h: any): number {
   return typeof jass.GetHandleId === "function" ? ((jass.GetHandleId(h) as number) || 0) : 0;
@@ -68,12 +73,38 @@ interface SpeedEntry {
   lf: number;
   tempTimer: any;
   listIndex: number;
+  effect: any;  // 特效句柄
 }
 
 const entryMap: Record<number, SpeedEntry> = {};
 const entryList: SpeedEntry[] = [];
 let systemTimer: any = null;
 let isRunning = false;
+
+/**
+ * 为单位添加移动速度突破特效
+ */
+function addSpeedEffect(u: any): any {
+  if (!u) return null;
+
+  // 创建特效并绑定到单位
+  const effect = typeof jass.AddSpecialEffectTarget === "function"
+    ? jass.AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin")
+    : null;
+
+  return effect;
+}
+
+/**
+ * 删除移动速度突破特效
+ */
+function removeSpeedEffect(effect: any): void {
+  if (!effect) return;
+
+  if (typeof jass.DestroyEffect === "function") {
+    jass.DestroyEffect(effect);
+  }
+}
 
 function doEvent(entry: SpeedEntry): void {
   const u = entry.u;
@@ -96,35 +127,40 @@ function doEvent(entry: SpeedEntry): void {
 
   const x = getUnitX(u);
   const y = getUnitY(u);
-  const engineSpeed = getUnitMoveSpeed(u);
-  const extraSpeed = entry.speed - engineSpeed;
-  const extraSpeedPerTick = extraSpeed / TICKS_PER_SEC;
-
-  const dis = X_GDBC(x, y, entry.lx, entry.ly);
-  const dis2 = X_GDBC(x, y, entry.tx, entry.ty);
   const f = getUnitFacing(u);
 
-  if (dis > engineSpeed / 60) {
-    if (Math.abs(f) - Math.abs(entry.lf) < 2) {
-      if (dis2 > extraSpeedPerTick) {
-        const d = X_GAFC(entry.lx, entry.ly, x, y);
-        let nx = x + Math.cos(d * (Math.PI / 180)) * extraSpeedPerTick;
-        let ny = y + Math.sin(d * (Math.PI / 180)) * extraSpeedPerTick;
-        if (!X_IsTerrainWalkable(nx, ny)) {
-          nx = X_GetAbleX();
-          ny = X_GetAbleY();
-        }
+  const dx = entry.tx - x;
+  const dy = entry.ty - y;
+  const dist = X_GDBC(x, y, entry.tx, entry.ty);
+
+  if (dist > 10) {
+    const angle = X_GAFC(x, y, entry.tx, entry.ty);
+    const engineSpeed = getUnitMoveSpeed(u);
+    const speedDiff = entry.speed - engineSpeed;
+
+    if (speedDiff > 0) {
+      const moveDist = speedDiff * TIMER_INTERVAL;
+      const rad = angle * (Math.PI / 180);
+      const nx = x + moveDist * Math.cos(rad);
+      const ny = y + moveDist * Math.sin(rad);
+
+      if (X_IsTerrainWalkable(nx, ny)) {
+        if (typeof jass.SetUnitX === "function") jass.SetUnitX(u, nx);
+        if (typeof jass.SetUnitY === "function") jass.SetUnitY(u, ny);
         entry.lx = nx;
         entry.ly = ny;
       } else {
-        entry.lx = entry.tx;
-        entry.ly = entry.ty;
-      }
-      if (typeof jass.SetUnitX === "function") {
-        jass.SetUnitX(u, entry.lx);
-      }
-      if (typeof jass.SetUnitY === "function") {
-        jass.SetUnitY(u, entry.ly);
+        const ableX = X_GetAbleX();
+        const ableY = X_GetAbleY();
+        if (ableX !== 0 || ableY !== 0) {
+          if (typeof jass.SetUnitX === "function") jass.SetUnitX(u, ableX);
+          if (typeof jass.SetUnitY === "function") jass.SetUnitY(u, ableY);
+          entry.lx = ableX;
+          entry.ly = ableY;
+        } else {
+          entry.lx = x;
+          entry.ly = y;
+        }
       }
     } else {
       entry.lx = x;
@@ -138,39 +174,56 @@ function doEvent(entry: SpeedEntry): void {
   entry.lf = f;
 }
 
+/** 是否已注册到中心计时器 */
+let _registeredToCenterTimer = false;
+/** tick计数器 */
+let _tickCounter = 0;
+
 function startTimer(): void {
   if (isRunning) return;
-  if (!systemTimer) {
-    systemTimer = typeof jass.CreateTimer === "function" ? jass.CreateTimer() : null;
-  }
-  if (!systemTimer) return;
-
   isRunning = true;
-  jass.TimerStart(systemTimer, TIMER_INTERVAL, true, () => {
-    const count = entryList.length;
-    for (let i = 0; i < count; i++) {
-      const entry = entryList[i];
-      if (entry && entryMap[entry.uid] === entry) {
-        doEvent(entry);
+
+  if (_registeredToCenterTimer) return;
+  _registeredToCenterTimer = true;
+
+  // 使用中心计时器的每10毫秒回调
+  const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+    onTick10ms: (callback: () => void) => void;
+  };
+
+  onTick10ms(() => {
+    if (!isRunning) return;
+
+    _tickCounter = _tickCounter + 1;
+    if (_tickCounter >= CENTER_TIMER_TICKS) {  // 每2次tick执行一次（0.02秒）
+      _tickCounter = 0;
+
+      const count = entryList.length;
+      for (let i = 0; i < count; i++) {
+        const entry = entryList[i];
+        if (entry && entryMap[entry.uid] === entry) {
+          doEvent(entry);
+        }
       }
-    }
-    if (entryList.length === 0) {
-      stopTimer();
+      // 注意：使用中心计时器后无法停止，但如果没有entry会跳过逻辑
     }
   });
 }
 
 function stopTimer(): void {
-  if (!isRunning) return;
-  if (systemTimer && typeof jass.PauseTimer === "function") {
-    jass.PauseTimer(systemTimer);
-  }
+  // 使用中心计时器后无法真正停止，只是标记为不运行
   isRunning = false;
 }
 
 function removeEntry(uid: number): void {
   const entry = entryMap[uid];
   if (entry == null) return;
+
+  // 删除特效
+  if (entry.effect) {
+    removeSpeedEffect(entry.effect);
+    entry.effect = null;
+  }
 
   if (entry.tempTimer && typeof jass.DestroyTimer === "function") {
     jass.DestroyTimer(entry.tempTimer);
@@ -219,6 +272,7 @@ function createTriggerForEntry(entry: SpeedEntry): void {
 /**
  * 设置单位移动速度突破（永久）
  * 若单位已在系统中（含临时加速中），取消临时计时器并覆盖为永久速度
+ * 若速度未超过522，自动取消注册
  * @param u 目标单位
  * @param speed 目标移动速度（限制在1~2000）
  */
@@ -228,6 +282,7 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
   speed = clampSpeed(speed);
   const uid = hid(u);
 
+  // 如果速度不超过522，取消注册
   if (speed <= ENGINE_SPEED_LIMIT) {
     removeEntry(uid);
     return;
@@ -235,15 +290,21 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
 
   const existing = entryMap[uid];
   if (existing != null) {
+    // 已存在，更新速度，取消临时计时器
     if (existing.tempTimer && typeof jass.DestroyTimer === "function") {
       jass.DestroyTimer(existing.tempTimer);
       existing.tempTimer = null;
     }
     existing.speed = speed;
     existing.originalSpeed = speed;
+    // 确保特效存在
+    if (!existing.effect) {
+      existing.effect = addSpeedEffect(u);
+    }
     return;
   }
 
+  // 新注册
   const entry: SpeedEntry = {
     speed: speed,
     originalSpeed: speed,
@@ -257,6 +318,7 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
     lf: getUnitFacing(u),
     tempTimer: null,
     listIndex: entryList.length,
+    effect: addSpeedEffect(u),  // 添加特效
   };
 
   createTriggerForEntry(entry);
@@ -286,6 +348,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
 
   const existing = entryMap[uid];
 
+  // 如果速度不超过522且不存在于系统中，直接返回
   if (speed <= ENGINE_SPEED_LIMIT && existing == null) {
     return;
   }
@@ -293,13 +356,19 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
   const savedOriginal = existing != null ? existing.originalSpeed : 0;
 
   if (existing != null) {
+    // 已存在，更新速度，取消之前的临时计时器
     if (existing.tempTimer && typeof jass.DestroyTimer === "function") {
       jass.DestroyTimer(existing.tempTimer);
       existing.tempTimer = null;
     }
     existing.speed = speed;
     existing.originalSpeed = savedOriginal;
+    // 确保特效存在
+    if (!existing.effect) {
+      existing.effect = addSpeedEffect(u);
+    }
   } else {
+    // 新注册
     const entry: SpeedEntry = {
       speed: speed,
       originalSpeed: 0,
@@ -313,6 +382,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
       lf: getUnitFacing(u),
       tempTimer: null,
       listIndex: entryList.length,
+      effect: addSpeedEffect(u),  // 添加特效
     };
 
     createTriggerForEntry(entry);

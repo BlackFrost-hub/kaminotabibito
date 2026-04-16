@@ -140,12 +140,18 @@ export function createDotExecutor(deps: {
     }
   }
 
-  // ========== 虚拟分区：计时器保障 ==========
+  // ========== 虚拟分区：计时器保障（使用中心计时器） ==========
+  let _registeredToCenterTimer = false;
+
   function ensureDotTimers(): void {
-    if (dotTimer == null && typeof deps.jass.TimerStart === "function") {
-      dotTimer = deps.LeakWatcher.createTimer("dot_tick");
-      deps.jass.TimerStart(dotTimer, 1, true, dotTickRun);
-    }
+    if (_registeredToCenterTimer) return;
+    _registeredToCenterTimer = true;
+
+    // 使用中心计时器的每秒回调
+    const { onSecond } = require("系统.00．核心系统.05．中心计时器") as {
+      onSecond: (callback: () => void) => void;
+    };
+    onSecond(dotTickRun);
   }
 
   // ========== 虚拟分区：批次清理通知 ==========

@@ -179,11 +179,15 @@ function ____exports.createDotExecutor(self, deps)
             dotTimer = nil
         end
     end
+    local _registeredToCenterTimer = false
     local function ensureDotTimers(self)
-        if dotTimer == nil and type(deps.jass.TimerStart) == "function" then
-            dotTimer = deps.LeakWatcher:createTimer("dot_tick")
-            deps.jass.TimerStart(dotTimer, 1, true, dotTickRun)
+        if _registeredToCenterTimer then
+            return
         end
+        _registeredToCenterTimer = true
+        local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+        local onSecond = ____require_result_4.onSecond
+        onSecond(nil, dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)
         if dotBatchDeferredRemaining <= 0 then

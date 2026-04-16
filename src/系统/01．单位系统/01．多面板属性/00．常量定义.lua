@@ -3,7 +3,7 @@ local ____exports = {}
 --- 系统启用开关，true启用，false禁用
 ____exports.MULTIBOARD_SYSTEM_ENABLED = true
 --- 多面板刷新间隔（秒）
-____exports.MULTIBOARD_REFRESH_INTERVAL = 4
+____exports.MULTIBOARD_REFRESH_INTERVAL = 3
 --- 多面板行列数
 ____exports.MULTIBOARD_ROWS = 11
 ____exports.MULTIBOARD_COLS = 4

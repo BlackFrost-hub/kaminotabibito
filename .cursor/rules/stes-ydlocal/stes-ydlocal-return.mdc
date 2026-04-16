@@ -112,3 +112,13 @@ alwaysApply: false
 - **`TS/系统/02．物品系统/07．装备提取.ts`**：STES 注册校验与重试、`ydl_triggerstep` 同步、区间读参、`YDLocal7Set(integer, ItemType)`、父页恢复。  
 - **`TS/系统/05．Buff系统/03．BuffJASS桥接.ts`**：YDLocal5 中文变量名传参、同步 + `try/finally` 收尾。  
 - **`TS/lib/扩展函数/YDWE函数/02．YDLocal兼容.ts`**：`getParentYdlocPageForReturnValue` 等。
+- **`TS/系统/12．测试系统/STES事件测试.ts`**：Lua 监听 + 写回真实返回值的模板。关键点：  
+  - `TEST_EVENT = "测试"`、`YD_LOCAL_REAL_KEY = "实数"`。  
+  - 监听端：注册 Lua trigger 后在回调中 `from5 = YDLocal5Get("real", YD_LOCAL_REAL_KEY)`，再 `YDLocal7Set("real", YD_LOCAL_REAL_KEY, ret)`，最后 `clearStar_PIndex()`。  
+  - 触发端：`STES_FireWithReal11Step(TEST_EVENT, YD_LOCAL_REAL_KEY)`（确保每轮子触发前给 `YDLocal5` 填值）。  
+- **`TS/系统/12．测试系统/YDLocal返回值测试.ts`**：验证 `YDLocal7Set` 到父端 `YDLocal1Get` 的 round-trip。关键点：  
+  - 先 `resolveGgTrgByKey("gg_trg____________________002")` 找到 JASS 触发器。  
+  - `YDLocalInitialize()` → `YDLocalExecuteTrigger(trg002)` → `saveParentIndex(trg002)`。  
+  - `YDLocal5Set("integer", "分法", 0)` 传参 → `YDTriggerExecuteTrigger(trg002, false)`。  
+  - 读返回：`YDLocal1Get("integer","分法")`、`YDLocal1Get("real","多大的")`、`YDLocal1Get("boolean","你好")`。  
+  - 最后必须 `YDLocal1Release()`，避免内存/上下文泄漏。

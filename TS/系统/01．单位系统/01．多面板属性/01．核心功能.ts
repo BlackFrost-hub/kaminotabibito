@@ -6,31 +6,41 @@
  */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
 
 import {
   MULTIBOARD_SYSTEM_ENABLED,
-  MULTIBOARD_REFRESH_INTERVAL,
   MULTIBOARD_ROWS,
   MULTIBOARD_COLS,
   DISPLAY_PLAYER_COUNT,
   ATTR_NAME_MAP,
 } from "./00．常量定义";
 
+const { getGameTimeFormatted, getGameDifficulty, onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+  getGameTimeFormatted: () => { hours: number; minutes: number; seconds: number; total: number };
+  getGameDifficulty: () => number;
+  onTick10ms: (callback: () => void) => void;
+};
+
 const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSet: (tableType: string, tableKey: any, attr: string, value: any) => void;
+  YDUserDataSet: (tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 
 // ==========================================================================================
 // 类型定义
 // ==========================================================================================
 
-/** 多面板数组 */
+/** 多面板数组（索引0-4对应玩家1-5，让TSTL自动处理+1转换） */
 let multiboards: any[] = [];
 
-/** 刷新计时器 */
-let refreshTimer: any = null;
+/** 是否已初始化 */
+let _initialized = false;
+
+/** 是否已注册到中心计时器 */
+let _registered = false;
+
+/** 刷新计数器（每50个10毫秒=0.5秒刷新一次） */
+let _refreshCounter = 0;
 
 // ==========================================================================================
 // BJ函数实现（避免依赖BJ函数）
@@ -72,7 +82,7 @@ function multiboardSetItemStyle(mb: any, col: number, row: number, showValue: bo
 
 /** 获取玩家属性值 */
 function getPlayerAttr(playerId: number, attrName: string): number {
-  const player = jass.Player(playerId);
+  const player = jass.Player(playerId - 1);  // 0-based 索引
   if (player == null) return 0;
   const value = YDUserDataGet("player", player, attrName, "real");
   return typeof value === "number" ? value : 0;
@@ -102,11 +112,9 @@ function formatReal(value: number): string {
 function updateMultiboard(mb: any, playerId: number): void {
   if (mb == null) return;
 
-  // 获取游戏时间和难度
-  const difficulty = jglobals.udg_N != null ? Math.floor(jglobals.udg_N) : 1;
-  const timeH = jglobals.udg_Time != null ? (jglobals.udg_Time[2] || 0) : 0;
-  const timeM = jglobals.udg_Time != null ? (jglobals.udg_Time[1] || 0) : 0;
-  const timeS = jglobals.udg_Time != null ? (jglobals.udg_Time[0] || 0) : 0;
+  // 从中心计时器获取游戏时间
+  const { hours: timeH, minutes: timeM, seconds: timeS } = getGameTimeFormatted();
+  const difficulty = getGameDifficulty();
 
   // 设置标题
   const title = `属性面板（难度：${difficulty}）游戏时间：${timeH}小时${timeM}分${timeS}秒`;
@@ -260,7 +268,7 @@ function updatePlayerSpeed(playerId: number): void {
   const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
   if (heroGroup == null) return;
 
-  const player = jass.Player(playerId);
+  const player = jass.Player(playerId - 1);  // 0-based 索引
   let foundUnit: any = null;
 
   jass.ForGroup(heroGroup, () => {
@@ -280,23 +288,33 @@ function updatePlayerSpeed(playerId: number): void {
   const moveSpeed = jass.GetUnitMoveSpeed(foundUnit);
 
   // 存储到玩家属性
-  YDUserDataSet("player", player, "每秒攻速", attacksPerSec);
-  YDUserDataSet("player", player, "移动速度", moveSpeed);
+  YDUserDataSet("player", player, "每秒攻速", "real", attacksPerSec);
+  YDUserDataSet("player", player, "移动速度", "real", moveSpeed);
 }
 
 // ==========================================================================================
-// 刷新回调
+// 刷新回调（使用中心计时器）
 // ==========================================================================================
 
+/** 每10毫秒回调，每50次（0.5秒）执行一次刷新 */
+function onRefreshTick(): void {
+  _refreshCounter = _refreshCounter + 1;
+  if (_refreshCounter >= 50) {  // 50 * 10ms = 500ms = 0.5秒
+    _refreshCounter = 0;
+    onRefresh();
+  }
+}
+
+/** 执行刷新 */
 function onRefresh(): void {
-  for (let i = 1; i <= DISPLAY_PLAYER_COUNT; i++) {
+  for (let i = 0; i < DISPLAY_PLAYER_COUNT; i++) {
     const mb = multiboards[i];
     if (mb == null) continue;
 
     if (!jass.IsMultiboardDisplayed(mb)) continue;
 
-    updatePlayerSpeed(i);
-    updateMultiboard(mb, i);
+    updatePlayerSpeed(i + 1);  // 玩家ID从1开始
+    updateMultiboard(mb, i + 1);
   }
 }
 
@@ -306,13 +324,15 @@ function onRefresh(): void {
 
 /** 创建单个多面板 */
 function createMultiboard(playerId: number): any {
-  const player = jass.Player(playerId);
+  const player = jass.Player(playerId - 1);
 
   // 检查玩家是否在线
-  const controller = jass.GetPlayerController(player);
   const slotState = jass.GetPlayerSlotState(player);
-  if (controller !== jass.MAP_CONTROL_USER) return null;
-  if (slotState !== jass.PLAYER_SLOT_STATE_PLAYING) return null;
+  const PLAYER_SLOT_STATE_PLAYING = jass.PLAYER_SLOT_STATE_PLAYING;
+
+  if (slotState !== PLAYER_SLOT_STATE_PLAYING) {
+    return null;
+  }
 
   const mb = jass.CreateMultiboard();
   if (mb == null) return null;
@@ -324,7 +344,14 @@ function createMultiboard(playerId: number): any {
   jass.MultiboardSetRowCount(mb, MULTIBOARD_ROWS);
   jass.MultiboardSetColumnCount(mb, MULTIBOARD_COLS);
 
-  // 设置图标（与JASS原版一致）
+  // 设置初始值（空字符串，后续由刷新计时器更新）
+  for (let row = 1; row <= MULTIBOARD_ROWS; row++) {
+    for (let col = 1; col <= MULTIBOARD_COLS; col++) {
+      multiboardSetItemValue(mb, col, row, "");
+    }
+  }
+
+  // 设置图标
   multiboardSetItemIcon(mb, 1, 1, "ReplaceableTextures\\CommandButtons\\BTNArcaniteMelee.blp");
   multiboardSetItemIcon(mb, 2, 1, "ReplaceableTextures\\CommandButtons\\BTNSteelRanged.blp");
   multiboardSetItemIcon(mb, 3, 1, "ReplaceableTextures\\CommandButtons\\BTNNecromancerMaster.blp");
@@ -381,7 +408,7 @@ function createMultiboard(playerId: number): any {
 }
 
 // ==========================================================================================
-// 初始化
+// 初始化（使用中心计时器）
 // ==========================================================================================
 
 /**
@@ -389,17 +416,25 @@ function createMultiboard(playerId: number): any {
  */
 export function initMultiboardSystem(): void {
   if (!MULTIBOARD_SYSTEM_ENABLED) return;
+  if (_initialized) return;
+  _initialized = true;
 
-  // 创建多面板
-  for (let i = 1; i <= DISPLAY_PLAYER_COUNT; i++) {
-    multiboards[i] = createMultiboard(i);
+  // 创建多面板（索引0-4对应玩家1-5）
+  for (let i = 0; i < DISPLAY_PLAYER_COUNT; i++) {
+    multiboards[i] = createMultiboard(i + 1);  // 玩家ID从1开始
   }
 
-  // 创建刷新计时器
-  if (refreshTimer == null) {
-    refreshTimer = jass.CreateTimer();
-    jass.TimerStart(refreshTimer, MULTIBOARD_REFRESH_INTERVAL, true, onRefresh);
-  }
+  // 注册到中心计时器（每0.5秒刷新一次，比原来的3秒更及时）
+  registerToCenterTimer();
+}
+
+/** 注册到中心计时器 */
+function registerToCenterTimer(): void {
+  if (_registered) return;
+  _registered = true;
+
+  // 注册每10毫秒回调，内部计数每50次执行一次刷新（0.5秒）
+  onTick10ms(onRefreshTick);
 }
 
 /** 检查系统是否启用 */
@@ -407,7 +442,15 @@ export function isMultiboardSystemEnabled(): boolean {
   return MULTIBOARD_SYSTEM_ENABLED;
 }
 
-// 自动初始化
-initMultiboardSystem();
+/** 延迟初始化（游戏开始后执行） */
+function delayedInit(): void {
+  initMultiboardSystem();
+}
+
+// 延迟初始化：游戏开始后1秒执行（等待玩家进入游戏）
+if (MULTIBOARD_SYSTEM_ENABLED) {
+  const initTimer = jass.CreateTimer();
+  jass.TimerStart(initTimer, 1.0, false, delayedInit);
+}
 
 export {};

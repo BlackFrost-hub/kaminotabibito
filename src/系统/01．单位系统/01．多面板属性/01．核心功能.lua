@@ -1,27 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
 local ____exports = {}
+local multiboardSetItemValue, getPlayerAttr, formatPercent, formatNumber, formatReal, updateMultiboard, updatePlayerSpeed, onRefreshTick, onRefresh, registerToCenterTimer, jass, getGameTimeFormatted, getGameDifficulty, onTick10ms, YDUserDataGet, YDUserDataSet, multiboards, _registered, _refreshCounter
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.01．单位系统.01．多面板属性.00．常量定义")
 local MULTIBOARD_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_SYSTEM_ENABLED
-local MULTIBOARD_REFRESH_INTERVAL = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_REFRESH_INTERVAL
 local MULTIBOARD_ROWS = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_ROWS
 local MULTIBOARD_COLS = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_COLS
 local DISPLAY_PLAYER_COUNT = ____00_FF0E_5E38_91CF_5B9A_4E49.DISPLAY_PLAYER_COUNT
---- 多面板属性系统 - 核心功能
--- 
--- 功能：创建多面板、定时刷新属性显示
--- 后续接手者：开关 MULTIBOARD_SYSTEM_ENABLED 在常量文件
-local jass = require("jass.common")
-local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
-local YDUserDataSet = ____require_result_0.YDUserDataSet
---- 多面板数组
-local multiboards = {}
---- 刷新计时器
-local refreshTimer = nil
---- 设置多面板项目值
-local function multiboardSetItemValue(self, mb, col, row, val)
+function multiboardSetItemValue(self, mb, col, row, val)
     if mb == nil then
         return
     end
@@ -31,31 +17,8 @@ local function multiboardSetItemValue(self, mb, col, row, val)
         jass.MultiboardReleaseItem(item)
     end
 end
---- 设置多面板项目图标
-local function multiboardSetItemIcon(self, mb, col, row, icon)
-    if mb == nil then
-        return
-    end
-    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
-    if item ~= nil then
-        jass.MultiboardSetItemIcon(item, icon)
-        jass.MultiboardReleaseItem(item)
-    end
-end
---- 设置多面板项目样式
-local function multiboardSetItemStyle(self, mb, col, row, showValue, showIcon)
-    if mb == nil then
-        return
-    end
-    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
-    if item ~= nil then
-        jass.MultiboardSetItemStyle(item, showValue, showIcon)
-        jass.MultiboardReleaseItem(item)
-    end
-end
---- 获取玩家属性值
-local function getPlayerAttr(self, playerId, attrName)
-    local player = jass.Player(playerId)
+function getPlayerAttr(self, playerId, attrName)
+    local player = jass.Player(playerId - 1)
     if player == nil then
         return 0
     end
@@ -68,46 +31,25 @@ local function getPlayerAttr(self, playerId, attrName)
     )
     return type(value) == "number" and value or 0
 end
---- 格式化百分比
-local function formatPercent(self, value)
+function formatPercent(self, value)
     local pct = math.floor(value * 100 + 0.5)
     return tostring(pct) .. "%"
 end
---- 格式化数值
-local function formatNumber(self, value)
+function formatNumber(self, value)
     return tostring(math.floor(value + 0.5))
 end
---- 格式化实数（保留小数）
-local function formatReal(self, value)
+function formatReal(self, value)
     return __TS__NumberToFixed(value, 2)
 end
---- 更新多面板显示
-local function updateMultiboard(self, mb, playerId)
+function updateMultiboard(self, mb, playerId)
     if mb == nil then
         return
     end
-    local difficulty = jglobals.udg_N ~= nil and math.floor(jglobals.udg_N) or 1
-    local ____temp_1
-    if jglobals.udg_Time ~= nil then
-        ____temp_1 = jglobals.udg_Time[2] or 0
-    else
-        ____temp_1 = 0
-    end
-    local timeH = ____temp_1
-    local ____temp_2
-    if jglobals.udg_Time ~= nil then
-        ____temp_2 = jglobals.udg_Time[1] or 0
-    else
-        ____temp_2 = 0
-    end
-    local timeM = ____temp_2
-    local ____temp_3
-    if jglobals.udg_Time ~= nil then
-        ____temp_3 = jglobals.udg_Time[0] or 0
-    else
-        ____temp_3 = 0
-    end
-    local timeS = ____temp_3
+    local ____getGameTimeFormatted_result_2 = getGameTimeFormatted(nil)
+    local timeH = ____getGameTimeFormatted_result_2.hours
+    local timeM = ____getGameTimeFormatted_result_2.minutes
+    local timeS = ____getGameTimeFormatted_result_2.seconds
+    local difficulty = getGameDifficulty(nil)
     local title = ((((((("属性面板（难度：" .. tostring(difficulty)) .. "）游戏时间：") .. tostring(timeH)) .. "小时") .. tostring(timeM)) .. "分") .. tostring(timeS)) .. "秒"
     jass.MultiboardSetTitleText(mb, title)
     local physDmg = 100 + getPlayerAttr(nil, playerId, "物理伤害") * 100
@@ -436,8 +378,7 @@ local function updateMultiboard(self, mb, playerId)
         "技能消耗减少：" .. formatPercent(nil, mpCost / 100)
     )
 end
---- 更新玩家攻速和移速
-local function updatePlayerSpeed(self, playerId)
+function updatePlayerSpeed(self, playerId)
     local heroGroup = YDUserDataGet(
         nil,
         "string",
@@ -448,7 +389,7 @@ local function updatePlayerSpeed(self, playerId)
     if heroGroup == nil then
         return
     end
-    local player = jass.Player(playerId)
+    local player = jass.Player(playerId - 1)
     local foundUnit = nil
     jass.ForGroup(
         heroGroup,
@@ -473,6 +414,7 @@ local function updatePlayerSpeed(self, playerId)
         "player",
         player,
         "每秒攻速",
+        "real",
         attacksPerSec
     )
     YDUserDataSet(
@@ -480,30 +422,38 @@ local function updatePlayerSpeed(self, playerId)
         "player",
         player,
         "移动速度",
+        "real",
         moveSpeed
     )
 end
-local function onRefresh(self)
+function onRefreshTick(self)
+    _refreshCounter = _refreshCounter + 1
+    if _refreshCounter >= 50 then
+        _refreshCounter = 0
+        onRefresh(nil)
+    end
+end
+function onRefresh(self)
     do
-        local i = 1
-        while i <= DISPLAY_PLAYER_COUNT do
+        local i = 0
+        while i < DISPLAY_PLAYER_COUNT do
             do
-                local __continue25
+                local __continue27
                 repeat
                     local mb = multiboards[i + 1]
                     if mb == nil then
-                        __continue25 = true
+                        __continue27 = true
                         break
                     end
                     if not jass.IsMultiboardDisplayed(mb) then
-                        __continue25 = true
+                        __continue27 = true
                         break
                     end
-                    updatePlayerSpeed(nil, i)
-                    updateMultiboard(nil, mb, i)
-                    __continue25 = true
+                    updatePlayerSpeed(nil, i + 1)
+                    updateMultiboard(nil, mb, i + 1)
+                    __continue27 = true
                 until true
-                if not __continue25 then
+                if not __continue27 then
                     break
                 end
             end
@@ -511,15 +461,54 @@ local function onRefresh(self)
         end
     end
 end
+function registerToCenterTimer(self)
+    if _registered then
+        return
+    end
+    _registered = true
+    onTick10ms(nil, onRefreshTick)
+end
+jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+getGameTimeFormatted = ____require_result_0.getGameTimeFormatted
+getGameDifficulty = ____require_result_0.getGameDifficulty
+onTick10ms = ____require_result_0.onTick10ms
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
+YDUserDataGet = ____require_result_1.YDUserDataGet
+YDUserDataSet = ____require_result_1.YDUserDataSet
+multiboards = {}
+--- 是否已初始化
+local _initialized = false
+_registered = false
+_refreshCounter = 0
+--- 设置多面板项目图标
+local function multiboardSetItemIcon(self, mb, col, row, icon)
+    if mb == nil then
+        return
+    end
+    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
+    if item ~= nil then
+        jass.MultiboardSetItemIcon(item, icon)
+        jass.MultiboardReleaseItem(item)
+    end
+end
+--- 设置多面板项目样式
+local function multiboardSetItemStyle(self, mb, col, row, showValue, showIcon)
+    if mb == nil then
+        return
+    end
+    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
+    if item ~= nil then
+        jass.MultiboardSetItemStyle(item, showValue, showIcon)
+        jass.MultiboardReleaseItem(item)
+    end
+end
 --- 创建单个多面板
 local function createMultiboard(self, playerId)
-    local player = jass.Player(playerId)
-    local controller = jass.GetPlayerController(player)
+    local player = jass.Player(playerId - 1)
     local slotState = jass.GetPlayerSlotState(player)
-    if controller ~= jass.MAP_CONTROL_USER then
-        return nil
-    end
-    if slotState ~= jass.PLAYER_SLOT_STATE_PLAYING then
+    local PLAYER_SLOT_STATE_PLAYING = jass.PLAYER_SLOT_STATE_PLAYING
+    if slotState ~= PLAYER_SLOT_STATE_PLAYING then
         return nil
     end
     local mb = jass.CreateMultiboard()
@@ -537,6 +526,25 @@ local function createMultiboard(self, playerId)
     jass.MultiboardSetItemsWidth(mb, 0.08)
     jass.MultiboardSetRowCount(mb, MULTIBOARD_ROWS)
     jass.MultiboardSetColumnCount(mb, MULTIBOARD_COLS)
+    do
+        local row = 1
+        while row <= MULTIBOARD_ROWS do
+            do
+                local col = 1
+                while col <= MULTIBOARD_COLS do
+                    multiboardSetItemValue(
+                        nil,
+                        mb,
+                        col,
+                        row,
+                        ""
+                    )
+                    col = col + 1
+                end
+            end
+            row = row + 1
+        end
+    end
     multiboardSetItemIcon(
         nil,
         mb,
@@ -859,21 +867,29 @@ function ____exports.initMultiboardSystem(self)
     if not MULTIBOARD_SYSTEM_ENABLED then
         return
     end
+    if _initialized then
+        return
+    end
+    _initialized = true
     do
-        local i = 1
-        while i <= DISPLAY_PLAYER_COUNT do
-            multiboards[i + 1] = createMultiboard(nil, i)
+        local i = 0
+        while i < DISPLAY_PLAYER_COUNT do
+            multiboards[i + 1] = createMultiboard(nil, i + 1)
             i = i + 1
         end
     end
-    if refreshTimer == nil then
-        refreshTimer = jass.CreateTimer()
-        jass.TimerStart(refreshTimer, MULTIBOARD_REFRESH_INTERVAL, true, onRefresh)
-    end
+    registerToCenterTimer(nil)
 end
 --- 检查系统是否启用
 function ____exports.isMultiboardSystemEnabled(self)
     return MULTIBOARD_SYSTEM_ENABLED
 end
-____exports.initMultiboardSystem(nil)
+--- 延迟初始化（游戏开始后执行）
+local function delayedInit(self)
+    ____exports.initMultiboardSystem(nil)
+end
+if MULTIBOARD_SYSTEM_ENABLED then
+    local initTimer = jass.CreateTimer()
+    jass.TimerStart(initTimer, 1, false, delayedInit)
+end
 return ____exports

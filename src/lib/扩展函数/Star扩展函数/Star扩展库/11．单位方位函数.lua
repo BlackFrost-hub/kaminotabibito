@@ -17,7 +17,7 @@ local BJ_DEGTORAD = ____require_result_0.BJ_DEGTORAD
 --- 计算两点间角度（度数）
 -- 对应 JASS: Math.GAFC / X_GAFC
 local function GAFC(self, x1, y1, x2, y2)
-    return math.atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
+    return jass.Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
 end
 --- 判断点是否在单位背面
 -- 
