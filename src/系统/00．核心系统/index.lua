@@ -48,6 +48,7 @@ if type(healEventMod.initHealEvent) == "function" then
     healEventMod:initHealEvent()
 end
 require("系统.00．核心系统.05．中心计时器")
+require("系统.00．核心系统.00．玩家系统.index")
 --- 初始化核心系统
 function ____exports.init(self)
 end

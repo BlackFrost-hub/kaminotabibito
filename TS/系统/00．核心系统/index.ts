@@ -28,6 +28,8 @@ if (typeof healEventMod.initHealEvent === "function") healEventMod.initHealEvent
 
 // 中心计时器（自动初始化）
 require("系统.00．核心系统.05．中心计时器");
+// 玩家单位管理器
+require("系统.00．核心系统.00．玩家系统.index");
 
 /**
  * 初始化核心系统
