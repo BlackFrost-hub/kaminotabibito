@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local applyElementalDamage, getRealAttrWithLimit, calcElementalDamageBonus, _____4F24_5BB3_51FD_6570
-function applyElementalDamage(self, attacker, target, isPlayer)
+function applyElementalDamage(attacker, target, isPlayer)
     local addDamage = 0
     local multiplier = 1
     if _____4F24_5BB3_51FD_6570.isMetalDamage() then
@@ -80,15 +80,16 @@ end
 -- 
 -- 功能：整合所有模块，执行完整的伤害计算流程
 -- 包含：免疫判定、护甲穿透、魔抗、属性伤害/抗性、专精、吸血吸魔
+-- 末尾：`YDWESetEventDamage` 之后通知 `registerAppliedFinalDamageListener` 订阅者（原 `06．最终伤害桥接`）。
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.04．伤害系统.04．伤害计算.01．属性读取")
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.01．属性读取")
 local getRealAttr = ____require_result_0.getRealAttr
 getRealAttrWithLimit = ____require_result_0.getRealAttrWithLimit
 local isPlayerUnit = ____require_result_0.isPlayerUnit
 local isImmuneDamage = ____require_result_0.isImmuneDamage
 local isImmuneNormalAttack = ____require_result_0.isImmuneNormalAttack
 local isDamageReduceDisabled = ____require_result_0.isDamageReduceDisabled
-local ____require_result_1 = require("系统.04．伤害系统.04．伤害计算.02．伤害修正")
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.02．伤害修正")
 local applyArmorPenetration = ____require_result_1.applyArmorPenetration
 local applyMagicResist = ____require_result_1.applyMagicResist
 local getPhysicalDamageModifier = ____require_result_1.getPhysicalDamageModifier
@@ -102,11 +103,40 @@ local getBossMasteryBonus = ____require_result_1.getBossMasteryBonus
 local getSummonDamageModifier = ____require_result_1.getSummonDamageModifier
 calcElementalDamageBonus = ____require_result_1.calcElementalDamageBonus
 local calcElementalResistReduction = ____require_result_1.calcElementalResistReduction
-local ____require_result_2 = require("系统.04．伤害系统.04．伤害计算.03．吸血吸魔")
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.03．吸血吸魔")
 local applyLifeAndManaSteal = ____require_result_2.applyLifeAndManaSteal
 _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local appliedFinalDamageListeners = {}
+--- 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)`
+function ____exports.registerAppliedFinalDamageListener(cb)
+    appliedFinalDamageListeners[#appliedFinalDamageListeners + 1] = cb
+end
+local function notifyAppliedFinalDamageListeners(target, attacker, applied)
+    do
+        local i = 0
+        while i < #appliedFinalDamageListeners do
+            do
+                local __continue5
+                repeat
+                    local cb = appliedFinalDamageListeners[i + 1]
+                    if cb == nil then
+                        __continue5 = true
+                        break
+                    end
+                    pcall(function () return cb(target, attacker, applied) end
+                    )
+                    __continue5 = true
+                until true
+                if not __continue5 then
+                    break
+                end
+            end
+            i = i + 1
+        end
+    end
+end
 --- 检查是否免疫伤害
-local function checkImmune(self, target, isNormalAtk)
+local function checkImmune(target, isNormalAtk)
     if isImmuneDamage(nil, target) and not isDamageReduceDisabled(nil, target) then
         return {immune = true, reason = "免疫伤害", showDodge = false}
     end
@@ -121,7 +151,7 @@ end
 -- @param attacker 攻击者
 -- @param baseDamage 基础伤害
 -- @returns 伤害计算结果
-function ____exports.calculateDamage(self, target, attacker, baseDamage)
+function ____exports.calculateDamage(target, attacker, baseDamage)
     local damage = baseDamage
     local isPlayer = isPlayerUnit(nil, target)
     local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
@@ -139,7 +169,7 @@ function ____exports.calculateDamage(self, target, attacker, baseDamage)
     if damage < 0.1 then
         return {finalDamage = 0, immune = false, showDodge = false}
     end
-    local immuneCheck = checkImmune(nil, target, isNormalAtk)
+    local immuneCheck = checkImmune(target, isNormalAtk)
     if immuneCheck.immune then
         return {finalDamage = 0, immune = true, immuneReason = immuneCheck.reason, showDodge = immuneCheck.showDodge}
     end
@@ -166,7 +196,7 @@ function ____exports.calculateDamage(self, target, attacker, baseDamage)
         addDamage = addDamage + physMod.addDamage
         finalMultiplier = finalMultiplier * physMod.multiplier
     end
-    if isMagicDmg and not isPhysDmg and not isEnhanceDmg then
+    if isMagicDmg and not isEnhanceDmg then
         local magicDmg = getMagicDamageModifier(nil, attacker)
         if magicDmg >= 0 then
             addDamage = addDamage + magicDmg
@@ -194,7 +224,7 @@ function ____exports.calculateDamage(self, target, attacker, baseDamage)
         local magicAtkDmg = getRealAttr(nil, attacker, "魔法普攻伤害", 0)
         addDamage = addDamage + magicAtkDmg
     end
-    local elementalResult = applyElementalDamage(nil, attacker, target, isPlayer)
+    local elementalResult = applyElementalDamage(attacker, target, isPlayer)
     addDamage = addDamage + elementalResult.addDamage
     finalMultiplier = finalMultiplier * elementalResult.multiplier
     local summonMod = getSummonDamageModifier(nil, attacker, target, isPlayer)
@@ -219,75 +249,22 @@ function ____exports.calculateDamage(self, target, attacker, baseDamage)
 end
 --- 处理伤害事件
 -- 在伤害回调中调用
-function ____exports.onDamageEvent(self, target, attacker, baseDamage)
+function ____exports.onDamageEvent(target, attacker, baseDamage)
     if target == nil or baseDamage < 0.1 then
         return
     end
-    local result = ____exports.calculateDamage(nil, target, attacker, baseDamage)
-    if attacker then
-        do
-            pcall(function()
-                local owner = jass.GetOwningPlayer(attacker)
-                if owner then
-                    jass.DisplayTimedTextToPlayer(
-                        owner,
-                        0,
-                        0,
-                        5,
-                        (((("|cff0000ff[调试]|r onDamageEvent: base=" .. tostring(baseDamage)) .. ", final=") .. tostring(result.finalDamage)) .. ", immune=") .. tostring(result.immune)
-                    )
-                end
-            end)
-        end
-    end
+    local result = ____exports.calculateDamage(target, attacker, baseDamage)
     if result.immune then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
+        notifyAppliedFinalDamageListeners(target, attacker, 0)
         if result.showDodge then
         end
         return
     end
     if result.finalDamage ~= baseDamage then
-        local success = _____4F24_5BB3_51FD_6570.YDWESetEventDamage(result.finalDamage)
-        if attacker then
-            do
-                pcall(function()
-                    local owner = jass.GetOwningPlayer(attacker)
-                    if owner then
-                        jass.DisplayTimedTextToPlayer(
-                            owner,
-                            0,
-                            0,
-                            5,
-                            (("|cff00ff00[调试]|r YDWESetEventDamage(" .. tostring(result.finalDamage)) .. ") = ") .. tostring(success)
-                        )
-                    end
-                end)
-            end
-        end
+        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(result.finalDamage)
     end
-    if attacker and target then
-        do
-            pcall(function()
-                local owner = jass.GetOwningPlayer(attacker)
-                if owner then
-                    local targetName = jass.GetUnitName(target)
-                    local targetHp = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
-                    local ____target_handle_3 = target.handle
-                    if ____target_handle_3 == nil then
-                        ____target_handle_3 = target
-                    end
-                    local targetHid = ____target_handle_3
-                    jass.DisplayTimedTextToPlayer(
-                        owner,
-                        0,
-                        0,
-                        5,
-                        (((((("|cffffff00[调试]|r 目标:" .. tostring(targetName)) .. ", handle:") .. tostring(targetHid)) .. ", 最终伤害:") .. tostring(result.finalDamage)) .. ", 目标当前HP:") .. tostring(targetHp)
-                    )
-                end
-            end)
-        end
-    end
+    notifyAppliedFinalDamageListeners(target, attacker, result.finalDamage)
     local isMagic = _____4F24_5BB3_51FD_6570.isMagicDamage()
     local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
     applyLifeAndManaSteal(

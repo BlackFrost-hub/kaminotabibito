@@ -248,6 +248,27 @@ function removeEntry(uid: number): void {
   delete entryMap[uid];
 }
 
+/**
+ * 同步「突破位移」用的目标点：仅监听点指令时，右键单位/物品不会刷新 tx/ty，
+ * 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
+ */
+function syncEntryOrderDestination(e: SpeedEntry): void {
+  const tgtU = typeof jass.GetOrderTargetUnit === "function" ? jass.GetOrderTargetUnit() : null;
+  if (tgtU != null && tgtU !== 0) {
+    e.tx = getUnitX(tgtU);
+    e.ty = getUnitY(tgtU);
+    return;
+  }
+  const tgtIt = typeof jass.GetOrderTargetItem === "function" ? jass.GetOrderTargetItem() : null;
+  if (tgtIt != null && tgtIt !== 0) {
+    e.tx = typeof jass.GetItemX === "function" ? ((jass.GetItemX(tgtIt) as number) || 0) : 0;
+    e.ty = typeof jass.GetItemY === "function" ? ((jass.GetItemY(tgtIt) as number) || 0) : 0;
+    return;
+  }
+  e.tx = typeof jass.GetOrderPointX === "function" ? ((jass.GetOrderPointX() as number) || 0) : 0;
+  e.ty = typeof jass.GetOrderPointY === "function" ? ((jass.GetOrderPointY() as number) || 0) : 0;
+}
+
 function createTriggerForEntry(entry: SpeedEntry): void {
   const t = typeof jass.CreateTrigger === "function" ? jass.CreateTrigger() : null;
   entry.t = t;
@@ -258,13 +279,16 @@ function createTriggerForEntry(entry: SpeedEntry): void {
 
   if (typeof jass.TriggerRegisterUnitEvent === "function") {
     jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
+    const evTarget = (jass as any).EVENT_UNIT_ISSUED_TARGET_ORDER;
+    if (evTarget != null) {
+      jass.TriggerRegisterUnitEvent(t, entry.u, evTarget);
+    }
   }
   if (typeof jass.TriggerAddAction === "function") {
     jass.TriggerAddAction(t, () => {
       const e = entryMap[uid];
       if (e == null) return;
-      e.tx = typeof jass.GetOrderPointX === "function" ? ((jass.GetOrderPointX() as number) || 0) : 0;
-      e.ty = typeof jass.GetOrderPointY === "function" ? ((jass.GetOrderPointY() as number) || 0) : 0;
+      syncEntryOrderDestination(e);
     });
   }
 }

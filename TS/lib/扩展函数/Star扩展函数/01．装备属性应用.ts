@@ -73,10 +73,6 @@ export function applyEquipStatsTS(unit: any, stats: EquipStatEntry[]): Record<st
       const next = cur + value;
       YDUserDataSet2("player", owner, name, "real", next);
       readBack[name] = next;
-      // 调试输出
-      if (name === "魔法伤害") {
-        jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cff00ff00[调试]|r 魔法伤害: cur=" + cur + ", value=" + value + ", next=" + next);
-      }
     }
 
     if (applyDynamicPercentProperty(unit, name, value)) {

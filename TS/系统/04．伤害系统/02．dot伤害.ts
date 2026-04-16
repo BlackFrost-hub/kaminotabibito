@@ -23,8 +23,8 @@ import {
   dotEffectModelFromBuffRow,
   type DotState,
   type DotTypeConfig,
-} from "./02．DOT定义/01．DOT配置";
-import { registerBuiltInDotTypes } from "./02．DOT定义/03．DOT类型定义";
+} from "./01．DOT定义/01．DOT配置";
+import { registerBuiltInDotTypes } from "./01．DOT定义/03．DOT类型定义";
 import {
   getDotSourceDisplayName,
   isValidDotStateRow,
@@ -32,11 +32,11 @@ import {
   tabRowForHid,
   tabSetHid,
   unitHid,
-} from "./02．DOT定义/04．DOT工具";
-import { createDotStateSync } from "./02．DOT定义/05．DOT状态同步";
-import { createDotExecutor } from "./02．DOT定义/06．DOT执行器";
-import { createDotApplyStrategy } from "./02．DOT定义/07．DOT施加策略";
-import { createDotBaseUtils } from "./02．DOT定义/08．DOT基础工具";
+} from "./01．DOT定义/04．DOT工具";
+import { createDotStateSync } from "./01．DOT定义/05．DOT状态同步";
+import { createDotExecutor } from "./01．DOT定义/06．DOT执行器";
+import { createDotApplyStrategy } from "./01．DOT定义/07．DOT施加策略";
+import { createDotBaseUtils } from "./01．DOT定义/08．DOT基础工具";
 
 // ========== 虚拟分区：其它依赖 ==========
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
@@ -239,5 +239,9 @@ export function dealBurnDamage(source: any, target: any, amount: number): void {
 // ========== 虚拟分区：伤害回调注册 ==========
 if (!registered) {
   registered = true;
-  damageEventModule.registerDamageCallback(onDamage);
+  // 先取出再调用，避免 TSTL 生成 damageEventModule:registerDamageCallback（模块表当 self 传入）
+  const registerCb = damageEventModule.registerDamageCallback;
+  if (registerCb != null) {
+    registerCb(onDamage);
+  }
 }

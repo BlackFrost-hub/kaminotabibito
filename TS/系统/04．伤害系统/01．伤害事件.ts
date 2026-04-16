@@ -103,9 +103,11 @@ function onAnyUnitDamagedAction(): void {
   const fromDotTickBatchForEvent = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
   if (!fromDotTickBatchForEvent && savedUnit != null && savedDamage > 0.1) {
     (pcall as any)(() => {
-      const dmgCalc = require("系统.04．伤害系统.04．伤害计算.04．主计算流程") as { onDamageEvent?: (target: any, attacker: any, baseDamage: number) => void };
-      if (dmgCalc != null && typeof dmgCalc.onDamageEvent === "function") {
-        dmgCalc.onDamageEvent(savedUnit, savedSource, savedDamage);
+      const dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as { onDamageEvent?: (target: any, attacker: any, baseDamage: number) => void };
+      // 先取出再调用，避免 TSTL 生成 dmgCalc:onDamageEvent；生成物首参 nil 由 fix-lua-for-pack 去掉（与 05．事件注册 中 onDamageEvent 一致）
+      const onDamageEvent = dmgCalc != null ? dmgCalc.onDamageEvent : undefined;
+      if (onDamageEvent != null) {
+        onDamageEvent(savedUnit, savedSource, savedDamage);
       }
     });
   }

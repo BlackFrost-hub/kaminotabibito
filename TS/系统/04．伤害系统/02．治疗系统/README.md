@@ -7,7 +7,7 @@
 ## 文件结构
 
 ```
-05．治疗系统/
+00．治疗系统/
 ├── 00．常量定义.ts    # 开关、事件名、默认配置
 ├── 01．核心功能.ts    # 核心治疗逻辑
 ├── index.ts          # 统一导出
@@ -87,7 +87,7 @@ getReceivedHealRate(unit);        // 获取受到治疗率
 ## 使用示例
 
 ```typescript
-import { spellHeal, itemHeal, regenHeal } from "系统.04．伤害系统.05．治疗系统.index";
+import { spellHeal, itemHeal, regenHeal } from "系统.04．伤害系统.00．治疗系统.index";
 
 // 技能治疗
 spellHeal(caster, target, 100, true);

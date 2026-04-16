@@ -6,7 +6,7 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_0.registerDamageCallback
-local ____require_result_1 = require("系统.04．伤害系统.04．伤害计算.04．主计算流程")
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local onDamageEvent = ____require_result_1.onDamageEvent
 --- 伤害计算系统是否已初始化
 local isInitialized = false
@@ -20,7 +20,7 @@ local function damageCallback(self, target, damage, damageType, fromDotTickBatch
     if fromDotTickBatch then
         return
     end
-    onDamageEvent(nil, target, source, damage)
+    onDamageEvent(target, source, damage)
 end
 --- 初始化伤害计算系统
 -- 

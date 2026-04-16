@@ -8,7 +8,7 @@ const jass = require("jass.common") as any;
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void, intervalSeconds: number) => void;
 };
-const { onDamageEvent } = require("系统.04．伤害系统.04．伤害计算.04．主计算流程") as {
+const { onDamageEvent } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   onDamageEvent: (target: any, attacker: any, baseDamage: number) => void;
 };
 

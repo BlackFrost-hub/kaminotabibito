@@ -1,9 +1,13 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local _____4F24_5BB3_4E8B_4EF6 = require("系统.04．伤害系统.01．伤害事件")
 local _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
-local function sendMsg(self, msg)
+local function sendMsg(msg)
     if type(jass.DisplayTextToPlayer) ~= "function" then
         return
     end
@@ -18,9 +22,23 @@ local function sendMsg(self, msg)
         end
     end
 end
-local function TrigActions(self)
+--- 伤害测试：`japi.GetEventDamage`（1.27 与 `YDWESetEventDamage` 改写后一致；无则 0）
+local function readEventDamageForDisplay()
+    local v
+    pcall(function ()
+            if type(japi.GetEventDamage) == "function" then
+                v = japi.GetEventDamage()
+            end
+        end
+    )
+    if v ~= nil and type(v) == "number" and not __TS__NumberIsNaN(v) then
+        return v
+    end
+    return 0
+end
+local function TrigActions()
     local unit = jass.GetTriggerUnit()
-    local damage = jass.GetEventDamage()
+    local damage = readEventDamageForDisplay()
     if not unit then
         return
     end
@@ -121,12 +139,12 @@ local function TrigActions(self)
             msg = (msg .. " 伤害来源：") .. tostring(sourceName)
         end
     end
-    sendMsg(nil, msg)
+    sendMsg(msg)
 end
-local function TrigConditions(self)
+local function TrigConditions()
     return true
 end
-local function init(self)
+local function init()
     local trg = jass.CreateTrigger()
     if type(jass.TriggerAddCondition) == "function" and type(jass.Condition) == "function" then
         jass.TriggerAddCondition(
@@ -139,5 +157,5 @@ local function init(self)
         jass.TriggerAddAction(trg, TrigActions)
     end
 end
-init(nil)
+init()
 return ____exports

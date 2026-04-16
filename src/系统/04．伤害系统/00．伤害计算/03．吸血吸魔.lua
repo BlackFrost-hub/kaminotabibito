@@ -36,12 +36,12 @@ end
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
-local ____require_result_1 = require("系统.04．伤害系统.04．伤害计算.01．属性读取")
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01．属性读取")
 local getRealAttr = ____require_result_1.getRealAttr
 local getRealAttrWithLimit = ____require_result_1.getRealAttrWithLimit
 local isPlayerUnit = ____require_result_1.isPlayerUnit
 local canBreakManaStealLimit = ____require_result_1.canBreakManaStealLimit
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害常量")
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.00．伤害常量")
 local STAT_LIMITS = ____require_result_2.STAT_LIMITS
 local ENEMY_STAT_LIMITS = ____require_result_2.ENEMY_STAT_LIMITS
 local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")

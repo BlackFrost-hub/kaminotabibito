@@ -16,13 +16,13 @@ const {
   getRealAttrWithLimit,
   isPlayerUnit,
   canBreakManaStealLimit,
-} = require("系统.04．伤害系统.04．伤害计算.01．属性读取") as {
+} = require("系统.04．伤害系统.00．伤害计算.01．属性读取") as {
   getRealAttr: (unit: any, attrName: string, defaultValue: number) => number;
   getRealAttrWithLimit: (unit: any, attrName: string, isPlayer: boolean) => number;
   isPlayerUnit: (unit: any) => boolean;
   canBreakManaStealLimit: (unit: any) => boolean;
 };
-const { STAT_LIMITS, ENEMY_STAT_LIMITS } = require("系统.04．伤害系统.00．伤害常量") as {
+const { STAT_LIMITS, ENEMY_STAT_LIMITS } = require("系统.04．伤害系统.00．伤害计算.00．伤害常量") as {
   STAT_LIMITS: Record<string, { max: number; min: number }>;
   ENEMY_STAT_LIMITS: Record<string, { max: number; min: number }>;
 };

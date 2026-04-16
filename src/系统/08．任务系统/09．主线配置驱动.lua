@@ -444,7 +444,7 @@ local function tick(self)
                 end
                 local matchedHero = nil
                 for ____, hero in ipairs(heroes) do
-                    if evalCondition(nil, cfg.condition, hero) then
+                    if evalCondition(cfg.condition, hero) then
                         matchedHero = hero
                         break
                     end

@@ -5,6 +5,12 @@ alwaysApply: true
 
 # War3 + TSTL + jass 常见坑（必读）
 
+## 0) 目标客户端：**魔兽争霸 3 补丁 1.27**
+
+- 勿默认存在 **1.29+** 的 `Blz*` 伤害读接口（如 `BlzGetEventDamage`）；即便能 `type(...) == "function"`，返回值也可能与 **YDWE `EXSetEventDamage` 改写后的实际结算** 不一致。
+- 在 `EVENT_UNIT_DAMAGED` 同步阶段读取「当前事件伤害」时，优先 **`jass.japi`**：`GetEventDamage`（若 LuaEngine 提供）、`EXGetEventDamageData(…)` 中与引擎约定一致的 **伤害数值槽**，最后才是 `jass.GetEventDamage`（多为改写前初始值）。**1.27 无** `BlzGetEventDamage`。
+- 若 `japi.GetEventDamage` 仍不可靠：在伤害修正流程末尾用 **`registerAppliedFinalDamageListener`**（`系统.04．伤害系统.04．伤害计算.04．主计算流程`）把最终伤害推给飘字/UI/统计，勿再叠一层快照表。
+
 ## 1) **禁止**对 jass API 使用可选链调用 `?.(...)`
 
 TSTL 会把 `obj.fn?.(x)` 编译成"取出函数后再用 self 调用"的形态，容易把 **table** 当成第一个参数传给需要 **jhandle_t** 的函数，导致：
@@ -131,10 +137,10 @@ content = content.replace(/\bjapi:/g, "japi.");
 
 **现象**：依编译形态不同，可能出现 `cb(nil, su, sd, ...)` 或 `cb(nil, nil, su, sd, ...)` 等，使 `unit`/`damage` 等参数错位。
 
-**✅ 修复方案**：在 `fix-lua-for-pack.js` 里按文件处理。例如 `01．伤害事件.lua`（规则 17）对 DamageCallbacks 的调用会去掉多余的第二个 `nil`：
+**✅ 修复方案**：在 `fix-lua-for-pack.js` 的全局表 `WC3_NIL_FIRST` 中处理（原仅 `伤害事件` 路径，现与 BJ/原生多传 `nil` 一并全局应用）。例如 DamageCallbacks 去掉多余的第二个 `nil`：
 
 ```javascript
-content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,");
+[/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,"],
 ```
 
 若其它文件出现同类错位，需对照生成 Lua 增删对应替换，不可假设全局只有一种 `cb(nil, …)` 形态。
@@ -149,7 +155,8 @@ content = content.replace(/cb\s*\(\s*nil\s*,\s*nil\s*,\s*su\s*,/g, "cb(nil, su,"
 
 1. **单文件**：在纯工具模块首行加 `/** @noSelfInFile */`（须在首条语句之前），该文件内导出不再带 `self`，与点号调用一致。见 [The Self Parameter](https://typescripttolua.github.io/docs/the-self-parameter/)。
 2. **全项目**：`tsconfig.json` 里 `"tstl": { "noImplicitSelf": true }`，等价于所有实现文件都带 `@noSelfInFile`。需配合 `strict` / `noImplicitThis` 处理「把方法当回调」处：用箭头包一层，或把接口里的回调声明为 `this: void`，否则 TSTL 报 `Unable to convert function with a 'this' parameter...`。
-3. **`fix-lua` 仍会保留**：`jass:` / `japi:` 冒号、多传 `nil`、Lua 1-based 随机下标、STES 注册等**引擎与 TSTL 缝隙**往往仍要脚本或自定义 TSTL 插件处理；目标是**把「self 剥离」类规则收进编译期**，脚本只留环境特化。
+3. **`require("…")` 单参（本仓库已做）**：在 `global.d.ts` 对 `declare function require` 使用 `/** @noSelf */`，并在 `tstl.noResolvePaths` 中加入 `jass.*`、`lib.*`、`系统.*`（picomatch），使 TSTL 直接生成 `require("…")` 且不因点分路径报 `Could not resolve`；`fix-lua-for-pack.js` **不再**替换 `require(nil, …)`。
+4. **`fix-lua` 仍会保留**：`jass:` / `japi:` 冒号、其它多传 `nil`、Lua 1-based 随机下标、STES 注册等**引擎与 TSTL 缝隙**往往仍要脚本或自定义 TSTL 插件处理；目标是**把「self 剥离」类规则收进编译期**，脚本只留环境特化。
 
 **跨模块解构边角**：若 A 文件为默认导出（Lua 带 `self`），`const { f } = require("B")` 且 B 已 `@noSelfInFile`，TSTL 仍可能对 `f(x)` 生成 `f(nil, x)`。本仓库例：`02．伤害修正` → `06．伤害函数` 的 `calcArmorReduction`，由 `fix-lua-for-pack.js` 规则 **6k** 去掉多余 `nil`；或给 A 也加 `@noSelfInFile`（需无隐式 `this`），或避免解构、改用 `require("B").f(x)` 并确认生成 Lua 为点号而非冒号。
 

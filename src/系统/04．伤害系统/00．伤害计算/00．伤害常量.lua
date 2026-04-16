@@ -113,13 +113,6 @@ ____exports.DAMAGE_TYPE_ATTRS = {
 --- 护甲减伤公式常量
 -- 减伤比例 = 护甲 / (护甲 + ARMOR_FACTOR)
 ____exports.ARMOR_FACTOR = 50
---- 判定单位是否为玩家英雄
--- 玩家0-7为人类玩家，每个玩家只有一个英雄
-function ____exports.isPlayerUnit(self, unit, jass)
-    local owner = jass.GetOwningPlayer(unit)
-    local playerId = jass.GetPlayerId(owner)
-    return playerId >= 0 and playerId <= 7
-end
 --- 获取属性值（应用上下限）
 -- 
 -- @param attrName 属性名

@@ -1,24 +1,24 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local ____01_FF0EDOT_914D_7F6E = require("系统.04．伤害系统.02．DOT定义.01．DOT配置")
+local ____01_FF0EDOT_914D_7F6E = require("系统.04．伤害系统.01．DOT定义.01．DOT配置")
 local dotEffectModelFromBuffRow = ____01_FF0EDOT_914D_7F6E.dotEffectModelFromBuffRow
-local ____03_FF0EDOT_7C7B_578B_5B9A_4E49 = require("系统.04．伤害系统.02．DOT定义.03．DOT类型定义")
+local ____03_FF0EDOT_7C7B_578B_5B9A_4E49 = require("系统.04．伤害系统.01．DOT定义.03．DOT类型定义")
 local registerBuiltInDotTypes = ____03_FF0EDOT_7C7B_578B_5B9A_4E49.registerBuiltInDotTypes
-local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.02．DOT定义.04．DOT工具")
+local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
 local getDotSourceDisplayName = ____04_FF0EDOT_5DE5_5177.getDotSourceDisplayName
 local isValidDotStateRow = ____04_FF0EDOT_5DE5_5177.isValidDotStateRow
 local tabDeleteHid = ____04_FF0EDOT_5DE5_5177.tabDeleteHid
 local tabRowForHid = ____04_FF0EDOT_5DE5_5177.tabRowForHid
 local tabSetHid = ____04_FF0EDOT_5DE5_5177.tabSetHid
 local unitHid = ____04_FF0EDOT_5DE5_5177.unitHid
-local ____05_FF0EDOT_72B6_6001_540C_6B65 = require("系统.04．伤害系统.02．DOT定义.05．DOT状态同步")
+local ____05_FF0EDOT_72B6_6001_540C_6B65 = require("系统.04．伤害系统.01．DOT定义.05．DOT状态同步")
 local createDotStateSync = ____05_FF0EDOT_72B6_6001_540C_6B65.createDotStateSync
-local ____06_FF0EDOT_6267_884C_5668 = require("系统.04．伤害系统.02．DOT定义.06．DOT执行器")
+local ____06_FF0EDOT_6267_884C_5668 = require("系统.04．伤害系统.01．DOT定义.06．DOT执行器")
 local createDotExecutor = ____06_FF0EDOT_6267_884C_5668.createDotExecutor
-local ____07_FF0EDOT_65BD_52A0_7B56_7565 = require("系统.04．伤害系统.02．DOT定义.07．DOT施加策略")
+local ____07_FF0EDOT_65BD_52A0_7B56_7565 = require("系统.04．伤害系统.01．DOT定义.07．DOT施加策略")
 local createDotApplyStrategy = ____07_FF0EDOT_65BD_52A0_7B56_7565.createDotApplyStrategy
-local ____08_FF0EDOT_57FA_7840_5DE5_5177 = require("系统.04．伤害系统.02．DOT定义.08．DOT基础工具")
+local ____08_FF0EDOT_57FA_7840_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.08．DOT基础工具")
 local createDotBaseUtils = ____08_FF0EDOT_57FA_7840_5DE5_5177.createDotBaseUtils
 --- 【通用 DOT 框架】持续伤害/减益（如反恢复、燃烧、中毒等）统一在此注册与驱动。
 -- 
@@ -196,6 +196,9 @@ function ____exports.dealBurnDamage(self, source, target, amount)
 end
 if not registered then
     registered = true
-    damageEventModule:registerDamageCallback(onDamage)
+    local registerCb = damageEventModule.registerDamageCallback
+    if registerCb ~= nil then
+        registerCb(nil, onDamage)
+    end
 end
 return ____exports

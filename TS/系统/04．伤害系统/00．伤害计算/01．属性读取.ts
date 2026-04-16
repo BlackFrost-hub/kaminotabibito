@@ -10,7 +10,7 @@ const jass = require("jass.common") as any;
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { STAT_LIMITS, ENEMY_STAT_LIMITS, BREAKABLE_LIMITS } = require("系统.04．伤害系统.00．伤害常量") as {
+const { STAT_LIMITS, ENEMY_STAT_LIMITS, BREAKABLE_LIMITS } = require("系统.04．伤害系统.00．伤害计算.00．伤害常量") as {
   STAT_LIMITS: Record<string, { max: number; min: number }>;
   ENEMY_STAT_LIMITS: Record<string, { max: number; min: number }>;
   BREAKABLE_LIMITS: Record<string, string>;

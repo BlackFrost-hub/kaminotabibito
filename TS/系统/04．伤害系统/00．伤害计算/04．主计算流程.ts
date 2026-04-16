@@ -1,8 +1,11 @@
+/** @noSelfInFile */
+
 /**
  * 伤害计算主流程
  *
  * 功能：整合所有模块，执行完整的伤害计算流程
  * 包含：免疫判定、护甲穿透、魔抗、属性伤害/抗性、专精、吸血吸魔
+ * 末尾：`YDWESetEventDamage` 之后通知 `registerAppliedFinalDamageListener` 订阅者（原 `06．最终伤害桥接`）。
  */
 
 const jass = require("jass.common") as any;
@@ -13,7 +16,7 @@ const {
   isImmuneDamage,
   isImmuneNormalAttack,
   isDamageReduceDisabled,
-} = require("系统.04．伤害系统.04．伤害计算.01．属性读取") as {
+} = require("系统.04．伤害系统.00．伤害计算.01．属性读取") as {
   getRealAttr: (unit: any, attrName: string, defaultValue: number) => number;
   getRealAttrWithLimit: (unit: any, attrName: string, isPlayer: boolean) => number;
   isPlayerUnit: (unit: any) => boolean;
@@ -35,7 +38,7 @@ const {
   getSummonDamageModifier,
   calcElementalDamageBonus,
   calcElementalResistReduction,
-} = require("系统.04．伤害系统.04．伤害计算.02．伤害修正") as {
+} = require("系统.04．伤害系统.00．伤害计算.02．伤害修正") as {
   applyArmorPenetration: (damage: number, target: any, attacker: any) => number;
   applyMagicResist: (damage: number, target: any, attacker: any) => number;
   getPhysicalDamageModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
@@ -50,7 +53,7 @@ const {
   calcElementalDamageBonus: (attacker: any, damageAttr: string) => number;
   calcElementalResistReduction: (target: any, resistAttr: string, isPlayer: boolean) => number;
 };
-const { applyLifeAndManaSteal } = require("系统.04．伤害系统.04．伤害计算.03．吸血吸魔") as {
+const { applyLifeAndManaSteal } = require("系统.04．伤害系统.00．伤害计算.03．吸血吸魔") as {
   applyLifeAndManaSteal: (attacker: any, damage: number, isMagic: boolean, isNormalAttack: boolean, showText: boolean) => void;
 };
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
@@ -70,6 +73,26 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
   isDarkDamage: () => boolean;
   YDWESetEventDamage: (amount: number) => boolean;
 };
+//=============================================================================
+// 〇、最终伤害已应用回调（与 onDamageEvent 同文件）
+//=============================================================================
+
+export type AppliedFinalDamageListener = (target: any, attacker: any, applied: number) => void;
+
+const appliedFinalDamageListeners: AppliedFinalDamageListener[] = [];
+
+/** 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)` */
+export function registerAppliedFinalDamageListener(cb: AppliedFinalDamageListener): void {
+  appliedFinalDamageListeners.push(cb);
+}
+
+function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: number): void {
+  for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
+    const cb = appliedFinalDamageListeners[i];
+    if (cb == null) continue;
+    (pcall as any)(() => cb(target, attacker, applied));
+  }
+}
 
 //=============================================================================
 // 一、伤害计算结果
@@ -199,8 +222,10 @@ export function calculateDamage(
     finalMultiplier *= physMod.multiplier;
   }
 
-  // Step 8: 魔法伤害修正
-  if (isMagicDmg && !isPhysDmg && !isEnhanceDmg) {
+  // Step 8: 魔法伤害修正（装备「魔法伤害」等）
+  // 不要求 !isPhysDmg：技能火焰等事件里 YDWE 可能同时标物理+火焰，isMagicDamage 已为 true，
+  // 若再要求 !isPhysDmg 会漏掉本段，导致 50×(1+30%) 未生效。
+  if (isMagicDmg && !isEnhanceDmg) {
     const magicDmg = getMagicDamageModifier(attacker);
     if (magicDmg >= 0) {
       addDamage += magicDmg;
@@ -370,21 +395,10 @@ export function onDamageEvent(
   // 计算最终伤害
   const result = calculateDamage(target, attacker, baseDamage);
 
-  // 调试输出
-  if (attacker) {
-    try {
-      const owner = jass.GetOwningPlayer(attacker);
-      if (owner) {
-        jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cff0000ff[调试]|r onDamageEvent: base=" + baseDamage + ", final=" + result.finalDamage + ", immune=" + tostring(result.immune));
-      }
-    } catch (_e) {
-      // 忽略错误
-    }
-  }
-
   // 免疫
   if (result.immune) {
     伤害函数.YDWESetEventDamage(0);
+    notifyAppliedFinalDamageListeners(target, attacker, 0);
     // 显示闪避（可选）
     if (result.showDodge) {
       // TODO: 显示闪避漂浮文字
@@ -394,34 +408,9 @@ export function onDamageEvent(
 
   // 设置最终伤害
   if (result.finalDamage !== baseDamage) {
-    const success = 伤害函数.YDWESetEventDamage(result.finalDamage);
-    // 调试输出
-    if (attacker) {
-      try {
-        const owner = jass.GetOwningPlayer(attacker);
-        if (owner) {
-          jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cff00ff00[调试]|r YDWESetEventDamage(" + result.finalDamage + ") = " + tostring(success));
-        }
-      } catch (_e) {
-        // 忽略错误
-      }
-    }
+    伤害函数.YDWESetEventDamage(result.finalDamage);
   }
-
-  // 调试：显示实际伤害信息
-  if (attacker && target) {
-    try {
-      const owner = jass.GetOwningPlayer(attacker);
-      if (owner) {
-        const targetName = jass.GetUnitName(target);
-        const targetHp = jass.GetUnitState(target, jass.UNIT_STATE_LIFE);
-        const targetHid = (target as any).handle ?? target;
-        jass.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cffffff00[调试]|r 目标:" + targetName + ", handle:" + tostring(targetHid) + ", 最终伤害:" + result.finalDamage + ", 目标当前HP:" + targetHp);
-      }
-    } catch (_e) {
-      // 忽略错误
-    }
-  }
+  notifyAppliedFinalDamageListeners(target, attacker, result.finalDamage);
 
   // 吸血吸魔
   const isMagic = 伤害函数.isMagicDamage();

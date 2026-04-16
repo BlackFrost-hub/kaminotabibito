@@ -9,6 +9,7 @@
   },
   "include": ["TS/**/*.ts", "TS/**/*.d.ts"],
   "tstl": {
-    "luaTarget": "5.1"
+    "luaTarget": "5.1",
+    "noResolvePaths": ["jass.*", "lib.*", "系统.*"]
   }
 }

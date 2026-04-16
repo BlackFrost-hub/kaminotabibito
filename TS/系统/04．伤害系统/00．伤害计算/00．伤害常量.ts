@@ -245,16 +245,6 @@ export const ARMOR_FACTOR = 50;
 //=============================================================================
 
 /**
- * 判定单位是否为玩家英雄
- * 玩家0-7为人类玩家，每个玩家只有一个英雄
- */
-export function isPlayerUnit(unit: any, jass: any): boolean {
-  const owner = jass.GetOwningPlayer(unit);
-  const playerId = jass.GetPlayerId(owner);
-  return playerId >= 0 && playerId <= 7;
-}
-
-/**
  * 获取属性值（应用上下限）
  * @param attrName 属性名
  * @param value 原始值

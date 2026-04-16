@@ -6,7 +6,7 @@ local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local ____exports = {}
-local ____02_FF0EDOT_89E3_6790 = require("系统.04．伤害系统.02．DOT定义.02．DOT解析")
+local ____02_FF0EDOT_89E3_6790 = require("系统.04．伤害系统.01．DOT定义.02．DOT解析")
 local splitItemBuffSegments = ____02_FF0EDOT_89E3_6790.splitItemBuffSegments
 function ____exports.createDotBaseUtils(self, deps)
     local function getStructureUnitTypeHandle(self)

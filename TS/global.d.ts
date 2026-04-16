@@ -5,6 +5,8 @@ declare function GetUnitState(unit: any, state: any): number;
 declare function GetEventDamageSource(): any;
 /** 1.29+ 最大生命，无 UNIT_STATE_MAX_LIFE 时可用 */
 declare function BlzGetUnitMaxHP(unit: any): number;
+/** 地图运行时 require 为单参；@noSelf 避免 TSTL 生成 require(nil, "…")。需配合 tsconfig tstl.noResolvePaths，否则 TSTL 会报 Could not resolve。 */
+/** @noSelf */
 declare function require(mod: string): any;
 declare const pcall: <T>(f: () => T) => [boolean, T | string];
 declare const tostring: (v: any) => string;

@@ -6,13 +6,13 @@
 
 const japi = require("jass.japi") as any;
 import {
-  EVENT_DAMAGE_DATA_VAILD,
   EVENT_DAMAGE_DATA_IS_PHYSICAL,
   EVENT_DAMAGE_DATA_IS_ATTACK,
   EVENT_DAMAGE_DATA_IS_RANGED,
   EVENT_DAMAGE_DATA_DAMAGE_TYPE,
   EVENT_DAMAGE_DATA_WEAPON_TYPE,
   EVENT_DAMAGE_DATA_ATTACK_TYPE,
+  EVENT_DAMAGE_DATA_DAMAGE_AMOUNT,
 } from "./01．伤害事件常量";
 
 export function EXGetEventDamageData(edd_type: number): number {
@@ -51,4 +51,36 @@ export function YDWEIsEventAttackType(attackType: any): boolean {
 
 export function YDWESetEventDamage(amount: number): boolean {
   return japi.EXSetEventDamage(amount);
+}
+
+function isFiniteNumber(n: number): boolean {
+  return typeof n === "number" && !Number.isNaN(n);
+}
+
+/**
+ * 在 `EVENT_UNIT_DAMAGED` 同步回调内、`EXSetEventDamage` 之后读取「当前事件伤害」。
+ * 1.27：`japi.GetEventDamage`（若存在）→ `EXGetEventDamageData(DAMAGE_AMOUNT)` → `jass.GetEventDamage`（常为改写前）。
+ */
+export function readEventDamageAfterModify(): number {
+  let fromJapiFn: number | undefined;
+  (pcall as any)(() => {
+    if (typeof (japi as any).GetEventDamage === "function") {
+      fromJapiFn = (japi as any).GetEventDamage();
+    }
+  });
+  if (fromJapiFn !== undefined && isFiniteNumber(fromJapiFn)) {
+    return fromJapiFn;
+  }
+
+  let fromExData: number | undefined;
+  (pcall as any)(() => {
+    if (typeof (japi as any).EXGetEventDamageData === "function") {
+      fromExData = (japi as any).EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT);
+    }
+  });
+  if (fromExData !== undefined && isFiniteNumber(fromExData)) {
+    return fromExData;
+  }
+
+  return typeof (jass as any).GetEventDamage === "function" ? (jass as any).GetEventDamage() : 0;
 }

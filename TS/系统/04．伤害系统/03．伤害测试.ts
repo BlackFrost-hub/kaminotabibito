@@ -1,4 +1,7 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const 伤害事件 = require("系统.04．伤害系统.01．伤害事件") as {
   MNAnyUnitDamaged: (trg: any, interval: number) => void;
 };
@@ -32,9 +35,23 @@ function sendMsg(msg: string): void {
   }
 }
 
+/** 伤害测试：`japi.GetEventDamage`（1.27 与 `YDWESetEventDamage` 改写后一致；无则 0） */
+function readEventDamageForDisplay(): number {
+  let v: number | undefined;
+  (pcall as any)(() => {
+    if (typeof (japi as any).GetEventDamage === "function") {
+      v = (japi as any).GetEventDamage();
+    }
+  });
+  if (v !== undefined && typeof v === "number" && !Number.isNaN(v)) {
+    return v;
+  }
+  return 0;
+}
+
 function TrigActions(): void {
   const unit = jass.GetTriggerUnit();
-  const damage = jass.GetEventDamage();
+  const damage = readEventDamageForDisplay();
   if (!unit) return;
 
   const name = typeof (jass as any).GetUnitName === "function" ? (jass as any).GetUnitName(unit) : "单位";

@@ -14,7 +14,7 @@ const {
   isIgnoreArmor,
   isIgnoreMagicResist,
   isPlayerUnit,
-} = require("系统.04．伤害系统.04．伤害计算.01．属性读取") as {
+} = require("系统.04．伤害系统.00．伤害计算.01．属性读取") as {
   getRealAttr: (unit: any, attrName: string, defaultValue: number) => number;
   getRealAttrWithLimit: (unit: any, attrName: string, isPlayer: boolean) => number;
   getAttackerArmorPierce: (attacker: any) => number;
@@ -219,18 +219,6 @@ export function getNormalAttackModifier(attacker: any, target: any, isPlayer: bo
  */
 export function getMagicDamageModifier(attacker: any): number {
   const magicDmg = getRealAttr(attacker, "魔法伤害", 0);
-  // 调试输出
-  if (attacker && magicDmg !== 0) {
-    const j = require("jass.common") as any;
-    try {
-      const owner = j.GetOwningPlayer(attacker);
-      if (owner) {
-        j.DisplayTimedTextToPlayer(owner, 0, 0, 5, "|cffff0000[调试]|r getMagicDamageModifier: magicDmg=" + magicDmg);
-      }
-    } catch (_e) {
-      // 忽略错误
-    }
-  }
   return magicDmg; // 加法叠加
 }
 

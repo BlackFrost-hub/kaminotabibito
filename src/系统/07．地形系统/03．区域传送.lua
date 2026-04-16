@@ -235,7 +235,7 @@ local function initRegionTeleport(self)
         if cfg == nil then
             return
         end
-        if not checkRegionCondition(nil, cfg.condition, unit) then
+        if not checkRegionCondition(cfg.condition, unit) then
             return
         end
         local useRule = cfg.teleportX == 0 and cfg.teleportY == 0 and type(cfg.rule) == "string" and #cfg.rule > 0

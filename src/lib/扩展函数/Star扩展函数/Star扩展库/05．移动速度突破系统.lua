@@ -237,14 +237,44 @@ local function removeEntry(self, uid)
     table.remove(entryList)
     __TS__Delete(entryMap, uid)
 end
-local function createTriggerForEntry(self, entry)
+--- 同步「突破位移」用的目标点：仅监听点指令时，右键单位/物品不会刷新 tx/ty，
+-- 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
+local function syncEntryOrderDestination(self, e)
     local ____temp_4
-    if type(jass.CreateTrigger) == "function" then
-        ____temp_4 = jass.CreateTrigger()
+    if type(jass.GetOrderTargetUnit) == "function" then
+        ____temp_4 = jass.GetOrderTargetUnit()
     else
         ____temp_4 = nil
     end
-    local t = ____temp_4
+    local tgtU = ____temp_4
+    if tgtU ~= nil and tgtU ~= 0 then
+        e.tx = getUnitX(nil, tgtU)
+        e.ty = getUnitY(nil, tgtU)
+        return
+    end
+    local ____temp_5
+    if type(jass.GetOrderTargetItem) == "function" then
+        ____temp_5 = jass.GetOrderTargetItem()
+    else
+        ____temp_5 = nil
+    end
+    local tgtIt = ____temp_5
+    if tgtIt ~= nil and tgtIt ~= 0 then
+        e.tx = type(jass.GetItemX) == "function" and (jass.GetItemX(tgtIt) or 0) or 0
+        e.ty = type(jass.GetItemY) == "function" and (jass.GetItemY(tgtIt) or 0) or 0
+        return
+    end
+    e.tx = type(jass.GetOrderPointX) == "function" and (jass.GetOrderPointX() or 0) or 0
+    e.ty = type(jass.GetOrderPointY) == "function" and (jass.GetOrderPointY() or 0) or 0
+end
+local function createTriggerForEntry(self, entry)
+    local ____temp_6
+    if type(jass.CreateTrigger) == "function" then
+        ____temp_6 = jass.CreateTrigger()
+    else
+        ____temp_6 = nil
+    end
+    local t = ____temp_6
     entry.t = t
     if t == nil then
         return
@@ -252,6 +282,10 @@ local function createTriggerForEntry(self, entry)
     local uid = entry.uid
     if type(jass.TriggerRegisterUnitEvent) == "function" then
         jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER)
+        local evTarget = jass.EVENT_UNIT_ISSUED_TARGET_ORDER
+        if evTarget ~= nil then
+            jass.TriggerRegisterUnitEvent(t, entry.u, evTarget)
+        end
     end
     if type(jass.TriggerAddAction) == "function" then
         jass.TriggerAddAction(
@@ -261,8 +295,7 @@ local function createTriggerForEntry(self, entry)
                 if e == nil then
                     return
                 end
-                e.tx = type(jass.GetOrderPointX) == "function" and (jass.GetOrderPointX() or 0) or 0
-                e.ty = type(jass.GetOrderPointY) == "function" and (jass.GetOrderPointY() or 0) or 0
+                syncEntryOrderDestination(nil, e)
             end
         )
     end
@@ -373,13 +406,13 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
     if current == nil then
         return
     end
-    local ____temp_5
+    local ____temp_7
     if type(jass.CreateTimer) == "function" then
-        ____temp_5 = jass.CreateTimer()
+        ____temp_7 = jass.CreateTimer()
     else
-        ____temp_5 = nil
+        ____temp_7 = nil
     end
-    local tempT = ____temp_5
+    local tempT = ____temp_7
     current.tempTimer = tempT
     if tempT then
         jass.TimerStart(
