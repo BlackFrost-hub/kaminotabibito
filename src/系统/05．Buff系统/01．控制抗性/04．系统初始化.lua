@@ -2,30 +2,51 @@
 local ____exports = {}
 --- 控制抗性系统初始化
 -- 
--- 注册技能施放事件，监听控制技能
+-- 通过统一技能事件系统监听控制技能
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
-local TriggerRegisterPlayerUnitEventSimple = ____require_result_0.TriggerRegisterPlayerUnitEventSimple
-local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
-local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
-local isExcludedFromControlResist = ____require_result_2.isExcludedFromControlResist
-local isControlAbility = ____require_result_2.isControlAbility
-local isUnitControlled = ____require_result_2.isUnitControlled
-local ____require_result_3 = require("系统.05．Buff系统.04．控制抗性.02．控制时间计算")
-local calcReducedControlTime = ____require_result_3.calcReducedControlTime
-local ____require_result_4 = require("系统.05．Buff系统.04．控制抗性.03．控制重施放")
-local recastControlAbility = ____require_result_4.recastControlAbility
---- 触发器
-local controlTrigger = nil
---- 控制抗性事件处理函数
-local function onSpellChannel(self)
-    local caster = jass.GetTriggerUnit()
-    local target = jass.GetSpellTargetUnit()
-    local abilityId = GetSpellAbilityId(nil)
+local ____require_result_0 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
+local isExcludedFromControlResist = ____require_result_0.isExcludedFromControlResist
+local isControlAbility = ____require_result_0.isControlAbility
+local isUnitControlled = ____require_result_0.isUnitControlled
+local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
+local calcReducedControlTime = ____require_result_1.calcReducedControlTime
+local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.03．控制重施放")
+local recastControlAbility = ____require_result_2.recastControlAbility
+local ____require_result_3 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local registerSpellChannelListener = ____require_result_3.registerSpellChannelListener
+local ALLOWED_PLAYERS = {
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    jass.PLAYER_NEUTRAL_AGGRESSIVE
+}
+local function isAllowedPlayer(self, player)
+    local id = jass.GetPlayerId(player)
+    do
+        local i = 0
+        while i < #ALLOWED_PLAYERS do
+            if ALLOWED_PLAYERS[i + 1] == id then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
+local function onSpellChannel(self, caster, abilityId)
+    if not isAllowedPlayer(
+        nil,
+        jass.GetOwningPlayer(caster)
+    ) then
+        return
+    end
     if isExcludedFromControlResist(nil, caster) then
         return
     end
+    local target = jass.GetSpellTargetUnit()
     if target == nil then
         return
     end
@@ -55,42 +76,12 @@ local function onSpellChannel(self)
         end
     )
 end
---- 初始化控制抗性系统
+local _initialized = false
 function ____exports.initControlResist(self)
-    if controlTrigger ~= nil then
+    if _initialized then
         return
     end
-    controlTrigger = jass.CreateTrigger()
-    do
-        local i = 0
-        while i <= 3 do
-            TriggerRegisterPlayerUnitEventSimple(
-                nil,
-                controlTrigger,
-                jass.Player(i),
-                jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-            )
-            i = i + 1
-        end
-    end
-    TriggerRegisterPlayerUnitEventSimple(
-        nil,
-        controlTrigger,
-        jass.Player(6),
-        jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-    )
-    TriggerRegisterPlayerUnitEventSimple(
-        nil,
-        controlTrigger,
-        jass.Player(7),
-        jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-    )
-    TriggerRegisterPlayerUnitEventSimple(
-        nil,
-        controlTrigger,
-        jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE),
-        jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-    )
-    jass.TriggerAddAction(controlTrigger, onSpellChannel)
+    _initialized = true
+    registerSpellChannelListener(nil, onSpellChannel)
 end
 return ____exports

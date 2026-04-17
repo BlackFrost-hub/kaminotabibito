@@ -18,7 +18,7 @@ const {
   CONTROL_REDUCTION_CAP: number;
   BOSS_CONTROL_LIMITS: Record<string, number>;
 };
-const { getHeroDuration } = require("系统.05．Buff系统.04．控制抗性.01．控制检测") as {
+const { getHeroDuration } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
   getHeroDuration: (abilityId: number) => number;
 };
 

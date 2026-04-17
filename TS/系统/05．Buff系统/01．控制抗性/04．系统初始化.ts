@@ -1,58 +1,52 @@
 /**
  * 控制抗性系统初始化
  *
- * 注册技能施放事件，监听控制技能
+ * 通过统一技能事件系统监听控制技能
  */
 
 const jass = require("jass.common") as any;
-const { TriggerRegisterPlayerUnitEventSimple } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterPlayerUnitEventSimple: (trig: any, player: any, event: number) => any;
-};
-const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  GetSpellAbilityId: () => number;
-};
+
 const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
   isExcludedFromControlResist: (unit: any) => boolean;
   isControlAbility: (abilityId: number) => boolean;
   isUnitControlled: (unit: any) => boolean;
 };
-const { calcReducedControlTime } = require("系统.05．Buff系统.04．控制抗性.02．控制时间计算") as {
+const { calcReducedControlTime } = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算") as {
   calcReducedControlTime: (target: any, abilityId: number) => number;
 };
-const { recastControlAbility } = require("系统.05．Buff系统.04．控制抗性.03．控制重施放") as {
+const { recastControlAbility } = require("系统.05．Buff系统.01．控制抗性.03．控制重施放") as {
   recastControlAbility: (caster: any, target: any, abilityId: number, duration: number) => void;
 };
+const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellChannelListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
+};
 
-/** 触发器 */
-let controlTrigger: any = null;
+const ALLOWED_PLAYERS: number[] = [0, 1, 2, 3, 6, 7, jass.PLAYER_NEUTRAL_AGGRESSIVE];
 
-/**
- * 控制抗性事件处理函数
- */
-function onSpellChannel(): void {
-  const caster = jass.GetTriggerUnit();
-  const target = jass.GetSpellTargetUnit();
-  const abilityId = GetSpellAbilityId();
+function isAllowedPlayer(player: any): boolean {
+  const id = jass.GetPlayerId(player);
+  for (let i = 0; i < ALLOWED_PLAYERS.length; i++) {
+    if (ALLOWED_PLAYERS[i] === id) return true;
+  }
+  return false;
+}
 
-  // 检查排除单位
+function onSpellChannel(caster: any, abilityId: number): void {
+  if (!isAllowedPlayer(jass.GetOwningPlayer(caster))) return;
+
   if (isExcludedFromControlResist(caster)) return;
 
-  // 检查是否有目标
+  const target = jass.GetSpellTargetUnit();
   if (target == null) return;
 
-  // 检查是否为控制技能
   if (!isControlAbility(abilityId)) return;
 
-  // 检查目标是否被控制
   if (!isUnitControlled(target)) return;
 
-  // 计算削减后的控制时间
   const duration = calcReducedControlTime(target, abilityId);
 
-  // 创建0秒计时器延迟处理（等待控制技能生效）
   const timer = jass.CreateTimer();
   jass.TimerStart(timer, 0, false, () => {
-    // 再次检查控制状态
     if (isUnitControlled(target)) {
       recastControlAbility(caster, target, abilityId, duration);
     }
@@ -60,43 +54,13 @@ function onSpellChannel(): void {
   });
 }
 
-/**
- * 初始化控制抗性系统
- */
+let _initialized = false;
+
 export function initControlResist(): void {
-  if (controlTrigger != null) return;
+  if (_initialized) return;
+  _initialized = true;
 
-  controlTrigger = jass.CreateTrigger();
-
-  // 玩家1-4 (Player 0-3)
-  for (let i = 0; i <= 3; i++) {
-    TriggerRegisterPlayerUnitEventSimple(
-      controlTrigger,
-      jass.Player(i),
-      jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-    );
-  }
-  // 玩家7 (Player 6)
-  TriggerRegisterPlayerUnitEventSimple(
-    controlTrigger,
-    jass.Player(6),
-    jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-  );
-  // 玩家8 (Player 7)
-  TriggerRegisterPlayerUnitEventSimple(
-    controlTrigger,
-    jass.Player(7),
-    jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-  );
-  // 中立敌对
-  TriggerRegisterPlayerUnitEventSimple(
-    controlTrigger,
-    jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE),
-    jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL
-  );
-
-  // 注册动作
-  jass.TriggerAddAction(controlTrigger, onSpellChannel);
+  registerSpellChannelListener(onSpellChannel);
 }
 
 export {};

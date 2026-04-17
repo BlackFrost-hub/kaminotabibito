@@ -12,7 +12,7 @@ local stringToFourCC = ____require_result_1.stringToFourCC
 local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量")
 local CONTROL_REDUCTION_CAP = ____require_result_2.CONTROL_REDUCTION_CAP
 local BOSS_CONTROL_LIMITS = ____require_result_2.BOSS_CONTROL_LIMITS
-local ____require_result_3 = require("系统.05．Buff系统.04．控制抗性.01．控制检测")
+local ____require_result_3 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
 local getHeroDuration = ____require_result_3.getHeroDuration
 --- 获取单位的减少控制时间属性
 -- 
