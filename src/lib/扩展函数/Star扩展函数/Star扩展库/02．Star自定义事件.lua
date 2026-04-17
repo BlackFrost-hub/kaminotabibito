@@ -354,47 +354,40 @@ function ____exports.STES_RemoveEvent(t, targetName)
     local i = 0
     while i < evCount do
         do
-            local __continue67
-            repeat
-                local nm = jass.LoadStr(HT, hd, i)
-                if nm == targetName then
-                    local nameHash = jass.StringHash(nm)
-                    local a = jass.LoadInteger(HT, nameHash, skey_index)
-                    local b = 0
-                    while b < a do
-                        local t1 = jass.LoadTriggerHandle(HT, nameHash, b)
-                        if t1 == t then
-                            a = a - 1
-                            local tTop = jass.LoadTriggerHandle(HT, nameHash, a)
-                            jass.SaveTriggerHandle(HT, nameHash, b, tTop)
-                            jass.SaveInteger(HT, nameHash, skey_index, a)
-                            if a >= b then
-                                break
-                            end
+            local nm = jass.LoadStr(HT, hd, i)
+            if nm == targetName then
+                local nameHash = jass.StringHash(nm)
+                local a = jass.LoadInteger(HT, nameHash, skey_index)
+                local b = 0
+                while b < a do
+                    local t1 = jass.LoadTriggerHandle(HT, nameHash, b)
+                    if t1 == t then
+                        a = a - 1
+                        local tTop = jass.LoadTriggerHandle(HT, nameHash, a)
+                        jass.SaveTriggerHandle(HT, nameHash, b, tTop)
+                        jass.SaveInteger(HT, nameHash, skey_index, a)
+                        if a >= b then
+                            break
                         end
-                        b = b + 1
                     end
-                    jass.SaveStr(
-                        HT,
-                        hd,
-                        i,
-                        jass.LoadStr(HT, hd, evCount - 1)
-                    )
-                    evCount = evCount - 1
-                    jass.SaveInteger(HT, hd, skey_index, evCount)
-                    if i >= evCount then
-                        break
-                    end
-                    __continue67 = true
+                    b = b + 1
+                end
+                jass.SaveStr(
+                    HT,
+                    hd,
+                    i,
+                    jass.LoadStr(HT, hd, evCount - 1)
+                )
+                evCount = evCount - 1
+                jass.SaveInteger(HT, hd, skey_index, evCount)
+                if i >= evCount then
                     break
                 end
-                i = i + 1
-                __continue67 = true
-            until true
-            if not __continue67 then
-                break
+                goto __continue67
             end
+            i = i + 1
         end
+        ::__continue67::
     end
 end
 --- 清除触发器上绑定的所有 STES 事件

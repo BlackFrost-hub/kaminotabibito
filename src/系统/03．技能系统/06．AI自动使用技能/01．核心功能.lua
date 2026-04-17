@@ -251,23 +251,16 @@ local function updateAIUnit(self, unitInfo)
     )
     for ____, skillInfo in ipairs(sortedSkills) do
         do
-            local __continue44
-            repeat
-                if not canCastSkill(nil, unit, skillInfo) then
-                    __continue44 = true
-                    break
-                end
-                local target = findBestTarget(nil, unit, skillInfo)
-                if target then
-                    castSkill(nil, unit, skillInfo, target)
-                    break
-                end
-                __continue44 = true
-            until true
-            if not __continue44 then
+            if not canCastSkill(nil, unit, skillInfo) then
+                goto __continue44
+            end
+            local target = findBestTarget(nil, unit, skillInfo)
+            if target then
+                castSkill(nil, unit, skillInfo, target)
                 break
             end
         end
+        ::__continue44::
     end
 end
 local function onAICheck(self)

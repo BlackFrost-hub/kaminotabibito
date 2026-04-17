@@ -43,24 +43,17 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
         local i = 0
         while i < #quests do
             do
-                local __continue11
-                repeat
-                    local q = quests[i + 1]
-                    if not q then
-                        __continue11 = true
-                        break
-                    end
-                    totalH = totalH + (____exports.getQuestItemHeight(
-                        nil,
-                        q,
-                        isExpanded(nil, q.id)
-                    ) + 0.01)
-                    __continue11 = true
-                until true
-                if not __continue11 then
-                    break
+                local q = quests[i + 1]
+                if not q then
+                    goto __continue11
                 end
+                totalH = totalH + (____exports.getQuestItemHeight(
+                    nil,
+                    q,
+                    isExpanded(nil, q.id)
+                ) + 0.01)
             end
+            ::__continue11::
             i = i + 1
         end
     end
@@ -165,33 +158,26 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
         local i = 0
         while i < #quests do
             do
-                local __continue40
-                repeat
-                    local q = quests[i + 1]
-                    if not q then
-                        __continue40 = true
-                        break
-                    end
-                    local expanded = isExpanded(nil, q.id)
-                    local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
-                    local fullyInside = ____exports.isQuestRowFullyInsideView(
-                        nil,
-                        rowTopRel,
-                        itemHeight,
-                        visibleTopRel,
-                        visibleBottomRel,
-                        EPS
-                    )
-                    if fullyInside then
-                        visibleRows[#visibleRows + 1] = {quest = q, expanded = expanded, rowTopRel = rowTopRel, itemHeight = itemHeight}
-                    end
-                    rowTopRel = rowTopRel - (itemHeight + 0.01)
-                    __continue40 = true
-                until true
-                if not __continue40 then
-                    break
+                local q = quests[i + 1]
+                if not q then
+                    goto __continue40
                 end
+                local expanded = isExpanded(nil, q.id)
+                local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
+                local fullyInside = ____exports.isQuestRowFullyInsideView(
+                    nil,
+                    rowTopRel,
+                    itemHeight,
+                    visibleTopRel,
+                    visibleBottomRel,
+                    EPS
+                )
+                if fullyInside then
+                    visibleRows[#visibleRows + 1] = {quest = q, expanded = expanded, rowTopRel = rowTopRel, itemHeight = itemHeight}
+                end
+                rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
+            ::__continue40::
             i = i + 1
         end
     end
@@ -260,20 +246,13 @@ function ____exports.refreshTaskUIList(self, opts)
         local i = 0
         while i < #visibleRows do
             do
-                local __continue49
-                repeat
-                    local row = visibleRows[i + 1]
-                    if not row then
-                        __continue49 = true
-                        break
-                    end
-                    createListItem(nil, row.quest, row.rowTopRel, row.expanded)
-                    __continue49 = true
-                until true
-                if not __continue49 then
-                    break
+                local row = visibleRows[i + 1]
+                if not row then
+                    goto __continue49
                 end
+                createListItem(nil, row.quest, row.rowTopRel, row.expanded)
             end
+            ::__continue49::
             i = i + 1
         end
     end

@@ -6,8 +6,8 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (s: string) => number;
 };
 
 //=============================================================================
@@ -21,7 +21,7 @@ const CONTROL_ABILITY_ID = 0x41303531; // A051
  * 获取辅助马甲单位类型
  */
 export function getControlHelperUnitType(): number {
-  return YDUserDataGet("string", "辅助马甲（减控用）", "单位类型", "unitcode");
+  return stringToFourCC("e02A");
 }
 
 //=============================================================================

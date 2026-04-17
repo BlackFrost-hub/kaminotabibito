@@ -26,60 +26,51 @@ function ____exports.ensureQuestConfigsRegistered(self)
     g.__questConfigsRegistered = true
     for ____, cfg in ipairs(QUEST_CONFIGS) do
         do
-            local __continue5
-            repeat
-                if cfg.enabled ~= true then
-                    __continue5 = true
-                    break
-                end
-                if not cfg.requireID then
-                    __continue5 = true
-                    break
-                end
-                local questId = tostring(cfg.requireID)
-                if questDB:getQuest(questId) then
-                    __continue5 = true
-                    break
-                end
-                local iconPath = ""
-                if cfg.startNpc then
-                    local npcCfg = __TS__ArrayFind(
-                        NPC_CONFIGS,
-                        function(____, n) return n.NPCrequireName == cfg.startNpc or n.NpcNameID == cfg.startNpc end
-                    )
-                    if npcCfg and npcCfg.unitcode then
-                        iconPath = getObjectProperty(nil, ObjectType.UNIT, npcCfg.unitcode, "Art")
-                    end
-                end
-                questDB:registerQuest({
-                    id = questId,
-                    type = QuestType.DAILY,
-                    title = cfg.name or questId,
-                    description = cfg.desc or cfg.name or "",
-                    objectives = (cfg.requireItem or cfg.targetUnit) and ({{
-                        id = "obj1",
-                        description = cfg.desc or cfg.name or "",
-                        current = 0,
-                        required = normalizeRequireCount(nil, cfg.requireCount),
-                        completed = false
-                    }}) or ({}),
-                    rewards = {{
-                        type = "gold",
-                        value = 0,
-                        description = resolveRewardDisplayText(nil, cfg)
-                    }},
-                    status = QuestStatus.UNDISCOVERED,
-                    startNpc = cfg.startNpc,
-                    icon = iconPath or nil,
-                    createdAt = 0,
-                    updatedAt = 0
-                })
-                __continue5 = true
-            until true
-            if not __continue5 then
-                break
+            if cfg.enabled ~= true then
+                goto __continue5
             end
+            if not cfg.requireID then
+                goto __continue5
+            end
+            local questId = tostring(cfg.requireID)
+            if questDB:getQuest(questId) then
+                goto __continue5
+            end
+            local iconPath = ""
+            if cfg.startNpc then
+                local npcCfg = __TS__ArrayFind(
+                    NPC_CONFIGS,
+                    function(____, n) return n.NPCrequireName == cfg.startNpc or n.NpcNameID == cfg.startNpc end
+                )
+                if npcCfg and npcCfg.unitcode then
+                    iconPath = getObjectProperty(nil, ObjectType.UNIT, npcCfg.unitcode, "Art")
+                end
+            end
+            questDB:registerQuest({
+                id = questId,
+                type = QuestType.DAILY,
+                title = cfg.name or questId,
+                description = cfg.desc or cfg.name or "",
+                objectives = (cfg.requireItem or cfg.targetUnit) and ({{
+                    id = "obj1",
+                    description = cfg.desc or cfg.name or "",
+                    current = 0,
+                    required = normalizeRequireCount(nil, cfg.requireCount),
+                    completed = false
+                }}) or ({}),
+                rewards = {{
+                    type = "gold",
+                    value = 0,
+                    description = resolveRewardDisplayText(nil, cfg)
+                }},
+                status = QuestStatus.UNDISCOVERED,
+                startNpc = cfg.startNpc,
+                icon = iconPath or nil,
+                createdAt = 0,
+                updatedAt = 0
+            })
         end
+        ::__continue5::
     end
 end
 function ____exports.getQuestState(self, questId)

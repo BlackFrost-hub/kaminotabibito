@@ -149,37 +149,29 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
     local result = __TS__ArraySlice(active)
     for ____, id in ipairs(completedIds) do
         do
-            local __continue30
-            repeat
-                local template = questDB:getQuest(id)
-                if not template or template.type ~= ____type or template.uiReserved then
-                    __continue30 = true
-                    break
-                end
-                if __TS__ArraySome(
-                    active,
-                    function(____, q) return q.id == id end
-                ) then
-                    __continue30 = true
-                    break
-                end
-                result[#result + 1] = __TS__ObjectAssign(
-                    {},
-                    template,
-                    {
-                        status = QuestStatus.COMPLETED,
-                        objectives = __TS__ArrayMap(
-                            template.objectives,
-                            function(____, o) return __TS__ObjectAssign({}, o, {completed = true, current = o.required}) end
-                        )
-                    }
-                )
-                __continue30 = true
-            until true
-            if not __continue30 then
-                break
+            local template = questDB:getQuest(id)
+            if not template or template.type ~= ____type or template.uiReserved then
+                goto __continue30
             end
+            if __TS__ArraySome(
+                active,
+                function(____, q) return q.id == id end
+            ) then
+                goto __continue30
+            end
+            result[#result + 1] = __TS__ObjectAssign(
+                {},
+                template,
+                {
+                    status = QuestStatus.COMPLETED,
+                    objectives = __TS__ArrayMap(
+                        template.objectives,
+                        function(____, o) return __TS__ObjectAssign({}, o, {completed = true, current = o.required}) end
+                    )
+                }
+            )
         end
+        ::__continue30::
     end
     return result
 end

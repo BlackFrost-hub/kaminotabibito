@@ -69,43 +69,30 @@ local function isKillQuestObjectiveCompleted(self, playerId, questId, requireCou
     local active = questDB:getPlayerActiveQuests(playerId)
     for ____, q in ipairs(active) do
         do
-            local __continue11
-            repeat
-                if not q or q.id ~= questId then
-                    __continue11 = true
-                    break
-                end
-                if not q.objectives or #q.objectives == 0 then
-                    return false
-                end
-                local current = 0
-                local required = 0
-                for ____, obj in ipairs(q.objectives) do
-                    do
-                        local __continue14
-                        repeat
-                            if not obj then
-                                __continue14 = true
-                                break
-                            end
-                            current = current + (obj.current or 0)
-                            required = required + (obj.required or 0)
-                            __continue14 = true
-                        until true
-                        if not __continue14 then
-                            break
-                        end
-                    end
-                end
-                if required <= 0 then
-                    required = requireCount > 0 and requireCount or 1
-                end
-                return current >= required
-            until true
-            if not __continue11 then
-                break
+            if not q or q.id ~= questId then
+                goto __continue11
             end
+            if not q.objectives or #q.objectives == 0 then
+                return false
+            end
+            local current = 0
+            local required = 0
+            for ____, obj in ipairs(q.objectives) do
+                do
+                    if not obj then
+                        goto __continue14
+                    end
+                    current = current + (obj.current or 0)
+                    required = required + (obj.required or 0)
+                end
+                ::__continue14::
+            end
+            if required <= 0 then
+                required = requireCount > 0 and requireCount or 1
+            end
+            return current >= required
         end
+        ::__continue11::
     end
     return false
 end
@@ -135,37 +122,29 @@ local function resolveSubmitItem(self, hero, requireItem)
             local slot = 0
             while slot < 6 do
                 do
-                    local __continue28
-                    repeat
-                        local ____temp_0
-                        if type(jass.UnitItemInSlot) == "function" then
-                            ____temp_0 = jass.UnitItemInSlot(hero, slot)
-                        else
-                            ____temp_0 = nil
-                        end
-                        local item = ____temp_0
-                        if not item or type(jass.GetItemTypeId) ~= "function" then
-                            __continue28 = true
-                            break
-                        end
-                        local itemId = jass.GetItemTypeId(item)
-                        local itemCode = _____5C01_88C5_51FD_6570:fourCCToString(itemId)
-                        local data = itemsData[itemCode]
-                        if not data then
-                            __continue28 = true
-                            break
-                        end
-                        if (data.type or "") ~= "道具/戒指/饰品" then
-                            __continue28 = true
-                            break
-                        end
-                        local level = data.level or ""
-                        return {itemId = itemId, itemCode = itemCode, itemLevel = level}
-                    until true
-                    if not __continue28 then
-                        break
+                    local ____temp_0
+                    if type(jass.UnitItemInSlot) == "function" then
+                        ____temp_0 = jass.UnitItemInSlot(hero, slot)
+                    else
+                        ____temp_0 = nil
                     end
+                    local item = ____temp_0
+                    if not item or type(jass.GetItemTypeId) ~= "function" then
+                        goto __continue28
+                    end
+                    local itemId = jass.GetItemTypeId(item)
+                    local itemCode = _____5C01_88C5_51FD_6570:fourCCToString(itemId)
+                    local data = itemsData[itemCode]
+                    if not data then
+                        goto __continue28
+                    end
+                    if (data.type or "") ~= "道具/戒指/饰品" then
+                        goto __continue28
+                    end
+                    local level = data.level or ""
+                    return {itemId = itemId, itemCode = itemCode, itemLevel = level}
                 end
+                ::__continue28::
                 slot = slot + 1
             end
         end
@@ -186,28 +165,21 @@ local function resolveSubmitItem(self, hero, requireItem)
         local parts = __TS__StringSplit(requireItem, "|")
         for ____, code in ipairs(parts) do
             do
-                local __continue34
-                repeat
-                    local c = __TS__StringTrim(code)
-                    if #c ~= 4 then
-                        __continue34 = true
-                        break
+                local c = __TS__StringTrim(code)
+                if #c ~= 4 then
+                    goto __continue34
+                end
+                local testId = calculateFourCC(nil, c)
+                if UnitHasItemOfTypeBJ(nil, hero, testId) then
+                    local data = itemsData[c]
+                    local ____opt_result_8
+                    if data ~= nil then
+                        ____opt_result_8 = data.level
                     end
-                    local testId = calculateFourCC(nil, c)
-                    if UnitHasItemOfTypeBJ(nil, hero, testId) then
-                        local data = itemsData[c]
-                        local ____opt_result_8
-                        if data ~= nil then
-                            ____opt_result_8 = data.level
-                        end
-                        return {itemId = testId, itemCode = c, itemLevel = ____opt_result_8 or ""}
-                    end
-                    __continue34 = true
-                until true
-                if not __continue34 then
-                    break
+                    return {itemId = testId, itemCode = c, itemLevel = ____opt_result_8 or ""}
                 end
             end
+            ::__continue34::
         end
     end
     return {itemId = 0, itemCode = "", itemLevel = ""}

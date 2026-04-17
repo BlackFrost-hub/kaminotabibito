@@ -108,168 +108,151 @@ local function parsePowerUP(self, powerUpStr)
         local si = 0
         while si < #rawSegs do
             do
-                local __continue9
-                repeat
-                    local rawSeg = __TS__StringTrim(rawSegs[si + 1])
-                    if rawSeg == "" then
-                        __continue9 = true
-                        break
-                    end
-                    local tokens = __TS__ArrayFilter(
-                        __TS__ArrayMap(
-                            __TS__StringSplit(rawSeg, ";"),
-                            function(____, x) return __TS__StringTrim(x) end
-                        ),
-                        function(____, x) return x ~= "" end
-                    )
-                    local timeSec = 0
-                    local effectTokens = {}
-                    for ____, t in ipairs(tokens) do
-                        local tl = string.lower(t)
-                        if (string.find(tl, "time", nil, true) or 0) - 1 == 0 then
-                            local w = __TS__ParseFloat(__TS__StringSubstring(t, 4)) or 0
-                            if w > timeSec then
-                                timeSec = w
-                            end
-                        else
-                            effectTokens[#effectTokens + 1] = t
+                local rawSeg = __TS__StringTrim(rawSegs[si + 1])
+                if rawSeg == "" then
+                    goto __continue9
+                end
+                local tokens = __TS__ArrayFilter(
+                    __TS__ArrayMap(
+                        __TS__StringSplit(rawSeg, ";"),
+                        function(____, x) return __TS__StringTrim(x) end
+                    ),
+                    function(____, x) return x ~= "" end
+                )
+                local timeSec = 0
+                local effectTokens = {}
+                for ____, t in ipairs(tokens) do
+                    local tl = string.lower(t)
+                    if (string.find(tl, "time", nil, true) or 0) - 1 == 0 then
+                        local w = __TS__ParseFloat(__TS__StringSubstring(t, 4)) or 0
+                        if w > timeSec then
+                            timeSec = w
                         end
+                    else
+                        effectTokens[#effectTokens + 1] = t
                     end
-                    local effects = {}
-                    for ____, t in ipairs(effectTokens) do
-                        do
-                            local __continue18
-                            repeat
-                                local tl0 = string.lower(t)
-                                if __TS__StringEndsWith(tl0, "gold") then
-                                    if (string.find(tl0, "%gold", nil, true) or 0) - 1 >= 0 then
-                                        local pctStr = __TS__StringTrim(__TS__StringSubstring(
-                                            t,
-                                            0,
-                                            (string.find(tl0, "%", nil, true) or 0) - 1
-                                        ))
-                                        local pctNum = __TS__ParseFloat(pctStr) or 0
-                                        effects[#effects + 1] = {type = "gold", isPct = true, value = pctNum / 100, isLevelMult = false}
-                                        __continue18 = true
-                                        break
-                                    end
-                                    local core = __TS__StringTrim(__TS__StringSubstring(t, 0, #t - 4))
-                                    local dash = (string.find(core, "-", nil, true) or 0) - 1
-                                    if dash >= 0 then
-                                        local a = __TS__ParseFloat(__TS__StringTrim(__TS__StringSubstring(core, 0, dash))) or 0
-                                        local b = __TS__ParseFloat(__TS__StringTrim(__TS__StringSubstring(core, dash + 1))) or 0
-                                        local mn = a < b and a or b
-                                        local mx = a < b and b or a
-                                        effects[#effects + 1] = {
-                                            type = "gold",
-                                            isPct = false,
-                                            value = 0,
-                                            isLevelMult = false,
-                                            min = mn,
-                                            max = mx
-                                        }
-                                    else
-                                        local v = __TS__ParseFloat(core) or 0
-                                        effects[#effects + 1] = {
-                                            type = "gold",
-                                            isPct = false,
-                                            value = 0,
-                                            isLevelMult = false,
-                                            min = v,
-                                            max = v
-                                        }
-                                    end
-                                    __continue18 = true
-                                    break
+                end
+                local effects = {}
+                for ____, t in ipairs(effectTokens) do
+                    do
+                        local tl0 = string.lower(t)
+                        if __TS__StringEndsWith(tl0, "gold") then
+                            if (string.find(tl0, "%gold", nil, true) or 0) - 1 >= 0 then
+                                local pctStr = __TS__StringTrim(__TS__StringSubstring(
+                                    t,
+                                    0,
+                                    (string.find(tl0, "%", nil, true) or 0) - 1
+                                ))
+                                local pctNum = __TS__ParseFloat(pctStr) or 0
+                                effects[#effects + 1] = {type = "gold", isPct = true, value = pctNum / 100, isLevelMult = false}
+                                goto __continue18
+                            end
+                            local core = __TS__StringTrim(__TS__StringSubstring(t, 0, #t - 4))
+                            local dash = (string.find(core, "-", nil, true) or 0) - 1
+                            if dash >= 0 then
+                                local a = __TS__ParseFloat(__TS__StringTrim(__TS__StringSubstring(core, 0, dash))) or 0
+                                local b = __TS__ParseFloat(__TS__StringTrim(__TS__StringSubstring(core, dash + 1))) or 0
+                                local mn = a < b and a or b
+                                local mx = a < b and b or a
+                                effects[#effects + 1] = {
+                                    type = "gold",
+                                    isPct = false,
+                                    value = 0,
+                                    isLevelMult = false,
+                                    min = mn,
+                                    max = mx
+                                }
+                            else
+                                local v = __TS__ParseFloat(core) or 0
+                                effects[#effects + 1] = {
+                                    type = "gold",
+                                    isPct = false,
+                                    value = 0,
+                                    isLevelMult = false,
+                                    min = v,
+                                    max = v
+                                }
+                            end
+                            goto __continue18
+                        end
+                        if (string.find(t, "(level*", nil, true) or 0) - 1 == 0 then
+                            local closeIdx = (string.find(t, ")", nil, true) or 0) - 1
+                            if closeIdx < 0 then
+                                goto __continue18
+                            end
+                            local mult = __TS__ParseFloat(__TS__StringSubstring(t, 7, closeIdx)) or 0
+                            local rawKey = __TS__StringTrim(__TS__StringSubstring(t, closeIdx + 1))
+                            local kl = string.lower(rawKey)
+                            if kl == "exp" then
+                                effects[#effects + 1] = {type = "exp", isPct = false, value = mult, isLevelMult = true}
+                            elseif kl == "level" then
+                                effects[#effects + 1] = {type = "level", isPct = false, value = mult, isLevelMult = true}
+                            else
+                                local ak = findStatKey(nil, rawKey)
+                                if ak ~= "" then
+                                    effects[#effects + 1] = {
+                                        type = "stat",
+                                        key = ak,
+                                        isPct = false,
+                                        value = mult,
+                                        isLevelMult = true
+                                    }
                                 end
-                                if (string.find(t, "(level*", nil, true) or 0) - 1 == 0 then
-                                    local closeIdx = (string.find(t, ")", nil, true) or 0) - 1
-                                    if closeIdx < 0 then
-                                        __continue18 = true
-                                        break
-                                    end
-                                    local mult = __TS__ParseFloat(__TS__StringSubstring(t, 7, closeIdx)) or 0
-                                    local rawKey = __TS__StringTrim(__TS__StringSubstring(t, closeIdx + 1))
-                                    local kl = string.lower(rawKey)
-                                    if kl == "exp" then
-                                        effects[#effects + 1] = {type = "exp", isPct = false, value = mult, isLevelMult = true}
-                                    elseif kl == "level" then
-                                        effects[#effects + 1] = {type = "level", isPct = false, value = mult, isLevelMult = true}
-                                    else
-                                        local ak = findStatKey(nil, rawKey)
-                                        if ak ~= "" then
-                                            effects[#effects + 1] = {
-                                                type = "stat",
-                                                key = ak,
-                                                isPct = false,
-                                                value = mult,
-                                                isLevelMult = true
-                                            }
-                                        end
-                                    end
-                                    __continue18 = true
-                                    break
-                                end
-                                local pctIdx = (string.find(t, "%", nil, true) or 0) - 1
-                                local isPct = pctIdx >= 0
-                                local cleaned = isPct and __TS__StringSubstring(t, 0, pctIdx) .. __TS__StringSubstring(t, pctIdx + 1) or t
-                                local numEnd = 0
-                                while numEnd < #cleaned do
-                                    local ch = __TS__StringSubstring(cleaned, numEnd, numEnd + 1)
-                                    if ch >= "0" and ch <= "9" or ch == "." or numEnd == 0 and ch == "-" then
-                                        numEnd = numEnd + 1
-                                    else
-                                        break
-                                    end
-                                end
-                                local num = __TS__ParseFloat(__TS__StringSubstring(cleaned, 0, numEnd)) or 0
-                                local rawKey = __TS__StringTrim(__TS__StringSubstring(cleaned, numEnd))
-                                local kl = string.lower(rawKey)
-                                if kl == "exp" then
-                                    effects[#effects + 1] = {type = "exp", isPct = false, value = num, isLevelMult = false}
-                                elseif kl == "level" then
-                                    effects[#effects + 1] = {type = "level", isPct = false, value = num, isLevelMult = false}
-                                elseif kl == "gold" then
-                                    if isPct then
-                                        effects[#effects + 1] = {type = "gold", isPct = true, value = num / 100, isLevelMult = false}
-                                    else
-                                        effects[#effects + 1] = {
-                                            type = "gold",
-                                            isPct = false,
-                                            value = 0,
-                                            isLevelMult = false,
-                                            min = num,
-                                            max = num
-                                        }
-                                    end
-                                else
-                                    local ak = findStatKey(nil, rawKey)
-                                    if ak ~= "" then
-                                        effects[#effects + 1] = {
-                                            type = "stat",
-                                            key = ak,
-                                            isPct = isPct,
-                                            value = isPct and num / 100 or num,
-                                            isLevelMult = false
-                                        }
-                                    end
-                                end
-                                __continue18 = true
-                            until true
-                            if not __continue18 then
+                            end
+                            goto __continue18
+                        end
+                        local pctIdx = (string.find(t, "%", nil, true) or 0) - 1
+                        local isPct = pctIdx >= 0
+                        local cleaned = isPct and __TS__StringSubstring(t, 0, pctIdx) .. __TS__StringSubstring(t, pctIdx + 1) or t
+                        local numEnd = 0
+                        while numEnd < #cleaned do
+                            local ch = __TS__StringSubstring(cleaned, numEnd, numEnd + 1)
+                            if ch >= "0" and ch <= "9" or ch == "." or numEnd == 0 and ch == "-" then
+                                numEnd = numEnd + 1
+                            else
                                 break
                             end
                         end
+                        local num = __TS__ParseFloat(__TS__StringSubstring(cleaned, 0, numEnd)) or 0
+                        local rawKey = __TS__StringTrim(__TS__StringSubstring(cleaned, numEnd))
+                        local kl = string.lower(rawKey)
+                        if kl == "exp" then
+                            effects[#effects + 1] = {type = "exp", isPct = false, value = num, isLevelMult = false}
+                        elseif kl == "level" then
+                            effects[#effects + 1] = {type = "level", isPct = false, value = num, isLevelMult = false}
+                        elseif kl == "gold" then
+                            if isPct then
+                                effects[#effects + 1] = {type = "gold", isPct = true, value = num / 100, isLevelMult = false}
+                            else
+                                effects[#effects + 1] = {
+                                    type = "gold",
+                                    isPct = false,
+                                    value = 0,
+                                    isLevelMult = false,
+                                    min = num,
+                                    max = num
+                                }
+                            end
+                        else
+                            local ak = findStatKey(nil, rawKey)
+                            if ak ~= "" then
+                                effects[#effects + 1] = {
+                                    type = "stat",
+                                    key = ak,
+                                    isPct = isPct,
+                                    value = isPct and num / 100 or num,
+                                    isLevelMult = false
+                                }
+                            end
+                        end
                     end
-                    if #effects > 0 then
-                        segments[#segments + 1] = {effects = effects, timeSec = timeSec}
-                    end
-                    __continue9 = true
-                until true
-                if not __continue9 then
-                    break
+                    ::__continue18::
+                end
+                if #effects > 0 then
+                    segments[#segments + 1] = {effects = effects, timeSec = timeSec}
                 end
             end
+            ::__continue9::
             si = si + 1
         end
     end
@@ -425,47 +408,40 @@ local function executeSegment(self, unit, seg)
     local goldFixed = {}
     for ____, eff in ipairs(seg.effects) do
         do
-            local __continue64
-            repeat
-                if eff.type == "gold" then
-                    if eff.isPct then
-                        goldPct = goldPct + eff.value
-                    else
-                        local mn = type(eff.min) == "number" and eff.min or 0
-                        local mx = type(eff.max) == "number" and eff.max or mn
-                        goldFixed[#goldFixed + 1] = {min = mn, max = mx}
-                    end
-                elseif eff.type == "exp" then
-                    local amount = eff.isLevelMult and math.floor(getHeroLevel(nil, unit) * eff.value) or math.floor(eff.value)
-                    addHeroXP(nil, unit, amount)
-                elseif eff.type == "level" then
-                    local cur = getHeroLevel(nil, unit)
-                    local add = eff.isLevelMult and math.floor(cur * eff.value) or math.floor(eff.value)
-                    if add > 0 and type(jass.SetHeroLevel) == "function" then
-                        jass.SetHeroLevel(unit, cur + add, true)
-                    end
-                elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
-                    local name = KEY_TO_NAME[eff.key]
-                    if name == nil then
-                        __continue64 = true
-                        break
-                    end
-                    local val
-                    if eff.isPct then
-                        val = getPctStatValue(nil, unit, eff.key) * eff.value
-                    elseif eff.isLevelMult then
-                        val = getHeroLevel(nil, unit) * eff.value
-                    else
-                        val = eff.value
-                    end
-                    statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
+            if eff.type == "gold" then
+                if eff.isPct then
+                    goldPct = goldPct + eff.value
+                else
+                    local mn = type(eff.min) == "number" and eff.min or 0
+                    local mx = type(eff.max) == "number" and eff.max or mn
+                    goldFixed[#goldFixed + 1] = {min = mn, max = mx}
                 end
-                __continue64 = true
-            until true
-            if not __continue64 then
-                break
+            elseif eff.type == "exp" then
+                local amount = eff.isLevelMult and math.floor(getHeroLevel(nil, unit) * eff.value) or math.floor(eff.value)
+                addHeroXP(nil, unit, amount)
+            elseif eff.type == "level" then
+                local cur = getHeroLevel(nil, unit)
+                local add = eff.isLevelMult and math.floor(cur * eff.value) or math.floor(eff.value)
+                if add > 0 and type(jass.SetHeroLevel) == "function" then
+                    jass.SetHeroLevel(unit, cur + add, true)
+                end
+            elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
+                local name = KEY_TO_NAME[eff.key]
+                if name == nil then
+                    goto __continue64
+                end
+                local val
+                if eff.isPct then
+                    val = getPctStatValue(nil, unit, eff.key) * eff.value
+                elseif eff.isLevelMult then
+                    val = getHeroLevel(nil, unit) * eff.value
+                else
+                    val = eff.value
+                end
+                statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
             end
         end
+        ::__continue64::
     end
     if goldPct ~= 0 then
         if seg.timeSec <= 0 then

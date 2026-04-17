@@ -126,27 +126,20 @@ local function countSelectedForPlayer(self, p)
     local sole = nil
     while true do
         do
-            local __continue20
-            repeat
-                local u = jass.FirstOfGroup(g)
-                if not u or u == 0 then
-                    break
-                end
-                jass.GroupRemoveUnit(g, u)
-                if not useSelectedNative and not jass.IsUnitSelected(u, p) then
-                    __continue20 = true
-                    break
-                end
-                n = n + 1
-                if sole == nil then
-                    sole = u
-                end
-                __continue20 = true
-            until true
-            if not __continue20 then
+            local u = jass.FirstOfGroup(g)
+            if not u or u == 0 then
                 break
             end
+            jass.GroupRemoveUnit(g, u)
+            if not useSelectedNative and not jass.IsUnitSelected(u, p) then
+                goto __continue20
+            end
+            n = n + 1
+            if sole == nil then
+                sole = u
+            end
         end
+        ::__continue20::
     end
     jass.DestroyGroup(g)
     return {n = n, sole = sole}
@@ -299,74 +292,65 @@ local function syncBuffBar(self)
                 local i = 0
                 while i < MAX_SLOTS do
                     do
-                        local __continue58
-                        repeat
-                            if i >= #rows then
-                                hideSlot(nil, i)
-                                __continue58 = true
-                                break
-                            end
-                            local row = rows[i + 1]
-                            local meta = buffs[row.id]
-                            local slot = slots[i + 1]
-                            if not slot then
-                                __continue58 = true
-                                break
-                            end
-                            local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
-                            if iconTex == "" then
-                                __continue58 = true
-                                break
-                            end
-                            local pd = row.state._dotParsedDuration
-                            local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
-                            local tipStr = meta ~= nil and formatDotTooltip(
-                                nil,
-                                meta.tooltip,
-                                durationForTip,
-                                row.state.effect,
-                                row.state.sourceName,
-                                meta.interval
-                            ) or (((((((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. tooltipIntStr(nil, row.state.remaining)) .. " 秒，伤害/秒 ") .. tooltipIntStr(nil, row.state.effect)) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「") .. (row.state.sourceName ~= nil and row.state.sourceName ~= "" and row.state.sourceName or "未知")) .. "」|r"
-                            pcall(function () return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
-                            )
-                            local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
-                            if slot.remainText and slot.remainText ~= 0 and type(japi.DzFrameSetText) == "function" then
-                                if lastRemainStrBySlot[i + 1] ~= remStr then
-                                    lastRemainStrBySlot[i + 1] = remStr
-                                    pcall(function () return japi.DzFrameSetText(slot.remainText, ("|cffffffff" .. remStr) .. "|r") end
-                                    )
-                                end
-                            end
-                            if slot.tipText and slot.tipText ~= 0 and type(japi.DzFrameSetText) == "function" then
-                                if lastTipStrBySlot[i + 1] ~= tipStr then
-                                    lastTipStrBySlot[i + 1] = tipStr
-                                    pcall(function () return japi.DzFrameSetText(slot.tipText, tipStr) end
-                                    )
-                                end
-                            end
-                            pcall(function () return ____UI_5DE5_5177:showFrame(slot.root) end
-                            )
-                            if slot.hit ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:showFrame(slot.hit) end
+                        if i >= #rows then
+                            hideSlot(nil, i)
+                            goto __continue58
+                        end
+                        local row = rows[i + 1]
+                        local meta = buffs[row.id]
+                        local slot = slots[i + 1]
+                        if not slot then
+                            goto __continue58
+                        end
+                        local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
+                        if iconTex == "" then
+                            goto __continue58
+                        end
+                        local pd = row.state._dotParsedDuration
+                        local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
+                        local tipStr = meta ~= nil and formatDotTooltip(
+                            nil,
+                            meta.tooltip,
+                            durationForTip,
+                            row.state.effect,
+                            row.state.sourceName,
+                            meta.interval
+                        ) or (((((((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. tooltipIntStr(nil, row.state.remaining)) .. " 秒，伤害/秒 ") .. tooltipIntStr(nil, row.state.effect)) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「") .. (row.state.sourceName ~= nil and row.state.sourceName ~= "" and row.state.sourceName or "未知")) .. "」|r"
+                        pcall(function () return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
+                        )
+                        local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
+                        if slot.remainText and slot.remainText ~= 0 and type(japi.DzFrameSetText) == "function" then
+                            if lastRemainStrBySlot[i + 1] ~= remStr then
+                                lastRemainStrBySlot[i + 1] = remStr
+                                pcall(function () return japi.DzFrameSetText(slot.remainText, ("|cffffffff" .. remStr) .. "|r") end
                                 )
                             end
-                            if not slotHovering[i + 1] then
-                                if slot.tipBox ~= 0 then
-                                    pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipBox) end
-                                    )
-                                end
-                                if slot.tipText ~= 0 then
-                                    pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipText) end
-                                    )
-                                end
+                        end
+                        if slot.tipText and slot.tipText ~= 0 and type(japi.DzFrameSetText) == "function" then
+                            if lastTipStrBySlot[i + 1] ~= tipStr then
+                                lastTipStrBySlot[i + 1] = tipStr
+                                pcall(function () return japi.DzFrameSetText(slot.tipText, tipStr) end
+                                )
                             end
-                            __continue58 = true
-                        until true
-                        if not __continue58 then
-                            break
+                        end
+                        pcall(function () return ____UI_5DE5_5177:showFrame(slot.root) end
+                        )
+                        if slot.hit ~= 0 then
+                            pcall(function () return ____UI_5DE5_5177:showFrame(slot.hit) end
+                            )
+                        end
+                        if not slotHovering[i + 1] then
+                            if slot.tipBox ~= 0 then
+                                pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipBox) end
+                                )
+                            end
+                            if slot.tipText ~= 0 then
+                                pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipText) end
+                                )
+                            end
                         end
                     end
+                    ::__continue58::
                     i = i + 1
                 end
             end

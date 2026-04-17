@@ -131,7 +131,7 @@ function ____exports.getEnabledNPCs(self)
 end
 --- 获取所有NPC配置列表（包括未启用的）
 function ____exports.getAllNPCs(self)
-    return {unpack(NPC_CONFIGS)}
+    return {table.unpack(NPC_CONFIGS)}
 end
 function ____exports.init(self)
     ____exports.initializeNPCs(nil)

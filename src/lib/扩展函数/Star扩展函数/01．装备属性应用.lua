@@ -74,68 +74,60 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
     local isHero = isHeroByGroup or not heroGroup and isHeroByType
     for ____, s in ipairs(stats) do
         do
-            local __continue18
-            repeat
-                local name = s.name
-                local value = __TS__Number(s.value) or 0
-                if value == 0 then
-                    readBack[name] = 0
-                    __continue18 = true
-                    break
-                end
-                applyBaseState(nil, unit, name, value)
-                if not isHero then
-                    local cur = __TS__Number(YDUserDataGet2(
-                        nil,
-                        "unit",
-                        unit,
-                        name,
-                        "real"
-                    )) or 0
-                    local next = cur + value
-                    YDUserDataSet2(
-                        nil,
-                        "unit",
-                        unit,
-                        name,
-                        "real",
-                        next
-                    )
-                    readBack[name] = next
-                    __continue18 = true
-                    break
-                end
-                if name ~= "移动速度" and owner then
-                    local cur = __TS__Number(YDUserDataGet2(
-                        nil,
-                        "player",
-                        owner,
-                        name,
-                        "real"
-                    )) or 0
-                    local next = cur + value
-                    YDUserDataSet2(
-                        nil,
-                        "player",
-                        owner,
-                        name,
-                        "real",
-                        next
-                    )
-                    readBack[name] = next
-                end
-                if applyDynamicPercentProperty(nil, unit, name, value) then
-                elseif name == "经验获取率" and owner and type(jass.SetPlayerHandicapXP) == "function" then
-                    local t = __TS__Number(g.udg_T) or 1
-                    local base = 0.35 + 0.65 * t
-                    jass.SetPlayerHandicapXP(owner, base * value)
-                end
-                __continue18 = true
-            until true
-            if not __continue18 then
-                break
+            local name = s.name
+            local value = __TS__Number(s.value) or 0
+            if value == 0 then
+                readBack[name] = 0
+                goto __continue18
+            end
+            applyBaseState(nil, unit, name, value)
+            if not isHero then
+                local cur = __TS__Number(YDUserDataGet2(
+                    nil,
+                    "unit",
+                    unit,
+                    name,
+                    "real"
+                )) or 0
+                local next = cur + value
+                YDUserDataSet2(
+                    nil,
+                    "unit",
+                    unit,
+                    name,
+                    "real",
+                    next
+                )
+                readBack[name] = next
+                goto __continue18
+            end
+            if name ~= "移动速度" and owner then
+                local cur = __TS__Number(YDUserDataGet2(
+                    nil,
+                    "player",
+                    owner,
+                    name,
+                    "real"
+                )) or 0
+                local next = cur + value
+                YDUserDataSet2(
+                    nil,
+                    "player",
+                    owner,
+                    name,
+                    "real",
+                    next
+                )
+                readBack[name] = next
+            end
+            if applyDynamicPercentProperty(nil, unit, name, value) then
+            elseif name == "经验获取率" and owner and type(jass.SetPlayerHandicapXP) == "function" then
+                local t = __TS__Number(g.udg_T) or 1
+                local base = 0.35 + 0.65 * t
+                jass.SetPlayerHandicapXP(owner, base * value)
             end
         end
+        ::__continue18::
     end
     return readBack
 end

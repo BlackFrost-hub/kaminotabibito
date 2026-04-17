@@ -1,24 +1,17 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 是否启用移动速度突破测试
+--- 测试系统统一入口
+-- 
+-- 通过开关控制是否加载各个测试模块。
 local ENABLE_MOVE_SPEED_TEST = true
---- 是否启用Dz函数测试
 local ENABLE_DZ_FUNCTION_TEST = false
---- 是否启用STES事件测试
 local ENABLE_STES_EVENT_TEST = false
---- 是否启用YDLocal返回值测试
 local ENABLE_YDLOCAL_TEST = false
---- 是否启用任务测试
 local ENABLE_QUEST_TEST = false
---- 是否启用模拟商店测试
 local ENABLE_SHOP_TEST = false
---- 是否启用测试233注册
 local ENABLE_TEST_233 = false
---- 是否启用测试事件
 local ENABLE_TEST_EVENT = false
---- 是否启用测试事件2
-local ENABLE_TEST_EVENT_2 = false
---- 加载测试模块
+local ENABLE_TEST_EVENT_2 = true
 local function loadTests(self)
     if ENABLE_MOVE_SPEED_TEST then
         require("系统.12．测试系统.移动速度突破测试")

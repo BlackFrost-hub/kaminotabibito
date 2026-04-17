@@ -5,19 +5,13 @@ local ____exports = {}
 -- 功能：移除原控制，用马甲重新施放缩短时长的控制技能
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_0.stringToFourCC
 --- 控制马甲技能ID
 local CONTROL_ABILITY_ID = 1093678385
 --- 获取辅助马甲单位类型
 function ____exports.getControlHelperUnitType(self)
-    return YDUserDataGet(
-        nil,
-        "string",
-        "辅助马甲（减控用）",
-        "单位类型",
-        "unitcode"
-    )
+    return stringToFourCC(nil, "e02A")
 end
 --- 移除原控制技能
 function ____exports.removeOriginalControl(self, unit, abilityId)

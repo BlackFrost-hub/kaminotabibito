@@ -88,14 +88,6 @@ do
         end
     end
 end
-local ok, err = pcall(function () return require("系统.02．物品系统.11．装备系统") end
-    )
-if not ok then
-    _G.print(
-        "装备系统加载失败:",
-        tostring(err)
-    )
-end
 do
     local ____export = require("系统.02．物品系统.11．装备系统")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -108,17 +100,11 @@ require("系统.02．物品系统.03．物品加工")
 require("系统.02．物品系统.04．装备成长")
 require("系统.02．物品系统.05．装备掉落")
 require("系统.02．物品系统.06．装备回复")
-local ok7, err7 = pcall(function () return require("系统.02．物品系统.07．装备提取") end
-    )
-if not ok7 then
-    _G.print(
-        "装备提取加载失败:",
-        tostring(err7)
-    )
-end
+require("系统.02．物品系统.07．装备提取")
 require("系统.02．物品系统.08．装备移速")
 require("系统.02．物品系统.09．装备排泄")
 require("系统.02．物品系统.10．装备限制")
+require("系统.02．物品系统.11．装备系统")
 --- 初始化物品系统
 -- 在 main.ts 中调用以确保所有模块已加载
 function ____exports.init(self)

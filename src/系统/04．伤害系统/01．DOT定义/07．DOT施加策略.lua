@@ -176,51 +176,42 @@ function ____exports.createDotApplyStrategy(self, deps)
             local t = 0
             while t < #deps.dotTypes do
                 do
-                    local __continue24
-                    repeat
-                        local cfg = deps.dotTypes[t + 1]
-                        local typeId = cfg.id
-                        if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
-                            __continue24 = true
-                            break
-                        end
-                        local best = cfg:getBestFromUnit(source)
-                        if best == nil then
-                            __continue24 = true
-                            break
-                        end
-                        local amount = cfg:computeAmount(target, best)
-                        if amount <= 0 then
-                            __continue24 = true
-                            break
-                        end
-                        if deps.stateByType[typeId] == nil then
-                            deps.stateByType[typeId] = {}
-                        end
-                        local tab = deps.stateByType[typeId]
-                        local curRaw = deps:tabRowForHid(tab, tgtHid)
-                        local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
-                        if curRaw ~= nil and cur == nil then
-                            deps:tabDeleteHid(tab, tgtHid)
-                        end
-                        applyEquipmentDotOnHeroAttack(
-                            nil,
-                            typeId,
-                            cfg,
-                            tab,
-                            tgtHid,
-                            target,
-                            source,
-                            amount,
-                            best.duration,
-                            cur
-                        )
-                        __continue24 = true
-                    until true
-                    if not __continue24 then
-                        break
+                    local cfg = deps.dotTypes[t + 1]
+                    local typeId = cfg.id
+                    if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
+                        goto __continue24
                     end
+                    local best = cfg:getBestFromUnit(source)
+                    if best == nil then
+                        goto __continue24
+                    end
+                    local amount = cfg:computeAmount(target, best)
+                    if amount <= 0 then
+                        goto __continue24
+                    end
+                    if deps.stateByType[typeId] == nil then
+                        deps.stateByType[typeId] = {}
+                    end
+                    local tab = deps.stateByType[typeId]
+                    local curRaw = deps:tabRowForHid(tab, tgtHid)
+                    local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
+                    if curRaw ~= nil and cur == nil then
+                        deps:tabDeleteHid(tab, tgtHid)
+                    end
+                    applyEquipmentDotOnHeroAttack(
+                        nil,
+                        typeId,
+                        cfg,
+                        tab,
+                        tgtHid,
+                        target,
+                        source,
+                        amount,
+                        best.duration,
+                        cur
+                    )
                 end
+                ::__continue24::
                 t = t + 1
             end
         end
@@ -246,85 +237,72 @@ function ____exports.createDotApplyStrategy(self, deps)
             local t = 0
             while t < #deps.dotTypes do
                 do
-                    local __continue36
-                    repeat
-                        local cfg = deps.dotTypes[t + 1]
-                        local typeId = cfg.id
-                        if deps.ignoredTargetByType[typeId] ~= nil and deps.ignoredTargetByType[typeId][tgtHid] == true then
-                            __TS__Delete(deps.ignoredTargetByType[typeId], tgtHid)
-                            __continue36 = true
-                            break
+                    local cfg = deps.dotTypes[t + 1]
+                    local typeId = cfg.id
+                    if deps.ignoredTargetByType[typeId] ~= nil and deps.ignoredTargetByType[typeId][tgtHid] == true then
+                        __TS__Delete(deps.ignoredTargetByType[typeId], tgtHid)
+                        goto __continue36
+                    end
+                    if suppressDotApplyForBatch then
+                        goto __continue36
+                    end
+                    if isAttackHitForDot then
+                        goto __continue36
+                    end
+                    if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
+                        goto __continue36
+                    end
+                    local best = cfg:getBestFromUnit(source)
+                    if best == nil then
+                        goto __continue36
+                    end
+                    if best.attackOnly == true or cfg.attackOnlyTrigger == true then
+                        if not isAttackHitForDot then
+                            goto __continue36
                         end
-                        if suppressDotApplyForBatch then
-                            __continue36 = true
-                            break
-                        end
-                        if isAttackHitForDot then
-                            __continue36 = true
-                            break
-                        end
-                        if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
-                            __continue36 = true
-                            break
-                        end
-                        local best = cfg:getBestFromUnit(source)
-                        if best == nil then
-                            __continue36 = true
-                            break
-                        end
-                        if best.attackOnly == true or cfg.attackOnlyTrigger == true then
-                            if not isAttackHitForDot then
-                                __continue36 = true
-                                break
-                            end
-                        end
-                        local amount = cfg:computeAmount(target, best)
-                        if amount <= 0 then
-                            __continue36 = true
-                            break
-                        end
-                        if deps.stateByType[typeId] == nil then
-                            deps.stateByType[typeId] = {}
-                        end
-                        local tab = deps.stateByType[typeId]
-                        local curRaw = deps:tabRowForHid(tab, tgtHid)
-                        local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
-                        if curRaw ~= nil and cur == nil then
-                            deps:tabDeleteHid(tab, tgtHid)
-                        end
-                        if isAttackHitForDot then
-                            applyEquipmentDotOnHeroAttack(
-                                nil,
-                                typeId,
-                                cfg,
-                                tab,
-                                tgtHid,
-                                target,
-                                source,
-                                amount,
-                                best.duration,
-                                cur
-                            )
-                        else
-                            applyEquipmentDotOnNonAttack(
-                                nil,
-                                typeId,
-                                cfg,
-                                tab,
-                                tgtHid,
-                                target,
-                                source,
-                                amount,
-                                best.duration,
-                                cur
-                            )
-                        end
-                        __continue36 = true
-                    until true
-                    if not __continue36 then
-                        break
+                    end
+                    local amount = cfg:computeAmount(target, best)
+                    if amount <= 0 then
+                        goto __continue36
+                    end
+                    if deps.stateByType[typeId] == nil then
+                        deps.stateByType[typeId] = {}
+                    end
+                    local tab = deps.stateByType[typeId]
+                    local curRaw = deps:tabRowForHid(tab, tgtHid)
+                    local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
+                    if curRaw ~= nil and cur == nil then
+                        deps:tabDeleteHid(tab, tgtHid)
+                    end
+                    if isAttackHitForDot then
+                        applyEquipmentDotOnHeroAttack(
+                            nil,
+                            typeId,
+                            cfg,
+                            tab,
+                            tgtHid,
+                            target,
+                            source,
+                            amount,
+                            best.duration,
+                            cur
+                        )
+                    else
+                        applyEquipmentDotOnNonAttack(
+                            nil,
+                            typeId,
+                            cfg,
+                            tab,
+                            tgtHid,
+                            target,
+                            source,
+                            amount,
+                            best.duration,
+                            cur
+                        )
                     end
                 end
+                ::__continue36::
                 t = t + 1
             end
         end

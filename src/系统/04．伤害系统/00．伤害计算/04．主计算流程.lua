@@ -116,21 +116,14 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied)
         local i = 0
         while i < #appliedFinalDamageListeners do
             do
-                local __continue5
-                repeat
-                    local cb = appliedFinalDamageListeners[i + 1]
-                    if cb == nil then
-                        __continue5 = true
-                        break
-                    end
-                    pcall(function () return cb(target, attacker, applied) end
-                    )
-                    __continue5 = true
-                until true
-                if not __continue5 then
-                    break
+                local cb = appliedFinalDamageListeners[i + 1]
+                if cb == nil then
+                    goto __continue5
                 end
+                pcall(function () return cb(target, attacker, applied) end
+                )
             end
+            ::__continue5::
             i = i + 1
         end
     end

@@ -11,5 +11,5 @@ ____exports.CONTROL_REDUCTION_CAP = 0.9
 -- value: 最大控制时间（秒）
 ____exports.BOSS_CONTROL_LIMITS = {N05U = 1}
 --- 不参与控制抗性的单位类型ID（字符串形式）
-____exports.EXCLUDED_UNIT_TYPES = {"e02A"}
+____exports.EXCLUDED_UNIT_TYPES = {"e02A", "bHun"}
 return ____exports

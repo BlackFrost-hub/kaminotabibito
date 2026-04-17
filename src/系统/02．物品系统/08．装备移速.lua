@@ -16,39 +16,30 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
         local slot = 0
         while slot <= 5 do
             do
-                local __continue8
-                repeat
-                    local item = jass.UnitItemInSlot(unit, slot)
-                    if not item then
-                        __continue8 = true
-                        break
-                    end
-                    if ignoreItem and item == ignoreItem then
-                        __continue8 = true
-                        break
-                    end
-                    local tid = jass.GetItemTypeId(item)
-                    local idStr = fourCCToString(nil, tid)
-                    local entry = itemsData[idStr]
-                    local typ = entry and entry.type
-                    if typ == "任务" or typ == "药剂" or typ == "食品" then
-                        __continue8 = true
-                        break
-                    end
-                    local v = entry and entry.movespeed2
-                    if type(v) == "number" and v > 0 then
-                        count = count + 1
-                    end
-                    if type(v) == "number" and v > max then
-                        max = v
-                        name = (entry and entry.name) ~= nil and __TS__StringTrim(tostring(entry.name)) or "" or "未知"
-                    end
-                    __continue8 = true
-                until true
-                if not __continue8 then
-                    break
+                local item = jass.UnitItemInSlot(unit, slot)
+                if not item then
+                    goto __continue8
+                end
+                if ignoreItem and item == ignoreItem then
+                    goto __continue8
+                end
+                local tid = jass.GetItemTypeId(item)
+                local idStr = fourCCToString(nil, tid)
+                local entry = itemsData[idStr]
+                local typ = entry and entry.type
+                if typ == "任务" or typ == "药剂" or typ == "食品" then
+                    goto __continue8
+                end
+                local v = entry and entry.movespeed2
+                if type(v) == "number" and v > 0 then
+                    count = count + 1
+                end
+                if type(v) == "number" and v > max then
+                    max = v
+                    name = (entry and entry.name) ~= nil and __TS__StringTrim(tostring(entry.name)) or "" or "未知"
                 end
             end
+            ::__continue8::
             slot = slot + 1
         end
     end

@@ -79,42 +79,28 @@ function ____exports.MultiboardSetItemStyleBJ(self, mb, col, row, showValue, sho
         local curRow = 1
         while curRow <= numRows do
             do
-                local __continue17
-                repeat
-                    if row ~= 0 and row ~= curRow then
-                        __continue17 = true
-                        break
-                    end
-                    do
-                        local curCol = 1
-                        while curCol <= numCols do
-                            do
-                                local __continue20
-                                repeat
-                                    if col ~= 0 and col ~= curCol then
-                                        __continue20 = true
-                                        break
-                                    end
-                                    local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
-                                    if item ~= nil then
-                                        jass.MultiboardSetItemStyle(item, showValue, showIcon)
-                                        jass.MultiboardReleaseItem(item)
-                                    end
-                                    __continue20 = true
-                                until true
-                                if not __continue20 then
-                                    break
-                                end
+                if row ~= 0 and row ~= curRow then
+                    goto __continue17
+                end
+                do
+                    local curCol = 1
+                    while curCol <= numCols do
+                        do
+                            if col ~= 0 and col ~= curCol then
+                                goto __continue20
                             end
-                            curCol = curCol + 1
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            if item ~= nil then
+                                jass.MultiboardSetItemStyle(item, showValue, showIcon)
+                                jass.MultiboardReleaseItem(item)
+                            end
                         end
+                        ::__continue20::
+                        curCol = curCol + 1
                     end
-                    __continue17 = true
-                until true
-                if not __continue17 then
-                    break
                 end
             end
+            ::__continue17::
             curRow = curRow + 1
         end
     end
@@ -130,42 +116,28 @@ function ____exports.MultiboardSetItemValueBJ(self, mb, col, row, val)
         local curRow = 1
         while curRow <= numRows do
             do
-                local __continue26
-                repeat
-                    if row ~= 0 and row ~= curRow then
-                        __continue26 = true
-                        break
-                    end
-                    do
-                        local curCol = 1
-                        while curCol <= numCols do
-                            do
-                                local __continue29
-                                repeat
-                                    if col ~= 0 and col ~= curCol then
-                                        __continue29 = true
-                                        break
-                                    end
-                                    local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
-                                    if item ~= nil then
-                                        jass.MultiboardSetItemValue(item, val)
-                                        jass.MultiboardReleaseItem(item)
-                                    end
-                                    __continue29 = true
-                                until true
-                                if not __continue29 then
-                                    break
-                                end
+                if row ~= 0 and row ~= curRow then
+                    goto __continue26
+                end
+                do
+                    local curCol = 1
+                    while curCol <= numCols do
+                        do
+                            if col ~= 0 and col ~= curCol then
+                                goto __continue29
                             end
-                            curCol = curCol + 1
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            if item ~= nil then
+                                jass.MultiboardSetItemValue(item, val)
+                                jass.MultiboardReleaseItem(item)
+                            end
                         end
+                        ::__continue29::
+                        curCol = curCol + 1
                     end
-                    __continue26 = true
-                until true
-                if not __continue26 then
-                    break
                 end
             end
+            ::__continue26::
             curRow = curRow + 1
         end
     end
@@ -181,48 +153,34 @@ function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, bl
         local curRow = 1
         while curRow <= numRows do
             do
-                local __continue35
-                repeat
-                    if row ~= 0 and row ~= curRow then
-                        __continue35 = true
-                        break
-                    end
-                    do
-                        local curCol = 1
-                        while curCol <= numCols do
-                            do
-                                local __continue38
-                                repeat
-                                    if col ~= 0 and col ~= curCol then
-                                        __continue38 = true
-                                        break
-                                    end
-                                    local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
-                                    if item ~= nil then
-                                        jass.MultiboardSetItemValueColor(
-                                            item,
-                                            PercentTo255(nil, red),
-                                            PercentTo255(nil, green),
-                                            PercentTo255(nil, blue),
-                                            PercentTo255(nil, 100 - transparency)
-                                        )
-                                        jass.MultiboardReleaseItem(item)
-                                    end
-                                    __continue38 = true
-                                until true
-                                if not __continue38 then
-                                    break
-                                end
+                if row ~= 0 and row ~= curRow then
+                    goto __continue35
+                end
+                do
+                    local curCol = 1
+                    while curCol <= numCols do
+                        do
+                            if col ~= 0 and col ~= curCol then
+                                goto __continue38
                             end
-                            curCol = curCol + 1
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            if item ~= nil then
+                                jass.MultiboardSetItemValueColor(
+                                    item,
+                                    PercentTo255(nil, red),
+                                    PercentTo255(nil, green),
+                                    PercentTo255(nil, blue),
+                                    PercentTo255(nil, 100 - transparency)
+                                )
+                                jass.MultiboardReleaseItem(item)
+                            end
                         end
+                        ::__continue38::
+                        curCol = curCol + 1
                     end
-                    __continue35 = true
-                until true
-                if not __continue35 then
-                    break
                 end
             end
+            ::__continue35::
             curRow = curRow + 1
         end
     end
@@ -238,42 +196,28 @@ function ____exports.MultiboardSetItemWidthBJ(self, mb, col, row, width)
         local curRow = 1
         while curRow <= numRows do
             do
-                local __continue44
-                repeat
-                    if row ~= 0 and row ~= curRow then
-                        __continue44 = true
-                        break
-                    end
-                    do
-                        local curCol = 1
-                        while curCol <= numCols do
-                            do
-                                local __continue47
-                                repeat
-                                    if col ~= 0 and col ~= curCol then
-                                        __continue47 = true
-                                        break
-                                    end
-                                    local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
-                                    if item ~= nil then
-                                        jass.MultiboardSetItemWidth(item, width / 100)
-                                        jass.MultiboardReleaseItem(item)
-                                    end
-                                    __continue47 = true
-                                until true
-                                if not __continue47 then
-                                    break
-                                end
+                if row ~= 0 and row ~= curRow then
+                    goto __continue44
+                end
+                do
+                    local curCol = 1
+                    while curCol <= numCols do
+                        do
+                            if col ~= 0 and col ~= curCol then
+                                goto __continue47
                             end
-                            curCol = curCol + 1
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            if item ~= nil then
+                                jass.MultiboardSetItemWidth(item, width / 100)
+                                jass.MultiboardReleaseItem(item)
+                            end
                         end
+                        ::__continue47::
+                        curCol = curCol + 1
                     end
-                    __continue44 = true
-                until true
-                if not __continue44 then
-                    break
                 end
             end
+            ::__continue44::
             curRow = curRow + 1
         end
     end
@@ -289,42 +233,28 @@ function ____exports.MultiboardSetItemIconBJ(self, mb, col, row, iconFileName)
         local curRow = 1
         while curRow <= numRows do
             do
-                local __continue53
-                repeat
-                    if row ~= 0 and row ~= curRow then
-                        __continue53 = true
-                        break
-                    end
-                    do
-                        local curCol = 1
-                        while curCol <= numCols do
-                            do
-                                local __continue56
-                                repeat
-                                    if col ~= 0 and col ~= curCol then
-                                        __continue56 = true
-                                        break
-                                    end
-                                    local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
-                                    if item ~= nil then
-                                        jass.MultiboardSetItemIcon(item, iconFileName)
-                                        jass.MultiboardReleaseItem(item)
-                                    end
-                                    __continue56 = true
-                                until true
-                                if not __continue56 then
-                                    break
-                                end
+                if row ~= 0 and row ~= curRow then
+                    goto __continue53
+                end
+                do
+                    local curCol = 1
+                    while curCol <= numCols do
+                        do
+                            if col ~= 0 and col ~= curCol then
+                                goto __continue56
                             end
-                            curCol = curCol + 1
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            if item ~= nil then
+                                jass.MultiboardSetItemIcon(item, iconFileName)
+                                jass.MultiboardReleaseItem(item)
+                            end
                         end
+                        ::__continue56::
+                        curCol = curCol + 1
                     end
-                    __continue53 = true
-                until true
-                if not __continue53 then
-                    break
                 end
             end
+            ::__continue53::
             curRow = curRow + 1
         end
     end

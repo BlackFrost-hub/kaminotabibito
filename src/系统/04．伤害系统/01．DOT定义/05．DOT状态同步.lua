@@ -19,79 +19,63 @@ function ____exports.createDotStateSync(self, deps)
         end
         for typeId in pairs(deps.stateByType) do
             do
-                local __continue6
-                repeat
-                    local tab = deps.stateByType[typeId]
-                    if tab == nil then
-                        __continue6 = true
-                        break
-                    end
-                    local buffID = map[typeId]
-                    if buffID == nil or buffID == "" then
-                        __continue6 = true
-                        break
-                    end
-                    local hids = collectHidsInTab(nil, tab)
-                    do
-                        local hi = 0
-                        while hi < #hids do
-                            do
-                                local __continue10
-                                repeat
-                                    local kn = hids[hi + 1]
-                                    local v = tabRowForHid(nil, tab, kn)
-                                    if v == nil or not isValidDotStateRow(nil, v) then
-                                        tabDeleteHid(nil, tab, kn)
-                                        __continue10 = true
-                                        break
-                                    end
-                                    local rt = buffM:getBuffRuntimeByHid(kn, buffID)
-                                    if rt == nil or rt.remaining <= 0 then
-                                        local cfg = __TS__ArrayFind(
-                                            deps.dotTypes,
-                                            function(____, c) return c.id == typeId end
-                                        )
-                                        if cfg ~= nil and type(cfg.onEnd) == "function" then
-                                            local uref = v._dotUnitRef
-                                            local ____self_1 = cfg
-                                            local ____self_1_onEnd_2 = ____self_1.onEnd
-                                            local ____temp_0
-                                            if uref ~= nil then
-                                                ____temp_0 = uref
-                                            else
-                                                ____temp_0 = kn
-                                            end
-                                            ____self_1_onEnd_2(____self_1, ____temp_0, v)
-                                        end
-                                        deps:notifyBuffPool(typeId, kn, nil)
-                                        tabDeleteHid(nil, tab, kn)
-                                        deps:removeDotTicksForTargetHid(typeId, kn)
-                                        __continue10 = true
-                                        break
-                                    end
-                                    v.remaining = rt.remaining
-                                    v.effect = rt.effect
-                                    if rt.sourceName ~= nil then
-                                        v.sourceName = rt.sourceName
-                                    end
-                                    if rt._dotParsedDuration ~= nil then
-                                        v._dotParsedDuration = rt._dotParsedDuration
-                                    end
-                                    __continue10 = true
-                                until true
-                                if not __continue10 then
-                                    break
-                                end
+                local tab = deps.stateByType[typeId]
+                if tab == nil then
+                    goto __continue6
+                end
+                local buffID = map[typeId]
+                if buffID == nil or buffID == "" then
+                    goto __continue6
+                end
+                local hids = collectHidsInTab(nil, tab)
+                do
+                    local hi = 0
+                    while hi < #hids do
+                        do
+                            local kn = hids[hi + 1]
+                            local v = tabRowForHid(nil, tab, kn)
+                            if v == nil or not isValidDotStateRow(nil, v) then
+                                tabDeleteHid(nil, tab, kn)
+                                goto __continue10
                             end
-                            hi = hi + 1
+                            local rt = buffM:getBuffRuntimeByHid(kn, buffID)
+                            if rt == nil or rt.remaining <= 0 then
+                                local cfg = __TS__ArrayFind(
+                                    deps.dotTypes,
+                                    function(____, c) return c.id == typeId end
+                                )
+                                if cfg ~= nil and type(cfg.onEnd) == "function" then
+                                    local uref = v._dotUnitRef
+                                    local ____self_1 = cfg
+                                    local ____self_1_onEnd_2 = ____self_1.onEnd
+                                    local ____temp_0
+                                    if uref ~= nil then
+                                        ____temp_0 = uref
+                                    else
+                                        ____temp_0 = kn
+                                    end
+                                    ____self_1_onEnd_2(____self_1, ____temp_0, v)
+                                end
+                                deps:notifyBuffPool(typeId, kn, nil)
+                                tabDeleteHid(nil, tab, kn)
+                                deps:removeDotTicksForTargetHid(typeId, kn)
+                                goto __continue10
+                            end
+                            v.remaining = rt.remaining
+                            v.effect = rt.effect
+                            if rt.sourceName ~= nil then
+                                v.sourceName = rt.sourceName
+                            end
+                            if rt._dotParsedDuration ~= nil then
+                                v._dotParsedDuration = rt._dotParsedDuration
+                            end
                         end
+                        ::__continue10::
+                        hi = hi + 1
                     end
-                    __continue6 = true
-                until true
-                if not __continue6 then
-                    break
                 end
             end
+            ::__continue6::
         end
     end
     local function clearDotByBuffPoolExpire(self, buffID, hid)

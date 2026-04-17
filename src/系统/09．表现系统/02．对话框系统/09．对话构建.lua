@@ -57,25 +57,17 @@ local function grantQuestItems(self, hero, questItems)
     local items = __TS__StringSplit(questItems, "|")
     for ____, raw in ipairs(items) do
         do
-            local __continue9
-            repeat
-                local itemCode = __TS__StringTrim(raw)
-                if #itemCode ~= 4 then
-                    __continue9 = true
-                    break
-                end
-                local itemId = calculateFourCC(nil, itemCode)
-                if itemId == 0 then
-                    __continue9 = true
-                    break
-                end
-                jass.UnitAddItemById(hero, itemId)
-                __continue9 = true
-            until true
-            if not __continue9 then
-                break
+            local itemCode = __TS__StringTrim(raw)
+            if #itemCode ~= 4 then
+                goto __continue9
             end
+            local itemId = calculateFourCC(nil, itemCode)
+            if itemId == 0 then
+                goto __continue9
+            end
+            jass.UnitAddItemById(hero, itemId)
         end
+        ::__continue9::
     end
 end
 local function canAcceptQuestByRequirements(self, quest, hero)
@@ -158,27 +150,19 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
     end
     for ____, part in ipairs(parts) do
         do
-            local __continue34
-            repeat
-                local trimmed = __TS__StringTrim(part)
-                if not trimmed then
-                    __continue34 = true
-                    break
-                end
-                local withoutOrder = trimOrderedPrefix(nil, trimmed)
-                local parsed = tryParseSpeakerLine(nil, withoutOrder)
-                if parsed then
-                    lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
-                    __continue34 = true
-                    break
-                end
-                lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
-                __continue34 = true
-            until true
-            if not __continue34 then
-                break
+            local trimmed = __TS__StringTrim(part)
+            if not trimmed then
+                goto __continue34
             end
+            local withoutOrder = trimOrderedPrefix(nil, trimmed)
+            local parsed = tryParseSpeakerLine(nil, withoutOrder)
+            if parsed then
+                lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
+                goto __continue34
+            end
+            lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
         end
+        ::__continue34::
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end

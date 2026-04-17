@@ -36,48 +36,39 @@ local function runRegionRule(self, rule, unit, owner)
     local totalWeight = 0
     for ____, raw in ipairs(parts) do
         do
-            local __continue7
-            repeat
-                local s = __TS__StringTrim(raw)
-                if not s then
-                    __continue7 = true
-                    break
-                end
-                local percentIdx = (string.find(s, "%", nil, true) or 0) - 1
-                if percentIdx <= 0 then
-                    __continue7 = true
-                    break
-                end
-                local weightStr = __TS__StringTrim(__TS__StringSubstring(s, 0, percentIdx))
-                local rest = __TS__StringTrim(__TS__StringSubstring(s, percentIdx + 1))
-                local weight = __TS__Number(weightStr)
-                if not weight or not __TS__NumberIsFinite(__TS__Number(weight)) or weight <= 0 then
-                    __continue7 = true
-                    break
-                end
-                local colonIdx = (string.find(rest, ":", nil, true) or 0) - 1
-                local actionName = __TS__StringTrim(colonIdx >= 0 and __TS__StringSubstring(rest, 0, colonIdx) or rest)
-                local param = colonIdx >= 0 and __TS__StringTrim(__TS__StringSubstring(rest, colonIdx + 1)) or ""
-                if actionName == "KillUnit" then
-                    items[#items + 1] = {weight = weight, action = "KillUnit", text = param}
-                    totalWeight = totalWeight + weight
-                elseif actionName == "传送" or string.lower(actionName) == "teleport" then
-                    local coords = __TS__StringSplit(param, ",")
-                    if #coords >= 2 then
-                        local x = __TS__Number(coords[1])
-                        local y = __TS__Number(coords[2])
-                        if __TS__NumberIsFinite(__TS__Number(x)) and __TS__NumberIsFinite(__TS__Number(y)) then
-                            items[#items + 1] = {weight = weight, action = "Teleport", x = x, y = y}
-                            totalWeight = totalWeight + weight
-                        end
+            local s = __TS__StringTrim(raw)
+            if not s then
+                goto __continue7
+            end
+            local percentIdx = (string.find(s, "%", nil, true) or 0) - 1
+            if percentIdx <= 0 then
+                goto __continue7
+            end
+            local weightStr = __TS__StringTrim(__TS__StringSubstring(s, 0, percentIdx))
+            local rest = __TS__StringTrim(__TS__StringSubstring(s, percentIdx + 1))
+            local weight = __TS__Number(weightStr)
+            if not weight or not __TS__NumberIsFinite(__TS__Number(weight)) or weight <= 0 then
+                goto __continue7
+            end
+            local colonIdx = (string.find(rest, ":", nil, true) or 0) - 1
+            local actionName = __TS__StringTrim(colonIdx >= 0 and __TS__StringSubstring(rest, 0, colonIdx) or rest)
+            local param = colonIdx >= 0 and __TS__StringTrim(__TS__StringSubstring(rest, colonIdx + 1)) or ""
+            if actionName == "KillUnit" then
+                items[#items + 1] = {weight = weight, action = "KillUnit", text = param}
+                totalWeight = totalWeight + weight
+            elseif actionName == "传送" or string.lower(actionName) == "teleport" then
+                local coords = __TS__StringSplit(param, ",")
+                if #coords >= 2 then
+                    local x = __TS__Number(coords[1])
+                    local y = __TS__Number(coords[2])
+                    if __TS__NumberIsFinite(__TS__Number(x)) and __TS__NumberIsFinite(__TS__Number(y)) then
+                        items[#items + 1] = {weight = weight, action = "Teleport", x = x, y = y}
+                        totalWeight = totalWeight + weight
                     end
                 end
-                __continue7 = true
-            until true
-            if not __continue7 then
-                break
             end
         end
+        ::__continue7::
     end
     if #items == 0 or totalWeight <= 0 then
         return
@@ -169,36 +160,27 @@ local function initRegionTeleport(self)
     end
     for k in pairs(_____533A_57DF_4F20_9001_914D_7F6E) do
         do
-            local __continue38
-            repeat
-                local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
-                if cfg == nil or not cfg.enabled then
-                    __continue38 = true
-                    break
-                end
-                if type(jass.CreateRegion) ~= "function" then
-                    __continue38 = true
-                    break
-                end
-                local region = jass.CreateRegion()
-                if type(jass.Rect) ~= "function" then
-                    __continue38 = true
-                    break
-                end
-                local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
-                if type(jass.RegionAddRect) == "function" then
-                    jass.RegionAddRect(region, rect)
-                end
-                if type(jass.TriggerRegisterEnterRegion) == "function" then
-                    jass.TriggerRegisterEnterRegion(trig, region, nil)
-                end
-                regionMap:set(region, cfg)
-                __continue38 = true
-            until true
-            if not __continue38 then
-                break
+            local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
+            if cfg == nil or not cfg.enabled then
+                goto __continue38
             end
+            if type(jass.CreateRegion) ~= "function" then
+                goto __continue38
+            end
+            local region = jass.CreateRegion()
+            if type(jass.Rect) ~= "function" then
+                goto __continue38
+            end
+            local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
+            if type(jass.RegionAddRect) == "function" then
+                jass.RegionAddRect(region, rect)
+            end
+            if type(jass.TriggerRegisterEnterRegion) == "function" then
+                jass.TriggerRegisterEnterRegion(trig, region, nil)
+            end
+            regionMap:set(region, cfg)
         end
+        ::__continue38::
     end
     local function onEnter()
         local ____temp_2

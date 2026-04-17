@@ -276,7 +276,7 @@ function ObjEditingUnitBase:setAttack1WeaponType(level, value) end
 ---@class UnitDefinition: ObjEditingUnitBase
 UnitDefinition = {}
 
----@param newId string 4 字符新单位原始 ID，例如 `'bSun'`
+---@param newId string 4 字符新单位原始 ID，例如 `'bHun'`
 ---@param baseId string 4 字符母单位原始 ID，例如 `'ewsp'`
 ---@return UnitDefinition
 function UnitDefinition:new(newId, baseId) end

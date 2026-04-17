@@ -15,27 +15,19 @@ function getItemsByScoreRange(self, minScore, maxScore)
     local result = {}
     for id in pairs(itemsData) do
         do
-            local __continue83
-            repeat
-                if type(id) ~= "string" or #id ~= 4 then
-                    __continue83 = true
-                    break
-                end
-                local entry = itemsData[id]
-                local score = entry and entry.score
-                if type(score) ~= "number" then
-                    __continue83 = true
-                    break
-                end
-                if score >= minScore and score <= maxScore then
-                    result[#result + 1] = id
-                end
-                __continue83 = true
-            until true
-            if not __continue83 then
-                break
+            if type(id) ~= "string" or #id ~= 4 then
+                goto __continue83
+            end
+            local entry = itemsData[id]
+            local score = entry and entry.score
+            if type(score) ~= "number" then
+                goto __continue83
+            end
+            if score >= minScore and score <= maxScore then
+                result[#result + 1] = id
             end
         end
+        ::__continue83::
     end
     return result
 end
@@ -101,38 +93,31 @@ local function parseItemPool(self, itemIdsStr)
     if hasColon then
         for ____, p in ipairs(parts) do
             do
-                local __continue16
-                repeat
-                    local colon = (string.find(p, ":", nil, true) or 0) - 1
-                    if colon < 0 then
-                        __continue16 = true
-                        break
-                    end
-                    local id = __TS__StringTrim(__TS__StringSubstring(p, 0, colon))
-                    local w = 0
-                    local always = false
-                    local rest = string.lower(__TS__StringTrim(__TS__StringSubstring(p, colon + 1)))
-                    if rest == "always" then
-                        w = 1
-                        always = true
-                    elseif (string.find(rest, "%", nil, true) or 0) - 1 >= 0 then
-                        w = __TS__ParseFloat(rest) / 100
-                    else
-                        w = __TS__ParseFloat(rest)
-                    end
-                    if #id >= 4 then
-                        pool[#pool + 1] = {
-                            id = __TS__StringSubstring(id, 0, 4),
-                            weight = w,
-                            always = always
-                        }
-                    end
-                    __continue16 = true
-                until true
-                if not __continue16 then
-                    break
+                local colon = (string.find(p, ":", nil, true) or 0) - 1
+                if colon < 0 then
+                    goto __continue16
+                end
+                local id = __TS__StringTrim(__TS__StringSubstring(p, 0, colon))
+                local w = 0
+                local always = false
+                local rest = string.lower(__TS__StringTrim(__TS__StringSubstring(p, colon + 1)))
+                if rest == "always" then
+                    w = 1
+                    always = true
+                elseif (string.find(rest, "%", nil, true) or 0) - 1 >= 0 then
+                    w = __TS__ParseFloat(rest) / 100
+                else
+                    w = __TS__ParseFloat(rest)
+                end
+                if #id >= 4 then
+                    pool[#pool + 1] = {
+                        id = __TS__StringSubstring(id, 0, 4),
+                        weight = w,
+                        always = always
+                    }
                 end
             end
+            ::__continue16::
         end
     else
         for ____, p in ipairs(parts) do
@@ -369,33 +354,25 @@ local function onUnitDeath(self, unit, _killer)
     local DROP_RULES = {{unitId = "hfoo", minScore = 150, maxScore = 250, proc = 1}}
     for ____, rule in ipairs(DROP_RULES) do
         do
-            local __continue76
-            repeat
-                if typeId ~= stringToFourCC(nil, rule.unitId) then
-                    __continue76 = true
-                    break
-                end
-                local r = math.random(1, 10000)
-                if r > rule.proc * 10000 then
-                    __continue76 = true
-                    break
-                end
-                local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
-                if #list == 0 then
-                    __continue76 = true
-                    break
-                end
-                local idx = math.random(1, #list)
-                local itemId = list[idx]
-                if itemId ~= nil and itemId ~= "" then
-                    createItemAtUnit(nil, unit, itemId)
-                end
-                break
-            until true
-            if not __continue76 then
-                break
+            if typeId ~= stringToFourCC(nil, rule.unitId) then
+                goto __continue76
             end
+            local r = math.random(1, 10000)
+            if r > rule.proc * 10000 then
+                goto __continue76
+            end
+            local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
+            if #list == 0 then
+                goto __continue76
+            end
+            local idx = math.random(1, #list)
+            local itemId = list[idx]
+            if itemId ~= nil and itemId ~= "" then
+                createItemAtUnit(nil, unit, itemId)
+            end
+            break
         end
+        ::__continue76::
     end
 end
 registerDeathListener(nil, onUnitDeath)

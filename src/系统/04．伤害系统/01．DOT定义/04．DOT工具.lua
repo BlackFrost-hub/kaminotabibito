@@ -51,25 +51,17 @@ function ____exports.collectHidsInTab(self, tab)
     local out = {}
     for k in pairs(tab) do
         do
-            local __continue13
-            repeat
-                local kn = type(k) == "number" and k or __TS__ParseInt(k, 10)
-                if __TS__NumberIsNaN(__TS__Number(kn)) or kn == 0 then
-                    __continue13 = true
-                    break
-                end
-                if seen[kn] then
-                    __continue13 = true
-                    break
-                end
-                seen[kn] = true
-                out[#out + 1] = kn
-                __continue13 = true
-            until true
-            if not __continue13 then
-                break
+            local kn = type(k) == "number" and k or __TS__ParseInt(k, 10)
+            if __TS__NumberIsNaN(__TS__Number(kn)) or kn == 0 then
+                goto __continue13
             end
+            if seen[kn] then
+                goto __continue13
+            end
+            seen[kn] = true
+            out[#out + 1] = kn
         end
+        ::__continue13::
     end
     return out
 end

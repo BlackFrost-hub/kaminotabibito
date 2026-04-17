@@ -17,51 +17,53 @@ local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_0.registerManualBuff
+local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
+local calcReducedControlDuration = ____require_result_1.calcReducedControlDuration
 local function sym(self, name)
-    local ____G_name_2 = _G[name]
-    if ____G_name_2 == nil then
-        local ____jglobals_1
+    local ____G_name_3 = _G[name]
+    if ____G_name_3 == nil then
+        local ____jglobals_2
         if jglobals then
-            ____jglobals_1 = jglobals[name]
+            ____jglobals_2 = jglobals[name]
         else
-            ____jglobals_1 = nil
+            ____jglobals_2 = nil
         end
-        ____G_name_2 = ____jglobals_1
+        ____G_name_3 = ____jglobals_2
     end
-    local ____G_name_2_4 = ____G_name_2
-    if ____G_name_2_4 == nil then
-        local ____jass_3
+    local ____G_name_3_5 = ____G_name_3
+    if ____G_name_3_5 == nil then
+        local ____jass_4
         if jass then
-            ____jass_3 = jass[name]
+            ____jass_4 = jass[name]
         else
-            ____jass_3 = nil
+            ____jass_4 = nil
         end
-        ____G_name_2_4 = ____jass_3
+        ____G_name_3_5 = ____jass_4
     end
-    return ____G_name_2_4
+    return ____G_name_3_5
 end
 local function getYDHT(self)
-    local ____sym_result_5 = sym(nil, "StarBaseHT")
-    if ____sym_result_5 == nil then
-        ____sym_result_5 = sym(nil, "YDHASH_HANDLE")
+    local ____sym_result_6 = sym(nil, "StarBaseHT")
+    if ____sym_result_6 == nil then
+        ____sym_result_6 = sym(nil, "YDHASH_HANDLE")
     end
-    local ____sym_result_5_6 = ____sym_result_5
-    if ____sym_result_5_6 == nil then
-        ____sym_result_5_6 = sym(nil, "YDHT")
+    local ____sym_result_6_7 = ____sym_result_6
+    if ____sym_result_6_7 == nil then
+        ____sym_result_6_7 = sym(nil, "YDHT")
     end
-    local ____sym_result_5_6_7 = ____sym_result_5_6
-    if ____sym_result_5_6_7 == nil then
-        ____sym_result_5_6_7 = sym(nil, "udg_YDHASH_HANDLE")
+    local ____sym_result_6_7_8 = ____sym_result_6_7
+    if ____sym_result_6_7_8 == nil then
+        ____sym_result_6_7_8 = sym(nil, "udg_YDHASH_HANDLE")
     end
-    local ____sym_result_5_6_7_8 = ____sym_result_5_6_7
-    if ____sym_result_5_6_7_8 == nil then
-        ____sym_result_5_6_7_8 = sym(nil, "udg_YDHT")
+    local ____sym_result_6_7_8_9 = ____sym_result_6_7_8
+    if ____sym_result_6_7_8_9 == nil then
+        ____sym_result_6_7_8_9 = sym(nil, "udg_YDHT")
     end
-    return ____sym_result_5_6_7_8
+    return ____sym_result_6_7_8_9
 end
 local YDHT = getYDHT(nil)
 ____exports.SFB_Unit = nil
-local SFB_UNIT_ID = 1649636718
+local SFB_UNIT_ID = 1648915822
 local ABILITY = {
     STUN = 1095975472,
     FREEZE = 1095975476,
@@ -99,6 +101,9 @@ local function getUnitSourceName(self, sourceUnit)
     end
     local n = jass.GetUnitName(sourceUnit)
     return type(n) == "string" and n ~= "" and n or ""
+end
+local function shouldApplyControlReduction(self, id)
+    return id == 0 or id == 1 or id == 2 or id == 5
 end
 local function getAngleBetweenUnits(self, u, tu)
     return jass.Atan2(
@@ -144,6 +149,12 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
         return
     end
     local sourceName = getUnitSourceName(nil, sourceUnit)
+    if shouldApplyControlReduction(nil, id) then
+        time = calcReducedControlDuration(nil, u, time)
+        if time <= 0 then
+            return
+        end
+    end
     if id >= 21 then
         local buffID = SFB_BUFF_ID[id]
         if buffID ~= nil and buffID ~= "" then
@@ -237,21 +248,21 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
     local abilityId
     local orderStr
     repeat
-        local ____switch24 = id
-        local ____cond24 = ____switch24 == 0
-        if ____cond24 then
+        local ____switch27 = id
+        local ____cond27 = ____switch27 == 0
+        if ____cond27 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 1
-        if ____cond24 then
+        ____cond27 = ____cond27 or ____switch27 == 1
+        if ____cond27 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 2
-        if ____cond24 then
+        ____cond27 = ____cond27 or ____switch27 == 2
+        if ____cond27 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -264,20 +275,20 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
             )
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 3
-        if ____cond24 then
+        ____cond27 = ____cond27 or ____switch27 == 3
+        if ____cond27 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 4
-        if ____cond24 then
+        ____cond27 = ____cond27 or ____switch27 == 4
+        if ____cond27 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 5
-        if ____cond24 then
+        ____cond27 = ____cond27 or ____switch27 == 5
+        if ____cond27 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(

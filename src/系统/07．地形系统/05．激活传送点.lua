@@ -275,21 +275,14 @@ local function initActivationPointsInternal(self)
     local count = 0
     for key in pairs(_____6FC0_6D3B_4F20_9001_70B9_914D_7F6E) do
         do
-            local __continue53
-            repeat
-                local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
-                if not cfg or cfg.enabled == false then
-                    __continue53 = true
-                    break
-                end
-                registerOnePoint(nil, cfg, key)
-                count = count + 1
-                __continue53 = true
-            until true
-            if not __continue53 then
-                break
+            local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
+            if not cfg or cfg.enabled == false then
+                goto __continue53
             end
+            registerOnePoint(nil, cfg, key)
+            count = count + 1
         end
+        ::__continue53::
     end
     dbg(
         nil,

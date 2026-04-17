@@ -438,25 +438,17 @@ function onRefresh(self)
         local i = 0
         while i < DISPLAY_PLAYER_COUNT do
             do
-                local __continue27
-                repeat
-                    local mb = multiboards[i + 1]
-                    if mb == nil then
-                        __continue27 = true
-                        break
-                    end
-                    if not jass.IsMultiboardDisplayed(mb) then
-                        __continue27 = true
-                        break
-                    end
-                    updatePlayerSpeed(nil, i + 1)
-                    updateMultiboard(nil, mb, i + 1)
-                    __continue27 = true
-                until true
-                if not __continue27 then
-                    break
+                local mb = multiboards[i + 1]
+                if mb == nil then
+                    goto __continue27
                 end
+                if not jass.IsMultiboardDisplayed(mb) then
+                    goto __continue27
+                end
+                updatePlayerSpeed(nil, i + 1)
+                updateMultiboard(nil, mb, i + 1)
             end
+            ::__continue27::
             i = i + 1
         end
     end

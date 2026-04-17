@@ -18,6 +18,9 @@ import { GS_Suspend } from "./03．硬直暂停系统";
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
+const { calcReducedControlDuration } = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算") as {
+  calcReducedControlDuration: (target: any, originalDuration: number) => number;
+};
 
 function sym(name: string): any {
   return (globalThis as any)[name]
@@ -37,7 +40,7 @@ const YDHT = getYDHT();
 
 export let SFB_Unit: any = null;
 
-const SFB_UNIT_ID = 0x6253756E;
+const SFB_UNIT_ID = 0x6248756E;
 
 const ABILITY = {
   STUN: 0x41534230,
@@ -77,6 +80,10 @@ function getUnitSourceName(sourceUnit: any): string {
   return typeof n === "string" && n !== "" ? n : "";
 }
 
+function shouldApplyControlReduction(id: number): boolean {
+  return id === 0 || id === 1 || id === 2 || id === 5;
+}
+
 function getAngleBetweenUnits(u: any, tu: any): number {
   return jass.Atan2(
     jass.GetUnitY(tu) - jass.GetUnitY(u),
@@ -114,6 +121,11 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
   if (time <= 0) return;
 
   const sourceName = getUnitSourceName(sourceUnit);
+
+  if (shouldApplyControlReduction(id)) {
+    time = calcReducedControlDuration(u, time);
+    if (time <= 0) return;
+  }
 
   if (id >= 21) {
     const buffID = SFB_BUFF_ID[id];

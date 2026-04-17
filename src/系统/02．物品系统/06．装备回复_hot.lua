@@ -20,37 +20,30 @@ function ____exports.parseEquipHealSegments(self, hotStr, abilList)
         local i = 0
         while i < #segments do
             do
-                local __continue5
-                repeat
-                    local seg = __TS__StringTrim(segments[i + 1])
-                    if seg == "" then
-                        __continue5 = true
-                        break
-                    end
-                    local tokens = __TS__ArrayFilter(
-                        __TS__ArrayMap(
-                            __TS__StringSplit(seg, ";"),
-                            function(____, x) return __TS__StringTrim(x) end
-                        ),
-                        function(____, x) return x ~= "" end
-                    )
-                    local waitSec = 0
-                    for ____, t in ipairs(tokens) do
-                        local waitIdx = (string.find(t, ":wait", nil, true) or 0) - 1
-                        if waitIdx >= 0 then
-                            local w = __TS__ParseFloat(__TS__StringSubstring(t, waitIdx + 5)) or 0
-                            if w > waitSec then
-                                waitSec = w
-                            end
+                local seg = __TS__StringTrim(segments[i + 1])
+                if seg == "" then
+                    goto __continue5
+                end
+                local tokens = __TS__ArrayFilter(
+                    __TS__ArrayMap(
+                        __TS__StringSplit(seg, ";"),
+                        function(____, x) return __TS__StringTrim(x) end
+                    ),
+                    function(____, x) return x ~= "" end
+                )
+                local waitSec = 0
+                for ____, t in ipairs(tokens) do
+                    local waitIdx = (string.find(t, ":wait", nil, true) or 0) - 1
+                    if waitIdx >= 0 then
+                        local w = __TS__ParseFloat(__TS__StringSubstring(t, waitIdx + 5)) or 0
+                        if w > waitSec then
+                            waitSec = w
                         end
                     end
-                    result[#result + 1] = {tokens = tokens, abilId = abilIds[i + 1] or "", waitSec = waitSec}
-                    __continue5 = true
-                until true
-                if not __continue5 then
-                    break
                 end
+                result[#result + 1] = {tokens = tokens, abilId = abilIds[i + 1] or "", waitSec = waitSec}
             end
+            ::__continue5::
             i = i + 1
         end
     end
@@ -122,22 +115,15 @@ function ____exports.sumHealFromItemData(self, unit, item, itemsData, fourCCToSt
         local i = 0
         while i < #segments do
             do
-                local __continue30
-                repeat
-                    local seg = segments[i + 1]
-                    if seg.abilId == "" then
-                        __continue30 = true
-                        break
-                    end
-                    local c = ____exports.calcEquipHealHpMp(nil, seg.tokens, unit)
-                    hp = hp + c.hp
-                    mp = mp + c.mp
-                    __continue30 = true
-                until true
-                if not __continue30 then
-                    break
+                local seg = segments[i + 1]
+                if seg.abilId == "" then
+                    goto __continue30
                 end
+                local c = ____exports.calcEquipHealHpMp(nil, seg.tokens, unit)
+                hp = hp + c.hp
+                mp = mp + c.mp
             end
+            ::__continue30::
             i = i + 1
         end
     end

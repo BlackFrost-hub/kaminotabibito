@@ -83,61 +83,45 @@ end
 function tickBuffPool(self)
     for hidKey in pairs(unitToBuffs) do
         do
-            local __continue60
-            repeat
-                local hid = toHid(nil, hidKey)
-                if hid == 0 then
-                    __continue60 = true
-                    break
-                end
-                local entry = unitToBuffs[hid]
-                if entry == nil then
-                    __continue60 = true
-                    break
-                end
-                if isBuffPoolUnitPaused(nil, entry.lastRef) then
-                    __continue60 = true
-                    break
-                end
-                local tab = entry.buffs
-                local expired = {}
-                for bid in pairs(tab) do
-                    do
-                        local __continue64
-                        repeat
-                            local row = tab[bid]
-                            if row == nil then
-                                __continue64 = true
-                                break
-                            end
-                            row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
-                            if row.remaining <= 0 then
-                                if row.source == "dot" then
-                                    notifyDotBuffExpiredFromPool(nil, bid, hid)
-                                end
-                                expired[#expired + 1] = bid
-                            end
-                            __continue64 = true
-                        until true
-                        if not __continue64 then
-                            break
-                        end
-                    end
-                end
-                do
-                    local ei = 0
-                    while ei < #expired do
-                        __TS__Delete(tab, expired[ei + 1])
-                        ei = ei + 1
-                    end
-                end
-                pruneEmptyHid(nil, hid)
-                __continue60 = true
-            until true
-            if not __continue60 then
-                break
+            local hid = toHid(nil, hidKey)
+            if hid == 0 then
+                goto __continue60
             end
+            local entry = unitToBuffs[hid]
+            if entry == nil then
+                goto __continue60
+            end
+            if isBuffPoolUnitPaused(nil, entry.lastRef) then
+                goto __continue60
+            end
+            local tab = entry.buffs
+            local expired = {}
+            for bid in pairs(tab) do
+                do
+                    local row = tab[bid]
+                    if row == nil then
+                        goto __continue64
+                    end
+                    row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
+                    if row.remaining <= 0 then
+                        if row.source == "dot" then
+                            notifyDotBuffExpiredFromPool(nil, bid, hid)
+                        end
+                        expired[#expired + 1] = bid
+                    end
+                end
+                ::__continue64::
+            end
+            do
+                local ei = 0
+                while ei < #expired do
+                    __TS__Delete(tab, expired[ei + 1])
+                    ei = ei + 1
+                end
+            end
+            pruneEmptyHid(nil, hid)
         end
+        ::__continue60::
     end
     syncDotFromPoolTick(nil)
     maybeStopSyncTimer(nil)

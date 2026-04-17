@@ -94,29 +94,22 @@ function processTemplate(self, template, unit, skillLevel)
     local i = 0
     while i < #template do
         do
-            local __continue27
-            repeat
-                if __TS__StringAccess(template, i) == BRACKET_LEFT_EN or __TS__StringAccess(template, i) == BRACKET_LEFT_CN then
-                    local isOpenBracket = __TS__StringAccess(template, i) == BRACKET_LEFT_EN
-                    local closeBracket = isOpenBracket and BRACKET_RIGHT_EN or BRACKET_RIGHT_CN
-                    local endIdx = indexOfChar(nil, template, closeBracket, i + 1)
-                    if endIdx > i + 1 then
-                        local formula = __TS__StringSlice(template, i + 1, endIdx)
-                        local value = evaluateFormula(nil, formula, unit, skillLevel)
-                        result = result .. formatNumber(nil, value)
-                        i = endIdx + 1
-                        __continue27 = true
-                        break
-                    end
+            if __TS__StringAccess(template, i) == BRACKET_LEFT_EN or __TS__StringAccess(template, i) == BRACKET_LEFT_CN then
+                local isOpenBracket = __TS__StringAccess(template, i) == BRACKET_LEFT_EN
+                local closeBracket = isOpenBracket and BRACKET_RIGHT_EN or BRACKET_RIGHT_CN
+                local endIdx = indexOfChar(nil, template, closeBracket, i + 1)
+                if endIdx > i + 1 then
+                    local formula = __TS__StringSlice(template, i + 1, endIdx)
+                    local value = evaluateFormula(nil, formula, unit, skillLevel)
+                    result = result .. formatNumber(nil, value)
+                    i = endIdx + 1
+                    goto __continue27
                 end
-                result = result .. __TS__StringAccess(template, i)
-                i = i + 1
-                __continue27 = true
-            until true
-            if not __continue27 then
-                break
             end
+            result = result .. __TS__StringAccess(template, i)
+            i = i + 1
         end
+        ::__continue27::
     end
     return result
 end
@@ -267,24 +260,17 @@ function ____exports.refreshAllSkillTips(self)
         local handleId = ____value[1]
         local unitSkills = ____value[2]
         do
-            local __continue53
-            repeat
-                local unit = unitHandleMap:get(handleId)
-                if not unit then
-                    __continue53 = true
-                    break
+            local unit = unitHandleMap:get(handleId)
+            if not unit then
+                goto __continue53
+            end
+            for ____, skillList in __TS__Iterator(unitSkills:values()) do
+                for ____, skillInfo in ipairs(skillList) do
+                    updateSkillTip(nil, skillInfo)
                 end
-                for ____, skillList in __TS__Iterator(unitSkills:values()) do
-                    for ____, skillInfo in ipairs(skillList) do
-                        updateSkillTip(nil, skillInfo)
-                    end
-                end
-                __continue53 = true
-            until true
-            if not __continue53 then
-                break
             end
         end
+        ::__continue53::
     end
 end
 function ____exports.registerSkillTip(self, unit, abilityId, template, level)

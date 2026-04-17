@@ -69,7 +69,7 @@ local function pickRandomDistinct(self, list, count)
     if count <= 0 then
         return out
     end
-    local pool = {unpack(list)}
+    local pool = {table.unpack(list)}
     while #pool > 0 and #out < count do
         local ____temp_0
         if type(math) ~= "nil" and math.random then

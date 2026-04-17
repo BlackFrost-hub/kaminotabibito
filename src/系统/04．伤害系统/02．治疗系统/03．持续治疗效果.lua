@@ -105,69 +105,62 @@ local function onHotTick(self)
     local toRemove = {}
     for ____, target in __TS__Iterator(hotUnits) do
         do
-            local __continue7
-            repeat
-                if IsUnitPausedBJ(nil, target) then
-                    __continue7 = true
-                    break
-                end
-                local countdown = YDUserDataGet(
-                    nil,
-                    "unit",
-                    target,
-                    ATTR_COUNTDOWN,
-                    "real"
-                ) - 1
-                YDUserDataSet(
-                    nil,
-                    "unit",
-                    target,
-                    ATTR_COUNTDOWN,
-                    countdown
-                )
-                local tickHP = YDUserDataGet(
-                    nil,
-                    "unit",
-                    target,
-                    ATTR_TICK_HP,
-                    "real"
-                )
-                local tickMP = YDUserDataGet(
-                    nil,
-                    "unit",
-                    target,
-                    ATTR_TICK_MP,
-                    "real"
-                )
-                local source = YDUserDataGet(
-                    nil,
-                    "unit",
-                    target,
-                    ATTR_SOURCE,
-                    "unit"
-                )
-                if tickHP > 0 then
-                    doHeal(nil, {
-                        HealSource = source,
-                        HealTarget = target,
-                        HealAmount = tickHP,
-                        ItemHeal = true,
-                        HealEffect = false
-                    })
-                end
-                if tickMP > 0 then
-                    doManaRegen(nil, target, tickMP, false)
-                end
-                local shouldEnd = not hasAnyHotBuff(nil, target) or countdown <= 0 or IsUnitDeadBJ(nil, target)
-                if shouldEnd then
-                    toRemove[#toRemove + 1] = target
-                end
-                __continue7 = true
-            until true
-            if not __continue7 then
-                break
+            if IsUnitPausedBJ(nil, target) then
+                goto __continue7
+            end
+            local countdown = YDUserDataGet(
+                nil,
+                "unit",
+                target,
+                ATTR_COUNTDOWN,
+                "real"
+            ) - 1
+            YDUserDataSet(
+                nil,
+                "unit",
+                target,
+                ATTR_COUNTDOWN,
+                countdown
+            )
+            local tickHP = YDUserDataGet(
+                nil,
+                "unit",
+                target,
+                ATTR_TICK_HP,
+                "real"
+            )
+            local tickMP = YDUserDataGet(
+                nil,
+                "unit",
+                target,
+                ATTR_TICK_MP,
+                "real"
+            )
+            local source = YDUserDataGet(
+                nil,
+                "unit",
+                target,
+                ATTR_SOURCE,
+                "unit"
+            )
+            if tickHP > 0 then
+                doHeal(nil, {
+                    HealSource = source,
+                    HealTarget = target,
+                    HealAmount = tickHP,
+                    ItemHeal = true,
+                    HealEffect = false
+                })
+            end
+            if tickMP > 0 then
+                doManaRegen(nil, target, tickMP, false)
+            end
+            local shouldEnd = not hasAnyHotBuff(nil, target) or countdown <= 0 or IsUnitDeadBJ(nil, target)
+            if shouldEnd then
+                toRemove[#toRemove + 1] = target
             end
         end
+        ::__continue7::
     end
     for ____, target in ipairs(toRemove) do
         ____exports.stopHot(nil, target)

@@ -102,31 +102,23 @@ local function collectAllIdsInScoreInterval(lo, hi)
     local out = {}
     for id in pairs(itemsTable) do
         do
-            local __continue16
-            repeat
-                if type(id) ~= "string" or #id ~= 4 then
-                    __continue16 = true
-                    break
-                end
-                local ____ydlStes_coerceOptionalNumber_6 = ydlStes_coerceOptionalNumber
-                local ____opt_4 = itemsTable[id]
-                if ____opt_4 ~= nil then
-                    ____opt_4 = ____opt_4.score
-                end
-                local sc = ____ydlStes_coerceOptionalNumber_6(nil, nil, ____opt_4)
-                if sc == nil then
-                    __continue16 = true
-                    break
-                end
-                if sc >= a and sc <= b then
-                    out[#out + 1] = id
-                end
-                __continue16 = true
-            until true
-            if not __continue16 then
-                break
+            if type(id) ~= "string" or #id ~= 4 then
+                goto __continue16
+            end
+            local ____ydlStes_coerceOptionalNumber_6 = ydlStes_coerceOptionalNumber
+            local ____opt_4 = itemsTable[id]
+            if ____opt_4 ~= nil then
+                ____opt_4 = ____opt_4.score
+            end
+            local sc = ____ydlStes_coerceOptionalNumber_6(nil, nil, ____opt_4)
+            if sc == nil then
+                goto __continue16
+            end
+            if sc >= a and sc <= b then
+                out[#out + 1] = id
             end
         end
+        ::__continue16::
     end
     return out
 end

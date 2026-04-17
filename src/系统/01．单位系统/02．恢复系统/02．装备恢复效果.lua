@@ -38,23 +38,16 @@ function ____exports.calcItemLifeRegenBonus(self, unit)
         local itemIdStr = ____value[1]
         local effect = ____value[2]
         do
-            local __continue8
-            repeat
-                if not hasItem(nil, unit, itemIdStr) then
-                    __continue8 = true
-                    break
-                end
-                if effect.type == "life_percent" then
-                    totalBonus = totalBonus + maxLife * effect.value
-                elseif effect.type == "life_fixed" then
-                    totalBonus = totalBonus + effect.value
-                end
-                __continue8 = true
-            until true
-            if not __continue8 then
-                break
+            if not hasItem(nil, unit, itemIdStr) then
+                goto __continue8
+            end
+            if effect.type == "life_percent" then
+                totalBonus = totalBonus + maxLife * effect.value
+            elseif effect.type == "life_fixed" then
+                totalBonus = totalBonus + effect.value
             end
         end
+        ::__continue8::
     end
     return totalBonus
 end
@@ -69,23 +62,16 @@ function ____exports.calcItemManaRegenBonus(self, unit)
         local itemIdStr = ____value[1]
         local effect = ____value[2]
         do
-            local __continue14
-            repeat
-                if not hasItem(nil, unit, itemIdStr) then
-                    __continue14 = true
-                    break
-                end
-                if effect.type == "mana_percent" then
-                    totalBonus = totalBonus + maxMana * effect.value
-                elseif effect.type == "mana_fixed" then
-                    totalBonus = totalBonus + effect.value
-                end
-                __continue14 = true
-            until true
-            if not __continue14 then
-                break
+            if not hasItem(nil, unit, itemIdStr) then
+                goto __continue14
+            end
+            if effect.type == "mana_percent" then
+                totalBonus = totalBonus + maxMana * effect.value
+            elseif effect.type == "mana_fixed" then
+                totalBonus = totalBonus + effect.value
             end
         end
+        ::__continue14::
     end
     return totalBonus
 end

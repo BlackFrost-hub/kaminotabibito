@@ -50,22 +50,15 @@ local function resolveQuestCallbackByTriggerPlayer(self)
         local i = 0
         while i < MAX_PLAYERS do
             do
-                local __continue4
-                repeat
-                    local st = g_states[i + 1]
-                    if not st or #st.queue == 0 then
-                        __continue4 = true
-                        break
-                    end
-                    if findFirstQuestEntryIndex(nil, st) >= 0 then
-                        questPids[#questPids + 1] = i
-                    end
-                    __continue4 = true
-                until true
-                if not __continue4 then
-                    break
+                local st = g_states[i + 1]
+                if not st or #st.queue == 0 then
+                    goto __continue4
+                end
+                if findFirstQuestEntryIndex(nil, st) >= 0 then
+                    questPids[#questPids + 1] = i
                 end
             end
+            ::__continue4::
             i = i + 1
         end
     end
@@ -231,24 +224,17 @@ local function dialogPanelHitCallback(self)
             local i = 0
             while i < MAX_PLAYERS do
                 do
-                    local __continue40
-                    repeat
-                        local s = g_states[i + 1]
-                        if not s then
-                            __continue40 = true
-                            break
-                        end
-                        if s.frames[5] ~= hitFrame and s.frames[4] ~= hitFrame and s.frames[3] ~= hitFrame and s.frames[12] ~= hitFrame and s.frames[13] ~= hitFrame then
-                            __continue40 = true
-                            break
-                        end
-                        handleDialogPanelClick(nil, s)
-                        return
-                    until true
-                    if not __continue40 then
-                        break
+                    local s = g_states[i + 1]
+                    if not s then
+                        goto __continue40
                     end
+                    if s.frames[5] ~= hitFrame and s.frames[4] ~= hitFrame and s.frames[3] ~= hitFrame and s.frames[12] ~= hitFrame and s.frames[13] ~= hitFrame then
+                        goto __continue40
+                    end
+                    handleDialogPanelClick(nil, s)
+                    return
                 end
+                ::__continue40::
                 i = i + 1
             end
         end
@@ -295,23 +281,16 @@ local function skipDialogLocal(self)
         local i = 0
         while i < MAX_PLAYERS do
             do
-                local __continue51
-                repeat
-                    local st = g_states[i + 1]
-                    if not st or #st.queue == 0 then
-                        __continue51 = true
-                        break
-                    end
-                    if dzPlayer(nil, i) == localPlayer then
-                        state = st
-                        break
-                    end
-                    __continue51 = true
-                until true
-                if not __continue51 then
+                local st = g_states[i + 1]
+                if not st or #st.queue == 0 then
+                    goto __continue51
+                end
+                if dzPlayer(nil, i) == localPlayer then
+                    state = st
                     break
                 end
             end
+            ::__continue51::
             i = i + 1
         end
     end

@@ -199,28 +199,21 @@ local function init(self)
     end
     for eventKey in pairs(QUEST_STES_OBJECTIVE_ROWS) do
         do
-            local __continue39
-            repeat
-                local row = QUEST_STES_OBJECTIVE_ROWS[eventKey]
-                if not row then
-                    __continue39 = true
-                    break
-                end
-                local trig = jass.CreateTrigger()
-                local key = eventKey
-                jass.TriggerAddAction(
-                    trig,
-                    function()
-                        runStesObjectiveCallback(nil, key)
-                    end
-                )
-                registerOneStesEvent(nil, trig, key)
-                __continue39 = true
-            until true
-            if not __continue39 then
-                break
+            local row = QUEST_STES_OBJECTIVE_ROWS[eventKey]
+            if not row then
+                goto __continue39
             end
+            local trig = jass.CreateTrigger()
+            local key = eventKey
+            jass.TriggerAddAction(
+                trig,
+                function()
+                    runStesObjectiveCallback(nil, key)
+                end
+            )
+            registerOneStesEvent(nil, trig, key)
         end
+        ::__continue39::
     end
 end
 init(nil)

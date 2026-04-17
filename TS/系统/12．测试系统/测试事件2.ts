@@ -1,4 +1,4 @@
-// 测试事件2 - 2222：4×+1000 + 4 条漂浮字；555：12×+1000 + 12 条（漂浮字均设 duration，走 漂浮文字函数 回收队列排泄）
+﻿// 测试事件2 - 2222：4×+1000 + 4 条漂浮字；555：12×+1000 + 12 条（漂浮字均设 duration，走 漂浮文字函数 回收队列排泄）
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
@@ -129,3 +129,5 @@ function init(): void {
 
 init();
 export {};
+
+

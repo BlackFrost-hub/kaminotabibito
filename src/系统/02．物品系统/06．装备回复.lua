@@ -133,27 +133,20 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
         local i = 0
         while i < loopIndex do
             do
-                local __continue19
-                repeat
-                    local trg = jass.LoadTriggerHandle(stesHT, hash, i)
-                    if trg == nil or trg == 0 then
-                        __continue19 = true
-                        break
-                    end
-                    YDLocalExecuteTrigger(nil, trg)
-                    saveParentIndex(nil, trg)
-                    YDLocal5Set(nil, "unit", YL_UNIT, unit)
-                    YDLocal5Set(nil, "real", YL_HP, hp)
-                    YDLocal5Set(nil, "real", YL_MP, mp)
-                    YDLocal5Set(nil, "item", YL_ITEM, item)
-                    YDLocal5Set(nil, "string", YL_ABIL, abilId)
-                    YDTriggerExecuteTrigger(nil, trg, false)
-                    __continue19 = true
-                until true
-                if not __continue19 then
-                    break
+                local trg = jass.LoadTriggerHandle(stesHT, hash, i)
+                if trg == nil or trg == 0 then
+                    goto __continue19
                 end
+                YDLocalExecuteTrigger(nil, trg)
+                saveParentIndex(nil, trg)
+                YDLocal5Set(nil, "unit", YL_UNIT, unit)
+                YDLocal5Set(nil, "real", YL_HP, hp)
+                YDLocal5Set(nil, "real", YL_MP, mp)
+                YDLocal5Set(nil, "item", YL_ITEM, item)
+                YDLocal5Set(nil, "string", YL_ABIL, abilId)
+                YDTriggerExecuteTrigger(nil, trg, false)
             end
+            ::__continue19::
             i = i + 1
         end
     end
@@ -274,32 +267,25 @@ local function onUseItem()
     local segments = parseEquipHealSegments(nil, entry.hot, entry.abilList)
     for ____, seg in ipairs(segments) do
         do
-            local __continue41
-            repeat
-                if seg.abilId == "" then
-                    __continue41 = true
-                    break
-                end
-                if seg.waitSec <= 0 then
-                    executeSegment(nil, unit, item, seg)
-                else
-                    local capturedSeg = seg
-                    local capturedUnit = unit
-                    local capturedItem = item
-                    withTimer(
-                        nil,
-                        seg.waitSec,
-                        function()
-                            executeSegment(nil, capturedUnit, capturedItem, capturedSeg)
-                        end
-                    )
-                end
-                __continue41 = true
-            until true
-            if not __continue41 then
-                break
+            if seg.abilId == "" then
+                goto __continue41
+            end
+            if seg.waitSec <= 0 then
+                executeSegment(nil, unit, item, seg)
+            else
+                local capturedSeg = seg
+                local capturedUnit = unit
+                local capturedItem = item
+                withTimer(
+                    nil,
+                    seg.waitSec,
+                    function()
+                        executeSegment(nil, capturedUnit, capturedItem, capturedSeg)
+                    end
+                )
             end
         end
+        ::__continue41::
     end
 end
 local INIT_KEY = "__EquipHealInited"

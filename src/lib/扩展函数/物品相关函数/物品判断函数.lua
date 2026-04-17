@@ -65,25 +65,17 @@ function ____exports.GetItemTypeTotalCountByChargesBJ(self, whichUnit, itemId)
         local i = 0
         while i < 6 do
             do
-                local __continue22
-                repeat
-                    local item = jass.UnitItemInSlot(whichUnit, i)
-                    if not item then
-                        __continue22 = true
-                        break
-                    end
-                    if jass.GetItemTypeId(item) ~= itemId then
-                        __continue22 = true
-                        break
-                    end
-                    local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
-                    total = total + (ch > 0 and ch or 1)
-                    __continue22 = true
-                until true
-                if not __continue22 then
-                    break
+                local item = jass.UnitItemInSlot(whichUnit, i)
+                if not item then
+                    goto __continue22
                 end
+                if jass.GetItemTypeId(item) ~= itemId then
+                    goto __continue22
+                end
+                local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
+                total = total + (ch > 0 and ch or 1)
             end
+            ::__continue22::
             i = i + 1
         end
     end
@@ -102,45 +94,37 @@ function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, ne
         local i = 0
         while i < 6 do
             do
-                local __continue29
-                repeat
-                    if remain <= 0 then
-                        break
-                    end
-                    local item = jass.UnitItemInSlot(whichUnit, i)
-                    if not item then
-                        __continue29 = true
-                        break
-                    end
-                    if jass.GetItemTypeId(item) ~= itemId then
-                        __continue29 = true
-                        break
-                    end
-                    local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
-                    if ch > 0 then
-                        if ch > remain then
-                            if type(jass.SetItemCharges) == "function" then
-                                jass.SetItemCharges(item, ch - remain)
-                            end
-                            remain = 0
-                        else
-                            remain = remain - ch
-                            if type(jass.RemoveItem) == "function" then
-                                jass.RemoveItem(item)
-                            end
+                if remain <= 0 then
+                    break
+                end
+                local item = jass.UnitItemInSlot(whichUnit, i)
+                if not item then
+                    goto __continue29
+                end
+                if jass.GetItemTypeId(item) ~= itemId then
+                    goto __continue29
+                end
+                local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
+                if ch > 0 then
+                    if ch > remain then
+                        if type(jass.SetItemCharges) == "function" then
+                            jass.SetItemCharges(item, ch - remain)
                         end
+                        remain = 0
                     else
-                        remain = remain - 1
+                        remain = remain - ch
                         if type(jass.RemoveItem) == "function" then
                             jass.RemoveItem(item)
                         end
                     end
-                    __continue29 = true
-                until true
-                if not __continue29 then
-                    break
+                else
+                    remain = remain - 1
+                    if type(jass.RemoveItem) == "function" then
+                        jass.RemoveItem(item)
+                    end
                 end
             end
+            ::__continue29::
             i = i + 1
         end
     end

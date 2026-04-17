@@ -136,66 +136,59 @@ function ____exports.renderExpandedQuestDetails(self, opts)
     local objYRel = rowTopRel - EXPANDED_OBJECTIVE_START_OFFSET
     for ____, obj in ipairs(quest.objectives) do
         do
-            local __continue18
-            repeat
-                local txt = buildObjectiveText(
+            local txt = buildObjectiveText(
+                nil,
+                obj.completed,
+                obj.description,
+                obj.current,
+                obj.required
+            )
+            local objKey = (quest.id .. "|") .. obj.id
+            local objFrame = objFrameByKey:get(objKey) or 0
+            if objFrame == 0 then
+                objFrame = createTextLabel(
                     nil,
-                    obj.completed,
-                    obj.description,
-                    obj.current,
-                    obj.required
-                )
-                local objKey = (quest.id .. "|") .. obj.id
-                local objFrame = objFrameByKey:get(objKey) or 0
+                    (("TaskObj_" .. quest.id) .. "_") .. obj.id,
+                    listParent,
+                    txt,
+                    {
+                        relativeTo = listParent,
+                        point = FramePoint.TOPLEFT,
+                        relativePoint = FramePoint.TOPLEFT,
+                        x = textXRel,
+                        y = objYRel
+                    },
+                    {width = textW, height = EXPANDED_OBJECTIVE_ROW_HEIGHT}
+                ) or 0
                 if objFrame == 0 then
-                    objFrame = createTextLabel(
-                        nil,
-                        (("TaskObj_" .. quest.id) .. "_") .. obj.id,
-                        listParent,
-                        txt,
-                        {
-                            relativeTo = listParent,
-                            point = FramePoint.TOPLEFT,
-                            relativePoint = FramePoint.TOPLEFT,
-                            x = textXRel,
-                            y = objYRel
-                        },
-                        {width = textW, height = EXPANDED_OBJECTIVE_ROW_HEIGHT}
-                    ) or 0
-                    if objFrame == 0 then
-                        objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                        __continue18 = true
-                        break
-                    end
-                    objFrameByKey:set(objKey, objFrame)
-                else
-                    setFramePointRelative(
-                        nil,
-                        objFrame,
-                        FramePoint.TOPLEFT,
-                        listParent,
-                        FramePoint.TOPLEFT,
-                        textXRel,
-                        objYRel
-                    )
-                    setFrameSize(nil, objFrame, {width = textW, height = EXPANDED_OBJECTIVE_ROW_HEIGHT})
-                    if type(japi.DzFrameSetText) == "function" then
-                        japi.DzFrameSetText(objFrame, txt)
-                    end
+                    objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
+                    goto __continue18
                 end
-                applyDzTextFontAndAlignment(nil, objFrame, listTextAlign)
-                if type(japi.DzFrameSetLevel) == "function" then
-                    japi.DzFrameSetLevel(objFrame, 3)
+                objFrameByKey:set(objKey, objFrame)
+            else
+                setFramePointRelative(
+                    nil,
+                    objFrame,
+                    FramePoint.TOPLEFT,
+                    listParent,
+                    FramePoint.TOPLEFT,
+                    textXRel,
+                    objYRel
+                )
+                setFrameSize(nil, objFrame, {width = textW, height = EXPANDED_OBJECTIVE_ROW_HEIGHT})
+                if type(japi.DzFrameSetText) == "function" then
+                    japi.DzFrameSetText(objFrame, txt)
                 end
-                showFrame(nil, objFrame)
-                listItemFrames[#listItemFrames + 1] = objFrame
-                objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                __continue18 = true
-            until true
-            if not __continue18 then
-                break
             end
+            applyDzTextFontAndAlignment(nil, objFrame, listTextAlign)
+            if type(japi.DzFrameSetLevel) == "function" then
+                japi.DzFrameSetLevel(objFrame, 3)
+            end
+            showFrame(nil, objFrame)
+            listItemFrames[#listItemFrames + 1] = objFrame
+            objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
         end
+        ::__continue18::
     end
     if quest.timeLimit and quest.timeLimit > 0 then
         local failFrame = failFrameByQuestId:get(quest.id) or 0

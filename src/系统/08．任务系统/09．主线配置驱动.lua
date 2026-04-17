@@ -115,45 +115,34 @@ local function parseDialogLines(self, dialogPreview)
     local rows = __TS__StringSplit(dialogPreview, "\n")
     for ____, raw in ipairs(rows) do
         do
-            local __continue15
-            repeat
-                local line = __TS__StringTrim(raw)
-                if line == "" then
-                    __continue15 = true
-                    break
-                end
-                local dot = (string.find(line, ".", nil, true) or 0) - 1
-                if dot <= 0 then
-                    __continue15 = true
-                    break
-                end
-                local left = __TS__StringTrim(__TS__StringSubstring(line, 0, dot))
-                if left == "" or __TS__Number(left) <= 0 then
-                    __continue15 = true
-                    break
-                end
-                local body = __TS__StringTrim(__TS__StringSubstring(line, dot + 1))
-                local sep = (string.find(body, "：", nil, true) or 0) - 1
-                if sep < 0 then
-                    sep = (string.find(body, ":", nil, true) or 0) - 1
-                end
-                if sep <= 0 then
-                    __continue15 = true
-                    break
-                end
-                local speaker = __TS__StringTrim(__TS__StringSubstring(body, 0, sep))
-                local text = __TS__StringTrim(__TS__StringSubstring(body, sep + 1))
-                if speaker == "" or text == "" then
-                    __continue15 = true
-                    break
-                end
-                out[#out + 1] = {speaker = speaker, text = text}
-                __continue15 = true
-            until true
-            if not __continue15 then
-                break
+            local line = __TS__StringTrim(raw)
+            if line == "" then
+                goto __continue15
             end
+            local dot = (string.find(line, ".", nil, true) or 0) - 1
+            if dot <= 0 then
+                goto __continue15
+            end
+            local left = __TS__StringTrim(__TS__StringSubstring(line, 0, dot))
+            if left == "" or __TS__Number(left) <= 0 then
+                goto __continue15
+            end
+            local body = __TS__StringTrim(__TS__StringSubstring(line, dot + 1))
+            local sep = (string.find(body, "：", nil, true) or 0) - 1
+            if sep < 0 then
+                sep = (string.find(body, ":", nil, true) or 0) - 1
+            end
+            if sep <= 0 then
+                goto __continue15
+            end
+            local speaker = __TS__StringTrim(__TS__StringSubstring(body, 0, sep))
+            local text = __TS__StringTrim(__TS__StringSubstring(body, sep + 1))
+            if speaker == "" or text == "" then
+                goto __continue15
+            end
+            out[#out + 1] = {speaker = speaker, text = text}
         end
+        ::__continue15::
     end
     return out
 end
@@ -229,39 +218,29 @@ local function parseTimelineEntries(self, timeline)
     local lines = __TS__StringSplit(timeline, "\n")
     for ____, raw in ipairs(lines) do
         do
-            local __continue40
-            repeat
-                local line = __TS__StringTrim(raw)
-                if line == "" then
-                    __continue40 = true
-                    break
-                end
-                local dot = (string.find(line, ".", nil, true) or 0) - 1
-                if dot <= 0 then
-                    __continue40 = true
-                    break
-                end
-                local left = __TS__StringTrim(__TS__StringSubstring(line, 0, dot))
-                local delay = __TS__Number(left)
-                if delay ~= delay then
-                    __continue40 = true
-                    break
-                end
-                local code = sanitizeActionCode(
-                    nil,
-                    __TS__StringSubstring(line, dot + 1)
-                )
-                if code == "" then
-                    __continue40 = true
-                    break
-                end
-                out[#out + 1] = {delay = delay, code = code}
-                __continue40 = true
-            until true
-            if not __continue40 then
-                break
+            local line = __TS__StringTrim(raw)
+            if line == "" then
+                goto __continue40
             end
+            local dot = (string.find(line, ".", nil, true) or 0) - 1
+            if dot <= 0 then
+                goto __continue40
+            end
+            local left = __TS__StringTrim(__TS__StringSubstring(line, 0, dot))
+            local delay = __TS__Number(left)
+            if delay ~= delay then
+                goto __continue40
+            end
+            local code = sanitizeActionCode(
+                nil,
+                __TS__StringSubstring(line, dot + 1)
+            )
+            if code == "" then
+                goto __continue40
+            end
+            out[#out + 1] = {delay = delay, code = code}
         end
+        ::__continue40::
     end
     return out
 end
@@ -359,31 +338,24 @@ local function runActionTimeline(self, timeline, triggerUnit)
     local entries = parseTimelineEntries(nil, timeline)
     for ____, e in ipairs(entries) do
         do
-            local __continue65
-            repeat
-                if e.delay <= 0 or type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-                    executeActionCode(nil, e.code, triggerUnit)
-                    __continue65 = true
-                    break
-                end
-                local t = jass.CreateTimer()
-                jass.TimerStart(
-                    t,
-                    e.delay,
-                    false,
-                    function()
-                        executeActionCode(nil, e.code, triggerUnit)
-                        if type(jass.DestroyTimer) == "function" then
-                            jass.DestroyTimer(t)
-                        end
-                    end
-                )
-                __continue65 = true
-            until true
-            if not __continue65 then
-                break
+            if e.delay <= 0 or type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
+                executeActionCode(nil, e.code, triggerUnit)
+                goto __continue65
             end
+            local t = jass.CreateTimer()
+            jass.TimerStart(
+                t,
+                e.delay,
+                false,
+                function()
+                    executeActionCode(nil, e.code, triggerUnit)
+                    if type(jass.DestroyTimer) == "function" then
+                        jass.DestroyTimer(t)
+                    end
+                end
+            )
         end
+        ::__continue65::
     end
 end
 local function getHeroes(self)
@@ -428,44 +400,35 @@ local function tick(self)
     local heroes = getHeroes(nil)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
-            local __continue78
-            repeat
-                if cfg.enabled == false then
-                    __continue78 = true
-                    break
-                end
-                if not cfg.condition or cfg.condition == "" then
-                    __continue78 = true
-                    break
-                end
-                if not hitFromStage(nil, cfg, stage) then
-                    __continue78 = true
-                    break
-                end
-                local matchedHero = nil
-                for ____, hero in ipairs(heroes) do
-                    if evalCondition(cfg.condition, hero) then
-                        matchedHero = hero
-                        break
-                    end
-                end
-                if not matchedHero then
-                    __continue78 = true
-                    break
-                end
-                local triggerUnit = matchedHero
-                if type(cfg.toStage) == "number" then
-                    setStage(nil, cfg.toStage)
-                end
-                runActionTimeline(nil, cfg.actionTimeline, triggerUnit)
-                playDialog(nil, cfg.dialogPreview)
-                refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
-                break
-            until true
-            if not __continue78 then
-                break
+            if cfg.enabled == false then
+                goto __continue78
             end
+            if not cfg.condition or cfg.condition == "" then
+                goto __continue78
+            end
+            if not hitFromStage(nil, cfg, stage) then
+                goto __continue78
+            end
+            local matchedHero = nil
+            for ____, hero in ipairs(heroes) do
+                if evalCondition(cfg.condition, hero) then
+                    matchedHero = hero
+                    break
+                end
+            end
+            if not matchedHero then
+                goto __continue78
+            end
+            local triggerUnit = matchedHero
+            if type(cfg.toStage) == "number" then
+                setStage(nil, cfg.toStage)
+            end
+            runActionTimeline(nil, cfg.actionTimeline, triggerUnit)
+            playDialog(nil, cfg.dialogPreview)
+            refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
+            break
         end
+        ::__continue78::
     end
     running = false
 end
@@ -475,38 +438,31 @@ local function extractFunctionNames(self, text)
     local i = 0
     while i < n do
         do
-            local __continue89
-            repeat
-                local ch = __TS__StringCharCodeAt(text, i)
-                local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
-                if not isStart then
-                    i = i + 1
-                    __continue89 = true
+            local ch = __TS__StringCharCodeAt(text, i)
+            local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
+            if not isStart then
+                i = i + 1
+                goto __continue89
+            end
+            local start = i
+            i = i + 1
+            while i < n do
+                local c = __TS__StringCharCodeAt(text, i)
+                local ok = c >= 65 and c <= 90 or c >= 97 and c <= 122 or c >= 48 and c <= 57 or c == 95
+                if not ok then
                     break
                 end
-                local start = i
                 i = i + 1
-                while i < n do
-                    local c = __TS__StringCharCodeAt(text, i)
-                    local ok = c >= 65 and c <= 90 or c >= 97 and c <= 122 or c >= 48 and c <= 57 or c == 95
-                    if not ok then
-                        break
-                    end
-                    i = i + 1
-                end
-                local j = i
-                while j < n and (__TS__StringCharAt(text, j) == " " or __TS__StringCharAt(text, j) == "\t") do
-                    j = j + 1
-                end
-                if j < n and __TS__StringCharAt(text, j) == "(" then
-                    names[#names + 1] = __TS__StringSubstring(text, start, i)
-                end
-                __continue89 = true
-            until true
-            if not __continue89 then
-                break
+            end
+            local j = i
+            while j < n and (__TS__StringCharAt(text, j) == " " or __TS__StringCharAt(text, j) == "\t") do
+                j = j + 1
+            end
+            if j < n and __TS__StringCharAt(text, j) == "(" then
+                names[#names + 1] = __TS__StringSubstring(text, start, i)
             end
         end
+        ::__continue89::
     end
     return names
 end

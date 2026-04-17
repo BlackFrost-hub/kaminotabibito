@@ -59,38 +59,31 @@ end
 local function gainHeroStat(self, players, statName, value)
     for ____, p in ipairs(players) do
         do
-            local __continue21
-            repeat
-                local hero = getPlayerFirstHero(nil, p)
-                if not hero then
-                    __continue21 = true
-                    break
-                end
-                if statName == "力量" and type(jass.SetHeroStr) == "function" then
-                    jass.SetHeroStr(
-                        hero,
-                        jass.GetHeroStr(hero, false) + value,
-                        true
-                    )
-                elseif statName == "敏捷" and type(jass.SetHeroAgi) == "function" then
-                    jass.SetHeroAgi(
-                        hero,
-                        jass.GetHeroAgi(hero, false) + value,
-                        true
-                    )
-                elseif statName == "智力" and type(jass.SetHeroInt) == "function" then
-                    jass.SetHeroInt(
-                        hero,
-                        jass.GetHeroInt(hero, false) + value,
-                        true
-                    )
-                end
-                __continue21 = true
-            until true
-            if not __continue21 then
-                break
+            local hero = getPlayerFirstHero(nil, p)
+            if not hero then
+                goto __continue21
+            end
+            if statName == "力量" and type(jass.SetHeroStr) == "function" then
+                jass.SetHeroStr(
+                    hero,
+                    jass.GetHeroStr(hero, false) + value,
+                    true
+                )
+            elseif statName == "敏捷" and type(jass.SetHeroAgi) == "function" then
+                jass.SetHeroAgi(
+                    hero,
+                    jass.GetHeroAgi(hero, false) + value,
+                    true
+                )
+            elseif statName == "智力" and type(jass.SetHeroInt) == "function" then
+                jass.SetHeroInt(
+                    hero,
+                    jass.GetHeroInt(hero, false) + value,
+                    true
+                )
             end
         end
+        ::__continue21::
     end
 end
 local function readFirstNumber(self, s)
@@ -212,39 +205,31 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
         local lineIdx = 0
         while lineIdx < #lines do
             do
-                local __continue57
-                repeat
-                    local line = __TS__StringTrim(lines[lineIdx + 1])
-                    if line == "" then
-                        __continue57 = true
-                        break
+                local line = __TS__StringTrim(lines[lineIdx + 1])
+                if line == "" then
+                    goto __continue57
+                end
+                local colon = (string.find(line, ":", nil, true) or 0) - 1
+                if colon > 0 then
+                    local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
+                    local expr = __TS__StringTrim(__TS__StringSubstring(line, colon + 1))
+                    if not isConditionMatchedWithContext(nil, cond, ctx) then
+                        goto __continue57
                     end
-                    local colon = (string.find(line, ":", nil, true) or 0) - 1
-                    if colon > 0 then
-                        local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
-                        local expr = __TS__StringTrim(__TS__StringSubstring(line, colon + 1))
-                        if not isConditionMatchedWithContext(nil, cond, ctx) then
-                            __continue57 = true
-                            break
-                        end
-                        local parts = __TS__StringSplit(expr, ";")
-                        for ____, p in ipairs(parts) do
-                            executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
-                        end
-                        matchedRuleIndex = lineIdx
-                        matchedCondition = cond
-                        break
-                    end
-                    local parts = __TS__StringSplit(line, ";")
+                    local parts = __TS__StringSplit(expr, ";")
                     for ____, p in ipairs(parts) do
                         executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
                     end
-                    __continue57 = true
-                until true
-                if not __continue57 then
+                    matchedRuleIndex = lineIdx
+                    matchedCondition = cond
                     break
                 end
+                local parts = __TS__StringSplit(line, ";")
+                for ____, p in ipairs(parts) do
+                    executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
+                end
             end
+            ::__continue57::
             lineIdx = lineIdx + 1
         end
     end
@@ -259,28 +244,20 @@ function ____exports.previewRewardMatchWithContext(self, rewardRaw, ctx)
         local lineIdx = 0
         while lineIdx < #lines do
             do
-                local __continue68
-                repeat
-                    local line = __TS__StringTrim(lines[lineIdx + 1])
-                    if line == "" then
-                        __continue68 = true
-                        break
-                    end
-                    local colon = (string.find(line, ":", nil, true) or 0) - 1
-                    if colon <= 0 then
-                        __continue68 = true
-                        break
-                    end
-                    local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
-                    if isConditionMatchedWithContext(nil, cond, ctx) then
-                        return {matchedRuleIndex = lineIdx, matchedCondition = cond}
-                    end
-                    __continue68 = true
-                until true
-                if not __continue68 then
-                    break
+                local line = __TS__StringTrim(lines[lineIdx + 1])
+                if line == "" then
+                    goto __continue68
+                end
+                local colon = (string.find(line, ":", nil, true) or 0) - 1
+                if colon <= 0 then
+                    goto __continue68
+                end
+                local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
+                if isConditionMatchedWithContext(nil, cond, ctx) then
+                    return {matchedRuleIndex = lineIdx, matchedCondition = cond}
                 end
             end
+            ::__continue68::
             lineIdx = lineIdx + 1
         end
     end

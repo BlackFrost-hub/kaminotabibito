@@ -104,44 +104,35 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
         local i = 0
         while i <= 5 do
             do
-                local __continue20
-                repeat
-                    local it = safeUnitItemInSlot(nil, unit, i)
-                    if not it or it == item then
-                        __continue20 = true
-                        break
-                    end
-                    local itTypeId = safeGetItemTypeId(nil, it)
-                    if itTypeId == nil then
-                        __continue20 = true
-                        break
-                    end
-                    local e = getEntry(nil, itTypeId)
-                    if not e then
-                        __continue20 = true
-                        break
-                    end
-                    if itTypeId == pickedTypeId then
-                        sameIdCount = sameIdCount + 1
-                    end
-                    if pickedSlotType ~= nil and e.type == pickedSlotType then
-                        sameSlotTypeCount = sameSlotTypeCount + 1
-                    end
-                    if e.type == TWO_HANDED then
-                        hasTwoHanded = true
-                    end
-                    if e.type == "主武器" then
-                        hasMain = true
-                    end
-                    if e.type == "副武器" then
-                        hasSub = true
-                    end
-                    __continue20 = true
-                until true
-                if not __continue20 then
-                    break
+                local it = safeUnitItemInSlot(nil, unit, i)
+                if not it or it == item then
+                    goto __continue20
+                end
+                local itTypeId = safeGetItemTypeId(nil, it)
+                if itTypeId == nil then
+                    goto __continue20
+                end
+                local e = getEntry(nil, itTypeId)
+                if not e then
+                    goto __continue20
+                end
+                if itTypeId == pickedTypeId then
+                    sameIdCount = sameIdCount + 1
+                end
+                if pickedSlotType ~= nil and e.type == pickedSlotType then
+                    sameSlotTypeCount = sameSlotTypeCount + 1
+                end
+                if e.type == TWO_HANDED then
+                    hasTwoHanded = true
+                end
+                if e.type == "主武器" then
+                    hasMain = true
+                end
+                if e.type == "副武器" then
+                    hasSub = true
                 end
             end
+            ::__continue20::
             i = i + 1
         end
     end
@@ -212,41 +203,33 @@ local function onPickup(self)
         local i = 0
         while i < #s do
             do
-                local __continue46
-                repeat
-                    if __TS__StringSubstring(s, i, i + 2) == "|r" then
-                        i = i + 2
-                        __continue46 = true
-                        break
-                    end
-                    if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
-                        local hex = true
-                        do
-                            local j = i + 2
-                            while j < i + 10 and hex do
-                                hex = (string.find(
-                                    "0123456789aAbBcCdDeEfF",
-                                    __TS__StringAccess(s, j),
-                                    nil,
-                                    true
-                                ) or 0) - 1 >= 0
-                                j = j + 1
-                            end
-                        end
-                        if hex then
-                            i = i + 10
-                            __continue46 = true
-                            break
-                        end
-                    end
-                    out = out .. __TS__StringAccess(s, i)
-                    i = i + 1
-                    __continue46 = true
-                until true
-                if not __continue46 then
-                    break
+                if __TS__StringSubstring(s, i, i + 2) == "|r" then
+                    i = i + 2
+                    goto __continue46
                 end
+                if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
+                    local hex = true
+                    do
+                        local j = i + 2
+                        while j < i + 10 and hex do
+                            hex = (string.find(
+                                "0123456789aAbBcCdDeEfF",
+                                __TS__StringAccess(s, j),
+                                nil,
+                                true
+                            ) or 0) - 1 >= 0
+                            j = j + 1
+                        end
+                    end
+                    if hex then
+                        i = i + 10
+                        goto __continue46
+                    end
+                end
+                out = out .. __TS__StringAccess(s, i)
+                i = i + 1
             end
+            ::__continue46::
         end
         return out
     end
@@ -269,44 +252,35 @@ local function onPickup(self)
         local i = 0
         while i <= 5 do
             do
-                local __continue55
-                repeat
-                    local it = safeUnitItemInSlot(nil, unit, i)
-                    if not it then
-                        __continue55 = true
-                        break
-                    end
-                    local itTypeId = safeGetItemTypeId(nil, it)
-                    if itTypeId == nil then
-                        __continue55 = true
-                        break
-                    end
-                    local e = getEntry(nil, itTypeId)
-                    if not e then
-                        __continue55 = true
-                        break
-                    end
-                    if itTypeId == pickedTypeId then
-                        sameIdCount = sameIdCount + 1
-                    end
-                    if pickedSlotType ~= nil and e.type == pickedSlotType then
-                        sameSlotTypeCount = sameSlotTypeCount + 1
-                    end
-                    if e.type == TWO_HANDED then
-                        hasTwoHanded = true
-                    end
-                    if e.type == "主武器" then
-                        hasMain = true
-                    end
-                    if e.type == "副武器" then
-                        hasSub = true
-                    end
-                    __continue55 = true
-                until true
-                if not __continue55 then
-                    break
+                local it = safeUnitItemInSlot(nil, unit, i)
+                if not it then
+                    goto __continue55
+                end
+                local itTypeId = safeGetItemTypeId(nil, it)
+                if itTypeId == nil then
+                    goto __continue55
+                end
+                local e = getEntry(nil, itTypeId)
+                if not e then
+                    goto __continue55
+                end
+                if itTypeId == pickedTypeId then
+                    sameIdCount = sameIdCount + 1
+                end
+                if pickedSlotType ~= nil and e.type == pickedSlotType then
+                    sameSlotTypeCount = sameSlotTypeCount + 1
+                end
+                if e.type == TWO_HANDED then
+                    hasTwoHanded = true
+                end
+                if e.type == "主武器" then
+                    hasMain = true
+                end
+                if e.type == "副武器" then
+                    hasSub = true
                 end
             end
+            ::__continue55::
             i = i + 1
         end
     end

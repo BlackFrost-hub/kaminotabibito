@@ -95,28 +95,21 @@ local function isEquipConditionMatched(self, condition, submittedItemLevel)
     local parts = __TS__StringSplit(expr, "&")
     for ____, raw in ipairs(parts) do
         do
-            local __continue18
-            repeat
-                local bound = parseEquipBoundToken(nil, raw)
-                if not bound then
-                    __continue18 = true
-                    break
-                end
-                if bound.op == "<" and not (levelRank < bound.rank) then
-                    return false
-                end
-                if bound.op == ">" and not (levelRank > bound.rank) then
-                    return false
-                end
-                if bound.op == "=" and not (levelRank == bound.rank) then
-                    return false
-                end
-                __continue18 = true
-            until true
-            if not __continue18 then
-                break
+            local bound = parseEquipBoundToken(nil, raw)
+            if not bound then
+                goto __continue18
+            end
+            if bound.op == "<" and not (levelRank < bound.rank) then
+                return false
+            end
+            if bound.op == ">" and not (levelRank > bound.rank) then
+                return false
+            end
+            if bound.op == "=" and not (levelRank == bound.rank) then
+                return false
             end
         end
+        ::__continue18::
     end
     return true
 end

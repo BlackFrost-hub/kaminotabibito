@@ -121,29 +121,21 @@ local function parsePrimaryBonus(self, s, primaryStr)
     local parts = __TS__StringSplit(seg, ",")
     for ____, p in ipairs(parts) do
         do
-            local __continue8
-            repeat
-                local idx = (string.find(p, "+", nil, true) or 0) - 1
-                if idx < 0 then
-                    __continue8 = true
-                    break
-                end
-                local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
-                local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
-                local key = NAME_TO_KEY[name]
-                if not key then
-                    __continue8 = true
-                    break
-                end
-                local isPct = (string.find(valStr, "%", nil, true) or 0) - 1 >= 0
-                local num = __TS__ParseFloat(valStr) or 0
-                out[key] = (out[key] or 0) + (isPct and num / 100 or num)
-                __continue8 = true
-            until true
-            if not __continue8 then
-                break
+            local idx = (string.find(p, "+", nil, true) or 0) - 1
+            if idx < 0 then
+                goto __continue8
             end
+            local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
+            local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
+            local key = NAME_TO_KEY[name]
+            if not key then
+                goto __continue8
+            end
+            local isPct = (string.find(valStr, "%", nil, true) or 0) - 1 >= 0
+            local num = __TS__ParseFloat(valStr) or 0
+            out[key] = (out[key] or 0) + (isPct and num / 100 or num)
         end
+        ::__continue8::
     end
     return out
 end
@@ -387,26 +379,19 @@ local function initEvents(self)
                 local i = 0
                 while i < #playerStats do
                     do
-                        local __continue42
-                        repeat
-                            local statName = playerStats[i + 1].name
-                            if statName == "移动速度" then
-                                __continue42 = true
-                                break
-                            end
-                            local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
-                            local num = __TS__Number(val)
-                            local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
-                            local nearZero = num > -0.000001 and num < 0.000001
-                            local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
-                            ) .. "%") or (nearZero and "0" or tostring(num))
-                            test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
-                            __continue42 = true
-                        until true
-                        if not __continue42 then
-                            break
+                        local statName = playerStats[i + 1].name
+                        if statName == "移动速度" then
+                            goto __continue42
                         end
+                        local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
+                        local num = __TS__Number(val)
+                        local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
+                        local nearZero = num > -0.000001 and num < 0.000001
+                        local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
+                        ) .. "%") or (nearZero and "0" or tostring(num))
+                        test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
                     end
+                    ::__continue42::
                     i = i + 1
                 end
             end

@@ -33,13 +33,13 @@ const { getHeroDuration } = require("系统.05．Buff系统.01．控制抗性.01
  */
 export function getControlReduction(unit: any): number {
   // 先读取单位属性
-  const unitValue = YDUserDataGet("unit", unit, "减少控制时间", "real");
+  const unitValue = YDUserDataGet("unit", unit, "眩晕抗性", "real");
   if (unitValue > 0.01) return unitValue;
 
   // 再读取玩家属性
   const player = jass.GetOwningPlayer(unit);
   if (player != null) {
-    const playerValue = YDUserDataGet("player", player, "减少控制时间", "real");
+    const playerValue = YDUserDataGet("player", player, "眩晕抗性", "real");
     if (playerValue > 0.01) return playerValue;
   }
 
@@ -74,6 +74,23 @@ export function applyBossControlLimit(unit: any, duration: number): number {
 }
 
 /**
+ * 基于原始持续时间计算削减后的控制时长
+ *
+ * 供快速Buff等直接传入持续时间的场景复用。
+ */
+export function calcReducedControlDuration(target: any, originalDuration: number): number {
+  let duration = originalDuration;
+
+  let reduction = getControlReduction(target);
+  if (reduction > 0.01) {
+    reduction = applyControlReductionCap(reduction);
+    duration = originalDuration * (1 - reduction);
+  }
+
+  return applyBossControlLimit(target, duration);
+}
+
+/**
  * 计算削减后的控制时间
  *
  * @param target 目标单位
@@ -83,21 +100,7 @@ export function applyBossControlLimit(unit: any, duration: number): number {
 export function calcReducedControlTime(target: any, abilityId: number): number {
   // 获取原始控制时间
   const originalDuration = getHeroDuration(abilityId);
-
-  // 获取控制抗性
-  let reduction = getControlReduction(target);
-  if (reduction <= 0.01) return originalDuration;
-
-  // 应用上限
-  reduction = applyControlReductionCap(reduction);
-
-  // 计算削减后时间
-  let duration = originalDuration * (1 - reduction);
-
-  // 应用Boss上限
-  duration = applyBossControlLimit(target, duration);
-
-  return duration;
+  return calcReducedControlDuration(target, originalDuration);
 }
 
 export {};

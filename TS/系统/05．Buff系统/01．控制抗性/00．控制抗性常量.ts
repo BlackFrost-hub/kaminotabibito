@@ -44,4 +44,5 @@ export const BOSS_CONTROL_LIMITS: Record<string, number> = {
  */
 export const EXCLUDED_UNIT_TYPES: string[] = [
   'e02A', // 辅助马甲
+  'bHun', // 快速Buff系统马甲（SFB_Unit）
 ];

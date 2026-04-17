@@ -116,46 +116,32 @@ function ____exports.createDotBaseUtils(self, deps)
             local slot = 0
             while slot <= 5 do
                 do
-                    local __continue33
-                    repeat
-                        local item = unitItemInSlot(nil, unit, slot)
-                        if not item then
-                            __continue33 = true
-                            break
-                        end
-                        local idStr = deps:fourCCToString(getItemTypeId(nil, item))
-                        local entry = deps.itemsData[idStr]
-                        local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
-                        do
-                            local si = 0
-                            while si < #segments do
-                                do
-                                    local __continue36
-                                    repeat
-                                        local parsed = parseBuff(nil, segments[si + 1])
-                                        if not parsed then
-                                            __continue36 = true
-                                            break
-                                        end
-                                        local product = getProduct(nil, parsed)
-                                        if best == nil or product > best.product then
-                                            best = __TS__ObjectAssign({}, parsed, {product = product})
-                                        end
-                                        __continue36 = true
-                                    until true
-                                    if not __continue36 then
-                                        break
-                                    end
+                    local item = unitItemInSlot(nil, unit, slot)
+                    if not item then
+                        goto __continue33
+                    end
+                    local idStr = deps:fourCCToString(getItemTypeId(nil, item))
+                    local entry = deps.itemsData[idStr]
+                    local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
+                    do
+                        local si = 0
+                        while si < #segments do
+                            do
+                                local parsed = parseBuff(nil, segments[si + 1])
+                                if not parsed then
+                                    goto __continue36
                                 end
-                                si = si + 1
+                                local product = getProduct(nil, parsed)
+                                if best == nil or product > best.product then
+                                    best = __TS__ObjectAssign({}, parsed, {product = product})
+                                end
                             end
+                            ::__continue36::
+                            si = si + 1
                         end
-                        __continue33 = true
-                    until true
-                    if not __continue33 then
-                        break
                     end
                 end
+                ::__continue33::
                 slot = slot + 1
             end
         end
