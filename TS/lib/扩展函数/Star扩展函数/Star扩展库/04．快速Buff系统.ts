@@ -14,6 +14,7 @@ const jglobals = require("jass.globals") as any;
 
 import { YDWESetUnitAbilityDataReal, EXSetUnitFacing } from "../../YDWE函数/00．YDWE函数";
 import { GS_Suspend } from "./03．硬直暂停系统";
+import { SUC_IsUnitStructure, SUC_IsValidUnit } from "./08．单位判定与筛选函数";
 
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -114,8 +115,8 @@ export function SFB_Init(): void {
  * @param time 持续时间（秒）
  */
 export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): void {
-  if (u == null || u === 0 || time === 0) return;
-  if (jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE)) return;
+  if (!SUC_IsValidUnit(u) || time === 0) return;
+  if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
 
   if (time <= 0) return;
@@ -227,8 +228,8 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
  * @param time 持续时间（秒）
  */
 export function SFB_setSlow(sourceUnit: any, u: any, as: number, ms: number, time: number): void {
-  if (u == null || u === 0 || time === 0) return;
-  if (jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE)) return;
+  if (!SUC_IsValidUnit(u) || time === 0) return;
+  if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
 
   if (time <= 0) return;

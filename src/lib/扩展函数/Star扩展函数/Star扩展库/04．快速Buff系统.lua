@@ -5,6 +5,9 @@ local YDWESetUnitAbilityDataReal = ____00_FF0EYDWE_51FD_6570.YDWESetUnitAbilityD
 local EXSetUnitFacing = ____00_FF0EYDWE_51FD_6570.EXSetUnitFacing
 local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
+local ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570 = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
+local SUC_IsUnitStructure = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570.SUC_IsUnitStructure
+local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570.SUC_IsValidUnit
 --- Star扩展库 - 快速Buff系统
 -- 
 -- 提供快速施加控制效果的功能，支持击晕、冰冻、沉默、变形、隐身、缴械等。
@@ -136,10 +139,10 @@ end
 -- 21=硬直, 22=暂停, 23=EX暂停
 -- @param time 持续时间（秒）
 function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
-    if u == nil or u == 0 or time == 0 then
+    if not SUC_IsValidUnit(nil, u) or time == 0 then
         return
     end
-    if jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE) then
+    if SUC_IsUnitStructure(nil, u) then
         return
     end
     if u == ____exports.SFB_Unit then
@@ -346,10 +349,10 @@ end
 -- @param ms 降低移速百分比
 -- @param time 持续时间（秒）
 function ____exports.SFB_setSlow(self, sourceUnit, u, as, ms, time)
-    if u == nil or u == 0 or time == 0 then
+    if not SUC_IsValidUnit(nil, u) or time == 0 then
         return
     end
-    if jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE) then
+    if SUC_IsUnitStructure(nil, u) then
         return
     end
     if u == ____exports.SFB_Unit then

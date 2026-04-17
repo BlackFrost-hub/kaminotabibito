@@ -8,14 +8,11 @@ local fastBuff = require("lib.扩展函数.Star扩展函数.Star扩展库.04．�
 local overSpeed = require("lib.扩展函数.Star扩展函数.Star扩展库.05．移动速度突破系统")
 local xLib = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 local effectGroup = require("lib.扩展函数.Star扩展函数.Star扩展库.07．特效组系统")
-local unitBase = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位基础函数")
-local timedLife = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位生命周期")
-local unitAttr = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性函数")
-local unitDir = require("lib.扩展函数.Star扩展函数.Star扩展库.11．单位方位函数")
-local unitFilter = require("lib.扩展函数.Star扩展函数.Star扩展库.12．单位筛选函数")
-local itemAbility = require("lib.扩展函数.Star扩展函数.Star扩展库.13．物品技能事件")
-local unitAtk = require("lib.扩展函数.Star扩展函数.Star扩展库.14．单位攻击力")
-local starBase = require("lib.扩展函数.Star扩展函数.Star扩展库.15．StarBase基础函数")
+local unitCondition = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
+local unitBase = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
+local unitAttr = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
+local itemAbility = require("lib.扩展函数.Star扩展函数.Star扩展库.11．物品技能事件")
+local starBase = require("lib.扩展函数.Star扩展函数.Star扩展库.12．StarBase基础函数")
 do
     local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -81,7 +78,7 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位基础函数")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -89,7 +86,7 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位生命周期")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -97,7 +94,7 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性函数")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -105,7 +102,7 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.11．单位方位函数")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.11．物品技能事件")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -113,31 +110,7 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.12．单位筛选函数")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.13．物品技能事件")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.14．单位攻击力")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.15．StarBase基础函数")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.12．StarBase基础函数")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -205,6 +178,18 @@ function ____exports.registerBridge(self)
     expose(nil, "EG_GroupAddGroup", effectGroup.EG_GroupAddGroup)
     expose(nil, "EG_I2EG", effectGroup.EG_I2EG)
     expose(nil, "EG_EG2I", effectGroup.EG_EG2I)
+    expose(nil, "SUC_IsValidUnit", unitCondition.SUC_IsValidUnit)
+    expose(nil, "SUC_GetFilterUnitOrNull", unitCondition.SUC_GetFilterUnitOrNull)
+    expose(nil, "SUC_GetUnitLife", unitCondition.SUC_GetUnitLife)
+    expose(nil, "SUC_IsUnitAlive", unitCondition.SUC_IsUnitAlive)
+    expose(nil, "SUC_IsUnitStructure", unitCondition.SUC_IsUnitStructure)
+    expose(nil, "SUC_IsUnitInvincible", unitCondition.SUC_IsUnitInvincible)
+    expose(nil, "SUC_IsUnitEnemyToUnit", unitCondition.SUC_IsUnitEnemyToUnit)
+    expose(nil, "SUC_IsUnitAllyToUnit", unitCondition.SUC_IsUnitAllyToUnit)
+    expose(nil, "SUC_MatchBasicTarget", unitCondition.SUC_MatchBasicTarget)
+    expose(nil, "SUF_Base_1", unitCondition.SUF_Base_1)
+    expose(nil, "SUF_Base_2", unitCondition.SUF_Base_2)
+    expose(nil, "SUF_Base_3", unitCondition.SUF_Base_3)
     expose(nil, "SU_IsUnitInvincible", unitBase.SU_IsUnitInvincible)
     expose(nil, "SU_SetUnitFlyHeight", unitBase.SU_SetUnitFlyHeight)
     expose(nil, "SU_GetHeroAllState", unitBase.SU_GetHeroAllState)
@@ -213,9 +198,9 @@ function ____exports.registerBridge(self)
     expose(nil, "UnitAddHp", unitBase.UnitAddHp)
     expose(nil, "SU_IsUnitDie", unitBase.SU_IsUnitDie)
     expose(nil, "SU_ShowOrHideUnit", unitBase.SU_ShowOrHideUnit)
-    expose(nil, "IsWaterElement", timedLife.IsWaterElement)
-    expose(nil, "GetUnitTimedLifeID", timedLife.GetUnitTimedLifeID)
-    expose(nil, "I2TimedLifeID", timedLife.I2TimedLifeID)
+    expose(nil, "IsWaterElement", unitBase.IsWaterElement)
+    expose(nil, "GetUnitTimedLifeID", unitBase.GetUnitTimedLifeID)
+    expose(nil, "I2TimedLifeID", unitBase.I2TimedLifeID)
     expose(nil, "SU_GetUnitModel", unitAttr.SU_GetUnitModel)
     expose(nil, "SU_GetHeroParmary", unitAttr.SU_GetHeroParmary)
     expose(nil, "SU_AddHeroState", unitAttr.SU_AddHeroState)
@@ -223,21 +208,19 @@ function ____exports.registerBridge(self)
     expose(nil, "SU_AddHeroAllState", unitAttr.SU_AddHeroAllState)
     expose(nil, "SU_SetHeroParmaryValue", unitAttr.SU_SetHeroParmaryValue)
     expose(nil, "SU_HeroISParmary", unitAttr.SU_HeroISParmary)
-    expose(nil, "SU_DotBehindUnit", unitDir.SU_DotBehindUnit)
-    expose(nil, "SU_GetUnitOfUnit", unitDir.SU_GetUnitOfUnit)
-    expose(nil, "SU_IsUnitInfrontUnit2", unitDir.SU_IsUnitInfrontUnit2)
-    expose(nil, "SU_IsUnitInfrontUnit", unitDir.SU_IsUnitInfrontUnit)
-    expose(nil, "SU_IsUnitBehindUnit", unitDir.SU_IsUnitBehindUnit)
-    expose(nil, "SUF_Base_1", unitFilter.SUF_Base_1)
-    expose(nil, "SUF_Base_2", unitFilter.SUF_Base_2)
-    expose(nil, "SUF_Base_3", unitFilter.SUF_Base_3)
+    expose(nil, "SU_DotBehindUnit", unitAttr.SU_DotBehindUnit)
+    expose(nil, "SU_GetUnitOfUnit", unitAttr.SU_GetUnitOfUnit)
+    expose(nil, "SU_IsUnitInfrontUnit2", unitAttr.SU_IsUnitInfrontUnit2)
+    expose(nil, "SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit)
+    expose(nil, "SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit)
+    expose(nil, "SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk)
     expose(nil, "SU_AddItemAbilityEvent", itemAbility.SU_AddItemAbilityEvent)
     expose(nil, "SU_InititemAbilityListener", itemAbility.SU_InititemAbilityListener)
     expose(nil, "SU_GetLastSpellItemAbility", itemAbility.SU_GetLastSpellItemAbility)
     expose(nil, "SU_GetLastSpellItemAbilityTargetX", itemAbility.SU_GetLastSpellItemAbilityTargetX)
     expose(nil, "SU_GetLastSpellItemAbilityTargetY", itemAbility.SU_GetLastSpellItemAbilityTargetY)
+    expose(nil, "SU_GetLastSpellItemAbilityTargetUnit", itemAbility.SU_GetLastSpellItemAbilityTargetUnit)
     expose(nil, "SU_GetLastSpellItemAbilityTargetPoint", itemAbility.SU_GetLastSpellItemAbilityTargetPoint)
-    expose(nil, "SU_GetUnitWhiteAtk", unitAtk.SU_GetUnitWhiteAtk)
     expose(nil, "Star_CoordinateX", starBase.Star_CoordinateX)
     expose(nil, "Star_CoordinateY", starBase.Star_CoordinateY)
     expose(nil, "Star_GetLocZ", starBase.Star_GetLocZ)

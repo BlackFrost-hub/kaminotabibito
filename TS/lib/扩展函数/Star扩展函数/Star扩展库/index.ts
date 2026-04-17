@@ -6,14 +6,11 @@ export * from "./04．快速Buff系统";
 export * from "./05．移动速度突破系统";
 export * from "./06．X库函数";
 export * from "./07．特效组系统";
-export * from "./08．单位基础函数";
-export * from "./09．单位生命周期";
-export * from "./10．单位属性函数";
-export * from "./11．单位方位函数";
-export * from "./12．单位筛选函数";
-export * from "./13．物品技能事件";
-export * from "./14．单位攻击力";
-export * from "./15．StarBase基础函数";
+export * from "./08．单位判定与筛选函数";
+export * from "./09．单位基础与生命周期函数";
+export * from "./10．单位属性方位与攻击函数";
+export * from "./11．物品技能事件";
+export * from "./12．StarBase基础函数";
 
 import * as cameraFunc from "./00．镜头函数";
 import * as sdrDebug from "./01．SDR调试计时器";
@@ -23,14 +20,11 @@ import * as fastBuff from "./04．快速Buff系统";
 import * as overSpeed from "./05．移动速度突破系统";
 import * as xLib from "./06．X库函数";
 import * as effectGroup from "./07．特效组系统";
-import * as unitBase from "./08．单位基础函数";
-import * as timedLife from "./09．单位生命周期";
-import * as unitAttr from "./10．单位属性函数";
-import * as unitDir from "./11．单位方位函数";
-import * as unitFilter from "./12．单位筛选函数";
-import * as itemAbility from "./13．物品技能事件";
-import * as unitAtk from "./14．单位攻击力";
-import * as starBase from "./15．StarBase基础函数";
+import * as unitCondition from "./08．单位判定与筛选函数";
+import * as unitBase from "./09．单位基础与生命周期函数";
+import * as unitAttr from "./10．单位属性方位与攻击函数";
+import * as itemAbility from "./11．物品技能事件";
+import * as starBase from "./12．StarBase基础函数";
 
 function expose(name: string, fn: any): void {
   if (typeof fn !== "function") return;
@@ -95,7 +89,20 @@ export function registerBridge(): void {
   expose("EG_GroupAddGroup", effectGroup.EG_GroupAddGroup);
   expose("EG_I2EG", effectGroup.EG_I2EG);
   expose("EG_EG2I", effectGroup.EG_EG2I);
-  // 单位基础函数
+  // 单位判定与筛选函数
+  expose("SUC_IsValidUnit", unitCondition.SUC_IsValidUnit);
+  expose("SUC_GetFilterUnitOrNull", unitCondition.SUC_GetFilterUnitOrNull);
+  expose("SUC_GetUnitLife", unitCondition.SUC_GetUnitLife);
+  expose("SUC_IsUnitAlive", unitCondition.SUC_IsUnitAlive);
+  expose("SUC_IsUnitStructure", unitCondition.SUC_IsUnitStructure);
+  expose("SUC_IsUnitInvincible", unitCondition.SUC_IsUnitInvincible);
+  expose("SUC_IsUnitEnemyToUnit", unitCondition.SUC_IsUnitEnemyToUnit);
+  expose("SUC_IsUnitAllyToUnit", unitCondition.SUC_IsUnitAllyToUnit);
+  expose("SUC_MatchBasicTarget", unitCondition.SUC_MatchBasicTarget);
+  expose("SUF_Base_1", unitCondition.SUF_Base_1);
+  expose("SUF_Base_2", unitCondition.SUF_Base_2);
+  expose("SUF_Base_3", unitCondition.SUF_Base_3);
+  // 单位基础与生命周期函数
   expose("SU_IsUnitInvincible", unitBase.SU_IsUnitInvincible);
   expose("SU_SetUnitFlyHeight", unitBase.SU_SetUnitFlyHeight);
   expose("SU_GetHeroAllState", unitBase.SU_GetHeroAllState);
@@ -104,11 +111,10 @@ export function registerBridge(): void {
   expose("UnitAddHp", unitBase.UnitAddHp);
   expose("SU_IsUnitDie", unitBase.SU_IsUnitDie);
   expose("SU_ShowOrHideUnit", unitBase.SU_ShowOrHideUnit);
-  // 单位生命周期
-  expose("IsWaterElement", timedLife.IsWaterElement);
-  expose("GetUnitTimedLifeID", timedLife.GetUnitTimedLifeID);
-  expose("I2TimedLifeID", timedLife.I2TimedLifeID);
-  // 单位属性函数
+  expose("IsWaterElement", unitBase.IsWaterElement);
+  expose("GetUnitTimedLifeID", unitBase.GetUnitTimedLifeID);
+  expose("I2TimedLifeID", unitBase.I2TimedLifeID);
+  // 单位属性方位与攻击函数
   expose("SU_GetUnitModel", unitAttr.SU_GetUnitModel);
   expose("SU_GetHeroParmary", unitAttr.SU_GetHeroParmary);
   expose("SU_AddHeroState", unitAttr.SU_AddHeroState);
@@ -116,25 +122,20 @@ export function registerBridge(): void {
   expose("SU_AddHeroAllState", unitAttr.SU_AddHeroAllState);
   expose("SU_SetHeroParmaryValue", unitAttr.SU_SetHeroParmaryValue);
   expose("SU_HeroISParmary", unitAttr.SU_HeroISParmary);
-  // 单位方位函数
-  expose("SU_DotBehindUnit", unitDir.SU_DotBehindUnit);
-  expose("SU_GetUnitOfUnit", unitDir.SU_GetUnitOfUnit);
-  expose("SU_IsUnitInfrontUnit2", unitDir.SU_IsUnitInfrontUnit2);
-  expose("SU_IsUnitInfrontUnit", unitDir.SU_IsUnitInfrontUnit);
-  expose("SU_IsUnitBehindUnit", unitDir.SU_IsUnitBehindUnit);
-  // 单位筛选函数
-  expose("SUF_Base_1", unitFilter.SUF_Base_1);
-  expose("SUF_Base_2", unitFilter.SUF_Base_2);
-  expose("SUF_Base_3", unitFilter.SUF_Base_3);
+  expose("SU_DotBehindUnit", unitAttr.SU_DotBehindUnit);
+  expose("SU_GetUnitOfUnit", unitAttr.SU_GetUnitOfUnit);
+  expose("SU_IsUnitInfrontUnit2", unitAttr.SU_IsUnitInfrontUnit2);
+  expose("SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit);
+  expose("SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit);
+  expose("SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk);
   // 物品技能事件
   expose("SU_AddItemAbilityEvent", itemAbility.SU_AddItemAbilityEvent);
   expose("SU_InititemAbilityListener", itemAbility.SU_InititemAbilityListener);
   expose("SU_GetLastSpellItemAbility", itemAbility.SU_GetLastSpellItemAbility);
   expose("SU_GetLastSpellItemAbilityTargetX", itemAbility.SU_GetLastSpellItemAbilityTargetX);
   expose("SU_GetLastSpellItemAbilityTargetY", itemAbility.SU_GetLastSpellItemAbilityTargetY);
+  expose("SU_GetLastSpellItemAbilityTargetUnit", itemAbility.SU_GetLastSpellItemAbilityTargetUnit);
   expose("SU_GetLastSpellItemAbilityTargetPoint", itemAbility.SU_GetLastSpellItemAbilityTargetPoint);
-  // 单位攻击力
-  expose("SU_GetUnitWhiteAtk", unitAtk.SU_GetUnitWhiteAtk);
   // StarBase基础函数
   expose("Star_CoordinateX", starBase.Star_CoordinateX);
   expose("Star_CoordinateY", starBase.Star_CoordinateY);
