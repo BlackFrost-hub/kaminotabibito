@@ -27,13 +27,26 @@ ____exports.items.I00T = {
     dmg = 6,
     int = 1
 }
-____exports.items.I00S = {
+____exports.items.pres = {
     type = "道具/戒指/饰品",
-    name = "恢复指环",
+    name = "恢复药水",
     goldPrice = 50,
-    score = 250,
-    level = "E-",
-    hp = 50
+    score = 400,
+    level = "E",
+    hot = "200hp",
+    movespeed2 = 75,
+    PowerUP = "50%int;time3",
+    abilList = "A08C"
+}
+____exports.items.rde3 = {
+    type = "守护指环 +4",
+    name = "恢复药水",
+    goldPrice = 50,
+    score = 400,
+    level = "E",
+    hot = "200hp",
+    movespeed2 = 150,
+    abilList = "A08C"
 }
 ____exports.items.I00P = {
     type = "道具/戒指/饰品",
@@ -43,9 +56,7 @@ ____exports.items.I00P = {
     level = "E-",
     dmg = 2,
     all = 2,
-    magicDmg = 0.3,
-    Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
-    primaryBonus = "力量+16/敏捷+20/智力+20"
+    Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
 }
 ____exports.items.I01K = {
     type = "道具/戒指/饰品",

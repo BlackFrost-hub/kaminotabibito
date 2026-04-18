@@ -129,6 +129,7 @@ local function expose(self, name, fn)
 end
 function ____exports.registerBridge(self)
     expose(nil, "StarOther_PanCameraToTimedUnitForPlayer", cameraFunc.StarOther_PanCameraToTimedUnitForPlayer)
+    expose(nil, "StarOther_PanCameraToTimedForPlayer", cameraFunc.StarOther_PanCameraToTimedForPlayer)
     expose(nil, "SDR_DebugTimer", sdrDebug.SDR_DebugTimer)
     expose(nil, "STES_Register", starEvent.STES_Register)
     expose(nil, "STES_RegisterEx", starEvent.STES_RegisterEx)

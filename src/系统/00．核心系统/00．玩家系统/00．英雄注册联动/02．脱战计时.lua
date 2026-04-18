@@ -9,9 +9,17 @@ local ____exports = {}
 -- 2. 计时器到期后恢复生命/魔法到100%，添加脱战移速技能
 -- 3. 若有脱战buff且受到超过1%最大生命伤害，移除脱战移速技能
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
+local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
+local SetUnitLifePercentBJ = ____require_result_1.SetUnitLifePercentBJ
+local SetUnitManaPercentBJ = ____require_result_1.SetUnitManaPercentBJ
+--- 从japi获取事件伤害
+local function getEventDamage(self)
+    return japi.GetEventDamage()
+end
 --- 脱战计时时间（秒）
 local OUT_OF_COMBAT_TIME = 18
 --- 脱战移速技能ID
@@ -120,10 +128,8 @@ local function onOutOfCombat(self, playerId)
                 "脱战成功！生命和魔法已恢复。"
             )
             jass.UnitAddAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY)
-            local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
-            local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
-            jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife)
-            jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana)
+            SetUnitLifePercentBJ(nil, unit, 100)
+            SetUnitManaPercentBJ(nil, unit, 100)
             jass.SetUnitPathing(unit, true)
         end
     )
@@ -144,14 +150,14 @@ local function checkRemoveOutOfCombatBuff(self, unit, damage)
             0,
             0,
             30,
-            "受到重创，脱战移速已消失！"
+            "|cffff0000『进入战斗状态』|r"
         )
     end
 end
 --- 单位受伤事件处理
 local function onUnitDamaged(self)
     local unit = jass.GetTriggerUnit()
-    local damage = jass.GetEventDamage()
+    local damage = getEventDamage(nil)
     if jass.IsUnitIllusion(unit) then
         return
     end

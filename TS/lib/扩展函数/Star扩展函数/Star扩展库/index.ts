@@ -35,6 +35,7 @@ function expose(name: string, fn: any): void {
 
 export function registerBridge(): void {
   expose("StarOther_PanCameraToTimedUnitForPlayer", cameraFunc.StarOther_PanCameraToTimedUnitForPlayer);
+  expose("StarOther_PanCameraToTimedForPlayer", cameraFunc.StarOther_PanCameraToTimedForPlayer);
   expose("SDR_DebugTimer", sdrDebug.SDR_DebugTimer);
   expose("STES_Register", starEvent.STES_Register);
   expose("STES_RegisterEx", starEvent.STES_RegisterEx);

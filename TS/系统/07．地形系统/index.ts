@@ -3,14 +3,12 @@
  */
 
 // 导出核心模块
-export * from "./01．镜头系统";
 export * from "./02．区域传送配置";
 export * from "./03．区域传送";
 export * from "./04．激活传送点配置";
 export * from "./05．激活传送点";
 
 // 加载所有子模块
-require("系统.07．地形系统.01．镜头系统");
 require("系统.07．地形系统.02．区域传送配置");
 
 const 区域传送 = require("系统.07．地形系统.03．区域传送") as { init区域传送?: () => void };

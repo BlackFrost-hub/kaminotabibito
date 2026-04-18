@@ -3,11 +3,11 @@ local ____exports = {}
 --- 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
 -- 
 -- JASS 侧：
--- - 传参：YDLocal5Set(group, "dwz", someGroup)
+-- - 传参：YDLocal5Set(unit, "英雄", someHero)
 -- - 触发：STES_Fire("玩家英雄注册")
 -- 
 -- Lua 侧职责：
--- - 从传入单位组中筛选玩家 1-5 操作的英雄
+-- - 从传入单位中筛选玩家 1-5 操作的英雄
 -- - 写入 YDUserData("player", whichPlayer, "英雄", "unit")
 -- - 在拿到英雄时，把英雄注册到各个依赖它的联动模块
 local jass = require("jass.common")
@@ -18,9 +18,9 @@ local YDUserDataSet = ____require_result_0.YDUserDataSet
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
 local YDLocal5Get = ____require_result_1.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．移速龙卷特效")
-local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．脱战计时")
-local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．背包满移交宠物")
+local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
+local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
+local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
 local TRIG_KEY = "__syzl_playerHeroRegister_trig"
 local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
@@ -102,62 +102,29 @@ local function registerPlayerHero(self, whichPlayer, whichHero)
     )
     registerHeroDependents(nil, whichHero)
 end
---- 从 JASS 传入的单位组里找出玩家 1-5 的英雄，并逐个完成登记。
-local function registerHeroesFromGroup(self, heroGroup)
-    if heroGroup == nil or heroGroup == 0 then
+--- 从 JASS 传入的单个英雄单位完成一次登记。
+-- 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。
+local function registerSingleHero(self, whichHero)
+    if not isPlayableHero(nil, whichHero) then
         return
     end
-    if type(jass.ForGroup) ~= "function" or type(jass.GetEnumUnit) ~= "function" then
+    if type(jass.GetOwningPlayer) ~= "function" then
         return
     end
-    if type(jass.GetOwningPlayer) ~= "function" or type(jass.GetPlayerId) ~= "function" or type(jass.Player) ~= "function" then
+    local owner = jass.GetOwningPlayer(whichHero)
+    if owner == nil or owner == 0 then
         return
     end
-    local heroByPlayer = {}
-    jass.ForGroup(
-        heroGroup,
-        function()
-            local whichUnit = jass.GetEnumUnit()
-            if not isPlayableHero(nil, whichUnit) then
-                return
-            end
-            local owner = jass.GetOwningPlayer(whichUnit)
-            local playerId = jass.GetPlayerId(owner) or -1
-            if playerId < 0 or playerId > 4 then
-                return
-            end
-            if heroByPlayer[playerId] == nil then
-                heroByPlayer[playerId] = whichUnit
-            end
-        end
-    )
-    do
-        local playerId = 0
-        while playerId <= 4 do
-            do
-                local hero = heroByPlayer[playerId]
-                if hero == nil then
-                    goto __continue29
-                end
-                registerPlayerHero(
-                    nil,
-                    jass.Player(playerId),
-                    hero
-                )
-            end
-            ::__continue29::
-            playerId = playerId + 1
-        end
-    end
+    registerPlayerHero(nil, owner, whichHero)
 end
 --- STES 子触发真正执行的核心入口。
 local function runRegisterPlayerHero(self)
     helper:ydlStes_syncTriggerStep(nil)
     do
         pcall(function()
-            registerHeroesFromGroup(
+            registerSingleHero(
                 nil,
-                YDLocal5Get(nil, "group", C.STES_PARAM_HERO_GROUP)
+                YDLocal5Get(nil, "unit", C.STES_PARAM_HERO_UNIT)
             )
         end)
         do

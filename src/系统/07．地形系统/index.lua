@@ -1,14 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
-    local ____export = require("系统.07．地形系统.01．镜头系统")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
     local ____export = require("系统.07．地形系统.02．区域传送配置")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -40,7 +32,6 @@ do
         end
     end
 end
-require("系统.07．地形系统.01．镜头系统")
 require("系统.07．地形系统.02．区域传送配置")
 local _____533A_57DF_4F20_9001 = require("系统.07．地形系统.03．区域传送")
 if type(_____533A_57DF_4F20_9001["init区域传送"]) == "function" then

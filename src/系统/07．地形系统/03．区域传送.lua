@@ -9,8 +9,6 @@ local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
 local ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E = require("系统.07．地形系统.02．区域传送配置")
 local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E.default
-local ____01_FF0E_955C_5934_7CFB_7EDF = require("系统.07．地形系统.01．镜头系统")
-local panCameraToTimedForPlayer = ____01_FF0E_955C_5934_7CFB_7EDF.panCameraToTimedForPlayer
 --- 区域传送：
 -- - 开局按 `区域传送配置` 批量创建 Region 并注册进入事件
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
@@ -18,6 +16,8 @@ local panCameraToTimedForPlayer = ____01_FF0E_955C_5934_7CFB_7EDF.panCameraToTim
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local regionMap = __TS__New(Map)
 local function dbg(self, _msg)
 end
@@ -78,13 +78,13 @@ local function runRegionRule(self, rule, unit, owner)
         r = jass.GetRandomInt(1, totalWeight)
     else
         local m = math
-        local ____temp_1
+        local ____temp_2
         if type(m.random) == "function" then
-            ____temp_1 = m:random(1, totalWeight)
+            ____temp_2 = m:random(1, totalWeight)
         else
-            ____temp_1 = 1
+            ____temp_2 = 1
         end
-        r = ____temp_1
+        r = ____temp_2
     end
     local chosen
     for ____, it in ipairs(items) do
@@ -183,30 +183,30 @@ local function initRegionTeleport(self)
         ::__continue38::
     end
     local function onEnter()
-        local ____temp_2
-        if type(jass.GetTriggerUnit) == "function" then
-            ____temp_2 = jass.GetTriggerUnit()
-        else
-            ____temp_2 = nil
-        end
-        local unit = ____temp_2
         local ____temp_3
-        if type(jass.GetTriggeringRegion) == "function" then
-            ____temp_3 = jass.GetTriggeringRegion()
+        if type(jass.GetTriggerUnit) == "function" then
+            ____temp_3 = jass.GetTriggerUnit()
         else
             ____temp_3 = nil
         end
-        local region = ____temp_3
-        if unit == nil or region == nil then
-            return
-        end
+        local unit = ____temp_3
         local ____temp_4
-        if type(jass.GetOwningPlayer) == "function" then
-            ____temp_4 = jass.GetOwningPlayer(unit)
+        if type(jass.GetTriggeringRegion) == "function" then
+            ____temp_4 = jass.GetTriggeringRegion()
         else
             ____temp_4 = nil
         end
-        local owner = ____temp_4
+        local region = ____temp_4
+        if unit == nil or region == nil then
+            return
+        end
+        local ____temp_5
+        if type(jass.GetOwningPlayer) == "function" then
+            ____temp_5 = jass.GetOwningPlayer(unit)
+        else
+            ____temp_5 = nil
+        end
+        local owner = ____temp_5
         if owner ~= nil and type(jass.Player) == "function" and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
             local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
             if owner == neutralAgg then
@@ -233,7 +233,7 @@ local function initRegionTeleport(self)
         end
         local player = owner
         if player ~= nil then
-            panCameraToTimedForPlayer(
+            StarOther_PanCameraToTimedForPlayer(
                 nil,
                 player,
                 cfg.teleportX,

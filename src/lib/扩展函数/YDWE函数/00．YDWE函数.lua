@@ -256,9 +256,12 @@ local typeNames = {
 -- @param objectId 物体ID，传字符串四字码（如 'Hamg'）或 FourCC 整数
 -- @param property 属性名（如 "Name", "Primary"）
 function ____exports.getObjectProperty(self, objectType, objectId, property)
-    local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t['") .. tostring(objectId)) .. "']; if _u then return _u.") .. property) .. " else return '' end end)()"
-    local result = japi.EXExecuteScript(script)
-    return result or ""
+    if type(objectId) == "number" then
+        local script = (((("(require'jass.slk')." .. typeNames[objectType + 1]) .. "[") .. tostring(objectId)) .. "].") .. property
+        return japi.EXExecuteScript(script) or ""
+    end
+    local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t['") .. objectId) .. "']; if _u then return _u.") .. property) .. " else return '' end end)()"
+    return japi.EXExecuteScript(script) or ""
 end
 function ____exports.getObjectPropertyInteger(self, objectType, objectId, property)
     local str = ____exports.getObjectProperty(nil, objectType, objectId, property)

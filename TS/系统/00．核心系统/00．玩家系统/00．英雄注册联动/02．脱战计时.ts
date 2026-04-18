@@ -8,11 +8,22 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
 
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
+
+const { SetUnitLifePercentBJ, SetUnitManaPercentBJ } = require("lib.扩展函数.BJ函数.index") as {
+  SetUnitLifePercentBJ: (whichUnit: any, percent: number) => void;
+  SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
+};
+
+/** 从japi获取事件伤害 */
+function getEventDamage(): number {
+  return japi.GetEventDamage();
+}
 
 //=============================================================================
 // 一、常量配置
@@ -113,10 +124,8 @@ function onOutOfCombat(playerId: number): void {
     jass.UnitAddAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY);
 
     // 恢复生命和魔法到100%
-    const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
-    const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
-    jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife);
-    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana);
+    SetUnitLifePercentBJ(unit, 100);
+    SetUnitManaPercentBJ(unit, 100);
 
     // 恢复碰撞
     jass.SetUnitPathing(unit, true);
@@ -138,7 +147,7 @@ function checkRemoveOutOfCombatBuff(unit: any, damage: number): void {
     jass.UnitRemoveAbility(unit, OUT_OF_COMBAT_BUFF);
 
     const owner = jass.GetOwningPlayer(unit);
-    jass.DisplayTimedTextToPlayer(owner, 0, 0, 30, "受到重创，脱战移速已消失！");
+    jass.DisplayTimedTextToPlayer(owner, 0, 0, 30, "|cffff0000『进入战斗状态』|r");
   }
 }
 
@@ -151,7 +160,7 @@ function checkRemoveOutOfCombatBuff(unit: any, damage: number): void {
  */
 function onUnitDamaged(): void {
   const unit = jass.GetTriggerUnit();
-  const damage = jass.GetEventDamage();
+  const damage = getEventDamage();
 
   // 检查是否为幻象
   if (jass.IsUnitIllusion(unit)) return;

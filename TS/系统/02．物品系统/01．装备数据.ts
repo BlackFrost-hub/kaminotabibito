@@ -86,7 +86,8 @@ export const items: Record<string, ItemDataEntry> = {};
 items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8};
 items["I00E"] = {type: "道具/戒指/饰品", name: "生命树枝", goldPrice: 100, score: 220, level: "E-", hp: 200, hpRegen: 1};
 items["I00T"] = {type: "主武器", name: "小法杖", goldPrice: 100, score: 222, level: "E-", dmg: 6, int: 1};
-items["I00S"] = {type: "道具/戒指/饰品", name: "恢复指环", goldPrice: 50, score: 250, level: "E-", hp: 50};
+items["pres"] = {type: "道具/戒指/饰品", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 75,PowerUP: "50%int;time3", abilList: "A08C"};
+items["rde3"] = {type: "守护指环 +4", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 150, abilList: "A08C"};
 items["I00P"] = {
   type: "道具/戒指/饰品",
   name: "树枝",
@@ -95,9 +96,7 @@ items["I00P"] = {
   level: "E-",
   dmg: 2,
   all: 2,
-  magicDmg: 0.3,
   Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
-  primaryBonus: "力量+16/敏捷+20/智力+20",
 };
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};
 items["I06X"] = {type: "道具/戒指/饰品", name: "初始魔法药水", goldPrice: 50, score: 400, level: "E", hot: "100mp", abilList: "A08C"};

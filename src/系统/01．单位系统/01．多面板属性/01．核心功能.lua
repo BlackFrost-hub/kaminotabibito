@@ -882,6 +882,6 @@ local function delayedInit(self)
 end
 if MULTIBOARD_SYSTEM_ENABLED then
     local initTimer = jass.CreateTimer()
-    jass.TimerStart(initTimer, 1, false, delayedInit)
+    jass.TimerStart(initTimer, 2, false, delayedInit)
 end
 return ____exports

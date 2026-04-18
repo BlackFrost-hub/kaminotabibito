@@ -44,6 +44,10 @@ local _millisCounter = 0
 local _initialized = false
 --- 游戏难度
 local _gameDifficulty = 1
+--- 游戏运行时间（秒，含小数）
+local _gameElapsedTime = 0
+--- 游戏时间：[秒, 分, 时]
+local _gameTimeHMS = {0, 0, 0}
 --- 时间缓存
 local _timeCache = {
     year = 2016,
@@ -161,6 +165,10 @@ end
 --- 每10毫秒更新服务器时间
 local function onTick(self)
     _millisCounter = _millisCounter + 1
+    _gameElapsedTime = _gameElapsedTime + 0.01
+    if jassGlobals.udg_Elapsed ~= nil then
+        jassGlobals.udg_Elapsed = _gameElapsedTime
+    end
     for ____, callback in ipairs(_tickCallbacks) do
         callback(nil)
     end
@@ -168,6 +176,20 @@ local function onTick(self)
         _millisCounter = 0
         _serverTime = _serverTime + 1000
         calcDate(nil, _serverTime / 1000)
+        _gameTimeHMS[1] = _gameTimeHMS[1] + 1
+        if _gameTimeHMS[1] >= 60 then
+            _gameTimeHMS[1] = 0
+            _gameTimeHMS[2] = _gameTimeHMS[2] + 1
+            if _gameTimeHMS[2] >= 60 then
+                _gameTimeHMS[2] = 0
+                _gameTimeHMS[3] = _gameTimeHMS[3] + 1
+            end
+        end
+        if jass.udg_Time ~= nil then
+            jass.udg_Time[0] = _gameTimeHMS[1]
+            jass.udg_Time[1] = _gameTimeHMS[2]
+            jass.udg_Time[2] = _gameTimeHMS[3]
+        end
         for ____, callback in ipairs(_secondCallbacks) do
             callback(nil)
         end
@@ -182,37 +204,37 @@ end
 -- @param i 0=年, 1=月, 2=日, 3=时, 4=分, 5=秒, 6=星期, 7=毫秒
 function ____exports.getTime(self, i)
     repeat
-        local ____switch28 = i
-        local ____cond28 = ____switch28 == 0
-        if ____cond28 then
+        local ____switch32 = i
+        local ____cond32 = ____switch32 == 0
+        if ____cond32 then
             return _timeCache.year
         end
-        ____cond28 = ____cond28 or ____switch28 == 1
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 1
+        if ____cond32 then
             return _timeCache.month
         end
-        ____cond28 = ____cond28 or ____switch28 == 2
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 2
+        if ____cond32 then
             return _timeCache.day
         end
-        ____cond28 = ____cond28 or ____switch28 == 3
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 3
+        if ____cond32 then
             return _timeCache.hour
         end
-        ____cond28 = ____cond28 or ____switch28 == 4
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 4
+        if ____cond32 then
             return _timeCache.minute
         end
-        ____cond28 = ____cond28 or ____switch28 == 5
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 5
+        if ____cond32 then
             return _timeCache.second
         end
-        ____cond28 = ____cond28 or ____switch28 == 6
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 6
+        if ____cond32 then
             return _timeCache.weekday
         end
-        ____cond28 = ____cond28 or ____switch28 == 7
-        if ____cond28 then
+        ____cond32 = ____cond32 or ____switch32 == 7
+        if ____cond32 then
             return _timeCache.millisecond
         end
         do
@@ -224,6 +246,14 @@ end
 -- 注意：这是游戏运行时间，不是服务器时间
 function ____exports.getGameTime(self)
     return _serverTime + _millisCounter * 10 - (_initialized and _serverTime or 0)
+end
+--- 获取游戏运行时间（秒）
+function ____exports.getGameElapsedTime(self)
+    return _gameElapsedTime
+end
+--- 获取游戏时间数组 [秒, 分, 时]
+function ____exports.getGameTimeHMS(self)
+    return {_gameTimeHMS[1], _gameTimeHMS[2], _gameTimeHMS[3]}
 end
 --- 获取游戏时间格式化对象
 function ____exports.getGameTimeFormatted(self)

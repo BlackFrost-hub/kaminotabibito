@@ -44,6 +44,12 @@ let _initialized = false;
 /** 游戏难度 */
 let _gameDifficulty = 1;
 
+/** 游戏运行时间（秒，含小数） */
+let _gameElapsedTime = 0;
+
+/** 游戏时间：[秒, 分, 时] */
+let _gameTimeHMS = [0, 0, 0];
+
 /** 时间缓存 */
 let _timeCache = {
   year: 2016,
@@ -178,6 +184,14 @@ function calcDate(now: number): void {
 function onTick(): void {
   _millisCounter = _millisCounter + 1;
 
+  // 游戏运行时间+0.01秒
+  _gameElapsedTime = _gameElapsedTime + 0.01;
+
+  // 同步到JASS全局变量（秒，含小数）
+  if (jassGlobals.udg_Elapsed != null) {
+    jassGlobals.udg_Elapsed = _gameElapsedTime;
+  }
+
   // 执行每10毫秒回调
   for (const callback of _tickCallbacks) {
     callback();
@@ -187,6 +201,24 @@ function onTick(): void {
     _millisCounter = 0;
     _serverTime = _serverTime + 1000;
     calcDate(_serverTime / 1000);
+
+    // 更新游戏时间 [秒, 分, 时]
+    _gameTimeHMS[0] = _gameTimeHMS[0] + 1;
+    if (_gameTimeHMS[0] >= 60) {
+      _gameTimeHMS[0] = 0;
+      _gameTimeHMS[1] = _gameTimeHMS[1] + 1;
+      if (_gameTimeHMS[1] >= 60) {
+        _gameTimeHMS[1] = 0;
+        _gameTimeHMS[2] = _gameTimeHMS[2] + 1;
+      }
+    }
+
+    // 同步到JASS全局变量
+    if ((jass as any).udg_Time != null) {
+      (jass as any).udg_Time[0] = _gameTimeHMS[0];
+      (jass as any).udg_Time[1] = _gameTimeHMS[1];
+      (jass as any).udg_Time[2] = _gameTimeHMS[2];
+    }
 
     // 执行每秒回调
     for (const callback of _secondCallbacks) {
@@ -230,6 +262,20 @@ export function getTime(i: number): number {
  */
 export function getGameTime(): number {
   return _serverTime + _millisCounter * 10 - (_initialized ? _serverTime : 0);
+}
+
+/**
+ * 获取游戏运行时间（秒）
+ */
+export function getGameElapsedTime(): number {
+  return _gameElapsedTime;
+}
+
+/**
+ * 获取游戏时间数组 [秒, 分, 时]
+ */
+export function getGameTimeHMS(): [number, number, number] {
+  return [_gameTimeHMS[0], _gameTimeHMS[1], _gameTimeHMS[2]];
 }
 
 /**

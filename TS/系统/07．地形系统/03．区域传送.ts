@@ -10,7 +10,9 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
 };
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
-import { panCameraToTimedForPlayer } from "./01．镜头系统";
+const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
+  StarOther_PanCameraToTimedForPlayer: (whichPlayer: any, x: number, y: number, duration: number) => void;
+};
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
 const regionMap = new Map<any, RegionConfig>();
@@ -211,7 +213,7 @@ function initRegionTeleport(): void {
     // dbg("传送完成");
     const player = owner;
     if (player != null) {
-      panCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
+      StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
       if (typeof (jass as any).DisplayTimedTextToPlayer === "function") {
         (jass as any).DisplayTimedTextToPlayer(
           player,

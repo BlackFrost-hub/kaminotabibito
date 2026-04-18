@@ -24,4 +24,24 @@ function ____exports.StarOther_PanCameraToTimedUnitForPlayer(self, whichPlayer, 
         )
     end
 end
+--- 对指定玩家在指定时间内平移镜头到 (x, y)。
+-- 仅在被移动镜头的玩家本地执行 PanCameraToTimed，其他玩家不受影响。
+-- 
+-- @param whichPlayer 要移动镜头的玩家（jhandle_t）
+-- @param x 目标 X 坐标
+-- @param y 目标 Y 坐标
+-- @param duration 平移耗时（秒）
+function ____exports.StarOther_PanCameraToTimedForPlayer(self, whichPlayer, x, y, duration)
+    if type(jass.GetLocalPlayer) ~= "function" then
+        return
+    end
+    local localPlayer = jass.GetLocalPlayer()
+    if localPlayer ~= whichPlayer then
+        return
+    end
+    if type(jass.PanCameraToTimed) ~= "function" then
+        return
+    end
+    jass.PanCameraToTimed(x, y, duration)
+end
 return ____exports

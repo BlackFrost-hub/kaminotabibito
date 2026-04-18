@@ -2,11 +2,11 @@
  * 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
  *
  * JASS 侧：
- * - 传参：YDLocal5Set(group, "dwz", someGroup)
+ * - 传参：YDLocal5Set(unit, "英雄", someHero)
  * - 触发：STES_Fire("玩家英雄注册")
  *
  * Lua 侧职责：
- * - 从传入单位组中筛选玩家 1-5 操作的英雄
+ * - 从传入单位中筛选玩家 1-5 操作的英雄
  * - 写入 YDUserData("player", whichPlayer, "英雄", "unit")
  * - 在拿到英雄时，把英雄注册到各个依赖它的联动模块
  */
@@ -31,16 +31,16 @@ const helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工�
   ydlStes_registerAfterGetTable: (_self: any, trig: any, eventName: string) => void;
 };
 
-const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．移速龙卷特效") as {
+const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效") as {
   registerMoveSpeedTornadoHero: (whichHero: any) => void;
 };
 
-const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．脱战计时") as {
+const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时") as {
   registerOutOfCombatHero: (whichHero: any) => void;
   initOutOfCombat: () => void;
 };
 
-const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．背包满移交宠物") as {
+const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物") as {
   registerPetItemHandoffHero: (whichHero: any) => void;
 };
 
@@ -109,30 +109,16 @@ function registerPlayerHero(whichPlayer: any, whichHero: any): void {
 }
 
 /**
- * 从 JASS 传入的单位组里找出玩家 1-5 的英雄，并逐个完成登记。
+ * 从 JASS 传入的单个英雄单位完成一次登记。
+ * 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。
  */
-function registerHeroesFromGroup(heroGroup: any): void {
-  if (heroGroup == null || heroGroup === 0) return;
-  if (typeof jass.ForGroup !== "function" || typeof jass.GetEnumUnit !== "function") return;
-  if (typeof jass.GetOwningPlayer !== "function" || typeof jass.GetPlayerId !== "function" || typeof jass.Player !== "function") return;
+function registerSingleHero(whichHero: any): void {
+  if (!isPlayableHero(whichHero)) return;
+  if (typeof jass.GetOwningPlayer !== "function") return;
 
-  const heroByPlayer: Record<number, any> = {};
-
-  jass.ForGroup(heroGroup, () => {
-    const whichUnit = jass.GetEnumUnit();
-    if (!isPlayableHero(whichUnit)) return;
-
-    const owner = jass.GetOwningPlayer(whichUnit);
-    const playerId = (jass.GetPlayerId(owner) as number) || -1;
-    if (playerId < 0 || playerId > 4) return;
-    if (heroByPlayer[playerId] == null) heroByPlayer[playerId] = whichUnit;
-  });
-
-  for (let playerId = 0; playerId <= 4; playerId++) {
-    const hero = heroByPlayer[playerId];
-    if (hero == null) continue;
-    registerPlayerHero(jass.Player(playerId), hero);
-  }
+  const owner = jass.GetOwningPlayer(whichHero);
+  if (owner == null || owner === 0) return;
+  registerPlayerHero(owner, whichHero);
 }
 
 /**
@@ -141,7 +127,7 @@ function registerHeroesFromGroup(heroGroup: any): void {
 function runRegisterPlayerHero(): void {
   helper.ydlStes_syncTriggerStep(undefined);
   try {
-    registerHeroesFromGroup(YDLocal5Get("group", C.STES_PARAM_HERO_GROUP));
+    registerSingleHero(YDLocal5Get("unit", C.STES_PARAM_HERO_UNIT));
   } finally {
     helper.ydlStes_finishChildCleanup(undefined);
   }
@@ -203,7 +189,7 @@ function tryRegisterPlayerHeroStes(): void {
  * 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
  */
 export function initPlayerHeroGetBridge(): void {
-  // 初始化脱战计时系统
+  // 初始化脱战计时系统。
   if (typeof outOfCombat.initOutOfCombat === "function") {
     outOfCombat.initOutOfCombat();
   }

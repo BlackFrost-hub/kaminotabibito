@@ -450,7 +450,7 @@ function delayedInit(): void {
 // 延迟初始化：游戏开始后1秒执行（等待玩家进入游戏）
 if (MULTIBOARD_SYSTEM_ENABLED) {
   const initTimer = jass.CreateTimer();
-  jass.TimerStart(initTimer, 1.0, false, delayedInit);
+  jass.TimerStart(initTimer, 2.0, false, delayedInit);
 }
 
 export {};
