@@ -9,7 +9,7 @@
 export const UI_ATTRIBUTE_SYSTEM_ENABLED = true;
 
 /** 系统初始化延迟时间（秒），游戏开始后多久启动UI */
-export const INIT_DELAY_SECONDS = 3.0;
+export const INIT_DELAY_SECONDS = 0.5;
 
 /** UI刷新间隔（秒），越小刷新越频繁但性能消耗越大 */
 export const REFRESH_INTERVAL_SECONDS = 0.5;
@@ -121,16 +121,19 @@ export const DETAIL_BOX_X = 0.118;
 export const DETAIL_BOX_Y = 0.4077288;
 
 /** 属性详情框宽度 */
-export const DETAIL_BOX_WIDTH = 0.18;
+export const DETAIL_BOX_WIDTH = 0.20;
 
 /** 属性详情框高度 */
-export const DETAIL_BOX_HEIGHT = 0.3;
+export const DETAIL_BOX_HEIGHT = 0.35;
 
 /** 属性行宽度 */
 export const DETAIL_LINE_WIDTH = 0.0766664;
 
 /** 属性行高度 */
 export const DETAIL_LINE_HEIGHT = 0.0186618;
+
+/** 属性详情字体大小 */
+export const DETAIL_FONT_SIZE = 0.0105;
 
 /** 第一行属性的起始Y坐标 */
 export const DETAIL_START_Y = 0.5363808;
@@ -146,7 +149,7 @@ export const DETAIL_RIGHT_X = 0.1545832;
 
 /**
  * 属性详情面板的行布局配置
- * 每行有两个属性（左右两列），共10行显示20个属性
+ * 每行有两个属性（左右两列），共15行显示30个属性
  * 格式：{ x: 水平位置, y: 垂直位置 }
  */
 export const DETAIL_LINE_LAYOUTS = [
@@ -170,4 +173,14 @@ export const DETAIL_LINE_LAYOUTS = [
   { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 8 },
   { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 9 },
   { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 9 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 10 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 10 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 11 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 11 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 12 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 12 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 13 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 13 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 14 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 14 },
 ] as const;

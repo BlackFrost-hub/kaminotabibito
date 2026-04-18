@@ -38,6 +38,7 @@ const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量
   DETAIL_BOX_HEIGHT: number;
   DETAIL_LINE_WIDTH: number;
   DETAIL_LINE_HEIGHT: number;
+  DETAIL_FONT_SIZE: number;
   DETAIL_LINE_LAYOUTS: readonly { x: number; y: number }[];
 };
 const {
@@ -155,8 +156,10 @@ function createDetailSlots(gameUI: number, players: any[]): void {
       show(icon, true);
     }
 
-    createText(gameUI, "UI属性系统快捷键" + i, iconX, 常量.HERO_KEY_Y, 0.009, `|cffffff00F${i + 2}|r`);
+    // 先创建快捷键文本（在icon上，同一父节点下先创建的优先级低）
+    createText(icon, "UI属性系统快捷键" + i, iconX, 常量.HERO_KEY_Y, 0.009, `|cffffff00F${i + 2}|r`);
 
+    // 后创建文本框，优先级高于快捷键文本，会覆盖它
     const box = createFrame("BACKDROP", "UI属性系统文本框" + i, icon);
     if (box !== 0) {
       setAbsolute(box, 常量.DETAIL_BOX_X, 常量.DETAIL_BOX_Y);
@@ -168,7 +171,7 @@ function createDetailSlots(gameUI: number, players: any[]): void {
     const lines: number[] = [];
     for (let lineIndex = 0; lineIndex < 常量.DETAIL_LINE_LAYOUTS.length; lineIndex++) {
       const pos = 常量.DETAIL_LINE_LAYOUTS[lineIndex];
-      const line = createText(box, `UI属性系统属性行${i}_${lineIndex}`, pos.x, pos.y, 0.009, "");
+      const line = createText(box, `UI属性系统属性行${i}_${lineIndex}`, pos.x, pos.y, 常量.DETAIL_FONT_SIZE, "");
       if (line !== 0) {
         japi.DzFrameSetSize(line, 常量.DETAIL_LINE_WIDTH, 常量.DETAIL_LINE_HEIGHT);
         show(line, false);

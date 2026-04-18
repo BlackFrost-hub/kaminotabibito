@@ -229,7 +229,7 @@ local function createDetailSlots(gameUI, players)
                 show(icon, true)
             end
             createText(
-                gameUI,
+                icon,
                 "UI属性系统快捷键" .. tostring(i),
                 iconX,
                 _____5E38_91CF.HERO_KEY_Y,
@@ -257,7 +257,7 @@ local function createDetailSlots(gameUI, players)
                         (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
                         pos.x,
                         pos.y,
-                        0.009,
+                        _____5E38_91CF.DETAIL_FONT_SIZE,
                         ""
                     )
                     if line ~= 0 then

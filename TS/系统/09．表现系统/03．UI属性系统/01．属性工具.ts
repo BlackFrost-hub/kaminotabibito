@@ -136,31 +136,51 @@ function number(player: any, attr: string): string {
 /**
  * 按 `属性查看.j` 的展示顺序拼出属性框每一行文本。
  * 这里统一改为读取当前 TS 正式属性名，不再兼容旧 JASS 字段名。
+ * 与装备系统属性对齐
  */
 export function buildDetailTexts(player: any): string[] {
   updatePlayerRealtimeStats(player);
 
   return [
-    dualLine("|cff993300", "物理伤害：", `${pctPlus100(player, "物理伤害")}/${pctMinus100(player, "物理抗性")}`, "|cff993300", "护甲穿透：", pct(player, "护甲穿透")),
-    dualLine("|cff00ccff", "魔法伤害：", `${pctPlus100(player, "魔法伤害")}/${pctMinus100(player, "魔抗")}`, "|cff00ccff", "魔法穿透：", pct(player, "魔法穿透")),
-    dualLine("|cffff6800", "技能伤害：", `${pctPlus100(player, "技能伤害")}/${pctMinus100(player, "技能抗性")}`, "|cffff6600", "强化伤害：", pctPlus100(player, "强化伤害")),
-    dualLine("|cff333333", "召唤物伤害：", `${pctPlus100(player, "召唤物伤害")}/${pctMinus100(player, "召唤物抗性")}`, "", "", ""),
-    dualLine("|cffff0000", "火属性：", `${pctPlus100(player, "火属性伤害")}/${pctMinus100(player, "火属性抗性")}`, "|cff00ffff", "冰属性：", `${pctPlus100(player, "水属性伤害")}/${pctMinus100(player, "水属性抗性")}`),
-    dualLine("|cffccffff", "雷属性：", `${pctPlus100(player, "雷属性伤害")}/${pctMinus100(player, "雷属性抗性")}`, "|cff99cc00", "风属性：", `${pctPlus100(player, "木属性伤害")}/${pctMinus100(player, "木属性抗性")}`),
-    dualLine("|cffffff00", "光属性：", `${pctPlus100(player, "光属性伤害")}/${pctMinus100(player, "光属性抗性")}`, "|cff993366", "暗属性：", `${pctPlus100(player, "暗属性伤害")}/${pctMinus100(player, "暗属性抗性")}`),
+    // 伤害与抗性
+    dualLine("|cff993300", "物理伤害：", pctPlus100(player, "物理伤害"), "|cff993300", "物理抗性：", pctMinus100(player, "物理抗性")),
+    dualLine("|cff00ccff", "魔法伤害：", pctPlus100(player, "魔法伤害"), "|cff00ccff", "魔抗：", pctMinus100(player, "魔抗")),
+    dualLine("|cffff6800", "技能伤害：", pctPlus100(player, "技能伤害"), "|cffff6800", "技能抗性：", pctMinus100(player, "技能抗性")),
+    dualLine("|cffff6600", "强化伤害：", pctPlus100(player, "强化伤害"), "|cff333333", "召唤物伤害：", pctPlus100(player, "召唤物伤害")),
+    dualLine("|cff333333", "召唤物抗性：", pctMinus100(player, "召唤物抗性"), "|cffff0000", "普攻伤害：", pctPlus100(player, "普攻伤害")),
+    dualLine("|cffff0000", "普攻抗性：", pctMinus100(player, "普攻抗性"), "|cffff0000", "魔法普攻：", pctPlus100(player, "魔法普攻伤害")),
+    // 元素属性
+    dualLine("|cffff0000", "火属性：", `${pctPlus100(player, "火属性伤害")}/${pctPlus100(player, "火属性抗性")}`, "|cff00ffff", "水属性：", `${pctPlus100(player, "水属性伤害")}/${pctPlus100(player, "水属性抗性")}`),
+    dualLine("|cffccffff", "雷属性：", `${pctPlus100(player, "雷属性伤害")}/${pctPlus100(player, "雷属性抗性")}`, "|cff99cc00", "木属性：", `${pctPlus100(player, "木属性伤害")}/${pctPlus100(player, "木属性抗性")}`),
+    dualLine("|cffffff00", "光属性：", `${pctPlus100(player, "光属性伤害")}/${pctPlus100(player, "光属性抗性")}`, "|cff993366", "暗属性：", `${pctPlus100(player, "暗属性伤害")}/${pctPlus100(player, "暗属性抗性")}`),
+    dualLine("|cffcccccc", "金属性：", `${pctPlus100(player, "金属性伤害")}/${pctPlus100(player, "金属性抗性")}`, "", "", ""),
+    // 穿透与暴击
+    dualLine("|cff993300", "护甲穿透：", pct(player, "护甲穿透"), "|cff00ccff", "魔法穿透：", pct(player, "魔法穿透")),
     dualLine("|cffff0000", "暴击率：", pct(player, "暴击率"), "|cffff0000", "暴击伤害：", formatPercent((150 + getPlayerAttr(player, "暴击伤害") * 100) / 100)),
-    dualLine("|cffff0000", "被暴击率：-", pct(player, "被暴击率"), "|cffff0000", "被暴击伤害：-", pct(player, "被暴击伤害")),
+    dualLine("|cffff8080", "被暴击率：-", pct(player, "被暴击率"), "|cffff8080", "被暴击伤害：-", pct(player, "被暴击伤害")),
+    // 命中与闪避
     dualLine("|cffff8080", "命中率：", pct(player, "命中率"), "|cffff8080", "闪避率：", pct(player, "闪避率")),
-    dualLine("|cffff8080", "冷却缩减：", pct(player, "冷却缩减"), "|cff99ccff", "固定伤害减少：", number(player, "伤害减少")),
-    dualLine("|cff99ccff", "攻击速度：", formatRate(getPlayerAttr(player, "每秒攻速")) + "次/秒", "|cff99ccff", "移动速度：", number(player, "移动速度")),
-    dualLine("|cff99ccff", "眩晕抗性：", pct(player, "眩晕抗性"), "", "", ""),
+    dualLine("|cff99ccff", "眩晕抗性：", pct(player, "眩晕抗性"), "|cffff8080", "重伤：", pct(player, "重伤")),
+    // 冷却与减伤
+    dualLine("|cffff8080", "冷却缩减：", pct(player, "冷却缩减"), "|cff99ccff", "伤害减少：", number(player, "伤害减少")),
+    dualLine("|cff99ccff", "伤害减少%：", pct(player, "伤害减少%"), "|cff99ccff", "受到技伤减少：", number(player, "受到技伤减少")),
+    dualLine("|cff99ccff", "受到物伤减少：", number(player, "受到物伤减少"), "", "", ""),
+    // 攻速移速
+    dualLine("|cff99ccff", "攻速：", formatRate(getPlayerAttr(player, "每秒攻速")) + "次/秒", "|cff99ccff", "移速：", number(player, "移动速度")),
+    // 吸血
     dualLine("|cffff0000", "普攻吸血：", pct(player, "普攻伤害吸血"), "|cffff0000", "魔法吸血：", pct(player, "魔法伤害吸血")),
     dualLine("|cffff0000", "伤害吸血：", pct(player, "伤害吸血"), "", "", ""),
-    dualLine("|cffccffcc", "当前回血：", number(player, "总生命恢复") + "/秒", "|cffccffcc", "基础生命恢复：", number(player, "生命恢复") + "/秒"),
-    dualLine("|cffccffcc", "百分比回血：", pct(player, "生命恢复%") + "/秒", "|cffccffcc", "生命恢复效率：", pct(player, "生命恢复效率")),
-    dualLine("|cffffcc99", "技能治疗效率：", pct(player, "技能治疗率"), "|cffffcc99", "受到治疗效率：", pct(player, "受到的治疗率")),
-    dualLine("|cffccffff", "当前回魔：", number(player, "总魔法恢复") + "/秒", "|cffccffff", "基础魔法恢复：", number(player, "魔法恢复") + "/秒"),
-    dualLine("|cffccffff", "百分比回魔：", pct(player, "魔法恢复%"), "|cffccffff", "技能消耗减少：", pct(player, "魔法消耗")),
+    // 生命恢复
+    dualLine("|cffccffcc", "生命恢复：", number(player, "生命恢复") + "/秒", "|cffccffcc", "生命恢复%：", pct(player, "生命恢复%")),
+    dualLine("|cffccffcc", "总生命恢复：", number(player, "总生命恢复") + "/秒", "|cffccffcc", "恢复效率：", pct(player, "生命恢复效率")),
+    // 魔法恢复
+    dualLine("|cffccffff", "魔法恢复：", number(player, "魔法恢复") + "/秒", "|cffccffff", "魔法恢复%：", pct(player, "魔法恢复%")),
+    dualLine("|cffccffff", "总魔法恢复：", number(player, "总魔法恢复") + "/秒", "|cffccffff", "魔法消耗减少：", pct(player, "魔法消耗")),
+    // 治疗效率
+    dualLine("|cffffcc99", "技能治疗率：", pct(player, "技能治疗率"), "|cffffcc99", "受到治疗率：", pct(player, "受到的治疗率")),
+    // 特殊属性
+    dualLine("|cffff00ff", "伤害%：", pct(player, "伤害%"), "|cffff00ff", "最终伤害%：", pct(player, "最终伤害%")),
+    dualLine("|cffff00ff", "经验获取率：", pct(player, "经验获取率"), "|cff99cc00", "蝼蚁专精：", pct(player, "蝼蚁专精")),
   ];
 }
 
