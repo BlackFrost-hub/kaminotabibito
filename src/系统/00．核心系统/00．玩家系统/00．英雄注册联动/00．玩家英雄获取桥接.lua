@@ -19,6 +19,7 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal�
 local YDLocal5Get = ____require_result_1.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．移速龙卷特效")
+local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．背包满移交宠物")
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
 local TRIG_KEY = "__syzl_playerHeroRegister_trig"
@@ -77,6 +78,9 @@ local function registerHeroDependents(self, whichHero)
     if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
         moveTornado:registerMoveSpeedTornadoHero(whichHero)
     end
+    if type(outOfCombat.registerOutOfCombatHero) == "function" then
+        outOfCombat:registerOutOfCombatHero(whichHero)
+    end
     if type(petItemHandoff.registerPetItemHandoffHero) == "function" then
         petItemHandoff:registerPetItemHandoffHero(whichHero)
     end
@@ -133,7 +137,7 @@ local function registerHeroesFromGroup(self, heroGroup)
             do
                 local hero = heroByPlayer[playerId]
                 if hero == nil then
-                    goto __continue28
+                    goto __continue29
                 end
                 registerPlayerHero(
                     nil,
@@ -141,7 +145,7 @@ local function registerHeroesFromGroup(self, heroGroup)
                     hero
                 )
             end
-            ::__continue28::
+            ::__continue29::
             playerId = playerId + 1
         end
     end
@@ -217,6 +221,9 @@ local function tryRegisterPlayerHeroStes(self)
 end
 --- 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
 function ____exports.initPlayerHeroGetBridge(self)
+    if type(outOfCombat.initOutOfCombat) == "function" then
+        outOfCombat:initOutOfCombat()
+    end
     tryRegisterPlayerHeroStes(nil)
 end
 return ____exports

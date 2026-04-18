@@ -35,6 +35,11 @@ const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
   registerMoveSpeedTornadoHero: (whichHero: any) => void;
 };
 
+const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．脱战计时") as {
+  registerOutOfCombatHero: (whichHero: any) => void;
+  initOutOfCombat: () => void;
+};
+
 const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．背包满移交宠物") as {
   registerPetItemHandoffHero: (whichHero: any) => void;
 };
@@ -83,6 +88,9 @@ function isPlayableHero(whichUnit: any): boolean {
 function registerHeroDependents(whichHero: any): void {
   if (typeof moveTornado.registerMoveSpeedTornadoHero === "function") {
     moveTornado.registerMoveSpeedTornadoHero(whichHero);
+  }
+  if (typeof outOfCombat.registerOutOfCombatHero === "function") {
+    outOfCombat.registerOutOfCombatHero(whichHero);
   }
   if (typeof petItemHandoff.registerPetItemHandoffHero === "function") {
     petItemHandoff.registerPetItemHandoffHero(whichHero);
@@ -195,6 +203,10 @@ function tryRegisterPlayerHeroStes(): void {
  * 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
  */
 export function initPlayerHeroGetBridge(): void {
+  // 初始化脱战计时系统
+  if (typeof outOfCombat.initOutOfCombat === "function") {
+    outOfCombat.initOutOfCombat();
+  }
   tryRegisterPlayerHeroStes();
 }
 
