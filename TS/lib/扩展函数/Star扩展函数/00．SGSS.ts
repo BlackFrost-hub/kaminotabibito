@@ -47,9 +47,6 @@ function resolveAbilityCode(raw: string): number {
     const fromObj = Number((abilityTable as any)._id);
     if (!isNaN(fromObj) && fromObj > 0) return fromObj;
   }
-  const g = globalThis as any;
-  if (typeof g.FourCC === "function") return (g.FourCC(raw) as number) || 0;
-  if (typeof jass.FourCC === "function") return (jass.FourCC(raw) as number) || 0;
   if (raw.length === 4) {
     return (
       raw.charCodeAt(0) * 0x1000000 +

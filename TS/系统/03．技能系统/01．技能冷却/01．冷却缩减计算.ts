@@ -5,9 +5,16 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
+const {
+  YDUserDataGet,
+  YDWESetUnitAbilityDataReal,
+  getObjectPropertyReal,
+  ObjectType,
+} = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;
+  getObjectPropertyReal: (objectType: number, objectId: number | string, property: string) => number;
+  ObjectType: { ABILITY: number };
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
@@ -121,11 +128,7 @@ export function applyCooldownCap(
 export function getBaseCooldown(abilityId: number, level: number): number {
   // 使用YDWE函数读取技能冷却
   const coolKey = "Cool" + level;
-  return japi.YDWEGetObjectPropertyReal(
-    japi.YDWE_OBJECT_TYPE_ABILITY,
-    abilityId,
-    coolKey
-  );
+  return getObjectPropertyReal(ObjectType.ABILITY, abilityId, coolKey);
 }
 
 /**
@@ -154,7 +157,7 @@ export function setAbilityCooldown(
   cooldown: number
 ): void {
   // YDWESetUnitAbilityDataReal 参数105为冷却时间
-  japi.YDWESetUnitAbilityDataReal(unit, abilityId, level, 105, cooldown);
+  YDWESetUnitAbilityDataReal(unit, abilityId, level, 105, cooldown);
 }
 
 export {};

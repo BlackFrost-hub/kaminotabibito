@@ -6,9 +6,11 @@ local ____exports = {}
 -- 
 -- 功能：计算技能冷却缩减，应用上限
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
+local YDWESetUnitAbilityDataReal = ____require_result_0.YDWESetUnitAbilityDataReal
+local getObjectPropertyReal = ____require_result_0.getObjectPropertyReal
+local ObjectType = ____require_result_0.ObjectType
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_1.stringToFourCC
 local ____require_result_2 = require("系统.03．技能系统.01．技能冷却.00．冷却常量")
@@ -89,7 +91,7 @@ end
 --- 获取技能原始冷却时间
 function ____exports.getBaseCooldown(self, abilityId, level)
     local coolKey = "Cool" .. tostring(level)
-    return japi.YDWEGetObjectPropertyReal(japi.YDWE_OBJECT_TYPE_ABILITY, abilityId, coolKey)
+    return getObjectPropertyReal(nil, ObjectType.ABILITY, abilityId, coolKey)
 end
 --- 计算实际冷却时间
 -- 
@@ -104,7 +106,8 @@ function ____exports.calcActualCooldown(self, baseCooldown, reduction)
 end
 --- 设置技能冷却时间
 function ____exports.setAbilityCooldown(self, unit, abilityId, level, cooldown)
-    japi.YDWESetUnitAbilityDataReal(
+    YDWESetUnitAbilityDataReal(
+        nil,
         unit,
         abilityId,
         level,

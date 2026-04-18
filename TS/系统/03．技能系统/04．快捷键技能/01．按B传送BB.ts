@@ -15,6 +15,9 @@ const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index")
 const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.index") as {
   DzTriggerRegisterKeyEventTrg: (trg: any, status: number, btn: number | string) => void;
 };
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (s: string) => number;
+};
 
 /** BB传送技能ID */
 const BB_TELEPORT_ABILITY = 'A0FC';
@@ -42,7 +45,7 @@ function onBKeyTeleport(): void {
 
   // 直接发布点目标命令，使用技能ID
   // 对于传送类技能，直接使用技能ID作为orderId
-  const abilityId = jass.FourCC(BB_TELEPORT_ABILITY);
+  const abilityId = stringToFourCC(BB_TELEPORT_ABILITY);
   jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY);
 
   // 注：YDWEAbilityId2OrderId 是YDWE宏定义，非标准JAPI函数

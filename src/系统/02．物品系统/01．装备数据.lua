@@ -75,39 +75,6 @@ ____exports.items.I06Y = {
     hot = "200hp",
     abilList = "A08C"
 }
-____exports.items.pres = {
-    type = "道具/戒指/饰品",
-    name = "恢复药水",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 75,
-    PowerUP = "50%int;time3",
-    abilList = "A08C"
-}
-____exports.items.rde3 = {
-    type = "守护指环 +4",
-    name = "恢复药水",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 150,
-    abilList = "A08C",
-    magicDmg = 0.3
-}
-____exports.items.pres = {
-    type = "道具/戒指/饰品",
-    name = "恢复药水",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 75,
-    PowerUP = "50%int;time3",
-    abilList = "A08C"
-}
 ____exports.items.I00D = {
     type = "道具/戒指/饰品",
     name = "魔力树枝",
@@ -352,8 +319,7 @@ ____exports.items.I00Q = {
     score = 1053,
     level = "D-",
     agi = 15,
-    atkSpeed = 0.15,
-    Buff = "attack:poison10;time10"
+    atkSpeed = 0.15
 }
 ____exports.items.I01Z = {
     type = "衣服",
@@ -517,6 +483,8 @@ ____exports.items.I00J = {
     level = "D-",
     atkSpeed = 0.25,
     armor = 5,
+    PhysReduce = 10,
+    SpellReduce = 30,
     abilList = "A03I"
 }
 ____exports.items.I01G = {
@@ -695,7 +663,8 @@ ____exports.items.I02L = {
     goldPrice = 200,
     score = 1480,
     level = "D-",
-    armor = 20
+    armor = 20,
+    PhysReduce = 30
 }
 ____exports.items.I03S = {
     type = "道具/戒指/饰品",
@@ -1879,9 +1848,7 @@ ____exports.items.I0C7 = {
     level = "B-",
     dmg = 100,
     critRate = 0.1,
-    hp = 800,
-    physDmg = 0.2,
-    Buff = "dmg:curse1%MaxHP;time3"
+    hp = 800
 }
 ____exports.items.I011 = {
     type = "道具/戒指/饰品",
@@ -3071,8 +3038,7 @@ ____exports.items.I08U = {
     name = "熔墓之戒",
     goldPrice = 1000,
     hp = 1200,
-    magicDmg = 0.25,
-    Buff = "dmg:antiHeal200%;time3"
+    magicDmg = 0.25
 }
 ____exports.items.I08V = {
     type = "道具/戒指/饰品",

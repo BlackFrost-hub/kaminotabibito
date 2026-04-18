@@ -5,9 +5,12 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
+};
+const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
+  getObjectProperty: (objectType: number, objectId: number | string, property: string) => string;
+  ObjectType: { ABILITY: number };
 };
 const { EXCLUDED_UNIT_TYPES } = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量") as {
   EXCLUDED_UNIT_TYPES: string[];
@@ -34,11 +37,7 @@ export function isExcludedFromControlResist(unit: any): boolean {
  * 检查技能命令是否为排除类型
  */
 function isExcludedOrder(abilityId: number): boolean {
-  const order = japi.YDWEGetObjectPropertyString(
-    japi.YDWE_OBJECT_TYPE_ABILITY,
-    abilityId,
-    "Order"
-  );
+  const order = getObjectProperty(ObjectType.ABILITY, abilityId, "Order");
   // 排除守卫类和蛛网类
   return order === "ward" || order === "web";
 }
@@ -47,11 +46,8 @@ function isExcludedOrder(abilityId: number): boolean {
  * 获取技能英雄持续时间
  */
 export function getHeroDuration(abilityId: number): number {
-  return japi.YDWEGetObjectPropertyReal(
-    japi.YDWE_OBJECT_TYPE_ABILITY,
-    abilityId,
-    "HeroDur1"
-  );
+  const str = getObjectProperty(ObjectType.ABILITY, abilityId, "HeroDur1");
+  return parseFloat(str) || 0;
 }
 
 /**

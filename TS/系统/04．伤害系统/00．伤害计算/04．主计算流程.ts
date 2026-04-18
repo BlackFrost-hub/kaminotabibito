@@ -220,6 +220,9 @@ export function calculateDamage(
     const physMod = getPhysicalDamageModifier(attacker, target, isPlayer);
     addDamage += physMod.addDamage;
     finalMultiplier *= physMod.multiplier;
+    // 受到物伤减少（固定值）
+    const physReduce = getRealAttr(target, "受到物伤减少", 0);
+    damage -= physReduce;
   }
 
   // Step 8: 魔法伤害修正（装备「魔法伤害」等）
@@ -249,6 +252,9 @@ export function calculateDamage(
     const skillMod = getSkillDamageModifier(attacker, target, isPlayer);
     addDamage += skillMod.addDamage;
     finalMultiplier *= skillMod.multiplier;
+    // 受到技伤减少（固定值）
+    const spellReduce = getRealAttr(target, "受到技伤减少", 0);
+    damage -= spellReduce;
   }
 
   // Step 11-12: 普攻伤害修正

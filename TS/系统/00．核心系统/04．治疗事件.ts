@@ -6,13 +6,15 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
 const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
   TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
 };
 const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetSpellAbilityId: () => number;
+};
+const { YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
+  YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
 };
 const {
   STES_GetTable,
@@ -101,7 +103,7 @@ function onSpellChannel(): void {
   if (!isHealOrder(currentOrder)) return;
 
   // 获取治疗量数据
-  const healAmount = japi.YDWEGetUnitAbilityDataReal(target, abilityId, 1, HEAL_DATA_FIELD);
+  const healAmount = YDWEGetUnitAbilityDataReal(target, abilityId, 1, HEAL_DATA_FIELD);
 
   // 发出stop命令并移除技能
   jass.IssueImmediateOrder(caster, "stop");

@@ -86,7 +86,9 @@ local KEY_TO_NAME = {
     finalDamageMultiplier = "最终伤害%",
     expGainRate = "经验获取率",
     hpPct = "最大生命值%",
-    baseDmgPct = "基础攻击力%"
+    baseDmgPct = "基础攻击力%",
+    SpellReduce = "受到技伤减少",
+    PhysReduce = "受到物伤减少"
 }
 --- 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key
 local function findStatKey(self, raw)

@@ -21,3 +21,10 @@ export const YD_TABLE_TYPE_PLAYER_HERO = "string";
 export const YD_TABLE_KEY_PLAYER_HERO = "玩家英雄";
 export const YD_ATTR_HERO_GROUP = "单位组";
 export const YD_VALUE_TYPE_GROUP = "group";
+
+/** STES：玩家英雄注册 */
+export const STES_EVENT_REGISTER_PLAYER_HERO = "玩家英雄注册";
+export const STES_PARAM_HERO_GROUP = "dwz";
+
+/** 玩家 YDUserData 属性 */
+export const YD_ATTR_PLAYER_HERO_UNIT = "英雄";

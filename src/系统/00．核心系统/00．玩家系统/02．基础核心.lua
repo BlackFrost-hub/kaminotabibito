@@ -3,12 +3,12 @@ local ____exports = {}
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
-local moveFx = require("系统.00．核心系统.00．玩家系统.03．移速龙卷特效")
+local heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index")
 local _inited = false
 local _tickCounter = 0
 local function runAllFeatureSyncs(self)
-    if type(moveFx.syncTornadoSpeedEffectsByHeroGroup) == "function" then
-        moveFx:syncTornadoSpeedEffectsByHeroGroup()
+    if type(heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes) == "function" then
+        heroLinkage:syncTornadoSpeedEffectsByRegisteredHeroes()
     end
 end
 function ____exports.initPlayerUnitManager(self)
@@ -16,6 +16,12 @@ function ____exports.initPlayerUnitManager(self)
         return
     end
     _inited = true
+    if type(heroLinkage.initPetItemHandoff) == "function" then
+        heroLinkage:initPetItemHandoff()
+    end
+    if type(heroLinkage.initPlayerHeroGetBridge) == "function" then
+        heroLinkage:initPlayerHeroGetBridge()
+    end
     onTick10ms(
         nil,
         function()

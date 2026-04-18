@@ -14,7 +14,6 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 
 const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
   TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
@@ -22,6 +21,10 @@ const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.ind
 
 const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetSpellAbilityId: () => number;
+};
+
+const { YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
+  YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
 };
 
 // 导入核心治疗功能
@@ -108,7 +111,7 @@ function onSpellChannel(): void {
   if (target == null) return;
 
   // 获取治疗量数据（从施法者读取技能数据）
-  const healAmount = japi.YDWEGetUnitAbilityDataReal(caster, abilityId, 1, HEAL_DATA_FIELD);
+  const healAmount = YDWEGetUnitAbilityDataReal(caster, abilityId, 1, HEAL_DATA_FIELD);
 
   // 发出stop命令并移除技能
   jass.IssueImmediateOrder(caster, "stop");

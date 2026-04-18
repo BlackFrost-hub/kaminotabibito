@@ -13,6 +13,8 @@ local questDebugPrint = ____01_FF0E_8C03_8BD5.questDebugPrint
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local findHeroOfPlayer = ____require_result_0.findHeroOfPlayer
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_1.stringToFourCC
 --- 任务标记为失败后，向该玩家显示标题（非 questId）。
 function ____exports.showQuestFailedMessage(self, playerId, questId)
     local quest = questDB:getQuest(questId)
@@ -150,7 +152,7 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             ____cond23 = ____cond23 or ____switch23 == "item"
             if ____cond23 then
                 if hero and type(jass.CreateItem) == "function" and type(jass.UnitAddItemById) == "function" and reward.itemId then
-                    local itemTypeId = jass.FourCC(reward.itemId)
+                    local itemTypeId = stringToFourCC(nil, reward.itemId)
                     jass.UnitAddItemById(hero, itemTypeId)
                     questDebugPrint(
                         nil,

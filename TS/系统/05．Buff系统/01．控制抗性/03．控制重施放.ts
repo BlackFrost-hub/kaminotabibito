@@ -5,9 +5,11 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
+};
+const { YDWESetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
+  YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;
 };
 
 //=============================================================================
@@ -65,8 +67,8 @@ export function setHelperAbilityDuration(
   jass.UnitAddAbility(helper, CONTROL_ABILITY_ID);
 
   // 设置持续时间（字段102和103）
-  japi.YDWESetUnitAbilityDataReal(helper, CONTROL_ABILITY_ID, 1, 102, duration);
-  japi.YDWESetUnitAbilityDataReal(helper, CONTROL_ABILITY_ID, 1, 103, duration);
+  YDWESetUnitAbilityDataReal(helper, CONTROL_ABILITY_ID, 1, 102, duration);
+  YDWESetUnitAbilityDataReal(helper, CONTROL_ABILITY_ID, 1, 103, duration);
 }
 
 /**

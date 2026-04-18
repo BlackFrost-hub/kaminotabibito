@@ -104,6 +104,7 @@ export function registerBridge(): void {
   expose("OperatorDegreeMultiply", misc.OperatorDegreeMultiply);
   expose("OperatorRealAdd", misc.OperatorRealAdd);
   expose("OperatorRealMultiply", misc.OperatorRealMultiply);
+  expose("String2OrderIdBJ", misc.String2OrderIdBJ);
   expose("IMaxBJ", mathBj.IMaxBJ);
   expose("IMinBJ", mathBj.IMinBJ);
   expose("RMaxBJ", mathBj.RMaxBJ);

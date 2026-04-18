@@ -4,9 +4,10 @@ local ____exports = {}
 -- 
 -- 功能：移除原控制，用马甲重新施放缩短时长的控制技能
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
+local YDWESetUnitAbilityDataReal = ____require_result_1.YDWESetUnitAbilityDataReal
 --- 控制马甲技能ID
 local CONTROL_ABILITY_ID = 1093678385
 --- 获取辅助马甲单位类型
@@ -34,14 +35,16 @@ end
 --- 设置马甲控制技能持续时间
 function ____exports.setHelperAbilityDuration(self, helper, duration)
     jass.UnitAddAbility(helper, CONTROL_ABILITY_ID)
-    japi.YDWESetUnitAbilityDataReal(
+    YDWESetUnitAbilityDataReal(
+        nil,
         helper,
         CONTROL_ABILITY_ID,
         1,
         102,
         duration
     )
-    japi.YDWESetUnitAbilityDataReal(
+    YDWESetUnitAbilityDataReal(
+        nil,
         helper,
         CONTROL_ABILITY_ID,
         1,

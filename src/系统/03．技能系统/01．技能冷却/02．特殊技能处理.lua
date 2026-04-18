@@ -5,7 +5,9 @@ local ____exports = {}
 -- 
 -- 处理通魔类技能的独立冷却设置
 local jass = require("jass.common")
-local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
+local YDWESetUnitAbilityState = ____require_result_0.YDWESetUnitAbilityState
+local YDWEGetUnitAbilityDataString = ____require_result_0.YDWEGetUnitAbilityDataString
 --- 风暴之刃技能ID
 local STORM_BLADE_SKILLS = {1093683786, 1093683785, 1093683787}
 --- 风暴之刃基础冷却
@@ -19,11 +21,23 @@ end
 --- 处理风暴之刃冷却
 function ____exports.handleStormBladeCooldown(self, unit, reduction)
     local cd = STORM_BLADE_BASE_CD - STORM_BLADE_BASE_CD * reduction
-    japi.YDWESetUnitAbilityState(unit, STORM_BLADE_LINKED_ABILITY, 1, cd)
+    YDWESetUnitAbilityState(
+        nil,
+        unit,
+        STORM_BLADE_LINKED_ABILITY,
+        1,
+        cd
+    )
 end
 --- 检查是否为三连斩技能（通过技能数据字符串判断）
 function ____exports.isTripleSlashSkill(self, unit, abilityId)
-    local skillString = japi.YDWEGetUnitAbilityDataString(unit, abilityId, 1, 216)
+    local skillString = YDWEGetUnitAbilityDataString(
+        nil,
+        unit,
+        abilityId,
+        1,
+        216
+    )
     return skillString == "SLSQW" or skillString == "SLSQE" or skillString == "SLSQR"
 end
 --- 三连斩基础冷却
@@ -33,7 +47,13 @@ local TRIPLE_SLASH_LINKED_ABILITY = 1093683796
 --- 处理三连斩冷却
 function ____exports.handleTripleSlashCooldown(self, unit, reduction)
     local cd = TRIPLE_SLASH_BASE_CD - TRIPLE_SLASH_BASE_CD * reduction
-    japi.YDWESetUnitAbilityState(unit, TRIPLE_SLASH_LINKED_ABILITY, 1, cd)
+    YDWESetUnitAbilityState(
+        nil,
+        unit,
+        TRIPLE_SLASH_LINKED_ABILITY,
+        1,
+        cd
+    )
 end
 --- 处理特殊技能冷却
 -- 

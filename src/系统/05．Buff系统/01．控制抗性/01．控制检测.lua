@@ -1,15 +1,18 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySome = ____lualib.__TS__ArraySome
+local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local ____exports = {}
 --- 控制技能检测模块
 -- 
 -- 功能：判断技能是否为控制技能，单位是否被控制
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量")
-local EXCLUDED_UNIT_TYPES = ____require_result_1.EXCLUDED_UNIT_TYPES
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_1.getObjectProperty
+local ObjectType = ____require_result_1.ObjectType
+local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量")
+local EXCLUDED_UNIT_TYPES = ____require_result_2.EXCLUDED_UNIT_TYPES
 --- 检查单位是否被排除
 function ____exports.isExcludedFromControlResist(self, unit)
     local unitTypeId = jass.GetUnitTypeId(unit)
@@ -20,12 +23,13 @@ function ____exports.isExcludedFromControlResist(self, unit)
 end
 --- 检查技能命令是否为排除类型
 local function isExcludedOrder(self, abilityId)
-    local order = japi.YDWEGetObjectPropertyString(japi.YDWE_OBJECT_TYPE_ABILITY, abilityId, "Order")
+    local order = getObjectProperty(nil, ObjectType.ABILITY, abilityId, "Order")
     return order == "ward" or order == "web"
 end
 --- 获取技能英雄持续时间
 function ____exports.getHeroDuration(self, abilityId)
-    return japi.YDWEGetObjectPropertyReal(japi.YDWE_OBJECT_TYPE_ABILITY, abilityId, "HeroDur1")
+    local str = getObjectProperty(nil, ObjectType.ABILITY, abilityId, "HeroDur1")
+    return __TS__ParseFloat(str) or 0
 end
 --- 判断技能是否为控制技能
 -- 

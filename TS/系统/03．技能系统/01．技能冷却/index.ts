@@ -7,13 +7,12 @@ export * from "./01．冷却缩减计算";
 export * from "./02．特殊技能处理";
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 
 const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
   registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
-const { isBlacklistedSkill, isExcludedUnit, getCooldownReduction, getCooldownReductionBonus, applyCooldownCap, calcActualCooldown, setAbilityCooldown } = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算") as {
+const { isBlacklistedSkill, isExcludedUnit, getCooldownReduction, getCooldownReductionBonus, applyCooldownCap, calcActualCooldown, setAbilityCooldown, getBaseCooldown } = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算") as {
   isBlacklistedSkill: (abilityId: number) => boolean;
   isExcludedUnit: (unit: any) => boolean;
   getCooldownReduction: (unit: any) => number;
@@ -21,6 +20,7 @@ const { isBlacklistedSkill, isExcludedUnit, getCooldownReduction, getCooldownRed
   applyCooldownCap: (reduction: number, abilityId: number, bonus: number) => number;
   calcActualCooldown: (baseCooldown: number, reduction: number) => number;
   setAbilityCooldown: (unit: any, abilityId: number, level: number, cooldown: number) => void;
+  getBaseCooldown: (abilityId: number, level: number) => number;
 };
 
 const { handleSpecialSkillCooldown } = require("系统.03．技能系统.01．技能冷却.02．特殊技能处理") as {
@@ -54,11 +54,7 @@ function onSpellEffectForCooldown(castingUnit: any, spellAbilityId: number): voi
   const level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId);
   if (level <= 0) return;
 
-  const baseCooldown = japi.YDWEGetObjectPropertyReal(
-    japi.YDWE_OBJECT_TYPE_ABILITY,
-    spellAbilityId,
-    "Cool" + level
-  );
+  const baseCooldown = getBaseCooldown(spellAbilityId, level);
   if (baseCooldown <= 0) return;
 
   const actualCooldown = calcActualCooldown(baseCooldown, cappedReduction);

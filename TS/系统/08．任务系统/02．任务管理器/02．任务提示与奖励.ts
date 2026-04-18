@@ -11,6 +11,9 @@ const jass = require("jass.common") as any;
 const { findHeroOfPlayer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   findHeroOfPlayer: (playerId: number) => any;
 };
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (s: string) => number;
+};
 
 import { questDB } from "../01．任务数据";
 import { questDebugPrint } from "./01．调试";
@@ -129,7 +132,7 @@ export function giveQuestRewards(playerId: number, questId: string): void {
           typeof jass.UnitAddItemById === "function" &&
           reward.itemId
         ) {
-          const itemTypeId = jass.FourCC(reward.itemId);
+          const itemTypeId = stringToFourCC(reward.itemId);
           jass.UnitAddItemById(hero, itemTypeId);
           questDebugPrint(`给予玩家 ${playerId} 物品 ${reward.description}`);
         } else {

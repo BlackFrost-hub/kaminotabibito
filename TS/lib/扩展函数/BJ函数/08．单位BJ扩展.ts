@@ -9,15 +9,15 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+    stringToFourCC: (s: string) => number;
+};
 
 export function String2UnitIdBJ(unitIdString: string): number {
     if (typeof jass.UnitId === "function") {
         return jass.UnitId(unitIdString);
     }
-    if (typeof jass.FourCC === "function") {
-        return jass.FourCC(unitIdString);
-    }
-    return 0;
+    return stringToFourCC(unitIdString);
 }
 
 export function GetIssuedOrderIdBJ(): number {

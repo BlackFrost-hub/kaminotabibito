@@ -11,6 +11,8 @@ local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_1.SelectUnitForPlayerSingle
 local ____require_result_2 = require("lib.扩展函数.KK扩展API.index")
 local DzTriggerRegisterKeyEventTrg = ____require_result_2.DzTriggerRegisterKeyEventTrg
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_3.stringToFourCC
 --- BB传送技能ID
 local BB_TELEPORT_ABILITY = "A0FC"
 --- 触发器
@@ -34,7 +36,7 @@ local function onBKeyTeleport(self)
     end
     local mouseX = japi.DzGetMouseTerrainX()
     local mouseY = japi.DzGetMouseTerrainY()
-    local abilityId = jass.FourCC(BB_TELEPORT_ABILITY)
+    local abilityId = stringToFourCC(nil, BB_TELEPORT_ABILITY)
     jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY)
     SelectUnitForPlayerSingle(nil, bbUnit, player)
 end

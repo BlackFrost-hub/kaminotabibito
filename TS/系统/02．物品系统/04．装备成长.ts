@@ -41,6 +41,7 @@ const KEY_TO_NAME: Record<string, string> = {
   magicAtkDmg: "魔法普攻伤害", antMastery: "蝼蚁专精", movespeed2: "移动速度",
   dmgBonus: "伤害%", finalDamageMultiplier: "最终伤害%", expGainRate: "经验获取率",
   hpPct: "最大生命值%", baseDmgPct: "基础攻击力%",
+  SpellReduce: "受到技伤减少", PhysReduce: "受到物伤减少",
 };
 
 /** 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key */

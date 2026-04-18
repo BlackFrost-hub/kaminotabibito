@@ -5,9 +5,12 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
+const { YDUserDataGet, YDWEGetUnitAbilityDataInteger, YDWEGetUnitAbilityDataReal, getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDWEGetUnitAbilityDataInteger: (u: any, abilcode: number, level: number, data_type: number) => number;
+  YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
+  getObjectProperty: (objectType: number, objectId: number | string, property: string) => string;
+  ObjectType: { ABILITY: number };
 };
 const { PERCENT_COST_THRESHOLD } = require("系统.03．技能系统.02．技能消耗.00．消耗常量") as {
   PERCENT_COST_THRESHOLD: number;
@@ -21,11 +24,7 @@ const { PERCENT_COST_THRESHOLD } = require("系统.03．技能系统.02．技能
  * 检查技能是否为暗夜精灵族
  */
 export function isNightElfAbility(abilityId: number): boolean {
-  const race = japi.YDWEGetObjectPropertyString(
-    japi.YDWE_OBJECT_TYPE_ABILITY,
-    abilityId,
-    "race"
-  );
+  const race = getObjectProperty(ObjectType.ABILITY, abilityId, "race");
   return race === "nightelf";
 }
 
@@ -37,14 +36,14 @@ export function isNightElfAbility(abilityId: number): boolean {
  * 获取技能固定消耗
  */
 export function getAbilityManaCost(unit: any, abilityId: number, level: number): number {
-  return japi.YDWEGetUnitAbilityDataInteger(unit, abilityId, level, 104);
+  return YDWEGetUnitAbilityDataInteger(unit, abilityId, level, 104);
 }
 
 /**
  * 获取技能百分比消耗
  */
 export function getAbilityPercentCost(unit: any, abilityId: number, level: number): number {
-  return japi.YDWEGetUnitAbilityDataReal(unit, abilityId, level, 102);
+  return YDWEGetUnitAbilityDataReal(unit, abilityId, level, 102);
 }
 
 /**

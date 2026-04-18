@@ -1,15 +1,22 @@
 /**
- * 玩家系统 - 统一初始化入口
+ * 玩家系统 - 统一入口
+ *
+ * 保留系统入口的自动初始化，同时导出明确的初始化函数，
+ * 让这个文件既能作为 side-effect 入口，也能作为普通 TS 模块使用。
  */
 
-// 绝对路径 require：Lua 运行时不支持相对路径 ./ 的解析
-const mgr = require("系统.00．核心系统.00．玩家系统.01．玩家单位管理器") as {
-  initPlayerUnitManager?: () => void;
+export * from "./00．常量";
+export * from "./01．玩家单位管理器";
+
+const manager = require("系统.00．核心系统.00．玩家系统.01．玩家单位管理器") as {
+  initPlayerUnitManager: () => void;
 };
 
-if (typeof mgr.initPlayerUnitManager === "function") {
-  mgr.initPlayerUnitManager();
+export const initPlayerSystem = manager.initPlayerUnitManager;
+export const initPlayerUnitManager = manager.initPlayerUnitManager;
+
+if (typeof initPlayerSystem === "function") {
+  initPlayerSystem();
 }
 
 export {};
-

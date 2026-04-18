@@ -21,6 +21,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
+  TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
+};
 
 const lastItemAbilityContext = {
   abilityId: 0,
@@ -216,13 +219,9 @@ export function SU_InititemAbilityListener(): void {
   if (su_ItemAbilityTrig == null || su_ItemAbilityTrig2 == null) return;
 
   // 注册技能施放事件
-  if (typeof jass.TriggerRegisterAnyUnitEventBJ === "function") {
-    jass.TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
-  }
+  TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
   // 注册物品使用事件
-  if (typeof jass.TriggerRegisterAnyUnitEventBJ === "function") {
-    jass.TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM);
-  }
+  TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM);
 
   // 添加动作
   if (typeof jass.TriggerAddAction === "function") {

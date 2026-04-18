@@ -85,13 +85,6 @@ local function resolveAbilityCode(self, raw)
             return fromObj
         end
     end
-    local g = _G
-    if type(g.FourCC) == "function" then
-        return g:FourCC(raw) or 0
-    end
-    if type(jass.FourCC) == "function" then
-        return jass.FourCC(raw) or 0
-    end
     if #raw == 4 then
         return (string.byte(raw, 1) or 0 / 0) * 16777216 + (string.byte(raw, 2) or 0 / 0) * 65536 + (string.byte(raw, 3) or 0 / 0) * 256 + (string.byte(raw, 4) or 0 / 0)
     end

@@ -38,23 +38,24 @@ function fireHealEvent(self, target, healAmount, sourcePlayer)
     end
 end
 jass = require("jass.common")
-local japi = require("jass.japi")
 jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
 local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-STES_GetTable = ____require_result_2.STES_GetTable
-local STES_Fire = ____require_result_2.STES_Fire
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-YDLocal5Set = ____require_result_3.YDLocal5Set
-local YDLocal7Set = ____require_result_3.YDLocal7Set
-local clearStar_PIndex = ____require_result_3.clearStar_PIndex
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
-YDLocalExecuteTrigger = ____require_result_4.YDLocalExecuteTrigger
-YDTriggerExecuteTrigger = ____require_result_4.YDTriggerExecuteTrigger
-saveParentIndex = ____require_result_4.saveParentIndex
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local YDWEGetUnitAbilityDataReal = ____require_result_2.YDWEGetUnitAbilityDataReal
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+STES_GetTable = ____require_result_3.STES_GetTable
+local STES_Fire = ____require_result_3.STES_Fire
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+YDLocal5Set = ____require_result_4.YDLocal5Set
+local YDLocal7Set = ____require_result_4.YDLocal7Set
+local clearStar_PIndex = ____require_result_4.clearStar_PIndex
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
+YDLocalExecuteTrigger = ____require_result_5.YDLocalExecuteTrigger
+YDTriggerExecuteTrigger = ____require_result_5.YDTriggerExecuteTrigger
+saveParentIndex = ____require_result_5.saveParentIndex
 --- 治疗事件名称
 ____exports.HEAL_EVENT_NAME = "治疗事件"
 --- 治疗命令ID列表
@@ -79,7 +80,13 @@ local function onSpellChannel(self)
     if not isHealOrder(nil, currentOrder) then
         return
     end
-    local healAmount = japi.YDWEGetUnitAbilityDataReal(target, abilityId, 1, HEAL_DATA_FIELD)
+    local healAmount = YDWEGetUnitAbilityDataReal(
+        nil,
+        target,
+        abilityId,
+        1,
+        HEAL_DATA_FIELD
+    )
     jass.IssueImmediateOrder(caster, "stop")
     jass.UnitRemoveAbility(caster, abilityId)
     fireHealEvent(

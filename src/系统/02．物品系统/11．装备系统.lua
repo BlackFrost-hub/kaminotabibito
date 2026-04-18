@@ -96,7 +96,9 @@ local STAT_CONFIG = {
     {name = "生命值%", key = "hpPercent"},
     {name = "法力值%", key = "mpPercent"},
     {name = "攻击力%", key = "dmgPercent"},
-    {name = "护甲%", key = "armorPercent"}
+    {name = "护甲%", key = "armorPercent"},
+    {name = "受到技伤减少", key = "SpellReduce"},
+    {name = "受到物伤减少", key = "PhysReduce"}
 }
 local NAME_TO_KEY = {}
 for ____, e in ipairs(STAT_CONFIG) do

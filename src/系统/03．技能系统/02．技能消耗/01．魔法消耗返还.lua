@@ -4,23 +4,38 @@ local ____exports = {}
 -- 
 -- 功能：暗夜精灵族技能施放后返还部分魔法
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
+local YDWEGetUnitAbilityDataInteger = ____require_result_0.YDWEGetUnitAbilityDataInteger
+local YDWEGetUnitAbilityDataReal = ____require_result_0.YDWEGetUnitAbilityDataReal
+local getObjectProperty = ____require_result_0.getObjectProperty
+local ObjectType = ____require_result_0.ObjectType
 local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.00．消耗常量")
 local PERCENT_COST_THRESHOLD = ____require_result_1.PERCENT_COST_THRESHOLD
 --- 检查技能是否为暗夜精灵族
 function ____exports.isNightElfAbility(self, abilityId)
-    local race = japi.YDWEGetObjectPropertyString(japi.YDWE_OBJECT_TYPE_ABILITY, abilityId, "race")
+    local race = getObjectProperty(nil, ObjectType.ABILITY, abilityId, "race")
     return race == "nightelf"
 end
 --- 获取技能固定消耗
 function ____exports.getAbilityManaCost(self, unit, abilityId, level)
-    return japi.YDWEGetUnitAbilityDataInteger(unit, abilityId, level, 104)
+    return YDWEGetUnitAbilityDataInteger(
+        nil,
+        unit,
+        abilityId,
+        level,
+        104
+    )
 end
 --- 获取技能百分比消耗
 function ____exports.getAbilityPercentCost(self, unit, abilityId, level)
-    return japi.YDWEGetUnitAbilityDataReal(unit, abilityId, level, 102)
+    return YDWEGetUnitAbilityDataReal(
+        nil,
+        unit,
+        abilityId,
+        level,
+        102
+    )
 end
 --- 计算技能总消耗
 function ____exports.calcTotalManaCost(self, unit, abilityId, level)

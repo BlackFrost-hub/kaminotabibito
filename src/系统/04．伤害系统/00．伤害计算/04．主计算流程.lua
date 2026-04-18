@@ -188,6 +188,8 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         local physMod = getPhysicalDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + physMod.addDamage
         finalMultiplier = finalMultiplier * physMod.multiplier
+        local physReduce = getRealAttr(nil, target, "受到物伤减少", 0)
+        damage = damage - physReduce
     end
     if isMagicDmg and not isEnhanceDmg then
         local magicDmg = getMagicDamageModifier(nil, attacker)
@@ -209,6 +211,8 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         local skillMod = getSkillDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + skillMod.addDamage
         finalMultiplier = finalMultiplier * skillMod.multiplier
+        local spellReduce = getRealAttr(nil, target, "受到技伤减少", 0)
+        damage = damage - spellReduce
     end
     if isNormalAtk then
         local atkMod = getNormalAttackModifier(nil, attacker, target, isPlayer)

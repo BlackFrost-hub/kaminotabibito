@@ -104,4 +104,31 @@ export function OperatorRealMultiply(a: number, b: number): number {
     return a * b;
 }
 
+/**
+ * 字符串转命令ID
+ * 对应JASS: String2OrderIdBJ
+ * 先尝试OrderId，若为0再尝试UnitId
+ */
+export function String2OrderIdBJ(orderIdString: string): number {
+    // Check to see if it's a generic order.
+    let orderId = 0;
+    if (typeof jass.OrderId === "function") {
+        orderId = jass.OrderId(orderIdString);
+    }
+    if (orderId !== 0) {
+        return orderId;
+    }
+
+    // Check to see if it's a (train) unit order.
+    if (typeof jass.UnitId === "function") {
+        orderId = jass.UnitId(orderIdString);
+    }
+    if (orderId !== 0) {
+        return orderId;
+    }
+
+    // Unrecognized - return 0
+    return 0;
+}
+
 export {};

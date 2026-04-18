@@ -73,7 +73,8 @@ const STAT_CONFIG: { name: string; key: string }[] = [
   { name: "伤害%", key: "dmgBonus" }, { name: "最终伤害%", key: "finalDmgBonus" }, { name: "经验获取率", key: "expGainRate" },
   { name: "最大生命值%", key: "hpPct" }, { name: "最大法力值%", key: "mpPct" },
   { name: "基础生命值%", key: "baseHpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }, { name: "基础护甲%", key: "baseArmorPct" },
-  { name: "生命值%", key: "hpPercent" }, { name: "法力值%", key: "mpPercent" }, { name: "攻击力%", key: "dmgPercent" }, { name: "护甲%", key: "armorPercent" }
+  { name: "生命值%", key: "hpPercent" }, { name: "法力值%", key: "mpPercent" }, { name: "攻击力%", key: "dmgPercent" }, { name: "护甲%", key: "armorPercent" },
+  { name: "受到技伤减少", key: "SpellReduce" }, { name: "受到物伤减少", key: "PhysReduce" },
 ];
 const NAME_TO_KEY: Record<string, string> = {};
 for (const e of STAT_CONFIG) { NAME_TO_KEY[e.name] = e.key; }

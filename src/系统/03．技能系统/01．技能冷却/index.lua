@@ -25,7 +25,6 @@ do
     end
 end
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
 local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
 local ____require_result_1 = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算")
@@ -36,6 +35,7 @@ local getCooldownReductionBonus = ____require_result_1.getCooldownReductionBonus
 local applyCooldownCap = ____require_result_1.applyCooldownCap
 local calcActualCooldown = ____require_result_1.calcActualCooldown
 local setAbilityCooldown = ____require_result_1.setAbilityCooldown
+local getBaseCooldown = ____require_result_1.getBaseCooldown
 local ____require_result_2 = require("系统.03．技能系统.01．技能冷却.02．特殊技能处理")
 local handleSpecialSkillCooldown = ____require_result_2.handleSpecialSkillCooldown
 local ____require_result_3 = require("系统.03．技能系统.01．技能冷却.00．冷却常量")
@@ -67,11 +67,7 @@ local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
     if level <= 0 then
         return
     end
-    local baseCooldown = japi.YDWEGetObjectPropertyReal(
-        japi.YDWE_OBJECT_TYPE_ABILITY,
-        spellAbilityId,
-        "Cool" .. tostring(level)
-    )
+    local baseCooldown = getBaseCooldown(nil, spellAbilityId, level)
     if baseCooldown <= 0 then
         return
     end

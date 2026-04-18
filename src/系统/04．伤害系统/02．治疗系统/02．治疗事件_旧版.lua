@@ -14,13 +14,14 @@ local ____exports = {}
 -- 1. 治疗命令ID列表可根据需要扩展
 -- 2. 直接调用 doHeal，不需要手动触发STES事件
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
 local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
-local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_2.doHeal
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local YDWEGetUnitAbilityDataReal = ____require_result_2.YDWEGetUnitAbilityDataReal
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_3.doHeal
 --- 治疗命令ID列表
 local HEAL_ORDER_IDS = {852092, 852063, 852501, 852160}
 --- 技能数据字段：治疗量（DataA = 108）
@@ -62,7 +63,13 @@ local function onSpellChannel(self)
     if target == nil then
         return
     end
-    local healAmount = japi.YDWEGetUnitAbilityDataReal(caster, abilityId, 1, HEAL_DATA_FIELD)
+    local healAmount = YDWEGetUnitAbilityDataReal(
+        nil,
+        caster,
+        abilityId,
+        1,
+        HEAL_DATA_FIELD
+    )
     jass.IssueImmediateOrder(caster, "stop")
     jass.UnitRemoveAbility(caster, abilityId)
     doHeal(nil, {

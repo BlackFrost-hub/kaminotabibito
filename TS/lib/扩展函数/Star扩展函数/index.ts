@@ -30,6 +30,13 @@ export function registerBridge(): void {
   expose("EC_GetPointZ", ecExt.EC_GetPointZ);
   expose("EC_CreateEffect", ecExt.EC_CreateEffect);
   expose("GS_PolarProjectionBJ", gsExt.GS_PolarProjectionBJ);
+  expose("SoHeroHatm", gsExt.SoHeroHatm);
+  expose("GS_news", gsExt.GS_news);
+  expose("GS_DisplayTimedTextToForcetakes", gsExt.GS_DisplayTimedTextToForcetakes);
+  expose("GS_UnitSector", gsExt.GS_UnitSector);
+  expose("GS_Sector", gsExt.GS_Sector);
   expose("StarOther_PanCameraToTimedUnitForPlayer", starLib.StarOther_PanCameraToTimedUnitForPlayer);
   expose("SDR_DebugTimer", starLib.SDR_DebugTimer);
 }
+
+export {};

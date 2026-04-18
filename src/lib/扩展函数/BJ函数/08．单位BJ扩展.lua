@@ -8,14 +8,13 @@ local ____exports = {}
 -- - 商店库存 → `03．物品与库存`
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_0.stringToFourCC
 function ____exports.String2UnitIdBJ(self, unitIdString)
     if type(jass.UnitId) == "function" then
         return jass.UnitId(unitIdString)
     end
-    if type(jass.FourCC) == "function" then
-        return jass.FourCC(unitIdString)
-    end
-    return 0
+    return stringToFourCC(nil, unitIdString)
 end
 function ____exports.GetIssuedOrderIdBJ(self)
     if type(jass.GetIssuedOrderId) == "function" then
@@ -166,13 +165,13 @@ function ____exports.SetUnitUseFoodBJ(self, enable, unit)
     jass.SetUnitUseFood(unit, enable)
 end
 function ____exports.UnitDamageTargetBJ(self, unit, target, amount, attacktype, damagetype)
-    local ____temp_0
+    local ____temp_1
     if jass.WEAPON_TYPE_WHOKNOWS ~= nil then
-        ____temp_0 = jass.WEAPON_TYPE_WHOKNOWS
+        ____temp_1 = jass.WEAPON_TYPE_WHOKNOWS
     else
-        ____temp_0 = nil
+        ____temp_1 = nil
     end
-    local weapon = ____temp_0
+    local weapon = ____temp_1
     return jass.UnitDamageTarget(
         unit,
         target,

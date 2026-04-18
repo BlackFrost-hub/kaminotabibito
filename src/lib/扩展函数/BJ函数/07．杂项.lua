@@ -99,4 +99,23 @@ end
 function ____exports.OperatorRealMultiply(self, a, b)
     return a * b
 end
+--- 字符串转命令ID
+-- 对应JASS: String2OrderIdBJ
+-- 先尝试OrderId，若为0再尝试UnitId
+function ____exports.String2OrderIdBJ(self, orderIdString)
+    local orderId = 0
+    if type(jass.OrderId) == "function" then
+        orderId = jass.OrderId(orderIdString)
+    end
+    if orderId ~= 0 then
+        return orderId
+    end
+    if type(jass.UnitId) == "function" then
+        orderId = jass.UnitId(orderIdString)
+    end
+    if orderId ~= 0 then
+        return orderId
+    end
+    return 0
+end
 return ____exports

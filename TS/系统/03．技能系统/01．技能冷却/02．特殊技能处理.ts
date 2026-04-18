@@ -5,7 +5,10 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
+const { YDWESetUnitAbilityState, YDWEGetUnitAbilityDataString } = require("lib.扩展函数.YDWE函数.index") as {
+  YDWESetUnitAbilityState: (u: any, abilcode: number, state_type: number, value: number) => boolean;
+  YDWEGetUnitAbilityDataString: (u: any, abilcode: number, level: number, data_type: number) => string;
+};
 
 //=============================================================================
 // 一、风暴之刃系列技能
@@ -36,7 +39,7 @@ export function isStormBladeSkill(abilityId: number): boolean {
  */
 export function handleStormBladeCooldown(unit: any, reduction: number): void {
   const cd = STORM_BLADE_BASE_CD - STORM_BLADE_BASE_CD * reduction;
-  japi.YDWESetUnitAbilityState(unit, STORM_BLADE_LINKED_ABILITY, 1, cd);
+  YDWESetUnitAbilityState(unit, STORM_BLADE_LINKED_ABILITY, 1, cd);
 }
 
 //=============================================================================
@@ -47,7 +50,7 @@ export function handleStormBladeCooldown(unit: any, reduction: number): void {
  * 检查是否为三连斩技能（通过技能数据字符串判断）
  */
 export function isTripleSlashSkill(unit: any, abilityId: number): boolean {
-  const skillString = japi.YDWEGetUnitAbilityDataString(unit, abilityId, 1, 216);
+  const skillString = YDWEGetUnitAbilityDataString(unit, abilityId, 1, 216);
   return (
     skillString === "SLSQW" ||
     skillString === "SLSQE" ||
@@ -66,7 +69,7 @@ const TRIPLE_SLASH_LINKED_ABILITY = 0x41304A54; // A0JT
  */
 export function handleTripleSlashCooldown(unit: any, reduction: number): void {
   const cd = TRIPLE_SLASH_BASE_CD - TRIPLE_SLASH_BASE_CD * reduction;
-  japi.YDWESetUnitAbilityState(unit, TRIPLE_SLASH_LINKED_ABILITY, 1, cd);
+  YDWESetUnitAbilityState(unit, TRIPLE_SLASH_LINKED_ABILITY, 1, cd);
 }
 
 //=============================================================================
