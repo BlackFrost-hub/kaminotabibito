@@ -7,14 +7,13 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
-};
-const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  GetSpellAbilityId: () => number;
-};
+
 const { YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
+};
+
+const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellChannelListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const {
   STES_GetTable,
@@ -84,33 +83,22 @@ function isHealOrder(orderId: number): boolean {
 // 三、事件处理
 //=============================================================================
 
-/** 触发器 */
-let healEventTrigger: any = null;
-
 /**
- * 治疗事件处理函数
+ * 治疗事件处理函数（通过统一技能事件回调）
  */
-function onSpellChannel(): void {
-  const caster = jass.GetTriggerUnit();
-  const abilityId = GetSpellAbilityId();
-  const target = jass.GetSpellTargetUnit();
+function onSpellChannel(castingUnit: any, spellAbilityId: number): void {
+  if (!jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT)) return;
 
-  // 检查是否为马甲单位
-  if (!jass.IsUnitType(caster, jass.UNIT_TYPE_ANCIENT)) return;
-
-  // 检查当前命令是否为治疗命令
-  const currentOrder = jass.GetUnitCurrentOrder(caster);
+  const currentOrder = jass.GetUnitCurrentOrder(castingUnit);
   if (!isHealOrder(currentOrder)) return;
 
-  // 获取治疗量数据
-  const healAmount = YDWEGetUnitAbilityDataReal(target, abilityId, 1, HEAL_DATA_FIELD);
+  const target = jass.GetSpellTargetUnit();
+  const healAmount = YDWEGetUnitAbilityDataReal(target, spellAbilityId, 1, HEAL_DATA_FIELD);
 
-  // 发出stop命令并移除技能
-  jass.IssueImmediateOrder(caster, "stop");
-  jass.UnitRemoveAbility(caster, abilityId);
+  jass.IssueImmediateOrder(castingUnit, "stop");
+  jass.UnitRemoveAbility(castingUnit, spellAbilityId);
 
-  // 触发治疗事件
-  fireHealEvent(target, healAmount, jass.GetOwningPlayer(caster));
+  fireHealEvent(target, healAmount, jass.GetOwningPlayer(castingUnit));
 }
 
 /**
@@ -151,19 +139,16 @@ function fireHealEvent(
 // 四、初始化
 //=============================================================================
 
+let _initialized = false;
+
 /**
  * 初始化治疗事件系统
  */
 export function initHealEvent(): void {
-  if (healEventTrigger != null) return;
+  if (_initialized) return;
+  _initialized = true;
 
-  healEventTrigger = jass.CreateTrigger();
-
-  // 注册任意单位施法事件
-  TriggerRegisterAnyUnitEventBJ(healEventTrigger, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL);
-
-  // 注册动作
-  jass.TriggerAddAction(healEventTrigger, onSpellChannel);
+  registerSpellChannelListener(onSpellChannel);
 }
 
 export {};

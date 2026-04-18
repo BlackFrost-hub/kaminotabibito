@@ -146,6 +146,27 @@ local function dualLine(leftColor, leftLabel, leftValue, rightColor, rightLabel,
     end
     return ((((((leftColor .. leftLabel) .. leftValue) .. "|r ") .. rightColor) .. rightLabel) .. rightValue) .. "|r"
 end
+local function singleLine(color, label, value)
+    return ((color .. label) .. value) .. "|r"
+end
+--- 将三列属性合并成五列布局（左列、分隔符、中列、分隔符、右列）
+-- 每列布局：第1行分隔线、第2行标题、第3行分隔线，从第4行开始显示竖线分隔符
+local function linesToColumns(left, mid, right)
+    local maxRows = math.max(#left, #mid, #right)
+    local result = {}
+    do
+        local i = 0
+        while i < maxRows do
+            result[#result + 1] = left[i + 1] or ""
+            result[#result + 1] = i >= 3 and "|" or ""
+            result[#result + 1] = mid[i + 1] or ""
+            result[#result + 1] = i >= 3 and "|" or ""
+            result[#result + 1] = right[i + 1] or ""
+            i = i + 1
+        end
+    end
+    return result
+end
 local function pctPlus100(player, attr)
     return ____exports.formatPercent((100 + ____exports.getPlayerAttr(player, attr) * 100) / 100)
 end
@@ -161,233 +182,357 @@ end
 --- 按 `属性查看.j` 的展示顺序拼出属性框每一行文本。
 -- 这里统一改为读取当前 TS 正式属性名，不再兼容旧 JASS 字段名。
 -- 与装备系统属性对齐
+-- 
+-- ============================================================
+-- 三列布局对齐规则（重要！后续开发者请务必遵守）
+-- ============================================================
+-- 
+-- 【布局结构】
+-- - 左列：基础属性（英雄核心属性）
+-- - 中列：常规属性（战斗相关属性）
+-- - 右列：特殊属性（元素和吸血属性）
+-- 
+-- 【行对齐规则】
+-- 同一行上的三列属性应该具有关联性，便于玩家对照查看：
+-- 
+-- 第3-4行：攻速移速 / 物理伤害抗性 / 光属性伤害抗性
+-- 第5-6行：生命法力% / 魔法伤害抗性 / 暗属性伤害抗性
+-- 第7-8行：生命恢复组 / 技能伤害抗性 / 木属性伤害抗性
+-- 第9-10行：生命恢复组 / 普攻伤害抗性 / 火属性伤害抗性
+-- 第11-12行：魔法恢复组 / 穿透属性 / 雷属性伤害抗性
+-- 第13-14行：【暴击组】暴击率/暴击伤害 ↔ 被暴击率/被暴击伤害 / 水属性伤害抗性
+-- 第15-16行：【命中组】命中率/闪避率 ↔ 伤害%/伤害减少% / 金属性伤害抗性
+-- 第17-18行：【重伤组】重伤/恢复效率 ↔ 强化伤害/最终伤害 / 召唤物伤害抗性
+-- 第19-20行：治疗相关 / 冷却缩减/经验获取率 / 吸血属性
+-- 第21行：预留 / 预留 / 伤害吸血
+-- 
+-- 【关键对齐组】
+-- 1. 暴击组（第13-14行）：
+--    - 左列：暴击率、暴击伤害（进攻方）
+--    - 中列：被暴击率、被暴击伤害（防守方）
+--    - 右列：水属性伤害、水属性抗性
+-- 
+-- 2. 命中组（第15-16行）：
+--    - 左列：命中率、闪避率（攻防对）
+--    - 中列：伤害%、伤害减少%（攻防对）
+--    - 右列：金属性伤害、金属性抗性
+-- 
+-- 3. 重伤组（第17-18行）：
+--    - 左列：重伤、恢复效率（攻防对）
+--    - 中列：强化伤害、最终伤害（伤害加成组）
+--    - 右列：召唤物伤害、召唤物抗性
+-- 
+-- 4. 伤害/抗性对（各自行内）：
+--    - 物理伤害 ↔ 物理抗性（第3-4行，橙色）
+--    - 魔法伤害 ↔ 魔抗（第5-6行，蓝色）
+--    - 技能伤害 ↔ 技能抗性（第7-8行，绿色）
+--    - 普攻伤害 ↔ 普攻抗性（第9-10行，灰色）
+--    - 所有元素属性伤害 ↔ 抗性（第3-18行，右列）
+-- 
+-- 【颜色统一规则】
+-- - 物理系：橙色 |cffc47f4f
+-- - 魔法系：蓝色 |cff67d8ff
+-- - 技能系：绿色 |cff7bff7b
+-- - 普攻系：灰色 |cffb5b5b5
+-- - 暴击系：红色 |cffff4b4b
+-- 
+-- 【修改注意事项】
+-- - 新增属性时，确保三列总行数一致
+-- - 调整属性位置时，保持关联属性在同一行
+-- - 修改后务必运行 npm run build 验证
+-- ============================================================
 function ____exports.buildDetailTexts(player)
     ____exports.updatePlayerRealtimeStats(player)
-    return {
-        dualLine(
-            "|cff993300",
-            "物理伤害：",
-            pctPlus100(player, "物理伤害"),
-            "|cff993300",
-            "物理抗性：",
-            pctMinus100(player, "物理抗性")
-        ),
-        dualLine(
-            "|cff00ccff",
-            "魔法伤害：",
-            pctPlus100(player, "魔法伤害"),
-            "|cff00ccff",
-            "魔抗：",
-            pctMinus100(player, "魔抗")
-        ),
-        dualLine(
-            "|cffff6800",
-            "技能伤害：",
-            pctPlus100(player, "技能伤害"),
-            "|cffff6800",
-            "技能抗性：",
-            pctMinus100(player, "技能抗性")
-        ),
-        dualLine(
-            "|cffff6600",
-            "强化伤害：",
-            pctPlus100(player, "强化伤害"),
-            "|cff333333",
-            "召唤物伤害：",
-            pctPlus100(player, "召唤物伤害")
-        ),
-        dualLine(
-            "|cff333333",
-            "召唤物抗性：",
-            pctMinus100(player, "召唤物抗性"),
-            "|cffff0000",
-            "普攻伤害：",
-            pctPlus100(player, "普攻伤害")
-        ),
-        dualLine(
-            "|cffff0000",
-            "普攻抗性：",
-            pctMinus100(player, "普攻抗性"),
-            "|cffff0000",
-            "魔法普攻：",
-            pctPlus100(player, "魔法普攻伤害")
-        ),
-        dualLine(
-            "|cffff0000",
-            "火属性：",
-            (pctPlus100(player, "火属性伤害") .. "/") .. pctPlus100(player, "火属性抗性"),
-            "|cff00ffff",
-            "水属性：",
-            (pctPlus100(player, "水属性伤害") .. "/") .. pctPlus100(player, "水属性抗性")
-        ),
-        dualLine(
-            "|cffccffff",
-            "雷属性：",
-            (pctPlus100(player, "雷属性伤害") .. "/") .. pctPlus100(player, "雷属性抗性"),
-            "|cff99cc00",
-            "木属性：",
-            (pctPlus100(player, "木属性伤害") .. "/") .. pctPlus100(player, "木属性抗性")
-        ),
-        dualLine(
-            "|cffffff00",
-            "光属性：",
-            (pctPlus100(player, "光属性伤害") .. "/") .. pctPlus100(player, "光属性抗性"),
-            "|cff993366",
-            "暗属性：",
-            (pctPlus100(player, "暗属性伤害") .. "/") .. pctPlus100(player, "暗属性抗性")
-        ),
-        dualLine(
-            "|cffcccccc",
-            "金属性：",
-            (pctPlus100(player, "金属性伤害") .. "/") .. pctPlus100(player, "金属性抗性"),
-            "",
-            "",
-            ""
-        ),
-        dualLine(
-            "|cff993300",
-            "护甲穿透：",
-            pct(player, "护甲穿透"),
-            "|cff00ccff",
-            "魔法穿透：",
-            pct(player, "魔法穿透")
-        ),
-        dualLine(
-            "|cffff0000",
-            "暴击率：",
-            pct(player, "暴击率"),
-            "|cffff0000",
-            "暴击伤害：",
-            ____exports.formatPercent((150 + ____exports.getPlayerAttr(player, "暴击伤害") * 100) / 100)
-        ),
-        dualLine(
-            "|cffff8080",
-            "被暴击率：-",
-            pct(player, "被暴击率"),
-            "|cffff8080",
-            "被暴击伤害：-",
-            pct(player, "被暴击伤害")
-        ),
-        dualLine(
-            "|cffff8080",
-            "命中率：",
-            pct(player, "命中率"),
-            "|cffff8080",
-            "闪避率：",
-            pct(player, "闪避率")
-        ),
-        dualLine(
-            "|cff99ccff",
-            "眩晕抗性：",
-            pct(player, "眩晕抗性"),
-            "|cffff8080",
-            "重伤：",
-            pct(player, "重伤")
-        ),
-        dualLine(
-            "|cffff8080",
-            "冷却缩减：",
-            pct(player, "冷却缩减"),
-            "|cff99ccff",
-            "伤害减少：",
-            number(player, "伤害减少")
-        ),
-        dualLine(
-            "|cff99ccff",
-            "伤害减少%：",
-            pct(player, "伤害减少%"),
-            "|cff99ccff",
-            "受到技伤减少：",
-            number(player, "受到技伤减少")
-        ),
-        dualLine(
-            "|cff99ccff",
-            "受到物伤减少：",
-            number(player, "受到物伤减少"),
-            "",
-            "",
-            ""
-        ),
-        dualLine(
-            "|cff99ccff",
+    local leftColumn = {
+        "|cff000000────────|r",
+        singleLine("|cffd8b26a", "【基础属性】", ""),
+        "|cff000000────────|r",
+        singleLine(
+            "|cff8ebfff",
             "攻速：",
-            ____exports.formatRate(____exports.getPlayerAttr(player, "每秒攻速")) .. "次/秒",
-            "|cff99ccff",
+            ____exports.formatRate(____exports.getPlayerAttr(player, "每秒攻速")) .. "次/秒"
+        ),
+        singleLine(
+            "|cff8ebfff",
             "移速：",
             number(player, "移动速度")
         ),
-        dualLine(
-            "|cffff0000",
-            "普攻吸血：",
-            pct(player, "普攻伤害吸血"),
-            "|cffff0000",
-            "魔法吸血：",
-            pct(player, "魔法伤害吸血")
+        singleLine(
+            "|cffc0ff82",
+            "生命值%：",
+            pct(player, "生命值%")
         ),
-        dualLine(
-            "|cffff0000",
-            "伤害吸血：",
-            pct(player, "伤害吸血"),
-            "",
-            "",
-            ""
+        singleLine(
+            "|cff8fdfff",
+            "法力值%：",
+            pct(player, "法力值%")
         ),
-        dualLine(
-            "|cffccffcc",
+        singleLine(
+            "|cff96ff9d",
             "生命恢复：",
-            number(player, "生命恢复") .. "/秒",
-            "|cffccffcc",
+            number(player, "生命恢复") .. "/秒"
+        ),
+        singleLine(
+            "|cff96ff9d",
             "生命恢复%：",
             pct(player, "生命恢复%")
         ),
-        dualLine(
-            "|cffccffcc",
+        singleLine(
+            "|cff96ff9d",
             "总生命恢复：",
-            number(player, "总生命恢复") .. "/秒",
-            "|cffccffcc",
-            "恢复效率：",
-            pct(player, "生命恢复效率")
+            number(player, "总生命恢复") .. "/秒"
         ),
-        dualLine(
-            "|cffccffff",
+        singleLine(
+            "|cff8fdfff",
             "魔法恢复：",
-            number(player, "魔法恢复") .. "/秒",
-            "|cffccffff",
+            number(player, "魔法恢复") .. "/秒"
+        ),
+        singleLine(
+            "|cff8fdfff",
             "魔法恢复%：",
             pct(player, "魔法恢复%")
         ),
-        dualLine(
-            "|cffccffff",
+        singleLine(
+            "|cff8fdfff",
             "总魔法恢复：",
-            number(player, "总魔法恢复") .. "/秒",
-            "|cffccffff",
-            "魔法消耗减少：",
-            pct(player, "魔法消耗")
+            number(player, "总魔法恢复") .. "/秒"
         ),
-        dualLine(
+        singleLine(
+            "|cffff6d5b",
+            "暴击率：",
+            pct(player, "暴击率")
+        ),
+        singleLine(
+            "|cffff4b4b",
+            "暴击伤害：",
+            ____exports.formatPercent((150 + ____exports.getPlayerAttr(player, "暴击伤害") * 100) / 100)
+        ),
+        singleLine(
+            "|cffffa7af",
+            "命中率：",
+            pct(player, "命中率")
+        ),
+        singleLine(
+            "|cffd4c7ff",
+            "闪避率：",
+            pct(player, "闪避率")
+        ),
+        singleLine(
+            "|cffff967d",
+            "重伤：",
+            pct(player, "重伤")
+        ),
+        singleLine(
+            "|cff96ff9d",
+            "恢复效率：",
+            pct(player, "生命恢复效率")
+        ),
+        singleLine(
             "|cffffcc99",
             "技能治疗率：",
-            pct(player, "技能治疗率"),
+            pct(player, "技能治疗率")
+        ),
+        singleLine(
             "|cffffcc99",
             "受到治疗率：",
             pct(player, "受到的治疗率")
-        ),
-        dualLine(
-            "|cffff00ff",
-            "伤害%：",
-            pct(player, "伤害%"),
-            "|cffff00ff",
-            "最终伤害%：",
-            pct(player, "最终伤害%")
-        ),
-        dualLine(
-            "|cffff00ff",
-            "经验获取率：",
-            pct(player, "经验获取率"),
-            "|cff99cc00",
-            "蝼蚁专精：",
-            pct(player, "蝼蚁专精")
         )
     }
+    local midColumn = {
+        "|cff000000────────|r",
+        singleLine("|cffff9d5c", "【常规属性】", ""),
+        "|cff000000────────|r",
+        singleLine(
+            "|cffc47f4f",
+            "物理伤害：",
+            pctPlus100(player, "物理伤害")
+        ),
+        singleLine(
+            "|cffc47f4f",
+            "物理抗性：",
+            pctMinus100(player, "物理抗性")
+        ),
+        singleLine(
+            "|cff67d8ff",
+            "魔法伤害：",
+            pctPlus100(player, "魔法伤害")
+        ),
+        singleLine(
+            "|cff67d8ff",
+            "魔抗：",
+            pctMinus100(player, "魔抗")
+        ),
+        singleLine(
+            "|cff7bff7b",
+            "技能伤害：",
+            pctPlus100(player, "技能伤害")
+        ),
+        singleLine(
+            "|cff7bff7b",
+            "技能抗性：",
+            pctMinus100(player, "技能抗性")
+        ),
+        singleLine(
+            "|cffb5b5b5",
+            "普攻伤害：",
+            pctPlus100(player, "普攻伤害")
+        ),
+        singleLine(
+            "|cffb5b5b5",
+            "普攻抗性：",
+            pctMinus100(player, "普攻抗性")
+        ),
+        singleLine(
+            "|cffffca7e",
+            "护甲穿透：",
+            pct(player, "护甲穿透")
+        ),
+        singleLine(
+            "|cff77ddff",
+            "魔法穿透：",
+            pct(player, "魔法穿透")
+        ),
+        singleLine(
+            "|cffff4b4b",
+            "被暴击率：",
+            pct(player, "被暴击率")
+        ),
+        singleLine(
+            "|cffff4b4b",
+            "被暴击伤害：",
+            pct(player, "被暴击伤害")
+        ),
+        singleLine(
+            "|cffff00ff",
+            "伤害%：",
+            pct(player, "伤害%")
+        ),
+        singleLine(
+            "|cffd0d9e1",
+            "伤害减少%：",
+            pct(player, "伤害减少%")
+        ),
+        singleLine(
+            "|cffff8b57",
+            "强化伤害：",
+            pctPlus100(player, "强化伤害")
+        ),
+        singleLine(
+            "|cffff00ff",
+            "最终伤害：",
+            pct(player, "最终伤害%")
+        ),
+        singleLine(
+            "|cff99ccff",
+            "冷却缩减：",
+            pct(player, "冷却缩减")
+        ),
+        singleLine(
+            "|cffff00ff",
+            "经验获取率：",
+            pct(player, "经验获取率")
+        )
+    }
+    local rightColumn = {
+        "|cff000000────────|r",
+        singleLine("|cff8fd9ff", "【特殊属性】", ""),
+        "|cff000000────────|r",
+        singleLine(
+            "|cffffeb7c",
+            "光属性伤害：",
+            pctPlus100(player, "光属性伤害")
+        ),
+        singleLine(
+            "|cffffeb7c",
+            "光属性抗性：",
+            pctMinus100(player, "光属性抗性")
+        ),
+        singleLine(
+            "|cff9e7bff",
+            "暗属性伤害：",
+            pctPlus100(player, "暗属性伤害")
+        ),
+        singleLine(
+            "|cff9e7bff",
+            "暗属性抗性：",
+            pctMinus100(player, "暗属性抗性")
+        ),
+        singleLine(
+            "|cff7bff7b",
+            "木属性伤害：",
+            pctPlus100(player, "木属性伤害")
+        ),
+        singleLine(
+            "|cff7bff7b",
+            "木属性抗性：",
+            pctMinus100(player, "木属性抗性")
+        ),
+        singleLine(
+            "|cffff7b7b",
+            "火属性伤害：",
+            pctPlus100(player, "火属性伤害")
+        ),
+        singleLine(
+            "|cffff7b7b",
+            "火属性抗性：",
+            pctMinus100(player, "火属性抗性")
+        ),
+        singleLine(
+            "|cffffeb3b",
+            "雷属性伤害：",
+            pctPlus100(player, "雷属性伤害")
+        ),
+        singleLine(
+            "|cffffeb3b",
+            "雷属性抗性：",
+            pctMinus100(player, "雷属性抗性")
+        ),
+        singleLine(
+            "|cff7bebff",
+            "水属性伤害：",
+            pctPlus100(player, "水属性伤害")
+        ),
+        singleLine(
+            "|cff7bebff",
+            "水属性抗性：",
+            pctMinus100(player, "水属性抗性")
+        ),
+        singleLine(
+            "|cffffd700",
+            "金属性伤害：",
+            pctPlus100(player, "金属性伤害")
+        ),
+        singleLine(
+            "|cffffd700",
+            "金属性抗性：",
+            pctMinus100(player, "金属性抗性")
+        ),
+        singleLine(
+            "|cffff7c7c",
+            "召唤物伤害：",
+            pctPlus100(player, "召唤物伤害")
+        ),
+        singleLine(
+            "|cffff7c7c",
+            "召唤物抗性：",
+            pctMinus100(player, "召唤物抗性")
+        ),
+        singleLine(
+            "|cffff7c7c",
+            "普攻吸血：",
+            pct(player, "普攻伤害吸血")
+        ),
+        singleLine(
+            "|cffff7c7c",
+            "魔法吸血：",
+            pct(player, "魔法伤害吸血")
+        ),
+        singleLine(
+            "|cffff7c7c",
+            "伤害吸血：",
+            pct(player, "伤害吸血")
+        )
+    }
+    return linesToColumns(leftColumn, midColumn, rightColumn)
 end
 return ____exports

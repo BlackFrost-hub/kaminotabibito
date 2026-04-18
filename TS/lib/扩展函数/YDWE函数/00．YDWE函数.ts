@@ -313,4 +313,50 @@ export function YDWEAngleBetweenUnits(fromUnit: any, toUnit: any): number {
   );
 }
 
+// ==========================================================================================
+// 延时销毁特效（使用中心计时器）
+// ==========================================================================================
+
+/** 待销毁特效列表 */
+const _pendingEffects: Array<{ eff: any; ticksLeft: number }> = [];
+
+/** 是否已注册到中心计时器 */
+let _effectRecycleRegistered = false;
+
+/** 每10毫秒检查待销毁特效 */
+function _tickEffectRecycle(): void {
+  for (let i = _pendingEffects.length - 1; i >= 0; i--) {
+    const entry = _pendingEffects[i];
+    entry.ticksLeft = entry.ticksLeft - 1;
+    if (entry.ticksLeft <= 0) {
+      if (entry.eff != null && typeof jass.DestroyEffect === "function") {
+        jass.DestroyEffect(entry.eff);
+      }
+      _pendingEffects.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * 延时销毁特效（使用中心计时器，避免频繁创建计时器）
+ * @param duration 延迟秒数
+ * @param effect 特效句柄
+ */
+export function YDWETimerDestroyEffect(duration: number, effect: any): void {
+  if (!effect || duration <= 0) return;
+
+  // 注册到中心计时器（只注册一次）
+  if (!_effectRecycleRegistered) {
+    _effectRecycleRegistered = true;
+    const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+      onTick10ms: (callback: () => void) => void;
+    };
+    onTick10ms(_tickEffectRecycle);
+  }
+
+  // 计算tick数（每10毫秒一个tick）
+  const ticks = Math.ceil(duration / 0.01);
+  _pendingEffects.push({ eff: effect, ticksLeft: ticks });
+}
+
 export {};

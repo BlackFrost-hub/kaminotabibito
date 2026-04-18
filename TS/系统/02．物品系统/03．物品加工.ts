@@ -30,6 +30,9 @@ const { stringToFourCC, fourCCToString } = require("lib.扩展函数.封装函�
   stringToFourCC: (s: string) => number;
   fourCCToString: (fourcc: number) => string;
 };
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
+};
 
 const CAMPFIRE_ID = 0x68303043; // 'h00C'
 const EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl";
@@ -323,16 +326,14 @@ function onAnyPickup(): void {
   }
 }
 
-function onAnyDeath(): void {
-  const u = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
-  if (!u || !isCampfire(u)) return;
-  const set = campfireItems.get(u);
+function onCampfireDeath(dyingUnit: any): void {
+  if (!dyingUnit || !isCampfire(dyingUnit)) return;
+  const set = campfireItems.get(dyingUnit);
   if (!set) return;
-  // 取消所有关联计时器（不删除物品，让物品按游戏规则掉落/保留）
   for (const it of set) {
     untrackItem(it);
   }
-  campfireItems.delete(u);
+  campfireItems.delete(dyingUnit);
 }
 
 export function init物品加工(): void {
@@ -342,7 +343,6 @@ export function init物品加工(): void {
     typeof (jass as any).Player !== "function"
   ) return;
 
-  // 玩家1-4（0..3）拾取物品
   const pickEv = (jass as any).EVENT_PLAYER_UNIT_PICKUP_ITEM ?? 18;
   const trigPick = (jass as any).CreateTrigger();
   for (let i = 0; i <= 3; i++) {
@@ -352,7 +352,6 @@ export function init物品加工(): void {
   }
   (jass as any).TriggerAddAction(trigPick, onAnyPickup);
 
-  // 兜底：玩家把物品从篝火丢到地上/丢出背包时，取消加工计时器
   const dropEv = (jass as any).EVENT_PLAYER_UNIT_DROP_ITEM ?? 19;
   const trigDrop = (jass as any).CreateTrigger();
   for (let i = 0; i <= 3; i++) {
@@ -368,15 +367,7 @@ export function init物品加工(): void {
     }
   });
 
-  // 篝火死亡：取消计时器
-  const trigDeath = (jass as any).CreateTrigger();
-  if (typeof (jass as any).TriggerRegisterPlayerUnitEvent === "function") {
-    const ev = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? 56;
-    for (let i = 0; i < 16; i++) {
-      (jass as any).TriggerRegisterPlayerUnitEvent(trigDeath, (jass as any).Player(i), ev, undefined!);
-    }
-  }
-  (jass as any).TriggerAddAction(trigDeath, onAnyDeath);
+  registerDeathListener(onCampfireDeath);
 }
 
 // 自动初始化（也可在 main.ts 显式调用）

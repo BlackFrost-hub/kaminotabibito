@@ -39,6 +39,20 @@ const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量
   DETAIL_LINE_WIDTH: number;
   DETAIL_LINE_HEIGHT: number;
   DETAIL_FONT_SIZE: number;
+  DETAIL_SEPARATOR_FONT_SIZE: number;
+  DETAIL_START_Y: number;
+  DETAIL_ROW_STEP: number;
+  DETAIL_LEFT_X: number;
+  DETAIL_MID_X: number;
+  DETAIL_RIGHT_X: number;
+  DETAIL_SEP1_X: number;
+  DETAIL_SEP2_X: number;
+  DETAIL_SEPARATOR_WIDTH: number;
+  DETAIL_SEPARATOR_HEIGHT_MULT: number;
+  DETAIL_SEPARATOR_Y_OFFSET: number;
+  DETAIL_SEPARATOR_X_OFFSET: number;
+  DETAIL_SEP_START_ROW: number;
+  DETAIL_SEP_END_ROW: number;
   DETAIL_LINE_LAYOUTS: readonly { x: number; y: number }[];
 };
 const {
@@ -59,7 +73,7 @@ const {
 
 let damagePanel = 0;
 const damageRows: { icon: number; values: number[]; player: any }[] = [];
-const detailSlots: { player: any; hero: any; functionKey: number; icon: number; box: number; lines: number[] }[] = [];
+const detailSlots: { player: any; hero: any; functionKey: number; icon: number; box: number; lines: number[]; separators: number[] }[] = [];
 
 function createFrame(tagName: string, name: string, parent: number): number {
   if (typeof japi.DzCreateFrameByTagName !== "function") return 0;
@@ -91,6 +105,9 @@ function showDetailSlot(index: number, visible: boolean): void {
   show(slot.box, visible);
   for (let i = 0; i < slot.lines.length; i++) {
     show(slot.lines[i], visible);
+  }
+  for (let i = 0; i < slot.separators.length; i++) {
+    show(slot.separators[i], visible);
   }
 }
 
@@ -161,22 +178,64 @@ function createDetailSlots(gameUI: number, players: any[]): void {
 
     // 后创建文本框，优先级高于快捷键文本，会覆盖它
     const box = createFrame("BACKDROP", "UI属性系统文本框" + i, icon);
+    const lines: number[] = [];
+    const separators: number[] = [];
+
     if (box !== 0) {
       setAbsolute(box, 常量.DETAIL_BOX_X, 常量.DETAIL_BOX_Y);
       japi.DzFrameSetTexture(box, 常量.PANEL_TEXTURE, 0);
       japi.DzFrameSetSize(box, 常量.DETAIL_BOX_WIDTH, 常量.DETAIL_BOX_HEIGHT);
       show(box, false);
-    }
 
-    const lines: number[] = [];
-    for (let lineIndex = 0; lineIndex < 常量.DETAIL_LINE_LAYOUTS.length; lineIndex++) {
-      const pos = 常量.DETAIL_LINE_LAYOUTS[lineIndex];
-      const line = createText(box, `UI属性系统属性行${i}_${lineIndex}`, pos.x, pos.y, 常量.DETAIL_FONT_SIZE, "");
-      if (line !== 0) {
-        japi.DzFrameSetSize(line, 常量.DETAIL_LINE_WIDTH, 常量.DETAIL_LINE_HEIGHT);
-        show(line, false);
+      // 创建普通文本行（5列：左、分隔符1、中、分隔符2、右）
+      // 使用相对于box的相对坐标
+      for (let lineIndex = 0; lineIndex < 常量.DETAIL_LINE_LAYOUTS.length; lineIndex++) {
+        const pos = 常量.DETAIL_LINE_LAYOUTS[lineIndex];
+        const isSeparatorCol = lineIndex % 5 === 1 || lineIndex % 5 === 3; // 第2列和第4列是分隔符
+
+        if (!isSeparatorCol) {
+          // 普通文本行 - 使用相对坐标（相对于box）
+          const line = createFrame("TEXT", `UI属性系统属性行${i}_${lineIndex}`, box);
+          if (line !== 0) {
+            japi.DzFrameSetPoint(line, 常量.ABSOLUTE_POINT_BOTTOMLEFT, box, 常量.ABSOLUTE_POINT_BOTTOMLEFT, pos.x, pos.y);
+            japi.DzFrameSetSize(line, 常量.DETAIL_LINE_WIDTH, 常量.DETAIL_LINE_HEIGHT);
+            japi.DzFrameSetFont(line, "UI\\uizt.ttf", 常量.DETAIL_FONT_SIZE, 0);
+            show(line, false);
+            lines.push(line);
+          }
+        }
       }
-      lines.push(line);
+
+      // 计算分隔符的Y坐标范围（使用常量）
+      const sepStartY = 常量.DETAIL_START_Y - 常量.DETAIL_ROW_STEP * 常量.DETAIL_SEP_START_ROW;
+      const sepEndY = 常量.DETAIL_START_Y - 常量.DETAIL_ROW_STEP * 常量.DETAIL_SEP_END_ROW;
+      const sepTotalHeight = (sepStartY - sepEndY + 常量.DETAIL_LINE_HEIGHT) * 常量.DETAIL_SEPARATOR_HEIGHT_MULT;
+      const sepWidth = 常量.DETAIL_SEPARATOR_WIDTH;
+      const sepRelY = sepEndY + 常量.DETAIL_SEPARATOR_Y_OFFSET;
+
+      // 左中分隔符 - 使用BACKDROP创建纯色竖线
+      const sep1 = createFrame("BACKDROP", `UI属性系统分隔符1_${i}`, box);
+      if (sep1 !== 0) {
+        japi.DzFrameSetPoint(sep1, 常量.ABSOLUTE_POINT_BOTTOMLEFT, box, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 常量.DETAIL_SEP1_X + 常量.DETAIL_SEPARATOR_X_OFFSET, sepRelY);
+        japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight);
+        japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0);
+        japi.DzFrameSetVertexColor(sep1, 0xFF000000);
+        japi.DzFrameSetPriority(sep1, 0);
+        show(sep1, false);
+        separators.push(sep1);
+      }
+
+      // 中右分隔符 - 使用BACKDROP创建纯色竖线
+      const sep2 = createFrame("BACKDROP", `UI属性系统分隔符2_${i}`, box);
+      if (sep2 !== 0) {
+        japi.DzFrameSetPoint(sep2, 常量.ABSOLUTE_POINT_BOTTOMLEFT, box, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 常量.DETAIL_SEP2_X + 常量.DETAIL_SEPARATOR_X_OFFSET, sepRelY);
+        japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight);
+        japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0);
+        japi.DzFrameSetVertexColor(sep2, 0xFF000000);
+        japi.DzFrameSetPriority(sep2, 0);
+        show(sep2, false);
+        separators.push(sep2);
+      }
     }
 
     const button = createFrame("GLUETEXTBUTTON", "UI属性系统按钮" + i, icon);
@@ -187,7 +246,7 @@ function createDetailSlots(gameUI: number, players: any[]): void {
       japi.DzFrameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_LEAVE, createDetailHoverAction(i, false), false);
     }
 
-    detailSlots.push({ player, hero, functionKey: 常量.KEY_F[i], icon, box, lines });
+    detailSlots.push({ player, hero, functionKey: 常量.KEY_F[i], icon, box, lines, separators });
   }
 }
 
@@ -247,10 +306,17 @@ export function updateDetailPanels(): void {
     slot.hero = getPlayerHero(slot.player);
     if (slot.icon !== 0) japi.DzFrameSetTexture(slot.icon, getHeroIcon(slot.hero), 0);
     const texts = buildDetailTexts(slot.player);
-    for (let lineIndex = 0; lineIndex < slot.lines.length; lineIndex++) {
-      const frame = slot.lines[lineIndex];
-      if (frame === 0) continue;
-      japi.DzFrameSetText(frame, texts[lineIndex] || "");
+    // 映射：lines数组只包含非分隔符列（0,2,4列），需要跳过1,3列
+    let lineIdx = 0;
+    for (let textIndex = 0; textIndex < texts.length; textIndex++) {
+      const isSeparatorCol = textIndex % 5 === 1 || textIndex % 5 === 3;
+      if (!isSeparatorCol) {
+        const frame = slot.lines[lineIdx];
+        if (frame !== 0) {
+          japi.DzFrameSetText(frame, texts[textIndex] || "");
+        }
+        lineIdx++;
+      }
     }
   }
 }

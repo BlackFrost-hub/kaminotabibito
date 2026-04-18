@@ -1,6 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local Set = ____lualib.Set
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 脱战计时系统
 -- 
@@ -9,17 +7,13 @@ local ____exports = {}
 -- 2. 计时器到期后恢复生命/魔法到100%，添加脱战移速技能
 -- 3. 若有脱战buff且受到超过1%最大生命伤害，移除脱战移速技能
 local jass = require("jass.common")
-local japi = require("jass.japi")
-local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
 local SetUnitLifePercentBJ = ____require_result_1.SetUnitLifePercentBJ
 local SetUnitManaPercentBJ = ____require_result_1.SetUnitManaPercentBJ
---- 从japi获取事件伤害
-local function getEventDamage(self)
-    return japi.GetEventDamage()
-end
+local ____require_result_2 = require("系统.04．伤害系统.01．伤害事件")
+local registerDamageCallback = ____require_result_2.registerDamageCallback
 --- 脱战计时时间（秒）
 local OUT_OF_COMBAT_TIME = 18
 --- 脱战移速技能ID
@@ -36,7 +30,6 @@ local outOfCombatTimers = {
     nil,
     nil
 }
-local damageTrigger = nil
 local timerTrigger = nil
 --- 检查单位是否为玩家英雄
 local function isPlayerHero(self, unit)
@@ -154,10 +147,8 @@ local function checkRemoveOutOfCombatBuff(self, unit, damage)
         )
     end
 end
---- 单位受伤事件处理
-local function onUnitDamaged(self)
-    local unit = jass.GetTriggerUnit()
-    local damage = getEventDamage(nil)
+--- 单位受伤事件处理（通过统一伤害事件回调）
+local function onUnitDamaged(self, unit, damage, _damageType, _fromDotTickBatch, _source, _isNormalAttack)
     if jass.IsUnitIllusion(unit) then
         return
     end
@@ -185,27 +176,14 @@ local function onTimerExpire(self)
         end
     end
 end
---- 已注册受伤事件的单位
-local registeredUnits = __TS__New(Set)
---- 为英雄注册受伤事件
-function ____exports.registerOutOfCombatHero(self, hero)
-    if hero == nil then
-        return
-    end
-    local handleId = jass.GetHandleId(hero)
-    if registeredUnits:has(handleId) then
-        return
-    end
-    registeredUnits:add(handleId)
-    jass.TriggerRegisterUnitEvent(damageTrigger, hero, jass.EVENT_UNIT_DAMAGED)
-end
+local _initialized = false
 --- 初始化脱战计时系统
 function ____exports.initOutOfCombat(self)
-    if damageTrigger ~= nil then
+    if _initialized then
         return
     end
-    damageTrigger = jass.CreateTrigger()
-    jass.TriggerAddAction(damageTrigger, onUnitDamaged)
+    _initialized = true
+    registerDamageCallback(nil, onUnitDamaged)
     timerTrigger = jass.CreateTrigger()
     do
         local i = 1

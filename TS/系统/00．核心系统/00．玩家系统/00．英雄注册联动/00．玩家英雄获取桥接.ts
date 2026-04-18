@@ -36,12 +36,15 @@ const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 };
 
 const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时") as {
-  registerOutOfCombatHero: (whichHero: any) => void;
   initOutOfCombat: () => void;
 };
 
 const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物") as {
   registerPetItemHandoffHero: (whichHero: any) => void;
+};
+
+const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
+  registerChestSystemHero: (whichHero: any) => void;
 };
 
 const REG_GUARD = "__syzl_playerHeroRegister_registered";
@@ -89,11 +92,11 @@ function registerHeroDependents(whichHero: any): void {
   if (typeof moveTornado.registerMoveSpeedTornadoHero === "function") {
     moveTornado.registerMoveSpeedTornadoHero(whichHero);
   }
-  if (typeof outOfCombat.registerOutOfCombatHero === "function") {
-    outOfCombat.registerOutOfCombatHero(whichHero);
-  }
   if (typeof petItemHandoff.registerPetItemHandoffHero === "function") {
     petItemHandoff.registerPetItemHandoffHero(whichHero);
+  }
+  if (typeof chestSystem.registerChestSystemHero === "function") {
+    chestSystem.registerChestSystemHero(whichHero);
   }
 }
 

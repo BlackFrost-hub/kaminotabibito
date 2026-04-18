@@ -21,6 +21,7 @@ local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工�
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
 local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
+local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
 local TRIG_KEY = "__syzl_playerHeroRegister_trig"
 local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
@@ -78,11 +79,11 @@ local function registerHeroDependents(self, whichHero)
     if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
         moveTornado:registerMoveSpeedTornadoHero(whichHero)
     end
-    if type(outOfCombat.registerOutOfCombatHero) == "function" then
-        outOfCombat:registerOutOfCombatHero(whichHero)
-    end
     if type(petItemHandoff.registerPetItemHandoffHero) == "function" then
         petItemHandoff:registerPetItemHandoffHero(whichHero)
+    end
+    if type(chestSystem.registerChestSystemHero) == "function" then
+        chestSystem:registerChestSystemHero(whichHero)
     end
 end
 --- 为单个玩家登记英雄：

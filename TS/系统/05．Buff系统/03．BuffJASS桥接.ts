@@ -25,6 +25,9 @@ const jass = require("jass.common") as any;
 const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_Register: (t: any, name: string) => void;
 };
+const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
+  YDWETimerDestroyEffect: (duration: number, effect: any) => void;
+};
 
 const {
   ydlStes_syncTriggerStep,
@@ -67,11 +70,7 @@ function playOneShotEffectOnTarget(modelPath: string, target: any): void {
   if (typeof jass.AddSpecialEffectTarget !== "function") return;
   const eff = jass.AddSpecialEffectTarget(modelPath, target, "overhead");
   if (eff == null || eff === 0) return;
-  if (typeof jass.YDWETimerDestroyEffect === "function") {
-    jass.YDWETimerDestroyEffect(2.0, eff);
-  } else if (typeof jass.DestroyEffect === "function") {
-    jass.DestroyEffect(eff);
-  }
+  YDWETimerDestroyEffect(2.0, eff);
 }
 
 /**

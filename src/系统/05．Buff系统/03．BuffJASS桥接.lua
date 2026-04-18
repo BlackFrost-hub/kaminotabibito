@@ -25,13 +25,15 @@ local registerManualBuff = ____00_FF0EBuff_7CFB_7EDF.registerManualBuff
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
 local STES_Register = ____require_result_0.STES_Register
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local ydlStes_syncTriggerStep = ____require_result_1.ydlStes_syncTriggerStep
-local ydlStes_finishChildCleanup = ____require_result_1.ydlStes_finishChildCleanup
-local ydlStes_readString5 = ____require_result_1.ydlStes_readString5
-local ydlStes_readUnit5 = ____require_result_1.ydlStes_readUnit5
-local ydlStes_readReal5 = ____require_result_1.ydlStes_readReal5
-local ydlStes_registerAfterGetTable = ____require_result_1.ydlStes_registerAfterGetTable
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWETimerDestroyEffect = ____require_result_1.YDWETimerDestroyEffect
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
+local ydlStes_readString5 = ____require_result_2.ydlStes_readString5
+local ydlStes_readUnit5 = ____require_result_2.ydlStes_readUnit5
+local ydlStes_readReal5 = ____require_result_2.ydlStes_readReal5
+local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
 ____exports.BUFF_ADD_STES_EVENT = "添加Buff"
 --- 与地图 YDLocal5Set 对齐的中文变量名
 local YL_UNIT_SOURCE = "Buff来源单位"
@@ -62,11 +64,7 @@ local function playOneShotEffectOnTarget(self, modelPath, target)
     if eff == nil or eff == 0 then
         return
     end
-    if type(jass.YDWETimerDestroyEffect) == "function" then
-        jass.YDWETimerDestroyEffect(2, eff)
-    elseif type(jass.DestroyEffect) == "function" then
-        jass.DestroyEffect(eff)
-    end
+    YDWETimerDestroyEffect(nil, 2, eff)
 end
 --- 从 YDLocal5 读参并施加 Buff（地图须在触发子触发前写入上表所列变量名）
 function ____exports.buffBridgeApplyFromYdlocal(self, _self)

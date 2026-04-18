@@ -39,23 +39,21 @@ function fireHealEvent(self, target, healAmount, sourcePlayer)
 end
 jass = require("jass.common")
 jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
-local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
-local YDWEGetUnitAbilityDataReal = ____require_result_2.YDWEGetUnitAbilityDataReal
-local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-STES_GetTable = ____require_result_3.STES_GetTable
-local STES_Fire = ____require_result_3.STES_Fire
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-YDLocal5Set = ____require_result_4.YDLocal5Set
-local YDLocal7Set = ____require_result_4.YDLocal7Set
-local clearStar_PIndex = ____require_result_4.clearStar_PIndex
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
-YDLocalExecuteTrigger = ____require_result_5.YDLocalExecuteTrigger
-YDTriggerExecuteTrigger = ____require_result_5.YDTriggerExecuteTrigger
-saveParentIndex = ____require_result_5.saveParentIndex
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
+local YDWEGetUnitAbilityDataReal = ____require_result_0.YDWEGetUnitAbilityDataReal
+local ____require_result_1 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local registerSpellChannelListener = ____require_result_1.registerSpellChannelListener
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+STES_GetTable = ____require_result_2.STES_GetTable
+local STES_Fire = ____require_result_2.STES_Fire
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+YDLocal5Set = ____require_result_3.YDLocal5Set
+local YDLocal7Set = ____require_result_3.YDLocal7Set
+local clearStar_PIndex = ____require_result_3.clearStar_PIndex
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
+YDLocalExecuteTrigger = ____require_result_4.YDLocalExecuteTrigger
+YDTriggerExecuteTrigger = ____require_result_4.YDTriggerExecuteTrigger
+saveParentIndex = ____require_result_4.saveParentIndex
 --- 治疗事件名称
 ____exports.HEAL_EVENT_NAME = "治疗事件"
 --- 治疗命令ID列表
@@ -66,43 +64,39 @@ local HEAL_DATA_FIELD = 108
 local function isHealOrder(self, orderId)
     return __TS__ArrayIncludes(HEAL_ORDER_IDS, orderId)
 end
---- 触发器
-local healEventTrigger = nil
---- 治疗事件处理函数
-local function onSpellChannel(self)
-    local caster = jass.GetTriggerUnit()
-    local abilityId = GetSpellAbilityId(nil)
-    local target = jass.GetSpellTargetUnit()
-    if not jass.IsUnitType(caster, jass.UNIT_TYPE_ANCIENT) then
+--- 治疗事件处理函数（通过统一技能事件回调）
+local function onSpellChannel(self, castingUnit, spellAbilityId)
+    if not jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
         return
     end
-    local currentOrder = jass.GetUnitCurrentOrder(caster)
+    local currentOrder = jass.GetUnitCurrentOrder(castingUnit)
     if not isHealOrder(nil, currentOrder) then
         return
     end
+    local target = jass.GetSpellTargetUnit()
     local healAmount = YDWEGetUnitAbilityDataReal(
         nil,
         target,
-        abilityId,
+        spellAbilityId,
         1,
         HEAL_DATA_FIELD
     )
-    jass.IssueImmediateOrder(caster, "stop")
-    jass.UnitRemoveAbility(caster, abilityId)
+    jass.IssueImmediateOrder(castingUnit, "stop")
+    jass.UnitRemoveAbility(castingUnit, spellAbilityId)
     fireHealEvent(
         nil,
         target,
         healAmount,
-        jass.GetOwningPlayer(caster)
+        jass.GetOwningPlayer(castingUnit)
     )
 end
+local _initialized = false
 --- 初始化治疗事件系统
 function ____exports.initHealEvent(self)
-    if healEventTrigger ~= nil then
+    if _initialized then
         return
     end
-    healEventTrigger = jass.CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(nil, healEventTrigger, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
-    jass.TriggerAddAction(healEventTrigger, onSpellChannel)
+    _initialized = true
+    registerSpellChannelListener(nil, onSpellChannel)
 end
 return ____exports

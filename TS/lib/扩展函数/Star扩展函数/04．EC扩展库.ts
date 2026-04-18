@@ -1,5 +1,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
+  YDWETimerDestroyEffect: (duration: number, effect: any) => void;
+};
 
 let starLocation: any = null;
 
@@ -25,7 +28,7 @@ export function EC_GetPointZ(x: number, y: number): number {
 /**
  * 创建特效（对齐 EC_CreateEffect）
  * time:
- * - >= 0: 到时销毁（优先 YDWETimerDestroyEffect）
+ * - >= 0: 到时销毁
  * - == -1: 不自动处理
  * - 其它负数: 立即销毁
  */
@@ -54,9 +57,7 @@ export function EC_CreateEffect(
   }
 
   if (time >= 0) {
-    if (typeof jass.YDWETimerDestroyEffect === "function") {
-      jass.YDWETimerDestroyEffect(time, eff);
-    }
+    YDWETimerDestroyEffect(time, eff);
   } else if (time !== -1) {
     if (typeof jass.DestroyEffect === "function") {
       jass.DestroyEffect(eff);

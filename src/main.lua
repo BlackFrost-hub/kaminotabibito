@@ -55,6 +55,10 @@ local _____5730_5F62_7CFB_7EDF = require("系统.07．地形系统.index")
 if type(_____5730_5F62_7CFB_7EDF.init) == "function" then
     _____5730_5F62_7CFB_7EDF:init()
 end
+local _____7ECF_6D4E_7CFB_7EDF = require("系统.06．经济系统.index")
+if type(_____7ECF_6D4E_7CFB_7EDF.init) == "function" then
+    _____7ECF_6D4E_7CFB_7EDF:init()
+end
 local _____4EFB_52A1_7CFB_7EDF = require("系统.08．任务系统.10．index")
 if type(_____4EFB_52A1_7CFB_7EDF.init) == "function" then
     _____4EFB_52A1_7CFB_7EDF:init()

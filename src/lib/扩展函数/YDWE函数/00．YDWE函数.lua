@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 --- YDWE JAPI 单元操作函数封装
 -- 
@@ -304,5 +305,43 @@ function ____exports.YDWEAngleBetweenUnits(self, fromUnit, toUnit)
         jass.GetUnitY(toUnit) - jass.GetUnitY(fromUnit),
         jass.GetUnitX(toUnit) - jass.GetUnitX(fromUnit)
     )
+end
+--- 待销毁特效列表
+local _pendingEffects = {}
+--- 是否已注册到中心计时器
+local _effectRecycleRegistered = false
+--- 每10毫秒检查待销毁特效
+local function _tickEffectRecycle(self)
+    do
+        local i = #_pendingEffects - 1
+        while i >= 0 do
+            local entry = _pendingEffects[i + 1]
+            entry.ticksLeft = entry.ticksLeft - 1
+            if entry.ticksLeft <= 0 then
+                if entry.eff ~= nil and type(jass.DestroyEffect) == "function" then
+                    jass.DestroyEffect(entry.eff)
+                end
+                __TS__ArraySplice(_pendingEffects, i, 1)
+            end
+            i = i - 1
+        end
+    end
+end
+--- 延时销毁特效（使用中心计时器，避免频繁创建计时器）
+-- 
+-- @param duration 延迟秒数
+-- @param effect 特效句柄
+function ____exports.YDWETimerDestroyEffect(self, duration, effect)
+    if not effect or duration <= 0 then
+        return
+    end
+    if not _effectRecycleRegistered then
+        _effectRecycleRegistered = true
+        local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+        local onTick10ms = ____require_result_0.onTick10ms
+        onTick10ms(nil, _tickEffectRecycle)
+    end
+    local ticks = math.ceil(duration / 0.01)
+    _pendingEffects[#_pendingEffects + 1] = {eff = effect, ticksLeft = ticks}
 end
 return ____exports

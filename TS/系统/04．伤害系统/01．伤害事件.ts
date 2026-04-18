@@ -11,6 +11,9 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 const { isHeroUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
 };
+const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+  registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
+};
 
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
 const EVENT_UNIT_DAMAGED_ID = 52;
@@ -66,18 +69,12 @@ function getUnitTypeHero(): any {
   return (jass as any).ConvertUnitType(2);
 }
 
-function unitDeathCondition(): boolean {
-  const u = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
-  if (!u) return false;
-  return !isHeroUnit(u);
-}
-
-function unitDeathAction(): void {
-  if (!UnitGroup) return;
-  const u = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
-  if (!u) return;
+function onUnitDeathForDamage(dyingUnit: any): void {
+  if (!UnitGroup || !dyingUnit) return;
+  if (isHeroUnit(dyingUnit)) return;
+  (globalThis as any).print?.("[伤害事件] 非英雄单位死亡，从追踪组移除:", dyingUnit);
   if (typeof (jass as any).GroupRemoveUnit === "function") {
-    (jass as any).GroupRemoveUnit(UnitGroup, u);
+    (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
   }
   recreateDamageTrigger();
 }
@@ -222,8 +219,6 @@ function initEnumUnit(): void {
   const TriggerAddAction = (jass as any).TriggerAddAction;
   const GroupEnumUnitsInRect = (jass as any).GroupEnumUnitsInRect;
   const DestroyGroup = (jass as any).DestroyGroup;
-  const RegisterPlayerUnitEvent = (jass as any).TriggerRegisterPlayerUnitEvent;
-  const evDeath = (jass as any).EVENT_PLAYER_UNIT_DEATH ?? 52;
 
   if (typeof CreateTrigger !== "function" || typeof CreateRegion !== "function") return;
 
@@ -236,7 +231,6 @@ function initEnumUnit(): void {
   if (typeof TriggerRegisterEnterRegion === "function") {
     TriggerRegisterEnterRegion(t, r, typeof Condition === "function" ? Condition(anyUnitDamagedFilter) : undefined);
   }
-  // 先枚举全图单位（恒真条件），再用 ForGroup 在回调里筛非蝗虫并注册，避免 Condition(filter) 在 Lua 下不被枚举调用
   if (grp && bounds && typeof GroupEnumUnitsInRect === "function" && typeof Condition === "function") {
     const alwaysTrue = (): boolean => true;
     GroupEnumUnitsInRect(grp, bounds, Condition(alwaysTrue));
@@ -254,18 +248,6 @@ function initEnumUnit(): void {
       });
     }
   }
-
-  const trideath = CreateTrigger();
-  if (typeof RegisterPlayerUnitEvent === "function" && evDeath != null) {
-    for (let pi = 0; pi <= 15; pi++) {
-      const p = (jass as any).Player(pi);
-      if (p != null) RegisterPlayerUnitEvent(trideath, p, evDeath, undefined);
-    }
-  }
-  if (typeof TriggerAddCondition === "function" && typeof Condition === "function") {
-    TriggerAddCondition(trideath, Condition(unitDeathCondition));
-  }
-  if (typeof TriggerAddAction === "function") TriggerAddAction(trideath, unitDeathAction);
 
   if (typeof DestroyGroup === "function" && grp) DestroyGroup(grp);
 }
@@ -326,6 +308,7 @@ function initDamageEventOnce(intervalSeconds?: number): void {
     ta = (jass as any).TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction);
   }
   initEnumUnit();
+  registerDeathListener(onUnitDeathForDamage);
   const sec = typeof intervalSeconds === "number" && intervalSeconds > 0 ? intervalSeconds : 60;
   if (typeof (jass as any).CreateTimer === "function" && TimerHandle == null) {
     TimerHandle = (jass as any).CreateTimer();

@@ -1,6 +1,9 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
+const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
+  YDWETimerDestroyEffect: (duration: number, effect: any) => void;
+};
 
 /** DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致） */
 function isDotTargetPaused(u: any): boolean {
@@ -43,9 +46,6 @@ export function createDotExecutor(deps: {
   getDotTickBatchTargetHids: () => Record<number, boolean> | null;
 } {
   // ========== 虚拟分区：内部状态 ==========
-  const EFFECT_RECYCLE_INTERVAL = 0.2;
-  const effectRecycleList: { eff: any; ticksLeft: number }[] = [];
-  let effectRecycleTimer: any = undefined;
   let dotTimer: any = undefined;
   let dotTickBatchTargetHids: Record<number, boolean> | null = null;
   let dotBatchSnapForClear: Record<number, boolean> | null = null;
@@ -56,29 +56,7 @@ export function createDotExecutor(deps: {
     if (!unit || !model || model === "" || typeof deps.jass.AddSpecialEffectTarget !== "function") return;
     const eff = deps.jass.AddSpecialEffectTarget(model, unit, "origin");
     if (eff == null) return;
-    if (typeof deps.jass.YDWETimerDestroyEffect === "function") {
-      deps.jass.YDWETimerDestroyEffect(duration, eff);
-      return;
-    }
-    const ticks = Math.ceil(duration / EFFECT_RECYCLE_INTERVAL);
-    effectRecycleList.push({ eff, ticksLeft: ticks });
-    if (effectRecycleTimer == null && typeof deps.jass.TimerStart === "function") {
-      effectRecycleTimer = deps.LeakWatcher.createTimer("dot_effectRecycle");
-      deps.jass.TimerStart(effectRecycleTimer, EFFECT_RECYCLE_INTERVAL, true, () => {
-        for (let i = effectRecycleList.length - 1; i >= 0; i--) {
-          const x = effectRecycleList[i];
-          x.ticksLeft = x.ticksLeft - 1;
-          if (x.ticksLeft <= 0) {
-            if (x.eff != null && typeof deps.jass.DestroyEffect === "function") deps.jass.DestroyEffect(x.eff);
-            effectRecycleList.splice(i, 1);
-          }
-        }
-        if (effectRecycleList.length === 0 && effectRecycleTimer != null) {
-          deps.LeakWatcher.destroyTimer(effectRecycleTimer);
-          effectRecycleTimer = undefined;
-        }
-      });
-    }
+    YDWETimerDestroyEffect(duration, eff);
   }
 
   // ========== 虚拟分区：造成 DOT 伤害 ==========

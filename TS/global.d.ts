@@ -93,7 +93,6 @@ interface JassCommon {
   YDWEIsEventPhysicalDamage?: () => boolean;
   YDWESetEventDamage?: (dmg: number) => void;
   YDWETimerDestroyTextTag?: (dur: number, tt: any) => void;
-  YDWETimerDestroyEffect?: (dur: number, e: any) => void;
   MNAnyUnitDamaged?: (trg: any, interval: number) => void;
   Condition?: (fn: () => boolean) => any;
   TriggerAddCondition?: (trg: any, cond: any) => void;

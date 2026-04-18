@@ -1,8 +1,10 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWETimerDestroyEffect = ____require_result_0.YDWETimerDestroyEffect
 --- DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致）
 local function isDotTargetPaused(self, u)
     if u == nil or u == 0 then
@@ -20,9 +22,6 @@ local function isDotTargetPaused(self, u)
     return paused
 end
 function ____exports.createDotExecutor(self, deps)
-    local EFFECT_RECYCLE_INTERVAL = 0.2
-    local effectRecycleList = {}
-    local effectRecycleTimer = nil
     local dotTimer = nil
     local dotTickBatchTargetHids = nil
     local dotBatchSnapForClear = nil
@@ -35,40 +34,7 @@ function ____exports.createDotExecutor(self, deps)
         if eff == nil then
             return
         end
-        if type(deps.jass.YDWETimerDestroyEffect) == "function" then
-            deps.jass.YDWETimerDestroyEffect(duration, eff)
-            return
-        end
-        local ticks = math.ceil(duration / EFFECT_RECYCLE_INTERVAL)
-        effectRecycleList[#effectRecycleList + 1] = {eff = eff, ticksLeft = ticks}
-        if effectRecycleTimer == nil and type(deps.jass.TimerStart) == "function" then
-            effectRecycleTimer = deps.LeakWatcher:createTimer("dot_effectRecycle")
-            deps.jass.TimerStart(
-                effectRecycleTimer,
-                EFFECT_RECYCLE_INTERVAL,
-                true,
-                function()
-                    do
-                        local i = #effectRecycleList - 1
-                        while i >= 0 do
-                            local x = effectRecycleList[i + 1]
-                            x.ticksLeft = x.ticksLeft - 1
-                            if x.ticksLeft <= 0 then
-                                if x.eff ~= nil and type(deps.jass.DestroyEffect) == "function" then
-                                    deps.jass.DestroyEffect(x.eff)
-                                end
-                                __TS__ArraySplice(effectRecycleList, i, 1)
-                            end
-                            i = i - 1
-                        end
-                    end
-                    if #effectRecycleList == 0 and effectRecycleTimer ~= nil then
-                        deps.LeakWatcher:destroyTimer(effectRecycleTimer)
-                        effectRecycleTimer = nil
-                    end
-                end
-            )
-        end
+        YDWETimerDestroyEffect(nil, duration, eff)
     end
     local function dealDamageForType(self, typeId, source, target, amount)
         if isDotTargetPaused(nil, target) then
@@ -117,20 +83,20 @@ function ____exports.createDotExecutor(self, deps)
             while i >= 0 do
                 local e = deps.dotTicks[i + 1]
                 local eh = deps:unitHid(e.target)
-                local ____temp_0
-                if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
-                    ____temp_0 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
-                else
-                    ____temp_0 = nil
-                end
-                local bid = ____temp_0
                 local ____temp_1
-                if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
-                    ____temp_1 = buffM:getBuffRuntimeByHid(eh, bid)
+                if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
+                    ____temp_1 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
                 else
                     ____temp_1 = nil
                 end
-                local rt = ____temp_1
+                local bid = ____temp_1
+                local ____temp_2
+                if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
+                    ____temp_2 = buffM:getBuffRuntimeByHid(eh, bid)
+                else
+                    ____temp_2 = nil
+                end
+                local rt = ____temp_2
                 if rt == nil or rt.remaining <= 0.001 then
                     __TS__ArraySplice(deps.dotTicks, i, 1)
                 end
@@ -182,17 +148,17 @@ function ____exports.createDotExecutor(self, deps)
                     function(____, c) return c.id == e.typeId end
                 )
                 local stTab = deps.stateByType[e.typeId]
-                local ____temp_3
+                local ____temp_4
                 if stTab ~= nil then
-                    local ____temp_2 = deps:tabRowForHid(stTab, eh)
-                    if ____temp_2 == nil then
-                        ____temp_2 = stTab[e.target]
+                    local ____temp_3 = deps:tabRowForHid(stTab, eh)
+                    if ____temp_3 == nil then
+                        ____temp_3 = stTab[e.target]
                     end
-                    ____temp_3 = ____temp_2
+                    ____temp_4 = ____temp_3
                 else
-                    ____temp_3 = nil
+                    ____temp_4 = nil
                 end
-                local stateRaw = ____temp_3
+                local stateRaw = ____temp_4
                 local state = deps:isValidDotStateRow(stateRaw) and stateRaw or nil
                 if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
                     cfg:onTick(e.target, state)
@@ -216,8 +182,8 @@ function ____exports.createDotExecutor(self, deps)
             return
         end
         _registeredToCenterTimer = true
-        local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-        local onSecond = ____require_result_4.onSecond
+        local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+        local onSecond = ____require_result_5.onSecond
         onSecond(nil, dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)

@@ -73,60 +73,171 @@ ____exports.HERO_KEY_Y = 0.540415
 --- 英雄头像按钮的点击区域大小
 ____exports.HERO_BUTTON_SIZE = 0.035
 --- 属性详情框X坐标
-____exports.DETAIL_BOX_X = 0.118
+____exports.DETAIL_BOX_X = 0.15
 --- 属性详情框Y坐标
-____exports.DETAIL_BOX_Y = 0.4077288
+____exports.DETAIL_BOX_Y = 0.34
 --- 属性详情框宽度
-____exports.DETAIL_BOX_WIDTH = 0.2
+____exports.DETAIL_BOX_WIDTH = 0.29
 --- 属性详情框高度
-____exports.DETAIL_BOX_HEIGHT = 0.35
+____exports.DETAIL_BOX_HEIGHT = 0.36
 --- 属性行宽度
-____exports.DETAIL_LINE_WIDTH = 0.0766664
+____exports.DETAIL_LINE_WIDTH = 0.082
 --- 属性行高度
 ____exports.DETAIL_LINE_HEIGHT = 0.0186618
 --- 属性详情字体大小
-____exports.DETAIL_FONT_SIZE = 0.0105
---- 第一行属性的起始Y坐标
-____exports.DETAIL_START_Y = 0.5363808
+____exports.DETAIL_FONT_SIZE = 0.0125
+--- 分隔符字体大小（比普通文本大，要连接成线）
+____exports.DETAIL_SEPARATOR_FONT_SIZE = 0.032
+--- 第一行属性的起始Y坐标（相对于box的相对坐标）
+____exports.DETAIL_START_Y = 0.162
 --- 每行属性之间的垂直间距
-____exports.DETAIL_ROW_STEP = 0.020358
---- 左列属性的X坐标
-____exports.DETAIL_LEFT_X = 0.0758336
---- 右列属性的X坐标
-____exports.DETAIL_RIGHT_X = 0.1545832
+____exports.DETAIL_ROW_STEP = 0.0145
+--- 左列属性的X坐标（相对于box的相对坐标）
+____exports.DETAIL_LEFT_X = -0.097
+--- 中列属性的X坐标（相对于box的相对坐标）
+____exports.DETAIL_MID_X = -0.004
+--- 右列属性的X坐标（相对于box的相对坐标）
+____exports.DETAIL_RIGHT_X = 0.089
+--- 列间距（左列与中列之间的距离）
+____exports.DETAIL_COL_SPACING = 0.093
+--- 左中分隔符的X坐标（相对于box的相对坐标）
+____exports.DETAIL_SEP1_X = -0.022
+--- 中右分隔符的X坐标（相对于box的相对坐标）
+____exports.DETAIL_SEP2_X = 0.071
+--- 分隔符线的宽度
+____exports.DETAIL_SEPARATOR_WIDTH = 0.0022
+--- 分隔符线的高度倍数（相对于行高）
+____exports.DETAIL_SEPARATOR_HEIGHT_MULT = 1.05
+--- 分隔符Y坐标偏移量（用于对齐文本）
+____exports.DETAIL_SEPARATOR_Y_OFFSET = 0.13
+--- 分隔符X坐标偏移量（用于调整水平位置）
+____exports.DETAIL_SEPARATOR_X_OFFSET = -0.036
+--- 分隔符起始行（从第几行开始显示）
+____exports.DETAIL_SEP_START_ROW = 3
+--- 分隔符结束行（到第几行结束）
+____exports.DETAIL_SEP_END_ROW = 21
 --- 属性详情面板的行布局配置
--- 每行有两个属性（左右两列），共15行显示30个属性
+-- 五列并排：
+-- - 左列：基础属性
+-- - 分隔符1：|
+-- - 中列：输出属性
+-- - 分隔符2：|
+-- - 右列：生存与特殊
+-- 共22行，前3行为分隔线+标题+分隔线，后19行为属性内容
 -- 格式：{ x: 水平位置, y: 垂直位置 }
 ____exports.DETAIL_LINE_LAYOUTS = {
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 0},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 0},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 0},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 0},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 0},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 1},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 1},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 1},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 1},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 1},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 2},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 2},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 2},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 2},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 2},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 3},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 3},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 3},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 3},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 3},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 4},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 4},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 4},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 4},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 4},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 5},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 5},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 5},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 5},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 5},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 6},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 6},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 6},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 6},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 6},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 7},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 7},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 7},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 7},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 7},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 8},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 8},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 8},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 8},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 8},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 9},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 9},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 9},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 9},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 9},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 10},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 10},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 10},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 10},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 10},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 11},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 11},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 11},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 11},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 11},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 12},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 12},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 12},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 12},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 12},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 13},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 13},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 13},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 13},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 13},
     {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14},
-    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14}
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 14},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 15},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 15},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 15},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 15},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 15},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 16},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 16},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 16},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 16},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 16},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 17},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 17},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 17},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 17},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 17},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 18},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 18},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 18},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 18},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 18},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 19},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 19},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 19},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 19},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 19},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 20},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 20},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 20},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 20},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 20},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22}
 }
 return ____exports

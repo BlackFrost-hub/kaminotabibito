@@ -1,60 +1,46 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, unitDeathCondition, unitDeathAction, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
+local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, registerDeathListener, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
 function getEventUnitDamaged(self)
     if type(jass.ConvertUnitEvent) == "function" then
         return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
     end
     return nil
 end
-function unitDeathCondition(self)
-    local ____temp_2
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_2 = jass.GetTriggerUnit()
-    else
-        ____temp_2 = nil
-    end
-    local u = ____temp_2
-    if not u then
-        return false
-    end
-    return not isHeroUnit(nil, u)
-end
-function unitDeathAction(self)
-    if not UnitGroup then
+function onUnitDeathForDamage(self, dyingUnit)
+    if not UnitGroup or not dyingUnit then
         return
     end
-    local ____temp_3
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_3 = jass.GetTriggerUnit()
-    else
-        ____temp_3 = nil
-    end
-    local u = ____temp_3
-    if not u then
+    if isHeroUnit(nil, dyingUnit) then
         return
+    end
+    local ____this_4
+    ____this_4 = _G
+    local ____opt_3 = ____this_4.print
+    if ____opt_3 ~= nil then
+        ____opt_3(____this_4, "[伤害事件] 非英雄单位死亡，从追踪组移除:", dyingUnit)
     end
     if type(jass.GroupRemoveUnit) == "function" then
-        jass.GroupRemoveUnit(UnitGroup, u)
+        jass.GroupRemoveUnit(UnitGroup, dyingUnit)
     end
     recreateDamageTrigger()
 end
 function onAnyUnitDamagedAction(self)
     local j = jass
-    local ____temp_4
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_4 = jass.GetTriggerUnit()
-    else
-        ____temp_4 = nil
-    end
-    local savedUnit = ____temp_4
     local ____temp_5
-    if type(jass.GetEventDamage) == "function" then
-        ____temp_5 = jass.GetEventDamage()
+    if type(jass.GetTriggerUnit) == "function" then
+        ____temp_5 = jass.GetTriggerUnit()
     else
-        ____temp_5 = 0
+        ____temp_5 = nil
     end
-    local savedDamage = ____temp_5
+    local savedUnit = ____temp_5
+    local ____temp_6
+    if type(jass.GetEventDamage) == "function" then
+        ____temp_6 = jass.GetEventDamage()
+    else
+        ____temp_6 = 0
+    end
+    local savedDamage = ____temp_6
     local savedSource = nil
     if type(jass.GetEventDamageSource) == "function" then
         pcall(function ()
@@ -74,23 +60,23 @@ function onAnyUnitDamagedAction(self)
             end
         )
     end
-    local ____temp_6
+    local ____temp_7
     if #dotBatchMarkQueue > 0 then
-        ____temp_6 = table.remove(dotBatchMarkQueue, 1) == true
+        ____temp_7 = table.remove(dotBatchMarkQueue, 1) == true
     else
-        ____temp_6 = false
+        ____temp_7 = false
     end
-    local fromDotTickBatchForEvent = ____temp_6
+    local fromDotTickBatchForEvent = ____temp_7
     if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
         pcall(function ()
                 local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-                local ____temp_7
+                local ____temp_8
                 if dmgCalc ~= nil then
-                    ____temp_7 = dmgCalc.onDamageEvent
+                    ____temp_8 = dmgCalc.onDamageEvent
                 else
-                    ____temp_7 = nil
+                    ____temp_8 = nil
                 end
-                local onDamageEvent = ____temp_7
+                local onDamageEvent = ____temp_8
                 if onDamageEvent ~= nil then
                     onDamageEvent(savedUnit, savedSource, savedDamage)
                 end
@@ -158,14 +144,14 @@ function processDamageEntry(self, entry)
         pcall(function ()
                 local dm = require("系统.04．伤害系统.02．dot伤害")
                 if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
-                    local ____dm_tryApplyHeroAttackGearDots_9 = dm.tryApplyHeroAttackGearDots
-                    local ____temp_8
+                    local ____dm_tryApplyHeroAttackGearDots_10 = dm.tryApplyHeroAttackGearDots
+                    local ____temp_9
                     if entry.source ~= nil then
-                        ____temp_8 = entry.source
+                        ____temp_9 = entry.source
                     else
-                        ____temp_8 = nil
+                        ____temp_9 = nil
                     end
-                    ____dm_tryApplyHeroAttackGearDots_9(dm, ____temp_8, su, sd)
+                    ____dm_tryApplyHeroAttackGearDots_10(dm, ____temp_9, su, sd)
                 end
             end
         )
@@ -202,23 +188,23 @@ function processDamageEntry(self, entry)
     end
 end
 function anyUnitDamagedFilter(self)
-    local ____temp_10
+    local ____temp_11
     if type(jass.GetFilterUnit) == "function" then
-        ____temp_10 = jass.GetFilterUnit()
+        ____temp_11 = jass.GetFilterUnit()
     else
-        ____temp_10 = nil
+        ____temp_11 = nil
     end
-    local u = ____temp_10
+    local u = ____temp_11
     if not u then
         return false
     end
-    local ____temp_11
+    local ____temp_12
     if type(jass.GetUnitAbilityLevel) == "function" then
-        ____temp_11 = jass.GetUnitAbilityLevel(u, ALOC)
+        ____temp_12 = jass.GetUnitAbilityLevel(u, ALOC)
     else
-        ____temp_11 = 0
+        ____temp_12 = 0
     end
-    local lvl = ____temp_11
+    local lvl = ____temp_12
     if lvl > 0 then
         return false
     end
@@ -245,12 +231,6 @@ function initEnumUnit(self)
     local TriggerAddAction = jass.TriggerAddAction
     local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
     local DestroyGroup = jass.DestroyGroup
-    local RegisterPlayerUnitEvent = jass.TriggerRegisterPlayerUnitEvent
-    local ____jass_EVENT_PLAYER_UNIT_DEATH_12 = jass.EVENT_PLAYER_UNIT_DEATH
-    if ____jass_EVENT_PLAYER_UNIT_DEATH_12 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DEATH_12 = 52
-    end
-    local evDeath = ____jass_EVENT_PLAYER_UNIT_DEATH_12
     if type(CreateTrigger) ~= "function" or type(CreateRegion) ~= "function" then
         return
     end
@@ -317,31 +297,6 @@ function initEnumUnit(self)
             )
         end
     end
-    local trideath = CreateTrigger()
-    if type(RegisterPlayerUnitEvent) == "function" and evDeath ~= nil then
-        do
-            local pi = 0
-            while pi <= 15 do
-                local p = jass.Player(pi)
-                if p ~= nil then
-                    RegisterPlayerUnitEvent(trideath,
-                        p,
-                        evDeath,
-                        nil
-                    )
-                end
-                pi = pi + 1
-            end
-        end
-    end
-    if type(TriggerAddCondition) == "function" and type(Condition) == "function" then
-        TriggerAddCondition(trideath,
-            Condition(unitDeathCondition)
-        )
-    end
-    if type(TriggerAddAction) == "function" then
-        TriggerAddAction(trideath, unitDeathAction)
-    end
     if type(DestroyGroup) == "function" and grp then
         DestroyGroup(grp)
     end
@@ -391,6 +346,7 @@ function initDamageEventOnce(self, intervalSeconds)
         ta = jass.TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
     end
     initEnumUnit()
+    registerDeathListener(nil, onUnitDeathForDamage)
     local sec = type(intervalSeconds) == "number" and intervalSeconds > 0 and intervalSeconds or 60
     if type(jass.CreateTimer) == "function" and TimerHandle == nil then
         TimerHandle = jass.CreateTimer()
@@ -404,6 +360,8 @@ local g = require("jass.globals")
 _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 isHeroUnit = ____require_result_0.isHeroUnit
+local ____require_result_1 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+registerDeathListener = ____require_result_1.registerDeathListener
 ALOC = 1097625443
 EVENT_UNIT_DAMAGED_ID = 52
 DamageEventQueue = {}
@@ -422,11 +380,11 @@ function ____exports.markNextPendingDamageAsDotTickBatch(self)
 end
 --- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致，优先 jass/globals 的 unittype 常量
 local function getUnitTypeHero(self)
-    local ____jass_UNIT_TYPE_HERO_1 = jass.UNIT_TYPE_HERO
-    if ____jass_UNIT_TYPE_HERO_1 == nil then
-        ____jass_UNIT_TYPE_HERO_1 = g.UNIT_TYPE_HERO
+    local ____jass_UNIT_TYPE_HERO_2 = jass.UNIT_TYPE_HERO
+    if ____jass_UNIT_TYPE_HERO_2 == nil then
+        ____jass_UNIT_TYPE_HERO_2 = g.UNIT_TYPE_HERO
     end
-    local direct = ____jass_UNIT_TYPE_HERO_1
+    local direct = ____jass_UNIT_TYPE_HERO_2
     if direct ~= nil then
         return direct
     end

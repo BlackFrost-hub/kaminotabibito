@@ -8,8 +8,6 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
-const jglobals = require("jass.globals") as any;
 
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -20,10 +18,9 @@ const { SetUnitLifePercentBJ, SetUnitManaPercentBJ } = require("lib.扩展函数
   SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
 };
 
-/** 从japi获取事件伤害 */
-function getEventDamage(): number {
-  return japi.GetEventDamage();
-}
+const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
+  registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
+};
 
 //=============================================================================
 // 一、常量配置
@@ -52,7 +49,6 @@ const outOfCombatTimers: any[] = [null, null, null, null, null];
 // 三、触发器
 //=============================================================================
 
-let damageTrigger: any = null;
 let timerTrigger: any = null;
 
 //=============================================================================
@@ -156,25 +152,22 @@ function checkRemoveOutOfCombatBuff(unit: any, damage: number): void {
 //=============================================================================
 
 /**
- * 单位受伤事件处理
+ * 单位受伤事件处理（通过统一伤害事件回调）
  */
-function onUnitDamaged(): void {
-  const unit = jass.GetTriggerUnit();
-  const damage = getEventDamage();
-
-  // 检查是否为幻象
+function onUnitDamaged(
+  unit: any,
+  damage: number,
+  _damageType: number,
+  _fromDotTickBatch: boolean,
+  _source: any,
+  _isNormalAttack: boolean
+): void {
   if (jass.IsUnitIllusion(unit)) return;
-
-  // 检查伤害是否>=1
   if (damage < 1.0) return;
-
-  // 检查是否为玩家英雄
   if (!isPlayerHero(unit)) return;
 
-  // 检查并移除脱战buff
   checkRemoveOutOfCombatBuff(unit, damage);
 
-  // 启动脱战计时器
   const playerId = getPlayerId(unit);
   startOutOfCombatTimer(playerId);
 }
@@ -194,45 +187,22 @@ function onTimerExpire(): void {
 }
 
 //=============================================================================
-// 六、英雄注册
+// 六、初始化
 //=============================================================================
 
-/** 已注册受伤事件的单位 */
-const registeredUnits = new Set<any>();
-
-/**
- * 为英雄注册受伤事件
- */
-export function registerOutOfCombatHero(hero: any): void {
-  if (hero == null) return;
-
-  // 避免重复注册
-  const handleId = jass.GetHandleId(hero);
-  if (registeredUnits.has(handleId)) return;
-  registeredUnits.add(handleId);
-
-  // 注册单位受伤事件
-  jass.TriggerRegisterUnitEvent(damageTrigger, hero, jass.EVENT_UNIT_DAMAGED);
-}
-
-//=============================================================================
-// 七、初始化
-//=============================================================================
+let _initialized = false;
 
 /**
  * 初始化脱战计时系统
  */
 export function initOutOfCombat(): void {
-  if (damageTrigger != null) return;
+  if (_initialized) return;
+  _initialized = true;
 
-  // 创建受伤触发器
-  damageTrigger = jass.CreateTrigger();
-  jass.TriggerAddAction(damageTrigger, onUnitDamaged);
+  registerDamageCallback(onUnitDamaged);
 
-  // 创建计时器触发器
   timerTrigger = jass.CreateTrigger();
 
-  // 为4个计时器注册到期事件
   for (let i = 1; i <= 4; i++) {
     const timer = jass.CreateTimer();
     outOfCombatTimers[i] = timer;

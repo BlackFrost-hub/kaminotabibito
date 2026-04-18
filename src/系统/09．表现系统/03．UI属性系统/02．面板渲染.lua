@@ -23,14 +23,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue47
+                            goto __continue52
                         end
                         japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue47::
+                    ::__continue52::
                     col = col + 1
                 end
             end
@@ -54,18 +54,19 @@ function ____exports.updateDetailPanels()
                 )
             end
             local texts = buildDetailTexts(slot.player)
+            local lineIdx = 0
             do
-                local lineIndex = 0
-                while lineIndex < #slot.lines do
-                    do
-                        local frame = slot.lines[lineIndex + 1]
-                        if frame == 0 then
-                            goto __continue54
+                local textIndex = 0
+                while textIndex < #texts do
+                    local isSeparatorCol = textIndex % 5 == 1 or textIndex % 5 == 3
+                    if not isSeparatorCol then
+                        local frame = slot.lines[lineIdx + 1]
+                        if frame ~= 0 then
+                            japi.DzFrameSetText(frame, texts[textIndex + 1] or "")
                         end
-                        japi.DzFrameSetText(frame, texts[lineIndex + 1] or "")
+                        lineIdx = lineIdx + 1
                     end
-                    ::__continue54::
-                    lineIndex = lineIndex + 1
+                    textIndex = textIndex + 1
                 end
             end
             i = i + 1
@@ -128,6 +129,13 @@ local function showDetailSlot(index, visible)
         local i = 0
         while i < #slot.lines do
             show(slot.lines[i + 1], visible)
+            i = i + 1
+        end
+    end
+    do
+        local i = 0
+        while i < #slot.separators do
+            show(slot.separators[i + 1], visible)
             i = i + 1
         end
     end
@@ -241,31 +249,88 @@ local function createDetailSlots(gameUI, players)
                 "UI属性系统文本框" .. tostring(i),
                 icon
             )
+            local lines = {}
+            local separators = {}
             if box ~= 0 then
                 setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
                 japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
                 japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
                 show(box, false)
-            end
-            local lines = {}
-            do
-                local lineIndex = 0
-                while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
-                    local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
-                    local line = createText(
-                        box,
-                        (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
-                        pos.x,
-                        pos.y,
-                        _____5E38_91CF.DETAIL_FONT_SIZE,
-                        ""
-                    )
-                    if line ~= 0 then
-                        japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
-                        show(line, false)
+                do
+                    local lineIndex = 0
+                    while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
+                        local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
+                        local isSeparatorCol = lineIndex % 5 == 1 or lineIndex % 5 == 3
+                        if not isSeparatorCol then
+                            local line = createFrame(
+                                "TEXT",
+                                (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
+                                box
+                            )
+                            if line ~= 0 then
+                                japi.DzFrameSetPoint(
+                                    line,
+                                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                                    box,
+                                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                                    pos.x,
+                                    pos.y
+                                )
+                                japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
+                                japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
+                                show(line, false)
+                                lines[#lines + 1] = line
+                            end
+                        end
+                        lineIndex = lineIndex + 1
                     end
-                    lines[#lines + 1] = line
-                    lineIndex = lineIndex + 1
+                end
+                local sepStartY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_START_ROW
+                local sepEndY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_END_ROW
+                local sepTotalHeight = (sepStartY - sepEndY + _____5E38_91CF.DETAIL_LINE_HEIGHT) * _____5E38_91CF.DETAIL_SEPARATOR_HEIGHT_MULT
+                local sepWidth = _____5E38_91CF.DETAIL_SEPARATOR_WIDTH
+                local sepRelY = sepEndY + _____5E38_91CF.DETAIL_SEPARATOR_Y_OFFSET
+                local sep1 = createFrame(
+                    "BACKDROP",
+                    "UI属性系统分隔符1_" .. tostring(i),
+                    box
+                )
+                if sep1 ~= 0 then
+                    japi.DzFrameSetPoint(
+                        sep1,
+                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                        box,
+                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                        _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                        sepRelY
+                    )
+                    japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
+                    japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+                    japi.DzFrameSetVertexColor(sep1, 4278190080)
+                    japi.DzFrameSetPriority(sep1, 0)
+                    show(sep1, false)
+                    separators[#separators + 1] = sep1
+                end
+                local sep2 = createFrame(
+                    "BACKDROP",
+                    "UI属性系统分隔符2_" .. tostring(i),
+                    box
+                )
+                if sep2 ~= 0 then
+                    japi.DzFrameSetPoint(
+                        sep2,
+                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                        box,
+                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                        _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                        sepRelY
+                    )
+                    japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
+                    japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+                    japi.DzFrameSetVertexColor(sep2, 4278190080)
+                    japi.DzFrameSetPriority(sep2, 0)
+                    show(sep2, false)
+                    separators[#separators + 1] = sep2
                 end
             end
             local button = createFrame(
@@ -302,7 +367,8 @@ local function createDetailSlots(gameUI, players)
                 functionKey = _____5E38_91CF.KEY_F[i + 1],
                 icon = icon,
                 box = box,
-                lines = lines
+                lines = lines,
+                separators = separators
             }
             i = i + 1
         end
@@ -333,11 +399,11 @@ function ____exports.focusHeroByFunctionKey(functionKey)
         while i < #detailSlots do
             do
                 if detailSlots[i + 1].functionKey ~= functionKey then
-                    goto __continue40
+                    goto __continue45
                 end
                 return detailSlots[i + 1].hero
             end
-            ::__continue40::
+            ::__continue45::
             i = i + 1
         end
     end

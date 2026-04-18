@@ -1,5 +1,8 @@
 /** @noSelfInFile */
 
+/** 伤害测试开关（默认关闭，伤害判断已合并到伤害显示系统） */
+const ENABLED = false;
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const 伤害事件 = require("系统.04．伤害系统.01．伤害事件") as {
@@ -147,6 +150,7 @@ function TrigConditions(): boolean {
 }
 
 function init(): void {
+  if (!ENABLED) return;
   const trg = jass.CreateTrigger();
   if (typeof jass.TriggerAddCondition === "function" && typeof jass.Condition === "function") {
     jass.TriggerAddCondition(trg, jass.Condition(TrigConditions));

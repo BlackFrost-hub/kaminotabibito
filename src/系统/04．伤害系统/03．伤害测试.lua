@@ -1,8 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local ____exports = {}
----
--- @noSelfInFile
+--- 伤害测试开关（默认关闭，伤害判断已合并到伤害显示系统）
+local ENABLED = false
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local _____4F24_5BB3_4E8B_4EF6 = require("系统.04．伤害系统.01．伤害事件")
@@ -145,6 +145,9 @@ local function TrigConditions()
     return true
 end
 local function init()
+    if not ENABLED then
+        return
+    end
     local trg = jass.CreateTrigger()
     if type(jass.TriggerAddCondition) == "function" and type(jass.Condition) == "function" then
         jass.TriggerAddCondition(

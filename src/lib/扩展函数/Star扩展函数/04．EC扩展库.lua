@@ -2,6 +2,8 @@
 local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWETimerDestroyEffect = ____require_result_0.YDWETimerDestroyEffect
 local starLocation = nil
 --- 获取坐标点地形高度（对齐 EC_GetPointZ）
 function ____exports.EC_GetPointZ(self, x, y)
@@ -22,7 +24,7 @@ function ____exports.EC_GetPointZ(self, x, y)
 end
 --- 创建特效（对齐 EC_CreateEffect）
 -- time:
--- - >= 0: 到时销毁（优先 YDWETimerDestroyEffect）
+-- - >= 0: 到时销毁
 -- - == -1: 不自动处理
 -- - 其它负数: 立即销毁
 function ____exports.EC_CreateEffect(self, path, x, y, z, fac, size, s, time)
@@ -45,9 +47,7 @@ function ____exports.EC_CreateEffect(self, path, x, y, z, fac, size, s, time)
         )
     end
     if time >= 0 then
-        if type(jass.YDWETimerDestroyEffect) == "function" then
-            jass.YDWETimerDestroyEffect(time, eff)
-        end
+        YDWETimerDestroyEffect(nil, time, eff)
     elseif time ~= -1 then
         if type(jass.DestroyEffect) == "function" then
             jass.DestroyEffect(eff)
