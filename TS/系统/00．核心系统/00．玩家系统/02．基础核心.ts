@@ -1,9 +1,9 @@
 /**
  * 玩家单位管理器 - 基础核心
- *
  * 职责：
- * - 向 `中心计时器` 注册周期 tick
- * - 按顺序调用各功能模块的同步入口
+ * - 向中心计时器注册周期tick（每10ms）
+ * - 按间隔调用各功能同步（如移速龙卷特效）
+ * 接入：由index.ts在启动时require并调用initPlayerUnitManager()
  */
 
 const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {

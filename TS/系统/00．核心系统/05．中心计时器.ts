@@ -197,6 +197,9 @@ function onTick(): void {
     callback();
   }
 
+  // 执行周期性回调
+  runPeriodicCallbacks();
+
   if (_millisCounter >= 100) {
     _millisCounter = 0;
     _serverTime = _serverTime + 1000;
@@ -347,6 +350,58 @@ export function getGameDifficulty(): number {
 // ==========================================================================================
 // 回调注册功能
 // ==========================================================================================
+
+/** 周期性回调列表 */
+interface PeriodicCallback {
+  id: number;
+  intervalMs: number;
+  lastRunTime: number;
+  callback: () => void;
+}
+
+let _periodicCallbackIdCounter = 0;
+const _periodicCallbacks: PeriodicCallback[] = [];
+
+/**
+ * 注册周期性回调函数
+ * @param intervalMs 间隔时间（毫秒）
+ * @param callback 回调函数
+ * @returns 回调ID，用于取消注册
+ */
+export function addPeriodicCallback(intervalMs: number, callback: () => void): number {
+  const id = ++_periodicCallbackIdCounter;
+  _periodicCallbacks.push({
+    id,
+    intervalMs,
+    lastRunTime: _serverTime + _millisCounter * 10,
+    callback,
+  });
+  return id;
+}
+
+/**
+ * 移除周期性回调函数
+ * @param id 回调ID
+ */
+export function removePeriodicCallback(id: number): void {
+  const index = _periodicCallbacks.findIndex((cb) => cb.id === id);
+  if (index > -1) {
+    _periodicCallbacks.splice(index, 1);
+  }
+}
+
+/**
+ * 执行周期性回调（在onTick中调用）
+ */
+function runPeriodicCallbacks(): void {
+  const now = _serverTime + _millisCounter * 10;
+  for (const periodicCb of _periodicCallbacks) {
+    if (now - periodicCb.lastRunTime >= periodicCb.intervalMs) {
+      periodicCb.lastRunTime = now;
+      periodicCb.callback();
+    }
+  }
+}
 
 /**
  * 注册每秒回调函数

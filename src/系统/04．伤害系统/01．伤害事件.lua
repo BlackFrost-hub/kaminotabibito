@@ -14,12 +14,6 @@ function onUnitDeathForDamage(self, dyingUnit)
     if isHeroUnit(nil, dyingUnit) then
         return
     end
-    local ____this_4
-    ____this_4 = _G
-    local ____opt_3 = ____this_4.print
-    if ____opt_3 ~= nil then
-        ____opt_3(____this_4, "[伤害事件] 非英雄单位死亡，从追踪组移除:", dyingUnit)
-    end
     if type(jass.GroupRemoveUnit) == "function" then
         jass.GroupRemoveUnit(UnitGroup, dyingUnit)
     end
@@ -27,20 +21,20 @@ function onUnitDeathForDamage(self, dyingUnit)
 end
 function onAnyUnitDamagedAction(self)
     local j = jass
-    local ____temp_5
+    local ____temp_3
     if type(jass.GetTriggerUnit) == "function" then
-        ____temp_5 = jass.GetTriggerUnit()
+        ____temp_3 = jass.GetTriggerUnit()
     else
-        ____temp_5 = nil
+        ____temp_3 = nil
     end
-    local savedUnit = ____temp_5
-    local ____temp_6
+    local savedUnit = ____temp_3
+    local ____temp_4
     if type(jass.GetEventDamage) == "function" then
-        ____temp_6 = jass.GetEventDamage()
+        ____temp_4 = jass.GetEventDamage()
     else
-        ____temp_6 = 0
+        ____temp_4 = 0
     end
-    local savedDamage = ____temp_6
+    local savedDamage = ____temp_4
     local savedSource = nil
     if type(jass.GetEventDamageSource) == "function" then
         pcall(function ()
@@ -60,23 +54,23 @@ function onAnyUnitDamagedAction(self)
             end
         )
     end
-    local ____temp_7
+    local ____temp_5
     if #dotBatchMarkQueue > 0 then
-        ____temp_7 = table.remove(dotBatchMarkQueue, 1) == true
+        ____temp_5 = table.remove(dotBatchMarkQueue, 1) == true
     else
-        ____temp_7 = false
+        ____temp_5 = false
     end
-    local fromDotTickBatchForEvent = ____temp_7
+    local fromDotTickBatchForEvent = ____temp_5
     if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
         pcall(function ()
                 local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-                local ____temp_8
+                local ____temp_6
                 if dmgCalc ~= nil then
-                    ____temp_8 = dmgCalc.onDamageEvent
+                    ____temp_6 = dmgCalc.onDamageEvent
                 else
-                    ____temp_8 = nil
+                    ____temp_6 = nil
                 end
-                local onDamageEvent = ____temp_8
+                local onDamageEvent = ____temp_6
                 if onDamageEvent ~= nil then
                     onDamageEvent(savedUnit, savedSource, savedDamage)
                 end
@@ -144,14 +138,14 @@ function processDamageEntry(self, entry)
         pcall(function ()
                 local dm = require("系统.04．伤害系统.02．dot伤害")
                 if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
-                    local ____dm_tryApplyHeroAttackGearDots_10 = dm.tryApplyHeroAttackGearDots
-                    local ____temp_9
+                    local ____dm_tryApplyHeroAttackGearDots_8 = dm.tryApplyHeroAttackGearDots
+                    local ____temp_7
                     if entry.source ~= nil then
-                        ____temp_9 = entry.source
+                        ____temp_7 = entry.source
                     else
-                        ____temp_9 = nil
+                        ____temp_7 = nil
                     end
-                    ____dm_tryApplyHeroAttackGearDots_10(dm, ____temp_9, su, sd)
+                    ____dm_tryApplyHeroAttackGearDots_8(dm, ____temp_7, su, sd)
                 end
             end
         )
@@ -188,23 +182,23 @@ function processDamageEntry(self, entry)
     end
 end
 function anyUnitDamagedFilter(self)
-    local ____temp_11
+    local ____temp_9
     if type(jass.GetFilterUnit) == "function" then
-        ____temp_11 = jass.GetFilterUnit()
+        ____temp_9 = jass.GetFilterUnit()
     else
-        ____temp_11 = nil
+        ____temp_9 = nil
     end
-    local u = ____temp_11
+    local u = ____temp_9
     if not u then
         return false
     end
-    local ____temp_12
+    local ____temp_10
     if type(jass.GetUnitAbilityLevel) == "function" then
-        ____temp_12 = jass.GetUnitAbilityLevel(u, ALOC)
+        ____temp_10 = jass.GetUnitAbilityLevel(u, ALOC)
     else
-        ____temp_12 = 0
+        ____temp_10 = 0
     end
-    local lvl = ____temp_12
+    local lvl = ____temp_10
     if lvl > 0 then
         return false
     end
@@ -236,31 +230,31 @@ function initEnumUnit(self)
     end
     local t = CreateTrigger()
     local r = CreateRegion()
-    local ____temp_13
+    local ____temp_11
     if type(CreateGroup) == "function" then
-        ____temp_13 = CreateGroup()
+        ____temp_11 = CreateGroup()
     else
-        ____temp_13 = nil
+        ____temp_11 = nil
     end
-    local grp = ____temp_13
-    local ____temp_14
+    local grp = ____temp_11
+    local ____temp_12
     if type(GetWorldBounds) == "function" then
-        ____temp_14 = GetWorldBounds()
+        ____temp_12 = GetWorldBounds()
     else
-        ____temp_14 = nil
+        ____temp_12 = nil
     end
-    local bounds = ____temp_14
+    local bounds = ____temp_12
     if bounds and type(RegionAddRect) == "function" then
         RegionAddRect(r, bounds)
     end
     if type(TriggerRegisterEnterRegion) == "function" then
-        local ____temp_15
+        local ____temp_13
         if type(Condition) == "function" then
-            ____temp_15 = Condition(anyUnitDamagedFilter)
+            ____temp_13 = Condition(anyUnitDamagedFilter)
         else
-            ____temp_15 = nil
+            ____temp_13 = nil
         end
-        TriggerRegisterEnterRegion(t, r, ____temp_15)
+        TriggerRegisterEnterRegion(t, r, ____temp_13)
     end
     if grp and bounds and type(GroupEnumUnitsInRect) == "function" and type(Condition) == "function" then
         local function alwaysTrue()
@@ -278,13 +272,13 @@ function initEnumUnit(self)
                     if not u then
                         return
                     end
-                    local ____temp_16
+                    local ____temp_14
                     if type(jass.GetUnitAbilityLevel) == "function" then
-                        ____temp_16 = jass.GetUnitAbilityLevel(u, ALOC)
+                        ____temp_14 = jass.GetUnitAbilityLevel(u, ALOC)
                     else
-                        ____temp_16 = 0
+                        ____temp_14 = 0
                     end
-                    local lvl = ____temp_16
+                    local lvl = ____temp_14
                     if lvl > 0 then
                         return
                     end

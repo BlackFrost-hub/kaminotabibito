@@ -26,11 +26,20 @@ const { YDLocalExecuteTrigger } = require("lib.扩展函数.YDWE函数.04．YDWE
   YDLocalExecuteTrigger: (trg: any) => void;
 };
 
-/** 与 JASS 进子触发前一致，避免 ydl_triggerstep 错位导致 YDLocal5Get 全 0 */
+/**
+ * 与 JASS 进子触发前一致，避免 ydl_triggerstep 错位导致 YDLocal5Get 全 0
+ * 
+ * 当 JASS 端触发 STES 事件时，Lua 端的触发器动作被调用，
+ * 此时需要执行 YDLocalExecuteTrigger 来同步 ydl_triggerstep，
+ * 这样后续的 YDLocal5Get 才能正确读取到 JASS 端传递的参数
+ */
 export function ydlStes_syncTriggerStep(_self: any): void {
   if (typeof jass.GetTriggeringTrigger !== "function") return;
   const trg = jass.GetTriggeringTrigger();
   if (trg == null || trg === 0) return;
+  
+  // 执行 YDLocalExecuteTrigger 同步 ydl_triggerstep
+  // 这是关键步骤，确保 YDLocal5Get 能读取到正确的参数
   YDLocalExecuteTrigger(trg);
 }
 

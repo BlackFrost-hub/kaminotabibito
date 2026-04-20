@@ -46,11 +46,7 @@ local function isPlayerHero(unit)
     if not heroGroup or not unit then
         return false
     end
-    local ____opt_7 = jass.IsUnitInGroup
-    if ____opt_7 ~= nil then
-        ____opt_7 = ____opt_7(jass, unit, heroGroup)
-    end
-    return ____opt_7 == true
+    return jass.IsUnitInGroup(unit, heroGroup) == true
 end
 --- 获取英雄单位组
 local function getHeroGroup()
@@ -64,28 +60,21 @@ local function getHeroGroup()
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
-    local ____opt_9 = jass.GetOwningPlayer
-    if ____opt_9 ~= nil then
-        ____opt_9 = ____opt_9(jass, dyingUnit)
-    end
-    local owner = ____opt_9
+    local owner = jass.GetOwningPlayer(dyingUnit)
     if owner == nil then
         return false
     end
-    local ____opt_11 = jass.GetPlayerId
-    if ____opt_11 ~= nil then
-        ____opt_11 = ____opt_11(jass, owner)
-    end
-    local playerId = ____opt_11
+    local playerId = jass.GetPlayerId(owner)
     return playerId == 12 or playerId == 7
 end
 --- 给予玩家金币（带音效和漂浮文字）
 local function giveGoldToPlayer(unit, player, baseGold, isShared)
     local params = {unit = unit, player = player, baseGold = baseGold, isShared = isShared}
     for ____, cb in ipairs(goldGainCallbacks) do
-        local result = pcall(function () return cb(params) end
-        )
-        if result ~= nil then
+        local pcallResult = pcall(nil, cb, params)
+        local success = pcallResult[0]
+        local result = pcallResult[1]
+        if success and result ~= nil then
             params = result
         end
     end
@@ -107,11 +96,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if not isValidDyingUnit(dyingUnit) then
         return
     end
-    local ____opt_13 = jass.GetUnitTypeId
-    if ____opt_13 ~= nil then
-        ____opt_13 = ____opt_13(jass, dyingUnit)
-    end
-    local dyingUnitType = ____opt_13
+    local dyingUnitType = jass.GetUnitTypeId(dyingUnit)
     if not dyingUnitType then
         return
     end
@@ -120,11 +105,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
         return
     end
     if killer ~= nil then
-        local ____opt_15 = jass.GetOwningPlayer
-        if ____opt_15 ~= nil then
-            ____opt_15 = ____opt_15(jass, killer)
-        end
-        local killerPlayer = ____opt_15
+        local killerPlayer = jass.GetOwningPlayer(killer)
         if killerPlayer ~= nil then
             giveGoldToPlayer(killer, killerPlayer, baseBounty, false)
         end
@@ -136,99 +117,63 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if shareGold <= 0 then
         return
     end
-    local ____opt_17 = jass.GetUnitX
-    if ____opt_17 ~= nil then
-        ____opt_17 = ____opt_17(jass, dyingUnit)
+    local ____temp_7 = jass.GetUnitX(dyingUnit)
+    if ____temp_7 == nil then
+        ____temp_7 = 0
     end
-    local ____opt_17_19 = ____opt_17
-    if ____opt_17_19 == nil then
-        ____opt_17_19 = 0
+    local dyingX = ____temp_7
+    local ____temp_8 = jass.GetUnitY(dyingUnit)
+    if ____temp_8 == nil then
+        ____temp_8 = 0
     end
-    local dyingX = ____opt_17_19
-    local ____opt_20 = jass.GetUnitY
-    if ____opt_20 ~= nil then
-        ____opt_20 = ____opt_20(jass, dyingUnit)
-    end
-    local ____opt_20_22 = ____opt_20
-    if ____opt_20_22 == nil then
-        ____opt_20_22 = 0
-    end
-    local dyingY = ____opt_20_22
-    local ____opt_23 = jass.GetOwningPlayer
-    if ____opt_23 ~= nil then
-        ____opt_23 = ____opt_23(jass, killer)
-    end
-    local killerPlayer = ____opt_23
+    local dyingY = ____temp_8
+    local killerPlayer = jass.GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
     if killerPlayer == nil or heroGroup == nil then
         return
     end
-    local ____opt_25 = jass.BlzGroupGetSize
-    if ____opt_25 ~= nil then
-        ____opt_25 = ____opt_25(jass, heroGroup)
+    local ____temp_9 = jass.BlzGroupGetSize(heroGroup)
+    if ____temp_9 == nil then
+        ____temp_9 = 0
     end
-    local ____opt_25_27 = ____opt_25
-    if ____opt_25_27 == nil then
-        ____opt_25_27 = 0
-    end
-    local heroCount = ____opt_25_27
+    local heroCount = ____temp_9
     do
         local i = 0
         while i < heroCount do
             do
-                local ____opt_28 = jass.BlzGroupUnitAt
-                if ____opt_28 ~= nil then
-                    ____opt_28 = ____opt_28(jass, heroGroup, i)
-                end
-                local hero = ____opt_28
+                local hero = jass.BlzGroupUnitAt(heroGroup, i)
                 if not hero then
-                    goto __continue23
+                    goto __continue22
                 end
                 if hero == killer then
-                    goto __continue23
+                    goto __continue22
                 end
-                local ____opt_30 = jass.IsUnitAlly
-                if ____opt_30 ~= nil then
-                    ____opt_30 = ____opt_30(jass, hero, killerPlayer)
+                if jass.IsUnitAlly(hero, killerPlayer) ~= true then
+                    goto __continue22
                 end
-                if ____opt_30 ~= true then
-                    goto __continue23
+                local ____temp_10 = jass.GetUnitX(hero)
+                if ____temp_10 == nil then
+                    ____temp_10 = 0
                 end
-                local ____opt_32 = jass.GetUnitX
-                if ____opt_32 ~= nil then
-                    ____opt_32 = ____opt_32(jass, hero)
+                local heroX = ____temp_10
+                local ____temp_11 = jass.GetUnitY(hero)
+                if ____temp_11 == nil then
+                    ____temp_11 = 0
                 end
-                local ____opt_32_34 = ____opt_32
-                if ____opt_32_34 == nil then
-                    ____opt_32_34 = 0
-                end
-                local heroX = ____opt_32_34
-                local ____opt_35 = jass.GetUnitY
-                if ____opt_35 ~= nil then
-                    ____opt_35 = ____opt_35(jass, hero)
-                end
-                local ____opt_35_37 = ____opt_35
-                if ____opt_35_37 == nil then
-                    ____opt_35_37 = 0
-                end
-                local heroY = ____opt_35_37
+                local heroY = ____temp_11
                 local dx = heroX - dyingX
                 local dy = heroY - dyingY
                 local dist = math.sqrt(dx * dx + dy * dy)
                 if dist > SHARE_RANGE then
-                    goto __continue23
+                    goto __continue22
                 end
-                local ____opt_38 = jass.GetOwningPlayer
-                if ____opt_38 ~= nil then
-                    ____opt_38 = ____opt_38(jass, hero)
-                end
-                local heroPlayer = ____opt_38
+                local heroPlayer = jass.GetOwningPlayer(hero)
                 if heroPlayer == nil then
-                    goto __continue23
+                    goto __continue22
                 end
                 giveGoldToPlayer(hero, heroPlayer, shareGold, true)
             end
-            ::__continue23::
+            ::__continue22::
             i = i + 1
         end
     end

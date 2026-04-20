@@ -4,7 +4,7 @@ const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
 //=============================================================================
-// 英雄属性常量（Blizzard.j）
+// BJ 全局变量（Blizzard.j）
 //=============================================================================
 
 /** 英雄属性 - 力量 */
@@ -15,6 +15,27 @@ export const bj_HEROSTAT_AGI = (jglobals as any).bj_HEROSTAT_AGI ?? 1;
 
 /** 英雄属性 - 智力 */
 export const bj_HEROSTAT_INT = (jglobals as any).bj_HEROSTAT_INT ?? 2;
+
+/** 单位组计数（CountUnitsInGroup 使用） */
+let bj_groupCountUnits = 0;
+
+/** 是否销毁单位组标记 */
+let bj_wantDestroyGroup = false;
+
+/** GroupAddGroup 的目标单位组 */
+let bj_groupAddGroupDest: any = null;
+
+/** CountUnitsInGroup 的回调函数 */
+function CountUnitsInGroupEnum(): void {
+    bj_groupCountUnits = bj_groupCountUnits + 1;
+}
+
+/** GroupAddGroup 的回调函数 */
+function GroupAddGroupEnum(): void {
+    if (bj_groupAddGroupDest != null) {
+        jass.GroupAddUnit(bj_groupAddGroupDest, jass.GetEnumUnit());
+    }
+}
 
 //=============================================================================
 // 修改方式常量（Blizzard.j）
@@ -179,11 +200,11 @@ export function ModifyHeroSkillPoints(whichHero: any, whichStat: number, modifyM
 
 /**
  * 判断单位是否拥有指定buff
- * 对应JASS: UnitHasBuffBJ
+ * 对应BJ: UnitHasBuffBJ (1.27 没有 UnitHasBuff，用 GetUnitAbilityLevel 实现)
  */
 export function UnitHasBuffBJ(whichUnit: any, buffId: number): boolean {
     if (whichUnit == null || whichUnit === 0) return false;
-    return jass.UnitHasBuff(whichUnit, buffId);
+    return jass.GetUnitAbilityLevel(whichUnit, buffId) > 0;
 }
 
 /**
@@ -204,6 +225,37 @@ export function GetLearnedSkillBJ(): number {
         return jass.GetLearnedSkill();
     }
     return 0;
+}
+
+/**
+ * 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
+ * 对应BJ: CountUnitsInGroup
+ */
+export function CountUnitsInGroup(g: any): number {
+    if (g == null || g === 0) return 0;
+    const wantDestroy = bj_wantDestroyGroup;
+    bj_wantDestroyGroup = false;
+    bj_groupCountUnits = 0;
+    jass.ForGroup(g, CountUnitsInGroupEnum);
+    if (wantDestroy) {
+        jass.DestroyGroup(g);
+    }
+    return bj_groupCountUnits;
+}
+
+/**
+ * 将一个单位组的单位添加到另一个单位组（1.27 没有 GroupAddGroup）
+ * 对应BJ: GroupAddGroup
+ */
+export function GroupAddGroup(sourceGroup: any, destGroup: any): void {
+    if (sourceGroup == null || sourceGroup === 0 || destGroup == null || destGroup === 0) return;
+    const wantDestroy = bj_wantDestroyGroup;
+    bj_wantDestroyGroup = false;
+    bj_groupAddGroupDest = destGroup;
+    jass.ForGroup(sourceGroup, GroupAddGroupEnum);
+    if (wantDestroy) {
+        jass.DestroyGroup(sourceGroup);
+    }
 }
 
 export {};

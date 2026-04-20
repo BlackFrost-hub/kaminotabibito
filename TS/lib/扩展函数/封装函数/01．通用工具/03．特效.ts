@@ -25,18 +25,15 @@ export function createTimedEffect(
   z: number = 0,
   duration: number = 2
 ): any {
-  let eff: any;
-  if (typeof jass.AddSpecialEffectZ === "function") {
-    eff = jass.AddSpecialEffectZ(modelPath, x, y, z);
-  } else if (typeof jass.AddSpecialEffect === "function") {
-    eff = jass.AddSpecialEffect(modelPath, x, y);
-  }
+  const eff = jass.AddSpecialEffect(modelPath, x, y);
   if (!eff) return null;
 
+  if (z !== 0 && typeof japi.EXSetEffectZ === "function") {
+    japi.EXSetEffectZ(eff, z);
+  }
+
   withTimer(duration, () => {
-    if (typeof jass.DestroyEffect === "function") {
-      jass.DestroyEffect(eff);
-    }
+    jass.DestroyEffect(eff);
   });
   return eff;
 }
@@ -45,14 +42,7 @@ const unitEffectMap: Map<string, any> = new Map();
 
 function getUnitEffectHandleId(unit: any): number {
   if (!unit) return 0;
-  if (typeof japi.DzGetUnitObjectId === "function") {
-    const handleId = japi.DzGetUnitObjectId(unit);
-    if (handleId) return handleId;
-  }
-  if (typeof jass.GetHandleId === "function") {
-    return jass.GetHandleId(unit);
-  }
-  return 0;
+  return jass.GetHandleId(unit);
 }
 
 function getUnitEffectKey(unit: any, effectKey: string): string {
@@ -62,7 +52,7 @@ function getUnitEffectKey(unit: any, effectKey: string): string {
 }
 
 function destroyBoundEffect(effect: any): void {
-  if (!effect || typeof jass.DestroyEffect !== "function") return;
+  if (!effect) return;
   DzUnbindEffect(effect);
   jass.DestroyEffect(effect);
 }
@@ -79,9 +69,6 @@ export function createUnitEffect(unit: any, attachPoint: string, modelPath: stri
   if (!unit) return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
-  if (typeof jass.AddSpecialEffectTarget !== "function") {
-    return null;
-  }
 
   const existingEffect = unitEffectMap.get(key);
   if (existingEffect) {

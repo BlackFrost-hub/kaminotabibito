@@ -1,8 +1,19 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringPadStart = ____lualib.__TS__StringPadStart
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
+local runPeriodicCallbacks, _serverTime, _millisCounter, _periodicCallbacks
+function runPeriodicCallbacks(self)
+    local now = _serverTime + _millisCounter * 10
+    for ____, periodicCb in ipairs(_periodicCallbacks) do
+        if now - periodicCb.lastRunTime >= periodicCb.intervalMs then
+            periodicCb.lastRunTime = now
+            periodicCb:callback()
+        end
+    end
+end
 --- 核心系统 - 中心计时器
 -- 
 -- 功能：
@@ -36,10 +47,8 @@ local NORMAL_MON_DAYS = {
 local BASE_TIMESTAMP = 1451606400
 --- 东八区偏移（秒）
 local TIMEZONE_OFFSET = 28800
---- 服务器时间（毫秒）
-local _serverTime = 0
---- 毫秒计数器（0-99）
-local _millisCounter = 0
+_serverTime = 0
+_millisCounter = 0
 --- 是否已初始化
 local _initialized = false
 --- 游戏难度
@@ -172,6 +181,7 @@ local function onTick(self)
     for ____, callback in ipairs(_tickCallbacks) do
         callback(nil)
     end
+    runPeriodicCallbacks(nil)
     if _millisCounter >= 100 then
         _millisCounter = 0
         _serverTime = _serverTime + 1000
@@ -343,6 +353,31 @@ end
 --- 获取游戏难度
 function ____exports.getGameDifficulty(self)
     return _gameDifficulty
+end
+local _periodicCallbackIdCounter = 0
+_periodicCallbacks = {}
+--- 注册周期性回调函数
+-- 
+-- @param intervalMs 间隔时间（毫秒）
+-- @param callback 回调函数
+-- @returns 回调ID，用于取消注册
+function ____exports.addPeriodicCallback(self, intervalMs, callback)
+    _periodicCallbackIdCounter = _periodicCallbackIdCounter + 1
+    local id = _periodicCallbackIdCounter
+    _periodicCallbacks[#_periodicCallbacks + 1] = {id = id, intervalMs = intervalMs, lastRunTime = _serverTime + _millisCounter * 10, callback = callback}
+    return id
+end
+--- 移除周期性回调函数
+-- 
+-- @param id 回调ID
+function ____exports.removePeriodicCallback(self, id)
+    local index = __TS__ArrayFindIndex(
+        _periodicCallbacks,
+        function(____, cb) return cb.id == id end
+    )
+    if index > -1 then
+        __TS__ArraySplice(_periodicCallbacks, index, 1)
+    end
 end
 --- 注册每秒回调函数
 -- 

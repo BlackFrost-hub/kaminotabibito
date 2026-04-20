@@ -30,6 +30,9 @@ const { stringToFourCC, fourCCToString } = require("lib.扩展函数.封装函�
   stringToFourCC: (s: string) => number;
   fourCCToString: (fourcc: number) => string;
 };
+const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排泄") as {
+  setLastCreatedItem: (item: any) => void;
+};
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -196,7 +199,9 @@ function pickResult(results: ResultOpt[]): ResultOpt {
 function createItemAtCampfire(campfire: any, itemId: number): any {
   const { x, y } = getUnitXY(campfire);
   if (typeof (jass as any).CreateItem !== "function") return null;
-  return (jass as any).CreateItem(itemId, x, y);
+  const item = (jass as any).CreateItem(itemId, x, y);
+  if (item) setLastCreatedItem(item);
+  return item;
 }
 
 function tryGiveItemToCampfire(campfire: any, item: any): boolean {

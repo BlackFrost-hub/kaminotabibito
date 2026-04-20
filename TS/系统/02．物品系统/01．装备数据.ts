@@ -87,7 +87,7 @@ items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score:
 items["I00E"] = {type: "道具/戒指/饰品", name: "生命树枝", goldPrice: 100, score: 220, level: "E-", hp: 200, hpRegen: 1};
 items["I00T"] = {type: "主武器", name: "小法杖", goldPrice: 100, score: 222, level: "E-", dmg: 6, int: 1};
 items["pres"] = {type: "道具/戒指/饰品", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 75,PowerUP: "50%int;time3", abilList: "A08C"};
-items["rde3"] = {type: "守护指环 +4", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 150, abilList: "A08C"};
+items["rde3"] = {type: "守护指环 +4", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 150,magicDmg: 1.0,abilList: "A08C"};
 items["I00P"] = {
   type: "道具/戒指/饰品",
   name: "树枝",

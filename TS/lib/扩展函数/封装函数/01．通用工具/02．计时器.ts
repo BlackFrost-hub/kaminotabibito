@@ -14,17 +14,16 @@ const jass = require("jass.common") as any;
  * @returns 计时器句柄（periodic=true 时可用，用于停止），不需要可忽略
  */
 export function withTimer(delaySec: number, callback: () => void, periodic: boolean = false, name?: string): any {
-  const t = (jass as any).CreateTimer?.();
+  const t = jass.CreateTimer();
   if (!t) { callback(); return null; }
-  if (typeof (jass as any).TimerStart !== "function") { callback(); return null; }
   if (periodic) {
-    (jass as any).TimerStart(t, delaySec, true, () => {
+    jass.TimerStart(t, delaySec, true, () => {
       callback();
     });
   } else {
-    (jass as any).TimerStart(t, delaySec, false, () => {
+    jass.TimerStart(t, delaySec, false, () => {
       callback();
-      if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+      jass.DestroyTimer(t);
     });
   }
   return t;
@@ -36,6 +35,6 @@ export function withTimer(delaySec: number, callback: () => void, periodic: bool
  */
 export function stopTimer(t: any): void {
   if (!t) return;
-  if (typeof (jass as any).PauseTimer === "function") (jass as any).PauseTimer(t);
-  if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+  jass.PauseTimer(t);
+  jass.DestroyTimer(t);
 }

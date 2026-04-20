@@ -13,7 +13,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { onUnitTargetInteractable, isInteractable } = require("系统.06．经济系统.00．宝箱系统.01．宝箱核心") as {
+const { onUnitTargetInteractable, isInteractable } = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心") as {
   onUnitTargetInteractable: (unit: any, target: any) => void;
   isInteractable: (destructableType: number) => boolean;
 };

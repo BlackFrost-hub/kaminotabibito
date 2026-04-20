@@ -10,7 +10,7 @@ local ____exports = {}
 -- 注册方式：通过玩家英雄注册联动，在英雄登记时自动注册命令事件
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.06．经济系统.00．宝箱系统.01．宝箱核心")
+local ____require_result_0 = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心")
 local onUnitTargetInteractable = ____require_result_0.onUnitTargetInteractable
 local isInteractable = ____require_result_0.isInteractable
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")

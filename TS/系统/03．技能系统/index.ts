@@ -13,7 +13,6 @@ export * from "./07．技能吟唱条/index";
 
 // ========== 功能模块导出 ==========
 export * from "./01．显示技能名字";
-export * from "./02．显示技能名字2";
 
 // ========== 初始化 ==========
 // 技能事件系统（通过index自动加载，内部注册SPELL_CHANNEL和SPELL_EFFECT触发器）
@@ -34,9 +33,6 @@ if (typeof switchBagMod.initSwitchBag === "function") switchBagMod.initSwitchBag
 
 // 显示技能名字（通过registerSpellChannelListener自动注册，无需手动init）
 require("系统.03．技能系统.01．显示技能名字");
-
-// 显示技能名字2（通过registerSpellEffectListener自动注册，无需手动init）
-require("系统.03．技能系统.02．显示技能名字2");
 
 // 动态技能说明系统
 const dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index") as { init?: () => void };

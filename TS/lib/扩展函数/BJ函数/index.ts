@@ -190,6 +190,8 @@ export function registerBridge(): void {
   expose("UnitHasBuffBJ", unitHero.UnitHasBuffBJ);
   expose("UnitRemoveBuffBJ", unitHero.UnitRemoveBuffBJ);
   expose("GetLearnedSkillBJ", unitHero.GetLearnedSkillBJ);
+  expose("CountUnitsInGroup", unitHero.CountUnitsInGroup);
+  expose("GroupAddGroup", unitHero.GroupAddGroup);
   // 物品位置相关BJ函数
   expose("GetItemLoc", itemInv.GetItemLoc);
   expose("CreateItemLoc", itemInv.CreateItemLoc);

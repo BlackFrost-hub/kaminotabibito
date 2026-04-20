@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 移速超过该值时挂上龙卷提示特效
+--- 移速阈值：超过该值时挂载龙卷提示特效
 ____exports.MOVE_SPEED_THRESHOLD = 400
 --- 龙卷提示模型（与地图资源路径一致）
 ____exports.TORNADO_EFFECT_MODEL = "Abilities\\Spells\\Other\\Tornado\\Tornado_Target.mdl"

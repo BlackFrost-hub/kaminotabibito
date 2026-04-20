@@ -1,6 +1,13 @@
 /** @noSelfInFile */
 /**
  * UI属性系统 - 属性读取、格式化与派生值更新
+ *
+ * 属性读取统一走当前TS正式字段名，优先对齐 TS/系统/02．物品系统/11．装备系统.ts
+ * 数据源：玩家->英雄、造成伤害/承受伤害/治疗量 等YDUserData
+ *
+ * 依赖：
+ * - lib.扩展函数.YDWE函数.index
+ * - lib.扩展函数.Star扩展函数.Star扩展库.index
  */
 
 const jass = require("jass.common") as any;

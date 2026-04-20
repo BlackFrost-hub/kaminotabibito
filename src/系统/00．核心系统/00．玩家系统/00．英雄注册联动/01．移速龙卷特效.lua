@@ -4,9 +4,11 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 --- 玩家系统 - 英雄注册联动 - 移速龙卷特效
--- 
--- 不再直接扫描英雄组，而是由“玩家英雄获取桥接”在拿到英雄时注册。
--- 周期同步只处理已注册英雄。
+-- 职责：
+-- - 移速>阈值时挂载龙卷提示特效，<=阈值时移除
+-- - 使用Map(unitHandleId -> effectHandle)避免重复创建/销毁
+-- - 单位离开英雄组时自动清理特效
+-- 接入：由"玩家英雄获取桥接"在获得英雄时注册，周期同步只处理已注册英雄
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
 local DzUnbindEffect = ____require_result_0.DzUnbindEffect

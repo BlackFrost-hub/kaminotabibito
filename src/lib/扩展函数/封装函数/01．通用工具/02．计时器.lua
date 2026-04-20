@@ -14,18 +14,8 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
     if periodic == nil then
         periodic = false
     end
-    local ____this_1
-    ____this_1 = jass
-    local ____opt_0 = ____this_1.CreateTimer
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0(____this_1)
-    end
-    local t = ____opt_0
+    local t = jass.CreateTimer()
     if not t then
-        callback(nil)
-        return nil
-    end
-    if type(jass.TimerStart) ~= "function" then
         callback(nil)
         return nil
     end
@@ -45,9 +35,7 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
             false,
             function()
                 callback(nil)
-                if type(jass.DestroyTimer) == "function" then
-                    jass.DestroyTimer(t)
-                end
+                jass.DestroyTimer(t)
             end
         )
     end
@@ -60,11 +48,7 @@ function ____exports.stopTimer(self, t)
     if not t then
         return
     end
-    if type(jass.PauseTimer) == "function" then
-        jass.PauseTimer(t)
-    end
-    if type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(t)
-    end
+    jass.PauseTimer(t)
+    jass.DestroyTimer(t)
 end
 return ____exports

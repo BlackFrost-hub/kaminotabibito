@@ -219,7 +219,7 @@ function createDetailSlots(gameUI: number, players: any[]): void {
         japi.DzFrameSetPoint(sep1, 常量.ABSOLUTE_POINT_BOTTOMLEFT, box, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 常量.DETAIL_SEP1_X + 常量.DETAIL_SEPARATOR_X_OFFSET, sepRelY);
         japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight);
         japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0);
-        japi.DzFrameSetVertexColor(sep1, 0xFF000000);
+        // 这里实测会触发 JAPI "frame type invalid"，因此直接使用纹理本色，避免非法着色调用。
         japi.DzFrameSetPriority(sep1, 0);
         show(sep1, false);
         separators.push(sep1);
@@ -231,7 +231,7 @@ function createDetailSlots(gameUI: number, players: any[]): void {
         japi.DzFrameSetPoint(sep2, 常量.ABSOLUTE_POINT_BOTTOMLEFT, box, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 常量.DETAIL_SEP2_X + 常量.DETAIL_SEPARATOR_X_OFFSET, sepRelY);
         japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight);
         japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0);
-        japi.DzFrameSetVertexColor(sep2, 0xFF000000);
+        // 同上：不要对该分隔线 frame 调用 DzFrameSetVertexColor。
         japi.DzFrameSetPriority(sep2, 0);
         show(sep2, false);
         separators.push(sep2);
@@ -320,4 +320,3 @@ export function updateDetailPanels(): void {
     }
   }
 }
-

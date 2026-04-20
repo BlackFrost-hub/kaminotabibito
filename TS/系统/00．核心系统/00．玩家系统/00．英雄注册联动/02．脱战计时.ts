@@ -13,9 +13,10 @@ const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
 
-const { SetUnitLifePercentBJ, SetUnitManaPercentBJ } = require("lib.扩展函数.BJ函数.index") as {
+const { SetUnitLifePercentBJ, SetUnitManaPercentBJ, UnitHasBuffBJ } = require("lib.扩展函数.BJ函数.index") as {
   SetUnitLifePercentBJ: (whichUnit: any, percent: number) => void;
   SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
+  UnitHasBuffBJ: (whichUnit: any, buffId: number) => boolean;
 };
 
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
@@ -132,7 +133,7 @@ function onOutOfCombat(playerId: number): void {
  * 检查并移除脱战buff（受到大伤害时）
  */
 function checkRemoveOutOfCombatBuff(unit: any, damage: number): void {
-  if (!jass.UnitHasBuffBJ(unit, OUT_OF_COMBAT_BUFF)) return;
+  if (!UnitHasBuffBJ(unit, OUT_OF_COMBAT_BUFF)) return;
 
   const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
   const threshold = maxLife * DAMAGE_THRESHOLD_RATIO;

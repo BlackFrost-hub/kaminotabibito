@@ -11,12 +11,17 @@ export * from "./02．公式解析器";
 // 导出核心功能
 export * from "./01．核心功能";
 
+// 导出英雄技能预注册
+export * from "./03．英雄技能预注册";
+
 // 导入初始化函数
 import { initDynamicSkillTipSystem } from "./01．核心功能";
+import { initHeroSkillPreregistration } from "./03．英雄技能预注册";
 
 /**
  * 初始化动态技能说明系统
  */
 export function init(): void {
   initDynamicSkillTipSystem();
+  initHeroSkillPreregistration();
 }

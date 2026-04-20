@@ -22,6 +22,25 @@ if ____jglobals_bj_HEROSTAT_INT_2 == nil then
 end
 --- 英雄属性 - 智力
 ____exports.bj_HEROSTAT_INT = ____jglobals_bj_HEROSTAT_INT_2
+--- 单位组计数（CountUnitsInGroup 使用）
+local bj_groupCountUnits = 0
+--- 是否销毁单位组标记
+local bj_wantDestroyGroup = false
+--- GroupAddGroup 的目标单位组
+local bj_groupAddGroupDest = nil
+--- CountUnitsInGroup 的回调函数
+local function CountUnitsInGroupEnum(self)
+    bj_groupCountUnits = bj_groupCountUnits + 1
+end
+--- GroupAddGroup 的回调函数
+local function GroupAddGroupEnum(self)
+    if bj_groupAddGroupDest ~= nil then
+        jass.GroupAddUnit(
+            bj_groupAddGroupDest,
+            jass.GetEnumUnit()
+        )
+    end
+end
 local ____jglobals_bj_MODIFYMETHOD_ADD_3 = jglobals.bj_MODIFYMETHOD_ADD
 if ____jglobals_bj_MODIFYMETHOD_ADD_3 == nil then
     ____jglobals_bj_MODIFYMETHOD_ADD_3 = 0
@@ -199,12 +218,12 @@ function ____exports.ModifyHeroSkillPoints(self, whichHero, whichStat, modifyMet
     return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value)
 end
 --- 判断单位是否拥有指定buff
--- 对应JASS: UnitHasBuffBJ
+-- 对应BJ: UnitHasBuffBJ (1.27 没有 UnitHasBuff，用 GetUnitAbilityLevel 实现)
 function ____exports.UnitHasBuffBJ(self, whichUnit, buffId)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
-    return jass.UnitHasBuff(whichUnit, buffId)
+    return jass.GetUnitAbilityLevel(whichUnit, buffId) > 0
 end
 --- 移除单位所有指定类型的buff
 -- 对应JASS: UnitRemoveBuffBJ
@@ -221,5 +240,34 @@ function ____exports.GetLearnedSkillBJ(self)
         return jass.GetLearnedSkill()
     end
     return 0
+end
+--- 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
+-- 对应BJ: CountUnitsInGroup
+function ____exports.CountUnitsInGroup(self, g)
+    if g == nil or g == 0 then
+        return 0
+    end
+    local wantDestroy = bj_wantDestroyGroup
+    bj_wantDestroyGroup = false
+    bj_groupCountUnits = 0
+    jass.ForGroup(g, CountUnitsInGroupEnum)
+    if wantDestroy then
+        jass.DestroyGroup(g)
+    end
+    return bj_groupCountUnits
+end
+--- 将一个单位组的单位添加到另一个单位组（1.27 没有 GroupAddGroup）
+-- 对应BJ: GroupAddGroup
+function ____exports.GroupAddGroup(self, sourceGroup, destGroup)
+    if sourceGroup == nil or sourceGroup == 0 or destGroup == nil or destGroup == 0 then
+        return
+    end
+    local wantDestroy = bj_wantDestroyGroup
+    bj_wantDestroyGroup = false
+    bj_groupAddGroupDest = destGroup
+    jass.ForGroup(sourceGroup, GroupAddGroupEnum)
+    if wantDestroy then
+        jass.DestroyGroup(sourceGroup)
+    end
 end
 return ____exports

@@ -46,6 +46,7 @@ ____exports.items.rde3 = {
     level = "E",
     hot = "200hp",
     movespeed2 = 150,
+    magicDmg = 1,
     abilList = "A08C"
 }
 ____exports.items.I00P = {

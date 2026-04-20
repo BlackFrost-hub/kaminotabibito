@@ -25,22 +25,18 @@ function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
     if duration == nil then
         duration = 2
     end
-    local eff
-    if type(jass.AddSpecialEffectZ) == "function" then
-        eff = jass.AddSpecialEffectZ(modelPath, x, y, z)
-    elseif type(jass.AddSpecialEffect) == "function" then
-        eff = jass.AddSpecialEffect(modelPath, x, y)
-    end
+    local eff = jass.AddSpecialEffect(modelPath, x, y)
     if not eff then
         return nil
+    end
+    if z ~= 0 and type(japi.EXSetEffectZ) == "function" then
+        japi.EXSetEffectZ(eff, z)
     end
     withTimer(
         nil,
         duration,
         function()
-            if type(jass.DestroyEffect) == "function" then
-                jass.DestroyEffect(eff)
-            end
+            jass.DestroyEffect(eff)
         end
     )
     return eff
@@ -50,16 +46,7 @@ local function getUnitEffectHandleId(self, unit)
     if not unit then
         return 0
     end
-    if type(japi.DzGetUnitObjectId) == "function" then
-        local handleId = japi.DzGetUnitObjectId(unit)
-        if handleId then
-            return handleId
-        end
-    end
-    if type(jass.GetHandleId) == "function" then
-        return jass.GetHandleId(unit)
-    end
-    return 0
+    return jass.GetHandleId(unit)
 end
 local function getUnitEffectKey(self, unit, effectKey)
     local handleId = getUnitEffectHandleId(nil, unit)
@@ -69,7 +56,7 @@ local function getUnitEffectKey(self, unit, effectKey)
     return (tostring(handleId) .. ":") .. effectKey
 end
 local function destroyBoundEffect(self, effect)
-    if not effect or type(jass.DestroyEffect) ~= "function" then
+    if not effect then
         return
     end
     DzUnbindEffect(nil, effect)
@@ -91,9 +78,6 @@ function ____exports.createUnitEffect(self, unit, attachPoint, modelPath, durati
     end
     local key = getUnitEffectKey(nil, unit, effectKey)
     if key == "" then
-        return nil
-    end
-    if type(jass.AddSpecialEffectTarget) ~= "function" then
         return nil
     end
     local existingEffect = unitEffectMap:get(key)

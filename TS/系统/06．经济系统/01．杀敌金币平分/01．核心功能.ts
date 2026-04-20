@@ -89,7 +89,7 @@ function getUnitBounty(this: void, unitType: number): number {
 function isPlayerHero(this: void, unit: any): boolean {
   const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
   if (!heroGroup || !unit) return false;
-  return jass.IsUnitInGroup?.(unit, heroGroup) === true;
+  return jass.IsUnitInGroup(unit, heroGroup) === true;
 }
 
 /** 获取英雄单位组 */
@@ -99,9 +99,9 @@ function getHeroGroup(this: void): any {
 
 /** 检查死亡单位是否触发金币平分（中立敌对或玩家8） */
 function isValidDyingUnit(this: void, dyingUnit: any): boolean {
-  const owner = jass.GetOwningPlayer?.(dyingUnit);
+  const owner = jass.GetOwningPlayer(dyingUnit);
   if (owner == null) return false;
-  const playerId = jass.GetPlayerId?.(owner);
+  const playerId = jass.GetPlayerId(owner);
   // 玩家12(中立敌对) 或 玩家8(粉色)
   return playerId === 12 || playerId === 7;
 }
@@ -118,8 +118,10 @@ function giveGoldToPlayer(this: void, unit: any, player: any, baseGold: number, 
 
   // 通知回调，让回调决定最终金币
   for (const cb of goldGainCallbacks) {
-    const result = (pcall as any)(() => cb(params));
-    if (result != null) {
+    const pcallResult = (pcall as any)(cb, params);
+    const success = pcallResult[0];
+    const result = pcallResult[1];
+    if (success && result != null) {
       params = result;
     }
   }
@@ -156,7 +158,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   if (!isValidDyingUnit(dyingUnit)) return;
 
   // 获取死亡单位赏金
-  const dyingUnitType = jass.GetUnitTypeId?.(dyingUnit);
+  const dyingUnitType = jass.GetUnitTypeId(dyingUnit);
   if (!dyingUnitType) return;
 
   const baseBounty = getUnitBounty(dyingUnitType);
@@ -164,7 +166,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
 
   // 击杀者获得金币
   if (killer != null) {
-    const killerPlayer = jass.GetOwningPlayer?.(killer);
+    const killerPlayer = jass.GetOwningPlayer(killer);
     if (killerPlayer != null) {
       giveGoldToPlayer(killer, killerPlayer, baseBounty, false);
     }
@@ -178,35 +180,35 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   if (shareGold <= 0) return;
 
   // 获取范围内友方英雄
-  const dyingX = jass.GetUnitX?.(dyingUnit) ?? 0;
-  const dyingY = jass.GetUnitY?.(dyingUnit) ?? 0;
-  const killerPlayer = jass.GetOwningPlayer?.(killer);
+  const dyingX = jass.GetUnitX(dyingUnit) ?? 0;
+  const dyingY = jass.GetUnitY(dyingUnit) ?? 0;
+  const killerPlayer = jass.GetOwningPlayer(killer);
   const heroGroup = getHeroGroup();
 
   if (killerPlayer == null || heroGroup == null) return;
 
   // 遍历玩家英雄
-  const heroCount = jass.BlzGroupGetSize?.(heroGroup) ?? 0;
+  const heroCount = jass.BlzGroupGetSize(heroGroup) ?? 0;
   for (let i = 0; i < heroCount; i++) {
-    const hero = jass.BlzGroupUnitAt?.(heroGroup, i);
+    const hero = jass.BlzGroupUnitAt(heroGroup, i);
     if (!hero) continue;
 
     // 跳过击杀者自己
     if (hero === killer) continue;
 
     // 检查是否为友方
-    if (jass.IsUnitAlly?.(hero, killerPlayer) !== true) continue;
+    if (jass.IsUnitAlly(hero, killerPlayer) !== true) continue;
 
     // 检查是否在范围内
-    const heroX = jass.GetUnitX?.(hero) ?? 0;
-    const heroY = jass.GetUnitY?.(hero) ?? 0;
+    const heroX = jass.GetUnitX(hero) ?? 0;
+    const heroY = jass.GetUnitY(hero) ?? 0;
     const dx = heroX - dyingX;
     const dy = heroY - dyingY;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist > SHARE_RANGE) continue;
 
     // 给予平分金币
-    const heroPlayer = jass.GetOwningPlayer?.(hero);
+    const heroPlayer = jass.GetOwningPlayer(hero);
     if (heroPlayer == null) continue;
 
     giveGoldToPlayer(hero, heroPlayer, shareGold, true);

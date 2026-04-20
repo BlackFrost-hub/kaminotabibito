@@ -16,6 +16,10 @@ local setG_LIndex = ____require_result_0.setG_LIndex
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
 local YDLocalExecuteTrigger = ____require_result_1.YDLocalExecuteTrigger
 --- 与 JASS 进子触发前一致，避免 ydl_triggerstep 错位导致 YDLocal5Get 全 0
+-- 
+-- 当 JASS 端触发 STES 事件时，Lua 端的触发器动作被调用，
+-- 此时需要执行 YDLocalExecuteTrigger 来同步 ydl_triggerstep，
+-- 这样后续的 YDLocal5Get 才能正确读取到 JASS 端传递的参数
 function ____exports.ydlStes_syncTriggerStep(self, _self)
     if type(jass.GetTriggeringTrigger) ~= "function" then
         return

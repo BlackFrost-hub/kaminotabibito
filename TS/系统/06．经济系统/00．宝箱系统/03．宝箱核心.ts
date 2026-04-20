@@ -19,7 +19,7 @@ const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as
 };
 
 const {
-  INTERACTABLE_TYPES,
+  CHEST_TYPES,
   DEFAULT_OPEN_TIME,
   INTERACT_RANGE,
   UPDATE_INTERVAL,
@@ -34,10 +34,13 @@ const {
   TEXT_OPENING,
   TEXT_SUCCESS,
   TEXT_INTERRUPTED,
-  isInteractableType,
-  getInteractableOpenTime,
-  getInteractableName,
+  isChestType,
+  getChestConfig,
 } = require("系统.06．经济系统.00．宝箱系统.00．常量定义") as typeof import("./00．常量定义");
+
+const { dropItemsFromChest } = require("系统.06．经济系统.00．宝箱系统.01．宝箱掉落配置") as {
+  dropItemsFromChest: (destructableType: string, x: number, y: number) => any[];
+};
 
 const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_GetTable: (self: any) => any;
@@ -137,17 +140,18 @@ function getUnitId(this: void, unit: any): number {
 }
 
 /**
- * 检查可破坏物是否为可交互目标
+ * 检查可破坏物是否为宝箱
  */
 function isInteractable(this: void, destructableType: number): boolean {
-  return isInteractableType(destructableType);
+  return isChestType(destructableType);
 }
 
 /**
- * 获取可交互目标的开启时间
+ * 获取宝箱的开启时间
  */
 function getOpenTime(this: void, destructableType: number): number {
-  return getInteractableOpenTime(destructableType);
+  const config = getChestConfig(destructableType);
+  return config?.openTime ?? DEFAULT_OPEN_TIME;
 }
 
 // ==========================================================================================
@@ -155,30 +159,30 @@ function getOpenTime(this: void, destructableType: number): number {
 // ==========================================================================================
 
 function fireStesEvent(this: void, eventName: string, opener: any, target: any): void {
-  const ht = STES_GetTable(undefined);
-  if (!ht) return;
+    const ht = STES_GetTable(undefined);
+    if (!ht) return;
 
-  const hash = jass.StringHash(eventName);
-  const skeyIndex = jass.StringHash("index");
-  const count = jass.LoadInteger(ht, hash, skeyIndex);
+    const hash = jass.StringHash(eventName);
+    const skeyIndex = jass.StringHash("index");
+    const count = jass.LoadInteger(ht, hash, skeyIndex);
 
-  for (let i = 0; i < count; i++) {
-    const trg = jass.LoadTriggerHandle(ht, hash, i);
-    if (trg) {
-      YDLocalExecuteTrigger(trg);
-      saveParentIndex(trg);
+    for (let i = 0; i < count; i++) {
+        const trg = jass.LoadTriggerHandle(ht, hash, i);
+        if (trg) {
+            // 先设置变量，再执行触发器
+            if (eventName === EVENT_CHEST_OPENED) {
+                YDLocal5Set("unit", YDLOCAL_VAR_OPENER, opener);
+                YDLocal5Set("destructable", YDLOCAL_VAR_CHEST, target);
+            } else if (eventName === EVENT_PLAYER_PREPARE_OPEN_CHEST) {
+                YDLocal5Set("unit", YDLOCAL_VAR_PRE_OPENER, opener);
+                YDLocal5Set("destructable", YDLOCAL_VAR_PRE_CHEST, target);
+            }
 
-      if (eventName === EVENT_CHEST_OPENED) {
-        YDLocal5Set("unit", YDLOCAL_VAR_OPENER, opener);
-        YDLocal5Set("destructable", YDLOCAL_VAR_CHEST, target);
-      } else if (eventName === EVENT_PLAYER_PREPARE_OPEN_CHEST) {
-        YDLocal5Set("unit", YDLOCAL_VAR_PRE_OPENER, opener);
-        YDLocal5Set("destructable", YDLOCAL_VAR_PRE_CHEST, target);
-      }
-
-      YDTriggerExecuteTrigger(trg, false);
+            YDLocalExecuteTrigger(trg);
+            saveParentIndex(trg);
+            YDTriggerExecuteTrigger(trg, false);
+        }
     }
-  }
 }
 
 // ==========================================================================================
@@ -195,7 +199,8 @@ function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void 
   }
 
   if (interrupted) {
-    showTextTag(data.unit, TEXT_INTERRUPTED, 85, 10, 10);
+    const cfg = getChestConfig(jass.GetDestructableTypeId?.(data.target) ?? 0);
+    showTextTag(data.unit, TEXT_INTERRUPTED(cfg?.name ?? "宝箱"), 85, 10, 10);
   }
 
   const unitId = getUnitId(data.unit);
@@ -231,8 +236,11 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
   const angle = angleBetweenPoints(unitX, unitY, targetX, targetY);
   jass.SetUnitFacing?.(unit, angle);
 
+  const config = getChestConfig(jass.GetDestructableTypeId?.(target) ?? 0);
+  const chestName = config?.name ?? "宝箱";
+
   fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target);
-  showTextTag(unit, TEXT_OPENING, 100, 100, 0);
+  showTextTag(unit, TEXT_OPENING(chestName), 100, 100, 0);
 
   const data: OpenData = {
     unit,
@@ -268,10 +276,27 @@ function updateAllOpening(this: void): void {
     const interrupted = currentOrder === smartOrder || currentOrder === attackOrder;
 
     if (completed || interrupted) {
-      if (completed) {
-        showTextTag(data.unit, TEXT_SUCCESS, 100, 100, 0);
+    if (completed) {
+        const cfg = getChestConfig(jass.GetDestructableTypeId?.(data.target) ?? 0);
+        const chestName = cfg?.name ?? "宝箱";
+        showTextTag(data.unit, TEXT_SUCCESS(chestName), 100, 100, 0);
+
+        // TS端执行掉落
+        const targetTypeStr = cfg?.destructableType;
+        if (targetTypeStr) {
+            const x = jass.GetDestructableX?.(data.target) ?? 0;
+            const y = jass.GetDestructableY?.(data.target) ?? 0;
+            dropItemsFromChest(targetTypeStr, x, y);
+        }
+
+        // 触发STES事件（JASS端可监听）
         fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target);
-      }
+
+        // 开启成功后处理宝箱（杀死可破坏物）
+        if (data.target && typeof jass.KillDestructable === "function") {
+            jass.KillDestructable(data.target);
+        }
+    }
       cleanupOpening(data, !completed && interrupted);
       continue;
     }

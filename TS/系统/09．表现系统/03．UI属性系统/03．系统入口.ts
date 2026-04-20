@@ -1,6 +1,14 @@
 /** @noSelfInFile */
 /**
  * UI属性系统 - 生命周期入口
+ *
+ * 功能：
+ * - Tab显示伤害统计
+ * - F2-F6跳镜头到对应英雄
+ * - 英雄头像悬浮显示属性框
+ *
+ * 初始化：延迟INIT_DELAY_SECONDS秒启动
+ * 刷新：每REFRESH_INTERVAL_SECONDS秒刷新伤害统计和属性文本
  */
 
 const jass = require("jass.common") as any;

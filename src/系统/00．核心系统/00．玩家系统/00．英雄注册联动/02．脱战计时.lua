@@ -12,6 +12,7 @@ local YDUserDataGet = ____require_result_0.YDUserDataGet
 local ____require_result_1 = require("lib.扩展函数.BJ函数.index")
 local SetUnitLifePercentBJ = ____require_result_1.SetUnitLifePercentBJ
 local SetUnitManaPercentBJ = ____require_result_1.SetUnitManaPercentBJ
+local UnitHasBuffBJ = ____require_result_1.UnitHasBuffBJ
 local ____require_result_2 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_2.registerDamageCallback
 --- 脱战计时时间（秒）
@@ -129,7 +130,7 @@ local function onOutOfCombat(self, playerId)
 end
 --- 检查并移除脱战buff（受到大伤害时）
 local function checkRemoveOutOfCombatBuff(self, unit, damage)
-    if not jass.UnitHasBuffBJ(unit, OUT_OF_COMBAT_BUFF) then
+    if not UnitHasBuffBJ(nil, unit, OUT_OF_COMBAT_BUFF) then
         return
     end
     local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)

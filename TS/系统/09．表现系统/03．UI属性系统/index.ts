@@ -1,6 +1,9 @@
 /** @noSelfInFile */
 /**
  * UI属性系统 - 统一导出入口
+ *
+ * JASS参考源：JASS/jass复制粘贴/属性查看.j
+ * 表现系统总入口：TS/系统/09．表现系统/index.ts
  */
 
 export * from "./00．常量定义";

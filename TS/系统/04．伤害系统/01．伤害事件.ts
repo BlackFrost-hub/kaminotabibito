@@ -72,7 +72,6 @@ function getUnitTypeHero(): any {
 function onUnitDeathForDamage(dyingUnit: any): void {
   if (!UnitGroup || !dyingUnit) return;
   if (isHeroUnit(dyingUnit)) return;
-  (globalThis as any).print?.("[伤害事件] 非英雄单位死亡，从追踪组移除:", dyingUnit);
   if (typeof (jass as any).GroupRemoveUnit === "function") {
     (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
   }

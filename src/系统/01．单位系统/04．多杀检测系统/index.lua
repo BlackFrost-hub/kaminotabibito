@@ -32,6 +32,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.01．单位系统.04．多杀检测系统.04．成功回调")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local eventMod = require("系统.01．单位系统.04．多杀检测系统.03．事件处理")
 if type(eventMod.initMultiKillSystem) == "function" then
     eventMod:initMultiKillSystem()

@@ -2,6 +2,13 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local ____exports = {}
 --- UI属性系统 - 属性读取、格式化与派生值更新
+-- 
+-- 属性读取统一走当前TS正式字段名，优先对齐 TS/系统/02．物品系统/11．装备系统.ts
+-- 数据源：玩家->英雄、造成伤害/承受伤害/治疗量 等YDUserData
+-- 
+-- 依赖：
+-- - lib.扩展函数.YDWE函数.index
+-- - lib.扩展函数.Star扩展函数.Star扩展库.index
 local jass = require("jass.common")
 local _____73A9_5BB6_5E38_91CF = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
