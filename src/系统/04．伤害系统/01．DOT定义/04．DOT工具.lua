@@ -10,9 +10,6 @@ function ____exports.unitHid(self, u)
     if u == nil or u == 0 then
         return 0
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return 0
-    end
     return jass.GetHandleId(u)
 end
 --- pairs 迭代可能混用 number / string 键，不合并会导致「同目标两行状态」或 onDamage 读不到 cur、乘积误判。
@@ -53,15 +50,15 @@ function ____exports.collectHidsInTab(self, tab)
         do
             local kn = type(k) == "number" and k or __TS__ParseInt(k, 10)
             if __TS__NumberIsNaN(__TS__Number(kn)) or kn == 0 then
-                goto __continue13
+                goto __continue12
             end
             if seen[kn] then
-                goto __continue13
+                goto __continue12
             end
             seen[kn] = true
             out[#out + 1] = kn
         end
-        ::__continue13::
+        ::__continue12::
     end
     return out
 end

@@ -76,7 +76,6 @@ const damageRows: { icon: number; values: number[]; player: any }[] = [];
 const detailSlots: { player: any; hero: any; functionKey: number; icon: number; box: number; lines: number[]; separators: number[] }[] = [];
 
 function createFrame(tagName: string, name: string, parent: number): number {
-  if (typeof japi.DzCreateFrameByTagName !== "function") return 0;
   return japi.DzCreateFrameByTagName(tagName, name, parent, "template", 0);
 }
 
@@ -86,7 +85,7 @@ function setAbsolute(frame: number, x: number, y: number): void {
 }
 
 function show(frame: number, visible: boolean): void {
-  if (frame === 0 || typeof japi.DzFrameShow !== "function") return;
+  if (frame === 0) return;
   japi.DzFrameShow(frame, visible);
 }
 
@@ -255,7 +254,6 @@ function createDetailSlots(gameUI: number, players: any[]): void {
  * 这里只负责“搭骨架”，具体数值文本由后续刷新函数填充。
  */
 export function createUiFrames(): void {
-  if (typeof japi.DzGetGameUI !== "function") return;
   const gameUI = japi.DzGetGameUI();
   if (gameUI == null || gameUI === 0) return;
 

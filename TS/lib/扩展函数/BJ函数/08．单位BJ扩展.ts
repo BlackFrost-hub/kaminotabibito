@@ -161,10 +161,7 @@ export function SetUnitExplodedBJ(unit: any, exploded: boolean): void {
 }
 
 export function GetTransportUnitBJ(): any {
-    if (typeof jass.GetTransportUnit === "function") {
-        return jass.GetTransportUnit();
-    }
-    return null;
+    return jass.GetTransportUnit();
 }
 
 export function GetLoadedUnitBJ(): any {

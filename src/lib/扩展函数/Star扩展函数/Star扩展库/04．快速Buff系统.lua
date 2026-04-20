@@ -99,9 +99,6 @@ local function getUnitSourceName(self, sourceUnit)
     if sourceUnit == nil or sourceUnit == 0 then
         return ""
     end
-    if type(jass.GetUnitName) ~= "function" then
-        return ""
-    end
     local n = jass.GetUnitName(sourceUnit)
     return type(n) == "string" and n ~= "" and n or ""
 end
@@ -211,25 +208,21 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
                 jass.StringHash("单位"),
                 u
             )
-            if type(japi.EXPauseUnit) == "function" then
-                japi.EXPauseUnit(u, true)
-            end
+            japi.EXPauseUnit(u, true)
             jass.TimerStart(
                 tempTimer,
                 time,
                 false,
                 function()
                     local t = jass.GetExpiredTimer()
-                    if type(japi.EXPauseUnit) == "function" then
-                        japi.EXPauseUnit(
-                            jass.LoadUnitHandle(
-                                YDHT,
-                                jass.GetHandleId(t),
-                                jass.StringHash("单位")
-                            ),
-                            false
-                        )
-                    end
+                    japi.EXPauseUnit(
+                        jass.LoadUnitHandle(
+                            YDHT,
+                            jass.GetHandleId(t),
+                            jass.StringHash("单位")
+                        ),
+                        false
+                    )
                     jass.RemoveSavedHandle(
                         YDHT,
                         jass.GetHandleId(t),
@@ -251,21 +244,21 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
     local abilityId
     local orderStr
     repeat
-        local ____switch27 = id
-        local ____cond27 = ____switch27 == 0
-        if ____cond27 then
+        local ____switch24 = id
+        local ____cond24 = ____switch24 == 0
+        if ____cond24 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond27 = ____cond27 or ____switch27 == 1
-        if ____cond27 then
+        ____cond24 = ____cond24 or ____switch24 == 1
+        if ____cond24 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond27 = ____cond27 or ____switch27 == 2
-        if ____cond27 then
+        ____cond24 = ____cond24 or ____switch24 == 2
+        if ____cond24 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -278,20 +271,20 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
             )
             break
         end
-        ____cond27 = ____cond27 or ____switch27 == 3
-        if ____cond27 then
+        ____cond24 = ____cond24 or ____switch24 == 3
+        if ____cond24 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond27 = ____cond27 or ____switch27 == 4
-        if ____cond27 then
+        ____cond24 = ____cond24 or ____switch24 == 4
+        if ____cond24 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond27 = ____cond27 or ____switch27 == 5
-        if ____cond27 then
+        ____cond24 = ____cond24 or ____switch24 == 5
+        if ____cond24 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(

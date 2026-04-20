@@ -318,7 +318,7 @@ local function _tickEffectRecycle(self)
             local entry = _pendingEffects[i + 1]
             entry.ticksLeft = entry.ticksLeft - 1
             if entry.ticksLeft <= 0 then
-                if entry.eff ~= nil and type(jass.DestroyEffect) == "function" then
+                if entry.eff ~= nil then
                     jass.DestroyEffect(entry.eff)
                 end
                 __TS__ArraySplice(_pendingEffects, i, 1)

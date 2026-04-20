@@ -1,6 +1,41 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local jass, g, ARMOR_REDUCTION_MULTIPLIER1, NATLOG_094, ARMOR_INVULNERABLE, DAMAGE_TEST, DAMAGE_LIFE, ARMOR_TEST_ABILITY
+--- YDWE护甲获取函数
+-- 
+-- 功能：获取单位护甲值（兼容1.27版本）
+-- 
+-- 方式：
+-- 1. 优先使用 GetUnitState + ConvertUnitState(0x20)
+-- 2. 兜底使用伤害测试法
+local jass = require("jass.common")
+local g = require("jass.globals")
+--- 护甲状态常量
+local UNIT_STATE_ARMOR = 32
+--- 护甲减伤系数（游戏常数，默认0.06）
+local ARMOR_REDUCTION_MULTIPLIER1 = 0.06
+local ARMOR_REDUCTION_MULTIPLIER2 = 1 - ARMOR_REDUCTION_MULTIPLIER1
+--- 自然对数常量
+local NATLOG_094 = math.log(ARMOR_REDUCTION_MULTIPLIER2)
+--- 无敌护甲值
+local ARMOR_INVULNERABLE = 917451.519
+--- 测试伤害值
+local DAMAGE_TEST = 160
+--- 测试生命阈值
+local DAMAGE_LIFE = 300
+--- 护甲测试技能ID（需要一个不会影响单位的技能）
+local ARMOR_TEST_ABILITY = 1097625443
+--- 获取单位护甲值（简单方式）
+-- 使用 GetUnitState + ConvertUnitState(0x20)
+-- 
+-- @param u 目标单位
+-- @returns 护甲值
+function ____exports.YDWEGetUnitArmor(self, u)
+    if u == nil then
+        return 0
+    end
+    local armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR)
+    return jass.GetUnitState(u, armorState)
+end
 --- 获取单位护甲值（伤害测试法）
 -- 通过造成测试伤害反算护甲值
 -- 
@@ -67,31 +102,5 @@ function ____exports.YDWEGetUnitArmorByDamageTest(self, u)
     else
         return redc / (ARMOR_REDUCTION_MULTIPLIER1 * (1 - redc))
     end
-end
-jass = require("jass.common")
-g = require("jass.globals")
---- 护甲状态常量
-local UNIT_STATE_ARMOR = 32
-ARMOR_REDUCTION_MULTIPLIER1 = 0.06
-local ARMOR_REDUCTION_MULTIPLIER2 = 1 - ARMOR_REDUCTION_MULTIPLIER1
-NATLOG_094 = math.log(ARMOR_REDUCTION_MULTIPLIER2)
-ARMOR_INVULNERABLE = 917451.519
-DAMAGE_TEST = 160
-DAMAGE_LIFE = 300
-ARMOR_TEST_ABILITY = 1097625443
---- 获取单位护甲值（简单方式）
--- 使用 GetUnitState + ConvertUnitState(0x20)
--- 
--- @param u 目标单位
--- @returns 护甲值
-function ____exports.YDWEGetUnitArmor(self, u)
-    if u == nil then
-        return 0
-    end
-    if type(jass.ConvertUnitState) == "function" then
-        local armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR)
-        return jass.GetUnitState(u, armorState)
-    end
-    return ____exports.YDWEGetUnitArmorByDamageTest(nil, u)
 end
 return ____exports

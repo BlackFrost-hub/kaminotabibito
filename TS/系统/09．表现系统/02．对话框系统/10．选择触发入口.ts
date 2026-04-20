@@ -37,7 +37,7 @@ export function initDialogEntrySelectionTrigger(): void {
     const unitName = jass.GetUnitName(u);
     const npcConfig = findNpcConfigByUnitName(unitName);
 
-    const npcName = npcConfig?.NPCrequireName || npcConfig?.NpcNameID;
+    const npcName = npcConfig ? (npcConfig.NPCrequireName || npcConfig.NpcNameID) : undefined;
     if (npcConfig && npcName) {
       const acceptedQuest = findAcceptedQuestBySubmitNpc(npcName, playerId);
       if (acceptedQuest && acceptedQuest.requireID) {

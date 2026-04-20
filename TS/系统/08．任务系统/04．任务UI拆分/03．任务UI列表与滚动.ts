@@ -131,7 +131,6 @@ export function updateScrollBarVisibility(
   hasQuestRows: boolean
 ): void {
   const vis = hasQuestRows;
-  if (typeof japi.DzFrameShow !== "function") return;
   for (const f of frames) {
     if (f && f !== 0) (pcall as any)(() => japi.DzFrameShow(f, vis));
   }

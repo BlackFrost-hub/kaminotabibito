@@ -15,7 +15,6 @@ const japi = require("jass.japi") as any;
  */
 export function DzTriggerRegisterMouseEventTrg(trg: any, status: number, btn: number): void {
   if (trg == null) return;
-  if (typeof japi.DzTriggerRegisterMouseEvent !== "function") return;
   japi.DzTriggerRegisterMouseEvent(trg, btn, status, true, null);
 }
 
@@ -28,7 +27,6 @@ export function DzTriggerRegisterMouseEventTrg(trg: any, status: number, btn: nu
  */
 export function DzTriggerRegisterKeyEventTrg(trg: any, status: number, btn: number | string): void {
   if (trg == null) return;
-  if (typeof japi.DzTriggerRegisterKeyEvent !== "function") return;
   japi.DzTriggerRegisterKeyEvent(trg, btn, status, true, null);
 }
 
@@ -39,7 +37,6 @@ export function DzTriggerRegisterKeyEventTrg(trg: any, status: number, btn: numb
  */
 export function DzTriggerRegisterMouseMoveEventTrg(trg: any): void {
   if (trg == null) return;
-  if (typeof japi.DzTriggerRegisterMouseMoveEvent !== "function") return;
   japi.DzTriggerRegisterMouseMoveEvent(trg, true, null);
 }
 
@@ -50,7 +47,6 @@ export function DzTriggerRegisterMouseMoveEventTrg(trg: any): void {
  */
 export function DzTriggerRegisterMouseWheelEventTrg(trg: any): void {
   if (trg == null) return;
-  if (typeof japi.DzTriggerRegisterMouseWheelEvent !== "function") return;
   japi.DzTriggerRegisterMouseWheelEvent(trg, true, null);
 }
 
@@ -61,7 +57,6 @@ export function DzTriggerRegisterMouseWheelEventTrg(trg: any): void {
  */
 export function DzTriggerRegisterWindowResizeEventTrg(trg: any): void {
   if (trg == null) return;
-  if (typeof japi.DzTriggerRegisterWindowResizeEvent !== "function") return;
   japi.DzTriggerRegisterWindowResizeEvent(trg, true, null);
 }
 
@@ -99,7 +94,6 @@ export function DzI2K(i: number): number {
  * @param trig 触发器
  */
 export function DzTriggerRegisterMallItemSyncData(trig: any): void {
-  if (typeof japi.DzTriggerRegisterSyncData !== "function") return;
   japi.DzTriggerRegisterSyncData(trig, "DZMIA", true);
 }
 
@@ -107,7 +101,6 @@ export function DzTriggerRegisterMallItemSyncData(trig: any): void {
  * 获取触发商城物品的玩家
  */
 export function DzGetTriggerMallItemPlayer(): any {
-  if (typeof japi.DzGetTriggerSyncPlayer !== "function") return null;
   return japi.DzGetTriggerSyncPlayer();
 }
 
@@ -115,7 +108,6 @@ export function DzGetTriggerMallItemPlayer(): any {
  * 获取触发的商城物品
  */
 export function DzGetTriggerMallItem(): string {
-  if (typeof japi.DzGetTriggerSyncData !== "function") return "";
   return (japi.DzGetTriggerSyncData() as string) || "";
 }
 

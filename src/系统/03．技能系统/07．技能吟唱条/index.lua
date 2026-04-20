@@ -17,7 +17,5 @@ do
     end
 end
 local castBarMod = require("系统.03．技能系统.07．技能吟唱条.01．核心功能")
-if type(castBarMod.init) == "function" then
-    castBarMod:init()
-end
+castBarMod:init()
 return ____exports

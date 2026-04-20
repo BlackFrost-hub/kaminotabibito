@@ -66,13 +66,7 @@ local function getYDHT(self)
     return ____temp_2
 end
 local function getTriggerUnitOrNull(self)
-    local ____temp_3
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_3 = jass.GetTriggerUnit()
-    else
-        ____temp_3 = nil
-    end
-    return ____temp_3
+    return jass.GetTriggerUnit()
 end
 local function saveLastSpellContext(self, caster)
     local StarBaseHT = getStarBaseHT(nil)
@@ -80,44 +74,14 @@ local function saveLastSpellContext(self, caster)
         return
     end
     local hd = jass.GetHandleId(caster)
-    local ____temp_4
-    if type(jass.GetSpellAbilityId) == "function" then
-        ____temp_4 = jass.GetSpellAbilityId()
-    else
-        ____temp_4 = 0
-    end
-    local spellId = ____temp_4
-    local ____temp_5
-    if type(jass.GetSpellTargetX) == "function" then
-        ____temp_5 = jass.GetSpellTargetX()
-    else
-        ____temp_5 = 0
-    end
-    local x = ____temp_5
-    local ____temp_6
-    if type(jass.GetSpellTargetY) == "function" then
-        ____temp_6 = jass.GetSpellTargetY()
-    else
-        ____temp_6 = 0
-    end
-    local y = ____temp_6
-    local ____temp_7
-    if type(jass.GetSpellTargetUnit) == "function" then
-        ____temp_7 = jass.GetSpellTargetUnit()
-    else
-        ____temp_7 = nil
-    end
-    local targetUnit = ____temp_7
-    if type(jass.SaveInteger) == "function" then
-        jass.SaveInteger(StarBaseHT, hd, HASH_LAST_SPELL, spellId)
-    end
-    if type(jass.SaveReal) == "function" then
-        jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_X, x)
-        jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_Y, y)
-    end
-    if type(jass.SaveUnitHandle) == "function" then
-        jass.SaveUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT, targetUnit)
-    end
+    local spellId = jass.GetSpellAbilityId()
+    local x = jass.GetSpellTargetX()
+    local y = jass.GetSpellTargetY()
+    local targetUnit = jass.GetSpellTargetUnit()
+    jass.SaveInteger(StarBaseHT, hd, HASH_LAST_SPELL, spellId)
+    jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_X, x)
+    jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_Y, y)
+    jass.SaveUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT, targetUnit)
 end
 local function loadLastSpellContext(self, caster)
     local StarBaseHT = getStarBaseHT(nil)
@@ -126,52 +90,23 @@ local function loadLastSpellContext(self, caster)
         return
     end
     local hd = jass.GetHandleId(caster)
-    local ____temp_8
-    if type(jass.LoadInteger) == "function" then
-        ____temp_8 = jass.LoadInteger(StarBaseHT, hd, HASH_LAST_SPELL)
-    else
-        ____temp_8 = 0
-    end
-    lastItemAbilityContext.abilityId = ____temp_8
-    local ____temp_9
-    if type(jass.LoadReal) == "function" then
-        ____temp_9 = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_X)
-    else
-        ____temp_9 = 0
-    end
-    lastItemAbilityContext.targetX = ____temp_9
-    local ____temp_10
-    if type(jass.LoadReal) == "function" then
-        ____temp_10 = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_Y)
-    else
-        ____temp_10 = 0
-    end
-    lastItemAbilityContext.targetY = ____temp_10
-    local ____temp_11
-    if type(jass.LoadUnitHandle) == "function" then
-        ____temp_11 = jass.LoadUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT)
-    else
-        ____temp_11 = nil
-    end
-    lastItemAbilityContext.targetUnit = ____temp_11
+    lastItemAbilityContext.abilityId = jass.LoadInteger(StarBaseHT, hd, HASH_LAST_SPELL)
+    lastItemAbilityContext.targetX = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_X)
+    lastItemAbilityContext.targetY = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_Y)
+    lastItemAbilityContext.targetUnit = jass.LoadUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT)
     if lastItemAbilityContext.targetUnit == 0 then
         lastItemAbilityContext.targetUnit = nil
     end
 end
 local function createLastSpellTargetPoint(self)
     lastItemAbilityContext.targetPoint = nil
-    if type(jass.Location) ~= "function" then
-        return
-    end
     lastItemAbilityContext.targetPoint = jass.Location(lastItemAbilityContext.targetX, lastItemAbilityContext.targetY)
 end
 local function destroyLastSpellTargetPoint(self)
     if lastItemAbilityContext.targetPoint == nil then
         return
     end
-    if type(jass.RemoveLocation) == "function" then
-        jass.RemoveLocation(lastItemAbilityContext.targetPoint)
-    end
+    jass.RemoveLocation(lastItemAbilityContext.targetPoint)
     lastItemAbilityContext.targetPoint = nil
 end
 local function fireItemAbilityEvents(self)
@@ -185,19 +120,17 @@ local function fireItemAbilityEvents(self)
             do
                 local trig = su_iatList[i + 1]
                 if trig == nil then
-                    goto __continue22
+                    goto __continue17
                 end
-                if type(jass.IsTriggerEnabled) == "function" and not jass.IsTriggerEnabled(trig) then
-                    goto __continue22
+                if not jass.IsTriggerEnabled(trig) then
+                    goto __continue17
                 end
-                if type(jass.TriggerEvaluate) == "function" and not jass.TriggerEvaluate(trig) then
-                    goto __continue22
+                if not jass.TriggerEvaluate(trig) then
+                    goto __continue17
                 end
-                if type(jass.TriggerExecute) == "function" then
-                    jass.TriggerExecute(trig)
-                end
+                jass.TriggerExecute(trig)
             end
-            ::__continue22::
+            ::__continue17::
             i = i + 1
         end
     end
@@ -215,11 +148,9 @@ function ____exports.SU_AddItemAbilityEvent(self, trg)
         return
     end
     local hd = jass.GetHandleId(trg)
-    local hasIndex = type(jass.HaveSavedInteger) == "function" and jass.HaveSavedInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX)
+    local hasIndex = jass.HaveSavedInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX)
     if not hasIndex then
-        if type(jass.SaveInteger) == "function" then
-            jass.SaveInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX, su_iatIndex)
-        end
+        jass.SaveInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX, su_iatIndex)
         su_iatList[su_iatIndex + 1] = trg
         su_iatIndex = su_iatIndex + 1
     end
@@ -247,29 +178,15 @@ function ____exports.SU_InititemAbilityListener(self)
     if su_ItemAbilityInited then
         return
     end
-    local ____temp_12
-    if type(jass.CreateTrigger) == "function" then
-        ____temp_12 = jass.CreateTrigger()
-    else
-        ____temp_12 = nil
-    end
-    su_ItemAbilityTrig = ____temp_12
-    local ____temp_13
-    if type(jass.CreateTrigger) == "function" then
-        ____temp_13 = jass.CreateTrigger()
-    else
-        ____temp_13 = nil
-    end
-    su_ItemAbilityTrig2 = ____temp_13
+    su_ItemAbilityTrig = jass.CreateTrigger()
+    su_ItemAbilityTrig2 = jass.CreateTrigger()
     if su_ItemAbilityTrig == nil or su_ItemAbilityTrig2 == nil then
         return
     end
     TriggerRegisterAnyUnitEventBJ(nil, su_ItemAbilityTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
     TriggerRegisterAnyUnitEventBJ(nil, su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM)
-    if type(jass.TriggerAddAction) == "function" then
-        jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1)
-        jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2)
-    end
+    jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1)
+    jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2)
     su_ItemAbilityInited = true
 end
 --- 获取最后使用的物品技能ID

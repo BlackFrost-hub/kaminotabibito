@@ -88,15 +88,11 @@ end
 -- 先尝试OrderId，若为0再尝试UnitId
 function ____exports.String2OrderIdBJ(self, orderIdString)
     local orderId = 0
-    if type(jass.OrderId) == "function" then
-        orderId = jass.OrderId(orderIdString)
-    end
+    orderId = jass.OrderId(orderIdString)
     if orderId ~= 0 then
         return orderId
     end
-    if type(jass.UnitId) == "function" then
-        orderId = jass.UnitId(orderIdString)
-    end
+    orderId = jass.UnitId(orderIdString)
     if orderId ~= 0 then
         return orderId
     end

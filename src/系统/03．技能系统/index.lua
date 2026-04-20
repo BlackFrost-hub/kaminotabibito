@@ -68,26 +68,16 @@ require("系统.03．技能系统.00．技能事件.index")
 require("系统.03．技能系统.01．技能冷却.index")
 require("系统.03．技能系统.02．技能消耗.index")
 local bbTeleportMod = require("系统.03．技能系统.04．快捷键技能.index")
-if type(bbTeleportMod.initBBTeleport) == "function" then
-    bbTeleportMod:initBBTeleport()
-end
+bbTeleportMod:initBBTeleport()
 local switchBagMod = require("系统.03．技能系统.04．快捷键技能.index")
-if type(switchBagMod.initSwitchBag) == "function" then
-    switchBagMod:initSwitchBag()
-end
+switchBagMod:initSwitchBag()
 require("系统.03．技能系统.01．显示技能名字")
 local dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index")
-if type(dynamicSkillTip.init) == "function" then
-    dynamicSkillTip:init()
-end
+dynamicSkillTip:init()
 local aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index")
-if type(aiSkillSystem.init) == "function" then
-    aiSkillSystem:init()
-end
+aiSkillSystem:init()
 local castBarSystem = require("系统.03．技能系统.07．技能吟唱条.index")
-if type(castBarSystem.init) == "function" then
-    castBarSystem:init()
-end
+castBarSystem:init()
 --- 初始化技能系统
 function ____exports.init(self)
 end

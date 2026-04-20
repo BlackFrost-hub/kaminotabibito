@@ -244,11 +244,11 @@ export function initAISkillSystem(): void {
 export function autoRegisterNeutralAggressive(unit: any): void {
   if (!unit) return;
 
-  const owner = typeof jass.GetOwningPlayer === "function" ? jass.GetOwningPlayer(unit) : null;
-  const neutralAggressive = (jass as any).Player?.(AI_PLAYER_NEUTRAL_AGGRESSIVE);
+  const owner = jass.GetOwningPlayer(unit);
+  const neutralAggressive = (jass as any).Player(AI_PLAYER_NEUTRAL_AGGRESSIVE);
 
   if (owner === neutralAggressive) {
-    const isHero = typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_HERO);
+    const isHero = jass.IsUnitType(unit, jass.UNIT_TYPE_HERO);
     if (!isHero) registerAIUnit(unit);
   }
 }
@@ -262,10 +262,8 @@ function initAutoRegister(): void {
       jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, jass.Player(i), enterRegionEvent, undefined!);
     }
 
-    const neutralAggressive = (jass as any).Player?.(AI_PLAYER_NEUTRAL_AGGRESSIVE);
-    if (neutralAggressive != null) {
-      jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, undefined!);
-    }
+    const neutralAggressive = (jass as any).Player(AI_PLAYER_NEUTRAL_AGGRESSIVE);
+    jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, undefined!);
 
     jass.TriggerAddAction(unitCreatedTrigger, () => {
       autoRegisterNeutralAggressive(jass.GetTriggerUnit());

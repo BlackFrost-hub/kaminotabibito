@@ -77,7 +77,6 @@ export function clearTaskUIList(ctx: TaskUIListControlContext): void {
 /** 只切换展开状态；真正的重排与滚动同步仍交给 `refreshList`。 */
 export function toggleTaskUIQuestExpand(ctx: TaskUIListControlContext, questId: string, refreshList: () => void): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 
@@ -133,7 +132,6 @@ export function createTaskUIListItem(
 /** 门面层的列表刷新入口：先清旧帧，再把数据和回调委托给列表模块。 */
 export function refreshTaskUIFacadeList(ctx: TaskUIListControlContext, refreshList: () => void): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 

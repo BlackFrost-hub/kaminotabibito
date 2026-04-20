@@ -265,26 +265,18 @@ function ____exports.GetTransmissionDuration(self, soundHandle, timeType, timeVa
     return duration
 end
 function ____exports.WaitForSoundBJ(self, soundHandle, offset)
-    if type(jass.TriggerWaitForSound) == "function" then
-        jass.TriggerWaitForSound(soundHandle, offset)
-    end
+    jass.TriggerWaitForSound(soundHandle, offset)
 end
 function ____exports.WaitTransmissionDuration(self, soundHandle, timeType, timeVal)
     if timeType == ____exports.bj_TIMETYPE_SET then
-        if type(jass.TriggerSleepAction) == "function" then
-            jass.TriggerSleepAction(timeVal)
-        end
+        jass.TriggerSleepAction(timeVal)
     elseif soundHandle == nil then
-        if type(jass.TriggerSleepAction) == "function" then
-            jass.TriggerSleepAction(____exports.bj_NOTHING_SOUND_DURATION)
-        end
+        jass.TriggerSleepAction(____exports.bj_NOTHING_SOUND_DURATION)
     elseif timeType == ____exports.bj_TIMETYPE_SUB then
         ____exports.WaitForSoundBJ(nil, soundHandle, timeVal)
     elseif timeType == ____exports.bj_TIMETYPE_ADD then
         ____exports.WaitForSoundBJ(nil, soundHandle, 0)
-        if type(jass.TriggerSleepAction) == "function" then
-            jass.TriggerSleepAction(timeVal)
-        end
+        jass.TriggerSleepAction(timeVal)
     end
 end
 function ____exports.EnableDawnDusk(self, flag)
@@ -295,7 +287,7 @@ function ____exports.IsDawnDuskEnabled(self)
 end
 function ____exports.PlaySoundBJ(self, soundHandle)
     jglobals.bj_lastPlayedSound = soundHandle
-    if soundHandle ~= nil and type(jass.StartSound) == "function" then
+    if soundHandle ~= nil then
         jass.StartSound(soundHandle)
     end
 end

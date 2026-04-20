@@ -23,14 +23,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue52
+                            goto __continue50
                         end
                         japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue52::
+                    ::__continue50::
                     col = col + 1
                 end
             end
@@ -86,9 +86,6 @@ local damagePanel = 0
 damageRows = {}
 detailSlots = {}
 local function createFrame(tagName, name, parent)
-    if type(japi.DzCreateFrameByTagName) ~= "function" then
-        return 0
-    end
     return japi.DzCreateFrameByTagName(
         tagName,
         name,
@@ -104,7 +101,7 @@ local function setAbsolute(frame, x, y)
     japi.DzFrameSetAbsolutePoint(frame, _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT, x, y)
 end
 local function show(frame, visible)
-    if frame == 0 or type(japi.DzFrameShow) ~= "function" then
+    if frame == 0 then
         return
     end
     japi.DzFrameShow(frame, visible)
@@ -375,9 +372,6 @@ end
 --- 一次性创建整套 UI 框体。
 -- 这里只负责“搭骨架”，具体数值文本由后续刷新函数填充。
 function ____exports.createUiFrames()
-    if type(japi.DzGetGameUI) ~= "function" then
-        return
-    end
     local gameUI = japi.DzGetGameUI()
     if gameUI == nil or gameUI == 0 then
         return
@@ -397,11 +391,11 @@ function ____exports.focusHeroByFunctionKey(functionKey)
         while i < #detailSlots do
             do
                 if detailSlots[i + 1].functionKey ~= functionKey then
-                    goto __continue45
+                    goto __continue43
                 end
                 return detailSlots[i + 1].hero
             end
-            ::__continue45::
+            ::__continue43::
             i = i + 1
         end
     end

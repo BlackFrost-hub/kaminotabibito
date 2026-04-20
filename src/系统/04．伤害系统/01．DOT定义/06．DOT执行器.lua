@@ -27,7 +27,7 @@ function ____exports.createDotExecutor(self, deps)
     local dotBatchSnapForClear = nil
     local dotBatchDeferredRemaining = 0
     local function addDotEffectOnUnit(self, unit, model, duration)
-        if not unit or not model or model == "" or type(deps.jass.AddSpecialEffectTarget) ~= "function" then
+        if not unit or not model or model == "" then
             return
         end
         local eff = deps.jass.AddSpecialEffectTarget(model, unit, "origin")
@@ -38,9 +38,6 @@ function ____exports.createDotExecutor(self, deps)
     end
     local function dealDamageForType(self, typeId, source, target, amount)
         if isDotTargetPaused(nil, target) then
-            return
-        end
-        if type(deps.jass.UnitDamageTarget) ~= "function" then
             return
         end
         local cfg = __TS__ArrayFind(

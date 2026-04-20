@@ -26,9 +26,9 @@ const UNIT_STATE_ATTACK1_COUNT = 0x11;
 
 function getUnitPrimaryTypeFromSlk(u: any): number {
   if (!SUC_IsValidUnit(u)) return -1;
-  const unitId = typeof jass.GetUnitTypeId === "function" ? jass.GetUnitTypeId(u) : 0;
+  const unitId = jass.GetUnitTypeId(u);
   if (unitId === 0) return -1;
-  if (japi == null || typeof japi.EXExecuteScript !== "function") return -1;
+  if (japi == null) return -1;
 
   const script = "(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" + unitId + "']; if _u then return _u.Primary or '' else return '' end end)()";
   const primary = japi.EXExecuteScript(script) || "";
@@ -47,18 +47,18 @@ function getHeroPrimaryGreenValue(u: any): number {
   const primaryType = getUnitPrimaryTypeFromSlk(u);
 
   if (primaryType === PRIMARY_STR) {
-    const total = typeof jass.GetHeroStr === "function" ? jass.GetHeroStr(u, true) : 0;
-    const green = typeof jass.GetHeroStr === "function" ? jass.GetHeroStr(u, false) : 0;
+    const total = jass.GetHeroStr(u, true);
+    const green = jass.GetHeroStr(u, false);
     return total - green;
   }
   if (primaryType === PRIMARY_AGI) {
-    const total = typeof jass.GetHeroAgi === "function" ? jass.GetHeroAgi(u, true) : 0;
-    const green = typeof jass.GetHeroAgi === "function" ? jass.GetHeroAgi(u, false) : 0;
+    const total = jass.GetHeroAgi(u, true);
+    const green = jass.GetHeroAgi(u, false);
     return total - green;
   }
   if (primaryType === PRIMARY_INT) {
-    const total = typeof jass.GetHeroInt === "function" ? jass.GetHeroInt(u, true) : 0;
-    const green = typeof jass.GetHeroInt === "function" ? jass.GetHeroInt(u, false) : 0;
+    const total = jass.GetHeroInt(u, true);
+    const green = jass.GetHeroInt(u, false);
     return total - green;
   }
 
@@ -69,10 +69,10 @@ function getHeroPrimaryGreenValue(u: any): number {
 export function SU_GetUnitModel(u: any): string {
   if (!SUC_IsValidUnit(u)) return "";
 
-  const unitId = typeof jass.GetUnitTypeId === "function" ? jass.GetUnitTypeId(u) : 0;
+  const unitId = jass.GetUnitTypeId(u);
   let file = "";
 
-  if (japi != null && typeof japi.EXExecuteScript === "function") {
+  if (japi != null) {
     const script = "(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" + unitId + "']; if _u then return _u.file or '' else return '' end end)()";
     file = japi.EXExecuteScript(script) || "";
   }
@@ -99,20 +99,14 @@ export function SU_AddHeroState(u: any, id: number, typ: number, value: number):
   const isAdd = typ === 0;
 
   if (id === PRIMARY_STR) {
-    const current = typeof jass.GetHeroStr === "function" ? jass.GetHeroStr(u, false) : 0;
-    if (typeof jass.SetHeroStr === "function") {
-      jass.SetHeroStr(u, isAdd ? current + value : value, false);
-    }
+    const current = jass.GetHeroStr(u, false);
+    jass.SetHeroStr(u, isAdd ? current + value : value, false);
   } else if (id === PRIMARY_AGI) {
-    const current = typeof jass.GetHeroAgi === "function" ? jass.GetHeroAgi(u, false) : 0;
-    if (typeof jass.SetHeroAgi === "function") {
-      jass.SetHeroAgi(u, isAdd ? current + value : value, false);
-    }
+    const current = jass.GetHeroAgi(u, false);
+    jass.SetHeroAgi(u, isAdd ? current + value : value, false);
   } else if (id === PRIMARY_INT) {
-    const current = typeof jass.GetHeroInt === "function" ? jass.GetHeroInt(u, false) : 0;
-    if (typeof jass.SetHeroInt === "function") {
-      jass.SetHeroInt(u, isAdd ? current + value : value, false);
-    }
+    const current = jass.GetHeroInt(u, false);
+    jass.SetHeroInt(u, isAdd ? current + value : value, false);
   }
 }
 
@@ -121,9 +115,9 @@ export function SU_GetHeroParmaryValue(u: any): number {
   if (!SUC_IsValidUnit(u)) return -1;
 
   const typ = SU_GetHeroParmary(u);
-  if (typ === PRIMARY_STR) return typeof jass.GetHeroStr === "function" ? jass.GetHeroStr(u, true) : 0;
-  if (typ === PRIMARY_AGI) return typeof jass.GetHeroAgi === "function" ? jass.GetHeroAgi(u, true) : 0;
-  if (typ === PRIMARY_INT) return typeof jass.GetHeroInt === "function" ? jass.GetHeroInt(u, true) : 0;
+  if (typ === PRIMARY_STR) return jass.GetHeroStr(u, true);
+  if (typ === PRIMARY_AGI) return jass.GetHeroAgi(u, true);
+  if (typ === PRIMARY_INT) return jass.GetHeroInt(u, true);
 
   return -1;
 }
@@ -166,11 +160,11 @@ export function SU_DotBehindUnit(fac: number, x: number, y: number, a: number, b
 export function SU_GetUnitOfUnit(u: any, tu: any): number {
   if (!SUC_IsValidUnit(u) || !SUC_IsValidUnit(tu)) return 3;
 
-  const x = typeof jass.GetUnitX === "function" ? jass.GetUnitX(u) : 0;
-  const y = typeof jass.GetUnitY === "function" ? jass.GetUnitY(u) : 0;
-  const a = typeof jass.GetUnitX === "function" ? jass.GetUnitX(tu) : 0;
-  const b = typeof jass.GetUnitY === "function" ? jass.GetUnitY(tu) : 0;
-  const facing = typeof jass.GetUnitFacing === "function" ? jass.GetUnitFacing(u) : 0;
+  const x = jass.GetUnitX(u);
+  const y = jass.GetUnitY(u);
+  const a = jass.GetUnitX(tu);
+  const b = jass.GetUnitY(tu);
+  const facing = jass.GetUnitFacing(u);
 
   const angle = GAFC(x, y, a, b) - facing;
   const c = CosBJ(angle);
@@ -186,11 +180,11 @@ export function SU_GetUnitOfUnit(u: any, tu: any): number {
 export function SU_IsUnitInfrontUnit2(u: any, tu: any): boolean {
   if (!SUC_IsValidUnit(u) || !SUC_IsValidUnit(tu)) return false;
 
-  const x = typeof jass.GetUnitX === "function" ? jass.GetUnitX(u) : 0;
-  const y = typeof jass.GetUnitY === "function" ? jass.GetUnitY(u) : 0;
-  const a = typeof jass.GetUnitX === "function" ? jass.GetUnitX(tu) : 0;
-  const b = typeof jass.GetUnitY === "function" ? jass.GetUnitY(tu) : 0;
-  const facing = typeof jass.GetUnitFacing === "function" ? jass.GetUnitFacing(u) : 0;
+  const x = jass.GetUnitX(u);
+  const y = jass.GetUnitY(u);
+  const a = jass.GetUnitX(tu);
+  const b = jass.GetUnitY(tu);
+  const facing = jass.GetUnitFacing(u);
 
   const angle = GAFC(x, y, a, b) - facing;
   return CosBJ(angle) > 0;
@@ -211,15 +205,9 @@ export function SU_GetUnitWhiteAtk(u: any, a: number): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
   const primaryGreen = getHeroPrimaryGreenValue(u);
-  const baseDmg = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE))
-    : 0;
-  const bonusDmg = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS))
-    : 0;
-  const diceCount = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT))
-    : 0;
+  const baseDmg = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE));
+  const bonusDmg = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS));
+  const diceCount = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT));
 
   return baseDmg + bonusDmg * (diceCount + 1) / 2 - a * primaryGreen;
 }

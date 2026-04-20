@@ -89,19 +89,17 @@ function ____exports.getHeroForAncientUnit(self, ancientUnit)
         return nil
     end
     local foundHero = nil
-    if type(jass.ForGroup) == "function" then
-        jass.ForGroup(
-            heroGroup,
-            function()
-                local enumUnit = jass.GetEnumUnit()
-                if enumUnit ~= nil and jass.GetOwningPlayer(enumUnit) == owner then
-                    if jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
-                        foundHero = enumUnit
-                    end
+    jass.ForGroup(
+        heroGroup,
+        function()
+            local enumUnit = jass.GetEnumUnit()
+            if enumUnit ~= nil and jass.GetOwningPlayer(enumUnit) == owner then
+                if jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
+                    foundHero = enumUnit
                 end
             end
-        )
-    end
+        end
+    )
     return foundHero
 end
 --- 获取吸血/吸魔的实际受益单位

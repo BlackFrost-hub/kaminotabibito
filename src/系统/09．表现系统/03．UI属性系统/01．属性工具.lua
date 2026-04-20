@@ -10,6 +10,7 @@ local ____exports = {}
 -- - lib.扩展函数.YDWE函数.index
 -- - lib.扩展函数.Star扩展函数.Star扩展库.index
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local _____73A9_5BB6_5E38_91CF = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
 local MAX_DISPLAY_PLAYERS = ____require_result_0.MAX_DISPLAY_PLAYERS
@@ -52,7 +53,8 @@ function ____exports.getDisplayPlayers()
     return players
 end
 --- 从玩家级 YDUserData 中读取当前登记的英雄。
--- 这套 UI 直接依赖"玩家 -> 英雄"映射，而不是自行遍历单位组兜底。
+-- 英雄来源由“玩家英雄获取桥接”模块注册：
+-- 系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接
 function ____exports.getPlayerHero(player)
     if player == nil then
         return nil
@@ -98,27 +100,41 @@ function ____exports.updatePlayerRealtimeStats(player)
     end
     local intervalState = jass.ConvertUnitState(37)
     local speedState = jass.ConvertUnitState(81)
-    local attackBaseInterval = jass.GetUnitState(hero, intervalState)
-    local attackSpeedScale = jass.GetUnitState(hero, speedState)
-    local attackInterval = attackSpeedScale > 0 and attackBaseInterval / attackSpeedScale or 0
-    local attacksPerSecond = attackInterval > 0 and 1 / attackInterval or 0
-    local moveSpeed = jass.GetUnitMoveSpeed(hero)
-    YDUserDataSet(
-        nil,
-        "player",
-        player,
-        "每秒攻速",
-        "real",
-        attacksPerSecond
-    )
-    YDUserDataSet(
-        nil,
-        "player",
-        player,
-        "移动速度",
-        "real",
-        moveSpeed
-    )
+    local baseInterval = japi.GetUnitState(hero, intervalState)
+    local speedScale = japi.GetUnitState(hero, speedState)
+    local oldAps = ____exports.getPlayerAttr(player, "每秒攻速")
+    local oldMoveSpeed = ____exports.getPlayerAttr(player, "移动速度")
+    local attackIntervalSafe = baseInterval > 0 and speedScale > 0 and baseInterval / speedScale or 0
+    local computedApsSafe = attackIntervalSafe > 0 and 1 / attackIntervalSafe or 0
+    local attacksPerSecond = computedApsSafe > 0 and computedApsSafe or oldAps
+    local rawMoveSpeed = jass.GetUnitMoveSpeed(hero)
+    local ____temp_2
+    if rawMoveSpeed > 0 then
+        ____temp_2 = rawMoveSpeed
+    else
+        ____temp_2 = oldMoveSpeed
+    end
+    local moveSpeed = ____temp_2
+    if attacksPerSecond > 0 then
+        YDUserDataSet(
+            nil,
+            "player",
+            player,
+            "每秒攻速",
+            "real",
+            attacksPerSecond
+        )
+    end
+    if moveSpeed > 0 then
+        YDUserDataSet(
+            nil,
+            "player",
+            player,
+            "移动速度",
+            "real",
+            moveSpeed
+        )
+    end
 end
 function ____exports.getHeroIcon(hero)
     if hero == nil then

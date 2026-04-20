@@ -106,27 +106,19 @@ export function GetTransmissionDuration(soundHandle: any, timeType: number, time
 }
 
 export function WaitForSoundBJ(soundHandle: any, offset: number): void {
-    if (typeof jass.TriggerWaitForSound === "function") {
-        jass.TriggerWaitForSound(soundHandle, offset);
-    }
+    jass.TriggerWaitForSound(soundHandle, offset);
 }
 
 export function WaitTransmissionDuration(soundHandle: any, timeType: number, timeVal: number): void {
     if (timeType === bj_TIMETYPE_SET) {
-        if (typeof jass.TriggerSleepAction === "function") {
-            jass.TriggerSleepAction(timeVal);
-        }
+        jass.TriggerSleepAction(timeVal);
     } else if (soundHandle == null) {
-        if (typeof jass.TriggerSleepAction === "function") {
-            jass.TriggerSleepAction(bj_NOTHING_SOUND_DURATION);
-        }
+        jass.TriggerSleepAction(bj_NOTHING_SOUND_DURATION);
     } else if (timeType === bj_TIMETYPE_SUB) {
         WaitForSoundBJ(soundHandle, timeVal);
     } else if (timeType === bj_TIMETYPE_ADD) {
         WaitForSoundBJ(soundHandle, 0);
-        if (typeof jass.TriggerSleepAction === "function") {
-            jass.TriggerSleepAction(timeVal);
-        }
+        jass.TriggerSleepAction(timeVal);
     }
 }
 
@@ -140,7 +132,7 @@ export function IsDawnDuskEnabled(): boolean {
 
 export function PlaySoundBJ(soundHandle: any): void {
     jglobals.bj_lastPlayedSound = soundHandle;
-    if (soundHandle != null && typeof jass.StartSound === "function") {
+    if (soundHandle != null) {
         jass.StartSound(soundHandle);
     }
 }

@@ -6,22 +6,21 @@ import { FrameConfig, FrameType, TryCreateFromFdfOptions } from "./00．类型�
 export function createFrame(config: FrameConfig): number | null {
   const { type, name, parent = 0, template = "template", id = 0 } = config;
 
-  if (typeof japi.DzCreateFrameByTagName !== "function") return null;
   if (type === FrameType.SIMPLEFRAME) return null;
 
   const frame = japi.DzCreateFrameByTagName(type, name, parent, template, id);
   if (frame == null || frame === 0) return null;
 
-  if (config.visible !== undefined && typeof japi.DzFrameShow === "function") {
+  if (config.visible !== undefined) {
     (pcall as any)(() => japi.DzFrameShow(frame, config.visible));
   }
-  if (config.enable === false && typeof japi.DzFrameSetEnable === "function") {
+  if (config.enable === false) {
     (pcall as any)(() => japi.DzFrameSetEnable(frame, false));
   }
-  if (config.alpha !== undefined && typeof japi.DzFrameSetAlpha === "function") {
+  if (config.alpha !== undefined) {
     (pcall as any)(() => japi.DzFrameSetAlpha(frame, config.alpha));
   }
-  if (config.level !== undefined && typeof japi.DzFrameSetLevel === "function") {
+  if (config.level !== undefined) {
     (pcall as any)(() => japi.DzFrameSetLevel(frame, config.level));
   }
 
@@ -38,13 +37,12 @@ export function loadTocOnce(
 ): void {
   if (__tocLoadedOnce[tocLoadKey]) return;
   __tocLoadedOnce[tocLoadKey] = true;
-  if (typeof japi.DzLoadToc !== "function") return;
 
   for (const p of tocPaths) {
     const ok = (pcall as any)(() => japi.DzLoadToc(p));
     if (!ok) {
       const pr = (globalThis as any).print;
-      if (typeof pr === "function") pr("[" + debugPrefix + "] DzLoadToc fail: " + p);
+      pr("[" + debugPrefix + "] DzLoadToc fail: " + p);
     }
   }
 }
@@ -56,7 +54,6 @@ export function tryCreateFromFdfSafe(
   opts: TryCreateFromFdfOptions
 ): number | null {
   loadTocOnce(opts.tocLoadKey, opts.tocPaths, opts.debugPrefix ?? "UI");
-  if (typeof japi.DzCreateFrame !== "function") return fallback();
 
   let f: number = 0;
   const ok = (pcall as any)(() => {

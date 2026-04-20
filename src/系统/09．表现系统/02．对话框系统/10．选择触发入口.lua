@@ -52,7 +52,13 @@ function ____exports.initDialogEntrySelectionTrigger(self)
             end
             local unitName = jass.GetUnitName(u)
             local npcConfig = findNpcConfigByUnitName(nil, unitName)
-            local npcName = npcConfig and npcConfig.NPCrequireName or npcConfig and npcConfig.NpcNameID
+            local ____npcConfig_0
+            if npcConfig then
+                ____npcConfig_0 = npcConfig.NPCrequireName or npcConfig.NpcNameID
+            else
+                ____npcConfig_0 = nil
+            end
+            local npcName = ____npcConfig_0
             if npcConfig and npcName then
                 local acceptedQuest = findAcceptedQuestBySubmitNpc(nil, npcName, playerId)
                 if acceptedQuest and acceptedQuest.requireID then

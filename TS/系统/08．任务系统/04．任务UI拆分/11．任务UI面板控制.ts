@@ -32,7 +32,6 @@ export interface TaskUIPanelContext {
 export function registerTaskUIRefreshCallback(ctx: TaskUIPanelContext, refreshList: () => void): void {
   ctx.questManager.registerUIRefreshCallback((_playerId: number, _questId?: string) => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -44,7 +43,6 @@ export function registerTaskUIRefreshCallback(ctx: TaskUIPanelContext, refreshLi
 
 /** 标签 hover 提示直接发给当前 UI 事件玩家，不走同步逻辑。 */
 export function showTaskUITabTooltip(msg: string): void {
-  if (typeof (japi as any).DzGetTriggerUIEventPlayer !== "function" || typeof (jass as any).DisplayTextToPlayer !== "function") return;
   const p = (japi as any).DzGetTriggerUIEventPlayer();
   if (p) (jass as any).DisplayTextToPlayer(p, 0, 0, msg);
 }
@@ -52,7 +50,6 @@ export function showTaskUITabTooltip(msg: string): void {
 /** 切分类时顺手清空展开态并回到顶部，保证列表状态可预期。 */
 export function switchTaskUICategory(ctx: TaskUIPanelContext, type: QuestType, refreshList: () => void): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 
@@ -70,7 +67,6 @@ export function toggleTaskUIPanel(
   hide: () => void
 ): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 
@@ -84,7 +80,6 @@ export function toggleTaskUIPanel(
 /** 显示面板时记录当前玩家并立刻刷新列表，确保内容和分类状态同步。 */
 export function showTaskUIPanel(ctx: TaskUIPanelContext, playerId: number, refreshList: () => void): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 
@@ -99,7 +94,6 @@ export function showTaskUIPanel(ctx: TaskUIPanelContext, playerId: number, refre
 /** 隐藏前先取消可能进行中的 thumb 拖拽，避免下次打开残留交互状态。 */
 export function hideTaskUIPanel(ctx: TaskUIPanelContext): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null) return;
 

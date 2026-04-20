@@ -135,7 +135,7 @@ function showTextTag(this: void, unit: any, text: string, red: number, green: nu
 
 /** 获取单位HandleId */
 function getUnitId(this: void, unit: any): number {
-  if (!unit || typeof jass.GetHandleId !== "function") return 0;
+  if (!unit) return 0;
   return jass.GetHandleId(unit);
 }
 
@@ -190,11 +190,9 @@ function fireStesEvent(this: void, eventName: string, opener: any, target: any):
 // ==========================================================================================
 
 function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void {
-  if (typeof jass.DzUnitDisableAttack === "function") {
-    jass.DzUnitDisableAttack(data.unit, false);
-  }
+  jass.DzUnitDisableAttack(data.unit, false);
 
-  if (data.progressBar && typeof jass.RemoveUnit === "function") {
+  if (data.progressBar) {
     jass.RemoveUnit(data.progressBar);
   }
 
@@ -227,9 +225,7 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
     jass.SetUnitFlyHeight?.(progressBar, flyHeight, 0);
   }
 
-  if (typeof jass.DzUnitDisableAttack === "function") {
-    jass.DzUnitDisableAttack(unit, true);
-  }
+  jass.DzUnitDisableAttack(unit, true);
 
   const targetX = jass.GetDestructableX?.(target) ?? 0;
   const targetY = jass.GetDestructableY?.(target) ?? 0;
@@ -293,7 +289,7 @@ function updateAllOpening(this: void): void {
         fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target);
 
         // 开启成功后处理宝箱（杀死可破坏物）
-        if (data.target && typeof jass.KillDestructable === "function") {
+        if (data.target) {
             jass.KillDestructable(data.target);
         }
     }

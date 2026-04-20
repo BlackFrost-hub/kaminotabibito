@@ -34,11 +34,10 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   // J：本地玩家按下时切换面板，并尽量同步「当前操作玩家」id（供 UI 逻辑使用）
   registerKeyDown(KEY.J, (player: any) => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
-      const getPid = typeof (jass as any).GetPlayerId === "function" ? (jass as any).GetPlayerId : null;
+      const getPid = (jass as any).GetPlayerId;
       if (getPid && player) setCurrentPlayerId(getPid(player));
       onClickSound();
       onTogglePanel();
@@ -48,7 +47,6 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   // 1 → 主线
   registerKeyDown(KEY_NUM.K1, (_player: any) => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
       if (!isVisible()) return;
@@ -60,7 +58,6 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   // 2 → 支线
   registerKeyDown(KEY_NUM.K2, (_player: any) => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
       if (!isVisible()) return;
@@ -72,7 +69,6 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   // 3 → 小任务/日常
   registerKeyDown(KEY_NUM.K3, (_player: any) => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
       if (!isVisible()) return;

@@ -91,11 +91,14 @@ function ____exports.setQuestState(self, questId, state, playerName)
             if def then
                 def.accepterName = playerName
             end
-            local ____opt_0 = questDB.globalData
-            if ____opt_0 ~= nil then
-                ____opt_0 = ____opt_0.quests:get(questId)
+            local globalData = questDB.globalData
+            local ____temp_0
+            if globalData ~= nil then
+                ____temp_0 = globalData.quests:get(questId)
+            else
+                ____temp_0 = nil
             end
-            local active = ____opt_0
+            local active = ____temp_0
             if active then
                 active.accepterName = playerName
             end
@@ -103,11 +106,14 @@ function ____exports.setQuestState(self, questId, state, playerName)
         return
     end
     if state == 2 then
-        local ____opt_2 = questDB.globalData
-        if ____opt_2 ~= nil then
-            ____opt_2 = ____opt_2.quests:get(questId)
+        local globalData = questDB.globalData
+        local ____temp_1
+        if globalData ~= nil then
+            ____temp_1 = globalData.quests:get(questId)
+        else
+            ____temp_1 = nil
         end
-        local active = ____opt_2
+        local active = ____temp_1
         if active then
             for ____, obj in __TS__Iterator(active.objectives) do
                 obj.current = obj.required
@@ -118,11 +124,13 @@ function ____exports.setQuestState(self, questId, state, playerName)
                 active.completerName = playerName
             end
         end
-        local ____opt_result_6
+        local ____temp_2
         if active ~= nil then
-            ____opt_result_6 = active.accepterName
+            ____temp_2 = active.accepterName
+        else
+            ____temp_2 = nil
         end
-        local savedAccepterName = ____opt_result_6
+        local savedAccepterName = ____temp_2
         questDB:completeQuest(0, questId)
         if playerName then
             local def = questDB:getQuest(questId)

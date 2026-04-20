@@ -28,28 +28,16 @@ function ____exports.createDotBaseUtils(self, deps)
             return false
         end
         local utStruct = getStructureUnitTypeHandle(nil)
-        if type(deps.jass.IsUnitType) == "function" and utStruct ~= nil then
+        if utStruct ~= nil then
             if deps.jass.IsUnitType(target, utStruct) == true then
                 return false
             end
-        end
-        if type(deps.jass.GetOwningPlayer) ~= "function" then
-            return false
         end
         local srcP = deps.jass.GetOwningPlayer(source)
         if srcP == nil then
             return false
         end
-        if type(deps.jass.IsUnitEnemy) == "function" then
-            return deps.jass.IsUnitEnemy(target, srcP) == true
-        end
-        if type(deps.jass.IsPlayerEnemy) == "function" then
-            local tp = deps.jass.GetOwningPlayer(target)
-            if tp ~= nil then
-                return deps.jass.IsPlayerEnemy(srcP, tp) == true
-            end
-        end
-        return false
+        return deps.jass.IsUnitEnemy(target, srcP) == true
     end
     local function heroUnitTypeForIsUnitType(self)
         local ____deps_jass_UNIT_TYPE_HERO_1 = deps.jass.UNIT_TYPE_HERO
@@ -60,18 +48,10 @@ function ____exports.createDotBaseUtils(self, deps)
         if direct ~= nil then
             return direct
         end
-        if type(deps.jass.ConvertUnitType) ~= "function" then
-            return nil
-        end
         return deps.jass.ConvertUnitType(2)
     end
     local function isSourceHeroPlayer1to4(self, unit)
-        if not unit or type(deps.jass.GetOwningPlayer) ~= "function" then
-            return false
-        end
-        local hasIsUnitType = type(deps.jass.IsUnitType) == "function"
-        local hasHeroLevel = type(deps.jass.GetHeroLevel) == "function"
-        if not hasIsUnitType and not hasHeroLevel then
+        if not unit then
             return false
         end
         local owner = deps.jass.GetOwningPlayer(unit)
@@ -90,24 +70,18 @@ function ____exports.createDotBaseUtils(self, deps)
             return false
         end
         local utHero = heroUnitTypeForIsUnitType(nil)
-        if hasIsUnitType and utHero ~= nil and deps.jass.IsUnitType(unit, utHero) == true then
+        if utHero ~= nil and deps.jass.IsUnitType(unit, utHero) == true then
             return true
         end
-        if hasHeroLevel and deps.jass.GetHeroLevel(unit) > 0 then
+        if deps.jass.GetHeroLevel(unit) > 0 then
             return true
         end
         return false
     end
     local function unitItemInSlot(self, unit, slot)
-        if type(deps.jass.UnitItemInSlot) ~= "function" then
-            return nil
-        end
         return deps.jass.UnitItemInSlot(unit, slot)
     end
     local function getItemTypeId(self, item)
-        if type(deps.jass.GetItemTypeId) ~= "function" then
-            return 0
-        end
         return deps.jass.GetItemTypeId(item)
     end
     local function getBestDotFromUnit(self, unit, parseBuff, getProduct)
@@ -118,7 +92,7 @@ function ____exports.createDotBaseUtils(self, deps)
                 do
                     local item = unitItemInSlot(nil, unit, slot)
                     if not item then
-                        goto __continue33
+                        goto __continue25
                     end
                     local idStr = deps:fourCCToString(getItemTypeId(nil, item))
                     local entry = deps.itemsData[idStr]
@@ -129,19 +103,19 @@ function ____exports.createDotBaseUtils(self, deps)
                             do
                                 local parsed = parseBuff(nil, segments[si + 1])
                                 if not parsed then
-                                    goto __continue36
+                                    goto __continue28
                                 end
                                 local product = getProduct(nil, parsed)
                                 if best == nil or product > best.product then
                                     best = __TS__ObjectAssign({}, parsed, {product = product})
                                 end
                             end
-                            ::__continue36::
+                            ::__continue28::
                             si = si + 1
                         end
                     end
                 end
-                ::__continue33::
+                ::__continue25::
                 slot = slot + 1
             end
         end
@@ -157,21 +131,16 @@ function ____exports.createDotBaseUtils(self, deps)
         if not targetUnit then
             return 0
         end
-        if type(deps.jass.BlzGetUnitMaxHP) == "function" then
-            local m = deps.jass.BlzGetUnitMaxHP(targetUnit)
-            if type(m) == "number" and __TS__NumberIsFinite(__TS__Number(m)) and m > 0 then
-                return m
-            end
-        end
-        if type(deps.jass.GetUnitState) ~= "function" then
-            return 0
+        local m = deps.jass.BlzGetUnitMaxHP(targetUnit)
+        if type(m) == "number" and __TS__NumberIsFinite(__TS__Number(m)) and m > 0 then
+            return m
         end
         local maxLifeState = nil
         if deps.jass.UNIT_STATE_MAX_LIFE ~= nil then
             maxLifeState = deps.jass.UNIT_STATE_MAX_LIFE
         elseif deps.g.UNIT_STATE_MAX_LIFE ~= nil then
             maxLifeState = deps.g.UNIT_STATE_MAX_LIFE
-        elseif type(deps.jass.ConvertUnitState) == "function" then
+        else
             maxLifeState = deps.jass.ConvertUnitState(1)
         end
         if maxLifeState == nil then
@@ -181,7 +150,7 @@ function ____exports.createDotBaseUtils(self, deps)
         return type(v) == "number" and __TS__NumberIsFinite(__TS__Number(v)) and v > 0 and v or 0
     end
     local function getTargetRegenHP(self, targetUnit)
-        if type(deps.jass.GetUnitTypeId) ~= "function" or not targetUnit then
+        if not targetUnit then
             return 0
         end
         local typeId = deps.jass.GetUnitTypeId(targetUnit)

@@ -68,19 +68,14 @@ local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
     end
-    if type(japi.DzGetUnitObjectId) == "function" then
-        local id = japi.DzGetUnitObjectId(unit)
-        if id ~= nil and id ~= 0 then
-            return id
-        end
+    local id = jass.GetUnitTypeId(unit)
+    if id ~= nil and id ~= 0 then
+        return id
     end
-    if type(jass.GetHandleId) == "function" then
-        return jass.GetHandleId(unit)
-    end
-    return 0
+    return jass.GetHandleId(unit)
 end
 local function dzGetPlayerId(self, p)
-    return type(jass.GetPlayerId) == "function" and jass.GetPlayerId(p) or -1
+    return jass.GetPlayerId(p)
 end
 local function cancelTimerHandle(self, t)
     if not t then
@@ -227,12 +222,10 @@ local function npcUnitsSameForBubble(self, a, b)
     if not a or not b then
         return false
     end
-    if type(jass.GetHandleId) == "function" then
-        local ha = jass.GetHandleId(a)
-        local hb = jass.GetHandleId(b)
-        if ha ~= 0 and ha == hb then
-            return true
-        end
+    local ha = jass.GetHandleId(a)
+    local hb = jass.GetHandleId(b)
+    if ha ~= 0 and ha == hb then
+        return true
     end
     return false
 end

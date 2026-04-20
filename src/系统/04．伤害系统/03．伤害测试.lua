@@ -8,9 +8,6 @@ local japi = require("jass.japi")
 local _____4F24_5BB3_4E8B_4EF6 = require("系统.04．伤害系统.01．伤害事件")
 local _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local function sendMsg(msg)
-    if type(jass.DisplayTextToPlayer) ~= "function" then
-        return
-    end
     do
         local i = 0
         while i <= 15 do
@@ -149,16 +146,12 @@ local function init()
         return
     end
     local trg = jass.CreateTrigger()
-    if type(jass.TriggerAddCondition) == "function" and type(jass.Condition) == "function" then
-        jass.TriggerAddCondition(
-            trg,
-            jass.Condition(TrigConditions)
-        )
-    end
+    jass.TriggerAddCondition(
+        trg,
+        jass.Condition(TrigConditions)
+    )
     _____4F24_5BB3_4E8B_4EF6:MNAnyUnitDamaged(trg, 60)
-    if type(jass.TriggerAddAction) == "function" then
-        jass.TriggerAddAction(trg, TrigActions)
-    end
+    jass.TriggerAddAction(trg, TrigActions)
 end
 init()
 return ____exports

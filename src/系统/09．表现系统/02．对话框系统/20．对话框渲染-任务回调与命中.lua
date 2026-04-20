@@ -72,7 +72,7 @@ local function resolveQuestCallbackByTriggerPlayer(self)
         local aid = getActivePlayerId(nil)
         if aid >= 0 and __TS__ArrayIndexOf(questPids, aid) >= 0 then
             pid = aid
-        elseif type(japi.DzGetTriggerUIEventPlayer) == "function" then
+        else
             local triggerPlayer = japi.DzGetTriggerUIEventPlayer()
             local tpid = dzGetPlayerId(nil, triggerPlayer)
             if tpid >= 0 and __TS__ArrayIndexOf(questPids, tpid) >= 0 then
@@ -216,9 +216,7 @@ end
 -- 非点击端 `DzGetTriggerUIEventFrame` 可能为 0：用与「等点击」一致的 `setActivePlayerId` 回退（勿扫全表，易与各端 waiting 状态漂移冲突 → 误 advance）。
 local function dialogPanelHitCallback(self)
     local hitFrame = 0
-    if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        hitFrame = japi.DzGetTriggerUIEventFrame()
-    end
+    hitFrame = japi.DzGetTriggerUIEventFrame()
     if hitFrame and hitFrame ~= 0 then
         do
             local i = 0
@@ -226,15 +224,15 @@ local function dialogPanelHitCallback(self)
                 do
                     local s = g_states[i + 1]
                     if not s then
-                        goto __continue40
+                        goto __continue39
                     end
                     if s.frames[5] ~= hitFrame and s.frames[4] ~= hitFrame and s.frames[3] ~= hitFrame and s.frames[12] ~= hitFrame and s.frames[13] ~= hitFrame then
-                        goto __continue40
+                        goto __continue39
                     end
                     handleDialogPanelClick(nil, s)
                     return
                 end
-                ::__continue40::
+                ::__continue39::
                 i = i + 1
             end
         end
@@ -283,14 +281,14 @@ local function skipDialogLocal(self)
             do
                 local st = g_states[i + 1]
                 if not st or #st.queue == 0 then
-                    goto __continue51
+                    goto __continue50
                 end
                 if dzPlayer(nil, i) == localPlayer then
                     state = st
                     break
                 end
             end
-            ::__continue51::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -343,7 +341,7 @@ local function skipDialogLocal(self)
         skipTyping(nil, state)
     end
     local hitFrame = state.frames[5]
-    if hitFrame and hitFrame ~= 0 and type(japi.DzClickFrame) == "function" then
+    if hitFrame and hitFrame ~= 0 then
         local guard = 0
         while #state.queue > 0 and not state.queue[1].isQuest and guard < 256 do
             guard = guard + 1

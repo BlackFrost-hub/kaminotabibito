@@ -62,10 +62,10 @@ function resolvePlayerIdFromTrigger(this: void): number | undefined {
   if (typeof (jass as any).STES_GetTriggerPlayer === "function") {
     pl = (jass as any).STES_GetTriggerPlayer();
   }
-  if (pl == null && typeof jass.GetTriggerPlayer === "function") {
+  if (pl == null) {
     pl = jass.GetTriggerPlayer();
   }
-  if (pl != null && typeof jass.GetPlayerId === "function") {
+  if (pl != null) {
     const id = jass.GetPlayerId(pl);
     if (typeof id === "number" && id >= 0 && id < 16) return id;
   }
@@ -158,10 +158,6 @@ export function registerSimpleSTESBridgeEvent(
   onEvent: () => void,
   debugMsg: string,
 ): void {
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    debugPrint(`JASS API 不完整，无法注册${debugMsg}事件`);
-    return;
-  }
   if (STES_Register == null) {
     debugPrint(`STES_Register 不可用，无法注册${debugMsg}事件`);
     return;
@@ -187,10 +183,6 @@ export function registerSimpleSTESBridgeEvent(
 }
 
 function init(): void {
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    debugPrint("[任务STES] JASS API 不完整，跳过注册");
-    return;
-  }
   if (STES_Register == null) {
     debugPrint("[任务STES] STES_Register 不可用，跳过注册");
     return;

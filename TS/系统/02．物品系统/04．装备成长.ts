@@ -180,16 +180,16 @@ function addHeroXP(unit: any, amount: number): void {
   if (amount <= 0) return;
   const chunk = Math.floor(amount / 10);
   for (let i = 0; i < 10; i++) {
-    if (typeof (jass as any).AddHeroXP === "function") (jass as any).AddHeroXP(unit, chunk, true);
+    (jass as any).AddHeroXP(unit, chunk, true);
   }
   const remainder = amount - chunk * 10;
-  if (remainder > 0 && typeof (jass as any).AddHeroXP === "function") {
+  if (remainder > 0) {
     (jass as any).AddHeroXP(unit, remainder, true);
   }
 }
 
 function getHeroLevel(unit: any): number {
-  return typeof (jass as any).GetHeroLevel === "function" ? (jass as any).GetHeroLevel(unit) : 1;
+  return (jass as any).GetHeroLevel(unit);
 }
 
 /**
@@ -198,29 +198,25 @@ function getHeroLevel(unit: any): number {
  * dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
  */
 function getPctStatValue(unit: any, key: string): number {
-  if (key === "int") return typeof (jass as any).GetHeroInt === "function" ? (jass as any).GetHeroInt(unit, true) : 0;
-  if (key === "str") return typeof (jass as any).GetHeroStr === "function" ? (jass as any).GetHeroStr(unit, true) : 0;
-  if (key === "agi") return typeof (jass as any).GetHeroAgi === "function" ? (jass as any).GetHeroAgi(unit, true) : 0;
-  if (key === "hp")  return typeof (jass as any).GetUnitState === "function" ? (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(1)) : 0;
-  if (key === "mp")  return typeof (jass as any).GetUnitState === "function" ? (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(3)) : 0;
-  if (key === "dmg") return typeof (jass as any).GetUnitState === "function" ? (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x15)) : 0;
-  if (key === "armor") return typeof (jass as any).GetUnitState === "function" ? (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x20)) : 0;
+  if (key === "int") return (jass as any).GetHeroInt(unit, true);
+  if (key === "str") return (jass as any).GetHeroStr(unit, true);
+  if (key === "agi") return (jass as any).GetHeroAgi(unit, true);
+  if (key === "hp")  return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(1));
+  if (key === "mp")  return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(3));
+  if (key === "dmg") return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x15));
+  if (key === "armor") return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x20));
   return 0;
 }
 
 /** 对 unit 所属玩家的金币做一次百分比加减（pct 可负） */
 function applyGoldPct(unit: any, pct: number): void {
-  if (typeof (jass as any).GetOwningPlayer !== "function") return;
   const player = (jass as any).GetOwningPlayer(unit);
   if (!player) return;
   const stateGold = (jass as any).ConvertPlayerState(1);
-  const cur: number = typeof (jass as any).GetPlayerState === "function"
-    ? (jass as any).GetPlayerState(player, stateGold) : 0;
+  const cur: number = (jass as any).GetPlayerState(player, stateGold);
   const delta = Math.round(cur * pct);
   const newVal = cur + delta < 0 ? 0 : cur + delta;
-  if (typeof (jass as any).SetPlayerState === "function") {
-    (jass as any).SetPlayerState(player, stateGold, newVal);
-  }
+  (jass as any).SetPlayerState(player, stateGold, newVal);
 }
 
 function executeSegment(unit: any, seg: Segment): void {
@@ -244,7 +240,7 @@ function executeSegment(unit: any, seg: Segment): void {
     } else if (eff.type === "level") {
       const cur = getHeroLevel(unit);
       const add = eff.isLevelMult ? Math.floor(cur * eff.value) : Math.floor(eff.value);
-      if (add > 0 && typeof (jass as any).SetHeroLevel === "function") {
+      if (add > 0) {
         (jass as any).SetHeroLevel(unit, cur + add, true);
       }
     } else if (eff.type === "stat" && eff.key !== undefined && eff.key !== "") {
@@ -270,21 +266,21 @@ function executeSegment(unit: any, seg: Segment): void {
       const capturedUnit = unit;
       const capturedPct = goldPct;
       let remaining = Math.floor(seg.timeSec);
-      const dt = typeof (jass as any).CreateTimer === "function" ? (jass as any).CreateTimer() : undefined;
-      if (dt && typeof (jass as any).TimerStart === "function") {
+      const dt = (jass as any).CreateTimer();
+      if (dt) {
         const t = dt;
         (jass as any).TimerStart(t, 1.0, true, () => {
           // 检查单位是否死亡，死亡则销毁计时器
-          if (capturedUnit && typeof (jass as any).IsUnitType === "function") {
+          if (capturedUnit) {
             if ((jass as any).IsUnitType(capturedUnit, (jass as any).UNIT_TYPE_DEAD)) {
-              if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+              (jass as any).DestroyTimer(t);
               return;
             }
           }
           applyGoldPct(capturedUnit, capturedPct);
           remaining = remaining - 1;
           if (remaining <= 0) {
-            if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+            (jass as any).DestroyTimer(t);
           }
         });
       }
@@ -312,12 +308,12 @@ function executeSegment(unit: any, seg: Segment): void {
     if (seg.timeSec > 0) {
       const capturedStats: { name: string; key: string; value: number }[] = statEffects;
       const capturedUnit = unit;
-      const dt = typeof (jass as any).CreateTimer === "function" ? (jass as any).CreateTimer() : undefined;
-      if (dt && typeof (jass as any).TimerStart === "function") {
+      const dt = (jass as any).CreateTimer();
+      if (dt) {
         const t = dt;
         (jass as any).TimerStart(t, seg.timeSec, false, () => {
           applyStats(capturedUnit, capturedStats, false);
-          if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+          (jass as any).DestroyTimer(t);
         });
       }
     }
@@ -325,14 +321,12 @@ function executeSegment(unit: any, seg: Segment): void {
 }
 
 function onUseItem(): void {
-  const unit = typeof (jass as any).GetManipulatingUnit === "function"
-    ? (jass as any).GetManipulatingUnit() : undefined;
-  const item = typeof (jass as any).GetManipulatedItem === "function"
-    ? (jass as any).GetManipulatedItem() : undefined;
+  const unit = (jass as any).GetManipulatingUnit();
+  const item = (jass as any).GetManipulatedItem();
   if (!unit || !item) return;
-  if (typeof (jass as any).IsUnitType === "function" && jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
-  const itemId = typeof (jass as any).GetItemTypeId === "function" ? (jass as any).GetItemTypeId(item) : 0;
+  if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
+  if ((jass as any).IsUnitIllusionBJ(unit)) return;
+  const itemId = (jass as any).GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
   const entry = (itemsData as Record<string, { PowerUP?: string }>)[idStr];
   if (!entry || !entry.PowerUP) return;
@@ -342,12 +336,12 @@ function onUseItem(): void {
   const key = "__EquipPowerUP_" + tostring(unit) + "_" + idStr;
   if (glob[key]) return;
   glob[key] = true;
-  const ct = typeof (jass as any).CreateTimer === "function" ? (jass as any).CreateTimer() : undefined;
-  if (ct && typeof (jass as any).TimerStart === "function") {
+  const ct = (jass as any).CreateTimer();
+  if (ct) {
     const t = ct;
     (jass as any).TimerStart(t, 0.5, false, () => {
       glob[key] = undefined;
-      if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(t);
+      (jass as any).DestroyTimer(t);
     });
   }
 

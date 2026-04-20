@@ -52,15 +52,15 @@ end
 function ____exports.calcEquipHealHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local maxHp = type(jass.GetUnitState) == "function" and jass.GetUnitState(
+    local maxHp = jass.GetUnitState(
         unit,
         jass.ConvertUnitState(1)
-    ) or 0
-    local curHp = type(jass.GetWidgetLife) == "function" and jass.GetWidgetLife(unit) or 0
-    local maxMp = type(jass.GetUnitState) == "function" and jass.GetUnitState(
+    )
+    local curHp = jass.GetWidgetLife(unit)
+    local maxMp = jass.GetUnitState(
         unit,
         jass.ConvertUnitState(3)
-    ) or 0
+    )
     local lostHp = maxHp - curHp
     for ____, rawToken in ipairs(tokens) do
         local waitIdx = (string.find(rawToken, ":wait", nil, true) or 0) - 1
@@ -99,9 +99,6 @@ function ____exports.sumHealFromItemData(self, unit, item, itemsData, fourCCToSt
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return {hp = 0, mp = 0, ok = false}
     end
-    if type(jass.GetItemTypeId) ~= "function" then
-        return {hp = 0, mp = 0, ok = false}
-    end
     local itemId = jass.GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
@@ -117,13 +114,13 @@ function ____exports.sumHealFromItemData(self, unit, item, itemsData, fourCCToSt
             do
                 local seg = segments[i + 1]
                 if seg.abilId == "" then
-                    goto __continue30
+                    goto __continue29
                 end
                 local c = ____exports.calcEquipHealHpMp(nil, seg.tokens, unit)
                 hp = hp + c.hp
                 mp = mp + c.mp
             end
-            ::__continue30::
+            ::__continue29::
             i = i + 1
         end
     end

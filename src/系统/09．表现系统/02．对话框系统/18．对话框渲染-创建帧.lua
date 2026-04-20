@@ -62,13 +62,7 @@ function ____exports.createDialogFrames(self)
         dzSetAlpha(nil, f, 255)
         dzSetTexture(nil, f, "")
     end
-    local ____temp_0
-    if type(japi.DzGetGameUI) == "function" then
-        ____temp_0 = japi.DzGetGameUI()
-    else
-        ____temp_0 = 0
-    end
-    local gameUI = ____temp_0
+    local gameUI = japi.DzGetGameUI()
     local bg = createFrame(nil, {
         type = FrameType.BACKDROP,
         name = "DialogBG",
@@ -97,25 +91,15 @@ function ____exports.createDialogFrames(self)
     }) or 0
     frames[5] = bgBtn
     if bgBtn ~= 0 then
-        if type(japi.DzFrameSetParent) == "function" then
-            pcall(function () return japi.DzFrameSetParent(bgBtn, bg) end
-            )
-        end
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            pcall(function () return japi.DzFrameClearAllPoints(bgBtn) end
-            )
-        end
-        if type(japi.DzFrameSetAllPoints) == "function" then
-            pcall(function () return japi.DzFrameSetAllPoints(bgBtn, bg) end
-            )
-        end
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(bgBtn, "")
-        end
-        if type(japi.DzFrameSetAlpha) == "function" then
-            pcall(function () return japi.DzFrameSetAlpha(bgBtn, 0) end
-            )
-        end
+        pcall(function () return japi.DzFrameSetParent(bgBtn, bg) end
+        )
+        pcall(function () return japi.DzFrameClearAllPoints(bgBtn) end
+        )
+        pcall(function () return japi.DzFrameSetAllPoints(bgBtn, bg) end
+        )
+        japi.DzFrameSetText(bgBtn, "")
+        pcall(function () return japi.DzFrameSetAlpha(bgBtn, 0) end
+        )
     end
     bindDialogPanelHitFrame(nil, bgBtn)
     local titleBg = dzCreate(nil, "GameUI", TAG_BASE_MAIN + 2)
@@ -136,14 +120,14 @@ function ____exports.createDialogFrames(self)
     frames[3] = nameText
     dzShow(nil, nameText, false)
     dzClearPoints(nil, nameText)
-    if nameText ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+    if nameText ~= 0 then
         pcall(function () return japi.DzFrameSetAllPoints(nameText, titleBg) end
         )
     end
     dzSetText(nil, nameText, "")
     dzSetFont(nil, nameText, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE)
     dzSetEnable(nil, nameText, false)
-    if nameText ~= 0 and type(japi.DzFrameSetTextAlignment) == "function" then
+    if nameText ~= 0 then
         pcall(function ()
                 japi.DzFrameSetTextAlignment(nameText, -1)
                 japi.DzFrameSetTextAlignment(nameText, 18)
@@ -173,13 +157,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[6] = acceptBg
-    if acceptBg ~= 0 and type(japi.DzFrameSetAbsolutePoint) == "function" then
+    if acceptBg ~= 0 then
         japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.18)
     end
-    if acceptBg ~= 0 and type(japi.DzFrameSetSize) == "function" then
+    if acceptBg ~= 0 then
         japi.DzFrameSetSize(acceptBg, 0.08, 0.022)
     end
-    if acceptBg ~= 0 and type(japi.DzFrameSetTexture) == "function" then
+    if acceptBg ~= 0 then
         japi.DzFrameSetTexture(acceptBg, "UI\\renwu\\jieshourenwuanniu.tga", 0)
     end
     local acceptLabel = createFrame(nil, {
@@ -190,13 +174,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[10] = acceptLabel
-    if acceptLabel ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+    if acceptLabel ~= 0 then
         japi.DzFrameSetAllPoints(acceptLabel, acceptBg)
     end
-    if acceptLabel ~= 0 and type(japi.DzFrameSetText) == "function" then
+    if acceptLabel ~= 0 then
         japi.DzFrameSetText(acceptLabel, "接受任务")
     end
-    if acceptLabel ~= 0 and type(japi.DzFrameSetTextColor) == "function" then
+    if acceptLabel ~= 0 then
         japi.DzFrameSetTextColor(
             acceptLabel,
             255,
@@ -205,10 +189,10 @@ function ____exports.createDialogFrames(self)
             255
         )
     end
-    if acceptLabel ~= 0 and type(japi.DzFrameSetFont) == "function" then
+    if acceptLabel ~= 0 then
         japi.DzFrameSetFont(acceptLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0)
     end
-    if acceptLabel ~= 0 and type(japi.DzFrameSetTextAlignment) == "function" then
+    if acceptLabel ~= 0 then
         japi.DzFrameSetTextAlignment(acceptLabel, 18)
     end
     local acceptBtn = createFrame(nil, {
@@ -219,13 +203,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[7] = acceptBtn
-    if acceptBtn ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+    if acceptBtn ~= 0 then
         japi.DzFrameSetAllPoints(acceptBtn, acceptBg)
     end
-    if acceptBtn ~= 0 and type(japi.DzFrameSetAlpha) == "function" then
+    if acceptBtn ~= 0 then
         japi.DzFrameSetAlpha(acceptBtn, 0)
     end
-    if acceptBtn ~= 0 and type(japi.DzFrameSetText) == "function" then
+    if acceptBtn ~= 0 then
         japi.DzFrameSetText(acceptBtn, "")
     end
     local rejectBg = createFrame(nil, {
@@ -236,13 +220,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[8] = rejectBg
-    if rejectBg ~= 0 and type(japi.DzFrameSetAbsolutePoint) == "function" then
+    if rejectBg ~= 0 then
         japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.18)
     end
-    if rejectBg ~= 0 and type(japi.DzFrameSetSize) == "function" then
+    if rejectBg ~= 0 then
         japi.DzFrameSetSize(rejectBg, 0.08, 0.022)
     end
-    if rejectBg ~= 0 and type(japi.DzFrameSetTexture) == "function" then
+    if rejectBg ~= 0 then
         japi.DzFrameSetTexture(rejectBg, "UI\\renwu\\jieshourenwuanniu.tga", 0)
     end
     local rejectLabel = createFrame(nil, {
@@ -253,13 +237,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[11] = rejectLabel
-    if rejectLabel ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+    if rejectLabel ~= 0 then
         japi.DzFrameSetAllPoints(rejectLabel, rejectBg)
     end
-    if rejectLabel ~= 0 and type(japi.DzFrameSetText) == "function" then
+    if rejectLabel ~= 0 then
         japi.DzFrameSetText(rejectLabel, "拒绝任务")
     end
-    if rejectLabel ~= 0 and type(japi.DzFrameSetTextColor) == "function" then
+    if rejectLabel ~= 0 then
         japi.DzFrameSetTextColor(
             rejectLabel,
             255,
@@ -268,10 +252,10 @@ function ____exports.createDialogFrames(self)
             255
         )
     end
-    if rejectLabel ~= 0 and type(japi.DzFrameSetFont) == "function" then
+    if rejectLabel ~= 0 then
         japi.DzFrameSetFont(rejectLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0)
     end
-    if rejectLabel ~= 0 and type(japi.DzFrameSetTextAlignment) == "function" then
+    if rejectLabel ~= 0 then
         japi.DzFrameSetTextAlignment(rejectLabel, 18)
     end
     local rejectBtn = createFrame(nil, {
@@ -282,13 +266,13 @@ function ____exports.createDialogFrames(self)
         visible = false
     }) or 0
     frames[9] = rejectBtn
-    if rejectBtn ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+    if rejectBtn ~= 0 then
         japi.DzFrameSetAllPoints(rejectBtn, rejectBg)
     end
-    if rejectBtn ~= 0 and type(japi.DzFrameSetAlpha) == "function" then
+    if rejectBtn ~= 0 then
         japi.DzFrameSetAlpha(rejectBtn, 0)
     end
-    if rejectBtn ~= 0 and type(japi.DzFrameSetText) == "function" then
+    if rejectBtn ~= 0 then
         japi.DzFrameSetText(rejectBtn, "")
     end
     local hintLabel = createFrame(nil, {
@@ -300,30 +284,20 @@ function ____exports.createDialogFrames(self)
     }) or 0
     frames[12] = hintLabel
     if hintLabel ~= 0 then
-        if type(japi.DzFrameSetPoint) == "function" then
-            pcall(function () return japi.DzFrameSetPoint(
-                    hintLabel,
-                    8,
-                    bg,
-                    8,
-                    -0.008,
-                    0.008
-                ) end
-            )
-        end
-        if type(japi.DzFrameSetSize) == "function" then
-            japi.DzFrameSetSize(hintLabel, 0.12, 0.018)
-        end
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(hintLabel, "|cff333333[点击以继续] ↓|r")
-        end
-        if type(japi.DzFrameSetFont) == "function" then
-            japi.DzFrameSetFont(hintLabel, DEFAULT_FONT, 0.016, 0)
-        end
-        if type(japi.DzFrameSetTextAlignment) == "function" then
-            japi.DzFrameSetTextAlignment(hintLabel, -1)
-            japi.DzFrameSetTextAlignment(hintLabel, 5)
-        end
+        pcall(function () return japi.DzFrameSetPoint(
+                hintLabel,
+                8,
+                bg,
+                8,
+                -0.008,
+                0.008
+            ) end
+        )
+        japi.DzFrameSetSize(hintLabel, 0.12, 0.018)
+        japi.DzFrameSetText(hintLabel, "|cff333333[点击以继续] ↓|r")
+        japi.DzFrameSetFont(hintLabel, DEFAULT_FONT, 0.016, 0)
+        japi.DzFrameSetTextAlignment(hintLabel, -1)
+        japi.DzFrameSetTextAlignment(hintLabel, 5)
     end
     local skipHintLabel = createFrame(nil, {
         type = FrameType.TEXT,
@@ -334,30 +308,20 @@ function ____exports.createDialogFrames(self)
     }) or 0
     frames[13] = skipHintLabel
     if skipHintLabel ~= 0 then
-        if type(japi.DzFrameSetPoint) == "function" then
-            pcall(function () return japi.DzFrameSetPoint(
-                    skipHintLabel,
-                    0,
-                    titleBg,
-                    2,
-                    0.005,
-                    -0.022
-                ) end
-            )
-        end
-        if type(japi.DzFrameSetSize) == "function" then
-            japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018)
-        end
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r")
-        end
-        if type(japi.DzFrameSetFont) == "function" then
-            japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0)
-        end
-        if type(japi.DzFrameSetTextAlignment) == "function" then
-            japi.DzFrameSetTextAlignment(skipHintLabel, -1)
-            japi.DzFrameSetTextAlignment(skipHintLabel, 4)
-        end
+        pcall(function () return japi.DzFrameSetPoint(
+                skipHintLabel,
+                0,
+                titleBg,
+                2,
+                0.005,
+                -0.022
+            ) end
+        )
+        japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018)
+        japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r")
+        japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0)
+        japi.DzFrameSetTextAlignment(skipHintLabel, -1)
+        japi.DzFrameSetTextAlignment(skipHintLabel, 4)
     end
     bindDialogPanelHitFrame(nil, nameText)
     bindDialogPanelHitFrame(nil, bodyText)

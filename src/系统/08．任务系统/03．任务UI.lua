@@ -98,9 +98,6 @@ function TaskUI.prototype.____constructor(self)
 end
 function TaskUI.prototype.init(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return

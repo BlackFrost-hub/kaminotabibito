@@ -29,7 +29,6 @@ const DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030";
 const ACTIVATION_RANGE = 300;
 /** 有坐标时 CreateUnit 的所属玩家：中立被动（common.j 的 PLAYER_NEUTRAL_PASSIVE，一般为 15） */
 function neutralPassivePlayer(): any {
-  if (typeof (jass as any).Player !== "function") return null;
   const pid =
     (jass as any).PLAYER_NEUTRAL_PASSIVE != null ? (jass as any).PLAYER_NEUTRAL_PASSIVE : 15;
   return (jass as any).Player(pid);
@@ -54,10 +53,8 @@ function resolveGgUnitByKey(unitKey: string): any {
 function formatGgUnitProbe(u: any): string {
   if (u == null || u === 0) return "nil/0";
   let tail = "";
-  if (typeof (jass as any).GetUnitTypeId === "function") {
-    tail = " typeId=" + (jass as any).GetUnitTypeId(u);
-  }
-  if (typeof (jass as any).GetUnitState === "function" && (jass as any).UNIT_STATE_LIFE != null) {
+  tail = " typeId=" + (jass as any).GetUnitTypeId(u);
+  if ((jass as any).UNIT_STATE_LIFE != null) {
     tail = tail + " life=" + (jass as any).GetUnitState(u, (jass as any).UNIT_STATE_LIFE);
   }
   return "ok" + tail;
@@ -66,7 +63,6 @@ function formatGgUnitProbe(u: any): string {
 /** 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil） */
 function scheduleDebugGgUnitHtow0030(): void {
   if (!DEBUG_GG_UNIT_HTOW_0030) return;
-  if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
   const key = DEBUG_GG_UNIT_HTOW_KEY;
   const runSnapshot = (label: string): void => {
     const gg = g as any;
@@ -86,13 +82,11 @@ function scheduleDebugGgUnitHtow0030(): void {
       formatGgUnitProbe(vj) +
       " | globalThis=" +
       formatGgUnitProbe(vG);
-    if (typeof (jass as any).DisplayTimedTextToPlayer === "function" && typeof (jass as any).Player === "function") {
-      for (let pi = 0; pi < 4; pi++) {
-        (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
-      }
+    for (let pi = 0; pi < 4; pi++) {
+      (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
     }
     const pr = (globalThis as any).print;
-    if (typeof pr === "function") pr(msg);
+    pr(msg);
   };
   withTimer(0.0, () => {
     runSnapshot("0s");
@@ -124,7 +118,7 @@ function resolveWatchUnit(cfg: PointConfig): any {
     const four = stringToFourCC(cfg.UnitID.substring(0, 4));
     if (four === 0) return null;
     const passive = neutralPassivePlayer();
-    if (passive == null || typeof (jass as any).CreateUnit !== "function") return null;
+    if (passive == null) return null;
     const face =
       typeof (jass as any).bj_UNIT_FACING === "number" ? (jass as any).bj_UNIT_FACING : 270;
     const u = (jass as any).CreateUnit(passive, four, tx, ty, face);
@@ -143,8 +137,6 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
 
   if (
     cfg.UnitID != null &&
-    typeof (jass as any).SetUnitOwner === "function" &&
-    typeof (jass as any).Player === "function" &&
     watchUnit != null &&
     watchUnit !== 0
   ) {
@@ -152,7 +144,7 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
     if (p6) (jass as any).SetUnitOwner(watchUnit, p6, true);
   }
 
-  if (cfg.reveal != null && typeof (jass as any).SetFogStateRect === "function" && typeof (jass as any).Player === "function") {
+  if (cfg.reveal != null) {
     const revealRect = gg[cfg.reveal];
     if (revealRect) {
       const mode = (jass as any).FOG_OF_WAR_VISIBLE;
@@ -162,32 +154,23 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
 
   if (
     cfg.text != null &&
-    typeof (jass as any).DisplayTimedTextToPlayer === "function" &&
-    typeof (jass as any).Player === "function"
+    true
   ) {
     for (let i = 0; i < 4; i++) {
       (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 8, cfg.text);
     }
   }
 
-  if (typeof (jass as any).GetLocalPlayer === "function" && typeof (jass as any).Player === "function") {
-    const localPlayer = (jass as any).GetLocalPlayer();
-    for (let i = 0; i < 4; i++) {
-      if (localPlayer === (jass as any).Player(i)) {
-        Sound3DII_Mp3Play(ACTIVATION_SOUND);
-        break;
-      }
+  const localPlayer = (jass as any).GetLocalPlayer();
+  for (let i = 0; i < 4; i++) {
+    if (localPlayer === (jass as any).Player(i)) {
+      Sound3DII_Mp3Play(ACTIVATION_SOUND);
+      break;
     }
   }
 }
 
 function registerOnePoint(cfg: PointConfig, key: string): void {
-  if (typeof (jass as any).CreateTrigger !== "function" || typeof (jass as any).TriggerAddAction !== "function") return;
-  if (typeof (jass as any).TriggerRegisterUnitInRange !== "function") {
-    dbg("缺少 TriggerRegisterUnitInRange");
-    return;
-  }
-
   const watchUnit = resolveWatchUnit(cfg);
   if (watchUnit == null || watchUnit === 0) {
     dbg("跳过：无有效监视单位 " + key);
@@ -200,13 +183,11 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
   let fired = false;
   (jass as any).TriggerAddAction(trig, () => {
     if (fired) return;
-    const enterer = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : null;
+    const enterer = (jass as any).GetTriggerUnit();
     if (enterer == null || enterer === 0) return;
     fired = true;
     runActivationEffects(cfg, watchUnit);
-    if (typeof (jass as any).DestroyTrigger === "function") {
-      (jass as any).DestroyTrigger(trig);
-    }
+    (jass as any).DestroyTrigger(trig);
   });
 }
 

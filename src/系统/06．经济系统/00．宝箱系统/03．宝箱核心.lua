@@ -35,7 +35,7 @@ function showTextTag(unit, text, red, green, blue)
     })
 end
 function getUnitId(unit)
-    if not unit or type(jass.GetHandleId) ~= "function" then
+    if not unit then
         return 0
     end
     return jass.GetHandleId(unit)
@@ -76,10 +76,8 @@ function fireStesEvent(eventName, opener, target)
     end
 end
 function cleanupOpening(data, interrupted)
-    if type(jass.DzUnitDisableAttack) == "function" then
-        jass.DzUnitDisableAttack(data.unit, false)
-    end
-    if data.progressBar and type(jass.RemoveUnit) == "function" then
+    jass.DzUnitDisableAttack(data.unit, false)
+    if data.progressBar then
         jass.RemoveUnit(data.progressBar)
     end
     if interrupted then
@@ -179,9 +177,7 @@ function startOpening(unit, target, openTime)
             ____opt_35(jass, progressBar, flyHeight, 0)
         end
     end
-    if type(jass.DzUnitDisableAttack) == "function" then
-        jass.DzUnitDisableAttack(unit, true)
-    end
+    jass.DzUnitDisableAttack(unit, true)
     local ____opt_37 = jass.GetDestructableX
     if ____opt_37 ~= nil then
         ____opt_37 = ____opt_37(jass, target)
@@ -294,12 +290,12 @@ function updateAllOpening()
                         dropItemsFromChest(nil, targetTypeStr, x, y)
                     end
                     fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target)
-                    if data.target and type(jass.KillDestructable) == "function" then
+                    if data.target then
                         jass.KillDestructable(data.target)
                     end
                 end
                 cleanupOpening(data, not completed and interrupted)
-                goto __continue29
+                goto __continue27
             end
             data.elapsed = data.elapsed + UPDATE_INTERVAL
             if data.progressBar then
@@ -331,7 +327,7 @@ function updateAllOpening()
                 end
             end
         end
-        ::__continue29::
+        ::__continue27::
     end
     for ____, ____value in __TS__Iterator(movingMap) do
         local unitId = ____value[1]

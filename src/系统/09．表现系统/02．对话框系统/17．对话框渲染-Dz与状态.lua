@@ -19,116 +19,87 @@ ____exports.KEY_SKIP_DIALOG = 192
 ____exports.g_states = {}
 ____exports.g_questCallbacksByPlayer = {}
 function ____exports.dzShow(self, f, b)
-    if f and f ~= 0 and type(japi.DzFrameShow) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameShow(f, b)
     end
 end
 function ____exports.dzSetText(self, f, s)
-    if f and f ~= 0 and type(japi.DzFrameSetText) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetText(f, s)
     end
 end
 function ____exports.dzSetTexture(self, f, path)
-    if f and f ~= 0 and type(japi.DzFrameSetTexture) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetTexture(f, path, 0)
     end
 end
 function ____exports.dzSetAlpha(self, f, a)
-    if f and f ~= 0 and type(japi.DzFrameSetAlpha) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetAlpha(f, a)
     end
 end
 function ____exports.dzSetPriority(self, f, p)
-    if f and f ~= 0 and type(japi.DzFrameSetPriority) == "function" then
+    if f and f ~= 0 then
         pcall(function () return japi.DzFrameSetPriority(f, p) end
         )
     end
 end
 function ____exports.dzSetAbsPoint(self, f, point, x, y)
-    if f and f ~= 0 and type(japi.DzFrameSetAbsolutePoint) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetAbsolutePoint(f, point, x, y)
     end
 end
 function ____exports.dzSetSize(self, f, w, h)
-    if f and f ~= 0 and type(japi.DzFrameSetSize) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetSize(f, w, h)
     end
 end
 function ____exports.dzClearPoints(self, f)
-    if f and f ~= 0 and type(japi.DzFrameClearAllPoints) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameClearAllPoints(f)
     end
 end
 function ____exports.dzSetEnable(self, f, b)
-    if f and f ~= 0 and type(japi.DzFrameSetEnable) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetEnable(f, b)
     end
 end
 function ____exports.dzSetFont(self, f, font, size)
-    if f and f ~= 0 and type(japi.DzFrameSetFont) == "function" then
+    if f and f ~= 0 then
         japi.DzFrameSetFont(f, font, size, 0)
     end
 end
 function ____exports.dzCreate(self, template, tag)
-    local ____temp_0
-    if type(japi.DzGetGameUI) == "function" then
-        ____temp_0 = japi.DzGetGameUI()
-    else
-        ____temp_0 = 0
-    end
-    local gameUI = ____temp_0
+    local gameUI = japi.DzGetGameUI()
     if not gameUI or gameUI == 0 then
-        return 0
-    end
-    if type(japi.DzCreateFrame) ~= "function" then
         return 0
     end
     return japi.DzCreateFrame(template, gameUI, tag)
 end
 function ____exports.dzGetLocalPlayer(self)
-    local ____temp_1
-    if type(jass.GetLocalPlayer) == "function" then
-        ____temp_1 = jass.GetLocalPlayer()
-    else
-        ____temp_1 = nil
-    end
-    return ____temp_1
+    return jass.GetLocalPlayer()
 end
 function ____exports.dzGetPlayerId(self, p)
-    return type(jass.GetPlayerId) == "function" and jass.GetPlayerId(p) or -1
+    return jass.GetPlayerId(p)
 end
 function ____exports.dzPlayer(self, index)
-    local ____temp_2
-    if type(jass.Player) == "function" then
-        ____temp_2 = jass.Player(index)
-    else
-        ____temp_2 = nil
-    end
-    return ____temp_2
+    return jass.Player(index)
 end
 function ____exports.dzTimerCreate(self)
-    local ____temp_3
-    if type(jass.CreateTimer) == "function" then
-        ____temp_3 = jass.CreateTimer()
-    else
-        ____temp_3 = nil
-    end
-    return ____temp_3
+    return jass.CreateTimer()
 end
 function ____exports.dzTimerStart(self, t, timeout, periodic, cb)
-    if t and type(jass.TimerStart) == "function" then
+    if t then
         jass.TimerStart(t, timeout, periodic, cb)
     end
 end
 function ____exports.dzTimerPause(self, t)
-    if t and type(jass.PauseTimer) == "function" then
+    if t then
         jass.PauseTimer(t)
     end
 end
 function ____exports.dzLoadToc(self)
-    if type(japi.DzLoadToc) == "function" then
-        japi.DzLoadToc(____exports.TOC_PATH)
-    end
+    japi.DzLoadToc(____exports.TOC_PATH)
 end
 local g_tocLoaded = false
 function ____exports.dzLoadTocOnce(self)

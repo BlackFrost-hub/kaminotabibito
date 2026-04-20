@@ -19,9 +19,6 @@ function ____exports.createFrame(self, config)
     if id == nil then
         id = 0
     end
-    if type(japi.DzCreateFrameByTagName) ~= "function" then
-        return nil
-    end
     if ____type == FrameType.SIMPLEFRAME then
         return nil
     end
@@ -35,19 +32,19 @@ function ____exports.createFrame(self, config)
     if frame == nil or frame == 0 then
         return nil
     end
-    if config.visible ~= nil and type(japi.DzFrameShow) == "function" then
+    if config.visible ~= nil then
         pcall(function () return japi.DzFrameShow(frame, config.visible) end
         )
     end
-    if config.enable == false and type(japi.DzFrameSetEnable) == "function" then
+    if config.enable == false then
         pcall(function () return japi.DzFrameSetEnable(frame, false) end
         )
     end
-    if config.alpha ~= nil and type(japi.DzFrameSetAlpha) == "function" then
+    if config.alpha ~= nil then
         pcall(function () return japi.DzFrameSetAlpha(frame, config.alpha) end
         )
     end
-    if config.level ~= nil and type(japi.DzFrameSetLevel) == "function" then
+    if config.level ~= nil then
         pcall(function () return japi.DzFrameSetLevel(frame, config.level) end
         )
     end
@@ -62,25 +59,17 @@ function ____exports.loadTocOnce(self, tocLoadKey, tocPaths, debugPrefix)
         return
     end
     __tocLoadedOnce[tocLoadKey] = true
-    if type(japi.DzLoadToc) ~= "function" then
-        return
-    end
     for ____, p in ipairs(tocPaths) do
         local ok = pcall(function () return japi.DzLoadToc(p) end
         )
         if not ok then
             local pr = _G.print
-            if type(pr) == "function" then
-                pr((("[" .. debugPrefix) .. "] DzLoadToc fail: ") .. p)
-            end
+            pr((("[" .. debugPrefix) .. "] DzLoadToc fail: ") .. p)
         end
     end
 end
 function ____exports.tryCreateFromFdfSafe(self, frameName, parent, fallback, opts)
     ____exports.loadTocOnce(nil, opts.tocLoadKey, opts.tocPaths, opts.debugPrefix or "UI")
-    if type(japi.DzCreateFrame) ~= "function" then
-        return fallback(nil)
-    end
     local f = 0
     local ok = pcall(function ()
             f = japi.DzCreateFrame(frameName, parent, 0)

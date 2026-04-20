@@ -10,9 +10,6 @@ function ____exports.DzTriggerRegisterMouseEventTrg(self, trg, status, btn)
     if trg == nil then
         return
     end
-    if type(japi.DzTriggerRegisterMouseEvent) ~= "function" then
-        return
-    end
     japi.DzTriggerRegisterMouseEvent(
         trg,
         btn,
@@ -30,9 +27,6 @@ function ____exports.DzTriggerRegisterKeyEventTrg(self, trg, status, btn)
     if trg == nil then
         return
     end
-    if type(japi.DzTriggerRegisterKeyEvent) ~= "function" then
-        return
-    end
     japi.DzTriggerRegisterKeyEvent(
         trg,
         btn,
@@ -48,9 +42,6 @@ function ____exports.DzTriggerRegisterMouseMoveEventTrg(self, trg)
     if trg == nil then
         return
     end
-    if type(japi.DzTriggerRegisterMouseMoveEvent) ~= "function" then
-        return
-    end
     japi.DzTriggerRegisterMouseMoveEvent(trg, true, nil)
 end
 --- 注册鼠标滚轮事件触发器
@@ -60,9 +51,6 @@ function ____exports.DzTriggerRegisterMouseWheelEventTrg(self, trg)
     if trg == nil then
         return
     end
-    if type(japi.DzTriggerRegisterMouseWheelEvent) ~= "function" then
-        return
-    end
     japi.DzTriggerRegisterMouseWheelEvent(trg, true, nil)
 end
 --- 注册窗口大小改变事件触发器
@@ -70,9 +58,6 @@ end
 -- @param trg 触发器
 function ____exports.DzTriggerRegisterWindowResizeEventTrg(self, trg)
     if trg == nil then
-        return
-    end
-    if type(japi.DzTriggerRegisterWindowResizeEvent) ~= "function" then
         return
     end
     japi.DzTriggerRegisterWindowResizeEvent(trg, true, nil)
@@ -97,23 +82,14 @@ end
 -- 
 -- @param trig 触发器
 function ____exports.DzTriggerRegisterMallItemSyncData(self, trig)
-    if type(japi.DzTriggerRegisterSyncData) ~= "function" then
-        return
-    end
     japi.DzTriggerRegisterSyncData(trig, "DZMIA", true)
 end
 --- 获取触发商城物品的玩家
 function ____exports.DzGetTriggerMallItemPlayer(self)
-    if type(japi.DzGetTriggerSyncPlayer) ~= "function" then
-        return nil
-    end
     return japi.DzGetTriggerSyncPlayer()
 end
 --- 获取触发的商城物品
 function ____exports.DzGetTriggerMallItem(self)
-    if type(japi.DzGetTriggerSyncData) ~= "function" then
-        return ""
-    end
     return japi.DzGetTriggerSyncData() or ""
 end
 return ____exports

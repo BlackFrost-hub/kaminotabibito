@@ -35,23 +35,23 @@ const ENGINE_SPEED_LIMIT = 522;
 const SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx";
 
 function hid(h: any): number {
-  return typeof jass.GetHandleId === "function" ? ((jass.GetHandleId(h) as number) || 0) : 0;
+  return (jass.GetHandleId(h) as number) || 0;
 }
 
 function getUnitX(u: any): number {
-  return typeof jass.GetUnitX === "function" ? ((jass.GetUnitX(u) as number) || 0) : 0;
+  return (jass.GetUnitX(u) as number) || 0;
 }
 
 function getUnitY(u: any): number {
-  return typeof jass.GetUnitY === "function" ? ((jass.GetUnitY(u) as number) || 0) : 0;
+  return (jass.GetUnitY(u) as number) || 0;
 }
 
 function getUnitFacing(u: any): number {
-  return typeof jass.GetUnitFacing === "function" ? ((jass.GetUnitFacing(u) as number) || 0) : 0;
+  return (jass.GetUnitFacing(u) as number) || 0;
 }
 
 function getUnitMoveSpeed(u: any): number {
-  return typeof jass.GetUnitMoveSpeed === "function" ? ((jass.GetUnitMoveSpeed(u) as number) || 0) : 0;
+  return (jass.GetUnitMoveSpeed(u) as number) || 0;
 }
 
 function clampSpeed(speed: number): number {
@@ -88,9 +88,7 @@ function addSpeedEffect(u: any): any {
   if (!u) return null;
 
   // 创建特效并绑定到单位
-  const effect = typeof jass.AddSpecialEffectTarget === "function"
-    ? jass.AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin")
-    : null;
+  const effect = jass.AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin");
 
   return effect;
 }
@@ -101,9 +99,7 @@ function addSpeedEffect(u: any): any {
 function removeSpeedEffect(effect: any): void {
   if (!effect) return;
 
-  if (typeof jass.DestroyEffect === "function") {
-    jass.DestroyEffect(effect);
-  }
+  jass.DestroyEffect(effect);
 }
 
 function doEvent(entry: SpeedEntry): void {
@@ -117,7 +113,7 @@ function doEvent(entry: SpeedEntry): void {
     return;
   }
 
-  const currentOrder = typeof jass.GetUnitCurrentOrder === "function" ? jass.GetUnitCurrentOrder(u) : 0;
+  const currentOrder = jass.GetUnitCurrentOrder(u);
 
   if (currentOrder !== ORDER_MOVE && currentOrder !== ORDER_SMART) {
     entry.lx = getUnitX(u);
@@ -145,16 +141,16 @@ function doEvent(entry: SpeedEntry): void {
       const ny = y + moveDist * Math.sin(rad);
 
       if (X_IsTerrainWalkable(nx, ny)) {
-        if (typeof jass.SetUnitX === "function") jass.SetUnitX(u, nx);
-        if (typeof jass.SetUnitY === "function") jass.SetUnitY(u, ny);
+        jass.SetUnitX(u, nx);
+        jass.SetUnitY(u, ny);
         entry.lx = nx;
         entry.ly = ny;
       } else {
         const ableX = X_GetAbleX();
         const ableY = X_GetAbleY();
         if (ableX !== 0 || ableY !== 0) {
-          if (typeof jass.SetUnitX === "function") jass.SetUnitX(u, ableX);
-          if (typeof jass.SetUnitY === "function") jass.SetUnitY(u, ableY);
+          jass.SetUnitX(u, ableX);
+          jass.SetUnitY(u, ableY);
           entry.lx = ableX;
           entry.ly = ableY;
         } else {
@@ -225,11 +221,11 @@ function removeEntry(uid: number): void {
     entry.effect = null;
   }
 
-  if (entry.tempTimer && typeof jass.DestroyTimer === "function") {
+  if (entry.tempTimer) {
     jass.DestroyTimer(entry.tempTimer);
     entry.tempTimer = null;
   }
-  if (entry.t && typeof jass.DestroyTrigger === "function") {
+  if (entry.t) {
     jass.DestroyTrigger(entry.t);
     entry.t = null;
   }
@@ -253,44 +249,40 @@ function removeEntry(uid: number): void {
  * 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
  */
 function syncEntryOrderDestination(e: SpeedEntry): void {
-  const tgtU = typeof jass.GetOrderTargetUnit === "function" ? jass.GetOrderTargetUnit() : null;
+  const tgtU = jass.GetOrderTargetUnit();
   if (tgtU != null && tgtU !== 0) {
     e.tx = getUnitX(tgtU);
     e.ty = getUnitY(tgtU);
     return;
   }
-  const tgtIt = typeof jass.GetOrderTargetItem === "function" ? jass.GetOrderTargetItem() : null;
+  const tgtIt = jass.GetOrderTargetItem();
   if (tgtIt != null && tgtIt !== 0) {
-    e.tx = typeof jass.GetItemX === "function" ? ((jass.GetItemX(tgtIt) as number) || 0) : 0;
-    e.ty = typeof jass.GetItemY === "function" ? ((jass.GetItemY(tgtIt) as number) || 0) : 0;
+    e.tx = (jass.GetItemX(tgtIt) as number) || 0;
+    e.ty = (jass.GetItemY(tgtIt) as number) || 0;
     return;
   }
-  e.tx = typeof jass.GetOrderPointX === "function" ? ((jass.GetOrderPointX() as number) || 0) : 0;
-  e.ty = typeof jass.GetOrderPointY === "function" ? ((jass.GetOrderPointY() as number) || 0) : 0;
+  e.tx = (jass.GetOrderPointX() as number) || 0;
+  e.ty = (jass.GetOrderPointY() as number) || 0;
 }
 
 function createTriggerForEntry(entry: SpeedEntry): void {
-  const t = typeof jass.CreateTrigger === "function" ? jass.CreateTrigger() : null;
+  const t = jass.CreateTrigger();
   entry.t = t;
 
   if (t == null) return;
 
   const uid = entry.uid;
 
-  if (typeof jass.TriggerRegisterUnitEvent === "function") {
-    jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
-    const evTarget = (jass as any).EVENT_UNIT_ISSUED_TARGET_ORDER;
-    if (evTarget != null) {
-      jass.TriggerRegisterUnitEvent(t, entry.u, evTarget);
-    }
+  jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
+  const evTarget = (jass as any).EVENT_UNIT_ISSUED_TARGET_ORDER;
+  if (evTarget != null) {
+    jass.TriggerRegisterUnitEvent(t, entry.u, evTarget);
   }
-  if (typeof jass.TriggerAddAction === "function") {
-    jass.TriggerAddAction(t, () => {
-      const e = entryMap[uid];
-      if (e == null) return;
-      syncEntryOrderDestination(e);
-    });
-  }
+  jass.TriggerAddAction(t, () => {
+    const e = entryMap[uid];
+    if (e == null) return;
+    syncEntryOrderDestination(e);
+  });
 }
 
 /**
@@ -315,7 +307,7 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
   const existing = entryMap[uid];
   if (existing != null) {
     // 已存在，更新速度，取消临时计时器
-    if (existing.tempTimer && typeof jass.DestroyTimer === "function") {
+    if (existing.tempTimer) {
       jass.DestroyTimer(existing.tempTimer);
       existing.tempTimer = null;
     }
@@ -381,7 +373,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
 
   if (existing != null) {
     // 已存在，更新速度，取消之前的临时计时器
-    if (existing.tempTimer && typeof jass.DestroyTimer === "function") {
+    if (existing.tempTimer) {
       jass.DestroyTimer(existing.tempTimer);
       existing.tempTimer = null;
     }
@@ -419,7 +411,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
   const current = entryMap[uid];
   if (current == null) return;
 
-  const tempT = typeof jass.CreateTimer === "function" ? jass.CreateTimer() : null;
+  const tempT = jass.CreateTimer();
   current.tempTimer = tempT;
 
   if (tempT) {

@@ -78,13 +78,7 @@ function runRegionRule(rule: string, unit: any, owner: any): void {
   if (items.length === 0 || totalWeight <= 0) return;
 
   // 用 JASS 的随机整数避免 Lua math.random 细节问题
-  let r: number;
-  if (typeof (jass as any).GetRandomInt === "function") {
-    r = (jass as any).GetRandomInt(1, totalWeight);
-  } else {
-    const m = (math as any);
-    r = typeof m.random === "function" ? m.random(1, totalWeight) : 1;
-  }
+  let r = (jass as any).GetRandomInt(1, totalWeight);
 
   let chosen: Item | undefined;
   for (const it of items) {
@@ -98,29 +92,25 @@ function runRegionRule(rule: string, unit: any, owner: any): void {
 
   // 获取单位名称，用于替换提示里的 {unit}
   let unitName = "单位";
-  if (typeof (jass as any).GetUnitName === "function") {
-    const n = (jass as any).GetUnitName(unit);
-    if (n != null) unitName = tostring(n);
-  }
+  const n = (jass as any).GetUnitName(unit);
+  if (n != null) unitName = tostring(n);
   const formatText = (raw?: string): string | undefined => {
     if (!raw) return undefined;
     return raw.split("{unit}").join(unitName);
   };
 
   if (chosen.action === "KillUnit") {
-    if (typeof (jass as any).KillUnit === "function") {
-      (jass as any).KillUnit(unit);
-    }
+    (jass as any).KillUnit(unit);
     const msg = formatText(chosen.text);
-    if (msg && owner != null && typeof (jass as any).DisplayTimedTextToPlayer === "function") {
+    if (msg && owner != null) {
       (jass as any).DisplayTimedTextToPlayer(owner, 0, 0, 8, msg);
     }
   } else if (chosen.action === "Teleport") {
-    if (typeof (jass as any).SetUnitPosition === "function" && chosen.x != null && chosen.y != null) {
+    if (chosen.x != null && chosen.y != null) {
       (jass as any).SetUnitPosition(unit, chosen.x, chosen.y);
     }
     const msg = formatText(undefined);
-    if (msg && owner != null && typeof (jass as any).DisplayTimedTextToPlayer === "function") {
+    if (msg && owner != null) {
       (jass as any).DisplayTimedTextToPlayer(owner, 0, 0, 8, msg);
     }
   }
@@ -128,7 +118,6 @@ function runRegionRule(rule: string, unit: any, owner: any): void {
 
 // 实际初始化逻辑：创建所有启用的 Region 并注册同一个进入触发
 function initRegionTeleport(): void {
-  if (typeof (jass as any).CreateTrigger !== "function") return;
   const trig = (jass as any).CreateTrigger();
 
   let total = 0;
@@ -148,41 +137,25 @@ function initRegionTeleport(): void {
     const cfg = (区域传送配置 as Record<string, RegionConfig>)[k];
     if (cfg == null || !cfg.enabled) continue;
 
-    if (typeof (jass as any).CreateRegion !== "function") continue;
     const region = (jass as any).CreateRegion();
     // dbg("已创建区域: " + cfg.id);
 
-    if (typeof (jass as any).Rect !== "function") continue;
     const rect = (jass as any).Rect(cfg.left, cfg.bottom, cfg.right, cfg.top);
-    if (typeof (jass as any).RegionAddRect === "function") {
-      (jass as any).RegionAddRect(region, rect);
-    }
-    if (typeof (jass as any).TriggerRegisterEnterRegion === "function") {
-      (jass as any).TriggerRegisterEnterRegion(trig, region, null);
-    }
+    (jass as any).RegionAddRect(region, rect);
+    (jass as any).TriggerRegisterEnterRegion(trig, region, null);
     // dbg("已注册区域: " + cfg.id);
     regionMap.set(region, cfg);
   }
 
   const onEnter = (): void => {
-    const unit =
-      typeof (jass as any).GetTriggerUnit === "function"
-        ? (jass as any).GetTriggerUnit()
-        : null;
-    const region =
-      typeof (jass as any).GetTriggeringRegion === "function"
-        ? (jass as any).GetTriggeringRegion()
-        : null;
+    const unit = (jass as any).GetTriggerUnit();
+    const region = (jass as any).GetTriggeringRegion();
     // dbg("单位进入区域，region=" + (region != null ? "(handle)" : "null"));
     if (unit == null || region == null) return;
     // 前置条件：不处理中立敌对单位
-    const owner =
-      typeof (jass as any).GetOwningPlayer === "function"
-        ? (jass as any).GetOwningPlayer(unit)
-        : null;
+    const owner = (jass as any).GetOwningPlayer(unit);
     if (
       owner != null &&
-      typeof (jass as any).Player === "function" &&
       (jass as any).PLAYER_NEUTRAL_AGGRESSIVE != null
     ) {
       const neutralAgg = (jass as any).Player(
@@ -204,31 +177,23 @@ function initRegionTeleport(): void {
       return;
     }
     // dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
-    if (typeof (jass as any).SetUnitPosition === "function") {
-      (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
-    }
-    if (typeof (jass as any).IssueImmediateOrder === "function") {
-      (jass as any).IssueImmediateOrder(unit, "stop");
-    }
+    (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
+    (jass as any).IssueImmediateOrder(unit, "stop");
     // dbg("传送完成");
     const player = owner;
     if (player != null) {
       StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
-      if (typeof (jass as any).DisplayTimedTextToPlayer === "function") {
-        (jass as any).DisplayTimedTextToPlayer(
-          player,
-          0,
-          0,
-          8,
-          cfg.text
-        );
-      }
+      (jass as any).DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        8,
+        cfg.text
+      );
     }
   };
 
-  if (typeof (jass as any).TriggerAddAction === "function") {
-    (jass as any).TriggerAddAction(trig, onEnter);
-  }
+  (jass as any).TriggerAddAction(trig, onEnter);
 }
 
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */

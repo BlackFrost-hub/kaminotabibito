@@ -77,15 +77,6 @@ export class QuestManager {
     const quest = (questDB as any).globalData?.quests.get(questId);
     if (!quest || !quest.timeLimit || quest.timeLimit <= 0) return;
 
-    if (
-      typeof jass.CreateTimer !== "function" ||
-      typeof jass.TimerStart !== "function" ||
-      typeof jass.GetExpiredTimer !== "function"
-    ) {
-      questDebugPrint("计时器API不可用，无法设置时间限制");
-      return;
-    }
-
     const timer = jass.CreateTimer();
     if (!timer) return;
 
@@ -102,12 +93,8 @@ export class QuestManager {
         QuestManager.getInstance().onQuestFailed(data.playerId, data.questId);
         (globalThis as any).__questTimers.delete(expired);
       }
-      if (typeof jass.PauseTimer === "function") {
-        jass.PauseTimer(expired);
-      }
-      if (typeof jass.DestroyTimer === "function") {
-        jass.DestroyTimer(expired);
-      }
+      jass.PauseTimer(expired);
+      jass.DestroyTimer(expired);
     });
 
     questDebugPrint(`已为任务 ${questId} 设置 ${quest.timeLimit} 秒时间限制`);
@@ -142,7 +129,7 @@ export class QuestManager {
 
     const success = questDB.abandonQuest(playerId, questId);
     if (success) {
-      if (nativeHandle && typeof jass.DestroyQuest === "function") {
+      if (nativeHandle) {
         jass.DestroyQuest(nativeHandle);
       }
 

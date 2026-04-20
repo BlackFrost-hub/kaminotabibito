@@ -115,7 +115,7 @@ export function fireMultiKillEvent(): void {
   dbg(`  killWindow=${killWindow !== undefined && killWindow !== 0 ? killWindow : "nil/0"}`);
   dbg(`  killThreshold=${killThreshold !== undefined && killThreshold !== 0 ? killThreshold : "nil/0"}`);
   dbg(
-    `  killGroup内单位数=${killGroup !== 0 && killGroup != null && typeof jass.CountUnitsInGroup === "function" ? jass.CountUnitsInGroup(killGroup) : "N/A"}`
+    `  killGroup内单位数=${killGroup !== 0 && killGroup != null ? jass.CountUnitsInGroup(killGroup) : "N/A"}`
   );
 
   if (killGroup == null || killGroup === 0) {

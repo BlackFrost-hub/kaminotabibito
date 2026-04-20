@@ -6,7 +6,6 @@ const jass = require("jass.common") as any;
 /** Lua 下单位作表键时，伤害回调的 target 与选中枚举的 sole 可能不是同一 userdata；统一用 GetHandleId 作键。 */
 export function unitHid(u: any): number {
   if (u == null || u === 0) return 0;
-  if (typeof (jass as any).GetHandleId !== "function") return 0;
   return (jass as any).GetHandleId(u) as number;
 }
 

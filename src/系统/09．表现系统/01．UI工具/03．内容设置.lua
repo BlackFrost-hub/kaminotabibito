@@ -9,7 +9,7 @@ function ____exports.setFrameTexture(self, frame, texture)
     if frame == 0 or frame == nil then
         return false
     end
-    if texture and type(japi.DzFrameSetTexture) == "function" then
+    if texture ~= "" then
         japi.DzFrameSetTexture(frame, texture, 0)
     end
     return true
@@ -54,7 +54,7 @@ function ____exports.setFrameHoverEvents(self, frame, onEnter, onLeave, sync)
     return true
 end
 function ____exports.setButtonText(self, frame, text)
-    if not frame or type(japi.DzFrameSetText) ~= "function" then
+    if not frame then
         return false
     end
     japi.DzFrameSetText(frame, text)

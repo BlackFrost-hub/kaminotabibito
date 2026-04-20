@@ -32,9 +32,6 @@ function toHid(self, u)
         local n = __TS__ParseInt(u, 10)
         return __TS__NumberIsNaN(__TS__Number(n)) and 0 or n
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return 0
-    end
     return jass.GetHandleId(u)
 end
 function pruneEmptyHid(self, hid)
@@ -54,7 +51,7 @@ end
 function notifyDotBuffExpiredFromPool(self, buffID, hid)
     pcall(function ()
             local m = require("系统.04．伤害系统.02．dot伤害")
-            if m ~= nil and type(m.clearDotByBuffPoolExpire) == "function" then
+            if m ~= nil then
                 m:clearDotByBuffPoolExpire(buffID, hid)
             end
         end
@@ -63,7 +60,7 @@ end
 function syncDotFromPoolTick(self)
     pcall(function ()
             local m = require("系统.04．伤害系统.02．dot伤害")
-            if m ~= nil and type(m.syncDotRemainingFromBuffPool) == "function" then
+            if m ~= nil then
                 m:syncDotRemainingFromBuffPool()
             end
         end
@@ -85,14 +82,14 @@ function tickBuffPool(self)
         do
             local hid = toHid(nil, hidKey)
             if hid == 0 then
-                goto __continue60
+                goto __continue59
             end
             local entry = unitToBuffs[hid]
             if entry == nil then
-                goto __continue60
+                goto __continue59
             end
             if isBuffPoolUnitPaused(nil, entry.lastRef) then
-                goto __continue60
+                goto __continue59
             end
             local tab = entry.buffs
             local expired = {}
@@ -100,7 +97,7 @@ function tickBuffPool(self)
                 do
                     local row = tab[bid]
                     if row == nil then
-                        goto __continue64
+                        goto __continue63
                     end
                     row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
                     if row.remaining <= 0 then
@@ -110,7 +107,7 @@ function tickBuffPool(self)
                         expired[#expired + 1] = bid
                     end
                 end
-                ::__continue64::
+                ::__continue63::
             end
             do
                 local ei = 0
@@ -121,7 +118,7 @@ function tickBuffPool(self)
             end
             pruneEmptyHid(nil, hid)
         end
-        ::__continue60::
+        ::__continue59::
     end
     syncDotFromPoolTick(nil)
     maybeStopSyncTimer(nil)

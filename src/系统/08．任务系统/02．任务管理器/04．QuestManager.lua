@@ -68,10 +68,6 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
     if not quest or not quest.timeLimit or quest.timeLimit <= 0 then
         return
     end
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" or type(jass.GetExpiredTimer) ~= "function" then
-        questDebugPrint(nil, "计时器API不可用，无法设置时间限制")
-        return
-    end
     local timer = jass.CreateTimer()
     if not timer then
         return
@@ -103,12 +99,8 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
                 ____exports.QuestManager:getInstance():onQuestFailed(data.playerId, data.questId)
                 _G.__questTimers:delete(expired)
             end
-            if type(jass.PauseTimer) == "function" then
-                jass.PauseTimer(expired)
-            end
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(expired)
-            end
+            jass.PauseTimer(expired)
+            jass.DestroyTimer(expired)
         end
     )
     questDebugPrint(
@@ -149,7 +141,7 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     local nativeHandle = ____opt_result_10
     local success = questDB:abandonQuest(playerId, questId)
     if success then
-        if nativeHandle and type(jass.DestroyQuest) == "function" then
+        if nativeHandle then
             jass.DestroyQuest(nativeHandle)
         end
         self:triggerUIRefresh(playerId, questId)

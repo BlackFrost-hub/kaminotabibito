@@ -20,10 +20,6 @@ local STES_Register = ____require_result_0.STES_Register
 local function debugPrint(self, msg)
 end
 local function registerObjectiveUpdateEvent(self)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        debugPrint(nil, "JASS API 不完整，无法注册目标更新事件")
-        return
-    end
     local trig = jass.CreateTrigger()
     jass.TriggerAddAction(
         trig,

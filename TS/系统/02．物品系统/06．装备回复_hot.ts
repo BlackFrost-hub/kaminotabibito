@@ -34,11 +34,9 @@ export function parseEquipHealSegments(hotStr: string, abilList: string): EquipH
 export function calcEquipHealHpMp(tokens: string[], unit: any): { hp: number; mp: number } {
   let hp = 0;
   let mp = 0;
-  const maxHp: number =
-    typeof jass.GetUnitState === "function" ? (jass.GetUnitState(unit, jass.ConvertUnitState(1)) as number) : 0;
-  const curHp: number = typeof jass.GetWidgetLife === "function" ? (jass.GetWidgetLife(unit) as number) : 0;
-  const maxMp: number =
-    typeof jass.GetUnitState === "function" ? (jass.GetUnitState(unit, jass.ConvertUnitState(3)) as number) : 0;
+  const maxHp: number = jass.GetUnitState(unit, jass.ConvertUnitState(1)) as number;
+  const curHp: number = jass.GetWidgetLife(unit) as number;
+  const maxMp: number = jass.GetUnitState(unit, jass.ConvertUnitState(3)) as number;
   const lostHp = maxHp - curHp;
 
   for (const rawToken of tokens) {
@@ -82,7 +80,6 @@ export function sumHealFromItemData(
   fourCCToString: (four: number) => string,
 ): { hp: number; mp: number; ok: boolean } {
   if (unit == null || unit === 0 || item == null || item === 0) return { hp: 0, mp: 0, ok: false };
-  if (typeof jass.GetItemTypeId !== "function") return { hp: 0, mp: 0, ok: false };
   const itemId = jass.GetItemTypeId(item) as number;
   const idStr = fourCCToString(itemId);
   const entry = itemsData[idStr];

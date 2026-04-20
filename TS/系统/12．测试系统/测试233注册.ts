@@ -89,19 +89,8 @@ function bindKeyBN_once_min(): void {
   g.__keytest_bound = true;
 
   const japi = require("jass.japi") as any;
-  if (
-    typeof (jass as any).CreateTrigger !== "function" ||
-    typeof (jass as any).DisplayTimedTextToPlayer !== "function" ||
-    typeof (jass as any).Player !== "function"
-  ) {
-    pr("[keytest] missing basic jass funcs");
-    return;
-  }
 
-  if (typeof japi.DzTriggerRegisterKeyEventByCode !== "function") {
-    pr("[keytest] DzTriggerRegisterKeyEventByCode not function");
-    return;
-  }
+
 
   const bind = (key: number, label: string) => {
     const trig = (jass as any).CreateTrigger();
@@ -128,12 +117,6 @@ function onChat233(): void {
 }
 
 function init(): void {
-  if (
-    typeof (jass as any).CreateTrigger !== "function" ||
-    typeof (jass as any).TriggerAddAction !== "function" ||
-    typeof (jass as any).TriggerRegisterPlayerChatEvent !== "function" ||
-    typeof (jass as any).Player !== "function"
-  ) return;
   const tr = (jass as any).CreateTrigger();
   (jass as any).TriggerRegisterPlayerChatEvent(tr, (jass as any).Player(0), "233", true);
   (jass as any).TriggerAddAction(tr, onChat233);

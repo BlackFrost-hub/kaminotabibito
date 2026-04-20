@@ -27,7 +27,6 @@ function typeIdToUnitId(typeId: number): string | undefined {
 
 function onDeath(dying: any, killer: any): void {
   if (dying == null) return;
-  if (typeof (jass as any).GetUnitTypeId !== "function") return;
   const typeId = (jass as any).GetUnitTypeId(dying) as number;
   const unitId = typeIdToUnitId(typeId);
   const entry = unitId ? (idData as Record<string, DropBerserkEntry>)[unitId] : undefined;
@@ -42,23 +41,15 @@ function onDeath(dying: any, killer: any): void {
   let x = 0;
   let y = 0;
   let facingDeg = 270;
-  if (typeof (jass as any).GetUnitX === "function" && typeof (jass as any).GetUnitY === "function") {
-    x = (jass as any).GetUnitX(dying) as number;
-    y = (jass as any).GetUnitY(dying) as number;
-  }
-  if (typeof (jass as any).GetUnitFacingDegrees === "function") {
-    facingDeg = (jass as any).GetUnitFacingDegrees(dying) as number;
-  } else if (typeof (jass as any).GetUnitFacing === "function") {
-    facingDeg = ((jass as any).GetUnitFacing(dying) as number) * (180 / 3.14159265359);
-  }
+  x = (jass as any).GetUnitX(dying) as number;
+  y = (jass as any).GetUnitY(dying) as number;
+  facingDeg = ((jass as any).GetUnitFacing(dying) as number) * (180 / 3.14159265359);
 
   const four = stringToFourCC(spawnUnitId.substring(0, 4));
-  const owner = typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(dying) : (jass as any).Player(15);
+  const owner = (jass as any).GetOwningPlayer(dying);
   let created: any = undefined;
-  if (typeof (jass as any).CreateUnit === "function") {
-    created = (jass as any).CreateUnit(owner, four, x, y, facingDeg);
-  }
-  const killerPlayer = killer && typeof (jass as any).GetOwningPlayer === "function" ? (jass as any).GetOwningPlayer(killer) : undefined;
+  created = (jass as any).CreateUnit(owner, four, x, y, facingDeg);
+  const killerPlayer = killer ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
     EXSetUnitFacing(created, facingDeg);
     CameraShakeForPlayer(killerPlayer, 20, 3.0);

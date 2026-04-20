@@ -11,10 +11,6 @@ export function StarOther_PanCameraToTimedUnitForPlayer(
   u: any,
   duration: number
 ): void {
-  if (typeof jass.GetLocalPlayer !== "function") return;
-  if (typeof jass.GetUnitX !== "function" || typeof jass.GetUnitY !== "function") return;
-  if (typeof jass.PanCameraToTimed !== "function") return;
-
   if (jass.GetLocalPlayer() === whichPlayer) {
     jass.PanCameraToTimed(jass.GetUnitX(u), jass.GetUnitY(u), duration);
   }
@@ -34,10 +30,8 @@ export function StarOther_PanCameraToTimedForPlayer(
   y: number,
   duration: number
 ): void {
-  if (typeof jass.GetLocalPlayer !== "function") return;
   const localPlayer = jass.GetLocalPlayer();
   if (localPlayer !== whichPlayer) return;
-  if (typeof jass.PanCameraToTimed !== "function") return;
   jass.PanCameraToTimed(x, y, duration);
 }
 

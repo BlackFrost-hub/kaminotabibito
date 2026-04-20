@@ -46,7 +46,7 @@ function resolveQuestCallbackByTriggerPlayer(): { state: PlayerDialogState; ques
     const aid = getActivePlayerId();
     if (aid >= 0 && questPids.indexOf(aid) >= 0) {
       pid = aid;
-    } else if (typeof japi.DzGetTriggerUIEventPlayer === "function") {
+    } else {
       const triggerPlayer = japi.DzGetTriggerUIEventPlayer();
       const tpid = dzGetPlayerId(triggerPlayer);
       if (tpid >= 0 && questPids.indexOf(tpid) >= 0) pid = tpid;
@@ -148,9 +148,7 @@ function handleDialogPanelClick(state: PlayerDialogState): void {
  */
 function dialogPanelHitCallback(): void {
   let hitFrame: Frame = 0;
-  if (typeof (japi as any).DzGetTriggerUIEventFrame === "function") {
-    hitFrame = (japi as any).DzGetTriggerUIEventFrame() as Frame;
-  }
+  hitFrame = (japi as any).DzGetTriggerUIEventFrame() as Frame;
   if (hitFrame && hitFrame !== 0) {
     for (let i = 0; i < MAX_PLAYERS; i++) {
       const s = g_states[i];
@@ -234,7 +232,7 @@ function skipDialogLocal(): void {
   // 用 DzClickFrame 模拟点击背景帧（frames[4]），触发 sync=true 的 dialogPanelHitCallback
   // 连续点击直到队列全部清空（每次 DzClickFrame 相当于玩家点击一次面板）
   const hitFrame = state.frames[4];
-  if (hitFrame && hitFrame !== 0 && typeof (japi as any).DzClickFrame === "function") {
+  if (hitFrame && hitFrame !== 0) {
     let guard = 0;
     while (state.queue.length > 0 && !state.queue[0].isQuest && guard < 256) {
       guard++;

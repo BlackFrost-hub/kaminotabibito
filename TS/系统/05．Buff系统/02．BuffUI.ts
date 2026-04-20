@@ -98,9 +98,8 @@ function formatDotTooltip(
 
 function tryDzFrameSetTooltipF2i(hostFrame: number, tooltipFrame: number): void {
   if (!hostFrame || hostFrame === 0 || !tooltipFrame || tooltipFrame === 0) return;
-  if (typeof (japi as any).DzFrameSetTooltip !== "function") return;
   (pcall as any)(() => {
-    const tipId = typeof (japi as any).DzF2I === "function" ? (japi as any).DzF2I(tooltipFrame) : tooltipFrame;
+    const tipId = (japi as any).DzF2I(tooltipFrame);
     (japi as any).DzFrameSetTooltip(hostFrame, tipId);
   });
 }
@@ -125,28 +124,16 @@ let lastBuffUiDbgKey = "";
 
 function debugBuffUi(msg: string): void {
   if (!BUFF_UI_DEBUG) return;
-  if (typeof (jass as any).GetLocalPlayer !== "function" || typeof (jass as any).DisplayTextToPlayer !== "function") return;
   const p = (jass as any).GetLocalPlayer();
   (jass as any).DisplayTextToPlayer(p, 0, 0, "[BuffUI] " + msg);
 }
 
 function countSelectedForPlayer(p: any): { n: number; sole: any } {
   if (!p || p === 0) return { n: 0, sole: null };
-  if (typeof (jass as any).CreateGroup !== "function") return { n: 0, sole: null };
   const g = (jass as any).CreateGroup();
-  const useSelectedNative = typeof (jass as any).GroupEnumUnitsSelected === "function";
+  const useSelectedNative = true;
   if (useSelectedNative) {
     (jass as any).GroupEnumUnitsSelected(g, p, null as any);
-  } else {
-    if (
-      typeof (jass as any).IsUnitSelected !== "function" ||
-      typeof (jass as any).GetWorldBounds !== "function" ||
-      typeof (jass as any).GroupEnumUnitsInRect !== "function"
-    ) {
-      (jass as any).DestroyGroup(g);
-      return { n: 0, sole: null };
-    }
-    (jass as any).GroupEnumUnitsInRect(g, (jass as any).GetWorldBounds(), null as any);
   }
   let n = 0;
   let sole: any = null;
@@ -170,7 +157,6 @@ function getSoleSelectedUnitForPlayer(p: any): any {
 
 function isUnitRefLikelyValid(u: any): boolean {
   if (u == null || u === 0) return false;
-  if (typeof (jass as any).GetUnitTypeId !== "function") return true;
   const tid = (jass as any).GetUnitTypeId(u) as number;
   return tid != null && tid !== 0;
 }
@@ -184,10 +170,7 @@ function collectBuffRows(unit: any): BuffBarRow[] {
     const rt = buffPoolMod.getBuffRuntime(unit, bid);
     if (rt != null) {
       const real = rt.remaining;
-      const iconRem =
-        typeof buffPoolMod.getDotIconDisplayRemaining === "function"
-          ? buffPoolMod.getDotIconDisplayRemaining(unit, bid, real)
-          : real;
+      const iconRem = buffPoolMod.getDotIconDisplayRemaining(unit, bid, real);
       const row: BuffBarRow = {
         id: bid,
         state: {
@@ -232,18 +215,11 @@ function hideAllSlots(): void {
 
 function syncBuffBar(): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") {
-      hideAllSlots();
-      return;
-    }
     const lp = jass.GetLocalPlayer();
     if (lp == null || lp === 0) return;
 
     const { n: selN, sole } = countSelectedForPlayer(lp);
-    const hid =
-      sole != null && sole !== 0 && typeof (jass as any).GetHandleId === "function"
-        ? ((jass as any).GetHandleId(sole) as number)
-        : 0;
+    const hid = sole != null && sole !== 0 ? ((jass as any).GetHandleId(sole) as number) : 0;
     const soleOk = sole != null && sole !== 0 && isUnitRefLikelyValid(sole);
     const inPool = soleOk && buffPoolMod.isUnitInBuffPool(sole);
     const rtD001 = soleOk ? buffPoolMod.getBuffRuntime(sole, "D001") : null;
@@ -306,13 +282,13 @@ function syncBuffBar(): void {
             "」|r";
       (pcall as any)(() => UI工具.setFrameTexture(slot.root, iconTex));
       const remStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
-      if (slot.remainText && slot.remainText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
+      if (slot.remainText && slot.remainText !== 0) {
         if (lastRemainStrBySlot[i] !== remStr) {
           lastRemainStrBySlot[i] = remStr;
           (pcall as any)(() => (japi as any).DzFrameSetText(slot.remainText, "|cffffffff" + remStr + "|r"));
         }
       }
-      if (slot.tipText && slot.tipText !== 0 && typeof (japi as any).DzFrameSetText === "function") {
+      if (slot.tipText && slot.tipText !== 0) {
         if (lastTipStrBySlot[i] !== tipStr) {
           lastTipStrBySlot[i] = tipStr;
           (pcall as any)(() => (japi as any).DzFrameSetText(slot.tipText, tipStr));
@@ -343,7 +319,7 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
     (pcall as any)(() => UI工具.setFramePosition(bd, { point: UI工具.FramePoint.TOPLEFT, x, y: BUFF_BAR_Y }));
     (pcall as any)(() => UI工具.setFrameSize(bd, { width: ICON_W, height: ICON_H }));
     (pcall as any)(() => UI工具.setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp"));
-    if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(bd, 180));
+    (pcall as any)(() => (japi as any).DzFrameSetLevel(bd, 180));
 
     const remainText =
       UI工具.createTextLabel(
@@ -360,12 +336,10 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
         { width: ICON_W, height: 0.014 }
       ) || 0;
     if (remainText && remainText !== 0) {
-      if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
-        (pcall as any)(() => {
-          (japi as any).DzFrameSetTextAlignment(remainText, UI工具.FramePoint.CENTER);
-        });
-      }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(remainText, 182));
+      (pcall as any)(() => {
+        (japi as any).DzFrameSetTextAlignment(remainText, UI工具.FramePoint.CENTER);
+      });
+      (pcall as any)(() => (japi as any).DzFrameSetLevel(remainText, 182));
     }
 
     const hit =
@@ -378,9 +352,9 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
         enable: true,
         alpha: 0,
       }) || 0;
-    if (hit && hit !== 0 && typeof (japi as any).DzFrameSetAllPoints === "function") {
+    if (hit && hit !== 0) {
       (pcall as any)(() => (japi as any).DzFrameSetAllPoints(hit, bd));
-      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(hit, 181));
+      (pcall as any)(() => (japi as any).DzFrameSetLevel(hit, 181));
       (pcall as any)(() => UI工具.setFrameHoverEvents(
         hit,
         () => {
@@ -420,7 +394,7 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
       ));
       (pcall as any)(() => UI工具.setFrameSize(tipBox, { width: boxW, height: boxH }));
       (pcall as any)(() => UI工具.setFrameTexture(tipBox, TIP_BOX_TEX));
-      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(tipBox, 0));
+      (pcall as any)(() => (japi as any).DzFrameSetLevel(tipBox, 0));
       (pcall as any)(() => UI工具.hideFrame(tipBox));
     }
 
@@ -435,12 +409,10 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
         { width: boxW * 0.92, height: boxH * 0.88 }
       ) || 0;
     if (tipText && tipText !== 0) {
-      if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
-        (pcall as any)(() => {
-          (japi as any).DzFrameSetTextAlignment(tipText, 0);
-        });
-      }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (pcall as any)(() => (japi as any).DzFrameSetLevel(tipText, 0));
+      (pcall as any)(() => {
+        (japi as any).DzFrameSetTextAlignment(tipText, 0);
+      });
+      (pcall as any)(() => (japi as any).DzFrameSetLevel(tipText, 0));
       (pcall as any)(() => UI工具.hideFrame(tipText));
     }
 
@@ -461,7 +433,6 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
 
 function createUi(): void {
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null || lp === 0) return;
     const parent = 硬件函数.getGameUI();
@@ -498,7 +469,6 @@ function startRefreshTimer(): void {
       if (_refreshCounter >= 10) {  // 10 * 10ms = 100ms = 0.1秒
         _refreshCounter = 0;
         (pcall as any)(() => {
-          if (typeof jass.GetLocalPlayer !== "function") return;
           const lp = jass.GetLocalPlayer();
           if (lp == null || lp === 0) return;
           syncBuffBar();
@@ -513,24 +483,16 @@ export function init(): void {
   buffUiInitialized = true;
   
   (pcall as any)(() => {
-    if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
-      const delayTimer = jass.CreateTimer();
-      jass.TimerStart(delayTimer, 1.0, false, () => {
-        (pcall as any)(() => {
-          if (typeof jass.GetLocalPlayer !== "function") {
-            if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(delayTimer);
-            return;
-          }
-          const lp = jass.GetLocalPlayer();
-          if (lp != null && lp !== 0) {
-            createUi();
-          }
-          startRefreshTimer();
-          if (typeof jass.DestroyTimer === "function") {
-            jass.DestroyTimer(delayTimer);
-          }
-        });
+    const delayTimer = jass.CreateTimer();
+    jass.TimerStart(delayTimer, 1.0, false, () => {
+      (pcall as any)(() => {
+        const lp = jass.GetLocalPlayer();
+        if (lp != null && lp !== 0) {
+          createUi();
+        }
+        startRefreshTimer();
+        jass.DestroyTimer(delayTimer);
       });
-    }
+    });
   });
 }

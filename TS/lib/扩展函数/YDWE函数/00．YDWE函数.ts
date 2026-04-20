@@ -329,7 +329,7 @@ function _tickEffectRecycle(): void {
     const entry = _pendingEffects[i];
     entry.ticksLeft = entry.ticksLeft - 1;
     if (entry.ticksLeft <= 0) {
-      if (entry.eff != null && typeof jass.DestroyEffect === "function") {
+      if (entry.eff != null) {
         jass.DestroyEffect(entry.eff);
       }
       _pendingEffects.splice(i, 1);

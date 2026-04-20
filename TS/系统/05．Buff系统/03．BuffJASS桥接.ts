@@ -60,14 +60,12 @@ const YL_REAL_VALUE = "Buff效果数值";
 
 function resolveSourceDisplayName(source: any): string | undefined {
   if (source == null || source === 0) return undefined;
-  if (typeof jass.GetUnitName !== "function") return undefined;
   const n = jass.GetUnitName(source);
   return typeof n === "string" && n !== "" ? n : undefined;
 }
 
 function playOneShotEffectOnTarget(modelPath: string, target: any): void {
   if (modelPath === "" || target == null || target === 0) return;
-  if (typeof jass.AddSpecialEffectTarget !== "function") return;
   const eff = jass.AddSpecialEffectTarget(modelPath, target, "overhead");
   if (eff == null || eff === 0) return;
   YDWETimerDestroyEffect(2.0, eff);
@@ -108,9 +106,6 @@ export function buffBridgeApplyFromYdlocal(_self: any): void {
 }
 
 function init(): void {
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    return;
-  }
   if (STES_Register == null) return;
   const trig = jass.CreateTrigger();
   jass.TriggerAddAction(trig, () => {

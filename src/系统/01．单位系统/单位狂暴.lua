@@ -25,9 +25,6 @@ local function onDeath(self, dying, killer)
     if dying == nil then
         return
     end
-    if type(jass.GetUnitTypeId) ~= "function" then
-        return
-    end
     local typeId = jass.GetUnitTypeId(dying)
     local unitId = typeIdToUnitId(nil, typeId)
     local entry = unitId and idData[unitId] or nil
@@ -46,43 +43,29 @@ local function onDeath(self, dying, killer)
     local x = 0
     local y = 0
     local facingDeg = 270
-    if type(jass.GetUnitX) == "function" and type(jass.GetUnitY) == "function" then
-        x = jass.GetUnitX(dying)
-        y = jass.GetUnitY(dying)
-    end
-    if type(jass.GetUnitFacingDegrees) == "function" then
-        facingDeg = jass.GetUnitFacingDegrees(dying)
-    elseif type(jass.GetUnitFacing) == "function" then
-        facingDeg = jass.GetUnitFacing(dying) * (180 / 3.14159265359)
-    end
+    x = jass.GetUnitX(dying)
+    y = jass.GetUnitY(dying)
+    facingDeg = jass.GetUnitFacing(dying) * (180 / 3.14159265359)
     local four = stringToFourCC(
         nil,
         __TS__StringSubstring(spawnUnitId, 0, 4)
     )
-    local ____temp_8
-    if type(jass.GetOwningPlayer) == "function" then
-        ____temp_8 = jass.GetOwningPlayer(dying)
-    else
-        ____temp_8 = jass.Player(15)
-    end
-    local owner = ____temp_8
+    local owner = jass.GetOwningPlayer(dying)
     local created = nil
-    if type(jass.CreateUnit) == "function" then
-        created = jass.CreateUnit(
-            owner,
-            four,
-            x,
-            y,
-            facingDeg
-        )
-    end
-    local ____temp_9
-    if killer and type(jass.GetOwningPlayer) == "function" then
-        ____temp_9 = jass.GetOwningPlayer(killer)
+    created = jass.CreateUnit(
+        owner,
+        four,
+        x,
+        y,
+        facingDeg
+    )
+    local ____killer_8
+    if killer then
+        ____killer_8 = jass.GetOwningPlayer(killer)
     else
-        ____temp_9 = nil
+        ____killer_8 = nil
     end
-    local killerPlayer = ____temp_9
+    local killerPlayer = ____killer_8
     if created and killerPlayer then
         EXSetUnitFacing(nil, created, facingDeg)
         CameraShakeForPlayer(nil, killerPlayer, 20, 3)

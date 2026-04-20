@@ -16,7 +16,6 @@ export function DzDoodadCreate(
   rotate: number,
   scale: number
 ): number {
-  if (typeof japi.DzDoodadCreate !== "function") return 0;
   return (japi.DzDoodadCreate(id, varId, x, y, z, rotate, scale) as number) || 0;
 }
 
@@ -24,7 +23,6 @@ export function DzDoodadCreate(
  * 获取装饰物类型ID
  */
 export function DzDoodadGetTypeId(doodad: number): number {
-  if (typeof japi.DzDoodadGetTypeId !== "function") return 0;
   return (japi.DzDoodadGetTypeId(doodad) as number) || 0;
 }
 
@@ -32,7 +30,6 @@ export function DzDoodadGetTypeId(doodad: number): number {
  * 设置装饰物模型
  */
 export function DzDoodadSetModel(doodad: number, modelFile: string): void {
-  if (typeof japi.DzDoodadSetModel !== "function") return;
   japi.DzDoodadSetModel(doodad, modelFile);
 }
 
@@ -40,7 +37,6 @@ export function DzDoodadSetModel(doodad: number, modelFile: string): void {
  * 设置装饰物队伍颜色
  */
 export function DzDoodadSetTeamColor(doodad: number, color: number): void {
-  if (typeof japi.DzDoodadSetTeamColor !== "function") return;
   japi.DzDoodadSetTeamColor(doodad, color);
 }
 
@@ -48,7 +44,6 @@ export function DzDoodadSetTeamColor(doodad: number, color: number): void {
  * 设置装饰物颜色
  */
 export function DzDoodadSetColor(doodad: number, color: number): void {
-  if (typeof japi.DzDoodadSetColor !== "function") return;
   japi.DzDoodadSetColor(doodad, color);
 }
 
@@ -56,7 +51,6 @@ export function DzDoodadSetColor(doodad: number, color: number): void {
  * 获取装饰物X坐标
  */
 export function DzDoodadGetX(doodad: number): number {
-  if (typeof japi.DzDoodadGetX !== "function") return 0;
   return (japi.DzDoodadGetX(doodad) as number) || 0;
 }
 
@@ -64,7 +58,6 @@ export function DzDoodadGetX(doodad: number): number {
  * 获取装饰物Y坐标
  */
 export function DzDoodadGetY(doodad: number): number {
-  if (typeof japi.DzDoodadGetY !== "function") return 0;
   return (japi.DzDoodadGetY(doodad) as number) || 0;
 }
 
@@ -72,7 +65,6 @@ export function DzDoodadGetY(doodad: number): number {
  * 获取装饰物Z坐标
  */
 export function DzDoodadGetZ(doodad: number): number {
-  if (typeof japi.DzDoodadGetZ !== "function") return 0;
   return (japi.DzDoodadGetZ(doodad) as number) || 0;
 }
 
@@ -80,7 +72,6 @@ export function DzDoodadGetZ(doodad: number): number {
  * 设置装饰物位置
  */
 export function DzDoodadSetPosition(doodad: number, x: number, y: number, z: number): void {
-  if (typeof japi.DzDoodadSetPosition !== "function") return;
   japi.DzDoodadSetPosition(doodad, x, y, z);
 }
 
@@ -94,7 +85,6 @@ export function DzDoodadSetOrientMatrixRotate(
   axisY: number,
   axisZ: number
 ): void {
-  if (typeof japi.DzDoodadSetOrientMatrixRotate !== "function") return;
   japi.DzDoodadSetOrientMatrixRotate(doodad, angle, axisX, axisY, axisZ);
 }
 
@@ -107,7 +97,6 @@ export function DzDoodadSetOrientMatrixScale(
   y: number,
   z: number
 ): void {
-  if (typeof japi.DzDoodadSetOrientMatrixScale !== "function") return;
   japi.DzDoodadSetOrientMatrixScale(doodad, x, y, z);
 }
 
@@ -115,7 +104,6 @@ export function DzDoodadSetOrientMatrixScale(
  * 设置装饰物方向矩阵重置大小
  */
 export function DzDoodadSetOrientMatrixResize(doodad: number): void {
-  if (typeof japi.DzDoodadSetOrientMatrixResize !== "function") return;
   japi.DzDoodadSetOrientMatrixResize(doodad);
 }
 
@@ -123,7 +111,6 @@ export function DzDoodadSetOrientMatrixResize(doodad: number): void {
  * 设置装饰物可见性
  */
 export function DzDoodadSetVisible(doodad: number, enable: boolean): void {
-  if (typeof japi.DzDoodadSetVisible !== "function") return;
   japi.DzDoodadSetVisible(doodad, enable);
 }
 
@@ -131,7 +118,6 @@ export function DzDoodadSetVisible(doodad: number, enable: boolean): void {
  * 设置装饰物动画
  */
 export function DzDoodadSetAnimation(doodad: number, animName: string, animRandom: boolean): void {
-  if (typeof japi.DzDoodadSetAnimation !== "function") return;
   japi.DzDoodadSetAnimation(doodad, animName, animRandom);
 }
 
@@ -139,7 +125,6 @@ export function DzDoodadSetAnimation(doodad: number, animName: string, animRando
  * 设置装饰物时间缩放
  */
 export function DzDoodadSetTimeScale(doodad: number, scale: number): void {
-  if (typeof japi.DzDoodadSetTimeScale !== "function") return;
   japi.DzDoodadSetTimeScale(doodad, scale);
 }
 
@@ -147,7 +132,6 @@ export function DzDoodadSetTimeScale(doodad: number, scale: number): void {
  * 获取装饰物时间缩放
  */
 export function DzDoodadGetTimeScale(doodad: number): number {
-  if (typeof japi.DzDoodadGetTimeScale !== "function") return 0;
   return (japi.DzDoodadGetTimeScale(doodad) as number) || 0;
 }
 
@@ -155,7 +139,6 @@ export function DzDoodadGetTimeScale(doodad: number): number {
  * 获取装饰物当前动画索引
  */
 export function DzDoodadGetCurrentAnimationIndex(doodad: number): number {
-  if (typeof japi.DzDoodadGetCurrentAnimationIndex !== "function") return 0;
   return (japi.DzDoodadGetCurrentAnimationIndex(doodad) as number) || 0;
 }
 
@@ -163,7 +146,6 @@ export function DzDoodadGetCurrentAnimationIndex(doodad: number): number {
  * 获取装饰物动画数量
  */
 export function DzDoodadGetAnimationCount(doodad: number): number {
-  if (typeof japi.DzDoodadGetAnimationCount !== "function") return 0;
   return (japi.DzDoodadGetAnimationCount(doodad) as number) || 0;
 }
 
@@ -171,7 +153,6 @@ export function DzDoodadGetAnimationCount(doodad: number): number {
  * 获取装饰物动画名称
  */
 export function DzDoodadGetAnimationName(doodad: number, index: number): string {
-  if (typeof japi.DzDoodadGetAnimationName !== "function") return "";
   return (japi.DzDoodadGetAnimationName(doodad, index) as string) || "";
 }
 
@@ -179,7 +160,6 @@ export function DzDoodadGetAnimationName(doodad: number, index: number): string 
  * 获取装饰物动画时间
  */
 export function DzDoodadGetAnimationTime(doodad: number, index: number): number {
-  if (typeof japi.DzDoodadGetAnimationTime !== "function") return 0;
   return (japi.DzDoodadGetAnimationTime(doodad, index) as number) || 0;
 }
 

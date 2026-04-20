@@ -89,7 +89,6 @@ function jassStesHashtable(this: void): any {
 function countOnJassStesTable(this: void, eventName: string): number {
   const ht = jassStesHashtable();
   if (ht == null || ht === 0) return -1;
-  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return -1;
   const h = jass.StringHash(eventName);
   return jass.LoadInteger(ht, h, ydlStes_skeyIndex(undefined));
 }
@@ -180,13 +179,9 @@ function runEquipExtract(this: void): void {
 }
 
 function scheduleRetry(this: void, fn: () => void): void {
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
-    fn();
-    return;
-  }
   const tm = jass.CreateTimer();
   jass.TimerStart(tm, RETRY_SEC, false, () => {
-    if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(tm);
+    jass.DestroyTimer(tm);
     fn();
   });
 }
@@ -199,7 +194,7 @@ function tryRegisterEquipStes(this: void): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
 
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
+  if (STES_Register == null) {
     g[REG_GUARD] = true;
     return;
   }

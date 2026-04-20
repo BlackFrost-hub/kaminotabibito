@@ -73,19 +73,7 @@ local function runRegionRule(self, rule, unit, owner)
     if #items == 0 or totalWeight <= 0 then
         return
     end
-    local r
-    if type(jass.GetRandomInt) == "function" then
-        r = jass.GetRandomInt(1, totalWeight)
-    else
-        local m = math
-        local ____temp_2
-        if type(m.random) == "function" then
-            ____temp_2 = m:random(1, totalWeight)
-        else
-            ____temp_2 = 1
-        end
-        r = ____temp_2
-    end
+    local r = jass.GetRandomInt(1, totalWeight)
     local chosen
     for ____, it in ipairs(items) do
         if r <= it.weight then
@@ -98,11 +86,9 @@ local function runRegionRule(self, rule, unit, owner)
         chosen = items[#items]
     end
     local unitName = "单位"
-    if type(jass.GetUnitName) == "function" then
-        local n = jass.GetUnitName(unit)
-        if n ~= nil then
-            unitName = tostring(n)
-        end
+    local n = jass.GetUnitName(unit)
+    if n ~= nil then
+        unitName = tostring(n)
     end
     local function formatText(____, raw)
         if not raw then
@@ -114,11 +100,9 @@ local function runRegionRule(self, rule, unit, owner)
         )
     end
     if chosen.action == "KillUnit" then
-        if type(jass.KillUnit) == "function" then
-            jass.KillUnit(unit)
-        end
+        jass.KillUnit(unit)
         local msg = formatText(nil, chosen.text)
-        if msg and owner ~= nil and type(jass.DisplayTimedTextToPlayer) == "function" then
+        if msg and owner ~= nil then
             jass.DisplayTimedTextToPlayer(
                 owner,
                 0,
@@ -128,11 +112,11 @@ local function runRegionRule(self, rule, unit, owner)
             )
         end
     elseif chosen.action == "Teleport" then
-        if type(jass.SetUnitPosition) == "function" and chosen.x ~= nil and chosen.y ~= nil then
+        if chosen.x ~= nil and chosen.y ~= nil then
             jass.SetUnitPosition(unit, chosen.x, chosen.y)
         end
         local msg = formatText(nil, nil)
-        if msg and owner ~= nil and type(jass.DisplayTimedTextToPlayer) == "function" then
+        if msg and owner ~= nil then
             jass.DisplayTimedTextToPlayer(
                 owner,
                 0,
@@ -144,9 +128,6 @@ local function runRegionRule(self, rule, unit, owner)
     end
 end
 local function initRegionTeleport(self)
-    if type(jass.CreateTrigger) ~= "function" then
-        return
-    end
     local trig = jass.CreateTrigger()
     local total = 0
     local enabledCount = 0
@@ -162,52 +143,24 @@ local function initRegionTeleport(self)
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue38
-            end
-            if type(jass.CreateRegion) ~= "function" then
-                goto __continue38
+                goto __continue33
             end
             local region = jass.CreateRegion()
-            if type(jass.Rect) ~= "function" then
-                goto __continue38
-            end
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
-            if type(jass.RegionAddRect) == "function" then
-                jass.RegionAddRect(region, rect)
-            end
-            if type(jass.TriggerRegisterEnterRegion) == "function" then
-                jass.TriggerRegisterEnterRegion(trig, region, nil)
-            end
+            jass.RegionAddRect(region, rect)
+            jass.TriggerRegisterEnterRegion(trig, region, nil)
             regionMap:set(region, cfg)
         end
-        ::__continue38::
+        ::__continue33::
     end
     local function onEnter()
-        local ____temp_3
-        if type(jass.GetTriggerUnit) == "function" then
-            ____temp_3 = jass.GetTriggerUnit()
-        else
-            ____temp_3 = nil
-        end
-        local unit = ____temp_3
-        local ____temp_4
-        if type(jass.GetTriggeringRegion) == "function" then
-            ____temp_4 = jass.GetTriggeringRegion()
-        else
-            ____temp_4 = nil
-        end
-        local region = ____temp_4
+        local unit = jass.GetTriggerUnit()
+        local region = jass.GetTriggeringRegion()
         if unit == nil or region == nil then
             return
         end
-        local ____temp_5
-        if type(jass.GetOwningPlayer) == "function" then
-            ____temp_5 = jass.GetOwningPlayer(unit)
-        else
-            ____temp_5 = nil
-        end
-        local owner = ____temp_5
-        if owner ~= nil and type(jass.Player) == "function" and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
+        local owner = jass.GetOwningPlayer(unit)
+        if owner ~= nil and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
             local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
             if owner == neutralAgg then
                 return
@@ -225,12 +178,8 @@ local function initRegionTeleport(self)
             runRegionRule(nil, cfg.rule, unit, owner)
             return
         end
-        if type(jass.SetUnitPosition) == "function" then
-            jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
-        end
-        if type(jass.IssueImmediateOrder) == "function" then
-            jass.IssueImmediateOrder(unit, "stop")
-        end
+        jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
+        jass.IssueImmediateOrder(unit, "stop")
         local player = owner
         if player ~= nil then
             StarOther_PanCameraToTimedForPlayer(
@@ -240,20 +189,16 @@ local function initRegionTeleport(self)
                 cfg.teleportY,
                 cfg.cameraTime
             )
-            if type(jass.DisplayTimedTextToPlayer) == "function" then
-                jass.DisplayTimedTextToPlayer(
-                    player,
-                    0,
-                    0,
-                    8,
-                    cfg.text
-                )
-            end
+            jass.DisplayTimedTextToPlayer(
+                player,
+                0,
+                0,
+                8,
+                cfg.text
+            )
         end
     end
-    if type(jass.TriggerAddAction) == "function" then
-        jass.TriggerAddAction(trig, onEnter)
-    end
+    jass.TriggerAddAction(trig, onEnter)
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function(self)

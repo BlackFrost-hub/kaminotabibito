@@ -54,17 +54,10 @@ export function createMainStoryNPCs(): MainStoryNpcMap {
  * 等价于 JASS 的 TriggerRegisterTimerEventSingle(..., 1.00)
  */
 export function initMainStoryNPCsWithDelay(delaySec: number = 1.0): void {
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
-    createMainStoryNPCs();
-    return;
-  }
-
   const timer = jass.CreateTimer();
   jass.TimerStart(timer, delaySec, false, () => {
     createMainStoryNPCs();
-    if (typeof jass.DestroyTimer === "function") {
-      jass.DestroyTimer(timer);
-    }
+    jass.DestroyTimer(timer);
   });
 }
 

@@ -23,23 +23,19 @@ export function setLastCreatedItem(item: any): void {
 
 function registerItemForCleanup(item: any): void {
   if (item == null) return;
-  if (typeof (jass as any).CreateTrigger !== "function") return;
   const trig = (jass as any).CreateTrigger();
   if (!trig) return;
-  if (typeof (jass as any).TriggerRegisterDeathEvent !== "function") return;
   (jass as any).TriggerRegisterDeathEvent(trig, item);
   const capturedItem = item;
   let taHandle: any = undefined;
   const onDeath = (): void => {
-    if (typeof (jass as any).RemoveItem === "function") (jass as any).RemoveItem(capturedItem);
-    if (taHandle != null && typeof (jass as any).TriggerRemoveAction === "function") {
+    (jass as any).RemoveItem(capturedItem);
+    if (taHandle != null) {
       (jass as any).TriggerRemoveAction(trig, taHandle);
     }
-    if (typeof (jass as any).DestroyTrigger === "function") (jass as any).DestroyTrigger(trig);
+    (jass as any).DestroyTrigger(trig);
   };
-  if (typeof (jass as any).TriggerAddAction === "function") {
-    taHandle = (jass as any).TriggerAddAction(trig, onDeath);
-  }
+  taHandle = (jass as any).TriggerAddAction(trig, onDeath);
 }
 
 export {};

@@ -30,10 +30,8 @@ export function showQuestFailedMessage(playerId: number, questId: string): void 
   const player = jass.Player(playerId);
   if (!player) return;
 
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    const message = `任务失败: ${quest.title}`;
-    jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
-  }
+  const message = `任务失败: ${quest.title}`;
+  jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
 }
 
 /**
@@ -46,10 +44,8 @@ export function showQuestAcceptedMessage(playerId: number, questId: string): voi
   const player = jass.Player(playerId);
   if (!player) return;
 
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    const message = `已接受任务: ${quest.title}\n${quest.description}`;
-    jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
-  }
+  const message = `已接受任务: ${quest.title}\n${quest.description}`;
+  jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
 }
 
 /**
@@ -62,10 +58,8 @@ export function showQuestCompletedMessage(playerId: number, questId: string): vo
   const player = jass.Player(playerId);
   if (!player) return;
 
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    const message = `任务完成: ${quest.title}\n已获得奖励！`;
-    jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
-  }
+  const message = `任务完成: ${quest.title}\n已获得奖励！`;
+  jass.DisplayTimedTextToPlayer(player, 0, 0, 10, message);
 }
 
 // ─── 浮字：放弃 / 追踪 ───
@@ -74,7 +68,6 @@ export function showQuestCompletedMessage(playerId: number, questId: string): vo
  * 放弃成功后的轻量提示；文案里用 questId，因 abandon 后配置行可能已从玩家表移除。
  */
 export function showAbandonedQuestNotice(playerId: number, questId: string): void {
-  if (typeof jass.DisplayTimedTextToPlayer !== "function") return;
   const player = jass.Player(playerId);
   if (player) {
     jass.DisplayTimedTextToPlayer(player, 0, 0, 8, `已放弃任务: ${questId}`);
@@ -86,7 +79,7 @@ export function showAbandonedQuestNotice(playerId: number, questId: string): voi
  */
 export function showQuestTrackingNotice(playerId: number, title: string): void {
   const player = jass.Player(playerId);
-  if (player && typeof jass.DisplayTimedTextToPlayer === "function") {
+  if (player) {
     jass.DisplayTimedTextToPlayer(player, 0, 0, 6, `正在追踪: ${title}`);
   }
 }
@@ -111,41 +104,31 @@ export function giveQuestRewards(playerId: number, questId: string): void {
   for (const reward of quest.rewards) {
     switch (reward.type) {
       case "experience":
-        if (hero && typeof jass.AddHeroXP === "function") {
+        if (hero) {
           jass.AddHeroXP(hero, reward.value, true);
           questDebugPrint(`给予玩家 ${playerId} ${reward.value} 经验`);
         } else {
-          questDebugPrint(`无法给予经验：未找到英雄或API不可用`);
+          questDebugPrint(`无法给予经验：未找到英雄`);
         }
         break;
       case "gold":
-        if (typeof jass.SetPlayerState === "function" && typeof jass.GetPlayerState === "function") {
+        {
           const currentGold = jass.GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) || 0;
           jass.SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value);
           questDebugPrint(`给予玩家 ${playerId} ${reward.value} 金币`);
         }
         break;
       case "item":
-        if (
-          hero &&
-          typeof jass.CreateItem === "function" &&
-          typeof jass.UnitAddItemById === "function" &&
-          reward.itemId
-        ) {
+        if (hero && reward.itemId) {
           const itemTypeId = stringToFourCC(reward.itemId);
           jass.UnitAddItemById(hero, itemTypeId);
           questDebugPrint(`给予玩家 ${playerId} 物品 ${reward.description}`);
         } else {
-          questDebugPrint(`无法给予物品：未找到英雄或API不可用`);
+          questDebugPrint(`无法给予物品：未找到英雄`);
         }
         break;
       case "attribute":
-        if (
-          hero &&
-          typeof jass.SetHeroStr === "function" &&
-          typeof jass.SetHeroAgi === "function" &&
-          typeof jass.SetHeroInt === "function"
-        ) {
+        if (hero) {
           jass.SetHeroStr(hero, jass.GetHeroStr(hero, false) + reward.value, true);
           jass.SetHeroAgi(hero, jass.GetHeroAgi(hero, false) + reward.value, true);
           jass.SetHeroInt(hero, jass.GetHeroInt(hero, false) + reward.value, true);

@@ -11,11 +11,9 @@ export function nextTypingProgress(current: number, step: number = STEP_LEN): nu
 
 // ========== 虚拟分区：兼容工具 ==========
 export function substringCompat(text: string, start: number, end: number): string {
-  if (typeof jass.SubString === "function") return jass.SubString(text, start, end) as string;
-  return (text as any).sub(start + 1, end) as string;
+  return jass.SubString(text, start, end) as string;
 }
 
 export function stringLengthCompat(text: string): number {
-  if (typeof jass.StringLength === "function") return jass.StringLength(text) as number;
-  return text.length;
+  return jass.StringLength(text) as number;
 }

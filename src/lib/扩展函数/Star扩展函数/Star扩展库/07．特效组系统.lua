@@ -162,13 +162,7 @@ function ____exports.EG_GetRandomOfGroup(self, id)
     if max < 0 then
         return nil
     end
-    local ____temp_0
-    if type(jass.GetRandomInt) == "function" then
-        ____temp_0 = jass.GetRandomInt(0, max)
-    else
-        ____temp_0 = math.floor(math.random() * (max + 1))
-    end
-    local idx = ____temp_0
+    local idx = jass.GetRandomInt(0, max)
     return g[idx]
 end
 --- 特效是否在指定特效组中

@@ -28,7 +28,7 @@ export function createTimedEffect(
   const eff = jass.AddSpecialEffect(modelPath, x, y);
   if (!eff) return null;
 
-  if (z !== 0 && typeof japi.EXSetEffectZ === "function") {
+  if (z !== 0) {
     japi.EXSetEffectZ(eff, z);
   }
 

@@ -15,11 +15,11 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 export function dzGetLocalPlayer(): any {
-  return typeof jass.GetLocalPlayer === "function" ? jass.GetLocalPlayer() : null;
+  return jass.GetLocalPlayer();
 }
 
 export function dzPlayer(index: number): any {
-  return typeof jass.Player === "function" ? jass.Player(index) : null;
+  return jass.Player(index);
 }
 
 export function questIdTailInRange01to20(id: string, prefix: string): boolean {
@@ -64,7 +64,6 @@ export function tryCreateFromFdfWithSource(
 ): { frame: number | null; fromFdf: boolean } {
   if (!isFdfFrameEnabled(name)) return { frame: fallback(), fromFdf: false };
   loadTocOnce(TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI");
-  if (typeof (japi as any).DzCreateFrame !== "function") return { frame: fallback(), fromFdf: false };
   let f: number = 0;
   const ok = (pcall as any)(() => {
     f = (japi as any).DzCreateFrame(name, parent, 0);

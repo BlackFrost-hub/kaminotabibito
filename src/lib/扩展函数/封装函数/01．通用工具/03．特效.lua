@@ -29,7 +29,7 @@ function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
     if not eff then
         return nil
     end
-    if z ~= 0 and type(japi.EXSetEffectZ) == "function" then
+    if z ~= 0 then
         japi.EXSetEffectZ(eff, z)
     end
     withTimer(

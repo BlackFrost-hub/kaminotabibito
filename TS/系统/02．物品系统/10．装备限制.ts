@@ -34,30 +34,14 @@ function getEntry(itemTypeId: number): { type?: string; name?: string; onlyone?:
 }
 
 function safeGetItemTypeId(it: any): number | undefined {
-  const fn = (jass as any).GetItemTypeId;
-  if (typeof fn !== "function") return undefined;
-  // 关键：直接用 jass.GetItemTypeId(it)，避免 TSTL 生成“带 self”的错误形态
   const a = (jass as any).GetItemTypeId(it);
   if (typeof a === "number") return a;
-  // 兜底（极少数情况）
-  const b = fn(jass, it);
-  if (typeof b === "number") return b;
-  const c = fn(undefined as any, it);
-  if (typeof c === "number") return c;
   return undefined;
 }
 
 function safeUnitItemInSlot(unit: any, slot: number): any | undefined {
-  const fn = (jass as any).UnitItemInSlot;
-  if (typeof fn !== "function") return undefined;
-  // 同上：先用直接调用形态
   const a = (jass as any).UnitItemInSlot(unit, slot);
   if (a) return a;
-  // 兜底（极少数情况）
-  const b = fn(jass, unit, slot);
-  if (b) return b;
-  const c = fn(undefined as any, unit, slot);
-  if (c) return c;
   return undefined;
 }
 

@@ -108,7 +108,7 @@ function ____exports.fireMultiKillEvent(self)
     )
     local ____dbg_9 = dbg
     local ____temp_8
-    if killGroup ~= 0 and killGroup ~= nil and type(jass.CountUnitsInGroup) == "function" then
+    if killGroup ~= 0 and killGroup ~= nil then
         ____temp_8 = jass.CountUnitsInGroup(killGroup)
     else
         ____temp_8 = "N/A"

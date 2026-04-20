@@ -41,9 +41,6 @@ local function tryConsumeRequiredResources(self, player, requiredResources, requ
         return true
     end
     local cost = normalizeRequireCount(nil, requireCount)
-    if type(jass.GetPlayerState) ~= "function" or type(jass.SetPlayerState) ~= "function" then
-        return false
-    end
     local key = string.lower(requiredResources)
     if key == "wood" or key == "lumber" or requiredResources == "能量碎片" then
         local state = jass.PLAYER_STATE_RESOURCE_LUMBER
@@ -70,7 +67,7 @@ local function isKillQuestObjectiveCompleted(self, playerId, questId, requireCou
     for ____, q in ipairs(active) do
         do
             if not q or q.id ~= questId then
-                goto __continue11
+                goto __continue10
             end
             if not q.objectives or #q.objectives == 0 then
                 return false
@@ -80,19 +77,19 @@ local function isKillQuestObjectiveCompleted(self, playerId, questId, requireCou
             for ____, obj in ipairs(q.objectives) do
                 do
                     if not obj then
-                        goto __continue14
+                        goto __continue13
                     end
                     current = current + (obj.current or 0)
                     required = required + (obj.required or 0)
                 end
-                ::__continue14::
+                ::__continue13::
             end
             if required <= 0 then
                 required = requireCount > 0 and requireCount or 1
             end
             return current >= required
         end
-        ::__continue11::
+        ::__continue10::
     end
     return false
 end
@@ -122,29 +119,23 @@ local function resolveSubmitItem(self, hero, requireItem)
             local slot = 0
             while slot < 6 do
                 do
-                    local ____temp_0
-                    if type(jass.UnitItemInSlot) == "function" then
-                        ____temp_0 = jass.UnitItemInSlot(hero, slot)
-                    else
-                        ____temp_0 = nil
-                    end
-                    local item = ____temp_0
-                    if not item or type(jass.GetItemTypeId) ~= "function" then
-                        goto __continue28
+                    local item = jass.UnitItemInSlot(hero, slot)
+                    if not item then
+                        goto __continue27
                     end
                     local itemId = jass.GetItemTypeId(item)
                     local itemCode = _____5C01_88C5_51FD_6570:fourCCToString(itemId)
                     local data = itemsData[itemCode]
                     if not data then
-                        goto __continue28
+                        goto __continue27
                     end
                     if (data.type or "") ~= "道具/戒指/饰品" then
-                        goto __continue28
+                        goto __continue27
                     end
                     local level = data.level or ""
                     return {itemId = itemId, itemCode = itemCode, itemLevel = level}
                 end
-                ::__continue28::
+                ::__continue27::
                 slot = slot + 1
             end
         end
@@ -153,13 +144,8 @@ local function resolveSubmitItem(self, hero, requireItem)
     if #requireItem == 4 then
         local itemId = calculateFourCC(nil, requireItem)
         local data = itemsData[requireItem]
-        local ____itemId_4 = itemId
-        local ____requireItem_5 = requireItem
-        local ____opt_result_3
-        if data ~= nil then
-            ____opt_result_3 = data.level
-        end
-        return {itemId = ____itemId_4, itemCode = ____requireItem_5, itemLevel = ____opt_result_3 or ""}
+        local itemLevel = data ~= nil and (data.level or "") or ""
+        return {itemId = itemId, itemCode = requireItem, itemLevel = itemLevel}
     end
     if (string.find(requireItem, "|", nil, true) or 0) - 1 >= 0 then
         local parts = __TS__StringSplit(requireItem, "|")
@@ -167,19 +153,16 @@ local function resolveSubmitItem(self, hero, requireItem)
             do
                 local c = __TS__StringTrim(code)
                 if #c ~= 4 then
-                    goto __continue34
+                    goto __continue33
                 end
                 local testId = calculateFourCC(nil, c)
                 if UnitHasItemOfTypeBJ(nil, hero, testId) then
                     local data = itemsData[c]
-                    local ____opt_result_8
-                    if data ~= nil then
-                        ____opt_result_8 = data.level
-                    end
-                    return {itemId = testId, itemCode = c, itemLevel = ____opt_result_8 or ""}
+                    local itemLevel = data ~= nil and (data.level or "") or ""
+                    return {itemId = testId, itemCode = c, itemLevel = itemLevel}
                 end
             end
-            ::__continue34::
+            ::__continue33::
         end
     end
     return {itemId = 0, itemCode = "", itemLevel = ""}
@@ -236,28 +219,27 @@ local function shouldUseGenericGiveFailHint(self, quest)
     return (string.find(reward, ":", nil, true) or 0) - 1 >= 0
 end
 function ____exports.handleQuestSubmit(self, params)
-    local ____params_9 = params
-    local quest = ____params_9.quest
-    local npcName = ____params_9.npcName
-    local heroName = ____params_9.heroName
-    local dialogOwnerId = ____params_9.dialogOwnerId
-    local npcUnit = ____params_9.npcUnit
-    local parseDialogText = ____params_9.parseDialogText
-    local openDialog = ____params_9.openDialog
-    local refreshTaskUIForAllClientsSoon = ____params_9.refreshTaskUIForAllClientsSoon
+    local ____params_0 = params
+    local quest = ____params_0.quest
+    local npcName = ____params_0.npcName
+    local heroName = ____params_0.heroName
+    local dialogOwnerId = ____params_0.dialogOwnerId
+    local npcUnit = ____params_0.npcUnit
+    local parseDialogText = ____params_0.parseDialogText
+    local openDialog = ____params_0.openDialog
+    local refreshTaskUIForAllClientsSoon = ____params_0.refreshTaskUIForAllClientsSoon
     local callbackOwner = jass.Player(dialogOwnerId)
-    local ____callbackOwner_10
+    local ____callbackOwner_1
     if callbackOwner then
-        ____callbackOwner_10 = getPlayerFirstHero(nil, callbackOwner)
+        ____callbackOwner_1 = getPlayerFirstHero(nil, callbackOwner)
     else
-        ____callbackOwner_10 = nil
+        ____callbackOwner_1 = nil
     end
-    local hero = ____callbackOwner_10
+    local hero = ____callbackOwner_1
     local requireItem = quest.requireItem
     local requiredResources = quest.requiredResources
     local requireCount = normalizeRequireCount(nil, quest.requireCount)
-    local ____opt_11 = quest.requireID
-    local questId = ____opt_11 and tostring(quest.requireID) or ""
+    local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
     local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
     local rewardBranchIndex = -1
     local useGenericGiveFailHint = shouldUseGenericGiveFailHint(nil, quest)
@@ -351,13 +333,13 @@ function ____exports.handleQuestSubmit(self, params)
             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r")
             return
         end
-        local ____temp_13
+        local ____temp_2
         if quest.type == "给予" then
-            ____temp_13 = npcUnit
+            ____temp_2 = npcUnit
         else
-            ____temp_13 = hero
+            ____temp_2 = hero
         end
-        local sourceUnit = ____temp_13
+        local sourceUnit = ____temp_2
         if not sourceUnit then
             if useGenericGiveFailHint then
                 showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。")

@@ -17,9 +17,6 @@ local jass = require("jass.common")
 --- 若已有 nativeHandle 则先销毁，再创建新原生任务并写回 `questData.nativeHandle`。
 -- 主线任务 `QuestSetRequired(true)`，其它为 false。
 function ____exports.syncQuestToWar3Native(self, _playerId, questId)
-    if type(jass.CreateQuest) ~= "function" then
-        return
-    end
     local ____opt_0 = questDB.globalData
     if ____opt_0 ~= nil then
         ____opt_0 = ____opt_0.quests:get(questId)
@@ -28,7 +25,7 @@ function ____exports.syncQuestToWar3Native(self, _playerId, questId)
     if not questData then
         return
     end
-    if questData.nativeHandle and type(jass.DestroyQuest) == "function" then
+    if questData.nativeHandle then
         jass.DestroyQuest(questData.nativeHandle)
     end
     local nativeQuest = jass.CreateQuest()
@@ -36,39 +33,27 @@ function ____exports.syncQuestToWar3Native(self, _playerId, questId)
     if not nativeQuest then
         return
     end
-    if type(jass.QuestSetTitle) == "function" then
-        jass.QuestSetTitle(nativeQuest, questData.title)
-    end
-    if type(jass.QuestSetDescription) == "function" then
-        jass.QuestSetDescription(nativeQuest, questData.description)
-    end
-    if questData.icon and type(jass.QuestSetIconPath) == "function" then
+    jass.QuestSetTitle(nativeQuest, questData.title)
+    jass.QuestSetDescription(nativeQuest, questData.description)
+    if questData.icon then
         jass.QuestSetIconPath(nativeQuest, questData.icon)
     end
-    if type(jass.QuestSetRequired) == "function" then
-        jass.QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
-    end
+    jass.QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
     repeat
-        local ____switch11 = questData.status
-        local ____cond11 = ____switch11 == QuestStatus.IN_PROGRESS
-        if ____cond11 then
-            if type(jass.QuestSetDiscovered) == "function" then
-                jass.QuestSetDiscovered(nativeQuest, true)
-            end
+        local ____switch7 = questData.status
+        local ____cond7 = ____switch7 == QuestStatus.IN_PROGRESS
+        if ____cond7 then
+            jass.QuestSetDiscovered(nativeQuest, true)
             break
         end
-        ____cond11 = ____cond11 or ____switch11 == QuestStatus.COMPLETED
-        if ____cond11 then
-            if type(jass.QuestSetCompleted) == "function" then
-                jass.QuestSetCompleted(nativeQuest, true)
-            end
+        ____cond7 = ____cond7 or ____switch7 == QuestStatus.COMPLETED
+        if ____cond7 then
+            jass.QuestSetCompleted(nativeQuest, true)
             break
         end
-        ____cond11 = ____cond11 or ____switch11 == QuestStatus.FAILED
-        if ____cond11 then
-            if type(jass.QuestSetFailed) == "function" then
-                jass.QuestSetFailed(nativeQuest, true)
-            end
+        ____cond7 = ____cond7 or ____switch7 == QuestStatus.FAILED
+        if ____cond7 then
+            jass.QuestSetFailed(nativeQuest, true)
             break
         end
     until true

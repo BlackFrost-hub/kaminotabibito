@@ -39,40 +39,16 @@ local function getEntry(self, itemTypeId)
     return itemsData[id]
 end
 local function safeGetItemTypeId(self, it)
-    local fn = jass.GetItemTypeId
-    if type(fn) ~= "function" then
-        return nil
-    end
     local a = jass.GetItemTypeId(it)
     if type(a) == "number" then
         return a
     end
-    local b = fn(nil, jass, it)
-    if type(b) == "number" then
-        return b
-    end
-    local c = fn(nil, nil, it)
-    if type(c) == "number" then
-        return c
-    end
     return nil
 end
 local function safeUnitItemInSlot(self, unit, slot)
-    local fn = jass.UnitItemInSlot
-    if type(fn) ~= "function" then
-        return nil
-    end
     local a = jass.UnitItemInSlot(unit, slot)
     if a then
         return a
-    end
-    local b = fn(nil, jass, unit, slot)
-    if b then
-        return b
-    end
-    local c = fn(nil, nil, unit, slot)
-    if c then
-        return c
     end
     return nil
 end
@@ -106,15 +82,15 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
             do
                 local it = safeUnitItemInSlot(nil, unit, i)
                 if not it or it == item then
-                    goto __continue20
+                    goto __continue14
                 end
                 local itTypeId = safeGetItemTypeId(nil, it)
                 if itTypeId == nil then
-                    goto __continue20
+                    goto __continue14
                 end
                 local e = getEntry(nil, itTypeId)
                 if not e then
-                    goto __continue20
+                    goto __continue14
                 end
                 if itTypeId == pickedTypeId then
                     sameIdCount = sameIdCount + 1
@@ -132,7 +108,7 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
                     hasSub = true
                 end
             end
-            ::__continue20::
+            ::__continue14::
             i = i + 1
         end
     end
@@ -205,7 +181,7 @@ local function onPickup(self)
             do
                 if __TS__StringSubstring(s, i, i + 2) == "|r" then
                     i = i + 2
-                    goto __continue46
+                    goto __continue40
                 end
                 if __TS__StringSubstring(s, i, i + 2) == "|c" and i + 10 <= #s then
                     local hex = true
@@ -223,13 +199,13 @@ local function onPickup(self)
                     end
                     if hex then
                         i = i + 10
-                        goto __continue46
+                        goto __continue40
                     end
                 end
                 out = out .. __TS__StringAccess(s, i)
                 i = i + 1
             end
-            ::__continue46::
+            ::__continue40::
         end
         return out
     end
@@ -254,15 +230,15 @@ local function onPickup(self)
             do
                 local it = safeUnitItemInSlot(nil, unit, i)
                 if not it then
-                    goto __continue55
+                    goto __continue49
                 end
                 local itTypeId = safeGetItemTypeId(nil, it)
                 if itTypeId == nil then
-                    goto __continue55
+                    goto __continue49
                 end
                 local e = getEntry(nil, itTypeId)
                 if not e then
-                    goto __continue55
+                    goto __continue49
                 end
                 if itTypeId == pickedTypeId then
                     sameIdCount = sameIdCount + 1
@@ -280,7 +256,7 @@ local function onPickup(self)
                     hasSub = true
                 end
             end
-            ::__continue55::
+            ::__continue49::
             i = i + 1
         end
     end

@@ -9,7 +9,5 @@ do
     end
 end
 local spellEventMod = require("系统.03．技能系统.00．技能事件.01．核心功能")
-if type(spellEventMod.init) == "function" then
-    spellEventMod:init()
-end
+spellEventMod:init()
 return ____exports

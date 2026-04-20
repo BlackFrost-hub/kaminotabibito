@@ -139,14 +139,10 @@ end
 require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡特效")
 require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
 local _____5BF9_8BDD_6846UI = require("系统.09．表现系统.02．对话框系统.00．对话框UI入口")
-if type(_____5BF9_8BDD_6846UI.initDialogSystem) == "function" then
-    _____5BF9_8BDD_6846UI:initDialogSystem()
-end
+_____5BF9_8BDD_6846UI:initDialogSystem()
 local ____require_result_0 = require("系统.09．表现系统.02．对话框系统.10．选择触发入口")
 local initDialogEntrySelectionTrigger = ____require_result_0.initDialogEntrySelectionTrigger
-if type(initDialogEntrySelectionTrigger) == "function" then
-    initDialogEntrySelectionTrigger(nil)
-end
+initDialogEntrySelectionTrigger(nil)
 --- 初始化对话框系统
 function ____exports.init(self)
 end

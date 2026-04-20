@@ -76,9 +76,6 @@ end
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil or lp == 0 then
                 return
@@ -92,9 +89,6 @@ function ____exports.testUI(self)
         3,
         function()
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil or lp == 0 then
                         return

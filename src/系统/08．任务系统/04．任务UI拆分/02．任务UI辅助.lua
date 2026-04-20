@@ -25,22 +25,10 @@ local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 local jass = require("jass.common")
 local japi = require("jass.japi")
 function ____exports.dzGetLocalPlayer(self)
-    local ____temp_0
-    if type(jass.GetLocalPlayer) == "function" then
-        ____temp_0 = jass.GetLocalPlayer()
-    else
-        ____temp_0 = nil
-    end
-    return ____temp_0
+    return jass.GetLocalPlayer()
 end
 function ____exports.dzPlayer(self, index)
-    local ____temp_1
-    if type(jass.Player) == "function" then
-        ____temp_1 = jass.Player(index)
-    else
-        ____temp_1 = nil
-    end
-    return ____temp_1
+    return jass.Player(index)
 end
 function ____exports.questIdTailInRange01to20(self, id, prefix)
     if #id ~= #prefix + 3 then
@@ -99,12 +87,6 @@ function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback)
         }
     end
     loadTocOnce(nil, TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI")
-    if type(japi.DzCreateFrame) ~= "function" then
-        return {
-            frame = fallback(nil),
-            fromFdf = false
-        }
-    end
     local f = 0
     local ok = pcall(function ()
             f = japi.DzCreateFrame(name, parent, 0)
@@ -151,13 +133,13 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
         do
             local template = questDB:getQuest(id)
             if not template or template.type ~= ____type or template.uiReserved then
-                goto __continue30
+                goto __continue29
             end
             if __TS__ArraySome(
                 active,
                 function(____, q) return q.id == id end
             ) then
-                goto __continue30
+                goto __continue29
             end
             result[#result + 1] = __TS__ObjectAssign(
                 {},
@@ -171,7 +153,7 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
                 }
             )
         end
-        ::__continue30::
+        ::__continue29::
     end
     return result
 end

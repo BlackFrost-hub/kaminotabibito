@@ -71,9 +71,6 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
-        return -1
-    end
     return jass.LoadInteger(
         ht,
         jass.StringHash(eventName),
@@ -81,19 +78,13 @@ local function countOnJassStesTable(eventName)
     )
 end
 local function scheduleRetry(fn)
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        fn()
-        return
-    end
     local timer = jass.CreateTimer()
     jass.TimerStart(
         timer,
         RETRY_SEC,
         false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(timer)
-            end
+            jass.DestroyTimer(timer)
             fn()
         end
     )
@@ -102,10 +93,6 @@ end
 local function tryRegisterTargetOrderStes()
     local g = _G
     if g[REG_GUARD] then
-        return
-    end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        g[REG_GUARD] = true
         return
     end
     if g[TRIG_KEY] == nil then
@@ -131,22 +118,14 @@ function ____exports.registerChestSystemHero(hero)
     if not hero then
         return
     end
-    if type(jass.TriggerRegisterUnitEvent) == "function" then
-        local g = _G
-        if g[TRIG_KEY] == nil then
-            local trig = jass.CreateTrigger()
-            jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
-            g[TRIG_KEY] = trig
-        end
-        local ____temp_8
-        if type(jass.ConvertUnitEvent) == "function" then
-            ____temp_8 = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
-        else
-            ____temp_8 = EVENT_UNIT_ISSUED_TARGET_ORDER
-        end
-        local ev = ____temp_8
-        jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev)
+    local g = _G
+    if g[TRIG_KEY] == nil then
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        g[TRIG_KEY] = trig
     end
+    local ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
+    jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev)
 end
 --- 初始化宝箱系统
 function ____exports.initChestSystem()

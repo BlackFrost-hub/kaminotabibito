@@ -162,9 +162,7 @@ export function EG_GetRandomOfGroup(id: number): any {
   const max = g.length - 1;
   if (max < 0) return null;
 
-  const idx = typeof jass.GetRandomInt === "function"
-    ? jass.GetRandomInt(0, max)
-    : Math.floor(Math.random() * (max + 1));
+  const idx = jass.GetRandomInt(0, max);
 
   return g[idx];
 }

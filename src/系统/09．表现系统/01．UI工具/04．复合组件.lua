@@ -41,12 +41,7 @@ function ____exports.createClickableIcon(self, name, parent, texture, position, 
     if not button then
         return nil
     end
-    if type(japi.DzFrameSetAllPoints) == "function" then
-        japi.DzFrameSetAllPoints(button, backdrop)
-    else
-        setFramePosition(nil, button, position)
-        setFrameSize(nil, button, size)
-    end
+    japi.DzFrameSetAllPoints(button, backdrop)
     setFrameClickEvent(nil, button, onClick)
     return {backdrop = backdrop, button = button}
 end
@@ -98,9 +93,7 @@ function ____exports.createTextLabel(self, name, parent, text, position, size)
     if frame then
         setPos(nil, frame)
         setFrameSize(nil, frame, size)
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(frame, text)
-        end
+        japi.DzFrameSetText(frame, text)
         return frame
     end
     local fallback = createFrame(nil, {
@@ -129,7 +122,7 @@ function ____exports.createTextArea(self, name, parent, text, position, size, ba
     if backdrop then
         setFramePosition(nil, backdrop, position)
         setFrameSize(nil, backdrop, size)
-        if backgroundTexture and type(japi.DzFrameSetTexture) == "function" then
+        if backgroundTexture then
             japi.DzFrameSetTexture(backdrop, backgroundTexture, 0)
         end
     end
@@ -141,15 +134,13 @@ function ____exports.createTextArea(self, name, parent, text, position, size, ba
         visible = true
     })
     if frame then
-        if backdrop and type(japi.DzFrameSetAllPoints) == "function" then
+        if backdrop then
             japi.DzFrameSetAllPoints(frame, backdrop)
         else
             setFramePosition(nil, frame, position)
             setFrameSize(nil, frame, size)
         end
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(frame, text)
-        end
+        japi.DzFrameSetText(frame, text)
         return frame
     end
     return ____exports.createTextLabel(
@@ -190,9 +181,7 @@ function ____exports.createTextBox(self, name, parent, text, position, size, bac
     local innerSize = {width = size.width - 0.01, height = size.height - 0.01}
     setFramePosition(nil, textFrame, innerPos)
     setFrameSize(nil, textFrame, innerSize)
-    if type(japi.DzFrameSetText) == "function" then
-        japi.DzFrameSetText(textFrame, text)
-    end
+    japi.DzFrameSetText(textFrame, text)
     return {backdrop = backdrop, text = textFrame}
 end
 return ____exports

@@ -27,12 +27,12 @@ require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡�
 require("系统.09．表现系统.02．对话框系统.16．对话框同步状态");
 
 // 初始化对话框系统
-const 对话框UI = require("系统.09．表现系统.02．对话框系统.00．对话框UI入口") as { initDialogSystem?: () => void };
-if (typeof 对话框UI.initDialogSystem === "function") 对话框UI.initDialogSystem();
+const 对话框UI = require("系统.09．表现系统.02．对话框系统.00．对话框UI入口") as { initDialogSystem: () => void };
+对话框UI.initDialogSystem();
 
 // 初始化选择触发
 const { initDialogEntrySelectionTrigger } = require("系统.09．表现系统.02．对话框系统.10．选择触发入口");
-if (typeof initDialogEntrySelectionTrigger === "function") initDialogEntrySelectionTrigger();
+initDialogEntrySelectionTrigger();
 
 /**
  * 初始化对话框系统

@@ -70,7 +70,6 @@ export function testUI(): void {
 
   // 显示UI
   (pcall as any)(() => {
-    if (typeof jass.GetLocalPlayer !== "function") return;
     const lp = jass.GetLocalPlayer();
     if (lp == null || lp === 0) return;
 
@@ -81,7 +80,6 @@ export function testUI(): void {
   // 等待3秒后隐藏
   withTimer(3, () => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null || lp === 0) return;
 

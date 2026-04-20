@@ -53,9 +53,6 @@ end
 --- 只切换展开状态；真正的重排与滚动同步仍交给 `refreshList`。
 function ____exports.toggleTaskUIQuestExpand(self, ctx, questId, refreshList)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -112,9 +109,6 @@ end
 --- 门面层的列表刷新入口：先清旧帧，再把数据和回调委托给列表模块。
 function ____exports.refreshTaskUIFacadeList(self, ctx, refreshList)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return

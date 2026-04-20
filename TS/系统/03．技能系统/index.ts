@@ -26,25 +26,25 @@ require("系统.03．技能系统.02．技能消耗.index");
 
 // 快捷键技能系统
 const bbTeleportMod = require("系统.03．技能系统.04．快捷键技能.index") as { initBBTeleport?: () => void };
-if (typeof bbTeleportMod.initBBTeleport === "function") bbTeleportMod.initBBTeleport();
+bbTeleportMod.initBBTeleport!();
 
 const switchBagMod = require("系统.03．技能系统.04．快捷键技能.index") as { initSwitchBag?: () => void };
-if (typeof switchBagMod.initSwitchBag === "function") switchBagMod.initSwitchBag();
+switchBagMod.initSwitchBag!();
 
 // 显示技能名字（通过registerSpellChannelListener自动注册，无需手动init）
 require("系统.03．技能系统.01．显示技能名字");
 
 // 动态技能说明系统
-const dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index") as { init?: () => void };
-if (typeof dynamicSkillTip.init === "function") dynamicSkillTip.init();
+const dynamicSkillTip = require("系统.03．技能系统.05．动态技能说明.index") as { init: () => void };
+dynamicSkillTip.init();
 
 // AI自动使用技能系统
-const aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index") as { init?: () => void };
-if (typeof aiSkillSystem.init === "function") aiSkillSystem.init();
+const aiSkillSystem = require("系统.03．技能系统.06．AI自动使用技能.index") as { init: () => void };
+aiSkillSystem.init();
 
 // 技能吟唱条系统
-const castBarSystem = require("系统.03．技能系统.07．技能吟唱条.index") as { init?: () => void };
-if (typeof castBarSystem.init === "function") castBarSystem.init();
+const castBarSystem = require("系统.03．技能系统.07．技能吟唱条.index") as { init: () => void };
+castBarSystem.init();
 
 /**
  * 初始化技能系统

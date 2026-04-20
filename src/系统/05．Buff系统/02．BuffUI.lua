@@ -67,17 +67,8 @@ local function tryDzFrameSetTooltipF2i(self, hostFrame, tooltipFrame)
     if not hostFrame or hostFrame == 0 or not tooltipFrame or tooltipFrame == 0 then
         return
     end
-    if type(japi.DzFrameSetTooltip) ~= "function" then
-        return
-    end
     pcall(function ()
-            local ____temp_0
-            if type(japi.DzF2I) == "function" then
-                ____temp_0 = japi.DzF2I(tooltipFrame)
-            else
-                ____temp_0 = tooltipFrame
-            end
-            local tipId = ____temp_0
+            local tipId = japi.DzF2I(tooltipFrame)
             japi.DzFrameSetTooltip(hostFrame, tipId)
         end
     )
@@ -94,9 +85,6 @@ local function debugBuffUi(self, msg)
     if not ____exports.BUFF_UI_DEBUG then
         return
     end
-    if type(jass.GetLocalPlayer) ~= "function" or type(jass.DisplayTextToPlayer) ~= "function" then
-        return
-    end
     local p = jass.GetLocalPlayer()
     jass.DisplayTextToPlayer(p, 0, 0, "[BuffUI] " .. msg)
 end
@@ -104,23 +92,10 @@ local function countSelectedForPlayer(self, p)
     if not p or p == 0 then
         return {n = 0, sole = nil}
     end
-    if type(jass.CreateGroup) ~= "function" then
-        return {n = 0, sole = nil}
-    end
     local g = jass.CreateGroup()
-    local useSelectedNative = type(jass.GroupEnumUnitsSelected) == "function"
+    local useSelectedNative = true
     if useSelectedNative then
         jass.GroupEnumUnitsSelected(g, p, nil)
-    else
-        if type(jass.IsUnitSelected) ~= "function" or type(jass.GetWorldBounds) ~= "function" or type(jass.GroupEnumUnitsInRect) ~= "function" then
-            jass.DestroyGroup(g)
-            return {n = 0, sole = nil}
-        end
-        jass.GroupEnumUnitsInRect(
-            g,
-            jass.GetWorldBounds(),
-            nil
-        )
     end
     local n = 0
     local sole = nil
@@ -132,22 +107,22 @@ local function countSelectedForPlayer(self, p)
             end
             jass.GroupRemoveUnit(g, u)
             if not useSelectedNative and not jass.IsUnitSelected(u, p) then
-                goto __continue20
+                goto __continue15
             end
             n = n + 1
             if sole == nil then
                 sole = u
             end
         end
-        ::__continue20::
+        ::__continue15::
     end
     jass.DestroyGroup(g)
     return {n = n, sole = sole}
 end
 local function getSoleSelectedUnitForPlayer(self, p)
-    local ____countSelectedForPlayer_result_1 = countSelectedForPlayer(nil, p)
-    local n = ____countSelectedForPlayer_result_1.n
-    local sole = ____countSelectedForPlayer_result_1.sole
+    local ____countSelectedForPlayer_result_0 = countSelectedForPlayer(nil, p)
+    local n = ____countSelectedForPlayer_result_0.n
+    local sole = ____countSelectedForPlayer_result_0.sole
     if n ~= 1 then
         return nil
     end
@@ -156,9 +131,6 @@ end
 local function isUnitRefLikelyValid(self, u)
     if u == nil or u == 0 then
         return false
-    end
-    if type(jass.GetUnitTypeId) ~= "function" then
-        return true
     end
     local tid = jass.GetUnitTypeId(u)
     return tid ~= nil and tid ~= 0
@@ -176,7 +148,7 @@ local function collectBuffRows(self, unit)
             local rt = buffPoolMod:getBuffRuntime(unit, bid)
             if rt ~= nil then
                 local real = rt.remaining
-                local iconRem = type(buffPoolMod.getDotIconDisplayRemaining) == "function" and buffPoolMod:getDotIconDisplayRemaining(unit, bid, real) or real
+                local iconRem = buffPoolMod:getDotIconDisplayRemaining(unit, bid, real)
                 local row = {id = bid, state = {effect = rt.effect, remaining = real, iconRemaining = iconRem, sourceName = rt.sourceName}, iconOverride = rt.iconOverride}
                 if bid == "D001" or bid == "D002" or bid == "D003" or bid == "D004" then
                     row.state._dotParsedDuration = rt._dotParsedDuration
@@ -236,41 +208,37 @@ local function hideAllSlots(self)
 end
 local function syncBuffBar(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                hideAllSlots(nil)
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil or lp == 0 then
                 return
             end
-            local ____countSelectedForPlayer_result_2 = countSelectedForPlayer(nil, lp)
-            local selN = ____countSelectedForPlayer_result_2.n
-            local sole = ____countSelectedForPlayer_result_2.sole
-            local hid = sole ~= nil and sole ~= 0 and type(jass.GetHandleId) == "function" and jass.GetHandleId(sole) or 0
+            local ____countSelectedForPlayer_result_1 = countSelectedForPlayer(nil, lp)
+            local selN = ____countSelectedForPlayer_result_1.n
+            local sole = ____countSelectedForPlayer_result_1.sole
+            local hid = sole ~= nil and sole ~= 0 and jass.GetHandleId(sole) or 0
             local soleOk = sole ~= nil and sole ~= 0 and isUnitRefLikelyValid(nil, sole)
             local inPool = soleOk and buffPoolMod:isUnitInBuffPool(sole)
+            local ____soleOk_2
+            if soleOk then
+                ____soleOk_2 = buffPoolMod:getBuffRuntime(sole, "D001")
+            else
+                ____soleOk_2 = nil
+            end
+            local rtD001 = ____soleOk_2
             local ____soleOk_3
             if soleOk then
-                ____soleOk_3 = buffPoolMod:getBuffRuntime(sole, "D001")
+                ____soleOk_3 = buffPoolMod:getBuffRuntime(sole, "D002")
             else
                 ____soleOk_3 = nil
             end
-            local rtD001 = ____soleOk_3
+            local rtD002 = ____soleOk_3
             local ____soleOk_4
             if soleOk then
-                ____soleOk_4 = buffPoolMod:getBuffRuntime(sole, "D002")
+                ____soleOk_4 = buffPoolMod:getBuffRuntime(sole, "D003")
             else
                 ____soleOk_4 = nil
             end
-            local rtD002 = ____soleOk_4
-            local ____soleOk_5
-            if soleOk then
-                ____soleOk_5 = buffPoolMod:getBuffRuntime(sole, "D003")
-            else
-                ____soleOk_5 = nil
-            end
-            local rtD003 = ____soleOk_5
+            local rtD003 = ____soleOk_4
             if ____exports.BUFF_UI_DEBUG then
                 local rowsProbe = soleOk and selN == 1 and collectBuffRows(nil, sole) or ({})
                 local key = (((((((((((tostring(selN) .. "|") .. tostring(hid)) .. "|") .. tostring(inPool)) .. "|") .. tostring(rtD001 ~= nil)) .. "|") .. tostring(rtD002 ~= nil)) .. "|") .. tostring(rtD003 ~= nil)) .. "|") .. tostring(#rowsProbe)
@@ -294,17 +262,17 @@ local function syncBuffBar(self)
                     do
                         if i >= #rows then
                             hideSlot(nil, i)
-                            goto __continue58
+                            goto __continue51
                         end
                         local row = rows[i + 1]
                         local meta = buffs[row.id]
                         local slot = slots[i + 1]
                         if not slot then
-                            goto __continue58
+                            goto __continue51
                         end
                         local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
                         if iconTex == "" then
-                            goto __continue58
+                            goto __continue51
                         end
                         local pd = row.state._dotParsedDuration
                         local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
@@ -319,14 +287,14 @@ local function syncBuffBar(self)
                         pcall(function () return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
                         )
                         local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
-                        if slot.remainText and slot.remainText ~= 0 and type(japi.DzFrameSetText) == "function" then
+                        if slot.remainText and slot.remainText ~= 0 then
                             if lastRemainStrBySlot[i + 1] ~= remStr then
                                 lastRemainStrBySlot[i + 1] = remStr
                                 pcall(function () return japi.DzFrameSetText(slot.remainText, ("|cffffffff" .. remStr) .. "|r") end
                                 )
                             end
                         end
-                        if slot.tipText and slot.tipText ~= 0 and type(japi.DzFrameSetText) == "function" then
+                        if slot.tipText and slot.tipText ~= 0 then
                             if lastTipStrBySlot[i + 1] ~= tipStr then
                                 lastTipStrBySlot[i + 1] = tipStr
                                 pcall(function () return japi.DzFrameSetText(slot.tipText, tipStr) end
@@ -350,7 +318,7 @@ local function syncBuffBar(self)
                             end
                         end
                     end
-                    ::__continue58::
+                    ::__continue51::
                     i = i + 1
                 end
             end
@@ -380,10 +348,8 @@ local function createOneSlot(self, index, parent)
             )
             pcall(function () return ____UI_5DE5_5177:setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp") end
             )
-            if type(japi.DzFrameSetLevel) == "function" then
-                pcall(function () return japi.DzFrameSetLevel(bd, 180) end
-                )
-            end
+            pcall(function () return japi.DzFrameSetLevel(bd, 180) end
+            )
             local remainText = ____UI_5DE5_5177:createTextLabel(
                 "BuffUIBarRemain" .. tostring(index),
                 bd,
@@ -398,16 +364,12 @@ local function createOneSlot(self, index, parent)
                 {width = ICON_W, height = 0.014}
             ) or 0
             if remainText and remainText ~= 0 then
-                if type(japi.DzFrameSetTextAlignment) == "function" then
-                    pcall(function ()
-                            japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
-                        end
-                    )
-                end
-                if type(japi.DzFrameSetLevel) == "function" then
-                    pcall(function () return japi.DzFrameSetLevel(remainText, 182) end
-                    )
-                end
+                pcall(function ()
+                        japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
+                    end
+                )
+                pcall(function () return japi.DzFrameSetLevel(remainText, 182) end
+                )
             end
             local hit = ____UI_5DE5_5177:createFrame({
                 type = ____UI_5DE5_5177.FrameType.GLUETEXTBUTTON,
@@ -418,13 +380,11 @@ local function createOneSlot(self, index, parent)
                 enable = true,
                 alpha = 0
             }) or 0
-            if hit and hit ~= 0 and type(japi.DzFrameSetAllPoints) == "function" then
+            if hit and hit ~= 0 then
                 pcall(function () return japi.DzFrameSetAllPoints(hit, bd) end
                 )
-                if type(japi.DzFrameSetLevel) == "function" then
-                    pcall(function () return japi.DzFrameSetLevel(hit, 181) end
-                    )
-                end
+                pcall(function () return japi.DzFrameSetLevel(hit, 181) end
+                )
                 pcall(function () return ____UI_5DE5_5177:setFrameHoverEvents(
                         hit,
                         function()
@@ -478,10 +438,8 @@ local function createOneSlot(self, index, parent)
                 )
                 pcall(function () return ____UI_5DE5_5177:setFrameTexture(tipBox, TIP_BOX_TEX) end
                 )
-                if type(japi.DzFrameSetLevel) == "function" then
-                    pcall(function () return japi.DzFrameSetLevel(tipBox, 0) end
-                    )
-                end
+                pcall(function () return japi.DzFrameSetLevel(tipBox, 0) end
+                )
                 pcall(function () return ____UI_5DE5_5177:hideFrame(tipBox) end
                 )
             end
@@ -505,16 +463,12 @@ local function createOneSlot(self, index, parent)
                 {width = boxW * 0.92, height = boxH * 0.88}
             ) or 0
             if tipText and tipText ~= 0 then
-                if type(japi.DzFrameSetTextAlignment) == "function" then
-                    pcall(function ()
-                            japi.DzFrameSetTextAlignment(tipText, 0)
-                        end
-                    )
-                end
-                if type(japi.DzFrameSetLevel) == "function" then
-                    pcall(function () return japi.DzFrameSetLevel(tipText, 0) end
-                    )
-                end
+                pcall(function ()
+                        japi.DzFrameSetTextAlignment(tipText, 0)
+                    end
+                )
+                pcall(function () return japi.DzFrameSetLevel(tipText, 0) end
+                )
                 pcall(function () return ____UI_5DE5_5177:hideFrame(tipText) end
                 )
             end
@@ -541,9 +495,6 @@ local function createOneSlot(self, index, parent)
 end
 local function createUi(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil or lp == 0 then
                 return
@@ -584,8 +535,8 @@ local function startRefreshTimer(self)
                 return
             end
             _registeredToCenterTimer = true
-            local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-            local onTick10ms = ____require_result_6.onTick10ms
+            local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+            local onTick10ms = ____require_result_5.onTick10ms
             onTick10ms(
                 nil,
                 function()
@@ -593,9 +544,6 @@ local function startRefreshTimer(self)
                     if _refreshCounter >= 10 then
                         _refreshCounter = 0
                         pcall(function ()
-                                if type(jass.GetLocalPlayer) ~= "function" then
-                                    return
-                                end
                                 local lp = jass.GetLocalPlayer()
                                 if lp == nil or lp == 0 then
                                     return
@@ -615,33 +563,23 @@ function ____exports.init(self)
     end
     buffUiInitialized = true
     pcall(function ()
-            if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-                local delayTimer = jass.CreateTimer()
-                jass.TimerStart(
-                    delayTimer,
-                    1,
-                    false,
-                    function()
-                        pcall(function ()
-                                if type(jass.GetLocalPlayer) ~= "function" then
-                                    if type(jass.DestroyTimer) == "function" then
-                                        jass.DestroyTimer(delayTimer)
-                                    end
-                                    return
-                                end
-                                local lp = jass.GetLocalPlayer()
-                                if lp ~= nil and lp ~= 0 then
-                                    createUi(nil)
-                                end
-                                startRefreshTimer(nil)
-                                if type(jass.DestroyTimer) == "function" then
-                                    jass.DestroyTimer(delayTimer)
-                                end
+            local delayTimer = jass.CreateTimer()
+            jass.TimerStart(
+                delayTimer,
+                1,
+                false,
+                function()
+                    pcall(function ()
+                            local lp = jass.GetLocalPlayer()
+                            if lp ~= nil and lp ~= 0 then
+                                createUi(nil)
                             end
-                        )
-                    end
-                )
-            end
+                            startRefreshTimer(nil)
+                            jass.DestroyTimer(delayTimer)
+                        end
+                    )
+                end
+            )
         end
     )
 end

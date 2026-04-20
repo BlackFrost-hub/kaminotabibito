@@ -4,7 +4,6 @@ local ____exports = {}
 local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local getMouseFocus = ____index.getMouseFocus
 local getMouseY = ____index.getMouseY
-local getWindowHeight = ____index.getWindowHeight
 local frameSetScriptByCode = ____index.frameSetScriptByCode
 local ____index = require("系统.09．表现系统.01．UI工具.index")
 local createFrame = ____index.createFrame
@@ -24,13 +23,7 @@ function ____exports.getScrollbarThumbTravelNorm(self, trackHeightNorm, thumbSiz
 end
 --- 与 syncThumb 一致的轨道像素高度（Dz 竖向 0..0.6 对应 client 高度）
 function ____exports.getScrollbarTrackThumbTravelPx(self, travelNorm)
-    local ____temp_0
-    if type(japi.DzGetClientHeight) == "function" then
-        ____temp_0 = japi.DzGetClientHeight()
-    else
-        ____temp_0 = getWindowHeight(nil) or 600
-    end
-    local ch = ____temp_0
+    local ch = japi.DzGetClientHeight()
     return math.max(1, ch * travelNorm / 0.6)
 end
 --- 与 war3map.j DzTriggerRegisterMouseEventTrg 一致：左键按下 (1,1)、释放 (1,0)
@@ -54,9 +47,6 @@ function VerticalScrollbarTrack.prototype.____constructor(self, options)
 end
 function VerticalScrollbarTrack.prototype.attach(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp ~= nil then
                 if not self.opt.thumbFrame or self.opt.thumbFrame == 0 then
@@ -75,12 +65,8 @@ function VerticalScrollbarTrack.prototype.attach(self)
                     self.hitBtn = nil
                     return
                 end
-                if type(japi.DzFrameSetAllPoints) == "function" then
-                    japi.DzFrameSetAllPoints(self.hitBtn, self.opt.thumbFrame)
-                end
-                if type(japi.DzFrameSetLevel) == "function" then
-                    japi.DzFrameSetLevel(self.hitBtn, 121)
-                end
+                japi.DzFrameSetAllPoints(self.hitBtn, self.opt.thumbFrame)
+                japi.DzFrameSetLevel(self.hitBtn, 121)
                 frameSetScriptByCode(
                     nil,
                     self.hitBtn,
@@ -102,63 +88,58 @@ function VerticalScrollbarTrack.prototype.attach(self)
                     function() return self:endDrag() end,
                     false
                 )
-                if type(jass.CreateTrigger) == "function" and type(japi.DzTriggerRegisterMouseEventByCode) == "function" then
-                    self.mouseDownTrigger = jass.CreateTrigger()
-                    japi.DzTriggerRegisterMouseEventByCode(
-                        self.mouseDownTrigger,
-                        MOUSE_BTN_LEFT,
-                        MOUSE_STATUS_PRESS,
-                        false,
-                        function()
-                            pcall(function ()
-                                    local lp2 = jass.GetLocalPlayer()
-                                    if lp2 == nil then
-                                        return
-                                    end
-                                    if not self.opt:isInteractionEnabled() or not self.hitBtn then
-                                        return
-                                    end
-                                    local maxScroll = self:getMaxScroll()
-                                    if maxScroll <= 0 then
-                                        return
-                                    end
-                                    if self.dragging then
-                                        return
-                                    end
-                                    local focus = getMouseFocus(nil)
-                                    if self:isFocusOnThisTrack(focus) then
-                                        self:startDrag()
-                                    end
+                self.mouseDownTrigger = jass.CreateTrigger()
+                japi.DzTriggerRegisterMouseEventByCode(
+                    self.mouseDownTrigger,
+                    MOUSE_BTN_LEFT,
+                    MOUSE_STATUS_PRESS,
+                    false,
+                    function()
+                        pcall(function ()
+                                local lp2 = jass.GetLocalPlayer()
+                                if lp2 == nil then
+                                    return
                                 end
-                            )
-                        end
-                    )
-                    self.mouseUpTrigger = jass.CreateTrigger()
-                    japi.DzTriggerRegisterMouseEventByCode(
-                        self.mouseUpTrigger,
-                        MOUSE_BTN_LEFT,
-                        MOUSE_STATUS_RELEASE,
-                        false,
-                        function()
-                            pcall(function ()
-                                    local lp2 = jass.GetLocalPlayer()
-                                    if lp2 == nil then
-                                        return
-                                    end
-                                    self:endDrag()
+                                if not self.opt:isInteractionEnabled() or not self.hitBtn then
+                                    return
                                 end
-                            )
-                        end
-                    )
-                end
+                                local maxScroll = self:getMaxScroll()
+                                if maxScroll <= 0 then
+                                    return
+                                end
+                                if self.dragging then
+                                    return
+                                end
+                                local focus = getMouseFocus(nil)
+                                if self:isFocusOnThisTrack(focus) then
+                                    self:startDrag()
+                                end
+                            end
+                        )
+                    end
+                )
+                self.mouseUpTrigger = jass.CreateTrigger()
+                japi.DzTriggerRegisterMouseEventByCode(
+                    self.mouseUpTrigger,
+                    MOUSE_BTN_LEFT,
+                    MOUSE_STATUS_RELEASE,
+                    false,
+                    function()
+                        pcall(function ()
+                                local lp2 = jass.GetLocalPlayer()
+                                if lp2 == nil then
+                                    return
+                                end
+                                self:endDrag()
+                            end
+                        )
+                    end
+                )
             end
         end
     )
     pcall(function ()
             self:stopDragTimer()
-            if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-                return
-            end
             self.dragTimer = jass.CreateTimer()
             jass.TimerStart(
                 self.dragTimer,
@@ -171,15 +152,12 @@ function VerticalScrollbarTrack.prototype.attach(self)
 end
 function VerticalScrollbarTrack.prototype.destroy(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp ~= nil then
-                if self.mouseDownTrigger and type(jass.DestroyTrigger) == "function" then
+                if self.mouseDownTrigger then
                     jass.DestroyTrigger(self.mouseDownTrigger)
                 end
-                if self.mouseUpTrigger and type(jass.DestroyTrigger) == "function" then
+                if self.mouseUpTrigger then
                     jass.DestroyTrigger(self.mouseUpTrigger)
                 end
             end
@@ -232,9 +210,6 @@ function VerticalScrollbarTrack.prototype.getMaxScroll(self)
 end
 function VerticalScrollbarTrack.prototype.forceBeginDragFromHit(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -255,9 +230,6 @@ function VerticalScrollbarTrack.prototype.forceBeginDragFromHit(self)
 end
 function VerticalScrollbarTrack.prototype.startDrag(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -278,19 +250,12 @@ function VerticalScrollbarTrack.prototype.stopDragTimer(self)
     if self.dragTimer == nil then
         return
     end
-    if type(jass.PauseTimer) == "function" then
-        jass.PauseTimer(self.dragTimer)
-    end
-    if type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(self.dragTimer)
-    end
+    jass.PauseTimer(self.dragTimer)
+    jass.DestroyTimer(self.dragTimer)
     self.dragTimer = nil
 end
 function VerticalScrollbarTrack.prototype.onDragTick(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -328,9 +293,6 @@ function VerticalScrollbarTrack.prototype.onDragTick(self)
 end
 function VerticalScrollbarTrack.prototype.endDrag(self)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -344,9 +306,6 @@ function VerticalScrollbarTrack.prototype.endDrag(self)
 end
 function VerticalScrollbarTrack.prototype.syncThumbVisual(self, maxScroll)
     pcall(function ()
-            if type(jass.GetLocalPlayer) ~= "function" then
-                return
-            end
             local lp = jass.GetLocalPlayer()
             if lp == nil then
                 return
@@ -361,15 +320,9 @@ function VerticalScrollbarTrack.prototype.syncThumbVisual(self, maxScroll)
                 return
             end
             local tf = self.opt.thumbFrame
-            if type(japi.DzFrameShow) == "function" then
-                japi.DzFrameShow(tf, true)
-            end
-            if type(japi.DzFrameSetLevel) == "function" then
-                japi.DzFrameSetLevel(tf, 120)
-            end
-            if type(japi.DzFrameSetSize) == "function" then
-                japi.DzFrameSetSize(tf, self.opt.thumbSizeNorm, self.opt.thumbSizeNorm)
-            end
+            japi.DzFrameShow(tf, true)
+            japi.DzFrameSetLevel(tf, 120)
+            japi.DzFrameSetSize(tf, self.opt.thumbSizeNorm, self.opt.thumbSizeNorm)
             local safeRange = ____exports.getScrollbarThumbTravelNorm(
                 nil,
                 self:trackH(),
@@ -379,9 +332,7 @@ function VerticalScrollbarTrack.prototype.syncThumbVisual(self, maxScroll)
             )
             local progress = maxScroll <= 0 and 0 or self.opt:getScrollOffset() / maxScroll
             local yOffset = (0.5 - progress) * safeRange + (self.opt.topCompensation - self.opt.bottomCompensation) * 0.5
-            if type(japi.DzFrameClearAllPoints) == "function" then
-                japi.DzFrameClearAllPoints(tf)
-            end
+            japi.DzFrameClearAllPoints(tf)
             setFramePointRelative(
                 nil,
                 tf,

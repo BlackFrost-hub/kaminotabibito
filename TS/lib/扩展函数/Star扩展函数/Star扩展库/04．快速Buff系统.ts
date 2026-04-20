@@ -76,7 +76,6 @@ const SFB_BUFF_ID: Record<number, string> = {
 
 function getUnitSourceName(sourceUnit: any): string {
   if (sourceUnit == null || sourceUnit === 0) return "";
-  if (typeof jass.GetUnitName !== "function") return "";
   const n = jass.GetUnitName(sourceUnit);
   return typeof n === "string" && n !== "" ? n : "";
 }
@@ -148,14 +147,10 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
     } else if (id === 23) {
       const tempTimer = jass.CreateTimer();
       jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
-      if (typeof japi.EXPauseUnit === "function") {
-        japi.EXPauseUnit(u, true);
-      }
+      japi.EXPauseUnit(u, true);
       jass.TimerStart(tempTimer, time, false, () => {
         const t = jass.GetExpiredTimer();
-        if (typeof japi.EXPauseUnit === "function") {
-          japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
-        }
+        japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
         jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
         jass.DestroyTimer(t);
       });

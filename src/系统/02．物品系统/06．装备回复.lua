@@ -58,9 +58,6 @@ local function applyHpMpToUnit(unit, hp, mp)
     if unit == nil or unit == 0 then
         return
     end
-    if type(jass.GetUnitState) ~= "function" or type(jass.SetUnitState) ~= "function" then
-        return
-    end
     if hp > 0 and jass.UNIT_STATE_LIFE ~= nil and jass.UNIT_STATE_MAX_LIFE ~= nil then
         local cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
         local maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
@@ -83,9 +80,6 @@ end
 --- 治疗前后差值，供 YDLocal7 与父 `YDLocal1Get(real,…)` 对齐手写 JASS 子触发的「有效回复量」语义
 local function applyHpMpToUnitAndGetApplied(unit, hp, mp)
     if unit == nil or unit == 0 then
-        return {hpApplied = 0, mpApplied = 0}
-    end
-    if type(jass.GetUnitState) ~= "function" then
         return {hpApplied = 0, mpApplied = 0}
     end
     local lifeBefore = 0
@@ -116,12 +110,6 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
     if stesHT == nil or stesHT == 0 then
         return
     end
-    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
-        return
-    end
-    if type(jass.LoadTriggerHandle) ~= "function" then
-        return
-    end
     local hash = jass.StringHash(____exports.ITEM_HEAL_STES_EVENT)
     local loopIndex = jass.LoadInteger(
         stesHT,
@@ -135,7 +123,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
             do
                 local trg = jass.LoadTriggerHandle(stesHT, hash, i)
                 if trg == nil or trg == 0 then
-                    goto __continue19
+                    goto __continue15
                 end
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -146,7 +134,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
                 YDLocal5Set(nil, "string", YL_ABIL, abilId)
                 YDTriggerExecuteTrigger(nil, trg, false)
             end
-            ::__continue19::
+            ::__continue15::
             i = i + 1
         end
     end
@@ -165,17 +153,13 @@ local function onItemHealStesChild()
             local item = YDLocal5Get(nil, "item", YL_ITEM)
             ydlStes_readString5(nil, nil, YL_ABIL)
             if unit == nil or unit == 0 then
-                if type(jass.GetManipulatingUnit) == "function" then
-                    unit = jass.GetManipulatingUnit()
-                end
-                if (unit == nil or unit == 0) and type(jass.GetTriggerUnit) == "function" then
+                unit = jass.GetManipulatingUnit()
+                if unit == nil or unit == 0 then
                     unit = jass.GetTriggerUnit()
                 end
             end
             if item == nil or item == 0 then
-                if type(jass.GetManipulatedItem) == "function" then
-                    item = jass.GetManipulatedItem()
-                end
+                item = jass.GetManipulatedItem()
             end
             local hp = rawHp
             local mp = rawMp
@@ -222,30 +206,18 @@ local function executeSegment(self, unit, item, seg)
     )
 end
 local function onUseItem()
-    local unit = nil
-    if type(jass.GetManipulatingUnit) == "function" then
-        unit = jass.GetManipulatingUnit()
-    end
-    if unit == nil and type(jass.GetTriggerUnit) == "function" then
+    local unit = jass.GetManipulatingUnit()
+    if unit == nil then
         unit = jass.GetTriggerUnit()
     end
-    local item = nil
-    if type(jass.GetManipulatedItem) == "function" then
-        item = jass.GetManipulatedItem()
-    end
+    local item = jass.GetManipulatedItem()
     if not unit or not item then
         return
     end
     if isSpecialUnit(nil, unit) then
         return
     end
-    local ____temp_8
-    if type(jass.GetItemTypeId) == "function" then
-        ____temp_8 = jass.GetItemTypeId(item)
-    else
-        ____temp_8 = 0
-    end
-    local itemId = ____temp_8
+    local itemId = jass.GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
@@ -268,7 +240,7 @@ local function onUseItem()
     for ____, seg in ipairs(segments) do
         do
             if seg.abilId == "" then
-                goto __continue41
+                goto __continue33
             end
             if seg.waitSec <= 0 then
                 executeSegment(nil, unit, item, seg)
@@ -285,7 +257,7 @@ local function onUseItem()
                 )
             end
         end
-        ::__continue41::
+        ::__continue33::
     end
 end
 local INIT_KEY = "__EquipHealInited"
@@ -296,9 +268,6 @@ local function init()
         return
     end
     glob[INIT_KEY] = true
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        return
-    end
     if not glob[STES_REG_KEY] and STES_Register ~= nil then
         local stesTrig = jass.CreateTrigger()
         jass.TriggerAddAction(
@@ -310,11 +279,11 @@ local function init()
         ydlStes_registerAfterGetTable(nil, nil, stesTrig, ____exports.ITEM_HEAL_STES_EVENT)
         glob[STES_REG_KEY] = true
     end
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_9 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_9 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_9 = 35
+    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 = jass.EVENT_PLAYER_UNIT_USE_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 == nil then
+        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 = 35
     end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_9
+    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8
     local trig = jass.CreateTrigger()
     do
         local i = 0
@@ -328,11 +297,9 @@ local function init()
             i = i + 1
         end
     end
-    if type(jass.Player) == "function" then
-        local p13 = jass.Player(13)
-        if p13 ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
-        end
+    local p13 = jass.Player(13)
+    if p13 ~= nil then
+        jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
     end
     jass.TriggerAddAction(
         trig,

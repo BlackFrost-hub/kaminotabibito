@@ -29,8 +29,6 @@ function getMaxMovespeed2Info(unit: any, ignoreItem?: any): { value: number; nam
   let max = 0;
   let name = "";
   let count = 0;
-  if (typeof (jass as any).UnitItemInSlot !== "function") return { value: 0, name: "", count: 0 };
-  if (typeof (jass as any).GetItemTypeId !== "function") return { value: 0, name: "", count: 0 };
   for (let slot = 0; slot <= 5; slot++) {
     const item = (jass as any).UnitItemInSlot(unit, slot);
     if (!item) continue;
@@ -66,12 +64,12 @@ function applyMovespeed2(unit: any, newSpeed: number): void {
 function onItemChange(): void {
   const unit = jass.GetManipulatingUnit();
   if (!unit) return;
-  if (typeof (jass as any).IsUnitType === "function" && jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return;
+  if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
+  if ((jass as any).IsUnitIllusionBJ(unit)) return;
   const eventId = jass.GetTriggerEventId();
   const isPickup = eventId === ((jass as any).EVENT_PLAYER_UNIT_PICKUP_ITEM ?? 38);
   const isDrop = eventId === ((jass as any).EVENT_PLAYER_UNIT_DROP_ITEM ?? 39);
-  const manipulated = typeof (jass as any).GetManipulatedItem === "function" ? (jass as any).GetManipulatedItem() : undefined;
+  const manipulated = jass.GetManipulatedItem();
   const newSpeed = isDrop ? getMaxMovespeed2(unit, manipulated) : getMaxMovespeed2(unit);
   const key = getUnitKey(unit);
   const cur = applied[key] != null ? applied[key] : 0;

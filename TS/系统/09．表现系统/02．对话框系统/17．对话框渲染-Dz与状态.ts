@@ -22,29 +22,28 @@ export const g_states: PlayerDialogState[] = [];
 export const g_questCallbacksByPlayer: Array<{ onAccept: () => void; onReject: () => void } | undefined> = [];
 
 // ========== 虚拟分区：Dz / JASS 封装 ==========
-export function dzShow(f: Frame, b: boolean): void { if (f && f !== 0 && typeof japi.DzFrameShow === "function") japi.DzFrameShow(f, b); }
-export function dzSetText(f: Frame, s: string): void { if (f && f !== 0 && typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(f, s); }
-export function dzSetTexture(f: Frame, path: string): void { if (f && f !== 0 && typeof japi.DzFrameSetTexture === "function") japi.DzFrameSetTexture(f, path, 0); }
-export function dzSetAlpha(f: Frame, a: number): void { if (f && f !== 0 && typeof japi.DzFrameSetAlpha === "function") japi.DzFrameSetAlpha(f, a); }
-export function dzSetPriority(f: Frame, p: number): void { if (f && f !== 0 && typeof japi.DzFrameSetPriority === "function") (pcall as any)(() => japi.DzFrameSetPriority(f, p)); }
-export function dzSetAbsPoint(f: Frame, point: number, x: number, y: number): void { if (f && f !== 0 && typeof japi.DzFrameSetAbsolutePoint === "function") japi.DzFrameSetAbsolutePoint(f, point, x, y); }
-export function dzSetSize(f: Frame, w: number, h: number): void { if (f && f !== 0 && typeof japi.DzFrameSetSize === "function") japi.DzFrameSetSize(f, w, h); }
-export function dzClearPoints(f: Frame): void { if (f && f !== 0 && typeof japi.DzFrameClearAllPoints === "function") japi.DzFrameClearAllPoints(f); }
-export function dzSetEnable(f: Frame, b: boolean): void { if (f && f !== 0 && typeof japi.DzFrameSetEnable === "function") japi.DzFrameSetEnable(f, b); }
-export function dzSetFont(f: Frame, font: string, size: number): void { if (f && f !== 0 && typeof japi.DzFrameSetFont === "function") japi.DzFrameSetFont(f, font, size, 0); }
+export function dzShow(f: Frame, b: boolean): void { if (f && f !== 0) japi.DzFrameShow(f, b); }
+export function dzSetText(f: Frame, s: string): void { if (f && f !== 0) japi.DzFrameSetText(f, s); }
+export function dzSetTexture(f: Frame, path: string): void { if (f && f !== 0) japi.DzFrameSetTexture(f, path, 0); }
+export function dzSetAlpha(f: Frame, a: number): void { if (f && f !== 0) japi.DzFrameSetAlpha(f, a); }
+export function dzSetPriority(f: Frame, p: number): void { if (f && f !== 0) (pcall as any)(() => japi.DzFrameSetPriority(f, p)); }
+export function dzSetAbsPoint(f: Frame, point: number, x: number, y: number): void { if (f && f !== 0) japi.DzFrameSetAbsolutePoint(f, point, x, y); }
+export function dzSetSize(f: Frame, w: number, h: number): void { if (f && f !== 0) japi.DzFrameSetSize(f, w, h); }
+export function dzClearPoints(f: Frame): void { if (f && f !== 0) japi.DzFrameClearAllPoints(f); }
+export function dzSetEnable(f: Frame, b: boolean): void { if (f && f !== 0) japi.DzFrameSetEnable(f, b); }
+export function dzSetFont(f: Frame, font: string, size: number): void { if (f && f !== 0) japi.DzFrameSetFont(f, font, size, 0); }
 export function dzCreate(template: string, tag: number): Frame {
-  const gameUI = typeof japi.DzGetGameUI === "function" ? japi.DzGetGameUI() : 0;
+  const gameUI = japi.DzGetGameUI();
   if (!gameUI || gameUI === 0) return 0;
-  if (typeof japi.DzCreateFrame !== "function") return 0;
   return japi.DzCreateFrame(template, gameUI, tag) as Frame;
 }
-export function dzGetLocalPlayer(): Player { return typeof jass.GetLocalPlayer === "function" ? jass.GetLocalPlayer() : null; }
-export function dzGetPlayerId(p: Player): number { return typeof jass.GetPlayerId === "function" ? (jass.GetPlayerId(p) as number) : -1; }
-export function dzPlayer(index: number): Player { return typeof jass.Player === "function" ? jass.Player(index) : null; }
-export function dzTimerCreate(): Timer { return typeof jass.CreateTimer === "function" ? jass.CreateTimer() : null; }
-export function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void { if (t && typeof jass.TimerStart === "function") jass.TimerStart(t, timeout, periodic, cb); }
-export function dzTimerPause(t: Timer): void { if (t && typeof jass.PauseTimer === "function") jass.PauseTimer(t); }
-export function dzLoadToc(): void { if (typeof japi.DzLoadToc === "function") japi.DzLoadToc(TOC_PATH); }
+export function dzGetLocalPlayer(): Player { return jass.GetLocalPlayer(); }
+export function dzGetPlayerId(p: Player): number { return jass.GetPlayerId(p) as number; }
+export function dzPlayer(index: number): Player { return jass.Player(index); }
+export function dzTimerCreate(): Timer { return jass.CreateTimer(); }
+export function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void { if (t) jass.TimerStart(t, timeout, periodic, cb); }
+export function dzTimerPause(t: Timer): void { if (t) jass.PauseTimer(t); }
+export function dzLoadToc(): void { japi.DzLoadToc(TOC_PATH); }
 let g_tocLoaded = false;
 export function dzLoadTocOnce(): void { if (g_tocLoaded) return; g_tocLoaded = true; dzLoadToc(); }
 

@@ -141,7 +141,6 @@ function getBackgroundModel(this: void, colorId: number): string {
  * 创建帧
  */
 function createFrame(this: void, tagName: string, name: string, parent: any): any {
-  if (typeof japi.DzCreateFrameByTagName !== "function") return null;
   return japi.DzCreateFrameByTagName(tagName, name, parent, "template", 0);
 }
 
@@ -149,7 +148,6 @@ function createFrame(this: void, tagName: string, name: string, parent: any): an
  * 设置帧的绝对位置
  */
 function setFrameAbsolutePoint(this: void, frame: any, x: number, y: number): void {
-  if (typeof japi.DzFrameSetAbsolutePoint !== "function") return;
   japi.DzFrameSetAbsolutePoint(frame, 4, x, y);
 }
 
@@ -157,7 +155,6 @@ function setFrameAbsolutePoint(this: void, frame: any, x: number, y: number): vo
  * 设置帧的相对位置
  */
 function setFramePoint(this: void, frame: any, parent: any, offsetX: number, offsetY: number): void {
-  if (typeof japi.DzFrameSetPoint !== "function") return;
   japi.DzFrameSetPoint(frame, 4, parent, 4, offsetX, offsetY);
 }
 
@@ -165,7 +162,6 @@ function setFramePoint(this: void, frame: any, parent: any, offsetX: number, off
  * 设置帧模型
  */
 function setFrameModel(this: void, frame: any, modelPath: string): void {
-  if (typeof japi.DzFrameSetModel !== "function") return;
   japi.DzFrameSetModel(frame, modelPath, 0, 0);
 }
 
@@ -173,7 +169,6 @@ function setFrameModel(this: void, frame: any, modelPath: string): void {
  * 设置帧动画偏移
  */
 function setFrameAnimateOffset(this: void, frame: any, offset: number): void {
-  if (typeof japi.DzFrameSetAnimateOffset !== "function") return;
   japi.DzFrameSetAnimateOffset(frame, offset);
 }
 
@@ -181,7 +176,6 @@ function setFrameAnimateOffset(this: void, frame: any, offset: number): void {
  * 设置帧动画
  */
 function setFrameAnimate(this: void, frame: any, animId: number, autoPlay: boolean): void {
-  if (typeof japi.DzFrameSetAnimate !== "function") return;
   japi.DzFrameSetAnimate(frame, animId, autoPlay);
 }
 
@@ -189,7 +183,6 @@ function setFrameAnimate(this: void, frame: any, animId: number, autoPlay: boole
  * 显示/隐藏帧
  */
 function showFrame(this: void, frame: any, show: boolean): void {
-  if (typeof japi.DzFrameShow !== "function") return;
   japi.DzFrameShow(frame, show);
 }
 
@@ -197,7 +190,6 @@ function showFrame(this: void, frame: any, show: boolean): void {
  * 设置帧文本
  */
 function setFrameText(this: void, frame: any, text: string): void {
-  if (typeof japi.DzFrameSetText !== "function") return;
   japi.DzFrameSetText(frame, text);
 }
 
@@ -205,7 +197,6 @@ function setFrameText(this: void, frame: any, text: string): void {
  * 设置帧优先级
  */
 function setFramePriority(this: void, frame: any, priority: number): void {
-  if (typeof japi.DzFrameSetPriority !== "function") return;
   japi.DzFrameSetPriority(frame, priority);
 }
 
@@ -213,7 +204,6 @@ function setFramePriority(this: void, frame: any, priority: number): void {
  * 销毁帧
  */
 function destroyFrame(this: void, frame: any): void {
-  if (typeof japi.DzDestroyFrame !== "function") return;
   japi.DzDestroyFrame(frame);
 }
 
@@ -221,7 +211,6 @@ function destroyFrame(this: void, frame: any): void {
  * 获取游戏UI
  */
 function getGameUI(this: void): any {
-  if (typeof japi.DzGetGameUI !== "function") return null;
   return japi.DzGetGameUI();
 }
 
@@ -443,19 +432,14 @@ function jassStesHashtable(this: void): any {
 function countOnJassStesTable(this: void, eventName: string): number {
   const ht = jassStesHashtable();
   if (ht == null || ht === 0) return -1;
-  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return -1;
   const h = jass.StringHash(eventName);
   return jass.LoadInteger(ht, h, ydlStes_skeyIndex(undefined));
 }
 
 function scheduleRetry(this: void, fn: () => void): void {
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
-    fn();
-    return;
-  }
   const tm = jass.CreateTimer();
   jass.TimerStart(tm, RETRY_SEC, false, () => {
-    if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(tm);
+    jass.DestroyTimer(tm);
     fn();
   });
 }
@@ -464,10 +448,6 @@ function tryRegisterCastBarStes(this: void): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
 
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    g[REG_GUARD] = true;
-    return;
-  }
   if (STES_Register == null) {
     g[REG_GUARD] = true;
     return;

@@ -25,14 +25,6 @@ function debugPrint(msg: string): void {
 }
 
 function registerObjectiveUpdateEvent(): void {
-  if (
-    typeof jass.CreateTrigger !== "function" ||
-    typeof jass.TriggerAddAction !== "function"
-  ) {
-    debugPrint("JASS API 不完整，无法注册目标更新事件");
-    return;
-  }
-
   const trig = jass.CreateTrigger();
 
   jass.TriggerAddAction(trig, () => {

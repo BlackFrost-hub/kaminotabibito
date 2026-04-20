@@ -50,32 +50,25 @@ local function onChat2222(self)
         if n >= GOLD_BURST_TIMES then
             return
         end
-        if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-            return
-        end
         local t = jass.CreateTimer()
         jass.TimerStart(
             t,
             GOLD_BURST_INTERVAL_SEC,
             false,
             function()
-                if type(jass.DestroyTimer) == "function" and type(jass.GetExpiredTimer) == "function" then
-                    jass.DestroyTimer(jass.GetExpiredTimer())
-                end
+                jass.DestroyTimer(jass.GetExpiredTimer())
                 step(nil)
             end
         )
     end
     step(nil)
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            10,
-            ("[测试事件2] 1s内4×+1000+4条漂浮字，收金币音复用，间隔" .. tostring(GOLD_BURST_INTERVAL_SEC)) .. "s"
-        )
-    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
+        0,
+        0,
+        10,
+        ("[测试事件2] 1s内4×+1000+4条漂浮字，收金币音复用，间隔" .. tostring(GOLD_BURST_INTERVAL_SEC)) .. "s"
+    )
 end
 local function onChat555(self)
     local p0 = jass.Player(0)
@@ -92,18 +85,13 @@ local function onChat555(self)
         if n >= GOLD_BURST_555_TIMES then
             return
         end
-        if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-            return
-        end
         local t = jass.CreateTimer()
         jass.TimerStart(
             t,
             GOLD_BURST_555_INTERVAL_SEC,
             false,
             function()
-                if type(jass.DestroyTimer) == "function" and type(jass.GetExpiredTimer) == "function" then
-                    jass.DestroyTimer(jass.GetExpiredTimer())
-                end
+                jass.DestroyTimer(jass.GetExpiredTimer())
                 step(nil)
             end
         )

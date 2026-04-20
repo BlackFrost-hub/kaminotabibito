@@ -23,30 +23,28 @@ const {
  * 获取单位句柄ID
  */
 export function getHandleId(unit: any): number {
-  return typeof jass.GetHandleId === "function" ? (jass.GetHandleId(unit) || 0) : 0;
+  return jass.GetHandleId(unit) || 0;
 }
 
 /**
  * 获取当前游戏时间（秒）
  */
 export function getGameTime(): number {
-  return typeof jass.GetGameTime === "function" ? jass.GetGameTime() : 0;
+  return jass.GetGameTime();
 }
 
 /**
  * 获取单位魔法值
  */
 export function getUnitMana(unit: any): number {
-  return typeof jass.GetUnitState === "function"
-    ? (jass.GetUnitState(unit, jass.UNIT_STATE_MANA) || 0)
-    : 0;
+  return jass.GetUnitState(unit, jass.UNIT_STATE_MANA) || 0;
 }
 
 /**
  * 获取单位等级
  */
 export function getUnitLevel(unit: any): number {
-  return typeof jass.GetHeroLevel === "function" ? (jass.GetHeroLevel(unit) || 0) : 0;
+  return jass.GetHeroLevel(unit) || 0;
 }
 
 /**
@@ -72,8 +70,8 @@ export function getDistance(x1: number, y1: number, x2: number, y2: number): num
  */
 export function getUnitPos(unit: any): { x: number; y: number } {
   return {
-    x: typeof jass.GetUnitX === "function" ? jass.GetUnitX(unit) : 0,
-    y: typeof jass.GetUnitY === "function" ? jass.GetUnitY(unit) : 0,
+    x: jass.GetUnitX(unit),
+    y: jass.GetUnitY(unit),
   };
 }
 
@@ -82,7 +80,7 @@ export function getUnitPos(unit: any): { x: number; y: number } {
  */
 export function isValidUnit(unit: any): boolean {
   if (!unit) return false;
-  return typeof jass.GetUnitTypeId === "function" && jass.GetUnitTypeId(unit) !== 0;
+  return jass.GetUnitTypeId(unit) !== 0;
 }
 
 /**
@@ -90,10 +88,7 @@ export function isValidUnit(unit: any): boolean {
  */
 export function isUnitDead(unit: any): boolean {
   if (!unit) return true;
-  if (typeof jass.IsUnitType === "function") {
-    return jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD);
-  }
-  return false;
+  return jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD);
 }
 
 export {};

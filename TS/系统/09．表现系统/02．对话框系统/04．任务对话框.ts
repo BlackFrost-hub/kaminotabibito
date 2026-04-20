@@ -46,10 +46,10 @@ export function setQuestButtonTexts(
   const localPlayer = getLocalPlayer();
   const targetPlayer = getPlayerById(state.playerId);
   if (localPlayer !== targetPlayer) return;
-  if (state.frames[9] && state.frames[9] !== 0 && typeof japi.DzFrameSetText === "function") {
+  if (state.frames[9] && state.frames[9] !== 0) {
     japi.DzFrameSetText(state.frames[9], acceptText);
   }
-  if (state.frames[10] && state.frames[10] !== 0 && typeof japi.DzFrameSetText === "function") {
+  if (state.frames[10] && state.frames[10] !== 0) {
     japi.DzFrameSetText(state.frames[10], rejectText);
   }
 }

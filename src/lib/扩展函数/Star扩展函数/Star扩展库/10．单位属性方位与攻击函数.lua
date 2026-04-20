@@ -31,17 +31,11 @@ local function getUnitPrimaryTypeFromSlk(self, u)
     if not SUC_IsValidUnit(nil, u) then
         return -1
     end
-    local ____temp_1
-    if type(jass.GetUnitTypeId) == "function" then
-        ____temp_1 = jass.GetUnitTypeId(u)
-    else
-        ____temp_1 = 0
-    end
-    local unitId = ____temp_1
+    local unitId = jass.GetUnitTypeId(u)
     if unitId == 0 then
         return -1
     end
-    if japi == nil or type(japi.EXExecuteScript) ~= "function" then
+    if japi == nil then
         return -1
     end
     local script = ("(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" .. tostring(unitId)) .. "']; if _u then return _u.Primary or '' else return '' end end)()"
@@ -63,54 +57,18 @@ end
 local function getHeroPrimaryGreenValue(self, u)
     local primaryType = getUnitPrimaryTypeFromSlk(nil, u)
     if primaryType == ____exports.PRIMARY_STR then
-        local ____temp_2
-        if type(jass.GetHeroStr) == "function" then
-            ____temp_2 = jass.GetHeroStr(u, true)
-        else
-            ____temp_2 = 0
-        end
-        local total = ____temp_2
-        local ____temp_3
-        if type(jass.GetHeroStr) == "function" then
-            ____temp_3 = jass.GetHeroStr(u, false)
-        else
-            ____temp_3 = 0
-        end
-        local green = ____temp_3
+        local total = jass.GetHeroStr(u, true)
+        local green = jass.GetHeroStr(u, false)
         return total - green
     end
     if primaryType == ____exports.PRIMARY_AGI then
-        local ____temp_4
-        if type(jass.GetHeroAgi) == "function" then
-            ____temp_4 = jass.GetHeroAgi(u, true)
-        else
-            ____temp_4 = 0
-        end
-        local total = ____temp_4
-        local ____temp_5
-        if type(jass.GetHeroAgi) == "function" then
-            ____temp_5 = jass.GetHeroAgi(u, false)
-        else
-            ____temp_5 = 0
-        end
-        local green = ____temp_5
+        local total = jass.GetHeroAgi(u, true)
+        local green = jass.GetHeroAgi(u, false)
         return total - green
     end
     if primaryType == ____exports.PRIMARY_INT then
-        local ____temp_6
-        if type(jass.GetHeroInt) == "function" then
-            ____temp_6 = jass.GetHeroInt(u, true)
-        else
-            ____temp_6 = 0
-        end
-        local total = ____temp_6
-        local ____temp_7
-        if type(jass.GetHeroInt) == "function" then
-            ____temp_7 = jass.GetHeroInt(u, false)
-        else
-            ____temp_7 = 0
-        end
-        local green = ____temp_7
+        local total = jass.GetHeroInt(u, true)
+        local green = jass.GetHeroInt(u, false)
         return total - green
     end
     return 0
@@ -119,15 +77,9 @@ function ____exports.SU_GetUnitModel(self, u)
     if not SUC_IsValidUnit(nil, u) then
         return ""
     end
-    local ____temp_8
-    if type(jass.GetUnitTypeId) == "function" then
-        ____temp_8 = jass.GetUnitTypeId(u)
-    else
-        ____temp_8 = 0
-    end
-    local unitId = ____temp_8
+    local unitId = jass.GetUnitTypeId(u)
     local file = ""
-    if japi ~= nil and type(japi.EXExecuteScript) == "function" then
+    if japi ~= nil then
         local script = ("(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" .. tostring(unitId)) .. "']; if _u then return _u.file or '' else return '' end end)()"
         file = japi.EXExecuteScript(script) or ""
     end
@@ -148,62 +100,38 @@ function ____exports.SU_AddHeroState(self, u, id, typ, value)
     end
     local isAdd = typ == 0
     if id == ____exports.PRIMARY_STR then
-        local ____temp_9
-        if type(jass.GetHeroStr) == "function" then
-            ____temp_9 = jass.GetHeroStr(u, false)
+        local current = jass.GetHeroStr(u, false)
+        local ____jass_SetHeroStr_3 = jass.SetHeroStr
+        local ____u_2 = u
+        local ____isAdd_1
+        if isAdd then
+            ____isAdd_1 = current + value
         else
-            ____temp_9 = 0
+            ____isAdd_1 = value
         end
-        local current = ____temp_9
-        if type(jass.SetHeroStr) == "function" then
-            local ____jass_SetHeroStr_12 = jass.SetHeroStr
-            local ____u_11 = u
-            local ____isAdd_10
-            if isAdd then
-                ____isAdd_10 = current + value
-            else
-                ____isAdd_10 = value
-            end
-            ____jass_SetHeroStr_12(jass, ____u_11, ____isAdd_10, false)
-        end
+        ____jass_SetHeroStr_3(jass, ____u_2, ____isAdd_1, false)
     elseif id == ____exports.PRIMARY_AGI then
-        local ____temp_13
-        if type(jass.GetHeroAgi) == "function" then
-            ____temp_13 = jass.GetHeroAgi(u, false)
+        local current = jass.GetHeroAgi(u, false)
+        local ____jass_SetHeroAgi_6 = jass.SetHeroAgi
+        local ____u_5 = u
+        local ____isAdd_4
+        if isAdd then
+            ____isAdd_4 = current + value
         else
-            ____temp_13 = 0
+            ____isAdd_4 = value
         end
-        local current = ____temp_13
-        if type(jass.SetHeroAgi) == "function" then
-            local ____jass_SetHeroAgi_16 = jass.SetHeroAgi
-            local ____u_15 = u
-            local ____isAdd_14
-            if isAdd then
-                ____isAdd_14 = current + value
-            else
-                ____isAdd_14 = value
-            end
-            ____jass_SetHeroAgi_16(jass, ____u_15, ____isAdd_14, false)
-        end
+        ____jass_SetHeroAgi_6(jass, ____u_5, ____isAdd_4, false)
     elseif id == ____exports.PRIMARY_INT then
-        local ____temp_17
-        if type(jass.GetHeroInt) == "function" then
-            ____temp_17 = jass.GetHeroInt(u, false)
+        local current = jass.GetHeroInt(u, false)
+        local ____jass_SetHeroInt_9 = jass.SetHeroInt
+        local ____u_8 = u
+        local ____isAdd_7
+        if isAdd then
+            ____isAdd_7 = current + value
         else
-            ____temp_17 = 0
+            ____isAdd_7 = value
         end
-        local current = ____temp_17
-        if type(jass.SetHeroInt) == "function" then
-            local ____jass_SetHeroInt_20 = jass.SetHeroInt
-            local ____u_19 = u
-            local ____isAdd_18
-            if isAdd then
-                ____isAdd_18 = current + value
-            else
-                ____isAdd_18 = value
-            end
-            ____jass_SetHeroInt_20(jass, ____u_19, ____isAdd_18, false)
-        end
+        ____jass_SetHeroInt_9(jass, ____u_8, ____isAdd_7, false)
     end
 end
 function ____exports.SU_GetHeroParmaryValue(self, u)
@@ -212,31 +140,13 @@ function ____exports.SU_GetHeroParmaryValue(self, u)
     end
     local typ = ____exports.SU_GetHeroParmary(nil, u)
     if typ == ____exports.PRIMARY_STR then
-        local ____temp_21
-        if type(jass.GetHeroStr) == "function" then
-            ____temp_21 = jass.GetHeroStr(u, true)
-        else
-            ____temp_21 = 0
-        end
-        return ____temp_21
+        return jass.GetHeroStr(u, true)
     end
     if typ == ____exports.PRIMARY_AGI then
-        local ____temp_22
-        if type(jass.GetHeroAgi) == "function" then
-            ____temp_22 = jass.GetHeroAgi(u, true)
-        else
-            ____temp_22 = 0
-        end
-        return ____temp_22
+        return jass.GetHeroAgi(u, true)
     end
     if typ == ____exports.PRIMARY_INT then
-        local ____temp_23
-        if type(jass.GetHeroInt) == "function" then
-            ____temp_23 = jass.GetHeroInt(u, true)
-        else
-            ____temp_23 = 0
-        end
-        return ____temp_23
+        return jass.GetHeroInt(u, true)
     end
     return -1
 end
@@ -314,41 +224,11 @@ function ____exports.SU_GetUnitOfUnit(self, u, tu)
     if not SUC_IsValidUnit(nil, u) or not SUC_IsValidUnit(nil, tu) then
         return 3
     end
-    local ____temp_24
-    if type(jass.GetUnitX) == "function" then
-        ____temp_24 = jass.GetUnitX(u)
-    else
-        ____temp_24 = 0
-    end
-    local x = ____temp_24
-    local ____temp_25
-    if type(jass.GetUnitY) == "function" then
-        ____temp_25 = jass.GetUnitY(u)
-    else
-        ____temp_25 = 0
-    end
-    local y = ____temp_25
-    local ____temp_26
-    if type(jass.GetUnitX) == "function" then
-        ____temp_26 = jass.GetUnitX(tu)
-    else
-        ____temp_26 = 0
-    end
-    local a = ____temp_26
-    local ____temp_27
-    if type(jass.GetUnitY) == "function" then
-        ____temp_27 = jass.GetUnitY(tu)
-    else
-        ____temp_27 = 0
-    end
-    local b = ____temp_27
-    local ____temp_28
-    if type(jass.GetUnitFacing) == "function" then
-        ____temp_28 = jass.GetUnitFacing(u)
-    else
-        ____temp_28 = 0
-    end
-    local facing = ____temp_28
+    local x = jass.GetUnitX(u)
+    local y = jass.GetUnitY(u)
+    local a = jass.GetUnitX(tu)
+    local b = jass.GetUnitY(tu)
+    local facing = jass.GetUnitFacing(u)
     local angle = GAFC(
         nil,
         x,
@@ -375,41 +255,11 @@ function ____exports.SU_IsUnitInfrontUnit2(self, u, tu)
     if not SUC_IsValidUnit(nil, u) or not SUC_IsValidUnit(nil, tu) then
         return false
     end
-    local ____temp_29
-    if type(jass.GetUnitX) == "function" then
-        ____temp_29 = jass.GetUnitX(u)
-    else
-        ____temp_29 = 0
-    end
-    local x = ____temp_29
-    local ____temp_30
-    if type(jass.GetUnitY) == "function" then
-        ____temp_30 = jass.GetUnitY(u)
-    else
-        ____temp_30 = 0
-    end
-    local y = ____temp_30
-    local ____temp_31
-    if type(jass.GetUnitX) == "function" then
-        ____temp_31 = jass.GetUnitX(tu)
-    else
-        ____temp_31 = 0
-    end
-    local a = ____temp_31
-    local ____temp_32
-    if type(jass.GetUnitY) == "function" then
-        ____temp_32 = jass.GetUnitY(tu)
-    else
-        ____temp_32 = 0
-    end
-    local b = ____temp_32
-    local ____temp_33
-    if type(jass.GetUnitFacing) == "function" then
-        ____temp_33 = jass.GetUnitFacing(u)
-    else
-        ____temp_33 = 0
-    end
-    local facing = ____temp_33
+    local x = jass.GetUnitX(u)
+    local y = jass.GetUnitY(u)
+    local a = jass.GetUnitX(tu)
+    local b = jass.GetUnitY(tu)
+    local facing = jass.GetUnitFacing(u)
     local angle = GAFC(
         nil,
         x,
@@ -430,36 +280,18 @@ function ____exports.SU_GetUnitWhiteAtk(self, u, a)
         return 0
     end
     local primaryGreen = getHeroPrimaryGreenValue(nil, u)
-    local ____temp_34
-    if type(jass.GetUnitState) == "function" then
-        ____temp_34 = jass.GetUnitState(
-            u,
-            jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
-        )
-    else
-        ____temp_34 = 0
-    end
-    local baseDmg = ____temp_34
-    local ____temp_35
-    if type(jass.GetUnitState) == "function" then
-        ____temp_35 = jass.GetUnitState(
-            u,
-            jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
-        )
-    else
-        ____temp_35 = 0
-    end
-    local bonusDmg = ____temp_35
-    local ____temp_36
-    if type(jass.GetUnitState) == "function" then
-        ____temp_36 = jass.GetUnitState(
-            u,
-            jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
-        )
-    else
-        ____temp_36 = 0
-    end
-    local diceCount = ____temp_36
+    local baseDmg = jass.GetUnitState(
+        u,
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
+    )
+    local bonusDmg = jass.GetUnitState(
+        u,
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
+    )
+    local diceCount = jass.GetUnitState(
+        u,
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
+    )
     return baseDmg + bonusDmg * (diceCount + 1) / 2 - a * primaryGreen
 end
 return ____exports

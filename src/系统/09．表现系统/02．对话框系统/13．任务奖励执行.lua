@@ -42,7 +42,7 @@ end
 local function gainExp(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
-        if hero and type(jass.AddHeroXP) == "function" then
+        if hero then
             jass.AddHeroXP(hero, value, true)
         end
     end
@@ -50,7 +50,7 @@ end
 local function gainLevel(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
-        if hero and type(jass.SetHeroLevel) == "function" then
+        if hero then
             local lv = jass.GetHeroLevel(hero)
             jass.SetHeroLevel(hero, lv + value, false)
         end
@@ -63,19 +63,19 @@ local function gainHeroStat(self, players, statName, value)
             if not hero then
                 goto __continue21
             end
-            if statName == "力量" and type(jass.SetHeroStr) == "function" then
+            if statName == "力量" then
                 jass.SetHeroStr(
                     hero,
                     jass.GetHeroStr(hero, false) + value,
                     true
                 )
-            elseif statName == "敏捷" and type(jass.SetHeroAgi) == "function" then
+            elseif statName == "敏捷" then
                 jass.SetHeroAgi(
                     hero,
                     jass.GetHeroAgi(hero, false) + value,
                     true
                 )
-            elseif statName == "智力" and type(jass.SetHeroInt) == "function" then
+            elseif statName == "智力" then
                 jass.SetHeroInt(
                     hero,
                     jass.GetHeroInt(hero, false) + value,
@@ -121,7 +121,7 @@ local function resolveAmountExpr(self, expr, triggerPlayerId)
             ____player_1 = nil
         end
         local hero = ____player_1
-        local level = hero and type(jass.GetHeroLevel) == "function" and jass.GetHeroLevel(hero) or 1
+        local level = hero and jass.GetHeroLevel(hero) or 1
         local a = 20000 - (level - 20) * 1000
         return IMaxBJ(nil, a, 10000)
     end

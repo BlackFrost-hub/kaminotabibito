@@ -66,7 +66,6 @@ function toHid(u: any): number {
     const n = parseInt(u, 10);
     return isNaN(n) ? 0 : n;
   }
-  if (typeof (jass as any).GetHandleId !== "function") return 0;
   return (jass as any).GetHandleId(u) as number;
 }
 
@@ -91,15 +90,15 @@ function pruneEmptyHid(hid: number): void {
 
 function notifyDotBuffExpiredFromPool(buffID: string, hid: number): void {
   (pcall as any)(() => {
-    const m = require("系统.04．伤害系统.02．dot伤害") as { clearDotByBuffPoolExpire?: (bid: string, h: number) => void };
-    if (m != null && typeof m.clearDotByBuffPoolExpire === "function") m.clearDotByBuffPoolExpire(buffID, hid);
+    const m = require("系统.04．伤害系统.02．dot伤害") as { clearDotByBuffPoolExpire: (bid: string, h: number) => void };
+    if (m != null) m.clearDotByBuffPoolExpire(buffID, hid);
   });
 }
 
 function syncDotFromPoolTick(): void {
   (pcall as any)(() => {
-    const m = require("系统.04．伤害系统.02．dot伤害") as { syncDotRemainingFromBuffPool?: () => void };
-    if (m != null && typeof m.syncDotRemainingFromBuffPool === "function") m.syncDotRemainingFromBuffPool();
+    const m = require("系统.04．伤害系统.02．dot伤害") as { syncDotRemainingFromBuffPool: () => void };
+    if (m != null) m.syncDotRemainingFromBuffPool();
   });
 }
 

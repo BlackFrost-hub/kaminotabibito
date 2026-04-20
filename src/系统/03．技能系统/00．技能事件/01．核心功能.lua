@@ -41,9 +41,7 @@ local function onSpellChannel()
         local i = 0
         while i < #channelListeners do
             local cb = channelListeners[i + 1]
-            if type(cb) == "function" then
-                cb(nil, castingUnit, spellAbilityId)
-            end
+            cb(nil, castingUnit, spellAbilityId)
             i = i + 1
         end
     end
@@ -61,9 +59,7 @@ local function onSpellEffect()
         local i = 0
         while i < #effectListeners do
             local cb = effectListeners[i + 1]
-            if type(cb) == "function" then
-                cb(nil, castingUnit, spellAbilityId)
-            end
+            cb(nil, castingUnit, spellAbilityId)
             i = i + 1
         end
     end

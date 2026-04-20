@@ -13,8 +13,8 @@ export * from "./01．UI工具/index";
 export * from "./03．垂直滚动条轨道";
 
 // ========== 初始化 ==========
-const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI?: () => void };
-if (typeof 原生UI.initNativeUI === "function") 原生UI.initNativeUI();
+const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
+原生UI.initNativeUI();
 
 // UI工具子系统（通过index自动加载）
 require("系统.09．表现系统.01．UI工具.index");

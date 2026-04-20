@@ -33,7 +33,6 @@ function refreshTaskUIForAllClientsSoon(): void {
 
 function grantQuestItems(hero: any, questItems?: string): void {
   if (!hero || !questItems || questItems === "") return;
-  if (typeof jass.UnitAddItemById !== "function") return;
   const items = questItems.split("|");
   for (const raw of items) {
     const itemCode = raw.trim();
@@ -66,7 +65,7 @@ function canAcceptQuestByRequirements(quest: QuestConfig, hero: any): boolean {
   }
   if (digits === "") return true;
   const limit = Number(digits);
-  if (!hero || typeof jass.GetHeroLevel !== "function") return false;
+  if (!hero) return false;
   const level = jass.GetHeroLevel(hero) as number;
   return level < limit;
 }
@@ -160,7 +159,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
       title: npcName,
       text: `【${quest.name}】\n\n${questDesc}\n\n奖励：${rewardText}`,
       onAccept: () => {
-        const questId = quest.requireID?.toString() || "";
+        const questId = quest.requireID != null ? quest.requireID.toString() : "";
         const playerObj = jass.Player(dialogOwnerId);
         const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
         if (!canAcceptQuestByRequirements(quest, hero)) {
@@ -222,7 +221,7 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
       acceptText: "提交任务",
       rejectText: "暂时忽略",
       onAccept: () => {
-        const questIdStr = quest.requireID?.toString() || "";
+        const questIdStr = quest.requireID != null ? quest.requireID.toString() : "";
         handleQuestSubmit({
           quest,
           npcName,

@@ -27,9 +27,6 @@ local DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030"
 local ACTIVATION_RANGE = 300
 --- 有坐标时 CreateUnit 的所属玩家：中立被动（common.j 的 PLAYER_NEUTRAL_PASSIVE，一般为 15）
 local function neutralPassivePlayer(self)
-    if type(jass.Player) ~= "function" then
-        return nil
-    end
     local ____temp_2
     if jass.PLAYER_NEUTRAL_PASSIVE ~= nil then
         ____temp_2 = jass.PLAYER_NEUTRAL_PASSIVE
@@ -65,10 +62,8 @@ local function formatGgUnitProbe(self, u)
         return "nil/0"
     end
     local tail = ""
-    if type(jass.GetUnitTypeId) == "function" then
-        tail = " typeId=" .. tostring(jass.GetUnitTypeId(u))
-    end
-    if type(jass.GetUnitState) == "function" and jass.UNIT_STATE_LIFE ~= nil then
+    tail = " typeId=" .. tostring(jass.GetUnitTypeId(u))
+    if jass.UNIT_STATE_LIFE ~= nil then
         tail = (tail .. " life=") .. tostring(jass.GetUnitState(u, jass.UNIT_STATE_LIFE))
     end
     return "ok" .. tail
@@ -76,9 +71,6 @@ end
 --- 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil）
 local function scheduleDebugGgUnitHtow0030(self)
     if not DEBUG_GG_UNIT_HTOW_0030 then
-        return
-    end
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
         return
     end
     local key = DEBUG_GG_UNIT_HTOW_KEY
@@ -90,25 +82,21 @@ local function scheduleDebugGgUnitHtow0030(self)
         local vj = jc[key]
         local vG = G[key]
         local msg = (((((((("[激活传送点调试] " .. label) .. " ") .. key) .. " | g=") .. formatGgUnitProbe(nil, vg)) .. " | jass.common=") .. formatGgUnitProbe(nil, vj)) .. " | globalThis=") .. formatGgUnitProbe(nil, vG)
-        if type(jass.DisplayTimedTextToPlayer) == "function" and type(jass.Player) == "function" then
-            do
-                local pi = 0
-                while pi < 4 do
-                    jass.DisplayTimedTextToPlayer(
-                        jass.Player(pi),
-                        0,
-                        0,
-                        14,
-                        msg
-                    )
-                    pi = pi + 1
-                end
+        do
+            local pi = 0
+            while pi < 4 do
+                jass.DisplayTimedTextToPlayer(
+                    jass.Player(pi),
+                    0,
+                    0,
+                    14,
+                    msg
+                )
+                pi = pi + 1
             end
         end
         local pr = _G.print
-        if type(pr) == "function" then
-            pr(msg)
-        end
+        pr(msg)
     end
     withTimer(
         nil,
@@ -152,7 +140,7 @@ local function resolveWatchUnit(self, cfg)
             return nil
         end
         local passive = neutralPassivePlayer(nil)
-        if passive == nil or type(jass.CreateUnit) ~= "function" then
+        if passive == nil then
             return nil
         end
         local ____temp_3
@@ -184,13 +172,13 @@ local function resolveWatchUnit(self, cfg)
 end
 local function runActivationEffects(self, cfg, watchUnit)
     local gg = g
-    if cfg.UnitID ~= nil and type(jass.SetUnitOwner) == "function" and type(jass.Player) == "function" and watchUnit ~= nil and watchUnit ~= 0 then
+    if cfg.UnitID ~= nil and watchUnit ~= nil and watchUnit ~= 0 then
         local p6 = jass.Player(6)
         if p6 then
             jass.SetUnitOwner(watchUnit, p6, true)
         end
     end
-    if cfg.reveal ~= nil and type(jass.SetFogStateRect) == "function" and type(jass.Player) == "function" then
+    if cfg.reveal ~= nil then
         local revealRect = gg[cfg.reveal]
         if revealRect then
             local mode = jass.FOG_OF_WAR_VISIBLE
@@ -202,7 +190,7 @@ local function runActivationEffects(self, cfg, watchUnit)
             )
         end
     end
-    if cfg.text ~= nil and type(jass.DisplayTimedTextToPlayer) == "function" and type(jass.Player) == "function" then
+    if cfg.text ~= nil and true then
         do
             local i = 0
             while i < 4 do
@@ -217,28 +205,19 @@ local function runActivationEffects(self, cfg, watchUnit)
             end
         end
     end
-    if type(jass.GetLocalPlayer) == "function" and type(jass.Player) == "function" then
-        local localPlayer = jass.GetLocalPlayer()
-        do
-            local i = 0
-            while i < 4 do
-                if localPlayer == jass.Player(i) then
-                    Sound3DII_Mp3Play(nil, ACTIVATION_SOUND)
-                    break
-                end
-                i = i + 1
+    local localPlayer = jass.GetLocalPlayer()
+    do
+        local i = 0
+        while i < 4 do
+            if localPlayer == jass.Player(i) then
+                Sound3DII_Mp3Play(nil, ACTIVATION_SOUND)
+                break
             end
+            i = i + 1
         end
     end
 end
 local function registerOnePoint(self, cfg, key)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        return
-    end
-    if type(jass.TriggerRegisterUnitInRange) ~= "function" then
-        dbg(nil, "缺少 TriggerRegisterUnitInRange")
-        return
-    end
     local watchUnit = resolveWatchUnit(nil, cfg)
     if watchUnit == nil or watchUnit == 0 then
         dbg(nil, "跳过：无有效监视单位 " .. key)
@@ -253,21 +232,13 @@ local function registerOnePoint(self, cfg, key)
             if fired then
                 return
             end
-            local ____temp_5
-            if type(jass.GetTriggerUnit) == "function" then
-                ____temp_5 = jass.GetTriggerUnit()
-            else
-                ____temp_5 = nil
-            end
-            local enterer = ____temp_5
+            local enterer = jass.GetTriggerUnit()
             if enterer == nil or enterer == 0 then
                 return
             end
             fired = true
             runActivationEffects(nil, cfg, watchUnit)
-            if type(jass.DestroyTrigger) == "function" then
-                jass.DestroyTrigger(trig)
-            end
+            jass.DestroyTrigger(trig)
         end
     )
 end
@@ -277,12 +248,12 @@ local function initActivationPointsInternal(self)
         do
             local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
             if not cfg or cfg.enabled == false then
-                goto __continue53
+                goto __continue44
             end
             registerOnePoint(nil, cfg, key)
             count = count + 1
         end
-        ::__continue53::
+        ::__continue44::
     end
     dbg(
         nil,

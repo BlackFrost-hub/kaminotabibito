@@ -4,7 +4,7 @@ import { PositionConfig, SizeConfig } from "./00．类型定义";
 
 // ========== 虚拟分区：绝对布局 ==========
 export function setFramePosition(frame: number, position: PositionConfig): boolean {
-  if (frame === 0 || frame == null || typeof japi.DzFrameSetAbsolutePoint !== "function") {
+  if (frame === 0 || frame == null) {
     return false;
   }
   japi.DzFrameSetAbsolutePoint(frame, position.point, position.x, position.y);
@@ -24,8 +24,7 @@ export function setFramePointRelative(
     frame === 0 ||
     frame == null ||
     relativeFrame === 0 ||
-    relativeFrame == null ||
-    typeof japi.DzFrameSetPoint !== "function"
+    relativeFrame == null
   ) {
     return false;
   }
@@ -35,7 +34,7 @@ export function setFramePointRelative(
 
 // ========== 虚拟分区：尺寸 ==========
 export function setFrameSize(frame: number, size: SizeConfig): boolean {
-  if (frame === 0 || frame == null || typeof japi.DzFrameSetSize !== "function") {
+  if (frame === 0 || frame == null) {
     return false;
   }
   japi.DzFrameSetSize(frame, size.width, size.height);

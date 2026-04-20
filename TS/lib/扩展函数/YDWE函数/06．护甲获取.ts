@@ -51,14 +51,8 @@ const ARMOR_TEST_ABILITY = 0x416C6F63; // 'Aloc' 蝗虫技能
 export function YDWEGetUnitArmor(u: any): number {
   if (u == null) return 0;
 
-  // 方式1：使用 GetUnitState + ConvertUnitState
-  if (typeof jass.ConvertUnitState === "function") {
-    const armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR);
-    return jass.GetUnitState(u, armorState);
-  }
-
-  // 方式2：兜底 - 使用伤害测试法
-  return YDWEGetUnitArmorByDamageTest(u);
+  const armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR);
+  return jass.GetUnitState(u, armorState);
 }
 
 /**

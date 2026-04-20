@@ -17,15 +17,13 @@ export function SUC_IsValidUnit(u: any): boolean {
 
 // 取当前枚举中的筛选单位。
 export function SUC_GetFilterUnitOrNull(): any {
-  return typeof jass.GetFilterUnit === "function" ? jass.GetFilterUnit() : null;
+  return jass.GetFilterUnit();
 }
 
 // 读取单位当前生命值。
 export function SUC_GetUnitLife(u: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
-  return typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    : 0;
+  return jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
 }
 
 // 判断单位是否还活着。
@@ -36,16 +34,12 @@ export function SUC_IsUnitAlive(u: any): boolean {
 // 判断单位是否为建筑。
 export function SUC_IsUnitStructure(u: any): boolean {
   if (!SUC_IsValidUnit(u)) return false;
-  return typeof jass.IsUnitType === "function"
-    ? jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE)
-    : false;
+  return jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE);
 }
 
 // 判断单位是否带无敌相关状态。
 export function SUC_IsUnitInvincible(u: any): boolean {
   if (!SUC_IsValidUnit(u)) return false;
-  if (typeof jass.GetUnitAbilityLevel !== "function") return false;
-
   const avul = jass.GetUnitAbilityLevel(u, AVUL);
   const bvul = jass.GetUnitAbilityLevel(u, BVUL);
   const bhds = jass.GetUnitAbilityLevel(u, BHDS);
@@ -56,14 +50,12 @@ export function SUC_IsUnitInvincible(u: any): boolean {
 // 判断目标是否敌对来源单位。
 export function SUC_IsUnitEnemyToUnit(target: any, source: any): boolean {
   if (!SUC_IsValidUnit(target) || !SUC_IsValidUnit(source)) return false;
-  if (typeof jass.IsUnitEnemy !== "function" || typeof jass.GetOwningPlayer !== "function") return false;
   return jass.IsUnitEnemy(target, jass.GetOwningPlayer(source));
 }
 
 // 判断目标是否友方来源单位。
 export function SUC_IsUnitAllyToUnit(target: any, source: any): boolean {
   if (!SUC_IsValidUnit(target) || !SUC_IsValidUnit(source)) return false;
-  if (typeof jass.IsUnitEnemy !== "function" || typeof jass.GetOwningPlayer !== "function") return false;
   return !jass.IsUnitEnemy(target, jass.GetOwningPlayer(source));
 }
 

@@ -10,27 +10,15 @@ function formatTime(time)
     return (tostring(intPart) .. ".") .. tostring(decPart)
 end
 function setFrameAnimateOffset(frame, offset)
-    if type(japi.DzFrameSetAnimateOffset) ~= "function" then
-        return
-    end
     japi.DzFrameSetAnimateOffset(frame, offset)
 end
 function showFrame(frame, show)
-    if type(japi.DzFrameShow) ~= "function" then
-        return
-    end
     japi.DzFrameShow(frame, show)
 end
 function setFrameText(frame, text)
-    if type(japi.DzFrameSetText) ~= "function" then
-        return
-    end
     japi.DzFrameSetText(frame, text)
 end
 function destroyFrame(frame)
-    if type(japi.DzDestroyFrame) ~= "function" then
-        return
-    end
     japi.DzDestroyFrame(frame)
 end
 function updateAllCastBars()
@@ -143,9 +131,6 @@ local function getBackgroundModel(colorId)
 end
 --- 创建帧
 local function createFrame(tagName, name, parent)
-    if type(japi.DzCreateFrameByTagName) ~= "function" then
-        return nil
-    end
     return japi.DzCreateFrameByTagName(
         tagName,
         name,
@@ -156,16 +141,10 @@ local function createFrame(tagName, name, parent)
 end
 --- 设置帧的绝对位置
 local function setFrameAbsolutePoint(frame, x, y)
-    if type(japi.DzFrameSetAbsolutePoint) ~= "function" then
-        return
-    end
     japi.DzFrameSetAbsolutePoint(frame, 4, x, y)
 end
 --- 设置帧的相对位置
 local function setFramePoint(frame, parent, offsetX, offsetY)
-    if type(japi.DzFrameSetPoint) ~= "function" then
-        return
-    end
     japi.DzFrameSetPoint(
         frame,
         4,
@@ -177,30 +156,18 @@ local function setFramePoint(frame, parent, offsetX, offsetY)
 end
 --- 设置帧模型
 local function setFrameModel(frame, modelPath)
-    if type(japi.DzFrameSetModel) ~= "function" then
-        return
-    end
     japi.DzFrameSetModel(frame, modelPath, 0, 0)
 end
 --- 设置帧动画
 local function setFrameAnimate(frame, animId, autoPlay)
-    if type(japi.DzFrameSetAnimate) ~= "function" then
-        return
-    end
     japi.DzFrameSetAnimate(frame, animId, autoPlay)
 end
 --- 设置帧优先级
 local function setFramePriority(frame, priority)
-    if type(japi.DzFrameSetPriority) ~= "function" then
-        return
-    end
     japi.DzFrameSetPriority(frame, priority)
 end
 --- 获取游戏UI
 local function getGameUI()
-    if type(japi.DzGetGameUI) ~= "function" then
-        return nil
-    end
     return japi.DzGetGameUI()
 end
 --- 创建吟唱条UI
@@ -330,9 +297,6 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
-        return -1
-    end
     local h = jass.StringHash(eventName)
     return jass.LoadInteger(
         ht,
@@ -341,19 +305,13 @@ local function countOnJassStesTable(eventName)
     )
 end
 local function scheduleRetry(fn)
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        fn(nil)
-        return
-    end
     local tm = jass.CreateTimer()
     jass.TimerStart(
         tm,
         RETRY_SEC,
         false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(tm)
-            end
+            jass.DestroyTimer(tm)
             fn(nil)
         end
     )
@@ -361,10 +319,6 @@ end
 local function tryRegisterCastBarStes()
     local g = _G
     if g[REG_GUARD] then
-        return
-    end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        g[REG_GUARD] = true
         return
     end
     if STES_Register == nil then

@@ -104,7 +104,6 @@ private entryText: number | null = null;
 
   public init(): void {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 

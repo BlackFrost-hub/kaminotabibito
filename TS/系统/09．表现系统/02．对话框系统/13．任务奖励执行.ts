@@ -37,14 +37,14 @@ function gainLumber(players: any[], value: number): void {
 function gainExp(players: any[], value: number): void {
   for (const p of players) {
     const hero = getPlayerFirstHero(p);
-    if (hero && typeof jass.AddHeroXP === "function") jass.AddHeroXP(hero, value, true);
+    if (hero) jass.AddHeroXP(hero, value, true);
   }
 }
 
 function gainLevel(players: any[], value: number): void {
   for (const p of players) {
     const hero = getPlayerFirstHero(p);
-    if (hero && typeof jass.SetHeroLevel === "function") {
+    if (hero) {
       const lv = jass.GetHeroLevel(hero);
       jass.SetHeroLevel(hero, lv + value, false);
     }
@@ -55,11 +55,11 @@ function gainHeroStat(players: any[], statName: string, value: number): void {
   for (const p of players) {
     const hero = getPlayerFirstHero(p);
     if (!hero) continue;
-    if (statName === "力量" && typeof jass.SetHeroStr === "function") {
+    if (statName === "力量") {
       jass.SetHeroStr(hero, jass.GetHeroStr(hero, false) + value, true);
-    } else if (statName === "敏捷" && typeof jass.SetHeroAgi === "function") {
+    } else if (statName === "敏捷") {
       jass.SetHeroAgi(hero, jass.GetHeroAgi(hero, false) + value, true);
-    } else if (statName === "智力" && typeof jass.SetHeroInt === "function") {
+    } else if (statName === "智力") {
       jass.SetHeroInt(hero, jass.GetHeroInt(hero, false) + value, true);
     }
   }
@@ -85,7 +85,7 @@ function resolveAmountExpr(expr: string, triggerPlayerId?: number): number {
   if (text.indexOf("IMaxBJ(") === 0) {
     const player = triggerPlayerId != null ? jass.Player(triggerPlayerId) : null;
     const hero = player ? getPlayerFirstHero(player) : null;
-    const level = hero && typeof jass.GetHeroLevel === "function" ? (jass.GetHeroLevel(hero) as number) : 1;
+    const level = hero ? (jass.GetHeroLevel(hero) as number) : 1;
     const a = 20000 - (level - 20) * 1000;
     return IMaxBJ(a, 10000);
   }

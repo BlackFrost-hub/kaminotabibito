@@ -41,10 +41,6 @@ local function tryRegisterLuaListenerForJassStes()
         return
     end
     g[LUA_STES_REG_KEY] = true
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        log("[STES事件测试] 无法 CreateTrigger，跳过 Lua STES 监听注册")
-        return
-    end
     local trig = jass.CreateTrigger()
     jass.TriggerAddAction(
         trig,

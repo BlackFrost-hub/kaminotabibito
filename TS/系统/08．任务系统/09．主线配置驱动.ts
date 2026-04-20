@@ -182,7 +182,7 @@ function createEvalEnv(triggerUnit: any): any {
   const local1GetFallback = (ty: string, key: string): any => {
     if (typeof gAny.YDLocal1Get === "function") return gAny.YDLocal1Get(ty, key);
     // 条件里最常见是 YDLocal1Get(location, "单位位置")
-    if (ty === "location" && key === "单位位置" && triggerUnit && typeof jass.GetUnitLoc === "function") {
+    if (ty === "location" && key === "单位位置" && triggerUnit) {
       if (!cachedLoc) cachedLoc = jass.GetUnitLoc(triggerUnit);
       return cachedLoc;
     }
@@ -249,21 +249,21 @@ function executeActionCode(code: string, triggerUnit: any): void {
 function runActionTimeline(timeline: string | undefined, triggerUnit: any): void {
   const entries = parseTimelineEntries(timeline);
   for (const e of entries) {
-    if (e.delay <= 0 || typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
+    if (e.delay <= 0) {
       executeActionCode(e.code, triggerUnit);
       continue;
     }
     const t = jass.CreateTimer();
     jass.TimerStart(t, e.delay, false, () => {
       executeActionCode(e.code, triggerUnit);
-      if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(t);
+      jass.DestroyTimer(t);
     });
   }
 }
 
 function getHeroes(): any[] {
   const group = typeof YDGet === "function" ? YDGet("string", "玩家英雄", "单位组", "group") : null;
-  if (!group || typeof jass.ForGroup !== "function") {
+  if (!group) {
     return [];
   }
   const arr: any[] = [];
@@ -365,10 +365,8 @@ function reportMissingFunctions(): void {
 function init(): void {
   ensureRuntimeQuest();
   reportMissingFunctions();
-  if (typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
-    const t = jass.CreateTimer();
-    jass.TimerStart(t, 0.30, true, tick);
-  }
+  const t = jass.CreateTimer();
+  jass.TimerStart(t, 0.30, true, tick);
 }
 
 init();

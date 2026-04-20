@@ -16,18 +16,18 @@ function getItemsByScoreRange(self, minScore, maxScore)
     for id in pairs(itemsData) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue83
+                goto __continue82
             end
             local entry = itemsData[id]
             local score = entry and entry.score
             if type(score) ~= "number" then
-                goto __continue83
+                goto __continue82
             end
             if score >= minScore and score <= maxScore then
                 result[#result + 1] = id
             end
         end
-        ::__continue83::
+        ::__continue82::
     end
     return result
 end
@@ -298,9 +298,6 @@ local function onUnitDeath(self, unit, _killer)
     if isSpecialUnit(nil, unit) then
         return
     end
-    if type(jass.GetUnitTypeId) ~= "function" then
-        return
-    end
     local typeId = jass.GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(nil, typeId)
     local entry = unitId and idData[unitId] or nil
@@ -355,15 +352,15 @@ local function onUnitDeath(self, unit, _killer)
     for ____, rule in ipairs(DROP_RULES) do
         do
             if typeId ~= stringToFourCC(nil, rule.unitId) then
-                goto __continue76
+                goto __continue75
             end
             local r = math.random(1, 10000)
             if r > rule.proc * 10000 then
-                goto __continue76
+                goto __continue75
             end
             local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
             if #list == 0 then
-                goto __continue76
+                goto __continue75
             end
             local idx = math.random(1, #list)
             local itemId = list[idx]
@@ -372,7 +369,7 @@ local function onUnitDeath(self, unit, _killer)
             end
             break
         end
-        ::__continue76::
+        ::__continue75::
     end
 end
 registerDeathListener(nil, onUnitDeath)

@@ -32,18 +32,13 @@ type Player = any;
 
 function npcPromptHandleKey(unit: any): number {
   if (!unit) return 0;
-  if (typeof japi.DzGetUnitObjectId === "function") {
-    const id = japi.DzGetUnitObjectId(unit) as number;
-    if (id != null && id !== 0) return id;
-  }
-  if (typeof jass.GetHandleId === "function") {
-    return jass.GetHandleId(unit) as number;
-  }
-  return 0;
+  const id = jass.GetUnitTypeId(unit) as number;
+  if (id != null && id !== 0) return id;
+  return jass.GetHandleId(unit) as number;
 }
 
 function dzGetPlayerId(p: Player): number {
-  return typeof jass.GetPlayerId === "function" ? (jass.GetPlayerId(p) as number) : -1;
+  return jass.GetPlayerId(p) as number;
 }
 
 function cancelTimerHandle(t: any): void {
@@ -171,11 +166,9 @@ function cancelBubbleEffectSchedule(playerId: number): void {
 function npcUnitsSameForBubble(a: any, b: any): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
-  if (typeof jass.GetHandleId === "function") {
-    const ha = jass.GetHandleId(a) as number;
-    const hb = jass.GetHandleId(b) as number;
-    if (ha !== 0 && ha === hb) return true;
-  }
+  const ha = jass.GetHandleId(a) as number;
+  const hb = jass.GetHandleId(b) as number;
+  if (ha !== 0 && ha === hb) return true;
   return false;
 }
 

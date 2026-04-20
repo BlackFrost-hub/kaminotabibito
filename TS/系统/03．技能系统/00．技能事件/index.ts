@@ -4,5 +4,5 @@
 
 export * from "./01．核心功能";
 
-const spellEventMod = require("系统.03．技能系统.00．技能事件.01．核心功能") as { init?: () => void };
-if (typeof spellEventMod.init === "function") spellEventMod.init();
+const spellEventMod = require("系统.03．技能系统.00．技能事件.01．核心功能") as { init: () => void };
+spellEventMod.init();

@@ -11,8 +11,6 @@ function abs(value: number): number {
 
 export function SoHeroHatm(c: any): number {
   if (c == null || c === 0) return 0;
-  if (typeof jass.GetUnitAbilityLevel !== "function" || typeof jass.UnitItemInSlot !== "function") return 0;
-
   const inventoryAbilityId = 1095658094; // 'AInv'
   if ((jass.GetUnitAbilityLevel(c, inventoryAbilityId) as number) <= 0) return 0;
 
@@ -25,8 +23,6 @@ export function SoHeroHatm(c: any): number {
 
 export function GS_news(P: any, S: string): void {
   if (P == null || P === 0 || S == null) return;
-  if (typeof jass.CreateForce !== "function" || typeof jass.ForceAddPlayer !== "function" || typeof jass.DestroyForce !== "function") return;
-
   const F = jass.CreateForce();
   if (F == null || F === 0) return;
   jass.ForceAddPlayer(F, P);
@@ -36,14 +32,11 @@ export function GS_news(P: any, S: string): void {
 
 export function GS_DisplayTimedTextToForcetakes(ply: any, r: number, str: string): void {
   if (ply == null || ply === 0 || str == null) return;
-  if (typeof jass.DisplayTimedTextToPlayer !== "function") return;
   jass.DisplayTimedTextToPlayer(ply, 0, 0, r, str);
 }
 
 export function GS_UnitSector(u1: any, u2: any, r: number): boolean {
   if (u1 == null || u1 === 0 || u2 == null || u2 === 0) return false;
-  if (typeof jass.GetUnitFacing !== "function" || typeof jass.GetUnitX !== "function" || typeof jass.GetUnitY !== "function" || typeof jass.Atan2 !== "function") return false;
-
   const angle1 = (jass.GetUnitFacing(u1) as number) || 0;
   const dy = ((jass.GetUnitY(u1) as number) || 0) - ((jass.GetUnitY(u2) as number) || 0);
   const dx = ((jass.GetUnitX(u1) as number) || 0) - ((jass.GetUnitX(u2) as number) || 0);

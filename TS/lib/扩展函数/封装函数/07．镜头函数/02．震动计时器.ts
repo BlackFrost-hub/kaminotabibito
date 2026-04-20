@@ -19,8 +19,6 @@ export function CameraShakeForPlayer(whichPlayer: any, magnitude: number, durati
   (jass as any).TimerStart(t, duration, false, () => {
     CameraClearNoiseForPlayer(whichPlayer);
     cameraTimers.delete(whichPlayer);
-    if (typeof (jass as any).DestroyTimer === "function") {
-      (jass as any).DestroyTimer(t);
-    }
+    (jass as any).DestroyTimer(t);
   });
 }

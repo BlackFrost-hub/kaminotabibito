@@ -12,6 +12,7 @@ local ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548 = require("系统.09．�
 local tryAttachQuestMarkerForConfigNpc = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.tryAttachQuestMarkerForConfigNpc
 --- NPC生成器 - 根据NPC配置表统一创建NPC
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local _print = _G.print
 --- 创建单个NPC
 -- 
@@ -47,11 +48,24 @@ local function createSingleNPC(self, npcConfig)
         )
         return nil
     end
-    if npcConfig.NPCrequireName and type(jass.SetUnitName) == "function" then
-        jass.SetUnitName(unit, npcConfig.NPCrequireName)
-    end
-    if npcConfig.modelFIle and type(jass.SetUnitModel) == "function" then
-        jass.SetUnitModel(unit, npcConfig.modelFIle)
+    if npcConfig.modelFIle then
+        local ____japi_DzSetUnitModel_0 = japi.DzSetUnitModel
+        if ____japi_DzSetUnitModel_0 == nil then
+            ____japi_DzSetUnitModel_0 = jass.SetUnitModel
+        end
+        local setModel = ____japi_DzSetUnitModel_0
+        if type(setModel) == "function" then
+            local ok = pcall(function () return setModel(nil, unit, npcConfig.modelFIle) end
+            )
+            if not ok then
+                _print(
+                    nil,
+                    (("[NPC生成器] 设置单位模型失败（已忽略）: " .. tostring(npcConfig.NpcNameID)) .. " model=") .. tostring(npcConfig.modelFIle)
+                )
+            end
+        else
+            _print(nil, "[NPC生成器] 无法设置单位模型：缺少 DzSetUnitModel / SetUnitModel")
+        end
     end
     runNpcInitAction(nil, unit, npcConfig.initAction)
     tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)

@@ -11,6 +11,7 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const 玩家常量 = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../../00．核心系统/00．玩家系统/00．常量");
 
@@ -50,7 +51,8 @@ export function getDisplayPlayers(): any[] {
 
 /**
  * 从玩家级 YDUserData 中读取当前登记的英雄。
- * 这套 UI 直接依赖"玩家 -> 英雄"映射，而不是自行遍历单位组兜底。
+ * 英雄来源由“玩家英雄获取桥接”模块注册：
+ * 系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接
  */
 export function getPlayerHero(player: any): any {
   if (player == null) return null;
@@ -81,14 +83,24 @@ export function updatePlayerRealtimeStats(player: any): void {
 
   const intervalState = jass.ConvertUnitState(0x25);
   const speedState = jass.ConvertUnitState(0x51);
-  const attackBaseInterval = jass.GetUnitState(hero, intervalState);
-  const attackSpeedScale = jass.GetUnitState(hero, speedState);
-  const attackInterval = attackSpeedScale > 0 ? attackBaseInterval / attackSpeedScale : 0;
-  const attacksPerSecond = attackInterval > 0 ? 1 / attackInterval : 0;
-  const moveSpeed = jass.GetUnitMoveSpeed(hero);
+  const baseInterval = japi.GetUnitState(hero, intervalState);
+  const speedScale = japi.GetUnitState(hero, speedState);
+  const oldAps = getPlayerAttr(player, "每秒攻速");
+  const oldMoveSpeed = getPlayerAttr(player, "移动速度");
 
-  YDUserDataSet("player", player, "每秒攻速", "real", attacksPerSecond);
-  YDUserDataSet("player", player, "移动速度", "real", moveSpeed);
+  // 安全回退：底层状态异常（0/NaN）时，不覆盖已有有效值
+  const attackIntervalSafe = baseInterval > 0 && speedScale > 0 ? baseInterval / speedScale : 0;
+  const computedApsSafe = attackIntervalSafe > 0 ? 1 / attackIntervalSafe : 0;
+  const attacksPerSecond = computedApsSafe > 0 ? computedApsSafe : oldAps;
+  const rawMoveSpeed = jass.GetUnitMoveSpeed(hero);
+  const moveSpeed = rawMoveSpeed > 0 ? rawMoveSpeed : oldMoveSpeed;
+
+  if (attacksPerSecond > 0) {
+    YDUserDataSet("player", player, "每秒攻速", "real", attacksPerSecond);
+  }
+  if (moveSpeed > 0) {
+    YDUserDataSet("player", player, "移动速度", "real", moveSpeed);
+  }
 }
 
 export function getHeroIcon(hero: any): string {

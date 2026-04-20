@@ -31,7 +31,6 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 };
 
 function sendMsg(msg: string): void {
-  if (typeof (jass as any).DisplayTextToPlayer !== "function") return;
   for (let i = 0; i <= 15; i++) {
     const p = (jass as any).Player(i);
     if (p != null) (jass as any).DisplayTextToPlayer(p, 0, 0, msg);
@@ -152,13 +151,9 @@ function TrigConditions(): boolean {
 function init(): void {
   if (!ENABLED) return;
   const trg = jass.CreateTrigger();
-  if (typeof jass.TriggerAddCondition === "function" && typeof jass.Condition === "function") {
-    jass.TriggerAddCondition(trg, jass.Condition(TrigConditions));
-  }
+  jass.TriggerAddCondition(trg, jass.Condition(TrigConditions));
   伤害事件.MNAnyUnitDamaged(trg, 60);
-  if (typeof jass.TriggerAddAction === "function") {
-    jass.TriggerAddAction(trg, TrigActions);
-  }
+  jass.TriggerAddAction(trg, TrigActions);
 }
 
 init();

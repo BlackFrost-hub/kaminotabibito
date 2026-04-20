@@ -194,7 +194,6 @@ function createItemAtUnit(unit: any, itemId: string): void {
 function onUnitDeath(unit: any, _killer: any): void {
   if (!unit) return;
   if (isSpecialUnit(unit)) return;
-  if (typeof (jass as any).GetUnitTypeId !== "function") return;
   const typeId = (jass as any).GetUnitTypeId(unit) as number;
   const unitId = typeIdToUnitId(typeId);
   const entry = unitId ? (idData as Record<string, UnitDataEntry>)[unitId] : undefined;

@@ -137,14 +137,6 @@ local function bindKeyBN_once_min(self)
     end
     g.__keytest_bound = true
     local japi = require("jass.japi")
-    if type(jass.CreateTrigger) ~= "function" or type(jass.DisplayTimedTextToPlayer) ~= "function" or type(jass.Player) ~= "function" then
-        pr("[keytest] missing basic jass funcs")
-        return
-    end
-    if type(japi.DzTriggerRegisterKeyEventByCode) ~= "function" then
-        pr("[keytest] DzTriggerRegisterKeyEventByCode not function")
-        return
-    end
     local function bind(____, key, label)
         local trig = jass.CreateTrigger()
         japi.DzTriggerRegisterKeyEventByCode(
@@ -189,9 +181,6 @@ local function onChat233(self)
     end
 end
 local function init(self)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.TriggerRegisterPlayerChatEvent) ~= "function" or type(jass.Player) ~= "function" then
-        return
-    end
     local tr = jass.CreateTrigger()
     jass.TriggerRegisterPlayerChatEvent(
         tr,

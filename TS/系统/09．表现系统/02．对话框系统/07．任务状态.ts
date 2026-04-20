@@ -64,14 +64,16 @@ export function setQuestState(questId: string, state: number, playerName?: strin
     if (playerName) {
       const def = questDB.getQuest(questId);
       if (def) def.accepterName = playerName;
-      const active = (questDB as any).globalData?.quests.get(questId);
+      const globalData = (questDB as any).globalData;
+      const active = globalData != null ? globalData.quests.get(questId) : null;
       if (active) active.accepterName = playerName;
     }
     return;
   }
 
   if (state === 2) {
-    const active = (questDB as any).globalData?.quests.get(questId);
+    const globalData = (questDB as any).globalData;
+    const active = globalData != null ? globalData.quests.get(questId) : null;
     if (active) {
       for (const obj of active.objectives) {
         obj.current = obj.required;
@@ -80,7 +82,7 @@ export function setQuestState(questId: string, state: number, playerName?: strin
       active.updatedAt = 0;
       if (playerName) active.completerName = playerName;
     }
-    const savedAccepterName = active?.accepterName;
+    const savedAccepterName = active != null ? active.accepterName : undefined;
     questDB.completeQuest(0, questId);
     if (playerName) {
       const def = questDB.getQuest(questId);

@@ -11,9 +11,6 @@ function ____exports.SoHeroHatm(self, c)
     if c == nil or c == 0 then
         return 0
     end
-    if type(jass.GetUnitAbilityLevel) ~= "function" or type(jass.UnitItemInSlot) ~= "function" then
-        return 0
-    end
     local inventoryAbilityId = 1095658094
     if jass.GetUnitAbilityLevel(c, inventoryAbilityId) <= 0 then
         return 0
@@ -34,9 +31,6 @@ function ____exports.GS_news(self, P, S)
     if P == nil or P == 0 or S == nil then
         return
     end
-    if type(jass.CreateForce) ~= "function" or type(jass.ForceAddPlayer) ~= "function" or type(jass.DestroyForce) ~= "function" then
-        return
-    end
     local F = jass.CreateForce()
     if F == nil or F == 0 then
         return
@@ -54,9 +48,6 @@ function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
     if ply == nil or ply == 0 or str == nil then
         return
     end
-    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
     jass.DisplayTimedTextToPlayer(
         ply,
         0,
@@ -67,9 +58,6 @@ function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
 end
 function ____exports.GS_UnitSector(self, u1, u2, r)
     if u1 == nil or u1 == 0 or u2 == nil or u2 == 0 then
-        return false
-    end
-    if type(jass.GetUnitFacing) ~= "function" or type(jass.GetUnitX) ~= "function" or type(jass.GetUnitY) ~= "function" or type(jass.Atan2) ~= "function" then
         return false
     end
     local angle1 = jass.GetUnitFacing(u1) or 0

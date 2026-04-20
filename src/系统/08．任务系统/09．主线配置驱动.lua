@@ -251,7 +251,7 @@ local function createEvalEnv(self, triggerUnit)
         if type(gAny.YDLocal1Get) == "function" then
             return gAny:YDLocal1Get(ty, key)
         end
-        if ty == "location" and key == "单位位置" and triggerUnit and type(jass.GetUnitLoc) == "function" then
+        if ty == "location" and key == "单位位置" and triggerUnit then
             if not cachedLoc then
                 cachedLoc = jass.GetUnitLoc(triggerUnit)
             end
@@ -338,7 +338,7 @@ local function runActionTimeline(self, timeline, triggerUnit)
     local entries = parseTimelineEntries(nil, timeline)
     for ____, e in ipairs(entries) do
         do
-            if e.delay <= 0 or type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
+            if e.delay <= 0 then
                 executeActionCode(nil, e.code, triggerUnit)
                 goto __continue65
             end
@@ -349,9 +349,7 @@ local function runActionTimeline(self, timeline, triggerUnit)
                 false,
                 function()
                     executeActionCode(nil, e.code, triggerUnit)
-                    if type(jass.DestroyTimer) == "function" then
-                        jass.DestroyTimer(t)
-                    end
+                    jass.DestroyTimer(t)
                 end
             )
         end
@@ -372,7 +370,7 @@ local function getHeroes(self)
         ____temp_11 = nil
     end
     local group = ____temp_11
-    if not group or type(jass.ForGroup) ~= "function" then
+    if not group then
         return {}
     end
     local arr = {}
@@ -401,13 +399,13 @@ local function tick(self)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
             if cfg.enabled == false then
-                goto __continue78
+                goto __continue77
             end
             if not cfg.condition or cfg.condition == "" then
-                goto __continue78
+                goto __continue77
             end
             if not hitFromStage(nil, cfg, stage) then
-                goto __continue78
+                goto __continue77
             end
             local matchedHero = nil
             for ____, hero in ipairs(heroes) do
@@ -417,7 +415,7 @@ local function tick(self)
                 end
             end
             if not matchedHero then
-                goto __continue78
+                goto __continue77
             end
             local triggerUnit = matchedHero
             if type(cfg.toStage) == "number" then
@@ -428,7 +426,7 @@ local function tick(self)
             refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
             break
         end
-        ::__continue78::
+        ::__continue77::
     end
     running = false
 end
@@ -442,7 +440,7 @@ local function extractFunctionNames(self, text)
             local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
             if not isStart then
                 i = i + 1
-                goto __continue89
+                goto __continue88
             end
             local start = i
             i = i + 1
@@ -462,7 +460,7 @@ local function extractFunctionNames(self, text)
                 names[#names + 1] = __TS__StringSubstring(text, start, i)
             end
         end
-        ::__continue89::
+        ::__continue88::
     end
     return names
 end
@@ -512,10 +510,8 @@ end
 local function init(self)
     ensureRuntimeQuest(nil)
     reportMissingFunctions(nil)
-    if type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
-        local t = jass.CreateTimer()
-        jass.TimerStart(t, 0.3, true, tick)
-    end
+    local t = jass.CreateTimer()
+    jass.TimerStart(t, 0.3, true, tick)
 end
 init(nil)
 return ____exports

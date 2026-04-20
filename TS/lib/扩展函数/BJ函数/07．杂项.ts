@@ -96,17 +96,13 @@ export function OperatorRealMultiply(a: number, b: number): number {
 export function String2OrderIdBJ(orderIdString: string): number {
     // Check to see if it's a generic order.
     let orderId = 0;
-    if (typeof jass.OrderId === "function") {
-        orderId = jass.OrderId(orderIdString);
-    }
+    orderId = jass.OrderId(orderIdString);
     if (orderId !== 0) {
         return orderId;
     }
 
     // Check to see if it's a (train) unit order.
-    if (typeof jass.UnitId === "function") {
-        orderId = jass.UnitId(orderIdString);
-    }
+    orderId = jass.UnitId(orderIdString);
     if (orderId !== 0) {
         return orderId;
     }

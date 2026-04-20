@@ -50,6 +50,7 @@ function loadTests(): void {
   if (ENABLE_TEST_EVENT_2) {
     require("系统.12．测试系统.测试事件2");
   }
+
 }
 
 loadTests();

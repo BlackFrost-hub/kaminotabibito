@@ -27,7 +27,6 @@ function normalizeRequireCount(count?: number): number {
 function tryConsumeRequiredResources(player: any, requiredResources?: string, requireCount?: number): boolean {
   if (!requiredResources || requiredResources === "") return true;
   const cost = normalizeRequireCount(requireCount);
-  if (typeof jass.GetPlayerState !== "function" || typeof jass.SetPlayerState !== "function") return false;
   const key = requiredResources.toLowerCase();
   if (key === "wood" || key === "lumber" || requiredResources === "能量碎片") {
     const state = jass.PLAYER_STATE_RESOURCE_LUMBER;
@@ -82,8 +81,8 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
   if (!hero || !requireItem) return { itemId: 0, itemCode: "", itemLevel: "" };
   if (requireItem.indexOf("装备等级:") === 0) {
     for (let slot = 0; slot < 6; slot++) {
-      const item = typeof jass.UnitItemInSlot === "function" ? jass.UnitItemInSlot(hero, slot) : null;
-      if (!item || typeof jass.GetItemTypeId !== "function") continue;
+      const item = jass.UnitItemInSlot(hero, slot);
+      if (!item) continue;
       const itemId = jass.GetItemTypeId(item) as number;
       const itemCode = 封装函数.fourCCToString(itemId);
       const data = (itemsData as Record<string, any>)[itemCode];
@@ -98,7 +97,8 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
   if (requireItem.length === 4) {
     const itemId = calculateFourCC(requireItem);
     const data = (itemsData as Record<string, any>)[requireItem];
-    return { itemId, itemCode: requireItem, itemLevel: (data?.level as string) || "" };
+    const itemLevel = data != null ? (data.level as string) || "" : "";
+    return { itemId, itemCode: requireItem, itemLevel };
   }
 
   if (requireItem.indexOf("|") >= 0) {
@@ -109,7 +109,8 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
       const testId = calculateFourCC(c);
       if (UnitHasItemOfTypeBJ(hero, testId)) {
         const data = (itemsData as Record<string, any>)[c];
-        return { itemId: testId, itemCode: c, itemLevel: (data?.level as string) || "" };
+        const itemLevel = data != null ? (data.level as string) || "" : "";
+        return { itemId: testId, itemCode: c, itemLevel };
       }
     }
   }
@@ -167,7 +168,7 @@ export function handleQuestSubmit(params: {
   const requireItem = quest.requireItem;
   const requiredResources = quest.requiredResources;
   const requireCount = normalizeRequireCount(quest.requireCount);
-  const questId = quest.requireID?.toString() || "";
+  const questId = quest.requireID != null ? quest.requireID.toString() : "";
   const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
   let rewardBranchIndex = -1;
   const useGenericGiveFailHint = shouldUseGenericGiveFailHint(quest);

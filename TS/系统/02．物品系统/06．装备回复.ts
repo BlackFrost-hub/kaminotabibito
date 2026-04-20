@@ -96,7 +96,6 @@ const YL_ABIL = "物品技能标识";
 /** 对生命/魔法做加法并封顶（不写技能表现，技能可由地图另挂 STES 或 GUI） */
 function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
   if (unit == null || unit === 0) return;
-  if (typeof jass.GetUnitState !== "function" || typeof jass.SetUnitState !== "function") return;
 
   if (hp > 0 && jass.UNIT_STATE_LIFE != null && jass.UNIT_STATE_MAX_LIFE != null) {
     const cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
@@ -113,7 +112,6 @@ function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
 /** 治疗前后差值，供 YDLocal7 与父 `YDLocal1Get(real,…)` 对齐手写 JASS 子触发的「有效回复量」语义 */
 function applyHpMpToUnitAndGetApplied(this: void, unit: any, hp: number, mp: number): { hpApplied: number; mpApplied: number } {
   if (unit == null || unit === 0) return { hpApplied: 0, mpApplied: 0 };
-  if (typeof jass.GetUnitState !== "function") return { hpApplied: 0, mpApplied: 0 };
 
   let lifeBefore = 0;
   let manaBefore = 0;
@@ -139,8 +137,6 @@ function applyHpMpToUnitAndGetApplied(this: void, unit: any, hp: number, mp: num
 function fireItemHealEvent(this: void, unit: any, item: any, hp: number, mp: number, abilId: string): void {
   const stesHT = STES_GetTable();
   if (stesHT == null || stesHT === 0) return;
-  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return;
-  if (typeof jass.LoadTriggerHandle !== "function") return;
 
   const hash = jass.StringHash(ITEM_HEAL_STES_EVENT);
   const loopIndex = jass.LoadInteger(stesHT, hash, ydlStes_skeyIndex(undefined));
@@ -177,11 +173,11 @@ function onItemHealStesChild(this: void): void {
     void ydlStes_readString5(undefined, YL_ABIL);
 
     if (unit == null || unit === 0) {
-      if (typeof jass.GetManipulatingUnit === "function") unit = jass.GetManipulatingUnit();
-      if ((unit == null || unit === 0) && typeof jass.GetTriggerUnit === "function") unit = jass.GetTriggerUnit();
+      unit = jass.GetManipulatingUnit();
+      if (unit == null || unit === 0) unit = jass.GetTriggerUnit();
     }
     if (item == null || item === 0) {
-      if (typeof jass.GetManipulatedItem === "function") item = jass.GetManipulatedItem();
+      item = jass.GetManipulatedItem();
     }
 
     let hp = rawHp;
@@ -219,14 +215,12 @@ function executeSegment(
 }
 
 function onUseItem(this: void): void {
-  let unit: any = undefined;
-  if (typeof jass.GetManipulatingUnit === "function") unit = jass.GetManipulatingUnit();
-  if (unit == null && typeof jass.GetTriggerUnit === "function") unit = jass.GetTriggerUnit();
-  let item: any = undefined;
-  if (typeof jass.GetManipulatedItem === "function") item = jass.GetManipulatedItem();
+  let unit: any = jass.GetManipulatingUnit();
+  if (unit == null) unit = jass.GetTriggerUnit();
+  let item: any = jass.GetManipulatedItem();
   if (!unit || !item) return;
   if (isSpecialUnit(unit)) return;
-  const itemId = typeof jass.GetItemTypeId === "function" ? jass.GetItemTypeId(item) : 0;
+  const itemId = jass.GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
   const entry = (itemsData as Record<string, { hot?: string; abilList?: string }>)[idStr];
   if (!entry || !entry.hot || !entry.abilList) return;
@@ -263,10 +257,6 @@ function init(this: void): void {
   if (glob[INIT_KEY]) return;
   glob[INIT_KEY] = true;
 
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    return;
-  }
-
   if (!glob[STES_REG_KEY] && STES_Register != null) {
     const stesTrig = jass.CreateTrigger();
     jass.TriggerAddAction(stesTrig, () => {
@@ -279,10 +269,8 @@ function init(this: void): void {
   const useItemEv = jass.EVENT_PLAYER_UNIT_USE_ITEM ?? 35;
   const trig = jass.CreateTrigger();
   for (let i = 0; i <= 6; i++) jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), useItemEv, undefined!);
-  if (typeof jass.Player === "function") {
-    const p13 = jass.Player(13);
-    if (p13 != null) jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, undefined!);
-  }
+  const p13 = jass.Player(13);
+  if (p13 != null) jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, undefined!);
   jass.TriggerAddAction(trig, () => {
     onUseItem();
   });

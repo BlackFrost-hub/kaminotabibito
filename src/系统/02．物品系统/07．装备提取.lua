@@ -85,9 +85,6 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
-        return -1
-    end
     local h = jass.StringHash(eventName)
     return jass.LoadInteger(
         ht,
@@ -103,7 +100,7 @@ local function collectAllIdsInScoreInterval(lo, hi)
     for id in pairs(itemsTable) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue16
+                goto __continue15
             end
             local ____ydlStes_coerceOptionalNumber_6 = ydlStes_coerceOptionalNumber
             local ____opt_4 = itemsTable[id]
@@ -112,13 +109,13 @@ local function collectAllIdsInScoreInterval(lo, hi)
             end
             local sc = ____ydlStes_coerceOptionalNumber_6(nil, nil, ____opt_4)
             if sc == nil then
-                goto __continue16
+                goto __continue15
             end
             if sc >= a and sc <= b then
                 out[#out + 1] = id
             end
         end
-        ::__continue16::
+        ::__continue15::
     end
     return out
 end
@@ -164,19 +161,13 @@ local function runEquipExtract()
     log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
 local function scheduleRetry(fn)
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        fn(nil)
-        return
-    end
     local tm = jass.CreateTimer()
     jass.TimerStart(
         tm,
         RETRY_SEC,
         false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(tm)
-            end
+            jass.DestroyTimer(tm)
             fn(nil)
         end
     )
@@ -188,7 +179,7 @@ local function tryRegisterEquipStes()
     if g[REG_GUARD] then
         return
     end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
+    if STES_Register == nil then
         g[REG_GUARD] = true
         return
     end

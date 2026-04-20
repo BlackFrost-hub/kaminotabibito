@@ -62,7 +62,6 @@ export function registerTaskUIListWheel(ctx: TaskUIScrollContext, refreshList: (
   if (ctx.taskListWheelTrig) return ctx.taskListWheelTrig;
   ctx.taskListWheelTrig = ctx.registerMouseWheel(false, () => {
     (pcall as any)(() => {
-      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 

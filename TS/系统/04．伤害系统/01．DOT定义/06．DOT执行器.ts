@@ -53,7 +53,7 @@ export function createDotExecutor(deps: {
 
   // ========== 虚拟分区：特效回收 ==========
   function addDotEffectOnUnit(unit: any, model: string, duration: number): void {
-    if (!unit || !model || model === "" || typeof deps.jass.AddSpecialEffectTarget !== "function") return;
+    if (!unit || !model || model === "") return;
     const eff = deps.jass.AddSpecialEffectTarget(model, unit, "origin");
     if (eff == null) return;
     YDWETimerDestroyEffect(duration, eff);
@@ -62,7 +62,6 @@ export function createDotExecutor(deps: {
   // ========== 虚拟分区：造成 DOT 伤害 ==========
   function dealDamageForType(typeId: string, source: any, target: any, amount: number): void {
     if (isDotTargetPaused(target)) return;
-    if (typeof deps.jass.UnitDamageTarget !== "function") return;
     const cfg = deps.dotTypes.find(c => c.id === typeId);
     if (cfg == null) return;
     const dh = deps.unitHid(target);

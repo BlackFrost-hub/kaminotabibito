@@ -126,10 +126,7 @@ function ____exports.SetUnitExplodedBJ(self, unit, exploded)
     jass.SetUnitExploded(unit, exploded)
 end
 function ____exports.GetTransportUnitBJ(self)
-    if type(jass.GetTransportUnit) == "function" then
-        return jass.GetTransportUnit()
-    end
-    return nil
+    return jass.GetTransportUnit()
 end
 function ____exports.GetLoadedUnitBJ(self)
     return jass.GetLoadedUnit()

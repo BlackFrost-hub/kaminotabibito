@@ -58,7 +58,7 @@ function getYDHT(): any {
 
 // 读取当前施法单位。
 function getTriggerUnitOrNull(): any {
-  return typeof jass.GetTriggerUnit === "function" ? jass.GetTriggerUnit() : null;
+  return jass.GetTriggerUnit();
 }
 
 // 按施法单位保存本次技能上下文，目标单位取技能真实目标。
@@ -69,23 +69,15 @@ function saveLastSpellContext(caster: any): void {
   if (caster == null || StarBaseHT == null) return;
 
   const hd = jass.GetHandleId(caster);
-  const spellId = typeof jass.GetSpellAbilityId === "function" ? jass.GetSpellAbilityId() : 0;
-  const x = typeof jass.GetSpellTargetX === "function" ? jass.GetSpellTargetX() : 0;
-  const y = typeof jass.GetSpellTargetY === "function" ? jass.GetSpellTargetY() : 0;
-  const targetUnit = typeof jass.GetSpellTargetUnit === "function"
-    ? jass.GetSpellTargetUnit()
-    : null;
+  const spellId = jass.GetSpellAbilityId();
+  const x = jass.GetSpellTargetX();
+  const y = jass.GetSpellTargetY();
+  const targetUnit = jass.GetSpellTargetUnit();
 
-  if (typeof jass.SaveInteger === "function") {
-    jass.SaveInteger(StarBaseHT, hd, HASH_LAST_SPELL, spellId);
-  }
-  if (typeof jass.SaveReal === "function") {
-    jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_X, x);
-    jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_Y, y);
-  }
-  if (typeof jass.SaveUnitHandle === "function") {
-    jass.SaveUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT, targetUnit);
-  }
+  jass.SaveInteger(StarBaseHT, hd, HASH_LAST_SPELL, spellId);
+  jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_X, x);
+  jass.SaveReal(StarBaseHT, hd, HASH_LAST_SPELL_Y, y);
+  jass.SaveUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT, targetUnit);
 }
 
 // 按施法单位读取最近一次技能上下文。
@@ -97,18 +89,10 @@ function loadLastSpellContext(caster: any): void {
   }
 
   const hd = jass.GetHandleId(caster);
-  lastItemAbilityContext.abilityId = typeof jass.LoadInteger === "function"
-    ? jass.LoadInteger(StarBaseHT, hd, HASH_LAST_SPELL)
-    : 0;
-  lastItemAbilityContext.targetX = typeof jass.LoadReal === "function"
-    ? jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_X)
-    : 0;
-  lastItemAbilityContext.targetY = typeof jass.LoadReal === "function"
-    ? jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_Y)
-    : 0;
-  lastItemAbilityContext.targetUnit = typeof jass.LoadUnitHandle === "function"
-    ? jass.LoadUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT)
-    : null;
+  lastItemAbilityContext.abilityId = jass.LoadInteger(StarBaseHT, hd, HASH_LAST_SPELL);
+  lastItemAbilityContext.targetX = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_X);
+  lastItemAbilityContext.targetY = jass.LoadReal(StarBaseHT, hd, HASH_LAST_SPELL_Y);
+  lastItemAbilityContext.targetUnit = jass.LoadUnitHandle(StarBaseHT, hd, HASH_LAST_SPELL_TARGET_UNIT);
   if (lastItemAbilityContext.targetUnit === 0) {
     lastItemAbilityContext.targetUnit = null;
   }
@@ -126,7 +110,6 @@ function resetLastSpellContext(): void {
 // 为当前上下文构建点对象。
 function createLastSpellTargetPoint(): void {
   lastItemAbilityContext.targetPoint = null;
-  if (typeof jass.Location !== "function") return;
   lastItemAbilityContext.targetPoint = jass.Location(
     lastItemAbilityContext.targetX,
     lastItemAbilityContext.targetY
@@ -136,9 +119,7 @@ function createLastSpellTargetPoint(): void {
 // 销毁当前上下文里的点对象。
 function destroyLastSpellTargetPoint(): void {
   if (lastItemAbilityContext.targetPoint == null) return;
-  if (typeof jass.RemoveLocation === "function") {
-    jass.RemoveLocation(lastItemAbilityContext.targetPoint);
-  }
+  jass.RemoveLocation(lastItemAbilityContext.targetPoint);
   lastItemAbilityContext.targetPoint = null;
 }
 
@@ -151,11 +132,9 @@ function fireItemAbilityEvents(): void {
   for (let i = 0; i < su_iatList.length; i++) {
     const trig = su_iatList[i];
     if (trig == null) continue;
-    if (typeof jass.IsTriggerEnabled === "function" && !jass.IsTriggerEnabled(trig)) continue;
-    if (typeof jass.TriggerEvaluate === "function" && !jass.TriggerEvaluate(trig)) continue;
-    if (typeof jass.TriggerExecute === "function") {
-      jass.TriggerExecute(trig);
-    }
+    if (!jass.IsTriggerEnabled(trig)) continue;
+    if (!jass.TriggerEvaluate(trig)) continue;
+    jass.TriggerExecute(trig);
   }
 
   destroyLastSpellTargetPoint();
@@ -174,13 +153,10 @@ export function SU_AddItemAbilityEvent(trg: any): void {
   const hd = jass.GetHandleId(trg);
 
   // 检查是否已注册
-  const hasIndex = typeof jass.HaveSavedInteger === "function"
-    && jass.HaveSavedInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX);
+  const hasIndex = jass.HaveSavedInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX);
 
   if (!hasIndex) {
-    if (typeof jass.SaveInteger === "function") {
-      jass.SaveInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX, su_iatIndex);
-    }
+    jass.SaveInteger(YDHT, hd, HASH_ITEM_ABILITY_INDEX, su_iatIndex);
     su_iatList[su_iatIndex] = trg;
     su_iatIndex++;
   }
@@ -213,8 +189,8 @@ function SU_InititemAbilityListener_2(): void {
 export function SU_InititemAbilityListener(): void {
   if (su_ItemAbilityInited) return;
 
-  su_ItemAbilityTrig = typeof jass.CreateTrigger === "function" ? jass.CreateTrigger() : null;
-  su_ItemAbilityTrig2 = typeof jass.CreateTrigger === "function" ? jass.CreateTrigger() : null;
+  su_ItemAbilityTrig = jass.CreateTrigger();
+  su_ItemAbilityTrig2 = jass.CreateTrigger();
 
   if (su_ItemAbilityTrig == null || su_ItemAbilityTrig2 == null) return;
 
@@ -224,10 +200,8 @@ export function SU_InititemAbilityListener(): void {
   TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM);
 
   // 添加动作
-  if (typeof jass.TriggerAddAction === "function") {
-    jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1);
-    jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2);
-  }
+  jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1);
+  jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2);
 
   su_ItemAbilityInited = true;
 }

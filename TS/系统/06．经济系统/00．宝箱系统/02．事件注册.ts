@@ -79,19 +79,13 @@ function jassStesHashtable(this: void): any {
 function countOnJassStesTable(this: void, eventName: string): number {
   const ht = jassStesHashtable();
   if (ht == null || ht === 0) return -1;
-  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return -1;
   return jass.LoadInteger(ht, jass.StringHash(eventName), helper.ydlStes_skeyIndex(undefined));
 }
 
 function scheduleRetry(this: void, fn: () => void): void {
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
-    fn();
-    return;
-  }
-
   const timer = jass.CreateTimer();
   jass.TimerStart(timer, RETRY_SEC, false, () => {
-    if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(timer);
+    jass.DestroyTimer(timer);
     fn();
   });
 }
@@ -102,11 +96,6 @@ function scheduleRetry(this: void, fn: () => void): void {
 function tryRegisterTargetOrderStes(this: void): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
-
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    g[REG_GUARD] = true;
-    return;
-  }
 
   if (g[TRIG_KEY] == null) {
     const trig = jass.CreateTrigger();
@@ -142,17 +131,15 @@ export function registerChestSystemHero(this: void, hero: any): void {
   if (!hero) return;
 
   // 注册单位目标命令事件
-  if (typeof jass.TriggerRegisterUnitEvent === "function") {
-    const g = globalThis as any;
-    if (g[TRIG_KEY] == null) {
-      const trig = jass.CreateTrigger();
-      jass.TriggerAddAction(trig, onUnitIssuedTargetOrder);
-      g[TRIG_KEY] = trig;
-    }
-
-    const ev = typeof jass.ConvertUnitEvent === "function" ? jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER) : EVENT_UNIT_ISSUED_TARGET_ORDER;
-    jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev);
+  const g = globalThis as any;
+  if (g[TRIG_KEY] == null) {
+    const trig = jass.CreateTrigger();
+    jass.TriggerAddAction(trig, onUnitIssuedTargetOrder);
+    g[TRIG_KEY] = trig;
   }
+
+  const ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER);
+  jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev);
 }
 
 /**

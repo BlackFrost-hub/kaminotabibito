@@ -4,20 +4,20 @@ import { getGameUI } from "../../../lib/扩展函数/封装函数/04．硬件输
 
 // ========== 虚拟分区：销毁 ==========
 export function destroyFrame(frame: number): boolean {
-  if (!frame || typeof japi.DzDestroyFrame !== "function") return false;
+  if (!frame) return false;
   japi.DzDestroyFrame(frame);
   return true;
 }
 
 // ========== 虚拟分区：显示隐藏 ==========
 export function hideFrame(frame: number): boolean {
-  if (!frame || typeof japi.DzFrameShow !== "function") return false;
+  if (!frame) return false;
   japi.DzFrameShow(frame, false);
   return true;
 }
 
 export function showFrame(frame: number): boolean {
-  if (!frame || typeof japi.DzFrameShow !== "function") return false;
+  if (!frame) return false;
   japi.DzFrameShow(frame, true);
   return true;
 }

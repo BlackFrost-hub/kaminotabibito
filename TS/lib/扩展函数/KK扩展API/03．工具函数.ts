@@ -22,7 +22,6 @@ export function DzGetColor2(a: number, r: number, g: number, b: number): number 
  * @returns 是否成功打开
  */
 export function DzOpenQQGroupUrl(url: string): boolean {
-  if (typeof japi.DzOpenQQGroupUrl !== "function") return false;
   return (japi.DzOpenQQGroupUrl(url) as boolean) || false;
 }
 

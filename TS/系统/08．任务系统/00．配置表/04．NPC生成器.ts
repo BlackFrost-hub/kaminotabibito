@@ -3,6 +3,7 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 // 引入NPC配置表
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
@@ -41,14 +42,18 @@ function createSingleNPC(npcConfig: NPCData): any {
     return null;
   }
 
-  // 设置单位名称
-  if (npcConfig.NPCrequireName && typeof jass.SetUnitName === "function") {
-    jass.SetUnitName(unit, npcConfig.NPCrequireName);
-  }
-
   // 设置模型文件（如果配置了）
-  if (npcConfig.modelFIle && typeof jass.SetUnitModel === "function") {
-    jass.SetUnitModel(unit, npcConfig.modelFIle);
+  if (npcConfig.modelFIle) {
+    const setModel = japi.DzSetUnitModel ?? jass.SetUnitModel;
+    if (typeof setModel === "function") {
+      // 某些 JAPI 环境在回调中触发 DzSetUnitModel 可能报 hook.wj / DzCallback0。
+      const ok = (pcall as any)(() => setModel(unit, npcConfig.modelFIle));
+      if (!ok) {
+        _print("[NPC生成器] 设置单位模型失败（已忽略）: " + tostring(npcConfig.NpcNameID) + " model=" + tostring(npcConfig.modelFIle));
+      }
+    } else {
+      _print("[NPC生成器] 无法设置单位模型：缺少 DzSetUnitModel / SetUnitModel");
+    }
   }
 
   // 初始化动作（例如商店物品池调整）

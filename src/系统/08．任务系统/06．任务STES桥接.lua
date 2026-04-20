@@ -48,10 +48,10 @@ local function resolvePlayerIdFromTrigger()
     if type(jass.STES_GetTriggerPlayer) == "function" then
         pl = jass.STES_GetTriggerPlayer()
     end
-    if pl == nil and type(jass.GetTriggerPlayer) == "function" then
+    if pl == nil then
         pl = jass.GetTriggerPlayer()
     end
-    if pl ~= nil and type(jass.GetPlayerId) == "function" then
+    if pl ~= nil then
         local id = jass.GetPlayerId(pl)
         if type(id) == "number" and id >= 0 and id < 16 then
             return id
@@ -148,10 +148,6 @@ end
 --- 注册简单 STES 回调（无任务表、无 objective 逻辑时可用）。
 -- 同样做 YDLocal 同步与父页恢复，便于父触发里已写 YDLocal5 时读参一致。
 function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, debugMsg)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        debugPrint(nil, ("JASS API 不完整，无法注册" .. debugMsg) .. "事件")
-        return
-    end
     if STES_Register == nil then
         debugPrint(nil, ("STES_Register 不可用，无法注册" .. debugMsg) .. "事件")
         return
@@ -189,10 +185,6 @@ function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, deb
     debugPrint(nil, ("已注册 " .. eventName) .. " 事件")
 end
 local function init(self)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        debugPrint(nil, "[任务STES] JASS API 不完整，跳过注册")
-        return
-    end
     if STES_Register == nil then
         debugPrint(nil, "[任务STES] STES_Register 不可用，跳过注册")
         return
@@ -201,7 +193,7 @@ local function init(self)
         do
             local row = QUEST_STES_OBJECTIVE_ROWS[eventKey]
             if not row then
-                goto __continue39
+                goto __continue37
             end
             local trig = jass.CreateTrigger()
             local key = eventKey
@@ -213,7 +205,7 @@ local function init(self)
             )
             registerOneStesEvent(nil, trig, key)
         end
-        ::__continue39::
+        ::__continue37::
     end
 end
 init(nil)

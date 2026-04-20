@@ -10,15 +10,9 @@ function ____exports.nextTypingProgress(self, current, step)
     return current + step
 end
 function ____exports.substringCompat(self, text, start, ____end)
-    if type(jass.SubString) == "function" then
-        return jass.SubString(text, start, ____end)
-    end
-    return text:sub(start + 1, ____end)
+    return jass.SubString(text, start, ____end)
 end
 function ____exports.stringLengthCompat(self, text)
-    if type(jass.StringLength) == "function" then
-        return jass.StringLength(text)
-    end
-    return #text
+    return jass.StringLength(text)
 end
 return ____exports

@@ -1,4 +1,4 @@
-﻿// 测试事件2 - 2222：4×+1000 + 4 条漂浮字；555：12×+1000 + 12 条（漂浮字均设 duration，走 漂浮文字函数 回收队列排泄）
+// 测试事件2 - 2222：4×+1000 + 4 条漂浮字；555：12×+1000 + 12 条（漂浮字均设 duration，走 漂浮文字函数 回收队列排泄）
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
@@ -50,25 +50,20 @@ function onChat2222(): void {
     spawnGoldFloatPlus1000();
     n++;
     if (n >= GOLD_BURST_TIMES) return;
-    if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
     const t = (jass as any).CreateTimer();
     (jass as any).TimerStart(t, GOLD_BURST_INTERVAL_SEC, false, () => {
-      if (typeof (jass as any).DestroyTimer === "function" && typeof (jass as any).GetExpiredTimer === "function") {
-        (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
-      }
+      (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
       step();
     });
   };
   step();
-  if (typeof (jass as any).DisplayTimedTextToPlayer === "function") {
-    (jass as any).DisplayTimedTextToPlayer(
-      (jass as any).Player(0),
-      0,
-      0,
-      10,
-      "[测试事件2] 1s内4×+1000+4条漂浮字，收金币音复用，间隔" + GOLD_BURST_INTERVAL_SEC + "s"
-    );
-  }
+  (jass as any).DisplayTimedTextToPlayer(
+    (jass as any).Player(0),
+    0,
+    0,
+    10,
+    "[测试事件2] 1s内4×+1000+4条漂浮字，收金币音复用，间隔" + GOLD_BURST_INTERVAL_SEC + "s"
+  );
 }
 
 function onChat555(): void {
@@ -81,12 +76,9 @@ function onChat555(): void {
     spawnGoldFloatPlus1000();
     n++;
     if (n >= GOLD_BURST_555_TIMES) return;
-    if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
     const t = (jass as any).CreateTimer();
     (jass as any).TimerStart(t, GOLD_BURST_555_INTERVAL_SEC, false, () => {
-      if (typeof (jass as any).DestroyTimer === "function" && typeof (jass as any).GetExpiredTimer === "function") {
-        (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
-      }
+      (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
       step();
     });
   };

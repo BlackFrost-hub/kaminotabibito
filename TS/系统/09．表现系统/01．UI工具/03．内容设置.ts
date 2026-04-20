@@ -6,7 +6,7 @@ import { EventType } from "./00．类型定义";
 // ========== 虚拟分区：视觉内容 ==========
 export function setFrameTexture(frame: number, texture: string): boolean {
   if (frame === 0 || frame == null) return false;
-  if (texture && typeof japi.DzFrameSetTexture === "function") {
+  if (texture !== "") {
     japi.DzFrameSetTexture(frame, texture, 0);
   }
   return true;
@@ -33,7 +33,7 @@ export function setFrameHoverEvents(
 
 // ========== 虚拟分区：文本内容 ==========
 export function setButtonText(frame: number, text: string): boolean {
-  if (!frame || typeof japi.DzFrameSetText !== "function") return false;
+  if (!frame) return false;
   japi.DzFrameSetText(frame, text);
   return true;
 }

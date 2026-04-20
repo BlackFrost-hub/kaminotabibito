@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿/**
+/**
  * 吸血与吸魔系统
  *
  * 功能：伤害吸血、魔法吸血、普攻吸血、伤害吸魔
@@ -71,16 +71,14 @@ export function getHeroForAncientUnit(ancientUnit: any): any {
 
   let foundHero: any = null;
 
-  if (typeof jass.ForGroup === "function") {
-    jass.ForGroup(heroGroup, () => {
-      const enumUnit = jass.GetEnumUnit();
-      if (enumUnit != null && jass.GetOwningPlayer(enumUnit) === owner) {
-        if (jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO)) {
-          foundHero = enumUnit;
-        }
+  jass.ForGroup(heroGroup, () => {
+    const enumUnit = jass.GetEnumUnit();
+    if (enumUnit != null && jass.GetOwningPlayer(enumUnit) === owner) {
+      if (jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO)) {
+        foundHero = enumUnit;
       }
-    });
-  }
+    }
+  });
 
   return foundHero;
 }

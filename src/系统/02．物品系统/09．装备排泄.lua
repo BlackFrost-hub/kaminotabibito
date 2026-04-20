@@ -5,33 +5,21 @@ function registerItemForCleanup(item)
     if item == nil then
         return
     end
-    if type(jass.CreateTrigger) ~= "function" then
-        return
-    end
     local trig = jass.CreateTrigger()
     if not trig then
-        return
-    end
-    if type(jass.TriggerRegisterDeathEvent) ~= "function" then
         return
     end
     jass.TriggerRegisterDeathEvent(trig, item)
     local capturedItem = item
     local taHandle = nil
     local function onDeath()
-        if type(jass.RemoveItem) == "function" then
-            jass.RemoveItem(capturedItem)
-        end
-        if taHandle ~= nil and type(jass.TriggerRemoveAction) == "function" then
+        jass.RemoveItem(capturedItem)
+        if taHandle ~= nil then
             jass.TriggerRemoveAction(trig, taHandle)
         end
-        if type(jass.DestroyTrigger) == "function" then
-            jass.DestroyTrigger(trig)
-        end
+        jass.DestroyTrigger(trig)
     end
-    if type(jass.TriggerAddAction) == "function" then
-        taHandle = jass.TriggerAddAction(trig, onDeath)
-    end
+    taHandle = jass.TriggerAddAction(trig, onDeath)
 end
 jass = require("jass.common")
 local _lastCreatedItem = nil

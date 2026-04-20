@@ -49,9 +49,7 @@ do
     end
 end
 local _____539F_751FUI = require("系统.09．表现系统.00．初始化UI")
-if type(_____539F_751FUI.initNativeUI) == "function" then
-    _____539F_751FUI:initNativeUI()
-end
+_____539F_751FUI:initNativeUI()
 require("系统.09．表现系统.01．UI工具.index")
 require("系统.09．表现系统.03．垂直滚动条轨道")
 require("系统.09．表现系统.02．对话框系统.index")

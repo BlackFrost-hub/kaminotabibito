@@ -23,9 +23,7 @@ function ____exports.CameraShakeForPlayer(self, whichPlayer, magnitude, duration
         function()
             CameraClearNoiseForPlayer(nil, whichPlayer)
             cameraTimers:delete(whichPlayer)
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(t)
-            end
+            jass.DestroyTimer(t)
         end
     )
 end

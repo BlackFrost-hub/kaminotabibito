@@ -22,20 +22,11 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         KEY.J,
         function(____, player)
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil then
                         return
                     end
-                    local ____temp_1
-                    if type(jass.GetPlayerId) == "function" then
-                        ____temp_1 = jass.GetPlayerId
-                    else
-                        ____temp_1 = nil
-                    end
-                    local getPid = ____temp_1
+                    local getPid = jass.GetPlayerId
                     if getPid and player then
                         setCurrentPlayerId(
                             nil,
@@ -53,9 +44,6 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         KEY_NUM.K1,
         function(____, _player)
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil then
                         return
@@ -74,9 +62,6 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         KEY_NUM.K2,
         function(____, _player)
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil then
                         return
@@ -95,9 +80,6 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         KEY_NUM.K3,
         function(____, _player)
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil then
                         return

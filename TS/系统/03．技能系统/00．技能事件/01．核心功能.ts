@@ -42,9 +42,7 @@ function onSpellChannel(this: void): void {
 
   for (let i = 0; i < channelListeners.length; i++) {
     const cb = channelListeners[i];
-    if (typeof cb === "function") {
-      cb(castingUnit, spellAbilityId);
-    }
+    cb(castingUnit, spellAbilityId);
   }
 }
 
@@ -56,9 +54,7 @@ function onSpellEffect(this: void): void {
 
   for (let i = 0; i < effectListeners.length; i++) {
     const cb = effectListeners[i];
-    if (typeof cb === "function") {
-      cb(castingUnit, spellAbilityId);
-    }
+    cb(castingUnit, spellAbilityId);
   }
 }
 

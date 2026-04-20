@@ -65,34 +65,26 @@ export function markNextPendingDamageAsDotTickBatch(): void {
 function getUnitTypeHero(): any {
   const direct = (jass as any).UNIT_TYPE_HERO ?? (g as any).UNIT_TYPE_HERO;
   if (direct != null) return direct;
-  if (typeof (jass as any).ConvertUnitType !== "function") return undefined;
   return (jass as any).ConvertUnitType(2);
 }
 
 function onUnitDeathForDamage(dyingUnit: any): void {
   if (!UnitGroup || !dyingUnit) return;
   if (isHeroUnit(dyingUnit)) return;
-  if (typeof (jass as any).GroupRemoveUnit === "function") {
-    (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
-  }
+  (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
   recreateDamageTrigger();
 }
 
 
 function onAnyUnitDamagedAction(): void {
   const j = jass as any;
-  const savedUnit = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
-  let savedDamage = typeof (jass as any).GetEventDamage === "function" ? (jass as any).GetEventDamage() : 0;
+  const savedUnit = (jass as any).GetTriggerUnit();
+  let savedDamage = (jass as any).GetEventDamage();
   let savedSource: any = null;
   /** 直接调用 jass.GetEventDamageSource()，不能赋局部变量再调用（TSTL/Lua 坑2：会编成 jass:xxx() 加 self 参数） */
-  if (typeof (jass as any).GetEventDamageSource === "function") {
-    (pcall as any)(() => { savedSource = (jass as any).GetEventDamageSource(); });
-  }
+  (pcall as any)(() => { savedSource = (jass as any).GetEventDamageSource(); });
   if (savedSource == null) {
     (pcall as any)(() => { savedSource = GetEventDamageSource(); });
-  }
-  if (savedSource == null && typeof (jass as any).BlzGetEventDamageSource === "function") {
-    (pcall as any)(() => { savedSource = (jass as any).BlzGetEventDamageSource(); });
   }
 
   // 在TriggerExecute之前先执行伤害计算（确保YDWESetEventDamage在同步阶段生效）
@@ -114,23 +106,17 @@ function onAnyUnitDamagedAction(): void {
     if (trg != null) {
       let enabled = false;
       let evaluated = false;
-      if (typeof (jass as any).IsTriggerEnabled === "function") {
-        (pcall as any)(() => {
-          if ((jass as any).IsTriggerEnabled(trg)) enabled = true;
-        });
-      }
+      (pcall as any)(() => {
+        if ((jass as any).IsTriggerEnabled(trg)) enabled = true;
+      });
       if (enabled) {
-        if (typeof (jass as any).TriggerEvaluate === "function") {
-          (pcall as any)(() => {
-            if ((jass as any).TriggerEvaluate(trg)) evaluated = true;
-          });
-        }
+        (pcall as any)(() => {
+          if ((jass as any).TriggerEvaluate(trg)) evaluated = true;
+        });
         if (evaluated) {
-          if (typeof (jass as any).TriggerExecute === "function") {
-            (pcall as any)(() => {
-              (jass as any).TriggerExecute(trg);
-            });
-          }
+          (pcall as any)(() => {
+            (jass as any).TriggerExecute(trg);
+          });
         }
       }
     }
@@ -191,15 +177,14 @@ function processDamageEntry(entry: any): void {
 }
 
 function anyUnitDamagedFilter(): boolean {
-  const u = typeof (jass as any).GetFilterUnit === "function" ? (jass as any).GetFilterUnit() : undefined;
+  const u = (jass as any).GetFilterUnit();
   if (!u) return false;
-  const lvl = typeof (jass as any).GetUnitAbilityLevel === "function"
-    ? (jass as any).GetUnitAbilityLevel(u, ALOC) : 0;
+  const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
   if (lvl > 0) return false;
-  if (UnitGroup && typeof (jass as any).GroupAddUnit === "function") {
+  if (UnitGroup) {
     (jass as any).GroupAddUnit(UnitGroup, u);
   }
-  if (MNDamageEventTrigger && typeof (jass as any).TriggerRegisterUnitEvent === "function") {
+  if (MNDamageEventTrigger) {
     const ev = getEventUnitDamaged();
     if (ev != null) (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
   }
@@ -207,70 +192,50 @@ function anyUnitDamagedFilter(): boolean {
 }
 
 function initEnumUnit(): void {
-  const CreateTrigger = (jass as any).CreateTrigger;
-  const CreateRegion = (jass as any).CreateRegion;
-  const CreateGroup = (jass as any).CreateGroup;
-  const GetWorldBounds = (jass as any).GetWorldBounds;
-  const RegionAddRect = (jass as any).RegionAddRect;
-  const TriggerRegisterEnterRegion = (jass as any).TriggerRegisterEnterRegion;
-  const Condition = (jass as any).Condition;
-  const TriggerAddCondition = (jass as any).TriggerAddCondition;
-  const TriggerAddAction = (jass as any).TriggerAddAction;
-  const GroupEnumUnitsInRect = (jass as any).GroupEnumUnitsInRect;
-  const DestroyGroup = (jass as any).DestroyGroup;
+  const t = (jass as any).CreateTrigger();
+  const r = (jass as any).CreateRegion();
+  const grp = (jass as any).CreateGroup();
+  const bounds = (jass as any).GetWorldBounds();
 
-  if (typeof CreateTrigger !== "function" || typeof CreateRegion !== "function") return;
-
-  const t = CreateTrigger();
-  const r = CreateRegion();
-  const grp = typeof CreateGroup === "function" ? CreateGroup() : undefined;
-  const bounds = typeof GetWorldBounds === "function" ? GetWorldBounds() : undefined;
-
-  if (bounds && typeof RegionAddRect === "function") RegionAddRect(r, bounds);
-  if (typeof TriggerRegisterEnterRegion === "function") {
-    TriggerRegisterEnterRegion(t, r, typeof Condition === "function" ? Condition(anyUnitDamagedFilter) : undefined);
-  }
-  if (grp && bounds && typeof GroupEnumUnitsInRect === "function" && typeof Condition === "function") {
-    const alwaysTrue = (): boolean => true;
-    GroupEnumUnitsInRect(grp, bounds, Condition(alwaysTrue));
-    if (UnitGroup && MNDamageEventTrigger && typeof (jass as any).ForGroup === "function" && typeof (jass as any).TriggerRegisterUnitEvent === "function") {
-      (jass as any).ForGroup(grp, () => {
-        const u = (jass as any).GetEnumUnit();
-        if (!u) return;
-        const lvl = typeof (jass as any).GetUnitAbilityLevel === "function" ? (jass as any).GetUnitAbilityLevel(u, ALOC) : 0;
-        if (lvl > 0) return;
-        (jass as any).GroupAddUnit(UnitGroup, u);
-        const ev = getEventUnitDamaged();
-        if (ev != null && typeof (jass as any).TriggerRegisterUnitEvent === "function") {
-          (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
-        }
-      });
-    }
+  if (bounds) (jass as any).RegionAddRect(r, bounds);
+  (jass as any).TriggerRegisterEnterRegion(t, r, (jass as any).Condition(anyUnitDamagedFilter));
+  const alwaysTrue = (): boolean => true;
+  (jass as any).GroupEnumUnitsInRect(grp, bounds, (jass as any).Condition(alwaysTrue));
+  if (UnitGroup && MNDamageEventTrigger) {
+    (jass as any).ForGroup(grp, () => {
+      const u = (jass as any).GetEnumUnit();
+      if (!u) return;
+      const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
+      if (lvl > 0) return;
+      (jass as any).GroupAddUnit(UnitGroup, u);
+      const ev = getEventUnitDamaged();
+      if (ev != null) {
+        (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
+      }
+    });
   }
 
-  if (typeof DestroyGroup === "function" && grp) DestroyGroup(grp);
+  if (grp) (jass as any).DestroyGroup(grp);
 }
 
 /** 重建伤害触发并仅对 UnitGroup 内存活单位重新注册，释放死亡单位的注册（事件泄漏 -1） */
 function recreateDamageTrigger(): void {
-  if (MNDamageEventTrigger && typeof (jass as any).TriggerRemoveAction === "function" && ta != null) {
+  if (MNDamageEventTrigger && ta != null) {
     (jass as any).TriggerRemoveAction(MNDamageEventTrigger, ta);
   }
-  if (MNDamageEventTrigger && typeof (jass as any).DestroyTrigger === "function") {
+  if (MNDamageEventTrigger) {
     (jass as any).DestroyTrigger(MNDamageEventTrigger);
   }
-  if (typeof (jass as any).CreateTrigger === "function") {
-    MNDamageEventTrigger = (jass as any).CreateTrigger();
-  }
-  if (MNDamageEventTrigger && typeof (jass as any).TriggerAddAction === "function") {
+  MNDamageEventTrigger = (jass as any).CreateTrigger();
+  if (MNDamageEventTrigger) {
     ta = (jass as any).TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction);
   }
-  if (UnitGroup && typeof (jass as any).ForGroup === "function" && MNDamageEventTrigger) {
+  if (UnitGroup && MNDamageEventTrigger) {
     const ev = getEventUnitDamaged();
     if (ev != null) {
       (jass as any).ForGroup(UnitGroup, () => {
         const u = (jass as any).GetEnumUnit();
-        if (u && typeof (jass as any).TriggerRegisterUnitEvent === "function") {
+        if (u) {
           (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
         }
       });
@@ -301,17 +266,17 @@ export function MNAnyUnitDamaged(trg: any, intervalSeconds: number): void {
 /** 内部初始化函数，只执行一次 */
 function initDamageEventOnce(intervalSeconds?: number): void {
   if (MNDamageEventTrigger != null) return;
-  if (typeof (jass as any).CreateTrigger === "function") MNDamageEventTrigger = (jass as any).CreateTrigger();
-  if (typeof (jass as any).CreateGroup === "function") UnitGroup = (jass as any).CreateGroup();
-  if (MNDamageEventTrigger && typeof (jass as any).TriggerAddAction === "function") {
+  MNDamageEventTrigger = (jass as any).CreateTrigger();
+  UnitGroup = (jass as any).CreateGroup();
+  if (MNDamageEventTrigger) {
     ta = (jass as any).TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction);
   }
   initEnumUnit();
   registerDeathListener(onUnitDeathForDamage);
   const sec = typeof intervalSeconds === "number" && intervalSeconds > 0 ? intervalSeconds : 60;
-  if (typeof (jass as any).CreateTimer === "function" && TimerHandle == null) {
+  if (TimerHandle == null) {
     TimerHandle = (jass as any).CreateTimer();
-    if (TimerHandle && typeof (jass as any).TimerStart === "function") {
+    if (TimerHandle) {
       (jass as any).TimerStart(TimerHandle, sec, true, timeout);
     }
   }

@@ -54,7 +54,7 @@ const itemState = new Map<any, ItemState>();          // item -> state
 const campfireItems = new Map<any, Set<any>>();       // campfire -> items
 
 function isCampfire(u: any): boolean {
-  return typeof (jass as any).GetUnitTypeId === "function" && (jass as any).GetUnitTypeId(u) === CAMPFIRE_ID;
+  return (jass as any).GetUnitTypeId(u) === CAMPFIRE_ID;
 }
 
 /** 使用 01．封装函数.ts 中的 stringToFourCC */
@@ -64,16 +64,15 @@ function fourCCToInt(id: string): number {
 
 /** 使用 01．封装函数.ts 中的 fourCCToString */
 function getItemIdStr(item: any): string {
-  const itemId = typeof (jass as any).GetItemTypeId === "function" ? (jass as any).GetItemTypeId(item) : 0;
+  const itemId = (jass as any).GetItemTypeId(item);
   return fourCCToString(itemId);
 }
 
 function getItemNameSafe(item: any): string {
-  return typeof (jass as any).GetItemName === "function" ? (jass as any).GetItemName(item) : "物品";
+  return (jass as any).GetItemName(item);
 }
 
 function getItemChargesSafe(item: any): number {
-  if (typeof (jass as any).GetItemCharges !== "function") return 1;
   const n = (jass as any).GetItemCharges(item);
   const v = Math.floor((Number(n as any) as any) ?? 0) || 0;
   return v > 0 ? v : 1;
@@ -81,14 +80,13 @@ function getItemChargesSafe(item: any): number {
 
 function setItemChargesSafe(item: any, n: number): void {
   if (!item) return;
-  if (typeof (jass as any).SetItemCharges !== "function") return;
   const v = Math.floor(n) || 1;
   (jass as any).SetItemCharges(item, v > 0 ? v : 1);
 }
 
 function getUnitXY(u: any): { x: number; y: number } {
-  const x = typeof (jass as any).GetUnitX === "function" ? (jass as any).GetUnitX(u) : 0;
-  const y = typeof (jass as any).GetUnitY === "function" ? (jass as any).GetUnitY(u) : 0;
+  const x = (jass as any).GetUnitX(u);
+  const y = (jass as any).GetUnitY(u);
   return { x, y };
 }
 
@@ -107,7 +105,6 @@ function floatBurnText(campfire: any, itemName: string): void {
 }
 
 function playFinishEffect(campfire: any): void {
-  if (typeof (jass as any).AddSpecialEffect !== "function") return;
   const { x, y } = getUnitXY(campfire);
   createTimedEffect(EFFECT_FIREBOMB, x, y, 0, 2.0);
 }
@@ -198,7 +195,6 @@ function pickResult(results: ResultOpt[]): ResultOpt {
 
 function createItemAtCampfire(campfire: any, itemId: number): any {
   const { x, y } = getUnitXY(campfire);
-  if (typeof (jass as any).CreateItem !== "function") return null;
   const item = (jass as any).CreateItem(itemId, x, y);
   if (item) setLastCreatedItem(item);
   return item;
@@ -206,16 +202,13 @@ function createItemAtCampfire(campfire: any, itemId: number): any {
 
 function tryGiveItemToCampfire(campfire: any, item: any): boolean {
   if (!item) return false;
-  if (typeof (jass as any).UnitAddItem !== "function") return false;
   return !!(jass as any).UnitAddItem(campfire, item);
 }
 
 function stopAndDestroyTimer(t: any): void {
   if (!t) return;
   stopTimer(t);
-  if (typeof (jass as any).DestroyTimer === "function") {
-    (jass as any).DestroyTimer(t);
-  }
+  (jass as any).DestroyTimer(t);
 }
 
 function untrackItem(item: any): void {
@@ -233,8 +226,8 @@ function untrackItem(item: any): void {
 }
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
-  const t = (jass as any).CreateTimer?.();
-  if (!t || typeof (jass as any).TimerStart !== "function") return;
+  const t = (jass as any).CreateTimer();
+  if (!t) return;
   const st = itemState.get(item);
   if (st) st.burnTimer = t;
   (jass as any).TimerStart(t, sec, false, () => {
@@ -243,14 +236,14 @@ function startBurnTimer(item: any, campfire: any, sec: number): void {
     }
     const name = getItemNameSafe(item);
     floatBurnText(campfire, name);
-    if (typeof (jass as any).RemoveItem === "function") (jass as any).RemoveItem(item);
+    (jass as any).RemoveItem(item);
     untrackItem(item);
   });
 }
 
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
-  const t = (jass as any).CreateTimer?.();
-  if (!t || typeof (jass as any).TimerStart !== "function") return;
+  const t = (jass as any).CreateTimer();
+  if (!t) return;
   const st = itemState.get(item);
   if (st) st.cookTimer = t;
   (jass as any).TimerStart(t, recipe.cookSec, false, () => {
@@ -342,31 +335,21 @@ function onCampfireDeath(dyingUnit: any): void {
 }
 
 export function init物品加工(): void {
-  if (
-    typeof (jass as any).CreateTrigger !== "function" ||
-    typeof (jass as any).TriggerAddAction !== "function" ||
-    typeof (jass as any).Player !== "function"
-  ) return;
-
   const pickEv = (jass as any).EVENT_PLAYER_UNIT_PICKUP_ITEM ?? 18;
   const trigPick = (jass as any).CreateTrigger();
   for (let i = 0; i <= 3; i++) {
-    if (typeof (jass as any).TriggerRegisterPlayerUnitEvent === "function") {
-      (jass as any).TriggerRegisterPlayerUnitEvent(trigPick, (jass as any).Player(i), pickEv, undefined!);
-    }
+    (jass as any).TriggerRegisterPlayerUnitEvent(trigPick, (jass as any).Player(i), pickEv, undefined!);
   }
   (jass as any).TriggerAddAction(trigPick, onAnyPickup);
 
   const dropEv = (jass as any).EVENT_PLAYER_UNIT_DROP_ITEM ?? 19;
   const trigDrop = (jass as any).CreateTrigger();
   for (let i = 0; i <= 3; i++) {
-    if (typeof (jass as any).TriggerRegisterPlayerUnitEvent === "function") {
-      (jass as any).TriggerRegisterPlayerUnitEvent(trigDrop, (jass as any).Player(i), dropEv, undefined!);
-    }
+    (jass as any).TriggerRegisterPlayerUnitEvent(trigDrop, (jass as any).Player(i), dropEv, undefined!);
   }
   (jass as any).TriggerAddAction(trigDrop, () => {
-    const unit = typeof (jass as any).GetManipulatingUnit === "function" ? (jass as any).GetManipulatingUnit() : undefined;
-    const item = typeof (jass as any).GetManipulatedItem === "function" ? (jass as any).GetManipulatedItem() : undefined;
+    const unit = (jass as any).GetManipulatingUnit();
+    const item = (jass as any).GetManipulatedItem();
     if (unit && item && isCampfire(unit) && itemState.has(item)) {
       untrackItem(item);
     }

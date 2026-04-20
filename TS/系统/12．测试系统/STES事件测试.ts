@@ -71,11 +71,6 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
 
     g[LUA_STES_REG_KEY] = true;
 
-    if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-        log("[STES事件测试] 无法 CreateTrigger，跳过 Lua STES 监听注册");
-        return;
-    }
-
     const trig = jass.CreateTrigger();
     jass.TriggerAddAction(trig, () => {
         try {

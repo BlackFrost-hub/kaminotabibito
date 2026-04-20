@@ -51,23 +51,20 @@ local function grantQuestItems(self, hero, questItems)
     if not hero or not questItems or questItems == "" then
         return
     end
-    if type(jass.UnitAddItemById) ~= "function" then
-        return
-    end
     local items = __TS__StringSplit(questItems, "|")
     for ____, raw in ipairs(items) do
         do
             local itemCode = __TS__StringTrim(raw)
             if #itemCode ~= 4 then
-                goto __continue9
+                goto __continue8
             end
             local itemId = calculateFourCC(nil, itemCode)
             if itemId == 0 then
-                goto __continue9
+                goto __continue8
             end
             jass.UnitAddItemById(hero, itemId)
         end
-        ::__continue9::
+        ::__continue8::
     end
 end
 local function canAcceptQuestByRequirements(self, quest, hero)
@@ -104,7 +101,7 @@ local function canAcceptQuestByRequirements(self, quest, hero)
         return true
     end
     local limit = __TS__Number(digits)
-    if not hero or type(jass.GetHeroLevel) ~= "function" then
+    if not hero then
         return false
     end
     local level = jass.GetHeroLevel(hero)
@@ -152,17 +149,17 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
         do
             local trimmed = __TS__StringTrim(part)
             if not trimmed then
-                goto __continue34
+                goto __continue33
             end
             local withoutOrder = trimOrderedPrefix(nil, trimmed)
             local parsed = tryParseSpeakerLine(nil, withoutOrder)
             if parsed then
                 lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
-                goto __continue34
+                goto __continue33
             end
             lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
         end
-        ::__continue34::
+        ::__continue33::
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end
@@ -213,16 +210,15 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
             title = npcName,
             text = (((("【" .. tostring(quest.name)) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
             onAccept = function()
-                local ____opt_2 = quest.requireID
-                local questId = ____opt_2 and tostring(quest.requireID) or ""
+                local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
                 local playerObj = jass.Player(dialogOwnerId)
-                local ____playerObj_4
+                local ____playerObj_2
                 if playerObj then
-                    ____playerObj_4 = getPlayerFirstHero(nil, playerObj)
+                    ____playerObj_2 = getPlayerFirstHero(nil, playerObj)
                 else
-                    ____playerObj_4 = nil
+                    ____playerObj_2 = nil
                 end
-                local hero = ____playerObj_4
+                local hero = ____playerObj_2
                 if not canAcceptQuestByRequirements(nil, quest, hero) then
                     local failRaw = quest.AcceptFailedText or "当前条件不满足，无法接受该任务。"
                     openNpcDialog(
@@ -269,20 +265,20 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
 end
 function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_5
+    local ____dialogOwner_3
     if dialogOwner then
-        ____dialogOwner_5 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_3 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_5 = nil
+        ____dialogOwner_3 = nil
     end
-    local ownerHero = ____dialogOwner_5
-    local ____ownerHero_6
+    local ownerHero = ____dialogOwner_3
+    local ____ownerHero_4
     if ownerHero then
-        ____ownerHero_6 = jass.GetUnitName(ownerHero)
+        ____ownerHero_4 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_6 = "你"
+        ____ownerHero_4 = "你"
     end
-    local heroName = ____ownerHero_6
+    local heroName = ____ownerHero_4
     local questDesc = quest.desc or quest.name or ""
     local rewardText = getQuestRewardDisplayText(nil, quest)
     local requireCount = normalizeRequireCount(nil, quest.requireCount)
@@ -294,8 +290,7 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
             acceptText = "提交任务",
             rejectText = "暂时忽略",
             onAccept = function()
-                local ____opt_7 = quest.requireID
-                local questIdStr = ____opt_7 and tostring(quest.requireID) or ""
+                local questIdStr = quest.requireID ~= nil and tostring(quest.requireID) or ""
                 handleQuestSubmit(nil, {
                     quest = quest,
                     npcName = npcName,

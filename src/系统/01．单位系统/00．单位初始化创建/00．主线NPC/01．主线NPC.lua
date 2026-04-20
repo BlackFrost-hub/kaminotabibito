@@ -124,10 +124,6 @@ function ____exports.initMainStoryNPCsWithDelay(self, delaySec)
     if delaySec == nil then
         delaySec = 1
     end
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        ____exports.createMainStoryNPCs(nil)
-        return
-    end
     local timer = jass.CreateTimer()
     jass.TimerStart(
         timer,
@@ -135,9 +131,7 @@ function ____exports.initMainStoryNPCsWithDelay(self, delaySec)
         false,
         function()
             ____exports.createMainStoryNPCs(nil)
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(timer)
-            end
+            jass.DestroyTimer(timer)
         end
     )
 end

@@ -18,13 +18,11 @@ import { questDebugPrint } from "./01．调试";
  * 主线任务 `QuestSetRequired(true)`，其它为 false。
  */
 export function syncQuestToWar3Native(_playerId: number, questId: string): void {
-  if (typeof jass.CreateQuest !== "function") return;
-
   const questData = (questDB as any).globalData?.quests.get(questId);
   if (!questData) return;
 
   // 避免泄漏：同一条配置重复同步时先拆掉旧句柄
-  if (questData.nativeHandle && typeof jass.DestroyQuest === "function") {
+  if (questData.nativeHandle) {
     jass.DestroyQuest(questData.nativeHandle);
   }
 
@@ -33,38 +31,26 @@ export function syncQuestToWar3Native(_playerId: number, questId: string): void 
 
   if (!nativeQuest) return;
 
-  if (typeof jass.QuestSetTitle === "function") {
-    jass.QuestSetTitle(nativeQuest, questData.title);
-  }
-  if (typeof jass.QuestSetDescription === "function") {
-    jass.QuestSetDescription(nativeQuest, questData.description);
-  }
+  jass.QuestSetTitle(nativeQuest, questData.title);
+  jass.QuestSetDescription(nativeQuest, questData.description);
 
-  if (questData.icon && typeof jass.QuestSetIconPath === "function") {
+  if (questData.icon) {
     jass.QuestSetIconPath(nativeQuest, questData.icon);
   }
 
   // 主线在 F9 里显示为「必要任务」
-  if (typeof jass.QuestSetRequired === "function") {
-    jass.QuestSetRequired(nativeQuest, questData.type === QuestType.MAIN);
-  }
+  jass.QuestSetRequired(nativeQuest, questData.type === QuestType.MAIN);
 
   // 与自定义状态枚举对齐到原生 Discover / Complete / Failed
   switch (questData.status) {
     case QuestStatus.IN_PROGRESS:
-      if (typeof jass.QuestSetDiscovered === "function") {
-        jass.QuestSetDiscovered(nativeQuest, true);
-      }
+      jass.QuestSetDiscovered(nativeQuest, true);
       break;
     case QuestStatus.COMPLETED:
-      if (typeof jass.QuestSetCompleted === "function") {
-        jass.QuestSetCompleted(nativeQuest, true);
-      }
+      jass.QuestSetCompleted(nativeQuest, true);
       break;
     case QuestStatus.FAILED:
-      if (typeof jass.QuestSetFailed === "function") {
-        jass.QuestSetFailed(nativeQuest, true);
-      }
+      jass.QuestSetFailed(nativeQuest, true);
       break;
   }
 

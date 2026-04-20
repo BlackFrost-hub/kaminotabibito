@@ -25,16 +25,14 @@ function ____exports.showQuestFailedMessage(self, playerId, questId)
     if not player then
         return
     end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        local message = "任务失败: " .. quest.title
-        jass.DisplayTimedTextToPlayer(
-            player,
-            0,
-            0,
-            10,
-            message
-        )
-    end
+    local message = "任务失败: " .. quest.title
+    jass.DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        10,
+        message
+    )
 end
 --- 成功接取后：标题 + 换行 + 描述，便于玩家看到任务概要。
 function ____exports.showQuestAcceptedMessage(self, playerId, questId)
@@ -46,16 +44,14 @@ function ____exports.showQuestAcceptedMessage(self, playerId, questId)
     if not player then
         return
     end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        local message = (("已接受任务: " .. quest.title) .. "\n") .. quest.description
-        jass.DisplayTimedTextToPlayer(
-            player,
-            0,
-            0,
-            10,
-            message
-        )
-    end
+    local message = (("已接受任务: " .. quest.title) .. "\n") .. quest.description
+    jass.DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        10,
+        message
+    )
 end
 --- 成功完成后：提示已获得奖励（实际发奖在 `giveQuestRewards`，应先于或配合本函数由上层顺序调用）。
 function ____exports.showQuestCompletedMessage(self, playerId, questId)
@@ -67,22 +63,17 @@ function ____exports.showQuestCompletedMessage(self, playerId, questId)
     if not player then
         return
     end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        local message = ("任务完成: " .. quest.title) .. "\n已获得奖励！"
-        jass.DisplayTimedTextToPlayer(
-            player,
-            0,
-            0,
-            10,
-            message
-        )
-    end
+    local message = ("任务完成: " .. quest.title) .. "\n已获得奖励！"
+    jass.DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        10,
+        message
+    )
 end
 --- 放弃成功后的轻量提示；文案里用 questId，因 abandon 后配置行可能已从玩家表移除。
 function ____exports.showAbandonedQuestNotice(self, playerId, questId)
-    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
     local player = jass.Player(playerId)
     if player then
         jass.DisplayTimedTextToPlayer(
@@ -97,7 +88,7 @@ end
 --- 自定义「追踪」高亮时的提示（当前 Manager 未改存档位，仅刷新 UI + 浮字）。
 function ____exports.showQuestTrackingNotice(self, playerId, title)
     local player = jass.Player(playerId)
-    if player and type(jass.DisplayTimedTextToPlayer) == "function" then
+    if player then
         jass.DisplayTimedTextToPlayer(
             player,
             0,
@@ -123,23 +114,23 @@ function ____exports.giveQuestRewards(self, playerId, questId)
     local hero = findHeroOfPlayer(nil, playerId)
     for ____, reward in ipairs(quest.rewards) do
         repeat
-            local ____switch23 = reward.type
-            local ____cond23 = ____switch23 == "experience"
-            if ____cond23 then
-                if hero and type(jass.AddHeroXP) == "function" then
+            local ____switch19 = reward.type
+            local ____cond19 = ____switch19 == "experience"
+            if ____cond19 then
+                if hero then
                     jass.AddHeroXP(hero, reward.value, true)
                     questDebugPrint(
                         nil,
                         ((("给予玩家 " .. tostring(playerId)) .. " ") .. tostring(reward.value)) .. " 经验"
                     )
                 else
-                    questDebugPrint(nil, "无法给予经验：未找到英雄或API不可用")
+                    questDebugPrint(nil, "无法给予经验：未找到英雄")
                 end
                 break
             end
-            ____cond23 = ____cond23 or ____switch23 == "gold"
-            if ____cond23 then
-                if type(jass.SetPlayerState) == "function" and type(jass.GetPlayerState) == "function" then
+            ____cond19 = ____cond19 or ____switch19 == "gold"
+            if ____cond19 then
+                do
                     local currentGold = jass.GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
                     jass.SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value)
                     questDebugPrint(
@@ -149,9 +140,9 @@ function ____exports.giveQuestRewards(self, playerId, questId)
                 end
                 break
             end
-            ____cond23 = ____cond23 or ____switch23 == "item"
-            if ____cond23 then
-                if hero and type(jass.CreateItem) == "function" and type(jass.UnitAddItemById) == "function" and reward.itemId then
+            ____cond19 = ____cond19 or ____switch19 == "item"
+            if ____cond19 then
+                if hero and reward.itemId then
                     local itemTypeId = stringToFourCC(nil, reward.itemId)
                     jass.UnitAddItemById(hero, itemTypeId)
                     questDebugPrint(
@@ -159,13 +150,13 @@ function ____exports.giveQuestRewards(self, playerId, questId)
                         (("给予玩家 " .. tostring(playerId)) .. " 物品 ") .. reward.description
                     )
                 else
-                    questDebugPrint(nil, "无法给予物品：未找到英雄或API不可用")
+                    questDebugPrint(nil, "无法给予物品：未找到英雄")
                 end
                 break
             end
-            ____cond23 = ____cond23 or ____switch23 == "attribute"
-            if ____cond23 then
-                if hero and type(jass.SetHeroStr) == "function" and type(jass.SetHeroAgi) == "function" and type(jass.SetHeroInt) == "function" then
+            ____cond19 = ____cond19 or ____switch19 == "attribute"
+            if ____cond19 then
+                if hero then
                     jass.SetHeroStr(
                         hero,
                         jass.GetHeroStr(hero, false) + reward.value,

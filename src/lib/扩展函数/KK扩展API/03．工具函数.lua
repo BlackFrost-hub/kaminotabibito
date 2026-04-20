@@ -16,9 +16,6 @@ end
 -- @param url QQ群链接
 -- @returns 是否成功打开
 function ____exports.DzOpenQQGroupUrl(self, url)
-    if type(japi.DzOpenQQGroupUrl) ~= "function" then
-        return false
-    end
     return japi.DzOpenQQGroupUrl(url) or false
 end
 return ____exports

@@ -50,9 +50,6 @@ function ____exports.registerTaskUIListWheel(self, ctx, refreshList)
         false,
         function()
             pcall(function ()
-                    if type(jass.GetLocalPlayer) ~= "function" then
-                        return
-                    end
                     local lp = jass.GetLocalPlayer()
                     if lp == nil then
                         return

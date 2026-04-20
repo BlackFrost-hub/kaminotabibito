@@ -44,12 +44,7 @@ export function createClickableIcon(
   });
   if (!button) return null;
 
-  if (typeof japi.DzFrameSetAllPoints === "function") {
-    japi.DzFrameSetAllPoints(button, backdrop);
-  } else {
-    setFramePosition(button, position);
-    setFrameSize(button, size);
-  }
+  japi.DzFrameSetAllPoints(button, backdrop);
   setFrameClickEvent(button, onClick);
   return { backdrop, button };
 }
@@ -108,7 +103,7 @@ export function createTextLabel(
   if (frame) {
     setPos(frame);
     setFrameSize(frame, size);
-    if (typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(frame, text);
+    japi.DzFrameSetText(frame, text);
     return frame;
   }
 
@@ -145,7 +140,7 @@ export function createTextArea(
   if (backdrop) {
     setFramePosition(backdrop, position);
     setFrameSize(backdrop, size);
-    if (backgroundTexture && typeof japi.DzFrameSetTexture === "function") {
+    if (backgroundTexture) {
       japi.DzFrameSetTexture(backdrop, backgroundTexture, 0);
     }
   }
@@ -158,13 +153,13 @@ export function createTextArea(
     visible: true,
   });
   if (frame) {
-    if (backdrop && typeof japi.DzFrameSetAllPoints === "function") {
+    if (backdrop) {
       japi.DzFrameSetAllPoints(frame, backdrop);
     } else {
       setFramePosition(frame, position);
       setFrameSize(frame, size);
     }
-    if (typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(frame, text);
+    japi.DzFrameSetText(frame, text);
     return frame;
   }
 
@@ -216,7 +211,7 @@ export function createTextBox(
   };
   setFramePosition(textFrame, innerPos);
   setFrameSize(textFrame, innerSize);
-  if (typeof japi.DzFrameSetText === "function") japi.DzFrameSetText(textFrame, text);
+  japi.DzFrameSetText(textFrame, text);
   return { backdrop, text: textFrame };
 }
 

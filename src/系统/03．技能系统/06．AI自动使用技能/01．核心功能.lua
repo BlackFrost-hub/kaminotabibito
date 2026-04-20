@@ -45,22 +45,10 @@ function ____exports.autoRegisterNeutralAggressive(self, unit)
     if not unit then
         return
     end
-    local ____temp_5
-    if type(jass.GetOwningPlayer) == "function" then
-        ____temp_5 = jass.GetOwningPlayer(unit)
-    else
-        ____temp_5 = nil
-    end
-    local owner = ____temp_5
-    local ____this_7
-    ____this_7 = jass
-    local ____opt_6 = ____this_7.Player
-    if ____opt_6 ~= nil then
-        ____opt_6 = ____opt_6(____this_7, AI_PLAYER_NEUTRAL_AGGRESSIVE)
-    end
-    local neutralAggressive = ____opt_6
+    local owner = jass.GetOwningPlayer(unit)
+    local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
     if owner == neutralAggressive then
-        local isHero = type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
+        local isHero = jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
         if not isHero then
             ____exports.registerAIUnit(nil, unit)
         end
@@ -69,11 +57,11 @@ end
 function initAutoRegister(self)
     if not unitCreatedTrigger then
         unitCreatedTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_SUMMON_8 = jass.EVENT_PLAYER_UNIT_SUMMON
-        if ____jass_EVENT_PLAYER_UNIT_SUMMON_8 == nil then
-            ____jass_EVENT_PLAYER_UNIT_SUMMON_8 = 89
+        local ____jass_EVENT_PLAYER_UNIT_SUMMON_5 = jass.EVENT_PLAYER_UNIT_SUMMON
+        if ____jass_EVENT_PLAYER_UNIT_SUMMON_5 == nil then
+            ____jass_EVENT_PLAYER_UNIT_SUMMON_5 = 89
         end
-        local enterRegionEvent = ____jass_EVENT_PLAYER_UNIT_SUMMON_8
+        local enterRegionEvent = ____jass_EVENT_PLAYER_UNIT_SUMMON_5
         do
             local i = 0
             while i < AI_PLAYER_COUNT do
@@ -86,16 +74,8 @@ function initAutoRegister(self)
                 i = i + 1
             end
         end
-        local ____this_10
-        ____this_10 = jass
-        local ____opt_9 = ____this_10.Player
-        if ____opt_9 ~= nil then
-            ____opt_9 = ____opt_9(____this_10, AI_PLAYER_NEUTRAL_AGGRESSIVE)
-        end
-        local neutralAggressive = ____opt_9
-        if neutralAggressive ~= nil then
-            jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, nil)
-        end
+        local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
+        jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, nil)
         jass.TriggerAddAction(
             unitCreatedTrigger,
             function()
