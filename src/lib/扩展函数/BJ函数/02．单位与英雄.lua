@@ -68,10 +68,7 @@ function ____exports.SelectUnitForPlayerSingle(self, whichUnit, whichPlayer)
     end
 end
 function ____exports.GetUnitCurrentOrder(self, unit)
-    if type(jass.GetUnitCurrentOrder) == "function" then
-        return jass.GetUnitCurrentOrder(unit)
-    end
-    return 0
+    return jass.GetUnitCurrentOrder(unit)
 end
 function ____exports.IsUnitDeadBJ(self, whichUnit)
     return jass.GetUnitState(whichUnit, jass.UNIT_STATE_LIFE) <= 0
@@ -143,16 +140,10 @@ function ____exports.SetUnitLifePercentBJ(self, whichUnit, percent)
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API）
 function ____exports.GetUnitLifePercent(self, whichUnit)
-    if type(jass.GetUnitStatePercent) == "function" then
-        return jass.GetUnitStatePercent(whichUnit, jass.UNIT_STATE_LIFE, jass.UNIT_STATE_MAX_LIFE)
-    end
     return ____exports.GetUnitLifePercentBJ(nil, whichUnit)
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitManaPercentBJ` 语义一致
 function ____exports.GetUnitManaPercent(self, whichUnit)
-    if type(jass.GetUnitStatePercent) == "function" then
-        return jass.GetUnitStatePercent(whichUnit, jass.UNIT_STATE_MANA, jass.UNIT_STATE_MAX_MANA)
-    end
     return ____exports.GetUnitManaPercentBJ(nil, whichUnit)
 end
 --- 对齐 Blizzard.j：`SetUnitState(LIFE, RMaxBJ(0, value))`（非百分比版）
@@ -212,9 +203,6 @@ function ____exports.ModifyHeroSkillPoints(self, whichHero, whichStat, modifyMet
     if whichHero == nil or whichHero == 0 then
         return false
     end
-    if type(jass.ModifyHeroSkillPoints) ~= "function" then
-        return false
-    end
     return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value)
 end
 --- 判断单位是否拥有指定buff
@@ -236,10 +224,7 @@ end
 --- 获取刚学会的技能ID
 -- 对应JASS: GetLearnedSkillBJ
 function ____exports.GetLearnedSkillBJ(self)
-    if type(jass.GetLearnedSkill) == "function" then
-        return jass.GetLearnedSkill()
-    end
-    return 0
+    return jass.GetLearnedSkill()
 end
 --- 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
 -- 对应BJ: CountUnitsInGroup

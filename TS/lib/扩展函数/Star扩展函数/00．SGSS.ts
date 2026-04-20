@@ -20,22 +20,22 @@ function hashHandle(): any {
 }
 
 function h2i(u: any): number {
-  return typeof jass.GetHandleId === "function" ? ((jass.GetHandleId(u) as number) || 0) : 0;
+  return (jass.GetHandleId(u) as number) || 0;
 }
 
 function sh(name: string): number {
-  return typeof jass.StringHash === "function" ? ((jass.StringHash(name) as number) || 0) : 0;
+  return (jass.StringHash(name) as number) || 0;
 }
 
 function loadReal(u: any, key: number): number {
   const hh = hashHandle();
-  if (!hh || typeof jass.LoadReal !== "function") return 0;
+  if (!hh) return 0;
   return (jass.LoadReal(hh, h2i(u), key) as number) || 0;
 }
 
 function saveReal(u: any, key: number, value: number): void {
   const hh = hashHandle();
-  if (!hh || typeof jass.SaveReal !== "function") return;
+  if (!hh) return;
   jass.SaveReal(hh, h2i(u), key, value);
 }
 
@@ -61,33 +61,29 @@ function resolveAbilityCode(raw: string): number {
 function setAbilityDataA(u: any, raw: string, value: number): void {
   const code = resolveAbilityCode(raw);
   if (!u || code === 0) return;
-  if (typeof jass.GetUnitAbilityLevel === "function" && typeof jass.UnitAddAbility === "function" && jass.GetUnitAbilityLevel(u, code) === 0) {
+  if (jass.GetUnitAbilityLevel(u, code) === 0) {
     jass.UnitAddAbility(u, code);
   }
-  if (typeof japi.EXGetUnitAbility === "function" && typeof japi.EXSetAbilityDataReal === "function") {
-    const abil = japi.EXGetUnitAbility(u, code);
-    if (abil) japi.EXSetAbilityDataReal(abil, 1, 108, value);
-  }
-  if (typeof jass.IncUnitAbilityLevel === "function") jass.IncUnitAbilityLevel(u, code);
-  if (typeof jass.DecUnitAbilityLevel === "function") jass.DecUnitAbilityLevel(u, code);
+  const abil = japi.EXGetUnitAbility(u, code);
+  if (abil) japi.EXSetAbilityDataReal(abil, 1, 108, value);
+  jass.IncUnitAbilityLevel(u, code);
+  jass.DecUnitAbilityLevel(u, code);
 }
 
 function setAbilityDataABC(u: any, raw: string, a: number, b: number, c: number): void {
   const code = resolveAbilityCode(raw);
   if (!u || code === 0) return;
-  if (typeof jass.GetUnitAbilityLevel === "function" && typeof jass.UnitAddAbility === "function" && jass.GetUnitAbilityLevel(u, code) === 0) {
+  if (jass.GetUnitAbilityLevel(u, code) === 0) {
     jass.UnitAddAbility(u, code);
   }
-  if (typeof japi.EXGetUnitAbility === "function" && typeof japi.EXSetAbilityDataReal === "function") {
-    const abil = japi.EXGetUnitAbility(u, code);
-    if (abil) {
-      japi.EXSetAbilityDataReal(abil, 1, 110, a);
-      japi.EXSetAbilityDataReal(abil, 1, 108, b);
-      japi.EXSetAbilityDataReal(abil, 1, 109, c);
-    }
+  const abil = japi.EXGetUnitAbility(u, code);
+  if (abil) {
+    japi.EXSetAbilityDataReal(abil, 1, 110, a);
+    japi.EXSetAbilityDataReal(abil, 1, 108, b);
+    japi.EXSetAbilityDataReal(abil, 1, 109, c);
   }
-  if (typeof jass.IncUnitAbilityLevel === "function") jass.IncUnitAbilityLevel(u, code);
-  if (typeof jass.DecUnitAbilityLevel === "function") jass.DecUnitAbilityLevel(u, code);
+  jass.IncUnitAbilityLevel(u, code);
+  jass.DecUnitAbilityLevel(u, code);
 }
 
 function setAtk(u: any, v: number): void {
@@ -111,30 +107,14 @@ function setState3(u: any, s: number, a: number, i: number): void {
   const ns = loadReal(u, ks) + s;
   const na = loadReal(u, ka) + a;
   const ni = loadReal(u, ki) + i;
-  // 英雄优先直接改主属性，避免依赖 ASG3 可用性。
-  if (typeof jass.IsUnitType === "function" && typeof jass.UNIT_TYPE_HERO !== "undefined" && jass.IsUnitType(u, jass.UNIT_TYPE_HERO)) {
-    if (typeof jass.GetHeroStr === "function" && typeof jass.SetHeroStr === "function") {
-      const cur = (jass.GetHeroStr(u, true) as number) || 0;
-      jass.SetHeroStr(u, cur + s, true);
-    }
-    if (typeof jass.GetHeroAgi === "function" && typeof jass.SetHeroAgi === "function") {
-      const cur = (jass.GetHeroAgi(u, true) as number) || 0;
-      jass.SetHeroAgi(u, cur + a, true);
-    }
-    if (typeof jass.GetHeroInt === "function" && typeof jass.SetHeroInt === "function") {
-      const cur = (jass.GetHeroInt(u, true) as number) || 0;
-      jass.SetHeroInt(u, cur + i, true);
-    }
-  } else {
-    setAbilityDataABC(u, "ASG3", ns, na, ni);
-  }
+  // 使用技能系统添加绿字属性
+  setAbilityDataABC(u, "ASG3", ns, na, ni);
   saveReal(u, ks, ns);
   saveReal(u, ka, na);
   saveReal(u, ki, ni);
 }
 
 function setHp(u: any, v: number): void {
-  if (typeof jass.GetUnitState !== "function" || typeof jass.SetUnitState !== "function") return;
   const key = sh("生命");
   const oldAdd = loadReal(u, key);
   const oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
@@ -148,7 +128,6 @@ function setHp(u: any, v: number): void {
 }
 
 function setMp(u: any, v: number): void {
-  if (typeof jass.GetUnitState !== "function" || typeof jass.SetUnitState !== "function") return;
   const key = sh("法力");
   const oldAdd = loadReal(u, key);
   const oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA);
@@ -194,7 +173,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
   const mpPct = sh("法力值百分比加成");
   const mpAdd = sh("法力值百分比加成增值");
 
-  if (id === 7 && typeof jass.GetUnitState === "function") {
+  if (id === 7) {
     const pv = loadReal(u, hpPct);
     const av = loadReal(u, hpAdd);
     const base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av;
@@ -206,7 +185,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
       saveReal(u, hpAdd, nav);
       setHp(u, nav);
     }
-  } else if (id === 8 && typeof jass.GetUnitState === "function") {
+  } else if (id === 8) {
     const pv = loadReal(u, mpPct);
     const av = loadReal(u, mpAdd);
     const base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av;

@@ -14,8 +14,8 @@ local __TS__ArrayPushArray = ____lualib.__TS__ArrayPushArray
 local ____exports = {}
 local ____require_result_0 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
 local getChestConfigByString = ____require_result_0.getChestConfigByString
-local ____require_result_1 = require("系统.02．物品系统.00．物品数据")
-local itemsData = ____require_result_1.itemsData
+local ____require_result_1 = require("系统.02．物品系统.01．装备数据")
+local items = ____require_result_1.items
 local function parseItemPool(poolStr)
     local entries = {}
     local parts = __TS__StringSplit(poolStr, ";")
@@ -26,10 +26,11 @@ local function parseItemPool(poolStr)
                 goto __continue3
             end
             if __TS__StringIncludes(trimmed, ":") then
-                local id, weightStr = table.unpack(
-                    __TS__StringSplit(trimmed, ":")
+                local splitParts = __TS__StringSplit(trimmed, ":")
+                local id = __TS__StringTrim(splitParts[1] or "")
+                local weightStr = splitParts[2] or ""
                 entries[#entries + 1] = {
-                    id = __TS__StringTrim(id),
+                    id = id,
                     weight = __TS__ParseFloat(weightStr) or 1
                 }
             else
@@ -76,7 +77,7 @@ local function drawByEqualWithoutRepeat(pool, picks)
 end
 local function filterItemsByScore(min, max)
     local result = {}
-    for ____, ____value in ipairs(__TS__ObjectEntries(itemsData)) do
+    for ____, ____value in ipairs(__TS__ObjectEntries(items)) do
         local id = ____value[1]
         local data = ____value[2]
         local score = data and data.score
@@ -131,7 +132,7 @@ local function executeDropByMode(dropMode, picks)
                     pool = __TS__ArrayFilter(
                         pool,
                         function(____, entry)
-                            local ____opt_4 = itemsData[entry.id]
+                            local ____opt_4 = items[entry.id]
                             local score = ____opt_4 and ____opt_4.score
                             if score == nil then
                                 return false

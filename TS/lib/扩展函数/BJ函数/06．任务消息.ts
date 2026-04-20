@@ -39,21 +39,16 @@ const bj_questItemAcquiredSound = jglobals.bj_questItemAcquiredSound ?? null;
 const bj_questWarningSound = jglobals.bj_questWarningSound ?? null;
 
 export function QuestMessageBJ(f: any, messageType: number, message: string): void {
-    if (
-        typeof jass.IsPlayerInForce !== "function" ||
-        typeof jass.GetLocalPlayer !== "function" ||
-        !jass.IsPlayerInForce(jass.GetLocalPlayer(), f)
-    ) {
+    if (!jass.IsPlayerInForce(jass.GetLocalPlayer(), f)) {
         return;
     }
     const lp = jass.GetLocalPlayer();
-    if (typeof jass.DisplayTimedTextToPlayer !== "function") return;
 
     const play = (s: any): void => {
-        if (s != null && typeof jass.StartSound === "function") jass.StartSound(s);
+        if (s != null) jass.StartSound(s);
     };
     const flash = (): void => {
-        if (typeof jass.FlashQuestDialogButton === "function") jass.FlashQuestDialogButton();
+        jass.FlashQuestDialogButton();
     };
 
     if (messageType === bj_QUESTMESSAGE_DISCOVERED) {

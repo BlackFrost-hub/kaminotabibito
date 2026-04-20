@@ -90,11 +90,7 @@ let _isRegistered = false;
  * @param a 透明度 (0-255)
  */
 export function DzGetColor(r: number, g: number, b: number, a: number): number {
-  if (typeof japi.DzGetColor === "function") {
-    return japi.DzGetColor(r, g, b, a);
-  }
-  // 降级：手动计算 ARGB
-  return (a << 24) | (r << 16) | (g << 8) | b;
+  return japi.DzGetColor(r, g, b, a);
 }
 
 /**
@@ -104,9 +100,7 @@ export function DzGetColor(r: number, g: number, b: number, a: number): number {
  */
 export function DzSetEffectVertexColor(effect: any, color: number): void {
   if (!effect) return;
-  if (typeof japi.DzSetEffectVertexColor === "function") {
-    japi.DzSetEffectVertexColor(effect, color);
-  }
+  japi.DzSetEffectVertexColor(effect, color);
 }
 
 /**
@@ -117,9 +111,7 @@ export function DzSetEffectVertexColor(effect: any, color: number): void {
  */
 export function EXSetEffectXY(effect: any, x: number, y: number): void {
   if (!effect) return;
-  if (typeof japi.EXSetEffectXY === "function") {
-    japi.EXSetEffectXY(effect, x, y);
-  }
+  japi.EXSetEffectXY(effect, x, y);
 }
 
 /**
@@ -129,9 +121,7 @@ export function EXSetEffectXY(effect: any, x: number, y: number): void {
  */
 export function EXSetEffectZ(effect: any, z: number): void {
   if (!effect) return;
-  if (typeof japi.EXSetEffectZ === "function") {
-    japi.EXSetEffectZ(effect, z);
-  }
+  japi.EXSetEffectZ(effect, z);
 }
 
 /**
@@ -141,9 +131,7 @@ export function EXSetEffectZ(effect: any, z: number): void {
  */
 export function EXSetEffectSize(effect: any, scale: number): void {
   if (!effect) return;
-  if (typeof japi.EXSetEffectSize === "function") {
-    japi.EXSetEffectSize(effect, scale);
-  }
+  japi.EXSetEffectSize(effect, scale);
 }
 
 /**
@@ -153,16 +141,14 @@ export function EXSetEffectSize(effect: any, scale: number): void {
  */
 export function EXSetEffectSpeed(effect: any, speed: number): void {
   if (!effect) return;
-  if (typeof japi.EXSetEffectSpeed === "function") {
-    japi.EXSetEffectSpeed(effect, speed);
-  }
+  japi.EXSetEffectSpeed(effect, speed);
 }
 
 /**
  * 获取单位HandleId
  */
 function getUnitId(unit: any): number {
-  if (!unit || typeof jass.GetHandleId !== "function") return 0;
+  if (!unit) return 0;
   return jass.GetHandleId(unit);
 }
 
@@ -171,9 +157,7 @@ function getUnitId(unit: any): number {
  */
 function destroyEffect(effect: any): void {
   if (!effect) return;
-  if (typeof jass.DestroyEffect === "function") {
-    jass.DestroyEffect(effect);
-  }
+  jass.DestroyEffect(effect);
 }
 
 // ==========================================================================================

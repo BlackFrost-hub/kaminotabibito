@@ -453,26 +453,15 @@ export function initCenterTimer(): void {
   _initialized = true;
 
   // 获取游戏开始时的服务器时间（转换为毫秒）
-  if (typeof japi.DzAPI_Map_GetGameStartTime === "function") {
-    const startTime = japi.DzAPI_Map_GetGameStartTime();
-    _serverTime = startTime * 1000;
-    jass.DisplayTimedTextToPlayer(
-      jass.GetLocalPlayer(),
-      0,
-      0,
-      10,
-      `[中心计时器初始化] DzAPI: ${startTime}, _serverTime = ${_serverTime}`
-    );
-  } else {
-    _serverTime = 0;
-    jass.DisplayTimedTextToPlayer(
-      jass.GetLocalPlayer(),
-      0,
-      0,
-      10,
-      `[中心计时器初始化] DzAPI 不可用，_serverTime = 0`
-    );
-  }
+  const startTime = japi.DzAPI_Map_GetGameStartTime();
+  _serverTime = startTime * 1000;
+  jass.DisplayTimedTextToPlayer(
+    jass.GetLocalPlayer(),
+    0,
+    0,
+    10,
+    `[中心计时器初始化] DzAPI: ${startTime}, _serverTime = ${_serverTime}`
+  );
 
   // 从JASS全局变量获取游戏难度（变量名为 udg_N）
   const difficultyReal = jassGlobals.udg_N as number | undefined;

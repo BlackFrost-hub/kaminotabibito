@@ -10,26 +10,11 @@ if ____jglobals_bj_lastCreatedImage_1 == nil then
 end
 ____exports.bj_lastCreatedImage = ____jglobals_bj_lastCreatedImage_1
 function ____exports.CreateImageBJ(self, file, size, where, zOffset, imageType)
-    if type(jass.CreateImage) ~= "function" then
-        return nil
-    end
     if where == nil or where == 0 then
         return nil
     end
-    local ____temp_2
-    if type(jass.GetLocationX) == "function" then
-        ____temp_2 = jass.GetLocationX(where)
-    else
-        ____temp_2 = 0
-    end
-    local x = ____temp_2
-    local ____temp_3
-    if type(jass.GetLocationY) == "function" then
-        ____temp_3 = jass.GetLocationY(where)
-    else
-        ____temp_3 = 0
-    end
-    local y = ____temp_3
+    local x = jass.GetLocationX(where)
+    local y = jass.GetLocationY(where)
     ____exports.bj_lastCreatedImage = jass.CreateImage(
         file,
         size,
@@ -46,44 +31,23 @@ function ____exports.CreateImageBJ(self, file, size, where, zOffset, imageType)
     return ____exports.bj_lastCreatedImage
 end
 function ____exports.ShowImageBJ(self, flag, whichImage)
-    if type(jass.ShowImage) ~= "function" then
-        return
-    end
     if whichImage == nil or whichImage == 0 then
         return
     end
     jass.ShowImage(whichImage, flag)
 end
 function ____exports.SetImagePositionBJ(self, whichImage, where, zOffset)
-    if type(jass.SetImagePosition) ~= "function" then
-        return
-    end
     if whichImage == nil or whichImage == 0 then
         return
     end
     if where == nil or where == 0 then
         return
     end
-    local ____temp_4
-    if type(jass.GetLocationX) == "function" then
-        ____temp_4 = jass.GetLocationX(where)
-    else
-        ____temp_4 = 0
-    end
-    local x = ____temp_4
-    local ____temp_5
-    if type(jass.GetLocationY) == "function" then
-        ____temp_5 = jass.GetLocationY(where)
-    else
-        ____temp_5 = 0
-    end
-    local y = ____temp_5
+    local x = jass.GetLocationX(where)
+    local y = jass.GetLocationY(where)
     jass.SetImagePosition(whichImage, x, y, zOffset)
 end
 function ____exports.SetImageColorBJ(self, whichImage, red, green, blue, alpha)
-    if type(jass.SetImageColor) ~= "function" then
-        return
-    end
     if whichImage == nil or whichImage == 0 then
         return
     end

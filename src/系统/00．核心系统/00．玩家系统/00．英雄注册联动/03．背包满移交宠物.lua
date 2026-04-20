@@ -10,19 +10,10 @@ function ensureSmartOrderId(self)
     if smartOrderId ~= 0 then
         return smartOrderId
     end
-    smartOrderId = type(String2OrderIdBJ) == "function" and String2OrderIdBJ(nil, SMART_ORDER) or (type(jass.OrderId) == "function" and (jass.OrderId(SMART_ORDER) or 0) or 0)
+    smartOrderId = String2OrderIdBJ(nil, SMART_ORDER)
     return smartOrderId
 end
 function onPetItemHandoff(self)
-    if type(jass.GetTriggerUnit) ~= "function" or type(jass.GetOrderTargetItem) ~= "function" then
-        return
-    end
-    if type(jass.GetIssuedOrderId) ~= "function" or type(jass.GetOwningPlayer) ~= "function" then
-        return
-    end
-    if type(jass.UnitAddItem) ~= "function" then
-        return
-    end
     local targetItem = jass.GetOrderTargetItem()
     if not isValidHandle(nil, targetItem) then
         return
@@ -72,7 +63,7 @@ local petItemHandoffTrigger = nil
 smartOrderId = 0
 local registeredHeroIds = __TS__New(Set)
 local function getHandleId(self, handle)
-    if not isValidHandle(nil, handle) or type(jass.GetHandleId) ~= "function" then
+    if not isValidHandle(nil, handle) then
         return 0
     end
     return jass.GetHandleId(handle) or 0
@@ -80,9 +71,6 @@ end
 local function ensurePetItemHandoffTrigger(self)
     if petItemHandoffTrigger ~= nil then
         return petItemHandoffTrigger
-    end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        return nil
     end
     petItemHandoffTrigger = jass.CreateTrigger()
     jass.TriggerAddAction(petItemHandoffTrigger, onPetItemHandoff)
@@ -95,7 +83,7 @@ function ____exports.registerPetItemHandoffHero(self, whichHero)
         return
     end
     local trigger = ensurePetItemHandoffTrigger(nil)
-    if trigger == nil or type(jass.TriggerRegisterUnitEvent) ~= "function" then
+    if trigger == nil then
         return
     end
     local heroId = getHandleId(nil, whichHero)

@@ -61,16 +61,10 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
     if not unit or not stats or #stats == 0 then
         return readBack
     end
-    local ____temp_3
-    if type(jass.GetOwningPlayer) == "function" then
-        ____temp_3 = jass.GetOwningPlayer(unit)
-    else
-        ____temp_3 = nil
-    end
-    local owner = ____temp_3
+    local owner = jass.GetOwningPlayer(unit)
     local heroGroup = getHeroGroup(nil)
-    local isHeroByGroup = not not (heroGroup and type(jass.IsUnitInGroup) == "function" and jass.IsUnitInGroup(unit, heroGroup))
-    local isHeroByType = not not (type(jass.IsUnitType) == "function" and jass.UNIT_TYPE_HERO ~= nil and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO))
+    local isHeroByGroup = not not (heroGroup and jass.IsUnitInGroup(unit, heroGroup))
+    local isHeroByType = not not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
     local isHero = isHeroByGroup or not heroGroup and isHeroByType
     for ____, s in ipairs(stats) do
         do
@@ -121,7 +115,7 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
                 readBack[name] = next
             end
             if applyDynamicPercentProperty(nil, unit, name, value) then
-            elseif name == "经验获取率" and owner and type(jass.SetPlayerHandicapXP) == "function" then
+            elseif name == "经验获取率" and owner then
                 local t = __TS__Number(g.udg_T) or 1
                 local base = 0.35 + 0.65 * t
                 jass.SetPlayerHandicapXP(owner, base * value)

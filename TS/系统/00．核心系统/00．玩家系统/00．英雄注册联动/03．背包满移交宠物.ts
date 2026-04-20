@@ -35,21 +35,18 @@ function isValidHandle(handle: any): boolean {
 }
 
 function getHandleId(handle: any): number {
-  if (!isValidHandle(handle) || typeof jass.GetHandleId !== "function") return 0;
+  if (!isValidHandle(handle)) return 0;
   return (jass.GetHandleId(handle) as number) || 0;
 }
 
 function ensureSmartOrderId(): number {
   if (smartOrderId !== 0) return smartOrderId;
-  smartOrderId = typeof String2OrderIdBJ === "function"
-    ? String2OrderIdBJ(SMART_ORDER)
-    : (typeof jass.OrderId === "function" ? ((jass.OrderId(SMART_ORDER) as number) || 0) : 0);
+  smartOrderId = String2OrderIdBJ(SMART_ORDER);
   return smartOrderId;
 }
 
 function ensurePetItemHandoffTrigger(): any {
   if (petItemHandoffTrigger != null) return petItemHandoffTrigger;
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") return null;
 
   petItemHandoffTrigger = jass.CreateTrigger();
   jass.TriggerAddAction(petItemHandoffTrigger, onPetItemHandoff);
@@ -60,10 +57,6 @@ function ensurePetItemHandoffTrigger(): any {
  * 处理“英雄背包已满时，将目标物品转交给宠物”的核心逻辑。
  */
 function onPetItemHandoff(): void {
-  if (typeof jass.GetTriggerUnit !== "function" || typeof jass.GetOrderTargetItem !== "function") return;
-  if (typeof jass.GetIssuedOrderId !== "function" || typeof jass.GetOwningPlayer !== "function") return;
-  if (typeof jass.UnitAddItem !== "function") return;
-
   const targetItem = jass.GetOrderTargetItem();
   if (!isValidHandle(targetItem)) return;
 
@@ -95,7 +88,7 @@ function onPetItemHandoff(): void {
 export function registerPetItemHandoffHero(whichHero: any): void {
   if (!isValidHandle(whichHero)) return;
   const trigger = ensurePetItemHandoffTrigger();
-  if (trigger == null || typeof jass.TriggerRegisterUnitEvent !== "function") return;
+  if (trigger == null) return;
 
   const heroId = getHandleId(whichHero);
   if (heroId === 0 || registeredHeroIds.has(heroId)) return;

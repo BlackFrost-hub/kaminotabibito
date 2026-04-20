@@ -14,24 +14,15 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 };
 
 export function String2UnitIdBJ(unitIdString: string): number {
-    if (typeof jass.UnitId === "function") {
-        return jass.UnitId(unitIdString);
-    }
-    return stringToFourCC(unitIdString);
+    return jass.UnitId(unitIdString);
 }
 
 export function GetIssuedOrderIdBJ(): number {
-    if (typeof jass.GetIssuedOrderId === "function") {
-        return jass.GetIssuedOrderId();
-    }
-    return 0;
+    return jass.GetIssuedOrderId();
 }
 
 export function GetKillingUnitBJ(): any {
-    if (typeof jass.GetKillingUnit === "function") {
-        return jass.GetKillingUnit();
-    }
-    return null;
+    return jass.GetKillingUnit();
 }
 
 export function UnitSuspendDecayBJ(suspend: boolean, unit: any): void {
@@ -49,7 +40,6 @@ export function SelectUnitSingle(unit: any): void {
 
 export function SelectGroupBJ(group: any): void {
     jass.ClearSelection();
-    if (typeof jass.ForGroup !== "function") return;
     jass.ForGroup(group, () => {
         const u = jass.GetEnumUnit();
         if (u != null) {
@@ -79,10 +69,7 @@ export function IssueTrainOrderByIdBJ(unit: any, id: number): boolean {
 }
 
 export function GroupTrainOrderByIdBJ(group: any, id: number): boolean {
-    if (typeof jass.GroupImmediateOrderById === "function") {
-        return jass.GroupImmediateOrderById(group, id);
-    }
-    return false;
+    return jass.GroupImmediateOrderById(group, id);
 }
 
 export function IssueUpgradeOrderByIdBJ(unit: any, id: number): boolean {
@@ -181,10 +168,7 @@ export function GetTransportUnitBJ(): any {
 }
 
 export function GetLoadedUnitBJ(): any {
-    if (typeof jass.GetLoadedUnit === "function") {
-        return jass.GetLoadedUnit();
-    }
-    return null;
+    return jass.GetLoadedUnit();
 }
 
 export function IsUnitInTransportBJ(unit: any, transport: any): boolean {

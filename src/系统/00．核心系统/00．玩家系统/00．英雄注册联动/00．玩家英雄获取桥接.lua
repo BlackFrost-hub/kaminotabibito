@@ -46,9 +46,6 @@ local function countOnJassStesTable(self, eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    if type(jass.StringHash) ~= "function" or type(jass.LoadInteger) ~= "function" then
-        return -1
-    end
     return jass.LoadInteger(
         ht,
         jass.StringHash(eventName),
@@ -59,9 +56,6 @@ end
 -- 这里是整条“英雄注册联动”链路的第一层筛选。
 local function isPlayableHero(self, whichUnit)
     if whichUnit == nil or whichUnit == 0 then
-        return false
-    end
-    if type(jass.IsUnitType) ~= "function" or type(jass.GetOwningPlayer) ~= "function" or type(jass.GetPlayerId) ~= "function" then
         return false
     end
     if jass.IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
@@ -109,9 +103,6 @@ local function registerSingleHero(self, whichHero)
     if not isPlayableHero(nil, whichHero) then
         return
     end
-    if type(jass.GetOwningPlayer) ~= "function" then
-        return
-    end
     local owner = jass.GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
@@ -135,19 +126,13 @@ local function runRegisterPlayerHero(self)
 end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(self, fn)
-    if type(jass.CreateTimer) ~= "function" or type(jass.TimerStart) ~= "function" then
-        fn(nil)
-        return
-    end
     local timer = jass.CreateTimer()
     jass.TimerStart(
         timer,
         RETRY_SEC,
         false,
         function()
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(timer)
-            end
+            jass.DestroyTimer(timer)
             fn(nil)
         end
     )
@@ -156,10 +141,6 @@ end
 local function tryRegisterPlayerHeroStes(self)
     local g = _G
     if g[REG_GUARD] then
-        return
-    end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" then
-        g[REG_GUARD] = true
         return
     end
     if g[TRIG_KEY] == nil then

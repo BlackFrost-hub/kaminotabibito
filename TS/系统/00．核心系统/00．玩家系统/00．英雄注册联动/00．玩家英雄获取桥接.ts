@@ -65,7 +65,6 @@ function jassStesHashtable(): any {
 function countOnJassStesTable(eventName: string): number {
   const ht = jassStesHashtable();
   if (ht == null || ht === 0) return -1;
-  if (typeof jass.StringHash !== "function" || typeof jass.LoadInteger !== "function") return -1;
   return jass.LoadInteger(ht, jass.StringHash(eventName), helper.ydlStes_skeyIndex(undefined));
 }
 
@@ -75,7 +74,6 @@ function countOnJassStesTable(eventName: string): number {
  */
 function isPlayableHero(whichUnit: any): boolean {
   if (whichUnit == null || whichUnit === 0) return false;
-  if (typeof jass.IsUnitType !== "function" || typeof jass.GetOwningPlayer !== "function" || typeof jass.GetPlayerId !== "function") return false;
   if (jass.IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) !== true) return false;
 
   const owner = jass.GetOwningPlayer(whichUnit);
@@ -117,7 +115,6 @@ function registerPlayerHero(whichPlayer: any, whichHero: any): void {
  */
 function registerSingleHero(whichHero: any): void {
   if (!isPlayableHero(whichHero)) return;
-  if (typeof jass.GetOwningPlayer !== "function") return;
 
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner == null || owner === 0) return;
@@ -140,14 +137,9 @@ function runRegisterPlayerHero(): void {
  * 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
  */
 function scheduleRetry(fn: () => void): void {
-  if (typeof jass.CreateTimer !== "function" || typeof jass.TimerStart !== "function") {
-    fn();
-    return;
-  }
-
   const timer = jass.CreateTimer();
   jass.TimerStart(timer, RETRY_SEC, false, () => {
-    if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(timer);
+    jass.DestroyTimer(timer);
     fn();
   });
 }
@@ -158,11 +150,6 @@ function scheduleRetry(fn: () => void): void {
 function tryRegisterPlayerHeroStes(): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
-
-  if (typeof jass.CreateTrigger !== "function" || typeof jass.TriggerAddAction !== "function") {
-    g[REG_GUARD] = true;
-    return;
-  }
 
   if (g[TRIG_KEY] == null) {
     const trig = jass.CreateTrigger();

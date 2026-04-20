@@ -157,17 +157,13 @@ export function applyDzTextFontAndAlignment(
 ): void {
   if (!frame || frame === 0) return;
   const scale = fontScale !== undefined && fontScale !== null ? fontScale : DEFAULT_UI_FONT_SCALE;
-  if (typeof (japi as any).DzFrameSetFont === "function") {
-    (pcall as any)(() => {
-      (japi as any).DzFrameSetFont(frame, fontFile, scale, fontFlag);
-    });
-  }
-  if (typeof (japi as any).DzFrameSetTextAlignment === "function") {
-    (pcall as any)(() => {
-      (japi as any).DzFrameSetTextAlignment(frame, DZ_TEXT_ALIGN_RESET);
-      (japi as any).DzFrameSetTextAlignment(frame, textAlignment);
-    });
-  }
+  (pcall as any)(() => {
+    (japi as any).DzFrameSetFont(frame, fontFile, scale, fontFlag);
+  });
+  (pcall as any)(() => {
+    (japi as any).DzFrameSetTextAlignment(frame, DZ_TEXT_ALIGN_RESET);
+    (japi as any).DzFrameSetTextAlignment(frame, textAlignment);
+  });
 }
 
 export function applyDzTextFontAndCenterAlignment(
@@ -192,15 +188,9 @@ export function createTextFrameFillBackdrop(backdrop: number, name: string, text
     visible: true,
   });
   if (!tf || tf === 0) return null;
-  if (typeof (japi as any).DzFrameClearAllPoints === "function") {
-    (pcall as any)(() => (japi as any).DzFrameClearAllPoints(tf));
-  }
-  if (typeof (japi as any).DzFrameSetAllPoints === "function") {
-    (pcall as any)(() => (japi as any).DzFrameSetAllPoints(tf, backdrop));
-  }
-  if (typeof (japi as any).DzFrameSetText === "function") {
-    (japi as any).DzFrameSetText(tf, text);
-  }
+  (pcall as any)(() => (japi as any).DzFrameClearAllPoints(tf));
+  (pcall as any)(() => (japi as any).DzFrameSetAllPoints(tf, backdrop));
+  (japi as any).DzFrameSetText(tf, text);
   return tf;
 }
 
@@ -226,15 +216,9 @@ export function createTabLabelTextOnBackdrop(
  */
 export function layoutGlueTextButtonOverBackdrop(backdrop: number, button: number): void {
   if (!backdrop || backdrop === 0 || !button || button === 0) return;
-  if (typeof (japi as any).DzFrameSetParent === "function") {
-    (pcall as any)(() => (japi as any).DzFrameSetParent(button, backdrop));
-  }
-  if (typeof (japi as any).DzFrameClearAllPoints === "function") {
-    (pcall as any)(() => (japi as any).DzFrameClearAllPoints(button));
-  }
-  if (typeof (japi as any).DzFrameSetAllPoints === "function") {
-    (pcall as any)(() => (japi as any).DzFrameSetAllPoints(button, backdrop));
-  }
+  (pcall as any)(() => (japi as any).DzFrameSetParent(button, backdrop));
+  (pcall as any)(() => (japi as any).DzFrameClearAllPoints(button));
+  (pcall as any)(() => (japi as any).DzFrameSetAllPoints(button, backdrop));
 }
 
 /**
@@ -243,7 +227,5 @@ export function layoutGlueTextButtonOverBackdrop(backdrop: number, button: numbe
 export function setupTransparentGlueHitLayer(backdrop: number, button: number): void {
   layoutGlueTextButtonOverBackdrop(backdrop, button);
   setButtonText(button, "");
-  if (typeof (japi as any).DzFrameSetAlpha === "function") {
-    (pcall as any)(() => (japi as any).DzFrameSetAlpha(button, 0));
-  }
+  (pcall as any)(() => (japi as any).DzFrameSetAlpha(button, 0));
 }

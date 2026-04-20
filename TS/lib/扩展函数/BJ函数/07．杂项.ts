@@ -3,32 +3,27 @@ const jglobals = require("jass.globals") as any;
 
 export function ModifyGateBJ(gateOperation: number, d: any): void {
     if (!d) return;
-    if (
-        typeof jass.GetDestructableLife !== "function" ||
-        typeof jass.GetDestructableMaxLife !== "function" ||
-        typeof jass.SetDestructableAnimation !== "function"
-    ) return;
 
     const CLOSE = jglobals.bj_GATEOPERATION_CLOSE;
     const OPEN = jglobals.bj_GATEOPERATION_OPEN;
     const DESTROY = jglobals.bj_GATEOPERATION_DESTROY;
 
     if (gateOperation === CLOSE) {
-        if (jass.GetDestructableLife(d) <= 0 && typeof jass.DestructableRestoreLife === "function") {
+        if (jass.GetDestructableLife(d) <= 0) {
             jass.DestructableRestoreLife(d, jass.GetDestructableMaxLife(d), true);
         }
         jass.SetDestructableAnimation(d, "stand");
         return;
     }
     if (gateOperation === OPEN) {
-        if (jass.GetDestructableLife(d) > 0 && typeof jass.KillDestructable === "function") {
+        if (jass.GetDestructableLife(d) > 0) {
             jass.KillDestructable(d);
         }
         jass.SetDestructableAnimation(d, "death alternate");
         return;
     }
     if (gateOperation === DESTROY) {
-        if (jass.GetDestructableLife(d) > 0 && typeof jass.KillDestructable === "function") {
+        if (jass.GetDestructableLife(d) > 0) {
             jass.KillDestructable(d);
         }
         jass.SetDestructableAnimation(d, "death");
@@ -36,13 +31,10 @@ export function ModifyGateBJ(gateOperation: number, d: any): void {
 }
 
 export function GetUnitsInRectMatching(r: any, filter: any): any {
-    if (typeof jass.CreateGroup !== "function") return null;
     const g = jass.CreateGroup();
     if (!g) return null;
-    if (typeof jass.GroupEnumUnitsInRect === "function") {
-        jass.GroupEnumUnitsInRect(g, r, filter);
-    }
-    if (filter && typeof jass.DestroyBoolExpr === "function") {
+    jass.GroupEnumUnitsInRect(g, r, filter);
+    if (filter) {
         jass.DestroyBoolExpr(filter);
     }
     return g;
@@ -51,10 +43,8 @@ export function GetUnitsInRectMatching(r: any, filter: any): any {
 export function ForGroupBJ(whichGroup: any, callback: any): void {
     const wantDestroy = !!jglobals.bj_wantDestroyGroup;
     jglobals.bj_wantDestroyGroup = false;
-    if (typeof jass.ForGroup === "function") {
-        jass.ForGroup(whichGroup, callback);
-    }
-    if (wantDestroy && typeof jass.DestroyGroup === "function") {
+    jass.ForGroup(whichGroup, callback);
+    if (wantDestroy) {
         jass.DestroyGroup(whichGroup);
     }
 }
@@ -68,10 +58,7 @@ export function GetRandomDirectionDeg(): number {
 }
 
 export function GetSpellAbilityId(): number {
-    if (typeof jass.GetSpellAbilityId === "function") {
-        return jass.GetSpellAbilityId();
-    }
-    return 0;
+    return jass.GetSpellAbilityId();
 }
 
 export function OrderIdToString(orderId: number): string {
@@ -85,11 +72,8 @@ export function OrderIdToString(orderId: number): string {
 export let lastCreatedEffect: any = null;
 
 export function AddSpecialEffectTargetUnitBJ(attachPointName: string, targetWidget: any, modelName: string): any {
-    if (typeof jass.AddSpecialEffectTarget === "function") {
-        lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName);
-        return lastCreatedEffect;
-    }
-    return null;
+    lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName);
+    return lastCreatedEffect;
 }
 
 export function OperatorDegreeMultiply(a: number, b: number): number {

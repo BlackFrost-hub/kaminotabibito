@@ -51,61 +51,46 @@ export function has(name: string): boolean {
 }
 
 export function isHardwareAPIAvailable(): boolean {
-  return (
-    typeof japi.DzIsKeyDown === "function" &&
-    typeof japi.DzGetMouseX === "function" &&
-    typeof japi.DzGetMouseY === "function"
-  );
+  return true;
 }
 
 // -------------------- 鼠标 --------------------
 
 export function getMouseTerrainX(): number {
-  if (typeof japi.DzGetMouseTerrainX !== "function") return 0;
   return japi.DzGetMouseTerrainX();
 }
 export function getMouseTerrainY(): number {
-  if (typeof japi.DzGetMouseTerrainY !== "function") return 0;
   return japi.DzGetMouseTerrainY();
 }
 export function getMouseTerrainZ(): number {
-  if (typeof japi.DzGetMouseTerrainZ !== "function") return 0;
   return japi.DzGetMouseTerrainZ();
 }
 export function isMouseOverUI(): boolean {
-  if (typeof japi.DzIsMouseOverUI !== "function") return false;
   return !!japi.DzIsMouseOverUI();
 }
 export function getMouseX(): number {
-  if (typeof japi.DzGetMouseX !== "function") return 0;
   return japi.DzGetMouseX();
 }
 export function getMouseY(): number {
-  if (typeof japi.DzGetMouseY !== "function") return 0;
   return japi.DzGetMouseY();
 }
 export function getMouseXRelative(): number {
-  if (typeof japi.DzGetMouseXRelative !== "function") return 0;
   return japi.DzGetMouseXRelative();
 }
 export function getMouseYRelative(): number {
-  if (typeof japi.DzGetMouseYRelative !== "function") return 0;
   return japi.DzGetMouseYRelative();
 }
 export function setMousePos(x: number, y: number): void {
-  if (typeof japi.DzSetMousePos !== "function") return;
   japi.DzSetMousePos(x, y);
 }
 
 // -------------------- 键盘 --------------------
 
 export function isKeyDown(keyCode: number): boolean {
-  if (typeof japi.DzIsKeyDown !== "function") return false;
   return !!japi.DzIsKeyDown(keyCode);
 }
 
 function createTriggerOrNull(): any {
-  if (typeof (jass as any).CreateTrigger !== "function") return null;
   return (jass as any).CreateTrigger();
 }
 
@@ -131,46 +116,31 @@ export function registerKeyEventByCode(
   if (!trig) return null;
 
   const keyChar = keyCodeToTrgChar(keyCode);
-  if (typeof japi.DzTriggerRegisterKeyEventTrg === "function") {
+  try {
+    japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
+  } catch (_e0) {
     try {
-      japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
-    } catch (_e0) {
-      try {
-        japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
-      } catch (_e1) {
-        // ignore
-      }
+      japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    } catch (_e1) {
+      // ignore
     }
-    if (typeof (jass as any).TriggerAddAction === "function") (jass as any).TriggerAddAction(trig, action);
-    return trig;
   }
-
-  if (typeof japi.DzTriggerRegisterKeyEventByCode === "function") {
-    japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, sync, action);
-    return trig;
-  }
-
-  if (typeof japi.DzTriggerRegisterKeyEvent === "function") {
-    japi.DzTriggerRegisterKeyEvent(trig, keyCode, status, sync, "");
-    if (typeof (jass as any).TriggerAddAction === "function") (jass as any).TriggerAddAction(trig, action);
-    return trig;
-  }
-
+  (jass as any).TriggerAddAction(trig, action);
   return trig;
 }
 
 export function registerKeyDown(keyCode: number, callback: (player: any, key: number) => void): any {
   return registerKeyEventByCode(keyCode, KEY_STATE.DOWN, false, () => {
-    const p = typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
-    const k = typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
     callback(p, k);
   });
 }
 
 export function registerKeyUp(keyCode: number, callback: (player: any, key: number) => void): any {
   return registerKeyEventByCode(keyCode, KEY_STATE.UP, false, () => {
-    const p = typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
-    const k = typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
     callback(p, k);
   });
 }
@@ -181,24 +151,22 @@ export function registerKeyEventRawStatus(keyCode: number, status: number, sync:
 }
 
 export function getTriggerKeyPlayer(): any {
-  return typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
+  return japi.DzGetTriggerKeyPlayer();
 }
 
 export function getTriggerKey(): number {
-  return typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+  return japi.DzGetTriggerKey();
 }
 
 // -------------------- 滚轮 --------------------
 
 export function getWheelDelta(): number {
-  if (typeof japi.DzGetWheelDelta !== "function") return 0;
   return japi.DzGetWheelDelta();
 }
 
 export function registerMouseWheel(sync: boolean, action: () => void): any {
   const trig = createTriggerOrNull();
   if (!trig) return null;
-  if (typeof japi.DzTriggerRegisterMouseWheelEventByCode !== "function") return null;
   japi.DzTriggerRegisterMouseWheelEventByCode(trig, sync, action);
   return trig;
 }
@@ -206,62 +174,50 @@ export function registerMouseWheel(sync: boolean, action: () => void): any {
 // -------------------- 窗口 --------------------
 
 export function getWindowWidth(): number {
-  if (typeof japi.DzGetWindowWidth !== "function") return 800;
   return japi.DzGetWindowWidth();
 }
 export function getWindowHeight(): number {
-  if (typeof japi.DzGetWindowHeight !== "function") return 600;
   return japi.DzGetWindowHeight();
 }
 export function getWindowX(): number {
-  if (typeof japi.DzGetWindowX !== "function") return 0;
   return japi.DzGetWindowX();
 }
 export function getWindowY(): number {
-  if (typeof japi.DzGetWindowY !== "function") return 0;
   return japi.DzGetWindowY();
 }
 export function isWindowActive(): boolean {
-  if (typeof japi.DzIsWindowActive !== "function") return true;
   return !!japi.DzIsWindowActive();
 }
 
 // -------------------- Frame（最小常用） --------------------
 
 export function getGameUI(): number {
-  if (typeof japi.DzGetGameUI !== "function") return 0;
   return japi.DzGetGameUI();
 }
 
 export function frameFindByName(name: string, id: number): number {
-  if (typeof japi.DzFrameFindByName !== "function") return 0;
   return japi.DzFrameFindByName(name, id);
 }
 
 /** 获取鼠标当前悬停的帧 */
 export function getMouseFocus(): number {
-  if (typeof japi.DzGetMouseFocus !== "function") return 0;
   return japi.DzGetMouseFocus();
 }
 
 /** UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...），参数顺序与原生一致 */
 export function frameSetScriptByCode(frame: number, eventId: number, action: () => void, sync: boolean): void {
-  if (typeof japi.DzFrameSetScriptByCode !== "function") return;
   japi.DzFrameSetScriptByCode(frame, eventId, action, sync);
 }
 
 // -------------------- 测试：B 键广播 9999 --------------------
 
 function initTestKeyB(): void {
-  if (typeof (jass as any).DisplayTimedTextToPlayer !== "function" || typeof (jass as any).Player !== "function") return;
-
   const lastDownByPid: boolean[] = [];
-  const getPid = typeof (jass as any).GetPlayerId === "function" ? (jass as any).GetPlayerId : null;
 
   const hook = (st: number) => {
     registerKeyEventRawStatus(KEY.B, st, false, () => {
-      const p = typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
-      const pid = getPid && p ? getPid(p) : 0;
+      const p = japi.DzGetTriggerKeyPlayer();
+      const pid = p ? (jass as any).GetPlayerId(p) : 0;
       const down = isKeyDown(KEY.B);
       const last = !!lastDownByPid[pid];
       lastDownByPid[pid] = down;
@@ -269,7 +225,7 @@ function initTestKeyB(): void {
         for (let i = 0; i < 12; i++) {
           (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 3, "9999");
         }
-        if (typeof (jass as any).GetPlayerName === "function" && p) {
+        if (p) {
           (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 3, "from=" + (jass as any).GetPlayerName(p));
         }
       }

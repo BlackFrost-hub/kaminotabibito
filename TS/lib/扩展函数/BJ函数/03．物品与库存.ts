@@ -92,9 +92,7 @@ export function RemoveItemTypeFromUnitBJ(whichUnit: any, itemId: number, count: 
  * endfunction
  */
 export function RemoveItemFromStockBJ(itemId: number, whichUnit: any): void {
-    if (typeof jass.RemoveItemFromStock === "function") {
-        jass.RemoveItemFromStock(whichUnit, itemId);
-    }
+    jass.RemoveItemFromStock(whichUnit, itemId);
 }
 
 /**
@@ -104,9 +102,7 @@ export function RemoveItemFromStockBJ(itemId: number, whichUnit: any): void {
  * endfunction
  */
 export function AddItemToStockBJ(itemId: number, whichUnit: any, currentStock: number, stockMax: number): void {
-    if (typeof jass.AddItemToStock === "function") {
-        jass.AddItemToStock(whichUnit, itemId, currentStock, stockMax);
-    }
+    jass.AddItemToStock(whichUnit, itemId, currentStock, stockMax);
 }
 
 /**
@@ -116,9 +112,7 @@ export function AddItemToStockBJ(itemId: number, whichUnit: any, currentStock: n
  * endfunction
  */
 export function AddUnitToStockBJ(unitId: number, whichUnit: any, currentStock: number, stockMax: number): void {
-    if (typeof jass.AddUnitToStock === "function") {
-        jass.AddUnitToStock(whichUnit, unitId, currentStock, stockMax);
-    }
+    jass.AddUnitToStock(whichUnit, unitId, currentStock, stockMax);
 }
 
 /**
@@ -128,9 +122,7 @@ export function AddUnitToStockBJ(unitId: number, whichUnit: any, currentStock: n
  * endfunction
  */
 export function RemoveUnitFromStockBJ(unitId: number, whichUnit: any): void {
-    if (typeof jass.RemoveUnitFromStock === "function") {
-        jass.RemoveUnitFromStock(whichUnit, unitId);
-    }
+    jass.RemoveUnitFromStock(whichUnit, unitId);
 }
 
 /**
@@ -139,14 +131,9 @@ export function RemoveUnitFromStockBJ(unitId: number, whichUnit: any): void {
  */
 export function GetItemLoc(whichItem: any): any {
     if (whichItem == null || whichItem === 0) return null;
-    if (typeof jass.GetItemX === "function" && typeof jass.GetItemY === "function") {
-        const x = jass.GetItemX(whichItem);
-        const y = jass.GetItemY(whichItem);
-        if (typeof jass.Location === "function") {
-            return jass.Location(x, y);
-        }
-    }
-    return null;
+    const x = jass.GetItemX(whichItem);
+    const y = jass.GetItemY(whichItem);
+    return jass.Location(x, y);
 }
 
 /**
@@ -155,9 +142,8 @@ export function GetItemLoc(whichItem: any): any {
  */
 export function CreateItemLoc(itemId: number, loc: any): any {
     if (loc == null || loc === 0) return null;
-    if (typeof jass.CreateItem !== "function") return null;
-    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
-    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    const x = jass.GetLocationX(loc);
+    const y = jass.GetLocationY(loc);
     return jass.CreateItem(itemId, x, y);
 }
 
@@ -168,9 +154,8 @@ export function CreateItemLoc(itemId: number, loc: any): any {
 export function SetItemPositionLoc(whichItem: any, loc: any): void {
     if (whichItem == null || whichItem === 0) return;
     if (loc == null || loc === 0) return;
-    if (typeof jass.SetItemPosition !== "function") return;
-    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
-    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    const x = jass.GetLocationX(loc);
+    const y = jass.GetLocationY(loc);
     jass.SetItemPosition(whichItem, x, y);
 }
 
@@ -182,9 +167,8 @@ export function UnitDropItemPointLoc(whichUnit: any, whichItem: any, loc: any): 
     if (whichUnit == null || whichUnit === 0) return false;
     if (whichItem == null || whichItem === 0) return false;
     if (loc == null || loc === 0) return false;
-    if (typeof jass.UnitDropItemPoint !== "function") return false;
-    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
-    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    const x = jass.GetLocationX(loc);
+    const y = jass.GetLocationY(loc);
     return jass.UnitDropItemPoint(whichUnit, whichItem, x, y);
 }
 
@@ -196,9 +180,8 @@ export function UnitUseItemPointLoc(whichUnit: any, whichItem: any, loc: any): b
     if (whichUnit == null || whichUnit === 0) return false;
     if (whichItem == null || whichItem === 0) return false;
     if (loc == null || loc === 0) return false;
-    if (typeof jass.UnitUseItemPoint !== "function") return false;
-    const x = typeof jass.GetLocationX === "function" ? jass.GetLocationX(loc) : 0;
-    const y = typeof jass.GetLocationY === "function" ? jass.GetLocationY(loc) : 0;
+    const x = jass.GetLocationX(loc);
+    const y = jass.GetLocationY(loc);
     jass.UnitUseItemPoint(whichUnit, whichItem, x, y);
     return true;
 }

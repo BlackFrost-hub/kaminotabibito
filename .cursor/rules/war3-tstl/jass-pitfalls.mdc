@@ -19,7 +19,8 @@ TSTL 会把 `obj.fn?.(x)` 编译成"取出函数后再用 self 调用"的形态�
 
 **✅ 正确写法**
 
-- 先判断 `typeof (jass as any).Fn === "function"`，再直接 `(jass as any).Fn(arg)` 调用。
+- 直接 `(jass as any).Fn(arg)` 调用，不要默认添加 `typeof === "function"` 安全检查。
+- 仅在规则或需求明确要求跨平台兼容时，才允许补存在性检查。
 
 ## 2) **禁止**把 `jass.xxx` 赋给局部变量再调用
 

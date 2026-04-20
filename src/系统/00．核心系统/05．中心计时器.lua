@@ -415,26 +415,15 @@ function ____exports.initCenterTimer(self)
         return
     end
     _initialized = true
-    if type(japi.DzAPI_Map_GetGameStartTime) == "function" then
-        local startTime = japi.DzAPI_Map_GetGameStartTime()
-        _serverTime = startTime * 1000
-        jass.DisplayTimedTextToPlayer(
-            jass.GetLocalPlayer(),
-            0,
-            0,
-            10,
-            (("[中心计时器初始化] DzAPI: " .. tostring(startTime)) .. ", _serverTime = ") .. tostring(_serverTime)
-        )
-    else
-        _serverTime = 0
-        jass.DisplayTimedTextToPlayer(
-            jass.GetLocalPlayer(),
-            0,
-            0,
-            10,
-            "[中心计时器初始化] DzAPI 不可用，_serverTime = 0"
-        )
-    end
+    local startTime = japi.DzAPI_Map_GetGameStartTime()
+    _serverTime = startTime * 1000
+    jass.DisplayTimedTextToPlayer(
+        jass.GetLocalPlayer(),
+        0,
+        0,
+        10,
+        (("[中心计时器初始化] DzAPI: " .. tostring(startTime)) .. ", _serverTime = ") .. tostring(_serverTime)
+    )
     local difficultyReal = jassGlobals.udg_N
     if difficultyReal ~= nil then
         _gameDifficulty = math.floor(difficultyReal)

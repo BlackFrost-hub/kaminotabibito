@@ -19,7 +19,5 @@ end
 local manager = require("系统.00．核心系统.00．玩家系统.01．玩家单位管理器")
 ____exports.initPlayerSystem = manager.initPlayerUnitManager
 ____exports.initPlayerUnitManager = manager.initPlayerUnitManager
-if type(____exports.initPlayerSystem) == "function" then
-    ____exports.initPlayerSystem(nil)
-end
+____exports.initPlayerSystem(nil)
 return ____exports

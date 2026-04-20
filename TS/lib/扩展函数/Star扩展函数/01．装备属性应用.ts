@@ -42,10 +42,10 @@ export function applyEquipStatsTS(unit: any, stats: EquipStatEntry[]): Record<st
   const readBack: Record<string, number> = {};
   if (!unit || !stats || stats.length === 0) return readBack;
 
-  const owner = typeof jass.GetOwningPlayer === "function" ? jass.GetOwningPlayer(unit) : null;
+  const owner = jass.GetOwningPlayer(unit);
   const heroGroup = getHeroGroup();
-  const isHeroByGroup = !!(heroGroup && typeof jass.IsUnitInGroup === "function" && jass.IsUnitInGroup(unit, heroGroup));
-  const isHeroByType = !!(typeof jass.IsUnitType === "function" && jass.UNIT_TYPE_HERO != null && jass.IsUnitType(unit, jass.UNIT_TYPE_HERO));
+  const isHeroByGroup = !!(heroGroup && jass.IsUnitInGroup(unit, heroGroup));
+  const isHeroByType = !!(jass.IsUnitType(unit, jass.UNIT_TYPE_HERO));
   // 与 JASS 逻辑保持一致：优先用“玩家英雄”分组判断；分组缺失时回退到英雄类型判断。
   const isHero = isHeroByGroup || (!heroGroup && isHeroByType);
 
@@ -77,7 +77,7 @@ export function applyEquipStatsTS(unit: any, stats: EquipStatEntry[]): Record<st
 
     if (applyDynamicPercentProperty(unit, name, value)) {
       // 已由统一动态百分比处理器消费
-    } else if (name === "经验获取率" && owner && typeof jass.SetPlayerHandicapXP === "function") {
+    } else if (name === "经验获取率" && owner) {
       const t = Number(g.udg_T) || 1;
       const base = 0.35 + 0.65 * t;
       jass.SetPlayerHandicapXP(owner, base * value);

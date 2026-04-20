@@ -8,24 +8,18 @@ local SetUnitManaPercentBJ = ____require_result_0.SetUnitManaPercentBJ
 local GetUnitLifePercent = ____require_result_0.GetUnitLifePercent
 local GetUnitManaPercent = ____require_result_0.GetUnitManaPercent
 local ModifyHeroStat = ____require_result_0.ModifyHeroStat
-local ____temp_1
-if type(jass.InitHashtable) == "function" then
-    ____temp_1 = jass.InitHashtable()
-else
-    ____temp_1 = nil
-end
-local HS = ____temp_1
+local HS = jass.InitHashtable()
 local function hid(self, h)
-    return type(jass.GetHandleId) == "function" and (jass.GetHandleId(h) or 0) or 0
+    return jass.GetHandleId(h) or 0
 end
 local function loadReal(self, handle, parent, child)
-    if not handle or type(jass.LoadReal) ~= "function" then
+    if not handle then
         return 0
     end
     return jass.LoadReal(handle, parent, child) or 0
 end
 local function saveReal(self, handle, parent, child, value)
-    if not handle or type(jass.SaveReal) ~= "function" then
+    if not handle then
         return
     end
     jass.SaveReal(handle, parent, child, value)

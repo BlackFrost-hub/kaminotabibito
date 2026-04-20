@@ -29,7 +29,6 @@ export let bj_lastRemovedItem: any = null;
  */
 export function UnitRemoveItemSwapped(whichItem: any, whichHero: any): void {
   if (whichItem == null || whichHero == null) return;
-  if (typeof jass.UnitRemoveItem !== "function") return;
 
   bj_lastRemovedItem = whichItem;
   jass.UnitRemoveItem(whichHero, whichItem);

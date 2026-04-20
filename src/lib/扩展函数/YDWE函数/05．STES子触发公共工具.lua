@@ -21,9 +21,6 @@ local YDLocalExecuteTrigger = ____require_result_1.YDLocalExecuteTrigger
 -- 此时需要执行 YDLocalExecuteTrigger 来同步 ydl_triggerstep，
 -- 这样后续的 YDLocal5Get 才能正确读取到 JASS 端传递的参数
 function ____exports.ydlStes_syncTriggerStep(self, _self)
-    if type(jass.GetTriggeringTrigger) ~= "function" then
-        return
-    end
     local trg = jass.GetTriggeringTrigger()
     if trg == nil or trg == 0 then
         return
@@ -120,10 +117,7 @@ function ____exports.ydlStes_skeyIndex(self, _self)
     if type(jglobals.STES_skey_index) == "number" and jglobals.STES_skey_index ~= 0 then
         return jglobals.STES_skey_index
     end
-    if type(jass.StringHash) == "function" then
-        return jass.StringHash("index")
-    end
-    return 0
+    return jass.StringHash("index")
 end
 --- STES_GetTable 后 Register（与任务/Buff 桥接写法一致）
 function ____exports.ydlStes_registerAfterGetTable(self, _self, trig, eventName)

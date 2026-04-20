@@ -40,16 +40,14 @@ jglobals = require("jass.globals")
 function ____exports.SetCinematicSceneBJ(self, soundHandle, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
     jglobals.bj_cineSceneLastSound = soundHandle
     PlaySoundBJ(nil, soundHandle)
-    if type(jass.SetCinematicScene) == "function" then
-        jass.SetCinematicScene(
-            portraitUnitId,
-            color,
-            speakerTitle,
-            text,
-            sceneDuration,
-            voiceoverDuration
-        )
-    end
+    jass.SetCinematicScene(
+        portraitUnitId,
+        color,
+        speakerTitle,
+        text,
+        sceneDuration,
+        voiceoverDuration
+    )
 end
 function ____exports.DoTransmissionBasicsXYBJ(self, unitId, color, x, y, soundHandle, unitName, message, duration)
     local hang = bj_TRANSMISSION_PORT_HANGTIME
@@ -63,15 +61,12 @@ function ____exports.DoTransmissionBasicsXYBJ(self, unitId, color, x, y, soundHa
         duration + hang,
         duration
     )
-    if unitId ~= 0 and type(jass.PingMinimap) == "function" then
+    if unitId ~= 0 then
         jass.PingMinimap(x, y, bj_TRANSMISSION_PING_TIME)
     end
 end
 function ____exports.TryInitCinematicBehaviorBJ(self)
     if jglobals.bj_cineSceneBeingSkipped ~= nil then
-        return
-    end
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerRegisterPlayerEvent) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.Player) ~= "function" then
         return
     end
     jglobals.bj_cineSceneBeingSkipped = jass.CreateTrigger()
@@ -86,9 +81,7 @@ function ____exports.TryInitCinematicBehaviorBJ(self)
             index = index + 1
         end
     end
-    if type(CancelCineSceneBJ) == "function" then
-        jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ)
-    end
+    jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ)
 end
 function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, unitName, soundHandle, message, timeType, timeVal, wait)
     ____exports.TryInitCinematicBehaviorBJ(nil)

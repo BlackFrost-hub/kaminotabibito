@@ -6,10 +6,7 @@ function skeyIndex(self)
     if type(jglobals.STES_skey_index) == "number" and jglobals.STES_skey_index ~= 0 then
         return jglobals.STES_skey_index
     end
-    if type(jass.StringHash) == "function" then
-        return jass.StringHash("index")
-    end
-    return 0
+    return jass.StringHash("index")
 end
 function fireHealEvent(self, target, healAmount, sourcePlayer)
     local ht = STES_GetTable(nil)

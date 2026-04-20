@@ -51,26 +51,19 @@ export const TEXMAP_FLAG_NONE = jglobals.TEXMAP_FLAG_NONE ?? 0;
 export const MAP_LOCK_SPEED = jglobals.MAP_LOCK_SPEED ?? 0;
 
 export function StopSoundBJ(soundHandle: any, fadeOut: boolean): void {
-    if (typeof jass.StopSound === "function") {
-        jass.StopSound(soundHandle, false, fadeOut);
-    }
+    jass.StopSound(soundHandle, false, fadeOut);
 }
 
 export function CancelCineSceneBJ(): void {
     StopSoundBJ(bj_cineSceneLastSound, true);
-    if (typeof jass.EndCinematicScene === "function") {
-        jass.EndCinematicScene();
-    }
+    jass.EndCinematicScene();
 }
 
 export function CameraResetSmoothingFactorBJ(): void {
-    if (typeof jass.CameraSetSmoothingFactor === "function") {
-        jass.CameraSetSmoothingFactor(0);
-    }
+    jass.CameraSetSmoothingFactor(0);
 }
 
 export function SetCineModeVolumeGroupsImmediateBJ(): void {
-    if (typeof jass.VolumeGroupSetVolume !== "function") return;
     jass.VolumeGroupSetVolume(SOUND_VOLUMEGROUP_UNITMOVEMENT, bj_CINEMODE_VOLUME_UNITMOVEMENT);
     jass.VolumeGroupSetVolume(SOUND_VOLUMEGROUP_UNITSOUNDS, bj_CINEMODE_VOLUME_UNITSOUNDS);
     jass.VolumeGroupSetVolume(SOUND_VOLUMEGROUP_COMBAT, bj_CINEMODE_VOLUME_COMBAT);
@@ -86,7 +79,7 @@ export function SetCineModeVolumeGroupsBJ(): void {
         SetCineModeVolumeGroupsImmediateBJ();
     } else {
         const t = bj_volumeGroupsTimer;
-        if (t != null && typeof jass.TimerStart === "function") {
+        if (t != null) {
             jass.TimerStart(t, bj_GAME_STARTED_THRESHOLD, false, SetCineModeVolumeGroupsImmediateBJ);
         }
     }
@@ -94,10 +87,7 @@ export function SetCineModeVolumeGroupsBJ(): void {
 
 export function GetSoundDurationBJ(soundHandle: any): number {
     if (soundHandle == null) return bj_NOTHING_SOUND_DURATION;
-    if (typeof jass.GetSoundDuration === "function") {
-        return jass.GetSoundDuration(soundHandle) * 0.001;
-    }
-    return bj_NOTHING_SOUND_DURATION;
+    return jass.GetSoundDuration(soundHandle) * 0.001;
 }
 
 export function GetTransmissionDuration(soundHandle: any, timeType: number, timeVal: number): number {

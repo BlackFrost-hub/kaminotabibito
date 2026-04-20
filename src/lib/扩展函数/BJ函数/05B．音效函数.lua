@@ -213,25 +213,16 @@ if ____jglobals_MAP_LOCK_SPEED_40 == nil then
 end
 ____exports.MAP_LOCK_SPEED = ____jglobals_MAP_LOCK_SPEED_40
 function ____exports.StopSoundBJ(self, soundHandle, fadeOut)
-    if type(jass.StopSound) == "function" then
-        jass.StopSound(soundHandle, false, fadeOut)
-    end
+    jass.StopSound(soundHandle, false, fadeOut)
 end
 function ____exports.CancelCineSceneBJ(self)
     ____exports.StopSoundBJ(nil, ____exports.bj_cineSceneLastSound, true)
-    if type(jass.EndCinematicScene) == "function" then
-        jass.EndCinematicScene()
-    end
+    jass.EndCinematicScene()
 end
 function ____exports.CameraResetSmoothingFactorBJ(self)
-    if type(jass.CameraSetSmoothingFactor) == "function" then
-        jass.CameraSetSmoothingFactor(0)
-    end
+    jass.CameraSetSmoothingFactor(0)
 end
 function ____exports.SetCineModeVolumeGroupsImmediateBJ(self)
-    if type(jass.VolumeGroupSetVolume) ~= "function" then
-        return
-    end
     jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITMOVEMENT, ____exports.bj_CINEMODE_VOLUME_UNITMOVEMENT)
     jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITSOUNDS, ____exports.bj_CINEMODE_VOLUME_UNITSOUNDS)
     jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_COMBAT, ____exports.bj_CINEMODE_VOLUME_COMBAT)
@@ -246,7 +237,7 @@ function ____exports.SetCineModeVolumeGroupsBJ(self)
         ____exports.SetCineModeVolumeGroupsImmediateBJ(nil)
     else
         local t = ____exports.bj_volumeGroupsTimer
-        if t ~= nil and type(jass.TimerStart) == "function" then
+        if t ~= nil then
             jass.TimerStart(t, ____exports.bj_GAME_STARTED_THRESHOLD, false, ____exports.SetCineModeVolumeGroupsImmediateBJ)
         end
     end
@@ -255,10 +246,7 @@ function ____exports.GetSoundDurationBJ(self, soundHandle)
     if soundHandle == nil then
         return ____exports.bj_NOTHING_SOUND_DURATION
     end
-    if type(jass.GetSoundDuration) == "function" then
-        return jass.GetSoundDuration(soundHandle) * 0.001
-    end
-    return ____exports.bj_NOTHING_SOUND_DURATION
+    return jass.GetSoundDuration(soundHandle) * 0.001
 end
 function ____exports.GetTransmissionDuration(self, soundHandle, timeType, timeVal)
     local duration

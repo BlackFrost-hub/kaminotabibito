@@ -19,27 +19,20 @@ local function isValidHandle(self, handle)
     return handle ~= nil and handle ~= 0
 end
 local function getHandleId(self, handle)
-    if not isValidHandle(nil, handle) or type(jass.GetHandleId) ~= "function" then
+    if not isValidHandle(nil, handle) then
         return 0
     end
     return jass.GetHandleId(handle) or 0
 end
 local function createTornadoEffect(self, whichUnit)
-    if type(jass.AddSpecialEffectTarget) ~= "function" then
-        return nil
-    end
     return jass.AddSpecialEffectTarget(C.TORNADO_EFFECT_MODEL, whichUnit, C.TORNADO_ATTACH_POINT)
 end
 local function destroyTornadoEffect(self, effect)
     if not isValidHandle(nil, effect) then
         return
     end
-    if type(DzUnbindEffect) == "function" then
-        DzUnbindEffect(nil, effect)
-    end
-    if type(jass.DestroyEffect) == "function" then
-        jass.DestroyEffect(effect)
-    end
+    DzUnbindEffect(nil, effect)
+    jass.DestroyEffect(effect)
 end
 local function removeTrackedHero(self, heroId)
     trackedHeroes:delete(heroId)
@@ -64,16 +57,13 @@ end
 --- 周期同步已注册英雄的移速特效状态。
 -- 这里只处理“已被桥接模块确认过”的英雄，不再自己扫描全局英雄组。
 function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
-    if type(jass.GetUnitMoveSpeed) ~= "function" or type(jass.IsUnitType) ~= "function" then
-        return
-    end
     for ____, ____value in __TS__Iterator(trackedHeroes) do
         local heroId = ____value[1]
         local hero = ____value[2]
         do
             if not isValidHandle(nil, hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
                 removeTrackedHero(nil, heroId)
-                goto __continue18
+                goto __continue14
             end
             local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
             local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
@@ -85,14 +75,14 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
                         tornadoEffects:set(heroId, effect)
                     end
                 end
-                goto __continue18
+                goto __continue14
             end
             if currentEffect ~= nil then
                 destroyTornadoEffect(nil, currentEffect)
                 tornadoEffects:delete(heroId)
             end
         end
-        ::__continue18::
+        ::__continue14::
     end
 end
 return ____exports

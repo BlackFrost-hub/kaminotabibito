@@ -62,10 +62,7 @@ export function SelectUnitForPlayerSingle(whichUnit: any, whichPlayer: any): voi
 }
 
 export function GetUnitCurrentOrder(unit: any): number {
-    if (typeof jass.GetUnitCurrentOrder === "function") {
-        return jass.GetUnitCurrentOrder(unit);
-    }
-    return 0;
+    return jass.GetUnitCurrentOrder(unit);
 }
 
 export function IsUnitDeadBJ(whichUnit: any): boolean {
@@ -127,17 +124,11 @@ export function SetUnitLifePercentBJ(whichUnit: any, percent: number): void {
 
 /** `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API） */
 export function GetUnitLifePercent(whichUnit: any): number {
-    if (typeof jass.GetUnitStatePercent === "function") {
-        return jass.GetUnitStatePercent(whichUnit, jass.UNIT_STATE_LIFE, jass.UNIT_STATE_MAX_LIFE);
-    }
     return GetUnitLifePercentBJ(whichUnit);
 }
 
 /** `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitManaPercentBJ` 语义一致 */
 export function GetUnitManaPercent(whichUnit: any): number {
-    if (typeof jass.GetUnitStatePercent === "function") {
-        return jass.GetUnitStatePercent(whichUnit, jass.UNIT_STATE_MANA, jass.UNIT_STATE_MAX_MANA);
-    }
     return GetUnitManaPercentBJ(whichUnit);
 }
 
@@ -194,7 +185,6 @@ export function IsSuspendedXPBJ(whichHero: any): boolean {
  */
 export function ModifyHeroSkillPoints(whichHero: any, whichStat: number, modifyMethod: number, value: number): boolean {
     if (whichHero == null || whichHero === 0) return false;
-    if (typeof jass.ModifyHeroSkillPoints !== "function") return false;
     return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value);
 }
 
@@ -221,10 +211,7 @@ export function UnitRemoveBuffBJ(buffId: number, whichUnit: any): void {
  * 对应JASS: GetLearnedSkillBJ
  */
 export function GetLearnedSkillBJ(): number {
-    if (typeof jass.GetLearnedSkill === "function") {
-        return jass.GetLearnedSkill();
-    }
-    return 0;
+    return jass.GetLearnedSkill();
 }
 
 /**

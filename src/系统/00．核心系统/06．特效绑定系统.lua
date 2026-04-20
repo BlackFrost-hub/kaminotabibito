@@ -5,7 +5,7 @@ local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 local getUnitId, destroyEffect, jass, boundEffects, unitToEffectMap
 function getUnitId(unit)
-    if not unit or type(jass.GetHandleId) ~= "function" then
+    if not unit then
         return 0
     end
     return jass.GetHandleId(unit)
@@ -14,9 +14,7 @@ function destroyEffect(effect)
     if not effect then
         return
     end
-    if type(jass.DestroyEffect) == "function" then
-        jass.DestroyEffect(effect)
-    end
+    jass.DestroyEffect(effect)
 end
 --- 移除绑定特效
 -- 
@@ -62,10 +60,7 @@ local _isRegistered = false
 -- @param b 蓝色 (0-255)
 -- @param a 透明度 (0-255)
 function ____exports.DzGetColor(r, g, b, a)
-    if type(japi.DzGetColor) == "function" then
-        return japi.DzGetColor(r, g, b, a)
-    end
-    return a << 24 | r << 16 | g << 8 | b
+    return japi.DzGetColor(r, g, b, a)
 end
 --- 设置特效顶点颜色
 -- 
@@ -75,9 +70,7 @@ function ____exports.DzSetEffectVertexColor(effect, color)
     if not effect then
         return
     end
-    if type(japi.DzSetEffectVertexColor) == "function" then
-        japi.DzSetEffectVertexColor(effect, color)
-    end
+    japi.DzSetEffectVertexColor(effect, color)
 end
 --- 设置特效坐标
 -- 
@@ -88,9 +81,7 @@ function ____exports.EXSetEffectXY(effect, x, y)
     if not effect then
         return
     end
-    if type(japi.EXSetEffectXY) == "function" then
-        japi.EXSetEffectXY(effect, x, y)
-    end
+    japi.EXSetEffectXY(effect, x, y)
 end
 --- 设置特效Z轴高度
 -- 
@@ -100,9 +91,7 @@ function ____exports.EXSetEffectZ(effect, z)
     if not effect then
         return
     end
-    if type(japi.EXSetEffectZ) == "function" then
-        japi.EXSetEffectZ(effect, z)
-    end
+    japi.EXSetEffectZ(effect, z)
 end
 --- 设置特效缩放
 -- 
@@ -112,9 +101,7 @@ function ____exports.EXSetEffectSize(effect, scale)
     if not effect then
         return
     end
-    if type(japi.EXSetEffectSize) == "function" then
-        japi.EXSetEffectSize(effect, scale)
-    end
+    japi.EXSetEffectSize(effect, scale)
 end
 --- 设置特效动画速度
 -- 
@@ -124,9 +111,7 @@ function ____exports.EXSetEffectSpeed(effect, speed)
     if not effect then
         return
     end
-    if type(japi.EXSetEffectSpeed) == "function" then
-        japi.EXSetEffectSpeed(effect, speed)
-    end
+    japi.EXSetEffectSpeed(effect, speed)
 end
 --- 更新所有绑定特效的位置
 local function updateBoundEffects()
@@ -136,7 +121,7 @@ local function updateBoundEffects()
         do
             if not data.unit then
                 ____exports.removeBoundEffect(effect)
-                goto __continue25
+                goto __continue18
             end
             local ____opt_2 = jass.GetUnitX
             if ____opt_2 ~= nil then
@@ -150,7 +135,7 @@ local function updateBoundEffects()
             local unitY = ____opt_4
             if unitX == nil or unitY == nil then
                 ____exports.removeBoundEffect(effect)
-                goto __continue25
+                goto __continue18
             end
             local ____opt_6 = jass.GetUnitFlyHeight
             if ____opt_6 ~= nil then
@@ -165,7 +150,7 @@ local function updateBoundEffects()
             ____exports.EXSetEffectXY(effect, unitX, unitY)
             ____exports.EXSetEffectZ(effect, z)
         end
-        ::__continue25::
+        ::__continue18::
     end
     if boundEffects.size == 0 and _isRegistered then
         offTick10ms(nil, updateBoundEffects)

@@ -15,8 +15,6 @@ const manager = require("系统.00．核心系统.00．玩家系统.01．玩家�
 export const initPlayerSystem = manager.initPlayerUnitManager;
 export const initPlayerUnitManager = manager.initPlayerUnitManager;
 
-if (typeof initPlayerSystem === "function") {
-  initPlayerSystem();
-}
+initPlayerSystem();
 
 export {};

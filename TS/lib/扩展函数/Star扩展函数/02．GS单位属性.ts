@@ -14,19 +14,19 @@ const {
   ModifyHeroStat: (whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
 };
 
-const HS = typeof jass.InitHashtable === "function" ? jass.InitHashtable() : null;
+const HS = jass.InitHashtable();
 
 function hid(h: any): number {
-  return typeof jass.GetHandleId === "function" ? ((jass.GetHandleId(h) as number) || 0) : 0;
+  return (jass.GetHandleId(h) as number) || 0;
 }
 
 function loadReal(handle: any, parent: number, child: number): number {
-  if (!handle || typeof jass.LoadReal !== "function") return 0;
+  if (!handle) return 0;
   return (jass.LoadReal(handle, parent, child) as number) || 0;
 }
 
 function saveReal(handle: any, parent: number, child: number, value: number): void {
-  if (!handle || typeof jass.SaveReal !== "function") return;
+  if (!handle) return;
   jass.SaveReal(handle, parent, child, value);
 }
 

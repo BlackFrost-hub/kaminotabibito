@@ -123,19 +123,15 @@ function ____exports.applyDzTextFontAndAlignment(self, frame, textAlignment, fon
         return
     end
     local scale = fontScale ~= nil and fontScale ~= nil and fontScale or ____exports.DEFAULT_UI_FONT_SCALE
-    if type(japi.DzFrameSetFont) == "function" then
-        pcall(function ()
-                japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
-            end
-        )
-    end
-    if type(japi.DzFrameSetTextAlignment) == "function" then
-        pcall(function ()
-                japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
-                japi.DzFrameSetTextAlignment(frame, textAlignment)
-            end
-        )
-    end
+    pcall(function ()
+            japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
+        end
+    )
+    pcall(function ()
+            japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
+            japi.DzFrameSetTextAlignment(frame, textAlignment)
+        end
+    )
 end
 function ____exports.applyDzTextFontAndCenterAlignment(self, frame, fontScale, fontFile, fontFlag)
     if fontFile == nil then
@@ -168,17 +164,11 @@ function ____exports.createTextFrameFillBackdrop(self, backdrop, name, text)
     if not tf or tf == 0 then
         return nil
     end
-    if type(japi.DzFrameClearAllPoints) == "function" then
-        pcall(function () return japi.DzFrameClearAllPoints(tf) end
-        )
-    end
-    if type(japi.DzFrameSetAllPoints) == "function" then
-        pcall(function () return japi.DzFrameSetAllPoints(tf, backdrop) end
-        )
-    end
-    if type(japi.DzFrameSetText) == "function" then
-        japi.DzFrameSetText(tf, text)
-    end
+    pcall(function () return japi.DzFrameClearAllPoints(tf) end
+    )
+    pcall(function () return japi.DzFrameSetAllPoints(tf, backdrop) end
+    )
+    japi.DzFrameSetText(tf, text)
     return tf
 end
 --- Tab 标签：`TEXT` 铺满背景 + 居中 + 指定 Tab 字号。
@@ -208,26 +198,18 @@ function ____exports.layoutGlueTextButtonOverBackdrop(self, backdrop, button)
     if not backdrop or backdrop == 0 or not button or button == 0 then
         return
     end
-    if type(japi.DzFrameSetParent) == "function" then
-        pcall(function () return japi.DzFrameSetParent(button, backdrop) end
-        )
-    end
-    if type(japi.DzFrameClearAllPoints) == "function" then
-        pcall(function () return japi.DzFrameClearAllPoints(button) end
-        )
-    end
-    if type(japi.DzFrameSetAllPoints) == "function" then
-        pcall(function () return japi.DzFrameSetAllPoints(button, backdrop) end
-        )
-    end
+    pcall(function () return japi.DzFrameSetParent(button, backdrop) end
+    )
+    pcall(function () return japi.DzFrameClearAllPoints(button) end
+    )
+    pcall(function () return japi.DzFrameSetAllPoints(button, backdrop) end
+    )
 end
 --- 透明命中层：铺满背景后清空按钮字并 `alpha=0`（文案由同背景的 `TEXT` 负责）。
 function ____exports.setupTransparentGlueHitLayer(self, backdrop, button)
     ____exports.layoutGlueTextButtonOverBackdrop(nil, backdrop, button)
     setButtonText(nil, button, "")
-    if type(japi.DzFrameSetAlpha) == "function" then
-        pcall(function () return japi.DzFrameSetAlpha(button, 0) end
-        )
-    end
+    pcall(function () return japi.DzFrameSetAlpha(button, 0) end
+    )
 end
 return ____exports

@@ -55,9 +55,7 @@ export function SetCinematicSceneBJ(
 ): void {
     jglobals.bj_cineSceneLastSound = soundHandle;
     PlaySoundBJ(soundHandle);
-    if (typeof jass.SetCinematicScene === "function") {
-        jass.SetCinematicScene(portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration);
-    }
+    jass.SetCinematicScene(portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration);
 }
 
 export function DoTransmissionBasicsXYBJ(
@@ -73,19 +71,13 @@ export function DoTransmissionBasicsXYBJ(
     const hang = bj_TRANSMISSION_PORT_HANGTIME;
     SetCinematicSceneBJ(soundHandle, unitId, color, unitName, message, duration + hang, duration);
 
-    if (unitId !== 0 && typeof jass.PingMinimap === "function") {
+    if (unitId !== 0) {
         jass.PingMinimap(x, y, bj_TRANSMISSION_PING_TIME);
     }
 }
 
 export function TryInitCinematicBehaviorBJ(): void {
     if (jglobals.bj_cineSceneBeingSkipped != null) return;
-    if (
-        typeof jass.CreateTrigger !== "function" ||
-        typeof jass.TriggerRegisterPlayerEvent !== "function" ||
-        typeof jass.TriggerAddAction !== "function" ||
-        typeof jass.Player !== "function"
-    ) return;
 
     jglobals.bj_cineSceneBeingSkipped = jass.CreateTrigger();
     for (let index = 0; index < bj_MAX_PLAYERS; index++) {
@@ -96,9 +88,7 @@ export function TryInitCinematicBehaviorBJ(): void {
         );
     }
 
-    if (typeof CancelCineSceneBJ === "function") {
-        jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ);
-    }
+    jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ);
 }
 
 export function TransmissionFromUnitWithNameBJ(

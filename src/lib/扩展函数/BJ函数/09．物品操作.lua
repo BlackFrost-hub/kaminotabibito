@@ -16,9 +16,6 @@ function ____exports.UnitRemoveItemSwapped(self, whichItem, whichHero)
     if whichItem == nil or whichHero == nil then
         return
     end
-    if type(jass.UnitRemoveItem) ~= "function" then
-        return
-    end
     ____exports.bj_lastRemovedItem = whichItem
     jass.UnitRemoveItem(whichHero, whichItem)
 end

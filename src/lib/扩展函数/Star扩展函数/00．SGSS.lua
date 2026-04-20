@@ -39,14 +39,14 @@ local function hashHandle(self)
     return ____pick_result_0_1_2_3
 end
 local function h2i(self, u)
-    return type(jass.GetHandleId) == "function" and (jass.GetHandleId(u) or 0) or 0
+    return jass.GetHandleId(u) or 0
 end
 local function sh(self, name)
-    return type(jass.StringHash) == "function" and (jass.StringHash(name) or 0) or 0
+    return jass.StringHash(name) or 0
 end
 local function loadReal(self, u, key)
     local hh = hashHandle(nil)
-    if not hh or type(jass.LoadReal) ~= "function" then
+    if not hh then
         return 0
     end
     return jass.LoadReal(
@@ -57,7 +57,7 @@ local function loadReal(self, u, key)
 end
 local function saveReal(self, u, key, value)
     local hh = hashHandle(nil)
-    if not hh or type(jass.SaveReal) ~= "function" then
+    if not hh then
         return
     end
     jass.SaveReal(
@@ -95,44 +95,32 @@ local function setAbilityDataA(self, u, raw, value)
     if not u or code == 0 then
         return
     end
-    if type(jass.GetUnitAbilityLevel) == "function" and type(jass.UnitAddAbility) == "function" and jass.GetUnitAbilityLevel(u, code) == 0 then
+    if jass.GetUnitAbilityLevel(u, code) == 0 then
         jass.UnitAddAbility(u, code)
     end
-    if type(japi.EXGetUnitAbility) == "function" and type(japi.EXSetAbilityDataReal) == "function" then
-        local abil = japi.EXGetUnitAbility(u, code)
-        if abil then
-            japi.EXSetAbilityDataReal(abil, 1, 108, value)
-        end
+    local abil = japi.EXGetUnitAbility(u, code)
+    if abil then
+        japi.EXSetAbilityDataReal(abil, 1, 108, value)
     end
-    if type(jass.IncUnitAbilityLevel) == "function" then
-        jass.IncUnitAbilityLevel(u, code)
-    end
-    if type(jass.DecUnitAbilityLevel) == "function" then
-        jass.DecUnitAbilityLevel(u, code)
-    end
+    jass.IncUnitAbilityLevel(u, code)
+    jass.DecUnitAbilityLevel(u, code)
 end
 local function setAbilityDataABC(self, u, raw, a, b, c)
     local code = resolveAbilityCode(nil, raw)
     if not u or code == 0 then
         return
     end
-    if type(jass.GetUnitAbilityLevel) == "function" and type(jass.UnitAddAbility) == "function" and jass.GetUnitAbilityLevel(u, code) == 0 then
+    if jass.GetUnitAbilityLevel(u, code) == 0 then
         jass.UnitAddAbility(u, code)
     end
-    if type(japi.EXGetUnitAbility) == "function" and type(japi.EXSetAbilityDataReal) == "function" then
-        local abil = japi.EXGetUnitAbility(u, code)
-        if abil then
-            japi.EXSetAbilityDataReal(abil, 1, 110, a)
-            japi.EXSetAbilityDataReal(abil, 1, 108, b)
-            japi.EXSetAbilityDataReal(abil, 1, 109, c)
-        end
+    local abil = japi.EXGetUnitAbility(u, code)
+    if abil then
+        japi.EXSetAbilityDataReal(abil, 1, 110, a)
+        japi.EXSetAbilityDataReal(abil, 1, 108, b)
+        japi.EXSetAbilityDataReal(abil, 1, 109, c)
     end
-    if type(jass.IncUnitAbilityLevel) == "function" then
-        jass.IncUnitAbilityLevel(u, code)
-    end
-    if type(jass.DecUnitAbilityLevel) == "function" then
-        jass.DecUnitAbilityLevel(u, code)
-    end
+    jass.IncUnitAbilityLevel(u, code)
+    jass.DecUnitAbilityLevel(u, code)
 end
 local function setAtk(self, u, v)
     local key = sh(nil, "攻击")
@@ -153,37 +141,19 @@ local function setState3(self, u, s, a, i)
     local ns = loadReal(nil, u, ks) + s
     local na = loadReal(nil, u, ka) + a
     local ni = loadReal(nil, u, ki) + i
-    if type(jass.IsUnitType) == "function" and type(jass.UNIT_TYPE_HERO) ~= "nil" and jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
-        if type(jass.GetHeroStr) == "function" and type(jass.SetHeroStr) == "function" then
-            local cur = jass.GetHeroStr(u, true) or 0
-            jass.SetHeroStr(u, cur + s, true)
-        end
-        if type(jass.GetHeroAgi) == "function" and type(jass.SetHeroAgi) == "function" then
-            local cur = jass.GetHeroAgi(u, true) or 0
-            jass.SetHeroAgi(u, cur + a, true)
-        end
-        if type(jass.GetHeroInt) == "function" and type(jass.SetHeroInt) == "function" then
-            local cur = jass.GetHeroInt(u, true) or 0
-            jass.SetHeroInt(u, cur + i, true)
-        end
-    else
-        setAbilityDataABC(
-            nil,
-            u,
-            "ASG3",
-            ns,
-            na,
-            ni
-        )
-    end
+    setAbilityDataABC(
+        nil,
+        u,
+        "ASG3",
+        ns,
+        na,
+        ni
+    )
     saveReal(nil, u, ks, ns)
     saveReal(nil, u, ka, na)
     saveReal(nil, u, ki, ni)
 end
 local function setHp(self, u, v)
-    if type(jass.GetUnitState) ~= "function" or type(jass.SetUnitState) ~= "function" then
-        return
-    end
     local key = sh(nil, "生命")
     local oldAdd = loadReal(nil, u, key)
     local oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
@@ -198,9 +168,6 @@ local function setHp(self, u, v)
     saveReal(nil, u, key, newAdd)
 end
 local function setMp(self, u, v)
-    if type(jass.GetUnitState) ~= "function" or type(jass.SetUnitState) ~= "function" then
-        return
-    end
     local key = sh(nil, "法力")
     local oldAdd = loadReal(nil, u, key)
     local oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA)
@@ -276,7 +243,7 @@ function ____exports.SGSS_SetStatePercentumEX2(self, u, id, v)
     local hpAdd = sh(nil, "生命值百分比加成增值")
     local mpPct = sh(nil, "法力值百分比加成")
     local mpAdd = sh(nil, "法力值百分比加成增值")
-    if id == 7 and type(jass.GetUnitState) == "function" then
+    if id == 7 then
         local pv = loadReal(nil, u, hpPct)
         local av = loadReal(nil, u, hpAdd)
         local base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av
@@ -288,7 +255,7 @@ function ____exports.SGSS_SetStatePercentumEX2(self, u, id, v)
             saveReal(nil, u, hpAdd, nav)
             setHp(nil, u, nav)
         end
-    elseif id == 8 and type(jass.GetUnitState) == "function" then
+    elseif id == 8 then
         local pv = loadReal(nil, u, mpPct)
         local av = loadReal(nil, u, mpAdd)
         local base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av

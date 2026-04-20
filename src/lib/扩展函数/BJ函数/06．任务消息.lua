@@ -173,25 +173,20 @@ if ____jglobals_bj_questWarningSound_33 == nil then
 end
 local bj_questWarningSound = ____jglobals_bj_questWarningSound_33
 function ____exports.QuestMessageBJ(self, f, messageType, message)
-    if type(jass.IsPlayerInForce) ~= "function" or type(jass.GetLocalPlayer) ~= "function" or not jass.IsPlayerInForce(
+    if not jass.IsPlayerInForce(
         jass.GetLocalPlayer(),
         f
     ) then
         return
     end
     local lp = jass.GetLocalPlayer()
-    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
     local function play(____, s)
-        if s ~= nil and type(jass.StartSound) == "function" then
+        if s ~= nil then
             jass.StartSound(s)
         end
     end
     local function flash()
-        if type(jass.FlashQuestDialogButton) == "function" then
-            jass.FlashQuestDialogButton()
-        end
+        jass.FlashQuestDialogButton()
     end
     if messageType == bj_QUESTMESSAGE_DISCOVERED then
         jass.DisplayTimedTextToPlayer(

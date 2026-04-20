@@ -34,7 +34,6 @@ const { YDLocalExecuteTrigger } = require("lib.扩展函数.YDWE函数.04．YDWE
  * 这样后续的 YDLocal5Get 才能正确读取到 JASS 端传递的参数
  */
 export function ydlStes_syncTriggerStep(_self: any): void {
-  if (typeof jass.GetTriggeringTrigger !== "function") return;
   const trg = jass.GetTriggeringTrigger();
   if (trg == null || trg === 0) return;
   
@@ -118,8 +117,7 @@ export function ydlStes_skeyIndex(_self: any): number {
   if (typeof jglobals.STES_skey_index === "number" && jglobals.STES_skey_index !== 0) {
     return jglobals.STES_skey_index;
   }
-  if (typeof jass.StringHash === "function") return jass.StringHash("index") as number;
-  return 0;
+  return jass.StringHash("index") as number;
 }
 
 /** STES_GetTable 后 Register（与任务/Buff 桥接写法一致） */

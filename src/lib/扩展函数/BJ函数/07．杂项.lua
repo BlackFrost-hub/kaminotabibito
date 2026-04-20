@@ -6,14 +6,11 @@ function ____exports.ModifyGateBJ(self, gateOperation, d)
     if not d then
         return
     end
-    if type(jass.GetDestructableLife) ~= "function" or type(jass.GetDestructableMaxLife) ~= "function" or type(jass.SetDestructableAnimation) ~= "function" then
-        return
-    end
     local CLOSE = jglobals.bj_GATEOPERATION_CLOSE
     local OPEN = jglobals.bj_GATEOPERATION_OPEN
     local DESTROY = jglobals.bj_GATEOPERATION_DESTROY
     if gateOperation == CLOSE then
-        if jass.GetDestructableLife(d) <= 0 and type(jass.DestructableRestoreLife) == "function" then
+        if jass.GetDestructableLife(d) <= 0 then
             jass.DestructableRestoreLife(
                 d,
                 jass.GetDestructableMaxLife(d),
@@ -24,31 +21,26 @@ function ____exports.ModifyGateBJ(self, gateOperation, d)
         return
     end
     if gateOperation == OPEN then
-        if jass.GetDestructableLife(d) > 0 and type(jass.KillDestructable) == "function" then
+        if jass.GetDestructableLife(d) > 0 then
             jass.KillDestructable(d)
         end
         jass.SetDestructableAnimation(d, "death alternate")
         return
     end
     if gateOperation == DESTROY then
-        if jass.GetDestructableLife(d) > 0 and type(jass.KillDestructable) == "function" then
+        if jass.GetDestructableLife(d) > 0 then
             jass.KillDestructable(d)
         end
         jass.SetDestructableAnimation(d, "death")
     end
 end
 function ____exports.GetUnitsInRectMatching(self, r, filter)
-    if type(jass.CreateGroup) ~= "function" then
-        return nil
-    end
     local g = jass.CreateGroup()
     if not g then
         return nil
     end
-    if type(jass.GroupEnumUnitsInRect) == "function" then
-        jass.GroupEnumUnitsInRect(g, r, filter)
-    end
-    if filter and type(jass.DestroyBoolExpr) == "function" then
+    jass.GroupEnumUnitsInRect(g, r, filter)
+    if filter then
         jass.DestroyBoolExpr(filter)
     end
     return g
@@ -56,10 +48,8 @@ end
 function ____exports.ForGroupBJ(self, whichGroup, callback)
     local wantDestroy = not not jglobals.bj_wantDestroyGroup
     jglobals.bj_wantDestroyGroup = false
-    if type(jass.ForGroup) == "function" then
-        jass.ForGroup(whichGroup, callback)
-    end
-    if wantDestroy and type(jass.DestroyGroup) == "function" then
+    jass.ForGroup(whichGroup, callback)
+    if wantDestroy then
         jass.DestroyGroup(whichGroup)
     end
 end
@@ -70,10 +60,7 @@ function ____exports.GetRandomDirectionDeg(self)
     return jass.GetRandomReal(0, 360)
 end
 function ____exports.GetSpellAbilityId(self)
-    if type(jass.GetSpellAbilityId) == "function" then
-        return jass.GetSpellAbilityId()
-    end
-    return 0
+    return jass.GetSpellAbilityId()
 end
 function ____exports.OrderIdToString(self, orderId)
     local c1 = orderId % 256
@@ -84,11 +71,8 @@ function ____exports.OrderIdToString(self, orderId)
 end
 ____exports.lastCreatedEffect = nil
 function ____exports.AddSpecialEffectTargetUnitBJ(self, attachPointName, targetWidget, modelName)
-    if type(jass.AddSpecialEffectTarget) == "function" then
-        ____exports.lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName)
-        return ____exports.lastCreatedEffect
-    end
-    return nil
+    ____exports.lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName)
+    return ____exports.lastCreatedEffect
 end
 function ____exports.OperatorDegreeMultiply(self, a, b)
     return a * b

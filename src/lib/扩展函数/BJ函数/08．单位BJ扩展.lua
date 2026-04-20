@@ -11,22 +11,13 @@ local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 function ____exports.String2UnitIdBJ(self, unitIdString)
-    if type(jass.UnitId) == "function" then
-        return jass.UnitId(unitIdString)
-    end
-    return stringToFourCC(nil, unitIdString)
+    return jass.UnitId(unitIdString)
 end
 function ____exports.GetIssuedOrderIdBJ(self)
-    if type(jass.GetIssuedOrderId) == "function" then
-        return jass.GetIssuedOrderId()
-    end
-    return 0
+    return jass.GetIssuedOrderId()
 end
 function ____exports.GetKillingUnitBJ(self)
-    if type(jass.GetKillingUnit) == "function" then
-        return jass.GetKillingUnit()
-    end
-    return nil
+    return jass.GetKillingUnit()
 end
 function ____exports.UnitSuspendDecayBJ(self, suspend, unit)
     jass.UnitSuspendDecay(unit, suspend)
@@ -40,9 +31,6 @@ function ____exports.SelectUnitSingle(self, unit)
 end
 function ____exports.SelectGroupBJ(self, group)
     jass.ClearSelection()
-    if type(jass.ForGroup) ~= "function" then
-        return
-    end
     jass.ForGroup(
         group,
         function()
@@ -69,10 +57,7 @@ function ____exports.IssueTrainOrderByIdBJ(self, unit, id)
     return jass.IssueImmediateOrderById(unit, id)
 end
 function ____exports.GroupTrainOrderByIdBJ(self, group, id)
-    if type(jass.GroupImmediateOrderById) == "function" then
-        return jass.GroupImmediateOrderById(group, id)
-    end
-    return false
+    return jass.GroupImmediateOrderById(group, id)
 end
 function ____exports.IssueUpgradeOrderByIdBJ(self, unit, id)
     return jass.IssueUpgradeOrderById(unit, id)
@@ -147,10 +132,7 @@ function ____exports.GetTransportUnitBJ(self)
     return nil
 end
 function ____exports.GetLoadedUnitBJ(self)
-    if type(jass.GetLoadedUnit) == "function" then
-        return jass.GetLoadedUnit()
-    end
-    return nil
+    return jass.GetLoadedUnit()
 end
 function ____exports.IsUnitInTransportBJ(self, unit, transport)
     return jass.IsUnitInTransport(unit, transport)

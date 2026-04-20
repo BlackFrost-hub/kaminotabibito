@@ -66,10 +66,7 @@ function skeyIndex(): number {
   if (typeof jglobals.STES_skey_index === "number" && jglobals.STES_skey_index !== 0) {
     return jglobals.STES_skey_index;
   }
-  if (typeof jass.StringHash === "function") {
-    return jass.StringHash("index");
-  }
-  return 0;
+  return jass.StringHash("index");
 }
 
 /**

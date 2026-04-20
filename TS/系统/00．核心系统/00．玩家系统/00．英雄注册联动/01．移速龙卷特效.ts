@@ -23,19 +23,18 @@ function isValidHandle(handle: any): boolean {
 }
 
 function getHandleId(handle: any): number {
-  if (!isValidHandle(handle) || typeof jass.GetHandleId !== "function") return 0;
+  if (!isValidHandle(handle)) return 0;
   return (jass.GetHandleId(handle) as number) || 0;
 }
 
 function createTornadoEffect(whichUnit: any): any {
-  if (typeof jass.AddSpecialEffectTarget !== "function") return null;
   return jass.AddSpecialEffectTarget(C.TORNADO_EFFECT_MODEL, whichUnit, C.TORNADO_ATTACH_POINT);
 }
 
 function destroyTornadoEffect(effect: any): void {
   if (!isValidHandle(effect)) return;
-  if (typeof DzUnbindEffect === "function") DzUnbindEffect(effect);
-  if (typeof jass.DestroyEffect === "function") jass.DestroyEffect(effect);
+  DzUnbindEffect(effect);
+  jass.DestroyEffect(effect);
 }
 
 function removeTrackedHero(heroId: number): void {
@@ -63,8 +62,6 @@ export function registerMoveSpeedTornadoHero(whichHero: any): void {
  * 这里只处理“已被桥接模块确认过”的英雄，不再自己扫描全局英雄组。
  */
 export function syncTornadoSpeedEffectsByRegisteredHeroes(): void {
-  if (typeof jass.GetUnitMoveSpeed !== "function" || typeof jass.IsUnitType !== "function") return;
-
   for (const [heroId, hero] of trackedHeroes) {
     if (!isValidHandle(hero) || jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) === true) {
       removeTrackedHero(heroId);

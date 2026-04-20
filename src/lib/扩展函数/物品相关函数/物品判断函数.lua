@@ -2,7 +2,7 @@
 local ____exports = {}
 local jass = require("jass.common")
 function ____exports.UnitHasItemOfTypeBJ(self, whichUnit, itemTypeId)
-    if not whichUnit or type(jass.UnitItemInSlot) ~= "function" or type(jass.GetItemTypeId) ~= "function" then
+    if not whichUnit then
         return false
     end
     do
@@ -18,7 +18,7 @@ function ____exports.UnitHasItemOfTypeBJ(self, whichUnit, itemTypeId)
     return false
 end
 function ____exports.UnitGetItemByTypeId(self, whichUnit, itemTypeId)
-    if not whichUnit or type(jass.UnitItemInSlot) ~= "function" or type(jass.GetItemTypeId) ~= "function" then
+    if not whichUnit then
         return nil
     end
     do
@@ -34,7 +34,7 @@ function ____exports.UnitGetItemByTypeId(self, whichUnit, itemTypeId)
     return nil
 end
 function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
-    if not whichUnit or type(jass.UnitItemInSlot) ~= "function" or type(jass.GetItemTypeId) ~= "function" then
+    if not whichUnit then
         return 0
     end
     do
@@ -57,7 +57,7 @@ function ____exports.GetItemOfTypeFromUnitBJ(self, whichUnit, itemId)
     return jass.UnitItemInSlot(whichUnit, index - 1)
 end
 function ____exports.GetItemTypeTotalCountByChargesBJ(self, whichUnit, itemId)
-    if not whichUnit or type(jass.UnitItemInSlot) ~= "function" or type(jass.GetItemTypeId) ~= "function" then
+    if not whichUnit then
         return 0
     end
     local total = 0
@@ -72,7 +72,7 @@ function ____exports.GetItemTypeTotalCountByChargesBJ(self, whichUnit, itemId)
                 if jass.GetItemTypeId(item) ~= itemId then
                     goto __continue22
                 end
-                local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
+                local ch = jass.GetItemCharges(item)
                 total = total + (ch > 0 and ch or 1)
             end
             ::__continue22::
@@ -104,24 +104,18 @@ function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, ne
                 if jass.GetItemTypeId(item) ~= itemId then
                     goto __continue29
                 end
-                local ch = type(jass.GetItemCharges) == "function" and jass.GetItemCharges(item) or 0
+                local ch = jass.GetItemCharges(item)
                 if ch > 0 then
                     if ch > remain then
-                        if type(jass.SetItemCharges) == "function" then
-                            jass.SetItemCharges(item, ch - remain)
-                        end
+                        jass.SetItemCharges(item, ch - remain)
                         remain = 0
                     else
                         remain = remain - ch
-                        if type(jass.RemoveItem) == "function" then
-                            jass.RemoveItem(item)
-                        end
+                        jass.RemoveItem(item)
                     end
                 else
                     remain = remain - 1
-                    if type(jass.RemoveItem) == "function" then
-                        jass.RemoveItem(item)
-                    end
+                    jass.RemoveItem(item)
                 end
             end
             ::__continue29::
@@ -131,7 +125,7 @@ function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, ne
     return remain <= 0
 end
 function ____exports.TryGiveItemToUnitBJ(self, targetUnit, item)
-    if not targetUnit or not item or type(jass.UnitAddItem) ~= "function" then
+    if not targetUnit or not item then
         return false
     end
     local ok = jass.UnitAddItem(targetUnit, item)
@@ -144,24 +138,9 @@ function ____exports.ReturnItemToHeroOrDropBJ(self, item, fromUnit, hero)
     if ____exports.TryGiveItemToUnitBJ(nil, hero, item) then
         return "added"
     end
-    if type(jass.UnitRemoveItem) ~= "function" or type(jass.SetItemPosition) ~= "function" then
-        return "failed"
-    end
     jass.UnitRemoveItem(fromUnit, item)
-    local ____temp_0
-    if type(jass.GetUnitX) == "function" then
-        ____temp_0 = jass.GetUnitX(hero)
-    else
-        ____temp_0 = 0
-    end
-    local x = ____temp_0
-    local ____temp_1
-    if type(jass.GetUnitY) == "function" then
-        ____temp_1 = jass.GetUnitY(hero)
-    else
-        ____temp_1 = 0
-    end
-    local y = ____temp_1
+    local x = jass.GetUnitX(hero)
+    local y = jass.GetUnitY(hero)
     jass.SetItemPosition(item, x, y)
     return "dropped"
 end

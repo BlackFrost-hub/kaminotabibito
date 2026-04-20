@@ -12,8 +12,8 @@ const { getChestConfigByString } = require("系统.06．经济系统.00．宝箱
   getChestConfigByString: (type: string) => ChestTypeConfig | undefined;
 };
 
-const { itemsData } = require("系统.02．物品系统.00．物品数据") as {
-  itemsData: Record<string, { score?: number }>;
+const { items } = require("系统.02．物品系统.01．装备数据") as {
+  items: Record<string, { score?: number }>;
 };
 
 // ==========================================================================================
@@ -33,8 +33,10 @@ function parseItemPool(poolStr: string): ItemPoolEntry[] {
     const trimmed = part.trim();
     if (!trimmed) continue;
     if (trimmed.includes(":")) {
-      const [id, weightStr] = trimmed.split(":");
-      entries.push({ id: id.trim(), weight: parseFloat(weightStr) || 1 });
+      const splitParts = trimmed.split(":");
+      const id = (splitParts[0] ?? "").trim();
+      const weightStr = splitParts[1] ?? "";
+      entries.push({ id, weight: parseFloat(weightStr) || 1 });
     } else {
       entries.push({ id: trimmed, weight: 1 });
     }
@@ -71,7 +73,7 @@ function drawByEqualWithoutRepeat(pool: ItemPoolEntry[], picks: number): string[
 
 function filterItemsByScore(min: number, max: number): string[] {
   const result: string[] = [];
-  for (const [id, data] of Object.entries(itemsData)) {
+  for (const [id, data] of Object.entries(items)) {
     const score = data?.score;
     if (score != null && score >= min && score <= max) {
       result.push(id);
@@ -123,7 +125,7 @@ function executeDropByMode(dropMode: DropMode, picks: number): string[] {
       let pool = parseItemPool(dropMode.items);
       if (pool.length > 0) {
         pool = pool.filter(entry => {
-          const score = itemsData[entry.id]?.score;
+          const score = items[entry.id]?.score;
           if (score == null) return false;
           return score >= dropMode.range.min && score <= dropMode.range.max;
         });
