@@ -256,12 +256,10 @@ function startRefreshTimer(): void {
 - 在 `sync=true` 回调里依赖“本地上下文闭包句柄”（如选择事件当时捕获的 `hero/unit/player`）。
 - **在 `sync=true` 回调里做非幂等、会改变“共享逻辑状态”的操作**（典型：`queue.shift()` / `push()` / 依赖执行顺序的计数）。各端进入回调的**时刻**可能不同，与后台 timer 等交错后，两端最终状态不一致 → desync。队列、任务回调表等**只允许在唯一可信的同步路径里改**（例如 `DzFrameSetScriptByCode(..., sync=true)` 的按钮回调）。另：**避免在 sync=true 里调用带 `GetLocalPlayer()` 分路且会 `TimerStart` 的函数**（如 `playEntry` / `advanceDialog`），否则两端 timer 启动次数可能不一致。
 
-### 对话框：`~` 跳过 + 接受/拒绝（2026-04 已验证）
+### 对话框：`~` 与 `DzClickFrame`（2026-04 备忘）
 
-- **问题**：在 **sync=true** 的键盘回调里 `shift` 队列（哪怕“全房都执行”），仍易 desync；二分结论：**不要在任何 sync=true 里改队列**。
-- **做法**：**`~` 键 `sync=false`**，只在按键端做纯 UI（停打字机、本地显示任务文案与按钮），**不改队列**。**接受/拒绝** 保持 **`sync=true`**；解析时用**整队扫描**找第一个任务行（不要求队首），用 **`splice(0, questIdx + 1)`** 一次删掉「任务行及之前所有普通行」再 `onAccept`/`onReject`。两端从同一队列快照出发，只在这一条同步路径里改队列，一致。
-- **`sync=false` 键盘 + `sync=true` 按钮是否冲突**：不冲突。按 `~` 前后各端**队列仍相同**；只有点按钮时全房一起改队列并执行业务，与未按 `~` 直接点接受等价。
-- **绿块**：任务行常无立绘贴图；若先 `applyPortraitFrames` 再 `showDialogFrames(true)`，后者会把 `frames[101~103]` 再显示出来 → 绿色占位。**顺序**：先 `showDialogFrames`，再 `applyPortraitFrames`（见 `01．对话框渲染核心` `skipDialogLocal`）。
+- **`DzClickFrame` 不是本机假点击**：若背景帧用 `frameSetScriptByCode(..., sync=true)`，一次点击会走联机 UI 同步，全房跑同一条回调（如 `dialogPanelHitCallback` → `advanceDialog`），与网页里 `element.click()` 完全不是一类成本。
+- **`~` 与连点**：`registerKeyEventByCode` 的 `sync` 形参无效（仍全房触发）；**禁止**单帧 `while` 连发多次 `DzClickFrame`（旧「一键清队列」会塞满同步/主线程 → 卡顿掉线）。多句快进用 Lua 裁队列；裁完刷新 UI 须**先 `showDialogFrames(true)` 再 `applyPortraitFrames`**（否则空立绘槽全开呈绿杠）；共享 state 对齐用 `DzGetTriggerKeyPlayer`，勿用 `dzGetLocalPlayer` 找对白队列。
 
 ### 推荐实践（本项目已踩坑验证）
 - 对任务按钮：初始化时全玩家预创建帧并预注册 `sync=true` 回调；点击时仅切换“当前任务回调上下文”。

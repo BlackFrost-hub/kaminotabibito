@@ -9,6 +9,18 @@ import { QuestType } from "../01．任务数据";
 
 const jass = require("jass.common") as any;
 
+/**
+ * `DzTriggerRegisterKeyEventTrg` 内部 sync=true：全客户端同一时刻都会跑回调。
+ * 任务面板是纯本地 UI，仅当「按下键的玩家 === 本机操控玩家」时才处理（见 dzapi/ui-frame-types 键盘 sync 规则）。
+ */
+function isTriggerKeyForLocalPlayer(triggerPlayer: any): boolean {
+  const lp = jass.GetLocalPlayer();
+  if (triggerPlayer == null || lp == null) return false;
+  const getPid = (jass as any).GetPlayerId as ((p: any) => number) | undefined;
+  if (getPid == null) return false;
+  return getPid(triggerPlayer) === getPid(lp);
+}
+
 export interface RegisterTaskUIHotkeysOpts {
   /** 来自硬件输入模块，需为函数才会注册 */
   registerKeyDown: any;
@@ -34,8 +46,7 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   // J：本地玩家按下时切换面板，并尽量同步「当前操作玩家」id（供 UI 逻辑使用）
   registerKeyDown(KEY.J, (player: any) => {
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
+      if (!isTriggerKeyForLocalPlayer(player)) return;
 
       const getPid = (jass as any).GetPlayerId;
       if (getPid && player) setCurrentPlayerId(getPid(player));
@@ -45,10 +56,9 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   });
 
   // 1 → 主线
-  registerKeyDown(KEY_NUM.K1, (_player: any) => {
+  registerKeyDown(KEY_NUM.K1, (player: any) => {
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
+      if (!isTriggerKeyForLocalPlayer(player)) return;
       if (!isVisible()) return;
       onClickSound();
       onSwitchCategory(QuestType.MAIN);
@@ -56,10 +66,9 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   });
 
   // 2 → 支线
-  registerKeyDown(KEY_NUM.K2, (_player: any) => {
+  registerKeyDown(KEY_NUM.K2, (player: any) => {
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
+      if (!isTriggerKeyForLocalPlayer(player)) return;
       if (!isVisible()) return;
       onClickSound();
       onSwitchCategory(QuestType.SIDE);
@@ -67,10 +76,9 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   });
 
   // 3 → 小任务/日常
-  registerKeyDown(KEY_NUM.K3, (_player: any) => {
+  registerKeyDown(KEY_NUM.K3, (player: any) => {
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
+      if (!isTriggerKeyForLocalPlayer(player)) return;
       if (!isVisible()) return;
       onClickSound();
       onSwitchCategory(QuestType.DAILY);

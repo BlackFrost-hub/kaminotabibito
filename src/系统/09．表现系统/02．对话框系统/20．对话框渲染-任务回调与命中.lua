@@ -19,6 +19,7 @@ local resetDialogActiveFlagsKeepOnFinish = ____05_FF0E_5BF9_8BDD_6846_4E1A_52A1_
 local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
 local getActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.getActivePlayerId
 local resetActivePlayerIdIfMatch = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.resetActivePlayerIdIfMatch
+local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActivePlayerId
 local ____18_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27 = require("系统.09．表现系统.02．对话框系统.18．对话框渲染-创建帧")
 local setDialogPanelHitBinder = ____18_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27.setDialogPanelHitBinder
 local ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001 = require("系统.09．表现系统.02．对话框系统.17．对话框渲染-Dz与状态")
@@ -37,11 +38,14 @@ local g_states = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_stat
 local japi = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.japi
 local KEY_SKIP_DIALOG = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.KEY_SKIP_DIALOG
 local MAX_PLAYERS = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.MAX_PLAYERS
+local ____02_FF0E_6253_5B57_673A_6548_679C = require("系统.09．表现系统.02．对话框系统.02．打字机效果")
+local stringLengthCompat = ____02_FF0E_6253_5B57_673A_6548_679C.stringLengthCompat
 local ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406 = require("系统.09．表现系统.02．对话框系统.19．对话框渲染-播放与状态管理")
 local advanceDialog = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.advanceDialog
 local showDialogFrames = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.showDialogFrames
 local skipTyping = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.skipTyping
 local playEntry = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.playEntry
+local jass = require("jass.common")
 local function resolveQuestCallbackByTriggerPlayer(self)
     --- sync=true 全房执行：扫描整个队列（不只看队首）找第一个任务行。
     -- ~ 键改为 sync=false 纯本地 UI 快进，队列不被修改，任务行可能不在队首。
@@ -265,36 +269,92 @@ function ____exports.bindDialogPanelHitFrame(self, hitFrame)
         true
     )
 end
---- ~ 键：sync=false，仅在按键玩家端执行，用 dzGetLocalPlayer() 定位本地状态。
--- 
--- - 有任务行：本地快进到任务页（不改队列，接受/拒绝走 sync=true）。
--- - 仅普通行：
---     打字未完 → skipTyping 补全、进入"等点击"。
---     已等点击 → 用 DzClickFrame 模拟点击对话框背景帧，触发 dialogPanelHitCallback
---               （注册时 sync=true），让全房同步推进队列。连续模拟点击直到队列清空。
-local function skipDialogLocal(self)
-    local localPlayer = dzGetLocalPlayer(nil)
-    local state
-    do
-        local i = 0
-        while i < MAX_PLAYERS do
-            do
-                local st = g_states[i + 1]
-                if not st or #st.queue == 0 then
-                    goto __continue50
-                end
-                if dzPlayer(nil, i) == localPlayer then
-                    state = st
-                    break
-                end
-            end
-            ::__continue50::
-            i = i + 1
-        end
-    end
-    if not state then
+--- 每玩家独立 ~ 键冷却：防止疯狂连按导致提交/日后谈对白链上引擎调用堆叠 → 即便已修 desync，
+-- 也能避免"对话框都还没渲染完就又被 ~ 推进下一步"的 UI 紊乱。
+-- 数组长度 MAX_PLAYERS，sync=true 回调里对称读写，所有客户端状态一致。
+local SKIP_KEY_COOLDOWN_SECONDS = 0.08
+local g_skipKeyCooldown = {}
+local function startSkipKeyCooldown(self, pid)
+    if pid < 0 or pid >= MAX_PLAYERS then
         return
     end
+    g_skipKeyCooldown[pid + 1] = true
+    local t = jass.CreateTimer()
+    jass.TimerStart(
+        t,
+        SKIP_KEY_COOLDOWN_SECONDS,
+        false,
+        function()
+            g_skipKeyCooldown[pid + 1] = false
+            jass.PauseTimer(t)
+            jass.DestroyTimer(t)
+        end
+    )
+end
+--- 多句纯对白：一次 ~ 将队列裁剪为**只保留最后一句**（全房对称 Lua），并显示全文 +「点击继续」。
+-- 不使用 DzClickFrame 连点，避免单帧 sync 堆叠；**关闭本段对话**仍需再按 ~ 或点背景（单次 DzClickFrame）。
+local function fastForwardQueueToLastNormalLine(self, state)
+    if #state.queue <= 1 then
+        return
+    end
+    local last = state.queue[#state.queue]
+    if not last or last.isQuest then
+        return
+    end
+    state.queue = {last}
+    showQuestButtons(
+        nil,
+        state,
+        false,
+        dzGetLocalPlayer,
+        dzPlayer,
+        dzShow
+    )
+    dzShow(nil, state.frames[12], false)
+    dzTimerPause(nil, state.tickTimer)
+    local entry = state.queue[1]
+    state.strLen = stringLengthCompat(nil, entry.text)
+    state.strNow = state.strLen
+    state.waitingClick = true
+    state.clickCooldown = false
+    setActivePlayerId(nil, state.playerId)
+    dzSetFont(nil, state.frames[3], DEFAULT_FONT, entry.titleFontSize)
+    dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize)
+    dzSetText(nil, state.frames[3], entry.title)
+    local localPlayer = dzGetLocalPlayer(nil)
+    local targetPlayer = dzPlayer(nil, state.playerId)
+    if localPlayer == targetPlayer then
+        dzSetText(nil, state.frames[4], entry.text)
+    end
+    showDialogFrames(nil, state, true)
+    applyPortraitFrames(
+        nil,
+        entry,
+        state.frames,
+        dzSetTexture,
+        dzShow
+    )
+    if localPlayer == targetPlayer then
+        dzShow(nil, state.frames[12], true)
+    end
+end
+local function skipDialogLocal(self)
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
+    if not triggerPlayer then
+        return
+    end
+    local triggerPid = dzGetPlayerId(nil, triggerPlayer)
+    if triggerPid == nil or triggerPid < 0 or triggerPid >= MAX_PLAYERS then
+        return
+    end
+    if g_skipKeyCooldown[triggerPid + 1] then
+        return
+    end
+    local state = g_states[triggerPid + 1]
+    if not state or #state.queue == 0 then
+        return
+    end
+    startSkipKeyCooldown(nil, triggerPid)
     dzTimerPause(nil, state.tickTimer)
     local questIdx = findFirstQuestEntryIndex(nil, state)
     if questIdx >= 0 then
@@ -337,14 +397,20 @@ local function skipDialogLocal(self)
         )
         return
     end
+    if #state.queue > 1 then
+        fastForwardQueueToLastNormalLine(nil, state)
+        return
+    end
     if state.strNow < state.strLen then
         skipTyping(nil, state)
+        return
     end
-    local hitFrame = state.frames[5]
-    if hitFrame and hitFrame ~= 0 then
-        local guard = 0
-        while #state.queue > 0 and not state.queue[1].isQuest and guard < 256 do
-            guard = guard + 1
+    --- DzClickFrame：sync=true 帧脚本，全房对称 → `advanceDialog`。
+    -- **每次 ~ 至多一次**（等同鼠标点一下背景），避免单 tick 内连点 N 次。
+    local lp = dzGetLocalPlayer(nil)
+    if lp == triggerPlayer then
+        local hitFrame = state.frames[5]
+        if hitFrame and hitFrame ~= 0 and #state.queue > 0 and not state.queue[1].isQuest then
             japi.DzClickFrame(hitFrame)
         end
     end

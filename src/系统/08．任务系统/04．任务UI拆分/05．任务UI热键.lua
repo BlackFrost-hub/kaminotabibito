@@ -3,6 +3,19 @@ local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local jass = require("jass.common")
+--- `DzTriggerRegisterKeyEventTrg` 内部 sync=true：全客户端同一时刻都会跑回调。
+-- 任务面板是纯本地 UI，仅当「按下键的玩家 === 本机操控玩家」时才处理（见 dzapi/ui-frame-types 键盘 sync 规则）。
+local function isTriggerKeyForLocalPlayer(self, triggerPlayer)
+    local lp = jass.GetLocalPlayer()
+    if triggerPlayer == nil or lp == nil then
+        return false
+    end
+    local getPid = jass.GetPlayerId
+    if getPid == nil then
+        return false
+    end
+    return getPid(triggerPlayer) == getPid(lp)
+end
 --- 注册 J、1、2、3：J 随时可开关面板；1/2/3 仅在面板可见时切换 QuestType。
 function ____exports.registerTaskUIHotkeys(self, opts)
     local ____opts_0 = opts
@@ -22,8 +35,7 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         KEY.J,
         function(____, player)
             pcall(function ()
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil then
+                    if not isTriggerKeyForLocalPlayer(nil, player) then
                         return
                     end
                     local getPid = jass.GetPlayerId
@@ -42,10 +54,9 @@ function ____exports.registerTaskUIHotkeys(self, opts)
     registerKeyDown(
         nil,
         KEY_NUM.K1,
-        function(____, _player)
+        function(____, player)
             pcall(function ()
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil then
+                    if not isTriggerKeyForLocalPlayer(nil, player) then
                         return
                     end
                     if not isVisible(nil) then
@@ -60,10 +71,9 @@ function ____exports.registerTaskUIHotkeys(self, opts)
     registerKeyDown(
         nil,
         KEY_NUM.K2,
-        function(____, _player)
+        function(____, player)
             pcall(function ()
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil then
+                    if not isTriggerKeyForLocalPlayer(nil, player) then
                         return
                     end
                     if not isVisible(nil) then
@@ -78,10 +88,9 @@ function ____exports.registerTaskUIHotkeys(self, opts)
     registerKeyDown(
         nil,
         KEY_NUM.K3,
-        function(____, _player)
+        function(____, player)
             pcall(function ()
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil then
+                    if not isTriggerKeyForLocalPlayer(nil, player) then
                         return
                     end
                     if not isVisible(nil) then

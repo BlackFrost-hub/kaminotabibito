@@ -52,8 +52,8 @@ local function countOnJassStesTable(self, eventName)
         helper:ydlStes_skeyIndex(nil)
     )
 end
---- 只接受玩家 1-5 当前操作的英雄。
--- 这里是整条“英雄注册联动”链路的第一层筛选。
+--- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
+-- 这里是整条"英雄注册联动"链路的第一层筛选。
 local function isPlayableHero(self, whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return false
@@ -63,6 +63,9 @@ local function isPlayableHero(self, whichUnit)
     end
     local owner = jass.GetOwningPlayer(whichUnit)
     if owner == nil or owner == 0 then
+        return false
+    end
+    if jass.GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
         return false
     end
     local playerId = jass.GetPlayerId(owner) or -1

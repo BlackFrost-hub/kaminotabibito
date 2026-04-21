@@ -34,6 +34,12 @@ function ____exports.isPlayingPlayer(player)
     end
     return jass.GetPlayerSlotState(player) == jass.PLAYER_SLOT_STATE_PLAYING
 end
+function ____exports.isHumanPlayer(player)
+    if player == nil then
+        return false
+    end
+    return jass.GetPlayerController(player) ~= jass.MAP_CONTROL_COMPUTER
+end
 function ____exports.getDisplayPlayers()
     local players = {}
     do
@@ -42,11 +48,14 @@ function ____exports.getDisplayPlayers()
             do
                 local player = jass.Player(i)
                 if not ____exports.isPlayingPlayer(player) then
-                    goto __continue8
+                    goto __continue10
+                end
+                if not ____exports.isHumanPlayer(player) then
+                    goto __continue10
                 end
                 players[#players + 1] = player
             end
-            ::__continue8::
+            ::__continue10::
             i = i + 1
         end
     end

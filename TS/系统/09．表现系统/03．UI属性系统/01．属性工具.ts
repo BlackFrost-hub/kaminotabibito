@@ -39,11 +39,19 @@ export function isPlayingPlayer(player: any): boolean {
   return jass.GetPlayerSlotState(player) === jass.PLAYER_SLOT_STATE_PLAYING;
 }
 
+export function isHumanPlayer(player: any): boolean {
+  if (player == null) return false;
+  // 检查是否为电脑玩家 (MAP_CONTROL_COMPUTER = 2)
+  return jass.GetPlayerController(player) !== jass.MAP_CONTROL_COMPUTER;
+}
+
 export function getDisplayPlayers(): any[] {
   const players: any[] = [];
   for (let i = 0; i < MAX_DISPLAY_PLAYERS; i++) {
     const player = jass.Player(i);
     if (!isPlayingPlayer(player)) continue;
+    // 跳过电脑玩家
+    if (!isHumanPlayer(player)) continue;
     players.push(player);
   }
   return players;

@@ -69,8 +69,8 @@ function countOnJassStesTable(eventName: string): number {
 }
 
 /**
- * 只接受玩家 1-5 当前操作的英雄。
- * 这里是整条“英雄注册联动”链路的第一层筛选。
+ * 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
+ * 这里是整条"英雄注册联动"链路的第一层筛选。
  */
 function isPlayableHero(whichUnit: any): boolean {
   if (whichUnit == null || whichUnit === 0) return false;
@@ -78,6 +78,9 @@ function isPlayableHero(whichUnit: any): boolean {
 
   const owner = jass.GetOwningPlayer(whichUnit);
   if (owner == null || owner === 0) return false;
+
+  // 排除电脑玩家 (MAP_CONTROL_COMPUTER = 2)
+  if (jass.GetPlayerController(owner) === jass.MAP_CONTROL_COMPUTER) return false;
 
   const playerId = (jass.GetPlayerId(owner) as number) || -1;
   return playerId >= 0 && playerId <= 4;

@@ -1,9 +1,11 @@
+const jass = require("jass.common") as any;
+
 import { frameSetScriptByCode, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { KEY_STATE } from "../../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
 import { applyPortraitFrames } from "./03．对话框立绘系统";
 import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "./04．任务对话框";
 import { Frame, PlayerDialogState, onDialogFinished, resetDialogActiveFlagsKeepOnFinish } from "./05．对话框业务逻辑";
-import { getActivePlayerId, resetActivePlayerIdIfMatch } from "./16．对话框同步状态";
+import { getActivePlayerId, resetActivePlayerIdIfMatch, setActivePlayerId } from "./16．对话框同步状态";
 import { setDialogPanelHitBinder } from "./18．对话框渲染-创建帧";
 import {
   DEFAULT_BODY_FONT_SIZE,
@@ -24,6 +26,7 @@ import {
   KEY_SKIP_DIALOG,
   MAX_PLAYERS,
 } from "./17．对话框渲染-Dz与状态";
+import { stringLengthCompat } from "./02．打字机效果";
 import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./19．对话框渲染-播放与状态管理";
 
 function resolveQuestCallbackByTriggerPlayer(): { state: PlayerDialogState; questIdx: number; onAccept: () => void; onReject: () => void } | undefined {
@@ -182,29 +185,99 @@ export function bindDialogPanelHitFrame(hitFrame: Frame): void {
 
 // ========== 虚拟分区：~ 键跳过对话 ==========
 /**
- * ~ 键：sync=false，仅在按键玩家端执行，用 dzGetLocalPlayer() 定位本地状态。
+ * ~ 键：**实测走 sync=true**（registerKeyEventByCode 内部最终调用 DzTriggerRegisterKeyEventTrg，
+ * 硬编码 sync=true，传入的 sync 参数被忽略，详见 jass-pitfalls 规则）。
  *
- * - 有任务行：本地快进到任务页（不改队列，接受/拒绝走 sync=true）。
+ * 因此此回调全房所有客户端都会触发，**严禁用 dzGetLocalPlayer() 去定位 state**
+ * （各端 localPlayer 不同，会导致 P1 端写 state.strNow/PauseTimer、P2 端提前 return，
+ * 共享 Lua 状态与引擎定时器在两端分歧 → 在后续大量引擎调用（如提交成功链）处踩爆 desync）。
+ *
+ * 改为用 DzGetTriggerKeyPlayer()（全房一致）定位 trigger 玩家的 state，所有客户端执行相同分支。
+ * 唯一必须局部化的是 DzClickFrame：它会触发 sync=true 的 dialogPanelHitCallback 在全房推进队列，
+ * 如果每客户端都 Click 一次，队列会被乘以客户端数倍速推进 → 所以只在按键玩家本地执行。
+ *
+ * - 有任务行：快进到任务页（不改队列，接受/拒绝走 sync=true）。
  * - 仅普通行：
- *     打字未完 → skipTyping 补全、进入"等点击"。
- *     已等点击 → 用 DzClickFrame 模拟点击对话框背景帧，触发 dialogPanelHitCallback
- *               （注册时 sync=true），让全房同步推进队列。连续模拟点击直到队列清空。
+ *     多句 → 一次 ~ 裁剪队列到**最后一句**并全文显示（纯 Lua，无连点 DzClickFrame）。
+ *     单句打字中 → skipTyping 补全；单句已读完 → 触发玩家端单次 DzClickFrame 关面板/推进。
  */
-function skipDialogLocal(): void {
+/**
+ * 每玩家独立 ~ 键冷却：防止疯狂连按导致提交/日后谈对白链上引擎调用堆叠 → 即便已修 desync，
+ * 也能避免"对话框都还没渲染完就又被 ~ 推进下一步"的 UI 紊乱。
+ * 数组长度 MAX_PLAYERS，sync=true 回调里对称读写，所有客户端状态一致。
+ */
+const SKIP_KEY_COOLDOWN_SECONDS = 0.08;
+const g_skipKeyCooldown: boolean[] = [];
+
+function startSkipKeyCooldown(pid: number): void {
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  g_skipKeyCooldown[pid] = true;
+  const t = jass.CreateTimer();
+  jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, () => {
+    g_skipKeyCooldown[pid] = false;
+    jass.PauseTimer(t);
+    jass.DestroyTimer(t);
+  });
+}
+
+/**
+ * 多句纯对白：一次 ~ 将队列裁剪为**只保留最后一句**（全房对称 Lua），并显示全文 +「点击继续」。
+ * 不使用 DzClickFrame 连点，避免单帧 sync 堆叠；**关闭本段对话**仍需再按 ~ 或点背景（单次 DzClickFrame）。
+ */
+function fastForwardQueueToLastNormalLine(state: PlayerDialogState): void {
+  if (state.queue.length <= 1) return;
+  const last = state.queue[state.queue.length - 1];
+  if (!last || last.isQuest) return;
+  state.queue = [last];
+
+  showQuestButtons(state, false, dzGetLocalPlayer, dzPlayer, dzShow);
+  dzShow(state.frames[11], false);
+  dzTimerPause(state.tickTimer);
+
+  const entry = state.queue[0]!;
+  state.strLen = stringLengthCompat(entry.text);
+  state.strNow = state.strLen;
+  state.waitingClick = true;
+  state.clickCooldown = false;
+  setActivePlayerId(state.playerId);
+
+  dzSetFont(state.frames[2], DEFAULT_FONT, entry.titleFontSize);
+  dzSetFont(state.frames[3], DEFAULT_FONT, entry.bodyFontSize);
+  dzSetText(state.frames[2], entry.title);
   const localPlayer = dzGetLocalPlayer();
-  let state: PlayerDialogState | undefined;
-  for (let i = 0; i < MAX_PLAYERS; i++) {
-    const st = g_states[i];
-    if (!st || st.queue.length === 0) continue;
-    if (dzPlayer(i) === localPlayer) { state = st; break; }
+  const targetPlayer = dzPlayer(state.playerId);
+  if (localPlayer === targetPlayer) {
+    dzSetText(state.frames[3], entry.text);
   }
-  if (!state) return;
+  /**
+   * 顺序必须与 `playEntry` 一致：`showDialogFrames(true)` 会把 101–103 立绘槽一律 Show，
+   * 再由 `applyPortraitFrames` 按是否有贴图关掉空槽。若先 apply 再 showDialogFrames，
+   * 会再次把三槽全开 + 空贴图 → 引擎典型 **整屏竖绿条** 占位。
+   */
+  showDialogFrames(state, true);
+  applyPortraitFrames(entry, state.frames, dzSetTexture, dzShow);
+  if (localPlayer === targetPlayer) {
+    dzShow(state.frames[11], true);
+  }
+}
+
+function skipDialogLocal(): void {
+  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
+  if (!triggerPlayer) return;
+  const triggerPid = dzGetPlayerId(triggerPlayer);
+  if (triggerPid == null || triggerPid < 0 || triggerPid >= MAX_PLAYERS) return;
+  if (g_skipKeyCooldown[triggerPid]) return;
+  const state = g_states[triggerPid];
+  if (!state || state.queue.length === 0) return;
+
+  /** CD 写入必须在任何"本次按键已生效"的分支前，且只在确认会真正处理时计 */
+  startSkipKeyCooldown(triggerPid);
 
   dzTimerPause(state.tickTimer);
 
   const questIdx = findFirstQuestEntryIndex(state);
   if (questIdx >= 0) {
-    // 有任务行：本地快进到任务页（不改队列）
+    // 有任务行：快进到任务页（不改队列）。所有客户端对称写 state.strNow。
     if (state.strNow < state.strLen) {
       state.strNow = state.strLen;
       const head = state.queue[0];
@@ -223,25 +296,41 @@ function skipDialogLocal(): void {
     return;
   }
 
-  // 仅普通行：先补全当前句打字
-  if (state.strNow < state.strLen) {
-    skipTyping(state);
-    // 补全后进入等点击状态，再继续往下用 DzClickFrame 推进
+  /**
+   * 多句纯对白（队首到队尾皆普通行，无任务行）：一次 ~ 直接「到最后一句」全文 + 等点击，
+   * 不触发 DzClickFrame 连点；结束本句/本段仍靠再按 ~ 或点背景（下方单次 DzClickFrame）。
+   */
+  if (state.queue.length > 1) {
+    fastForwardQueueToLastNormalLine(state);
+    return;
   }
 
-  // 用 DzClickFrame 模拟点击背景帧（frames[4]），触发 sync=true 的 dialogPanelHitCallback
-  // 连续点击直到队列全部清空（每次 DzClickFrame 相当于玩家点击一次面板）
-  const hitFrame = state.frames[4];
-  if (hitFrame && hitFrame !== 0) {
-    let guard = 0;
-    while (state.queue.length > 0 && !state.queue[0].isQuest && guard < 256) {
-      guard++;
+  /**
+   * 单句普通行两段式：
+   *   第一次按 ~：打字机未完 → 只 skipTyping 补完当前句，return。
+   *   第二次按 ~：strNow == strLen → 走 DzClickFrame 关闭/推进。
+   *
+   * 不能在同一次按键里"补打字 + DzClickFrame"：全房同一 sync=true tick 内叠加过重。
+   */
+  if (state.strNow < state.strLen) {
+    skipTyping(state);
+    return;
+  }
+
+  /**
+   * DzClickFrame：sync=true 帧脚本，全房对称 → `advanceDialog`。
+   * **每次 ~ 至多一次**（等同鼠标点一下背景），避免单 tick 内连点 N 次。
+   */
+  const lp = dzGetLocalPlayer();
+  if (lp === triggerPlayer) {
+    const hitFrame = state.frames[4];
+    if (hitFrame && hitFrame !== 0 && state.queue.length > 0 && !state.queue[0].isQuest) {
       (japi as any).DzClickFrame(hitFrame);
     }
   }
 }
 
-// 初始化跳过键监听（sync=false：只在按键玩家端触发）
+// 初始化跳过键监听（registerKeyEventByCode 实际仍走 sync=true 全房触发，见文件头注释）
 let g_skipKeyInitialized = false;
 export function initSkipKeyListener(): void {
   if (g_skipKeyInitialized) return;
