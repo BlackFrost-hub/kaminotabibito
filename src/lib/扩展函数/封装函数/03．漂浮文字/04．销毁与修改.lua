@@ -11,7 +11,7 @@ function ____exports.DestroyFloatText(self, textTag)
     end
     if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
         LeakWatcher:destroyTextTag(textTag)
-    elseif type(jass.DestroyTextTag) == "function" then
+    else
         jass.DestroyTextTag(textTag)
     end
 end

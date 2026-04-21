@@ -14,7 +14,5 @@ export function createGroup(tag: string): any {
 export function destroyGroup(gp: any): void {
   if (!gp) return;
   untrack("group", gp);
-  if (typeof (jass as any).DestroyGroup === "function") {
-    (jass as any).DestroyGroup(gp);
-  }
+  (jass as any).DestroyGroup(gp);
 }

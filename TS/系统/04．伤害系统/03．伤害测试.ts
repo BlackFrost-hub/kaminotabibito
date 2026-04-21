@@ -41,9 +41,7 @@ function sendMsg(msg: string): void {
 function readEventDamageForDisplay(): number {
   let v: number | undefined;
   (pcall as any)(() => {
-    if (typeof (japi as any).GetEventDamage === "function") {
-      v = (japi as any).GetEventDamage();
-    }
+    v = (japi as any).GetEventDamage();
   });
   if (v !== undefined && typeof v === "number" && !Number.isNaN(v)) {
     return v;
@@ -56,8 +54,8 @@ function TrigActions(): void {
   const damage = readEventDamageForDisplay();
   if (!unit) return;
 
-  const name = typeof (jass as any).GetUnitName === "function" ? (jass as any).GetUnitName(unit) : "单位";
-  const damageStr = typeof (jass as any).R2S === "function" ? (jass as any).R2S(damage) : tostring(damage);
+  const name = (jass as any).GetUnitName(unit);
+  const damageStr = (jass as any).R2S(damage);
 
   let damageTypeParts: string[] = [];
   if (伤害函数.isFireDamage()) {
@@ -130,13 +128,11 @@ function TrigActions(): void {
   }
 
   let source: any = null;
-  if (typeof (jass as any).GetEventDamageSource === "function") {
-    (pcall as any)(() => { source = (jass as any).GetEventDamageSource(); });
-  }
+  (pcall as any)(() => { source = (jass as any).GetEventDamageSource(); });
   if (source == null) {
     (pcall as any)(() => { source = GetEventDamageSource(); });
   }
-  if (source != null && typeof (jass as any).GetUnitName === "function") {
+  if (source != null) {
     const sourceName = (jass as any).GetUnitName(source);
     if (sourceName != null && sourceName !== "") msg = msg + " 伤害来源：" + sourceName;
   }

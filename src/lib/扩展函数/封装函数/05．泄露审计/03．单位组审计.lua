@@ -15,8 +15,6 @@ function ____exports.destroyGroup(self, gp)
         return
     end
     untrack(nil, "group", gp)
-    if type(jass.DestroyGroup) == "function" then
-        jass.DestroyGroup(gp)
-    end
+    jass.DestroyGroup(gp)
 end
 return ____exports

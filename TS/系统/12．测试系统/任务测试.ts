@@ -16,9 +16,7 @@ import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数
 function debugPrint(msg: string): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;
   pr?.("[QuestTest] " + msg);
-  if (typeof jass.DisplayTimedTextToPlayer === "function") {
-    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "[任务测试] " + msg);
-  }
+  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "[任务测试] " + msg);
 }
 
 /**
@@ -134,8 +132,7 @@ export function runAllTests(): void {
 export function registerTestCommand(): void {
   if (typeof registerKeyDown === "function") {
     registerKeyDown(KEY_LETTER.Y, (player, key) => {
-      const getPid = typeof jass.GetPlayerId === "function" ? jass.GetPlayerId : null;
-      const playerId = getPid && player ? getPid(player) : 0;
+      const playerId = player ? jass.GetPlayerId(player) : 0;
 
       if (playerId === 0) { // 只有玩家1触发，但所有玩家都执行任务数据操作
         // 任务数据操作（全局同步，所有玩家都要执行）

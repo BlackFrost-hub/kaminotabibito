@@ -13,19 +13,19 @@ const jass = require("jass.common") as any;
 export function isValidUnit(unit: any): boolean {
     if (!unit) return false;
 
-    if (typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD)) {
+    if (jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD)) {
         return false;
     }
 
-    if (typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE)) {
+    if (jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE)) {
         return false;
     }
 
-    if (typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL)) {
+    if (jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL)) {
         return false;
     }
 
-    if (typeof jass.IsUnitType === "function" && jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)) {
+    if (jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)) {
         return false;
     }
 
@@ -41,10 +41,10 @@ export function isValidUnit(unit: any): boolean {
 export function isUnitEnemy(targetUnit: any, sourceUnit: any): boolean {
     if (!targetUnit || !sourceUnit) return false;
 
-    const sourcePlayer = typeof jass.GetOwningPlayer === "function" ? jass.GetOwningPlayer(sourceUnit) : undefined;
+    const sourcePlayer = jass.GetOwningPlayer(sourceUnit);
     if (!sourcePlayer) return false;
 
-    return typeof jass.IsUnitEnemy === "function" && jass.IsUnitEnemy(targetUnit, sourcePlayer);
+    return jass.IsUnitEnemy(targetUnit, sourcePlayer);
 }
 
 /**
@@ -66,7 +66,7 @@ export function isValidEnemyUnit(targetUnit: any, sourceUnit: any): boolean {
 export function isNotUsingInventoryItem(unit: any): boolean {
     if (!unit) return true;
 
-    const orderId = typeof jass.GetUnitCurrentOrder === "function" ? jass.GetUnitCurrentOrder(unit) : 0;
+    const orderId = jass.GetUnitCurrentOrder(unit);
     const ITEM_USE_MIN = 852008;
     const ITEM_USE_MAX = 852013;
 

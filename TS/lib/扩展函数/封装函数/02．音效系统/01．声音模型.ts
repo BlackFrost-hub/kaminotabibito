@@ -90,15 +90,15 @@ export class SoundModel {
    */
   applyToSound(sound: any, x: number, y: number, z: number, cutoff: number): void {
     const jass = require("jass.common") as any;
-    if (typeof jass.SetSoundDistances === "function") jass.SetSoundDistances(sound, this.sd.minDis, this.sd.maxDis);
-    if (typeof jass.SetSoundDistanceCutoff === "function") jass.SetSoundDistanceCutoff(sound, cutoff);
-    if (typeof jass.SetSoundPosition === "function") jass.SetSoundPosition(sound, x, y, z);
-    if (typeof jass.SetSoundChannel === "function") jass.SetSoundChannel(sound, this.channel);
-    if (typeof jass.SetSoundVolume === "function") jass.SetSoundVolume(sound, this.volume);
-    if (typeof jass.SetSoundPitch === "function") jass.SetSoundPitch(sound, this.pitch);
-    if (typeof jass.SetSoundConeOrientation === "function") jass.SetSoundConeOrientation(sound, this.sco.x, this.sco.y, this.sco.z);
-    if (typeof jass.SetSoundConeAngles === "function") jass.SetSoundConeAngles(sound, this.ca.inside, this.ca.outside, this.ca.volume);
-    if (typeof jass.SetSoundVelocity === "function") jass.SetSoundVelocity(sound, this.sv.x, this.sv.y, this.sv.z);
+    jass.SetSoundDistances(sound, this.sd.minDis, this.sd.maxDis);
+    jass.SetSoundDistanceCutoff(sound, cutoff);
+    jass.SetSoundPosition(sound, x, y, z);
+    jass.SetSoundChannel(sound, this.channel);
+    jass.SetSoundVolume(sound, this.volume);
+    jass.SetSoundPitch(sound, this.pitch);
+    jass.SetSoundConeOrientation(sound, this.sco.x, this.sco.y, this.sco.z);
+    jass.SetSoundConeAngles(sound, this.ca.inside, this.ca.outside, this.ca.volume);
+    jass.SetSoundVelocity(sound, this.sv.x, this.sv.y, this.sv.z);
   }
 }
 

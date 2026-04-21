@@ -39,10 +39,7 @@ export function leakKey(leakType: LeakType, handle: any): any {
   if (typeof handle === "object" && handle !== null) {
     return handle;
   }
-  if (typeof (jass as any).GetHandleId === "function") {
-    return `${leakType}:${(jass as any).GetHandleId(handle)}`;
-  }
-  return handle;
+  return `${leakType}:${(jass as any).GetHandleId(handle)}`;
 }
 
 export function track(type: LeakType, handle: any, tag: string): void {

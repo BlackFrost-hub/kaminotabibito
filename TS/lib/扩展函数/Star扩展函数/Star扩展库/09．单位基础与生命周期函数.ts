@@ -27,24 +27,18 @@ export function SU_SetUnitFlyHeight(whichUnit: any, newHeight: number, rate: num
   if (!SUC_IsValidUnit(whichUnit)) return;
 
   const AMRF = 0x416d7266;
-  if (typeof jass.UnitAddAbility === "function") {
-    jass.UnitAddAbility(whichUnit, AMRF);
-  }
-  if (typeof jass.UnitRemoveAbility === "function") {
-    jass.UnitRemoveAbility(whichUnit, AMRF);
-  }
-  if (typeof jass.SetUnitFlyHeight === "function") {
-    jass.SetUnitFlyHeight(whichUnit, newHeight, rate);
-  }
+  jass.UnitAddAbility(whichUnit, AMRF);
+  jass.UnitRemoveAbility(whichUnit, AMRF);
+  jass.SetUnitFlyHeight(whichUnit, newHeight, rate);
 }
 
 // 读取英雄三围总和。
 export function SU_GetHeroAllState(u: any, b: boolean): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
-  const str = typeof jass.GetHeroStr === "function" ? jass.GetHeroStr(u, b) : 0;
-  const agi = typeof jass.GetHeroAgi === "function" ? jass.GetHeroAgi(u, b) : 0;
-  const int = typeof jass.GetHeroInt === "function" ? jass.GetHeroInt(u, b) : 0;
+  const str = jass.GetHeroStr(u, b);
+  const agi = jass.GetHeroAgi(u, b);
+  const int = jass.GetHeroInt(u, b);
 
   return str + agi + int;
 }
@@ -53,12 +47,8 @@ export function SU_GetHeroAllState(u: any, b: boolean): number {
 export function SU_GetUnitLostHPPercent(u: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
-  const maxLife = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    : 0;
-  const life = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    : 0;
+  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
 
   if (maxLife <= 0) return 0;
   return (maxLife - life) / maxLife;
@@ -68,12 +58,8 @@ export function SU_GetUnitLostHPPercent(u: any): number {
 export function SU_GetUnitLostHP(u: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
-  const maxLife = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    : 0;
-  const life = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    : 0;
+  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
 
   return maxLife - life;
 }
@@ -82,20 +68,14 @@ export function SU_GetUnitLostHP(u: any): number {
 export function UnitAddHp(u: any, value: number, b: boolean): void {
   if (!SUC_IsValidUnit(u)) return;
 
-  const life = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    : 0;
-  const maxLife = typeof jass.GetUnitState === "function"
-    ? jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    : 0;
+  const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
+  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
 
   const percent = maxLife > 0 ? life / maxLife : 1;
   const addValue = b ? maxLife * value : value;
 
-  if (typeof jass.SetUnitState === "function") {
-    jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue);
-    jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent);
-  }
+  jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue);
+  jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent);
 }
 
 // 保留旧语义的存活判断。
@@ -107,12 +87,10 @@ export function SU_IsUnitDie(u: any): boolean {
 export function SU_ShowOrHideUnit(u: any, isShow: boolean): void {
   if (!SUC_IsValidUnit(u)) return;
 
-  if (typeof jass.SetUnitVertexColor === "function") {
-    if (isShow) {
-      jass.SetUnitVertexColor(u, 255, 255, 255, 255);
-    } else {
-      jass.SetUnitVertexColor(u, 255, 255, 255, 0);
-    }
+  if (isShow) {
+    jass.SetUnitVertexColor(u, 255, 255, 255, 255);
+  } else {
+    jass.SetUnitVertexColor(u, 255, 255, 255, 0);
   }
 
   if (isShow) {
@@ -127,18 +105,16 @@ export function IsWaterElement(u: any): boolean {
   if (!SUC_IsValidUnit(u)) return false;
 
   const BHWE = 0x42487765;
-  return typeof jass.GetUnitAbilityLevel === "function"
-    && jass.GetUnitAbilityLevel(u, BHWE) !== 0;
+  return jass.GetUnitAbilityLevel(u, BHWE) !== 0;
 }
 
 // 识别单位的生命周期类型。
 export function GetUnitTimedLifeID(u: any): number {
   if (!SUC_IsValidUnit(u)) return TIMED_LIFE_NONE;
-  if (typeof jass.GetUnitAbilityLevel !== "function") return TIMED_LIFE_NONE;
 
   if (jass.GetUnitAbilityLevel(u, 0x4255616e) !== 0) return TIMED_LIFE_RAISE_DEAD;
   if (jass.GetUnitAbilityLevel(u, 0x4261706c) !== 0) return TIMED_LIFE_DISEASE_CLOUD;
-  if (jass.GetUnitAbilityLevel(u, 0x4245666e) !== 0) return TIMED_LIFE_FORCE_OF_NATURE;
+  if (jass.GetUnitAbilityLevel(u, 0x42456666) !== 0) return TIMED_LIFE_FORCE_OF_NATURE;
   if (jass.GetUnitAbilityLevel(u, 0x42687764) !== 0) return TIMED_LIFE_HEALING_WARD;
   if (jass.GetUnitAbilityLevel(u, 0x42726169) !== 0) return TIMED_LIFE_ANIMATE_DEAD;
   if (jass.GetUnitAbilityLevel(u, 0x42487765) !== 0) return TIMED_LIFE_WATER_ELEMENTAL;

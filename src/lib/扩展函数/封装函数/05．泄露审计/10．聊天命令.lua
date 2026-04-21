@@ -8,37 +8,30 @@ local dump = ____09_FF0E_6253_5370_7EDF_8BA1.dump
 local jass = require("jass.common")
 --- 注册聊天 "-leak" 触发方式，方便临时查看
 function ____exports.initLeakWatcherTriggers(self)
-    if type(jass.CreateTrigger) ~= "function" or type(jass.TriggerAddAction) ~= "function" or type(jass.Player) ~= "function" then
-        return
-    end
-    if type(jass.TriggerRegisterPlayerChatEvent) == "function" then
-        local trChat = jass.CreateTrigger()
-        jass.TriggerRegisterPlayerChatEvent(
-            trChat,
-            jass.Player(0),
-            "-leak",
-            false
-        )
-        jass.TriggerAddAction(
-            trChat,
-            function()
-                local tag
-                if type(jass.GetEventPlayerChatString) == "function" then
-                    local raw = jass.GetEventPlayerChatString()
-                    if raw ~= nil and #raw > 5 then
-                        local idx = (string.find(raw, " ", nil, true) or 0) - 1
-                        if idx >= 0 and idx < #raw - 1 then
-                            tag = __TS__StringTrim(__TS__StringSubstring(raw, idx + 1))
-                            if tag == "" then
-                                tag = nil
-                            end
-                        end
+    local trChat = jass.CreateTrigger()
+    jass.TriggerRegisterPlayerChatEvent(
+        trChat,
+        jass.Player(0),
+        "-leak",
+        false
+    )
+    jass.TriggerAddAction(
+        trChat,
+        function()
+            local tag
+            local raw = jass.GetEventPlayerChatString()
+            if raw ~= nil and #raw > 5 then
+                local idx = (string.find(raw, " ", nil, true) or 0) - 1
+                if idx >= 0 and idx < #raw - 1 then
+                    tag = __TS__StringTrim(__TS__StringSubstring(raw, idx + 1))
+                    if tag == "" then
+                        tag = nil
                     end
                 end
-                dump(nil, tag)
             end
-        )
-    end
+            dump(nil, tag)
+        end
+    )
 end
 ____exports.initLeakWatcherTriggers(nil)
 return ____exports

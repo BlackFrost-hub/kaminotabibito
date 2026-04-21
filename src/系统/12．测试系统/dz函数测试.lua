@@ -61,16 +61,14 @@ local function testDzUnbindEffect(self)
                 5,
                 "|cff00ff00[DzUnbindEffect测试]|r DzSetEffectScale(0) 返回: " .. tostring(scaleResult)
             )
-            if type(jass.DestroyEffect) == "function" then
-                jass.DestroyEffect(testEffect)
-                jass.DisplayTimedTextToPlayer(
-                    jass.Player(0),
-                    0,
-                    0,
-                    5,
-                    "|cff00ff00[DzUnbindEffect测试]|r 特效已删除"
-                )
-            end
+            jass.DestroyEffect(testEffect)
+            jass.DisplayTimedTextToPlayer(
+                jass.Player(0),
+                0,
+                0,
+                5,
+                "|cff00ff00[DzUnbindEffect测试]|r 特效已删除"
+            )
         end
     )
 end

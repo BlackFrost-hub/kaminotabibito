@@ -172,7 +172,7 @@ function initEvents(): void {
     const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
     let primary: Record<string, number> = {};
     if (primaryBonus) {
-      const typeId = typeof (jass as any).GetUnitTypeId === "function" ? (jass as any).GetUnitTypeId(unit) : 0;
+      const typeId = (jass as any).GetUnitTypeId(unit);
       const unitId = typeId !== 0 ? fourCCToString(typeId) : "";
       const primaryStr = unitId !== "" ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
       primary = parsePrimaryBonus(primaryBonus, primaryStr);
@@ -194,7 +194,7 @@ function initEvents(): void {
       addStat(merged[e.key], e.name);
     }
     const owner = jass.GetOwningPlayer(unit);
-    const playerName = (typeof (jass as any).GetPlayerName === "function" ? (jass as any).GetPlayerName(owner) : "") ?? "";
+    const playerName = ((jass as any).GetPlayerName(owner) as string) ?? "";
 
     const actionText = isAdd ? "获得" : "丢弃";
     const levelText = itemData.level || "";

@@ -46,10 +46,7 @@ function skeyIndex(this: void): number {
     if (typeof jg.STES_skey_index === "number" && jg.STES_skey_index !== 0) {
         return jg.STES_skey_index;
     }
-    if (typeof jass.StringHash === "function") {
-        return jass.StringHash("index") as number;
-    }
-    return 0;
+    return jass.StringHash("index") as number;
 }
 
 function log(this: void, msg: string): void {
@@ -115,8 +112,7 @@ function runAfterDelay(this: void): void {
 
     const hash = jass.StringHash(TEST_EVENT);
     const sk = skeyIndex();
-    const count =
-        typeof jass.LoadInteger === "function" ? jass.LoadInteger(ht, hash, sk) : 0;
+    const count = jass.LoadInteger(ht, hash, sk);
 
     log(
         "[STES事件测试] 表=" +

@@ -19,15 +19,13 @@ local function debugPrint(self, msg)
     if pr ~= nil then
         pr("[QuestTest] " .. msg)
     end
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            8,
-            "[任务测试] " .. msg
-        )
-    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
+        0,
+        0,
+        8,
+        "[任务测试] " .. msg
+    )
 end
 --- 测试任务接受和完成
 function ____exports.testQuestAcceptComplete(self)
@@ -153,20 +151,13 @@ function ____exports.registerTestCommand(self)
             nil,
             KEY_LETTER.Y,
             function(____, player, key)
-                local ____temp_3
-                if type(jass.GetPlayerId) == "function" then
-                    ____temp_3 = jass.GetPlayerId
+                local ____player_3
+                if player then
+                    ____player_3 = jass.GetPlayerId(player)
                 else
-                    ____temp_3 = nil
+                    ____player_3 = 0
                 end
-                local getPid = ____temp_3
-                local ____temp_4
-                if getPid and player then
-                    ____temp_4 = getPid(player)
-                else
-                    ____temp_4 = 0
-                end
-                local playerId = ____temp_4
+                local playerId = ____player_3
                 if playerId == 0 then
                     ____exports.testQuestData(nil)
                     ____exports.testQuestAcceptComplete(nil)

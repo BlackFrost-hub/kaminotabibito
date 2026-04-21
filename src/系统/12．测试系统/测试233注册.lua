@@ -170,15 +170,13 @@ local function onChat233(self)
     dumpJapiKeys(nil)
     dumpDzKeyEventTrgType(nil)
     bindKeyBN_once_min(nil)
-    if type(jass.DisplayTimedTextToPlayer) == "function" and type(jass.Player) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            6,
-            "[japi] 已打印 jass.japi keys"
-        )
-    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
+        0,
+        0,
+        6,
+        "[japi] 已打印 jass.japi keys"
+    )
 end
 local function init(self)
     local tr = jass.CreateTrigger()

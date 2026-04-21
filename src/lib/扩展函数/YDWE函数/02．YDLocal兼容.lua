@@ -8,10 +8,7 @@ function ____exports.getSKey_PIndex(self)
     if type(jg.SKey_PIndex) == "number" and jg.SKey_PIndex ~= 0 then
         return jg.SKey_PIndex
     end
-    if type(jass.StringHash) == "function" then
-        return jass.StringHash("parentIndex")
-    end
-    return 0
+    return jass.StringHash("parentIndex")
 end
 function sym(self, name)
     local ____G_name_1 = _G[name]
@@ -56,28 +53,13 @@ function loadStar_PIndex(self)
     if not YDHT then
         return 0
     end
-    local ____temp_32
-    if type(jass.GetTriggeringTrigger) == "function" then
-        ____temp_32 = jass.GetTriggeringTrigger()
-    else
-        ____temp_32 = nil
-    end
-    local trig = ____temp_32
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
-        return 0
-    end
-    if type(jass.GetHandleId) ~= "function" then
         return 0
     end
     local hd = jass.GetHandleId(trig)
     local sk = ____exports.getSKey_PIndex(nil)
-    local ____temp_33
-    if type(jass.LoadInteger) == "function" then
-        ____temp_33 = jass.LoadInteger(YDHT, hd, sk) or 0
-    else
-        ____temp_33 = 0
-    end
-    return ____temp_33
+    return jass.LoadInteger(YDHT, hd, sk) or 0
 end
 jass = require("jass.common")
 jglobals = require("jass.globals")
@@ -89,10 +71,7 @@ function ____exports.getSKey_Trigger(self)
     if type(jg.SKey_Trigger) == "number" and jg.SKey_Trigger ~= 0 then
         return jg.SKey_Trigger
     end
-    if type(jass.StringHash) == "function" then
-        return jass.StringHash("Trigger")
-    end
-    return 0
+    return jass.StringHash("Trigger")
 end
 local _indexStack = {}
 local function ydlocHandle(self)
@@ -135,183 +114,78 @@ local function setG_LIndex(self, v)
     _G.G_LIndex = v
 end
 local function sh(self, s)
-    if type(jass.StringHash) ~= "function" then
-        return 0
-    end
     return jass.StringHash(s) or 0
 end
 local function loadByHash(self, ____type, h, p, c)
     repeat
-        local ____switch21 = ____type
-        local ____cond21 = ____switch21 == "integer"
-        if ____cond21 then
-            local ____temp_10
-            if type(jass.LoadInteger) == "function" then
-                ____temp_10 = jass.LoadInteger(h, p, c)
-            else
-                ____temp_10 = 0
-            end
-            return ____temp_10
+        local ____switch18 = ____type
+        local ____cond18 = ____switch18 == "integer"
+        if ____cond18 then
+            return jass.LoadInteger(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "real"
-        if ____cond21 then
-            local ____temp_11
-            if type(jass.LoadReal) == "function" then
-                ____temp_11 = jass.LoadReal(h, p, c)
-            else
-                ____temp_11 = 0
-            end
-            return ____temp_11
+        ____cond18 = ____cond18 or ____switch18 == "real"
+        if ____cond18 then
+            return jass.LoadReal(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "boolean"
-        if ____cond21 then
-            local ____temp_12
-            if type(jass.LoadBoolean) == "function" then
-                ____temp_12 = jass.LoadBoolean(h, p, c)
-            else
-                ____temp_12 = false
-            end
-            return ____temp_12
+        ____cond18 = ____cond18 or ____switch18 == "boolean"
+        if ____cond18 then
+            return jass.LoadBoolean(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "string"
-        if ____cond21 then
-            local ____temp_13
-            if type(jass.LoadStr) == "function" then
-                ____temp_13 = jass.LoadStr(h, p, c)
-            else
-                ____temp_13 = ""
-            end
-            return ____temp_13
+        ____cond18 = ____cond18 or ____switch18 == "string"
+        if ____cond18 then
+            return jass.LoadStr(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "unit"
-        if ____cond21 then
-            local ____temp_14
-            if type(jass.LoadUnitHandle) == "function" then
-                ____temp_14 = jass.LoadUnitHandle(h, p, c)
-            else
-                ____temp_14 = nil
-            end
-            return ____temp_14
+        ____cond18 = ____cond18 or ____switch18 == "unit"
+        if ____cond18 then
+            return jass.LoadUnitHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "group"
-        if ____cond21 then
-            local ____temp_15
-            if type(jass.LoadGroupHandle) == "function" then
-                ____temp_15 = jass.LoadGroupHandle(h, p, c)
-            else
-                ____temp_15 = nil
-            end
-            return ____temp_15
+        ____cond18 = ____cond18 or ____switch18 == "group"
+        if ____cond18 then
+            return jass.LoadGroupHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "timer"
-        if ____cond21 then
-            local ____temp_16
-            if type(jass.LoadTimerHandle) == "function" then
-                ____temp_16 = jass.LoadTimerHandle(h, p, c)
-            else
-                ____temp_16 = nil
-            end
-            return ____temp_16
+        ____cond18 = ____cond18 or ____switch18 == "timer"
+        if ____cond18 then
+            return jass.LoadTimerHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "trigger"
-        if ____cond21 then
-            local ____temp_17
-            if type(jass.LoadTriggerHandle) == "function" then
-                ____temp_17 = jass.LoadTriggerHandle(h, p, c)
-            else
-                ____temp_17 = nil
-            end
-            return ____temp_17
+        ____cond18 = ____cond18 or ____switch18 == "trigger"
+        if ____cond18 then
+            return jass.LoadTriggerHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "item"
-        if ____cond21 then
-            local ____temp_18
-            if type(jass.LoadItemHandle) == "function" then
-                ____temp_18 = jass.LoadItemHandle(h, p, c)
-            else
-                ____temp_18 = nil
-            end
-            return ____temp_18
+        ____cond18 = ____cond18 or ____switch18 == "item"
+        if ____cond18 then
+            return jass.LoadItemHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "player"
-        if ____cond21 then
-            local ____temp_19
-            if type(jass.LoadPlayerHandle) == "function" then
-                ____temp_19 = jass.LoadPlayerHandle(h, p, c)
-            else
-                ____temp_19 = nil
-            end
-            return ____temp_19
+        ____cond18 = ____cond18 or ____switch18 == "player"
+        if ____cond18 then
+            return jass.LoadPlayerHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "location"
-        if ____cond21 then
-            local ____temp_20
-            if type(jass.LoadLocationHandle) == "function" then
-                ____temp_20 = jass.LoadLocationHandle(h, p, c)
-            else
-                ____temp_20 = nil
-            end
-            return ____temp_20
+        ____cond18 = ____cond18 or ____switch18 == "location"
+        if ____cond18 then
+            return jass.LoadLocationHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "destructable"
-        if ____cond21 then
-            local ____temp_21
-            if type(jass.LoadDestructableHandle) == "function" then
-                ____temp_21 = jass.LoadDestructableHandle(h, p, c)
-            else
-                ____temp_21 = nil
-            end
-            return ____temp_21
+        ____cond18 = ____cond18 or ____switch18 == "destructable"
+        if ____cond18 then
+            return jass.LoadDestructableHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "force"
-        if ____cond21 then
-            local ____temp_22
-            if type(jass.LoadForceHandle) == "function" then
-                ____temp_22 = jass.LoadForceHandle(h, p, c)
-            else
-                ____temp_22 = nil
-            end
-            return ____temp_22
+        ____cond18 = ____cond18 or ____switch18 == "force"
+        if ____cond18 then
+            return jass.LoadForceHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "rect"
-        if ____cond21 then
-            local ____temp_23
-            if type(jass.LoadRectHandle) == "function" then
-                ____temp_23 = jass.LoadRectHandle(h, p, c)
-            else
-                ____temp_23 = nil
-            end
-            return ____temp_23
+        ____cond18 = ____cond18 or ____switch18 == "rect"
+        if ____cond18 then
+            return jass.LoadRectHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "region"
-        if ____cond21 then
-            local ____temp_24
-            if type(jass.LoadRegionHandle) == "function" then
-                ____temp_24 = jass.LoadRegionHandle(h, p, c)
-            else
-                ____temp_24 = nil
-            end
-            return ____temp_24
+        ____cond18 = ____cond18 or ____switch18 == "region"
+        if ____cond18 then
+            return jass.LoadRegionHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "sound"
-        if ____cond21 then
-            local ____temp_25
-            if type(jass.LoadSoundHandle) == "function" then
-                ____temp_25 = jass.LoadSoundHandle(h, p, c)
-            else
-                ____temp_25 = nil
-            end
-            return ____temp_25
+        ____cond18 = ____cond18 or ____switch18 == "sound"
+        if ____cond18 then
+            return jass.LoadSoundHandle(h, p, c)
         end
-        ____cond21 = ____cond21 or ____switch21 == "effect"
-        if ____cond21 then
-            local ____temp_26
-            if type(jass.LoadEffectHandle) == "function" then
-                ____temp_26 = jass.LoadEffectHandle(h, p, c)
-            else
-                ____temp_26 = nil
-            end
-            return ____temp_26
+        ____cond18 = ____cond18 or ____switch18 == "effect"
+        if ____cond18 then
+            return jass.LoadEffectHandle(h, p, c)
         end
         do
             return nil
@@ -320,160 +194,126 @@ local function loadByHash(self, ____type, h, p, c)
 end
 local function saveByHash(self, ____type, h, p, c, value)
     repeat
-        local ____switch23 = ____type
-        local ____cond23 = ____switch23 == "integer"
-        if ____cond23 then
-            if type(jass.SaveInteger) == "function" then
-                jass.SaveInteger(
-                    h,
-                    p,
-                    c,
-                    __TS__Number(value) or 0
-                )
-            end
+        local ____switch20 = ____type
+        local ____cond20 = ____switch20 == "integer"
+        if ____cond20 then
+            jass.SaveInteger(
+                h,
+                p,
+                c,
+                __TS__Number(value) or 0
+            )
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "real"
-        if ____cond23 then
-            if type(jass.SaveReal) == "function" then
-                jass.SaveReal(
-                    h,
-                    p,
-                    c,
-                    __TS__Number(value) or 0
-                )
-            end
+        ____cond20 = ____cond20 or ____switch20 == "real"
+        if ____cond20 then
+            jass.SaveReal(
+                h,
+                p,
+                c,
+                __TS__Number(value) or 0
+            )
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "boolean"
-        if ____cond23 then
-            if type(jass.SaveBoolean) == "function" then
-                jass.SaveBoolean(h, p, c, not not value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "boolean"
+        if ____cond20 then
+            jass.SaveBoolean(h, p, c, not not value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "string"
-        if ____cond23 then
-            if type(jass.SaveStr) == "function" then
-                jass.SaveStr(
-                    h,
-                    p,
-                    c,
-                    tostring(value)
-                )
-            end
+        ____cond20 = ____cond20 or ____switch20 == "string"
+        if ____cond20 then
+            jass.SaveStr(
+                h,
+                p,
+                c,
+                tostring(value)
+            )
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "unit"
-        if ____cond23 then
-            if type(jass.SaveUnitHandle) == "function" then
-                jass.SaveUnitHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "unit"
+        if ____cond20 then
+            jass.SaveUnitHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "group"
-        if ____cond23 then
-            if type(jass.SaveGroupHandle) == "function" then
-                jass.SaveGroupHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "group"
+        if ____cond20 then
+            jass.SaveGroupHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "timer"
-        if ____cond23 then
-            if type(jass.SaveTimerHandle) == "function" then
-                jass.SaveTimerHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "timer"
+        if ____cond20 then
+            jass.SaveTimerHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "trigger"
-        if ____cond23 then
-            if type(jass.SaveTriggerHandle) == "function" then
-                jass.SaveTriggerHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "trigger"
+        if ____cond20 then
+            jass.SaveTriggerHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "item"
-        if ____cond23 then
-            if type(jass.SaveItemHandle) == "function" then
-                jass.SaveItemHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "item"
+        if ____cond20 then
+            jass.SaveItemHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "player"
-        if ____cond23 then
-            if type(jass.SavePlayerHandle) == "function" then
-                jass.SavePlayerHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "player"
+        if ____cond20 then
+            jass.SavePlayerHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "location"
-        if ____cond23 then
-            if type(jass.SaveLocationHandle) == "function" then
-                jass.SaveLocationHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "location"
+        if ____cond20 then
+            jass.SaveLocationHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "destructable"
-        if ____cond23 then
-            if type(jass.SaveDestructableHandle) == "function" then
-                jass.SaveDestructableHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "destructable"
+        if ____cond20 then
+            jass.SaveDestructableHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "force"
-        if ____cond23 then
-            if type(jass.SaveForceHandle) == "function" then
-                jass.SaveForceHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "force"
+        if ____cond20 then
+            jass.SaveForceHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "rect"
-        if ____cond23 then
-            if type(jass.SaveRectHandle) == "function" then
-                jass.SaveRectHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "rect"
+        if ____cond20 then
+            jass.SaveRectHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "region"
-        if ____cond23 then
-            if type(jass.SaveRegionHandle) == "function" then
-                jass.SaveRegionHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "region"
+        if ____cond20 then
+            jass.SaveRegionHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "sound"
-        if ____cond23 then
-            if type(jass.SaveSoundHandle) == "function" then
-                jass.SaveSoundHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "sound"
+        if ____cond20 then
+            jass.SaveSoundHandle(h, p, c, value)
             return
         end
-        ____cond23 = ____cond23 or ____switch23 == "effect"
-        if ____cond23 then
-            if type(jass.SaveEffectHandle) == "function" then
-                jass.SaveEffectHandle(h, p, c, value)
-            end
+        ____cond20 = ____cond20 or ____switch20 == "effect"
+        if ____cond20 then
+            jass.SaveEffectHandle(h, p, c, value)
             return
         end
     until true
 end
 local function defaultForType(self, ____type)
     repeat
-        local ____switch42 = ____type
-        local ____cond42 = ____switch42 == "integer"
-        if ____cond42 then
+        local ____switch22 = ____type
+        local ____cond22 = ____switch22 == "integer"
+        if ____cond22 then
             return 0
         end
-        ____cond42 = ____cond42 or ____switch42 == "real"
-        if ____cond42 then
+        ____cond22 = ____cond22 or ____switch22 == "real"
+        if ____cond22 then
             return 0
         end
-        ____cond42 = ____cond42 or ____switch42 == "boolean"
-        if ____cond42 then
+        ____cond22 = ____cond22 or ____switch22 == "boolean"
+        if ____cond22 then
             return false
         end
-        ____cond42 = ____cond42 or ____switch42 == "string"
-        if ____cond42 then
+        ____cond22 = ____cond22 or ____switch22 == "string"
+        if ____cond22 then
             return ""
         end
         do
@@ -489,32 +329,15 @@ end
 -- - 设置 G_LIndex = G_SIndex
 function ____exports.YDLocalInitialize(self)
     local YDLOC = ydlocHandle(nil)
-    local ____temp_27
-    if type(jass.GetTriggeringTrigger) == "function" then
-        ____temp_27 = jass.GetTriggeringTrigger()
-    else
-        ____temp_27 = nil
-    end
-    local trig = ____temp_27
+    local trig = jass.GetTriggeringTrigger()
     if not trig or not YDLOC then
         return
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return
-    end
     local hd = jass.GetHandleId(trig)
-    local ____temp_28
-    if type(jass.LoadInteger) == "function" then
-        ____temp_28 = jass.LoadInteger(YDLOC, hd, STEP_KEY)
-    else
-        ____temp_28 = 0
-    end
-    local step = ____temp_28
+    local step = jass.LoadInteger(YDLOC, hd, STEP_KEY)
     step = step + 3
-    if type(jass.SaveInteger) == "function" then
-        jass.SaveInteger(YDLOC, hd, STEP_KEY, step)
-        jass.SaveInteger(YDLOC, hd, STEP_KEY2, step)
-    end
+    jass.SaveInteger(YDLOC, hd, STEP_KEY, step)
+    jass.SaveInteger(YDLOC, hd, STEP_KEY2, step)
     _indexStack[#_indexStack + 1] = getG_SIndex(nil)
     local newSIndex = hd * step
     setG_SIndex(nil, newSIndex)
@@ -527,7 +350,7 @@ end
 function ____exports.YDLocal1Release(self)
     local YDLOC = ydlocHandle(nil)
     local sIndex = getG_SIndex(nil)
-    if YDLOC and sIndex ~= 0 and type(jass.FlushChildHashtable) == "function" then
+    if YDLOC and sIndex ~= 0 then
         jass.FlushChildHashtable(YDLOC, sIndex)
     end
     local prevIndex = #_indexStack > 0 and table.remove(_indexStack) or 0
@@ -595,11 +418,11 @@ function ____exports.YDLocal5Set(self, ____type, name, value)
     if not h then
         return
     end
-    local ____G_ydl_triggerstep_29 = _G.ydl_triggerstep
-    if ____G_ydl_triggerstep_29 == nil then
-        ____G_ydl_triggerstep_29 = 0
+    local ____G_ydl_triggerstep_10 = _G.ydl_triggerstep
+    if ____G_ydl_triggerstep_10 == nil then
+        ____G_ydl_triggerstep_10 = 0
     end
-    local p = ____G_ydl_triggerstep_29
+    local p = ____G_ydl_triggerstep_10
     local c = sh(nil, name)
     saveByHash(
         nil,
@@ -617,11 +440,11 @@ function ____exports.YDLocal5Get(self, ____type, name)
     if not h then
         return defaultForType(nil, ____type)
     end
-    local ____G_ydl_triggerstep_30 = _G.ydl_triggerstep
-    if ____G_ydl_triggerstep_30 == nil then
-        ____G_ydl_triggerstep_30 = 0
+    local ____G_ydl_triggerstep_11 = _G.ydl_triggerstep
+    if ____G_ydl_triggerstep_11 == nil then
+        ____G_ydl_triggerstep_11 = 0
     end
-    local p = ____G_ydl_triggerstep_30
+    local p = ____G_ydl_triggerstep_11
     local c = sh(nil, name)
     return loadByHash(
         nil,
@@ -639,17 +462,15 @@ function ____exports.flushYDLocal5ParamPage(self)
     if not h then
         return
     end
-    local ____G_ydl_triggerstep_31 = _G.ydl_triggerstep
-    if ____G_ydl_triggerstep_31 == nil then
-        ____G_ydl_triggerstep_31 = 0
+    local ____G_ydl_triggerstep_12 = _G.ydl_triggerstep
+    if ____G_ydl_triggerstep_12 == nil then
+        ____G_ydl_triggerstep_12 = 0
     end
-    local p = ____G_ydl_triggerstep_31
+    local p = ____G_ydl_triggerstep_12
     if type(p) ~= "number" or p == 0 or p ~= p then
         return
     end
-    if type(jass.FlushChildHashtable) == "function" then
-        jass.FlushChildHashtable(h, p)
-    end
+    jass.FlushChildHashtable(h, p)
 end
 --- YDLocal7Set - 返回值：写入到父级局部变量表
 -- 对应宏: YDHashSet(YDLOC, type, Star_PIndex, StringHash(name), value)
@@ -699,24 +520,13 @@ function ____exports.clearStar_PIndex(self)
     if not YDHT then
         return
     end
-    local ____temp_34
-    if type(jass.GetTriggeringTrigger) == "function" then
-        ____temp_34 = jass.GetTriggeringTrigger()
-    else
-        ____temp_34 = nil
-    end
-    local trig = ____temp_34
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
-        return
-    end
-    if type(jass.GetHandleId) ~= "function" then
         return
     end
     local hd = jass.GetHandleId(trig)
     local sk = ____exports.getSKey_PIndex(nil)
-    if type(jass.RemoveSavedInteger) == "function" then
-        jass.RemoveSavedInteger(YDHT, hd, sk)
-    end
+    jass.RemoveSavedInteger(YDHT, hd, sk)
 end
 ____exports.STEP_KEY = STEP_KEY
 ____exports.STEP_KEY2 = STEP_KEY2

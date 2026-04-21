@@ -82,33 +82,15 @@ function SoundModel.create(self)
 end
 function SoundModel.prototype.applyToSound(self, sound, x, y, z, cutoff)
     local jass = require("jass.common")
-    if type(jass.SetSoundDistances) == "function" then
-        jass.SetSoundDistances(sound, self.sd.minDis, self.sd.maxDis)
-    end
-    if type(jass.SetSoundDistanceCutoff) == "function" then
-        jass.SetSoundDistanceCutoff(sound, cutoff)
-    end
-    if type(jass.SetSoundPosition) == "function" then
-        jass.SetSoundPosition(sound, x, y, z)
-    end
-    if type(jass.SetSoundChannel) == "function" then
-        jass.SetSoundChannel(sound, self.channel)
-    end
-    if type(jass.SetSoundVolume) == "function" then
-        jass.SetSoundVolume(sound, self.volume)
-    end
-    if type(jass.SetSoundPitch) == "function" then
-        jass.SetSoundPitch(sound, self.pitch)
-    end
-    if type(jass.SetSoundConeOrientation) == "function" then
-        jass.SetSoundConeOrientation(sound, self.sco.x, self.sco.y, self.sco.z)
-    end
-    if type(jass.SetSoundConeAngles) == "function" then
-        jass.SetSoundConeAngles(sound, self.ca.inside, self.ca.outside, self.ca.volume)
-    end
-    if type(jass.SetSoundVelocity) == "function" then
-        jass.SetSoundVelocity(sound, self.sv.x, self.sv.y, self.sv.z)
-    end
+    jass.SetSoundDistances(sound, self.sd.minDis, self.sd.maxDis)
+    jass.SetSoundDistanceCutoff(sound, cutoff)
+    jass.SetSoundPosition(sound, x, y, z)
+    jass.SetSoundChannel(sound, self.channel)
+    jass.SetSoundVolume(sound, self.volume)
+    jass.SetSoundPitch(sound, self.pitch)
+    jass.SetSoundConeOrientation(sound, self.sco.x, self.sco.y, self.sco.z)
+    jass.SetSoundConeAngles(sound, self.ca.inside, self.ca.outside, self.ca.volume)
+    jass.SetSoundVelocity(sound, self.sv.x, self.sv.y, self.sv.z)
 end
 --- 获取声音类型字符串
 function ____exports.getSoundTypeByID(self, id)

@@ -19,10 +19,7 @@ local function skeyIndex()
     if type(jg.STES_skey_index) == "number" and jg.STES_skey_index ~= 0 then
         return jg.STES_skey_index
     end
-    if type(jass.StringHash) == "function" then
-        return jass.StringHash("index")
-    end
-    return 0
+    return jass.StringHash("index")
 end
 local function log(msg)
     local p = _G.print
@@ -74,13 +71,7 @@ local function runAfterDelay()
     tryRegisterLuaListenerForJassStes()
     local hash = jass.StringHash(TEST_EVENT)
     local sk = skeyIndex()
-    local ____temp_1
-    if type(jass.LoadInteger) == "function" then
-        ____temp_1 = jass.LoadInteger(ht, hash, sk)
-    else
-        ____temp_1 = 0
-    end
-    local count = ____temp_1
+    local count = jass.LoadInteger(ht, hash, sk)
     log((((((("[STES事件测试] 表=" .. tostring(ht)) .. " 事件「") .. TEST_EVENT) .. "」count=") .. tostring(count)) .. " skey_index=") .. tostring(sk))
     if count <= 0 then
         log(("[STES事件测试] 计数为 0：事件「" .. TEST_EVENT) .. "」尚无 STES 注册（检查 JASS 是否已 Register、事件名是否一致）")

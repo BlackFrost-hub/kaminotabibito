@@ -51,10 +51,8 @@ export function isValidDotStateRow(v: any): boolean {
 
 export function getDotSourceDisplayName(u: any): string {
   if (u == null || u === 0) return "未知";
-  if (typeof (jass as any).GetUnitName === "function") {
-    const n = (jass as any).GetUnitName(u);
-    if (n !== undefined && n !== null && `${n}` !== "") return `${n}`;
-  }
+  const n = (jass as any).GetUnitName(u);
+  if (n !== undefined && n !== null && `${n}` !== "") return `${n}`;
   return "未知";
 }
 

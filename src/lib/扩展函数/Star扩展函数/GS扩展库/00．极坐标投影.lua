@@ -20,17 +20,9 @@ function ____exports.GS_PolarProjectionBJ(self, source, dist, angle)
     if not source then
         return nil
     end
-    if type(jass.GetLocationX) ~= "function" or type(jass.GetLocationY) ~= "function" then
-        return nil
-    end
     local x = jass.GetLocationX(source) + dist * math.cos(angle * bj_DEGTORAD)
     local y = jass.GetLocationY(source) + dist * math.sin(angle * bj_DEGTORAD)
-    if type(jass.RemoveLocation) == "function" then
-        jass.RemoveLocation(source)
-    end
-    if type(jass.Location) == "function" then
-        return jass.Location(x, y)
-    end
-    return nil
+    jass.RemoveLocation(source)
+    return jass.Location(x, y)
 end
 return ____exports

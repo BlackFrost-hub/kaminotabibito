@@ -12,7 +12,5 @@ export function trackRect(tag: string, rect: any): void {
 export function removeRect(rect: any): void {
   if (!rect) return;
   untrack("rect", rect);
-  if (typeof (jass as any).RemoveRect === "function") {
-    (jass as any).RemoveRect(rect);
-  }
+  (jass as any).RemoveRect(rect);
 }

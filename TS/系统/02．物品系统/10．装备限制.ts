@@ -124,10 +124,8 @@ function onPickup(): void {
   let msg = "";
 
   let player = jass.Player(0);
-  if (typeof (jass as any).GetOwningPlayer === "function") {
-    const p = (jass as any).GetOwningPlayer(unit);
-    if (p) player = p;
-  }
+  const p = (jass as any).GetOwningPlayer(unit);
+  if (p) player = p;
   let sameIdCount = 0;
   let sameSlotTypeCount = 0;
   let hasTwoHanded = false;
@@ -164,16 +162,7 @@ function onPickup(): void {
   if (msg === "") return;
 
   equipShared.skipNextDrop = true;
-  if (typeof (jass as any).UnitRemoveItem === "function") {
-    (jass as any).UnitRemoveItem(unit, item);
-  } else {
-    const UnitDropItemPoint = (jass as any).UnitDropItemPoint;
-    const GetUnitX = (jass as any).GetUnitX;
-    const GetUnitY = (jass as any).GetUnitY;
-    if (typeof UnitDropItemPoint === "function" && typeof GetUnitX === "function" && typeof GetUnitY === "function") {
-      UnitDropItemPoint(unit, item, GetUnitX(unit), GetUnitY(unit));
-    }
-  }
+  (jass as any).UnitRemoveItem(unit, item);
   jass.DisplayTimedTextToPlayer(player, 0, 0, 6, msg);
 }
 

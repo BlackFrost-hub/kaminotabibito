@@ -19,9 +19,6 @@ local function scheduleDestroySoundIfNeeded(self, sound)
     if not sound then
         return
     end
-    if type(jass.DestroySound) ~= "function" or type(jass.TimerStart) ~= "function" then
-        return
-    end
     local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
     local ____temp_0
     if Leak and Leak.LeakWatcher then
@@ -30,19 +27,13 @@ local function scheduleDestroySoundIfNeeded(self, sound)
         ____temp_0 = nil
     end
     local LW = ____temp_0
-    local ____temp_2
+    local ____temp_1
     if LW and type(LW.createTimer) == "function" then
-        ____temp_2 = LW:createTimer("sound_ui_fallback_destroy")
+        ____temp_1 = LW:createTimer("sound_ui_fallback_destroy")
     else
-        local ____temp_1
-        if type(jass.CreateTimer) == "function" then
-            ____temp_1 = jass.CreateTimer()
-        else
-            ____temp_1 = nil
-        end
-        ____temp_2 = ____temp_1
+        ____temp_1 = jass.CreateTimer()
     end
-    local t = ____temp_2
+    local t = ____temp_1
     if not t then
         return
     end
@@ -55,7 +46,7 @@ local function scheduleDestroySoundIfNeeded(self, sound)
             jass.DestroySound(sound)
             if LW and type(LW.destroyTimer) == "function" then
                 LW:destroyTimer(expired)
-            elseif type(jass.DestroyTimer) == "function" then
+            else
                 jass.DestroyTimer(expired)
             end
         end
@@ -70,15 +61,15 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     if model == nil then
         model = getDefaultSoundModel(nil)
     end
-    if type(jass.CreateSound) == "function" and type(jass.StartSound) == "function" then
+    do
         local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-        local ____temp_3
+        local ____temp_2
         if Leak and Leak.LeakWatcher then
-            ____temp_3 = Leak.LeakWatcher
+            ____temp_2 = Leak.LeakWatcher
         else
-            ____temp_3 = nil
+            ____temp_2 = nil
         end
-        local LW = ____temp_3
+        local LW = ____temp_2
         local trackedByLeak = false
         local s = nil
         if LW and type(LW.createSound) == "function" then
@@ -107,28 +98,17 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             )
         end
         if s then
-            if type(jass.SetSoundChannel) == "function" then
-                jass.SetSoundChannel(s, model.channel)
-            end
-            if type(jass.SetSoundVolume) == "function" then
-                jass.SetSoundVolume(s, model.volume)
-            end
-            if type(jass.SetSoundPitch) == "function" then
-                jass.SetSoundPitch(s, model.pitch)
-            end
-            local shouldPlay = not player or type(jass.GetLocalPlayer) == "function" and jass.GetLocalPlayer() == player
+            jass.SetSoundChannel(s, model.channel)
+            jass.SetSoundVolume(s, model.volume)
+            jass.SetSoundPitch(s, model.pitch)
+            local shouldPlay = not player or jass.GetLocalPlayer() == player
             if shouldPlay then
                 jass.StartSound(s)
             end
             if LW and type(LW.killSoundWhenDone) == "function" then
                 LW:killSoundWhenDone(s)
-            elseif type(jass.KillSoundWhenDone) == "function" then
-                jass.KillSoundWhenDone(s)
-                if trackedByLeak and LW and type(LW.releaseSound) == "function" then
-                    LW:releaseSound(s)
-                end
             else
-                scheduleDestroySoundIfNeeded(nil, s)
+                jass.KillSoundWhenDone(s)
                 if trackedByLeak and LW and type(LW.releaseSound) == "function" then
                     LW:releaseSound(s)
                 end

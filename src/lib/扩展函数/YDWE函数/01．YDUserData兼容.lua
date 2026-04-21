@@ -91,12 +91,6 @@ local function hashHandle(self)
     return h
 end
 local function sh(self, s)
-    if type(jass.StringHash) ~= "function" then
-        error(
-            __TS__New(Error, "[YDUserData兼容] 缺少 StringHash"),
-            0
-        )
-    end
     return jass.StringHash(s) or 0
 end
 local function tableId(self, tableType, tableKey)
@@ -121,364 +115,151 @@ local function tableId(self, tableType, tableKey)
             tostring(tableKey)
         )
     end
-    if type(jass.GetHandleId) == "function" then
-        return jass.GetHandleId(tableKey) or 0
-    end
-    return __TS__Number(tableKey) or 0
+    return jass.GetHandleId(tableKey) or 0
 end
 local function loadByHash(self, ____type, p, c)
     local h = hashHandle(nil)
     repeat
-        local ____switch17 = ____type
-        local ____cond17 = ____switch17 == "integer"
-        if ____cond17 then
-            local ____temp_9
-            if type(jass.LoadInteger) == "function" then
-                ____temp_9 = jass.LoadInteger(h, p, c)
-            else
-                ____temp_9 = 0
-            end
-            return ____temp_9
+        local ____switch15 = ____type
+        local ____cond15 = ____switch15 == "integer"
+        if ____cond15 then
+            return jass.LoadInteger(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "real"
-        if ____cond17 then
-            local ____temp_10
-            if type(jass.LoadReal) == "function" then
-                ____temp_10 = jass.LoadReal(h, p, c)
-            else
-                ____temp_10 = 0
-            end
-            return ____temp_10
+        ____cond15 = ____cond15 or ____switch15 == "real"
+        if ____cond15 then
+            return jass.LoadReal(h, p, c)
         end
-        ____cond17 = ____cond17 or (____switch17 == "radian" or ____switch17 == "degree")
-        if ____cond17 then
-            local ____temp_11
-            if type(jass.LoadReal) == "function" then
-                ____temp_11 = jass.LoadReal(h, p, c)
-            else
-                ____temp_11 = 0
-            end
-            return ____temp_11
+        ____cond15 = ____cond15 or (____switch15 == "radian" or ____switch15 == "degree")
+        if ____cond15 then
+            return jass.LoadReal(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "boolean"
-        if ____cond17 then
-            local ____temp_12
-            if type(jass.LoadBoolean) == "function" then
-                ____temp_12 = jass.LoadBoolean(h, p, c)
-            else
-                ____temp_12 = false
-            end
-            return ____temp_12
+        ____cond15 = ____cond15 or ____switch15 == "boolean"
+        if ____cond15 then
+            return jass.LoadBoolean(h, p, c)
         end
-        ____cond17 = ____cond17 or (____switch17 == "string" or ____switch17 == "imagefile" or ____switch17 == "modelfile")
-        if ____cond17 then
-            local ____temp_13
-            if type(jass.LoadStr) == "function" then
-                ____temp_13 = jass.LoadStr(h, p, c)
-            else
-                ____temp_13 = ""
-            end
-            return ____temp_13
+        ____cond15 = ____cond15 or (____switch15 == "string" or ____switch15 == "imagefile" or ____switch15 == "modelfile")
+        if ____cond15 then
+            return jass.LoadStr(h, p, c)
         end
-        ____cond17 = ____cond17 or (____switch17 == "unitcode" or ____switch17 == "itemcode" or ____switch17 == "abilcode" or ____switch17 == "frame" or ____switch17 == "hashtable" or ____switch17 == "effectGroup" or ____switch17 == "lightningGroup" or ____switch17 == "StarStrPool" or ____switch17 == "starCircle" or ____switch17 == "Srrounder" or ____switch17 == "StarIntPool" or ____switch17 == "terraintype" or ____switch17 == "doodad")
-        if ____cond17 then
-            local ____temp_14
-            if type(jass.LoadInteger) == "function" then
-                ____temp_14 = jass.LoadInteger(h, p, c)
-            else
-                ____temp_14 = 0
-            end
-            return ____temp_14
+        ____cond15 = ____cond15 or (____switch15 == "unitcode" or ____switch15 == "itemcode" or ____switch15 == "abilcode" or ____switch15 == "frame" or ____switch15 == "hashtable" or ____switch15 == "effectGroup" or ____switch15 == "lightningGroup" or ____switch15 == "StarStrPool" or ____switch15 == "starCircle" or ____switch15 == "Srrounder" or ____switch15 == "StarIntPool" or ____switch15 == "terraintype" or ____switch15 == "doodad")
+        if ____cond15 then
+            return jass.LoadInteger(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "unit"
-        if ____cond17 then
-            local ____temp_15
-            if type(jass.LoadUnitHandle) == "function" then
-                ____temp_15 = jass.LoadUnitHandle(h, p, c)
-            else
-                ____temp_15 = nil
-            end
-            return ____temp_15
+        ____cond15 = ____cond15 or ____switch15 == "unit"
+        if ____cond15 then
+            return jass.LoadUnitHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "group"
-        if ____cond17 then
-            local ____temp_16
-            if type(jass.LoadGroupHandle) == "function" then
-                ____temp_16 = jass.LoadGroupHandle(h, p, c)
-            else
-                ____temp_16 = nil
-            end
-            return ____temp_16
+        ____cond15 = ____cond15 or ____switch15 == "group"
+        if ____cond15 then
+            return jass.LoadGroupHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "timer"
-        if ____cond17 then
-            local ____temp_17
-            if type(jass.LoadTimerHandle) == "function" then
-                ____temp_17 = jass.LoadTimerHandle(h, p, c)
-            else
-                ____temp_17 = nil
-            end
-            return ____temp_17
+        ____cond15 = ____cond15 or ____switch15 == "timer"
+        if ____cond15 then
+            return jass.LoadTimerHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "trigger"
-        if ____cond17 then
-            local ____temp_18
-            if type(jass.LoadTriggerHandle) == "function" then
-                ____temp_18 = jass.LoadTriggerHandle(h, p, c)
-            else
-                ____temp_18 = nil
-            end
-            return ____temp_18
+        ____cond15 = ____cond15 or ____switch15 == "trigger"
+        if ____cond15 then
+            return jass.LoadTriggerHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "item"
-        if ____cond17 then
-            local ____temp_19
-            if type(jass.LoadItemHandle) == "function" then
-                ____temp_19 = jass.LoadItemHandle(h, p, c)
-            else
-                ____temp_19 = nil
-            end
-            return ____temp_19
+        ____cond15 = ____cond15 or ____switch15 == "item"
+        if ____cond15 then
+            return jass.LoadItemHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "player"
-        if ____cond17 then
-            local ____temp_20
-            if type(jass.LoadPlayerHandle) == "function" then
-                ____temp_20 = jass.LoadPlayerHandle(h, p, c)
-            else
-                ____temp_20 = nil
-            end
-            return ____temp_20
+        ____cond15 = ____cond15 or ____switch15 == "player"
+        if ____cond15 then
+            return jass.LoadPlayerHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "location"
-        if ____cond17 then
-            local ____temp_21
-            if type(jass.LoadLocationHandle) == "function" then
-                ____temp_21 = jass.LoadLocationHandle(h, p, c)
-            else
-                ____temp_21 = nil
-            end
-            return ____temp_21
+        ____cond15 = ____cond15 or ____switch15 == "location"
+        if ____cond15 then
+            return jass.LoadLocationHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "destructable"
-        if ____cond17 then
-            local ____temp_22
-            if type(jass.LoadDestructableHandle) == "function" then
-                ____temp_22 = jass.LoadDestructableHandle(h, p, c)
-            else
-                ____temp_22 = nil
-            end
-            return ____temp_22
+        ____cond15 = ____cond15 or ____switch15 == "destructable"
+        if ____cond15 then
+            return jass.LoadDestructableHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "force"
-        if ____cond17 then
-            local ____temp_23
-            if type(jass.LoadForceHandle) == "function" then
-                ____temp_23 = jass.LoadForceHandle(h, p, c)
-            else
-                ____temp_23 = nil
-            end
-            return ____temp_23
+        ____cond15 = ____cond15 or ____switch15 == "force"
+        if ____cond15 then
+            return jass.LoadForceHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "rect"
-        if ____cond17 then
-            local ____temp_24
-            if type(jass.LoadRectHandle) == "function" then
-                ____temp_24 = jass.LoadRectHandle(h, p, c)
-            else
-                ____temp_24 = nil
-            end
-            return ____temp_24
+        ____cond15 = ____cond15 or ____switch15 == "rect"
+        if ____cond15 then
+            return jass.LoadRectHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "region"
-        if ____cond17 then
-            local ____temp_25
-            if type(jass.LoadRegionHandle) == "function" then
-                ____temp_25 = jass.LoadRegionHandle(h, p, c)
-            else
-                ____temp_25 = nil
-            end
-            return ____temp_25
+        ____cond15 = ____cond15 or ____switch15 == "region"
+        if ____cond15 then
+            return jass.LoadRegionHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "sound"
-        if ____cond17 then
-            local ____temp_26
-            if type(jass.LoadSoundHandle) == "function" then
-                ____temp_26 = jass.LoadSoundHandle(h, p, c)
-            else
-                ____temp_26 = nil
-            end
-            return ____temp_26
+        ____cond15 = ____cond15 or ____switch15 == "sound"
+        if ____cond15 then
+            return jass.LoadSoundHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "effect"
-        if ____cond17 then
-            local ____temp_27
-            if type(jass.LoadEffectHandle) == "function" then
-                ____temp_27 = jass.LoadEffectHandle(h, p, c)
-            else
-                ____temp_27 = nil
-            end
-            return ____temp_27
+        ____cond15 = ____cond15 or ____switch15 == "effect"
+        if ____cond15 then
+            return jass.LoadEffectHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "unitpool"
-        if ____cond17 then
-            local ____temp_28
-            if type(jass.LoadUnitPoolHandle) == "function" then
-                ____temp_28 = jass.LoadUnitPoolHandle(h, p, c)
-            else
-                ____temp_28 = nil
-            end
-            return ____temp_28
+        ____cond15 = ____cond15 or ____switch15 == "unitpool"
+        if ____cond15 then
+            return jass.LoadUnitPoolHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "itempool"
-        if ____cond17 then
-            local ____temp_29
-            if type(jass.LoadItemPoolHandle) == "function" then
-                ____temp_29 = jass.LoadItemPoolHandle(h, p, c)
-            else
-                ____temp_29 = nil
-            end
-            return ____temp_29
+        ____cond15 = ____cond15 or ____switch15 == "itempool"
+        if ____cond15 then
+            return jass.LoadItemPoolHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "quest"
-        if ____cond17 then
-            local ____temp_30
-            if type(jass.LoadQuestHandle) == "function" then
-                ____temp_30 = jass.LoadQuestHandle(h, p, c)
-            else
-                ____temp_30 = nil
-            end
-            return ____temp_30
+        ____cond15 = ____cond15 or ____switch15 == "quest"
+        if ____cond15 then
+            return jass.LoadQuestHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "questitem"
-        if ____cond17 then
-            local ____temp_31
-            if type(jass.LoadQuestItemHandle) == "function" then
-                ____temp_31 = jass.LoadQuestItemHandle(h, p, c)
-            else
-                ____temp_31 = nil
-            end
-            return ____temp_31
+        ____cond15 = ____cond15 or ____switch15 == "questitem"
+        if ____cond15 then
+            return jass.LoadQuestItemHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "timerdialog"
-        if ____cond17 then
-            local ____temp_32
-            if type(jass.LoadTimerDialogHandle) == "function" then
-                ____temp_32 = jass.LoadTimerDialogHandle(h, p, c)
-            else
-                ____temp_32 = nil
-            end
-            return ____temp_32
+        ____cond15 = ____cond15 or ____switch15 == "timerdialog"
+        if ____cond15 then
+            return jass.LoadTimerDialogHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "leaderboard"
-        if ____cond17 then
-            local ____temp_33
-            if type(jass.LoadLeaderboardHandle) == "function" then
-                ____temp_33 = jass.LoadLeaderboardHandle(h, p, c)
-            else
-                ____temp_33 = nil
-            end
-            return ____temp_33
+        ____cond15 = ____cond15 or ____switch15 == "leaderboard"
+        if ____cond15 then
+            return jass.LoadLeaderboardHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "multiboard"
-        if ____cond17 then
-            local ____temp_34
-            if type(jass.LoadMultiboardHandle) == "function" then
-                ____temp_34 = jass.LoadMultiboardHandle(h, p, c)
-            else
-                ____temp_34 = nil
-            end
-            return ____temp_34
+        ____cond15 = ____cond15 or ____switch15 == "multiboard"
+        if ____cond15 then
+            return jass.LoadMultiboardHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "multiboarditem"
-        if ____cond17 then
-            local ____temp_35
-            if type(jass.LoadMultiboardItemHandle) == "function" then
-                ____temp_35 = jass.LoadMultiboardItemHandle(h, p, c)
-            else
-                ____temp_35 = nil
-            end
-            return ____temp_35
+        ____cond15 = ____cond15 or ____switch15 == "multiboarditem"
+        if ____cond15 then
+            return jass.LoadMultiboardItemHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "trackable"
-        if ____cond17 then
-            local ____temp_36
-            if type(jass.LoadTrackableHandle) == "function" then
-                ____temp_36 = jass.LoadTrackableHandle(h, p, c)
-            else
-                ____temp_36 = nil
-            end
-            return ____temp_36
+        ____cond15 = ____cond15 or ____switch15 == "trackable"
+        if ____cond15 then
+            return jass.LoadTrackableHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "dialog"
-        if ____cond17 then
-            local ____temp_37
-            if type(jass.LoadDialogHandle) == "function" then
-                ____temp_37 = jass.LoadDialogHandle(h, p, c)
-            else
-                ____temp_37 = nil
-            end
-            return ____temp_37
+        ____cond15 = ____cond15 or ____switch15 == "dialog"
+        if ____cond15 then
+            return jass.LoadDialogHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "button"
-        if ____cond17 then
-            local ____temp_38
-            if type(jass.LoadButtonHandle) == "function" then
-                ____temp_38 = jass.LoadButtonHandle(h, p, c)
-            else
-                ____temp_38 = nil
-            end
-            return ____temp_38
+        ____cond15 = ____cond15 or ____switch15 == "button"
+        if ____cond15 then
+            return jass.LoadButtonHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "texttag"
-        if ____cond17 then
-            local ____temp_39
-            if type(jass.LoadTextTagHandle) == "function" then
-                ____temp_39 = jass.LoadTextTagHandle(h, p, c)
-            else
-                ____temp_39 = nil
-            end
-            return ____temp_39
+        ____cond15 = ____cond15 or ____switch15 == "texttag"
+        if ____cond15 then
+            return jass.LoadTextTagHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "lightning"
-        if ____cond17 then
-            local ____temp_40
-            if type(jass.LoadLightningHandle) == "function" then
-                ____temp_40 = jass.LoadLightningHandle(h, p, c)
-            else
-                ____temp_40 = nil
-            end
-            return ____temp_40
+        ____cond15 = ____cond15 or ____switch15 == "lightning"
+        if ____cond15 then
+            return jass.LoadLightningHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "image"
-        if ____cond17 then
-            local ____temp_41
-            if type(jass.LoadImageHandle) == "function" then
-                ____temp_41 = jass.LoadImageHandle(h, p, c)
-            else
-                ____temp_41 = nil
-            end
-            return ____temp_41
+        ____cond15 = ____cond15 or ____switch15 == "image"
+        if ____cond15 then
+            return jass.LoadImageHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "fogstate"
-        if ____cond17 then
-            local ____temp_42
-            if type(jass.LoadFogStateHandle) == "function" then
-                ____temp_42 = jass.LoadFogStateHandle(h, p, c)
-            else
-                ____temp_42 = nil
-            end
-            return ____temp_42
+        ____cond15 = ____cond15 or ____switch15 == "fogstate"
+        if ____cond15 then
+            return jass.LoadFogStateHandle(h, p, c)
         end
-        ____cond17 = ____cond17 or ____switch17 == "fogmodifier"
-        if ____cond17 then
-            local ____temp_43
-            if type(jass.LoadFogModifierHandle) == "function" then
-                ____temp_43 = jass.LoadFogModifierHandle(h, p, c)
-            else
-                ____temp_43 = nil
-            end
-            return ____temp_43
+        ____cond15 = ____cond15 or ____switch15 == "fogmodifier"
+        if ____cond15 then
+            return jass.LoadFogModifierHandle(h, p, c)
         end
         do
             return nil
@@ -488,15 +269,9 @@ end
 local function saveByHash(self, ____type, p, c, value)
     local h = hashHandle(nil)
     repeat
-        local ____switch19 = ____type
-        local ____cond19 = ____switch19 == "integer"
-        if ____cond19 then
-            if type(jass.SaveInteger) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveInteger"),
-                    0
-                )
-            end
+        local ____switch17 = ____type
+        local ____cond17 = ____switch17 == "integer"
+        if ____cond17 then
             jass.SaveInteger(
                 h,
                 p,
@@ -505,14 +280,8 @@ local function saveByHash(self, ____type, p, c, value)
             )
             return
         end
-        ____cond19 = ____cond19 or (____switch19 == "real" or ____switch19 == "radian" or ____switch19 == "degree")
-        if ____cond19 then
-            if type(jass.SaveReal) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveReal"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or (____switch17 == "real" or ____switch17 == "radian" or ____switch17 == "degree")
+        if ____cond17 then
             jass.SaveReal(
                 h,
                 p,
@@ -521,25 +290,13 @@ local function saveByHash(self, ____type, p, c, value)
             )
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "boolean"
-        if ____cond19 then
-            if type(jass.SaveBoolean) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveBoolean"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "boolean"
+        if ____cond17 then
             jass.SaveBoolean(h, p, c, not not value)
             return
         end
-        ____cond19 = ____cond19 or (____switch19 == "string" or ____switch19 == "imagefile" or ____switch19 == "modelfile")
-        if ____cond19 then
-            if type(jass.SaveStr) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveStr"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or (____switch17 == "string" or ____switch17 == "imagefile" or ____switch17 == "modelfile")
+        if ____cond17 then
             jass.SaveStr(
                 h,
                 p,
@@ -548,333 +305,153 @@ local function saveByHash(self, ____type, p, c, value)
             )
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "unit"
-        if ____cond19 then
-            if type(jass.SaveUnitHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveUnitHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "unit"
+        if ____cond17 then
             jass.SaveUnitHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "group"
-        if ____cond19 then
-            if type(jass.SaveGroupHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveGroupHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "group"
+        if ____cond17 then
             jass.SaveGroupHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "timer"
-        if ____cond19 then
-            if type(jass.SaveTimerHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveTimerHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "timer"
+        if ____cond17 then
             jass.SaveTimerHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "trigger"
-        if ____cond19 then
-            if type(jass.SaveTriggerHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveTriggerHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "trigger"
+        if ____cond17 then
             jass.SaveTriggerHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "item"
-        if ____cond19 then
-            if type(jass.SaveItemHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveItemHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "item"
+        if ____cond17 then
             jass.SaveItemHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "player"
-        if ____cond19 then
-            if type(jass.SavePlayerHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SavePlayerHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "player"
+        if ____cond17 then
             jass.SavePlayerHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "location"
-        if ____cond19 then
-            if type(jass.SaveLocationHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveLocationHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "location"
+        if ____cond17 then
             jass.SaveLocationHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "destructable"
-        if ____cond19 then
-            if type(jass.SaveDestructableHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveDestructableHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "destructable"
+        if ____cond17 then
             jass.SaveDestructableHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "force"
-        if ____cond19 then
-            if type(jass.SaveForceHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveForceHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "force"
+        if ____cond17 then
             jass.SaveForceHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "rect"
-        if ____cond19 then
-            if type(jass.SaveRectHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveRectHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "rect"
+        if ____cond17 then
             jass.SaveRectHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "region"
-        if ____cond19 then
-            if type(jass.SaveRegionHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveRegionHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "region"
+        if ____cond17 then
             jass.SaveRegionHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "sound"
-        if ____cond19 then
-            if type(jass.SaveSoundHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveSoundHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "sound"
+        if ____cond17 then
             jass.SaveSoundHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "effect"
-        if ____cond19 then
-            if type(jass.SaveEffectHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveEffectHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "effect"
+        if ____cond17 then
             jass.SaveEffectHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "unitpool"
-        if ____cond19 then
-            if type(jass.SaveUnitPoolHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveUnitPoolHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "unitpool"
+        if ____cond17 then
             jass.SaveUnitPoolHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "itempool"
-        if ____cond19 then
-            if type(jass.SaveItemPoolHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveItemPoolHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "itempool"
+        if ____cond17 then
             jass.SaveItemPoolHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "quest"
-        if ____cond19 then
-            if type(jass.SaveQuestHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveQuestHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "quest"
+        if ____cond17 then
             jass.SaveQuestHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "questitem"
-        if ____cond19 then
-            if type(jass.SaveQuestItemHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveQuestItemHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "questitem"
+        if ____cond17 then
             jass.SaveQuestItemHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "timerdialog"
-        if ____cond19 then
-            if type(jass.SaveTimerDialogHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveTimerDialogHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "timerdialog"
+        if ____cond17 then
             jass.SaveTimerDialogHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "leaderboard"
-        if ____cond19 then
-            if type(jass.SaveLeaderboardHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveLeaderboardHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "leaderboard"
+        if ____cond17 then
             jass.SaveLeaderboardHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "multiboard"
-        if ____cond19 then
-            if type(jass.SaveMultiboardHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveMultiboardHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "multiboard"
+        if ____cond17 then
             jass.SaveMultiboardHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "multiboarditem"
-        if ____cond19 then
-            if type(jass.SaveMultiboardItemHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveMultiboardItemHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "multiboarditem"
+        if ____cond17 then
             jass.SaveMultiboardItemHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "trackable"
-        if ____cond19 then
-            if type(jass.SaveTrackableHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveTrackableHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "trackable"
+        if ____cond17 then
             jass.SaveTrackableHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "dialog"
-        if ____cond19 then
-            if type(jass.SaveDialogHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveDialogHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "dialog"
+        if ____cond17 then
             jass.SaveDialogHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "button"
-        if ____cond19 then
-            if type(jass.SaveButtonHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveButtonHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "button"
+        if ____cond17 then
             jass.SaveButtonHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "texttag"
-        if ____cond19 then
-            if type(jass.SaveTextTagHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveTextTagHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "texttag"
+        if ____cond17 then
             jass.SaveTextTagHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "lightning"
-        if ____cond19 then
-            if type(jass.SaveLightningHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveLightningHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "lightning"
+        if ____cond17 then
             jass.SaveLightningHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "image"
-        if ____cond19 then
-            if type(jass.SaveImageHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveImageHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "image"
+        if ____cond17 then
             jass.SaveImageHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "fogstate"
-        if ____cond19 then
-            if type(jass.SaveFogStateHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveFogStateHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "fogstate"
+        if ____cond17 then
             jass.SaveFogStateHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or ____switch19 == "fogmodifier"
-        if ____cond19 then
-            if type(jass.SaveFogModifierHandle) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveFogModifierHandle"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or ____switch17 == "fogmodifier"
+        if ____cond17 then
             jass.SaveFogModifierHandle(h, p, c, value)
             return
         end
-        ____cond19 = ____cond19 or (____switch19 == "unitcode" or ____switch19 == "itemcode" or ____switch19 == "abilcode" or ____switch19 == "frame" or ____switch19 == "hashtable" or ____switch19 == "effectGroup" or ____switch19 == "lightningGroup" or ____switch19 == "StarStrPool" or ____switch19 == "starCircle" or ____switch19 == "Srrounder" or ____switch19 == "StarIntPool" or ____switch19 == "terraintype" or ____switch19 == "doodad")
-        if ____cond19 then
-            if type(jass.SaveInteger) ~= "function" then
-                error(
-                    __TS__New(Error, "[YDUserData兼容] 缺少 SaveInteger"),
-                    0
-                )
-            end
+        ____cond17 = ____cond17 or (____switch17 == "unitcode" or ____switch17 == "itemcode" or ____switch17 == "abilcode" or ____switch17 == "frame" or ____switch17 == "hashtable" or ____switch17 == "effectGroup" or ____switch17 == "lightningGroup" or ____switch17 == "StarStrPool" or ____switch17 == "starCircle" or ____switch17 == "Srrounder" or ____switch17 == "StarIntPool" or ____switch17 == "terraintype" or ____switch17 == "doodad")
+        if ____cond17 then
             jass.SaveInteger(
                 h,
                 p,
@@ -944,9 +521,7 @@ end
 function ____exports.YDUserDataClearTable(self, tableTypeName, tableKey)
     local h = hashHandle(nil)
     local p = tableId(nil, tableTypeName, tableKey)
-    if type(jass.FlushChildHashtable) == "function" then
-        jass.FlushChildHashtable(h, p)
-    end
+    jass.FlushChildHashtable(h, p)
 end
 --- YDUserDataClear - 清除指定属性
 -- 对应宏: YDHashClear（按值类型选用 RemoveSaved*）
@@ -960,41 +535,29 @@ function ____exports.YDUserDataClear(self, tableTypeName, tableKey, attr, valueT
     local rmStr = jass.RemoveSavedString
     local rmHandle = jass.RemoveSavedHandle
     repeat
-        local ____switch63 = valueTypeName
-        local ____cond63 = ____switch63 == "integer" or ____switch63 == "unitcode" or ____switch63 == "itemcode" or ____switch63 == "abilcode" or ____switch63 == "frame" or ____switch63 == "hashtable" or ____switch63 == "effectGroup" or ____switch63 == "lightningGroup" or ____switch63 == "StarStrPool" or ____switch63 == "starCircle" or ____switch63 == "Srrounder" or ____switch63 == "StarIntPool" or ____switch63 == "terraintype" or ____switch63 == "doodad"
-        if ____cond63 then
-            if type(rmInt) == "function" then
-                rmInt(nil, h, p, c)
-            end
+        local ____switch26 = valueTypeName
+        local ____cond26 = ____switch26 == "integer" or ____switch26 == "unitcode" or ____switch26 == "itemcode" or ____switch26 == "abilcode" or ____switch26 == "frame" or ____switch26 == "hashtable" or ____switch26 == "effectGroup" or ____switch26 == "lightningGroup" or ____switch26 == "StarStrPool" or ____switch26 == "starCircle" or ____switch26 == "Srrounder" or ____switch26 == "StarIntPool" or ____switch26 == "terraintype" or ____switch26 == "doodad"
+        if ____cond26 then
+            rmInt(nil, h, p, c)
             return
         end
-        ____cond63 = ____cond63 or (____switch63 == "real" or ____switch63 == "radian" or ____switch63 == "degree")
-        if ____cond63 then
-            if type(rmReal) == "function" then
-                rmReal(nil, h, p, c)
-            end
+        ____cond26 = ____cond26 or (____switch26 == "real" or ____switch26 == "radian" or ____switch26 == "degree")
+        if ____cond26 then
+            rmReal(nil, h, p, c)
             return
         end
-        ____cond63 = ____cond63 or ____switch63 == "boolean"
-        if ____cond63 then
-            if type(rmBool) == "function" then
-                rmBool(nil, h, p, c)
-            end
+        ____cond26 = ____cond26 or ____switch26 == "boolean"
+        if ____cond26 then
+            rmBool(nil, h, p, c)
             return
         end
-        ____cond63 = ____cond63 or (____switch63 == "string" or ____switch63 == "imagefile" or ____switch63 == "modelfile")
-        if ____cond63 then
-            if type(rmStr) == "function" then
-                rmStr(nil, h, p, c)
-            end
+        ____cond26 = ____cond26 or (____switch26 == "string" or ____switch26 == "imagefile" or ____switch26 == "modelfile")
+        if ____cond26 then
+            rmStr(nil, h, p, c)
             return
         end
         do
-            if type(rmHandle) == "function" then
-                rmHandle(nil, h, p, c)
-            elseif type(rmInt) == "function" then
-                rmInt(nil, h, p, c)
-            end
+            rmHandle(nil, h, p, c)
         end
     until true
 end
@@ -1009,19 +572,19 @@ function ____exports.YDUserDataClear2(self, tableTypeName, tableKey, valueTypeNa
 end
 local function hasByHash(self, ____type, p, c)
     local h = hashHandle(nil)
-    if type(jass.HaveSavedInteger) == "function" and jass.HaveSavedInteger(h, p, c) then
+    if jass.HaveSavedInteger(h, p, c) then
         return true
     end
-    if type(jass.HaveSavedReal) == "function" and jass.HaveSavedReal(h, p, c) then
+    if jass.HaveSavedReal(h, p, c) then
         return true
     end
-    if type(jass.HaveSavedBoolean) == "function" and jass.HaveSavedBoolean(h, p, c) then
+    if jass.HaveSavedBoolean(h, p, c) then
         return true
     end
-    if type(jass.HaveSavedString) == "function" and jass.HaveSavedString(h, p, c) then
+    if jass.HaveSavedString(h, p, c) then
         return true
     end
-    if type(jass.HaveSavedHandle) == "function" and jass.HaveSavedHandle(h, p, c) then
+    if jass.HaveSavedHandle(h, p, c) then
         return true
     end
     return false

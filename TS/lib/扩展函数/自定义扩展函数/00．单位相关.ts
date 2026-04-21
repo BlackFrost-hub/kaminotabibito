@@ -29,10 +29,6 @@ export function createUnitWithOptions(
     scaleY?: number,
     scaleZ?: number
 ): any {
-    if (typeof jass.CreateUnit !== "function") {
-        return null;
-    }
-
     let unitTypeId: number | null = null;
     if (typeof unitId === "number") {
         unitTypeId = unitId;
@@ -53,7 +49,7 @@ export function createUnitWithOptions(
         return null;
     }
 
-    if (facing !== undefined && typeof jass.SetUnitFacing === "function") {
+    if (facing !== undefined) {
         jass.SetUnitFacing(unit, facing * 180 / Math.PI);
     }
 
@@ -61,9 +57,7 @@ export function createUnitWithOptions(
     const scaleY2 = scaleY ?? 1.0;
     const scaleZ2 = scaleZ ?? 1.0;
 
-    if (typeof jass.SetUnitScale === "function") {
-        jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2);
-    }
+    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2);
 
     return unit;
 }
@@ -76,9 +70,9 @@ export function createUnitWithOptions(
 export function getPlayerFirstHero(player: any): any {
     if (!player) return null;
 
-    // 通过 YDUserData 获取“玩家英雄-单位组”后遍历，避免整图枚举
+    // 通过 YDUserData 获取"玩家英雄-单位组"后遍历，避免整图枚举
     const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group") as any;
-    if (!heroGroup || typeof jass.GetEnumUnit !== "function" || typeof jass.GetOwningPlayer !== "function") return null;
+    if (!heroGroup) return null;
 
     let hero: any = null;
     ForGroupBJ(heroGroup, () => {
@@ -88,7 +82,7 @@ export function getPlayerFirstHero(player: any): any {
         // 对齐你给的 JASS：if GetOwningPlayer(GetEnumUnit()) == Player(x)
         if (jass.GetOwningPlayer(u) === player) {
             // 保险起见仍检查英雄类型（按存表语义理论上应全是英雄）
-            if (typeof jass.IsUnitType === "function" ? jass.IsUnitType(u, jass.UNIT_TYPE_HERO) : true) {
+            if (jass.IsUnitType(u, jass.UNIT_TYPE_HERO)) {
                 hero = u;
             }
         }

@@ -256,7 +256,7 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
     const chosen = pickResult(recipe.results);
     const inputCharges = getItemChargesSafe(item); // 例如“生鱼大”堆叠 10 次
     // 删除原物品
-    if (typeof (jass as any).RemoveItem === "function") (jass as any).RemoveItem(item);
+    (jass as any).RemoveItem(item);
     // 从追踪中移除原 item（会销毁 cookTimer）
     untrackItem(item);
 
@@ -275,7 +275,7 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
       if (!ok) {
         // 放不进：这是“多余产物”，按 20% 概率留地上，否则移除
         const roll = (math as any).random(1, 100);
-        if (roll > 20 && typeof (jass as any).RemoveItem === "function") (jass as any).RemoveItem(it);
+        if (roll > 20) (jass as any).RemoveItem(it);
         // 若 roll<=20，就留在地上（不计入篝火超时烤焦）
       } else {
         // 在篝火内：开始超时烤焦
@@ -293,8 +293,8 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
 }
 
 function onAnyPickup(): void {
-  const u = typeof (jass as any).GetTriggerUnit === "function" ? (jass as any).GetTriggerUnit() : undefined;
-  const item = typeof (jass as any).GetManipulatedItem === "function" ? (jass as any).GetManipulatedItem() : undefined;
+  const u = (jass as any).GetTriggerUnit();
+  const item = (jass as any).GetManipulatedItem();
   if (!u || !item) return;
 
   // 取回：其他单位拾取了处于追踪中的 item

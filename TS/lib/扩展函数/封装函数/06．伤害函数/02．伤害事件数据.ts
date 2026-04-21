@@ -64,9 +64,7 @@ function isFiniteNumber(n: number): boolean {
 export function readEventDamageAfterModify(): number {
   let fromJapiFn: number | undefined;
   (pcall as any)(() => {
-    if (typeof (japi as any).GetEventDamage === "function") {
-      fromJapiFn = (japi as any).GetEventDamage();
-    }
+    fromJapiFn = (japi as any).GetEventDamage();
   });
   if (fromJapiFn !== undefined && isFiniteNumber(fromJapiFn)) {
     return fromJapiFn;
@@ -74,13 +72,11 @@ export function readEventDamageAfterModify(): number {
 
   let fromExData: number | undefined;
   (pcall as any)(() => {
-    if (typeof (japi as any).EXGetEventDamageData === "function") {
-      fromExData = (japi as any).EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT);
-    }
+    fromExData = (japi as any).EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT);
   });
   if (fromExData !== undefined && isFiniteNumber(fromExData)) {
     return fromExData;
   }
 
-  return typeof (jass as any).GetEventDamage === "function" ? (jass as any).GetEventDamage() : 0;
+  return (jass as any).GetEventDamage();
 }

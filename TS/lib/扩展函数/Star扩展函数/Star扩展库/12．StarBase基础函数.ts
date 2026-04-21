@@ -36,12 +36,10 @@ export function Star_CoordinateX(x: number): number {
   let minX = -10000;
   let maxX = 10000;
 
-  if (typeof jass.GetWorldBounds === "function") {
-    const mapRect = jass.GetWorldBounds();
-    if (mapRect) {
-      if (typeof jass.GetRectMinX === "function") minX = jass.GetRectMinX(mapRect);
-      if (typeof jass.GetRectMaxX === "function") maxX = jass.GetRectMaxX(mapRect);
-    }
+  const mapRect = jass.GetWorldBounds();
+  if (mapRect) {
+    minX = jass.GetRectMinX(mapRect);
+    maxX = jass.GetRectMaxX(mapRect);
   }
 
   if (x < minX) return minX;
@@ -58,12 +56,10 @@ export function Star_CoordinateY(y: number): number {
   let minY = -10000;
   let maxY = 10000;
 
-  if (typeof jass.GetWorldBounds === "function") {
-    const mapRect = jass.GetWorldBounds();
-    if (mapRect) {
-      if (typeof jass.GetRectMinY === "function") minY = jass.GetRectMinY(mapRect);
-      if (typeof jass.GetRectMaxY === "function") maxY = jass.GetRectMaxY(mapRect);
-    }
+  const mapRect = jass.GetWorldBounds();
+  if (mapRect) {
+    minY = jass.GetRectMinY(mapRect);
+    maxY = jass.GetRectMaxY(mapRect);
   }
 
   if (y < minY) return minY;
@@ -79,15 +75,13 @@ export function Star_CoordinateY(y: number): number {
  */
 export function Star_GetLocZ(x: number, y: number): number {
   if (Star_Location == null) {
-    Star_Location = typeof jass.Location === "function" ? jass.Location(0, 0) : null;
+    Star_Location = jass.Location(0, 0);
   }
   if (Star_Location == null) return 0;
 
-  if (typeof jass.MoveLocation === "function") {
-    jass.MoveLocation(Star_Location, x, y);
-  }
+  jass.MoveLocation(Star_Location, x, y);
 
-  return typeof jass.GetLocationZ === "function" ? jass.GetLocationZ(Star_Location) : 0;
+  return jass.GetLocationZ(Star_Location);
 }
 
 /**
@@ -103,19 +97,9 @@ export function GetRectByHandle(i: number): any {
     tempHT = StarBaseHT;
   }
 
-  if (typeof jass.FlushChildHashtable === "function") {
-    jass.FlushChildHashtable(tempHT, 2);
-  }
-
-  if (typeof jass.SaveFogStateHandle === "function" && typeof jass.ConvertFogState === "function") {
-    jass.SaveFogStateHandle(tempHT, 2, 1, jass.ConvertFogState(i));
-  }
-
-  if (typeof jass.LoadRectHandle === "function") {
-    return jass.LoadRectHandle(tempHT, 2, 1);
-  }
-
-  return null;
+  jass.FlushChildHashtable(tempHT, 2);
+  jass.SaveFogStateHandle(tempHT, 2, 1, jass.ConvertFogState(i));
+  return jass.LoadRectHandle(tempHT, 2, 1);
 }
 
 export {};

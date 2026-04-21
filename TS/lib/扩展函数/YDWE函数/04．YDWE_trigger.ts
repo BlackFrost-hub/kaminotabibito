@@ -66,16 +66,15 @@ function findYDHT(): any {
  */
 export function YDLocalExecuteTrigger(trg: any): void {
     if (!trg) return;
-    if (typeof jass.GetHandleId !== "function") return;
     const YDLOC = findYDLOC();
     const hd = jass.GetHandleId(trg);
 
-    if (YDLOC && typeof jass.HaveSavedInteger === "function" && jass.HaveSavedInteger(YDLOC, hd, getSKey_Trigger())) {
+    if (YDLOC && jass.HaveSavedInteger(YDLOC, hd, getSKey_Trigger())) {
         (globalThis as any).ydl_triggerstep = hd;
         return;
     }
 
-    const step = YDLOC ? (typeof jass.LoadInteger === "function" ? jass.LoadInteger(YDLOC, hd, STEP_KEY) : 0) : 0;
+    const step = YDLOC ? jass.LoadInteger(YDLOC, hd, STEP_KEY) : 0;
     (globalThis as any).ydl_triggerstep = hd * (step + 3);
 }
 
@@ -90,9 +89,7 @@ export function YDTriggerExecuteTrigger(trg: any, flag: boolean): void {
     if (flag) {
         ConditionalTriggerExecute(trg);
     } else {
-        if (typeof jass.TriggerExecute === "function") {
-            jass.TriggerExecute(trg);
-        }
+        jass.TriggerExecute(trg);
     }
 }
 
@@ -109,8 +106,6 @@ export function saveParentIndex(trg: any): void {
     if (!trg) return;
     const YDHT = findYDHT();
     if (!YDHT) return;
-    if (typeof jass.GetHandleId !== "function") return;
-    if (typeof jass.SaveInteger !== "function") return;
 
     const childHd = jass.GetHandleId(trg);
     const parentIndex = getG_SIndex();
@@ -127,8 +122,6 @@ export function removeParentIndex(trg: any): void {
     if (!trg) return;
     const YDHT = findYDHT();
     if (!YDHT) return;
-    if (typeof jass.GetHandleId !== "function") return;
-    if (typeof jass.RemoveSavedInteger !== "function") return;
 
     const childHd = jass.GetHandleId(trg);
     jass.RemoveSavedInteger(YDHT, childHd, getSKey_PIndex());

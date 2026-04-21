@@ -13,7 +13,5 @@ export function trackEffect(tag: string, eff: any): void {
 export function destroyEffect(eff: any): void {
   if (!eff) return;
   untrack("effect", eff);
-  if (typeof (jass as any).DestroyEffect === "function") {
-    (jass as any).DestroyEffect(eff);
-  }
+  (jass as any).DestroyEffect(eff);
 }

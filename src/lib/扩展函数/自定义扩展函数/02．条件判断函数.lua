@@ -11,16 +11,16 @@ function ____exports.isValidUnit(self, unit)
     if not unit then
         return false
     end
-    if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
         return false
     end
-    if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
-    if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
         return false
     end
-    if type(jass.IsUnitType) == "function" and jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
     return true
@@ -34,17 +34,11 @@ function ____exports.isUnitEnemy(self, targetUnit, sourceUnit)
     if not targetUnit or not sourceUnit then
         return false
     end
-    local ____temp_0
-    if type(jass.GetOwningPlayer) == "function" then
-        ____temp_0 = jass.GetOwningPlayer(sourceUnit)
-    else
-        ____temp_0 = nil
-    end
-    local sourcePlayer = ____temp_0
+    local sourcePlayer = jass.GetOwningPlayer(sourceUnit)
     if not sourcePlayer then
         return false
     end
-    return type(jass.IsUnitEnemy) == "function" and jass.IsUnitEnemy(targetUnit, sourcePlayer)
+    return jass.IsUnitEnemy(targetUnit, sourcePlayer)
 end
 --- 判断单位是否有效且是敌对单位
 -- 
@@ -63,13 +57,7 @@ function ____exports.isNotUsingInventoryItem(self, unit)
     if not unit then
         return true
     end
-    local ____temp_1
-    if type(jass.GetUnitCurrentOrder) == "function" then
-        ____temp_1 = jass.GetUnitCurrentOrder(unit)
-    else
-        ____temp_1 = 0
-    end
-    local orderId = ____temp_1
+    local orderId = jass.GetUnitCurrentOrder(unit)
     local ITEM_USE_MIN = 852008
     local ITEM_USE_MAX = 852013
     return orderId < ITEM_USE_MIN or orderId > ITEM_USE_MAX

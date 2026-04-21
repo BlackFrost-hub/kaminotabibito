@@ -179,16 +179,15 @@ function pickFromEqualPool(ids: string[], picks: number): string[] {
 
 function createItemAtUnit(unit: any, itemId: string): void {
   const four = stringToFourCC(itemId);
-  let loc: any = undefined;
-  if (typeof (jass as any).GetUnitLoc === "function") loc = (jass as any).GetUnitLoc(unit);
-  if (loc && typeof (jass as any).CreateItemLoc === "function") {
+  const loc: any = (jass as any).GetUnitLoc(unit);
+  if (loc) {
     equipExcrete.setLastCreatedItem((jass as any).CreateItemLoc(four, loc));
   } else if ((jass as any).GetUnitX != null) {
     const x = (jass as any).GetUnitX(unit);
     const y = (jass as any).GetUnitY(unit);
     equipExcrete.setLastCreatedItem((jass as any).CreateItem(four, x, y));
   }
-  if (loc && typeof (jass as any).RemoveLocation === "function") (jass as any).RemoveLocation(loc);
+  if (loc) (jass as any).RemoveLocation(loc);
 }
 
 function onUnitDeath(unit: any, _killer: any): void {

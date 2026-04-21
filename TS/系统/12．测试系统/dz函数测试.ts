@@ -50,10 +50,8 @@ function testDzUnbindEffect(): void {
       `|cff00ff00[DzUnbindEffect测试]|r DzSetEffectScale(0) 返回: ${scaleResult}`
     );
 
-    if (typeof jass.DestroyEffect === "function") {
-      jass.DestroyEffect(testEffect);
-      jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cff00ff00[DzUnbindEffect测试]|r 特效已删除");
-    }
+    jass.DestroyEffect(testEffect);
+    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "|cff00ff00[DzUnbindEffect测试]|r 特效已删除");
   });
 }
 

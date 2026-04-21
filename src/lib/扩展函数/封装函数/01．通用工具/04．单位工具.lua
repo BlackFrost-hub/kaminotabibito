@@ -15,13 +15,10 @@ function ____exports.isHeroUnit(self, unit)
         ____jass_UNIT_TYPE_HERO_0 = g.UNIT_TYPE_HERO
     end
     local utHero = ____jass_UNIT_TYPE_HERO_0
-    if utHero ~= nil and type(jass.IsUnitType) == "function" then
+    if utHero ~= nil then
         return jass.IsUnitType(unit, utHero) == true
     end
-    if type(jass.GetHeroLevel) == "function" then
-        return jass.GetHeroLevel(unit) > 0
-    end
-    return false
+    return jass.GetHeroLevel(unit) > 0
 end
 --- 判断单位是否为玩家英雄（玩家0-7）
 -- 用于区分玩家单位和敌对单位
@@ -71,9 +68,6 @@ end
 -- @param playerId 玩家索引（0-15）
 -- @returns 英雄单位，如果没有找到返回 null
 function ____exports.findHeroOfPlayer(self, playerId)
-    if type(jass.CreateGroup) ~= "function" or type(jass.GroupEnumUnitsOfPlayer) ~= "function" then
-        return nil
-    end
     local group = jass.CreateGroup()
     jass.GroupEnumUnitsOfPlayer(
         group,

@@ -32,7 +32,7 @@ function onUnitDeath(this: void): void {
   const dyingUnit = jass.GetTriggerUnit();
   if (dyingUnit == null) return;
 
-  const killingUnit = typeof jass.GetKillingUnit === "function" ? jass.GetKillingUnit() : null;
+  const killingUnit = jass.GetKillingUnit();
 
   for (let i = 0; i < listeners.length; i++) {
     const cb = listeners[i];

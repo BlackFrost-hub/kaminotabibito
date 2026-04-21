@@ -15,8 +15,6 @@ function ____exports.destroyTrigger(self, trg)
         return
     end
     untrack(nil, "trigger", trg)
-    if type(jass.DestroyTrigger) == "function" then
-        jass.DestroyTrigger(trg)
-    end
+    jass.DestroyTrigger(trg)
 end
 return ____exports

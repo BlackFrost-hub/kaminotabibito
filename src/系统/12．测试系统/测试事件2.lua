@@ -97,35 +97,31 @@ local function onChat555(self)
         )
     end
     step(nil)
-    if type(jass.DisplayTimedTextToPlayer) == "function" then
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            12,
-            "[测试事件2] 555：1s内12×+1000+12条漂浮字+12次音，间隔1/11s；首按可能少1声"
-        )
-    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
+        0,
+        0,
+        12,
+        "[测试事件2] 555：1s内12×+1000+12条漂浮字+12次音，间隔1/11s；首按可能少1声"
+    )
 end
 local function init(self)
     local tr = jass.CreateTrigger()
-    if type(jass.TriggerRegisterPlayerChatEvent) == "function" and type(jass.TriggerAddAction) == "function" and type(jass.Player) == "function" then
-        jass.TriggerRegisterPlayerChatEvent(
-            tr,
-            jass.Player(0),
-            "2222",
-            true
-        )
-        jass.TriggerAddAction(tr, onChat2222)
-        local tr555 = jass.CreateTrigger()
-        jass.TriggerRegisterPlayerChatEvent(
-            tr555,
-            jass.Player(0),
-            "555",
-            true
-        )
-        jass.TriggerAddAction(tr555, onChat555)
-    end
+    jass.TriggerRegisterPlayerChatEvent(
+        tr,
+        jass.Player(0),
+        "2222",
+        true
+    )
+    jass.TriggerAddAction(tr, onChat2222)
+    local tr555 = jass.CreateTrigger()
+    jass.TriggerRegisterPlayerChatEvent(
+        tr555,
+        jass.Player(0),
+        "555",
+        true
+    )
+    jass.TriggerAddAction(tr555, onChat555)
 end
 init(nil)
 return ____exports

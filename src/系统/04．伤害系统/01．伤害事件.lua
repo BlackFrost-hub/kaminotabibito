@@ -2,10 +2,7 @@
 local ____exports = {}
 local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, registerDeathListener, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
 function getEventUnitDamaged(self)
-    if type(jass.ConvertUnitEvent) == "function" then
-        return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
-    end
-    return nil
+    return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
 end
 function onUnitDeathForDamage(self, dyingUnit)
     if not UnitGroup or not dyingUnit then

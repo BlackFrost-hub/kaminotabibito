@@ -16,18 +16,18 @@ function getItemsByScoreRange(self, minScore, maxScore)
     for id in pairs(itemsData) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue82
+                goto __continue81
             end
             local entry = itemsData[id]
             local score = entry and entry.score
             if type(score) ~= "number" then
-                goto __continue82
+                goto __continue81
             end
             if score >= minScore and score <= maxScore then
                 result[#result + 1] = id
             end
         end
-        ::__continue82::
+        ::__continue81::
     end
     return result
 end
@@ -276,18 +276,15 @@ local function pickFromEqualPool(self, ids, picks)
 end
 local function createItemAtUnit(self, unit, itemId)
     local four = stringToFourCC(nil, itemId)
-    local loc = nil
-    if type(jass.GetUnitLoc) == "function" then
-        loc = jass.GetUnitLoc(unit)
-    end
-    if loc and type(jass.CreateItemLoc) == "function" then
+    local loc = jass.GetUnitLoc(unit)
+    if loc then
         equipExcrete:setLastCreatedItem(jass.CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
         local x = jass.GetUnitX(unit)
         local y = jass.GetUnitY(unit)
         equipExcrete:setLastCreatedItem(jass.CreateItem(four, x, y))
     end
-    if loc and type(jass.RemoveLocation) == "function" then
+    if loc then
         jass.RemoveLocation(loc)
     end
 end
@@ -352,15 +349,15 @@ local function onUnitDeath(self, unit, _killer)
     for ____, rule in ipairs(DROP_RULES) do
         do
             if typeId ~= stringToFourCC(nil, rule.unitId) then
-                goto __continue75
+                goto __continue74
             end
             local r = math.random(1, 10000)
             if r > rule.proc * 10000 then
-                goto __continue75
+                goto __continue74
             end
             local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
             if #list == 0 then
-                goto __continue75
+                goto __continue74
             end
             local idx = math.random(1, #list)
             local itemId = list[idx]
@@ -369,7 +366,7 @@ local function onUnitDeath(self, unit, _killer)
             end
             break
         end
-        ::__continue75::
+        ::__continue74::
     end
 end
 registerDeathListener(nil, onUnitDeath)

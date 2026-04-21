@@ -47,9 +47,7 @@ end
 function ____exports.readEventDamageAfterModify()
     local fromJapiFn
     pcall(function ()
-            if type(japi.GetEventDamage) == "function" then
-                fromJapiFn = japi.GetEventDamage()
-            end
+            fromJapiFn = japi.GetEventDamage()
         end
     )
     if fromJapiFn ~= nil and isFiniteNumber(fromJapiFn) then
@@ -57,20 +55,12 @@ function ____exports.readEventDamageAfterModify()
     end
     local fromExData
     pcall(function ()
-            if type(japi.EXGetEventDamageData) == "function" then
-                fromExData = japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
-            end
+            fromExData = japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
         end
     )
     if fromExData ~= nil and isFiniteNumber(fromExData) then
         return fromExData
     end
-    local ____temp_0
-    if type(jass.GetEventDamage) == "function" then
-        ____temp_0 = jass.GetEventDamage()
-    else
-        ____temp_0 = 0
-    end
-    return ____temp_0
+    return jass.GetEventDamage()
 end
 return ____exports

@@ -108,9 +108,6 @@ local function ensureStesKeys(self)
     if keysInitialized then
         return
     end
-    if type(jass.StringHash) ~= "function" then
-        return
-    end
     skey_count = jass.StringHash("count")
     ____exports.skey_count = skey_count
     skey_countEx = jass.StringHash("countEx")
@@ -150,9 +147,6 @@ local function ensureLuaOnlyStesTable(self)
     if StarBaseHT ~= nil and StarBaseHT ~= 0 then
         return
     end
-    if type(jass.InitHashtable) ~= "function" then
-        return
-    end
     local ht = jass.InitHashtable()
     StarBaseHT = ht
     ____exports.StarBaseHT = StarBaseHT
@@ -178,9 +172,6 @@ function ____exports.STES_Register(a, b, c)
     if not StarBaseHT then
         return
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return
-    end
     local t
     local name
     if type(a) == "string" then
@@ -200,9 +191,7 @@ function ____exports.STES_Register(a, b, c)
     local hd = jass.GetHandleId(t)
     local index = jass.LoadInteger(StarBaseHT, hash, skey_index)
     local index2 = jass.LoadInteger(StarBaseHT, hd, skey_index)
-    if type(jass.SaveTriggerHandle) == "function" then
-        jass.SaveTriggerHandle(StarBaseHT, hash, index, t)
-    end
+    jass.SaveTriggerHandle(StarBaseHT, hash, index, t)
     jass.SaveInteger(StarBaseHT, hash, skey_index, index + 1)
     jass.SaveStr(StarBaseHT, hd, index2, name)
     jass.SaveInteger(StarBaseHT, hd, skey_index, index2 + 1)
@@ -234,9 +223,6 @@ function ____exports.STES_GetUnitEvent(u, name)
     if u == nil or u == 0 then
         return name
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return name
-    end
     return tostring(jass.GetHandleId(u)) .. name
 end
 --- 与 JASS STES_Execute 一致：仅遍历触发器，Evaluate 通过才 Execute
@@ -246,18 +232,12 @@ function ____exports.STES_Execute(name)
     if not StarBaseHT then
         return
     end
-    if type(jass.StringHash) ~= "function" then
-        return
-    end
-    if type(jass.LoadInteger) ~= "function" then
-        return
-    end
     local hash = jass.StringHash(name)
     local index = jass.LoadInteger(StarBaseHT, hash, skey_index)
     local i = 0
     while i < index do
         local t = jass.LoadTriggerHandle(StarBaseHT, hash, i)
-        if t and type(jass.TriggerEvaluate) == "function" and type(jass.TriggerExecute) == "function" then
+        if t then
             if jass.TriggerEvaluate(t) then
                 jass.TriggerExecute(t)
             end
@@ -270,12 +250,6 @@ function ____exports.STES_Fire(name)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT then
-        return
-    end
-    if type(jass.StringHash) ~= "function" then
-        return
-    end
-    if type(jass.LoadInteger) ~= "function" then
         return
     end
     local hash = jass.StringHash(name)
@@ -304,12 +278,6 @@ function ____exports.STES_FireWithReal11Step(name, realParamKey)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT then
-        return
-    end
-    if type(jass.StringHash) ~= "function" then
-        return
-    end
-    if type(jass.LoadInteger) ~= "function" then
         return
     end
     if realParamKey == "" then
@@ -343,9 +311,6 @@ function ____exports.STES_RemoveEvent(t, targetName)
         return
     end
     if type(targetName) ~= "string" or targetName == "" then
-        return
-    end
-    if type(jass.GetHandleId) ~= "function" then
         return
     end
     local HT = StarBaseHT
@@ -383,11 +348,11 @@ function ____exports.STES_RemoveEvent(t, targetName)
                 if i >= evCount then
                     break
                 end
-                goto __continue67
+                goto __continue55
             end
             i = i + 1
         end
-        ::__continue67::
+        ::__continue55::
     end
 end
 --- 清除触发器上绑定的所有 STES 事件
@@ -395,9 +360,6 @@ function ____exports.STES_Remove(t)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT or t == nil or t == 0 then
-        return
-    end
-    if type(jass.GetHandleId) ~= "function" then
         return
     end
     local HT = StarBaseHT
@@ -424,9 +386,7 @@ function ____exports.STES_Remove(t)
         end
         i = i + 1
     end
-    if type(jass.FlushChildHashtable) == "function" then
-        jass.FlushChildHashtable(HT, hd)
-    end
+    jass.FlushChildHashtable(HT, hd)
 end
 ____exports.StarBaseHT = StarBaseHT
 ____exports.skey_count = skey_count

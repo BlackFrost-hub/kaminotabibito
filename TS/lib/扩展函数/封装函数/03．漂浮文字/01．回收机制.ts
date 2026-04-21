@@ -38,7 +38,7 @@ export function ensureFloatTextRecycleTimer(): void {
           const tt = it.tt;
           if (tt) {
             if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") LeakWatcher.destroyTextTag(tt);
-            else if (typeof (jass as any).DestroyTextTag === "function") (jass as any).DestroyTextTag(tt);
+            else (jass as any).DestroyTextTag(tt);
           }
           floatTextQueue.splice(i, 1);
         }

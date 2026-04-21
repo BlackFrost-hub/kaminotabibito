@@ -20,10 +20,7 @@ const EVENT_UNIT_DAMAGED_ID = 52;
 
 /** 事件句柄，TriggerRegisterUnitEvent 第3参要 jhandle_t 不能传数字 */
 function getEventUnitDamaged(): any {
-  if (typeof (jass as any).ConvertUnitEvent === "function") {
-    return (jass as any).ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID);
-  }
-  return undefined;
+  return (jass as any).ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID);
 }
 
 const DamageEventQueue: any[] = [];

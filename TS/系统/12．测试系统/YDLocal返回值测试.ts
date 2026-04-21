@@ -71,11 +71,11 @@ function testYDLocalReturn(): void {
     _print("===== 测试结束 =====");
 }
 
-if (ENABLED && typeof jass.CreateTimer === "function" && typeof jass.TimerStart === "function") {
+if (ENABLED) {
     const tm = jass.CreateTimer();
     jass.TimerStart(tm, 1.0, false, () => {
         testYDLocalReturn();
-        if (typeof jass.DestroyTimer === "function") jass.DestroyTimer(tm);
+        jass.DestroyTimer(tm);
     });
 }
 

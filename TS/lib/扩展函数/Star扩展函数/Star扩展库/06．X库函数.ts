@@ -28,9 +28,9 @@ const DUMMY_ITEM_ID = (function () {
   return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
 })();
 
-const PATHING_TYPE_WALKABILITY = typeof jass.ConvertPathingType === "function" ? jass.ConvertPathingType(0) : 0;
-const PATHING_TYPE_FLOATABILITY = typeof jass.ConvertPathingType === "function" ? jass.ConvertPathingType(1) : 1;
-const PATHING_TYPE_BUILDABILITY = typeof jass.ConvertPathingType === "function" ? jass.ConvertPathingType(2) : 2;
+const PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0);
+const PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1);
+const PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2);
 
 let dummyItem: any = null;
 let searchRect: any = null;
@@ -42,13 +42,11 @@ const hiddenItems: any[] = [];
 function initXLib(): void {
   if (dummyItem !== null) return;
 
-  if (typeof jass.Rect === "function") {
-    searchRect = jass.Rect(0, 0, 128, 128);
-  }
+  searchRect = jass.Rect(0, 0, 128, 128);
 
-  if (typeof jass.CreateItem === "function" && DUMMY_ITEM_ID !== 0) {
+  if (DUMMY_ITEM_ID !== 0) {
     dummyItem = jass.CreateItem(DUMMY_ITEM_ID, 0, 0);
-    if (dummyItem && typeof jass.SetItemVisible === "function") {
+    if (dummyItem) {
       jass.SetItemVisible(dummyItem, false);
     }
   }
@@ -60,15 +58,12 @@ function initXLib(): void {
 function hideItemsInRect(): void {
   if (!searchRect) return;
   hiddenItems.length = 0;
-  if (typeof jass.EnumItemsInRect !== "function") return;
 
   jass.EnumItemsInRect(searchRect, null, () => {
-    const it = typeof jass.GetEnumItem === "function" ? jass.GetEnumItem() : null;
-    if (it && typeof jass.IsItemVisible === "function" && jass.IsItemVisible(it)) {
+    const it = jass.GetEnumItem();
+    if (it && jass.IsItemVisible(it)) {
       hiddenItems.push(it);
-      if (typeof jass.SetItemVisible === "function") {
-        jass.SetItemVisible(it, false);
-      }
+      jass.SetItemVisible(it, false);
     }
   });
 }
@@ -79,7 +74,7 @@ function hideItemsInRect(): void {
 function restoreHiddenItems(): void {
   for (let i = hiddenItems.length - 1; i >= 0; i--) {
     const it = hiddenItems[i];
-    if (it && typeof jass.SetItemVisible === "function") {
+    if (it) {
       jass.SetItemVisible(it, true);
     }
     hiddenItems[i] = null;
@@ -98,31 +93,22 @@ export function X_IsTerrainWalkable(x: number, y: number): boolean {
   initXLib();
 
   if (!dummyItem || !searchRect) {
-    if (typeof jass.IsTerrainPathable === "function") {
-      return !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
-    }
-    return true;
+    return !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
   }
 
-  if (typeof jass.MoveRectTo === "function") {
-    jass.MoveRectTo(searchRect, x, y);
-  }
+  jass.MoveRectTo(searchRect, x, y);
 
   hideItemsInRect();
 
-  if (typeof jass.SetItemPosition === "function") {
-    jass.SetItemPosition(dummyItem, x, y);
-  }
+  jass.SetItemPosition(dummyItem, x, y);
 
-  const itemX = typeof jass.GetItemX === "function" ? (jass.GetItemX(dummyItem) as number) : x;
-  const itemY = typeof jass.GetItemY === "function" ? (jass.GetItemY(dummyItem) as number) : y;
+  const itemX = jass.GetItemX(dummyItem) as number;
+  const itemY = jass.GetItemY(dummyItem) as number;
 
   lastAbleX = itemX;
   lastAbleY = itemY;
 
-  if (typeof jass.SetItemVisible === "function") {
-    jass.SetItemVisible(dummyItem, false);
-  }
+  jass.SetItemVisible(dummyItem, false);
 
   restoreHiddenItems();
 
@@ -130,11 +116,7 @@ export function X_IsTerrainWalkable(x: number, y: number): boolean {
   const dy = itemY - y;
   const distOk = dx * dx + dy * dy <= MAX_RANGE * MAX_RANGE;
 
-  if (typeof jass.IsTerrainPathable === "function") {
-    return distOk && !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
-  }
-
-  return distOk;
+  return distOk && !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
 }
 
 /**
@@ -155,7 +137,6 @@ export function X_GetAbleY(): number {
  * 深水检测
  */
 export function X_IsTerrainDeepWater(x: number, y: number): boolean {
-  if (typeof jass.IsTerrainPathable !== "function") return false;
   return !jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
     && jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
 }
@@ -164,7 +145,6 @@ export function X_IsTerrainDeepWater(x: number, y: number): boolean {
  * 浅水检测
  */
 export function X_IsTerrainShallowWater(x: number, y: number): boolean {
-  if (typeof jass.IsTerrainPathable !== "function") return false;
   return !jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
     && !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
     && jass.IsTerrainPathable(x, y, PATHING_TYPE_BUILDABILITY);
@@ -174,7 +154,6 @@ export function X_IsTerrainShallowWater(x: number, y: number): boolean {
  * 陆地检测
  */
 export function X_IsTerrainLand(x: number, y: number): boolean {
-  if (typeof jass.IsTerrainPathable !== "function") return true;
   return jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY);
 }
 
@@ -182,7 +161,6 @@ export function X_IsTerrainLand(x: number, y: number): boolean {
  * 平台检测
  */
 export function X_IsTerrainPlatform(x: number, y: number): boolean {
-  if (typeof jass.IsTerrainPathable !== "function") return false;
   return !jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
     && !jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
     && !jass.IsTerrainPathable(x, y, PATHING_TYPE_BUILDABILITY);
@@ -196,12 +174,9 @@ export function X_IsTerrainPlatform(x: number, y: number): boolean {
  */
 export function X_SetUnitMovable(u: any, b: boolean): void {
   if (!u) return;
-  if (typeof jass.SetUnitPropWindow !== "function") return;
 
   if (b) {
-    const defaultWindow = typeof jass.GetUnitDefaultPropWindow === "function"
-      ? jass.GetUnitDefaultPropWindow(u)
-      : 0;
+    const defaultWindow = jass.GetUnitDefaultPropWindow(u);
     jass.SetUnitPropWindow(u, defaultWindow);
   } else {
     jass.SetUnitPropWindow(u, 0);

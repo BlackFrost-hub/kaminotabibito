@@ -37,7 +37,7 @@ function ____exports.ensureFloatTextRecycleTimer(self)
                             if tt then
                                 if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
                                     LeakWatcher:destroyTextTag(tt)
-                                elseif type(jass.DestroyTextTag) == "function" then
+                                else
                                     jass.DestroyTextTag(tt)
                                 end
                             end

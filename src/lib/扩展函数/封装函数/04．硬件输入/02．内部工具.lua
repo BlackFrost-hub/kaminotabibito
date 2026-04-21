@@ -20,12 +20,9 @@ function ____exports.has(self, name)
     return type(japi[name]) == "function"
 end
 function ____exports.isHardwareAPIAvailable(self)
-    return type(japi.DzIsKeyDown) == "function" and type(japi.DzGetMouseX) == "function" and type(japi.DzGetMouseY) == "function"
+    return true
 end
 function ____exports.createTriggerOrNull(self)
-    if type(jass.CreateTrigger) ~= "function" then
-        return nil
-    end
     return jass.CreateTrigger()
 end
 return ____exports

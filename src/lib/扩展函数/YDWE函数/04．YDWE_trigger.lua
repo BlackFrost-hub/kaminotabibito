@@ -93,12 +93,9 @@ function ____exports.YDLocalExecuteTrigger(self, trg)
     if not trg then
         return
     end
-    if type(jass.GetHandleId) ~= "function" then
-        return
-    end
     local YDLOC = findYDLOC(nil)
     local hd = jass.GetHandleId(trg)
-    if YDLOC and type(jass.HaveSavedInteger) == "function" and jass.HaveSavedInteger(
+    if YDLOC and jass.HaveSavedInteger(
         YDLOC,
         hd,
         getSKey_Trigger(nil)
@@ -106,19 +103,13 @@ function ____exports.YDLocalExecuteTrigger(self, trg)
         _G.ydl_triggerstep = hd
         return
     end
-    local ____YDLOC_10
+    local ____YDLOC_9
     if YDLOC then
-        local ____temp_9
-        if type(jass.LoadInteger) == "function" then
-            ____temp_9 = jass.LoadInteger(YDLOC, hd, STEP_KEY)
-        else
-            ____temp_9 = 0
-        end
-        ____YDLOC_10 = ____temp_9
+        ____YDLOC_9 = jass.LoadInteger(YDLOC, hd, STEP_KEY)
     else
-        ____YDLOC_10 = 0
+        ____YDLOC_9 = 0
     end
-    local step = ____YDLOC_10
+    local step = ____YDLOC_9
     _G.ydl_triggerstep = hd * (step + 3)
 end
 --- 执行触发器
@@ -133,9 +124,7 @@ function ____exports.YDTriggerExecuteTrigger(self, trg, flag)
     if flag then
         ConditionalTriggerExecute(nil, trg)
     else
-        if type(jass.TriggerExecute) == "function" then
-            jass.TriggerExecute(trg)
-        end
+        jass.TriggerExecute(trg)
     end
 end
 --- 保存父索引到 YDHT，使子触发器可以通过 YDLocal7Set 写返回值
@@ -151,12 +140,6 @@ function ____exports.saveParentIndex(self, trg)
     end
     local YDHT = findYDHT(nil)
     if not YDHT then
-        return
-    end
-    if type(jass.GetHandleId) ~= "function" then
-        return
-    end
-    if type(jass.SaveInteger) ~= "function" then
         return
     end
     local childHd = jass.GetHandleId(trg)
@@ -178,12 +161,6 @@ function ____exports.removeParentIndex(self, trg)
     end
     local YDHT = findYDHT(nil)
     if not YDHT then
-        return
-    end
-    if type(jass.GetHandleId) ~= "function" then
-        return
-    end
-    if type(jass.RemoveSavedInteger) ~= "function" then
         return
     end
     local childHd = jass.GetHandleId(trg)

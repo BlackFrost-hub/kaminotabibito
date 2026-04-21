@@ -24,61 +24,25 @@ function ____exports.SU_SetUnitFlyHeight(self, whichUnit, newHeight, rate)
         return
     end
     local AMRF = 1097691750
-    if type(jass.UnitAddAbility) == "function" then
-        jass.UnitAddAbility(whichUnit, AMRF)
-    end
-    if type(jass.UnitRemoveAbility) == "function" then
-        jass.UnitRemoveAbility(whichUnit, AMRF)
-    end
-    if type(jass.SetUnitFlyHeight) == "function" then
-        jass.SetUnitFlyHeight(whichUnit, newHeight, rate)
-    end
+    jass.UnitAddAbility(whichUnit, AMRF)
+    jass.UnitRemoveAbility(whichUnit, AMRF)
+    jass.SetUnitFlyHeight(whichUnit, newHeight, rate)
 end
 function ____exports.SU_GetHeroAllState(self, u, b)
     if not SUC_IsValidUnit(nil, u) then
         return 0
     end
-    local ____temp_0
-    if type(jass.GetHeroStr) == "function" then
-        ____temp_0 = jass.GetHeroStr(u, b)
-    else
-        ____temp_0 = 0
-    end
-    local str = ____temp_0
-    local ____temp_1
-    if type(jass.GetHeroAgi) == "function" then
-        ____temp_1 = jass.GetHeroAgi(u, b)
-    else
-        ____temp_1 = 0
-    end
-    local agi = ____temp_1
-    local ____temp_2
-    if type(jass.GetHeroInt) == "function" then
-        ____temp_2 = jass.GetHeroInt(u, b)
-    else
-        ____temp_2 = 0
-    end
-    local int = ____temp_2
+    local str = jass.GetHeroStr(u, b)
+    local agi = jass.GetHeroAgi(u, b)
+    local int = jass.GetHeroInt(u, b)
     return str + agi + int
 end
 function ____exports.SU_GetUnitLostHPPercent(self, u)
     if not SUC_IsValidUnit(nil, u) then
         return 0
     end
-    local ____temp_3
-    if type(jass.GetUnitState) == "function" then
-        ____temp_3 = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    else
-        ____temp_3 = 0
-    end
-    local maxLife = ____temp_3
-    local ____temp_4
-    if type(jass.GetUnitState) == "function" then
-        ____temp_4 = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    else
-        ____temp_4 = 0
-    end
-    local life = ____temp_4
+    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     if maxLife <= 0 then
         return 0
     end
@@ -88,46 +52,20 @@ function ____exports.SU_GetUnitLostHP(self, u)
     if not SUC_IsValidUnit(nil, u) then
         return 0
     end
-    local ____temp_5
-    if type(jass.GetUnitState) == "function" then
-        ____temp_5 = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    else
-        ____temp_5 = 0
-    end
-    local maxLife = ____temp_5
-    local ____temp_6
-    if type(jass.GetUnitState) == "function" then
-        ____temp_6 = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    else
-        ____temp_6 = 0
-    end
-    local life = ____temp_6
+    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     return maxLife - life
 end
 function ____exports.UnitAddHp(self, u, value, b)
     if not SUC_IsValidUnit(nil, u) then
         return
     end
-    local ____temp_7
-    if type(jass.GetUnitState) == "function" then
-        ____temp_7 = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    else
-        ____temp_7 = 0
-    end
-    local life = ____temp_7
-    local ____temp_8
-    if type(jass.GetUnitState) == "function" then
-        ____temp_8 = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    else
-        ____temp_8 = 0
-    end
-    local maxLife = ____temp_8
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
+    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
     local percent = maxLife > 0 and life / maxLife or 1
     local addValue = b and maxLife * value or value
-    if type(jass.SetUnitState) == "function" then
-        jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
-        jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
-    end
+    jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
+    jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
 end
 function ____exports.SU_IsUnitDie(self, u)
     return SUC_IsUnitAlive(nil, u)
@@ -136,24 +74,22 @@ function ____exports.SU_ShowOrHideUnit(self, u, isShow)
     if not SUC_IsValidUnit(nil, u) then
         return
     end
-    if type(jass.SetUnitVertexColor) == "function" then
-        if isShow then
-            jass.SetUnitVertexColor(
-                u,
-                255,
-                255,
-                255,
-                255
-            )
-        else
-            jass.SetUnitVertexColor(
-                u,
-                255,
-                255,
-                255,
-                0
-            )
-        end
+    if isShow then
+        jass.SetUnitVertexColor(
+            u,
+            255,
+            255,
+            255,
+            255
+        )
+    else
+        jass.SetUnitVertexColor(
+            u,
+            255,
+            255,
+            255,
+            0
+        )
     end
     if isShow then
         ____exports.SU_SetUnitFlyHeight(nil, u, 999999, 0)
@@ -166,13 +102,10 @@ function ____exports.IsWaterElement(self, u)
         return false
     end
     local BHWE = 1112045413
-    return type(jass.GetUnitAbilityLevel) == "function" and jass.GetUnitAbilityLevel(u, BHWE) ~= 0
+    return jass.GetUnitAbilityLevel(u, BHWE) ~= 0
 end
 function ____exports.GetUnitTimedLifeID(self, u)
     if not SUC_IsValidUnit(nil, u) then
-        return ____exports.TIMED_LIFE_NONE
-    end
-    if type(jass.GetUnitAbilityLevel) ~= "function" then
         return ____exports.TIMED_LIFE_NONE
     end
     if jass.GetUnitAbilityLevel(u, 1112891758) ~= 0 then
@@ -181,7 +114,7 @@ function ____exports.GetUnitTimedLifeID(self, u)
     if jass.GetUnitAbilityLevel(u, 1113682028) ~= 0 then
         return ____exports.TIMED_LIFE_DISEASE_CLOUD
     end
-    if jass.GetUnitAbilityLevel(u, 1111844462) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1111844454) ~= 0 then
         return ____exports.TIMED_LIFE_FORCE_OF_NATURE
     end
     if jass.GetUnitAbilityLevel(u, 1114142564) ~= 0 then

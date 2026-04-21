@@ -27,13 +27,7 @@ local function onUnitDeath()
     if dyingUnit == nil then
         return
     end
-    local ____temp_1
-    if type(jass.GetKillingUnit) == "function" then
-        ____temp_1 = jass.GetKillingUnit()
-    else
-        ____temp_1 = nil
-    end
-    local killingUnit = ____temp_1
+    local killingUnit = jass.GetKillingUnit()
     do
         local i = 0
         while i < #listeners do

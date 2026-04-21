@@ -19,8 +19,8 @@ const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展�
 export function getUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
-    const x = typeof jass.GetUnitX === "function" ? jass.GetUnitX(centerUnit) : 0;
-    const y = typeof jass.GetUnitY === "function" ? jass.GetUnitY(centerUnit) : 0;
+    const x = jass.GetUnitX(centerUnit);
+    const y = jass.GetUnitY(centerUnit);
 
     return getUnitsInRange(x, y, radius);
 }
@@ -34,10 +34,6 @@ export function getUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
  * @returns 符合条件的单位数组
  */
 export function getUnitsInRange(x: number, y: number, radius: number): any[] {
-    if (typeof jass.CreateGroup !== "function" || typeof jass.GroupEnumUnitsInRange !== "function") {
-        return [];
-    }
-
     const group = jass.CreateGroup();
     jass.GroupEnumUnitsInRange(group, x, y, radius, null);
 
@@ -52,9 +48,7 @@ export function getUnitsInRange(x: number, y: number, radius: number): any[] {
         unit = jass.FirstOfGroup(group);
     }
 
-    if (typeof jass.DestroyGroup === "function") {
-        jass.DestroyGroup(group);
-    }
+    jass.DestroyGroup(group);
 
     return units;
 }
@@ -68,8 +62,8 @@ export function getUnitsInRange(x: number, y: number, radius: number): any[] {
 export function getEnemyUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
-    const x = typeof jass.GetUnitX === "function" ? jass.GetUnitX(centerUnit) : 0;
-    const y = typeof jass.GetUnitY === "function" ? jass.GetUnitY(centerUnit) : 0;
+    const x = jass.GetUnitX(centerUnit);
+    const y = jass.GetUnitY(centerUnit);
 
     return getEnemyUnitsInRange(centerUnit, x, y, radius);
 }
@@ -83,10 +77,6 @@ export function getEnemyUnitsInRangeOfUnit(centerUnit: any, radius: number): any
  * @returns 符合条件的敌对单位数组
  */
 export function getEnemyUnitsInRange(centerUnit: any, x: number, y: number, radius: number): any[] {
-    if (typeof jass.CreateGroup !== "function" || typeof jass.GroupEnumUnitsInRange !== "function") {
-        return [];
-    }
-
     const group = jass.CreateGroup();
     jass.GroupEnumUnitsInRange(group, x, y, radius, null);
 
@@ -101,9 +91,7 @@ export function getEnemyUnitsInRange(centerUnit: any, x: number, y: number, radi
         unit = jass.FirstOfGroup(group);
     }
 
-    if (typeof jass.DestroyGroup === "function") {
-        jass.DestroyGroup(group);
-    }
+    jass.DestroyGroup(group);
 
     return units;
 }

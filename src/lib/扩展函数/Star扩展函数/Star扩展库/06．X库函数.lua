@@ -26,27 +26,9 @@ local DUMMY_ITEM_ID = (function(self)
     local b4 = string.byte("wolg", 4)
     return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4
 end)(nil)
-local ____temp_0
-if type(jass.ConvertPathingType) == "function" then
-    ____temp_0 = jass.ConvertPathingType(0)
-else
-    ____temp_0 = 0
-end
-local PATHING_TYPE_WALKABILITY = ____temp_0
-local ____temp_1
-if type(jass.ConvertPathingType) == "function" then
-    ____temp_1 = jass.ConvertPathingType(1)
-else
-    ____temp_1 = 1
-end
-local PATHING_TYPE_FLOATABILITY = ____temp_1
-local ____temp_2
-if type(jass.ConvertPathingType) == "function" then
-    ____temp_2 = jass.ConvertPathingType(2)
-else
-    ____temp_2 = 2
-end
-local PATHING_TYPE_BUILDABILITY = ____temp_2
+local PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0)
+local PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1)
+local PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2)
 local dummyItem = nil
 local searchRect = nil
 local lastAbleX = 0
@@ -56,12 +38,10 @@ local function initXLib(self)
     if dummyItem ~= nil then
         return
     end
-    if type(jass.Rect) == "function" then
-        searchRect = jass.Rect(0, 0, 128, 128)
-    end
-    if type(jass.CreateItem) == "function" and DUMMY_ITEM_ID ~= 0 then
+    searchRect = jass.Rect(0, 0, 128, 128)
+    if DUMMY_ITEM_ID ~= 0 then
         dummyItem = jass.CreateItem(DUMMY_ITEM_ID, 0, 0)
-        if dummyItem and type(jass.SetItemVisible) == "function" then
+        if dummyItem then
             jass.SetItemVisible(dummyItem, false)
         end
     end
@@ -72,25 +52,14 @@ local function hideItemsInRect(self)
         return
     end
     __TS__ArraySetLength(hiddenItems, 0)
-    if type(jass.EnumItemsInRect) ~= "function" then
-        return
-    end
     jass.EnumItemsInRect(
         searchRect,
         nil,
         function()
-            local ____temp_3
-            if type(jass.GetEnumItem) == "function" then
-                ____temp_3 = jass.GetEnumItem()
-            else
-                ____temp_3 = nil
-            end
-            local it = ____temp_3
-            if it and type(jass.IsItemVisible) == "function" and jass.IsItemVisible(it) then
+            local it = jass.GetEnumItem()
+            if it and jass.IsItemVisible(it) then
                 hiddenItems[#hiddenItems + 1] = it
-                if type(jass.SetItemVisible) == "function" then
-                    jass.SetItemVisible(it, false)
-                end
+                jass.SetItemVisible(it, false)
             end
         end
     )
@@ -101,7 +70,7 @@ local function restoreHiddenItems(self)
         local i = #hiddenItems - 1
         while i >= 0 do
             local it = hiddenItems[i + 1]
-            if it and type(jass.SetItemVisible) == "function" then
+            if it then
                 jass.SetItemVisible(it, true)
             end
             hiddenItems[i + 1] = nil
@@ -119,33 +88,21 @@ end
 function ____exports.X_IsTerrainWalkable(self, x, y)
     initXLib(nil)
     if not dummyItem or not searchRect then
-        if type(jass.IsTerrainPathable) == "function" then
-            return not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
-        end
-        return true
+        return not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
     end
-    if type(jass.MoveRectTo) == "function" then
-        jass.MoveRectTo(searchRect, x, y)
-    end
+    jass.MoveRectTo(searchRect, x, y)
     hideItemsInRect(nil)
-    if type(jass.SetItemPosition) == "function" then
-        jass.SetItemPosition(dummyItem, x, y)
-    end
-    local itemX = type(jass.GetItemX) == "function" and jass.GetItemX(dummyItem) or x
-    local itemY = type(jass.GetItemY) == "function" and jass.GetItemY(dummyItem) or y
+    jass.SetItemPosition(dummyItem, x, y)
+    local itemX = jass.GetItemX(dummyItem)
+    local itemY = jass.GetItemY(dummyItem)
     lastAbleX = itemX
     lastAbleY = itemY
-    if type(jass.SetItemVisible) == "function" then
-        jass.SetItemVisible(dummyItem, false)
-    end
+    jass.SetItemVisible(dummyItem, false)
     restoreHiddenItems(nil)
     local dx = itemX - x
     local dy = itemY - y
     local distOk = dx * dx + dy * dy <= MAX_RANGE * MAX_RANGE
-    if type(jass.IsTerrainPathable) == "function" then
-        return distOk and not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
-    end
-    return distOk
+    return distOk and not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
 end
 --- 获取最近可通行X坐标（需先调用X_IsTerrainWalkable）
 function ____exports.X_GetAbleX(self)
@@ -157,30 +114,18 @@ function ____exports.X_GetAbleY(self)
 end
 --- 深水检测
 function ____exports.X_IsTerrainDeepWater(self, x, y)
-    if type(jass.IsTerrainPathable) ~= "function" then
-        return false
-    end
     return not jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY) and jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
 end
 --- 浅水检测
 function ____exports.X_IsTerrainShallowWater(self, x, y)
-    if type(jass.IsTerrainPathable) ~= "function" then
-        return false
-    end
     return not jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY) and not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) and jass.IsTerrainPathable(x, y, PATHING_TYPE_BUILDABILITY)
 end
 --- 陆地检测
 function ____exports.X_IsTerrainLand(self, x, y)
-    if type(jass.IsTerrainPathable) ~= "function" then
-        return true
-    end
     return jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
 end
 --- 平台检测
 function ____exports.X_IsTerrainPlatform(self, x, y)
-    if type(jass.IsTerrainPathable) ~= "function" then
-        return false
-    end
     return not jass.IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY) and not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) and not jass.IsTerrainPathable(x, y, PATHING_TYPE_BUILDABILITY)
 end
 --- 设置单位是否可以移动
@@ -192,17 +137,8 @@ function ____exports.X_SetUnitMovable(self, u, b)
     if not u then
         return
     end
-    if type(jass.SetUnitPropWindow) ~= "function" then
-        return
-    end
     if b then
-        local ____temp_4
-        if type(jass.GetUnitDefaultPropWindow) == "function" then
-            ____temp_4 = jass.GetUnitDefaultPropWindow(u)
-        else
-            ____temp_4 = 0
-        end
-        local defaultWindow = ____temp_4
+        local defaultWindow = jass.GetUnitDefaultPropWindow(u)
         jass.SetUnitPropWindow(u, defaultWindow)
     else
         jass.SetUnitPropWindow(u, 0)

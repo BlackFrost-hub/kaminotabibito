@@ -24,14 +24,9 @@ export function has(name: string): boolean {
 }
 
 export function isHardwareAPIAvailable(): boolean {
-  return (
-    typeof (japi as any).DzIsKeyDown === "function" &&
-    typeof (japi as any).DzGetMouseX === "function" &&
-    typeof (japi as any).DzGetMouseY === "function"
-  );
+  return true;
 }
 
 export function createTriggerOrNull(): any {
-  if (typeof (jass as any).CreateTrigger !== "function") return null;
   return (jass as any).CreateTrigger();
 }

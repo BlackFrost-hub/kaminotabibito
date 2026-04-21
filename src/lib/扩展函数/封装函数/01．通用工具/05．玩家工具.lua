@@ -25,7 +25,7 @@ function ____exports.AddGoldWithFeedback(self, params)
         ____temp_2 = player
     else
         local ____temp_1
-        if unit ~= nil and type(jass.GetOwningPlayer) == "function" then
+        if unit ~= nil then
             ____temp_1 = jass.GetOwningPlayer(unit)
         else
             ____temp_1 = nil
@@ -60,9 +60,6 @@ function ____exports.printToPlayer(self, player, msg, duration)
         duration = 6
     end
     if not player then
-        return
-    end
-    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
         return
     end
     jass.DisplayTimedTextToPlayer(

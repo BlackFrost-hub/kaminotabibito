@@ -77,9 +77,6 @@ function ____exports.AngleBetweenPoints(self, locA, locB)
     if locA == nil or locB == nil then
         return 0
     end
-    if type(jass.GetLocationX) ~= "function" or type(jass.GetLocationY) ~= "function" then
-        return 0
-    end
     local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
     local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
     return jass.Atan2(dy, dx) * BJ_RADTODEG
@@ -88,9 +85,6 @@ end
 -- 对应 Blizzard.j: DistanceBetweenPoints
 function ____exports.DistanceBetweenPoints(self, locA, locB)
     if locA == nil or locB == nil then
-        return 0
-    end
-    if type(jass.GetLocationX) ~= "function" or type(jass.GetLocationY) ~= "function" then
         return 0
     end
     local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
@@ -115,10 +109,7 @@ function ____exports.RMinBJ(self, a, b)
 end
 --- 百分比转整数 - PercentToInt
 function ____exports.PercentToInt(self, percentage, max)
-    if type(jass.R2I) == "function" then
-        return jass.R2I(percentage * 0.01 * max)
-    end
-    return math.floor(percentage * 0.01 * max)
+    return jass.R2I(percentage * 0.01 * max)
 end
 --- 百分比转255 - PercentTo255
 function ____exports.PercentTo255(self, percentage)

@@ -59,53 +59,37 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
     if permanent == nil then
         permanent = false
     end
-    local ____temp_3
+    local ____temp_2
     if LeakWatcher and type(LeakWatcher.createTextTag) == "function" then
-        ____temp_3 = LeakWatcher:createTextTag("float_text")
+        ____temp_2 = LeakWatcher:createTextTag("float_text")
     else
-        local ____temp_2
-        if type(jass.CreateTextTag) == "function" then
-            ____temp_2 = jass.CreateTextTag()
-        else
-            ____temp_2 = nil
-        end
-        ____temp_3 = ____temp_2
+        ____temp_2 = jass.CreateTextTag()
     end
-    local textTag = ____temp_3
+    local textTag = ____temp_2
     if not textTag then
         return nil
     end
     local sizeToHeight = size * 0.0023
-    if type(jass.SetTextTagText) == "function" then
-        jass.SetTextTagText(textTag, text, sizeToHeight)
-    end
-    if type(jass.SetTextTagColor) == "function" then
-        jass.SetTextTagColor(
-            textTag,
-            red,
-            green,
-            blue,
-            alpha
-        )
-    end
-    if targetUnit and type(jass.SetTextTagPosUnit) == "function" then
+    jass.SetTextTagText(textTag, text, sizeToHeight)
+    jass.SetTextTagColor(
+        textTag,
+        red,
+        green,
+        blue,
+        alpha
+    )
+    if targetUnit then
         jass.SetTextTagPosUnit(textTag, targetUnit, height)
-    elseif type(jass.SetTextTagPos) == "function" then
+    else
         jass.SetTextTagPos(textTag, x, y, height)
     end
-    if type(jass.SetTextTagVisibility) == "function" then
-        jass.SetTextTagVisibility(textTag, true)
-    end
-    if (speedX ~= 0 or speedY ~= 0) and type(jass.SetTextTagVelocity) == "function" then
+    jass.SetTextTagVisibility(textTag, true)
+    if speedX ~= 0 or speedY ~= 0 then
         jass.SetTextTagVelocity(textTag, speedX, speedY)
     end
     if not permanent and duration > 0 then
-        if type(jass.SetTextTagLifespan) == "function" then
-            jass.SetTextTagLifespan(textTag, duration)
-        end
-        if type(jass.SetTextTagFadepoint) == "function" then
-            jass.SetTextTagFadepoint(textTag, duration - 0.5)
-        end
+        jass.SetTextTagLifespan(textTag, duration)
+        jass.SetTextTagFadepoint(textTag, duration - 0.5)
         local ticks = math.max(
             1,
             math.floor(duration / RECYCLE_TICK + 0.999)

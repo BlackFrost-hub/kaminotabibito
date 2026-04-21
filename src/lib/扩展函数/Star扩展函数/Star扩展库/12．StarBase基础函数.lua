@@ -31,16 +31,10 @@ end
 function ____exports.Star_CoordinateX(self, x)
     local minX = -10000
     local maxX = 10000
-    if type(jass.GetWorldBounds) == "function" then
-        local mapRect = jass.GetWorldBounds()
-        if mapRect then
-            if type(jass.GetRectMinX) == "function" then
-                minX = jass.GetRectMinX(mapRect)
-            end
-            if type(jass.GetRectMaxX) == "function" then
-                maxX = jass.GetRectMaxX(mapRect)
-            end
-        end
+    local mapRect = jass.GetWorldBounds()
+    if mapRect then
+        minX = jass.GetRectMinX(mapRect)
+        maxX = jass.GetRectMaxX(mapRect)
     end
     if x < minX then
         return minX
@@ -57,16 +51,10 @@ end
 function ____exports.Star_CoordinateY(self, y)
     local minY = -10000
     local maxY = 10000
-    if type(jass.GetWorldBounds) == "function" then
-        local mapRect = jass.GetWorldBounds()
-        if mapRect then
-            if type(jass.GetRectMinY) == "function" then
-                minY = jass.GetRectMinY(mapRect)
-            end
-            if type(jass.GetRectMaxY) == "function" then
-                maxY = jass.GetRectMaxY(mapRect)
-            end
-        end
+    local mapRect = jass.GetWorldBounds()
+    if mapRect then
+        minY = jass.GetRectMinY(mapRect)
+        maxY = jass.GetRectMaxY(mapRect)
     end
     if y < minY then
         return minY
@@ -83,27 +71,13 @@ end
 -- @returns Z轴高度
 function ____exports.Star_GetLocZ(self, x, y)
     if Star_Location == nil then
-        local ____temp_1
-        if type(jass.Location) == "function" then
-            ____temp_1 = jass.Location(0, 0)
-        else
-            ____temp_1 = nil
-        end
-        Star_Location = ____temp_1
+        Star_Location = jass.Location(0, 0)
     end
     if Star_Location == nil then
         return 0
     end
-    if type(jass.MoveLocation) == "function" then
-        jass.MoveLocation(Star_Location, x, y)
-    end
-    local ____temp_2
-    if type(jass.GetLocationZ) == "function" then
-        ____temp_2 = jass.GetLocationZ(Star_Location)
-    else
-        ____temp_2 = 0
-    end
-    return ____temp_2
+    jass.MoveLocation(Star_Location, x, y)
+    return jass.GetLocationZ(Star_Location)
 end
 --- 整数地址转矩形
 -- 
@@ -117,20 +91,13 @@ function ____exports.GetRectByHandle(self, i)
     if tempHT == nil then
         tempHT = StarBaseHT
     end
-    if type(jass.FlushChildHashtable) == "function" then
-        jass.FlushChildHashtable(tempHT, 2)
-    end
-    if type(jass.SaveFogStateHandle) == "function" and type(jass.ConvertFogState) == "function" then
-        jass.SaveFogStateHandle(
-            tempHT,
-            2,
-            1,
-            jass.ConvertFogState(i)
-        )
-    end
-    if type(jass.LoadRectHandle) == "function" then
-        return jass.LoadRectHandle(tempHT, 2, 1)
-    end
-    return nil
+    jass.FlushChildHashtable(tempHT, 2)
+    jass.SaveFogStateHandle(
+        tempHT,
+        2,
+        1,
+        jass.ConvertFogState(i)
+    )
+    return jass.LoadRectHandle(tempHT, 2, 1)
 end
 return ____exports

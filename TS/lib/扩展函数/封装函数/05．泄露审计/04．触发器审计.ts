@@ -14,7 +14,5 @@ export function createTrigger(tag: string): any {
 export function destroyTrigger(trg: any): void {
   if (!trg) return;
   untrack("trigger", trg);
-  if (typeof (jass as any).DestroyTrigger === "function") {
-    (jass as any).DestroyTrigger(trg);
-  }
+  (jass as any).DestroyTrigger(trg);
 }

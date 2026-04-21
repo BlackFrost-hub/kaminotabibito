@@ -57,18 +57,18 @@ export function registerKeyEventByCode(
         // ignore
       }
     }
-    if (typeof (jass as any).TriggerAddAction === "function") (jass as any).TriggerAddAction(trig, action);
+    (jass as any).TriggerAddAction(trig, action);
     return trig;
   }
 
-  if (typeof japi.DzTriggerRegisterKeyEventByCode === "function") {
+  if (japi.DzTriggerRegisterKeyEventByCode) {
     japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, sync, action);
     return trig;
   }
 
-  if (typeof japi.DzTriggerRegisterKeyEvent === "function") {
+  if (japi.DzTriggerRegisterKeyEvent) {
     japi.DzTriggerRegisterKeyEvent(trig, keyCode, status, sync, "");
-    if (typeof (jass as any).TriggerAddAction === "function") (jass as any).TriggerAddAction(trig, action);
+    (jass as any).TriggerAddAction(trig, action);
     return trig;
   }
 
@@ -79,8 +79,8 @@ export function registerKeyDown(keyCode: number, callback: (player: any, key: nu
   const trig = createTriggerOrNull();
   if (!trig) return null;
   const action = () => {
-    const p = typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
-    const k = typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
     callback(p, k);
   };
   // DzTriggerRegisterKeyEventTrg(trg, status, key)：JASS 封装，内部 sync=true，全房所有客户端触发回调。
@@ -88,11 +88,11 @@ export function registerKeyDown(keyCode: number, callback: (player: any, key: nu
   // 注意：sync=true 的键盘回调内，全局操作必须在本地玩家判断之外执行（与 frameSetScriptByCode sync=true 规则一致）。
   if (typeof japi.DzTriggerRegisterKeyEventTrg === "function") {
     japi.DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.DOWN, keyCode);
-    if (typeof (jass as any).TriggerAddAction === "function") (jass as any).TriggerAddAction(trig, action);
+    (jass as any).TriggerAddAction(trig, action);
     return trig;
   }
   // fallback：DzTriggerRegisterKeyEventByCode（sync=false，仅本机触发）
-  if (typeof japi.DzTriggerRegisterKeyEventByCode === "function") {
+  if (japi.DzTriggerRegisterKeyEventByCode) {
     japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, KEY_STATE.DOWN, false, action);
     return trig;
   }
@@ -101,8 +101,8 @@ export function registerKeyDown(keyCode: number, callback: (player: any, key: nu
 
 export function registerKeyUp(keyCode: number, callback: (player: any, key: number) => void): any {
   return registerKeyEventByCode(keyCode, KEY_STATE.UP, false, () => {
-    const p = typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
-    const k = typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
     callback(p, k);
   });
 }
@@ -113,9 +113,9 @@ export function registerKeyEventRawStatus(keyCode: number, status: number, sync:
 }
 
 export function getTriggerKeyPlayer(): any {
-  return typeof japi.DzGetTriggerKeyPlayer === "function" ? japi.DzGetTriggerKeyPlayer() : null;
+  return japi.DzGetTriggerKeyPlayer();
 }
 
 export function getTriggerKey(): number {
-  return typeof japi.DzGetTriggerKey === "function" ? japi.DzGetTriggerKey() : 0;
+  return japi.DzGetTriggerKey();
 }

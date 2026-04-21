@@ -14,13 +14,10 @@ const g = require("jass.globals") as { [key: string]: any };
 export function isHeroUnit(unit: any): boolean {
   if (!unit) return false;
   const utHero = (jass as any).UNIT_TYPE_HERO ?? (g as any).UNIT_TYPE_HERO;
-  if (utHero != null && typeof (jass as any).IsUnitType === "function") {
+  if (utHero != null) {
     return (jass as any).IsUnitType(unit, utHero) === true;
   }
-  if (typeof (jass as any).GetHeroLevel === "function") {
-    return (jass as any).GetHeroLevel(unit) > 0;
-  }
-  return false;
+  return (jass as any).GetHeroLevel(unit) > 0;
 }
 
 /**
@@ -67,7 +64,6 @@ export function isSpecialUnit(unit: any): boolean {
  * @returns 英雄单位，如果没有找到返回 null
  */
 export function findHeroOfPlayer(playerId: number): any {
-  if (typeof jass.CreateGroup !== "function" || typeof jass.GroupEnumUnitsOfPlayer !== "function") return null;
   const group = jass.CreateGroup();
   jass.GroupEnumUnitsOfPlayer(group, jass.Player(playerId), null);
   const unit = jass.FirstOfGroup(group);

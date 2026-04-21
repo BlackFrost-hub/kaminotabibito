@@ -18,22 +18,19 @@ import { lastPlayedSound } from "./03．3D音效播放";
  */
 function scheduleDestroySoundIfNeeded(sound: any): void {
   if (!sound) return;
-  if (typeof (jass as any).DestroySound !== "function" || typeof (jass as any).TimerStart !== "function") return;
   const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
   const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
   const t =
     LW && typeof LW.createTimer === "function"
       ? LW.createTimer("sound_ui_fallback_destroy")
-      : typeof (jass as any).CreateTimer === "function"
-        ? (jass as any).CreateTimer()
-        : null;
+      : (jass as any).CreateTimer();
   if (!t) return;
   (jass as any).TimerStart(t, 0.55, false, () => {
     const expired = (jass as any).GetExpiredTimer();
     (jass as any).DestroySound(sound);
     if (LW && typeof LW.destroyTimer === "function") {
       LW.destroyTimer(expired);
-    } else if (typeof (jass as any).DestroyTimer === "function") {
+    } else {
       (jass as any).DestroyTimer(expired);
     }
   });
@@ -51,7 +48,7 @@ export function Sound3DII_Mp3Play(
   model: SoundModel = getDefaultSoundModel()
 ): any {
   // 1.27 下 UI 音效频繁播放容易触发"池/通道限制"。这里改为：每次新建 sound，并 KillSoundWhenDone
-  if (typeof (jass as any).CreateSound === "function" && typeof (jass as any).StartSound === "function") {
+  {
     const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
     const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
     let trackedByLeak = false;
@@ -80,24 +77,19 @@ export function Sound3DII_Mp3Play(
       );
     }
     if (s) {
-      if (typeof (jass as any).SetSoundChannel === "function") (jass as any).SetSoundChannel(s, model.channel);
-      if (typeof (jass as any).SetSoundVolume === "function") (jass as any).SetSoundVolume(s, model.volume);
-      if (typeof (jass as any).SetSoundPitch === "function") (jass as any).SetSoundPitch(s, model.pitch);
+      (jass as any).SetSoundChannel(s, model.channel);
+      (jass as any).SetSoundVolume(s, model.volume);
+      (jass as any).SetSoundPitch(s, model.pitch);
 
       const shouldPlay =
         !player ||
-        (typeof (jass as any).GetLocalPlayer === "function" && (jass as any).GetLocalPlayer() === player);
+        (jass as any).GetLocalPlayer() === player;
       if (shouldPlay) (jass as any).StartSound(s);
 
       if (LW && typeof LW.killSoundWhenDone === "function") {
         LW.killSoundWhenDone(s);
-      } else if (typeof (jass as any).KillSoundWhenDone === "function") {
-        (jass as any).KillSoundWhenDone(s);
-        if (trackedByLeak && LW && typeof LW.releaseSound === "function") {
-          LW.releaseSound(s);
-        }
       } else {
-        scheduleDestroySoundIfNeeded(s);
+        (jass as any).KillSoundWhenDone(s);
         if (trackedByLeak && LW && typeof LW.releaseSound === "function") {
           LW.releaseSound(s);
         }

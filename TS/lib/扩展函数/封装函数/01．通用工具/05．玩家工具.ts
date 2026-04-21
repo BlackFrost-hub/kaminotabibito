@@ -31,7 +31,7 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
   const p =
     player != null
       ? player
-      : unit != null && typeof (jass as any).GetOwningPlayer === "function"
+      : unit != null
         ? (jass as any).GetOwningPlayer(unit)
         : null;
   if (!p) return;
@@ -66,7 +66,6 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
  */
 export function printToPlayer(player: any, msg: string, duration: number = 6): void {
   if (!player) return;
-  if (typeof (jass as any).DisplayTimedTextToPlayer !== "function") return;
   (jass as any).DisplayTimedTextToPlayer(player, 0, 0, duration, msg);
 }
 

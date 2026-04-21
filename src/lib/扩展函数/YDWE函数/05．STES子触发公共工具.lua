@@ -50,11 +50,9 @@ function ____exports.ydlStes_coerceOptionalNumber(self, _self, v)
         return v
     end
     local tn = _G.tonumber
-    if type(tn) == "function" then
-        local t = tn(nil, v)
-        if type(t) == "number" and t == t then
-            return t
-        end
+    local t = tn(nil, v)
+    if type(t) == "number" and t == t then
+        return t
     end
     return nil
 end
@@ -67,11 +65,9 @@ function ____exports.ydlStes_coerceReal(self, _self, v)
         return v
     end
     local tn = _G.tonumber
-    if type(tn) == "function" then
-        local t = tn(nil, v)
-        if type(t) == "number" and t == t and __TS__NumberIsFinite(__TS__Number(t)) then
-            return t
-        end
+    local t = tn(nil, v)
+    if type(t) == "number" and t == t and __TS__NumberIsFinite(__TS__Number(t)) then
+        return t
     end
     return 0
 end
@@ -94,11 +90,9 @@ function ____exports.ydlStes_readInteger5(self, _self, name)
         return math.floor(v)
     end
     local tn = _G.tonumber
-    if type(tn) == "function" then
-        local t = tn(nil, v)
-        if type(t) == "number" and t == t then
-            return math.floor(t)
-        end
+    local t = tn(nil, v)
+    if type(t) == "number" and t == t then
+        return math.floor(t)
     end
     return 0
 end

@@ -18,9 +18,6 @@ local jass = require("jass.common")
 -- @param scaleZ Z轴缩放，不传则使用1.0
 -- @returns 创建的单位，失败返回null
 function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing, scale, scaleY, scaleZ)
-    if type(jass.CreateUnit) ~= "function" then
-        return nil
-    end
     local unitTypeId = nil
     if type(unitId) == "number" then
         unitTypeId = unitId
@@ -46,15 +43,13 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     if not unit then
         return nil
     end
-    if facing ~= nil and type(jass.SetUnitFacing) == "function" then
+    if facing ~= nil then
         jass.SetUnitFacing(unit, facing * 180 / math.pi)
     end
     local scaleX = scale or 1
     local scaleY2 = scaleY or 1
     local scaleZ2 = scaleZ or 1
-    if type(jass.SetUnitScale) == "function" then
-        jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
-    end
+    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
     return unit
 end
 --- 获取玩家的第一个英雄
@@ -72,7 +67,7 @@ function ____exports.getPlayerFirstHero(self, player)
         "单位组",
         "group"
     )
-    if not heroGroup or type(jass.GetEnumUnit) ~= "function" or type(jass.GetOwningPlayer) ~= "function" then
+    if not heroGroup then
         return nil
     end
     local hero = nil
@@ -85,13 +80,7 @@ function ____exports.getPlayerFirstHero(self, player)
                 return
             end
             if jass.GetOwningPlayer(u) == player then
-                local ____temp_0
-                if type(jass.IsUnitType) == "function" then
-                    ____temp_0 = jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
-                else
-                    ____temp_0 = true
-                end
-                if ____temp_0 then
+                if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
                     hero = u
                 end
             end

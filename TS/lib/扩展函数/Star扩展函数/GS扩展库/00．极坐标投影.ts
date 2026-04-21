@@ -20,21 +20,15 @@ const bj_DEGTORAD = jglobals.bj_DEGTORAD ?? (Math.PI / 180);
  */
 export function GS_PolarProjectionBJ(source: any, dist: number, angle: number): any {
     if (!source) return null;
-    if (typeof jass.GetLocationX !== "function" || typeof jass.GetLocationY !== "function") return null;
 
     const x = jass.GetLocationX(source) + dist * Math.cos(angle * bj_DEGTORAD);
     const y = jass.GetLocationY(source) + dist * Math.sin(angle * bj_DEGTORAD);
 
     // 移除源位置（与原版 JASS 行为一致）
-    if (typeof jass.RemoveLocation === "function") {
-        jass.RemoveLocation(source);
-    }
+    jass.RemoveLocation(source);
 
     // 创建并返回新位置
-    if (typeof jass.Location === "function") {
-        return jass.Location(x, y);
-    }
-    return null;
+    return jass.Location(x, y);
 }
 
 export {};

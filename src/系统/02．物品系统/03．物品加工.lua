@@ -318,9 +318,7 @@ local function startCookTimer(self, item, campfire, recipe)
             playFinishEffect(nil, campfire)
             local chosen = pickResult(nil, recipe.results)
             local inputCharges = getItemChargesSafe(nil, item)
-            if type(jass.RemoveItem) == "function" then
-                jass.RemoveItem(item)
-            end
+            jass.RemoveItem(item)
             untrackItem(nil, item)
             local timeout = recipe.timeoutSec > 0 and recipe.timeoutSec or 0
             local remaining = chosen.qty * inputCharges
@@ -333,7 +331,7 @@ local function startCookTimer(self, item, campfire, recipe)
                 local ok = tryGiveItemToCampfire(nil, campfire, it)
                 if not ok then
                     local roll = math.random(1, 100)
-                    if roll > 20 and type(jass.RemoveItem) == "function" then
+                    if roll > 20 then
                         jass.RemoveItem(it)
                     end
                 else
@@ -354,20 +352,8 @@ local function startCookTimer(self, item, campfire, recipe)
     )
 end
 local function onAnyPickup(self)
-    local ____temp_9
-    if type(jass.GetTriggerUnit) == "function" then
-        ____temp_9 = jass.GetTriggerUnit()
-    else
-        ____temp_9 = nil
-    end
-    local u = ____temp_9
-    local ____temp_10
-    if type(jass.GetManipulatedItem) == "function" then
-        ____temp_10 = jass.GetManipulatedItem()
-    else
-        ____temp_10 = nil
-    end
-    local item = ____temp_10
+    local u = jass.GetTriggerUnit()
+    local item = jass.GetManipulatedItem()
     if not u or not item then
         return
     end
@@ -409,11 +395,11 @@ local function onCampfireDeath(self, dyingUnit)
     campfireItems:delete(dyingUnit)
 end
 ____exports["init物品加工"] = function(self)
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11 = 18
+    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 == nil then
+        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 = 18
     end
-    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_11
+    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9
     local trigPick = jass.CreateTrigger()
     do
         local i = 0
@@ -428,11 +414,11 @@ ____exports["init物品加工"] = function(self)
         end
     end
     jass.TriggerAddAction(trigPick, onAnyPickup)
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12 = 19
+    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 == nil then
+        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 = 19
     end
-    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_12
+    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10
     local trigDrop = jass.CreateTrigger()
     do
         local i = 0

@@ -20,10 +20,10 @@ try {
   japi = null;
 }
 
-const HS_S = typeof jass.InitHashtable === "function" ? jass.InitHashtable() : null;
+const HS_S = jass.InitHashtable();
 
 function hid(h: any): number {
-  return typeof jass.GetHandleId === "function" ? ((jass.GetHandleId(h) as number) || 0) : 0;
+  return (jass.GetHandleId(h) as number) || 0;
 }
 
 /**
@@ -33,53 +33,41 @@ function hid(h: any): number {
  * @param time 暂停时间（秒）
  */
 export function GS_Suspend(u: any, time: number): void {
-  if (u == null || u === 0 || HS_S == null) return;
+  if (u == null || u === 0) return;
 
   const uid = hid(u);
-  let T: any = typeof jass.LoadTimerHandle === "function" ? jass.LoadTimerHandle(HS_S, uid, 1) : null;
+  let T: any = jass.LoadTimerHandle(HS_S, uid, 1);
 
-  const remaining = T != null && typeof jass.TimerGetRemaining === "function"
-    ? jass.TimerGetRemaining(T)
-    : 0;
+  const remaining = T != null ? jass.TimerGetRemaining(T) : 0;
 
   if (T == null || remaining === 0) {
-    T = typeof jass.CreateTimer === "function" ? jass.CreateTimer() : null;
+    T = jass.CreateTimer();
     if (T == null) return;
 
-    if (japi != null && typeof japi.EXPauseUnit === "function") {
+    if (japi != null) {
       japi.EXPauseUnit(u, true);
     }
-    if (typeof jass.SaveUnitHandle === "function") {
-      jass.SaveUnitHandle(HS_S, hid(T), 1, u);
-    }
-    if (typeof jass.SaveTimerHandle === "function") {
-      jass.SaveTimerHandle(HS_S, uid, 1, T);
-    }
+    jass.SaveUnitHandle(HS_S, hid(T), 1, u);
+    jass.SaveTimerHandle(HS_S, uid, 1, T);
   }
-
-  if (typeof jass.TimerStart !== "function") return;
 
   const timerRef = T;
   jass.TimerStart(timerRef, time, false, () => {
-    const expiredTimer = typeof jass.GetExpiredTimer === "function" ? jass.GetExpiredTimer() : timerRef;
+    const expiredTimer = jass.GetExpiredTimer();
     const tid = hid(expiredTimer);
-    const savedUnit = typeof jass.LoadUnitHandle === "function" ? jass.LoadUnitHandle(HS_S, tid, 1) : null;
+    const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
 
     if (savedUnit != null && savedUnit !== 0) {
-      if (japi != null && typeof japi.EXPauseUnit === "function") {
+      if (japi != null) {
         japi.EXPauseUnit(savedUnit, false);
       }
     }
 
-    if (typeof jass.FlushChildHashtable === "function") {
-      jass.FlushChildHashtable(HS_S, tid);
-      if (savedUnit != null && savedUnit !== 0) {
-        jass.FlushChildHashtable(HS_S, hid(savedUnit));
-      }
+    jass.FlushChildHashtable(HS_S, tid);
+    if (savedUnit != null && savedUnit !== 0) {
+      jass.FlushChildHashtable(HS_S, hid(savedUnit));
     }
-    if (typeof jass.DestroyTimer === "function") {
-      jass.DestroyTimer(expiredTimer);
-    }
+    jass.DestroyTimer(expiredTimer);
   });
 }
 
@@ -89,12 +77,12 @@ export function GS_Suspend(u: any, time: number): void {
  * @returns 是否正在暂停中
  */
 export function GS_IsUnitSuspending(u: any): boolean {
-  if (u == null || u === 0 || HS_S == null) return false;
+  if (u == null || u === 0) return false;
 
-  const T = typeof jass.LoadTimerHandle === "function" ? jass.LoadTimerHandle(HS_S, hid(u), 1) : null;
+  const T = jass.LoadTimerHandle(HS_S, hid(u), 1);
   if (T == null) return false;
 
-  const remaining = typeof jass.TimerGetRemaining === "function" ? jass.TimerGetRemaining(T) : 0;
+  const remaining = jass.TimerGetRemaining(T);
   return remaining !== 0;
 }
 
@@ -104,12 +92,12 @@ export function GS_IsUnitSuspending(u: any): boolean {
  * @returns 剩余暂停时间（秒）
  */
 export function GS_LoadSuspend(u: any): number {
-  if (u == null || u === 0 || HS_S == null) return 0;
+  if (u == null || u === 0) return 0;
 
-  const T = typeof jass.LoadTimerHandle === "function" ? jass.LoadTimerHandle(HS_S, hid(u), 1) : null;
+  const T = jass.LoadTimerHandle(HS_S, hid(u), 1);
   if (T == null) return 0;
 
-  const remaining = typeof jass.TimerGetRemaining === "function" ? jass.TimerGetRemaining(T) : 0;
+  const remaining = jass.TimerGetRemaining(T);
   return remaining || 0;
 }
 
@@ -120,7 +108,7 @@ export function GS_LoadSuspend(u: any): number {
  * @param r 时间值（秒）
  */
 export function GS_UnitSuspend(u: any, i: number, r: number): void {
-  if (u == null || u === 0 || HS_S == null) return;
+  if (u == null || u === 0) return;
 
   const currentRemain = GS_LoadSuspend(u);
 

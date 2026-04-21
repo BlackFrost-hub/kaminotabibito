@@ -114,7 +114,6 @@ export function ModuloReal(dividend: number, divisor: number): number {
  */
 export function AngleBetweenPoints(locA: any, locB: any): number {
   if (locA == null || locB == null) return 0;
-  if (typeof jass.GetLocationX !== "function" || typeof jass.GetLocationY !== "function") return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
   return jass.Atan2(dy, dx) * BJ_RADTODEG;
@@ -126,7 +125,6 @@ export function AngleBetweenPoints(locA: any, locB: any): number {
  */
 export function DistanceBetweenPoints(locA: any, locB: any): number {
   if (locA == null || locB == null) return 0;
-  if (typeof jass.GetLocationX !== "function" || typeof jass.GetLocationY !== "function") return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
   return Math.sqrt(dx * dx + dy * dy);
@@ -162,10 +160,7 @@ export function RMinBJ(a: number, b: number): number {
 
 /** 百分比转整数 - PercentToInt */
 export function PercentToInt(percentage: number, max: number): number {
-  if (typeof jass.R2I === "function") {
-    return jass.R2I(percentage * 0.01 * max);
-  }
-  return Math.floor(percentage * 0.01 * max);
+  return jass.R2I(percentage * 0.01 * max);
 }
 
 /** 百分比转255 - PercentTo255 */

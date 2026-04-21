@@ -39,32 +39,24 @@ export function CreateFloatText(
   const textTag =
     LeakWatcher && typeof LeakWatcher.createTextTag === "function"
       ? LeakWatcher.createTextTag("float_text")
-      : typeof (jass as any).CreateTextTag === "function"
-        ? (jass as any).CreateTextTag()
-        : null;
+      : (jass as any).CreateTextTag();
   if (!textTag) return null;
 
   const sizeToHeight = size * 0.0023; // 约等于 TextTagSize2Height(size)，10 -> 0.023
-  if (typeof (jass as any).SetTextTagText === "function") {
-    (jass as any).SetTextTagText(textTag, text, sizeToHeight);
-  }
-  if (typeof (jass as any).SetTextTagColor === "function") {
-    (jass as any).SetTextTagColor(textTag, red, green, blue, alpha);
-  }
-  if (targetUnit && typeof (jass as any).SetTextTagPosUnit === "function") {
+  (jass as any).SetTextTagText(textTag, text, sizeToHeight);
+  (jass as any).SetTextTagColor(textTag, red, green, blue, alpha);
+  if (targetUnit) {
     (jass as any).SetTextTagPosUnit(textTag, targetUnit, height);
-  } else if (typeof (jass as any).SetTextTagPos === "function") {
+  } else {
     (jass as any).SetTextTagPos(textTag, x, y, height);
   }
-  if (typeof (jass as any).SetTextTagVisibility === "function") {
-    (jass as any).SetTextTagVisibility(textTag, true);
-  }
-  if ((speedX !== 0 || speedY !== 0) && typeof (jass as any).SetTextTagVelocity === "function") {
+  (jass as any).SetTextTagVisibility(textTag, true);
+  if (speedX !== 0 || speedY !== 0) {
     (jass as any).SetTextTagVelocity(textTag, speedX, speedY);
   }
   if (!permanent && duration > 0) {
-    if (typeof (jass as any).SetTextTagLifespan === "function") (jass as any).SetTextTagLifespan(textTag, duration);
-    if (typeof (jass as any).SetTextTagFadepoint === "function") (jass as any).SetTextTagFadepoint(textTag, duration - 0.5);
+    (jass as any).SetTextTagLifespan(textTag, duration);
+    (jass as any).SetTextTagFadepoint(textTag, duration - 0.5);
     // 统一进入回收队列（避免高频创建时 timer 回调丢失）
     const ticks = Math.max(1, Math.floor(duration / RECYCLE_TICK + 0.999)); // ceil
     floatTextQueue.push({ tt: textTag, ticksLeft: ticks });

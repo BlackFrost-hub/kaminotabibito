@@ -16,8 +16,6 @@ function ____exports.destroyTimer(self, t)
         return
     end
     untrack(nil, "timer", t)
-    if type(jass.DestroyTimer) == "function" then
-        jass.DestroyTimer(t)
-    end
+    jass.DestroyTimer(t)
 end
 return ____exports

@@ -13,8 +13,6 @@ function ____exports.removeRect(self, rect)
         return
     end
     untrack(nil, "rect", rect)
-    if type(jass.RemoveRect) == "function" then
-        jass.RemoveRect(rect)
-    end
+    jass.RemoveRect(rect)
 end
 return ____exports

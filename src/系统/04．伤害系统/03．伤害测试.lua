@@ -23,9 +23,7 @@ end
 local function readEventDamageForDisplay()
     local v
     pcall(function ()
-            if type(japi.GetEventDamage) == "function" then
-                v = japi.GetEventDamage()
-            end
+            v = japi.GetEventDamage()
         end
     )
     if v ~= nil and type(v) == "number" and not __TS__NumberIsNaN(v) then
@@ -39,20 +37,8 @@ local function TrigActions()
     if not unit then
         return
     end
-    local ____temp_0
-    if type(jass.GetUnitName) == "function" then
-        ____temp_0 = jass.GetUnitName(unit)
-    else
-        ____temp_0 = "单位"
-    end
-    local name = ____temp_0
-    local ____temp_1
-    if type(jass.R2S) == "function" then
-        ____temp_1 = jass.R2S(damage)
-    else
-        ____temp_1 = tostring(damage)
-    end
-    local damageStr = ____temp_1
+    local name = jass.GetUnitName(unit)
+    local damageStr = jass.R2S(damage)
     local damageTypeParts = {}
     if _____4F24_5BB3_51FD_6570.isFireDamage() then
         damageTypeParts[#damageTypeParts + 1] = "火"
@@ -118,19 +104,17 @@ local function TrigActions()
         msg = msg .. "（远程）"
     end
     local source = nil
-    if type(jass.GetEventDamageSource) == "function" then
-        pcall(function ()
-                source = jass.GetEventDamageSource()
-            end
-        )
-    end
+    pcall(function ()
+            source = jass.GetEventDamageSource()
+        end
+    )
     if source == nil then
         pcall(function ()
                 source = GetEventDamageSource()
             end
         )
     end
-    if source ~= nil and type(jass.GetUnitName) == "function" then
+    if source ~= nil then
         local sourceName = jass.GetUnitName(source)
         if sourceName ~= nil and sourceName ~= "" then
             msg = (msg .. " 伤害来源：") .. tostring(sourceName)

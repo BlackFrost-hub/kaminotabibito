@@ -16,7 +16,6 @@ export function createSound(
   fadeOutRate: number,
   eaxSetting: string,
 ): any {
-  if (typeof (jass as any).CreateSound !== "function") return null;
   const s = (jass as any).CreateSound(
     fileName,
     looping,
@@ -33,9 +32,7 @@ export function createSound(
 /** 标记音效播放完成后销毁，并在本审计中释放引用 */
 export function killSoundWhenDone(s: any): void {
   if (!s) return;
-  if (typeof (jass as any).KillSoundWhenDone === "function") {
-    (jass as any).KillSoundWhenDone(s);
-  }
+  (jass as any).KillSoundWhenDone(s);
   // 引擎会在播放完后真正释放；审计层面在这里就算"已回收"，避免 -leak 中 sound 一直堆
   untrack("sound", s);
 }
@@ -51,10 +48,6 @@ export function releaseSound(s: any): void {
 /** 立刻停止并销毁（更激进，适合需要马上释放时） */
 export function stopSoundAndKill(s: any, killWhenDone: boolean = true, fadeOut: boolean = false): void {
   if (!s) return;
-  if (typeof (jass as any).StopSound === "function") {
-    (jass as any).StopSound(s, killWhenDone, fadeOut);
-  } else if (typeof (jass as any).KillSoundWhenDone === "function") {
-    (jass as any).KillSoundWhenDone(s);
-  }
+  (jass as any).StopSound(s, killWhenDone, fadeOut);
   untrack("sound", s);
 }

@@ -111,9 +111,7 @@ function onChat233(): void {
   dumpJapiKeys();
   dumpDzKeyEventTrgType();
   bindKeyBN_once_min();
-  if (typeof (jass as any).DisplayTimedTextToPlayer === "function" && typeof (jass as any).Player === "function") {
-    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 6, "[japi] 已打印 jass.japi keys");
-  }
+  (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 6, "[japi] 已打印 jass.japi keys");
 }
 
 function init(): void {

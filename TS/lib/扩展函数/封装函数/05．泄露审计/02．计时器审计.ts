@@ -15,7 +15,5 @@ export function createTimer(tag: string): any {
 export function destroyTimer(t: any): void {
   if (!t) return;
   untrack("timer", t);
-  if (typeof (jass as any).DestroyTimer === "function") {
-    (jass as any).DestroyTimer(t);
-  }
+  (jass as any).DestroyTimer(t);
 }

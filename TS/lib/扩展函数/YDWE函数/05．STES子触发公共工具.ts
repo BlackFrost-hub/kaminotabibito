@@ -62,11 +62,9 @@ export function ydlStes_finishChildCleanup(_self: any): void {
 export function ydlStes_coerceOptionalNumber(_self: any, v: any): number | undefined {
   if (v == null) return undefined;
   if (typeof v === "number" && v === v) return v;
-  const tn = (globalThis as any).tonumber as ((x: any) => number | undefined) | undefined;
-  if (typeof tn === "function") {
-    const t = tn(v);
-    if (typeof t === "number" && t === t) return t;
-  }
+  const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
+  const t = tn(v);
+  if (typeof t === "number" && t === t) return t;
   return undefined;
 }
 
@@ -74,11 +72,9 @@ export function ydlStes_coerceOptionalNumber(_self: any, v: any): number | undef
 export function ydlStes_coerceReal(_self: any, v: any): number {
   if (v == null) return 0;
   if (typeof v === "number" && v === v && isFinite(v)) return v;
-  const tn = (globalThis as any).tonumber as ((x: any) => number | undefined) | undefined;
-  if (typeof tn === "function") {
-    const t = tn(v);
-    if (typeof t === "number" && t === t && isFinite(t)) return t;
-  }
+  const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
+  const t = tn(v);
+  if (typeof t === "number" && t === t && isFinite(t)) return t;
   return 0;
 }
 
@@ -96,11 +92,9 @@ export function ydlStes_readBoolean5(_self: any, name: string): boolean {
 export function ydlStes_readInteger5(_self: any, name: string): number {
   const v = YDLocal5Get("integer", name);
   if (typeof v === "number" && v === v) return Math.floor(v);
-  const tn = (globalThis as any).tonumber as ((x: any) => number | undefined) | undefined;
-  if (typeof tn === "function") {
-    const t = tn(v);
-    if (typeof t === "number" && t === t) return Math.floor(t);
-  }
+  const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
+  const t = tn(v);
+  if (typeof t === "number" && t === t) return Math.floor(t);
   return 0;
 }
 

@@ -13,7 +13,7 @@ export function DestroyFloatText(textTag: any): void {
 
   if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") {
     LeakWatcher.destroyTextTag(textTag);
-  } else if (typeof (jass as any).DestroyTextTag === "function") {
+  } else {
     (jass as any).DestroyTextTag(textTag);
   }
 }

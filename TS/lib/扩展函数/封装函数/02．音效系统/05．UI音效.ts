@@ -21,7 +21,6 @@ function getOrCreateReuseSound(path: string): any {
   const cache = soundReuseByPath as any;
   const hit = cache[path];
   if (hit) return hit;
-  if (typeof (jass as any).CreateSound !== "function") return null;
   const m = getDefaultSoundModel();
   const s = (jass as any).CreateSound(
     path,
@@ -54,18 +53,16 @@ export function Sound3DII_Mp3PlayReuse(
   const p = player === 0 ? null : player;
   const s = getOrCreateReuseSound(path);
   if (!s) return;
-  if (typeof (jass as any).SetSoundChannel === "function") (jass as any).SetSoundChannel(s, model.channel);
-  if (typeof (jass as any).SetSoundVolume === "function") (jass as any).SetSoundVolume(s, model.volume);
-  if (typeof (jass as any).SetSoundPitch === "function") (jass as any).SetSoundPitch(s, model.pitch);
+  (jass as any).SetSoundChannel(s, model.channel);
+  (jass as any).SetSoundVolume(s, model.volume);
+  (jass as any).SetSoundPitch(s, model.pitch);
   const shouldPlay =
     !p ||
-    (typeof (jass as any).GetLocalPlayer === "function" && (jass as any).GetLocalPlayer() === p);
+    (jass as any).GetLocalPlayer() === p;
   if (shouldPlay) {
     const started = soundReuseHadStartedByPath as any;
     if (started[path]) {
-      if (typeof (jass as any).StopSound === "function") {
-        (jass as any).StopSound(s, false, false);
-      }
+      (jass as any).StopSound(s, false, false);
     } else {
       started[path] = true;
     }

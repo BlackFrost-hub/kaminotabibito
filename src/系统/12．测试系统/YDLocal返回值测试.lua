@@ -109,7 +109,7 @@ local function testYDLocalReturn(self)
     end
     _print(nil, "===== 测试结束 =====")
 end
-if ENABLED and type(jass.CreateTimer) == "function" and type(jass.TimerStart) == "function" then
+if ENABLED then
     local tm = jass.CreateTimer()
     jass.TimerStart(
         tm,
@@ -117,9 +117,7 @@ if ENABLED and type(jass.CreateTimer) == "function" and type(jass.TimerStart) ==
         false,
         function()
             testYDLocalReturn(nil)
-            if type(jass.DestroyTimer) == "function" then
-                jass.DestroyTimer(tm)
-            end
+            jass.DestroyTimer(tm)
         end
     )
 end

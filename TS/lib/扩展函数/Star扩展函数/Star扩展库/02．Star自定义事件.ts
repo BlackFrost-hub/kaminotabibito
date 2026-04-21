@@ -81,7 +81,6 @@ function syncStesGlobals(ht: any): void {
 /** 初始化 skey_* 常量（只执行一次） */
 function ensureStesKeys(): void {
     if (keysInitialized) return;
-    if (typeof jass.StringHash !== "function") return;
 
     skey_count = jass.StringHash("count");
     skey_countEx = jass.StringHash("countEx");
@@ -120,7 +119,6 @@ function refreshStesBinding(): void {
 /** 无 JASS STES 表时，仅用于纯 Lua 自测；不修改 jglobals.STES___HT / STES_HT */
 function ensureLuaOnlyStesTable(): void {
     if (StarBaseHT != null && StarBaseHT !== 0) return;
-    if (typeof jass.InitHashtable !== "function") return;
     const ht = jass.InitHashtable();
     StarBaseHT = ht;
     const g = globalThis as any;
@@ -148,7 +146,6 @@ export function STES_Register(self: any, a: any, b: any, c?: any): void {
     refreshStesBinding();
     if (!StarBaseHT) ensureLuaOnlyStesTable();
     if (!StarBaseHT) return;
-    if (typeof jass.GetHandleId !== "function") return;
 
     let t: any;
     let name: string;
@@ -169,9 +166,7 @@ export function STES_Register(self: any, a: any, b: any, c?: any): void {
     const index = jass.LoadInteger(StarBaseHT, hash, skey_index);
     const index2 = jass.LoadInteger(StarBaseHT, hd, skey_index);
 
-    if (typeof jass.SaveTriggerHandle === "function") {
-        jass.SaveTriggerHandle(StarBaseHT, hash, index, t);
-    }
+    jass.SaveTriggerHandle(StarBaseHT, hash, index, t);
     jass.SaveInteger(StarBaseHT, hash, skey_index, index + 1);
 
     jass.SaveStr(StarBaseHT, hd, index2, name);
@@ -205,7 +200,6 @@ export function STES_RegisterEx(self: any, funcName: string, eventName: string):
  */
 export function STES_GetUnitEvent(self: any, u: any, name: string): string {
     if (u == null || u === 0) return name;
-    if (typeof jass.GetHandleId !== "function") return name;
     return String(jass.GetHandleId(u)) + name;
 }
 
@@ -216,15 +210,13 @@ export function STES_Execute(self: any, name: string): void {
     init();
     refreshStesBinding();
     if (!StarBaseHT) return;
-    if (typeof jass.StringHash !== "function") return;
-    if (typeof jass.LoadInteger !== "function") return;
 
     const hash = jass.StringHash(name);
     const index = jass.LoadInteger(StarBaseHT, hash, skey_index);
     let i = 0;
     while (i < index) {
         const t = jass.LoadTriggerHandle(StarBaseHT, hash, i);
-        if (t && typeof jass.TriggerEvaluate === "function" && typeof jass.TriggerExecute === "function") {
+        if (t) {
             if (jass.TriggerEvaluate(t)) {
                 jass.TriggerExecute(t);
             }
@@ -240,8 +232,6 @@ export function STES_Fire(self: any, name: string): void {
     init();
     refreshStesBinding();
     if (!StarBaseHT) return;
-    if (typeof jass.StringHash !== "function") return;
-    if (typeof jass.LoadInteger !== "function") return;
 
     const hash = jass.StringHash(name);
     const loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index);
@@ -271,8 +261,6 @@ export function STES_FireWithReal11Step(self: any, name: string, realParamKey: s
     init();
     refreshStesBinding();
     if (!StarBaseHT) return;
-    if (typeof jass.StringHash !== "function") return;
-    if (typeof jass.LoadInteger !== "function") return;
     if (realParamKey === "") return;
 
     const hash = jass.StringHash(name);
@@ -303,7 +291,6 @@ export function STES_RemoveEvent(self: any, t: any, targetName: string): void {
     refreshStesBinding();
     if (!StarBaseHT || t == null || t === 0) return;
     if (typeof targetName !== "string" || targetName === "") return;
-    if (typeof jass.GetHandleId !== "function") return;
 
     const HT = StarBaseHT;
     const hd = jass.GetHandleId(t);
@@ -347,7 +334,6 @@ export function STES_Remove(self: any, t: any): void {
     init();
     refreshStesBinding();
     if (!StarBaseHT || t == null || t === 0) return;
-    if (typeof jass.GetHandleId !== "function") return;
 
     const HT = StarBaseHT;
     const hd = jass.GetHandleId(t);
@@ -373,9 +359,7 @@ export function STES_Remove(self: any, t: any): void {
         }
         i += 1;
     }
-    if (typeof jass.FlushChildHashtable === "function") {
-        jass.FlushChildHashtable(HT, hd);
-    }
+    jass.FlushChildHashtable(HT, hd);
 }
 
 export { StarBaseHT, skey_count, skey_countEx, skey_index, skey_indexEx, StarVarStr };

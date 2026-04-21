@@ -83,40 +83,32 @@ function onChat555(): void {
     });
   };
   step();
-  if (typeof (jass as any).DisplayTimedTextToPlayer === "function") {
-    (jass as any).DisplayTimedTextToPlayer(
-      (jass as any).Player(0),
-      0,
-      0,
-      12,
-      "[测试事件2] 555：1s内12×+1000+12条漂浮字+12次音，间隔1/11s；首按可能少1声"
-    );
-  }
+  (jass as any).DisplayTimedTextToPlayer(
+    (jass as any).Player(0),
+    0,
+    0,
+    12,
+    "[测试事件2] 555：1s内12×+1000+12条漂浮字+12次音，间隔1/11s；首按可能少1声"
+  );
 }
 
 function init(): void {
   const tr = (jass as any).CreateTrigger();
-  if (
-    typeof (jass as any).TriggerRegisterPlayerChatEvent === "function" &&
-    typeof (jass as any).TriggerAddAction === "function" &&
-    typeof (jass as any).Player === "function"
-  ) {
-    (jass as any).TriggerRegisterPlayerChatEvent(
-      tr,
-      (jass as any).Player(0),
-      "2222",
-      true
-    );
-    (jass as any).TriggerAddAction(tr, onChat2222);
-    const tr555 = (jass as any).CreateTrigger();
-    (jass as any).TriggerRegisterPlayerChatEvent(
-      tr555,
-      (jass as any).Player(0),
-      "555",
-      true
-    );
-    (jass as any).TriggerAddAction(tr555, onChat555);
-  }
+  (jass as any).TriggerRegisterPlayerChatEvent(
+    tr,
+    (jass as any).Player(0),
+    "2222",
+    true
+  );
+  (jass as any).TriggerAddAction(tr, onChat2222);
+  const tr555 = (jass as any).CreateTrigger();
+  (jass as any).TriggerRegisterPlayerChatEvent(
+    tr555,
+    (jass as any).Player(0),
+    "555",
+    true
+  );
+  (jass as any).TriggerAddAction(tr555, onChat555);
 }
 
 init();

@@ -61,12 +61,10 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
                 ____catch(____hasReturned)
             end
         end
-        if type(jass.TriggerAddAction) == "function" then
-            jass.TriggerAddAction(trig, action)
-        end
+        jass.TriggerAddAction(trig, action)
         return trig
     end
-    if type(japi.DzTriggerRegisterKeyEventByCode) == "function" then
+    if japi.DzTriggerRegisterKeyEventByCode then
         japi.DzTriggerRegisterKeyEventByCode(
             trig,
             keyCode,
@@ -76,7 +74,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
         )
         return trig
     end
-    if type(japi.DzTriggerRegisterKeyEvent) == "function" then
+    if japi.DzTriggerRegisterKeyEvent then
         japi.DzTriggerRegisterKeyEvent(
             trig,
             keyCode,
@@ -84,9 +82,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
             sync,
             ""
         )
-        if type(jass.TriggerAddAction) == "function" then
-            jass.TriggerAddAction(trig, action)
-        end
+        jass.TriggerAddAction(trig, action)
         return trig
     end
     return trig
@@ -97,30 +93,16 @@ function ____exports.registerKeyDown(self, keyCode, callback)
         return nil
     end
     local function action()
-        local ____temp_0
-        if type(japi.DzGetTriggerKeyPlayer) == "function" then
-            ____temp_0 = japi.DzGetTriggerKeyPlayer()
-        else
-            ____temp_0 = nil
-        end
-        local p = ____temp_0
-        local ____temp_1
-        if type(japi.DzGetTriggerKey) == "function" then
-            ____temp_1 = japi.DzGetTriggerKey()
-        else
-            ____temp_1 = 0
-        end
-        local k = ____temp_1
+        local p = japi.DzGetTriggerKeyPlayer()
+        local k = japi.DzGetTriggerKey()
         callback(nil, p, k)
     end
     if type(japi.DzTriggerRegisterKeyEventTrg) == "function" then
         japi.DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.DOWN, keyCode)
-        if type(jass.TriggerAddAction) == "function" then
-            jass.TriggerAddAction(trig, action)
-        end
+        jass.TriggerAddAction(trig, action)
         return trig
     end
-    if type(japi.DzTriggerRegisterKeyEventByCode) == "function" then
+    if japi.DzTriggerRegisterKeyEventByCode then
         japi.DzTriggerRegisterKeyEventByCode(
             trig,
             keyCode,
@@ -145,20 +127,8 @@ function ____exports.registerKeyUp(self, keyCode, callback)
         KEY_STATE.UP,
         false,
         function()
-            local ____temp_2
-            if type(japi.DzGetTriggerKeyPlayer) == "function" then
-                ____temp_2 = japi.DzGetTriggerKeyPlayer()
-            else
-                ____temp_2 = nil
-            end
-            local p = ____temp_2
-            local ____temp_3
-            if type(japi.DzGetTriggerKey) == "function" then
-                ____temp_3 = japi.DzGetTriggerKey()
-            else
-                ____temp_3 = 0
-            end
-            local k = ____temp_3
+            local p = japi.DzGetTriggerKeyPlayer()
+            local k = japi.DzGetTriggerKey()
             callback(nil, p, k)
         end
     )
@@ -174,21 +144,9 @@ function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, acti
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
-    local ____temp_4
-    if type(japi.DzGetTriggerKeyPlayer) == "function" then
-        ____temp_4 = japi.DzGetTriggerKeyPlayer()
-    else
-        ____temp_4 = nil
-    end
-    return ____temp_4
+    return japi.DzGetTriggerKeyPlayer()
 end
 function ____exports.getTriggerKey(self)
-    local ____temp_5
-    if type(japi.DzGetTriggerKey) == "function" then
-        ____temp_5 = japi.DzGetTriggerKey()
-    else
-        ____temp_5 = 0
-    end
-    return ____temp_5
+    return japi.DzGetTriggerKey()
 end
 return ____exports

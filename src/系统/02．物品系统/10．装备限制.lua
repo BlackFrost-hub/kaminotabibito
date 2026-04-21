@@ -213,11 +213,9 @@ local function onPickup(self)
     local nameColored = ((COLOR_NAME .. "『") .. name) .. "』|r"
     local msg = ""
     local player = jass.Player(0)
-    if type(jass.GetOwningPlayer) == "function" then
-        local p = jass.GetOwningPlayer(unit)
-        if p then
-            player = p
-        end
+    local p = jass.GetOwningPlayer(unit)
+    if p then
+        player = p
     end
     local sameIdCount = 0
     local sameSlotTypeCount = 0
@@ -230,15 +228,15 @@ local function onPickup(self)
             do
                 local it = safeUnitItemInSlot(nil, unit, i)
                 if not it then
-                    goto __continue49
+                    goto __continue48
                 end
                 local itTypeId = safeGetItemTypeId(nil, it)
                 if itTypeId == nil then
-                    goto __continue49
+                    goto __continue48
                 end
                 local e = getEntry(nil, itTypeId)
                 if not e then
-                    goto __continue49
+                    goto __continue48
                 end
                 if itTypeId == pickedTypeId then
                     sameIdCount = sameIdCount + 1
@@ -256,7 +254,7 @@ local function onPickup(self)
                     hasSub = true
                 end
             end
-            ::__continue49::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -279,22 +277,7 @@ local function onPickup(self)
         return
     end
     ____exports.equipShared.skipNextDrop = true
-    if type(jass.UnitRemoveItem) == "function" then
-        jass.UnitRemoveItem(unit, item)
-    else
-        local UnitDropItemPoint = jass.UnitDropItemPoint
-        local GetUnitX = jass.GetUnitX
-        local GetUnitY = jass.GetUnitY
-        if type(UnitDropItemPoint) == "function" and type(GetUnitX) == "function" and type(GetUnitY) == "function" then
-            UnitDropItemPoint(
-                nil,
-                unit,
-                item,
-                GetUnitX(nil, unit),
-                GetUnitY(nil, unit)
-            )
-        end
-    end
+    jass.UnitRemoveItem(unit, item)
     jass.DisplayTimedTextToPlayer(
         player,
         0,

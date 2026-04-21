@@ -18,9 +18,6 @@ local function getOrCreateReuseSound(self, path)
     if hit then
         return hit
     end
-    if type(jass.CreateSound) ~= "function" then
-        return nil
-    end
     local m = getDefaultSoundModel(nil)
     local s = jass.CreateSound(
         path,
@@ -59,22 +56,14 @@ function ____exports.Sound3DII_Mp3PlayReuse(self, path, player, model)
     if not s then
         return
     end
-    if type(jass.SetSoundChannel) == "function" then
-        jass.SetSoundChannel(s, model.channel)
-    end
-    if type(jass.SetSoundVolume) == "function" then
-        jass.SetSoundVolume(s, model.volume)
-    end
-    if type(jass.SetSoundPitch) == "function" then
-        jass.SetSoundPitch(s, model.pitch)
-    end
-    local shouldPlay = not p or type(jass.GetLocalPlayer) == "function" and jass.GetLocalPlayer() == p
+    jass.SetSoundChannel(s, model.channel)
+    jass.SetSoundVolume(s, model.volume)
+    jass.SetSoundPitch(s, model.pitch)
+    local shouldPlay = not p or jass.GetLocalPlayer() == p
     if shouldPlay then
         local started = soundReuseHadStartedByPath
         if started[path] then
-            if type(jass.StopSound) == "function" then
-                jass.StopSound(s, false, false)
-            end
+            jass.StopSound(s, false, false)
         else
             started[path] = true
         end

@@ -70,11 +70,9 @@ function ____exports.getDotSourceDisplayName(self, u)
     if u == nil or u == 0 then
         return "未知"
     end
-    if type(jass.GetUnitName) == "function" then
-        local n = jass.GetUnitName(u)
-        if n ~= nil and n ~= nil and tostring(n) ~= "" then
-            return tostring(n)
-        end
+    local n = jass.GetUnitName(u)
+    if n ~= nil and n ~= nil and tostring(n) ~= "" then
+        return tostring(n)
     end
     return "未知"
 end

@@ -290,25 +290,19 @@ local function initEvents(self)
             local primaryBonus = itemData.primaryBonus
             local primary = {}
             if primaryBonus then
-                local ____temp_6
-                if type(jass.GetUnitTypeId) == "function" then
-                    ____temp_6 = jass.GetUnitTypeId(unit)
-                else
-                    ____temp_6 = 0
-                end
-                local typeId = ____temp_6
+                local typeId = jass.GetUnitTypeId(unit)
                 local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
                 local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
                 primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
             end
             local merged = {}
             for ____, e in ipairs(STAT_CONFIG) do
-                local ____e_key_8 = e.key
-                local ____itemData_e_key_7 = itemData[e.key]
-                if ____itemData_e_key_7 == nil then
-                    ____itemData_e_key_7 = 0
+                local ____e_key_7 = e.key
+                local ____itemData_e_key_6 = itemData[e.key]
+                if ____itemData_e_key_6 == nil then
+                    ____itemData_e_key_6 = 0
                 end
-                merged[____e_key_8] = ____itemData_e_key_7 + (primary[e.key] or 0)
+                merged[____e_key_7] = ____itemData_e_key_6 + (primary[e.key] or 0)
             end
             merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
             local playerStats = {}
@@ -326,17 +320,7 @@ local function initEvents(self)
                 addStat(nil, merged[e.key], e.name)
             end
             local owner = jass.GetOwningPlayer(unit)
-            local ____temp_9
-            if type(jass.GetPlayerName) == "function" then
-                ____temp_9 = jass.GetPlayerName(owner)
-            else
-                ____temp_9 = ""
-            end
-            local ____temp_9_10 = ____temp_9
-            if ____temp_9_10 == nil then
-                ____temp_9_10 = ""
-            end
-            local playerName = ____temp_9_10
+            local playerName = jass.GetPlayerName(owner) or ""
             local actionText = isAdd and "获得" or "丢弃"
             local levelText = itemData.level or ""
             local levelColor
@@ -399,14 +383,14 @@ local function initEvents(self)
             end
             local hasMovespeed2 = itemData.movespeed2 ~= nil
             if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-                local ____equipMovespeed_getMaxMovespeed2Info_12 = equipMovespeed.getMaxMovespeed2Info
-                local ____isDrop_11
+                local ____equipMovespeed_getMaxMovespeed2Info_9 = equipMovespeed.getMaxMovespeed2Info
+                local ____isDrop_8
                 if isDrop then
-                    ____isDrop_11 = item
+                    ____isDrop_8 = item
                 else
-                    ____isDrop_11 = nil
+                    ____isDrop_8 = nil
                 end
-                local ms = ____equipMovespeed_getMaxMovespeed2Info_12(equipMovespeed, unit, ____isDrop_11)
+                local ms = ____equipMovespeed_getMaxMovespeed2Info_9(equipMovespeed, unit, ____isDrop_8)
                 if ms.value > 0 then
                     test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
                 end
@@ -426,7 +410,7 @@ local function initEvents(self)
                     0,
                     0.02,
                     5,
-                    (("|cffffff00『系统消息』：|r" .. tostring(playerName)) .. "的当前装备加成") .. table.concat(test5Parts, "，")
+                    (("|cffffff00『系统消息』：|r" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
                 )
             end
         end
