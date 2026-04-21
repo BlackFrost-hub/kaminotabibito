@@ -4,6 +4,7 @@ local ____exports = {}
 -- 判断单位类型、查找单位等
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local bjFuncs = require("lib.扩展函数.BJ函数.index")
 local g = require("jass.globals")
 --- 判断单位是否为英雄单位
 function ____exports.isHeroUnit(self, unit)
@@ -52,13 +53,10 @@ function ____exports.isSpecialUnit(self, unit)
     if not unit then
         return true
     end
-    if jass.UNIT_TYPE_SUMMONED ~= nil and jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return true
     end
-    if type(jass.IsUnitIllusionBJ) == "function" and jass.IsUnitIllusionBJ(unit) then
-        return true
-    end
-    if type(jass.IsUnitIllusion) == "function" and jass.IsUnitIllusion(unit) then
+    if bjFuncs:IsUnitIllusionBJ(unit) then
         return true
     end
     return false

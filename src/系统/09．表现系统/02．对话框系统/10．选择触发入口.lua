@@ -17,23 +17,14 @@ local buildQuestCompletedDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestComp
 local buildQuestInProgressDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
 local buildQuestOfferDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
 local jass = require("jass.common")
+local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
+local DIALOG_SELECT_EVENT_PLAYER_IDS = {0, 1, 2, 3}
 function ____exports.initDialogEntrySelectionTrigger(self)
     ensureQuestConfigsRegistered(nil)
     local trg = jass.CreateTrigger()
-    do
-        local i = 0
-        while i < 4 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trg,
-                jass.Player(i),
-                jass.EVENT_PLAYER_UNIT_SELECTED,
-                nil
-            )
-            i = i + 1
-        end
-    end
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(trg, DIALOG_SELECT_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SELECTED)
     jass.TriggerAddAction(
         trg,
         function()

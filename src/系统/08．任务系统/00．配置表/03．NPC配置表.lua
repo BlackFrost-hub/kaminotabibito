@@ -10,7 +10,7 @@ ____exports.NPC_CONFIGS = {
         X = -327.9,
         Y = -88.9,
         Facing = 270,
-        modelFIle = "units\\human\\Peasant\\Peasant",
+        modelFIle = "units\\human\\Peasant\\Peasant.mdl",
         enabled = true
     },
     {
@@ -33,7 +33,7 @@ ____exports.NPC_CONFIGS = {
         X = -27392.3,
         Y = -28285.2,
         Facing = 200,
-        modelFIle = "units\\critters\\HighElfPeasant\\HighElfPeasant",
+        modelFIle = "units\\critters\\HighElfPeasant\\HighElfPeasant.mdl",
         enabled = false
     },
     {
@@ -57,7 +57,7 @@ ____exports.NPC_CONFIGS = {
         X = -15871.9,
         Y = -20945.1,
         Facing = 270,
-        modelFIle = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower",
+        modelFIle = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower.mdx",
         initAction = "RemoveItemFromStockBJ:itemId(I0AG|I0AH|I0AI);random1",
         enabled = false
     },
@@ -82,7 +82,7 @@ ____exports.NPC_CONFIGS = {
         X = -25549.1,
         Y = -26008.7,
         Facing = 120,
-        modelFIle = "units\\creeps\\HighElfArcher\\HighElfArcher",
+        modelFIle = "units\\creeps\\HighElfArcher\\HighElfArcher.mdx",
         enabled = false
     },
     {
@@ -106,7 +106,7 @@ ____exports.NPC_CONFIGS = {
         X = -18313.7,
         Y = -25518.5,
         Facing = 0,
-        modelFIle = "units\\creeps\\BanditMage\\BanditMage",
+        modelFIle = "units\\creeps\\BanditMage\\BanditMage.mdx",
         enabled = false
     },
     {
@@ -139,7 +139,7 @@ ____exports.NPC_CONFIGS = {
         X = -5460.2,
         Y = -24955.4,
         Facing = 90,
-        modelFIle = "units\\creeps\\Bandit\\Bandit",
+        modelFIle = "units\\creeps\\Bandit\\Bandit.mdx",
         enabled = false
     },
     {
@@ -187,7 +187,7 @@ ____exports.NPC_CONFIGS = {
         X = 6903.8,
         Y = -25005.3,
         Facing = 10,
-        modelFIle = "units\\creeps\\OrcWarlock\\OrcWarlock",
+        modelFIle = "units\\creeps\\OrcWarlock\\OrcWarlock.mdx",
         enabled = false
     },
     {
@@ -199,7 +199,7 @@ ____exports.NPC_CONFIGS = {
         X = 8864.6,
         Y = -22209.2,
         Facing = 255.96,
-        modelFIle = "units\\creeps\\assassin\\assassin",
+        modelFIle = "units\\creeps\\assassin\\assassin.mdx",
         enabled = false
     },
     {
@@ -223,7 +223,7 @@ ____exports.NPC_CONFIGS = {
         X = -27974.4,
         Y = -7209.5,
         Facing = 270,
-        modelFIle = "units\\critters\\VillagerMan\\VillagerMan",
+        modelFIle = "units\\critters\\VillagerMan\\VillagerMan.mdx",
         enabled = false
     },
     {
@@ -247,7 +247,7 @@ ____exports.NPC_CONFIGS = {
         X = -22800.6,
         Y = -29084.3,
         Facing = 90,
-        modelFIle = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief",
+        modelFIle = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief.mdx",
         enabled = false
     },
     {
@@ -289,7 +289,7 @@ ____exports.NPC_CONFIGS = {
         NpcNameID = "|cffff0000失踪的精灵村民（Boss战任务）|r",
         unitcode = "edot",
         requireType = "任务",
-        modelFIle = "units\\nightelf\\DruidoftheTalon\\DruidoftheTalon",
+        modelFIle = "units\\nightelf\\DruidoftheTalon\\DruidoftheTalon.mdx",
         enabled = false
     }
 }

@@ -1,70 +1,92 @@
 ---
-description: 全局高优先级工程规则，覆盖 jass/japi/BJ 边界、模块 require、封装复用、目录组织与 STES 桥接约定
+description: 全局高优先级：jass/japi/BJ/本地库边界、require、封装与 STES 约定
 alwaysApply: true
 ---
 
 # Global Engine Rules
 
-以下规则为全局高优先级规则，适用于整个仓库。
+## 1. 命名空间（必读，勿混）
 
-## 1. 先看 jass 表和 japi 表
-- 先看项目根目录里的 `jass表.txt` 和 `japi表.txt`
-- 不要把 BJ 函数当成 jass 或 japi 函数使用
-- 不要把 jass、japi、BJ 三者互相混淆
-- 不要把本地函数库当成 jass / japi 原生函数使用
+| 来源 | 含义 | 用法 |
+|------|------|------|
+| **jass** | `require("jass.common")`，**common.j 原生** | 仅调表里有的原生；常量用 `jass.EVENT_*` 等，勿手写魔数 |
+| **japi** | `require("jass.japi")`，**扩展（Dz/EX 等）** | 与 jass 区分，勿混名 |
+| **BJ** | **Blizzard.j**，Lua 里**不一定**挂在 `jass` 上 | 用项目封装：`require("lib.扩展函数.BJ函数…")`，**禁止** `(jass as any).IsUnitIllusionBJ` 这类冒充 |
+| **本地库** | `TS/lib`、`系统/*` 等 | 只通过 **require 调本地导出**；**禁止**挂到 `jass`/`japi` 表冒充原生，也禁止让引擎 API「反向依赖」本地实现 |
 
-## 2. require 必须使用绝对模块路径
-- 正例：`require("lib.扩展函数.YDWE函数.04．YDWE_trigger")`
-- 正例：`require("系统.05．Buff系统.00．Buff系统")`
-- 反例：`require("./06．XX函数")`
-- 相对路径在 Lua 运行时无法正确解析
+- 查表：根目录 `jass表.txt`、`japi表.txt`（运行时日志为准）。
+- **BJ ≠ jass ≠ japi**；需要 BJ 语义时走 BJ 封装模块，不要当原生用。
 
-## 3. 优先复用封装库
-- `TS/lib/扩展函数` 是项目封装函数库
-- 在新增封装、抽通用逻辑、优化源文件前，先检查这里是否已有可复用实现
-- 如果缺少通用封装，应补齐或明确报告缺口
+## 2. require
 
-## 4. 不要把 globalThis 当成 jass 全局
-- 对于 jass 全局变量，不要使用 `globalThis`
-- `globalThis` 是 TS / Lua 侧全局，不是 jass 全局
+- 绝对模块路径：`require("lib.…")`、`require("系统.…")`；**禁止** `./` 相对路径（Lua 无法解析）。
 
-## 5. 通用函数与目录组织
-- 可复用通用函数优先放入 `TS/lib/扩展函数/自定义扩展函数` 或更合适的现有封装文件
-- 新建文件夹时必须带 `index` 统一导入导出，并在父级 `index` 中补入口
-- 单文件不应超过 800 行，最好不超过 500 行；过长就拆分
+## 3. 复用 `TS/lib/扩展函数`
 
-## 6. 新系统要补文档
-- 新建完整系统时，需要补充对应的 `.md` 说明，方便后续 AI 或人接手
+- 新增逻辑前先搜是否已有封装；缺口可补或注明。
 
-## 7. STES / YDLocal 示例入口
-- `TS/系统/02．物品系统/07．装备提取.ts`
-- `TS/系统/12．测试系统/STES事件测试.ts`
-- `TS/系统/12．测试系统/YDLocal返回值测试.ts`
+## 4. 全局对象
 
-## 8. .cursor 目录是坑点与经验库
-- `.cursor` 目录中记录了一些项目坑点和经验，遇到相关问题优先回看
+- **勿用 `globalThis` 代替 jass 全局**（`udg_*` 等按引擎约定取）。
 
-## 9. STES 桥接边界
-- jass 端不能直接调用 lua 端函数
-- 但可以通过 STES 事件桥接，实现被 jass 触发、传参、回调等能力
-- 如果需求明确要求“能被 jass 端调用 / 触发 / 传参”，就必须按 STES 可桥接方式设计
+## 5. 目录与体量
 
-## 10. 走不通时要变通，但不能越界
-- 一个方法走不通时可以变通
-- 但前提是不违反这里的边界规则
+- 通用逻辑放 `自定义扩展函数` 或既有封装；新目录需 `index` 并在父级登记；单文件不宜过长（建议不超过约 500 行），过长拆分。
 
-## 11. 拆分 / 新建文件时的关键函数注释
-- 当智能体拆分文件、构建新模块、或重组系统时，不要只写文件头部注释
-- 对于跨模块入口、核心流程、或不易直接看懂的关键函数，需要补充简短注释
-- 不需要给每个小工具函数都加注释；优先保证“关键函数有注释”
+## 6. 新系统文档
 
-## 12. 安全检查默认策略（全局覆盖）
-- 新建文件和常规改代码时，默认**不要**添加“函数存在性/可选链/返回值兜底”安全检查（如 `if (typeof xxx === "function")`、`if (typeof xxx !== "function")`、`xxx?.(...)`、以及为 jass/japi 写的 `typeof jass.X / typeof japi.X` 存在性判断）。
-- **业务判空/判合法应保留**（如句柄 `null/0`、配置缺失、数组越界、玩家/单位是否有效）；不要把“对象是否存在”与“API 函数是否存在”混为一谈。
-- **已用运行日志 / `jass表.txt` / `japi表.txt` 确认存在的原生函数**：直接调用，不要再包一层 `typeof`。
-- **巡检漏网提醒**：清理或审查时务必同时搜 `=== "function"` **与** `!== "function"`（以及 `typeof jass.` / `typeof japi.`），只搜一种容易漏。
-- **允许的少数例外**（不属于“无意义样板”）：
-  1) **动态名字解析**：例如按字符串从 `japi`/`jass` 上取函数、桥接注册等，必须用 `typeof` 判断再调用；
-  2) 规则或需求明确要求跨平台 / 多运行时兼容；
-  3) 调用点已复现运行时不确定且用户同意保留防御式写法。
-- 目标：保持代码简洁，减少冗余与 token 噪音；默认**非必要不加**安全检查。
+- 新完整系统补简短 `.md`，便于接手。
+
+## 7. STES / YDLocal 参考
+
+- `系统/02．物品系统/07．装备提取.ts`、`系统/12．测试系统/STES事件测试.ts`、`YDLocal返回值测试.ts`
+
+## 8. `.cursor` 经验库
+
+- 遇坑先查 `.cursor/rules` 与历史说明。
+
+## 9. STES 桥接
+
+- jass **不能**直接调 Lua 函数；需 STES/事件桥接。需求若写「jass 可触发/传参」，按 STES 可桥接方式设计。
+
+## 10. 变通不越界
+
+- 实现可变通，但不违反上述边界。
+
+## 11. 拆分与注释
+
+- 拆文件/新模块时：跨模块入口、核心流程、难读函数给**短注释**；不必给每个小函数写注释。
+
+## 12. 安全检查（默认少写）
+
+- 默认**不要**为 jass/japi **加** `typeof === "function"` / 可选链式「API 存在性」判断。
+- **业务判空保留**（句柄、配置、索引、玩家/单位是否有效）；勿与「API 是否存在」混谈。
+- **已在 jass/japi 表确认的原生**：直接点号调用。
+- 巡检时同时搜 `=== "function"` 与 `!== "function"`。
+- **例外**：动态字符串取表、规则要求多运行时、已复现不确定且用户同意保留。
+
+## 13. 玩家单位事件：禁止业务代码直连 `TriggerRegisterPlayerUnitEvent`
+
+**目的**：同一 `(玩家, eventId)` 重复原生注册会浪费句柄、难审计；统一走事件中心可减少重复注册、与现有系统一致。
+
+**✅ 新代码必须这样接**
+
+| 场景 | 入口 |
+|------|------|
+| 通用玩家单位事件（拾取/丢弃/使用物品/死亡/选中/升级等） | `require("系统.00．核心系统.01．事件中心.01．玩家单位事件")` 的 `registerPlayerUnitEvent` / `registerPlayerUnitEventForPlayerIds` / `registerDefaultPlayerUnitEvent` / `registerPlayerUnitEventById` |
+| 区域进入 | `require("系统.00．核心系统.01．事件中心.02．区域事件中心")` 的 `registerEnterRegionTrigger` |
+| 单位特定事件、单位+范围 | `require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")` 的 `registerUnitEventTrigger` / `registerUnitInRangeTrigger` |
+| **仅** `EVENT_PLAYER_UNIT_SPELL_CHANNEL` / `EVENT_PLAYER_UNIT_SPELL_EFFECT` | `require("系统.03．技能系统.00．技能事件.01．核心功能")` 的 `registerSpellChannelListener` / `registerSpellEffectListener`（由该模块 `init` 统一注册原生事件） |
+
+**❌ 禁止**（除非下面「例外」）
+
+- 业务/系统模块里手写 `jass.TriggerRegisterPlayerUnitEvent(...)`，或自写 `for i=0..n` 对每个玩家循环注册同一事件（应改用上表 API）。
+
+**例外（不视为违规）**
+
+- **`01．事件中心/01．玩家单位事件.ts` 内部**：实现 master 分发时的原生注册。
+- **`01．事件中心/02．区域事件中心.ts` 内部**：`TriggerRegisterEnterRegion`（语义非「玩家单位事件」，且已集中管理）。
+- **`01．事件中心/03．单位特定事件中心.ts` 内部**：`TriggerRegisterUnitEvent` / `TriggerRegisterUnitInRange` 等单位实例级事件入口。
+- **`03．技能系统/00．技能事件/01．核心功能.ts` 的 `init`**：对 SPELL_CHANNEL/EFFECT 的注册（唯一入口）。
+- **Timer 到期、STES 子触发、Dz 键鼠等**：与「多玩家同一 event」不是同一类；能收进中心计时器/事件中心的按对应中心入口走，不能收的按子系统既有方式保留。
+- **仅作封装的 lib**（如 `lib/扩展函数/BJ函数/01．触发与事件.ts`）：新增功能仍应优先走事件中心，避免再叠一层独立注册习惯。

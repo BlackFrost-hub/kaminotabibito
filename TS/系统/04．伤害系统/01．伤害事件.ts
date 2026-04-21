@@ -16,11 +16,10 @@ const { registerDeathListener } = require("系统.01．单位系统.03．单位�
 };
 
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
-const EVENT_UNIT_DAMAGED_ID = 52;
 
-/** 事件句柄，TriggerRegisterUnitEvent 第3参要 jhandle_t 不能传数字 */
+/** 事件句柄：common.j 全局 unitevent `EVENT_UNIT_DAMAGED`；TriggerRegisterUnitEvent 第3参要 jhandle_t 不能传数字 */
 function getEventUnitDamaged(): any {
-  return (jass as any).ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID);
+  return (jass as any).EVENT_UNIT_DAMAGED;
 }
 
 const DamageEventQueue: any[] = [];
@@ -58,11 +57,9 @@ const dotBatchMarkQueue: boolean[] = [];
 export function markNextPendingDamageAsDotTickBatch(): void {
   dotBatchMarkQueue.push(true);
 }
-/** 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致，优先 jass/globals 的 unittype 常量 */
+/** 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致 */
 function getUnitTypeHero(): any {
-  const direct = (jass as any).UNIT_TYPE_HERO ?? (g as any).UNIT_TYPE_HERO;
-  if (direct != null) return direct;
-  return (jass as any).ConvertUnitType(2);
+  return (jass as any).UNIT_TYPE_HERO ?? (jass as any).ConvertUnitType(2);
 }
 
 function onUnitDeathForDamage(dyingUnit: any): void {
@@ -178,6 +175,8 @@ function anyUnitDamagedFilter(): boolean {
   if (!u) return false;
   const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
   if (lvl > 0) return false;
+  // GroupAddUnit 对已存在单位无二次加入，但 TriggerRegisterUnitEvent 会叠加订阅；进区可能重复触发
+  if (UnitGroup && (jass as any).IsUnitInGroup(u, UnitGroup)) return false;
   if (UnitGroup) {
     (jass as any).GroupAddUnit(UnitGroup, u);
   }
@@ -204,6 +203,8 @@ function initEnumUnit(): void {
       if (!u) return;
       const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
       if (lvl > 0) return;
+      // 与 anyUnitDamagedFilter 对称：若 EnterRegion 已先于本 ForGroup 入组并 Register，避免二次 Register
+      if ((jass as any).IsUnitInGroup(u, UnitGroup)) return;
       (jass as any).GroupAddUnit(UnitGroup, u);
       const ev = getEventUnitDamaged();
       if (ev != null) {

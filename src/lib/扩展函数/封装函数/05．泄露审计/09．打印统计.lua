@@ -10,16 +10,7 @@ local stats = ____01_FF0E_6838_5FC3_7EDF_8BA1.stats
 local jass = require("jass.common")
 --- 打印当前统计信息；可选 tagFilter 只查看某个来源
 function ____exports.dump(self, tagFilter)
-    if type(jass.DisplayTimedTextToPlayer) ~= "function" then
-        return
-    end
-    local ____table_Player_0
-    if jass.Player then
-        ____table_Player_0 = jass.Player(0)
-    else
-        ____table_Player_0 = nil
-    end
-    local p0 = ____table_Player_0
+    local p0 = jass.Player(0)
     local function printLine(____, msg)
         if not p0 then
             return

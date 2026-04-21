@@ -28,6 +28,7 @@ local ____exports = {}
 --   - h00C:10->I02H*2:5
 --   - h00C:20->I034*1;20%I036*1:5
 local jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
@@ -44,6 +45,7 @@ local ____require_result_4 = require("系统.01．单位系统.03．单位死亡
 local registerDeathListener = ____require_result_4.registerDeathListener
 local CAMPFIRE_ID = 1747988547
 local EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
+local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
 local itemState = __TS__New(Map)
 local campfireItems = __TS__New(Map)
 local function isCampfire(self, u)
@@ -275,18 +277,10 @@ local function untrackItem(self, item)
     end
 end
 local function startBurnTimer(self, item, campfire, sec)
-    local t = jass.CreateTimer()
-    if not t then
-        return
-    end
     local st = itemState:get(item)
-    if st then
-        st.burnTimer = t
-    end
-    jass.TimerStart(
-        t,
+    local t = withTimer(
+        nil,
         sec,
-        false,
         function()
             if not itemState:has(item) then
                 return
@@ -297,6 +291,9 @@ local function startBurnTimer(self, item, campfire, sec)
             untrackItem(nil, item)
         end
     )
+    if st then
+        st.burnTimer = t
+    end
 end
 local function startCookTimer(self, item, campfire, recipe)
     local t = jass.CreateTimer()
@@ -395,53 +392,14 @@ local function onCampfireDeath(self, dyingUnit)
     campfireItems:delete(dyingUnit)
 end
 ____exports["init物品加工"] = function(self)
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9 = 18
-    end
-    local pickEv = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_9
-    local trigPick = jass.CreateTrigger()
-    do
-        local i = 0
-        while i <= 3 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trigPick,
-                jass.Player(i),
-                pickEv,
-                nil
-            )
-            i = i + 1
+    itemEventCenter:onItemPickup(function(____, unit, item)
+        onAnyPickup(nil)
+    end)
+    itemEventCenter:onItemDrop(function(____, unit, item)
+        if unit and item and isCampfire(nil, unit) and itemState:has(item) then
+            untrackItem(nil, item)
         end
-    end
-    jass.TriggerAddAction(trigPick, onAnyPickup)
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10 = 19
-    end
-    local dropEv = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_10
-    local trigDrop = jass.CreateTrigger()
-    do
-        local i = 0
-        while i <= 3 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trigDrop,
-                jass.Player(i),
-                dropEv,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    jass.TriggerAddAction(
-        trigDrop,
-        function()
-            local unit = jass.GetManipulatingUnit()
-            local item = jass.GetManipulatedItem()
-            if unit and item and isCampfire(nil, unit) and itemState:has(item) then
-                untrackItem(nil, item)
-            end
-        end
-    )
+    end)
     registerDeathListener(nil, onCampfireDeath)
 end
 ____exports["init物品加工"](nil)

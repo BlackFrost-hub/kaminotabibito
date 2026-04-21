@@ -5,6 +5,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const bjFuncs = require("lib.扩展函数.BJ函数.index") as { IsUnitIllusionBJ: (unit: any) => boolean };
 
 const g = require("jass.globals") as { [key: string]: any };
 
@@ -52,9 +53,8 @@ export function isAncientUnit(unit: any): boolean {
  */
 export function isSpecialUnit(unit: any): boolean {
   if (!unit) return true;
-  if ((jass as any).UNIT_TYPE_SUMMONED != null && jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return true;
-  if (typeof (jass as any).IsUnitIllusionBJ === "function" && (jass as any).IsUnitIllusionBJ(unit)) return true;
-  if (typeof (jass as any).IsUnitIllusion === "function" && (jass as any).IsUnitIllusion(unit)) return true;
+  if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return true;
+  if (bjFuncs.IsUnitIllusionBJ(unit)) return true;
   return false;
 }
 

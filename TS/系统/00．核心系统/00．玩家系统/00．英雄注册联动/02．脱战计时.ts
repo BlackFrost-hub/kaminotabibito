@@ -22,6 +22,10 @@ const { SetUnitLifePercentBJ, SetUnitManaPercentBJ, UnitHasBuffBJ } = require("l
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
 };
+const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (delayMs: number, callback: () => void) => number;
+  removeDelayedCallback: (id: number) => void;
+};
 
 //=============================================================================
 // 一、常量配置
@@ -43,14 +47,8 @@ const DAMAGE_THRESHOLD_RATIO = 0.01;
 // 二、计时器存储
 //=============================================================================
 
-/** 玩家脱战计时器（玩家0-3对应索引1-4） */
-const outOfCombatTimers: any[] = [null, null, null, null, null];
-
-//=============================================================================
-// 三、触发器
-//=============================================================================
-
-let timerTrigger: any = null;
+/** 玩家脱战延迟任务（玩家0-3对应索引1-4） */
+const outOfCombatTaskIds: number[] = [0, 0, 0, 0, 0];
 
 //=============================================================================
 // 四、核心功能
@@ -90,14 +88,16 @@ function startOutOfCombatTimer(playerId: number): void {
   if (playerId < 0 || playerId > 3) return;
 
   const timerIndex = playerId + 1;
-  let timer = outOfCombatTimers[timerIndex];
-
-  if (timer == null) {
-    timer = jass.CreateTimer();
-    outOfCombatTimers[timerIndex] = timer;
+  const oldTaskId = outOfCombatTaskIds[timerIndex];
+  if (oldTaskId !== 0) {
+    centerTimer.removeDelayedCallback(oldTaskId);
   }
 
-  jass.TimerStart(timer, OUT_OF_COMBAT_TIME, false, () => {});
+  outOfCombatTaskIds[timerIndex] = centerTimer.addDelayedCallback(OUT_OF_COMBAT_TIME * 1000, () => {
+    if (outOfCombatTaskIds[timerIndex] === 0) return;
+    outOfCombatTaskIds[timerIndex] = 0;
+    onOutOfCombat(playerId);
+  });
 }
 
 /**
@@ -173,20 +173,6 @@ function onUnitDamaged(
   startOutOfCombatTimer(playerId);
 }
 
-/**
- * 计时器到期事件处理
- */
-function onTimerExpire(): void {
-  const expiredTimer = jass.GetExpiredTimer();
-
-  for (let i = 1; i <= 4; i++) {
-    if (outOfCombatTimers[i] === expiredTimer) {
-      onOutOfCombat(i - 1);
-      return;
-    }
-  }
-}
-
 //=============================================================================
 // 六、初始化
 //=============================================================================
@@ -201,16 +187,6 @@ export function initOutOfCombat(): void {
   _initialized = true;
 
   registerDamageCallback(onUnitDamaged);
-
-  timerTrigger = jass.CreateTrigger();
-
-  for (let i = 1; i <= 4; i++) {
-    const timer = jass.CreateTimer();
-    outOfCombatTimers[i] = timer;
-    jass.TriggerRegisterTimerExpireEvent(timerTrigger, timer);
-  }
-
-  jass.TriggerAddAction(timerTrigger, onTimerExpire);
 }
 
 export {};

@@ -14,7 +14,7 @@ export const DEFAULT_TITLE_FONT_SIZE = 0.018;
 export const DEFAULT_BODY_FONT_SIZE = 0.012;
 export const DEFAULT_BG_TEX = "UI\\wenbenkuang.blp";
 export const DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp";
-/** ~ 键（波浪号/反引号，数字键盘左边ESC下面） */
+/** ~ 键 VK_OEM_3（192）；注册须走数字 VK，见 `封装函数/04．硬件输入/04．键盘函数` 中 registerKeyBindToTrigger */
 export const KEY_SKIP_DIALOG = 192;
 
 // ========== 虚拟分区：运行时状态 ==========

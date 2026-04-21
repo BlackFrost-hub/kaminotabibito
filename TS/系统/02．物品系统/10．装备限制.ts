@@ -1,5 +1,8 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
+const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (callback: (unit: any, item: any) => void) => number;
+};
 const { fourCCToString, isHeroUnit, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
   isHeroUnit: (unit: any) => boolean;
@@ -18,6 +21,7 @@ const itemsData = (require("系统.02．物品系统.01．装备数据") as {
 }).default ?? {};
 /** 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性 */
 export const equipShared = { skipNextDrop: false };
+const EQUIP_LIMIT_EVENT_PLAYER_IDS = [0, 1, 2, 3] as const;
 
 const ONE_PER_SLOT: string[] = ["主武器", "副武器", "衣服", "鞋子", "裤子", "头盔", "灵魂"];
 const TWO_HANDED = "双手武器";
@@ -90,11 +94,9 @@ export function equipLimitWouldAllowPickup(unit: any, item: any): boolean {
   return msg === "";
 }
 
-function onPickup(): void {
+function onPickup(unit: any, item: any): void {
   if (isEquipLimitDisabledByJass()) return;
-  const unit = jass.GetManipulatingUnit?.() ?? jass.GetTriggerUnit?.();
-  const item = jass.GetManipulatedItem?.();
-  if (!unit || !item) return;
+  if (unit === null || unit === 0 || item === null || item === 0) return;
   if (!isHeroUnit(unit)) return;
   if (isSpecialUnit(unit)) return;
   const pickedTypeId = safeGetItemTypeId(item);
@@ -166,20 +168,14 @@ function onPickup(): void {
   jass.DisplayTimedTextToPlayer(player, 0, 0, 6, msg);
 }
 
-function isHeroCond(): boolean {
-  const u = jass.GetTriggerUnit?.() ?? (jass as any).GetManipulatingUnit?.();
-  return isHeroUnit(u);
-}
-
 function init(): void {
-  const trig = jass.CreateTrigger();
-  const eventId = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM;
-  for (let i = 0; i < 4; i++) {
-    jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), eventId, undefined!);
-  }
-  const cond = (jass as any).Condition;
-  if (typeof cond === "function") (jass as any).TriggerAddCondition(trig, cond(isHeroCond));
-  jass.TriggerAddAction(trig, onPickup);
+  // 使用物品事件中心注册，减少触发器数量
+  itemEventCenter.onItemPickup((unit, item) => {
+    // 只处理英雄单位
+    if (unit !== null && unit !== 0 && isHeroUnit(unit)) {
+      onPickup(unit, item);
+    }
+  });
 }
 
 init();

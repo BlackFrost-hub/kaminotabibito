@@ -7,8 +7,10 @@ local ____exports = {}
 -- 因此一律 `japi.DzXxx(...)` 直接点号调用，禁止本文件内再写 japiFn 模式。
 local jass = require("jass.common")
 local japi = require("jass.japi")
---- 按键状态（BzAPI：1=按下，2=抬起）
-____exports.KEY_STATE = {DOWN = 1, UP = 2}
+local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
+local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
+--- 按键状态（DzTriggerRegisterKeyEventTrg：1=按下，0=抬起）
+____exports.KEY_STATE = {DOWN = 1, UP = 0}
 --- 鼠标按键（BzAPI：1=左，2=右，3=中）
 ____exports.MOUSE_BUTTON = {LEFT = 1, RIGHT = 2, MIDDLE = 3}
 --- A-Z
@@ -128,28 +130,44 @@ local function keyCodeToTrgChar(self, keyCode)
     end
     return ""
 end
---- 注册按键事件（by code）。注意：这里不做 try/catch 兜底，避免不必要的同步差异。
-function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
-    local trig = createTriggerOrNull(nil)
-    if not trig then
-        return nil
+--- F1–F12、Tab、OEM 区（含 ~ =192）：与 JASS 一致用 VK 数字，勿用 string.char（F2→q、Tab→控制符、192→与引擎不一致）。
+local function registerKeyBindToTrigger(self, trig, status, keyCode)
+    if keyCode >= 112 and keyCode <= 123 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
+    end
+    if keyCode >= 1 and keyCode < 32 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
+    end
+    if keyCode >= 186 and keyCode <= 192 or keyCode >= 219 and keyCode <= 222 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
     end
     local keyChar = keyCodeToTrgChar(nil, keyCode)
     do
         local function ____catch(_e0)
             do
                 pcall(function()
-                    japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode)
+                    DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
                 end)
             end
         end
         local ____try, ____hasReturned = pcall(function()
-            japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar)
+            DzTriggerRegisterKeyEventTrg(nil, trig, status, keyChar)
         end)
         if not ____try then
             ____catch(____hasReturned)
         end
     end
+end
+--- 注册按键事件（by code）。注意：这里不做 try/catch 兜底，避免不必要的同步差异。
+function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
+    local trig = createTriggerOrNull(nil)
+    if not trig then
+        return nil
+    end
+    registerKeyBindToTrigger(nil, trig, status, keyCode)
     jass.TriggerAddAction(trig, action)
     return trig
 end
@@ -245,13 +263,13 @@ local function initTestKeyB(self)
             false,
             function()
                 local p = japi.DzGetTriggerKeyPlayer()
-                local ____p_0
+                local ____p_1
                 if p then
-                    ____p_0 = jass.GetPlayerId(p)
+                    ____p_1 = jass.GetPlayerId(p)
                 else
-                    ____p_0 = 0
+                    ____p_1 = 0
                 end
-                local pid = ____p_0
+                local pid = ____p_1
                 local down = ____exports.isKeyDown(nil, ____exports.KEY.B)
                 local last = not not lastDownByPid[pid]
                 lastDownByPid[pid] = down

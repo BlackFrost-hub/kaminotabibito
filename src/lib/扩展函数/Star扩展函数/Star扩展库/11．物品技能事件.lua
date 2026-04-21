@@ -28,8 +28,9 @@ end
 --   - StrHEX(s) = StringHash(s) - 字符串转哈希码
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
+local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
+local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
 lastItemAbilityContext = {
     abilityId = 0,
     targetX = 0,
@@ -39,9 +40,26 @@ lastItemAbilityContext = {
 }
 local su_iatList = {}
 local su_iatIndex = 0
-local su_ItemAbilityTrig = nil
 local su_ItemAbilityTrig2 = nil
 local su_ItemAbilityInited = false
+local STAR_ITEM_ABILITY_EVENT_PLAYER_IDS = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+}
 local HASH_LAST_SPELL = jass.StringHash("最后使用的技能")
 local HASH_LAST_SPELL_X = jass.StringHash("最后使用的技能X")
 local HASH_LAST_SPELL_Y = jass.StringHash("最后使用的技能Y")
@@ -178,14 +196,12 @@ function ____exports.SU_InititemAbilityListener(self)
     if su_ItemAbilityInited then
         return
     end
-    su_ItemAbilityTrig = jass.CreateTrigger()
     su_ItemAbilityTrig2 = jass.CreateTrigger()
-    if su_ItemAbilityTrig == nil or su_ItemAbilityTrig2 == nil then
+    if su_ItemAbilityTrig2 == nil then
         return
     end
-    TriggerRegisterAnyUnitEventBJ(nil, su_ItemAbilityTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    TriggerRegisterAnyUnitEventBJ(nil, su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM)
-    jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1)
+    registerSpellEffectListener(nil, SU_InititemAbilityListener_1)
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(su_ItemAbilityTrig2, STAR_ITEM_ABILITY_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_USE_ITEM)
     jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2)
     su_ItemAbilityInited = true
 end

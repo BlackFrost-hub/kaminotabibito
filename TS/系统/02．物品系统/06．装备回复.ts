@@ -1,4 +1,4 @@
-/**
+﻿﻿/**
  * 装备回复：使用物品时解析 hot/abilList，按段 **STES「物品治疗事件」** 分发。
  *
  * 逆天约定（传参与返回值**同时支持**，不互斥）：
@@ -15,6 +15,9 @@
  */
 
 const jass = require("jass.common") as any;
+const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemUse: (callback: (unit: any, item: any) => void) => number;
+};
 
 const { STES_Register, STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_Register: (t: any, name: string) => void;
@@ -115,15 +118,13 @@ function applyHpMpToUnitAndGetApplied(this: void, unit: any, hp: number, mp: num
 
   let lifeBefore = 0;
   let manaBefore = 0;
-  if (jass.UNIT_STATE_LIFE != null) lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
-  if (jass.UNIT_STATE_MANA != null) manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
+  lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
+  manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
 
   applyHpMpToUnit(unit, hp, mp);
 
-  let lifeAfter = lifeBefore;
-  let manaAfter = manaBefore;
-  if (jass.UNIT_STATE_LIFE != null) lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
-  if (jass.UNIT_STATE_MANA != null) manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
+  let lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
+  let manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
 
   return {
     hpApplied: Math.max(0, lifeAfter - lifeBefore),
@@ -266,12 +267,8 @@ function init(this: void): void {
     glob[STES_REG_KEY] = true;
   }
 
-  const useItemEv = jass.EVENT_PLAYER_UNIT_USE_ITEM ?? 35;
-  const trig = jass.CreateTrigger();
-  for (let i = 0; i <= 6; i++) jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), useItemEv, undefined!);
-  const p13 = jass.Player(13);
-  if (p13 != null) jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, undefined!);
-  jass.TriggerAddAction(trig, () => {
+  // 使用物品事件中心注册，减少触发器数量
+  itemEventCenter.onItemUse((unit, item) => {
     onUseItem();
   });
 }

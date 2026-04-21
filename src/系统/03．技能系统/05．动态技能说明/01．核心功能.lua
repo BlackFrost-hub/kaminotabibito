@@ -138,6 +138,7 @@ end
 -- 功能：注册动态技能说明、公式解析、自动刷新
 -- 后续接手者：开关 DYNAMIC_SKILL_TIP_ENABLED 在常量文件
 local jass = require("jass.common")
+local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 EXGetUnitAbility = ____require_result_0.EXGetUnitAbility
 EXSetAbilityDataString = ____require_result_0.EXSetAbilityDataString
@@ -338,12 +339,7 @@ function ____exports.initDynamicSkillTipSystem(self)
         do
             local i = 0
             while i < PLAYER_COUNT do
-                jass.TriggerRegisterPlayerUnitEvent(
-                    levelUpTrigger,
-                    jass.Player(i),
-                    levelEventId,
-                    nil
-                )
+                playerUnitEvent.registerPlayerUnitEventById(levelUpTrigger, i, levelEventId)
                 i = i + 1
             end
         end

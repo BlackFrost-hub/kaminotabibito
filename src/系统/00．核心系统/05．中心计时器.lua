@@ -1,33 +1,45 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__StringPadStart = ____lualib.__TS__StringPadStart
 local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
-local runPeriodicCallbacks, _serverTime, _millisCounter, _periodicCallbacks
-function runPeriodicCallbacks(self)
-    local now = _serverTime + _millisCounter * 10
-    for ____, periodicCb in ipairs(_periodicCallbacks) do
-        if now - periodicCb.lastRunTime >= periodicCb.intervalMs then
-            periodicCb.lastRunTime = now
-            periodicCb:callback()
-        end
-    end
-end
---- 核心系统 - 中心计时器
+---
+-- @file 系统/00．核心系统/05．中心计时器.ts
+-- @module 中心计时器
 -- 
--- 功能：
--- - 提供统一的游戏时间追踪（服务器时间）
--- - 使用 DzAPI_Map_GetGameStartTime() 获取游戏开始时的服务器时间戳
--- - 每10毫秒累加，支持获取年月日时分秒毫秒
+-- ## 职责
+-- 全图唯一「逻辑时钟」：用 **0.01s 周期** 驱动游戏内时间、日历缓存、以及与 JASS 全局变量的同步。
+-- 其它系统需要「游戏时间 / 定时回调」时应 **require 本模块**，不要各自再建 `CreateTimer(0.01)`。
 -- 
--- 后续接手者：所有需要游戏时间的模块都从这里获取
+-- ## 引用
+-- - 推荐：`require("系统.00．核心系统.05．中心计时器")`
+-- - 或经 `系统.00．核心系统.index` 的 `export *` 再导入同名导出。
 -- 
--- 参考：JASS\jass复制粘贴\gettime.j
+-- ## 时间模型（内部状态）
+-- - **nowMs** ≈ `_serverTime + _millisCounter * 10`：`getServerTime()` / 多数逻辑用的「毫秒」。
+-- - **服务器锚点**：`initCenterTimer` 内 `DzAPI_Map_GetGameStartTime()` → `_serverTime`（毫秒档，每秒整 tick 时 +1000）。
+-- - **游戏经过时间**：`_gameElapsedTime`（秒，含小数），写入 `jass.globals.udg_Elapsed`（若存在）。
+-- - **游戏内 [秒,分,时]**：`_gameTimeHMS`，每秒推进并写入 `jass.udg_Time[0..2]`（若存在）。
+-- - **日历**：`calcDate` / `updateDate` 与旧版 JASS `gettime.j` 一致：`BASE_TIMESTAMP`(2015-01-01 UTC) + `TIMEZONE_OFFSET`(东八区秒)。
+-- 
+-- ## 回调分层（均在 `onTick` 内按序执行）
+-- 1. **每 10ms**：`onTick10ms` 注册的回调（全部调用）。
+-- 2. **周期性**：`addPeriodicCallback`（按间隔与 `nowMs` 比较）。
+-- 3. **每 1s**（每满 100 次 10ms tick）：`calcDate`、`udg_Time`、然后 `onSecond` 回调。
+-- 
+-- ## 对外导出（摘要）
+-- - **读时间**：`getServerTime`、`getTime(0..7)`、`getGameTime`、`getGameElapsedTime`、`getGameTimeHMS`、
+-- `getGameTimeFormatted` / `getGameTimeString*`、`getDateTimeString*`。
+-- - **难度**：`getGameDifficulty` / `setGameDifficulty`（初始化时从 `udg_N` 读一次）。
+-- - **注册回调**：`onTick10ms` / `offTick10ms`、`onSecond` / `offSecond`、`addPeriodicCallback` / `removePeriodicCallback`。
+-- - **显式初始化**：`initCenterTimer`（幂等）；文件末尾另有 **0s 延迟单次计时器** 自动调用，一般无需手动调。
+-- 
+-- ## 副作用
+-- 模块加载即注册 `TimerStart(..., 0, false, initCenterTimer)`，游戏开始后一帧内拉起主循环。
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jassGlobals = require("jass.globals")
---- 每月天数（非闰年）
 local NORMAL_MON_DAYS = {
     0,
     31,
@@ -43,21 +55,16 @@ local NORMAL_MON_DAYS = {
     30,
     31
 }
---- 2015-01-01 00:00:00 UTC 的时间戳
 local BASE_TIMESTAMP = 1451606400
---- 东八区偏移（秒）
 local TIMEZONE_OFFSET = 28800
-_serverTime = 0
-_millisCounter = 0
---- 是否已初始化
+local _serverTime = 0
+local _millisCounter = 0
 local _initialized = false
---- 游戏难度
+--- 仅用于 `TimerStart(..., 0, false, initCenterTimer)` 的引导计时器，进入 `initCenterTimer` 后必须销毁，否则会永久占一个句柄。
+local bootstrapTimer = nil
 local _gameDifficulty = 1
---- 游戏运行时间（秒，含小数）
 local _gameElapsedTime = 0
---- 游戏时间：[秒, 分, 时]
 local _gameTimeHMS = {0, 0, 0}
---- 时间缓存
 local _timeCache = {
     year = 2016,
     month = 1,
@@ -68,43 +75,27 @@ local _timeCache = {
     millisecond = 0,
     weekday = 0
 }
---- 每秒回调函数列表
 local _secondCallbacks = {}
---- 每10毫秒回调函数列表
 local _tickCallbacks = {}
---- 数学取模
+--- 当前逻辑毫秒（与 getServerTime 一致）
+local function nowMs(self)
+    return _serverTime + _millisCounter * 10
+end
 local function mathMod(self, dividend, divisor)
-    local modulus = dividend - math.floor(dividend / divisor) * divisor
-    if modulus < 0 then
-        modulus = modulus + divisor
+    local m = dividend - math.floor(dividend / divisor) * divisor
+    if m < 0 then
+        m = m + divisor
     end
-    return modulus
+    return m
 end
---- 判断闰年
 local function isLeapYear(self, y)
-    if mathMod(nil, y, 4) == 0 then
-        if mathMod(nil, y, 100) == 0 then
-            return mathMod(nil, y, 400) == 0
-        end
-        return true
-    end
-    return false
+    return y % 4 == 0 and y % 100 ~= 0 or y % 400 == 0
 end
---- 获取某年某月的天数
 local function getMonthDays(self, y, m)
-    if m == 2 and isLeapYear(nil, y) then
-        return 29
-    end
-    return NORMAL_MON_DAYS[m + 1]
+    return m == 2 and isLeapYear(nil, y) and 29 or NORMAL_MON_DAYS[m + 1]
 end
---- 更新日期缓存
--- 
--- @param y 年份
--- @param remainSec 剩余秒数
--- @param dayBy2015 从2015年开始的天数
 local function updateDate(self, y, remainSec, dayBy2015)
-    local bIsLeap = isLeapYear(nil, y)
-    local dayNum = remainSec / (24 * 60 * 60)
+    local dayNum = remainSec / 86400
     local totalDay = math.floor(dayNum)
     if dayNum - totalDay > 0 then
         totalDay = totalDay + 1
@@ -124,7 +115,7 @@ local function updateDate(self, y, remainSec, dayBy2015)
                 _timeCache.day = remainDay
                 _timeCache.hour = mathMod(
                     nil,
-                    math.floor(remainSec / (60 * 60)),
+                    math.floor(remainSec / 3600),
                     24
                 )
                 _timeCache.minute = mathMod(
@@ -146,10 +137,6 @@ local function updateDate(self, y, remainSec, dayBy2015)
         end
     end
 end
---- 计算日期
--- 与JASS源代码逻辑完全一致
--- 
--- @param now Unix时间戳（秒，从1970-01-01开始）
 local function calcDate(self, now)
     local remain = now - BASE_TIMESTAMP + TIMEZONE_OFFSET
     local y = 2016
@@ -171,118 +158,145 @@ local function calcDate(self, now)
         y = y + 1
     end
 end
---- 每10毫秒更新服务器时间
+local TIME_GET_KEYS = {
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "second",
+    "weekday",
+    "millisecond"
+}
+local function removeFnFromArray(self, arr, fn)
+    local i = __TS__ArrayIndexOf(arr, fn)
+    if i > -1 then
+        __TS__ArraySplice(arr, i, 1)
+    end
+end
+local function pad2(self, n)
+    return __TS__StringPadStart(
+        tostring(n),
+        2,
+        "0"
+    )
+end
+local function pad3(self, n)
+    return __TS__StringPadStart(
+        tostring(n),
+        3,
+        "0"
+    )
+end
+local _periodicCallbackIdCounter = 0
+local _periodicCallbacks = {}
+local _delayedCallbackIdCounter = 0
+local _delayedCallbacks = {}
+local function runPeriodicCallbacks(self)
+    local now = nowMs(nil)
+    for ____, p in ipairs(_periodicCallbacks) do
+        if now - p.lastRunTime >= p.intervalMs then
+            p.lastRunTime = now
+            p:callback()
+        end
+    end
+end
+local function runDelayedCallbacks(self)
+    local now = nowMs(nil)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_delayedCallbacks do
+            do
+                local d = _delayedCallbacks[i + 1]
+                if not d.active then
+                    goto __continue28
+                end
+                if now >= d.dueTime then
+                    d.active = false
+                    d:callback()
+                else
+                    _delayedCallbacks[writeIndex + 1] = d
+                    writeIndex = writeIndex + 1
+                end
+            end
+            ::__continue28::
+            i = i + 1
+        end
+    end
+    do
+        local i = #_delayedCallbacks - 1
+        while i >= writeIndex do
+            table.remove(_delayedCallbacks)
+            i = i - 1
+        end
+    end
+end
 local function onTick(self)
     _millisCounter = _millisCounter + 1
     _gameElapsedTime = _gameElapsedTime + 0.01
     if jassGlobals.udg_Elapsed ~= nil then
         jassGlobals.udg_Elapsed = _gameElapsedTime
     end
-    for ____, callback in ipairs(_tickCallbacks) do
-        callback(nil)
+    for ____, cb in ipairs(_tickCallbacks) do
+        cb(nil)
     end
     runPeriodicCallbacks(nil)
-    if _millisCounter >= 100 then
-        _millisCounter = 0
-        _serverTime = _serverTime + 1000
-        calcDate(nil, _serverTime / 1000)
-        _gameTimeHMS[1] = _gameTimeHMS[1] + 1
-        if _gameTimeHMS[1] >= 60 then
-            _gameTimeHMS[1] = 0
-            _gameTimeHMS[2] = _gameTimeHMS[2] + 1
-            if _gameTimeHMS[2] >= 60 then
-                _gameTimeHMS[2] = 0
-                _gameTimeHMS[3] = _gameTimeHMS[3] + 1
-            end
-        end
-        if jass.udg_Time ~= nil then
-            jass.udg_Time[0] = _gameTimeHMS[1]
-            jass.udg_Time[1] = _gameTimeHMS[2]
-            jass.udg_Time[2] = _gameTimeHMS[3]
-        end
-        for ____, callback in ipairs(_secondCallbacks) do
-            callback(nil)
+    runDelayedCallbacks(nil)
+    if _millisCounter < 100 then
+        return
+    end
+    _millisCounter = 0
+    _serverTime = _serverTime + 1000
+    calcDate(nil, _serverTime / 1000)
+    _gameTimeHMS[1] = _gameTimeHMS[1] + 1
+    if _gameTimeHMS[1] >= 60 then
+        _gameTimeHMS[1] = 0
+        _gameTimeHMS[2] = _gameTimeHMS[2] + 1
+        if _gameTimeHMS[2] >= 60 then
+            _gameTimeHMS[2] = 0
+            _gameTimeHMS[3] = _gameTimeHMS[3] + 1
         end
     end
+    local jt = jass.udg_Time
+    if jt ~= nil then
+        jt[0] = _gameTimeHMS[1]
+        jt[1] = _gameTimeHMS[2]
+        jt[2] = _gameTimeHMS[3]
+    end
+    for ____, cb in ipairs(_secondCallbacks) do
+        cb(nil)
+    end
 end
---- 获取服务器时间（毫秒）
 function ____exports.getServerTime(self)
-    return _serverTime + _millisCounter * 10
+    return nowMs(nil)
 end
---- 获取时间组件
--- 
--- @param i 0=年, 1=月, 2=日, 3=时, 4=分, 5=秒, 6=星期, 7=毫秒
 function ____exports.getTime(self, i)
-    repeat
-        local ____switch32 = i
-        local ____cond32 = ____switch32 == 0
-        if ____cond32 then
-            return _timeCache.year
-        end
-        ____cond32 = ____cond32 or ____switch32 == 1
-        if ____cond32 then
-            return _timeCache.month
-        end
-        ____cond32 = ____cond32 or ____switch32 == 2
-        if ____cond32 then
-            return _timeCache.day
-        end
-        ____cond32 = ____cond32 or ____switch32 == 3
-        if ____cond32 then
-            return _timeCache.hour
-        end
-        ____cond32 = ____cond32 or ____switch32 == 4
-        if ____cond32 then
-            return _timeCache.minute
-        end
-        ____cond32 = ____cond32 or ____switch32 == 5
-        if ____cond32 then
-            return _timeCache.second
-        end
-        ____cond32 = ____cond32 or ____switch32 == 6
-        if ____cond32 then
-            return _timeCache.weekday
-        end
-        ____cond32 = ____cond32 or ____switch32 == 7
-        if ____cond32 then
-            return _timeCache.millisecond
-        end
-        do
-            return 0
-        end
-    until true
+    if i < 0 or i > 7 then
+        return 0
+    end
+    return _timeCache[TIME_GET_KEYS[i + 1]]
 end
---- 获取游戏时间（从游戏开始到现在的毫秒数）
--- 注意：这是游戏运行时间，不是服务器时间
 function ____exports.getGameTime(self)
-    return _serverTime + _millisCounter * 10 - (_initialized and _serverTime or 0)
+    return nowMs(nil) - (_initialized and _serverTime or 0)
 end
---- 获取游戏运行时间（秒）
 function ____exports.getGameElapsedTime(self)
     return _gameElapsedTime
 end
---- 获取游戏时间数组 [秒, 分, 时]
 function ____exports.getGameTimeHMS(self)
     return {_gameTimeHMS[1], _gameTimeHMS[2], _gameTimeHMS[3]}
 end
---- 获取游戏时间格式化对象
 function ____exports.getGameTimeFormatted(self)
-    local totalMs = _serverTime + _millisCounter * 10
+    local totalMs = nowMs(nil)
     local totalSec = math.floor(totalMs / 1000)
-    local hours = math.floor(totalSec / 3600)
-    local minutes = math.floor(totalSec % 3600 / 60)
-    local seconds = math.floor(totalSec % 60)
-    local milliseconds = totalMs % 1000
     return {
-        hours = hours,
-        minutes = minutes,
-        seconds = seconds,
-        milliseconds = milliseconds,
+        hours = math.floor(totalSec / 3600),
+        minutes = math.floor(totalSec % 3600 / 60),
+        seconds = math.floor(totalSec % 60),
+        milliseconds = totalMs % 1000,
         totalMs = totalMs
     }
 end
---- 获取游戏时间字符串
--- 格式：X小时Y分Z秒
 function ____exports.getGameTimeString(self)
     local ____exports_getGameTimeFormatted_result_0 = ____exports.getGameTimeFormatted(nil)
     local hours = ____exports_getGameTimeFormatted_result_0.hours
@@ -290,8 +304,6 @@ function ____exports.getGameTimeString(self)
     local seconds = ____exports_getGameTimeFormatted_result_0.seconds
     return ((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒"
 end
---- 获取游戏时间字符串（含毫秒）
--- 格式：X小时Y分Z秒MMM毫秒
 function ____exports.getGameTimeStringWithMs(self)
     local ____exports_getGameTimeFormatted_result_1 = ____exports.getGameTimeFormatted(nil)
     local hours = ____exports_getGameTimeFormatted_result_1.hours
@@ -300,8 +312,6 @@ function ____exports.getGameTimeStringWithMs(self)
     local milliseconds = ____exports_getGameTimeFormatted_result_1.milliseconds
     return ((((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒") .. tostring(milliseconds)) .. "毫秒"
 end
---- 获取日期时间字符串
--- 格式：YYYY-MM-DD HH:MM:SS
 function ____exports.getDateTimeString(self)
     local ____timeCache_2 = _timeCache
     local year = ____timeCache_2.year
@@ -310,17 +320,8 @@ function ____exports.getDateTimeString(self)
     local hour = ____timeCache_2.hour
     local minute = ____timeCache_2.minute
     local second = ____timeCache_2.second
-    local function pad(____, n)
-        return __TS__StringPadStart(
-            tostring(n),
-            2,
-            "0"
-        )
-    end
-    return (((((((((tostring(year) .. "-") .. pad(nil, month)) .. "-") .. pad(nil, day)) .. " ") .. pad(nil, hour)) .. ":") .. pad(nil, minute)) .. ":") .. pad(nil, second)
+    return (((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)
 end
---- 获取日期时间字符串（含毫秒）
--- 格式：YYYY-MM-DD HH:MM:SS.mmm
 function ____exports.getDateTimeStringWithMs(self)
     local ____timeCache_3 = _timeCache
     local year = ____timeCache_3.year
@@ -330,89 +331,75 @@ function ____exports.getDateTimeStringWithMs(self)
     local minute = ____timeCache_3.minute
     local second = ____timeCache_3.second
     local millisecond = ____timeCache_3.millisecond
-    local function pad(____, n)
-        return __TS__StringPadStart(
-            tostring(n),
-            2,
-            "0"
-        )
-    end
-    local function padMs(____, n)
-        return __TS__StringPadStart(
-            tostring(n),
-            3,
-            "0"
-        )
-    end
-    return (((((((((((tostring(year) .. "-") .. pad(nil, month)) .. "-") .. pad(nil, day)) .. " ") .. pad(nil, hour)) .. ":") .. pad(nil, minute)) .. ":") .. pad(nil, second)) .. ".") .. padMs(nil, millisecond)
+    return (((((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)) .. ".") .. pad3(nil, millisecond)
 end
---- 设置游戏难度
 function ____exports.setGameDifficulty(self, difficulty)
     _gameDifficulty = difficulty
 end
---- 获取游戏难度
 function ____exports.getGameDifficulty(self)
     return _gameDifficulty
 end
-local _periodicCallbackIdCounter = 0
-_periodicCallbacks = {}
---- 注册周期性回调函数
--- 
--- @param intervalMs 间隔时间（毫秒）
--- @param callback 回调函数
--- @returns 回调ID，用于取消注册
 function ____exports.addPeriodicCallback(self, intervalMs, callback)
     _periodicCallbackIdCounter = _periodicCallbackIdCounter + 1
     local id = _periodicCallbackIdCounter
-    _periodicCallbacks[#_periodicCallbacks + 1] = {id = id, intervalMs = intervalMs, lastRunTime = _serverTime + _millisCounter * 10, callback = callback}
+    _periodicCallbacks[#_periodicCallbacks + 1] = {
+        id = id,
+        intervalMs = intervalMs,
+        lastRunTime = nowMs(nil),
+        callback = callback
+    }
     return id
 end
---- 移除周期性回调函数
--- 
--- @param id 回调ID
 function ____exports.removePeriodicCallback(self, id)
-    local index = __TS__ArrayFindIndex(
+    local idx = __TS__ArrayFindIndex(
         _periodicCallbacks,
-        function(____, cb) return cb.id == id end
+        function(____, c) return c.id == id end
     )
-    if index > -1 then
-        __TS__ArraySplice(_periodicCallbacks, index, 1)
+    if idx > -1 then
+        __TS__ArraySplice(_periodicCallbacks, idx, 1)
     end
 end
---- 注册每秒回调函数
--- 
--- @param callback 每秒执行一次的回调函数
+function ____exports.addDelayedCallback(self, delayMs, callback)
+    _delayedCallbackIdCounter = _delayedCallbackIdCounter + 1
+    local id = _delayedCallbackIdCounter
+    local safeDelay = math.max(
+        0,
+        math.floor(delayMs)
+    )
+    _delayedCallbacks[#_delayedCallbacks + 1] = {
+        id = id,
+        dueTime = nowMs(nil) + safeDelay,
+        active = true,
+        callback = callback
+    }
+    return id
+end
+function ____exports.removeDelayedCallback(self, id)
+    for ____, d in ipairs(_delayedCallbacks) do
+        if d.id == id then
+            d.active = false
+        end
+    end
+end
 function ____exports.onSecond(self, callback)
     _secondCallbacks[#_secondCallbacks + 1] = callback
 end
---- 注册每10毫秒回调函数
--- 
--- @param callback 每10毫秒执行一次的回调函数
 function ____exports.onTick10ms(self, callback)
     _tickCallbacks[#_tickCallbacks + 1] = callback
 end
---- 移除每秒回调函数
--- 
--- @param callback 要移除的回调函数
 function ____exports.offSecond(self, callback)
-    local index = __TS__ArrayIndexOf(_secondCallbacks, callback)
-    if index > -1 then
-        __TS__ArraySplice(_secondCallbacks, index, 1)
-    end
+    removeFnFromArray(nil, _secondCallbacks, callback)
 end
---- 移除每10毫秒回调函数
--- 
--- @param callback 要移除的回调函数
 function ____exports.offTick10ms(self, callback)
-    local index = __TS__ArrayIndexOf(_tickCallbacks, callback)
-    if index > -1 then
-        __TS__ArraySplice(_tickCallbacks, index, 1)
-    end
+    removeFnFromArray(nil, _tickCallbacks, callback)
 end
---- 初始化中心计时器
 function ____exports.initCenterTimer(self)
     if _initialized then
         return
+    end
+    if bootstrapTimer then
+        jass.DestroyTimer(bootstrapTimer)
+        bootstrapTimer = nil
     end
     _initialized = true
     local startTime = japi.DzAPI_Map_GetGameStartTime()
@@ -424,17 +411,17 @@ function ____exports.initCenterTimer(self)
         10,
         (("[中心计时器初始化] DzAPI: " .. tostring(startTime)) .. ", _serverTime = ") .. tostring(_serverTime)
     )
-    local difficultyReal = jassGlobals.udg_N
-    if difficultyReal ~= nil then
-        _gameDifficulty = math.floor(difficultyReal)
-        if _gameDifficulty < 1 then
-            _gameDifficulty = 1
-        end
+    local dr = jassGlobals.udg_N
+    if dr ~= nil then
+        _gameDifficulty = math.max(
+            1,
+            math.floor(dr)
+        )
     end
     calcDate(nil, _serverTime / 1000)
     local timer = jass.CreateTimer()
     jass.TimerStart(timer, 0.01, true, onTick)
 end
-local initTimer = jass.CreateTimer()
-jass.TimerStart(initTimer, 0, false, ____exports.initCenterTimer)
+bootstrapTimer = jass.CreateTimer()
+jass.TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
 return ____exports

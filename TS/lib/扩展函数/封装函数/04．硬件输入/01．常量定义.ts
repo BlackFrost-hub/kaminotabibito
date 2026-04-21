@@ -3,8 +3,8 @@
  * 硬件输入 - 常量定义
  */
 
-/** 按键状态（BzAPI：1=按下，2=抬起） */
-export const KEY_STATE = { DOWN: 1, UP: 2 } as const;
+/** 按键状态（DzTriggerRegisterKeyEventTrg：1=按下，0=抬起） */
+export const KEY_STATE = { DOWN: 1, UP: 0 } as const;
 
 /** 鼠标按键（BzAPI：1=左，2=右，3=中） */
 export const MOUSE_BUTTON = { LEFT: 1, RIGHT: 2, MIDDLE: 3 } as const;

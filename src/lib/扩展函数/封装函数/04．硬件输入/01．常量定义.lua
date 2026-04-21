@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 按键状态（BzAPI：1=按下，2=抬起）
-____exports.KEY_STATE = {DOWN = 1, UP = 2}
+--- 按键状态（DzTriggerRegisterKeyEventTrg：1=按下，0=抬起）
+____exports.KEY_STATE = {DOWN = 1, UP = 0}
 --- 鼠标按键（BzAPI：1=左，2=右，3=中）
 ____exports.MOUSE_BUTTON = {LEFT = 1, RIGHT = 2, MIDDLE = 3}
 --- A-Z

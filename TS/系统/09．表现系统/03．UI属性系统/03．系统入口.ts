@@ -87,10 +87,9 @@ function registerFocusHotkeys(): void {
   for (let i = 0; i < 常量.KEY_F.length; i++) {
     const functionKey = 常量.KEY_F[i];
     registerKey(常量.KEY_EVENT_UP, functionKey, () => {
-      const player = 硬件函数.getTriggerKeyPlayer();
-      if (player !== jass.GetLocalPlayer()) return;
       const hero = focusHeroByFunctionKey(functionKey);
       if (hero == null) return;
+      const player = 硬件函数.getTriggerKeyPlayer() || jass.GetLocalPlayer();
       Star扩展库.StarOther_PanCameraToTimedForPlayer(player, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
     });
   }

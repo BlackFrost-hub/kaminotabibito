@@ -9,6 +9,9 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.index") as {
+  DzTriggerRegisterKeyEventTrg: (trg: any, status: number, btn: number | string) => void;
+};
 declare const string: { char: (n: number) => string } | undefined;
 
 import { createTriggerOrNull } from "./02．内部工具";
@@ -33,6 +36,36 @@ function keyCodeToTrgChar(keyCode: number): string {
 }
 
 /**
+ * - VK 112–123（F1–F12）：必须用数字；string.char(113) 会变成 `q` 而非 F2。
+ * - VK 1–31（含 Tab=9）：JASS 用数字；string.char(9) 是制表符，与引擎不一致会导致 Tab 失效。
+ * - VK 186–192、219–222（OEM 标点 / `~ 等）：须用数字；string.char(192) 等与 Dz 侧 VK 不一致会导致 ~ 跳过等失效。
+ */
+function registerKeyBindToTrigger(trig: any, status: number, keyCode: number): void {
+  if (keyCode >= 112 && keyCode <= 123) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  if (keyCode >= 1 && keyCode < 32) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  if ((keyCode >= 186 && keyCode <= 192) || (keyCode >= 219 && keyCode <= 222)) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  const keyChar = keyCodeToTrgChar(keyCode);
+  try {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
+  } catch (_e0) {
+    try {
+      DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    } catch (_e1) {
+      // ignore
+    }
+  }
+}
+
+/**
  * 注册按键事件（by code）。
  * sync=true：全房所有客户端触发；sync=false：仅本机触发。
  * 注意：这里不做 try/catch 兜底，避免不必要的同步差异。
@@ -46,32 +79,8 @@ export function registerKeyEventByCode(
   const trig = createTriggerOrNull();
   if (!trig) return null;
 
-  const keyChar = keyCodeToTrgChar(keyCode);
-  if (typeof japi.DzTriggerRegisterKeyEventTrg === "function") {
-    try {
-      japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
-    } catch (_e0) {
-      try {
-        japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
-      } catch (_e1) {
-        // ignore
-      }
-    }
-    (jass as any).TriggerAddAction(trig, action);
-    return trig;
-  }
-
-  if (japi.DzTriggerRegisterKeyEventByCode) {
-    japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, sync, action);
-    return trig;
-  }
-
-  if (japi.DzTriggerRegisterKeyEvent) {
-    japi.DzTriggerRegisterKeyEvent(trig, keyCode, status, sync, "");
-    (jass as any).TriggerAddAction(trig, action);
-    return trig;
-  }
-
+  registerKeyBindToTrigger(trig, status, keyCode);
+  (jass as any).TriggerAddAction(trig, action);
   return trig;
 }
 
@@ -86,17 +95,9 @@ export function registerKeyDown(keyCode: number, callback: (player: any, key: nu
   // DzTriggerRegisterKeyEventTrg(trg, status, key)：JASS 封装，内部 sync=true，全房所有客户端触发回调。
   // 参数顺序（JASS 源文件确认）：第2参是 status(DOWN=1)，第3参是 keyCode。
   // 注意：sync=true 的键盘回调内，全局操作必须在本地玩家判断之外执行（与 frameSetScriptByCode sync=true 规则一致）。
-  if (typeof japi.DzTriggerRegisterKeyEventTrg === "function") {
-    japi.DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.DOWN, keyCode);
-    (jass as any).TriggerAddAction(trig, action);
-    return trig;
-  }
-  // fallback：DzTriggerRegisterKeyEventByCode（sync=false，仅本机触发）
-  if (japi.DzTriggerRegisterKeyEventByCode) {
-    japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, KEY_STATE.DOWN, false, action);
-    return trig;
-  }
-  return registerKeyEventByCode(keyCode, KEY_STATE.DOWN, false, action);
+  DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.DOWN, keyCode);
+  (jass as any).TriggerAddAction(trig, action);
+  return trig;
 }
 
 export function registerKeyUp(keyCode: number, callback: (player: any, key: number) => void): any {

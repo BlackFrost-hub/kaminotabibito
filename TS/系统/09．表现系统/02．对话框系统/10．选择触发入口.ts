@@ -1,4 +1,7 @@
-const jass = require("jass.common") as any;
+﻿const jass = require("jass.common") as any;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventForPlayerIds: (this: void, trg: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
+};
 const UI函数 = require("系统.00．核心系统.03．UI函数") as {
   openNpcDialog: (player: any, data: any) => void;
 };
@@ -14,15 +17,14 @@ import {
 } from "./09．对话构建";
 
 const { openNpcDialog } = UI函数;
+const DIALOG_SELECT_EVENT_PLAYER_IDS = [0, 1, 2, 3] as const;
 
 // ========== 虚拟分区：初始化 ==========
 export function initDialogEntrySelectionTrigger(): void {
   ensureQuestConfigsRegistered();
 
   const trg = jass.CreateTrigger();
-  for (let i = 0; i < 4; i++) {
-    jass.TriggerRegisterPlayerUnitEvent(trg, jass.Player(i), jass.EVENT_PLAYER_UNIT_SELECTED, null);
-  }
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(trg, DIALOG_SELECT_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SELECTED);
 
   jass.TriggerAddAction(trg, () => {
     const u = jass.GetTriggerUnit();

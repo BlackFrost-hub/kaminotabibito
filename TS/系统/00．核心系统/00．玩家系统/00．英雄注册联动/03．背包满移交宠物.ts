@@ -20,6 +20,9 @@ const { SoHeroHatm, GS_news } = require("lib.扩展函数.Star扩展函数.GS扩
   SoHeroHatm: (whichUnit: any) => number;
   GS_news: (whichPlayer: any, message: string) => void;
 };
+const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
+};
 
 const PET_ATTR = "BB";
 const SMART_ORDER = "smart";
@@ -93,7 +96,7 @@ export function registerPetItemHandoffHero(whichHero: any): void {
   const heroId = getHandleId(whichHero);
   if (heroId === 0 || registeredHeroIds.has(heroId)) return;
 
-  jass.TriggerRegisterUnitEvent(trigger, whichHero, jass.EVENT_UNIT_ISSUED_TARGET_ORDER);
+  unitSpecificEventCenter.registerUnitEventTrigger(trigger, whichHero, jass.EVENT_UNIT_ISSUED_TARGET_ORDER);
   registeredHeroIds.add(heroId);
 }
 

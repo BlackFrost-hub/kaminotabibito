@@ -28,6 +28,9 @@ const helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工�
   ydlStes_skeyIndex: (_self: any) => number;
   ydlStes_registerAfterGetTable: (_self: any, trig: any, eventName: string) => void;
 };
+const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
+};
 
 // ==========================================================================================
 // 常量
@@ -51,13 +54,13 @@ const STES_EVENT_UNIT_TARGET_ORDER = "单位发布目标命令";
  * 处理单位发布目标命令事件
  */
 function onUnitIssuedTargetOrder(this: void): void {
-  const unit = jass.GetTriggerUnit?.();
+  const unit = jass.GetTriggerUnit();
   if (!unit) return;
 
-  const target = jass.GetOrderTargetDestructable?.();
+  const target = jass.GetOrderTargetDestructable();
   if (!target) return;
 
-  const targetType = jass.GetDestructableTypeId?.(target);
+  const targetType = jass.GetDestructableTypeId(target);
   if (!isInteractable(targetType)) return;
 
   onUnitTargetInteractable(unit, target);
@@ -139,7 +142,7 @@ export function registerChestSystemHero(this: void, hero: any): void {
   }
 
   const ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER);
-  jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev);
+  unitSpecificEventCenter.registerUnitEventTrigger(g[TRIG_KEY], hero, ev);
 }
 
 /**

@@ -20,6 +20,9 @@ export * from "./04．物品治疗效果";
 // 导出魔法恢复
 export * from "./05．魔法恢复";
 
+// 导出施法治疗事件（STES「治疗事件」分发，迁移自 核心系统/04．治疗事件）
+export * from "./06．施法治疗事件";
+
 /**
  * 初始化治疗系统
  */
@@ -35,4 +38,10 @@ export function init(): void {
     initHotSystem?: () => void;
   };
   if (typeof hotSystem.initHotSystem === "function") hotSystem.initHotSystem();
+
+  // 初始化施法治疗事件（STES「治疗事件」）
+  const healEvent = require("系统.04．伤害系统.02．治疗系统.06．施法治疗事件") as {
+    initHealEvent?: () => void;
+  };
+  if (typeof healEvent.initHealEvent === "function") healEvent.initHealEvent();
 }

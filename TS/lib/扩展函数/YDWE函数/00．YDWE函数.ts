@@ -343,7 +343,11 @@ function _tickEffectRecycle(): void {
  * @param effect 特效句柄
  */
 export function YDWETimerDestroyEffect(duration: number, effect: any): void {
-  if (!effect || duration <= 0) return;
+  if (!effect) return;
+  if (duration <= 0) {
+    jass.DestroyEffect(effect);
+    return;
+  }
 
   // 注册到中心计时器（只注册一次）
   if (!_effectRecycleRegistered) {

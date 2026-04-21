@@ -23,10 +23,27 @@ local ____exports = {}
 --     // 处理发动技能效果逻辑
 --   });
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
+local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 local channelListeners = {}
 local effectListeners = {}
+local SPELL_EVENT_PLAYER_IDS = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+}
 local _initialized = false
 local function onSpellChannel()
     local castingUnit = jass.GetTriggerUnit()
@@ -94,10 +111,10 @@ function ____exports.init()
     end
     _initialized = true
     local channelTrig = jass.CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(nil, channelTrig, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(channelTrig, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
     jass.TriggerAddAction(channelTrig, onSpellChannel)
     local effectTrig = jass.CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(nil, effectTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrig, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
     jass.TriggerAddAction(effectTrig, onSpellEffect)
 end
 return ____exports

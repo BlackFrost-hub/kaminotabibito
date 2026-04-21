@@ -48,6 +48,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.06．施法治疗事件")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 --- 初始化治疗系统
 function ____exports.init(self)
     local healEventOld = require("系统.04．伤害系统.02．治疗系统.02．治疗事件_旧版")
@@ -57,6 +65,10 @@ function ____exports.init(self)
     local hotSystem = require("系统.04．伤害系统.02．治疗系统.03．持续治疗效果")
     if type(hotSystem.initHotSystem) == "function" then
         hotSystem:initHotSystem()
+    end
+    local healEvent = require("系统.04．伤害系统.02．治疗系统.06．施法治疗事件")
+    if type(healEvent.initHealEvent) == "function" then
+        healEvent:initHealEvent()
     end
 end
 return ____exports

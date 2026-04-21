@@ -15,8 +15,8 @@
 
 const jass = require("jass.common") as any;
 
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
+const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellChannelListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
 const { GetSpellAbilityId } = require("lib.扩展函数.BJ函数.07．杂项") as {
@@ -81,7 +81,7 @@ function isProxyUnit(unit: any): boolean {
 //=============================================================================
 
 /** 触发器实例 */
-let healEventOldTrigger: any = null;
+let healEventOldInitialized = false;
 
 /**
  * 治疗事件处理函数
@@ -93,9 +93,9 @@ let healEventOldTrigger: any = null;
  * 4. 发出stop命令并移除技能
  * 5. 直接调用 doHeal 执行治疗（TS参数传参）
  */
-function onSpellChannel(): void {
-  const caster = jass.GetTriggerUnit();
-  const abilityId = GetSpellAbilityId();
+function onSpellChannel(castingUnit?: any, spellAbilityId?: number): void {
+  const caster = castingUnit != null ? castingUnit : jass.GetTriggerUnit();
+  const abilityId = spellAbilityId != null ? spellAbilityId : GetSpellAbilityId();
 
   // 检查是否为马甲单位
   if (!isProxyUnit(caster)) return;
@@ -139,22 +139,16 @@ function onSpellChannel(): void {
  */
 export function initHealEventOld(): void {
   if (!HEAL_EVENT_OLD_ENABLED) return;
-  if (healEventOldTrigger != null) return;
-
-  healEventOldTrigger = jass.CreateTrigger();
-
-  // 注册任意单位施法事件
-  TriggerRegisterAnyUnitEventBJ(healEventOldTrigger, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL);
-
-  // 注册动作
-  jass.TriggerAddAction(healEventOldTrigger, onSpellChannel);
+  if (healEventOldInitialized) return;
+  healEventOldInitialized = true;
+  registerSpellChannelListener(onSpellChannel);
 }
 
 /**
  * 检查系统是否已初始化
  */
 export function isHealEventOldInitialized(): boolean {
-  return healEventOldTrigger != null;
+  return healEventOldInitialized;
 }
 
 export {};

@@ -19,6 +19,7 @@ local X_GAFC = ____require_result_0.X_GAFC
 local X_IsTerrainWalkable = ____require_result_0.X_IsTerrainWalkable
 local X_GetAbleX = ____require_result_0.X_GetAbleX
 local X_GetAbleY = ____require_result_0.X_GetAbleY
+local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local ORDER_MOVE = 851971
 local ORDER_SMART = 851986
 local TIMER_INTERVAL = 0.02
@@ -240,10 +241,10 @@ local function createTriggerForEntry(self, entry)
         return
     end
     local uid = entry.uid
-    jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER)
+    unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER)
     local evTarget = jass.EVENT_UNIT_ISSUED_TARGET_ORDER
     if evTarget ~= nil then
-        jass.TriggerRegisterUnitEvent(t, entry.u, evTarget)
+        unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, evTarget)
     end
     jass.TriggerAddAction(
         t,

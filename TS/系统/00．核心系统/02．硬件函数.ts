@@ -9,12 +9,15 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.index") as {
+  DzTriggerRegisterKeyEventTrg: (trg: any, status: number, btn: number | string) => void;
+};
 declare const string: { char: (n: number) => string } | undefined;
 
 // -------------------- 常量 --------------------
 
-/** 按键状态（BzAPI：1=按下，2=抬起） */
-export const KEY_STATE = { DOWN: 1, UP: 2 } as const;
+/** 按键状态（DzTriggerRegisterKeyEventTrg：1=按下，0=抬起） */
+export const KEY_STATE = { DOWN: 1, UP: 0 } as const;
 
 /** 鼠标按键（BzAPI：1=左，2=右，3=中） */
 export const MOUSE_BUTTON = { LEFT: 1, RIGHT: 2, MIDDLE: 3 } as const;
@@ -105,6 +108,32 @@ function keyCodeToTrgChar(keyCode: number): string {
   return "";
 }
 
+/** F1–F12、Tab、OEM 区（含 ~ =192）：与 JASS 一致用 VK 数字，勿用 string.char（F2→q、Tab→控制符、192→与引擎不一致）。 */
+function registerKeyBindToTrigger(trig: any, status: number, keyCode: number): void {
+  if (keyCode >= 112 && keyCode <= 123) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  if (keyCode >= 1 && keyCode < 32) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  if ((keyCode >= 186 && keyCode <= 192) || (keyCode >= 219 && keyCode <= 222)) {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    return;
+  }
+  const keyChar = keyCodeToTrgChar(keyCode);
+  try {
+    DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
+  } catch (_e0) {
+    try {
+      DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
+    } catch (_e1) {
+      // ignore
+    }
+  }
+}
+
 /** 注册按键事件（by code）。注意：这里不做 try/catch 兜底，避免不必要的同步差异。 */
 export function registerKeyEventByCode(
   keyCode: number,
@@ -115,16 +144,7 @@ export function registerKeyEventByCode(
   const trig = createTriggerOrNull();
   if (!trig) return null;
 
-  const keyChar = keyCodeToTrgChar(keyCode);
-  try {
-    japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar);
-  } catch (_e0) {
-    try {
-      japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode);
-    } catch (_e1) {
-      // ignore
-    }
-  }
+  registerKeyBindToTrigger(trig, status, keyCode);
   (jass as any).TriggerAddAction(trig, action);
   return trig;
 }

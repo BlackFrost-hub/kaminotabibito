@@ -55,6 +55,7 @@ String2OrderIdBJ = ____require_result_1.String2OrderIdBJ
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.GS扩展库.index")
 SoHeroHatm = ____require_result_2.SoHeroHatm
 GS_news = ____require_result_2.GS_news
+local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 PET_ATTR = "BB"
 SMART_ORDER = "smart"
 MSG_BOTH_FULL = "|cffffff00『系统提示』：|r英雄和|cffffcc99『宠物』|r的物品栏都已满，无法拾取！"
@@ -90,7 +91,7 @@ function ____exports.registerPetItemHandoffHero(self, whichHero)
     if heroId == 0 or registeredHeroIds:has(heroId) then
         return
     end
-    jass.TriggerRegisterUnitEvent(trigger, whichHero, jass.EVENT_UNIT_ISSUED_TARGET_ORDER)
+    unitSpecificEventCenter.registerUnitEventTrigger(trigger, whichHero, jass.EVENT_UNIT_ISSUED_TARGET_ORDER)
     registeredHeroIds:add(heroId)
 end
 --- 初始化时只确保触发器存在，真正的英雄注册由桥接模块负责。

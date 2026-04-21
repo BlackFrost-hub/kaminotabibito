@@ -57,6 +57,10 @@ interface JassCommon {
   EVENT_PLAYER_UNIT_PICKUP_ITEM: number;
   EVENT_PLAYER_UNIT_DROP_ITEM: number;
   EVENT_PLAYER_UNIT_SELECTED: number;
+  /** 使用物品（与 TriggerRegisterPlayerUnitEvent 第三参一致，勿用手写魔数） */
+  EVENT_PLAYER_UNIT_USE_ITEM: number;
+  /** 单位被召唤/创建类事件（playerunitevent） */
+  EVENT_PLAYER_UNIT_SUMMON: number;
   EVENT_PLAYER_UNIT_DAMAGED: number;
   GetEventDamage: () => number;
   GetEventDamageSource: () => any;

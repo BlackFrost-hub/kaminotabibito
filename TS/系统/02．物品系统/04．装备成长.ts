@@ -5,6 +5,9 @@
  * 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
  */
 const jass = require("jass.common") as JassCommon;
+const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemUse: (callback: (unit: any, item: any) => void) => number;
+};
 const g = require("jass.globals") as { [k: string]: any };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
@@ -13,6 +16,13 @@ const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．�
 const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
   fourCCToString: (four: number) => string;
+};
+const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
+  IsUnitIllusionBJ: (unit: any) => boolean;
+};
+const { onSecond, offSecond } = require("系统.00．核心系统.05．中心计时器") as {
+  onSecond: (cb: () => void) => void;
+  offSecond: (cb: () => void) => void;
 };
 
 /** key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致） */
@@ -259,6 +269,7 @@ function executeSegment(unit: any, seg: Segment): void {
   }
 
   // 处理金币百分比效果（每秒一次，持续 timeSec 秒；无 time 则只触发一次）
+  // 使用中心计时器的 onSecond：省 timer handle，死亡/到期自动 offSecond 解绑
   if (goldPct !== 0) {
     if (seg.timeSec <= 0) {
       applyGoldPct(unit, goldPct);
@@ -266,24 +277,18 @@ function executeSegment(unit: any, seg: Segment): void {
       const capturedUnit = unit;
       const capturedPct = goldPct;
       let remaining = Math.floor(seg.timeSec);
-      const dt = (jass as any).CreateTimer();
-      if (dt) {
-        const t = dt;
-        (jass as any).TimerStart(t, 1.0, true, () => {
-          // 检查单位是否死亡，死亡则销毁计时器
-          if (capturedUnit) {
-            if ((jass as any).IsUnitType(capturedUnit, (jass as any).UNIT_TYPE_DEAD)) {
-              (jass as any).DestroyTimer(t);
-              return;
-            }
-          }
-          applyGoldPct(capturedUnit, capturedPct);
-          remaining = remaining - 1;
-          if (remaining <= 0) {
-            (jass as any).DestroyTimer(t);
-          }
-        });
-      }
+      const cb = (): void => {
+        if (capturedUnit && (jass as any).IsUnitType(capturedUnit, (jass as any).UNIT_TYPE_DEAD)) {
+          offSecond(cb);
+          return;
+        }
+        applyGoldPct(capturedUnit, capturedPct);
+        remaining -= 1;
+        if (remaining <= 0) {
+          offSecond(cb);
+        }
+      };
+      onSecond(cb);
     }
   }
 
@@ -325,7 +330,7 @@ function onUseItem(): void {
   const item = (jass as any).GetManipulatedItem();
   if (!unit || !item) return;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
-  if ((jass as any).IsUnitIllusionBJ(unit)) return;
+  if (IsUnitIllusionBJ(unit)) return;
   const itemId = (jass as any).GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
   const entry = (itemsData as Record<string, { PowerUP?: string }>)[idStr];
@@ -355,12 +360,10 @@ const INIT_KEY = "__EquipPowerUPInited";
 function init(): void {
   if ((g as any)[INIT_KEY]) return;
   (g as any)[INIT_KEY] = true;
-  const useItemEv = (jass as any).EVENT_PLAYER_UNIT_USE_ITEM ?? 35;
-  const trig = jass.CreateTrigger();
-  for (let i = 0; i <= 6; i++) jass.TriggerRegisterPlayerUnitEvent(trig, jass.Player(i), useItemEv, undefined!);
-  const p13 = (jass as any).Player?.(13);
-  if (p13 != null) jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, undefined!);
-  jass.TriggerAddAction(trig, onUseItem);
+  // 使用物品事件中心注册，减少触发器数量
+  itemEventCenter.onItemUse((unit, item) => {
+    onUseItem();
+  });
 }
 
 init();

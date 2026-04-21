@@ -15,7 +15,10 @@ import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表
 import itemsData from "../../02．物品系统/01．装备数据";
 import { questDB } from "../../08．任务系统/01．任务数据";
 import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./13．任务奖励执行";
-import { calculateFourCC, showLocalHint } from "./06．常量与工具";
+import { showLocalHint } from "./06．常量与工具";
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (s: string) => number;
+};
 import { setQuestState } from "./07．任务状态";
 import { removeQuestMarkerAfterNpcTriggered } from "./15．NPC头顶与气泡特效";
 
@@ -95,7 +98,7 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
   }
 
   if (requireItem.length === 4) {
-    const itemId = calculateFourCC(requireItem);
+    const itemId = stringToFourCC(requireItem);
     const data = (itemsData as Record<string, any>)[requireItem];
     const itemLevel = data != null ? (data.level as string) || "" : "";
     return { itemId, itemCode: requireItem, itemLevel };
@@ -106,7 +109,7 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
     for (const code of parts) {
       const c = code.trim();
       if (c.length !== 4) continue;
-      const testId = calculateFourCC(c);
+      const testId = stringToFourCC(c);
       if (UnitHasItemOfTypeBJ(hero, testId)) {
         const data = (itemsData as Record<string, any>)[c];
         const itemLevel = data != null ? (data.level as string) || "" : "";

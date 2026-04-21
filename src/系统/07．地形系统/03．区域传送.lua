@@ -18,6 +18,7 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local withTimer = ____require_result_0.withTimer
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
+local regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
 local regionMap = __TS__New(Map)
 local function dbg(self, _msg)
 end
@@ -148,7 +149,8 @@ local function initRegionTeleport(self)
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
             jass.RegionAddRect(region, rect)
-            jass.TriggerRegisterEnterRegion(trig, region, nil)
+            jass.RemoveRect(rect)
+            regionEventCenter.registerEnterRegionTrigger(trig, region, nil)
             regionMap:set(region, cfg)
         end
         ::__continue33::

@@ -88,7 +88,7 @@ function getDigitImagePath(this: void, digit: number): string {
 /** 获取单位模型缩放 */
 function getUnitModelScale(this: void, unit: any): number {
   if (!unit) return 1.0;
-  const unitType = jass.GetUnitTypeId?.(unit);
+  const unitType = jass.GetUnitTypeId(unit);
   if (!unitType) return 1.0;
   const scaleStr = getObjectProperty(2, unitType, "modelScale");
   const scale = parseFloat(scaleStr);
@@ -145,16 +145,16 @@ function createDigitImage(
   const imagePath = getDigitImagePath(digit);
   const size = DIGIT_BASE_SIZE * modelScale;
 
-  const image = jass.CreateImage?.(imagePath, size, size, size, x, y, 5.0, 0, 0, 0, 2);
+  const image = jass.CreateImage(imagePath, size, size, size, x, y, 5.0, 0, 0, 0, 2);
   if (!image) return null;
 
-  jass.SetImageColor?.(image, color.red, color.green, color.blue, 255);
+  jass.SetImageColor(image, color.red, color.green, color.blue, 255);
 
   const height = (BASE_HEIGHT + unitFlyHeight) * modelScale;
-  jass.SetImageConstantHeight?.(image, true, height);
+  jass.SetImageConstantHeight(image, true, height);
 
-  jass.SetImageRenderAlways?.(image, true);
-  jass.SetImageType?.(image, 5);
+  jass.SetImageRenderAlways(image, true);
+  jass.SetImageType(image, 5);
 
   return image;
 }
@@ -175,9 +175,9 @@ export function showDamageNumber(this: void, target: any, damage: number): void 
   const damageStr = String(damageInt);
   const digitCount = getDigitCount(damageInt);
 
-  const x = jass.GetUnitX?.(target) ?? 0;
-  const y = jass.GetUnitY?.(target) ?? 0;
-  const flyHeight = jass.GetUnitFlyHeight?.(target) ?? 0;
+  const x = jass.GetUnitX(target);
+  const y = jass.GetUnitY(target);
+  const flyHeight = jass.GetUnitFlyHeight(target);
   const modelScale = getUnitModelScale(target);
 
   const color = getDamageTypeColor();
@@ -212,13 +212,13 @@ export function updateAllDamageDigits(this: void): void {
     data.tick += 1;
 
     if (data.tick >= DISPLAY_DURATION_TICKS) {
-      jass.DestroyImage?.(data.image);
+      jass.DestroyImage(data.image);
       activeDigits.splice(i, 1);
       continue;
     }
 
     const newHeight = RISE_SPEED * data.tick;
-    jass.SetImagePosition?.(data.image, data.x, data.y, newHeight);
+    jass.SetImagePosition(data.image, data.x, data.y, newHeight);
   }
 }
 

@@ -20,6 +20,9 @@ const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require(
   X_GetAbleX: () => number;
   X_GetAbleY: () => number;
 };
+const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
+};
 
 const ORDER_MOVE = 851971;
 const ORDER_SMART = 851986;
@@ -273,10 +276,10 @@ function createTriggerForEntry(entry: SpeedEntry): void {
 
   const uid = entry.uid;
 
-  jass.TriggerRegisterUnitEvent(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
+  unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
   const evTarget = (jass as any).EVENT_UNIT_ISSUED_TARGET_ORDER;
   if (evTarget != null) {
-    jass.TriggerRegisterUnitEvent(t, entry.u, evTarget);
+    unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, evTarget);
   }
   jass.TriggerAddAction(t, () => {
     const e = entryMap[uid];

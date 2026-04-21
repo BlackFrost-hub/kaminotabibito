@@ -1,4 +1,7 @@
-const jass = require("jass.common") as any;
+﻿const jass = require("jass.common") as any;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEvent: (this: void, trig: any, player: any, eventId: any, filter?: any) => void;
+};
 // const { Ir_SetUnitAttackType, Ir_GetUnitAttackType } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
 //   Ir_SetUnitAttackType: (u: any, atp: number) => void;
 //   Ir_GetUnitAttackType: (u: any) => number;
@@ -16,12 +19,7 @@ const jass = require("jass.common") as any;
 
 const trg = jass.CreateTrigger();
 const redPlayer = jass.Player(0);
-jass.TriggerRegisterPlayerUnitEvent(
-  trg,
-  redPlayer,
-  jass.EVENT_PLAYER_UNIT_SELECTED,
-  null
-);
+playerUnitEvent.registerPlayerUnitEvent(trg, redPlayer, jass.EVENT_PLAYER_UNIT_SELECTED);
 jass.TriggerAddAction(trg, () => {
   const u = jass.GetTriggerUnit();
   if (!u) return;

@@ -11,6 +11,8 @@ local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
 -- 因此注册键位时一律用 japi.DzXxx(...) 直接点号调用（勿赋给局部再调）。
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
+local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
 function ____exports.isKeyDown(self, keyCode)
     if type(japi.DzIsKeyDown) ~= "function" then
         return false
@@ -36,6 +38,39 @@ local function keyCodeToTrgChar(self, keyCode)
     end
     return ""
 end
+--- - VK 112–123（F1–F12）：必须用数字；string.char(113) 会变成 `q` 而非 F2。
+-- - VK 1–31（含 Tab=9）：JASS 用数字；string.char(9) 是制表符，与引擎不一致会导致 Tab 失效。
+-- - VK 186–192、219–222（OEM 标点 / `~ 等）：须用数字；string.char(192) 等与 Dz 侧 VK 不一致会导致 ~ 跳过等失效。
+local function registerKeyBindToTrigger(self, trig, status, keyCode)
+    if keyCode >= 112 and keyCode <= 123 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
+    end
+    if keyCode >= 1 and keyCode < 32 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
+    end
+    if keyCode >= 186 and keyCode <= 192 or keyCode >= 219 and keyCode <= 222 then
+        DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+        return
+    end
+    local keyChar = keyCodeToTrgChar(nil, keyCode)
+    do
+        local function ____catch(_e0)
+            do
+                pcall(function()
+                    DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
+                end)
+            end
+        end
+        local ____try, ____hasReturned = pcall(function()
+            DzTriggerRegisterKeyEventTrg(nil, trig, status, keyChar)
+        end)
+        if not ____try then
+            ____catch(____hasReturned)
+        end
+    end
+end
 --- 注册按键事件（by code）。
 -- sync=true：全房所有客户端触发；sync=false：仅本机触发。
 -- 注意：这里不做 try/catch 兜底，避免不必要的同步差异。
@@ -44,47 +79,8 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
     if not trig then
         return nil
     end
-    local keyChar = keyCodeToTrgChar(nil, keyCode)
-    if type(japi.DzTriggerRegisterKeyEventTrg) == "function" then
-        do
-            local function ____catch(_e0)
-                do
-                    pcall(function()
-                        japi.DzTriggerRegisterKeyEventTrg(trig, status, keyCode)
-                    end)
-                end
-            end
-            local ____try, ____hasReturned = pcall(function()
-                japi.DzTriggerRegisterKeyEventTrg(trig, status, keyChar)
-            end)
-            if not ____try then
-                ____catch(____hasReturned)
-            end
-        end
-        jass.TriggerAddAction(trig, action)
-        return trig
-    end
-    if japi.DzTriggerRegisterKeyEventByCode then
-        japi.DzTriggerRegisterKeyEventByCode(
-            trig,
-            keyCode,
-            status,
-            sync,
-            action
-        )
-        return trig
-    end
-    if japi.DzTriggerRegisterKeyEvent then
-        japi.DzTriggerRegisterKeyEvent(
-            trig,
-            keyCode,
-            status,
-            sync,
-            ""
-        )
-        jass.TriggerAddAction(trig, action)
-        return trig
-    end
+    registerKeyBindToTrigger(nil, trig, status, keyCode)
+    jass.TriggerAddAction(trig, action)
     return trig
 end
 function ____exports.registerKeyDown(self, keyCode, callback)
@@ -97,28 +93,9 @@ function ____exports.registerKeyDown(self, keyCode, callback)
         local k = japi.DzGetTriggerKey()
         callback(nil, p, k)
     end
-    if type(japi.DzTriggerRegisterKeyEventTrg) == "function" then
-        japi.DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.DOWN, keyCode)
-        jass.TriggerAddAction(trig, action)
-        return trig
-    end
-    if japi.DzTriggerRegisterKeyEventByCode then
-        japi.DzTriggerRegisterKeyEventByCode(
-            trig,
-            keyCode,
-            KEY_STATE.DOWN,
-            false,
-            action
-        )
-        return trig
-    end
-    return ____exports.registerKeyEventByCode(
-        nil,
-        keyCode,
-        KEY_STATE.DOWN,
-        false,
-        action
-    )
+    DzTriggerRegisterKeyEventTrg(nil, trig, KEY_STATE.DOWN, keyCode)
+    jass.TriggerAddAction(trig, action)
+    return trig
 end
 function ____exports.registerKeyUp(self, keyCode, callback)
     return ____exports.registerKeyEventByCode(

@@ -15,6 +15,44 @@ import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．�
 const _print = (globalThis as any).print as (...args: any[]) => void;
 
 /**
+ * 头顶叹号/问号：`AddSpecialEffectTarget` 若在 `DzSetUnitModel` 之前或同帧绑定，换模常会顶掉特效（见 jass-pitfalls §15）。
+ * 有自定义模型时延后到换模之后（0.02s）；无模型时 0.01s 再挂，与 CreateUnit 错开一帧。
+ */
+const DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01;
+const DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02;
+
+function scheduleTryAttachQuestMarkerForConfigNpc(unit: any, npcConfig: NPCData): void {
+  const delaySec = npcConfig.modelFIle ? DELAY_QUEST_MARKER_AFTER_SET_MODEL : DELAY_QUEST_MARKER_NO_CUSTOM_MODEL;
+  const t = jass.CreateTimer();
+  if (!t) {
+    tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
+    return;
+  }
+  jass.TimerStart(t, delaySec, false, () => {
+    jass.DestroyTimer(t);
+    tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
+  });
+}
+
+/**
+ * 设置单位模型：`SetUnitModel` 非 jass.common 原生，仅 BzAPI：`japi.DzSetUnitModel`（点号直调）。
+ * 延后 0.01s 再调，减轻同栈紧跟 CreateUnit 时 JAPI::Plus / hook 桩（DzCallback0）问题。
+ */
+function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): void {
+  const t = jass.CreateTimer();
+  if (!t) return;
+  jass.TimerStart(t, 0.01, false, () => {
+    jass.DestroyTimer(t);
+    const ok = (pcall as any)(() => {
+      japi.DzSetUnitModel(unit, modelPath);
+    });
+    if (!ok) {
+      _print("[NPC生成器] 设置单位模型失败（已忽略）: " + npcLabel + " model=" + tostring(modelPath));
+    }
+  });
+}
+
+/**
  * 创建单个NPC
  * @param npcConfig NPC配置数据
  * @returns 创建的单位，失败返回null
@@ -42,24 +80,15 @@ function createSingleNPC(npcConfig: NPCData): any {
     return null;
   }
 
-  // 设置模型文件（如果配置了）
+  // 设置模型文件（如果配置了）：japi.DzSetUnitModel，见 scheduleSetUnitModel
   if (npcConfig.modelFIle) {
-    const setModel = japi.DzSetUnitModel ?? jass.SetUnitModel;
-    if (typeof setModel === "function") {
-      // 某些 JAPI 环境在回调中触发 DzSetUnitModel 可能报 hook.wj / DzCallback0。
-      const ok = (pcall as any)(() => setModel(unit, npcConfig.modelFIle));
-      if (!ok) {
-        _print("[NPC生成器] 设置单位模型失败（已忽略）: " + tostring(npcConfig.NpcNameID) + " model=" + tostring(npcConfig.modelFIle));
-      }
-    } else {
-      _print("[NPC生成器] 无法设置单位模型：缺少 DzSetUnitModel / SetUnitModel");
-    }
+    scheduleSetUnitModel(unit, npcConfig.modelFIle, tostring(npcConfig.NpcNameID));
   }
 
   // 初始化动作（例如商店物品池调整）
   runNpcInitAction(unit, npcConfig.initAction);
 
-  tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
+  scheduleTryAttachQuestMarkerForConfigNpc(unit, npcConfig);
 
   _print("[NPC生成器] 成功创建NPC: " + tostring(npcConfig.NpcNameID) + " at (" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")");
   return unit;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 激活传送点系统（按《激活传送点配置》）：
  * - **enabled: false**：该条不启用，不创建单位、不注册任何触发器（与配置中其它字段无关）。
  * - **有 teleportX + teleportY + UnitID（四位 rawcode）**：进入游戏后在坐标处 CreateUnit，再对该单位注册接近检测；
@@ -14,6 +14,16 @@ const { stringToFourCC, withTimer } = require("lib.扩展函数.封装函数.01�
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3Play: (path: string, player?: any) => void;
+};
+const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitInRangeTrigger: (
+    this: void,
+    trigger: any,
+    unit: any,
+    range: number,
+    filter?: any,
+    once?: boolean
+  ) => () => void;
 };
 
 const ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav";
@@ -178,7 +188,13 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
   }
 
   const trig = (jass as any).CreateTrigger();
-  (jass as any).TriggerRegisterUnitInRange(trig, watchUnit, ACTIVATION_RANGE, null as any);
+  const unregister = unitSpecificEventCenter.registerUnitInRangeTrigger(
+    trig,
+    watchUnit,
+    ACTIVATION_RANGE,
+    null,
+    true
+  );
 
   let fired = false;
   (jass as any).TriggerAddAction(trig, () => {
@@ -187,6 +203,7 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
     if (enterer == null || enterer === 0) return;
     fired = true;
     runActivationEffects(cfg, watchUnit);
+    unregister();
     (jass as any).DestroyTrigger(trig);
   });
 }

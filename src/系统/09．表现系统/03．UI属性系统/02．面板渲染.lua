@@ -393,7 +393,7 @@ function ____exports.focusHeroByFunctionKey(functionKey)
                 if detailSlots[i + 1].functionKey ~= functionKey then
                     goto __continue43
                 end
-                return detailSlots[i + 1].hero
+                return getPlayerHero(detailSlots[i + 1].player)
             end
             ::__continue43::
             i = i + 1

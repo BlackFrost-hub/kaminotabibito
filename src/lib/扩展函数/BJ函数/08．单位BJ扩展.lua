@@ -8,8 +8,6 @@ local ____exports = {}
 -- - 商店库存 → `03．物品与库存`
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_0.stringToFourCC
 function ____exports.String2UnitIdBJ(self, unitIdString)
     return jass.UnitId(unitIdString)
 end
@@ -144,13 +142,13 @@ function ____exports.SetUnitUseFoodBJ(self, enable, unit)
     jass.SetUnitUseFood(unit, enable)
 end
 function ____exports.UnitDamageTargetBJ(self, unit, target, amount, attacktype, damagetype)
-    local ____temp_1
+    local ____temp_0
     if jass.WEAPON_TYPE_WHOKNOWS ~= nil then
-        ____temp_1 = jass.WEAPON_TYPE_WHOKNOWS
+        ____temp_0 = jass.WEAPON_TYPE_WHOKNOWS
     else
-        ____temp_1 = nil
+        ____temp_0 = nil
     end
-    local weapon = ____temp_1
+    local weapon = ____temp_0
     return jass.UnitDamageTarget(
         unit,
         target,

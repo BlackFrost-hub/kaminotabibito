@@ -7,8 +7,7 @@ import { alive, types, stats, LeakType } from "./01．核心统计";
 
 /** 打印当前统计信息；可选 tagFilter 只查看某个来源 */
 export function dump(tagFilter?: string): void {
-  if (typeof (jass as any).DisplayTimedTextToPlayer !== "function") return;
-  const p0 = (jass as any).Player ? (jass as any).Player(0) : null;
+  const p0 = (jass as any).Player(0);
 
   const printLine = (msg: string): void => {
     if (!p0) return;

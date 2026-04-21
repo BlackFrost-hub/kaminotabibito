@@ -42,15 +42,14 @@ export function EC_CreateEffect(
 
   japi.EXSetEffectSize(eff, size);
   japi.EXSetEffectZ(eff, EC_GetPointZ(x, y) + z);
+  japi.EXEffectMatRotateZ(eff, fac);
+  japi.EXSetEffectSpeed(eff, s);
 
   if (time >= 0) {
     YDWETimerDestroyEffect(time, eff);
   } else if (time !== -1) {
     jass.DestroyEffect(eff);
   }
-
-  japi.EXEffectMatRotateZ(eff, fac);
-  japi.EXSetEffectSpeed(eff, s);
 
   return eff;
 }

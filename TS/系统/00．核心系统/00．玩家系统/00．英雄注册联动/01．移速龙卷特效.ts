@@ -5,13 +5,12 @@
  * - 使用Map(unitHandleId -> effectHandle)避免重复创建/销毁
  * - 单位离开英雄组时自动清理特效
  * 接入：由"玩家英雄获取桥接"在获得英雄时注册，周期同步只处理已注册英雄
+ * 这里的安全检查是必须的，无视全局规则，2026年4月21日21:29:21
  */
 
-const jass = require("jass.common") as any;
 
-const { DzUnbindEffect } = require("lib.扩展函数.KK扩展API.index") as {
-  DzUnbindEffect: (whichEffect: any) => boolean;
-};
+const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");
 
@@ -33,7 +32,9 @@ function createTornadoEffect(whichUnit: any): any {
 
 function destroyTornadoEffect(effect: any): void {
   if (!isValidHandle(effect)) return;
-  DzUnbindEffect(effect);
+  if (typeof japi.DzUnbindEffect === "function") {
+    japi.DzUnbindEffect(effect);
+  }
   jass.DestroyEffect(effect);
 }
 

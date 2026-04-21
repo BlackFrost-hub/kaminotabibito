@@ -14,8 +14,8 @@ local ____exports = {}
 -- 1. 治疗命令ID列表可根据需要扩展
 -- 2. 直接调用 doHeal，不需要手动触发STES事件
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
+local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local registerSpellChannelListener = ____require_result_0.registerSpellChannelListener
 local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
@@ -40,7 +40,7 @@ local function isProxyUnit(self, unit)
     return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) == true
 end
 --- 触发器实例
-local healEventOldTrigger = nil
+local healEventOldInitialized = false
 --- 治疗事件处理函数
 -- 
 -- 逻辑：
@@ -49,9 +49,15 @@ local healEventOldTrigger = nil
 -- 3. 获取施法者的技能数据（治疗量）
 -- 4. 发出stop命令并移除技能
 -- 5. 直接调用 doHeal 执行治疗（TS参数传参）
-local function onSpellChannel(self)
-    local caster = jass.GetTriggerUnit()
-    local abilityId = GetSpellAbilityId(nil)
+local function onSpellChannel(self, castingUnit, spellAbilityId)
+    local ____temp_4
+    if castingUnit ~= nil then
+        ____temp_4 = castingUnit
+    else
+        ____temp_4 = jass.GetTriggerUnit()
+    end
+    local caster = ____temp_4
+    local abilityId = spellAbilityId ~= nil and spellAbilityId or GetSpellAbilityId(nil)
     if not isProxyUnit(nil, caster) then
         return
     end
@@ -88,15 +94,14 @@ function ____exports.initHealEventOld(self)
     if not HEAL_EVENT_OLD_ENABLED then
         return
     end
-    if healEventOldTrigger ~= nil then
+    if healEventOldInitialized then
         return
     end
-    healEventOldTrigger = jass.CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(nil, healEventOldTrigger, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
-    jass.TriggerAddAction(healEventOldTrigger, onSpellChannel)
+    healEventOldInitialized = true
+    registerSpellChannelListener(nil, onSpellChannel)
 end
 --- 检查系统是否已初始化
 function ____exports.isHealEventOldInitialized(self)
-    return healEventOldTrigger ~= nil
+    return healEventOldInitialized
 end
 return ____exports

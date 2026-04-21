@@ -197,7 +197,7 @@ function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void 
   }
 
   if (interrupted) {
-    const cfg = getChestConfig(jass.GetDestructableTypeId?.(data.target) ?? 0);
+    const cfg = getChestConfig(jass.GetDestructableTypeId(data.target));
     showTextTag(data.unit, TEXT_INTERRUPTED(cfg?.name ?? "宝箱"), 85, 10, 10);
   }
 
@@ -208,31 +208,31 @@ function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void 
 }
 
 function startOpening(this: void, unit: any, target: any, openTime: number): void {
-  jass.IssueImmediateOrder?.(unit, "stop");
+  jass.IssueImmediateOrder(unit, "stop");
 
   if (openTime <= 0) openTime = 1.0;
   const speed = 1.0 / openTime;
 
-  const unitX = jass.GetUnitX?.(unit) ?? 0;
-  const unitY = jass.GetUnitY?.(unit) ?? 0;
+  const unitX = jass.GetUnitX(unit);
+  const unitY = jass.GetUnitY(unit);
   const progressType = getProgressBarUnitType();
-  const progressBar = jass.CreateUnit?.(jass.Player?.(4), progressType, unitX, unitY, 0);
+  const progressBar = jass.CreateUnit(jass.Player(4), progressType, unitX, unitY, 0);
 
   if (progressBar) {
-    jass.SetUnitTimeScale?.(progressBar, speed);
-    jass.SetUnitScale?.(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE);
-    const flyHeight = (jass.GetUnitFlyHeight?.(unit) ?? 0) + PROGRESS_BAR_HEIGHT_OFFSET;
-    jass.SetUnitFlyHeight?.(progressBar, flyHeight, 0);
+    jass.SetUnitTimeScale(progressBar, speed);
+    jass.SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE);
+    const flyHeight = jass.GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET;
+    jass.SetUnitFlyHeight(progressBar, flyHeight, 0);
   }
 
   jass.DzUnitDisableAttack(unit, true);
 
-  const targetX = jass.GetDestructableX?.(target) ?? 0;
-  const targetY = jass.GetDestructableY?.(target) ?? 0;
+  const targetX = jass.GetDestructableX(target);
+  const targetY = jass.GetDestructableY(target);
   const angle = angleBetweenPoints(unitX, unitY, targetX, targetY);
-  jass.SetUnitFacing?.(unit, angle);
+  jass.SetUnitFacing(unit, angle);
 
-  const config = getChestConfig(jass.GetDestructableTypeId?.(target) ?? 0);
+  const config = getChestConfig(jass.GetDestructableTypeId(target));
   const chestName = config?.name ?? "宝箱";
 
   fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target);
@@ -264,7 +264,7 @@ const CENTER_TIMER_TICKS = Math.ceil(UPDATE_INTERVAL / 0.01);
 
 function updateAllOpening(this: void): void {
   for (const [unitId, data] of openingMap) {
-    const currentOrder = jass.GetUnitCurrentOrder?.(data.unit);
+    const currentOrder = jass.GetUnitCurrentOrder(data.unit);
     const smartOrder = String2OrderIdBJ("smart");
     const attackOrder = String2OrderIdBJ("attack");
 
@@ -273,15 +273,15 @@ function updateAllOpening(this: void): void {
 
     if (completed || interrupted) {
     if (completed) {
-        const cfg = getChestConfig(jass.GetDestructableTypeId?.(data.target) ?? 0);
+        const cfg = getChestConfig(jass.GetDestructableTypeId(data.target));
         const chestName = cfg?.name ?? "宝箱";
         showTextTag(data.unit, TEXT_SUCCESS(chestName), 100, 100, 0);
 
         // TS端执行掉落
         const targetTypeStr = cfg?.destructableType;
         if (targetTypeStr) {
-            const x = jass.GetDestructableX?.(data.target) ?? 0;
-            const y = jass.GetDestructableY?.(data.target) ?? 0;
+            const x = jass.GetDestructableX(data.target);
+            const y = jass.GetDestructableY(data.target);
             dropItemsFromChest(targetTypeStr, x, y);
         }
 
@@ -300,23 +300,23 @@ function updateAllOpening(this: void): void {
     data.elapsed += UPDATE_INTERVAL;
 
     if (data.progressBar) {
-      const unitX = jass.GetUnitX?.(data.unit) ?? 0;
-      const unitY = jass.GetUnitY?.(data.unit) ?? 0;
-      jass.SetUnitX?.(data.progressBar, unitX);
-      jass.SetUnitY?.(data.progressBar, unitY);
+      const unitX = jass.GetUnitX(data.unit);
+      const unitY = jass.GetUnitY(data.unit);
+      jass.SetUnitX(data.progressBar, unitX);
+      jass.SetUnitY(data.progressBar, unitY);
     }
   }
 
   for (const [unitId, data] of movingMap) {
-    const currentOrder = jass.GetUnitCurrentOrder?.(data.unit);
+    const currentOrder = jass.GetUnitCurrentOrder(data.unit);
     const moveOrder = String2OrderIdBJ("move");
 
-    const inRange = jass.IsUnitInRangeXY?.(data.unit, data.targetX, data.targetY, INTERACT_RANGE);
+    const inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE);
     const orderChanged = currentOrder !== moveOrder;
 
     if (inRange || orderChanged) {
       if (inRange) {
-        const targetType = jass.GetDestructableTypeId?.(data.target);
+        const targetType = jass.GetDestructableTypeId(data.target);
         if (targetType && isInteractable(targetType)) {
           const openTime = getOpenTime(targetType);
           startOpening(data.unit, data.target, openTime);
@@ -358,18 +358,18 @@ function ensureRegisteredToCenterTimer(this: void): void {
 export function onUnitTargetInteractable(this: void, unit: any, target: any): void {
   if (!unit || !target) return;
 
-  const targetType = jass.GetDestructableTypeId?.(target);
+  const targetType = jass.GetDestructableTypeId(target);
   if (!isInteractable(targetType)) return;
 
   const openTime = getOpenTime(targetType);
 
-  const targetX = jass.GetDestructableX?.(target) ?? 0;
-  const targetY = jass.GetDestructableY?.(target) ?? 0;
+  const targetX = jass.GetDestructableX(target);
+  const targetY = jass.GetDestructableY(target);
 
-  const inRange = jass.IsUnitInRangeXY?.(unit, targetX, targetY, INTERACT_RANGE);
+  const inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE);
 
   if (!inRange) {
-    jass.IssuePointOrder?.(unit, "move", targetX, targetY);
+    jass.IssuePointOrder(unit, "move", targetX, targetY);
 
     const data: MoveData = {
       unit,

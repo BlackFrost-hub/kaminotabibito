@@ -120,7 +120,7 @@ let damageCallbackRegistered = false;
 // 导入成功回调
 // ==========================================================================================
 
-const { onMultiKillSuccess } = require("./04．成功回调") as {
+const { onMultiKillSuccess } = require("系统.01．单位系统.04．多杀检测系统.04．成功回调") as {
   onMultiKillSuccess: (instance: MonitorInstance) => void;
 };
 

@@ -13,6 +13,7 @@ local ____exports = {}
 -- 效果类型：Nstat / N%stat / Nexp / Nlevel / (level*N)stat / (level*N)exp
 -- 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
 local jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local g = require("jass.globals")
 local itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
@@ -20,6 +21,11 @@ local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local AddGoldWithFeedback = ____require_result_1.AddGoldWithFeedback
 local fourCCToString = ____require_result_1.fourCCToString
+local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local onSecond = ____require_result_3.onSecond
+local offSecond = ____require_result_3.offSecond
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
 local KEY_TO_NAME = {
     hp = "生命值",
@@ -391,28 +397,19 @@ local function executeSegment(self, unit, seg)
             local capturedUnit = unit
             local capturedPct = goldPct
             local remaining = math.floor(seg.timeSec)
-            local dt = jass.CreateTimer()
-            if dt then
-                local t = dt
-                jass.TimerStart(
-                    t,
-                    1,
-                    true,
-                    function()
-                        if capturedUnit then
-                            if jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
-                                jass.DestroyTimer(t)
-                                return
-                            end
-                        end
-                        applyGoldPct(nil, capturedUnit, capturedPct)
-                        remaining = remaining - 1
-                        if remaining <= 0 then
-                            jass.DestroyTimer(t)
-                        end
-                    end
-                )
+            local cb
+            cb = function()
+                if capturedUnit and jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
+                    offSecond(nil, cb)
+                    return
+                end
+                applyGoldPct(nil, capturedUnit, capturedPct)
+                remaining = remaining - 1
+                if remaining <= 0 then
+                    offSecond(nil, cb)
+                end
             end
+            onSecond(nil, cb)
         end
     end
     if #goldFixed > 0 then
@@ -464,7 +461,7 @@ local function onUseItem(self)
     if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
-    if jass.IsUnitIllusionBJ(unit) then
+    if IsUnitIllusionBJ(nil, unit) then
         return
     end
     local itemId = jass.GetItemTypeId(item)
@@ -503,35 +500,9 @@ local function init(self)
         return
     end
     g[INIT_KEY] = true
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_2 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_2 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_2 = 35
-    end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_2
-    local trig = jass.CreateTrigger()
-    do
-        local i = 0
-        while i <= 6 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                useItemEv,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    local ____this_4
-    ____this_4 = jass
-    local ____opt_3 = ____this_4.Player
-    if ____opt_3 ~= nil then
-        ____opt_3 = ____opt_3(____this_4, 13)
-    end
-    local p13 = ____opt_3
-    if p13 ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
-    end
-    jass.TriggerAddAction(trig, onUseItem)
+    itemEventCenter:onItemUse(function(____, unit, item)
+        onUseItem(nil)
+    end)
 end
 init(nil)
 return ____exports

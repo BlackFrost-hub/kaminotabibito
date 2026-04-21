@@ -18,6 +18,7 @@ local stringToFourCC = ____require_result_0.stringToFourCC
 local withTimer = ____require_result_0.withTimer
 local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3Play = ____require_result_1.Sound3DII_Mp3Play
+local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
 -- 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
@@ -224,7 +225,13 @@ local function registerOnePoint(self, cfg, key)
         return
     end
     local trig = jass.CreateTrigger()
-    jass.TriggerRegisterUnitInRange(trig, watchUnit, ACTIVATION_RANGE, nil)
+    local unregister = unitSpecificEventCenter.registerUnitInRangeTrigger(
+        trig,
+        watchUnit,
+        ACTIVATION_RANGE,
+        nil,
+        true
+    )
     local fired = false
     jass.TriggerAddAction(
         trig,
@@ -238,6 +245,7 @@ local function registerOnePoint(self, cfg, key)
             end
             fired = true
             runActivationEffects(nil, cfg, watchUnit)
+            unregister(nil)
             jass.DestroyTrigger(trig)
         end
     )

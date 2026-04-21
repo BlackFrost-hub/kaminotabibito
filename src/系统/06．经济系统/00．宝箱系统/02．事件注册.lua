@@ -16,6 +16,7 @@ local isInteractable = ____require_result_0.isInteractable
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
 local YDLocal5Get = ____require_result_1.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local EVENT_UNIT_ISSUED_TARGET_ORDER = 19
 local REG_GUARD = "__syzl_chestSystem_registered"
 local TRIG_KEY = "__syzl_chestSystem_trig"
@@ -26,27 +27,15 @@ local RETRY_SEC = 0.1
 local STES_EVENT_UNIT_TARGET_ORDER = "单位发布目标命令"
 --- 处理单位发布目标命令事件
 local function onUnitIssuedTargetOrder()
-    local ____opt_2 = jass.GetTriggerUnit
-    if ____opt_2 ~= nil then
-        ____opt_2 = ____opt_2(jass)
-    end
-    local unit = ____opt_2
+    local unit = jass.GetTriggerUnit()
     if not unit then
         return
     end
-    local ____opt_4 = jass.GetOrderTargetDestructable
-    if ____opt_4 ~= nil then
-        ____opt_4 = ____opt_4(jass)
-    end
-    local target = ____opt_4
+    local target = jass.GetOrderTargetDestructable()
     if not target then
         return
     end
-    local ____opt_6 = jass.GetDestructableTypeId
-    if ____opt_6 ~= nil then
-        ____opt_6 = ____opt_6(jass, target)
-    end
-    local targetType = ____opt_6
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(nil, targetType) then
         return
     end
@@ -125,7 +114,7 @@ function ____exports.registerChestSystemHero(hero)
         g[TRIG_KEY] = trig
     end
     local ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
-    jass.TriggerRegisterUnitEvent(g[TRIG_KEY], hero, ev)
+    unitSpecificEventCenter.registerUnitEventTrigger(g[TRIG_KEY], hero, ev)
 end
 --- 初始化宝箱系统
 function ____exports.initChestSystem()

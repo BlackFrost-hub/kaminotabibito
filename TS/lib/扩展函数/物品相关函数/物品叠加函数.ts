@@ -5,25 +5,85 @@
  */
 
 const jass = require("jass.common") as any;
+const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+    registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
+};
+const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
+    addDelayedCallback: (delayMs: number, callback: () => void) => number;
+};
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+    registerPlayerUnitEventForPlayerIds: (
+        this: void,
+        trig: any,
+        playerIds: readonly number[],
+        eventId: any,
+        filter?: any
+    ) => void;
+};
 
+const ABIL_INVENTORY = 0x41496e76; // 'AInv'
+const DEFAULT_ITEM_PICKUP_RANGE = 500;
+const PICKUP_RECHECK_DELAY_MS = 100;
+/** 下一帧补一次 stop（毫秒）；不向自身发 PointOrder，避免转身/拾取动画被 move 顶掉显得僵硬 */
+const STOP_QUEUE_DEFER_MS = 16;
+/** 与移动速度突破等一致：远距离点地物多为 move，近距离交互多为 smart；只认 851971 会漏掉 smart，表现为「范围内仍走过去拾取」 */
+const FALLBACK_ORDER_MOVE = 851971;
+const FALLBACK_ORDER_SMART = 851986;
+let cachedOrderMove = 0;
+let cachedOrderSmart = 0;
 let HT: any = null;
 
+function ensureMoveSmartOrderIds(): void {
+    if (cachedOrderMove !== 0) return;
+    const m = jass.OrderId("move") as number;
+    const s = jass.OrderId("smart") as number;
+    cachedOrderMove = m !== 0 ? m : FALLBACK_ORDER_MOVE;
+    cachedOrderSmart = s !== 0 ? s : FALLBACK_ORDER_SMART;
+}
+
+function isIssuedMoveOrSmartOrder(orderId: number): boolean {
+    ensureMoveSmartOrderIds();
+    return orderId === cachedOrderMove || orderId === cachedOrderSmart;
+}
+
+/** 脚本里直接合并+RemoveItem 不走引擎拾取，单位不会自动转向物品；合并前补面向 */
+function faceUnitTowardGroundItem(u: any, item: any): void {
+    if (u === null || u === 0 || item === null || item === 0) return;
+    const angleDeg =
+        (jass.Atan2(jass.GetItemY(item) - jass.GetUnitY(u), jass.GetItemX(item) - jass.GetUnitX(u)) as number) * (180 / Math.PI);
+    jass.SetUnitFacing(u, angleDeg);
+}
+
+/**
+ * 叠取后打断仍排队的走向：仅 `stop`，勿对脚下 `IssuePointOrder(move)`——后者会干扰朝向与拾取表现。
+ * 若单帧 stop 被覆盖，再在约 1 帧后补一次 stop（不重发 PointOrder）。
+ */
+function suppressPendingMoveAfterGroundStack(u: any): void {
+    if (u === null || u === 0) return;
+    jass.IssueImmediateOrder(u, "stop");
+    centerTimer.addDelayedCallback(STOP_QUEUE_DEFER_MS, () => {
+        if (u === null || u === 0) return;
+        jass.IssueImmediateOrder(u, "stop");
+    });
+}
+
 function initHashtable(): any {
-    if (HT === null) {
-        HT = jass.InitHashtable();
-    }
-    return HT;
+    return HT != null ? HT : (HT = jass.InitHashtable());
 }
 
 let StackStatus = false;
 let StackRegd = false;
-const ItemRange = 600;
+let ItemRange = DEFAULT_ITEM_PICKUP_RANGE;
+const STACK_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4] as const;
 
 let StarItem_TryPickUp_item: any = null;
 let StarItem_bagLoc = 0;
 let StarItem_CallBackUnit: any = null;
 
 let temp_trig: any = null;
+const tempTrigUnregisters: Record<number, Array<() => void>> = {};
+export const StarTrig_UnitOrder = jass.CreateTrigger();
+export const StarTrig_ItemPickUP = jass.CreateTrigger();
 
 const StarItem_TryPickUpTrigs: any[] = [];
 let StarItem_TryPickUpTrig_Index = 0;
@@ -50,73 +110,175 @@ function ItemStacked(): void {
     }
 }
 
-function ItemStack_Act3(wp: any, u: any): void {
-    let i = 0;
-    let wp2: any = null;
-
-    while (i < 6) {
-        wp2 = jass.UnitItemInSlot(u, i);
+/** 地上 wp 与背包同类可叠：合并充能、回调、移除地上物；成功返回 true */
+function tryMergeGroundItemIntoInventory(wp: any, u: any): boolean {
+    for (let i = 0; i < 6; i++) {
+        const wp2 = jass.UnitItemInSlot(u, i);
         if (wp2 !== null && jass.GetItemTypeId(wp) === jass.GetItemTypeId(wp2) && wp !== wp2) {
+            faceUnitTowardGroundItem(u, wp);
             jass.SetItemCharges(wp2, jass.GetItemCharges(wp2) + jass.GetItemCharges(wp));
             StarItem_TryPickUp_item = wp2;
             StarItem_CallBackUnit = u;
             ItemStacked();
-            jass.IssueImmediateOrderById(u, 851972);
             jass.RemoveItem(wp);
-            break;
+            return true;
         }
-        i += 1;
     }
+    return false;
 }
 
-function CheakPickUp(): boolean {
+function cleanupTempTrigger(triggeringTrigger: any): void {
+    if (triggeringTrigger === null) return;
+    const tid = jass.GetHandleId(triggeringTrigger);
+    const unregisters = tempTrigUnregisters[tid];
+    if (unregisters !== undefined) {
+        for (let i = 0; i < unregisters.length; i++) unregisters[i]();
+        delete tempTrigUnregisters[tid];
+    }
+    const ht = initHashtable();
+    if (ht !== null) {
+        jass.FlushChildHashtable(ht, tid);
+    }
+    jass.DestroyTrigger(triggeringTrigger);
+}
+
+function CheakPickUpForTrigger(triggeringTrigger: any, fromTimer: boolean): boolean {
     const ht = initHashtable();
     if (ht === null) return false;
 
-    const triggeringTrigger = jass.GetTriggeringTrigger();
     if (triggeringTrigger === null) return false;
+    const tid = jass.GetHandleId(triggeringTrigger);
+    if (tempTrigUnregisters[tid] === undefined) return false;
 
-    const wp = jass.LoadItemHandle(ht, jass.GetHandleId(triggeringTrigger), 10034);
-    const u = jass.LoadUnitHandle(ht, jass.GetHandleId(triggeringTrigger), 10035);
+    const wp = jass.LoadItemHandle(ht, tid, 10034);
+    const u = jass.LoadUnitHandle(ht, tid, 10035);
 
-    if (wp === null || u === null) return false;
-
-    if (jass.IsUnitInRange(u, wp, ItemRange + 50)) {
-        ItemStack_Act3(wp, u);
-        jass.IssueImmediateOrderById(u, 851972);
+    if (wp === null || u === null) {
+        cleanupTempTrigger(triggeringTrigger);
+        return false;
     }
 
-    jass.DestroyTrigger(triggeringTrigger);
+    if (isItemInRange(u, wp, ItemRange + 50)) {
+        tryMergeGroundItemIntoInventory(wp, u);
+        cleanupTempTrigger(triggeringTrigger);
+        StackStatus = false;
+        suppressPendingMoveAfterGroundStack(u);
+        StackStatus = true;
+        return false;
+    }
 
-    return false;
+    if (fromTimer) return true;
+
+    // 走路途中会连续触发 ISSUED_*；若此处 DestroyTrigger，轮询（schedulePickUpCheck）会失效，
+    // 表现为「走到物品旁却不叠取」。未到范围时仅忽略事件，交给延时轮询继续检测。
+    return true;
+}
+
+function CheakPickUp(): boolean {
+    const trig = jass.GetTriggeringTrigger();
+    if (jass.GetTriggerEventId() === jass.EVENT_UNIT_DEATH) {
+        cleanupTempTrigger(trig);
+        return false;
+    }
+    return CheakPickUpForTrigger(trig, false);
+}
+
+function isHeroTriggerUnit(): boolean {
+    const u = jass.GetTriggerUnit();
+    return u !== null && u !== 0 && jass.IsUnitType(u, jass.UNIT_TYPE_HERO);
+}
+
+function isHeroFilterUnit(): boolean {
+    const u = jass.GetFilterUnit();
+    return u !== null && u !== 0 && jass.IsUnitType(u, jass.UNIT_TYPE_HERO);
+}
+
+function hasInventoryAbility(unit: any): boolean {
+    return unit !== null && unit !== 0 && jass.GetUnitAbilityLevel(unit, ABIL_INVENTORY) !== 0;
+}
+
+function isItemInRange(unit: any, item: any, range: number): boolean {
+    if (unit === null || unit === 0 || item === null || item === 0) return false;
+    const dx = jass.GetUnitX(unit) - jass.GetItemX(item);
+    const dy = jass.GetUnitY(unit) - jass.GetItemY(item);
+    return dx * dx + dy * dy <= range * range;
+}
+
+function schedulePickUpCheck(triggeringTrigger: any): void {
+    centerTimer.addDelayedCallback(PICKUP_RECHECK_DELAY_MS, () => {
+        if (CheakPickUpForTrigger(triggeringTrigger, true)) {
+            schedulePickUpCheck(triggeringTrigger);
+        }
+    });
+}
+
+function StarItem_UnitOrderCond(): boolean {
+    return isHeroTriggerUnit() && StarItem_ItemStack_Cond();
+}
+
+function StarItem_ItemPickUpCond(): boolean {
+    return isHeroTriggerUnit() && StarItem_ItemStack_Cond2();
+}
+
+function isStackableItemType(item: any): boolean {
+    if (item === null) return false;
+    const itemType = jass.GetItemType(item);
+    const chargedType = jass.ITEM_TYPE_CHARGED != null ? jass.ITEM_TYPE_CHARGED : jass.ConvertItemType(1);
+    const purchasableType = jass.ITEM_TYPE_PURCHASABLE != null ? jass.ITEM_TYPE_PURCHASABLE : jass.ConvertItemType(4);
+    return itemType === chargedType || itemType === purchasableType;
+}
+
+function ensureStackEventTriggers(): void {
+    if (StackRegd) return;
+    StackRegd = true;
+
+    jass.TriggerAddCondition(StarTrig_UnitOrder, jass.Condition(StarItem_UnitOrderCond));
+    jass.TriggerAddCondition(StarTrig_ItemPickUP, jass.Condition(StarItem_ItemPickUpCond));
+
+    const heroFilter = jass.Condition(isHeroFilterUnit);
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(
+        StarTrig_UnitOrder,
+        STACK_EVENT_PLAYER_IDS,
+        jass.EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER,
+        heroFilter
+    );
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(
+        StarTrig_ItemPickUP,
+        STACK_EVENT_PLAYER_IDS,
+        jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
+        heroFilter
+    );
 }
 
 export function StarItem_ItemStack_Act2(): void {
     let i = 0;
     const wp = jass.GetOrderTargetItem();
-    let wp2: any = null;
     const u = jass.GetTriggerUnit();
 
     if (wp === null || u === null) return;
 
     while (i < 6) {
-        wp2 = jass.UnitItemInSlot(u, i);
+        const wp2 = jass.UnitItemInSlot(u, i);
         if (wp2 !== null && jass.GetItemTypeId(wp) === jass.GetItemTypeId(wp2) && wp !== wp2) {
+            ensureMoveSmartOrderIds();
             StackStatus = false;
-            jass.IssuePointOrderById(u, 851971, jass.GetItemX(wp), jass.GetItemY(wp));
+            jass.IssuePointOrderById(u, cachedOrderMove, jass.GetItemX(wp), jass.GetItemY(wp));
             StackStatus = true;
             temp_trig = jass.CreateTrigger();
             if (temp_trig !== null) {
-                jass.TriggerRegisterUnitEvent(temp_trig, u, jass.EVENT_UNIT_ISSUED_TARGET_ORDER);
-                jass.TriggerRegisterUnitEvent(temp_trig, u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
-                jass.TriggerRegisterUnitEvent(temp_trig, u, jass.EVENT_UNIT_ISSUED_ORDER);
-                jass.TriggerRegisterUnitEvent(temp_trig, u, jass.EVENT_UNIT_DEATH);
-                jass.TriggerRegisterTimerEvent(temp_trig, 0.1, true);
-                jass.TriggerAddCondition(temp_trig, jass.Condition(CheakPickUp));
+                const currentTrig = temp_trig;
+                const tid = jass.GetHandleId(currentTrig);
+                tempTrigUnregisters[tid] = [
+                    unitSpecificEventCenter.registerUnitEventTrigger(currentTrig, u, jass.EVENT_UNIT_ISSUED_TARGET_ORDER, true),
+                    unitSpecificEventCenter.registerUnitEventTrigger(currentTrig, u, jass.EVENT_UNIT_ISSUED_POINT_ORDER, true),
+                    unitSpecificEventCenter.registerUnitEventTrigger(currentTrig, u, jass.EVENT_UNIT_ISSUED_ORDER, true),
+                    unitSpecificEventCenter.registerUnitEventTrigger(currentTrig, u, jass.EVENT_UNIT_DEATH, true),
+                ];
+                jass.TriggerAddCondition(currentTrig, jass.Condition(CheakPickUp));
+                schedulePickUpCheck(currentTrig);
 
                 const ht = initHashtable();
                 if (ht !== null) {
-                    const tid = jass.GetHandleId(temp_trig);
                     jass.SaveItemHandle(ht, tid, 10034, wp);
                     jass.SaveUnitHandle(ht, tid, 10035, u);
                 }
@@ -128,30 +290,15 @@ export function StarItem_ItemStack_Act2(): void {
 }
 
 export function StarItem_ItemStack_Act(): void {
-    let i = 0;
     const wp = jass.GetOrderTargetItem();
-    let wp2: any = null;
     const u = jass.GetTriggerUnit();
-
-    if (wp === null || u === null) return;
-
-    while (i < 6) {
-        wp2 = jass.UnitItemInSlot(u, i);
-        if (wp2 !== null && jass.GetItemTypeId(wp) === jass.GetItemTypeId(wp2) && wp !== wp2) {
-            jass.SetItemCharges(wp2, jass.GetItemCharges(wp2) + jass.GetItemCharges(wp));
-            StarItem_TryPickUp_item = wp2;
-            StarItem_CallBackUnit = u;
-            ItemStacked();
-            jass.RemoveItem(wp);
-            break;
-        }
-        i += 1;
-    }
+    if (wp === null || u === null || !tryMergeGroundItemIntoInventory(wp, u)) return;
+    StackStatus = false;
+    suppressPendingMoveAfterGroundStack(u);
+    StackStatus = true;
 }
 
-export function StarItem_IsItemInRange(u: any, ite: any, r: number): boolean {
-    return jass.IsUnitInRange(u, ite, r);
-}
+export const StarItem_IsItemInRange = isItemInRange;
 
 export function StarItem_UnitMoveItem(t: any): void {
     StarItem_MoveItemTrigs[StarItem_MoveItemTrig_Index] = t;
@@ -163,20 +310,16 @@ export function StarItem_ItemStack_Cond(): boolean {
     const orderId = jass.GetIssuedOrderId();
 
     if (StackStatus) {
-        if (orderId === 851971) {
+        if (isIssuedMoveOrSmartOrder(orderId)) {
             const targetItem = jass.GetOrderTargetItem();
             if (targetItem !== null) {
                 const triggerUnit = jass.GetTriggerUnit();
-                if (triggerUnit !== null && jass.GetUnitAbilityLevel(triggerUnit, 1090517987) !== 0) {
-                    const itemType = jass.GetItemType(targetItem);
-                    const ITEM_TYPE_CHARGED = 4;
-                    const ITEM_TYPE_PURCHASABLE = 11;
-                    if (itemType === ITEM_TYPE_CHARGED || itemType === ITEM_TYPE_PURCHASABLE) {
-                        if (jass.IsUnitInRange(triggerUnit, targetItem, ItemRange)) {
-                            StarItem_ItemStack_Act();
-                        } else {
-                            StarItem_ItemStack_Act2();
-                        }
+                if (hasInventoryAbility(triggerUnit) && isStackableItemType(targetItem)) {
+                    // 与下方 CheakPickUpForTrigger / ItemStack_Act3 使用同一距离容差，避免 500～550 段误判走 Act2 再走路
+                    if (isItemInRange(triggerUnit, targetItem, ItemRange + 50)) {
+                        StarItem_ItemStack_Act();
+                    } else {
+                        StarItem_ItemStack_Act2();
                     }
                 }
             }
@@ -184,11 +327,11 @@ export function StarItem_ItemStack_Cond(): boolean {
     }
 
     if (StarItem_TryPickUpTrig_Index > 0) {
-        if (orderId === 851971) {
+        if (isIssuedMoveOrSmartOrder(orderId)) {
             const targetItem = jass.GetOrderTargetItem();
             if (targetItem !== null) {
                 const triggerUnit = jass.GetTriggerUnit();
-                if (triggerUnit !== null && jass.GetUnitAbilityLevel(triggerUnit, 1090517987) !== 0) {
+                if (hasInventoryAbility(triggerUnit)) {
                     i = 0;
                     StarItem_TryPickUp_item = targetItem;
                     StarItem_CallBackUnit = triggerUnit;
@@ -269,24 +412,19 @@ export function StarItem_ItemStack_Cond2(): boolean {
 
     if (StackStatus) {
         const manipulatedItem = jass.GetManipulatedItem();
-        if (manipulatedItem !== null) {
-            const itemType = jass.GetItemType(manipulatedItem);
-            const ITEM_TYPE_CHARGED = 4;
-            const ITEM_TYPE_PURCHASABLE = 11;
-            if (itemType === ITEM_TYPE_CHARGED || itemType === ITEM_TYPE_PURCHASABLE) {
-                const triggerUnit = jass.GetTriggerUnit();
-                while (i < 6) {
-                    const itemInSlot = triggerUnit !== null ? jass.UnitItemInSlot(triggerUnit, i) : null;
-                    if (itemInSlot !== null && jass.GetItemTypeId(manipulatedItem) === jass.GetItemTypeId(itemInSlot) && manipulatedItem !== itemInSlot) {
-                        jass.SetItemCharges(itemInSlot, jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem));
-                        StarItem_TryPickUp_item = itemInSlot;
-                        StarItem_CallBackUnit = triggerUnit;
-                        ItemStacked();
-                        jass.RemoveItem(manipulatedItem);
-                        return true;
-                    }
-                    i += 1;
+        if (manipulatedItem !== null && isStackableItemType(manipulatedItem)) {
+            const triggerUnit = jass.GetTriggerUnit();
+            while (i < 6) {
+                const itemInSlot = triggerUnit !== null ? jass.UnitItemInSlot(triggerUnit, i) : null;
+                if (itemInSlot !== null && jass.GetItemTypeId(manipulatedItem) === jass.GetItemTypeId(itemInSlot) && manipulatedItem !== itemInSlot) {
+                    jass.SetItemCharges(itemInSlot, jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem));
+                    StarItem_TryPickUp_item = itemInSlot;
+                    StarItem_CallBackUnit = triggerUnit;
+                    ItemStacked();
+                    jass.RemoveItem(manipulatedItem);
+                    return true;
                 }
+                i += 1;
             }
         }
     }
@@ -295,13 +433,8 @@ export function StarItem_ItemStack_Cond2(): boolean {
 }
 
 export function StarItem_OpenStack(r: number): void {
-    if (!StackRegd) {
-        StackRegd = true;
-    }
-    if (jass.TriggerAddCondition && jass.Condition) {
-        // 需要外部传入 StarTrig_UnitOrder 和 StarTrig_ItemPickUP 触发器
-    }
-    ItemRange;
+    ItemRange = r > 0 ? r : DEFAULT_ITEM_PICKUP_RANGE;
+    ensureStackEventTriggers();
     StackStatus = true;
 }
 
@@ -326,5 +459,7 @@ export function GetItemByHandle(i: number): any {
     if (ht === null) return null;
     return null;
 }
+
+StarItem_OpenStack(ItemRange);
 
 export {};

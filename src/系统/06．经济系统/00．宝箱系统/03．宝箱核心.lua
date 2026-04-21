@@ -81,16 +81,7 @@ function cleanupOpening(data, interrupted)
         jass.RemoveUnit(data.progressBar)
     end
     if interrupted then
-        local ____getChestConfig_13 = getChestConfig
-        local ____opt_10 = jass.GetDestructableTypeId
-        if ____opt_10 ~= nil then
-            ____opt_10 = ____opt_10(jass, data.target)
-        end
-        local ____opt_10_12 = ____opt_10
-        if ____opt_10_12 == nil then
-            ____opt_10_12 = 0
-        end
-        local cfg = ____getChestConfig_13(____opt_10_12)
+        local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
         showTextTag(
             data.unit,
             TEXT_INTERRUPTED(cfg and cfg.name or "宝箱"),
@@ -105,112 +96,33 @@ function cleanupOpening(data, interrupted)
     end
 end
 function startOpening(unit, target, openTime)
-    local ____opt_16 = jass.IssueImmediateOrder
-    if ____opt_16 ~= nil then
-        ____opt_16(jass, unit, "stop")
-    end
+    jass.IssueImmediateOrder(unit, "stop")
     if openTime <= 0 then
         openTime = 1
     end
     local speed = 1 / openTime
-    local ____opt_18 = jass.GetUnitX
-    if ____opt_18 ~= nil then
-        ____opt_18 = ____opt_18(jass, unit)
-    end
-    local ____opt_18_20 = ____opt_18
-    if ____opt_18_20 == nil then
-        ____opt_18_20 = 0
-    end
-    local unitX = ____opt_18_20
-    local ____opt_21 = jass.GetUnitY
-    if ____opt_21 ~= nil then
-        ____opt_21 = ____opt_21(jass, unit)
-    end
-    local ____opt_21_23 = ____opt_21
-    if ____opt_21_23 == nil then
-        ____opt_21_23 = 0
-    end
-    local unitY = ____opt_21_23
+    local unitX = jass.GetUnitX(unit)
+    local unitY = jass.GetUnitY(unit)
     local progressType = getProgressBarUnitType()
-    local ____opt_24 = jass.CreateUnit
-    if ____opt_24 ~= nil then
-        local ____opt_25 = jass.Player
-        if ____opt_25 ~= nil then
-            ____opt_25 = ____opt_25(jass, 4)
-        end
-        ____opt_24 = ____opt_24(
-            jass,
-            ____opt_25,
-            progressType,
-            unitX,
-            unitY,
-            0
-        )
-    end
-    local progressBar = ____opt_24
+    local progressBar = jass.CreateUnit(
+        jass.Player(4),
+        progressType,
+        unitX,
+        unitY,
+        0
+    )
     if progressBar then
-        local ____opt_28 = jass.SetUnitTimeScale
-        if ____opt_28 ~= nil then
-            ____opt_28(jass, progressBar, speed)
-        end
-        local ____opt_30 = jass.SetUnitScale
-        if ____opt_30 ~= nil then
-            ____opt_30(
-                jass,
-                progressBar,
-                PROGRESS_BAR_SCALE,
-                PROGRESS_BAR_SCALE,
-                PROGRESS_BAR_SCALE
-            )
-        end
-        local ____opt_32 = jass.GetUnitFlyHeight
-        if ____opt_32 ~= nil then
-            ____opt_32 = ____opt_32(jass, unit)
-        end
-        local ____opt_32_34 = ____opt_32
-        if ____opt_32_34 == nil then
-            ____opt_32_34 = 0
-        end
-        local flyHeight = ____opt_32_34 + PROGRESS_BAR_HEIGHT_OFFSET
-        local ____opt_35 = jass.SetUnitFlyHeight
-        if ____opt_35 ~= nil then
-            ____opt_35(jass, progressBar, flyHeight, 0)
-        end
+        jass.SetUnitTimeScale(progressBar, speed)
+        jass.SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE)
+        local flyHeight = jass.GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET
+        jass.SetUnitFlyHeight(progressBar, flyHeight, 0)
     end
     jass.DzUnitDisableAttack(unit, true)
-    local ____opt_37 = jass.GetDestructableX
-    if ____opt_37 ~= nil then
-        ____opt_37 = ____opt_37(jass, target)
-    end
-    local ____opt_37_39 = ____opt_37
-    if ____opt_37_39 == nil then
-        ____opt_37_39 = 0
-    end
-    local targetX = ____opt_37_39
-    local ____opt_40 = jass.GetDestructableY
-    if ____opt_40 ~= nil then
-        ____opt_40 = ____opt_40(jass, target)
-    end
-    local ____opt_40_42 = ____opt_40
-    if ____opt_40_42 == nil then
-        ____opt_40_42 = 0
-    end
-    local targetY = ____opt_40_42
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
     local angle = angleBetweenPoints(unitX, unitY, targetX, targetY)
-    local ____opt_43 = jass.SetUnitFacing
-    if ____opt_43 ~= nil then
-        ____opt_43(jass, unit, angle)
-    end
-    local ____getChestConfig_48 = getChestConfig
-    local ____opt_45 = jass.GetDestructableTypeId
-    if ____opt_45 ~= nil then
-        ____opt_45 = ____opt_45(jass, target)
-    end
-    local ____opt_45_47 = ____opt_45
-    if ____opt_45_47 == nil then
-        ____opt_45_47 = 0
-    end
-    local config = ____getChestConfig_48(____opt_45_47)
+    jass.SetUnitFacing(unit, angle)
+    local config = getChestConfig(jass.GetDestructableTypeId(target))
     local chestName = config and config.name or "宝箱"
     fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target)
     showTextTag(
@@ -238,27 +150,14 @@ function updateAllOpening()
         local unitId = ____value[1]
         local data = ____value[2]
         do
-            local ____opt_51 = jass.GetUnitCurrentOrder
-            if ____opt_51 ~= nil then
-                ____opt_51 = ____opt_51(jass, data.unit)
-            end
-            local currentOrder = ____opt_51
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
             local smartOrder = String2OrderIdBJ(nil, "smart")
             local attackOrder = String2OrderIdBJ(nil, "attack")
             local completed = data.elapsed >= data.openTime
             local interrupted = currentOrder == smartOrder or currentOrder == attackOrder
             if completed or interrupted then
                 if completed then
-                    local ____getChestConfig_56 = getChestConfig
-                    local ____opt_53 = jass.GetDestructableTypeId
-                    if ____opt_53 ~= nil then
-                        ____opt_53 = ____opt_53(jass, data.target)
-                    end
-                    local ____opt_53_55 = ____opt_53
-                    if ____opt_53_55 == nil then
-                        ____opt_53_55 = 0
-                    end
-                    local cfg = ____getChestConfig_56(____opt_53_55)
+                    local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
                     local chestName = cfg and cfg.name or "宝箱"
                     showTextTag(
                         data.unit,
@@ -269,24 +168,8 @@ function updateAllOpening()
                     )
                     local targetTypeStr = cfg and cfg.destructableType
                     if targetTypeStr then
-                        local ____opt_61 = jass.GetDestructableX
-                        if ____opt_61 ~= nil then
-                            ____opt_61 = ____opt_61(jass, data.target)
-                        end
-                        local ____opt_61_63 = ____opt_61
-                        if ____opt_61_63 == nil then
-                            ____opt_61_63 = 0
-                        end
-                        local x = ____opt_61_63
-                        local ____opt_64 = jass.GetDestructableY
-                        if ____opt_64 ~= nil then
-                            ____opt_64 = ____opt_64(jass, data.target)
-                        end
-                        local ____opt_64_66 = ____opt_64
-                        if ____opt_64_66 == nil then
-                            ____opt_64_66 = 0
-                        end
-                        local y = ____opt_64_66
+                        local x = jass.GetDestructableX(data.target)
+                        local y = jass.GetDestructableY(data.target)
                         dropItemsFromChest(nil, targetTypeStr, x, y)
                     end
                     fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target)
@@ -299,32 +182,10 @@ function updateAllOpening()
             end
             data.elapsed = data.elapsed + UPDATE_INTERVAL
             if data.progressBar then
-                local ____opt_67 = jass.GetUnitX
-                if ____opt_67 ~= nil then
-                    ____opt_67 = ____opt_67(jass, data.unit)
-                end
-                local ____opt_67_69 = ____opt_67
-                if ____opt_67_69 == nil then
-                    ____opt_67_69 = 0
-                end
-                local unitX = ____opt_67_69
-                local ____opt_70 = jass.GetUnitY
-                if ____opt_70 ~= nil then
-                    ____opt_70 = ____opt_70(jass, data.unit)
-                end
-                local ____opt_70_72 = ____opt_70
-                if ____opt_70_72 == nil then
-                    ____opt_70_72 = 0
-                end
-                local unitY = ____opt_70_72
-                local ____opt_73 = jass.SetUnitX
-                if ____opt_73 ~= nil then
-                    ____opt_73(jass, data.progressBar, unitX)
-                end
-                local ____opt_75 = jass.SetUnitY
-                if ____opt_75 ~= nil then
-                    ____opt_75(jass, data.progressBar, unitY)
-                end
+                local unitX = jass.GetUnitX(data.unit)
+                local unitY = jass.GetUnitY(data.unit)
+                jass.SetUnitX(data.progressBar, unitX)
+                jass.SetUnitY(data.progressBar, unitY)
             end
         end
         ::__continue27::
@@ -332,31 +193,13 @@ function updateAllOpening()
     for ____, ____value in __TS__Iterator(movingMap) do
         local unitId = ____value[1]
         local data = ____value[2]
-        local ____opt_77 = jass.GetUnitCurrentOrder
-        if ____opt_77 ~= nil then
-            ____opt_77 = ____opt_77(jass, data.unit)
-        end
-        local currentOrder = ____opt_77
+        local currentOrder = jass.GetUnitCurrentOrder(data.unit)
         local moveOrder = String2OrderIdBJ(nil, "move")
-        local ____opt_79 = jass.IsUnitInRangeXY
-        if ____opt_79 ~= nil then
-            ____opt_79 = ____opt_79(
-                jass,
-                data.unit,
-                data.targetX,
-                data.targetY,
-                INTERACT_RANGE
-            )
-        end
-        local inRange = ____opt_79
+        local inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
         local orderChanged = currentOrder ~= moveOrder
         if inRange or orderChanged then
             if inRange then
-                local ____opt_81 = jass.GetDestructableTypeId
-                if ____opt_81 ~= nil then
-                    ____opt_81 = ____opt_81(jass, data.target)
-                end
-                local targetType = ____opt_81
+                local targetType = jass.GetDestructableTypeId(data.target)
                 if targetType and isInteractable(targetType) then
                     local openTime = getOpenTime(targetType)
                     startOpening(data.unit, data.target, openTime)
@@ -371,8 +214,8 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____require_result_83 = require("系统.00．核心系统.05．中心计时器")
-    local onTick10ms = ____require_result_83.onTick10ms
+    local ____require_result_18 = require("系统.00．核心系统.05．中心计时器")
+    local onTick10ms = ____require_result_18.onTick10ms
     onTick10ms(
         nil,
         function()
@@ -437,55 +280,16 @@ function ____exports.onUnitTargetInteractable(unit, target)
     if not unit or not target then
         return
     end
-    local ____opt_84 = jass.GetDestructableTypeId
-    if ____opt_84 ~= nil then
-        ____opt_84 = ____opt_84(jass, target)
-    end
-    local targetType = ____opt_84
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(targetType) then
         return
     end
     local openTime = getOpenTime(targetType)
-    local ____opt_86 = jass.GetDestructableX
-    if ____opt_86 ~= nil then
-        ____opt_86 = ____opt_86(jass, target)
-    end
-    local ____opt_86_88 = ____opt_86
-    if ____opt_86_88 == nil then
-        ____opt_86_88 = 0
-    end
-    local targetX = ____opt_86_88
-    local ____opt_89 = jass.GetDestructableY
-    if ____opt_89 ~= nil then
-        ____opt_89 = ____opt_89(jass, target)
-    end
-    local ____opt_89_91 = ____opt_89
-    if ____opt_89_91 == nil then
-        ____opt_89_91 = 0
-    end
-    local targetY = ____opt_89_91
-    local ____opt_92 = jass.IsUnitInRangeXY
-    if ____opt_92 ~= nil then
-        ____opt_92 = ____opt_92(
-            jass,
-            unit,
-            targetX,
-            targetY,
-            INTERACT_RANGE
-        )
-    end
-    local inRange = ____opt_92
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
+    local inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
     if not inRange then
-        local ____opt_94 = jass.IssuePointOrder
-        if ____opt_94 ~= nil then
-            ____opt_94(
-                jass,
-                unit,
-                "move",
-                targetX,
-                targetY
-            )
-        end
+        jass.IssuePointOrder(unit, "move", targetX, targetY)
         local data = {unit = unit, target = target, targetX = targetX, targetY = targetY}
         local unitId = getUnitId(unit)
         if unitId ~= 0 then
@@ -502,13 +306,13 @@ function ____exports.isUnitOpening(unit)
         return false
     end
     local unitId = getUnitId(unit)
-    local ____temp_96
+    local ____temp_19
     if unitId ~= 0 then
-        ____temp_96 = openingMap:has(unitId)
+        ____temp_19 = openingMap:has(unitId)
     else
-        ____temp_96 = false
+        ____temp_19 = false
     end
-    return ____temp_96
+    return ____temp_19
 end
 --- 中断单位开启
 function ____exports.interruptOpening(unit)
@@ -516,13 +320,13 @@ function ____exports.interruptOpening(unit)
         return
     end
     local unitId = getUnitId(unit)
-    local ____temp_97
+    local ____temp_20
     if unitId ~= 0 then
-        ____temp_97 = openingMap:get(unitId)
+        ____temp_20 = openingMap:get(unitId)
     else
-        ____temp_97 = nil
+        ____temp_20 = nil
     end
-    local data = ____temp_97
+    local data = ____temp_20
     if data ~= nil then
         cleanupOpening(data, true)
     end

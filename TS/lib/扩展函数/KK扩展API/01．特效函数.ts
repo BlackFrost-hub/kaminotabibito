@@ -8,6 +8,7 @@ const japi = require("jass.japi") as any;
  * 绑定特效到单位/物体挂点
  */
 export function DzBindEffect(parent: any, attachPoint: string, whichEffect: any): boolean {
+  if (typeof japi.DzBindEffect !== "function") return false;
   japi.DzBindEffect(parent, attachPoint, whichEffect);
   return true;
 }
@@ -16,6 +17,7 @@ export function DzBindEffect(parent: any, attachPoint: string, whichEffect: any)
  * 解除特效绑定
  */
 export function DzUnbindEffect(whichEffect: any): boolean {
+  if (typeof japi.DzUnbindEffect !== "function") return false;
   japi.DzUnbindEffect(whichEffect);
   return true;
 }
@@ -26,6 +28,7 @@ export function DzUnbindEffect(whichEffect: any): boolean {
  * @param scale 缩放比例
  */
 export function DzSetEffectScale(whichEffect: any, scale: number): boolean {
+  if (typeof japi.DzSetEffectScale !== "function") return false;
   japi.DzSetEffectScale(whichEffect, scale);
   return true;
 }

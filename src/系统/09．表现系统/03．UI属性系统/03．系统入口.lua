@@ -39,14 +39,11 @@ function registerFocusHotkeys()
                 _____5E38_91CF.KEY_EVENT_UP,
                 functionKey,
                 function()
-                    local player = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer()
-                    if player ~= jass.GetLocalPlayer() then
-                        return
-                    end
                     local hero = focusHeroByFunctionKey(functionKey)
                     if hero == nil then
                         return
                     end
+                    local player = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() or jass.GetLocalPlayer()
                     ____Star_6269_5C55_5E93:StarOther_PanCameraToTimedForPlayer(
                         player,
                         jass.GetUnitX(hero),

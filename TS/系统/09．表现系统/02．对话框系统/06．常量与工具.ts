@@ -8,11 +8,6 @@ export const DEFAULT_QUEST_ACCEPTED_MSG = "多谢帮忙..我会在此地等候�
 export const DEFAULT_AFTER_COMPLETE_MSG = "谢谢你的帮助，旅行者";
 
 // ========== 虚拟分区：工具 ==========
-export function calculateFourCC(code: string): number {
-  if (code.length !== 4) return 0;
-  const bytes = [code.charCodeAt(0), code.charCodeAt(1), code.charCodeAt(2), code.charCodeAt(3)];
-  return bytes[0] * 16777216 + bytes[1] * 65536 + bytes[2] * 256 + bytes[3];
-}
 
 export function showLocalHint(playerId: number, msg: string, duration: number = 5): void {
   const localPlayer = jass.GetLocalPlayer();

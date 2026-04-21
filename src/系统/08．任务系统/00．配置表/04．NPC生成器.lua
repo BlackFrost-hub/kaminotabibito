@@ -14,6 +14,53 @@ local tryAttachQuestMarkerForConfigNpc = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local _print = _G.print
+--- 头顶叹号/问号：`AddSpecialEffectTarget` 若在 `DzSetUnitModel` 之前或同帧绑定，换模常会顶掉特效（见 jass-pitfalls §15）。
+-- 有自定义模型时延后到换模之后（0.02s）；无模型时 0.01s 再挂，与 CreateUnit 错开一帧。
+local DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01
+local DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02
+local function scheduleTryAttachQuestMarkerForConfigNpc(self, unit, npcConfig)
+    local delaySec = npcConfig.modelFIle and DELAY_QUEST_MARKER_AFTER_SET_MODEL or DELAY_QUEST_MARKER_NO_CUSTOM_MODEL
+    local t = jass.CreateTimer()
+    if not t then
+        tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
+        return
+    end
+    jass.TimerStart(
+        t,
+        delaySec,
+        false,
+        function()
+            jass.DestroyTimer(t)
+            tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
+        end
+    )
+end
+--- 设置单位模型：`SetUnitModel` 非 jass.common 原生，仅 BzAPI：`japi.DzSetUnitModel`（点号直调）。
+-- 延后 0.01s 再调，减轻同栈紧跟 CreateUnit 时 JAPI::Plus / hook 桩（DzCallback0）问题。
+local function scheduleSetUnitModel(self, unit, modelPath, npcLabel)
+    local t = jass.CreateTimer()
+    if not t then
+        return
+    end
+    jass.TimerStart(
+        t,
+        0.01,
+        false,
+        function()
+            jass.DestroyTimer(t)
+            local ok = pcall(function ()
+                    japi.DzSetUnitModel(unit, modelPath)
+                end
+            )
+            if not ok then
+                _print(
+                    nil,
+                    (("[NPC生成器] 设置单位模型失败（已忽略）: " .. npcLabel) .. " model=") .. tostring(modelPath)
+                )
+            end
+        end
+    )
+end
 --- 创建单个NPC
 -- 
 -- @param npcConfig NPC配置数据
@@ -49,26 +96,15 @@ local function createSingleNPC(self, npcConfig)
         return nil
     end
     if npcConfig.modelFIle then
-        local ____japi_DzSetUnitModel_0 = japi.DzSetUnitModel
-        if ____japi_DzSetUnitModel_0 == nil then
-            ____japi_DzSetUnitModel_0 = jass.SetUnitModel
-        end
-        local setModel = ____japi_DzSetUnitModel_0
-        if type(setModel) == "function" then
-            local ok = pcall(function () return setModel(nil, unit, npcConfig.modelFIle) end
-            )
-            if not ok then
-                _print(
-                    nil,
-                    (("[NPC生成器] 设置单位模型失败（已忽略）: " .. tostring(npcConfig.NpcNameID)) .. " model=") .. tostring(npcConfig.modelFIle)
-                )
-            end
-        else
-            _print(nil, "[NPC生成器] 无法设置单位模型：缺少 DzSetUnitModel / SetUnitModel")
-        end
+        scheduleSetUnitModel(
+            nil,
+            unit,
+            npcConfig.modelFIle,
+            tostring(npcConfig.NpcNameID)
+        )
     end
     runNpcInitAction(nil, unit, npcConfig.initAction)
-    tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
+    scheduleTryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
     _print(
         nil,
         ((((("[NPC生成器] 成功创建NPC: " .. tostring(npcConfig.NpcNameID)) .. " at (") .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"

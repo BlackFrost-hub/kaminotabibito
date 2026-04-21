@@ -332,7 +332,11 @@ end
 -- @param duration 延迟秒数
 -- @param effect 特效句柄
 function ____exports.YDWETimerDestroyEffect(self, duration, effect)
-    if not effect or duration <= 0 then
+    if not effect then
+        return
+    end
+    if duration <= 0 then
+        jass.DestroyEffect(effect)
         return
     end
     if not _effectRecycleRegistered then

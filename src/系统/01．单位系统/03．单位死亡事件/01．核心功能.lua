@@ -18,9 +18,26 @@ local ____exports = {}
 --   // 主动触发（一般不需要，由系统内部自动调用）
 --   onUnitDeath();
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterAnyUnitEventBJ = ____require_result_0.TriggerRegisterAnyUnitEventBJ
+local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 local listeners = {}
+local DEATH_EVENT_PLAYER_IDS = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+}
 local _initialized = false
 local function onUnitDeath()
     local dyingUnit = jass.GetTriggerUnit()
@@ -57,7 +74,7 @@ function ____exports.init()
     end
     _initialized = true
     local trig = jass.CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(nil, trig, jass.EVENT_PLAYER_UNIT_DEATH)
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, DEATH_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DEATH)
     jass.TriggerAddAction(trig, onUnitDeath)
 end
 return ____exports

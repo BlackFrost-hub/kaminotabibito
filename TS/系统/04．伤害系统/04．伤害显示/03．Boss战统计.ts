@@ -37,9 +37,9 @@ export function updateBossDamageStats(this: void, source: any, target: any, dama
 
   // 玩家对Boss造成伤害
   if (target === bossUnit && source) {
-    const sourcePlayer = jass.GetOwningPlayer?.(source);
-    if (sourcePlayer && jass.IsPlayerInForce?.(sourcePlayer, playerForce)) {
-      const bossLife = jass.GetUnitState?.(bossUnit, jass.UNIT_STATE_LIFE) ?? 0;
+    const sourcePlayer = jass.GetOwningPlayer(source);
+    if (sourcePlayer && jass.IsPlayerInForce(sourcePlayer, playerForce)) {
+      const bossLife = jass.GetUnitState(bossUnit, jass.UNIT_STATE_LIFE);
       const actualDamage = Math.min(bossLife, damageInt);
       const currentDamage = YDUserDataGet("player", sourcePlayer, "造成伤害", "real") ?? 0;
       YDUserDataSet("player", sourcePlayer, "造成伤害", "real", currentDamage + actualDamage);
@@ -48,11 +48,11 @@ export function updateBossDamageStats(this: void, source: any, target: any, dama
 
   // Boss对玩家造成伤害
   if (source === bossUnit && target) {
-    const targetPlayer = jass.GetOwningPlayer?.(target);
-    const isSummoned = jass.IsUnitType?.(target, jass.UNIT_TYPE_SUMMONED) ?? false;
+    const targetPlayer = jass.GetOwningPlayer(target);
+    const isSummoned = jass.IsUnitType(target, jass.UNIT_TYPE_SUMMONED);
 
-    if (!isSummoned && targetPlayer && jass.IsPlayerInForce?.(targetPlayer, playerForce)) {
-      const bossLife = jass.GetUnitState?.(source, jass.UNIT_STATE_LIFE) ?? 0;
+    if (!isSummoned && targetPlayer && jass.IsPlayerInForce(targetPlayer, playerForce)) {
+      const bossLife = jass.GetUnitState(source, jass.UNIT_STATE_LIFE);
       const actualDamage = Math.min(bossLife, damageInt);
       const currentDamage = YDUserDataGet("player", targetPlayer, "承受伤害", "real") ?? 0;
       YDUserDataSet("player", targetPlayer, "承受伤害", "real", currentDamage + actualDamage);

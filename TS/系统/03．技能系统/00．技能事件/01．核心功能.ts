@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 技能事件系统 - 核心功能
  *
  * 统一注册技能相关事件，提供回调注册接口供其他系统调用。
@@ -23,14 +23,15 @@
 
 const jass = require("jass.common") as any;
 
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: any) => void;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
 };
 
 type SpellCallback = (castingUnit: any, spellAbilityId: number) => void;
 
 const channelListeners: SpellCallback[] = [];
 const effectListeners: SpellCallback[] = [];
+const SPELL_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 let _initialized = false;
 
@@ -83,11 +84,11 @@ export function init(this: void): void {
   _initialized = true;
 
   const channelTrig = jass.CreateTrigger();
-  TriggerRegisterAnyUnitEventBJ(channelTrig, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL);
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(channelTrig, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL);
   jass.TriggerAddAction(channelTrig, onSpellChannel);
 
   const effectTrig = jass.CreateTrigger();
-  TriggerRegisterAnyUnitEventBJ(effectTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrig, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
   jass.TriggerAddAction(effectTrig, onSpellEffect);
 }
 

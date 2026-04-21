@@ -25,7 +25,6 @@ local applyRewardWithContext = ____13_FF0E_4EFB_52A1_5956_52B1_6267_884C.applyRe
 local getPlayerFirstHero = ____13_FF0E_4EFB_52A1_5956_52B1_6267_884C.getPlayerFirstHero
 local previewRewardMatchWithContext = ____13_FF0E_4EFB_52A1_5956_52B1_6267_884C.previewRewardMatchWithContext
 local ____06_FF0E_5E38_91CF_4E0E_5DE5_5177 = require("系统.09．表现系统.02．对话框系统.06．常量与工具")
-local calculateFourCC = ____06_FF0E_5E38_91CF_4E0E_5DE5_5177.calculateFourCC
 local showLocalHint = ____06_FF0E_5E38_91CF_4E0E_5DE5_5177.showLocalHint
 local ____07_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.07．任务状态")
 local setQuestState = ____07_FF0E_4EFB_52A1_72B6_6001.setQuestState
@@ -33,6 +32,8 @@ local ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548 = require("系统.09．�
 local removeQuestMarkerAfterNpcTriggered = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.removeQuestMarkerAfterNpcTriggered
 local jass = require("jass.common")
 local _____5C01_88C5_51FD_6570 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_0.stringToFourCC
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1
 end
@@ -142,7 +143,7 @@ local function resolveSubmitItem(self, hero, requireItem)
         return {itemId = 0, itemCode = "", itemLevel = ""}
     end
     if #requireItem == 4 then
-        local itemId = calculateFourCC(nil, requireItem)
+        local itemId = stringToFourCC(nil, requireItem)
         local data = itemsData[requireItem]
         local itemLevel = data ~= nil and (data.level or "") or ""
         return {itemId = itemId, itemCode = requireItem, itemLevel = itemLevel}
@@ -155,7 +156,7 @@ local function resolveSubmitItem(self, hero, requireItem)
                 if #c ~= 4 then
                     goto __continue33
                 end
-                local testId = calculateFourCC(nil, c)
+                local testId = stringToFourCC(nil, c)
                 if UnitHasItemOfTypeBJ(nil, hero, testId) then
                     local data = itemsData[c]
                     local itemLevel = data ~= nil and (data.level or "") or ""
@@ -219,23 +220,23 @@ local function shouldUseGenericGiveFailHint(self, quest)
     return (string.find(reward, ":", nil, true) or 0) - 1 >= 0
 end
 function ____exports.handleQuestSubmit(self, params)
-    local ____params_0 = params
-    local quest = ____params_0.quest
-    local npcName = ____params_0.npcName
-    local heroName = ____params_0.heroName
-    local dialogOwnerId = ____params_0.dialogOwnerId
-    local npcUnit = ____params_0.npcUnit
-    local parseDialogText = ____params_0.parseDialogText
-    local openDialog = ____params_0.openDialog
-    local refreshTaskUIForAllClientsSoon = ____params_0.refreshTaskUIForAllClientsSoon
+    local ____params_1 = params
+    local quest = ____params_1.quest
+    local npcName = ____params_1.npcName
+    local heroName = ____params_1.heroName
+    local dialogOwnerId = ____params_1.dialogOwnerId
+    local npcUnit = ____params_1.npcUnit
+    local parseDialogText = ____params_1.parseDialogText
+    local openDialog = ____params_1.openDialog
+    local refreshTaskUIForAllClientsSoon = ____params_1.refreshTaskUIForAllClientsSoon
     local callbackOwner = jass.Player(dialogOwnerId)
-    local ____callbackOwner_1
+    local ____callbackOwner_2
     if callbackOwner then
-        ____callbackOwner_1 = getPlayerFirstHero(nil, callbackOwner)
+        ____callbackOwner_2 = getPlayerFirstHero(nil, callbackOwner)
     else
-        ____callbackOwner_1 = nil
+        ____callbackOwner_2 = nil
     end
-    local hero = ____callbackOwner_1
+    local hero = ____callbackOwner_2
     local requireItem = quest.requireItem
     local requiredResources = quest.requiredResources
     local requireCount = normalizeRequireCount(nil, quest.requireCount)
@@ -333,13 +334,13 @@ function ____exports.handleQuestSubmit(self, params)
             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r")
             return
         end
-        local ____temp_2
+        local ____temp_3
         if quest.type == "给予" then
-            ____temp_2 = npcUnit
+            ____temp_3 = npcUnit
         else
-            ____temp_2 = hero
+            ____temp_3 = hero
         end
-        local sourceUnit = ____temp_2
+        local sourceUnit = ____temp_3
         if not sourceUnit then
             if useGenericGiveFailHint then
                 showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。")

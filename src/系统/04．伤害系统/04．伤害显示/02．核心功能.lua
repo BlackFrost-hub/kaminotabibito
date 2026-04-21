@@ -17,24 +17,12 @@ function ____exports.updateAllDamageDigits()
                 local data = activeDigits[i + 1]
                 data.tick = data.tick + 1
                 if data.tick >= DISPLAY_DURATION_TICKS then
-                    local ____opt_23 = jass.DestroyImage
-                    if ____opt_23 ~= nil then
-                        ____opt_23(jass, data.image)
-                    end
+                    jass.DestroyImage(data.image)
                     __TS__ArraySplice(activeDigits, i, 1)
                     goto __continue40
                 end
                 local newHeight = RISE_SPEED * data.tick
-                local ____opt_25 = jass.SetImagePosition
-                if ____opt_25 ~= nil then
-                    ____opt_25(
-                        jass,
-                        data.image,
-                        data.x,
-                        data.y,
-                        newHeight
-                    )
-                end
+                jass.SetImagePosition(data.image, data.x, data.y, newHeight)
             end
             ::__continue40::
             i = i - 1
@@ -50,8 +38,8 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____require_result_27 = require("系统.00．核心系统.05．中心计时器")
-    local onTick10ms = ____require_result_27.onTick10ms
+    local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+    local onTick10ms = ____require_result_2.onTick10ms
     onTick10ms(
         nil,
         function()
@@ -112,11 +100,7 @@ local function getUnitModelScale(unit)
     if not unit then
         return 1
     end
-    local ____opt_2 = jass.GetUnitTypeId
-    if ____opt_2 ~= nil then
-        ____opt_2 = ____opt_2(jass, unit)
-    end
-    local unitType = ____opt_2
+    local unitType = jass.GetUnitTypeId(unit)
     if not unitType then
         return 1
     end
@@ -193,51 +177,33 @@ end
 local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
     local imagePath = getDigitImagePath(digit)
     local size = DIGIT_BASE_SIZE * modelScale
-    local ____opt_4 = jass.CreateImage
-    if ____opt_4 ~= nil then
-        ____opt_4 = ____opt_4(
-            jass,
-            imagePath,
-            size,
-            size,
-            size,
-            x,
-            y,
-            5,
-            0,
-            0,
-            0,
-            2
-        )
-    end
-    local image = ____opt_4
+    local image = jass.CreateImage(
+        imagePath,
+        size,
+        size,
+        size,
+        x,
+        y,
+        5,
+        0,
+        0,
+        0,
+        2
+    )
     if not image then
         return nil
     end
-    local ____opt_6 = jass.SetImageColor
-    if ____opt_6 ~= nil then
-        ____opt_6(
-            jass,
-            image,
-            color.red,
-            color.green,
-            color.blue,
-            255
-        )
-    end
+    jass.SetImageColor(
+        image,
+        color.red,
+        color.green,
+        color.blue,
+        255
+    )
     local height = (BASE_HEIGHT + unitFlyHeight) * modelScale
-    local ____opt_8 = jass.SetImageConstantHeight
-    if ____opt_8 ~= nil then
-        ____opt_8(jass, image, true, height)
-    end
-    local ____opt_10 = jass.SetImageRenderAlways
-    if ____opt_10 ~= nil then
-        ____opt_10(jass, image, true)
-    end
-    local ____opt_12 = jass.SetImageType
-    if ____opt_12 ~= nil then
-        ____opt_12(jass, image, 5)
-    end
+    jass.SetImageConstantHeight(image, true, height)
+    jass.SetImageRenderAlways(image, true)
+    jass.SetImageType(image, 5)
     return image
 end
 --- 显示伤害数字
@@ -251,33 +217,9 @@ function ____exports.showDamageNumber(target, damage)
     local damageInt = math.floor(damage)
     local damageStr = tostring(damageInt)
     local digitCount = getDigitCount(damageInt)
-    local ____opt_14 = jass.GetUnitX
-    if ____opt_14 ~= nil then
-        ____opt_14 = ____opt_14(jass, target)
-    end
-    local ____opt_14_16 = ____opt_14
-    if ____opt_14_16 == nil then
-        ____opt_14_16 = 0
-    end
-    local x = ____opt_14_16
-    local ____opt_17 = jass.GetUnitY
-    if ____opt_17 ~= nil then
-        ____opt_17 = ____opt_17(jass, target)
-    end
-    local ____opt_17_19 = ____opt_17
-    if ____opt_17_19 == nil then
-        ____opt_17_19 = 0
-    end
-    local y = ____opt_17_19
-    local ____opt_20 = jass.GetUnitFlyHeight
-    if ____opt_20 ~= nil then
-        ____opt_20 = ____opt_20(jass, target)
-    end
-    local ____opt_20_22 = ____opt_20
-    if ____opt_20_22 == nil then
-        ____opt_20_22 = 0
-    end
-    local flyHeight = ____opt_20_22
+    local x = jass.GetUnitX(target)
+    local y = jass.GetUnitY(target)
+    local flyHeight = jass.GetUnitFlyHeight(target)
     local modelScale = getUnitModelScale(target)
     local color = getDamageTypeColor()
     local offsetX = -INITIAL_OFFSET_BASE * digitCount

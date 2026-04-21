@@ -5,7 +5,7 @@ local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local initAutoRegister, jass, aiUnitRegistry, unitCreatedTrigger
+local initAutoRegister, jass, playerUnitEvent, aiUnitRegistry, unitCreatedTrigger
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.00．常量定义")
 local AI_SKILL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_SKILL_SYSTEM_ENABLED
 local AI_CHECK_INTERVAL = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_CHECK_INTERVAL
@@ -57,25 +57,16 @@ end
 function initAutoRegister(self)
     if not unitCreatedTrigger then
         unitCreatedTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_UNIT_SUMMON_5 = jass.EVENT_PLAYER_UNIT_SUMMON
-        if ____jass_EVENT_PLAYER_UNIT_SUMMON_5 == nil then
-            ____jass_EVENT_PLAYER_UNIT_SUMMON_5 = 89
-        end
-        local enterRegionEvent = ____jass_EVENT_PLAYER_UNIT_SUMMON_5
+        local enterRegionEvent = jass.EVENT_PLAYER_UNIT_SUMMON
         do
             local i = 0
             while i < AI_PLAYER_COUNT do
-                jass.TriggerRegisterPlayerUnitEvent(
-                    unitCreatedTrigger,
-                    jass.Player(i),
-                    enterRegionEvent,
-                    nil
-                )
+                playerUnitEvent.registerPlayerUnitEventById(unitCreatedTrigger, i, enterRegionEvent)
                 i = i + 1
             end
         end
         local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
-        jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, nil)
+        playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent)
         jass.TriggerAddAction(
             unitCreatedTrigger,
             function()
@@ -88,6 +79,7 @@ function initAutoRegister(self)
     end
 end
 jass = require("jass.common")
+playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 aiUnitRegistry = __TS__New(Map)
 local aiCheckTimer = nil
 unitCreatedTrigger = nil

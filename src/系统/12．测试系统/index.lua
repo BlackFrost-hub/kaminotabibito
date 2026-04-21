@@ -9,7 +9,7 @@ local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_QUEST_TEST = false
 local ENABLE_SHOP_TEST = false
-local ENABLE_TEST_233 = false
+local ENABLE_TEST_233 = true
 local ENABLE_TEST_EVENT = false
 local ENABLE_TEST_EVENT_2 = true
 local function loadTests(self)

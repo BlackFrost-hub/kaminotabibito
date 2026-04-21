@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 动态技能说明系统 - 核心功能
  *
  * 功能：注册动态技能说明、公式解析、自动刷新
@@ -6,6 +6,9 @@
  */
 
 const jass = require("jass.common") as any;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventById: (this: void, trig: any, playerId: number, eventId: any, filter?: any) => void;
+};
 
 import {
   DYNAMIC_SKILL_TIP_ENABLED,
@@ -303,7 +306,7 @@ export function initDynamicSkillTipSystem(): void {
     levelUpTrigger = jass.CreateTrigger();
     const levelEventId = (jass as any).EVENT_PLAYER_HERO_LEVEL ?? EVENT_ID_HERO_LEVEL;
     for (let i = 0; i < PLAYER_COUNT; i++) {
-      jass.TriggerRegisterPlayerUnitEvent(levelUpTrigger, jass.Player(i), levelEventId, undefined!);
+      playerUnitEvent.registerPlayerUnitEventById(levelUpTrigger, i, levelEventId);
     }
     jass.TriggerAddAction(levelUpTrigger, () => {
       const unit = jass.GetTriggerUnit();

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 区域传送：
  * - 开局按 `区域传送配置` 批量创建 Region 并注册进入事件
  * - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
@@ -12,6 +12,9 @@ import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (whichPlayer: any, x: number, y: number, duration: number) => void;
+};
+const regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => () => void;
 };
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
@@ -142,7 +145,8 @@ function initRegionTeleport(): void {
 
     const rect = (jass as any).Rect(cfg.left, cfg.bottom, cfg.right, cfg.top);
     (jass as any).RegionAddRect(region, rect);
-    (jass as any).TriggerRegisterEnterRegion(trig, region, null);
+    (jass as any).RemoveRect(rect);
+    regionEventCenter.registerEnterRegionTrigger(trig, region, null);
     // dbg("已注册区域: " + cfg.id);
     regionMap.set(region, cfg);
   }

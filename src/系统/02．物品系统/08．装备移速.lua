@@ -40,13 +40,27 @@ function getMaxMovespeed2Info(self, unit, ignoreItem)
     return {value = max, name = name, count = count}
 end
 jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 fourCCToString = ____require_result_0.fourCCToString
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
 local SGSS_SetState = ____require_result_1.SGSS_SetState
+local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
 --- 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加）
 local applied = {}
+local EQUIP_SPEED_EVENT_PLAYER_IDS = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    13
+}
 local function getUnitKey(self, unit)
     return tostring(unit)
 end
@@ -68,30 +82,18 @@ local function applyMovespeed2(self, unit, newSpeed)
     end
     applied[key] = newSpeed
 end
-local function onItemChange(self)
-    local unit = jass.GetManipulatingUnit()
-    if not unit then
+local function onItemChange(self, unit, item, isPickup)
+    if unit == nil or unit == 0 then
         return
     end
     if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
-    if jass.IsUnitIllusionBJ(unit) then
+    if IsUnitIllusionBJ(nil, unit) then
         return
     end
-    local eventId = jass.GetTriggerEventId()
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8 = 38
-    end
-    local isPickup = eventId == ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_8
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9 = 39
-    end
-    local isDrop = eventId == ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_9
-    local manipulated = jass.GetManipulatedItem()
-    local newSpeed = isDrop and getMaxMovespeed2(nil, unit, manipulated) or getMaxMovespeed2(nil, unit)
+    local isDrop = not isPickup
+    local newSpeed = isDrop and getMaxMovespeed2(nil, unit, item) or getMaxMovespeed2(nil, unit)
     local key = getUnitKey(nil, unit)
     local cur = applied[key] ~= nil and applied[key] or 0
     if isPickup and newSpeed <= cur then
@@ -100,47 +102,12 @@ local function onItemChange(self)
     applyMovespeed2(nil, unit, newSpeed)
 end
 local function init(self)
-    local trig = jass.CreateTrigger()
-    local ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 == nil then
-        ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10 = 38
-    end
-    local pickup = ____jass_EVENT_PLAYER_UNIT_PICKUP_ITEM_10
-    local ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 = jass.EVENT_PLAYER_UNIT_DROP_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 == nil then
-        ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11 = 39
-    end
-    local drop = ____jass_EVENT_PLAYER_UNIT_DROP_ITEM_11
-    do
-        local i = 0
-        while i <= 7 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                pickup,
-                nil
-            )
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                drop,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    local ____this_13
-    ____this_13 = jass
-    local ____opt_12 = ____this_13.Player
-    if ____opt_12 ~= nil then
-        ____opt_12 = ____opt_12(____this_13, 13)
-    end
-    local p13 = ____opt_12
-    if p13 ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, p13, pickup, nil)
-        jass.TriggerRegisterPlayerUnitEvent(trig, p13, drop, nil)
-    end
-    jass.TriggerAddAction(trig, onItemChange)
+    itemEventCenter:onItemPickup(function(____, unit, item)
+        onItemChange(nil, unit, item, true)
+    end)
+    itemEventCenter:onItemDrop(function(____, unit, item)
+        onItemChange(nil, unit, item, false)
+    end)
 end
 init(nil)
 ____exports.getMaxMovespeed2Info = getMaxMovespeed2Info

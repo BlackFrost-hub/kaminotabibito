@@ -40,6 +40,7 @@ end
 -- - unitType 为 elite/Boss 且 T>1 时，picks = round(basePicks×(1+0.334×(T-1)))。
 local jass = require("jass.common")
 local g = require("jass.globals")
+local itemInv = require("lib.扩展函数.BJ函数.index")
 local equipExcrete = require("系统.02．物品系统.09．装备排泄")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
@@ -278,7 +279,7 @@ local function createItemAtUnit(self, unit, itemId)
     local four = stringToFourCC(nil, itemId)
     local loc = jass.GetUnitLoc(unit)
     if loc then
-        equipExcrete:setLastCreatedItem(jass.CreateItemLoc(four, loc))
+        equipExcrete:setLastCreatedItem(itemInv:CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
         local x = jass.GetUnitX(unit)
         local y = jass.GetUnitY(unit)

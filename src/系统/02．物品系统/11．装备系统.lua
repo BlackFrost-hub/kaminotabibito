@@ -8,6 +8,7 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 --- 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true
 local jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local g = require("jass.globals")
 local items = require("系统.02．物品系统.01．装备数据").default
 local equipLimit = require("系统.02．物品系统.10．装备限制")
@@ -21,6 +22,17 @@ local isSpecialUnit = ____require_result_1.isSpecialUnit
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
 local getObjectProperty = ____require_result_2.getObjectProperty
 local ObjectType = ____require_result_2.ObjectType
+local EQUIP_EVENT_PLAYER_IDS = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    13
+}
 --- 属性配置：显示名 -> itemData key。新增属性只需在此加一行，primaryBonus 即可用该显示名
 local STAT_CONFIG = {
     {name = "生命值", key = "hp"},
@@ -202,219 +214,191 @@ local percentNames = {
     "攻击力%",
     "护甲%"
 }
-local function initEvents(self)
-    local trig = jass.CreateTrigger()
+--- 处理物品拾取/丢弃的核心逻辑
+local function handleItemEvent(self, unit, item, isPickup)
+    if unit == nil or unit == 0 or item == nil or item == 0 then
+        return
+    end
+    if isSpecialUnit(nil, unit) then
+        return
+    end
+    local player = jass.GetOwningPlayer(unit)
+    local itemId = jass.GetItemTypeId(item)
+    local isDrop = not isPickup
+    local skipFlag = equipShared.skipNextDrop
+    if isDrop and skipFlag then
+        equipShared.skipNextDrop = false
+        return
+    end
+    local idStr = fourCCToString(nil, itemId)
+    local itemData = items[idStr]
+    if not itemData then
+        if isPickup then
+            local ____temp_5 = type(slk) ~= "nil" and slk.item
+            if ____temp_5 then
+                local ____opt_3 = slk.item[idStr]
+                ____temp_5 = ____opt_3 and ____opt_3.name
+            end
+            local displayName = ____temp_5 or idStr
+            local border = "|cff606060────────────────────────|r"
+            local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
+            jass.DisplayTimedTextToPlayer(
+                player,
+                0,
+                0.01,
+                10,
+                msg
+            )
+        end
+        return
+    end
+    local skipType = itemData.type
+    if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
+        return
+    end
+    local isConsumable = isDrop and itemData.hot ~= nil
+    if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
+        return
+    end
+    local charges = jass.GetItemCharges(item)
+    local mult = charges > 0 and charges or 1
+    local isAdd = isPickup
+    local primaryBonus = itemData.primaryBonus
+    local primary = {}
+    if primaryBonus then
+        local typeId = jass.GetUnitTypeId(unit)
+        local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
+        local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
+        primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
+    end
+    local merged = {}
+    for ____, e in ipairs(STAT_CONFIG) do
+        local ____e_key_7 = e.key
+        local ____itemData_e_key_6 = itemData[e.key]
+        if ____itemData_e_key_6 == nil then
+            ____itemData_e_key_6 = 0
+        end
+        merged[____e_key_7] = ____itemData_e_key_6 + (primary[e.key] or 0)
+    end
+    merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
+    local playerStats = {}
+    local function addStat(____, val, name)
+        if val == nil or val == 0 then
+            return
+        end
+        local value = val * mult
+        if not isAdd then
+            value = -value
+        end
+        playerStats[#playerStats + 1] = {name = name, value = value}
+    end
+    for ____, e in ipairs(STAT_CONFIG) do
+        addStat(nil, merged[e.key], e.name)
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    local playerName = jass.GetPlayerName(owner) or ""
+    local actionText = isAdd and "获得" or "丢弃"
+    local levelText = itemData.level or ""
+    local levelColor
+    if levelText == "E-" or levelText == "E" then
+        levelColor = "|cFF808080"
+    elseif levelText == "D" then
+        levelColor = "|cFF00FF00"
+    elseif levelText == "C" then
+        levelColor = "|cFF0000FF"
+    elseif levelText == "B" then
+        levelColor = "|cFF800080"
+    elseif levelText == "A" then
+        levelColor = "|cFFFFA500"
+    elseif levelText == "S" then
+        levelColor = "|cFFFF0000"
+    else
+        levelColor = "|cFFFFFFFF"
+    end
+    local coloredLevel = (levelColor .. levelText) .. "|r"
+    local coloredName = ("|cFFFFD700" .. (itemData.name or "未知")) .. "|r"
+    if not isConsumable then
+        local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
+        for ____, stat in ipairs(playerStats) do
+            local sign = stat.value > 0 and "+" or ""
+            local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
+            local v = isPct and stat.value * 100 or stat.value
+            local nearZero = v > -0.000001 and v < 0.000001
+            local vStr = nearZero and "0" or tostring(v)
+            msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
+        end
+        jass.DisplayTimedTextToPlayer(
+            player,
+            0,
+            0.01,
+            5,
+            msg
+        )
+    end
+    local tempReadMap = applyEquipStatsTS(nil, unit, playerStats)
+    local test5Parts = {}
     do
         local i = 0
-        while i <= 7 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
-                nil
-            )
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                jass.EVENT_PLAYER_UNIT_DROP_ITEM,
-                nil
-            )
+        while i < #playerStats do
+            do
+                local statName = playerStats[i + 1].name
+                if statName == "移动速度" then
+                    goto __continue39
+                end
+                local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
+                local num = __TS__Number(val)
+                local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
+                local nearZero = num > -0.000001 and num < 0.000001
+                local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
+                ) .. "%") or (nearZero and "0" or tostring(num))
+                test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
+            end
+            ::__continue39::
             i = i + 1
         end
     end
-    jass.TriggerRegisterPlayerUnitEvent(
-        trig,
-        jass.Player(13),
-        jass.EVENT_PLAYER_UNIT_PICKUP_ITEM,
-        nil
-    )
-    jass.TriggerRegisterPlayerUnitEvent(
-        trig,
-        jass.Player(13),
-        jass.EVENT_PLAYER_UNIT_DROP_ITEM,
-        nil
-    )
-    jass.TriggerAddAction(
-        trig,
-        function()
-            local item = jass.GetManipulatedItem()
-            local unit = jass.GetManipulatingUnit()
-            if not unit or not item then
-                return
-            end
-            if isSpecialUnit(nil, unit) then
-                return
-            end
-            local player = jass.GetOwningPlayer(unit)
-            local itemId = jass.GetItemTypeId(item)
-            local event = jass.GetTriggerEventId()
-            local isDrop = event == jass.EVENT_PLAYER_UNIT_DROP_ITEM
-            local skipFlag = equipShared.skipNextDrop
-            if isDrop and skipFlag then
-                equipShared.skipNextDrop = false
-                return
-            end
-            local idStr = fourCCToString(nil, itemId)
-            local itemData = items[idStr]
-            if not itemData then
-                if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM then
-                    local ____temp_5 = type(slk) ~= "nil" and slk.item
-                    if ____temp_5 then
-                        local ____opt_3 = slk.item[idStr]
-                        ____temp_5 = ____opt_3 and ____opt_3.name
-                    end
-                    local displayName = ____temp_5 or idStr
-                    local border = "|cff606060────────────────────────|r"
-                    local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
-                    jass.DisplayTimedTextToPlayer(
-                        player,
-                        0,
-                        0.01,
-                        10,
-                        msg
-                    )
-                end
-                return
-            end
-            local skipType = itemData.type
-            if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
-                return
-            end
-            local isConsumable = isDrop and itemData.hot ~= nil
-            if event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
-                return
-            end
-            local charges = jass.GetItemCharges(item)
-            local mult = charges > 0 and charges or 1
-            local isAdd = event == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-            local primaryBonus = itemData.primaryBonus
-            local primary = {}
-            if primaryBonus then
-                local typeId = jass.GetUnitTypeId(unit)
-                local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
-                local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
-                primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
-            end
-            local merged = {}
-            for ____, e in ipairs(STAT_CONFIG) do
-                local ____e_key_7 = e.key
-                local ____itemData_e_key_6 = itemData[e.key]
-                if ____itemData_e_key_6 == nil then
-                    ____itemData_e_key_6 = 0
-                end
-                merged[____e_key_7] = ____itemData_e_key_6 + (primary[e.key] or 0)
-            end
-            merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
-            local playerStats = {}
-            local function addStat(____, val, name)
-                if val == nil or val == 0 then
-                    return
-                end
-                local value = val * mult
-                if not isAdd then
-                    value = -value
-                end
-                playerStats[#playerStats + 1] = {name = name, value = value}
-            end
-            for ____, e in ipairs(STAT_CONFIG) do
-                addStat(nil, merged[e.key], e.name)
-            end
-            local owner = jass.GetOwningPlayer(unit)
-            local playerName = jass.GetPlayerName(owner) or ""
-            local actionText = isAdd and "获得" or "丢弃"
-            local levelText = itemData.level or ""
-            local levelColor
-            if levelText == "E-" or levelText == "E" then
-                levelColor = "|cFF808080"
-            elseif levelText == "D" then
-                levelColor = "|cFF00FF00"
-            elseif levelText == "C" then
-                levelColor = "|cFF0000FF"
-            elseif levelText == "B" then
-                levelColor = "|cFF800080"
-            elseif levelText == "A" then
-                levelColor = "|cFFFFA500"
-            elseif levelText == "S" then
-                levelColor = "|cFFFF0000"
-            else
-                levelColor = "|cFFFFFFFF"
-            end
-            local coloredLevel = (levelColor .. levelText) .. "|r"
-            local coloredName = ("|cFFFFD700" .. (itemData.name or "未知")) .. "|r"
-            if not isConsumable then
-                local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
-                for ____, stat in ipairs(playerStats) do
-                    local sign = stat.value > 0 and "+" or ""
-                    local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
-                    local v = isPct and stat.value * 100 or stat.value
-                    local nearZero = v > -0.000001 and v < 0.000001
-                    local vStr = nearZero and "0" or tostring(v)
-                    msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
-                end
-                jass.DisplayTimedTextToPlayer(
-                    player,
-                    0,
-                    0.01,
-                    5,
-                    msg
-                )
-            end
-            local tempReadMap = applyEquipStatsTS(nil, unit, playerStats)
-            local test5Parts = {}
-            do
-                local i = 0
-                while i < #playerStats do
-                    do
-                        local statName = playerStats[i + 1].name
-                        if statName == "移动速度" then
-                            goto __continue42
-                        end
-                        local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
-                        local num = __TS__Number(val)
-                        local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
-                        local nearZero = num > -0.000001 and num < 0.000001
-                        local valStr = isPct and (nearZero and "0%" or tostring(math.floor(num * 1000 + 0.5) / 10
-                        ) .. "%") or (nearZero and "0" or tostring(num))
-                        test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
-                    end
-                    ::__continue42::
-                    i = i + 1
-                end
-            end
-            local hasMovespeed2 = itemData.movespeed2 ~= nil
-            if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-                local ____equipMovespeed_getMaxMovespeed2Info_9 = equipMovespeed.getMaxMovespeed2Info
-                local ____isDrop_8
-                if isDrop then
-                    ____isDrop_8 = item
-                else
-                    ____isDrop_8 = nil
-                end
-                local ms = ____equipMovespeed_getMaxMovespeed2Info_9(equipMovespeed, unit, ____isDrop_8)
-                if ms.value > 0 then
-                    test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
-                end
-                if ms.value > 0 and ms.name ~= "" and ms.count >= 2 then
-                    jass.DisplayTimedTextToPlayer(
-                        owner,
-                        0,
-                        0.02,
-                        5,
-                        ("|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" .. ms.name) .. "』|r"
-                    )
-                end
-            end
-            if #test5Parts > 0 then
-                jass.DisplayTimedTextToPlayer(
-                    owner,
-                    0,
-                    0.02,
-                    5,
-                    (("|cffffff00『系统消息』：|r" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
-                )
-            end
+    local hasMovespeed2 = itemData.movespeed2 ~= nil
+    if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
+        local ____equipMovespeed_getMaxMovespeed2Info_10 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_9 = unit
+        local ____isDrop_8
+        if isDrop then
+            ____isDrop_8 = item
+        else
+            ____isDrop_8 = nil
         end
-    )
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_10(equipMovespeed, ____unit_9, ____isDrop_8)
+        if ms.value > 0 then
+            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
+        end
+        if ms.value > 0 and ms.name ~= "" and ms.count >= 2 then
+            jass.DisplayTimedTextToPlayer(
+                owner,
+                0,
+                0.02,
+                5,
+                ("|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" .. ms.name) .. "』|r"
+            )
+        end
+    end
+    if #test5Parts > 0 then
+        jass.DisplayTimedTextToPlayer(
+            owner,
+            0,
+            0.02,
+            5,
+            (("|cffffff00『系统消息』：|r" .. playerName) .. "的当前装备加成") .. table.concat(test5Parts, "，")
+        )
+    end
+end
+--- 初始化事件：使用物品事件中心统一注册
+local function initEvents(self)
+    itemEventCenter:onItemPickup(function(____, unit, item)
+        handleItemEvent(nil, unit, item, true)
+    end)
+    itemEventCenter:onItemDrop(function(____, unit, item)
+        handleItemEvent(nil, unit, item, false)
+    end)
 end
 initEvents(nil)
 return ____exports

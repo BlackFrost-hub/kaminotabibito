@@ -1,8 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, registerDeathListener, ALOC, EVENT_UNIT_DAMAGED_ID, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
+local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
 function getEventUnitDamaged(self)
-    return jass.ConvertUnitEvent(EVENT_UNIT_DAMAGED_ID)
+    return jass.EVENT_UNIT_DAMAGED
 end
 function onUnitDeathForDamage(self, dyingUnit)
     if not UnitGroup or not dyingUnit then
@@ -159,6 +159,9 @@ function anyUnitDamagedFilter(self)
     if lvl > 0 then
         return false
     end
+    if UnitGroup and jass.IsUnitInGroup(u, UnitGroup) then
+        return false
+    end
     if UnitGroup then
         jass.GroupAddUnit(UnitGroup, u)
     end
@@ -201,6 +204,9 @@ function initEnumUnit(self)
                 end
                 local lvl = jass.GetUnitAbilityLevel(u, ALOC)
                 if lvl > 0 then
+                    return
+                end
+                if jass.IsUnitInGroup(u, UnitGroup) then
                     return
                 end
                 jass.GroupAddUnit(UnitGroup, u)
@@ -271,7 +277,6 @@ isHeroUnit = ____require_result_0.isHeroUnit
 local ____require_result_1 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
 registerDeathListener = ____require_result_1.registerDeathListener
 ALOC = 1097625443
-EVENT_UNIT_DAMAGED_ID = 52
 DamageEventQueue = {}
 DamageCallbacks = {}
 DamageEventNumber = 0
@@ -286,17 +291,13 @@ dotBatchMarkQueue = {}
 function ____exports.markNextPendingDamageAsDotTickBatch(self)
     dotBatchMarkQueue[#dotBatchMarkQueue + 1] = true
 end
---- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致，优先 jass/globals 的 unittype 常量
+--- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致
 local function getUnitTypeHero(self)
     local ____jass_UNIT_TYPE_HERO_2 = jass.UNIT_TYPE_HERO
     if ____jass_UNIT_TYPE_HERO_2 == nil then
-        ____jass_UNIT_TYPE_HERO_2 = g.UNIT_TYPE_HERO
+        ____jass_UNIT_TYPE_HERO_2 = jass.ConvertUnitType(2)
     end
-    local direct = ____jass_UNIT_TYPE_HERO_2
-    if direct ~= nil then
-        return direct
-    end
-    return jass.ConvertUnitType(2)
+    return ____jass_UNIT_TYPE_HERO_2
 end
 --- 注册一个触发器：当任意单位受到伤害时，若该触发器启用且条件通过则执行。
 -- 

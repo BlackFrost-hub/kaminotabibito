@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Star扩展库 - 物品技能事件系统
  *
  * 来源于 StarUnit.j，提供物品技能事件监听功能。
@@ -21,8 +21,11 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.index") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, event: number) => void;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
+};
+const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  registerSpellEffectListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
 const lastItemAbilityContext = {
@@ -36,9 +39,9 @@ const lastItemAbilityContext = {
 const su_iatList: any[] = [];
 let su_iatIndex: number = 0;
 
-let su_ItemAbilityTrig: any = null;
 let su_ItemAbilityTrig2: any = null;
 let su_ItemAbilityInited: boolean = false;
+const STAR_ITEM_ABILITY_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 const HASH_LAST_SPELL = jass.StringHash("最后使用的技能");
 const HASH_LAST_SPELL_X = jass.StringHash("最后使用的技能X");
@@ -189,18 +192,13 @@ function SU_InititemAbilityListener_2(): void {
 export function SU_InititemAbilityListener(): void {
   if (su_ItemAbilityInited) return;
 
-  su_ItemAbilityTrig = jass.CreateTrigger();
   su_ItemAbilityTrig2 = jass.CreateTrigger();
 
-  if (su_ItemAbilityTrig == null || su_ItemAbilityTrig2 == null) return;
+  if (su_ItemAbilityTrig2 == null) return;
 
-  // 注册技能施放事件
-  TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
-  // 注册物品使用事件
-  TriggerRegisterAnyUnitEventBJ(su_ItemAbilityTrig2, jass.EVENT_PLAYER_UNIT_USE_ITEM);
+  registerSpellEffectListener(SU_InititemAbilityListener_1);
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(su_ItemAbilityTrig2, STAR_ITEM_ABILITY_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_USE_ITEM);
 
-  // 添加动作
-  jass.TriggerAddAction(su_ItemAbilityTrig, SU_InititemAbilityListener_1);
   jass.TriggerAddAction(su_ItemAbilityTrig2, SU_InititemAbilityListener_2);
 
   su_ItemAbilityInited = true;

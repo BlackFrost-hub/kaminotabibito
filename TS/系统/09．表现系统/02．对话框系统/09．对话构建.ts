@@ -8,7 +8,10 @@ import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函�
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { taskUI } from "../../08．任务系统/03．任务UI";
-import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, calculateFourCC, giveQuestReward, showLocalHint } from "./06．常量与工具";
+import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, giveQuestReward, showLocalHint } from "./06．常量与工具";
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (s: string) => number;
+};
 import { findDialogConfig } from "./08．配置查询";
 import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./07．任务状态";
 import { getPlayerFirstHero } from "./13．任务奖励执行";
@@ -37,7 +40,7 @@ function grantQuestItems(hero: any, questItems?: string): void {
   for (const raw of items) {
     const itemCode = raw.trim();
     if (itemCode.length !== 4) continue;
-    const itemId = calculateFourCC(itemCode);
+    const itemId = stringToFourCC(itemCode);
     if (itemId === 0) continue;
     jass.UnitAddItemById(hero, itemId);
   }

@@ -271,7 +271,8 @@ export function showDamagePanel(visible: boolean): void {
 export function focusHeroByFunctionKey(functionKey: number): any {
   for (let i = 0; i < detailSlots.length; i++) {
     if (detailSlots[i].functionKey !== functionKey) continue;
-    return detailSlots[i].hero;
+    // 与 JASS 一致：每次按键从玩家「英雄」数据取当前单位，不用创建时缓存的 handle
+    return getPlayerHero(detailSlots[i].player);
   }
   return null;
 }

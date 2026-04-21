@@ -5,6 +5,8 @@ alwaysApply: true
 
 # War3 + TSTL + jass 常见坑（必读）
 
+**分层**：`jass` / `japi` / **BJ（Blizzard.j）** / **项目本地库** 勿混用；BJ 与本地封装边界见 `.cursor/rules/agent-shared/global-engine-rules.mdc` §1。
+
 ## 0) 目标客户端：**魔兽争霸 3 补丁 1.27**
 
 - 勿默认存在 **1.29+** 的 `Blz*` 伤害读接口（如 `BlzGetEventDamage`）；即便能 `type(...) == "function"`，返回值也可能与 **YDWE `EXSetEventDamage` 改写后的实际结算** 不一致。
@@ -163,3 +165,22 @@ content = content.replace(/\bjapi:/g, "japi.");
 
 **工程组织**：若脚本过长，可按主题拆成 `scripts/fix-lua/rules/*.js`，由入口遍历 `src` 串行应用，逻辑不变、可维护性更好。
 
+## 14) `DzTriggerRegisterKeyEvent(Trg)`：键码不要用 `string.char(VK)` 冒充
+
+Lua 里 `string.char(113)` 是字母 **`q`**，不是 **F2**；`string.char(9)` 是 **制表符**，不是 JASS 里用的 **VK=9（Tab）**。用字符路径注册会把热键绑到错键上，表现为 **F2–F6 / Tab 全失效**。
+
+**✅ 做法**：与 `属性查看.j` 一致，对 **F1–F12（112–123）**、**控制键（1–31，含 Tab=9）** 传 **数字 VK**；**OEM 区（如 `~` / VK_OEM_3 = 192，以及常见 186–192、219–222）** 同样须传 **数字 VK**，勿用 `string.char(192)`。实现见 `lib/扩展函数/封装函数/04．硬件输入/04．键盘函数` 的 `registerKeyBindToTrigger`。
+
+仅对明确可打印字母/数字键再考虑字符分支。
+
+## 15) `DzSetUnitModel` 与 `AddSpecialEffectTarget(overhead)` 的先后
+
+**现象**：`CreateUnit` 后立刻 `AddSpecialEffectTarget(..., "overhead", …)`，若随后又 **`japi.DzSetUnitModel`**（常见延后 0.01s 避免 hook 问题），换模往往会 **清掉或弄丢** 已绑定的头顶特效，表现为 **开局 NPC 叹号/问号不出现**。
+
+**✅ 做法**：头顶任务标记放在 **换模完成之后**（例如与 `DzSetUnitModel` 同策略：再延后一帧/0.02s），或先换模再挂特效；无自定义模型时也可 **短延时 0.01s** 再挂，避免与 CreateUnit 同栈绑定失败。
+
+## 16) `TriggerRegisterPlayerUnitEvent`：业务代码勿手写直连
+
+在业务/系统 TS 里对每个玩家循环 `TriggerRegisterPlayerUnitEvent`，会与已有监听 **重复注册** 同一原生事件，浪费且难查。
+
+**✅ 做法**：统一走 **`系统.00．核心系统.01．事件中心.01．玩家单位事件`**（区域进入用 `02．区域事件中心`，单位实例事件/范围用 `03．单位特定事件中心`）；**施法通道/效果** 走 **`系统.03．技能系统.00．技能事件`**。细则与例外见 **`.cursor/rules/agent-shared/global-engine-rules.mdc` §13**。

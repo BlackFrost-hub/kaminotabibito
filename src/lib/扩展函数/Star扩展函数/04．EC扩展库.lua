@@ -31,13 +31,13 @@ function ____exports.EC_CreateEffect(self, path, x, y, z, fac, size, s, time)
         eff,
         ____exports.EC_GetPointZ(nil, x, y) + z
     )
+    japi.EXEffectMatRotateZ(eff, fac)
+    japi.EXSetEffectSpeed(eff, s)
     if time >= 0 then
         YDWETimerDestroyEffect(nil, time, eff)
     elseif time ~= -1 then
         jass.DestroyEffect(eff)
     end
-    japi.EXEffectMatRotateZ(eff, fac)
-    japi.EXSetEffectSpeed(eff, s)
     return eff
 end
 return ____exports

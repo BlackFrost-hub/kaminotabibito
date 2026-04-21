@@ -3,6 +3,10 @@
  */
 
 const jass = require("jass.common") as any;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEvent: (this: void, trig: any, player: any, eventId: any, filter?: any) => void;
+  registerPlayerUnitEventById: (this: void, trig: any, playerId: number, eventId: any, filter?: any) => void;
+};
 
 // 导入常量
 import {
@@ -256,14 +260,14 @@ export function autoRegisterNeutralAggressive(unit: any): void {
 function initAutoRegister(): void {
   if (!unitCreatedTrigger) {
     unitCreatedTrigger = jass.CreateTrigger();
-    const enterRegionEvent = (jass as any).EVENT_PLAYER_UNIT_SUMMON ?? 89;
+    const enterRegionEvent = jass.EVENT_PLAYER_UNIT_SUMMON;
 
     for (let i = 0; i < AI_PLAYER_COUNT; i++) {
-      jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, jass.Player(i), enterRegionEvent, undefined!);
+      playerUnitEvent.registerPlayerUnitEventById(unitCreatedTrigger, i, enterRegionEvent);
     }
 
     const neutralAggressive = (jass as any).Player(AI_PLAYER_NEUTRAL_AGGRESSIVE);
-    jass.TriggerRegisterPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent, undefined!);
+    playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent);
 
     jass.TriggerAddAction(unitCreatedTrigger, () => {
       autoRegisterNeutralAggressive(jass.GetTriggerUnit());

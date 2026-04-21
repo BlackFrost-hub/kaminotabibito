@@ -9,9 +9,9 @@ local ____exports = {}
 -- - 使用Map(unitHandleId -> effectHandle)避免重复创建/销毁
 -- - 单位离开英雄组时自动清理特效
 -- 接入：由"玩家英雄获取桥接"在获得英雄时注册，周期同步只处理已注册英雄
+-- 这里的安全检查是必须的，无视全局规则，2026年4月21日21:29:21
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
-local DzUnbindEffect = ____require_result_0.DzUnbindEffect
+local japi = require("jass.japi")
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local trackedHeroes = __TS__New(Map)
 local tornadoEffects = __TS__New(Map)
@@ -31,7 +31,9 @@ local function destroyTornadoEffect(self, effect)
     if not isValidHandle(nil, effect) then
         return
     end
-    DzUnbindEffect(nil, effect)
+    if type(japi.DzUnbindEffect) == "function" then
+        japi.DzUnbindEffect(effect)
+    end
     jass.DestroyEffect(effect)
 end
 local function removeTrackedHero(self, heroId)
@@ -63,7 +65,7 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
         do
             if not isValidHandle(nil, hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
                 removeTrackedHero(nil, heroId)
-                goto __continue14
+                goto __continue15
             end
             local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
             local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
@@ -75,14 +77,14 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
                         tornadoEffects:set(heroId, effect)
                     end
                 end
-                goto __continue14
+                goto __continue15
             end
             if currentEffect ~= nil then
                 destroyTornadoEffect(nil, currentEffect)
                 tornadoEffects:delete(heroId)
             end
         end
-        ::__continue14::
+        ::__continue15::
     end
 end
 return ____exports

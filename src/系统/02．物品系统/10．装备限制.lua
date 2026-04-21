@@ -5,6 +5,7 @@ local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
 local jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local isHeroUnit = ____require_result_0.isHeroUnit
@@ -19,6 +20,7 @@ end
 local itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
 --- 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性
 ____exports.equipShared = {skipNextDrop = false}
+local EQUIP_LIMIT_EVENT_PLAYER_IDS = {0, 1, 2, 3}
 local ONE_PER_SLOT = {
     "主武器",
     "副武器",
@@ -141,20 +143,11 @@ function ____exports.equipLimitWouldAllowPickup(self, unit, item)
     end
     return msg == ""
 end
-local function onPickup(self)
+local function onPickup(self, unit, item)
     if isEquipLimitDisabledByJass(nil) then
         return
     end
-    local ____opt_1 = jass.GetManipulatingUnit
-    local ____temp_5 = ____opt_1 and ____opt_1(jass)
-    if ____temp_5 == nil then
-        local ____opt_3 = jass.GetTriggerUnit
-        ____temp_5 = ____opt_3 and ____opt_3(jass)
-    end
-    local unit = ____temp_5
-    local ____opt_6 = jass.GetManipulatedItem
-    local item = ____opt_6 and ____opt_6(jass)
-    if not unit or not item then
+    if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
     if not isHeroUnit(nil, unit) then
@@ -286,44 +279,12 @@ local function onPickup(self)
         msg
     )
 end
-local function isHeroCond(self)
-    local ____opt_8 = jass.GetTriggerUnit
-    local ____temp_12 = ____opt_8 and ____opt_8(jass)
-    if ____temp_12 == nil then
-        local ____this_11
-        ____this_11 = jass
-        local ____opt_10 = ____this_11.GetManipulatingUnit
-        if ____opt_10 ~= nil then
-            ____opt_10 = ____opt_10(____this_11)
-        end
-        ____temp_12 = ____opt_10
-    end
-    local u = ____temp_12
-    return isHeroUnit(nil, u)
-end
 local function init(self)
-    local trig = jass.CreateTrigger()
-    local eventId = jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
-    do
-        local i = 0
-        while i < 4 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                eventId,
-                nil
-            )
-            i = i + 1
+    itemEventCenter:onItemPickup(function(____, unit, item)
+        if unit ~= nil and unit ~= 0 and isHeroUnit(nil, unit) then
+            onPickup(nil, unit, item)
         end
-    end
-    local cond = jass.Condition
-    if type(cond) == "function" then
-        jass.TriggerAddCondition(
-            trig,
-            cond(nil, isHeroCond)
-        )
-    end
-    jass.TriggerAddAction(trig, onPickup)
+    end)
 end
 init(nil)
 return ____exports

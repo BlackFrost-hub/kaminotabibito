@@ -14,6 +14,7 @@ local ____exports = {}
 -- 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
 -- 规则：`.cursor/rules/equipment/heal-hot-format.md` / `heal-use-item.md`
 local jass = require("jass.common")
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
 local STES_Register = ____require_result_0.STES_Register
 local STES_GetTable = ____require_result_0.STES_GetTable
@@ -84,21 +85,11 @@ local function applyHpMpToUnitAndGetApplied(unit, hp, mp)
     end
     local lifeBefore = 0
     local manaBefore = 0
-    if jass.UNIT_STATE_LIFE ~= nil then
-        lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    end
-    if jass.UNIT_STATE_MANA ~= nil then
-        manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
-    end
+    lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
     applyHpMpToUnit(unit, hp, mp)
-    local lifeAfter = lifeBefore
-    local manaAfter = manaBefore
-    if jass.UNIT_STATE_LIFE ~= nil then
-        lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    end
-    if jass.UNIT_STATE_MANA ~= nil then
-        manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
-    end
+    local lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
     return {
         hpApplied = math.max(0, lifeAfter - lifeBefore),
         mpApplied = math.max(0, manaAfter - manaBefore)
@@ -123,7 +114,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
             do
                 local trg = jass.LoadTriggerHandle(stesHT, hash, i)
                 if trg == nil or trg == 0 then
-                    goto __continue15
+                    goto __continue11
                 end
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -134,7 +125,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
                 YDLocal5Set(nil, "string", YL_ABIL, abilId)
                 YDTriggerExecuteTrigger(nil, trg, false)
             end
-            ::__continue15::
+            ::__continue11::
             i = i + 1
         end
     end
@@ -240,7 +231,7 @@ local function onUseItem()
     for ____, seg in ipairs(segments) do
         do
             if seg.abilId == "" then
-                goto __continue33
+                goto __continue29
             end
             if seg.waitSec <= 0 then
                 executeSegment(nil, unit, item, seg)
@@ -257,7 +248,7 @@ local function onUseItem()
                 )
             end
         end
-        ::__continue33::
+        ::__continue29::
     end
 end
 local INIT_KEY = "__EquipHealInited"
@@ -279,34 +270,9 @@ local function init()
         ydlStes_registerAfterGetTable(nil, nil, stesTrig, ____exports.ITEM_HEAL_STES_EVENT)
         glob[STES_REG_KEY] = true
     end
-    local ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 = jass.EVENT_PLAYER_UNIT_USE_ITEM
-    if ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 == nil then
-        ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8 = 35
-    end
-    local useItemEv = ____jass_EVENT_PLAYER_UNIT_USE_ITEM_8
-    local trig = jass.CreateTrigger()
-    do
-        local i = 0
-        while i <= 6 do
-            jass.TriggerRegisterPlayerUnitEvent(
-                trig,
-                jass.Player(i),
-                useItemEv,
-                nil
-            )
-            i = i + 1
-        end
-    end
-    local p13 = jass.Player(13)
-    if p13 ~= nil then
-        jass.TriggerRegisterPlayerUnitEvent(trig, p13, useItemEv, nil)
-    end
-    jass.TriggerAddAction(
-        trig,
-        function()
-            onUseItem()
-        end
-    )
+    itemEventCenter:onItemUse(function(____, unit, item)
+        onUseItem()
+    end)
 end
 init()
 return ____exports

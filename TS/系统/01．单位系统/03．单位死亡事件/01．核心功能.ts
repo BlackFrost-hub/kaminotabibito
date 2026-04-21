@@ -18,13 +18,14 @@
 
 const jass = require("jass.common") as any;
 
-const { TriggerRegisterAnyUnitEventBJ } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterAnyUnitEventBJ: (trig: any, whichEvent: any) => void;
+const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
 };
 
 type DeathCallback = (dyingUnit: any, killingUnit: any) => void;
 
 const listeners: DeathCallback[] = [];
+const DEATH_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 let _initialized = false;
 
@@ -57,7 +58,7 @@ export function init(this: void): void {
   _initialized = true;
 
   const trig = jass.CreateTrigger();
-  TriggerRegisterAnyUnitEventBJ(trig, jass.EVENT_PLAYER_UNIT_DEATH);
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, DEATH_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DEATH);
   jass.TriggerAddAction(trig, onUnitDeath);
 }
 

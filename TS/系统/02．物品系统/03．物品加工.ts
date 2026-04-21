@@ -17,6 +17,10 @@
  */
 
 const jass = require("jass.common") as any;
+const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (callback: (unit: any, item: any) => void) => number;
+  onItemDrop: (callback: (unit: any, item: any) => void) => number;
+};
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { recipe?: string }> }).default;
 const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   withTimer: (delaySec: number, callback: () => void) => any;
@@ -39,6 +43,7 @@ const { registerDeathListener } = require("系统.01．单位系统.03．单位�
 
 const CAMPFIRE_ID = 0x68303043; // 'h00C'
 const EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl";
+const CAMPFIRE_EVENT_PLAYER_IDS = [0, 1, 2, 3] as const;
 
 type ResultOpt = { prob?: number; itemId: number; qty: number };
 type RecipeParsed = { cookSec: number; timeoutSec: number; results: ResultOpt[] };
@@ -226,11 +231,8 @@ function untrackItem(item: any): void {
 }
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
-  const t = (jass as any).CreateTimer();
-  if (!t) return;
   const st = itemState.get(item);
-  if (st) st.burnTimer = t;
-  (jass as any).TimerStart(t, sec, false, () => {
+  const t = withTimer(sec, () => {
     if (!itemState.has(item)) {
       return;
     }
@@ -239,6 +241,7 @@ function startBurnTimer(item: any, campfire: any, sec: number): void {
     (jass as any).RemoveItem(item);
     untrackItem(item);
   });
+  if (st) st.burnTimer = t;
 }
 
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
@@ -335,21 +338,12 @@ function onCampfireDeath(dyingUnit: any): void {
 }
 
 export function init物品加工(): void {
-  const pickEv = (jass as any).EVENT_PLAYER_UNIT_PICKUP_ITEM ?? 18;
-  const trigPick = (jass as any).CreateTrigger();
-  for (let i = 0; i <= 3; i++) {
-    (jass as any).TriggerRegisterPlayerUnitEvent(trigPick, (jass as any).Player(i), pickEv, undefined!);
-  }
-  (jass as any).TriggerAddAction(trigPick, onAnyPickup);
+  // 使用物品事件中心注册，减少触发器数量
+  itemEventCenter.onItemPickup((unit, item) => {
+    onAnyPickup();
+  });
 
-  const dropEv = (jass as any).EVENT_PLAYER_UNIT_DROP_ITEM ?? 19;
-  const trigDrop = (jass as any).CreateTrigger();
-  for (let i = 0; i <= 3; i++) {
-    (jass as any).TriggerRegisterPlayerUnitEvent(trigDrop, (jass as any).Player(i), dropEv, undefined!);
-  }
-  (jass as any).TriggerAddAction(trigDrop, () => {
-    const unit = (jass as any).GetManipulatingUnit();
-    const item = (jass as any).GetManipulatedItem();
+  itemEventCenter.onItemDrop((unit, item) => {
     if (unit && item && isCampfire(unit) && itemState.has(item)) {
       untrackItem(item);
     }

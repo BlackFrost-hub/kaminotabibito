@@ -10,7 +10,7 @@ const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_QUEST_TEST = false;
 const ENABLE_SHOP_TEST = false;
-const ENABLE_TEST_233 = false;
+const ENABLE_TEST_233 = true;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_TEST_EVENT_2 = true;
 
