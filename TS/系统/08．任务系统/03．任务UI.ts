@@ -1,7 +1,16 @@
 /**
- * 任务系统 - 全新任务 UI（魔兽原生风格）
- * 层级：GameUI → TaskEntryIcon（绝对 ENTRY_X/Y）→ 点击；TaskMainPanel（TOPLEFT 相对入口 TOPLEFT：PANEL_REL_TO_ENTRY_*）→ 标签/滚动条/listContainer；
- * listContainer 内：任务行/标题/目标/空列表（全部相对 listContainer，与装饰框对齐）。
+ * 任务系统 - 多槽位任务 UI（魔兽原生风格）
+ *
+ * 架构（与属性 UI 对齐的"4 槽位"模型）：
+ * - 所有客户端对称创建 `MAX_TASK_UI_SLOTS` 套完整任务 UI（入口图标 + 主面板 + 列表 + 滚动条），
+ *   槽位 i 绑定玩家 Player(i)；默认所有主面板都隐藏。
+ * - 每客户端只"显示/交互"本机本地玩家对应的槽位（slotPid === GetPlayerId(GetLocalPlayer())），
+ *   其余 3 个槽位的入口图标/主面板永远保持隐藏，不接受 J/1/2/3 输入、不刷新。
+ * - 这样全端的帧创建、refresh/wheel 回调注册在数量与顺序上保持对称，降低同步风险；
+ *   "只本地显示"通过 DzFrameShow 在本机完成，不引入同步点。
+ *
+ * 层级（单个槽位）：
+ *   GameUI → TaskEntryIcon(s) → 点击 → TaskMainPanel(s) → 标签/滚动条/listContainer → 任务行
  */
 
 const jass = require("jass.common") as any;
@@ -66,11 +75,16 @@ import {
 } from "../00．核心系统/03．UI函数";
 import { ENABLE_TASK_UI_CLIENT } from "./04．任务UI拆分/01．任务UI常量";
 
-// （以上常量/辅助函数已拆分到 `04．任务UI拆分/*`）
+/** 多槽位数量：4 个玩家槽位。超出 4 的玩家将不创建任务 UI（理论上当前地图也只有 4 位活跃玩家）。 */
+const MAX_TASK_UI_SLOTS = 4;
 
+/** 单个槽位的任务 UI；所有槽位在所有客户端上被对称创建，只有 `isForLocalPlayer()` 的那个会响应交互。 */
 class TaskUI {
+  /** 本槽位绑定的玩家 id（即 GetPlayerId(Player(i))）。 */
+  public readonly slotPid: number;
+
   private entryFrame: number | null = null;
-private entryText: number | null = null;
+  private entryText: number | null = null;
   private mainPanel: number | null = null;
   private listContainer: number | null = null;
   private tabMain: number | null = null;
@@ -103,24 +117,44 @@ private entryText: number | null = null;
   private failFrameByQuestId = new Map<string, number>();
   private rowIconByQuestId = new Map<string, number>();
 
+  constructor(slotPid: number) {
+    this.slotPid = slotPid;
+    this.currentPlayerId = slotPid;
+  }
+
+  /** 判断"本机本地玩家 === 本槽位绑定玩家"，是所有交互/显示动作的唯一门控。 */
+  private isForLocalPlayer(): boolean {
+    const lp = jass.GetLocalPlayer();
+    if (lp == null) return false;
+    const getPid = (jass as any).GetPlayerId as ((p: any) => number) | undefined;
+    if (typeof getPid !== "function") return false;
+    return getPid(lp) === this.slotPid;
+  }
+
   public init(): void {
     if (!ENABLE_TASK_UI_CLIENT) return;
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null) return;
-
       const gameUI = getGameUI();
       if (!gameUI) return;
 
+      // 注意：这里不做 GetLocalPlayer 门控——所有客户端对所有槽位同样创建帧，
+      // 以保证帧/回调注册的端间对称；显示隔离在后续 hide/showFrame 里完成。
       this.createEntryIcon(gameUI);
       this.createMainPanel(gameUI);
       this.registerTaskListWheel();
       this.registerRefreshCallback();
       this.hide();
+
+      // 非本地槽位：连入口图标也隐藏，避免 4 个"任务(J)"按钮叠在屏幕同一位置。
+      // 本地槽位：hide() 只会隐藏 mainPanel，入口图标默认仍显示。
+      if (!this.isForLocalPlayer() && this.entryFrame != null) {
+        (pcall as any)(() => hideFrame(this.entryFrame as number));
+      }
     });
   }
 
   private registerRefreshCallback(): void {
+    // 4 个槽位都会向 questManager 注册 refresh 回调，触发时各自判断自己是否为本地可见再刷新。
     registerTaskUIRefreshCallback(this.getPanelControlContext(), () => this.refreshList());
   }
 
@@ -143,6 +177,7 @@ private entryText: number | null = null;
       applyDzTextFontAndCenterAlignment,
       onClickSound: () => SoundUI_ClickPlay(),
       onTogglePanel: () => this.togglePanel(),
+      slotPid: this.slotPid,
     });
     this.entryFrame = res.entryFrame;
     this.entryText = res.entryText;
@@ -175,6 +210,7 @@ private entryText: number | null = null;
       },
       isVisible: () => this.isVisible,
       onScrollChanged: () => this.refreshList(),
+      slotPid: this.slotPid,
     });
 
     this.mainPanel = res.mainPanel;
@@ -190,10 +226,6 @@ private entryText: number | null = null;
     this.scrollThumbHitBtn = res.scrollThumbHitBtn;
     this.vScrollTrack?.destroy();
     this.vScrollTrack = res.vScrollTrack;
-  }
-
-  private onListWheel(): void {
-    handleTaskUIListWheel(this.getScrollContext(), () => this.refreshList());
   }
 
   private syncScrollThumb(maxScroll: number): void {
@@ -213,7 +245,8 @@ private entryText: number | null = null;
     showTaskUITabTooltip(msg);
   }
 
-  private switchCategory(type: QuestType): void {
+  public switchCategory(type: QuestType): void {
+    if (!this.isForLocalPlayer()) return;
     switchTaskUICategory(this.getPanelControlContext(), type, () => this.refreshList());
   }
 
@@ -228,6 +261,7 @@ private entryText: number | null = null;
   }
 
   refreshList(): void {
+    if (!this.isForLocalPlayer()) return;
     refreshTaskUIFacadeList(this.getListControlContext(), () => this.refreshList());
   }
 
@@ -235,35 +269,26 @@ private entryText: number | null = null;
     return createTaskUIListItem(this.getListControlContext(), quest, rowTopRel, expanded, () => this.refreshList());
   }
 
-  private togglePanel(): void {
+  public togglePanel(): void {
+    if (!this.isForLocalPlayer()) return;
     toggleTaskUIPanel(this.getPanelControlContext(), (playerId: number) => this.show(playerId), () => this.hide());
   }
 
   public show(playerId: number): void {
+    if (!this.isForLocalPlayer()) return;
     showTaskUIPanel(this.getPanelControlContext(), playerId, () => this.refreshList());
   }
 
   public hide(): void {
+    // init 路径允许非本地槽位也隐藏自身（静默下落为 no-op 即可，mainPanel 默认已隐藏）。
     hideTaskUIPanel(this.getPanelControlContext());
   }
 
-  public registerHotkey(): void {
-    if (!ENABLE_TASK_UI_CLIENT) return;
-    registerTaskUIHotkeys({
-      registerKeyDown,
-      KEY,
-      KEY_NUM,
-      onClickSound: () => SoundUI_ClickPlay(),
-      onTogglePanel: () => this.togglePanel(),
-      onSwitchCategory: (type: QuestType) => this.switchCategory(type),
-      isVisible: () => this.isVisible,
-      setCurrentPlayerId: (pid: number) => {
-        this.currentPlayerId = pid;
-      },
-    });
+  public getIsVisible(): boolean {
+    return this.isVisible;
   }
 
-  /** 把门面类的字段包装成“列表控制模块”可消费的上下文，避免拆分文件直接持有 `this`。 */
+  /** 把门面类的字段包装成"列表控制模块"可消费的上下文，避免拆分文件直接持有 `this`。 */
   private getListControlContext() {
     return {
       mainPanel: this.mainPanel,
@@ -355,14 +380,61 @@ private entryText: number | null = null;
   }
 }
 
-export const taskUI = new TaskUI();
+// ------------------------------------------------------------
+// 多槽位实例 & 模块级调度
+// ------------------------------------------------------------
+
+/** 4 个槽位：Player(0)..Player(3)，每客户端全端对称创建。 */
+const taskUISlots: TaskUI[] = [];
+for (let pid = 0; pid < MAX_TASK_UI_SLOTS; pid++) {
+  taskUISlots.push(new TaskUI(pid));
+}
+
+/** 对外兜底导出：某些老代码可能通过 `taskUI` 访问。这里返回 slot 0 对应的实例；
+ *  需要按本地玩家操作时用 `getLocalTaskUI()`。 */
+export const taskUI = taskUISlots[0];
+
+export function getLocalTaskUI(): TaskUI | null {
+  const lp = jass.GetLocalPlayer();
+  if (lp == null) return null;
+  const getPid = (jass as any).GetPlayerId as ((p: any) => number) | undefined;
+  if (typeof getPid !== "function") return null;
+  const pid = getPid(lp);
+  if (pid == null || pid < 0 || pid >= MAX_TASK_UI_SLOTS) return null;
+  return taskUISlots[pid] ?? null;
+}
 
 export function init(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
-  taskUI.init();
+  // 所有客户端顺序初始化 4 个槽位，保持帧创建/回调注册的端间对称。
+  for (let i = 0; i < taskUISlots.length; i++) {
+    taskUISlots[i].init();
+  }
 }
 
 export function registerHotkey(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
-  taskUI.registerHotkey();
+  // 热键在模块级只注册一次，按"触发玩家 === 本地玩家"派发到本地槽位；
+  // 避免 4 槽位各自注册 4 份造成每次按 J 有 4 份回调同时跑。
+  registerTaskUIHotkeys({
+    registerKeyDown,
+    KEY,
+    KEY_NUM,
+    onClickSound: () => SoundUI_ClickPlay(),
+    onTogglePanel: () => {
+      const ui = getLocalTaskUI();
+      if (ui) ui.togglePanel();
+    },
+    onSwitchCategory: (type: QuestType) => {
+      const ui = getLocalTaskUI();
+      if (ui) ui.switchCategory(type);
+    },
+    isVisible: () => {
+      const ui = getLocalTaskUI();
+      return ui ? ui.getIsVisible() : false;
+    },
+    setCurrentPlayerId: (_pid: number) => {
+      // 槽位与玩家一一绑定，这里无需再动态设置，保留为 no-op 兼容既有接口。
+    },
+  });
 }

@@ -60,20 +60,22 @@ export function isFdfFrameEnabled(frameName: string): boolean {
 export function tryCreateFromFdfWithSource(
   name: string,
   parent: number,
-  fallback: () => number | null
+  fallback: () => number | null,
+  contextId: number = 0
 ): { frame: number | null; fromFdf: boolean } {
   if (!isFdfFrameEnabled(name)) return { frame: fallback(), fromFdf: false };
   loadTocOnce(TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI");
   let f: number = 0;
   const ok = (pcall as any)(() => {
-    f = (japi as any).DzCreateFrame(name, parent, 0);
+    // contextId 用作 DzCreateFrame 的 priority/实例号，多槽位(0..3)各自创建独立 FDF 实例
+    f = (japi as any).DzCreateFrame(name, parent, contextId);
   });
   if (ok && f != null && f !== 0) return { frame: f, fromFdf: true };
   return { frame: fallback(), fromFdf: false };
 }
 
-export function tryCreateFromFdfOnly(name: string, parent: number): number | null {
-  const res = tryCreateFromFdfWithSource(name, parent, () => null);
+export function tryCreateFromFdfOnly(name: string, parent: number, contextId: number = 0): number | null {
+  const res = tryCreateFromFdfWithSource(name, parent, () => null, contextId);
   if (res.fromFdf && res.frame && res.frame !== 0) return res.frame;
   return null;
 }

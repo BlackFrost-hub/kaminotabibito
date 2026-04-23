@@ -10,7 +10,6 @@ local createTaskUIListItem = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.createT
 local clearTaskUIList = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.clearTaskUIList
 local ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E = require("系统.08．任务系统.04．任务UI拆分.10．任务UI滚动与滚轮")
 local registerTaskUIListWheel = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.registerTaskUIListWheel
-local handleTaskUIListWheel = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.handleTaskUIListWheel
 local syncTaskUIScrollThumb = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.syncTaskUIScrollThumb
 local updateTaskUIScrollBarVisibility = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.updateTaskUIScrollBarVisibility
 local ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.11．任务UI面板控制")
@@ -61,14 +60,26 @@ local createTabLabelTextOnBackdrop = ____03_FF0EUI_51FD_6570.createTabLabelTextO
 local setupTransparentGlueHitLayer = ____03_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local ENABLE_TASK_UI_CLIENT = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_CLIENT
---- 任务系统 - 全新任务 UI（魔兽原生风格）
--- 层级：GameUI → TaskEntryIcon（绝对 ENTRY_X/Y）→ 点击；TaskMainPanel（TOPLEFT 相对入口 TOPLEFT：PANEL_REL_TO_ENTRY_*）→ 标签/滚动条/listContainer；
--- listContainer 内：任务行/标题/目标/空列表（全部相对 listContainer，与装饰框对齐）。
+--- 任务系统 - 多槽位任务 UI（魔兽原生风格）
+-- 
+-- 架构（与属性 UI 对齐的"4 槽位"模型）：
+-- - 所有客户端对称创建 `MAX_TASK_UI_SLOTS` 套完整任务 UI（入口图标 + 主面板 + 列表 + 滚动条），
+--   槽位 i 绑定玩家 Player(i)；默认所有主面板都隐藏。
+-- - 每客户端只"显示/交互"本机本地玩家对应的槽位（slotPid === GetPlayerId(GetLocalPlayer())），
+--   其余 3 个槽位的入口图标/主面板永远保持隐藏，不接受 J/1/2/3 输入、不刷新。
+-- - 这样全端的帧创建、refresh/wheel 回调注册在数量与顺序上保持对称，降低同步风险；
+--   "只本地显示"通过 DzFrameShow 在本机完成，不引入同步点。
+-- 
+-- 层级（单个槽位）：
+--   GameUI → TaskEntryIcon(s) → 点击 → TaskMainPanel(s) → 标签/滚动条/listContainer → 任务行
 local jass = require("jass.common")
 local japi = require("jass.japi")
+--- 多槽位数量：4 个玩家槽位。超出 4 的玩家将不创建任务 UI（理论上当前地图也只有 4 位活跃玩家）。
+local MAX_TASK_UI_SLOTS = 4
+--- 单个槽位的任务 UI；所有槽位在所有客户端上被对称创建，只有 `isForLocalPlayer()` 的那个会响应交互。
 local TaskUI = __TS__Class()
 TaskUI.name = "TaskUI"
-function TaskUI.prototype.____constructor(self)
+function TaskUI.prototype.____constructor(self, slotPid)
     self.entryFrame = nil
     self.entryText = nil
     self.mainPanel = nil
@@ -97,16 +108,25 @@ function TaskUI.prototype.____constructor(self)
     self.objFrameByKey = __TS__New(Map)
     self.failFrameByQuestId = __TS__New(Map)
     self.rowIconByQuestId = __TS__New(Map)
+    self.slotPid = slotPid
+    self.currentPlayerId = slotPid
+end
+function TaskUI.prototype.isForLocalPlayer(self)
+    local lp = jass.GetLocalPlayer()
+    if lp == nil then
+        return false
+    end
+    local getPid = jass.GetPlayerId
+    if type(getPid) ~= "function" then
+        return false
+    end
+    return getPid(lp) == self.slotPid
 end
 function TaskUI.prototype.init(self)
     if not ENABLE_TASK_UI_CLIENT then
         return
     end
     pcall(function ()
-            local lp = jass.GetLocalPlayer()
-            if lp == nil then
-                return
-            end
             local gameUI = getGameUI(nil)
             if not gameUI then
                 return
@@ -116,6 +136,10 @@ function TaskUI.prototype.init(self)
             self:registerTaskListWheel()
             self:registerRefreshCallback()
             self:hide()
+            if not self:isForLocalPlayer() and self.entryFrame ~= nil then
+                pcall(function () return hideFrame(nil, self.entryFrame) end
+                )
+            end
         end
     )
 end
@@ -149,7 +173,8 @@ function TaskUI.prototype.createEntryIcon(self, parent)
             setFrameClickEvent = setFrameClickEvent,
             applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
             onClickSound = function() return SoundUI_ClickPlay(nil) end,
-            onTogglePanel = function() return self:togglePanel() end
+            onTogglePanel = function() return self:togglePanel() end,
+            slotPid = self.slotPid
         }
     )
     self.entryFrame = res.entryFrame
@@ -183,7 +208,8 @@ function TaskUI.prototype.createMainPanel(self, parent)
                 self.scrollOffset = v
             end,
             isVisible = function() return self.isVisible end,
-            onScrollChanged = function() return self:refreshList() end
+            onScrollChanged = function() return self:refreshList() end,
+            slotPid = self.slotPid
         }
     )
     self.mainPanel = res.mainPanel
@@ -202,13 +228,6 @@ function TaskUI.prototype.createMainPanel(self, parent)
         ____opt_0:destroy()
     end
     self.vScrollTrack = res.vScrollTrack
-end
-function TaskUI.prototype.onListWheel(self)
-    handleTaskUIListWheel(
-        nil,
-        self:getScrollContext(),
-        function() return self:refreshList() end
-    )
 end
 function TaskUI.prototype.syncScrollThumb(self, maxScroll)
     syncTaskUIScrollThumb(
@@ -235,6 +254,9 @@ function TaskUI.prototype.showTabTooltip(self, msg)
     showTaskUITabTooltip(nil, msg)
 end
 function TaskUI.prototype.switchCategory(self, ____type)
+    if not self:isForLocalPlayer() then
+        return
+    end
     switchTaskUICategory(
         nil,
         self:getPanelControlContext(),
@@ -252,6 +274,9 @@ function TaskUI.prototype.toggleExpand(self, questId)
     self:refreshList()
 end
 function TaskUI.prototype.refreshList(self)
+    if not self:isForLocalPlayer() then
+        return
+    end
     refreshTaskUIFacadeList(
         nil,
         self:getListControlContext(),
@@ -269,6 +294,9 @@ function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
     )
 end
 function TaskUI.prototype.togglePanel(self)
+    if not self:isForLocalPlayer() then
+        return
+    end
     toggleTaskUIPanel(
         nil,
         self:getPanelControlContext(),
@@ -277,6 +305,9 @@ function TaskUI.prototype.togglePanel(self)
     )
 end
 function TaskUI.prototype.show(self, playerId)
+    if not self:isForLocalPlayer() then
+        return
+    end
     showTaskUIPanel(
         nil,
         self:getPanelControlContext(),
@@ -290,25 +321,8 @@ function TaskUI.prototype.hide(self)
         self:getPanelControlContext()
     )
 end
-function TaskUI.prototype.registerHotkey(self)
-    if not ENABLE_TASK_UI_CLIENT then
-        return
-    end
-    registerTaskUIHotkeys(
-        nil,
-        {
-            registerKeyDown = registerKeyDown,
-            KEY = KEY,
-            KEY_NUM = KEY_NUM,
-            onClickSound = function() return SoundUI_ClickPlay(nil) end,
-            onTogglePanel = function() return self:togglePanel() end,
-            onSwitchCategory = function(____, ____type) return self:switchCategory(____type) end,
-            isVisible = function() return self.isVisible end,
-            setCurrentPlayerId = function(____, pid)
-                self.currentPlayerId = pid
-            end
-        }
-    )
+function TaskUI.prototype.getIsVisible(self)
+    return self.isVisible
 end
 function TaskUI.prototype.getListControlContext(self)
     return {
@@ -394,17 +408,81 @@ function TaskUI.prototype.getPanelControlContext(self)
         end
     }
 end
-____exports.taskUI = __TS__New(TaskUI)
+--- 4 个槽位：Player(0)..Player(3)，每客户端全端对称创建。
+local taskUISlots = {}
+do
+    local pid = 0
+    while pid < MAX_TASK_UI_SLOTS do
+        taskUISlots[#taskUISlots + 1] = __TS__New(TaskUI, pid)
+        pid = pid + 1
+    end
+end
+--- 对外兜底导出：某些老代码可能通过 `taskUI` 访问。这里返回 slot 0 对应的实例；
+-- 需要按本地玩家操作时用 `getLocalTaskUI()`。
+____exports.taskUI = taskUISlots[1]
+function ____exports.getLocalTaskUI(self)
+    local lp = jass.GetLocalPlayer()
+    if lp == nil then
+        return nil
+    end
+    local getPid = jass.GetPlayerId
+    if type(getPid) ~= "function" then
+        return nil
+    end
+    local pid = getPid(lp)
+    if pid == nil or pid < 0 or pid >= MAX_TASK_UI_SLOTS then
+        return nil
+    end
+    return taskUISlots[pid + 1] or nil
+end
 function ____exports.init(self)
     if not ENABLE_TASK_UI_CLIENT then
         return
     end
-    ____exports.taskUI:init()
+    do
+        local i = 0
+        while i < #taskUISlots do
+            taskUISlots[i + 1]:init()
+            i = i + 1
+        end
+    end
 end
 function ____exports.registerHotkey(self)
     if not ENABLE_TASK_UI_CLIENT then
         return
     end
-    ____exports.taskUI:registerHotkey()
+    registerTaskUIHotkeys(
+        nil,
+        {
+            registerKeyDown = registerKeyDown,
+            KEY = KEY,
+            KEY_NUM = KEY_NUM,
+            onClickSound = function() return SoundUI_ClickPlay(nil) end,
+            onTogglePanel = function()
+                local ui = ____exports.getLocalTaskUI(nil)
+                if ui then
+                    ui:togglePanel()
+                end
+            end,
+            onSwitchCategory = function(____, ____type)
+                local ui = ____exports.getLocalTaskUI(nil)
+                if ui then
+                    ui:switchCategory(____type)
+                end
+            end,
+            isVisible = function()
+                local ui = ____exports.getLocalTaskUI(nil)
+                local ____ui_2
+                if ui then
+                    ____ui_2 = ui:getIsVisible()
+                else
+                    ____ui_2 = false
+                end
+                return ____ui_2
+            end,
+            setCurrentPlayerId = function(____, _pid)
+            end
+        }
+    )
 end
 return ____exports

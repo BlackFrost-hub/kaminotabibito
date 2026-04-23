@@ -33,6 +33,8 @@ export interface BuildTaskEntryIconOpts {
   applyDzTextFontAndCenterAlignment: any;
   onClickSound: () => void;
   onTogglePanel: () => void;
+  /** 槽位号 0..N-1，用于在多槽位(每客户端对称创建 N 套)时区分 FDF contextId 与子帧名，避免冲突。 */
+  slotPid?: number;
 }
 
 /**
@@ -53,9 +55,12 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     applyDzTextFontAndCenterAlignment,
     onClickSound,
     onTogglePanel,
+    slotPid,
   } = opts;
+  const ctxId = slotPid ?? 0;
+  const suf = `_s${ctxId}`;
 
-  const entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent);
+  const entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent, ctxId);
   if (!entryFrame) return { entryFrame: null, entryText: null };
 
   // 整体位置与尺寸来自常量（与主面板的相对偏移配合）
@@ -77,7 +82,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
   const textFrame =
     createFrame({
       type: FrameType.TEXT,
-      name: "TaskEntryText",
+      name: "TaskEntryText" + suf,
       parent: entryFrame,
       template: "template",
       visible: true,
@@ -87,7 +92,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     setFramePointRelative(textFrame, titleRel.point, titleRel.relativeTo, titleRel.relativePoint, titleRel.x, titleRel.y);
     setFrameSize(textFrame, { width: tw, height: th });
   } else {
-    entryText = createTextLabel("TaskEntryText", entryFrame, "", titleRel, { width: tw, height: th });
+    entryText = createTextLabel("TaskEntryText" + suf, entryFrame, "", titleRel, { width: tw, height: th });
   }
 
   if (entryText != null && entryText !== 0) {
@@ -101,7 +106,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
   const btn =
     createFrame({
       type: FrameType.GLUETEXTBUTTON,
-      name: "TaskEntryBtn",
+      name: "TaskEntryBtn" + suf,
       parent: entryFrame,
       template: "template",
       visible: true,

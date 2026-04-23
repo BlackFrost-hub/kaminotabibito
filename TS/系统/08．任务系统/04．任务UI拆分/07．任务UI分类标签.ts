@@ -39,6 +39,8 @@ export interface BuildTaskCategoryTabsOpts {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
+  /** 槽位号 0..N-1，多槽位 FDF 实例 contextId，区分同名分类背景/标签帧 */
+  slotPid?: number;
 }
 
 /**
@@ -65,6 +67,7 @@ function createTaskTab(opts: {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
+  ctxId: number;
 }): TabPair {
   const {
     japi,
@@ -87,9 +90,10 @@ function createTaskTab(opts: {
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    ctxId,
   } = opts;
 
-  const bg = tryCreateFromFdfOnly(bgName, tabParent);
+  const bg = tryCreateFromFdfOnly(bgName, tabParent, ctxId);
   if (bg) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
@@ -103,7 +107,7 @@ function createTaskTab(opts: {
     if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
   }
 
-  const tab = tryCreateFromFdfOnly(tabName, tabParent);
+  const tab = tryCreateFromFdfOnly(tabName, tabParent, ctxId);
   if (tab) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(tab);
     if (bg) {
@@ -168,13 +172,15 @@ export function buildTaskPanelCategoryTabs(opts: BuildTaskCategoryTabsOpts): Tas
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    ctxId: opts.slotPid ?? 0,
   };
+  const suf = `_s${common.ctxId}`;
 
   const mainResult = createTaskTab({
     ...common,
     bgName: "TaskTabMainBg",
     tabName: "TaskTabMain",
-    labelName: "TaskTabMainLabel",
+    labelName: "TaskTabMainLabel" + suf,
     x: 0.02,
     labelText: "|cffffcc00主线(1)|r",
     category: QuestType.MAIN,
@@ -185,7 +191,7 @@ export function buildTaskPanelCategoryTabs(opts: BuildTaskCategoryTabsOpts): Tas
     ...common,
     bgName: "TaskTabSideBg",
     tabName: "TaskTabSide",
-    labelName: "TaskTabSideLabel",
+    labelName: "TaskTabSideLabel" + suf,
     x: 0.135,
     labelText: "|cffffcc00支线(2)|r",
     category: QuestType.SIDE,
@@ -196,7 +202,7 @@ export function buildTaskPanelCategoryTabs(opts: BuildTaskCategoryTabsOpts): Tas
     ...common,
     bgName: "TaskTabDailyBg",
     tabName: "TaskTabDaily",
-    labelName: "TaskTabDailyLabel",
+    labelName: "TaskTabDailyLabel" + suf,
     x: 0.25,
     labelText: "|cffffcc00小任务(3)|r",
     category: QuestType.DAILY,

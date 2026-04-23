@@ -12,7 +12,7 @@
 当前规则领域包括：
 
 - `war3-tstl/`：TSTL、Lua、JASS、回调和随机数陷阱。
-- `dzapi/`：DzAPI UI 框架使用、同步行为和 FDF/UI 陷阱。
+- `dzapi/`：DzAPI UI 框架、LoadToc、FDF；联机 UI 与 desync 分层见 `dzapi/n-slot-ui-symmetric-execution.mdc`（与 `ui-frame-types.mdc` 分工：后者偏 Frame API 表，前者偏对称执行与 N 槽）。
 - `equipment/`：装备相关数据和触发器约定。
 - `stes-ydlocal/`：STES 和 YDLocal 使用约束。
 - `tooling/`：调试输出、声音和封装约定。

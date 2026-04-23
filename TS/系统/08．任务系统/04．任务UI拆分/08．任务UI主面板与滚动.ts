@@ -73,6 +73,8 @@ export interface BuildTaskMainPanelOpts {
   setScrollOffset: (v: number) => void;
   isVisible: () => boolean;
   onScrollChanged: () => void;
+  /** 槽位号 0..N-1，用于在多槽位(每客户端对称创建 N 套)时区分 FDF contextId 与子帧名，避免冲突。 */
+  slotPid?: number;
 }
 
 /**
@@ -105,7 +107,10 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     setScrollOffset,
     isVisible,
     onScrollChanged,
+    slotPid,
   } = opts;
+  const ctxId = slotPid ?? 0;
+  const suf = `_s${ctxId}`;
 
   const empty: BuildMainPanelResult = {
     mainPanel: null,
@@ -122,7 +127,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     vScrollTrack: null,
   };
 
-  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent, ctxId);
   if (!mainPanel) return empty;
 
   if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
@@ -139,7 +144,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel, ctxId);
   if (listContainer) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
     // 列表模块只往这个容器里塞任务行；容器本身的尺寸/锚点统一在这里管理。
@@ -168,6 +173,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    slotPid: ctxId,
   });
 
   let scrollBarFrame: number | null = null;
@@ -182,13 +188,13 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       const f =
         createFrame({
           type: FrameType.BACKDROP,
-          name: "TaskScrollBarBtn",
+          name: "TaskScrollBarBtn" + suf,
           parent: mainPanel,
           template: "template",
           visible: true,
         }) ?? 0;
       return f;
-    });
+    }, ctxId);
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -202,7 +208,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollThumbFrame =
       createFrame({
         type: FrameType.BACKDROP,
-        name: "TaskScrollThumbDyn",
+        name: "TaskScrollThumbDyn" + suf,
         parent: mainPanel,
         template: "template",
         visible: true,
@@ -219,7 +225,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       vScrollTrack = new VerticalScrollbarTrack({
         trackFrame: scrollBarFrame,
         thumbFrame: scrollThumbFrame,
-        hitButtonName: "TaskScrollThumbHit",
+        hitButtonName: "TaskScrollThumbHit" + suf,
         listViewHeightNorm: LIST_VIEW_H,
         trackHeightNorm: LIST_VIEW_H,
         thumbSizeNorm: SCROLL_THUMB_SIZE,

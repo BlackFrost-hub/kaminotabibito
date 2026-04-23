@@ -1,6 +1,6 @@
 ---
-description: 
-alwaysApply: true
+description: 跨智能体规则桥接：提醒先从 `.cursor/rules/README.md` 进入并保持 AGENTS/规则索引一致；用于维护规则系统本身或排查代理规则入口时
+alwaysApply: false
 ---
 
 # Cross-Agent Rule Bridge

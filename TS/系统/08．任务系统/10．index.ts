@@ -35,7 +35,7 @@ if (typeof 任务UI.init === "function") 任务UI.init();
 if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
 
 // 任务UI拆分（通过index自动加载）
-// require("系统.08．任务系统.04．任务UI拆分.index");
+ require("系统.08．任务系统.04．任务UI拆分.index");
 
 // STES桥接
 require("系统.08．任务系统.05．任务STES配置表");

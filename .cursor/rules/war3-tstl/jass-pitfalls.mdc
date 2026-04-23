@@ -1,6 +1,7 @@
 ---
-description: 
-alwaysApply: true
+description: War3 1.27 + TSTL + Lua/JASS 编译与运行时常见坑。用于修改 TS 业务代码、JASS 交互、jass/japi 调用、回调注册、随机数、键盘注册或 fix-lua 相关逻辑时
+globs: TS/**/*.ts
+alwaysApply: false
 ---
 
 # War3 + TSTL + jass 常见坑（必读）

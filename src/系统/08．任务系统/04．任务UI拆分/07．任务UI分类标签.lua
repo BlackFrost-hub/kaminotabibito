@@ -33,7 +33,8 @@ local function createTaskTab(self, opts)
     local onClickSound = ____opts_0.onClickSound
     local onSwitchCategory = ____opts_0.onSwitchCategory
     local onShowTabTooltip = ____opts_0.onShowTabTooltip
-    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent)
+    local ctxId = ____opts_0.ctxId
+    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent, ctxId)
     if bg then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(bg)
@@ -68,7 +69,7 @@ local function createTaskTab(self, opts)
             japi.DzFrameSetLevel(tabLabel, 8)
         end
     end
-    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent)
+    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent, ctxId)
     if tab then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(tab)
@@ -150,14 +151,16 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip
+        onShowTabTooltip = onShowTabTooltip,
+        ctxId = opts.slotPid or 0
     }
+    local suf = "_s" .. tostring(common.ctxId)
     local mainResult = createTaskTab(
         nil,
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabMainBg",
             tabName = "TaskTabMain",
-            labelName = "TaskTabMainLabel",
+            labelName = "TaskTabMainLabel" .. suf,
             x = 0.02,
             labelText = "|cffffcc00主线(1)|r",
             category = QuestType.MAIN,
@@ -169,7 +172,7 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabSideBg",
             tabName = "TaskTabSide",
-            labelName = "TaskTabSideLabel",
+            labelName = "TaskTabSideLabel" .. suf,
             x = 0.135,
             labelText = "|cffffcc00支线(2)|r",
             category = QuestType.SIDE,
@@ -181,7 +184,7 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabDailyBg",
             tabName = "TaskTabDaily",
-            labelName = "TaskTabDailyLabel",
+            labelName = "TaskTabDailyLabel" .. suf,
             x = 0.25,
             labelText = "|cffffcc00小任务(3)|r",
             category = QuestType.DAILY,

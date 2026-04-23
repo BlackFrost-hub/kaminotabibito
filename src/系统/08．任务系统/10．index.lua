@@ -91,6 +91,7 @@ end
 if type(_____4EFB_52A1UI.registerHotkey) == "function" then
     _____4EFB_52A1UI:registerHotkey()
 end
+require("系统.08．任务系统.04．任务UI拆分.index")
 require("系统.08．任务系统.05．任务STES配置表")
 require("系统.08．任务系统.06．任务STES桥接")
 require("系统.08．任务系统.07．任务事件桥接")

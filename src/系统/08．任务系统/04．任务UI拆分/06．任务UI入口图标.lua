@@ -25,7 +25,10 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local applyDzTextFontAndCenterAlignment = ____opts_0.applyDzTextFontAndCenterAlignment
     local onClickSound = ____opts_0.onClickSound
     local onTogglePanel = ____opts_0.onTogglePanel
-    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent)
+    local slotPid = ____opts_0.slotPid
+    local ctxId = slotPid or 0
+    local suf = "_s" .. tostring(ctxId)
+    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent, ctxId)
     if not entryFrame then
         return {entryFrame = nil, entryText = nil}
     end
@@ -43,7 +46,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local entryText = nil
     local ____createFrame_result_1 = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "TaskEntryText",
+        name = "TaskEntryText" .. suf,
         parent = entryFrame,
         template = "template",
         visible = true
@@ -67,7 +70,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     else
         entryText = createTextLabel(
             nil,
-            "TaskEntryText",
+            "TaskEntryText" .. suf,
             entryFrame,
             "",
             titleRel,
@@ -82,7 +85,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     end
     local ____createFrame_result_2 = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "TaskEntryBtn",
+        name = "TaskEntryBtn" .. suf,
         parent = entryFrame,
         template = "template",
         visible = true,

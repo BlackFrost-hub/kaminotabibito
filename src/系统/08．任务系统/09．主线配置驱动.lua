@@ -27,7 +27,7 @@ local QuestStatus = ____require_result_4.QuestStatus
 local ____require_result_5 = require("系统.08．任务系统.02．任务管理器.index")
 local questManager = ____require_result_5.questManager
 --- 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
-____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER = false
+____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER = true
 local YDGet = _G.YDUserDataGet
 local YDSet = _G.YDUserDataSet
 local RUNTIME_QUEST_ID = "main_story_runtime"

@@ -37,7 +37,7 @@ const { questManager } = require("系统.08．任务系统.02．任务管理器.
 /**
  * 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
  */
-export const ENABLE_MAIN_QUEST_CONFIG_DRIVER = false;
+export const ENABLE_MAIN_QUEST_CONFIG_DRIVER = true;
 
 const YDGet = (globalThis as any).YDUserDataGet as ((t1: any, k1: any, k2: any, t2: any) => any) | undefined;
 const YDSet = (globalThis as any).YDUserDataSet as ((t1: any, k1: any, k2: any, t2: any, val: any) => void) | undefined;

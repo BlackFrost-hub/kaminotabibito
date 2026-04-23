@@ -79,7 +79,10 @@ function ____exports.isFdfFrameEnabled(self, frameName)
     end
     return false
 end
-function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback)
+function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, contextId)
+    if contextId == nil then
+        contextId = 0
+    end
     if not ____exports.isFdfFrameEnabled(nil, name) then
         return {
             frame = fallback(nil),
@@ -89,7 +92,7 @@ function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback)
     loadTocOnce(nil, TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI")
     local f = 0
     local ok = pcall(function ()
-            f = japi.DzCreateFrame(name, parent, 0)
+            f = japi.DzCreateFrame(name, parent, contextId)
         end
     )
     if ok and f ~= nil and f ~= 0 then
@@ -100,12 +103,16 @@ function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback)
         fromFdf = false
     }
 end
-function ____exports.tryCreateFromFdfOnly(self, name, parent)
+function ____exports.tryCreateFromFdfOnly(self, name, parent, contextId)
+    if contextId == nil then
+        contextId = 0
+    end
     local res = ____exports.tryCreateFromFdfWithSource(
         nil,
         name,
         parent,
-        function() return nil end
+        function() return nil end,
+        contextId
     )
     if res.fromFdf and res.frame and res.frame ~= 0 then
         return res.frame

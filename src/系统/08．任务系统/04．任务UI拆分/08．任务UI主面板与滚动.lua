@@ -56,6 +56,9 @@ function ____exports.buildTaskMainPanel(self, opts)
     local setScrollOffset = ____opts_0.setScrollOffset
     local isVisible = ____opts_0.isVisible
     local onScrollChanged = ____opts_0.onScrollChanged
+    local slotPid = ____opts_0.slotPid
+    local ctxId = slotPid or 0
+    local suf = "_s" .. tostring(ctxId)
     local empty = {
         mainPanel = nil,
         listContainer = nil,
@@ -70,7 +73,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbHitBtn = nil,
         vScrollTrack = nil
     }
-    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
+    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent, ctxId)
     if not mainPanel then
         return empty
     end
@@ -91,7 +94,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         setFramePosition(nil, mainPanel, {point = FramePoint.TOPLEFT, x = ENTRY_X + PANEL_REL_TO_ENTRY_X, y = ENTRY_Y + PANEL_REL_TO_ENTRY_Y})
     end
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
-    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
+    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel, ctxId)
     if listContainer then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(listContainer)
@@ -123,7 +126,8 @@ function ____exports.buildTaskMainPanel(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip
+        onShowTabTooltip = onShowTabTooltip,
+        slotPid = ctxId
     })
     local scrollBarFrame = nil
     local scrollThumbFrame = nil
@@ -137,7 +141,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             function()
                 local ____createFrame_result_1 = createFrame(nil, {
                     type = FrameType.BACKDROP,
-                    name = "TaskScrollBarBtn",
+                    name = "TaskScrollBarBtn" .. suf,
                     parent = mainPanel,
                     template = "template",
                     visible = true
@@ -147,7 +151,8 @@ function ____exports.buildTaskMainPanel(self, opts)
                 end
                 local f = ____createFrame_result_1
                 return f
-            end
+            end,
+            ctxId
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
@@ -182,7 +187,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         end
         local ____createFrame_result_2 = createFrame(nil, {
             type = FrameType.BACKDROP,
-            name = "TaskScrollThumbDyn",
+            name = "TaskScrollThumbDyn" .. suf,
             parent = mainPanel,
             template = "template",
             visible = true
@@ -207,7 +212,7 @@ function ____exports.buildTaskMainPanel(self, opts)
                 {
                     trackFrame = scrollBarFrame,
                     thumbFrame = scrollThumbFrame,
-                    hitButtonName = "TaskScrollThumbHit",
+                    hitButtonName = "TaskScrollThumbHit" .. suf,
                     listViewHeightNorm = LIST_VIEW_H,
                     trackHeightNorm = LIST_VIEW_H,
                     thumbSizeNorm = SCROLL_THUMB_SIZE,
