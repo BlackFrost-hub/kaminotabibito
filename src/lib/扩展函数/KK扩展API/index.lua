@@ -1,7 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local doodadApi = require("lib.扩展函数.KK扩展API.00．装饰物函数")
-local effectApi = require("lib.扩展函数.KK扩展API.01．特效函数")
 local eventApi = require("lib.扩展函数.KK扩展API.02．事件注册函数")
 local utilApi = require("lib.扩展函数.KK扩展API.03．工具函数")
 ____exports.DzDoodadCreate = doodadApi.DzDoodadCreate
@@ -24,9 +23,6 @@ ____exports.DzDoodadGetCurrentAnimationIndex = doodadApi.DzDoodadGetCurrentAnima
 ____exports.DzDoodadGetAnimationCount = doodadApi.DzDoodadGetAnimationCount
 ____exports.DzDoodadGetAnimationName = doodadApi.DzDoodadGetAnimationName
 ____exports.DzDoodadGetAnimationTime = doodadApi.DzDoodadGetAnimationTime
-____exports.DzBindEffect = effectApi.DzBindEffect
-____exports.DzUnbindEffect = effectApi.DzUnbindEffect
-____exports.DzSetEffectScale = effectApi.DzSetEffectScale
 ____exports.DzTriggerRegisterMouseEventTrg = eventApi.DzTriggerRegisterMouseEventTrg
 ____exports.DzTriggerRegisterKeyEventTrg = eventApi.DzTriggerRegisterKeyEventTrg
 ____exports.DzTriggerRegisterMouseMoveEventTrg = eventApi.DzTriggerRegisterMouseMoveEventTrg
@@ -72,9 +68,6 @@ function ____exports.registerBridge(self)
     expose(nil, "DzDoodadGetAnimationCount", doodadApi.DzDoodadGetAnimationCount)
     expose(nil, "DzDoodadGetAnimationName", doodadApi.DzDoodadGetAnimationName)
     expose(nil, "DzDoodadGetAnimationTime", doodadApi.DzDoodadGetAnimationTime)
-    expose(nil, "DzBindEffect", effectApi.DzBindEffect)
-    expose(nil, "DzUnbindEffect", effectApi.DzUnbindEffect)
-    expose(nil, "DzSetEffectScale", effectApi.DzSetEffectScale)
     expose(nil, "DzTriggerRegisterMouseEventTrg", eventApi.DzTriggerRegisterMouseEventTrg)
     expose(nil, "DzTriggerRegisterKeyEventTrg", eventApi.DzTriggerRegisterKeyEventTrg)
     expose(nil, "DzTriggerRegisterMouseMoveEventTrg", eventApi.DzTriggerRegisterMouseMoveEventTrg)

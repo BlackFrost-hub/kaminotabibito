@@ -1,8 +1,10 @@
-const japi = require("jass.japi") as any;
-
 /**
  * KK扩展API - 装饰物相关函数
+ *
+ * 注意：这些函数只有KK平台才有，其他平台（如YDWE、WE）不支持
  */
+
+const japi = require("jass.japi") as any;
 
 /**
  * 创建装饰物

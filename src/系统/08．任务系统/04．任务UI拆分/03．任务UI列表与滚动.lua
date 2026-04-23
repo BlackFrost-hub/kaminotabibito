@@ -138,6 +138,9 @@ end
 -- 仅当当前分类下没有任何任务行（空列表占位）时隐藏。
 function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames, hasQuestRows)
     local vis = hasQuestRows
+    if type(japi.DzFrameShow) ~= "function" then
+        return
+    end
     for ____, f in ipairs(frames) do
         if f and f ~= 0 then
             pcall(function () return japi.DzFrameShow(f, vis) end
@@ -157,7 +160,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue39
+                    goto __continue40
                 end
                 local expanded = isExpanded(nil, q.id)
                 local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
@@ -174,7 +177,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                 end
                 rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
-            ::__continue39::
+            ::__continue40::
             i = i + 1
         end
     end
@@ -245,11 +248,11 @@ function ____exports.refreshTaskUIList(self, opts)
             do
                 local row = visibleRows[i + 1]
                 if not row then
-                    goto __continue48
+                    goto __continue49
                 end
                 createListItem(nil, row.quest, row.rowTopRel, row.expanded)
             end
-            ::__continue48::
+            ::__continue49::
             i = i + 1
         end
     end

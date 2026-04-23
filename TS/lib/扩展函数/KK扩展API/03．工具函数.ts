@@ -1,8 +1,8 @@
-const japi = require("jass.japi") as any;
-
 /**
  * KK扩展API - 工具函数
  */
+
+const japi = require("jass.japi") as any;
 
 /**
  * 计算ARGB颜色值

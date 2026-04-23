@@ -8,7 +8,7 @@
  * - 英雄头像悬浮显示属性框
  *
  * 初始化：延迟INIT_DELAY_SECONDS秒启动
- * 刷新：每REFRESH_INTERVAL_SECONDS秒刷新伤害统计和属性文本
+ * 刷新：每 REFRESH_INTERVAL_SECONDS 无条件刷新（与 `属性查看.j` 一致：两处 CreateTimer 3.00 周期也是全局一直跑；本 TS 间隔见常量，非按 Tab 门控）
  */
 
 const jass = require("jass.common") as any;
@@ -18,6 +18,7 @@ const 硬件函数 = require("系统.00．核心系统.02．硬件函数") as {
 };
 const 中心计时器 = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (callback: () => void) => void;
+  offTick10ms: (callback: () => void) => void;
 };
 
 const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量定义") as {
@@ -50,13 +51,15 @@ let initialized = false;
 let startupScheduled = false;
 let startupAccumulator = 0;
 let refreshAccumulator = 0;
+/** 延迟启动用 tick，init 后注销，避免每 10ms 空转 */
+let startupTickHandler: (() => void) | null = null;
 
 /**
  * 统一刷新整套 UI 的动态内容。
  */
 function refreshAllUi(): void {
-  updateDamagePanel();
-  updateDetailPanels();
+   updateDamagePanel();
+   updateDetailPanels();
 }
 
 /**
@@ -87,10 +90,12 @@ function registerFocusHotkeys(): void {
   for (let i = 0; i < 常量.KEY_F.length; i++) {
     const functionKey = 常量.KEY_F[i];
     registerKey(常量.KEY_EVENT_UP, functionKey, () => {
+      const p = 硬件函数.getTriggerKeyPlayer();
+      if (p == null) return;
       const hero = focusHeroByFunctionKey(functionKey);
       if (hero == null) return;
-      const player = 硬件函数.getTriggerKeyPlayer() || jass.GetLocalPlayer();
-      Star扩展库.StarOther_PanCameraToTimedForPlayer(player, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
+      // 与 `属性查看.j` 一致：只按 DzGetTriggerKeyPlayer 平移镜头，勿用 GetLocalPlayer 兜底（会偏离按键所属玩家）。
+      Star扩展库.StarOther_PanCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
     });
   }
 }
@@ -110,12 +115,13 @@ function startRefreshLoop(): void {
 function scheduleUiStartup(): void {
   if (startupScheduled) return;
   startupScheduled = true;
-  中心计时器.onTick10ms(() => {
+  startupTickHandler = () => {
     if (initialized) return;
     startupAccumulator = startupAccumulator + 0.01;
     if (startupAccumulator + 0.0001 < 常量.INIT_DELAY_SECONDS) return;
     initUiAttributeSystem();
-  });
+  };
+  中心计时器.onTick10ms(startupTickHandler);
 }
 
 /**
@@ -124,6 +130,12 @@ function scheduleUiStartup(): void {
 export function initUiAttributeSystem(): void {
   if (!常量.UI_ATTRIBUTE_SYSTEM_ENABLED) return;
   if (initialized) return;
+
+  if (startupTickHandler != null) {
+    中心计时器.offTick10ms(startupTickHandler);
+    startupTickHandler = null;
+  }
+
   initialized = true;
 
   createUiFrames();

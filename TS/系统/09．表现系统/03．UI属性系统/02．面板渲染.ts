@@ -278,14 +278,12 @@ export function focusHeroByFunctionKey(functionKey: number): any {
 }
 
 /**
- * 刷新伤害统计面板。
- * 这里既更新伤害数字，也顺手刷新头像，避免玩家英雄替换后 UI 继续显示旧图标。
+ * 刷新伤害统计面板（仅三列数值文本）。
+ * 与 `属性查看.j` 周期回调一致：头像 `DzFrameSetTexture` 只在创建时设一次，定时器里不刷头像。
  */
 export function updateDamagePanel(): void {
   for (let i = 0; i < damageRows.length; i++) {
     const row = damageRows[i];
-    const hero = getPlayerHero(row.player);
-    if (row.icon !== 0) japi.DzFrameSetTexture(row.icon, getHeroIcon(hero), 0);
     const values = getDamageValues(row.player);
     for (let col = 0; col < row.values.length; col++) {
       const frame = row.values[col];
@@ -302,10 +300,7 @@ export function updateDamagePanel(): void {
 export function updateDetailPanels(): void {
   for (let i = 0; i < detailSlots.length; i++) {
     const slot = detailSlots[i];
-    slot.hero = getPlayerHero(slot.player);
-    if (slot.icon !== 0) japi.DzFrameSetTexture(slot.icon, getHeroIcon(slot.hero), 0);
     const texts = buildDetailTexts(slot.player);
-    // 映射：lines数组只包含非分隔符列（0,2,4列），需要跳过1,3列
     let lineIdx = 0;
     for (let textIndex = 0; textIndex < texts.length; textIndex++) {
       const isSeparatorCol = textIndex % 5 === 1 || textIndex % 5 === 3;

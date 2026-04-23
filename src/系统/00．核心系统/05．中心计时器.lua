@@ -404,13 +404,6 @@ function ____exports.initCenterTimer(self)
     _initialized = true
     local startTime = japi.DzAPI_Map_GetGameStartTime()
     _serverTime = startTime * 1000
-    jass.DisplayTimedTextToPlayer(
-        jass.GetLocalPlayer(),
-        0,
-        0,
-        10,
-        (("[中心计时器初始化] DzAPI: " .. tostring(startTime)) .. ", _serverTime = ") .. tostring(_serverTime)
-    )
     local dr = jassGlobals.udg_N
     if dr ~= nil then
         _gameDifficulty = math.max(

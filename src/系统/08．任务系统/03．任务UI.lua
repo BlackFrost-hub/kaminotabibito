@@ -59,6 +59,8 @@ local applyDzTextFontAndAlignment = ____03_FF0EUI_51FD_6570.applyDzTextFontAndAl
 local applyDzTextFontAndCenterAlignment = ____03_FF0EUI_51FD_6570.applyDzTextFontAndCenterAlignment
 local createTabLabelTextOnBackdrop = ____03_FF0EUI_51FD_6570.createTabLabelTextOnBackdrop
 local setupTransparentGlueHitLayer = ____03_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
+local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
+local ENABLE_TASK_UI_CLIENT = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_CLIENT
 --- 任务系统 - 全新任务 UI（魔兽原生风格）
 -- 层级：GameUI → TaskEntryIcon（绝对 ENTRY_X/Y）→ 点击；TaskMainPanel（TOPLEFT 相对入口 TOPLEFT：PANEL_REL_TO_ENTRY_*）→ 标签/滚动条/listContainer；
 -- listContainer 内：任务行/标题/目标/空列表（全部相对 listContainer，与装饰框对齐）。
@@ -97,6 +99,9 @@ function TaskUI.prototype.____constructor(self)
     self.rowIconByQuestId = __TS__New(Map)
 end
 function TaskUI.prototype.init(self)
+    if not ENABLE_TASK_UI_CLIENT then
+        return
+    end
     pcall(function ()
             local lp = jass.GetLocalPlayer()
             if lp == nil then
@@ -286,6 +291,9 @@ function TaskUI.prototype.hide(self)
     )
 end
 function TaskUI.prototype.registerHotkey(self)
+    if not ENABLE_TASK_UI_CLIENT then
+        return
+    end
     registerTaskUIHotkeys(
         nil,
         {
@@ -388,9 +396,15 @@ function TaskUI.prototype.getPanelControlContext(self)
 end
 ____exports.taskUI = __TS__New(TaskUI)
 function ____exports.init(self)
+    if not ENABLE_TASK_UI_CLIENT then
+        return
+    end
     ____exports.taskUI:init()
 end
 function ____exports.registerHotkey(self)
+    if not ENABLE_TASK_UI_CLIENT then
+        return
+    end
     ____exports.taskUI:registerHotkey()
 end
 return ____exports

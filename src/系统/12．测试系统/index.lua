@@ -4,7 +4,6 @@ local ____exports = {}
 -- 
 -- 通过开关控制是否加载各个测试模块。
 local ENABLE_MOVE_SPEED_TEST = true
-local ENABLE_DZ_FUNCTION_TEST = false
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_QUEST_TEST = false
@@ -15,9 +14,6 @@ local ENABLE_TEST_EVENT_2 = true
 local function loadTests(self)
     if ENABLE_MOVE_SPEED_TEST then
         require("系统.12．测试系统.移动速度突破测试")
-    end
-    if ENABLE_DZ_FUNCTION_TEST then
-        require("系统.12．测试系统.dz函数测试")
     end
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")

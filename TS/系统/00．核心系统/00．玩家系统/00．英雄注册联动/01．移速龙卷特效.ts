@@ -32,9 +32,6 @@ function createTornadoEffect(whichUnit: any): any {
 
 function destroyTornadoEffect(effect: any): void {
   if (!isValidHandle(effect)) return;
-  if (typeof japi.DzUnbindEffect === "function") {
-    japi.DzUnbindEffect(effect);
-  }
   jass.DestroyEffect(effect);
 }
 

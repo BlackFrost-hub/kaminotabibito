@@ -8,8 +8,6 @@ local withTimer = ____02_FF0E_8BA1_65F6_5668.withTimer
 -- 创建和管理特效
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
-local DzUnbindEffect = ____require_result_0.DzUnbindEffect
 --- 创建特效并在指定时间后自动销毁
 -- 
 -- @param modelPath 特效模型路径
@@ -59,7 +57,6 @@ local function destroyBoundEffect(self, effect)
     if not effect then
         return
     end
-    DzUnbindEffect(nil, effect)
     jass.DestroyEffect(effect)
 end
 --- 在单位上创建绑定特效

@@ -82,8 +82,9 @@ export function getDamageValues(player: any): number[] {
 }
 
 /**
- * 同步 JASS 原稿依赖的实时派生值。
- * 这里保留 0x25 / 0x51 的攻速算法，并把结果写回玩家属性表，供 UI 文本直接读取。
+ * 从英雄单位状态计算「每秒攻速」「移动速度」并写回玩家级 YDUserData。
+ * 与 `JASS/jass复制粘贴/属性查看.j` 的展示数据源一致：表由同步逻辑维护，UI 刷新前回写这两列便于全图读表一致。
+ * 注意：仅 Tab 显隐伤害面板、头像悬浮显隐属性框走本机 Frame（见面板里 DzFrameSetScriptByCode 异步位）。
  */
 export function updatePlayerRealtimeStats(player: any): void {
   const hero = getPlayerHero(player);
@@ -96,7 +97,6 @@ export function updatePlayerRealtimeStats(player: any): void {
   const oldAps = getPlayerAttr(player, "每秒攻速");
   const oldMoveSpeed = getPlayerAttr(player, "移动速度");
 
-  // 安全回退：底层状态异常（0/NaN）时，不覆盖已有有效值
   const attackIntervalSafe = baseInterval > 0 && speedScale > 0 ? baseInterval / speedScale : 0;
   const computedApsSafe = attackIntervalSafe > 0 ? 1 / attackIntervalSafe : 0;
   const attacksPerSecond = computedApsSafe > 0 ? computedApsSafe : oldAps;
@@ -111,13 +111,15 @@ export function updatePlayerRealtimeStats(player: any): void {
   }
 }
 
+/**
+ * 英雄头像贴图路径（物编 Art / uico）。
+ * 与 `属性查看.j` 一致：**仅在创建 Dz 头像时调用一次**；周期定时器只刷文字，不重复 `DzFrameSetTexture` 头像。
+ */
 export function getHeroIcon(hero: any): string {
   if (hero == null) return EMPTY_ICON;
   const typeId = jass.GetUnitTypeId(hero);
   if (typeId == null || typeId === 0) return EMPTY_ICON;
 
-  // 这里读取的是"单位类型"物编，不是单位实例。
-  // 源 JASS 使用 Art；若当前物编返回的不是贴图路径，则回退到单位图标字段。
   const art = getObjectProperty(ObjectType.UNIT, typeId, "Art");
   if (isTexturePath(art)) return art;
 

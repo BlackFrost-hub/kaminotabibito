@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local refreshAllUi, registerKey, registerDamagePanelHotkeys, registerFocusHotkeys, startRefreshLoop, jass, _____786C_4EF6_51FD_6570, _____4E2D_5FC3_8BA1_65F6_5668, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, showDamagePanel, updateDamagePanel, updateDetailPanels, ____Star_6269_5C55_5E93, initialized, refreshAccumulator
+local refreshAllUi, registerKey, registerDamagePanelHotkeys, registerFocusHotkeys, startRefreshLoop, jass, _____786C_4EF6_51FD_6570, _____4E2D_5FC3_8BA1_65F6_5668, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, showDamagePanel, updateDamagePanel, updateDetailPanels, ____Star_6269_5C55_5E93, initialized, refreshAccumulator, startupTickHandler
 function refreshAllUi()
     updateDamagePanel()
     updateDetailPanels()
@@ -39,13 +39,16 @@ function registerFocusHotkeys()
                 _____5E38_91CF.KEY_EVENT_UP,
                 functionKey,
                 function()
+                    local p = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer()
+                    if p == nil then
+                        return
+                    end
                     local hero = focusHeroByFunctionKey(functionKey)
                     if hero == nil then
                         return
                     end
-                    local player = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() or jass.GetLocalPlayer()
                     ____Star_6269_5C55_5E93:StarOther_PanCameraToTimedForPlayer(
-                        player,
+                        p,
                         jass.GetUnitX(hero),
                         jass.GetUnitY(hero),
                         0.05
@@ -74,6 +77,10 @@ function ____exports.initUiAttributeSystem()
     if initialized then
         return
     end
+    if startupTickHandler ~= nil then
+        _____4E2D_5FC3_8BA1_65F6_5668:offTick10ms(startupTickHandler)
+        startupTickHandler = nil
+    end
     initialized = true
     createUiFrames()
     refreshAllUi()
@@ -96,13 +103,14 @@ initialized = false
 local startupScheduled = false
 local startupAccumulator = 0
 refreshAccumulator = 0
+startupTickHandler = nil
 --- 独立安排 UI 启动时机。
 local function scheduleUiStartup()
     if startupScheduled then
         return
     end
     startupScheduled = true
-    _____4E2D_5FC3_8BA1_65F6_5668:onTick10ms(function()
+    startupTickHandler = function()
         if initialized then
             return
         end
@@ -111,7 +119,8 @@ local function scheduleUiStartup()
             return
         end
         ____exports.initUiAttributeSystem()
-    end)
+    end
+    _____4E2D_5FC3_8BA1_65F6_5668:onTick10ms(startupTickHandler)
 end
 function ____exports.isUiAttributeSystemEnabled()
     return _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED

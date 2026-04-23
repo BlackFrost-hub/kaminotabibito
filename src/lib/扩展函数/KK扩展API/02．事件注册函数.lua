@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- KK扩展API - 事件注册函数
+-- 
+-- 这些是对底层 DzAPI 的封装，简化事件注册流程
 local japi = require("jass.japi")
 --- 注册鼠标事件触发器
 -- 

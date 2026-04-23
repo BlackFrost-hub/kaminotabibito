@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- KK扩展API - 工具函数
 local japi = require("jass.japi")
 --- 计算ARGB颜色值
 -- 

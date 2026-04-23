@@ -5,7 +5,7 @@
 // ========== 子系统导出 ==========
 export * from "./01．UI工具/index";
 export * from "./02．对话框系统/index";
-export * from "./03．UI属性系统/index";
+// export * from "./03．UI属性系统/index";
 
 // ========== 核心模块导出 ==========
 export * from "./00．初始化UI";

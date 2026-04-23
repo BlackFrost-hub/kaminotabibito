@@ -1,12 +1,18 @@
 export const TASK_UI_TOC_PATHS = ["UI\\TaskUI.toc"];
 export const TASK_UI_TOC_LOAD_KEY = "TaskUI";
 
+/** 二分开关：关则任务UI客户端不初始化 */
+export const ENABLE_TASK_UI_CLIENT = true;
+
 export const ENABLE_FDF_A = true;
 export const ENABLE_FDF_B = true;
 export const ENABLE_FDF_SCROLLBAR = true;
-export const ENABLE_FDF_SCROLLBAR_BORDER = false;
-export const ENABLE_FDF_SCROLLBAR_THUMB = false;
+export const ENABLE_FDF_SCROLLBAR_BORDER = true;
+export const ENABLE_FDF_SCROLLBAR_THUMB = true;
 export const ENABLE_MOUSE_WHEEL_SCROLL = true;
+
+/** 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中（排除 VerticalScrollbarTrack 常驻逻辑） */
+export const ENABLE_TASK_UI_RIGHT_SCROLLBAR = true;
 
 export const ENTRY_W = 0.059 * 1.3;
 export const ENTRY_H = 0.0156 * 1.4;

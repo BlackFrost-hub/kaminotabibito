@@ -47,6 +47,7 @@ import type { QuestData, QuestObjective } from "./01．任务数据";
 import { questDB } from "./01．任务数据";
 import { questManager } from "./02．任务管理器/index";
 import { QUEST_STES_OBJECTIVE_ROWS, type QuestStesObjectiveRow } from "./05．任务STES配置表";
+import { ENABLE_QUEST_STES_OBJECTIVE_BRIDGE } from "./00．任务系统二分开关";
 
 /** 与地图 YDLocal5Set 对齐 */
 const YL_BOOL_USE_PRESET_PLAYER = "任务使用预设玩家编号";
@@ -201,4 +202,4 @@ function init(): void {
   }
 }
 
-init();
+if (ENABLE_QUEST_STES_OBJECTIVE_BRIDGE) init();

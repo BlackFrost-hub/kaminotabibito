@@ -5,7 +5,6 @@
  */
 
 const ENABLE_MOVE_SPEED_TEST = true;
-const ENABLE_DZ_FUNCTION_TEST = false;
 const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_QUEST_TEST = false;
@@ -17,10 +16,6 @@ const ENABLE_TEST_EVENT_2 = true;
 function loadTests(): void {
   if (ENABLE_MOVE_SPEED_TEST) {
     require("系统.12．测试系统.移动速度突破测试");
-  }
-
-  if (ENABLE_DZ_FUNCTION_TEST) {
-    require("系统.12．测试系统.dz函数测试");
   }
 
   if (ENABLE_STES_EVENT_TEST) {

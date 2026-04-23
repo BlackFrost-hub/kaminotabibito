@@ -350,7 +350,6 @@ export function initCenterTimer(): void {
 
   const startTime = japi.DzAPI_Map_GetGameStartTime();
   _serverTime = startTime * 1000;
-  jass.DisplayTimedTextToPlayer(jass.GetLocalPlayer(), 0, 0, 10, `[中心计时器初始化] DzAPI: ${startTime}, _serverTime = ${_serverTime}`);
 
   const dr = jassGlobals.udg_N as number | undefined;
   if (dr !== undefined) {

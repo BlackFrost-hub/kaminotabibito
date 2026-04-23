@@ -31,9 +31,6 @@ local function destroyTornadoEffect(self, effect)
     if not isValidHandle(nil, effect) then
         return
     end
-    if type(japi.DzUnbindEffect) == "function" then
-        japi.DzUnbindEffect(effect)
-    end
     jass.DestroyEffect(effect)
 end
 local function removeTrackedHero(self, heroId)
@@ -65,7 +62,7 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
         do
             if not isValidHandle(nil, hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
                 removeTrackedHero(nil, heroId)
-                goto __continue15
+                goto __continue14
             end
             local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
             local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
@@ -77,14 +74,14 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
                         tornadoEffects:set(heroId, effect)
                     end
                 end
-                goto __continue15
+                goto __continue14
             end
             if currentEffect ~= nil then
                 destroyTornadoEffect(nil, currentEffect)
                 tornadoEffects:delete(heroId)
             end
         end
-        ::__continue15::
+        ::__continue14::
     end
 end
 return ____exports

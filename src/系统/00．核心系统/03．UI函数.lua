@@ -123,15 +123,9 @@ function ____exports.applyDzTextFontAndAlignment(self, frame, textAlignment, fon
         return
     end
     local scale = fontScale ~= nil and fontScale ~= nil and fontScale or ____exports.DEFAULT_UI_FONT_SCALE
-    pcall(function ()
-            japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
-        end
-    )
-    pcall(function ()
-            japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
-            japi.DzFrameSetTextAlignment(frame, textAlignment)
-        end
-    )
+    japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
+    japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
+    japi.DzFrameSetTextAlignment(frame, textAlignment)
 end
 function ____exports.applyDzTextFontAndCenterAlignment(self, frame, fontScale, fontFile, fontFlag)
     if fontFile == nil then

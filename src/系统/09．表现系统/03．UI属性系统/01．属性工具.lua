@@ -100,8 +100,9 @@ function ____exports.getDamageValues(player)
     end
     return values
 end
---- 同步 JASS 原稿依赖的实时派生值。
--- 这里保留 0x25 / 0x51 的攻速算法，并把结果写回玩家属性表，供 UI 文本直接读取。
+--- 从英雄单位状态计算「每秒攻速」「移动速度」并写回玩家级 YDUserData。
+-- 与 `JASS/jass复制粘贴/属性查看.j` 的展示数据源一致：表由同步逻辑维护，UI 刷新前回写这两列便于全图读表一致。
+-- 注意：仅 Tab 显隐伤害面板、头像悬浮显隐属性框走本机 Frame（见面板里 DzFrameSetScriptByCode 异步位）。
 function ____exports.updatePlayerRealtimeStats(player)
     local hero = ____exports.getPlayerHero(player)
     if hero == nil then
@@ -145,6 +146,8 @@ function ____exports.updatePlayerRealtimeStats(player)
         )
     end
 end
+--- 英雄头像贴图路径（物编 Art / uico）。
+-- 与 `属性查看.j` 一致：**仅在创建 Dz 头像时调用一次**；周期定时器只刷文字，不重复 `DzFrameSetTexture` 头像。
 function ____exports.getHeroIcon(hero)
     if hero == nil then
         return EMPTY_ICON

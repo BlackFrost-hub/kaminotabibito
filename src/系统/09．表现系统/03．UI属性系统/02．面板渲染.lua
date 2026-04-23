@@ -1,21 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local japi, _____5E38_91CF, buildDetailTexts, formatInteger, getDamageValues, getHeroIcon, getPlayerHero, damageRows, detailSlots
---- 刷新伤害统计面板。
--- 这里既更新伤害数字，也顺手刷新头像，避免玩家英雄替换后 UI 继续显示旧图标。
+local japi, _____5E38_91CF, buildDetailTexts, formatInteger, getDamageValues, damageRows, detailSlots
+--- 刷新伤害统计面板（仅三列数值文本）。
+-- 与 `属性查看.j` 周期回调一致：头像 `DzFrameSetTexture` 只在创建时设一次，定时器里不刷头像。
 function ____exports.updateDamagePanel()
     do
         local i = 0
         while i < #damageRows do
             local row = damageRows[i + 1]
-            local hero = getPlayerHero(row.player)
-            if row.icon ~= 0 then
-                japi.DzFrameSetTexture(
-                    row.icon,
-                    getHeroIcon(hero),
-                    0
-                )
-            end
             local values = getDamageValues(row.player)
             do
                 local col = 0
@@ -23,14 +15,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue50
+                            goto __continue49
                         end
                         japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue50::
+                    ::__continue49::
                     col = col + 1
                 end
             end
@@ -45,14 +37,6 @@ function ____exports.updateDetailPanels()
         local i = 0
         while i < #detailSlots do
             local slot = detailSlots[i + 1]
-            slot.hero = getPlayerHero(slot.player)
-            if slot.icon ~= 0 then
-                japi.DzFrameSetTexture(
-                    slot.icon,
-                    getHeroIcon(slot.hero),
-                    0
-                )
-            end
             local texts = buildDetailTexts(slot.player)
             local lineIdx = 0
             do
@@ -80,8 +64,8 @@ buildDetailTexts = ____require_result_0.buildDetailTexts
 formatInteger = ____require_result_0.formatInteger
 getDamageValues = ____require_result_0.getDamageValues
 local getDisplayPlayers = ____require_result_0.getDisplayPlayers
-getHeroIcon = ____require_result_0.getHeroIcon
-getPlayerHero = ____require_result_0.getPlayerHero
+local getHeroIcon = ____require_result_0.getHeroIcon
+local getPlayerHero = ____require_result_0.getPlayerHero
 local damagePanel = 0
 damageRows = {}
 detailSlots = {}

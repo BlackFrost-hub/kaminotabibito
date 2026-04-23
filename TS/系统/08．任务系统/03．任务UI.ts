@@ -64,6 +64,7 @@ import {
   createTabLabelTextOnBackdrop,
   setupTransparentGlueHitLayer,
 } from "../00．核心系统/03．UI函数";
+import { ENABLE_TASK_UI_CLIENT } from "./04．任务UI拆分/01．任务UI常量";
 
 // （以上常量/辅助函数已拆分到 `04．任务UI拆分/*`）
 
@@ -103,6 +104,7 @@ private entryText: number | null = null;
   private rowIconByQuestId = new Map<string, number>();
 
   public init(): void {
+    if (!ENABLE_TASK_UI_CLIENT) return;
     (pcall as any)(() => {
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
@@ -246,6 +248,7 @@ private entryText: number | null = null;
   }
 
   public registerHotkey(): void {
+    if (!ENABLE_TASK_UI_CLIENT) return;
     registerTaskUIHotkeys({
       registerKeyDown,
       KEY,
@@ -355,9 +358,11 @@ private entryText: number | null = null;
 export const taskUI = new TaskUI();
 
 export function init(): void {
+  if (!ENABLE_TASK_UI_CLIENT) return;
   taskUI.init();
 }
 
 export function registerHotkey(): void {
+  if (!ENABLE_TASK_UI_CLIENT) return;
   taskUI.registerHotkey();
 }

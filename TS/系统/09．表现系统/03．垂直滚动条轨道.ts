@@ -26,7 +26,8 @@ export function getScrollbarThumbTravelNorm(
 /** 与 syncThumb 一致的轨道像素高度（Dz 竖向 0..0.6 对应 client 高度） */
 export function getScrollbarTrackThumbTravelPx(travelNorm: number): number {
   const ch = (japi as any).DzGetClientHeight();
-  return Math.max(1, (ch * travelNorm) / 0.6);
+  const clientH = typeof ch === "number" && ch > 0 ? ch : getWindowHeight() || 600;
+  return Math.max(1, (clientH * travelNorm) / 0.6);
 }
 
 /** 与 war3map.j DzTriggerRegisterMouseEventTrg 一致：左键按下 (1,1)、释放 (1,0) */
@@ -84,6 +85,7 @@ export class VerticalScrollbarTrack {
   /** 创建命中按钮并加入全局分发（同一地图可多实例） */
   attach(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp != null) {
         if (!this.opt.thumbFrame || this.opt.thumbFrame === 0) return;
@@ -100,54 +102,65 @@ export class VerticalScrollbarTrack {
           this.hitBtn = null;
           return;
         }
-        (japi as any).DzFrameSetAllPoints(this.hitBtn, this.opt.thumbFrame);
-        (japi as any).DzFrameSetLevel(this.hitBtn, 121);
+        if (typeof (japi as any).DzFrameSetAllPoints === "function") {
+          (japi as any).DzFrameSetAllPoints(this.hitBtn, this.opt.thumbFrame);
+        }
+        if (typeof (japi as any).DzFrameSetLevel === "function") {
+          (japi as any).DzFrameSetLevel(this.hitBtn, 121);
+        }
 
         /** 帧上直接按下：避免仅依赖全局 MOUSE_DOWN + DzGetMouseFocus 时 focus 未落到透明 GLUETEXTBUTTON 导致无法 startDrag */
         frameSetScriptByCode(this.hitBtn, EventType.MOUSE_DOWN, () => this.forceBeginDragFromHit(), false);
         frameSetScriptByCode(this.hitBtn, EventType.MOUSE_CLICK, () => this.forceBeginDragFromHit(), false);
         frameSetScriptByCode(this.hitBtn, EventType.MOUSE_UP, () => this.endDrag(), false);
 
-        this.mouseDownTrigger = jass.CreateTrigger();
-        (japi as any).DzTriggerRegisterMouseEventByCode(this.mouseDownTrigger, MOUSE_BTN_LEFT, MOUSE_STATUS_PRESS, false, () => {
-          (pcall as any)(() => {
-            const lp2 = jass.GetLocalPlayer();
-            if (lp2 == null) return;
-            if (!this.opt.isInteractionEnabled() || !this.hitBtn) return;
-            const maxScroll = this.getMaxScroll();
-            if (maxScroll <= 0) return;
-            if (this.dragging) return;
-            const focus = getMouseFocus();
-            if (this.isFocusOnThisTrack(focus)) this.startDrag();
+        if (typeof jass.CreateTrigger === "function" && typeof (japi as any).DzTriggerRegisterMouseEventByCode === "function") {
+          this.mouseDownTrigger = jass.CreateTrigger();
+          if (!this.mouseDownTrigger) return;
+          (japi as any).DzTriggerRegisterMouseEventByCode(this.mouseDownTrigger, MOUSE_BTN_LEFT, MOUSE_STATUS_PRESS, false, () => {
+            (pcall as any)(() => {
+              const lp2 = jass.GetLocalPlayer();
+              if (lp2 == null) return;
+              if (!this.opt.isInteractionEnabled() || !this.hitBtn) return;
+              const maxScroll = this.getMaxScroll();
+              if (maxScroll <= 0) return;
+              if (this.dragging) return;
+              const focus = getMouseFocus();
+              if (this.isFocusOnThisTrack(focus)) this.startDrag();
+            });
           });
-        });
 
-        this.mouseUpTrigger = jass.CreateTrigger();
-        (japi as any).DzTriggerRegisterMouseEventByCode(this.mouseUpTrigger, MOUSE_BTN_LEFT, MOUSE_STATUS_RELEASE, false, () => {
-          (pcall as any)(() => {
-            const lp2 = jass.GetLocalPlayer();
-            if (lp2 == null) return;
-            this.endDrag();
+          this.mouseUpTrigger = jass.CreateTrigger();
+          if (!this.mouseUpTrigger) return;
+          (japi as any).DzTriggerRegisterMouseEventByCode(this.mouseUpTrigger, MOUSE_BTN_LEFT, MOUSE_STATUS_RELEASE, false, () => {
+            (pcall as any)(() => {
+              const lp2 = jass.GetLocalPlayer();
+              if (lp2 == null) return;
+              this.endDrag();
+            });
           });
-        });
+        }
       }
     });
 
     (pcall as any)(() => {
       this.stopDragTimer();
+      if (typeof (jass as any).CreateTimer !== "function" || typeof (jass as any).TimerStart !== "function") return;
       this.dragTimer = (jass as any).CreateTimer();
+      if (!this.dragTimer) return;
       (jass as any).TimerStart(this.dragTimer, this.dragTick, true, () => this.onDragTick());
     });
   }
 
   destroy(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp != null) {
-        if (this.mouseDownTrigger) {
+        if (this.mouseDownTrigger && typeof jass.DestroyTrigger === "function") {
           jass.DestroyTrigger(this.mouseDownTrigger);
         }
-        if (this.mouseUpTrigger) {
+        if (this.mouseUpTrigger && typeof jass.DestroyTrigger === "function") {
           jass.DestroyTrigger(this.mouseUpTrigger);
         }
       }
@@ -197,6 +210,7 @@ export class VerticalScrollbarTrack {
   /** 透明命中键回调：不依赖 getMouseFocus，与 tryBeginDrag 条件一致 */
   private forceBeginDragFromHit(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -210,6 +224,7 @@ export class VerticalScrollbarTrack {
 
   private startDrag(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -223,13 +238,14 @@ export class VerticalScrollbarTrack {
 
   private stopDragTimer(): void {
     if (this.dragTimer === null) return;
-    (jass as any).PauseTimer(this.dragTimer);
-    (jass as any).DestroyTimer(this.dragTimer);
+    if (typeof (jass as any).PauseTimer === "function") (jass as any).PauseTimer(this.dragTimer);
+    if (typeof (jass as any).DestroyTimer === "function") (jass as any).DestroyTimer(this.dragTimer);
     this.dragTimer = null;
   }
 
   private onDragTick(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -259,6 +275,7 @@ export class VerticalScrollbarTrack {
 
   private endDrag(): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -270,6 +287,7 @@ export class VerticalScrollbarTrack {
   /** 根据 scrollOffset / maxScroll 设置 thumb 相对轨道位置 */
   syncThumbVisual(maxScroll: number): void {
     (pcall as any)(() => {
+      if (typeof jass.GetLocalPlayer !== "function") return;
       const lp = jass.GetLocalPlayer();
       if (lp == null) return;
 
@@ -278,9 +296,11 @@ export class VerticalScrollbarTrack {
       if (!this.opt.trackFrame || this.opt.trackFrame === 0) return;
 
       const tf = this.opt.thumbFrame;
-      (japi as any).DzFrameShow(tf, true);
-      (japi as any).DzFrameSetLevel(tf, 120);
-      (japi as any).DzFrameSetSize(tf, this.opt.thumbSizeNorm, this.opt.thumbSizeNorm);
+      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(tf, true);
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tf, 120);
+      if (typeof (japi as any).DzFrameSetSize === "function") {
+        (japi as any).DzFrameSetSize(tf, this.opt.thumbSizeNorm, this.opt.thumbSizeNorm);
+      }
 
       const safeRange = getScrollbarThumbTravelNorm(
         this.trackH(),
@@ -293,7 +313,9 @@ export class VerticalScrollbarTrack {
         (0.5 - progress) * safeRange +
         (this.opt.topCompensation - this.opt.bottomCompensation) * 0.5;
 
-      (japi as any).DzFrameClearAllPoints(tf);
+      if (typeof (japi as any).DzFrameClearAllPoints === "function") {
+        (japi as any).DzFrameClearAllPoints(tf);
+      }
       setFramePointRelative(tf, FramePoint.CENTER, this.opt.trackFrame, FramePoint.CENTER, 0, yOffset);
     });
   }

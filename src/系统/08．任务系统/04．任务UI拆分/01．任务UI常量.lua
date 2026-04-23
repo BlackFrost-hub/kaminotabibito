@@ -2,12 +2,16 @@
 local ____exports = {}
 ____exports.TASK_UI_TOC_PATHS = {"UI\\TaskUI.toc"}
 ____exports.TASK_UI_TOC_LOAD_KEY = "TaskUI"
+--- 二分开关：关则任务UI客户端不初始化
+____exports.ENABLE_TASK_UI_CLIENT = true
 ____exports.ENABLE_FDF_A = true
 ____exports.ENABLE_FDF_B = true
 ____exports.ENABLE_FDF_SCROLLBAR = true
-____exports.ENABLE_FDF_SCROLLBAR_BORDER = false
-____exports.ENABLE_FDF_SCROLLBAR_THUMB = false
+____exports.ENABLE_FDF_SCROLLBAR_BORDER = true
+____exports.ENABLE_FDF_SCROLLBAR_THUMB = true
 ____exports.ENABLE_MOUSE_WHEEL_SCROLL = true
+--- 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中（排除 VerticalScrollbarTrack 常驻逻辑）
+____exports.ENABLE_TASK_UI_RIGHT_SCROLLBAR = true
 ____exports.ENTRY_W = 0.059 * 1.3
 ____exports.ENTRY_H = 0.0156 * 1.4
 ____exports.ENTRY_X = 0.005

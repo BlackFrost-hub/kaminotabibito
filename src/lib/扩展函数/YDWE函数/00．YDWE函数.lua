@@ -256,6 +256,8 @@ local typeNames = {
 -- @param objectType 物体类型（0-6），使用 ObjectType 常量
 -- @param objectId 物体ID，传字符串四字码（如 'Hamg'）或 FourCC 整数
 -- @param property 属性名（如 "Name", "Primary"）
+-- 
+-- 实现为 `EXExecuteScript`：在引擎内**同步**求值，不是异步回调；但不宜在联机「每 10ms/高频计时器」里对大量单位反复调用，应在业务侧缓存。
 function ____exports.getObjectProperty(self, objectType, objectId, property)
     if type(objectId) == "number" then
         local script = (((("(require'jass.slk')." .. typeNames[objectType + 1]) .. "[") .. tostring(objectId)) .. "].") .. property

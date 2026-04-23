@@ -20,6 +20,7 @@ local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_T
 local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
 local THUMB_DRAG_TICK = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_TICK
 local THUMB_DRAG_SENSITIVITY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_SENSITIVITY
+local ENABLE_TASK_UI_RIGHT_SCROLLBAR = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_RIGHT_SCROLLBAR
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local tryCreateFromFdfWithSource = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfWithSource
@@ -124,128 +125,119 @@ function ____exports.buildTaskMainPanel(self, opts)
         onSwitchCategory = onSwitchCategory,
         onShowTabTooltip = onShowTabTooltip
     })
-    local sbSrc = tryCreateFromFdfWithSource(
-        nil,
-        "TaskScrollBar",
-        mainPanel,
-        function()
-            local ____createFrame_result_1 = createFrame(nil, {
-                type = FrameType.BACKDROP,
-                name = "TaskScrollBarBtn",
-                parent = mainPanel,
-                template = "template",
-                visible = true
-            })
-            if ____createFrame_result_1 == nil then
-                ____createFrame_result_1 = 0
-            end
-            local f = ____createFrame_result_1
-            return f
-        end
-    )
-    local scrollBarFrame = sbSrc.frame
-    if scrollBarFrame and scrollBarFrame ~= 0 then
-        if type(japi.DzFrameShow) == "function" then
-            japi.DzFrameShow(scrollBarFrame, true)
-        end
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(scrollBarFrame)
-        end
-        setFramePointRelative(
-            nil,
-            scrollBarFrame,
-            FramePoint.TOPRIGHT,
-            mainPanel,
-            FramePoint.TOPRIGHT,
-            SCROLLBAR_REL_X,
-            -SCROLLBAR_TOP_INSET
-        )
-        setFramePointRelative(
-            nil,
-            scrollBarFrame,
-            FramePoint.BOTTOMRIGHT,
-            mainPanel,
-            FramePoint.BOTTOMRIGHT,
-            SCROLLBAR_REL_X,
-            SCROLLBAR_BOTTOM_INSET
-        )
-        setFrameSize(nil, scrollBarFrame, {width = SCROLLBAR_W, height = LIST_VIEW_H})
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(scrollBarFrame, 30)
-        end
-    end
-    local ____createFrame_result_2 = createFrame(nil, {
-        type = FrameType.BACKDROP,
-        name = "TaskScrollThumbDyn",
-        parent = mainPanel,
-        template = "template",
-        visible = true
-    })
-    if ____createFrame_result_2 == nil then
-        ____createFrame_result_2 = 0
-    end
-    local scrollThumbFrame = ____createFrame_result_2
-    if scrollThumbFrame and scrollThumbFrame ~= 0 then
-        setFrameTexture(nil, scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp")
-        setFrameSize(nil, scrollThumbFrame, {width = SCROLL_THUMB_SIZE, height = SCROLL_THUMB_SIZE})
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(scrollThumbFrame, 120)
-        end
-        if type(japi.DzFrameShow) == "function" then
-            japi.DzFrameShow(scrollThumbFrame, true)
-        end
-    end
+    local scrollBarFrame = nil
+    local scrollThumbFrame = nil
     local vScrollTrack = nil
     local scrollThumbHitBtn = nil
-    if scrollThumbFrame and scrollThumbFrame ~= 0 and scrollBarFrame and scrollBarFrame ~= 0 then
-        vScrollTrack = __TS__New(
-            VerticalScrollbarTrack,
-            {
-                trackFrame = scrollBarFrame,
-                thumbFrame = scrollThumbFrame,
-                hitButtonName = "TaskScrollThumbHit",
-                listViewHeightNorm = LIST_VIEW_H,
-                trackHeightNorm = LIST_VIEW_H,
-                thumbSizeNorm = SCROLL_THUMB_SIZE,
-                topCompensation = SCROLL_THUMB_TOP_COMPENSATION,
-                bottomCompensation = SCROLL_THUMB_BOTTOM_COMPENSATION,
-                dragTick = THUMB_DRAG_TICK,
-                sensitivity = THUMB_DRAG_SENSITIVITY,
-                getTotalContentHeight = getTotalContentHeight,
-                getScrollOffset = getScrollOffset,
-                setScrollOffset = setScrollOffset,
-                isInteractionEnabled = isVisible,
-                onScrollChanged = onScrollChanged,
-                skipManualThumbSync = function() return false end
-            }
+    if ENABLE_TASK_UI_RIGHT_SCROLLBAR then
+        local sbSrc = tryCreateFromFdfWithSource(
+            nil,
+            "TaskScrollBar",
+            mainPanel,
+            function()
+                local ____createFrame_result_1 = createFrame(nil, {
+                    type = FrameType.BACKDROP,
+                    name = "TaskScrollBarBtn",
+                    parent = mainPanel,
+                    template = "template",
+                    visible = true
+                })
+                if ____createFrame_result_1 == nil then
+                    ____createFrame_result_1 = 0
+                end
+                local f = ____createFrame_result_1
+                return f
+            end
         )
-        vScrollTrack:attach()
-        scrollThumbHitBtn = vScrollTrack:getHitButtonFrame()
-    end
-    local ____mainPanel_4 = mainPanel
-    local ____listContainer_5 = listContainer
-    local ____tabs_tabMainBg_6 = tabs.tabMainBg
-    local ____tabs_tabMain_7 = tabs.tabMain
-    local ____tabs_tabSideBg_8 = tabs.tabSideBg
-    local ____tabs_tabSide_9 = tabs.tabSide
-    local ____tabs_tabDailyBg_10 = tabs.tabDailyBg
-    local ____tabs_tabDaily_11 = tabs.tabDaily
-    local ____temp_12 = scrollBarFrame or nil
-    local ____scrollThumbFrame_3 = scrollThumbFrame
-    if ____scrollThumbFrame_3 == nil then
-        ____scrollThumbFrame_3 = nil
+        scrollBarFrame = sbSrc.frame
+        if scrollBarFrame and scrollBarFrame ~= 0 then
+            if type(japi.DzFrameShow) == "function" then
+                japi.DzFrameShow(scrollBarFrame, true)
+            end
+            if type(japi.DzFrameClearAllPoints) == "function" then
+                japi.DzFrameClearAllPoints(scrollBarFrame)
+            end
+            setFramePointRelative(
+                nil,
+                scrollBarFrame,
+                FramePoint.TOPRIGHT,
+                mainPanel,
+                FramePoint.TOPRIGHT,
+                SCROLLBAR_REL_X,
+                -SCROLLBAR_TOP_INSET
+            )
+            setFramePointRelative(
+                nil,
+                scrollBarFrame,
+                FramePoint.BOTTOMRIGHT,
+                mainPanel,
+                FramePoint.BOTTOMRIGHT,
+                SCROLLBAR_REL_X,
+                SCROLLBAR_BOTTOM_INSET
+            )
+            setFrameSize(nil, scrollBarFrame, {width = SCROLLBAR_W, height = LIST_VIEW_H})
+            if type(japi.DzFrameSetLevel) == "function" then
+                japi.DzFrameSetLevel(scrollBarFrame, 30)
+            end
+        end
+        local ____createFrame_result_2 = createFrame(nil, {
+            type = FrameType.BACKDROP,
+            name = "TaskScrollThumbDyn",
+            parent = mainPanel,
+            template = "template",
+            visible = true
+        })
+        if ____createFrame_result_2 == nil then
+            ____createFrame_result_2 = 0
+        end
+        scrollThumbFrame = ____createFrame_result_2
+        if scrollThumbFrame and scrollThumbFrame ~= 0 then
+            setFrameTexture(nil, scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp")
+            setFrameSize(nil, scrollThumbFrame, {width = SCROLL_THUMB_SIZE, height = SCROLL_THUMB_SIZE})
+            if type(japi.DzFrameSetLevel) == "function" then
+                japi.DzFrameSetLevel(scrollThumbFrame, 120)
+            end
+            if type(japi.DzFrameShow) == "function" then
+                japi.DzFrameShow(scrollThumbFrame, true)
+            end
+        end
+        if scrollThumbFrame and scrollThumbFrame ~= 0 and scrollBarFrame and scrollBarFrame ~= 0 then
+            vScrollTrack = __TS__New(
+                VerticalScrollbarTrack,
+                {
+                    trackFrame = scrollBarFrame,
+                    thumbFrame = scrollThumbFrame,
+                    hitButtonName = "TaskScrollThumbHit",
+                    listViewHeightNorm = LIST_VIEW_H,
+                    trackHeightNorm = LIST_VIEW_H,
+                    thumbSizeNorm = SCROLL_THUMB_SIZE,
+                    topCompensation = SCROLL_THUMB_TOP_COMPENSATION,
+                    bottomCompensation = SCROLL_THUMB_BOTTOM_COMPENSATION,
+                    dragTick = THUMB_DRAG_TICK,
+                    sensitivity = THUMB_DRAG_SENSITIVITY,
+                    getTotalContentHeight = getTotalContentHeight,
+                    getScrollOffset = getScrollOffset,
+                    setScrollOffset = setScrollOffset,
+                    isInteractionEnabled = isVisible,
+                    onScrollChanged = onScrollChanged,
+                    skipManualThumbSync = function() return false end
+                }
+            )
+            vScrollTrack:attach()
+            scrollThumbHitBtn = vScrollTrack:getHitButtonFrame()
+        end
     end
     return {
-        mainPanel = ____mainPanel_4,
-        listContainer = ____listContainer_5,
-        tabMainBg = ____tabs_tabMainBg_6,
-        tabMain = ____tabs_tabMain_7,
-        tabSideBg = ____tabs_tabSideBg_8,
-        tabSide = ____tabs_tabSide_9,
-        tabDailyBg = ____tabs_tabDailyBg_10,
-        tabDaily = ____tabs_tabDaily_11,
-        scrollBarFrame = ____temp_12,
-        scrollThumbFrame = ____scrollThumbFrame_3,
+        mainPanel = mainPanel,
+        listContainer = listContainer,
+        tabMainBg = tabs.tabMainBg,
+        tabMain = tabs.tabMain,
+        tabSideBg = tabs.tabSideBg,
+        tabSide = tabs.tabSide,
+        tabDailyBg = tabs.tabDailyBg,
+        tabDaily = tabs.tabDaily,
+        scrollBarFrame = scrollBarFrame or nil,
+        scrollThumbFrame = scrollThumbFrame or nil,
         scrollThumbHitBtn = scrollThumbHitBtn,
         vScrollTrack = vScrollTrack
     }

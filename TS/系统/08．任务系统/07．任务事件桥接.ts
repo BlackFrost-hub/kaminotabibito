@@ -4,6 +4,7 @@
 
 import { handleQuestAccepted, handleQuestCompleted } from "./02．任务管理器/index";
 import { registerSimpleSTESBridgeEvent } from "./06．任务STES桥接";
+import { ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE } from "./00．任务系统二分开关";
 
 function init(): void {
   registerSimpleSTESBridgeEvent(
@@ -18,5 +19,5 @@ function init(): void {
   );
 }
 
-init();
+if (ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE) init();
 export {};

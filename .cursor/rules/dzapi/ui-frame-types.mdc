@@ -210,6 +210,13 @@ function startRefreshTimer(): void {
 3. **计时器必须在所有玩家上启动！但回调内部用 `GetLocalPlayer()` 隔离 UI 操作！**
 4. 如果有定时器在定期刷新 UI，**直接在定时器里查询选择状态**即可，不需要选择事件触发器（这个可以优化）
 5. 在魔兽地图中，任何可能在不同玩家产生不同执行次数/结果的代码，都必须用 GetLocalPlayer() 隔离 UI 操作，或者直接用定时器轮询替代事件触发
+
+### 物编 `EXExecuteScript` 与英雄头像（联机实测）
+
+- `getObjectProperty` → **`EXExecuteScript` 同步**，不是异步；但**勿**在「全房 `中心计时器` 周期 + 多玩家」里高频反复调（易掉线/不同步）；周期 UI 刷新里去掉 `getHeroIcon` 一类物编读即可验证。
+- 英雄头像 **`DzFrameSetTexture`**：**仅在建帧时设一次**；周期回调只刷 **`DzFrameSetText`** 等文字，周期里**不再** `getHeroIcon` / `getObjectProperty`。
+- 换型/换英雄要改头像：在**业务事件**里对该槽**单次**改纹理，**勿**把物编读挂回高频 tick。
+
 ### 简单版：
 ## 异步掉线（Desync）避坑
 

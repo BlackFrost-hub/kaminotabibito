@@ -1,5 +1,4 @@
 const doodadApi: any = require("lib.扩展函数.KK扩展API.00．装饰物函数");
-const effectApi: any = require("lib.扩展函数.KK扩展API.01．特效函数");
 const eventApi: any = require("lib.扩展函数.KK扩展API.02．事件注册函数");
 const utilApi: any = require("lib.扩展函数.KK扩展API.03．工具函数");
 
@@ -23,10 +22,6 @@ export const DzDoodadGetCurrentAnimationIndex: (doodad: number) => number = dood
 export const DzDoodadGetAnimationCount: (doodad: number) => number = doodadApi.DzDoodadGetAnimationCount;
 export const DzDoodadGetAnimationName: (doodad: number, index: number) => string = doodadApi.DzDoodadGetAnimationName;
 export const DzDoodadGetAnimationTime: (doodad: number, index: number) => number = doodadApi.DzDoodadGetAnimationTime;
-
-export const DzBindEffect: (parent: any, attachPoint: string, whichEffect: any) => boolean = effectApi.DzBindEffect;
-export const DzUnbindEffect: (whichEffect: any) => boolean = effectApi.DzUnbindEffect;
-export const DzSetEffectScale: (whichEffect: any, scale: number) => boolean = effectApi.DzSetEffectScale;
 
 export const DzTriggerRegisterMouseEventTrg: (trg: any, status: number, btn: number) => void = eventApi.DzTriggerRegisterMouseEventTrg;
 export const DzTriggerRegisterKeyEventTrg: (trg: any, status: number, btn: number | string) => void = eventApi.DzTriggerRegisterKeyEventTrg;
@@ -72,10 +67,6 @@ export function registerBridge(): void {
   expose("DzDoodadGetAnimationCount", doodadApi.DzDoodadGetAnimationCount);
   expose("DzDoodadGetAnimationName", doodadApi.DzDoodadGetAnimationName);
   expose("DzDoodadGetAnimationTime", doodadApi.DzDoodadGetAnimationTime);
-
-  expose("DzBindEffect", effectApi.DzBindEffect);
-  expose("DzUnbindEffect", effectApi.DzUnbindEffect);
-  expose("DzSetEffectScale", effectApi.DzSetEffectScale);
 
   expose("DzTriggerRegisterMouseEventTrg", eventApi.DzTriggerRegisterMouseEventTrg);
   expose("DzTriggerRegisterKeyEventTrg", eventApi.DzTriggerRegisterKeyEventTrg);

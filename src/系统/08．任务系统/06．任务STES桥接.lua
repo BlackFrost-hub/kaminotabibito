@@ -6,6 +6,8 @@ local ____index = require("系统.08．任务系统.02．任务管理器.index")
 local questManager = ____index.questManager
 local ____05_FF0E_4EFB_52A1STES_914D_7F6E_8868 = require("系统.08．任务系统.05．任务STES配置表")
 local QUEST_STES_OBJECTIVE_ROWS = ____05_FF0E_4EFB_52A1STES_914D_7F6E_8868.QUEST_STES_OBJECTIVE_ROWS
+local ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173 = require("系统.08．任务系统.00．任务系统二分开关")
+local ENABLE_QUEST_STES_OBJECTIVE_BRIDGE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_STES_OBJECTIVE_BRIDGE
 --- 任务系统 — STES 多事件注册与回调（配置见 `05．任务STES配置表.ts`）
 -- 
 -- =============================================================================
@@ -208,5 +210,7 @@ local function init(self)
         ::__continue37::
     end
 end
-init(nil)
+if ENABLE_QUEST_STES_OBJECTIVE_BRIDGE then
+    init(nil)
+end
 return ____exports

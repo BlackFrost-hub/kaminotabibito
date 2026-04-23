@@ -19,6 +19,7 @@ const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展�
 };
 
 import { handleObjectiveUpdated } from "./02．任务管理器/index";
+import { ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT } from "./00．任务系统二分开关";
 
 function debugPrint(msg: string): void {
   // debugPrint 暂时静音：只用于开发阶段
@@ -45,5 +46,5 @@ function init(): void {
   registerObjectiveUpdateEvent();
 }
 
-init();
+if (ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT) init();
 export {};

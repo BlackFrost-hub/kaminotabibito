@@ -7,7 +7,6 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { withTimer } from "./02．计时器";
-const { DzUnbindEffect } = require("lib.扩展函数.KK扩展API.index") as { DzUnbindEffect: (whichEffect: any) => boolean };
 
 /**
  * 创建特效并在指定时间后自动销毁
@@ -53,7 +52,6 @@ function getUnitEffectKey(unit: any, effectKey: string): string {
 
 function destroyBoundEffect(effect: any): void {
   if (!effect) return;
-  DzUnbindEffect(effect);
   jass.DestroyEffect(effect);
 }
 

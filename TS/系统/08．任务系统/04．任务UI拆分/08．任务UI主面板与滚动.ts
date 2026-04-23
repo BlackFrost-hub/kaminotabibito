@@ -27,6 +27,7 @@ import {
   SCROLL_THUMB_BOTTOM_COMPENSATION,
   THUMB_DRAG_TICK,
   THUMB_DRAG_SENSITIVITY,
+  ENABLE_TASK_UI_RIGHT_SCROLLBAR,
 } from "./01．任务UI常量";
 import { QuestType } from "../01．任务数据";
 import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource } from "./02．任务UI辅助";
@@ -169,69 +170,74 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onShowTabTooltip,
   });
 
-  // 轨道：优先 TOC/FDF，失败则用代码创建窄条 BACKDROP
-  const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", mainPanel, () => {
-    // BACKDROP 只承担视觉轨道；不要把它当原生 Slider 用，数值滚动交给 VerticalScrollbarTrack。
-    const f =
+  let scrollBarFrame: number | null = null;
+  let scrollThumbFrame: number | null = null;
+  let vScrollTrack: VerticalScrollbarTrack | null = null;
+  let scrollThumbHitBtn: number | null = null;
+
+  if (ENABLE_TASK_UI_RIGHT_SCROLLBAR) {
+    // 轨道：优先 TOC/FDF，失败则用代码创建窄条 BACKDROP
+    const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", mainPanel, () => {
+      // BACKDROP 只承担视觉轨道；不要把它当原生 Slider 用，数值滚动交给 VerticalScrollbarTrack。
+      const f =
+        createFrame({
+          type: FrameType.BACKDROP,
+          name: "TaskScrollBarBtn",
+          parent: mainPanel,
+          template: "template",
+          visible: true,
+        }) ?? 0;
+      return f;
+    });
+    scrollBarFrame = sbSrc.frame;
+    if (scrollBarFrame && scrollBarFrame !== 0) {
+      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
+      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(scrollBarFrame);
+      setFramePointRelative(scrollBarFrame, FramePoint.TOPRIGHT, mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
+      setFramePointRelative(scrollBarFrame, FramePoint.BOTTOMRIGHT, mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
+      setFrameSize(scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollBarFrame, 30);
+    }
+
+    scrollThumbFrame =
       createFrame({
         type: FrameType.BACKDROP,
-        name: "TaskScrollBarBtn",
+        name: "TaskScrollThumbDyn",
         parent: mainPanel,
         template: "template",
         visible: true,
       }) ?? 0;
-    return f;
-  });
-  const scrollBarFrame = sbSrc.frame;
-  if (scrollBarFrame && scrollBarFrame !== 0) {
-    if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
-    if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(scrollBarFrame);
-    setFramePointRelative(scrollBarFrame, FramePoint.TOPRIGHT, mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
-    setFramePointRelative(scrollBarFrame, FramePoint.BOTTOMRIGHT, mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
-    setFrameSize(scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollBarFrame, 30);
-  }
+    if (scrollThumbFrame && scrollThumbFrame !== 0) {
+      setFrameTexture(scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
+      setFrameSize(scrollThumbFrame, { width: SCROLL_THUMB_SIZE, height: SCROLL_THUMB_SIZE });
+      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
+      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
+    }
 
-  const scrollThumbFrame =
-    createFrame({
-      type: FrameType.BACKDROP,
-      name: "TaskScrollThumbDyn",
-      parent: mainPanel,
-      template: "template",
-      visible: true,
-    }) ?? 0;
-  if (scrollThumbFrame && scrollThumbFrame !== 0) {
-    setFrameTexture(scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
-    setFrameSize(scrollThumbFrame, { width: SCROLL_THUMB_SIZE, height: SCROLL_THUMB_SIZE });
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
-    if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
-  }
-
-  let vScrollTrack: VerticalScrollbarTrack | null = null;
-  let scrollThumbHitBtn: number | null = null;
-  if (scrollThumbFrame && scrollThumbFrame !== 0 && scrollBarFrame && scrollBarFrame !== 0) {
-    // thumb 本体是 BACKDROP，不直接接点击；命中层和拖拽注册都由 VerticalScrollbarTrack 内部统一处理。
-    vScrollTrack = new VerticalScrollbarTrack({
-      trackFrame: scrollBarFrame,
-      thumbFrame: scrollThumbFrame,
-      hitButtonName: "TaskScrollThumbHit",
-      listViewHeightNorm: LIST_VIEW_H,
-      trackHeightNorm: LIST_VIEW_H,
-      thumbSizeNorm: SCROLL_THUMB_SIZE,
-      topCompensation: SCROLL_THUMB_TOP_COMPENSATION,
-      bottomCompensation: SCROLL_THUMB_BOTTOM_COMPENSATION,
-      dragTick: THUMB_DRAG_TICK,
-      sensitivity: THUMB_DRAG_SENSITIVITY,
-      getTotalContentHeight,
-      getScrollOffset,
-      setScrollOffset,
-      isInteractionEnabled: isVisible,
-      onScrollChanged,
-      skipManualThumbSync: () => false,
-    });
-    // attach 之后才会创建透明 hit button 并挂好鼠标拖拽/滚轮逻辑。
-    vScrollTrack.attach();
-    scrollThumbHitBtn = vScrollTrack.getHitButtonFrame();
+    if (scrollThumbFrame && scrollThumbFrame !== 0 && scrollBarFrame && scrollBarFrame !== 0) {
+      // thumb 本体是 BACKDROP，不直接接点击；命中层和拖拽注册都由 VerticalScrollbarTrack 内部统一处理。
+      vScrollTrack = new VerticalScrollbarTrack({
+        trackFrame: scrollBarFrame,
+        thumbFrame: scrollThumbFrame,
+        hitButtonName: "TaskScrollThumbHit",
+        listViewHeightNorm: LIST_VIEW_H,
+        trackHeightNorm: LIST_VIEW_H,
+        thumbSizeNorm: SCROLL_THUMB_SIZE,
+        topCompensation: SCROLL_THUMB_TOP_COMPENSATION,
+        bottomCompensation: SCROLL_THUMB_BOTTOM_COMPENSATION,
+        dragTick: THUMB_DRAG_TICK,
+        sensitivity: THUMB_DRAG_SENSITIVITY,
+        getTotalContentHeight,
+        getScrollOffset,
+        setScrollOffset,
+        isInteractionEnabled: isVisible,
+        onScrollChanged,
+        skipManualThumbSync: () => false,
+      });
+      // attach 之后才会创建透明 hit button 并挂好鼠标拖拽/滚轮逻辑。
+      vScrollTrack.attach();
+      scrollThumbHitBtn = vScrollTrack.getHitButtonFrame();
+    }
   }
 
   return {

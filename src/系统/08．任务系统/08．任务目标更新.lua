@@ -2,6 +2,8 @@
 local ____exports = {}
 local ____index = require("系统.08．任务系统.02．任务管理器.index")
 local handleObjectiveUpdated = ____index.handleObjectiveUpdated
+local ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173 = require("系统.08．任务系统.00．任务系统二分开关")
+local ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT
 --- 任务系统 - "目标更新"事件桥接
 -- 
 -- 设计目标：
@@ -47,5 +49,7 @@ end
 local function init(self)
     registerObjectiveUpdateEvent(nil)
 end
-init(nil)
+if ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT then
+    init(nil)
+end
 return ____exports

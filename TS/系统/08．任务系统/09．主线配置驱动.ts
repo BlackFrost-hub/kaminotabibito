@@ -34,6 +34,11 @@ const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配�
 const { questDB, QuestType, QuestStatus } = require("系统.08．任务系统.01．任务数据") as any;
 const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as any;
 
+/**
+ * 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
+ */
+export const ENABLE_MAIN_QUEST_CONFIG_DRIVER = false;
+
 const YDGet = (globalThis as any).YDUserDataGet as ((t1: any, k1: any, k2: any, t2: any) => any) | undefined;
 const YDSet = (globalThis as any).YDUserDataSet as ((t1: any, k1: any, k2: any, t2: any, val: any) => void) | undefined;
 
@@ -363,11 +368,12 @@ function reportMissingFunctions(): void {
 }
 
 function init(): void {
+  if (!ENABLE_MAIN_QUEST_CONFIG_DRIVER) return;
   ensureRuntimeQuest();
   reportMissingFunctions();
   const t = jass.CreateTimer();
   jass.TimerStart(t, 0.30, true, tick);
 }
 
-init();
+if (ENABLE_MAIN_QUEST_CONFIG_DRIVER) init();
 export {};

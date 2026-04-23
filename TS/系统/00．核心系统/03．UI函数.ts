@@ -157,13 +157,10 @@ export function applyDzTextFontAndAlignment(
 ): void {
   if (!frame || frame === 0) return;
   const scale = fontScale !== undefined && fontScale !== null ? fontScale : DEFAULT_UI_FONT_SCALE;
-  (pcall as any)(() => {
-    (japi as any).DzFrameSetFont(frame, fontFile, scale, fontFlag);
-  });
-  (pcall as any)(() => {
-    (japi as any).DzFrameSetTextAlignment(frame, DZ_TEXT_ALIGN_RESET);
-    (japi as any).DzFrameSetTextAlignment(frame, textAlignment);
-  });
+  // DzFrameSetFont 和 DzFrameSetTextAlignment 都会导致多人游戏不同步
+  japi.DzFrameSetFont(frame, fontFile, scale, fontFlag);
+  japi.DzFrameSetTextAlignment(frame, DZ_TEXT_ALIGN_RESET);
+   japi.DzFrameSetTextAlignment(frame, textAlignment);
 }
 
 export function applyDzTextFontAndCenterAlignment(

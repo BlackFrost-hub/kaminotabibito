@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- KK扩展API - 装饰物相关函数
+-- 
+-- 注意：这些函数只有KK平台才有，其他平台（如YDWE、WE）不支持
 local japi = require("jass.japi")
 --- 创建装饰物
 function ____exports.DzDoodadCreate(self, id, varId, x, y, z, rotate, scale)
