@@ -29,6 +29,24 @@ export interface TaskUIScrollContext {
   onPageChanged: () => void;
 }
 
+function handleMouseWheelEvent(ctx: TaskUIScrollContext): void {
+  (pcall as any)(() => {
+    if (!ctx.isVisible()) return;
+    if (
+      !isWheelTargetForTaskListByJapi(
+        japi,
+        ctx.getMouseFocus,
+        ctx.listContainer,
+        ctx.scrollBarFrame,
+        ctx.scrollThumbFrame,
+        ctx.scrollThumbHitBtn
+      )
+    )
+      return;
+    handleTaskUIListWheel(ctx);
+  });
+}
+
 function updateTaskUIScrollThumbPosition(ctx: TaskUIScrollContext, pageCount: number): void {
   if (!ctx.scrollBarFrame || !ctx.scrollThumbFrame) return;
 
@@ -85,13 +103,7 @@ export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
 export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
   if (!ENABLE_MOUSE_WHEEL_SCROLL) return ctx.taskListWheelTrig;
   if (ctx.taskListWheelTrig) return ctx.taskListWheelTrig;
-  ctx.taskListWheelTrig = ctx.registerMouseWheel(false, () => {
-    (pcall as any)(() => {
-      if (!ctx.isVisible()) return;
-      if (!isTaskUIWheelTarget(ctx)) return;
-      handleTaskUIListWheel(ctx);
-    });
-  });
+  ctx.taskListWheelTrig = ctx.registerMouseWheel(false, () => handleMouseWheelEvent(ctx));
   return ctx.taskListWheelTrig;
 }
 

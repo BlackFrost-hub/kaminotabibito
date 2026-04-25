@@ -13,6 +13,20 @@ import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系�
 import { getStatusText, isQuestWithRowIconLayout, tryCreateFromFdfOnly } from "./02．任务UI辅助";
 import { getQuestItemHeight } from "./03．任务UI列表与滚动";
 
+// 点击处理器缓存，避免频繁创建匿名闭包
+const questRowClickHandlers: Map<string, { onClickSound: () => void; onToggleExpand: (questId: string) => void }> = new Map();
+
+function handleQuestRowClick(questId: string): void {
+  const handler = questRowClickHandlers.get(questId);
+  if (!handler) return;
+  handler.onClickSound();
+  handler.onToggleExpand(questId);
+}
+
+function registerQuestRowClickHandler(questId: string, onClickSound: () => void, onToggleExpand: (questId: string) => void): void {
+  questRowClickHandlers.set(questId, { onClickSound, onToggleExpand });
+}
+
 // ────────────────────────────────────────────────
 // 行布局计算
 // ────────────────────────────────────────────────
@@ -430,14 +444,8 @@ export function renderQuestRow(opts: {
   }
   setFramePointRelative(clickBtn, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
   setFrameSize(clickBtn, { width: rowWidth, height: itemH });
-  setFrameClickEvent(
-    clickBtn,
-    () => {
-      onClickSound();
-      onToggleExpand(quest.id);
-    },
-    false
-  );
+  registerQuestRowClickHandler(quest.id, onClickSound, onToggleExpand);
+  setFrameClickEvent(clickBtn, () => handleQuestRowClick(quest.id), false);
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
   showFrame(clickBtn);
   listItemFrames.push(clickBtn);

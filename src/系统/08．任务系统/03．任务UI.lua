@@ -7,6 +7,7 @@ local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务�
 local applyTaskUIFacadeVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUIFacadeVisibleState
 local applyTaskUICategorySwitchVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUICategorySwitchVisibleState
 local applyTaskUIExpandVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUIExpandVisibleState
+local applyTaskUIPageSwitchVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUIPageSwitchVisibleState
 local createTaskUIPrecreatedListPool = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.createTaskUIPrecreatedListPool
 local getTaskUICategoryPageCount = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.getTaskUICategoryPageCount
 local rebuildTaskUIFacadeListPool = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.rebuildTaskUIFacadeListPool
@@ -16,9 +17,6 @@ local updateTaskUIScrollBarVisibility = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6
 local ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.11．任务UI面板控制")
 local registerTaskUIRefreshCallback = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.registerTaskUIRefreshCallback
 local showTaskUITabTooltip = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.showTaskUITabTooltip
-local ____12_FF0E_4EFB_52A1UI_8C03_8BD5 = require("系统.08．任务系统.04．任务UI拆分.12．任务UI调试")
-local taskUiDebug = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebug
-local taskUiDebugPlayerTag = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebugPlayerTag
 local ____05_FF0E_4EFB_52A1UI_70ED_952E = require("系统.08．任务系统.04．任务UI拆分.05．任务UI热键")
 local registerTaskUIHotkeys = ____05_FF0E_4EFB_52A1UI_70ED_952E.registerTaskUIHotkeys
 local ____06_FF0E_4EFB_52A1UI_5165_53E3_56FE_6807 = require("系统.08．任务系统.04．任务UI拆分.06．任务UI入口图标")
@@ -302,10 +300,6 @@ function TaskUI.prototype.toggleExpand(self, questId)
         ____temp_6 = questId
     end
     local next = ____temp_6
-    taskUiDebug(
-        nil,
-        (((((("toggleExpand category=" .. tostring(self.currentCategory)) .. " current=") .. tostring(current)) .. " next=") .. tostring(next)) .. " ") .. taskUiDebugPlayerTag(nil)
-    )
     self:setExpandedQuestId(self.currentCategory, next)
     self:applyExpandVisibleState()
 end
@@ -399,7 +393,10 @@ function TaskUI.prototype.getScrollContext(self)
         setCurrentPage = function(____, page) return self:setCurrentPage(self.currentCategory, page) end,
         onPageChanged = function()
             self:setExpandedQuestId(self.currentCategory, nil)
-            self:applyVisibleState()
+            applyTaskUIPageSwitchVisibleState(
+                nil,
+                self:getListControlContext()
+            )
         end
     }
 end

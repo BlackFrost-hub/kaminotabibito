@@ -5,6 +5,7 @@ import {
   applyTaskUIFacadeVisibleState,
   applyTaskUICategorySwitchVisibleState,
   applyTaskUIExpandVisibleState,
+  applyTaskUIPageSwitchVisibleState,
   createTaskUIPrecreatedListPool,
   getTaskUICategoryPageCount,
   rebuildTaskUIFacadeListPool,
@@ -339,7 +340,7 @@ class TaskUI {
       setCurrentPage: (page: number) => this.setCurrentPage(this.currentCategory, page),
       onPageChanged: () => {
         this.setExpandedQuestId(this.currentCategory, null);
-        this.applyVisibleState();
+        applyTaskUIPageSwitchVisibleState(this.getListControlContext());
       },
     };
   }

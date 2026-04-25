@@ -8,6 +8,19 @@ import {
 } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
 
+// 入口图标点击处理器
+let entryIconClickHandler: { onTogglePanel: () => void; onClickSound: () => void } | null = null;
+
+function handleEntryIconClick(): void {
+  if (!entryIconClickHandler) return;
+  entryIconClickHandler.onTogglePanel();
+  entryIconClickHandler.onClickSound();
+}
+
+function registerEntryIconClickHandler(onTogglePanel: () => void, onClickSound: () => void): void {
+  entryIconClickHandler = { onTogglePanel, onClickSound };
+}
+
 export interface BuildEntryIconResult {
   entryFrame: number | null;
   entryText: number | null;
@@ -98,14 +111,8 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     }) ?? 0;
     if (btn && typeof (japi as any).DzFrameSetAllPoints === "function") {
     (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    setFrameClickEvent(
-      btn,
-      () => {
-        onTogglePanel();
-        onClickSound();
-      },
-      false
-    );
+    registerEntryIconClickHandler(onTogglePanel, onClickSound);
+    setFrameClickEvent(btn, handleEntryIconClick, false);
   }
 
   return { entryFrame, entryText };

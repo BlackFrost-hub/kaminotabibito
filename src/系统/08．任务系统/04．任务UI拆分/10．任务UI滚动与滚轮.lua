@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local updateTaskUIScrollThumbPosition
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local ENABLE_MOUSE_WHEEL_SCROLL = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_MOUSE_WHEEL_SCROLL
 local ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8 = require("系统.08．任务系统.04．任务UI拆分.03．任务UI列表与滚动")
@@ -10,8 +11,7 @@ local SCROLLBAR_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLLBAR_W
 local SCROLL_THUMB_SIZE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_SIZE
 local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_TOP_COMPENSATION
 local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
-local japi = require("jass.japi")
-local function updateTaskUIScrollThumbPosition(self, ctx, pageCount)
+function updateTaskUIScrollThumbPosition(self, ctx, pageCount)
     if not ctx.scrollBarFrame or not ctx.scrollThumbFrame then
         return
     end
@@ -41,20 +41,6 @@ local function updateTaskUIScrollThumbPosition(self, ctx, pageCount)
         -topOffset
     )
 end
-function ____exports.isTaskUIWheelTarget(self, ctx)
-    if not ctx.mainPanel then
-        return false
-    end
-    return isWheelTargetForTaskListByJapi(
-        nil,
-        japi,
-        ctx.getMouseFocus,
-        ctx.listContainer,
-        ctx.scrollBarFrame,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-    )
-end
 function ____exports.handleTaskUIListWheel(self, ctx)
     local pageCount = ctx:getCurrentPageCount()
     if pageCount <= 1 then
@@ -79,6 +65,41 @@ function ____exports.handleTaskUIListWheel(self, ctx)
     ctx:onPageChanged()
     updateTaskUIScrollThumbPosition(nil, ctx, pageCount)
 end
+local japi = require("jass.japi")
+local function handleMouseWheelEvent(self, ctx)
+    pcall(function ()
+            if not ctx:isVisible() then
+                return
+            end
+            if not isWheelTargetForTaskListByJapi(
+                nil,
+                japi,
+                ctx.getMouseFocus,
+                ctx.listContainer,
+                ctx.scrollBarFrame,
+                ctx.scrollThumbFrame,
+                ctx.scrollThumbHitBtn
+            ) then
+                return
+            end
+            ____exports.handleTaskUIListWheel(nil, ctx)
+        end
+    )
+end
+function ____exports.isTaskUIWheelTarget(self, ctx)
+    if not ctx.mainPanel then
+        return false
+    end
+    return isWheelTargetForTaskListByJapi(
+        nil,
+        japi,
+        ctx.getMouseFocus,
+        ctx.listContainer,
+        ctx.scrollBarFrame,
+        ctx.scrollThumbFrame,
+        ctx.scrollThumbHitBtn
+    )
+end
 function ____exports.registerTaskUIListWheel(self, ctx)
     if not ENABLE_MOUSE_WHEEL_SCROLL then
         return ctx.taskListWheelTrig
@@ -88,18 +109,7 @@ function ____exports.registerTaskUIListWheel(self, ctx)
     end
     ctx.taskListWheelTrig = ctx:registerMouseWheel(
         false,
-        function()
-            pcall(function ()
-                    if not ctx:isVisible() then
-                        return
-                    end
-                    if not ____exports.isTaskUIWheelTarget(nil, ctx) then
-                        return
-                    end
-                    ____exports.handleTaskUIListWheel(nil, ctx)
-                end
-            )
-        end
+        function() return handleMouseWheelEvent(nil, ctx) end
     )
     return ctx.taskListWheelTrig
 end

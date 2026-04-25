@@ -9,6 +9,17 @@ local ENTRY_TITLE_TEXT_BOX_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_TITLE_TEX
 local ENTRY_TITLE_TEXT_BOX_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_TITLE_TEXT_BOX_H
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
+local entryIconClickHandler = nil
+local function handleEntryIconClick(self)
+    if not entryIconClickHandler then
+        return
+    end
+    entryIconClickHandler:onTogglePanel()
+    entryIconClickHandler:onClickSound()
+end
+local function registerEntryIconClickHandler(self, onTogglePanel, onClickSound)
+    entryIconClickHandler = {onTogglePanel = onTogglePanel, onClickSound = onClickSound}
+end
 function ____exports.buildTaskEntryIcon(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -94,15 +105,8 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local btn = ____createFrame_result_2
     if btn and type(japi.DzFrameSetAllPoints) == "function" then
         japi.DzFrameSetAllPoints(btn, entryFrame)
-        setFrameClickEvent(
-            nil,
-            btn,
-            function()
-                onTogglePanel(nil)
-                onClickSound(nil)
-            end,
-            false
-        )
+        registerEntryIconClickHandler(nil, onTogglePanel, onClickSound)
+        setFrameClickEvent(nil, btn, handleEntryIconClick, false)
     end
     return {entryFrame = entryFrame, entryText = entryText}
 end

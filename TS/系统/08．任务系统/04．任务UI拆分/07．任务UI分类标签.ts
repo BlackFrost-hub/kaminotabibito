@@ -10,6 +10,20 @@ import { QuestType } from "../01．任务数据";
 import { TAB_REL_Y, TAB_FRAME_W, TAB_FRAME_H, TAB_CATEGORY_FONT_SCALE } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
 
+// 分类标签点击处理器缓存
+const categoryTabClickHandlers: Map<QuestType, { onSwitchCategory: (type: QuestType) => void; onClickSound: () => void }> = new Map();
+
+function handleCategoryTabClick(category: QuestType): void {
+  const handler = categoryTabClickHandlers.get(category);
+  if (!handler) return;
+  handler.onSwitchCategory(category);
+  handler.onClickSound();
+}
+
+function registerCategoryTabClickHandler(category: QuestType, onSwitchCategory: (type: QuestType) => void, onClickSound: () => void): void {
+  categoryTabClickHandlers.set(category, { onSwitchCategory, onClickSound });
+}
+
 interface TabPair {
   bg: number | null;
   tab: number | null;
@@ -116,14 +130,8 @@ function createTaskTab(opts: {
       }
     }
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tab, 9);
-    setFrameClickEvent(
-      tab,
-      () => {
-        onSwitchCategory(category);
-        onClickSound();
-      },
-      false
-    );
+    registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
+    setFrameClickEvent(tab, () => handleCategoryTabClick(category), false);
     setFrameHoverEvents(tab, () => onShowTabTooltip(tooltip), () => {}, false);
   }
 

@@ -1,6 +1,4 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local Set = ____lualib.Set
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
@@ -19,16 +17,25 @@ function ____exports.getQuestItemHeight(self, quest, expanded)
     if quest.description and quest.description ~= "" then
         h = h + 0.025
     end
-    local rewardDesc = quest.rewards and #quest.rewards > 0 and table.concat(
-        __TS__ArrayFilter(
-            __TS__ArrayMap(
-                quest.rewards,
-                function(____, r) return r.description end
-            ),
-            function(____, d) return d and d ~= "" end
-        ),
-        "、"
-    ) or ""
+    local rewardDesc = ""
+    if quest.rewards and #quest.rewards > 0 then
+        local descs = {}
+        for ____, r in ipairs(quest.rewards) do
+            if r.description and r.description ~= "" then
+                descs[#descs + 1] = r.description
+            end
+        end
+        if #descs > 0 then
+            rewardDesc = descs[1]
+            do
+                local i = 1
+                while i < #descs do
+                    rewardDesc = rewardDesc .. "、" .. descs[i + 1]
+                    i = i + 1
+                end
+            end
+        end
+    end
     if rewardDesc ~= "" then
         h = h + 0.025
     end
@@ -45,7 +52,7 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue11
+                    goto __continue16
                 end
                 totalH = totalH + (____exports.getQuestItemHeight(
                     nil,
@@ -53,7 +60,7 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
                     isExpanded(nil, q.id)
                 ) + 0.01)
             end
-            ::__continue11::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -160,7 +167,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue40
+                    goto __continue45
                 end
                 local expanded = isExpanded(nil, q.id)
                 local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
@@ -177,7 +184,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                 end
                 rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
-            ::__continue40::
+            ::__continue45::
             i = i + 1
         end
     end
@@ -248,11 +255,11 @@ function ____exports.refreshTaskUIList(self, opts)
             do
                 local row = visibleRows[i + 1]
                 if not row then
-                    goto __continue49
+                    goto __continue54
                 end
                 createListItem(nil, row.quest, row.rowTopRel, row.expanded)
             end
-            ::__continue49::
+            ::__continue54::
             i = i + 1
         end
     end

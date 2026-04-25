@@ -1,8 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local LIST_ITEM_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_ITEM_H
@@ -22,6 +20,18 @@ local isQuestWithRowIconLayout = ____02_FF0E_4EFB_52A1UI_8F85_52A9.isQuestWithRo
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8 = require("系统.08．任务系统.04．任务UI拆分.03．任务UI列表与滚动")
 local getQuestItemHeight = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.getQuestItemHeight
+local questRowClickHandlers = __TS__New(Map)
+local function handleQuestRowClick(self, questId)
+    local handler = questRowClickHandlers:get(questId)
+    if not handler then
+        return
+    end
+    handler:onClickSound()
+    handler:onToggleExpand(questId)
+end
+local function registerQuestRowClickHandler(self, questId, onClickSound, onToggleExpand)
+    questRowClickHandlers:set(questId, {onClickSound = onClickSound, onToggleExpand = onToggleExpand})
+end
 function ____exports.calcTaskListItemLayout(self, showMainRowIcon)
     local rowWidth = LIST_CONTAINER_W * 0.9
     local rowLeftRel = LIST_CONTENT_LEFT_INSET
@@ -162,7 +172,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                 ) or 0
                 if objFrame == 0 then
                     objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                    goto __continue18
+                    goto __continue21
                 end
                 objFrameByKey:set(objKey, objFrame)
             else
@@ -188,7 +198,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
             listItemFrames[#listItemFrames + 1] = objFrame
             objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
         end
-        ::__continue18::
+        ::__continue21::
     end
     if quest.timeLimit and quest.timeLimit > 0 then
         local failFrame = failFrameByQuestId:get(quest.id) or 0
@@ -258,16 +268,25 @@ function ____exports.renderExpandedQuestDetails(self, opts)
         detailIdx = detailIdx + 1
         objYRel = objYRel - EXPANDED_DETAIL_ROW_HEIGHT
     end
-    local rewardDesc = quest.rewards and #quest.rewards > 0 and table.concat(
-        __TS__ArrayFilter(
-            __TS__ArrayMap(
-                quest.rewards,
-                function(____, r) return r.description end
-            ),
-            function(____, d) return d and d ~= "" end
-        ),
-        "、"
-    ) or ""
+    local rewardDesc = ""
+    if quest.rewards and #quest.rewards > 0 then
+        local descs = {}
+        for ____, r in ipairs(quest.rewards) do
+            if r.description and r.description ~= "" then
+                descs[#descs + 1] = r.description
+            end
+        end
+        if #descs > 0 then
+            rewardDesc = descs[1]
+            do
+                local i = 1
+                while i < #descs do
+                    rewardDesc = rewardDesc .. "、" .. descs[i + 1]
+                    i = i + 1
+                end
+            end
+        end
+    end
     if rewardDesc ~= "" then
         getOrCreateDetailFrame(
             nil,
@@ -469,13 +488,11 @@ function ____exports.renderQuestRow(self, opts)
         rowTopRel
     )
     setFrameSize(nil, clickBtn, {width = rowWidth, height = itemH})
+    registerQuestRowClickHandler(nil, quest.id, onClickSound, onToggleExpand)
     setFrameClickEvent(
         nil,
         clickBtn,
-        function()
-            onClickSound(nil)
-            onToggleExpand(nil, quest.id)
-        end,
+        function() return handleQuestRowClick(nil, quest.id) end,
         false
     )
     if type(japi.DzFrameSetLevel) == "function" then

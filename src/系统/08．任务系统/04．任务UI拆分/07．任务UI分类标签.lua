@@ -1,4 +1,6 @@
 local ____lualib = require("lualib_bundle")
+local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
@@ -14,6 +16,18 @@ local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfO
 -- 
 -- 架构：全局1套UI，不再区分 slotPid。
 local japi = require("jass.japi")
+local categoryTabClickHandlers = __TS__New(Map)
+local function handleCategoryTabClick(self, category)
+    local handler = categoryTabClickHandlers:get(category)
+    if not handler then
+        return
+    end
+    handler:onSwitchCategory(category)
+    handler:onClickSound()
+end
+local function registerCategoryTabClickHandler(self, category, onSwitchCategory, onClickSound)
+    categoryTabClickHandlers:set(category, {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound})
+end
 local function createTaskTab(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -104,13 +118,11 @@ local function createTaskTab(self, opts)
         if type(japi.DzFrameSetLevel) == "function" then
             japi.DzFrameSetLevel(tab, 9)
         end
+        registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
         setFrameClickEvent(
             nil,
             tab,
-            function()
-                onSwitchCategory(nil, category)
-                onClickSound(nil)
-            end,
+            function() return handleCategoryTabClick(nil, category) end,
             false
         )
         setFrameHoverEvents(

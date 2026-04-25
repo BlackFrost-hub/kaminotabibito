@@ -795,3 +795,39 @@ export function applyTaskUIExpandVisibleState(ctx: TaskUIListControlContext): vo
     }
   });
 }
+
+export function applyTaskUIPageSwitchVisibleState(ctx: TaskUIListControlContext): void {
+  (pcall as any)(() => {
+    const pool = ctx.precreatedListPool;
+    if (!pool) return;
+
+    const categoryView = pool.categories[ctx.currentCategory];
+    if (!categoryView) return;
+
+    const pageCount = categoryView.pageCount;
+    if (pageCount <= 0) {
+      setVisible(categoryView.emptyText, true);
+      for (const page of categoryView.pages) {
+        for (const variant of page.variants) {
+          setVisible(variant.root, false);
+        }
+        setVisible(page.root, false);
+      }
+      ctx.updateScrollBarVisibility(0, false);
+      return;
+    }
+
+    setVisible(categoryView.emptyText, false);
+    const clampedPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage(ctx.currentCategory)));
+    for (let pageIndex = 0; pageIndex < categoryView.pages.length; pageIndex++) {
+      const page = categoryView.pages[pageIndex];
+      const isCurrentPage = pageIndex === clampedPage;
+      setVisible(page.root, isCurrentPage);
+      for (let variantIndex = 0; variantIndex < page.variants.length; variantIndex++) {
+        setVisible(page.variants[variantIndex].root, isCurrentPage && variantIndex === 0);
+      }
+    }
+
+    ctx.updateScrollBarVisibility(pageCount, true);
+  });
+}

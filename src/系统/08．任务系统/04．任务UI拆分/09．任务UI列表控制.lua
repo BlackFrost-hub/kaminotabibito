@@ -1,8 +1,5 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
-local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
 local ____exports = {}
 local handleTaskRowClick, japi, currentTaskRowExpandHandler, currentTaskRowClickSound, taskRowBindingByFrameId
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
@@ -29,9 +26,6 @@ local QUEST_ROW_ICON_Y_OFFSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.QUEST_ROW_ICON
 local BG_TEX = ____01_FF0E_4EFB_52A1UI_5E38_91CF.BG_TEX
 local ____03_FF0EUI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
 local DZ_TEXT_ALIGN_LEFT = ____03_FF0EUI_51FD_6570.DZ_TEXT_ALIGN_LEFT
-local ____12_FF0E_4EFB_52A1UI_8C03_8BD5 = require("系统.08．任务系统.04．任务UI拆分.12．任务UI调试")
-local taskUiDebug = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebug
-local taskUiDebugPlayerTag = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebugPlayerTag
 function handleTaskRowClick(self)
     local ____temp_2
     if type(japi.DzGetTriggerUIEventFrame) == "function" then
@@ -448,14 +442,8 @@ local function clearPage(self, page)
     page.questIds = createEmptyQuestIdList(nil)
     for ____, variant in ipairs(page.variants) do
         clearVariant(nil, variant)
+        setVisible(nil, variant.root, false)
     end
-    hideFrames(
-        nil,
-        __TS__ArrayMap(
-            page.variants,
-            function(____, v) return v.root end
-        )
-    )
     setVisible(nil, page.root, false)
 end
 local function buildObjectiveText(self, quest, index)
@@ -470,18 +458,22 @@ local function buildRewardText(self, quest)
     if not quest.rewards or #quest.rewards <= 0 then
         return ""
     end
-    local rewardDesc = table.concat(
-        __TS__ArrayFilter(
-            __TS__ArrayMap(
-                quest.rewards,
-                function(____, r) return r.description end
-            ),
-            function(____, d) return d and d ~= "" end
-        ),
-        "、"
-    )
-    if rewardDesc == "" then
+    local descs = {}
+    for ____, r in ipairs(quest.rewards) do
+        if r.description and r.description ~= "" then
+            descs[#descs + 1] = r.description
+        end
+    end
+    if #descs == 0 then
         return ""
+    end
+    local rewardDesc = descs[1]
+    do
+        local i = 1
+        while i < #descs do
+            rewardDesc = rewardDesc .. "、" .. descs[i + 1]
+            i = i + 1
+        end
     end
     return ("|cffff9900任务奖励：|r|cffffcc00" .. rewardDesc) .. "|r"
 end
@@ -582,7 +574,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 local frame = slot.objectiveFrames[i + 1] or 0
                 local text = buildObjectiveText(nil, quest, i)
                 if not frame or text == "" then
-                    goto __continue86
+                    goto __continue88
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -598,7 +590,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
-            ::__continue86::
+            ::__continue88::
             i = i + 1
         end
     end
@@ -633,7 +625,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 local frame = slot.detailFrames[i + 1] or 0
                 local text = details[i + 1] or ""
                 if not frame or text == "" then
-                    goto __continue90
+                    goto __continue92
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -649,7 +641,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
-            ::__continue90::
+            ::__continue92::
             i = i + 1
         end
     end
@@ -689,7 +681,7 @@ local function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 local slot = variant.rowSlots[rowIndex + 1]
                 if not quest then
                     hideRowSlot(nil, slot)
-                    goto __continue100
+                    goto __continue102
                 end
                 local expanded = rowIndex == expandedRowIndex
                 local itemH = getQuestItemHeight(nil, quest, expanded)
@@ -716,7 +708,7 @@ local function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 end
                 rowTopRel = rowTopRel - (itemH + QUEST_ROW_GAP)
             end
-            ::__continue100::
+            ::__continue102::
             rowIndex = rowIndex + 1
         end
     end
@@ -792,16 +784,10 @@ function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
                                     pageQuests,
                                     variantIndex - 1
                                 )
+                                setVisible(nil, page.variants[variantIndex + 1].root, false)
                                 variantIndex = variantIndex + 1
                             end
                         end
-                        hideFrames(
-                            nil,
-                            __TS__ArrayMap(
-                                page.variants,
-                                function(____, variant) return variant.root end
-                            )
-                        )
                         setVisible(nil, page.root, false)
                         pageIndex = pageIndex + 1
                     end
@@ -837,23 +823,19 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                     local isCurrentCategory = category == ctx.currentCategory
                     setVisible(nil, categoryView.root, isCurrentCategory)
                     if not isCurrentCategory then
-                        goto __continue130
+                        goto __continue131
                     end
                     local pageCount = categoryView.pageCount
                     if pageCount <= 0 then
                         setVisible(nil, categoryView.emptyText, true)
                         for ____, page in ipairs(categoryView.pages) do
-                            hideFrames(
-                                nil,
-                                __TS__ArrayMap(
-                                    page.variants,
-                                    function(____, variant) return variant.root end
-                                )
-                            )
+                            for ____, variant in ipairs(page.variants) do
+                                setVisible(nil, variant.root, false)
+                            end
                             setVisible(nil, page.root, false)
                         end
                         ctx:updateScrollBarVisibility(0, false)
-                        goto __continue130
+                        goto __continue131
                     end
                     setVisible(nil, categoryView.emptyText, false)
                     local clampedPage = math.max(
@@ -867,22 +849,20 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                     local expandedQuestId = ctx:getExpandedQuestId(category)
                     local variantIndex = 0
                     if expandedQuestId then
-                        local rowIndex = __TS__ArrayFindIndex(
-                            currentPage.questIds,
-                            function(____, questId) return questId == expandedQuestId end
-                        )
+                        local rowIndex = -1
+                        do
+                            local i = 0
+                            while i < #currentPage.questIds do
+                                if currentPage.questIds[i + 1] == expandedQuestId then
+                                    rowIndex = i
+                                    break
+                                end
+                                i = i + 1
+                            end
+                        end
                         if rowIndex >= 0 then
                             variantIndex = rowIndex + 1
                         end
-                        taskUiDebug(
-                            nil,
-                            (((((((((((("applyVisibleState category=" .. tostring(category)) .. " page=") .. tostring(clampedPage)) .. " expandedQuestId=") .. tostring(expandedQuestId)) .. " rowIndex=") .. tostring(rowIndex)) .. " variantIndex=") .. tostring(variantIndex)) .. " pageQuestIds=") .. table.concat(currentPage.questIds, ",")) .. " ") .. taskUiDebugPlayerTag(nil)
-                        )
-                    else
-                        taskUiDebug(
-                            nil,
-                            (((((("applyVisibleState category=" .. tostring(category)) .. " page=") .. tostring(clampedPage)) .. " expandedQuestId=nil variantIndex=0 pageQuestIds=") .. table.concat(currentPage.questIds, ",")) .. " ") .. taskUiDebugPlayerTag(nil)
-                        )
                     end
                     do
                         local pageIndex = 0
@@ -892,7 +872,7 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                                 local isCurrentPage = pageIndex == clampedPage
                                 setVisible(nil, page.root, isCurrentPage)
                                 if not isCurrentPage then
-                                    goto __continue141
+                                    goto __continue144
                                 end
                                 do
                                     local i = 0
@@ -902,13 +882,13 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                                     end
                                 end
                             end
-                            ::__continue141::
+                            ::__continue144::
                             pageIndex = pageIndex + 1
                         end
                     end
                     ctx:updateScrollBarVisibility(pageCount, true)
                 end
-                ::__continue130::
+                ::__continue131::
             end
         end
     )
@@ -927,32 +907,24 @@ function ____exports.applyTaskUICategorySwitchVisibleState(self, ctx)
                     if not isCurrentCategory then
                         setVisible(nil, categoryView.emptyText, false)
                         for ____, page in ipairs(categoryView.pages) do
-                            hideFrames(
-                                nil,
-                                __TS__ArrayMap(
-                                    page.variants,
-                                    function(____, variant) return variant.root end
-                                )
-                            )
+                            for ____, variant in ipairs(page.variants) do
+                                setVisible(nil, variant.root, false)
+                            end
                             setVisible(nil, page.root, false)
                         end
-                        goto __continue149
+                        goto __continue152
                     end
                     local pageCount = categoryView.pageCount
                     if pageCount <= 0 then
                         setVisible(nil, categoryView.emptyText, true)
                         for ____, page in ipairs(categoryView.pages) do
-                            hideFrames(
-                                nil,
-                                __TS__ArrayMap(
-                                    page.variants,
-                                    function(____, variant) return variant.root end
-                                )
-                            )
+                            for ____, variant in ipairs(page.variants) do
+                                setVisible(nil, variant.root, false)
+                            end
                             setVisible(nil, page.root, false)
                         end
                         ctx:updateScrollBarVisibility(0, false)
-                        goto __continue149
+                        goto __continue152
                     end
                     setVisible(nil, categoryView.emptyText, false)
                     do
@@ -973,7 +945,7 @@ function ____exports.applyTaskUICategorySwitchVisibleState(self, ctx)
                     end
                     ctx:updateScrollBarVisibility(pageCount, true)
                 end
-                ::__continue149::
+                ::__continue152::
             end
         end
     )
@@ -1007,10 +979,17 @@ function ____exports.applyTaskUIExpandVisibleState(self, ctx)
             local expandedQuestId = ctx:getExpandedQuestId(ctx.currentCategory)
             local variantIndex = 0
             if expandedQuestId then
-                local rowIndex = __TS__ArrayFindIndex(
-                    currentPage.questIds,
-                    function(____, questId) return questId == expandedQuestId end
-                )
+                local rowIndex = -1
+                do
+                    local i = 0
+                    while i < #currentPage.questIds do
+                        if currentPage.questIds[i + 1] == expandedQuestId then
+                            rowIndex = i
+                            break
+                        end
+                        i = i + 1
+                    end
+                end
                 if rowIndex >= 0 then
                     variantIndex = rowIndex + 1
                 end
@@ -1022,6 +1001,56 @@ function ____exports.applyTaskUIExpandVisibleState(self, ctx)
                     i = i + 1
                 end
             end
+        end
+    )
+end
+function ____exports.applyTaskUIPageSwitchVisibleState(self, ctx)
+    pcall(function ()
+            local pool = ctx.precreatedListPool
+            if not pool then
+                return
+            end
+            local categoryView = pool.categories[ctx.currentCategory]
+            if not categoryView then
+                return
+            end
+            local pageCount = categoryView.pageCount
+            if pageCount <= 0 then
+                setVisible(nil, categoryView.emptyText, true)
+                for ____, page in ipairs(categoryView.pages) do
+                    for ____, variant in ipairs(page.variants) do
+                        setVisible(nil, variant.root, false)
+                    end
+                    setVisible(nil, page.root, false)
+                end
+                ctx:updateScrollBarVisibility(0, false)
+                return
+            end
+            setVisible(nil, categoryView.emptyText, false)
+            local clampedPage = math.max(
+                0,
+                math.min(
+                    pageCount - 1,
+                    ctx:getCurrentPage(ctx.currentCategory)
+                )
+            )
+            do
+                local pageIndex = 0
+                while pageIndex < #categoryView.pages do
+                    local page = categoryView.pages[pageIndex + 1]
+                    local isCurrentPage = pageIndex == clampedPage
+                    setVisible(nil, page.root, isCurrentPage)
+                    do
+                        local variantIndex = 0
+                        while variantIndex < #page.variants do
+                            setVisible(nil, page.variants[variantIndex + 1].root, isCurrentPage and variantIndex == 0)
+                            variantIndex = variantIndex + 1
+                        end
+                    end
+                    pageIndex = pageIndex + 1
+                end
+            end
+            ctx:updateScrollBarVisibility(pageCount, true)
         end
     )
 end
