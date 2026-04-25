@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 const jass = require("jass.common") as any;
 
 const MAX_PLAYER_SLOTS = 16;
@@ -11,7 +12,7 @@ export function TriggerRegisterPlayerUnitEventSimple(
   whichPlayer: any,
   whichEvent: number
 ): any {
-  return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, whichEvent, null);
+  return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, whichEvent, undefined);
 }
 
 /**
@@ -34,6 +35,20 @@ export function TriggerRegisterPlayerUnitEventForPlayers(
   for (let i = 0; i <= 7; i++) {
     TriggerRegisterPlayerUnitEventSimple(trig, jass.Player(i), whichEvent);
   }
+}
+
+/**
+ * 对齐 Blizzard.j: TriggerRegisterPlayerSelectionEventBJ
+ */
+export function TriggerRegisterPlayerSelectionEventBJ(
+  trig: any,
+  whichPlayer: any,
+  selected: boolean
+): any {
+  if (selected) {
+    return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, undefined);
+  }
+  return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, undefined);
 }
 
 export function ConditionalTriggerExecute(trig: any): void {

@@ -36,7 +36,8 @@ export function isQuestWithRowIconLayout(quest: QuestData): boolean {
   if (quest.type === QuestType.MAIN) return questIdTailInRange01to20(id, "main_");
   if (quest.type === QuestType.SIDE) return questIdTailInRange01to20(id, "side_");
   if (quest.type === QuestType.DAILY) return questIdTailInRange01to20(id, "daily_");
-  return false;
+  // 任务 UI 默认给列表项保留图标位，避免测试任务/运行时任务因为 id 命名不同而整列丢图标。
+  return true;
 }
 
 export function isFdfFrameEnabled(frameName: string): boolean {
@@ -67,7 +68,6 @@ export function tryCreateFromFdfWithSource(
   loadTocOnce(TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI");
   let f: number = 0;
   const ok = (pcall as any)(() => {
-    // contextId 用作 DzCreateFrame 的 priority/实例号，多槽位(0..3)各自创建独立 FDF 实例
     f = (japi as any).DzCreateFrame(name, parent, contextId);
   });
   if (ok && f != null && f !== 0) return { frame: f, fromFdf: true };
@@ -92,7 +92,9 @@ export function getStatusText(status: QuestStatus): string {
 }
 
 export function getQuestsForUI(playerId: number, type: QuestType): QuestData[] {
-  const active = questManager.getPlayerQuests(playerId, type).filter(q => !q.uiReserved);
+  const active = questDB
+    .getPlayerActiveQuests(playerId)
+    .filter(q => q.type === type && !q.uiReserved);
   const completedIds = questDB.getPlayerCompletedQuests(playerId);
   const result: QuestData[] = active.slice();
 

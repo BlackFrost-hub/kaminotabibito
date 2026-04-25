@@ -98,8 +98,8 @@ function ____exports.initHeroSkillPreregistration(self)
     local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
     local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
     registerSpellEffectListener(nil, onSpellEffect)
-    local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-    local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+    local ____G_1 = _G
+    local addPeriodicCallback = ____G_1.addPeriodicCallback
     _periodicCallbackId = addPeriodicCallback(nil, 2000, onPeriodicRefresh)
 end
 return ____exports

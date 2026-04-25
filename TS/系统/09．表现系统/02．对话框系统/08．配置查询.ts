@@ -1,7 +1,10 @@
+const jass = require("jass.common") as any;
+
 import { DIALOG_NPC_CONFIGS, DialogNPCData } from "../../08．任务系统/00．配置表/01．对话配置表";
 import { NPC_CONFIGS, NPCData } from "../../08．任务系统/00．配置表/03．NPC配置表";
 import { QUEST_CONFIGS, QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { hasPlayerAcceptedQuest } from "./07．任务状态";
+import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
 // ========== 虚拟分区：配置查询 ==========
 export function findQuestByNpc(npcName: string): QuestConfig | undefined {
@@ -35,3 +38,21 @@ export function findNpcConfigByUnitName(unitName: string): NPCData | null {
   return null;
 }
 
+export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): NPCData | null {
+  if (!unit || !unitName) return null;
+  const selectedUnitCode = fourCCToString((jass as any).GetUnitTypeId(unit) as number);
+  for (const npc of NPC_CONFIGS) {
+    if (npc.enabled !== true) continue;
+    if (npc.unitcode && npc.unitcode !== selectedUnitCode) continue;
+    if (npc.NPCrequireName === unitName || npc.NpcNameID === unitName) return npc;
+  }
+  return null;
+}
+
+export function findEnabledNpcConfigByRequireId(requireID: number): NPCData | null {
+  for (const npc of NPC_CONFIGS) {
+    if (npc.enabled !== true) continue;
+    if (npc.requireID === requireID) return npc;
+  }
+  return null;
+}

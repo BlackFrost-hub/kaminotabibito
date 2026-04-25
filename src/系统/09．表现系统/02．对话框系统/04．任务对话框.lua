@@ -17,12 +17,7 @@ function ____exports.showQuestButtons(self, state, visible, getLocalPlayer, getP
     dzShow(nil, state.frames[9], visible)
     dzShow(nil, state.frames[11], visible)
 end
-function ____exports.setQuestButtonTexts(self, state, acceptText, rejectText, getLocalPlayer, getPlayerById)
-    local localPlayer = getLocalPlayer(nil)
-    local targetPlayer = getPlayerById(nil, state.playerId)
-    if localPlayer ~= targetPlayer then
-        return
-    end
+function ____exports.setQuestButtonTexts(self, state, acceptText, rejectText)
     if state.frames[10] and state.frames[10] ~= 0 then
         japi.DzFrameSetText(state.frames[10], acceptText)
     end

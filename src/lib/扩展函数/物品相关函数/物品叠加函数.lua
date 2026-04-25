@@ -345,7 +345,7 @@ function ____exports.StarItem_ItemStack_Cond2(self)
 end
 jass = require("jass.common")
 unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-centerTimer = require("系统.00．核心系统.05．中心计时器")
+centerTimer = _G
 local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 ABIL_INVENTORY = 1095331446
 local DEFAULT_ITEM_PICKUP_RANGE = 500

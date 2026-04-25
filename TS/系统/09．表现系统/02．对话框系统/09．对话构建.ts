@@ -7,7 +7,6 @@ import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
-import { taskUI } from "../../08．任务系统/03．任务UI";
 import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, giveQuestReward, showLocalHint } from "./06．常量与工具";
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
@@ -20,6 +19,15 @@ import { resolveRewardDisplayText } from "./14．任务展示文案";
 import { scheduleGrayQuestMarkerAfterBubbleFade, scheduleYellowQuestMarkerAfterBubbleFade } from "./15．NPC头顶与气泡特效";
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
+const { addDelayedCallback } = globalThis as unknown as {
+  addDelayedCallback: (delayMs: number, callback: () => void) => number;
+};
+
+function scheduleOpenDialogLater(player: any, data: NpcDialogData): void {
+  addDelayedCallback(10, () => {
+    openNpcDialog(player, data);
+  });
+}
 
 function normalizeRequireCount(count?: number): number {
   return count != null && count > 1 ? count : 1;
@@ -28,7 +36,12 @@ function normalizeRequireCount(count?: number): number {
 function refreshTaskUIForAllClientsSoon(): void {
   const t = jass.CreateTimer();
   jass.TimerStart(t, 0.03, false, () => {
-    (pcall as any)(() => taskUI.refreshList());
+    (pcall as any)(() => {
+      const mod = require("系统.08．任务系统.03．任务UI") as { taskUI?: { refreshList?: () => void } };
+      if (mod.taskUI && typeof mod.taskUI.refreshList === "function") {
+        mod.taskUI.refreshList();
+      }
+    });
     jass.PauseTimer(t);
     jass.DestroyTimer(t);
   });
@@ -167,7 +180,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
         if (!canAcceptQuestByRequirements(quest, hero)) {
           const failRaw = quest.AcceptFailedText || "当前条件不满足，无法接受该任务。";
-          openNpcDialog(playerObj, {
+          scheduleOpenDialogLater(playerObj, {
             lines: parseDialogText(failRaw, npcName, heroName),
             npcUnit,
             removeOverheadMarkerOnOpen: false,
@@ -175,15 +188,15 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
           });
           return;
         }
-        if (!hasPlayerAcceptedQuest(0, questId)) {
+        if (!hasPlayerAcceptedQuest(dialogOwnerId, questId)) {
           const playerName = jass.GetPlayerName(playerObj) || "冒险者";
-          setQuestState(questId, 1, playerName);
+          setQuestState(dialogOwnerId, questId, 1, playerName);
           grantQuestItems(hero, quest.questItems);
           refreshTaskUIForAllClientsSoon();
         }
         const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
-        openNpcDialog(jass.Player(dialogOwnerId), {
+        scheduleOpenDialogLater(jass.Player(dialogOwnerId), {
           lines: acceptedLines,
           npcUnit,
           removeOverheadMarkerOnOpen: false,

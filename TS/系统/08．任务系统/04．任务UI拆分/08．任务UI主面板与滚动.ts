@@ -1,11 +1,7 @@
 /**
  * 任务主面板壳体 + 列表容器 + 右侧滚动条
  *
- * 流程概览：
- * 1. TaskMainPanel：相对入口图标定位（无入口则退化为绝对坐标 + ENTRY_*）。
- * 2. TaskListContainer：任务行由列表模块渲染，此处只负责帧布局与显示。
- * 3. 顶部分类标签委托给 `07．任务UI分类标签`。
- * 4. 滚动条：FDF `TaskScrollBar` 或动态 BACKDROP；滑块用 VerticalScrollbarTrack 绑定列表滚动。
+ * 架构：全局1套UI，不再区分 slotPid。
  */
 
 import {
@@ -23,16 +19,11 @@ import {
   SCROLLBAR_W,
   LIST_VIEW_H,
   SCROLL_THUMB_SIZE,
-  SCROLL_THUMB_TOP_COMPENSATION,
-  SCROLL_THUMB_BOTTOM_COMPENSATION,
-  THUMB_DRAG_TICK,
-  THUMB_DRAG_SENSITIVITY,
   ENABLE_TASK_UI_RIGHT_SCROLLBAR,
 } from "./01．任务UI常量";
 import { QuestType } from "../01．任务数据";
 import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource } from "./02．任务UI辅助";
 import { buildTaskPanelCategoryTabs } from "./07．任务UI分类标签";
-import { VerticalScrollbarTrack } from "../../09．表现系统/03．垂直滚动条轨道";
 
 export interface BuildMainPanelResult {
   mainPanel: number | null;
@@ -46,7 +37,7 @@ export interface BuildMainPanelResult {
   scrollBarFrame: number | null;
   scrollThumbFrame: number | null;
   scrollThumbHitBtn: number | null;
-  vScrollTrack: VerticalScrollbarTrack | null;
+  vScrollTrack: null;
 }
 
 export interface BuildTaskMainPanelOpts {
@@ -68,20 +59,8 @@ export interface BuildTaskMainPanelOpts {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
-  getTotalContentHeight: () => number;
-  getScrollOffset: () => number;
-  setScrollOffset: (v: number) => void;
-  isVisible: () => boolean;
-  onScrollChanged: () => void;
-  /** 槽位号 0..N-1，用于在多槽位(每客户端对称创建 N 套)时区分 FDF contextId 与子帧名，避免冲突。 */
-  slotPid?: number;
 }
 
-/**
- * 创建主面板及滚动区域；任一关键 FDF 缺失时返回空壳（各字段 null），上层应跳过绑定。
- *
- * 这里不负责渲染任务行内容，只负责把“主面板壳体 + 列表容器 + 分类标签 + 滚动轨道”搭起来。
- */
 export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanelResult {
   const {
     japi,
@@ -102,15 +81,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
-    getTotalContentHeight,
-    getScrollOffset,
-    setScrollOffset,
-    isVisible,
-    onScrollChanged,
-    slotPid,
   } = opts;
-  const ctxId = slotPid ?? 0;
-  const suf = `_s${ctxId}`;
 
   const empty: BuildMainPanelResult = {
     mainPanel: null,
@@ -127,15 +98,13 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     vScrollTrack: null,
   };
 
-  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent, ctxId);
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
   if (!mainPanel) return empty;
 
   if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
   if (entryFrame) {
-    // 正常路径：主面板跟随入口图标定位，便于入口位置调整时整块 UI 一起移动。
     setFramePointRelative(mainPanel, FramePoint.TOPLEFT, entryFrame, FramePoint.TOPLEFT, PANEL_REL_TO_ENTRY_X, PANEL_REL_TO_ENTRY_Y);
   } else {
-    // 兜底路径：入口帧缺失时退回常量里的绝对坐标，避免整套任务 UI 直接失踪。
     setFramePosition(mainPanel, {
       point: FramePoint.TOPLEFT,
       x: ENTRY_X + PANEL_REL_TO_ENTRY_X,
@@ -144,10 +113,9 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel, ctxId);
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
   if (listContainer) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
-    // 列表模块只往这个容器里塞任务行；容器本身的尺寸/锚点统一在这里管理。
     setFramePointRelative(
       listContainer,
       FramePoint.TOPLEFT,
@@ -173,28 +141,24 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
-    slotPid: ctxId,
   });
 
   let scrollBarFrame: number | null = null;
   let scrollThumbFrame: number | null = null;
-  let vScrollTrack: VerticalScrollbarTrack | null = null;
   let scrollThumbHitBtn: number | null = null;
 
   if (ENABLE_TASK_UI_RIGHT_SCROLLBAR) {
-    // 轨道：优先 TOC/FDF，失败则用代码创建窄条 BACKDROP
     const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", mainPanel, () => {
-      // BACKDROP 只承担视觉轨道；不要把它当原生 Slider 用，数值滚动交给 VerticalScrollbarTrack。
       const f =
         createFrame({
           type: FrameType.BACKDROP,
-          name: "TaskScrollBarBtn" + suf,
+          name: "TaskScrollBarBtn",
           parent: mainPanel,
           template: "template",
           visible: true,
         }) ?? 0;
       return f;
-    }, ctxId);
+    });
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -208,7 +172,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollThumbFrame =
       createFrame({
         type: FrameType.BACKDROP,
-        name: "TaskScrollThumbDyn" + suf,
+        name: "TaskScrollThumbDyn",
         parent: mainPanel,
         template: "template",
         visible: true,
@@ -216,33 +180,18 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     if (scrollThumbFrame && scrollThumbFrame !== 0) {
       setFrameTexture(scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
       setFrameSize(scrollThumbFrame, { width: SCROLL_THUMB_SIZE, height: SCROLL_THUMB_SIZE });
+      if (scrollBarFrame && scrollBarFrame !== 0) {
+        setFramePointRelative(
+          scrollThumbFrame,
+          FramePoint.TOPLEFT,
+          scrollBarFrame,
+          FramePoint.TOPLEFT,
+          (SCROLLBAR_W - SCROLL_THUMB_SIZE) * 0.5,
+          0
+        );
+      }
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
-    }
-
-    if (scrollThumbFrame && scrollThumbFrame !== 0 && scrollBarFrame && scrollBarFrame !== 0) {
-      // thumb 本体是 BACKDROP，不直接接点击；命中层和拖拽注册都由 VerticalScrollbarTrack 内部统一处理。
-      vScrollTrack = new VerticalScrollbarTrack({
-        trackFrame: scrollBarFrame,
-        thumbFrame: scrollThumbFrame,
-        hitButtonName: "TaskScrollThumbHit" + suf,
-        listViewHeightNorm: LIST_VIEW_H,
-        trackHeightNorm: LIST_VIEW_H,
-        thumbSizeNorm: SCROLL_THUMB_SIZE,
-        topCompensation: SCROLL_THUMB_TOP_COMPENSATION,
-        bottomCompensation: SCROLL_THUMB_BOTTOM_COMPENSATION,
-        dragTick: THUMB_DRAG_TICK,
-        sensitivity: THUMB_DRAG_SENSITIVITY,
-        getTotalContentHeight,
-        getScrollOffset,
-        setScrollOffset,
-        isInteractionEnabled: isVisible,
-        onScrollChanged,
-        skipManualThumbSync: () => false,
-      });
-      // attach 之后才会创建透明 hit button 并挂好鼠标拖拽/滚轮逻辑。
-      vScrollTrack.attach();
-      scrollThumbHitBtn = vScrollTrack.getHitButtonFrame();
     }
   }
 
@@ -258,6 +207,6 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollBarFrame: scrollBarFrame ?? null,
     scrollThumbFrame: scrollThumbFrame ?? null,
     scrollThumbHitBtn,
-    vScrollTrack,
+    vScrollTrack: null,
   };
 }

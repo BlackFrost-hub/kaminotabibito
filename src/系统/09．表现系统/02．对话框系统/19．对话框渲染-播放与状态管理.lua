@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local startTyping, onTypingTick
+local showContinueHint, startTyping, onTypingTick
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____index.Sound3DII_Mp3PlayReuse
 local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
@@ -39,6 +39,14 @@ local dzLoadTocOnce = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.d
 local g_questCallbacksByPlayer = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
 local g_states = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
 local syncQuestCallbacksTableFromQueueHead = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.syncQuestCallbacksTableFromQueueHead
+function showContinueHint(self, state, visible)
+    local localPlayer = dzGetLocalPlayer(nil)
+    local targetPlayer = dzPlayer(nil, state.playerId)
+    if localPlayer ~= targetPlayer then
+        return
+    end
+    dzShow(nil, state.frames[12], visible)
+end
 function startTyping(self, state)
     dzTimerStart(
         nil,
@@ -60,13 +68,8 @@ function onTypingTick(self, state)
         dzTimerPause(nil, state.tickTimer)
         return
     end
-    local localPlayer = dzGetLocalPlayer(nil)
-    local targetPlayer = dzPlayer(nil, state.playerId)
-    local isLocal = localPlayer == targetPlayer
     if state.strNow >= state.strLen then
-        if isLocal then
-            dzSetText(nil, state.frames[4], entry.text)
-        end
+        dzSetText(nil, state.frames[4], entry.text)
         dzTimerPause(nil, state.tickTimer)
         if entry.isQuest then
             syncQuestCallbacksTableFromQueueHead(nil, state)
@@ -81,9 +84,9 @@ function onTypingTick(self, state)
         else
             state.waitingClick = true
             setActivePlayerId(nil, state.playerId)
-            dzShow(nil, state.frames[12], true)
+            showContinueHint(nil, state, true)
         end
-    elseif isLocal then
+    else
         dzSetText(
             nil,
             state.frames[4],
@@ -91,7 +94,6 @@ function onTypingTick(self, state)
         )
     end
 end
---- 由入口模块注入，避免本模块依赖「任务回调」形成环
 local g_bindQuestSyncHandlers
 function ____exports.setQuestSyncHandlersBinder(self, fn)
     g_bindQuestSyncHandlers = fn
@@ -190,70 +192,26 @@ function ____exports.playEntry(self, state)
     state.isActive = true
     state.waitingClick = false
     state.clickCooldown = true
-    local localPlayer = dzGetLocalPlayer(nil)
-    local targetPlayer = dzPlayer(nil, state.playerId)
-    local isLocal = localPlayer == targetPlayer
     if not state.initialized then
         dzLoadTocOnce(nil)
-        state.frames = createDialogFrames(nil)
+        state.frames = createDialogFrames(nil, state.playerId)
         state.initialized = true
         bindQuestSyncHandlers(nil, state)
     end
     ____exports.showDialogFrames(nil, state, true)
     if isFirstOpen then
-        Sound3DII_Mp3PlayReuse(nil, DIALOG_OPEN_SOUND, targetPlayer)
+        Sound3DII_Mp3PlayReuse(
+            nil,
+            DIALOG_OPEN_SOUND,
+            dzPlayer(nil, state.playerId)
+        )
     end
     local entry = state.queue[1]
     setActivePlayerId(nil, state.playerId)
     if entry.isQuest and entry.questCallbacks then
         syncQuestCallbacksTableFromQueueHead(nil, state)
         local buttonTexts = resolveQuestButtonTexts(nil, entry.acceptText, entry.rejectText)
-        setQuestButtonTexts(
-            nil,
-            state,
-            buttonTexts.accept,
-            buttonTexts.reject,
-            dzGetLocalPlayer,
-            dzPlayer
-        )
-    end
-    if not isLocal then
-        state.strLen = stringLengthCompat(nil, entry.text)
-        state.strNow = 0
-        dzTimerStart(
-            nil,
-            state.tickTimer,
-            TICK,
-            true,
-            function()
-                if #state.queue == 0 then
-                    dzTimerPause(nil, state.tickTimer)
-                    return
-                end
-                local cur = state.queue[1]
-                if not cur then
-                    dzTimerPause(nil, state.tickTimer)
-                    return
-                end
-                state.strNow = nextTypingProgress(nil, state.strNow, STEP_LEN)
-                state.clickCooldown = false
-                if state.strNow >= state.strLen then
-                    dzTimerPause(nil, state.tickTimer)
-                    if cur.isQuest then
-                        syncQuestCallbacksTableFromQueueHead(nil, state)
-                    else
-                        state.waitingClick = true
-                        setActivePlayerId(nil, state.playerId)
-                        local lp = dzGetLocalPlayer(nil)
-                        local tp = dzPlayer(nil, state.playerId)
-                        if lp == tp then
-                            dzShow(nil, state.frames[12], true)
-                        end
-                    end
-                end
-            end
-        )
-        return
+        setQuestButtonTexts(nil, state, buttonTexts.accept, buttonTexts.reject)
     end
     dzSetFont(nil, state.frames[3], DEFAULT_FONT, entry.titleFontSize)
     dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize)
@@ -262,7 +220,9 @@ function ____exports.playEntry(self, state)
     applyPortraitFrames(
         nil,
         entry,
-        state.frames,
+        state,
+        dzGetLocalPlayer,
+        dzPlayer,
         dzSetTexture,
         dzShow
     )
@@ -275,14 +235,10 @@ function ____exports.skipTyping(self, state)
         return
     end
     local entry = state.queue[1]
-    local localPlayer = dzGetLocalPlayer(nil)
-    local targetPlayer = dzPlayer(nil, state.playerId)
     if state.strNow < state.strLen then
         dzTimerPause(nil, state.tickTimer)
         state.strNow = state.strLen
-        if localPlayer == targetPlayer then
-            dzSetText(nil, state.frames[4], entry.text)
-        end
+        dzSetText(nil, state.frames[4], entry.text)
     end
     if entry.isQuest then
         syncQuestCallbacksTableFromQueueHead(nil, state)
@@ -297,7 +253,7 @@ function ____exports.skipTyping(self, state)
     else
         state.waitingClick = true
         setActivePlayerId(nil, state.playerId)
-        dzShow(nil, state.frames[12], true)
+        showContinueHint(nil, state, true)
     end
     state.clickCooldown = false
 end
@@ -310,7 +266,7 @@ function ____exports.advanceDialog(self, state)
         dzPlayer,
         dzShow
     )
-    dzShow(nil, state.frames[12], false)
+    showContinueHint(nil, state, false)
     table.remove(state.queue, 1)
     if #state.queue == 0 then
         resetActivePlayerIdIfMatch(nil, state.playerId)

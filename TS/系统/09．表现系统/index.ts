@@ -5,7 +5,7 @@
 // ========== 子系统导出 ==========
 export * from "./01．UI工具/index";
 export * from "./02．对话框系统/index";
-// export * from "./03．UI属性系统/index";
+export * from "./03．UI属性系统/index";
 
 // ========== 核心模块导出 ==========
 export * from "./00．初始化UI";
@@ -25,7 +25,7 @@ require("系统.09．表现系统.03．垂直滚动条轨道");
 require("系统.09．表现系统.02．对话框系统.index");
 
 // UI属性系统
-require("系统.09．表现系统.03．UI属性系统.index");
+//require("系统.09．表现系统.03．UI属性系统.index");
 
 /**
  * 初始化表现系统

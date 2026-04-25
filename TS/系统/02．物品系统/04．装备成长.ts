@@ -20,7 +20,7 @@ const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
 };
-const { onSecond, offSecond } = require("系统.00．核心系统.05．中心计时器") as {
+const { onSecond, offSecond } = globalThis as unknown as {
   onSecond: (cb: () => void) => void;
   offSecond: (cb: () => void) => void;
 };

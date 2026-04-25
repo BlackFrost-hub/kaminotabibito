@@ -1,105 +1,98 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-require("系统.08．任务系统.00．配置表.index")
+local ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173 = require("系统.08．任务系统.00．任务系统二分开关")
+local ENABLE_QUEST_CONFIG_TABLE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_CONFIG_TABLE
+local ENABLE_QUEST_RUNTIME_CORE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_RUNTIME_CORE
+local ENABLE_QUEST_UI_MODULE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_UI_MODULE
+local ENABLE_QUEST_MAINLINE_DRIVER = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_MAINLINE_DRIVER
+local ENABLE_QUEST_EVENT_BRIDGE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_EVENT_BRIDGE
+local ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT
+local ENABLE_QUEST_STES_OBJECTIVE_BRIDGE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_STES_OBJECTIVE_BRIDGE
+local ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE
+local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
+local QuestDatabase = ____01_FF0E_4EFB_52A1_6570_636E.QuestDatabase
+local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
+local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 do
-    local ____export = require("系统.08．任务系统.04．任务UI拆分.index")
+    local ____export = require("系统.08．任务系统.00．任务系统二分开关")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
         end
     end
 end
-do
-    local ____export = require("系统.08．任务系统.01．任务数据")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
+--- 注册20个假的主线任务用于测试（状态为进行中，直接显示在UI中）
+local function registerDummyMainQuests(self)
+    local db = QuestDatabase:getInstance()
+    local now = os.time()
+    do
+        local i = 1
+        while i <= 20 do
+            local questId = "dummy_main_" .. tostring(i)
+            local questDef = {
+                id = questId,
+                type = QuestType.MAIN,
+                title = "测试主线任务 " .. tostring(i),
+                description = ("这是第 " .. tostring(i)) .. " 个测试主线任务，用于测试任务UI的显示和刷新。",
+                objectives = {{
+                    id = questId .. "_obj1",
+                    description = "完成目标 1",
+                    current = 0,
+                    required = 1,
+                    completed = false
+                }},
+                rewards = {{
+                    type = "experience",
+                    value = 100 * i,
+                    description = tostring(100 * i) .. " 经验值"
+                }},
+                status = QuestStatus.UNDISCOVERED,
+                icon = "ReplaceableTextures\\CommandButtons\\BTNScroll.blp",
+                createdAt = now,
+                updatedAt = now
+            }
+            db:registerQuest(questDef)
+            local activeQuest = __TS__ObjectAssign({}, questDef, {status = QuestStatus.IN_PROGRESS, createdAt = now, updatedAt = now, startTime = now})
+            db.globalData.quests:set(questId, activeQuest)
+            i = i + 1
         end
     end
 end
-do
-    local ____export = require("系统.08．任务系统.02．任务管理器.index")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
+if ENABLE_QUEST_CONFIG_TABLE then
+    require("系统.08．任务系统.00．配置表.index")
+end
+if ENABLE_QUEST_RUNTIME_CORE then
+    require("系统.08．任务系统.01．任务数据")
+    local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器.index")
+    if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
+        _____4EFB_52A1_7BA1_7406_5668:init()
+    end
+    registerDummyMainQuests(nil)
+end
+if ENABLE_QUEST_UI_MODULE then
+    local _____4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
+    if type(_____4EFB_52A1UI.init) == "function" then
+        _____4EFB_52A1UI:init()
+    end
+    if type(_____4EFB_52A1UI.registerHotkey) == "function" then
+        _____4EFB_52A1UI:registerHotkey()
     end
 end
-do
-    local ____export = require("系统.08．任务系统.03．任务UI")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
+if ENABLE_QUEST_STES_OBJECTIVE_BRIDGE or ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE then
+    require("系统.08．任务系统.05．任务STES配置表")
+    require("系统.08．任务系统.06．任务STES桥接")
 end
-do
-    local ____export = require("系统.08．任务系统.05．任务STES配置表")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
+if ENABLE_QUEST_EVENT_BRIDGE then
+    require("系统.08．任务系统.07．任务事件桥接")
 end
-do
-    local ____export = require("系统.08．任务系统.06．任务STES桥接")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
+if ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT then
+    require("系统.08．任务系统.08．任务目标更新")
 end
-do
-    local ____export = require("系统.08．任务系统.07．任务事件桥接")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
+if ENABLE_QUEST_MAINLINE_DRIVER then
+    require("系统.08．任务系统.09．主线配置驱动")
 end
-do
-    local ____export = require("系统.08．任务系统.08．任务目标更新")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.08．任务系统.09．主线配置驱动")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-require("系统.08．任务系统.01．任务数据")
-local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器.index")
-if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
-    _____4EFB_52A1_7BA1_7406_5668:init()
-end
-local ____require_result_0 = require("系统.08．任务系统.01．任务数据")
-local questDB = ____require_result_0.questDB
-local QuestType = ____require_result_0.QuestType
-local QuestStatus = ____require_result_0.QuestStatus
-local ____require_result_1 = require("系统.08．任务系统.02．任务管理器.index")
-local questManager = ____require_result_1.questManager
-local _____4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
-if type(_____4EFB_52A1UI.init) == "function" then
-    _____4EFB_52A1UI:init()
-end
-if type(_____4EFB_52A1UI.registerHotkey) == "function" then
-    _____4EFB_52A1UI:registerHotkey()
-end
-require("系统.08．任务系统.04．任务UI拆分.index")
-require("系统.08．任务系统.05．任务STES配置表")
-require("系统.08．任务系统.06．任务STES桥接")
-require("系统.08．任务系统.07．任务事件桥接")
-require("系统.08．任务系统.08．任务目标更新")
-require("系统.08．任务系统.09．主线配置驱动")
-local ENABLE_TASK_UI_SCROLL_STRESS_TEST = false
-local TASK_UI_SCROLL_STRESS_COUNT = 20
---- 初始化任务系统
+--- 预留：与 `main` 中 `任务系统.init?.()` 对应；当前初始化已在模块加载时完成。
 function ____exports.init(self)
 end
 return ____exports

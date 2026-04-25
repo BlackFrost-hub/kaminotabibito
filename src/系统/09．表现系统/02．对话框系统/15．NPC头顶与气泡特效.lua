@@ -50,7 +50,7 @@ function ____exports.destroyBubbleEffect(self, playerId)
 end
 jass = require("jass.common")
 local japi = require("jass.japi")
-MAX_PLAYERS = 28
+MAX_PLAYERS = 4
 BUBBLE_EFFECT_PATH = "resource\\models\\qipao.mdx"
 local NPC_OVERHEAD_BLUE_EXCL = "resource\\models\\exclamation\\bluetanhao.mdx"
 local NPC_OVERHEAD_YELLOW_EXCL = "resource\\models\\exclamation\\yellowtanhao.mdx"

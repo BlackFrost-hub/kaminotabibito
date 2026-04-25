@@ -80,8 +80,10 @@ function initAutoRegister(self)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
+local ____G_0 = _G
+local addPeriodicCallback = ____G_0.addPeriodicCallback
 aiUnitRegistry = __TS__New(Map)
-local aiCheckTimer = nil
+local aiCheckRegistered = false
 unitCreatedTrigger = nil
 function ____exports.registerAISkill(self, unit, config)
     if not unit or not config.abilityId then
@@ -146,8 +148,8 @@ function ____exports.unregisterAIUnit(self, unit)
     return true
 end
 local function canCastSkill(self, unit, skillInfo)
-    local ____skillInfo_0 = skillInfo
-    local config = ____skillInfo_0.config
+    local ____skillInfo_1 = skillInfo
+    local config = ____skillInfo_1.config
     if not isValidUnit(nil, unit) or isUnitDead(nil, unit) then
         return false
     end
@@ -167,8 +169,8 @@ local function canCastSkill(self, unit, skillInfo)
     return true
 end
 local function findBestTarget(self, unit, skillInfo)
-    local ____skillInfo_1 = skillInfo
-    local config = ____skillInfo_1.config
+    local ____skillInfo_2 = skillInfo
+    local config = ____skillInfo_2.config
     if config.targetType == TARGET_TYPE_NONE then
         return true
     end
@@ -178,8 +180,8 @@ local function findBestTarget(self, unit, skillInfo)
     return nil
 end
 local function castSkill(self, unit, skillInfo, target)
-    local ____skillInfo_2 = skillInfo
-    local config = ____skillInfo_2.config
+    local ____skillInfo_3 = skillInfo
+    local config = ____skillInfo_3.config
     do
         local function ____catch(_e)
             return true, false
@@ -211,9 +213,9 @@ local function castSkill(self, unit, skillInfo, target)
     end
 end
 local function updateAIUnit(self, unitInfo)
-    local ____unitInfo_3 = unitInfo
-    local unit = ____unitInfo_3.unit
-    local skills = ____unitInfo_3.skills
+    local ____unitInfo_4 = unitInfo
+    local unit = ____unitInfo_4.unit
+    local skills = ____unitInfo_4.skills
     if not isValidUnit(nil, unit) or isUnitDead(nil, unit) then
         return
     end
@@ -240,15 +242,22 @@ local function onAICheck(self)
         updateAIUnit(nil, unitInfo)
     end
 end
-local ____require_result_4 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
-local registerDeathListener = ____require_result_4.registerDeathListener
+local ____require_result_5 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_5.registerDeathListener
 function ____exports.initAISkillSystem(self)
     if not AI_SKILL_SYSTEM_ENABLED then
         return
     end
-    if not aiCheckTimer then
-        aiCheckTimer = jass.CreateTimer()
-        jass.TimerStart(aiCheckTimer, AI_CHECK_INTERVAL, true, onAICheck)
+    if not aiCheckRegistered then
+        aiCheckRegistered = true
+        addPeriodicCallback(
+            nil,
+            math.max(
+                1,
+                math.floor(AI_CHECK_INTERVAL * 1000)
+            ),
+            onAICheck
+        )
     end
     registerDeathListener(
         nil,

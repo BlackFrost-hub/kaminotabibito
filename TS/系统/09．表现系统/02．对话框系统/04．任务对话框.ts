@@ -40,12 +40,7 @@ export function setQuestButtonTexts(
   state: PlayerDialogState,
   acceptText: string,
   rejectText: string,
-  getLocalPlayer: () => any,
-  getPlayerById: (id: number) => any,
 ): void {
-  const localPlayer = getLocalPlayer();
-  const targetPlayer = getPlayerById(state.playerId);
-  if (localPlayer !== targetPlayer) return;
   if (state.frames[9] && state.frames[9] !== 0) {
     japi.DzFrameSetText(state.frames[9], acceptText);
   }

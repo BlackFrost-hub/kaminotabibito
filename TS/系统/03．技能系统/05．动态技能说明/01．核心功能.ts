@@ -6,17 +6,16 @@
  */
 
 const jass = require("jass.common") as any;
-const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
-  registerPlayerUnitEventById: (this: void, trig: any, playerId: number, eventId: any, filter?: any) => void;
+const heroLevelEventCenter = require("系统.00．核心系统.01．事件中心.06．英雄升级事件中心") as {
+  registerHeroLevelListener: (this: void, callback: (heroUnit: any) => void) => void;
 };
+const { registerHeroLevelListener } = heroLevelEventCenter;
 
 import {
   DYNAMIC_SKILL_TIP_ENABLED,
-  EVENT_ID_HERO_LEVEL,
   EVENT_ID_UNIT_DEATH,
   PLAYER_NEUTRAL_AGGRESSIVE,
   PLAYER_NEUTRAL_PASSIVE,
-  PLAYER_COUNT,
   UNIT_STATE_ATTACK1_BASE,
   UNIT_STATE_ATTACK1_BONUS,
   UNIT_STATE_ARMOR,
@@ -293,30 +292,29 @@ export function registerSkillTips(
 // 事件处理
 // ==========================================================================================
 
-let levelUpTrigger: any = null;
-
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
 };
 
+let _heroLevelListenerBound = false;
+let _deathListenerBound = false;
+
 export function initDynamicSkillTipSystem(): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
 
-  if (!levelUpTrigger) {
-    levelUpTrigger = jass.CreateTrigger();
-    const levelEventId = (jass as any).EVENT_PLAYER_HERO_LEVEL ?? EVENT_ID_HERO_LEVEL;
-    for (let i = 0; i < PLAYER_COUNT; i++) {
-      playerUnitEvent.registerPlayerUnitEventById(levelUpTrigger, i, levelEventId);
-    }
-    jass.TriggerAddAction(levelUpTrigger, () => {
-      const unit = jass.GetTriggerUnit();
+  if (!_heroLevelListenerBound) {
+    _heroLevelListenerBound = true;
+    registerHeroLevelListener((unit) => {
       refreshUnitSkillTips(unit);
     });
   }
 
-  registerDeathListener((dyingUnit) => {
-    unregisterDynamicSkillTip(dyingUnit);
-  });
+  if (!_deathListenerBound) {
+    _deathListenerBound = true;
+    registerDeathListener((dyingUnit) => {
+      unregisterDynamicSkillTip(dyingUnit);
+    });
+  }
 }
 
 // ==========================================================================================

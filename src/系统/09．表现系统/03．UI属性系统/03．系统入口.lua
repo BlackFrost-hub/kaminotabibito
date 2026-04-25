@@ -6,7 +6,7 @@ function refreshAllUi()
     updateDetailPanels()
 end
 function registerKey(status, keyCode, action)
-    _____786C_4EF6_51FD_6570:registerKeyEventRawStatus(keyCode, status, false, action)
+    _____786C_4EF6_51FD_6570:registerKeyEventRawStatus(keyCode, status, true, action)
 end
 function registerDamagePanelHotkeys()
     registerKey(
@@ -90,7 +90,7 @@ function ____exports.initUiAttributeSystem()
 end
 jass = require("jass.common")
 _____786C_4EF6_51FD_6570 = require("系统.00．核心系统.02．硬件函数")
-_____4E2D_5FC3_8BA1_65F6_5668 = require("系统.00．核心系统.05．中心计时器")
+_____4E2D_5FC3_8BA1_65F6_5668 = _G
 _____5E38_91CF = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
 createUiFrames = ____require_result_0.createUiFrames

@@ -354,7 +354,7 @@ export function YDWETimerDestroyEffect(duration: number, effect: any): void {
   // 注册到中心计时器（只注册一次）
   if (!_effectRecycleRegistered) {
     _effectRecycleRegistered = true;
-    const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+const { onTick10ms } = globalThis as unknown as {
       onTick10ms: (callback: () => void) => void;
     };
     onTick10ms(_tickEffectRecycle);

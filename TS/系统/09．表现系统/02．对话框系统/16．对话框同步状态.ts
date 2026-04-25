@@ -3,23 +3,38 @@
  * - 供任务面板等同步 UI 与 `01．对话框渲染核心` 使用
  */
 
-const MAX_PLAYERS = 28;
+/** 对话同步状态只维护 4 个固定玩家槽位。 */
+const MAX_PLAYERS = 4;
 
 const g_finishCallbacks: (((() => void) | undefined))[] = [];
-let g_activePlayerId: number = -1;
+const g_activePlayerFlags: boolean[] = [];
 
 export function setActivePlayerId(playerId: number): void {
-  g_activePlayerId = playerId;
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  g_activePlayerFlags[playerId] = true;
 }
 
 export function getActivePlayerId(): number {
-  return g_activePlayerId;
+  let found = -1;
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    if (!g_activePlayerFlags[i]) continue;
+    if (found >= 0) return -1;
+    found = i;
+  }
+  return found;
+}
+
+export function getActivePlayerIds(): number[] {
+  const ids: number[] = [];
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    if (g_activePlayerFlags[i]) ids.push(i);
+  }
+  return ids;
 }
 
 export function resetActivePlayerIdIfMatch(playerId: number): void {
-  if (g_activePlayerId === playerId) {
-    g_activePlayerId = -1;
-  }
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  g_activePlayerFlags[playerId] = false;
 }
 
 export function setFinishCallback(playerId: number, callback: () => void): void {

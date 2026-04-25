@@ -35,9 +35,20 @@ export const DzI2K: (i: number) => number = eventApi.DzI2K;
 export const DzTriggerRegisterMallItemSyncData: (trig: any) => void = eventApi.DzTriggerRegisterMallItemSyncData;
 export const DzGetTriggerMallItemPlayer: () => any = eventApi.DzGetTriggerMallItemPlayer;
 export const DzGetTriggerMallItem: () => string = eventApi.DzGetTriggerMallItem;
+export const DzSyncData: (prefix: string, data: string) => void = eventApi.DzSyncData;
+export const DzSyncDataImmediately: (prefix: string, data: string) => void = eventApi.DzSyncDataImmediately;
+export const DzSyncBuffer: (prefix: string, data: string, dataLen: number) => void = eventApi.DzSyncBuffer;
+export const DzTriggerRegisterDialogEntrySyncData: (trig: any) => void = eventApi.DzTriggerRegisterDialogEntrySyncData;
+export const DzSyncDialogEntryData: (data: string) => void = eventApi.DzSyncDialogEntryData;
+export const DzGetTriggerDialogEntryPlayer: () => any = eventApi.DzGetTriggerDialogEntryPlayer;
+export const DzGetTriggerDialogEntryData: () => string = eventApi.DzGetTriggerDialogEntryData;
+export const DzTriggerRegisterSyncDataTrg: (trig: any, prefix: string, server: boolean) => void = eventApi.DzTriggerRegisterSyncDataTrg;
+export const DzGetTriggerSyncPlayer: () => any = eventApi.DzGetTriggerSyncPlayer;
+export const DzGetTriggerSyncData: () => string = eventApi.DzGetTriggerSyncData;
 
 export const DzGetColor2: (a: number, r: number, g: number, b: number) => number = utilApi.DzGetColor2;
 export const DzOpenQQGroupUrl: (url: string) => boolean = utilApi.DzOpenQQGroupUrl;
+export const DzExecuteFunc: (funcName: string) => void = utilApi.DzExecuteFunc;
 
 function expose(name: string, fn: any): void {
   if (typeof fn !== "function") return;
@@ -80,7 +91,18 @@ export function registerBridge(): void {
   expose("DzTriggerRegisterMallItemSyncData", eventApi.DzTriggerRegisterMallItemSyncData);
   expose("DzGetTriggerMallItemPlayer", eventApi.DzGetTriggerMallItemPlayer);
   expose("DzGetTriggerMallItem", eventApi.DzGetTriggerMallItem);
+  expose("DzSyncData", eventApi.DzSyncData);
+  expose("DzSyncDataImmediately", eventApi.DzSyncDataImmediately);
+  expose("DzSyncBuffer", eventApi.DzSyncBuffer);
+  expose("DzTriggerRegisterDialogEntrySyncData", eventApi.DzTriggerRegisterDialogEntrySyncData);
+  expose("DzSyncDialogEntryData", eventApi.DzSyncDialogEntryData);
+  expose("DzGetTriggerDialogEntryPlayer", eventApi.DzGetTriggerDialogEntryPlayer);
+  expose("DzGetTriggerDialogEntryData", eventApi.DzGetTriggerDialogEntryData);
+  expose("DzTriggerRegisterSyncDataTrg", eventApi.DzTriggerRegisterSyncDataTrg);
+  expose("DzGetTriggerSyncPlayer", eventApi.DzGetTriggerSyncPlayer);
+  expose("DzGetTriggerSyncData", eventApi.DzGetTriggerSyncData);
 
   expose("DzGetColor2", utilApi.DzGetColor2);
   expose("DzOpenQQGroupUrl", utilApi.DzOpenQQGroupUrl);
+  expose("DzExecuteFunc", utilApi.DzExecuteFunc);
 }

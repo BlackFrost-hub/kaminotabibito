@@ -19,4 +19,10 @@ end
 function ____exports.DzOpenQQGroupUrl(self, url)
     return japi.DzOpenQQGroupUrl(url) or false
 end
+--- 异步执行全局函数
+-- 
+-- @param funcName 全局函数名
+function ____exports.DzExecuteFunc(self, funcName)
+    japi.DzExecuteFunc(funcName)
+end
 return ____exports

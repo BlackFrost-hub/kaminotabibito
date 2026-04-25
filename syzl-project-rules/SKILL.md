@@ -1,6 +1,6 @@
 ---
 name: syzl-project-rules
-description: Route work in the syzl repository through its project-specific engineering rules. Use when Codex is asked to inspect, edit, review, refactor, or discuss code in this repo, especially for TypeScript, Lua, JASS, DzAPI UI, task UI, equipment, STES/YDLocal, or other areas covered by `.cursor/rules/`.
+description: Route work in the syzl repository through its project-specific engineering rules. Use when working anywhere in this repo, especially for TypeScript, Lua, JASS, DzAPI UI, task UI, shared single-UI managers, N-slot symmetric UI, equipment, STES/YDLocal, or other areas covered by `.cursor/rules/`.
 ---
 
 # Syzl Project Rules
@@ -52,6 +52,86 @@ Use this skill to onboard into the repo's rule system before making changes. Rea
 - Keep local-only UI work inside `GetLocalPlayer()` branches.
 - When `sync=true` is involved, re-check `n-slot-ui-symmetric-execution.mdc` before editing.
 - Treat `ui-frame-types.mdc` as the API/layout reference and `n-slot-ui-symmetric-execution.mdc` as the multiplayer-semantics reference.
+
+## Shared UI Architecture
+
+When the task is about Warcraft III multiplayer UI architecture, classify the topology before changing code.
+
+### Global Single-UI Manager
+
+Use when:
+
+- Each client owns one logical UI tree
+- Interaction is mainly local visual behavior
+- Open/close, tab switch, expand/collapse, and paging are local presentation
+
+Bias:
+
+- One manager
+- One frame tree
+- Mouse events usually `sync=false`
+- Keyboard may be local only if the platform path is proven stable
+- Mouse and keyboard must converge into the same downstream local functions
+- Prefer only visual/idempotent operations on already-existing frames
+
+### N-Slot Symmetric UI
+
+Use when:
+
+- Each client must hold slot UI for all players
+- Shared slot state must stay symmetric
+- Only final visibility differs per local player
+
+Bias:
+
+- One manager, not one manager instance per player
+- Create slot frames symmetrically
+- Keep creation, registration, timers, and shared state symmetric
+- Only final visibility and explicitly local feedback stay local
+
+## Local False Chain Rules
+
+Inside a local `sync=false` mouse/keyboard/UI chain, prefer only:
+
+- `DzFrameShow`
+- `DzFrameSetText`
+- `DzFrameSetTexture`
+- `DzFrameSetPoint`
+- `DzFrameSetSize`
+- Switching prebuilt pages/variants by show/hide
+- Local click sound restricted to the local player
+
+Do not put these into the local `false` chain unless the whole subsystem is intentionally symmetric:
+
+- `DzSyncData` / `DzSyncDataImmediately`
+- Desync probes that create handles locally
+- `CreateItem` / `RemoveItem` for diagnostics
+- Runtime frame creation triggered by local interaction
+- Runtime event registration triggered by local interaction
+- Timers started only from local UI interaction
+- Bare `SoundUI_ClickPlay()` / `StartSound()` that reaches all clients
+
+## Sound Rule
+
+Local UI sound must be explicitly local.
+
+Bad:
+
+```ts
+SoundUI_ClickPlay();
+```
+
+Good:
+
+```ts
+const localPlayer = GetLocalPlayer();
+SoundUI_ClickPlay(undefined, localPlayer);
+```
+
+Best:
+
+- Cache `localPlayer` once in the UI manager
+- Reuse one `playLocalClickSound()` helper in buttons, hotkeys, and row clicks
 
 ## Working Style
 

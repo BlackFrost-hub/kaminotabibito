@@ -31,7 +31,7 @@ const {
   YDUserDataClear: (tableType: string, key: any, attr: string, valueType: string) => void;
 };
 
-const { onSecond, offSecond } = require("系统.00．核心系统.05．中心计时器") as {
+const { onSecond, offSecond } = globalThis as unknown as {
   onSecond: (callback: () => void) => void;
   offSecond: (callback: () => void) => void;
 };

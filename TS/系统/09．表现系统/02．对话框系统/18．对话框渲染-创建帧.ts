@@ -34,15 +34,22 @@ function bindDialogPanelHitFrame(hitFrame: Frame): void {
   if (g_bindDialogPanelHitFrame) g_bindDialogPanelHitFrame(hitFrame);
 }
 
+const TAG_SLOT_OFFSET = 1000;
+
 // ========== 虚拟分区：初始化 ==========
-export function createDialogFrames(): Frame[] {
+export function createDialogFrames(slotId: number = 0): Frame[] {
   const frames: Frame[] = [];
   for (let i = 0; i <= 11; i++) frames[i] = 0;
   frames[101] = 0; frames[102] = 0; frames[103] = 0;
+
+  const slotTag = TAG_BASE_MAIN + slotId * TAG_SLOT_OFFSET;
+  const portraitTag = TAG_BASE_PORTRAIT + slotId * TAG_SLOT_OFFSET;
+  const nameSuffix = `_s${slotId}`;
+
   const portraits = [
-    { idx: 101, tag: TAG_BASE_PORTRAIT, x: 0.24, y: 0.1421 + 0.2 },
-    { idx: 102, tag: TAG_BASE_PORTRAIT + 1, x: 0.24 + 0.377 / 3, y: 0.1421 + 0.2 },
-    { idx: 103, tag: TAG_BASE_PORTRAIT + 2, x: 0.24 + 0.377 / 1.5, y: 0.1421 + 0.2 },
+    { idx: 101, tag: portraitTag, x: 0.24, y: 0.1421 + 0.2 },
+    { idx: 102, tag: portraitTag + 1, x: 0.24 + 0.377 / 3, y: 0.1421 + 0.2 },
+    { idx: 103, tag: portraitTag + 2, x: 0.24 + 0.377 / 1.5, y: 0.1421 + 0.2 },
   ];
   for (const p of portraits) {
     const f = dzCreate("GameUI", p.tag);
@@ -50,10 +57,10 @@ export function createDialogFrames(): Frame[] {
     dzShow(f, false); dzClearPoints(f); dzSetAbsPoint(f, 3, p.x, p.y); dzSetSize(f, 0.367 / 3, 0.231); dzSetAlpha(f, 255); dzSetTexture(f, "");
   }
   const gameUI = japi.DzGetGameUI();
-  const bg = createFrame({ type: FrameType.BACKDROP, name: "DialogBG", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const bg = createFrame({ type: FrameType.BACKDROP, name: `DialogBG${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[0] = bg;
   dzClearPoints(bg); dzSetAbsPoint(bg, 3, 0.23, 0.2421); dzSetSize(bg, 0.377, 0.131); dzSetAlpha(bg, 255); dzSetTexture(bg, DEFAULT_BG_TEX);
-  const bgBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogBGBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const bgBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: `DialogBGBtn${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[4] = bgBtn;
   if (bgBtn !== 0) {
     (pcall as any)(() => japi.DzFrameSetParent(bgBtn, bg));
@@ -64,54 +71,54 @@ export function createDialogFrames(): Frame[] {
   }
   bindDialogPanelHitFrame(bgBtn);
 
-  const titleBg = dzCreate("GameUI", TAG_BASE_MAIN + 2);
+  const titleBg = dzCreate("GameUI", slotTag + 2);
   frames[1] = titleBg;
   dzShow(titleBg, false); dzClearPoints(titleBg); dzSetAbsPoint(titleBg, 3, 0.24, 0.3083); dzSetSize(titleBg, 0.107, 0.0328); dzSetAlpha(titleBg, 255); dzSetTexture(titleBg, DEFAULT_TITLE_TEX);
-  const nameText = dzCreate("GameText", TAG_BASE_MAIN + 3);
+  const nameText = dzCreate("GameText", slotTag + 3);
   frames[2] = nameText;
   dzShow(nameText, false); dzClearPoints(nameText);
   if (nameText !== 0) (pcall as any)(() => japi.DzFrameSetAllPoints(nameText, titleBg));
   dzSetText(nameText, ""); dzSetFont(nameText, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE); dzSetEnable(nameText, false);
   if (nameText !== 0) (pcall as any)(() => { japi.DzFrameSetTextAlignment(nameText, -1); japi.DzFrameSetTextAlignment(nameText, 18); });
-  const bodyText = dzCreate("GameTextpxL", TAG_BASE_MAIN + 4);
+  const bodyText = dzCreate("GameTextpxL", slotTag + 4);
   frames[3] = bodyText;
   dzShow(bodyText, false); dzClearPoints(bodyText); dzSetAbsPoint(bodyText, 0, 0.24, 0.28); dzSetSize(bodyText, 0.35, 0.22); dzSetText(bodyText, ""); dzSetFont(bodyText, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE); dzSetEnable(bodyText, false);
 
-  const acceptBg = createFrame({ type: FrameType.BACKDROP, name: "DialogAcceptBg", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const acceptBg = createFrame({ type: FrameType.BACKDROP, name: `DialogAcceptBg${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[5] = acceptBg; if (acceptBg !== 0) japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.1800);
   if (acceptBg !== 0) japi.DzFrameSetSize(acceptBg, 0.08, 0.022);
   if (acceptBg !== 0) japi.DzFrameSetTexture(acceptBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
-  const acceptLabel = createFrame({ type: FrameType.TEXT, name: "DialogAcceptLabel", parent: acceptBg, template: "template", visible: false }) ?? 0;
+  const acceptLabel = createFrame({ type: FrameType.TEXT, name: `DialogAcceptLabel${nameSuffix}`, parent: acceptBg, template: "template", visible: false }) ?? 0;
   frames[9] = acceptLabel;
   if (acceptLabel !== 0) japi.DzFrameSetAllPoints(acceptLabel, acceptBg);
   if (acceptLabel !== 0) japi.DzFrameSetText(acceptLabel, "接受任务");
   if (acceptLabel !== 0) japi.DzFrameSetTextColor(acceptLabel, 255, 255, 255, 255);
   if (acceptLabel !== 0) japi.DzFrameSetFont(acceptLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0);
   if (acceptLabel !== 0) japi.DzFrameSetTextAlignment(acceptLabel, 18);
-  const acceptBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogAcceptBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const acceptBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: `DialogAcceptBtn${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[6] = acceptBtn;
   if (acceptBtn !== 0) japi.DzFrameSetAllPoints(acceptBtn, acceptBg);
   if (acceptBtn !== 0) japi.DzFrameSetAlpha(acceptBtn, 0);
   if (acceptBtn !== 0) japi.DzFrameSetText(acceptBtn, "");
 
-  const rejectBg = createFrame({ type: FrameType.BACKDROP, name: "DialogRejectBg", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const rejectBg = createFrame({ type: FrameType.BACKDROP, name: `DialogRejectBg${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[7] = rejectBg; if (rejectBg !== 0) japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.1800);
   if (rejectBg !== 0) japi.DzFrameSetSize(rejectBg, 0.08, 0.022);
   if (rejectBg !== 0) japi.DzFrameSetTexture(rejectBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
-  const rejectLabel = createFrame({ type: FrameType.TEXT, name: "DialogRejectLabel", parent: rejectBg, template: "template", visible: false }) ?? 0;
+  const rejectLabel = createFrame({ type: FrameType.TEXT, name: `DialogRejectLabel${nameSuffix}`, parent: rejectBg, template: "template", visible: false }) ?? 0;
   frames[10] = rejectLabel;
   if (rejectLabel !== 0) japi.DzFrameSetAllPoints(rejectLabel, rejectBg);
   if (rejectLabel !== 0) japi.DzFrameSetText(rejectLabel, "拒绝任务");
   if (rejectLabel !== 0) japi.DzFrameSetTextColor(rejectLabel, 255, 255, 255, 255);
   if (rejectLabel !== 0) japi.DzFrameSetFont(rejectLabel, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE, 0);
   if (rejectLabel !== 0) japi.DzFrameSetTextAlignment(rejectLabel, 18);
-  const rejectBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: "DialogRejectBtn", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const rejectBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: `DialogRejectBtn${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[8] = rejectBtn;
   if (rejectBtn !== 0) japi.DzFrameSetAllPoints(rejectBtn, rejectBg);
   if (rejectBtn !== 0) japi.DzFrameSetAlpha(rejectBtn, 0);
   if (rejectBtn !== 0) japi.DzFrameSetText(rejectBtn, "");
 
-  const hintLabel = createFrame({ type: FrameType.TEXT, name: "DialogHintLabel", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const hintLabel = createFrame({ type: FrameType.TEXT, name: `DialogHintLabel${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[11] = hintLabel;
   if (hintLabel !== 0) {
     (pcall as any)(() => japi.DzFrameSetPoint(hintLabel, 8, bg, 8, -0.008, 0.008));
@@ -121,11 +128,9 @@ export function createDialogFrames(): Frame[] {
     japi.DzFrameSetTextAlignment(hintLabel, -1); japi.DzFrameSetTextAlignment(hintLabel, 5);
   }
 
-  // 跳过提示文本（在说话人标题下方）
-  const skipHintLabel = createFrame({ type: FrameType.TEXT, name: "DialogSkipHint", parent: gameUI, template: "template", visible: false }) ?? 0;
+  const skipHintLabel = createFrame({ type: FrameType.TEXT, name: `DialogSkipHint${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[12] = skipHintLabel;
   if (skipHintLabel !== 0) {
-    // 锚定到标题背景的左下角，往下偏移一点
     (pcall as any)(() => japi.DzFrameSetPoint(skipHintLabel, 0, titleBg, 2, 0.005, -0.022));
     japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018);
     japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r");

@@ -15,7 +15,7 @@ import {
   ATTR_NAME_MAP,
 } from "./00．常量定义";
 
-const { getGameTimeFormatted, getGameDifficulty, onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+const { getGameTimeFormatted, getGameDifficulty, onTick10ms } = globalThis as unknown as {
   getGameTimeFormatted: () => { hours: number; minutes: number; seconds: number; total: number };
   getGameDifficulty: () => number;
   onTick10ms: (callback: () => void) => void;

@@ -23,9 +23,9 @@ local AddGoldWithFeedback = ____require_result_1.AddGoldWithFeedback
 local fourCCToString = ____require_result_1.fourCCToString
 local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local onSecond = ____require_result_3.onSecond
-local offSecond = ____require_result_3.offSecond
+local ____G_3 = _G
+local onSecond = ____G_3.onSecond
+local offSecond = ____G_3.offSecond
 --- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
 local KEY_TO_NAME = {
     hp = "生命值",

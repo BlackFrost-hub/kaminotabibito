@@ -5,7 +5,8 @@ local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActi
 local japi = require("jass.japi")
 local jass = require("jass.common")
 ____exports.DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
-____exports.MAX_PLAYERS = 28
+--- 对话框系统固定为 4 个玩家槽位：P1~P4。
+____exports.MAX_PLAYERS = 4
 ____exports.TOC_PATH = "ui\\StarGameUI.toc"
 ____exports.TAG_BASE_MAIN = 1024
 ____exports.TAG_BASE_PORTRAIT = 1125

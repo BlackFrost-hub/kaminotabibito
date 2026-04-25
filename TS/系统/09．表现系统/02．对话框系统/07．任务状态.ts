@@ -51,16 +51,16 @@ export function ensureQuestConfigsRegistered(): void {
 }
 
 // ========== 虚拟分区：任务状态 ==========
-export function getQuestState(questId: string): number {
-  const status = questDB.getPlayerQuestStatus(0, questId);
+export function getQuestState(playerId: number, questId: string): number {
+  const status = questDB.getPlayerQuestStatus(playerId, questId);
   if (status === QuestStatus.COMPLETED) return 2;
   if (status === QuestStatus.IN_PROGRESS) return 1;
   return 0;
 }
 
-export function setQuestState(questId: string, state: number, playerName?: string): void {
+export function setQuestState(playerId: number, questId: string, state: number, playerName?: string): void {
   if (state === 1) {
-    questDB.acceptQuest(0, questId);
+    questDB.acceptQuest(playerId, questId);
     if (playerName) {
       const def = questDB.getQuest(questId);
       if (def) def.accepterName = playerName;
@@ -83,7 +83,7 @@ export function setQuestState(questId: string, state: number, playerName?: strin
       if (playerName) active.completerName = playerName;
     }
     const savedAccepterName = active != null ? active.accepterName : undefined;
-    questDB.completeQuest(0, questId);
+    questDB.completeQuest(playerId, questId);
     if (playerName) {
       const def = questDB.getQuest(questId);
       if (def) {
@@ -94,11 +94,11 @@ export function setQuestState(questId: string, state: number, playerName?: strin
   }
 }
 
-export function hasPlayerAcceptedQuest(_playerId: number, questId: string): boolean {
-  return getQuestState(questId) === 1;
+export function hasPlayerAcceptedQuest(playerId: number, questId: string): boolean {
+  return getQuestState(playerId, questId) === 1;
 }
 
-export function hasPlayerCompletedQuest(_playerId: number, questId: string): boolean {
-  return getQuestState(questId) === 2;
+export function hasPlayerCompletedQuest(playerId: number, questId: string): boolean {
+  return getQuestState(playerId, questId) === 2;
 }
 

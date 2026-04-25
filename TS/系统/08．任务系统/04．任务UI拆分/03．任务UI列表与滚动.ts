@@ -15,9 +15,17 @@ export function getQuestItemHeight(quest: QuestData, expanded: boolean): number 
   if (!expanded) return LIST_ITEM_H * 0.4;
   let h = LIST_ITEM_H + quest.objectives.length * 0.03 + (quest.timeLimit && quest.timeLimit > 0 ? 0.02 : 0);
   if (quest.description && quest.description !== "") h += 0.025;
-  const rewardDesc = quest.rewards && quest.rewards.length > 0
-    ? quest.rewards.map(r => r.description).filter(d => d && d !== "").join("、")
-    : "";
+  let rewardDesc = "";
+  if (quest.rewards && quest.rewards.length > 0) {
+    const descs: string[] = [];
+    for (const r of quest.rewards) {
+      if (r.description && r.description !== "") descs.push(r.description);
+    }
+    if (descs.length > 0) {
+      rewardDesc = descs[0];
+      for (let i = 1; i < descs.length; i++) rewardDesc += "、" + descs[i];
+    }
+  }
   if (rewardDesc !== "") h += 0.025;
   if (quest.accepterName || quest.completerName) h += 0.025;
   return h;

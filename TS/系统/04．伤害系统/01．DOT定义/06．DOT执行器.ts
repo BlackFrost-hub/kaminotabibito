@@ -145,7 +145,7 @@ export function createDotExecutor(deps: {
     _registeredToCenterTimer = true;
 
     // 使用中心计时器的每秒回调
-    const { onSecond } = require("系统.00．核心系统.05．中心计时器") as {
+const { onSecond } = globalThis as unknown as {
       onSecond: (callback: () => void) => void;
     };
     onSecond(dotTickRun);

@@ -125,24 +125,26 @@ function ____exports.updatePlayerRealtimeStats(player)
         ____temp_2 = oldMoveSpeed
     end
     local moveSpeed = ____temp_2
-    if attacksPerSecond > 0 then
+    local apsQuant = math.floor(attacksPerSecond * 10000 + 0.5) / 10000
+    local moveQuant = math.floor(moveSpeed * 100 + 0.5) / 100
+    if apsQuant > 0 then
         YDUserDataSet(
             nil,
             "player",
             player,
             "每秒攻速",
             "real",
-            attacksPerSecond
+            apsQuant
         )
     end
-    if moveSpeed > 0 then
+    if moveQuant > 0 then
         YDUserDataSet(
             nil,
             "player",
             player,
             "移动速度",
             "real",
-            moveSpeed
+            moveQuant
         )
     end
 end

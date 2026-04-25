@@ -73,8 +73,8 @@ function ____exports.ensureQuestConfigsRegistered(self)
         ::__continue5::
     end
 end
-function ____exports.getQuestState(self, questId)
-    local status = questDB:getPlayerQuestStatus(0, questId)
+function ____exports.getQuestState(self, playerId, questId)
+    local status = questDB:getPlayerQuestStatus(playerId, questId)
     if status == QuestStatus.COMPLETED then
         return 2
     end
@@ -83,9 +83,9 @@ function ____exports.getQuestState(self, questId)
     end
     return 0
 end
-function ____exports.setQuestState(self, questId, state, playerName)
+function ____exports.setQuestState(self, playerId, questId, state, playerName)
     if state == 1 then
-        questDB:acceptQuest(0, questId)
+        questDB:acceptQuest(playerId, questId)
         if playerName then
             local def = questDB:getQuest(questId)
             if def then
@@ -131,7 +131,7 @@ function ____exports.setQuestState(self, questId, state, playerName)
             ____temp_2 = nil
         end
         local savedAccepterName = ____temp_2
-        questDB:completeQuest(0, questId)
+        questDB:completeQuest(playerId, questId)
         if playerName then
             local def = questDB:getQuest(questId)
             if def then
@@ -143,10 +143,10 @@ function ____exports.setQuestState(self, questId, state, playerName)
         end
     end
 end
-function ____exports.hasPlayerAcceptedQuest(self, _playerId, questId)
-    return ____exports.getQuestState(nil, questId) == 1
+function ____exports.hasPlayerAcceptedQuest(self, playerId, questId)
+    return ____exports.getQuestState(nil, playerId, questId) == 1
 end
-function ____exports.hasPlayerCompletedQuest(self, _playerId, questId)
-    return ____exports.getQuestState(nil, questId) == 2
+function ____exports.hasPlayerCompletedQuest(self, playerId, questId)
+    return ____exports.getQuestState(nil, playerId, questId) == 2
 end
 return ____exports

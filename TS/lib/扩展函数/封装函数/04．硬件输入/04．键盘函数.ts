@@ -65,6 +65,14 @@ function registerKeyBindToTrigger(trig: any, status: number, keyCode: number): v
   }
 }
 
+function registerKeyBindToTriggerLocal(trig: any, status: number, keyCode: number, action: () => void): void {
+  if (typeof japi.DzTriggerRegisterKeyEventByCode !== "function") {
+    registerKeyBindToTrigger(trig, status, keyCode);
+    return;
+  }
+  japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, false, action);
+}
+
 /**
  * 注册按键事件（by code）。
  * sync=true：全房所有客户端触发；sync=false：仅本机触发。
@@ -79,8 +87,12 @@ export function registerKeyEventByCode(
   const trig = createTriggerOrNull();
   if (!trig) return null;
 
-  registerKeyBindToTrigger(trig, status, keyCode);
-  (jass as any).TriggerAddAction(trig, action);
+  if (sync) {
+    registerKeyBindToTrigger(trig, status, keyCode);
+    (jass as any).TriggerAddAction(trig, action);
+  } else {
+    registerKeyBindToTriggerLocal(trig, status, keyCode, action);
+  }
   return trig;
 }
 
@@ -100,12 +112,41 @@ export function registerKeyDown(keyCode: number, callback: (player: any, key: nu
   return trig;
 }
 
+export function registerKeyDownLocal(keyCode: number, callback: (player: any, key: number) => void): any {
+  return registerKeyEventByCode(keyCode, KEY_STATE.DOWN, false, () => {
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
+    callback(p, k);
+  });
+}
+
+export function registerKeyUpLocal(keyCode: number, callback: (player: any, key: number) => void): any {
+  return registerKeyEventByCode(keyCode, KEY_STATE.UP, false, () => {
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
+    callback(p, k);
+  });
+}
+
 export function registerKeyUp(keyCode: number, callback: (player: any, key: number) => void): any {
   return registerKeyEventByCode(keyCode, KEY_STATE.UP, false, () => {
     const p = japi.DzGetTriggerKeyPlayer();
     const k = japi.DzGetTriggerKey();
     callback(p, k);
   });
+}
+
+export function registerKeyUpSync(keyCode: number, callback: (player: any, key: number) => void): any {
+  const trig = createTriggerOrNull();
+  if (!trig) return null;
+  const action = () => {
+    const p = japi.DzGetTriggerKeyPlayer();
+    const k = japi.DzGetTriggerKey();
+    callback(p, k);
+  };
+  DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.UP, keyCode);
+  (jass as any).TriggerAddAction(trig, action);
+  return trig;
 }
 
 /** 仅用于测试：允许传原始 status 数值（0/1/2） */

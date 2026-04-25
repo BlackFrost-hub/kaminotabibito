@@ -22,7 +22,7 @@ const { SetUnitLifePercentBJ, SetUnitManaPercentBJ, UnitHasBuffBJ } = require("l
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
 };
-const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
+const centerTimer = globalThis as unknown as {
   addDelayedCallback: (delayMs: number, callback: () => void) => number;
   removeDelayedCallback: (id: number) => void;
 };

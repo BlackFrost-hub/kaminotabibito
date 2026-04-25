@@ -525,33 +525,26 @@ local function createUi(self)
         end
     )
 end
---- 刷新计数器（每10个10毫秒=0.1秒刷新一次）
-local _refreshCounter = 0
---- 是否已注册到中心计时器
-local _registeredToCenterTimer = false
+local _refreshTimer = nil
 local function startRefreshTimer(self)
     pcall(function ()
-            if _registeredToCenterTimer then
+            if _refreshTimer ~= nil then
                 return
             end
-            _registeredToCenterTimer = true
-            local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-            local onTick10ms = ____require_result_5.onTick10ms
-            onTick10ms(
-                nil,
+            _refreshTimer = jass.CreateTimer()
+            jass.TimerStart(
+                _refreshTimer,
+                0.1,
+                true,
                 function()
-                    _refreshCounter = _refreshCounter + 1
-                    if _refreshCounter >= 10 then
-                        _refreshCounter = 0
-                        pcall(function ()
-                                local lp = jass.GetLocalPlayer()
-                                if lp == nil or lp == 0 then
-                                    return
-                                end
-                                syncBuffBar(nil)
+                    pcall(function ()
+                            local lp = jass.GetLocalPlayer()
+                            if lp == nil or lp == 0 then
+                                return
                             end
-                        )
-                    end
+                            syncBuffBar(nil)
+                        end
+                    )
                 end
             )
         end

@@ -68,8 +68,8 @@ local damageCallbackRegistered = false
 local ____require_result_4 = require("系统.01．单位系统.04．多杀检测系统.04．成功回调")
 local onMultiKillSuccess = ____require_result_4.onMultiKillSuccess
 local function getGameTime(self)
-    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-    local getServerTime = ____require_result_5.getServerTime
+    local ____G_5 = _G
+    local getServerTime = ____G_5.getServerTime
     return getServerTime(nil) / 1000
 end
 local function killAllInGroup(self, instance)

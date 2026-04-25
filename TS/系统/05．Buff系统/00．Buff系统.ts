@@ -254,7 +254,7 @@ function ensureSyncTimer(): void {
   _registeredToCenterTimer = true;
 
   // 使用中心计时器的每10毫秒回调
-  const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 

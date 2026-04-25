@@ -5,7 +5,8 @@ import { setActivePlayerId } from "./16．对话框同步状态";
 import type { Frame, Player, PlayerDialogState, Timer } from "./05．对话框业务逻辑";
 
 export const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
-export const MAX_PLAYERS = 28;
+/** 对话框系统固定为 4 个玩家槽位：P1~P4。 */
+export const MAX_PLAYERS = 4;
 export const TOC_PATH = "ui\\StarGameUI.toc";
 export const TAG_BASE_MAIN = 1024;
 export const TAG_BASE_PORTRAIT = 1125;

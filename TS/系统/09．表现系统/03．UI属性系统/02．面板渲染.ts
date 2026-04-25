@@ -165,12 +165,14 @@ function createDetailSlots(gameUI: number, players: any[]): void {
     const iconX = 常量.HERO_ICON_START_X + 常量.HERO_ICON_STEP_X * i;
 
     const icon = createFrame("BACKDROP", "UI属性系统英雄头像" + i, gameUI);
-    if (icon !== 0) {
-      setAbsolute(icon, iconX, 常量.HERO_ICON_Y);
-      japi.DzFrameSetSize(icon, 常量.HERO_ICON_WIDTH, 常量.HERO_ICON_HEIGHT);
-      japi.DzFrameSetTexture(icon, getHeroIcon(hero), 0);
-      show(icon, true);
+    if (icon === 0) {
+      detailSlots.push({ player, hero, functionKey: 常量.KEY_F[i], icon: 0, box: 0, lines: [], separators: [] });
+      continue;
     }
+    setAbsolute(icon, iconX, 常量.HERO_ICON_Y);
+    japi.DzFrameSetSize(icon, 常量.HERO_ICON_WIDTH, 常量.HERO_ICON_HEIGHT);
+    japi.DzFrameSetTexture(icon, getHeroIcon(hero), 0);
+    show(icon, true);
 
     // 先创建快捷键文本（在icon上，同一父节点下先创建的优先级低）
     createText(icon, "UI属性系统快捷键" + i, iconX, 常量.HERO_KEY_Y, 0.009, `|cffffff00F${i + 2}|r`);

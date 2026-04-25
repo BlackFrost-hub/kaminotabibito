@@ -11,7 +11,8 @@ import { QUEST_CONFIGS } from "../../08．任务系统/00．配置表/02．任�
 import type { NPCData } from "../../08．任务系统/00．配置表/03．NPC配置表";
 import { createUnitEffect, destroyUnitEffect } from "../../../lib/扩展函数/封装函数/01．通用工具/03．特效";
 
-const MAX_PLAYERS = 28;
+/** NPC 对话占用与气泡状态固定绑定到 4 个玩家槽位。 */
+const MAX_PLAYERS = 4;
 
 const BUBBLE_EFFECT_PATH = "resource\\models\\qipao.mdx";
 const NPC_OVERHEAD_BLUE_EXCL = "resource\\models\\exclamation\\bluetanhao.mdx";

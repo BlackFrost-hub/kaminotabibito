@@ -134,7 +134,16 @@ function registerKeyBindToTrigger(trig: any, status: number, keyCode: number): v
   }
 }
 
-/** 注册按键事件（by code）。注意：这里不做 try/catch 兜底，避免不必要的同步差异。 */
+/** sync=false 时走 ByCode(..., false)，仅本机触发，避免纯 UI 热键走全房 sync。 */
+function registerKeyBindToTriggerLocal(trig: any, status: number, keyCode: number, action: () => void): void {
+  if (typeof japi.DzTriggerRegisterKeyEventByCode !== "function") {
+    registerKeyBindToTrigger(trig, status, keyCode);
+    return;
+  }
+  japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, false, action);
+}
+
+/** 注册按键事件（by code）。sync=true 全房回调；sync=false 仅本机（与 `封装函数/04．硬件输入/04．键盘函数` 一致）。 */
 export function registerKeyEventByCode(
   keyCode: number,
   status: (typeof KEY_STATE)[keyof typeof KEY_STATE],
@@ -144,8 +153,12 @@ export function registerKeyEventByCode(
   const trig = createTriggerOrNull();
   if (!trig) return null;
 
-  registerKeyBindToTrigger(trig, status, keyCode);
-  (jass as any).TriggerAddAction(trig, action);
+  if (sync) {
+    registerKeyBindToTrigger(trig, status, keyCode);
+    (jass as any).TriggerAddAction(trig, action);
+  } else {
+    registerKeyBindToTriggerLocal(trig, status, keyCode, action);
+  }
   return trig;
 }
 
@@ -228,34 +241,3 @@ export function getMouseFocus(): number {
 export function frameSetScriptByCode(frame: number, eventId: number, action: () => void, sync: boolean): void {
   japi.DzFrameSetScriptByCode(frame, eventId, action, sync);
 }
-
-// -------------------- 测试：B 键广播 9999 --------------------
-
-function initTestKeyB(): void {
-  const lastDownByPid: boolean[] = [];
-
-  const hook = (st: number) => {
-    registerKeyEventRawStatus(KEY.B, st, false, () => {
-      const p = japi.DzGetTriggerKeyPlayer();
-      const pid = p ? (jass as any).GetPlayerId(p) : 0;
-      const down = isKeyDown(KEY.B);
-      const last = !!lastDownByPid[pid];
-      lastDownByPid[pid] = down;
-      if (last && !down) {
-        for (let i = 0; i < 12; i++) {
-          (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 3, "9999");
-        }
-        if (p) {
-          (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 3, "from=" + (jass as any).GetPlayerName(p));
-        }
-      }
-    });
-  };
-
-  hook(0);
-  hook(1);
-  hook(2);
-  for (let i = 0; i < 12; i++) lastDownByPid[i] = false;
-}
-
-initTestKeyB();

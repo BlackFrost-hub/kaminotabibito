@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local ENTRY_X = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_X
@@ -16,21 +15,12 @@ local SCROLLBAR_BOTTOM_INSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLLBAR_BOTTO
 local SCROLLBAR_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLLBAR_W
 local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
 local SCROLL_THUMB_SIZE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_SIZE
-local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_TOP_COMPENSATION
-local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
-local THUMB_DRAG_TICK = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_TICK
-local THUMB_DRAG_SENSITIVITY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.THUMB_DRAG_SENSITIVITY
 local ENABLE_TASK_UI_RIGHT_SCROLLBAR = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_RIGHT_SCROLLBAR
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local tryCreateFromFdfWithSource = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfWithSource
 local ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E = require("系统.08．任务系统.04．任务UI拆分.07．任务UI分类标签")
 local buildTaskPanelCategoryTabs = ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E.buildTaskPanelCategoryTabs
-local ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053 = require("系统.09．表现系统.03．垂直滚动条轨道")
-local VerticalScrollbarTrack = ____03_FF0E_5782_76F4_6EDA_52A8_6761_8F68_9053.VerticalScrollbarTrack
---- 创建主面板及滚动区域；任一关键 FDF 缺失时返回空壳（各字段 null），上层应跳过绑定。
--- 
--- 这里不负责渲染任务行内容，只负责把“主面板壳体 + 列表容器 + 分类标签 + 滚动轨道”搭起来。
 function ____exports.buildTaskMainPanel(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -51,14 +41,6 @@ function ____exports.buildTaskMainPanel(self, opts)
     local onClickSound = ____opts_0.onClickSound
     local onSwitchCategory = ____opts_0.onSwitchCategory
     local onShowTabTooltip = ____opts_0.onShowTabTooltip
-    local getTotalContentHeight = ____opts_0.getTotalContentHeight
-    local getScrollOffset = ____opts_0.getScrollOffset
-    local setScrollOffset = ____opts_0.setScrollOffset
-    local isVisible = ____opts_0.isVisible
-    local onScrollChanged = ____opts_0.onScrollChanged
-    local slotPid = ____opts_0.slotPid
-    local ctxId = slotPid or 0
-    local suf = "_s" .. tostring(ctxId)
     local empty = {
         mainPanel = nil,
         listContainer = nil,
@@ -73,7 +55,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbHitBtn = nil,
         vScrollTrack = nil
     }
-    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent, ctxId)
+    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
     if not mainPanel then
         return empty
     end
@@ -94,7 +76,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         setFramePosition(nil, mainPanel, {point = FramePoint.TOPLEFT, x = ENTRY_X + PANEL_REL_TO_ENTRY_X, y = ENTRY_Y + PANEL_REL_TO_ENTRY_Y})
     end
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
-    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel, ctxId)
+    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
     if listContainer then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(listContainer)
@@ -126,12 +108,10 @@ function ____exports.buildTaskMainPanel(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip,
-        slotPid = ctxId
+        onShowTabTooltip = onShowTabTooltip
     })
     local scrollBarFrame = nil
     local scrollThumbFrame = nil
-    local vScrollTrack = nil
     local scrollThumbHitBtn = nil
     if ENABLE_TASK_UI_RIGHT_SCROLLBAR then
         local sbSrc = tryCreateFromFdfWithSource(
@@ -141,7 +121,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             function()
                 local ____createFrame_result_1 = createFrame(nil, {
                     type = FrameType.BACKDROP,
-                    name = "TaskScrollBarBtn" .. suf,
+                    name = "TaskScrollBarBtn",
                     parent = mainPanel,
                     template = "template",
                     visible = true
@@ -151,8 +131,7 @@ function ____exports.buildTaskMainPanel(self, opts)
                 end
                 local f = ____createFrame_result_1
                 return f
-            end,
-            ctxId
+            end
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
@@ -187,7 +166,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         end
         local ____createFrame_result_2 = createFrame(nil, {
             type = FrameType.BACKDROP,
-            name = "TaskScrollThumbDyn" .. suf,
+            name = "TaskScrollThumbDyn",
             parent = mainPanel,
             template = "template",
             visible = true
@@ -199,37 +178,23 @@ function ____exports.buildTaskMainPanel(self, opts)
         if scrollThumbFrame and scrollThumbFrame ~= 0 then
             setFrameTexture(nil, scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp")
             setFrameSize(nil, scrollThumbFrame, {width = SCROLL_THUMB_SIZE, height = SCROLL_THUMB_SIZE})
+            if scrollBarFrame and scrollBarFrame ~= 0 then
+                setFramePointRelative(
+                    nil,
+                    scrollThumbFrame,
+                    FramePoint.TOPLEFT,
+                    scrollBarFrame,
+                    FramePoint.TOPLEFT,
+                    (SCROLLBAR_W - SCROLL_THUMB_SIZE) * 0.5,
+                    0
+                )
+            end
             if type(japi.DzFrameSetLevel) == "function" then
                 japi.DzFrameSetLevel(scrollThumbFrame, 120)
             end
             if type(japi.DzFrameShow) == "function" then
                 japi.DzFrameShow(scrollThumbFrame, true)
             end
-        end
-        if scrollThumbFrame and scrollThumbFrame ~= 0 and scrollBarFrame and scrollBarFrame ~= 0 then
-            vScrollTrack = __TS__New(
-                VerticalScrollbarTrack,
-                {
-                    trackFrame = scrollBarFrame,
-                    thumbFrame = scrollThumbFrame,
-                    hitButtonName = "TaskScrollThumbHit" .. suf,
-                    listViewHeightNorm = LIST_VIEW_H,
-                    trackHeightNorm = LIST_VIEW_H,
-                    thumbSizeNorm = SCROLL_THUMB_SIZE,
-                    topCompensation = SCROLL_THUMB_TOP_COMPENSATION,
-                    bottomCompensation = SCROLL_THUMB_BOTTOM_COMPENSATION,
-                    dragTick = THUMB_DRAG_TICK,
-                    sensitivity = THUMB_DRAG_SENSITIVITY,
-                    getTotalContentHeight = getTotalContentHeight,
-                    getScrollOffset = getScrollOffset,
-                    setScrollOffset = setScrollOffset,
-                    isInteractionEnabled = isVisible,
-                    onScrollChanged = onScrollChanged,
-                    skipManualThumbSync = function() return false end
-                }
-            )
-            vScrollTrack:attach()
-            scrollThumbHitBtn = vScrollTrack:getHitButtonFrame()
         end
     end
     return {
@@ -244,7 +209,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollBarFrame = scrollBarFrame or nil,
         scrollThumbFrame = scrollThumbFrame or nil,
         scrollThumbHitBtn = scrollThumbHitBtn,
-        vScrollTrack = vScrollTrack
+        vScrollTrack = nil
     }
 end
 return ____exports

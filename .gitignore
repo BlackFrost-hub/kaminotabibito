@@ -1,7 +1,18 @@
 /.build
 /.def
+/.JASS
+/.w3x/
 *.w3x
 ~$*
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.temp
+Thumbs.db
+Desktop.ini
 
 # local editor / assistant cache
 .vscode/jass-cache/

@@ -22,7 +22,7 @@ export function initDialogSystem(): void {
   dzLoadTocOnce();
   for (let i = 0; i < MAX_PLAYERS; i++) {
     const state = ensureState(i);
-    if (!state.initialized) { state.frames = createDialogFrames(); state.initialized = true; }
+    if (!state.initialized) { state.frames = createDialogFrames(i); state.initialized = true; }
     bindQuestSyncHandlersImpl(state);
   }
   initSkipKeyListener();
@@ -91,7 +91,8 @@ export function isDialogActive(p: Player): boolean {
 export function setDialogFinishCallback(p: Player, callback: () => void): void {
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return;
-  ensureState(pid).onFinish = callback;
+  const state = ensureState(pid);
+  state.onFinish = callback;
 }
 export function displayQuest(
   p: Player, title: string, text: string, onAccept: () => void, onReject: () => void, acceptText?: string, rejectText?: string,

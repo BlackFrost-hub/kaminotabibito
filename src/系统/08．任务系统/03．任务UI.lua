@@ -1,24 +1,24 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local Set = ____lualib.Set
+local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
 local __TS__New = ____lualib.__TS__New
-local Map = ____lualib.Map
 local ____exports = {}
 local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.09．任务UI列表控制")
-local refreshTaskUIFacadeList = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.refreshTaskUIFacadeList
-local createTaskUIListItem = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.createTaskUIListItem
-local clearTaskUIList = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.clearTaskUIList
+local applyTaskUIFacadeVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUIFacadeVisibleState
+local applyTaskUICategorySwitchVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUICategorySwitchVisibleState
+local applyTaskUIExpandVisibleState = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.applyTaskUIExpandVisibleState
+local createTaskUIPrecreatedListPool = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.createTaskUIPrecreatedListPool
+local getTaskUICategoryPageCount = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.getTaskUICategoryPageCount
+local rebuildTaskUIFacadeListPool = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.rebuildTaskUIFacadeListPool
 local ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E = require("系统.08．任务系统.04．任务UI拆分.10．任务UI滚动与滚轮")
 local registerTaskUIListWheel = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.registerTaskUIListWheel
-local syncTaskUIScrollThumb = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.syncTaskUIScrollThumb
 local updateTaskUIScrollBarVisibility = ____10_FF0E_4EFB_52A1UI_6EDA_52A8_4E0E_6EDA_8F6E.updateTaskUIScrollBarVisibility
 local ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.11．任务UI面板控制")
 local registerTaskUIRefreshCallback = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.registerTaskUIRefreshCallback
 local showTaskUITabTooltip = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.showTaskUITabTooltip
-local switchTaskUICategory = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.switchTaskUICategory
-local toggleTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.toggleTaskUIPanel
-local showTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.showTaskUIPanel
-local hideTaskUIPanel = ____11_FF0E_4EFB_52A1UI_9762_677F_63A7_5236.hideTaskUIPanel
+local ____12_FF0E_4EFB_52A1UI_8C03_8BD5 = require("系统.08．任务系统.04．任务UI拆分.12．任务UI调试")
+local taskUiDebug = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebug
+local taskUiDebugPlayerTag = ____12_FF0E_4EFB_52A1UI_8C03_8BD5.taskUiDebugPlayerTag
 local ____05_FF0E_4EFB_52A1UI_70ED_952E = require("系统.08．任务系统.04．任务UI拆分.05．任务UI热键")
 local registerTaskUIHotkeys = ____05_FF0E_4EFB_52A1UI_70ED_952E.registerTaskUIHotkeys
 local ____06_FF0E_4EFB_52A1UI_5165_53E3_56FE_6807 = require("系统.08．任务系统.04．任务UI拆分.06．任务UI入口图标")
@@ -27,11 +27,11 @@ local ____08_FF0E_4EFB_52A1UI_4E3B_9762_677F_4E0E_6EDA_52A8 = require("系统.08
 local buildTaskMainPanel = ____08_FF0E_4EFB_52A1UI_4E3B_9762_677F_4E0E_6EDA_52A8.buildTaskMainPanel
 local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local getGameUI = ____index.getGameUI
-local registerKeyDown = ____index.registerKeyDown
+local registerKeyUpLocal = ____index.registerKeyUpLocal
 local KEY = ____index.KEY
 local KEY_NUM = ____index.KEY_NUM
-local getWheelDelta = ____index.getWheelDelta
 local getMouseFocus = ____index.getMouseFocus
+local getWheelDelta = ____index.getWheelDelta
 local registerMouseWheel = ____index.registerMouseWheel
 local ____index = require("系统.09．表现系统.01．UI工具.index")
 local createFrame = ____index.createFrame
@@ -47,8 +47,6 @@ local FrameType = ____index.FrameType
 local FramePoint = ____index.FramePoint
 local hideFrame = ____index.hideFrame
 local showFrame = ____index.showFrame
-local ____index = require("系统.08．任务系统.02．任务管理器.index")
-local questManager = ____index.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
@@ -60,67 +58,26 @@ local createTabLabelTextOnBackdrop = ____03_FF0EUI_51FD_6570.createTabLabelTextO
 local setupTransparentGlueHitLayer = ____03_FF0EUI_51FD_6570.setupTransparentGlueHitLayer
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local ENABLE_TASK_UI_CLIENT = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_CLIENT
---- 任务系统 - 多槽位任务 UI（魔兽原生风格）
--- 
--- 架构（与属性 UI 对齐的"4 槽位"模型）：
--- - 所有客户端对称创建 `MAX_TASK_UI_SLOTS` 套完整任务 UI（入口图标 + 主面板 + 列表 + 滚动条），
---   槽位 i 绑定玩家 Player(i)；默认所有主面板都隐藏。
--- - 每客户端只"显示/交互"本机本地玩家对应的槽位（slotPid === GetPlayerId(GetLocalPlayer())），
---   其余 3 个槽位的入口图标/主面板永远保持隐藏，不接受 J/1/2/3 输入、不刷新。
--- - 这样全端的帧创建、refresh/wheel 回调注册在数量与顺序上保持对称，降低同步风险；
---   "只本地显示"通过 DzFrameShow 在本机完成，不引入同步点。
--- 
--- 层级（单个槽位）：
---   GameUI → TaskEntryIcon(s) → 点击 → TaskMainPanel(s) → 标签/滚动条/listContainer → 任务行
 local jass = require("jass.common")
 local japi = require("jass.japi")
---- 多槽位数量：4 个玩家槽位。超出 4 的玩家将不创建任务 UI（理论上当前地图也只有 4 位活跃玩家）。
-local MAX_TASK_UI_SLOTS = 4
---- 单个槽位的任务 UI；所有槽位在所有客户端上被对称创建，只有 `isForLocalPlayer()` 的那个会响应交互。
 local TaskUI = __TS__Class()
 TaskUI.name = "TaskUI"
-function TaskUI.prototype.____constructor(self, slotPid)
+function TaskUI.prototype.____constructor(self)
     self.entryFrame = nil
-    self.entryText = nil
     self.mainPanel = nil
     self.listContainer = nil
-    self.tabMain = nil
-    self.tabSide = nil
-    self.tabDaily = nil
-    self.tabMainBg = nil
-    self.tabSideBg = nil
-    self.tabDailyBg = nil
-    self.currentCategory = QuestType.MAIN
-    self.listItemFrames = {}
     self.scrollBarFrame = nil
     self.scrollThumbFrame = nil
     self.scrollThumbHitBtn = nil
-    self.vScrollTrack = nil
     self.taskListWheelTrig = nil
-    self.scrollOffset = 0
-    self.totalContentHeight = 0
-    self.expandedQuestIds = __TS__New(Set)
+    self.precreatedListPool = nil
+    self.pagesDirty = false
+    self.localPlayerId = 0
+    self.localPlayer = nil
+    self.currentCategory = QuestType.MAIN
+    self.currentPage = 0
+    self.expandedQuestId = nil
     self.isVisible = false
-    self.currentPlayerId = 0
-    self.rowBackdropByQuestId = __TS__New(Map)
-    self.titleByQuestId = __TS__New(Map)
-    self.clickBtnByQuestId = __TS__New(Map)
-    self.objFrameByKey = __TS__New(Map)
-    self.failFrameByQuestId = __TS__New(Map)
-    self.rowIconByQuestId = __TS__New(Map)
-    self.slotPid = slotPid
-    self.currentPlayerId = slotPid
-end
-function TaskUI.prototype.isForLocalPlayer(self)
-    local lp = jass.GetLocalPlayer()
-    if lp == nil then
-        return false
-    end
-    local getPid = jass.GetPlayerId
-    if type(getPid) ~= "function" then
-        return false
-    end
-    return getPid(lp) == self.slotPid
 end
 function TaskUI.prototype.init(self)
     if not ENABLE_TASK_UI_CLIENT then
@@ -131,30 +88,20 @@ function TaskUI.prototype.init(self)
             if not gameUI then
                 return
             end
+            self.localPlayer = jass.GetLocalPlayer()
+            self.localPlayerId = self:resolveLocalPlayerId()
             self:createEntryIcon(gameUI)
             self:createMainPanel(gameUI)
+            self:createListPool()
             self:registerTaskListWheel()
-            self:registerRefreshCallback()
-            self:hide()
-            if not self:isForLocalPlayer() and self.entryFrame ~= nil then
-                pcall(function () return hideFrame(nil, self.entryFrame) end
-                )
-            end
+            self:resetToDefault()
+            self:rebuildPages()
+            registerTaskUIRefreshCallback(
+                nil,
+                function() return self:markPagesDirty() end
+            )
+            self:doHide()
         end
-    )
-end
-function TaskUI.prototype.registerRefreshCallback(self)
-    registerTaskUIRefreshCallback(
-        nil,
-        self:getPanelControlContext(),
-        function() return self:refreshList() end
-    )
-end
-function TaskUI.prototype.registerTaskListWheel(self)
-    self.taskListWheelTrig = registerTaskUIListWheel(
-        nil,
-        self:getScrollContext(),
-        function() return self:refreshList() end
     )
 end
 function TaskUI.prototype.createEntryIcon(self, parent)
@@ -172,13 +119,11 @@ function TaskUI.prototype.createEntryIcon(self, parent)
             setFramePointRelative = setFramePointRelative,
             setFrameClickEvent = setFrameClickEvent,
             applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
-            onClickSound = function() return SoundUI_ClickPlay(nil) end,
-            onTogglePanel = function() return self:togglePanel() end,
-            slotPid = self.slotPid
+            onClickSound = function() return self:playLocalClickSound() end,
+            onTogglePanel = function() return self:togglePanelByVisibilityOnly() end
         }
     )
     self.entryFrame = res.entryFrame
-    self.entryText = res.entryText
 end
 function TaskUI.prototype.createMainPanel(self, parent)
     local res = buildTaskMainPanel(
@@ -199,145 +144,221 @@ function TaskUI.prototype.createMainPanel(self, parent)
             setButtonText = setButtonText,
             createTabLabelTextOnBackdrop = createTabLabelTextOnBackdrop,
             setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
-            onClickSound = function() return SoundUI_ClickPlay(nil) end,
+            onClickSound = function() return self:playLocalClickSound() end,
             onSwitchCategory = function(____, ____type) return self:switchCategory(____type) end,
-            onShowTabTooltip = function(____, msg) return self:showTabTooltip(msg) end,
-            getTotalContentHeight = function() return self.totalContentHeight end,
-            getScrollOffset = function() return self.scrollOffset end,
-            setScrollOffset = function(____, v)
-                self.scrollOffset = v
-            end,
-            isVisible = function() return self.isVisible end,
-            onScrollChanged = function() return self:refreshList() end,
-            slotPid = self.slotPid
+            onShowTabTooltip = function(____, msg) return self:showTabTooltip(msg) end
         }
     )
     self.mainPanel = res.mainPanel
     self.listContainer = res.listContainer
-    self.tabMainBg = res.tabMainBg
-    self.tabMain = res.tabMain
-    self.tabSideBg = res.tabSideBg
-    self.tabSide = res.tabSide
-    self.tabDailyBg = res.tabDailyBg
-    self.tabDaily = res.tabDaily
     self.scrollBarFrame = res.scrollBarFrame
     self.scrollThumbFrame = res.scrollThumbFrame
     self.scrollThumbHitBtn = res.scrollThumbHitBtn
-    local ____opt_0 = self.vScrollTrack
-    if ____opt_0 ~= nil then
-        ____opt_0:destroy()
-    end
-    self.vScrollTrack = res.vScrollTrack
 end
-function TaskUI.prototype.syncScrollThumb(self, maxScroll)
-    syncTaskUIScrollThumb(
-        nil,
-        self:getScrollContext(),
-        maxScroll
-    )
-end
-function TaskUI.prototype.updateScrollBarVisibility(self, maxScroll, hasQuestRows)
-    updateTaskUIScrollBarVisibility(
-        nil,
-        self:getScrollContext(),
-        maxScroll,
-        hasQuestRows
-    )
-end
-function TaskUI.prototype.clearList(self)
-    clearTaskUIList(
+function TaskUI.prototype.createListPool(self)
+    self.precreatedListPool = createTaskUIPrecreatedListPool(
         nil,
         self:getListControlContext()
     )
 end
+function TaskUI.prototype.registerTaskListWheel(self)
+    self.taskListWheelTrig = registerTaskUIListWheel(
+        nil,
+        self:getScrollContext()
+    )
+end
+function TaskUI.prototype.rebuildPages(self)
+    rebuildTaskUIFacadeListPool(
+        nil,
+        self:getListControlContext()
+    )
+    self:normalizeVisibleState()
+    self.pagesDirty = false
+    if self.isVisible then
+        self:applyVisibleState()
+    end
+end
+function TaskUI.prototype.markPagesDirty(self)
+    self.pagesDirty = true
+end
+function TaskUI.prototype.normalizeVisibleState(self)
+    local category = self.currentCategory
+    local pageCount = self:getPageCount(category)
+    if pageCount <= 0 then
+        self.currentPage = 0
+        self.expandedQuestId = nil
+        return
+    end
+    local clampedPage = math.max(
+        0,
+        math.min(pageCount - 1, self.currentPage)
+    )
+    self.currentPage = clampedPage
+    if not self.expandedQuestId then
+        return
+    end
+    local pageQuestIds = self:getQuestIdsForPage(category, clampedPage)
+    if not __TS__ArrayIncludes(pageQuestIds, self.expandedQuestId) then
+        self.expandedQuestId = nil
+    end
+end
+function TaskUI.prototype.applyVisibleState(self)
+    applyTaskUIFacadeVisibleState(
+        nil,
+        self:getListControlContext()
+    )
+end
+function TaskUI.prototype.applyCategorySwitchVisibleState(self)
+    applyTaskUICategorySwitchVisibleState(
+        nil,
+        self:getListControlContext()
+    )
+end
+function TaskUI.prototype.applyExpandVisibleState(self)
+    applyTaskUIExpandVisibleState(
+        nil,
+        self:getListControlContext()
+    )
+end
+function TaskUI.prototype.resetToDefault(self)
+    self.currentCategory = QuestType.MAIN
+    self.currentPage = 0
+    self.expandedQuestId = nil
+end
+function TaskUI.prototype.resolveLocalPlayerId(self)
+    local lp = jass.GetLocalPlayer()
+    if lp == nil then
+        return 0
+    end
+    local ____temp_0
+    if type(jass.GetPlayerId) == "function" then
+        ____temp_0 = jass.GetPlayerId(lp)
+    else
+        ____temp_0 = -1
+    end
+    local pid = ____temp_0
+    return pid < 0 and 0 or pid
+end
 function TaskUI.prototype.showTabTooltip(self, msg)
     showTaskUITabTooltip(nil, msg)
 end
-function TaskUI.prototype.switchCategory(self, ____type)
-    if not self:isForLocalPlayer() then
+function TaskUI.prototype.playLocalClickSound(self)
+    SoundUI_ClickPlay(nil, nil, self.localPlayer)
+end
+function TaskUI.prototype.getCurrentPage(self, ____type)
+    return ____type == self.currentCategory and self.currentPage or 0
+end
+function TaskUI.prototype.setCurrentPage(self, ____type, page)
+    if ____type ~= self.currentCategory then
         return
     end
-    switchTaskUICategory(
-        nil,
-        self:getPanelControlContext(),
-        ____type,
-        function() return self:refreshList() end
-    )
+    self.currentPage = math.max(0, page)
+end
+function TaskUI.prototype.getExpandedQuestId(self, ____type)
+    local ____temp_1
+    if ____type == self.currentCategory then
+        ____temp_1 = self.expandedQuestId
+    else
+        ____temp_1 = nil
+    end
+    return ____temp_1
+end
+function TaskUI.prototype.setExpandedQuestId(self, ____type, questId)
+    if ____type ~= self.currentCategory then
+        return
+    end
+    self.expandedQuestId = questId
+end
+function TaskUI.prototype.getPageCount(self, ____type)
+    return getTaskUICategoryPageCount(nil, self.precreatedListPool, ____type)
+end
+function TaskUI.prototype.getQuestIdsForPage(self, ____type, page)
+    local ____opt_2 = self.precreatedListPool
+    local categoryView = ____opt_2 and ____opt_2.categories[____type]
+    if not categoryView then
+        return {}
+    end
+    local pageView = categoryView.pages[page + 1]
+    return pageView and pageView.questIds or ({})
+end
+function TaskUI.prototype.switchCategory(self, ____type)
+    if not self.isVisible then
+        return
+    end
+    if self.currentCategory == ____type then
+        return
+    end
+    self.currentCategory = ____type
+    self:setCurrentPage(____type, 0)
+    self:setExpandedQuestId(____type, nil)
+    self:applyCategorySwitchVisibleState()
 end
 function TaskUI.prototype.toggleExpand(self, questId)
-    local ctx = self:getListControlContext()
-    if ctx.expandedQuestIds:has(questId) then
-        ctx.expandedQuestIds:delete(questId)
+    local current = self:getExpandedQuestId(self.currentCategory)
+    local ____temp_6
+    if current == questId then
+        ____temp_6 = nil
     else
-        ctx.expandedQuestIds:add(questId)
+        ____temp_6 = questId
     end
-    self:refreshList()
+    local next = ____temp_6
+    taskUiDebug(
+        nil,
+        (((((("toggleExpand category=" .. tostring(self.currentCategory)) .. " current=") .. tostring(current)) .. " next=") .. tostring(next)) .. " ") .. taskUiDebugPlayerTag(nil)
+    )
+    self:setExpandedQuestId(self.currentCategory, next)
+    self:applyExpandVisibleState()
 end
-function TaskUI.prototype.refreshList(self)
-    if not self:isForLocalPlayer() then
+function TaskUI.prototype.changeCurrentPage(self, delta)
+    local pageCount = self:getPageCount(self.currentCategory)
+    if pageCount <= 1 then
         return
     end
-    refreshTaskUIFacadeList(
-        nil,
-        self:getListControlContext(),
-        function() return self:refreshList() end
+    local currentPage = self:getCurrentPage(self.currentCategory)
+    local nextPage = math.max(
+        0,
+        math.min(pageCount - 1, currentPage + delta)
     )
-end
-function TaskUI.prototype.createListItem(self, quest, rowTopRel, expanded)
-    return createTaskUIListItem(
-        nil,
-        self:getListControlContext(),
-        quest,
-        rowTopRel,
-        expanded,
-        function() return self:refreshList() end
-    )
-end
-function TaskUI.prototype.togglePanel(self)
-    if not self:isForLocalPlayer() then
+    if nextPage == currentPage then
         return
     end
-    toggleTaskUIPanel(
-        nil,
-        self:getPanelControlContext(),
-        function(____, playerId) return self:show(playerId) end,
-        function() return self:hide() end
-    )
+    self:setCurrentPage(self.currentCategory, nextPage)
+    self:setExpandedQuestId(self.currentCategory, nil)
+    self:applyVisibleState()
 end
-function TaskUI.prototype.show(self, playerId)
-    if not self:isForLocalPlayer() then
-        return
+function TaskUI.prototype.togglePanelByVisibilityOnly(self)
+    if self.isVisible then
+        self:doHide()
+    else
+        self:doShow()
     end
-    showTaskUIPanel(
-        nil,
-        self:getPanelControlContext(),
-        playerId,
-        function() return self:refreshList() end
-    )
 end
-function TaskUI.prototype.hide(self)
-    hideTaskUIPanel(
-        nil,
-        self:getPanelControlContext()
-    )
+function TaskUI.prototype.doShow(self)
+    self:resetToDefault()
+    if self.pagesDirty then
+        self:rebuildPages()
+    end
+    self:applyVisibleState()
+    self.isVisible = true
+    if self.mainPanel then
+        showFrame(nil, self.mainPanel)
+    end
 end
-function TaskUI.prototype.getIsVisible(self)
-    return self.isVisible
+function TaskUI.prototype.doHide(self)
+    self:resetToDefault()
+    self:applyVisibleState()
+    if self.mainPanel then
+        hideFrame(nil, self.mainPanel)
+    end
+    self.isVisible = false
 end
 function TaskUI.prototype.getListControlContext(self)
     return {
         mainPanel = self.mainPanel,
         listContainer = self.listContainer,
-        currentPlayerId = self.currentPlayerId,
+        currentPlayerId = self.localPlayerId,
         currentCategory = self.currentCategory,
-        expandedQuestIds = self.expandedQuestIds,
-        listItemFrames = self.listItemFrames,
-        rowBackdropByQuestId = self.rowBackdropByQuestId,
-        titleByQuestId = self.titleByQuestId,
-        clickBtnByQuestId = self.clickBtnByQuestId,
-        objFrameByKey = self.objFrameByKey,
-        failFrameByQuestId = self.failFrameByQuestId,
-        rowIconByQuestId = self.rowIconByQuestId,
+        precreatedListPool = self.precreatedListPool,
         createTextLabel = createTextLabel,
         FramePoint = FramePoint,
         FrameType = FrameType,
@@ -346,20 +367,17 @@ function TaskUI.prototype.getListControlContext(self)
         setFramePointRelative = setFramePointRelative,
         setFrameSize = setFrameSize,
         setFrameClickEvent = setFrameClickEvent,
+        setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         showFrame = showFrame,
+        hideFrame = hideFrame,
         applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
         applyDzTextFontAndAlignment = applyDzTextFontAndAlignment,
-        syncScrollThumb = function(____, maxScroll) return self:syncScrollThumb(maxScroll) end,
-        updateScrollBarVisibility = function(____, maxScroll, hasQuestRows) return self:updateScrollBarVisibility(maxScroll, hasQuestRows) end,
+        playClickSound = function() return self:playLocalClickSound() end,
+        updateScrollBarVisibility = function(____, pageCount, hasQuestRows) return self:updateScrollBarVisibility(pageCount, hasQuestRows) end,
         toggleExpand = function(____, questId) return self:toggleExpand(questId) end,
-        getScrollOffset = function() return self.scrollOffset end,
-        setScrollOffset = function(____, v)
-            self.scrollOffset = v
-        end,
-        getTotalContentHeight = function() return self.totalContentHeight end,
-        setTotalContentHeight = function(____, v)
-            self.totalContentHeight = v
-        end
+        getCurrentPage = function(____, ____type) return self:getCurrentPage(____type) end,
+        setCurrentPage = function(____, ____type, page) return self:setCurrentPage(____type, page) end,
+        getExpandedQuestId = function(____, ____type) return self:getExpandedQuestId(____type) end
     }
 end
 function TaskUI.prototype.getScrollContext(self)
@@ -369,83 +387,37 @@ function TaskUI.prototype.getScrollContext(self)
         scrollBarFrame = self.scrollBarFrame,
         scrollThumbFrame = self.scrollThumbFrame,
         scrollThumbHitBtn = self.scrollThumbHitBtn,
+        FramePoint = FramePoint,
+        setFramePointRelative = setFramePointRelative,
         taskListWheelTrig = self.taskListWheelTrig,
-        getMouseFocus = type(getMouseFocus) == "function" and getMouseFocus or nil,
-        getWheelDelta = type(getWheelDelta) == "function" and getWheelDelta or nil,
+        getMouseFocus = getMouseFocus,
+        getWheelDelta = getWheelDelta,
         registerMouseWheel = registerMouseWheel,
-        vScrollTrack = self.vScrollTrack,
         isVisible = function() return self.isVisible end,
-        getScrollOffset = function() return self.scrollOffset end,
-        setScrollOffset = function(____, v)
-            self.scrollOffset = v
-        end,
-        getTotalContentHeight = function() return self.totalContentHeight end
-    }
-end
-function TaskUI.prototype.getPanelControlContext(self)
-    return {
-        mainPanel = self.mainPanel,
-        expandedQuestIds = self.expandedQuestIds,
-        vScrollTrack = self.vScrollTrack,
-        showFrame = showFrame,
-        hideFrame = hideFrame,
-        questManager = questManager,
-        getCurrentCategory = function() return self.currentCategory end,
-        setCurrentCategory = function(____, ____type)
-            self.currentCategory = ____type
-        end,
-        getScrollOffset = function() return self.scrollOffset end,
-        setScrollOffset = function(____, v)
-            self.scrollOffset = v
-        end,
-        isVisible = function() return self.isVisible end,
-        setVisible = function(____, v)
-            self.isVisible = v
-        end,
-        getCurrentPlayerId = function() return self.currentPlayerId end,
-        setCurrentPlayerId = function(____, v)
-            self.currentPlayerId = v
+        getCurrentPageCount = function() return self:getPageCount(self.currentCategory) end,
+        getCurrentPage = function() return self:getCurrentPage(self.currentCategory) end,
+        setCurrentPage = function(____, page) return self:setCurrentPage(self.currentCategory, page) end,
+        onPageChanged = function()
+            self:setExpandedQuestId(self.currentCategory, nil)
+            self:applyVisibleState()
         end
     }
 end
---- 4 个槽位：Player(0)..Player(3)，每客户端全端对称创建。
-local taskUISlots = {}
-do
-    local pid = 0
-    while pid < MAX_TASK_UI_SLOTS do
-        taskUISlots[#taskUISlots + 1] = __TS__New(TaskUI, pid)
-        pid = pid + 1
-    end
+function TaskUI.prototype.updateScrollBarVisibility(self, pageCount, hasQuestRows)
+    updateTaskUIScrollBarVisibility(
+        nil,
+        self:getScrollContext(),
+        pageCount,
+        hasQuestRows
+    )
 end
---- 对外兜底导出：某些老代码可能通过 `taskUI` 访问。这里返回 slot 0 对应的实例；
--- 需要按本地玩家操作时用 `getLocalTaskUI()`。
-____exports.taskUI = taskUISlots[1]
-function ____exports.getLocalTaskUI(self)
-    local lp = jass.GetLocalPlayer()
-    if lp == nil then
-        return nil
-    end
-    local getPid = jass.GetPlayerId
-    if type(getPid) ~= "function" then
-        return nil
-    end
-    local pid = getPid(lp)
-    if pid == nil or pid < 0 or pid >= MAX_TASK_UI_SLOTS then
-        return nil
-    end
-    return taskUISlots[pid + 1] or nil
-end
+local taskUI = __TS__New(TaskUI)
+____exports.taskUI = taskUI
 function ____exports.init(self)
     if not ENABLE_TASK_UI_CLIENT then
         return
     end
-    do
-        local i = 0
-        while i < #taskUISlots do
-            taskUISlots[i + 1]:init()
-            i = i + 1
-        end
-    end
+    taskUI:init()
 end
 function ____exports.registerHotkey(self)
     if not ENABLE_TASK_UI_CLIENT then
@@ -454,34 +426,12 @@ function ____exports.registerHotkey(self)
     registerTaskUIHotkeys(
         nil,
         {
-            registerKeyDown = registerKeyDown,
+            registerKeyUpLocal = registerKeyUpLocal,
             KEY = KEY,
             KEY_NUM = KEY_NUM,
-            onClickSound = function() return SoundUI_ClickPlay(nil) end,
-            onTogglePanel = function()
-                local ui = ____exports.getLocalTaskUI(nil)
-                if ui then
-                    ui:togglePanel()
-                end
-            end,
-            onSwitchCategory = function(____, ____type)
-                local ui = ____exports.getLocalTaskUI(nil)
-                if ui then
-                    ui:switchCategory(____type)
-                end
-            end,
-            isVisible = function()
-                local ui = ____exports.getLocalTaskUI(nil)
-                local ____ui_2
-                if ui then
-                    ____ui_2 = ui:getIsVisible()
-                else
-                    ____ui_2 = false
-                end
-                return ____ui_2
-            end,
-            setCurrentPlayerId = function(____, _pid)
-            end
+            onClickSound = function() return taskUI:playLocalClickSound() end,
+            onTogglePanelLocal = function() return taskUI:togglePanelByVisibilityOnly() end,
+            onSwitchCategoryLocal = function(____, ____type) return taskUI:switchCategory(____type) end
         }
     )
 end

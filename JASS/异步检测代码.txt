@@ -1,0 +1,52 @@
+library uitest initializer Init
+
+    globals
+        private real feq = 1.0
+        private integer array hids
+        private integer array cnt
+        private integer check = 0
+    endglobals
+    
+    function OnTestSync takes nothing returns nothing
+        local player p = DzGetTriggerSyncPlayer()
+        local string str = DzGetTriggerSyncData()
+        local integer hid = S2I(str)
+        local integer pid = GetPlayerId(p)
+        set cnt[pid] = cnt[pid] + 1
+        set hids[pid] = hid
+        if (GetPlayerSlotState(Player(1)) != PLAYER_SLOT_STATE_PLAYING or cnt[0] == cnt[1]) and (GetPlayerSlotState(Player(2)) != PLAYER_SLOT_STATE_PLAYING or cnt[0] == cnt[2]) and (GetPlayerSlotState(Player(3)) != PLAYER_SLOT_STATE_PLAYING or cnt[0] == cnt[3]) and (GetPlayerSlotState(Player(4)) != PLAYER_SLOT_STATE_PLAYING or cnt[0] == cnt[4]) then
+            if (hids[0] != hids[1] and GetPlayerSlotState(Player(1)) == PLAYER_SLOT_STATE_PLAYING) or (hids[0] != hids[2] and GetPlayerSlotState(Player(2)) == PLAYER_SLOT_STATE_PLAYING) or (hids[0] != hids[3] and GetPlayerSlotState(Player(3)) == PLAYER_SLOT_STATE_PLAYING) or (hids[0] != hids[4] and GetPlayerSlotState(Player(4)) == PLAYER_SLOT_STATE_PLAYING) then
+                call BJDebugMsg("检测异步！")
+                call BJDebugMsg("1:"+I2S(hids[0]))
+                call BJDebugMsg("2:"+I2S(hids[1]))
+                call BJDebugMsg("3:"+I2S(hids[2]))
+                call BJDebugMsg("4:"+I2S(hids[3]))
+                call BJDebugMsg("5:"+I2S(hids[4]))
+                call PauseTimer(GetExpiredTimer())
+            endif
+            set check = check + 1
+        endif
+        if pid == 0 and ModuloInteger(cnt[0], 30) == 0 then
+            call BJDebugMsg("异步检测运行中，检测次数:"+I2S(check)+" 同步次数:"+I2S(cnt[0]))
+        endif
+        set p = null
+    endfunction
+    
+    private function OnTimer takes nothing returns nothing
+        local item it = CreateItem('ratc',0,0)
+        local integer hid = GetHandleId(it)
+        call DzSyncData("UI测试",I2S(hid))
+        call RemoveItem(it)
+        set it = null
+    endfunction
+
+    private function Init takes nothing returns nothing
+        local trigger trg = CreateTrigger()
+        call TimerStart(CreateTimer(), feq, true, function OnTimer)
+        call DzTriggerRegisterSyncData( trg, "UI测试", false )
+        call TriggerAddAction(trg, function OnTestSync)
+        call BJDebugMsg("Init")
+        set trg = null
+    endfunction
+
+endlibrary

@@ -9,6 +9,9 @@
  *
  * 初始化：延迟INIT_DELAY_SECONDS秒启动
  * 刷新：每 REFRESH_INTERVAL_SECONDS 无条件刷新（与 `属性查看.j` 一致：两处 CreateTimer 3.00 周期也是全局一直跑；本 TS 间隔见常量，非按 Tab 门控）
+ *
+ * 联机：键盘走 `sync=true`，全端对称进回调；**仅** Tab 控制的伤害面板显隐在回调内用
+ * `getTriggerKeyPlayer() === GetLocalPlayer()` 隔离。F2–F6、中心计时器刷新等为同步路径（镜头平移仍只在触发键玩家本机生效，见 Star 镜头封装）。
  */
 
 const jass = require("jass.common") as any;
@@ -16,7 +19,7 @@ const 硬件函数 = require("系统.00．核心系统.02．硬件函数") as {
   registerKeyEventRawStatus: (keyCode: number, status: number, sync: boolean, action: () => void) => any;
   getTriggerKeyPlayer: () => any;
 };
-const 中心计时器 = require("系统.00．核心系统.05．中心计时器") as {
+const 中心计时器 = globalThis as unknown as {
   onTick10ms: (callback: () => void) => void;
   offTick10ms: (callback: () => void) => void;
 };
@@ -63,10 +66,10 @@ function refreshAllUi(): void {
 }
 
 /**
- * 包一层按键注册，保持和原 JASS 的 Tab/F2-F6 热键行为一致。
+ * 包一层按键注册：sync=true 全房对称；Tab 显隐在 action 内自行做本地玩家门控。
  */
 function registerKey(status: number, keyCode: number, action: () => void): void {
-  硬件函数.registerKeyEventRawStatus(keyCode, status, false, action);
+  硬件函数.registerKeyEventRawStatus(keyCode, status, true, action);
 }
 
 /**

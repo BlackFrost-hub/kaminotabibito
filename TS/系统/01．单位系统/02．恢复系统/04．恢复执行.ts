@@ -231,7 +231,7 @@ function registerToCenterTimer(): void {
   if (_registered) return;
   _registered = true;
 
-  const { onSecond } = require("系统.00．核心系统.05．中心计时器") as {
+const { onSecond } = globalThis as unknown as {
     onSecond: (callback: () => void) => void;
   };
 

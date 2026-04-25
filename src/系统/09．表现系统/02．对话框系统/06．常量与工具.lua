@@ -10,16 +10,13 @@ function ____exports.showLocalHint(self, playerId, msg, duration)
     if duration == nil then
         duration = 5
     end
-    local localPlayer = jass.GetLocalPlayer()
-    if localPlayer == jass.Player(playerId) then
-        jass.DisplayTimedTextToPlayer(
-            localPlayer,
-            0,
-            0,
-            duration,
-            msg
-        )
-    end
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(playerId),
+        0,
+        0,
+        duration,
+        msg
+    )
 end
 function ____exports.giveQuestReward(self, reward, triggerPlayerId)
     giveRewardToPlayers(nil, reward, triggerPlayerId)

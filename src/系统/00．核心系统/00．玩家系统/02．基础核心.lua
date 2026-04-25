@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local onTick10ms = ____require_result_0.onTick10ms
+local ____G_0 = _G
+local onTick10ms = ____G_0.onTick10ms
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index")
 local _inited = false

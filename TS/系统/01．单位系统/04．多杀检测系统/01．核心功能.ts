@@ -129,7 +129,7 @@ const { onMultiKillSuccess } = require("系统.01．单位系统.04．多杀检�
 // ==========================================================================================
 
 function getGameTime(): number {
-  const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+const { getServerTime } = globalThis as unknown as {
     getServerTime: () => number;
   };
   // 直接使用服务器时间（毫秒），转换为秒

@@ -19,10 +19,10 @@ ____exports.NPC_CONFIGS = {
         NpcNameID = "人类猎人",
         unitcode = "hmil",
         requireType = "对话",
-        X = -26819.3,
-        Y = -8344.6,
+        X = 0,
+        Y = 0,
         Facing = 220,
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵村信使",

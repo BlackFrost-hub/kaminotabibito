@@ -207,8 +207,8 @@ local function registerToCenterTimer(self)
         return
     end
     _registered = true
-    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-    local onSecond = ____require_result_5.onSecond
+    local ____G_5 = _G
+    local onSecond = ____G_5.onSecond
     onSecond(nil, ____exports.onRegenTimer)
 end
 registerToCenterTimer(nil)

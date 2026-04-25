@@ -33,7 +33,11 @@ local function bindDialogPanelHitFrame(self, hitFrame)
         g_bindDialogPanelHitFrame(nil, hitFrame)
     end
 end
-function ____exports.createDialogFrames(self)
+local TAG_SLOT_OFFSET = 1000
+function ____exports.createDialogFrames(self, slotId)
+    if slotId == nil then
+        slotId = 0
+    end
     local frames = {}
     do
         local i = 0
@@ -45,7 +49,10 @@ function ____exports.createDialogFrames(self)
     frames[102] = 0
     frames[103] = 0
     frames[104] = 0
-    local portraits = {{idx = 101, tag = TAG_BASE_PORTRAIT, x = 0.24, y = 0.1421 + 0.2}, {idx = 102, tag = TAG_BASE_PORTRAIT + 1, x = 0.24 + 0.377 / 3, y = 0.1421 + 0.2}, {idx = 103, tag = TAG_BASE_PORTRAIT + 2, x = 0.24 + 0.377 / 1.5, y = 0.1421 + 0.2}}
+    local slotTag = TAG_BASE_MAIN + slotId * TAG_SLOT_OFFSET
+    local portraitTag = TAG_BASE_PORTRAIT + slotId * TAG_SLOT_OFFSET
+    local nameSuffix = "_s" .. tostring(slotId)
+    local portraits = {{idx = 101, tag = portraitTag, x = 0.24, y = 0.1421 + 0.2}, {idx = 102, tag = portraitTag + 1, x = 0.24 + 0.377 / 3, y = 0.1421 + 0.2}, {idx = 103, tag = portraitTag + 2, x = 0.24 + 0.377 / 1.5, y = 0.1421 + 0.2}}
     for ____, p in ipairs(portraits) do
         local f = dzCreate(nil, "GameUI", p.tag)
         frames[p.idx + 1] = f
@@ -65,7 +72,7 @@ function ____exports.createDialogFrames(self)
     local gameUI = japi.DzGetGameUI()
     local bg = createFrame(nil, {
         type = FrameType.BACKDROP,
-        name = "DialogBG",
+        name = "DialogBG" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -84,7 +91,7 @@ function ____exports.createDialogFrames(self)
     dzSetTexture(nil, bg, DEFAULT_BG_TEX)
     local bgBtn = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "DialogBGBtn",
+        name = "DialogBGBtn" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -102,7 +109,7 @@ function ____exports.createDialogFrames(self)
         )
     end
     bindDialogPanelHitFrame(nil, bgBtn)
-    local titleBg = dzCreate(nil, "GameUI", TAG_BASE_MAIN + 2)
+    local titleBg = dzCreate(nil, "GameUI", slotTag + 2)
     frames[2] = titleBg
     dzShow(nil, titleBg, false)
     dzClearPoints(nil, titleBg)
@@ -116,7 +123,7 @@ function ____exports.createDialogFrames(self)
     dzSetSize(nil, titleBg, 0.107, 0.0328)
     dzSetAlpha(nil, titleBg, 255)
     dzSetTexture(nil, titleBg, DEFAULT_TITLE_TEX)
-    local nameText = dzCreate(nil, "GameText", TAG_BASE_MAIN + 3)
+    local nameText = dzCreate(nil, "GameText", slotTag + 3)
     frames[3] = nameText
     dzShow(nil, nameText, false)
     dzClearPoints(nil, nameText)
@@ -134,7 +141,7 @@ function ____exports.createDialogFrames(self)
             end
         )
     end
-    local bodyText = dzCreate(nil, "GameTextpxL", TAG_BASE_MAIN + 4)
+    local bodyText = dzCreate(nil, "GameTextpxL", slotTag + 4)
     frames[4] = bodyText
     dzShow(nil, bodyText, false)
     dzClearPoints(nil, bodyText)
@@ -151,7 +158,7 @@ function ____exports.createDialogFrames(self)
     dzSetEnable(nil, bodyText, false)
     local acceptBg = createFrame(nil, {
         type = FrameType.BACKDROP,
-        name = "DialogAcceptBg",
+        name = "DialogAcceptBg" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -168,7 +175,7 @@ function ____exports.createDialogFrames(self)
     end
     local acceptLabel = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "DialogAcceptLabel",
+        name = "DialogAcceptLabel" .. nameSuffix,
         parent = acceptBg,
         template = "template",
         visible = false
@@ -197,7 +204,7 @@ function ____exports.createDialogFrames(self)
     end
     local acceptBtn = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "DialogAcceptBtn",
+        name = "DialogAcceptBtn" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -214,7 +221,7 @@ function ____exports.createDialogFrames(self)
     end
     local rejectBg = createFrame(nil, {
         type = FrameType.BACKDROP,
-        name = "DialogRejectBg",
+        name = "DialogRejectBg" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -231,7 +238,7 @@ function ____exports.createDialogFrames(self)
     end
     local rejectLabel = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "DialogRejectLabel",
+        name = "DialogRejectLabel" .. nameSuffix,
         parent = rejectBg,
         template = "template",
         visible = false
@@ -260,7 +267,7 @@ function ____exports.createDialogFrames(self)
     end
     local rejectBtn = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "DialogRejectBtn",
+        name = "DialogRejectBtn" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -277,7 +284,7 @@ function ____exports.createDialogFrames(self)
     end
     local hintLabel = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "DialogHintLabel",
+        name = "DialogHintLabel" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false
@@ -301,7 +308,7 @@ function ____exports.createDialogFrames(self)
     end
     local skipHintLabel = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "DialogSkipHint",
+        name = "DialogSkipHint" .. nameSuffix,
         parent = gameUI,
         template = "template",
         visible = false

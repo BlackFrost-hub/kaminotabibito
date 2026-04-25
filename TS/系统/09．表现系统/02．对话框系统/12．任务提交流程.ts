@@ -21,6 +21,9 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 };
 import { setQuestState } from "./07．任务状态";
 import { removeQuestMarkerAfterNpcTriggered } from "./15．NPC头顶与气泡特效";
+const { addDelayedCallback } = globalThis as unknown as {
+  addDelayedCallback: (delayMs: number, callback: () => void) => number;
+};
 
 // ========== 虚拟分区：提交流程工具 ==========
 function normalizeRequireCount(count?: number): number {
@@ -226,7 +229,9 @@ export function handleQuestSubmit(params: {
       const completeRaw = pickNpcCompleteTextByBranch(quest.NpcCompleteText, rewardBranchIndex);
       const completeLines = parseDialogText(completeRaw, npcName, heroName);
       /** 必须带 npcUnit，否则 openNpcDialog 不会挂 qipao（与进行中/接取对白一致） */
-      openDialog(jass.Player(dialogOwnerId), npcUnit ? { lines: completeLines, npcUnit } : { lines: completeLines });
+      addDelayedCallback(10, () => {
+        openDialog(jass.Player(dialogOwnerId), npcUnit ? { lines: completeLines, npcUnit } : { lines: completeLines });
+      });
     }
   }
 
@@ -236,7 +241,7 @@ export function handleQuestSubmit(params: {
       showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r资源不足，提交需要 ${requiredResources} x ${requireCount}`);
       return;
     }
-    setQuestState(questId, 2, playerName);
+    setQuestState(dialogOwnerId, questId, 2, playerName);
     const rewardResult = applyRewardWithContext(quest.reward || "", { triggerPlayerId: dialogOwnerId });
     rewardBranchIndex = rewardResult.matchedRuleIndex;
     onComplete();
@@ -322,7 +327,7 @@ export function handleQuestSubmit(params: {
       }
       const consumed = ConsumeItemTypeCountByChargesBJ(sourceUnit, itemId, requireCount);
       if (consumed) {
-        setQuestState(questId, 2, playerName);
+        setQuestState(dialogOwnerId, questId, 2, playerName);
         const rewardResult = applyRewardWithContext(quest.reward || "", {
           triggerPlayerId: dialogOwnerId,
           submittedItemId: submitInfo.itemCode,
@@ -343,7 +348,7 @@ export function handleQuestSubmit(params: {
     return;
   }
 
-  setQuestState(questId, 2, playerName);
+  setQuestState(dialogOwnerId, questId, 2, playerName);
   const rewardResult = applyRewardWithContext(quest.reward || "", { triggerPlayerId: dialogOwnerId });
   rewardBranchIndex = rewardResult.matchedRuleIndex;
   onComplete();

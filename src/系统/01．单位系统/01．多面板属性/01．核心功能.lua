@@ -461,10 +461,10 @@ function registerToCenterTimer(self)
     onTick10ms(nil, onRefreshTick)
 end
 jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-getGameTimeFormatted = ____require_result_0.getGameTimeFormatted
-getGameDifficulty = ____require_result_0.getGameDifficulty
-onTick10ms = ____require_result_0.onTick10ms
+local ____G_0 = _G
+getGameTimeFormatted = ____G_0.getGameTimeFormatted
+getGameDifficulty = ____G_0.getGameDifficulty
+onTick10ms = ____G_0.onTick10ms
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 YDUserDataGet = ____require_result_1.YDUserDataGet
 YDUserDataSet = ____require_result_1.YDUserDataSet

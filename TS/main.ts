@@ -1,6 +1,7 @@
 // main.ts
-const runtime = require("jass.runtime") as { console?: boolean };
+const runtime = require("jass.runtime") as { console?: boolean; handle_level?: number };
 runtime.console = true;
+runtime.handle_level = 0;
 const jassConsole = require("jass.console") as { write: (s: string) => void };
 require("jass.japi"); // 扩展 JASS 原生 (Blz* 等)
 const jass = require("jass.common") as Record<string, unknown>;
@@ -43,8 +44,8 @@ const 伤害系统 = require("系统.04．伤害系统.index") as { init?: () =>
 if (typeof 伤害系统.init === "function") 伤害系统.init();
 
 // // ---------- 05．Buff系统 ----------
-const Buff系统 = require("系统.05．Buff系统.index") as { init?: () => void };
-if (typeof Buff系统.init === "function") Buff系统.init();
+//const Buff系统 = require("系统.05．Buff系统.index") as { init?: () => void };
+//if (typeof Buff系统.init === "function") Buff系统.init();
 
 // // ---------- 07．地形系统 ----------
 const 地形系统 = require("系统.07．地形系统.index") as { init?: () => void };
@@ -59,8 +60,8 @@ const 任务系统 = require("系统.08．任务系统.10．index") as { init?: 
 if (typeof 任务系统.init === "function") 任务系统.init();
 
 // // ---------- 09．表现系统 ----------
-const 表现系统 = require("系统.09．表现系统.index") as { init?: () => void };
-if (typeof 表现系统.init === "function") 表现系统.init();
+//const 表现系统 = require("系统.09．表现系统.index") as { init?: () => void };
+//if (typeof 表现系统.init === "function") 表现系统.init();
 
 // // ---------- 12．测试系统 ----------
 // 通过统一的 index.ts 入口加载测试，在 系统.12．测试系统.index 中配置开关

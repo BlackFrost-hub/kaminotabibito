@@ -66,22 +66,14 @@ export function testQuestAcceptComplete(): void {
 export function testUI(): void {
   debugPrint("测试任务UI...");
 
-  // 显示UI
   (pcall as any)(() => {
-    const lp = jass.GetLocalPlayer();
-    if (lp == null || lp === 0) return;
-
-    taskUI.show(0);
+    taskUI.togglePanelByVisibilityOnly();
     debugPrint("任务UI已显示");
   });
 
-  // 等待3秒后隐藏
   withTimer(3, () => {
     (pcall as any)(() => {
-      const lp = jass.GetLocalPlayer();
-      if (lp == null || lp === 0) return;
-
-      taskUI.hide();
+      taskUI.togglePanelByVisibilityOnly();
       debugPrint("任务UI已隐藏");
     });
   });

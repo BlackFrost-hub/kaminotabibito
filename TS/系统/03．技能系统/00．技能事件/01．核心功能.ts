@@ -35,16 +35,27 @@ const SPELL_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 
 let _initialized = false;
 
+function hasListener(list: SpellCallback[], callback: SpellCallback): boolean {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i] === callback) return true;
+  }
+  return false;
+}
+
+function dispatchSpellListeners(list: SpellCallback[], castingUnit: any, spellAbilityId: number): void {
+  for (let i = 0; i < list.length; i++) {
+    const callback = list[i];
+    if (callback != null) callback(castingUnit, spellAbilityId);
+  }
+}
+
 function onSpellChannel(this: void): void {
   const castingUnit = jass.GetTriggerUnit();
   if (castingUnit == null) return;
   const spellAbilityId = jass.GetSpellAbilityId();
   if (spellAbilityId == null) return;
 
-  for (let i = 0; i < channelListeners.length; i++) {
-    const cb = channelListeners[i];
-    cb(castingUnit, spellAbilityId);
-  }
+  dispatchSpellListeners(channelListeners, castingUnit, spellAbilityId);
 }
 
 function onSpellEffect(this: void): void {
@@ -53,15 +64,13 @@ function onSpellEffect(this: void): void {
   const spellAbilityId = jass.GetSpellAbilityId();
   if (spellAbilityId == null) return;
 
-  for (let i = 0; i < effectListeners.length; i++) {
-    const cb = effectListeners[i];
-    cb(castingUnit, spellAbilityId);
-  }
+  dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId);
 }
 
 export function registerSpellChannelListener(callback: SpellCallback): void {
   if (typeof callback !== "function") return;
-  channelListeners.push(callback);
+  init();
+  if (!hasListener(channelListeners, callback)) channelListeners.push(callback);
 }
 
 export function unregisterSpellChannelListener(callback: SpellCallback): void {
@@ -71,7 +80,8 @@ export function unregisterSpellChannelListener(callback: SpellCallback): void {
 
 export function registerSpellEffectListener(callback: SpellCallback): void {
   if (typeof callback !== "function") return;
-  effectListeners.push(callback);
+  init();
+  if (!hasListener(effectListeners, callback)) effectListeners.push(callback);
 }
 
 export function unregisterSpellEffectListener(callback: SpellCallback): void {

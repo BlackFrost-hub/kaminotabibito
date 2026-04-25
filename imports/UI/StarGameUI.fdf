@@ -1,4 +1,4 @@
-// -- INCLUDE FILES ÒýÓÃ¿Ø¼þÄ£°åÎÄ¼þ---------------------------------------------------------
+// -- INCLUDE FILES ï¿½ï¿½ï¿½Ã¿Ø¼ï¿½Ä£ï¿½ï¿½ï¿½Ä¼ï¿½---------------------------------------------------------
 IncludeFile "UI\FrameDef\Glue\BattleNetTemplates.fdf",
 IncludeFile "UI\FrameDef\UI\EscMenuTemplates.fdf",
 IncludeFile "UI\FrameDef\Glue\StandardTemplates.fdf",
@@ -8,20 +8,20 @@ IncludeFile "UI\FrameDef\Glue\StandardTemplates.fdf",
 //*
 //******
 
-// ÓÎÏ·½çÃæ
+// ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½
 Frame "BACKDROP" "GameUI" {
-        BackdropBlendAll, //Blend£¬¿ªÆôÍ¸Ã÷Í¨µÀ
+        BackdropBlendAll, //Blendï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½Í¨ï¿½ï¿½
 
 }
 Frame "TEXT" "ButtonText" INHERITS "BattleNetButtonTextTemplate" {
     
-      		//±³¾°
+      		//ï¿½ï¿½ï¿½ï¿½
     		ControlBackdrop "TextBG",
    		Frame "BACKDROP" "TextBG" {
    			BackdropBackground  "StarUI_ItemEmpty.tga",
      			BackdropBlendAll,
     		}
-	Text "ÎÄ±¾",
+	Text "ï¿½Ä±ï¿½",
 
 }
 	Frame "TEXTBUTTON" "BPK1" {
@@ -31,7 +31,7 @@ Frame "TEXT" "ButtonText" INHERITS "BattleNetButtonTextTemplate" {
   		ButtonPushedTextOffset -0.001f -0.0015f,
 		SetPoint TOPLEFT, "BAG", TOPLEFT, 0.0174, -0.039,
 
-      		//±³¾°
+      		//ï¿½ï¿½ï¿½ï¿½
     		ControlBackdrop "BPK1UP",
    		Frame "BACKDROP" "BPK1UP" {
    			BackdropBackground  "StarUI_ItemEmpty.tga",
@@ -39,13 +39,13 @@ Frame "TEXT" "ButtonText" INHERITS "BattleNetButtonTextTemplate" {
     		}
 
 			
-    		//½ûÓÃ
+    		//ï¿½ï¿½ï¿½ï¿½
     		ControlDisabledBackdrop "BPK1DIS",
     		Frame "BACKDROP" "BPK1DIS" {
         		BackdropBackground  "StarUI_ItemEmpty.tga",
         		BackdropBlendAll,
     		}
-    		//¸ßÁÁ
+    		//ï¿½ï¿½ï¿½ï¿½
     		ControlMouseOverHighlight "BPK1LIGHT",
     		Frame "HIGHLIGHT" "BPK1LIGHT" {
         		HighlightType "FILETEXTURE",
@@ -57,59 +57,59 @@ Frame "TEXT" "ButtonText" INHERITS "BattleNetButtonTextTemplate" {
 
     Frame "Text" "GameText" {
         FrameFont "Fonts\123456.ttf", 0.012, "",
-       FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+       FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
     Frame "Text" "GameTextpx" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
     Frame "Text" "GameTextBG2" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
 	
     Frame "Text" "GameTextBG" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
 	
     Frame "Text" "GameTextBG1" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
 	  FontColor 1.0 0.5 0.0 1.0,
     }
 	
     Frame "Text" "GameTextBGs" {
         FrameFont "Fonts\123456.ttf", 0.004, "",
-        FontJustificationH JUSTIFYCENTER, //¾ÓÖÐ¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYCENTER, //ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
 	  FontColor 1.0 1.0 1.0 1.0,
     }
 	    Frame "Text" "GameTextpxR" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        FontJustificationH JUSTIFYRIGHT, //ÓÒ±ß¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        FontJustificationH JUSTIFYRIGHT, //ï¿½Ò±ß¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
         Frame "Text" "GameTextpxL" {
         FrameFont "Fonts\123456.ttf", 0.008, "",
-        //FontJustificationH JUSTIFYLIFT, //×ó±ß¶ÔÆë
-        FontJustificationV JUSTIFYTOP, //×ÖÌå¶ÔÆëV
+        //FontJustificationH JUSTIFYLIFT, //ï¿½ï¿½ß¶ï¿½ï¿½ï¿½
+        FontJustificationV JUSTIFYTOP, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½V
     }
-// ÉèÖÃÍ¼±ê
+// ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
 Frame "BACKDROP" "GameUI_Icon" {
-        BackdropBlendAll, //Blend£¬¿ªÆôÍ¸Ã÷Í¨µÀ
+        BackdropBlendAll, //Blendï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½Í¨ï¿½ï¿½
 }
 
-    // ÉèÖÃÄ£ÐÍ
+    // ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
     Frame "SPRITE" "GameUI_Model" {
     }
 
-    // ÉèÖÃ°´Å¥
+    // ï¿½ï¿½ï¿½Ã°ï¿½Å¥
     Frame "GLUETEXTBUTTON" "GameUI_Button" INHERITS WITHCHILDREN "BlankButtonTemplate" {
-        SetAllPoints, //³ß´çÓëÃªµãÈ«²¿¸½¼ÓÔÚ¸¸¿Ø¼þMallItemÉÏ
+        SetAllPoints, //ï¿½ß´ï¿½ï¿½ï¿½Ãªï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ø¼ï¿½MallItemï¿½ï¿½
     }

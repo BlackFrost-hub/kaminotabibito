@@ -9,6 +9,9 @@ local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.0
 local QUEST_CONFIGS = ____02_FF0E_4EFB_52A1_914D_7F6E_8868.QUEST_CONFIGS
 local ____07_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.07．任务状态")
 local hasPlayerAcceptedQuest = ____07_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
+local ____01_FF0EFourCC_8F6C_6362 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+local fourCCToString = ____01_FF0EFourCC_8F6C_6362.fourCCToString
+local jass = require("jass.common")
 function ____exports.findQuestByNpc(self, npcName)
     return __TS__ArrayFind(
         QUEST_CONFIGS,
@@ -51,6 +54,44 @@ function ____exports.findNpcConfigByUnitName(self, unitName)
         if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
             return npc
         end
+    end
+    return nil
+end
+function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
+    if not unit or not unitName then
+        return nil
+    end
+    local selectedUnitCode = fourCCToString(
+        nil,
+        jass.GetUnitTypeId(unit)
+    )
+    for ____, npc in ipairs(NPC_CONFIGS) do
+        do
+            if npc.enabled ~= true then
+                goto __continue19
+            end
+            if npc.unitcode and npc.unitcode ~= selectedUnitCode then
+                goto __continue19
+            end
+            if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
+                return npc
+            end
+        end
+        ::__continue19::
+    end
+    return nil
+end
+function ____exports.findEnabledNpcConfigByRequireId(self, requireID)
+    for ____, npc in ipairs(NPC_CONFIGS) do
+        do
+            if npc.enabled ~= true then
+                goto __continue25
+            end
+            if npc.requireID == requireID then
+                return npc
+            end
+        end
+        ::__continue25::
     end
     return nil
 end

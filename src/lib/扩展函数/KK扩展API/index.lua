@@ -35,8 +35,19 @@ ____exports.DzI2K = eventApi.DzI2K
 ____exports.DzTriggerRegisterMallItemSyncData = eventApi.DzTriggerRegisterMallItemSyncData
 ____exports.DzGetTriggerMallItemPlayer = eventApi.DzGetTriggerMallItemPlayer
 ____exports.DzGetTriggerMallItem = eventApi.DzGetTriggerMallItem
+____exports.DzSyncData = eventApi.DzSyncData
+____exports.DzSyncDataImmediately = eventApi.DzSyncDataImmediately
+____exports.DzSyncBuffer = eventApi.DzSyncBuffer
+____exports.DzTriggerRegisterDialogEntrySyncData = eventApi.DzTriggerRegisterDialogEntrySyncData
+____exports.DzSyncDialogEntryData = eventApi.DzSyncDialogEntryData
+____exports.DzGetTriggerDialogEntryPlayer = eventApi.DzGetTriggerDialogEntryPlayer
+____exports.DzGetTriggerDialogEntryData = eventApi.DzGetTriggerDialogEntryData
+____exports.DzTriggerRegisterSyncDataTrg = eventApi.DzTriggerRegisterSyncDataTrg
+____exports.DzGetTriggerSyncPlayer = eventApi.DzGetTriggerSyncPlayer
+____exports.DzGetTriggerSyncData = eventApi.DzGetTriggerSyncData
 ____exports.DzGetColor2 = utilApi.DzGetColor2
 ____exports.DzOpenQQGroupUrl = utilApi.DzOpenQQGroupUrl
+____exports.DzExecuteFunc = utilApi.DzExecuteFunc
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return
@@ -80,7 +91,18 @@ function ____exports.registerBridge(self)
     expose(nil, "DzTriggerRegisterMallItemSyncData", eventApi.DzTriggerRegisterMallItemSyncData)
     expose(nil, "DzGetTriggerMallItemPlayer", eventApi.DzGetTriggerMallItemPlayer)
     expose(nil, "DzGetTriggerMallItem", eventApi.DzGetTriggerMallItem)
+    expose(nil, "DzSyncData", eventApi.DzSyncData)
+    expose(nil, "DzSyncDataImmediately", eventApi.DzSyncDataImmediately)
+    expose(nil, "DzSyncBuffer", eventApi.DzSyncBuffer)
+    expose(nil, "DzTriggerRegisterDialogEntrySyncData", eventApi.DzTriggerRegisterDialogEntrySyncData)
+    expose(nil, "DzSyncDialogEntryData", eventApi.DzSyncDialogEntryData)
+    expose(nil, "DzGetTriggerDialogEntryPlayer", eventApi.DzGetTriggerDialogEntryPlayer)
+    expose(nil, "DzGetTriggerDialogEntryData", eventApi.DzGetTriggerDialogEntryData)
+    expose(nil, "DzTriggerRegisterSyncDataTrg", eventApi.DzTriggerRegisterSyncDataTrg)
+    expose(nil, "DzGetTriggerSyncPlayer", eventApi.DzGetTriggerSyncPlayer)
+    expose(nil, "DzGetTriggerSyncData", eventApi.DzGetTriggerSyncData)
     expose(nil, "DzGetColor2", utilApi.DzGetColor2)
     expose(nil, "DzOpenQQGroupUrl", utilApi.DzOpenQQGroupUrl)
+    expose(nil, "DzExecuteFunc", utilApi.DzExecuteFunc)
 end
 return ____exports

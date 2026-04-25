@@ -10,10 +10,7 @@ export const DEFAULT_AFTER_COMPLETE_MSG = "谢谢你的帮助，旅行者";
 // ========== 虚拟分区：工具 ==========
 
 export function showLocalHint(playerId: number, msg: string, duration: number = 5): void {
-  const localPlayer = jass.GetLocalPlayer();
-  if (localPlayer === jass.Player(playerId)) {
-    jass.DisplayTimedTextToPlayer(localPlayer, 0, 0, duration, msg);
-  }
+  jass.DisplayTimedTextToPlayer(jass.Player(playerId), 0, 0, duration, msg);
 }
 
 export function giveQuestReward(reward: string, triggerPlayerId?: number): void {

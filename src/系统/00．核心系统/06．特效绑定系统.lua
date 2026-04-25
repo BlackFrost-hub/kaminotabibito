@@ -33,9 +33,9 @@ local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
 local EC_CreateEffect = ____require_result_0.EC_CreateEffect
 local EC_GetPointZ = ____require_result_0.EC_GetPointZ
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local onTick10ms = ____require_result_1.onTick10ms
-local offTick10ms = ____require_result_1.offTick10ms
+local ____G_1 = _G
+local onTick10ms = ____G_1.onTick10ms
+local offTick10ms = ____G_1.offTick10ms
 --- 进度条模型路径
 ____exports.PROGRESSBAR_MODEL = "resource\\models\\Common\\Progressbar.mdx"
 --- 默认黄色颜色 (R=255, G=255, B=0, A=255)

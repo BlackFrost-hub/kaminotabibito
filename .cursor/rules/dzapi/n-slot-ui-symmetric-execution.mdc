@@ -14,7 +14,7 @@ alwaysApply: false
 
 ## 1. 方案 B（N 槽）：设计结论
 
-- 默认优先 **方案 B（N 槽）**：每个客户端都创建同样数量、同样结构的 UI 壳；本地差异只放在显隐、输入门控、滚动位置等表现层。
+- 默认优先 **方案 B（N 槽）**：每个客户端都创建同样数量、同样结构的 UI 壳；本地差异只放在显隐等表现层。设置UI文本/贴图等全局同步
 - 设计目标不是“所有人画面一致”，而是 **所有客户端执行形态一致**。魔兽里的 desync 根因通常是 **全局状态读写的顺序、次数、分支不一致**，不是“不同槽位是否画出同一帧文本”。
 - **方案 A（每端仅 1 套本地 UI）维护成本高**：只要后续迭代里让“面板是否存在/是否打开”影响到计时器、注册次数、同步回调链或共享状态读写，就更容易把 UI 问题升级成 desync。
 - 方案 B 的价值是把 **创建、注册回调、滚轮、刷新入口** 固定成 **每个客户端永远跑同一套 N 槽流程**；最后才用 **`GetLocalPlayer()` + 可见性/可交互性** 区分谁看见、谁可操作。
@@ -122,7 +122,25 @@ function startRefreshTimer(): void {
 3. **热键**：模块级只注册一份，派发到本机槽位，避免一次按键 N 份逻辑。
 4. **多份 `registerUIRefreshCallback`**：回调内用「本槽是否本地 + 是否可见」早退，或集中注册再分发（二选一，保持全端对称）。
 
-### 4.2 本仓库参考
+### 4.2 本地隔离 vs 全局同步（N槽场景）
+
+**N槽模型**：每个客户端创建N套UI壳（N=玩家数），槽位i服务Player(i)。所有客户端的槽位i状态必须一致，只有显示/隐藏不同。
+
+| 操作类型 | 需要本地隔离 (`GetLocalPlayer`) | 说明 |
+|---------|-------------------------------|------|
+| `DzFrameShow` (显隐) | ✅ 必须 | 只有本地玩家看到自己的UI |
+| `StartSound` / 音效 | ✅ 必须指定玩家 | 否则全房播放 |
+| `DisplayTextToPlayer` | ✅ 必须指定玩家 | 否则全房可见 |
+| 全局变量修改 | ❌ 不需要 | 所有客户端同步修改 |
+| 计时器状态 | ❌ 不需要 | 所有客户端同步修改 |
+| `DzFrameSetTexture` | ❌ 不需要 | 贴图内容全房一致 |
+| `DzFrameSetText` | ❌ 不需要 | 文本内容全房一致 |
+| `DzFrameSetPoint` | ❌ 不需要 | 位置全房一致 |
+| 滚动条滑块位置 | ❌ 不需要 | 位置状态全房一致 |
+
+**原则**：4个槽位在所有客户端都存在，只是**显示/隐藏**不同。修改槽位的**内容**（贴图、文本、滑块位置）需要所有客户端同步知道，只有**显示/隐藏**、**音效**、**文本消息**需要本地隔离。
+
+### 4.3 本仓库参考
 
 `TS/系统/08．任务系统/03．任务UI.ts` 与 `04．任务UI拆分/*`（`slotPid`、`contextId`、帧名后缀）。属性 UI「同时要看到多人」可仍用多行展示，不必同一文件结构，但**数据全局、显示本地**分层一致。
 
@@ -172,6 +190,30 @@ function startRefreshTimer(): void {
 
 **曾误传「平台只对键盘 false 派发」——已证伪，忽略旧说法。**
 
-任务面板热键：全房 sync 触发时，回调内须 **`触发键玩家 === GetLocalPlayer()`** 再处理（见 `04．任务UI拆分/05．任务UI热键.ts`）。
+### 热键处理最佳实践
+
+**使用 `DzGetTriggerKeyPlayer()` 获取真实按键玩家：**
+
+```typescript
+registerKeyDown(KEY.J, () => {
+  const keyPlayer = DzGetTriggerKeyPlayer();  // 所有客户端返回相同的真实按键玩家
+  const pid = GetPlayerId(keyPlayer);
+  
+  // 修改该玩家的全局状态（所有客户端同步执行）
+  g_taskUIVisible[pid] = true;
+  
+  // UI显示在 GetLocalPlayer 判断内控制（只显示给对应玩家）
+  if (GetLocalPlayer() === keyPlayer) {
+    showFrame(mainPanel);
+  }
+});
+```
+
+**原则：**
+- 状态修改（全局数组）→ 所有客户端同步执行，无需 `GetLocalPlayer` 判断
+- UI显示（`showFrame`/`hideFrame`）→ 只在 `GetLocalPlayer() === keyPlayer` 时执行
+- 不需要用 `GetLocalPlayer` 来判断"要不要处理"，而是用 `DzGetTriggerKeyPlayer` 确定"处理哪个玩家"
+
+**参考实现：** `04．任务UI拆分/05．任务UI热键.ts`
 
 **Frame 叠放与 `DzFrameSetPriority`**：见 `ui-frame-types.mdc` 文末「Frame 叠放与优先级」。

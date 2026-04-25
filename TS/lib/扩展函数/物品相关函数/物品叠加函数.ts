@@ -8,7 +8,7 @@ const jass = require("jass.common") as any;
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
     registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
 };
-const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
+const centerTimer = globalThis as unknown as {
     addDelayedCallback: (delayMs: number, callback: () => void) => number;
 };
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {

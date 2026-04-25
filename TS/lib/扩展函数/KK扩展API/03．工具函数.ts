@@ -25,4 +25,12 @@ export function DzOpenQQGroupUrl(url: string): boolean {
   return (japi.DzOpenQQGroupUrl(url) as boolean) || false;
 }
 
+/**
+ * 异步执行全局函数
+ * @param funcName 全局函数名
+ */
+export function DzExecuteFunc(funcName: string): void {
+  japi.DzExecuteFunc(funcName);
+}
+
 export {};

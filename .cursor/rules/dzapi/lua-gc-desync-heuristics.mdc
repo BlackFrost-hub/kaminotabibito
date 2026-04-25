@@ -1,0 +1,106 @@
+---
+description: Lua/ydLua 联机异步经验补充：少本地 table 写入、少匿名闭包、少依赖 GC
+globs: TS/**/*.ts, TS/**/*.lua
+alwaysApply: false
+---
+
+# Lua GC / 闭包异步经验
+
+适用对象：
+- TSTL -> Lua 项目
+- DzAPI UI
+- 任何频繁本地输入、频繁 JASS <-> Lua 回调的系统
+
+这不是绝对规则，而是联机稳定性优先时应默认靠拢的经验。
+
+## 1. 默认假设
+
+- 不要依赖 Lua GC 帮你“自然整理”运行时对象
+- 不要假设本地玩家之间 GC 时机一致
+- 除显示/读取这类幂等操作外，尽量同步执行
+
+## 2. 本地域内尽量只做幂等操作
+
+本地域里优先只做：
+- `DzFrameShow`
+- `DzFrameSetText`
+- `DzFrameSetTexture`
+- `DzFrameSetPoint`
+- `DzFrameSetSize`
+- 读变量
+
+本地域里默认避免：
+- 新建 table / string 后立刻参与复杂逻辑
+- 改全局表结构
+- 把运行时对象挂进全局引用
+- 创建/删除/修改非幂等运行时对象
+
+## 3. 少用匿名闭包进 JASS 回调
+
+默认避免把匿名闭包频繁传给：
+- `DzFrameSetScriptByCode`
+- 键盘/鼠标/滚轮注册
+- `TimerStart`
+- `ForGroup`
+- 触发条件/Filter
+
+优先改成：
+- 模块级命名函数
+- 单列分发
+- Lua 层先记录索引/字符串 key，再统一处理
+
+## 4. table 约束
+
+- table key 优先使用字符串或数字
+- 不要用 `unit/frame/player/item` 这类 handle/userdata 做 key
+- value 里也尽量不要长期挂复杂运行时对象引用
+- 不要依赖 `pairs()` 的 hash 部分遍历顺序
+
+优先形式：
+
+```lua
+state["main|0|3"] = true
+rows[3] = "quest_001"
+```
+
+避免形式：
+
+```lua
+state[unit] = true
+state[frame] = pageTable
+```
+
+## 5. 运行时句柄保护
+
+如果项目使用 `jass.runtime`，默认建议在主入口启用：
+
+```lua
+local runtime = require("jass.runtime")
+runtime.handle_level = 0
+```
+
+目的：
+- 尽量避免 runtime 自动释放 handle 引用后，不同玩家 Lua 侧句柄状态漂移
+
+## 6. UI 系统落地建议
+
+- 少本地 `Map` / table 状态写入
+- 少本地后台刷新
+- 少“每个按钮一个闭包”
+- 优先“单管理器 + 单列事件分发 + 预设 frame + show/hide 切换”
+
+## 7. 不要把异步探针塞进本地链
+
+- `sync=false` 的本地 UI 事件链里，不要用 `DzSyncData` / `DzSyncDataImmediately` 做探针
+- 也不要在本地链里临时 `CreateItem` / `RemoveItem` / 创建 handle 再同步出去做比对
+
+原因：
+
+- 这类探针本身就不是幂等显示操作
+- 它们放进本地链后，往往会先制造 desync，而不是检测出 desync
+
+## 8. 本地 UI 音效约束
+
+- 本地 UI 链里的 `StartSound` / `SoundUI_ClickPlay` 必须限制到本地玩家
+- 如果音效封装支持 `whichPlayer`，就必须传本地玩家
+- 不要默认依赖“UI 音效只是表现，所以全房播放也没事”

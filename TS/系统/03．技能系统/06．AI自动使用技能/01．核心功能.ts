@@ -7,6 +7,9 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
   registerPlayerUnitEvent: (this: void, trig: any, player: any, eventId: any, filter?: any) => void;
   registerPlayerUnitEventById: (this: void, trig: any, playerId: number, eventId: any, filter?: any) => void;
 };
+const { addPeriodicCallback } = globalThis as unknown as {
+  addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+};
 
 // 导入常量
 import {
@@ -69,7 +72,7 @@ type AIUnitRegistry = Map<number, UnitAIInfo>;
 // ==========================================================================================
 
 const aiUnitRegistry: AIUnitRegistry = new Map();
-let aiCheckTimer: any = null;
+let aiCheckRegistered = false;
 let unitCreatedTrigger: any = null;
 
 // ==========================================================================================
@@ -233,9 +236,9 @@ const { registerDeathListener } = require("系统.01．单位系统.03．单位�
 export function initAISkillSystem(): void {
   if (!AI_SKILL_SYSTEM_ENABLED) return;
 
-  if (!aiCheckTimer) {
-    aiCheckTimer = jass.CreateTimer();
-    jass.TimerStart(aiCheckTimer, AI_CHECK_INTERVAL, true, onAICheck);
+  if (!aiCheckRegistered) {
+    aiCheckRegistered = true;
+    addPeriodicCallback(Math.max(1, Math.floor(AI_CHECK_INTERVAL * 1000)), onAICheck);
   }
 
   registerDeathListener((dyingUnit) => {

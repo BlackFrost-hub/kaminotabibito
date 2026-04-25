@@ -74,11 +74,7 @@ end
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
     pcall(function ()
-            local lp = jass.GetLocalPlayer()
-            if lp == nil or lp == 0 then
-                return
-            end
-            taskUI:show(0)
+            taskUI:togglePanelByVisibilityOnly()
             debugPrint(nil, "任务UI已显示")
         end
     )
@@ -87,11 +83,7 @@ function ____exports.testUI(self)
         3,
         function()
             pcall(function ()
-                    local lp = jass.GetLocalPlayer()
-                    if lp == nil or lp == 0 then
-                        return
-                    end
-                    taskUI:hide()
+                    taskUI:togglePanelByVisibilityOnly()
                     debugPrint(nil, "任务UI已隐藏")
                 end
             )

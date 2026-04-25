@@ -7,7 +7,7 @@
 | 目录 | 内容 |
 |------|------|
 | [`war3-tstl/`](war3-tstl/) | TSTL -> Lua、jass/japi 调用、随机数、全局数组、伤害事件等 War3 运行时坑点 |
-| [`dzapi/`](dzapi/) | DzAPI UI、LoadToc、FDF、Frame 类型；**联机 desync / N 槽对称执行 / Timer·sync** 见 [`dzapi/n-slot-ui-symmetric-execution.mdc`](dzapi/n-slot-ui-symmetric-execution.mdc) |
+| [`dzapi/`](dzapi/) | DzAPI UI、LoadToc、FDF、Frame 类型；**联机 desync / N 槽对称执行 / Timer·sync** 见 [`dzapi/n-slot-ui-symmetric-execution.mdc`](dzapi/n-slot-ui-symmetric-execution.mdc)；**单管理器 + 本地开关 + 关闭重置** 见 [`dzapi/single-manager-local-reset-ui.mdc`](dzapi/single-manager-local-reset-ui.mdc)；**Lua GC / 匿名闭包 / table key 异步经验** 见 [`dzapi/lua-gc-desync-heuristics.mdc`](dzapi/lua-gc-desync-heuristics.mdc) |
 | [`equipment/`](equipment/) | 装备恢复、`hot` 字段、`USE_ITEM` 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
 | [`tooling/`](tooling/) | 调试输出、`print`、音效与封装约定 |

@@ -46,7 +46,7 @@ SetUnitManaPercentBJ = ____require_result_1.SetUnitManaPercentBJ
 local UnitHasBuffBJ = ____require_result_1.UnitHasBuffBJ
 local ____require_result_2 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_2.registerDamageCallback
-local centerTimer = require("系统.00．核心系统.05．中心计时器")
+local centerTimer = _G
 --- 脱战计时时间（秒）
 local OUT_OF_COMBAT_TIME = 18
 OUT_OF_COMBAT_SPEED_ABILITY = 1093677378

@@ -161,14 +161,38 @@ local function registerKeyBindToTrigger(self, trig, status, keyCode)
         end
     end
 end
---- 注册按键事件（by code）。注意：这里不做 try/catch 兜底，避免不必要的同步差异。
+--- sync=false 时走 ByCode(..., false)，仅本机触发，避免纯 UI 热键走全房 sync。
+local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action)
+    if type(japi.DzTriggerRegisterKeyEventByCode) ~= "function" then
+        registerKeyBindToTrigger(nil, trig, status, keyCode)
+        return
+    end
+    japi.DzTriggerRegisterKeyEventByCode(
+        trig,
+        keyCode,
+        status,
+        false,
+        action
+    )
+end
+--- 注册按键事件（by code）。sync=true 全房回调；sync=false 仅本机（与 `封装函数/04．硬件输入/04．键盘函数` 一致）。
 function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
     local trig = createTriggerOrNull(nil)
     if not trig then
         return nil
     end
-    registerKeyBindToTrigger(nil, trig, status, keyCode)
-    jass.TriggerAddAction(trig, action)
+    if sync then
+        registerKeyBindToTrigger(nil, trig, status, keyCode)
+        jass.TriggerAddAction(trig, action)
+    else
+        registerKeyBindToTriggerLocal(
+            nil,
+            trig,
+            status,
+            keyCode,
+            action
+        )
+    end
     return trig
 end
 function ____exports.registerKeyDown(self, keyCode, callback)
@@ -253,63 +277,4 @@ end
 function ____exports.frameSetScriptByCode(self, frame, eventId, action, sync)
     japi.DzFrameSetScriptByCode(frame, eventId, action, sync)
 end
-local function initTestKeyB(self)
-    local lastDownByPid = {}
-    local function hook(____, st)
-        ____exports.registerKeyEventRawStatus(
-            nil,
-            ____exports.KEY.B,
-            st,
-            false,
-            function()
-                local p = japi.DzGetTriggerKeyPlayer()
-                local ____p_1
-                if p then
-                    ____p_1 = jass.GetPlayerId(p)
-                else
-                    ____p_1 = 0
-                end
-                local pid = ____p_1
-                local down = ____exports.isKeyDown(nil, ____exports.KEY.B)
-                local last = not not lastDownByPid[pid]
-                lastDownByPid[pid] = down
-                if last and not down then
-                    do
-                        local i = 0
-                        while i < 12 do
-                            jass.DisplayTimedTextToPlayer(
-                                jass.Player(i),
-                                0,
-                                0,
-                                3,
-                                "9999"
-                            )
-                            i = i + 1
-                        end
-                    end
-                    if p then
-                        jass.DisplayTimedTextToPlayer(
-                            jass.Player(0),
-                            0,
-                            0,
-                            3,
-                            "from=" .. tostring(jass.GetPlayerName(p))
-                        )
-                    end
-                end
-            end
-        )
-    end
-    hook(nil, 0)
-    hook(nil, 1)
-    hook(nil, 2)
-    do
-        local i = 0
-        while i < 12 do
-            lastDownByPid[i + 1] = false
-            i = i + 1
-        end
-    end
-end
-initTestKeyB(nil)
 return ____exports

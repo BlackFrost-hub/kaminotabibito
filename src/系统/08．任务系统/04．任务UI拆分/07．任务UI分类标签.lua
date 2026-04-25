@@ -10,7 +10,10 @@ local TAB_FRAME_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TAB_FRAME_H
 local TAB_CATEGORY_FONT_SCALE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TAB_CATEGORY_FONT_SCALE
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
---- 创建一组标签：背景（若 FDF 存在）、Dz 文字、点击切分类、悬停 tooltip。
+--- 主面板顶部分类标签（主线 / 支线 / 小任务）
+-- 
+-- 架构：全局1套UI，不再区分 slotPid。
+local japi = require("jass.japi")
 local function createTaskTab(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -33,8 +36,7 @@ local function createTaskTab(self, opts)
     local onClickSound = ____opts_0.onClickSound
     local onSwitchCategory = ____opts_0.onSwitchCategory
     local onShowTabTooltip = ____opts_0.onShowTabTooltip
-    local ctxId = ____opts_0.ctxId
-    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent, ctxId)
+    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent)
     if bg then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(bg)
@@ -69,7 +71,7 @@ local function createTaskTab(self, opts)
             japi.DzFrameSetLevel(tabLabel, 8)
         end
     end
-    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent, ctxId)
+    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent)
     if tab then
         if type(japi.DzFrameClearAllPoints) == "function" then
             japi.DzFrameClearAllPoints(tab)
@@ -106,8 +108,8 @@ local function createTaskTab(self, opts)
             nil,
             tab,
             function()
-                onClickSound(nil)
                 onSwitchCategory(nil, category)
+                onClickSound(nil)
             end,
             false
         )
@@ -122,7 +124,6 @@ local function createTaskTab(self, opts)
     end
     return {bg = bg, tab = tab}
 end
---- 在主面板上铺好三个分类标签；x 位置与热键 1/2/3、文案「主线(1)」等保持一致。
 function ____exports.buildTaskPanelCategoryTabs(self, opts)
     local ____opts_1 = opts
     local japi = ____opts_1.japi
@@ -151,20 +152,18 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip,
-        ctxId = opts.slotPid or 0
+        onShowTabTooltip = onShowTabTooltip
     }
-    local suf = "_s" .. tostring(common.ctxId)
     local mainResult = createTaskTab(
         nil,
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabMainBg",
             tabName = "TaskTabMain",
-            labelName = "TaskTabMainLabel" .. suf,
+            labelName = "TaskTabMainLabel",
             x = 0.02,
             labelText = "|cffffcc00主线(1)|r",
             category = QuestType.MAIN,
-            tooltip = "按 1 切换主线任务"
+            tooltip = "切换到主线任务"
         })
     )
     local sideResult = createTaskTab(
@@ -172,11 +171,11 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabSideBg",
             tabName = "TaskTabSide",
-            labelName = "TaskTabSideLabel" .. suf,
+            labelName = "TaskTabSideLabel",
             x = 0.135,
             labelText = "|cffffcc00支线(2)|r",
             category = QuestType.SIDE,
-            tooltip = "按 2 切换支线任务"
+            tooltip = "切换到支线任务"
         })
     )
     local dailyResult = createTaskTab(
@@ -184,11 +183,11 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         __TS__ObjectAssign({}, common, {
             bgName = "TaskTabDailyBg",
             tabName = "TaskTabDaily",
-            labelName = "TaskTabDailyLabel" .. suf,
+            labelName = "TaskTabDailyLabel",
             x = 0.25,
             labelText = "|cffffcc00小任务(3)|r",
             category = QuestType.DAILY,
-            tooltip = "按 3 切换小任务"
+            tooltip = "切换到小任务"
         })
     )
     return {

@@ -103,11 +103,14 @@ export function updatePlayerRealtimeStats(player: any): void {
   const rawMoveSpeed = jass.GetUnitMoveSpeed(hero);
   const moveSpeed = rawMoveSpeed > 0 ? rawMoveSpeed : oldMoveSpeed;
 
-  if (attacksPerSecond > 0) {
-    YDUserDataSet("player", player, "每秒攻速", "real", attacksPerSecond);
+  // 全客户端周期回写 YD：须与浮点无关的确定性，否则 SaveReal 微差易 desync/掉线
+  const apsQuant = Math.round(attacksPerSecond * 10000) / 10000;
+  const moveQuant = Math.round(moveSpeed * 100) / 100;
+  if (apsQuant > 0) {
+    YDUserDataSet("player", player, "每秒攻速", "real", apsQuant);
   }
-  if (moveSpeed > 0) {
-    YDUserDataSet("player", player, "移动速度", "real", moveSpeed);
+  if (moveQuant > 0) {
+    YDUserDataSet("player", player, "移动速度", "real", moveQuant);
   }
 }
 

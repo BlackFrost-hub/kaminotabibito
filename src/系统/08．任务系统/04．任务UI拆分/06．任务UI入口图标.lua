@@ -9,7 +9,6 @@ local ENTRY_TITLE_TEXT_BOX_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_TITLE_TEX
 local ENTRY_TITLE_TEXT_BOX_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_TITLE_TEXT_BOX_H
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
---- 在 parent（一般为 GameUI）下创建入口；FDF 缺失时返回双 null，由上层决定是否降级。
 function ____exports.buildTaskEntryIcon(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -25,10 +24,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local applyDzTextFontAndCenterAlignment = ____opts_0.applyDzTextFontAndCenterAlignment
     local onClickSound = ____opts_0.onClickSound
     local onTogglePanel = ____opts_0.onTogglePanel
-    local slotPid = ____opts_0.slotPid
-    local ctxId = slotPid or 0
-    local suf = "_s" .. tostring(ctxId)
-    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent, ctxId)
+    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent)
     if not entryFrame then
         return {entryFrame = nil, entryText = nil}
     end
@@ -46,7 +42,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local entryText = nil
     local ____createFrame_result_1 = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "TaskEntryText" .. suf,
+        name = "TaskEntryText",
         parent = entryFrame,
         template = "template",
         visible = true
@@ -70,7 +66,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     else
         entryText = createTextLabel(
             nil,
-            "TaskEntryText" .. suf,
+            "TaskEntryText",
             entryFrame,
             "",
             titleRel,
@@ -85,7 +81,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     end
     local ____createFrame_result_2 = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "TaskEntryBtn" .. suf,
+        name = "TaskEntryBtn",
         parent = entryFrame,
         template = "template",
         visible = true,
@@ -102,8 +98,8 @@ function ____exports.buildTaskEntryIcon(self, opts)
             nil,
             btn,
             function()
-                onClickSound(nil)
                 onTogglePanel(nil)
+                onClickSound(nil)
             end,
             false
         )

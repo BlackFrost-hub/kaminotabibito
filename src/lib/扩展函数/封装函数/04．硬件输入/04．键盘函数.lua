@@ -71,6 +71,19 @@ local function registerKeyBindToTrigger(self, trig, status, keyCode)
         end
     end
 end
+local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action)
+    if type(japi.DzTriggerRegisterKeyEventByCode) ~= "function" then
+        registerKeyBindToTrigger(nil, trig, status, keyCode)
+        return
+    end
+    japi.DzTriggerRegisterKeyEventByCode(
+        trig,
+        keyCode,
+        status,
+        false,
+        action
+    )
+end
 --- 注册按键事件（by code）。
 -- sync=true：全房所有客户端触发；sync=false：仅本机触发。
 -- 注意：这里不做 try/catch 兜底，避免不必要的同步差异。
@@ -79,8 +92,18 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
     if not trig then
         return nil
     end
-    registerKeyBindToTrigger(nil, trig, status, keyCode)
-    jass.TriggerAddAction(trig, action)
+    if sync then
+        registerKeyBindToTrigger(nil, trig, status, keyCode)
+        jass.TriggerAddAction(trig, action)
+    else
+        registerKeyBindToTriggerLocal(
+            nil,
+            trig,
+            status,
+            keyCode,
+            action
+        )
+    end
     return trig
 end
 function ____exports.registerKeyDown(self, keyCode, callback)
@@ -97,6 +120,32 @@ function ____exports.registerKeyDown(self, keyCode, callback)
     jass.TriggerAddAction(trig, action)
     return trig
 end
+function ____exports.registerKeyDownLocal(self, keyCode, callback)
+    return ____exports.registerKeyEventByCode(
+        nil,
+        keyCode,
+        KEY_STATE.DOWN,
+        false,
+        function()
+            local p = japi.DzGetTriggerKeyPlayer()
+            local k = japi.DzGetTriggerKey()
+            callback(nil, p, k)
+        end
+    )
+end
+function ____exports.registerKeyUpLocal(self, keyCode, callback)
+    return ____exports.registerKeyEventByCode(
+        nil,
+        keyCode,
+        KEY_STATE.UP,
+        false,
+        function()
+            local p = japi.DzGetTriggerKeyPlayer()
+            local k = japi.DzGetTriggerKey()
+            callback(nil, p, k)
+        end
+    )
+end
 function ____exports.registerKeyUp(self, keyCode, callback)
     return ____exports.registerKeyEventByCode(
         nil,
@@ -109,6 +158,20 @@ function ____exports.registerKeyUp(self, keyCode, callback)
             callback(nil, p, k)
         end
     )
+end
+function ____exports.registerKeyUpSync(self, keyCode, callback)
+    local trig = createTriggerOrNull(nil)
+    if not trig then
+        return nil
+    end
+    local function action()
+        local p = japi.DzGetTriggerKeyPlayer()
+        local k = japi.DzGetTriggerKey()
+        callback(nil, p, k)
+    end
+    DzTriggerRegisterKeyEventTrg(nil, trig, KEY_STATE.UP, keyCode)
+    jass.TriggerAddAction(trig, action)
+    return trig
 end
 --- 仅用于测试：允许传原始 status 数值（0/1/2）
 function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, action)

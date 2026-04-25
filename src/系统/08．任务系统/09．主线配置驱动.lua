@@ -26,12 +26,15 @@ local QuestType = ____require_result_4.QuestType
 local QuestStatus = ____require_result_4.QuestStatus
 local ____require_result_5 = require("系统.08．任务系统.02．任务管理器.index")
 local questManager = ____require_result_5.questManager
+local ____G_6 = _G
+local addPeriodicCallback = ____G_6.addPeriodicCallback
 --- 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
 ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER = true
 local YDGet = _G.YDUserDataGet
 local YDSet = _G.YDUserDataSet
 local RUNTIME_QUEST_ID = "main_story_runtime"
 local running = false
+local mainQuestTickRegistered = false
 local function getStage(self)
     if type(YDGet) == "function" then
         return __TS__Number(YDGet(
@@ -81,15 +84,15 @@ local function ensureRuntimeQuest(self)
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
 local function refreshQuestUI(self, desc, msg)
-    local ____opt_8 = questDB.globalData
-    if ____opt_8 ~= nil then
-        ____opt_8 = ____opt_8.quests
+    local ____opt_9 = questDB.globalData
+    if ____opt_9 ~= nil then
+        ____opt_9 = ____opt_9.quests
     end
-    local ____opt_result_10
-    if ____opt_8 ~= nil then
-        ____opt_result_10 = ____opt_8:get(RUNTIME_QUEST_ID)
+    local ____opt_result_11
+    if ____opt_9 ~= nil then
+        ____opt_result_11 = ____opt_9:get(RUNTIME_QUEST_ID)
     end
-    local q = ____opt_result_10
+    local q = ____opt_result_11
     if q then
         if type(desc) == "string" and desc ~= "" then
             q.description = desc
@@ -359,9 +362,9 @@ local function runActionTimeline(self, timeline, triggerUnit)
     end
 end
 local function getHeroes(self)
-    local ____temp_11
+    local ____temp_12
     if type(YDGet) == "function" then
-        ____temp_11 = YDGet(
+        ____temp_12 = YDGet(
             nil,
             "string",
             "玩家英雄",
@@ -369,9 +372,9 @@ local function getHeroes(self)
             "group"
         )
     else
-        ____temp_11 = nil
+        ____temp_12 = nil
     end
-    local group = ____temp_11
+    local group = ____temp_12
     if not group then
         return {}
     end
@@ -515,8 +518,11 @@ local function init(self)
     end
     ensureRuntimeQuest(nil)
     reportMissingFunctions(nil)
-    local t = jass.CreateTimer()
-    jass.TimerStart(t, 0.3, true, tick)
+    if mainQuestTickRegistered then
+        return
+    end
+    mainQuestTickRegistered = true
+    addPeriodicCallback(nil, 300, tick)
 end
 if ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER then
     init(nil)

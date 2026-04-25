@@ -343,8 +343,8 @@ function ____exports.YDWETimerDestroyEffect(self, duration, effect)
     end
     if not _effectRecycleRegistered then
         _effectRecycleRegistered = true
-        local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-        local onTick10ms = ____require_result_0.onTick10ms
+        local ____G_0 = _G
+        local onTick10ms = ____G_0.onTick10ms
         onTick10ms(nil, _tickEffectRecycle)
     end
     local ticks = math.ceil(duration / 0.01)

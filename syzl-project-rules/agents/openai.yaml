@@ -1,4 +1,4 @@
 interface:
   display_name: "Syzl Project Rules"
-  short_description: "Route work through this repo's engineering rules."
-  default_prompt: "Use $syzl-project-rules to work inside this repository while following its project-specific rules first."
+  short_description: "Route work through repo rules and War3 shared UI boundaries."
+  default_prompt: "Use $syzl-project-rules to work inside this repository while following its project-specific rules and Warcraft III shared UI constraints first."

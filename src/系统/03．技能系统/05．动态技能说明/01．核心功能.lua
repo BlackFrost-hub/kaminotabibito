@@ -14,8 +14,6 @@ local ____exports = {}
 local evaluateFormula, processTemplate, updateSkillTip, EXGetUnitAbility, EXSetAbilityDataString, attributeGetters
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.05．动态技能说明.00．常量定义")
 local DYNAMIC_SKILL_TIP_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.DYNAMIC_SKILL_TIP_ENABLED
-local EVENT_ID_HERO_LEVEL = ____00_FF0E_5E38_91CF_5B9A_4E49.EVENT_ID_HERO_LEVEL
-local PLAYER_COUNT = ____00_FF0E_5E38_91CF_5B9A_4E49.PLAYER_COUNT
 local UNIT_STATE_ATTACK1_BASE = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BASE
 local UNIT_STATE_ATTACK1_BONUS = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BONUS
 local UNIT_STATE_ARMOR = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ARMOR
@@ -138,7 +136,8 @@ end
 -- 功能：注册动态技能说明、公式解析、自动刷新
 -- 后续接手者：开关 DYNAMIC_SKILL_TIP_ENABLED 在常量文件
 local jass = require("jass.common")
-local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
+local heroLevelEventCenter = require("系统.00．核心系统.01．事件中心.06．英雄升级事件中心")
+local registerHeroLevelListener = heroLevelEventCenter.registerHeroLevelListener
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 EXGetUnitAbility = ____require_result_0.EXGetUnitAbility
 EXSetAbilityDataString = ____require_result_0.EXSetAbilityDataString
@@ -322,41 +321,29 @@ function ____exports.registerSkillTips(self, unit, abilityId, tipTemplate, ubert
     )
     return success1 or success2
 end
-local levelUpTrigger = nil
 local ____require_result_3 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
 local registerDeathListener = ____require_result_3.registerDeathListener
+local _heroLevelListenerBound = false
+local _deathListenerBound = false
 function ____exports.initDynamicSkillTipSystem(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
-    if not levelUpTrigger then
-        levelUpTrigger = jass.CreateTrigger()
-        local ____jass_EVENT_PLAYER_HERO_LEVEL_4 = jass.EVENT_PLAYER_HERO_LEVEL
-        if ____jass_EVENT_PLAYER_HERO_LEVEL_4 == nil then
-            ____jass_EVENT_PLAYER_HERO_LEVEL_4 = EVENT_ID_HERO_LEVEL
-        end
-        local levelEventId = ____jass_EVENT_PLAYER_HERO_LEVEL_4
-        do
-            local i = 0
-            while i < PLAYER_COUNT do
-                playerUnitEvent.registerPlayerUnitEventById(levelUpTrigger, i, levelEventId)
-                i = i + 1
-            end
-        end
-        jass.TriggerAddAction(
-            levelUpTrigger,
-            function()
-                local unit = jass.GetTriggerUnit()
-                ____exports.refreshUnitSkillTips(nil, unit)
+    if not _heroLevelListenerBound then
+        _heroLevelListenerBound = true
+        registerHeroLevelListener(function(____, unit)
+            ____exports.refreshUnitSkillTips(nil, unit)
+        end)
+    end
+    if not _deathListenerBound then
+        _deathListenerBound = true
+        registerDeathListener(
+            nil,
+            function(____, dyingUnit)
+                ____exports.unregisterDynamicSkillTip(nil, dyingUnit)
             end
         )
     end
-    registerDeathListener(
-        nil,
-        function(____, dyingUnit)
-            ____exports.unregisterDynamicSkillTip(nil, dyingUnit)
-        end
-    )
 end
 function ____exports.registerAttributeGetter(self, attrName, getter)
     attributeGetters[attrName] = getter

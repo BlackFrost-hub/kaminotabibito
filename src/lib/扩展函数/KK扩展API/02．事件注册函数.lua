@@ -95,4 +95,66 @@ end
 function ____exports.DzGetTriggerMallItem(self)
     return japi.DzGetTriggerSyncData() or ""
 end
+--- 发送同步数据
+-- 
+-- @param prefix 同步前缀
+-- @param data 同步内容
+function ____exports.DzSyncData(self, prefix, data)
+    japi.DzSyncData(prefix, data)
+end
+--- 立即发送同步数据
+-- 
+-- @param prefix 同步前缀
+-- @param data 同步内容
+function ____exports.DzSyncDataImmediately(self, prefix, data)
+    japi.DzSyncDataImmediately(prefix, data)
+end
+--- 发送缓冲同步数据
+-- 
+-- @param prefix 同步前缀
+-- @param data 同步内容
+-- @param dataLen 数据长度
+function ____exports.DzSyncBuffer(self, prefix, data, dataLen)
+    japi.DzSyncBuffer(prefix, data, dataLen)
+end
+local DIALOG_ENTRY_SYNC_PREFIX = "DZDLG"
+--- 注册 NPC 对话入口同步数据事件
+-- 
+-- @param trig 触发器
+function ____exports.DzTriggerRegisterDialogEntrySyncData(self, trig)
+    japi.DzTriggerRegisterSyncData(trig, DIALOG_ENTRY_SYNC_PREFIX, true)
+end
+--- 通用同步数据事件注册
+-- 
+-- @param trig 触发器
+-- @param prefix 同步前缀
+-- @param server 是否服务端同步
+function ____exports.DzTriggerRegisterSyncDataTrg(self, trig, prefix, server)
+    if trig == nil or prefix == nil or prefix == "" then
+        return
+    end
+    japi.DzTriggerRegisterSyncData(trig, prefix, server)
+end
+--- 获取触发同步的玩家
+function ____exports.DzGetTriggerSyncPlayer(self)
+    return japi.DzGetTriggerSyncPlayer()
+end
+--- 获取触发同步的数据
+function ____exports.DzGetTriggerSyncData(self)
+    return japi.DzGetTriggerSyncData() or ""
+end
+--- 发送 NPC 对话入口同步数据
+-- 
+-- @param data 同步数据
+function ____exports.DzSyncDialogEntryData(self, data)
+    japi.DzSyncData(DIALOG_ENTRY_SYNC_PREFIX, data)
+end
+--- 获取触发 NPC 对话入口同步的玩家
+function ____exports.DzGetTriggerDialogEntryPlayer(self)
+    return japi.DzGetTriggerSyncPlayer()
+end
+--- 获取触发的 NPC 对话入口同步数据
+function ____exports.DzGetTriggerDialogEntryData(self)
+    return japi.DzGetTriggerSyncData() or ""
+end
 return ____exports

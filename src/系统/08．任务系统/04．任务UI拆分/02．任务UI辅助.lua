@@ -16,8 +16,6 @@ local ENABLE_FDF_SCROLLBAR_BORDER = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_FDF
 local ENABLE_FDF_SCROLLBAR_THUMB = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_FDF_SCROLLBAR_THUMB
 local ____index = require("系统.09．表现系统.01．UI工具.index")
 local loadTocOnce = ____index.loadTocOnce
-local ____index = require("系统.08．任务系统.02．任务管理器.index")
-local questManager = ____index.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
@@ -57,7 +55,7 @@ function ____exports.isQuestWithRowIconLayout(self, quest)
     if quest.type == QuestType.DAILY then
         return ____exports.questIdTailInRange01to20(nil, id, "daily_")
     end
-    return false
+    return true
 end
 function ____exports.isFdfFrameEnabled(self, frameName)
     local isA = frameName == "TaskEntryIcon" or frameName == "TaskMainPanel" or frameName == "TaskListContainer"
@@ -131,8 +129,8 @@ function ____exports.getStatusText(self, status)
 end
 function ____exports.getQuestsForUI(self, playerId, ____type)
     local active = __TS__ArrayFilter(
-        questManager:getPlayerQuests(playerId, ____type),
-        function(____, q) return not q.uiReserved end
+        questDB:getPlayerActiveQuests(playerId),
+        function(____, q) return q.type == ____type and not q.uiReserved end
     )
     local completedIds = questDB:getPlayerCompletedQuests(playerId)
     local result = __TS__ArraySlice(active)

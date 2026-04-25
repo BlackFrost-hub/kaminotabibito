@@ -31,7 +31,7 @@ function ____exports.initDialogSystem(self)
         while i < MAX_PLAYERS do
             local state = ensureState(nil, i)
             if not state.initialized then
-                state.frames = createDialogFrames(nil)
+                state.frames = createDialogFrames(nil, i)
                 state.initialized = true
             end
             bindQuestSyncHandlersImpl(nil, state)
@@ -174,7 +174,8 @@ function ____exports.setDialogFinishCallback(self, p, callback)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
     end
-    ensureState(nil, pid).onFinish = callback
+    local state = ensureState(nil, pid)
+    state.onFinish = callback
 end
 function ____exports.displayQuest(self, p, title, text, onAccept, onReject, acceptText, rejectText)
     local pid = dzGetPlayerId(nil, p)

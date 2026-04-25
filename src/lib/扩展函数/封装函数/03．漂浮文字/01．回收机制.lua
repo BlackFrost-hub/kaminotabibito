@@ -16,8 +16,8 @@ function ____exports.ensureFloatTextRecycleTimer(self)
         return
     end
     _registeredToCenterTimer = true
-    local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-    local onTick10ms = ____require_result_1.onTick10ms
+    local ____G_1 = _G
+    local onTick10ms = ____G_1.onTick10ms
     onTick10ms(
         nil,
         function()

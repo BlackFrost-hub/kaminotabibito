@@ -33,6 +33,9 @@ const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配�
 };
 const { questDB, QuestType, QuestStatus } = require("系统.08．任务系统.01．任务数据") as any;
 const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as any;
+const { addPeriodicCallback } = globalThis as unknown as {
+  addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+};
 
 /**
  * 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
@@ -44,6 +47,7 @@ const YDSet = (globalThis as any).YDUserDataSet as ((t1: any, k1: any, k2: any, 
 
 const RUNTIME_QUEST_ID = "main_story_runtime";
 let running = false;
+let mainQuestTickRegistered = false;
 
 function getStage(): number {
   if (typeof YDGet === "function") {
@@ -371,8 +375,9 @@ function init(): void {
   if (!ENABLE_MAIN_QUEST_CONFIG_DRIVER) return;
   ensureRuntimeQuest();
   reportMissingFunctions();
-  const t = jass.CreateTimer();
-  jass.TimerStart(t, 0.30, true, tick);
+  if (mainQuestTickRegistered) return;
+  mainQuestTickRegistered = true;
+  addPeriodicCallback(300, tick);
 }
 
 if (ENABLE_MAIN_QUEST_CONFIG_DRIVER) init();

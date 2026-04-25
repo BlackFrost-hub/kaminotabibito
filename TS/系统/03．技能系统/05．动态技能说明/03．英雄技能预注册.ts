@@ -138,7 +138,7 @@ export function initHeroSkillPreregistration(): void {
   registerSpellEffectListener(onSpellEffect);
 
   // 注册中心计时器，每2秒刷新一次技能描述
-  const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addPeriodicCallback } = globalThis as unknown as {
     addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
   };
   _periodicCallbackId = addPeriodicCallback(2000, onPeriodicRefresh);

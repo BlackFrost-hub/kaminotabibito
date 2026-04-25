@@ -179,8 +179,8 @@ function ____exports.createDotExecutor(self, deps)
             return
         end
         _registeredToCenterTimer = true
-        local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-        local onSecond = ____require_result_5.onSecond
+        local ____G_5 = _G
+        local onSecond = ____G_5.onSecond
         onSecond(nil, dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)

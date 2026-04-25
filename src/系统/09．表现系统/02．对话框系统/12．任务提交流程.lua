@@ -34,6 +34,8 @@ local jass = require("jass.common")
 local _____5C01_88C5_51FD_6570 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
+local ____G_1 = _G
+local addDelayedCallback = ____G_1.addDelayedCallback
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1
 end
@@ -220,23 +222,23 @@ local function shouldUseGenericGiveFailHint(self, quest)
     return (string.find(reward, ":", nil, true) or 0) - 1 >= 0
 end
 function ____exports.handleQuestSubmit(self, params)
-    local ____params_1 = params
-    local quest = ____params_1.quest
-    local npcName = ____params_1.npcName
-    local heroName = ____params_1.heroName
-    local dialogOwnerId = ____params_1.dialogOwnerId
-    local npcUnit = ____params_1.npcUnit
-    local parseDialogText = ____params_1.parseDialogText
-    local openDialog = ____params_1.openDialog
-    local refreshTaskUIForAllClientsSoon = ____params_1.refreshTaskUIForAllClientsSoon
+    local ____params_2 = params
+    local quest = ____params_2.quest
+    local npcName = ____params_2.npcName
+    local heroName = ____params_2.heroName
+    local dialogOwnerId = ____params_2.dialogOwnerId
+    local npcUnit = ____params_2.npcUnit
+    local parseDialogText = ____params_2.parseDialogText
+    local openDialog = ____params_2.openDialog
+    local refreshTaskUIForAllClientsSoon = ____params_2.refreshTaskUIForAllClientsSoon
     local callbackOwner = jass.Player(dialogOwnerId)
-    local ____callbackOwner_2
+    local ____callbackOwner_3
     if callbackOwner then
-        ____callbackOwner_2 = getPlayerFirstHero(nil, callbackOwner)
+        ____callbackOwner_3 = getPlayerFirstHero(nil, callbackOwner)
     else
-        ____callbackOwner_2 = nil
+        ____callbackOwner_3 = nil
     end
-    local hero = ____callbackOwner_2
+    local hero = ____callbackOwner_3
     local requireItem = quest.requireItem
     local requiredResources = quest.requiredResources
     local requireCount = normalizeRequireCount(nil, quest.requireCount)
@@ -306,10 +308,16 @@ function ____exports.handleQuestSubmit(self, params)
         if quest.NpcCompleteText then
             local completeRaw = pickNpcCompleteTextByBranch(nil, quest.NpcCompleteText, rewardBranchIndex)
             local completeLines = parseDialogText(nil, completeRaw, npcName, heroName)
-            openDialog(
+            addDelayedCallback(
                 nil,
-                jass.Player(dialogOwnerId),
-                npcUnit and ({lines = completeLines, npcUnit = npcUnit}) or ({lines = completeLines})
+                10,
+                function()
+                    openDialog(
+                        nil,
+                        jass.Player(dialogOwnerId),
+                        npcUnit and ({lines = completeLines, npcUnit = npcUnit}) or ({lines = completeLines})
+                    )
+                end
             )
         end
     end
@@ -323,7 +331,13 @@ function ____exports.handleQuestSubmit(self, params)
             )
             return
         end
-        setQuestState(nil, questId, 2, playerName)
+        setQuestState(
+            nil,
+            dialogOwnerId,
+            questId,
+            2,
+            playerName
+        )
         local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId})
         rewardBranchIndex = rewardResult.matchedRuleIndex
         onComplete(nil)
@@ -334,13 +348,13 @@ function ____exports.handleQuestSubmit(self, params)
             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r")
             return
         end
-        local ____temp_3
+        local ____temp_4
         if quest.type == "给予" then
-            ____temp_3 = npcUnit
+            ____temp_4 = npcUnit
         else
-            ____temp_3 = hero
+            ____temp_4 = hero
         end
-        local sourceUnit = ____temp_3
+        local sourceUnit = ____temp_4
         if not sourceUnit then
             if useGenericGiveFailHint then
                 showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。")
@@ -410,7 +424,13 @@ function ____exports.handleQuestSubmit(self, params)
             end
             local consumed = ConsumeItemTypeCountByChargesBJ(nil, sourceUnit, itemId, requireCount)
             if consumed then
-                setQuestState(nil, questId, 2, playerName)
+                setQuestState(
+                    nil,
+                    dialogOwnerId,
+                    questId,
+                    2,
+                    playerName
+                )
                 local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
                 rewardBranchIndex = rewardResult.matchedRuleIndex
                 onComplete(nil)
@@ -427,7 +447,13 @@ function ____exports.handleQuestSubmit(self, params)
         end
         return
     end
-    setQuestState(nil, questId, 2, playerName)
+    setQuestState(
+        nil,
+        dialogOwnerId,
+        questId,
+        2,
+        playerName
+    )
     local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId})
     rewardBranchIndex = rewardResult.matchedRuleIndex
     onComplete(nil)

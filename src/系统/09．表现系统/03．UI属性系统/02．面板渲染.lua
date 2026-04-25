@@ -199,15 +199,27 @@ local function createDetailSlots(gameUI, players)
     do
         local i = 0
         while i < #players do
-            local player = players[i + 1]
-            local hero = getPlayerHero(player)
-            local iconX = _____5E38_91CF.HERO_ICON_START_X + _____5E38_91CF.HERO_ICON_STEP_X * i
-            local icon = createFrame(
-                "BACKDROP",
-                "UI属性系统英雄头像" .. tostring(i),
-                gameUI
-            )
-            if icon ~= 0 then
+            do
+                local player = players[i + 1]
+                local hero = getPlayerHero(player)
+                local iconX = _____5E38_91CF.HERO_ICON_START_X + _____5E38_91CF.HERO_ICON_STEP_X * i
+                local icon = createFrame(
+                    "BACKDROP",
+                    "UI属性系统英雄头像" .. tostring(i),
+                    gameUI
+                )
+                if icon == 0 then
+                    detailSlots[#detailSlots + 1] = {
+                        player = player,
+                        hero = hero,
+                        functionKey = _____5E38_91CF.KEY_F[i + 1],
+                        icon = 0,
+                        box = 0,
+                        lines = {},
+                        separators = {}
+                    }
+                    goto __continue28
+                end
                 setAbsolute(icon, iconX, _____5E38_91CF.HERO_ICON_Y)
                 japi.DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
                 japi.DzFrameSetTexture(
@@ -216,139 +228,140 @@ local function createDetailSlots(gameUI, players)
                     0
                 )
                 show(icon, true)
-            end
-            createText(
-                icon,
-                "UI属性系统快捷键" .. tostring(i),
-                iconX,
-                _____5E38_91CF.HERO_KEY_Y,
-                0.009,
-                ("|cffffff00F" .. tostring(i + 2)) .. "|r"
-            )
-            local box = createFrame(
-                "BACKDROP",
-                "UI属性系统文本框" .. tostring(i),
-                icon
-            )
-            local lines = {}
-            local separators = {}
-            if box ~= 0 then
-                setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
-                japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
-                japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
-                show(box, false)
-                do
-                    local lineIndex = 0
-                    while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
-                        local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
-                        local isSeparatorCol = lineIndex % 5 == 1 or lineIndex % 5 == 3
-                        if not isSeparatorCol then
-                            local line = createFrame(
-                                "TEXT",
-                                (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
-                                box
-                            )
-                            if line ~= 0 then
-                                japi.DzFrameSetPoint(
-                                    line,
-                                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                                    box,
-                                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                                    pos.x,
-                                    pos.y
+                createText(
+                    icon,
+                    "UI属性系统快捷键" .. tostring(i),
+                    iconX,
+                    _____5E38_91CF.HERO_KEY_Y,
+                    0.009,
+                    ("|cffffff00F" .. tostring(i + 2)) .. "|r"
+                )
+                local box = createFrame(
+                    "BACKDROP",
+                    "UI属性系统文本框" .. tostring(i),
+                    icon
+                )
+                local lines = {}
+                local separators = {}
+                if box ~= 0 then
+                    setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
+                    japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
+                    japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
+                    show(box, false)
+                    do
+                        local lineIndex = 0
+                        while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
+                            local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
+                            local isSeparatorCol = lineIndex % 5 == 1 or lineIndex % 5 == 3
+                            if not isSeparatorCol then
+                                local line = createFrame(
+                                    "TEXT",
+                                    (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
+                                    box
                                 )
-                                japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
-                                japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
-                                show(line, false)
-                                lines[#lines + 1] = line
+                                if line ~= 0 then
+                                    japi.DzFrameSetPoint(
+                                        line,
+                                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                                        box,
+                                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                                        pos.x,
+                                        pos.y
+                                    )
+                                    japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
+                                    japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
+                                    show(line, false)
+                                    lines[#lines + 1] = line
+                                end
                             end
+                            lineIndex = lineIndex + 1
                         end
-                        lineIndex = lineIndex + 1
+                    end
+                    local sepStartY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_START_ROW
+                    local sepEndY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_END_ROW
+                    local sepTotalHeight = (sepStartY - sepEndY + _____5E38_91CF.DETAIL_LINE_HEIGHT) * _____5E38_91CF.DETAIL_SEPARATOR_HEIGHT_MULT
+                    local sepWidth = _____5E38_91CF.DETAIL_SEPARATOR_WIDTH
+                    local sepRelY = sepEndY + _____5E38_91CF.DETAIL_SEPARATOR_Y_OFFSET
+                    local sep1 = createFrame(
+                        "BACKDROP",
+                        "UI属性系统分隔符1_" .. tostring(i),
+                        box
+                    )
+                    if sep1 ~= 0 then
+                        japi.DzFrameSetPoint(
+                            sep1,
+                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                            box,
+                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                            _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                            sepRelY
+                        )
+                        japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
+                        japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+                        japi.DzFrameSetPriority(sep1, 0)
+                        show(sep1, false)
+                        separators[#separators + 1] = sep1
+                    end
+                    local sep2 = createFrame(
+                        "BACKDROP",
+                        "UI属性系统分隔符2_" .. tostring(i),
+                        box
+                    )
+                    if sep2 ~= 0 then
+                        japi.DzFrameSetPoint(
+                            sep2,
+                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                            box,
+                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                            _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                            sepRelY
+                        )
+                        japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
+                        japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+                        japi.DzFrameSetPriority(sep2, 0)
+                        show(sep2, false)
+                        separators[#separators + 1] = sep2
                     end
                 end
-                local sepStartY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_START_ROW
-                local sepEndY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_END_ROW
-                local sepTotalHeight = (sepStartY - sepEndY + _____5E38_91CF.DETAIL_LINE_HEIGHT) * _____5E38_91CF.DETAIL_SEPARATOR_HEIGHT_MULT
-                local sepWidth = _____5E38_91CF.DETAIL_SEPARATOR_WIDTH
-                local sepRelY = sepEndY + _____5E38_91CF.DETAIL_SEPARATOR_Y_OFFSET
-                local sep1 = createFrame(
-                    "BACKDROP",
-                    "UI属性系统分隔符1_" .. tostring(i),
-                    box
+                local button = createFrame(
+                    "GLUETEXTBUTTON",
+                    "UI属性系统按钮" .. tostring(i),
+                    icon
                 )
-                if sep1 ~= 0 then
+                if button ~= 0 then
                     japi.DzFrameSetPoint(
-                        sep1,
+                        button,
                         _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        box,
+                        icon,
                         _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
-                        sepRelY
+                        0,
+                        0
                     )
-                    japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
-                    japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-                    japi.DzFrameSetPriority(sep1, 0)
-                    show(sep1, false)
-                    separators[#separators + 1] = sep1
-                end
-                local sep2 = createFrame(
-                    "BACKDROP",
-                    "UI属性系统分隔符2_" .. tostring(i),
-                    box
-                )
-                if sep2 ~= 0 then
-                    japi.DzFrameSetPoint(
-                        sep2,
-                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        box,
-                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
-                        sepRelY
+                    japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
+                    japi.DzFrameSetScriptByCode(
+                        button,
+                        _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
+                        createDetailHoverAction(i, true),
+                        false
                     )
-                    japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
-                    japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-                    japi.DzFrameSetPriority(sep2, 0)
-                    show(sep2, false)
-                    separators[#separators + 1] = sep2
+                    japi.DzFrameSetScriptByCode(
+                        button,
+                        _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
+                        createDetailHoverAction(i, false),
+                        false
+                    )
                 end
+                detailSlots[#detailSlots + 1] = {
+                    player = player,
+                    hero = hero,
+                    functionKey = _____5E38_91CF.KEY_F[i + 1],
+                    icon = icon,
+                    box = box,
+                    lines = lines,
+                    separators = separators
+                }
             end
-            local button = createFrame(
-                "GLUETEXTBUTTON",
-                "UI属性系统按钮" .. tostring(i),
-                icon
-            )
-            if button ~= 0 then
-                japi.DzFrameSetPoint(
-                    button,
-                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                    icon,
-                    _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                    0,
-                    0
-                )
-                japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
-                japi.DzFrameSetScriptByCode(
-                    button,
-                    _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
-                    createDetailHoverAction(i, true),
-                    false
-                )
-                japi.DzFrameSetScriptByCode(
-                    button,
-                    _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
-                    createDetailHoverAction(i, false),
-                    false
-                )
-            end
-            detailSlots[#detailSlots + 1] = {
-                player = player,
-                hero = hero,
-                functionKey = _____5E38_91CF.KEY_F[i + 1],
-                icon = icon,
-                box = box,
-                lines = lines,
-                separators = separators
-            }
+            ::__continue28::
             i = i + 1
         end
     end

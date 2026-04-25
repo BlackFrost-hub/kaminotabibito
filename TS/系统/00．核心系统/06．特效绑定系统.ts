@@ -18,7 +18,7 @@ const { EC_CreateEffect, EC_GetPointZ } = require("lib.扩展函数.Star扩展�
   EC_GetPointZ: (x: number, y: number) => number;
 };
 
-const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+const { onTick10ms, offTick10ms } = globalThis as unknown as {
   onTick10ms: (callback: () => void) => void;
   offTick10ms: (callback: () => void) => void;
 };
