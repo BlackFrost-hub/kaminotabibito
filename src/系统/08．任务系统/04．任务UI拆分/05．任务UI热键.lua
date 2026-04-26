@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local handleCategoryHotkey, jass, currentHotkeyOpts
+local handleCategoryHotkey, currentHotkeyOpts
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 function handleCategoryHotkey(self, player, category)
@@ -8,14 +8,9 @@ function handleCategoryHotkey(self, player, category)
     if not opts then
         return
     end
-    opts:onSwitchCategoryState(category)
-    local localPlayer = jass.GetLocalPlayer()
-    if player ~= localPlayer then
-        return
-    end
-    opts:onSwitchCategoryUI(category)
+    opts:onSwitchCategorySync(player, category)
 end
-jass = require("jass.common")
+local jass = require("jass.common")
 currentHotkeyOpts = nil
 --- 防止 `registerTaskUIHotkeys` 被调用多次时重复挂 J/K1–K3 触发器（会导致一次按键两次 toggle）
 local taskUIKeybindsInstalled = false
@@ -24,11 +19,7 @@ local function handleTogglePanelHotkey(self, player)
     if not opts then
         return
     end
-    local localPlayer = jass.GetLocalPlayer()
-    if player ~= localPlayer then
-        return
-    end
-    opts:onTogglePanelLocal()
+    opts:onTogglePanelSync(player)
 end
 local function handleMainCategoryHotkey(self, player)
     handleCategoryHotkey(nil, player, QuestType.MAIN)

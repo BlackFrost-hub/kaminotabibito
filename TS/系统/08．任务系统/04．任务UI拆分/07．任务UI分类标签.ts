@@ -4,6 +4,7 @@
  * 架构：全局1套UI，不再区分 slotPid。
  */
 
+const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { QuestType } from "../01．任务数据";
@@ -21,8 +22,14 @@ let currentTooltipHandler: ((msg: string) => void) | null = null;
 function handleCategoryTabClick(category: QuestType): void {
   const handler = categoryTabClickHandlers[category];
   if (!handler) return;
+  // sync=true 帧回调：onSwitchCategory 内部已做全局状态+本地UI分层
   handler.onSwitchCategory(category);
-  handler.onClickSound();
+  // 音效只在点击者本地播放
+  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
+    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  if (triggerPlayer === jass.GetLocalPlayer()) {
+    handler.onClickSound();
+  }
 }
 
 // 命名函数替代匿名闭包 - 分类标签点击
@@ -156,7 +163,7 @@ function createTaskTab(opts: {
     // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
     currentTooltipMessage = tooltip;
     currentTooltipHandler = onShowTabTooltip;
-    setFrameClickEvent(tab, tabClickHandlers[category], false);
+    setFrameClickEvent(tab, tabClickHandlers[category], true);
     setFrameHoverEvents(tab, onTabHoverShow, onTabHoverHide, false);
   }
 

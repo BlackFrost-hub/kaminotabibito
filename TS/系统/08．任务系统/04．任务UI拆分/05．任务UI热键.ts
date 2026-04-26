@@ -7,21 +7,18 @@ let currentHotkeyOpts: RegisterTaskUIHotkeysOpts | null = null;
 let taskUIKeybindsInstalled = false;
 
 export interface RegisterTaskUIHotkeysOpts {
+  /** 用 `registerKeyUpSync`：sync=true 全房触发，回调内用 DzGetTriggerKeyPlayer 区分按键者 */
   registerKeyUpSync: any;
   KEY: any;
   KEY_NUM: any;
-  onTogglePanelLocal: () => void;
-  onSwitchCategoryState: (type: QuestType) => void;
-  onSwitchCategoryUI: (type: QuestType) => void;
+  onTogglePanelSync: (player: any) => void;
+  onSwitchCategorySync: (player: any, type: QuestType) => void;
 }
 
 function handleTogglePanelHotkey(player: any): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
-  // 只有本地玩家按键时才处理UI显示
-  const localPlayer = jass.GetLocalPlayer();
-  if (player !== localPlayer) return;
-  opts.onTogglePanelLocal();
+  opts.onTogglePanelSync(player);
 }
 
 function handleMainCategoryHotkey(player: any): void {
@@ -39,12 +36,7 @@ function handleDailyCategoryHotkey(player: any): void {
 function handleCategoryHotkey(player: any, category: QuestType): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
-  // 1. 先同步修改状态（所有客户端执行）
-  opts.onSwitchCategoryState(category);
-  // 2. 只有本地玩家才处理UI显示
-  const localPlayer = jass.GetLocalPlayer();
-  if (player !== localPlayer) return;
-  opts.onSwitchCategoryUI(category);
+  opts.onSwitchCategorySync(player, category);
 }
 
 export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {

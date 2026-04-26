@@ -115,7 +115,8 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 1. **轨道若是 BACKDROP**：不要对它 **`DzFrameSetMinMaxValue` / `DzFrameSetValue`**（易崩）。数值滚动用 **`scrollOffset` 变量** + 列表偏移；需要原生 Slider 时用 **SCROLLBAR/SLIDER** 隐藏层单独管 value。
 
-2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。
+2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。  
+   - **若逻辑用 `DzGetMouseFocus` / `isDescendantOf` 做命中**（例如全局 `DzTriggerRegisterMouseEventByCode` 里判断「是否点在 thumb 上」），**必须**有真实可点帧（透明按钮），**不能**只建 BACKDROP 却把 `scrollThumbHitBtn` 等字段留 **`null`**——否则按下永远判不中（任务 UI 分页滑块曾因此无法拖拽）。实现范例：`TS/系统/08．任务系统/04．任务UI拆分/08．任务UI主面板与滚动.ts` 内 `TaskScrollThumbHit` + `setupTransparentGlueHitLayer`。
 
 3. **thumb 位置与「跟手」拖拽**：`syncScrollThumb` 里用的 **竖直可移动行程**（如 `LIST_VIEW_H - thumbSize ± 补偿` 的 **safeRange 归一化高度**）必须与 **拖拽时 `dy`→`scrollOffset` 用的轨道像素高度** 同源；换算：  
    **`trackPx ≈ DzGetClientHeight() * safeRangeNorm / 0.6`**（与工程里竖向 **0.6** UI 坐标一致，同 `PY` 思路；实现见 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `getScrollbarTrackThumbTravelPx`**）。**禁止**用 `windowHeight * 随意常数`（如 `0.35`）当轨道高，否则会与滑块不同步。

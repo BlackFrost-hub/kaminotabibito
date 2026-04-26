@@ -6,7 +6,7 @@
 
 | 目录 | 内容 |
 |------|------|
-| [`war3-tstl/`](war3-tstl/) | TSTL -> Lua、jass/japi 调用、随机数、全局数组、伤害事件等 War3 运行时坑点 |
+| [`war3-tstl/`](war3-tstl/) | TSTL -> Lua、jass/japi 调用、随机数、全局数组、伤害事件等 War3 运行时坑点；**上下文表字段绑导入函数 → Lua 冒号调用错位**见 [`war3-tstl/jass-pitfalls.mdc`](war3-tstl/jass-pitfalls.mdc) §7.1 |
 | [`dzapi/`](dzapi/) | DzAPI UI、LoadToc、FDF、Frame 类型；**联机 desync / N 槽对称执行 / Timer·sync** 见 [`dzapi/n-slot-ui-symmetric-execution.mdc`](dzapi/n-slot-ui-symmetric-execution.mdc)；**单管理器 + 本地开关 + 关闭重置** 见 [`dzapi/single-manager-local-reset-ui.mdc`](dzapi/single-manager-local-reset-ui.mdc)；**Lua GC / 匿名闭包 / table key / pairs 异步经验** 见 [`dzapi/lua-gc-desync-heuristics.mdc`](dzapi/lua-gc-desync-heuristics.mdc)；**Lua 运行时安全代码模板（句柄保护、pairs 禁用、JASS 回调替换）** 见 [`dzapi/lua-runtime-safety.mdc`](dzapi/lua-runtime-safety.mdc)；**DzLoadToc 与 FDF 安全使用** 见 [`dzapi/loadtoc-fdf-safety.mdc`](dzapi/loadtoc-fdf-safety.mdc) |
 | [`equipment/`](equipment/) | 装备恢复、`hot` 字段、`USE_ITEM` 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |

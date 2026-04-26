@@ -15,6 +15,7 @@ local pcallDzFrameSetAlpha = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameSetAl
 --- 主面板顶部分类标签（主线 / 支线 / 小任务）
 -- 
 -- 架构：全局1套UI，不再区分 slotPid。
+local jass = require("jass.common")
 local japi = require("jass.japi")
 --- 用 Record 固定三类槽位，避免 Map 弱序/迭代习惯
 local categoryTabClickHandlers = {}
@@ -26,7 +27,16 @@ local function handleCategoryTabClick(self, category)
         return
     end
     handler:onSwitchCategory(category)
-    handler:onClickSound()
+    local ____temp_0
+    if type(japi.DzGetTriggerKeyPlayer) == "function" then
+        ____temp_0 = japi.DzGetTriggerKeyPlayer()
+    else
+        ____temp_0 = jass.GetLocalPlayer()
+    end
+    local triggerPlayer = ____temp_0
+    if triggerPlayer == jass.GetLocalPlayer() then
+        handler:onClickSound()
+    end
 end
 local function onMainTabClick(self)
     handleCategoryTabClick(nil, QuestType.MAIN)
@@ -49,27 +59,27 @@ local function registerCategoryTabClickHandler(self, category, onSwitchCategory,
     categoryTabClickHandlers[category] = {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound}
 end
 local function createTaskTab(self, opts)
-    local ____opts_0 = opts
-    local japi = ____opts_0.japi
-    local tabParent = ____opts_0.tabParent
-    local bgName = ____opts_0.bgName
-    local tabName = ____opts_0.tabName
-    local labelName = ____opts_0.labelName
-    local x = ____opts_0.x
-    local labelText = ____opts_0.labelText
-    local category = ____opts_0.category
-    local tooltip = ____opts_0.tooltip
-    local FramePoint = ____opts_0.FramePoint
-    local setFramePointRelative = ____opts_0.setFramePointRelative
-    local setFrameSize = ____opts_0.setFrameSize
-    local setFrameHoverEvents = ____opts_0.setFrameHoverEvents
-    local setFrameClickEvent = ____opts_0.setFrameClickEvent
-    local setButtonText = ____opts_0.setButtonText
-    local createTabLabelTextOnBackdrop = ____opts_0.createTabLabelTextOnBackdrop
-    local setupTransparentGlueHitLayer = ____opts_0.setupTransparentGlueHitLayer
-    local onClickSound = ____opts_0.onClickSound
-    local onSwitchCategory = ____opts_0.onSwitchCategory
-    local onShowTabTooltip = ____opts_0.onShowTabTooltip
+    local ____opts_1 = opts
+    local japi = ____opts_1.japi
+    local tabParent = ____opts_1.tabParent
+    local bgName = ____opts_1.bgName
+    local tabName = ____opts_1.tabName
+    local labelName = ____opts_1.labelName
+    local x = ____opts_1.x
+    local labelText = ____opts_1.labelText
+    local category = ____opts_1.category
+    local tooltip = ____opts_1.tooltip
+    local FramePoint = ____opts_1.FramePoint
+    local setFramePointRelative = ____opts_1.setFramePointRelative
+    local setFrameSize = ____opts_1.setFrameSize
+    local setFrameHoverEvents = ____opts_1.setFrameHoverEvents
+    local setFrameClickEvent = ____opts_1.setFrameClickEvent
+    local setButtonText = ____opts_1.setButtonText
+    local createTabLabelTextOnBackdrop = ____opts_1.createTabLabelTextOnBackdrop
+    local setupTransparentGlueHitLayer = ____opts_1.setupTransparentGlueHitLayer
+    local onClickSound = ____opts_1.onClickSound
+    local onSwitchCategory = ____opts_1.onSwitchCategory
+    local onShowTabTooltip = ____opts_1.onShowTabTooltip
     local bg = tryCreateFromFdfOnly(nil, bgName, tabParent)
     if bg then
         if type(japi.DzFrameClearAllPoints) == "function" then
@@ -132,7 +142,7 @@ local function createTaskTab(self, opts)
         registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
         currentTooltipMessage = tooltip
         currentTooltipHandler = onShowTabTooltip
-        setFrameClickEvent(nil, tab, tabClickHandlers[category], false)
+        setFrameClickEvent(nil, tab, tabClickHandlers[category], true)
         setFrameHoverEvents(
             nil,
             tab,
@@ -144,20 +154,20 @@ local function createTaskTab(self, opts)
     return {bg = bg, tab = tab}
 end
 function ____exports.buildTaskPanelCategoryTabs(self, opts)
-    local ____opts_1 = opts
-    local japi = ____opts_1.japi
-    local tabParent = ____opts_1.tabParent
-    local FramePoint = ____opts_1.FramePoint
-    local setFramePointRelative = ____opts_1.setFramePointRelative
-    local setFrameSize = ____opts_1.setFrameSize
-    local setFrameHoverEvents = ____opts_1.setFrameHoverEvents
-    local setFrameClickEvent = ____opts_1.setFrameClickEvent
-    local setButtonText = ____opts_1.setButtonText
-    local createTabLabelTextOnBackdrop = ____opts_1.createTabLabelTextOnBackdrop
-    local setupTransparentGlueHitLayer = ____opts_1.setupTransparentGlueHitLayer
-    local onClickSound = ____opts_1.onClickSound
-    local onSwitchCategory = ____opts_1.onSwitchCategory
-    local onShowTabTooltip = ____opts_1.onShowTabTooltip
+    local ____opts_2 = opts
+    local japi = ____opts_2.japi
+    local tabParent = ____opts_2.tabParent
+    local FramePoint = ____opts_2.FramePoint
+    local setFramePointRelative = ____opts_2.setFramePointRelative
+    local setFrameSize = ____opts_2.setFrameSize
+    local setFrameHoverEvents = ____opts_2.setFrameHoverEvents
+    local setFrameClickEvent = ____opts_2.setFrameClickEvent
+    local setButtonText = ____opts_2.setButtonText
+    local createTabLabelTextOnBackdrop = ____opts_2.createTabLabelTextOnBackdrop
+    local setupTransparentGlueHitLayer = ____opts_2.setupTransparentGlueHitLayer
+    local onClickSound = ____opts_2.onClickSound
+    local onSwitchCategory = ____opts_2.onSwitchCategory
+    local onShowTabTooltip = ____opts_2.onShowTabTooltip
     local common = {
         japi = japi,
         tabParent = tabParent,

@@ -98,9 +98,8 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     if (typeof (japi as any).DzFrameSetAllPoints === "function") {
       (japi as any).DzFrameSetAllPoints(btn, entryFrame);
     }
-    // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
-    // 直接使用 onTogglePanel 回调，和键盘 J 键保持一致
-    setFrameClickEvent(btn, onTogglePanel, false);
+    // sync=true：帧点击全房触发，回调内部做全局状态+本地UI分层
+    setFrameClickEvent(btn, onTogglePanel, true);
   }
 
   return { entryFrame, entryText };

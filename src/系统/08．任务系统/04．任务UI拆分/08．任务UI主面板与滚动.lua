@@ -19,46 +19,28 @@ local ENABLE_TASK_UI_RIGHT_SCROLLBAR = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local tryCreateFromFdfWithSource = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfWithSource
-local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 local ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E = require("系统.08．任务系统.04．任务UI拆分.07．任务UI分类标签")
 local buildTaskPanelCategoryTabs = ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E.buildTaskPanelCategoryTabs
-local taskScrollBarFallbackParent = 0
-local taskScrollBarFallbackCreateFrame = nil
-local taskScrollBarFallbackFrameType = nil
-local function buildTaskScrollBarFallbackFromFdf(self)
-    local ____taskScrollBarFallbackCreateFrame_result_0 = taskScrollBarFallbackCreateFrame(nil, {
-        type = taskScrollBarFallbackFrameType.BACKDROP,
-        name = "TaskScrollBarBtn",
-        parent = taskScrollBarFallbackParent,
-        template = "template",
-        visible = true
-    })
-    if ____taskScrollBarFallbackCreateFrame_result_0 == nil then
-        ____taskScrollBarFallbackCreateFrame_result_0 = 0
-    end
-    local f = ____taskScrollBarFallbackCreateFrame_result_0
-    return f or nil
-end
 function ____exports.buildTaskMainPanel(self, opts)
-    local ____opts_1 = opts
-    local japi = ____opts_1.japi
-    local parent = ____opts_1.parent
-    local entryFrame = ____opts_1.entryFrame
-    local FrameType = ____opts_1.FrameType
-    local FramePoint = ____opts_1.FramePoint
-    local createFrame = ____opts_1.createFrame
-    local setFramePosition = ____opts_1.setFramePosition
-    local setFrameSize = ____opts_1.setFrameSize
-    local setFramePointRelative = ____opts_1.setFramePointRelative
-    local setFrameTexture = ____opts_1.setFrameTexture
-    local setFrameHoverEvents = ____opts_1.setFrameHoverEvents
-    local setFrameClickEvent = ____opts_1.setFrameClickEvent
-    local setButtonText = ____opts_1.setButtonText
-    local createTabLabelTextOnBackdrop = ____opts_1.createTabLabelTextOnBackdrop
-    local setupTransparentGlueHitLayer = ____opts_1.setupTransparentGlueHitLayer
-    local onClickSound = ____opts_1.onClickSound
-    local onSwitchCategory = ____opts_1.onSwitchCategory
-    local onShowTabTooltip = ____opts_1.onShowTabTooltip
+    local ____opts_0 = opts
+    local japi = ____opts_0.japi
+    local parent = ____opts_0.parent
+    local entryFrame = ____opts_0.entryFrame
+    local FrameType = ____opts_0.FrameType
+    local FramePoint = ____opts_0.FramePoint
+    local createFrame = ____opts_0.createFrame
+    local setFramePosition = ____opts_0.setFramePosition
+    local setFrameSize = ____opts_0.setFrameSize
+    local setFramePointRelative = ____opts_0.setFramePointRelative
+    local setFrameTexture = ____opts_0.setFrameTexture
+    local setFrameHoverEvents = ____opts_0.setFrameHoverEvents
+    local setFrameClickEvent = ____opts_0.setFrameClickEvent
+    local setButtonText = ____opts_0.setButtonText
+    local createTabLabelTextOnBackdrop = ____opts_0.createTabLabelTextOnBackdrop
+    local setupTransparentGlueHitLayer = ____opts_0.setupTransparentGlueHitLayer
+    local onClickSound = ____opts_0.onClickSound
+    local onSwitchCategory = ____opts_0.onSwitchCategory
+    local onShowTabTooltip = ____opts_0.onShowTabTooltip
     local empty = {
         mainPanel = nil,
         listContainer = nil,
@@ -108,7 +90,10 @@ function ____exports.buildTaskMainPanel(self, opts)
             LIST_CONTAINER_REL_TO_PANEL_X,
             LIST_CONTAINER_REL_TO_PANEL_Y
         )
-        pcallDzFrameShow(nil, japi, listContainer, true)
+        if type(japi.DzFrameShow) == "function" then
+            pcall(function () return japi.DzFrameShow(listContainer, true) end
+            )
+        end
     end
     local tabs = buildTaskPanelCategoryTabs(nil, {
         japi = japi,
@@ -129,13 +114,25 @@ function ____exports.buildTaskMainPanel(self, opts)
     local scrollThumbFrame = nil
     local scrollThumbHitBtn = nil
     if ENABLE_TASK_UI_RIGHT_SCROLLBAR then
-        taskScrollBarFallbackParent = mainPanel
-        taskScrollBarFallbackCreateFrame = createFrame
-        taskScrollBarFallbackFrameType = FrameType
-        local sbSrc = tryCreateFromFdfWithSource(nil, "TaskScrollBar", mainPanel, buildTaskScrollBarFallbackFromFdf)
-        taskScrollBarFallbackParent = 0
-        taskScrollBarFallbackCreateFrame = nil
-        taskScrollBarFallbackFrameType = nil
+        local sbSrc = tryCreateFromFdfWithSource(
+            nil,
+            "TaskScrollBar",
+            mainPanel,
+            function()
+                local ____createFrame_result_1 = createFrame(nil, {
+                    type = FrameType.BACKDROP,
+                    name = "TaskScrollBarBtn",
+                    parent = mainPanel,
+                    template = "template",
+                    visible = true
+                })
+                if ____createFrame_result_1 == nil then
+                    ____createFrame_result_1 = 0
+                end
+                local f = ____createFrame_result_1
+                return f
+            end
+        )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
             if type(japi.DzFrameShow) == "function" then
@@ -197,21 +194,6 @@ function ____exports.buildTaskMainPanel(self, opts)
             end
             if type(japi.DzFrameShow) == "function" then
                 japi.DzFrameShow(scrollThumbFrame, true)
-            end
-            local ____createFrame_result_3 = createFrame(nil, {
-                type = FrameType.GLUETEXTBUTTON,
-                name = "TaskScrollThumbHit",
-                parent = scrollThumbFrame,
-                template = "template",
-                visible = true
-            })
-            if ____createFrame_result_3 == nil then
-                ____createFrame_result_3 = nil
-            end
-            local thumbHit = ____createFrame_result_3
-            if thumbHit and thumbHit ~= 0 then
-                setupTransparentGlueHitLayer(nil, scrollThumbFrame, thumbHit)
-                scrollThumbHitBtn = thumbHit
             end
         end
     end

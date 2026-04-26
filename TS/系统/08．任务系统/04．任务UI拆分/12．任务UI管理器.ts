@@ -59,7 +59,7 @@ function taskUIModuleRowExpand(questId: string): void {
 }
 
 function taskUIModuleSwitchCategory(type: QuestType): void {
-  mgr?.switchCategory(type);
+  taskUI.switchCategory(type);
 }
 
 function taskUIModuleNoopTabTooltip(_msg: string): void {}
@@ -108,15 +108,21 @@ function taskUIListCtxGetExpandedQuestId(type: QuestType): string | null {
   return mgr != null ? mgr.listGetExpandedQuestId(type) : null;
 }
 
+let __togglePanelTriggerPlayer: any = null;
+
 function taskUITogglePanelPcallBody(): void {
-  if (!mgr) return;
-  mgr.togglePanel();
-  clickSoundCallback?.();
+  if (!taskUI) return;
+  taskUI.togglePanelSync(__togglePanelTriggerPlayer);
+  if (__togglePanelTriggerPlayer === jass.GetLocalPlayer()) {
+    clickSoundCallback?.();
+  }
 }
 
 // 统一的面板切换回调（键盘 J 键和鼠标点击入口图标共用）
 function dispatchTogglePanel(): void {
-  if (!mgr) return;
+  __togglePanelTriggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
+    ? (japi as any).DzGetTriggerKeyPlayer()
+    : jass.GetLocalPlayer();
   pcall(taskUITogglePanelPcallBody);
 }
 
@@ -221,7 +227,8 @@ class TaskUI {
     this.resetToDefault();
     this.rebuildPages();
     registerTaskUIRefreshCallback(dispatchRefresh);
-    this.hidePanel();
+    this.hidePanelState();
+    this.hidePanelUI();
     this.uiInitialized = true;
   }
 
@@ -266,7 +273,12 @@ class TaskUI {
   rebuildPages(): void {
     rebuildTaskUIFacadeListPool(this.getListControlContext());
     this.pagesDirty = false;
-    if (this.isVisible) this.showCurrentCategory();
+    if (this.isVisible) {
+      const localPlayer = jass.GetLocalPlayer();
+      if (this.localPlayer != null && this.localPlayer === localPlayer) {
+        this.showCurrentCategory();
+      }
+    }
   }
 
   private resetToDefault(): void {
@@ -325,7 +337,7 @@ class TaskUI {
     applyTaskUIFacadeVisibleState(this.getListControlContext());
   }
 
-  /** 同步修改分类状态（所有客户端执行） */
+  /** 同步修改分类全局状态（所有客户端执行，不受 GetLocalPlayer 限制） */
   switchCategoryState(type: QuestType): void {
     if (this.currentCategory === type) return;
     this.currentCategory = type;
@@ -333,7 +345,7 @@ class TaskUI {
     this.expandedQuestId = null;
   }
 
-  /** 本地显示分类UI（仅本地玩家执行） */
+  /** 本地显示分类UI（仅在 GetLocalPlayer === triggerPlayer 时执行） */
   switchCategoryUI(type: QuestType): void {
     if (!this.isVisible) return;
     applyTaskUICategorySwitchVisibleState(this.getListControlContext());
@@ -341,11 +353,19 @@ class TaskUI {
     updateTaskUIScrollBarVisibility(this.getScrollContext(), pc, pc > 0);
   }
 
-  switchCategory(type: QuestType): void {
-    if (!this.isVisible) return;
-    if (this.currentCategory === type) return;
+  /** sync=true 回调入口：全局状态在所有客户端同步修改，UI 只对按键者显示 */
+  switchCategorySync(player: any, type: QuestType): void {
     this.switchCategoryState(type);
-    this.switchCategoryUI(type);
+    const localPlayer = jass.GetLocalPlayer();
+    if (player === localPlayer) {
+      this.switchCategoryUI(type);
+    }
+  }
+
+  /** 鼠标 Tab 点击入口（sync=true 帧回调，全房触发） */
+  switchCategory(type: QuestType): void {
+    const triggerPlayer = japi.DzGetTriggerKeyPlayer();
+    this.switchCategorySync(triggerPlayer, type);
   }
 
   private toggleExpand(questId: string): void {
@@ -365,24 +385,51 @@ class TaskUI {
     switchPageLocal(this.precreatedListPool, this.currentCategory, currentPage, nextPage);
   }
 
-  togglePanel(): void {
+  /** sync=true 回调入口：面板切换，全局状态全房同步，UI 只对按键者显示 */
+  togglePanelSync(player: any): void {
     if (this.isVisible) {
-      this.hidePanel();
+      this.hidePanelState();
+      const localPlayer = jass.GetLocalPlayer();
+      if (player === localPlayer) {
+        this.hidePanelUI();
+      }
     } else {
-      this.showPanel();
+      this.showPanelState();
+      const localPlayer = jass.GetLocalPlayer();
+      if (player === localPlayer) {
+        this.showPanelUI();
+      }
     }
   }
 
-  private showPanel(): void {
-    if (!this.mainPanel) return;
+  togglePanel(): void {
+    const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
+      ? (japi as any).DzGetTriggerKeyPlayer()
+      : jass.GetLocalPlayer();
+    this.togglePanelSync(triggerPlayer);
+  }
+
+  /** 全局状态：标记面板可见 + 重置状态 */
+  private showPanelState(): void {
     this.resetToDefault();
     if (this.pagesDirty) this.rebuildPages();
-    showFrame(this.mainPanel);
     this.isVisible = true;
+  }
+
+  /** 本地 UI：显示面板帧 + 刷新分类显示 */
+  private showPanelUI(): void {
+    if (!this.mainPanel) return;
+    showFrame(this.mainPanel);
     this.showCurrentCategory();
   }
 
-  private hidePanel(): void {
+  /** 全局状态：标记面板不可见 */
+  private hidePanelState(): void {
+    this.isVisible = false;
+  }
+
+  /** 本地 UI：隐藏面板帧 + 隐藏分类 */
+  private hidePanelUI(): void {
     if (!this.mainPanel) return;
     if (this.precreatedListPool) {
       for (const ct of [QuestType.MAIN, QuestType.SIDE, QuestType.DAILY]) {
@@ -391,7 +438,6 @@ class TaskUI {
       }
     }
     hideFrame(this.mainPanel);
-    this.isVisible = false;
   }
 
   private getListControlContext(): TaskUIListControlContext {
@@ -425,12 +471,13 @@ function taskUIInitPcallBody(): void {
 const taskUI = new TaskUI();
 export { taskUI };
 
-function taskUIHotkeySwitchCategoryState(type: QuestType): void {
-  taskUI.switchCategoryState(type);
+function taskUIHotkeyTogglePanel(player: any): void {
+  __togglePanelTriggerPlayer = player;
+  pcall(taskUITogglePanelPcallBody);
 }
 
-function taskUIHotkeySwitchCategoryUI(type: QuestType): void {
-  taskUI.switchCategoryUI(type);
+function taskUIHotkeySwitchCategory(player: any, type: QuestType): void {
+  taskUI.switchCategorySync(player, type);
 }
 
 /** 地图加载时创建全局单例任务 UI（各客户端对称执行一次） */
@@ -445,9 +492,8 @@ export function registerHotkey(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
   registerTaskUIHotkeys({
     registerKeyUpSync, KEY, KEY_NUM,
-    onTogglePanelLocal: dispatchTogglePanel,
-    onSwitchCategoryState: taskUIHotkeySwitchCategoryState,
-    onSwitchCategoryUI: taskUIHotkeySwitchCategoryUI,
+    onTogglePanelSync: taskUIHotkeyTogglePanel,
+    onSwitchCategorySync: taskUIHotkeySwitchCategory,
   });
 }
 

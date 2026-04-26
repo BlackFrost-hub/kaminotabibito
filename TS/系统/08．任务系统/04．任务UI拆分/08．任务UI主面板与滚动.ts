@@ -22,24 +22,8 @@ import {
   ENABLE_TASK_UI_RIGHT_SCROLLBAR,
 } from "./01．任务UI常量";
 import { QuestType } from "../01．任务数据";
-import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource, pcallDzFrameShow } from "./02．任务UI辅助";
+import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource } from "./02．任务UI辅助";
 import { buildTaskPanelCategoryTabs } from "./07．任务UI分类标签";
-
-let taskScrollBarFallbackParent = 0;
-let taskScrollBarFallbackCreateFrame: any = null;
-let taskScrollBarFallbackFrameType: any = null;
-
-function buildTaskScrollBarFallbackFromFdf(): number | null {
-  const f =
-    taskScrollBarFallbackCreateFrame({
-      type: taskScrollBarFallbackFrameType.BACKDROP,
-      name: "TaskScrollBarBtn",
-      parent: taskScrollBarFallbackParent,
-      template: "template",
-      visible: true,
-    }) ?? 0;
-  return f || null;
-}
 
 export interface BuildMainPanelResult {
   mainPanel: number | null;
@@ -140,7 +124,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       LIST_CONTAINER_REL_TO_PANEL_X,
       LIST_CONTAINER_REL_TO_PANEL_Y
     );
-    pcallDzFrameShow(japi, listContainer, true);
+    if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(listContainer, true));
   }
 
   const tabs = buildTaskPanelCategoryTabs({
@@ -164,13 +148,17 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   let scrollThumbHitBtn: number | null = null;
 
   if (ENABLE_TASK_UI_RIGHT_SCROLLBAR) {
-    taskScrollBarFallbackParent = mainPanel;
-    taskScrollBarFallbackCreateFrame = createFrame;
-    taskScrollBarFallbackFrameType = FrameType;
-    const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", mainPanel, buildTaskScrollBarFallbackFromFdf);
-    taskScrollBarFallbackParent = 0;
-    taskScrollBarFallbackCreateFrame = null;
-    taskScrollBarFallbackFrameType = null;
+    const sbSrc = tryCreateFromFdfWithSource("TaskScrollBar", mainPanel, () => {
+      const f =
+        createFrame({
+          type: FrameType.BACKDROP,
+          name: "TaskScrollBarBtn",
+          parent: mainPanel,
+          template: "template",
+          visible: true,
+        }) ?? 0;
+      return f;
+    });
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -204,19 +192,6 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       }
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
-      // BACKDROP 不接收点击；透明 GLUETEXTBUTTON 铺满 thumb，供 DzGetMouseFocus / 全局拖拽命中
-      const thumbHit =
-        createFrame({
-          type: FrameType.GLUETEXTBUTTON,
-          name: "TaskScrollThumbHit",
-          parent: scrollThumbFrame,
-          template: "template",
-          visible: true,
-        }) ?? null;
-      if (thumbHit && thumbHit !== 0) {
-        setupTransparentGlueHitLayer(scrollThumbFrame, thumbHit);
-        scrollThumbHitBtn = thumbHit;
-      }
     }
   }
 

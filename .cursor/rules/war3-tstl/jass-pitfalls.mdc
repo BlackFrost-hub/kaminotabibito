@@ -81,6 +81,36 @@ TSTL 编译后会把模块表本身当成第一个 self 参数传给注册函数
 damageEvent.registerDamageCallback(callback);
 ```
 
+### 7.1 上下文表 / 对象字面量：勿把「模块导出函数」直接绑在字段上
+
+**❌ 典型错误**
+
+```typescript
+import { registerMouseWheel as registerMouseWheelHardware } from "…";
+
+const scrollCtx = {
+  registerMouseWheel: registerMouseWheelHardware,
+};
+// 消费方
+scrollCtx.registerMouseWheel(false, onWheel);
+```
+
+**TSTL → Lua**：对「表字段上的函数」调用，可能编成 **`scrollCtx:registerMouseWheel(false, onWheel)`**（冒号调用）。Lua 会把 **`scrollCtx` 表塞进第一个形参**（本应是 `sync`），后续参数整体错位；表现为 **滚轮/全局鼠标注册不生效、参数像被随机吃掉**。
+
+**✅ 正确写法**
+
+1. 字面量里用 **`this: void` 包装**再转发（强制生成点号调用语义、首参不被当 self）：
+
+```typescript
+registerMouseWheel: function (this: void, sync: boolean, cb: () => void, playerId?: number): unknown {
+  return registerMouseWheelHardware(sync, cb, playerId);
+},
+```
+
+2. **接口 / 类型**里对该方法声明 **`registerMouseWheel(this: void, …)`**，与 [The Self Parameter](https://typescripttolua.github.io/docs/the-self-parameter/) 及本文件 **§13** 的 `noImplicitSelf` 思路一致。
+
+**工程参考**：`TS/系统/08．任务系统/04．任务UI拆分/10．任务UI滚动与滚轮.ts`（`TaskUIScrollContext`）、`12．任务UI管理器.ts`（`scrollCtxCache` 构造）。
+
 ## 8) 回调验证：不要对 TSTL 编译后的回调做 `typeof === "function"` 检查
 
 **❌ 错误写法**

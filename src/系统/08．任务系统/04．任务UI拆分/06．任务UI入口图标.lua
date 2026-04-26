@@ -95,7 +95,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
         if type(japi.DzFrameSetAllPoints) == "function" then
             japi.DzFrameSetAllPoints(btn, entryFrame)
         end
-        setFrameClickEvent(nil, btn, onTogglePanel, false)
+        setFrameClickEvent(nil, btn, onTogglePanel, true)
     end
     return {entryFrame = entryFrame, entryText = entryText}
 end
