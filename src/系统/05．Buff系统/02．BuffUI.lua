@@ -74,11 +74,50 @@ local function tryDzFrameSetTooltipF2i(self, hostFrame, tooltipFrame)
     )
 end
 local slots = {}
-local lastTipStrBySlot = {}
-local lastRemainStrBySlot = {}
-local slotHovering = {}
 local refreshTimer = nil
 local buffUiInitialized = false
+--- 从帧获取当前文本，用于比较是否需要更新（避免本地table状态）
+local function getFrameText(self, frame)
+    if not frame or frame == 0 then
+        return ""
+    end
+    do
+        local function ____catch(e)
+            return true, ""
+        end
+        local ____try, ____hasReturned, ____returnValue = pcall(function()
+            return true, japi.DzFrameGetText(frame) or ""
+        end)
+        if not ____try then
+            ____hasReturned, ____returnValue = ____catch(____hasReturned)
+        end
+        if ____hasReturned then
+            return ____returnValue
+        end
+    end
+end
+local function onSlotEnter(self, index)
+    local s = slots[index + 1]
+    if s ~= nil and s.tipBox ~= 0 then
+        pcall(function () return ____UI_5DE5_5177:showFrame(s.tipBox) end
+        )
+    end
+    if s ~= nil and s.tipText ~= 0 then
+        pcall(function () return ____UI_5DE5_5177:showFrame(s.tipText) end
+        )
+    end
+end
+local function onSlotLeave(self, index)
+    local s = slots[index + 1]
+    if s ~= nil and s.tipText ~= 0 then
+        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipText) end
+        )
+    end
+    if s ~= nil and s.tipBox ~= 0 then
+        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipBox) end
+        )
+    end
+end
 ____exports.BUFF_UI_DEBUG = false
 local lastBuffUiDbgKey = ""
 local function debugBuffUi(self, msg)
@@ -107,14 +146,14 @@ local function countSelectedForPlayer(self, p)
             end
             jass.GroupRemoveUnit(g, u)
             if not useSelectedNative and not jass.IsUnitSelected(u, p) then
-                goto __continue15
+                goto __continue29
             end
             n = n + 1
             if sole == nil then
                 sole = u
             end
         end
-        ::__continue15::
+        ::__continue29::
     end
     jass.DestroyGroup(g)
     return {n = n, sole = sole}
@@ -177,9 +216,6 @@ local function hideSlot(self, i)
     if s == nil then
         return
     end
-    slotHovering[i + 1] = false
-    lastTipStrBySlot[i + 1] = ""
-    lastRemainStrBySlot[i + 1] = ""
     if s.tipText ~= 0 then
         pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipText) end
         )
@@ -262,17 +298,17 @@ local function syncBuffBar(self)
                     do
                         if i >= #rows then
                             hideSlot(nil, i)
-                            goto __continue51
+                            goto __continue65
                         end
                         local row = rows[i + 1]
                         local meta = buffs[row.id]
                         local slot = slots[i + 1]
                         if not slot then
-                            goto __continue51
+                            goto __continue65
                         end
                         local iconTex = row.iconOverride ~= nil and row.iconOverride ~= "" and row.iconOverride or (meta ~= nil and meta.icon or "")
                         if iconTex == "" then
-                            goto __continue51
+                            goto __continue65
                         end
                         local pd = row.state._dotParsedDuration
                         local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
@@ -287,16 +323,15 @@ local function syncBuffBar(self)
                         pcall(function () return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
                         )
                         local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
+                        local remTextFormatted = ("|cffffffff" .. remStr) .. "|r"
                         if slot.remainText and slot.remainText ~= 0 then
-                            if lastRemainStrBySlot[i + 1] ~= remStr then
-                                lastRemainStrBySlot[i + 1] = remStr
-                                pcall(function () return japi.DzFrameSetText(slot.remainText, ("|cffffffff" .. remStr) .. "|r") end
+                            if getFrameText(nil, slot.remainText) ~= remTextFormatted then
+                                pcall(function () return japi.DzFrameSetText(slot.remainText, remTextFormatted) end
                                 )
                             end
                         end
                         if slot.tipText and slot.tipText ~= 0 then
-                            if lastTipStrBySlot[i + 1] ~= tipStr then
-                                lastTipStrBySlot[i + 1] = tipStr
+                            if getFrameText(nil, slot.tipText) ~= tipStr then
                                 pcall(function () return japi.DzFrameSetText(slot.tipText, tipStr) end
                                 )
                             end
@@ -307,18 +342,8 @@ local function syncBuffBar(self)
                             pcall(function () return ____UI_5DE5_5177:showFrame(slot.hit) end
                             )
                         end
-                        if not slotHovering[i + 1] then
-                            if slot.tipBox ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipBox) end
-                                )
-                            end
-                            if slot.tipText ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:hideFrame(slot.tipText) end
-                                )
-                            end
-                        end
                     end
-                    ::__continue51::
+                    ::__continue65::
                     i = i + 1
                 end
             end
@@ -387,30 +412,8 @@ local function createOneSlot(self, index, parent)
                 )
                 pcall(function () return ____UI_5DE5_5177:setFrameHoverEvents(
                         hit,
-                        function()
-                            slotHovering[index + 1] = true
-                            local s = slots[index + 1]
-                            if s ~= nil and s.tipBox ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:showFrame(s.tipBox) end
-                                )
-                            end
-                            if s ~= nil and s.tipText ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:showFrame(s.tipText) end
-                                )
-                            end
-                        end,
-                        function()
-                            slotHovering[index + 1] = false
-                            local s = slots[index + 1]
-                            if s ~= nil and s.tipText ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipText) end
-                                )
-                            end
-                            if s ~= nil and s.tipBox ~= 0 then
-                                pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipBox) end
-                                )
-                            end
-                        end,
+                        function() return onSlotEnter(nil, index) end,
+                        function() return onSlotLeave(nil, index) end,
                         false
                     ) end
                 )
@@ -494,36 +497,20 @@ local function createOneSlot(self, index, parent)
     end
 end
 local function createUi(self)
-    pcall(function ()
-            local lp = jass.GetLocalPlayer()
-            if lp == nil or lp == 0 then
-                return
+    local parent = _____786C_4EF6_51FD_6570:getGameUI()
+    if parent == 0 or parent == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < MAX_SLOTS do
+            local s = createOneSlot(nil, i, parent)
+            if s ~= nil then
+                slots[i + 1] = s
             end
-            local parent = _____786C_4EF6_51FD_6570:getGameUI()
-            if parent == 0 or parent == nil then
-                return
-            end
-            do
-                local j = 0
-                while j < MAX_SLOTS do
-                    lastTipStrBySlot[j + 1] = ""
-                    lastRemainStrBySlot[j + 1] = ""
-                    slotHovering[j + 1] = false
-                    j = j + 1
-                end
-            end
-            do
-                local i = 0
-                while i < MAX_SLOTS do
-                    local s = createOneSlot(nil, i, parent)
-                    if s ~= nil then
-                        slots[i + 1] = s
-                    end
-                    i = i + 1
-                end
-            end
+            i = i + 1
         end
-    )
+    end
 end
 local _refreshTimer = nil
 local function startRefreshTimer(self)
@@ -551,6 +538,10 @@ local function startRefreshTimer(self)
     )
 end
 function ____exports.init(self)
+end
+--- 玩家英雄注册回调。
+-- 为注册英雄的玩家创建BuffUI。
+function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     if buffUiInitialized then
         return
     end
@@ -563,10 +554,7 @@ function ____exports.init(self)
                 false,
                 function()
                     pcall(function ()
-                            local lp = jass.GetLocalPlayer()
-                            if lp ~= nil and lp ~= 0 then
-                                createUi(nil)
-                            end
+                            createUi(nil)
                             startRefreshTimer(nil)
                             jass.DestroyTimer(delayTimer)
                         end

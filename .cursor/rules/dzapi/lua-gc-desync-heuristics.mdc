@@ -19,21 +19,45 @@ alwaysApply: false
 - 不要假设本地玩家之间 GC 时机一致
 - 除显示/读取这类幂等操作外，尽量同步执行
 
-## 2. 本地域内尽量只做幂等操作
+## 2. 同步创建，异步显示
 
-本地域里优先只做：
-- `DzFrameShow`
-- `DzFrameSetText`
-- `DzFrameSetTexture`
+### 核心原则
+- **创建/删除/修改** → 必须同步执行（所有玩家一起执行）
+- **显示/隐藏/读取** → 可以异步执行（本地玩家单独执行）
+
+### UI 系统标准架构
+1. **初始化阶段（同步）**：所有玩家一起创建帧、table、string
+2. **交互阶段（异步）**：本地玩家控制 show/hide、设置文本、更新纹理
+
+### 本地域内优先只做（纯幂等操作，不创建新对象）
+- `DzFrameShow` / `DzFrameHide`
+- `DzFrameSetTexture`（使用预定义路径）
 - `DzFrameSetPoint`
 - `DzFrameSetSize`
 - 读变量
 
-本地域里默认避免：
-- 新建 table / string 后立刻参与复杂逻辑
+### 谨慎使用（确保内容同步创建）
+- `DzFrameSetText` → **文本必须同步创建**，这里只做显示赋值
+  ```lua
+  -- ✅ 正确：字符串同步创建，异步显示
+  local text = "伤害: " .. damage  -- 所有玩家执行，创建相同字符串
+  if GetLocalPlayer() == Player(0) then
+      DzFrameSetText(frame, text)  -- 只有玩家0显示
+  end
+  
+  -- ❌ 错误：异步创建字符串
+  if GetLocalPlayer() == Player(0) then
+      local text = "伤害: " .. damage  -- 只有玩家0创建
+      DzFrameSetText(frame, text)
+  end
+  ```
+
+### 本地域内默认避免
+- 字符串拼接/格式化（`..` / `string.format`）
+- 新建 table / string
+- 创建/删除帧
 - 改全局表结构
 - 把运行时对象挂进全局引用
-- 创建/删除/修改非幂等运行时对象
 
 ## 3. 少用匿名闭包进 JASS 回调
 
@@ -116,12 +140,14 @@ runtime.handle_level = 0
 目的：
 - 尽量避免 runtime 自动释放 handle 引用后，不同玩家 Lua 侧句柄状态漂移
 
+若需要**入口一整段**的强化方案（含禁用 `pairs`、`TimerStart`/`TriggerAddAction` 等全局包装，且常见写法为 `handle_level = 1`），见同目录 **`lua-runtime-safety.mdc`**；与上式最小配置**二选一**，勿混用两套却未对齐。
+
 ## 6. UI 系统落地建议
 
-- 少本地 `Map` / table 状态写入
-- 少本地后台刷新
-- 少“每个按钮一个闭包”
-- 优先“单管理器 + 单列事件分发 + 预设 frame + show/hide 切换”
+- 1.少本地 `Map` / table 状态写入
+- 2.少本地后台刷新
+- 3.少“每个按钮一个闭包”
+- 4.优先“单管理器 + 单列事件分发 + 预设 frame + show/hide 切换”
 
 ## 7. 不要把异步探针塞进本地链
 

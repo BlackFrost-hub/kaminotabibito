@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local japi, _____5E38_91CF, buildDetailTexts, formatInteger, getDamageValues, damageRows, detailSlots
 --- 刷新伤害统计面板（仅三列数值文本）。
@@ -15,14 +17,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue49
+                            goto __continue53
                         end
                         japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue49::
+                    ::__continue53::
                     col = col + 1
                 end
             end
@@ -58,17 +60,21 @@ function ____exports.updateDetailPanels()
     end
 end
 japi = require("jass.japi")
+local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local frameSetScriptByCode = ____require_result_0.frameSetScriptByCode
 _____5E38_91CF = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
-local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.01．属性工具")
-buildDetailTexts = ____require_result_0.buildDetailTexts
-formatInteger = ____require_result_0.formatInteger
-getDamageValues = ____require_result_0.getDamageValues
-local getDisplayPlayers = ____require_result_0.getDisplayPlayers
-local getHeroIcon = ____require_result_0.getHeroIcon
-local getPlayerHero = ____require_result_0.getPlayerHero
+local ____require_result_1 = require("系统.09．表现系统.03．UI属性系统.01．属性工具")
+buildDetailTexts = ____require_result_1.buildDetailTexts
+formatInteger = ____require_result_1.formatInteger
+getDamageValues = ____require_result_1.getDamageValues
+local getHeroIcon = ____require_result_1.getHeroIcon
+local getPlayerHero = ____require_result_1.getPlayerHero
 local damagePanel = 0
+local damagePanelCreated = false
 damageRows = {}
 detailSlots = {}
+local registeredPlayers = __TS__New(Set)
 local function createFrame(tagName, name, parent)
     return japi.DzCreateFrameByTagName(
         tagName,
@@ -126,9 +132,13 @@ local function createDetailHoverAction(index, visible)
         showDetailSlot(index, visible)
     end
 end
---- 创建左侧伤害统计面板。
+--- 创建左侧伤害统计面板（只创建一次）。
 -- 结构直接对应原 JASS：标题行 + 每名玩家一行头像和三列数值。
-local function createDamagePanel(gameUI, players)
+local function createDamagePanel(gameUI)
+    if damagePanelCreated then
+        return
+    end
+    damagePanelCreated = true
     damagePanel = createFrame("BACKDROP", "UI属性系统伤害统计", gameUI)
     if damagePanel == 0 then
         return
@@ -152,232 +162,244 @@ local function createDamagePanel(gameUI, players)
             i = i + 1
         end
     end
+end
+--- 为单个玩家创建伤害统计行。
+-- 在玩家英雄注册后调用。
+local function createDamageRowForPlayer(gameUI, player, hero, index)
+    if damagePanel == 0 then
+        return
+    end
+    local rowY = _____5E38_91CF.DAMAGE_ICON_Y - _____5E38_91CF.DAMAGE_ROW_STEP * index
+    local icon = createFrame(
+        "BACKDROP",
+        "UI属性系统伤害头像" .. tostring(index),
+        damagePanel
+    )
+    if icon ~= 0 then
+        setAbsolute(icon, _____5E38_91CF.DAMAGE_ICON_X, rowY)
+        japi.DzFrameSetTexture(
+            icon,
+            getHeroIcon(hero),
+            0
+        )
+        japi.DzFrameSetSize(icon, _____5E38_91CF.DAMAGE_ICON_WIDTH, _____5E38_91CF.DAMAGE_ICON_HEIGHT)
+        show(icon, true)
+    end
+    local values = {}
     do
-        local i = 0
-        while i < #players do
-            local player = players[i + 1]
-            local hero = getPlayerHero(player)
-            local rowY = _____5E38_91CF.DAMAGE_ICON_Y - _____5E38_91CF.DAMAGE_ROW_STEP * i
-            local icon = createFrame(
-                "BACKDROP",
-                "UI属性系统伤害头像" .. tostring(i),
-                damagePanel
+        local col = 0
+        while col < #_____5E38_91CF.DAMAGE_VALUE_X do
+            values[#values + 1] = createText(
+                damagePanel,
+                (("UI属性系统伤害值" .. tostring(index)) .. "_") .. tostring(col),
+                _____5E38_91CF.DAMAGE_VALUE_X[col + 1],
+                _____5E38_91CF.DAMAGE_TITLE_Y - _____5E38_91CF.DAMAGE_ROW_STEP * (index + 1),
+                0.009,
+                "0"
             )
-            if icon ~= 0 then
-                setAbsolute(icon, _____5E38_91CF.DAMAGE_ICON_X, rowY)
-                japi.DzFrameSetTexture(
-                    icon,
-                    getHeroIcon(hero),
-                    0
-                )
-                japi.DzFrameSetSize(icon, _____5E38_91CF.DAMAGE_ICON_WIDTH, _____5E38_91CF.DAMAGE_ICON_HEIGHT)
-                show(icon, true)
-            end
-            local values = {}
-            do
-                local col = 0
-                while col < #_____5E38_91CF.DAMAGE_VALUE_X do
-                    values[#values + 1] = createText(
-                        damagePanel,
-                        (("UI属性系统伤害值" .. tostring(i)) .. "_") .. tostring(col),
-                        _____5E38_91CF.DAMAGE_VALUE_X[col + 1],
-                        _____5E38_91CF.DAMAGE_TITLE_Y - _____5E38_91CF.DAMAGE_ROW_STEP * (i + 1),
-                        0.009,
-                        "0"
-                    )
-                    col = col + 1
-                end
-            end
-            damageRows[#damageRows + 1] = {icon = icon, values = values, player = player}
-            i = i + 1
+            col = col + 1
         end
     end
+    damageRows[#damageRows + 1] = {icon = icon, values = values, player = player}
 end
---- 创建顶部英雄头像入口与悬浮属性框。
--- 每个槽位绑定一个玩家，后续刷新时只更新头像与文本，不重复建框。
-local function createDetailSlots(gameUI, players)
-    do
-        local i = 0
-        while i < #players do
-            do
-                local player = players[i + 1]
-                local hero = getPlayerHero(player)
-                local iconX = _____5E38_91CF.HERO_ICON_START_X + _____5E38_91CF.HERO_ICON_STEP_X * i
-                local icon = createFrame(
-                    "BACKDROP",
-                    "UI属性系统英雄头像" .. tostring(i),
-                    gameUI
-                )
-                if icon == 0 then
-                    detailSlots[#detailSlots + 1] = {
-                        player = player,
-                        hero = hero,
-                        functionKey = _____5E38_91CF.KEY_F[i + 1],
-                        icon = 0,
-                        box = 0,
-                        lines = {},
-                        separators = {}
-                    }
-                    goto __continue28
-                end
-                setAbsolute(icon, iconX, _____5E38_91CF.HERO_ICON_Y)
-                japi.DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
-                japi.DzFrameSetTexture(
-                    icon,
-                    getHeroIcon(hero),
-                    0
-                )
-                show(icon, true)
-                createText(
-                    icon,
-                    "UI属性系统快捷键" .. tostring(i),
-                    iconX,
-                    _____5E38_91CF.HERO_KEY_Y,
-                    0.009,
-                    ("|cffffff00F" .. tostring(i + 2)) .. "|r"
-                )
-                local box = createFrame(
-                    "BACKDROP",
-                    "UI属性系统文本框" .. tostring(i),
-                    icon
-                )
-                local lines = {}
-                local separators = {}
-                if box ~= 0 then
-                    setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
-                    japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
-                    japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
-                    show(box, false)
-                    do
-                        local lineIndex = 0
-                        while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
-                            local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
-                            local isSeparatorCol = lineIndex % 5 == 1 or lineIndex % 5 == 3
-                            if not isSeparatorCol then
-                                local line = createFrame(
-                                    "TEXT",
-                                    (("UI属性系统属性行" .. tostring(i)) .. "_") .. tostring(lineIndex),
-                                    box
-                                )
-                                if line ~= 0 then
-                                    japi.DzFrameSetPoint(
-                                        line,
-                                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                                        box,
-                                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                                        pos.x,
-                                        pos.y
-                                    )
-                                    japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
-                                    japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
-                                    show(line, false)
-                                    lines[#lines + 1] = line
-                                end
-                            end
-                            lineIndex = lineIndex + 1
-                        end
-                    end
-                    local sepStartY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_START_ROW
-                    local sepEndY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_END_ROW
-                    local sepTotalHeight = (sepStartY - sepEndY + _____5E38_91CF.DETAIL_LINE_HEIGHT) * _____5E38_91CF.DETAIL_SEPARATOR_HEIGHT_MULT
-                    local sepWidth = _____5E38_91CF.DETAIL_SEPARATOR_WIDTH
-                    local sepRelY = sepEndY + _____5E38_91CF.DETAIL_SEPARATOR_Y_OFFSET
-                    local sep1 = createFrame(
-                        "BACKDROP",
-                        "UI属性系统分隔符1_" .. tostring(i),
+--- 为单个玩家创建顶部英雄头像入口与悬浮属性框。
+-- 在玩家英雄注册后调用。
+local function createDetailSlotForPlayer(gameUI, player, hero, index)
+    local iconX = _____5E38_91CF.HERO_ICON_START_X + _____5E38_91CF.HERO_ICON_STEP_X * index
+    local icon = createFrame(
+        "BACKDROP",
+        "UI属性系统英雄头像" .. tostring(index),
+        gameUI
+    )
+    if icon == 0 then
+        detailSlots[#detailSlots + 1] = {
+            player = player,
+            hero = hero,
+            functionKey = _____5E38_91CF.KEY_F[index + 1],
+            icon = 0,
+            box = 0,
+            lines = {},
+            separators = {}
+        }
+        return
+    end
+    setAbsolute(icon, iconX, _____5E38_91CF.HERO_ICON_Y)
+    japi.DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
+    local iconPath = getHeroIcon(hero)
+    japi.DzFrameSetTexture(icon, iconPath, 0)
+    show(icon, true)
+    createText(
+        icon,
+        "UI属性系统快捷键" .. tostring(index),
+        iconX,
+        _____5E38_91CF.HERO_KEY_Y,
+        0.009,
+        ("|cffffff00F" .. tostring(index + 2)) .. "|r"
+    )
+    local box = createFrame(
+        "BACKDROP",
+        "UI属性系统文本框" .. tostring(index),
+        icon
+    )
+    local lines = {}
+    local separators = {}
+    if box ~= 0 then
+        setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
+        japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
+        japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
+        show(box, false)
+        do
+            local lineIndex = 0
+            while lineIndex < #_____5E38_91CF.DETAIL_LINE_LAYOUTS do
+                local pos = _____5E38_91CF.DETAIL_LINE_LAYOUTS[lineIndex + 1]
+                local isSeparatorCol = lineIndex % 5 == 1 or lineIndex % 5 == 3
+                if not isSeparatorCol then
+                    local line = createFrame(
+                        "TEXT",
+                        (("UI属性系统属性行" .. tostring(index)) .. "_") .. tostring(lineIndex),
                         box
                     )
-                    if sep1 ~= 0 then
+                    if line ~= 0 then
                         japi.DzFrameSetPoint(
-                            sep1,
+                            line,
                             _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
                             box,
                             _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                            _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
-                            sepRelY
+                            pos.x,
+                            pos.y
                         )
-                        japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
-                        japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-                        japi.DzFrameSetPriority(sep1, 0)
-                        show(sep1, false)
-                        separators[#separators + 1] = sep1
-                    end
-                    local sep2 = createFrame(
-                        "BACKDROP",
-                        "UI属性系统分隔符2_" .. tostring(i),
-                        box
-                    )
-                    if sep2 ~= 0 then
-                        japi.DzFrameSetPoint(
-                            sep2,
-                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                            box,
-                            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                            _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
-                            sepRelY
-                        )
-                        japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
-                        japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-                        japi.DzFrameSetPriority(sep2, 0)
-                        show(sep2, false)
-                        separators[#separators + 1] = sep2
+                        japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
+                        japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
+                        show(line, false)
+                        lines[#lines + 1] = line
                     end
                 end
-                local button = createFrame(
-                    "GLUETEXTBUTTON",
-                    "UI属性系统按钮" .. tostring(i),
-                    icon
-                )
-                if button ~= 0 then
-                    japi.DzFrameSetPoint(
-                        button,
-                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        icon,
-                        _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
-                        0,
-                        0
-                    )
-                    japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
-                    japi.DzFrameSetScriptByCode(
-                        button,
-                        _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
-                        createDetailHoverAction(i, true),
-                        false
-                    )
-                    japi.DzFrameSetScriptByCode(
-                        button,
-                        _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
-                        createDetailHoverAction(i, false),
-                        false
-                    )
-                end
-                detailSlots[#detailSlots + 1] = {
-                    player = player,
-                    hero = hero,
-                    functionKey = _____5E38_91CF.KEY_F[i + 1],
-                    icon = icon,
-                    box = box,
-                    lines = lines,
-                    separators = separators
-                }
+                lineIndex = lineIndex + 1
             end
-            ::__continue28::
-            i = i + 1
+        end
+        local sepStartY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_START_ROW
+        local sepEndY = _____5E38_91CF.DETAIL_START_Y - _____5E38_91CF.DETAIL_ROW_STEP * _____5E38_91CF.DETAIL_SEP_END_ROW
+        local sepTotalHeight = (sepStartY - sepEndY + _____5E38_91CF.DETAIL_LINE_HEIGHT) * _____5E38_91CF.DETAIL_SEPARATOR_HEIGHT_MULT
+        local sepWidth = _____5E38_91CF.DETAIL_SEPARATOR_WIDTH
+        local sepRelY = sepEndY + _____5E38_91CF.DETAIL_SEPARATOR_Y_OFFSET
+        local sep1 = createFrame(
+            "BACKDROP",
+            "UI属性系统分隔符1_" .. tostring(index),
+            box
+        )
+        if sep1 ~= 0 then
+            japi.DzFrameSetPoint(
+                sep1,
+                _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                box,
+                _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                sepRelY
+            )
+            japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
+            japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+            japi.DzFrameSetPriority(sep1, 0)
+            show(sep1, false)
+            separators[#separators + 1] = sep1
+        end
+        local sep2 = createFrame(
+            "BACKDROP",
+            "UI属性系统分隔符2_" .. tostring(index),
+            box
+        )
+        if sep2 ~= 0 then
+            japi.DzFrameSetPoint(
+                sep2,
+                _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                box,
+                _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+                _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
+                sepRelY
+            )
+            japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
+            japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+            japi.DzFrameSetPriority(sep2, 0)
+            show(sep2, false)
+            separators[#separators + 1] = sep2
         end
     end
+    local button = createFrame(
+        "GLUETEXTBUTTON",
+        "UI属性系统按钮" .. tostring(index),
+        icon
+    )
+    if button ~= 0 then
+        japi.DzFrameSetPoint(
+            button,
+            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+            icon,
+            _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
+            0,
+            0
+        )
+        japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
+        local playerId = jass.GetPlayerId(player)
+        frameSetScriptByCode(
+            nil,
+            button,
+            _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
+            createDetailHoverAction(index, true),
+            false,
+            playerId
+        )
+        frameSetScriptByCode(
+            nil,
+            button,
+            _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
+            createDetailHoverAction(index, false),
+            false,
+            playerId
+        )
+    end
+    detailSlots[#detailSlots + 1] = {
+        player = player,
+        hero = hero,
+        functionKey = _____5E38_91CF.KEY_F[index + 1],
+        icon = icon,
+        box = box,
+        lines = lines,
+        separators = separators
+    }
 end
---- 一次性创建整套 UI 框体。
--- 这里只负责“搭骨架”，具体数值文本由后续刷新函数填充。
+--- 玩家英雄注册回调。
+-- 每注册一个玩家英雄就创建一个UI槽位。
+-- `this: void`：TSTL 勿对导出函数注入首参 nil（见玩家英雄获取桥接）。
+function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
+    if whichPlayer == nil or whichPlayer == 0 then
+        return
+    end
+    local playerId = jass.GetPlayerId(whichPlayer)
+    if playerId < 0 or playerId >= _____5E38_91CF.MAX_DISPLAY_PLAYERS then
+        return
+    end
+    if registeredPlayers:has(playerId) then
+        return
+    end
+    registeredPlayers:add(playerId)
+    local gameUI = japi.DzGetGameUI()
+    if gameUI == nil or gameUI == 0 then
+        return
+    end
+    createDamagePanel(gameUI)
+    local index = #detailSlots
+    createDamageRowForPlayer(gameUI, whichPlayer, whichHero, index)
+    createDetailSlotForPlayer(gameUI, whichPlayer, whichHero, index)
+    ____exports.updateDamagePanel()
+    ____exports.updateDetailPanels()
+end
+--- 创建基础UI框架（伤害面板）。
+-- 具体玩家槽位由 onPlayerHeroRegistered 按需创建。
 function ____exports.createUiFrames()
     local gameUI = japi.DzGetGameUI()
     if gameUI == nil or gameUI == 0 then
         return
     end
-    local players = getDisplayPlayers()
-    createDamagePanel(gameUI, players)
-    createDetailSlots(gameUI, players)
-    ____exports.updateDamagePanel()
-    ____exports.updateDetailPanels()
+    createDamagePanel(gameUI)
 end
 function ____exports.showDamagePanel(visible)
     show(damagePanel, visible)
@@ -388,11 +410,11 @@ function ____exports.focusHeroByFunctionKey(functionKey)
         while i < #detailSlots do
             do
                 if detailSlots[i + 1].functionKey ~= functionKey then
-                    goto __continue43
+                    goto __continue47
                 end
                 return getPlayerHero(detailSlots[i + 1].player)
             end
-            ::__continue43::
+            ::__continue47::
             i = i + 1
         end
     end

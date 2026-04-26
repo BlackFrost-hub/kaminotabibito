@@ -19,4 +19,11 @@ end
 function ____exports.isWindowActive(self)
     return not not japi.DzIsWindowActive()
 end
+function ____exports.getClientHeight(self)
+    local ____opt_0 = japi.DzGetClientHeight
+    if ____opt_0 ~= nil then
+        ____opt_0 = ____opt_0(japi)
+    end
+    return ____opt_0 or 0
+end
 return ____exports

@@ -26,19 +26,22 @@ local initSkipKeyListener = ____20_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_4EFB_52A1_56
 setQuestSyncHandlersBinder(nil, bindQuestSyncHandlersImpl)
 function ____exports.initDialogSystem(self)
     dzLoadTocOnce(nil)
-    do
-        local i = 0
-        while i < MAX_PLAYERS do
-            local state = ensureState(nil, i)
-            if not state.initialized then
-                state.frames = createDialogFrames(nil, i)
-                state.initialized = true
-            end
-            bindQuestSyncHandlersImpl(nil, state)
-            i = i + 1
-        end
-    end
     initSkipKeyListener(nil)
+end
+--- 玩家英雄注册回调。
+-- 为注册英雄的玩家创建对话框UI。
+function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
+    local jass = require("jass.common")
+    local playerId = jass.GetPlayerId(whichPlayer)
+    if playerId < 0 or playerId >= MAX_PLAYERS then
+        return
+    end
+    local state = ensureState(nil, playerId)
+    if not state.initialized then
+        state.frames = createDialogFrames(nil, playerId)
+        state.initialized = true
+    end
+    bindQuestSyncHandlersImpl(nil, state)
 end
 function ____exports.displayText(self, p, title, text, duration, titleFontSize, bodyFontSize)
     if duration <= 0 then

@@ -8,19 +8,6 @@ import {
 } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
 
-// 入口图标点击处理器
-let entryIconClickHandler: { onTogglePanel: () => void; onClickSound: () => void } | null = null;
-
-function handleEntryIconClick(): void {
-  if (!entryIconClickHandler) return;
-  entryIconClickHandler.onTogglePanel();
-  entryIconClickHandler.onClickSound();
-}
-
-function registerEntryIconClickHandler(onTogglePanel: () => void, onClickSound: () => void): void {
-  entryIconClickHandler = { onTogglePanel, onClickSound };
-}
-
 export interface BuildEntryIconResult {
   entryFrame: number | null;
   entryText: number | null;
@@ -38,7 +25,6 @@ export interface BuildTaskEntryIconOpts {
   setFramePointRelative: any;
   setFrameClickEvent: any;
   applyDzTextFontAndCenterAlignment: any;
-  onClickSound: () => void;
   onTogglePanel: () => void;
 }
 
@@ -55,7 +41,6 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     setFramePointRelative,
     setFrameClickEvent,
     applyDzTextFontAndCenterAlignment,
-    onClickSound,
     onTogglePanel,
   } = opts;
 
@@ -109,10 +94,13 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
       enable: true,
       alpha: 0,
     }) ?? 0;
-    if (btn && typeof (japi as any).DzFrameSetAllPoints === "function") {
-    (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    registerEntryIconClickHandler(onTogglePanel, onClickSound);
-    setFrameClickEvent(btn, handleEntryIconClick, false);
+  if (btn) {
+    if (typeof (japi as any).DzFrameSetAllPoints === "function") {
+      (japi as any).DzFrameSetAllPoints(btn, entryFrame);
+    }
+    // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
+    // 直接使用 onTogglePanel 回调，和键盘 J 键保持一致
+    setFrameClickEvent(btn, onTogglePanel, false);
   }
 
   return { entryFrame, entryText };

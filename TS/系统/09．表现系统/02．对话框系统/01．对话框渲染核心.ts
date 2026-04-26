@@ -20,12 +20,24 @@ setQuestSyncHandlersBinder(bindQuestSyncHandlersImpl);
 // ========== 虚拟分区：API ==========
 export function initDialogSystem(): void {
   dzLoadTocOnce();
-  for (let i = 0; i < MAX_PLAYERS; i++) {
-    const state = ensureState(i);
-    if (!state.initialized) { state.frames = createDialogFrames(i); state.initialized = true; }
-    bindQuestSyncHandlersImpl(state);
-  }
   initSkipKeyListener();
+}
+
+/**
+ * 玩家英雄注册回调。
+ * 为注册英雄的玩家创建对话框UI。
+ */
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
+  const jass = require("jass.common") as any;
+  const playerId = jass.GetPlayerId(whichPlayer);
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  
+  const state = ensureState(playerId);
+  if (!state.initialized) {
+    state.frames = createDialogFrames(playerId);
+    state.initialized = true;
+  }
+  bindQuestSyncHandlersImpl(state);
 }
 export function displayText(p: Player, title: string, text: string, duration: number, titleFontSize?: number, bodyFontSize?: number): void {
   if (duration <= 0) duration = 1;

@@ -2,17 +2,24 @@
 local ____exports = {}
 local ____02_FF0E_5185_90E8_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.02．内部工具")
 local createTriggerOrNull = ____02_FF0E_5185_90E8_5DE5_5177.createTriggerOrNull
+local runFalseLocalRegistration = ____02_FF0E_5185_90E8_5DE5_5177.runFalseLocalRegistration
 --- 硬件输入 - 滚轮函数
 -- 
--- 与 04．键盘函数 相同：勿用 japiFn 取出再调用，否则 TSTL 会编成 f(nil, ...) 导致参数错位、注册失败（errjhw 371 等）。
+-- 约定：
+-- - `DzTriggerRegisterMouseWheelEventByCode(..., true, ...)` 直接同步注册
+-- - `DzTriggerRegisterMouseWheelEventByCode(..., false, ...)` 必须经过
+--   `runFalseLocalRegistration(...)` 包装，并支持可选 `playerId`
 local japi = require("jass.japi")
 function ____exports.getWheelDelta(self)
-    if type(japi.DzGetWheelDelta) ~= "function" then
-        return 0
+    local ____temp_0
+    if type(japi.DzGetWheelDelta) == "function" then
+        ____temp_0 = japi.DzGetWheelDelta()
+    else
+        ____temp_0 = 0
     end
-    return japi.DzGetWheelDelta()
+    return ____temp_0
 end
-function ____exports.registerMouseWheel(self, sync, action)
+function ____exports.registerMouseWheel(self, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
     if not trig then
         return nil
@@ -20,7 +27,17 @@ function ____exports.registerMouseWheel(self, sync, action)
     if type(japi.DzTriggerRegisterMouseWheelEventByCode) ~= "function" then
         return nil
     end
-    japi.DzTriggerRegisterMouseWheelEventByCode(trig, sync, action)
+    if sync then
+        japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
+    else
+        runFalseLocalRegistration(
+            nil,
+            function()
+                japi.DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
+            end,
+            playerId
+        )
+    end
     return trig
 end
 return ____exports

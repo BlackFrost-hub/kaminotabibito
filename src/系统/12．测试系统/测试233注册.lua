@@ -1,6 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local __TS__TypeOf = ____lualib.__TS__TypeOf
 local ____exports = {}
+local ____04_FF0E_952E_76D8_51FD_6570 = require("lib.扩展函数.封装函数.04．硬件输入.04．键盘函数")
+local registerKeyEventByCode = ____04_FF0E_952E_76D8_51FD_6570.registerKeyEventByCode
+local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
+local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
 local jass = require("jass.common")
 local function dumpJapiKeys(self)
     local pr = _G.print
@@ -136,13 +140,11 @@ local function bindKeyBN_once_min(self)
         return
     end
     g.__keytest_bound = true
-    local japi = require("jass.japi")
     local function bind(____, key, label)
-        local trig = jass.CreateTrigger()
-        japi.DzTriggerRegisterKeyEventByCode(
-            trig,
+        registerKeyEventByCode(
+            nil,
             key,
-            1,
+            KEY_STATE.DOWN,
             false,
             function()
                 local msg = ((("[KEYOK] " .. label) .. " key=") .. tostring(key)) .. " sync=false"

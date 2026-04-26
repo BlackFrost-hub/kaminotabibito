@@ -63,10 +63,18 @@ local ENABLE_TASK_UI_CLIENT = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_C
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local mgr = nil
+local clickSoundCallback = nil
 local function dispatchTogglePanel(self)
-    if mgr then
-        mgr:togglePanel()
+    if not mgr then
+        return
     end
+    pcall(function ()
+            mgr:togglePanel()
+            if clickSoundCallback ~= nil then
+                clickSoundCallback(nil)
+            end
+        end
+    )
 end
 local function dispatchRefresh(self)
     if mgr then
@@ -116,24 +124,21 @@ function TaskUI.prototype.init(self)
     )
 end
 function TaskUI.prototype.createEntryIcon(self, parent)
-    local res = buildTaskEntryIcon(
-        nil,
-        {
-            japi = japi,
-            parent = parent,
-            FrameType = FrameType,
-            FramePoint = FramePoint,
-            createFrame = createFrame,
-            createTextLabel = createTextLabel,
-            setFramePosition = setFramePosition,
-            setFrameSize = setFrameSize,
-            setFramePointRelative = setFramePointRelative,
-            setFrameClickEvent = setFrameClickEvent,
-            applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
-            onClickSound = function() return self:playLocalClickSound() end,
-            onTogglePanel = dispatchTogglePanel
-        }
-    )
+    clickSoundCallback = function() return self:playLocalClickSound() end
+    local res = buildTaskEntryIcon(nil, {
+        japi = japi,
+        parent = parent,
+        FrameType = FrameType,
+        FramePoint = FramePoint,
+        createFrame = createFrame,
+        createTextLabel = createTextLabel,
+        setFramePosition = setFramePosition,
+        setFrameSize = setFrameSize,
+        setFramePointRelative = setFramePointRelative,
+        setFrameClickEvent = setFrameClickEvent,
+        applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
+        onTogglePanel = dispatchTogglePanel
+    })
     self.entryFrame = res.entryFrame
 end
 function TaskUI.prototype.createMainPanel(self, parent)
@@ -204,13 +209,13 @@ function TaskUI.prototype.resolveLocalPlayerId(self)
     if lp == nil then
         return 0
     end
-    local ____temp_0
+    local ____temp_2
     if type(jass.GetPlayerId) == "function" then
-        ____temp_0 = jass.GetPlayerId(lp)
+        ____temp_2 = jass.GetPlayerId(lp)
     else
-        ____temp_0 = -1
+        ____temp_2 = -1
     end
-    local pid = ____temp_0
+    local pid = ____temp_2
     return pid < 0 and 0 or pid
 end
 function TaskUI.prototype.playLocalClickSound(self)
@@ -247,13 +252,13 @@ function TaskUI.prototype.switchCategory(self, ____type)
 end
 function TaskUI.prototype.toggleExpand(self, questId)
     local oldExpanded = self.expandedQuestId
-    local ____temp_1
+    local ____temp_3
     if oldExpanded == questId then
-        ____temp_1 = nil
+        ____temp_3 = nil
     else
-        ____temp_1 = questId
+        ____temp_3 = questId
     end
-    self.expandedQuestId = ____temp_1
+    self.expandedQuestId = ____temp_3
     toggleExpandLocal(
         nil,
         self.precreatedListPool,
@@ -355,13 +360,13 @@ function TaskUI.prototype.getListControlContext(self)
             end
         end,
         getExpandedQuestId = function(____, ____type)
-            local ____temp_2
+            local ____temp_4
             if ____type == self.currentCategory then
-                ____temp_2 = self.expandedQuestId
+                ____temp_4 = self.expandedQuestId
             else
-                ____temp_2 = nil
+                ____temp_4 = nil
             end
-            return ____temp_2
+            return ____temp_4
         end
     }
 end
@@ -405,6 +410,10 @@ function ____exports.init(self)
     end
     taskUI:init()
 end
+--- 任务UI是全局单一UI，不需要在玩家英雄注册时创建。
+-- 保留此函数是为了兼容性，但不做任何操作。
+function ____exports.onPlayerHeroRegistered(_whichPlayer, _whichHero)
+end
 function ____exports.registerHotkey(self)
     if not ENABLE_TASK_UI_CLIENT then
         return
@@ -415,8 +424,7 @@ function ____exports.registerHotkey(self)
             registerKeyUpLocal = registerKeyUpLocal,
             KEY = KEY,
             KEY_NUM = KEY_NUM,
-            onClickSound = function() return taskUI:playLocalClickSound() end,
-            onTogglePanelLocal = function() return taskUI:togglePanel() end,
+            onTogglePanelLocal = dispatchTogglePanel,
             onSwitchCategoryLocal = function(____, ____type) return taskUI:switchCategory(____type) end
         }
     )

@@ -30,7 +30,8 @@ export let currentTaskRowClickSound: (() => void) | null = null;
 export const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number } | undefined> = {};
 
 const ROWS_PER_PAGE = 7;
-const ROWS_PER_SCROLL_STEP = 3;
+/** 相邻页在任务列表上错开的行数（原 3，改为 1 则每次翻页少滑一行） */
+const ROWS_PER_SCROLL_STEP = 1;
 const PAGE_VARIANT_COUNT = ROWS_PER_PAGE + 1;
 const TITLE_HEIGHT = LIST_ITEM_H * 0.38;
 const OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25;

@@ -8,23 +8,17 @@ function handleCategoryHotkey(self, _player, category)
     if not opts then
         return
     end
-    pcall(function ()
-            opts:onSwitchCategoryLocal(category)
-            opts:onClickSound()
-        end
-    )
+    opts:onSwitchCategoryLocal(category)
 end
 currentHotkeyOpts = nil
+--- 防止 `registerTaskUIHotkeys` 被调用多次时重复挂 J/K1–K3 触发器（会导致一次按键两次 toggle）
+local taskUIKeybindsInstalled = false
 local function handleTogglePanelHotkey(self, _player)
     local opts = currentHotkeyOpts
     if not opts then
         return
     end
-    pcall(function ()
-            opts:onTogglePanelLocal()
-            opts:onClickSound()
-        end
-    )
+    opts:onTogglePanelLocal()
 end
 local function handleMainCategoryHotkey(self, player)
     handleCategoryHotkey(nil, player, QuestType.MAIN)
@@ -44,6 +38,10 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         return
     end
     currentHotkeyOpts = opts
+    if taskUIKeybindsInstalled then
+        return
+    end
+    taskUIKeybindsInstalled = true
     registerKeyUpLocal(nil, KEY.J, handleTogglePanelHotkey)
     registerKeyUpLocal(nil, KEY_NUM.K1, handleMainCategoryHotkey)
     registerKeyUpLocal(nil, KEY_NUM.K2, handleSideCategoryHotkey)

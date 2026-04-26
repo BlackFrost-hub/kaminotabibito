@@ -1,5 +1,7 @@
 // 输入 233 时：打印 jass.japi keys，并附带键盘事件/类型测试
 const jass = require("jass.common") as any;
+import { registerKeyEventByCode } from "../../lib/扩展函数/封装函数/04．硬件输入/04．键盘函数";
+import { KEY_STATE } from "../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
 
 function dumpJapiKeys(): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;
@@ -88,13 +90,8 @@ function bindKeyBN_once_min(): void {
   }
   g.__keytest_bound = true;
 
-  const japi = require("jass.japi") as any;
-
-
-
   const bind = (key: number, label: string) => {
-    const trig = (jass as any).CreateTrigger();
-    japi.DzTriggerRegisterKeyEventByCode(trig, key, 1, false, () => {
+    registerKeyEventByCode(key, KEY_STATE.DOWN, false, () => {
       const msg = `[KEYOK] ${label} key=${tostring(key)} sync=false`;
       for (let i = 0; i < 12; i++) {
         (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 5, msg);

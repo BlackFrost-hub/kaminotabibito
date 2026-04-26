@@ -25,4 +25,18 @@ end
 function ____exports.createTriggerOrNull(self)
     return jass.CreateTrigger()
 end
+--- `sync=false` 的底层注册在本项目环境里必须先包一层本地玩家判断。
+-- 
+-- - 传 `playerId`：只对该本地玩家执行注册
+-- - 不传 `playerId`：任意本地玩家都执行注册
+function ____exports.runFalseLocalRegistration(self, register, playerId)
+    local lp = jass.GetLocalPlayer()
+    if lp == nil then
+        return
+    end
+    if playerId ~= nil and jass.GetPlayerId(lp) ~= playerId then
+        return
+    end
+    register(nil)
+end
 return ____exports

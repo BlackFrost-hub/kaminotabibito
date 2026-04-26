@@ -1,19 +1,19 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- DZ/JAPI 硬件函数封装（键盘/鼠标/窗口/UI Frame）
+--- 核心系统 - 硬件函数
 -- 
--- 与 `lib/扩展函数/封装函数/04．硬件输入` 保持一致：
--- TSTL 会把「japi 表取出再赋给局部变量调用」编成多传 nil 首参，导致 DzFrameSetScriptByCode / 键鼠注册等参数错位。
--- 因此一律 `japi.DzXxx(...)` 直接点号调用，禁止本文件内再写 japiFn 模式。
+-- 与 `lib/扩展函数/封装函数/04．硬件输入/*` 保持同一契约：
+-- - `*Trg`：按同步入口处理，不包本地玩家判断
+-- - `*ByCode(..., false)` / `DzFrameSetScriptByCode(..., false)`：
+--   必须走 `runFalseLocalRegistration(...)`，并支持可选 `playerId`
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
 local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
---- 按键状态（DzTriggerRegisterKeyEventTrg：1=按下，0=抬起）
+local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.02．内部工具")
+local runFalseLocalRegistration = ____require_result_1.runFalseLocalRegistration
 ____exports.KEY_STATE = {DOWN = 1, UP = 0}
---- 鼠标按键（BzAPI：1=左，2=右，3=中）
 ____exports.MOUSE_BUTTON = {LEFT = 1, RIGHT = 2, MIDDLE = 3}
---- A-Z
 ____exports.KEY = {
     A = 65,
     B = 66,
@@ -42,7 +42,6 @@ ____exports.KEY = {
     Y = 89,
     Z = 90
 }
---- F1-F12
 ____exports.KEY_F = {
     F1 = 112,
     F2 = 113,
@@ -57,9 +56,7 @@ ____exports.KEY_F = {
     F11 = 122,
     F12 = 123
 }
---- 字母键（兼容旧代码，推荐使用 KEY）
 ____exports.KEY_LETTER = ____exports.KEY
---- 0-9
 ____exports.KEY_NUM = {
     K0 = 48,
     K1 = 49,
@@ -130,7 +127,6 @@ local function keyCodeToTrgChar(self, keyCode)
     end
     return ""
 end
---- F1–F12、Tab、OEM 区（含 ~ =192）：与 JASS 一致用 VK 数字，勿用 string.char（F2→q、Tab→控制符、192→与引擎不一致）。
 local function registerKeyBindToTrigger(self, trig, status, keyCode)
     if keyCode >= 112 and keyCode <= 123 then
         DzTriggerRegisterKeyEventTrg(nil, trig, status, keyCode)
@@ -161,22 +157,26 @@ local function registerKeyBindToTrigger(self, trig, status, keyCode)
         end
     end
 end
---- sync=false 时走 ByCode(..., false)，仅本机触发，避免纯 UI 热键走全房 sync。
-local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action)
+local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action, playerId)
     if type(japi.DzTriggerRegisterKeyEventByCode) ~= "function" then
         registerKeyBindToTrigger(nil, trig, status, keyCode)
         return
     end
-    japi.DzTriggerRegisterKeyEventByCode(
-        trig,
-        keyCode,
-        status,
-        false,
-        action
+    runFalseLocalRegistration(
+        nil,
+        function()
+            japi.DzTriggerRegisterKeyEventByCode(
+                trig,
+                keyCode,
+                status,
+                false,
+                action
+            )
+        end,
+        playerId
     )
 end
---- 注册按键事件（by code）。sync=true 全房回调；sync=false 仅本机（与 `封装函数/04．硬件输入/04．键盘函数` 一致）。
-function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
+function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
     if not trig then
         return nil
@@ -190,45 +190,52 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action)
             trig,
             status,
             keyCode,
-            action
+            action,
+            playerId
         )
     end
     return trig
 end
-function ____exports.registerKeyDown(self, keyCode, callback)
+function ____exports.registerKeyDown(self, keyCode, callback, playerId)
     return ____exports.registerKeyEventByCode(
         nil,
         keyCode,
         ____exports.KEY_STATE.DOWN,
         false,
         function()
-            local p = japi.DzGetTriggerKeyPlayer()
-            local k = japi.DzGetTriggerKey()
-            callback(nil, p, k)
-        end
+            callback(
+                nil,
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
+            )
+        end,
+        playerId
     )
 end
-function ____exports.registerKeyUp(self, keyCode, callback)
+function ____exports.registerKeyUp(self, keyCode, callback, playerId)
     return ____exports.registerKeyEventByCode(
         nil,
         keyCode,
         ____exports.KEY_STATE.UP,
         false,
         function()
-            local p = japi.DzGetTriggerKeyPlayer()
-            local k = japi.DzGetTriggerKey()
-            callback(nil, p, k)
-        end
+            callback(
+                nil,
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
+            )
+        end,
+        playerId
     )
 end
---- 仅用于测试：允许传原始 status 数值（0/1/2）
-function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, action)
+function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, action, playerId)
     return ____exports.registerKeyEventByCode(
         nil,
         keyCode,
         status,
         sync,
-        action
+        action,
+        playerId
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
@@ -240,12 +247,22 @@ end
 function ____exports.getWheelDelta(self)
     return japi.DzGetWheelDelta()
 end
-function ____exports.registerMouseWheel(self, sync, action)
+function ____exports.registerMouseWheel(self, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
     if not trig then
         return nil
     end
-    japi.DzTriggerRegisterMouseWheelEventByCode(trig, sync, action)
+    if sync then
+        japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
+    else
+        runFalseLocalRegistration(
+            nil,
+            function()
+                japi.DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
+            end,
+            playerId
+        )
+    end
     return trig
 end
 function ____exports.getWindowWidth(self)
@@ -269,12 +286,20 @@ end
 function ____exports.frameFindByName(self, name, id)
     return japi.DzFrameFindByName(name, id)
 end
---- 获取鼠标当前悬停的帧
 function ____exports.getMouseFocus(self)
     return japi.DzGetMouseFocus()
 end
---- UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...），参数顺序与原生一致
-function ____exports.frameSetScriptByCode(self, frame, eventId, action, sync)
-    japi.DzFrameSetScriptByCode(frame, eventId, action, sync)
+function ____exports.frameSetScriptByCode(self, frame, eventId, action, sync, playerId)
+    if sync then
+        japi.DzFrameSetScriptByCode(frame, eventId, action, true)
+        return
+    end
+    runFalseLocalRegistration(
+        nil,
+        function()
+            japi.DzFrameSetScriptByCode(frame, eventId, action, false)
+        end,
+        playerId
+    )
 end
 return ____exports

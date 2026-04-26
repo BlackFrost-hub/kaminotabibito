@@ -101,7 +101,21 @@ export function isWheelTargetForTaskList(
   if (listContainer && (f === listContainer || isDescendantOf(japi, f, listContainer))) return true;
   if (scrollBarFrame && (f === scrollBarFrame || isDescendantOf(japi, f, scrollBarFrame))) return true;
   if (scrollThumbFrame && (f === scrollThumbFrame || isDescendantOf(japi, f, scrollThumbFrame))) return true;
-  if (scrollThumbHitBtn && f === scrollThumbHitBtn) return true;
+  if (scrollThumbHitBtn && (f === scrollThumbHitBtn || isDescendantOf(japi, f, scrollThumbHitBtn))) return true;
+  return false;
+}
+
+/** 分页滑块 thumb / 透明命中键（及子帧）：供全局鼠标拖拽判定（不含整条轨道） */
+export function isTaskScrollThumbDragHit(
+  japi: any,
+  getMouseFocus: (() => number) | undefined,
+  scrollThumbFrame: number | null,
+  scrollThumbHitBtn: number | null
+): boolean {
+  const f = typeof getMouseFocus === "function" ? getMouseFocus() : 0;
+  if (!f || f === 0) return false;
+  if (scrollThumbHitBtn && (f === scrollThumbHitBtn || isDescendantOf(japi, f, scrollThumbHitBtn))) return true;
+  if (scrollThumbFrame && (f === scrollThumbFrame || isDescendantOf(japi, f, scrollThumbFrame))) return true;
   return false;
 }
 

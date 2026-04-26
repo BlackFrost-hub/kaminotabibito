@@ -118,9 +118,9 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。
 
 3. **thumb 位置与「跟手」拖拽**：`syncScrollThumb` 里用的 **竖直可移动行程**（如 `LIST_VIEW_H - thumbSize ± 补偿` 的 **safeRange 归一化高度**）必须与 **拖拽时 `dy`→`scrollOffset` 用的轨道像素高度** 同源；换算：  
-   **`trackPx ≈ DzGetClientHeight() * safeRangeNorm / 0.6`**（与工程里竖向 **0.6** UI 坐标一致，同 `PY` 思路）。**禁止**用 `windowHeight * 随意常数`（如 `0.35`）当轨道高，否则会与滑块不同步。
+   **`trackPx ≈ DzGetClientHeight() * safeRangeNorm / 0.6`**（与工程里竖向 **0.6** UI 坐标一致，同 `PY` 思路；实现见 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `getScrollbarTrackThumbTravelPx`**）。**禁止**用 `windowHeight * 随意常数`（如 `0.35`）当轨道高，否则会与滑块不同步。
 
-4. **全局鼠标注册（拖拽）**：`DzTriggerRegisterMouseEventByCode` **必须** `japi.DzTriggerRegisterMouseEventByCode(trig, …)` **直接调用**，禁止 `const reg = japi.xxx; reg(trig,…)`（TSTL 易编成 **`reg(nil, trig,…)`** → `key=0` / `errjhw(333)`）。参数顺序与 `war3map.j` 里 **`DzTriggerRegisterMouseEventTrg(trg, status, btn)` → 原生 `(btn, status)`** 一致；左键按下 **`(1,1)`**，左键释放 **`(1,0)`**（以本图 JASS 为准）。
+4. **全局鼠标注册（拖拽）**：业务侧禁止裸调 `DzTriggerRegisterMouseEventByCode` / `DzTriggerRegisterMouseMoveEventByCode`；统一用 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `registerMouseButtonEventByCode`**、**`registerMouseMoveEventByCode`**（与 **`registerMouseWheel`** 同契约：`sync=false` 时内部走 **`runFalseLocalRegistration`**；`sync=true` 时点号直调 native）。禁止 `const reg = japi.xxx; reg(…)`。左键参数：原生 **`(btn, status)`**；本图约定按下 **`(1,1)`**、释放 **`(1,0)`**。
 
 5. **Frame 脚本 eventId**：拖拽起点用 **`MOUSE_DOWN`（工程里常量为 `5`）**，不是 **`MOUSE_CLICK`（`1`）**。参考 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType`。
 

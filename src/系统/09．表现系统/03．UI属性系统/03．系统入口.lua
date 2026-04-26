@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local refreshAllUi, registerKey, registerDamagePanelHotkeys, registerFocusHotkeys, startRefreshLoop, jass, _____786C_4EF6_51FD_6570, _____4E2D_5FC3_8BA1_65F6_5668, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, showDamagePanel, updateDamagePanel, updateDetailPanels, ____Star_6269_5C55_5E93, initialized, refreshAccumulator, startupTickHandler
+local refreshAllUi, registerKey, dispatchTabKey, registerDamagePanelHotkeys, dispatchFocusHotkey, registerFocusHotkeys, startRefreshLoop, jass, _____786C_4EF6_51FD_6570, _____4E2D_5FC3_8BA1_65F6_5668, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, showDamagePanel, updateDamagePanel, updateDetailPanels, ____Star_6269_5C55_5E93, initialized, refreshAccumulator, startupTickHandler
 function refreshAllUi()
     updateDamagePanel()
     updateDetailPanels()
@@ -8,26 +8,38 @@ end
 function registerKey(status, keyCode, action)
     _____786C_4EF6_51FD_6570:registerKeyEventRawStatus(keyCode, status, true, action)
 end
+function dispatchTabKey(show)
+    if _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() ~= jass.GetLocalPlayer() then
+        return
+    end
+    showDamagePanel(show)
+end
 function registerDamagePanelHotkeys()
     registerKey(
         _____5E38_91CF.KEY_EVENT_DOWN,
         _____5E38_91CF.KEY_TAB,
-        function()
-            if _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() ~= jass.GetLocalPlayer() then
-                return
-            end
-            showDamagePanel(true)
-        end
+        function() return dispatchTabKey(true) end
     )
     registerKey(
         _____5E38_91CF.KEY_EVENT_UP,
         _____5E38_91CF.KEY_TAB,
-        function()
-            if _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() ~= jass.GetLocalPlayer() then
-                return
-            end
-            showDamagePanel(false)
-        end
+        function() return dispatchTabKey(false) end
+    )
+end
+function dispatchFocusHotkey(keyCode)
+    local p = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer()
+    if p == nil then
+        return
+    end
+    local hero = focusHeroByFunctionKey(keyCode)
+    if hero == nil then
+        return
+    end
+    ____Star_6269_5C55_5E93:StarOther_PanCameraToTimedForPlayer(
+        p,
+        jass.GetUnitX(hero),
+        jass.GetUnitY(hero),
+        0.05
     )
 end
 function registerFocusHotkeys()
@@ -38,22 +50,7 @@ function registerFocusHotkeys()
             registerKey(
                 _____5E38_91CF.KEY_EVENT_UP,
                 functionKey,
-                function()
-                    local p = _____786C_4EF6_51FD_6570:getTriggerKeyPlayer()
-                    if p == nil then
-                        return
-                    end
-                    local hero = focusHeroByFunctionKey(functionKey)
-                    if hero == nil then
-                        return
-                    end
-                    ____Star_6269_5C55_5E93:StarOther_PanCameraToTimedForPlayer(
-                        p,
-                        jass.GetUnitX(hero),
-                        jass.GetUnitY(hero),
-                        0.05
-                    )
-                end
+                function() return dispatchFocusHotkey(functionKey) end
             )
             i = i + 1
         end
@@ -95,6 +92,7 @@ _____5E38_91CF = require("系统.09．表现系统.03．UI属性系统.00．常�
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
 createUiFrames = ____require_result_0.createUiFrames
 focusHeroByFunctionKey = ____require_result_0.focusHeroByFunctionKey
+local _onPlayerHeroRegistered = ____require_result_0.onPlayerHeroRegistered
 showDamagePanel = ____require_result_0.showDamagePanel
 updateDamagePanel = ____require_result_0.updateDamagePanel
 updateDetailPanels = ____require_result_0.updateDetailPanels
@@ -124,6 +122,13 @@ local function scheduleUiStartup()
 end
 function ____exports.isUiAttributeSystemEnabled()
     return _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED
+end
+--- 玩家英雄注册回调。
+-- 由玩家系统调用，每注册一个玩家英雄就创建一个UI槽位。
+function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
+    if type(_onPlayerHeroRegistered) == "function" then
+        _onPlayerHeroRegistered(whichPlayer, whichHero)
+    end
 end
 if _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED then
     scheduleUiStartup()

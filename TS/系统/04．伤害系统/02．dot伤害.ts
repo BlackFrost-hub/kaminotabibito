@@ -200,10 +200,9 @@ function getDotStateByTypeId(typeId: string, unit: any): DotState | null {
   const tab = (stateByType as any)[typeId];
   if (tab == null || unit == null || unit === 0) return null;
   const h = unitHid(unit);
-  const raw = h !== 0 ? tabRowForHid(tab, h) : null;
-  if (raw != null) return isValidDotStateRow(raw) ? (raw as DotState) : null;
-  const u = tab[unit];
-  return u != null && isValidDotStateRow(u) ? (u as DotState) : null;
+  if (h === 0) return null;
+  const raw = tabRowForHid(tab, h);
+  return raw != null && isValidDotStateRow(raw) ? (raw as DotState) : null;
 }
 
 /** 供治疗等系统读取：单位当前反恢复状态，无则返回 null */

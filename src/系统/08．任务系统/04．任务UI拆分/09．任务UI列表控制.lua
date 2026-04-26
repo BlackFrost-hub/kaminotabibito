@@ -59,7 +59,8 @@ ____exports.currentTaskRowExpandHandler = nil
 ____exports.currentTaskRowClickSound = nil
 ____exports.taskRowBindingByFrameId = {}
 local ROWS_PER_PAGE = 7
-local ROWS_PER_SCROLL_STEP = 3
+--- 相邻页在任务列表上错开的行数（原 3，改为 1 则每次翻页少滑一行）
+local ROWS_PER_SCROLL_STEP = 1
 local PAGE_VARIANT_COUNT = ROWS_PER_PAGE + 1
 local TITLE_HEIGHT = LIST_ITEM_H * 0.38
 local OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25

@@ -192,6 +192,25 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       }
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
+
+      // 拖拽命中层：thumb 本体在部分环境下不稳定接收焦点，补一层透明 GLUETEXTBUTTON 作为统一命中目标。
+      scrollThumbHitBtn =
+        createFrame({
+          type: FrameType.GLUETEXTBUTTON,
+          name: "TaskScrollThumbHitBtn",
+          parent: mainPanel,
+          template: "template",
+          visible: true,
+          enable: true,
+          alpha: 0,
+        }) ?? 0;
+      if (scrollThumbHitBtn && scrollThumbHitBtn !== 0) {
+        setupTransparentGlueHitLayer(scrollThumbFrame, scrollThumbHitBtn);
+        if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbHitBtn, 121);
+        if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbHitBtn, true);
+      } else {
+        scrollThumbHitBtn = null;
+      }
     }
   }
 

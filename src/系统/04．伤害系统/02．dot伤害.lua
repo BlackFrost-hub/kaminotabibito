@@ -157,18 +157,11 @@ local function getDotStateByTypeId(self, typeId, unit)
         return nil
     end
     local h = unitHid(nil, unit)
-    local ____temp_2
-    if h ~= 0 then
-        ____temp_2 = tabRowForHid(nil, tab, h)
-    else
-        ____temp_2 = nil
+    if h == 0 then
+        return nil
     end
-    local raw = ____temp_2
-    if raw ~= nil then
-        return isValidDotStateRow(nil, raw) and raw or nil
-    end
-    local u = tab[unit]
-    return u ~= nil and isValidDotStateRow(nil, u) and u or nil
+    local raw = tabRowForHid(nil, tab, h)
+    return raw ~= nil and isValidDotStateRow(nil, raw) and raw or nil
 end
 --- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
 function ____exports.getUnitAntiHeal(self, unit)

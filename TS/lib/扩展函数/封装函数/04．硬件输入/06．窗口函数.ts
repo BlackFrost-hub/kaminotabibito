@@ -28,3 +28,7 @@ export function getWindowY(): number {
 export function isWindowActive(): boolean {
   return !!japi.DzIsWindowActive();
 }
+
+export function getClientHeight(): number {
+  return japi.DzGetClientHeight?.() || 0;
+}

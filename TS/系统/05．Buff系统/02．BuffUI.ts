@@ -113,11 +113,31 @@ interface SlotFrames {
 }
 
 const slots: SlotFrames[] = [];
-const lastTipStrBySlot: string[] = [];
-const lastRemainStrBySlot: string[] = [];
-const slotHovering: boolean[] = [];
 let refreshTimer: any = undefined;
 let buffUiInitialized = false;
+
+/** 从帧获取当前文本，用于比较是否需要更新（避免本地table状态） */
+function getFrameText(frame: number): string {
+  if (!frame || frame === 0) return "";
+  try {
+    return (japi as any).DzFrameGetText(frame) || "";
+  } catch (e) {
+    return "";
+  }
+}
+
+// 命名函数：用于 setFrameHoverEvents 回调
+function onSlotEnter(index: number): void {
+  const s = slots[index];
+  if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.showFrame(s.tipBox));
+  if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.showFrame(s.tipText));
+}
+
+function onSlotLeave(index: number): void {
+  const s = slots[index];
+  if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipText));
+  if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipBox));
+}
 
 export let BUFF_UI_DEBUG = false;
 let lastBuffUiDbgKey = "";
@@ -200,9 +220,6 @@ function collectBuffRows(unit: any): BuffBarRow[] {
 function hideSlot(i: number): void {
   const s = slots[i];
   if (s == null) return;
-  slotHovering[i] = false;
-  lastTipStrBySlot[i] = "";
-  lastRemainStrBySlot[i] = "";
   if (s.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipText));
   if (s.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipBox));
   if (s.hit !== 0) (pcall as any)(() => UI工具.hideFrame(s.hit));
@@ -282,24 +299,21 @@ function syncBuffBar(): void {
             "」|r";
       (pcall as any)(() => UI工具.setFrameTexture(slot.root, iconTex));
       const remStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
+      const remTextFormatted = "|cffffffff" + remStr + "|r";
+      // 使用帧本身存储的文本进行比较，避免本地table状态
       if (slot.remainText && slot.remainText !== 0) {
-        if (lastRemainStrBySlot[i] !== remStr) {
-          lastRemainStrBySlot[i] = remStr;
-          (pcall as any)(() => (japi as any).DzFrameSetText(slot.remainText, "|cffffffff" + remStr + "|r"));
+        if (getFrameText(slot.remainText) !== remTextFormatted) {
+          (pcall as any)(() => (japi as any).DzFrameSetText(slot.remainText, remTextFormatted));
         }
       }
       if (slot.tipText && slot.tipText !== 0) {
-        if (lastTipStrBySlot[i] !== tipStr) {
-          lastTipStrBySlot[i] = tipStr;
+        if (getFrameText(slot.tipText) !== tipStr) {
           (pcall as any)(() => (japi as any).DzFrameSetText(slot.tipText, tipStr));
         }
       }
       (pcall as any)(() => UI工具.showFrame(slot.root));
       if (slot.hit !== 0) (pcall as any)(() => UI工具.showFrame(slot.hit));
-      if (!slotHovering[i]) {
-        if (slot.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(slot.tipBox));
-        if (slot.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(slot.tipText));
-      }
+      // tooltip 显示状态由 hover 事件控制，不需要本地状态数组
     }
   });
 }
@@ -357,18 +371,8 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
       (pcall as any)(() => (japi as any).DzFrameSetLevel(hit, 181));
       (pcall as any)(() => UI工具.setFrameHoverEvents(
         hit,
-        () => {
-          slotHovering[index] = true;
-          const s = slots[index];
-          if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.showFrame(s.tipBox));
-          if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.showFrame(s.tipText));
-        },
-        () => {
-          slotHovering[index] = false;
-          const s = slots[index];
-          if (s != null && s.tipText !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipText));
-          if (s != null && s.tipBox !== 0) (pcall as any)(() => UI工具.hideFrame(s.tipBox));
-        },
+        () => onSlotEnter(index),
+        () => onSlotLeave(index),
         false
       ));
     }
@@ -432,21 +436,13 @@ function createOneSlot(index: number, parent: number): SlotFrames | null {
 }
 
 function createUi(): void {
-  (pcall as any)(() => {
-    const lp = jass.GetLocalPlayer();
-    if (lp == null || lp === 0) return;
-    const parent = 硬件函数.getGameUI();
-    if (parent === 0 || parent == null) return;
-    for (let j = 0; j < MAX_SLOTS; j++) {
-      lastTipStrBySlot[j] = "";
-      lastRemainStrBySlot[j] = "";
-      slotHovering[j] = false;
-    }
-    for (let i = 0; i < MAX_SLOTS; i++) {
-      const s = createOneSlot(i, parent);
-      if (s != null) slots[i] = s;
-    }
-  });
+  // 同步创建帧（所有玩家执行）
+  const parent = 硬件函数.getGameUI();
+  if (parent === 0 || parent == null) return;
+  for (let i = 0; i < MAX_SLOTS; i++) {
+    const s = createOneSlot(i, parent);
+    if (s != null) slots[i] = s;
+  }
 }
 
 let _refreshTimer: any = null;
@@ -466,17 +462,24 @@ function startRefreshTimer(): void {
 }
 
 export function init(): void {
+  // 不再自动初始化，改为通过 onPlayerHeroRegistered 按需初始化
+}
+
+/**
+ * 玩家英雄注册回调。
+ * 为注册英雄的玩家创建BuffUI。
+ */
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
   if (buffUiInitialized) return;
   buffUiInitialized = true;
-  
+
   (pcall as any)(() => {
     const delayTimer = jass.CreateTimer();
     jass.TimerStart(delayTimer, 1.0, false, () => {
       (pcall as any)(() => {
-        const lp = jass.GetLocalPlayer();
-        if (lp != null && lp !== 0) {
-          createUi();
-        }
+        // 所有客户端都执行UI创建（避免desync）
+        createUi();
+        // 所有客户端都启动周期计时器（避免desync）
         startRefreshTimer();
         jass.DestroyTimer(delayTimer);
       });

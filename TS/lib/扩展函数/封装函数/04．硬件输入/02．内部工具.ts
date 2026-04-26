@@ -30,3 +30,16 @@ export function isHardwareAPIAvailable(): boolean {
 export function createTriggerOrNull(): any {
   return (jass as any).CreateTrigger();
 }
+
+/**
+ * `sync=false` 的底层注册在本项目环境里必须先包一层本地玩家判断。
+ *
+ * - 传 `playerId`：只对该本地玩家执行注册
+ * - 不传 `playerId`：任意本地玩家都执行注册
+ */
+export function runFalseLocalRegistration(register: () => void, playerId?: number): void {
+  const lp = jass.GetLocalPlayer();
+  if (lp == null) return;
+  if (playerId != null && jass.GetPlayerId(lp) !== playerId) return;
+  register();
+}

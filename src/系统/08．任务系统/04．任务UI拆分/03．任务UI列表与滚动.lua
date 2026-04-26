@@ -121,7 +121,21 @@ function ____exports.isWheelTargetForTaskList(self, japi, getMouseFocus, listCon
     if scrollThumbFrame and (f == scrollThumbFrame or ____exports.isDescendantOf(nil, japi, f, scrollThumbFrame)) then
         return true
     end
-    if scrollThumbHitBtn and f == scrollThumbHitBtn then
+    if scrollThumbHitBtn and (f == scrollThumbHitBtn or ____exports.isDescendantOf(nil, japi, f, scrollThumbHitBtn)) then
+        return true
+    end
+    return false
+end
+--- 分页滑块 thumb / 透明命中键（及子帧）：供全局鼠标拖拽判定（不含整条轨道）
+function ____exports.isTaskScrollThumbDragHit(self, japi, getMouseFocus, scrollThumbFrame, scrollThumbHitBtn)
+    local f = type(getMouseFocus) == "function" and getMouseFocus(nil) or 0
+    if not f or f == 0 then
+        return false
+    end
+    if scrollThumbHitBtn and (f == scrollThumbHitBtn or ____exports.isDescendantOf(nil, japi, f, scrollThumbHitBtn)) then
+        return true
+    end
+    if scrollThumbFrame and (f == scrollThumbFrame or ____exports.isDescendantOf(nil, japi, f, scrollThumbFrame)) then
         return true
     end
     return false
@@ -167,7 +181,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue45
+                    goto __continue49
                 end
                 local expanded = isExpanded(nil, q.id)
                 local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
@@ -184,7 +198,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                 end
                 rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
-            ::__continue45::
+            ::__continue49::
             i = i + 1
         end
     end
@@ -255,11 +269,11 @@ function ____exports.refreshTaskUIList(self, opts)
             do
                 local row = visibleRows[i + 1]
                 if not row then
-                    goto __continue54
+                    goto __continue58
                 end
                 createListItem(nil, row.quest, row.rowTopRel, row.expanded)
             end
-            ::__continue54::
+            ::__continue58::
             i = i + 1
         end
     end

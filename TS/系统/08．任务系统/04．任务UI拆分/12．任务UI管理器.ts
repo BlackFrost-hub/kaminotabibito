@@ -43,7 +43,17 @@ import { ENABLE_TASK_UI_CLIENT } from "./01．任务UI常量";
 
 // ── 模块级分发变量（避免匿名闭包进 JASS 回调） ──
 let mgr: TaskUI | null = null;
-function dispatchTogglePanel(): void { if (mgr) mgr.togglePanel(); }
+let clickSoundCallback: (() => void) | null = null;
+
+// 统一的面板切换回调（键盘 J 键和鼠标点击入口图标共用）
+function dispatchTogglePanel(): void {
+  if (!mgr) return;
+  (pcall as any)(() => {
+    mgr!.togglePanel();
+    clickSoundCallback?.();
+  });
+}
+
 function dispatchRefresh(): void { if (mgr) mgr.rebuildPages(); }
 
 class TaskUI {
@@ -83,11 +93,12 @@ class TaskUI {
   }
 
   private createEntryIcon(parent: number): void {
+    // 设置音效回调，供 dispatchTogglePanel 使用
+    clickSoundCallback = () => this.playLocalClickSound();
     const res = buildTaskEntryIcon({
       japi, parent, FrameType, FramePoint, createFrame, createTextLabel,
       setFramePosition, setFrameSize, setFramePointRelative, setFrameClickEvent,
       applyDzTextFontAndCenterAlignment,
-      onClickSound: () => this.playLocalClickSound(),
       onTogglePanel: dispatchTogglePanel,
     });
     this.entryFrame = res.entryFrame;
@@ -255,16 +266,27 @@ const taskUI = new TaskUI();
 export { taskUI };
 
 export function init(): void {
+  // 任务UI是全局单一UI，在init时直接初始化
   if (!ENABLE_TASK_UI_CLIENT) return;
   taskUI.init();
+}
+
+// 热键不在此模块顶层注册：与 `系统.08．任务系统.10．index` 中 `registerHotkey()` 重复会导致同一键挂两个触发器，一次松键 toggle 两次（J「无效」）。
+// 由 `10．index` 在 `require("…03．任务UI")` 之后统一调用 `registerHotkey()`；`05．任务UI热键` 内另有 `taskUIKeybindsInstalled` 防重复。
+
+/**
+ * 任务UI是全局单一UI，不需要在玩家英雄注册时创建。
+ * 保留此函数是为了兼容性，但不做任何操作。
+ */
+export function onPlayerHeroRegistered(this: void, _whichPlayer: any, _whichHero: any): void {
+  // 任务UI是全局单一UI，所有玩家共享，不需要按玩家创建
 }
 
 export function registerHotkey(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
   registerTaskUIHotkeys({
     registerKeyUpLocal, KEY, KEY_NUM,
-    onClickSound: () => taskUI.playLocalClickSound(),
-    onTogglePanelLocal: () => taskUI.togglePanel(),
+    onTogglePanelLocal: dispatchTogglePanel,
     onSwitchCategoryLocal: (type: QuestType) => taskUI.switchCategory(type),
   });
 }

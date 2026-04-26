@@ -83,6 +83,7 @@ if (ENABLE_QUEST_RUNTIME_CORE) {
 if (ENABLE_QUEST_UI_MODULE) {
   const 任务UI = require("系统.08．任务系统.03．任务UI") as { init?: () => void; registerHotkey?: () => void };
   if (typeof 任务UI.init === "function") 任务UI.init();
+  // 仅此一处注册 J/K1–K3：`12．任务UI管理器` 顶层不再 register，避免同一键叠两个 Dz 回调导致一次松键 toggle 两次。
   if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
   // 03 已静态依赖 04 各子模块；无需再 require 04.index，避免将来在 index 里加顶层副作用时重复执行
 }

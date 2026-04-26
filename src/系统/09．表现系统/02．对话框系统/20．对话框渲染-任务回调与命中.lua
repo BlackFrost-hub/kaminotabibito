@@ -362,9 +362,7 @@ function ____exports.initSkipKeyListener(self)
         KEY_SKIP_DIALOG,
         KEY_STATE.DOWN,
         true,
-        function()
-            skipDialogLocal(nil)
-        end
+        skipDialogLocal
     )
 end
 function ____exports.bindQuestSyncHandlersImpl(self, state)
@@ -375,30 +373,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch64 = state.playerId
-        local ____cond64 = ____switch64 == 0
-        if ____cond64 then
+        local ____switch63 = state.playerId
+        local ____cond63 = ____switch63 == 0
+        if ____cond63 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond64 = ____cond64 or ____switch64 == 1
-        if ____cond64 then
+        ____cond63 = ____cond63 or ____switch63 == 1
+        if ____cond63 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond64 = ____cond64 or ____switch64 == 2
-        if ____cond64 then
+        ____cond63 = ____cond63 or ____switch63 == 2
+        if ____cond63 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond64 = ____cond64 or ____switch64 == 3
-        if ____cond64 then
+        ____cond63 = ____cond63 or ____switch63 == 3
+        if ____cond63 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

@@ -249,9 +249,7 @@ export function initSkipKeyListener(): void {
   g_skipKeyInitialized = true;
   // sync=true：全房回调都用触发玩家（DzGetTriggerKeyPlayer）定位 state，所有客户端对称修改。
   // 禁止在 sync=true 回调里调用 DzClickFrame（会导致每客户端各触发一次重复点击）。
-  registerKeyEventByCode(KEY_SKIP_DIALOG, KEY_STATE.DOWN, true, () => {
-    skipDialogLocal();
-  });
+  registerKeyEventByCode(KEY_SKIP_DIALOG, KEY_STATE.DOWN, true, skipDialogLocal);
 }
 
 export function bindQuestSyncHandlersImpl(state: PlayerDialogState): void {

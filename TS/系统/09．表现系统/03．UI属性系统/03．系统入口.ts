@@ -36,12 +36,14 @@ const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量
 const {
   createUiFrames,
   focusHeroByFunctionKey,
+  onPlayerHeroRegistered: _onPlayerHeroRegistered,
   showDamagePanel,
   updateDamagePanel,
   updateDetailPanels,
 } = require("系统.09．表现系统.03．UI属性系统.02．面板渲染") as {
   createUiFrames: (this: void) => void;
   focusHeroByFunctionKey: (this: void, functionKey: number) => any;
+  onPlayerHeroRegistered: (this: void, whichPlayer: any, whichHero: any) => void;
   showDamagePanel: (this: void, visible: boolean) => void;
   updateDamagePanel: (this: void) => void;
   updateDetailPanels: (this: void) => void;
@@ -72,34 +74,39 @@ function registerKey(status: number, keyCode: number, action: () => void): void 
   硬件函数.registerKeyEventRawStatus(keyCode, status, true, action);
 }
 
+/** 模块级分发函数：Tab 键显示/隐藏伤害统计（避免匿名闭包） */
+function dispatchTabKey(show: boolean): void {
+  if (硬件函数.getTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
+  showDamagePanel(show);
+}
+
 /**
  * 注册 Tab 显示/隐藏伤害统计。
+ * 使用命名函数 dispatchTabKey 避免匿名闭包进 JASS 回调。
  */
 function registerDamagePanelHotkeys(): void {
-  registerKey(常量.KEY_EVENT_DOWN, 常量.KEY_TAB, () => {
-    if (硬件函数.getTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
-    showDamagePanel(true);
-  });
-  registerKey(常量.KEY_EVENT_UP, 常量.KEY_TAB, () => {
-    if (硬件函数.getTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
-    showDamagePanel(false);
-  });
+  registerKey(常量.KEY_EVENT_DOWN, 常量.KEY_TAB, () => dispatchTabKey(true));
+  registerKey(常量.KEY_EVENT_UP, 常量.KEY_TAB, () => dispatchTabKey(false));
+}
+
+/** 模块级分发函数：F2-F6 跳镜头统一入口（避免匿名闭包） */
+function dispatchFocusHotkey(keyCode: number): void {
+  const p = 硬件函数.getTriggerKeyPlayer();
+  if (p == null) return;
+  const hero = focusHeroByFunctionKey(keyCode);
+  if (hero == null) return;
+  // 与 `属性查看.j` 一致：只按 DzGetTriggerKeyPlayer 平移镜头，勿用 GetLocalPlayer 兜底（会偏离按键所属玩家）。
+  Star扩展库.StarOther_PanCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
 }
 
 /**
  * 注册 F2-F6 跳镜头。
+ * 使用命名函数 dispatchFocusHotkey 避免匿名闭包进 JASS 回调。
  */
 function registerFocusHotkeys(): void {
   for (let i = 0; i < 常量.KEY_F.length; i++) {
     const functionKey = 常量.KEY_F[i];
-    registerKey(常量.KEY_EVENT_UP, functionKey, () => {
-      const p = 硬件函数.getTriggerKeyPlayer();
-      if (p == null) return;
-      const hero = focusHeroByFunctionKey(functionKey);
-      if (hero == null) return;
-      // 与 `属性查看.j` 一致：只按 DzGetTriggerKeyPlayer 平移镜头，勿用 GetLocalPlayer 兜底（会偏离按键所属玩家）。
-      Star扩展库.StarOther_PanCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
-    });
+    registerKey(常量.KEY_EVENT_UP, functionKey, () => dispatchFocusHotkey(functionKey));
   }
 }
 
@@ -150,6 +157,16 @@ export function initUiAttributeSystem(): void {
 
 export function isUiAttributeSystemEnabled(): boolean {
   return 常量.UI_ATTRIBUTE_SYSTEM_ENABLED;
+}
+
+/**
+ * 玩家英雄注册回调。
+ * 由玩家系统调用，每注册一个玩家英雄就创建一个UI槽位。
+ */
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
+  if (typeof _onPlayerHeroRegistered === "function") {
+    _onPlayerHeroRegistered(whichPlayer, whichHero);
+  }
 }
 
 if (常量.UI_ATTRIBUTE_SYSTEM_ENABLED) {

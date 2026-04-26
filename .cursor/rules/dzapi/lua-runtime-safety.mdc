@@ -5,14 +5,25 @@ alwaysApply: false
 
 # Lua 运行时安全代码
 
-## 用途
+## 与 `lua-gc-desync-heuristics.mdc` 的分工
 
-在项目入口 Lua 文件（如 `main.lua` 或 `init.lua`）中加载，提供以下保护：
+- **前者**：联机异步/GC 的**经验与约束**（同步创建·异步显示、少匿名闭包进 JASS、`pairs`/table key、`jass.runtime.handle_level` 最小化等）。
+- **本文件**：仅保留**入口可粘贴的一整段 Lua**（全局替换 `pairs`、`TimerStart`、`TriggerAddAction` 等）；**不重复**前者的原理与示例。
 
-1. **禁用 `pairs`** - 防止遍历顺序随机导致的 desync
-2. **句柄保护** - 防止 Lua 引用句柄，GC 异步释放
-3. **禁止睡眠函数** - 防止闪退 bug
-4. **替换 JASS 回调** - 使用命名函数替代匿名闭包
+**为何仍保留代码里的行内注释**：便于粘贴后本地维护；与「原则在长文里」不冲突。
+
+**与前者 §5 的差异**：本模板使用 `runtime.handle_level = 1`（与常见 ydLua 入口示例一致）；前者另给出更保守的 `handle_level = 0` 思路。**按项目只选一套**，勿混用两套策略却忘记对齐。
+
+## 本模板做的事（一览）
+
+| 块 | 作用 |
+|----|------|
+| 禁用 `pairs` / `SafePairs` | 动机与替代写法见前者 **§4** |
+| `handle_level`、`sleep` | 句柄与协程相关；背景见前者 **§1、§5** |
+| 禁用 `Condition` / `Filter` | 减少 JASS 侧 code 回调坑 |
+| `ForGroup` / `ForForce` / `Enum*` 包装 | 匿名闭包策略见前者 **§3**；此处用固定命名入口转发 |
+| `TimerStart` / `DestroyTimer` | 用 handle 映射存真实回调，统一命名 tick |
+| `TriggerAddAction` 等 | 同上，减少闭包直挂触发器 |
 
 ## 完整代码
 
@@ -163,54 +174,6 @@ rawset(jass, 'DestroyTrigger', function(trg)
 end)
 ```
 
-## 关键原理
-
-### 1. 匿名闭包问题
-
-**错误：**
-```lua
-ForGroup(group, function()
-    -- 匿名闭包捕获变量，不同客户端闭包对象不同
-end)
-```
-
-**正确：**
-```lua
--- 使用命名函数 action_func，通过 func_ref 传递实际动作
--- 所有客户端执行相同的命名函数，只是 func_ref 指向不同
-```
-
-### 2. Timer/Trigger 句柄映射
-
-**错误：**
-```lua
-TimerStart(timer, 0.03, true, function()
-    -- 每个 timer 创建一个闭包
-end)
-```
-
-**正确：**
-```lua
--- 使用 timer_table[handle] = action 存储回调
--- 触发时使用命名函数 timer_action_func 统一处理
-```
-
-### 3. pairs 随机遍历
-
-**错误：**
-```lua
-for k, v in pairs(state) do
-    -- 遍历顺序随机，不同客户端可能不同
-end
-```
-
-**正确：**
-```lua
--- 禁用 pairs，强制使用确定性的遍历方式
--- 数组用 for i = 1, #arr
--- hash 表如果需要遍历，提取 key 排序后再遍历
-```
-
 ## 使用方式
 
 1. 将上述代码保存为 `lua-runtime-safety.lua`
@@ -222,6 +185,6 @@ end
 
 ## 注意事项
 
-- 这段代码会全局替换 `pairs`、`TimerStart`、`TriggerAddAction` 等函数
-- 一旦加载，所有代码都必须遵守这些约束
-- 如果确实需要使用 `pairs`，使用 `SafePairs` 并确保遍历顺序不影响同步
+- 会全局替换 `pairs`、`TimerStart`、`TriggerAddAction` 等；加载后全项目须遵守约束。
+- 确需 `pairs` 时用 `SafePairs`，且遍历顺序不得影响同步（见前者 **§4**）。
+- 若**不采用**本入口模板，仍建议阅读前者 **§1–§8** 做业务层约束；若采用本模板，须评估与 TSTL 生成代码、第三方 `require` 的兼容性。

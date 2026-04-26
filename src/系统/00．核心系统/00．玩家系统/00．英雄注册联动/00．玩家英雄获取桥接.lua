@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 --- 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
 -- 
@@ -27,7 +29,7 @@ local TRIG_KEY = "__syzl_playerHeroRegister_trig"
 local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
 local MAX_REG_ATTEMPTS = 30
 local RETRY_SEC = 0.1
-local function jassStesHashtable(self)
+local function jassStesHashtable()
     local candidates = {jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT}
     do
         local i = 0
@@ -41,8 +43,8 @@ local function jassStesHashtable(self)
     end
     return nil
 end
-local function countOnJassStesTable(self, eventName)
-    local ht = jassStesHashtable(nil)
+local function countOnJassStesTable(eventName)
+    local ht = jassStesHashtable()
     if ht == nil or ht == 0 then
         return -1
     end
@@ -54,7 +56,7 @@ local function countOnJassStesTable(self, eventName)
 end
 --- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
 -- 这里是整条"英雄注册联动"链路的第一层筛选。
-local function isPlayableHero(self, whichUnit)
+local function isPlayableHero(whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
@@ -71,8 +73,20 @@ local function isPlayableHero(self, whichUnit)
     local playerId = jass.GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
+--- 经局部变量再调，避免 TSTL 编成 `mod:fn(...)`；`onPlayerHeroRegistered` 在面板模块已标 `this: void`，勿再注入 nil 首参
+local function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
+    local mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
+    local cb = mod.onPlayerHeroRegistered
+    if type(cb) ~= "function" then
+        return
+    end
+    cb(whichPlayer, whichHero)
+end
+local uiRegisteredPlayers = __TS__New(Set)
+local dialogSystem = require("系统.09．表现系统.02．对话框系统.01．对话框渲染核心")
+local buffUISystem = require("系统.05．Buff系统.02．BuffUI")
 --- 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
-local function registerHeroDependents(self, whichHero)
+local function registerHeroDependents(whichHero)
     if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
         moveTornado:registerMoveSpeedTornadoHero(whichHero)
     end
@@ -82,11 +96,25 @@ local function registerHeroDependents(self, whichHero)
     if type(chestSystem.registerChestSystemHero) == "function" then
         chestSystem:registerChestSystemHero(whichHero)
     end
+    local owner = jass.GetOwningPlayer(whichHero)
+    if owner ~= nil and owner ~= 0 then
+        local playerId = jass.GetPlayerId(owner)
+        if not uiRegisteredPlayers:has(playerId) then
+            uiRegisteredPlayers:add(playerId)
+            invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
+            if type(dialogSystem.onPlayerHeroRegistered) == "function" then
+                dialogSystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+            if type(buffUISystem.onPlayerHeroRegistered) == "function" then
+                buffUISystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+        end
+    end
 end
 --- 为单个玩家登记英雄：
 -- 1. 写入玩家侧 YDUserData
 -- 2. 触发后续联动模块注册
-local function registerPlayerHero(self, whichPlayer, whichHero)
+local function registerPlayerHero(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 or whichHero == nil or whichHero == 0 then
         return
     end
@@ -98,29 +126,26 @@ local function registerPlayerHero(self, whichPlayer, whichHero)
         "unit",
         whichHero
     )
-    registerHeroDependents(nil, whichHero)
+    registerHeroDependents(whichHero)
 end
 --- 从 JASS 传入的单个英雄单位完成一次登记。
 -- 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。
-local function registerSingleHero(self, whichHero)
-    if not isPlayableHero(nil, whichHero) then
+local function registerSingleHero(whichHero)
+    if not isPlayableHero(whichHero) then
         return
     end
     local owner = jass.GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
     end
-    registerPlayerHero(nil, owner, whichHero)
+    registerPlayerHero(owner, whichHero)
 end
 --- STES 子触发真正执行的核心入口。
-local function runRegisterPlayerHero(self)
+local function runRegisterPlayerHero()
     helper:ydlStes_syncTriggerStep(nil)
     do
         pcall(function()
-            registerSingleHero(
-                nil,
-                YDLocal5Get(nil, "unit", C.STES_PARAM_HERO_UNIT)
-            )
+            registerSingleHero(YDLocal5Get(nil, "unit", C.STES_PARAM_HERO_UNIT))
         end)
         do
             helper:ydlStes_finishChildCleanup(nil)
@@ -128,7 +153,7 @@ local function runRegisterPlayerHero(self)
     end
 end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
-local function scheduleRetry(self, fn)
+local function scheduleRetry(fn)
     local timer = jass.CreateTimer()
     jass.TimerStart(
         timer,
@@ -136,12 +161,12 @@ local function scheduleRetry(self, fn)
         false,
         function()
             jass.DestroyTimer(timer)
-            fn(nil)
+            fn()
         end
     )
 end
 --- 向 JASS 侧 STES 表注册“玩家英雄注册”监听。
-local function tryRegisterPlayerHeroStes(self)
+local function tryRegisterPlayerHeroStes()
     local g = _G
     if g[REG_GUARD] then
         return
@@ -151,31 +176,28 @@ local function tryRegisterPlayerHeroStes(self)
         jass.TriggerAddAction(
             trig,
             function()
-                runRegisterPlayerHero(nil)
+                runRegisterPlayerHero()
             end
         )
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], C.STES_EVENT_REGISTER_PLAYER_HERO)
-    local count = countOnJassStesTable(nil, C.STES_EVENT_REGISTER_PLAYER_HERO)
+    local count = countOnJassStesTable(C.STES_EVENT_REGISTER_PLAYER_HERO)
     local attempt = (g[ATTEMPT_KEY] or 0) + 1
     g[ATTEMPT_KEY] = attempt
     if count >= 1 or attempt >= MAX_REG_ATTEMPTS then
         g[REG_GUARD] = true
         return
     end
-    scheduleRetry(
-        nil,
-        function()
-            tryRegisterPlayerHeroStes(nil)
-        end
-    )
+    scheduleRetry(function()
+        tryRegisterPlayerHeroStes()
+    end)
 end
 --- 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
-function ____exports.initPlayerHeroGetBridge(self)
+function ____exports.initPlayerHeroGetBridge()
     if type(outOfCombat.initOutOfCombat) == "function" then
         outOfCombat:initOutOfCombat()
     end
-    tryRegisterPlayerHeroStes(nil)
+    tryRegisterPlayerHeroStes()
 end
 return ____exports

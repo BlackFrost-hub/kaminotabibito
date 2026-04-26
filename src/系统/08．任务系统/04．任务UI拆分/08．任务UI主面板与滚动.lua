@@ -195,6 +195,30 @@ function ____exports.buildTaskMainPanel(self, opts)
             if type(japi.DzFrameShow) == "function" then
                 japi.DzFrameShow(scrollThumbFrame, true)
             end
+            local ____createFrame_result_3 = createFrame(nil, {
+                type = FrameType.GLUETEXTBUTTON,
+                name = "TaskScrollThumbHitBtn",
+                parent = mainPanel,
+                template = "template",
+                visible = true,
+                enable = true,
+                alpha = 0
+            })
+            if ____createFrame_result_3 == nil then
+                ____createFrame_result_3 = 0
+            end
+            scrollThumbHitBtn = ____createFrame_result_3
+            if scrollThumbHitBtn and scrollThumbHitBtn ~= 0 then
+                setupTransparentGlueHitLayer(nil, scrollThumbFrame, scrollThumbHitBtn)
+                if type(japi.DzFrameSetLevel) == "function" then
+                    japi.DzFrameSetLevel(scrollThumbHitBtn, 121)
+                end
+                if type(japi.DzFrameShow) == "function" then
+                    japi.DzFrameShow(scrollThumbHitBtn, true)
+                end
+            else
+                scrollThumbHitBtn = nil
+            end
         end
     end
     return {

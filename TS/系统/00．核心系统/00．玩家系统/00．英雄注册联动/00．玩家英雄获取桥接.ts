@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
  *
@@ -86,6 +87,29 @@ function isPlayableHero(whichUnit: any): boolean {
   return playerId >= 0 && playerId <= 4;
 }
 
+/** 经局部变量再调，避免 TSTL 编成 `mod:fn(...)`；`onPlayerHeroRegistered` 在面板模块已标 `this: void`，勿再注入 nil 首参 */
+function invokeUiAttrOnPlayerHeroRegistered(whichPlayer: any, whichHero: any): void {
+  const mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染") as {
+    onPlayerHeroRegistered?: (this: void, w: any, h: any) => void;
+  };
+  const cb = mod.onPlayerHeroRegistered;
+  if (typeof cb !== "function") return;
+  cb(whichPlayer, whichHero);
+}
+
+// 记录已注册UI的玩家，防止重复注册
+const uiRegisteredPlayers = new Set<number>();
+
+// 对话框系统
+const dialogSystem = require("系统.09．表现系统.02．对话框系统.01．对话框渲染核心") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
+
+// BuffUI系统
+const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
+
 /**
  * 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
  */
@@ -98,6 +122,27 @@ function registerHeroDependents(whichHero: any): void {
   }
   if (typeof chestSystem.registerChestSystemHero === "function") {
     chestSystem.registerChestSystemHero(whichHero);
+  }
+  const owner = jass.GetOwningPlayer(whichHero);
+  if (owner != null && owner !== 0) {
+    const playerId = jass.GetPlayerId(owner);
+
+    // UI系统只注册一次，防止重复注册
+    if (!uiRegisteredPlayers.has(playerId)) {
+      uiRegisteredPlayers.add(playerId);
+
+      invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
+
+      // 对话框系统 - 为玩家创建对话框UI
+      if (typeof dialogSystem.onPlayerHeroRegistered === "function") {
+        dialogSystem.onPlayerHeroRegistered(owner, whichHero);
+      }
+
+      // BuffUI系统 - 为玩家创建BuffUI
+      if (typeof buffUISystem.onPlayerHeroRegistered === "function") {
+        buffUISystem.onPlayerHeroRegistered(owner, whichHero);
+      }
+    }
   }
 }
 

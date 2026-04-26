@@ -2,24 +2,30 @@
 /**
  * 硬件输入 - 滚轮函数
  *
- * 与 04．键盘函数 相同：勿用 japiFn 取出再调用，否则 TSTL 会编成 f(nil, ...) 导致参数错位、注册失败（errjhw 371 等）。
+ * 约定：
+ * - `DzTriggerRegisterMouseWheelEventByCode(..., true, ...)` 直接同步注册
+ * - `DzTriggerRegisterMouseWheelEventByCode(..., false, ...)` 必须经过
+ *   `runFalseLocalRegistration(...)` 包装，并支持可选 `playerId`
  */
 
 const japi = require("jass.japi") as any;
 
-import { createTriggerOrNull } from "./02．内部工具";
-
-// -------------------- 滚轮 --------------------
+import { createTriggerOrNull, runFalseLocalRegistration } from "./02．内部工具";
 
 export function getWheelDelta(): number {
-  if (typeof japi.DzGetWheelDelta !== "function") return 0;
-  return japi.DzGetWheelDelta();
+  return typeof japi.DzGetWheelDelta === "function" ? japi.DzGetWheelDelta() : 0;
 }
 
-export function registerMouseWheel(sync: boolean, action: () => void): any {
+export function registerMouseWheel(sync: boolean, action: () => void, playerId?: number): any {
   const trig = createTriggerOrNull();
   if (!trig) return null;
   if (typeof japi.DzTriggerRegisterMouseWheelEventByCode !== "function") return null;
-  japi.DzTriggerRegisterMouseWheelEventByCode(trig, sync, action);
+  if (sync) {
+    japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action);
+  } else {
+    runFalseLocalRegistration(() => {
+      japi.DzTriggerRegisterMouseWheelEventByCode(trig, false, action);
+    }, playerId);
+  }
   return trig;
 }
