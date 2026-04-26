@@ -18,6 +18,8 @@ local SCROLLBAR_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLLBAR_W
 local SCROLL_THUMB_SIZE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_SIZE
 local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_TOP_COMPENSATION
 local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
+local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
+local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 function thumbTravelNorm(self)
     return LIST_VIEW_H - SCROLL_THUMB_SIZE - SCROLL_THUMB_TOP_COMPENSATION - SCROLL_THUMB_BOTTOM_COMPENSATION
 end
@@ -126,29 +128,29 @@ local japi = require("jass.japi")
 local wheelCtx = nil
 --- 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc）
 local taskThumbGlobalMouseTrig = nil
+local function taskUIWheelEventPcallBody(self)
+    local ctx = wheelCtx
+    if not ctx:isVisible() then
+        return
+    end
+    if not isWheelTargetForTaskListByJapi(
+        nil,
+        japi,
+        ctx.getMouseFocus,
+        ctx.listContainer,
+        ctx.scrollBarFrame,
+        ctx.scrollThumbFrame,
+        ctx.scrollThumbHitBtn
+    ) then
+        return
+    end
+    ____exports.handleTaskUIListWheel(nil, ctx)
+end
 local function onMouseWheelEvent(self)
     if not wheelCtx then
         return
     end
-    pcall(function ()
-            local ctx = wheelCtx
-            if not ctx:isVisible() then
-                return
-            end
-            if not isWheelTargetForTaskListByJapi(
-                nil,
-                japi,
-                ctx.getMouseFocus,
-                ctx.listContainer,
-                ctx.scrollBarFrame,
-                ctx.scrollThumbFrame,
-                ctx.scrollThumbHitBtn
-            ) then
-                return
-            end
-            ____exports.handleTaskUIListWheel(nil, ctx)
-        end
-    )
+    pcall(nil, taskUIWheelEventPcallBody)
 end
 function ____exports.isTaskUIWheelTarget(self, ctx)
     if not ctx.mainPanel then
@@ -212,37 +214,37 @@ local function onThumbDragEnd(self)
     updateTaskUIScrollThumbPosition(nil, dragCtx, pageCount)
 end
 --- 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc
+local function taskUIThumbPressPcallBody(self)
+    local ctx = wheelCtx
+    if not ctx or not ctx:isVisible() then
+        return
+    end
+    if not isTaskScrollThumbDragHit(
+        nil,
+        japi,
+        ctx.getMouseFocus,
+        ctx.scrollThumbFrame,
+        ctx.scrollThumbHitBtn
+    ) then
+        return
+    end
+    dragCtx = ctx
+    onThumbDragStart(nil)
+end
 local function onGlobalThumbLeftPress(self)
-    pcall(function ()
-            local ctx = wheelCtx
-            if not ctx or not ctx:isVisible() then
-                return
-            end
-            if not isTaskScrollThumbDragHit(
-                nil,
-                japi,
-                ctx.getMouseFocus,
-                ctx.scrollThumbFrame,
-                ctx.scrollThumbHitBtn
-            ) then
-                return
-            end
-            dragCtx = ctx
-            onThumbDragStart(nil)
-        end
-    )
+    pcall(nil, taskUIThumbPressPcallBody)
+end
+local function taskUIThumbReleasePcallBody(self)
+    onThumbDragEnd(nil)
 end
 local function onGlobalThumbLeftRelease(self)
-    pcall(function ()
-            onThumbDragEnd(nil)
-        end
-    )
+    pcall(nil, taskUIThumbReleasePcallBody)
+end
+local function taskUIThumbMovePcallBody(self)
+    onThumbDragMove(nil)
 end
 local function onGlobalThumbDragMove(self)
-    pcall(function ()
-            onThumbDragMove(nil)
-        end
-    )
+    pcall(nil, taskUIThumbMovePcallBody)
 end
 local function ensureTaskThumbGlobalMouseRegistered(self)
     if taskThumbGlobalMouseTrig ~= nil then
@@ -286,13 +288,9 @@ function ____exports.registerTaskUIListWheel(self, ctx)
 end
 function ____exports.updateTaskUIScrollBarVisibility(self, ctx, pageCount, hasQuestRows)
     local visible = hasQuestRows
-    if type(japi.DzFrameShow) ~= "function" then
-        return
-    end
     for ____, frame in ipairs({ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn}) do
         if frame and frame ~= 0 then
-            pcall(function () return japi.DzFrameShow(frame, visible) end
-            )
+            pcallDzFrameShow(nil, japi, frame, visible)
         end
     end
     if visible then

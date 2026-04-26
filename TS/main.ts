@@ -60,8 +60,8 @@ const 任务系统 = require("系统.08．任务系统.10．index") as { init?: 
 if (typeof 任务系统.init === "function") 任务系统.init();
 
 // // ---------- 09．表现系统 ----------
-//const 表现系统 = require("系统.09．表现系统.index") as { init?: () => void };
-//if (typeof 表现系统.init === "function") 表现系统.init();
+const 表现系统 = require("系统.09．表现系统.index") as { init?: () => void };
+if (typeof 表现系统.init === "function") 表现系统.init();
 // // ---------- 12．测试系统 ----------
 // 通过统一的 index.ts 入口加载测试，在 系统.12．测试系统.index 中配置开关
 require("系统.12．测试系统.index");

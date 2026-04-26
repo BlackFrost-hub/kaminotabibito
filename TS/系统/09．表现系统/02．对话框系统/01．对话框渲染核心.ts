@@ -63,12 +63,12 @@ export function clearDialog(p: Player): void {
   clearState(state);
 }
 export function setDialogShowable(p: Player, visible: boolean): void {
-  const localPlayer = dzGetLocalPlayer();
-  if (localPlayer !== p) return;
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   const state = ensureState(pid);
   state.canShow = visible;
+  const localPlayer = dzGetLocalPlayer();
+  if (localPlayer !== p) return;
   if (!visible && state.initialized) {
     for (let i = 0; i < 9; i++) dzShow(state.frames[i], false);
     dzShow(state.frames[11], false);

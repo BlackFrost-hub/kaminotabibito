@@ -24,7 +24,7 @@ function registerDummyMainQuests(): void {
   const db = QuestDatabase.getInstance();
   const now = os.time();
   for (let i = 1; i <= 20; i++) {
-    const questId = `dummy_main_${i}`;
+    const questId = `dummy_main_${i < 10 ? "00" + i : i < 100 ? "0" + i : String(i)}`;
     // 先注册任务定义
     const questDef: QuestData = {
       id: questId,
@@ -79,13 +79,13 @@ if (ENABLE_QUEST_RUNTIME_CORE) {
   registerDummyMainQuests();
 }
 
-// ========== 任务 UI（03 / 04） ==========
+// ========== 任务 UI（04 拆分模块） ==========
 if (ENABLE_QUEST_UI_MODULE) {
-  const 任务UI = require("系统.08．任务系统.03．任务UI") as { init?: () => void; registerHotkey?: () => void };
-  if (typeof 任务UI.init === "function") 任务UI.init();
+  const manager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as { init?: () => void; registerHotkey?: () => void };
+  // 开局创建全局单例任务 UI（各客户端对称）；不绑定英雄注册。
+  if (typeof manager.init === "function") manager.init();
   // 仅此一处注册 J/K1–K3：`12．任务UI管理器` 顶层不再 register，避免同一键叠两个 Dz 回调导致一次松键 toggle 两次。
-  if (typeof 任务UI.registerHotkey === "function") 任务UI.registerHotkey();
-  // 03 已静态依赖 04 各子模块；无需再 require 04.index，避免将来在 index 里加顶层副作用时重复执行
+  if (typeof manager.registerHotkey === "function") manager.registerHotkey();
 }
 
 // ========== STES（05 + 06） ==========

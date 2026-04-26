@@ -1,3 +1,5 @@
+const jass = require("jass.common") as any;
+
 import { QuestType } from "../01．任务数据";
 
 let currentHotkeyOpts: RegisterTaskUIHotkeysOpts | null = null;
@@ -5,16 +7,20 @@ let currentHotkeyOpts: RegisterTaskUIHotkeysOpts | null = null;
 let taskUIKeybindsInstalled = false;
 
 export interface RegisterTaskUIHotkeysOpts {
-  registerKeyUpLocal: any;
+  registerKeyUpSync: any;
   KEY: any;
   KEY_NUM: any;
   onTogglePanelLocal: () => void;
-  onSwitchCategoryLocal: (type: QuestType) => void;
+  onSwitchCategoryState: (type: QuestType) => void;
+  onSwitchCategoryUI: (type: QuestType) => void;
 }
 
-function handleTogglePanelHotkey(_player: any): void {
+function handleTogglePanelHotkey(player: any): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
+  // 只有本地玩家按键时才处理UI显示
+  const localPlayer = jass.GetLocalPlayer();
+  if (player !== localPlayer) return;
   opts.onTogglePanelLocal();
 }
 
@@ -30,20 +36,25 @@ function handleDailyCategoryHotkey(player: any): void {
   handleCategoryHotkey(player, QuestType.DAILY);
 }
 
-function handleCategoryHotkey(_player: any, category: QuestType): void {
+function handleCategoryHotkey(player: any, category: QuestType): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
-  opts.onSwitchCategoryLocal(category);
+  // 1. 先同步修改状态（所有客户端执行）
+  opts.onSwitchCategoryState(category);
+  // 2. 只有本地玩家才处理UI显示
+  const localPlayer = jass.GetLocalPlayer();
+  if (player !== localPlayer) return;
+  opts.onSwitchCategoryUI(category);
 }
 
 export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
-  const { registerKeyUpLocal, KEY, KEY_NUM } = opts;
-  if (typeof registerKeyUpLocal !== "function") return;
+  const { registerKeyUpSync, KEY, KEY_NUM } = opts;
+  if (typeof registerKeyUpSync !== "function") return;
   currentHotkeyOpts = opts;
   if (taskUIKeybindsInstalled) return;
   taskUIKeybindsInstalled = true;
-  registerKeyUpLocal(KEY.J, handleTogglePanelHotkey);
-  registerKeyUpLocal(KEY_NUM.K1, handleMainCategoryHotkey);
-  registerKeyUpLocal(KEY_NUM.K2, handleSideCategoryHotkey);
-  registerKeyUpLocal(KEY_NUM.K3, handleDailyCategoryHotkey);
+  registerKeyUpSync(KEY.J, handleTogglePanelHotkey);
+  registerKeyUpSync(KEY_NUM.K1, handleMainCategoryHotkey);
+  registerKeyUpSync(KEY_NUM.K2, handleSideCategoryHotkey);
+  registerKeyUpSync(KEY_NUM.K3, handleDailyCategoryHotkey);
 }

@@ -1,6 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local LIST_ITEM_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_ITEM_H
@@ -20,8 +18,10 @@ local isQuestWithRowIconLayout = ____02_FF0E_4EFB_52A1UI_8F85_52A9.isQuestWithRo
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8 = require("系统.08．任务系统.04．任务UI拆分.03．任务UI列表与滚动")
 local getQuestItemHeight = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.getQuestItemHeight
-local questRowClickHandlers = __TS__New(Map)
-local frameToQuestIdMap = __TS__New(Map)
+--- questId -> 处理器（字符串 key，无 Map 迭代）
+local questRowClickHandlers = {}
+--- frameId -> questId（数字 key，无 Map）
+local frameToQuestIdMap = {}
 local function onQuestRowClick(self)
     local japi = require("jass.japi")
     local ____temp_0
@@ -34,11 +34,11 @@ local function onQuestRowClick(self)
     if not frame then
         return
     end
-    local questId = frameToQuestIdMap:get(frame)
-    if not questId then
+    local questId = frameToQuestIdMap[frame]
+    if questId == nil or questId == "" then
         return
     end
-    local handler = questRowClickHandlers:get(questId)
+    local handler = questRowClickHandlers[questId]
     if not handler then
         return
     end
@@ -46,7 +46,7 @@ local function onQuestRowClick(self)
     handler:onToggleExpand(questId)
 end
 local function registerQuestRowClickHandler(self, questId, onClickSound, onToggleExpand)
-    questRowClickHandlers:set(questId, {onClickSound = onClickSound, onToggleExpand = onToggleExpand})
+    questRowClickHandlers[questId] = {onClickSound = onClickSound, onToggleExpand = onToggleExpand}
 end
 function ____exports.calcTaskListItemLayout(self, showMainRowIcon)
     local rowWidth = LIST_CONTAINER_W * 0.9
@@ -76,10 +76,10 @@ local EXPANDED_OBJECTIVE_START_OFFSET = LIST_ITEM_H * 0.35
 local EXPANDED_OBJECTIVE_ROW_HEIGHT = LIST_ITEM_H * 0.25
 local EXPANDED_FAIL_ROW_HEIGHT = LIST_ITEM_H * 0.2
 local EXPANDED_DETAIL_ROW_HEIGHT = LIST_ITEM_H * 0.22
-local detailFrameByQuestId = __TS__New(Map)
+local detailFrameByQuestId = {}
 local function getOrCreateDetailFrame(self, questId, index, listParent, text, textXRel, yRel, textW, FramePoint, createTextLabel, setFramePointRelative, setFrameSize, applyDzTextFontAndAlignment, showFrame, japi, listItemFrames)
     local key = (questId .. "|") .. tostring(index)
-    local frames = detailFrameByQuestId:get(questId)
+    local frames = detailFrameByQuestId[questId]
     local fr = 0
     if frames and #frames > index then
         fr = frames[index + 1] or 0
@@ -102,7 +102,7 @@ local function getOrCreateDetailFrame(self, questId, index, listParent, text, te
         if fr ~= 0 then
             if not frames then
                 frames = {}
-                detailFrameByQuestId:set(questId, frames)
+                detailFrameByQuestId[questId] = frames
             end
             while #frames <= index do
                 frames[#frames + 1] = 0
@@ -170,7 +170,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                 obj.required
             )
             local objKey = (quest.id .. "|") .. obj.id
-            local objFrame = objFrameByKey:get(objKey) or 0
+            local objFrame = objFrameByKey[objKey] or 0
             if objFrame == 0 then
                 objFrame = createTextLabel(
                     nil,
@@ -190,7 +190,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                     objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
                     goto __continue23
                 end
-                objFrameByKey:set(objKey, objFrame)
+                objFrameByKey[objKey] = objFrame
             else
                 setFramePointRelative(
                     nil,
@@ -217,7 +217,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
         ::__continue23::
     end
     if quest.timeLimit and quest.timeLimit > 0 then
-        local failFrame = failFrameByQuestId:get(quest.id) or 0
+        local failFrame = failFrameByQuestId[quest.id] or 0
         local failText = buildFailText(nil, quest.timeLimit)
         if failFrame == 0 then
             failFrame = createTextLabel(
@@ -237,7 +237,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
             if failFrame == 0 then
                 return false
             end
-            failFrameByQuestId:set(quest.id, failFrame)
+            failFrameByQuestId[quest.id] = failFrame
         else
             setFramePointRelative(
                 nil,
@@ -397,7 +397,7 @@ function ____exports.renderQuestRow(self, opts)
     local textXRel = ____exports_calcTaskListItemLayout_result_3.textXRel
     local listTextAlign = ____exports_calcTaskListItemLayout_result_3.listTextAlign
     local textW = ____exports_calcTaskListItemLayout_result_3.textW
-    local rowBackdrop = rowBackdropByQuestId:get(quest.id) or 0
+    local rowBackdrop = rowBackdropByQuestId[quest.id] or 0
     if rowBackdrop == 0 then
         rowBackdrop = tryCreateFromFdfOnly(nil, "TaskButtonBackdrop", listParent) or 0
         if rowBackdrop == 0 then
@@ -414,7 +414,7 @@ function ____exports.renderQuestRow(self, opts)
             end
         end
         if rowBackdrop ~= 0 then
-            rowBackdropByQuestId:set(quest.id, rowBackdrop)
+            rowBackdropByQuestId[quest.id] = rowBackdrop
         end
     end
     if rowBackdrop == 0 then
@@ -437,7 +437,7 @@ function ____exports.renderQuestRow(self, opts)
     listItemFrames[#listItemFrames + 1] = rowBackdrop
     local npcName = quest.startNpc or "未知"
     local titleText = ((((("|cffffff00『" .. quest.title) .. "』|r→发布NPC:|cff00ccff『") .. npcName) .. "』|r [") .. statusText) .. "]"
-    local titleFrame = titleByQuestId:get(quest.id) or 0
+    local titleFrame = titleByQuestId[quest.id] or 0
     if titleFrame == 0 then
         titleFrame = createTextLabel(
             nil,
@@ -456,7 +456,7 @@ function ____exports.renderQuestRow(self, opts)
         if titleFrame == 0 then
             return false
         end
-        titleByQuestId:set(quest.id, titleFrame)
+        titleByQuestId[quest.id] = titleFrame
     else
         setFramePointRelative(
             nil,
@@ -478,7 +478,7 @@ function ____exports.renderQuestRow(self, opts)
     end
     showFrame(nil, titleFrame)
     listItemFrames[#listItemFrames + 1] = titleFrame
-    local clickBtn = clickBtnByQuestId:get(quest.id) or 0
+    local clickBtn = clickBtnByQuestId[quest.id] or 0
     if clickBtn == 0 then
         clickBtn = createFrame(nil, {
             type = FrameType.GLUETEXTBUTTON,
@@ -492,7 +492,7 @@ function ____exports.renderQuestRow(self, opts)
         if clickBtn == 0 then
             return false
         end
-        clickBtnByQuestId:set(quest.id, clickBtn)
+        clickBtnByQuestId[quest.id] = clickBtn
     end
     setFramePointRelative(
         nil,
@@ -505,7 +505,7 @@ function ____exports.renderQuestRow(self, opts)
     )
     setFrameSize(nil, clickBtn, {width = rowWidth, height = itemH})
     registerQuestRowClickHandler(nil, quest.id, onClickSound, onToggleExpand)
-    frameToQuestIdMap:set(clickBtn, quest.id)
+    frameToQuestIdMap[clickBtn] = quest.id
     setFrameClickEvent(nil, clickBtn, onQuestRowClick, false)
     if type(japi.DzFrameSetLevel) == "function" then
         japi.DzFrameSetLevel(clickBtn, 4)
@@ -514,7 +514,7 @@ function ____exports.renderQuestRow(self, opts)
     listItemFrames[#listItemFrames + 1] = clickBtn
     if showMainRowIcon then
         local iconPath = ____exports.resolveQuestRowIconPath(nil, quest.icon)
-        local iconFr = rowIconByQuestId:get(quest.id) or 0
+        local iconFr = rowIconByQuestId[quest.id] or 0
         if iconFr == 0 then
             iconFr = createFrame(nil, {
                 type = FrameType.BACKDROP,
@@ -525,7 +525,7 @@ function ____exports.renderQuestRow(self, opts)
             }) or 0
             if iconFr ~= 0 then
                 setFrameTexture(nil, iconFr, iconPath)
-                rowIconByQuestId:set(quest.id, iconFr)
+                rowIconByQuestId[quest.id] = iconFr
             end
         else
             setFrameTexture(nil, iconFr, iconPath)

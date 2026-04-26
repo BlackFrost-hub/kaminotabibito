@@ -44,7 +44,18 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     onTogglePanel,
   } = opts;
 
-  const entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent);
+  let entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent);
+  if (!entryFrame) {
+    entryFrame =
+      createFrame({
+        type: FrameType.GLUETEXTBUTTON,
+        name: "TaskEntryIconDyn",
+        parent,
+        template: "template",
+        visible: true,
+        enable: true,
+      }) ?? 0;
+  }
   if (!entryFrame) return { entryFrame: null, entryText: null };
 
   setFramePosition(entryFrame, { point: FramePoint.TOPLEFT, x: ENTRY_X, y: ENTRY_Y });

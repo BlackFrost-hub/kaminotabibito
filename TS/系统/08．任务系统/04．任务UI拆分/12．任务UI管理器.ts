@@ -1,6 +1,7 @@
 /**
  * 12．任务UI管理器
- * 职责：TaskUI 生命周期、持有引用、协调内容更新与本地显示控制。
+ * 职责：全局单例 TaskUI 生命周期、持有引用、协调内容更新与本地显示控制。
+ * 开局由 `10．index` 调用 `init()` 创建一套 UI（各客户端对称执行）；不再依赖英雄注册。
  */
 
 const jass = require("jass.common") as any;
@@ -9,23 +10,26 @@ const japi = require("jass.japi") as any;
 import { QuestType } from "../01．任务数据";
 import {
   applyTaskUIFacadeVisibleState,
+  applyTaskUICategorySwitchVisibleState,
   getTaskUICategoryPageCount,
   setTaskRowHandlers,
   TaskUIPrecreatedListPool,
+  type TaskUIListControlContext,
 } from "./09．任务UI列表控制";
 import { createTaskUIPrecreatedListPool } from "./13．任务UI预设构建";
 import { rebuildTaskUIFacadeListPool } from "./14．任务UI内容同步";
-import { switchCategoryLocal, toggleExpandLocal, switchPageLocal } from "./15．任务UI本地显示";
+import { toggleExpandLocal, switchPageLocal } from "./15．任务UI本地显示";
 import {
   registerTaskUIListWheel,
   updateTaskUIScrollBarVisibility,
+  type TaskUIScrollContext,
 } from "./10．任务UI滚动与滚轮";
-import { registerTaskUIRefreshCallback } from "./11．任务UI面板控制";
 import { registerTaskUIHotkeys } from "./16．任务UI输入绑定";
+import { questManager } from "../02．任务管理器/index";
 import { buildTaskEntryIcon } from "./06．任务UI入口图标";
 import { buildTaskMainPanel } from "./08．任务UI主面板与滚动";
 import {
-  getGameUI, registerKeyUpLocal, KEY, KEY_NUM,
+  getGameUI, registerKeyUpSync, KEY, KEY_NUM,
   getMouseFocus, getWheelDelta, registerMouseWheel,
 } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import {
@@ -45,16 +49,83 @@ import { ENABLE_TASK_UI_CLIENT } from "./01．任务UI常量";
 let mgr: TaskUI | null = null;
 let clickSoundCallback: (() => void) | null = null;
 
+function taskUIModulePlayClickSound(): void {
+  mgr?.playLocalClickSound();
+}
+
+function taskUIModuleRowExpand(questId: string): void {
+  mgr?.toggleExpandForRow(questId);
+}
+
+function taskUIModuleSwitchCategory(type: QuestType): void {
+  mgr?.switchCategory(type);
+}
+
+function taskUIModuleNoopTabTooltip(_msg: string): void {}
+
+function taskUIScrollCtxIsVisible(): boolean {
+  return mgr?.isVisible ?? false;
+}
+
+function taskUIScrollCtxGetCurrentPageCount(): number {
+  return mgr != null ? mgr.getPageCountForCurrentCategory() : 0;
+}
+
+function taskUIScrollCtxGetCurrentPage(): number {
+  return mgr?.currentPage ?? 0;
+}
+
+function taskUIScrollCtxSetCurrentPage(p: number): void {
+  if (mgr) mgr.currentPage = p;
+}
+
+function taskUIScrollCtxOnPageChanged(prev: number, next: number): void {
+  mgr?.applyScrollPageChanged(prev, next);
+}
+
+function taskUIListCtxPlayClickSound(): void {
+  taskUIModulePlayClickSound();
+}
+
+function taskUIListCtxUpdateScrollBar(pageCount: number, hasQuestRows: boolean): void {
+  mgr?.syncScrollBarVisibility(pageCount, hasQuestRows);
+}
+
+function taskUIListCtxToggleExpand(questId: string): void {
+  mgr?.toggleExpandForRow(questId);
+}
+
+function taskUIListCtxGetCurrentPage(type: QuestType): number {
+  return mgr != null ? mgr.listGetCurrentPage(type) : 0;
+}
+
+function taskUIListCtxSetCurrentPage(type: QuestType, page: number): void {
+  mgr?.listSetCurrentPage(type, page);
+}
+
+function taskUIListCtxGetExpandedQuestId(type: QuestType): string | null {
+  return mgr != null ? mgr.listGetExpandedQuestId(type) : null;
+}
+
+function taskUITogglePanelPcallBody(): void {
+  if (!mgr) return;
+  mgr.togglePanel();
+  clickSoundCallback?.();
+}
+
 // 统一的面板切换回调（键盘 J 键和鼠标点击入口图标共用）
 function dispatchTogglePanel(): void {
   if (!mgr) return;
-  (pcall as any)(() => {
-    mgr!.togglePanel();
-    clickSoundCallback?.();
-  });
+  (pcall as any)(taskUITogglePanelPcallBody);
 }
 
-function dispatchRefresh(): void { if (mgr) mgr.rebuildPages(); }
+function dispatchRefresh(): void {
+  if (mgr) mgr.rebuildPages();
+}
+
+function pcallDispatchRefreshBody(): void {
+  dispatchRefresh();
+}
 
 class TaskUI {
   entryFrame: number | null = null;
@@ -72,29 +143,88 @@ class TaskUI {
   currentPage = 0;
   expandedQuestId: string | null = null;
   isVisible = false;
+  /** 防止 `init()` 被重复调用时叠多套帧与回调 */
+  private uiInitialized = false;
+  /** 列表/滚动上下文各建一次，避免每次 `rebuild` 分配新闭包对象 */
+  private listCtxCache: TaskUIListControlContext | null = null;
+  private scrollCtxCache: TaskUIScrollContext | null = null;
+
+  private ensureUiContextCaches(): void {
+    if (this.scrollCtxCache != null) return;
+    this.scrollCtxCache = {
+      mainPanel: this.mainPanel,
+      listContainer: this.listContainer,
+      scrollBarFrame: this.scrollBarFrame,
+      scrollThumbFrame: this.scrollThumbFrame,
+      scrollThumbHitBtn: this.scrollThumbHitBtn,
+      FramePoint,
+      setFramePointRelative,
+      taskListWheelTrig: this.taskListWheelTrig,
+      getMouseFocus,
+      getWheelDelta,
+      registerMouseWheel,
+      isVisible: taskUIScrollCtxIsVisible,
+      getCurrentPageCount: taskUIScrollCtxGetCurrentPageCount,
+      getCurrentPage: taskUIScrollCtxGetCurrentPage,
+      setCurrentPage: taskUIScrollCtxSetCurrentPage,
+      onPageChanged: taskUIScrollCtxOnPageChanged,
+    };
+
+    this.listCtxCache = {
+      mainPanel: this.mainPanel,
+      listContainer: this.listContainer,
+      currentPlayerId: this.localPlayerId,
+      currentCategory: this.currentCategory,
+      precreatedListPool: this.precreatedListPool,
+      createTextLabel,
+      FramePoint,
+      FrameType,
+      createFrame,
+      setFrameTexture,
+      setFramePointRelative,
+      setFrameSize,
+      setFrameClickEvent,
+      setupTransparentGlueHitLayer,
+      showFrame,
+      hideFrame,
+      applyDzTextFontAndCenterAlignment,
+      applyDzTextFontAndAlignment,
+      playClickSound: taskUIListCtxPlayClickSound,
+      updateScrollBarVisibility: taskUIListCtxUpdateScrollBar,
+      toggleExpand: taskUIListCtxToggleExpand,
+      getCurrentPage: taskUIListCtxGetCurrentPage,
+      setCurrentPage: taskUIListCtxSetCurrentPage,
+      getExpandedQuestId: taskUIListCtxGetExpandedQuestId,
+    };
+  }
 
   init(): void {
     if (!ENABLE_TASK_UI_CLIENT) return;
+    if (this.uiInitialized) return;
     mgr = this;
-    (pcall as any)(() => {
-      const gameUI = getGameUI();
-      if (!gameUI) return;
-      this.localPlayer = jass.GetLocalPlayer();
-      this.localPlayerId = this.resolveLocalPlayerId();
-      this.createEntryIcon(gameUI);
-      this.createMainPanel(gameUI);
-      this.createListPool();
-      this.registerTaskListWheel();
-      this.resetToDefault();
-      this.rebuildPages();
-      registerTaskUIRefreshCallback(dispatchRefresh);
-      this.hidePanel();
-    });
+    (pcall as any)(taskUIInitPcallBody);
+  }
+
+  /** 供模块级 `taskUIInitPcallBody` 调用（pcall 内不得写匿名闭包） */
+  runInitBodyInPcall(): void {
+    const gameUI = getGameUI();
+    if (!gameUI) return;
+    this.localPlayer = jass.GetLocalPlayer();
+    this.localPlayerId = this.resolveLocalPlayerId();
+    this.createEntryIcon(gameUI);
+    this.createMainPanel(gameUI);
+    this.createListPool();
+    this.registerTaskListWheel();
+    this.resetToDefault();
+    this.rebuildPages();
+    registerTaskUIRefreshCallback(dispatchRefresh);
+    this.hidePanel();
+    this.uiInitialized = true;
   }
 
   private createEntryIcon(parent: number): void {
     // 设置音效回调，供 dispatchTogglePanel 使用
-    clickSoundCallback = () => this.playLocalClickSound();
+    clickSoundCallback = taskUIModulePlayClickSound;
     const res = buildTaskEntryIcon({
       japi, parent, FrameType, FramePoint, createFrame, createTextLabel,
       setFramePosition, setFrameSize, setFramePointRelative, setFrameClickEvent,
@@ -110,9 +240,9 @@ class TaskUI {
       createFrame, setFramePosition, setFrameSize, setFramePointRelative,
       setFrameTexture, setFrameHoverEvents, setFrameClickEvent, setButtonText,
       createTabLabelTextOnBackdrop, setupTransparentGlueHitLayer,
-      onClickSound: () => this.playLocalClickSound(),
-      onSwitchCategory: (type: QuestType) => this.switchCategory(type),
-      onShowTabTooltip: () => {},
+      onClickSound: taskUIModulePlayClickSound,
+      onSwitchCategory: taskUIModuleSwitchCategory,
+      onShowTabTooltip: taskUIModuleNoopTabTooltip,
     });
     this.mainPanel = res.mainPanel;
     this.listContainer = res.listContainer;
@@ -123,10 +253,7 @@ class TaskUI {
 
   private createListPool(): void {
     this.precreatedListPool = createTaskUIPrecreatedListPool(this.getListControlContext());
-    setTaskRowHandlers(
-      (questId: string) => this.toggleExpand(questId),
-      () => this.playLocalClickSound(),
-    );
+    setTaskRowHandlers(taskUIModuleRowExpand, taskUIModulePlayClickSound);
   }
 
   private registerTaskListWheel(): void {
@@ -156,6 +283,36 @@ class TaskUI {
     SoundUI_ClickPlay(undefined, this.localPlayer);
   }
 
+  toggleExpandForRow(questId: string): void {
+    this.toggleExpand(questId);
+  }
+
+  getPageCountForCurrentCategory(): number {
+    return this.getPageCount(this.currentCategory);
+  }
+
+  applyScrollPageChanged(prev: number, next: number): void {
+    this.currentPage = next;
+    this.expandedQuestId = null;
+    switchPageLocal(this.precreatedListPool, this.currentCategory, prev, next);
+  }
+
+  syncScrollBarVisibility(pageCount: number, hasQuestRows: boolean): void {
+    updateTaskUIScrollBarVisibility(this.getScrollContext(), pageCount, hasQuestRows);
+  }
+
+  listGetCurrentPage(type: QuestType): number {
+    return type === this.currentCategory ? this.currentPage : 0;
+  }
+
+  listSetCurrentPage(type: QuestType, page: number): void {
+    if (type === this.currentCategory) this.currentPage = page;
+  }
+
+  listGetExpandedQuestId(type: QuestType): string | null {
+    return type === this.currentCategory ? this.expandedQuestId : null;
+  }
+
   private getPageCount(type: QuestType): number {
     return getTaskUICategoryPageCount(this.precreatedListPool, type);
   }
@@ -165,16 +322,27 @@ class TaskUI {
     applyTaskUIFacadeVisibleState(this.getListControlContext());
   }
 
-  switchCategory(type: QuestType): void {
-    if (!this.isVisible) return;
+  /** 同步修改分类状态（所有客户端执行） */
+  switchCategoryState(type: QuestType): void {
     if (this.currentCategory === type) return;
-    const old = this.currentCategory;
     this.currentCategory = type;
     this.currentPage = 0;
     this.expandedQuestId = null;
-    switchCategoryLocal(this.precreatedListPool, old, type);
+  }
+
+  /** 本地显示分类UI（仅本地玩家执行） */
+  switchCategoryUI(type: QuestType): void {
+    if (!this.isVisible) return;
+    applyTaskUICategorySwitchVisibleState(this.getListControlContext());
     const pc = this.getPageCount(type);
     updateTaskUIScrollBarVisibility(this.getScrollContext(), pc, pc > 0);
+  }
+
+  switchCategory(type: QuestType): void {
+    if (!this.isVisible) return;
+    if (this.currentCategory === type) return;
+    this.switchCategoryState(type);
+    this.switchCategoryUI(type);
   }
 
   private toggleExpand(questId: string): void {
@@ -223,70 +391,73 @@ class TaskUI {
     this.isVisible = false;
   }
 
-  private getListControlContext() {
-    return {
-      mainPanel: this.mainPanel, listContainer: this.listContainer,
-      currentPlayerId: this.localPlayerId, currentCategory: this.currentCategory,
-      precreatedListPool: this.precreatedListPool,
-      createTextLabel, FramePoint, FrameType, createFrame, setFrameTexture,
-      setFramePointRelative, setFrameSize, setFrameClickEvent,
-      setupTransparentGlueHitLayer, showFrame, hideFrame,
-      applyDzTextFontAndCenterAlignment, applyDzTextFontAndAlignment,
-      playClickSound: () => this.playLocalClickSound(),
-      updateScrollBarVisibility: (pageCount: number, hasQuestRows: boolean) =>
-        updateTaskUIScrollBarVisibility(this.getScrollContext(), pageCount, hasQuestRows),
-      toggleExpand: (questId: string) => this.toggleExpand(questId),
-      getCurrentPage: (type: QuestType) => type === this.currentCategory ? this.currentPage : 0,
-      setCurrentPage: (type: QuestType, page: number) => { if (type === this.currentCategory) this.currentPage = page; },
-      getExpandedQuestId: (type: QuestType) => type === this.currentCategory ? this.expandedQuestId : null,
-    };
+  private getListControlContext(): TaskUIListControlContext {
+    this.ensureUiContextCaches();
+    const c = this.listCtxCache!;
+    c.mainPanel = this.mainPanel;
+    c.listContainer = this.listContainer;
+    c.currentPlayerId = this.localPlayerId;
+    c.currentCategory = this.currentCategory;
+    c.precreatedListPool = this.precreatedListPool;
+    return c;
   }
 
-  private getScrollContext() {
-    return {
-      mainPanel: this.mainPanel, listContainer: this.listContainer,
-      scrollBarFrame: this.scrollBarFrame, scrollThumbFrame: this.scrollThumbFrame,
-      scrollThumbHitBtn: this.scrollThumbHitBtn, FramePoint, setFramePointRelative,
-      taskListWheelTrig: this.taskListWheelTrig,
-      getMouseFocus, getWheelDelta, registerMouseWheel,
-      isVisible: () => this.isVisible,
-      getCurrentPageCount: () => this.getPageCount(this.currentCategory),
-      getCurrentPage: () => this.currentPage,
-      setCurrentPage: (p: number) => { this.currentPage = p; },
-      onPageChanged: (prev: number, next: number) => {
-        this.currentPage = next;
-        this.expandedQuestId = null;
-        switchPageLocal(this.precreatedListPool, this.currentCategory, prev, next);
-      },
-    };
+  private getScrollContext(): TaskUIScrollContext {
+    this.ensureUiContextCaches();
+    const s = this.scrollCtxCache!;
+    s.mainPanel = this.mainPanel;
+    s.listContainer = this.listContainer;
+    s.scrollBarFrame = this.scrollBarFrame;
+    s.scrollThumbFrame = this.scrollThumbFrame;
+    s.scrollThumbHitBtn = this.scrollThumbHitBtn;
+    s.taskListWheelTrig = this.taskListWheelTrig;
+    return s;
   }
+}
+
+function taskUIInitPcallBody(): void {
+  mgr?.runInitBodyInPcall();
 }
 
 const taskUI = new TaskUI();
 export { taskUI };
 
+function taskUIHotkeySwitchCategoryState(type: QuestType): void {
+  taskUI.switchCategoryState(type);
+}
+
+function taskUIHotkeySwitchCategoryUI(type: QuestType): void {
+  taskUI.switchCategoryUI(type);
+}
+
+/** 地图加载时创建全局单例任务 UI（各客户端对称执行一次） */
 export function init(): void {
-  // 任务UI是全局单一UI，在init时直接初始化
-  if (!ENABLE_TASK_UI_CLIENT) return;
   taskUI.init();
 }
 
 // 热键不在此模块顶层注册：与 `系统.08．任务系统.10．index` 中 `registerHotkey()` 重复会导致同一键挂两个触发器，一次松键 toggle 两次（J「无效」）。
 // 由 `10．index` 在 `require("…03．任务UI")` 之后统一调用 `registerHotkey()`；`05．任务UI热键` 内另有 `taskUIKeybindsInstalled` 防重复。
 
-/**
- * 任务UI是全局单一UI，不需要在玩家英雄注册时创建。
- * 保留此函数是为了兼容性，但不做任何操作。
- */
-export function onPlayerHeroRegistered(this: void, _whichPlayer: any, _whichHero: any): void {
-  // 任务UI是全局单一UI，所有玩家共享，不需要按玩家创建
-}
-
 export function registerHotkey(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
   registerTaskUIHotkeys({
-    registerKeyUpLocal, KEY, KEY_NUM,
+    registerKeyUpSync, KEY, KEY_NUM,
     onTogglePanelLocal: dispatchTogglePanel,
-    onSwitchCategoryLocal: (type: QuestType) => taskUI.switchCategory(type),
+    onSwitchCategoryState: taskUIHotkeySwitchCategoryState,
+    onSwitchCategoryUI: taskUIHotkeySwitchCategoryUI,
   });
+}
+
+/**
+ * 注册任务UI刷新回调。
+ * 当任务数据变化时，重建UI列表。
+ */
+function onQuestManagerUiRefresh(_playerId: number, _questId?: string): void {
+  (pcall as any)(pcallDispatchRefreshBody);
+}
+
+/** 当前仅由 `init` 调用；参数保留与旧调用点兼容，实现固定走 `dispatchRefresh` */
+export function registerTaskUIRefreshCallback(_rebuildPages: () => void): void {
+  if (!questManager || typeof questManager.registerUIRefreshCallback !== "function") return;
+  questManager.registerUIRefreshCallback(onQuestManagerUiRefresh);
 }

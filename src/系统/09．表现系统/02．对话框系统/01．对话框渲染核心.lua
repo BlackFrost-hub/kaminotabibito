@@ -105,16 +105,16 @@ function ____exports.clearDialog(self, p)
     clearState(nil, state)
 end
 function ____exports.setDialogShowable(self, p, visible)
-    local localPlayer = dzGetLocalPlayer(nil)
-    if localPlayer ~= p then
-        return
-    end
     local pid = dzGetPlayerId(nil, p)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
     end
     local state = ensureState(nil, pid)
     state.canShow = visible
+    local localPlayer = dzGetLocalPlayer(nil)
+    if localPlayer ~= p then
+        return
+    end
     if not visible and state.initialized then
         do
             local i = 0

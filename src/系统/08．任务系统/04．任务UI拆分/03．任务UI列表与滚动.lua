@@ -9,6 +9,7 @@ local LIST_CONTAINER_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_CONTAINER_W
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local EMPTY_TEXTS = ____02_FF0E_4EFB_52A1UI_8F85_52A9.EMPTY_TEXTS
 local getQuestsForUI = ____02_FF0E_4EFB_52A1UI_8F85_52A9.getQuestsForUI
+local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 function ____exports.getQuestItemHeight(self, quest, expanded)
     if not expanded then
         return LIST_ITEM_H * 0.4
@@ -159,13 +160,9 @@ end
 -- 仅当当前分类下没有任何任务行（空列表占位）时隐藏。
 function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames, hasQuestRows)
     local vis = hasQuestRows
-    if type(japi.DzFrameShow) ~= "function" then
-        return
-    end
     for ____, f in ipairs(frames) do
         if f and f ~= 0 then
-            pcall(function () return japi.DzFrameShow(f, vis) end
-            )
+            pcallDzFrameShow(nil, japi, f, vis)
         end
     end
 end
@@ -181,7 +178,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue49
+                    goto __continue47
                 end
                 local expanded = isExpanded(nil, q.id)
                 local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
@@ -198,7 +195,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                 end
                 rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
-            ::__continue49::
+            ::__continue47::
             i = i + 1
         end
     end
@@ -269,11 +266,11 @@ function ____exports.refreshTaskUIList(self, opts)
             do
                 local row = visibleRows[i + 1]
                 if not row then
-                    goto __continue58
+                    goto __continue56
                 end
                 createListItem(nil, row.quest, row.rowTopRel, row.expanded)
             end
-            ::__continue58::
+            ::__continue56::
             i = i + 1
         end
     end

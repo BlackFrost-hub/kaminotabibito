@@ -1,21 +1,31 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local handleCategoryHotkey, currentHotkeyOpts
+local handleCategoryHotkey, jass, currentHotkeyOpts
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
-function handleCategoryHotkey(self, _player, category)
+function handleCategoryHotkey(self, player, category)
     local opts = currentHotkeyOpts
     if not opts then
         return
     end
-    opts:onSwitchCategoryLocal(category)
+    opts:onSwitchCategoryState(category)
+    local localPlayer = jass.GetLocalPlayer()
+    if player ~= localPlayer then
+        return
+    end
+    opts:onSwitchCategoryUI(category)
 end
+jass = require("jass.common")
 currentHotkeyOpts = nil
 --- 防止 `registerTaskUIHotkeys` 被调用多次时重复挂 J/K1–K3 触发器（会导致一次按键两次 toggle）
 local taskUIKeybindsInstalled = false
-local function handleTogglePanelHotkey(self, _player)
+local function handleTogglePanelHotkey(self, player)
     local opts = currentHotkeyOpts
     if not opts then
+        return
+    end
+    local localPlayer = jass.GetLocalPlayer()
+    if player ~= localPlayer then
         return
     end
     opts:onTogglePanelLocal()
@@ -31,10 +41,10 @@ local function handleDailyCategoryHotkey(self, player)
 end
 function ____exports.registerTaskUIHotkeys(self, opts)
     local ____opts_0 = opts
-    local registerKeyUpLocal = ____opts_0.registerKeyUpLocal
+    local registerKeyUpSync = ____opts_0.registerKeyUpSync
     local KEY = ____opts_0.KEY
     local KEY_NUM = ____opts_0.KEY_NUM
-    if type(registerKeyUpLocal) ~= "function" then
+    if type(registerKeyUpSync) ~= "function" then
         return
     end
     currentHotkeyOpts = opts
@@ -42,9 +52,9 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         return
     end
     taskUIKeybindsInstalled = true
-    registerKeyUpLocal(nil, KEY.J, handleTogglePanelHotkey)
-    registerKeyUpLocal(nil, KEY_NUM.K1, handleMainCategoryHotkey)
-    registerKeyUpLocal(nil, KEY_NUM.K2, handleSideCategoryHotkey)
-    registerKeyUpLocal(nil, KEY_NUM.K3, handleDailyCategoryHotkey)
+    registerKeyUpSync(nil, KEY.J, handleTogglePanelHotkey)
+    registerKeyUpSync(nil, KEY_NUM.K1, handleMainCategoryHotkey)
+    registerKeyUpSync(nil, KEY_NUM.K2, handleSideCategoryHotkey)
+    registerKeyUpSync(nil, KEY_NUM.K3, handleDailyCategoryHotkey)
 end
 return ____exports

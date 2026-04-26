@@ -2,8 +2,6 @@
 local ____exports = {}
 local ____index = require("系统.08．任务系统.02．任务管理器.index")
 local questManager = ____index.questManager
-local ____03_FF0E_4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
-local taskUI = ____03_FF0E_4EFB_52A1UI.taskUI
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
@@ -14,6 +12,7 @@ local KEY_LETTER = ____index.KEY_LETTER
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
+local taskUI = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器").taskUI
 local function debugPrint(self, msg)
     local pr = _G.print
     if pr ~= nil then

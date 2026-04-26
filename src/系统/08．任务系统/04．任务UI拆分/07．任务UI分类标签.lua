@@ -1,6 +1,4 @@
 local ____lualib = require("lualib_bundle")
-local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
@@ -12,15 +10,18 @@ local TAB_FRAME_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TAB_FRAME_H
 local TAB_CATEGORY_FONT_SCALE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TAB_CATEGORY_FONT_SCALE
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
+local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
+local pcallDzFrameSetAlpha = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameSetAlpha
 --- 主面板顶部分类标签（主线 / 支线 / 小任务）
 -- 
 -- 架构：全局1套UI，不再区分 slotPid。
 local japi = require("jass.japi")
-local categoryTabClickHandlers = __TS__New(Map)
+--- 用 Record 固定三类槽位，避免 Map 弱序/迭代习惯
+local categoryTabClickHandlers = {}
 local currentTooltipMessage = nil
 local currentTooltipHandler = nil
 local function handleCategoryTabClick(self, category)
-    local handler = categoryTabClickHandlers:get(category)
+    local handler = categoryTabClickHandlers[category]
     if not handler then
         return
     end
@@ -45,7 +46,7 @@ local function onTabHoverHide(self)
 end
 local tabClickHandlers = {[QuestType.MAIN] = onMainTabClick, [QuestType.SIDE] = onSideTabClick, [QuestType.DAILY] = onDailyTabClick}
 local function registerCategoryTabClickHandler(self, category, onSwitchCategory, onClickSound)
-    categoryTabClickHandlers:set(category, {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound})
+    categoryTabClickHandlers[category] = {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound}
 end
 local function createTaskTab(self, opts)
     local ____opts_0 = opts
@@ -84,10 +85,7 @@ local function createTaskTab(self, opts)
             TAB_REL_Y
         )
         setFrameSize(nil, bg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(bg, true) end
-            )
-        end
+        pcallDzFrameShow(nil, japi, bg, true)
         if type(japi.DzFrameSetLevel) == "function" then
             japi.DzFrameSetLevel(bg, 7)
         end
@@ -123,16 +121,10 @@ local function createTaskTab(self, opts)
             )
             setFrameSize(nil, tab, {width = TAB_FRAME_W, height = TAB_FRAME_H})
         end
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(tab, true) end
-            )
-        end
+        pcallDzFrameShow(nil, japi, tab, true)
         if not bg then
             setButtonText(nil, tab, "")
-            if type(japi.DzFrameSetAlpha) == "function" then
-                pcall(function () return japi.DzFrameSetAlpha(tab, 0) end
-                )
-            end
+            pcallDzFrameSetAlpha(nil, japi, tab, 0)
         end
         if type(japi.DzFrameSetLevel) == "function" then
             japi.DzFrameSetLevel(tab, 9)

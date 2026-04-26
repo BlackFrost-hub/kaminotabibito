@@ -13,27 +13,28 @@ import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系�
 import { getStatusText, isQuestWithRowIconLayout, tryCreateFromFdfOnly } from "./02．任务UI辅助";
 import { getQuestItemHeight } from "./03．任务UI列表与滚动";
 
-// 点击处理器缓存，避免频繁创建匿名闭包
-const questRowClickHandlers: Map<string, { onClickSound: () => void; onToggleExpand: (questId: string) => void }> = new Map();
+type QuestRowClickHandler = { onClickSound: () => void; onToggleExpand: (questId: string) => void };
+/** questId -> 处理器（字符串 key，无 Map 迭代） */
+const questRowClickHandlers: Record<string, QuestRowClickHandler> = {};
 
-// frame handle -> questId 映射表（避免匿名闭包）
-const frameToQuestIdMap: Map<number, string> = new Map();
+/** frameId -> questId（数字 key，无 Map） */
+const frameToQuestIdMap: Record<number, string> = {};
 
 // 命名函数替代匿名闭包 - 任务行点击
 function onQuestRowClick(): void {
   const japi = require("jass.japi") as any;
   const frame = typeof japi.DzGetTriggerUIEventFrame === "function" ? japi.DzGetTriggerUIEventFrame() : 0;
   if (!frame) return;
-  const questId = frameToQuestIdMap.get(frame);
-  if (!questId) return;
-  const handler = questRowClickHandlers.get(questId);
+  const questId = frameToQuestIdMap[frame];
+  if (questId === undefined || questId === "") return;
+  const handler = questRowClickHandlers[questId];
   if (!handler) return;
   handler.onClickSound();
   handler.onToggleExpand(questId);
 }
 
 function registerQuestRowClickHandler(questId: string, onClickSound: () => void, onToggleExpand: (questId: string) => void): void {
-  questRowClickHandlers.set(questId, { onClickSound, onToggleExpand });
+  questRowClickHandlers[questId] = { onClickSound, onToggleExpand };
 }
 
 // ────────────────────────────────────────────────
@@ -85,7 +86,7 @@ const EXPANDED_OBJECTIVE_ROW_HEIGHT = LIST_ITEM_H * 0.25;
 const EXPANDED_FAIL_ROW_HEIGHT = LIST_ITEM_H * 0.2;
 const EXPANDED_DETAIL_ROW_HEIGHT = LIST_ITEM_H * 0.22;
 
-const detailFrameByQuestId = new Map<string, number[]>();
+const detailFrameByQuestId: Record<string, number[]> = {};
 
 function getOrCreateDetailFrame(
   questId: string,
@@ -105,7 +106,7 @@ function getOrCreateDetailFrame(
   listItemFrames: number[],
 ): number {
   const key = questId + "|" + index;
-  let frames = detailFrameByQuestId.get(questId);
+  let frames = detailFrameByQuestId[questId];
   let fr = 0;
   if (frames && frames.length > index) {
     fr = frames[index] || 0;
@@ -128,7 +129,7 @@ function getOrCreateDetailFrame(
     if (fr !== 0) {
       if (!frames) {
         frames = [];
-        detailFrameByQuestId.set(questId, frames);
+        detailFrameByQuestId[questId] = frames;
       }
       while (frames.length <= index) frames.push(0);
       frames[index] = fr;
@@ -170,8 +171,8 @@ export function renderExpandedQuestDetails(opts: {
   setFrameSize: any;
   applyDzTextFontAndAlignment: any;
   showFrame: any;
-  objFrameByKey: Map<string, number>;
-  failFrameByQuestId: Map<string, number>;
+  objFrameByKey: Record<string, number>;
+  failFrameByQuestId: Record<string, number>;
   listItemFrames: number[];
 }): boolean {
   const {
@@ -197,7 +198,7 @@ export function renderExpandedQuestDetails(opts: {
   for (const obj of quest.objectives) {
     const txt = buildObjectiveText(obj.completed, obj.description, obj.current, obj.required);
     const objKey = quest.id + "|" + obj.id;
-    let objFrame = objFrameByKey.get(objKey) || 0;
+    let objFrame = objFrameByKey[objKey] || 0;
     if (objFrame === 0) {
       objFrame =
         createTextLabel(
@@ -217,7 +218,7 @@ export function renderExpandedQuestDetails(opts: {
         objYRel -= EXPANDED_OBJECTIVE_ROW_HEIGHT;
         continue;
       }
-      objFrameByKey.set(objKey, objFrame);
+      objFrameByKey[objKey] = objFrame;
     } else {
       setFramePointRelative(objFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, objYRel);
       setFrameSize(objFrame, { width: textW, height: EXPANDED_OBJECTIVE_ROW_HEIGHT });
@@ -231,7 +232,7 @@ export function renderExpandedQuestDetails(opts: {
   }
 
   if (quest.timeLimit && quest.timeLimit > 0) {
-    let failFrame = failFrameByQuestId.get(quest.id) || 0;
+    let failFrame = failFrameByQuestId[quest.id] || 0;
     const failText = buildFailText(quest.timeLimit);
     if (failFrame === 0) {
       failFrame =
@@ -249,7 +250,7 @@ export function renderExpandedQuestDetails(opts: {
           { width: textW, height: EXPANDED_FAIL_ROW_HEIGHT }
         ) || 0;
       if (failFrame === 0) return false;
-      failFrameByQuestId.set(quest.id, failFrame);
+      failFrameByQuestId[quest.id] = failFrame;
     } else {
       setFramePointRelative(failFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, objYRel);
       setFrameSize(failFrame, { width: textW, height: EXPANDED_FAIL_ROW_HEIGHT });
@@ -342,12 +343,12 @@ export function renderQuestRow(opts: {
   applyDzTextFontAndAlignment: any;
   onToggleExpand: (questId: string) => void;
   onClickSound: () => void;
-  rowBackdropByQuestId: Map<string, number>;
-  titleByQuestId: Map<string, number>;
-  clickBtnByQuestId: Map<string, number>;
-  objFrameByKey: Map<string, number>;
-  failFrameByQuestId: Map<string, number>;
-  rowIconByQuestId: Map<string, number>;
+  rowBackdropByQuestId: Record<string, number>;
+  titleByQuestId: Record<string, number>;
+  clickBtnByQuestId: Record<string, number>;
+  objFrameByKey: Record<string, number>;
+  failFrameByQuestId: Record<string, number>;
+  rowIconByQuestId: Record<string, number>;
   listItemFrames: number[];
 }): boolean {
   const {
@@ -382,7 +383,7 @@ export function renderQuestRow(opts: {
   const showMainRowIcon = isQuestWithRowIconLayout(quest);
   const { rowWidth, rowLeftRel, iconHLayout, textXRel, listTextAlign, textW } = calcTaskListItemLayout(showMainRowIcon);
 
-  let rowBackdrop = rowBackdropByQuestId.get(quest.id) || 0;
+  let rowBackdrop = rowBackdropByQuestId[quest.id] || 0;
   if (rowBackdrop === 0) {
     rowBackdrop = tryCreateFromFdfOnly("TaskButtonBackdrop", listParent) || 0;
     if (rowBackdrop === 0) {
@@ -397,7 +398,7 @@ export function renderQuestRow(opts: {
       rowBackdrop = bgFrame || 0;
       if (rowBackdrop !== 0) setFrameTexture(rowBackdrop, BG_TEX);
     }
-    if (rowBackdrop !== 0) rowBackdropByQuestId.set(quest.id, rowBackdrop);
+    if (rowBackdrop !== 0) rowBackdropByQuestId[quest.id] = rowBackdrop;
   }
   if (rowBackdrop === 0) return false;
   setFramePointRelative(rowBackdrop, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
@@ -408,7 +409,7 @@ export function renderQuestRow(opts: {
 
   const npcName = quest.startNpc || "未知";
   const titleText = "|cffffff00『" + quest.title + "』|r→发布NPC:|cff00ccff『" + npcName + "』|r [" + statusText + "]";
-  let titleFrame = titleByQuestId.get(quest.id) || 0;
+  let titleFrame = titleByQuestId[quest.id] || 0;
   if (titleFrame === 0) {
     titleFrame =
       createTextLabel(
@@ -425,7 +426,7 @@ export function renderQuestRow(opts: {
         { width: textW, height: LIST_ITEM_H * 0.38 }
       ) || 0;
     if (titleFrame === 0) return false;
-    titleByQuestId.set(quest.id, titleFrame);
+    titleByQuestId[quest.id] = titleFrame;
   } else {
     setFramePointRelative(titleFrame, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, textXRel, rowTopRel - 0.005);
     setFrameSize(titleFrame, { width: textW, height: LIST_ITEM_H * 0.38 });
@@ -436,7 +437,7 @@ export function renderQuestRow(opts: {
   showFrame(titleFrame);
   listItemFrames.push(titleFrame);
 
-  let clickBtn = clickBtnByQuestId.get(quest.id) || 0;
+  let clickBtn = clickBtnByQuestId[quest.id] || 0;
   if (clickBtn === 0) {
     clickBtn =
       createFrame({
@@ -449,13 +450,13 @@ export function renderQuestRow(opts: {
         alpha: 0,
       }) || 0;
     if (clickBtn === 0) return false;
-    clickBtnByQuestId.set(quest.id, clickBtn);
+    clickBtnByQuestId[quest.id] = clickBtn;
   }
   setFramePointRelative(clickBtn, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
   setFrameSize(clickBtn, { width: rowWidth, height: itemH });
   registerQuestRowClickHandler(quest.id, onClickSound, onToggleExpand);
   // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
-  frameToQuestIdMap.set(clickBtn, quest.id);
+  frameToQuestIdMap[clickBtn] = quest.id;
   setFrameClickEvent(clickBtn, onQuestRowClick, false);
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
   showFrame(clickBtn);
@@ -463,7 +464,7 @@ export function renderQuestRow(opts: {
 
   if (showMainRowIcon) {
     const iconPath = resolveQuestRowIconPath(quest.icon);
-    let iconFr = rowIconByQuestId.get(quest.id) || 0;
+    let iconFr = rowIconByQuestId[quest.id] || 0;
     if (iconFr === 0) {
       iconFr =
         createFrame({
@@ -475,7 +476,7 @@ export function renderQuestRow(opts: {
         }) || 0;
       if (iconFr !== 0) {
         setFrameTexture(iconFr, iconPath);
-        rowIconByQuestId.set(quest.id, iconFr);
+        rowIconByQuestId[quest.id] = iconFr;
       }
     } else {
       setFrameTexture(iconFr, iconPath);

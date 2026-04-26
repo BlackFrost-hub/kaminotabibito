@@ -6,7 +6,6 @@
 
 import { QuestType } from "../01．任务数据";
 import { TaskUIPrecreatedListPool, setVisible } from "./09．任务UI列表控制";
-import { MAX_PAGES_PER_CATEGORY } from "./01．任务UI常量";
 
 /**
  * 切换展开/收起：隐藏当前页所有 variant，只显示目标 variant。
@@ -69,44 +68,3 @@ export function switchPageLocal(
   }
 }
 
-/**
- * 切换分类：隐藏旧分类 root + 当前分类所有页 → 显示新分类 page 0 + variant 0。
- * 用 MAX_PAGES_PER_CATEGORY 固定次数遍历，不依赖 pages.length。
- */
-export function switchCategoryLocal(
-  pool: TaskUIPrecreatedListPool | null,
-  previousCategory: QuestType,
-  currentCategory: QuestType
-): void {
-  if (!pool) return;
-
-  const prev = pool.categories[previousCategory];
-  if (prev != null) {
-    setVisible(prev.root, false);
-  }
-
-  const cv = pool.categories[currentCategory];
-  if (!cv) return;
-
-  // 先隐藏当前分类所有页（固定 MAX_PAGES_PER_CATEGORY 次，跨端一致）
-  for (let i = 0; i < MAX_PAGES_PER_CATEGORY; i++) {
-    const page = cv.pages[i];
-    if (!page) continue;
-    setVisible(page.root, false);
-    for (let j = 0; j < page.variants.length; j++) {
-      setVisible(page.variants[j].root, false);
-    }
-  }
-
-  // 再显示 root 和 page 0 + variant 0
-  setVisible(cv.root, true);
-  setVisible(cv.emptyText, cv.pageCount <= 0);
-
-  const page0 = cv.pages[0];
-  if (page0 != null) {
-    for (let i = 0; i < page0.variants.length; i++) {
-      setVisible(page0.variants[i].root, i === 0);
-    }
-    setVisible(page0.root, true);
-  }
-}

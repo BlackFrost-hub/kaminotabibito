@@ -1,307 +1,185 @@
----
-description: Lua/ydLua 联机异步经验补充：少本地 table 写入、少匿名闭包、少依赖 GC
+description: Lua/ydLua 联机异步安全规范（社区经验优化版，按致命风险排序）
 globs: TS/**/*.ts, TS/**/*.lua
 alwaysApply: false
 ---
 
-# Lua GC / 闭包异步经验
+> **⚠️ 最高优先级（Dz / 任务面板等一切联机 UI）**  
+> UI 路径是社区经验里**最容易**因闭包、GC、`pcall` 体、回调注册路径与 `GetLocalPlayer()` 混写而诱发掉线或 desync 的环节，**不得**按「调用频率低、只是包一层」在此放宽。  
+> - **必须**较下文普通条目更严：进 JASS/Dz 的回调、`pcall` 包裹体、帧点击/滚轮/键盘注册 → **模块顶层具名函数 + 单列或 `mgr` 分发**；禁止把 **`() => …`** 传到上述注册点（细则见下 §「回调铁律」及仓库内 `04．任务UI拆分` 实现）。  
+> - **必须**与 `n-slot-ui-symmetric-execution.mdc` 一致：**全端对称的执行次数与创建路径**；纯显隐、本机音效、仅本地可见的改帧再在本地门控内做。  
+> - **审查快照**：同文件文末 **「附录：任务 UI（`04．任务UI拆分`）符合性」**；代码迭代后应复验。
 
-适用对象：
-- TSTL -> Lua 项目
-- DzAPI UI
-- 任何频繁本地输入、频繁 JASS <-> Lua 回调的系统
+# Lua GC / 闭包异步经验（优先级排序版）
 
-这不是绝对规则，而是联机稳定性优先时应默认靠拢的经验。
+> 适用：TSTL → Lua、DzAPI UI、任何频繁 JASS↔Lua 交互的系统。  
+> 这不是理论，而是从社区血泪教训中提炼的稳定优先准则。  
+> **越靠前的条目，越要无条件遵守。**（**例外不存在于 UI 回调链**：UI 一律按上文「最高优先级」执行，不降级。）
 
-## 1. 默认假设
+## 🚨 重要程度速查（从高到低）
 
-- 不要依赖 Lua GC 帮你“自然整理”运行时对象
-- 不要假设本地玩家之间 GC 时机一致
-- 除显示/读取这类幂等操作外，尽量同步执行
+1. **创建 / 删除 / 修改 → 必须同步**  
+   对象生命周期操作绝不能进入 `GetLocalPlayer()` 分支。唯一允许异步的只有显示/隐藏、读变量/非冥等性操作。
 
-## 2. 同步创建，异步显示
+2. **禁止异步全局引用**  
+   在本地分支中给全局表写 handle（单位、帧、物品等）会在 GC 后导致各端句柄不一致，直接掉线。
 
-### 核心原则
-- **创建/删除/修改** → 必须同步执行（所有玩家一起执行）
-- **显示/隐藏/读取** → 可以异步执行（本地玩家单独执行）
+3. **匿名闭包严禁传入 JASS 回调**  
+   频繁把 `() => ...` 传给 `TimerStart`、`ForGroup`、触发条件等，是最隐蔽的异步源。必须改为模块级命名函数 + 参数表传递。
 
-### UI 系统标准架构
-1. **初始化阶段（同步）**：所有玩家一起创建帧、table、string
-2. **交互阶段（异步）**：本地玩家控制 show/hide、设置文本、更新纹理
+4. **强制禁用 `pairs()`**  
+   `pairs` 对哈希表的遍历顺序不保证跨客户端一致，可直接导致掉线。入口处全局禁用，改用数组下标或 `sort` 后有序遍历。
 
-### 本地域内优先只做（纯幂等操作，不创建新对象）
-- `DzFrameShow` / `DzFrameHide`
-- `DzFrameSetTexture`（使用预定义路径）
-- `DzFrameSetPoint`
-- `DzFrameSetSize`
-- 读变量
+5. **字符串 / table 只在同步路径创建**  
+   所有字符串拼接、新建表必须在所有玩家代码路径中执行，本地分支只做最终显示赋值。
 
-### 谨慎使用（确保内容同步创建）
-- `DzFrameSetText` → **文本必须同步创建**，这里只做显示赋值
-  ```lua
-  -- ✅ 正确：字符串同步创建，异步显示
-  local text = "伤害: " .. damage  -- 所有玩家执行，创建相同字符串
-  if GetLocalPlayer() == Player(0) then
-      DzFrameSetText(frame, text)  -- 只有玩家0显示
-  end
-  
-  -- ❌ 错误：异步创建字符串
-  if GetLocalPlayer() == Player(0) then
-      local text = "伤害: " .. damage  -- 只有玩家0创建
-      DzFrameSetText(frame, text)
-  end
-  ```
-
-### 本地域内默认避免
-- 字符串拼接/格式化（`..` / `string.format`）
-- 新建 table / string
-- 创建/删除帧
-- 改全局表结构
-- 把运行时对象挂进全局引用
-
-## 3. 少用匿名闭包进 JASS 回调
-
-默认避免把匿名闭包频繁传给：
-- `DzFrameSetScriptByCode`
-- 键盘/鼠标/滚轮注册
-- `TimerStart`
-- `ForGroup`
-- 触发条件/Filter
-
-优先改成：
-- 模块级命名函数
-- 单列分发
-- Lua 层先记录索引/字符串 key，再统一处理
-
-## 4. table 约束与 pairs 禁用
-
-- table key 优先使用字符串或数字
-- 不要用 `unit/frame/player/item` 这类 handle/userdata 做 key
-- value 里也尽量不要长期挂复杂运行时对象引用
-- **不要依赖 `pairs()` 的 hash 部分遍历顺序——`pairs` 是随机的，不同客户端遍历顺序不同会导致 desync**
-
-**强制禁用 `pairs`（项目入口 Lua 代码）：**
-
-```lua
--- 禁止使用 pairs，遍历顺序随机会导致异步
-SafePairs = pairs
-pairs = function ()
-    error("不能使用pairs,请确认100%安全后用SafePairs替换")
-end
-```
-
-**替代方案：**
-- 数组遍历用 `for i = 1, #arr do ... end`
-- TSTL 的 `for...of` 会编译成 `pairs`，需要手动改成传统 `for` 循环
-- 如果确实需要 `pairs`（如遍历非数组 table），使用 `SafePairs` 并确保遍历顺序不影响同步
-
-优先形式：
-
-```lua
--- 确定性的数组遍历
-for i = 1, #rows do
-    local row = rows[i]
-    -- ...
-end
-
--- 字符串 key 的确定性遍历（如果需要）
-local keys = {}
-for k, _ in SafePairs(state) do
-    table.insert(keys, k)
-end
-table.sort(keys)  -- 排序后遍历顺序确定
-for _, k in ipairs(keys) do
-    local v = state[k]
-    -- ...
-end
-```
-
-避免形式：
-
-```lua
-state[unit] = true
-state[frame] = pageTable
-
--- 遍历顺序随机，不同客户端可能不同
-for k, v in pairs(state) do
-    -- ...
-end
-```
-
-## 5. 运行时句柄保护
-
-如果项目使用 `jass.runtime`，默认建议在主入口启用：
-
-```lua
-local runtime = require("jass.runtime")
-runtime.handle_level = 0
-```
-
-目的：
-- 尽量避免 runtime 自动释放 handle 引用后，不同玩家 Lua 侧句柄状态漂移
-
-若需要**入口一整段**的强化方案（含禁用 `pairs`、`TimerStart`/`TriggerAddAction` 等全局包装，且常见写法为 `handle_level = 1`），见同目录 **`lua-runtime-safety.mdc`**；与上式最小配置**二选一**，勿混用两套却未对齐。
-
-## 6. UI 系统落地建议
-
-- 1.少本地 `Map` / table 状态写入
-- 2.少本地后台刷新
-- 3.少“每个按钮一个闭包”
-- 4.优先“单管理器 + 单列事件分发 + 预设 frame + show/hide 切换”
-
-## 7. 不要把异步探针塞进本地链
-
-- `sync=false` 的本地 UI 事件链里，不要用 `DzSyncData` / `DzSyncDataImmediately` 做探针
-- 也不要在本地链里临时 `CreateItem` / `RemoveItem` / 创建 handle 再同步出去做比对
-
-原因：
-
-- 这类探针本身就不是幂等显示操作
-- 它们放进本地链后，往往会先制造 desync，而不是检测出 desync
-
-## 8. 本地 UI 音效约束
-
-- 本地 UI 链里的 `StartSound` / `SoundUI_ClickPlay` 必须限制到本地玩家
-- 如果音效封装支持 `whichPlayer`，就必须传本地玩家
-- 不要默认依赖"UI 音效只是表现，所以全房播放也没事"
+6. **最小化 `GetLocalPlayer()` 内部逻辑**  
+   本地玩家分支内除纯显示和读取外不要做任何事，包括数学运算、字符串操作等。
 
 ---
 
-# 避免 Lua 异步口诀（社区经验整理）
+## 📘 核心原则：同步创建，异步显示
 
-> 本地玩家睁大眼，除了显示不要浪  
-> 匿名闭包频繁创，不如写为动作行
+### 必须同步（非幂等）的操作
+- 创建帧、创建字符串、创建 table
+- 销毁句柄、修改全局表结构
+- 任何对运行时对象的写入
 
-## 核心原则
+### 可以异步（幂等）的操作
+- `DzFrameShow` / `DzFrameHide`
+- `DzFrameSetTexture`（使用预定义路径）
+- `DzFrameSetPoint` / `DzFrameSetSize`
+- 读取变量
 
-Lua 引擎能允许的异步操作更少了，所以**除了必要异步（如显示面板）请全部同步执行**。
-
-## 匿名闭包 vs 命名函数
-
-**匿名闭包函数**是由 JASS 回调 Lua 函数，在大量频繁创建下容易异步。尽量改为：
-- **触发的动作**（单列模式运行）
-- **命名函数**（可能比匿名函数引起异步的几率低）
-
-**像 `ForGroup` 这些传闭包函数的**，可以直接在 Lua 层封装调用循环取第一个单位，以达到不让闭包进入 JASS 回调里。
-
-## 幂等性操作判断
-
-**可以异步的（幂等性）：**
-- 显示（`DzFrameShow` 等）
-- 取变量值
-- 查看操作
-
-**必须同步的（非幂等性）：**
-- 创建
-- 删除
-- 修改
-
-口诀：**创建删除修改要同步，查看显示可以异步。**
-
-## 详细注意事项
-
-### 1. 避免异步创建 table 和 string
-
-**错误：**
+### UI 系统标准模式
 ```lua
--- 异步创建内容并显示
+-- ✅ 正确：内容同步创建，异步显示
+local text = "伤害: " .. damage  -- 所有玩家都执行，创建相同字符串
 if GetLocalPlayer() == Player(0) then
-    local content = createContent()  -- 异步创建
-    display(content)                  -- 异步显示
+    DzFrameSetText(frame, text)  -- 只在本地显示
 end
-```
 
-**正确：**
-```lua
--- 内容同步创建，异步显示
-local content = createContent()  -- 同步创建（所有玩家执行）
+-- ❌ 错误：字符串在本地分支创建
 if GetLocalPlayer() == Player(0) then
-    display(content)              -- 异步显示
+    local text = "伤害: " .. damage  -- 仅本地创建，其他玩家没有
+    DzFrameSetText(frame, text)
 end
-```
+📘 回调铁律：命名函数 + 单列，绝不用匿名闭包
+默认禁止
+将匿名闭包频繁传递给：
 
-### 2. 避免异步全局引用
+DzFrameSetScriptByCode、键盘/鼠标注册
 
-**错误：**
-```lua
-全局表 = {}
+TimerStart、ForGroup、Filter、触发条件
+
+正确做法
+所有回调使用顶层命名函数
+
+动态参数通过字符串 key 的全局表或数组传递
+
+ForGroup 等直接在 Lua 层用循环替代，不让闭包进入 JASS
+
+lua
+-- ✅ 正确：命名函数，单列模式
+local callbacks = {}
+function MyTimerCallback()
+    local data = callbacks[this]  -- 通过预存数据获取上下文
+    -- ...
+end
+
+-- ❌ 错误：每触发一次就创建新闭包
+TimerStart(t, 0.1, false, function()
+    -- 每次不同的匿名闭包，大数据量下极易异步
+end)
+📘 table 与迭代器铁律
+入口强制禁用 pairs
+lua
+-- 项目入口文件
+SafePairs = pairs
+pairs = function()
+    error("pairs 遍历顺序不确定，可能导致异步！请使用 SafePairs 或数组索引")
+end
+替代方案
+数组优先：for i = 1, #arr do ... end
+
+需要遍历非数组 table 时：先收集 key → sort → 再遍历
+
+lua
+local keys = {}
+for k in SafePairs(t) do table.insert(keys, k) end
+table.sort(keys)
+for _, k in ipairs(keys) do
+    local v = t[k]
+    -- ...
+end
+key 类型限制：只用字符串或数字，绝不用 unit、frame、player 等 handle/userdata
+
+减少 Map（哈希表）使用：优先用数组（顺序表）存储数据，哈希表仅用于必要的键值查找场景。数组遍历顺序天然一致，无需 `sort` 即可保证同步。
+
+📘 全局状态与引用
+任何对全局表的写操作（GlobalTable[x] = y）必须发生在所有玩家共有的代码路径中
+
+绝不在 GetLocalPlayer() 内创建或写入全局引用
+
+UI 控件引用、缓存数据等均受此约束
+
+lua
+-- ✅ 正确：所有玩家都写入，结构一致
+local data = ComputeAllPlayerData()  -- 同步计算
+GlobalTable["LastResult"] = data
+
 if GetLocalPlayer() == Player(0) then
-    全局表[某单位] = true        -- 异步写入 handle key
-    全局表[xxx] = 某单位          -- 异步写入 handle value
+    ShowResultUI(data)  -- 只做显示
 end
-```
 
-**后果：** 不同玩家 GC 后 handle 不同步。
-
-**正确：**
-```lua
--- 除显示外或幂等性的操作其余全部同步执行计算
--- 即每个玩家计算所有玩家的数据
-local data = calculateAllPlayersData()  -- 同步计算
+-- ❌ 错误：只本地写入
 if GetLocalPlayer() == Player(0) then
-    display(data)                          -- 异步显示
+    GlobalTable[myUnit] = true  -- 只有玩家0记录了该单位，GC后其它端数据不同
 end
-```
+📘 其他硬性约束
+数学库：使用 JASS 提供的数学函数，Lua 的 math 可能异步。
 
-### 3. 少用 `GetLocalPlayer()` 判断
+禁止等待：用计时器代替 TriggerSleepAction。
 
-**避免思路：**
-- 少在 `GetLocalPlayer()` 判断里执行操作
-- 一不小心你的异步操作可能会引起地图异步
-- 即使某些数据可能根本不需要用到，也要同步创建
+条件判断放动作里：不要把条件写在 TriggerAddCondition 的返回布尔中，那个隐式闭包也会进 JASS。
 
-### 4. 闭包给 JASS 的回调尽量少用
+音效：本地 UI 触发的 StartSound 必须传入本地玩家参数，不能全局播放。
 
-- 在 Lua 层封装即可
-- 实在无法避免的可声明一个函数，传函数名当回调
+运行时保护：
 
-### 5. 尽量避免大量 JASS 和 Lua 混用
+lua
+local runtime = require("jass.runtime")
+runtime.handle_level = 0
+单例复用：避免频繁创建销毁，把常用对象挂到全局变量，降低 GC 压力。
 
-推荐完全使用 Lua 做图。
+Lua 与 JASS 交互：尽量用全 Lua 逻辑，减少混用。
 
-### 6. 使用 JASS 的数学库
+⚠️ 心态与概率
+Lua 异步是几率性的，无法做到 100% 绝对安全。
 
-Lua 本身的 `math` 库可能异步。
+严格按照上述规范，异步概率可控制在 0.1% 以下。
 
-### 7. 不要使用等待
+不要为追求完美写出更危险的并行逻辑；当无法避免时，接受极小概率，不要过度恐慌。
 
-使用计时器替代。
+测试参考：10 万次 JASS 回调 + 修改操作未异步；1 万字符串 key 的 SafePairs 顺序未见异常（但 handle key 极度危险）。
 
-### 8. table 表请使用数组或字符串 key
+口诀
+本地玩家睁大眼，除了显示不要浪
+匿名闭包频繁创，不如写为动作行
+创建删除修改皆同步，查看显示可异步
 
-其他对象类型的 key 容易不同玩家的随机顺序不一致。
+---
 
-### 9. 条件在动作里 if 判断
+## 附录：任务 UI（`TS/系统/08．任务系统/04．任务UI拆分`）规则符合性快照
 
-不要放触发条件里，不然又是一个跟 JASS 交互的闭包。
+> 随代码变更请复验；以源码为准。与 `n-slot-ui-symmetric-execution.mdc` §4.3 交叉维护。
 
-## 无法避免怎么办？
+| 规则域 | 结论 |
+|--------|------|
+| **创建 / 生命周期（§1–2）** | `10．index` 在 `ENABLE_QUEST_UI_MODULE` 下对各客户端对称调用 `12．任务UI管理器` 的 `init()` / `registerHotkey()`；帧创建在 `runInitBodyInPcall` 等**全房共有路径**，非「仅本地分支才建 UI」。 |
+| **匿名闭包 → JASS/Dz（§3）** | 行点击 `handleTaskRowClick`、分类 Tab 具名表、`12` 模块级分发、`09`/`10`/`02` 中 `pcall` 已用具名体；`DzFrameShow`/`DzCreateFrame` 等经 `02` 的 `pcallDzFrameShow` 等与具名 `pcall` 体。 |
+| **`pairs`（§4）** | 分类遍历走 `questTypes()` 等**固定顺序数组**，热路径未见 `pairs(` 哈希遍历。 |
+| **本机分支（§5–6）** | `05．任务UI热键`：先全端 `onSwitchCategoryState`，再在 `player === GetLocalPlayer()` 内做分类 UI；与「状态同步、显示本地」分层一致。 |
+| **`n-slot` §3 计时器** | 任务 UI 不以「仅本机 `TimerStart`」做主刷新链；数据变更走管理器刷新回调 → 全端 `rebuildPages` 路径。 |
+| **与字面「N 槽」（`n-slot` §4）** | 当前为**每客户端一套对称壳**（源码注释：全局一套、不区分 `slotPid`），**不是**按 `Player(i)` 乘 N 套物理帧；仍满足 **「各端执行同套创建/注册逻辑」** 的铁律。若将来改为 N 槽，须同步帧名/`contextId`/热键分发及本附录与 `n-slot` §4.3。 |
 
-Lua 异步是几率性的：
-- **无法避免就不要避免**，强行避免只会让你的异步几率变大
-- 但并不是 100% 或 5% 几率异步不能玩！
-- 操作得好就是 99.99% 不异步（为什么不是 100%？因为机器本身就无法保证 100% 正确可靠）
-- **不要过度恐慌！**
-
-通常往上述方向去尽量靠，**异步几率不会超过 0.1%**。
-
-## 一些建议
-
-1. **避免大量创建又删除**，以免频繁触发 Lua 频繁 GC
-   - 能单例使用的对象就挂载到全局变量一直用
-   - 不要动不动就大括号 `{}` 新建表
-
-2. **尽量减少频繁使用匿名闭包函数**
-
-3. **使用 Lua 层事件分发或模拟**（比如中心计时器）
-   - 以减少 Lua 与 JASS 需要回调的交互
-
-## 一些测试数据
-
-- Lua 与 JASS 的回调闭包，回调 10w 次并在回调里做修改增加操作，未异步（具体回调上限值多少可能每次不会相同）
-- Lua `pairs` 1w 字符串 key 的表，多玩家未出现随机顺序不一致
-
-## 一些可能有用的备注
-
-- Lua 传递给 JASS 的闭包不会被释放，所以要尽量少传闭包过去
-- Lua 传给 JASS 的 `Filter` 可以搞成单列的，不要手动销毁它
+**残留关注点**：新增 `setFrameClickEvent` / 滚轮 / 同步键注册时，继续保持具名函数 + 分发，避免回退为箭头传入注册点。

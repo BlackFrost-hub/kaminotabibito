@@ -1,10 +1,14 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
+local __TS__StringCharAt = ____lualib.__TS__StringCharAt
+local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local TASK_UI_TOC_LOAD_KEY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TASK_UI_TOC_LOAD_KEY
@@ -22,6 +26,36 @@ local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local __dzPcallShowJapi = nil
+local __dzPcallShowFrame = 0
+local __dzPcallShowVis = false
+local function __dzPcallFrameShowBody(self)
+    __dzPcallShowJapi:DzFrameShow(__dzPcallShowFrame, __dzPcallShowVis)
+end
+function ____exports.pcallDzFrameShow(self, japiAny, frame, visible)
+    if type(japiAny.DzFrameShow) ~= "function" then
+        return
+    end
+    __dzPcallShowJapi = japiAny
+    __dzPcallShowFrame = frame
+    __dzPcallShowVis = visible
+    pcall(nil, __dzPcallFrameShowBody)
+    __dzPcallShowJapi = nil
+end
+local __dzPcallAlphaVal = 0
+local function __dzPcallFrameSetAlphaBody(self)
+    __dzPcallShowJapi:DzFrameSetAlpha(__dzPcallShowFrame, __dzPcallAlphaVal)
+end
+function ____exports.pcallDzFrameSetAlpha(self, japiAny, frame, alpha)
+    if type(japiAny.DzFrameSetAlpha) ~= "function" then
+        return
+    end
+    __dzPcallShowJapi = japiAny
+    __dzPcallShowFrame = frame
+    __dzPcallAlphaVal = alpha
+    pcall(nil, __dzPcallFrameSetAlphaBody)
+    __dzPcallShowJapi = nil
+end
 function ____exports.dzGetLocalPlayer(self)
     return jass.GetLocalPlayer()
 end
@@ -77,6 +111,16 @@ function ____exports.isFdfFrameEnabled(self, frameName)
     end
     return false
 end
+local function tryCreateFromFdfOnlyNullFallback(self)
+    return nil
+end
+local __dzCreateName = ""
+local __dzCreateParent = 0
+local __dzCreateContextId = 0
+local __dzCreateResultFrame = 0
+local function __dzCreateFramePcallBody(self)
+    __dzCreateResultFrame = japi.DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId)
+end
 function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, contextId)
     if contextId == nil then
         contextId = 0
@@ -88,11 +132,11 @@ function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, co
         }
     end
     loadTocOnce(nil, TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI")
-    local f = 0
-    local ok = pcall(function ()
-            f = japi.DzCreateFrame(name, parent, contextId)
-        end
-    )
+    __dzCreateName = name
+    __dzCreateParent = parent
+    __dzCreateContextId = contextId
+    local ok = pcall(nil, __dzCreateFramePcallBody)
+    local f = __dzCreateResultFrame
     if ok and f ~= nil and f ~= 0 then
         return {frame = f, fromFdf = true}
     end
@@ -109,7 +153,7 @@ function ____exports.tryCreateFromFdfOnly(self, name, parent, contextId)
         nil,
         name,
         parent,
-        function() return nil end,
+        tryCreateFromFdfOnlyNullFallback,
         contextId
     )
     if res.fromFdf and res.frame and res.frame ~= 0 then
@@ -127,6 +171,62 @@ function ____exports.getStatusText(self, status)
     }
     return m[status] or status
 end
+local function questIdTailIsAllDigits(self, s)
+    if #s == 0 then
+        return false
+    end
+    do
+        local i = 0
+        while i < #s do
+            local c = __TS__StringCharCodeAt(s, i)
+            if c < 48 or c > 57 then
+                return false
+            end
+            i = i + 1
+        end
+    end
+    return true
+end
+--- TSTL 无 `lastIndexOf`，手写从右找 `_`
+local function lastUnderscoreIndex(self, s)
+    do
+        local i = #s - 1
+        while i >= 0 do
+            if __TS__StringCharAt(s, i) == "_" then
+                return i
+            end
+            i = i - 1
+        end
+    end
+    return -1
+end
+--- `foo_2` 与 `foo_10` 字典序会乱；同一「末段 `_` 前」前缀且尾为纯数字时按数值比，否则字典序
+local function compareQuestIdForListOrder(self, aId, bId)
+    local ua = lastUnderscoreIndex(nil, aId)
+    local ub = lastUnderscoreIndex(nil, bId)
+    if ua > 0 and ub > 0 then
+        local preA = __TS__StringSubstring(aId, 0, ua + 1)
+        local preB = __TS__StringSubstring(bId, 0, ub + 1)
+        if preA == preB then
+            local tailA = __TS__StringSubstring(aId, ua + 1)
+            local tailB = __TS__StringSubstring(bId, ub + 1)
+            if questIdTailIsAllDigits(nil, tailA) and questIdTailIsAllDigits(nil, tailB) then
+                local na = __TS__ParseInt(tailA, 10)
+                local nb = __TS__ParseInt(tailB, 10)
+                if na ~= nb then
+                    return na - nb
+                end
+            end
+        end
+    end
+    if aId < bId then
+        return -1
+    end
+    if aId > bId then
+        return 1
+    end
+    return 0
+end
 function ____exports.getQuestsForUI(self, playerId, ____type)
     local active = __TS__ArrayFilter(
         questDB:getPlayerActiveQuests(playerId),
@@ -138,13 +238,13 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
         do
             local template = questDB:getQuest(id)
             if not template or template.type ~= ____type or template.uiReserved then
-                goto __continue29
+                goto __continue51
             end
             if __TS__ArraySome(
                 active,
                 function(____, q) return q.id == id end
             ) then
-                goto __continue29
+                goto __continue51
             end
             result[#result + 1] = __TS__ObjectAssign(
                 {},
@@ -158,8 +258,12 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
                 }
             )
         end
-        ::__continue29::
+        ::__continue51::
     end
+    __TS__ArraySort(
+        result,
+        function(____, a, b) return compareQuestIdForListOrder(nil, a.id, b.id) end
+    )
     return result
 end
 ____exports.EMPTY_TEXTS = {[QuestType.MAIN] = "暂无主线任务", [QuestType.SIDE] = "暂无支线任务", [QuestType.DAILY] = "暂无小任务"}

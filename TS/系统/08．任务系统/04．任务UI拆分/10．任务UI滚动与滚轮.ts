@@ -19,6 +19,7 @@ import {
   SCROLL_THUMB_TOP_COMPENSATION,
   SCROLL_THUMB_BOTTOM_COMPENSATION,
 } from "./01．任务UI常量";
+import { pcallDzFrameShow } from "./02．任务UI辅助";
 
 export interface TaskUIScrollContext {
   mainPanel: number | null;
@@ -44,14 +45,16 @@ let wheelCtx: TaskUIScrollContext | null = null;
 /** 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc） */
 let taskThumbGlobalMouseTrig: unknown = null;
 
+function taskUIWheelEventPcallBody(): void {
+  const ctx = wheelCtx!;
+  if (!ctx.isVisible()) return;
+  if (!isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) return;
+  handleTaskUIListWheel(ctx);
+}
+
 function onMouseWheelEvent(): void {
   if (!wheelCtx) return;
-  (pcall as any)(() => {
-    const ctx = wheelCtx!;
-    if (!ctx.isVisible()) return;
-    if (!isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) return;
-    handleTaskUIListWheel(ctx);
-  });
+  (pcall as any)(taskUIWheelEventPcallBody);
 }
 
 function thumbTravelNorm(): number {
@@ -155,30 +158,34 @@ function onThumbDragEnd(): void {
 }
 
 /** 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc */
+function taskUIThumbPressPcallBody(): void {
+  const ctx = wheelCtx;
+  if (!ctx || !ctx.isVisible()) return;
+  if (!isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) {
+    return;
+  }
+  dragCtx = ctx;
+  onThumbDragStart();
+}
+
 function onGlobalThumbLeftPress(): void {
-  (pcall as any)(() => {
-    const ctx = wheelCtx;
-    if (!ctx || !ctx.isVisible()) return;
-    if (
-      !isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)
-    ) {
-      return;
-    }
-    dragCtx = ctx;
-    onThumbDragStart();
-  });
+  (pcall as any)(taskUIThumbPressPcallBody);
+}
+
+function taskUIThumbReleasePcallBody(): void {
+  onThumbDragEnd();
 }
 
 function onGlobalThumbLeftRelease(): void {
-  (pcall as any)(() => {
-    onThumbDragEnd();
-  });
+  (pcall as any)(taskUIThumbReleasePcallBody);
+}
+
+function taskUIThumbMovePcallBody(): void {
+  onThumbDragMove();
 }
 
 function onGlobalThumbDragMove(): void {
-  (pcall as any)(() => {
-    onThumbDragMove();
-  });
+  (pcall as any)(taskUIThumbMovePcallBody);
 }
 
 function ensureTaskThumbGlobalMouseRegistered(): void {
@@ -205,9 +212,8 @@ export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
 
 export function updateTaskUIScrollBarVisibility(ctx: TaskUIScrollContext, pageCount: number, hasQuestRows: boolean): void {
   const visible = hasQuestRows;
-  if (typeof japi.DzFrameShow !== "function") return;
   for (const frame of [ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn]) {
-    if (frame && frame !== 0) (pcall as any)(() => japi.DzFrameShow(frame, visible));
+    if (frame && frame !== 0) pcallDzFrameShow(japi, frame, visible);
   }
   if (visible) updateTaskUIScrollThumbPosition(ctx, pageCount);
 }

@@ -29,7 +29,7 @@ local function registerDummyMainQuests(self)
     do
         local i = 1
         while i <= 20 do
-            local questId = "dummy_main_" .. tostring(i)
+            local questId = "dummy_main_" .. (i < 10 and "00" .. tostring(i) or (i < 100 and "0" .. tostring(i) or tostring(i)))
             local questDef = {
                 id = questId,
                 type = QuestType.MAIN,
@@ -71,12 +71,12 @@ if ENABLE_QUEST_RUNTIME_CORE then
     registerDummyMainQuests(nil)
 end
 if ENABLE_QUEST_UI_MODULE then
-    local _____4EFB_52A1UI = require("系统.08．任务系统.03．任务UI")
-    if type(_____4EFB_52A1UI.init) == "function" then
-        _____4EFB_52A1UI:init()
+    local manager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
+    if type(manager.init) == "function" then
+        manager:init()
     end
-    if type(_____4EFB_52A1UI.registerHotkey) == "function" then
-        _____4EFB_52A1UI:registerHotkey()
+    if type(manager.registerHotkey) == "function" then
+        manager:registerHotkey()
     end
 end
 if ENABLE_QUEST_STES_OBJECTIVE_BRIDGE or ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE then

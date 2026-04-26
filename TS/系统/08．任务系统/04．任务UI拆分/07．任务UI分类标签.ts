@@ -8,17 +8,18 @@ const japi = require("jass.japi") as any;
 
 import { QuestType } from "../01．任务数据";
 import { TAB_REL_Y, TAB_FRAME_W, TAB_FRAME_H, TAB_CATEGORY_FONT_SCALE } from "./01．任务UI常量";
-import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
+import { tryCreateFromFdfOnly, pcallDzFrameShow, pcallDzFrameSetAlpha } from "./02．任务UI辅助";
 
-// 分类标签点击处理器缓存
-const categoryTabClickHandlers: Map<QuestType, { onSwitchCategory: (type: QuestType) => void; onClickSound: () => void }> = new Map();
+type CategoryTabHandler = { onSwitchCategory: (type: QuestType) => void; onClickSound: () => void };
+/** 用 Record 固定三类槽位，避免 Map 弱序/迭代习惯 */
+const categoryTabClickHandlers: Partial<Record<QuestType, CategoryTabHandler>> = {};
 
 // 当前悬停提示消息（避免匿名闭包）
 let currentTooltipMessage: string | null = null;
 let currentTooltipHandler: ((msg: string) => void) | null = null;
 
 function handleCategoryTabClick(category: QuestType): void {
-  const handler = categoryTabClickHandlers.get(category);
+  const handler = categoryTabClickHandlers[category];
   if (!handler) return;
   handler.onSwitchCategory(category);
   handler.onClickSound();
@@ -44,7 +45,7 @@ const tabClickHandlers: Record<QuestType, () => void> = {
 };
 
 function registerCategoryTabClickHandler(category: QuestType, onSwitchCategory: (type: QuestType) => void, onClickSound: () => void): void {
-  categoryTabClickHandlers.set(category, { onSwitchCategory, onClickSound });
+  categoryTabClickHandlers[category] = { onSwitchCategory, onClickSound };
 }
 
 interface TabPair {
@@ -127,7 +128,7 @@ function createTaskTab(opts: {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
     setFrameSize(bg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-    if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(bg, true));
+    pcallDzFrameShow(japi, bg, true);
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(bg, 7);
   }
 
@@ -145,12 +146,10 @@ function createTaskTab(opts: {
       setFramePointRelative(tab, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
       setFrameSize(tab, { width: TAB_FRAME_W, height: TAB_FRAME_H });
     }
-    if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(tab, true));
+    pcallDzFrameShow(japi, tab, true);
     if (!bg) {
       setButtonText(tab, "");
-      if (typeof (japi as any).DzFrameSetAlpha === "function") {
-        (pcall as any)(() => (japi as any).DzFrameSetAlpha(tab, 0));
-      }
+      pcallDzFrameSetAlpha(japi, tab, 0);
     }
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tab, 9);
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);

@@ -9,7 +9,7 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
 };
 
 import { questManager } from "../08．任务系统/02．任务管理器/index";
-import { taskUI } from "../08．任务系统/03．任务UI";
+const taskUI = require("../08．任务系统/04．任务UI拆分/12．任务UI管理器").taskUI;
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
 import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数/04．硬件输入/index";
 

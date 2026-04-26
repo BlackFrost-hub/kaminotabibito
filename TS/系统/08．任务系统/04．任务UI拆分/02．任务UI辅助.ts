@@ -14,6 +14,39 @@ import { questDB, QuestType, QuestStatus, QuestData } from "../01．任务数据
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
+// ── Dz 调用 pcall：具名函数，避免每次分配匿名闭包 ──
+let __dzPcallShowJapi: any = null;
+let __dzPcallShowFrame = 0;
+let __dzPcallShowVis = false;
+
+function __dzPcallFrameShowBody(): void {
+  __dzPcallShowJapi.DzFrameShow(__dzPcallShowFrame, __dzPcallShowVis);
+}
+
+export function pcallDzFrameShow(japiAny: any, frame: number, visible: boolean): void {
+  if (typeof japiAny.DzFrameShow !== "function") return;
+  __dzPcallShowJapi = japiAny;
+  __dzPcallShowFrame = frame;
+  __dzPcallShowVis = visible;
+  (pcall as any)(__dzPcallFrameShowBody);
+  __dzPcallShowJapi = null;
+}
+
+let __dzPcallAlphaVal = 0;
+
+function __dzPcallFrameSetAlphaBody(): void {
+  __dzPcallShowJapi.DzFrameSetAlpha(__dzPcallShowFrame, __dzPcallAlphaVal);
+}
+
+export function pcallDzFrameSetAlpha(japiAny: any, frame: number, alpha: number): void {
+  if (typeof japiAny.DzFrameSetAlpha !== "function") return;
+  __dzPcallShowJapi = japiAny;
+  __dzPcallShowFrame = frame;
+  __dzPcallAlphaVal = alpha;
+  (pcall as any)(__dzPcallFrameSetAlphaBody);
+  __dzPcallShowJapi = null;
+}
+
 export function dzGetLocalPlayer(): any {
   return jass.GetLocalPlayer();
 }
@@ -58,6 +91,19 @@ export function isFdfFrameEnabled(frameName: string): boolean {
   return false;
 }
 
+function tryCreateFromFdfOnlyNullFallback(): number | null {
+  return null;
+}
+
+let __dzCreateName = "";
+let __dzCreateParent = 0;
+let __dzCreateContextId = 0;
+let __dzCreateResultFrame = 0;
+
+function __dzCreateFramePcallBody(): void {
+  __dzCreateResultFrame = (japi as any).DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId);
+}
+
 export function tryCreateFromFdfWithSource(
   name: string,
   parent: number,
@@ -66,16 +112,17 @@ export function tryCreateFromFdfWithSource(
 ): { frame: number | null; fromFdf: boolean } {
   if (!isFdfFrameEnabled(name)) return { frame: fallback(), fromFdf: false };
   loadTocOnce(TASK_UI_TOC_LOAD_KEY, TASK_UI_TOC_PATHS, "TaskUI");
-  let f: number = 0;
-  const ok = (pcall as any)(() => {
-    f = (japi as any).DzCreateFrame(name, parent, contextId);
-  });
+  __dzCreateName = name;
+  __dzCreateParent = parent;
+  __dzCreateContextId = contextId;
+  const ok = (pcall as any)(__dzCreateFramePcallBody);
+  const f = __dzCreateResultFrame;
   if (ok && f != null && f !== 0) return { frame: f, fromFdf: true };
   return { frame: fallback(), fromFdf: false };
 }
 
 export function tryCreateFromFdfOnly(name: string, parent: number, contextId: number = 0): number | null {
-  const res = tryCreateFromFdfWithSource(name, parent, () => null, contextId);
+  const res = tryCreateFromFdfWithSource(name, parent, tryCreateFromFdfOnlyNullFallback, contextId);
   if (res.fromFdf && res.frame && res.frame !== 0) return res.frame;
   return null;
 }
@@ -89,6 +136,45 @@ export function getStatusText(status: QuestStatus): string {
     [QuestStatus.UNDISCOVERED]: "|cff888888未发现|r",
   };
   return m[status] || status;
+}
+
+function questIdTailIsAllDigits(s: string): boolean {
+  if (s.length === 0) return false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c < 48 || c > 57) return false;
+  }
+  return true;
+}
+
+/** TSTL 无 `lastIndexOf`，手写从右找 `_` */
+function lastUnderscoreIndex(s: string): number {
+  for (let i = s.length - 1; i >= 0; i--) {
+    if (s.charAt(i) === "_") return i;
+  }
+  return -1;
+}
+
+/** `foo_2` 与 `foo_10` 字典序会乱；同一「末段 `_` 前」前缀且尾为纯数字时按数值比，否则字典序 */
+function compareQuestIdForListOrder(aId: string, bId: string): number {
+  const ua = lastUnderscoreIndex(aId);
+  const ub = lastUnderscoreIndex(bId);
+  if (ua > 0 && ub > 0) {
+    const preA = aId.substring(0, ua + 1);
+    const preB = bId.substring(0, ub + 1);
+    if (preA === preB) {
+      const tailA = aId.substring(ua + 1);
+      const tailB = bId.substring(ub + 1);
+      if (questIdTailIsAllDigits(tailA) && questIdTailIsAllDigits(tailB)) {
+        const na = parseInt(tailA, 10);
+        const nb = parseInt(tailB, 10);
+        if (na !== nb) return na - nb;
+      }
+    }
+  }
+  if (aId < bId) return -1;
+  if (aId > bId) return 1;
+  return 0;
 }
 
 export function getQuestsForUI(playerId: number, type: QuestType): QuestData[] {
@@ -109,6 +195,8 @@ export function getQuestsForUI(playerId: number, type: QuestType): QuestData[] {
     });
   }
 
+  // 稳定顺序：避免底层表迭代顺序在各端不一致 → chunk 分页数/重绘次数分叉 → 联机不同步
+  result.sort((a, b) => compareQuestIdForListOrder(a.id, b.id));
   return result;
 }
 

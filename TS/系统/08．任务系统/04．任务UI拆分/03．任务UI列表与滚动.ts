@@ -5,7 +5,7 @@ import {
   LIST_CONTENT_TOP_INSET,
   LIST_CONTAINER_W,
 } from "./01．任务UI常量";
-import { EMPTY_TEXTS, getQuestsForUI } from "./02．任务UI辅助";
+import { EMPTY_TEXTS, getQuestsForUI, pcallDzFrameShow } from "./02．任务UI辅助";
 
 // ────────────────────────────────────────────────
 // 行高与总高度
@@ -153,9 +153,8 @@ export function updateScrollBarVisibility(
   hasQuestRows: boolean
 ): void {
   const vis = hasQuestRows;
-  if (typeof japi.DzFrameShow !== "function") return;
   for (const f of frames) {
-    if (f && f !== 0) (pcall as any)(() => japi.DzFrameShow(f, vis));
+    if (f && f !== 0) pcallDzFrameShow(japi, f, vis);
   }
 }
 
