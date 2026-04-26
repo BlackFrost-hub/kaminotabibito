@@ -25,9 +25,9 @@ import {
 import { DZ_TEXT_ALIGN_LEFT } from "../../00．核心系统/03．UI函数";
 
 
-let currentTaskRowExpandHandler: ((questId: string) => void) | null = null;
-let currentTaskRowClickSound: (() => void) | null = null;
-const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number } | undefined> = {};
+export let currentTaskRowExpandHandler: ((questId: string) => void) | null = null;
+export let currentTaskRowClickSound: (() => void) | null = null;
+export const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number } | undefined> = {};
 
 const ROWS_PER_PAGE = 7;
 const ROWS_PER_SCROLL_STEP = 3;
@@ -111,7 +111,7 @@ function setText(frame: number | null, text: string): void {
   if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(frame, text);
 }
 
-function setVisible(frame: number | null, visible: boolean): void {
+export function setVisible(frame: number | null, visible: boolean): void {
   if (!frame || frame === 0) return;
   if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(frame, visible);
 }
@@ -329,7 +329,7 @@ function createVariant(
   return { root, rowSlots };
 }
 
-function handleTaskRowClick(): void {
+export function handleTaskRowClick(): void {
   const frame =
     typeof (japi as any).DzGetTriggerUIEventFrame === "function" ? (japi as any).DzGetTriggerUIEventFrame() : 0;
   if (!frame) return;
@@ -645,6 +645,12 @@ export function rebuildTaskUIFacadeListPool(ctx: TaskUIListControlContext): void
       setVisible(categoryView.root, false);
     }
   });
+}
+
+/** 设置行点击的回调，由管理器在创建池时调用 */
+export function setTaskRowHandlers(expand: (questId: string) => void, sound: () => void): void {
+  currentTaskRowExpandHandler = expand;
+  currentTaskRowClickSound = sound;
 }
 
 export function getTaskUICategoryPageCount(

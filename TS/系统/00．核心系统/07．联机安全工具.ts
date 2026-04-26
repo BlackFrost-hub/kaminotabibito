@@ -1,0 +1,229 @@
+/**
+ * 联机安全工具（显式调用版）
+ *
+ * 目标：
+ * - 只把 `lua防闪退和异步代码.lua` 里“值得借鉴的思路”拆成可控 TS 封装
+ * - 不 monkey patch `jass.*`
+ * - 不改全局 `pairs`
+ * - 不偷偷改变项目已有语义
+ *
+ * 适用场景：
+ * - 想避免把匿名闭包高频直接塞进 JASS 回调时
+ * - 想给 Trigger / Timer / ForGroup / ForForce / EnumItemsInRect / EnumDestructablesInRect
+ *   提供一个更可控的 trampoline 入口时
+ *
+ * 不做的事：
+ * - 不接管已有系统
+ * - 不替换全局运行时
+ * - 不试图“万能防异步”
+ */
+
+const jass = require("jass.common") as any;
+const runtime = require("jass.runtime") as any;
+const xpcallFn = (globalThis as any).xpcall as undefined | ((fn: VoidCallback, err: (msg: string) => void) => void);
+
+type VoidCallback = () => void;
+
+function getErrorHandler(): ((msg: string) => void) | undefined {
+  const handler = runtime?.error_handle;
+  return typeof handler === "function" ? handler : undefined;
+}
+
+function runSafely(callback: VoidCallback | undefined): void {
+  if (typeof callback !== "function") return;
+  const handler = getErrorHandler();
+  if (handler && typeof xpcallFn === "function") {
+    xpcallFn(callback, handler);
+    return;
+  }
+  callback();
+}
+
+function createStackTrampoline(stack: VoidCallback[]): VoidCallback {
+  return () => {
+    const top = stack[stack.length - 1];
+    runSafely(top);
+  };
+}
+
+const forGroupStack: VoidCallback[] = [];
+const forForceStack: VoidCallback[] = [];
+const enumItemsStack: VoidCallback[] = [];
+const enumDestructablesStack: VoidCallback[] = [];
+
+const forGroupTrampoline = createStackTrampoline(forGroupStack);
+const forForceTrampoline = createStackTrampoline(forForceStack);
+const enumItemsTrampoline = createStackTrampoline(enumItemsStack);
+const enumDestructablesTrampoline = createStackTrampoline(enumDestructablesStack);
+
+/**
+ * 安全 ForGroup：
+ * - 仍然调用原生 `ForGroup`
+ * - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
+ * - 支持同步嵌套调用（用栈而不是单槽）
+ */
+export function safeForGroup(group: any, action: VoidCallback): void {
+  if (!group || typeof action !== "function") return;
+  forGroupStack.push(action);
+  try {
+    jass.ForGroup(group, forGroupTrampoline);
+  } finally {
+    forGroupStack.pop();
+  }
+}
+
+/**
+ * 安全 ForForce，思路同 `safeForGroup`。
+ */
+export function safeForForce(force: any, action: VoidCallback): void {
+  if (!force || typeof action !== "function") return;
+  forForceStack.push(action);
+  try {
+    jass.ForForce(force, forForceTrampoline);
+  } finally {
+    forForceStack.pop();
+  }
+}
+
+/**
+ * 安全枚举矩形内物品。
+ * 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
+ */
+export function safeEnumItemsInRect(rect: any, filter: any, action: VoidCallback): void {
+  if (!rect || typeof action !== "function") return;
+  enumItemsStack.push(action);
+  try {
+    jass.EnumItemsInRect(rect, filter ?? null, enumItemsTrampoline);
+  } finally {
+    enumItemsStack.pop();
+  }
+}
+
+/**
+ * 安全枚举矩形内可破坏物。
+ * 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
+ */
+export function safeEnumDestructablesInRect(rect: any, filter: any, action: VoidCallback): void {
+  if (!rect || typeof action !== "function") return;
+  enumDestructablesStack.push(action);
+  try {
+    jass.EnumDestructablesInRect(rect, filter ?? null, enumDestructablesTrampoline);
+  } finally {
+    enumDestructablesStack.pop();
+  }
+}
+
+/**
+ * 安全 TimerStart：
+ * - 用 handleId -> callback registry 避免把匿名闭包直接塞给 JASS
+ * - 适合“必须使用独立 timer”的场景
+ * - 高频/周期逻辑仍优先使用 `05．中心计时器.ts`
+ */
+const timerActionByHandleId: Record<number, VoidCallback | undefined> = {};
+
+function timerTrampoline(): void {
+  const timer = jass.GetExpiredTimer();
+  if (!timer) return;
+  const hid = jass.GetHandleId(timer);
+  runSafely(timerActionByHandleId[hid]);
+}
+
+export function safeTimerStart(timer: any, timeout: number, periodic: boolean, action: VoidCallback): void {
+  if (!timer || typeof action !== "function") return;
+  const hid = jass.GetHandleId(timer);
+  timerActionByHandleId[hid] = action;
+  jass.TimerStart(timer, timeout, periodic, timerTrampoline);
+}
+
+export function safeDestroyTimer(timer: any): void {
+  if (!timer) return;
+  const hid = jass.GetHandleId(timer);
+  timerActionByHandleId[hid] = undefined;
+  delete timerActionByHandleId[hid];
+  jass.DestroyTimer(timer);
+}
+
+/**
+ * 安全 Trigger Action：
+ * - 每个 trigger 只挂一个原生 trampoline action
+ * - 真实业务回调留在 Lua registry 里，避免“每加一次动作就再塞一个匿名闭包进 JASS”
+ * - 返回的是项目内 token，不是原生 triggeraction handle
+ */
+export interface SafeTriggerActionHandle {
+  readonly id: number;
+}
+
+interface SafeTriggerRegistry {
+  actionHandle: any;
+  actions: Array<{ id: number; callback: VoidCallback }>;
+}
+
+const triggerRegistryByHandleId: Record<number, SafeTriggerRegistry | undefined> = {};
+let safeTriggerActionIdCounter = 0;
+
+function getOrCreateSafeTriggerRegistry(trigger: any): SafeTriggerRegistry | null {
+  if (!trigger) return null;
+  const hid = jass.GetHandleId(trigger);
+  let registry = triggerRegistryByHandleId[hid];
+  if (registry) return registry;
+
+  const trampoline = () => {
+    const currentTrigger = jass.GetTriggeringTrigger();
+    if (!currentTrigger) return;
+    const currentHid = jass.GetHandleId(currentTrigger);
+    const currentRegistry = triggerRegistryByHandleId[currentHid];
+    if (!currentRegistry) return;
+    for (let i = 0; i < currentRegistry.actions.length; i++) {
+      runSafely(currentRegistry.actions[i].callback);
+    }
+  };
+
+  registry = {
+    actionHandle: jass.TriggerAddAction(trigger, trampoline),
+    actions: [],
+  };
+  triggerRegistryByHandleId[hid] = registry;
+  return registry;
+}
+
+export function safeTriggerAddAction(trigger: any, callback: VoidCallback): SafeTriggerActionHandle | null {
+  if (!trigger || typeof callback !== "function") return null;
+  const registry = getOrCreateSafeTriggerRegistry(trigger);
+  if (!registry) return null;
+  const handle = { id: ++safeTriggerActionIdCounter } as const;
+  registry.actions.push({ id: handle.id, callback });
+  return handle;
+}
+
+export function safeTriggerRemoveAction(trigger: any, action: SafeTriggerActionHandle | null | undefined): void {
+  if (!trigger || !action) return;
+  const hid = jass.GetHandleId(trigger);
+  const registry = triggerRegistryByHandleId[hid];
+  if (!registry) return;
+  for (let i = 0; i < registry.actions.length; i++) {
+    if (registry.actions[i].id === action.id) {
+      registry.actions.splice(i, 1);
+      return;
+    }
+  }
+}
+
+export function safeTriggerClearActions(trigger: any): void {
+  if (!trigger) return;
+  const hid = jass.GetHandleId(trigger);
+  const registry = triggerRegistryByHandleId[hid];
+  if (!registry) return;
+  registry.actions.length = 0;
+}
+
+export function safeDestroyTrigger(trigger: any): void {
+  if (!trigger) return;
+  const hid = jass.GetHandleId(trigger);
+  const registry = triggerRegistryByHandleId[hid];
+  if (registry?.actionHandle) {
+    jass.TriggerRemoveAction(trigger, registry.actionHandle);
+  }
+  triggerRegistryByHandleId[hid] = undefined;
+  delete triggerRegistryByHandleId[hid];
+  jass.DestroyTrigger(trigger);
+}

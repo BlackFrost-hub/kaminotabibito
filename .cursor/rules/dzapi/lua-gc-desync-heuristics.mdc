@@ -49,18 +49,47 @@ alwaysApply: false
 - 单列分发
 - Lua 层先记录索引/字符串 key，再统一处理
 
-## 4. table 约束
+## 4. table 约束与 pairs 禁用
 
 - table key 优先使用字符串或数字
 - 不要用 `unit/frame/player/item` 这类 handle/userdata 做 key
 - value 里也尽量不要长期挂复杂运行时对象引用
-- 不要依赖 `pairs()` 的 hash 部分遍历顺序
+- **不要依赖 `pairs()` 的 hash 部分遍历顺序——`pairs` 是随机的，不同客户端遍历顺序不同会导致 desync**
+
+**强制禁用 `pairs`（项目入口 Lua 代码）：**
+
+```lua
+-- 禁止使用 pairs，遍历顺序随机会导致异步
+SafePairs = pairs
+pairs = function ()
+    error("不能使用pairs,请确认100%安全后用SafePairs替换")
+end
+```
+
+**替代方案：**
+- 数组遍历用 `for i = 1, #arr do ... end`
+- TSTL 的 `for...of` 会编译成 `pairs`，需要手动改成传统 `for` 循环
+- 如果确实需要 `pairs`（如遍历非数组 table），使用 `SafePairs` 并确保遍历顺序不影响同步
 
 优先形式：
 
 ```lua
-state["main|0|3"] = true
-rows[3] = "quest_001"
+-- 确定性的数组遍历
+for i = 1, #rows do
+    local row = rows[i]
+    -- ...
+end
+
+-- 字符串 key 的确定性遍历（如果需要）
+local keys = {}
+for k, _ in SafePairs(state) do
+    table.insert(keys, k)
+end
+table.sort(keys)  -- 排序后遍历顺序确定
+for _, k in ipairs(keys) do
+    local v = state[k]
+    -- ...
+end
 ```
 
 避免形式：
@@ -68,6 +97,11 @@ rows[3] = "quest_001"
 ```lua
 state[unit] = true
 state[frame] = pageTable
+
+-- 遍历顺序随机，不同客户端可能不同
+for k, v in pairs(state) do
+    -- ...
+end
 ```
 
 ## 5. 运行时句柄保护
@@ -103,4 +137,145 @@ runtime.handle_level = 0
 
 - 本地 UI 链里的 `StartSound` / `SoundUI_ClickPlay` 必须限制到本地玩家
 - 如果音效封装支持 `whichPlayer`，就必须传本地玩家
-- 不要默认依赖“UI 音效只是表现，所以全房播放也没事”
+- 不要默认依赖"UI 音效只是表现，所以全房播放也没事"
+
+---
+
+# 避免 Lua 异步口诀（社区经验整理）
+
+> 本地玩家睁大眼，除了显示不要浪  
+> 匿名闭包频繁创，不如写为动作行
+
+## 核心原则
+
+Lua 引擎能允许的异步操作更少了，所以**除了必要异步（如显示面板）请全部同步执行**。
+
+## 匿名闭包 vs 命名函数
+
+**匿名闭包函数**是由 JASS 回调 Lua 函数，在大量频繁创建下容易异步。尽量改为：
+- **触发的动作**（单列模式运行）
+- **命名函数**（可能比匿名函数引起异步的几率低）
+
+**像 `ForGroup` 这些传闭包函数的**，可以直接在 Lua 层封装调用循环取第一个单位，以达到不让闭包进入 JASS 回调里。
+
+## 幂等性操作判断
+
+**可以异步的（幂等性）：**
+- 显示（`DzFrameShow` 等）
+- 取变量值
+- 查看操作
+
+**必须同步的（非幂等性）：**
+- 创建
+- 删除
+- 修改
+
+口诀：**创建删除修改要同步，查看显示可以异步。**
+
+## 详细注意事项
+
+### 1. 避免异步创建 table 和 string
+
+**错误：**
+```lua
+-- 异步创建内容并显示
+if GetLocalPlayer() == Player(0) then
+    local content = createContent()  -- 异步创建
+    display(content)                  -- 异步显示
+end
+```
+
+**正确：**
+```lua
+-- 内容同步创建，异步显示
+local content = createContent()  -- 同步创建（所有玩家执行）
+if GetLocalPlayer() == Player(0) then
+    display(content)              -- 异步显示
+end
+```
+
+### 2. 避免异步全局引用
+
+**错误：**
+```lua
+全局表 = {}
+if GetLocalPlayer() == Player(0) then
+    全局表[某单位] = true        -- 异步写入 handle key
+    全局表[xxx] = 某单位          -- 异步写入 handle value
+end
+```
+
+**后果：** 不同玩家 GC 后 handle 不同步。
+
+**正确：**
+```lua
+-- 除显示外或幂等性的操作其余全部同步执行计算
+-- 即每个玩家计算所有玩家的数据
+local data = calculateAllPlayersData()  -- 同步计算
+if GetLocalPlayer() == Player(0) then
+    display(data)                          -- 异步显示
+end
+```
+
+### 3. 少用 `GetLocalPlayer()` 判断
+
+**避免思路：**
+- 少在 `GetLocalPlayer()` 判断里执行操作
+- 一不小心你的异步操作可能会引起地图异步
+- 即使某些数据可能根本不需要用到，也要同步创建
+
+### 4. 闭包给 JASS 的回调尽量少用
+
+- 在 Lua 层封装即可
+- 实在无法避免的可声明一个函数，传函数名当回调
+
+### 5. 尽量避免大量 JASS 和 Lua 混用
+
+推荐完全使用 Lua 做图。
+
+### 6. 使用 JASS 的数学库
+
+Lua 本身的 `math` 库可能异步。
+
+### 7. 不要使用等待
+
+使用计时器替代。
+
+### 8. table 表请使用数组或字符串 key
+
+其他对象类型的 key 容易不同玩家的随机顺序不一致。
+
+### 9. 条件在动作里 if 判断
+
+不要放触发条件里，不然又是一个跟 JASS 交互的闭包。
+
+## 无法避免怎么办？
+
+Lua 异步是几率性的：
+- **无法避免就不要避免**，强行避免只会让你的异步几率变大
+- 但并不是 100% 或 5% 几率异步不能玩！
+- 操作得好就是 99.99% 不异步（为什么不是 100%？因为机器本身就无法保证 100% 正确可靠）
+- **不要过度恐慌！**
+
+通常往上述方向去尽量靠，**异步几率不会超过 0.1%**。
+
+## 一些建议
+
+1. **避免大量创建又删除**，以免频繁触发 Lua 频繁 GC
+   - 能单例使用的对象就挂载到全局变量一直用
+   - 不要动不动就大括号 `{}` 新建表
+
+2. **尽量减少频繁使用匿名闭包函数**
+
+3. **使用 Lua 层事件分发或模拟**（比如中心计时器）
+   - 以减少 Lua 与 JASS 需要回调的交互
+
+## 一些测试数据
+
+- Lua 与 JASS 的回调闭包，回调 10w 次并在回调里做修改增加操作，未异步（具体回调上限值多少可能每次不会相同）
+- Lua `pairs` 1w 字符串 key 的表，多玩家未出现随机顺序不一致
+
+## 一些可能有用的备注
+
+- Lua 传递给 JASS 的闭包不会被释放，所以要尽量少传闭包过去
+- Lua 传给 JASS 的 `Filter` 可以搞成单列的，不要手动销毁它

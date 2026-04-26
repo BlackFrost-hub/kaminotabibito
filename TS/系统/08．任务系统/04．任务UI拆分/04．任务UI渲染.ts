@@ -16,7 +16,16 @@ import { getQuestItemHeight } from "./03．任务UI列表与滚动";
 // 点击处理器缓存，避免频繁创建匿名闭包
 const questRowClickHandlers: Map<string, { onClickSound: () => void; onToggleExpand: (questId: string) => void }> = new Map();
 
-function handleQuestRowClick(questId: string): void {
+// frame handle -> questId 映射表（避免匿名闭包）
+const frameToQuestIdMap: Map<number, string> = new Map();
+
+// 命名函数替代匿名闭包 - 任务行点击
+function onQuestRowClick(): void {
+  const japi = require("jass.japi") as any;
+  const frame = typeof japi.DzGetTriggerUIEventFrame === "function" ? japi.DzGetTriggerUIEventFrame() : 0;
+  if (!frame) return;
+  const questId = frameToQuestIdMap.get(frame);
+  if (!questId) return;
   const handler = questRowClickHandlers.get(questId);
   if (!handler) return;
   handler.onClickSound();
@@ -445,7 +454,9 @@ export function renderQuestRow(opts: {
   setFramePointRelative(clickBtn, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
   setFrameSize(clickBtn, { width: rowWidth, height: itemH });
   registerQuestRowClickHandler(quest.id, onClickSound, onToggleExpand);
-  setFrameClickEvent(clickBtn, () => handleQuestRowClick(quest.id), false);
+  // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
+  frameToQuestIdMap.set(clickBtn, quest.id);
+  setFrameClickEvent(clickBtn, onQuestRowClick, false);
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
   showFrame(clickBtn);
   listItemFrames.push(clickBtn);

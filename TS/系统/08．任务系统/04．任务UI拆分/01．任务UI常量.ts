@@ -11,6 +11,9 @@ export const ENABLE_FDF_SCROLLBAR_BORDER = true;
 export const ENABLE_FDF_SCROLLBAR_THUMB = true;
 export const ENABLE_MOUSE_WHEEL_SCROLL = true;
 
+/** 每分类预设最大页数（用于固定次数遍历隐藏，不依赖 pages.length） */
+export const MAX_PAGES_PER_CATEGORY = 20;
+
 /** 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中（排除 VerticalScrollbarTrack 常驻逻辑） */
 export const ENABLE_TASK_UI_RIGHT_SCROLLBAR = true;
 

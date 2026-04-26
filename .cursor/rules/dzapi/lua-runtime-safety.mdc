@@ -1,0 +1,227 @@
+---
+description: Lua/ydLua 运行时安全代码模板：防止异步、闪退、句柄泄漏
+alwaysApply: false
+---
+
+# Lua 运行时安全代码
+
+## 用途
+
+在项目入口 Lua 文件（如 `main.lua` 或 `init.lua`）中加载，提供以下保护：
+
+1. **禁用 `pairs`** - 防止遍历顺序随机导致的 desync
+2. **句柄保护** - 防止 Lua 引用句柄，GC 异步释放
+3. **禁止睡眠函数** - 防止闪退 bug
+4. **替换 JASS 回调** - 使用命名函数替代匿名闭包
+
+## 完整代码
+
+```lua
+local runtime = require("jass.runtime")
+local jass = require("jass.common")
+
+-- ==================== 1. 禁用 pairs ====================
+-- pairs 遍历 hash 表顺序随机，不同客户端顺序不同会导致 desync
+SafePairs = pairs
+pairs = function()
+    error("不能使用pairs,请确认100%安全后用SafePairs替换")
+end
+
+-- ==================== 2. 句柄保护 ====================
+-- 防止 lua 引用句柄，gc 是异步的，防止释放句柄异步
+runtime.handle_level = 1
+
+-- ==================== 3. 禁止睡眠函数 ====================
+-- 会造成一些闪退 bug
+runtime.sleep = true
+
+-- ==================== 4. 错误处理 ====================
+local function error_handle(msg)
+    print(msg)
+end
+
+-- ==================== 5. 禁用 Condition/Filter ====================
+-- 这些是 JASS 回调，容易出问题
+rawset(jass, 'Condition', function(code)
+    error("不能使用Condition")
+end)
+
+rawset(jass, 'Filter', function(code)
+    error("不能使用Filter")
+end)
+
+-- ==================== 6. 替换 ForGroup/ForForce 等回调 ====================
+-- 使用命名函数 action_func 替代匿名闭包
+local func_ref
+local function action_func()
+    if func_ref then
+        xpcall(func_ref, runtime.error_handle or error_handle)
+    end
+end
+
+-- 替换 ForGroup
+local ForGroup = jass.ForGroup
+rawset(jass, 'ForGroup', function(group, action)
+    func_ref = action
+    ForGroup(group, action_func)
+    func_ref = nil
+end)
+
+-- 替换 ForForce
+local ForForce = jass.ForForce
+rawset(jass, 'ForForce', function(force, action)
+    func_ref = action
+    ForForce(force, action_func)
+    func_ref = nil
+end)
+
+-- 替换 EnumDestructablesInRect
+local EnumDestructablesInRect = jass.EnumDestructablesInRect
+rawset(jass, 'EnumDestructablesInRect', function(rect, filter, action)
+    func_ref = action
+    EnumDestructablesInRect(rect, filter, action_func)
+    func_ref = nil
+end)
+
+-- 替换 EnumItemsInRect
+local EnumItemsInRect = jass.EnumItemsInRect
+rawset(jass, 'EnumItemsInRect', function(rect, filter, action)
+    func_ref = action
+    EnumItemsInRect(rect, filter, action_func)
+    func_ref = nil
+end)
+
+-- ==================== 7. 替换 TimerStart ====================
+-- 使用 handle -> action 映射表，避免闭包
+local GetHandleId = jass.GetHandleId
+local TimerStart = jass.TimerStart
+local GetExpiredTimer = jass.GetExpiredTimer
+local DestroyTimer = jass.DestroyTimer
+local timer_table = {}
+
+local function timer_action_func()
+    local action = timer_table[GetHandleId(GetExpiredTimer())]
+    if action then
+        xpcall(action, runtime.error_handle or error_handle)
+    end
+end
+
+rawset(jass, 'TimerStart', function(timer, time, is_loop, action)
+    timer_table[GetHandleId(timer)] = action
+    TimerStart(timer, time, is_loop, timer_action_func)
+end)
+
+rawset(jass, 'DestroyTimer', function(timer)
+    timer_table[GetHandleId(timer)] = nil
+    DestroyTimer(timer)
+end)
+
+-- ==================== 8. 替换 TriggerAddAction ====================
+-- 使用 trigger handle -> {action handle -> action} 映射表
+local TriggerAddAction = jass.TriggerAddAction
+local TriggerRemoveAction = jass.TriggerRemoveAction
+local TriggerClearActions = jass.TriggerClearActions
+local GetTriggeringTrigger = jass.GetTriggeringTrigger
+local DestroyTrigger = jass.DestroyTrigger
+local action_table = {}
+
+local function trigger_action_func()
+    local actions = action_table[GetHandleId(GetTriggeringTrigger())]
+    if actions then
+        for _, action in SafePairs(actions) do
+            xpcall(action, runtime.error_handle or error_handle)
+        end
+    end
+end
+
+rawset(jass, 'TriggerAddAction', function(trg, action)
+    local act = TriggerAddAction(trg, trigger_action_func)
+    trg = GetHandleId(trg)
+    if action_table[trg] == nil then
+        action_table[trg] = {}
+    end
+    action_table[trg][GetHandleId(act)] = action
+    return act
+end)
+
+rawset(jass, 'TriggerRemoveAction', function(trg, act)
+    local actions = action_table[GetHandleId(trg)]
+    if actions then
+        actions[GetHandleId(act)] = nil
+    end
+    TriggerRemoveAction(trg, act)
+end)
+
+rawset(jass, 'TriggerClearActions', function(trg)
+    action_table[GetHandleId(trg)] = nil
+    TriggerClearActions(trg)
+end)
+
+rawset(jass, 'DestroyTrigger', function(trg)
+    action_table[GetHandleId(trg)] = nil
+    DestroyTrigger(trg)
+end)
+```
+
+## 关键原理
+
+### 1. 匿名闭包问题
+
+**错误：**
+```lua
+ForGroup(group, function()
+    -- 匿名闭包捕获变量，不同客户端闭包对象不同
+end)
+```
+
+**正确：**
+```lua
+-- 使用命名函数 action_func，通过 func_ref 传递实际动作
+-- 所有客户端执行相同的命名函数，只是 func_ref 指向不同
+```
+
+### 2. Timer/Trigger 句柄映射
+
+**错误：**
+```lua
+TimerStart(timer, 0.03, true, function()
+    -- 每个 timer 创建一个闭包
+end)
+```
+
+**正确：**
+```lua
+-- 使用 timer_table[handle] = action 存储回调
+-- 触发时使用命名函数 timer_action_func 统一处理
+```
+
+### 3. pairs 随机遍历
+
+**错误：**
+```lua
+for k, v in pairs(state) do
+    -- 遍历顺序随机，不同客户端可能不同
+end
+```
+
+**正确：**
+```lua
+-- 禁用 pairs，强制使用确定性的遍历方式
+-- 数组用 for i = 1, #arr
+-- hash 表如果需要遍历，提取 key 排序后再遍历
+```
+
+## 使用方式
+
+1. 将上述代码保存为 `lua-runtime-safety.lua`
+2. 在项目入口文件（如 `main.lua`）的第一行加载：
+   ```lua
+   require "lua-runtime-safety"
+   ```
+3. 确保这是最先加载的代码，在创建任何 timer/trigger 之前
+
+## 注意事项
+
+- 这段代码会全局替换 `pairs`、`TimerStart`、`TriggerAddAction` 等函数
+- 一旦加载，所有代码都必须遵守这些约束
+- 如果确实需要使用 `pairs`，使用 `SafePairs` 并确保遍历顺序不影响同步

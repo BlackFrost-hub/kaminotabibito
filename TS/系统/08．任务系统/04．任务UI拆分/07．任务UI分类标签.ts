@@ -13,12 +13,35 @@ import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
 // 分类标签点击处理器缓存
 const categoryTabClickHandlers: Map<QuestType, { onSwitchCategory: (type: QuestType) => void; onClickSound: () => void }> = new Map();
 
+// 当前悬停提示消息（避免匿名闭包）
+let currentTooltipMessage: string | null = null;
+let currentTooltipHandler: ((msg: string) => void) | null = null;
+
 function handleCategoryTabClick(category: QuestType): void {
   const handler = categoryTabClickHandlers.get(category);
   if (!handler) return;
   handler.onSwitchCategory(category);
   handler.onClickSound();
 }
+
+// 命名函数替代匿名闭包 - 分类标签点击
+function onMainTabClick(): void { handleCategoryTabClick(QuestType.MAIN); }
+function onSideTabClick(): void { handleCategoryTabClick(QuestType.SIDE); }
+function onDailyTabClick(): void { handleCategoryTabClick(QuestType.DAILY); }
+
+// 命名函数替代匿名闭包 - 悬停提示
+function onTabHoverShow(): void {
+  if (currentTooltipHandler && currentTooltipMessage) {
+    currentTooltipHandler(currentTooltipMessage);
+  }
+}
+function onTabHoverHide(): void { /* 空操作 */ }
+
+const tabClickHandlers: Record<QuestType, () => void> = {
+  [QuestType.MAIN]: onMainTabClick,
+  [QuestType.SIDE]: onSideTabClick,
+  [QuestType.DAILY]: onDailyTabClick,
+};
 
 function registerCategoryTabClickHandler(category: QuestType, onSwitchCategory: (type: QuestType) => void, onClickSound: () => void): void {
   categoryTabClickHandlers.set(category, { onSwitchCategory, onClickSound });
@@ -131,8 +154,11 @@ function createTaskTab(opts: {
     }
     if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tab, 9);
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
-    setFrameClickEvent(tab, () => handleCategoryTabClick(category), false);
-    setFrameHoverEvents(tab, () => onShowTabTooltip(tooltip), () => {}, false);
+    // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
+    currentTooltipMessage = tooltip;
+    currentTooltipHandler = onShowTabTooltip;
+    setFrameClickEvent(tab, tabClickHandlers[category], false);
+    setFrameHoverEvents(tab, onTabHoverShow, onTabHoverHide, false);
   }
 
   return { bg, tab };

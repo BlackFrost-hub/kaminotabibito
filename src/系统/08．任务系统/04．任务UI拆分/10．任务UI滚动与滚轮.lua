@@ -62,12 +62,17 @@ function ____exports.handleTaskUIListWheel(self, ctx)
         return
     end
     ctx:setCurrentPage(nextPage)
-    ctx:onPageChanged()
+    ctx:onPageChanged(currentPage, nextPage)
     updateTaskUIScrollThumbPosition(nil, ctx, pageCount)
 end
 local japi = require("jass.japi")
-local function handleMouseWheelEvent(self, ctx)
+local wheelCtx = nil
+local function onMouseWheelEvent(self)
+    if not wheelCtx then
+        return
+    end
     pcall(function ()
+            local ctx = wheelCtx
             if not ctx:isVisible() then
                 return
             end
@@ -107,10 +112,8 @@ function ____exports.registerTaskUIListWheel(self, ctx)
     if ctx.taskListWheelTrig then
         return ctx.taskListWheelTrig
     end
-    ctx.taskListWheelTrig = ctx:registerMouseWheel(
-        false,
-        function() return handleMouseWheelEvent(nil, ctx) end
-    )
+    wheelCtx = ctx
+    ctx.taskListWheelTrig = ctx:registerMouseWheel(false, onMouseWheelEvent)
     return ctx.taskListWheelTrig
 end
 function ____exports.updateTaskUIScrollBarVisibility(self, ctx, pageCount, hasQuestRows)

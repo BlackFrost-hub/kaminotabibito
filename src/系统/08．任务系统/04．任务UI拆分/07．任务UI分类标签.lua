@@ -17,6 +17,8 @@ local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfO
 -- 架构：全局1套UI，不再区分 slotPid。
 local japi = require("jass.japi")
 local categoryTabClickHandlers = __TS__New(Map)
+local currentTooltipMessage = nil
+local currentTooltipHandler = nil
 local function handleCategoryTabClick(self, category)
     local handler = categoryTabClickHandlers:get(category)
     if not handler then
@@ -25,6 +27,23 @@ local function handleCategoryTabClick(self, category)
     handler:onSwitchCategory(category)
     handler:onClickSound()
 end
+local function onMainTabClick(self)
+    handleCategoryTabClick(nil, QuestType.MAIN)
+end
+local function onSideTabClick(self)
+    handleCategoryTabClick(nil, QuestType.SIDE)
+end
+local function onDailyTabClick(self)
+    handleCategoryTabClick(nil, QuestType.DAILY)
+end
+local function onTabHoverShow(self)
+    if currentTooltipHandler and currentTooltipMessage then
+        currentTooltipHandler(nil, currentTooltipMessage)
+    end
+end
+local function onTabHoverHide(self)
+end
+local tabClickHandlers = {[QuestType.MAIN] = onMainTabClick, [QuestType.SIDE] = onSideTabClick, [QuestType.DAILY] = onDailyTabClick}
 local function registerCategoryTabClickHandler(self, category, onSwitchCategory, onClickSound)
     categoryTabClickHandlers:set(category, {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound})
 end
@@ -119,18 +138,14 @@ local function createTaskTab(self, opts)
             japi.DzFrameSetLevel(tab, 9)
         end
         registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
-        setFrameClickEvent(
-            nil,
-            tab,
-            function() return handleCategoryTabClick(nil, category) end,
-            false
-        )
+        currentTooltipMessage = tooltip
+        currentTooltipHandler = onShowTabTooltip
+        setFrameClickEvent(nil, tab, tabClickHandlers[category], false)
         setFrameHoverEvents(
             nil,
             tab,
-            function() return onShowTabTooltip(nil, tooltip) end,
-            function()
-            end,
+            onTabHoverShow,
+            onTabHoverHide,
             false
         )
     end

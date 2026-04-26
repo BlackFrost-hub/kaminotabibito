@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
-local handleTaskRowClick, japi, currentTaskRowExpandHandler, currentTaskRowClickSound, taskRowBindingByFrameId
+local japi
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
@@ -26,7 +26,7 @@ local QUEST_ROW_ICON_Y_OFFSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.QUEST_ROW_ICON
 local BG_TEX = ____01_FF0E_4EFB_52A1UI_5E38_91CF.BG_TEX
 local ____03_FF0EUI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
 local DZ_TEXT_ALIGN_LEFT = ____03_FF0EUI_51FD_6570.DZ_TEXT_ALIGN_LEFT
-function handleTaskRowClick(self)
+function ____exports.handleTaskRowClick(self)
     local ____temp_2
     if type(japi.DzGetTriggerUIEventFrame) == "function" then
         ____temp_2 = japi.DzGetTriggerUIEventFrame()
@@ -37,7 +37,7 @@ function handleTaskRowClick(self)
     if not frame then
         return
     end
-    local binding = taskRowBindingByFrameId[frame]
+    local binding = ____exports.taskRowBindingByFrameId[frame]
     if not binding then
         return
     end
@@ -45,17 +45,19 @@ function handleTaskRowClick(self)
     if not questId then
         return
     end
-    if currentTaskRowClickSound ~= nil then
-        currentTaskRowClickSound(nil)
+    local ____opt_3 = ____exports.currentTaskRowClickSound
+    if ____opt_3 ~= nil then
+        ____exports.currentTaskRowClickSound(nil)
     end
-    if currentTaskRowExpandHandler ~= nil then
-        currentTaskRowExpandHandler(nil, questId)
+    local ____opt_5 = ____exports.currentTaskRowExpandHandler
+    if ____opt_5 ~= nil then
+        ____exports.currentTaskRowExpandHandler(nil, questId)
     end
 end
 japi = require("jass.japi")
-currentTaskRowExpandHandler = nil
-currentTaskRowClickSound = nil
-taskRowBindingByFrameId = {}
+____exports.currentTaskRowExpandHandler = nil
+____exports.currentTaskRowClickSound = nil
+____exports.taskRowBindingByFrameId = {}
 local ROWS_PER_PAGE = 7
 local ROWS_PER_SCROLL_STEP = 3
 local PAGE_VARIANT_COUNT = ROWS_PER_PAGE + 1
@@ -81,7 +83,7 @@ local function setText(self, frame, text)
         japi.DzFrameSetText(frame, text)
     end
 end
-local function setVisible(self, frame, visible)
+function ____exports.setVisible(self, frame, visible)
     if not frame or frame == 0 then
         return
     end
@@ -91,7 +93,7 @@ local function setVisible(self, frame, visible)
 end
 local function hideFrames(self, frames)
     for ____, frame in ipairs(frames) do
-        setVisible(nil, frame, false)
+        ____exports.setVisible(nil, frame, false)
     end
 end
 local function questTypes(self)
@@ -156,7 +158,7 @@ local function createHiddenText(self, ctx, name, parent, width, height)
     if not frame then
         return nil
     end
-    setVisible(nil, frame, false)
+    ____exports.setVisible(nil, frame, false)
     if type(japi.DzFrameSetLevel) == "function" then
         japi.DzFrameSetLevel(frame, TEXT_LEVEL)
     end
@@ -344,12 +346,12 @@ local function createVariant(self, ctx, page, category, pageIndex, variantIndex)
                 root,
                 (((("TaskVar_" .. category) .. "_") .. tostring(pageIndex)) .. "_") .. tostring(variantIndex),
                 slotRowIndex,
-                handleTaskRowClick
+                ____exports.handleTaskRowClick
             )
             local ____opt_0 = rowSlots[#rowSlots]
             local clickBtn = ____opt_0 and ____opt_0.clickBtn
             if clickBtn then
-                taskRowBindingByFrameId[clickBtn] = {page = page, rowIndex = slotRowIndex}
+                ____exports.taskRowBindingByFrameId[clickBtn] = {page = page, rowIndex = slotRowIndex}
             end
             rowIndex = rowIndex + 1
         end
@@ -404,7 +406,7 @@ local function createCategory(self, ctx, category)
         if type(japi.DzFrameSetLevel) == "function" then
             japi.DzFrameSetLevel(emptyText, TEXT_LEVEL)
         end
-        setVisible(nil, emptyText, false)
+        ____exports.setVisible(nil, emptyText, false)
     end
     return {root = root, emptyText = emptyText or nil, pageCount = 0, pages = {}}
 end
@@ -412,8 +414,8 @@ function ____exports.createTaskUIPrecreatedListPool(self, ctx)
     if not ctx.listContainer then
         return nil
     end
-    currentTaskRowExpandHandler = ctx.toggleExpand
-    currentTaskRowClickSound = ctx.playClickSound
+    ____exports.currentTaskRowExpandHandler = ctx.toggleExpand
+    ____exports.currentTaskRowClickSound = ctx.playClickSound
     return {categories = {
         [QuestType.MAIN] = createCategory(nil, ctx, QuestType.MAIN),
         [QuestType.SIDE] = createCategory(nil, ctx, QuestType.SIDE),
@@ -442,9 +444,9 @@ local function clearPage(self, page)
     page.questIds = createEmptyQuestIdList(nil)
     for ____, variant in ipairs(page.variants) do
         clearVariant(nil, variant)
-        setVisible(nil, variant.root, false)
+        ____exports.setVisible(nil, variant.root, false)
     end
-    setVisible(nil, page.root, false)
+    ____exports.setVisible(nil, page.root, false)
 end
 local function buildObjectiveText(self, quest, index)
     local obj = quest.objectives[index + 1]
@@ -516,7 +518,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
         rowTopRel
     )
     ctx:setFrameSize(slot.backdrop, {width = rowWidth, height = itemH})
-    setVisible(nil, slot.backdrop, true)
+    ____exports.setVisible(nil, slot.backdrop, true)
     ctx:setFramePointRelative(
         slot.title,
         ctx.FramePoint.TOPLEFT,
@@ -528,7 +530,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
     ctx:setFrameSize(slot.title, {width = textW, height = TITLE_HEIGHT})
     setText(nil, slot.title, titleText)
     ctx:applyDzTextFontAndAlignment(slot.title, listTextAlign)
-    setVisible(nil, slot.title, true)
+    ____exports.setVisible(nil, slot.title, true)
     ctx:setFramePointRelative(
         slot.clickBtn,
         ctx.FramePoint.TOPLEFT,
@@ -541,7 +543,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
     if slot.backdrop and ctx.setupTransparentGlueHitLayer then
         ctx:setupTransparentGlueHitLayer(slot.backdrop, slot.clickBtn)
     end
-    setVisible(nil, slot.clickBtn, true)
+    ____exports.setVisible(nil, slot.clickBtn, true)
     if showIcon then
         ctx:setFramePointRelative(
             slot.icon,
@@ -556,12 +558,12 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
             slot.icon,
             resolveQuestRowIconPath(nil, quest.icon)
         )
-        setVisible(nil, slot.icon, true)
+        ____exports.setVisible(nil, slot.icon, true)
     else
-        setVisible(nil, slot.icon, false)
+        ____exports.setVisible(nil, slot.icon, false)
     end
     hideFrames(nil, slot.objectiveFrames)
-    setVisible(nil, slot.failFrame, false)
+    ____exports.setVisible(nil, slot.failFrame, false)
     hideFrames(nil, slot.detailFrames)
     if not expanded then
         return
@@ -587,7 +589,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 ctx:setFrameSize(frame, {width = textW, height = OBJECTIVE_HEIGHT})
                 setText(nil, frame, text)
                 ctx:applyDzTextFontAndAlignment(frame, listTextAlign)
-                setVisible(nil, frame, true)
+                ____exports.setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
             ::__continue88::
@@ -610,7 +612,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
             ("|cffff4444失败:|r 时间限制 " .. tostring(quest.timeLimit)) .. "秒"
         )
         ctx:applyDzTextFontAndAlignment(slot.failFrame, listTextAlign)
-        setVisible(nil, slot.failFrame, true)
+        ____exports.setVisible(nil, slot.failFrame, true)
         y = y - FAIL_HEIGHT
     end
     local details = {
@@ -638,7 +640,7 @@ local function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, p
                 ctx:setFrameSize(frame, {width = textW, height = DETAIL_HEIGHT})
                 setText(nil, frame, text)
                 ctx:applyDzTextFontAndAlignment(frame, DZ_TEXT_ALIGN_LEFT)
-                setVisible(nil, frame, true)
+                ____exports.setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
             ::__continue92::
@@ -712,7 +714,7 @@ local function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
             rowIndex = rowIndex + 1
         end
     end
-    setVisible(nil, variant.root, false)
+    ____exports.setVisible(nil, variant.root, false)
 end
 local function chunkQuests(self, quests)
     local pages = {}
@@ -751,7 +753,7 @@ function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
                 local pages = chunkQuests(nil, quests)
                 categoryView.pageCount = #pages
                 setText(nil, categoryView.emptyText, EMPTY_TEXTS[category])
-                setVisible(nil, categoryView.emptyText, false)
+                ____exports.setVisible(nil, categoryView.emptyText, false)
                 do
                     local pageIndex = 0
                     while pageIndex < #pages do
@@ -784,11 +786,11 @@ function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
                                     pageQuests,
                                     variantIndex - 1
                                 )
-                                setVisible(nil, page.variants[variantIndex + 1].root, false)
+                                ____exports.setVisible(nil, page.variants[variantIndex + 1].root, false)
                                 variantIndex = variantIndex + 1
                             end
                         end
-                        setVisible(nil, page.root, false)
+                        ____exports.setVisible(nil, page.root, false)
                         pageIndex = pageIndex + 1
                     end
                 end
@@ -799,10 +801,15 @@ function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
                         pageIndex = pageIndex + 1
                     end
                 end
-                setVisible(nil, categoryView.root, false)
+                ____exports.setVisible(nil, categoryView.root, false)
             end
         end
     )
+end
+--- 设置行点击的回调，由管理器在创建池时调用
+function ____exports.setTaskRowHandlers(self, expand, sound)
+    ____exports.currentTaskRowExpandHandler = expand
+    ____exports.currentTaskRowClickSound = sound
 end
 function ____exports.getTaskUICategoryPageCount(self, pool, category)
     if not pool then
@@ -821,23 +828,23 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                 do
                     local categoryView = pool.categories[category]
                     local isCurrentCategory = category == ctx.currentCategory
-                    setVisible(nil, categoryView.root, isCurrentCategory)
+                    ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
                     if not isCurrentCategory then
-                        goto __continue131
+                        goto __continue132
                     end
                     local pageCount = categoryView.pageCount
                     if pageCount <= 0 then
-                        setVisible(nil, categoryView.emptyText, true)
+                        ____exports.setVisible(nil, categoryView.emptyText, true)
                         for ____, page in ipairs(categoryView.pages) do
                             for ____, variant in ipairs(page.variants) do
-                                setVisible(nil, variant.root, false)
+                                ____exports.setVisible(nil, variant.root, false)
                             end
-                            setVisible(nil, page.root, false)
+                            ____exports.setVisible(nil, page.root, false)
                         end
                         ctx:updateScrollBarVisibility(0, false)
-                        goto __continue131
+                        goto __continue132
                     end
-                    setVisible(nil, categoryView.emptyText, false)
+                    ____exports.setVisible(nil, categoryView.emptyText, false)
                     local clampedPage = math.max(
                         0,
                         math.min(
@@ -870,25 +877,25 @@ function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
                             do
                                 local page = categoryView.pages[pageIndex + 1]
                                 local isCurrentPage = pageIndex == clampedPage
-                                setVisible(nil, page.root, isCurrentPage)
+                                ____exports.setVisible(nil, page.root, isCurrentPage)
                                 if not isCurrentPage then
-                                    goto __continue144
+                                    goto __continue145
                                 end
                                 do
                                     local i = 0
                                     while i < #page.variants do
-                                        setVisible(nil, page.variants[i + 1].root, i == variantIndex)
+                                        ____exports.setVisible(nil, page.variants[i + 1].root, i == variantIndex)
                                         i = i + 1
                                     end
                                 end
                             end
-                            ::__continue144::
+                            ::__continue145::
                             pageIndex = pageIndex + 1
                         end
                     end
                     ctx:updateScrollBarVisibility(pageCount, true)
                 end
-                ::__continue131::
+                ::__continue132::
             end
         end
     )
@@ -903,40 +910,40 @@ function ____exports.applyTaskUICategorySwitchVisibleState(self, ctx)
                 do
                     local categoryView = pool.categories[category]
                     local isCurrentCategory = category == ctx.currentCategory
-                    setVisible(nil, categoryView.root, isCurrentCategory)
+                    ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
                     if not isCurrentCategory then
-                        setVisible(nil, categoryView.emptyText, false)
+                        ____exports.setVisible(nil, categoryView.emptyText, false)
                         for ____, page in ipairs(categoryView.pages) do
                             for ____, variant in ipairs(page.variants) do
-                                setVisible(nil, variant.root, false)
+                                ____exports.setVisible(nil, variant.root, false)
                             end
-                            setVisible(nil, page.root, false)
+                            ____exports.setVisible(nil, page.root, false)
                         end
-                        goto __continue152
+                        goto __continue153
                     end
                     local pageCount = categoryView.pageCount
                     if pageCount <= 0 then
-                        setVisible(nil, categoryView.emptyText, true)
+                        ____exports.setVisible(nil, categoryView.emptyText, true)
                         for ____, page in ipairs(categoryView.pages) do
                             for ____, variant in ipairs(page.variants) do
-                                setVisible(nil, variant.root, false)
+                                ____exports.setVisible(nil, variant.root, false)
                             end
-                            setVisible(nil, page.root, false)
+                            ____exports.setVisible(nil, page.root, false)
                         end
                         ctx:updateScrollBarVisibility(0, false)
-                        goto __continue152
+                        goto __continue153
                     end
-                    setVisible(nil, categoryView.emptyText, false)
+                    ____exports.setVisible(nil, categoryView.emptyText, false)
                     do
                         local pageIndex = 0
                         while pageIndex < #categoryView.pages do
                             local page = categoryView.pages[pageIndex + 1]
                             local isCurrentPage = pageIndex == 0
-                            setVisible(nil, page.root, isCurrentPage)
+                            ____exports.setVisible(nil, page.root, isCurrentPage)
                             do
                                 local variantIndex = 0
                                 while variantIndex < #page.variants do
-                                    setVisible(nil, page.variants[variantIndex + 1].root, isCurrentPage and variantIndex == 0)
+                                    ____exports.setVisible(nil, page.variants[variantIndex + 1].root, isCurrentPage and variantIndex == 0)
                                     variantIndex = variantIndex + 1
                                 end
                             end
@@ -945,7 +952,7 @@ function ____exports.applyTaskUICategorySwitchVisibleState(self, ctx)
                     end
                     ctx:updateScrollBarVisibility(pageCount, true)
                 end
-                ::__continue152::
+                ::__continue153::
             end
         end
     )
@@ -997,7 +1004,7 @@ function ____exports.applyTaskUIExpandVisibleState(self, ctx)
             do
                 local i = 0
                 while i < #currentPage.variants do
-                    setVisible(nil, currentPage.variants[i + 1].root, i == variantIndex)
+                    ____exports.setVisible(nil, currentPage.variants[i + 1].root, i == variantIndex)
                     i = i + 1
                 end
             end
@@ -1016,17 +1023,17 @@ function ____exports.applyTaskUIPageSwitchVisibleState(self, ctx)
             end
             local pageCount = categoryView.pageCount
             if pageCount <= 0 then
-                setVisible(nil, categoryView.emptyText, true)
+                ____exports.setVisible(nil, categoryView.emptyText, true)
                 for ____, page in ipairs(categoryView.pages) do
                     for ____, variant in ipairs(page.variants) do
-                        setVisible(nil, variant.root, false)
+                        ____exports.setVisible(nil, variant.root, false)
                     end
-                    setVisible(nil, page.root, false)
+                    ____exports.setVisible(nil, page.root, false)
                 end
                 ctx:updateScrollBarVisibility(0, false)
                 return
             end
-            setVisible(nil, categoryView.emptyText, false)
+            ____exports.setVisible(nil, categoryView.emptyText, false)
             local clampedPage = math.max(
                 0,
                 math.min(
@@ -1039,11 +1046,11 @@ function ____exports.applyTaskUIPageSwitchVisibleState(self, ctx)
                 while pageIndex < #categoryView.pages do
                     local page = categoryView.pages[pageIndex + 1]
                     local isCurrentPage = pageIndex == clampedPage
-                    setVisible(nil, page.root, isCurrentPage)
+                    ____exports.setVisible(nil, page.root, isCurrentPage)
                     do
                         local variantIndex = 0
                         while variantIndex < #page.variants do
-                            setVisible(nil, page.variants[variantIndex + 1].root, isCurrentPage and variantIndex == 0)
+                            ____exports.setVisible(nil, page.variants[variantIndex + 1].root, isCurrentPage and variantIndex == 0)
                             variantIndex = variantIndex + 1
                         end
                     end

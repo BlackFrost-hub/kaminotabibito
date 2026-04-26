@@ -21,66 +21,44 @@ export interface TaskUIScrollContext {
   taskListWheelTrig: unknown;
   getMouseFocus?: () => number;
   getWheelDelta?: () => number;
-  registerMouseWheel: (sync: boolean, cb: () => void) => unknown;
+  registerMouseWheel: (sync: boolean, cb: () => void, playerId?: number) => unknown;
   isVisible: () => boolean;
   getCurrentPageCount: () => number;
   getCurrentPage: () => number;
   setCurrentPage: (page: number) => void;
-  onPageChanged: () => void;
+  onPageChanged: (prevPage: number, nextPage: number) => void;
 }
 
-function handleMouseWheelEvent(ctx: TaskUIScrollContext): void {
+// ── 模块级上下文（避免匿名闭包进 JASS） ──
+let wheelCtx: TaskUIScrollContext | null = null;
+
+function onMouseWheelEvent(): void {
+  if (!wheelCtx) return;
   (pcall as any)(() => {
+    const ctx = wheelCtx!;
     if (!ctx.isVisible()) return;
-    if (
-      !isWheelTargetForTaskListByJapi(
-        japi,
-        ctx.getMouseFocus,
-        ctx.listContainer,
-        ctx.scrollBarFrame,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-      )
-    )
-      return;
+    if (!isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) return;
     handleTaskUIListWheel(ctx);
   });
 }
 
 function updateTaskUIScrollThumbPosition(ctx: TaskUIScrollContext, pageCount: number): void {
   if (!ctx.scrollBarFrame || !ctx.scrollThumbFrame) return;
-
   const centeredX = (SCROLLBAR_W - SCROLL_THUMB_SIZE) * 0.5;
   let travelRange = LIST_VIEW_H - SCROLL_THUMB_SIZE - SCROLL_THUMB_TOP_COMPENSATION - SCROLL_THUMB_BOTTOM_COMPENSATION;
   if (travelRange < 0) travelRange = 0;
-
   let topOffset = SCROLL_THUMB_TOP_COMPENSATION;
   if (pageCount > 1) {
     const currentPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage()));
     const ratio = currentPage / (pageCount - 1);
     topOffset += travelRange * ratio;
   }
-
-  ctx.setFramePointRelative(
-    ctx.scrollThumbFrame,
-    ctx.FramePoint.TOPLEFT,
-    ctx.scrollBarFrame,
-    ctx.FramePoint.TOPLEFT,
-    centeredX,
-    -topOffset
-  );
+  ctx.setFramePointRelative(ctx.scrollThumbFrame, ctx.FramePoint.TOPLEFT, ctx.scrollBarFrame, ctx.FramePoint.TOPLEFT, centeredX, -topOffset);
 }
 
 export function isTaskUIWheelTarget(ctx: TaskUIScrollContext): boolean {
   if (!ctx.mainPanel) return false;
-  return isWheelTargetForTaskListByJapi(
-    japi,
-    ctx.getMouseFocus,
-    ctx.listContainer,
-    ctx.scrollBarFrame,
-    ctx.scrollThumbFrame,
-    ctx.scrollThumbHitBtn
-  );
+  return isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn);
 }
 
 export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
@@ -88,30 +66,25 @@ export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
   if (pageCount <= 1) return;
   const delta = typeof ctx.getWheelDelta === "function" ? ctx.getWheelDelta() : 0;
   if (delta === 0) return;
-
   const currentPage = ctx.getCurrentPage();
   let nextPage = currentPage;
   if (delta > 0) nextPage = Math.max(0, currentPage - 1);
   if (delta < 0) nextPage = Math.min(pageCount - 1, currentPage + 1);
   if (nextPage === currentPage) return;
-
   ctx.setCurrentPage(nextPage);
-  ctx.onPageChanged();
+  ctx.onPageChanged(currentPage, nextPage);
   updateTaskUIScrollThumbPosition(ctx, pageCount);
 }
 
 export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
   if (!ENABLE_MOUSE_WHEEL_SCROLL) return ctx.taskListWheelTrig;
   if (ctx.taskListWheelTrig) return ctx.taskListWheelTrig;
-  ctx.taskListWheelTrig = ctx.registerMouseWheel(false, () => handleMouseWheelEvent(ctx));
+  wheelCtx = ctx;
+  ctx.taskListWheelTrig = ctx.registerMouseWheel(false, onMouseWheelEvent);
   return ctx.taskListWheelTrig;
 }
 
-export function updateTaskUIScrollBarVisibility(
-  ctx: TaskUIScrollContext,
-  pageCount: number,
-  hasQuestRows: boolean
-): void {
+export function updateTaskUIScrollBarVisibility(ctx: TaskUIScrollContext, pageCount: number, hasQuestRows: boolean): void {
   const visible = hasQuestRows;
   if (typeof japi.DzFrameShow !== "function") return;
   for (const frame of [ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn]) {
