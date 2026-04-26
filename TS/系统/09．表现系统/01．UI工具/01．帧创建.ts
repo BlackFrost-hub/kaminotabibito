@@ -47,6 +47,15 @@ export function loadTocOnce(
   }
 }
 
+let __fdfSafeFrameName = "";
+let __fdfSafeParent = 0;
+let __fdfSafeContextId = 0;
+let __fdfSafeOutFrame = 0;
+
+function __fdfSafeCreateFramePcallBody(): void {
+  __fdfSafeOutFrame = japi.DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId);
+}
+
 export function tryCreateFromFdfSafe(
   frameName: string,
   parent: number,
@@ -55,10 +64,11 @@ export function tryCreateFromFdfSafe(
 ): number | null {
   loadTocOnce(opts.tocLoadKey, opts.tocPaths, opts.debugPrefix ?? "UI");
 
-  let f: number = 0;
-  const ok = (pcall as any)(() => {
-    f = japi.DzCreateFrame(frameName, parent, 0);
-  });
+  __fdfSafeFrameName = frameName;
+  __fdfSafeParent = parent;
+  __fdfSafeContextId = opts.contextId ?? 0;
+  const ok = pcall(__fdfSafeCreateFramePcallBody);
+  const f = __fdfSafeOutFrame;
   if (ok && f != null && f !== 0) return f;
   return fallback();
 }

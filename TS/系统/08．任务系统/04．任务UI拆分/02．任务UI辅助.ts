@@ -14,7 +14,7 @@ import { questDB, QuestType, QuestStatus, QuestData } from "../01．任务数据
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-// ── Dz 调用 pcall：具名函数，避免每次分配匿名闭包 ──
+// ── Dz 调用 pcall：仅用模块顶层具名体 + 全局 `pcall(具名)`（勿 `(pcall as any)(具名)`，TSTL 会编成 `pcall(nil, fn)`） ──
 let __dzPcallShowJapi: any = null;
 let __dzPcallShowFrame = 0;
 let __dzPcallShowVis = false;
@@ -28,7 +28,7 @@ export function pcallDzFrameShow(japiAny: any, frame: number, visible: boolean):
   __dzPcallShowJapi = japiAny;
   __dzPcallShowFrame = frame;
   __dzPcallShowVis = visible;
-  (pcall as any)(__dzPcallFrameShowBody);
+  pcall(__dzPcallFrameShowBody);
   __dzPcallShowJapi = null;
 }
 
@@ -43,7 +43,7 @@ export function pcallDzFrameSetAlpha(japiAny: any, frame: number, alpha: number)
   __dzPcallShowJapi = japiAny;
   __dzPcallShowFrame = frame;
   __dzPcallAlphaVal = alpha;
-  (pcall as any)(__dzPcallFrameSetAlphaBody);
+  pcall(__dzPcallFrameSetAlphaBody);
   __dzPcallShowJapi = null;
 }
 
@@ -115,7 +115,8 @@ export function tryCreateFromFdfWithSource(
   __dzCreateName = name;
   __dzCreateParent = parent;
   __dzCreateContextId = contextId;
-  const ok = (pcall as any)(__dzCreateFramePcallBody);
+  // void 具名体写槽位 + `local ok = pcall(具名)`：首返回值即 boolean，勿对 `pcall` 结果做下标/解构元组（见 `01．帧创建` 同构实现）。
+  const ok = pcall(__dzCreateFramePcallBody);
   const f = __dzCreateResultFrame;
   if (ok && f != null && f !== 0) return { frame: f, fromFdf: true };
   return { frame: fallback(), fromFdf: false };

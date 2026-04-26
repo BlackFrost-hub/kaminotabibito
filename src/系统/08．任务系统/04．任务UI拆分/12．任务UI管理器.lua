@@ -35,7 +35,7 @@ local KEY = ____index.KEY
 local KEY_NUM = ____index.KEY_NUM
 local getMouseFocus = ____index.getMouseFocus
 local getWheelDelta = ____index.getWheelDelta
-local registerMouseWheel = ____index.registerMouseWheel
+local registerMouseWheelHardware = ____index.registerMouseWheel
 local ____index = require("系统.09．表现系统.01．UI工具.index")
 local createFrame = ____index.createFrame
 local setFramePosition = ____index.setFramePosition
@@ -73,7 +73,7 @@ function taskUIInitPcallBody(self)
     end
 end
 function onQuestManagerUiRefresh(self, _playerId, _questId)
-    pcall(nil, pcallDispatchRefreshBody)
+    pcall(pcallDispatchRefreshBody)
 end
 --- 当前仅由 `init` 调用；参数保留与旧调用点兼容，实现固定走 `dispatchRefresh`
 function ____exports.registerTaskUIRefreshCallback(self, _rebuildPages)
@@ -172,7 +172,7 @@ local function dispatchTogglePanel(self)
     if not mgr then
         return
     end
-    pcall(nil, taskUITogglePanelPcallBody)
+    pcall(taskUITogglePanelPcallBody)
 end
 local TaskUI = __TS__Class()
 TaskUI.name = "TaskUI"
@@ -211,7 +211,9 @@ function TaskUI.prototype.ensureUiContextCaches(self)
         taskListWheelTrig = self.taskListWheelTrig,
         getMouseFocus = getMouseFocus,
         getWheelDelta = getWheelDelta,
-        registerMouseWheel = registerMouseWheel,
+        registerMouseWheel = function(sync, cb, playerId)
+            return registerMouseWheelHardware(nil, sync, cb, playerId)
+        end,
         isVisible = taskUIScrollCtxIsVisible,
         getCurrentPageCount = taskUIScrollCtxGetCurrentPageCount,
         getCurrentPage = taskUIScrollCtxGetCurrentPage,
@@ -253,7 +255,7 @@ function TaskUI.prototype.init(self)
         return
     end
     mgr = self
-    pcall(nil, taskUIInitPcallBody)
+    pcall(taskUIInitPcallBody)
 end
 function TaskUI.prototype.runInitBodyInPcall(self)
     local gameUI = getGameUI(nil)

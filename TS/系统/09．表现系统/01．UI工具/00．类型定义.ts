@@ -89,5 +89,7 @@ export interface TryCreateFromFdfOptions {
   tocLoadKey: string;
   tocPaths: string[];
   debugPrefix?: string;
+  /** `DzCreateFrame` 第四参；默认 0 */
+  contextId?: number;
 }
 

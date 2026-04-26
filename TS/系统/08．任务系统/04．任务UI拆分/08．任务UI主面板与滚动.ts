@@ -18,7 +18,6 @@ import {
   SCROLLBAR_BOTTOM_INSET,
   SCROLLBAR_W,
   LIST_VIEW_H,
-  LIST_CONTAINER_W,
   SCROLL_THUMB_SIZE,
   ENABLE_TASK_UI_RIGHT_SCROLLBAR,
 } from "./01．任务UI常量";
@@ -115,17 +114,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     vScrollTrack: null,
   };
 
-  let mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
-  if (!mainPanel) {
-    mainPanel =
-      createFrame({
-        type: FrameType.FRAME,
-        name: "TaskMainPanelDyn",
-        parent,
-        template: "template",
-        visible: false,
-      }) ?? 0;
-  }
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
   if (!mainPanel) return empty;
 
   if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
@@ -140,30 +129,19 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  let listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
-  if (!listContainer) {
-    listContainer =
-      createFrame({
-        type: FrameType.FRAME,
-        name: "TaskListContainerDyn",
-        parent: mainPanel,
-        template: "template",
-        visible: true,
-      }) ?? 0;
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
+  if (listContainer) {
+    if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
+    setFramePointRelative(
+      listContainer,
+      FramePoint.TOPLEFT,
+      mainPanel,
+      FramePoint.TOPLEFT,
+      LIST_CONTAINER_REL_TO_PANEL_X,
+      LIST_CONTAINER_REL_TO_PANEL_Y
+    );
+    pcallDzFrameShow(japi, listContainer, true);
   }
-  if (!listContainer) return empty;
-
-  if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
-  setFramePointRelative(
-    listContainer,
-    FramePoint.TOPLEFT,
-    mainPanel,
-    FramePoint.TOPLEFT,
-    LIST_CONTAINER_REL_TO_PANEL_X,
-    LIST_CONTAINER_REL_TO_PANEL_Y
-  );
-  setFrameSize(listContainer, { width: LIST_CONTAINER_W, height: LIST_VIEW_H });
-  pcallDzFrameShow(japi, listContainer, true);
 
   const tabs = buildTaskPanelCategoryTabs({
     japi,
@@ -226,6 +204,19 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       }
       if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
+      // BACKDROP 不接收点击；透明 GLUETEXTBUTTON 铺满 thumb，供 DzGetMouseFocus / 全局拖拽命中
+      const thumbHit =
+        createFrame({
+          type: FrameType.GLUETEXTBUTTON,
+          name: "TaskScrollThumbHit",
+          parent: scrollThumbFrame,
+          template: "template",
+          visible: true,
+        }) ?? null;
+      if (thumbHit && thumbHit !== 0) {
+        setupTransparentGlueHitLayer(scrollThumbFrame, thumbHit);
+        scrollThumbHitBtn = thumbHit;
+      }
     }
   }
 

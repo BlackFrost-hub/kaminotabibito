@@ -36,3 +36,7 @@
 2. 全局规则放到 `agent-shared/*.mdc` 并使用 `alwaysApply: true`。
 3. 子系统规则放到最相关的子目录中，由更具体的文件承接。
 4. 新增项目规则时，在这里补一条入口，保证可发现性。
+
+## Tooling Supplements
+
+- `tooling/encoding-and-patch-safety.mdc`: 中文文件编码、局部补丁、TSTL no-self / pcall 产物核对、安全回滚规则。

@@ -68,13 +68,20 @@ function ____exports.loadTocOnce(self, tocLoadKey, tocPaths, debugPrefix)
         end
     end
 end
+local __fdfSafeFrameName = ""
+local __fdfSafeParent = 0
+local __fdfSafeContextId = 0
+local __fdfSafeOutFrame = 0
+local function __fdfSafeCreateFramePcallBody(self)
+    __fdfSafeOutFrame = japi.DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId)
+end
 function ____exports.tryCreateFromFdfSafe(self, frameName, parent, fallback, opts)
     ____exports.loadTocOnce(nil, opts.tocLoadKey, opts.tocPaths, opts.debugPrefix or "UI")
-    local f = 0
-    local ok = pcall(function ()
-            f = japi.DzCreateFrame(frameName, parent, 0)
-        end
-    )
+    __fdfSafeFrameName = frameName
+    __fdfSafeParent = parent
+    __fdfSafeContextId = opts.contextId or 0
+    local ok = pcall(__fdfSafeCreateFramePcallBody)
+    local f = __fdfSafeOutFrame
     if ok and f ~= nil and f ~= 0 then
         return f
     end

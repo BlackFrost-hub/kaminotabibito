@@ -150,7 +150,7 @@ local function onMouseWheelEvent(self)
     if not wheelCtx then
         return
     end
-    pcall(nil, taskUIWheelEventPcallBody)
+    taskUIWheelEventPcallBody(nil)
 end
 function ____exports.isTaskUIWheelTarget(self, ctx)
     if not ctx.mainPanel then
@@ -232,19 +232,19 @@ local function taskUIThumbPressPcallBody(self)
     onThumbDragStart(nil)
 end
 local function onGlobalThumbLeftPress(self)
-    pcall(nil, taskUIThumbPressPcallBody)
+    taskUIThumbPressPcallBody(nil)
 end
 local function taskUIThumbReleasePcallBody(self)
     onThumbDragEnd(nil)
 end
 local function onGlobalThumbLeftRelease(self)
-    pcall(nil, taskUIThumbReleasePcallBody)
+    taskUIThumbReleasePcallBody(nil)
 end
 local function taskUIThumbMovePcallBody(self)
     onThumbDragMove(nil)
 end
 local function onGlobalThumbDragMove(self)
-    pcall(nil, taskUIThumbMovePcallBody)
+    taskUIThumbMovePcallBody(nil)
 end
 local function ensureTaskThumbGlobalMouseRegistered(self)
     if taskThumbGlobalMouseTrig ~= nil then
@@ -283,7 +283,7 @@ function ____exports.registerTaskUIListWheel(self, ctx)
     if ctx.taskListWheelTrig then
         return ctx.taskListWheelTrig
     end
-    ctx.taskListWheelTrig = ctx:registerMouseWheel(false, onMouseWheelEvent)
+    ctx.taskListWheelTrig = ctx.registerMouseWheel(false, onMouseWheelEvent)
     return ctx.taskListWheelTrig
 end
 function ____exports.updateTaskUIScrollBarVisibility(self, ctx, pageCount, hasQuestRows)

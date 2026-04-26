@@ -569,7 +569,7 @@ function ____exports.createTaskUIPrecreatedListPool(self, ctx)
 end
 function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
     pcallTaskUIListCtx = ctx
-    pcall(nil, pcallRebuildTaskUIFacadeListPoolBody)
+    pcall(pcallRebuildTaskUIFacadeListPoolBody)
     pcallTaskUIListCtx = nil
 end
 --- 设置行点击的回调，由管理器在创建池时调用
@@ -586,22 +586,22 @@ function ____exports.getTaskUICategoryPageCount(self, pool, category)
 end
 function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx
-    pcall(nil, pcallApplyTaskUIFacadeVisibleStateBody)
+    pcall(pcallApplyTaskUIFacadeVisibleStateBody)
     pcallTaskUIListCtx = nil
 end
 function ____exports.applyTaskUICategorySwitchVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx
-    pcall(nil, pcallApplyTaskUICategorySwitchVisibleStateBody)
+    pcall(pcallApplyTaskUICategorySwitchVisibleStateBody)
     pcallTaskUIListCtx = nil
 end
 function ____exports.applyTaskUIExpandVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx
-    pcall(nil, pcallApplyTaskUIExpandVisibleStateBody)
+    pcall(pcallApplyTaskUIExpandVisibleStateBody)
     pcallTaskUIListCtx = nil
 end
 function ____exports.applyTaskUIPageSwitchVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx
-    pcall(nil, pcallApplyTaskUIPageSwitchVisibleStateBody)
+    pcall(pcallApplyTaskUIPageSwitchVisibleStateBody)
     pcallTaskUIListCtx = nil
 end
 return ____exports

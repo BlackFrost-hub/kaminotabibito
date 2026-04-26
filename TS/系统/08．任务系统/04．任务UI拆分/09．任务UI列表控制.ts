@@ -459,7 +459,7 @@ function renderVariant(
 
 export function rebuildTaskUIFacadeListPool(ctx: TaskUIListControlContext): void {
   pcallTaskUIListCtx = ctx;
-  (pcall as any)(pcallRebuildTaskUIFacadeListPoolBody);
+  pcall(pcallRebuildTaskUIFacadeListPoolBody);
   pcallTaskUIListCtx = null;
 }
 
@@ -479,24 +479,24 @@ export function getTaskUICategoryPageCount(
 
 export function applyTaskUIFacadeVisibleState(ctx: TaskUIListControlContext): void {
   pcallTaskUIListCtx = ctx;
-  (pcall as any)(pcallApplyTaskUIFacadeVisibleStateBody);
+  pcall(pcallApplyTaskUIFacadeVisibleStateBody);
   pcallTaskUIListCtx = null;
 }
 
 export function applyTaskUICategorySwitchVisibleState(ctx: TaskUIListControlContext): void {
   pcallTaskUIListCtx = ctx;
-  (pcall as any)(pcallApplyTaskUICategorySwitchVisibleStateBody);
+  pcall(pcallApplyTaskUICategorySwitchVisibleStateBody);
   pcallTaskUIListCtx = null;
 }
 
 export function applyTaskUIExpandVisibleState(ctx: TaskUIListControlContext): void {
   pcallTaskUIListCtx = ctx;
-  (pcall as any)(pcallApplyTaskUIExpandVisibleStateBody);
+  pcall(pcallApplyTaskUIExpandVisibleStateBody);
   pcallTaskUIListCtx = null;
 }
 
 export function applyTaskUIPageSwitchVisibleState(ctx: TaskUIListControlContext): void {
   pcallTaskUIListCtx = ctx;
-  (pcall as any)(pcallApplyTaskUIPageSwitchVisibleStateBody);
+  pcall(pcallApplyTaskUIPageSwitchVisibleStateBody);
   pcallTaskUIListCtx = null;
 }

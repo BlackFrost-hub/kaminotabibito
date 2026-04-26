@@ -39,7 +39,7 @@ function ____exports.pcallDzFrameShow(self, japiAny, frame, visible)
     __dzPcallShowJapi = japiAny
     __dzPcallShowFrame = frame
     __dzPcallShowVis = visible
-    pcall(nil, __dzPcallFrameShowBody)
+    pcall(__dzPcallFrameShowBody)
     __dzPcallShowJapi = nil
 end
 local __dzPcallAlphaVal = 0
@@ -53,7 +53,7 @@ function ____exports.pcallDzFrameSetAlpha(self, japiAny, frame, alpha)
     __dzPcallShowJapi = japiAny
     __dzPcallShowFrame = frame
     __dzPcallAlphaVal = alpha
-    pcall(nil, __dzPcallFrameSetAlphaBody)
+    pcall(__dzPcallFrameSetAlphaBody)
     __dzPcallShowJapi = nil
 end
 function ____exports.dzGetLocalPlayer(self)
@@ -135,7 +135,7 @@ function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, co
     __dzCreateName = name
     __dzCreateParent = parent
     __dzCreateContextId = contextId
-    local ok = pcall(nil, __dzCreateFramePcallBody)
+    local ok = pcall(__dzCreateFramePcallBody)
     local f = __dzCreateResultFrame
     if ok and f ~= nil and f ~= 0 then
         return {frame = f, fromFdf = true}

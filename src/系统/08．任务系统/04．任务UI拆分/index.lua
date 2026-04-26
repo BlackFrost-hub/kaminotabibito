@@ -65,7 +65,7 @@ do
     end
 end
 do
-    local ____export = require("系统.08．任务系统.04．任务UI拆分.09．任务UI列表控制")
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.10．任务UI滚动与滚轮")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -73,7 +73,55 @@ do
     end
 end
 do
-    local ____export = require("系统.08．任务系统.04．任务UI拆分.10．任务UI滚动与滚轮")
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.11．任务UI列表控制辅助")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.13．任务UI预设构建")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.14．任务UI内容同步")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.15．任务UI本地显示")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.16．任务UI输入绑定")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.08．任务系统.04．任务UI拆分.17．任务UI列表帧构建")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

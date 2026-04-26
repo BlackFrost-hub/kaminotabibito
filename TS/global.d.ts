@@ -8,6 +8,8 @@ declare function BlzGetUnitMaxHP(unit: any): number;
 /** 地图运行时 require 为单参；@noSelf 避免 TSTL 生成 require(nil, "…")。需配合 tsconfig tstl.noResolvePaths，否则 TSTL 会报 Could not resolve。 */
 /** @noSelf */
 declare function require(mod: string): any;
+/** TSTL：`pcall` 勿 `as any`，否则 `(pcall as any)(具名)` 会编成 `pcall(nil, fn)`。 */
+/** @noSelf */
 declare const pcall: <T>(f: () => T) => [boolean, T | string];
 declare const tostring: (v: any) => string;
 declare const string: { char: (...codes: number[]) => string; byte: (s: string, i?: number) => number };

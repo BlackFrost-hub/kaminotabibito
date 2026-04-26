@@ -139,3 +139,5 @@ Best:
 - Cite concrete rule files when making recommendations.
 - If rules seem to conflict, prefer the file closest to the code being changed.
 - Run `npm run build` after actual code changes are complete, and report the result.
+- Before rewriting Chinese-heavy files or fixing TSTL callback/no-self issues, read `.cursor/rules/tooling/encoding-and-patch-safety.mdc`.
+- Prefer local patch edits over whole-file rewrites; verify generated `src/**/*.lua` only after a successful build.

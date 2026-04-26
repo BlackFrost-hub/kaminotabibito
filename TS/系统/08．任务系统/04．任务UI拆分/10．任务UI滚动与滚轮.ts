@@ -32,7 +32,8 @@ export interface TaskUIScrollContext {
   taskListWheelTrig: unknown;
   getMouseFocus?: () => number;
   getWheelDelta?: () => number;
-  registerMouseWheel: (sync: boolean, cb: () => void, playerId?: number) => unknown;
+  /** `this: void`：避免 TSTL 编成 `ctx:registerMouseWheel` 把上下文表塞进 `sync` 位 */
+  registerMouseWheel(this: void, sync: boolean, cb: () => void, playerId?: number): unknown;
   isVisible: () => boolean;
   getCurrentPageCount: () => number;
   getCurrentPage: () => number;
@@ -54,7 +55,7 @@ function taskUIWheelEventPcallBody(): void {
 
 function onMouseWheelEvent(): void {
   if (!wheelCtx) return;
-  (pcall as any)(taskUIWheelEventPcallBody);
+  taskUIWheelEventPcallBody();
 }
 
 function thumbTravelNorm(): number {
@@ -169,7 +170,7 @@ function taskUIThumbPressPcallBody(): void {
 }
 
 function onGlobalThumbLeftPress(): void {
-  (pcall as any)(taskUIThumbPressPcallBody);
+  taskUIThumbPressPcallBody();
 }
 
 function taskUIThumbReleasePcallBody(): void {
@@ -177,7 +178,7 @@ function taskUIThumbReleasePcallBody(): void {
 }
 
 function onGlobalThumbLeftRelease(): void {
-  (pcall as any)(taskUIThumbReleasePcallBody);
+  taskUIThumbReleasePcallBody();
 }
 
 function taskUIThumbMovePcallBody(): void {
@@ -185,7 +186,7 @@ function taskUIThumbMovePcallBody(): void {
 }
 
 function onGlobalThumbDragMove(): void {
-  (pcall as any)(taskUIThumbMovePcallBody);
+  taskUIThumbMovePcallBody();
 }
 
 function ensureTaskThumbGlobalMouseRegistered(): void {

@@ -30,7 +30,8 @@ import { buildTaskEntryIcon } from "./06．任务UI入口图标";
 import { buildTaskMainPanel } from "./08．任务UI主面板与滚动";
 import {
   getGameUI, registerKeyUpSync, KEY, KEY_NUM,
-  getMouseFocus, getWheelDelta, registerMouseWheel,
+  getMouseFocus, getWheelDelta,
+  registerMouseWheel as registerMouseWheelHardware,
 } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import {
   createFrame, setFramePosition, setFrameSize, setFrameTexture,
@@ -116,7 +117,7 @@ function taskUITogglePanelPcallBody(): void {
 // 统一的面板切换回调（键盘 J 键和鼠标点击入口图标共用）
 function dispatchTogglePanel(): void {
   if (!mgr) return;
-  (pcall as any)(taskUITogglePanelPcallBody);
+  pcall(taskUITogglePanelPcallBody);
 }
 
 function dispatchRefresh(): void {
@@ -162,7 +163,9 @@ class TaskUI {
       taskListWheelTrig: this.taskListWheelTrig,
       getMouseFocus,
       getWheelDelta,
-      registerMouseWheel,
+      registerMouseWheel: function (this: void, sync: boolean, cb: () => void, playerId?: number): unknown {
+        return registerMouseWheelHardware(sync, cb, playerId);
+      },
       isVisible: taskUIScrollCtxIsVisible,
       getCurrentPageCount: taskUIScrollCtxGetCurrentPageCount,
       getCurrentPage: taskUIScrollCtxGetCurrentPage,
@@ -202,10 +205,10 @@ class TaskUI {
     if (!ENABLE_TASK_UI_CLIENT) return;
     if (this.uiInitialized) return;
     mgr = this;
-    (pcall as any)(taskUIInitPcallBody);
+    pcall(taskUIInitPcallBody);
   }
 
-  /** 供模块级 `taskUIInitPcallBody` 调用（pcall 内不得写匿名闭包） */
+  /** 供模块级 `taskUIInitPcallBody` 调用；初始化体须为顶层具名函数供 `pcall(具名)` 使用 */
   runInitBodyInPcall(): void {
     const gameUI = getGameUI();
     if (!gameUI) return;
@@ -453,7 +456,7 @@ export function registerHotkey(): void {
  * 当任务数据变化时，重建UI列表。
  */
 function onQuestManagerUiRefresh(_playerId: number, _questId?: string): void {
-  (pcall as any)(pcallDispatchRefreshBody);
+  pcall(pcallDispatchRefreshBody);
 }
 
 /** 当前仅由 `init` 调用；参数保留与旧调用点兼容，实现固定走 `dispatchRefresh` */
