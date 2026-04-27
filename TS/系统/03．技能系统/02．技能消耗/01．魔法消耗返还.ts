@@ -91,7 +91,8 @@ export function applyManaRefund(unit: any, manaCost: number): void {
   const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
 
   // 不超过最大魔法
-  const actualRefund = Math.min(refund, maxMana - currentMana);
+  const manaGap = maxMana - currentMana;
+  const actualRefund = refund < manaGap ? refund : manaGap;
   if (actualRefund <= 0) return;
 
   jass.SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRefund);

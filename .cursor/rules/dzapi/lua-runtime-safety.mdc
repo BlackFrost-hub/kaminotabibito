@@ -14,7 +14,26 @@ alwaysApply: false
 
 **与前者 §5 的差异**：本模板使用 `runtime.handle_level = 1`（与常见 ydLua 入口示例一致）；前者另给出更保守的 `handle_level = 0` 思路。**按项目只选一套**，勿混用两套策略却忘记对齐。
 
-## 本模板做的事（一览）
+## 当前项目结论
+
+本文件里的“整段全局 hook 模板”现在**不再推荐直接采用**。
+
+原因不是它完全没价值，而是它把风险从“业务层直接传匿名闭包进 JASS”转成了“全局替换 `TimerStart` / `TriggerAddAction` / `ForGroup` / `pairs` 等基础 API”。
+
+当前项目里，这种做法有几个明确问题：
+
+1. `ForGroup / ForForce / Enum*` 共享单个 `func_ref` 槽位，嵌套或重入时会互相覆盖。
+2. `TriggerAddAction` 的 action 分发表若靠 `SafePairs` 遍历，执行顺序不稳定。
+3. 全局 hook 基础 API 会改变整个工程语义，对 TSTL 产物和第三方模块兼容性要求过高。
+4. 它仍然依赖“Lua function → 全局表 → JASS 命名入口转发”模型，不适合作为当前仓库的默认安全方案。
+
+当前仓库的推荐方向是：
+
+- **优先在业务层收敛**，不要把匿名闭包、`Condition`、`Filter`、高频 JASS 回调直接送进引擎。
+- **模块级具名函数 + 稳定 key 分发**，按具体子系统局部治理。
+- **不要在项目入口全局重写 `TimerStart` / `TriggerAddAction` / `ForGroup`**，除非专门做运行时实验并完整评估兼容性。
+
+## 历史模板做的事（一览）
 
 | 块 | 作用 |
 |----|------|
@@ -25,166 +44,35 @@ alwaysApply: false
 | `TimerStart` / `DestroyTimer` | 用 handle 映射存真实回调，统一命名 tick |
 | `TriggerAddAction` 等 | 同上，减少闭包直挂触发器 |
 
-## 完整代码
+## 已废弃的整段入口模板
 
-```lua
-local runtime = require("jass.runtime")
-local jass = require("jass.common")
+下面这些做法现在只保留为“历史思路”，**不要直接复制进项目入口**：
 
--- ==================== 1. 禁用 pairs ====================
--- pairs 遍历 hash 表顺序随机，不同客户端顺序不同会导致 desync
-SafePairs = pairs
-pairs = function()
-    error("不能使用pairs,请确认100%安全后用SafePairs替换")
-end
+- 全局替换 `pairs`
+- 全局替换 `TimerStart` / `DestroyTimer`
+- 全局替换 `TriggerAddAction` / `TriggerClearActions`
+- 全局替换 `ForGroup` / `ForForce` / `Enum*`
+- 用单槽 `func_ref` 或 `handle -> function` 哈希表统一兜底所有回调
 
--- ==================== 2. 句柄保护 ====================
--- 防止 lua 引用句柄，gc 是异步的，防止释放句柄异步
-runtime.handle_level = 1
+如果确实需要在某个独立实验环境中试验这类运行时 hook，必须额外评估：
 
--- ==================== 3. 禁止睡眠函数 ====================
--- 会造成一些闪退 bug
-runtime.sleep = true
-
--- ==================== 4. 错误处理 ====================
-local function error_handle(msg)
-    print(msg)
-end
-
--- ==================== 5. 禁用 Condition/Filter ====================
--- 这些是 JASS 回调，容易出问题
-rawset(jass, 'Condition', function(code)
-    error("不能使用Condition")
-end)
-
-rawset(jass, 'Filter', function(code)
-    error("不能使用Filter")
-end)
-
--- ==================== 6. 替换 ForGroup/ForForce 等回调 ====================
--- 使用命名函数 action_func 替代匿名闭包
-local func_ref
-local function action_func()
-    if func_ref then
-        xpcall(func_ref, runtime.error_handle or error_handle)
-    end
-end
-
--- 替换 ForGroup
-local ForGroup = jass.ForGroup
-rawset(jass, 'ForGroup', function(group, action)
-    func_ref = action
-    ForGroup(group, action_func)
-    func_ref = nil
-end)
-
--- 替换 ForForce
-local ForForce = jass.ForForce
-rawset(jass, 'ForForce', function(force, action)
-    func_ref = action
-    ForForce(force, action_func)
-    func_ref = nil
-end)
-
--- 替换 EnumDestructablesInRect
-local EnumDestructablesInRect = jass.EnumDestructablesInRect
-rawset(jass, 'EnumDestructablesInRect', function(rect, filter, action)
-    func_ref = action
-    EnumDestructablesInRect(rect, filter, action_func)
-    func_ref = nil
-end)
-
--- 替换 EnumItemsInRect
-local EnumItemsInRect = jass.EnumItemsInRect
-rawset(jass, 'EnumItemsInRect', function(rect, filter, action)
-    func_ref = action
-    EnumItemsInRect(rect, filter, action_func)
-    func_ref = nil
-end)
-
--- ==================== 7. 替换 TimerStart ====================
--- 使用 handle -> action 映射表，避免闭包
-local GetHandleId = jass.GetHandleId
-local TimerStart = jass.TimerStart
-local GetExpiredTimer = jass.GetExpiredTimer
-local DestroyTimer = jass.DestroyTimer
-local timer_table = {}
-
-local function timer_action_func()
-    local action = timer_table[GetHandleId(GetExpiredTimer())]
-    if action then
-        xpcall(action, runtime.error_handle or error_handle)
-    end
-end
-
-rawset(jass, 'TimerStart', function(timer, time, is_loop, action)
-    timer_table[GetHandleId(timer)] = action
-    TimerStart(timer, time, is_loop, timer_action_func)
-end)
-
-rawset(jass, 'DestroyTimer', function(timer)
-    timer_table[GetHandleId(timer)] = nil
-    DestroyTimer(timer)
-end)
-
--- ==================== 8. 替换 TriggerAddAction ====================
--- 使用 trigger handle -> {action handle -> action} 映射表
-local TriggerAddAction = jass.TriggerAddAction
-local TriggerRemoveAction = jass.TriggerRemoveAction
-local TriggerClearActions = jass.TriggerClearActions
-local GetTriggeringTrigger = jass.GetTriggeringTrigger
-local DestroyTrigger = jass.DestroyTrigger
-local action_table = {}
-
-local function trigger_action_func()
-    local actions = action_table[GetHandleId(GetTriggeringTrigger())]
-    if actions then
-        for _, action in SafePairs(actions) do
-            xpcall(action, runtime.error_handle or error_handle)
-        end
-    end
-end
-
-rawset(jass, 'TriggerAddAction', function(trg, action)
-    local act = TriggerAddAction(trg, trigger_action_func)
-    trg = GetHandleId(trg)
-    if action_table[trg] == nil then
-        action_table[trg] = {}
-    end
-    action_table[trg][GetHandleId(act)] = action
-    return act
-end)
-
-rawset(jass, 'TriggerRemoveAction', function(trg, act)
-    local actions = action_table[GetHandleId(trg)]
-    if actions then
-        actions[GetHandleId(act)] = nil
-    end
-    TriggerRemoveAction(trg, act)
-end)
-
-rawset(jass, 'TriggerClearActions', function(trg)
-    action_table[GetHandleId(trg)] = nil
-    TriggerClearActions(trg)
-end)
-
-rawset(jass, 'DestroyTrigger', function(trg)
-    action_table[GetHandleId(trg)] = nil
-    DestroyTrigger(trg)
-end)
-```
+1. 是否会破坏 TSTL 生成代码的既有语义。
+2. 是否引入新的 `pairs` 顺序问题。
+3. 是否在嵌套枚举、重入 timer、重复 trigger action 下覆盖旧引用。
+4. 是否与仓库现有的 Dz / UI / STES / YDLocal 封装冲突。
 
 ## 使用方式
 
-1. 将上述代码保存为 `lua-runtime-safety.lua`
-2. 在项目入口文件（如 `main.lua`）的第一行加载：
-   ```lua
-   require "lua-runtime-safety"
-   ```
-3. 确保这是最先加载的代码，在创建任何 timer/trigger 之前
+当前项目**不建议**按“整段入口脚本”接入。
+
+更推荐的使用方式是：
+
+1. 先读 `lua-gc-desync-heuristics.mdc`，按业务层规则整改。
+2. 在具体子系统里把匿名闭包、`Condition`、`Filter`、高频 JASS 回调改成模块级具名函数。
+3. 只在局部模块内做受控封装，不在入口全局改写基础 API。
 
 ## 注意事项
 
-- 会全局替换 `pairs`、`TimerStart`、`TriggerAddAction` 等；加载后全项目须遵守约束。
-- 确需 `pairs` 时用 `SafePairs`，且遍历顺序不得影响同步（见前者 **§4**）。
-- 若**不采用**本入口模板，仍建议阅读前者 **§1–§8** 做业务层约束；若采用本模板，须评估与 TSTL 生成代码、第三方 `require` 的兼容性。
+- 不要把这份文件理解成“推荐在入口全局重写 JASS 基础 API”的模板。
+- 若只是要规避 desync，优先修业务代码，不要先引入大范围 runtime hook。
+- 若未来确实要保留某个局部 runtime 封装，应单独建实验文档，并明确适用边界与兼容性验证结果。

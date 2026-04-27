@@ -9,8 +9,8 @@ local jass, isValidUnit, isUnitEnemy
 -- @param radius 搜索半径
 -- @returns 符合条件的单位数组
 function ____exports.getUnitsInRange(self, x, y, radius)
-    local group = jass:CreateGroup()
-    jass:GroupEnumUnitsInRange(
+    local group = jass.CreateGroup()
+    jass.GroupEnumUnitsInRange(
         group,
         x,
         y,
@@ -18,15 +18,15 @@ function ____exports.getUnitsInRange(self, x, y, radius)
         nil
     )
     local units = {}
-    local unit = jass:FirstOfGroup(group)
+    local unit = jass.FirstOfGroup(group)
     while unit do
         if isValidUnit(nil, unit) then
             units[#units + 1] = unit
         end
-        jass:GroupRemoveUnit(group, unit)
-        unit = jass:FirstOfGroup(group)
+        jass.GroupRemoveUnit(group, unit)
+        unit = jass.FirstOfGroup(group)
     end
-    jass:DestroyGroup(group)
+    jass.DestroyGroup(group)
     return units
 end
 --- 获取以指定坐标为中心、指定半径范围内的所有有效敌对单位
@@ -37,8 +37,8 @@ end
 -- @param radius 搜索半径
 -- @returns 符合条件的敌对单位数组
 function ____exports.getEnemyUnitsInRange(self, centerUnit, x, y, radius)
-    local group = jass:CreateGroup()
-    jass:GroupEnumUnitsInRange(
+    local group = jass.CreateGroup()
+    jass.GroupEnumUnitsInRange(
         group,
         x,
         y,
@@ -46,15 +46,15 @@ function ____exports.getEnemyUnitsInRange(self, centerUnit, x, y, radius)
         nil
     )
     local units = {}
-    local unit = jass:FirstOfGroup(group)
+    local unit = jass.FirstOfGroup(group)
     while unit do
         if isUnitEnemy(nil, unit, centerUnit) then
             units[#units + 1] = unit
         end
-        jass:GroupRemoveUnit(group, unit)
-        unit = jass:FirstOfGroup(group)
+        jass.GroupRemoveUnit(group, unit)
+        unit = jass.FirstOfGroup(group)
     end
-    jass:DestroyGroup(group)
+    jass.DestroyGroup(group)
     return units
 end
 jass = require("jass.common")
@@ -71,8 +71,8 @@ function ____exports.getUnitsInRangeOfUnit(self, centerUnit, radius)
     if not centerUnit then
         return {}
     end
-    local x = jass:GetUnitX(centerUnit)
-    local y = jass:GetUnitY(centerUnit)
+    local x = jass.GetUnitX(centerUnit)
+    local y = jass.GetUnitY(centerUnit)
     return ____exports.getUnitsInRange(nil, x, y, radius)
 end
 --- 获取以指定单位为中心、指定半径范围内的所有有效敌对单位
@@ -84,8 +84,8 @@ function ____exports.getEnemyUnitsInRangeOfUnit(self, centerUnit, radius)
     if not centerUnit then
         return {}
     end
-    local x = jass:GetUnitX(centerUnit)
-    local y = jass:GetUnitY(centerUnit)
+    local x = jass.GetUnitX(centerUnit)
+    local y = jass.GetUnitY(centerUnit)
     return ____exports.getEnemyUnitsInRange(
         nil,
         centerUnit,

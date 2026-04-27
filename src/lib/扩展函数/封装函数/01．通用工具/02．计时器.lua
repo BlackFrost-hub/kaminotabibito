@@ -7,6 +7,9 @@ local ____exports = {}
 -- - runTimerOnce：调用方已 CreateTimer（并可能先写入哈希表），再一次性 TimerStart + 结束后销毁。
 --   与中心计时器无关：变长间隔、每实例独立结束时间（如音效时长）仍应用独立 timer。
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 --- 在已有计时器句柄上启动一次性回调，触发后销毁该计时器。
 -- 回调内可使用 GetExpiredTimer()，与手写 TimerStart(..., false, ...) 等价，仅收敛重复代码。
 -- 
@@ -16,13 +19,14 @@ function ____exports.runTimerOnce(self, timer, delaySec, callback)
         callback(nil)
         return
     end
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         timer,
         delaySec,
         false,
         function()
             callback(nil)
-            jass:DestroyTimer(timer)
+            safeDestroyTimer(nil, timer)
         end
     )
 end
@@ -37,13 +41,14 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
     if periodic == nil then
         periodic = false
     end
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     if not t then
         callback(nil)
         return nil
     end
     if periodic then
-        jass:TimerStart(
+        safeTimerStart(
+            nil,
             t,
             delaySec,
             true,
@@ -52,13 +57,14 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
             end
         )
     else
-        jass:TimerStart(
+        safeTimerStart(
+            nil,
             t,
             delaySec,
             false,
             function()
                 callback(nil)
-                jass:DestroyTimer(t)
+                safeDestroyTimer(nil, t)
             end
         )
     end
@@ -71,7 +77,7 @@ function ____exports.stopTimer(self, t)
     if not t then
         return
     end
-    jass:PauseTimer(t)
-    jass:DestroyTimer(t)
+    jass.PauseTimer(t)
+    safeDestroyTimer(nil, t)
 end
 return ____exports

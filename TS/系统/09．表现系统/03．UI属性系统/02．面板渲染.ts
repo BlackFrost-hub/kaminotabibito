@@ -81,6 +81,7 @@ let damagePanelCreated = false;
 const damageRows: { icon: number; values: number[]; player: any }[] = [];
 const detailSlots: { player: any; hero: any; functionKey: number; icon: number; box: number; lines: number[]; separators: number[] }[] = [];
 const registeredPlayers: Set<number> = new Set();
+const detailHoverSlotByFrameId: Record<number, number> = {};
 
 function createFrame(tagName: string, name: string, parent: number): number {
   return japi.DzCreateFrameByTagName(tagName, name, parent, "template", 0);
@@ -117,10 +118,24 @@ function showDetailSlot(index: number, visible: boolean): void {
   }
 }
 
-function createDetailHoverAction(index: number, visible: boolean): () => void {
-  return () => {
-    showDetailSlot(index, visible);
-  };
+function getTriggerUiEventFrame(): number {
+  return typeof japi.DzGetTriggerUIEventFrame === "function" ? japi.DzGetTriggerUIEventFrame() : 0;
+}
+
+function onDetailHoverEnter(): void {
+  const frame = getTriggerUiEventFrame();
+  if (frame === 0) return;
+  const index = detailHoverSlotByFrameId[frame];
+  if (index == null) return;
+  showDetailSlot(index, true);
+}
+
+function onDetailHoverLeave(): void {
+  const frame = getTriggerUiEventFrame();
+  if (frame === 0) return;
+  const index = detailHoverSlotByFrameId[frame];
+  if (index == null) return;
+  showDetailSlot(index, false);
 }
 
 /**
@@ -256,8 +271,9 @@ function createDetailSlotForPlayer(gameUI: number, player: any, hero: any, index
     japi.DzFrameSetPoint(button, 常量.ABSOLUTE_POINT_BOTTOMLEFT, icon, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 0, 0);
     japi.DzFrameSetSize(button, 常量.HERO_BUTTON_SIZE, 常量.HERO_BUTTON_SIZE);
     const playerId = jass.GetPlayerId(player);
-    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_ENTER, createDetailHoverAction(index, true), false, playerId);
-    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_LEAVE, createDetailHoverAction(index, false), false, playerId);
+    detailHoverSlotByFrameId[button] = index;
+    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_ENTER, onDetailHoverEnter, false, playerId);
+    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_LEAVE, onDetailHoverLeave, false, playerId);
   }
 
   detailSlots.push({ player, hero, functionKey: 常量.KEY_F[index], icon, box, lines, separators });

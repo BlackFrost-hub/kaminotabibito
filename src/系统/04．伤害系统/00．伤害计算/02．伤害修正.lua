@@ -32,8 +32,8 @@ function ____exports.applyArmorPenetration(self, damage, target, attacker)
     end
     local armorPierce = getAttackerArmorPierce(nil, attacker)
     local ignoreArmor = isIgnoreArmor(nil, attacker)
-    local originalReduction = calcArmorReduction(nil, originalArmor)
-    local piercedReduction = calcPiercedArmorReduction(nil, originalArmor, armorPierce, ignoreArmor)
+    local originalReduction = calcArmorReduction(originalArmor)
+    local piercedReduction = calcPiercedArmorReduction(originalArmor, armorPierce, ignoreArmor)
     local baseDamage = damage / (1 - originalReduction)
     return baseDamage * (1 - piercedReduction)
 end
@@ -130,8 +130,8 @@ end
 --- 获取蝼蚁专精加成
 -- 条件：目标非英雄且非恶魔种族
 function ____exports.getAntMasteryBonus(self, attacker, target)
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if isHero or isDemon then
         return 0
     end
@@ -140,8 +140,8 @@ end
 --- 获取Boss专精加成
 -- 条件：目标是英雄或恶魔种族
 function ____exports.getBossMasteryBonus(self, attacker, target)
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -149,7 +149,7 @@ function ____exports.getBossMasteryBonus(self, attacker, target)
 end
 --- 检查单位是否为召唤物
 function ____exports.isSummonedUnit(self, unit)
-    return jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)
 end
 --- 获取召唤物伤害修正
 function ____exports.getSummonDamageModifier(self, attacker, target, isPlayer)

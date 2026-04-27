@@ -13,7 +13,10 @@ import { DZ_TEXT_ALIGN_CENTER, DZ_TEXT_ALIGN_LEFT } from "../../00．核心系�
 import { getStatusText, isQuestWithRowIconLayout, tryCreateFromFdfOnly } from "./02．任务UI辅助";
 import { getQuestItemHeight } from "./03．任务UI列表与滚动";
 
-type QuestRowClickHandler = { onClickSound: () => void; onToggleExpand: (questId: string) => void };
+type QuestRowClickHandler = {
+  onClickSound: (this: void) => void;
+  onToggleExpand: (this: void, questId: string) => void;
+};
 /** questId -> 处理器（字符串 key，无 Map 迭代） */
 const questRowClickHandlers: Record<string, QuestRowClickHandler> = {};
 
@@ -29,11 +32,17 @@ function onQuestRowClick(): void {
   if (questId === undefined || questId === "") return;
   const handler = questRowClickHandlers[questId];
   if (!handler) return;
-  handler.onClickSound();
-  handler.onToggleExpand(questId);
+  const onClickSound = handler.onClickSound;
+  const onToggleExpand = handler.onToggleExpand;
+  onClickSound();
+  onToggleExpand(questId);
 }
 
-function registerQuestRowClickHandler(questId: string, onClickSound: () => void, onToggleExpand: (questId: string) => void): void {
+function registerQuestRowClickHandler(
+  questId: string,
+  onClickSound: (this: void) => void,
+  onToggleExpand: (this: void, questId: string) => void
+): void {
   questRowClickHandlers[questId] = { onClickSound, onToggleExpand };
 }
 
@@ -141,7 +150,6 @@ function getOrCreateDetailFrame(
   }
   if (fr !== 0) {
     applyDzTextFontAndAlignment(fr, DZ_TEXT_ALIGN_LEFT);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(fr, 3);
     showFrame(fr);
     listItemFrames.push(fr);
   }
@@ -225,7 +233,6 @@ export function renderExpandedQuestDetails(opts: {
       if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(objFrame, txt);
     }
     applyDzTextFontAndAlignment(objFrame, listTextAlign);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(objFrame, 3);
     showFrame(objFrame);
     listItemFrames.push(objFrame);
     objYRel -= EXPANDED_OBJECTIVE_ROW_HEIGHT;
@@ -257,7 +264,6 @@ export function renderExpandedQuestDetails(opts: {
       if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(failFrame, failText);
     }
     applyDzTextFontAndAlignment(failFrame, listTextAlign);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(failFrame, 3);
     showFrame(failFrame);
     listItemFrames.push(failFrame);
     objYRel -= EXPANDED_FAIL_ROW_HEIGHT;
@@ -341,8 +347,8 @@ export function renderQuestRow(opts: {
   setFrameClickEvent: any;
   showFrame: any;
   applyDzTextFontAndAlignment: any;
-  onToggleExpand: (questId: string) => void;
-  onClickSound: () => void;
+  onToggleExpand: (this: void, questId: string) => void;
+  onClickSound: (this: void) => void;
   rowBackdropByQuestId: Record<string, number>;
   titleByQuestId: Record<string, number>;
   clickBtnByQuestId: Record<string, number>;
@@ -403,7 +409,6 @@ export function renderQuestRow(opts: {
   if (rowBackdrop === 0) return false;
   setFramePointRelative(rowBackdrop, FramePoint.TOPLEFT, listParent, FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
   setFrameSize(rowBackdrop, { width: rowWidth, height: itemH });
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(rowBackdrop, 1);
   showFrame(rowBackdrop);
   listItemFrames.push(rowBackdrop);
 
@@ -433,7 +438,6 @@ export function renderQuestRow(opts: {
     if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(titleFrame, titleText);
   }
   applyDzTextFontAndAlignment(titleFrame, listTextAlign);
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(titleFrame, 3);
   showFrame(titleFrame);
   listItemFrames.push(titleFrame);
 
@@ -458,7 +462,6 @@ export function renderQuestRow(opts: {
   // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
   frameToQuestIdMap[clickBtn] = quest.id;
   setFrameClickEvent(clickBtn, onQuestRowClick, true);
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
   showFrame(clickBtn);
   listItemFrames.push(clickBtn);
 
@@ -493,7 +496,6 @@ export function renderQuestRow(opts: {
         rowTopRel - QUEST_ROW_ICON_Y_OFFSET
       );
       setFrameSize(iconFr, { width: iconW, height: iconH });
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(iconFr, 5);
       showFrame(iconFr);
       listItemFrames.push(iconFr);
     }

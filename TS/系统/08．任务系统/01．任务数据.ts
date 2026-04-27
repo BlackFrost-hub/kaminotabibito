@@ -266,7 +266,7 @@ export class QuestDatabase {
     const objective = quest.objectives.find(obj => obj.id === objectiveId);
     if (!objective) return false;
 
-    objective.current = Math.min(progress, objective.required);
+    objective.current = progress < objective.required ? progress : objective.required;
     objective.completed = objective.current >= objective.required;
     quest.updatedAt = now();
 

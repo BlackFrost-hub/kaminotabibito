@@ -1,14 +1,18 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
+const DEFAULT_BJ_PI = 3.141592653589793;
+const DEFAULT_BJ_DEGTORAD = DEFAULT_BJ_PI / 180;
+const DEFAULT_BJ_RADTODEG = 180 / DEFAULT_BJ_PI;
+
 function bjDegToRad(): number {
   const v = (jglobals as any).bj_DEGTORAD;
-  return typeof v === "number" ? v : Math.PI / 180;
+  return typeof v === "number" ? v : DEFAULT_BJ_DEGTORAD;
 }
 
 function bjRadToDeg(): number {
   const v = (jglobals as any).bj_RADTODEG;
-  return typeof v === "number" ? v : 180 / Math.PI;
+  return typeof v === "number" ? v : DEFAULT_BJ_RADTODEG;
 }
 
 export function OperatorDegreeAdd(a: number, b: number): number {
@@ -56,7 +60,7 @@ export function OperatorIntegerMultiply(a: number, b: number): number {
 }
 
 export function OperatorIntegerDivide(a: number, b: number): number {
-    return Math.floor(a / b);
+    return jass.R2I(a / b);
 }
 
 export function OperatorRealAdd(a: number, b: number): number {
@@ -85,9 +89,9 @@ function applyOp(a: number, op: string, b: number): number {
 
 export function YDWEOperatorInt3(a1: number, op1: string, a2: number, op2: string, a3: number): number {
     if (op2 === "*" || op2 === "/") {
-        return Math.floor(applyOp(a1, op1, applyOp(a2, op2, a3)));
+        return jass.R2I(applyOp(a1, op1, applyOp(a2, op2, a3)));
     }
-    return Math.floor(applyOp(applyOp(a1, op1, a2), op2, a3));
+    return jass.R2I(applyOp(applyOp(a1, op1, a2), op2, a3));
 }
 
 export function YDWEOperatorReal3(a1: number, op1: string, a2: number, op2: string, a3: number): number {

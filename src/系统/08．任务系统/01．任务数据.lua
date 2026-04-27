@@ -10,7 +10,7 @@ local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local ____exports = {}
 --- 获取当前时间戳（War3 Lua 环境下替代 Date.now）
 local function now(self)
-    return os:time()
+    return os.time()
 end
 ____exports.QuestType = QuestType or ({})
 ____exports.QuestType.MAIN = "主线"
@@ -174,7 +174,7 @@ function QuestDatabase.prototype.updateObjective(self, playerId, questId, object
     if not objective then
         return false
     end
-    objective.current = math.min(progress, objective.required)
+    objective.current = progress < objective.required and progress or objective.required
     objective.completed = objective.current >= objective.required
     quest.updatedAt = now(nil)
     return true

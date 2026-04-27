@@ -1,7 +1,7 @@
 /**
  * 装备提取 — STES「装备提取事件」子触发：YDLocal5(ScoreMin/Max) → YDLocal7Set(integer, "ItemType", …)
  *
- * 规则：读 YDLocal5 的 ScoreMin/ScoreMax，在闭区间内枚举带 score 的 4 字 id，`math.random` 抽一件；无候选则 ItemType=0。
+ * 规则：读 YDLocal5 的 ScoreMin/ScoreMax，在闭区间内枚举带 score 的 4 字 id，`GetRandomInt` 抽一件；无候选则 ItemType=0。
  *
  * 须与地图 JASS 一致：StringHash("装备提取事件")、ItemType。
  *
@@ -11,6 +11,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_Register: (t: any, name: string) => void;
@@ -27,12 +31,14 @@ const {
   ydlStes_coerceOptionalNumber,
   ydlStes_skeyIndex,
   ydlStes_registerAfterGetTable,
+  registerStesListener,
 } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
   ydlStes_syncTriggerStep: (self: any) => void;
   ydlStes_finishChildCleanup: (self: any) => void;
   ydlStes_coerceOptionalNumber: (self: any, v: any) => number | undefined;
   ydlStes_skeyIndex: (self: any) => number;
   ydlStes_registerAfterGetTable: (self: any, trig: any, eventName: string) => void;
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 
 const dataMod = require("系统.02．物品系统.01．装备数据") as {
@@ -111,7 +117,7 @@ function collectAllIdsInScoreInterval(this: void, lo: number, hi: number): strin
 
 function pickFromScorePool(this: void, ids: string[]): { raw: number; id: string } {
   if (ids.length === 0) return { raw: 0, id: "" };
-  const idx = (math as any).random(1, ids.length);
+  const idx = (jass as any).GetRandomInt(1, ids.length);
   const id = (ids as any)[idx] as string;
   if (typeof id !== "string" || id.length !== 4) return { raw: 0, id: "" };
   return { raw: stringToFourCC(id), id };
@@ -180,8 +186,12 @@ function runEquipExtract(this: void): void {
 
 function scheduleRetry(this: void, fn: () => void): void {
   const tm = jass.CreateTimer();
-  jass.TimerStart(tm, RETRY_SEC, false, () => {
-    jass.DestroyTimer(tm);
+  if (!tm) {
+    fn();
+    return;
+  }
+  safeTimerStart(tm, RETRY_SEC, false, () => {
+    safeDestroyTimer(tm);
     fn();
   });
 }
@@ -194,10 +204,6 @@ function tryRegisterEquipStes(this: void): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
 
-  if (STES_Register == null) {
-    g[REG_GUARD] = true;
-    return;
-  }
   if (STES_Register == null) {
     g[REG_GUARD] = true;
     return;

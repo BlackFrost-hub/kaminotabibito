@@ -1,7 +1,7 @@
 /**
  * 主面板顶部分类标签（主线 / 支线 / 小任务）
  *
- * 架构：全局1套UI，不再区分 slotPid。
+ * 架构：N 槽分类标签；每个 slot 独立创建，sync=true 回调再按触发玩家路由。
  */
 
 const jass = require("jass.common") as any;
@@ -11,7 +11,10 @@ import { QuestType } from "../01．任务数据";
 import { TAB_REL_Y, TAB_FRAME_W, TAB_FRAME_H, TAB_CATEGORY_FONT_SCALE } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly, pcallDzFrameShow, pcallDzFrameSetAlpha } from "./02．任务UI辅助";
 
-type CategoryTabHandler = { onSwitchCategory: (type: QuestType) => void; onClickSound: () => void };
+type CategoryTabHandler = {
+  onSwitchCategory: (this: void, type: QuestType) => void;
+  onClickSound: (this: void) => void;
+};
 /** 用 Record 固定三类槽位，避免 Map 弱序/迭代习惯 */
 const categoryTabClickHandlers: Partial<Record<QuestType, CategoryTabHandler>> = {};
 
@@ -22,13 +25,13 @@ let currentTooltipHandler: ((msg: string) => void) | null = null;
 function handleCategoryTabClick(category: QuestType): void {
   const handler = categoryTabClickHandlers[category];
   if (!handler) return;
-  // sync=true 帧回调：onSwitchCategory 内部已做全局状态+本地UI分层
-  handler.onSwitchCategory(category);
-  // 音效只在点击者本地播放
+  const onSwitchCategory = handler.onSwitchCategory;
+  onSwitchCategory(category);
   const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
     ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
   if (triggerPlayer === jass.GetLocalPlayer()) {
-    handler.onClickSound();
+    const onClickSound = handler.onClickSound;
+    onClickSound();
   }
 }
 
@@ -51,7 +54,11 @@ const tabClickHandlers: Record<QuestType, () => void> = {
   [QuestType.DAILY]: onDailyTabClick,
 };
 
-function registerCategoryTabClickHandler(category: QuestType, onSwitchCategory: (type: QuestType) => void, onClickSound: () => void): void {
+function registerCategoryTabClickHandler(
+  category: QuestType,
+  onSwitchCategory: (this: void, type: QuestType) => void,
+  onClickSound: (this: void) => void
+): void {
   categoryTabClickHandlers[category] = { onSwitchCategory, onClickSound };
 }
 
@@ -80,9 +87,9 @@ export interface BuildTaskCategoryTabsOpts {
   setButtonText: any;
   createTabLabelTextOnBackdrop: any;
   setupTransparentGlueHitLayer: any;
-  onClickSound: () => void;
-  onSwitchCategory: (type: QuestType) => void;
-  onShowTabTooltip: (msg: string) => void;
+  onClickSound: (this: void) => void;
+  onSwitchCategory: (this: void, type: QuestType) => void;
+  onShowTabTooltip: (this: void, msg: string) => void;
   slotId: number;
   contextId: number;
 }
@@ -105,9 +112,9 @@ function createTaskTab(opts: {
   setButtonText: any;
   createTabLabelTextOnBackdrop: any;
   setupTransparentGlueHitLayer: any;
-  onClickSound: () => void;
-  onSwitchCategory: (type: QuestType) => void;
-  onShowTabTooltip: (msg: string) => void;
+  onClickSound: (this: void) => void;
+  onSwitchCategory: (this: void, type: QuestType) => void;
+  onShowTabTooltip: (this: void, msg: string) => void;
   contextId: number;
   nameSuffix: string;
 }): TabPair {
@@ -142,12 +149,10 @@ function createTaskTab(opts: {
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
     setFrameSize(bg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
     pcallDzFrameShow(japi, bg, true);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(bg, 7);
   }
 
   if (bg) {
-    const tabLabel = createTabLabelTextOnBackdrop(bg, labelName + nameSuffix, labelText, TAB_CATEGORY_FONT_SCALE);
-    if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
+    createTabLabelTextOnBackdrop(bg, labelName + nameSuffix, labelText, TAB_CATEGORY_FONT_SCALE);
   }
 
   const tab = tryCreateFromFdfOnly(tabName, tabParent, contextId);
@@ -164,9 +169,7 @@ function createTaskTab(opts: {
       setButtonText(tab, "");
       pcallDzFrameSetAlpha(japi, tab, 0);
     }
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tab, 9);
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
-    // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
     currentTooltipMessage = tooltip;
     currentTooltipHandler = onShowTabTooltip;
     setFrameClickEvent(tab, tabClickHandlers[category], true);

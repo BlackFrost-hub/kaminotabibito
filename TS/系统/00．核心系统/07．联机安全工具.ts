@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 联机安全工具（显式调用版）
  *
@@ -9,7 +10,7 @@
  *
  * 适用场景：
  * - 想避免把匿名闭包高频直接塞进 JASS 回调时
- * - 想给 Trigger / Timer / ForGroup / ForForce / EnumItemsInRect / EnumDestructablesInRect
+ * - 想给 Trigger / Timer / ForForce / EnumItemsInRect / EnumDestructablesInRect
  *   提供一个更可控的 trampoline 入口时
  *
  * 不做的事：
@@ -39,41 +40,32 @@ function runSafely(callback: VoidCallback | undefined): void {
   callback();
 }
 
-function createStackTrampoline(stack: VoidCallback[]): VoidCallback {
-  return () => {
-    const top = stack[stack.length - 1];
-    runSafely(top);
-  };
-}
-
-const forGroupStack: VoidCallback[] = [];
 const forForceStack: VoidCallback[] = [];
 const enumItemsStack: VoidCallback[] = [];
 const enumDestructablesStack: VoidCallback[] = [];
 
-const forGroupTrampoline = createStackTrampoline(forGroupStack);
-const forForceTrampoline = createStackTrampoline(forForceStack);
-const enumItemsTrampoline = createStackTrampoline(enumItemsStack);
-const enumDestructablesTrampoline = createStackTrampoline(enumDestructablesStack);
+function runTopOfStack(stack: VoidCallback[]): void {
+  const top = stack[stack.length - 1];
+  runSafely(top);
+}
 
-/**
- * 安全 ForGroup：
- * - 仍然调用原生 `ForGroup`
- * - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
- * - 支持同步嵌套调用（用栈而不是单槽）
- */
-export function safeForGroup(group: any, action: VoidCallback): void {
-  if (!group || typeof action !== "function") return;
-  forGroupStack.push(action);
-  try {
-    jass.ForGroup(group, forGroupTrampoline);
-  } finally {
-    forGroupStack.pop();
-  }
+function forForceTrampoline(): void {
+  runTopOfStack(forForceStack);
+}
+
+function enumItemsTrampoline(): void {
+  runTopOfStack(enumItemsStack);
+}
+
+function enumDestructablesTrampoline(): void {
+  runTopOfStack(enumDestructablesStack);
 }
 
 /**
- * 安全 ForForce，思路同 `safeForGroup`。
+ * 安全 ForForce：
+ * - 仍然调用原生 `ForForce`
+ * - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
+ * - 支持同步嵌套调用（用栈而不是单槽）
  */
 export function safeForForce(force: any, action: VoidCallback): void {
   if (!force || typeof action !== "function") return;
@@ -161,25 +153,25 @@ interface SafeTriggerRegistry {
 const triggerRegistryByHandleId: Record<number, SafeTriggerRegistry | undefined> = {};
 let safeTriggerActionIdCounter = 0;
 
+function triggerActionTrampoline(): void {
+  const currentTrigger = jass.GetTriggeringTrigger();
+  if (!currentTrigger) return;
+  const currentHid = jass.GetHandleId(currentTrigger);
+  const currentRegistry = triggerRegistryByHandleId[currentHid];
+  if (!currentRegistry) return;
+  for (let i = 0; i < currentRegistry.actions.length; i++) {
+    runSafely(currentRegistry.actions[i].callback);
+  }
+}
+
 function getOrCreateSafeTriggerRegistry(trigger: any): SafeTriggerRegistry | null {
   if (!trigger) return null;
   const hid = jass.GetHandleId(trigger);
   let registry = triggerRegistryByHandleId[hid];
   if (registry) return registry;
 
-  const trampoline = () => {
-    const currentTrigger = jass.GetTriggeringTrigger();
-    if (!currentTrigger) return;
-    const currentHid = jass.GetHandleId(currentTrigger);
-    const currentRegistry = triggerRegistryByHandleId[currentHid];
-    if (!currentRegistry) return;
-    for (let i = 0; i < currentRegistry.actions.length; i++) {
-      runSafely(currentRegistry.actions[i].callback);
-    }
-  };
-
   registry = {
-    actionHandle: jass.TriggerAddAction(trigger, trampoline),
+    actionHandle: jass.TriggerAddAction(trigger, triggerActionTrampoline),
     actions: [],
   };
   triggerRegistryByHandleId[hid] = registry;

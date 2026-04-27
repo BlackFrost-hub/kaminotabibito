@@ -36,6 +36,9 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jassGlobals = require("jass.globals") as any;
+const { max } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  max: (a: number, b: number) => number;
+};
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const BASE_TIMESTAMP = 1451606400;
@@ -69,8 +72,12 @@ function nowMs(): number {
   return _serverTime + _millisCounter * 10;
 }
 
+function intFloor(value: number): number {
+  return jass.R2I(value);
+}
+
 function mathMod(dividend: number, divisor: number): number {
-  let m = dividend - Math.floor(dividend / divisor) * divisor;
+  let m = dividend - intFloor(dividend / divisor) * divisor;
   if (m < 0) m += divisor;
   return m;
 }
@@ -85,7 +92,7 @@ function getMonthDays(y: number, m: number): number {
 
 function updateDate(y: number, remainSec: number, dayBy2015: number): void {
   let dayNum = remainSec / 86400;
-  let totalDay = Math.floor(dayNum);
+  let totalDay = intFloor(dayNum);
   if (dayNum - totalDay > 0) totalDay++;
   if (totalDay === 0) totalDay = 1;
   dayBy2015 += totalDay;
@@ -97,8 +104,8 @@ function updateDate(y: number, remainSec: number, dayBy2015: number): void {
       _timeCache.year = y;
       _timeCache.month = m;
       _timeCache.day = remainDay;
-      _timeCache.hour = mathMod(Math.floor(remainSec / 3600), 24);
-      _timeCache.minute = mathMod(Math.floor(remainSec / 60), 60);
+      _timeCache.hour = mathMod(intFloor(remainSec / 3600), 24);
+      _timeCache.minute = mathMod(intFloor(remainSec / 60), 60);
       _timeCache.second = mathMod(remainSec, 60);
       _timeCache.millisecond = _millisCounter * 10;
       _timeCache.weekday = mathMod(mathMod(dayBy2015, 7) + 4, 7);
@@ -262,11 +269,11 @@ export function getGameTimeFormatted(): {
   totalMs: number;
 } {
   const totalMs = nowMs();
-  const totalSec = Math.floor(totalMs / 1000);
+  const totalSec = intFloor(totalMs / 1000);
   return {
-    hours: Math.floor(totalSec / 3600),
-    minutes: Math.floor((totalSec % 3600) / 60),
-    seconds: Math.floor(totalSec % 60),
+    hours: intFloor(totalSec / 3600),
+    minutes: intFloor((totalSec % 3600) / 60),
+    seconds: intFloor(totalSec % 60),
     milliseconds: totalMs % 1000,
     totalMs,
   };
@@ -313,7 +320,7 @@ export function removePeriodicCallback(id: number): void {
 
 export function addDelayedCallback(delayMs: number, callback: () => void): number {
   const id = ++_delayedCallbackIdCounter;
-  const safeDelay = Math.max(0, Math.floor(delayMs));
+  const safeDelay = max(0, intFloor(delayMs));
   _delayedCallbacks.push({ id, dueTime: nowMs() + safeDelay, active: true, callback });
   return id;
 }
@@ -353,7 +360,7 @@ export function initCenterTimer(): void {
 
   const dr = jassGlobals.udg_N as number | undefined;
   if (dr !== undefined) {
-    _gameDifficulty = Math.max(1, Math.floor(dr));
+    _gameDifficulty = max(1, intFloor(dr));
   }
 
   calcDate(_serverTime / 1000);

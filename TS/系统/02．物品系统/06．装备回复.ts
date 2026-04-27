@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 装备回复：使用物品时解析 hot/abilList，按段 **STES「物品治疗事件」** 分发。
  *
  * 逆天约定（传参与返回值**同时支持**，不互斥）：
@@ -19,8 +19,7 @@ const itemEventCenter = require("系统.00．核心系统.01．事件中心.04�
   onItemUse: (callback: (unit: any, item: any) => void) => number;
 };
 
-const { STES_Register, STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Register: (t: any, name: string) => void;
+const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
   STES_GetTable: () => any;
 };
 
@@ -48,14 +47,14 @@ const {
   ydlStes_readString5,
   ydlStes_readReal5,
   ydlStes_skeyIndex,
-  ydlStes_registerAfterGetTable,
+  registerStesListener,
 } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
   ydlStes_syncTriggerStep: (self: any) => void;
   ydlStes_finishChildCleanup: (self: any) => void;
   ydlStes_readString5: (self: any, name: string) => string;
   ydlStes_readReal5: (self: any, name: string) => number;
   ydlStes_skeyIndex: (self: any) => number;
-  ydlStes_registerAfterGetTable: (self: any, trig: any, eventName: string) => void;
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 
 const { YDLocalExecuteTrigger, YDTriggerExecuteTrigger, saveParentIndex } = require("lib.扩展函数.YDWE函数.04．YDWE_trigger") as {
@@ -103,12 +102,14 @@ function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
   if (hp > 0 && jass.UNIT_STATE_LIFE != null && jass.UNIT_STATE_MAX_LIFE != null) {
     const cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
     const maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE) as number;
-    jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, Math.min(maxL, cur + hp));
+    const nextLife = cur + hp;
+    jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, nextLife < maxL ? nextLife : maxL);
   }
   if (mp > 0 && jass.UNIT_STATE_MANA != null && jass.UNIT_STATE_MAX_MANA != null) {
     const curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
     const maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA) as number;
-    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, Math.min(maxM, curM + mp));
+    const nextMana = curM + mp;
+    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, nextMana < maxM ? nextMana : maxM);
   }
 }
 
@@ -127,8 +128,8 @@ function applyHpMpToUnitAndGetApplied(this: void, unit: any, hp: number, mp: num
   let manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
 
   return {
-    hpApplied: Math.max(0, lifeAfter - lifeBefore),
-    mpApplied: Math.max(0, manaAfter - manaBefore),
+    hpApplied: lifeAfter > lifeBefore ? lifeAfter - lifeBefore : 0,
+    mpApplied: manaAfter > manaBefore ? manaAfter - manaBefore : 0,
   };
 }
 
@@ -258,12 +259,10 @@ function init(this: void): void {
   if (glob[INIT_KEY]) return;
   glob[INIT_KEY] = true;
 
-  if (!glob[STES_REG_KEY] && STES_Register != null) {
-    const stesTrig = jass.CreateTrigger();
-    jass.TriggerAddAction(stesTrig, () => {
+  if (!glob[STES_REG_KEY]) {
+    registerStesListener(ITEM_HEAL_STES_EVENT, () => {
       onItemHealStesChild();
     });
-    ydlStes_registerAfterGetTable(undefined, stesTrig, ITEM_HEAL_STES_EVENT);
     glob[STES_REG_KEY] = true;
   }
 

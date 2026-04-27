@@ -40,6 +40,8 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jassGlobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local max = ____require_result_0.max
 local NORMAL_MON_DAYS = {
     0,
     31,
@@ -81,8 +83,11 @@ local _tickCallbacks = {}
 local function nowMs(self)
     return _serverTime + _millisCounter * 10
 end
+local function intFloor(self, value)
+    return jass.R2I(value)
+end
 local function mathMod(self, dividend, divisor)
-    local m = dividend - math.floor(dividend / divisor) * divisor
+    local m = dividend - intFloor(nil, dividend / divisor) * divisor
     if m < 0 then
         m = m + divisor
     end
@@ -96,7 +101,7 @@ local function getMonthDays(self, y, m)
 end
 local function updateDate(self, y, remainSec, dayBy2015)
     local dayNum = remainSec / 86400
-    local totalDay = math.floor(dayNum)
+    local totalDay = intFloor(nil, dayNum)
     if dayNum - totalDay > 0 then
         totalDay = totalDay + 1
     end
@@ -115,12 +120,12 @@ local function updateDate(self, y, remainSec, dayBy2015)
                 _timeCache.day = remainDay
                 _timeCache.hour = mathMod(
                     nil,
-                    math.floor(remainSec / 3600),
+                    intFloor(nil, remainSec / 3600),
                     24
                 )
                 _timeCache.minute = mathMod(
                     nil,
-                    math.floor(remainSec / 60),
+                    intFloor(nil, remainSec / 60),
                     60
                 )
                 _timeCache.second = mathMod(nil, remainSec, 60)
@@ -210,7 +215,7 @@ local function runDelayedCallbacks(self)
             do
                 local d = _delayedCallbacks[i + 1]
                 if not d.active then
-                    goto __continue28
+                    goto __continue29
                 end
                 if now >= d.dueTime then
                     d.active = false
@@ -220,7 +225,7 @@ local function runDelayedCallbacks(self)
                     writeIndex = writeIndex + 1
                 end
             end
-            ::__continue28::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -288,41 +293,31 @@ function ____exports.getGameTimeHMS(self)
 end
 function ____exports.getGameTimeFormatted(self)
     local totalMs = nowMs(nil)
-    local totalSec = math.floor(totalMs / 1000)
+    local totalSec = intFloor(nil, totalMs / 1000)
     return {
-        hours = math.floor(totalSec / 3600),
-        minutes = math.floor(totalSec % 3600 / 60),
-        seconds = math.floor(totalSec % 60),
+        hours = intFloor(nil, totalSec / 3600),
+        minutes = intFloor(nil, totalSec % 3600 / 60),
+        seconds = intFloor(nil, totalSec % 60),
         milliseconds = totalMs % 1000,
         totalMs = totalMs
     }
 end
 function ____exports.getGameTimeString(self)
-    local ____exports_getGameTimeFormatted_result_0 = ____exports.getGameTimeFormatted(nil)
-    local hours = ____exports_getGameTimeFormatted_result_0.hours
-    local minutes = ____exports_getGameTimeFormatted_result_0.minutes
-    local seconds = ____exports_getGameTimeFormatted_result_0.seconds
-    return ((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒"
-end
-function ____exports.getGameTimeStringWithMs(self)
     local ____exports_getGameTimeFormatted_result_1 = ____exports.getGameTimeFormatted(nil)
     local hours = ____exports_getGameTimeFormatted_result_1.hours
     local minutes = ____exports_getGameTimeFormatted_result_1.minutes
     local seconds = ____exports_getGameTimeFormatted_result_1.seconds
-    local milliseconds = ____exports_getGameTimeFormatted_result_1.milliseconds
+    return ((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒"
+end
+function ____exports.getGameTimeStringWithMs(self)
+    local ____exports_getGameTimeFormatted_result_2 = ____exports.getGameTimeFormatted(nil)
+    local hours = ____exports_getGameTimeFormatted_result_2.hours
+    local minutes = ____exports_getGameTimeFormatted_result_2.minutes
+    local seconds = ____exports_getGameTimeFormatted_result_2.seconds
+    local milliseconds = ____exports_getGameTimeFormatted_result_2.milliseconds
     return ((((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒") .. tostring(milliseconds)) .. "毫秒"
 end
 function ____exports.getDateTimeString(self)
-    local ____timeCache_2 = _timeCache
-    local year = ____timeCache_2.year
-    local month = ____timeCache_2.month
-    local day = ____timeCache_2.day
-    local hour = ____timeCache_2.hour
-    local minute = ____timeCache_2.minute
-    local second = ____timeCache_2.second
-    return (((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)
-end
-function ____exports.getDateTimeStringWithMs(self)
     local ____timeCache_3 = _timeCache
     local year = ____timeCache_3.year
     local month = ____timeCache_3.month
@@ -330,7 +325,17 @@ function ____exports.getDateTimeStringWithMs(self)
     local hour = ____timeCache_3.hour
     local minute = ____timeCache_3.minute
     local second = ____timeCache_3.second
-    local millisecond = ____timeCache_3.millisecond
+    return (((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)
+end
+function ____exports.getDateTimeStringWithMs(self)
+    local ____timeCache_4 = _timeCache
+    local year = ____timeCache_4.year
+    local month = ____timeCache_4.month
+    local day = ____timeCache_4.day
+    local hour = ____timeCache_4.hour
+    local minute = ____timeCache_4.minute
+    local second = ____timeCache_4.second
+    local millisecond = ____timeCache_4.millisecond
     return (((((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)) .. ".") .. pad3(nil, millisecond)
 end
 function ____exports.setGameDifficulty(self, difficulty)
@@ -362,9 +367,10 @@ end
 function ____exports.addDelayedCallback(self, delayMs, callback)
     _delayedCallbackIdCounter = _delayedCallbackIdCounter + 1
     local id = _delayedCallbackIdCounter
-    local safeDelay = math.max(
+    local safeDelay = max(
+        nil,
         0,
-        math.floor(delayMs)
+        intFloor(nil, delayMs)
     )
     _delayedCallbacks[#_delayedCallbacks + 1] = {
         id = id,
@@ -398,23 +404,24 @@ function ____exports.initCenterTimer(self)
         return
     end
     if bootstrapTimer then
-        jass:DestroyTimer(bootstrapTimer)
+        jass.DestroyTimer(bootstrapTimer)
         bootstrapTimer = nil
     end
     _initialized = true
-    local startTime = japi:DzAPI_Map_GetGameStartTime()
+    local startTime = japi.DzAPI_Map_GetGameStartTime()
     _serverTime = startTime * 1000
     local dr = jassGlobals.udg_N
     if dr ~= nil then
-        _gameDifficulty = math.max(
+        _gameDifficulty = max(
+            nil,
             1,
-            math.floor(dr)
+            intFloor(nil, dr)
         )
     end
     calcDate(nil, _serverTime / 1000)
-    local timer = jass:CreateTimer()
-    jass:TimerStart(timer, 0.01, true, onTick)
+    local timer = jass.CreateTimer()
+    jass.TimerStart(timer, 0.01, true, onTick)
 end
-bootstrapTimer = jass:CreateTimer()
-jass:TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
+bootstrapTimer = jass.CreateTimer()
+jass.TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
 return ____exports

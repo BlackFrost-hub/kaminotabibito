@@ -25,7 +25,7 @@ export interface BuildTaskEntryIconOpts {
   setFramePointRelative: any;
   setFrameClickEvent: any;
   applyDzTextFontAndCenterAlignment: any;
-  onTogglePanel: (player: any) => void;
+  onTogglePanel: (this: void) => void;
   slotId: number;
   contextId: number;
 }

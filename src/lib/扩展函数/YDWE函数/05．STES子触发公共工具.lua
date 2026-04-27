@@ -21,7 +21,7 @@ local YDLocalExecuteTrigger = ____require_result_1.YDLocalExecuteTrigger
 -- 此时需要执行 YDLocalExecuteTrigger 来同步 ydl_triggerstep，
 -- 这样后续的 YDLocal5Get 才能正确读取到 JASS 端传递的参数
 function ____exports.ydlStes_syncTriggerStep(self, _self)
-    local trg = jass:GetTriggeringTrigger()
+    local trg = jass.GetTriggeringTrigger()
     if trg == nil or trg == 0 then
         return
     end
@@ -79,7 +79,7 @@ function ____exports.ydlStes_readString5(self, _self, name)
     if v == nil then
         return ""
     end
-    return tostring(nil, v)
+    return tostring(v)
 end
 function ____exports.ydlStes_readBoolean5(self, _self, name)
     return YDLocal5Get(nil, "boolean", name) == true
@@ -87,12 +87,12 @@ end
 function ____exports.ydlStes_readInteger5(self, _self, name)
     local v = YDLocal5Get(nil, "integer", name)
     if type(v) == "number" and v == v then
-        return math.floor(v)
+        return jass.R2I(v)
     end
     local tn = _G.tonumber
     local t = tn(nil, v)
     if type(t) == "number" and t == t then
-        return math.floor(t)
+        return jass.R2I(t)
     end
     return 0
 end
@@ -111,7 +111,7 @@ function ____exports.ydlStes_skeyIndex(self, _self)
     if type(jglobals.STES_skey_index) == "number" and jglobals.STES_skey_index ~= 0 then
         return jglobals.STES_skey_index
     end
-    return jass:StringHash("index")
+    return jass.StringHash("index")
 end
 --- STES_GetTable 后 Register（与任务/Buff 桥接写法一致）
 function ____exports.ydlStes_registerAfterGetTable(self, _self, trig, eventName)
@@ -122,6 +122,29 @@ function ____exports.ydlStes_registerAfterGetTable(self, _self, trig, eventName)
         return
     end
     STES_GetTable(nil)
-    STES_Register(nil, trig, eventName)
+    STES_Register(trig, eventName)
+end
+--- 一步完成 STES 监听注册：CreateTrigger → TriggerAddAction → ydlStes_registerAfterGetTable
+-- 
+-- 替代散落各处的三连写法：
+--   const trig = jass.CreateTrigger();
+--   jass.TriggerAddAction(trig, callback);
+--   ydlStes_registerAfterGetTable(undefined, trig, eventName);
+-- 
+-- @param eventName STES 事件名（须与 JASS 端 StringHash 一致）
+-- @param callback 触发器动作（通常包含 ydlStes_syncTriggerStep + 业务逻辑 + ydlStes_finishChildCleanup）
+-- @returns 创建的触发器，或 null 表示 STES_Register 不可用
+function ____exports.registerStesListener(self, eventName, callback)
+    local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+    local STES_Register = ____require_result_3.STES_Register
+    local STES_GetTable = ____require_result_3.STES_GetTable
+    if STES_Register == nil then
+        return nil
+    end
+    local trig = jass.CreateTrigger()
+    jass.TriggerAddAction(trig, callback)
+    STES_GetTable(nil)
+    STES_Register(trig, eventName)
+    return trig
 end
 return ____exports

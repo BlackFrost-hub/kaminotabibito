@@ -3,6 +3,8 @@
  * 用于物品/单位 ID 的字符串与数字转换
  */
 
+const jass = require("jass.common") as any;
+
 /**
  * 将 4 字符字符串转换为 FourCC 数字（用于物品/单位 ID）
  */
@@ -19,8 +21,8 @@ export function stringToFourCC(s: string): number {
  */
 export function fourCCToString(fourcc: number): string {
   const c1 = string.char(fourcc % 256);
-  const c2 = string.char(Math.floor(fourcc / 256) % 256);
-  const c3 = string.char(Math.floor(fourcc / 65536) % 256);
-  const c4 = string.char(Math.floor(fourcc / 16777216) % 256);
+  const c2 = string.char(jass.R2I(fourcc / 256) % 256);
+  const c3 = string.char(jass.R2I(fourcc / 65536) % 256);
+  const c4 = string.char(jass.R2I(fourcc / 16777216) % 256);
   return c4 + c3 + c2 + c1;
 }

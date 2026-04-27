@@ -226,22 +226,69 @@ function ____exports.bindDialogPanelHitFrame(self, _hitFrame)
 end
 local SKIP_KEY_COOLDOWN_SECONDS = 0.12
 local g_skipKeyCooldown = {}
+local g_skipKeyCooldownTimers = {}
+local function finishSkipKeyCooldownForPlayer(self, pid)
+    if pid < 0 or pid >= MAX_PLAYERS then
+        return
+    end
+    g_skipKeyCooldown[pid + 1] = false
+    local t = g_skipKeyCooldownTimers[pid + 1]
+    g_skipKeyCooldownTimers[pid + 1] = nil
+    if not t then
+        return
+    end
+    jass.PauseTimer(t)
+    jass.DestroyTimer(t)
+end
+local function skipKeyCooldownCallbackP0(self)
+    finishSkipKeyCooldownForPlayer(nil, 0)
+end
+local function skipKeyCooldownCallbackP1(self)
+    finishSkipKeyCooldownForPlayer(nil, 1)
+end
+local function skipKeyCooldownCallbackP2(self)
+    finishSkipKeyCooldownForPlayer(nil, 2)
+end
+local function skipKeyCooldownCallbackP3(self)
+    finishSkipKeyCooldownForPlayer(nil, 3)
+end
 local function startSkipKeyCooldown(self, pid)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
     end
     g_skipKeyCooldown[pid + 1] = true
-    local t = jass:CreateTimer()
-    jass:TimerStart(
-        t,
-        SKIP_KEY_COOLDOWN_SECONDS,
-        false,
-        function()
-            g_skipKeyCooldown[pid + 1] = false
-            jass:PauseTimer(t)
-            jass:DestroyTimer(t)
+    local t = jass.CreateTimer()
+    g_skipKeyCooldownTimers[pid + 1] = t
+    repeat
+        local ____switch51 = pid
+        local ____cond51 = ____switch51 == 0
+        if ____cond51 then
+            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0)
+            return
         end
-    )
+        ____cond51 = ____cond51 or ____switch51 == 1
+        if ____cond51 then
+            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1)
+            return
+        end
+        ____cond51 = ____cond51 or ____switch51 == 2
+        if ____cond51 then
+            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2)
+            return
+        end
+        ____cond51 = ____cond51 or ____switch51 == 3
+        if ____cond51 then
+            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3)
+            return
+        end
+        do
+            jass.PauseTimer(t)
+            jass.DestroyTimer(t)
+            g_skipKeyCooldownTimers[pid + 1] = nil
+            g_skipKeyCooldown[pid + 1] = false
+            return
+        end
+    until true
 end
 local function fastForwardQueueToLastNormalLine(self, state)
     if #state.queue <= 1 then
@@ -285,7 +332,7 @@ local function fastForwardQueueToLastNormalLine(self, state)
     showContinueHintLocal(nil, state, true)
 end
 local function skipDialogLocal(self)
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     if not triggerPlayer then
         return
     end
@@ -373,30 +420,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch63 = state.playerId
-        local ____cond63 = ____switch63 == 0
-        if ____cond63 then
+        local ____switch70 = state.playerId
+        local ____cond70 = ____switch70 == 0
+        if ____cond70 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond63 = ____cond63 or ____switch63 == 1
-        if ____cond63 then
+        ____cond70 = ____cond70 or ____switch70 == 1
+        if ____cond70 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond63 = ____cond63 or ____switch63 == 2
-        if ____cond63 then
+        ____cond70 = ____cond70 or ____switch70 == 2
+        if ____cond70 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond63 = ____cond63 or ____switch63 == 3
-        if ____cond63 then
+        ____cond70 = ____cond70 or ____switch70 == 3
+        if ____cond70 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

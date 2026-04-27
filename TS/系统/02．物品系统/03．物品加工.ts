@@ -17,6 +17,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (callback: (unit: any, item: any) => void) => number;
   onItemDrop: (callback: (unit: any, item: any) => void) => number;
@@ -79,13 +83,13 @@ function getItemNameSafe(item: any): string {
 
 function getItemChargesSafe(item: any): number {
   const n = (jass as any).GetItemCharges(item);
-  const v = Math.floor((Number(n as any) as any) ?? 0) || 0;
+  const v = jass.R2I((Number(n as any) as any) ?? 0) || 0;
   return v > 0 ? v : 1;
 }
 
 function setItemChargesSafe(item: any, n: number): void {
   if (!item) return;
-  const v = Math.floor(n) || 1;
+  const v = jass.R2I(n) || 1;
   (jass as any).SetItemCharges(item, v > 0 ? v : 1);
 }
 
@@ -136,8 +140,8 @@ function getRecipeForItem(item: any): RecipeParsed | null {
   const resultsStr = rest.substring(arrowIdx + 2, colonIdx).trim();
   const timeoutStr = rest.substring(colonIdx + 1).trim();
 
-  const cookSec = Math.floor(parseFloat(cookStr) || 0);
-  const timeoutSec = Math.floor(parseFloat(timeoutStr) || 0);
+  const cookSec = jass.R2I(parseFloat(cookStr) || 0);
+  const timeoutSec = jass.R2I(parseFloat(timeoutStr) || 0);
   if (cookSec <= 0) return null;
 
   const rawOpts = resultsStr.split(";").map((s) => s.trim()).filter((s) => s !== "");
@@ -156,7 +160,7 @@ function getRecipeForItem(item: any): RecipeParsed | null {
     const starIdx = s.indexOf("*");
     const idPart = (starIdx >= 0 ? s.substring(0, starIdx) : s).trim();
     const qtyPart = (starIdx >= 0 ? s.substring(starIdx + 1) : "").trim();
-    const qty = Math.floor(parseFloat(qtyPart) || 1);
+    const qty = jass.R2I(parseFloat(qtyPart) || 1);
     const itemId = fourCCToInt(idPart);
     if (itemId !== 0 && qty > 0) opts.push({ prob, itemId, qty });
   }
@@ -187,10 +191,10 @@ function pickResult(results: ResultOpt[]): ResultOpt {
   }
   // 全 0：均匀
   if (total <= 0) {
-    const idx = (math as any).random(1, results.length);
+    const idx = (jass as any).GetRandomInt(1, results.length);
     return (results as any)[idx];
   }
-  let roll = (math as any).random() * total;
+  let roll = ((jass as any).GetRandomReal(0, 1) as number) * total;
   for (let i = 0; i < results.length; i++) {
     roll -= weights[i];
     if (roll <= 0) return results[i];
@@ -249,7 +253,7 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
   if (!t) return;
   const st = itemState.get(item);
   if (st) st.cookTimer = t;
-  (jass as any).TimerStart(t, recipe.cookSec, false, () => {
+  safeTimerStart(t, recipe.cookSec, false, () => {
     if (!itemState.has(item)) {
       return;
     }
@@ -277,7 +281,7 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
       const ok = tryGiveItemToCampfire(campfire, it);
       if (!ok) {
         // 放不进：这是“多余产物”，按 20% 概率留地上，否则移除
-        const roll = (math as any).random(1, 100);
+        const roll = (jass as any).GetRandomInt(1, 100);
         if (roll > 20) (jass as any).RemoveItem(it);
         // 若 roll<=20，就留在地上（不计入篝火超时烤焦）
       } else {
@@ -292,6 +296,7 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
       remaining = 0;
       // 若篝火满了，会进入 !ok 分支，后续都会按 20% 掉地上处理
     }
+    safeDestroyTimer(t);
   });
 }
 

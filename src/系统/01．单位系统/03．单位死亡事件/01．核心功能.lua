@@ -40,11 +40,11 @@ local DEATH_EVENT_PLAYER_IDS = {
 }
 local _initialized = false
 local function onUnitDeath()
-    local dyingUnit = jass:GetTriggerUnit()
+    local dyingUnit = jass.GetTriggerUnit()
     if dyingUnit == nil then
         return
     end
-    local killingUnit = jass:GetKillingUnit()
+    local killingUnit = jass.GetKillingUnit()
     do
         local i = 0
         while i < #listeners do
@@ -73,8 +73,8 @@ function ____exports.init()
         return
     end
     _initialized = true
-    local trig = jass:CreateTrigger()
+    local trig = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, DEATH_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DEATH)
-    jass:TriggerAddAction(trig, onUnitDeath)
+    jass.TriggerAddAction(trig, onUnitDeath)
 end
 return ____exports

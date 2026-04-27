@@ -4,13 +4,16 @@ local ____exports = {}
 local ENABLED = false
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local max = ____require_result_0.max
+local min = ____require_result_0.min
 --- 本图 JASS 里 YDLocal5Set/YDLocal1Get 使用的实数变量名字符串（须与触发器里完全一致）
 local YD_LOCAL_REAL_KEY = "实数"
 local stesMod = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Get = ____require_result_0.YDLocal5Get
-local YDLocal7Set = ____require_result_0.YDLocal7Set
-local clearStar_PIndex = ____require_result_0.clearStar_PIndex
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_1.YDLocal5Get
+local YDLocal7Set = ____require_result_1.YDLocal7Set
+local clearStar_PIndex = ____require_result_1.clearStar_PIndex
 local TEST_EVENT = "测试"
 local BOOT_GUARD_KEY = "__syzl_stesTest_booted"
 local LUA_STES_REG_KEY = "__syzl_stesTest_luaStesReg"
@@ -19,7 +22,7 @@ local function skeyIndex()
     if type(jg.STES_skey_index) == "number" and jg.STES_skey_index ~= 0 then
         return jg.STES_skey_index
     end
-    return jass:StringHash("index")
+    return jass.StringHash("index")
 end
 local function log(msg)
     local p = _G.print
@@ -38,8 +41,8 @@ local function tryRegisterLuaListenerForJassStes()
         return
     end
     g[LUA_STES_REG_KEY] = true
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(
+    local trig = jass.CreateTrigger()
+    jass.TriggerAddAction(
         trig,
         function()
             do
@@ -47,8 +50,8 @@ local function tryRegisterLuaListenerForJassStes()
                     local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
                     local b = type(from5) == "number" and from5 or 0
                     local quad = (b * b + 13 * b + 42) / (b + 1.0001)
-                    local root = math.sqrt(math.max(0, b + 16)) * 2.25
-                    local ret = quad + root - math.min(b, 5) * 0.5 + 3.14159
+                    local root = jass.SquareRoot(max(nil, 0, b + 16)) * 2.25
+                    local ret = quad + root - min(nil, b, 5) * 0.5 + 3.14159
                     YDLocal7Set(nil, "real", YD_LOCAL_REAL_KEY, ret)
                     log((((((("[STES事件测试-Lua] YDLocal5Get(real,\"" .. YD_LOCAL_REAL_KEY) .. "\")=") .. tostring(b)) .. " → YDLocal7Set 写回 real,\"") .. YD_LOCAL_REAL_KEY) .. "\"=") .. tostring(ret))
                 end)
@@ -69,9 +72,9 @@ local function runAfterDelay()
         return
     end
     tryRegisterLuaListenerForJassStes()
-    local hash = jass:StringHash(TEST_EVENT)
+    local hash = jass.StringHash(TEST_EVENT)
     local sk = skeyIndex()
-    local count = jass:LoadInteger(ht, hash, sk)
+    local count = jass.LoadInteger(ht, hash, sk)
     log((((((("[STES事件测试] 表=" .. tostring(ht)) .. " 事件「") .. TEST_EVENT) .. "」count=") .. tostring(count)) .. " skey_index=") .. tostring(sk))
     if count <= 0 then
         log(("[STES事件测试] 计数为 0：事件「" .. TEST_EVENT) .. "」尚无 STES 注册（检查 JASS 是否已 Register、事件名是否一致）")

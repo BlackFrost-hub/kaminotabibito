@@ -222,8 +222,8 @@ local function handleItemEvent(self, unit, item, isPickup)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local player = jass:GetOwningPlayer(unit)
-    local itemId = jass:GetItemTypeId(item)
+    local player = jass.GetOwningPlayer(unit)
+    local itemId = jass.GetItemTypeId(item)
     local isDrop = not isPickup
     local skipFlag = equipShared.skipNextDrop
     if isDrop and skipFlag then
@@ -242,7 +242,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             local displayName = ____temp_5 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
-            jass:DisplayTimedTextToPlayer(
+            jass.DisplayTimedTextToPlayer(
                 player,
                 0,
                 0.01,
@@ -260,25 +260,31 @@ local function handleItemEvent(self, unit, item, isPickup)
     if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
         return
     end
-    local charges = jass:GetItemCharges(item)
-    local mult = charges > 0 and charges or 1
+    local charges = jass.GetItemCharges(item)
+    local ____temp_6
+    if charges > 0 then
+        ____temp_6 = charges
+    else
+        ____temp_6 = 1
+    end
+    local mult = ____temp_6
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
     if primaryBonus then
-        local typeId = jass:GetUnitTypeId(unit)
+        local typeId = jass.GetUnitTypeId(unit)
         local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
         local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
         primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
     end
     local merged = {}
     for ____, e in ipairs(STAT_CONFIG) do
-        local ____e_key_7 = e.key
-        local ____itemData_e_key_6 = itemData[e.key]
-        if ____itemData_e_key_6 == nil then
-            ____itemData_e_key_6 = 0
+        local ____e_key_8 = e.key
+        local ____itemData_e_key_7 = itemData[e.key]
+        if ____itemData_e_key_7 == nil then
+            ____itemData_e_key_7 = 0
         end
-        merged[____e_key_7] = ____itemData_e_key_6 + (primary[e.key] or 0)
+        merged[____e_key_8] = ____itemData_e_key_7 + (primary[e.key] or 0)
     end
     merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
     local playerStats = {}
@@ -295,8 +301,8 @@ local function handleItemEvent(self, unit, item, isPickup)
     for ____, e in ipairs(STAT_CONFIG) do
         addStat(nil, merged[e.key], e.name)
     end
-    local owner = jass:GetOwningPlayer(unit)
-    local playerName = jass:GetPlayerName(owner) or ""
+    local owner = jass.GetOwningPlayer(unit)
+    local playerName = jass.GetPlayerName(owner) or ""
     local actionText = isAdd and "获得" or "丢弃"
     local levelText = itemData.level or ""
     local levelColor
@@ -324,10 +330,10 @@ local function handleItemEvent(self, unit, item, isPickup)
             local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
             local v = isPct and stat.value * 100 or stat.value
             local nearZero = v > -0.000001 and v < 0.000001
-            local vStr = nearZero and "0" or tostring(nil, v)
+            local vStr = nearZero and "0" or tostring(v)
             msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
         end
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             player,
             0,
             0.01,
@@ -349,10 +355,8 @@ local function handleItemEvent(self, unit, item, isPickup)
                 local num = __TS__Number(val)
                 local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
                 local nearZero = num > -0.000001 and num < 0.000001
-                local valStr = isPct and (nearZero and "0%" or tostring(
-                    nil,
-                    math:floor(num * 1000 + 0.5) / 10
-                ) .. "%") or (nearZero and "0" or tostring(nil, num))
+                local valStr = isPct and (nearZero and "0%" or tostring(jass.R2I(num * 1000 + 0.5) / 10
+                ) .. "%") or (nearZero and "0" or tostring(num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
             ::__continue39::
@@ -361,20 +365,20 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_10 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_9 = unit
-        local ____isDrop_8
+        local ____equipMovespeed_getMaxMovespeed2Info_11 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_10 = unit
+        local ____isDrop_9
         if isDrop then
-            ____isDrop_8 = item
+            ____isDrop_9 = item
         else
-            ____isDrop_8 = nil
+            ____isDrop_9 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_10(equipMovespeed, ____unit_9, ____isDrop_8)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_11(equipMovespeed, ____unit_10, ____isDrop_9)
         if ms.value > 0 then
-            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(nil, ms.value)
+            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end
         if ms.value > 0 and ms.name ~= "" and ms.count >= 2 then
-            jass:DisplayTimedTextToPlayer(
+            jass.DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0.02,
@@ -384,7 +388,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
     end
     if #test5Parts > 0 then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             owner,
             0,
             0.02,

@@ -1,5 +1,9 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (f: any, messageType: number, message: string) => void;
 };
@@ -17,6 +21,9 @@ const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05
 };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: () => any;
+};
+const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
 const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配置表.06．主线任务配置表") as {
   MAIN_STORY_QUEST_CONFIGS: Array<{
@@ -120,7 +127,7 @@ function parseDialogLines(dialogPreview?: string): Array<{ speaker: string; text
 function calcDialogDuration(text: string): number {
   const n = text.length;
   // 基础 1.0 秒，每 10 个字符 +1.0 秒；下限 2 秒，上限 12 秒
-  const t = 1 + math.floor(n / 10);
+  const t = 1 + jass.R2I(n / 10);
   if (t < 2) return 2;
   if (t > 12) return 12;
   return t;
@@ -263,9 +270,13 @@ function runActionTimeline(timeline: string | undefined, triggerUnit: any): void
       continue;
     }
     const t = jass.CreateTimer();
-    jass.TimerStart(t, e.delay, false, () => {
+    if (!t) {
       executeActionCode(e.code, triggerUnit);
-      jass.DestroyTimer(t);
+      continue;
+    }
+    safeTimerStart(t, e.delay, false, () => {
+      executeActionCode(e.code, triggerUnit);
+      safeDestroyTimer(t);
     });
   }
 }
@@ -276,11 +287,9 @@ function getHeroes(): any[] {
     return [];
   }
   const arr: any[] = [];
-  const cb = (g: any) => {
-    const u = jass.FirstOfGroup(g);
+  forEachUnitInGroup(group, (u) => {
     if (u) arr.push(u);
-  };
-  jass.ForGroup(group, cb);
+  });
   return arr;
 }
 

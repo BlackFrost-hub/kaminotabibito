@@ -5,6 +5,11 @@
  * 支持：+ - * / × ÷ ( ) 和数字
  */
 
+const jass = require("jass.common") as any;
+const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  round: (value: number) => number;
+};
+
 // 导入常量
 import {
   OPERATOR_MULTIPLY_CN,
@@ -190,12 +195,14 @@ function parseAddSub(): number {
  */
 export function formatNumber(value: number): string {
   if (!isFinite(value)) return "0";
-  if (Math.floor(value) === value) {
-    return Math.floor(value).toString();
+  const intValue = jass.R2I(value);
+  if (intValue === value) {
+    return intValue.toString();
   }
-  const rounded = Math.round(value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER;
-  if (Math.floor(rounded) === rounded) {
-    return Math.floor(rounded).toString();
+  const rounded = round(value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER;
+  const intRounded = jass.R2I(rounded);
+  if (intRounded === rounded) {
+    return intRounded.toString();
   }
   return rounded.toString();
 }

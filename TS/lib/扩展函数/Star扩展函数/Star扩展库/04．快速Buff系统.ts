@@ -11,6 +11,10 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 import { YDWESetUnitAbilityDataReal, EXSetUnitFacing } from "../../YDWE函数/00．YDWE函数";
 import { GS_Suspend } from "./03．硬直暂停系统";
@@ -138,21 +142,21 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
       const tempTimer = jass.CreateTimer();
       jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
       jass.PauseUnit(u, true);
-      jass.TimerStart(tempTimer, time, false, () => {
+      safeTimerStart(tempTimer, time, false, () => {
         const t = jass.GetExpiredTimer();
         jass.PauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
         jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-        jass.DestroyTimer(t);
+        safeDestroyTimer(t);
       });
     } else if (id === 23) {
       const tempTimer = jass.CreateTimer();
       jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
       japi.EXPauseUnit(u, true);
-      jass.TimerStart(tempTimer, time, false, () => {
+      safeTimerStart(tempTimer, time, false, () => {
         const t = jass.GetExpiredTimer();
         japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
         jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-        jass.DestroyTimer(t);
+        safeDestroyTimer(t);
       });
     }
     return;

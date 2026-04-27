@@ -37,18 +37,6 @@ interface UnitDataEntry {
 
 const PREFIX = "|cffffff00『系统提示』：|r";
 
-// 安全初始化随机种子（只执行一次，所有玩家一致）
-(() => {
-  const key = "__equip_drop_rand_init";
-  if ((globalThis as any)[key]) return;
-  (globalThis as any)[key] = true;
-  // 使用固定种子初始化，所有玩家一样
-  // 魔兽引擎会自动管理后续随机数序列的同步
-  math.randomseed(123456789);
-  // 预先消耗一些随机数，确保随机性
-  for (let i = 0; i < 10; i++) math.random();
-})();
-
 function typeIdToUnitId(typeId: number): string | undefined {
   for (const id in idData) {
     if (stringToFourCC(id) === typeId) return id;
@@ -97,7 +85,7 @@ function getEffectivePicks(basePicks: number, unitType: string | number | undefi
   const T = (g.udg_T as number) != null ? Number(g.udg_T) : 0;
   if (T <= 1) return basePicks;
   const mult = 1 + 0.334 * (T - 1);
-  return Math.floor(basePicks * mult + 0.5);
+  return (jass as any).R2I(basePicks * mult + 0.5);
 }
 
 /** 加权随机取一个（权重不必归一化） */
@@ -105,8 +93,8 @@ function weightedPickOne(pool: { id: string; weight: number }[]): string | undef
   if (pool.length === 0) return undefined;
   let sum = 0;
   for (const p of pool) sum += p.weight;
-  if (sum <= 0) return (pool as any)[(math as any).random(1, pool.length)]?.id;
-  const r = (math as any).random(1, 10000) as number / 10000 * sum;
+  if (sum <= 0) return (pool as any)[(jass as any).GetRandomInt(1, pool.length)]?.id;
+  const r = ((jass as any).GetRandomReal(0, 1) as number) * sum;
   let acc = 0;
   for (const p of pool) {
     acc += p.weight;
@@ -134,14 +122,14 @@ function pickFromWeightedPool(
       (globalThis as any).print?.("[装备掉落] 必掉物品:", p.id, p.weight);
       out.push(p.id);
     } else {
-      const r = (math as any).random(1, 10000) as number / 10000;
+      const r = (jass as any).GetRandomReal(0, 1) as number;
       (globalThis as any).print?.("[装备掉落] 概率判定:", p.id, "weight:", p.weight, "r:", r, "命中:", r < p.weight);
       if (r < p.weight) out.push(p.id);
     }
   }
   if (out.length > picks) {
     for (let i = out.length - 1; i >= 1; i--) {
-      const j = (math as any).random(1, i + 1) as number;
+      const j = (jass as any).GetRandomInt(1, i + 1) as number;
       const t = out[i];
       out[i] = out[j - 1];
       out[j - 1] = t;
@@ -165,14 +153,14 @@ function pickFromEqualPool(ids: string[], picks: number): string[] {
   const list = ids.slice();
   const firstPicks = picks <= list.length ? picks : list.length;
   for (let i = 0; i < firstPicks; i++) {
-    const idx = (math as any).random(1, list.length) as number;
+    const idx = (jass as any).GetRandomInt(1, list.length) as number;
     const id = (list as any)[idx - 1] as string;
     out.push(id);
     list.splice(idx - 1, 1);
   }
   const needMore = picks - out.length;
   for (let i = 0; i < needMore; i++) {
-    const idx = (math as any).random(1, ids.length) as number;
+    const idx = (jass as any).GetRandomInt(1, ids.length) as number;
     out.push((ids as any)[idx - 1] as string);
   }
   return out;
@@ -203,12 +191,13 @@ function onUnitDeath(unit: any, _killer: any): void {
   if (entry && entry.itemIds != null) {
     (globalThis as any).print?.("[装备掉落] 找到掉落表 itemIds:", entry.itemIds);
     const dropProc = entry.dropProc != null ? Number(entry.dropProc) : 1;
-    const r = (math as any).random(1, 10000) as number;
+    const r = (jass as any).GetRandomInt(1, 10000) as number;
     if (r > dropProc * 10000) return;
     const rawItemIds = String(entry.itemIds);
     const pool = parseItemPool(rawItemIds);
     if (pool.length === 0) return;
-    let picksNum = Math.max(1, Math.floor(Number(entry.picks) || 1));
+    let picksNum = (jass as any).R2I(Number(entry.picks) || 1);
+    if (picksNum < 1) picksNum = 1;
     picksNum = getEffectivePicks(picksNum, entry.unitType);
     const ids = pool.map((p) => p.id);
     // 只有 “I00C;I00E;I00D” 这种无冒号的格式才走等概率抽 picks 个
@@ -226,11 +215,11 @@ function onUnitDeath(unit: any, _killer: any): void {
   ];
   for (const rule of DROP_RULES) {
     if (typeId !== stringToFourCC(rule.unitId)) continue;
-    const r = (math as any).random(1, 10000) as number;
+    const r = (jass as any).GetRandomInt(1, 10000) as number;
     if (r > rule.proc * 10000) continue;
     const list = getItemsByScoreRange(rule.minScore, rule.maxScore);
     if (list.length === 0) continue;
-    const idx = (math as any).random(1, list.length) as number;
+    const idx = (jass as any).GetRandomInt(1, list.length) as number;
     const itemId = (list as any)[idx] as string;
     if (itemId != null && itemId !== "") createItemAtUnit(unit, itemId);
     break;

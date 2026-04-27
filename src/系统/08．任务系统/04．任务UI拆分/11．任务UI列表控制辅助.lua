@@ -83,11 +83,8 @@ function ____exports.chunkQuests(self, quests)
         while i < #quests do
             local ____end = i + ____exports.ROWS_PER_PAGE
             if ____end >= #quests then
-                pages[#pages + 1] = __TS__ArraySlice(
-                    quests,
-                    math.max(0, #quests - ____exports.ROWS_PER_PAGE),
-                    #quests
-                )
+                local startIndex = #quests - ____exports.ROWS_PER_PAGE
+                pages[#pages + 1] = __TS__ArraySlice(quests, startIndex > 0 and startIndex or 0, #quests)
                 break
             end
             pages[#pages + 1] = __TS__ArraySlice(quests, i, ____end)

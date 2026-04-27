@@ -72,6 +72,13 @@ function parseAddSub(self)
     end
     return result
 end
+--- 动态技能说明系统 - 公式解析器
+-- 
+-- 提供安全的数学表达式解析和计算功能
+-- 支持：+ - * / × ÷ ( ) 和数字
+local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local round = ____require_result_0.round
 --- 移除字符串中的所有空格
 function ____exports.removeAllSpaces(self, s)
     local result = ""
@@ -167,12 +174,14 @@ function ____exports.formatNumber(self, value)
     if not __TS__NumberIsFinite(__TS__Number(value)) then
         return "0"
     end
-    if math.floor(value) == value then
-        return tostring(math.floor(value))
+    local intValue = jass.R2I(value)
+    if intValue == value then
+        return tostring(intValue)
     end
-    local rounded = math.floor(value * DECIMAL_MULTIPLIER + 0.5) / DECIMAL_MULTIPLIER
-    if math.floor(rounded) == rounded then
-        return tostring(math.floor(rounded))
+    local rounded = round(nil, value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER
+    local intRounded = jass.R2I(rounded)
+    if intRounded == rounded then
+        return tostring(intRounded)
     end
     return tostring(rounded)
 end

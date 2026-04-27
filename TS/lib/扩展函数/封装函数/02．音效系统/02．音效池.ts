@@ -4,6 +4,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 const hash = (jass as any).InitHashtable();
 
 // 哈希表键值常量
@@ -68,7 +72,7 @@ export function createSoundInternal(
 
   let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
   if (duration <= 0 || duration > 3600) duration = 1;
-  (jass as any).TimerStart(timer, duration, false, () => {
+  safeTimerStart(timer, duration, false, () => {
     const expiredTimer = (jass as any).GetExpiredTimer();
     const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
     if (s) {
@@ -77,7 +81,7 @@ export function createSoundInternal(
       const ph = (jass as any).StringHash(p);
       (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
     }
-    (jass as any).DestroyTimer(expiredTimer);
+    safeDestroyTimer(expiredTimer);
   });
 
   return sound;
@@ -105,14 +109,14 @@ export function getSoundInternal(
   model.applyToSound(sound, x, y, z, cutoff);
 
   if (timer) {
-    (jass as any).DestroyTimer(timer);
+    safeDestroyTimer(timer);
     const newTimer = (jass as any).CreateTimer();
     (jass as any).SaveTimerHandle(hash, (jass as any).GetHandleId(sound), KEY_TIMER, newTimer);
     (jass as any).SaveSoundHandle(hash, (jass as any).GetHandleId(newTimer), KEY_SOUND, sound);
 
     let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
     if (duration <= 0 || duration > 3600) duration = 1;
-    (jass as any).TimerStart(newTimer, duration, false, () => {
+    safeTimerStart(newTimer, duration, false, () => {
       const expiredTimer = (jass as any).GetExpiredTimer();
       const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
       if (s) {
@@ -121,7 +125,7 @@ export function getSoundInternal(
         const ph = (jass as any).StringHash(p);
         (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
       }
-      (jass as any).DestroyTimer(expiredTimer);
+      safeDestroyTimer(expiredTimer);
     });
   }
 

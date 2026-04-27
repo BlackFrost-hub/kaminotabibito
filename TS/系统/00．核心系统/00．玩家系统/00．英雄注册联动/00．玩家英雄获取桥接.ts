@@ -14,6 +14,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");
 
@@ -112,8 +116,20 @@ const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
 
 // 任务UI系统
 const taskUISystem = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as {
-  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => boolean;
 };
+
+const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
+  initPlayerSelectionCenter?: (this: void, whichPlayer: any) => void;
+};
+const initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter as
+  | ((this: void, whichPlayer: any) => void)
+  | undefined;
+
+function invokeSelectionCenterInit(whichPlayer: any): void {
+  if (typeof initPlayerSelectionCenter !== "function") return;
+  initPlayerSelectionCenter(whichPlayer);
+}
 
 /**
  * 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
@@ -131,10 +147,13 @@ function registerHeroDependents(whichHero: any): void {
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner != null && owner !== 0) {
     const playerId = jass.GetPlayerId(owner);
+    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[Bridge] registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
+
+    invokeSelectionCenterInit(owner);
 
     // UI系统只注册一次，防止重复注册
     if (!uiRegisteredPlayers.has(playerId)) {
-      uiRegisteredPlayers.add(playerId);
+      let taskUiReady = true;
 
       invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
 
@@ -150,7 +169,11 @@ function registerHeroDependents(whichHero: any): void {
 
       // 任务UI系统 - 为玩家创建N槽任务UI
       if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
-        taskUISystem.onPlayerHeroRegistered(owner, whichHero);
+        taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
+      }
+
+      if (taskUiReady) {
+        uiRegisteredPlayers.add(playerId);
       }
     }
   }
@@ -196,8 +219,12 @@ function runRegisterPlayerHero(): void {
  */
 function scheduleRetry(fn: () => void): void {
   const timer = jass.CreateTimer();
-  jass.TimerStart(timer, RETRY_SEC, false, () => {
-    jass.DestroyTimer(timer);
+  if (!timer) {
+    fn();
+    return;
+  }
+  safeTimerStart(timer, RETRY_SEC, false, () => {
+    safeDestroyTimer(timer);
     fn();
   });
 }

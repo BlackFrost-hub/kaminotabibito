@@ -35,7 +35,7 @@ local function neutralPassivePlayer(self)
         ____temp_2 = 15
     end
     local pid = ____temp_2
-    return jass:Player(pid)
+    return jass.Player(pid)
 end
 local function dbg(self, _msg)
 end
@@ -63,9 +63,9 @@ local function formatGgUnitProbe(self, u)
         return "nil/0"
     end
     local tail = ""
-    tail = " typeId=" .. tostring(jass:GetUnitTypeId(u))
+    tail = " typeId=" .. tostring(jass.GetUnitTypeId(u))
     if jass.UNIT_STATE_LIFE ~= nil then
-        tail = (tail .. " life=") .. tostring(jass:GetUnitState(u, jass.UNIT_STATE_LIFE))
+        tail = (tail .. " life=") .. tostring(jass.GetUnitState(u, jass.UNIT_STATE_LIFE))
     end
     return "ok" .. tail
 end
@@ -86,8 +86,8 @@ local function scheduleDebugGgUnitHtow0030(self)
         do
             local pi = 0
             while pi < 4 do
-                jass:DisplayTimedTextToPlayer(
-                    jass:Player(pi),
+                jass.DisplayTimedTextToPlayer(
+                    jass.Player(pi),
                     0,
                     0,
                     14,
@@ -97,7 +97,7 @@ local function scheduleDebugGgUnitHtow0030(self)
             end
         end
         local pr = _G.print
-        pr(nil, msg)
+        pr(msg)
     end
     withTimer(
         nil,
@@ -151,7 +151,7 @@ local function resolveWatchUnit(self, cfg)
             ____temp_3 = 270
         end
         local face = ____temp_3
-        local u = jass:CreateUnit(
+        local u = jass.CreateUnit(
             passive,
             four,
             tx,
@@ -174,17 +174,17 @@ end
 local function runActivationEffects(self, cfg, watchUnit)
     local gg = g
     if cfg.UnitID ~= nil and watchUnit ~= nil and watchUnit ~= 0 then
-        local p6 = jass:Player(6)
+        local p6 = jass.Player(6)
         if p6 then
-            jass:SetUnitOwner(watchUnit, p6, true)
+            jass.SetUnitOwner(watchUnit, p6, true)
         end
     end
     if cfg.reveal ~= nil then
         local revealRect = gg[cfg.reveal]
         if revealRect then
             local mode = jass.FOG_OF_WAR_VISIBLE
-            jass:SetFogStateRect(
-                jass:Player(0),
+            jass.SetFogStateRect(
+                jass.Player(0),
                 mode,
                 revealRect,
                 true
@@ -195,8 +195,8 @@ local function runActivationEffects(self, cfg, watchUnit)
         do
             local i = 0
             while i < 4 do
-                jass:DisplayTimedTextToPlayer(
-                    jass:Player(i),
+                jass.DisplayTimedTextToPlayer(
+                    jass.Player(i),
                     0,
                     0,
                     8,
@@ -206,11 +206,11 @@ local function runActivationEffects(self, cfg, watchUnit)
             end
         end
     end
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     do
         local i = 0
         while i < 4 do
-            if localPlayer == jass:Player(i) then
+            if localPlayer == jass.Player(i) then
                 Sound3DII_Mp3Play(nil, ACTIVATION_SOUND)
                 break
             end
@@ -224,7 +224,7 @@ local function registerOnePoint(self, cfg, key)
         dbg(nil, "跳过：无有效监视单位 " .. key)
         return
     end
-    local trig = jass:CreateTrigger()
+    local trig = jass.CreateTrigger()
     local unregister = unitSpecificEventCenter.registerUnitInRangeTrigger(
         trig,
         watchUnit,
@@ -233,20 +233,20 @@ local function registerOnePoint(self, cfg, key)
         true
     )
     local fired = false
-    jass:TriggerAddAction(
+    jass.TriggerAddAction(
         trig,
         function()
             if fired then
                 return
             end
-            local enterer = jass:GetTriggerUnit()
+            local enterer = jass.GetTriggerUnit()
             if enterer == nil or enterer == 0 then
                 return
             end
             fired = true
             runActivationEffects(nil, cfg, watchUnit)
             unregister(nil)
-            jass:DestroyTrigger(trig)
+            jass.DestroyTrigger(trig)
         end
     )
 end

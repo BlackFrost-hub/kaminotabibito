@@ -10,21 +10,24 @@ local ____exports = {}
 -- 不包含：UI 渲染、数据存储。
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
-local DEFAULT_COLOR_ID = ____require_result_0.DEFAULT_COLOR_ID
-local EVENT_NAME_CAST_BAR = ____require_result_0.EVENT_NAME_CAST_BAR
-local ____require_result_1 = require("系统.03．技能系统.07．技能吟唱条.02．渲染")
-local startCastBar = ____require_result_1.startCastBar
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_2.STES_Register
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local ydlStes_syncTriggerStep = ____require_result_3.ydlStes_syncTriggerStep
-local ydlStes_finishChildCleanup = ____require_result_3.ydlStes_finishChildCleanup
-local ydlStes_skeyIndex = ____require_result_3.ydlStes_skeyIndex
-local ydlStes_registerAfterGetTable = ____require_result_3.ydlStes_registerAfterGetTable
-local ydlStes_readInteger5 = ____require_result_3.ydlStes_readInteger5
-local ydlStes_readReal5 = ____require_result_3.ydlStes_readReal5
-local ydlStes_readString5 = ____require_result_3.ydlStes_readString5
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_1 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
+local DEFAULT_COLOR_ID = ____require_result_1.DEFAULT_COLOR_ID
+local EVENT_NAME_CAST_BAR = ____require_result_1.EVENT_NAME_CAST_BAR
+local ____require_result_2 = require("系统.03．技能系统.07．技能吟唱条.02．渲染")
+local startCastBar = ____require_result_2.startCastBar
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_3.STES_Register
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_4.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_4.ydlStes_finishChildCleanup
+local ydlStes_skeyIndex = ____require_result_4.ydlStes_skeyIndex
+local ydlStes_registerAfterGetTable = ____require_result_4.ydlStes_registerAfterGetTable
+local ydlStes_readInteger5 = ____require_result_4.ydlStes_readInteger5
+local ydlStes_readReal5 = ____require_result_4.ydlStes_readReal5
+local ydlStes_readString5 = ____require_result_4.ydlStes_readString5
 local REG_GUARD = "__syzl_castBar_registered"
 local TRIG_KEY = "__syzl_castBar_trig"
 local ATTEMPT_KEY = "__syzl_castBarRegAttempt"
@@ -58,21 +61,26 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    local h = jass:StringHash(eventName)
-    return jass:LoadInteger(
+    local h = jass.StringHash(eventName)
+    return jass.LoadInteger(
         ht,
         h,
         ydlStes_skeyIndex(nil, nil)
     )
 end
 local function scheduleRetry(fn)
-    local tm = jass:CreateTimer()
-    jass:TimerStart(
+    local tm = jass.CreateTimer()
+    if not tm then
+        fn(nil)
+        return
+    end
+    safeTimerStart(
+        nil,
         tm,
         RETRY_SEC,
         false,
         function()
-            jass:DestroyTimer(tm)
+            safeDestroyTimer(nil, tm)
             fn(nil)
         end
     )
@@ -87,8 +95,8 @@ function ____exports.tryRegisterCastBarStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, onCastBarEvent)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onCastBarEvent)
         g[TRIG_KEY] = trig
     end
     local trig = g[TRIG_KEY]

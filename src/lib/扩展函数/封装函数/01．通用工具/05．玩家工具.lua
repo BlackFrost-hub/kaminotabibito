@@ -3,11 +3,11 @@ local ____exports = {}
 --- 玩家工具函数
 -- 玩家状态调整、消息显示等
 local jass = require("jass.common")
-local SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav"
+local SOUND_GOLD = "Abilities\\\\Spells\\\\Items\\\\ResourceItems\\\\ReceiveGold.wav"
 --- 调整玩家状态（如金币、木材），在原有基础上增加 delta。
 function ____exports.AdjustPlayerStateBJ(self, delta, whichPlayer, whichPlayerState)
-    local current = jass:GetPlayerState(whichPlayer, whichPlayerState)
-    jass:SetPlayerState(whichPlayer, whichPlayerState, current + delta)
+    local current = jass.GetPlayerState(whichPlayer, whichPlayerState)
+    jass.SetPlayerState(whichPlayer, whichPlayerState, current + delta)
 end
 --- 增减金币，并自动反馈：
 -- - 传 player：只对该玩家播放"收金币"音效，不创建漂浮字
@@ -26,7 +26,7 @@ function ____exports.AddGoldWithFeedback(self, params)
     else
         local ____temp_1
         if unit ~= nil then
-            ____temp_1 = jass:GetOwningPlayer(unit)
+            ____temp_1 = jass.GetOwningPlayer(unit)
         else
             ____temp_1 = nil
         end
@@ -43,7 +43,7 @@ function ____exports.AddGoldWithFeedback(self, params)
     local ____require_result_4 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
     local CreateFloatTextOnUnit = ____require_result_4.CreateFloatTextOnUnit
     if unit ~= nil then
-        local txt = delta > 0 and "+" .. tostring(nil, delta) or tostring(nil, delta)
+        local txt = delta > 0 and "+" .. tostring(delta) or tostring(delta)
         CreateFloatTextOnUnit(nil, unit, txt, {red = 255, green = 215, blue = 0, alpha = 0})
         Sound3DII_UnitPlay(nil, SOUND_GOLD, unit, 1500)
     else
@@ -62,7 +62,7 @@ function ____exports.printToPlayer(self, player, msg, duration)
     if not player then
         return
     end
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -81,6 +81,39 @@ function ____exports.printToPlayers(self, players, msg, duration)
     end
     for ____, p in ipairs(players) do
         ____exports.printToPlayer(nil, p, msg, duration)
+    end
+end
+--- 获取本地玩家，并进行有效性检查（非 null 且非 0）
+-- 
+-- @returns 本地玩家句柄，如果无效则返回 null
+function ____exports.getLocalPlayerOrNull(self)
+    local lp = jass.GetLocalPlayer()
+    if lp == nil or lp == 0 then
+        return nil
+    end
+    return lp
+end
+--- 遍历所有玩家并执行回调函数
+-- 
+-- @param action 回调函数，参数为玩家句柄和玩家ID
+-- @param maxPlayers 最大玩家数，默认为12（玩家0-11）
+function ____exports.forEachPlayingPlayer(self, action, maxPlayers)
+    if maxPlayers == nil then
+        maxPlayers = 12
+    end
+    do
+        local i = 0
+        while i < maxPlayers do
+            do
+                local p = jass.Player(i)
+                if not p or p == 0 then
+                    goto __continue17
+                end
+                action(nil, p, i)
+            end
+            ::__continue17::
+            i = i + 1
+        end
     end
 end
 return ____exports

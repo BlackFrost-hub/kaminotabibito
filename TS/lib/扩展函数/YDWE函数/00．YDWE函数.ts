@@ -10,6 +10,9 @@
 
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
+const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  ceil: (value: number) => number;
+};
 const jglobals = require("jass.globals") as any;
 
 // ==========================================================================================
@@ -361,7 +364,7 @@ const { onTick10ms } = globalThis as unknown as {
   }
 
   // 计算tick数（每10毫秒一个tick）
-  const ticks = Math.ceil(duration / 0.01);
+  const ticks = ceil(duration / 0.01);
   _pendingEffects.push({ eff: effect, ticksLeft: ticks });
 }
 

@@ -18,6 +18,9 @@ const { SetUnitLifePercentBJ, SetUnitManaPercentBJ, UnitHasBuffBJ } = require("l
   SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
   UnitHasBuffBJ: (whichUnit: any, buffId: number) => boolean;
 };
+const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
+};
 
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
@@ -65,8 +68,8 @@ function isPlayerHero(unit: any): boolean {
   if (heroGroup == null) return false;
 
   let found = false;
-  jass.ForGroup(heroGroup, () => {
-    if (jass.GetEnumUnit() === unit) found = true;
+  forEachUnitInGroup(heroGroup, (enumUnit) => {
+    if (enumUnit === unit) found = true;
   });
   return found;
 }
@@ -107,8 +110,7 @@ function onOutOfCombat(playerId: number): void {
   const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
   if (heroGroup == null) return;
 
-  jass.ForGroup(heroGroup, () => {
-    const unit = jass.GetEnumUnit();
+  forEachUnitInGroup(heroGroup, (unit) => {
     if (unit == null) return;
 
     const owner = jass.GetOwningPlayer(unit);

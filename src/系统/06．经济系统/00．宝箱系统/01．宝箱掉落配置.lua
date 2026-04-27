@@ -4,7 +4,6 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringIncludes = ____lualib.__TS__StringIncludes
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
-local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
@@ -12,10 +11,17 @@ local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__ArrayPushArray = ____lualib.__TS__ArrayPushArray
 local ____exports = {}
+local jass = require("jass.common")
 local ____require_result_0 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
 local getChestConfigByString = ____require_result_0.getChestConfigByString
 local ____require_result_1 = require("系统.02．物品系统.01．装备数据")
 local items = ____require_result_1.items
+local function randomReal01()
+    return jass.GetRandomReal(0, 1) or 0
+end
+local function randomInt(min, max)
+    return jass.GetRandomInt(min, max) or min
+end
 local function parseItemPool(poolStr)
     local entries = {}
     local parts = __TS__StringSplit(poolStr, ";")
@@ -23,7 +29,7 @@ local function parseItemPool(poolStr)
         do
             local trimmed = __TS__StringTrim(part)
             if not trimmed then
-                goto __continue3
+                goto __continue5
             end
             if __TS__StringIncludes(trimmed, ":") then
                 local splitParts = __TS__StringSplit(trimmed, ":")
@@ -37,7 +43,7 @@ local function parseItemPool(poolStr)
                 entries[#entries + 1] = {id = trimmed, weight = 1}
             end
         end
-        ::__continue3::
+        ::__continue5::
     end
     return entries
 end
@@ -51,7 +57,7 @@ local function drawByWeightWithRepeat(pool, picks)
     do
         local i = 0
         while i < picks do
-            local r = math:random() * totalWeight
+            local r = randomReal01() * totalWeight
             for ____, entry in ipairs(pool) do
                 r = r - entry.weight
                 if r <= 0 then
@@ -65,10 +71,17 @@ local function drawByWeightWithRepeat(pool, picks)
     return result
 end
 local function drawByEqualWithoutRepeat(pool, picks)
-    local shuffled = __TS__ArraySort(
-        {table.unpack(pool)},
-        function() return math:random() - 0.5 end
-    )
+    local shuffled = {table.unpack(pool)}
+    do
+        local i = #shuffled - 1
+        while i >= 1 do
+            local j = randomInt(1, i + 1) - 1
+            local t = shuffled[i + 1]
+            shuffled[i + 1] = shuffled[j + 1]
+            shuffled[j + 1] = t
+            i = i - 1
+        end
+    end
     local count = picks < #shuffled and picks or #shuffled
     return __TS__ArrayMap(
         __TS__ArraySlice(shuffled, 0, count),
@@ -108,9 +121,9 @@ local function executeDropByMode(dropMode, picks)
         end
     end
     repeat
-        local ____switch30 = dropMode.type
-        local ____cond30 = ____switch30 == "pool"
-        if ____cond30 then
+        local ____switch33 = dropMode.type
+        local ____cond33 = ____switch33 == "pool"
+        if ____cond33 then
             do
                 local pool = parseItemPool(dropMode.items)
                 if #pool > 0 and picks > 0 then
@@ -124,8 +137,8 @@ local function executeDropByMode(dropMode, picks)
                 break
             end
         end
-        ____cond30 = ____cond30 or ____switch30 == "mixed"
-        if ____cond30 then
+        ____cond33 = ____cond33 or ____switch33 == "mixed"
+        if ____cond33 then
             do
                 local pool = parseItemPool(dropMode.items)
                 if #pool > 0 then
@@ -148,8 +161,8 @@ local function executeDropByMode(dropMode, picks)
                 break
             end
         end
-        ____cond30 = ____cond30 or ____switch30 == "score"
-        if ____cond30 then
+        ____cond33 = ____cond33 or ____switch33 == "score"
+        if ____cond33 then
             do
                 local itemIds = filterItemsByScore(dropMode.range.min, dropMode.range.max)
                 if #itemIds > 0 and picks > 0 then
@@ -192,8 +205,8 @@ end
 -- @returns 创建的物品
 function ____exports.createDropItem(itemId, x, y)
     local jass = require("jass.common")
-    local item = jass:CreateItem(
-        jass:FourCC(itemId),
+    local item = jass.CreateItem(
+        jass.FourCC(itemId),
         x,
         y
     )

@@ -36,7 +36,7 @@ local GOLD_BURST_INTERVAL_SEC = 0.25
 local GOLD_BURST_555_TIMES = 12
 local GOLD_BURST_555_INTERVAL_SEC = 1 / 11
 local function onChat2222(self)
-    local p0 = jass:Player(0)
+    local p0 = jass.Player(0)
     local n = 0
     local step
     step = function()
@@ -50,20 +50,20 @@ local function onChat2222(self)
         if n >= GOLD_BURST_TIMES then
             return
         end
-        local t = jass:CreateTimer()
-        jass:TimerStart(
+        local t = jass.CreateTimer()
+        jass.TimerStart(
             t,
             GOLD_BURST_INTERVAL_SEC,
             false,
             function()
-                jass:DestroyTimer(jass:GetExpiredTimer())
+                jass.DestroyTimer(jass.GetExpiredTimer())
                 step(nil)
             end
         )
     end
     step(nil)
-    jass:DisplayTimedTextToPlayer(
-        jass:Player(0),
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
         0,
         0,
         10,
@@ -71,7 +71,7 @@ local function onChat2222(self)
     )
 end
 local function onChat555(self)
-    local p0 = jass:Player(0)
+    local p0 = jass.Player(0)
     local n = 0
     local step
     step = function()
@@ -85,20 +85,20 @@ local function onChat555(self)
         if n >= GOLD_BURST_555_TIMES then
             return
         end
-        local t = jass:CreateTimer()
-        jass:TimerStart(
+        local t = jass.CreateTimer()
+        jass.TimerStart(
             t,
             GOLD_BURST_555_INTERVAL_SEC,
             false,
             function()
-                jass:DestroyTimer(jass:GetExpiredTimer())
+                jass.DestroyTimer(jass.GetExpiredTimer())
                 step(nil)
             end
         )
     end
     step(nil)
-    jass:DisplayTimedTextToPlayer(
-        jass:Player(0),
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
         0,
         0,
         12,
@@ -106,22 +106,22 @@ local function onChat555(self)
     )
 end
 local function init(self)
-    local tr = jass:CreateTrigger()
-    jass:TriggerRegisterPlayerChatEvent(
+    local tr = jass.CreateTrigger()
+    jass.TriggerRegisterPlayerChatEvent(
         tr,
-        jass:Player(0),
+        jass.Player(0),
         "2222",
         true
     )
-    jass:TriggerAddAction(tr, onChat2222)
-    local tr555 = jass:CreateTrigger()
-    jass:TriggerRegisterPlayerChatEvent(
+    jass.TriggerAddAction(tr, onChat2222)
+    local tr555 = jass.CreateTrigger()
+    jass.TriggerRegisterPlayerChatEvent(
         tr555,
-        jass:Player(0),
+        jass.Player(0),
         "555",
         true
     )
-    jass:TriggerAddAction(tr555, onChat555)
+    jass.TriggerAddAction(tr555, onChat555)
 end
 init(nil)
 return ____exports

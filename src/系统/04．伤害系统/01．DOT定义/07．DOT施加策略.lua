@@ -4,8 +4,11 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 function ____exports.createDotApplyStrategy(self, deps)
     local DURATION_TIER_EPS = 0.05
+    local function abs(self, value)
+        return value < 0 and -value or value
+    end
     local function sameDurationTier(self, cur, bestDuration)
-        return cur._dotParsedDuration ~= nil and math.abs(bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS
+        return cur._dotParsedDuration ~= nil and abs(nil, bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS
     end
     local function pushDotTickForTarget(self, typeId, source, target, tgtHid, amount, _duration, cfg)
         do
@@ -179,15 +182,15 @@ function ____exports.createDotApplyStrategy(self, deps)
                     local cfg = deps.dotTypes[t + 1]
                     local typeId = cfg.id
                     if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
-                        goto __continue24
+                        goto __continue25
                     end
                     local best = cfg:getBestFromUnit(source)
                     if best == nil then
-                        goto __continue24
+                        goto __continue25
                     end
                     local amount = cfg:computeAmount(target, best)
                     if amount <= 0 then
-                        goto __continue24
+                        goto __continue25
                     end
                     if deps.stateByType[typeId] == nil then
                         deps.stateByType[typeId] = {}
@@ -211,7 +214,7 @@ function ____exports.createDotApplyStrategy(self, deps)
                         cur
                     )
                 end
-                ::__continue24::
+                ::__continue25::
                 t = t + 1
             end
         end
@@ -241,29 +244,29 @@ function ____exports.createDotApplyStrategy(self, deps)
                     local typeId = cfg.id
                     if deps.ignoredTargetByType[typeId] ~= nil and deps.ignoredTargetByType[typeId][tgtHid] == true then
                         __TS__Delete(deps.ignoredTargetByType[typeId], tgtHid)
-                        goto __continue36
+                        goto __continue37
                     end
                     if suppressDotApplyForBatch then
-                        goto __continue36
+                        goto __continue37
                     end
                     if isAttackHitForDot then
-                        goto __continue36
+                        goto __continue37
                     end
                     if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
-                        goto __continue36
+                        goto __continue37
                     end
                     local best = cfg:getBestFromUnit(source)
                     if best == nil then
-                        goto __continue36
+                        goto __continue37
                     end
                     if best.attackOnly == true or cfg.attackOnlyTrigger == true then
                         if not isAttackHitForDot then
-                            goto __continue36
+                            goto __continue37
                         end
                     end
                     local amount = cfg:computeAmount(target, best)
                     if amount <= 0 then
-                        goto __continue36
+                        goto __continue37
                     end
                     if deps.stateByType[typeId] == nil then
                         deps.stateByType[typeId] = {}
@@ -302,7 +305,7 @@ function ____exports.createDotApplyStrategy(self, deps)
                         )
                     end
                 end
-                ::__continue36::
+                ::__continue37::
                 t = t + 1
             end
         end

@@ -9,3 +9,4 @@ export * from "./04．单位工具";
 export * from "./05．玩家工具";
 export * from "./06．格式化工具";
 export * from "./07．数学运算";
+export * from "./08．Map安全遍历";

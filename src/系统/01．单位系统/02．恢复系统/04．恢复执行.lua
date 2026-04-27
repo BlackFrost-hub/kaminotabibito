@@ -7,51 +7,55 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
-local ____require_result_1 = require("系统.01．单位系统.02．恢复系统.01．恢复计算")
-local calcBaseLifeRegen = ____require_result_1.calcBaseLifeRegen
-local calcBaseManaRegen = ____require_result_1.calcBaseManaRegen
-local calcTotalLifeRegen = ____require_result_1.calcTotalLifeRegen
-local calcTotalManaRegen = ____require_result_1.calcTotalManaRegen
-local calcBossTotalLifeRegen = ____require_result_1.calcBossTotalLifeRegen
-local getPercentLifeRegen = ____require_result_1.getPercentLifeRegen
-local getPercentManaRegen = ____require_result_1.getPercentManaRegen
-local ____require_result_2 = require("系统.01．单位系统.02．恢复系统.02．装备恢复效果")
-local calcItemLifeRegenBonus = ____require_result_2.calcItemLifeRegenBonus
-local ____require_result_3 = require("系统.01．单位系统.02．恢复系统.03．单位恢复特性")
-local getUnitLifeRegenMultiplier = ____require_result_3.getUnitLifeRegenMultiplier
-local ____require_result_4 = require("系统.01．单位系统.02．恢复系统.00．恢复常量")
-local REGEN_THRESHOLD = ____require_result_4.REGEN_THRESHOLD
-local PERCENT_REGEN_THRESHOLD = ____require_result_4.PERCENT_REGEN_THRESHOLD
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local forEachUnitInGroup = ____require_result_1.forEachUnitInGroup
+local ____require_result_2 = require("系统.01．单位系统.02．恢复系统.01．恢复计算")
+local calcBaseLifeRegen = ____require_result_2.calcBaseLifeRegen
+local calcBaseManaRegen = ____require_result_2.calcBaseManaRegen
+local calcTotalLifeRegen = ____require_result_2.calcTotalLifeRegen
+local calcTotalManaRegen = ____require_result_2.calcTotalManaRegen
+local calcBossTotalLifeRegen = ____require_result_2.calcBossTotalLifeRegen
+local getPercentLifeRegen = ____require_result_2.getPercentLifeRegen
+local getPercentManaRegen = ____require_result_2.getPercentManaRegen
+local ____require_result_3 = require("系统.01．单位系统.02．恢复系统.02．装备恢复效果")
+local calcItemLifeRegenBonus = ____require_result_3.calcItemLifeRegenBonus
+local ____require_result_4 = require("系统.01．单位系统.02．恢复系统.03．单位恢复特性")
+local getUnitLifeRegenMultiplier = ____require_result_4.getUnitLifeRegenMultiplier
+local ____require_result_5 = require("系统.01．单位系统.02．恢复系统.00．恢复常量")
+local REGEN_THRESHOLD = ____require_result_5.REGEN_THRESHOLD
+local PERCENT_REGEN_THRESHOLD = ____require_result_5.PERCENT_REGEN_THRESHOLD
 --- 执行单位生命恢复
 local function applyLifeRegen(self, unit, regen)
     if regen <= 0 then
         return
     end
-    local currentLife = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    local maxLife = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
-    local actualRegen = math.min(regen, maxLife - currentLife)
+    local currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local lifeGap = maxLife - currentLife
+    local actualRegen = regen < lifeGap and regen or lifeGap
     if actualRegen <= 0 then
         return
     end
-    jass:SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife + actualRegen)
+    jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife + actualRegen)
 end
 --- 执行单位魔法恢复
 local function applyManaRegen(self, unit, regen)
     if regen <= 0 then
         return
     end
-    local currentMana = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
-    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
-    local actualRegen = math.min(regen, maxMana - currentMana)
+    local currentMana = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
+    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local manaGap = maxMana - currentMana
+    local actualRegen = regen < manaGap and regen or manaGap
     if actualRegen <= 0 then
         return
     end
-    jass:SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRegen)
+    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRegen)
 end
 --- 处理玩家英雄恢复
 -- 与 JASS 源代码逻辑完全一致
 function ____exports.processPlayerHeroRegen(self, unit)
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return
     end
@@ -84,7 +88,7 @@ function ____exports.processPlayerHeroRegen(self, unit)
         "生命恢复属性增幅",
         "real"
     ) or 0
-    local maxLife = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     local totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen)
     local baseManaRegen = calcBaseManaRegen(nil, unit)
     local fixedManaRegen = YDUserDataGet(
@@ -104,7 +108,7 @@ function ____exports.processPlayerHeroRegen(self, unit)
         totalFixedManaRegen
     )
     local percentManaRegen = getPercentManaRegen(nil, unit)
-    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     local totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen)
     YDUserDataSet(
         nil,
@@ -176,10 +180,10 @@ end
 function ____exports.onRegenTimer(self)
     local heroGroup = getPlayerHeroGroup(nil)
     if heroGroup ~= nil then
-        jass:ForGroup(
+        forEachUnitInGroup(
+            nil,
             heroGroup,
-            function()
-                local unit = jass:GetEnumUnit()
+            function(____, unit)
                 if unit ~= nil then
                     ____exports.processPlayerHeroRegen(nil, unit)
                 end
@@ -188,10 +192,10 @@ function ____exports.onRegenTimer(self)
     end
     local bossGroup = getBossGroup(nil)
     if bossGroup ~= nil then
-        jass:ForGroup(
+        forEachUnitInGroup(
+            nil,
             bossGroup,
-            function()
-                local unit = jass:GetEnumUnit()
+            function(____, unit)
                 if unit ~= nil then
                     ____exports.processBossRegen(nil, unit)
                 end
@@ -207,8 +211,8 @@ local function registerToCenterTimer(self)
         return
     end
     _registered = true
-    local ____G_5 = _G
-    local onSecond = ____G_5.onSecond
+    local ____G_6 = _G
+    local onSecond = ____G_6.onSecond
     onSecond(nil, ____exports.onRegenTimer)
 end
 registerToCenterTimer(nil)

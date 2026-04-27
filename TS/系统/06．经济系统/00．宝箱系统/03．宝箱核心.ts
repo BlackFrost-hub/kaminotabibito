@@ -13,6 +13,11 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { ceil, forEachSorted } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  ceil: (value: number) => number;
+  forEachSorted: <K extends number | string, V>(map: Map<K, V>, callback: (key: K, value: V) => void) => void;
+};
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
 const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
   String2OrderIdBJ: (orderIdString: string) => number;
@@ -117,7 +122,7 @@ function getProgressBarUnitType(this: void): number {
 
 /** 计算两点角度 */
 function angleBetweenPoints(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG;
 }
 
 /** 显示漂浮文字 */
@@ -260,10 +265,10 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
 
 let _registeredToCenterTimer = false;
 let _tickCounter = 0;
-const CENTER_TIMER_TICKS = Math.ceil(UPDATE_INTERVAL / 0.01);
+const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 
 function updateAllOpening(this: void): void {
-  for (const [unitId, data] of openingMap) {
+  forEachSorted(openingMap, (unitId, data) => {
     const currentOrder = jass.GetUnitCurrentOrder(data.unit);
     const smartOrder = String2OrderIdBJ("smart");
     const attackOrder = String2OrderIdBJ("attack");
@@ -294,7 +299,7 @@ function updateAllOpening(this: void): void {
         }
     }
       cleanupOpening(data, !completed && interrupted);
-      continue;
+      return;
     }
 
     data.elapsed += UPDATE_INTERVAL;
@@ -305,9 +310,9 @@ function updateAllOpening(this: void): void {
       jass.SetUnitX(data.progressBar, unitX);
       jass.SetUnitY(data.progressBar, unitY);
     }
-  }
+  });
 
-  for (const [unitId, data] of movingMap) {
+  forEachSorted(movingMap, (unitId, data) => {
     const currentOrder = jass.GetUnitCurrentOrder(data.unit);
     const moveOrder = String2OrderIdBJ("move");
 
@@ -324,7 +329,7 @@ function updateAllOpening(this: void): void {
       }
       movingMap.delete(unitId);
     }
-  }
+  });
 }
 
 function ensureRegisteredToCenterTimer(this: void): void {

@@ -1,7 +1,7 @@
 // equip_system.ts
 /** 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true */
 // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP === undefined) (globalThis as any).DEBUG_EQUIP_SKIP_DROP = true;
-const jass = require("jass.common") as JassCommon;
+const jass = require("jass.common") as any;
 const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (callback: (unit: any, item: any) => void) => number;
   onItemDrop: (callback: (unit: any, item: any) => void) => number;
@@ -226,7 +226,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     const num = Number(val);
     const isPct = percentNames.indexOf(statName) >= 0;
     const nearZero = num > -1e-6 && num < 1e-6;
-    const valStr = isPct ? (nearZero ? "0%" : tostring(math.floor(num * 1000 + 0.5) / 10) + "%") : (nearZero ? "0" : tostring(num));
+      const valStr = isPct ? (nearZero ? "0%" : tostring(jass.R2I(num * 1000 + 0.5) / 10) + "%") : (nearZero ? "0" : tostring(num));
     test5Parts.push(statName + "为：" + valStr);
   }
   // 仅当本次操作的装备带移速时才在「当前装备加成」里显示移速，且 DROP 时排除被丢物品再算

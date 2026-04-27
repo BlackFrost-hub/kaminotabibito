@@ -5,13 +5,13 @@ local jass = require("jass.common")
 -- 对应JASS: GetEntireMapRect
 -- 实现: return GetWorldBounds()
 function ____exports.GetEntireMapRect(self)
-    return jass:GetWorldBounds()
+    return jass.GetWorldBounds()
 end
 function ____exports.RectContainsCoords(self, r, x, y)
     if not r then
         return false
     end
-    return jass:GetRectMinX(r) <= x and x <= jass:GetRectMaxX(r) and jass:GetRectMinY(r) <= y and y <= jass:GetRectMaxY(r)
+    return jass.GetRectMinX(r) <= x and x <= jass.GetRectMaxX(r) and jass.GetRectMinY(r) <= y and y <= jass.GetRectMaxY(r)
 end
 function ____exports.RectContainsLoc(self, r, loc)
     if not r or not loc then
@@ -20,8 +20,8 @@ function ____exports.RectContainsLoc(self, r, loc)
     return ____exports.RectContainsCoords(
         nil,
         r,
-        jass:GetLocationX(loc),
-        jass:GetLocationY(loc)
+        jass.GetLocationX(loc),
+        jass.GetLocationY(loc)
     )
 end
 function ____exports.RectContainsUnit(self, r, whichUnit)
@@ -31,26 +31,26 @@ function ____exports.RectContainsUnit(self, r, whichUnit)
     return ____exports.RectContainsCoords(
         nil,
         r,
-        jass:GetUnitX(whichUnit),
-        jass:GetUnitY(whichUnit)
+        jass.GetUnitX(whichUnit),
+        jass.GetUnitY(whichUnit)
     )
 end
 function ____exports.SetStackedSoundBJ(self, add, soundHandle, r)
     if not soundHandle or not r then
         return
     end
-    local width = jass:GetRectMaxX(r) - jass:GetRectMinX(r)
-    local height = jass:GetRectMaxY(r) - jass:GetRectMinY(r)
-    jass:SetSoundPosition(
+    local width = jass.GetRectMaxX(r) - jass.GetRectMinX(r)
+    local height = jass.GetRectMaxY(r) - jass.GetRectMinY(r)
+    jass.SetSoundPosition(
         soundHandle,
-        jass:GetRectCenterX(r),
-        jass:GetRectCenterY(r),
+        jass.GetRectCenterX(r),
+        jass.GetRectCenterY(r),
         0
     )
     if add then
-        jass:RegisterStackedSound(soundHandle, true, width, height)
+        jass.RegisterStackedSound(soundHandle, true, width, height)
     else
-        jass:UnregisterStackedSound(soundHandle, true, width, height)
+        jass.UnregisterStackedSound(soundHandle, true, width, height)
     end
 end
 return ____exports

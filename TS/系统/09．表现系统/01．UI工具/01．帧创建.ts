@@ -2,6 +2,32 @@ const japi = require("jass.japi") as any;
 
 import { FrameConfig, FrameType, TryCreateFromFdfOptions } from "./00．类型定义";
 
+let __safeFrame = 0;
+let __safeVisible = false;
+let __safeAlpha = 0;
+let __safeLevel = 0;
+let __safeTocPath = "";
+
+function __safeShowFramePcallBody(): void {
+  japi.DzFrameShow(__safeFrame, __safeVisible);
+}
+
+function __safeSetEnableFalsePcallBody(): void {
+  japi.DzFrameSetEnable(__safeFrame, false);
+}
+
+function __safeSetAlphaPcallBody(): void {
+  japi.DzFrameSetAlpha(__safeFrame, __safeAlpha);
+}
+
+function __safeSetLevelPcallBody(): void {
+  japi.DzFrameSetPriority(__safeFrame, __safeLevel);
+}
+
+function __safeLoadTocPcallBody(): void {
+  japi.DzLoadToc(__safeTocPath);
+}
+
 // ========== 虚拟分区：基础创建 ==========
 export function createFrame(config: FrameConfig): number | null {
   const { type, name, parent = 0, template = "template", id = 0 } = config;
@@ -12,16 +38,23 @@ export function createFrame(config: FrameConfig): number | null {
   if (frame == null || frame === 0) return null;
 
   if (config.visible !== undefined) {
-    (pcall as any)(() => japi.DzFrameShow(frame, config.visible));
+    __safeFrame = frame;
+    __safeVisible = config.visible;
+    pcall(__safeShowFramePcallBody);
   }
   if (config.enable === false) {
-    (pcall as any)(() => japi.DzFrameSetEnable(frame, false));
+    __safeFrame = frame;
+    pcall(__safeSetEnableFalsePcallBody);
   }
   if (config.alpha !== undefined) {
-    (pcall as any)(() => japi.DzFrameSetAlpha(frame, config.alpha));
+    __safeFrame = frame;
+    __safeAlpha = config.alpha;
+    pcall(__safeSetAlphaPcallBody);
   }
   if (config.level !== undefined) {
-    (pcall as any)(() => japi.DzFrameSetLevel(frame, config.level));
+    __safeFrame = frame;
+    __safeLevel = config.level;
+    pcall(__safeSetLevelPcallBody);
   }
 
   return frame;
@@ -39,7 +72,8 @@ export function loadTocOnce(
   __tocLoadedOnce[tocLoadKey] = true;
 
   for (const p of tocPaths) {
-    const ok = (pcall as any)(() => japi.DzLoadToc(p));
+    __safeTocPath = p;
+    const ok = pcall(__safeLoadTocPcallBody);
     if (!ok) {
       const pr = (globalThis as any).print;
       pr("[" + debugPrefix + "] DzLoadToc fail: " + p);
@@ -72,4 +106,3 @@ export function tryCreateFromFdfSafe(
   if (ok && f != null && f !== 0) return f;
   return fallback();
 }
-

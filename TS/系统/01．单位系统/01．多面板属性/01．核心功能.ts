@@ -6,6 +6,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 import {
   MULTIBOARD_SYSTEM_ENABLED,
@@ -24,6 +28,9 @@ const { getGameTimeFormatted, getGameDifficulty, onTick10ms } = globalThis as un
 const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSet: (tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
 
 // ==========================================================================================
@@ -90,13 +97,13 @@ function getPlayerAttr(playerId: number, attrName: string): number {
 
 /** 格式化百分比 */
 function formatPercent(value: number): string {
-  const pct = Math.floor(value * 100 + 0.5);
+  const pct = jass.R2I(value * 100 + 0.5);
   return pct.toString() + "%";
 }
 
 /** 格式化数值 */
 function formatNumber(value: number): string {
-  return Math.floor(value + 0.5).toString();
+  return jass.R2I(value + 0.5).toString();
 }
 
 /** 格式化实数（保留小数） */
@@ -271,8 +278,7 @@ function updatePlayerSpeed(playerId: number): void {
   const player = jass.Player(playerId - 1);  // 0-based 索引
   let foundUnit: any = null;
 
-  jass.ForGroup(heroGroup, () => {
-    const u = jass.GetEnumUnit();
+  forEachUnitInGroup(heroGroup, (u) => {
     if (u != null && jass.GetOwningPlayer(u) === player) {
       foundUnit = u;
     }
@@ -450,10 +456,14 @@ function delayedInit(): void {
 // 延迟初始化：游戏开始后1秒执行（等待玩家进入游戏）
 if (MULTIBOARD_SYSTEM_ENABLED) {
   const initTimer = jass.CreateTimer();
-  jass.TimerStart(initTimer, 2.0, false, () => {
+  if (!initTimer) {
     delayedInit();
-    jass.DestroyTimer(initTimer);
-  });
+  } else {
+    safeTimerStart(initTimer, 2.0, false, () => {
+      delayedInit();
+      safeDestroyTimer(initTimer);
+    });
+  }
 }
 
 export {};

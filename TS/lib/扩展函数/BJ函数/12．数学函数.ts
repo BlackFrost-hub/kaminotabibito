@@ -1,17 +1,21 @@
 const jass = require("jass.common") as any;
 
+const DEFAULT_BJ_PI = 3.141592653589793;
+const DEFAULT_BJ_RADTODEG = 180 / DEFAULT_BJ_PI;
+const DEFAULT_BJ_DEGTORAD = DEFAULT_BJ_PI / 180;
+
 // ===========================================================================
 // 数学常量（本地使用，不从 00．BJ全局兜底.ts 导入以避免循环依赖）
 // ===========================================================================
 
 /** 与 Blizzard.j `bj_PI` 对齐的工程常量 */
-const BJ_PI = Math.PI;
+const BJ_PI = DEFAULT_BJ_PI;
 
 /** 弧度 → 角度乘数（Blizzard.j `bj_RADTODEG` = 180/bj_PI） */
-const BJ_RADTODEG = 180 / Math.PI;
+const BJ_RADTODEG = DEFAULT_BJ_RADTODEG;
 
 /** 角度 → 弧度乘数（Blizzard.j `bj_DEGTORAD` = bj_PI/180） */
-const BJ_DEGTORAD = Math.PI / 180;
+const BJ_DEGTORAD = DEFAULT_BJ_DEGTORAD;
 
 // ===========================================================================
 // 三角函数（角度版本）
@@ -20,32 +24,33 @@ const BJ_DEGTORAD = Math.PI / 180;
 
 /** 余弦（角度） */
 export function CosBJ(degrees: number): number {
-  return Math.cos(degrees * BJ_DEGTORAD);
+  return jass.Cos(degrees * BJ_DEGTORAD);
 }
 
 /** 正弦（角度） */
 export function SinBJ(degrees: number): number {
-  return Math.sin(degrees * BJ_DEGTORAD);
+  return jass.Sin(degrees * BJ_DEGTORAD);
 }
 
 /** 正切（角度） */
 export function TanBJ(degrees: number): number {
-  return Math.tan(degrees * BJ_DEGTORAD);
+  const rad = degrees * BJ_DEGTORAD;
+  return jass.Sin(rad) / jass.Cos(rad);
 }
 
 /** 反余弦（返回角度） */
 export function AcosBJ(value: number): number {
-  return Math.acos(value) * BJ_RADTODEG;
+  return jass.Acos(value) * BJ_RADTODEG;
 }
 
 /** 反正弦（返回角度） */
 export function AsinBJ(value: number): number {
-  return Math.asin(value) * BJ_RADTODEG;
+  return jass.Asin(value) * BJ_RADTODEG;
 }
 
 /** 反正切（返回角度） */
 export function AtanBJ(value: number): number {
-  return Math.atan(value) * BJ_RADTODEG;
+  return jass.Atan(value) * BJ_RADTODEG;
 }
 
 /** 反正切2（返回角度） */
@@ -59,7 +64,7 @@ export function Atan2BJ(y: number, x: number): number {
 
 /** 实数绝对值 - RAbsBJ */
 export function RAbsBJ(a: number): number {
-  return Math.abs(a);
+  return a < 0 ? -a : a;
 }
 
 /** 实数符号 - RSignBJ（返回 ±1） */
@@ -69,12 +74,13 @@ export function RSignBJ(a: number): number {
 
 /** 整数绝对值 - IAbsBJ */
 export function IAbsBJ(a: number): number {
-  return Math.abs(Math.floor(a));
+  const ia = jass.R2I(a);
+  return ia < 0 ? -ia : ia;
 }
 
 /** 整数符号 - ISignBJ（返回 ±1） */
 export function ISignBJ(a: number): number {
-  const ia = Math.floor(a);
+  const ia = jass.R2I(a);
   return ia < 0 ? -1 : (ia > 0 ? 1 : 0);
 }
 
@@ -84,7 +90,7 @@ export function ISignBJ(a: number): number {
 
 /** 随机百分比 (0-100) - GetRandomPercentageBJ */
 export function GetRandomPercentageBJ(): number {
-  return Math.random() * 100;
+  return jass.GetRandomReal(0, 100);
 }
 
 // ===========================================================================
@@ -93,9 +99,9 @@ export function GetRandomPercentageBJ(): number {
 
 /** 整数取模 - ModuloInteger */
 export function ModuloInteger(dividend: number, divisor: number): number {
-  const d = Math.floor(divisor);
+  const d = jass.R2I(divisor);
   if (d === 0) return 0;
-  return Math.floor(dividend) % d;
+  return jass.R2I(dividend) % d;
 }
 
 /** 实数取模 - ModuloReal */
@@ -127,7 +133,7 @@ export function DistanceBetweenPoints(locA: any, locB: any): number {
   if (locA == null || locB == null) return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
-  return Math.sqrt(dx * dx + dy * dy);
+  return jass.SquareRoot(dx * dx + dy * dy);
 }
 
 // ===========================================================================

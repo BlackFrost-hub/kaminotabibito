@@ -111,7 +111,7 @@ function goldGainCallback(params: { unit: any; player: any; baseGold: number; is
   let finalGold = baseGold;
 
   if (goldRate >= GOLD_RATE_THRESHOLD) {
-    finalGold = Math.floor(baseGold * (1 + goldRate));
+    finalGold = jass.R2I(baseGold * (1 + goldRate));
   }
 
   // 给予金币

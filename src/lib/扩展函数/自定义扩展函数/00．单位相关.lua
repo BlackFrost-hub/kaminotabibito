@@ -2,10 +2,16 @@
 local ____exports = {}
 local ____01_FF0EYDUserData_517C_5BB9 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____01_FF0EYDUserData_517C_5BB9.YDUserDataGet
-local ____07_FF0E_6742_9879 = require("lib.扩展函数.BJ函数.07．杂项")
-local ForGroupBJ = ____07_FF0E_6742_9879.ForGroupBJ
+local ____04_FF0E_5355_4F4D_5DE5_5177 = require("lib.扩展函数.封装函数.01．通用工具.04．单位工具")
+local forEachUnitInGroup = ____04_FF0E_5355_4F4D_5DE5_5177.forEachUnitInGroup
 --- 单位相关扩展函数
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
+local ____jglobals_bj_RADTODEG_0 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_0 == nil then
+    ____jglobals_bj_RADTODEG_0 = 57.29577951308232
+end
+local BJ_RADTODEG = ____jglobals_bj_RADTODEG_0
 --- 创建单位并设置尺寸和角度
 -- 
 -- @param playerId 玩家ID (0-15)
@@ -33,8 +39,8 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     if unitTypeId == nil then
         return nil
     end
-    local unit = jass:CreateUnit(
-        jass:Player(playerId),
+    local unit = jass.CreateUnit(
+        jass.Player(playerId),
         unitTypeId,
         x,
         y,
@@ -44,12 +50,12 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
         return nil
     end
     if facing ~= nil then
-        jass:SetUnitFacing(unit, facing * 180 / math.pi)
+        jass.SetUnitFacing(unit, facing * BJ_RADTODEG)
     end
     local scaleX = scale or 1
     local scaleY2 = scaleY or 1
     local scaleZ2 = scaleZ or 1
-    jass:SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
+    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
     return unit
 end
 --- 获取玩家的第一个英雄
@@ -71,16 +77,15 @@ function ____exports.getPlayerFirstHero(self, player)
         return nil
     end
     local hero = nil
-    ForGroupBJ(
+    forEachUnitInGroup(
         nil,
         heroGroup,
-        function()
-            local u = jass:GetEnumUnit()
+        function(____, u)
             if hero ~= nil then
                 return
             end
-            if jass:GetOwningPlayer(u) == player then
-                if jass:IsUnitType(u, jass.UNIT_TYPE_HERO) then
+            if jass.GetOwningPlayer(u) == player then
+                if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
                     hero = u
                 end
             end

@@ -12,6 +12,11 @@ local ____exports = {}
 --   GS_LoadSuspend(u)            - 获取单位剩余暂停时间
 --   GS_UnitSuspend(u, i, r)      - 修改暂停时间（0=增加，1=减少，2=取最大值）
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+local RMaxBJ = ____require_result_0.RMaxBJ
+local ____require_result_1 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_1.safeTimerStart
+local safeDestroyTimer = ____require_result_1.safeDestroyTimer
 local japi = nil
 do
     local function ____catch(_e)
@@ -24,9 +29,9 @@ do
         ____catch(____hasReturned)
     end
 end
-local HS_S = jass:InitHashtable()
+local HS_S = jass.InitHashtable()
 local function hid(self, h)
-    return jass:GetHandleId(h) or 0
+    return jass.GetHandleId(h) or 0
 end
 --- 暂停单位一段时间
 -- 若单位已在暂停中，会重置暂停时间
@@ -38,52 +43,53 @@ function ____exports.GS_Suspend(self, u, time)
         return
     end
     local uid = hid(nil, u)
-    local T = jass:LoadTimerHandle(HS_S, uid, 1)
-    local ____temp_0
+    local T = jass.LoadTimerHandle(HS_S, uid, 1)
+    local ____temp_2
     if T ~= nil then
-        ____temp_0 = jass:TimerGetRemaining(T)
+        ____temp_2 = jass.TimerGetRemaining(T)
     else
-        ____temp_0 = 0
+        ____temp_2 = 0
     end
-    local remaining = ____temp_0
+    local remaining = ____temp_2
     if T == nil or remaining == 0 then
-        T = jass:CreateTimer()
+        T = jass.CreateTimer()
         if T == nil then
             return
         end
         if japi ~= nil then
-            japi:EXPauseUnit(u, true)
+            japi.EXPauseUnit(u, true)
         end
-        jass:SaveUnitHandle(
+        jass.SaveUnitHandle(
             HS_S,
             hid(nil, T),
             1,
             u
         )
-        jass:SaveTimerHandle(HS_S, uid, 1, T)
+        jass.SaveTimerHandle(HS_S, uid, 1, T)
     end
     local timerRef = T
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         timerRef,
         time,
         false,
         function()
-            local expiredTimer = jass:GetExpiredTimer()
+            local expiredTimer = jass.GetExpiredTimer()
             local tid = hid(nil, expiredTimer)
-            local savedUnit = jass:LoadUnitHandle(HS_S, tid, 1)
+            local savedUnit = jass.LoadUnitHandle(HS_S, tid, 1)
             if savedUnit ~= nil and savedUnit ~= 0 then
                 if japi ~= nil then
-                    japi:EXPauseUnit(savedUnit, false)
+                    japi.EXPauseUnit(savedUnit, false)
                 end
             end
-            jass:FlushChildHashtable(HS_S, tid)
+            jass.FlushChildHashtable(HS_S, tid)
             if savedUnit ~= nil and savedUnit ~= 0 then
-                jass:FlushChildHashtable(
+                jass.FlushChildHashtable(
                     HS_S,
                     hid(nil, savedUnit)
                 )
             end
-            jass:DestroyTimer(expiredTimer)
+            safeDestroyTimer(nil, expiredTimer)
         end
     )
 end
@@ -95,7 +101,7 @@ function ____exports.GS_IsUnitSuspending(self, u)
     if u == nil or u == 0 then
         return false
     end
-    local T = jass:LoadTimerHandle(
+    local T = jass.LoadTimerHandle(
         HS_S,
         hid(nil, u),
         1
@@ -103,7 +109,7 @@ function ____exports.GS_IsUnitSuspending(self, u)
     if T == nil then
         return false
     end
-    local remaining = jass:TimerGetRemaining(T)
+    local remaining = jass.TimerGetRemaining(T)
     return remaining ~= 0
 end
 --- 获取单位剩余暂停时间
@@ -114,7 +120,7 @@ function ____exports.GS_LoadSuspend(self, u)
     if u == nil or u == 0 then
         return 0
     end
-    local T = jass:LoadTimerHandle(
+    local T = jass.LoadTimerHandle(
         HS_S,
         hid(nil, u),
         1
@@ -122,7 +128,7 @@ function ____exports.GS_LoadSuspend(self, u)
     if T == nil then
         return 0
     end
-    local remaining = jass:TimerGetRemaining(T)
+    local remaining = jass.TimerGetRemaining(T)
     return remaining or 0
 end
 --- 修改单位暂停时间
@@ -141,13 +147,13 @@ function ____exports.GS_UnitSuspend(self, u, i, r)
         ____exports.GS_Suspend(
             nil,
             u,
-            math.max(0, currentRemain - r)
+            RMaxBJ(nil, 0, currentRemain - r)
         )
     elseif i == 2 then
         ____exports.GS_Suspend(
             nil,
             u,
-            math.max(currentRemain, r)
+            RMaxBJ(nil, currentRemain, r)
         )
     end
 end

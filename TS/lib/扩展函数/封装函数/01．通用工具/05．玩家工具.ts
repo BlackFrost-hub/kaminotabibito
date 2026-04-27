@@ -5,7 +5,7 @@
 
 const jass = require("jass.common") as any;
 
-const SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav";
+const SOUND_GOLD = "Abilities\\\\Spells\\\\Items\\\\ResourceItems\\\\ReceiveGold.wav";
 
 /**
  * 调整玩家状态（如金币、木材），在原有基础上增加 delta。
@@ -78,5 +78,28 @@ export function printToPlayer(player: any, msg: string, duration: number = 6): v
 export function printToPlayers(players: any[], msg: string, duration: number = 6): void {
   for (const p of players) {
     printToPlayer(p, msg, duration);
+  }
+}
+
+/**
+ * 获取本地玩家，并进行有效性检查（非 null 且非 0）
+ * @returns 本地玩家句柄，如果无效则返回 null
+ */
+export function getLocalPlayerOrNull(): any {
+  const lp = jass.GetLocalPlayer();
+  if (lp == null || lp === 0) return null;
+  return lp;
+}
+
+/**
+ * 遍历所有玩家并执行回调函数
+ * @param action 回调函数，参数为玩家句柄和玩家ID
+ * @param maxPlayers 最大玩家数，默认为12（玩家0-11）
+ */
+export function forEachPlayingPlayer(action: (player: any, playerId: number) => void, maxPlayers: number = 12): void {
+  for (let i = 0; i < maxPlayers; i++) {
+    const p = jass.Player(i);
+    if (!p || p === 0) continue;
+    action(p, i);
   }
 }

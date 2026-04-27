@@ -3,6 +3,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 import { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } from "./01．镜头震动";
 
 // 震动时长封装（内部使用计时器）
@@ -12,13 +16,13 @@ export function CameraShakeForPlayer(whichPlayer: any, magnitude: number, durati
   CameraSetEQNoiseForPlayer(whichPlayer, magnitude);
   const existing = cameraTimers.get(whichPlayer);
   if (existing) {
-    (jass as any).DestroyTimer(existing);
+    safeDestroyTimer(existing);
   }
   const t = (jass as any).CreateTimer();
   cameraTimers.set(whichPlayer, t);
-  (jass as any).TimerStart(t, duration, false, () => {
+  safeTimerStart(t, duration, false, () => {
     CameraClearNoiseForPlayer(whichPlayer);
     cameraTimers.delete(whichPlayer);
-    (jass as any).DestroyTimer(t);
+    safeDestroyTimer(t);
   });
 }

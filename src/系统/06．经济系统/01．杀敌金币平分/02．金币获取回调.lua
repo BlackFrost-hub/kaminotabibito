@@ -48,13 +48,13 @@ local function fireStesEvent(unit, gold)
     if not ht then
         return
     end
-    local hash = jass:StringHash(EVENT_VALUE_DISPLAY)
-    local skeyIndex = jass:StringHash("index")
-    local count = jass:LoadInteger(ht, hash, skeyIndex)
+    local hash = jass.StringHash(EVENT_VALUE_DISPLAY)
+    local skeyIndex = jass.StringHash("index")
+    local count = jass.LoadInteger(ht, hash, skeyIndex)
     do
         local i = 0
         while i < count do
-            local trg = jass:LoadTriggerHandle(ht, hash, i)
+            local trg = jass.LoadTriggerHandle(ht, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -89,7 +89,7 @@ local function goldGainCallback(params)
     local goldRate = getPlayerGoldRate(player)
     local finalGold = baseGold
     if goldRate >= GOLD_RATE_THRESHOLD then
-        finalGold = math.floor(baseGold * (1 + goldRate))
+        finalGold = jass.R2I(baseGold * (1 + goldRate))
     end
     AdjustPlayerStateBJ(nil, finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD)
     fireStesEvent(unit, finalGold)

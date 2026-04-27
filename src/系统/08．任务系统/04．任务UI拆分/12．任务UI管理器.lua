@@ -3,7 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local taskUIInitPcallBody, taskUITogglePanelPcallBody, taskUIHotkeyTogglePanel, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, pcallInitTarget, __togglePanelTriggerPlayer
+local getTaskUIByPlayerId, taskUIInitPcallBody, taskUITogglePanelPcallBody, taskUIHotkeyTogglePanel, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, pcallInitTarget, __togglePanelTriggerPlayer
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.09．任务UI列表控制")
@@ -62,6 +62,12 @@ local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04�
 local ENABLE_TASK_UI_CLIENT = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_CLIENT
 local MAX_PLAYERS = ____01_FF0E_4EFB_52A1UI_5E38_91CF.MAX_PLAYERS
 local TAG_SLOT_OFFSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.TAG_SLOT_OFFSET
+function getTaskUIByPlayerId(playerId)
+    if type(playerId) ~= "number" or playerId < 0 or playerId >= MAX_PLAYERS then
+        return nil
+    end
+    return taskUIs[playerId]
+end
 function taskUIInitPcallBody(self)
     if pcallInitTarget ~= nil then
         pcallInitTarget:runInitBodyInPcall()
@@ -69,39 +75,37 @@ function taskUIInitPcallBody(self)
 end
 function taskUITogglePanelPcallBody(self)
     local player = __togglePanelTriggerPlayer
-    local ____temp_13
+    local ____temp_10
     if player ~= nil and player ~= 0 then
-        ____temp_13 = jass:GetPlayerId(player)
+        ____temp_10 = jass.GetPlayerId(player)
     else
-        ____temp_13 = -1
+        ____temp_10 = -1
     end
-    local pid = ____temp_13
-    if pid >= 0 and pid < #taskUIs then
-        local ____opt_14 = taskUIs[pid]
-        if ____opt_14 ~= nil then
-            ____opt_14:togglePanelSync(player)
-        end
+    local pid = ____temp_10
+    local ui = getTaskUIByPlayerId(pid)
+    if ui then
+        ui:togglePanelSync(player)
     end
 end
-function taskUIHotkeyTogglePanel(self, player)
+function taskUIHotkeyTogglePanel(player)
     __togglePanelTriggerPlayer = player
     pcall(taskUITogglePanelPcallBody)
 end
 function onQuestManagerUiRefresh(self, _playerId, _questId)
     do
         local i = 0
-        while i < #taskUIs do
+        while i < MAX_PLAYERS do
             do
-                local ui = taskUIs[i + 1]
+                local ui = taskUIs[i]
                 if ui == nil or not ui.uiInitialized then
-                    goto __continue100
+                    goto __continue115
                 end
                 ui.pagesDirty = true
                 if ui.isVisible then
                     ui:rebuildPages()
                 end
             end
-            ::__continue100::
+            ::__continue115::
             i = i + 1
         end
     end
@@ -125,7 +129,7 @@ refreshCallbackRegistered = false
 local function getTriggerPlayerId(self)
     local ____temp_0
     if japi.DzGetTriggerKeyPlayer ~= nil then
-        ____temp_0 = japi:DzGetTriggerKeyPlayer()
+        ____temp_0 = japi.DzGetTriggerKeyPlayer()
     else
         ____temp_0 = nil
     end
@@ -133,38 +137,59 @@ local function getTriggerPlayerId(self)
     if tp == nil or tp == 0 then
         return -1
     end
-    local pid = jass:GetPlayerId(tp)
+    local pid = jass.GetPlayerId(tp)
     return type(pid) == "number" and pid >= 0 and pid < MAX_PLAYERS and pid or -1
 end
-local function taskUIModulePlayClickSound(self)
-    local lp = jass:GetLocalPlayer()
-    local pid = jass:GetPlayerId(lp)
-    if pid >= 0 and pid < #taskUIs then
-        local ____opt_1 = taskUIs[pid]
-        if ____opt_1 ~= nil then
-            ____opt_1:playLocalClickSound()
-        end
+local function taskUIModulePlayClickSound()
+    local lp = jass.GetLocalPlayer()
+    local pid = jass.GetPlayerId(lp)
+    local ____temp_1
+    if pid >= 0 and pid < MAX_PLAYERS then
+        ____temp_1 = taskUIs[pid]
+    else
+        ____temp_1 = nil
+    end
+    local ui = ____temp_1
+    if ui then
+        ui:playLocalClickSound()
     end
 end
-local function taskUIModuleRowExpand(self, questId)
+local function taskUIModuleRowExpand(rowIndex)
     local pid = getTriggerPlayerId(nil)
-    if pid >= 0 and pid < #taskUIs then
-        local ____opt_3 = taskUIs[pid + 1]
-        if ____opt_3 ~= nil then
-            ____opt_3:toggleExpandForRow(questId)
-        end
+    local ____temp_2
+    if pid >= 0 and pid < MAX_PLAYERS then
+        ____temp_2 = taskUIs[pid]
+    else
+        ____temp_2 = nil
+    end
+    local ui = ____temp_2
+    if ui then
+        ui:toggleExpandForVisibleRow(rowIndex)
     end
 end
-local function taskUIModuleSwitchCategory(self, ____type)
+local function taskUIModuleSwitchCategory(____type)
     local pid = getTriggerPlayerId(nil)
-    if pid >= 0 and pid < #taskUIs then
-        local ____opt_5 = taskUIs[pid + 1]
-        if ____opt_5 ~= nil then
-            ____opt_5:switchCategory(____type)
-        end
+    local ____temp_3
+    if pid >= 0 and pid < MAX_PLAYERS then
+        ____temp_3 = taskUIs[pid]
+    else
+        ____temp_3 = nil
+    end
+    local ui = ____temp_3
+    if ui then
+        ui:switchCategory(____type)
     end
 end
-local function taskUIModuleNoopTabTooltip(self, _msg)
+local function taskUIModuleNoopTabTooltip(_msg)
+end
+local function getTriggerPlayerOrLocal()
+    if japi.DzGetTriggerKeyPlayer ~= nil then
+        return japi.DzGetTriggerKeyPlayer()
+    end
+    return jass.GetLocalPlayer()
+end
+local function taskUIEntryClick()
+    taskUIHotkeyTogglePanel(getTriggerPlayerOrLocal())
 end
 local TaskUI = __TS__Class()
 TaskUI.name = "TaskUI"
@@ -175,7 +200,7 @@ function TaskUI.prototype.____constructor(self, slotId)
     self.scrollBarFrame = nil
     self.scrollThumbFrame = nil
     self.scrollThumbHitBtn = nil
-    self.taskListWheelTrig = nil
+    self.taskListWheelRegistered = false
     self.precreatedListPool = nil
     self.pagesDirty = false
     self.localPlayerId = 0
@@ -196,6 +221,7 @@ function TaskUI.prototype.ensureUiContextCaches(self)
         return
     end
     self.scrollCtxCache = {
+        playerId = self.playerId,
         mainPanel = self.mainPanel,
         listContainer = self.listContainer,
         scrollBarFrame = self.scrollBarFrame,
@@ -203,13 +229,14 @@ function TaskUI.prototype.ensureUiContextCaches(self)
         scrollThumbHitBtn = self.scrollThumbHitBtn,
         FramePoint = FramePoint,
         setFramePointRelative = setFramePointRelative,
-        taskListWheelTrig = self.taskListWheelTrig,
+        taskListWheelRegistered = self.taskListWheelRegistered,
         getMouseFocus = getMouseFocus,
         getWheelDelta = getWheelDelta,
         registerMouseWheel = function(sync, cb, playerId)
             return registerMouseWheelHardware(nil, sync, cb, playerId)
         end,
         isVisible = function() return ____self.isVisible end,
+        isOwnedByLocalPlayer = function() return ____self.localPlayer == jass.GetLocalPlayer() end,
         getCurrentPageCount = function() return ____self:getPageCountForCurrentCategory() end,
         getCurrentPage = function() return ____self.currentPage end,
         setCurrentPage = function(____, p)
@@ -245,8 +272,8 @@ function TaskUI.prototype.ensureUiContextCaches(self)
         updateScrollBarVisibility = function(____, pageCount, hasQuestRows)
             ____self:syncScrollBarVisibility(pageCount, hasQuestRows)
         end,
-        toggleExpand = function(____, questId)
-            ____self:toggleExpandForRow(questId)
+        toggleExpand = function(____, rowIndex)
+            ____self:toggleExpandForVisibleRow(rowIndex)
         end,
         getCurrentPage = function(____, ____type) return ____self:listGetCurrentPage(____type) end,
         setCurrentPage = function(____, ____type, page)
@@ -257,15 +284,35 @@ function TaskUI.prototype.ensureUiContextCaches(self)
 end
 function TaskUI.prototype.init(self, playerId)
     if not ENABLE_TASK_UI_CLIENT then
-        return
+        return false
     end
     if self.uiInitialized then
-        return
+        return true
     end
-    taskUIs[playerId + 1] = self
-    self.localPlayer = jass:Player(playerId)
+    self.localPlayer = jass.Player(playerId)
     self.localPlayerId = playerId
-    pcall(taskUIInitPcallBody)
+    pcallInitTarget = self
+    do
+        local function ____catch(_e)
+            pcallInitTarget = nil
+            return true, false
+        end
+        local ____try, ____hasReturned, ____returnValue = pcall(function()
+            taskUIInitPcallBody(nil)
+        end)
+        if not ____try then
+            ____hasReturned, ____returnValue = ____catch(____hasReturned)
+        end
+        if ____hasReturned then
+            return ____returnValue
+        end
+    end
+    pcallInitTarget = nil
+    if not self.uiInitialized then
+        return false
+    end
+    taskUIs[playerId] = self
+    return true
 end
 function TaskUI.prototype.runInitBodyInPcall(self)
     local gameUI = getGameUI(nil)
@@ -296,7 +343,7 @@ function TaskUI.prototype.createEntryIcon(self, parent)
         setFramePointRelative = setFramePointRelative,
         setFrameClickEvent = setFrameClickEvent,
         applyDzTextFontAndCenterAlignment = applyDzTextFontAndCenterAlignment,
-        onTogglePanel = taskUIHotkeyTogglePanel,
+        onTogglePanel = taskUIEntryClick,
         slotId = self.slotId,
         contextId = self.slotContextId
     })
@@ -339,7 +386,7 @@ function TaskUI.prototype.createListPool(self)
     setTaskRowHandlers(nil, taskUIModuleRowExpand, taskUIModulePlayClickSound)
 end
 function TaskUI.prototype.registerTaskListWheel(self)
-    self.taskListWheelTrig = registerTaskUIListWheel(
+    registerTaskUIListWheel(
         nil,
         self:getScrollContext()
     )
@@ -351,7 +398,7 @@ function TaskUI.prototype.rebuildPages(self)
     )
     self.pagesDirty = false
     if self.isVisible then
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if self.localPlayer ~= nil and self.localPlayer == localPlayer then
             self:showCurrentCategory()
         end
@@ -368,12 +415,27 @@ end
 function TaskUI.prototype.toggleExpandForRow(self, questId)
     self:toggleExpand(questId)
 end
+function TaskUI.prototype.toggleExpandForVisibleRow(self, rowIndex)
+    local ____opt_4 = self.precreatedListPool
+    local categoryView = ____opt_4 and ____opt_4.categories[self.currentCategory]
+    if not categoryView then
+        return
+    end
+    local page = categoryView.pages[self.currentPage + 1]
+    if not page then
+        return
+    end
+    local questId = page.questIds[rowIndex + 1]
+    if not questId then
+        return
+    end
+    self:toggleExpand(questId)
+end
 function TaskUI.prototype.getPageCountForCurrentCategory(self)
     return self:getPageCount(self.currentCategory)
 end
 function TaskUI.prototype.applyScrollPageChanged(self, prev, next)
     self.currentPage = next
-    self.expandedQuestId = nil
     switchPageLocal(
         nil,
         self.precreatedListPool,
@@ -399,13 +461,13 @@ function TaskUI.prototype.listSetCurrentPage(self, ____type, page)
     end
 end
 function TaskUI.prototype.listGetExpandedQuestId(self, ____type)
-    local ____temp_7
+    local ____temp_6
     if ____type == self.currentCategory then
-        ____temp_7 = self.expandedQuestId
+        ____temp_6 = self.expandedQuestId
     else
-        ____temp_7 = nil
+        ____temp_6 = nil
     end
-    return ____temp_7
+    return ____temp_6
 end
 function TaskUI.prototype.getPageCount(self, ____type)
     return getTaskUICategoryPageCount(nil, self.precreatedListPool, ____type)
@@ -442,25 +504,25 @@ function TaskUI.prototype.switchCategoryUI(self, ____type)
 end
 function TaskUI.prototype.switchCategorySync(self, player, ____type)
     self:switchCategoryState(____type)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if player == localPlayer then
         self:switchCategoryUI(____type)
     end
 end
 function TaskUI.prototype.switchCategory(self, ____type)
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     self:switchCategorySync(triggerPlayer, ____type)
 end
 function TaskUI.prototype.toggleExpandSync(self, player, questId)
     local oldExpanded = self.expandedQuestId
-    local ____temp_8
+    local ____temp_7
     if oldExpanded == questId then
-        ____temp_8 = nil
+        ____temp_7 = nil
     else
-        ____temp_8 = questId
+        ____temp_7 = questId
     end
-    self.expandedQuestId = ____temp_8
-    local localPlayer = jass:GetLocalPlayer()
+    self.expandedQuestId = ____temp_7
+    local localPlayer = jass.GetLocalPlayer()
     if player == localPlayer then
         toggleExpandLocal(
             nil,
@@ -473,13 +535,7 @@ function TaskUI.prototype.toggleExpandSync(self, player, questId)
     end
 end
 function TaskUI.prototype.toggleExpand(self, questId)
-    local ____temp_9
-    if japi.DzGetTriggerKeyPlayer ~= nil then
-        ____temp_9 = japi:DzGetTriggerKeyPlayer()
-    else
-        ____temp_9 = jass:GetLocalPlayer()
-    end
-    local triggerPlayer = ____temp_9
+    local triggerPlayer = getTriggerPlayerOrLocal()
     self:toggleExpandSync(triggerPlayer, questId)
 end
 function TaskUI.prototype.changeCurrentPage(self, delta)
@@ -488,10 +544,13 @@ function TaskUI.prototype.changeCurrentPage(self, delta)
         return
     end
     local currentPage = self.currentPage
-    local nextPage = math.max(
-        0,
-        math.min(pageCount - 1, currentPage + delta)
-    )
+    local nextPage = currentPage + delta
+    if nextPage < 0 then
+        nextPage = 0
+    end
+    if nextPage > pageCount - 1 then
+        nextPage = pageCount - 1
+    end
     if nextPage == currentPage then
         return
     end
@@ -508,26 +567,20 @@ end
 function TaskUI.prototype.togglePanelSync(self, player)
     if self.isVisible then
         self:hidePanelState()
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if player == localPlayer then
             self:hidePanelUI()
         end
     else
         self:showPanelState()
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if player == localPlayer then
             self:showPanelUI()
         end
     end
 end
 function TaskUI.prototype.togglePanel(self)
-    local ____temp_10
-    if japi.DzGetTriggerKeyPlayer ~= nil then
-        ____temp_10 = japi:DzGetTriggerKeyPlayer()
-    else
-        ____temp_10 = jass:GetLocalPlayer()
-    end
-    local triggerPlayer = ____temp_10
+    local triggerPlayer = getTriggerPlayerOrLocal()
     self:togglePanelSync(triggerPlayer)
 end
 function TaskUI.prototype.showPanelState(self)
@@ -555,7 +608,7 @@ function TaskUI.prototype.hidePanelUI(self)
         for ____, ct in ipairs({QuestType.MAIN, QuestType.SIDE, QuestType.DAILY}) do
             local cv = self.precreatedListPool.categories[ct]
             if cv ~= nil then
-                japi:DzFrameShow(cv.root, false)
+                japi.DzFrameShow(cv.root, false)
             end
         end
     end
@@ -575,12 +628,13 @@ end
 function TaskUI.prototype.getScrollContext(self)
     self:ensureUiContextCaches()
     local s = self.scrollCtxCache
+    s.playerId = self.playerId
     s.mainPanel = self.mainPanel
     s.listContainer = self.listContainer
     s.scrollBarFrame = self.scrollBarFrame
     s.scrollThumbFrame = self.scrollThumbFrame
     s.scrollThumbHitBtn = self.scrollThumbHitBtn
-    s.taskListWheelTrig = self.taskListWheelTrig
+    s.taskListWheelRegistered = self.taskListWheelRegistered
     return s
 end
 __TS__SetDescriptor(
@@ -601,19 +655,17 @@ __TS__SetDescriptor(
 )
 pcallInitTarget = nil
 __togglePanelTriggerPlayer = nil
-local function taskUIHotkeySwitchCategory(self, player, ____type)
-    local ____temp_16
+local function taskUIHotkeySwitchCategory(player, ____type)
+    local ____temp_11
     if player ~= nil and player ~= 0 then
-        ____temp_16 = jass:GetPlayerId(player)
+        ____temp_11 = jass.GetPlayerId(player)
     else
-        ____temp_16 = -1
+        ____temp_11 = -1
     end
-    local pid = ____temp_16
-    if pid >= 0 and pid < #taskUIs then
-        local ____opt_17 = taskUIs[pid]
-        if ____opt_17 ~= nil then
-            ____opt_17:switchCategorySync(player, ____type)
-        end
+    local pid = ____temp_11
+    local ui = getTaskUIByPlayerId(pid)
+    if ui then
+        ui:switchCategorySync(player, ____type)
     end
 end
 --- 英雄注册回调：当玩家英雄注册时，为该玩家创建一套任务 UI。
@@ -621,22 +673,22 @@ end
 -- 所有客户端对称执行（全局创建），异步显隐。
 function ____exports.onPlayerHeroRegistered(whichPlayer, _whichHero)
     if not ENABLE_TASK_UI_CLIENT then
-        return
+        return false
     end
     if whichPlayer == nil or whichPlayer == 0 then
-        return
+        return false
     end
-    local pid = jass:GetPlayerId(whichPlayer)
+    local pid = jass.GetPlayerId(whichPlayer)
     if type(pid) ~= "number" or pid < 0 or pid >= MAX_PLAYERS then
-        return
+        return false
     end
-    if taskUIs[pid + 1] ~= nil then
-        return
+    local ____opt_12 = taskUIs[pid]
+    if (____opt_12 and ____opt_12.uiInitialized) == true then
+        return true
     end
     local ui = __TS__New(TaskUI, pid)
-    pcallInitTarget = ui
-    ui:init(pid)
-    pcallInitTarget = nil
+    local ok = ui:init(pid)
+    return ok
 end
 --- 热键注册：全局只注册一次
 function ____exports.registerHotkey(self)

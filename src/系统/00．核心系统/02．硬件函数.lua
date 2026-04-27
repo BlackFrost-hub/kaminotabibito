@@ -76,37 +76,37 @@ function ____exports.isHardwareAPIAvailable(self)
     return true
 end
 function ____exports.getMouseTerrainX(self)
-    return japi:DzGetMouseTerrainX()
+    return japi.DzGetMouseTerrainX()
 end
 function ____exports.getMouseTerrainY(self)
-    return japi:DzGetMouseTerrainY()
+    return japi.DzGetMouseTerrainY()
 end
 function ____exports.getMouseTerrainZ(self)
-    return japi:DzGetMouseTerrainZ()
+    return japi.DzGetMouseTerrainZ()
 end
 function ____exports.isMouseOverUI(self)
-    return not not japi:DzIsMouseOverUI()
+    return not not japi.DzIsMouseOverUI()
 end
 function ____exports.getMouseX(self)
-    return japi:DzGetMouseX()
+    return japi.DzGetMouseX()
 end
 function ____exports.getMouseY(self)
-    return japi:DzGetMouseY()
+    return japi.DzGetMouseY()
 end
 function ____exports.getMouseXRelative(self)
-    return japi:DzGetMouseXRelative()
+    return japi.DzGetMouseXRelative()
 end
 function ____exports.getMouseYRelative(self)
-    return japi:DzGetMouseYRelative()
+    return japi.DzGetMouseYRelative()
 end
 function ____exports.setMousePos(self, x, y)
-    japi:DzSetMousePos(x, y)
+    japi.DzSetMousePos(x, y)
 end
 function ____exports.isKeyDown(self, keyCode)
-    return not not japi:DzIsKeyDown(keyCode)
+    return not not japi.DzIsKeyDown(keyCode)
 end
 local function createTriggerOrNull(self)
-    return jass:CreateTrigger()
+    return jass.CreateTrigger()
 end
 local function keyCodeToTrgChar(self, keyCode)
     if string and type(string.char) == "function" and keyCode >= 1 and keyCode <= 255 then
@@ -115,7 +115,7 @@ local function keyCodeToTrgChar(self, keyCode)
                 return true, ""
             end
             local ____try, ____hasReturned, ____returnValue = pcall(function()
-                return true, string:char(keyCode)
+                return true, string.char(keyCode)
             end)
             if not ____try then
                 ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -165,7 +165,7 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
     runFalseLocalRegistration(
         nil,
         function()
-            japi:DzTriggerRegisterKeyEventByCode(
+            japi.DzTriggerRegisterKeyEventByCode(
                 trig,
                 keyCode,
                 status,
@@ -183,7 +183,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action,
     end
     if sync then
         registerKeyBindToTrigger(nil, trig, status, keyCode)
-        jass:TriggerAddAction(trig, action)
+        jass.TriggerAddAction(trig, action)
     else
         registerKeyBindToTriggerLocal(
             nil,
@@ -205,8 +205,8 @@ function ____exports.registerKeyDown(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -221,8 +221,8 @@ function ____exports.registerKeyUp(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -239,13 +239,13 @@ function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, acti
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
-    return japi:DzGetTriggerKeyPlayer()
+    return japi.DzGetTriggerKeyPlayer()
 end
 function ____exports.getTriggerKey(self)
-    return japi:DzGetTriggerKey()
+    return japi.DzGetTriggerKey()
 end
 function ____exports.getWheelDelta(self)
-    return japi:DzGetWheelDelta()
+    return japi.DzGetWheelDelta()
 end
 function ____exports.registerMouseWheel(self, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
@@ -253,12 +253,12 @@ function ____exports.registerMouseWheel(self, sync, action, playerId)
         return nil
     end
     if sync then
-        japi:DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
+        japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
     else
         runFalseLocalRegistration(
             nil,
             function()
-                japi:DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
+                japi.DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
             end,
             playerId
         )
@@ -266,38 +266,38 @@ function ____exports.registerMouseWheel(self, sync, action, playerId)
     return trig
 end
 function ____exports.getWindowWidth(self)
-    return japi:DzGetWindowWidth()
+    return japi.DzGetWindowWidth()
 end
 function ____exports.getWindowHeight(self)
-    return japi:DzGetWindowHeight()
+    return japi.DzGetWindowHeight()
 end
 function ____exports.getWindowX(self)
-    return japi:DzGetWindowX()
+    return japi.DzGetWindowX()
 end
 function ____exports.getWindowY(self)
-    return japi:DzGetWindowY()
+    return japi.DzGetWindowY()
 end
 function ____exports.isWindowActive(self)
-    return not not japi:DzIsWindowActive()
+    return not not japi.DzIsWindowActive()
 end
 function ____exports.getGameUI(self)
-    return japi:DzGetGameUI()
+    return japi.DzGetGameUI()
 end
 function ____exports.frameFindByName(self, name, id)
-    return japi:DzFrameFindByName(name, id)
+    return japi.DzFrameFindByName(name, id)
 end
 function ____exports.getMouseFocus(self)
-    return japi:DzGetMouseFocus()
+    return japi.DzGetMouseFocus()
 end
 function ____exports.frameSetScriptByCode(self, frame, eventId, action, sync, playerId)
     if sync then
-        japi:DzFrameSetScriptByCode(frame, eventId, action, true)
+        japi.DzFrameSetScriptByCode(frame, eventId, action, true)
         return
     end
     runFalseLocalRegistration(
         nil,
         function()
-            japi:DzFrameSetScriptByCode(frame, eventId, action, false)
+            japi.DzFrameSetScriptByCode(frame, eventId, action, false)
         end,
         playerId
     )

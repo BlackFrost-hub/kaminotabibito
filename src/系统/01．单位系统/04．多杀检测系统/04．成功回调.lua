@@ -23,7 +23,7 @@ function ____exports.onMultiKillSuccess(self, instance)
         buildEffectParams(nil, instance)
     )
     if instance.finish and instance.effectSource ~= nil then
-        jass:ShowUnit(instance.effectSource, true)
+        jass.ShowUnit(instance.effectSource, true)
     end
 end
 return ____exports

@@ -12,6 +12,7 @@ local ____03_FF0E_7269_54C1_4E0E_5E93_5B58 = require("lib.扩展函数.BJ函数.
 local RemoveItemFromStockBJ = ____03_FF0E_7269_54C1_4E0E_5E93_5B58.RemoveItemFromStockBJ
 local ____index = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____index.stringToFourCC
+local jass = require("jass.common")
 local function readFirstInt(self, text)
     local found = false
     local n = 0
@@ -71,13 +72,7 @@ local function pickRandomDistinct(self, list, count)
     end
     local pool = {table.unpack(list)}
     while #pool > 0 and #out < count do
-        local ____temp_0
-        if type(math) ~= "nil" and math.random then
-            ____temp_0 = math:random(1, #pool)
-        else
-            ____temp_0 = 1
-        end
-        local idx = ____temp_0
+        local idx = jass.GetRandomInt(1, #pool) or 1
         local picked = pool[idx]
         out[#out + 1] = picked
         __TS__ArraySplice(pool, idx - 1, 1)

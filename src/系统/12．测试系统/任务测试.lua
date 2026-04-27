@@ -16,10 +16,10 @@ local taskUIManager = require("系统.08．任务系统.04．任务UI拆分.12�
 local function debugPrint(self, msg)
     local pr = _G.print
     if pr ~= nil then
-        pr(nil, "[QuestTest] " .. msg)
+        pr("[QuestTest] " .. msg)
     end
-    jass:DisplayTimedTextToPlayer(
-        jass:Player(0),
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
         0,
         0,
         8,
@@ -72,10 +72,8 @@ end
 --- 测试UI显示
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
-    pcall(
-        nil,
-        function()
-            local p0 = jass:Player(0)
+    pcall(function ()
+            local p0 = jass.Player(0)
             if type(taskUIManager.onPlayerHeroRegistered) == "function" then
                 taskUIManager.onPlayerHeroRegistered(p0, nil)
             end
@@ -138,7 +136,7 @@ function ____exports.registerTestCommand(self)
             function(____, player, key)
                 local ____player_3
                 if player then
-                    ____player_3 = jass:GetPlayerId(player)
+                    ____player_3 = jass.GetPlayerId(player)
                 else
                     ____player_3 = 0
                 end

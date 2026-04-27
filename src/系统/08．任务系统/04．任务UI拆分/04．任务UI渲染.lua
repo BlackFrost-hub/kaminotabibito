@@ -26,7 +26,7 @@ local function onQuestRowClick(self)
     local japi = require("jass.japi")
     local ____temp_0
     if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_0 = japi:DzGetTriggerUIEventFrame()
+        ____temp_0 = japi.DzGetTriggerUIEventFrame()
     else
         ____temp_0 = 0
     end
@@ -42,8 +42,10 @@ local function onQuestRowClick(self)
     if not handler then
         return
     end
-    handler:onClickSound()
-    handler:onToggleExpand(questId)
+    local onClickSound = handler.onClickSound
+    local onToggleExpand = handler.onToggleExpand
+    onClickSound()
+    onToggleExpand(questId)
 end
 local function registerQuestRowClickHandler(self, questId, onClickSound, onToggleExpand)
     questRowClickHandlers[questId] = {onClickSound = onClickSound, onToggleExpand = onToggleExpand}
@@ -121,14 +123,11 @@ local function getOrCreateDetailFrame(self, questId, index, listParent, text, te
         )
         setFrameSize(nil, fr, {width = textW, height = EXPANDED_DETAIL_ROW_HEIGHT})
         if type(japi.DzFrameSetText) == "function" then
-            japi:DzFrameSetText(fr, text)
+            japi.DzFrameSetText(fr, text)
         end
     end
     if fr ~= 0 then
         applyDzTextFontAndAlignment(nil, fr, DZ_TEXT_ALIGN_LEFT)
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi:DzFrameSetLevel(fr, 3)
-        end
         showFrame(nil, fr)
         listItemFrames[#listItemFrames + 1] = fr
     end
@@ -188,7 +187,7 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                 ) or 0
                 if objFrame == 0 then
                     objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
-                    goto __continue23
+                    goto __continue22
                 end
                 objFrameByKey[objKey] = objFrame
             else
@@ -203,18 +202,15 @@ function ____exports.renderExpandedQuestDetails(self, opts)
                 )
                 setFrameSize(nil, objFrame, {width = textW, height = EXPANDED_OBJECTIVE_ROW_HEIGHT})
                 if type(japi.DzFrameSetText) == "function" then
-                    japi:DzFrameSetText(objFrame, txt)
+                    japi.DzFrameSetText(objFrame, txt)
                 end
             end
             applyDzTextFontAndAlignment(nil, objFrame, listTextAlign)
-            if type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(objFrame, 3)
-            end
             showFrame(nil, objFrame)
             listItemFrames[#listItemFrames + 1] = objFrame
             objYRel = objYRel - EXPANDED_OBJECTIVE_ROW_HEIGHT
         end
-        ::__continue23::
+        ::__continue22::
     end
     if quest.timeLimit and quest.timeLimit > 0 then
         local failFrame = failFrameByQuestId[quest.id] or 0
@@ -250,13 +246,10 @@ function ____exports.renderExpandedQuestDetails(self, opts)
             )
             setFrameSize(nil, failFrame, {width = textW, height = EXPANDED_FAIL_ROW_HEIGHT})
             if type(japi.DzFrameSetText) == "function" then
-                japi:DzFrameSetText(failFrame, failText)
+                japi.DzFrameSetText(failFrame, failText)
             end
         end
         applyDzTextFontAndAlignment(nil, failFrame, listTextAlign)
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi:DzFrameSetLevel(failFrame, 3)
-        end
         showFrame(nil, failFrame)
         listItemFrames[#listItemFrames + 1] = failFrame
         objYRel = objYRel - EXPANDED_FAIL_ROW_HEIGHT
@@ -430,9 +423,6 @@ function ____exports.renderQuestRow(self, opts)
         rowTopRel
     )
     setFrameSize(nil, rowBackdrop, {width = rowWidth, height = itemH})
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(rowBackdrop, 1)
-    end
     showFrame(nil, rowBackdrop)
     listItemFrames[#listItemFrames + 1] = rowBackdrop
     local npcName = quest.startNpc or "未知"
@@ -469,13 +459,10 @@ function ____exports.renderQuestRow(self, opts)
         )
         setFrameSize(nil, titleFrame, {width = textW, height = LIST_ITEM_H * 0.38})
         if type(japi.DzFrameSetText) == "function" then
-            japi:DzFrameSetText(titleFrame, titleText)
+            japi.DzFrameSetText(titleFrame, titleText)
         end
     end
     applyDzTextFontAndAlignment(nil, titleFrame, listTextAlign)
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(titleFrame, 3)
-    end
     showFrame(nil, titleFrame)
     listItemFrames[#listItemFrames + 1] = titleFrame
     local clickBtn = clickBtnByQuestId[quest.id] or 0
@@ -507,9 +494,6 @@ function ____exports.renderQuestRow(self, opts)
     registerQuestRowClickHandler(nil, quest.id, onClickSound, onToggleExpand)
     frameToQuestIdMap[clickBtn] = quest.id
     setFrameClickEvent(nil, clickBtn, onQuestRowClick, true)
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(clickBtn, 4)
-    end
     showFrame(nil, clickBtn)
     listItemFrames[#listItemFrames + 1] = clickBtn
     if showMainRowIcon then
@@ -543,9 +527,6 @@ function ____exports.renderQuestRow(self, opts)
                 rowTopRel - QUEST_ROW_ICON_Y_OFFSET
             )
             setFrameSize(nil, iconFr, {width = iconW, height = iconH})
-            if type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(iconFr, 5)
-            end
             showFrame(nil, iconFr)
             listItemFrames[#listItemFrames + 1] = iconFr
         end

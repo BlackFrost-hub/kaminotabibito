@@ -91,10 +91,10 @@ export function ydlStes_readBoolean5(_self: any, name: string): boolean {
 
 export function ydlStes_readInteger5(_self: any, name: string): number {
   const v = YDLocal5Get("integer", name);
-  if (typeof v === "number" && v === v) return Math.floor(v);
+  if (typeof v === "number" && v === v) return jass.R2I(v);
   const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
   const t = tn(v);
-  if (typeof t === "number" && t === t) return Math.floor(t);
+  if (typeof t === "number" && t === t) return jass.R2I(t);
   return 0;
 }
 
@@ -123,4 +123,32 @@ export function ydlStes_registerAfterGetTable(_self: any, trig: any, eventName: 
   if (STES_Register == null) return;
   STES_GetTable();
   STES_Register(trig, eventName);
+}
+
+/**
+ * 一步完成 STES 监听注册：CreateTrigger → TriggerAddAction → ydlStes_registerAfterGetTable
+ *
+ * 替代散落各处的三连写法：
+ *   const trig = jass.CreateTrigger();
+ *   jass.TriggerAddAction(trig, callback);
+ *   ydlStes_registerAfterGetTable(undefined, trig, eventName);
+ *
+ * @param eventName STES 事件名（须与 JASS 端 StringHash 一致）
+ * @param callback  触发器动作（通常包含 ydlStes_syncTriggerStep + 业务逻辑 + ydlStes_finishChildCleanup）
+ * @returns 创建的触发器，或 null 表示 STES_Register 不可用
+ */
+export function registerStesListener(
+  eventName: string,
+  callback: () => void
+): any | null {
+  const { STES_Register, STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+    STES_Register: (t: any, name: string) => void;
+    STES_GetTable: () => any;
+  };
+  if (STES_Register == null) return null;
+  const trig = jass.CreateTrigger();
+  jass.TriggerAddAction(trig, callback);
+  STES_GetTable();
+  STES_Register(trig, eventName);
+  return trig;
 }

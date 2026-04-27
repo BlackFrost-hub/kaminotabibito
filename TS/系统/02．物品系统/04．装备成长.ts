@@ -5,6 +5,13 @@
  * 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
  */
 const jass = require("jass.common") as JassCommon;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
+const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  round: (value: number) => number;
+};
 const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemUse: (callback: (unit: any, item: any) => void) => number;
 };
@@ -188,7 +195,7 @@ function applyStats(unit: any, statEffects: { name: string; key: string; value: 
 /** 分 10 份给经验，避免跳级触发不到 */
 function addHeroXP(unit: any, amount: number): void {
   if (amount <= 0) return;
-  const chunk = Math.floor(amount / 10);
+  const chunk = (jass as any).R2I(amount / 10);
   for (let i = 0; i < 10; i++) {
     (jass as any).AddHeroXP(unit, chunk, true);
   }
@@ -224,7 +231,7 @@ function applyGoldPct(unit: any, pct: number): void {
   if (!player) return;
   const stateGold = (jass as any).ConvertPlayerState(1);
   const cur: number = (jass as any).GetPlayerState(player, stateGold);
-  const delta = Math.round(cur * pct);
+  const delta = round(cur * pct);
   const newVal = cur + delta < 0 ? 0 : cur + delta;
   (jass as any).SetPlayerState(player, stateGold, newVal);
 }
@@ -244,12 +251,12 @@ function executeSegment(unit: any, seg: Segment): void {
       }
     } else if (eff.type === "exp") {
       const amount = eff.isLevelMult
-        ? Math.floor(getHeroLevel(unit) * eff.value)
-        : Math.floor(eff.value);
+        ? (jass as any).R2I(getHeroLevel(unit) * eff.value)
+        : (jass as any).R2I(eff.value);
       addHeroXP(unit, amount);
     } else if (eff.type === "level") {
       const cur = getHeroLevel(unit);
-      const add = eff.isLevelMult ? Math.floor(cur * eff.value) : Math.floor(eff.value);
+      const add = eff.isLevelMult ? (jass as any).R2I(cur * eff.value) : (jass as any).R2I(eff.value);
       if (add > 0) {
         (jass as any).SetHeroLevel(unit, cur + add, true);
       }
@@ -276,7 +283,7 @@ function executeSegment(unit: any, seg: Segment): void {
     } else {
       const capturedUnit = unit;
       const capturedPct = goldPct;
-      let remaining = Math.floor(seg.timeSec);
+      let remaining = (jass as any).R2I(seg.timeSec);
       const cb = (): void => {
         if (capturedUnit && (jass as any).IsUnitType(capturedUnit, (jass as any).UNIT_TYPE_DEAD)) {
           offSecond(cb);
@@ -295,13 +302,13 @@ function executeSegment(unit: any, seg: Segment): void {
   // 固定/范围金币：使用封装函数（单位：漂浮字 + 1500 范围音效）
   if (goldFixed.length > 0) {
     for (let i = 0; i < goldFixed.length; i++) {
-      const mn = Math.floor(goldFixed[i].min);
-      const mx = Math.floor(goldFixed[i].max);
+        const mn = (jass as any).R2I(goldFixed[i].min);
+        const mx = (jass as any).R2I(goldFixed[i].max);
       let delta = mn;
       if (mx !== mn) {
         const a = mn < mx ? mn : mx;
         const b = mn < mx ? mx : mn;
-        delta = (math as any).random(a, b);
+        delta = (jass as any).GetRandomInt(a, b);
       }
       if (delta !== 0) AddGoldWithFeedback({ delta, unit });
     }
@@ -316,9 +323,9 @@ function executeSegment(unit: any, seg: Segment): void {
       const dt = (jass as any).CreateTimer();
       if (dt) {
         const t = dt;
-        (jass as any).TimerStart(t, seg.timeSec, false, () => {
+        safeTimerStart(t, seg.timeSec, false, () => {
           applyStats(capturedUnit, capturedStats, false);
-          (jass as any).DestroyTimer(t);
+          safeDestroyTimer(t);
         });
       }
     }
@@ -344,9 +351,9 @@ function onUseItem(): void {
   const ct = (jass as any).CreateTimer();
   if (ct) {
     const t = ct;
-    (jass as any).TimerStart(t, 0.5, false, () => {
+    safeTimerStart(t, 0.5, false, () => {
       glob[key] = undefined;
-      (jass as any).DestroyTimer(t);
+      safeDestroyTimer(t);
     });
   }
 

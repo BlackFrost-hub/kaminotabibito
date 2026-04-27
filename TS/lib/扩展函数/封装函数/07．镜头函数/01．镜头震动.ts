@@ -16,7 +16,7 @@ export function CameraSetEQNoiseForPlayer(whichPlayer: any, magnitude: number): 
   }
   const localPlayer = (jass as any).GetLocalPlayer();
   if (localPlayer === whichPlayer) {
-    const pow10richter = Math.pow(10, richter);
+    const pow10richter = jass.Pow(10, richter);
     (jass as any).CameraSetTargetNoiseEx(magnitude * 2.0, magnitude * pow10richter, true);
     (jass as any).CameraSetSourceNoiseEx(magnitude * 2.0, magnitude * pow10richter, true);
   }

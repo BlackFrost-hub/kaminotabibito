@@ -57,10 +57,10 @@ function ____exports.pcallDzFrameSetAlpha(self, japiAny, frame, alpha)
     __dzPcallShowJapi = nil
 end
 function ____exports.dzGetLocalPlayer(self)
-    return jass:GetLocalPlayer()
+    return jass.GetLocalPlayer()
 end
 function ____exports.dzPlayer(self, index)
-    return jass:Player(index)
+    return jass.Player(index)
 end
 function ____exports.questIdTailInRange01to20(self, id, prefix)
     if #id ~= #prefix + 3 then
@@ -119,7 +119,7 @@ local __dzCreateParent = 0
 local __dzCreateContextId = 0
 local __dzCreateResultFrame = 0
 local function __dzCreateFramePcallBody(self)
-    __dzCreateResultFrame = japi:DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId)
+    __dzCreateResultFrame = japi.DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId)
 end
 function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, contextId)
     if contextId == nil then

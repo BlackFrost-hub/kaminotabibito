@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local showContinueHint, startTyping, onTypingTick
+local showContinueHint, runTypingTickForPlayer, typingTickCallbackP0, typingTickCallbackP1, typingTickCallbackP2, typingTickCallbackP3, startTyping, onTypingTick
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____index.Sound3DII_Mp3PlayReuse
 local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
@@ -47,14 +47,76 @@ function showContinueHint(self, state, visible)
     end
     dzShow(nil, state.frames[12], visible)
 end
+function runTypingTickForPlayer(self, playerId)
+    local state = g_states[playerId + 1]
+    if not state then
+        return
+    end
+    onTypingTick(nil, state)
+end
+function typingTickCallbackP0(self)
+    runTypingTickForPlayer(nil, 0)
+end
+function typingTickCallbackP1(self)
+    runTypingTickForPlayer(nil, 1)
+end
+function typingTickCallbackP2(self)
+    runTypingTickForPlayer(nil, 2)
+end
+function typingTickCallbackP3(self)
+    runTypingTickForPlayer(nil, 3)
+end
 function startTyping(self, state)
-    dzTimerStart(
-        nil,
-        state.tickTimer,
-        TICK,
-        true,
-        function() return onTypingTick(nil, state) end
-    )
+    repeat
+        local ____switch40 = state.playerId
+        local ____cond40 = ____switch40 == 0
+        if ____cond40 then
+            dzTimerStart(
+                nil,
+                state.tickTimer,
+                TICK,
+                true,
+                typingTickCallbackP0
+            )
+            return
+        end
+        ____cond40 = ____cond40 or ____switch40 == 1
+        if ____cond40 then
+            dzTimerStart(
+                nil,
+                state.tickTimer,
+                TICK,
+                true,
+                typingTickCallbackP1
+            )
+            return
+        end
+        ____cond40 = ____cond40 or ____switch40 == 2
+        if ____cond40 then
+            dzTimerStart(
+                nil,
+                state.tickTimer,
+                TICK,
+                true,
+                typingTickCallbackP2
+            )
+            return
+        end
+        ____cond40 = ____cond40 or ____switch40 == 3
+        if ____cond40 then
+            dzTimerStart(
+                nil,
+                state.tickTimer,
+                TICK,
+                true,
+                typingTickCallbackP3
+            )
+            return
+        end
+        do
+            return
+        end
+    until true
 end
 function onTypingTick(self, state)
     if #state.queue == 0 then

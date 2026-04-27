@@ -7,6 +7,7 @@
  */
 
 import type { ChestTypeConfig, DropMode } from "./00．常量定义";
+const jass = require("jass.common") as any;
 
 const { getChestConfigByString } = require("系统.06．经济系统.00．宝箱系统.00．常量定义") as {
   getChestConfigByString: (type: string) => ChestTypeConfig | undefined;
@@ -21,6 +22,14 @@ const { items } = require("系统.02．物品系统.01．装备数据") as {
 // ==========================================================================================
 
 interface ItemPoolEntry { id: string; weight: number; }
+
+function randomReal01(): number {
+  return (jass.GetRandomReal(0, 1) as number) || 0;
+}
+
+function randomInt(min: number, max: number): number {
+  return (jass.GetRandomInt(min, max) as number) || min;
+}
 
 // ==========================================================================================
 // 物品池解析
@@ -52,7 +61,7 @@ function drawByWeightWithRepeat(pool: ItemPoolEntry[], picks: number): string[] 
   const result: string[] = [];
   const totalWeight = pool.reduce((sum, e) => sum + e.weight, 0);
   for (let i = 0; i < picks; i++) {
-    let r = math.random() * totalWeight;
+    let r = randomReal01() * totalWeight;
     for (const entry of pool) {
       r -= entry.weight;
       if (r <= 0) { result.push(entry.id); break; }
@@ -62,7 +71,13 @@ function drawByWeightWithRepeat(pool: ItemPoolEntry[], picks: number): string[] 
 }
 
 function drawByEqualWithoutRepeat(pool: ItemPoolEntry[], picks: number): string[] {
-  const shuffled = [...pool].sort(() => math.random() - 0.5);
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i >= 1; i--) {
+    const j = randomInt(1, i + 1) - 1;
+    const t = shuffled[i];
+    shuffled[i] = shuffled[j];
+    shuffled[j] = t;
+  }
   const count = picks < shuffled.length ? picks : shuffled.length;
   return shuffled.slice(0, count).map(e => e.id);
 }

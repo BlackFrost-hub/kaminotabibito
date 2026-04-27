@@ -47,7 +47,7 @@ import {
 import { ENABLE_TASK_UI_CLIENT, MAX_PLAYERS, TAG_SLOT_OFFSET } from "./01．任务UI常量";
 
 // ── N 槽：按 playerId 索引的 TaskUI 数组 ──
-const taskUIs: TaskUI[] = [];
+const taskUIs: Record<number, TaskUI | undefined> = {};
 let hotkeyRegistered = false;
 let refreshCallbackRegistered = false;
 
@@ -61,29 +61,42 @@ function getTriggerPlayerId(): number {
   return (typeof pid === "number" && pid >= 0 && pid < MAX_PLAYERS) ? pid : -1;
 }
 
-function taskUIModulePlayClickSound(): void {
+function taskUIModulePlayClickSound(this: void): void {
   const lp = jass.GetLocalPlayer();
   const pid = jass.GetPlayerId(lp);
-  if (pid >= 0 && pid < taskUIs.length) {
-    taskUIs[pid]?.playLocalClickSound();
-  }
+  const ui = pid >= 0 && pid < MAX_PLAYERS ? taskUIs[pid] : undefined;
+  if (ui) ui.playLocalClickSound();
 }
 
-function taskUIModuleRowExpand(questId: string): void {
+function taskUIModuleRowExpand(this: void, rowIndex: number): void {
   const pid = getTriggerPlayerId();
-  if (pid >= 0 && pid < taskUIs.length) {
-    taskUIs[pid]?.toggleExpandForRow(questId);
-  }
+  const ui = pid >= 0 && pid < MAX_PLAYERS ? taskUIs[pid] : undefined;
+  if (ui) ui.toggleExpandForVisibleRow(rowIndex);
 }
 
-function taskUIModuleSwitchCategory(type: QuestType): void {
+function taskUIModuleSwitchCategory(this: void, type: QuestType): void {
   const pid = getTriggerPlayerId();
-  if (pid >= 0 && pid < taskUIs.length) {
-    taskUIs[pid]?.switchCategory(type);
-  }
+  const ui = pid >= 0 && pid < MAX_PLAYERS ? taskUIs[pid] : undefined;
+  if (ui) ui.switchCategory(type);
 }
 
-function taskUIModuleNoopTabTooltip(_msg: string): void {}
+function taskUIModuleNoopTabTooltip(this: void, _msg: string): void {}
+
+function getTriggerPlayerOrLocal(this: void): any {
+  if ((japi as any).DzGetTriggerKeyPlayer != null) {
+    return (japi as any).DzGetTriggerKeyPlayer();
+  }
+  return jass.GetLocalPlayer();
+}
+
+function getTaskUIByPlayerId(this: void, playerId: number): TaskUI | undefined {
+  if (typeof playerId !== "number" || playerId < 0 || playerId >= MAX_PLAYERS) return undefined;
+  return taskUIs[playerId];
+}
+
+function taskUIEntryClick(this: void): void {
+  taskUIHotkeyTogglePanel(getTriggerPlayerOrLocal());
+}
 
 class TaskUI {
   readonly slotId: number;
@@ -94,7 +107,7 @@ class TaskUI {
   scrollBarFrame: number | null = null;
   scrollThumbFrame: number | null = null;
   scrollThumbHitBtn: number | null = null;
-  taskListWheelTrig: unknown = null;
+  taskListWheelRegistered = false;
   precreatedListPool: TaskUIPrecreatedListPool | null = null;
   pagesDirty = false;
   localPlayerId = 0;
@@ -116,6 +129,7 @@ class TaskUI {
     const self = this;
     if (this.scrollCtxCache != null) return;
     this.scrollCtxCache = {
+      playerId: this.playerId,
       mainPanel: this.mainPanel,
       listContainer: this.listContainer,
       scrollBarFrame: this.scrollBarFrame,
@@ -123,13 +137,14 @@ class TaskUI {
       scrollThumbHitBtn: this.scrollThumbHitBtn,
       FramePoint,
       setFramePointRelative,
-      taskListWheelTrig: this.taskListWheelTrig,
+      taskListWheelRegistered: this.taskListWheelRegistered,
       getMouseFocus,
       getWheelDelta,
       registerMouseWheel: function (this: void, sync: boolean, cb: () => void, playerId?: number): unknown {
         return registerMouseWheelHardware(sync, cb, playerId);
       },
       isVisible: () => self.isVisible,
+      isOwnedByLocalPlayer: () => self.localPlayer === jass.GetLocalPlayer(),
       getCurrentPageCount: () => self.getPageCountForCurrentCategory(),
       getCurrentPage: () => self.currentPage,
       setCurrentPage: (p: number) => { self.currentPage = p; },
@@ -158,20 +173,31 @@ class TaskUI {
       applyDzTextFontAndAlignment,
       playClickSound: () => { self.playLocalClickSound(); },
       updateScrollBarVisibility: (pageCount: number, hasQuestRows: boolean) => { self.syncScrollBarVisibility(pageCount, hasQuestRows); },
-      toggleExpand: (questId: string) => { self.toggleExpandForRow(questId); },
+      toggleExpand: (rowIndex: number) => { self.toggleExpandForVisibleRow(rowIndex); },
       getCurrentPage: (type: QuestType) => self.listGetCurrentPage(type),
       setCurrentPage: (type: QuestType, page: number) => { self.listSetCurrentPage(type, page); },
       getExpandedQuestId: (type: QuestType) => self.listGetExpandedQuestId(type),
     };
   }
 
-  init(playerId: number): void {
-    if (!ENABLE_TASK_UI_CLIENT) return;
-    if (this.uiInitialized) return;
-    taskUIs[playerId] = this;
+  init(playerId: number): boolean {
+    if (!ENABLE_TASK_UI_CLIENT) return false;
+    if (this.uiInitialized) return true;
     this.localPlayer = jass.Player(playerId);
     this.localPlayerId = playerId;
-    pcall(taskUIInitPcallBody);
+    pcallInitTarget = this;
+    try {
+      taskUIInitPcallBody();
+    } catch (_e) {
+      pcallInitTarget = null;
+      return false;
+    }
+    pcallInitTarget = null;
+    if (!this.uiInitialized) {
+      return false;
+    }
+    taskUIs[playerId] = this;
+    return true;
   }
 
   /** nameSuffix 用于帧名区分不同槽位 */
@@ -200,7 +226,7 @@ class TaskUI {
       japi, parent, FrameType, FramePoint, createFrame, createTextLabel,
       setFramePosition, setFrameSize, setFramePointRelative, setFrameClickEvent,
       applyDzTextFontAndCenterAlignment,
-      onTogglePanel: taskUIHotkeyTogglePanel,
+      onTogglePanel: taskUIEntryClick,
       slotId: this.slotId,
       contextId: this.slotContextId,
     });
@@ -232,7 +258,7 @@ class TaskUI {
   }
 
   private registerTaskListWheel(): void {
-    this.taskListWheelTrig = registerTaskUIListWheel(this.getScrollContext());
+    registerTaskUIListWheel(this.getScrollContext());
   }
 
   rebuildPages(): void {
@@ -260,13 +286,24 @@ class TaskUI {
     this.toggleExpand(questId);
   }
 
+  toggleExpandForVisibleRow(rowIndex: number): void {
+    const categoryView = this.precreatedListPool?.categories[this.currentCategory];
+    if (!categoryView) return;
+    const page = categoryView.pages[this.currentPage];
+    if (!page) return;
+    const questId = page.questIds[rowIndex];
+    if (!questId) return;
+    this.toggleExpand(questId);
+  }
+
   getPageCountForCurrentCategory(): number {
     return this.getPageCount(this.currentCategory);
   }
 
   applyScrollPageChanged(prev: number, next: number): void {
     this.currentPage = next;
-    this.expandedQuestId = null;
+    // 滚轮/拖拽走 sync=false，本地翻页不能清共享展开态；
+    // 否则后续 sync=true 行点击读取 oldExpanded 时，各端会出现状态分叉。
     switchPageLocal(this.precreatedListPool, this.currentCategory, prev, next);
   }
 
@@ -337,9 +374,7 @@ class TaskUI {
   }
 
   private toggleExpand(questId: string): void {
-    const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
-      ? (japi as any).DzGetTriggerKeyPlayer()
-      : jass.GetLocalPlayer();
+    const triggerPlayer = getTriggerPlayerOrLocal();
     this.toggleExpandSync(triggerPlayer, questId);
   }
 
@@ -347,7 +382,9 @@ class TaskUI {
     const pageCount = this.getPageCount(this.currentCategory);
     if (pageCount <= 1) return;
     const currentPage = this.currentPage;
-    const nextPage = Math.max(0, Math.min(pageCount - 1, currentPage + delta));
+    let nextPage = currentPage + delta;
+    if (nextPage < 0) nextPage = 0;
+    if (nextPage > pageCount - 1) nextPage = pageCount - 1;
     if (nextPage === currentPage) return;
     this.currentPage = nextPage;
     this.expandedQuestId = null;
@@ -372,9 +409,7 @@ class TaskUI {
   }
 
   togglePanel(): void {
-    const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
-      ? (japi as any).DzGetTriggerKeyPlayer()
-      : jass.GetLocalPlayer();
+    const triggerPlayer = getTriggerPlayerOrLocal();
     this.togglePanelSync(triggerPlayer);
   }
 
@@ -424,12 +459,13 @@ class TaskUI {
   private getScrollContext(): TaskUIScrollContext {
     this.ensureUiContextCaches();
     const s = this.scrollCtxCache!;
+    s.playerId = this.playerId;
     s.mainPanel = this.mainPanel;
     s.listContainer = this.listContainer;
     s.scrollBarFrame = this.scrollBarFrame;
     s.scrollThumbFrame = this.scrollThumbFrame;
     s.scrollThumbHitBtn = this.scrollThumbHitBtn;
-    s.taskListWheelTrig = this.taskListWheelTrig;
+    s.taskListWheelRegistered = this.taskListWheelRegistered;
     return s;
   }
 }
@@ -447,21 +483,19 @@ let __togglePanelTriggerPlayer: any = null;
 function taskUITogglePanelPcallBody(): void {
   const player = __togglePanelTriggerPlayer;
   const pid = (player != null && player !== 0) ? jass.GetPlayerId(player) : -1;
-  if (pid >= 0 && pid < taskUIs.length) {
-    taskUIs[pid]?.togglePanelSync(player);
-  }
+  const ui = getTaskUIByPlayerId(pid);
+  if (ui) ui.togglePanelSync(player);
 }
 
-function taskUIHotkeyTogglePanel(player: any): void {
+function taskUIHotkeyTogglePanel(this: void, player: any): void {
   __togglePanelTriggerPlayer = player;
   pcall(taskUITogglePanelPcallBody);
 }
 
-function taskUIHotkeySwitchCategory(player: any, type: QuestType): void {
+function taskUIHotkeySwitchCategory(this: void, player: any, type: QuestType): void {
   const pid = (player != null && player !== 0) ? jass.GetPlayerId(player) : -1;
-  if (pid >= 0 && pid < taskUIs.length) {
-    taskUIs[pid]?.switchCategorySync(player, type);
-  }
+  const ui = getTaskUIByPlayerId(pid);
+  if (ui) ui.switchCategorySync(player, type);
 }
 
 /**
@@ -469,17 +503,16 @@ function taskUIHotkeySwitchCategory(player: any, type: QuestType): void {
  * 由 `00．玩家英雄获取桥接` 调用。
  * 所有客户端对称执行（全局创建），异步显隐。
  */
-export function onPlayerHeroRegistered(this: void, whichPlayer: any, _whichHero: any): void {
-  if (!ENABLE_TASK_UI_CLIENT) return;
-  if (whichPlayer == null || whichPlayer === 0) return;
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, _whichHero: any): boolean {
+  if (!ENABLE_TASK_UI_CLIENT) return false;
+  if (whichPlayer == null || whichPlayer === 0) return false;
   const pid = jass.GetPlayerId(whichPlayer);
-  if (typeof pid !== "number" || pid < 0 || pid >= MAX_PLAYERS) return;
-  if (taskUIs[pid] != null) return;
+  if (typeof pid !== "number" || pid < 0 || pid >= MAX_PLAYERS) return false;
+  if (taskUIs[pid]?.uiInitialized === true) return true;
 
   const ui = new TaskUI(pid);
-  pcallInitTarget = ui;
-  ui.init(pid);
-  pcallInitTarget = null;
+  const ok = ui.init(pid);
+  return ok;
 }
 
 /** 热键注册：全局只注册一次 */
@@ -499,7 +532,7 @@ export function registerHotkey(): void {
  * 当任务数据变化时，遍历所有已创建槽位重建UI列表。
  */
 function onQuestManagerUiRefresh(_playerId: number, _questId?: string): void {
-  for (let i = 0; i < taskUIs.length; i++) {
+  for (let i = 0; i < MAX_PLAYERS; i++) {
     const ui = taskUIs[i];
     if (ui == null || !ui.uiInitialized) continue;
     ui.pagesDirty = true;

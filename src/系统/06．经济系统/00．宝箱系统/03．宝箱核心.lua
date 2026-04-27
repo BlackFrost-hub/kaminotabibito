@@ -1,9 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local getProgressBarUnitType, angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, fireStesEvent, cleanupOpening, startOpening, updateAllOpening, ensureRegisteredToCenterTimer, jass, String2OrderIdBJ, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_SCALE, PROGRESS_BAR_HEIGHT_OFFSET, EVENT_PLAYER_PREPARE_OPEN_CHEST, EVENT_CHEST_OPENED, YDLOCAL_VAR_OPENER, YDLOCAL_VAR_CHEST, YDLOCAL_VAR_PRE_OPENER, YDLOCAL_VAR_PRE_CHEST, TEXT_OPENING, TEXT_SUCCESS, TEXT_INTERRUPTED, isChestType, getChestConfig, dropItemsFromChest, STES_GetTable, YDLocalExecuteTrigger, saveParentIndex, YDTriggerExecuteTrigger, YDLocal5Set, YDUserDataGet, CreateFloatTextOnUnit, openingMap, movingMap, _progressBarUnitType, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
+local getProgressBarUnitType, angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, fireStesEvent, cleanupOpening, startOpening, updateAllOpening, ensureRegisteredToCenterTimer, jass, forEachSorted, BJ_RADTODEG, String2OrderIdBJ, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_SCALE, PROGRESS_BAR_HEIGHT_OFFSET, EVENT_PLAYER_PREPARE_OPEN_CHEST, EVENT_CHEST_OPENED, YDLOCAL_VAR_OPENER, YDLOCAL_VAR_CHEST, YDLOCAL_VAR_PRE_OPENER, YDLOCAL_VAR_PRE_CHEST, TEXT_OPENING, TEXT_SUCCESS, TEXT_INTERRUPTED, isChestType, getChestConfig, dropItemsFromChest, STES_GetTable, YDLocalExecuteTrigger, saveParentIndex, YDTriggerExecuteTrigger, YDLocal5Set, YDUserDataGet, CreateFloatTextOnUnit, openingMap, movingMap, _progressBarUnitType, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 function getProgressBarUnitType()
     if _progressBarUnitType ~= 0 then
         return _progressBarUnitType
@@ -21,7 +20,7 @@ function getProgressBarUnitType()
     return _progressBarUnitType
 end
 function angleBetweenPoints(x1, y1, x2, y2)
-    return math.atan2(y2 - y1, x2 - x1) * 180 / math.pi
+    return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
 function showTextTag(unit, text, red, green, blue)
     CreateFloatTextOnUnit(nil, unit, text, {
@@ -38,7 +37,7 @@ function getUnitId(unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 function isInteractable(destructableType)
     return isChestType(destructableType)
@@ -52,13 +51,13 @@ function fireStesEvent(eventName, opener, target)
     if not ht then
         return
     end
-    local hash = jass:StringHash(eventName)
-    local skeyIndex = jass:StringHash("index")
-    local count = jass:LoadInteger(ht, hash, skeyIndex)
+    local hash = jass.StringHash(eventName)
+    local skeyIndex = jass.StringHash("index")
+    local count = jass.LoadInteger(ht, hash, skeyIndex)
     do
         local i = 0
         while i < count do
-            local trg = jass:LoadTriggerHandle(ht, hash, i)
+            local trg = jass.LoadTriggerHandle(ht, hash, i)
             if trg then
                 if eventName == EVENT_CHEST_OPENED then
                     YDLocal5Set(nil, "unit", YDLOCAL_VAR_OPENER, opener)
@@ -76,12 +75,12 @@ function fireStesEvent(eventName, opener, target)
     end
 end
 function cleanupOpening(data, interrupted)
-    jass:DzUnitDisableAttack(data.unit, false)
+    jass.DzUnitDisableAttack(data.unit, false)
     if data.progressBar then
-        jass:RemoveUnit(data.progressBar)
+        jass.RemoveUnit(data.progressBar)
     end
     if interrupted then
-        local cfg = getChestConfig(jass:GetDestructableTypeId(data.target))
+        local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
         showTextTag(
             data.unit,
             TEXT_INTERRUPTED(cfg and cfg.name or "宝箱"),
@@ -96,33 +95,33 @@ function cleanupOpening(data, interrupted)
     end
 end
 function startOpening(unit, target, openTime)
-    jass:IssueImmediateOrder(unit, "stop")
+    jass.IssueImmediateOrder(unit, "stop")
     if openTime <= 0 then
         openTime = 1
     end
     local speed = 1 / openTime
-    local unitX = jass:GetUnitX(unit)
-    local unitY = jass:GetUnitY(unit)
+    local unitX = jass.GetUnitX(unit)
+    local unitY = jass.GetUnitY(unit)
     local progressType = getProgressBarUnitType()
-    local progressBar = jass:CreateUnit(
-        jass:Player(4),
+    local progressBar = jass.CreateUnit(
+        jass.Player(4),
         progressType,
         unitX,
         unitY,
         0
     )
     if progressBar then
-        jass:SetUnitTimeScale(progressBar, speed)
-        jass:SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE)
-        local flyHeight = jass:GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET
-        jass:SetUnitFlyHeight(progressBar, flyHeight, 0)
+        jass.SetUnitTimeScale(progressBar, speed)
+        jass.SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE)
+        local flyHeight = jass.GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET
+        jass.SetUnitFlyHeight(progressBar, flyHeight, 0)
     end
-    jass:DzUnitDisableAttack(unit, true)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
+    jass.DzUnitDisableAttack(unit, true)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
     local angle = angleBetweenPoints(unitX, unitY, targetX, targetY)
-    jass:SetUnitFacing(unit, angle)
-    local config = getChestConfig(jass:GetDestructableTypeId(target))
+    jass.SetUnitFacing(unit, angle)
+    local config = getChestConfig(jass.GetDestructableTypeId(target))
     local chestName = config and config.name or "宝箱"
     fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target)
     showTextTag(
@@ -146,18 +145,18 @@ function startOpening(unit, target, openTime)
     ensureRegisteredToCenterTimer()
 end
 function updateAllOpening()
-    for ____, ____value in __TS__Iterator(openingMap) do
-        local unitId = ____value[1]
-        local data = ____value[2]
-        do
-            local currentOrder = jass:GetUnitCurrentOrder(data.unit)
+    forEachSorted(
+        nil,
+        openingMap,
+        function(unitId, data)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
             local smartOrder = String2OrderIdBJ(nil, "smart")
             local attackOrder = String2OrderIdBJ(nil, "attack")
             local completed = data.elapsed >= data.openTime
             local interrupted = currentOrder == smartOrder or currentOrder == attackOrder
             if completed or interrupted then
                 if completed then
-                    local cfg = getChestConfig(jass:GetDestructableTypeId(data.target))
+                    local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
                     local chestName = cfg and cfg.name or "宝箱"
                     showTextTag(
                         data.unit,
@@ -168,54 +167,55 @@ function updateAllOpening()
                     )
                     local targetTypeStr = cfg and cfg.destructableType
                     if targetTypeStr then
-                        local x = jass:GetDestructableX(data.target)
-                        local y = jass:GetDestructableY(data.target)
+                        local x = jass.GetDestructableX(data.target)
+                        local y = jass.GetDestructableY(data.target)
                         dropItemsFromChest(nil, targetTypeStr, x, y)
                     end
                     fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target)
                     if data.target then
-                        jass:KillDestructable(data.target)
+                        jass.KillDestructable(data.target)
                     end
                 end
                 cleanupOpening(data, not completed and interrupted)
-                goto __continue27
+                return
             end
             data.elapsed = data.elapsed + UPDATE_INTERVAL
             if data.progressBar then
-                local unitX = jass:GetUnitX(data.unit)
-                local unitY = jass:GetUnitY(data.unit)
-                jass:SetUnitX(data.progressBar, unitX)
-                jass:SetUnitY(data.progressBar, unitY)
+                local unitX = jass.GetUnitX(data.unit)
+                local unitY = jass.GetUnitY(data.unit)
+                jass.SetUnitX(data.progressBar, unitX)
+                jass.SetUnitY(data.progressBar, unitY)
             end
         end
-        ::__continue27::
-    end
-    for ____, ____value in __TS__Iterator(movingMap) do
-        local unitId = ____value[1]
-        local data = ____value[2]
-        local currentOrder = jass:GetUnitCurrentOrder(data.unit)
-        local moveOrder = String2OrderIdBJ(nil, "move")
-        local inRange = jass:IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
-        local orderChanged = currentOrder ~= moveOrder
-        if inRange or orderChanged then
-            if inRange then
-                local targetType = jass:GetDestructableTypeId(data.target)
-                if targetType and isInteractable(targetType) then
-                    local openTime = getOpenTime(targetType)
-                    startOpening(data.unit, data.target, openTime)
+    )
+    forEachSorted(
+        nil,
+        movingMap,
+        function(unitId, data)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
+            local moveOrder = String2OrderIdBJ(nil, "move")
+            local inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
+            local orderChanged = currentOrder ~= moveOrder
+            if inRange or orderChanged then
+                if inRange then
+                    local targetType = jass.GetDestructableTypeId(data.target)
+                    if targetType and isInteractable(targetType) then
+                        local openTime = getOpenTime(targetType)
+                        startOpening(data.unit, data.target, openTime)
+                    end
                 end
+                movingMap:delete(unitId)
             end
-            movingMap:delete(unitId)
         end
-    end
+    )
 end
 function ensureRegisteredToCenterTimer()
     if _registeredToCenterTimer then
         return
     end
     _registeredToCenterTimer = true
-    local ____G_18 = _G
-    local onTick10ms = ____G_18.onTick10ms
+    local ____G_20 = _G
+    local onTick10ms = ____G_20.onTick10ms
     onTick10ms(
         nil,
         function()
@@ -232,46 +232,54 @@ function ensureRegisteredToCenterTimer()
 end
 jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.07．杂项")
-String2OrderIdBJ = ____require_result_0.String2OrderIdBJ
-local ____require_result_1 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
-local CHEST_TYPES = ____require_result_1.CHEST_TYPES
-DEFAULT_OPEN_TIME = ____require_result_1.DEFAULT_OPEN_TIME
-INTERACT_RANGE = ____require_result_1.INTERACT_RANGE
-UPDATE_INTERVAL = ____require_result_1.UPDATE_INTERVAL
-PROGRESS_BAR_SCALE = ____require_result_1.PROGRESS_BAR_SCALE
-PROGRESS_BAR_HEIGHT_OFFSET = ____require_result_1.PROGRESS_BAR_HEIGHT_OFFSET
-EVENT_PLAYER_PREPARE_OPEN_CHEST = ____require_result_1.EVENT_PLAYER_PREPARE_OPEN_CHEST
-EVENT_CHEST_OPENED = ____require_result_1.EVENT_CHEST_OPENED
-YDLOCAL_VAR_OPENER = ____require_result_1.YDLOCAL_VAR_OPENER
-YDLOCAL_VAR_CHEST = ____require_result_1.YDLOCAL_VAR_CHEST
-YDLOCAL_VAR_PRE_OPENER = ____require_result_1.YDLOCAL_VAR_PRE_OPENER
-YDLOCAL_VAR_PRE_CHEST = ____require_result_1.YDLOCAL_VAR_PRE_CHEST
-TEXT_OPENING = ____require_result_1.TEXT_OPENING
-TEXT_SUCCESS = ____require_result_1.TEXT_SUCCESS
-TEXT_INTERRUPTED = ____require_result_1.TEXT_INTERRUPTED
-isChestType = ____require_result_1.isChestType
-getChestConfig = ____require_result_1.getChestConfig
-local ____require_result_2 = require("系统.06．经济系统.00．宝箱系统.01．宝箱掉落配置")
-dropItemsFromChest = ____require_result_2.dropItemsFromChest
-local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-STES_GetTable = ____require_result_3.STES_GetTable
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
-YDLocalExecuteTrigger = ____require_result_4.YDLocalExecuteTrigger
-saveParentIndex = ____require_result_4.saveParentIndex
-YDTriggerExecuteTrigger = ____require_result_4.YDTriggerExecuteTrigger
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-YDLocal5Set = ____require_result_5.YDLocal5Set
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-YDUserDataGet = ____require_result_6.YDUserDataGet
-local ____require_result_7 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
-CreateFloatTextOnUnit = ____require_result_7.CreateFloatTextOnUnit
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local ceil = ____require_result_0.ceil
+forEachSorted = ____require_result_0.forEachSorted
+local ____jglobals_bj_RADTODEG_1 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_1 == nil then
+    ____jglobals_bj_RADTODEG_1 = 57.29577951308232
+end
+BJ_RADTODEG = ____jglobals_bj_RADTODEG_1
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+String2OrderIdBJ = ____require_result_2.String2OrderIdBJ
+local ____require_result_3 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
+local CHEST_TYPES = ____require_result_3.CHEST_TYPES
+DEFAULT_OPEN_TIME = ____require_result_3.DEFAULT_OPEN_TIME
+INTERACT_RANGE = ____require_result_3.INTERACT_RANGE
+UPDATE_INTERVAL = ____require_result_3.UPDATE_INTERVAL
+PROGRESS_BAR_SCALE = ____require_result_3.PROGRESS_BAR_SCALE
+PROGRESS_BAR_HEIGHT_OFFSET = ____require_result_3.PROGRESS_BAR_HEIGHT_OFFSET
+EVENT_PLAYER_PREPARE_OPEN_CHEST = ____require_result_3.EVENT_PLAYER_PREPARE_OPEN_CHEST
+EVENT_CHEST_OPENED = ____require_result_3.EVENT_CHEST_OPENED
+YDLOCAL_VAR_OPENER = ____require_result_3.YDLOCAL_VAR_OPENER
+YDLOCAL_VAR_CHEST = ____require_result_3.YDLOCAL_VAR_CHEST
+YDLOCAL_VAR_PRE_OPENER = ____require_result_3.YDLOCAL_VAR_PRE_OPENER
+YDLOCAL_VAR_PRE_CHEST = ____require_result_3.YDLOCAL_VAR_PRE_CHEST
+TEXT_OPENING = ____require_result_3.TEXT_OPENING
+TEXT_SUCCESS = ____require_result_3.TEXT_SUCCESS
+TEXT_INTERRUPTED = ____require_result_3.TEXT_INTERRUPTED
+isChestType = ____require_result_3.isChestType
+getChestConfig = ____require_result_3.getChestConfig
+local ____require_result_4 = require("系统.06．经济系统.00．宝箱系统.01．宝箱掉落配置")
+dropItemsFromChest = ____require_result_4.dropItemsFromChest
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+STES_GetTable = ____require_result_5.STES_GetTable
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
+YDLocalExecuteTrigger = ____require_result_6.YDLocalExecuteTrigger
+saveParentIndex = ____require_result_6.saveParentIndex
+YDTriggerExecuteTrigger = ____require_result_6.YDTriggerExecuteTrigger
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+YDLocal5Set = ____require_result_7.YDLocal5Set
+local ____require_result_8 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+YDUserDataGet = ____require_result_8.YDUserDataGet
+local ____require_result_9 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
+CreateFloatTextOnUnit = ____require_result_9.CreateFloatTextOnUnit
 openingMap = __TS__New(Map)
 movingMap = __TS__New(Map)
 _progressBarUnitType = 0
 _registeredToCenterTimer = false
 _tickCounter = 0
-CENTER_TIMER_TICKS = math.ceil(UPDATE_INTERVAL / 0.01)
+CENTER_TIMER_TICKS = ceil(nil, UPDATE_INTERVAL / 0.01)
 --- 处理单位对可交互目标的命令
 -- 
 -- @param unit 触发单位
@@ -280,16 +288,16 @@ function ____exports.onUnitTargetInteractable(unit, target)
     if not unit or not target then
         return
     end
-    local targetType = jass:GetDestructableTypeId(target)
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(targetType) then
         return
     end
     local openTime = getOpenTime(targetType)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
-    local inRange = jass:IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
+    local inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
     if not inRange then
-        jass:IssuePointOrder(unit, "move", targetX, targetY)
+        jass.IssuePointOrder(unit, "move", targetX, targetY)
         local data = {unit = unit, target = target, targetX = targetX, targetY = targetY}
         local unitId = getUnitId(unit)
         if unitId ~= 0 then
@@ -306,13 +314,13 @@ function ____exports.isUnitOpening(unit)
         return false
     end
     local unitId = getUnitId(unit)
-    local ____temp_19
+    local ____temp_21
     if unitId ~= 0 then
-        ____temp_19 = openingMap:has(unitId)
+        ____temp_21 = openingMap:has(unitId)
     else
-        ____temp_19 = false
+        ____temp_21 = false
     end
-    return ____temp_19
+    return ____temp_21
 end
 --- 中断单位开启
 function ____exports.interruptOpening(unit)
@@ -320,13 +328,13 @@ function ____exports.interruptOpening(unit)
         return
     end
     local unitId = getUnitId(unit)
-    local ____temp_20
+    local ____temp_22
     if unitId ~= 0 then
-        ____temp_20 = openingMap:get(unitId)
+        ____temp_22 = openingMap:get(unitId)
     else
-        ____temp_20 = nil
+        ____temp_22 = nil
     end
-    local data = ____temp_20
+    local data = ____temp_22
     if data ~= nil then
         cleanupOpening(data, true)
     end

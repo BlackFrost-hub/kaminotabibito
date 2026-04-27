@@ -1,5 +1,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  clampRange: (value: number, minValue: number, maxValue: number) => number;
+};
 
 import { QuestData, QuestType } from "../01．任务数据";
 import {
@@ -34,20 +37,29 @@ import {
   showOnlyPageAndVariant,
 } from "./11．任务UI列表控制辅助";
 import {
-  createCategory,
-  ensurePage,
   clearVariant,
   clearPage,
   hideRowSlot,
 } from "./17．任务UI列表帧构建";
 
 
-export let currentTaskRowExpandHandler: ((questId: string) => void) | null = null;
-export let currentTaskRowClickSound: (() => void) | null = null;
+export let currentTaskRowExpandHandler: ((this: void, rowIndex: number) => void) | null = null;
+export let currentTaskRowClickSound: ((this: void) => void) | null = null;
 export const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number } | undefined> = {};
 
 /** `pcall` 单次槽位：任务 UI 列表控制内不会嵌套这些导出 */
 let pcallTaskUIListCtx: TaskUIListControlContext | null = null;
+
+function findTaskRowBindingFrame(frame: number): number {
+  let cur = frame;
+  for (let i = 0; i < 16; i++) {
+    if (!cur || cur === 0) return 0;
+    if (taskRowBindingByFrameId[cur] !== undefined) return cur;
+    if (typeof (japi as any).DzFrameGetParent !== "function") return 0;
+    cur = (japi as any).DzFrameGetParent(cur);
+  }
+  return 0;
+}
 
 function pcallRebuildTaskUIFacadeListPoolBody(): void {
   const ctx = pcallTaskUIListCtx!;
@@ -57,14 +69,14 @@ function pcallRebuildTaskUIFacadeListPoolBody(): void {
     const categoryView = ctx.precreatedListPool.categories[category];
     const quests = getQuestsForUI(ctx.currentPlayerId, category);
     const pages = chunkQuests(quests);
+    const renderedPageCount = pages.length < categoryView.pages.length ? pages.length : categoryView.pages.length;
 
-    categoryView.pageCount = pages.length;
+    categoryView.pageCount = renderedPageCount;
     setText(categoryView.emptyText, EMPTY_TEXTS[category]);
     setVisible(categoryView.emptyText, false);
 
-    for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
-      const page = ensurePage(ctx, categoryView, category, pageIndex, handleTaskRowClick);
-      bindTaskRowClickButtonsForPage(page);
+    for (let pageIndex = 0; pageIndex < renderedPageCount; pageIndex++) {
+      const page = categoryView.pages[pageIndex];
       const pageQuests = pages[pageIndex] || [];
       page.questIds = createEmptyQuestIdList();
       for (let rowIndex = 0; rowIndex < ROWS_PER_PAGE; rowIndex++) {
@@ -106,7 +118,7 @@ function pcallApplyTaskUIFacadeVisibleStateBody(): void {
     }
 
     setVisible(categoryView.emptyText, false);
-    const clampedPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage(category)));
+    const clampedPage = clampRange(ctx.getCurrentPage(category), 0, pageCount - 1);
     const currentPage = categoryView.pages[clampedPage];
     const expandedQuestId = ctx.getExpandedQuestId(category);
     const variantIndex = findExpandedVariantIndex(currentPage, expandedQuestId);
@@ -160,7 +172,7 @@ function pcallApplyTaskUIExpandVisibleStateBody(): void {
     return;
   }
 
-  const clampedPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage(ctx.currentCategory)));
+  const clampedPage = clampRange(ctx.getCurrentPage(ctx.currentCategory), 0, pageCount - 1);
   const currentPage = categoryView.pages[clampedPage];
   if (!currentPage) return;
 
@@ -189,7 +201,7 @@ function pcallApplyTaskUIPageSwitchVisibleStateBody(): void {
   }
 
   setVisible(categoryView.emptyText, false);
-  const clampedPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage(ctx.currentCategory)));
+  const clampedPage = clampRange(ctx.getCurrentPage(ctx.currentCategory), 0, pageCount - 1);
   showOnlyPageAndVariant(categoryView, clampedPage, 0, setVisible);
 
   ctx.updateScrollBarVisibility(pageCount, true);
@@ -258,7 +270,7 @@ export interface TaskUIListControlContext {
   applyDzTextFontAndAlignment: any;
   playClickSound: () => void;
   updateScrollBarVisibility: (pageCount: number, hasQuestRows: boolean) => void;
-  toggleExpand: (questId: string) => void;
+  toggleExpand: (rowIndex: number) => void;
   getCurrentPage: (type: QuestType) => number;
   setCurrentPage: (type: QuestType, page: number) => void;
   getExpandedQuestId: (type: QuestType) => string | null;
@@ -279,16 +291,18 @@ function hideFrames(frames: Array<number | null>): void {
 }
 
 export function handleTaskRowClick(): void {
-  const frame =
+  let frame =
     typeof (japi as any).DzGetTriggerUIEventFrame === "function" ? (japi as any).DzGetTriggerUIEventFrame() : 0;
-  if (!frame) return;
-  const binding = taskRowBindingByFrameId[frame];
+  if (!frame && typeof (japi as any).DzGetMouseFocus === "function") {
+    frame = (japi as any).DzGetMouseFocus();
+  }
+  const bindingFrame = findTaskRowBindingFrame(frame);
+  if (!bindingFrame) return;
+  const binding = taskRowBindingByFrameId[bindingFrame];
   if (!binding) return;
   const questId = binding.page.questIds[binding.rowIndex];
   if (!questId) return;
-  // sync=true 回调：expandedQuestId 修改在 toggleExpand 中对所有客户端同步执行
-  // 音效和 toggleExpandLocal（纯 UI）只对按键者执行
-  currentTaskRowExpandHandler?.(questId);
+  currentTaskRowExpandHandler?.(binding.rowIndex);
   const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
     ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
   if (triggerPlayer === jass.GetLocalPlayer()) {
@@ -296,29 +310,44 @@ export function handleTaskRowClick(): void {
   }
 }
 
+function handleTaskRowClickByRowIndex(rowIndex: number): void {
+  currentTaskRowExpandHandler?.(rowIndex);
+  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
+    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  if (triggerPlayer === jass.GetLocalPlayer()) {
+    currentTaskRowClickSound?.();
+  }
+}
+
+export function handleTaskRowClickRow0(): void { handleTaskRowClickByRowIndex(0); }
+export function handleTaskRowClickRow1(): void { handleTaskRowClickByRowIndex(1); }
+export function handleTaskRowClickRow2(): void { handleTaskRowClickByRowIndex(2); }
+export function handleTaskRowClickRow3(): void { handleTaskRowClickByRowIndex(3); }
+export function handleTaskRowClickRow4(): void { handleTaskRowClickByRowIndex(4); }
+export function handleTaskRowClickRow5(): void { handleTaskRowClickByRowIndex(5); }
+export function handleTaskRowClickRow6(): void { handleTaskRowClickByRowIndex(6); }
+
+export const taskRowClickHandlersByIndex: Array<() => void> = [
+  handleTaskRowClickRow0,
+  handleTaskRowClickRow1,
+  handleTaskRowClickRow2,
+  handleTaskRowClickRow3,
+  handleTaskRowClickRow4,
+  handleTaskRowClickRow5,
+  handleTaskRowClickRow6,
+];
+
 /** 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包 */
 export function bindTaskRowClickButtonsForPage(page: TaskUIPageFrames): void {
   for (let vi = 0; vi < page.variants.length; vi++) {
     const variant = page.variants[vi];
     for (let ri = 0; ri < variant.rowSlots.length; ri++) {
       const btn = variant.rowSlots[ri]?.clickBtn ?? null;
-      if (btn) taskRowBindingByFrameId[btn] = { page, rowIndex: ri };
+      if (btn) {
+        taskRowBindingByFrameId[btn] = { page, rowIndex: ri };
+      }
     }
   }
-}
-
-export function createTaskUIPrecreatedListPool(ctx: TaskUIListControlContext): TaskUIPrecreatedListPool | null {
-  if (!ctx.listContainer) return null;
-  currentTaskRowExpandHandler = ctx.toggleExpand;
-  currentTaskRowClickSound = ctx.playClickSound;
-
-  return {
-    categories: {
-      [QuestType.MAIN]: createCategory(ctx, QuestType.MAIN, setVisible),
-      [QuestType.SIDE]: createCategory(ctx, QuestType.SIDE, setVisible),
-      [QuestType.DAILY]: createCategory(ctx, QuestType.DAILY, setVisible),
-    },
-  };
 }
 
 function renderQuestRowSlot(
@@ -347,9 +376,6 @@ function renderQuestRowSlot(
 
   ctx.setFramePointRelative(slot.clickBtn, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, rowLeftRel, rowTopRel);
   ctx.setFrameSize(slot.clickBtn, { width: rowWidth, height: itemH });
-  if (slot.backdrop && ctx.setupTransparentGlueHitLayer) {
-    ctx.setupTransparentGlueHitLayer(slot.backdrop, slot.clickBtn);
-  }
   setVisible(slot.clickBtn, true);
 
   if (showIcon) {
@@ -472,7 +498,10 @@ export function rebuildTaskUIFacadeListPool(ctx: TaskUIListControlContext): void
 }
 
 /** 设置行点击的回调，由管理器在创建池时调用 */
-export function setTaskRowHandlers(expand: (questId: string) => void, sound: () => void): void {
+export function setTaskRowHandlers(
+  expand: (this: void, rowIndex: number) => void,
+  sound: (this: void) => void
+): void {
   currentTaskRowExpandHandler = expand;
   currentTaskRowClickSound = sound;
 }

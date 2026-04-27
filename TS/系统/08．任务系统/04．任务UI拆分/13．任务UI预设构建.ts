@@ -15,7 +15,7 @@ import {
   TaskUIRowSlotFrames,
   TaskUIPrecreatedListPool,
   setVisible,
-  handleTaskRowClick,
+  taskRowClickHandlersByIndex,
   taskRowBindingByFrameId,
 } from "./09．任务UI列表控制";
 import {
@@ -35,12 +35,6 @@ const TITLE_HEIGHT = LIST_ITEM_H * 0.38;
 const OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25;
 const FAIL_HEIGHT = LIST_ITEM_H * 0.2;
 const DETAIL_HEIGHT = LIST_ITEM_H * 0.22;
-const ROOT_LEVEL = 40;
-const BACKDROP_LEVEL = 41;
-const TEXT_LEVEL = 43;
-const BUTTON_LEVEL = 46;
-const ICON_LEVEL = 45;
-
 function createEmptyQuestIdList(): string[] {
   const questIds: string[] = [];
   for (let i = 0; i < ROWS_PER_PAGE; i++) questIds.push("");
@@ -58,7 +52,6 @@ function createHiddenRoot(
   if (!frame) return null;
   ctx.setFramePointRelative(frame, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, 0, 0);
   ctx.setFrameSize(frame, { width, height });
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ROOT_LEVEL);
   return frame;
 }
 
@@ -66,7 +59,6 @@ function createHiddenText(ctx: TaskUIListControlContext, name: string, parent: n
   const frame = ctx.createTextLabel(name, parent, "", { relativeTo: parent, point: ctx.FramePoint.TOPLEFT, relativePoint: ctx.FramePoint.TOPLEFT, x: 0, y: 0 }, { width, height }) || 0;
   if (!frame) return null;
   setVisible(frame, false);
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, TEXT_LEVEL);
   return frame;
 }
 
@@ -76,20 +68,17 @@ function createHiddenBackdrop(ctx: TaskUIListControlContext, templateName: strin
     frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name: frameName, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
     if (frame && texture) ctx.setFrameTexture(frame, texture);
   }
-  if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BACKDROP_LEVEL);
   return frame || null;
 }
 
 function createPlainHiddenBackdrop(ctx: TaskUIListControlContext, name: string, parent: number): number | null {
   const frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
-  if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ICON_LEVEL);
   return frame || null;
 }
 
 function createHiddenButton(ctx: TaskUIListControlContext, name: string, parent: number, onClick: () => void): number | null {
   const frame = ctx.createFrame({ type: ctx.FrameType.GLUETEXTBUTTON, name, parent, template: "template", visible: false, enable: true, alpha: 0, id: ctx.contextId }) || 0;
   if (!frame) return null;
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BUTTON_LEVEL);
   ctx.setFrameClickEvent(frame, onClick, true);
   return frame;
 }
@@ -116,7 +105,7 @@ function createVariant(ctx: TaskUIListControlContext, page: TaskUIPageFrames, ca
   const rowSlots: TaskUIRowSlotFrames[] = [];
   const prefix = "TV" + category + "_" + pageIndex + "_" + variantIndex;
   for (let rowIndex = 0; rowIndex < ROWS_PER_PAGE; rowIndex++) {
-    const slot = createRowSlot(ctx, root as number, prefix + "_R" + rowIndex, rowIndex, handleTaskRowClick);
+    const slot = createRowSlot(ctx, root as number, prefix + "_R" + rowIndex, rowIndex, taskRowClickHandlersByIndex[rowIndex]!);
     if (slot.clickBtn) taskRowBindingByFrameId[slot.clickBtn] = { page, rowIndex };
     rowSlots.push(slot);
   }
@@ -138,7 +127,7 @@ function createPage(ctx: TaskUIListControlContext, categoryRoot: number, categor
 function createCategory(ctx: TaskUIListControlContext, category: QuestType): TaskUICategoryFrames {
   const root = createHiddenRoot(ctx, "TaskCategory_" + category, ctx.listContainer as number);
   const emptyText = createHiddenText(ctx, "TaskEmpty_" + category, root as number, LIST_CONTAINER_W * 0.85, 0.08) || 0;
-  if (emptyText) {
+  if (emptyText !== 0) {
     ctx.applyDzTextFontAndCenterAlignment(emptyText);
     setVisible(emptyText, false);
   }

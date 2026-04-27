@@ -15,11 +15,6 @@ local PAGE_VARIANT_COUNT = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9
 local ROWS_PER_PAGE = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.ROWS_PER_PAGE
 local japi = require("jass.japi")
 local PAGE_ROOT_HEIGHT = LIST_VIEW_H
-local ROOT_LEVEL = 40
-local BACKDROP_LEVEL = 41
-local TEXT_LEVEL = 43
-local BUTTON_LEVEL = 46
-local ICON_LEVEL = 45
 local TITLE_HEIGHT = LIST_ITEM_H * 0.38
 local OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25
 local FAIL_HEIGHT = LIST_ITEM_H * 0.2
@@ -51,9 +46,6 @@ function ____exports.createHiddenRoot(self, ctx, name, parent, width, height)
         0
     )
     ctx:setFrameSize(frame, {width = width, height = height})
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, ROOT_LEVEL)
-    end
     return frame
 end
 function ____exports.createHiddenText(self, ctx, name, parent, width, height)
@@ -74,10 +66,7 @@ function ____exports.createHiddenText(self, ctx, name, parent, width, height)
         return nil
     end
     if type(japi.DzFrameShow) == "function" then
-        japi:DzFrameShow(frame, false)
-    end
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, TEXT_LEVEL)
+        japi.DzFrameShow(frame, false)
     end
     return frame
 end
@@ -96,9 +85,6 @@ function ____exports.createHiddenBackdrop(self, ctx, templateName, frameName, pa
             ctx:setFrameTexture(frame, texture)
         end
     end
-    if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, BACKDROP_LEVEL)
-    end
     return frame or nil
 end
 function ____exports.createPlainHiddenBackdrop(self, ctx, name, parent)
@@ -110,9 +96,6 @@ function ____exports.createPlainHiddenBackdrop(self, ctx, name, parent)
         visible = false,
         id = ctx.contextId
     }) or 0
-    if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, ICON_LEVEL)
-    end
     return frame or nil
 end
 function ____exports.createHiddenButton(self, ctx, name, parent, onClick)
@@ -128,9 +111,6 @@ function ____exports.createHiddenButton(self, ctx, name, parent, onClick)
     }) or 0
     if not frame then
         return nil
-    end
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, BUTTON_LEVEL)
     end
     ctx:setFrameClickEvent(frame, onClick, true)
     return frame
@@ -197,18 +177,6 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
         (prefix .. "_Icon_") .. tostring(rowIndex),
         parent
     )
-    if backdrop and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(backdrop, BACKDROP_LEVEL)
-    end
-    if title and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(title, TEXT_LEVEL)
-    end
-    if clickBtn and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(clickBtn, BUTTON_LEVEL)
-    end
-    if icon and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(icon, ICON_LEVEL)
-    end
     do
         local i = 0
         while i < 4 do
@@ -220,9 +188,6 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
                 LIST_CONTAINER_W * 0.9,
                 OBJECTIVE_HEIGHT
             )
-            if frame and type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(frame, TEXT_LEVEL)
-            end
             objectiveFrames[#objectiveFrames + 1] = frame or 0
             i = i + 1
         end
@@ -235,9 +200,6 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
         LIST_CONTAINER_W * 0.9,
         FAIL_HEIGHT
     )
-    if failFrame and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(failFrame, TEXT_LEVEL)
-    end
     do
         local i = 0
         while i < 3 do
@@ -249,9 +211,6 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
                 LIST_CONTAINER_W * 0.9,
                 DETAIL_HEIGHT
             )
-            if frame and type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(frame, TEXT_LEVEL)
-            end
             detailFrames[#detailFrames + 1] = frame or 0
             i = i + 1
         end
@@ -266,7 +225,7 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
         detailFrames = detailFrames
     }
 end
-function ____exports.createVariant(self, ctx, page, category, pageIndex, variantIndex, onRowClick)
+function ____exports.createVariant(self, ctx, page, category, pageIndex, variantIndex, rowClickHandlers)
     local root = ____exports.createHiddenRoot(
         nil,
         ctx,
@@ -283,14 +242,15 @@ function ____exports.createVariant(self, ctx, page, category, pageIndex, variant
                 root,
                 (((("TaskVar_" .. category) .. "_") .. tostring(pageIndex)) .. "_") .. tostring(variantIndex),
                 rowIndex,
-                onRowClick
+                rowClickHandlers[rowIndex + 1] or (function()
+                end)
             )
             rowIndex = rowIndex + 1
         end
     end
     return {root = root, rowSlots = rowSlots}
 end
-function ____exports.createPage(self, ctx, categoryRoot, category, pageIndex, onRowClick)
+function ____exports.createPage(self, ctx, categoryRoot, category, pageIndex, rowClickHandlers)
     local page = {
         root = ____exports.createHiddenRoot(
             nil,
@@ -312,14 +272,14 @@ function ____exports.createPage(self, ctx, categoryRoot, category, pageIndex, on
                 category,
                 pageIndex,
                 variantIndex,
-                onRowClick
+                rowClickHandlers
             )
             variantIndex = variantIndex + 1
         end
     end
     return page
 end
-function ____exports.createCategory(self, ctx, category, setVisible)
+function ____exports.createCategory(self, ctx, category, setVisible, rowClickHandlers)
     local root = ____exports.createHiddenRoot(nil, ctx, "TaskCategory_" .. category, ctx.listContainer)
     local emptyText = ctx:createTextLabel(
         "TaskEmpty_" .. category,
@@ -336,26 +296,8 @@ function ____exports.createCategory(self, ctx, category, setVisible)
     ) or 0
     if emptyText then
         ctx:applyDzTextFontAndCenterAlignment(emptyText)
-        if type(japi.DzFrameSetLevel) == "function" then
-            japi:DzFrameSetLevel(emptyText, TEXT_LEVEL)
-        end
         setVisible(nil, emptyText, false)
     end
     return {root = root, emptyText = emptyText or nil, pageCount = 0, pages = {}}
-end
-function ____exports.ensurePage(self, ctx, categoryView, category, pageIndex, onRowClick)
-    while #categoryView.pages <= pageIndex do
-        local p = ____exports.createPage(
-            nil,
-            ctx,
-            categoryView.root,
-            category,
-            #categoryView.pages,
-            onRowClick
-        )
-        local ____categoryView_pages_1 = categoryView.pages
-        ____categoryView_pages_1[#____categoryView_pages_1 + 1] = p
-    end
-    return categoryView.pages[pageIndex + 1]
 end
 return ____exports

@@ -56,4 +56,12 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.封装函数.01．通用工具.08．Map安全遍历")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

@@ -3,9 +3,12 @@
  */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 import { YDUserDataGet } from "../YDWE函数/01．YDUserData兼容";
-import { ForGroupBJ } from "../BJ函数/07．杂项";
+import { forEachUnitInGroup } from "../封装函数/01．通用工具/04．单位工具";
+
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
 /**
  * 创建单位并设置尺寸和角度
@@ -50,7 +53,7 @@ export function createUnitWithOptions(
     }
 
     if (facing !== undefined) {
-        jass.SetUnitFacing(unit, facing * 180 / Math.PI);
+        jass.SetUnitFacing(unit, facing * BJ_RADTODEG);
     }
 
     const scaleX = scale ?? 1.0;
@@ -75,8 +78,7 @@ export function getPlayerFirstHero(player: any): any {
     if (!heroGroup) return null;
 
     let hero: any = null;
-    ForGroupBJ(heroGroup, () => {
-        const u = jass.GetEnumUnit();
+    forEachUnitInGroup(heroGroup, (u: any) => {
         if (hero != null) return; // 已找到第一个则不再覆写
 
         // 对齐你给的 JASS：if GetOwningPlayer(GetEnumUnit()) == Player(x)

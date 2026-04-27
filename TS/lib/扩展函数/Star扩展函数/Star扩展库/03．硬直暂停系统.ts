@@ -13,6 +13,13 @@
  */
 
 const jass = require("jass.common") as any;
+const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  RMaxBJ: (a: number, b: number) => number;
+};
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 let japi: any = null;
 try {
   japi = require("jass.japi") as any;
@@ -52,7 +59,7 @@ export function GS_Suspend(u: any, time: number): void {
   }
 
   const timerRef = T;
-  jass.TimerStart(timerRef, time, false, () => {
+  safeTimerStart(timerRef, time, false, () => {
     const expiredTimer = jass.GetExpiredTimer();
     const tid = hid(expiredTimer);
     const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
@@ -67,7 +74,7 @@ export function GS_Suspend(u: any, time: number): void {
     if (savedUnit != null && savedUnit !== 0) {
       jass.FlushChildHashtable(HS_S, hid(savedUnit));
     }
-    jass.DestroyTimer(expiredTimer);
+    safeDestroyTimer(expiredTimer);
   });
 }
 
@@ -115,9 +122,9 @@ export function GS_UnitSuspend(u: any, i: number, r: number): void {
   if (i === 0) {
     GS_Suspend(u, currentRemain + r);
   } else if (i === 1) {
-    GS_Suspend(u, Math.max(0, currentRemain - r));
+    GS_Suspend(u, RMaxBJ(0, currentRemain - r));
   } else if (i === 2) {
-    GS_Suspend(u, Math.max(currentRemain, r));
+    GS_Suspend(u, RMaxBJ(currentRemain, r));
   }
 }
 

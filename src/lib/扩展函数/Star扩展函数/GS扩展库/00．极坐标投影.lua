@@ -4,9 +4,10 @@ local ____exports = {}
 -- 对齐 JASS BJ: PolarProjectionBJ
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local DEFAULT_BJ_DEGTORAD = 0.017453292519943295
 local ____jglobals_bj_DEGTORAD_0 = jglobals.bj_DEGTORAD
 if ____jglobals_bj_DEGTORAD_0 == nil then
-    ____jglobals_bj_DEGTORAD_0 = math.pi / 180
+    ____jglobals_bj_DEGTORAD_0 = DEFAULT_BJ_DEGTORAD
 end
 --- 角度转弧度常量
 local bj_DEGTORAD = ____jglobals_bj_DEGTORAD_0
@@ -20,9 +21,10 @@ function ____exports.GS_PolarProjectionBJ(self, source, dist, angle)
     if not source then
         return nil
     end
-    local x = jass:GetLocationX(source) + dist * math.cos(angle * bj_DEGTORAD)
-    local y = jass:GetLocationY(source) + dist * math.sin(angle * bj_DEGTORAD)
-    jass:RemoveLocation(source)
-    return jass:Location(x, y)
+    local rad = angle * bj_DEGTORAD
+    local x = jass.GetLocationX(source) + dist * jass.Cos(rad)
+    local y = jass.GetLocationY(source) + dist * jass.Sin(rad)
+    jass.RemoveLocation(source)
+    return jass.Location(x, y)
 end
 return ____exports

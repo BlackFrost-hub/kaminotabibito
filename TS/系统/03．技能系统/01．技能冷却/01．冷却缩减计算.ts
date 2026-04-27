@@ -109,13 +109,13 @@ export function applyCooldownCap(
   // 检查技能独立上限
   for (const [idStr, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
     if (stringToFourCC(idStr) === abilityId) {
-      return Math.min(reduction, cap);
+      return reduction < cap ? reduction : cap;
     }
   }
 
   // 通用上限 + 突破加成
   const cap = COOLDOWN_REDUCTION_CAP + bonus;
-  return Math.min(reduction, cap);
+  return reduction < cap ? reduction : cap;
 }
 
 //=============================================================================

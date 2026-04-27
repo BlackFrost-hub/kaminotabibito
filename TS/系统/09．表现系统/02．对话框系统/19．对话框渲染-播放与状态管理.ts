@@ -154,8 +154,34 @@ export function skipTyping(state: PlayerDialogState): void {
   state.clickCooldown = false;
 }
 
+function runTypingTickForPlayer(playerId: number): void {
+  const state = g_states[playerId];
+  if (!state) return;
+  onTypingTick(state);
+}
+
+function typingTickCallbackP0(): void { runTypingTickForPlayer(0); }
+function typingTickCallbackP1(): void { runTypingTickForPlayer(1); }
+function typingTickCallbackP2(): void { runTypingTickForPlayer(2); }
+function typingTickCallbackP3(): void { runTypingTickForPlayer(3); }
+
 function startTyping(state: PlayerDialogState): void {
-  dzTimerStart(state.tickTimer, TICK, true, () => onTypingTick(state));
+  switch (state.playerId) {
+    case 0:
+      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP0);
+      return;
+    case 1:
+      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP1);
+      return;
+    case 2:
+      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP2);
+      return;
+    case 3:
+      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP3);
+      return;
+    default:
+      return;
+  }
 }
 
 function onTypingTick(state: PlayerDialogState): void {

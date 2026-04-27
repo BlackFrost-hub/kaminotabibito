@@ -8,7 +8,8 @@ function handleCategoryHotkey(self, player, category)
     if not opts then
         return
     end
-    opts:onSwitchCategorySync(player, category)
+    local onSwitchCategorySync = opts.onSwitchCategorySync
+    onSwitchCategorySync(player, category)
 end
 local jass = require("jass.common")
 currentHotkeyOpts = nil
@@ -19,7 +20,8 @@ local function handleTogglePanelHotkey(self, player)
     if not opts then
         return
     end
-    opts:onTogglePanelSync(player)
+    local onTogglePanelSync = opts.onTogglePanelSync
+    onTogglePanelSync(player)
 end
 local function handleMainCategoryHotkey(self, player)
     handleCategoryHotkey(nil, player, QuestType.MAIN)

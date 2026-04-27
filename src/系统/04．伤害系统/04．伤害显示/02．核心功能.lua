@@ -17,12 +17,12 @@ function ____exports.updateAllDamageDigits()
                 local data = activeDigits[i + 1]
                 data.tick = data.tick + 1
                 if data.tick >= DISPLAY_DURATION_TICKS then
-                    jass:DestroyImage(data.image)
+                    jass.DestroyImage(data.image)
                     __TS__ArraySplice(activeDigits, i, 1)
                     goto __continue40
                 end
                 local newHeight = RISE_SPEED * data.tick
-                jass:SetImagePosition(data.image, data.x, data.y, newHeight)
+                jass.SetImagePosition(data.image, data.x, data.y, newHeight)
             end
             ::__continue40::
             i = i - 1
@@ -38,8 +38,8 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_2 = _G
-    local onTick10ms = ____G_2.onTick10ms
+    local ____G_3 = _G
+    local onTick10ms = ____G_3.onTick10ms
     onTick10ms(
         nil,
         function()
@@ -55,20 +55,22 @@ function ensureRegisteredToCenterTimer()
     )
 end
 jass = require("jass.common")
-local ____require_result_0 = require("系统.04．伤害系统.04．伤害显示.00．常量定义")
-local MIN_DAMAGE_THRESHOLD = ____require_result_0.MIN_DAMAGE_THRESHOLD
-local DIGIT_IMAGE_PATH_TEMPLATE = ____require_result_0.DIGIT_IMAGE_PATH_TEMPLATE
-local DIGIT_BASE_SIZE = ____require_result_0.DIGIT_BASE_SIZE
-local DIGIT_SPACING = ____require_result_0.DIGIT_SPACING
-local INITIAL_OFFSET_BASE = ____require_result_0.INITIAL_OFFSET_BASE
-DISPLAY_DURATION_TICKS = ____require_result_0.DISPLAY_DURATION_TICKS
-local UPDATE_INTERVAL = ____require_result_0.UPDATE_INTERVAL
-RISE_SPEED = ____require_result_0.RISE_SPEED
-local BASE_HEIGHT = ____require_result_0.BASE_HEIGHT
-local DAMAGE_TYPE_COLORS = ____require_result_0.DAMAGE_TYPE_COLORS
-local DEFAULT_COLOR = ____require_result_0.DEFAULT_COLOR
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
-local getObjectProperty = ____require_result_1.getObjectProperty
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local ceil = ____require_result_0.ceil
+local ____require_result_1 = require("系统.04．伤害系统.04．伤害显示.00．常量定义")
+local MIN_DAMAGE_THRESHOLD = ____require_result_1.MIN_DAMAGE_THRESHOLD
+local DIGIT_IMAGE_PATH_TEMPLATE = ____require_result_1.DIGIT_IMAGE_PATH_TEMPLATE
+local DIGIT_BASE_SIZE = ____require_result_1.DIGIT_BASE_SIZE
+local DIGIT_SPACING = ____require_result_1.DIGIT_SPACING
+local INITIAL_OFFSET_BASE = ____require_result_1.INITIAL_OFFSET_BASE
+DISPLAY_DURATION_TICKS = ____require_result_1.DISPLAY_DURATION_TICKS
+local UPDATE_INTERVAL = ____require_result_1.UPDATE_INTERVAL
+RISE_SPEED = ____require_result_1.RISE_SPEED
+local BASE_HEIGHT = ____require_result_1.BASE_HEIGHT
+local DAMAGE_TYPE_COLORS = ____require_result_1.DAMAGE_TYPE_COLORS
+local DEFAULT_COLOR = ____require_result_1.DEFAULT_COLOR
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_2.getObjectProperty
 local _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 activeDigits = {}
 --- 数字图片路径缓存（0-9）
@@ -100,7 +102,7 @@ local function getUnitModelScale(unit)
     if not unit then
         return 1
     end
-    local unitType = jass:GetUnitTypeId(unit)
+    local unitType = jass.GetUnitTypeId(unit)
     if not unitType then
         return 1
     end
@@ -141,34 +143,34 @@ local function getDigitCount(value)
 end
 --- 获取伤害类型对应的颜色
 local function getDamageTypeColor()
-    if _____4F24_5BB3_51FD_6570:isFireDamage() then
+    if _____4F24_5BB3_51FD_6570.isFireDamage() then
         return DAMAGE_TYPE_COLORS.FIRE
     end
-    if _____4F24_5BB3_51FD_6570:isWaterDamage() then
+    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
         return DAMAGE_TYPE_COLORS.COLD
     end
-    if _____4F24_5BB3_51FD_6570:isThunderDamage() then
+    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
         return DAMAGE_TYPE_COLORS.LIGHTNING
     end
-    if _____4F24_5BB3_51FD_6570:isMetalDamage() then
+    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
         return DAMAGE_TYPE_COLORS.POISON
     end
-    if _____4F24_5BB3_51FD_6570:isLightDamage() then
+    if _____4F24_5BB3_51FD_6570.isLightDamage() then
         return DAMAGE_TYPE_COLORS.DIVINE
     end
-    if _____4F24_5BB3_51FD_6570:isDarkDamage() then
+    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
         return DAMAGE_TYPE_COLORS.SHADOW
     end
-    if _____4F24_5BB3_51FD_6570:isWoodDamage() then
+    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
         return DAMAGE_TYPE_COLORS.PLANT
     end
-    if _____4F24_5BB3_51FD_6570:isPhysicalDamage() then
+    if _____4F24_5BB3_51FD_6570.isPhysicalDamage() then
         return DAMAGE_TYPE_COLORS.NORMAL
     end
-    if _____4F24_5BB3_51FD_6570:isMagicDamage() then
+    if _____4F24_5BB3_51FD_6570.isMagicDamage() then
         return DAMAGE_TYPE_COLORS.MAGIC
     end
-    if _____4F24_5BB3_51FD_6570:isEnhancedDamage() then
+    if _____4F24_5BB3_51FD_6570.isEnhancedDamage() then
         return DAMAGE_TYPE_COLORS.ENHANCED
     end
     return DEFAULT_COLOR
@@ -177,7 +179,7 @@ end
 local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
     local imagePath = getDigitImagePath(digit)
     local size = DIGIT_BASE_SIZE * modelScale
-    local image = jass:CreateImage(
+    local image = jass.CreateImage(
         imagePath,
         size,
         size,
@@ -193,7 +195,7 @@ local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
     if not image then
         return nil
     end
-    jass:SetImageColor(
+    jass.SetImageColor(
         image,
         color.red,
         color.green,
@@ -201,9 +203,9 @@ local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
         255
     )
     local height = (BASE_HEIGHT + unitFlyHeight) * modelScale
-    jass:SetImageConstantHeight(image, true, height)
-    jass:SetImageRenderAlways(image, true)
-    jass:SetImageType(image, 5)
+    jass.SetImageConstantHeight(image, true, height)
+    jass.SetImageRenderAlways(image, true)
+    jass.SetImageType(image, 5)
     return image
 end
 --- 显示伤害数字
@@ -214,12 +216,12 @@ function ____exports.showDamageNumber(target, damage)
     if not target or damage < MIN_DAMAGE_THRESHOLD then
         return
     end
-    local damageInt = math.floor(damage)
+    local damageInt = jass.R2I(damage)
     local damageStr = tostring(damageInt)
     local digitCount = getDigitCount(damageInt)
-    local x = jass:GetUnitX(target)
-    local y = jass:GetUnitY(target)
-    local flyHeight = jass:GetUnitFlyHeight(target)
+    local x = jass.GetUnitX(target)
+    local y = jass.GetUnitY(target)
+    local flyHeight = jass.GetUnitFlyHeight(target)
     local modelScale = getUnitModelScale(target)
     local color = getDamageTypeColor()
     local offsetX = -INITIAL_OFFSET_BASE * digitCount
@@ -249,5 +251,5 @@ function ____exports.showDamageNumber(target, damage)
 end
 _registeredToCenterTimer = false
 _tickCounter = 0
-CENTER_TIMER_TICKS = math.ceil(UPDATE_INTERVAL / 0.01)
+CENTER_TIMER_TICKS = ceil(nil, UPDATE_INTERVAL / 0.01)
 return ____exports

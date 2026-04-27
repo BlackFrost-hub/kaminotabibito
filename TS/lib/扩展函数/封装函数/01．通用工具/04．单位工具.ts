@@ -5,9 +5,25 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const bjFuncs = require("lib.扩展函数.BJ函数.index") as { IsUnitIllusionBJ: (unit: any) => boolean };
 
 const g = require("jass.globals") as { [key: string]: any };
+const groupScratchPool: any[] = [];
+
+function acquireScratchGroup(): any {
+  const scratch = groupScratchPool.pop();
+  if (scratch) return scratch;
+  return jass.CreateGroup();
+}
+
+function releaseScratchGroup(group: any): void {
+  if (!group || group === 0) return;
+  while (true) {
+    const unit = jass.FirstOfGroup(group);
+    if (!unit || unit === 0) break;
+    jass.GroupRemoveUnit(group, unit);
+  }
+  groupScratchPool.push(group);
+}
 
 /**
  * 判断单位是否为英雄单位
@@ -54,7 +70,7 @@ export function isAncientUnit(unit: any): boolean {
 export function isSpecialUnit(unit: any): boolean {
   if (!unit) return true;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return true;
-  if (bjFuncs.IsUnitIllusionBJ(unit)) return true;
+  if (jass.IsUnitIllusion(unit)) return true;
   return false;
 }
 
@@ -73,6 +89,32 @@ export function findHeroOfPlayer(playerId: number): any {
 }
 
 /**
+ * 用 `FirstOfGroup + while` 在 Lua 层遍历单位组，并在遍历结束后恢复原组成员。
+ * 不把业务 action 挂到 JASS 的 `ForGroup` 回调里，适合联机场景逐步替换原生 `ForGroup`。
+ */
+export function forEachUnitInGroup(group: any, action: (unit: any) => void): void {
+  if (!group || typeof action !== "function") return;
+  const scratch = acquireScratchGroup();
+  try {
+    while (true) {
+      const unit = jass.FirstOfGroup(group);
+      if (!unit || unit === 0) break;
+      jass.GroupRemoveUnit(group, unit);
+      jass.GroupAddUnit(scratch, unit);
+      action(unit);
+    }
+    while (true) {
+      const unit = jass.FirstOfGroup(scratch);
+      if (!unit || unit === 0) break;
+      jass.GroupRemoveUnit(scratch, unit);
+      jass.GroupAddUnit(group, unit);
+    }
+  } finally {
+    releaseScratchGroup(scratch);
+  }
+}
+
+/**
  * 获取单位的攻击类型（Attack Type）
  * 单位状态0x23对应攻击类型，使用ConvertUnitState转换
  */
@@ -82,4 +124,25 @@ export function Ir_GetUnitAttackType(u: any): number {
 
 export function Ir_SetUnitAttackType(u: any, atp: number): void {
   japi.SetUnitState(u, (jass as any).ConvertUnitState(0x23), atp);
+}
+
+/**
+ * 获取单位所属玩家的ID
+ * @param unit 单位句柄
+ * @returns 玩家ID（0-11），如果单位无效则返回 -1
+ */
+export function getUnitOwnerId(unit: any): number {
+  if (!unit || unit === 0) return -1;
+  const owner = jass.GetOwningPlayer(unit);
+  if (!owner || owner === 0) return -1;
+  return jass.GetPlayerId(owner);
+}
+
+/**
+ * 检查句柄是否有效（非 null、非 0、非 undefined）
+ * @param handle 任何句柄类型
+ * @returns 是否有效
+ */
+export function isHandleValid(handle: any): boolean {
+  return handle != null && handle !== 0;
 }

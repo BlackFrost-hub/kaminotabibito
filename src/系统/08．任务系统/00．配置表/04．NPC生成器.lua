@@ -16,6 +16,10 @@ local tryAttachQuestMarkerForConfigNpc = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1
 -- 根据 NPC 配置表统一创建 NPC，并维护“配置 -> 已创建单位”的索引。
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local BJ_DEGTORAD = 0.017453292519943295
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local _print = _G.print
 --- 维护已创建 NPC 的稳定查表，供同步入口按配置键回查真实单位。
 local g_npcUnitByRequireId = __TS__New(Map)
@@ -41,42 +45,42 @@ local function registerCreatedNpcUnit(self, npcConfig, unit)
 end
 local function scheduleTryAttachQuestMarker(self, unit, npcConfig)
     local delaySec = npcConfig.modelFIle and DELAY_QUEST_MARKER_AFTER_SET_MODEL or DELAY_QUEST_MARKER_NO_CUSTOM_MODEL
-    local timer = jass:CreateTimer()
+    local timer = jass.CreateTimer()
     if not timer then
         tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
         return
     end
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         timer,
         delaySec,
         false,
         function()
-            jass:DestroyTimer(timer)
+            safeDestroyTimer(nil, timer)
             tryAttachQuestMarkerForConfigNpc(nil, unit, npcConfig)
         end
     )
 end
 local function scheduleSetUnitModel(self, unit, modelPath, npcLabel)
-    local timer = jass:CreateTimer()
+    local timer = jass.CreateTimer()
     if not timer then
         return
     end
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         timer,
         0.01,
         false,
         function()
-            jass:DestroyTimer(timer)
-            local ok = pcall(
-                nil,
-                function()
-                    japi:DzSetUnitModel(unit, modelPath)
+            safeDestroyTimer(nil, timer)
+            local ok = pcall(function ()
+                    japi.DzSetUnitModel(unit, modelPath)
                 end
             )
             if not ok then
                 _print(
                     nil,
-                    (("[NPC生成器] 设置单位模型失败（已忽略） " .. npcLabel) .. " model=") .. tostring(nil, modelPath)
+                    (("[NPC生成器] 设置单位模型失败（已忽略） " .. npcLabel) .. " model=") .. tostring(modelPath)
                 )
             end
         end
@@ -86,7 +90,7 @@ local function createSingleNPC(self, npcConfig)
     if not npcConfig.unitcode or npcConfig.X == nil or npcConfig.Y == nil then
         _print(
             nil,
-            "[NPC生成器] 配置不完整，跳过: " .. tostring(nil, npcConfig.NpcNameID)
+            "[NPC生成器] 配置不完整，跳过: " .. tostring(npcConfig.NpcNameID)
         )
         return nil
     end
@@ -96,7 +100,7 @@ local function createSingleNPC(self, npcConfig)
         return nil
     end
     local facingDeg = npcConfig.Facing or 270
-    local facingRad = facingDeg * math.pi / 180
+    local facingRad = facingDeg * BJ_DEGTORAD
     local unit = createUnitWithOptions(
         nil,
         15,
@@ -108,7 +112,7 @@ local function createSingleNPC(self, npcConfig)
     if not unit then
         _print(
             nil,
-            ((("[NPC生成器] 创建单位失败: " .. tostring(nil, npcConfig.NpcNameID)) .. " (") .. unitCode) .. ")"
+            ((("[NPC生成器] 创建单位失败: " .. tostring(npcConfig.NpcNameID)) .. " (") .. unitCode) .. ")"
         )
         return nil
     end
@@ -117,7 +121,7 @@ local function createSingleNPC(self, npcConfig)
             nil,
             unit,
             npcConfig.modelFIle,
-            tostring(nil, npcConfig.NpcNameID)
+            tostring(npcConfig.NpcNameID)
         )
     end
     runNpcInitAction(nil, unit, npcConfig.initAction)
@@ -125,7 +129,7 @@ local function createSingleNPC(self, npcConfig)
     registerCreatedNpcUnit(nil, npcConfig, unit)
     _print(
         nil,
-        ((((("[NPC生成器] 成功创建NPC: " .. tostring(nil, npcConfig.NpcNameID)) .. " at (") .. tostring(nil, npcConfig.X)) .. ", ") .. tostring(nil, npcConfig.Y)) .. ")"
+        ((((("[NPC生成器] 成功创建NPC: " .. tostring(npcConfig.NpcNameID)) .. " at (") .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"
     )
     return unit
 end
@@ -163,14 +167,14 @@ function ____exports.createNPCByQuestId(self, requireID)
     if not npcConfig then
         _print(
             nil,
-            "[NPC生成器] 未找到任务ID对应的NPC: " .. tostring(nil, requireID)
+            "[NPC生成器] 未找到任务ID对应的NPC: " .. tostring(requireID)
         )
         return nil
     end
     if npcConfig.enabled ~= true then
         _print(
             nil,
-            ((("[NPC生成器] NPC未启用: " .. tostring(nil, npcConfig.NpcNameID)) .. " (任务ID: ") .. tostring(nil, requireID)) .. ")"
+            ((("[NPC生成器] NPC未启用: " .. tostring(npcConfig.NpcNameID)) .. " (任务ID: ") .. tostring(requireID)) .. ")"
         )
         return nil
     end
@@ -186,25 +190,25 @@ function ____exports.getAllNPCs(self)
     return {table.unpack(NPC_CONFIGS)}
 end
 function ____exports.findExistingNpcByRequireId(self, requireID)
-    local ____temp_0 = g_npcUnitByRequireId:get(requireID)
-    if ____temp_0 == nil then
-        ____temp_0 = nil
+    local ____temp_1 = g_npcUnitByRequireId:get(requireID)
+    if ____temp_1 == nil then
+        ____temp_1 = nil
     end
-    return ____temp_0
+    return ____temp_1
 end
 function ____exports.findExistingNpcByName(self, npcName)
     if not npcName then
         return nil
     end
-    local ____temp_1 = g_npcUnitByNpcNameId:get(npcName)
-    if ____temp_1 == nil then
-        ____temp_1 = g_npcUnitByDisplayName:get(npcName)
+    local ____temp_2 = g_npcUnitByNpcNameId:get(npcName)
+    if ____temp_2 == nil then
+        ____temp_2 = g_npcUnitByDisplayName:get(npcName)
     end
-    local ____temp_1_2 = ____temp_1
-    if ____temp_1_2 == nil then
-        ____temp_1_2 = nil
+    local ____temp_2_3 = ____temp_2
+    if ____temp_2_3 == nil then
+        ____temp_2_3 = nil
     end
-    return ____temp_1_2
+    return ____temp_2_3
 end
 function ____exports.init(self)
     ____exports.initializeNPCs(nil)

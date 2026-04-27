@@ -11,9 +11,9 @@ local function sendMsg(msg)
     do
         local i = 0
         while i <= 15 do
-            local p = jass:Player(i)
+            local p = jass.Player(i)
             if p ~= nil then
-                jass:DisplayTextToPlayer(p, 0, 0, msg)
+                jass.DisplayTextToPlayer(p, 0, 0, msg)
             end
             i = i + 1
         end
@@ -22,10 +22,8 @@ end
 --- 伤害测试：`japi.GetEventDamage`（1.27 与 `YDWESetEventDamage` 改写后一致；无则 0）
 local function readEventDamageForDisplay()
     local v
-    pcall(
-        nil,
-        function()
-            v = japi:GetEventDamage()
+    pcall(function ()
+            v = japi.GetEventDamage()
         end
     )
     if v ~= nil and type(v) == "number" and not __TS__NumberIsNaN(v) then
@@ -34,56 +32,56 @@ local function readEventDamageForDisplay()
     return 0
 end
 local function TrigActions()
-    local unit = jass:GetTriggerUnit()
+    local unit = jass.GetTriggerUnit()
     local damage = readEventDamageForDisplay()
     if not unit then
         return
     end
-    local name = jass:GetUnitName(unit)
-    local damageStr = jass:R2S(damage)
+    local name = jass.GetUnitName(unit)
+    local damageStr = jass.R2S(damage)
     local damageTypeParts = {}
-    if _____4F24_5BB3_51FD_6570:isFireDamage() then
+    if _____4F24_5BB3_51FD_6570.isFireDamage() then
         damageTypeParts[#damageTypeParts + 1] = "火"
     end
-    if _____4F24_5BB3_51FD_6570:isWaterDamage() then
+    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
         damageTypeParts[#damageTypeParts + 1] = "冰"
     end
-    if _____4F24_5BB3_51FD_6570:isThunderDamage() then
+    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
         damageTypeParts[#damageTypeParts + 1] = "雷"
     end
-    if _____4F24_5BB3_51FD_6570:isMetalDamage() then
+    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
         damageTypeParts[#damageTypeParts + 1] = "毒"
     end
-    if _____4F24_5BB3_51FD_6570:isLightDamage() then
+    if _____4F24_5BB3_51FD_6570.isLightDamage() then
         damageTypeParts[#damageTypeParts + 1] = "光"
     end
-    if _____4F24_5BB3_51FD_6570:YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC) then
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventDamageType(jass.DAMAGE_TYPE_MAGIC) then
         damageTypeParts[#damageTypeParts + 1] = "魔法"
     end
-    if _____4F24_5BB3_51FD_6570:isWoodDamage() then
+    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
         damageTypeParts[#damageTypeParts + 1] = "风"
     end
-    if _____4F24_5BB3_51FD_6570:isDarkDamage() then
+    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
         damageTypeParts[#damageTypeParts + 1] = "暗"
     end
-    if _____4F24_5BB3_51FD_6570:isPhysicalDamage() then
+    if _____4F24_5BB3_51FD_6570.isPhysicalDamage() then
         damageTypeParts[#damageTypeParts + 1] = "物理"
     end
     local typeText = ""
     if #damageTypeParts > 0 then
         typeText = table.concat(damageTypeParts, "")
-        if _____4F24_5BB3_51FD_6570:isMagicDamage() then
+        if _____4F24_5BB3_51FD_6570.isMagicDamage() then
             typeText = typeText .. "魔法"
         end
     end
-    local isEnhanced = _____4F24_5BB3_51FD_6570:isEnhancedDamage()
-    local isTrue = _____4F24_5BB3_51FD_6570:isTrueDamage()
+    local isEnhanced = _____4F24_5BB3_51FD_6570.isEnhancedDamage()
+    local isTrue = _____4F24_5BB3_51FD_6570.isTrueDamage()
     local prefix = ""
-    if _____4F24_5BB3_51FD_6570:isNormalAttack() then
+    if _____4F24_5BB3_51FD_6570.isNormalAttack() then
         prefix = "普攻"
-    elseif _____4F24_5BB3_51FD_6570:isSkillAttack() then
+    elseif _____4F24_5BB3_51FD_6570.isSkillAttack() then
         prefix = "技能攻击"
-    elseif _____4F24_5BB3_51FD_6570:isSkillDamage() then
+    elseif _____4F24_5BB3_51FD_6570.isSkillDamage() then
         prefix = "技能"
     end
     if isEnhanced and prefix ~= "" then
@@ -102,26 +100,22 @@ local function TrigActions()
     else
         msg = ((tostring(name) .. "受到了") .. tostring(damageStr)) .. "点伤害"
     end
-    if _____4F24_5BB3_51FD_6570:YDWEIsEventRangedDamage() then
+    if _____4F24_5BB3_51FD_6570.YDWEIsEventRangedDamage() then
         msg = msg .. "（远程）"
     end
     local source = nil
-    pcall(
-        nil,
-        function()
-            source = jass:GetEventDamageSource()
+    pcall(function ()
+            source = jass.GetEventDamageSource()
         end
     )
     if source == nil then
-        pcall(
-            nil,
-            function()
-                source = GetEventDamageSource(nil)
+        pcall(function ()
+                source = GetEventDamageSource()
             end
         )
     end
     if source ~= nil then
-        local sourceName = jass:GetUnitName(source)
+        local sourceName = jass.GetUnitName(source)
         if sourceName ~= nil and sourceName ~= "" then
             msg = (msg .. " 伤害来源：") .. tostring(sourceName)
         end
@@ -135,13 +129,13 @@ local function init()
     if not ENABLED then
         return
     end
-    local trg = jass:CreateTrigger()
-    jass:TriggerAddCondition(
+    local trg = jass.CreateTrigger()
+    jass.TriggerAddCondition(
         trg,
-        jass:Condition(TrigConditions)
+        jass.Condition(TrigConditions)
     )
     _____4F24_5BB3_4E8B_4EF6:MNAnyUnitDamaged(trg, 60)
-    jass:TriggerAddAction(trg, TrigActions)
+    jass.TriggerAddAction(trg, TrigActions)
 end
 init()
 return ____exports

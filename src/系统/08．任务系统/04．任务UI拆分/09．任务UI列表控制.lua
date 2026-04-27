@@ -1,8 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local setText, hideFrames, renderQuestRowSlot, renderVariant, jass, japi, OBJECTIVE_HEIGHT, FAIL_HEIGHT, DETAIL_HEIGHT, TITLE_HEIGHT, OBJECTIVE_START_OFFSET, QUEST_ROW_GAP, VIEW_BOTTOM_REL, VIEW_EPS
-local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
-local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
+local setText, hideFrames, renderQuestRowSlot, renderVariant, japi, OBJECTIVE_HEIGHT, FAIL_HEIGHT, DETAIL_HEIGHT, TITLE_HEIGHT, OBJECTIVE_START_OFFSET, QUEST_ROW_GAP, VIEW_BOTTOM_REL, VIEW_EPS
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local EMPTY_TEXTS = ____02_FF0E_4EFB_52A1UI_8F85_52A9.EMPTY_TEXTS
 local getQuestsForUI = ____02_FF0E_4EFB_52A1UI_8F85_52A9.getQuestsForUI
@@ -34,8 +32,6 @@ local findExpandedVariantIndex = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F8
 local hideAllCategoryPages = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.hideAllCategoryPages
 local showOnlyPageAndVariant = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.showOnlyPageAndVariant
 local ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA = require("系统.08．任务系统.04．任务UI拆分.17．任务UI列表帧构建")
-local createCategory = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createCategory
-local ensurePage = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.ensurePage
 local clearVariant = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.clearVariant
 local clearPage = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.clearPage
 local hideRowSlot = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.hideRowSlot
@@ -44,7 +40,7 @@ function setText(self, frame, text)
         return
     end
     if type(japi.DzFrameSetText) == "function" then
-        japi:DzFrameSetText(frame, text)
+        japi.DzFrameSetText(frame, text)
     end
 end
 function ____exports.setVisible(self, frame, visible)
@@ -52,7 +48,7 @@ function ____exports.setVisible(self, frame, visible)
         return
     end
     if type(japi.DzFrameShow) == "function" then
-        japi:DzFrameShow(frame, visible)
+        japi.DzFrameShow(frame, visible)
     end
 end
 function hideFrames(self, frames)
@@ -60,75 +56,17 @@ function hideFrames(self, frames)
         ____exports.setVisible(nil, frame, false)
     end
 end
-function ____exports.handleTaskRowClick(self)
-    local ____temp_0
-    if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_0 = japi:DzGetTriggerUIEventFrame()
-    else
-        ____temp_0 = 0
-    end
-    local frame = ____temp_0
-    if not frame then
-        return
-    end
-    local binding = ____exports.taskRowBindingByFrameId[frame]
-    if not binding then
-        return
-    end
-    local questId = binding.page.questIds[binding.rowIndex + 1]
-    if not questId then
-        return
-    end
-    local ____opt_1 = ____exports.currentTaskRowExpandHandler
-    if ____opt_1 ~= nil then
-        ____exports.currentTaskRowExpandHandler(nil, questId)
-    end
-    local ____temp_3
-    if type(japi.DzGetTriggerKeyPlayer) == "function" then
-        ____temp_3 = japi:DzGetTriggerKeyPlayer()
-    else
-        ____temp_3 = jass:GetLocalPlayer()
-    end
-    local triggerPlayer = ____temp_3
-    if triggerPlayer == jass:GetLocalPlayer() then
-        local ____opt_4 = ____exports.currentTaskRowClickSound
-        if ____opt_4 ~= nil then
-            ____exports.currentTaskRowClickSound(nil)
-        end
-    end
-end
---- 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包
-function ____exports.bindTaskRowClickButtonsForPage(self, page)
-    do
-        local vi = 0
-        while vi < #page.variants do
-            local variant = page.variants[vi + 1]
-            do
-                local ri = 0
-                while ri < #variant.rowSlots do
-                    local ____opt_6 = variant.rowSlots[ri + 1]
-                    local btn = ____opt_6 and ____opt_6.clickBtn or nil
-                    if btn then
-                        ____exports.taskRowBindingByFrameId[btn] = {page = page, rowIndex = ri}
-                    end
-                    ri = ri + 1
-                end
-            end
-            vi = vi + 1
-        end
-    end
-end
 function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
     local itemH = getQuestItemHeight(nil, quest, expanded)
     local statusText = getStatusText(nil, quest.status)
     local showIcon = isQuestWithRowIconLayout(nil, quest)
-    local ____calcTaskListItemLayout_result_8 = calcTaskListItemLayout(nil, showIcon)
-    local rowWidth = ____calcTaskListItemLayout_result_8.rowWidth
-    local rowLeftRel = ____calcTaskListItemLayout_result_8.rowLeftRel
-    local iconHLayout = ____calcTaskListItemLayout_result_8.iconHLayout
-    local textXRel = ____calcTaskListItemLayout_result_8.textXRel
-    local listTextAlign = ____calcTaskListItemLayout_result_8.listTextAlign
-    local textW = ____calcTaskListItemLayout_result_8.textW
+    local ____calcTaskListItemLayout_result_14 = calcTaskListItemLayout(nil, showIcon)
+    local rowWidth = ____calcTaskListItemLayout_result_14.rowWidth
+    local rowLeftRel = ____calcTaskListItemLayout_result_14.rowLeftRel
+    local iconHLayout = ____calcTaskListItemLayout_result_14.iconHLayout
+    local textXRel = ____calcTaskListItemLayout_result_14.textXRel
+    local listTextAlign = ____calcTaskListItemLayout_result_14.listTextAlign
+    local textW = ____calcTaskListItemLayout_result_14.textW
     local titleText = ((((("|cffffff00【" .. quest.title) .. "】|r→发布NPC:|cff00ccff【") .. (quest.startNpc or "未知")) .. "】|r [") .. statusText) .. "]"
     ctx:setFramePointRelative(
         slot.backdrop,
@@ -161,9 +99,6 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
         rowTopRel
     )
     ctx:setFrameSize(slot.clickBtn, {width = rowWidth, height = itemH})
-    if slot.backdrop and ctx.setupTransparentGlueHitLayer then
-        ctx:setupTransparentGlueHitLayer(slot.backdrop, slot.clickBtn)
-    end
     ____exports.setVisible(nil, slot.clickBtn, true)
     if showIcon then
         ctx:setFramePointRelative(
@@ -197,7 +132,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.objectiveFrames[i + 1] or 0
                 local text = buildObjectiveText(nil, quest, i)
                 if not frame or text == "" then
-                    goto __continue66
+                    goto __continue79
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -213,7 +148,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
-            ::__continue66::
+            ::__continue79::
             i = i + 1
         end
     end
@@ -248,7 +183,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.detailFrames[i + 1] or 0
                 local text = details[i + 1] or ""
                 if not frame or text == "" then
-                    goto __continue70
+                    goto __continue83
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -264,7 +199,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
-            ::__continue70::
+            ::__continue83::
             i = i + 1
         end
     end
@@ -304,7 +239,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 local slot = variant.rowSlots[rowIndex + 1]
                 if not quest then
                     hideRowSlot(nil, slot, ____exports.setVisible)
-                    goto __continue80
+                    goto __continue93
                 end
                 local expanded = rowIndex == expandedRowIndex
                 local itemH = getQuestItemHeight(nil, quest, expanded)
@@ -331,19 +266,41 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 end
                 rowTopRel = rowTopRel - (itemH + QUEST_ROW_GAP)
             end
-            ::__continue80::
+            ::__continue93::
             rowIndex = rowIndex + 1
         end
     end
     ____exports.setVisible(nil, variant.root, false)
 end
-jass = require("jass.common")
+local jass = require("jass.common")
 japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local clampRange = ____require_result_0.clampRange
 ____exports.currentTaskRowExpandHandler = nil
 ____exports.currentTaskRowClickSound = nil
 ____exports.taskRowBindingByFrameId = {}
 --- `pcall` 单次槽位：任务 UI 列表控制内不会嵌套这些导出
 local pcallTaskUIListCtx = nil
+local function findTaskRowBindingFrame(self, frame)
+    local cur = frame
+    do
+        local i = 0
+        while i < 16 do
+            if not cur or cur == 0 then
+                return 0
+            end
+            if ____exports.taskRowBindingByFrameId[cur] ~= nil then
+                return cur
+            end
+            if type(japi.DzFrameGetParent) ~= "function" then
+                return 0
+            end
+            cur = japi.DzFrameGetParent(cur)
+            i = i + 1
+        end
+    end
+    return 0
+end
 local function pcallRebuildTaskUIFacadeListPoolBody(self)
     local ctx = pcallTaskUIListCtx
     if not ctx.listContainer or not ctx.precreatedListPool then
@@ -353,21 +310,14 @@ local function pcallRebuildTaskUIFacadeListPoolBody(self)
         local categoryView = ctx.precreatedListPool.categories[category]
         local quests = getQuestsForUI(nil, ctx.currentPlayerId, category)
         local pages = chunkQuests(nil, quests)
-        categoryView.pageCount = #pages
+        local renderedPageCount = #pages < #categoryView.pages and #pages or #categoryView.pages
+        categoryView.pageCount = renderedPageCount
         setText(nil, categoryView.emptyText, EMPTY_TEXTS[category])
         ____exports.setVisible(nil, categoryView.emptyText, false)
         do
             local pageIndex = 0
-            while pageIndex < #pages do
-                local page = ensurePage(
-                    nil,
-                    ctx,
-                    categoryView,
-                    category,
-                    pageIndex,
-                    ____exports.handleTaskRowClick
-                )
-                ____exports.bindTaskRowClickButtonsForPage(nil, page)
+            while pageIndex < renderedPageCount do
+                local page = categoryView.pages[pageIndex + 1]
                 local pageQuests = pages[pageIndex + 1] or ({})
                 page.questIds = createEmptyQuestIdList(nil)
                 do
@@ -420,22 +370,21 @@ local function pcallApplyTaskUIFacadeVisibleStateBody(self)
             local isCurrentCategory = category == ctx.currentCategory
             ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
             if not isCurrentCategory then
-                goto __continue17
+                goto __continue23
             end
             local pageCount = categoryView.pageCount
             if pageCount <= 0 then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
                 ____exports.setVisible(nil, categoryView.emptyText, true)
                 ctx:updateScrollBarVisibility(0, false)
-                goto __continue17
+                goto __continue23
             end
             ____exports.setVisible(nil, categoryView.emptyText, false)
-            local clampedPage = math.max(
+            local clampedPage = clampRange(
+                nil,
+                ctx:getCurrentPage(category),
                 0,
-                math.min(
-                    pageCount - 1,
-                    ctx:getCurrentPage(category)
-                )
+                pageCount - 1
             )
             local currentPage = categoryView.pages[clampedPage + 1]
             local expandedQuestId = ctx:getExpandedQuestId(category)
@@ -449,7 +398,7 @@ local function pcallApplyTaskUIFacadeVisibleStateBody(self)
             )
             ctx:updateScrollBarVisibility(pageCount, true)
         end
-        ::__continue17::
+        ::__continue23::
     end
 end
 local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
@@ -465,14 +414,14 @@ local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
             ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
             if not isCurrentCategory then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
-                goto __continue23
+                goto __continue29
             end
             local pageCount = categoryView.pageCount
             if pageCount <= 0 then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
                 ____exports.setVisible(nil, categoryView.emptyText, true)
                 ctx:updateScrollBarVisibility(0, false)
-                goto __continue23
+                goto __continue29
             end
             ____exports.setVisible(nil, categoryView.emptyText, false)
             showOnlyPageAndVariant(
@@ -484,7 +433,7 @@ local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
             )
             ctx:updateScrollBarVisibility(pageCount, true)
         end
-        ::__continue23::
+        ::__continue29::
     end
 end
 local function pcallApplyTaskUIExpandVisibleStateBody(self)
@@ -502,12 +451,11 @@ local function pcallApplyTaskUIExpandVisibleStateBody(self)
         ctx:updateScrollBarVisibility(0, false)
         return
     end
-    local clampedPage = math.max(
+    local clampedPage = clampRange(
+        nil,
+        ctx:getCurrentPage(ctx.currentCategory),
         0,
-        math.min(
-            pageCount - 1,
-            ctx:getCurrentPage(ctx.currentCategory)
-        )
+        pageCount - 1
     )
     local currentPage = categoryView.pages[clampedPage + 1]
     if not currentPage then
@@ -541,12 +489,11 @@ local function pcallApplyTaskUIPageSwitchVisibleStateBody(self)
         return
     end
     ____exports.setVisible(nil, categoryView.emptyText, false)
-    local clampedPage = math.max(
+    local clampedPage = clampRange(
+        nil,
+        ctx:getCurrentPage(ctx.currentCategory),
         0,
-        math.min(
-            pageCount - 1,
-            ctx:getCurrentPage(ctx.currentCategory)
-        )
+        pageCount - 1
     )
     showOnlyPageAndVariant(
         nil,
@@ -565,17 +512,116 @@ OBJECTIVE_START_OFFSET = LIST_ITEM_H * 0.35
 QUEST_ROW_GAP = 0.01
 VIEW_BOTTOM_REL = LIST_CONTENT_TOP_INSET - LIST_VIEW_H
 VIEW_EPS = 0.002
-function ____exports.createTaskUIPrecreatedListPool(self, ctx)
-    if not ctx.listContainer then
-        return nil
+function ____exports.handleTaskRowClick(self)
+    local ____temp_1
+    if type(japi.DzGetTriggerUIEventFrame) == "function" then
+        ____temp_1 = japi.DzGetTriggerUIEventFrame()
+    else
+        ____temp_1 = 0
     end
-    ____exports.currentTaskRowExpandHandler = ctx.toggleExpand
-    ____exports.currentTaskRowClickSound = ctx.playClickSound
-    return {categories = {
-        [QuestType.MAIN] = createCategory(nil, ctx, QuestType.MAIN, ____exports.setVisible),
-        [QuestType.SIDE] = createCategory(nil, ctx, QuestType.SIDE, ____exports.setVisible),
-        [QuestType.DAILY] = createCategory(nil, ctx, QuestType.DAILY, ____exports.setVisible)
-    }}
+    local frame = ____temp_1
+    if not frame and type(japi.DzGetMouseFocus) == "function" then
+        frame = japi.DzGetMouseFocus()
+    end
+    local bindingFrame = findTaskRowBindingFrame(nil, frame)
+    if not bindingFrame then
+        return
+    end
+    local binding = ____exports.taskRowBindingByFrameId[bindingFrame]
+    if not binding then
+        return
+    end
+    local questId = binding.page.questIds[binding.rowIndex + 1]
+    if not questId then
+        return
+    end
+    local ____opt_2 = ____exports.currentTaskRowExpandHandler
+    if ____opt_2 ~= nil then
+        ____exports.currentTaskRowExpandHandler(binding.rowIndex)
+    end
+    local ____temp_4
+    if type(japi.DzGetTriggerKeyPlayer) == "function" then
+        ____temp_4 = japi.DzGetTriggerKeyPlayer()
+    else
+        ____temp_4 = jass.GetLocalPlayer()
+    end
+    local triggerPlayer = ____temp_4
+    if triggerPlayer == jass.GetLocalPlayer() then
+        local ____opt_5 = ____exports.currentTaskRowClickSound
+        if ____opt_5 ~= nil then
+            ____exports.currentTaskRowClickSound()
+        end
+    end
+end
+local function handleTaskRowClickByRowIndex(self, rowIndex)
+    local ____opt_7 = ____exports.currentTaskRowExpandHandler
+    if ____opt_7 ~= nil then
+        ____exports.currentTaskRowExpandHandler(rowIndex)
+    end
+    local ____temp_9
+    if type(japi.DzGetTriggerKeyPlayer) == "function" then
+        ____temp_9 = japi.DzGetTriggerKeyPlayer()
+    else
+        ____temp_9 = jass.GetLocalPlayer()
+    end
+    local triggerPlayer = ____temp_9
+    if triggerPlayer == jass.GetLocalPlayer() then
+        local ____opt_10 = ____exports.currentTaskRowClickSound
+        if ____opt_10 ~= nil then
+            ____exports.currentTaskRowClickSound()
+        end
+    end
+end
+function ____exports.handleTaskRowClickRow0(self)
+    handleTaskRowClickByRowIndex(nil, 0)
+end
+function ____exports.handleTaskRowClickRow1(self)
+    handleTaskRowClickByRowIndex(nil, 1)
+end
+function ____exports.handleTaskRowClickRow2(self)
+    handleTaskRowClickByRowIndex(nil, 2)
+end
+function ____exports.handleTaskRowClickRow3(self)
+    handleTaskRowClickByRowIndex(nil, 3)
+end
+function ____exports.handleTaskRowClickRow4(self)
+    handleTaskRowClickByRowIndex(nil, 4)
+end
+function ____exports.handleTaskRowClickRow5(self)
+    handleTaskRowClickByRowIndex(nil, 5)
+end
+function ____exports.handleTaskRowClickRow6(self)
+    handleTaskRowClickByRowIndex(nil, 6)
+end
+____exports.taskRowClickHandlersByIndex = {
+    ____exports.handleTaskRowClickRow0,
+    ____exports.handleTaskRowClickRow1,
+    ____exports.handleTaskRowClickRow2,
+    ____exports.handleTaskRowClickRow3,
+    ____exports.handleTaskRowClickRow4,
+    ____exports.handleTaskRowClickRow5,
+    ____exports.handleTaskRowClickRow6
+}
+--- 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包
+function ____exports.bindTaskRowClickButtonsForPage(self, page)
+    do
+        local vi = 0
+        while vi < #page.variants do
+            local variant = page.variants[vi + 1]
+            do
+                local ri = 0
+                while ri < #variant.rowSlots do
+                    local ____opt_12 = variant.rowSlots[ri + 1]
+                    local btn = ____opt_12 and ____opt_12.clickBtn or nil
+                    if btn then
+                        ____exports.taskRowBindingByFrameId[btn] = {page = page, rowIndex = ri}
+                    end
+                    ri = ri + 1
+                end
+            end
+            vi = vi + 1
+        end
+    end
 end
 function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
     pcallTaskUIListCtx = ctx
@@ -591,8 +637,8 @@ function ____exports.getTaskUICategoryPageCount(self, pool, category)
     if not pool then
         return 0
     end
-    local ____opt_9 = pool.categories[category]
-    return ____opt_9 and ____opt_9.pageCount or 0
+    local ____opt_15 = pool.categories[category]
+    return ____opt_15 and ____opt_15.pageCount or 0
 end
 function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx

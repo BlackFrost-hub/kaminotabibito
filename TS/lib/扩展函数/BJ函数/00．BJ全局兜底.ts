@@ -8,14 +8,18 @@
 
 const jglobals = require("jass.globals") as Record<string, unknown>;
 
+const DEFAULT_BJ_PI = 3.141592653589793;
+const DEFAULT_BJ_RADTODEG = 180 / DEFAULT_BJ_PI;
+const DEFAULT_BJ_DEGTORAD = DEFAULT_BJ_PI / 180;
+
 /** 与 Blizzard.j `bj_PI` 对齐的工程常量 */
-export const BJ_PI = Math.PI;
+export const BJ_PI = DEFAULT_BJ_PI;
 
 /** 弧度 → 角度乘数（Blizzard.j `bj_RADTODEG` = 180/bj_PI） */
-export const BJ_RADTODEG = 180 / Math.PI;
+export const BJ_RADTODEG = DEFAULT_BJ_RADTODEG;
 
 /** 角度 → 弧度乘数（Blizzard.j `bj_DEGTORAD` = bj_PI/180） */
-export const BJ_DEGTORAD = Math.PI / 180;
+export const BJ_DEGTORAD = DEFAULT_BJ_DEGTORAD;
 
 // 导出 bj_ 前缀常量（优先从 jglobals 获取）
 export const bj_PI = (jglobals as any).bj_PI ?? BJ_PI;

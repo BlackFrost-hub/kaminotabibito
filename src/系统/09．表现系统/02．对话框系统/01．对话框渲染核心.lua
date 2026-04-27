@@ -32,7 +32,7 @@ end
 -- 为注册英雄的玩家创建对话框UI。
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     local jass = require("jass.common")
-    local playerId = jass:GetPlayerId(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return
     end

@@ -17,14 +17,14 @@ local ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C
 -- - udg_Progress: 当前进度值
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_0.STES_Register
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local registerStesListener = ____require_result_0.registerStesListener
 local function debugPrint(self, msg)
 end
 local function registerObjectiveUpdateEvent(self)
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(
-        trig,
+    registerStesListener(
+        nil,
+        "任务目标更新",
         function()
             debugPrint(nil, "目标更新事件触发，调用任务管理器...")
             do
@@ -43,7 +43,6 @@ local function registerObjectiveUpdateEvent(self)
             end
         end
     )
-    STES_Register(nil, trig, "任务目标更新")
     debugPrint(nil, "已注册 任务目标更新 事件")
 end
 local function init(self)

@@ -8,8 +8,9 @@ const g = require("jass.globals") as Record<string, unknown>;
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   isNormalAttack: () => boolean;
 };
-const { isHeroUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
@@ -198,11 +199,10 @@ function initEnumUnit(): void {
   const alwaysTrue = (): boolean => true;
   (jass as any).GroupEnumUnitsInRect(grp, bounds, (jass as any).Condition(alwaysTrue));
   if (UnitGroup && MNDamageEventTrigger) {
-    (jass as any).ForGroup(grp, () => {
-      const u = (jass as any).GetEnumUnit();
-      if (!u) return;
-      const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
-      if (lvl > 0) return;
+        forEachUnitInGroup(grp, (u: any) => {
+          if (!u) return;
+          const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
+          if (lvl > 0) return;
       // 与 anyUnitDamagedFilter 对称：若 EnterRegion 已先于本 ForGroup 入组并 Register，避免二次 Register
       if ((jass as any).IsUnitInGroup(u, UnitGroup)) return;
       (jass as any).GroupAddUnit(UnitGroup, u);
@@ -231,11 +231,10 @@ function recreateDamageTrigger(): void {
   if (UnitGroup && MNDamageEventTrigger) {
     const ev = getEventUnitDamaged();
     if (ev != null) {
-      (jass as any).ForGroup(UnitGroup, () => {
-        const u = (jass as any).GetEnumUnit();
-        if (u) {
-          (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
-        }
+        forEachUnitInGroup(UnitGroup, (u: any) => {
+          if (u) {
+            (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
+          }
       });
     }
   }

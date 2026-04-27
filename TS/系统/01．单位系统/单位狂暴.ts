@@ -36,7 +36,7 @@ function onDeath(dying: any, killer: any): void {
   if (spawnUnitId === "") return;
 
   const BERSERK_PROC = 1; // 100% for test
-  if ((math as any).random(1, 10000) as number > BERSERK_PROC * 10000) return;
+  if ((jass as any).GetRandomInt(1, 10000) as number > BERSERK_PROC * 10000) return;
 
   let x = 0;
   let y = 0;

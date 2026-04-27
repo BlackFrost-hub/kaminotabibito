@@ -23,8 +23,8 @@ local registerManualBuff = ____00_FF0EBuff_7CFB_7EDF.registerManualBuff
 -- 
 -- （旧版 udg_TempUnit[3][4] / TempString[21]–[23] / TempReal[5][6] 已不再使用。）
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_0.STES_Register
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local registerStesListener = ____require_result_0.registerStesListener
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWETimerDestroyEffect = ____require_result_1.YDWETimerDestroyEffect
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
@@ -33,7 +33,6 @@ local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildClean
 local ydlStes_readString5 = ____require_result_2.ydlStes_readString5
 local ydlStes_readUnit5 = ____require_result_2.ydlStes_readUnit5
 local ydlStes_readReal5 = ____require_result_2.ydlStes_readReal5
-local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
 ____exports.BUFF_ADD_STES_EVENT = "添加Buff"
 --- 与地图 YDLocal5Set 对齐的中文变量名
 local YL_UNIT_SOURCE = "Buff来源单位"
@@ -47,14 +46,14 @@ local function resolveSourceDisplayName(self, source)
     if source == nil or source == 0 then
         return nil
     end
-    local n = jass:GetUnitName(source)
+    local n = jass.GetUnitName(source)
     return type(n) == "string" and n ~= "" and n or nil
 end
 local function playOneShotEffectOnTarget(self, modelPath, target)
     if modelPath == "" or target == nil or target == 0 then
         return
     end
-    local eff = jass:AddSpecialEffectTarget(modelPath, target, "overhead")
+    local eff = jass.AddSpecialEffectTarget(modelPath, target, "overhead")
     if eff == nil or eff == 0 then
         return
     end
@@ -103,17 +102,13 @@ function ____exports.buffBridgeApplyFromYdlocal(self, _self)
     end
 end
 local function init(self)
-    if STES_Register == nil then
-        return
-    end
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(
-        trig,
+    registerStesListener(
+        nil,
+        ____exports.BUFF_ADD_STES_EVENT,
         function()
             ____exports.buffBridgeApplyFromYdlocal(nil, nil)
         end
     )
-    ydlStes_registerAfterGetTable(nil, nil, trig, ____exports.BUFF_ADD_STES_EVENT)
 end
 init(nil)
 return ____exports

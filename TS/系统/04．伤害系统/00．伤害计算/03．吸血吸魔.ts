@@ -29,11 +29,10 @@ const { STAT_LIMITS, ENEMY_STAT_LIMITS } = require("系统.04．伤害系统.00�
 const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextOnUnit: (unit: any, text: string, options: any) => any;
 };
-const { isAncientUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { isAncientUnit, formatNumber, forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isAncientUnit: (unit: any) => boolean;
-};
-const { formatNumber } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   formatNumber: (num: number) => string;
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
 
 //=============================================================================
@@ -71,8 +70,7 @@ export function getHeroForAncientUnit(ancientUnit: any): any {
 
   let foundHero: any = null;
 
-  jass.ForGroup(heroGroup, () => {
-    const enumUnit = jass.GetEnumUnit();
+  forEachUnitInGroup(heroGroup, (enumUnit: any) => {
     if (enumUnit != null && jass.GetOwningPlayer(enumUnit) === owner) {
       if (jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO)) {
         foundHero = enumUnit;
@@ -118,7 +116,9 @@ export function calcLifeSteal(attacker: any, isPlayer: boolean): number {
   if (limit !== undefined) {
     if (isPlayer && lifeSteal > limit.max) {
       const breakLimit = getRealAttr(attacker, "伤害吸血上限", 0);
-      lifeSteal = breakLimit > 0 ? Math.min(lifeSteal, breakLimit) : limit.max;
+      lifeSteal = breakLimit > 0
+        ? (lifeSteal < breakLimit ? lifeSteal : breakLimit)
+        : limit.max;
     } else if (lifeSteal > limit.max) {
       lifeSteal = limit.max;
     }
@@ -250,7 +250,8 @@ export function applyLifeSteal(
   const maxLife = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_LIFE);
 
   // 不能超过最大生命
-  const actualHeal = Math.min(heal, maxLife - currentLife);
+  const lifeGap = maxLife - currentLife;
+  const actualHeal = heal < lifeGap ? heal : lifeGap;
   if (actualHeal <= 0) return;
 
   // 回复生命
@@ -313,7 +314,8 @@ export function applyManaSteal(
   const maxMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_MANA);
 
   // 不能超过最大魔法
-  const actualMana = Math.min(mana, maxMana - currentMana);
+  const manaGap = maxMana - currentMana;
+  const actualMana = mana < manaGap ? mana : manaGap;
   if (actualMana <= 0) return;
 
   // 回复魔法

@@ -15,9 +15,7 @@ function isBuffPoolUnitPaused(self, u)
         return false
     end
     local paused = false
-    pcall(
-        nil,
-        function()
+    pcall(function ()
             paused = fn(nil, u) == true
         end
     )
@@ -34,7 +32,7 @@ function toHid(self, u)
         local n = __TS__ParseInt(u, 10)
         return __TS__NumberIsNaN(__TS__Number(n)) and 0 or n
     end
-    return jass:GetHandleId(u)
+    return jass.GetHandleId(u)
 end
 function pruneEmptyHid(self, hid)
     local e = unitToBuffs[hid]
@@ -51,9 +49,7 @@ function pruneEmptyHid(self, hid)
     end
 end
 function notifyDotBuffExpiredFromPool(self, buffID, hid)
-    pcall(
-        nil,
-        function()
+    pcall(function ()
             local m = require("系统.04．伤害系统.02．dot伤害")
             if m ~= nil then
                 m:clearDotByBuffPoolExpire(buffID, hid)
@@ -62,9 +58,7 @@ function notifyDotBuffExpiredFromPool(self, buffID, hid)
     )
 end
 function syncDotFromPoolTick(self)
-    pcall(
-        nil,
-        function()
+    pcall(function ()
             local m = require("系统.04．伤害系统.02．dot伤害")
             if m ~= nil then
                 m:syncDotRemainingFromBuffPool()

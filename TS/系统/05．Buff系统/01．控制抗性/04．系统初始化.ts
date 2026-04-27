@@ -5,6 +5,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
   isExcludedFromControlResist: (unit: any) => boolean;
@@ -46,11 +50,17 @@ function onSpellChannel(caster: any, abilityId: number): void {
   const duration = calcReducedControlTime(target, abilityId);
 
   const timer = jass.CreateTimer();
-  jass.TimerStart(timer, 0, false, () => {
+  if (!timer) {
     if (isUnitControlled(target)) {
       recastControlAbility(caster, target, abilityId, duration);
     }
-    jass.DestroyTimer(timer);
+    return;
+  }
+  safeTimerStart(timer, 0, false, () => {
+    if (isUnitControlled(target)) {
+      recastControlAbility(caster, target, abilityId, duration);
+    }
+    safeDestroyTimer(timer);
   });
 }
 

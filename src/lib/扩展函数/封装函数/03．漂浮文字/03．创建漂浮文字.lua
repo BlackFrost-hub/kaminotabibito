@@ -9,6 +9,8 @@ local RECYCLE_TICK = ____01_FF0E_56DE_6536_673A_5236.RECYCLE_TICK
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.05．泄露审计.index")
 local LeakWatcher = ____require_result_0.LeakWatcher
+local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函数")
+local RMaxBJ = ____require_result_1.RMaxBJ
 --- 创建漂浮文字
 -- 
 -- @param targetUnit 目标单位（指定则忽略坐标）
@@ -17,61 +19,61 @@ local LeakWatcher = ____require_result_0.LeakWatcher
 -- @param options 文字配置选项
 -- @returns 创建的漂浮文字句柄
 function ____exports.CreateFloatText(self, targetUnit, x, y, options)
-    local ____options_1 = options
-    local text = ____options_1.text
-    local size = ____options_1.size
+    local ____options_2 = options
+    local text = ____options_2.text
+    local size = ____options_2.size
     if size == nil then
         size = 10
     end
-    local red = ____options_1.red
+    local red = ____options_2.red
     if red == nil then
         red = 255
     end
-    local green = ____options_1.green
+    local green = ____options_2.green
     if green == nil then
         green = 255
     end
-    local blue = ____options_1.blue
+    local blue = ____options_2.blue
     if blue == nil then
         blue = 255
     end
-    local alpha = ____options_1.alpha
+    local alpha = ____options_2.alpha
     if alpha == nil then
         alpha = 0
     end
-    local duration = ____options_1.duration
+    local duration = ____options_2.duration
     if duration == nil then
         duration = 1
     end
-    local speedX = ____options_1.speedX
+    local speedX = ____options_2.speedX
     if speedX == nil then
         speedX = 0
     end
-    local speedY = ____options_1.speedY
+    local speedY = ____options_2.speedY
     if speedY == nil then
         speedY = 0.07
     end
-    local height = ____options_1.height
+    local height = ____options_2.height
     if height == nil then
         height = 0
     end
-    local permanent = ____options_1.permanent
+    local permanent = ____options_2.permanent
     if permanent == nil then
         permanent = false
     end
-    local ____temp_2
+    local ____temp_3
     if LeakWatcher and type(LeakWatcher.createTextTag) == "function" then
-        ____temp_2 = LeakWatcher:createTextTag("float_text")
+        ____temp_3 = LeakWatcher:createTextTag("float_text")
     else
-        ____temp_2 = jass:CreateTextTag()
+        ____temp_3 = jass.CreateTextTag()
     end
-    local textTag = ____temp_2
+    local textTag = ____temp_3
     if not textTag then
         return nil
     end
     local sizeToHeight = size * 0.0023
-    jass:SetTextTagText(textTag, text, sizeToHeight)
-    jass:SetTextTagColor(
+    jass.SetTextTagText(textTag, text, sizeToHeight)
+    jass.SetTextTagColor(
         textTag,
         red,
         green,
@@ -79,20 +81,21 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
         alpha
     )
     if targetUnit then
-        jass:SetTextTagPosUnit(textTag, targetUnit, height)
+        jass.SetTextTagPosUnit(textTag, targetUnit, height)
     else
-        jass:SetTextTagPos(textTag, x, y, height)
+        jass.SetTextTagPos(textTag, x, y, height)
     end
-    jass:SetTextTagVisibility(textTag, true)
+    jass.SetTextTagVisibility(textTag, true)
     if speedX ~= 0 or speedY ~= 0 then
-        jass:SetTextTagVelocity(textTag, speedX, speedY)
+        jass.SetTextTagVelocity(textTag, speedX, speedY)
     end
     if not permanent and duration > 0 then
-        jass:SetTextTagLifespan(textTag, duration)
-        jass:SetTextTagFadepoint(textTag, duration - 0.5)
-        local ticks = math.max(
+        jass.SetTextTagLifespan(textTag, duration)
+        jass.SetTextTagFadepoint(textTag, duration - 0.5)
+        local ticks = RMaxBJ(
+            nil,
             1,
-            math.floor(duration / RECYCLE_TICK + 0.999)
+            jass.R2I(duration / RECYCLE_TICK + 0.999)
         )
         floatTextQueue[#floatTextQueue + 1] = {tt = textTag, ticksLeft = ticks}
         ensureFloatTextRecycleTimer(nil)

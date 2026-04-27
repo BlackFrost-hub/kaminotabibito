@@ -3,6 +3,8 @@
  * 加法/乘法叠加等通用计算
  */
 
+const jass = require("jass.common") as any;
+
 /**
  * 加法/乘法叠加计算
  * 正数：加法叠加（累加到 addValue）
@@ -43,6 +45,41 @@ export function OperatorResistReduction(
  */
 export function createValueHolder(initialValue: number = 0): { value: number } {
   return { value: initialValue };
+}
+
+/**
+ * 四舍五入到最近整数。
+ */
+export function round(value: number): number {
+  if (value >= 0) return jass.R2I(value + 0.5);
+  return -jass.R2I(-value + 0.5);
+}
+
+/**
+ * 向上取整到整数。
+ */
+export function ceil(value: number): number {
+  const truncated = jass.R2I(value);
+  if (value > 0 && truncated < value) return truncated + 1;
+  return truncated;
+}
+
+export function clampMin(value: number, minValue: number): number {
+  return value < minValue ? minValue : value;
+}
+
+export function clampRange(value: number, minValue: number, maxValue: number): number {
+  if (value < minValue) return minValue;
+  if (value > maxValue) return maxValue;
+  return value;
+}
+
+export function max(a: number, b: number): number {
+  return a >= b ? a : b;
+}
+
+export function min(a: number, b: number): number {
+  return a <= b ? a : b;
 }
 
 export {};

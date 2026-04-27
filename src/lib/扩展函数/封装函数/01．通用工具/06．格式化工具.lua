@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- 格式化工具函数
+-- 数字格式化、字符串处理等
+local jass = require("jass.common")
 --- 格式化数字
 -- 规则：≥10 取整数，<10 保留1位小数
 -- 
@@ -7,14 +10,10 @@ local ____exports = {}
 -- @returns 格式化后的字符串
 function ____exports.formatNumber(self, num)
     if num >= 10 then
-        return tostring(
-            nil,
-            math.floor(num)
+        return tostring(jass.R2I(num)
         )
     else
-        return tostring(
-            nil,
-            math.floor(num * 10) / 10
+        return tostring(jass.R2I(num * 10) / 10
         )
     end
 end
@@ -24,10 +23,8 @@ end
 -- @param decimals 小数位数
 -- @returns 格式化后的字符串
 function ____exports.formatNumberDecimals(self, num, decimals)
-    local multiplier = 10 ^ decimals
-    return tostring(
-        nil,
-        math.floor(num * multiplier) / multiplier
+    local multiplier = jass.Pow(10, decimals)
+    return tostring(jass.R2I(num * multiplier) / multiplier
     )
 end
 --- 格式化百分比

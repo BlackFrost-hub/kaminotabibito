@@ -31,14 +31,12 @@ local ENABLE_QUEST_STES_OBJECTIVE_BRIDGE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_
 -- 地图触发 STES 事件名 → 对应 Trigger → 闭包内 `eventKey` 查 `QUEST_STES_OBJECTIVE_ROWS`
 -- → 解析玩家 → **`questManager.updateQuestObjective`**。
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_0.STES_Register
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local ydlStes_syncTriggerStep = ____require_result_1.ydlStes_syncTriggerStep
-local ydlStes_finishChildCleanup = ____require_result_1.ydlStes_finishChildCleanup
-local ydlStes_readBoolean5 = ____require_result_1.ydlStes_readBoolean5
-local ydlStes_readInteger5 = ____require_result_1.ydlStes_readInteger5
-local ydlStes_registerAfterGetTable = ____require_result_1.ydlStes_registerAfterGetTable
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_0.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_0.ydlStes_finishChildCleanup
+local ydlStes_readBoolean5 = ____require_result_0.ydlStes_readBoolean5
+local ydlStes_readInteger5 = ____require_result_0.ydlStes_readInteger5
+local registerStesListener = ____require_result_0.registerStesListener
 --- 与地图 YDLocal5Set 对齐
 local YL_BOOL_USE_PRESET_PLAYER = "任务使用预设玩家编号"
 local YL_INT_PLAYER_ID = "任务玩家编号"
@@ -48,13 +46,13 @@ end
 local function resolvePlayerIdFromTrigger()
     local pl = nil
     if type(jass.STES_GetTriggerPlayer) == "function" then
-        pl = jass:STES_GetTriggerPlayer()
+        pl = jass.STES_GetTriggerPlayer()
     end
     if pl == nil then
-        pl = jass:GetTriggerPlayer()
+        pl = jass.GetTriggerPlayer()
     end
     if pl ~= nil then
-        local id = jass:GetPlayerId(pl)
+        local id = jass.GetPlayerId(pl)
         if type(id) == "number" and id >= 0 and id < 16 then
             return id
         end
@@ -141,22 +139,19 @@ local function runStesObjectiveCallback(self, eventKey)
     end
 end
 local function registerOneStesEvent(self, trigger, eventName)
-    if STES_Register == nil then
-        debugPrint(nil, "STES_Register 不可用，无法注册 " .. eventName)
-        return
-    end
-    ydlStes_registerAfterGetTable(nil, nil, trigger, eventName)
+    registerStesListener(
+        nil,
+        eventName,
+        function()
+        end
+    )
 end
 --- 注册简单 STES 回调（无任务表、无 objective 逻辑时可用）。
 -- 同样做 YDLocal 同步与父页恢复，便于父触发里已写 YDLocal5 时读参一致。
 function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, debugMsg)
-    if STES_Register == nil then
-        debugPrint(nil, ("STES_Register 不可用，无法注册" .. debugMsg) .. "事件")
-        return
-    end
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(
-        trig,
+    registerStesListener(
+        nil,
+        eventName,
         function()
             do
                 pcall(function()
@@ -183,31 +178,25 @@ function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, deb
             end
         end
     )
-    ydlStes_registerAfterGetTable(nil, nil, trig, eventName)
     debugPrint(nil, ("已注册 " .. eventName) .. " 事件")
 end
 local function init(self)
-    if STES_Register == nil then
-        debugPrint(nil, "[任务STES] STES_Register 不可用，跳过注册")
-        return
-    end
     for eventKey in pairs(QUEST_STES_OBJECTIVE_ROWS) do
         do
             local row = QUEST_STES_OBJECTIVE_ROWS[eventKey]
             if not row then
-                goto __continue37
+                goto __continue35
             end
-            local trig = jass:CreateTrigger()
             local key = eventKey
-            jass:TriggerAddAction(
-                trig,
+            registerStesListener(
+                nil,
+                key,
                 function()
                     runStesObjectiveCallback(nil, key)
                 end
             )
-            registerOneStesEvent(nil, trig, key)
         end
-        ::__continue37::
+        ::__continue35::
     end
 end
 if ENABLE_QUEST_STES_OBJECTIVE_BRIDGE then

@@ -65,7 +65,8 @@ export function handleEdwardPassiveCost(unit: any, manaCost: number): void {
   if (!isEdwardUnit(unit)) return;
 
   const currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE);
-  const deductAmount = Math.min(manaCost, currentLife - 1); // 保留1点生命
+  const lifeKeep = currentLife - 1;
+  const deductAmount = manaCost < lifeKeep ? manaCost : lifeKeep; // 保留1点生命
 
   if (deductAmount > 0) {
     jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife - deductAmount);

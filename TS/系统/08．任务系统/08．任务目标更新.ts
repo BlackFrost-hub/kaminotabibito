@@ -14,8 +14,8 @@
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
-const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Register: (t: any, name: string) => void;
+const { registerStesListener } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 
 import { handleObjectiveUpdated } from "./02．任务管理器/index";
@@ -26,9 +26,7 @@ function debugPrint(msg: string): void {
 }
 
 function registerObjectiveUpdateEvent(): void {
-  const trig = jass.CreateTrigger();
-
-  jass.TriggerAddAction(trig, () => {
+  registerStesListener("任务目标更新", () => {
     debugPrint("目标更新事件触发，调用任务管理器...");
     try {
       handleObjectiveUpdated();
@@ -36,8 +34,6 @@ function registerObjectiveUpdateEvent(): void {
       debugPrint(`处理目标更新事件时出错: ${error}`);
     }
   });
-
-  STES_Register(trig, "任务目标更新");
 
   debugPrint("已注册 任务目标更新 事件");
 }

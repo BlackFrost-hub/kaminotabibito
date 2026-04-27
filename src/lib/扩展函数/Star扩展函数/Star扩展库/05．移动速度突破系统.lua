@@ -13,12 +13,16 @@ local ____exports = {}
 --   SOS_GetUnitSpeed(u)                 - 获取单位突破速度
 --   SOS_UnSetUnitSpeed(u)               - 取消单位速度突破
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
-local X_GDBC = ____require_result_0.X_GDBC
-local X_GAFC = ____require_result_0.X_GAFC
-local X_IsTerrainWalkable = ____require_result_0.X_IsTerrainWalkable
-local X_GetAbleX = ____require_result_0.X_GetAbleX
-local X_GetAbleY = ____require_result_0.X_GetAbleY
+local jglobals = require("jass.globals")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
+local X_GDBC = ____require_result_1.X_GDBC
+local X_GAFC = ____require_result_1.X_GAFC
+local X_IsTerrainWalkable = ____require_result_1.X_IsTerrainWalkable
+local X_GetAbleX = ____require_result_1.X_GetAbleX
+local X_GetAbleY = ____require_result_1.X_GetAbleY
 local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local ORDER_MOVE = 851971
 local ORDER_SMART = 851986
@@ -29,22 +33,27 @@ local CENTER_TIMER_TICKS = 2
 local SPEED_MIN = 1
 local SPEED_MAX = 2000
 local ENGINE_SPEED_LIMIT = 522
+local ____jglobals_bj_DEGTORAD_2 = jglobals.bj_DEGTORAD
+if ____jglobals_bj_DEGTORAD_2 == nil then
+    ____jglobals_bj_DEGTORAD_2 = 0.017453292519943295
+end
+local BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_2
 --- 移动速度突破特效模型路径
 local SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx"
 local function hid(self, h)
-    return jass:GetHandleId(h) or 0
+    return jass.GetHandleId(h) or 0
 end
 local function getUnitX(self, u)
-    return jass:GetUnitX(u) or 0
+    return jass.GetUnitX(u) or 0
 end
 local function getUnitY(self, u)
-    return jass:GetUnitY(u) or 0
+    return jass.GetUnitY(u) or 0
 end
 local function getUnitFacing(self, u)
-    return jass:GetUnitFacing(u) or 0
+    return jass.GetUnitFacing(u) or 0
 end
 local function getUnitMoveSpeed(self, u)
-    return jass:GetUnitMoveSpeed(u) or 0
+    return jass.GetUnitMoveSpeed(u) or 0
 end
 local function clampSpeed(self, speed)
     if speed < SPEED_MIN then
@@ -64,7 +73,7 @@ local function addSpeedEffect(self, u)
     if not u then
         return nil
     end
-    local effect = jass:AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin")
+    local effect = jass.AddSpecialEffectTarget(SPEED_EFFECT_MODEL, u, "origin")
     return effect
 end
 --- 删除移动速度突破特效
@@ -72,7 +81,7 @@ local function removeSpeedEffect(self, effect)
     if not effect then
         return
     end
-    jass:DestroyEffect(effect)
+    jass.DestroyEffect(effect)
 end
 local function doEvent(self, entry)
     local u = entry.u
@@ -85,7 +94,7 @@ local function doEvent(self, entry)
         entry.lf = getUnitFacing(nil, u)
         return
     end
-    local currentOrder = jass:GetUnitCurrentOrder(u)
+    local currentOrder = jass.GetUnitCurrentOrder(u)
     if currentOrder ~= ORDER_MOVE and currentOrder ~= ORDER_SMART then
         entry.lx = getUnitX(nil, u)
         entry.ly = getUnitY(nil, u)
@@ -115,20 +124,20 @@ local function doEvent(self, entry)
         local speedDiff = entry.speed - engineSpeed
         if speedDiff > 0 then
             local moveDist = speedDiff * TIMER_INTERVAL
-            local rad = angle * (math.pi / 180)
-            local nx = x + moveDist * math.cos(rad)
-            local ny = y + moveDist * math.sin(rad)
+            local rad = angle * BJ_DEGTORAD
+            local nx = x + moveDist * jass.Cos(rad)
+            local ny = y + moveDist * jass.Sin(rad)
             if X_IsTerrainWalkable(nil, nx, ny) then
-                jass:SetUnitX(u, nx)
-                jass:SetUnitY(u, ny)
+                jass.SetUnitX(u, nx)
+                jass.SetUnitY(u, ny)
                 entry.lx = nx
                 entry.ly = ny
             else
                 local ableX = X_GetAbleX(nil)
                 local ableY = X_GetAbleY(nil)
                 if ableX ~= 0 or ableY ~= 0 then
-                    jass:SetUnitX(u, ableX)
-                    jass:SetUnitY(u, ableY)
+                    jass.SetUnitX(u, ableX)
+                    jass.SetUnitY(u, ableY)
                     entry.lx = ableX
                     entry.ly = ableY
                 else
@@ -159,8 +168,8 @@ local function startTimer(self)
         return
     end
     _registeredToCenterTimer = true
-    local ____G_1 = _G
-    local onTick10ms = ____G_1.onTick10ms
+    local ____G_3 = _G
+    local onTick10ms = ____G_3.onTick10ms
     onTick10ms(
         nil,
         function()
@@ -198,11 +207,11 @@ local function removeEntry(self, uid)
         entry.effect = nil
     end
     if entry.tempTimer then
-        jass:DestroyTimer(entry.tempTimer)
+        safeDestroyTimer(nil, entry.tempTimer)
         entry.tempTimer = nil
     end
     if entry.t then
-        jass:DestroyTrigger(entry.t)
+        jass.DestroyTrigger(entry.t)
         entry.t = nil
     end
     entry.u = nil
@@ -219,23 +228,23 @@ end
 --- 同步「突破位移」用的目标点：仅监听点指令时，右键单位/物品不会刷新 tx/ty，
 -- 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
 local function syncEntryOrderDestination(self, e)
-    local tgtU = jass:GetOrderTargetUnit()
+    local tgtU = jass.GetOrderTargetUnit()
     if tgtU ~= nil and tgtU ~= 0 then
         e.tx = getUnitX(nil, tgtU)
         e.ty = getUnitY(nil, tgtU)
         return
     end
-    local tgtIt = jass:GetOrderTargetItem()
+    local tgtIt = jass.GetOrderTargetItem()
     if tgtIt ~= nil and tgtIt ~= 0 then
-        e.tx = jass:GetItemX(tgtIt) or 0
-        e.ty = jass:GetItemY(tgtIt) or 0
+        e.tx = jass.GetItemX(tgtIt) or 0
+        e.ty = jass.GetItemY(tgtIt) or 0
         return
     end
-    e.tx = jass:GetOrderPointX() or 0
-    e.ty = jass:GetOrderPointY() or 0
+    e.tx = jass.GetOrderPointX() or 0
+    e.ty = jass.GetOrderPointY() or 0
 end
 local function createTriggerForEntry(self, entry)
-    local t = jass:CreateTrigger()
+    local t = jass.CreateTrigger()
     entry.t = t
     if t == nil then
         return
@@ -246,7 +255,7 @@ local function createTriggerForEntry(self, entry)
     if evTarget ~= nil then
         unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, evTarget)
     end
-    jass:TriggerAddAction(
+    jass.TriggerAddAction(
         t,
         function()
             local e = entryMap[uid]
@@ -276,7 +285,7 @@ function ____exports.SOS_SetUnitSpeed(self, u, speed)
     local existing = entryMap[uid]
     if existing ~= nil then
         if existing.tempTimer then
-            jass:DestroyTimer(existing.tempTimer)
+            safeDestroyTimer(nil, existing.tempTimer)
             existing.tempTimer = nil
         end
         existing.speed = speed
@@ -330,7 +339,7 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
     local savedOriginal = existing ~= nil and existing.originalSpeed or 0
     if existing ~= nil then
         if existing.tempTimer then
-            jass:DestroyTimer(existing.tempTimer)
+            jass.DestroyTimer(existing.tempTimer)
             existing.tempTimer = nil
         end
         existing.speed = speed
@@ -363,10 +372,11 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
     if current == nil then
         return
     end
-    local tempT = jass:CreateTimer()
+    local tempT = jass.CreateTimer()
     current.tempTimer = tempT
     if tempT then
-        jass:TimerStart(
+        safeTimerStart(
+            nil,
             tempT,
             duration,
             false,

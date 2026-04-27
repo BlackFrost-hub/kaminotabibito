@@ -6,10 +6,12 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
+const DEFAULT_BJ_DEGTORAD = 0.017453292519943295;
+
 /**
  * 角度转弧度常量
  */
-const bj_DEGTORAD = jglobals.bj_DEGTORAD ?? (Math.PI / 180);
+const bj_DEGTORAD = jglobals.bj_DEGTORAD ?? DEFAULT_BJ_DEGTORAD;
 
 /**
  * 极坐标投影 - 从源位置按指定角度和距离计算目标位置
@@ -21,8 +23,9 @@ const bj_DEGTORAD = jglobals.bj_DEGTORAD ?? (Math.PI / 180);
 export function GS_PolarProjectionBJ(source: any, dist: number, angle: number): any {
     if (!source) return null;
 
-    const x = jass.GetLocationX(source) + dist * Math.cos(angle * bj_DEGTORAD);
-    const y = jass.GetLocationY(source) + dist * Math.sin(angle * bj_DEGTORAD);
+    const rad = angle * bj_DEGTORAD;
+    const x = jass.GetLocationX(source) + dist * jass.Cos(rad);
+    const y = jass.GetLocationY(source) + dist * jass.Sin(rad);
 
     // 移除源位置（与原版 JASS 行为一致）
     jass.RemoveLocation(source);

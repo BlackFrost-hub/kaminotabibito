@@ -3,6 +3,8 @@
  * 数字格式化、字符串处理等
  */
 
+const jass = require("jass.common") as any;
+
 /**
  * 格式化数字
  * 规则：≥10 取整数，<10 保留1位小数
@@ -12,9 +14,9 @@
  */
 export function formatNumber(num: number): string {
   if (num >= 10) {
-    return tostring(Math.floor(num));
+    return tostring(jass.R2I(num));
   } else {
-    return tostring(Math.floor(num * 10) / 10);
+    return tostring(jass.R2I(num * 10) / 10);
   }
 }
 
@@ -26,8 +28,8 @@ export function formatNumber(num: number): string {
  * @returns 格式化后的字符串
  */
 export function formatNumberDecimals(num: number, decimals: number): string {
-  const multiplier = Math.pow(10, decimals);
-  return tostring(Math.floor(num * multiplier) / multiplier);
+  const multiplier = jass.Pow(10, decimals);
+  return tostring(jass.R2I(num * multiplier) / multiplier);
 }
 
 /**

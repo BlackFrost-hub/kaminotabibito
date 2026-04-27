@@ -4,7 +4,7 @@ local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．�
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.09．任务UI列表控制")
 local setVisible = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.setVisible
-local handleTaskRowClick = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.handleTaskRowClick
+local taskRowClickHandlersByIndex = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.taskRowClickHandlersByIndex
 local taskRowBindingByFrameId = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.taskRowBindingByFrameId
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
@@ -25,11 +25,6 @@ local TITLE_HEIGHT = LIST_ITEM_H * 0.38
 local OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25
 local FAIL_HEIGHT = LIST_ITEM_H * 0.2
 local DETAIL_HEIGHT = LIST_ITEM_H * 0.22
-local ROOT_LEVEL = 40
-local BACKDROP_LEVEL = 41
-local TEXT_LEVEL = 43
-local BUTTON_LEVEL = 46
-local ICON_LEVEL = 45
 local function createEmptyQuestIdList(self)
     local questIds = {}
     do
@@ -68,9 +63,6 @@ local function createHiddenRoot(self, ctx, name, parent, width, height)
         0
     )
     ctx:setFrameSize(frame, {width = width, height = height})
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, ROOT_LEVEL)
-    end
     return frame
 end
 local function createHiddenText(self, ctx, name, parent, width, height)
@@ -91,9 +83,6 @@ local function createHiddenText(self, ctx, name, parent, width, height)
         return nil
     end
     setVisible(nil, frame, false)
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, TEXT_LEVEL)
-    end
     return frame
 end
 local function createHiddenBackdrop(self, ctx, templateName, frameName, parent, texture, contextId)
@@ -111,9 +100,6 @@ local function createHiddenBackdrop(self, ctx, templateName, frameName, parent, 
             ctx:setFrameTexture(frame, texture)
         end
     end
-    if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, BACKDROP_LEVEL)
-    end
     return frame or nil
 end
 local function createPlainHiddenBackdrop(self, ctx, name, parent)
@@ -125,9 +111,6 @@ local function createPlainHiddenBackdrop(self, ctx, name, parent)
         visible = false,
         id = ctx.contextId
     }) or 0
-    if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, ICON_LEVEL)
-    end
     return frame or nil
 end
 local function createHiddenButton(self, ctx, name, parent, onClick)
@@ -143,9 +126,6 @@ local function createHiddenButton(self, ctx, name, parent, onClick)
     }) or 0
     if not frame then
         return nil
-    end
-    if type(japi.DzFrameSetLevel) == "function" then
-        japi:DzFrameSetLevel(frame, BUTTON_LEVEL)
     end
     ctx:setFrameClickEvent(frame, onClick, true)
     return frame
@@ -249,7 +229,7 @@ local function createVariant(self, ctx, page, category, pageIndex, variantIndex)
                 root,
                 (prefix .. "_R") .. tostring(rowIndex),
                 rowIndex,
-                handleTaskRowClick
+                taskRowClickHandlersByIndex[rowIndex + 1]
             )
             if slot.clickBtn then
                 taskRowBindingByFrameId[slot.clickBtn] = {page = page, rowIndex = rowIndex}
@@ -298,7 +278,7 @@ local function createCategory(self, ctx, category)
         LIST_CONTAINER_W * 0.85,
         0.08
     ) or 0
-    if emptyText then
+    if emptyText ~= 0 then
         ctx:applyDzTextFontAndCenterAlignment(emptyText)
         setVisible(nil, emptyText, false)
     end

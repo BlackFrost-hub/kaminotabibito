@@ -4,6 +4,9 @@
 
 const jass = require("jass.common") as any;
 const { LeakWatcher } = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher: any };
+const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  RMaxBJ: (a: number, b: number) => number;
+};
 import { floatTextQueue, ensureFloatTextRecycleTimer, RECYCLE_TICK } from "./01．回收机制";
 import { lastCreatedTextTag, FloatTextOptions } from "./02．类型定义";
 
@@ -58,7 +61,7 @@ export function CreateFloatText(
     (jass as any).SetTextTagLifespan(textTag, duration);
     (jass as any).SetTextTagFadepoint(textTag, duration - 0.5);
     // 统一进入回收队列（避免高频创建时 timer 回调丢失）
-    const ticks = Math.max(1, Math.floor(duration / RECYCLE_TICK + 0.999)); // ceil
+    const ticks = RMaxBJ(1, jass.R2I(duration / RECYCLE_TICK + 0.999)); // ceil
     floatTextQueue.push({ tt: textTag, ticksLeft: ticks });
     ensureFloatTextRecycleTimer();
   }

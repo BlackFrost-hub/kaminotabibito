@@ -28,7 +28,7 @@ function ____exports.getControlReduction(self, unit)
     if unitValue > 0.01 then
         return unitValue
     end
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player ~= nil then
         local playerValue = YDUserDataGet(
             nil,
@@ -45,11 +45,11 @@ function ____exports.getControlReduction(self, unit)
 end
 --- 应用控制时间削减上限
 function ____exports.applyControlReductionCap(self, reduction)
-    return math.min(reduction, CONTROL_REDUCTION_CAP)
+    return reduction < CONTROL_REDUCTION_CAP and reduction or CONTROL_REDUCTION_CAP
 end
 --- 检查并应用Boss控制时间上限
 function ____exports.applyBossControlLimit(self, unit, duration)
-    local unitTypeId = jass:GetUnitTypeId(unit)
+    local unitTypeId = jass.GetUnitTypeId(unit)
     for ____, ____value in ipairs(__TS__ObjectEntries(BOSS_CONTROL_LIMITS)) do
         local idStr = ____value[1]
         local limit = ____value[2]

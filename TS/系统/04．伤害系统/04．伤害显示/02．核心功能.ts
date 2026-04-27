@@ -13,6 +13,9 @@
  */
 
 const jass = require("jass.common") as any;
+const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  ceil: (value: number) => number;
+};
 
 const {
   MIN_DAMAGE_THRESHOLD,
@@ -171,7 +174,7 @@ function createDigitImage(
 export function showDamageNumber(this: void, target: any, damage: number): void {
   if (!target || damage < MIN_DAMAGE_THRESHOLD) return;
 
-  const damageInt = Math.floor(damage);
+  const damageInt = jass.R2I(damage);
   const damageStr = String(damageInt);
   const digitCount = getDigitCount(damageInt);
 
@@ -235,7 +238,7 @@ export function hasActiveDigits(this: void): boolean {
 
 let _registeredToCenterTimer = false;
 let _tickCounter = 0;
-const CENTER_TIMER_TICKS = Math.ceil(UPDATE_INTERVAL / 0.01);
+const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 
 function ensureRegisteredToCenterTimer(this: void): void {
   if (_registeredToCenterTimer) return;

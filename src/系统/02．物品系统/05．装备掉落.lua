@@ -16,18 +16,18 @@ function getItemsByScoreRange(self, minScore, maxScore)
     for id in pairs(itemsData) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue81
+                goto __continue78
             end
             local entry = itemsData[id]
             local score = entry and entry.score
             if type(score) ~= "number" then
-                goto __continue81
+                goto __continue78
             end
             if score >= minScore and score <= maxScore then
                 result[#result + 1] = id
             end
         end
-        ::__continue81::
+        ::__continue78::
     end
     return result
 end
@@ -49,22 +49,7 @@ local ____require_result_1 = require("系统.01．单位系统.03．单位死亡
 local registerDeathListener = ____require_result_1.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})
 itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
-local PREFIX = "|cffffff00『系统提示』：|r";
-(function()
-    local key = "__equip_drop_rand_init"
-    if _G[key] then
-        return
-    end
-    _G[key] = true
-    math:randomseed(123456789)
-    do
-        local i = 0
-        while i < 10 do
-            math:random()
-            i = i + 1
-        end
-    end
-end)(nil)
+local PREFIX = "|cffffff00『系统提示』：|r"
 local function typeIdToUnitId(self, typeId)
     for id in pairs(idData) do
         if stringToFourCC(nil, id) == typeId then
@@ -96,7 +81,7 @@ local function parseItemPool(self, itemIdsStr)
             do
                 local colon = (string.find(p, ":", nil, true) or 0) - 1
                 if colon < 0 then
-                    goto __continue16
+                    goto __continue12
                 end
                 local id = __TS__StringTrim(__TS__StringSubstring(p, 0, colon))
                 local w = 0
@@ -118,7 +103,7 @@ local function parseItemPool(self, itemIdsStr)
                     }
                 end
             end
-            ::__continue16::
+            ::__continue12::
         end
     else
         for ____, p in ipairs(parts) do
@@ -141,7 +126,7 @@ local function getEffectivePicks(self, basePicks, unitType)
         return basePicks
     end
     local mult = 1 + 0.334 * (T - 1)
-    return math.floor(basePicks * mult + 0.5)
+    return jass.R2I(basePicks * mult + 0.5)
 end
 --- 加权随机取一个（权重不必归一化）
 local function weightedPickOne(self, pool)
@@ -153,13 +138,13 @@ local function weightedPickOne(self, pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_2 = pool[math:random(1, #pool)]
+        local ____opt_2 = pool[jass.GetRandomInt(1, #pool)]
         if ____opt_2 ~= nil then
             ____opt_2 = ____opt_2.id
         end
         return ____opt_2
     end
-    local r = math:random(1, 10000) / 10000 * sum
+    local r = jass.GetRandomReal(0, 1) * sum
     local acc = 0
     for ____, p in ipairs(pool) do
         acc = acc + p.weight
@@ -190,7 +175,7 @@ local function pickFromWeightedPool(self, pool, picks)
             end
             out[#out + 1] = p.id
         else
-            local r = math:random(1, 10000) / 10000
+            local r = jass.GetRandomReal(0, 1)
             local ____this_7
             ____this_7 = _G
             local ____opt_6 = ____this_7.print
@@ -216,7 +201,7 @@ local function pickFromWeightedPool(self, pool, picks)
         do
             local i = #out - 1
             while i >= 1 do
-                local j = math:random(1, i + 1)
+                local j = jass.GetRandomInt(1, i + 1)
                 local t = out[i + 1]
                 out[i + 1] = out[j]
                 out[j] = t
@@ -257,7 +242,7 @@ local function pickFromEqualPool(self, ids, picks)
     do
         local i = 0
         while i < firstPicks do
-            local idx = math:random(1, #list)
+            local idx = jass.GetRandomInt(1, #list)
             local id = list[idx - 1]
             out[#out + 1] = id
             __TS__ArraySplice(list, idx - 1, 1)
@@ -268,7 +253,7 @@ local function pickFromEqualPool(self, ids, picks)
     do
         local i = 0
         while i < needMore do
-            local idx = math:random(1, #ids)
+            local idx = jass.GetRandomInt(1, #ids)
             out[#out + 1] = ids[idx - 1]
             i = i + 1
         end
@@ -277,16 +262,16 @@ local function pickFromEqualPool(self, ids, picks)
 end
 local function createItemAtUnit(self, unit, itemId)
     local four = stringToFourCC(nil, itemId)
-    local loc = jass:GetUnitLoc(unit)
+    local loc = jass.GetUnitLoc(unit)
     if loc then
         equipExcrete:setLastCreatedItem(itemInv:CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
-        local x = jass:GetUnitX(unit)
-        local y = jass:GetUnitY(unit)
-        equipExcrete:setLastCreatedItem(jass:CreateItem(four, x, y))
+        local x = jass.GetUnitX(unit)
+        local y = jass.GetUnitY(unit)
+        equipExcrete:setLastCreatedItem(jass.CreateItem(four, x, y))
     end
     if loc then
-        jass:RemoveLocation(loc)
+        jass.RemoveLocation(loc)
     end
 end
 local function onUnitDeath(self, unit, _killer)
@@ -296,7 +281,7 @@ local function onUnitDeath(self, unit, _killer)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local typeId = jass:GetUnitTypeId(unit)
+    local typeId = jass.GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(nil, typeId)
     local entry = unitId and idData[unitId] or nil
     local ____this_11
@@ -321,7 +306,7 @@ local function onUnitDeath(self, unit, _killer)
             ____opt_12(____this_13, "[装备掉落] 找到掉落表 itemIds:", entry.itemIds)
         end
         local dropProc = entry.dropProc ~= nil and __TS__Number(entry.dropProc) or 1
-        local r = math:random(1, 10000)
+        local r = jass.GetRandomInt(1, 10000)
         if r > dropProc * 10000 then
             return
         end
@@ -330,10 +315,10 @@ local function onUnitDeath(self, unit, _killer)
         if #pool == 0 then
             return
         end
-        local picksNum = math.max(
-            1,
-            math.floor(__TS__Number(entry.picks) or 1)
-        )
+        local picksNum = jass.R2I(__TS__Number(entry.picks) or 1)
+        if picksNum < 1 then
+            picksNum = 1
+        end
         picksNum = getEffectivePicks(nil, picksNum, entry.unitType)
         local ids = __TS__ArrayMap(
             pool,
@@ -350,24 +335,24 @@ local function onUnitDeath(self, unit, _killer)
     for ____, rule in ipairs(DROP_RULES) do
         do
             if typeId ~= stringToFourCC(nil, rule.unitId) then
-                goto __continue74
+                goto __continue71
             end
-            local r = math:random(1, 10000)
+            local r = jass.GetRandomInt(1, 10000)
             if r > rule.proc * 10000 then
-                goto __continue74
+                goto __continue71
             end
             local list = getItemsByScoreRange(nil, rule.minScore, rule.maxScore)
             if #list == 0 then
-                goto __continue74
+                goto __continue71
             end
-            local idx = math:random(1, #list)
+            local idx = jass.GetRandomInt(1, #list)
             local itemId = list[idx]
             if itemId ~= nil and itemId ~= "" then
                 createItemAtUnit(nil, unit, itemId)
             end
             break
         end
-        ::__continue74::
+        ::__continue71::
     end
 end
 registerDeathListener(nil, onUnitDeath)

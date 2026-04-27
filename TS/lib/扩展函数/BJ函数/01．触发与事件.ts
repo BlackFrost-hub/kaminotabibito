@@ -39,16 +39,29 @@ export function TriggerRegisterPlayerUnitEventForPlayers(
 
 /**
  * 对齐 Blizzard.j: TriggerRegisterPlayerSelectionEventBJ
+ * 注意：EVENT_PLAYER_UNIT_DESELECTED 在魔兽1.27中可能不存在，需要检查
  */
 export function TriggerRegisterPlayerSelectionEventBJ(
   trig: any,
   whichPlayer: any,
   selected: boolean
 ): any {
+  // 从 jass 对象获取事件ID（这些常量是在 jass 对象上，而不是 globalThis 上）
+  const selectedEvent = (jass as any).EVENT_PLAYER_UNIT_SELECTED;
+  const deselectedEvent = (jass as any).EVENT_PLAYER_UNIT_DESELECTED;
+
   if (selected) {
-    return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, undefined);
+    if (selectedEvent === undefined || selectedEvent === null) {
+      return null;
+    }
+    return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, selectedEvent, undefined);
   }
-  return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, undefined);
+  // 1.27版本可能没有 DESELECTED 事件，需要检查
+  if (deselectedEvent === undefined || deselectedEvent === null) {
+    // 如果事件不存在，返回 null 表示注册失败
+    return null;
+  }
+  return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, deselectedEvent, undefined);
 }
 
 export function ConditionalTriggerExecute(trig: any): void {

@@ -5,6 +5,7 @@
  */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
     registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
 };
@@ -29,6 +30,7 @@ const STOP_QUEUE_DEFER_MS = 16;
 /** 与移动速度突破等一致：远距离点地物多为 move，近距离交互多为 smart；只认 851971 会漏掉 smart，表现为「范围内仍走过去拾取」 */
 const FALLBACK_ORDER_MOVE = 851971;
 const FALLBACK_ORDER_SMART = 851986;
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 let cachedOrderMove = 0;
 let cachedOrderSmart = 0;
 let HT: any = null;
@@ -50,7 +52,7 @@ function isIssuedMoveOrSmartOrder(orderId: number): boolean {
 function faceUnitTowardGroundItem(u: any, item: any): void {
     if (u === null || u === 0 || item === null || item === 0) return;
     const angleDeg =
-        (jass.Atan2(jass.GetItemY(item) - jass.GetUnitY(u), jass.GetItemX(item) - jass.GetUnitX(u)) as number) * (180 / Math.PI);
+        (jass.Atan2(jass.GetItemY(item) - jass.GetUnitY(u), jass.GetItemX(item) - jass.GetUnitX(u)) as number) * BJ_RADTODEG;
     jass.SetUnitFacing(u, angleDeg);
 }
 

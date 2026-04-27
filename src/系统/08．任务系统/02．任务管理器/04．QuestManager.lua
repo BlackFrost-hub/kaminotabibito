@@ -26,6 +26,9 @@ local showQuestTrackingNotice = ____02_FF0E_4EFB_52A1_63D0_793A_4E0E_5956_52B1.s
 -- 
 -- 不负责：从 JASS 全局读 udg_*（见 `05．事件桥接`）；F9 原生任务同步（见 `03．原生任务同步`，需自行接入）。
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 --- 单例类。计时器到期回调里必须用 `QuestManager.getInstance()`，
 -- 避免在模块顶层 `questManager` 尚未完成初始化时闭包引用未定义。
 ____exports.QuestManager = __TS__Class()
@@ -60,37 +63,38 @@ function QuestManager.prototype.setupWar3QuestSync(self)
     questDebugPrint(nil, "War3原生任务同步已就绪")
 end
 function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
-    local ____opt_0 = questDB.globalData
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0.quests:get(questId)
+    local ____opt_1 = questDB.globalData
+    if ____opt_1 ~= nil then
+        ____opt_1 = ____opt_1.quests:get(questId)
     end
-    local quest = ____opt_0
+    local quest = ____opt_1
     if not quest or not quest.timeLimit or quest.timeLimit <= 0 then
         return
     end
-    local timer = jass:CreateTimer()
+    local timer = jass.CreateTimer()
     if not timer then
         return
     end
-    local ____G___questTimers_3 = _G.__questTimers
-    if not ____G___questTimers_3 then
-        local ____TS__New_result_2 = __TS__New(Map)
-        _G.__questTimers = ____TS__New_result_2
-        ____G___questTimers_3 = ____TS__New_result_2
+    local ____G___questTimers_4 = _G.__questTimers
+    if not ____G___questTimers_4 then
+        local ____TS__New_result_3 = __TS__New(Map)
+        _G.__questTimers = ____TS__New_result_3
+        ____G___questTimers_4 = ____TS__New_result_3
     end
-    local timerData = ____G___questTimers_3
+    local timerData = ____G___questTimers_4
     timerData:set(timer, {playerId = playerId, questId = questId})
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         timer,
         quest.timeLimit,
         false,
         function()
-            local expired = jass:GetExpiredTimer()
-            local ____opt_4 = _G.__questTimers
-            if ____opt_4 ~= nil then
-                ____opt_4 = ____opt_4:get(expired)
+            local expired = jass.GetExpiredTimer()
+            local ____opt_5 = _G.__questTimers
+            if ____opt_5 ~= nil then
+                ____opt_5 = ____opt_5:get(expired)
             end
-            local data = ____opt_4
+            local data = ____opt_5
             if data then
                 questDebugPrint(
                     nil,
@@ -99,8 +103,8 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
                 ____exports.QuestManager:getInstance():onQuestFailed(data.playerId, data.questId)
                 _G.__questTimers:delete(expired)
             end
-            jass:PauseTimer(expired)
-            jass:DestroyTimer(expired)
+            jass.PauseTimer(expired)
+            safeDestroyTimer(nil, expired)
         end
     )
     questDebugPrint(
@@ -130,19 +134,19 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
         nil,
         (("玩家 " .. tostring(playerId)) .. " 放弃任务 ") .. questId
     )
-    local ____opt_8 = questDB.globalData
-    if ____opt_8 ~= nil then
-        ____opt_8 = ____opt_8.quests:get(questId)
+    local ____opt_9 = questDB.globalData
+    if ____opt_9 ~= nil then
+        ____opt_9 = ____opt_9.quests:get(questId)
     end
-    local ____opt_result_10
-    if ____opt_8 ~= nil then
-        ____opt_result_10 = ____opt_8.nativeHandle
+    local ____opt_result_11
+    if ____opt_9 ~= nil then
+        ____opt_result_11 = ____opt_9.nativeHandle
     end
-    local nativeHandle = ____opt_result_10
+    local nativeHandle = ____opt_result_11
     local success = questDB:abandonQuest(playerId, questId)
     if success then
         if nativeHandle then
-            jass:DestroyQuest(nativeHandle)
+            jass.DestroyQuest(nativeHandle)
         end
         self:triggerUIRefresh(playerId, questId)
         showAbandonedQuestNotice(nil, playerId, questId)
@@ -155,11 +159,11 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     return success
 end
 function QuestManager.prototype.toggleQuestTracking(self, playerId, questId)
-    local ____opt_11 = questDB.globalData
-    if ____opt_11 ~= nil then
-        ____opt_11 = ____opt_11.quests:get(questId)
+    local ____opt_12 = questDB.globalData
+    if ____opt_12 ~= nil then
+        ____opt_12 = ____opt_12.quests:get(questId)
     end
-    local questData = ____opt_11
+    local questData = ____opt_12
     if not questData then
         return false
     end
@@ -169,8 +173,8 @@ function QuestManager.prototype.toggleQuestTracking(self, playerId, questId)
     return true
 end
 function QuestManager.prototype.registerUIRefreshCallback(self, callback)
-    local ____self_uiRefreshCallbacks_13 = self.uiRefreshCallbacks
-    ____self_uiRefreshCallbacks_13[#____self_uiRefreshCallbacks_13 + 1] = callback
+    local ____self_uiRefreshCallbacks_14 = self.uiRefreshCallbacks
+    ____self_uiRefreshCallbacks_14[#____self_uiRefreshCallbacks_14 + 1] = callback
 end
 function QuestManager.prototype.triggerUIRefresh(self, playerId, questId)
     for ____, callback in ipairs(self.uiRefreshCallbacks) do
@@ -230,11 +234,11 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
     local success = questDB:updateObjective(playerId, questId, objectiveId, progress)
     if success then
         self:triggerUIRefresh(playerId, questId)
-        local ____opt_14 = questDB.globalData
-        if ____opt_14 ~= nil then
-            ____opt_14 = ____opt_14.quests:get(questId)
+        local ____opt_15 = questDB.globalData
+        if ____opt_15 ~= nil then
+            ____opt_15 = ____opt_15.quests:get(questId)
         end
-        local quest = ____opt_14
+        local quest = ____opt_15
         if quest and quest.objectives then
             local allCompleted = true
             for ____, obj in __TS__Iterator(quest.objectives) do

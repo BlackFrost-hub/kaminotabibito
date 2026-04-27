@@ -54,7 +54,7 @@ export function getControlReduction(unit: any): number {
  * 应用控制时间削减上限
  */
 export function applyControlReductionCap(reduction: number): number {
-  return Math.min(reduction, CONTROL_REDUCTION_CAP);
+  return reduction < CONTROL_REDUCTION_CAP ? reduction : CONTROL_REDUCTION_CAP;
 }
 
 /**

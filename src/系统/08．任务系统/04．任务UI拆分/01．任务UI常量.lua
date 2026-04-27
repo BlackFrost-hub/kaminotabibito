@@ -15,7 +15,7 @@ ____exports.ENABLE_FDF_SCROLLBAR_BORDER = true
 ____exports.ENABLE_FDF_SCROLLBAR_THUMB = true
 ____exports.ENABLE_MOUSE_WHEEL_SCROLL = true
 --- 每分类预设最大页数（用于固定次数遍历隐藏，不依赖 pages.length）
-____exports.MAX_PAGES_PER_CATEGORY = 20
+____exports.MAX_PAGES_PER_CATEGORY = 50
 --- 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中
 ____exports.ENABLE_TASK_UI_RIGHT_SCROLLBAR = true
 ____exports.ENTRY_W = 0.059 * 1.3

@@ -11,6 +11,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 const { DEFAULT_COLOR_ID, EVENT_NAME_CAST_BAR } = require("系统.03．技能系统.07．技能吟唱条.00．常量定义") as {
   DEFAULT_COLOR_ID: number;
@@ -92,8 +96,12 @@ function countOnJassStesTable(this: void, eventName: string): number {
 
 function scheduleRetry(this: void, fn: () => void): void {
   const tm = jass.CreateTimer();
-  jass.TimerStart(tm, RETRY_SEC, false, () => {
-    jass.DestroyTimer(tm);
+  if (!tm) {
+    fn();
+    return;
+  }
+  safeTimerStart(tm, RETRY_SEC, false, () => {
+    safeDestroyTimer(tm);
     fn();
   });
 }

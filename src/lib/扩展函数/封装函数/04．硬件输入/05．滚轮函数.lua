@@ -13,7 +13,7 @@ local japi = require("jass.japi")
 function ____exports.getWheelDelta(self)
     local ____temp_0
     if type(japi.DzGetWheelDelta) == "function" then
-        ____temp_0 = japi:DzGetWheelDelta()
+        ____temp_0 = japi.DzGetWheelDelta()
     else
         ____temp_0 = 0
     end
@@ -28,12 +28,12 @@ function ____exports.registerMouseWheel(self, sync, action, playerId)
         return nil
     end
     if sync then
-        japi:DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
+        japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action)
     else
         runFalseLocalRegistration(
             nil,
             function()
-                japi:DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
+                japi.DzTriggerRegisterMouseWheelEventByCode(trig, false, action)
             end,
             playerId
         )

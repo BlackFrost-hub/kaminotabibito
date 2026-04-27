@@ -129,7 +129,8 @@ function getMissingLife(target: any): number {
   if (target == null) return 0;
   const maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE);
   const curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE);
-  return Math.max(0, maxLife - curLife);
+  const missing = maxLife - curLife;
+  return missing > 0 ? missing : 0;
 }
 
 /** 播放治疗特效 */
@@ -218,7 +219,8 @@ export function doHeal(params: HealParams): number {
   if (amount <= 0) return 0;
 
   // 限制不超过已损失生命
-  const actualHeal = Math.min(amount, getMissingLife(HealTarget));
+  const missingLife = getMissingLife(HealTarget);
+  const actualHeal = amount < missingLife ? amount : missingLife;
   if (actualHeal <= 0) return 0;
 
   // 设置生命值

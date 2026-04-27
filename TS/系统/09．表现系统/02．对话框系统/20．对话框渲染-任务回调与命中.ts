@@ -156,16 +156,48 @@ export function bindDialogPanelHitFrame(_hitFrame: Frame): void {
 
 const SKIP_KEY_COOLDOWN_SECONDS = 0.12;
 const g_skipKeyCooldown: boolean[] = [];
+const g_skipKeyCooldownTimers: any[] = [];
+
+function finishSkipKeyCooldownForPlayer(pid: number): void {
+  if (pid < 0 || pid >= MAX_PLAYERS) return;
+  g_skipKeyCooldown[pid] = false;
+  const t = g_skipKeyCooldownTimers[pid];
+  g_skipKeyCooldownTimers[pid] = undefined;
+  if (!t) return;
+  jass.PauseTimer(t);
+  jass.DestroyTimer(t);
+}
+
+function skipKeyCooldownCallbackP0(): void { finishSkipKeyCooldownForPlayer(0); }
+function skipKeyCooldownCallbackP1(): void { finishSkipKeyCooldownForPlayer(1); }
+function skipKeyCooldownCallbackP2(): void { finishSkipKeyCooldownForPlayer(2); }
+function skipKeyCooldownCallbackP3(): void { finishSkipKeyCooldownForPlayer(3); }
 
 function startSkipKeyCooldown(pid: number): void {
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   g_skipKeyCooldown[pid] = true;
   const t = jass.CreateTimer();
-  jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, () => {
-    g_skipKeyCooldown[pid] = false;
-    jass.PauseTimer(t);
-    jass.DestroyTimer(t);
-  });
+  g_skipKeyCooldownTimers[pid] = t;
+  switch (pid) {
+    case 0:
+      jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0);
+      return;
+    case 1:
+      jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1);
+      return;
+    case 2:
+      jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2);
+      return;
+    case 3:
+      jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3);
+      return;
+    default:
+      jass.PauseTimer(t);
+      jass.DestroyTimer(t);
+      g_skipKeyCooldownTimers[pid] = undefined;
+      g_skipKeyCooldown[pid] = false;
+      return;
+  }
 }
 
 function fastForwardQueueToLastNormalLine(state: PlayerDialogState): void {

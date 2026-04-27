@@ -7,23 +7,27 @@ local CameraSetEQNoiseForPlayer = ____01_FF0E_955C_5934_9707_52A8.CameraSetEQNoi
 local CameraClearNoiseForPlayer = ____01_FF0E_955C_5934_9707_52A8.CameraClearNoiseForPlayer
 --- 镜头震动计时器封装
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local cameraTimers = __TS__New(Map)
 function ____exports.CameraShakeForPlayer(self, whichPlayer, magnitude, duration)
     CameraSetEQNoiseForPlayer(nil, whichPlayer, magnitude)
     local existing = cameraTimers:get(whichPlayer)
     if existing then
-        jass:DestroyTimer(existing)
+        safeDestroyTimer(nil, existing)
     end
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     cameraTimers:set(whichPlayer, t)
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         t,
         duration,
         false,
         function()
             CameraClearNoiseForPlayer(nil, whichPlayer)
             cameraTimers:delete(whichPlayer)
-            jass:DestroyTimer(t)
+            safeDestroyTimer(nil, t)
         end
     )
 end

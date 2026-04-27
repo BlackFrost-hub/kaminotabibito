@@ -7,6 +7,9 @@
  */
 
 const japi = require("jass.japi") as any;
+const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  RMaxBJ: (a: number, b: number) => number;
+};
 
 import { runFalseLocalRegistration } from "./02．内部工具";
 import { getClientHeight, getWindowHeight } from "./06．窗口函数";
@@ -64,7 +67,7 @@ export function setMousePos(x: number, y: number): void {
 export function getScrollbarTrackThumbTravelPx(travelNorm: number): number {
   const ch = getClientHeight();
   const clientH = ch > 0 ? ch : getWindowHeight() || 600;
-  return Math.max(1, (clientH * travelNorm) / 0.6);
+  return RMaxBJ(1, (clientH * travelNorm) / 0.6);
 }
 
 /**

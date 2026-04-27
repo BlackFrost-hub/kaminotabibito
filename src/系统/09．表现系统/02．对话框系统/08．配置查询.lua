@@ -63,7 +63,7 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     end
     local selectedUnitCode = fourCCToString(
         nil,
-        jass:GetUnitTypeId(unit)
+        jass.GetUnitTypeId(unit)
     )
     for ____, npc in ipairs(NPC_CONFIGS) do
         do

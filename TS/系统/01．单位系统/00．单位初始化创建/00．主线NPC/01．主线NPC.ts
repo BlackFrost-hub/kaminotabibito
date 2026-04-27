@@ -1,4 +1,9 @@
 const jass = require("jass.common") as any;
+const BJ_DEGTORAD = 0.017453292519943295;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 import { createUnitWithOptions } from "../../../../lib/扩展函数/自定义扩展函数/00．单位相关";
 export interface MainStoryNpcMap {
   自然守护者?: any;
@@ -21,7 +26,7 @@ export const MAIN_STORY_NPCS: MainStoryNpcMap = {};
 
 function createNeutralPassive(unitId: string, x: number, y: number, facingDeg: number): any {
   // createUnitWithOptions 约定 playerId=15 对应中立被动
-  const facingRad = (facingDeg * Math.PI) / 180;
+  const facingRad = facingDeg * BJ_DEGTORAD;
   return createUnitWithOptions(15, unitId, x, y, facingRad);
 }
 
@@ -55,9 +60,13 @@ export function createMainStoryNPCs(): MainStoryNpcMap {
  */
 export function initMainStoryNPCsWithDelay(delaySec: number = 1.0): void {
   const timer = jass.CreateTimer();
-  jass.TimerStart(timer, delaySec, false, () => {
+  if (!timer) {
     createMainStoryNPCs();
-    jass.DestroyTimer(timer);
+    return;
+  }
+  safeTimerStart(timer, delaySec, false, () => {
+    createMainStoryNPCs();
+    safeDestroyTimer(timer);
   });
 }
 

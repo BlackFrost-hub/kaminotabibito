@@ -1,4 +1,9 @@
 const japi = require("jass.japi") as any;
+const { round, clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  round: (value: number) => number;
+  clampMin: (value: number, minValue: number) => number;
+  clampRange: (value: number, minValue: number, maxValue: number) => number;
+};
 
 import { ENABLE_MOUSE_WHEEL_SCROLL } from "./01．任务UI常量";
 import {
@@ -22,6 +27,7 @@ import {
 import { pcallDzFrameShow } from "./02．任务UI辅助";
 
 export interface TaskUIScrollContext {
+  playerId: number;
   mainPanel: number | null;
   listContainer: number | null;
   scrollBarFrame: number | null;
@@ -29,12 +35,13 @@ export interface TaskUIScrollContext {
   scrollThumbHitBtn: number | null;
   FramePoint: any;
   setFramePointRelative: any;
-  taskListWheelTrig: unknown;
+  taskListWheelRegistered: boolean;
   getMouseFocus?: () => number;
   getWheelDelta?: () => number;
   /** `this: void`：避免 TSTL 编成 `ctx:registerMouseWheel` 把上下文表塞进 `sync` 位 */
   registerMouseWheel(this: void, sync: boolean, cb: () => void, playerId?: number): unknown;
   isVisible: () => boolean;
+  isOwnedByLocalPlayer: () => boolean;
   getCurrentPageCount: () => number;
   getCurrentPage: () => number;
   setCurrentPage: (page: number) => void;
@@ -46,14 +53,14 @@ let wheelCtx: TaskUIScrollContext | null = null;
 /** N 槽：所有已注册的滚动上下文，滚轮/拖拽事件路由到可见的那个 */
 const allWheelCtxs: TaskUIScrollContext[] = [];
 /** 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc） */
-let taskThumbGlobalMouseTrig: unknown = null;
+let taskThumbGlobalMouseRegistered = false;
 
 function findVisibleWheelCtx(): TaskUIScrollContext | null {
   for (let i = 0; i < allWheelCtxs.length; i++) {
     const ctx = allWheelCtxs[i];
-    if (ctx.isVisible()) return ctx;
+    if (ctx.isOwnedByLocalPlayer() && ctx.isVisible()) return ctx;
   }
-  return wheelCtx;
+  return null;
 }
 
 function taskUIWheelEventPcallBody(): void {
@@ -78,7 +85,7 @@ function setTaskScrollThumbByRatio(ctx: TaskUIScrollContext, ratio: number): voi
   const centeredX = (SCROLLBAR_W - SCROLL_THUMB_SIZE) * 0.5;
   let travelRange = thumbTravelNorm();
   if (travelRange < 0) travelRange = 0;
-  const r = Math.max(0, Math.min(1, ratio));
+  const r = clampRange(ratio, 0, 1);
   const topOffset = SCROLL_THUMB_TOP_COMPENSATION + travelRange * r;
   ctx.setFramePointRelative(ctx.scrollThumbFrame, ctx.FramePoint.TOPLEFT, ctx.scrollBarFrame, ctx.FramePoint.TOPLEFT, centeredX, -topOffset);
 }
@@ -88,7 +95,7 @@ function updateTaskUIScrollThumbPosition(ctx: TaskUIScrollContext, pageCount: nu
     setTaskScrollThumbByRatio(ctx, 0);
     return;
   }
-  const currentPage = Math.max(0, Math.min(pageCount - 1, ctx.getCurrentPage()));
+  const currentPage = clampRange(ctx.getCurrentPage(), 0, pageCount - 1);
   const ratio = currentPage / (pageCount - 1);
   setTaskScrollThumbByRatio(ctx, ratio);
 }
@@ -105,8 +112,8 @@ export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
   if (delta === 0) return;
   const currentPage = ctx.getCurrentPage();
   let nextPage = currentPage;
-  if (delta > 0) nextPage = Math.max(0, currentPage - 1);
-  if (delta < 0) nextPage = Math.min(pageCount - 1, currentPage + 1);
+  if (delta > 0) nextPage = clampMin(currentPage - 1, 0);
+  if (delta < 0) nextPage = currentPage + 1 < pageCount ? currentPage + 1 : pageCount - 1;
   if (nextPage === currentPage) return;
   ctx.setCurrentPage(nextPage);
   ctx.onPageChanged(currentPage, nextPage);
@@ -125,7 +132,7 @@ function ratioFromThumbDragMouseY(pageCount: number, mouseYPx: number): number {
   if (travelNorm <= 0 || pageCount <= 1) return 0;
   const travelPx = getScrollbarTrackThumbTravelPx(travelNorm);
   const startRatio = pageCount > 1 ? thumbDragStartPage / (pageCount - 1) : 0;
-  return Math.max(0, Math.min(1, startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx));
+  return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1);
 }
 
 function onThumbDragStart(): void {
@@ -144,7 +151,7 @@ function onThumbDragMove(): void {
   if (pageCount <= 1) return;
   const ratio = ratioFromThumbDragMouseY(pageCount, getMouseY());
   setTaskScrollThumbByRatio(dragCtx, ratio);
-  const targetPage = Math.max(0, Math.min(pageCount - 1, Math.round(ratio * (pageCount - 1))));
+  const targetPage = clampRange(round(ratio * (pageCount - 1)), 0, pageCount - 1);
   const cur = dragCtx.getCurrentPage();
   if (targetPage !== cur) {
     dragCtx.setCurrentPage(targetPage);
@@ -159,7 +166,7 @@ function onThumbDragEnd(): void {
   const pageCount = dragCtx.getCurrentPageCount();
   if (pageCount <= 1) return;
   const ratio = ratioFromThumbDragMouseY(pageCount, getMouseY());
-  const targetPage = Math.max(0, Math.min(pageCount - 1, Math.round(ratio * (pageCount - 1))));
+  const targetPage = clampRange(round(ratio * (pageCount - 1)), 0, pageCount - 1);
   const cur = dragCtx.getCurrentPage();
   if (targetPage !== cur) {
     dragCtx.setCurrentPage(targetPage);
@@ -172,7 +179,8 @@ function onThumbDragEnd(): void {
 function taskUIThumbPressPcallBody(): void {
   const ctx = findVisibleWheelCtx();
   if (!ctx || !ctx.isVisible()) return;
-  if (!isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) {
+  const hit = isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn);
+  if (!hit) {
     return;
   }
   dragCtx = ctx;
@@ -200,14 +208,13 @@ function onGlobalThumbDragMove(): void {
 }
 
 function ensureTaskThumbGlobalMouseRegistered(): void {
-  if (taskThumbGlobalMouseTrig != null) return;
+  if (taskThumbGlobalMouseRegistered) return;
   const trig = createTriggerOrNull();
   if (!trig) return;
-  // 左键按下/抬起 (btn=1,status) 见 ui-frame-types.mdc；sync 与滚轮一致走本机 false
   registerMouseButtonEventByCode(trig, 1, 1, false, onGlobalThumbLeftPress);
   registerMouseButtonEventByCode(trig, 1, 0, false, onGlobalThumbLeftRelease);
   registerMouseMoveEventByCode(trig, false, onGlobalThumbDragMove);
-  taskThumbGlobalMouseTrig = trig;
+  taskThumbGlobalMouseRegistered = true;
 }
 
 export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
@@ -216,10 +223,11 @@ export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
   allWheelCtxs.push(ctx);
   ensureTaskThumbGlobalMouseRegistered();
 
-  if (!ENABLE_MOUSE_WHEEL_SCROLL) return ctx.taskListWheelTrig;
-  if (ctx.taskListWheelTrig) return ctx.taskListWheelTrig;
-  ctx.taskListWheelTrig = ctx.registerMouseWheel(false, onMouseWheelEvent);
-  return ctx.taskListWheelTrig;
+  if (!ENABLE_MOUSE_WHEEL_SCROLL) return null;
+  if (ctx.taskListWheelRegistered) return null;
+  ctx.registerMouseWheel(false, onMouseWheelEvent);
+  ctx.taskListWheelRegistered = true;
+  return null;
 }
 
 export function updateTaskUIScrollBarVisibility(ctx: TaskUIScrollContext, pageCount: number, hasQuestRows: boolean): void {

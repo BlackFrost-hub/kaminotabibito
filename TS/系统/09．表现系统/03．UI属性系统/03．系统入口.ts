@@ -17,12 +17,18 @@
 const jass = require("jass.common") as any;
 const 硬件函数 = require("系统.00．核心系统.02．硬件函数") as {
   registerKeyEventRawStatus: (keyCode: number, status: number, sync: boolean, action: () => void) => any;
+  getTriggerKey: () => number;
   getTriggerKeyPlayer: () => any;
 };
 const 中心计时器 = globalThis as unknown as {
   onTick10ms: (callback: () => void) => void;
   offTick10ms: (callback: () => void) => void;
 };
+const registerKeyEventRawStatus = 硬件函数.registerKeyEventRawStatus;
+const getTriggerKey = 硬件函数.getTriggerKey;
+const getTriggerKeyPlayer = 硬件函数.getTriggerKeyPlayer;
+const onTick10ms = 中心计时器.onTick10ms;
+const offTick10ms = 中心计时器.offTick10ms;
 
 const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量定义") as {
   INIT_DELAY_SECONDS: number;
@@ -51,6 +57,7 @@ const {
 const Star扩展库 = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (player: any, x: number, y: number, duration: number) => void;
 };
+const panCameraToTimedForPlayer = Star扩展库.StarOther_PanCameraToTimedForPlayer;
 
 let initialized = false;
 let startupScheduled = false;
@@ -71,13 +78,21 @@ function refreshAllUi(): void {
  * 包一层按键注册：sync=true 全房对称；Tab 显隐在 action 内自行做本地玩家门控。
  */
 function registerKey(status: number, keyCode: number, action: () => void): void {
-  硬件函数.registerKeyEventRawStatus(keyCode, status, true, action);
+  registerKeyEventRawStatus(keyCode, status, true, action);
 }
 
 /** 模块级分发函数：Tab 键显示/隐藏伤害统计（避免匿名闭包） */
 function dispatchTabKey(show: boolean): void {
-  if (硬件函数.getTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
+  if (getTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
   showDamagePanel(show);
+}
+
+function onTabKeyDown(): void {
+  dispatchTabKey(true);
+}
+
+function onTabKeyUp(): void {
+  dispatchTabKey(false);
 }
 
 /**
@@ -85,18 +100,22 @@ function dispatchTabKey(show: boolean): void {
  * 使用命名函数 dispatchTabKey 避免匿名闭包进 JASS 回调。
  */
 function registerDamagePanelHotkeys(): void {
-  registerKey(常量.KEY_EVENT_DOWN, 常量.KEY_TAB, () => dispatchTabKey(true));
-  registerKey(常量.KEY_EVENT_UP, 常量.KEY_TAB, () => dispatchTabKey(false));
+  registerKey(常量.KEY_EVENT_DOWN, 常量.KEY_TAB, onTabKeyDown);
+  registerKey(常量.KEY_EVENT_UP, 常量.KEY_TAB, onTabKeyUp);
 }
 
 /** 模块级分发函数：F2-F6 跳镜头统一入口（避免匿名闭包） */
 function dispatchFocusHotkey(keyCode: number): void {
-  const p = 硬件函数.getTriggerKeyPlayer();
+  const p = getTriggerKeyPlayer();
   if (p == null) return;
   const hero = focusHeroByFunctionKey(keyCode);
   if (hero == null) return;
   // 与 `属性查看.j` 一致：只按 DzGetTriggerKeyPlayer 平移镜头，勿用 GetLocalPlayer 兜底（会偏离按键所属玩家）。
-  Star扩展库.StarOther_PanCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
+  panCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
+}
+
+function dispatchFocusTriggeredKey(): void {
+  dispatchFocusHotkey(getTriggerKey());
 }
 
 /**
@@ -106,17 +125,26 @@ function dispatchFocusHotkey(keyCode: number): void {
 function registerFocusHotkeys(): void {
   for (let i = 0; i < 常量.KEY_F.length; i++) {
     const functionKey = 常量.KEY_F[i];
-    registerKey(常量.KEY_EVENT_UP, functionKey, () => dispatchFocusHotkey(functionKey));
+    registerKey(常量.KEY_EVENT_UP, functionKey, dispatchFocusTriggeredKey);
   }
 }
 
+function onRefreshLoopTick(): void {
+  refreshAccumulator = refreshAccumulator + 0.01;
+  if (refreshAccumulator + 0.0001 < 常量.REFRESH_INTERVAL_SECONDS) return;
+  refreshAccumulator = 0;
+  refreshAllUi();
+}
+
 function startRefreshLoop(): void {
-  中心计时器.onTick10ms(() => {
-    refreshAccumulator = refreshAccumulator + 0.01;
-    if (refreshAccumulator + 0.0001 < 常量.REFRESH_INTERVAL_SECONDS) return;
-    refreshAccumulator = 0;
-    refreshAllUi();
-  });
+  onTick10ms(onRefreshLoopTick);
+}
+
+function onStartupTick(): void {
+  if (initialized) return;
+  startupAccumulator = startupAccumulator + 0.01;
+  if (startupAccumulator + 0.0001 < 常量.INIT_DELAY_SECONDS) return;
+  initUiAttributeSystem();
 }
 
 /**
@@ -125,13 +153,8 @@ function startRefreshLoop(): void {
 function scheduleUiStartup(): void {
   if (startupScheduled) return;
   startupScheduled = true;
-  startupTickHandler = () => {
-    if (initialized) return;
-    startupAccumulator = startupAccumulator + 0.01;
-    if (startupAccumulator + 0.0001 < 常量.INIT_DELAY_SECONDS) return;
-    initUiAttributeSystem();
-  };
-  中心计时器.onTick10ms(startupTickHandler);
+  startupTickHandler = onStartupTick;
+  onTick10ms(startupTickHandler);
 }
 
 /**
@@ -142,7 +165,7 @@ export function initUiAttributeSystem(): void {
   if (initialized) return;
 
   if (startupTickHandler != null) {
-    中心计时器.offTick10ms(startupTickHandler);
+    offTick10ms(startupTickHandler);
     startupTickHandler = null;
   }
 

@@ -5,7 +5,7 @@ alwaysApply: false
 
 > **⚠️ 最高优先级（Dz / 任务面板等一切联机 UI）**  
 > UI 路径是社区经验里**最容易**因闭包、GC、`pcall` 体、回调注册路径与 `GetLocalPlayer()` 混写而诱发掉线或 desync 的环节，**不得**按「调用频率低、只是包一层」在此放宽。  
-> - **必须**较下文普通条目更严：进 JASS/Dz 的回调、`pcall` 包裹体、帧点击/滚轮/键盘注册 → **模块顶层具名函数 + 单列或 `mgr` 分发**；禁止把 **`() => …`** 传到上述注册点（细则见下 §「回调铁律」及仓库内 `04．任务UI拆分` 实现）。**`pcall`** 用 **`pcall(模块顶层 void 具名体)`** + 槽位写结果 + **`local ok = pcall(…)`** 读 boolean（`TS/global.d.ts` 对 `pcall` 的 `@noSelf`）；禁止 **`(pcall as any)(具名)`**（TSTL→`pcall(nil,fn)`）、**匿名 `function` 仅转发具名体**，以及 **`pcall(…)[n]` / 解构元组** 取 ok（Lua 多返回值与 TSTL 易错）。  
+> - **必须**较下文普通条目更严：进 JASS/Dz 的回调、`pcall` 包裹体、帧点击/滚轮/键盘注册 → **模块顶层具名函数 + 单列或 `mgr` 分发**；禁止把 **`() => …`** 传到上述注册点（细则见下 §「回调铁律」及仓库内 `04．任务UI拆分` 实现）。**`pcall`** 用 **`pcall(模块顶层 void 具名体)`** + 槽位写结果 + **`local ok = pcall(…)`** 读 boolean（`TS/global.d.ts` 对 `pcall` 的 `@noSelf`）；禁止 **`(pcall as any)(具名)`**（TSTL→`pcall(nil,fn)`）、**匿名 `function` 仅转发具名体**，以及 **`pcall(…)[n]` / 解构元组** 取 ok（Lua 多返回值与 TSTL 易错）。若遇到 **`pcall` 返回后后续逻辑疑似不执行**、导致 `uiInitialized=true` 但实例未落表这类现象，UI 初始化链优先改为 **直接调用 + `try/catch`**，不要继续在 `const [ok] = pcall(...)` 这类形态上加补丁。  
 > - **必须**与 `n-slot-ui-symmetric-execution.mdc` 一致：**全端对称的执行次数与创建路径**；纯显隐、本机音效、仅本地可见的改帧再在本地门控内做。  
 > - **审查快照**：同文件文末 **「附录：任务 UI（`04．任务UI拆分`）符合性」**；代码迭代后应复验。
 
@@ -22,6 +22,7 @@ alwaysApply: false
 
 2. **禁止异步全局引用**  
    在本地分支中给全局表写 handle（单位、帧、物品等）会在 GC 后导致各端句柄不一致，直接掉线。
+   对 `sync=false` / 本地异步路径里临时创建或拿到的 handle（trigger、timer、frame、unit、item 等），**不要跨帧持有引用**；若只是为了当前帧注册/调用，使用后立即清空局部或模块槽位引用。禁止把这类 handle 挂进本地缓存表、实例字段或模块级变量后继续跨帧保留。
 
 3. **匿名闭包严禁传入 JASS 回调**  
    频繁把 `() => ...` 传给 `TimerStart`、`ForGroup`、触发条件等，是最隐蔽的异步源。必须改为模块级命名函数 + 参数表传递。
@@ -84,6 +85,11 @@ TimerStart、ForGroup、Filter、触发条件
 动态参数通过字符串 key 的全局表或数组传递
 
 ForGroup 等直接在 Lua 层用循环替代，不让闭包进入 JASS
+
+补充社区经验：
+- 单位组遍历优先 `FirstOfGroup` + `while`，不要继续把业务 action 挂到 `ForGroup` / `ForForce`。能在 Lua 层手动取第一个单位循环，就不要再走 JASS 侧 action 回调。
+- 独立 `TimerStart` 只留给一次性延迟或确有独立生命周期的对象；常规周期逻辑优先接入项目中心计时器做分发，减少“每个系统各起一条 timer”。
+- 数学运算优先使用 JASS 数学函数，不要把联机关键路径建立在 Lua `math` 库之上。社区长期经验认为 `math` 存在低概率异步风险；项目层面的默认策略是“业务代码直接少用/不用 `math`”，而不是先在入口全局 monkey patch 整个数学库。
 
 lua
 -- ✅ 正确：命名函数，单列模式
@@ -186,7 +192,7 @@ Lua 异步是几率性的，无法做到 100% 绝对安全。
 | 规则域 | 结论 |
 |--------|------|
 | **创建 / 生命周期（§1–2）** | `10．index` 在 `ENABLE_QUEST_UI_MODULE` 下对各客户端对称调用 `12．任务UI管理器` 的 `init()` / `registerHotkey()`；帧创建在 `runInitBodyInPcall` 等**全房共有路径**，非「仅本地分支才建 UI」。 |
-| **匿名闭包 → JASS/Dz（§3）** | 行点击 `handleTaskRowClick`、分类 Tab 具名表、`12` 模块级分发；`01`/`02`/`09`/`10`/`12` 的 `pcall`：**void 具名体写模块槽位** + **`local ok = pcall(具名)`** 读 boolean（`TS/global.d.ts` 对 `pcall` 的 `@noSelf`）；**禁止** `(pcall as any)(具名)`（TSTL→`pcall(nil,fn)`）及对 `pcall` 返回值做 **下标/元组解构** 取 ok（Lua 多返回值与 TSTL 易错）。 |
+| **匿名闭包 → JASS/Dz（§3）** | 行点击 `handleTaskRowClick`、分类 Tab 具名表、`12` 模块级分发；`01`/`02`/`09`/`10`/`12` 的 `pcall`：**void 具名体写模块槽位** + **`local ok = pcall(具名)`** 读 boolean（`TS/global.d.ts` 对 `pcall` 的 `@noSelf`）；**禁止** `(pcall as any)(具名)`（TSTL→`pcall(nil,fn)`）及对 `pcall` 返回值做 **下标/元组解构** 取 ok（Lua 多返回值与 TSTL 易错）。若某个 UI 初始化点出现 **函数体已执行，但 `pcall` 返回后的赋值/落表没发生**，直接改为 **`try { body(); } catch { return false; }`**，并在 build 后核对生成 Lua。 |
 | **`pairs`（§4）** | 分类遍历走 `questTypes()` 等**固定顺序数组**，热路径未见 `pairs(` 哈希遍历。 |
 | **本机分支（§5–6）** | `05．任务UI热键`：先全端 `onSwitchCategoryState`，再在 `player === GetLocalPlayer()` 内做分类 UI；与「状态同步、显示本地」分层一致。 |
 | **`n-slot` §3 计时器** | 任务 UI 不以「仅本机 `TimerStart`」做主刷新链；数据变更走管理器刷新回调 → 全端 `rebuildPages` 路径。 |

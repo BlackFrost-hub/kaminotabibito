@@ -25,22 +25,18 @@
 
 const jass = require("jass.common") as any;
 
-const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Register: (t: any, name: string) => void;
-};
-
 const {
   ydlStes_syncTriggerStep,
   ydlStes_finishChildCleanup,
   ydlStes_readBoolean5,
   ydlStes_readInteger5,
-  ydlStes_registerAfterGetTable,
+  registerStesListener,
 } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
   ydlStes_syncTriggerStep: (self: any) => void;
   ydlStes_finishChildCleanup: (self: any) => void;
   ydlStes_readBoolean5: (self: any, name: string) => boolean;
   ydlStes_readInteger5: (self: any, name: string) => number;
-  ydlStes_registerAfterGetTable: (self: any, trig: any, eventName: string) => void;
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 
 import type { QuestData, QuestObjective } from "./01．任务数据";
@@ -143,11 +139,7 @@ function runStesObjectiveCallback(eventKey: string): void {
 }
 
 function registerOneStesEvent(trigger: any, eventName: string): void {
-  if (STES_Register == null) {
-    debugPrint(`STES_Register 不可用，无法注册 ${eventName}`);
-    return;
-  }
-  ydlStes_registerAfterGetTable(undefined, trigger, eventName);
+  registerStesListener(eventName, () => {});
 }
 
 /**
@@ -159,13 +151,7 @@ export function registerSimpleSTESBridgeEvent(
   onEvent: () => void,
   debugMsg: string,
 ): void {
-  if (STES_Register == null) {
-    debugPrint(`STES_Register 不可用，无法注册${debugMsg}事件`);
-    return;
-  }
-
-  const trig = jass.CreateTrigger();
-  jass.TriggerAddAction(trig, () => {
+  registerStesListener(eventName, () => {
     try {
       ydlStes_syncTriggerStep(undefined);
       debugPrint(`${debugMsg}事件触发...`);
@@ -178,27 +164,18 @@ export function registerSimpleSTESBridgeEvent(
       ydlStes_finishChildCleanup(undefined);
     }
   });
-
-  ydlStes_registerAfterGetTable(undefined, trig, eventName);
   debugPrint(`已注册 ${eventName} 事件`);
 }
 
 function init(): void {
-  if (STES_Register == null) {
-    debugPrint("[任务STES] STES_Register 不可用，跳过注册");
-    return;
-  }
-
   for (const eventKey in QUEST_STES_OBJECTIVE_ROWS) {
     const row = QUEST_STES_OBJECTIVE_ROWS[eventKey];
     if (!row) continue;
 
-    const trig = jass.CreateTrigger();
     const key = eventKey;
-    jass.TriggerAddAction(trig, () => {
+    registerStesListener(key, () => {
       runStesObjectiveCallback(key);
     });
-    registerOneStesEvent(trig, key);
   }
 }
 

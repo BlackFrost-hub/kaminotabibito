@@ -336,14 +336,10 @@ export function initHotSystem(): void {
   if (!HOT_SYSTEM_ENABLED) return;
   if (hotTrigger != null) return;
 
-  hotTrigger = jass.CreateTrigger();
-  jass.TriggerAddAction(hotTrigger, onHotEvent);
-
-  // 注册到STES
-  const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-    STES_Register: (trg: any, name: string) => void;
+  const { registerStesListener } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
+    registerStesListener: (eventName: string, callback: () => void) => any | null;
   };
-  STES_Register(hotTrigger, HOT_EVENT_NAME);
+  hotTrigger = registerStesListener(HOT_EVENT_NAME, onHotEvent);
 }
 
 /**

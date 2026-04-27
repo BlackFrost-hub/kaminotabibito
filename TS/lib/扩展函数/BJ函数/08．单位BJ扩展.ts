@@ -9,6 +9,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+    forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
+};
 
 export function String2UnitIdBJ(unitIdString: string): number {
     return jass.UnitId(unitIdString);
@@ -37,8 +40,7 @@ export function SelectUnitSingle(unit: any): void {
 
 export function SelectGroupBJ(group: any): void {
     jass.ClearSelection();
-    jass.ForGroup(group, () => {
-        const u = jass.GetEnumUnit();
+    forEachUnitInGroup(group, (u: any) => {
         if (u != null) {
             jass.SelectUnit(u, true);
         }

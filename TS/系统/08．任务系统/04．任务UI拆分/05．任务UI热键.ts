@@ -11,14 +11,15 @@ export interface RegisterTaskUIHotkeysOpts {
   registerKeyUpSync: any;
   KEY: any;
   KEY_NUM: any;
-  onTogglePanelSync: (player: any) => void;
-  onSwitchCategorySync: (player: any, type: QuestType) => void;
+  onTogglePanelSync: (this: void, player: any) => void;
+  onSwitchCategorySync: (this: void, player: any, type: QuestType) => void;
 }
 
 function handleTogglePanelHotkey(player: any): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
-  opts.onTogglePanelSync(player);
+  const onTogglePanelSync = opts.onTogglePanelSync;
+  onTogglePanelSync(player);
 }
 
 function handleMainCategoryHotkey(player: any): void {
@@ -36,7 +37,8 @@ function handleDailyCategoryHotkey(player: any): void {
 function handleCategoryHotkey(player: any, category: QuestType): void {
   const opts = currentHotkeyOpts;
   if (!opts) return;
-  opts.onSwitchCategorySync(player, category);
+  const onSwitchCategorySync = opts.onSwitchCategorySync;
+  onSwitchCategorySync(player, category);
 }
 
 export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {

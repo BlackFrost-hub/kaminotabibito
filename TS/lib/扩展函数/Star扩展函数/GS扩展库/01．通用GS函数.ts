@@ -1,12 +1,17 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { RAbsBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  RAbsBJ: (a: number) => number;
+};
+
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (f: any, messageType: number, message: string) => void;
 };
 
 function abs(value: number): number {
-  return Math.abs(value);
+  return RAbsBJ(value);
 }
 
 export function SoHeroHatm(c: any): number {
@@ -40,7 +45,7 @@ export function GS_UnitSector(u1: any, u2: any, r: number): boolean {
   const angle1 = (jass.GetUnitFacing(u1) as number) || 0;
   const dy = ((jass.GetUnitY(u1) as number) || 0) - ((jass.GetUnitY(u2) as number) || 0);
   const dx = ((jass.GetUnitX(u1) as number) || 0) - ((jass.GetUnitX(u2) as number) || 0);
-  const angle2 = ((jglobals.bj_RADTODEG ?? (180 / Math.PI)) as number) * (jass.Atan2(dy, dx) as number);
+  const angle2 = BJ_RADTODEG * (jass.Atan2(dy, dx) as number);
   return abs(abs((angle1 - angle2) - 180) - 180) > r;
 }
 

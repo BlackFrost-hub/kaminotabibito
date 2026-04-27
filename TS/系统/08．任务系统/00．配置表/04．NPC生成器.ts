@@ -5,6 +5,11 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const BJ_DEGTORAD = 0.017453292519943295;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
 import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
@@ -47,8 +52,8 @@ function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
     tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
     return;
   }
-  jass.TimerStart(timer, delaySec, false, () => {
-    jass.DestroyTimer(timer);
+  safeTimerStart(timer, delaySec, false, () => {
+    safeDestroyTimer(timer);
     tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
   });
 }
@@ -56,8 +61,8 @@ function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
 function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): void {
   const timer = jass.CreateTimer();
   if (!timer) return;
-  jass.TimerStart(timer, 0.01, false, () => {
-    jass.DestroyTimer(timer);
+  safeTimerStart(timer, 0.01, false, () => {
+    safeDestroyTimer(timer);
     const ok = (pcall as any)(() => {
       japi.DzSetUnitModel(unit, modelPath);
     });
@@ -80,7 +85,7 @@ function createSingleNPC(npcConfig: NPCData): any {
   }
 
   const facingDeg = npcConfig.Facing ?? 270;
-  const facingRad = facingDeg * Math.PI / 180;
+  const facingRad = facingDeg * BJ_DEGTORAD;
   const unit = createUnitWithOptions(15, unitCode, npcConfig.X, npcConfig.Y, facingRad);
   if (!unit) {
     _print("[NPC生成器] 创建单位失败: " + tostring(npcConfig.NpcNameID) + " (" + unitCode + ")");

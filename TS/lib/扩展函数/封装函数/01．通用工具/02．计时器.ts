@@ -8,6 +8,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 /**
  * 在已有计时器句柄上启动一次性回调，触发后销毁该计时器。
@@ -20,9 +24,9 @@ export function runTimerOnce(timer: any, delaySec: number, callback: () => void)
     callback();
     return;
   }
-  jass.TimerStart(timer, delaySec, false, () => {
+  safeTimerStart(timer, delaySec, false, () => {
     callback();
-    jass.DestroyTimer(timer);
+    safeDestroyTimer(timer);
   });
 }
 
@@ -38,13 +42,13 @@ export function withTimer(delaySec: number, callback: () => void, periodic: bool
   const t = jass.CreateTimer();
   if (!t) { callback(); return null; }
   if (periodic) {
-    jass.TimerStart(t, delaySec, true, () => {
+    safeTimerStart(t, delaySec, true, () => {
       callback();
     });
   } else {
-    jass.TimerStart(t, delaySec, false, () => {
+    safeTimerStart(t, delaySec, false, () => {
       callback();
-      jass.DestroyTimer(t);
+      safeDestroyTimer(t);
     });
   }
   return t;
@@ -57,5 +61,5 @@ export function withTimer(delaySec: number, callback: () => void, periodic: bool
 export function stopTimer(t: any): void {
   if (!t) return;
   jass.PauseTimer(t);
-  jass.DestroyTimer(t);
+  safeDestroyTimer(t);
 }

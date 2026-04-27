@@ -176,7 +176,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   if (!isPlayerHero(killer)) return;
 
   // 计算平分金币（基础赏金的40%）
-  const shareGold = Math.floor(baseBounty / 10) * 4;
+  const shareGold = jass.R2I(baseBounty / 10) * 4;
   if (shareGold <= 0) return;
 
   // 获取范围内友方英雄
@@ -204,7 +204,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
     const heroY = jass.GetUnitY(hero) ?? 0;
     const dx = heroX - dyingX;
     const dy = heroY - dyingY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = jass.SquareRoot(dx * dx + dy * dy);
     if (dist > SHARE_RANGE) continue;
 
     // 给予平分金币

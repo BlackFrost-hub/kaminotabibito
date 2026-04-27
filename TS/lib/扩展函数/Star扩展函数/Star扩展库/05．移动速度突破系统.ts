@@ -13,6 +13,11 @@
  */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GDBC: (x1: number, y1: number, x2: number, y2: number) => number;
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
@@ -33,6 +38,7 @@ const CENTER_TIMER_TICKS = 2;
 const SPEED_MIN = 1;
 const SPEED_MAX = 2000;
 const ENGINE_SPEED_LIMIT = 522;
+const BJ_DEGTORAD = jglobals.bj_DEGTORAD ?? 0.017453292519943295;
 
 /** 移动速度突破特效模型路径 */
 const SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx";
@@ -139,9 +145,9 @@ function doEvent(entry: SpeedEntry): void {
 
     if (speedDiff > 0) {
       const moveDist = speedDiff * TIMER_INTERVAL;
-      const rad = angle * (Math.PI / 180);
-      const nx = x + moveDist * Math.cos(rad);
-      const ny = y + moveDist * Math.sin(rad);
+      const rad = angle * BJ_DEGTORAD;
+      const nx = x + moveDist * jass.Cos(rad);
+      const ny = y + moveDist * jass.Sin(rad);
 
       if (X_IsTerrainWalkable(nx, ny)) {
         jass.SetUnitX(u, nx);
@@ -225,7 +231,7 @@ function removeEntry(uid: number): void {
   }
 
   if (entry.tempTimer) {
-    jass.DestroyTimer(entry.tempTimer);
+    safeDestroyTimer(entry.tempTimer);
     entry.tempTimer = null;
   }
   if (entry.t) {
@@ -311,7 +317,7 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
   if (existing != null) {
     // 已存在，更新速度，取消临时计时器
     if (existing.tempTimer) {
-      jass.DestroyTimer(existing.tempTimer);
+      safeDestroyTimer(existing.tempTimer);
       existing.tempTimer = null;
     }
     existing.speed = speed;
@@ -418,7 +424,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
   current.tempTimer = tempT;
 
   if (tempT) {
-    jass.TimerStart(tempT, duration, false, () => {
+    safeTimerStart(tempT, duration, false, () => {
       const e = entryMap[uid];
       if (e == null || e.tempTimer !== tempT) return;
       e.tempTimer = null;

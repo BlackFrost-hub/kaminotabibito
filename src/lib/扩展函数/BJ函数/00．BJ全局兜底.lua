@@ -6,12 +6,15 @@ local ____exports = {}
 -- 数值与 Blizzard.j 一致：`bj_RADTODEG = 180/π`，`bj_DEGTORAD = π/180`。
 -- `bj_lastCreatedUnit` / `bj_lastReplacedUnit` 为可变全局，缺省时置为 nil，由创建/替换单位逻辑更新。
 local jglobals = require("jass.globals")
+local DEFAULT_BJ_PI = 3.141592653589793
+local DEFAULT_BJ_RADTODEG = 180 / DEFAULT_BJ_PI
+local DEFAULT_BJ_DEGTORAD = DEFAULT_BJ_PI / 180
 --- 与 Blizzard.j `bj_PI` 对齐的工程常量
-____exports.BJ_PI = math.pi
+____exports.BJ_PI = DEFAULT_BJ_PI
 --- 弧度 → 角度乘数（Blizzard.j `bj_RADTODEG` = 180/bj_PI）
-____exports.BJ_RADTODEG = 180 / math.pi
+____exports.BJ_RADTODEG = DEFAULT_BJ_RADTODEG
 --- 角度 → 弧度乘数（Blizzard.j `bj_DEGTORAD` = bj_PI/180）
-____exports.BJ_DEGTORAD = math.pi / 180
+____exports.BJ_DEGTORAD = DEFAULT_BJ_DEGTORAD
 local ____jglobals_bj_PI_0 = jglobals.bj_PI
 if ____jglobals_bj_PI_0 == nil then
     ____jglobals_bj_PI_0 = ____exports.BJ_PI

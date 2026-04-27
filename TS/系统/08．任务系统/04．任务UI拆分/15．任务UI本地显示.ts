@@ -25,14 +25,12 @@ export function toggleExpandLocal(
   const page = cv.pages[pageIndex];
   if (!page) return;
 
-  // 计算目标 variant 索引
   let targetVariant = 0;
   if (expandedQuestId !== questId) {
     const rowIndex = page.questIds.indexOf(questId);
     if (rowIndex >= 0) targetVariant = rowIndex + 1;
   }
 
-  // 隐藏所有 variant，只显示目标 variant
   for (let i = 0; i < page.variants.length; i++) {
     setVisible(page.variants[i].root, i === targetVariant);
   }

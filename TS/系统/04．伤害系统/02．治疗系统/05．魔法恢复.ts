@@ -61,7 +61,9 @@ export function doManaRegen(
   const maxMana = jass.GetUnitState(target, jass.UNIT_STATE_MAX_MANA);
 
   // 计算实际恢复量（不超过上限）
-  const actualRegen = Math.min(amount, Math.max(0, maxMana - currentMana));
+  const manaGap = maxMana - currentMana;
+  const safeGap = manaGap > 0 ? manaGap : 0;
+  const actualRegen = amount < safeGap ? amount : safeGap;
   if (actualRegen <= 0) return 0;
 
   // 设置魔法值

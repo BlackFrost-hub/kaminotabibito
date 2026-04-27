@@ -10,6 +10,9 @@ local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04�
 local EMPTY_TEXTS = ____02_FF0E_4EFB_52A1UI_8F85_52A9.EMPTY_TEXTS
 local getQuestsForUI = ____02_FF0E_4EFB_52A1UI_8F85_52A9.getQuestsForUI
 local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local clampMin = ____require_result_0.clampMin
+local clampRange = ____require_result_0.clampRange
 function ____exports.getQuestItemHeight(self, quest, expanded)
     if not expanded then
         return LIST_ITEM_H * 0.4
@@ -68,13 +71,10 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
     return totalH
 end
 function ____exports.getMaxScroll(self, totalContentHeight)
-    return math.max(0, totalContentHeight - LIST_VIEW_H)
+    return clampMin(nil, totalContentHeight - LIST_VIEW_H, 0)
 end
 function ____exports.clampScrollOffset(self, scrollOffset, maxScroll)
-    return math.min(
-        maxScroll,
-        math.max(0, scrollOffset)
-    )
+    return clampRange(nil, scrollOffset, 0, maxScroll)
 end
 function ____exports.isQuestRowFullyInsideView(self, rowTopRel, itemHeight, visibleTopRel, visibleBottomRel, eps)
     local itemTopRel = rowTopRel
@@ -92,13 +92,13 @@ function ____exports.isDescendantOf(self, japi, frame, ancestor)
             if cur == ancestor then
                 return true
             end
-            local ____temp_0
+            local ____temp_1
             if type(japi.DzFrameGetParent) == "function" then
-                ____temp_0 = japi:DzFrameGetParent(cur)
+                ____temp_1 = japi.DzFrameGetParent(cur)
             else
-                ____temp_0 = 0
+                ____temp_1 = 0
             end
-            local p = ____temp_0
+            local p = ____temp_1
             if not p or p == 0 then
                 return false
             end
@@ -147,12 +147,12 @@ function ____exports.computeNextScrollOffsetByWheel(self, getWheelDelta, current
         return currentOffset
     end
     local step = LIST_ITEM_H + 0.01
-    local maxScroll = math.max(0, totalContentHeight - listViewHeight)
+    local maxScroll = clampMin(nil, totalContentHeight - listViewHeight, 0)
     if delta > 0 then
-        return math.max(0, currentOffset - step)
+        return clampMin(nil, currentOffset - step, 0)
     end
     if delta < 0 then
-        return math.min(maxScroll, currentOffset + step)
+        return currentOffset + step < maxScroll and currentOffset + step or maxScroll
     end
     return currentOffset
 end
@@ -202,21 +202,21 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
     return visibleRows
 end
 function ____exports.refreshTaskUIList(self, opts)
-    local ____opts_1 = opts
-    local currentPlayerId = ____opts_1.currentPlayerId
-    local currentCategory = ____opts_1.currentCategory
-    local scrollOffset = ____opts_1.scrollOffset
-    local setScrollOffset = ____opts_1.setScrollOffset
-    local setTotalContentHeight = ____opts_1.setTotalContentHeight
-    local listContainer = ____opts_1.listContainer
-    local expandedQuestIds = ____opts_1.expandedQuestIds
-    local createTextLabel = ____opts_1.createTextLabel
-    local FramePoint = ____opts_1.FramePoint
-    local applyDzTextFontAndCenterAlignment = ____opts_1.applyDzTextFontAndCenterAlignment
-    local pushListItemFrame = ____opts_1.pushListItemFrame
-    local syncScrollThumb = ____opts_1.syncScrollThumb
-    local updateScrollBarVis = ____opts_1.updateScrollBarVisibility
-    local createListItem = ____opts_1.createListItem
+    local ____opts_2 = opts
+    local currentPlayerId = ____opts_2.currentPlayerId
+    local currentCategory = ____opts_2.currentCategory
+    local scrollOffset = ____opts_2.scrollOffset
+    local setScrollOffset = ____opts_2.setScrollOffset
+    local setTotalContentHeight = ____opts_2.setTotalContentHeight
+    local listContainer = ____opts_2.listContainer
+    local expandedQuestIds = ____opts_2.expandedQuestIds
+    local createTextLabel = ____opts_2.createTextLabel
+    local FramePoint = ____opts_2.FramePoint
+    local applyDzTextFontAndCenterAlignment = ____opts_2.applyDzTextFontAndCenterAlignment
+    local pushListItemFrame = ____opts_2.pushListItemFrame
+    local syncScrollThumb = ____opts_2.syncScrollThumb
+    local updateScrollBarVis = ____opts_2.updateScrollBarVisibility
+    local createListItem = ____opts_2.createListItem
     local quests = getQuestsForUI(nil, currentPlayerId, currentCategory)
     if #quests == 0 then
         setTotalContentHeight(nil, 0)

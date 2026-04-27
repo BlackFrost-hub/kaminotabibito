@@ -2,13 +2,16 @@
 local ____exports = {}
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local DEFAULT_BJ_PI = 3.141592653589793
+local DEFAULT_BJ_DEGTORAD = DEFAULT_BJ_PI / 180
+local DEFAULT_BJ_RADTODEG = 180 / DEFAULT_BJ_PI
 local function bjDegToRad(self)
     local v = jglobals.bj_DEGTORAD
-    return type(v) == "number" and v or math.pi / 180
+    return type(v) == "number" and v or DEFAULT_BJ_DEGTORAD
 end
 local function bjRadToDeg(self)
     local v = jglobals.bj_RADTODEG
-    return type(v) == "number" and v or 180 / math.pi
+    return type(v) == "number" and v or DEFAULT_BJ_RADTODEG
 end
 function ____exports.OperatorDegreeAdd(self, a, b)
     return a + b
@@ -44,7 +47,7 @@ function ____exports.OperatorIntegerMultiply(self, a, b)
     return a * b
 end
 function ____exports.OperatorIntegerDivide(self, a, b)
-    return math.floor(a / b)
+    return jass.R2I(a / b)
 end
 function ____exports.OperatorRealAdd(self, a, b)
     return a + b
@@ -75,14 +78,14 @@ local function applyOp(self, a, op, b)
 end
 function ____exports.YDWEOperatorInt3(self, a1, op1, a2, op2, a3)
     if op2 == "*" or op2 == "/" then
-        return math.floor(applyOp(
+        return jass.R2I(applyOp(
             nil,
             a1,
             op1,
             applyOp(nil, a2, op2, a3)
         ))
     end
-    return math.floor(applyOp(
+    return jass.R2I(applyOp(
         nil,
         applyOp(nil, a1, op1, a2),
         op2,
@@ -125,13 +128,13 @@ function ____exports.YDWERad2R(self, rad)
     return rad
 end
 function ____exports.YDWEInitHashtable(self)
-    return jass:InitHashtable()
+    return jass.InitHashtable()
 end
 function ____exports.YDWEIsTriggerEventId(self, eventid)
-    return eventid == jass:GetTriggerEventId()
+    return eventid == jass.GetTriggerEventId()
 end
 function ____exports.YDWEH2I(self, handle)
-    return jass:GetHandleId(handle)
+    return jass.GetHandleId(handle)
 end
 function ____exports.YDWEGetUnitID(self, a)
     return ____exports.YDWEH2I(nil, a)

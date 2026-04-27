@@ -169,7 +169,7 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 ## Frame 叠放与优先级
 
-- `DzFrameSetPriority` 才是优先级主控制；`DzFrameSetLevel` 仅作同层/局部排序辅助，不能替代 Priority。
+- `DzFrameSetPriority` 才是优先级主控制；`DzFrameSetLevel` 压根不存在！要用`DzFrameSetPriority`
 
 ## 相关规则
 

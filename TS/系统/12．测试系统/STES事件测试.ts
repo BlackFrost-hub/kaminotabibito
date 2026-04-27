@@ -16,6 +16,10 @@ const ENABLED = false;
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { max, min } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+    max: (a: number, b: number) => number;
+    min: (a: number, b: number) => number;
+};
 /** 本图 JASS 里 YDLocal5Set/YDLocal1Get 使用的实数变量名字符串（须与触发器里完全一致） */
 const YD_LOCAL_REAL_KEY = "实数";
 
@@ -74,8 +78,8 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
             const from5 = YDLocal5Get("real", YD_LOCAL_REAL_KEY);
             const b = typeof from5 === "number" ? from5 : 0;
             const quad = (b * b + 13 * b + 42) / (b + 1.0001);
-            const root = Math.sqrt(Math.max(0, b + 16)) * 2.25;
-            const ret = quad + root - Math.min(b, 5) * 0.5 + 3.14159;
+            const root = jass.SquareRoot(max(0, b + 16)) * 2.25;
+            const ret = quad + root - min(b, 5) * 0.5 + 3.14159;
             YDLocal7Set("real", YD_LOCAL_REAL_KEY, ret);
             log(
                 "[STES事件测试-Lua] YDLocal5Get(real,\"" +

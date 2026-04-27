@@ -1,4 +1,8 @@
 import { QuestData, QuestType } from "../01．任务数据";
+const { clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  clampMin: (value: number, minValue: number) => number;
+  clampRange: (value: number, minValue: number, maxValue: number) => number;
+};
 import {
   LIST_ITEM_H,
   LIST_VIEW_H,
@@ -45,11 +49,11 @@ export function calcTotalContentHeight(
 }
 
 export function getMaxScroll(totalContentHeight: number): number {
-  return Math.max(0, totalContentHeight - LIST_VIEW_H);
+  return clampMin(totalContentHeight - LIST_VIEW_H, 0);
 }
 
 export function clampScrollOffset(scrollOffset: number, maxScroll: number): number {
-  return Math.min(maxScroll, Math.max(0, scrollOffset));
+  return clampRange(scrollOffset, 0, maxScroll);
 }
 
 // ────────────────────────────────────────────────
@@ -132,9 +136,9 @@ export function computeNextScrollOffsetByWheel(
   const delta = typeof getWheelDelta === "function" ? getWheelDelta() : 0;
   if (delta === 0) return currentOffset;
   const step = LIST_ITEM_H + 0.01;
-  const maxScroll = Math.max(0, totalContentHeight - listViewHeight);
-  if (delta > 0) return Math.max(0, currentOffset - step);
-  if (delta < 0) return Math.min(maxScroll, currentOffset + step);
+  const maxScroll = clampMin(totalContentHeight - listViewHeight, 0);
+  if (delta > 0) return clampMin(currentOffset - step, 0);
+  if (delta < 0) return currentOffset + step < maxScroll ? currentOffset + step : maxScroll;
   return currentOffset;
 }
 

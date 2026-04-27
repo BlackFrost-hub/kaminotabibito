@@ -1,5 +1,3 @@
-const japi = require("jass.japi") as any;
-
 import { LIST_CONTAINER_W, LIST_VIEW_H, LIST_ITEM_H, BG_TEX } from "./01．任务UI常量";
 import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
 import type { TaskUIListControlContext } from "./09．任务UI列表控制";
@@ -8,12 +6,9 @@ import { EMPTY_TEXTS } from "./02．任务UI辅助";
 import { createEmptyQuestIdList, PAGE_VARIANT_COUNT, ROWS_PER_PAGE } from "./11．任务UI列表控制辅助";
 import type { TaskUICategoryFrames, TaskUIPageFrames, TaskUIPageVariantFrames, TaskUIRowSlotFrames } from "./09．任务UI列表控制";
 
+const japi = require("jass.japi") as any;
+
 const PAGE_ROOT_HEIGHT = LIST_VIEW_H;
-const ROOT_LEVEL = 40;
-const BACKDROP_LEVEL = 41;
-const TEXT_LEVEL = 43;
-const BUTTON_LEVEL = 46;
-const ICON_LEVEL = 45;
 const TITLE_HEIGHT = LIST_ITEM_H * 0.38;
 const OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25;
 const FAIL_HEIGHT = LIST_ITEM_H * 0.2;
@@ -40,7 +35,6 @@ export function createHiddenRoot(
   if (!frame) return null;
   ctx.setFramePointRelative(frame, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, 0, 0);
   ctx.setFrameSize(frame, { width, height });
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ROOT_LEVEL);
   return frame;
 }
 
@@ -67,7 +61,6 @@ export function createHiddenText(
     ) || 0;
   if (!frame) return null;
   if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(frame, false);
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, TEXT_LEVEL);
   return frame;
 }
 
@@ -94,7 +87,6 @@ export function createHiddenBackdrop(
       ctx.setFrameTexture(frame, texture);
     }
   }
-  if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BACKDROP_LEVEL);
   return frame || null;
 }
 
@@ -112,7 +104,6 @@ export function createPlainHiddenBackdrop(
       visible: false,
       id: ctx.contextId,
     }) || 0;
-  if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ICON_LEVEL);
   return frame || null;
 }
 
@@ -134,7 +125,6 @@ export function createHiddenButton(
       id: ctx.contextId,
     }) || 0;
   if (!frame) return null;
-  if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BUTTON_LEVEL);
   ctx.setFrameClickEvent(frame, onClick, true);
   return frame;
 }
@@ -184,23 +174,15 @@ export function createRowSlot(
   const clickBtn = createHiddenButton(ctx, prefix + "_Click_" + rowIndex, parent, onClick);
   const icon = createPlainHiddenBackdrop(ctx, prefix + "_Icon_" + rowIndex, parent);
 
-  if (backdrop && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(backdrop, BACKDROP_LEVEL);
-  if (title && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(title, TEXT_LEVEL);
-  if (clickBtn && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, BUTTON_LEVEL);
-  if (icon && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(icon, ICON_LEVEL);
-
   for (let i = 0; i < 4; i++) {
     const frame = createHiddenText(ctx, prefix + "_Obj_" + rowIndex + "_" + i, parent, LIST_CONTAINER_W * 0.9, OBJECTIVE_HEIGHT);
-    if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, TEXT_LEVEL);
     objectiveFrames.push(frame || 0);
   }
 
   const failFrame = createHiddenText(ctx, prefix + "_Fail_" + rowIndex, parent, LIST_CONTAINER_W * 0.9, FAIL_HEIGHT);
-  if (failFrame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(failFrame, TEXT_LEVEL);
 
   for (let i = 0; i < 3; i++) {
     const frame = createHiddenText(ctx, prefix + "_Detail_" + rowIndex + "_" + i, parent, LIST_CONTAINER_W * 0.9, DETAIL_HEIGHT);
-    if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, TEXT_LEVEL);
     detailFrames.push(frame || 0);
   }
 
@@ -221,7 +203,7 @@ export function createVariant(
   category: QuestType,
   pageIndex: number,
   variantIndex: number,
-  onRowClick: () => void
+  rowClickHandlers: Array<() => void>
 ): TaskUIPageVariantFrames {
   const root = createHiddenRoot(ctx, "TaskVariant_" + category + "_" + pageIndex + "_" + variantIndex, page.root as number);
   const rowSlots: TaskUIRowSlotFrames[] = [];
@@ -232,7 +214,7 @@ export function createVariant(
         root as number,
         "TaskVar_" + category + "_" + pageIndex + "_" + variantIndex,
         rowIndex,
-        onRowClick
+        rowClickHandlers[rowIndex] ?? (() => {})
       )
     );
   }
@@ -244,7 +226,7 @@ export function createPage(
   categoryRoot: number,
   category: QuestType,
   pageIndex: number,
-  onRowClick: () => void
+  rowClickHandlers: Array<() => void>
 ): TaskUIPageFrames {
   const page: TaskUIPageFrames = {
     root: createHiddenRoot(ctx, "TaskPage_" + category + "_" + pageIndex, categoryRoot),
@@ -252,7 +234,7 @@ export function createPage(
     variants: [],
   };
   for (let variantIndex = 0; variantIndex < PAGE_VARIANT_COUNT; variantIndex++) {
-    page.variants.push(createVariant(ctx, page, category, pageIndex, variantIndex, onRowClick));
+    page.variants.push(createVariant(ctx, page, category, pageIndex, variantIndex, rowClickHandlers));
   }
   return page;
 }
@@ -260,7 +242,8 @@ export function createPage(
 export function createCategory(
   ctx: TaskUIListControlContext,
   category: QuestType,
-  setVisible: SetVisibleLike
+  setVisible: SetVisibleLike,
+  rowClickHandlers: Array<() => void>
 ): TaskUICategoryFrames {
   const root = createHiddenRoot(ctx, "TaskCategory_" + category, ctx.listContainer as number);
   const emptyText =
@@ -279,7 +262,6 @@ export function createCategory(
     ) || 0;
   if (emptyText) {
     ctx.applyDzTextFontAndCenterAlignment(emptyText);
-    if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(emptyText, TEXT_LEVEL);
     setVisible(emptyText, false);
   }
 
@@ -289,18 +271,4 @@ export function createCategory(
     pageCount: 0,
     pages: [],
   };
-}
-
-export function ensurePage(
-  ctx: TaskUIListControlContext,
-  categoryView: TaskUICategoryFrames,
-  category: QuestType,
-  pageIndex: number,
-  onRowClick: () => void
-): TaskUIPageFrames {
-  while (categoryView.pages.length <= pageIndex) {
-    const p = createPage(ctx, categoryView.root as number, category, categoryView.pages.length, onRowClick);
-    categoryView.pages.push(p);
-  }
-  return categoryView.pages[pageIndex];
 }

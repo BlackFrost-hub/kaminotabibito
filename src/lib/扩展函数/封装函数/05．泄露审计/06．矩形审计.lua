@@ -13,6 +13,6 @@ function ____exports.removeRect(self, rect)
         return
     end
     untrack(nil, "rect", rect)
-    jass:RemoveRect(rect)
+    jass.RemoveRect(rect)
 end
 return ____exports

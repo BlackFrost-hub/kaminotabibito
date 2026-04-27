@@ -48,8 +48,8 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮�
 CreateFloatTextOnUnit = ____require_result_3.CreateFloatTextOnUnit
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local isAncientUnit = ____require_result_4.isAncientUnit
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.index")
-formatNumber = ____require_result_5.formatNumber
+formatNumber = ____require_result_4.formatNumber
+local forEachUnitInGroup = ____require_result_4.forEachUnitInGroup
 --- 获取玩家英雄组
 -- 存储位置：YDUserDataGet("string", "玩家英雄", "单位组", "group")
 function ____exports.getPlayerHeroGroup(self)
@@ -80,7 +80,7 @@ function ____exports.getHeroForAncientUnit(self, ancientUnit)
     if ancientUnit == nil then
         return nil
     end
-    local owner = jass:GetOwningPlayer(ancientUnit)
+    local owner = jass.GetOwningPlayer(ancientUnit)
     if owner == nil then
         return nil
     end
@@ -89,12 +89,12 @@ function ____exports.getHeroForAncientUnit(self, ancientUnit)
         return nil
     end
     local foundHero = nil
-    jass:ForGroup(
+    forEachUnitInGroup(
+        nil,
         heroGroup,
-        function()
-            local enumUnit = jass:GetEnumUnit()
-            if enumUnit ~= nil and jass:GetOwningPlayer(enumUnit) == owner then
-                if jass:IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
+        function(____, enumUnit)
+            if enumUnit ~= nil and jass.GetOwningPlayer(enumUnit) == owner then
+                if jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
                     foundHero = enumUnit
                 end
             end
@@ -125,7 +125,7 @@ function ____exports.calcLifeSteal(self, attacker, isPlayer)
     if limit ~= nil then
         if isPlayer and lifeSteal > limit.max then
             local breakLimit = getRealAttr(nil, attacker, "伤害吸血上限", 0)
-            lifeSteal = breakLimit > 0 and math.min(lifeSteal, breakLimit) or limit.max
+            lifeSteal = breakLimit > 0 and (lifeSteal < breakLimit and lifeSteal or breakLimit) or limit.max
         elseif lifeSteal > limit.max then
             lifeSteal = limit.max
         end
@@ -225,13 +225,14 @@ function ____exports.applyLifeSteal(self, attacker, heal, showText)
     if heal <= 0 or attacker == nil then
         return
     end
-    local currentLife = jass:GetUnitState(attacker, jass.UNIT_STATE_LIFE)
-    local maxLife = jass:GetUnitState(attacker, jass.UNIT_STATE_MAX_LIFE)
-    local actualHeal = math.min(heal, maxLife - currentLife)
+    local currentLife = jass.GetUnitState(attacker, jass.UNIT_STATE_LIFE)
+    local maxLife = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_LIFE)
+    local lifeGap = maxLife - currentLife
+    local actualHeal = heal < lifeGap and heal or lifeGap
     if actualHeal <= 0 then
         return
     end
-    jass:SetUnitState(attacker, jass.UNIT_STATE_LIFE, currentLife + actualHeal)
+    jass.SetUnitState(attacker, jass.UNIT_STATE_LIFE, currentLife + actualHeal)
     if showText then
         showLifeStealText(nil, attacker, actualHeal)
     end
@@ -242,7 +243,7 @@ end
 -- @param damage 最终伤害
 -- @returns 吸魔值
 function ____exports.calcManaSteal(self, attacker, damage)
-    if not jass:IsUnitType(attacker, jass.UNIT_TYPE_HERO) then
+    if not jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO) then
         return 0
     end
     local isPlayer = isPlayerUnit(nil, attacker)
@@ -275,13 +276,14 @@ function ____exports.applyManaSteal(self, attacker, mana, showText)
     if mana <= 0 or attacker == nil then
         return
     end
-    local currentMana = jass:GetUnitState(attacker, jass.UNIT_STATE_MANA)
-    local maxMana = jass:GetUnitState(attacker, jass.UNIT_STATE_MAX_MANA)
-    local actualMana = math.min(mana, maxMana - currentMana)
+    local currentMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MANA)
+    local maxMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_MANA)
+    local manaGap = maxMana - currentMana
+    local actualMana = mana < manaGap and mana or manaGap
     if actualMana <= 0 then
         return
     end
-    jass:SetUnitState(attacker, jass.UNIT_STATE_MANA, currentMana + actualMana)
+    jass.SetUnitState(attacker, jass.UNIT_STATE_MANA, currentMana + actualMana)
     if showText then
         showManaStealText(nil, attacker, actualMana)
     end

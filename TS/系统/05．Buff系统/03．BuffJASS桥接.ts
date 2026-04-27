@@ -22,8 +22,8 @@
  */
 
 const jass = require("jass.common") as any;
-const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Register: (t: any, name: string) => void;
+const { registerStesListener } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWETimerDestroyEffect: (duration: number, effect: any) => void;
@@ -35,14 +35,12 @@ const {
   ydlStes_readString5,
   ydlStes_readUnit5,
   ydlStes_readReal5,
-  ydlStes_registerAfterGetTable,
 } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
   ydlStes_syncTriggerStep: (self: any) => void;
   ydlStes_finishChildCleanup: (self: any) => void;
   ydlStes_readString5: (self: any, name: string) => string;
   ydlStes_readUnit5: (self: any, name: string) => any;
   ydlStes_readReal5: (self: any, name: string) => number;
-  ydlStes_registerAfterGetTable: (self: any, trig: any, eventName: string) => void;
 };
 
 import { registerManualBuff } from "./00．Buff系统";
@@ -106,12 +104,9 @@ export function buffBridgeApplyFromYdlocal(_self: any): void {
 }
 
 function init(): void {
-  if (STES_Register == null) return;
-  const trig = jass.CreateTrigger();
-  jass.TriggerAddAction(trig, () => {
+  registerStesListener(BUFF_ADD_STES_EVENT, () => {
     buffBridgeApplyFromYdlocal(undefined);
   });
-  ydlStes_registerAfterGetTable(undefined, trig, BUFF_ADD_STES_EVENT);
 }
 
 init();

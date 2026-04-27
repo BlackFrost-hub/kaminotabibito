@@ -9,7 +9,13 @@
  * 不包含：生命周期入口、STES 输入注册。
  */
 
+const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { ceil, max, forEachSorted } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  ceil: (value: number) => number;
+  max: (a: number, b: number) => number;
+  forEachSorted: <K extends number | string, V>(map: Map<K, V>, callback: (key: K, value: V) => void) => void;
+};
 
 const {
   UPDATE_INTERVAL,
@@ -80,8 +86,8 @@ function getNextHandleId(): number {
 // ==========================================================================================
 
 function formatTime(this: void, time: number): string {
-  const intPart = Math.floor(time);
-  const decPart = Math.floor((time - intPart) * 10);
+  const intPart = jass.R2I(time);
+  const decPart = jass.R2I((time - intPart) * 10);
   return intPart + "." + decPart;
 }
 
@@ -145,7 +151,7 @@ function getGameUI(this: void): any {
 function updateAllCastBars(this: void): void {
   const deltaTime = UPDATE_INTERVAL;
 
-  for (const [handleId, data] of castBarDataMap) {
+  forEachSorted(castBarDataMap, (handleId, data) => {
     data.elapsedTime += deltaTime;
     data.progress = data.elapsedTime / data.totalTime;
 
@@ -153,7 +159,7 @@ function updateAllCastBars(this: void): void {
     setFrameAnimateOffset(data.foreground, animOffset);
 
     const remaining = data.totalTime - data.elapsedTime;
-    setFrameText(data.countdown, formatTime(Math.max(0, remaining)));
+    setFrameText(data.countdown, formatTime(max(0, remaining)));
 
     if (data.elapsedTime >= data.totalTime) {
       showFrame(data.foreground, false);
@@ -168,7 +174,7 @@ function updateAllCastBars(this: void): void {
 
       castBarDataMap.delete(handleId);
     }
-  }
+  });
 }
 
 /** 创建吟唱条 UI 帧组 */
@@ -255,7 +261,7 @@ function createCastBarUI(this: void, colorId: number, totalTime: number, customS
 
 let _registeredToCenterTimer = false;
 let _tickCounter = 0;
-const CENTER_TIMER_TICKS = Math.ceil(UPDATE_INTERVAL / 0.01);
+const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 
 function ensureRegisteredToCenterTimer(this: void): void {
   if (_registeredToCenterTimer) return;

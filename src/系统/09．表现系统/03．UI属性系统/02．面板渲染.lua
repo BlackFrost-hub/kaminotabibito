@@ -17,14 +17,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue53
+                            goto __continue58
                         end
-                        japi:DzFrameSetText(
+                        japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue53::
+                    ::__continue58::
                     col = col + 1
                 end
             end
@@ -48,7 +48,7 @@ function ____exports.updateDetailPanels()
                     if not isSeparatorCol then
                         local frame = slot.lines[lineIdx + 1]
                         if frame ~= 0 then
-                            japi:DzFrameSetText(frame, texts[textIndex + 1] or "")
+                            japi.DzFrameSetText(frame, texts[textIndex + 1] or "")
                         end
                         lineIdx = lineIdx + 1
                     end
@@ -75,8 +75,9 @@ local damagePanelCreated = false
 damageRows = {}
 detailSlots = {}
 local registeredPlayers = __TS__New(Set)
+local detailHoverSlotByFrameId = {}
 local function createFrame(tagName, name, parent)
-    return japi:DzCreateFrameByTagName(
+    return japi.DzCreateFrameByTagName(
         tagName,
         name,
         parent,
@@ -88,13 +89,13 @@ local function setAbsolute(frame, x, y)
     if frame == 0 then
         return
     end
-    japi:DzFrameSetAbsolutePoint(frame, _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT, x, y)
+    japi.DzFrameSetAbsolutePoint(frame, _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT, x, y)
 end
 local function show(frame, visible)
     if frame == 0 then
         return
     end
-    japi:DzFrameShow(frame, visible)
+    japi.DzFrameShow(frame, visible)
 end
 local function createText(parent, name, x, y, size, text)
     local frame = createFrame("TEXT", name, parent)
@@ -102,8 +103,8 @@ local function createText(parent, name, x, y, size, text)
         return 0
     end
     setAbsolute(frame, x, y)
-    japi:DzFrameSetText(frame, text)
-    japi:DzFrameSetFont(frame, "UI\\uizt.ttf", size, 0)
+    japi.DzFrameSetText(frame, text)
+    japi.DzFrameSetFont(frame, "UI\\uizt.ttf", size, 0)
     return frame
 end
 local function showDetailSlot(index, visible)
@@ -127,10 +128,36 @@ local function showDetailSlot(index, visible)
         end
     end
 end
-local function createDetailHoverAction(index, visible)
-    return function()
-        showDetailSlot(index, visible)
+local function getTriggerUiEventFrame()
+    local ____temp_2
+    if type(japi.DzGetTriggerUIEventFrame) == "function" then
+        ____temp_2 = japi.DzGetTriggerUIEventFrame()
+    else
+        ____temp_2 = 0
     end
+    return ____temp_2
+end
+local function onDetailHoverEnter()
+    local frame = getTriggerUiEventFrame()
+    if frame == 0 then
+        return
+    end
+    local index = detailHoverSlotByFrameId[frame]
+    if index == nil then
+        return
+    end
+    showDetailSlot(index, true)
+end
+local function onDetailHoverLeave()
+    local frame = getTriggerUiEventFrame()
+    if frame == 0 then
+        return
+    end
+    local index = detailHoverSlotByFrameId[frame]
+    if index == nil then
+        return
+    end
+    showDetailSlot(index, false)
 end
 --- 创建左侧伤害统计面板（只创建一次）。
 -- 结构直接对应原 JASS：标题行 + 每名玩家一行头像和三列数值。
@@ -143,10 +170,10 @@ local function createDamagePanel(gameUI)
     if damagePanel == 0 then
         return
     end
-    japi:DzFrameSetTexture(damagePanel, _____5E38_91CF.PANEL_TEXTURE, 0)
+    japi.DzFrameSetTexture(damagePanel, _____5E38_91CF.PANEL_TEXTURE, 0)
     setAbsolute(damagePanel, _____5E38_91CF.DAMAGE_PANEL_X, _____5E38_91CF.DAMAGE_PANEL_Y)
-    japi:DzFrameSetSize(damagePanel, _____5E38_91CF.DAMAGE_PANEL_WIDTH, _____5E38_91CF.DAMAGE_PANEL_HEIGHT)
-    japi:DzFrameSetAlpha(damagePanel, _____5E38_91CF.DAMAGE_PANEL_ALPHA)
+    japi.DzFrameSetSize(damagePanel, _____5E38_91CF.DAMAGE_PANEL_WIDTH, _____5E38_91CF.DAMAGE_PANEL_HEIGHT)
+    japi.DzFrameSetAlpha(damagePanel, _____5E38_91CF.DAMAGE_PANEL_ALPHA)
     show(damagePanel, false)
     do
         local i = 0
@@ -177,12 +204,12 @@ local function createDamageRowForPlayer(gameUI, player, hero, index)
     )
     if icon ~= 0 then
         setAbsolute(icon, _____5E38_91CF.DAMAGE_ICON_X, rowY)
-        japi:DzFrameSetTexture(
+        japi.DzFrameSetTexture(
             icon,
             getHeroIcon(hero),
             0
         )
-        japi:DzFrameSetSize(icon, _____5E38_91CF.DAMAGE_ICON_WIDTH, _____5E38_91CF.DAMAGE_ICON_HEIGHT)
+        japi.DzFrameSetSize(icon, _____5E38_91CF.DAMAGE_ICON_WIDTH, _____5E38_91CF.DAMAGE_ICON_HEIGHT)
         show(icon, true)
     end
     local values = {}
@@ -224,9 +251,9 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
         return
     end
     setAbsolute(icon, iconX, _____5E38_91CF.HERO_ICON_Y)
-    japi:DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
+    japi.DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
     local iconPath = getHeroIcon(hero)
-    japi:DzFrameSetTexture(icon, iconPath, 0)
+    japi.DzFrameSetTexture(icon, iconPath, 0)
     show(icon, true)
     createText(
         icon,
@@ -245,8 +272,8 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
     local separators = {}
     if box ~= 0 then
         setAbsolute(box, _____5E38_91CF.DETAIL_BOX_X, _____5E38_91CF.DETAIL_BOX_Y)
-        japi:DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
-        japi:DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
+        japi.DzFrameSetTexture(box, _____5E38_91CF.PANEL_TEXTURE, 0)
+        japi.DzFrameSetSize(box, _____5E38_91CF.DETAIL_BOX_WIDTH, _____5E38_91CF.DETAIL_BOX_HEIGHT)
         show(box, false)
         do
             local lineIndex = 0
@@ -260,7 +287,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
                         box
                     )
                     if line ~= 0 then
-                        japi:DzFrameSetPoint(
+                        japi.DzFrameSetPoint(
                             line,
                             _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
                             box,
@@ -268,8 +295,8 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
                             pos.x,
                             pos.y
                         )
-                        japi:DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
-                        japi:DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
+                        japi.DzFrameSetSize(line, _____5E38_91CF.DETAIL_LINE_WIDTH, _____5E38_91CF.DETAIL_LINE_HEIGHT)
+                        japi.DzFrameSetFont(line, "UI\\uizt.ttf", _____5E38_91CF.DETAIL_FONT_SIZE, 0)
                         show(line, false)
                         lines[#lines + 1] = line
                     end
@@ -288,7 +315,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
             box
         )
         if sep1 ~= 0 then
-            japi:DzFrameSetPoint(
+            japi.DzFrameSetPoint(
                 sep1,
                 _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
                 box,
@@ -296,9 +323,9 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
                 _____5E38_91CF.DETAIL_SEP1_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
                 sepRelY
             )
-            japi:DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
-            japi:DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-            japi:DzFrameSetPriority(sep1, 0)
+            japi.DzFrameSetSize(sep1, sepWidth, sepTotalHeight)
+            japi.DzFrameSetTexture(sep1, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+            japi.DzFrameSetPriority(sep1, 0)
             show(sep1, false)
             separators[#separators + 1] = sep1
         end
@@ -308,7 +335,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
             box
         )
         if sep2 ~= 0 then
-            japi:DzFrameSetPoint(
+            japi.DzFrameSetPoint(
                 sep2,
                 _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
                 box,
@@ -316,9 +343,9 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
                 _____5E38_91CF.DETAIL_SEP2_X + _____5E38_91CF.DETAIL_SEPARATOR_X_OFFSET,
                 sepRelY
             )
-            japi:DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
-            japi:DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
-            japi:DzFrameSetPriority(sep2, 0)
+            japi.DzFrameSetSize(sep2, sepWidth, sepTotalHeight)
+            japi.DzFrameSetTexture(sep2, "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+            japi.DzFrameSetPriority(sep2, 0)
             show(sep2, false)
             separators[#separators + 1] = sep2
         end
@@ -329,7 +356,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
         icon
     )
     if button ~= 0 then
-        japi:DzFrameSetPoint(
+        japi.DzFrameSetPoint(
             button,
             _____5E38_91CF.ABSOLUTE_POINT_BOTTOMLEFT,
             icon,
@@ -337,13 +364,14 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
             0,
             0
         )
-        japi:DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
-        local playerId = jass:GetPlayerId(player)
+        japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
+        local playerId = jass.GetPlayerId(player)
+        detailHoverSlotByFrameId[button] = index
         frameSetScriptByCode(
             nil,
             button,
             _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
-            createDetailHoverAction(index, true),
+            onDetailHoverEnter,
             false,
             playerId
         )
@@ -351,7 +379,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
             nil,
             button,
             _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
-            createDetailHoverAction(index, false),
+            onDetailHoverLeave,
             false,
             playerId
         )
@@ -373,7 +401,7 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 then
         return
     end
-    local playerId = jass:GetPlayerId(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
     if playerId < 0 or playerId >= _____5E38_91CF.MAX_DISPLAY_PLAYERS then
         return
     end
@@ -381,7 +409,7 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
         return
     end
     registeredPlayers:add(playerId)
-    local gameUI = japi:DzGetGameUI()
+    local gameUI = japi.DzGetGameUI()
     if gameUI == nil or gameUI == 0 then
         return
     end
@@ -395,7 +423,7 @@ end
 --- 创建基础UI框架（伤害面板）。
 -- 具体玩家槽位由 onPlayerHeroRegistered 按需创建。
 function ____exports.createUiFrames()
-    local gameUI = japi:DzGetGameUI()
+    local gameUI = japi.DzGetGameUI()
     if gameUI == nil or gameUI == 0 then
         return
     end
@@ -410,11 +438,11 @@ function ____exports.focusHeroByFunctionKey(functionKey)
         while i < #detailSlots do
             do
                 if detailSlots[i + 1].functionKey ~= functionKey then
-                    goto __continue47
+                    goto __continue52
                 end
                 return getPlayerHero(detailSlots[i + 1].player)
             end
-            ::__continue47::
+            ::__continue52::
             i = i + 1
         end
     end

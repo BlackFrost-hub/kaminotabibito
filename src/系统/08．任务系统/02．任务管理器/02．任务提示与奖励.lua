@@ -21,12 +21,12 @@ function ____exports.showQuestFailedMessage(self, playerId, questId)
     if not quest then
         return
     end
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if not player then
         return
     end
     local message = "任务失败: " .. quest.title
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -40,12 +40,12 @@ function ____exports.showQuestAcceptedMessage(self, playerId, questId)
     if not quest then
         return
     end
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if not player then
         return
     end
     local message = (("已接受任务: " .. quest.title) .. "\n") .. quest.description
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -59,12 +59,12 @@ function ____exports.showQuestCompletedMessage(self, playerId, questId)
     if not quest then
         return
     end
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if not player then
         return
     end
     local message = ("任务完成: " .. quest.title) .. "\n已获得奖励！"
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -74,9 +74,9 @@ function ____exports.showQuestCompletedMessage(self, playerId, questId)
 end
 --- 放弃成功后的轻量提示；文案里用 questId，因 abandon 后配置行可能已从玩家表移除。
 function ____exports.showAbandonedQuestNotice(self, playerId, questId)
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if player then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             player,
             0,
             0,
@@ -87,9 +87,9 @@ function ____exports.showAbandonedQuestNotice(self, playerId, questId)
 end
 --- 自定义「追踪」高亮时的提示（当前 Manager 未改存档位，仅刷新 UI + 浮字）。
 function ____exports.showQuestTrackingNotice(self, playerId, title)
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if player then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             player,
             0,
             0,
@@ -107,7 +107,7 @@ function ____exports.giveQuestRewards(self, playerId, questId)
     if not quest then
         return
     end
-    local player = jass:Player(playerId)
+    local player = jass.Player(playerId)
     if not player then
         return
     end
@@ -118,7 +118,7 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             local ____cond19 = ____switch19 == "experience"
             if ____cond19 then
                 if hero then
-                    jass:AddHeroXP(hero, reward.value, true)
+                    jass.AddHeroXP(hero, reward.value, true)
                     questDebugPrint(
                         nil,
                         ((("给予玩家 " .. tostring(playerId)) .. " ") .. tostring(reward.value)) .. " 经验"
@@ -131,8 +131,8 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             ____cond19 = ____cond19 or ____switch19 == "gold"
             if ____cond19 then
                 do
-                    local currentGold = jass:GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
-                    jass:SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value)
+                    local currentGold = jass.GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
+                    jass.SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, currentGold + reward.value)
                     questDebugPrint(
                         nil,
                         ((("给予玩家 " .. tostring(playerId)) .. " ") .. tostring(reward.value)) .. " 金币"
@@ -144,7 +144,7 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             if ____cond19 then
                 if hero and reward.itemId then
                     local itemTypeId = stringToFourCC(nil, reward.itemId)
-                    jass:UnitAddItemById(hero, itemTypeId)
+                    jass.UnitAddItemById(hero, itemTypeId)
                     questDebugPrint(
                         nil,
                         (("给予玩家 " .. tostring(playerId)) .. " 物品 ") .. reward.description
@@ -157,19 +157,19 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             ____cond19 = ____cond19 or ____switch19 == "attribute"
             if ____cond19 then
                 if hero then
-                    jass:SetHeroStr(
+                    jass.SetHeroStr(
                         hero,
-                        jass:GetHeroStr(hero, false) + reward.value,
+                        jass.GetHeroStr(hero, false) + reward.value,
                         true
                     )
-                    jass:SetHeroAgi(
+                    jass.SetHeroAgi(
                         hero,
-                        jass:GetHeroAgi(hero, false) + reward.value,
+                        jass.GetHeroAgi(hero, false) + reward.value,
                         true
                     )
-                    jass:SetHeroInt(
+                    jass.SetHeroInt(
                         hero,
-                        jass:GetHeroInt(hero, false) + reward.value,
+                        jass.GetHeroInt(hero, false) + reward.value,
                         true
                     )
                     questDebugPrint(

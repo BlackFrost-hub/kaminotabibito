@@ -10,65 +10,67 @@ local getWindowHeight = ____06_FF0E_7A97_53E3_51FD_6570.getWindowHeight
 -- 禁止 japiFn 取出再调：TSTL 会编成 f(nil, ...) 导致参数错位。
 -- `sync=false` 的全局鼠标注册与滚轮一致，须经 `runFalseLocalRegistration`（见 `05．滚轮函数.ts`）。
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+local RMaxBJ = ____require_result_0.RMaxBJ
 function ____exports.getMouseTerrainX(self)
     if type(japi.DzGetMouseTerrainX) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseTerrainX()
+    return japi.DzGetMouseTerrainX()
 end
 function ____exports.getMouseTerrainY(self)
     if type(japi.DzGetMouseTerrainY) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseTerrainY()
+    return japi.DzGetMouseTerrainY()
 end
 function ____exports.getMouseTerrainZ(self)
     if type(japi.DzGetMouseTerrainZ) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseTerrainZ()
+    return japi.DzGetMouseTerrainZ()
 end
 function ____exports.isMouseOverUI(self)
     if type(japi.DzIsMouseOverUI) ~= "function" then
         return false
     end
-    return not not japi:DzIsMouseOverUI()
+    return not not japi.DzIsMouseOverUI()
 end
 function ____exports.getMouseX(self)
     if type(japi.DzGetMouseX) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseX()
+    return japi.DzGetMouseX()
 end
 function ____exports.getMouseY(self)
     if type(japi.DzGetMouseY) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseY()
+    return japi.DzGetMouseY()
 end
 function ____exports.getMouseXRelative(self)
     if type(japi.DzGetMouseXRelative) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseXRelative()
+    return japi.DzGetMouseXRelative()
 end
 function ____exports.getMouseYRelative(self)
     if type(japi.DzGetMouseYRelative) ~= "function" then
         return 0
     end
-    return japi:DzGetMouseYRelative()
+    return japi.DzGetMouseYRelative()
 end
 function ____exports.setMousePos(self, x, y)
     if type(japi.DzSetMousePos) ~= "function" then
         return
     end
-    japi:DzSetMousePos(x, y)
+    japi.DzSetMousePos(x, y)
 end
 --- 纵向 UI 归一化行程（如 LIST_VIEW_H - thumb）→ 与 Dz 纵向 0..0.6 对应的像素行程（任务分页滑块拖拽等）
 function ____exports.getScrollbarTrackThumbTravelPx(self, travelNorm)
     local ch = getClientHeight(nil)
     local clientH = ch > 0 and ch or (getWindowHeight(nil) or 600)
-    return math.max(1, clientH * travelNorm / 0.6)
+    return RMaxBJ(nil, 1, clientH * travelNorm / 0.6)
 end
 --- 全局鼠标键 ByCode 注册；与 `registerMouseWheel` 同一套 sync / 本地玩家契约。
 -- 
@@ -78,7 +80,7 @@ function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, syn
         return
     end
     if sync then
-        japi:DzTriggerRegisterMouseEventByCode(
+        japi.DzTriggerRegisterMouseEventByCode(
             trig,
             btn,
             status,
@@ -89,7 +91,7 @@ function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, syn
         runFalseLocalRegistration(
             nil,
             function()
-                japi:DzTriggerRegisterMouseEventByCode(
+                japi.DzTriggerRegisterMouseEventByCode(
                     trig,
                     btn,
                     status,
@@ -107,12 +109,12 @@ function ____exports.registerMouseMoveEventByCode(self, trig, sync, action, play
         return
     end
     if sync then
-        japi:DzTriggerRegisterMouseMoveEventByCode(trig, true, action)
+        japi.DzTriggerRegisterMouseMoveEventByCode(trig, true, action)
     else
         runFalseLocalRegistration(
             nil,
             function()
-                japi:DzTriggerRegisterMouseMoveEventByCode(trig, false, action)
+                japi.DzTriggerRegisterMouseMoveEventByCode(trig, false, action)
             end,
             playerId
         )

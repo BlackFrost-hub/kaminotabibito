@@ -23,8 +23,8 @@ import {
 
 const jass = require("jass.common") as any;
 
-const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Register: (trg: any, name: string) => void;
+const { registerStesListener } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
+  registerStesListener: (eventName: string, callback: () => void) => any | null;
 };
 
 const { YDLocal5Get } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
@@ -158,9 +158,7 @@ export function initMultiKillSystem(): void {
   if (!MULTI_KILL_SYSTEM_ENABLED) return;
   if (multiKillTrigger != null) return;
 
-  multiKillTrigger = jass.CreateTrigger();
-  jass.TriggerAddAction(multiKillTrigger, onMultiKillEvent);
-  STES_Register(multiKillTrigger, MULTI_KILL_EVENT);
+  multiKillTrigger = registerStesListener(MULTI_KILL_EVENT, onMultiKillEvent);
 }
 
 export function isMultiKillSystemInitialized(): boolean {

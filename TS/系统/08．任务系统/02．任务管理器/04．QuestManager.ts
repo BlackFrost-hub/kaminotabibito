@@ -11,6 +11,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 import { questDB, QuestType, QuestStatus, QuestData } from "../01．任务数据";
 import { questDebugPrint } from "./01．调试";
@@ -85,7 +89,7 @@ export class QuestManager {
       ((globalThis as any).__questTimers = new Map<number, { playerId: number; questId: string }>());
     timerData.set(timer, { playerId, questId });
 
-    jass.TimerStart(timer, quest.timeLimit, false, () => {
+    safeTimerStart(timer, quest.timeLimit, false, () => {
       const expired = jass.GetExpiredTimer();
       const data = (globalThis as any).__questTimers?.get(expired);
       if (data) {
@@ -94,7 +98,7 @@ export class QuestManager {
         (globalThis as any).__questTimers.delete(expired);
       }
       jass.PauseTimer(expired);
-      jass.DestroyTimer(expired);
+      safeDestroyTimer(expired);
     });
 
     questDebugPrint(`已为任务 ${questId} 设置 ${quest.timeLimit} 秒时间限制`);

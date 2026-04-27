@@ -33,10 +33,13 @@ export function createDotApplyStrategy(deps: {
 } {
   // ========== 虚拟分区：常量 ==========
   const DURATION_TIER_EPS = 0.05;
+  function abs(value: number): number {
+    return value < 0 ? -value : value;
+  }
 
   // ========== 虚拟分区：工具函数 ==========
   function sameDurationTier(cur: DotState, bestDuration: number): boolean {
-    return cur._dotParsedDuration != null && Math.abs(bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS;
+    return cur._dotParsedDuration != null && abs(bestDuration - cur._dotParsedDuration) < DURATION_TIER_EPS;
   }
 
   // ========== 虚拟分区：tick 记录 ==========

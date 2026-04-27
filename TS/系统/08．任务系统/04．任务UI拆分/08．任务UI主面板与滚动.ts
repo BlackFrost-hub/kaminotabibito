@@ -4,6 +4,8 @@
  * 架构：全局1套UI，不再区分 slotPid。
  */
 
+const japi = require("jass.japi") as any;
+
 import {
   ENTRY_X,
   ENTRY_Y,
@@ -56,9 +58,9 @@ export interface BuildTaskMainPanelOpts {
   setButtonText: any;
   createTabLabelTextOnBackdrop: any;
   setupTransparentGlueHitLayer: any;
-  onClickSound: () => void;
-  onSwitchCategory: (type: QuestType) => void;
-  onShowTabTooltip: (msg: string) => void;
+  onClickSound: (this: void) => void;
+  onSwitchCategory: (this: void, type: QuestType) => void;
+  onShowTabTooltip: (this: void, msg: string) => void;
   slotId: number;
   contextId: number;
 }
@@ -87,8 +89,6 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     contextId,
   } = opts;
 
-  const nameSuffix = `_s${slotId}`;
-
   const empty: BuildMainPanelResult = {
     mainPanel: null,
     listContainer: null,
@@ -104,8 +104,10 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     vScrollTrack: null,
   };
 
-  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent, contextId);
-  if (!mainPanel) return empty;
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
+  if (!mainPanel) {
+    return empty;
+  }
 
   if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
   if (entryFrame) {
@@ -119,7 +121,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel, contextId);
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
   if (listContainer) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
     setFramePointRelative(
@@ -160,13 +162,13 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       const f =
         createFrame({
           type: FrameType.BACKDROP,
-          name: "TaskScrollBarBtn" + nameSuffix,
+          name: "TaskScrollBarBtn",
           parent: mainPanel,
           template: "template",
           visible: true,
         }) ?? 0;
       return f;
-    }, contextId);
+    });
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -174,13 +176,12 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       setFramePointRelative(scrollBarFrame, FramePoint.TOPRIGHT, mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
       setFramePointRelative(scrollBarFrame, FramePoint.BOTTOMRIGHT, mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
       setFrameSize(scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollBarFrame, 30);
     }
 
     scrollThumbFrame =
       createFrame({
         type: FrameType.BACKDROP,
-        name: "TaskScrollThumbDyn" + nameSuffix,
+        name: "TaskScrollThumbDyn",
         parent: mainPanel,
         template: "template",
         visible: true,
@@ -198,12 +199,24 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
           0
         );
       }
-      if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(scrollThumbFrame, 120);
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
+
+      scrollThumbHitBtn =
+        createFrame({
+          type: FrameType.GLUETEXTBUTTON,
+          name: "TaskScrollThumbHitDyn",
+          parent: mainPanel,
+          template: "template",
+          visible: true,
+        }) ?? 0;
+      if (scrollThumbHitBtn && scrollThumbHitBtn !== 0) {
+        setupTransparentGlueHitLayer(scrollThumbFrame, scrollThumbHitBtn);
+        if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbHitBtn, true);
+      }
     }
   }
 
-  return {
+  const result: BuildMainPanelResult = {
     mainPanel,
     listContainer,
     tabMainBg: tabs.tabMainBg,
@@ -217,4 +230,5 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollThumbHitBtn,
     vScrollTrack: null,
   };
+  return result;
 }

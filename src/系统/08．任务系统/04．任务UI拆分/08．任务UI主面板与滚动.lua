@@ -21,6 +21,10 @@ local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfO
 local tryCreateFromFdfWithSource = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfWithSource
 local ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E = require("系统.08．任务系统.04．任务UI拆分.07．任务UI分类标签")
 local buildTaskPanelCategoryTabs = ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E.buildTaskPanelCategoryTabs
+--- 任务主面板壳体 + 列表容器 + 右侧滚动条
+-- 
+-- 架构：全局1套UI，不再区分 slotPid。
+local japi = require("jass.japi")
 function ____exports.buildTaskMainPanel(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -43,7 +47,6 @@ function ____exports.buildTaskMainPanel(self, opts)
     local onShowTabTooltip = ____opts_0.onShowTabTooltip
     local slotId = ____opts_0.slotId
     local contextId = ____opts_0.contextId
-    local nameSuffix = "_s" .. tostring(slotId)
     local empty = {
         mainPanel = nil,
         listContainer = nil,
@@ -58,12 +61,12 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbHitBtn = nil,
         vScrollTrack = nil
     }
-    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent, contextId)
+    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
     if not mainPanel then
         return empty
     end
     if type(japi.DzFrameClearAllPoints) == "function" then
-        japi:DzFrameClearAllPoints(mainPanel)
+        japi.DzFrameClearAllPoints(mainPanel)
     end
     if entryFrame then
         setFramePointRelative(
@@ -79,10 +82,10 @@ function ____exports.buildTaskMainPanel(self, opts)
         setFramePosition(nil, mainPanel, {point = FramePoint.TOPLEFT, x = ENTRY_X + PANEL_REL_TO_ENTRY_X, y = ENTRY_Y + PANEL_REL_TO_ENTRY_Y})
     end
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
-    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel, contextId)
+    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
     if listContainer then
         if type(japi.DzFrameClearAllPoints) == "function" then
-            japi:DzFrameClearAllPoints(listContainer)
+            japi.DzFrameClearAllPoints(listContainer)
         end
         setFramePointRelative(
             nil,
@@ -94,9 +97,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             LIST_CONTAINER_REL_TO_PANEL_Y
         )
         if type(japi.DzFrameShow) == "function" then
-            pcall(
-                nil,
-                function() return japi:DzFrameShow(listContainer, true) end
+            pcall(function () return japi.DzFrameShow(listContainer, true) end
             )
         end
     end
@@ -128,7 +129,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             function()
                 local ____createFrame_result_1 = createFrame(nil, {
                     type = FrameType.BACKDROP,
-                    name = "TaskScrollBarBtn" .. nameSuffix,
+                    name = "TaskScrollBarBtn",
                     parent = mainPanel,
                     template = "template",
                     visible = true
@@ -138,16 +139,15 @@ function ____exports.buildTaskMainPanel(self, opts)
                 end
                 local f = ____createFrame_result_1
                 return f
-            end,
-            contextId
+            end
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
             if type(japi.DzFrameShow) == "function" then
-                japi:DzFrameShow(scrollBarFrame, true)
+                japi.DzFrameShow(scrollBarFrame, true)
             end
             if type(japi.DzFrameClearAllPoints) == "function" then
-                japi:DzFrameClearAllPoints(scrollBarFrame)
+                japi.DzFrameClearAllPoints(scrollBarFrame)
             end
             setFramePointRelative(
                 nil,
@@ -168,13 +168,10 @@ function ____exports.buildTaskMainPanel(self, opts)
                 SCROLLBAR_BOTTOM_INSET
             )
             setFrameSize(nil, scrollBarFrame, {width = SCROLLBAR_W, height = LIST_VIEW_H})
-            if type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(scrollBarFrame, 30)
-            end
         end
         local ____createFrame_result_2 = createFrame(nil, {
             type = FrameType.BACKDROP,
-            name = "TaskScrollThumbDyn" .. nameSuffix,
+            name = "TaskScrollThumbDyn",
             parent = mainPanel,
             template = "template",
             visible = true
@@ -197,15 +194,29 @@ function ____exports.buildTaskMainPanel(self, opts)
                     0
                 )
             end
-            if type(japi.DzFrameSetLevel) == "function" then
-                japi:DzFrameSetLevel(scrollThumbFrame, 120)
-            end
             if type(japi.DzFrameShow) == "function" then
-                japi:DzFrameShow(scrollThumbFrame, true)
+                japi.DzFrameShow(scrollThumbFrame, true)
+            end
+            local ____createFrame_result_3 = createFrame(nil, {
+                type = FrameType.GLUETEXTBUTTON,
+                name = "TaskScrollThumbHitDyn",
+                parent = mainPanel,
+                template = "template",
+                visible = true
+            })
+            if ____createFrame_result_3 == nil then
+                ____createFrame_result_3 = 0
+            end
+            scrollThumbHitBtn = ____createFrame_result_3
+            if scrollThumbHitBtn and scrollThumbHitBtn ~= 0 then
+                setupTransparentGlueHitLayer(nil, scrollThumbFrame, scrollThumbHitBtn)
+                if type(japi.DzFrameShow) == "function" then
+                    japi.DzFrameShow(scrollThumbHitBtn, true)
+                end
             end
         end
     end
-    return {
+    local result = {
         mainPanel = mainPanel,
         listContainer = listContainer,
         tabMainBg = tabs.tabMainBg,
@@ -219,5 +230,6 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbHitBtn = scrollThumbHitBtn,
         vScrollTrack = nil
     }
+    return result
 end
 return ____exports

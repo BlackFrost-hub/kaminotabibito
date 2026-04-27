@@ -13,7 +13,7 @@ local ____exports = {}
 -- 
 -- 适用场景：
 -- - 想避免把匿名闭包高频直接塞进 JASS 回调时
--- - 想给 Trigger / Timer / ForGroup / ForForce / EnumItemsInRect / EnumDestructablesInRect
+-- - 想给 Trigger / Timer / ForForce / EnumItemsInRect / EnumDestructablesInRect
 --   提供一个更可控的 trampoline 入口时
 -- 
 -- 不做的事：
@@ -23,7 +23,7 @@ local ____exports = {}
 local jass = require("jass.common")
 local runtime = require("jass.runtime")
 local xpcallFn = _G.xpcall
-local function getErrorHandler(self)
+local function getErrorHandler()
     local ____opt_result_2
     if runtime ~= nil then
         ____opt_result_2 = runtime.error_handle
@@ -37,58 +37,45 @@ local function getErrorHandler(self)
     end
     return ____temp_3
 end
-local function runSafely(self, callback)
+local function runSafely(callback)
     if type(callback) ~= "function" then
         return
     end
-    local handler = getErrorHandler(nil)
+    local handler = getErrorHandler()
     if handler and type(xpcallFn) == "function" then
-        xpcallFn(nil, callback, handler)
+        xpcallFn(callback, handler)
         return
     end
-    callback(nil)
+    callback()
 end
-local function createStackTrampoline(self, stack)
-    return function()
-        local top = stack[#stack]
-        runSafely(nil, top)
-    end
-end
-local forGroupStack = {}
 local forForceStack = {}
 local enumItemsStack = {}
 local enumDestructablesStack = {}
-local forGroupTrampoline = createStackTrampoline(nil, forGroupStack)
-local forForceTrampoline = createStackTrampoline(nil, forForceStack)
-local enumItemsTrampoline = createStackTrampoline(nil, enumItemsStack)
-local enumDestructablesTrampoline = createStackTrampoline(nil, enumDestructablesStack)
---- 安全 ForGroup：
--- - 仍然调用原生 `ForGroup`
+local function runTopOfStack(stack)
+    local top = stack[#stack]
+    runSafely(top)
+end
+local function forForceTrampoline()
+    runTopOfStack(forForceStack)
+end
+local function enumItemsTrampoline()
+    runTopOfStack(enumItemsStack)
+end
+local function enumDestructablesTrampoline()
+    runTopOfStack(enumDestructablesStack)
+end
+--- 安全 ForForce：
+-- - 仍然调用原生 `ForForce`
 -- - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
 -- - 支持同步嵌套调用（用栈而不是单槽）
-function ____exports.safeForGroup(self, group, action)
-    if not group or type(action) ~= "function" then
-        return
-    end
-    forGroupStack[#forGroupStack + 1] = action
-    do
-        pcall(function()
-            jass:ForGroup(group, forGroupTrampoline)
-        end)
-        do
-            table.remove(forGroupStack)
-        end
-    end
-end
---- 安全 ForForce，思路同 `safeForGroup`。
-function ____exports.safeForForce(self, force, action)
+function ____exports.safeForForce(force, action)
     if not force or type(action) ~= "function" then
         return
     end
     forForceStack[#forForceStack + 1] = action
     do
         pcall(function()
-            jass:ForForce(force, forForceTrampoline)
+            jass.ForForce(force, forForceTrampoline)
         end)
         do
             table.remove(forForceStack)
@@ -97,7 +84,7 @@ function ____exports.safeForForce(self, force, action)
 end
 --- 安全枚举矩形内物品。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
-function ____exports.safeEnumItemsInRect(self, rect, filter, action)
+function ____exports.safeEnumItemsInRect(rect, filter, action)
     if not rect or type(action) ~= "function" then
         return
     end
@@ -119,7 +106,7 @@ function ____exports.safeEnumItemsInRect(self, rect, filter, action)
 end
 --- 安全枚举矩形内可破坏物。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
-function ____exports.safeEnumDestructablesInRect(self, rect, filter, action)
+function ____exports.safeEnumDestructablesInRect(rect, filter, action)
     if not rect or type(action) ~= "function" then
         return
     end
@@ -144,72 +131,72 @@ end
 -- - 适合“必须使用独立 timer”的场景
 -- - 高频/周期逻辑仍优先使用 `05．中心计时器.ts`
 local timerActionByHandleId = {}
-local function timerTrampoline(self)
-    local timer = jass:GetExpiredTimer()
+local function timerTrampoline()
+    local timer = jass.GetExpiredTimer()
     if not timer then
         return
     end
-    local hid = jass:GetHandleId(timer)
-    runSafely(nil, timerActionByHandleId[hid])
+    local hid = jass.GetHandleId(timer)
+    runSafely(timerActionByHandleId[hid])
 end
-function ____exports.safeTimerStart(self, timer, timeout, periodic, action)
+function ____exports.safeTimerStart(timer, timeout, periodic, action)
     if not timer or type(action) ~= "function" then
         return
     end
-    local hid = jass:GetHandleId(timer)
+    local hid = jass.GetHandleId(timer)
     timerActionByHandleId[hid] = action
-    jass:TimerStart(timer, timeout, periodic, timerTrampoline)
+    jass.TimerStart(timer, timeout, periodic, timerTrampoline)
 end
-function ____exports.safeDestroyTimer(self, timer)
+function ____exports.safeDestroyTimer(timer)
     if not timer then
         return
     end
-    local hid = jass:GetHandleId(timer)
+    local hid = jass.GetHandleId(timer)
     timerActionByHandleId[hid] = nil
     __TS__Delete(timerActionByHandleId, hid)
-    jass:DestroyTimer(timer)
+    jass.DestroyTimer(timer)
 end
 local triggerRegistryByHandleId = {}
 local safeTriggerActionIdCounter = 0
-local function getOrCreateSafeTriggerRegistry(self, trigger)
+local function triggerActionTrampoline()
+    local currentTrigger = jass.GetTriggeringTrigger()
+    if not currentTrigger then
+        return
+    end
+    local currentHid = jass.GetHandleId(currentTrigger)
+    local currentRegistry = triggerRegistryByHandleId[currentHid]
+    if not currentRegistry then
+        return
+    end
+    do
+        local i = 0
+        while i < #currentRegistry.actions do
+            runSafely(currentRegistry.actions[i + 1].callback)
+            i = i + 1
+        end
+    end
+end
+local function getOrCreateSafeTriggerRegistry(trigger)
     if not trigger then
         return nil
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if registry then
         return registry
     end
-    local function trampoline()
-        local currentTrigger = jass:GetTriggeringTrigger()
-        if not currentTrigger then
-            return
-        end
-        local currentHid = jass:GetHandleId(currentTrigger)
-        local currentRegistry = triggerRegistryByHandleId[currentHid]
-        if not currentRegistry then
-            return
-        end
-        do
-            local i = 0
-            while i < #currentRegistry.actions do
-                runSafely(nil, currentRegistry.actions[i + 1].callback)
-                i = i + 1
-            end
-        end
-    end
     registry = {
-        actionHandle = jass:TriggerAddAction(trigger, trampoline),
+        actionHandle = jass.TriggerAddAction(trigger, triggerActionTrampoline),
         actions = {}
     }
     triggerRegistryByHandleId[hid] = registry
     return registry
 end
-function ____exports.safeTriggerAddAction(self, trigger, callback)
+function ____exports.safeTriggerAddAction(trigger, callback)
     if not trigger or type(callback) ~= "function" then
         return nil
     end
-    local registry = getOrCreateSafeTriggerRegistry(nil, trigger)
+    local registry = getOrCreateSafeTriggerRegistry(trigger)
     if not registry then
         return nil
     end
@@ -219,11 +206,11 @@ function ____exports.safeTriggerAddAction(self, trigger, callback)
     ____registry_actions_10[#____registry_actions_10 + 1] = {id = handle.id, callback = callback}
     return handle
 end
-function ____exports.safeTriggerRemoveAction(self, trigger, action)
+function ____exports.safeTriggerRemoveAction(trigger, action)
     if not trigger or not action then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if not registry then
         return
@@ -239,28 +226,28 @@ function ____exports.safeTriggerRemoveAction(self, trigger, action)
         end
     end
 end
-function ____exports.safeTriggerClearActions(self, trigger)
+function ____exports.safeTriggerClearActions(trigger)
     if not trigger then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if not registry then
         return
     end
     __TS__ArraySetLength(registry.actions, 0)
 end
-function ____exports.safeDestroyTrigger(self, trigger)
+function ____exports.safeDestroyTrigger(trigger)
     if not trigger then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if registry and registry.actionHandle then
-        jass:TriggerRemoveAction(trigger, registry.actionHandle)
+        jass.TriggerRemoveAction(trigger, registry.actionHandle)
     end
     triggerRegistryByHandleId[hid] = nil
     __TS__Delete(triggerRegistryByHandleId, hid)
-    jass:DestroyTrigger(trigger)
+    jass.DestroyTrigger(trigger)
 end
 return ____exports

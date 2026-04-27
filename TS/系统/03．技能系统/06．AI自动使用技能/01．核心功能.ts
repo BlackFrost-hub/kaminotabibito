@@ -75,6 +75,11 @@ const aiUnitRegistry: AIUnitRegistry = new Map();
 let aiCheckRegistered = false;
 let unitCreatedTrigger: any = null;
 
+function clampMinInt(value: number, minValue: number): number {
+  const intValue = jass.R2I(value);
+  return intValue < minValue ? minValue : intValue;
+}
+
 // ==========================================================================================
 // 注册与注销API
 // ==========================================================================================
@@ -238,7 +243,7 @@ export function initAISkillSystem(): void {
 
   if (!aiCheckRegistered) {
     aiCheckRegistered = true;
-    addPeriodicCallback(Math.max(1, Math.floor(AI_CHECK_INTERVAL * 1000)), onAICheck);
+    addPeriodicCallback(clampMinInt(AI_CHECK_INTERVAL * 1000, 1), onAICheck);
   }
 
   registerDeathListener((dyingUnit) => {

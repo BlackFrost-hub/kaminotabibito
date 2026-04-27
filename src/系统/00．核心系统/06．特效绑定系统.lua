@@ -8,13 +8,13 @@ function getUnitId(unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 function destroyEffect(effect)
     if not effect then
         return
     end
-    jass:DestroyEffect(effect)
+    jass.DestroyEffect(effect)
 end
 function ____exports.removeBoundEffect(effect)
     if not effect then
@@ -59,12 +59,12 @@ local function updateBoundEffects()
                 ____exports.removeBoundEffect(effect)
                 goto __continue7
             end
-            local unitX = jass:GetUnitX(data.unit)
-            local unitY = jass:GetUnitY(data.unit)
-            local unitFlyHeight = jass:GetUnitFlyHeight(data.unit)
+            local unitX = jass.GetUnitX(data.unit)
+            local unitY = jass.GetUnitY(data.unit)
+            local unitFlyHeight = jass.GetUnitFlyHeight(data.unit)
             local z = EC_GetPointZ(nil, unitX, unitY) + unitFlyHeight + data.heightOffset
-            japi:EXSetEffectXY(effect, unitX, unitY)
-            japi:EXSetEffectZ(effect, z)
+            japi.EXSetEffectXY(effect, unitX, unitY)
+            japi.EXSetEffectZ(effect, z)
         end
         ::__continue7::
     end
@@ -92,9 +92,9 @@ function ____exports.createBoundEffect(unit, modelPath, options)
     if existingEffect then
         ____exports.removeBoundEffect(existingEffect)
     end
-    local unitX = jass:GetUnitX(unit)
-    local unitY = jass:GetUnitY(unit)
-    local unitFlyHeight = jass:GetUnitFlyHeight(unit)
+    local unitX = jass.GetUnitX(unit)
+    local unitY = jass.GetUnitY(unit)
+    local unitFlyHeight = jass.GetUnitFlyHeight(unit)
     local heightOffset = options and options.heightOffset or ____exports.DEFAULT_HEIGHT_OFFSET
     local scale = options and options.scale or ____exports.DEFAULT_SCALE
     local facing = options and options.facing or 0
@@ -116,8 +116,8 @@ function ____exports.createBoundEffect(unit, modelPath, options)
     if not effect then
         return nil
     end
-    local colorValue = japi:DzGetColor(color.r, color.g, color.b, color.a)
-    japi:DzSetEffectVertexColor(effect, colorValue)
+    local colorValue = japi.DzGetColor(color.r, color.g, color.b, color.a)
+    japi.DzSetEffectVertexColor(effect, colorValue)
     local data = {
         effect = effect,
         unit = unit,
@@ -166,7 +166,7 @@ function ____exports.setEffectAnimSpeed(effect, speed)
     if not effect then
         return
     end
-    japi:EXSetEffectSpeed(effect, speed)
+    japi.EXSetEffectSpeed(effect, speed)
     local data = boundEffects:get(effect)
     if data then
         data.animSpeed = speed

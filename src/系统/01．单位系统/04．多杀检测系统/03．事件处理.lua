@@ -6,8 +6,8 @@ local MULTI_KILL_EVENT = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTI_KILL_EVENT
 local ____01_FF0E_6838_5FC3_529F_80FD = require("系统.01．单位系统.04．多杀检测系统.01．核心功能")
 local startMultiKillMonitor = ____01_FF0E_6838_5FC3_529F_80FD.startMultiKillMonitor
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_0.STES_Register
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local registerStesListener = ____require_result_0.registerStesListener
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
 local YDLocal5Get = ____require_result_1.YDLocal5Get
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
@@ -51,7 +51,7 @@ function ____exports.fireMultiKillEvent(self)
     local healSource = YDLocal5Get(nil, "unit", "HealSource")
     local resolvedEffectSource = effectSource
     if resolvedEffectSource == nil or resolvedEffectSource == 0 then
-        resolvedEffectSource = jass:FirstOfGroup(killGroup)
+        resolvedEffectSource = jass.FirstOfGroup(killGroup)
         if resolvedEffectSource ~= nil and resolvedEffectSource ~= 0 then
             dbg(nil, "effectSource 未传，已用 killGroup 内第一个单位作为 effectSource")
         end
@@ -109,7 +109,7 @@ function ____exports.fireMultiKillEvent(self)
     local ____dbg_9 = dbg
     local ____temp_8
     if killGroup ~= 0 and killGroup ~= nil then
-        ____temp_8 = jass:CountUnitsInGroup(killGroup)
+        ____temp_8 = jass.CountUnitsInGroup(killGroup)
     else
         ____temp_8 = "N/A"
     end
@@ -163,9 +163,7 @@ function ____exports.initMultiKillSystem(self)
     if multiKillTrigger ~= nil then
         return
     end
-    multiKillTrigger = jass:CreateTrigger()
-    jass:TriggerAddAction(multiKillTrigger, onMultiKillEvent)
-    STES_Register(nil, multiKillTrigger, MULTI_KILL_EVENT)
+    multiKillTrigger = registerStesListener(nil, MULTI_KILL_EVENT, onMultiKillEvent)
 end
 function ____exports.isMultiKillSystemInitialized(self)
     return multiKillTrigger ~= nil

@@ -60,7 +60,7 @@ local function grantQuestItems(self, hero, questItems)
             if itemId == 0 then
                 goto __continue8
             end
-            jass:UnitAddItemById(hero, itemId)
+            jass.UnitAddItemById(hero, itemId)
         end
         ::__continue8::
     end
@@ -102,7 +102,7 @@ local function canAcceptQuestByRequirements(self, quest, hero)
     if not hero then
         return false
     end
-    local level = jass:GetHeroLevel(hero)
+    local level = jass.GetHeroLevel(hero)
     return level < limit
 end
 local function getQuestRewardDisplayText(self, quest)
@@ -179,7 +179,7 @@ function ____exports.buildQuestCompletedDialog(self, quest, npcName)
     return {lines = {{title = npcName, text = msg, duration = 4}}, removeOverheadMarkerOnOpen = true}
 end
 function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, npcUnit)
-    local dialogOwner = jass:Player(dialogOwnerId)
+    local dialogOwner = jass.Player(dialogOwnerId)
     local ____dialogOwner_2
     if dialogOwner then
         ____dialogOwner_2 = getPlayerFirstHero(nil, dialogOwner)
@@ -189,7 +189,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
     local ownerHero = ____dialogOwner_2
     local ____ownerHero_3
     if ownerHero then
-        ____ownerHero_3 = jass:GetUnitName(ownerHero)
+        ____ownerHero_3 = jass.GetUnitName(ownerHero)
     else
         ____ownerHero_3 = "你"
     end
@@ -209,7 +209,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
             text = (((("【" .. tostring(quest.name)) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
             onAccept = function()
                 local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
-                local playerObj = jass:Player(dialogOwnerId)
+                local playerObj = jass.Player(dialogOwnerId)
                 local ____playerObj_4
                 if playerObj then
                     ____playerObj_4 = getPlayerFirstHero(nil, playerObj)
@@ -232,7 +232,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                     return
                 end
                 if not hasPlayerAcceptedQuest(nil, dialogOwnerId, questId) then
-                    local playerName = jass:GetPlayerName(playerObj) or "冒险者"
+                    local playerName = jass.GetPlayerName(playerObj) or "冒险者"
                     setQuestState(
                         nil,
                         dialogOwnerId,
@@ -247,7 +247,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                 local acceptedLines = ____exports.parseDialogText(nil, acceptedRaw, npcName, heroName)
                 scheduleOpenDialogLater(
                     nil,
-                    jass:Player(dialogOwnerId),
+                    jass.Player(dialogOwnerId),
                     {lines = acceptedLines, npcUnit = npcUnit, removeOverheadMarkerOnOpen = false, applyGrayQuestMarkerAfterDialog = true}
                 )
                 if hasPlayerAcceptedQuest(nil, dialogOwnerId, questId) then
@@ -268,7 +268,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
     }
 end
 function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit)
-    local dialogOwner = jass:Player(dialogOwnerId)
+    local dialogOwner = jass.Player(dialogOwnerId)
     local ____dialogOwner_5
     if dialogOwner then
         ____dialogOwner_5 = getPlayerFirstHero(nil, dialogOwner)
@@ -278,7 +278,7 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
     local ownerHero = ____dialogOwner_5
     local ____ownerHero_6
     if ownerHero then
-        ____ownerHero_6 = jass:GetUnitName(ownerHero)
+        ____ownerHero_6 = jass.GetUnitName(ownerHero)
     else
         ____ownerHero_6 = "你"
     end

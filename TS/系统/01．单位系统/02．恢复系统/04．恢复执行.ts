@@ -9,6 +9,9 @@ const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.in
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSet: (tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
+};
 const {
   calcBaseLifeRegen,
   calcBaseManaRegen,
@@ -54,7 +57,8 @@ function applyLifeRegen(unit: any, regen: number): void {
   const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
 
   // 不超过最大生命
-  const actualRegen = Math.min(regen, maxLife - currentLife);
+  const lifeGap = maxLife - currentLife;
+  const actualRegen = regen < lifeGap ? regen : lifeGap;
   if (actualRegen <= 0) return;
 
   jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife + actualRegen);
@@ -70,7 +74,8 @@ function applyManaRegen(unit: any, regen: number): void {
   const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
 
   // 不超过最大魔法
-  const actualRegen = Math.min(regen, maxMana - currentMana);
+  const manaGap = maxMana - currentMana;
+  const actualRegen = regen < manaGap ? regen : manaGap;
   if (actualRegen <= 0) return;
 
   jass.SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRegen);
@@ -197,8 +202,7 @@ export function onRegenTimer(): void {
   // 处理玩家英雄
   const heroGroup = getPlayerHeroGroup();
   if (heroGroup != null) {
-    jass.ForGroup(heroGroup, () => {
-      const unit = jass.GetEnumUnit();
+    forEachUnitInGroup(heroGroup, (unit) => {
       if (unit != null) {
         processPlayerHeroRegen(unit);
       }
@@ -208,8 +212,7 @@ export function onRegenTimer(): void {
   // 处理Boss单位
   const bossGroup = getBossGroup();
   if (bossGroup != null) {
-    jass.ForGroup(bossGroup, () => {
-      const unit = jass.GetEnumUnit();
+    forEachUnitInGroup(bossGroup, (unit) => {
       if (unit != null) {
         processBossRegen(unit);
       }

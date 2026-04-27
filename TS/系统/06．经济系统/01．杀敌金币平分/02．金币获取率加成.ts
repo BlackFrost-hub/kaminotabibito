@@ -5,6 +5,8 @@
  * 功能：处理金币获取率加成
  */
 
+const jass = require("jass.common") as any;
+
 const { GOLD_RATE_THRESHOLD } = require("系统.06．经济系统.01．杀敌金币平分.00．常量定义") as typeof import("./00．常量定义");
 
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
@@ -40,7 +42,7 @@ function goldRateCallback(params: any): any {
   let finalGold = baseGold;
 
   if (goldRate >= GOLD_RATE_THRESHOLD) {
-    finalGold = Math.floor(baseGold * (1 + goldRate));
+    finalGold = jass.R2I(baseGold * (1 + goldRate));
   }
 
   return { ...params, finalGold };

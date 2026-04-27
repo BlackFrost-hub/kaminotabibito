@@ -4,6 +4,10 @@
  */
 
 const jass = require("jass.common") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
 import { SoundModel } from "./01．声音模型";
 import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
@@ -25,13 +29,13 @@ function scheduleDestroySoundIfNeeded(sound: any): void {
       ? LW.createTimer("sound_ui_fallback_destroy")
       : (jass as any).CreateTimer();
   if (!t) return;
-  (jass as any).TimerStart(t, 0.55, false, () => {
+  safeTimerStart(t, 0.55, false, () => {
     const expired = (jass as any).GetExpiredTimer();
     (jass as any).DestroySound(sound);
     if (LW && typeof LW.destroyTimer === "function") {
       LW.destroyTimer(expired);
     } else {
-      (jass as any).DestroyTimer(expired);
+      safeDestroyTimer(expired);
     }
   });
 }

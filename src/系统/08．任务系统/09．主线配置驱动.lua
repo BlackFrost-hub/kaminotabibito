@@ -12,22 +12,27 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_0.QuestMessageBJ
-local ____require_result_1 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_1.TransmissionFromUnitWithNameBJ
-local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_2.GetPlayersAll
-local ____require_result_3 = require("系统.08．任务系统.00．配置表.06．主线任务配置表")
-local MAIN_STORY_QUEST_CONFIGS = ____require_result_3.MAIN_STORY_QUEST_CONFIGS
-local ____require_result_4 = require("系统.08．任务系统.01．任务数据")
-local questDB = ____require_result_4.questDB
-local QuestType = ____require_result_4.QuestType
-local QuestStatus = ____require_result_4.QuestStatus
-local ____require_result_5 = require("系统.08．任务系统.02．任务管理器.index")
-local questManager = ____require_result_5.questManager
-local ____G_6 = _G
-local addPeriodicCallback = ____G_6.addPeriodicCallback
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_1.QuestMessageBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_2.TransmissionFromUnitWithNameBJ
+local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_3.GetPlayersAll
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local forEachUnitInGroup = ____require_result_4.forEachUnitInGroup
+local ____require_result_5 = require("系统.08．任务系统.00．配置表.06．主线任务配置表")
+local MAIN_STORY_QUEST_CONFIGS = ____require_result_5.MAIN_STORY_QUEST_CONFIGS
+local ____require_result_6 = require("系统.08．任务系统.01．任务数据")
+local questDB = ____require_result_6.questDB
+local QuestType = ____require_result_6.QuestType
+local QuestStatus = ____require_result_6.QuestStatus
+local ____require_result_7 = require("系统.08．任务系统.02．任务管理器.index")
+local questManager = ____require_result_7.questManager
+local ____G_8 = _G
+local addPeriodicCallback = ____G_8.addPeriodicCallback
 --- 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
 ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER = true
 local YDGet = _G.YDUserDataGet
@@ -78,26 +83,26 @@ local function ensureRuntimeQuest(self)
         rewards = {},
         status = QuestStatus.UNDISCOVERED,
         icon = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp",
-        createdAt = os:time(),
-        updatedAt = os:time()
+        createdAt = os.time(),
+        updatedAt = os.time()
     })
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
 local function refreshQuestUI(self, desc, msg)
-    local ____opt_9 = questDB.globalData
-    if ____opt_9 ~= nil then
-        ____opt_9 = ____opt_9.quests
+    local ____opt_11 = questDB.globalData
+    if ____opt_11 ~= nil then
+        ____opt_11 = ____opt_11.quests
     end
-    local ____opt_result_11
-    if ____opt_9 ~= nil then
-        ____opt_result_11 = ____opt_9:get(RUNTIME_QUEST_ID)
+    local ____opt_result_13
+    if ____opt_11 ~= nil then
+        ____opt_result_13 = ____opt_11:get(RUNTIME_QUEST_ID)
     end
-    local q = ____opt_result_11
+    local q = ____opt_result_13
     if q then
         if type(desc) == "string" and desc ~= "" then
             q.description = desc
         end
-        q.updatedAt = os:time()
+        q.updatedAt = os.time()
     end
     local triggerUIRefresh = questManager.triggerUIRefresh
     if type(triggerUIRefresh) == "function" then
@@ -153,7 +158,7 @@ local function parseDialogLines(self, dialogPreview)
 end
 local function calcDialogDuration(self, text)
     local n = #text
-    local t = 1 + math:floor(n / 10)
+    local t = 1 + jass.R2I(n / 10)
     if t < 2 then
         return 2
     end
@@ -258,7 +263,7 @@ local function createEvalEnv(self, triggerUnit)
         end
         if ty == "location" and key == "单位位置" and triggerUnit then
             if not cachedLoc then
-                cachedLoc = jass:GetUnitLoc(triggerUnit)
+                cachedLoc = jass.GetUnitLoc(triggerUnit)
             end
             return cachedLoc
         end
@@ -334,7 +339,7 @@ local function executeActionCode(self, code, triggerUnit)
         if type(p) == "function" then
             p(
                 nil,
-                (("[主线配置驱动] action执行失败: " .. code) .. " | err=") .. tostring(nil, ok[1])
+                (("[主线配置驱动] action执行失败: " .. code) .. " | err=") .. tostring(ok[1])
             )
         end
     end
@@ -347,14 +352,19 @@ local function runActionTimeline(self, timeline, triggerUnit)
                 executeActionCode(nil, e.code, triggerUnit)
                 goto __continue65
             end
-            local t = jass:CreateTimer()
-            jass:TimerStart(
+            local t = jass.CreateTimer()
+            if not t then
+                executeActionCode(nil, e.code, triggerUnit)
+                goto __continue65
+            end
+            safeTimerStart(
+                nil,
                 t,
                 e.delay,
                 false,
                 function()
                     executeActionCode(nil, e.code, triggerUnit)
-                    jass:DestroyTimer(t)
+                    safeDestroyTimer(nil, t)
                 end
             )
         end
@@ -362,9 +372,9 @@ local function runActionTimeline(self, timeline, triggerUnit)
     end
 end
 local function getHeroes(self)
-    local ____temp_12
+    local ____temp_14
     if type(YDGet) == "function" then
-        ____temp_12 = YDGet(
+        ____temp_14 = YDGet(
             nil,
             "string",
             "玩家英雄",
@@ -372,20 +382,22 @@ local function getHeroes(self)
             "group"
         )
     else
-        ____temp_12 = nil
+        ____temp_14 = nil
     end
-    local group = ____temp_12
+    local group = ____temp_14
     if not group then
         return {}
     end
     local arr = {}
-    local function cb(____, g)
-        local u = jass:FirstOfGroup(g)
-        if u then
-            arr[#arr + 1] = u
+    forEachUnitInGroup(
+        nil,
+        group,
+        function(____, u)
+            if u then
+                arr[#arr + 1] = u
+            end
         end
-    end
-    jass:ForGroup(group, cb)
+    )
     return arr
 end
 local function hitFromStage(self, cfg, stage)
@@ -404,23 +416,23 @@ local function tick(self)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
             if cfg.enabled == false then
-                goto __continue77
+                goto __continue78
             end
             if not cfg.condition or cfg.condition == "" then
-                goto __continue77
+                goto __continue78
             end
             if not hitFromStage(nil, cfg, stage) then
-                goto __continue77
+                goto __continue78
             end
             local matchedHero = nil
             for ____, hero in ipairs(heroes) do
-                if evalCondition(nil, cfg.condition, hero) then
+                if evalCondition(cfg.condition, hero) then
                     matchedHero = hero
                     break
                 end
             end
             if not matchedHero then
-                goto __continue77
+                goto __continue78
             end
             local triggerUnit = matchedHero
             if type(cfg.toStage) == "number" then
@@ -431,7 +443,7 @@ local function tick(self)
             refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
             break
         end
-        ::__continue77::
+        ::__continue78::
     end
     running = false
 end
@@ -445,7 +457,7 @@ local function extractFunctionNames(self, text)
             local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
             if not isStart then
                 i = i + 1
-                goto __continue88
+                goto __continue89
             end
             local start = i
             i = i + 1
@@ -465,7 +477,7 @@ local function extractFunctionNames(self, text)
                 names[#names + 1] = __TS__StringSubstring(text, start, i)
             end
         end
-        ::__continue88::
+        ::__continue89::
     end
     return names
 end
@@ -504,11 +516,11 @@ local function reportMissingFunctions(self)
     if type(p) == "function" then
         p(
             nil,
-            "[主线配置驱动] 缺失函数统计 - condition: " .. tostring(nil, _G.__mainQuestMissingReport.condition.length)
+            "[主线配置驱动] 缺失函数统计 - condition: " .. tostring(_G.__mainQuestMissingReport.condition.length)
         )
         p(
             nil,
-            "[主线配置驱动] 缺失函数统计 - actionTimeline: " .. tostring(nil, _G.__mainQuestMissingReport.actionTimeline.length)
+            "[主线配置驱动] 缺失函数统计 - actionTimeline: " .. tostring(_G.__mainQuestMissingReport.actionTimeline.length)
         )
     end
 end

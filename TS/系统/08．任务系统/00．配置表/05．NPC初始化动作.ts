@@ -1,5 +1,6 @@
 import { RemoveItemFromStockBJ } from "../../../lib/扩展函数/BJ函数/03．物品与库存";
 import { stringToFourCC } from "../../../lib/扩展函数/封装函数/01．通用工具/index";
+const jass = require("jass.common") as any;
 
 // ========== 虚拟分区：基础解析 ==========
 function readFirstInt(text: string): number {
@@ -45,7 +46,7 @@ function pickRandomDistinct(list: string[], count: number): string[] {
   if (count <= 0) return out;
   const pool = [...list];
   while (pool.length > 0 && out.length < count) {
-    const idx = typeof math !== "undefined" && (math as any).random ? (math as any).random(1, pool.length) : 1;
+    const idx = (jass.GetRandomInt(1, pool.length) as number) || 1;
     const picked = (pool as any)[idx] as string;
     out.push(picked);
     pool.splice(idx - 1, 1);

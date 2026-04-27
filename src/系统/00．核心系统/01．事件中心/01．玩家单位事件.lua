@@ -26,14 +26,14 @@ local function normalizeFilter(filter)
     return ____temp_0
 end
 local function eventKey(player, eventId)
-    local playerId = jass:GetPlayerId(player)
-    return (tostring(nil, playerId) .. ":") .. tostring(nil, eventId)
+    local playerId = jass.GetPlayerId(player)
+    return (tostring(playerId) .. ":") .. tostring(eventId)
 end
 local function currentEventKey()
-    local player = jass:GetTriggerPlayer()
-    local playerId = jass:GetPlayerId(player)
-    local eventId = jass:GetTriggerEventId()
-    return (tostring(nil, playerId) .. ":") .. tostring(nil, eventId)
+    local player = jass.GetTriggerPlayer()
+    local playerId = jass.GetPlayerId(player)
+    local eventId = jass.GetTriggerEventId()
+    return (tostring(playerId) .. ":") .. tostring(eventId)
 end
 local function hasTrigger(list, trig)
     do
@@ -62,13 +62,13 @@ local function dispatchPlayerUnitEvent(key)
                 end
                 local ____temp_1
                 if type(jass.TriggerEvaluate) == "function" then
-                    ____temp_1 = jass:TriggerEvaluate(trig)
+                    ____temp_1 = jass.TriggerEvaluate(trig)
                 else
                     ____temp_1 = true
                 end
                 local passed = ____temp_1
                 if passed then
-                    jass:TriggerExecute(trig)
+                    jass.TriggerExecute(trig)
                 end
             end
             ::__continue12::
@@ -80,8 +80,8 @@ local function ensureMasterTrigger()
     if masterTrigger then
         return masterTrigger
     end
-    masterTrigger = jass:CreateTrigger()
-    jass:TriggerAddAction(
+    masterTrigger = jass.CreateTrigger()
+    jass.TriggerAddAction(
         masterTrigger,
         function()
             dispatchPlayerUnitEvent(currentEventKey())
@@ -96,7 +96,7 @@ local function ensureNativeRegistration(player, eventId, key)
     local master = ensureMasterTrigger()
     registeredKeys[key] = true
     dispatchTriggers[key] = dispatchTriggers[key] or ({})
-    jass:TriggerRegisterPlayerUnitEvent(master, player, eventId, nil)
+    jass.TriggerRegisterPlayerUnitEvent(master, player, eventId, nil)
 end
 function ____exports.registerPlayerUnitEvent(trig, player, eventId, filter)
     if not trig or not player or not eventId then
@@ -104,7 +104,7 @@ function ____exports.registerPlayerUnitEvent(trig, player, eventId, filter)
     end
     local normalizedFilter = normalizeFilter(filter)
     if normalizedFilter then
-        jass:TriggerRegisterPlayerUnitEvent(trig, player, eventId, normalizedFilter)
+        jass.TriggerRegisterPlayerUnitEvent(trig, player, eventId, normalizedFilter)
         return
     end
     local key = eventKey(player, eventId)
@@ -117,7 +117,7 @@ end
 function ____exports.registerPlayerUnitEventById(trig, playerId, eventId, filter)
     ____exports.registerPlayerUnitEvent(
         trig,
-        jass:Player(playerId),
+        jass.Player(playerId),
         eventId,
         filter
     )

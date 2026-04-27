@@ -13,8 +13,8 @@ local SOS_UnSetUnitSpeed = ____require_result_0.SOS_UnSetUnitSpeed
 local function testMoveSpeedBreakthrough()
     local testUnit = g.gg_unit_Hamg_0002
     if not testUnit then
-        jass:DisplayTimedTextToPlayer(
-            jass:Player(0),
+        jass.DisplayTimedTextToPlayer(
+            jass.Player(0),
             0,
             0,
             5,
@@ -23,41 +23,41 @@ local function testMoveSpeedBreakthrough()
         return
     end
     SOS_SetUnitSpeed(nil, testUnit, 700)
-    jass:DisplayTimedTextToPlayer(
-        jass:Player(0),
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(0),
         0,
         0,
         5,
         "[移动速度突破测试] 已将 gg_unit_Hamg_0002 设置为700移速，3秒后取消注册"
     )
-    local cancelTimer = jass:CreateTimer()
-    jass:TimerStart(
+    local cancelTimer = jass.CreateTimer()
+    jass.TimerStart(
         cancelTimer,
         3,
         false,
         function()
             SOS_UnSetUnitSpeed(nil, testUnit)
-            jass:DisplayTimedTextToPlayer(
-                jass:Player(0),
+            jass.DisplayTimedTextToPlayer(
+                jass.Player(0),
                 0,
                 0,
                 5,
                 "[移动速度突破测试] 已取消 gg_unit_Hamg_0002 的移动速度突破注册"
             )
-            jass:DestroyTimer(cancelTimer)
+            jass.DestroyTimer(cancelTimer)
         end
     )
 end
 --- 初始化测试
 local function initTest()
-    local timer = jass:CreateTimer()
-    jass:TimerStart(
+    local timer = jass.CreateTimer()
+    jass.TimerStart(
         timer,
         0.1,
         false,
         function()
             testMoveSpeedBreakthrough()
-            jass:DestroyTimer(timer)
+            jass.DestroyTimer(timer)
         end
     )
 end

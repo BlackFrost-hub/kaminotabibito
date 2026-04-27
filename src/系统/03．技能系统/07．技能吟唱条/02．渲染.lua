@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 --- 技能吟唱条系统 - 渲染层
 -- 
@@ -11,34 +10,39 @@ local ____exports = {}
 -- - 吟唱条数据存储（Map）与中心计时器驱动
 -- 
 -- 不包含：生命周期入口、STES 输入注册。
+local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
-local UPDATE_INTERVAL = ____require_result_0.UPDATE_INTERVAL
-local BAR_POS_X = ____require_result_0.BAR_POS_X
-local BAR_POS_Y = ____require_result_0.BAR_POS_Y
-local TEXT_OFFSET_X = ____require_result_0.TEXT_OFFSET_X
-local TEXT_OFFSET_Y = ____require_result_0.TEXT_OFFSET_Y
-local PROGRESS_OFFSET_X = ____require_result_0.PROGRESS_OFFSET_X
-local PROGRESS_OFFSET_Y = ____require_result_0.PROGRESS_OFFSET_Y
-local SYMBOL_OFFSET_X = ____require_result_0.SYMBOL_OFFSET_X
-local COUNTDOWN_OFFSET_X = ____require_result_0.COUNTDOWN_OFFSET_X
-local TIP_OFFSET_X = ____require_result_0.TIP_OFFSET_X
-local DEFAULT_COLOR_ID = ____require_result_0.DEFAULT_COLOR_ID
-local FOREGROUND_MODELS = ____require_result_0.FOREGROUND_MODELS
-local BACKGROUND_MODELS = ____require_result_0.BACKGROUND_MODELS
-local DEFAULT_CAST_TEXT = ____require_result_0.DEFAULT_CAST_TEXT
-local DEFAULT_TIP_TEXT = ____require_result_0.DEFAULT_TIP_TEXT
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local ceil = ____require_result_0.ceil
+local max = ____require_result_0.max
+local forEachSorted = ____require_result_0.forEachSorted
+local ____require_result_1 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
+local UPDATE_INTERVAL = ____require_result_1.UPDATE_INTERVAL
+local BAR_POS_X = ____require_result_1.BAR_POS_X
+local BAR_POS_Y = ____require_result_1.BAR_POS_Y
+local TEXT_OFFSET_X = ____require_result_1.TEXT_OFFSET_X
+local TEXT_OFFSET_Y = ____require_result_1.TEXT_OFFSET_Y
+local PROGRESS_OFFSET_X = ____require_result_1.PROGRESS_OFFSET_X
+local PROGRESS_OFFSET_Y = ____require_result_1.PROGRESS_OFFSET_Y
+local SYMBOL_OFFSET_X = ____require_result_1.SYMBOL_OFFSET_X
+local COUNTDOWN_OFFSET_X = ____require_result_1.COUNTDOWN_OFFSET_X
+local TIP_OFFSET_X = ____require_result_1.TIP_OFFSET_X
+local DEFAULT_COLOR_ID = ____require_result_1.DEFAULT_COLOR_ID
+local FOREGROUND_MODELS = ____require_result_1.FOREGROUND_MODELS
+local BACKGROUND_MODELS = ____require_result_1.BACKGROUND_MODELS
+local DEFAULT_CAST_TEXT = ____require_result_1.DEFAULT_CAST_TEXT
+local DEFAULT_TIP_TEXT = ____require_result_1.DEFAULT_TIP_TEXT
 --- 吟唱条数据 Map：句柄ID -> 数据
 ____exports.castBarDataMap = __TS__New(Map)
 local nextHandleId = 1
 local function getNextHandleId(self)
-    local ____nextHandleId_1 = nextHandleId
-    nextHandleId = ____nextHandleId_1 + 1
-    return ____nextHandleId_1
+    local ____nextHandleId_2 = nextHandleId
+    nextHandleId = ____nextHandleId_2 + 1
+    return ____nextHandleId_2
 end
 local function formatTime(time)
-    local intPart = math.floor(time)
-    local decPart = math.floor((time - intPart) * 10)
+    local intPart = jass.R2I(time)
+    local decPart = jass.R2I((time - intPart) * 10)
     return (tostring(intPart) .. ".") .. tostring(decPart)
 end
 local function getForegroundModel(colorId)
@@ -48,7 +52,7 @@ local function getBackgroundModel(colorId)
     return BACKGROUND_MODELS[colorId] or BACKGROUND_MODELS[DEFAULT_COLOR_ID]
 end
 local function createFrame(tagName, name, parent)
-    return japi:DzCreateFrameByTagName(
+    return japi.DzCreateFrameByTagName(
         tagName,
         name,
         parent,
@@ -57,10 +61,10 @@ local function createFrame(tagName, name, parent)
     )
 end
 local function setFrameAbsolutePoint(frame, x, y)
-    japi:DzFrameSetAbsolutePoint(frame, 4, x, y)
+    japi.DzFrameSetAbsolutePoint(frame, 4, x, y)
 end
 local function setFramePoint(frame, parent, offsetX, offsetY)
-    japi:DzFrameSetPoint(
+    japi.DzFrameSetPoint(
         frame,
         4,
         parent,
@@ -70,56 +74,58 @@ local function setFramePoint(frame, parent, offsetX, offsetY)
     )
 end
 local function setFrameModel(frame, modelPath)
-    japi:DzFrameSetModel(frame, modelPath, 0, 0)
+    japi.DzFrameSetModel(frame, modelPath, 0, 0)
 end
 local function setFrameAnimateOffset(frame, offset)
-    japi:DzFrameSetAnimateOffset(frame, offset)
+    japi.DzFrameSetAnimateOffset(frame, offset)
 end
 local function setFrameAnimate(frame, animId, autoPlay)
-    japi:DzFrameSetAnimate(frame, animId, autoPlay)
+    japi.DzFrameSetAnimate(frame, animId, autoPlay)
 end
 local function showFrame(frame, show)
-    japi:DzFrameShow(frame, show)
+    japi.DzFrameShow(frame, show)
 end
 local function setFrameText(frame, text)
-    japi:DzFrameSetText(frame, text)
+    japi.DzFrameSetText(frame, text)
 end
 local function setFramePriority(frame, priority)
-    japi:DzFrameSetPriority(frame, priority)
+    japi.DzFrameSetPriority(frame, priority)
 end
 local function destroyFrame(frame)
-    japi:DzDestroyFrame(frame)
+    japi.DzDestroyFrame(frame)
 end
 local function getGameUI()
-    return japi:DzGetGameUI()
+    return japi.DzGetGameUI()
 end
 --- 每 tick 推进所有吟唱条，完成时销毁帧并从 Map 移除
 local function updateAllCastBars()
     local deltaTime = UPDATE_INTERVAL
-    for ____, ____value in __TS__Iterator(____exports.castBarDataMap) do
-        local handleId = ____value[1]
-        local data = ____value[2]
-        data.elapsedTime = data.elapsedTime + deltaTime
-        data.progress = data.elapsedTime / data.totalTime
-        local animOffset = 1 - data.progress
-        setFrameAnimateOffset(data.foreground, animOffset)
-        local remaining = data.totalTime - data.elapsedTime
-        setFrameText(
-            data.countdown,
-            formatTime(math.max(0, remaining))
-        )
-        if data.elapsedTime >= data.totalTime then
-            showFrame(data.foreground, false)
-            destroyFrame(data.background)
-            destroyFrame(data.textDisplay)
-            destroyFrame(data.progressFrame)
-            destroyFrame(data.symbol)
-            destroyFrame(data.countdown)
-            destroyFrame(data.tip)
-            destroyFrame(data.foreground)
-            ____exports.castBarDataMap:delete(handleId)
+    forEachSorted(
+        nil,
+        ____exports.castBarDataMap,
+        function(____, handleId, data)
+            data.elapsedTime = data.elapsedTime + deltaTime
+            data.progress = data.elapsedTime / data.totalTime
+            local animOffset = 1 - data.progress
+            setFrameAnimateOffset(data.foreground, animOffset)
+            local remaining = data.totalTime - data.elapsedTime
+            setFrameText(
+                data.countdown,
+                formatTime(max(nil, 0, remaining))
+            )
+            if data.elapsedTime >= data.totalTime then
+                showFrame(data.foreground, false)
+                destroyFrame(data.background)
+                destroyFrame(data.textDisplay)
+                destroyFrame(data.progressFrame)
+                destroyFrame(data.symbol)
+                destroyFrame(data.countdown)
+                destroyFrame(data.tip)
+                destroyFrame(data.foreground)
+                ____exports.castBarDataMap:delete(handleId)
+            end
         end
-    end
+    )
 end
 --- 创建吟唱条 UI 帧组
 local function createCastBarUI(colorId, totalTime, customString)
@@ -201,14 +207,14 @@ local function createCastBarUI(colorId, totalTime, customString)
 end
 local _registeredToCenterTimer = false
 local _tickCounter = 0
-local CENTER_TIMER_TICKS = math.ceil(UPDATE_INTERVAL / 0.01)
+local CENTER_TIMER_TICKS = ceil(nil, UPDATE_INTERVAL / 0.01)
 local function ensureRegisteredToCenterTimer()
     if _registeredToCenterTimer then
         return
     end
     _registeredToCenterTimer = true
-    local ____G_2 = _G
-    local onTick10ms = ____G_2.onTick10ms
+    local ____G_3 = _G
+    local onTick10ms = ____G_3.onTick10ms
     onTick10ms(
         nil,
         function()

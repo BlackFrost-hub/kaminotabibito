@@ -63,9 +63,9 @@ export function GetSpellAbilityId(): number {
 
 export function OrderIdToString(orderId: number): string {
     const c1 = orderId % 256;
-    const c2 = Math.floor(orderId / 256) % 256;
-    const c3 = Math.floor(orderId / 256 / 256) % 256;
-    const c4 = Math.floor(orderId / 256 / 256 / 256) % 256;
+    const c2 = jass.R2I(orderId / 256) % 256;
+    const c3 = jass.R2I(orderId / 256 / 256) % 256;
+    const c4 = jass.R2I(orderId / 256 / 256 / 256) % 256;
     return String.fromCharCode(c1, c2, c3, c4);
 }
 

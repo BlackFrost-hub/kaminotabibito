@@ -18,6 +18,12 @@
  */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
+const { safeEnumItemsInRect } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeEnumItemsInRect: (rect: any, filter: any, action: () => void) => void;
+};
+
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
 const MAX_RANGE = 10;
 const DUMMY_ITEM_ID = (function () {
@@ -59,7 +65,7 @@ function hideItemsInRect(): void {
   if (!searchRect) return;
   hiddenItems.length = 0;
 
-  jass.EnumItemsInRect(searchRect, null, () => {
+  safeEnumItemsInRect(searchRect, null, () => {
     const it = jass.GetEnumItem();
     if (it && jass.IsItemVisible(it)) {
       hiddenItems.push(it);
@@ -189,21 +195,21 @@ export function X_SetUnitMovable(u: any, b: boolean): void {
 export function X_GDBC(x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
-  return Math.sqrt(dx * dx + dy * dy);
+  return jass.SquareRoot(dx * dx + dy * dy);
 }
 
 /**
  * 坐标间角度（度数）
  */
 export function X_GAFC(x1: number, y1: number, x2: number, y2: number): number {
-  return jass.Atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+  return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG;
 }
 
 /**
  * 实数转整数（四舍五入）
  */
 export function X_R2I2(r: number): number {
-  return Math.floor(r + 0.5);
+  return jass.R2I(r + 0.5);
 }
 
 export {};

@@ -44,8 +44,8 @@ const 伤害系统 = require("系统.04．伤害系统.index") as { init?: () =>
 if (typeof 伤害系统.init === "function") 伤害系统.init();
 
 // // ---------- 05．Buff系统 ----------
-//const Buff系统 = require("系统.05．Buff系统.index") as { init?: () => void };
-//if (typeof Buff系统.init === "function") Buff系统.init();
+const Buff系统 = require("系统.05．Buff系统.index") as { init?: () => void };
+if (typeof Buff系统.init === "function") Buff系统.init();
 
 // // ---------- 07．地形系统 ----------
 const 地形系统 = require("系统.07．地形系统.index") as { init?: () => void };

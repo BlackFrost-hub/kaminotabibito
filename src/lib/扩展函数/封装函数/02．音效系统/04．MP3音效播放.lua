@@ -13,6 +13,9 @@ local lastPlayedSound = ____03_FF0E3D_97F3_6548_64AD_653E.lastPlayedSound
 --- MP3音效播放
 -- 播放MP3音效（可指定玩家）
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local DEBUG_SOUND = false
 --- 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积
 local function scheduleDestroySoundIfNeeded(self, sound)
@@ -20,34 +23,35 @@ local function scheduleDestroySoundIfNeeded(self, sound)
         return
     end
     local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-    local ____temp_0
-    if Leak and Leak.LeakWatcher then
-        ____temp_0 = Leak.LeakWatcher
-    else
-        ____temp_0 = nil
-    end
-    local LW = ____temp_0
     local ____temp_1
-    if LW and type(LW.createTimer) == "function" then
-        ____temp_1 = LW:createTimer("sound_ui_fallback_destroy")
+    if Leak and Leak.LeakWatcher then
+        ____temp_1 = Leak.LeakWatcher
     else
-        ____temp_1 = jass:CreateTimer()
+        ____temp_1 = nil
     end
-    local t = ____temp_1
+    local LW = ____temp_1
+    local ____temp_2
+    if LW and type(LW.createTimer) == "function" then
+        ____temp_2 = LW:createTimer("sound_ui_fallback_destroy")
+    else
+        ____temp_2 = jass.CreateTimer()
+    end
+    local t = ____temp_2
     if not t then
         return
     end
-    jass:TimerStart(
+    safeTimerStart(
+        nil,
         t,
         0.55,
         false,
         function()
-            local expired = jass:GetExpiredTimer()
-            jass:DestroySound(sound)
+            local expired = jass.GetExpiredTimer()
+            jass.DestroySound(sound)
             if LW and type(LW.destroyTimer) == "function" then
                 LW:destroyTimer(expired)
             else
-                jass:DestroyTimer(expired)
+                safeDestroyTimer(nil, expired)
             end
         end
     )
@@ -63,13 +67,13 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     end
     do
         local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-        local ____temp_2
+        local ____temp_3
         if Leak and Leak.LeakWatcher then
-            ____temp_2 = Leak.LeakWatcher
+            ____temp_3 = Leak.LeakWatcher
         else
-            ____temp_2 = nil
+            ____temp_3 = nil
         end
-        local LW = ____temp_2
+        local LW = ____temp_3
         local trackedByLeak = false
         local s = nil
         if LW and type(LW.createSound) == "function" then
@@ -87,7 +91,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
                 trackedByLeak = true
             end
         else
-            s = jass:CreateSound(
+            s = jass.CreateSound(
                 path,
                 false,
                 false,
@@ -98,30 +102,30 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             )
         end
         if s then
-            jass:SetSoundChannel(s, model.channel)
-            jass:SetSoundVolume(s, model.volume)
-            jass:SetSoundPitch(s, model.pitch)
-            local shouldPlay = not player or jass:GetLocalPlayer() == player
+            jass.SetSoundChannel(s, model.channel)
+            jass.SetSoundVolume(s, model.volume)
+            jass.SetSoundPitch(s, model.pitch)
+            local shouldPlay = not player or jass.GetLocalPlayer() == player
             if shouldPlay then
-                jass:StartSound(s)
+                jass.StartSound(s)
             end
             if LW and type(LW.killSoundWhenDone) == "function" then
                 LW:killSoundWhenDone(s)
             else
-                jass:KillSoundWhenDone(s)
+                jass.KillSoundWhenDone(s)
                 if trackedByLeak and LW and type(LW.releaseSound) == "function" then
                     LW:releaseSound(s)
                 end
             end
             lastPlayedSound = s
             if DEBUG_SOUND and _G.print then
-                _G:print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay)
+                _G.print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay)
             end
             return s
         end
     end
-    local pathHash = jass:StringHash(path)
-    local count = jass:LoadInteger(hash, pathHash, KEY_COUNT) or 0
+    local pathHash = jass.StringHash(path)
+    local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
     if count > POOL_MAX then
         count = POOL_MAX
     end
@@ -129,7 +133,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     do
         local i = 0
         while i < count do
-            if jass:LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE) then
+            if jass.LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE) then
                 availableIndex = i
                 break
             end
@@ -153,7 +157,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             model
         )
         if sound then
-            jass:SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
+            jass.SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
         end
     else
         sound = getSoundInternal(
@@ -169,11 +173,11 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     end
     if sound then
         if player then
-            if jass:GetLocalPlayer() == player then
-                jass:StartSound(sound)
+            if jass.GetLocalPlayer() == player then
+                jass.StartSound(sound)
             end
         else
-            jass:StartSound(sound)
+            jass.StartSound(sound)
         end
         lastPlayedSound = sound
     end

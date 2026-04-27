@@ -10,9 +10,9 @@ function ____exports.nextTypingProgress(self, current, step)
     return current + step
 end
 function ____exports.substringCompat(self, text, start, ____end)
-    return jass:SubString(text, start, ____end)
+    return jass.SubString(text, start, ____end)
 end
 function ____exports.stringLengthCompat(self, text)
-    return jass:StringLength(text)
+    return jass.StringLength(text)
 end
 return ____exports

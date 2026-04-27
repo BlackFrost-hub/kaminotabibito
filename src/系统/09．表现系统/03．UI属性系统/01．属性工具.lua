@@ -11,16 +11,26 @@ local ____exports = {}
 -- - lib.扩展函数.Star扩展函数.Star扩展库.index
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local round = ____require_result_0.round
+local max = ____require_result_0.max
 local _____73A9_5BB6_5E38_91CF = require("系统.00．核心系统.00．玩家系统.00．常量")
-local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
-local MAX_DISPLAY_PLAYERS = ____require_result_0.MAX_DISPLAY_PLAYERS
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_1.YDUserDataGet
-local YDUserDataSet = ____require_result_1.YDUserDataSet
-local getObjectProperty = ____require_result_1.getObjectProperty
-local ObjectType = ____require_result_1.ObjectType
+local ____require_result_1 = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
+local MAX_DISPLAY_PLAYERS = ____require_result_1.MAX_DISPLAY_PLAYERS
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataGet = ____require_result_2.YDUserDataGet
+local YDUserDataSet = ____require_result_2.YDUserDataSet
+local getObjectProperty = ____require_result_2.getObjectProperty
+local ObjectType = ____require_result_2.ObjectType
 local EMPTY_ICON = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 local DAMAGE_ATTRS = {"造成伤害", "承受伤害", "治疗量"}
+local function maxNum3(a, b, c)
+    return max(
+        nil,
+        max(nil, a, b),
+        c
+    )
+end
 local function isTexturePath(path)
     if path == "" then
         return false
@@ -32,13 +42,13 @@ function ____exports.isPlayingPlayer(player)
     if player == nil then
         return false
     end
-    return jass:GetPlayerSlotState(player) == jass.PLAYER_SLOT_STATE_PLAYING
+    return jass.GetPlayerSlotState(player) == jass.PLAYER_SLOT_STATE_PLAYING
 end
 function ____exports.isHumanPlayer(player)
     if player == nil then
         return false
     end
-    return jass:GetPlayerController(player) ~= jass.MAP_CONTROL_COMPUTER
+    return jass.GetPlayerController(player) ~= jass.MAP_CONTROL_COMPUTER
 end
 function ____exports.getDisplayPlayers()
     local players = {}
@@ -46,16 +56,16 @@ function ____exports.getDisplayPlayers()
         local i = 0
         while i < MAX_DISPLAY_PLAYERS do
             do
-                local player = jass:Player(i)
+                local player = jass.Player(i)
                 if not ____exports.isPlayingPlayer(player) then
-                    goto __continue10
+                    goto __continue11
                 end
                 if not ____exports.isHumanPlayer(player) then
-                    goto __continue10
+                    goto __continue11
                 end
                 players[#players + 1] = player
             end
-            ::__continue10::
+            ::__continue11::
             i = i + 1
         end
     end
@@ -108,25 +118,25 @@ function ____exports.updatePlayerRealtimeStats(player)
     if hero == nil then
         return
     end
-    local intervalState = jass:ConvertUnitState(37)
-    local speedState = jass:ConvertUnitState(81)
-    local baseInterval = japi:GetUnitState(hero, intervalState)
-    local speedScale = japi:GetUnitState(hero, speedState)
+    local intervalState = jass.ConvertUnitState(37)
+    local speedState = jass.ConvertUnitState(81)
+    local baseInterval = japi.GetUnitState(hero, intervalState)
+    local speedScale = japi.GetUnitState(hero, speedState)
     local oldAps = ____exports.getPlayerAttr(player, "每秒攻速")
     local oldMoveSpeed = ____exports.getPlayerAttr(player, "移动速度")
     local attackIntervalSafe = baseInterval > 0 and speedScale > 0 and baseInterval / speedScale or 0
     local computedApsSafe = attackIntervalSafe > 0 and 1 / attackIntervalSafe or 0
     local attacksPerSecond = computedApsSafe > 0 and computedApsSafe or oldAps
-    local rawMoveSpeed = jass:GetUnitMoveSpeed(hero)
-    local ____temp_2
+    local rawMoveSpeed = jass.GetUnitMoveSpeed(hero)
+    local ____temp_3
     if rawMoveSpeed > 0 then
-        ____temp_2 = rawMoveSpeed
+        ____temp_3 = rawMoveSpeed
     else
-        ____temp_2 = oldMoveSpeed
+        ____temp_3 = oldMoveSpeed
     end
-    local moveSpeed = ____temp_2
-    local apsQuant = math.floor(attacksPerSecond * 10000 + 0.5) / 10000
-    local moveQuant = math.floor(moveSpeed * 100 + 0.5) / 100
+    local moveSpeed = ____temp_3
+    local apsQuant = round(nil, attacksPerSecond * 10000) / 10000
+    local moveQuant = round(nil, moveSpeed * 100) / 100
     if apsQuant > 0 then
         YDUserDataSet(
             nil,
@@ -154,7 +164,7 @@ function ____exports.getHeroIcon(hero)
     if hero == nil then
         return EMPTY_ICON
     end
-    local typeId = jass:GetUnitTypeId(hero)
+    local typeId = jass.GetUnitTypeId(hero)
     if typeId == nil or typeId == 0 then
         return EMPTY_ICON
     end
@@ -169,13 +179,16 @@ function ____exports.getHeroIcon(hero)
     return EMPTY_ICON
 end
 function ____exports.formatInteger(value)
-    return tostring(math.floor(math.max(0, value) + 0.5))
+    return tostring(round(
+        nil,
+        max(nil, 0, value)
+    ))
 end
 function ____exports.formatPercent(value)
-    return tostring(math.floor(value * 100 + 0.5)) .. "%"
+    return tostring(round(nil, value * 100)) .. "%"
 end
 function ____exports.formatRate(value)
-    return tostring(math.floor(value * 100 + 0.5) / 100)
+    return tostring(round(nil, value * 100) / 100)
 end
 local function dualLine(leftColor, leftLabel, leftValue, rightColor, rightLabel, rightValue)
     if rightLabel == "" then
@@ -189,7 +202,7 @@ end
 --- 将三列属性合并成五列布局（左列、分隔符、中列、分隔符、右列）
 -- 每列布局：第1行分隔线、第2行标题、第3行分隔线，从第4行开始显示竖线分隔符
 local function linesToColumns(left, mid, right)
-    local maxRows = math.max(#left, #mid, #right)
+    local maxRows = maxNum3(#left, #mid, #right)
     local result = {}
     do
         local i = 0

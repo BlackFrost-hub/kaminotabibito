@@ -3,7 +3,7 @@ local __TS__TypeOf = ____lualib.__TS__TypeOf
 local ____exports = {}
 --- 装备提取 — STES「装备提取事件」子触发：YDLocal5(ScoreMin/Max) → YDLocal7Set(integer, "ItemType", …)
 -- 
--- 规则：读 YDLocal5 的 ScoreMin/ScoreMax，在闭区间内枚举带 score 的 4 字 id，`math.random` 抽一件；无候选则 ItemType=0。
+-- 规则：读 YDLocal5 的 ScoreMin/ScoreMax，在闭区间内枚举带 score 的 4 字 id，`GetRandomInt` 抽一件；无候选则 ItemType=0。
 -- 
 -- 须与地图 JASS 一致：StringHash("装备提取事件")、ItemType。
 -- 
@@ -11,20 +11,24 @@ local ____exports = {}
 -- 避免早先 STES_Register 写入「Lua 自用表」后仍置 REG_GUARD，导致 JASS 遍历计数恒为 0、聊天无任何反应。
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Register = ____require_result_0.STES_Register
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Get = ____require_result_1.YDLocal5Get
-local YDLocal7Set = ____require_result_1.YDLocal7Set
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
-local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
-local ydlStes_coerceOptionalNumber = ____require_result_2.ydlStes_coerceOptionalNumber
-local ydlStes_skeyIndex = ____require_result_2.ydlStes_skeyIndex
-local ydlStes_registerAfterGetTable = ____require_result_2.ydlStes_registerAfterGetTable
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_Register = ____require_result_1.STES_Register
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_2.YDLocal5Get
+local YDLocal7Set = ____require_result_2.YDLocal7Set
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_3.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_3.ydlStes_finishChildCleanup
+local ydlStes_coerceOptionalNumber = ____require_result_3.ydlStes_coerceOptionalNumber
+local ydlStes_skeyIndex = ____require_result_3.ydlStes_skeyIndex
+local ydlStes_registerAfterGetTable = ____require_result_3.ydlStes_registerAfterGetTable
+local registerStesListener = ____require_result_3.registerStesListener
 local dataMod = require("系统.02．物品系统.01．装备数据")
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_3.stringToFourCC
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_4.stringToFourCC
 local ITEM_TYPE_KEY = "ItemType"
 local REG_GUARD = "__syzl_equipExtract_registered"
 local TRIG_KEY = "__syzl_equipExtract_trig"
@@ -85,8 +89,8 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    local h = jass:StringHash(eventName)
-    return jass:LoadInteger(
+    local h = jass.StringHash(eventName)
+    return jass.LoadInteger(
         ht,
         h,
         ydlStes_skeyIndex(nil, nil)
@@ -102,12 +106,12 @@ local function collectAllIdsInScoreInterval(lo, hi)
             if type(id) ~= "string" or #id ~= 4 then
                 goto __continue15
             end
-            local ____ydlStes_coerceOptionalNumber_6 = ydlStes_coerceOptionalNumber
-            local ____opt_4 = itemsTable[id]
-            if ____opt_4 ~= nil then
-                ____opt_4 = ____opt_4.score
+            local ____ydlStes_coerceOptionalNumber_7 = ydlStes_coerceOptionalNumber
+            local ____opt_5 = itemsTable[id]
+            if ____opt_5 ~= nil then
+                ____opt_5 = ____opt_5.score
             end
-            local sc = ____ydlStes_coerceOptionalNumber_6(nil, nil, ____opt_4)
+            local sc = ____ydlStes_coerceOptionalNumber_7(nil, nil, ____opt_5)
             if sc == nil then
                 goto __continue15
             end
@@ -123,7 +127,7 @@ local function pickFromScorePool(ids)
     if #ids == 0 then
         return {raw = 0, id = ""}
     end
-    local idx = math:random(1, #ids)
+    local idx = jass.GetRandomInt(1, #ids)
     local id = ids[idx]
     if type(id) ~= "string" or #id ~= 4 then
         return {raw = 0, id = ""}
@@ -153,21 +157,26 @@ local function runEquipExtract()
         log(((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选0件 → ItemType=0")
         return
     end
-    local ____pickFromScorePool_result_7 = pickFromScorePool(pool)
-    local raw = ____pickFromScorePool_result_7.raw
-    local pickedId = ____pickFromScorePool_result_7.id
+    local ____pickFromScorePool_result_8 = pickFromScorePool(pool)
+    local raw = ____pickFromScorePool_result_8.raw
+    local pickedId = ____pickFromScorePool_result_8.id
     YDLocal7Set(nil, "integer", ITEM_TYPE_KEY, raw)
     ydlStes_finishChildCleanup(nil, nil)
     log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
 local function scheduleRetry(fn)
-    local tm = jass:CreateTimer()
-    jass:TimerStart(
+    local tm = jass.CreateTimer()
+    if not tm then
+        fn(nil)
+        return
+    end
+    safeTimerStart(
+        nil,
         tm,
         RETRY_SEC,
         false,
         function()
-            jass:DestroyTimer(tm)
+            safeDestroyTimer(nil, tm)
             fn(nil)
         end
     )
@@ -183,13 +192,9 @@ local function tryRegisterEquipStes()
         g[REG_GUARD] = true
         return
     end
-    if STES_Register == nil then
-        g[REG_GUARD] = true
-        return
-    end
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(
             trig,
             function()
                 runEquipExtract()

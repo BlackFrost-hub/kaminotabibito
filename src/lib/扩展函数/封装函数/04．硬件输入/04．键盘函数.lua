@@ -18,7 +18,7 @@ local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEv
 function ____exports.isKeyDown(self, keyCode)
     local ____temp_1
     if type(japi.DzIsKeyDown) == "function" then
-        ____temp_1 = not not japi:DzIsKeyDown(keyCode)
+        ____temp_1 = not not japi.DzIsKeyDown(keyCode)
     else
         ____temp_1 = false
     end
@@ -31,7 +31,7 @@ local function keyCodeToTrgChar(self, keyCode)
                 return true, ""
             end
             local ____try, ____hasReturned, ____returnValue = pcall(function()
-                return true, string:char(keyCode)
+                return true, string.char(keyCode)
             end)
             if not ____try then
                 ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -81,7 +81,7 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
     runFalseLocalRegistration(
         nil,
         function()
-            japi:DzTriggerRegisterKeyEventByCode(
+            japi.DzTriggerRegisterKeyEventByCode(
                 trig,
                 keyCode,
                 status,
@@ -99,7 +99,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action,
     end
     if sync then
         registerKeyBindToTrigger(nil, trig, status, keyCode)
-        jass:TriggerAddAction(trig, action)
+        jass.TriggerAddAction(trig, action)
     else
         registerKeyBindToTriggerLocal(
             nil,
@@ -121,8 +121,8 @@ function ____exports.registerKeyDown(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -140,8 +140,8 @@ function ____exports.registerKeyUp(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -156,13 +156,13 @@ function ____exports.registerKeyUpSync(self, keyCode, callback)
         return nil
     end
     DzTriggerRegisterKeyEventTrg(nil, trig, KEY_STATE.UP, keyCode)
-    jass:TriggerAddAction(
+    jass.TriggerAddAction(
         trig,
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end
     )
@@ -179,9 +179,9 @@ function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, acti
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
-    return japi:DzGetTriggerKeyPlayer()
+    return japi.DzGetTriggerKeyPlayer()
 end
 function ____exports.getTriggerKey(self)
-    return japi:DzGetTriggerKey()
+    return japi.DzGetTriggerKey()
 end
 return ____exports

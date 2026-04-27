@@ -110,18 +110,18 @@ export function GS_Unit_Pry_change(u: any, i: number, r: number): void {
     return;
   }
   if (i === 16) {
-    ModifyHeroStat(jglobals.bj_HEROSTAT_STR, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
+    ModifyHeroStat(jglobals.bj_HEROSTAT_STR, u, jglobals.bj_MODIFYMETHOD_ADD, jass.R2I(r));
     GS_Unit_Pry_change(u, 0, r * 5);
     return;
   }
   if (i === 17) {
-    ModifyHeroStat(jglobals.bj_HEROSTAT_AGI, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
+    ModifyHeroStat(jglobals.bj_HEROSTAT_AGI, u, jglobals.bj_MODIFYMETHOD_ADD, jass.R2I(r));
     GS_Unit_Pry_change(u, 2, r * 0.3);
     GS_Unit_Pry_change(u, 3, r);
     return;
   }
   if (i === 18) {
-    ModifyHeroStat(jglobals.bj_HEROSTAT_INT, u, jglobals.bj_MODIFYMETHOD_ADD, Math.floor(r));
+    ModifyHeroStat(jglobals.bj_HEROSTAT_INT, u, jglobals.bj_MODIFYMETHOD_ADD, jass.R2I(r));
     GS_Unit_Pry_change(u, 5, r * 0.5);
     return;
   }

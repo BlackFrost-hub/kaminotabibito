@@ -35,7 +35,7 @@ local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not triggerPlayer or not npcConfig or not npcUnit then
         return
     end
-    local playerId = jass:GetPlayerId(triggerPlayer)
+    local playerId = jass.GetPlayerId(triggerPlayer)
     if playerId < 0 or playerId >= DIALOG_PLAYER_SLOTS then
         return
     end
@@ -43,7 +43,7 @@ local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not hero then
         return
     end
-    if not jass:IsUnitInRange(hero, npcUnit, 350) then
+    if not jass.IsUnitInRange(hero, npcUnit, 350) then
         return
     end
     local npcName = resolveNpcDialogName(npcConfig)
@@ -107,7 +107,7 @@ local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
         )
         return
     end
-    local heroName = jass:GetUnitName(hero)
+    local heroName = jass.GetUnitName(hero)
     local dialogData = buildDialogData(nil, npcName, heroName)
     if dialogData then
         openNpcDialog(
@@ -118,20 +118,20 @@ local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     end
 end
 local function onPlayerSelectedUnit()
-    local triggerPlayer = jass:GetTriggerPlayer()
-    local playerId = jass:GetPlayerId(triggerPlayer)
+    local triggerPlayer = jass.GetTriggerPlayer()
+    local playerId = jass.GetPlayerId(triggerPlayer)
     if playerId < 0 or playerId >= DIALOG_PLAYER_SLOTS then
         return
     end
-    local selectedUnit = jass:GetTriggerUnit()
+    local selectedUnit = jass.GetTriggerUnit()
     if not selectedUnit then
         return
     end
-    local selectedOwner = jass:GetOwningPlayer(selectedUnit)
-    if not selectedOwner or selectedOwner ~= jass:Player(15) then
+    local selectedOwner = jass.GetOwningPlayer(selectedUnit)
+    if not selectedOwner or selectedOwner ~= jass.Player(15) then
         return
     end
-    local unitName = jass:GetUnitName(selectedUnit)
+    local unitName = jass.GetUnitName(selectedUnit)
     local npcConfig = findEnabledNpcConfigBySelectedUnit(nil, selectedUnit, unitName)
     if not npcConfig or npcConfig.requireID == nil then
         return
@@ -140,7 +140,7 @@ local function onPlayerSelectedUnit()
     if not hero then
         return
     end
-    if not jass:IsUnitInRange(hero, selectedUnit, 350) then
+    if not jass.IsUnitInRange(hero, selectedUnit, 350) then
         return
     end
     openDialogForConfiguredNpc(triggerPlayer, npcConfig, selectedUnit)
@@ -151,14 +151,14 @@ function ____exports.initDialogEntrySelectionTrigger()
         return
     end
     g_dialogSelectionTriggerRegistered = true
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(trig, onPlayerSelectedUnit)
+    local trig = jass.CreateTrigger()
+    jass.TriggerAddAction(trig, onPlayerSelectedUnit)
     do
         local i = 0
         while i < DIALOG_PLAYER_SLOTS do
             TriggerRegisterPlayerSelectionEventBJ(
                 trig,
-                jass:Player(i),
+                jass.Player(i),
                 true
             )
             i = i + 1

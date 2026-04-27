@@ -110,14 +110,14 @@ local function testYDLocalReturn(self)
     _print(nil, "===== 测试结束 =====")
 end
 if ENABLED then
-    local tm = jass:CreateTimer()
-    jass:TimerStart(
+    local tm = jass.CreateTimer()
+    jass.TimerStart(
         tm,
         1,
         false,
         function()
             testYDLocalReturn(nil)
-            jass:DestroyTimer(tm)
+            jass.DestroyTimer(tm)
         end
     )
 end

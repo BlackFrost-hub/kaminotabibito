@@ -56,7 +56,8 @@ export function chunkQuests(quests: QuestData[]): QuestData[][] {
   for (let i = 0; i < quests.length; i += ROWS_PER_SCROLL_STEP) {
     const end = i + ROWS_PER_PAGE;
     if (end >= quests.length) {
-      pages.push(quests.slice(Math.max(0, quests.length - ROWS_PER_PAGE), quests.length));
+      const startIndex = quests.length - ROWS_PER_PAGE;
+      pages.push(quests.slice(startIndex > 0 ? startIndex : 0, quests.length));
       break;
     }
     pages.push(quests.slice(i, end));

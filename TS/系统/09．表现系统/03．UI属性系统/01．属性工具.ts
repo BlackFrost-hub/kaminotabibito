@@ -12,6 +12,10 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { round, max } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  round: (value: number) => number;
+  max: (a: number, b: number) => number;
+};
 
 const 玩家常量 = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../../00．核心系统/00．玩家系统/00．常量");
 
@@ -27,6 +31,10 @@ const { YDUserDataGet, YDUserDataSet, getObjectProperty, ObjectType } = require(
 
 const EMPTY_ICON = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
 const DAMAGE_ATTRS = ["造成伤害", "承受伤害", "治疗量"] as const;
+
+function maxNum3(a: number, b: number, c: number): number {
+  return max(max(a, b), c);
+}
 
 function isTexturePath(path: string): boolean {
   if (path === "") return false;
@@ -104,8 +112,8 @@ export function updatePlayerRealtimeStats(player: any): void {
   const moveSpeed = rawMoveSpeed > 0 ? rawMoveSpeed : oldMoveSpeed;
 
   // 全客户端周期回写 YD：须与浮点无关的确定性，否则 SaveReal 微差易 desync/掉线
-  const apsQuant = Math.round(attacksPerSecond * 10000) / 10000;
-  const moveQuant = Math.round(moveSpeed * 100) / 100;
+  const apsQuant = round(attacksPerSecond * 10000) / 10000;
+  const moveQuant = round(moveSpeed * 100) / 100;
   if (apsQuant > 0) {
     YDUserDataSet("player", player, "每秒攻速", "real", apsQuant);
   }
@@ -133,15 +141,15 @@ export function getHeroIcon(hero: any): string {
 }
 
 export function formatInteger(value: number): string {
-  return Math.floor(Math.max(0, value) + 0.5).toString();
+  return round(max(0, value)).toString();
 }
 
 export function formatPercent(value: number): string {
-  return Math.floor(value * 100 + 0.5).toString() + "%";
+  return round(value * 100).toString() + "%";
 }
 
 export function formatRate(value: number): string {
-  return (Math.floor(value * 100 + 0.5) / 100).toString();
+  return (round(value * 100) / 100).toString();
 }
 
 function dualLine(leftColor: string, leftLabel: string, leftValue: string, rightColor: string, rightLabel: string, rightValue: string): string {
@@ -158,7 +166,7 @@ function singleLine(color: string, label: string, value: string): string {
  * 每列布局：第1行分隔线、第2行标题、第3行分隔线，从第4行开始显示竖线分隔符
  */
 function linesToColumns(left: string[], mid: string[], right: string[]): string[] {
-  const maxRows = Math.max(left.length, mid.length, right.length);
+  const maxRows = maxNum3(left.length, mid.length, right.length);
   const result: string[] = [];
 
   for (let i = 0; i < maxRows; i++) {
@@ -377,4 +385,3 @@ export function buildDetailTexts(player: any): string[] {
 
   return linesToColumns(leftColumn, midColumn, rightColumn);
 }
-

@@ -79,7 +79,7 @@ function getPlayerAttr(unit: any, attrName: string): number {
  */
 export function getPercentLifeRegen(unit: any): number {
   let value = getPlayerAttr(unit, "百分比生命回复");
-  return Math.min(value, LIFE_REGEN_PERCENT_CAP);
+  return value < LIFE_REGEN_PERCENT_CAP ? value : LIFE_REGEN_PERCENT_CAP;
 }
 
 /**
@@ -87,7 +87,7 @@ export function getPercentLifeRegen(unit: any): number {
  */
 export function getPercentManaRegen(unit: any): number {
   let value = getPlayerAttr(unit, "百分比魔法回复");
-  return Math.min(value, MANA_REGEN_PERCENT_CAP);
+  return value < MANA_REGEN_PERCENT_CAP ? value : MANA_REGEN_PERCENT_CAP;
 }
 
 //=============================================================================

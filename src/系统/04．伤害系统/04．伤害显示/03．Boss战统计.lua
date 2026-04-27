@@ -28,7 +28,7 @@ function ____exports.updateBossDamageStats(source, target, damage)
     if not bossUnit then
         return
     end
-    local damageInt = math.floor(damage)
+    local damageInt = jass.R2I(damage)
     local playerForce = YDUserDataGet(
         nil,
         "string",
@@ -37,21 +37,27 @@ function ____exports.updateBossDamageStats(source, target, damage)
         "force"
     )
     if target == bossUnit and source then
-        local sourcePlayer = jass:GetOwningPlayer(source)
-        if sourcePlayer and jass:IsPlayerInForce(sourcePlayer, playerForce) then
-            local bossLife = jass:GetUnitState(bossUnit, jass.UNIT_STATE_LIFE)
-            local actualDamage = math.min(bossLife, damageInt)
-            local ____YDUserDataGet_result_1 = YDUserDataGet(
+        local sourcePlayer = jass.GetOwningPlayer(source)
+        if sourcePlayer and jass.IsPlayerInForce(sourcePlayer, playerForce) then
+            local bossLife = jass.GetUnitState(bossUnit, jass.UNIT_STATE_LIFE)
+            local ____temp_1
+            if damageInt < bossLife then
+                ____temp_1 = damageInt
+            else
+                ____temp_1 = bossLife
+            end
+            local actualDamage = ____temp_1
+            local ____YDUserDataGet_result_2 = YDUserDataGet(
                 nil,
                 "player",
                 sourcePlayer,
                 "造成伤害",
                 "real"
             )
-            if ____YDUserDataGet_result_1 == nil then
-                ____YDUserDataGet_result_1 = 0
+            if ____YDUserDataGet_result_2 == nil then
+                ____YDUserDataGet_result_2 = 0
             end
-            local currentDamage = ____YDUserDataGet_result_1
+            local currentDamage = ____YDUserDataGet_result_2
             YDUserDataSet(
                 nil,
                 "player",
@@ -63,22 +69,28 @@ function ____exports.updateBossDamageStats(source, target, damage)
         end
     end
     if source == bossUnit and target then
-        local targetPlayer = jass:GetOwningPlayer(target)
-        local isSummoned = jass:IsUnitType(target, jass.UNIT_TYPE_SUMMONED)
-        if not isSummoned and targetPlayer and jass:IsPlayerInForce(targetPlayer, playerForce) then
-            local bossLife = jass:GetUnitState(source, jass.UNIT_STATE_LIFE)
-            local actualDamage = math.min(bossLife, damageInt)
-            local ____YDUserDataGet_result_2 = YDUserDataGet(
+        local targetPlayer = jass.GetOwningPlayer(target)
+        local isSummoned = jass.IsUnitType(target, jass.UNIT_TYPE_SUMMONED)
+        if not isSummoned and targetPlayer and jass.IsPlayerInForce(targetPlayer, playerForce) then
+            local bossLife = jass.GetUnitState(source, jass.UNIT_STATE_LIFE)
+            local ____temp_3
+            if damageInt < bossLife then
+                ____temp_3 = damageInt
+            else
+                ____temp_3 = bossLife
+            end
+            local actualDamage = ____temp_3
+            local ____YDUserDataGet_result_4 = YDUserDataGet(
                 nil,
                 "player",
                 targetPlayer,
                 "承受伤害",
                 "real"
             )
-            if ____YDUserDataGet_result_2 == nil then
-                ____YDUserDataGet_result_2 = 0
+            if ____YDUserDataGet_result_4 == nil then
+                ____YDUserDataGet_result_4 = 0
             end
-            local currentDamage = ____YDUserDataGet_result_2
+            local currentDamage = ____YDUserDataGet_result_4
             YDUserDataSet(
                 nil,
                 "player",
@@ -113,30 +125,30 @@ function ____exports.getBossUnit()
 end
 --- 获取玩家对Boss的总伤害
 function ____exports.getPlayerDamageToBoss(player)
-    local ____YDUserDataGet_result_3 = YDUserDataGet(
+    local ____YDUserDataGet_result_5 = YDUserDataGet(
         nil,
         "player",
         player,
         "造成伤害",
         "real"
     )
-    if ____YDUserDataGet_result_3 == nil then
-        ____YDUserDataGet_result_3 = 0
+    if ____YDUserDataGet_result_5 == nil then
+        ____YDUserDataGet_result_5 = 0
     end
-    return ____YDUserDataGet_result_3
+    return ____YDUserDataGet_result_5
 end
 --- 获取玩家承受Boss的总伤害
 function ____exports.getPlayerDamageFromBoss(player)
-    local ____YDUserDataGet_result_4 = YDUserDataGet(
+    local ____YDUserDataGet_result_6 = YDUserDataGet(
         nil,
         "player",
         player,
         "承受伤害",
         "real"
     )
-    if ____YDUserDataGet_result_4 == nil then
-        ____YDUserDataGet_result_4 = 0
+    if ____YDUserDataGet_result_6 == nil then
+        ____YDUserDataGet_result_6 = 0
     end
-    return ____YDUserDataGet_result_4
+    return ____YDUserDataGet_result_6
 end
 return ____exports
