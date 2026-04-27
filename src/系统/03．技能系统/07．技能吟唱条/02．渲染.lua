@@ -48,7 +48,7 @@ local function getBackgroundModel(colorId)
     return BACKGROUND_MODELS[colorId] or BACKGROUND_MODELS[DEFAULT_COLOR_ID]
 end
 local function createFrame(tagName, name, parent)
-    return japi.DzCreateFrameByTagName(
+    return japi:DzCreateFrameByTagName(
         tagName,
         name,
         parent,
@@ -57,10 +57,10 @@ local function createFrame(tagName, name, parent)
     )
 end
 local function setFrameAbsolutePoint(frame, x, y)
-    japi.DzFrameSetAbsolutePoint(frame, 4, x, y)
+    japi:DzFrameSetAbsolutePoint(frame, 4, x, y)
 end
 local function setFramePoint(frame, parent, offsetX, offsetY)
-    japi.DzFrameSetPoint(
+    japi:DzFrameSetPoint(
         frame,
         4,
         parent,
@@ -70,28 +70,28 @@ local function setFramePoint(frame, parent, offsetX, offsetY)
     )
 end
 local function setFrameModel(frame, modelPath)
-    japi.DzFrameSetModel(frame, modelPath, 0, 0)
+    japi:DzFrameSetModel(frame, modelPath, 0, 0)
 end
 local function setFrameAnimateOffset(frame, offset)
-    japi.DzFrameSetAnimateOffset(frame, offset)
+    japi:DzFrameSetAnimateOffset(frame, offset)
 end
 local function setFrameAnimate(frame, animId, autoPlay)
-    japi.DzFrameSetAnimate(frame, animId, autoPlay)
+    japi:DzFrameSetAnimate(frame, animId, autoPlay)
 end
 local function showFrame(frame, show)
-    japi.DzFrameShow(frame, show)
+    japi:DzFrameShow(frame, show)
 end
 local function setFrameText(frame, text)
-    japi.DzFrameSetText(frame, text)
+    japi:DzFrameSetText(frame, text)
 end
 local function setFramePriority(frame, priority)
-    japi.DzFrameSetPriority(frame, priority)
+    japi:DzFrameSetPriority(frame, priority)
 end
 local function destroyFrame(frame)
-    japi.DzDestroyFrame(frame)
+    japi:DzDestroyFrame(frame)
 end
 local function getGameUI()
-    return japi.DzGetGameUI()
+    return japi:DzGetGameUI()
 end
 --- 每 tick 推进所有吟唱条，完成时销毁帧并从 Map 移除
 local function updateAllCastBars()

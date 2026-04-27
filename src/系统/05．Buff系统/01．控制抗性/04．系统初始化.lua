@@ -24,7 +24,7 @@ local ALLOWED_PLAYERS = {
     jass.PLAYER_NEUTRAL_AGGRESSIVE
 }
 local function isAllowedPlayer(self, player)
-    local id = jass.GetPlayerId(player)
+    local id = jass:GetPlayerId(player)
     do
         local i = 0
         while i < #ALLOWED_PLAYERS do
@@ -39,14 +39,14 @@ end
 local function onSpellChannel(self, caster, abilityId)
     if not isAllowedPlayer(
         nil,
-        jass.GetOwningPlayer(caster)
+        jass:GetOwningPlayer(caster)
     ) then
         return
     end
     if isExcludedFromControlResist(nil, caster) then
         return
     end
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if target == nil then
         return
     end
@@ -57,8 +57,8 @@ local function onSpellChannel(self, caster, abilityId)
         return
     end
     local duration = calcReducedControlTime(nil, target, abilityId)
-    local timer = jass.CreateTimer()
-    jass.TimerStart(
+    local timer = jass:CreateTimer()
+    jass:TimerStart(
         timer,
         0,
         false,
@@ -72,7 +72,7 @@ local function onSpellChannel(self, caster, abilityId)
                     duration
                 )
             end
-            jass.DestroyTimer(timer)
+            jass:DestroyTimer(timer)
         end
     )
 end

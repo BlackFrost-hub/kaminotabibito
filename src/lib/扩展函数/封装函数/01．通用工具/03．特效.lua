@@ -23,18 +23,18 @@ function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
     if duration == nil then
         duration = 2
     end
-    local eff = jass.AddSpecialEffect(modelPath, x, y)
+    local eff = jass:AddSpecialEffect(modelPath, x, y)
     if not eff then
         return nil
     end
     if z ~= 0 then
-        japi.EXSetEffectZ(eff, z)
+        japi:EXSetEffectZ(eff, z)
     end
     withTimer(
         nil,
         duration,
         function()
-            jass.DestroyEffect(eff)
+            jass:DestroyEffect(eff)
         end
     )
     return eff
@@ -44,7 +44,7 @@ local function getUnitEffectHandleId(self, unit)
     if not unit then
         return 0
     end
-    return jass.GetHandleId(unit)
+    return jass:GetHandleId(unit)
 end
 local function getUnitEffectKey(self, unit, effectKey)
     local handleId = getUnitEffectHandleId(nil, unit)
@@ -57,7 +57,7 @@ local function destroyBoundEffect(self, effect)
     if not effect then
         return
     end
-    jass.DestroyEffect(effect)
+    jass:DestroyEffect(effect)
 end
 --- 在单位上创建绑定特效
 -- 
@@ -81,7 +81,7 @@ function ____exports.createUnitEffect(self, unit, attachPoint, modelPath, durati
     if existingEffect then
         destroyBoundEffect(nil, existingEffect)
     end
-    local effect = jass.AddSpecialEffectTarget(modelPath, unit, attachPoint)
+    local effect = jass:AddSpecialEffectTarget(modelPath, unit, attachPoint)
     if not effect then
         return nil
     end

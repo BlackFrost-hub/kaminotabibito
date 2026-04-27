@@ -73,7 +73,7 @@ local function pickRandomDistinct(self, list, count)
     while #pool > 0 and #out < count do
         local ____temp_0
         if type(math) ~= "nil" and math.random then
-            ____temp_0 = math.random(1, #pool)
+            ____temp_0 = math:random(1, #pool)
         else
             ____temp_0 = 1
         end

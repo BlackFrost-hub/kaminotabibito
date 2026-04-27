@@ -23,24 +23,24 @@ local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852622
 })
 local function getAbilityName(self, unit, abilityId, level)
-    local abil = japi.EXGetUnitAbility(unit, abilityId)
+    local abil = japi:EXGetUnitAbility(unit, abilityId)
     if not abil then
         return ""
     end
-    return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) or ""
+    return japi:EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) or ""
 end
 local function onSpellChannel(self, castingUnit, spellAbilityId)
-    if jass.IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL) then
         return
     end
-    if jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
         return
     end
-    local orderId = jass.GetUnitCurrentOrder(castingUnit)
+    local orderId = jass:GetUnitCurrentOrder(castingUnit)
     if ITEM_USE_ORDER_IDS:has(orderId) then
         return
     end
-    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     local skillName = getAbilityName(nil, castingUnit, spellAbilityId, level)
     if not skillName then
         return

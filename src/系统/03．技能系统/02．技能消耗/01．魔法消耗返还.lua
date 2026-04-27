@@ -44,12 +44,12 @@ function ____exports.calcTotalManaCost(self, unit, abilityId, level)
     if percentCost >= PERCENT_COST_THRESHOLD then
         return -1
     end
-    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     return fixedCost + maxMana * percentCost
 end
 --- 获取魔法消耗减少属性
 function ____exports.getManaCostReduction(self, unit)
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if player == nil then
         return 0
     end
@@ -68,13 +68,13 @@ function ____exports.applyManaRefund(self, unit, manaCost)
         return
     end
     local refund = manaCost * reduction
-    local currentMana = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
-    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local currentMana = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
+    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     local actualRefund = math.min(refund, maxMana - currentMana)
     if actualRefund <= 0 then
         return
     end
-    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRefund)
+    jass:SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRefund)
 end
 --- 处理暗夜精灵族技能消耗返还
 -- 
@@ -85,7 +85,7 @@ function ____exports.handleManaRefund(self, unit, abilityId)
     if not ____exports.isNightElfAbility(nil, abilityId) then
         return false
     end
-    local level = jass.GetUnitAbilityLevel(unit, abilityId)
+    local level = jass:GetUnitAbilityLevel(unit, abilityId)
     local manaCost = ____exports.calcTotalManaCost(nil, unit, abilityId, level)
     if manaCost < 0 then
         return false

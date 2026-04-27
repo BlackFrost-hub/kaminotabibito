@@ -124,14 +124,14 @@ function ____exports.initMainStoryNPCsWithDelay(self, delaySec)
     if delaySec == nil then
         delaySec = 1
     end
-    local timer = jass.CreateTimer()
-    jass.TimerStart(
+    local timer = jass:CreateTimer()
+    jass:TimerStart(
         timer,
         delaySec,
         false,
         function()
             ____exports.createMainStoryNPCs(nil)
-            jass.DestroyTimer(timer)
+            jass:DestroyTimer(timer)
         end
     )
 end

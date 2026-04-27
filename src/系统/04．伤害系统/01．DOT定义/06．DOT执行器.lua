@@ -15,7 +15,9 @@ local function isDotTargetPaused(self, u)
         return false
     end
     local paused = false
-    pcall(function ()
+    pcall(
+        nil,
+        function()
             paused = fn(nil, u) == true
         end
     )
@@ -30,7 +32,7 @@ function ____exports.createDotExecutor(self, deps)
         if not unit or not model or model == "" then
             return
         end
-        local eff = deps.jass.AddSpecialEffectTarget(model, unit, "origin")
+        local eff = deps.jass:AddSpecialEffectTarget(model, unit, "origin")
         if eff == nil then
             return
         end
@@ -62,7 +64,7 @@ function ____exports.createDotExecutor(self, deps)
         if type(deps.damageEventModule.markNextPendingDamageAsDotTickBatch) == "function" then
             deps.damageEventModule:markNextPendingDamageAsDotTickBatch()
         end
-        deps.jass.UnitDamageTarget(
+        deps.jass:UnitDamageTarget(
             source,
             target,
             amount,

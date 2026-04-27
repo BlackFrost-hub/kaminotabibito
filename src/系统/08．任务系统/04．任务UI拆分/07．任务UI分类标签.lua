@@ -29,12 +29,12 @@ local function handleCategoryTabClick(self, category)
     handler:onSwitchCategory(category)
     local ____temp_0
     if type(japi.DzGetTriggerKeyPlayer) == "function" then
-        ____temp_0 = japi.DzGetTriggerKeyPlayer()
+        ____temp_0 = japi:DzGetTriggerKeyPlayer()
     else
-        ____temp_0 = jass.GetLocalPlayer()
+        ____temp_0 = jass:GetLocalPlayer()
     end
     local triggerPlayer = ____temp_0
-    if triggerPlayer == jass.GetLocalPlayer() then
+    if triggerPlayer == jass:GetLocalPlayer() then
         handler:onClickSound()
     end
 end
@@ -80,10 +80,12 @@ local function createTaskTab(self, opts)
     local onClickSound = ____opts_1.onClickSound
     local onSwitchCategory = ____opts_1.onSwitchCategory
     local onShowTabTooltip = ____opts_1.onShowTabTooltip
-    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent)
+    local contextId = ____opts_1.contextId
+    local nameSuffix = ____opts_1.nameSuffix
+    local bg = tryCreateFromFdfOnly(nil, bgName, tabParent, contextId)
     if bg then
         if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(bg)
+            japi:DzFrameClearAllPoints(bg)
         end
         setFramePointRelative(
             nil,
@@ -97,25 +99,25 @@ local function createTaskTab(self, opts)
         setFrameSize(nil, bg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
         pcallDzFrameShow(nil, japi, bg, true)
         if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(bg, 7)
+            japi:DzFrameSetLevel(bg, 7)
         end
     end
     if bg then
         local tabLabel = createTabLabelTextOnBackdrop(
             nil,
             bg,
-            labelName,
+            labelName .. nameSuffix,
             labelText,
             TAB_CATEGORY_FONT_SCALE
         )
         if tabLabel and type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(tabLabel, 8)
+            japi:DzFrameSetLevel(tabLabel, 8)
         end
     end
-    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent)
+    local tab = tryCreateFromFdfOnly(nil, tabName, tabParent, contextId)
     if tab then
         if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(tab)
+            japi:DzFrameClearAllPoints(tab)
         end
         if bg then
             setupTransparentGlueHitLayer(nil, bg, tab)
@@ -137,7 +139,7 @@ local function createTaskTab(self, opts)
             pcallDzFrameSetAlpha(nil, japi, tab, 0)
         end
         if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(tab, 9)
+            japi:DzFrameSetLevel(tab, 9)
         end
         registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
         currentTooltipMessage = tooltip
@@ -168,6 +170,9 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
     local onClickSound = ____opts_2.onClickSound
     local onSwitchCategory = ____opts_2.onSwitchCategory
     local onShowTabTooltip = ____opts_2.onShowTabTooltip
+    local slotId = ____opts_2.slotId
+    local contextId = ____opts_2.contextId
+    local nameSuffix = "_s" .. tostring(slotId)
     local common = {
         japi = japi,
         tabParent = tabParent,
@@ -181,7 +186,9 @@ function ____exports.buildTaskPanelCategoryTabs(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip
+        onShowTabTooltip = onShowTabTooltip,
+        contextId = contextId,
+        nameSuffix = nameSuffix
     }
     local mainResult = createTaskTab(
         nil,

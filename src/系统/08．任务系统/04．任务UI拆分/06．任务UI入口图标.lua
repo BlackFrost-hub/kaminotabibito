@@ -23,7 +23,10 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local setFrameClickEvent = ____opts_0.setFrameClickEvent
     local applyDzTextFontAndCenterAlignment = ____opts_0.applyDzTextFontAndCenterAlignment
     local onTogglePanel = ____opts_0.onTogglePanel
-    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent)
+    local slotId = ____opts_0.slotId
+    local contextId = ____opts_0.contextId
+    local nameSuffix = "_s" .. tostring(slotId)
+    local entryFrame = tryCreateFromFdfOnly(nil, "TaskEntryIcon", parent, contextId)
     if not entryFrame then
         return {entryFrame = nil, entryText = nil}
     end
@@ -41,7 +44,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local entryText = nil
     local ____createFrame_result_1 = createFrame(nil, {
         type = FrameType.TEXT,
-        name = "TaskEntryText",
+        name = "TaskEntryText" .. nameSuffix,
         parent = entryFrame,
         template = "template",
         visible = true
@@ -65,7 +68,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     else
         entryText = createTextLabel(
             nil,
-            "TaskEntryText",
+            "TaskEntryText" .. nameSuffix,
             entryFrame,
             "",
             titleRel,
@@ -74,13 +77,13 @@ function ____exports.buildTaskEntryIcon(self, opts)
     end
     if entryText ~= nil and entryText ~= 0 then
         if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(entryText, "|cffffcc00任务(J)|r")
+            japi:DzFrameSetText(entryText, "|cffffcc00任务(J)|r")
         end
         applyDzTextFontAndCenterAlignment(nil, entryText)
     end
     local ____createFrame_result_2 = createFrame(nil, {
         type = FrameType.GLUETEXTBUTTON,
-        name = "TaskEntryBtn",
+        name = "TaskEntryBtn" .. nameSuffix,
         parent = entryFrame,
         template = "template",
         visible = true,
@@ -93,7 +96,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     local btn = ____createFrame_result_2
     if btn then
         if type(japi.DzFrameSetAllPoints) == "function" then
-            japi.DzFrameSetAllPoints(btn, entryFrame)
+            japi:DzFrameSetAllPoints(btn, entryFrame)
         end
         setFrameClickEvent(nil, btn, onTogglePanel, true)
     end

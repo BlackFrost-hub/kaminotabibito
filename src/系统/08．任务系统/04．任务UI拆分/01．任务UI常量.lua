@@ -1,5 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- N 槽：最大玩家数（与对话框系统一致）
+____exports.MAX_PLAYERS = 4
+--- N 槽：DzCreateFrame contextId 偏移基数，每槽位占 1000 个 ID 空间
+____exports.TAG_SLOT_OFFSET = 1000
 ____exports.TASK_UI_TOC_PATHS = {"UI\\TaskUI.toc"}
 ____exports.TASK_UI_TOC_LOAD_KEY = "TaskUI"
 --- 二分开关：关则任务UI客户端不初始化

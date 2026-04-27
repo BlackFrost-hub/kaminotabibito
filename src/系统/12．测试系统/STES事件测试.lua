@@ -19,7 +19,7 @@ local function skeyIndex()
     if type(jg.STES_skey_index) == "number" and jg.STES_skey_index ~= 0 then
         return jg.STES_skey_index
     end
-    return jass.StringHash("index")
+    return jass:StringHash("index")
 end
 local function log(msg)
     local p = _G.print
@@ -38,8 +38,8 @@ local function tryRegisterLuaListenerForJassStes()
         return
     end
     g[LUA_STES_REG_KEY] = true
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(
+    local trig = jass:CreateTrigger()
+    jass:TriggerAddAction(
         trig,
         function()
             do
@@ -69,9 +69,9 @@ local function runAfterDelay()
         return
     end
     tryRegisterLuaListenerForJassStes()
-    local hash = jass.StringHash(TEST_EVENT)
+    local hash = jass:StringHash(TEST_EVENT)
     local sk = skeyIndex()
-    local count = jass.LoadInteger(ht, hash, sk)
+    local count = jass:LoadInteger(ht, hash, sk)
     log((((((("[STES事件测试] 表=" .. tostring(ht)) .. " 事件「") .. TEST_EVENT) .. "」count=") .. tostring(count)) .. " skey_index=") .. tostring(sk))
     if count <= 0 then
         log(("[STES事件测试] 计数为 0：事件「" .. TEST_EVENT) .. "」尚无 STES 注册（检查 JASS 是否已 Register、事件名是否一致）")

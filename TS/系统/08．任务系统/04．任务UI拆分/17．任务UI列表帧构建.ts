@@ -35,6 +35,7 @@ export function createHiddenRoot(
       parent,
       template: "template",
       visible: false,
+      id: ctx.contextId,
     }) || 0;
   if (!frame) return null;
   ctx.setFramePointRelative(frame, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, 0, 0);
@@ -78,7 +79,7 @@ export function createHiddenBackdrop(
   texture?: string,
   contextId?: number
 ): number | null {
-  let frame = tryCreateFromFdfOnly(templateName, parent, contextId ?? 0) || 0;
+  let frame = tryCreateFromFdfOnly(templateName, parent, contextId ?? ctx.contextId) || 0;
   if (!frame) {
     frame =
       ctx.createFrame({
@@ -87,6 +88,7 @@ export function createHiddenBackdrop(
         parent,
         template: "template",
         visible: false,
+        id: ctx.contextId,
       }) || 0;
     if (frame && texture) {
       ctx.setFrameTexture(frame, texture);
@@ -108,6 +110,7 @@ export function createPlainHiddenBackdrop(
       parent,
       template: "template",
       visible: false,
+      id: ctx.contextId,
     }) || 0;
   if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ICON_LEVEL);
   return frame || null;
@@ -128,10 +131,11 @@ export function createHiddenButton(
       visible: false,
       enable: true,
       alpha: 0,
+      id: ctx.contextId,
     }) || 0;
   if (!frame) return null;
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BUTTON_LEVEL);
-  ctx.setFrameClickEvent(frame, onClick, false);
+  ctx.setFrameClickEvent(frame, onClick, true);
   return frame;
 }
 

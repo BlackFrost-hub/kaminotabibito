@@ -1,10 +1,10 @@
 ---
-description: DzAPI UI Frame 类型与避坑（1.27e）；联机 desync/sync/N 槽见同目录 n-slot-ui-symmetric-execution.mdc
-globs: TS/**/表现/**/*.ts, TS/**/*UI*.ts
+description: DzAPI UI Frame 类型、FDF安全加载与避坑（1.27e）；联机 desync/sync/N 槽见 n-slot-ui-symmetric-execution.mdc，LoadToc/FDF 崩溃规避见下文 §FDF安全
+globs: TS/**/表现/**/*.ts, TS/**/*UI*.ts, TS/**/任务UI*.ts
 alwaysApply: false
 ---
 
-# DzAPI UI Frame 类型与避坑
+# DzAPI UI Frame 类型、FDF安全与避坑
 
 ## 支持的 Frame 类型（DzCreateFrameByTagName）
 
@@ -28,12 +28,54 @@ alwaysApply: false
 | SIMPLESTATUSBAR | 简易工具栏 |
 | SIMPLECHECKBOX | 简单复选框 |
 
-## 最小「提示框 / 文本框底」：只建一个 BACKDROP（本图约定，避免乱叠层）
+## FDF 安全加载规则（1.27e）
 
-**目标**：提示框、简单边框底图 → **仅一个 `BACKDROP`**，不要默认套 EscMenu 金边切片、不要多条细边拼框（易错位），除非你明确要复杂样式。
+### 核心结论
+1. `DzLoadToc` **在 1.27e 是可以用的**；之前"疑似不能用"的问题，更多是 **TOC/FDF 路径/依赖没加载对** 或 **用 `DzCreateFrame` 创建了不兼容的 FDF 帧类型导致引擎级崩溃**。
+2. **有 `DzLoadToc` 成功并不代表所有 FDF 帧都安全**；建议"先保底、再逐步替换"。
+3. 即使 `DzLoadToc("UI\\xxx.toc")` 能成功，`DzCreateFrame` 创建某些 FDF 帧也可能在客户端**绘制/交互阶段触发引擎级 crash**。
+4. 这类 crash 不是普通 Lua error，**`pcall` 也拦不住**。
 
-**JASS 参考（父级 `DzGetGameUI()` + 绝对点 + 尺寸 + 贴图）：**
+### 已定位的崩溃案例
+- 任务 UI 里启用 FDF 创建 `TaskScrollBar` 会导致**进图加载阶段崩溃**。
+- 将滚动条相关帧切回代码创建后，崩溃消失。
 
+### 正确用法
+1. `imports/UI/*.toc` 填 FDF 路径（地图根相对路径），如 `UI\TaskUI.fdf`。
+2. 初始化时只加载一次，用 `pcall` 包住 `japi.DzLoadToc(path)`。
+3. `DzCreateFrame` 的名字必须与 FDF 里 `Frame "..." "FRAME_NAME"` 中**第二个引号名字完全一致**。
+4. 失败要兜底：`DzCreateFrame` 可能返回 `0`，失败就回退到代码 `createFrame(...)`。
+
+### FDF 渐进接入策略
+1. 把要从 FDF 创建的帧分组（容器、Tab/Close、滚动条）。
+2. 每次只打开一组，确认稳定后再扩大。
+3. 会崩的帧改为 fallback（代码创建）。
+
+### 推荐接入阶段
+1. **第一步**：先只用 FDF 创建偏静态容器（BACKDROP 外壳）。
+2. **第二步**：确认稳定后，再逐个替换 Tab/Close/Scrollbar；每替换一个测一次。
+
+### 代码模板
+```typescript
+// 加载 TOC（带兜底）
+function loadTaskUITocOnce(): boolean {
+  const [ok] = pcall(() => japi.DzLoadToc("UI\\TaskUI.toc"));
+  return ok;
+}
+
+// 安全创建 FDF 帧（失败回退）
+function tryCreateFromFdf(name: string, parent: number, fallback: () => number): number {
+  const [ok, frame] = pcall(() => japi.DzCreateFrame(name, parent, 0));
+  if (ok && frame && frame !== 0) return frame;
+  return fallback();
+}
+```
+
+## 最小「提示框 / 文本框底」：只建一个 BACKDROP
+
+**目标**：提示框、简单边框底图 → **仅一个 `BACKDROP`**，不要默认套 EscMenu 金边切片、不要多条细边拼框（易错位）。
+
+**JASS 参考：**
 ```jass
 call YDLocal1Set(frame, "主线任务", DzCreateFrameByTagName("BACKDROP", "主线任务", DzGetGameUI(), "template", 0))
 call DzFrameSetAbsolutePoint(YDLocal1Get(frame, "主线任务"), 4, 0.20, 0.5573046)
@@ -41,18 +83,18 @@ call DzFrameSetSize(YDLocal1Get(frame, "主线任务"), 0.03, 0.03)
 call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wenbenkuang.blp", 0)
 ```
 
-- **`DzFrameSetAbsolutePoint(..., 4, x, y)`**：`4` = CENTER（与工程里 `FramePoint.CENTER` 一致）。  
-- **边框/底图一体**：用地图已导入的 **`war3mapImported\wenbenkuang.blp`** 一张贴图即可（路径与 `DzFrameSetTexture(..., 0)` 一致）。
+- **`4` = CENTER**（与工程里 `FramePoint.CENTER` 一致）。
+- **边框/底图一体**：用地图已导入的 **`war3mapImported\wenbenkuang.blp`** 一张贴图即可。
 
-**TS 等价流程（`TS/系统/09．表现系统/UI工具.ts`）**：`createFrame({ type: BACKDROP, parent, template: "template" })` → `setFramePosition` 或 `setFramePointRelative`（相对父级时用）→ `setFrameSize` → `setFrameTexture(path)`（内部即 `DzFrameSetTexture`）。需要文字时再 **单独** `createTextLabel` 叠在子级，勿把 `human-options-menu-border` 等 **Edge 切片**当整图拉伸。
+**TS 等价流程**：`createFrame({ type: BACKDROP, parent, template: "template" })` → `setFramePosition` → `setFrameSize` → `setFrameTexture(path)`。需要文字时再 **单独** `createTextLabel` 叠在子级。
 
 **工程示例**：`TS/系统/05．Buff系统/02．BuffUI.ts` 中 Buff 提示框（单 BACKDROP + `wenbenkuang`）。
 
 ## 避坑
 
-1. **SPRITE 可能崩溃**：DzAPI 静态文档仅列出 BACKDROP/TEXT/BUTTON/GLUEBUTTON/GLUETEXTBUTTON/FRAME，SPRITE 实测可能导致游戏崩溃。优先用 **BACKDROP + DzFrameSetTexture** 显示头像/图标。
+1. **SPRITE 可能崩溃**：优先用 **BACKDROP + DzFrameSetTexture** 显示头像/图标。
 
-2. **BACKDROP 不接收点击**：BACKDROP 是纯背景，DzFrameSetScriptByCode 点击无效。可点击需用 **BUTTON** 或 **GLUETEXTBUTTON**，再用 DzFrameSetTexture 设贴图。
+2. **BACKDROP 不接收点击**：可点击需用 **BUTTON** 或 **GLUETEXTBUTTON**，再用 `DzFrameSetTexture` 设贴图。
 
 3. **Layer "ARTWORK" 进游戏直接崩溃**：不要使用。
 
@@ -60,13 +102,13 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 5. **TSTL 编译**：`japi.XXX` 会编译成 `japi:XXX`，需在 fix-lua-for-pack.js 中把 `japi:` 改为 `japi.`，否则多传 japi 当首参导致参数错位。
 
-6. **template 参数**：DzCreateFrameByTagName 第 4 参用 `"template"` 非 `""`，否则可能创建失败。
+6. **template 参数**：`DzCreateFrameByTagName` 第 4 参用 `"template"` 非 `""`。
 
-7. **GLUETEXTBUTTON + BACKDROP 父子**：BACKDROP 作父，GLUETEXTBUTTON 作子可生效。用 DzFrameSetAllPoints(btn, backdrop) 让按钮覆盖背景。
+7. **GLUETEXTBUTTON + BACKDROP 父子**：BACKDROP 作父，GLUETEXTBUTTON 作子可生效。用 `DzFrameSetAllPoints(btn, backdrop)` 让按钮覆盖背景。
 
-8. **定位**：DzFrameSetAbsolutePoint(frame, 4, x, y) 绝对坐标，4=CENTER。
+8. **定位**：`DzFrameSetAbsolutePoint(frame, 4, x, y)` 绝对坐标，4=CENTER。
 
-9. **`DzFrameSetTextAlignment(frame, integer)` — 文本对齐（以本表为准，勿与旧「0 左、1 居中」混用）**
+9. **`DzFrameSetTextAlignment(frame, integer)` — 文本对齐**
 
    | 对齐 | 整数值 |
    |------|--------|
@@ -80,19 +122,15 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
    | 下 | `20` |
    | 右下 | `36` |
 
-   **改对齐前必须先重置**：再次改变同一 frame 的对齐方式前，须先 `DzFrameSetTextAlignment(frame, -1)`，再设目标值；否则新值会与旧状态**叠加**（类似「科技改护甲」类叠加），出现偏移（例如先 `20` 再设 `32` 理论右上却变右下）。**`-1` 会强制回到等价左上基准（0）**，再设表内值才可预期。
-
-   **TEXT 与底图**：实践中宜先给 **TEXT 与父 BACKDROP（或占位区）设好相同或匹配的 `DzFrameSetSize`**，再 `DzFrameSetPoint` / 对齐，再 `DzFrameSetText` / `DzFrameSetFont`，避免只靠锚点而字号区域与底图不一致。
+   **改对齐前必须先重置**：再次改变同一 frame 的对齐方式前，须先 `DzFrameSetTextAlignment(frame, -1)`，再设目标值；否则新值会与旧状态**叠加**。
 
 10. **`DzFrameSetFont(frame, path, fontSize, flag)`**
+    - 第三参在本图/部分环境下为**小实数**，实测**有效量级上限约 `0.02`**；写 `0.8`、`3` 等与 UI 坐标混淆时**常看不出字号变化或表现异常**。
+    - **不要**与 **`DzFrameSetScale` 叠在同一目标上重复缩放**。
 
-   - 第三参在本图/部分环境下为**小实数**，实测**有效量级上限约 `0.02`**；写 `0.8`、`3` 等与 UI 坐标混淆时**常看不出字号变化或表现异常**。微调可在 `0.001`～`0.02` 间试。
-   - 与 **`DzFrameSetSize`** 的关系：TEXT 字形常会随**文本框宽高**适配；**不要**与 **`DzFrameSetScale` 叠在同一目标上重复缩放**（同属尺度，易把字缩没或难调）。
+11. **`DzFrameSetTooltip(hostFrame, tooltipFrameInt)`**：第二参是 **提示用 Frame 的整型 id**，不是 `|cff...|r` 字符串。
 
-12. **`DzFrameSetTooltip(hostFrame, tooltipFrameInt)`**（`japi.lua`：第二参为 **integer**）  
-   - 第二参是 **提示用 Frame 的整型 id**，不是 `|cff...|r` 字符串。常见：`DzFrameSetTooltip(宿主, DzF2I(提示框Frame))`；无 `DzF2I` 时可尝试直接传提示框句柄数值。勿与「字符串 tooltip」用法混用。
-
-**`DzFrameSetScript` / `DzFrameSetScriptByCode` 的 `eventId`（与 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType` 一致）**
+## 事件 ID（`DzFrameSetScriptByCode`）
 
 | 事件 | ID |
 |------|-----|
@@ -103,55 +141,36 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 | 鼠标按下 | 5 |
 | 鼠标滚轮 | 6 |
 | Slider 值变化 | 11 |
-| 鼠标双击 | 12 |（这个有同行告诉我是无效事件，还没验证过，2026年3月30日17:51:12）
+| 鼠标双击 | 12 |（有同行告诉我是无效事件，未验证）
 
-13. **DzFrameSetScript**：`DzFrameSetScript(frame, eventId, funcName, sync)` 用函数名字符串注册。**TS/Lua 下不生效**（引擎通过 JASS ExecuteFunc 查找，无法调用 Lua 函数），因此本项目默认不用它。
+**注意**：`DzFrameSetScript`（字符串函数名）在 TS/Lua 下不生效（引擎通过 JASS ExecuteFunc 查找），统一用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**。如果只是**本机即时 UI 反馈**，通常用 **`sync=false`**。
 
-14. **为 Frame 注册回调**：统一用 **`DzFrameSetScriptByCode(frame, eventId, funcHandle, sync)`**，直接传 **函数/闭包**；不要用 `DzFrameSetScript`。如果只是**本机即时 UI 反馈**，通常用 **`sync=false`**。
+## 滚动条 / 自定义滑块教训
 
-15. **`DisplayTextToPlayer`**：`DzFrameSetScriptByCode` 回调内可直接调用 `DisplayTextToPlayer(DzGetTriggerUIEventPlayer(), 0, 0, msg)`，无需再套 `TriggerExecute`。
+1. **轨道若是 BACKDROP**：不要对它 **`DzFrameSetMinMaxValue` / `DzFrameSetValue`**（易崩）。数值滚动用 **`scrollOffset` 变量** + 列表偏移。
 
-## 滚动条 / 自定义滑块（thumb）教训（1.27e）
+2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。
 
-1. **轨道若是 BACKDROP**：不要对它 **`DzFrameSetMinMaxValue` / `DzFrameSetValue`**（易崩）。数值滚动用 **`scrollOffset` 变量** + 列表偏移；需要原生 Slider 时用 **SCROLLBAR/SLIDER** 隐藏层单独管 value。
+3. **thumb 位置与「跟手」拖拽**：`syncScrollThumb` 里用的 **竖直可移动行程** 必须与 **拖拽时 `dy`→`scrollOffset` 用的轨道像素高度** 同源；换算见 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `getScrollbarTrackThumbTravelPx`**。
 
-2. **圆形 thumb 视觉**：可用 **BACKDROP + `DzFrameSetTexture`**；**BACKDROP 不接点击**，在 thumb 上叠 **透明 `GLUETEXTBUTTON`**（`DzFrameSetAllPoints` 铺满）做点击/拖拽命中。  
-   - **若逻辑用 `DzGetMouseFocus` / `isDescendantOf` 做命中**（例如全局 `DzTriggerRegisterMouseEventByCode` 里判断「是否点在 thumb 上」），**必须**有真实可点帧（透明按钮），**不能**只建 BACKDROP 却把 `scrollThumbHitBtn` 等字段留 **`null`**——否则按下永远判不中（任务 UI 分页滑块曾因此无法拖拽）。实现范例：`TS/系统/08．任务系统/04．任务UI拆分/08．任务UI主面板与滚动.ts` 内 `TaskScrollThumbHit` + `setupTransparentGlueHitLayer`。
+4. **全局鼠标注册（拖拽）**：业务侧禁止裸调 `DzTriggerRegisterMouseEventByCode`；统一用 **`registerMouseButtonEventByCode`**、**`registerMouseMoveEventByCode`**。左键参数：按下 **`(1,1)`**、释放 **`(1,0)`**。
 
-3. **thumb 位置与「跟手」拖拽**：`syncScrollThumb` 里用的 **竖直可移动行程**（如 `LIST_VIEW_H - thumbSize ± 补偿` 的 **safeRange 归一化高度**）必须与 **拖拽时 `dy`→`scrollOffset` 用的轨道像素高度** 同源；换算：  
-   **`trackPx ≈ DzGetClientHeight() * safeRangeNorm / 0.6`**（与工程里竖向 **0.6** UI 坐标一致，同 `PY` 思路；实现见 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `getScrollbarTrackThumbTravelPx`**）。**禁止**用 `windowHeight * 随意常数`（如 `0.35`）当轨道高，否则会与滑块不同步。
+5. **拖拽起点用 `MOUSE_DOWN`（`5`）**，不是 `MOUSE_CLICK`（`1`）。
 
-4. **全局鼠标注册（拖拽）**：业务侧禁止裸调 `DzTriggerRegisterMouseEventByCode` / `DzTriggerRegisterMouseMoveEventByCode`；统一用 **`lib/…/04．硬件输入/03．鼠标函数.ts` → `registerMouseButtonEventByCode`**、**`registerMouseMoveEventByCode`**（与 **`registerMouseWheel`** 同契约：`sync=false` 时内部走 **`runFalseLocalRegistration`**；`sync=true` 时点号直调 native）。禁止 `const reg = japi.xxx; reg(…)`。左键参数：原生 **`(btn, status)`**；本图约定按下 **`(1,1)`**、释放 **`(1,0)`**。
+## Frame 组与 SimpleFrame 组
 
-5. **Frame 脚本 eventId**：拖拽起点用 **`MOUSE_DOWN`（工程里常量为 `5`）**，不是 **`MOUSE_CLICK`（`1`）**。参考 `TS/系统/09．表现系统/UI工具.ts` 的 `EventType`。
+1. **不要混父子**：SimpleFrames（`SIMPLEFRAME/SIMPLEBUTTON/SIMPLECHECKBOX/SIMPLESTATUSBAR`）和 Frame 组在父子关系上不稳定，混用常导致"创建成功但行为异常"或失败。
 
-## 你这次补充的关键记忆（Frame 系统）
-
-1. **Frame 组与 SimpleFrame 组不要混父子**
-   - SimpleFrames：`SIMPLEFRAME/SIMPLEBUTTON/SIMPLECHECKBOX/SIMPLESTATUSBAR`。
-   - 这两组在父子关系上不稳定，混用常导致“创建成功但行为异常”或直接创建失败。
-   - 任务 UI 这条链（`TaskMainPanel -> TaskListContainer -> Tab/Scroll`）统一用 Frame 组更稳。
-
-2. **FrameLevel 规则不同**
+2. **FrameLevel 规则不同**：
    - Frame 组：只和同级 siblings 竞争；子帧在父帧层内排序。
    - SimpleFrame 组：更像全局同层竞争，父子关系影响弱很多。
-   - 结论：重叠问题优先先统一组别，再调 `DzFrameSetLevel`。
 
-3. **父子关系的实际效果**
-   - 子帧可见性依赖父帧可见性。
-   - 子帧默认拷贝父帧的 alpha/scale/level（创建时）。
-   - Functional child（FDF 内定义的功能子帧，如 ButtonText/ControlBackdrop）和 Loose child（代码额外创建）行为不同，前者更依赖模板链。
+3. **父子关系的实际效果**：子帧可见性依赖父帧可见性；子帧默认拷贝父帧的 alpha/scale/level（创建时）。
 
-4. **FDF 语法与定位要点**
-   - 行注释 `//` 与块注释 `/*...*/` 可用。
-   - 非 block action 末尾需逗号。
-   - 路径使用单反斜杠（如 `UI\TaskUI.fdf`）。
-   - `SetPoint` 规则遵循 0.8x0.6 UI 坐标系；Frame 组默认受 4:3 区域约束，超界会形变。
-
-## Frame 叠放与优先级（避免「J 面板盖住对话框」）
+## Frame 叠放与优先级
 
 - `DzFrameSetPriority` 才是优先级主控制；`DzFrameSetLevel` 仅作同层/局部排序辅助，不能替代 Priority。
 
-## 联机异步（Desync）、对称执行与 N 槽位 UI
+## 相关规则
 
-**计时器全端启动、GetLocalPlayer 分层、`DzFrameSetScriptByCode(..., sync=true)` 的联机约束、键盘 sync、BuffUI 反例、物编读、对话框与 N 槽位任务 UI** 等，**单一事实来源**：[`n-slot-ui-symmetric-execution.mdc`](n-slot-ui-symmetric-execution.mdc)（本文件只保留 Frame 类型、事件 ID、布局/滚动与 API 形态，避免两处漂移）。
+- 联机执行分层、GetLocalPlayer 分层、sync 约束、键盘 sync、BuffUI 反例、N 槽位任务 UI：见 [`n-slot-ui-symmetric-execution.mdc`](n-slot-ui-symmetric-execution.mdc)

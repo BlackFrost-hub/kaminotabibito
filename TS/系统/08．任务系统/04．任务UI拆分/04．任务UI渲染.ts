@@ -457,7 +457,7 @@ export function renderQuestRow(opts: {
   registerQuestRowClickHandler(quest.id, onClickSound, onToggleExpand);
   // 使用命名函数替代匿名闭包，避免 JASS 回调中的闭包问题
   frameToQuestIdMap[clickBtn] = quest.id;
-  setFrameClickEvent(clickBtn, onQuestRowClick, false);
+  setFrameClickEvent(clickBtn, onQuestRowClick, true);
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(clickBtn, 4);
   showFrame(clickBtn);
   listItemFrames.push(clickBtn);

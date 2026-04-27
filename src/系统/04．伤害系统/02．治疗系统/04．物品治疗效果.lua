@@ -45,7 +45,7 @@ local function canBeHealed(self, unit, sourcePlayer, source)
     if not isValidUnit(nil, unit) then
         return false
     end
-    if not jass.IsUnitAlly(unit, sourcePlayer) and unit ~= source then
+    if not jass:IsUnitAlly(unit, sourcePlayer) and unit ~= source then
         return false
     end
     return true
@@ -63,7 +63,7 @@ function ____exports.doHealItemEffect(self, abilId, target, healHP, healMP)
     if target == nil then
         return
     end
-    local sourcePlayer = jass.GetOwningPlayer(target)
+    local sourcePlayer = jass:GetOwningPlayer(target)
     if abilId == ABIL_A002 then
         doHeal(nil, {
             HealSource = target,
@@ -90,19 +90,19 @@ function ____exports.doHealItemEffect(self, abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A0B8 then
-        local x = jass.GetUnitX(target)
-        local y = jass.GetUnitY(target)
-        local group = jass.CreateGroup()
-        jass.GroupEnumUnitsInRange(
+        local x = jass:GetUnitX(target)
+        local y = jass:GetUnitY(target)
+        local group = jass:CreateGroup()
+        jass:GroupEnumUnitsInRange(
             group,
             x,
             y,
             GROUP_HEAL_RADIUS,
             nil
         )
-        local unit = jass.FirstOfGroup(group)
+        local unit = jass:FirstOfGroup(group)
         while unit ~= nil do
-            jass.GroupRemoveUnit(group, unit)
+            jass:GroupRemoveUnit(group, unit)
             if canBeHealed(nil, unit, sourcePlayer, target) then
                 doHeal(nil, {
                     HealSource = target,
@@ -113,9 +113,9 @@ function ____exports.doHealItemEffect(self, abilId, target, healHP, healMP)
                 })
                 doManaRegen(nil, unit, healMP, true)
             end
-            unit = jass.FirstOfGroup(group)
+            unit = jass:FirstOfGroup(group)
         end
-        jass.DestroyGroup(group)
+        jass:DestroyGroup(group)
         return
     end
     if abilId == ABIL_A08C then

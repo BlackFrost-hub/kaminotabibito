@@ -43,12 +43,22 @@ export interface TaskUIScrollContext {
 
 // ── 模块级上下文（避免匿名闭包进 JASS） ──
 let wheelCtx: TaskUIScrollContext | null = null;
+/** N 槽：所有已注册的滚动上下文，滚轮/拖拽事件路由到可见的那个 */
+const allWheelCtxs: TaskUIScrollContext[] = [];
 /** 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc） */
 let taskThumbGlobalMouseTrig: unknown = null;
 
+function findVisibleWheelCtx(): TaskUIScrollContext | null {
+  for (let i = 0; i < allWheelCtxs.length; i++) {
+    const ctx = allWheelCtxs[i];
+    if (ctx.isVisible()) return ctx;
+  }
+  return wheelCtx;
+}
+
 function taskUIWheelEventPcallBody(): void {
-  const ctx = wheelCtx!;
-  if (!ctx.isVisible()) return;
+  const ctx = findVisibleWheelCtx();
+  if (!ctx || !ctx.isVisible()) return;
   if (!isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) return;
   handleTaskUIListWheel(ctx);
 }
@@ -160,7 +170,7 @@ function onThumbDragEnd(): void {
 
 /** 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc */
 function taskUIThumbPressPcallBody(): void {
-  const ctx = wheelCtx;
+  const ctx = findVisibleWheelCtx();
   if (!ctx || !ctx.isVisible()) return;
   if (!isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) {
     return;
@@ -203,6 +213,7 @@ function ensureTaskThumbGlobalMouseRegistered(): void {
 export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
   wheelCtx = ctx;
   dragCtx = ctx;
+  allWheelCtxs.push(ctx);
   ensureTaskThumbGlobalMouseRegistered();
 
   if (!ENABLE_MOUSE_WHEEL_SCROLL) return ctx.taskListWheelTrig;

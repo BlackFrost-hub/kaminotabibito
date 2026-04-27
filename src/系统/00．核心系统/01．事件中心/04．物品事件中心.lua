@@ -30,8 +30,8 @@ local function getNextListenerId(self)
 end
 --- 分发拾取事件到所有监听器
 local function dispatchPickupEvent(self)
-    local unit = jass.GetTriggerUnit()
-    local item = jass.GetManipulatedItem()
+    local unit = jass:GetTriggerUnit()
+    local item = jass:GetManipulatedItem()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
@@ -48,8 +48,8 @@ local function dispatchPickupEvent(self)
 end
 --- 分发丢弃事件到所有监听器
 local function dispatchDropEvent(self)
-    local unit = jass.GetTriggerUnit()
-    local item = jass.GetManipulatedItem()
+    local unit = jass:GetTriggerUnit()
+    local item = jass:GetManipulatedItem()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
@@ -66,8 +66,8 @@ local function dispatchDropEvent(self)
 end
 --- 分发使用事件到所有监听器
 local function dispatchUseEvent(self)
-    local unit = jass.GetTriggerUnit()
-    local item = jass.GetManipulatedItem()
+    local unit = jass:GetTriggerUnit()
+    local item = jass:GetManipulatedItem()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
@@ -87,36 +87,36 @@ local function initPickupTrigger(self)
     if pickupTrigger ~= nil then
         return
     end
-    pickupTrigger = jass.CreateTrigger()
+    pickupTrigger = jass:CreateTrigger()
     if pickupTrigger == nil or pickupTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(pickupTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    jass.TriggerAddAction(pickupTrigger, dispatchPickupEvent)
+    jass:TriggerAddAction(pickupTrigger, dispatchPickupEvent)
 end
 --- 初始化丢弃事件触发器
 local function initDropTrigger(self)
     if dropTrigger ~= nil then
         return
     end
-    dropTrigger = jass.CreateTrigger()
+    dropTrigger = jass:CreateTrigger()
     if dropTrigger == nil or dropTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(dropTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DROP_ITEM)
-    jass.TriggerAddAction(dropTrigger, dispatchDropEvent)
+    jass:TriggerAddAction(dropTrigger, dispatchDropEvent)
 end
 --- 初始化使用事件触发器
 local function initUseTrigger(self)
     if useTrigger ~= nil then
         return
     end
-    useTrigger = jass.CreateTrigger()
+    useTrigger = jass:CreateTrigger()
     if useTrigger == nil or useTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(useTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_USE_ITEM)
-    jass.TriggerAddAction(useTrigger, dispatchUseEvent)
+    jass:TriggerAddAction(useTrigger, dispatchUseEvent)
 end
 --- 注册物品拾取事件监听器
 -- 

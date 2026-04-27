@@ -78,8 +78,8 @@ local function ensureRuntimeQuest(self)
         rewards = {},
         status = QuestStatus.UNDISCOVERED,
         icon = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp",
-        createdAt = os.time(),
-        updatedAt = os.time()
+        createdAt = os:time(),
+        updatedAt = os:time()
     })
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
@@ -97,7 +97,7 @@ local function refreshQuestUI(self, desc, msg)
         if type(desc) == "string" and desc ~= "" then
             q.description = desc
         end
-        q.updatedAt = os.time()
+        q.updatedAt = os:time()
     end
     local triggerUIRefresh = questManager.triggerUIRefresh
     if type(triggerUIRefresh) == "function" then
@@ -153,7 +153,7 @@ local function parseDialogLines(self, dialogPreview)
 end
 local function calcDialogDuration(self, text)
     local n = #text
-    local t = 1 + math.floor(n / 10)
+    local t = 1 + math:floor(n / 10)
     if t < 2 then
         return 2
     end
@@ -258,7 +258,7 @@ local function createEvalEnv(self, triggerUnit)
         end
         if ty == "location" and key == "单位位置" and triggerUnit then
             if not cachedLoc then
-                cachedLoc = jass.GetUnitLoc(triggerUnit)
+                cachedLoc = jass:GetUnitLoc(triggerUnit)
             end
             return cachedLoc
         end
@@ -334,7 +334,7 @@ local function executeActionCode(self, code, triggerUnit)
         if type(p) == "function" then
             p(
                 nil,
-                (("[主线配置驱动] action执行失败: " .. code) .. " | err=") .. tostring(ok[1])
+                (("[主线配置驱动] action执行失败: " .. code) .. " | err=") .. tostring(nil, ok[1])
             )
         end
     end
@@ -347,14 +347,14 @@ local function runActionTimeline(self, timeline, triggerUnit)
                 executeActionCode(nil, e.code, triggerUnit)
                 goto __continue65
             end
-            local t = jass.CreateTimer()
-            jass.TimerStart(
+            local t = jass:CreateTimer()
+            jass:TimerStart(
                 t,
                 e.delay,
                 false,
                 function()
                     executeActionCode(nil, e.code, triggerUnit)
-                    jass.DestroyTimer(t)
+                    jass:DestroyTimer(t)
                 end
             )
         end
@@ -380,12 +380,12 @@ local function getHeroes(self)
     end
     local arr = {}
     local function cb(____, g)
-        local u = jass.FirstOfGroup(g)
+        local u = jass:FirstOfGroup(g)
         if u then
             arr[#arr + 1] = u
         end
     end
-    jass.ForGroup(group, cb)
+    jass:ForGroup(group, cb)
     return arr
 end
 local function hitFromStage(self, cfg, stage)
@@ -414,7 +414,7 @@ local function tick(self)
             end
             local matchedHero = nil
             for ____, hero in ipairs(heroes) do
-                if evalCondition(cfg.condition, hero) then
+                if evalCondition(nil, cfg.condition, hero) then
                     matchedHero = hero
                     break
                 end
@@ -504,11 +504,11 @@ local function reportMissingFunctions(self)
     if type(p) == "function" then
         p(
             nil,
-            "[主线配置驱动] 缺失函数统计 - condition: " .. tostring(_G.__mainQuestMissingReport.condition.length)
+            "[主线配置驱动] 缺失函数统计 - condition: " .. tostring(nil, _G.__mainQuestMissingReport.condition.length)
         )
         p(
             nil,
-            "[主线配置驱动] 缺失函数统计 - actionTimeline: " .. tostring(_G.__mainQuestMissingReport.actionTimeline.length)
+            "[主线配置驱动] 缺失函数统计 - actionTimeline: " .. tostring(nil, _G.__mainQuestMissingReport.actionTimeline.length)
         )
     end
 end

@@ -31,10 +31,10 @@ function ____exports.handleEdwardPassiveCost(self, unit, manaCost)
     if not ____exports.isEdwardUnit(nil, unit) then
         return
     end
-    local currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local currentLife = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
     local deductAmount = math.min(manaCost, currentLife - 1)
     if deductAmount > 0 then
-        jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife - deductAmount)
+        jass:SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife - deductAmount)
     end
 end
 return ____exports

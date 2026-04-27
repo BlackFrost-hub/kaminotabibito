@@ -53,7 +53,8 @@ local function createHiddenRoot(self, ctx, name, parent, width, height)
         name = name,
         parent = parent,
         template = "template",
-        visible = false
+        visible = false,
+        id = ctx.contextId
     }) or 0
     if not frame then
         return nil
@@ -68,7 +69,7 @@ local function createHiddenRoot(self, ctx, name, parent, width, height)
     )
     ctx:setFrameSize(frame, {width = width, height = height})
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, ROOT_LEVEL)
+        japi:DzFrameSetLevel(frame, ROOT_LEVEL)
     end
     return frame
 end
@@ -91,7 +92,7 @@ local function createHiddenText(self, ctx, name, parent, width, height)
     end
     setVisible(nil, frame, false)
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, TEXT_LEVEL)
+        japi:DzFrameSetLevel(frame, TEXT_LEVEL)
     end
     return frame
 end
@@ -103,14 +104,15 @@ local function createHiddenBackdrop(self, ctx, templateName, frameName, parent, 
             name = frameName,
             parent = parent,
             template = "template",
-            visible = false
+            visible = false,
+            id = ctx.contextId
         }) or 0
         if frame and texture then
             ctx:setFrameTexture(frame, texture)
         end
     end
     if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, BACKDROP_LEVEL)
+        japi:DzFrameSetLevel(frame, BACKDROP_LEVEL)
     end
     return frame or nil
 end
@@ -120,10 +122,11 @@ local function createPlainHiddenBackdrop(self, ctx, name, parent)
         name = name,
         parent = parent,
         template = "template",
-        visible = false
+        visible = false,
+        id = ctx.contextId
     }) or 0
     if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, ICON_LEVEL)
+        japi:DzFrameSetLevel(frame, ICON_LEVEL)
     end
     return frame or nil
 end
@@ -135,15 +138,16 @@ local function createHiddenButton(self, ctx, name, parent, onClick)
         template = "template",
         visible = false,
         enable = true,
-        alpha = 0
+        alpha = 0,
+        id = ctx.contextId
     }) or 0
     if not frame then
         return nil
     end
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, BUTTON_LEVEL)
+        japi:DzFrameSetLevel(frame, BUTTON_LEVEL)
     end
-    ctx:setFrameClickEvent(frame, onClick, false)
+    ctx:setFrameClickEvent(frame, onClick, true)
     return frame
 end
 local function createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)

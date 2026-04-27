@@ -41,11 +41,11 @@ function ____exports.doManaRegen(self, target, amount, showEffect)
     if target == nil or amount <= 0 then
         return 0
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_DEAD) then
         return 0
     end
-    local currentMana = jass.GetUnitState(target, jass.UNIT_STATE_MANA)
-    local maxMana = jass.GetUnitState(target, jass.UNIT_STATE_MAX_MANA)
+    local currentMana = jass:GetUnitState(target, jass.UNIT_STATE_MANA)
+    local maxMana = jass:GetUnitState(target, jass.UNIT_STATE_MAX_MANA)
     local actualRegen = math.min(
         amount,
         math.max(0, maxMana - currentMana)
@@ -53,7 +53,7 @@ function ____exports.doManaRegen(self, target, amount, showEffect)
     if actualRegen <= 0 then
         return 0
     end
-    jass.SetUnitState(target, jass.UNIT_STATE_MANA, currentMana + actualRegen)
+    jass:SetUnitState(target, jass.UNIT_STATE_MANA, currentMana + actualRegen)
     if showEffect then
         fireManaShowEvent(nil, target, actualRegen)
     end
@@ -69,6 +69,6 @@ function ____exports.fireManaRegenEvent(self, target, amount, source)
     YDLocal5Set(nil, "real", "HealAmount", amount)
     YDLocal5Set(nil, "unit", "HealTarget", target)
     YDLocal5Set(nil, "unit", "HealSource", source)
-    STES_Fire(nil, "恢复魔法事件")
+    STES_Fire(nil, nil, "恢复魔法事件")
 end
 return ____exports

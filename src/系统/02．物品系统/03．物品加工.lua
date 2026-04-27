@@ -49,7 +49,7 @@ local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
 local itemState = __TS__New(Map)
 local campfireItems = __TS__New(Map)
 local function isCampfire(self, u)
-    return jass.GetUnitTypeId(u) == CAMPFIRE_ID
+    return jass:GetUnitTypeId(u) == CAMPFIRE_ID
 end
 --- 使用 01．封装函数.ts 中的 stringToFourCC
 local function fourCCToInt(self, id)
@@ -57,14 +57,14 @@ local function fourCCToInt(self, id)
 end
 --- 使用 01．封装函数.ts 中的 fourCCToString
 local function getItemIdStr(self, item)
-    local itemId = jass.GetItemTypeId(item)
+    local itemId = jass:GetItemTypeId(item)
     return fourCCToString(nil, itemId)
 end
 local function getItemNameSafe(self, item)
-    return jass.GetItemName(item)
+    return jass:GetItemName(item)
 end
 local function getItemChargesSafe(self, item)
-    local n = jass.GetItemCharges(item)
+    local n = jass:GetItemCharges(item)
     local ____TS__Number_result_5 = __TS__Number(n)
     if ____TS__Number_result_5 == nil then
         ____TS__Number_result_5 = 0
@@ -77,11 +77,11 @@ local function setItemChargesSafe(self, item, n)
         return
     end
     local v = math.floor(n) or 1
-    jass.SetItemCharges(item, v > 0 and v or 1)
+    jass:SetItemCharges(item, v > 0 and v or 1)
 end
 local function getUnitXY(self, u)
-    local x = jass.GetUnitX(u)
-    local y = jass.GetUnitY(u)
+    local x = jass:GetUnitX(u)
+    local y = jass:GetUnitY(u)
     return {x = x, y = y}
 end
 local function floatBurnText(self, campfire, itemName)
@@ -217,10 +217,10 @@ local function pickResult(self, results)
         end
     end
     if total <= 0 then
-        local idx = math.random(1, #results)
+        local idx = math:random(1, #results)
         return results[idx]
     end
-    local roll = math.random() * total
+    local roll = math:random() * total
     do
         local i = 0
         while i < #results do
@@ -237,7 +237,7 @@ local function createItemAtCampfire(self, campfire, itemId)
     local ____getUnitXY_result_8 = getUnitXY(nil, campfire)
     local x = ____getUnitXY_result_8.x
     local y = ____getUnitXY_result_8.y
-    local item = jass.CreateItem(itemId, x, y)
+    local item = jass:CreateItem(itemId, x, y)
     if item then
         setLastCreatedItem(nil, item)
     end
@@ -247,14 +247,14 @@ local function tryGiveItemToCampfire(self, campfire, item)
     if not item then
         return false
     end
-    return not not jass.UnitAddItem(campfire, item)
+    return not not jass:UnitAddItem(campfire, item)
 end
 local function stopAndDestroyTimer(self, t)
     if not t then
         return
     end
     stopTimer(nil, t)
-    jass.DestroyTimer(t)
+    jass:DestroyTimer(t)
 end
 local function untrackItem(self, item)
     local st = itemState:get(item)
@@ -287,7 +287,7 @@ local function startBurnTimer(self, item, campfire, sec)
             end
             local name = getItemNameSafe(nil, item)
             floatBurnText(nil, campfire, name)
-            jass.RemoveItem(item)
+            jass:RemoveItem(item)
             untrackItem(nil, item)
         end
     )
@@ -296,7 +296,7 @@ local function startBurnTimer(self, item, campfire, sec)
     end
 end
 local function startCookTimer(self, item, campfire, recipe)
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if not t then
         return
     end
@@ -304,7 +304,7 @@ local function startCookTimer(self, item, campfire, recipe)
     if st then
         st.cookTimer = t
     end
-    jass.TimerStart(
+    jass:TimerStart(
         t,
         recipe.cookSec,
         false,
@@ -315,7 +315,7 @@ local function startCookTimer(self, item, campfire, recipe)
             playFinishEffect(nil, campfire)
             local chosen = pickResult(nil, recipe.results)
             local inputCharges = getItemChargesSafe(nil, item)
-            jass.RemoveItem(item)
+            jass:RemoveItem(item)
             untrackItem(nil, item)
             local timeout = recipe.timeoutSec > 0 and recipe.timeoutSec or 0
             local remaining = chosen.qty * inputCharges
@@ -327,9 +327,9 @@ local function startCookTimer(self, item, campfire, recipe)
                 setItemChargesSafe(nil, it, remaining)
                 local ok = tryGiveItemToCampfire(nil, campfire, it)
                 if not ok then
-                    local roll = math.random(1, 100)
+                    local roll = math:random(1, 100)
                     if roll > 20 then
-                        jass.RemoveItem(it)
+                        jass:RemoveItem(it)
                     end
                 else
                     itemState:set(it, {campfire = campfire, stage = "done"})
@@ -349,8 +349,8 @@ local function startCookTimer(self, item, campfire, recipe)
     )
 end
 local function onAnyPickup(self)
-    local u = jass.GetTriggerUnit()
-    local item = jass.GetManipulatedItem()
+    local u = jass:GetTriggerUnit()
+    local item = jass:GetManipulatedItem()
     if not u or not item then
         return
     end

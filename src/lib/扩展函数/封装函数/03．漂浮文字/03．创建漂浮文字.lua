@@ -63,15 +63,15 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
     if LeakWatcher and type(LeakWatcher.createTextTag) == "function" then
         ____temp_2 = LeakWatcher:createTextTag("float_text")
     else
-        ____temp_2 = jass.CreateTextTag()
+        ____temp_2 = jass:CreateTextTag()
     end
     local textTag = ____temp_2
     if not textTag then
         return nil
     end
     local sizeToHeight = size * 0.0023
-    jass.SetTextTagText(textTag, text, sizeToHeight)
-    jass.SetTextTagColor(
+    jass:SetTextTagText(textTag, text, sizeToHeight)
+    jass:SetTextTagColor(
         textTag,
         red,
         green,
@@ -79,17 +79,17 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
         alpha
     )
     if targetUnit then
-        jass.SetTextTagPosUnit(textTag, targetUnit, height)
+        jass:SetTextTagPosUnit(textTag, targetUnit, height)
     else
-        jass.SetTextTagPos(textTag, x, y, height)
+        jass:SetTextTagPos(textTag, x, y, height)
     end
-    jass.SetTextTagVisibility(textTag, true)
+    jass:SetTextTagVisibility(textTag, true)
     if speedX ~= 0 or speedY ~= 0 then
-        jass.SetTextTagVelocity(textTag, speedX, speedY)
+        jass:SetTextTagVelocity(textTag, speedX, speedY)
     end
     if not permanent and duration > 0 then
-        jass.SetTextTagLifespan(textTag, duration)
-        jass.SetTextTagFadepoint(textTag, duration - 0.5)
+        jass:SetTextTagLifespan(textTag, duration)
+        jass:SetTextTagFadepoint(textTag, duration - 0.5)
         local ticks = math.max(
             1,
             math.floor(duration / RECYCLE_TICK + 0.999)

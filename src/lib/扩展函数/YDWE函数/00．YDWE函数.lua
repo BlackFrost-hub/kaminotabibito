@@ -57,37 +57,37 @@ ____exports.ABILITY_DATA_UBERTIP = 218
 ____exports.ABILITY_DATA_UNUBERTIP = 219
 ____exports.ABILITY_DATA_UNART = 220
 function ____exports.EXGetUnitAbility(self, u, abilcode)
-    return japi.EXGetUnitAbility(u, abilcode)
+    return japi:EXGetUnitAbility(u, abilcode)
 end
 function ____exports.EXGetUnitAbilityByIndex(self, u, index)
-    return japi.EXGetUnitAbilityByIndex(u, index)
+    return japi:EXGetUnitAbilityByIndex(u, index)
 end
 function ____exports.EXGetAbilityId(self, abil)
-    return japi.EXGetAbilityId(abil)
+    return japi:EXGetAbilityId(abil)
 end
 function ____exports.EXGetAbilityState(self, abil, state_type)
-    return japi.EXGetAbilityState(abil, state_type)
+    return japi:EXGetAbilityState(abil, state_type)
 end
 function ____exports.EXSetAbilityState(self, abil, state_type, value)
-    return japi.EXSetAbilityState(abil, state_type, value)
+    return japi:EXSetAbilityState(abil, state_type, value)
 end
 function ____exports.EXGetAbilityDataReal(self, abil, level, data_type)
-    return japi.EXGetAbilityDataReal(abil, level, data_type)
+    return japi:EXGetAbilityDataReal(abil, level, data_type)
 end
 function ____exports.EXSetAbilityDataReal(self, abil, level, data_type, value)
-    return japi.EXSetAbilityDataReal(abil, level, data_type, value)
+    return japi:EXSetAbilityDataReal(abil, level, data_type, value)
 end
 function ____exports.EXGetAbilityDataInteger(self, abil, level, data_type)
-    return japi.EXGetAbilityDataInteger(abil, level, data_type)
+    return japi:EXGetAbilityDataInteger(abil, level, data_type)
 end
 function ____exports.EXSetAbilityDataInteger(self, abil, level, data_type, value)
-    return japi.EXSetAbilityDataInteger(abil, level, data_type, value)
+    return japi:EXSetAbilityDataInteger(abil, level, data_type, value)
 end
 function ____exports.EXGetAbilityDataString(self, abil, level, data_type)
-    return japi.EXGetAbilityDataString(abil, level, data_type)
+    return japi:EXGetAbilityDataString(abil, level, data_type)
 end
 function ____exports.EXSetAbilityDataString(self, abil, level, data_type, value)
-    return japi.EXSetAbilityDataString(abil, level, data_type, value)
+    return japi:EXSetAbilityDataString(abil, level, data_type, value)
 end
 function ____exports.YDWEGetUnitAbilityState(self, u, abilcode, state_type)
     return ____exports.EXGetAbilityState(
@@ -156,36 +156,36 @@ function ____exports.YDWESetUnitAbilityDataString(self, u, abilcode, level, data
     )
 end
 function ____exports.EXSetAbilityAEmeDataA(self, abil, unitid)
-    return japi.EXSetAbilityAEmeDataA(abil, unitid)
+    return japi:EXSetAbilityAEmeDataA(abil, unitid)
 end
 function ____exports.YDWEUnitTransform(self, u, abilcode, targetid)
-    jass.UnitAddAbility(u, abilcode)
+    jass:UnitAddAbility(u, abilcode)
     ____exports.EXSetAbilityDataInteger(
         nil,
         ____exports.EXGetUnitAbility(nil, u, abilcode),
         1,
         ____exports.ABILITY_DATA_UNITID,
-        jass.GetUnitTypeId(u)
+        jass:GetUnitTypeId(u)
     )
     ____exports.EXSetAbilityAEmeDataA(
         nil,
         ____exports.EXGetUnitAbility(nil, u, abilcode),
-        jass.GetUnitTypeId(u)
+        jass:GetUnitTypeId(u)
     )
-    jass.UnitRemoveAbility(u, abilcode)
-    jass.UnitAddAbility(u, abilcode)
+    jass:UnitRemoveAbility(u, abilcode)
+    jass:UnitAddAbility(u, abilcode)
     ____exports.EXSetAbilityAEmeDataA(
         nil,
         ____exports.EXGetUnitAbility(nil, u, abilcode),
         targetid
     )
-    jass.UnitRemoveAbility(u, abilcode)
+    jass:UnitRemoveAbility(u, abilcode)
 end
 function ____exports.EXGetItemDataString(self, itemcode, data_type)
-    return japi.EXGetItemDataString(itemcode, data_type)
+    return japi:EXGetItemDataString(itemcode, data_type)
 end
 function ____exports.EXSetItemDataString(self, itemcode, data_type, value)
-    return japi.EXSetItemDataString(itemcode, data_type, value)
+    return japi:EXSetItemDataString(itemcode, data_type, value)
 end
 function ____exports.YDWEGetItemDataString(self, itemcode, data_type)
     return ____exports.EXGetItemDataString(nil, itemcode, data_type)
@@ -194,16 +194,16 @@ function ____exports.YDWESetItemDataString(self, itemcode, data_type, value)
     return ____exports.EXSetItemDataString(nil, itemcode, data_type, value)
 end
 function ____exports.EXSetUnitFacing(self, u, angle)
-    japi.EXSetUnitFacing(u, angle)
+    japi:EXSetUnitFacing(u, angle)
 end
 function ____exports.EXPauseUnit(self, u, flag)
-    japi.EXPauseUnit(u, flag)
+    japi:EXPauseUnit(u, flag)
 end
 function ____exports.EXSetUnitCollisionType(self, enable, u, t)
-    japi.EXSetUnitCollisionType(enable, u, t)
+    japi:EXSetUnitCollisionType(enable, u, t)
 end
 function ____exports.EXSetUnitMoveType(self, u, t)
-    japi.EXSetUnitMoveType(u, t)
+    japi:EXSetUnitMoveType(u, t)
 end
 function ____exports.YDWEUnitAddStun(self, u)
     ____exports.EXPauseUnit(nil, u, true)
@@ -261,10 +261,10 @@ local typeNames = {
 function ____exports.getObjectProperty(self, objectType, objectId, property)
     if type(objectId) == "number" then
         local script = (((("(require'jass.slk')." .. typeNames[objectType + 1]) .. "[") .. tostring(objectId)) .. "].") .. property
-        return japi.EXExecuteScript(script) or ""
+        return japi:EXExecuteScript(script) or ""
     end
     local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t['") .. objectId) .. "']; if _u then return _u.") .. property) .. " else return '' end end)()"
-    return japi.EXExecuteScript(script) or ""
+    return japi:EXExecuteScript(script) or ""
 end
 function ____exports.getObjectPropertyInteger(self, objectType, objectId, property)
     local str = ____exports.getObjectProperty(nil, objectType, objectId, property)
@@ -295,17 +295,17 @@ function ____exports.getAbilityDataA(self, abilityId, level)
     return ____exports.getAbilityData(nil, abilityId, "A", level)
 end
 function ____exports.EXExecuteScript(self, script)
-    return japi.EXExecuteScript(script)
+    return japi:EXExecuteScript(script)
 end
 function ____exports.YDWEDistanceBetweenUnits(self, a, b)
-    local dx = jass.GetUnitX(a) - jass.GetUnitX(b)
-    local dy = jass.GetUnitY(a) - jass.GetUnitY(b)
-    return jass.SquareRoot(dx * dx + dy * dy)
+    local dx = jass:GetUnitX(a) - jass:GetUnitX(b)
+    local dy = jass:GetUnitY(a) - jass:GetUnitY(b)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 function ____exports.YDWEAngleBetweenUnits(self, fromUnit, toUnit)
-    return jglobals.bj_RADTODEG * jass.Atan2(
-        jass.GetUnitY(toUnit) - jass.GetUnitY(fromUnit),
-        jass.GetUnitX(toUnit) - jass.GetUnitX(fromUnit)
+    return jglobals.bj_RADTODEG * jass:Atan2(
+        jass:GetUnitY(toUnit) - jass:GetUnitY(fromUnit),
+        jass:GetUnitX(toUnit) - jass:GetUnitX(fromUnit)
     )
 end
 --- 待销毁特效列表
@@ -321,7 +321,7 @@ local function _tickEffectRecycle(self)
             entry.ticksLeft = entry.ticksLeft - 1
             if entry.ticksLeft <= 0 then
                 if entry.eff ~= nil then
-                    jass.DestroyEffect(entry.eff)
+                    jass:DestroyEffect(entry.eff)
                 end
                 __TS__ArraySplice(_pendingEffects, i, 1)
             end
@@ -338,7 +338,7 @@ function ____exports.YDWETimerDestroyEffect(self, duration, effect)
         return
     end
     if duration <= 0 then
-        jass.DestroyEffect(effect)
+        jass:DestroyEffect(effect)
         return
     end
     if not _effectRecycleRegistered then

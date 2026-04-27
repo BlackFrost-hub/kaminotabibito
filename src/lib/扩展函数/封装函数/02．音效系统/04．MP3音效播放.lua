@@ -31,23 +31,23 @@ local function scheduleDestroySoundIfNeeded(self, sound)
     if LW and type(LW.createTimer) == "function" then
         ____temp_1 = LW:createTimer("sound_ui_fallback_destroy")
     else
-        ____temp_1 = jass.CreateTimer()
+        ____temp_1 = jass:CreateTimer()
     end
     local t = ____temp_1
     if not t then
         return
     end
-    jass.TimerStart(
+    jass:TimerStart(
         t,
         0.55,
         false,
         function()
-            local expired = jass.GetExpiredTimer()
-            jass.DestroySound(sound)
+            local expired = jass:GetExpiredTimer()
+            jass:DestroySound(sound)
             if LW and type(LW.destroyTimer) == "function" then
                 LW:destroyTimer(expired)
             else
-                jass.DestroyTimer(expired)
+                jass:DestroyTimer(expired)
             end
         end
     )
@@ -87,7 +87,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
                 trackedByLeak = true
             end
         else
-            s = jass.CreateSound(
+            s = jass:CreateSound(
                 path,
                 false,
                 false,
@@ -98,30 +98,30 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             )
         end
         if s then
-            jass.SetSoundChannel(s, model.channel)
-            jass.SetSoundVolume(s, model.volume)
-            jass.SetSoundPitch(s, model.pitch)
-            local shouldPlay = not player or jass.GetLocalPlayer() == player
+            jass:SetSoundChannel(s, model.channel)
+            jass:SetSoundVolume(s, model.volume)
+            jass:SetSoundPitch(s, model.pitch)
+            local shouldPlay = not player or jass:GetLocalPlayer() == player
             if shouldPlay then
-                jass.StartSound(s)
+                jass:StartSound(s)
             end
             if LW and type(LW.killSoundWhenDone) == "function" then
                 LW:killSoundWhenDone(s)
             else
-                jass.KillSoundWhenDone(s)
+                jass:KillSoundWhenDone(s)
                 if trackedByLeak and LW and type(LW.releaseSound) == "function" then
                     LW:releaseSound(s)
                 end
             end
             lastPlayedSound = s
             if DEBUG_SOUND and _G.print then
-                _G.print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay)
+                _G:print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay)
             end
             return s
         end
     end
-    local pathHash = jass.StringHash(path)
-    local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
+    local pathHash = jass:StringHash(path)
+    local count = jass:LoadInteger(hash, pathHash, KEY_COUNT) or 0
     if count > POOL_MAX then
         count = POOL_MAX
     end
@@ -129,7 +129,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     do
         local i = 0
         while i < count do
-            if jass.LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE) then
+            if jass:LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE) then
                 availableIndex = i
                 break
             end
@@ -153,7 +153,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             model
         )
         if sound then
-            jass.SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
+            jass:SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
         end
     else
         sound = getSoundInternal(
@@ -169,11 +169,11 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     end
     if sound then
         if player then
-            if jass.GetLocalPlayer() == player then
-                jass.StartSound(sound)
+            if jass:GetLocalPlayer() == player then
+                jass:StartSound(sound)
             end
         else
-            jass.StartSound(sound)
+            jass:StartSound(sound)
         end
         lastPlayedSound = sound
     end

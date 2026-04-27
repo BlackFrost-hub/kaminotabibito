@@ -47,14 +47,14 @@ local function resolveSourceDisplayName(self, source)
     if source == nil or source == 0 then
         return nil
     end
-    local n = jass.GetUnitName(source)
+    local n = jass:GetUnitName(source)
     return type(n) == "string" and n ~= "" and n or nil
 end
 local function playOneShotEffectOnTarget(self, modelPath, target)
     if modelPath == "" or target == nil or target == 0 then
         return
     end
-    local eff = jass.AddSpecialEffectTarget(modelPath, target, "overhead")
+    local eff = jass:AddSpecialEffectTarget(modelPath, target, "overhead")
     if eff == nil or eff == 0 then
         return
     end
@@ -106,8 +106,8 @@ local function init(self)
     if STES_Register == nil then
         return
     end
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(
+    local trig = jass:CreateTrigger()
+    jass:TriggerAddAction(
         trig,
         function()
             ____exports.buffBridgeApplyFromYdlocal(nil, nil)

@@ -51,7 +51,7 @@ local function drawByWeightWithRepeat(pool, picks)
     do
         local i = 0
         while i < picks do
-            local r = math.random() * totalWeight
+            local r = math:random() * totalWeight
             for ____, entry in ipairs(pool) do
                 r = r - entry.weight
                 if r <= 0 then
@@ -67,7 +67,7 @@ end
 local function drawByEqualWithoutRepeat(pool, picks)
     local shuffled = __TS__ArraySort(
         {table.unpack(pool)},
-        function() return math.random() - 0.5 end
+        function() return math:random() - 0.5 end
     )
     local count = picks < #shuffled and picks or #shuffled
     return __TS__ArrayMap(
@@ -192,8 +192,8 @@ end
 -- @returns 创建的物品
 function ____exports.createDropItem(itemId, x, y)
     local jass = require("jass.common")
-    local item = jass.CreateItem(
-        jass.FourCC(itemId),
+    local item = jass:CreateItem(
+        jass:FourCC(itemId),
         x,
         y
     )

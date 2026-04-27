@@ -16,13 +16,13 @@ function ____exports.runTimerOnce(self, timer, delaySec, callback)
         callback(nil)
         return
     end
-    jass.TimerStart(
+    jass:TimerStart(
         timer,
         delaySec,
         false,
         function()
             callback(nil)
-            jass.DestroyTimer(timer)
+            jass:DestroyTimer(timer)
         end
     )
 end
@@ -37,13 +37,13 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
     if periodic == nil then
         periodic = false
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if not t then
         callback(nil)
         return nil
     end
     if periodic then
-        jass.TimerStart(
+        jass:TimerStart(
             t,
             delaySec,
             true,
@@ -52,13 +52,13 @@ function ____exports.withTimer(self, delaySec, callback, periodic, name)
             end
         )
     else
-        jass.TimerStart(
+        jass:TimerStart(
             t,
             delaySec,
             false,
             function()
                 callback(nil)
-                jass.DestroyTimer(t)
+                jass:DestroyTimer(t)
             end
         )
     end
@@ -71,7 +71,7 @@ function ____exports.stopTimer(self, t)
     if not t then
         return
     end
-    jass.PauseTimer(t)
-    jass.DestroyTimer(t)
+    jass:PauseTimer(t)
+    jass:DestroyTimer(t)
 end
 return ____exports

@@ -25,7 +25,9 @@ export interface BuildTaskEntryIconOpts {
   setFramePointRelative: any;
   setFrameClickEvent: any;
   applyDzTextFontAndCenterAlignment: any;
-  onTogglePanel: () => void;
+  onTogglePanel: (player: any) => void;
+  slotId: number;
+  contextId: number;
 }
 
 export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIconResult {
@@ -42,9 +44,12 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     setFrameClickEvent,
     applyDzTextFontAndCenterAlignment,
     onTogglePanel,
+    slotId,
+    contextId,
   } = opts;
 
-  const entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent);
+  const nameSuffix = `_s${slotId}`;
+  const entryFrame = tryCreateFromFdfOnly("TaskEntryIcon", parent, contextId);
   if (!entryFrame) return { entryFrame: null, entryText: null };
 
   setFramePosition(entryFrame, { point: FramePoint.TOPLEFT, x: ENTRY_X, y: ENTRY_Y });
@@ -64,7 +69,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
   const textFrame =
     createFrame({
       type: FrameType.TEXT,
-      name: "TaskEntryText",
+      name: "TaskEntryText" + nameSuffix,
       parent: entryFrame,
       template: "template",
       visible: true,
@@ -74,7 +79,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     setFramePointRelative(textFrame, titleRel.point, titleRel.relativeTo, titleRel.relativePoint, titleRel.x, titleRel.y);
     setFrameSize(textFrame, { width: tw, height: th });
   } else {
-    entryText = createTextLabel("TaskEntryText", entryFrame, "", titleRel, { width: tw, height: th });
+    entryText = createTextLabel("TaskEntryText" + nameSuffix, entryFrame, "", titleRel, { width: tw, height: th });
   }
 
   if (entryText != null && entryText !== 0) {
@@ -87,7 +92,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
   const btn =
     createFrame({
       type: FrameType.GLUETEXTBUTTON,
-      name: "TaskEntryBtn",
+      name: "TaskEntryBtn" + nameSuffix,
       parent: entryFrame,
       template: "template",
       visible: true,

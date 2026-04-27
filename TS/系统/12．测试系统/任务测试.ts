@@ -9,7 +9,9 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
 };
 
 import { questManager } from "../08．任务系统/02．任务管理器/index";
-const taskUI = require("../08．任务系统/04．任务UI拆分/12．任务UI管理器").taskUI;
+const taskUIManager = require("../08．任务系统/04．任务UI拆分/12．任务UI管理器") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
 import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数/04．硬件输入/index";
 
@@ -67,15 +69,11 @@ export function testUI(): void {
   debugPrint("测试任务UI...");
 
   (pcall as any)(() => {
-    taskUI.togglePanelByVisibilityOnly();
-    debugPrint("任务UI已显示");
-  });
-
-  withTimer(3, () => {
-    (pcall as any)(() => {
-      taskUI.togglePanelByVisibilityOnly();
-      debugPrint("任务UI已隐藏");
-    });
+    const p0 = jass.Player(0);
+    if (typeof taskUIManager.onPlayerHeroRegistered === "function") {
+      taskUIManager.onPlayerHeroRegistered(p0, null);
+    }
+    debugPrint("任务UI已为玩家0创建");
   });
 }
 

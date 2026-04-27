@@ -7,7 +7,7 @@ local untrack = ____01_FF0E_6838_5FC3_7EDF_8BA1.untrack
 local jass = require("jass.common")
 --- 创建计时器（记得用 destroyTimer 回收），tag 代表来源模块
 function ____exports.createTimer(self, tag)
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     track(nil, "timer", t, tag)
     return t
 end
@@ -16,6 +16,6 @@ function ____exports.destroyTimer(self, t)
         return
     end
     untrack(nil, "timer", t)
-    jass.DestroyTimer(t)
+    jass:DestroyTimer(t)
 end
 return ____exports

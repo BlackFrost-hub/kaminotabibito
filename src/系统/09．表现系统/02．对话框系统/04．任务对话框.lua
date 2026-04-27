@@ -19,10 +19,10 @@ function ____exports.showQuestButtons(self, state, visible, getLocalPlayer, getP
 end
 function ____exports.setQuestButtonTexts(self, state, acceptText, rejectText)
     if state.frames[10] and state.frames[10] ~= 0 then
-        japi.DzFrameSetText(state.frames[10], acceptText)
+        japi:DzFrameSetText(state.frames[10], acceptText)
     end
     if state.frames[11] and state.frames[11] ~= 0 then
-        japi.DzFrameSetText(state.frames[11], rejectText)
+        japi:DzFrameSetText(state.frames[11], rejectText)
     end
 end
 return ____exports

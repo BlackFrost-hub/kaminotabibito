@@ -34,7 +34,7 @@ local function isItemSkillByOrder(self, unit)
     if not unit then
         return false
     end
-    local currentOrder = jass.GetUnitCurrentOrder(unit)
+    local currentOrder = jass:GetUnitCurrentOrder(unit)
     if not currentOrder then
         return false
     end
@@ -42,7 +42,7 @@ local function isItemSkillByOrder(self, unit)
 end
 --- 获取技能唯一标识
 local function getSkillKey(self, unit, abilityId)
-    return (tostring(jass.GetHandleId(unit)) .. "_") .. tostring(abilityId)
+    return (tostring(jass:GetHandleId(unit)) .. "_") .. tostring(abilityId)
 end
 --- 获取技能描述模板
 -- 可以根据技能ID返回不同的模板
@@ -67,7 +67,7 @@ local function onSpellEffect(self, castingUnit, spellAbilityId)
     if not template then
         return
     end
-    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     if level <= 0 then
         return
     end

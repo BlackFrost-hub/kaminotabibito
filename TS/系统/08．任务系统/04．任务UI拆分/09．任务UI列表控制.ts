@@ -1,3 +1,4 @@
+const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 import { QuestData, QuestType } from "../01．任务数据";
@@ -241,6 +242,7 @@ export interface TaskUIListControlContext {
   currentPlayerId: number;
   currentCategory: QuestType;
   precreatedListPool: TaskUIPrecreatedListPool | null;
+  contextId: number;
   createTextLabel: any;
   FramePoint: any;
   FrameType: any;
@@ -284,8 +286,14 @@ export function handleTaskRowClick(): void {
   if (!binding) return;
   const questId = binding.page.questIds[binding.rowIndex];
   if (!questId) return;
-  currentTaskRowClickSound?.();
+  // sync=true 回调：expandedQuestId 修改在 toggleExpand 中对所有客户端同步执行
+  // 音效和 toggleExpandLocal（纯 UI）只对按键者执行
   currentTaskRowExpandHandler?.(questId);
+  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
+    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  if (triggerPlayer === jass.GetLocalPlayer()) {
+    currentTaskRowClickSound?.();
+  }
 }
 
 /** 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包 */

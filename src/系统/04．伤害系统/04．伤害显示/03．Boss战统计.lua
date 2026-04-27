@@ -37,9 +37,9 @@ function ____exports.updateBossDamageStats(source, target, damage)
         "force"
     )
     if target == bossUnit and source then
-        local sourcePlayer = jass.GetOwningPlayer(source)
-        if sourcePlayer and jass.IsPlayerInForce(sourcePlayer, playerForce) then
-            local bossLife = jass.GetUnitState(bossUnit, jass.UNIT_STATE_LIFE)
+        local sourcePlayer = jass:GetOwningPlayer(source)
+        if sourcePlayer and jass:IsPlayerInForce(sourcePlayer, playerForce) then
+            local bossLife = jass:GetUnitState(bossUnit, jass.UNIT_STATE_LIFE)
             local actualDamage = math.min(bossLife, damageInt)
             local ____YDUserDataGet_result_1 = YDUserDataGet(
                 nil,
@@ -63,10 +63,10 @@ function ____exports.updateBossDamageStats(source, target, damage)
         end
     end
     if source == bossUnit and target then
-        local targetPlayer = jass.GetOwningPlayer(target)
-        local isSummoned = jass.IsUnitType(target, jass.UNIT_TYPE_SUMMONED)
-        if not isSummoned and targetPlayer and jass.IsPlayerInForce(targetPlayer, playerForce) then
-            local bossLife = jass.GetUnitState(source, jass.UNIT_STATE_LIFE)
+        local targetPlayer = jass:GetOwningPlayer(target)
+        local isSummoned = jass:IsUnitType(target, jass.UNIT_TYPE_SUMMONED)
+        if not isSummoned and targetPlayer and jass:IsPlayerInForce(targetPlayer, playerForce) then
+            local bossLife = jass:GetUnitState(source, jass.UNIT_STATE_LIFE)
             local actualDamage = math.min(bossLife, damageInt)
             local ____YDUserDataGet_result_2 = YDUserDataGet(
                 nil,

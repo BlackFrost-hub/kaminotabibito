@@ -10,57 +10,57 @@ function ____exports.ModifyGateBJ(self, gateOperation, d)
     local OPEN = jglobals.bj_GATEOPERATION_OPEN
     local DESTROY = jglobals.bj_GATEOPERATION_DESTROY
     if gateOperation == CLOSE then
-        if jass.GetDestructableLife(d) <= 0 then
-            jass.DestructableRestoreLife(
+        if jass:GetDestructableLife(d) <= 0 then
+            jass:DestructableRestoreLife(
                 d,
-                jass.GetDestructableMaxLife(d),
+                jass:GetDestructableMaxLife(d),
                 true
             )
         end
-        jass.SetDestructableAnimation(d, "stand")
+        jass:SetDestructableAnimation(d, "stand")
         return
     end
     if gateOperation == OPEN then
-        if jass.GetDestructableLife(d) > 0 then
-            jass.KillDestructable(d)
+        if jass:GetDestructableLife(d) > 0 then
+            jass:KillDestructable(d)
         end
-        jass.SetDestructableAnimation(d, "death alternate")
+        jass:SetDestructableAnimation(d, "death alternate")
         return
     end
     if gateOperation == DESTROY then
-        if jass.GetDestructableLife(d) > 0 then
-            jass.KillDestructable(d)
+        if jass:GetDestructableLife(d) > 0 then
+            jass:KillDestructable(d)
         end
-        jass.SetDestructableAnimation(d, "death")
+        jass:SetDestructableAnimation(d, "death")
     end
 end
 function ____exports.GetUnitsInRectMatching(self, r, filter)
-    local g = jass.CreateGroup()
+    local g = jass:CreateGroup()
     if not g then
         return nil
     end
-    jass.GroupEnumUnitsInRect(g, r, filter)
+    jass:GroupEnumUnitsInRect(g, r, filter)
     if filter then
-        jass.DestroyBoolExpr(filter)
+        jass:DestroyBoolExpr(filter)
     end
     return g
 end
 function ____exports.ForGroupBJ(self, whichGroup, callback)
     local wantDestroy = not not jglobals.bj_wantDestroyGroup
     jglobals.bj_wantDestroyGroup = false
-    jass.ForGroup(whichGroup, callback)
+    jass:ForGroup(whichGroup, callback)
     if wantDestroy then
-        jass.DestroyGroup(whichGroup)
+        jass:DestroyGroup(whichGroup)
     end
 end
 function ____exports.GetPlayersAll(self)
     return jglobals.bj_FORCE_ALL_PLAYERS
 end
 function ____exports.GetRandomDirectionDeg(self)
-    return jass.GetRandomReal(0, 360)
+    return jass:GetRandomReal(0, 360)
 end
 function ____exports.GetSpellAbilityId(self)
-    return jass.GetSpellAbilityId()
+    return jass:GetSpellAbilityId()
 end
 function ____exports.OrderIdToString(self, orderId)
     local c1 = orderId % 256
@@ -71,7 +71,7 @@ function ____exports.OrderIdToString(self, orderId)
 end
 ____exports.lastCreatedEffect = nil
 function ____exports.AddSpecialEffectTargetUnitBJ(self, attachPointName, targetWidget, modelName)
-    ____exports.lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName)
+    ____exports.lastCreatedEffect = jass:AddSpecialEffectTarget(modelName, targetWidget, attachPointName)
     return ____exports.lastCreatedEffect
 end
 function ____exports.OperatorDegreeMultiply(self, a, b)
@@ -88,11 +88,11 @@ end
 -- 先尝试OrderId，若为0再尝试UnitId
 function ____exports.String2OrderIdBJ(self, orderIdString)
     local orderId = 0
-    orderId = jass.OrderId(orderIdString)
+    orderId = jass:OrderId(orderIdString)
     if orderId ~= 0 then
         return orderId
     end
-    orderId = jass.UnitId(orderIdString)
+    orderId = jass:UnitId(orderIdString)
     if orderId ~= 0 then
         return orderId
     end

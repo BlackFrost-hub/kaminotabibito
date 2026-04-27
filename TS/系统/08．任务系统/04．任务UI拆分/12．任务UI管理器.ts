@@ -1,7 +1,7 @@
 /**
  * 12．任务UI管理器
- * 职责：全局单例 TaskUI 生命周期、持有引用、协调内容更新与本地显示控制。
- * 开局由 `10．index` 调用 `init()` 创建一套 UI（各客户端对称执行）；不再依赖英雄注册。
+ * N 槽架构：每个英雄注册的玩家创建一套任务 UI（全局创建），只显示给对应玩家（异步显隐）。
+ * 由 `00．玩家英雄获取桥接` 的 `onPlayerHeroRegistered` 触发创建。
  */
 
 const jass = require("jass.common") as any;
@@ -44,97 +44,50 @@ import {
   applyDzTextFontAndAlignment, applyDzTextFontAndCenterAlignment,
   createTabLabelTextOnBackdrop, setupTransparentGlueHitLayer,
 } from "../../00．核心系统/03．UI函数";
-import { ENABLE_TASK_UI_CLIENT } from "./01．任务UI常量";
+import { ENABLE_TASK_UI_CLIENT, MAX_PLAYERS, TAG_SLOT_OFFSET } from "./01．任务UI常量";
 
-// ── 模块级分发变量（避免匿名闭包进 JASS 回调） ──
-let mgr: TaskUI | null = null;
-let clickSoundCallback: (() => void) | null = null;
+// ── N 槽：按 playerId 索引的 TaskUI 数组 ──
+const taskUIs: TaskUI[] = [];
+let hotkeyRegistered = false;
+let refreshCallbackRegistered = false;
+
+/** 获取按键玩家对应的 playerId（-1 表示无效） */
+function getTriggerPlayerId(): number {
+  const tp = (japi as any).DzGetTriggerKeyPlayer != null
+    ? (japi as any).DzGetTriggerKeyPlayer()
+    : null;
+  if (tp == null || tp === 0) return -1;
+  const pid = jass.GetPlayerId(tp);
+  return (typeof pid === "number" && pid >= 0 && pid < MAX_PLAYERS) ? pid : -1;
+}
 
 function taskUIModulePlayClickSound(): void {
-  mgr?.playLocalClickSound();
+  const lp = jass.GetLocalPlayer();
+  const pid = jass.GetPlayerId(lp);
+  if (pid >= 0 && pid < taskUIs.length) {
+    taskUIs[pid]?.playLocalClickSound();
+  }
 }
 
 function taskUIModuleRowExpand(questId: string): void {
-  mgr?.toggleExpandForRow(questId);
+  const pid = getTriggerPlayerId();
+  if (pid >= 0 && pid < taskUIs.length) {
+    taskUIs[pid]?.toggleExpandForRow(questId);
+  }
 }
 
 function taskUIModuleSwitchCategory(type: QuestType): void {
-  taskUI.switchCategory(type);
+  const pid = getTriggerPlayerId();
+  if (pid >= 0 && pid < taskUIs.length) {
+    taskUIs[pid]?.switchCategory(type);
+  }
 }
 
 function taskUIModuleNoopTabTooltip(_msg: string): void {}
 
-function taskUIScrollCtxIsVisible(): boolean {
-  return mgr?.isVisible ?? false;
-}
-
-function taskUIScrollCtxGetCurrentPageCount(): number {
-  return mgr != null ? mgr.getPageCountForCurrentCategory() : 0;
-}
-
-function taskUIScrollCtxGetCurrentPage(): number {
-  return mgr?.currentPage ?? 0;
-}
-
-function taskUIScrollCtxSetCurrentPage(p: number): void {
-  if (mgr) mgr.currentPage = p;
-}
-
-function taskUIScrollCtxOnPageChanged(prev: number, next: number): void {
-  mgr?.applyScrollPageChanged(prev, next);
-}
-
-function taskUIListCtxPlayClickSound(): void {
-  taskUIModulePlayClickSound();
-}
-
-function taskUIListCtxUpdateScrollBar(pageCount: number, hasQuestRows: boolean): void {
-  mgr?.syncScrollBarVisibility(pageCount, hasQuestRows);
-}
-
-function taskUIListCtxToggleExpand(questId: string): void {
-  mgr?.toggleExpandForRow(questId);
-}
-
-function taskUIListCtxGetCurrentPage(type: QuestType): number {
-  return mgr != null ? mgr.listGetCurrentPage(type) : 0;
-}
-
-function taskUIListCtxSetCurrentPage(type: QuestType, page: number): void {
-  mgr?.listSetCurrentPage(type, page);
-}
-
-function taskUIListCtxGetExpandedQuestId(type: QuestType): string | null {
-  return mgr != null ? mgr.listGetExpandedQuestId(type) : null;
-}
-
-let __togglePanelTriggerPlayer: any = null;
-
-function taskUITogglePanelPcallBody(): void {
-  if (!taskUI) return;
-  taskUI.togglePanelSync(__togglePanelTriggerPlayer);
-  if (__togglePanelTriggerPlayer === jass.GetLocalPlayer()) {
-    clickSoundCallback?.();
-  }
-}
-
-// 统一的面板切换回调（键盘 J 键和鼠标点击入口图标共用）
-function dispatchTogglePanel(): void {
-  __togglePanelTriggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
-    ? (japi as any).DzGetTriggerKeyPlayer()
-    : jass.GetLocalPlayer();
-  pcall(taskUITogglePanelPcallBody);
-}
-
-function dispatchRefresh(): void {
-  if (mgr) mgr.rebuildPages();
-}
-
-function pcallDispatchRefreshBody(): void {
-  dispatchRefresh();
-}
-
 class TaskUI {
+  readonly slotId: number;
+  readonly playerId: number;
   entryFrame: number | null = null;
   mainPanel: number | null = null;
   listContainer: number | null = null;
@@ -150,13 +103,17 @@ class TaskUI {
   currentPage = 0;
   expandedQuestId: string | null = null;
   isVisible = false;
-  /** 防止 `init()` 被重复调用时叠多套帧与回调 */
-  private uiInitialized = false;
-  /** 列表/滚动上下文各建一次，避免每次 `rebuild` 分配新闭包对象 */
+  uiInitialized = false;
   private listCtxCache: TaskUIListControlContext | null = null;
   private scrollCtxCache: TaskUIScrollContext | null = null;
 
+  constructor(slotId: number) {
+    this.slotId = slotId;
+    this.playerId = slotId;
+  }
+
   private ensureUiContextCaches(): void {
+    const self = this;
     if (this.scrollCtxCache != null) return;
     this.scrollCtxCache = {
       mainPanel: this.mainPanel,
@@ -172,11 +129,11 @@ class TaskUI {
       registerMouseWheel: function (this: void, sync: boolean, cb: () => void, playerId?: number): unknown {
         return registerMouseWheelHardware(sync, cb, playerId);
       },
-      isVisible: taskUIScrollCtxIsVisible,
-      getCurrentPageCount: taskUIScrollCtxGetCurrentPageCount,
-      getCurrentPage: taskUIScrollCtxGetCurrentPage,
-      setCurrentPage: taskUIScrollCtxSetCurrentPage,
-      onPageChanged: taskUIScrollCtxOnPageChanged,
+      isVisible: () => self.isVisible,
+      getCurrentPageCount: () => self.getPageCountForCurrentCategory(),
+      getCurrentPage: () => self.currentPage,
+      setCurrentPage: (p: number) => { self.currentPage = p; },
+      onPageChanged: (prev: number, next: number) => { self.applyScrollPageChanged(prev, next); },
     };
 
     this.listCtxCache = {
@@ -185,6 +142,7 @@ class TaskUI {
       currentPlayerId: this.localPlayerId,
       currentCategory: this.currentCategory,
       precreatedListPool: this.precreatedListPool,
+      contextId: this.slotContextId,
       createTextLabel,
       FramePoint,
       FrameType,
@@ -198,48 +156,53 @@ class TaskUI {
       hideFrame,
       applyDzTextFontAndCenterAlignment,
       applyDzTextFontAndAlignment,
-      playClickSound: taskUIListCtxPlayClickSound,
-      updateScrollBarVisibility: taskUIListCtxUpdateScrollBar,
-      toggleExpand: taskUIListCtxToggleExpand,
-      getCurrentPage: taskUIListCtxGetCurrentPage,
-      setCurrentPage: taskUIListCtxSetCurrentPage,
-      getExpandedQuestId: taskUIListCtxGetExpandedQuestId,
+      playClickSound: () => { self.playLocalClickSound(); },
+      updateScrollBarVisibility: (pageCount: number, hasQuestRows: boolean) => { self.syncScrollBarVisibility(pageCount, hasQuestRows); },
+      toggleExpand: (questId: string) => { self.toggleExpandForRow(questId); },
+      getCurrentPage: (type: QuestType) => self.listGetCurrentPage(type),
+      setCurrentPage: (type: QuestType, page: number) => { self.listSetCurrentPage(type, page); },
+      getExpandedQuestId: (type: QuestType) => self.listGetExpandedQuestId(type),
     };
   }
 
-  init(): void {
+  init(playerId: number): void {
     if (!ENABLE_TASK_UI_CLIENT) return;
     if (this.uiInitialized) return;
-    mgr = this;
+    taskUIs[playerId] = this;
+    this.localPlayer = jass.Player(playerId);
+    this.localPlayerId = playerId;
     pcall(taskUIInitPcallBody);
   }
 
-  /** 供模块级 `taskUIInitPcallBody` 调用；初始化体须为顶层具名函数供 `pcall(具名)` 使用 */
+  /** nameSuffix 用于帧名区分不同槽位 */
+  private get nameSuffix(): string { return `_s${this.slotId}`; }
+  /** contextId 偏移用于 DzCreateFrame 区分不同槽位的 FDF 实例 */
+  private get slotContextId(): number { return this.slotId * TAG_SLOT_OFFSET; }
+
+  /** 供 `taskUIInitPcallBody` 调用 */
   runInitBodyInPcall(): void {
     const gameUI = getGameUI();
     if (!gameUI) return;
-    this.localPlayer = jass.GetLocalPlayer();
-    this.localPlayerId = this.resolveLocalPlayerId();
     this.createEntryIcon(gameUI);
     this.createMainPanel(gameUI);
     this.createListPool();
     this.registerTaskListWheel();
     this.resetToDefault();
     this.rebuildPages();
-    registerTaskUIRefreshCallback(dispatchRefresh);
+    registerTaskUIRefreshCallback();
     this.hidePanelState();
     this.hidePanelUI();
     this.uiInitialized = true;
   }
 
   private createEntryIcon(parent: number): void {
-    // 设置音效回调，供 dispatchTogglePanel 使用
-    clickSoundCallback = taskUIModulePlayClickSound;
     const res = buildTaskEntryIcon({
       japi, parent, FrameType, FramePoint, createFrame, createTextLabel,
       setFramePosition, setFrameSize, setFramePointRelative, setFrameClickEvent,
       applyDzTextFontAndCenterAlignment,
-      onTogglePanel: dispatchTogglePanel,
+      onTogglePanel: taskUIHotkeyTogglePanel,
+      slotId: this.slotId,
+      contextId: this.slotContextId,
     });
     this.entryFrame = res.entryFrame;
   }
@@ -253,6 +216,8 @@ class TaskUI {
       onClickSound: taskUIModulePlayClickSound,
       onSwitchCategory: taskUIModuleSwitchCategory,
       onShowTabTooltip: taskUIModuleNoopTabTooltip,
+      slotId: this.slotId,
+      contextId: this.slotContextId,
     });
     this.mainPanel = res.mainPanel;
     this.listContainer = res.listContainer;
@@ -285,13 +250,6 @@ class TaskUI {
     this.currentCategory = QuestType.MAIN;
     this.currentPage = 0;
     this.expandedQuestId = null;
-  }
-
-  private resolveLocalPlayerId(): number {
-    const lp = jass.GetLocalPlayer();
-    if (lp == null) return 0;
-    const pid = typeof jass.GetPlayerId === "function" ? jass.GetPlayerId(lp) : -1;
-    return pid < 0 ? 0 : pid;
   }
 
   playLocalClickSound(): void {
@@ -368,10 +326,21 @@ class TaskUI {
     this.switchCategorySync(triggerPlayer, type);
   }
 
-  private toggleExpand(questId: string): void {
+  /** sync=true 回调入口：展开/折叠，全局状态全房同步，UI 只对按键者执行 */
+  toggleExpandSync(player: any, questId: string): void {
     const oldExpanded = this.expandedQuestId;
     this.expandedQuestId = oldExpanded === questId ? null : questId;
-    toggleExpandLocal(this.precreatedListPool, this.currentCategory, this.currentPage, oldExpanded, questId);
+    const localPlayer = jass.GetLocalPlayer();
+    if (player === localPlayer) {
+      toggleExpandLocal(this.precreatedListPool, this.currentCategory, this.currentPage, oldExpanded, questId);
+    }
+  }
+
+  private toggleExpand(questId: string): void {
+    const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer != null
+      ? (japi as any).DzGetTriggerKeyPlayer()
+      : jass.GetLocalPlayer();
+    this.toggleExpandSync(triggerPlayer, questId);
   }
 
   private changeCurrentPage(delta: number): void {
@@ -434,7 +403,7 @@ class TaskUI {
     if (this.precreatedListPool) {
       for (const ct of [QuestType.MAIN, QuestType.SIDE, QuestType.DAILY]) {
         const cv = this.precreatedListPool.categories[ct];
-        if (cv) (japi as any).DzFrameShow(cv.root, false);
+        if (cv != null) (japi as any).DzFrameShow(cv.root, false);
       }
     }
     hideFrame(this.mainPanel);
@@ -448,6 +417,7 @@ class TaskUI {
     c.currentPlayerId = this.localPlayerId;
     c.currentCategory = this.currentCategory;
     c.precreatedListPool = this.precreatedListPool;
+    c.contextId = this.slotContextId;
     return c;
   }
 
@@ -464,12 +434,23 @@ class TaskUI {
   }
 }
 
+// ── pcall 槽位：供 TaskUI.init 内 pcall 调用 ──
+let pcallInitTarget: TaskUI | null = null;
+
 function taskUIInitPcallBody(): void {
-  mgr?.runInitBodyInPcall();
+  pcallInitTarget?.runInitBodyInPcall();
 }
 
-const taskUI = new TaskUI();
-export { taskUI };
+// ── 热键回调：sync=true 全房触发，按 triggerPlayerId 路由到对应槽位 ──
+let __togglePanelTriggerPlayer: any = null;
+
+function taskUITogglePanelPcallBody(): void {
+  const player = __togglePanelTriggerPlayer;
+  const pid = (player != null && player !== 0) ? jass.GetPlayerId(player) : -1;
+  if (pid >= 0 && pid < taskUIs.length) {
+    taskUIs[pid]?.togglePanelSync(player);
+  }
+}
 
 function taskUIHotkeyTogglePanel(player: any): void {
   __togglePanelTriggerPlayer = player;
@@ -477,19 +458,35 @@ function taskUIHotkeyTogglePanel(player: any): void {
 }
 
 function taskUIHotkeySwitchCategory(player: any, type: QuestType): void {
-  taskUI.switchCategorySync(player, type);
+  const pid = (player != null && player !== 0) ? jass.GetPlayerId(player) : -1;
+  if (pid >= 0 && pid < taskUIs.length) {
+    taskUIs[pid]?.switchCategorySync(player, type);
+  }
 }
 
-/** 地图加载时创建全局单例任务 UI（各客户端对称执行一次） */
-export function init(): void {
-  taskUI.init();
+/**
+ * 英雄注册回调：当玩家英雄注册时，为该玩家创建一套任务 UI。
+ * 由 `00．玩家英雄获取桥接` 调用。
+ * 所有客户端对称执行（全局创建），异步显隐。
+ */
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, _whichHero: any): void {
+  if (!ENABLE_TASK_UI_CLIENT) return;
+  if (whichPlayer == null || whichPlayer === 0) return;
+  const pid = jass.GetPlayerId(whichPlayer);
+  if (typeof pid !== "number" || pid < 0 || pid >= MAX_PLAYERS) return;
+  if (taskUIs[pid] != null) return;
+
+  const ui = new TaskUI(pid);
+  pcallInitTarget = ui;
+  ui.init(pid);
+  pcallInitTarget = null;
 }
 
-// 热键不在此模块顶层注册：与 `系统.08．任务系统.10．index` 中 `registerHotkey()` 重复会导致同一键挂两个触发器，一次松键 toggle 两次（J「无效」）。
-// 由 `10．index` 在 `require("…03．任务UI")` 之后统一调用 `registerHotkey()`；`05．任务UI热键` 内另有 `taskUIKeybindsInstalled` 防重复。
-
+/** 热键注册：全局只注册一次 */
 export function registerHotkey(): void {
   if (!ENABLE_TASK_UI_CLIENT) return;
+  if (hotkeyRegistered) return;
+  hotkeyRegistered = true;
   registerTaskUIHotkeys({
     registerKeyUpSync, KEY, KEY_NUM,
     onTogglePanelSync: taskUIHotkeyTogglePanel,
@@ -499,14 +496,22 @@ export function registerHotkey(): void {
 
 /**
  * 注册任务UI刷新回调。
- * 当任务数据变化时，重建UI列表。
+ * 当任务数据变化时，遍历所有已创建槽位重建UI列表。
  */
 function onQuestManagerUiRefresh(_playerId: number, _questId?: string): void {
-  pcall(pcallDispatchRefreshBody);
+  for (let i = 0; i < taskUIs.length; i++) {
+    const ui = taskUIs[i];
+    if (ui == null || !ui.uiInitialized) continue;
+    ui.pagesDirty = true;
+    if (ui.isVisible) {
+      ui.rebuildPages();
+    }
+  }
 }
 
-/** 当前仅由 `init` 调用；参数保留与旧调用点兼容，实现固定走 `dispatchRefresh` */
-export function registerTaskUIRefreshCallback(_rebuildPages: () => void): void {
+export function registerTaskUIRefreshCallback(): void {
+  if (refreshCallbackRegistered) return;
+  refreshCallbackRegistered = true;
   if (!questManager || typeof questManager.registerUIRefreshCallback !== "function") return;
   questManager.registerUIRefreshCallback(onQuestManagerUiRefresh);
 }

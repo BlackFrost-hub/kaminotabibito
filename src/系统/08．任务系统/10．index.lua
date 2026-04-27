@@ -25,7 +25,7 @@ end
 --- 注册20个假的主线任务用于测试（状态为进行中，直接显示在UI中）
 local function registerDummyMainQuests(self)
     local db = QuestDatabase:getInstance()
-    local now = os.time()
+    local now = os:time()
     do
         local i = 1
         while i <= 20 do
@@ -72,9 +72,6 @@ if ENABLE_QUEST_RUNTIME_CORE then
 end
 if ENABLE_QUEST_UI_MODULE then
     local manager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
-    if type(manager.init) == "function" then
-        manager:init()
-    end
     if type(manager.registerHotkey) == "function" then
         manager:registerHotkey()
     end

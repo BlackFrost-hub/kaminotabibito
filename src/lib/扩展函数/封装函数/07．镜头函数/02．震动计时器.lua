@@ -12,18 +12,18 @@ function ____exports.CameraShakeForPlayer(self, whichPlayer, magnitude, duration
     CameraSetEQNoiseForPlayer(nil, whichPlayer, magnitude)
     local existing = cameraTimers:get(whichPlayer)
     if existing then
-        jass.DestroyTimer(existing)
+        jass:DestroyTimer(existing)
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     cameraTimers:set(whichPlayer, t)
-    jass.TimerStart(
+    jass:TimerStart(
         t,
         duration,
         false,
         function()
             CameraClearNoiseForPlayer(nil, whichPlayer)
             cameraTimers:delete(whichPlayer)
-            jass.DestroyTimer(t)
+            jass:DestroyTimer(t)
         end
     )
 end

@@ -17,8 +17,8 @@ function cancelBubbleEffectSchedule(self, playerId)
     end
     local t = g_bubbleScheduleTimers[playerId + 1]
     if t then
-        jass.PauseTimer(t)
-        jass.DestroyTimer(t)
+        jass:PauseTimer(t)
+        jass:DestroyTimer(t)
         g_bubbleScheduleTimers[playerId + 1] = nil
     end
 end
@@ -68,21 +68,21 @@ local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
     end
-    local id = jass.GetUnitTypeId(unit)
+    local id = jass:GetUnitTypeId(unit)
     if id ~= nil and id ~= 0 then
         return id
     end
-    return jass.GetHandleId(unit)
+    return jass:GetHandleId(unit)
 end
 local function dzGetPlayerId(self, p)
-    return jass.GetPlayerId(p)
+    return jass:GetPlayerId(p)
 end
 local function cancelTimerHandle(self, t)
     if not t then
         return
     end
-    jass.PauseTimer(t)
-    jass.DestroyTimer(t)
+    jass:PauseTimer(t)
+    jass:DestroyTimer(t)
 end
 local function cancelPendingGrayMarkerTimerForHandle(self, key)
     if key == 0 then
@@ -222,8 +222,8 @@ local function npcUnitsSameForBubble(self, a, b)
     if not a or not b then
         return false
     end
-    local ha = jass.GetHandleId(a)
-    local hb = jass.GetHandleId(b)
+    local ha = jass:GetHandleId(a)
+    local hb = jass:GetHandleId(b)
     if ha ~= 0 and ha == hb then
         return true
     end
@@ -253,16 +253,16 @@ function ____exports.scheduleBubbleEffectAfterOverheadClear(self, playerId, npcU
         ____exports.createBubbleEffect(nil, playerId, npcUnit)
         return
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     g_bubbleScheduleTimers[playerId + 1] = t
-    jass.TimerStart(
+    jass:TimerStart(
         t,
         ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY,
         false,
         function()
             g_bubbleScheduleTimers[playerId + 1] = nil
-            jass.PauseTimer(t)
-            jass.DestroyTimer(t)
+            jass:PauseTimer(t)
+            jass:DestroyTimer(t)
             local uNow = g_npcUnits[playerId + 1]
             if not npcUnitsSameForBubble(nil, uNow, npcUnit) then
                 return

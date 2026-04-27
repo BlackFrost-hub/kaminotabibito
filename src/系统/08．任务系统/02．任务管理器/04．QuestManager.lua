@@ -68,7 +68,7 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
     if not quest or not quest.timeLimit or quest.timeLimit <= 0 then
         return
     end
-    local timer = jass.CreateTimer()
+    local timer = jass:CreateTimer()
     if not timer then
         return
     end
@@ -80,12 +80,12 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
     end
     local timerData = ____G___questTimers_3
     timerData:set(timer, {playerId = playerId, questId = questId})
-    jass.TimerStart(
+    jass:TimerStart(
         timer,
         quest.timeLimit,
         false,
         function()
-            local expired = jass.GetExpiredTimer()
+            local expired = jass:GetExpiredTimer()
             local ____opt_4 = _G.__questTimers
             if ____opt_4 ~= nil then
                 ____opt_4 = ____opt_4:get(expired)
@@ -99,8 +99,8 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
                 ____exports.QuestManager:getInstance():onQuestFailed(data.playerId, data.questId)
                 _G.__questTimers:delete(expired)
             end
-            jass.PauseTimer(expired)
-            jass.DestroyTimer(expired)
+            jass:PauseTimer(expired)
+            jass:DestroyTimer(expired)
         end
     )
     questDebugPrint(
@@ -142,7 +142,7 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     local success = questDB:abandonQuest(playerId, questId)
     if success then
         if nativeHandle then
-            jass.DestroyQuest(nativeHandle)
+            jass:DestroyQuest(nativeHandle)
         end
         self:triggerUIRefresh(playerId, questId)
         showAbandonedQuestNotice(nil, playerId, questId)

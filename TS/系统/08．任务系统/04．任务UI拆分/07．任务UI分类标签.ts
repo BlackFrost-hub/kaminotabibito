@@ -83,6 +83,8 @@ export interface BuildTaskCategoryTabsOpts {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
+  slotId: number;
+  contextId: number;
 }
 
 function createTaskTab(opts: {
@@ -106,6 +108,8 @@ function createTaskTab(opts: {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
+  contextId: number;
+  nameSuffix: string;
 }): TabPair {
   const {
     japi,
@@ -128,9 +132,11 @@ function createTaskTab(opts: {
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    contextId,
+    nameSuffix,
   } = opts;
 
-  const bg = tryCreateFromFdfOnly(bgName, tabParent);
+  const bg = tryCreateFromFdfOnly(bgName, tabParent, contextId);
   if (bg) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
@@ -140,11 +146,11 @@ function createTaskTab(opts: {
   }
 
   if (bg) {
-    const tabLabel = createTabLabelTextOnBackdrop(bg, labelName, labelText, TAB_CATEGORY_FONT_SCALE);
+    const tabLabel = createTabLabelTextOnBackdrop(bg, labelName + nameSuffix, labelText, TAB_CATEGORY_FONT_SCALE);
     if (tabLabel && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(tabLabel, 8);
   }
 
-  const tab = tryCreateFromFdfOnly(tabName, tabParent);
+  const tab = tryCreateFromFdfOnly(tabName, tabParent, contextId);
   if (tab) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(tab);
     if (bg) {
@@ -185,8 +191,10 @@ export function buildTaskPanelCategoryTabs(opts: BuildTaskCategoryTabsOpts): Tas
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    slotId,
+    contextId,
   } = opts;
-
+  const nameSuffix = `_s${slotId}`;
   const common = {
     japi,
     tabParent,
@@ -201,6 +209,8 @@ export function buildTaskPanelCategoryTabs(opts: BuildTaskCategoryTabsOpts): Tas
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    contextId,
+    nameSuffix,
   };
   const mainResult = createTaskTab({
     ...common,

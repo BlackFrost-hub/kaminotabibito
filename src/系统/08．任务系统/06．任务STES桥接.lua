@@ -48,13 +48,13 @@ end
 local function resolvePlayerIdFromTrigger()
     local pl = nil
     if type(jass.STES_GetTriggerPlayer) == "function" then
-        pl = jass.STES_GetTriggerPlayer()
+        pl = jass:STES_GetTriggerPlayer()
     end
     if pl == nil then
-        pl = jass.GetTriggerPlayer()
+        pl = jass:GetTriggerPlayer()
     end
     if pl ~= nil then
-        local id = jass.GetPlayerId(pl)
+        local id = jass:GetPlayerId(pl)
         if type(id) == "number" and id >= 0 and id < 16 then
             return id
         end
@@ -154,8 +154,8 @@ function ____exports.registerSimpleSTESBridgeEvent(self, eventName, onEvent, deb
         debugPrint(nil, ("STES_Register 不可用，无法注册" .. debugMsg) .. "事件")
         return
     end
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(
+    local trig = jass:CreateTrigger()
+    jass:TriggerAddAction(
         trig,
         function()
             do
@@ -197,9 +197,9 @@ local function init(self)
             if not row then
                 goto __continue37
             end
-            local trig = jass.CreateTrigger()
+            local trig = jass:CreateTrigger()
             local key = eventKey
-            jass.TriggerAddAction(
+            jass:TriggerAddAction(
                 trig,
                 function()
                     runStesObjectiveCallback(nil, key)

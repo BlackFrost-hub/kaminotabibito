@@ -94,7 +94,7 @@ function ____exports.isDescendantOf(self, japi, frame, ancestor)
             end
             local ____temp_0
             if type(japi.DzFrameGetParent) == "function" then
-                ____temp_0 = japi.DzFrameGetParent(cur)
+                ____temp_0 = japi:DzFrameGetParent(cur)
             else
                 ____temp_0 = 0
             end

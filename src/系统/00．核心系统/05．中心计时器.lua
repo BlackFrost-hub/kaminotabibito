@@ -398,11 +398,11 @@ function ____exports.initCenterTimer(self)
         return
     end
     if bootstrapTimer then
-        jass.DestroyTimer(bootstrapTimer)
+        jass:DestroyTimer(bootstrapTimer)
         bootstrapTimer = nil
     end
     _initialized = true
-    local startTime = japi.DzAPI_Map_GetGameStartTime()
+    local startTime = japi:DzAPI_Map_GetGameStartTime()
     _serverTime = startTime * 1000
     local dr = jassGlobals.udg_N
     if dr ~= nil then
@@ -412,9 +412,9 @@ function ____exports.initCenterTimer(self)
         )
     end
     calcDate(nil, _serverTime / 1000)
-    local timer = jass.CreateTimer()
-    jass.TimerStart(timer, 0.01, true, onTick)
+    local timer = jass:CreateTimer()
+    jass:TimerStart(timer, 0.01, true, onTick)
 end
-bootstrapTimer = jass.CreateTimer()
-jass.TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
+bootstrapTimer = jass:CreateTimer()
+jass:TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
 return ____exports

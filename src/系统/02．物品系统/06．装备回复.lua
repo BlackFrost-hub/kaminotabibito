@@ -60,18 +60,18 @@ local function applyHpMpToUnit(unit, hp, mp)
         return
     end
     if hp > 0 and jass.UNIT_STATE_LIFE ~= nil and jass.UNIT_STATE_MAX_LIFE ~= nil then
-        local cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-        local maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
-        jass.SetUnitState(
+        local cur = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
+        local maxL = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+        jass:SetUnitState(
             unit,
             jass.UNIT_STATE_LIFE,
             math.min(maxL, cur + hp)
         )
     end
     if mp > 0 and jass.UNIT_STATE_MANA ~= nil and jass.UNIT_STATE_MAX_MANA ~= nil then
-        local curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
-        local maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
-        jass.SetUnitState(
+        local curM = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
+        local maxM = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+        jass:SetUnitState(
             unit,
             jass.UNIT_STATE_MANA,
             math.min(maxM, curM + mp)
@@ -85,11 +85,11 @@ local function applyHpMpToUnitAndGetApplied(unit, hp, mp)
     end
     local lifeBefore = 0
     local manaBefore = 0
-    lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
+    lifeBefore = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    manaBefore = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
     applyHpMpToUnit(unit, hp, mp)
-    local lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    local manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
+    local lifeAfter = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local manaAfter = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
     return {
         hpApplied = math.max(0, lifeAfter - lifeBefore),
         mpApplied = math.max(0, manaAfter - manaBefore)
@@ -101,8 +101,8 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
     if stesHT == nil or stesHT == 0 then
         return
     end
-    local hash = jass.StringHash(____exports.ITEM_HEAL_STES_EVENT)
-    local loopIndex = jass.LoadInteger(
+    local hash = jass:StringHash(____exports.ITEM_HEAL_STES_EVENT)
+    local loopIndex = jass:LoadInteger(
         stesHT,
         hash,
         ydlStes_skeyIndex(nil, nil)
@@ -112,7 +112,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
         local i = 0
         while i < loopIndex do
             do
-                local trg = jass.LoadTriggerHandle(stesHT, hash, i)
+                local trg = jass:LoadTriggerHandle(stesHT, hash, i)
                 if trg == nil or trg == 0 then
                     goto __continue11
                 end
@@ -144,13 +144,13 @@ local function onItemHealStesChild()
             local item = YDLocal5Get(nil, "item", YL_ITEM)
             ydlStes_readString5(nil, nil, YL_ABIL)
             if unit == nil or unit == 0 then
-                unit = jass.GetManipulatingUnit()
+                unit = jass:GetManipulatingUnit()
                 if unit == nil or unit == 0 then
-                    unit = jass.GetTriggerUnit()
+                    unit = jass:GetTriggerUnit()
                 end
             end
             if item == nil or item == 0 then
-                item = jass.GetManipulatedItem()
+                item = jass:GetManipulatedItem()
             end
             local hp = rawHp
             local mp = rawMp
@@ -197,25 +197,25 @@ local function executeSegment(self, unit, item, seg)
     )
 end
 local function onUseItem()
-    local unit = jass.GetManipulatingUnit()
+    local unit = jass:GetManipulatingUnit()
     if unit == nil then
-        unit = jass.GetTriggerUnit()
+        unit = jass:GetTriggerUnit()
     end
-    local item = jass.GetManipulatedItem()
+    local item = jass:GetManipulatedItem()
     if not unit or not item then
         return
     end
     if isSpecialUnit(nil, unit) then
         return
     end
-    local itemId = jass.GetItemTypeId(item)
+    local itemId = jass:GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
         return
     end
     local glob = _G
-    local key = (tostring(unit) .. "_") .. idStr
+    local key = (tostring(nil, unit) .. "_") .. idStr
     if glob.__EquipHealExecutedKey == key then
         return
     end
@@ -260,8 +260,8 @@ local function init()
     end
     glob[INIT_KEY] = true
     if not glob[STES_REG_KEY] and STES_Register ~= nil then
-        local stesTrig = jass.CreateTrigger()
-        jass.TriggerAddAction(
+        local stesTrig = jass:CreateTrigger()
+        jass:TriggerAddAction(
             stesTrig,
             function()
                 onItemHealStesChild()

@@ -33,7 +33,7 @@ function ____exports.AtanBJ(self, value)
 end
 --- 反正切2（返回角度）
 function ____exports.Atan2BJ(self, y, x)
-    return jass.Atan2(y, x) * BJ_RADTODEG
+    return jass:Atan2(y, x) * BJ_RADTODEG
 end
 --- 实数绝对值 - RAbsBJ
 function ____exports.RAbsBJ(self, a)
@@ -77,9 +77,9 @@ function ____exports.AngleBetweenPoints(self, locA, locB)
     if locA == nil or locB == nil then
         return 0
     end
-    local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
-    local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
-    return jass.Atan2(dy, dx) * BJ_RADTODEG
+    local dx = jass:GetLocationX(locB) - jass:GetLocationX(locA)
+    local dy = jass:GetLocationY(locB) - jass:GetLocationY(locA)
+    return jass:Atan2(dy, dx) * BJ_RADTODEG
 end
 --- 两点之间距离 - DistanceBetweenPoints
 -- 对应 Blizzard.j: DistanceBetweenPoints
@@ -87,8 +87,8 @@ function ____exports.DistanceBetweenPoints(self, locA, locB)
     if locA == nil or locB == nil then
         return 0
     end
-    local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
-    local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
+    local dx = jass:GetLocationX(locB) - jass:GetLocationX(locA)
+    local dy = jass:GetLocationY(locB) - jass:GetLocationY(locA)
     return math.sqrt(dx * dx + dy * dy)
 end
 --- 整数最大值 - IMaxBJ
@@ -109,7 +109,7 @@ function ____exports.RMinBJ(self, a, b)
 end
 --- 百分比转整数 - PercentToInt
 function ____exports.PercentToInt(self, percentage, max)
-    return jass.R2I(percentage * 0.01 * max)
+    return jass:R2I(percentage * 0.01 * max)
 end
 --- 百分比转255 - PercentTo255
 function ____exports.PercentTo255(self, percentage)

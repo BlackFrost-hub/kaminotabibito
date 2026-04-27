@@ -9,7 +9,7 @@ function registerKey(status, keyCode, action)
     _____786C_4EF6_51FD_6570:registerKeyEventRawStatus(keyCode, status, true, action)
 end
 function dispatchTabKey(show)
-    if _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() ~= jass.GetLocalPlayer() then
+    if _____786C_4EF6_51FD_6570:getTriggerKeyPlayer() ~= jass:GetLocalPlayer() then
         return
     end
     showDamagePanel(show)
@@ -37,8 +37,8 @@ function dispatchFocusHotkey(keyCode)
     end
     ____Star_6269_5C55_5E93:StarOther_PanCameraToTimedForPlayer(
         p,
-        jass.GetUnitX(hero),
-        jass.GetUnitY(hero),
+        jass:GetUnitX(hero),
+        jass:GetUnitY(hero),
         0.05
     )
 end

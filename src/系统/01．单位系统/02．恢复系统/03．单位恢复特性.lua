@@ -14,7 +14,7 @@ local stringToFourCC = ____require_result_0.stringToFourCC
 -- @param unit 目标单位
 -- @returns 生命恢复倍率（默认1.0）
 function ____exports.getUnitLifeRegenMultiplier(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+    local unitTypeId = jass:GetUnitTypeId(unit)
     for ____, ____value in ipairs(__TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS)) do
         local idStr = ____value[1]
         local trait = ____value[2]
@@ -29,7 +29,7 @@ end
 -- @param unit 目标单位
 -- @returns 魔法恢复倍率（默认1.0）
 function ____exports.getUnitManaRegenMultiplier(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+    local unitTypeId = jass:GetUnitTypeId(unit)
     for ____, ____value in ipairs(__TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS)) do
         local idStr = ____value[1]
         local trait = ____value[2]

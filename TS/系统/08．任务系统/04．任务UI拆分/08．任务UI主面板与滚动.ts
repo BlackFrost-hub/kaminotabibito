@@ -59,6 +59,8 @@ export interface BuildTaskMainPanelOpts {
   onClickSound: () => void;
   onSwitchCategory: (type: QuestType) => void;
   onShowTabTooltip: (msg: string) => void;
+  slotId: number;
+  contextId: number;
 }
 
 export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanelResult {
@@ -81,7 +83,11 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    slotId,
+    contextId,
   } = opts;
+
+  const nameSuffix = `_s${slotId}`;
 
   const empty: BuildMainPanelResult = {
     mainPanel: null,
@@ -98,7 +104,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     vScrollTrack: null,
   };
 
-  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent, contextId);
   if (!mainPanel) return empty;
 
   if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
@@ -113,7 +119,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel, contextId);
   if (listContainer) {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
     setFramePointRelative(
@@ -141,6 +147,8 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     onClickSound,
     onSwitchCategory,
     onShowTabTooltip,
+    slotId,
+    contextId,
   });
 
   let scrollBarFrame: number | null = null;
@@ -152,13 +160,13 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       const f =
         createFrame({
           type: FrameType.BACKDROP,
-          name: "TaskScrollBarBtn",
+          name: "TaskScrollBarBtn" + nameSuffix,
           parent: mainPanel,
           template: "template",
           visible: true,
         }) ?? 0;
       return f;
-    });
+    }, contextId);
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -172,7 +180,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollThumbFrame =
       createFrame({
         type: FrameType.BACKDROP,
-        name: "TaskScrollThumbDyn",
+        name: "TaskScrollThumbDyn" + nameSuffix,
         parent: mainPanel,
         template: "template",
         visible: true,

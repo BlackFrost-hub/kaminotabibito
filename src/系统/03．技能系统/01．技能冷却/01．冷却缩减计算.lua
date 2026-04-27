@@ -26,12 +26,12 @@ function ____exports.isBlacklistedSkill(self, abilityId)
 end
 --- 检查单位是否为特殊单位（E001不参与冷却缩减）
 function ____exports.isExcludedUnit(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+    local unitTypeId = jass:GetUnitTypeId(unit)
     return unitTypeId == stringToFourCC(nil, "E001")
 end
 --- 获取冷却缩减属性
 function ____exports.getCooldownReduction(self, unit)
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if player == nil then
         return 0
     end
@@ -45,7 +45,7 @@ function ____exports.getCooldownReduction(self, unit)
 end
 --- 获取冷却缩减加成属性（突破上限）
 function ____exports.getCooldownReductionBonus(self, unit)
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if player == nil then
         return 0
     end

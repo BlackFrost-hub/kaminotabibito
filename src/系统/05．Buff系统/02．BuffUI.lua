@@ -67,9 +67,11 @@ local function tryDzFrameSetTooltipF2i(self, hostFrame, tooltipFrame)
     if not hostFrame or hostFrame == 0 or not tooltipFrame or tooltipFrame == 0 then
         return
     end
-    pcall(function ()
-            local tipId = japi.DzF2I(tooltipFrame)
-            japi.DzFrameSetTooltip(hostFrame, tipId)
+    pcall(
+        nil,
+        function()
+            local tipId = japi:DzF2I(tooltipFrame)
+            japi:DzFrameSetTooltip(hostFrame, tipId)
         end
     )
 end
@@ -86,7 +88,7 @@ local function getFrameText(self, frame)
             return true, ""
         end
         local ____try, ____hasReturned, ____returnValue = pcall(function()
-            return true, japi.DzFrameGetText(frame) or ""
+            return true, japi:DzFrameGetText(frame) or ""
         end)
         if not ____try then
             ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -99,22 +101,30 @@ end
 local function onSlotEnter(self, index)
     local s = slots[index + 1]
     if s ~= nil and s.tipBox ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:showFrame(s.tipBox) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:showFrame(s.tipBox) end
         )
     end
     if s ~= nil and s.tipText ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:showFrame(s.tipText) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:showFrame(s.tipText) end
         )
     end
 end
 local function onSlotLeave(self, index)
     local s = slots[index + 1]
     if s ~= nil and s.tipText ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipText) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.tipText) end
         )
     end
     if s ~= nil and s.tipBox ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipBox) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.tipBox) end
         )
     end
 end
@@ -124,28 +134,28 @@ local function debugBuffUi(self, msg)
     if not ____exports.BUFF_UI_DEBUG then
         return
     end
-    local p = jass.GetLocalPlayer()
-    jass.DisplayTextToPlayer(p, 0, 0, "[BuffUI] " .. msg)
+    local p = jass:GetLocalPlayer()
+    jass:DisplayTextToPlayer(p, 0, 0, "[BuffUI] " .. msg)
 end
 local function countSelectedForPlayer(self, p)
     if not p or p == 0 then
         return {n = 0, sole = nil}
     end
-    local g = jass.CreateGroup()
+    local g = jass:CreateGroup()
     local useSelectedNative = true
     if useSelectedNative then
-        jass.GroupEnumUnitsSelected(g, p, nil)
+        jass:GroupEnumUnitsSelected(g, p, nil)
     end
     local n = 0
     local sole = nil
     while true do
         do
-            local u = jass.FirstOfGroup(g)
+            local u = jass:FirstOfGroup(g)
             if not u or u == 0 then
                 break
             end
-            jass.GroupRemoveUnit(g, u)
-            if not useSelectedNative and not jass.IsUnitSelected(u, p) then
+            jass:GroupRemoveUnit(g, u)
+            if not useSelectedNative and not jass:IsUnitSelected(u, p) then
                 goto __continue29
             end
             n = n + 1
@@ -155,7 +165,7 @@ local function countSelectedForPlayer(self, p)
         end
         ::__continue29::
     end
-    jass.DestroyGroup(g)
+    jass:DestroyGroup(g)
     return {n = n, sole = sole}
 end
 local function getSoleSelectedUnitForPlayer(self, p)
@@ -171,7 +181,7 @@ local function isUnitRefLikelyValid(self, u)
     if u == nil or u == 0 then
         return false
     end
-    local tid = jass.GetUnitTypeId(u)
+    local tid = jass:GetUnitTypeId(u)
     return tid ~= nil and tid ~= 0
 end
 local function collectBuffRows(self, unit)
@@ -217,19 +227,27 @@ local function hideSlot(self, i)
         return
     end
     if s.tipText ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipText) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.tipText) end
         )
     end
     if s.tipBox ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.tipBox) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.tipBox) end
         )
     end
     if s.hit ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.hit) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.hit) end
         )
     end
     if s.root ~= 0 then
-        pcall(function () return ____UI_5DE5_5177:hideFrame(s.root) end
+        pcall(
+            nil,
+            function() return ____UI_5DE5_5177:hideFrame(s.root) end
         )
     end
 end
@@ -243,15 +261,17 @@ local function hideAllSlots(self)
     end
 end
 local function syncBuffBar(self)
-    pcall(function ()
-            local lp = jass.GetLocalPlayer()
+    pcall(
+        nil,
+        function()
+            local lp = jass:GetLocalPlayer()
             if lp == nil or lp == 0 then
                 return
             end
             local ____countSelectedForPlayer_result_1 = countSelectedForPlayer(nil, lp)
             local selN = ____countSelectedForPlayer_result_1.n
             local sole = ____countSelectedForPlayer_result_1.sole
-            local hid = sole ~= nil and sole ~= 0 and jass.GetHandleId(sole) or 0
+            local hid = sole ~= nil and sole ~= 0 and jass:GetHandleId(sole) or 0
             local soleOk = sole ~= nil and sole ~= 0 and isUnitRefLikelyValid(nil, sole)
             local inPool = soleOk and buffPoolMod:isUnitInBuffPool(sole)
             local ____soleOk_2
@@ -320,26 +340,36 @@ local function syncBuffBar(self)
                             row.state.sourceName,
                             meta.interval
                         ) or (((((((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. tooltipIntStr(nil, row.state.remaining)) .. " 秒，伤害/秒 ") .. tooltipIntStr(nil, row.state.effect)) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「") .. (row.state.sourceName ~= nil and row.state.sourceName ~= "" and row.state.sourceName or "未知")) .. "」|r"
-                        pcall(function () return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
+                        pcall(
+                            nil,
+                            function() return ____UI_5DE5_5177:setFrameTexture(slot.root, iconTex) end
                         )
                         local remStr = formatBuffRemainOneDecimal(nil, row.state.iconRemaining)
                         local remTextFormatted = ("|cffffffff" .. remStr) .. "|r"
                         if slot.remainText and slot.remainText ~= 0 then
                             if getFrameText(nil, slot.remainText) ~= remTextFormatted then
-                                pcall(function () return japi.DzFrameSetText(slot.remainText, remTextFormatted) end
+                                pcall(
+                                    nil,
+                                    function() return japi:DzFrameSetText(slot.remainText, remTextFormatted) end
                                 )
                             end
                         end
                         if slot.tipText and slot.tipText ~= 0 then
                             if getFrameText(nil, slot.tipText) ~= tipStr then
-                                pcall(function () return japi.DzFrameSetText(slot.tipText, tipStr) end
+                                pcall(
+                                    nil,
+                                    function() return japi:DzFrameSetText(slot.tipText, tipStr) end
                                 )
                             end
                         end
-                        pcall(function () return ____UI_5DE5_5177:showFrame(slot.root) end
+                        pcall(
+                            nil,
+                            function() return ____UI_5DE5_5177:showFrame(slot.root) end
                         )
                         if slot.hit ~= 0 then
-                            pcall(function () return ____UI_5DE5_5177:showFrame(slot.hit) end
+                            pcall(
+                                nil,
+                                function() return ____UI_5DE5_5177:showFrame(slot.hit) end
                             )
                         end
                     end
@@ -367,13 +397,21 @@ local function createOneSlot(self, index, parent)
             if not bd or bd == 0 then
                 return true, nil
             end
-            pcall(function () return ____UI_5DE5_5177:setFramePosition(bd, {point = ____UI_5DE5_5177.FramePoint.TOPLEFT, x = x, y = BUFF_BAR_Y}) end
+            pcall(
+                nil,
+                function() return ____UI_5DE5_5177:setFramePosition(bd, {point = ____UI_5DE5_5177.FramePoint.TOPLEFT, x = x, y = BUFF_BAR_Y}) end
             )
-            pcall(function () return ____UI_5DE5_5177:setFrameSize(bd, {width = ICON_W, height = ICON_H}) end
+            pcall(
+                nil,
+                function() return ____UI_5DE5_5177:setFrameSize(bd, {width = ICON_W, height = ICON_H}) end
             )
-            pcall(function () return ____UI_5DE5_5177:setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp") end
+            pcall(
+                nil,
+                function() return ____UI_5DE5_5177:setFrameTexture(bd, "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp") end
             )
-            pcall(function () return japi.DzFrameSetLevel(bd, 180) end
+            pcall(
+                nil,
+                function() return japi:DzFrameSetLevel(bd, 180) end
             )
             local remainText = ____UI_5DE5_5177:createTextLabel(
                 "BuffUIBarRemain" .. tostring(index),
@@ -389,11 +427,15 @@ local function createOneSlot(self, index, parent)
                 {width = ICON_W, height = 0.014}
             ) or 0
             if remainText and remainText ~= 0 then
-                pcall(function ()
-                        japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
+                pcall(
+                    nil,
+                    function()
+                        japi:DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
                     end
                 )
-                pcall(function () return japi.DzFrameSetLevel(remainText, 182) end
+                pcall(
+                    nil,
+                    function() return japi:DzFrameSetLevel(remainText, 182) end
                 )
             end
             local hit = ____UI_5DE5_5177:createFrame({
@@ -406,11 +448,17 @@ local function createOneSlot(self, index, parent)
                 alpha = 0
             }) or 0
             if hit and hit ~= 0 then
-                pcall(function () return japi.DzFrameSetAllPoints(hit, bd) end
+                pcall(
+                    nil,
+                    function() return japi:DzFrameSetAllPoints(hit, bd) end
                 )
-                pcall(function () return japi.DzFrameSetLevel(hit, 181) end
+                pcall(
+                    nil,
+                    function() return japi:DzFrameSetLevel(hit, 181) end
                 )
-                pcall(function () return ____UI_5DE5_5177:setFrameHoverEvents(
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:setFrameHoverEvents(
                         hit,
                         function() return onSlotEnter(nil, index) end,
                         function() return onSlotLeave(nil, index) end,
@@ -428,7 +476,9 @@ local function createOneSlot(self, index, parent)
                 visible = false
             }) or 0
             if tipBox and tipBox ~= 0 then
-                pcall(function () return ____UI_5DE5_5177:setFramePointRelative(
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:setFramePointRelative(
                         tipBox,
                         ____UI_5DE5_5177.FramePoint.TOPLEFT,
                         bd,
@@ -437,13 +487,21 @@ local function createOneSlot(self, index, parent)
                         TIP_OFFSET_Y_FROM_ICON_TOP
                     ) end
                 )
-                pcall(function () return ____UI_5DE5_5177:setFrameSize(tipBox, {width = boxW, height = boxH}) end
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:setFrameSize(tipBox, {width = boxW, height = boxH}) end
                 )
-                pcall(function () return ____UI_5DE5_5177:setFrameTexture(tipBox, TIP_BOX_TEX) end
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:setFrameTexture(tipBox, TIP_BOX_TEX) end
                 )
-                pcall(function () return japi.DzFrameSetLevel(tipBox, 0) end
+                pcall(
+                    nil,
+                    function() return japi:DzFrameSetLevel(tipBox, 0) end
                 )
-                pcall(function () return ____UI_5DE5_5177:hideFrame(tipBox) end
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:hideFrame(tipBox) end
                 )
             end
             local tipText = ____UI_5DE5_5177:createTextLabel(
@@ -466,19 +524,27 @@ local function createOneSlot(self, index, parent)
                 {width = boxW * 0.92, height = boxH * 0.88}
             ) or 0
             if tipText and tipText ~= 0 then
-                pcall(function ()
-                        japi.DzFrameSetTextAlignment(tipText, 0)
+                pcall(
+                    nil,
+                    function()
+                        japi:DzFrameSetTextAlignment(tipText, 0)
                     end
                 )
-                pcall(function () return japi.DzFrameSetLevel(tipText, 0) end
+                pcall(
+                    nil,
+                    function() return japi:DzFrameSetLevel(tipText, 0) end
                 )
-                pcall(function () return ____UI_5DE5_5177:hideFrame(tipText) end
+                pcall(
+                    nil,
+                    function() return ____UI_5DE5_5177:hideFrame(tipText) end
                 )
             end
             if hit ~= 0 and tipBox ~= 0 then
                 tryDzFrameSetTooltipF2i(nil, hit, tipBox)
             end
-            pcall(function () return ____UI_5DE5_5177:hideFrame(bd) end
+            pcall(
+                nil,
+                function() return ____UI_5DE5_5177:hideFrame(bd) end
             )
             return true, {
                 root = bd,
@@ -514,18 +580,22 @@ local function createUi(self)
 end
 local _refreshTimer = nil
 local function startRefreshTimer(self)
-    pcall(function ()
+    pcall(
+        nil,
+        function()
             if _refreshTimer ~= nil then
                 return
             end
-            _refreshTimer = jass.CreateTimer()
-            jass.TimerStart(
+            _refreshTimer = jass:CreateTimer()
+            jass:TimerStart(
                 _refreshTimer,
                 0.1,
                 true,
                 function()
-                    pcall(function ()
-                            local lp = jass.GetLocalPlayer()
+                    pcall(
+                        nil,
+                        function()
+                            local lp = jass:GetLocalPlayer()
                             if lp == nil or lp == 0 then
                                 return
                             end
@@ -546,17 +616,21 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
         return
     end
     buffUiInitialized = true
-    pcall(function ()
-            local delayTimer = jass.CreateTimer()
-            jass.TimerStart(
+    pcall(
+        nil,
+        function()
+            local delayTimer = jass:CreateTimer()
+            jass:TimerStart(
                 delayTimer,
                 1,
                 false,
                 function()
-                    pcall(function ()
+                    pcall(
+                        nil,
+                        function()
                             createUi(nil)
                             startRefreshTimer(nil)
-                            jass.DestroyTimer(delayTimer)
+                            jass:DestroyTimer(delayTimer)
                         end
                     )
                 end

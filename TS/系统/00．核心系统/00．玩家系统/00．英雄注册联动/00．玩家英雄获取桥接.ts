@@ -110,6 +110,11 @@ const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 
+// 任务UI系统
+const taskUISystem = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
+
 /**
  * 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
  */
@@ -141,6 +146,11 @@ function registerHeroDependents(whichHero: any): void {
       // BuffUI系统 - 为玩家创建BuffUI
       if (typeof buffUISystem.onPlayerHeroRegistered === "function") {
         buffUISystem.onPlayerHeroRegistered(owner, whichHero);
+      }
+
+      // 任务UI系统 - 为玩家创建N槽任务UI
+      if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
+        taskUISystem.onPlayerHeroRegistered(owner, whichHero);
       }
     }
   }

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local setText, hideFrames, renderQuestRowSlot, renderVariant, japi, OBJECTIVE_HEIGHT, FAIL_HEIGHT, DETAIL_HEIGHT, TITLE_HEIGHT, OBJECTIVE_START_OFFSET, QUEST_ROW_GAP, VIEW_BOTTOM_REL, VIEW_EPS
+local setText, hideFrames, renderQuestRowSlot, renderVariant, jass, japi, OBJECTIVE_HEIGHT, FAIL_HEIGHT, DETAIL_HEIGHT, TITLE_HEIGHT, OBJECTIVE_START_OFFSET, QUEST_ROW_GAP, VIEW_BOTTOM_REL, VIEW_EPS
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
@@ -44,7 +44,7 @@ function setText(self, frame, text)
         return
     end
     if type(japi.DzFrameSetText) == "function" then
-        japi.DzFrameSetText(frame, text)
+        japi:DzFrameSetText(frame, text)
     end
 end
 function ____exports.setVisible(self, frame, visible)
@@ -52,7 +52,7 @@ function ____exports.setVisible(self, frame, visible)
         return
     end
     if type(japi.DzFrameShow) == "function" then
-        japi.DzFrameShow(frame, visible)
+        japi:DzFrameShow(frame, visible)
     end
 end
 function hideFrames(self, frames)
@@ -63,7 +63,7 @@ end
 function ____exports.handleTaskRowClick(self)
     local ____temp_0
     if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_0 = japi.DzGetTriggerUIEventFrame()
+        ____temp_0 = japi:DzGetTriggerUIEventFrame()
     else
         ____temp_0 = 0
     end
@@ -79,13 +79,22 @@ function ____exports.handleTaskRowClick(self)
     if not questId then
         return
     end
-    local ____opt_1 = ____exports.currentTaskRowClickSound
+    local ____opt_1 = ____exports.currentTaskRowExpandHandler
     if ____opt_1 ~= nil then
-        ____exports.currentTaskRowClickSound(nil)
-    end
-    local ____opt_3 = ____exports.currentTaskRowExpandHandler
-    if ____opt_3 ~= nil then
         ____exports.currentTaskRowExpandHandler(nil, questId)
+    end
+    local ____temp_3
+    if type(japi.DzGetTriggerKeyPlayer) == "function" then
+        ____temp_3 = japi:DzGetTriggerKeyPlayer()
+    else
+        ____temp_3 = jass:GetLocalPlayer()
+    end
+    local triggerPlayer = ____temp_3
+    if triggerPlayer == jass:GetLocalPlayer() then
+        local ____opt_4 = ____exports.currentTaskRowClickSound
+        if ____opt_4 ~= nil then
+            ____exports.currentTaskRowClickSound(nil)
+        end
     end
 end
 --- 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包
@@ -97,8 +106,8 @@ function ____exports.bindTaskRowClickButtonsForPage(self, page)
             do
                 local ri = 0
                 while ri < #variant.rowSlots do
-                    local ____opt_5 = variant.rowSlots[ri + 1]
-                    local btn = ____opt_5 and ____opt_5.clickBtn or nil
+                    local ____opt_6 = variant.rowSlots[ri + 1]
+                    local btn = ____opt_6 and ____opt_6.clickBtn or nil
                     if btn then
                         ____exports.taskRowBindingByFrameId[btn] = {page = page, rowIndex = ri}
                     end
@@ -113,13 +122,13 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
     local itemH = getQuestItemHeight(nil, quest, expanded)
     local statusText = getStatusText(nil, quest.status)
     local showIcon = isQuestWithRowIconLayout(nil, quest)
-    local ____calcTaskListItemLayout_result_7 = calcTaskListItemLayout(nil, showIcon)
-    local rowWidth = ____calcTaskListItemLayout_result_7.rowWidth
-    local rowLeftRel = ____calcTaskListItemLayout_result_7.rowLeftRel
-    local iconHLayout = ____calcTaskListItemLayout_result_7.iconHLayout
-    local textXRel = ____calcTaskListItemLayout_result_7.textXRel
-    local listTextAlign = ____calcTaskListItemLayout_result_7.listTextAlign
-    local textW = ____calcTaskListItemLayout_result_7.textW
+    local ____calcTaskListItemLayout_result_8 = calcTaskListItemLayout(nil, showIcon)
+    local rowWidth = ____calcTaskListItemLayout_result_8.rowWidth
+    local rowLeftRel = ____calcTaskListItemLayout_result_8.rowLeftRel
+    local iconHLayout = ____calcTaskListItemLayout_result_8.iconHLayout
+    local textXRel = ____calcTaskListItemLayout_result_8.textXRel
+    local listTextAlign = ____calcTaskListItemLayout_result_8.listTextAlign
+    local textW = ____calcTaskListItemLayout_result_8.textW
     local titleText = ((((("|cffffff00【" .. quest.title) .. "】|r→发布NPC:|cff00ccff【") .. (quest.startNpc or "未知")) .. "】|r [") .. statusText) .. "]"
     ctx:setFramePointRelative(
         slot.backdrop,
@@ -188,7 +197,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.objectiveFrames[i + 1] or 0
                 local text = buildObjectiveText(nil, quest, i)
                 if not frame or text == "" then
-                    goto __continue65
+                    goto __continue66
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -204,7 +213,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
-            ::__continue65::
+            ::__continue66::
             i = i + 1
         end
     end
@@ -239,7 +248,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.detailFrames[i + 1] or 0
                 local text = details[i + 1] or ""
                 if not frame or text == "" then
-                    goto __continue69
+                    goto __continue70
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -255,7 +264,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
-            ::__continue69::
+            ::__continue70::
             i = i + 1
         end
     end
@@ -295,7 +304,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 local slot = variant.rowSlots[rowIndex + 1]
                 if not quest then
                     hideRowSlot(nil, slot, ____exports.setVisible)
-                    goto __continue79
+                    goto __continue80
                 end
                 local expanded = rowIndex == expandedRowIndex
                 local itemH = getQuestItemHeight(nil, quest, expanded)
@@ -322,12 +331,13 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 end
                 rowTopRel = rowTopRel - (itemH + QUEST_ROW_GAP)
             end
-            ::__continue79::
+            ::__continue80::
             rowIndex = rowIndex + 1
         end
     end
     ____exports.setVisible(nil, variant.root, false)
 end
+jass = require("jass.common")
 japi = require("jass.japi")
 ____exports.currentTaskRowExpandHandler = nil
 ____exports.currentTaskRowClickSound = nil
@@ -581,8 +591,8 @@ function ____exports.getTaskUICategoryPageCount(self, pool, category)
     if not pool then
         return 0
     end
-    local ____opt_8 = pool.categories[category]
-    return ____opt_8 and ____opt_8.pageCount or 0
+    local ____opt_9 = pool.categories[category]
+    return ____opt_9 and ____opt_9.pageCount or 0
 end
 function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx

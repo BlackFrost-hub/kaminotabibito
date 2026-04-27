@@ -231,15 +231,15 @@ local function startSkipKeyCooldown(self, pid)
         return
     end
     g_skipKeyCooldown[pid + 1] = true
-    local t = jass.CreateTimer()
-    jass.TimerStart(
+    local t = jass:CreateTimer()
+    jass:TimerStart(
         t,
         SKIP_KEY_COOLDOWN_SECONDS,
         false,
         function()
             g_skipKeyCooldown[pid + 1] = false
-            jass.PauseTimer(t)
-            jass.DestroyTimer(t)
+            jass:PauseTimer(t)
+            jass:DestroyTimer(t)
         end
     )
 end
@@ -285,7 +285,7 @@ local function fastForwardQueueToLastNormalLine(self, state)
     showContinueHintLocal(nil, state, true)
 end
 local function skipDialogLocal(self)
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
     if not triggerPlayer then
         return
     end

@@ -7,10 +7,14 @@ local ____exports = {}
 -- @returns 格式化后的字符串
 function ____exports.formatNumber(self, num)
     if num >= 10 then
-        return tostring(math.floor(num)
+        return tostring(
+            nil,
+            math.floor(num)
         )
     else
-        return tostring(math.floor(num * 10) / 10
+        return tostring(
+            nil,
+            math.floor(num * 10) / 10
         )
     end
 end
@@ -21,7 +25,9 @@ end
 -- @returns 格式化后的字符串
 function ____exports.formatNumberDecimals(self, num, decimals)
     local multiplier = 10 ^ decimals
-    return tostring(math.floor(num * multiplier) / multiplier
+    return tostring(
+        nil,
+        math.floor(num * multiplier) / multiplier
     )
 end
 --- 格式化百分比

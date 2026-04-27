@@ -308,11 +308,11 @@ function ____exports.initHotSystem(self)
     if hotTrigger ~= nil then
         return
     end
-    hotTrigger = jass.CreateTrigger()
-    jass.TriggerAddAction(hotTrigger, onHotEvent)
+    hotTrigger = jass:CreateTrigger()
+    jass:TriggerAddAction(hotTrigger, onHotEvent)
     local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
     local STES_Register = ____require_result_10.STES_Register
-    STES_Register(hotTrigger, ____exports.HOT_EVENT_NAME)
+    STES_Register(nil, hotTrigger, ____exports.HOT_EVENT_NAME)
 end
 --- 检查系统是否已初始化
 function ____exports.isHotSystemInitialized(self)

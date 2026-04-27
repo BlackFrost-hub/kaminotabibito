@@ -3,7 +3,7 @@ local ____exports = {}
 --- 音效池管理
 -- 同一音效路径最多4个同时播放
 local jass = require("jass.common")
-local hash = jass.InitHashtable()
+local hash = jass:InitHashtable()
 local KEY_COUNT = 1000
 local KEY_INDEX = 1001
 local KEY_TIMER = 1002
@@ -24,8 +24,8 @@ function ____exports.createSoundInternal(self, path, cutoff, index, x, y, z, is3
     if model == nil then
         model = defaultSoundModel
     end
-    local timer = jass.CreateTimer()
-    local sound = jass.CreateSound(
+    local timer = jass:CreateTimer()
+    local sound = jass:CreateSound(
         path,
         false,
         is3d,
@@ -44,63 +44,63 @@ function ____exports.createSoundInternal(self, path, cutoff, index, x, y, z, is3
         z,
         cutoff
     )
-    local pathHash = jass.StringHash(path)
-    jass.SaveSoundHandle(hash, pathHash, index, sound)
-    jass.SaveTimerHandle(
+    local pathHash = jass:StringHash(path)
+    jass:SaveSoundHandle(hash, pathHash, index, sound)
+    jass:SaveTimerHandle(
         hash,
-        jass.GetHandleId(sound),
+        jass:GetHandleId(sound),
         KEY_TIMER,
         timer
     )
-    jass.SaveSoundHandle(
+    jass:SaveSoundHandle(
         hash,
-        jass.GetHandleId(timer),
+        jass:GetHandleId(timer),
         KEY_SOUND,
         sound
     )
-    jass.SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
-    jass.SaveInteger(
+    jass:SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
+    jass:SaveInteger(
         hash,
-        jass.GetHandleId(sound),
+        jass:GetHandleId(sound),
         KEY_INDEX,
         index
     )
-    jass.SaveStr(
+    jass:SaveStr(
         hash,
-        jass.GetHandleId(sound),
+        jass:GetHandleId(sound),
         KEY_PATH,
         path
     )
-    local duration = jass.GetSoundFileDuration(path) * 0.001
+    local duration = jass:GetSoundFileDuration(path) * 0.001
     if duration <= 0 or duration > 3600 then
         duration = 1
     end
-    jass.TimerStart(
+    jass:TimerStart(
         timer,
         duration,
         false,
         function()
-            local expiredTimer = jass.GetExpiredTimer()
-            local s = jass.LoadSoundHandle(
+            local expiredTimer = jass:GetExpiredTimer()
+            local s = jass:LoadSoundHandle(
                 hash,
-                jass.GetHandleId(expiredTimer),
+                jass:GetHandleId(expiredTimer),
                 KEY_SOUND
             )
             if s then
-                local idx = jass.LoadInteger(
+                local idx = jass:LoadInteger(
                     hash,
-                    jass.GetHandleId(s),
+                    jass:GetHandleId(s),
                     KEY_INDEX
                 )
-                local p = jass.LoadStr(
+                local p = jass:LoadStr(
                     hash,
-                    jass.GetHandleId(s),
+                    jass:GetHandleId(s),
                     KEY_PATH
                 )
-                local ph = jass.StringHash(p)
-                jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
+                local ph = jass:StringHash(p)
+                jass:SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
             end
-            jass.DestroyTimer(expiredTimer)
+            jass:DestroyTimer(expiredTimer)
         end
     )
     return sound
@@ -110,14 +110,14 @@ function ____exports.getSoundInternal(self, path, cutoff, index, x, y, z, model)
     if model == nil then
         model = defaultSoundModel
     end
-    local pathHash = jass.StringHash(path)
-    local sound = jass.LoadSoundHandle(hash, pathHash, index)
+    local pathHash = jass:StringHash(path)
+    local sound = jass:LoadSoundHandle(hash, pathHash, index)
     if not sound then
         return nil
     end
-    local timer = jass.LoadTimerHandle(
+    local timer = jass:LoadTimerHandle(
         hash,
-        jass.GetHandleId(sound),
+        jass:GetHandleId(sound),
         KEY_TIMER
     )
     model:applyToSound(
@@ -128,54 +128,54 @@ function ____exports.getSoundInternal(self, path, cutoff, index, x, y, z, model)
         cutoff
     )
     if timer then
-        jass.DestroyTimer(timer)
-        local newTimer = jass.CreateTimer()
-        jass.SaveTimerHandle(
+        jass:DestroyTimer(timer)
+        local newTimer = jass:CreateTimer()
+        jass:SaveTimerHandle(
             hash,
-            jass.GetHandleId(sound),
+            jass:GetHandleId(sound),
             KEY_TIMER,
             newTimer
         )
-        jass.SaveSoundHandle(
+        jass:SaveSoundHandle(
             hash,
-            jass.GetHandleId(newTimer),
+            jass:GetHandleId(newTimer),
             KEY_SOUND,
             sound
         )
-        local duration = jass.GetSoundFileDuration(path) * 0.001
+        local duration = jass:GetSoundFileDuration(path) * 0.001
         if duration <= 0 or duration > 3600 then
             duration = 1
         end
-        jass.TimerStart(
+        jass:TimerStart(
             newTimer,
             duration,
             false,
             function()
-                local expiredTimer = jass.GetExpiredTimer()
-                local s = jass.LoadSoundHandle(
+                local expiredTimer = jass:GetExpiredTimer()
+                local s = jass:LoadSoundHandle(
                     hash,
-                    jass.GetHandleId(expiredTimer),
+                    jass:GetHandleId(expiredTimer),
                     KEY_SOUND
                 )
                 if s then
-                    local idx = jass.LoadInteger(
+                    local idx = jass:LoadInteger(
                         hash,
-                        jass.GetHandleId(s),
+                        jass:GetHandleId(s),
                         KEY_INDEX
                     )
-                    local p = jass.LoadStr(
+                    local p = jass:LoadStr(
                         hash,
-                        jass.GetHandleId(s),
+                        jass:GetHandleId(s),
                         KEY_PATH
                     )
-                    local ph = jass.StringHash(p)
-                    jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
+                    local ph = jass:StringHash(p)
+                    jass:SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
                 end
-                jass.DestroyTimer(expiredTimer)
+                jass:DestroyTimer(expiredTimer)
             end
         )
     end
-    jass.SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
+    jass:SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
     return sound
 end
 ____exports.hash = hash

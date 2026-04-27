@@ -22,7 +22,7 @@ function ____exports.createFrame(self, config)
     if ____type == FrameType.SIMPLEFRAME then
         return nil
     end
-    local frame = japi.DzCreateFrameByTagName(
+    local frame = japi:DzCreateFrameByTagName(
         ____type,
         name,
         parent,
@@ -33,19 +33,27 @@ function ____exports.createFrame(self, config)
         return nil
     end
     if config.visible ~= nil then
-        pcall(function () return japi.DzFrameShow(frame, config.visible) end
+        pcall(
+            nil,
+            function() return japi:DzFrameShow(frame, config.visible) end
         )
     end
     if config.enable == false then
-        pcall(function () return japi.DzFrameSetEnable(frame, false) end
+        pcall(
+            nil,
+            function() return japi:DzFrameSetEnable(frame, false) end
         )
     end
     if config.alpha ~= nil then
-        pcall(function () return japi.DzFrameSetAlpha(frame, config.alpha) end
+        pcall(
+            nil,
+            function() return japi:DzFrameSetAlpha(frame, config.alpha) end
         )
     end
     if config.level ~= nil then
-        pcall(function () return japi.DzFrameSetLevel(frame, config.level) end
+        pcall(
+            nil,
+            function() return japi:DzFrameSetLevel(frame, config.level) end
         )
     end
     return frame
@@ -60,11 +68,13 @@ function ____exports.loadTocOnce(self, tocLoadKey, tocPaths, debugPrefix)
     end
     __tocLoadedOnce[tocLoadKey] = true
     for ____, p in ipairs(tocPaths) do
-        local ok = pcall(function () return japi.DzLoadToc(p) end
+        local ok = pcall(
+            nil,
+            function() return japi:DzLoadToc(p) end
         )
         if not ok then
             local pr = _G.print
-            pr((("[" .. debugPrefix) .. "] DzLoadToc fail: ") .. p)
+            pr(nil, (("[" .. debugPrefix) .. "] DzLoadToc fail: ") .. p)
         end
     end
 end
@@ -73,7 +83,7 @@ local __fdfSafeParent = 0
 local __fdfSafeContextId = 0
 local __fdfSafeOutFrame = 0
 local function __fdfSafeCreateFramePcallBody(self)
-    __fdfSafeOutFrame = japi.DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId)
+    __fdfSafeOutFrame = japi:DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId)
 end
 function ____exports.tryCreateFromFdfSafe(self, frameName, parent, fallback, opts)
     ____exports.loadTocOnce(nil, opts.tocLoadKey, opts.tocPaths, opts.debugPrefix or "UI")

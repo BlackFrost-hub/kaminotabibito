@@ -38,7 +38,7 @@ function ____exports.ensureFloatTextRecycleTimer(self)
                                 if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
                                     LeakWatcher:destroyTextTag(tt)
                                 else
-                                    jass.DestroyTextTag(tt)
+                                    jass:DestroyTextTag(tt)
                                 end
                             end
                             __TS__ArraySplice(____exports.floatTextQueue, i, 1)

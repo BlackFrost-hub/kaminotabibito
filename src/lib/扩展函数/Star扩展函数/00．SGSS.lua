@@ -39,17 +39,17 @@ local function hashHandle(self)
     return ____pick_result_0_1_2_3
 end
 local function h2i(self, u)
-    return jass.GetHandleId(u) or 0
+    return jass:GetHandleId(u) or 0
 end
 local function sh(self, name)
-    return jass.StringHash(name) or 0
+    return jass:StringHash(name) or 0
 end
 local function loadReal(self, u, key)
     local hh = hashHandle(nil)
     if not hh then
         return 0
     end
-    return jass.LoadReal(
+    return jass:LoadReal(
         hh,
         h2i(nil, u),
         key
@@ -60,7 +60,7 @@ local function saveReal(self, u, key, value)
     if not hh then
         return
     end
-    jass.SaveReal(
+    jass:SaveReal(
         hh,
         h2i(nil, u),
         key,
@@ -95,32 +95,32 @@ local function setAbilityDataA(self, u, raw, value)
     if not u or code == 0 then
         return
     end
-    if jass.GetUnitAbilityLevel(u, code) == 0 then
-        jass.UnitAddAbility(u, code)
+    if jass:GetUnitAbilityLevel(u, code) == 0 then
+        jass:UnitAddAbility(u, code)
     end
-    local abil = japi.EXGetUnitAbility(u, code)
+    local abil = japi:EXGetUnitAbility(u, code)
     if abil then
-        japi.EXSetAbilityDataReal(abil, 1, 108, value)
+        japi:EXSetAbilityDataReal(abil, 1, 108, value)
     end
-    jass.IncUnitAbilityLevel(u, code)
-    jass.DecUnitAbilityLevel(u, code)
+    jass:IncUnitAbilityLevel(u, code)
+    jass:DecUnitAbilityLevel(u, code)
 end
 local function setAbilityDataABC(self, u, raw, a, b, c)
     local code = resolveAbilityCode(nil, raw)
     if not u or code == 0 then
         return
     end
-    if jass.GetUnitAbilityLevel(u, code) == 0 then
-        jass.UnitAddAbility(u, code)
+    if jass:GetUnitAbilityLevel(u, code) == 0 then
+        jass:UnitAddAbility(u, code)
     end
-    local abil = japi.EXGetUnitAbility(u, code)
+    local abil = japi:EXGetUnitAbility(u, code)
     if abil then
-        japi.EXSetAbilityDataReal(abil, 1, 110, a)
-        japi.EXSetAbilityDataReal(abil, 1, 108, b)
-        japi.EXSetAbilityDataReal(abil, 1, 109, c)
+        japi:EXSetAbilityDataReal(abil, 1, 110, a)
+        japi:EXSetAbilityDataReal(abil, 1, 108, b)
+        japi:EXSetAbilityDataReal(abil, 1, 109, c)
     end
-    jass.IncUnitAbilityLevel(u, code)
-    jass.DecUnitAbilityLevel(u, code)
+    jass:IncUnitAbilityLevel(u, code)
+    jass:DecUnitAbilityLevel(u, code)
 end
 local function setAtk(self, u, v)
     local key = sh(nil, "攻击")
@@ -156,27 +156,27 @@ end
 local function setHp(self, u, v)
     local key = sh(nil, "生命")
     local oldAdd = loadReal(nil, u, key)
-    local oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
-    local oldLife = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
+    local oldMax = jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local oldLife = jass:GetUnitState(u, jass.UNIT_STATE_LIFE)
     local ratio = oldMax > 0.405 and oldLife / oldMax or 1
     local newAdd = oldAdd + v
     local newMax = oldMax - oldAdd + newAdd
-    jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, newMax)
+    jass:SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, newMax)
     if oldLife > 0.405 then
-        jass.SetUnitState(u, jass.UNIT_STATE_LIFE, newMax * ratio)
+        jass:SetUnitState(u, jass.UNIT_STATE_LIFE, newMax * ratio)
     end
     saveReal(nil, u, key, newAdd)
 end
 local function setMp(self, u, v)
     local key = sh(nil, "法力")
     local oldAdd = loadReal(nil, u, key)
-    local oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA)
-    local oldMana = jass.GetUnitState(u, jass.UNIT_STATE_MANA)
+    local oldMax = jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA)
+    local oldMana = jass:GetUnitState(u, jass.UNIT_STATE_MANA)
     local ratio = oldMax > 0 and oldMana / oldMax or 1
     local newAdd = oldAdd + v
     local newMax = oldMax - oldAdd + newAdd
-    jass.SetUnitState(u, jass.UNIT_STATE_MAX_MANA, newMax)
-    jass.SetUnitState(u, jass.UNIT_STATE_MANA, newMax * ratio)
+    jass:SetUnitState(u, jass.UNIT_STATE_MAX_MANA, newMax)
+    jass:SetUnitState(u, jass.UNIT_STATE_MANA, newMax * ratio)
     saveReal(nil, u, key, newAdd)
 end
 local function setMove(self, u, v)
@@ -246,7 +246,7 @@ function ____exports.SGSS_SetStatePercentumEX2(self, u, id, v)
     if id == 7 then
         local pv = loadReal(nil, u, hpPct)
         local av = loadReal(nil, u, hpAdd)
-        local base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av
+        local base = jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av
         local npv = pv + v
         local nav = base * npv
         if av ~= nav then
@@ -258,7 +258,7 @@ function ____exports.SGSS_SetStatePercentumEX2(self, u, id, v)
     elseif id == 8 then
         local pv = loadReal(nil, u, mpPct)
         local av = loadReal(nil, u, mpAdd)
-        local base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av
+        local base = jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av
         local npv = pv + v
         local nav = base * npv
         if av ~= nav then

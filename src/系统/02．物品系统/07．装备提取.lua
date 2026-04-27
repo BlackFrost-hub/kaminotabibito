@@ -85,8 +85,8 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    local h = jass.StringHash(eventName)
-    return jass.LoadInteger(
+    local h = jass:StringHash(eventName)
+    return jass:LoadInteger(
         ht,
         h,
         ydlStes_skeyIndex(nil, nil)
@@ -123,7 +123,7 @@ local function pickFromScorePool(ids)
     if #ids == 0 then
         return {raw = 0, id = ""}
     end
-    local idx = math.random(1, #ids)
+    local idx = math:random(1, #ids)
     local id = ids[idx]
     if type(id) ~= "string" or #id ~= 4 then
         return {raw = 0, id = ""}
@@ -161,13 +161,13 @@ local function runEquipExtract()
     log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
 local function scheduleRetry(fn)
-    local tm = jass.CreateTimer()
-    jass.TimerStart(
+    local tm = jass:CreateTimer()
+    jass:TimerStart(
         tm,
         RETRY_SEC,
         false,
         function()
-            jass.DestroyTimer(tm)
+            jass:DestroyTimer(tm)
             fn(nil)
         end
     )
@@ -188,8 +188,8 @@ local function tryRegisterEquipStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(
             trig,
             function()
                 runEquipExtract()

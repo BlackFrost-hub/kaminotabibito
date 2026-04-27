@@ -48,9 +48,9 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass.LoadInteger(
+    return jass:LoadInteger(
         ht,
-        jass.StringHash(eventName),
+        jass:StringHash(eventName),
         helper:ydlStes_skeyIndex(nil)
     )
 end
@@ -60,17 +60,17 @@ local function isPlayableHero(whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
-    if jass.IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass:IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
         return false
     end
-    local owner = jass.GetOwningPlayer(whichUnit)
+    local owner = jass:GetOwningPlayer(whichUnit)
     if owner == nil or owner == 0 then
         return false
     end
-    if jass.GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
+    if jass:GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
         return false
     end
-    local playerId = jass.GetPlayerId(owner) or -1
+    local playerId = jass:GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
 --- 经局部变量再调，避免 TSTL 编成 `mod:fn(...)`；`onPlayerHeroRegistered` 在面板模块已标 `this: void`，勿再注入 nil 首参
@@ -85,6 +85,7 @@ end
 local uiRegisteredPlayers = __TS__New(Set)
 local dialogSystem = require("系统.09．表现系统.02．对话框系统.01．对话框渲染核心")
 local buffUISystem = require("系统.05．Buff系统.02．BuffUI")
+local taskUISystem = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
 --- 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
 local function registerHeroDependents(whichHero)
     if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
@@ -96,9 +97,9 @@ local function registerHeroDependents(whichHero)
     if type(chestSystem.registerChestSystemHero) == "function" then
         chestSystem:registerChestSystemHero(whichHero)
     end
-    local owner = jass.GetOwningPlayer(whichHero)
+    local owner = jass:GetOwningPlayer(whichHero)
     if owner ~= nil and owner ~= 0 then
-        local playerId = jass.GetPlayerId(owner)
+        local playerId = jass:GetPlayerId(owner)
         if not uiRegisteredPlayers:has(playerId) then
             uiRegisteredPlayers:add(playerId)
             invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
@@ -107,6 +108,9 @@ local function registerHeroDependents(whichHero)
             end
             if type(buffUISystem.onPlayerHeroRegistered) == "function" then
                 buffUISystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+            if type(taskUISystem.onPlayerHeroRegistered) == "function" then
+                taskUISystem.onPlayerHeroRegistered(owner, whichHero)
             end
         end
     end
@@ -134,7 +138,7 @@ local function registerSingleHero(whichHero)
     if not isPlayableHero(whichHero) then
         return
     end
-    local owner = jass.GetOwningPlayer(whichHero)
+    local owner = jass:GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
     end
@@ -154,13 +158,13 @@ local function runRegisterPlayerHero()
 end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(fn)
-    local timer = jass.CreateTimer()
-    jass.TimerStart(
+    local timer = jass:CreateTimer()
+    jass:TimerStart(
         timer,
         RETRY_SEC,
         false,
         function()
-            jass.DestroyTimer(timer)
+            jass:DestroyTimer(timer)
             fn()
         end
     )
@@ -172,8 +176,8 @@ local function tryRegisterPlayerHeroStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(
             trig,
             function()
                 runRegisterPlayerHero()

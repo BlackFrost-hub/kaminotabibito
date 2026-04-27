@@ -286,68 +286,68 @@ local function addHeroXP(self, unit, amount)
     do
         local i = 0
         while i < 10 do
-            jass.AddHeroXP(unit, chunk, true)
+            jass:AddHeroXP(unit, chunk, true)
             i = i + 1
         end
     end
     local remainder = amount - chunk * 10
     if remainder > 0 then
-        jass.AddHeroXP(unit, remainder, true)
+        jass:AddHeroXP(unit, remainder, true)
     end
 end
 local function getHeroLevel(self, unit)
-    return jass.GetHeroLevel(unit)
+    return jass:GetHeroLevel(unit)
 end
 --- 获取单位当前属性的绝对值，用于百分比计算。
 -- str/agi/int 用 GetHeroStr/Agi/Int；hp/mp 用 GetUnitState+ConvertUnitState；
 -- dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
 local function getPctStatValue(self, unit, key)
     if key == "int" then
-        return jass.GetHeroInt(unit, true)
+        return jass:GetHeroInt(unit, true)
     end
     if key == "str" then
-        return jass.GetHeroStr(unit, true)
+        return jass:GetHeroStr(unit, true)
     end
     if key == "agi" then
-        return jass.GetHeroAgi(unit, true)
+        return jass:GetHeroAgi(unit, true)
     end
     if key == "hp" then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             unit,
-            jass.ConvertUnitState(1)
+            jass:ConvertUnitState(1)
         )
     end
     if key == "mp" then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             unit,
-            jass.ConvertUnitState(3)
+            jass:ConvertUnitState(3)
         )
     end
     if key == "dmg" then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             unit,
-            jass.ConvertUnitState(21)
+            jass:ConvertUnitState(21)
         )
     end
     if key == "armor" then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             unit,
-            jass.ConvertUnitState(32)
+            jass:ConvertUnitState(32)
         )
     end
     return 0
 end
 --- 对 unit 所属玩家的金币做一次百分比加减（pct 可负）
 local function applyGoldPct(self, unit, pct)
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if not player then
         return
     end
-    local stateGold = jass.ConvertPlayerState(1)
-    local cur = jass.GetPlayerState(player, stateGold)
+    local stateGold = jass:ConvertPlayerState(1)
+    local cur = jass:GetPlayerState(player, stateGold)
     local delta = math.floor(cur * pct + 0.5)
     local newVal = cur + delta < 0 and 0 or cur + delta
-    jass.SetPlayerState(player, stateGold, newVal)
+    jass:SetPlayerState(player, stateGold, newVal)
 end
 local function executeSegment(self, unit, seg)
     local statEffects = {}
@@ -370,7 +370,7 @@ local function executeSegment(self, unit, seg)
                 local cur = getHeroLevel(nil, unit)
                 local add = eff.isLevelMult and math.floor(cur * eff.value) or math.floor(eff.value)
                 if add > 0 then
-                    jass.SetHeroLevel(unit, cur + add, true)
+                    jass:SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                 local name = KEY_TO_NAME[eff.key]
@@ -399,7 +399,7 @@ local function executeSegment(self, unit, seg)
             local remaining = math.floor(seg.timeSec)
             local cb
             cb = function()
-                if capturedUnit and jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
+                if capturedUnit and jass:IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
                     offSecond(nil, cb)
                     return
                 end
@@ -422,7 +422,7 @@ local function executeSegment(self, unit, seg)
                 if mx ~= mn then
                     local a = mn < mx and mn or mx
                     local b = mn < mx and mx or mn
-                    delta = math.random(a, b)
+                    delta = math:random(a, b)
                 end
                 if delta ~= 0 then
                     AddGoldWithFeedback(nil, {delta = delta, unit = unit})
@@ -436,16 +436,16 @@ local function executeSegment(self, unit, seg)
         if seg.timeSec > 0 then
             local capturedStats = statEffects
             local capturedUnit = unit
-            local dt = jass.CreateTimer()
+            local dt = jass:CreateTimer()
             if dt then
                 local t = dt
-                jass.TimerStart(
+                jass:TimerStart(
                     t,
                     seg.timeSec,
                     false,
                     function()
                         applyStats(nil, capturedUnit, capturedStats, false)
-                        jass.DestroyTimer(t)
+                        jass:DestroyTimer(t)
                     end
                 )
             end
@@ -453,39 +453,39 @@ local function executeSegment(self, unit, seg)
     end
 end
 local function onUseItem(self)
-    local unit = jass.GetManipulatingUnit()
-    local item = jass.GetManipulatedItem()
+    local unit = jass:GetManipulatingUnit()
+    local item = jass:GetManipulatedItem()
     if not unit or not item then
         return
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
     if IsUnitIllusionBJ(nil, unit) then
         return
     end
-    local itemId = jass.GetItemTypeId(item)
+    local itemId = jass:GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.PowerUP then
         return
     end
     local glob = _G
-    local key = (("__EquipPowerUP_" .. tostring(unit)) .. "_") .. idStr
+    local key = (("__EquipPowerUP_" .. tostring(nil, unit)) .. "_") .. idStr
     if glob[key] then
         return
     end
     glob[key] = true
-    local ct = jass.CreateTimer()
+    local ct = jass:CreateTimer()
     if ct then
         local t = ct
-        jass.TimerStart(
+        jass:TimerStart(
             t,
             0.5,
             false,
             function()
                 glob[key] = nil
-                jass.DestroyTimer(t)
+                jass:DestroyTimer(t)
             end
         )
     end

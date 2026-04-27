@@ -22,8 +22,8 @@ local STES_Register = ____require_result_0.STES_Register
 local function debugPrint(self, msg)
 end
 local function registerObjectiveUpdateEvent(self)
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(
+    local trig = jass:CreateTrigger()
+    jass:TriggerAddAction(
         trig,
         function()
             debugPrint(nil, "目标更新事件触发，调用任务管理器...")
@@ -43,7 +43,7 @@ local function registerObjectiveUpdateEvent(self)
             end
         end
     )
-    STES_Register(trig, "任务目标更新")
+    STES_Register(nil, trig, "任务目标更新")
     debugPrint(nil, "已注册 任务目标更新 事件")
 end
 local function init(self)

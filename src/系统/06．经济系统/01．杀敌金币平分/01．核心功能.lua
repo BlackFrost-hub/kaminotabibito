@@ -46,7 +46,7 @@ local function isPlayerHero(unit)
     if not heroGroup or not unit then
         return false
     end
-    return jass.IsUnitInGroup(unit, heroGroup) == true
+    return jass:IsUnitInGroup(unit, heroGroup) == true
 end
 --- 获取英雄单位组
 local function getHeroGroup()
@@ -60,11 +60,11 @@ local function getHeroGroup()
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
-    local owner = jass.GetOwningPlayer(dyingUnit)
+    local owner = jass:GetOwningPlayer(dyingUnit)
     if owner == nil then
         return false
     end
-    local playerId = jass.GetPlayerId(owner)
+    local playerId = jass:GetPlayerId(owner)
     return playerId == 12 or playerId == 7
 end
 --- 给予玩家金币（带音效和漂浮文字）
@@ -96,7 +96,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if not isValidDyingUnit(dyingUnit) then
         return
     end
-    local dyingUnitType = jass.GetUnitTypeId(dyingUnit)
+    local dyingUnitType = jass:GetUnitTypeId(dyingUnit)
     if not dyingUnitType then
         return
     end
@@ -105,7 +105,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
         return
     end
     if killer ~= nil then
-        local killerPlayer = jass.GetOwningPlayer(killer)
+        local killerPlayer = jass:GetOwningPlayer(killer)
         if killerPlayer ~= nil then
             giveGoldToPlayer(killer, killerPlayer, baseBounty, false)
         end
@@ -117,22 +117,22 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if shareGold <= 0 then
         return
     end
-    local ____temp_7 = jass.GetUnitX(dyingUnit)
+    local ____temp_7 = jass:GetUnitX(dyingUnit)
     if ____temp_7 == nil then
         ____temp_7 = 0
     end
     local dyingX = ____temp_7
-    local ____temp_8 = jass.GetUnitY(dyingUnit)
+    local ____temp_8 = jass:GetUnitY(dyingUnit)
     if ____temp_8 == nil then
         ____temp_8 = 0
     end
     local dyingY = ____temp_8
-    local killerPlayer = jass.GetOwningPlayer(killer)
+    local killerPlayer = jass:GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
     if killerPlayer == nil or heroGroup == nil then
         return
     end
-    local ____temp_9 = jass.BlzGroupGetSize(heroGroup)
+    local ____temp_9 = jass:BlzGroupGetSize(heroGroup)
     if ____temp_9 == nil then
         ____temp_9 = 0
     end
@@ -141,22 +141,22 @@ local function onUnitDeathHandler(dyingUnit, killer)
         local i = 0
         while i < heroCount do
             do
-                local hero = jass.BlzGroupUnitAt(heroGroup, i)
+                local hero = jass:BlzGroupUnitAt(heroGroup, i)
                 if not hero then
                     goto __continue22
                 end
                 if hero == killer then
                     goto __continue22
                 end
-                if jass.IsUnitAlly(hero, killerPlayer) ~= true then
+                if jass:IsUnitAlly(hero, killerPlayer) ~= true then
                     goto __continue22
                 end
-                local ____temp_10 = jass.GetUnitX(hero)
+                local ____temp_10 = jass:GetUnitX(hero)
                 if ____temp_10 == nil then
                     ____temp_10 = 0
                 end
                 local heroX = ____temp_10
-                local ____temp_11 = jass.GetUnitY(hero)
+                local ____temp_11 = jass:GetUnitY(hero)
                 if ____temp_11 == nil then
                     ____temp_11 = 0
                 end
@@ -167,7 +167,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
                 if dist > SHARE_RANGE then
                     goto __continue22
                 end
-                local heroPlayer = jass.GetOwningPlayer(hero)
+                local heroPlayer = jass:GetOwningPlayer(hero)
                 if heroPlayer == nil then
                     goto __continue22
                 end

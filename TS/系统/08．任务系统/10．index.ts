@@ -81,9 +81,8 @@ if (ENABLE_QUEST_RUNTIME_CORE) {
 
 // ========== 任务 UI（04 拆分模块） ==========
 if (ENABLE_QUEST_UI_MODULE) {
-  const manager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as { init?: () => void; registerHotkey?: () => void };
-  // 开局创建全局单例任务 UI（各客户端对称）；不绑定英雄注册。
-  if (typeof manager.init === "function") manager.init();
+  const manager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as { registerHotkey?: () => void };
+  // N 槽架构：不再在此 init 单例；由 `00．玩家英雄获取桥接` 的 `onPlayerHeroRegistered` 触发创建。
   // 仅此一处注册 J/K1–K3：`12．任务UI管理器` 顶层不再 register，避免同一键叠两个 Dz 回调导致一次松键 toggle 两次。
   if (typeof manager.registerHotkey === "function") manager.registerHotkey();
 }

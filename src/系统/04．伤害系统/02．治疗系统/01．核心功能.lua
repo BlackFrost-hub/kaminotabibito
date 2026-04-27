@@ -111,8 +111,8 @@ local function getMissingLife(self, target)
     if target == nil then
         return 0
     end
-    local maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
-    local curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+    local maxLife = jass:GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
+    local curLife = jass:GetUnitState(target, jass.UNIT_STATE_LIFE)
     return math.max(0, maxLife - curLife)
 end
 --- 播放治疗特效
@@ -121,11 +121,11 @@ local function playHealEffect(self, target, effectPath)
         return
     end
     local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_HEAL_EFFECT_PATH
-    local x = jass.GetUnitX(target)
-    local y = jass.GetUnitY(target)
-    local eff = jass.AddSpecialEffect(path, x, y)
+    local x = jass:GetUnitX(target)
+    local y = jass:GetUnitY(target)
+    local eff = jass:AddSpecialEffect(path, x, y)
     if eff ~= nil then
-        jass.DestroyEffect(eff)
+        jass:DestroyEffect(eff)
     end
 end
 --- 触发数值显示事件
@@ -161,7 +161,7 @@ local function addHealStats(self, target, amount)
     if target == nil or amount <= 0 then
         return
     end
-    local hid = jass.GetHandleId(target)
+    local hid = jass:GetHandleId(target)
     if hid == nil or hid == 0 then
         return
     end
@@ -188,7 +188,7 @@ function ____exports.doHeal(self, params)
     if HealTarget == nil or HealAmount <= 0 then
         return 0
     end
-    if jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
         return 0
     end
     local amount = calcHealAmount(nil, HealSource, HealTarget, HealAmount)
@@ -215,8 +215,8 @@ function ____exports.doHeal(self, params)
     if actualHeal <= 0 then
         return 0
     end
-    local curLife = jass.GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
-    jass.SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
+    local curLife = jass:GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
+    jass:SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
     if HealEffect then
         playHealEffect(nil, HealTarget, HealEffectPath)
     end
@@ -281,7 +281,7 @@ function ____exports.getTotalHealed(self, unit)
     if unit == nil then
         return 0
     end
-    local hid = jass.GetHandleId(unit)
+    local hid = jass:GetHandleId(unit)
     if hid == nil or hid == 0 then
         return 0
     end

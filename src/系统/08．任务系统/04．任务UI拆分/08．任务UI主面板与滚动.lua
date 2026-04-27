@@ -41,6 +41,9 @@ function ____exports.buildTaskMainPanel(self, opts)
     local onClickSound = ____opts_0.onClickSound
     local onSwitchCategory = ____opts_0.onSwitchCategory
     local onShowTabTooltip = ____opts_0.onShowTabTooltip
+    local slotId = ____opts_0.slotId
+    local contextId = ____opts_0.contextId
+    local nameSuffix = "_s" .. tostring(slotId)
     local empty = {
         mainPanel = nil,
         listContainer = nil,
@@ -55,12 +58,12 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbHitBtn = nil,
         vScrollTrack = nil
     }
-    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
+    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent, contextId)
     if not mainPanel then
         return empty
     end
     if type(japi.DzFrameClearAllPoints) == "function" then
-        japi.DzFrameClearAllPoints(mainPanel)
+        japi:DzFrameClearAllPoints(mainPanel)
     end
     if entryFrame then
         setFramePointRelative(
@@ -76,10 +79,10 @@ function ____exports.buildTaskMainPanel(self, opts)
         setFramePosition(nil, mainPanel, {point = FramePoint.TOPLEFT, x = ENTRY_X + PANEL_REL_TO_ENTRY_X, y = ENTRY_Y + PANEL_REL_TO_ENTRY_Y})
     end
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
-    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
+    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel, contextId)
     if listContainer then
         if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(listContainer)
+            japi:DzFrameClearAllPoints(listContainer)
         end
         setFramePointRelative(
             nil,
@@ -91,7 +94,9 @@ function ____exports.buildTaskMainPanel(self, opts)
             LIST_CONTAINER_REL_TO_PANEL_Y
         )
         if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(listContainer, true) end
+            pcall(
+                nil,
+                function() return japi:DzFrameShow(listContainer, true) end
             )
         end
     end
@@ -108,7 +113,9 @@ function ____exports.buildTaskMainPanel(self, opts)
         setupTransparentGlueHitLayer = setupTransparentGlueHitLayer,
         onClickSound = onClickSound,
         onSwitchCategory = onSwitchCategory,
-        onShowTabTooltip = onShowTabTooltip
+        onShowTabTooltip = onShowTabTooltip,
+        slotId = slotId,
+        contextId = contextId
     })
     local scrollBarFrame = nil
     local scrollThumbFrame = nil
@@ -121,7 +128,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             function()
                 local ____createFrame_result_1 = createFrame(nil, {
                     type = FrameType.BACKDROP,
-                    name = "TaskScrollBarBtn",
+                    name = "TaskScrollBarBtn" .. nameSuffix,
                     parent = mainPanel,
                     template = "template",
                     visible = true
@@ -131,15 +138,16 @@ function ____exports.buildTaskMainPanel(self, opts)
                 end
                 local f = ____createFrame_result_1
                 return f
-            end
+            end,
+            contextId
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
             if type(japi.DzFrameShow) == "function" then
-                japi.DzFrameShow(scrollBarFrame, true)
+                japi:DzFrameShow(scrollBarFrame, true)
             end
             if type(japi.DzFrameClearAllPoints) == "function" then
-                japi.DzFrameClearAllPoints(scrollBarFrame)
+                japi:DzFrameClearAllPoints(scrollBarFrame)
             end
             setFramePointRelative(
                 nil,
@@ -161,12 +169,12 @@ function ____exports.buildTaskMainPanel(self, opts)
             )
             setFrameSize(nil, scrollBarFrame, {width = SCROLLBAR_W, height = LIST_VIEW_H})
             if type(japi.DzFrameSetLevel) == "function" then
-                japi.DzFrameSetLevel(scrollBarFrame, 30)
+                japi:DzFrameSetLevel(scrollBarFrame, 30)
             end
         end
         local ____createFrame_result_2 = createFrame(nil, {
             type = FrameType.BACKDROP,
-            name = "TaskScrollThumbDyn",
+            name = "TaskScrollThumbDyn" .. nameSuffix,
             parent = mainPanel,
             template = "template",
             visible = true
@@ -190,10 +198,10 @@ function ____exports.buildTaskMainPanel(self, opts)
                 )
             end
             if type(japi.DzFrameSetLevel) == "function" then
-                japi.DzFrameSetLevel(scrollThumbFrame, 120)
+                japi:DzFrameSetLevel(scrollThumbFrame, 120)
             end
             if type(japi.DzFrameShow) == "function" then
-                japi.DzFrameShow(scrollThumbFrame, true)
+                japi:DzFrameShow(scrollThumbFrame, true)
             end
         end
     end

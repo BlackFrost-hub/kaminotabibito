@@ -26,34 +26,34 @@ function ____exports.syncQuestToWar3Native(self, _playerId, questId)
         return
     end
     if questData.nativeHandle then
-        jass.DestroyQuest(questData.nativeHandle)
+        jass:DestroyQuest(questData.nativeHandle)
     end
-    local nativeQuest = jass.CreateQuest()
+    local nativeQuest = jass:CreateQuest()
     questData.nativeHandle = nativeQuest
     if not nativeQuest then
         return
     end
-    jass.QuestSetTitle(nativeQuest, questData.title)
-    jass.QuestSetDescription(nativeQuest, questData.description)
+    jass:QuestSetTitle(nativeQuest, questData.title)
+    jass:QuestSetDescription(nativeQuest, questData.description)
     if questData.icon then
-        jass.QuestSetIconPath(nativeQuest, questData.icon)
+        jass:QuestSetIconPath(nativeQuest, questData.icon)
     end
-    jass.QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
+    jass:QuestSetRequired(nativeQuest, questData.type == QuestType.MAIN)
     repeat
         local ____switch7 = questData.status
         local ____cond7 = ____switch7 == QuestStatus.IN_PROGRESS
         if ____cond7 then
-            jass.QuestSetDiscovered(nativeQuest, true)
+            jass:QuestSetDiscovered(nativeQuest, true)
             break
         end
         ____cond7 = ____cond7 or ____switch7 == QuestStatus.COMPLETED
         if ____cond7 then
-            jass.QuestSetCompleted(nativeQuest, true)
+            jass:QuestSetCompleted(nativeQuest, true)
             break
         end
         ____cond7 = ____cond7 or ____switch7 == QuestStatus.FAILED
         if ____cond7 then
-            jass.QuestSetFailed(nativeQuest, true)
+            jass:QuestSetFailed(nativeQuest, true)
             break
         end
     until true

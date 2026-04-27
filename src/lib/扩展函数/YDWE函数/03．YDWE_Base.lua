@@ -125,13 +125,13 @@ function ____exports.YDWERad2R(self, rad)
     return rad
 end
 function ____exports.YDWEInitHashtable(self)
-    return jass.InitHashtable()
+    return jass:InitHashtable()
 end
 function ____exports.YDWEIsTriggerEventId(self, eventid)
-    return eventid == jass.GetTriggerEventId()
+    return eventid == jass:GetTriggerEventId()
 end
 function ____exports.YDWEH2I(self, handle)
-    return jass.GetHandleId(handle)
+    return jass:GetHandleId(handle)
 end
 function ____exports.YDWEGetUnitID(self, a)
     return ____exports.YDWEH2I(nil, a)

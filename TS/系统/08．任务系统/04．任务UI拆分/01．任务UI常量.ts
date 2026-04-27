@@ -1,3 +1,8 @@
+/** N 槽：最大玩家数（与对话框系统一致） */
+export const MAX_PLAYERS = 4;
+/** N 槽：DzCreateFrame contextId 偏移基数，每槽位占 1000 个 ID 空间 */
+export const TAG_SLOT_OFFSET = 1000;
+
 export const TASK_UI_TOC_PATHS = ["UI\\TaskUI.toc"];
 export const TASK_UI_TOC_LOAD_KEY = "TaskUI";
 

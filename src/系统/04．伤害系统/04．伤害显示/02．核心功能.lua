@@ -17,12 +17,12 @@ function ____exports.updateAllDamageDigits()
                 local data = activeDigits[i + 1]
                 data.tick = data.tick + 1
                 if data.tick >= DISPLAY_DURATION_TICKS then
-                    jass.DestroyImage(data.image)
+                    jass:DestroyImage(data.image)
                     __TS__ArraySplice(activeDigits, i, 1)
                     goto __continue40
                 end
                 local newHeight = RISE_SPEED * data.tick
-                jass.SetImagePosition(data.image, data.x, data.y, newHeight)
+                jass:SetImagePosition(data.image, data.x, data.y, newHeight)
             end
             ::__continue40::
             i = i - 1
@@ -100,7 +100,7 @@ local function getUnitModelScale(unit)
     if not unit then
         return 1
     end
-    local unitType = jass.GetUnitTypeId(unit)
+    local unitType = jass:GetUnitTypeId(unit)
     if not unitType then
         return 1
     end
@@ -141,34 +141,34 @@ local function getDigitCount(value)
 end
 --- 获取伤害类型对应的颜色
 local function getDamageTypeColor()
-    if _____4F24_5BB3_51FD_6570.isFireDamage() then
+    if _____4F24_5BB3_51FD_6570:isFireDamage() then
         return DAMAGE_TYPE_COLORS.FIRE
     end
-    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
+    if _____4F24_5BB3_51FD_6570:isWaterDamage() then
         return DAMAGE_TYPE_COLORS.COLD
     end
-    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
+    if _____4F24_5BB3_51FD_6570:isThunderDamage() then
         return DAMAGE_TYPE_COLORS.LIGHTNING
     end
-    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
+    if _____4F24_5BB3_51FD_6570:isMetalDamage() then
         return DAMAGE_TYPE_COLORS.POISON
     end
-    if _____4F24_5BB3_51FD_6570.isLightDamage() then
+    if _____4F24_5BB3_51FD_6570:isLightDamage() then
         return DAMAGE_TYPE_COLORS.DIVINE
     end
-    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
+    if _____4F24_5BB3_51FD_6570:isDarkDamage() then
         return DAMAGE_TYPE_COLORS.SHADOW
     end
-    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
+    if _____4F24_5BB3_51FD_6570:isWoodDamage() then
         return DAMAGE_TYPE_COLORS.PLANT
     end
-    if _____4F24_5BB3_51FD_6570.isPhysicalDamage() then
+    if _____4F24_5BB3_51FD_6570:isPhysicalDamage() then
         return DAMAGE_TYPE_COLORS.NORMAL
     end
-    if _____4F24_5BB3_51FD_6570.isMagicDamage() then
+    if _____4F24_5BB3_51FD_6570:isMagicDamage() then
         return DAMAGE_TYPE_COLORS.MAGIC
     end
-    if _____4F24_5BB3_51FD_6570.isEnhancedDamage() then
+    if _____4F24_5BB3_51FD_6570:isEnhancedDamage() then
         return DAMAGE_TYPE_COLORS.ENHANCED
     end
     return DEFAULT_COLOR
@@ -177,7 +177,7 @@ end
 local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
     local imagePath = getDigitImagePath(digit)
     local size = DIGIT_BASE_SIZE * modelScale
-    local image = jass.CreateImage(
+    local image = jass:CreateImage(
         imagePath,
         size,
         size,
@@ -193,7 +193,7 @@ local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
     if not image then
         return nil
     end
-    jass.SetImageColor(
+    jass:SetImageColor(
         image,
         color.red,
         color.green,
@@ -201,9 +201,9 @@ local function createDigitImage(digit, x, y, modelScale, color, unitFlyHeight)
         255
     )
     local height = (BASE_HEIGHT + unitFlyHeight) * modelScale
-    jass.SetImageConstantHeight(image, true, height)
-    jass.SetImageRenderAlways(image, true)
-    jass.SetImageType(image, 5)
+    jass:SetImageConstantHeight(image, true, height)
+    jass:SetImageRenderAlways(image, true)
+    jass:SetImageType(image, 5)
     return image
 end
 --- 显示伤害数字
@@ -217,9 +217,9 @@ function ____exports.showDamageNumber(target, damage)
     local damageInt = math.floor(damage)
     local damageStr = tostring(damageInt)
     local digitCount = getDigitCount(damageInt)
-    local x = jass.GetUnitX(target)
-    local y = jass.GetUnitY(target)
-    local flyHeight = jass.GetUnitFlyHeight(target)
+    local x = jass:GetUnitX(target)
+    local y = jass:GetUnitY(target)
+    local flyHeight = jass:GetUnitFlyHeight(target)
     local modelScale = getUnitModelScale(target)
     local color = getDamageTypeColor()
     local offsetX = -INITIAL_OFFSET_BASE * digitCount

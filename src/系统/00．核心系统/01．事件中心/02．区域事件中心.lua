@@ -7,10 +7,10 @@ local enterRegionListeners = {}
 local enterRegionRegistered = {}
 local enterRegionMasters = {}
 local function handleKey(handle)
-    return tostring(handle)
+    return tostring(nil, handle)
 end
 local function filterKey(filter)
-    return filter == nil and "null" or tostring(filter)
+    return filter == nil and "null" or tostring(nil, filter)
 end
 local function normalizeFilter(filter)
     local ____temp_0
@@ -46,9 +46,9 @@ local function dispatchListeners(list)
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue12
                 end
-                local passed = jass.TriggerEvaluate(listener.trigger)
+                local passed = jass:TriggerEvaluate(listener.trigger)
                 if passed then
-                    jass.TriggerExecute(listener.trigger)
+                    jass:TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
@@ -100,12 +100,12 @@ function ____exports.registerEnterRegionTrigger(trigger, region, filter)
     local key = regionKey(region, filter)
     if not enterRegionRegistered[key] then
         local normalizedFilter = normalizeFilter(filter)
-        local master = jass.CreateTrigger()
+        local master = jass:CreateTrigger()
         enterRegionMasters[key] = master
         enterRegionRegistered[key] = true
         enterRegionListeners[key] = enterRegionListeners[key] or ({})
-        jass.TriggerRegisterEnterRegion(master, region, normalizedFilter)
-        jass.TriggerAddAction(
+        jass:TriggerRegisterEnterRegion(master, region, normalizedFilter)
+        jass:TriggerAddAction(
             master,
             function()
                 dispatchListeners(enterRegionListeners[key])

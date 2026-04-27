@@ -34,17 +34,8 @@ function normalizeRequireCount(count?: number): number {
 }
 
 function refreshTaskUIForAllClientsSoon(): void {
-  const t = jass.CreateTimer();
-  jass.TimerStart(t, 0.03, false, () => {
-    (pcall as any)(() => {
-      const mod = require("系统.08．任务系统.03．任务UI") as { taskUI?: { refreshList?: () => void } };
-      if (mod.taskUI && typeof mod.taskUI.refreshList === "function") {
-        mod.taskUI.refreshList();
-      }
-    });
-    jass.PauseTimer(t);
-    jass.DestroyTimer(t);
-  });
+  // 任务UI刷新已由 questManager.registerUIRefreshCallback 自动处理，
+  // 不再需要手动调用旧 taskUI.refreshList。
 }
 
 function grantQuestItems(hero: any, questItems?: string): void {

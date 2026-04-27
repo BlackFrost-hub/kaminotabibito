@@ -54,7 +54,7 @@ function createHiddenRoot(
   width: number = LIST_CONTAINER_W,
   height: number = PAGE_ROOT_HEIGHT
 ): number | null {
-  const frame = ctx.createFrame({ type: "FRAME", name, parent, template: "template", visible: false }) || 0;
+  const frame = ctx.createFrame({ type: "FRAME", name, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
   if (!frame) return null;
   ctx.setFramePointRelative(frame, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, 0, 0);
   ctx.setFrameSize(frame, { width, height });
@@ -73,7 +73,7 @@ function createHiddenText(ctx: TaskUIListControlContext, name: string, parent: n
 function createHiddenBackdrop(ctx: TaskUIListControlContext, templateName: string, frameName: string, parent: number, texture?: string, contextId?: number): number | null {
   let frame = tryCreateFromFdfOnly(templateName, parent, contextId ?? 0) || 0;
   if (!frame) {
-    frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name: frameName, parent, template: "template", visible: false }) || 0;
+    frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name: frameName, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
     if (frame && texture) ctx.setFrameTexture(frame, texture);
   }
   if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BACKDROP_LEVEL);
@@ -81,16 +81,16 @@ function createHiddenBackdrop(ctx: TaskUIListControlContext, templateName: strin
 }
 
 function createPlainHiddenBackdrop(ctx: TaskUIListControlContext, name: string, parent: number): number | null {
-  const frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name, parent, template: "template", visible: false }) || 0;
+  const frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
   if (frame && typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, ICON_LEVEL);
   return frame || null;
 }
 
 function createHiddenButton(ctx: TaskUIListControlContext, name: string, parent: number, onClick: () => void): number | null {
-  const frame = ctx.createFrame({ type: ctx.FrameType.GLUETEXTBUTTON, name, parent, template: "template", visible: false, enable: true, alpha: 0 }) || 0;
+  const frame = ctx.createFrame({ type: ctx.FrameType.GLUETEXTBUTTON, name, parent, template: "template", visible: false, enable: true, alpha: 0, id: ctx.contextId }) || 0;
   if (!frame) return null;
   if (typeof (japi as any).DzFrameSetLevel === "function") (japi as any).DzFrameSetLevel(frame, BUTTON_LEVEL);
-  ctx.setFrameClickEvent(frame, onClick, false);
+  ctx.setFrameClickEvent(frame, onClick, true);
   return frame;
 }
 

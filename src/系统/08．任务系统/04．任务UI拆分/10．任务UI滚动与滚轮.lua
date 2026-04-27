@@ -126,11 +126,26 @@ function onThumbDragMove(self)
 end
 local japi = require("jass.japi")
 local wheelCtx = nil
+--- N 槽：所有已注册的滚动上下文，滚轮/拖拽事件路由到可见的那个
+local allWheelCtxs = {}
 --- 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc）
 local taskThumbGlobalMouseTrig = nil
+local function findVisibleWheelCtx(self)
+    do
+        local i = 0
+        while i < #allWheelCtxs do
+            local ctx = allWheelCtxs[i + 1]
+            if ctx:isVisible() then
+                return ctx
+            end
+            i = i + 1
+        end
+    end
+    return wheelCtx
+end
 local function taskUIWheelEventPcallBody(self)
-    local ctx = wheelCtx
-    if not ctx:isVisible() then
+    local ctx = findVisibleWheelCtx(nil)
+    if not ctx or not ctx:isVisible() then
         return
     end
     if not isWheelTargetForTaskListByJapi(
@@ -215,7 +230,7 @@ local function onThumbDragEnd(self)
 end
 --- 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc
 local function taskUIThumbPressPcallBody(self)
-    local ctx = wheelCtx
+    local ctx = findVisibleWheelCtx(nil)
     if not ctx or not ctx:isVisible() then
         return
     end
@@ -276,6 +291,7 @@ end
 function ____exports.registerTaskUIListWheel(self, ctx)
     wheelCtx = ctx
     dragCtx = ctx
+    allWheelCtxs[#allWheelCtxs + 1] = ctx
     ensureTaskThumbGlobalMouseRegistered(nil)
     if not ENABLE_MOUSE_WHEEL_SCROLL then
         return ctx.taskListWheelTrig

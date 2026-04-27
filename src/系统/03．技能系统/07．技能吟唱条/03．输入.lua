@@ -58,21 +58,21 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    local h = jass.StringHash(eventName)
-    return jass.LoadInteger(
+    local h = jass:StringHash(eventName)
+    return jass:LoadInteger(
         ht,
         h,
         ydlStes_skeyIndex(nil, nil)
     )
 end
 local function scheduleRetry(fn)
-    local tm = jass.CreateTimer()
-    jass.TimerStart(
+    local tm = jass:CreateTimer()
+    jass:TimerStart(
         tm,
         RETRY_SEC,
         false,
         function()
-            jass.DestroyTimer(tm)
+            jass:DestroyTimer(tm)
             fn(nil)
         end
     )
@@ -87,8 +87,8 @@ function ____exports.tryRegisterCastBarStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(trig, onCastBarEvent)
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(trig, onCastBarEvent)
         g[TRIG_KEY] = trig
     end
     local trig = g[TRIG_KEY]

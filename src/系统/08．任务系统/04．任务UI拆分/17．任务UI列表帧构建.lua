@@ -36,7 +36,8 @@ function ____exports.createHiddenRoot(self, ctx, name, parent, width, height)
         name = name,
         parent = parent,
         template = "template",
-        visible = false
+        visible = false,
+        id = ctx.contextId
     }) or 0
     if not frame then
         return nil
@@ -51,7 +52,7 @@ function ____exports.createHiddenRoot(self, ctx, name, parent, width, height)
     )
     ctx:setFrameSize(frame, {width = width, height = height})
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, ROOT_LEVEL)
+        japi:DzFrameSetLevel(frame, ROOT_LEVEL)
     end
     return frame
 end
@@ -73,29 +74,30 @@ function ____exports.createHiddenText(self, ctx, name, parent, width, height)
         return nil
     end
     if type(japi.DzFrameShow) == "function" then
-        japi.DzFrameShow(frame, false)
+        japi:DzFrameShow(frame, false)
     end
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, TEXT_LEVEL)
+        japi:DzFrameSetLevel(frame, TEXT_LEVEL)
     end
     return frame
 end
 function ____exports.createHiddenBackdrop(self, ctx, templateName, frameName, parent, texture, contextId)
-    local frame = tryCreateFromFdfOnly(nil, templateName, parent, contextId or 0) or 0
+    local frame = tryCreateFromFdfOnly(nil, templateName, parent, contextId or ctx.contextId) or 0
     if not frame then
         frame = ctx:createFrame({
             type = ctx.FrameType.BACKDROP,
             name = frameName,
             parent = parent,
             template = "template",
-            visible = false
+            visible = false,
+            id = ctx.contextId
         }) or 0
         if frame and texture then
             ctx:setFrameTexture(frame, texture)
         end
     end
     if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, BACKDROP_LEVEL)
+        japi:DzFrameSetLevel(frame, BACKDROP_LEVEL)
     end
     return frame or nil
 end
@@ -105,10 +107,11 @@ function ____exports.createPlainHiddenBackdrop(self, ctx, name, parent)
         name = name,
         parent = parent,
         template = "template",
-        visible = false
+        visible = false,
+        id = ctx.contextId
     }) or 0
     if frame and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, ICON_LEVEL)
+        japi:DzFrameSetLevel(frame, ICON_LEVEL)
     end
     return frame or nil
 end
@@ -120,15 +123,16 @@ function ____exports.createHiddenButton(self, ctx, name, parent, onClick)
         template = "template",
         visible = false,
         enable = true,
-        alpha = 0
+        alpha = 0,
+        id = ctx.contextId
     }) or 0
     if not frame then
         return nil
     end
     if type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(frame, BUTTON_LEVEL)
+        japi:DzFrameSetLevel(frame, BUTTON_LEVEL)
     end
-    ctx:setFrameClickEvent(frame, onClick, false)
+    ctx:setFrameClickEvent(frame, onClick, true)
     return frame
 end
 local function hideFrames(self, frames, setVisible)
@@ -194,16 +198,16 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
         parent
     )
     if backdrop and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(backdrop, BACKDROP_LEVEL)
+        japi:DzFrameSetLevel(backdrop, BACKDROP_LEVEL)
     end
     if title and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(title, TEXT_LEVEL)
+        japi:DzFrameSetLevel(title, TEXT_LEVEL)
     end
     if clickBtn and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(clickBtn, BUTTON_LEVEL)
+        japi:DzFrameSetLevel(clickBtn, BUTTON_LEVEL)
     end
     if icon and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(icon, ICON_LEVEL)
+        japi:DzFrameSetLevel(icon, ICON_LEVEL)
     end
     do
         local i = 0
@@ -217,7 +221,7 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
                 OBJECTIVE_HEIGHT
             )
             if frame and type(japi.DzFrameSetLevel) == "function" then
-                japi.DzFrameSetLevel(frame, TEXT_LEVEL)
+                japi:DzFrameSetLevel(frame, TEXT_LEVEL)
             end
             objectiveFrames[#objectiveFrames + 1] = frame or 0
             i = i + 1
@@ -232,7 +236,7 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
         FAIL_HEIGHT
     )
     if failFrame and type(japi.DzFrameSetLevel) == "function" then
-        japi.DzFrameSetLevel(failFrame, TEXT_LEVEL)
+        japi:DzFrameSetLevel(failFrame, TEXT_LEVEL)
     end
     do
         local i = 0
@@ -246,7 +250,7 @@ function ____exports.createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
                 DETAIL_HEIGHT
             )
             if frame and type(japi.DzFrameSetLevel) == "function" then
-                japi.DzFrameSetLevel(frame, TEXT_LEVEL)
+                japi:DzFrameSetLevel(frame, TEXT_LEVEL)
             end
             detailFrames[#detailFrames + 1] = frame or 0
             i = i + 1
@@ -333,7 +337,7 @@ function ____exports.createCategory(self, ctx, category, setVisible)
     if emptyText then
         ctx:applyDzTextFontAndCenterAlignment(emptyText)
         if type(japi.DzFrameSetLevel) == "function" then
-            japi.DzFrameSetLevel(emptyText, TEXT_LEVEL)
+            japi:DzFrameSetLevel(emptyText, TEXT_LEVEL)
         end
         setVisible(nil, emptyText, false)
     end

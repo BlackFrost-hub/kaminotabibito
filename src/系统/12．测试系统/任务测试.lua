@@ -12,14 +12,14 @@ local KEY_LETTER = ____index.KEY_LETTER
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
-local taskUI = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器").taskUI
+local taskUIManager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
 local function debugPrint(self, msg)
     local pr = _G.print
     if pr ~= nil then
-        pr("[QuestTest] " .. msg)
+        pr(nil, "[QuestTest] " .. msg)
     end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
+    jass:DisplayTimedTextToPlayer(
+        jass:Player(0),
         0,
         0,
         8,
@@ -72,20 +72,14 @@ end
 --- 测试UI显示
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
-    pcall(function ()
-            taskUI:togglePanelByVisibilityOnly()
-            debugPrint(nil, "任务UI已显示")
-        end
-    )
-    withTimer(
+    pcall(
         nil,
-        3,
         function()
-            pcall(function ()
-                    taskUI:togglePanelByVisibilityOnly()
-                    debugPrint(nil, "任务UI已隐藏")
-                end
-            )
+            local p0 = jass:Player(0)
+            if type(taskUIManager.onPlayerHeroRegistered) == "function" then
+                taskUIManager.onPlayerHeroRegistered(p0, nil)
+            end
+            debugPrint(nil, "任务UI已为玩家0创建")
         end
     )
 end
@@ -144,7 +138,7 @@ function ____exports.registerTestCommand(self)
             function(____, player, key)
                 local ____player_3
                 if player then
-                    ____player_3 = jass.GetPlayerId(player)
+                    ____player_3 = jass:GetPlayerId(player)
                 else
                     ____player_3 = 0
                 end

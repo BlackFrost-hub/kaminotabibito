@@ -52,7 +52,9 @@ function ____exports.registerDotType(self, config)
 end
 --- Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统
 local function notifyBuffPool(self, typeId, target, state)
-    pcall(function ()
+    pcall(
+        nil,
+        function()
             local m = require("系统.05．Buff系统.00．Buff系统")
             if m ~= nil and type(m.syncDotBuff) == "function" then
                 m:syncDotBuff(typeId, target, state)

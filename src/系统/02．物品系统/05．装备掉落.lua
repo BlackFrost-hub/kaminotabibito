@@ -56,11 +56,11 @@ local PREFIX = "|cffffff00『系统提示』：|r";
         return
     end
     _G[key] = true
-    math.randomseed(123456789)
+    math:randomseed(123456789)
     do
         local i = 0
         while i < 10 do
-            math.random()
+            math:random()
             i = i + 1
         end
     end
@@ -153,13 +153,13 @@ local function weightedPickOne(self, pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_2 = pool[math.random(1, #pool)]
+        local ____opt_2 = pool[math:random(1, #pool)]
         if ____opt_2 ~= nil then
             ____opt_2 = ____opt_2.id
         end
         return ____opt_2
     end
-    local r = math.random(1, 10000) / 10000 * sum
+    local r = math:random(1, 10000) / 10000 * sum
     local acc = 0
     for ____, p in ipairs(pool) do
         acc = acc + p.weight
@@ -190,7 +190,7 @@ local function pickFromWeightedPool(self, pool, picks)
             end
             out[#out + 1] = p.id
         else
-            local r = math.random(1, 10000) / 10000
+            local r = math:random(1, 10000) / 10000
             local ____this_7
             ____this_7 = _G
             local ____opt_6 = ____this_7.print
@@ -216,7 +216,7 @@ local function pickFromWeightedPool(self, pool, picks)
         do
             local i = #out - 1
             while i >= 1 do
-                local j = math.random(1, i + 1)
+                local j = math:random(1, i + 1)
                 local t = out[i + 1]
                 out[i + 1] = out[j]
                 out[j] = t
@@ -257,7 +257,7 @@ local function pickFromEqualPool(self, ids, picks)
     do
         local i = 0
         while i < firstPicks do
-            local idx = math.random(1, #list)
+            local idx = math:random(1, #list)
             local id = list[idx - 1]
             out[#out + 1] = id
             __TS__ArraySplice(list, idx - 1, 1)
@@ -268,7 +268,7 @@ local function pickFromEqualPool(self, ids, picks)
     do
         local i = 0
         while i < needMore do
-            local idx = math.random(1, #ids)
+            local idx = math:random(1, #ids)
             out[#out + 1] = ids[idx - 1]
             i = i + 1
         end
@@ -277,16 +277,16 @@ local function pickFromEqualPool(self, ids, picks)
 end
 local function createItemAtUnit(self, unit, itemId)
     local four = stringToFourCC(nil, itemId)
-    local loc = jass.GetUnitLoc(unit)
+    local loc = jass:GetUnitLoc(unit)
     if loc then
         equipExcrete:setLastCreatedItem(itemInv:CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
-        local x = jass.GetUnitX(unit)
-        local y = jass.GetUnitY(unit)
-        equipExcrete:setLastCreatedItem(jass.CreateItem(four, x, y))
+        local x = jass:GetUnitX(unit)
+        local y = jass:GetUnitY(unit)
+        equipExcrete:setLastCreatedItem(jass:CreateItem(four, x, y))
     end
     if loc then
-        jass.RemoveLocation(loc)
+        jass:RemoveLocation(loc)
     end
 end
 local function onUnitDeath(self, unit, _killer)
@@ -296,7 +296,7 @@ local function onUnitDeath(self, unit, _killer)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local typeId = jass.GetUnitTypeId(unit)
+    local typeId = jass:GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(nil, typeId)
     local entry = unitId and idData[unitId] or nil
     local ____this_11
@@ -321,7 +321,7 @@ local function onUnitDeath(self, unit, _killer)
             ____opt_12(____this_13, "[装备掉落] 找到掉落表 itemIds:", entry.itemIds)
         end
         local dropProc = entry.dropProc ~= nil and __TS__Number(entry.dropProc) or 1
-        local r = math.random(1, 10000)
+        local r = math:random(1, 10000)
         if r > dropProc * 10000 then
             return
         end
@@ -352,7 +352,7 @@ local function onUnitDeath(self, unit, _killer)
             if typeId ~= stringToFourCC(nil, rule.unitId) then
                 goto __continue74
             end
-            local r = math.random(1, 10000)
+            local r = math:random(1, 10000)
             if r > rule.proc * 10000 then
                 goto __continue74
             end
@@ -360,7 +360,7 @@ local function onUnitDeath(self, unit, _killer)
             if #list == 0 then
                 goto __continue74
             end
-            local idx = math.random(1, #list)
+            local idx = math:random(1, #list)
             local itemId = list[idx]
             if itemId ~= nil and itemId ~= "" then
                 createItemAtUnit(nil, unit, itemId)
