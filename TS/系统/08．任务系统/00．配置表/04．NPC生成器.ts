@@ -16,6 +16,11 @@ import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展
 import { runNpcInitAction } from "./05．NPC初始化动作";
 import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/15．NPC头顶与气泡特效";
 
+// ── pcall 槽位：具名函数体 + 模块变量 ──
+let __pcallModelUnit: any = 0;
+let __pcallModelPath = "";
+function __pcallSetUnitModelBody(): void { japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath); }
+
 const _print = (globalThis as any).print as (...args: any[]) => void;
 
 /**
