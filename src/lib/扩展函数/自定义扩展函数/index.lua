@@ -27,6 +27,14 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return

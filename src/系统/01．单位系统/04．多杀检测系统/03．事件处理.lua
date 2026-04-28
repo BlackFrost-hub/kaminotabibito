@@ -14,11 +14,10 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子�
 local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local CountUnitsInGroup = ____require_result_3.CountUnitsInGroup
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_4.debugLog
 local function dbg(self, msg)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, "[多杀STES] " .. msg)
-    end
+    debugLog(nil, "多杀STES", msg)
 end
 --- 触发"OnMultiKill"事件
 -- 供JASS端调用，启动多杀监控
@@ -84,64 +83,64 @@ function ____exports.fireMultiKillEvent(self)
     local killWindow = YDLocal5Get(nil, "real", "killWindow")
     local killThreshold = YDLocal5Get(nil, "integer", "killThreshold")
     dbg(nil, "【关键参数检查】")
-    local ____dbg_5 = dbg
-    local ____temp_4
+    local ____dbg_6 = dbg
+    local ____temp_5
     if killWindow ~= nil and killWindow ~= 0 then
-        ____temp_4 = killWindow
+        ____temp_5 = killWindow
     else
-        ____temp_4 = "nil/0"
+        ____temp_5 = "nil/0"
     end
-    ____dbg_5(
+    ____dbg_6(
         nil,
-        "  killWindow=" .. tostring(____temp_4)
+        "  killWindow=" .. tostring(____temp_5)
     )
-    local ____dbg_7 = dbg
-    local ____temp_6
+    local ____dbg_8 = dbg
+    local ____temp_7
     if killThreshold ~= nil and killThreshold ~= 0 then
-        ____temp_6 = killThreshold
+        ____temp_7 = killThreshold
     else
-        ____temp_6 = "nil/0"
+        ____temp_7 = "nil/0"
     end
-    ____dbg_7(
+    ____dbg_8(
         nil,
-        "  killThreshold=" .. tostring(____temp_6)
+        "  killThreshold=" .. tostring(____temp_7)
     )
-    local ____dbg_9 = dbg
-    local ____temp_8
+    local ____dbg_10 = dbg
+    local ____temp_9
     if killGroup ~= 0 and killGroup ~= nil then
-        ____temp_8 = jass.CountUnitsInGroup(killGroup)
+        ____temp_9 = jass.CountUnitsInGroup(killGroup)
     else
-        ____temp_8 = "N/A"
+        ____temp_9 = "N/A"
     end
-    ____dbg_9(
+    ____dbg_10(
         nil,
-        "  killGroup内单位数=" .. tostring(____temp_8)
+        "  killGroup内单位数=" .. tostring(____temp_9)
     )
     if killGroup == nil or killGroup == 0 then
         dbg(nil, "错误: killGroup 为空，无法启动监控")
         return
     end
     dbg(nil, "调用 startMultiKillMonitor...")
-    local ____startMultiKillMonitor_14 = startMultiKillMonitor
-    local ____resolvedEffectSource_12 = resolvedEffectSource
-    local ____killGroup_13 = killGroup
-    local ____temp_10
-    if killThreshold ~= nil and killThreshold ~= 0 then
-        ____temp_10 = killThreshold
-    else
-        ____temp_10 = 3
-    end
+    local ____startMultiKillMonitor_15 = startMultiKillMonitor
+    local ____resolvedEffectSource_13 = resolvedEffectSource
+    local ____killGroup_14 = killGroup
     local ____temp_11
-    if killWindow ~= nil and killWindow ~= 0 then
-        ____temp_11 = killWindow
+    if killThreshold ~= nil and killThreshold ~= 0 then
+        ____temp_11 = killThreshold
     else
         ____temp_11 = 3
     end
-    ____startMultiKillMonitor_14(nil, {
-        effectSource = ____resolvedEffectSource_12,
-        killGroup = ____killGroup_13,
-        killThreshold = ____temp_10,
-        killWindow = ____temp_11,
+    local ____temp_12
+    if killWindow ~= nil and killWindow ~= 0 then
+        ____temp_12 = killWindow
+    else
+        ____temp_12 = 3
+    end
+    ____startMultiKillMonitor_15(nil, {
+        effectSource = ____resolvedEffectSource_13,
+        killGroup = ____killGroup_14,
+        killThreshold = ____temp_11,
+        killWindow = ____temp_12,
         diyEvent = diyEvent,
         diyEventString = diyEventString,
         finish = finish,

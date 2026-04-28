@@ -9,7 +9,7 @@ const japi = require("jass.japi") as any;
 // ── pcall 槽位：具名函数体，禁止 (pcall as any)(匿名) ──
 let __pcallShowFrame = 0;
 let __pcallShowVis = false;
-function __pcallFrameShowBody(): void { (japi as any).DzFrameShow(__pcallShowFrame, __pcallShowVis); }
+function __pcallFrameShowBody(): void { japi.DzFrameShow(__pcallShowFrame, __pcallShowVis); }
 function pcallDzFrameShow(frame: number, visible: boolean): void { __pcallShowFrame = frame; __pcallShowVis = visible; pcall(__pcallFrameShowBody); }
 
 import {

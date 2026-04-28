@@ -1,8 +1,7 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (f: any, messageType: number, message: string) => void;
@@ -40,6 +39,9 @@ const { MAIN_STORY_QUEST_CONFIGS } = require("系统.08．任务系统.00．配�
 };
 const { questDB, QuestType, QuestStatus } = require("系统.08．任务系统.01．任务数据") as any;
 const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as any;
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
 const { addPeriodicCallback } = globalThis as unknown as {
   addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
 };
@@ -249,16 +251,14 @@ function executeActionCode(code: string, triggerUnit: any): void {
   if (typeof loadFn !== "function" || typeof setfenvFn !== "function") return;
   const chunk = loadFn(code);
   if (chunk == null) {
-    const p = (globalThis as any).print;
-    if (typeof p === "function") p("[主线配置驱动] action编译失败: " + code);
+    debugLog("主线配置驱动", "action编译失败:", code);
     return;
   }
   const env = createEvalEnv(triggerUnit);
   setfenvFn(chunk, env);
   const ok = (pcall as any)(chunk);
   if (ok[0] !== true) {
-    const p = (globalThis as any).print;
-    if (typeof p === "function") p("[主线配置驱动] action执行失败: " + code + " | err=" + tostring(ok[1]));
+    debugLog("主线配置驱动", "action执行失败:", code, "| err=" + tostring(ok[1]));
   }
 }
 
@@ -269,14 +269,8 @@ function runActionTimeline(timeline: string | undefined, triggerUnit: any): void
       executeActionCode(e.code, triggerUnit);
       continue;
     }
-    const t = jass.CreateTimer();
-    if (!t) {
+    createDelayedCall(e.delay, () => {
       executeActionCode(e.code, triggerUnit);
-      continue;
-    }
-    safeTimerStart(t, e.delay, false, () => {
-      executeActionCode(e.code, triggerUnit);
-      safeDestroyTimer(t);
     });
   }
 }
@@ -373,11 +367,8 @@ function reportMissingFunctions(): void {
     condition: Array.from(missCond).sort(),
     actionTimeline: Array.from(missAction).sort(),
   };
-  const p = (globalThis as any).print;
-  if (typeof p === "function") {
-    p("[主线配置驱动] 缺失函数统计 - condition: " + tostring((globalThis as any).__mainQuestMissingReport.condition.length));
-    p("[主线配置驱动] 缺失函数统计 - actionTimeline: " + tostring((globalThis as any).__mainQuestMissingReport.actionTimeline.length));
-  }
+  debugLog("主线配置驱动", "缺失函数统计 - condition:", tostring((globalThis as any).__mainQuestMissingReport.condition.length));
+  debugLog("主线配置驱动", "缺失函数统计 - actionTimeline:", tostring((globalThis as any).__mainQuestMissingReport.actionTimeline.length));
 }
 
 function init(): void {

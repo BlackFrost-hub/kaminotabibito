@@ -51,8 +51,7 @@ let syncTimer: any = undefined;
 let __pcallIsPausedUnit: any = 0;
 let __pcallIsPausedResult = false;
 function __pcallIsUnitPausedBody(): void {
-  const fn = unitBjExt.IsUnitPausedBJ;
-  if (fn != null) __pcallIsPausedResult = fn(__pcallIsPausedUnit) === true;
+  if (unitBjExt.IsUnitPausedBJ != null) __pcallIsPausedResult = (unitBjExt as any).IsUnitPausedBJ(__pcallIsPausedUnit) === true;
 }
 
 let __pcallExpiredBuffId = "";

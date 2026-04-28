@@ -12,9 +12,8 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 const { onUnitTargetInteractable, isInteractable } = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心") as {
@@ -90,15 +89,7 @@ function countOnJassStesTable(this: void, eventName: string): number {
 }
 
 function scheduleRetry(this: void, fn: () => void): void {
-  const timer = jass.CreateTimer();
-  if (!timer) {
-    fn();
-    return;
-  }
-  safeTimerStart(timer, RETRY_SEC, false, () => {
-    safeDestroyTimer(timer);
-    fn();
-  });
+  createDelayedCall(RETRY_SEC, fn);
 }
 
 /**

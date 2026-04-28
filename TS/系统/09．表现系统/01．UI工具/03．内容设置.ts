@@ -37,4 +37,3 @@ export function setButtonText(frame: number, text: string): boolean {
   japi.DzFrameSetText(frame, text);
   return true;
 }
-

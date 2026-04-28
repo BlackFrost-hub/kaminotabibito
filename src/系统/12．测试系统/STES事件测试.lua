@@ -25,10 +25,9 @@ local function skeyIndex()
     return jass.StringHash("index")
 end
 local function log(msg)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, msg)
-    end
+    local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+    local debugLogForce = ____require_result_2.debugLogForce
+    debugLogForce(nil, "STES测试", msg)
 end
 --- 向「测试」再挂一个 Lua 创建的触发器：JASS 侧用 STES_GetTable 遍历 + TriggerExecute 时会执行到（如聊天 333）。
 local function tryRegisterLuaListenerForJassStes()

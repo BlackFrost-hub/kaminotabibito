@@ -17,6 +17,9 @@ const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数
   stringToFourCC: (s: string) => number;
   isSpecialUnit: (unit: any) => boolean;
 };
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -119,11 +122,11 @@ function pickFromWeightedPool(
   const out: string[] = [];
   for (const p of pool) {
     if (p.weight >= 1 || p.always) {
-      (globalThis as any).print?.("[装备掉落] 必掉物品:", p.id, p.weight);
+      debugLog("装备掉落", "必掉物品:", p.id, p.weight);
       out.push(p.id);
     } else {
       const r = (jass as any).GetRandomReal(0, 1) as number;
-      (globalThis as any).print?.("[装备掉落] 概率判定:", p.id, "weight:", p.weight, "r:", r, "命中:", r < p.weight);
+      debugLog("装备掉落", "概率判定:", p.id, "weight:", p.weight, "r:", r, "命中:", r < p.weight);
       if (r < p.weight) out.push(p.id);
     }
   }
@@ -186,10 +189,10 @@ function onUnitDeath(unit: any, _killer: any): void {
   const unitId = typeIdToUnitId(typeId);
   const entry = unitId ? (idData as Record<string, UnitDataEntry>)[unitId] : undefined;
 
-  (globalThis as any).print?.("[装备掉落] 单位死亡 typeId:", typeId, "unitId:", unitId, "entry:", entry?.name);
+  debugLog("装备掉落", "单位死亡 typeId:", typeId, "unitId:", unitId, "entry:", entry?.name);
 
   if (entry && entry.itemIds != null) {
-    (globalThis as any).print?.("[装备掉落] 找到掉落表 itemIds:", entry.itemIds);
+    debugLog("装备掉落", "找到掉落表 itemIds:", entry.itemIds);
     const dropProc = entry.dropProc != null ? Number(entry.dropProc) : 1;
     const r = (jass as any).GetRandomInt(1, 10000) as number;
     if (r > dropProc * 10000) return;

@@ -4,9 +4,8 @@ local ____00_FF0E_5355_4F4D_76F8_5173 = require("lib.扩展函数.自定义扩�
 local createUnitWithOptions = ____00_FF0E_5355_4F4D_76F8_5173.createUnitWithOptions
 local jass = require("jass.common")
 local BJ_DEGTORAD = 0.017453292519943295
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 ____exports.MAIN_STORY_NPCS = {}
 local function createNeutralPassive(self, unitId, x, y, facingDeg)
     local facingRad = facingDeg * BJ_DEGTORAD
@@ -128,21 +127,7 @@ function ____exports.initMainStoryNPCsWithDelay(self, delaySec)
     if delaySec == nil then
         delaySec = 1
     end
-    local timer = jass.CreateTimer()
-    if not timer then
-        ____exports.createMainStoryNPCs(nil)
-        return
-    end
-    safeTimerStart(
-        nil,
-        timer,
-        delaySec,
-        false,
-        function()
-            ____exports.createMainStoryNPCs(nil)
-            safeDestroyTimer(nil, timer)
-        end
-    )
+    createDelayedCall(nil, delaySec, ____exports.createMainStoryNPCs)
 end
 ____exports.default = {createMainStoryNPCs = ____exports.createMainStoryNPCs, initMainStoryNPCsWithDelay = ____exports.initMainStoryNPCsWithDelay}
 return ____exports

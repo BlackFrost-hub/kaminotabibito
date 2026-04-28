@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 激活传送点系统（按《激活传送点配置》）：
  * - **enabled: false**：该条不启用，不创建单位、不注册任何触发器（与配置中其它字段无关）。
  * - **有 teleportX + teleportY + UnitID（四位 rawcode）**：进入游戏后在坐标处 CreateUnit，再对该单位注册接近检测；
@@ -14,6 +14,10 @@ const { stringToFourCC, withTimer } = require("lib.扩展函数.封装函数.01�
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3Play: (path: string, player?: any) => void;
+};
+const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+  setDebug: (module: string, on: boolean) => void;
 };
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitInRangeTrigger: (
@@ -33,6 +37,7 @@ const ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav";
  * 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
  */
 const DEBUG_GG_UNIT_HTOW_0030 = false;
+setDebug("激活传送点", DEBUG_GG_UNIT_HTOW_0030);
 const DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030";
 
 /** 接近传送点多少距离算激活（与地图尺度一致） */
@@ -95,8 +100,7 @@ function scheduleDebugGgUnitHtow0030(): void {
     for (let pi = 0; pi < 4; pi++) {
       (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
     }
-    const pr = (globalThis as any).print;
-    pr(msg);
+    debugLog("激活传送点", msg);
   };
   withTimer(0.0, () => {
     runSnapshot("0s");

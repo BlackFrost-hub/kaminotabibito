@@ -12,9 +12,8 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
 local QuestMessageBJ = ____require_result_1.QuestMessageBJ
 local ____require_result_2 = require("lib.扩展函数.BJ函数.05A．电影函数")
@@ -31,8 +30,10 @@ local QuestType = ____require_result_6.QuestType
 local QuestStatus = ____require_result_6.QuestStatus
 local ____require_result_7 = require("系统.08．任务系统.02．任务管理器.index")
 local questManager = ____require_result_7.questManager
-local ____G_8 = _G
-local addPeriodicCallback = ____G_8.addPeriodicCallback
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_8.debugLog
+local ____G_9 = _G
+local addPeriodicCallback = ____G_9.addPeriodicCallback
 --- 二分开关：关则本模块 **不执行 init**（不注册 0.3s tick、不 ensureRuntimeQuest、不跑缺失函数统计）。
 ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER = true
 local YDGet = _G.YDUserDataGet
@@ -89,15 +90,15 @@ local function ensureRuntimeQuest(self)
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
 local function refreshQuestUI(self, desc, msg)
-    local ____opt_11 = questDB.globalData
-    if ____opt_11 ~= nil then
-        ____opt_11 = ____opt_11.quests
+    local ____opt_12 = questDB.globalData
+    if ____opt_12 ~= nil then
+        ____opt_12 = ____opt_12.quests
     end
-    local ____opt_result_13
-    if ____opt_11 ~= nil then
-        ____opt_result_13 = ____opt_11:get(RUNTIME_QUEST_ID)
+    local ____opt_result_14
+    if ____opt_12 ~= nil then
+        ____opt_result_14 = ____opt_12:get(RUNTIME_QUEST_ID)
     end
-    local q = ____opt_result_13
+    local q = ____opt_result_14
     if q then
         if type(desc) == "string" and desc ~= "" then
             q.description = desc
@@ -325,23 +326,20 @@ local function executeActionCode(self, code, triggerUnit)
     end
     local chunk = loadFn(nil, code)
     if chunk == nil then
-        local p = _G.print
-        if type(p) == "function" then
-            p(nil, "[主线配置驱动] action编译失败: " .. code)
-        end
+        debugLog(nil, "主线配置驱动", "action编译失败:", code)
         return
     end
     local env = createEvalEnv(nil, triggerUnit)
     setfenvFn(nil, chunk, env)
     local ok = pcall(nil, chunk)
     if ok[0] ~= true then
-        local p = _G.print
-        if type(p) == "function" then
-            p(
-                nil,
-                (("[主线配置驱动] action执行失败: " .. code) .. " | err=") .. tostring(ok[1])
-            )
-        end
+        debugLog(
+            nil,
+            "主线配置驱动",
+            "action执行失败:",
+            code,
+            "| err=" .. tostring(ok[1])
+        )
     end
 end
 local function runActionTimeline(self, timeline, triggerUnit)
@@ -350,31 +348,23 @@ local function runActionTimeline(self, timeline, triggerUnit)
         do
             if e.delay <= 0 then
                 executeActionCode(nil, e.code, triggerUnit)
-                goto __continue65
+                goto __continue63
             end
-            local t = jass.CreateTimer()
-            if not t then
-                executeActionCode(nil, e.code, triggerUnit)
-                goto __continue65
-            end
-            safeTimerStart(
+            createDelayedCall(
                 nil,
-                t,
                 e.delay,
-                false,
                 function()
                     executeActionCode(nil, e.code, triggerUnit)
-                    safeDestroyTimer(nil, t)
                 end
             )
         end
-        ::__continue65::
+        ::__continue63::
     end
 end
 local function getHeroes(self)
-    local ____temp_14
+    local ____temp_15
     if type(YDGet) == "function" then
-        ____temp_14 = YDGet(
+        ____temp_15 = YDGet(
             nil,
             "string",
             "玩家英雄",
@@ -382,9 +372,9 @@ local function getHeroes(self)
             "group"
         )
     else
-        ____temp_14 = nil
+        ____temp_15 = nil
     end
-    local group = ____temp_14
+    local group = ____temp_15
     if not group then
         return {}
     end
@@ -416,13 +406,13 @@ local function tick(self)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
             if cfg.enabled == false then
-                goto __continue78
+                goto __continue75
             end
             if not cfg.condition or cfg.condition == "" then
-                goto __continue78
+                goto __continue75
             end
             if not hitFromStage(nil, cfg, stage) then
-                goto __continue78
+                goto __continue75
             end
             local matchedHero = nil
             for ____, hero in ipairs(heroes) do
@@ -432,7 +422,7 @@ local function tick(self)
                 end
             end
             if not matchedHero then
-                goto __continue78
+                goto __continue75
             end
             local triggerUnit = matchedHero
             if type(cfg.toStage) == "number" then
@@ -443,7 +433,7 @@ local function tick(self)
             refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
             break
         end
-        ::__continue78::
+        ::__continue75::
     end
     running = false
 end
@@ -457,7 +447,7 @@ local function extractFunctionNames(self, text)
             local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
             if not isStart then
                 i = i + 1
-                goto __continue89
+                goto __continue86
             end
             local start = i
             i = i + 1
@@ -477,7 +467,7 @@ local function extractFunctionNames(self, text)
                 names[#names + 1] = __TS__StringSubstring(text, start, i)
             end
         end
-        ::__continue89::
+        ::__continue86::
     end
     return names
 end
@@ -512,17 +502,18 @@ local function reportMissingFunctions(self)
         condition = __TS__ArraySort(__TS__ArrayFrom(missCond)),
         actionTimeline = __TS__ArraySort(__TS__ArrayFrom(missAction))
     }
-    local p = _G.print
-    if type(p) == "function" then
-        p(
-            nil,
-            "[主线配置驱动] 缺失函数统计 - condition: " .. tostring(_G.__mainQuestMissingReport.condition.length)
-        )
-        p(
-            nil,
-            "[主线配置驱动] 缺失函数统计 - actionTimeline: " .. tostring(_G.__mainQuestMissingReport.actionTimeline.length)
-        )
-    end
+    debugLog(
+        nil,
+        "主线配置驱动",
+        "缺失函数统计 - condition:",
+        tostring(_G.__mainQuestMissingReport.condition.length)
+    )
+    debugLog(
+        nil,
+        "主线配置驱动",
+        "缺失函数统计 - actionTimeline:",
+        tostring(_G.__mainQuestMissingReport.actionTimeline.length)
+    )
 end
 local function init(self)
     if not ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER then

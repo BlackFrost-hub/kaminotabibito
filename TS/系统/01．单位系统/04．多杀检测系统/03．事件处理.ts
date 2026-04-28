@@ -39,10 +39,12 @@ const { CountUnitsInGroup } = require("lib.扩展函数.BJ函数.02．单位与�
   CountUnitsInGroup: (group: any) => number;
 };
 
-// 调试函数
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
+
 function dbg(msg: string): void {
-  const p = (globalThis as any).print as ((m: string) => void) | undefined;
-  if (typeof p === "function") p(`[多杀STES] ${msg}`);
+  debugLog("多杀STES", msg);
 }
 
 // ==========================================================================================

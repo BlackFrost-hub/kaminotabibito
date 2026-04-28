@@ -1,8 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____01_FF0E_89E6_53D1_4E0E_4E8B_4EF6 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterPlayerSelectionEventBJ = ____01_FF0E_89E6_53D1_4E0E_4E8B_4EF6.TriggerRegisterPlayerSelectionEventBJ
+local resolveNpcDialogName, openDialogForConfiguredNpc, onPlayerSelectedUnit, jass, openNpcDialog, DIALOG_PLAYER_SLOTS
 local ____07_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.07．任务状态")
 local ensureQuestConfigsRegistered = ____07_FF0E_4EFB_52A1_72B6_6001.ensureQuestConfigsRegistered
 local hasPlayerAcceptedQuest = ____07_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
@@ -18,20 +17,13 @@ local buildDialogData = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildDialogData
 local buildQuestCompletedDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestCompletedDialog
 local buildQuestInProgressDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
 local buildQuestOfferDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
----
--- @noSelfInFile
-local jass = require("jass.common")
-local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-local openNpcDialog = ____UI_51FD_6570.openNpcDialog
-local DIALOG_PLAYER_SLOTS = 4
-local g_dialogSelectionTriggerRegistered = false
-local function resolveNpcDialogName(npcConfig)
+function resolveNpcDialogName(npcConfig)
     if npcConfig.NPCrequireName ~= nil and npcConfig.NPCrequireName ~= "" then
         return npcConfig.NPCrequireName
     end
     return npcConfig.NpcNameID or ""
 end
-local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
+function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not triggerPlayer or not npcConfig or not npcUnit then
         return
     end
@@ -117,14 +109,14 @@ local function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
         )
     end
 end
-local function onPlayerSelectedUnit()
-    local triggerPlayer = jass.GetTriggerPlayer()
-    local playerId = jass.GetPlayerId(triggerPlayer)
+function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
+    if not isSelected then
+        return
+    end
     if playerId < 0 or playerId >= DIALOG_PLAYER_SLOTS then
         return
     end
-    local selectedUnit = jass.GetTriggerUnit()
-    if not selectedUnit then
+    if not selectedUnit or selectedUnit == 0 then
         return
     end
     local selectedOwner = jass.GetOwningPlayer(selectedUnit)
@@ -145,24 +137,25 @@ local function onPlayerSelectedUnit()
     end
     openDialogForConfiguredNpc(triggerPlayer, npcConfig, selectedUnit)
 end
-function ____exports.initDialogEntrySelectionTrigger()
-    ensureQuestConfigsRegistered(nil)
-    if g_dialogSelectionTriggerRegistered then
+jass = require("jass.common")
+local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
+local ____selectionCenter = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
+openNpcDialog = ____UI_51FD_6570.openNpcDialog
+DIALOG_PLAYER_SLOTS = 4
+local dialogSelectionListenerRegistered = false
+local function registerDialogSelectionListener()
+    local cb = ____selectionCenter.addSelectionListener
+    if type(cb) ~= "function" then
         return
     end
-    g_dialogSelectionTriggerRegistered = true
-    local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(trig, onPlayerSelectedUnit)
-    do
-        local i = 0
-        while i < DIALOG_PLAYER_SLOTS do
-            TriggerRegisterPlayerSelectionEventBJ(
-                trig,
-                jass.Player(i),
-                true
-            )
-            i = i + 1
-        end
+    cb(nil, onPlayerSelectedUnit)
+end
+function ____exports.initDialogEntrySelectionTrigger()
+    ensureQuestConfigsRegistered(nil)
+    if dialogSelectionListenerRegistered then
+        return
     end
+    dialogSelectionListenerRegistered = true
+    registerDialogSelectionListener()
 end
 return ____exports

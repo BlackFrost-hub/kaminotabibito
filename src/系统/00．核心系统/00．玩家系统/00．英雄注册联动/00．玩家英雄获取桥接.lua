@@ -14,9 +14,8 @@ local ____exports = {}
 -- - 在拿到英雄时，把英雄注册到各个依赖它的联动模块
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataSet = ____require_result_1.YDUserDataSet
@@ -27,6 +26,8 @@ local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_3.debugLog
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
 local TRIG_KEY = "__syzl_playerHeroRegister_trig"
 local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
@@ -111,12 +112,10 @@ local function registerHeroDependents(whichHero)
     local owner = jass.GetOwningPlayer(whichHero)
     if owner ~= nil and owner ~= 0 then
         local playerId = jass.GetPlayerId(owner)
-        jass.DisplayTimedTextToPlayer(
-            jass.Player(0),
-            0,
-            0,
-            10,
-            (("[Bridge] registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
+        debugLog(
+            nil,
+            "Bridge",
+            (("registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
         )
         invokeSelectionCenterInit(owner)
         if not uiRegisteredPlayers:has(playerId) then
@@ -180,21 +179,7 @@ local function runRegisterPlayerHero()
 end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(fn)
-    local timer = jass.CreateTimer()
-    if not timer then
-        fn()
-        return
-    end
-    safeTimerStart(
-        nil,
-        timer,
-        RETRY_SEC,
-        false,
-        function()
-            safeDestroyTimer(nil, timer)
-            fn()
-        end
-    )
+    createDelayedCall(nil, RETRY_SEC, fn)
 end
 --- 向 JASS 侧 STES 表注册“玩家英雄注册”监听。
 local function tryRegisterPlayerHeroStes()

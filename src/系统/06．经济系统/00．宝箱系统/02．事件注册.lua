@@ -10,9 +10,8 @@ local ____exports = {}
 -- 注册方式：通过玩家英雄注册联动，在英雄登记时自动注册命令事件
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心")
 local onUnitTargetInteractable = ____require_result_1.onUnitTargetInteractable
 local isInteractable = ____require_result_1.isInteractable
@@ -70,21 +69,7 @@ local function countOnJassStesTable(eventName)
     )
 end
 local function scheduleRetry(fn)
-    local timer = jass.CreateTimer()
-    if not timer then
-        fn()
-        return
-    end
-    safeTimerStart(
-        nil,
-        timer,
-        RETRY_SEC,
-        false,
-        function()
-            safeDestroyTimer(nil, timer)
-            fn()
-        end
-    )
+    createDelayedCall(nil, RETRY_SEC, fn)
 end
 --- 注册单位目标命令事件监听
 local function tryRegisterTargetOrderStes()

@@ -5,9 +5,8 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
@@ -49,18 +48,10 @@ function onSpellChannel(caster: any, abilityId: number): void {
 
   const duration = calcReducedControlTime(target, abilityId);
 
-  const timer = jass.CreateTimer();
-  if (!timer) {
+  createDelayedCall(0, () => {
     if (isUnitControlled(target)) {
       recastControlAbility(caster, target, abilityId, duration);
     }
-    return;
-  }
-  safeTimerStart(timer, 0, false, () => {
-    if (isUnitControlled(target)) {
-      recastControlAbility(caster, target, abilityId, duration);
-    }
-    safeDestroyTimer(timer);
   });
 }
 

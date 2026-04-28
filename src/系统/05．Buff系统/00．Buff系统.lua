@@ -7,9 +7,8 @@ local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
 local __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitBjExt, unitToBuffs, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
 function __pcallIsUnitPausedBody(self)
-    local fn = unitBjExt.IsUnitPausedBJ
-    if fn ~= nil then
-        __pcallIsPausedResult = fn(nil, __pcallIsPausedUnit) == true
+    if unitBjExt.IsUnitPausedBJ ~= nil then
+        __pcallIsPausedResult = unitBjExt:IsUnitPausedBJ(__pcallIsPausedUnit) == true
     end
 end
 function __pcallNotifyExpiredBody(self)

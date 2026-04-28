@@ -4,9 +4,8 @@ local ____exports = {}
 -- 
 -- 通过统一技能事件系统监听控制技能
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
 local isExcludedFromControlResist = ____require_result_1.isExcludedFromControlResist
 local isControlAbility = ____require_result_1.isControlAbility
@@ -60,24 +59,9 @@ local function onSpellChannel(self, caster, abilityId)
         return
     end
     local duration = calcReducedControlTime(nil, target, abilityId)
-    local timer = jass.CreateTimer()
-    if not timer then
-        if isUnitControlled(nil, target) then
-            recastControlAbility(
-                nil,
-                caster,
-                target,
-                abilityId,
-                duration
-            )
-        end
-        return
-    end
-    safeTimerStart(
+    createDelayedCall(
         nil,
-        timer,
         0,
-        false,
         function()
             if isUnitControlled(nil, target) then
                 recastControlAbility(
@@ -88,7 +72,6 @@ local function onSpellChannel(self, caster, abilityId)
                     duration
                 )
             end
-            safeDestroyTimer(nil, timer)
         end
     )
 end

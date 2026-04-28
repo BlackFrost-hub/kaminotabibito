@@ -36,9 +36,6 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jassGlobals = require("jass.globals") as any;
-const { max } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  max: (a: number, b: number) => number;
-};
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const BASE_TIMESTAMP = 1451606400;
@@ -74,6 +71,10 @@ function nowMs(): number {
 
 function intFloor(value: number): number {
   return jass.R2I(value);
+}
+
+function maxNum(a: number, b: number): number {
+  return a > b ? a : b;
 }
 
 function mathMod(dividend: number, divisor: number): number {
@@ -320,7 +321,7 @@ export function removePeriodicCallback(id: number): void {
 
 export function addDelayedCallback(delayMs: number, callback: () => void): number {
   const id = ++_delayedCallbackIdCounter;
-  const safeDelay = max(0, intFloor(delayMs));
+  const safeDelay = maxNum(0, intFloor(delayMs));
   _delayedCallbacks.push({ id, dueTime: nowMs() + safeDelay, active: true, callback });
   return id;
 }
@@ -360,7 +361,7 @@ export function initCenterTimer(): void {
 
   const dr = jassGlobals.udg_N as number | undefined;
   if (dr !== undefined) {
-    _gameDifficulty = max(1, intFloor(dr));
+    _gameDifficulty = maxNum(1, intFloor(dr));
   }
 
   calcDate(_serverTime / 1000);

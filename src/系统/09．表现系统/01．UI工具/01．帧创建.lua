@@ -3,6 +3,8 @@ local ____exports = {}
 local ____00_FF0E_7C7B_578B_5B9A_4E49 = require("系统.09．表现系统.01．UI工具.00．类型定义")
 local FrameType = ____00_FF0E_7C7B_578B_5B9A_4E49.FrameType
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_0.debugLog
 local __safeFrame = 0
 local __safeVisible = false
 local __safeAlpha = 0
@@ -24,18 +26,18 @@ local function __safeLoadTocPcallBody(self)
     japi.DzLoadToc(__safeTocPath)
 end
 function ____exports.createFrame(self, config)
-    local ____config_0 = config
-    local ____type = ____config_0.type
-    local name = ____config_0.name
-    local parent = ____config_0.parent
+    local ____config_1 = config
+    local ____type = ____config_1.type
+    local name = ____config_1.name
+    local parent = ____config_1.parent
     if parent == nil then
         parent = 0
     end
-    local template = ____config_0.template
+    local template = ____config_1.template
     if template == nil then
         template = "template"
     end
-    local id = ____config_0.id
+    local id = ____config_1.id
     if id == nil then
         id = 0
     end
@@ -86,8 +88,7 @@ function ____exports.loadTocOnce(self, tocLoadKey, tocPaths, debugPrefix)
         __safeTocPath = p
         local ok = pcall(__safeLoadTocPcallBody)
         if not ok then
-            local pr = _G.print
-            pr((("[" .. debugPrefix) .. "] DzLoadToc fail: ") .. p)
+            debugLog(nil, debugPrefix, "DzLoadToc fail:", p)
         end
     end
 end

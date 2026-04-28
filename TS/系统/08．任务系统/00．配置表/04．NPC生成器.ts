@@ -6,9 +6,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const BJ_DEGTORAD = 0.017453292519943295;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
@@ -21,7 +20,9 @@ let __pcallModelUnit: any = 0;
 let __pcallModelPath = "";
 function __pcallSetUnitModelBody(): void { japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath); }
 
-const _print = (globalThis as any).print as (...args: any[]) => void;
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
 
 /**
  * 维护已创建 NPC 的稳定查表，供同步入口按配置键回查真实单位。
@@ -52,40 +53,31 @@ function registerCreatedNpcUnit(npcConfig: NPCData, unit: any): void {
 
 function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
   const delaySec = npcConfig.modelFIle ? DELAY_QUEST_MARKER_AFTER_SET_MODEL : DELAY_QUEST_MARKER_NO_CUSTOM_MODEL;
-  const timer = jass.CreateTimer();
-  if (!timer) {
-    tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
-    return;
-  }
-  safeTimerStart(timer, delaySec, false, () => {
-    safeDestroyTimer(timer);
+  createDelayedCall(delaySec, () => {
     tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
   });
 }
 
 function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): void {
-  const timer = jass.CreateTimer();
-  if (!timer) return;
-  safeTimerStart(timer, 0.01, false, () => {
-    safeDestroyTimer(timer);
-    const ok = (pcall as any)(() => {
-      japi.DzSetUnitModel(unit, modelPath);
-    });
+  createDelayedCall(0.01, () => {
+    __pcallModelUnit = unit;
+    __pcallModelPath = modelPath;
+    const ok = pcall(__pcallSetUnitModelBody);
     if (!ok) {
-      _print("[NPC生成器] 设置单位模型失败（已忽略） " + npcLabel + " model=" + tostring(modelPath));
+      debugLog("NPC生成器", "设置单位模型失败（已忽略）", npcLabel, "model=" + tostring(modelPath));
     }
   });
 }
 
 function createSingleNPC(npcConfig: NPCData): any {
   if (!npcConfig.unitcode || npcConfig.X == null || npcConfig.Y == null) {
-    _print("[NPC生成器] 配置不完整，跳过: " + tostring(npcConfig.NpcNameID));
+    debugLog("NPC生成器", "配置不完整，跳过:", tostring(npcConfig.NpcNameID));
     return null;
   }
 
   const unitCode = npcConfig.unitcode;
   if (unitCode.length !== 4) {
-    _print("[NPC生成器] 单位代码无效: " + unitCode);
+    debugLog("NPC生成器", "单位代码无效:", unitCode);
     return null;
   }
 
@@ -93,7 +85,7 @@ function createSingleNPC(npcConfig: NPCData): any {
   const facingRad = facingDeg * BJ_DEGTORAD;
   const unit = createUnitWithOptions(15, unitCode, npcConfig.X, npcConfig.Y, facingRad);
   if (!unit) {
-    _print("[NPC生成器] 创建单位失败: " + tostring(npcConfig.NpcNameID) + " (" + unitCode + ")");
+    debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NpcNameID), "(" + unitCode + ")");
     return null;
   }
 
@@ -105,20 +97,18 @@ function createSingleNPC(npcConfig: NPCData): any {
   scheduleTryAttachQuestMarker(unit, npcConfig);
   registerCreatedNpcUnit(npcConfig, unit);
 
-  _print(
-    "[NPC生成器] 成功创建NPC: "
-      + tostring(npcConfig.NpcNameID)
-      + " at ("
-      + tostring(npcConfig.X)
-      + ", "
-      + tostring(npcConfig.Y)
-      + ")"
+  debugLog(
+    "NPC生成器",
+    "成功创建NPC:",
+    tostring(npcConfig.NpcNameID),
+    "at",
+    "(" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")"
   );
   return unit;
 }
 
 export function initializeNPCs(): void {
-  _print("[NPC生成器] 开始初始化NPC...");
+  debugLog("NPC生成器", "开始初始化NPC...");
   g_npcUnitByRequireId.clear();
   g_npcUnitByNpcNameId.clear();
   g_npcUnitByDisplayName.clear();
@@ -133,11 +123,11 @@ export function initializeNPCs(): void {
 export function createNPCByName(npcName: string): any {
   const npcConfig = NPC_CONFIGS.find((npc) => npc.NpcNameID === npcName || npc.NPCrequireName === npcName);
   if (!npcConfig) {
-    _print("[NPC生成器] 未找到NPC配置: " + npcName);
+    debugLog("NPC生成器", "未找到NPC配置:", npcName);
     return null;
   }
   if (npcConfig.enabled !== true) {
-    _print("[NPC生成器] NPC未启用: " + npcName);
+    debugLog("NPC生成器", "NPC未启用:", npcName);
     return null;
   }
   return createSingleNPC(npcConfig);
@@ -146,11 +136,11 @@ export function createNPCByName(npcName: string): any {
 export function createNPCByQuestId(requireID: number): any {
   const npcConfig = NPC_CONFIGS.find((npc) => npc.requireID === requireID);
   if (!npcConfig) {
-    _print("[NPC生成器] 未找到任务ID对应的NPC: " + tostring(requireID));
+    debugLog("NPC生成器", "未找到任务ID对应的NPC:", tostring(requireID));
     return null;
   }
   if (npcConfig.enabled !== true) {
-    _print("[NPC生成器] NPC未启用: " + tostring(npcConfig.NpcNameID) + " (任务ID: " + tostring(requireID) + ")");
+    debugLog("NPC生成器", "NPC未启用:", tostring(npcConfig.NpcNameID), "(任务ID:", tostring(requireID) + ")");
     return null;
   }
   return createSingleNPC(npcConfig);

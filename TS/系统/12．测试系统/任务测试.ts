@@ -15,10 +15,12 @@ const taskUIManager = require("../08．任务系统/04．任务UI拆分/12．任
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
 import { registerKeyDown, KEY_LETTER } from "../../lib/扩展函数/封装函数/04．硬件输入/index";
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLogForce: (module: string, ...args: any[]) => void;
+};
+
 function debugPrint(msg: string): void {
-  const pr = (globalThis as any).print as ((s: string) => void) | undefined;
-  pr?.("[QuestTest] " + msg);
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 8, "[任务测试] " + msg);
+  debugLogForce("任务测试", msg);
 }
 
 /**

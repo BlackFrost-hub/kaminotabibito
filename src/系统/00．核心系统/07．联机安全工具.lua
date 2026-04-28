@@ -23,19 +23,46 @@ local ____exports = {}
 local jass = require("jass.common")
 local runtime = require("jass.runtime")
 local xpcallFn = _G.xpcall
-local function getErrorHandler()
-    local ____opt_result_2
-    if runtime ~= nil then
-        ____opt_result_2 = runtime.error_handle
-    end
-    local handler = ____opt_result_2
-    local ____temp_3
-    if type(handler) == "function" then
-        ____temp_3 = handler
+local function normalizeUnaryHandleArg(handleOrSelf, maybeHandle)
+    local ____temp_0
+    if maybeHandle ~= nil then
+        ____temp_0 = maybeHandle
     else
-        ____temp_3 = nil
+        ____temp_0 = handleOrSelf
     end
-    return ____temp_3
+    return ____temp_0
+end
+local function normalizeTimerArgs(timerOrSelf, timeoutOrTimer, periodicOrTimeout, actionOrPeriodic, maybeAction)
+    if maybeAction ~= nil then
+        return {timer = timeoutOrTimer, timeout = periodicOrTimeout, periodic = actionOrPeriodic, action = maybeAction}
+    end
+    return {timer = timerOrSelf, timeout = timeoutOrTimer, periodic = periodicOrTimeout, action = actionOrPeriodic}
+end
+local function normalizeForForceArgs(forceOrSelf, actionOrForce, maybeAction)
+    if maybeAction ~= nil then
+        return {force = actionOrForce, action = maybeAction}
+    end
+    return {force = forceOrSelf, action = actionOrForce}
+end
+local function normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    if maybeAction ~= nil then
+        return {rect = filterOrRect, filter = actionOrFilter, action = maybeAction}
+    end
+    return {rect = rectOrSelf, filter = filterOrRect, action = actionOrFilter}
+end
+local function getErrorHandler()
+    local ____opt_result_3
+    if runtime ~= nil then
+        ____opt_result_3 = runtime.error_handle
+    end
+    local handler = ____opt_result_3
+    local ____temp_4
+    if type(handler) == "function" then
+        ____temp_4 = handler
+    else
+        ____temp_4 = nil
+    end
+    return ____temp_4
 end
 local function runSafely(callback)
     if type(callback) ~= "function" then
@@ -68,7 +95,10 @@ end
 -- - 仍然调用原生 `ForForce`
 -- - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
 -- - 支持同步嵌套调用（用栈而不是单槽）
-function ____exports.safeForForce(force, action)
+function ____exports.safeForForce(forceOrSelf, actionOrForce, maybeAction)
+    local ____normalizeForForceArgs_result_5 = normalizeForForceArgs(forceOrSelf, actionOrForce, maybeAction)
+    local force = ____normalizeForForceArgs_result_5.force
+    local action = ____normalizeForForceArgs_result_5.action
     if not force or type(action) ~= "function" then
         return
     end
@@ -84,20 +114,24 @@ function ____exports.safeForForce(force, action)
 end
 --- 安全枚举矩形内物品。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
-function ____exports.safeEnumItemsInRect(rect, filter, action)
+function ____exports.safeEnumItemsInRect(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local ____normalizeEnumArgs_result_6 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local rect = ____normalizeEnumArgs_result_6.rect
+    local filter = ____normalizeEnumArgs_result_6.filter
+    local action = ____normalizeEnumArgs_result_6.action
     if not rect or type(action) ~= "function" then
         return
     end
     enumItemsStack[#enumItemsStack + 1] = action
     do
         pcall(function()
-            local ____jass_EnumItemsInRect_6 = jass.EnumItemsInRect
-            local ____rect_5 = rect
-            local ____filter_4 = filter
-            if ____filter_4 == nil then
-                ____filter_4 = nil
+            local ____jass_EnumItemsInRect_9 = jass.EnumItemsInRect
+            local ____rect_8 = rect
+            local ____filter_7 = filter
+            if ____filter_7 == nil then
+                ____filter_7 = nil
             end
-            ____jass_EnumItemsInRect_6(jass, ____rect_5, ____filter_4, enumItemsTrampoline)
+            ____jass_EnumItemsInRect_9(jass, ____rect_8, ____filter_7, enumItemsTrampoline)
         end)
         do
             table.remove(enumItemsStack)
@@ -106,20 +140,24 @@ function ____exports.safeEnumItemsInRect(rect, filter, action)
 end
 --- 安全枚举矩形内可破坏物。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
-function ____exports.safeEnumDestructablesInRect(rect, filter, action)
+function ____exports.safeEnumDestructablesInRect(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local ____normalizeEnumArgs_result_10 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local rect = ____normalizeEnumArgs_result_10.rect
+    local filter = ____normalizeEnumArgs_result_10.filter
+    local action = ____normalizeEnumArgs_result_10.action
     if not rect or type(action) ~= "function" then
         return
     end
     enumDestructablesStack[#enumDestructablesStack + 1] = action
     do
         pcall(function()
-            local ____jass_EnumDestructablesInRect_9 = jass.EnumDestructablesInRect
-            local ____rect_8 = rect
-            local ____filter_7 = filter
-            if ____filter_7 == nil then
-                ____filter_7 = nil
+            local ____jass_EnumDestructablesInRect_13 = jass.EnumDestructablesInRect
+            local ____rect_12 = rect
+            local ____filter_11 = filter
+            if ____filter_11 == nil then
+                ____filter_11 = nil
             end
-            ____jass_EnumDestructablesInRect_9(jass, ____rect_8, ____filter_7, enumDestructablesTrampoline)
+            ____jass_EnumDestructablesInRect_13(jass, ____rect_12, ____filter_11, enumDestructablesTrampoline)
         end)
         do
             table.remove(enumDestructablesStack)
@@ -139,7 +177,18 @@ local function timerTrampoline()
     local hid = jass.GetHandleId(timer)
     runSafely(timerActionByHandleId[hid])
 end
-function ____exports.safeTimerStart(timer, timeout, periodic, action)
+function ____exports.safeTimerStart(timerOrSelf, timeoutOrTimer, periodicOrTimeout, actionOrPeriodic, maybeAction)
+    local ____normalizeTimerArgs_result_14 = normalizeTimerArgs(
+        timerOrSelf,
+        timeoutOrTimer,
+        periodicOrTimeout,
+        actionOrPeriodic,
+        maybeAction
+    )
+    local timer = ____normalizeTimerArgs_result_14.timer
+    local timeout = ____normalizeTimerArgs_result_14.timeout
+    local periodic = ____normalizeTimerArgs_result_14.periodic
+    local action = ____normalizeTimerArgs_result_14.action
     if not timer or type(action) ~= "function" then
         return
     end
@@ -147,7 +196,8 @@ function ____exports.safeTimerStart(timer, timeout, periodic, action)
     timerActionByHandleId[hid] = action
     jass.TimerStart(timer, timeout, periodic, timerTrampoline)
 end
-function ____exports.safeDestroyTimer(timer)
+function ____exports.safeDestroyTimer(timerOrSelf, maybeTimer)
+    local timer = normalizeUnaryHandleArg(timerOrSelf, maybeTimer)
     if not timer then
         return
     end
@@ -192,7 +242,15 @@ local function getOrCreateSafeTriggerRegistry(trigger)
     triggerRegistryByHandleId[hid] = registry
     return registry
 end
-function ____exports.safeTriggerAddAction(trigger, callback)
+function ____exports.safeTriggerAddAction(triggerOrSelf, callbackOrTrigger, maybeCallback)
+    local ____temp_15
+    if maybeCallback ~= nil then
+        ____temp_15 = callbackOrTrigger
+    else
+        ____temp_15 = triggerOrSelf
+    end
+    local trigger = ____temp_15
+    local callback = maybeCallback ~= nil and maybeCallback or callbackOrTrigger
     if not trigger or type(callback) ~= "function" then
         return nil
     end
@@ -202,11 +260,25 @@ function ____exports.safeTriggerAddAction(trigger, callback)
     end
     safeTriggerActionIdCounter = safeTriggerActionIdCounter + 1
     local handle = {id = safeTriggerActionIdCounter}
-    local ____registry_actions_10 = registry.actions
-    ____registry_actions_10[#____registry_actions_10 + 1] = {id = handle.id, callback = callback}
+    local ____registry_actions_16 = registry.actions
+    ____registry_actions_16[#____registry_actions_16 + 1] = {id = handle.id, callback = callback}
     return handle
 end
-function ____exports.safeTriggerRemoveAction(trigger, action)
+function ____exports.safeTriggerRemoveAction(triggerOrSelf, actionOrTrigger, maybeAction)
+    local ____temp_17
+    if maybeAction ~= nil then
+        ____temp_17 = actionOrTrigger
+    else
+        ____temp_17 = triggerOrSelf
+    end
+    local trigger = ____temp_17
+    local ____temp_18
+    if maybeAction ~= nil then
+        ____temp_18 = maybeAction
+    else
+        ____temp_18 = actionOrTrigger
+    end
+    local action = ____temp_18
     if not trigger or not action then
         return
     end
@@ -226,7 +298,8 @@ function ____exports.safeTriggerRemoveAction(trigger, action)
         end
     end
 end
-function ____exports.safeTriggerClearActions(trigger)
+function ____exports.safeTriggerClearActions(triggerOrSelf, maybeTrigger)
+    local trigger = normalizeUnaryHandleArg(triggerOrSelf, maybeTrigger)
     if not trigger then
         return
     end
@@ -237,7 +310,8 @@ function ____exports.safeTriggerClearActions(trigger)
     end
     __TS__ArraySetLength(registry.actions, 0)
 end
-function ____exports.safeDestroyTrigger(trigger)
+function ____exports.safeDestroyTrigger(triggerOrSelf, maybeTrigger)
+    local trigger = normalizeUnaryHandleArg(triggerOrSelf, maybeTrigger)
     if not trigger then
         return
     end

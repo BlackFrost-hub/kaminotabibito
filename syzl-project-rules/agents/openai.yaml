@@ -1,4 +1,4 @@
 interface:
   display_name: "Syzl Project Rules"
-  short_description: "Route work through repo rules and War3 shared UI boundaries."
-  default_prompt: "Use $syzl-project-rules to work inside this repository while following its project-specific rules and Warcraft III shared UI constraints first."
+  short_description: "Route work through repo rules, War3 UI boundaries, UTF-8-safe patching, and named-only JASS callbacks."
+  default_prompt: "Use $syzl-project-rules to work inside this repository while following its project-specific rules, Warcraft III shared UI constraints, UTF-8-safe patch discipline for Chinese-heavy files, and the repo-wide named-function-only rule for any JASS engine callback path."

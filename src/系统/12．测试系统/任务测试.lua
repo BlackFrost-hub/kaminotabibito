@@ -13,18 +13,10 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
 local taskUIManager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLogForce = ____require_result_1.debugLogForce
 local function debugPrint(self, msg)
-    local pr = _G.print
-    if pr ~= nil then
-        pr("[QuestTest] " .. msg)
-    end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        8,
-        "[任务测试] " .. msg
-    )
+    debugLogForce(nil, "任务测试", msg)
 end
 --- 测试任务接受和完成
 function ____exports.testQuestAcceptComplete(self)
@@ -134,13 +126,13 @@ function ____exports.registerTestCommand(self)
             nil,
             KEY_LETTER.Y,
             function(____, player, key)
-                local ____player_3
+                local ____player_2
                 if player then
-                    ____player_3 = jass.GetPlayerId(player)
+                    ____player_2 = jass.GetPlayerId(player)
                 else
-                    ____player_3 = 0
+                    ____player_2 = 0
                 end
-                local playerId = ____player_3
+                local playerId = ____player_2
                 if playerId == 0 then
                     ____exports.testQuestData(nil)
                     ____exports.testQuestAcceptComplete(nil)

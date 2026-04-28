@@ -16,27 +16,30 @@ local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
-local DEBUG_SOUND = false
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_1.debugLog
+local setDebug = ____require_result_1.setDebug
+setDebug(nil, "Sound3DII", false)
 --- 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积
 local function scheduleDestroySoundIfNeeded(self, sound)
     if not sound then
         return
     end
     local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-    local ____temp_1
-    if Leak and Leak.LeakWatcher then
-        ____temp_1 = Leak.LeakWatcher
-    else
-        ____temp_1 = nil
-    end
-    local LW = ____temp_1
     local ____temp_2
-    if LW and type(LW.createTimer) == "function" then
-        ____temp_2 = LW:createTimer("sound_ui_fallback_destroy")
+    if Leak and Leak.LeakWatcher then
+        ____temp_2 = Leak.LeakWatcher
     else
-        ____temp_2 = jass.CreateTimer()
+        ____temp_2 = nil
     end
-    local t = ____temp_2
+    local LW = ____temp_2
+    local ____temp_3
+    if LW and type(LW.createTimer) == "function" then
+        ____temp_3 = LW:createTimer("sound_ui_fallback_destroy")
+    else
+        ____temp_3 = jass.CreateTimer()
+    end
+    local t = ____temp_3
     if not t then
         return
     end
@@ -67,13 +70,13 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
     end
     do
         local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-        local ____temp_3
+        local ____temp_4
         if Leak and Leak.LeakWatcher then
-            ____temp_3 = Leak.LeakWatcher
+            ____temp_4 = Leak.LeakWatcher
         else
-            ____temp_3 = nil
+            ____temp_4 = nil
         end
-        local LW = ____temp_3
+        local LW = ____temp_4
         local trackedByLeak = false
         local s = nil
         if LW and type(LW.createSound) == "function" then
@@ -118,9 +121,7 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
                 end
             end
             lastPlayedSound = s
-            if DEBUG_SOUND and _G.print then
-                _G.print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay)
-            end
+            debugLog(nil, "Sound3DII", "new sound, localPlay=", shouldPlay)
             return s
         end
     end

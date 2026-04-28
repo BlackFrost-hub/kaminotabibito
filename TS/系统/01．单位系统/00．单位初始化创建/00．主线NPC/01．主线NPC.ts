@@ -1,8 +1,7 @@
 const jass = require("jass.common") as any;
 const BJ_DEGTORAD = 0.017453292519943295;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 import { createUnitWithOptions } from "../../../../lib/扩展函数/自定义扩展函数/00．单位相关";
 export interface MainStoryNpcMap {
@@ -59,15 +58,7 @@ export function createMainStoryNPCs(): MainStoryNpcMap {
  * 等价于 JASS 的 TriggerRegisterTimerEventSingle(..., 1.00)
  */
 export function initMainStoryNPCsWithDelay(delaySec: number = 1.0): void {
-  const timer = jass.CreateTimer();
-  if (!timer) {
-    createMainStoryNPCs();
-    return;
-  }
-  safeTimerStart(timer, delaySec, false, () => {
-    createMainStoryNPCs();
-    safeDestroyTimer(timer);
-  });
+  createDelayedCall(delaySec, createMainStoryNPCs);
 }
 
 export default {

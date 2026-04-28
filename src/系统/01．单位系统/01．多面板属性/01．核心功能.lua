@@ -461,9 +461,8 @@ function registerToCenterTimer(self)
     onTick10ms(nil, onRefreshTick)
 end
 jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____G_1 = _G
 getGameTimeFormatted = ____G_1.getGameTimeFormatted
 getGameDifficulty = ____G_1.getGameDifficulty
@@ -886,20 +885,6 @@ local function delayedInit(self)
     ____exports.initMultiboardSystem(nil)
 end
 if MULTIBOARD_SYSTEM_ENABLED then
-    local initTimer = jass.CreateTimer()
-    if not initTimer then
-        delayedInit(nil)
-    else
-        safeTimerStart(
-            nil,
-            initTimer,
-            2,
-            false,
-            function()
-                delayedInit(nil)
-                safeDestroyTimer(nil, initTimer)
-            end
-        )
-    end
+    createDelayedCall(nil, 2, delayedInit)
 end
 return ____exports

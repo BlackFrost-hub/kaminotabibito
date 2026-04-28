@@ -6,9 +6,8 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 import {
@@ -455,15 +454,7 @@ function delayedInit(): void {
 
 // 延迟初始化：游戏开始后1秒执行（等待玩家进入游戏）
 if (MULTIBOARD_SYSTEM_ENABLED) {
-  const initTimer = jass.CreateTimer();
-  if (!initTimer) {
-    delayedInit();
-  } else {
-    safeTimerStart(initTimer, 2.0, false, () => {
-      delayedInit();
-      safeDestroyTimer(initTimer);
-    });
-  }
+  createDelayedCall(2.0, delayedInit);
 }
 
 export {};

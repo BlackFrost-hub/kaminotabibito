@@ -11,9 +11,8 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
@@ -48,6 +47,9 @@ const dataMod = require("系统.02．物品系统.01．装备数据") as {
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
 
 const ITEM_TYPE_KEY = "ItemType";
 const REG_GUARD = "__syzl_equipExtract_registered";
@@ -59,8 +61,7 @@ const RETRY_SEC = 0.1;
 const itemsTable = dataMod.items ?? dataMod.default ?? {};
 
 function log(this: void, msg: string): void {
-  const p = (globalThis as any).print as ((m: string) => void) | undefined;
-  if (typeof p === "function") p(msg);
+  debugLog("装备提取", msg);
 }
 
 function formatDbgVal(this: void, v: any): string {
@@ -185,15 +186,7 @@ function runEquipExtract(this: void): void {
 }
 
 function scheduleRetry(this: void, fn: () => void): void {
-  const tm = jass.CreateTimer();
-  if (!tm) {
-    fn();
-    return;
-  }
-  safeTimerStart(tm, RETRY_SEC, false, () => {
-    safeDestroyTimer(tm);
-    fn();
-  });
+  createDelayedCall(RETRY_SEC, fn);
 }
 
 /**

@@ -25,6 +25,52 @@ const xpcallFn = (globalThis as any).xpcall as undefined | ((fn: VoidCallback, e
 
 type VoidCallback = () => void;
 
+function normalizeUnaryHandleArg(handleOrSelf: any, maybeHandle?: any): any {
+  return maybeHandle !== undefined ? maybeHandle : handleOrSelf;
+}
+
+function normalizeTimerArgs(
+  timerOrSelf: any,
+  timeoutOrTimer: any,
+  periodicOrTimeout: any,
+  actionOrPeriodic: any,
+  maybeAction?: any
+): { timer: any; timeout: number; periodic: boolean; action: VoidCallback | undefined } {
+  if (maybeAction !== undefined) {
+    return {
+      timer: timeoutOrTimer,
+      timeout: periodicOrTimeout,
+      periodic: actionOrPeriodic,
+      action: maybeAction,
+    };
+  }
+  return {
+    timer: timerOrSelf,
+    timeout: timeoutOrTimer,
+    periodic: periodicOrTimeout,
+    action: actionOrPeriodic,
+  };
+}
+
+function normalizeForForceArgs(forceOrSelf: any, actionOrForce: any, maybeAction?: any): { force: any; action: VoidCallback | undefined } {
+  if (maybeAction !== undefined) {
+    return { force: actionOrForce, action: maybeAction };
+  }
+  return { force: forceOrSelf, action: actionOrForce };
+}
+
+function normalizeEnumArgs(
+  rectOrSelf: any,
+  filterOrRect: any,
+  actionOrFilter: any,
+  maybeAction?: any
+): { rect: any; filter: any; action: VoidCallback | undefined } {
+  if (maybeAction !== undefined) {
+    return { rect: filterOrRect, filter: actionOrFilter, action: maybeAction };
+  }
+  return { rect: rectOrSelf, filter: filterOrRect, action: actionOrFilter };
+}
+
 function getErrorHandler(): ((msg: string) => void) | undefined {
   const handler = runtime?.error_handle;
   return typeof handler === "function" ? handler : undefined;
@@ -67,7 +113,8 @@ function enumDestructablesTrampoline(): void {
  * - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
  * - 支持同步嵌套调用（用栈而不是单槽）
  */
-export function safeForForce(force: any, action: VoidCallback): void {
+export function safeForForce(forceOrSelf: any, actionOrForce: any, maybeAction?: VoidCallback): void {
+  const { force, action } = normalizeForForceArgs(forceOrSelf, actionOrForce, maybeAction);
   if (!force || typeof action !== "function") return;
   forForceStack.push(action);
   try {
@@ -81,7 +128,8 @@ export function safeForForce(force: any, action: VoidCallback): void {
  * 安全枚举矩形内物品。
  * 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
  */
-export function safeEnumItemsInRect(rect: any, filter: any, action: VoidCallback): void {
+export function safeEnumItemsInRect(rectOrSelf: any, filterOrRect: any, actionOrFilter: any, maybeAction?: VoidCallback): void {
+  const { rect, filter, action } = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction);
   if (!rect || typeof action !== "function") return;
   enumItemsStack.push(action);
   try {
@@ -95,7 +143,8 @@ export function safeEnumItemsInRect(rect: any, filter: any, action: VoidCallback
  * 安全枚举矩形内可破坏物。
  * 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
  */
-export function safeEnumDestructablesInRect(rect: any, filter: any, action: VoidCallback): void {
+export function safeEnumDestructablesInRect(rectOrSelf: any, filterOrRect: any, actionOrFilter: any, maybeAction?: VoidCallback): void {
+  const { rect, filter, action } = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction);
   if (!rect || typeof action !== "function") return;
   enumDestructablesStack.push(action);
   try {
@@ -120,14 +169,22 @@ function timerTrampoline(): void {
   runSafely(timerActionByHandleId[hid]);
 }
 
-export function safeTimerStart(timer: any, timeout: number, periodic: boolean, action: VoidCallback): void {
+export function safeTimerStart(timerOrSelf: any, timeoutOrTimer: any, periodicOrTimeout: any, actionOrPeriodic: any, maybeAction?: VoidCallback): void {
+  const { timer, timeout, periodic, action } = normalizeTimerArgs(
+    timerOrSelf,
+    timeoutOrTimer,
+    periodicOrTimeout,
+    actionOrPeriodic,
+    maybeAction
+  );
   if (!timer || typeof action !== "function") return;
   const hid = jass.GetHandleId(timer);
   timerActionByHandleId[hid] = action;
   jass.TimerStart(timer, timeout, periodic, timerTrampoline);
 }
 
-export function safeDestroyTimer(timer: any): void {
+export function safeDestroyTimer(timerOrSelf: any, maybeTimer?: any): void {
+  const timer = normalizeUnaryHandleArg(timerOrSelf, maybeTimer);
   if (!timer) return;
   const hid = jass.GetHandleId(timer);
   timerActionByHandleId[hid] = undefined;
@@ -178,7 +235,9 @@ function getOrCreateSafeTriggerRegistry(trigger: any): SafeTriggerRegistry | nul
   return registry;
 }
 
-export function safeTriggerAddAction(trigger: any, callback: VoidCallback): SafeTriggerActionHandle | null {
+export function safeTriggerAddAction(triggerOrSelf: any, callbackOrTrigger: any, maybeCallback?: VoidCallback): SafeTriggerActionHandle | null {
+  const trigger = maybeCallback !== undefined ? callbackOrTrigger : triggerOrSelf;
+  const callback = maybeCallback !== undefined ? maybeCallback : callbackOrTrigger;
   if (!trigger || typeof callback !== "function") return null;
   const registry = getOrCreateSafeTriggerRegistry(trigger);
   if (!registry) return null;
@@ -187,7 +246,9 @@ export function safeTriggerAddAction(trigger: any, callback: VoidCallback): Safe
   return handle;
 }
 
-export function safeTriggerRemoveAction(trigger: any, action: SafeTriggerActionHandle | null | undefined): void {
+export function safeTriggerRemoveAction(triggerOrSelf: any, actionOrTrigger: any, maybeAction?: SafeTriggerActionHandle | null | undefined): void {
+  const trigger = maybeAction !== undefined ? actionOrTrigger : triggerOrSelf;
+  const action = maybeAction !== undefined ? maybeAction : actionOrTrigger;
   if (!trigger || !action) return;
   const hid = jass.GetHandleId(trigger);
   const registry = triggerRegistryByHandleId[hid];
@@ -200,7 +261,8 @@ export function safeTriggerRemoveAction(trigger: any, action: SafeTriggerActionH
   }
 }
 
-export function safeTriggerClearActions(trigger: any): void {
+export function safeTriggerClearActions(triggerOrSelf: any, maybeTrigger?: any): void {
+  const trigger = normalizeUnaryHandleArg(triggerOrSelf, maybeTrigger);
   if (!trigger) return;
   const hid = jass.GetHandleId(trigger);
   const registry = triggerRegistryByHandleId[hid];
@@ -208,7 +270,8 @@ export function safeTriggerClearActions(trigger: any): void {
   registry.actions.length = 0;
 }
 
-export function safeDestroyTrigger(trigger: any): void {
+export function safeDestroyTrigger(triggerOrSelf: any, maybeTrigger?: any): void {
+  const trigger = normalizeUnaryHandleArg(triggerOrSelf, maybeTrigger);
   if (!trigger) return;
   const hid = jass.GetHandleId(trigger);
   const registry = triggerRegistryByHandleId[hid];

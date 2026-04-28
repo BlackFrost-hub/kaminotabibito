@@ -14,9 +14,8 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
 };
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");
@@ -50,6 +49,9 @@ const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．
 
 const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
   registerChestSystemHero: (whichHero: any) => void;
+};
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
 };
 
 const REG_GUARD = "__syzl_playerHeroRegister_registered";
@@ -147,7 +149,7 @@ function registerHeroDependents(whichHero: any): void {
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner != null && owner !== 0) {
     const playerId = jass.GetPlayerId(owner);
-    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[Bridge] registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
+    debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
 
     invokeSelectionCenterInit(owner);
 
@@ -218,15 +220,7 @@ function runRegisterPlayerHero(): void {
  * 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
  */
 function scheduleRetry(fn: () => void): void {
-  const timer = jass.CreateTimer();
-  if (!timer) {
-    fn();
-    return;
-  }
-  safeTimerStart(timer, RETRY_SEC, false, () => {
-    safeDestroyTimer(timer);
-    fn();
-  });
+  createDelayedCall(RETRY_SEC, fn);
 }
 
 /**

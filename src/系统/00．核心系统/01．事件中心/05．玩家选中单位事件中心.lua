@@ -1,32 +1,44 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_0.debugLog
+local setDebug = ____require_result_0.setDebug
 local selectedUnit = {}
 local selectedCount = {}
 local selectedUnitsByPlayer = {}
-local _initialized = false
+local selectionListeners = {}
 local registeredPlayers = {}
---- 输出调试信息
+local selectedTrigger = nil
+local deselectedTrigger = nil
+local initialized = false
+local hasDeselectEvent = jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil and jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil
+setDebug(nil, "SelectionCenter", true)
 local function dbg(tag, ...)
-    local args = {...}
-    local p = _G.print
-    if type(p) == "function" then
-        local parts = {}
-        for ____, a in ipairs(args) do
-            if a == nil then
-                parts[#parts + 1] = "null"
-            elseif a == nil then
-                parts[#parts + 1] = "undef"
-            else
-                parts[#parts + 1] = tostring(a)
-            end
-        end
-        p((("[SelectionCenter] " .. tag) .. " ") .. table.concat(parts, " "))
+    debugLog(nil, "SelectionCenter", tag, ...)
+end
+local function isValidPlayer(whichPlayer)
+    return not not whichPlayer and whichPlayer ~= 0
+end
+local function isRealUnit(whichUnit)
+    return not not whichUnit and whichUnit ~= 0 and jass.GetUnitTypeId(whichUnit) ~= 0
+end
+local function getUnitHandleId(whichUnit)
+    if not whichUnit or whichUnit == 0 then
+        return 0
     end
+    local ____temp_1
+    if type(jass.GetHandleId) == "function" then
+        ____temp_1 = jass.GetHandleId(whichUnit)
+    else
+        ____temp_1 = 0
+    end
+    return ____temp_1
 end
 local function getSelectedUnitList(playerId)
     local list = selectedUnitsByPlayer[playerId]
@@ -43,34 +55,18 @@ local function refreshPlayerSelectionSummary(playerId)
         selectedUnit[playerId] = nil
         return
     end
-    local count = #list
-    selectedCount[playerId] = count
-    local ____playerId_1 = playerId
-    local ____temp_0
-    if count == 1 then
-        ____temp_0 = list[1]
-    else
-        ____temp_0 = nil
-    end
-    selectedUnit[____playerId_1] = ____temp_0
-end
-local function isRealUnit(unit)
-    return not not unit and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0
-end
-local function getUnitHandleId(unit)
-    if not unit or unit == 0 then
-        return 0
-    end
+    selectedCount[playerId] = #list
+    local ____playerId_3 = playerId
     local ____temp_2
-    if type(jass.GetHandleId) == "function" then
-        ____temp_2 = jass.GetHandleId(unit)
+    if #list == 1 then
+        ____temp_2 = list[1]
     else
-        ____temp_2 = 0
+        ____temp_2 = nil
     end
-    return ____temp_2
+    selectedUnit[____playerId_3] = ____temp_2
 end
-local function findSelectedUnitIndex(list, unit)
-    local hid = getUnitHandleId(unit)
+local function findSelectedUnitIndex(list, whichUnit)
+    local hid = getUnitHandleId(whichUnit)
     if hid == 0 then
         return -1
     end
@@ -85,16 +81,18 @@ local function findSelectedUnitIndex(list, unit)
     end
     return -1
 end
---- 处理选中/取消选择事件
--- 
--- @param isSelected - true表示选中事件，false表示取消选择事件
--- @remarks - 选中单位：记录为当前选中单位
--- - 选中物品：视为取消选择当前单位
--- - 选中其他（既不是单位也不是物品）：视为取消选择当前单位
--- - 取消选择：清空选中单位
+local function dispatchSelectionListeners(player, playerId, unit, isSelected)
+    do
+        local i = 0
+        while i < #selectionListeners do
+            selectionListeners[i + 1](player, playerId, unit, isSelected)
+            i = i + 1
+        end
+    end
+end
 local function handleSelectionEvent(isSelected)
     local player = jass.GetTriggerPlayer()
-    if not player or player == 0 then
+    if not isValidPlayer(player) then
         return
     end
     local playerId = jass.GetPlayerId(player)
@@ -107,18 +105,11 @@ local function handleSelectionEvent(isSelected)
         end
         return
     end
-    local ____temp_3
-    if type(jass.GetUnitName) == "function" then
-        ____temp_3 = jass.GetUnitName(unit)
-    else
-        ____temp_3 = "unknown"
-    end
-    local unitName = ____temp_3
+    local list = getSelectedUnitList(playerId)
     local hid = getUnitHandleId(unit)
     if hid == 0 then
         return
     end
-    local list = getSelectedUnitList(playerId)
     if isSelected then
         if findSelectedUnitIndex(list, unit) < 0 then
             list[#list + 1] = unit
@@ -127,8 +118,7 @@ local function handleSelectionEvent(isSelected)
             "SELECTED",
             "playerId=" .. tostring(playerId),
             "unit=" .. tostring(unit),
-            "hid=" .. tostring(hid),
-            "name=" .. tostring(unitName)
+            "hid=" .. tostring(hid)
         )
     else
         local index = findSelectedUnitIndex(list, unit)
@@ -139,11 +129,11 @@ local function handleSelectionEvent(isSelected)
             "DESELECTED",
             "playerId=" .. tostring(playerId),
             "unit=" .. tostring(unit),
-            "hid=" .. tostring(hid),
-            "name=" .. tostring(unitName)
+            "hid=" .. tostring(hid)
         )
     end
     refreshPlayerSelectionSummary(playerId)
+    dispatchSelectionListeners(player, playerId, unit, isSelected)
 end
 local function onPlayerUnitSelectedAction()
     handleSelectionEvent(true)
@@ -151,10 +141,16 @@ end
 local function onPlayerUnitDeselectedAction()
     handleSelectionEvent(false)
 end
-local function isValidPlayer(whichPlayer)
-    return not not whichPlayer and whichPlayer ~= 0
+local function ensureSelectionTriggers()
+    if selectedTrigger == nil or selectedTrigger == 0 then
+        selectedTrigger = jass.CreateTrigger()
+        jass.TriggerAddAction(selectedTrigger, onPlayerUnitSelectedAction)
+    end
+    if hasDeselectEvent and (deselectedTrigger == nil or deselectedTrigger == 0) then
+        deselectedTrigger = jass.CreateTrigger()
+        jass.TriggerAddAction(deselectedTrigger, onPlayerUnitDeselectedAction)
+    end
 end
---- 为单个玩家注册选中/取消选择触发器。
 local function registerSelectionTriggersForPlayer(whichPlayer)
     if not isValidPlayer(whichPlayer) then
         return
@@ -163,31 +159,57 @@ local function registerSelectionTriggersForPlayer(whichPlayer)
     if registeredPlayers[playerId] then
         return
     end
-    local hasDeselectEvent = jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil and jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil
-    local trigSel = jass.CreateTrigger()
-    local selResult = jass.TriggerRegisterPlayerUnitEvent(trigSel, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
-    if selResult then
-        jass.TriggerAddAction(trigSel, onPlayerUnitSelectedAction)
+    ensureSelectionTriggers()
+    if selectedTrigger ~= nil and selectedTrigger ~= 0 then
+        jass.TriggerRegisterPlayerUnitEvent(selectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
+        dbg(
+            "REGISTER",
+            "playerId=" .. tostring(playerId),
+            "trigger=" .. tostring(selectedTrigger)
+        )
     end
-    if hasDeselectEvent then
-        local trigDesel = jass.CreateTrigger()
-        local deselResult = jass.TriggerRegisterPlayerUnitEvent(trigDesel, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, nil)
-        if deselResult then
-            jass.TriggerAddAction(trigDesel, onPlayerUnitDeselectedAction)
-        end
+    if hasDeselectEvent and deselectedTrigger ~= nil and deselectedTrigger ~= 0 then
+        jass.TriggerRegisterPlayerUnitEvent(deselectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, nil)
     end
     registeredPlayers[playerId] = true
-    _initialized = true
+    initialized = true
 end
---- 为指定玩家初始化选中单位事件监听。
 function ____exports.initPlayerSelectionCenter(whichPlayer)
     registerSelectionTriggersForPlayer(whichPlayer)
 end
---- 获取玩家当前唯一选中的单位
--- 
--- @param playerId - 玩家ID（0-15）
--- @returns 如果玩家只选中了一个单位，返回该单位；否则返回null
+local function normalizeSelectionListener(arg1, arg2)
+    if type(arg1) == "function" then
+        return arg1
+    end
+    if type(arg2) == "function" then
+        return arg2
+    end
+    return nil
+end
+function ____exports.addSelectionListener(arg1, arg2)
+    local listener = normalizeSelectionListener(arg1, arg2)
+    if type(listener) ~= "function" then
+        return
+    end
+    if __TS__ArrayIndexOf(selectionListeners, listener) >= 0 then
+        return
+    end
+    selectionListeners[#selectionListeners + 1] = listener
+end
+function ____exports.removeSelectionListener(arg1, arg2)
+    local listener = normalizeSelectionListener(arg1, arg2)
+    if type(listener) ~= "function" then
+        return
+    end
+    local index = __TS__ArrayIndexOf(selectionListeners, listener)
+    if index >= 0 then
+        __TS__ArraySplice(selectionListeners, index, 1)
+    end
+end
 function ____exports.getSoleSelectedUnitForPlayer(playerId)
+    if not initialized then
+        return nil
+    end
     local unit = selectedUnit[playerId]
     local count = selectedCount[playerId] or 0
     if not unit or unit == 0 then

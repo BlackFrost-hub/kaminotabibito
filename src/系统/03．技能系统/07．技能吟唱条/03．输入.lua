@@ -10,9 +10,8 @@ local ____exports = {}
 -- 不包含：UI 渲染、数据存储。
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("系统.03．技能系统.07．技能吟唱条.00．常量定义")
 local DEFAULT_COLOR_ID = ____require_result_1.DEFAULT_COLOR_ID
 local EVENT_NAME_CAST_BAR = ____require_result_1.EVENT_NAME_CAST_BAR
@@ -69,21 +68,7 @@ local function countOnJassStesTable(eventName)
     )
 end
 local function scheduleRetry(fn)
-    local tm = jass.CreateTimer()
-    if not tm then
-        fn(nil)
-        return
-    end
-    safeTimerStart(
-        nil,
-        tm,
-        RETRY_SEC,
-        false,
-        function()
-            safeDestroyTimer(nil, tm)
-            fn(nil)
-        end
-    )
+    createDelayedCall(nil, RETRY_SEC, fn)
 end
 function ____exports.tryRegisterCastBarStes()
     local g = _G

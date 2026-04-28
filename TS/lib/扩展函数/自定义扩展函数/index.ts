@@ -1,10 +1,12 @@
 export * from "./00．单位相关";
 export * from "./01．选取中心范围";
 export * from "./02．条件判断函数";
+export * from "./03．调试输出";
 
 import * as unitRelated from "./00．单位相关";
 import * as rangeQuery from "./01．选取中心范围";
 import * as conditionCheck from "./02．条件判断函数";
+import * as debugOutput from "./03．调试输出";
 
 function expose(name: string, fn: any): void {
     if (typeof fn !== "function") return;

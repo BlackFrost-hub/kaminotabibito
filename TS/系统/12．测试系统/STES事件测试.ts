@@ -54,10 +54,10 @@ function skeyIndex(this: void): number {
 }
 
 function log(this: void, msg: string): void {
-    const p = (globalThis as any).print as ((m: string) => void) | undefined;
-    if (typeof p === "function") {
-        p(msg);
-    }
+    const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
+      debugLogForce: (module: string, ...args: any[]) => void;
+    };
+    debugLogForce("STES测试", msg);
 }
 
 /**

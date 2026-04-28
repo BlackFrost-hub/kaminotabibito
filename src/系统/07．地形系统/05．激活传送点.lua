@@ -18,23 +18,27 @@ local stringToFourCC = ____require_result_0.stringToFourCC
 local withTimer = ____require_result_0.withTimer
 local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3Play = ____require_result_1.Sound3DII_Mp3Play
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_2.debugLog
+local setDebug = ____require_result_2.setDebug
 local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
 -- 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
 local DEBUG_GG_UNIT_HTOW_0030 = false
+setDebug(nil, "激活传送点", DEBUG_GG_UNIT_HTOW_0030)
 local DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030"
 --- 接近传送点多少距离算激活（与地图尺度一致）
 local ACTIVATION_RANGE = 300
 --- 有坐标时 CreateUnit 的所属玩家：中立被动（common.j 的 PLAYER_NEUTRAL_PASSIVE，一般为 15）
 local function neutralPassivePlayer(self)
-    local ____temp_2
+    local ____temp_3
     if jass.PLAYER_NEUTRAL_PASSIVE ~= nil then
-        ____temp_2 = jass.PLAYER_NEUTRAL_PASSIVE
+        ____temp_3 = jass.PLAYER_NEUTRAL_PASSIVE
     else
-        ____temp_2 = 15
+        ____temp_3 = 15
     end
-    local pid = ____temp_2
+    local pid = ____temp_3
     return jass.Player(pid)
 end
 local function dbg(self, _msg)
@@ -96,8 +100,7 @@ local function scheduleDebugGgUnitHtow0030(self)
                 pi = pi + 1
             end
         end
-        local pr = _G.print
-        pr(msg)
+        debugLog(nil, "激活传送点", msg)
     end
     withTimer(
         nil,
@@ -144,13 +147,13 @@ local function resolveWatchUnit(self, cfg)
         if passive == nil then
             return nil
         end
-        local ____temp_3
+        local ____temp_4
         if type(jass.bj_UNIT_FACING) == "number" then
-            ____temp_3 = jass.bj_UNIT_FACING
+            ____temp_4 = jass.bj_UNIT_FACING
         else
-            ____temp_3 = 270
+            ____temp_4 = 270
         end
-        local face = ____temp_3
+        local face = ____temp_4
         local u = jass.CreateUnit(
             passive,
             four,
@@ -158,13 +161,13 @@ local function resolveWatchUnit(self, cfg)
             ty,
             face
         )
-        local ____temp_4
+        local ____temp_5
         if u ~= nil and u ~= 0 then
-            ____temp_4 = u
+            ____temp_5 = u
         else
-            ____temp_4 = nil
+            ____temp_5 = nil
         end
-        return ____temp_4
+        return ____temp_5
     end
     if cfg.UnitID ~= nil and (string.find(cfg.UnitID, "gg_", nil, true) or 0) - 1 == 0 then
         return resolveGgUnitByKey(nil, cfg.UnitID)

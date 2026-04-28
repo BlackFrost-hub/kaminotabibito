@@ -12,7 +12,11 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 import { SoundModel } from "./01．声音模型";
 import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
 
-const DEBUG_SOUND = false;
+const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+  setDebug: (module: string, on: boolean) => void;
+};
+setDebug("Sound3DII", false);
 
 // 导入最后播放的音效变量
 import { lastPlayedSound } from "./03．3D音效播放";
@@ -100,7 +104,7 @@ export function Sound3DII_Mp3Play(
       }
 
       (lastPlayedSound as any) = s;
-      if (DEBUG_SOUND && (globalThis as any).print) (globalThis as any).print("[Sound3DII_Mp3Play] new sound, localPlay=", shouldPlay);
+      debugLog("Sound3DII", "new sound, localPlay=", shouldPlay);
       return s;
     }
   }

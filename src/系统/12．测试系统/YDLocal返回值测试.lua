@@ -22,7 +22,8 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.04．YDWE_trig
 local YDLocalExecuteTrigger = ____require_result_1.YDLocalExecuteTrigger
 local YDTriggerExecuteTrigger = ____require_result_1.YDTriggerExecuteTrigger
 local saveParentIndex = ____require_result_1.saveParentIndex
-local _print = _G.print
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLogForce = ____require_result_2.debugLogForce
 local function resolveGgTrgByKey(self, key)
     local a = jglobals[key]
     if a ~= nil and a ~= 0 then
@@ -39,75 +40,56 @@ local function resolveGgTrgByKey(self, key)
     return nil
 end
 local function testYDLocalReturn(self)
-    _print(nil, "===== 测试中文变量名 =====")
+    debugLogForce(nil, "YDLocal测试", "===== 测试中文变量名 =====")
     local trg002 = resolveGgTrgByKey(nil, "gg_trg____________________002")
-    _print(
-        nil,
-        "查找触发器 gg_trg____________________002 = " .. tostring(trg002 or "nil")
-    )
+    debugLogForce(nil, "YDLocal测试", "查找触发器 gg_trg____________________002 =", trg002 or "nil")
     if trg002 then
         YDLocalInitialize(nil)
         local sIdx = getG_SIndex(nil)
-        _print(
+        debugLogForce(
             nil,
+            "YDLocal测试",
             "YDLocalInitialize 后 G_SIndex=" .. tostring(sIdx)
         )
         YDLocalExecuteTrigger(nil, trg002)
         saveParentIndex(nil, trg002)
-        _print(nil, "saveParentIndex 完成")
+        debugLogForce(nil, "YDLocal测试", "saveParentIndex 完成")
         YDLocal5Set(nil, "integer", "分法", 0)
-        _print(nil, "YDLocal5Set(integer, '分法', 0) 设置参数默认值")
-        _print(nil, "执行 YDTriggerExecuteTrigger...")
+        debugLogForce(nil, "YDLocal测试", "YDLocal5Set(integer, '分法', 0) 设置参数默认值")
+        debugLogForce(nil, "YDLocal测试", "执行 YDTriggerExecuteTrigger...")
         YDTriggerExecuteTrigger(nil, trg002, false)
         local ret1 = YDLocal1Get(nil, "integer", "分法")
         local ret2 = YDLocal1Get(nil, "real", "多大的")
         local ret3 = YDLocal1Get(nil, "boolean", "你好")
-        _print(
-            nil,
-            "YDLocal1Get(integer, '分法') = " .. tostring(ret1)
-        )
-        _print(
-            nil,
-            "YDLocal1Get(real, '多大的') = " .. tostring(ret2)
-        )
-        _print(
-            nil,
-            "YDLocal1Get(boolean, '你好') = " .. tostring(ret3)
-        )
+        debugLogForce(nil, "YDLocal测试", "YDLocal1Get(integer, '分法') =", ret1)
+        debugLogForce(nil, "YDLocal测试", "YDLocal1Get(real, '多大的') =", ret2)
+        debugLogForce(nil, "YDLocal测试", "YDLocal1Get(boolean, '你好') =", ret3)
         local success = true
         if ret1 ~= 6678678 then
-            _print(
-                nil,
-                "❌ integer '分法' 失败，期望 6678678，实际 " .. tostring(ret1)
-            )
+            debugLogForce(nil, "YDLocal测试", "❌ integer '分法' 失败，期望 6678678，实际", ret1)
             success = false
         end
         if ret2 ~= 78378376 then
-            _print(
-                nil,
-                "❌ real '多大的' 失败，期望 78378376，实际 " .. tostring(ret2)
-            )
+            debugLogForce(nil, "YDLocal测试", "❌ real '多大的' 失败，期望 78378376，实际", ret2)
             success = false
         end
         if ret3 ~= true then
-            _print(
-                nil,
-                "❌ boolean '你好' 失败，期望 true，实际 " .. tostring(ret3)
-            )
+            debugLogForce(nil, "YDLocal测试", "❌ boolean '你好' 失败，期望 true，实际", ret3)
             success = false
         end
         if success then
-            _print(nil, "✅ 全部返回值测试成功！")
+            debugLogForce(nil, "YDLocal测试", "✅ 全部返回值测试成功！")
         end
         YDLocal1Release(nil)
-        _print(
+        debugLogForce(
             nil,
+            "YDLocal测试",
             "YDLocal1Release 后 G_SIndex=" .. tostring(getG_SIndex(nil))
         )
     else
-        _print(nil, "触发器未找到")
+        debugLogForce(nil, "YDLocal测试", "触发器未找到")
     end
-    _print(nil, "===== 测试结束 =====")
+    debugLogForce(nil, "YDLocal测试", "===== 测试结束 =====")
 end
 if ENABLED then
     local tm = jass.CreateTimer()

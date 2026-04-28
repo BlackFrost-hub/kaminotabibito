@@ -11,9 +11,8 @@ local ____exports = {}
 -- 避免早先 STES_Register 写入「Lua 自用表」后仍置 REG_GUARD，导致 JASS 遍历计数恒为 0、聊天无任何反应。
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
 local STES_Register = ____require_result_1.STES_Register
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
@@ -29,6 +28,8 @@ local registerStesListener = ____require_result_3.registerStesListener
 local dataMod = require("系统.02．物品系统.01．装备数据")
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_4.stringToFourCC
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_5.debugLog
 local ITEM_TYPE_KEY = "ItemType"
 local REG_GUARD = "__syzl_equipExtract_registered"
 local TRIG_KEY = "__syzl_equipExtract_trig"
@@ -37,10 +38,7 @@ local MAX_REG_ATTEMPTS = 30
 local RETRY_SEC = 0.1
 local itemsTable = dataMod.items or dataMod.default or ({})
 local function log(msg)
-    local p = _G.print
-    if type(p) == "function" then
-        p(nil, msg)
-    end
+    debugLog(nil, "装备提取", msg)
 end
 local function formatDbgVal(v)
     if v == nil then
@@ -104,22 +102,22 @@ local function collectAllIdsInScoreInterval(lo, hi)
     for id in pairs(itemsTable) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue15
+                goto __continue14
             end
-            local ____ydlStes_coerceOptionalNumber_7 = ydlStes_coerceOptionalNumber
-            local ____opt_5 = itemsTable[id]
-            if ____opt_5 ~= nil then
-                ____opt_5 = ____opt_5.score
+            local ____ydlStes_coerceOptionalNumber_8 = ydlStes_coerceOptionalNumber
+            local ____opt_6 = itemsTable[id]
+            if ____opt_6 ~= nil then
+                ____opt_6 = ____opt_6.score
             end
-            local sc = ____ydlStes_coerceOptionalNumber_7(nil, nil, ____opt_5)
+            local sc = ____ydlStes_coerceOptionalNumber_8(nil, nil, ____opt_6)
             if sc == nil then
-                goto __continue15
+                goto __continue14
             end
             if sc >= a and sc <= b then
                 out[#out + 1] = id
             end
         end
-        ::__continue15::
+        ::__continue14::
     end
     return out
 end
@@ -157,29 +155,15 @@ local function runEquipExtract()
         log(((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选0件 → ItemType=0")
         return
     end
-    local ____pickFromScorePool_result_8 = pickFromScorePool(pool)
-    local raw = ____pickFromScorePool_result_8.raw
-    local pickedId = ____pickFromScorePool_result_8.id
+    local ____pickFromScorePool_result_9 = pickFromScorePool(pool)
+    local raw = ____pickFromScorePool_result_9.raw
+    local pickedId = ____pickFromScorePool_result_9.id
     YDLocal7Set(nil, "integer", ITEM_TYPE_KEY, raw)
     ydlStes_finishChildCleanup(nil, nil)
     log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
 local function scheduleRetry(fn)
-    local tm = jass.CreateTimer()
-    if not tm then
-        fn(nil)
-        return
-    end
-    safeTimerStart(
-        nil,
-        tm,
-        RETRY_SEC,
-        false,
-        function()
-            safeDestroyTimer(nil, tm)
-            fn(nil)
-        end
-    )
+    createDelayedCall(nil, RETRY_SEC, fn)
 end
 --- 反复 STES_GetTable + Register，直到 **JASS 全局表** 上该事件监听数 >= 1，或超出次数。
 -- 字面量事件名供 fix-lua-for-pack 10b 去掉多余 nil。

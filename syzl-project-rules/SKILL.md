@@ -1,6 +1,6 @@
 ---
 name: syzl-project-rules
-description: Route work in the syzl repository through its project-specific engineering rules. Use when working anywhere in this repo, especially for TypeScript, Lua, JASS, DzAPI UI, task UI, shared single-UI managers, N-slot symmetric UI, equipment, STES/YDLocal, or other areas covered by `.cursor/rules/`.
+description: Route work in the syzl repository through its project-specific engineering rules. Use when working anywhere in this repo, especially for TypeScript, Lua, JASS, DzAPI UI, task UI, shared single-UI managers, N-slot symmetric UI, equipment, STES/YDLocal, or other areas covered by `.cursor/rules/`. Enforce the repo-wide callback rule: anything that enters the JASS engine callback path (timers, triggers, unit groups, frame events) must use named functions, never anonymous closures.
 ---
 
 # Syzl Project Rules
@@ -43,6 +43,7 @@ Use this skill to onboard into the repo's rule system before making changes. Rea
 - Use absolute `require(...)` paths.
 - Do not treat `globalThis` as a replacement for JASS globals.
 - Do not make local function libraries pretend to be `jass` or `japi`, and do not make engine APIs depend on local helper implementations.
+- Any callback that enters the JASS engine callback path must be a named function. This includes timers, triggers, unit groups, and frame events. Anonymous closures are forbidden on these paths.
 - Route new player-unit event wiring through the repo event center unless a documented exception applies.
 
 ## DzAPI Red Lines
@@ -52,6 +53,7 @@ Use this skill to onboard into the repo's rule system before making changes. Rea
 - Keep local-only UI work inside `GetLocalPlayer()` branches.
 - When `sync=true` is involved, re-check `n-slot-ui-symmetric-execution.mdc` before editing.
 - Treat `ui-frame-types.mdc` as the API/layout reference and `n-slot-ui-symmetric-execution.mdc` as the multiplayer-semantics reference.
+- For any JASS-engine callback path in UI code, prefer named top-level dispatchers over inline closures even when the callback is only registered once.
 
 ## Shared UI Architecture
 
@@ -141,3 +143,12 @@ Best:
 - Run `npm run build` after actual code changes are complete, and report the result.
 - Before rewriting Chinese-heavy files or fixing TSTL callback/no-self issues, read `.cursor/rules/tooling/encoding-and-patch-safety.mdc`.
 - Prefer local patch edits over whole-file rewrites; verify generated `src/**/*.lua` only after a successful build.
+- Do not treat terminal mojibake as proof that a source file is already damaged. Distinguish display/code-page problems from real byte corruption before rewriting Chinese-heavy files.
+- When Chinese-heavy files look garbled in the terminal, prefer the smallest UTF-8-safe patch and verify behavior/build/generated Lua before attempting any larger rewrite.
+
+## Current Repo-Wide Reminders
+
+- Any callback that enters the JASS engine path must use a named function. This applies to timers, triggers, unit groups, and frame events.
+- For multiplayer UI, decide the topology first: local single-UI, shared single-manager, or N-slot symmetric UI. Then keep shared state symmetric and push local-only behavior to the final show/input stage.
+- Do not mix engine tooltip ownership with manual tooltip ownership in the same UI path. If a panel manages tooltip frame visibility itself, do not also rely on `DzFrameSetTooltip(...)` for that same frame chain.
+- Treat root `jass表.txt` and `japi表.txt` as authoritative before assuming an engine API exists. If an API is absent in the runtime, prefer safe skip/removal over inventing a replacement with different semantics.

@@ -1,4 +1,7 @@
 const japi = require("jass.japi") as any;
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLog: (module: string, ...args: any[]) => void;
+};
 
 import { FrameConfig, FrameType, TryCreateFromFdfOptions } from "./00．类型定义";
 
@@ -75,8 +78,7 @@ export function loadTocOnce(
     __safeTocPath = p;
     const ok = pcall(__safeLoadTocPcallBody);
     if (!ok) {
-      const pr = (globalThis as any).print;
-      pr("[" + debugPrefix + "] DzLoadToc fail: " + p);
+      debugLog(debugPrefix, "DzLoadToc fail:", p);
     }
   }
 }
