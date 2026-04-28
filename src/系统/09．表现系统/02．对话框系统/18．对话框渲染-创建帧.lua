@@ -23,6 +23,86 @@ local dzShow = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzShow
 local TAG_BASE_MAIN = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.TAG_BASE_MAIN
 local TAG_BASE_PORTRAIT = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.TAG_BASE_PORTRAIT
 local japi = require("jass.japi")
+local __pcallFrameA = 0
+local __pcallFrameB = 0
+local __pcallValN = 0
+local function __pcallSetParentBody(self)
+    japi.DzFrameSetParent(__pcallFrameA, __pcallFrameB)
+end
+local function __pcallClearAllPointsBody(self)
+    japi.DzFrameClearAllPoints(__pcallFrameA)
+end
+local function __pcallSetAllPointsBody(self)
+    japi.DzFrameSetAllPoints(__pcallFrameA, __pcallFrameB)
+end
+local function __pcallSetAlphaBody(self)
+    japi.DzFrameSetAlpha(__pcallFrameA, __pcallValN)
+end
+local function __pcallSetTextAlignResetBody(self)
+    japi.DzFrameSetTextAlignment(__pcallFrameA, -1)
+end
+local function __pcallSetTextAlignCenterBody(self)
+    japi.DzFrameSetTextAlignment(__pcallFrameA, 18)
+end
+local __pcallFrameC = 0
+local __pcallPointN = 0
+local __pcallRelPointN = 0
+local __pcallOffX = 0
+local __pcallOffY = 0
+local function __pcallSetPointHintBody(self)
+    japi.DzFrameSetPoint(
+        __pcallFrameA,
+        8,
+        __pcallFrameC,
+        8,
+        -0.008,
+        0.008
+    )
+end
+local function __pcallSetPointSkipBody(self)
+    japi.DzFrameSetPoint(
+        __pcallFrameA,
+        0,
+        __pcallFrameC,
+        2,
+        0.005,
+        -0.022
+    )
+end
+local function pcallSetParent(self, a, b)
+    __pcallFrameA = a
+    __pcallFrameB = b
+    pcall(__pcallSetParentBody)
+end
+local function pcallClearAllPoints(self, a)
+    __pcallFrameA = a
+    pcall(__pcallClearAllPointsBody)
+end
+local function pcallSetAllPoints(self, a, b)
+    __pcallFrameA = a
+    __pcallFrameB = b
+    pcall(__pcallSetAllPointsBody)
+end
+local function pcallSetAlpha(self, a, n)
+    __pcallFrameA = a
+    __pcallValN = n
+    pcall(__pcallSetAlphaBody)
+end
+local function pcallSetTextAlignResetThenCenter(self, a)
+    __pcallFrameA = a
+    pcall(__pcallSetTextAlignResetBody)
+    pcall(__pcallSetTextAlignCenterBody)
+end
+local function pcallSetPointHint(self, a, c)
+    __pcallFrameA = a
+    __pcallFrameC = c
+    pcall(__pcallSetPointHintBody)
+end
+local function pcallSetPointSkip(self, a, c)
+    __pcallFrameA = a
+    __pcallFrameC = c
+    pcall(__pcallSetPointSkipBody)
+end
 --- 由「任务回调与命中」模块在加载末尾注入，避免 createDialogFrames ↔ dialogPanelHitCallback 循环依赖
 local g_bindDialogPanelHitFrame
 function ____exports.setDialogPanelHitBinder(self, fn)
@@ -98,15 +178,11 @@ function ____exports.createDialogFrames(self, slotId)
     }) or 0
     frames[5] = bgBtn
     if bgBtn ~= 0 then
-        pcall(function () return japi.DzFrameSetParent(bgBtn, bg) end
-        )
-        pcall(function () return japi.DzFrameClearAllPoints(bgBtn) end
-        )
-        pcall(function () return japi.DzFrameSetAllPoints(bgBtn, bg) end
-        )
+        pcallSetParent(nil, bgBtn, bg)
+        pcallClearAllPoints(nil, bgBtn)
+        pcallSetAllPoints(nil, bgBtn, bg)
         japi.DzFrameSetText(bgBtn, "")
-        pcall(function () return japi.DzFrameSetAlpha(bgBtn, 0) end
-        )
+        pcallSetAlpha(nil, bgBtn, 0)
     end
     bindDialogPanelHitFrame(nil, bgBtn)
     local titleBg = dzCreate(nil, "GameUI", slotTag + 2)
@@ -128,18 +204,13 @@ function ____exports.createDialogFrames(self, slotId)
     dzShow(nil, nameText, false)
     dzClearPoints(nil, nameText)
     if nameText ~= 0 then
-        pcall(function () return japi.DzFrameSetAllPoints(nameText, titleBg) end
-        )
+        pcallSetAllPoints(nil, nameText, titleBg)
     end
     dzSetText(nil, nameText, "")
     dzSetFont(nil, nameText, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE)
     dzSetEnable(nil, nameText, false)
     if nameText ~= 0 then
-        pcall(function ()
-                japi.DzFrameSetTextAlignment(nameText, -1)
-                japi.DzFrameSetTextAlignment(nameText, 18)
-            end
-        )
+        pcallSetTextAlignResetThenCenter(nil, nameText)
     end
     local bodyText = dzCreate(nil, "GameTextpxL", slotTag + 4)
     frames[4] = bodyText
@@ -291,15 +362,7 @@ function ____exports.createDialogFrames(self, slotId)
     }) or 0
     frames[12] = hintLabel
     if hintLabel ~= 0 then
-        pcall(function () return japi.DzFrameSetPoint(
-                hintLabel,
-                8,
-                bg,
-                8,
-                -0.008,
-                0.008
-            ) end
-        )
+        pcallSetPointHint(nil, hintLabel, bg)
         japi.DzFrameSetSize(hintLabel, 0.12, 0.018)
         japi.DzFrameSetText(hintLabel, "|cff333333[点击以继续] ↓|r")
         japi.DzFrameSetFont(hintLabel, DEFAULT_FONT, 0.016, 0)
@@ -315,15 +378,7 @@ function ____exports.createDialogFrames(self, slotId)
     }) or 0
     frames[13] = skipHintLabel
     if skipHintLabel ~= 0 then
-        pcall(function () return japi.DzFrameSetPoint(
-                skipHintLabel,
-                0,
-                titleBg,
-                2,
-                0.005,
-                -0.022
-            ) end
-        )
+        pcallSetPointSkip(nil, skipHintLabel, titleBg)
         japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018)
         japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r")
         japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0)

@@ -2,6 +2,7 @@
 const jass = require("jass.common") as any;
 import { registerKeyEventByCode } from "../../lib/扩展函数/封装函数/04．硬件输入/04．键盘函数";
 import { KEY_STATE } from "../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
+import { forEachPlayingPlayer } from "../../lib/扩展函数/封装函数/01．通用工具/05．玩家工具";
 
 function dumpJapiKeys(): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;
@@ -93,9 +94,9 @@ function bindKeyBN_once_min(): void {
   const bind = (key: number, label: string) => {
     registerKeyEventByCode(key, KEY_STATE.DOWN, false, () => {
       const msg = `[KEYOK] ${label} key=${tostring(key)} sync=false`;
-      for (let i = 0; i < 12; i++) {
-        (jass as any).DisplayTimedTextToPlayer((jass as any).Player(i), 0, 0, 5, msg);
-      }
+      forEachPlayingPlayer((p: any) => {
+        (jass as any).DisplayTimedTextToPlayer(p, 0, 0, 5, msg);
+      });
     });
   };
 

@@ -7,9 +7,10 @@ local ____exports = {}
 local jass = require("jass.common")
 local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local fourCCToString = ____require_result_0.fourCCToString
 local isHeroUnit = ____require_result_0.isHeroUnit
 local isSpecialUnit = ____require_result_0.isSpecialUnit
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.index")
+local getItemDataEntryByTypeId = ____require_result_1.getItemDataEntryByTypeId
 --- 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`）
 local g = require("jass.globals")
 --- 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制
@@ -17,7 +18,6 @@ local function isEquipLimitDisabledByJass(self)
     local v = g.udg_Itmeboolean
     return v == true or v == 1
 end
-local itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
 --- 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性
 ____exports.equipShared = {skipNextDrop = false}
 local EQUIP_LIMIT_EVENT_PLAYER_IDS = {0, 1, 2, 3}
@@ -37,8 +37,7 @@ local COLOR_TYPE = "|cff00ff00"
 local COLOR_NAME = "|cff00bfff"
 local COLOR_ERR = "|cffff0000"
 local function getEntry(self, itemTypeId)
-    local id = fourCCToString(nil, itemTypeId)
-    return itemsData[id]
+    return getItemDataEntryByTypeId(nil, itemTypeId)
 end
 local function safeGetItemTypeId(self, it)
     local a = jass.GetItemTypeId(it)

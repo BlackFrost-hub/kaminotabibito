@@ -25,6 +25,16 @@ local buildTaskPanelCategoryTabs = ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E.b
 -- 
 -- 架构：全局1套UI，不再区分 slotPid。
 local japi = require("jass.japi")
+local __pcallShowFrame = 0
+local __pcallShowVis = false
+local function __pcallFrameShowBody(self)
+    japi.DzFrameShow(__pcallShowFrame, __pcallShowVis)
+end
+local function pcallDzFrameShow(self, frame, visible)
+    __pcallShowFrame = frame
+    __pcallShowVis = visible
+    pcall(__pcallFrameShowBody)
+end
 function ____exports.buildTaskMainPanel(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -96,10 +106,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             LIST_CONTAINER_REL_TO_PANEL_X,
             LIST_CONTAINER_REL_TO_PANEL_Y
         )
-        if type(japi.DzFrameShow) == "function" then
-            pcall(function () return japi.DzFrameShow(listContainer, true) end
-            )
-        end
+        pcallDzFrameShow(nil, listContainer, true)
     end
     local tabs = buildTaskPanelCategoryTabs(nil, {
         japi = japi,

@@ -16,10 +16,6 @@ const itemEventCenter = require("系统.00．核心系统.01．事件中心.04�
   onItemUse: (callback: (unit: any, item: any) => void) => number;
 };
 const g = require("jass.globals") as { [k: string]: any };
-const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { PowerUP?: string }> }).default;
-const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
-  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => void;
-};
 const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
   fourCCToString: (four: number) => string;
@@ -27,49 +23,18 @@ const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
 };
+const { KEY_TO_NAME, findStatKey, getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
+  KEY_TO_NAME: Record<string, string>;
+  findStatKey: (raw: string) => string;
+  getItemDataEntry: (item: any) => any | null;
+};
+const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
+  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
+};
 const { onSecond, offSecond } = globalThis as unknown as {
   onSecond: (cb: () => void) => void;
   offSecond: (cb: () => void) => void;
 };
-
-/** key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致） */
-const KEY_TO_NAME: Record<string, string> = {
-  hp: "生命值", mp: "魔法值", dmg: "攻击力", armor: "护甲", atkSpeed: "攻速",
-  movespeed: "叠加移动速度", str: "力量", agi: "敏捷", int: "智力", all: "全属性",
-  critRate: "暴击率", critDmg: "暴击伤害", magicResist: "魔抗",
-  hpRegen: "生命恢复", hpRegenPct: "生命恢复%", hpRegenEff: "生命恢复效率",
-  skillHeal: "技能治疗率", healReceived: "受到的治疗率",
-  mpRegen: "魔法恢复", mpRegenPct: "魔法恢复%", mpCost: "魔法消耗",
-  cdReduction: "冷却缩减", accuracy: "命中率", dodge: "闪避率",
-  armorPierce: "护甲穿透", magicPierce: "魔法穿透",
-  skillDmg: "技能伤害", skillResist: "技能抗性", magicDmg: "魔法伤害",
-  physDmg: "物理伤害", physResist: "物理抗性", enhanceDmg: "强化伤害",
-  atkDmg: "普攻伤害", atkResist: "普攻抗性",
-  lightDmg: "光属性伤害", lightResist: "光属性抗性",
-  darkDmg: "暗属性伤害", darkResist: "暗属性抗性",
-  woodDmg: "木属性伤害", woodResist: "木属性抗性",
-  fireDmg: "火属性伤害", fireResist: "火属性抗性",
-  thunderDmg: "雷属性伤害", thunderResist: "雷属性抗性",
-  waterDmg: "水属性伤害", waterResist: "水属性抗性",
-  MetalResist: "金属性抗性", summonDmg: "召唤物伤害", summonResist: "召唤物抗性",
-  dmgReduction: "伤害减少", dmgReductionPct: "伤害减少%",
-  lifeSteal: "伤害吸血", magicLifeSteal: "魔法伤害吸血", atkLifeSteal: "普攻伤害吸血",
-  critRateTaken: "被暴击率", critDmgTaken: "被暴击伤害", stunResist: "眩晕抗性",
-  magicAtkDmg: "魔法普攻伤害", antMastery: "蝼蚁专精", movespeed2: "移动速度",
-  dmgBonus: "伤害%", finalDamageMultiplier: "最终伤害%", expGainRate: "经验获取率",
-  hpPct: "最大生命值%", baseDmgPct: "基础攻击力%",
-  SpellReduce: "受到技伤减少", PhysReduce: "受到物伤减少",
-};
-
-/** 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key */
-function findStatKey(raw: string): string {
-  if (KEY_TO_NAME[raw] !== undefined) return raw;
-  const rl = raw.toLowerCase();
-  for (const k in KEY_TO_NAME) {
-    if (k.toLowerCase() === rl) return k;
-  }
-  return "";
-}
 
 interface Effect {
   type: "stat" | "exp" | "level" | "gold";
@@ -338,13 +303,11 @@ function onUseItem(): void {
   if (!unit || !item) return;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
   if (IsUnitIllusionBJ(unit)) return;
-  const itemId = (jass as any).GetItemTypeId(item);
-  const idStr = fourCCToString(itemId);
-  const entry = (itemsData as Record<string, { PowerUP?: string }>)[idStr];
+  const entry = getItemDataEntry(item);
   if (!entry || !entry.PowerUP) return;
 
-  // 防重：USE_ITEM 会触发两次
   const glob = globalThis as any;
+  const idStr = fourCCToString((jass as any).GetItemTypeId(item));
   const key = "__EquipPowerUP_" + tostring(unit) + "_" + idStr;
   if (glob[key]) return;
   glob[key] = true;

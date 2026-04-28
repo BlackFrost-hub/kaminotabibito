@@ -37,7 +37,7 @@ function renderBuffBarLocal(vm)
                 local slotVM = vm.slots[i + 1]
                 local slot = slots[i + 1]
                 if not slot then
-                    goto __continue36
+                    goto __continue35
                 end
                 if slotVM.visible then
                     if slot.root ~= 0 then
@@ -57,7 +57,7 @@ function renderBuffBarLocal(vm)
                     hideSlot(i)
                 end
             end
-            ::__continue36::
+            ::__continue35::
             i = i + 1
         end
     end
@@ -145,9 +145,7 @@ local function setFrameLevelSafe(frame, level)
     if frame == 0 then
         return
     end
-    if type(japi.DzFrameSetPriority) == "function" then
-        japi.DzFrameSetPriority(frame, level)
-    end
+    japi.DzFrameSetPriority(frame, level)
 end
 local function showSlotTooltipByIndex(index)
     local s = slots[index + 1]

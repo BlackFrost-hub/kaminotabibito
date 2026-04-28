@@ -25,7 +25,9 @@ const itemEventCenter = require("系统.00．核心系统.01．事件中心.04�
   onItemPickup: (callback: (unit: any, item: any) => void) => number;
   onItemDrop: (callback: (unit: any, item: any) => void) => number;
 };
-const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { recipe?: string }> }).default;
+const { getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
+  getItemDataEntry: (item: any) => any | null;
+};
 const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   withTimer: (delaySec: number, callback: () => void) => any;
   stopTimer: (t: any) => void;
@@ -34,9 +36,8 @@ const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.�
 const { CreateFloatTextAtPoint } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextAtPoint: (x: number, y: number, text: string, options?: any) => any;
 };
-const { stringToFourCC, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
-  fourCCToString: (fourcc: number) => string;
 };
 const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排泄") as {
   setLastCreatedItem: (item: any) => void;
@@ -69,12 +70,6 @@ function isCampfire(u: any): boolean {
 /** 使用 01．封装函数.ts 中的 stringToFourCC */
 function fourCCToInt(id: string): number {
   return stringToFourCC(id);
-}
-
-/** 使用 01．封装函数.ts 中的 fourCCToString */
-function getItemIdStr(item: any): string {
-  const itemId = (jass as any).GetItemTypeId(item);
-  return fourCCToString(itemId);
 }
 
 function getItemNameSafe(item: any): string {
@@ -119,8 +114,7 @@ function playFinishEffect(campfire: any): void {
 }
 
 function getRecipeForItem(item: any): RecipeParsed | null {
-  const idStr = getItemIdStr(item);
-  const entry = (itemsData as any)[idStr] as { recipe?: string } | undefined;
+  const entry = getItemDataEntry(item);
   const recipe = entry && entry.recipe ? entry.recipe : undefined;
   if (!recipe) return null;
 
@@ -144,7 +138,7 @@ function getRecipeForItem(item: any): RecipeParsed | null {
   const timeoutSec = jass.R2I(parseFloat(timeoutStr) || 0);
   if (cookSec <= 0) return null;
 
-  const rawOpts = resultsStr.split(";").map((s) => s.trim()).filter((s) => s !== "");
+  const rawOpts = resultsStr.split(";").map((s: string) => s.trim()).filter((s: string) => s !== "");
   if (rawOpts.length === 0) return null;
 
   const opts: ResultOpt[] = [];

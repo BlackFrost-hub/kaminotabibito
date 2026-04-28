@@ -233,7 +233,7 @@ export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
 export function updateTaskUIScrollBarVisibility(ctx: TaskUIScrollContext, pageCount: number, hasQuestRows: boolean): void {
   const visible = hasQuestRows;
   for (const frame of [ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn]) {
-    if (frame && frame !== 0) pcallDzFrameShow(japi, frame, visible);
+    if (frame && frame !== 0) pcallDzFrameShow(frame, visible);
   }
   if (visible) updateTaskUIScrollThumbPosition(ctx, pageCount);
 }

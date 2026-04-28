@@ -10,7 +10,6 @@ local ____exports = {}
 local jass = require("jass.common")
 local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local g = require("jass.globals")
-local items = require("系统.02．物品系统.01．装备数据").default
 local equipLimit = require("系统.02．物品系统.10．装备限制")
 local equipShared = equipLimit.equipShared
 local equipMovespeed = require("系统.02．物品系统.08．装备移速")
@@ -19,9 +18,13 @@ local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_1.fourCCToString
 local isSpecialUnit = ____require_result_1.isSpecialUnit
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
-local getObjectProperty = ____require_result_2.getObjectProperty
-local ObjectType = ____require_result_2.ObjectType
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
+local STAT_CONFIG = ____require_result_2.STAT_CONFIG
+local NAME_TO_KEY = ____require_result_2.NAME_TO_KEY
+local getItemDataEntry = ____require_result_2.getItemDataEntry
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_3.getObjectProperty
+local ObjectType = ____require_result_3.ObjectType
 local EQUIP_EVENT_PLAYER_IDS = {
     0,
     1,
@@ -33,92 +36,6 @@ local EQUIP_EVENT_PLAYER_IDS = {
     7,
     13
 }
---- 属性配置：显示名 -> itemData key。新增属性只需在此加一行，primaryBonus 即可用该显示名
-local STAT_CONFIG = {
-    {name = "生命值", key = "hp"},
-    {name = "魔法值", key = "mp"},
-    {name = "攻击力", key = "dmg"},
-    {name = "护甲", key = "armor"},
-    {name = "攻速", key = "atkSpeed"},
-    {name = "叠加移动速度", key = "movespeed"},
-    {name = "力量", key = "str"},
-    {name = "敏捷", key = "agi"},
-    {name = "智力", key = "int"},
-    {name = "全属性", key = "all"},
-    {name = "暴击率", key = "critRate"},
-    {name = "暴击伤害", key = "critDmg"},
-    {name = "魔抗", key = "magicResist"},
-    {name = "生命恢复", key = "hpRegen"},
-    {name = "生命恢复%", key = "hpRegenPct"},
-    {name = "生命恢复效率", key = "hpRegenEff"},
-    {name = "技能治疗率", key = "skillHeal"},
-    {name = "受到的治疗率", key = "healReceived"},
-    {name = "重伤", key = "wound"},
-    {name = "魔法恢复", key = "mpRegen"},
-    {name = "魔法恢复%", key = "mpRegenPct"},
-    {name = "魔法消耗", key = "mpCost"},
-    {name = "冷却缩减", key = "cdReduction"},
-    {name = "命中率", key = "accuracy"},
-    {name = "闪避率", key = "dodge"},
-    {name = "护甲穿透", key = "armorPierce"},
-    {name = "魔法穿透", key = "magicPierce"},
-    {name = "技能伤害", key = "skillDmg"},
-    {name = "技能抗性", key = "skillResist"},
-    {name = "魔法伤害", key = "magicDmg"},
-    {name = "物理伤害", key = "physDmg"},
-    {name = "物理抗性", key = "physResist"},
-    {name = "强化伤害", key = "enhanceDmg"},
-    {name = "普攻伤害", key = "atkDmg"},
-    {name = "普攻抗性", key = "atkResist"},
-    {name = "光属性伤害", key = "lightDmg"},
-    {name = "光属性抗性", key = "lightResist"},
-    {name = "暗属性伤害", key = "darkDmg"},
-    {name = "暗属性抗性", key = "darkResist"},
-    {name = "木属性伤害", key = "woodDmg"},
-    {name = "木属性抗性", key = "woodResist"},
-    {name = "火属性伤害", key = "fireDmg"},
-    {name = "火属性抗性", key = "fireResist"},
-    {name = "雷属性伤害", key = "thunderDmg"},
-    {name = "雷属性抗性", key = "thunderResist"},
-    {name = "水属性伤害", key = "waterDmg"},
-    {name = "水属性抗性", key = "waterResist"},
-    {name = "金属性抗性", key = "metalResist"},
-    {name = "金属性伤害", key = "metalDmg"},
-    {name = "召唤物伤害", key = "summonDmg"},
-    {name = "召唤物抗性", key = "summonResist"},
-    {name = "伤害减少", key = "dmgReduction"},
-    {name = "伤害减少%", key = "dmgReductionPct"},
-    {name = "伤害吸血", key = "lifeSteal"},
-    {name = "魔法伤害吸血", key = "magicLifeSteal"},
-    {name = "普攻伤害吸血", key = "atkLifeSteal"},
-    {name = "被暴击率", key = "critRateTaken"},
-    {name = "被暴击伤害", key = "critDmgTaken"},
-    {name = "眩晕抗性", key = "stunResist"},
-    {name = "魔法普攻伤害", key = "magicAtkDmg"},
-    {name = "蝼蚁专精", key = "antMastery"},
-    {name = "移动速度", key = "movespeed2"},
-    {name = "伤害%", key = "dmgBonus"},
-    {name = "最终伤害%", key = "finalDmgBonus"},
-    {name = "经验获取率", key = "expGainRate"},
-    {name = "最大生命值%", key = "hpPct"},
-    {name = "最大法力值%", key = "mpPct"},
-    {name = "基础生命值%", key = "baseHpPct"},
-    {name = "基础攻击力%", key = "baseDmgPct"},
-    {name = "基础护甲%", key = "baseArmorPct"},
-    {name = "生命值%", key = "hpPercent"},
-    {name = "法力值%", key = "mpPercent"},
-    {name = "攻击力%", key = "dmgPercent"},
-    {name = "护甲%", key = "armorPercent"},
-    {name = "受到技伤减少", key = "SpellReduce"},
-    {name = "受到物伤减少", key = "PhysReduce"}
-}
-local NAME_TO_KEY = {}
-for ____, e in ipairs(STAT_CONFIG) do
-    NAME_TO_KEY[e.name] = e.key
-end
-if not NAME_TO_KEY["移速"] then
-    NAME_TO_KEY["移速"] = "moveSpeed"
-end
 --- 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值
 local function parsePrimaryBonus(self, s, primaryStr)
     local out = {}
@@ -137,19 +54,19 @@ local function parsePrimaryBonus(self, s, primaryStr)
         do
             local idx = (string.find(p, "+", nil, true) or 0) - 1
             if idx < 0 then
-                goto __continue8
+                goto __continue5
             end
             local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
             local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
             local key = NAME_TO_KEY[name]
             if not key then
-                goto __continue8
+                goto __continue5
             end
             local isPct = (string.find(valStr, "%", nil, true) or 0) - 1 >= 0
             local num = __TS__ParseFloat(valStr) or 0
             out[key] = (out[key] or 0) + (isPct and num / 100 or num)
         end
-        ::__continue8::
+        ::__continue5::
     end
     return out
 end
@@ -223,23 +140,25 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local player = jass.GetOwningPlayer(unit)
-    local itemId = jass.GetItemTypeId(item)
     local isDrop = not isPickup
     local skipFlag = equipShared.skipNextDrop
     if isDrop and skipFlag then
         equipShared.skipNextDrop = false
         return
     end
-    local idStr = fourCCToString(nil, itemId)
-    local itemData = items[idStr]
+    local idStr = fourCCToString(
+        nil,
+        jass.GetItemTypeId(item)
+    )
+    local itemData = getItemDataEntry(nil, item)
     if not itemData then
         if isPickup then
-            local ____temp_5 = type(slk) ~= "nil" and slk.item
-            if ____temp_5 then
-                local ____opt_3 = slk.item[idStr]
-                ____temp_5 = ____opt_3 and ____opt_3.name
+            local ____temp_6 = type(slk) ~= "nil" and slk.item
+            if ____temp_6 then
+                local ____opt_4 = slk.item[idStr]
+                ____temp_6 = ____opt_4 and ____opt_4.name
             end
-            local displayName = ____temp_5 or idStr
+            local displayName = ____temp_6 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
             jass.DisplayTimedTextToPlayer(
@@ -261,13 +180,13 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local charges = jass.GetItemCharges(item)
-    local ____temp_6
+    local ____temp_7
     if charges > 0 then
-        ____temp_6 = charges
+        ____temp_7 = charges
     else
-        ____temp_6 = 1
+        ____temp_7 = 1
     end
-    local mult = ____temp_6
+    local mult = ____temp_7
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
@@ -279,14 +198,18 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local merged = {}
     for ____, e in ipairs(STAT_CONFIG) do
-        local ____e_key_8 = e.key
-        local ____itemData_e_key_7 = itemData[e.key]
-        if ____itemData_e_key_7 == nil then
-            ____itemData_e_key_7 = 0
+        local ____e_key_9 = e.key
+        local ____itemData_e_key_8 = itemData[e.key]
+        if ____itemData_e_key_8 == nil then
+            ____itemData_e_key_8 = 0
         end
-        merged[____e_key_8] = ____itemData_e_key_7 + (primary[e.key] or 0)
+        merged[____e_key_9] = ____itemData_e_key_8 + (primary[e.key] or 0)
     end
-    merged.moveSpeed = (itemData.moveSpeed or 0) + (primary.moveSpeed or 0)
+    local ____itemData_moveSpeed_10 = itemData.moveSpeed
+    if ____itemData_moveSpeed_10 == nil then
+        ____itemData_moveSpeed_10 = 0
+    end
+    merged.moveSpeed = ____itemData_moveSpeed_10 + (primary.moveSpeed or 0)
     local playerStats = {}
     local function addStat(____, val, name)
         if val == nil or val == 0 then
@@ -321,8 +244,8 @@ local function handleItemEvent(self, unit, item, isPickup)
     else
         levelColor = "|cFFFFFFFF"
     end
-    local coloredLevel = (levelColor .. levelText) .. "|r"
-    local coloredName = ("|cFFFFD700" .. (itemData.name or "未知")) .. "|r"
+    local coloredLevel = (levelColor .. tostring(levelText)) .. "|r"
+    local coloredName = ("|cFFFFD700" .. tostring(itemData.name or "未知")) .. "|r"
     if not isConsumable then
         local msg = (((((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. "[") .. coloredLevel) .. "]") .. "级") .. "『") .. coloredName) .. "』"
         for ____, stat in ipairs(playerStats) do
@@ -349,7 +272,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             do
                 local statName = playerStats[i + 1].name
                 if statName == "移动速度" then
-                    goto __continue39
+                    goto __continue36
                 end
                 local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
                 local num = __TS__Number(val)
@@ -359,21 +282,21 @@ local function handleItemEvent(self, unit, item, isPickup)
                 ) .. "%") or (nearZero and "0" or tostring(num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
-            ::__continue39::
+            ::__continue36::
             i = i + 1
         end
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_11 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_10 = unit
-        local ____isDrop_9
+        local ____equipMovespeed_getMaxMovespeed2Info_13 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_12 = unit
+        local ____isDrop_11
         if isDrop then
-            ____isDrop_9 = item
+            ____isDrop_11 = item
         else
-            ____isDrop_9 = nil
+            ____isDrop_11 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_11(equipMovespeed, ____unit_10, ____isDrop_9)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_13(equipMovespeed, ____unit_12, ____isDrop_11)
         if ms.value > 0 then
             test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end

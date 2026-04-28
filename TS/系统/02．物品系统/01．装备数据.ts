@@ -1,4 +1,4 @@
-﻿interface ItemDataEntry {
+﻿export interface ItemDataEntry {
   name: string;
   type?: string;
   score?: number;

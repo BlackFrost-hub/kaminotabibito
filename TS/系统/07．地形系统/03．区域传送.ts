@@ -18,7 +18,7 @@ const regionEventCenter = require("系统.00．核心系统.01．事件中心.02
 };
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
-const regionMap = new Map<any, RegionConfig>();
+const regionMap = new Map<number, RegionConfig>();
 
 // 简易调试输出：把关键信息打到玩家 0 屏幕上，便于排查区域是否创建/触发
 // function dbg(msg: string): void {
@@ -148,7 +148,7 @@ function initRegionTeleport(): void {
     (jass as any).RemoveRect(rect);
     regionEventCenter.registerEnterRegionTrigger(trig, region, null);
     // dbg("已注册区域: " + cfg.id);
-    regionMap.set(region, cfg);
+    regionMap.set((jass as any).GetHandleId(region), cfg);
   }
 
   const onEnter = (): void => {
@@ -167,7 +167,7 @@ function initRegionTeleport(): void {
       );
       if (owner === neutralAgg) return;
     }
-    const cfg = regionMap.get(region);
+    const cfg = regionMap.get((jass as any).GetHandleId(region));
     // dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
     if (cfg == null) return;
 

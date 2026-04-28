@@ -162,7 +162,7 @@ function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames, ha
     local vis = hasQuestRows
     for ____, f in ipairs(frames) do
         if f and f ~= 0 then
-            pcallDzFrameShow(nil, japi, f, vis)
+            pcallDzFrameShow(nil, f, vis)
         end
     end
 end

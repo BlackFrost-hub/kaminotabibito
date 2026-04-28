@@ -63,9 +63,7 @@ function getTriggerUiEventFrame(): number {
 
 function setFrameLevelSafe(frame: number, level: number): void {
   if (frame === 0) return;
-  if (typeof (japi as any).DzFrameSetPriority === "function") {
-    (japi as any).DzFrameSetPriority(frame, level);
-  }
+  (japi as any).DzFrameSetPriority(frame, level);
 }
 
 function showSlotTooltipByIndex(index: number): void {

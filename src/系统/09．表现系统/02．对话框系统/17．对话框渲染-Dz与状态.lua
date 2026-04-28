@@ -19,6 +19,11 @@ ____exports.DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp"
 ____exports.KEY_SKIP_DIALOG = 192
 ____exports.g_states = {}
 ____exports.g_questCallbacksByPlayer = {}
+local __dzPcallFrame = 0
+local __dzPcallPriority = 0
+local function __dzSetPriorityPcallBody(self)
+    japi.DzFrameSetPriority(__dzPcallFrame, __dzPcallPriority)
+end
 function ____exports.dzShow(self, f, b)
     if f and f ~= 0 then
         japi.DzFrameShow(f, b)
@@ -41,8 +46,9 @@ function ____exports.dzSetAlpha(self, f, a)
 end
 function ____exports.dzSetPriority(self, f, p)
     if f and f ~= 0 then
-        pcall(function () return japi.DzFrameSetPriority(f, p) end
-        )
+        __dzPcallFrame = f
+        __dzPcallPriority = p
+        pcall(__dzSetPriorityPcallBody)
     end
 end
 function ____exports.dzSetAbsPoint(self, f, point, x, y)

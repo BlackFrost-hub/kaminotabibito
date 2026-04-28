@@ -5,6 +5,8 @@ local ____04_FF0E_952E_76D8_51FD_6570 = require("lib.扩展函数.封装函数.0
 local registerKeyEventByCode = ____04_FF0E_952E_76D8_51FD_6570.registerKeyEventByCode
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
+local ____05_FF0E_73A9_5BB6_5DE5_5177 = require("lib.扩展函数.封装函数.01．通用工具.05．玩家工具")
+local forEachPlayingPlayer = ____05_FF0E_73A9_5BB6_5DE5_5177.forEachPlayingPlayer
 local jass = require("jass.common")
 local function dumpJapiKeys(self)
     local pr = _G.print
@@ -148,19 +150,18 @@ local function bindKeyBN_once_min(self)
             false,
             function()
                 local msg = ((("[KEYOK] " .. label) .. " key=") .. tostring(key)) .. " sync=false"
-                do
-                    local i = 0
-                    while i < 12 do
+                forEachPlayingPlayer(
+                    nil,
+                    function(____, p)
                         jass.DisplayTimedTextToPlayer(
-                            jass.Player(i),
+                            p,
                             0,
                             0,
                             5,
                             msg
                         )
-                        i = i + 1
                     end
-                end
+                )
             end
         )
     end

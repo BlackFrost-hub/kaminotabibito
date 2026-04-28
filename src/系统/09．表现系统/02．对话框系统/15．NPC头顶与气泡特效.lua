@@ -74,6 +74,13 @@ local function npcPromptHandleKey(self, unit)
     end
     return jass.GetHandleId(unit)
 end
+--- 占用表 key：用 GetHandleId（同类型多 NPC 需独立占用，不能用 UnitTypeId）
+local function npcOccupationKey(self, unit)
+    if not unit then
+        return 0
+    end
+    return jass.GetHandleId(unit)
+end
 local function dzGetPlayerId(self, p)
     return jass.GetPlayerId(p)
 end
@@ -244,6 +251,73 @@ function ____exports.shouldSkipNewBubbleSchedule(self, playerId, npcUnit)
     end
     return false
 end
+--- 延迟气泡回调的 npcUnit 快照（避免闭包捕获 handle）
+local g_bubbleScheduleNpcUnit = {}
+local function runBubbleScheduleForPlayer(self, playerId)
+    if playerId < 0 or playerId >= MAX_PLAYERS then
+        return
+    end
+    local npcUnit = g_bubbleScheduleNpcUnit[playerId + 1]
+    g_bubbleScheduleNpcUnit[playerId + 1] = nil
+    local t = g_bubbleScheduleTimers[playerId + 1]
+    g_bubbleScheduleTimers[playerId + 1] = nil
+    if t then
+        jass.PauseTimer(t)
+        jass.DestroyTimer(t)
+    end
+    local uNow = g_npcUnits[playerId + 1]
+    if not npcUnitsSameForBubble(nil, uNow, npcUnit) then
+        return
+    end
+    if not uNow or g_npcOccupiedBy:get(npcOccupationKey(nil, uNow)) ~= playerId then
+        return
+    end
+    ____exports.createBubbleEffect(nil, playerId, uNow)
+end
+local function bubbleScheduleCallbackP0(self)
+    runBubbleScheduleForPlayer(nil, 0)
+end
+local function bubbleScheduleCallbackP1(self)
+    runBubbleScheduleForPlayer(nil, 1)
+end
+local function bubbleScheduleCallbackP2(self)
+    runBubbleScheduleForPlayer(nil, 2)
+end
+local function bubbleScheduleCallbackP3(self)
+    runBubbleScheduleForPlayer(nil, 3)
+end
+local function startBubbleScheduleTimer(self, playerId, delay)
+    local t = jass.CreateTimer()
+    g_bubbleScheduleTimers[playerId + 1] = t
+    repeat
+        local ____switch67 = playerId
+        local ____cond67 = ____switch67 == 0
+        if ____cond67 then
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0)
+            return
+        end
+        ____cond67 = ____cond67 or ____switch67 == 1
+        if ____cond67 then
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1)
+            return
+        end
+        ____cond67 = ____cond67 or ____switch67 == 2
+        if ____cond67 then
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2)
+            return
+        end
+        ____cond67 = ____cond67 or ____switch67 == 3
+        if ____cond67 then
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3)
+            return
+        end
+        do
+            jass.PauseTimer(t)
+            jass.DestroyTimer(t)
+            return
+        end
+    until true
+end
 function ____exports.scheduleBubbleEffectAfterOverheadClear(self, playerId, npcUnit, waitForOverheadClearDelay)
     if playerId < 0 or playerId >= MAX_PLAYERS or not npcUnit then
         return
@@ -253,32 +327,15 @@ function ____exports.scheduleBubbleEffectAfterOverheadClear(self, playerId, npcU
         ____exports.createBubbleEffect(nil, playerId, npcUnit)
         return
     end
-    local t = jass.CreateTimer()
-    g_bubbleScheduleTimers[playerId + 1] = t
-    jass.TimerStart(
-        t,
-        ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY,
-        false,
-        function()
-            g_bubbleScheduleTimers[playerId + 1] = nil
-            jass.PauseTimer(t)
-            jass.DestroyTimer(t)
-            local uNow = g_npcUnits[playerId + 1]
-            if not npcUnitsSameForBubble(nil, uNow, npcUnit) then
-                return
-            end
-            if not uNow or g_npcOccupiedBy:get(uNow) ~= playerId then
-                return
-            end
-            ____exports.createBubbleEffect(nil, playerId, uNow)
-        end
-    )
+    g_bubbleScheduleNpcUnit[playerId + 1] = npcUnit
+    startBubbleScheduleTimer(nil, playerId, ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY)
 end
 function ____exports.releaseNpcOccupation(self, playerId)
     local npcUnit = g_npcUnits[playerId + 1]
     if npcUnit then
-        if g_npcOccupiedBy:get(npcUnit) == playerId then
-            g_npcOccupiedBy:delete(npcUnit)
+        local key = npcOccupationKey(nil, npcUnit)
+        if key ~= 0 and g_npcOccupiedBy:get(key) == playerId then
+            g_npcOccupiedBy:delete(key)
         end
     end
     g_npcUnits[playerId + 1] = nil
@@ -290,7 +347,11 @@ function ____exports.isNpcOccupied(self, npcUnit)
     if not npcUnit then
         return -1
     end
-    return g_npcOccupiedBy:get(npcUnit) or -1
+    local key = npcOccupationKey(nil, npcUnit)
+    if key == 0 then
+        return -1
+    end
+    return g_npcOccupiedBy:get(key) or -1
 end
 function ____exports.tryOccupyNpc(self, p, npcUnit)
     if not npcUnit then
@@ -300,11 +361,15 @@ function ____exports.tryOccupyNpc(self, p, npcUnit)
     if pid < 0 or pid >= MAX_PLAYERS then
         return false
     end
-    local occupiedBy = g_npcOccupiedBy:get(npcUnit)
+    local key = npcOccupationKey(nil, npcUnit)
+    if key == 0 then
+        return false
+    end
+    local occupiedBy = g_npcOccupiedBy:get(key)
     if occupiedBy ~= nil and occupiedBy ~= pid then
         return false
     end
-    g_npcOccupiedBy:set(npcUnit, pid)
+    g_npcOccupiedBy:set(key, pid)
     g_npcUnits[pid + 1] = npcUnit
     return true
 end

@@ -47,16 +47,34 @@ interface UnitBuffEntry {
 const unitToBuffs: Record<number, UnitBuffEntry> = {};
 let syncTimer: any = undefined;
 
+// ── pcall 槽位：具名函数体 + 模块变量，禁止 (pcall as any)(匿名) ──
+let __pcallIsPausedUnit: any = 0;
+let __pcallIsPausedResult = false;
+function __pcallIsUnitPausedBody(): void {
+  const fn = unitBjExt.IsUnitPausedBJ;
+  if (fn != null) __pcallIsPausedResult = fn(__pcallIsPausedUnit) === true;
+}
+
+let __pcallExpiredBuffId = "";
+let __pcallExpiredHid = 0;
+function __pcallNotifyExpiredBody(): void {
+  const m = require("系统.04．伤害系统.02．dot伤害") as { clearDotByBuffPoolExpire?: (this: void, bid: string, h: number) => void };
+  if (m != null && m.clearDotByBuffPoolExpire) m.clearDotByBuffPoolExpire(__pcallExpiredBuffId, __pcallExpiredHid);
+}
+
+function __pcallSyncDotBody(): void {
+  const m = require("系统.04．伤害系统.02．dot伤害") as { syncDotRemainingFromBuffPool?: (this: void) => void };
+  if (m != null && m.syncDotRemainingFromBuffPool) m.syncDotRemainingFromBuffPool();
+}
+
 /** 与 `PauseUnit` 一致：暂停中的单位 Buff 池不计时（由中心计时器驱动，见 `tickBuffPool`） */
 function isBuffPoolUnitPaused(u: any): boolean {
   if (u == null || u === 0) return false;
-  const fn = unitBjExt.IsUnitPausedBJ;
-  if (fn == null) return false;
-  let paused = false;
-  (pcall as any)(() => {
-    paused = fn(u) === true;
-  });
-  return paused;
+  if (unitBjExt.IsUnitPausedBJ == null) return false;
+  __pcallIsPausedUnit = u;
+  __pcallIsPausedResult = false;
+  pcall(__pcallIsUnitPausedBody);
+  return __pcallIsPausedResult;
 }
 
 function toHid(u: any): number {
@@ -89,17 +107,13 @@ function pruneEmptyHid(hid: number): void {
 }
 
 function notifyDotBuffExpiredFromPool(buffID: string, hid: number): void {
-  (pcall as any)(() => {
-    const m = require("系统.04．伤害系统.02．dot伤害") as { clearDotByBuffPoolExpire: (bid: string, h: number) => void };
-    if (m != null) m.clearDotByBuffPoolExpire(buffID, hid);
-  });
+  __pcallExpiredBuffId = buffID;
+  __pcallExpiredHid = hid;
+  pcall(__pcallNotifyExpiredBody);
 }
 
 function syncDotFromPoolTick(): void {
-  (pcall as any)(() => {
-    const m = require("系统.04．伤害系统.02．dot伤害") as { syncDotRemainingFromBuffPool: () => void };
-    if (m != null) m.syncDotRemainingFromBuffPool();
-  });
+  pcall(__pcallSyncDotBody);
 }
 
 /**

@@ -77,8 +77,6 @@ export function setDialogShowable(p: Player, visible: boolean): void {
   }
 }
 export function setDialogBGTexture(p: Player, path: string): void {
-  const localPlayer = dzGetLocalPlayer();
-  if (localPlayer !== p) return;
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   const state = g_states[pid];
@@ -86,8 +84,6 @@ export function setDialogBGTexture(p: Player, path: string): void {
   dzSetTexture(state.frames[0], path);
 }
 export function setDialogTitleTexture(p: Player, path: string): void {
-  const localPlayer = dzGetLocalPlayer();
-  if (localPlayer !== p) return;
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   const state = g_states[pid];

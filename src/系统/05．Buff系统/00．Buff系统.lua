@@ -5,21 +5,36 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local isBuffPoolUnitPaused, toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitBjExt, unitToBuffs, _registeredToCenterTimer, _tickCounter
+local __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, toHid, pruneEmptyHid, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, ensureSyncTimer, maybeStopSyncTimer, jass, unitBjExt, unitToBuffs, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
+function __pcallIsUnitPausedBody(self)
+    local fn = unitBjExt.IsUnitPausedBJ
+    if fn ~= nil then
+        __pcallIsPausedResult = fn(nil, __pcallIsPausedUnit) == true
+    end
+end
+function __pcallNotifyExpiredBody(self)
+    local m = require("系统.04．伤害系统.02．dot伤害")
+    if m ~= nil and m.clearDotByBuffPoolExpire then
+        m.clearDotByBuffPoolExpire(__pcallExpiredBuffId, __pcallExpiredHid)
+    end
+end
+function __pcallSyncDotBody(self)
+    local m = require("系统.04．伤害系统.02．dot伤害")
+    if m ~= nil and m.syncDotRemainingFromBuffPool then
+        m.syncDotRemainingFromBuffPool()
+    end
+end
 function isBuffPoolUnitPaused(self, u)
     if u == nil or u == 0 then
         return false
     end
-    local fn = unitBjExt.IsUnitPausedBJ
-    if fn == nil then
+    if unitBjExt.IsUnitPausedBJ == nil then
         return false
     end
-    local paused = false
-    pcall(function ()
-            paused = fn(nil, u) == true
-        end
-    )
-    return paused
+    __pcallIsPausedUnit = u
+    __pcallIsPausedResult = false
+    pcall(__pcallIsUnitPausedBody)
+    return __pcallIsPausedResult
 end
 function toHid(self, u)
     if u == nil or u == 0 then
@@ -49,22 +64,12 @@ function pruneEmptyHid(self, hid)
     end
 end
 function notifyDotBuffExpiredFromPool(self, buffID, hid)
-    pcall(function ()
-            local m = require("系统.04．伤害系统.02．dot伤害")
-            if m ~= nil then
-                m:clearDotByBuffPoolExpire(buffID, hid)
-            end
-        end
-    )
+    __pcallExpiredBuffId = buffID
+    __pcallExpiredHid = hid
+    pcall(__pcallNotifyExpiredBody)
 end
 function syncDotFromPoolTick(self)
-    pcall(function ()
-            local m = require("系统.04．伤害系统.02．dot伤害")
-            if m ~= nil then
-                m:syncDotRemainingFromBuffPool()
-            end
-        end
-    )
+    pcall(__pcallSyncDotBody)
 end
 function ____exports.getBuffRuntimeByHid(self, hid, buffID)
     if hid == 0 then
@@ -82,14 +87,14 @@ function tickBuffPool(self)
         do
             local hid = toHid(nil, hidKey)
             if hid == 0 then
-                goto __continue59
+                goto __continue60
             end
             local entry = unitToBuffs[hid]
             if entry == nil then
-                goto __continue59
+                goto __continue60
             end
             if isBuffPoolUnitPaused(nil, entry.lastRef) then
-                goto __continue59
+                goto __continue60
             end
             local tab = entry.buffs
             local expired = {}
@@ -97,7 +102,7 @@ function tickBuffPool(self)
                 do
                     local row = tab[bid]
                     if row == nil then
-                        goto __continue63
+                        goto __continue64
                     end
                     row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
                     if row.remaining <= 0 then
@@ -107,7 +112,7 @@ function tickBuffPool(self)
                         expired[#expired + 1] = bid
                     end
                 end
-                ::__continue63::
+                ::__continue64::
             end
             do
                 local ei = 0
@@ -118,7 +123,7 @@ function tickBuffPool(self)
             end
             pruneEmptyHid(nil, hid)
         end
-        ::__continue59::
+        ::__continue60::
     end
     syncDotFromPoolTick(nil)
     maybeStopSyncTimer(nil)
@@ -157,6 +162,10 @@ ____exports.BUFF_POOL_TICK = 0.1
 ____exports.DOT_TYPE_TO_BUFF_ID = {antiHeal = "D001", burn = "D002", poison = "D003", trollCurse = "D004"}
 unitToBuffs = {}
 local syncTimer = nil
+__pcallIsPausedUnit = 0
+__pcallIsPausedResult = false
+__pcallExpiredBuffId = ""
+__pcallExpiredHid = 0
 local function ensureEntry(self, u)
     local hid = toHid(nil, u)
     if hid == 0 then

@@ -34,6 +34,10 @@ const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．�
   CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
 };
 
+const { getUnitOwnerId } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  getUnitOwnerId: (unit: any) => number;
+};
+
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -99,10 +103,8 @@ function getHeroGroup(this: void): any {
 
 /** 检查死亡单位是否触发金币平分（中立敌对或玩家8） */
 function isValidDyingUnit(this: void, dyingUnit: any): boolean {
-  const owner = jass.GetOwningPlayer(dyingUnit);
-  if (owner == null) return false;
-  const playerId = jass.GetPlayerId(owner);
-  // 玩家12(中立敌对) 或 玩家8(粉色)
+  const playerId = getUnitOwnerId(dyingUnit);
+  // 玩家12(中立敌对) 或 玩家8(粉色，实际索引为7)
   return playerId === 12 || playerId === 7;
 }
 

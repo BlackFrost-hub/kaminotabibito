@@ -2,15 +2,11 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__Number = ____lualib.__TS__Number
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
-local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
-local __TS__StringSplit = ____lualib.__TS__StringSplit
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
-local Set = ____lualib.Set
 local __TS__Iterator = ____lualib.__TS__Iterator
+local Set = ____lualib.Set
 local ____exports = {}
 --- 物品加工系统（篝火 h00C）
 -- 
@@ -32,20 +28,20 @@ local ____require_result_0 = require("系统.00．核心系统.07．联机安全
 local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
-local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local withTimer = ____require_result_1.withTimer
-local stopTimer = ____require_result_1.stopTimer
-local createTimedEffect = ____require_result_1.createTimedEffect
-local ____require_result_2 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-local CreateFloatTextAtPoint = ____require_result_2.CreateFloatTextAtPoint
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_3.stringToFourCC
-local fourCCToString = ____require_result_3.fourCCToString
-local ____require_result_4 = require("系统.02．物品系统.09．装备排泄")
-local setLastCreatedItem = ____require_result_4.setLastCreatedItem
-local ____require_result_5 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
-local registerDeathListener = ____require_result_5.registerDeathListener
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.index")
+local getItemDataEntry = ____require_result_1.getItemDataEntry
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local withTimer = ____require_result_2.withTimer
+local stopTimer = ____require_result_2.stopTimer
+local createTimedEffect = ____require_result_2.createTimedEffect
+local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+local CreateFloatTextAtPoint = ____require_result_3.CreateFloatTextAtPoint
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_4.stringToFourCC
+local ____require_result_5 = require("系统.02．物品系统.09．装备排泄")
+local setLastCreatedItem = ____require_result_5.setLastCreatedItem
+local ____require_result_6 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_6.registerDeathListener
 local CAMPFIRE_ID = 1747988547
 local EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
 local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
@@ -58,45 +54,40 @@ end
 local function fourCCToInt(self, id)
     return stringToFourCC(nil, id)
 end
---- 使用 01．封装函数.ts 中的 fourCCToString
-local function getItemIdStr(self, item)
-    local itemId = jass.GetItemTypeId(item)
-    return fourCCToString(nil, itemId)
-end
 local function getItemNameSafe(self, item)
     return jass.GetItemName(item)
 end
 local function getItemChargesSafe(self, item)
     local n = jass.GetItemCharges(item)
-    local ____jass_R2I_7 = jass.R2I
-    local ____TS__Number_result_6 = __TS__Number(n)
-    if ____TS__Number_result_6 == nil then
-        ____TS__Number_result_6 = 0
+    local ____jass_R2I_8 = jass.R2I
+    local ____TS__Number_result_7 = __TS__Number(n)
+    if ____TS__Number_result_7 == nil then
+        ____TS__Number_result_7 = 0
     end
-    local v = ____jass_R2I_7(jass, ____TS__Number_result_6) or 0
-    local ____temp_8
-    if v > 0 then
-        ____temp_8 = v
-    else
-        ____temp_8 = 1
-    end
-    return ____temp_8
-end
-local function setItemChargesSafe(self, item, n)
-    if not item then
-        return
-    end
-    local v = jass.R2I(n) or 1
-    local ____self_11 = jass
-    local ____self_11_SetItemCharges_12 = ____self_11.SetItemCharges
-    local ____item_10 = item
+    local v = ____jass_R2I_8(jass, ____TS__Number_result_7) or 0
     local ____temp_9
     if v > 0 then
         ____temp_9 = v
     else
         ____temp_9 = 1
     end
-    ____self_11_SetItemCharges_12(____self_11, ____item_10, ____temp_9)
+    return ____temp_9
+end
+local function setItemChargesSafe(self, item, n)
+    if not item then
+        return
+    end
+    local v = jass.R2I(n) or 1
+    local ____self_12 = jass
+    local ____self_12_SetItemCharges_13 = ____self_12.SetItemCharges
+    local ____item_11 = item
+    local ____temp_10
+    if v > 0 then
+        ____temp_10 = v
+    else
+        ____temp_10 = 1
+    end
+    ____self_12_SetItemCharges_13(____self_12, ____item_11, ____temp_10)
 end
 local function getUnitXY(self, u)
     local x = jass.GetUnitX(u)
@@ -104,9 +95,9 @@ local function getUnitXY(self, u)
     return {x = x, y = y}
 end
 local function floatBurnText(self, campfire, itemName)
-    local ____getUnitXY_result_13 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_13.x
-    local y = ____getUnitXY_result_13.y
+    local ____getUnitXY_result_14 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_14.x
+    local y = ____getUnitXY_result_14.y
     CreateFloatTextAtPoint(
         nil,
         x,
@@ -125,9 +116,9 @@ local function floatBurnText(self, campfire, itemName)
     )
 end
 local function playFinishEffect(self, campfire)
-    local ____getUnitXY_result_14 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_14.x
-    local y = ____getUnitXY_result_14.y
+    local ____getUnitXY_result_15 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_15.x
+    local y = ____getUnitXY_result_15.y
     createTimedEffect(
         nil,
         EFFECT_FIREBOMB,
@@ -138,23 +129,28 @@ local function playFinishEffect(self, campfire)
     )
 end
 local function getRecipeForItem(self, item)
-    local idStr = getItemIdStr(nil, item)
-    local entry = itemsData[idStr]
-    local recipe = entry and entry.recipe and entry.recipe or nil
+    local entry = getItemDataEntry(nil, item)
+    local ____temp_16
+    if entry and entry.recipe then
+        ____temp_16 = entry.recipe
+    else
+        ____temp_16 = nil
+    end
+    local recipe = ____temp_16
     if not recipe then
         return nil
     end
     local prefix = "h00C:"
-    if (string.find(recipe, prefix, nil, true) or 0) - 1 ~= 0 then
+    if recipe:indexOf(prefix) ~= 0 then
         return nil
     end
-    local rest = __TS__StringSubstring(recipe, #prefix)
-    local arrowIdx = (string.find(rest, "->", nil, true) or 0) - 1
+    local rest = recipe:substring(#prefix)
+    local arrowIdx = rest:indexOf("->")
     local colonIdx = -1
     do
-        local i = #rest - 1
+        local i = rest.length - 1
         while i >= 0 do
-            if __TS__StringSubstring(rest, i, i + 1) == ":" then
+            if rest:substring(i, i + 1) == ":" then
                 colonIdx = i
                 break
             end
@@ -164,39 +160,45 @@ local function getRecipeForItem(self, item)
     if arrowIdx < 0 or colonIdx < 0 or colonIdx <= arrowIdx + 2 then
         return nil
     end
-    local cookStr = __TS__StringTrim(__TS__StringSubstring(rest, 0, arrowIdx))
-    local resultsStr = __TS__StringTrim(__TS__StringSubstring(rest, arrowIdx + 2, colonIdx))
-    local timeoutStr = __TS__StringTrim(__TS__StringSubstring(rest, colonIdx + 1))
+    local cookStr = rest:substring(0, arrowIdx):trim()
+    local resultsStr = rest:substring(arrowIdx + 2, colonIdx):trim()
+    local timeoutStr = rest:substring(colonIdx + 1):trim()
     local cookSec = jass.R2I(__TS__ParseFloat(cookStr) or 0)
     local timeoutSec = jass.R2I(__TS__ParseFloat(timeoutStr) or 0)
     if cookSec <= 0 then
         return nil
     end
-    local rawOpts = __TS__ArrayFilter(
-        __TS__ArrayMap(
-            __TS__StringSplit(resultsStr, ";"),
-            function(____, s) return __TS__StringTrim(s) end
-        ),
-        function(____, s) return s ~= "" end
-    )
-    if #rawOpts == 0 then
+    local rawOpts = resultsStr:split(";"):map(function(____, s) return __TS__StringTrim(s) end):filter(function(____, s) return s ~= "" end)
+    if rawOpts.length == 0 then
         return nil
     end
     local opts = {}
-    for ____, raw in ipairs(rawOpts) do
+    for ____, raw in __TS__Iterator(rawOpts) do
         local s = raw
         local prob = nil
-        local pctIdx = (string.find(s, "%", nil, true) or 0) - 1
+        local pctIdx = s:indexOf("%")
         if pctIdx > 0 then
-            local p = __TS__ParseFloat(__TS__StringTrim(__TS__StringSubstring(s, 0, pctIdx)))
+            local p = __TS__ParseFloat(s:substring(0, pctIdx):trim())
             if not __TS__NumberIsNaN(__TS__Number(p)) and p > 0 then
                 prob = p
             end
-            s = __TS__StringTrim(__TS__StringSubstring(s, pctIdx + 1))
+            s = s:substring(pctIdx + 1):trim()
         end
-        local starIdx = (string.find(s, "*", nil, true) or 0) - 1
-        local idPart = __TS__StringTrim(starIdx >= 0 and __TS__StringSubstring(s, 0, starIdx) or s)
-        local qtyPart = __TS__StringTrim(starIdx >= 0 and __TS__StringSubstring(s, starIdx + 1) or "")
+        local starIdx = s:indexOf("*")
+        local ____temp_17
+        if starIdx >= 0 then
+            ____temp_17 = s:substring(0, starIdx)
+        else
+            ____temp_17 = s
+        end
+        local idPart = ____temp_17:trim()
+        local ____temp_18
+        if starIdx >= 0 then
+            ____temp_18 = s:substring(starIdx + 1)
+        else
+            ____temp_18 = ""
+        end
+        local qtyPart = ____temp_18:trim()
         local qty = jass.R2I(__TS__ParseFloat(qtyPart) or 1)
         local itemId = fourCCToInt(nil, idPart)
         if itemId ~= 0 and qty > 0 then
@@ -253,9 +255,9 @@ local function pickResult(self, results)
     return results[#results]
 end
 local function createItemAtCampfire(self, campfire, itemId)
-    local ____getUnitXY_result_15 = getUnitXY(nil, campfire)
-    local x = ____getUnitXY_result_15.x
-    local y = ____getUnitXY_result_15.y
+    local ____getUnitXY_result_19 = getUnitXY(nil, campfire)
+    local x = ____getUnitXY_result_19.x
+    local y = ____getUnitXY_result_19.y
     local item = jass.CreateItem(itemId, x, y)
     if item then
         setLastCreatedItem(nil, item)

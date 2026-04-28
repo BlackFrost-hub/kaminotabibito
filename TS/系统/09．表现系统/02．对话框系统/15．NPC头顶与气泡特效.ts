@@ -24,7 +24,7 @@ const NPC_BUBBLE_EFFECT_KEY = "npc_bubble";
 const g_bubbleEffects: any[] = [];
 const g_bubbleScheduleTimers: any[] = [];
 const g_npcUnits: any[] = [];
-const g_npcOccupiedBy: Map<any, number> = new Map();
+const g_npcOccupiedBy: Map<number, number> = new Map();
 const g_npcPromptEffectByHandle = new Map<number, boolean>();
 const g_pendingGrayMarkerTimerByHandle = new Map<number, any>();
 const g_pendingYellowMarkerTimerByHandle = new Map<number, any>();
@@ -35,6 +35,12 @@ function npcPromptHandleKey(unit: any): number {
   if (!unit) return 0;
   const id = jass.GetUnitTypeId(unit) as number;
   if (id != null && id !== 0) return id;
+  return jass.GetHandleId(unit) as number;
+}
+
+/** 占用表 key：用 GetHandleId（同类型多 NPC 需独立占用，不能用 UnitTypeId） */
+function npcOccupationKey(unit: any): number {
+  if (!unit) return 0;
   return jass.GetHandleId(unit) as number;
 }
 
@@ -181,6 +187,42 @@ export function shouldSkipNewBubbleSchedule(playerId: number, npcUnit: any): boo
   return false;
 }
 
+/** 延迟气泡回调的 npcUnit 快照（避免闭包捕获 handle） */
+const g_bubbleScheduleNpcUnit: any[] = [];
+
+function runBubbleScheduleForPlayer(playerId: number): void {
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  const npcUnit = g_bubbleScheduleNpcUnit[playerId];
+  g_bubbleScheduleNpcUnit[playerId] = undefined;
+  const t = g_bubbleScheduleTimers[playerId];
+  g_bubbleScheduleTimers[playerId] = undefined;
+  if (t) {
+    jass.PauseTimer(t);
+    jass.DestroyTimer(t);
+  }
+  const uNow = g_npcUnits[playerId];
+  if (!npcUnitsSameForBubble(uNow, npcUnit)) return;
+  if (!uNow || g_npcOccupiedBy.get(npcOccupationKey(uNow)) !== playerId) return;
+  createBubbleEffect(playerId, uNow);
+}
+
+function bubbleScheduleCallbackP0(): void { runBubbleScheduleForPlayer(0); }
+function bubbleScheduleCallbackP1(): void { runBubbleScheduleForPlayer(1); }
+function bubbleScheduleCallbackP2(): void { runBubbleScheduleForPlayer(2); }
+function bubbleScheduleCallbackP3(): void { runBubbleScheduleForPlayer(3); }
+
+function startBubbleScheduleTimer(playerId: number, delay: number): void {
+  const t = jass.CreateTimer();
+  g_bubbleScheduleTimers[playerId] = t;
+  switch (playerId) {
+    case 0: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0); return;
+    case 1: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1); return;
+    case 2: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2); return;
+    case 3: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3); return;
+    default: jass.PauseTimer(t); jass.DestroyTimer(t); return;
+  }
+}
+
 export function scheduleBubbleEffectAfterOverheadClear(playerId: number, npcUnit: any, waitForOverheadClearDelay: boolean): void {
   if (playerId < 0 || playerId >= MAX_PLAYERS || !npcUnit) return;
   cancelBubbleEffectSchedule(playerId);
@@ -188,17 +230,8 @@ export function scheduleBubbleEffectAfterOverheadClear(playerId: number, npcUnit
     createBubbleEffect(playerId, npcUnit);
     return;
   }
-  const t = jass.CreateTimer();
-  g_bubbleScheduleTimers[playerId] = t;
-  jass.TimerStart(t, BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY, false, () => {
-    g_bubbleScheduleTimers[playerId] = undefined;
-    jass.PauseTimer(t);
-    jass.DestroyTimer(t);
-    const uNow = g_npcUnits[playerId];
-    if (!npcUnitsSameForBubble(uNow, npcUnit)) return;
-    if (!uNow || g_npcOccupiedBy.get(uNow) !== playerId) return;
-    createBubbleEffect(playerId, uNow);
-  });
+  g_bubbleScheduleNpcUnit[playerId] = npcUnit;
+  startBubbleScheduleTimer(playerId, BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY);
 }
 
 export function createBubbleEffect(playerId: number, npcUnit: any): void {
@@ -223,8 +256,9 @@ export function destroyBubbleEffect(playerId: number): void {
 export function releaseNpcOccupation(playerId: number): void {
   const npcUnit = g_npcUnits[playerId];
   if (npcUnit) {
-    if (g_npcOccupiedBy.get(npcUnit) === playerId) {
-      g_npcOccupiedBy.delete(npcUnit);
+    const key = npcOccupationKey(npcUnit);
+    if (key !== 0 && g_npcOccupiedBy.get(key) === playerId) {
+      g_npcOccupiedBy.delete(key);
     }
   }
   g_npcUnits[playerId] = undefined;
@@ -236,18 +270,22 @@ export function getNpcUnit(playerId: number): any {
 
 export function isNpcOccupied(npcUnit: any): number {
   if (!npcUnit) return -1;
-  return g_npcOccupiedBy.get(npcUnit) ?? -1;
+  const key = npcOccupationKey(npcUnit);
+  if (key === 0) return -1;
+  return g_npcOccupiedBy.get(key) ?? -1;
 }
 
 export function tryOccupyNpc(p: Player, npcUnit: any): boolean {
   if (!npcUnit) return false;
   const pid = dzGetPlayerId(p);
   if (pid < 0 || pid >= MAX_PLAYERS) return false;
-  const occupiedBy = g_npcOccupiedBy.get(npcUnit);
+  const key = npcOccupationKey(npcUnit);
+  if (key === 0) return false;
+  const occupiedBy = g_npcOccupiedBy.get(key);
   if (occupiedBy !== undefined && occupiedBy !== pid) {
     return false;
   }
-  g_npcOccupiedBy.set(npcUnit, pid);
+  g_npcOccupiedBy.set(key, pid);
   g_npcUnits[pid] = npcUnit;
   return true;
 }

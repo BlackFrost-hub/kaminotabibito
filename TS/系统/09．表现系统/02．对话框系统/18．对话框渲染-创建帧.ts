@@ -2,6 +2,34 @@ const japi = require("jass.japi") as any;
 
 import { createFrame, FrameType } from "../01．UI工具/index";
 import type { Frame } from "./05．对话框业务逻辑";
+
+// ── pcall 槽位：具名函数体 + 模块变量，禁止 (pcall as any)(匿名) ──
+let __pcallFrameA: number = 0;
+let __pcallFrameB: number = 0;
+let __pcallValN: number = 0;
+
+function __pcallSetParentBody(): void { japi.DzFrameSetParent(__pcallFrameA, __pcallFrameB); }
+function __pcallClearAllPointsBody(): void { japi.DzFrameClearAllPoints(__pcallFrameA); }
+function __pcallSetAllPointsBody(): void { japi.DzFrameSetAllPoints(__pcallFrameA, __pcallFrameB); }
+function __pcallSetAlphaBody(): void { japi.DzFrameSetAlpha(__pcallFrameA, __pcallValN); }
+function __pcallSetTextAlignResetBody(): void { japi.DzFrameSetTextAlignment(__pcallFrameA, -1); }
+function __pcallSetTextAlignCenterBody(): void { japi.DzFrameSetTextAlignment(__pcallFrameA, 18); }
+let __pcallFrameC: number = 0;
+let __pcallPointN: number = 0;
+let __pcallRelPointN: number = 0;
+let __pcallOffX: number = 0;
+let __pcallOffY: number = 0;
+function __pcallSetPointHintBody(): void { japi.DzFrameSetPoint(__pcallFrameA, 8, __pcallFrameC, 8, -0.008, 0.008); }
+function __pcallSetPointSkipBody(): void { japi.DzFrameSetPoint(__pcallFrameA, 0, __pcallFrameC, 2, 0.005, -0.022); }
+
+function pcallSetParent(a: number, b: number): void { __pcallFrameA = a; __pcallFrameB = b; pcall(__pcallSetParentBody); }
+function pcallClearAllPoints(a: number): void { __pcallFrameA = a; pcall(__pcallClearAllPointsBody); }
+function pcallSetAllPoints(a: number, b: number): void { __pcallFrameA = a; __pcallFrameB = b; pcall(__pcallSetAllPointsBody); }
+function pcallSetAlpha(a: number, n: number): void { __pcallFrameA = a; __pcallValN = n; pcall(__pcallSetAlphaBody); }
+function pcallSetTextAlignResetThenCenter(a: number): void { __pcallFrameA = a; pcall(__pcallSetTextAlignResetBody); pcall(__pcallSetTextAlignCenterBody); }
+function pcallSetPointHint(a: number, c: number): void { __pcallFrameA = a; __pcallFrameC = c; pcall(__pcallSetPointHintBody); }
+function pcallSetPointSkip(a: number, c: number): void { __pcallFrameA = a; __pcallFrameC = c; pcall(__pcallSetPointSkipBody); }
+
 import {
   DEFAULT_BG_TEX,
   DEFAULT_BODY_FONT_SIZE,
@@ -63,11 +91,11 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   const bgBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: `DialogBGBtn${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[4] = bgBtn;
   if (bgBtn !== 0) {
-    (pcall as any)(() => japi.DzFrameSetParent(bgBtn, bg));
-    (pcall as any)(() => japi.DzFrameClearAllPoints(bgBtn));
-    (pcall as any)(() => japi.DzFrameSetAllPoints(bgBtn, bg));
+    pcallSetParent(bgBtn, bg);
+    pcallClearAllPoints(bgBtn);
+    pcallSetAllPoints(bgBtn, bg);
     japi.DzFrameSetText(bgBtn, "");
-    (pcall as any)(() => japi.DzFrameSetAlpha(bgBtn, 0));
+    pcallSetAlpha(bgBtn, 0);
   }
   bindDialogPanelHitFrame(bgBtn);
 
@@ -77,9 +105,9 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   const nameText = dzCreate("GameText", slotTag + 3);
   frames[2] = nameText;
   dzShow(nameText, false); dzClearPoints(nameText);
-  if (nameText !== 0) (pcall as any)(() => japi.DzFrameSetAllPoints(nameText, titleBg));
+  if (nameText !== 0) pcallSetAllPoints(nameText, titleBg);
   dzSetText(nameText, ""); dzSetFont(nameText, DEFAULT_FONT, DEFAULT_TITLE_FONT_SIZE); dzSetEnable(nameText, false);
-  if (nameText !== 0) (pcall as any)(() => { japi.DzFrameSetTextAlignment(nameText, -1); japi.DzFrameSetTextAlignment(nameText, 18); });
+  if (nameText !== 0) pcallSetTextAlignResetThenCenter(nameText);
   const bodyText = dzCreate("GameTextpxL", slotTag + 4);
   frames[3] = bodyText;
   dzShow(bodyText, false); dzClearPoints(bodyText); dzSetAbsPoint(bodyText, 0, 0.24, 0.28); dzSetSize(bodyText, 0.35, 0.22); dzSetText(bodyText, ""); dzSetFont(bodyText, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE); dzSetEnable(bodyText, false);
@@ -121,7 +149,7 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   const hintLabel = createFrame({ type: FrameType.TEXT, name: `DialogHintLabel${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[11] = hintLabel;
   if (hintLabel !== 0) {
-    (pcall as any)(() => japi.DzFrameSetPoint(hintLabel, 8, bg, 8, -0.008, 0.008));
+    pcallSetPointHint(hintLabel, bg);
     japi.DzFrameSetSize(hintLabel, 0.12, 0.018);
     japi.DzFrameSetText(hintLabel, "|cff333333[点击以继续] ↓|r");
     japi.DzFrameSetFont(hintLabel, DEFAULT_FONT, 0.016, 0);
@@ -131,7 +159,7 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   const skipHintLabel = createFrame({ type: FrameType.TEXT, name: `DialogSkipHint${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[12] = skipHintLabel;
   if (skipHintLabel !== 0) {
-    (pcall as any)(() => japi.DzFrameSetPoint(skipHintLabel, 0, titleBg, 2, 0.005, -0.022));
+    pcallSetPointSkip(skipHintLabel, titleBg);
     japi.DzFrameSetSize(skipHintLabel, 0.12, 0.018);
     japi.DzFrameSetText(skipHintLabel, "|cff333333按下 ~ 键跳过对话|r");
     japi.DzFrameSetFont(skipHintLabel, DEFAULT_FONT, 0.012, 0);

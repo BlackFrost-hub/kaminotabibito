@@ -22,12 +22,17 @@ export const KEY_SKIP_DIALOG = 192;
 export const g_states: PlayerDialogState[] = [];
 export const g_questCallbacksByPlayer: Array<{ onAccept: () => void; onReject: () => void } | undefined> = [];
 
+// ========== 虚拟分区：pcall 槽位（具名体 + 模块变量，禁止 (pcall as any)(匿名)） ==========
+let __dzPcallFrame = 0;
+let __dzPcallPriority = 0;
+function __dzSetPriorityPcallBody(): void { japi.DzFrameSetPriority(__dzPcallFrame, __dzPcallPriority); }
+
 // ========== 虚拟分区：Dz / JASS 封装 ==========
 export function dzShow(f: Frame, b: boolean): void { if (f && f !== 0) japi.DzFrameShow(f, b); }
 export function dzSetText(f: Frame, s: string): void { if (f && f !== 0) japi.DzFrameSetText(f, s); }
 export function dzSetTexture(f: Frame, path: string): void { if (f && f !== 0) japi.DzFrameSetTexture(f, path, 0); }
 export function dzSetAlpha(f: Frame, a: number): void { if (f && f !== 0) japi.DzFrameSetAlpha(f, a); }
-export function dzSetPriority(f: Frame, p: number): void { if (f && f !== 0) (pcall as any)(() => japi.DzFrameSetPriority(f, p)); }
+export function dzSetPriority(f: Frame, p: number): void { if (f && f !== 0) { __dzPcallFrame = f; __dzPcallPriority = p; pcall(__dzSetPriorityPcallBody); } }
 export function dzSetAbsPoint(f: Frame, point: number, x: number, y: number): void { if (f && f !== 0) japi.DzFrameSetAbsolutePoint(f, point, x, y); }
 export function dzSetSize(f: Frame, w: number, h: number): void { if (f && f !== 0) japi.DzFrameSetSize(f, w, h); }
 export function dzClearPoints(f: Frame): void { if (f && f !== 0) japi.DzFrameClearAllPoints(f); }

@@ -6,6 +6,12 @@
 
 const japi = require("jass.japi") as any;
 
+// ── pcall 槽位：具名函数体，禁止 (pcall as any)(匿名) ──
+let __pcallShowFrame = 0;
+let __pcallShowVis = false;
+function __pcallFrameShowBody(): void { (japi as any).DzFrameShow(__pcallShowFrame, __pcallShowVis); }
+function pcallDzFrameShow(frame: number, visible: boolean): void { __pcallShowFrame = frame; __pcallShowVis = visible; pcall(__pcallFrameShowBody); }
+
 import {
   ENTRY_X,
   ENTRY_Y,
@@ -132,7 +138,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
       LIST_CONTAINER_REL_TO_PANEL_X,
       LIST_CONTAINER_REL_TO_PANEL_Y
     );
-    if (typeof (japi as any).DzFrameShow === "function") (pcall as any)(() => (japi as any).DzFrameShow(listContainer, true));
+    pcallDzFrameShow(listContainer, true);
   }
 
   const tabs = buildTaskPanelCategoryTabs({

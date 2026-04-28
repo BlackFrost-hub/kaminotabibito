@@ -3,10 +3,12 @@ const jass = require("jass.common") as JassCommon;
 const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (callback: (unit: any, item: any) => void) => number;
 };
-const { fourCCToString, isHeroUnit, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+const { isHeroUnit, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
   isSpecialUnit: (unit: any) => boolean;
+};
+const { getItemDataEntryByTypeId } = require("lib.扩展函数.物品相关函数.index") as {
+  getItemDataEntryByTypeId: (itemTypeId: number) => any | null;
 };
 /** 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`） */
 const g = require("jass.globals") as { udg_Itmeboolean?: boolean | number; [key: string]: any };
@@ -16,9 +18,6 @@ function isEquipLimitDisabledByJass(): boolean {
   const v = g.udg_Itmeboolean;
   return v === true || v === 1;
 }
-const itemsData = (require("系统.02．物品系统.01．装备数据") as {
-  default?: Record<string, { type?: string; name?: string; onlyone?: boolean | string }>;
-}).default ?? {};
 /** 与装备系统共用：装备限制 UnitRemoveItem 前设为 true，装备系统 DROP 时跳过扣属性 */
 export const equipShared = { skipNextDrop: false };
 const EQUIP_LIMIT_EVENT_PLAYER_IDS = [0, 1, 2, 3] as const;
@@ -33,8 +32,7 @@ const COLOR_NAME = "|cff00bfff";  // 物品名 蓝
 const COLOR_ERR = "|cffff0000";   // 错误/强调 红
 
 function getEntry(itemTypeId: number): { type?: string; name?: string; onlyone?: boolean | string } | undefined {
-  const id = fourCCToString(itemTypeId);
-  return (itemsData as Record<string, { type?: string; name?: string; onlyone?: boolean | string }>)[id];
+  return getItemDataEntryByTypeId(itemTypeId) as { type?: string; name?: string; onlyone?: boolean | string } | undefined;
 }
 
 function safeGetItemTypeId(it: any): number | undefined {

@@ -15,36 +15,31 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 // ── Dz 调用 pcall：仅用模块顶层具名体 + 全局 `pcall(具名)`（勿 `(pcall as any)(具名)`，TSTL 会编成 `pcall(nil, fn)`） ──
-let __dzPcallShowJapi: any = null;
-let __dzPcallShowFrame = 0;
-let __dzPcallShowVis = false;
+let __dzPcallFrame = 0;
+let __dzPcallVis = false;
 
 function __dzPcallFrameShowBody(): void {
-  __dzPcallShowJapi.DzFrameShow(__dzPcallShowFrame, __dzPcallShowVis);
+  japi.DzFrameShow(__dzPcallFrame, __dzPcallVis);
 }
 
-export function pcallDzFrameShow(japiAny: any, frame: number, visible: boolean): void {
-  if (typeof japiAny.DzFrameShow !== "function") return;
-  __dzPcallShowJapi = japiAny;
-  __dzPcallShowFrame = frame;
-  __dzPcallShowVis = visible;
+export function pcallDzFrameShow(frame: number, visible: boolean): void {
+  if (typeof japi.DzFrameShow !== "function") return;
+  __dzPcallFrame = frame;
+  __dzPcallVis = visible;
   pcall(__dzPcallFrameShowBody);
-  __dzPcallShowJapi = null;
 }
 
 let __dzPcallAlphaVal = 0;
 
 function __dzPcallFrameSetAlphaBody(): void {
-  __dzPcallShowJapi.DzFrameSetAlpha(__dzPcallShowFrame, __dzPcallAlphaVal);
+  japi.DzFrameSetAlpha(__dzPcallFrame, __dzPcallAlphaVal);
 }
 
-export function pcallDzFrameSetAlpha(japiAny: any, frame: number, alpha: number): void {
-  if (typeof japiAny.DzFrameSetAlpha !== "function") return;
-  __dzPcallShowJapi = japiAny;
-  __dzPcallShowFrame = frame;
+export function pcallDzFrameSetAlpha(frame: number, alpha: number): void {
+  if (typeof japi.DzFrameSetAlpha !== "function") return;
+  __dzPcallFrame = frame;
   __dzPcallAlphaVal = alpha;
   pcall(__dzPcallFrameSetAlphaBody);
-  __dzPcallShowJapi = null;
 }
 
 export function dzGetLocalPlayer(): any {

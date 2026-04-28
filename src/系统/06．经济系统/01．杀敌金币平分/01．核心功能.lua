@@ -21,8 +21,10 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效�
 local Sound3DII_Mp3PlayReuse = ____require_result_4.Sound3DII_Mp3PlayReuse
 local ____require_result_5 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
 local CreateFloatTextOnUnit = ____require_result_5.CreateFloatTextOnUnit
-local ____require_result_6 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
-local registerDeathListener = ____require_result_6.registerDeathListener
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local getUnitOwnerId = ____require_result_6.getUnitOwnerId
+local ____require_result_7 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_7.registerDeathListener
 local SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav"
 local GOLD_R = 255
 local GOLD_G = 215
@@ -60,11 +62,7 @@ local function getHeroGroup()
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
-    local owner = jass.GetOwningPlayer(dyingUnit)
-    if owner == nil then
-        return false
-    end
-    local playerId = jass.GetPlayerId(owner)
+    local playerId = getUnitOwnerId(nil, dyingUnit)
     return playerId == 12 or playerId == 7
 end
 --- 给予玩家金币（带音效和漂浮文字）
@@ -117,63 +115,63 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if shareGold <= 0 then
         return
     end
-    local ____temp_7 = jass.GetUnitX(dyingUnit)
-    if ____temp_7 == nil then
-        ____temp_7 = 0
-    end
-    local dyingX = ____temp_7
-    local ____temp_8 = jass.GetUnitY(dyingUnit)
+    local ____temp_8 = jass.GetUnitX(dyingUnit)
     if ____temp_8 == nil then
         ____temp_8 = 0
     end
-    local dyingY = ____temp_8
+    local dyingX = ____temp_8
+    local ____temp_9 = jass.GetUnitY(dyingUnit)
+    if ____temp_9 == nil then
+        ____temp_9 = 0
+    end
+    local dyingY = ____temp_9
     local killerPlayer = jass.GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
     if killerPlayer == nil or heroGroup == nil then
         return
     end
-    local ____temp_9 = jass.BlzGroupGetSize(heroGroup)
-    if ____temp_9 == nil then
-        ____temp_9 = 0
+    local ____temp_10 = jass.BlzGroupGetSize(heroGroup)
+    if ____temp_10 == nil then
+        ____temp_10 = 0
     end
-    local heroCount = ____temp_9
+    local heroCount = ____temp_10
     do
         local i = 0
         while i < heroCount do
             do
                 local hero = jass.BlzGroupUnitAt(heroGroup, i)
                 if not hero then
-                    goto __continue22
+                    goto __continue21
                 end
                 if hero == killer then
-                    goto __continue22
+                    goto __continue21
                 end
                 if jass.IsUnitAlly(hero, killerPlayer) ~= true then
-                    goto __continue22
+                    goto __continue21
                 end
-                local ____temp_10 = jass.GetUnitX(hero)
-                if ____temp_10 == nil then
-                    ____temp_10 = 0
-                end
-                local heroX = ____temp_10
-                local ____temp_11 = jass.GetUnitY(hero)
+                local ____temp_11 = jass.GetUnitX(hero)
                 if ____temp_11 == nil then
                     ____temp_11 = 0
                 end
-                local heroY = ____temp_11
+                local heroX = ____temp_11
+                local ____temp_12 = jass.GetUnitY(hero)
+                if ____temp_12 == nil then
+                    ____temp_12 = 0
+                end
+                local heroY = ____temp_12
                 local dx = heroX - dyingX
                 local dy = heroY - dyingY
                 local dist = jass.SquareRoot(dx * dx + dy * dy)
                 if dist > SHARE_RANGE then
-                    goto __continue22
+                    goto __continue21
                 end
                 local heroPlayer = jass.GetOwningPlayer(hero)
                 if heroPlayer == nil then
-                    goto __continue22
+                    goto __continue21
                 end
                 giveGoldToPlayer(hero, heroPlayer, shareGold, true)
             end
-            ::__continue22::
+            ::__continue21::
             i = i + 1
         end
     end

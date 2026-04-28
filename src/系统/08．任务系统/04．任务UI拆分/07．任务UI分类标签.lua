@@ -99,7 +99,7 @@ local function createTaskTab(self, opts)
             TAB_REL_Y
         )
         setFrameSize(nil, bg, {width = TAB_FRAME_W, height = TAB_FRAME_H})
-        pcallDzFrameShow(nil, japi, bg, true)
+        pcallDzFrameShow(nil, bg, true)
     end
     if bg then
         createTabLabelTextOnBackdrop(
@@ -129,10 +129,10 @@ local function createTaskTab(self, opts)
             )
             setFrameSize(nil, tab, {width = TAB_FRAME_W, height = TAB_FRAME_H})
         end
-        pcallDzFrameShow(nil, japi, tab, true)
+        pcallDzFrameShow(nil, tab, true)
         if not bg then
             setButtonText(nil, tab, "")
-            pcallDzFrameSetAlpha(nil, japi, tab, 0)
+            pcallDzFrameSetAlpha(nil, tab, 0)
         end
         registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
         currentTooltipMessage = tooltip

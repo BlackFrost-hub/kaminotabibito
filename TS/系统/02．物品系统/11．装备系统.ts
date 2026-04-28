@@ -7,7 +7,6 @@ const itemEventCenter = require("系统.00．核心系统.01．事件中心.04�
   onItemDrop: (callback: (unit: any, item: any) => void) => number;
 };
 const g = require("jass.globals") as { udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
-const items = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, ItemData> }).default;
 const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
@@ -18,6 +17,11 @@ const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数
   fourCCToString: (four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
 };
+const { STAT_CONFIG, NAME_TO_KEY, getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
+  STAT_CONFIG: { name: string; key: string }[];
+  NAME_TO_KEY: Record<string, string>;
+  getItemDataEntry: (item: any) => any | null;
+};
 const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
@@ -25,66 +29,10 @@ const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.i
 
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
 
-interface ItemData {
-  name?: string;
-  level?: string;
-  hp?: number;
-  mp?: number;
-  dmg?: number;
-  armor?: number;
-  atkSpeed?: number;
-  moveSpeed?: number;
-  str?: number;
-  agi?: number;
-  int?: number;
-  all?: number;
-  critRate?: number;
-  critDamage?: number;
-  [key: string]: any;
-}
-
 interface StatEntry {
   name: string;
   value: number;
 }
-
-/** 属性配置：显示名 -> itemData key。新增属性只需在此加一行，primaryBonus 即可用该显示名 */
-const STAT_CONFIG: { name: string; key: string }[] = [
-  { name: "生命值", key: "hp" }, { name: "魔法值", key: "mp" },
-  { name: "攻击力", key: "dmg" }, { name: "护甲", key: "armor" },
-  { name: "攻速", key: "atkSpeed" }, { name: "叠加移动速度", key: "movespeed" },
-  { name: "力量", key: "str" }, { name: "敏捷", key: "agi" },
-  { name: "智力", key: "int" }, { name: "全属性", key: "all" },
-  { name: "暴击率", key: "critRate" }, { name: "暴击伤害", key: "critDmg" }, { name: "魔抗", key: "magicResist" },
-  { name: "生命恢复", key: "hpRegen" }, { name: "生命恢复%", key: "hpRegenPct" }, { name: "生命恢复效率", key: "hpRegenEff" },
-  { name: "技能治疗率", key: "skillHeal" }, { name: "受到的治疗率", key: "healReceived" },
-  { name: "重伤", key: "wound" },
-  { name: "魔法恢复", key: "mpRegen" }, { name: "魔法恢复%", key: "mpRegenPct" }, { name: "魔法消耗", key: "mpCost" },
-  { name: "冷却缩减", key: "cdReduction" }, { name: "命中率", key: "accuracy" }, { name: "闪避率", key: "dodge" },
-  { name: "护甲穿透", key: "armorPierce" }, { name: "魔法穿透", key: "magicPierce" },
-  { name: "技能伤害", key: "skillDmg" }, { name: "技能抗性", key: "skillResist" }, { name: "魔法伤害", key: "magicDmg" },
-  { name: "物理伤害", key: "physDmg" }, { name: "物理抗性", key: "physResist" }, { name: "强化伤害", key: "enhanceDmg" },
-  { name: "普攻伤害", key: "atkDmg" }, { name: "普攻抗性", key: "atkResist" },
-  { name: "光属性伤害", key: "lightDmg" }, { name: "光属性抗性", key: "lightResist" },
-  { name: "暗属性伤害", key: "darkDmg" }, { name: "暗属性抗性", key: "darkResist" },
-  { name: "木属性伤害", key: "woodDmg" }, { name: "木属性抗性", key: "woodResist" },
-  { name: "火属性伤害", key: "fireDmg" }, { name: "火属性抗性", key: "fireResist" },
-  { name: "雷属性伤害", key: "thunderDmg" }, { name: "雷属性抗性", key: "thunderResist" },
-  { name: "水属性伤害", key: "waterDmg" }, { name: "水属性抗性", key: "waterResist" },
-  { name: "金属性抗性", key: "metalResist" }, { name: "金属性伤害", key: "metalDmg" }, { name: "召唤物伤害", key: "summonDmg" }, { name: "召唤物抗性", key: "summonResist" },
-  { name: "伤害减少", key: "dmgReduction" }, { name: "伤害减少%", key: "dmgReductionPct" },
-  { name: "伤害吸血", key: "lifeSteal" }, { name: "魔法伤害吸血", key: "magicLifeSteal" }, { name: "普攻伤害吸血", key: "atkLifeSteal" },
-  { name: "被暴击率", key: "critRateTaken" }, { name: "被暴击伤害", key: "critDmgTaken" }, { name: "眩晕抗性", key: "stunResist" },
-  { name: "魔法普攻伤害", key: "magicAtkDmg" }, { name: "蝼蚁专精", key: "antMastery" }, { name: "移动速度", key: "movespeed2" },
-  { name: "伤害%", key: "dmgBonus" }, { name: "最终伤害%", key: "finalDmgBonus" }, { name: "经验获取率", key: "expGainRate" },
-  { name: "最大生命值%", key: "hpPct" }, { name: "最大法力值%", key: "mpPct" },
-  { name: "基础生命值%", key: "baseHpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }, { name: "基础护甲%", key: "baseArmorPct" },
-  { name: "生命值%", key: "hpPercent" }, { name: "法力值%", key: "mpPercent" }, { name: "攻击力%", key: "dmgPercent" }, { name: "护甲%", key: "armorPercent" },
-  { name: "受到技伤减少", key: "SpellReduce" }, { name: "受到物伤减少", key: "PhysReduce" },
-];
-const NAME_TO_KEY: Record<string, string> = {};
-for (const e of STAT_CONFIG) { NAME_TO_KEY[e.name] = e.key; }
-if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed"; // 移速字段映射，不参与 addStat
 
 /** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值 */
 function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number> {
@@ -131,15 +79,14 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   if (unit === null || unit === 0 || item === null || item === 0) return;
   if (isSpecialUnit(unit)) return;
   const player = jass.GetOwningPlayer(unit);
-  const itemId = jass.GetItemTypeId(item);
   const isDrop = !isPickup;
   const skipFlag = equipShared.skipNextDrop;
   if (isDrop && skipFlag) {
     equipShared.skipNextDrop = false;
     return;
   }
-  const idStr = fourCCToString(itemId);
-  const itemData = items[idStr];
+  const idStr = fourCCToString(jass.GetItemTypeId(item));
+  const itemData = getItemDataEntry(item);
   if (!itemData) {
     if (isPickup) {
       const displayName = (typeof slk !== "undefined" && slk.item && (slk.item as Record<string, { name?: string }>)[idStr]?.name) || idStr;
@@ -149,10 +96,10 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     }
     return;
   }
-  const skipType = (itemData as { type?: string }).type;
+  const skipType = itemData.type;
   if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
   // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」，但仍需计算属性
-  const isConsumable = isDrop && (itemData as { hot?: string }).hot != null;
+  const isConsumable = isDrop && itemData.hot != null;
   // 拾取时：装备限制不通过则不加属性、不提示"获得"，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）
   // 被拒时不设 skipNextDrop：只由装备限制在 UnitRemoveItem 前设置，避免误跳过后续玩家手动丢弃
   if (isPickup && typeof equipLimit.equipLimitWouldAllowPickup === "function" && !equipLimit.equipLimitWouldAllowPickup(unit, item)) {
@@ -163,7 +110,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const mult = charges > 0 ? charges : 1;
 
   const isAdd = isPickup;
-  const primaryBonus = (itemData as { primaryBonus?: string }).primaryBonus;
+  const primaryBonus = itemData.primaryBonus;
   let primary: Record<string, number> = {};
   if (primaryBonus) {
     const typeId = (jass as any).GetUnitTypeId(unit);
@@ -230,7 +177,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     test5Parts.push(statName + "为：" + valStr);
   }
   // 仅当本次操作的装备带移速时才在「当前装备加成」里显示移速，且 DROP 时排除被丢物品再算
-  const hasMovespeed2 = (itemData as { movespeed2?: number }).movespeed2 != null;
+  const hasMovespeed2 = itemData.movespeed2 != null;
   if (hasMovespeed2 && unit != null && typeof equipMovespeed.getMaxMovespeed2Info === "function") {
     const ms = equipMovespeed.getMaxMovespeed2Info(unit, isDrop ? item : undefined);
     if (ms.value > 0) test5Parts.push("移动速度为：" + tostring(ms.value));

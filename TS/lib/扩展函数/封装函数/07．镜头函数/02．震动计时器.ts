@@ -10,19 +10,20 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 import { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } from "./01．镜头震动";
 
 // 震动时长封装（内部使用计时器）
-const cameraTimers: Map<any, any> = new Map();
+const cameraTimers: Map<number, any> = new Map();
 
 export function CameraShakeForPlayer(whichPlayer: any, magnitude: number, duration: number): void {
   CameraSetEQNoiseForPlayer(whichPlayer, magnitude);
-  const existing = cameraTimers.get(whichPlayer);
+  const playerId = (jass as any).GetPlayerId(whichPlayer);
+  const existing = cameraTimers.get(playerId);
   if (existing) {
     safeDestroyTimer(existing);
   }
   const t = (jass as any).CreateTimer();
-  cameraTimers.set(whichPlayer, t);
+  cameraTimers.set(playerId, t);
   safeTimerStart(t, duration, false, () => {
     CameraClearNoiseForPlayer(whichPlayer);
-    cameraTimers.delete(whichPlayer);
+    cameraTimers.delete(playerId);
     safeDestroyTimer(t);
   });
 }

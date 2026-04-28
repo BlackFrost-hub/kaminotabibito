@@ -135,10 +135,6 @@ function ____exports.setDialogShowable(self, p, visible)
     end
 end
 function ____exports.setDialogBGTexture(self, p, path)
-    local localPlayer = dzGetLocalPlayer(nil)
-    if localPlayer ~= p then
-        return
-    end
     local pid = dzGetPlayerId(nil, p)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
@@ -150,10 +146,6 @@ function ____exports.setDialogBGTexture(self, p, path)
     dzSetTexture(nil, state.frames[1], path)
 end
 function ____exports.setDialogTitleTexture(self, p, path)
-    local localPlayer = dzGetLocalPlayer(nil)
-    if localPlayer ~= p then
-        return
-    end
     local pid = dzGetPlayerId(nil, p)
     if pid < 0 or pid >= MAX_PLAYERS then
         return

@@ -148,7 +148,7 @@ function createTaskTab(opts: {
     if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
     setFrameSize(bg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
-    pcallDzFrameShow(japi, bg, true);
+    pcallDzFrameShow(bg, true);
   }
 
   if (bg) {
@@ -164,10 +164,10 @@ function createTaskTab(opts: {
       setFramePointRelative(tab, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
       setFrameSize(tab, { width: TAB_FRAME_W, height: TAB_FRAME_H });
     }
-    pcallDzFrameShow(japi, tab, true);
+    pcallDzFrameShow(tab, true);
     if (!bg) {
       setButtonText(tab, "");
-      pcallDzFrameSetAlpha(japi, tab, 0);
+      pcallDzFrameSetAlpha(tab, 0);
     }
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
     currentTooltipMessage = tooltip;

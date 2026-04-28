@@ -20,100 +20,20 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local round = ____require_result_1.round
 local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local g = require("jass.globals")
-local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-local applyEquipStatsTS = ____require_result_2.applyEquipStatsTS
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local AddGoldWithFeedback = ____require_result_3.AddGoldWithFeedback
-local fourCCToString = ____require_result_3.fourCCToString
-local ____require_result_4 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local IsUnitIllusionBJ = ____require_result_4.IsUnitIllusionBJ
-local ____G_5 = _G
-local onSecond = ____G_5.onSecond
-local offSecond = ____G_5.offSecond
---- key -> 显示名（与装备系统.ts STAT_CONFIG 保持一致）
-local KEY_TO_NAME = {
-    hp = "生命值",
-    mp = "魔法值",
-    dmg = "攻击力",
-    armor = "护甲",
-    atkSpeed = "攻速",
-    movespeed = "叠加移动速度",
-    str = "力量",
-    agi = "敏捷",
-    int = "智力",
-    all = "全属性",
-    critRate = "暴击率",
-    critDmg = "暴击伤害",
-    magicResist = "魔抗",
-    hpRegen = "生命恢复",
-    hpRegenPct = "生命恢复%",
-    hpRegenEff = "生命恢复效率",
-    skillHeal = "技能治疗率",
-    healReceived = "受到的治疗率",
-    mpRegen = "魔法恢复",
-    mpRegenPct = "魔法恢复%",
-    mpCost = "魔法消耗",
-    cdReduction = "冷却缩减",
-    accuracy = "命中率",
-    dodge = "闪避率",
-    armorPierce = "护甲穿透",
-    magicPierce = "魔法穿透",
-    skillDmg = "技能伤害",
-    skillResist = "技能抗性",
-    magicDmg = "魔法伤害",
-    physDmg = "物理伤害",
-    physResist = "物理抗性",
-    enhanceDmg = "强化伤害",
-    atkDmg = "普攻伤害",
-    atkResist = "普攻抗性",
-    lightDmg = "光属性伤害",
-    lightResist = "光属性抗性",
-    darkDmg = "暗属性伤害",
-    darkResist = "暗属性抗性",
-    woodDmg = "木属性伤害",
-    woodResist = "木属性抗性",
-    fireDmg = "火属性伤害",
-    fireResist = "火属性抗性",
-    thunderDmg = "雷属性伤害",
-    thunderResist = "雷属性抗性",
-    waterDmg = "水属性伤害",
-    waterResist = "水属性抗性",
-    MetalResist = "金属性抗性",
-    summonDmg = "召唤物伤害",
-    summonResist = "召唤物抗性",
-    dmgReduction = "伤害减少",
-    dmgReductionPct = "伤害减少%",
-    lifeSteal = "伤害吸血",
-    magicLifeSteal = "魔法伤害吸血",
-    atkLifeSteal = "普攻伤害吸血",
-    critRateTaken = "被暴击率",
-    critDmgTaken = "被暴击伤害",
-    stunResist = "眩晕抗性",
-    magicAtkDmg = "魔法普攻伤害",
-    antMastery = "蝼蚁专精",
-    movespeed2 = "移动速度",
-    dmgBonus = "伤害%",
-    finalDamageMultiplier = "最终伤害%",
-    expGainRate = "经验获取率",
-    hpPct = "最大生命值%",
-    baseDmgPct = "基础攻击力%",
-    SpellReduce = "受到技伤减少",
-    PhysReduce = "受到物伤减少"
-}
---- 根据原始 key 字符串（大小写不敏感）查找 KEY_TO_NAME 里的正确 key
-local function findStatKey(self, raw)
-    if KEY_TO_NAME[raw] ~= nil then
-        return raw
-    end
-    local rl = string.lower(raw)
-    for k in pairs(KEY_TO_NAME) do
-        if string.lower(k) == rl then
-            return k
-        end
-    end
-    return ""
-end
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local AddGoldWithFeedback = ____require_result_2.AddGoldWithFeedback
+local fourCCToString = ____require_result_2.fourCCToString
+local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
+local KEY_TO_NAME = ____require_result_4.KEY_TO_NAME
+local findStatKey = ____require_result_4.findStatKey
+local getItemDataEntry = ____require_result_4.getItemDataEntry
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+local applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
+local ____G_6 = _G
+local onSecond = ____G_6.onSecond
+local offSecond = ____G_6.offSecond
 local function parsePowerUP(self, powerUpStr)
     local segments = {}
     local rawSegs = __TS__StringSplit(powerUpStr, "+")
@@ -123,7 +43,7 @@ local function parsePowerUP(self, powerUpStr)
             do
                 local rawSeg = __TS__StringTrim(rawSegs[si + 1])
                 if rawSeg == "" then
-                    goto __continue9
+                    goto __continue4
                 end
                 local tokens = __TS__ArrayFilter(
                     __TS__ArrayMap(
@@ -158,7 +78,7 @@ local function parsePowerUP(self, powerUpStr)
                                 ))
                                 local pctNum = __TS__ParseFloat(pctStr) or 0
                                 effects[#effects + 1] = {type = "gold", isPct = true, value = pctNum / 100, isLevelMult = false}
-                                goto __continue18
+                                goto __continue13
                             end
                             local core = __TS__StringTrim(__TS__StringSubstring(t, 0, #t - 4))
                             local dash = (string.find(core, "-", nil, true) or 0) - 1
@@ -186,12 +106,12 @@ local function parsePowerUP(self, powerUpStr)
                                     max = v
                                 }
                             end
-                            goto __continue18
+                            goto __continue13
                         end
                         if (string.find(t, "(level*", nil, true) or 0) - 1 == 0 then
                             local closeIdx = (string.find(t, ")", nil, true) or 0) - 1
                             if closeIdx < 0 then
-                                goto __continue18
+                                goto __continue13
                             end
                             local mult = __TS__ParseFloat(__TS__StringSubstring(t, 7, closeIdx)) or 0
                             local rawKey = __TS__StringTrim(__TS__StringSubstring(t, closeIdx + 1))
@@ -212,7 +132,7 @@ local function parsePowerUP(self, powerUpStr)
                                     }
                                 end
                             end
-                            goto __continue18
+                            goto __continue13
                         end
                         local pctIdx = (string.find(t, "%", nil, true) or 0) - 1
                         local isPct = pctIdx >= 0
@@ -259,13 +179,13 @@ local function parsePowerUP(self, powerUpStr)
                             end
                         end
                     end
-                    ::__continue18::
+                    ::__continue13::
                 end
                 if #effects > 0 then
                     segments[#segments + 1] = {effects = effects, timeSec = timeSec}
                 end
             end
-            ::__continue9::
+            ::__continue4::
             si = si + 1
         end
     end
@@ -369,30 +289,30 @@ local function executeSegment(self, unit, seg)
                     goldFixed[#goldFixed + 1] = {min = mn, max = mx}
                 end
             elseif eff.type == "exp" then
-                local ____eff_isLevelMult_6
-                if eff.isLevelMult then
-                    ____eff_isLevelMult_6 = jass.R2I(getHeroLevel(nil, unit) * eff.value)
-                else
-                    ____eff_isLevelMult_6 = jass.R2I(eff.value)
-                end
-                local amount = ____eff_isLevelMult_6
-                addHeroXP(nil, unit, amount)
-            elseif eff.type == "level" then
-                local cur = getHeroLevel(nil, unit)
                 local ____eff_isLevelMult_7
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass.R2I(cur * eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(nil, unit) * eff.value)
                 else
                     ____eff_isLevelMult_7 = jass.R2I(eff.value)
                 end
-                local add = ____eff_isLevelMult_7
+                local amount = ____eff_isLevelMult_7
+                addHeroXP(nil, unit, amount)
+            elseif eff.type == "level" then
+                local cur = getHeroLevel(nil, unit)
+                local ____eff_isLevelMult_8
+                if eff.isLevelMult then
+                    ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
+                else
+                    ____eff_isLevelMult_8 = jass.R2I(eff.value)
+                end
+                local add = ____eff_isLevelMult_8
                 if add > 0 then
                     jass.SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                 local name = KEY_TO_NAME[eff.key]
                 if name == nil then
-                    goto __continue61
+                    goto __continue56
                 end
                 local val
                 if eff.isPct then
@@ -405,7 +325,7 @@ local function executeSegment(self, unit, seg)
                 statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
             end
         end
-        ::__continue61::
+        ::__continue56::
     end
     if goldPct ~= 0 then
         if seg.timeSec <= 0 then
@@ -437,20 +357,20 @@ local function executeSegment(self, unit, seg)
                 local mx = jass.R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
-                    local ____temp_8
-                    if mn < mx then
-                        ____temp_8 = mn
-                    else
-                        ____temp_8 = mx
-                    end
-                    local a = ____temp_8
                     local ____temp_9
                     if mn < mx then
-                        ____temp_9 = mx
-                    else
                         ____temp_9 = mn
+                    else
+                        ____temp_9 = mx
                     end
-                    local b = ____temp_9
+                    local a = ____temp_9
+                    local ____temp_10
+                    if mn < mx then
+                        ____temp_10 = mx
+                    else
+                        ____temp_10 = mn
+                    end
+                    local b = ____temp_10
                     delta = jass.GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
@@ -494,13 +414,15 @@ local function onUseItem(self)
     if IsUnitIllusionBJ(nil, unit) then
         return
     end
-    local itemId = jass.GetItemTypeId(item)
-    local idStr = fourCCToString(nil, itemId)
-    local entry = itemsData[idStr]
+    local entry = getItemDataEntry(nil, item)
     if not entry or not entry.PowerUP then
         return
     end
     local glob = _G
+    local idStr = fourCCToString(
+        nil,
+        jass.GetItemTypeId(item)
+    )
     local key = (("__EquipPowerUP_" .. tostring(unit)) .. "_") .. idStr
     if glob[key] then
         return

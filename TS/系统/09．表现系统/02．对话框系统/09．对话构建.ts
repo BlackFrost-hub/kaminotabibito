@@ -8,6 +8,12 @@ import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函�
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, giveQuestReward, showLocalHint } from "./06．常量与工具";
+const ____npcEffect = require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡特效") as {
+  getNpcUnit: (this: void, playerId: number) => any;
+  scheduleYellowQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
+  scheduleGrayQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
+};
+function getDialogNpcUnit(this: void, playerId: number): any { return ____npcEffect.getNpcUnit(playerId); }
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
@@ -160,7 +166,6 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
 
   return {
     lines: startLines,
-    /** 打开任务面板时先去掉黄叹号；接取成功后的收尾对白结束约 3 秒后再挂灰问号（与气泡淡出对齐，见 applyGrayQuestMarkerAfterDialog） */
     removeOverheadMarkerOnOpen: true,
     quest: {
       title: npcName,
@@ -169,11 +174,12 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         const questId = quest.requireID != null ? quest.requireID.toString() : "";
         const playerObj = jass.Player(dialogOwnerId);
         const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
+        const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
         if (!canAcceptQuestByRequirements(quest, hero)) {
           const failRaw = quest.AcceptFailedText || "当前条件不满足，无法接受该任务。";
           scheduleOpenDialogLater(playerObj, {
             lines: parseDialogText(failRaw, npcName, heroName),
-            npcUnit,
+            npcUnit: currentNpcUnit,
             removeOverheadMarkerOnOpen: false,
             restoreYellowQuestMarkerAfterDialog: true,
           });
@@ -189,7 +195,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
         scheduleOpenDialogLater(jass.Player(dialogOwnerId), {
           lines: acceptedLines,
-          npcUnit,
+          npcUnit: currentNpcUnit,
           removeOverheadMarkerOnOpen: false,
           applyGrayQuestMarkerAfterDialog: true,
         });
@@ -198,9 +204,10 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         }
       },
       onReject: () => {
+        const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
         showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『${quest.name}』|r`);
-        if (npcUnit) {
-          scheduleYellowQuestMarkerAfterBubbleFade(npcUnit);
+        if (currentNpcUnit) {
+          scheduleYellowQuestMarkerAfterBubbleFade(currentNpcUnit);
         }
       },
     },
@@ -217,11 +224,6 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
 
   return {
     lines: [],
-    /**
-     * 进行中：**不要**用 applyGrayQuestMarkerAfterDialog。
-     * 任务 UI 的 onAccept 在 onDialogFinished 之后执行；若在 onFinish 里挂灰问号，提交成功时任务尚未标记完成，会误挂灰问号。
-     * 改为：仅「暂时忽略」onReject、或提交失败且任务仍进行中时，再延迟挂回灰问号；提交成功则不再挂。
-     */
     quest: {
       title: npcName,
       text: `【${quest.name}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
@@ -229,28 +231,30 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
       rejectText: "暂时忽略",
       onAccept: () => {
         const questIdStr = quest.requireID != null ? quest.requireID.toString() : "";
+        const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
         handleQuestSubmit({
           quest,
           npcName,
           heroName,
           dialogOwnerId,
-          npcUnit,
+          npcUnit: currentNpcUnit,
           parseDialogText,
           openDialog: openNpcDialog,
           refreshTaskUIForAllClientsSoon,
         });
         if (
-          npcUnit &&
+          currentNpcUnit &&
           questIdStr !== "" &&
           hasPlayerAcceptedQuest(dialogOwnerId, questIdStr) &&
           !hasPlayerCompletedQuest(dialogOwnerId, questIdStr)
         ) {
-          scheduleGrayQuestMarkerAfterBubbleFade(npcUnit);
+          scheduleGrayQuestMarkerAfterBubbleFade(currentNpcUnit);
         }
       },
       onReject: () => {
-        if (npcUnit) {
-          scheduleGrayQuestMarkerAfterBubbleFade(npcUnit);
+        const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
+        if (currentNpcUnit) {
+          scheduleGrayQuestMarkerAfterBubbleFade(currentNpcUnit);
         }
       },
     },

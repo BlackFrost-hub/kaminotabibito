@@ -26,35 +26,30 @@ local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local __dzPcallShowJapi = nil
-local __dzPcallShowFrame = 0
-local __dzPcallShowVis = false
+local __dzPcallFrame = 0
+local __dzPcallVis = false
 local function __dzPcallFrameShowBody(self)
-    __dzPcallShowJapi:DzFrameShow(__dzPcallShowFrame, __dzPcallShowVis)
+    japi.DzFrameShow(__dzPcallFrame, __dzPcallVis)
 end
-function ____exports.pcallDzFrameShow(self, japiAny, frame, visible)
-    if type(japiAny.DzFrameShow) ~= "function" then
+function ____exports.pcallDzFrameShow(self, frame, visible)
+    if type(japi.DzFrameShow) ~= "function" then
         return
     end
-    __dzPcallShowJapi = japiAny
-    __dzPcallShowFrame = frame
-    __dzPcallShowVis = visible
+    __dzPcallFrame = frame
+    __dzPcallVis = visible
     pcall(__dzPcallFrameShowBody)
-    __dzPcallShowJapi = nil
 end
 local __dzPcallAlphaVal = 0
 local function __dzPcallFrameSetAlphaBody(self)
-    __dzPcallShowJapi:DzFrameSetAlpha(__dzPcallShowFrame, __dzPcallAlphaVal)
+    japi.DzFrameSetAlpha(__dzPcallFrame, __dzPcallAlphaVal)
 end
-function ____exports.pcallDzFrameSetAlpha(self, japiAny, frame, alpha)
-    if type(japiAny.DzFrameSetAlpha) ~= "function" then
+function ____exports.pcallDzFrameSetAlpha(self, frame, alpha)
+    if type(japi.DzFrameSetAlpha) ~= "function" then
         return
     end
-    __dzPcallShowJapi = japiAny
-    __dzPcallShowFrame = frame
+    __dzPcallFrame = frame
     __dzPcallAlphaVal = alpha
     pcall(__dzPcallFrameSetAlphaBody)
-    __dzPcallShowJapi = nil
 end
 function ____exports.dzGetLocalPlayer(self)
     return jass.GetLocalPlayer()

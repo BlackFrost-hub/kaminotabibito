@@ -303,7 +303,7 @@ function ____exports.updateTaskUIScrollBarVisibility(self, ctx, pageCount, hasQu
     local visible = hasQuestRows
     for ____, frame in ipairs({ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn}) do
         if frame and frame ~= 0 then
-            pcallDzFrameShow(nil, japi, frame, visible)
+            pcallDzFrameShow(nil, frame, visible)
         end
     end
     if visible then

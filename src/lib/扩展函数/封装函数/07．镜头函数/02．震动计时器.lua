@@ -13,12 +13,13 @@ local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local cameraTimers = __TS__New(Map)
 function ____exports.CameraShakeForPlayer(self, whichPlayer, magnitude, duration)
     CameraSetEQNoiseForPlayer(nil, whichPlayer, magnitude)
-    local existing = cameraTimers:get(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
+    local existing = cameraTimers:get(playerId)
     if existing then
         safeDestroyTimer(nil, existing)
     end
     local t = jass.CreateTimer()
-    cameraTimers:set(whichPlayer, t)
+    cameraTimers:set(playerId, t)
     safeTimerStart(
         nil,
         t,
@@ -26,7 +27,7 @@ function ____exports.CameraShakeForPlayer(self, whichPlayer, magnitude, duration
         false,
         function()
             CameraClearNoiseForPlayer(nil, whichPlayer)
-            cameraTimers:delete(whichPlayer)
+            cameraTimers:delete(playerId)
             safeDestroyTimer(nil, t)
         end
     )

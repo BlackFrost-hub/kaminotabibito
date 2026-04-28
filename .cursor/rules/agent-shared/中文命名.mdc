@@ -1,0 +1,46 @@
+---
+description: 中文命名偏好 - 新代码用中文，旧代码不改
+globs: TS/**/*.ts
+alwaysApply: true
+---
+
+# 中文命名偏好
+
+## 原则
+
+写新代码时，变量、函数、类、方法、参数、类型，全用中文。
+
+## 不做什么
+
+不审查旧代码，不因为旧代码是英文就改掉。
+
+## 例外
+
+JASS API、DzAPI、Lua 标准库、TSTL 编译指令、import 路径，保留英文。
+
+## 示例
+
+### ✅ 新代码这样写
+
+```typescript
+const 当前玩家 = GetLocalPlayer();
+const 金币数量 = 1000;
+
+export function 初始化(): void {
+    设置金币(当前玩家, 金币数量);
+}
+
+function 设置金币(玩家: any, 数量: number): void {
+    (jass as any).SetPlayerState(玩家, (jass as any).ConvertPlayerState(1), 数量);
+}
+❌ 新代码不要这样写
+const currentPlayer = GetLocalPlayer();
+const goldAmount = 1000;
+
+export function init(): void {
+    setGold(currentPlayer, goldAmount);
+}
+⚠️ 旧代码这样不动它
+// 旧文件里的英文命名，不改
+const player = GetLocalPlayer();
+function updateUI(): void { ... }

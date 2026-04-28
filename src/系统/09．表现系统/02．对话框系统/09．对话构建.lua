@@ -26,6 +26,10 @@ local scheduleGrayQuestMarkerAfterBubbleFade = ____15_FF0ENPC_5934_9876_4E0E_6C1
 local scheduleYellowQuestMarkerAfterBubbleFade = ____15_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleYellowQuestMarkerAfterBubbleFade
 local jass = require("jass.common")
 local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
+local ____npcEffect = require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡特效")
+local function getDialogNpcUnit(playerId)
+    return ____npcEffect.getNpcUnit(playerId)
+end
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
@@ -54,15 +58,15 @@ local function grantQuestItems(self, hero, questItems)
         do
             local itemCode = __TS__StringTrim(raw)
             if #itemCode ~= 4 then
-                goto __continue8
+                goto __continue9
             end
             local itemId = stringToFourCC(nil, itemCode)
             if itemId == 0 then
-                goto __continue8
+                goto __continue9
             end
             jass.UnitAddItemById(hero, itemId)
         end
-        ::__continue8::
+        ::__continue9::
     end
 end
 local function canAcceptQuestByRequirements(self, quest, hero)
@@ -147,17 +151,17 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
         do
             local trimmed = __TS__StringTrim(part)
             if not trimmed then
-                goto __continue33
+                goto __continue34
             end
             local withoutOrder = trimOrderedPrefix(nil, trimmed)
             local parsed = tryParseSpeakerLine(nil, withoutOrder)
             if parsed then
                 lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
-                goto __continue33
+                goto __continue34
             end
             lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
         end
-        ::__continue33::
+        ::__continue34::
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end
@@ -217,6 +221,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                     ____playerObj_4 = nil
                 end
                 local hero = ____playerObj_4
+                local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 if not canAcceptQuestByRequirements(nil, quest, hero) then
                     local failRaw = quest.AcceptFailedText or "当前条件不满足，无法接受该任务。"
                     scheduleOpenDialogLater(
@@ -224,7 +229,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                         playerObj,
                         {
                             lines = ____exports.parseDialogText(nil, failRaw, npcName, heroName),
-                            npcUnit = npcUnit,
+                            npcUnit = currentNpcUnit,
                             removeOverheadMarkerOnOpen = false,
                             restoreYellowQuestMarkerAfterDialog = true
                         }
@@ -248,20 +253,21 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                 scheduleOpenDialogLater(
                     nil,
                     jass.Player(dialogOwnerId),
-                    {lines = acceptedLines, npcUnit = npcUnit, removeOverheadMarkerOnOpen = false, applyGrayQuestMarkerAfterDialog = true}
+                    {lines = acceptedLines, npcUnit = currentNpcUnit, removeOverheadMarkerOnOpen = false, applyGrayQuestMarkerAfterDialog = true}
                 )
                 if hasPlayerAcceptedQuest(nil, dialogOwnerId, questId) then
                     showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r该任务已经接受过了")
                 end
             end,
             onReject = function()
+                local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 showLocalHint(
                     nil,
                     dialogOwnerId,
                     ("|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『" .. tostring(quest.name)) .. "』|r"
                 )
-                if npcUnit then
-                    scheduleYellowQuestMarkerAfterBubbleFade(nil, npcUnit)
+                if currentNpcUnit then
+                    scheduleYellowQuestMarkerAfterBubbleFade(nil, currentNpcUnit)
                 end
             end
         }
@@ -295,23 +301,25 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
             rejectText = "暂时忽略",
             onAccept = function()
                 local questIdStr = quest.requireID ~= nil and tostring(quest.requireID) or ""
+                local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 handleQuestSubmit(nil, {
                     quest = quest,
                     npcName = npcName,
                     heroName = heroName,
                     dialogOwnerId = dialogOwnerId,
-                    npcUnit = npcUnit,
+                    npcUnit = currentNpcUnit,
                     parseDialogText = ____exports.parseDialogText,
                     openDialog = openNpcDialog,
                     refreshTaskUIForAllClientsSoon = refreshTaskUIForAllClientsSoon
                 })
-                if npcUnit and questIdStr ~= "" and hasPlayerAcceptedQuest(nil, dialogOwnerId, questIdStr) and not hasPlayerCompletedQuest(nil, dialogOwnerId, questIdStr) then
-                    scheduleGrayQuestMarkerAfterBubbleFade(nil, npcUnit)
+                if currentNpcUnit and questIdStr ~= "" and hasPlayerAcceptedQuest(nil, dialogOwnerId, questIdStr) and not hasPlayerCompletedQuest(nil, dialogOwnerId, questIdStr) then
+                    scheduleGrayQuestMarkerAfterBubbleFade(nil, currentNpcUnit)
                 end
             end,
             onReject = function()
-                if npcUnit then
-                    scheduleGrayQuestMarkerAfterBubbleFade(nil, npcUnit)
+                local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
+                if currentNpcUnit then
+                    scheduleGrayQuestMarkerAfterBubbleFade(nil, currentNpcUnit)
                 end
             end
         }

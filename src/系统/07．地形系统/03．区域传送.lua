@@ -151,7 +151,10 @@ local function initRegionTeleport(self)
             jass.RegionAddRect(region, rect)
             jass.RemoveRect(rect)
             regionEventCenter.registerEnterRegionTrigger(trig, region, nil)
-            regionMap:set(region, cfg)
+            regionMap:set(
+                jass.GetHandleId(region),
+                cfg
+            )
         end
         ::__continue33::
     end
@@ -168,7 +171,7 @@ local function initRegionTeleport(self)
                 return
             end
         end
-        local cfg = regionMap:get(region)
+        local cfg = regionMap:get(jass.GetHandleId(region))
         if cfg == nil then
             return
         end
