@@ -75,9 +75,7 @@ function ____exports.buildTaskMainPanel(self, opts)
     if not mainPanel then
         return empty
     end
-    if type(japi.DzFrameClearAllPoints) == "function" then
-        japi.DzFrameClearAllPoints(mainPanel)
-    end
+    japi.DzFrameClearAllPoints(mainPanel)
     if entryFrame then
         setFramePointRelative(
             nil,
@@ -94,9 +92,7 @@ function ____exports.buildTaskMainPanel(self, opts)
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
     local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
     if listContainer then
-        if type(japi.DzFrameClearAllPoints) == "function" then
-            japi.DzFrameClearAllPoints(listContainer)
-        end
+        japi.DzFrameClearAllPoints(listContainer)
         setFramePointRelative(
             nil,
             listContainer,
@@ -150,12 +146,8 @@ function ____exports.buildTaskMainPanel(self, opts)
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
-            if type(japi.DzFrameShow) == "function" then
-                japi.DzFrameShow(scrollBarFrame, true)
-            end
-            if type(japi.DzFrameClearAllPoints) == "function" then
-                japi.DzFrameClearAllPoints(scrollBarFrame)
-            end
+            japi.DzFrameShow(scrollBarFrame, true)
+            japi.DzFrameClearAllPoints(scrollBarFrame)
             setFramePointRelative(
                 nil,
                 scrollBarFrame,
@@ -201,9 +193,7 @@ function ____exports.buildTaskMainPanel(self, opts)
                     0
                 )
             end
-            if type(japi.DzFrameShow) == "function" then
-                japi.DzFrameShow(scrollThumbFrame, true)
-            end
+            japi.DzFrameShow(scrollThumbFrame, true)
             local ____createFrame_result_3 = createFrame(nil, {
                 type = FrameType.GLUETEXTBUTTON,
                 name = "TaskScrollThumbHitDyn",
@@ -217,9 +207,7 @@ function ____exports.buildTaskMainPanel(self, opts)
             scrollThumbHitBtn = ____createFrame_result_3
             if scrollThumbHitBtn and scrollThumbHitBtn ~= 0 then
                 setupTransparentGlueHitLayer(nil, scrollThumbFrame, scrollThumbHitBtn)
-                if type(japi.DzFrameShow) == "function" then
-                    japi.DzFrameShow(scrollThumbHitBtn, true)
-                end
+                japi.DzFrameShow(scrollThumbHitBtn, true)
             end
         end
     end

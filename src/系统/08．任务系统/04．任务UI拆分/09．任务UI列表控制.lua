@@ -39,17 +39,13 @@ function setText(self, frame, text)
     if not frame or frame == 0 then
         return
     end
-    if type(japi.DzFrameSetText) == "function" then
-        japi.DzFrameSetText(frame, text)
-    end
+    japi.DzFrameSetText(frame, text)
 end
 function ____exports.setVisible(self, frame, visible)
     if not frame or frame == 0 then
         return
     end
-    if type(japi.DzFrameShow) == "function" then
-        japi.DzFrameShow(frame, visible)
-    end
+    japi.DzFrameShow(frame, visible)
 end
 function hideFrames(self, frames)
     for ____, frame in ipairs(frames) do
@@ -60,13 +56,13 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
     local itemH = getQuestItemHeight(nil, quest, expanded)
     local statusText = getStatusText(nil, quest.status)
     local showIcon = isQuestWithRowIconLayout(nil, quest)
-    local ____calcTaskListItemLayout_result_14 = calcTaskListItemLayout(nil, showIcon)
-    local rowWidth = ____calcTaskListItemLayout_result_14.rowWidth
-    local rowLeftRel = ____calcTaskListItemLayout_result_14.rowLeftRel
-    local iconHLayout = ____calcTaskListItemLayout_result_14.iconHLayout
-    local textXRel = ____calcTaskListItemLayout_result_14.textXRel
-    local listTextAlign = ____calcTaskListItemLayout_result_14.listTextAlign
-    local textW = ____calcTaskListItemLayout_result_14.textW
+    local ____calcTaskListItemLayout_result_11 = calcTaskListItemLayout(nil, showIcon)
+    local rowWidth = ____calcTaskListItemLayout_result_11.rowWidth
+    local rowLeftRel = ____calcTaskListItemLayout_result_11.rowLeftRel
+    local iconHLayout = ____calcTaskListItemLayout_result_11.iconHLayout
+    local textXRel = ____calcTaskListItemLayout_result_11.textXRel
+    local listTextAlign = ____calcTaskListItemLayout_result_11.listTextAlign
+    local textW = ____calcTaskListItemLayout_result_11.textW
     local titleText = ((((("|cffffff00【" .. quest.title) .. "】|r→发布NPC:|cff00ccff【") .. (quest.startNpc or "未知")) .. "】|r [") .. statusText) .. "]"
     ctx:setFramePointRelative(
         slot.backdrop,
@@ -132,7 +128,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.objectiveFrames[i + 1] or 0
                 local text = buildObjectiveText(nil, quest, i)
                 if not frame or text == "" then
-                    goto __continue79
+                    goto __continue76
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -148,7 +144,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
-            ::__continue79::
+            ::__continue76::
             i = i + 1
         end
     end
@@ -183,7 +179,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.detailFrames[i + 1] or 0
                 local text = details[i + 1] or ""
                 if not frame or text == "" then
-                    goto __continue83
+                    goto __continue80
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -199,7 +195,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
-            ::__continue83::
+            ::__continue80::
             i = i + 1
         end
     end
@@ -239,7 +235,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 local slot = variant.rowSlots[rowIndex + 1]
                 if not quest then
                     hideRowSlot(nil, slot, ____exports.setVisible)
-                    goto __continue93
+                    goto __continue90
                 end
                 local expanded = rowIndex == expandedRowIndex
                 local itemH = getQuestItemHeight(nil, quest, expanded)
@@ -266,7 +262,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 end
                 rowTopRel = rowTopRel - (itemH + QUEST_ROW_GAP)
             end
-            ::__continue93::
+            ::__continue90::
             rowIndex = rowIndex + 1
         end
     end
@@ -291,9 +287,6 @@ local function findTaskRowBindingFrame(self, frame)
             end
             if ____exports.taskRowBindingByFrameId[cur] ~= nil then
                 return cur
-            end
-            if type(japi.DzFrameGetParent) ~= "function" then
-                return 0
             end
             cur = japi.DzFrameGetParent(cur)
             i = i + 1
@@ -370,14 +363,14 @@ local function pcallApplyTaskUIFacadeVisibleStateBody(self)
             local isCurrentCategory = category == ctx.currentCategory
             ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
             if not isCurrentCategory then
-                goto __continue23
+                goto __continue22
             end
             local pageCount = categoryView.pageCount
             if pageCount <= 0 then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
                 ____exports.setVisible(nil, categoryView.emptyText, true)
                 ctx:updateScrollBarVisibility(0, false)
-                goto __continue23
+                goto __continue22
             end
             ____exports.setVisible(nil, categoryView.emptyText, false)
             local clampedPage = clampRange(
@@ -398,7 +391,7 @@ local function pcallApplyTaskUIFacadeVisibleStateBody(self)
             )
             ctx:updateScrollBarVisibility(pageCount, true)
         end
-        ::__continue23::
+        ::__continue22::
     end
 end
 local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
@@ -414,14 +407,14 @@ local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
             ____exports.setVisible(nil, categoryView.root, isCurrentCategory)
             if not isCurrentCategory then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
-                goto __continue29
+                goto __continue28
             end
             local pageCount = categoryView.pageCount
             if pageCount <= 0 then
                 hideAllCategoryPages(nil, categoryView, ____exports.setVisible)
                 ____exports.setVisible(nil, categoryView.emptyText, true)
                 ctx:updateScrollBarVisibility(0, false)
-                goto __continue29
+                goto __continue28
             end
             ____exports.setVisible(nil, categoryView.emptyText, false)
             showOnlyPageAndVariant(
@@ -433,7 +426,7 @@ local function pcallApplyTaskUICategorySwitchVisibleStateBody(self)
             )
             ctx:updateScrollBarVisibility(pageCount, true)
         end
-        ::__continue29::
+        ::__continue28::
     end
 end
 local function pcallApplyTaskUIExpandVisibleStateBody(self)
@@ -513,14 +506,8 @@ QUEST_ROW_GAP = 0.01
 VIEW_BOTTOM_REL = LIST_CONTENT_TOP_INSET - LIST_VIEW_H
 VIEW_EPS = 0.002
 function ____exports.handleTaskRowClick(self)
-    local ____temp_1
-    if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_1 = japi.DzGetTriggerUIEventFrame()
-    else
-        ____temp_1 = 0
-    end
-    local frame = ____temp_1
-    if not frame and type(japi.DzGetMouseFocus) == "function" then
+    local frame = japi.DzGetTriggerUIEventFrame()
+    if not frame then
         frame = japi.DzGetMouseFocus()
     end
     local bindingFrame = findTaskRowBindingFrame(nil, frame)
@@ -535,39 +522,27 @@ function ____exports.handleTaskRowClick(self)
     if not questId then
         return
     end
-    local ____opt_2 = ____exports.currentTaskRowExpandHandler
-    if ____opt_2 ~= nil then
+    local ____opt_1 = ____exports.currentTaskRowExpandHandler
+    if ____opt_1 ~= nil then
         ____exports.currentTaskRowExpandHandler(binding.rowIndex)
     end
-    local ____temp_4
-    if type(japi.DzGetTriggerKeyPlayer) == "function" then
-        ____temp_4 = japi.DzGetTriggerKeyPlayer()
-    else
-        ____temp_4 = jass.GetLocalPlayer()
-    end
-    local triggerPlayer = ____temp_4
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     if triggerPlayer == jass.GetLocalPlayer() then
-        local ____opt_5 = ____exports.currentTaskRowClickSound
-        if ____opt_5 ~= nil then
+        local ____opt_3 = ____exports.currentTaskRowClickSound
+        if ____opt_3 ~= nil then
             ____exports.currentTaskRowClickSound()
         end
     end
 end
 local function handleTaskRowClickByRowIndex(self, rowIndex)
-    local ____opt_7 = ____exports.currentTaskRowExpandHandler
-    if ____opt_7 ~= nil then
+    local ____opt_5 = ____exports.currentTaskRowExpandHandler
+    if ____opt_5 ~= nil then
         ____exports.currentTaskRowExpandHandler(rowIndex)
     end
-    local ____temp_9
-    if type(japi.DzGetTriggerKeyPlayer) == "function" then
-        ____temp_9 = japi.DzGetTriggerKeyPlayer()
-    else
-        ____temp_9 = jass.GetLocalPlayer()
-    end
-    local triggerPlayer = ____temp_9
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     if triggerPlayer == jass.GetLocalPlayer() then
-        local ____opt_10 = ____exports.currentTaskRowClickSound
-        if ____opt_10 ~= nil then
+        local ____opt_7 = ____exports.currentTaskRowClickSound
+        if ____opt_7 ~= nil then
             ____exports.currentTaskRowClickSound()
         end
     end
@@ -611,8 +586,8 @@ function ____exports.bindTaskRowClickButtonsForPage(self, page)
             do
                 local ri = 0
                 while ri < #variant.rowSlots do
-                    local ____opt_12 = variant.rowSlots[ri + 1]
-                    local btn = ____opt_12 and ____opt_12.clickBtn or nil
+                    local ____opt_9 = variant.rowSlots[ri + 1]
+                    local btn = ____opt_9 and ____opt_9.clickBtn or nil
                     if btn then
                         ____exports.taskRowBindingByFrameId[btn] = {page = page, rowIndex = ri}
                     end
@@ -637,8 +612,8 @@ function ____exports.getTaskUICategoryPageCount(self, pool, category)
     if not pool then
         return 0
     end
-    local ____opt_15 = pool.categories[category]
-    return ____opt_15 and ____opt_15.pageCount or 0
+    local ____opt_12 = pool.categories[category]
+    return ____opt_12 and ____opt_12.pageCount or 0
 end
 function ____exports.applyTaskUIFacadeVisibleState(self, ctx)
     pcallTaskUIListCtx = ctx

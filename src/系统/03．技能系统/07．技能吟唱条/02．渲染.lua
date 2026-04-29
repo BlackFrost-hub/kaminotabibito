@@ -35,7 +35,7 @@ local DEFAULT_TIP_TEXT = ____require_result_1.DEFAULT_TIP_TEXT
 --- 吟唱条数据 Map：句柄ID -> 数据
 ____exports.castBarDataMap = __TS__New(Map)
 local nextHandleId = 1
-local function getNextHandleId(self)
+local function getNextHandleId()
     local ____nextHandleId_2 = nextHandleId
     nextHandleId = ____nextHandleId_2 + 1
     return ____nextHandleId_2
@@ -103,7 +103,7 @@ local function updateAllCastBars()
     forEachSorted(
         nil,
         ____exports.castBarDataMap,
-        function(____, handleId, data)
+        function(handleId, data)
             data.elapsedTime = data.elapsedTime + deltaTime
             data.progress = data.elapsedTime / data.totalTime
             local animOffset = 1 - data.progress
@@ -208,6 +208,16 @@ end
 local _registeredToCenterTimer = false
 local _tickCounter = 0
 local CENTER_TIMER_TICKS = ceil(nil, UPDATE_INTERVAL / 0.01)
+local function onCastBarCenterTimerTick()
+    if ____exports.castBarDataMap.size == 0 then
+        return
+    end
+    _tickCounter = _tickCounter + 1
+    if _tickCounter >= CENTER_TIMER_TICKS then
+        _tickCounter = 0
+        updateAllCastBars()
+    end
+end
 local function ensureRegisteredToCenterTimer()
     if _registeredToCenterTimer then
         return
@@ -215,19 +225,7 @@ local function ensureRegisteredToCenterTimer()
     _registeredToCenterTimer = true
     local ____G_3 = _G
     local onTick10ms = ____G_3.onTick10ms
-    onTick10ms(
-        nil,
-        function()
-            if ____exports.castBarDataMap.size == 0 then
-                return
-            end
-            _tickCounter = _tickCounter + 1
-            if _tickCounter >= CENTER_TIMER_TICKS then
-                _tickCounter = 0
-                updateAllCastBars()
-            end
-        end
-    )
+    onTick10ms(nil, onCastBarCenterTimerTick)
 end
 --- 创建 UI + 入表 + 确保 tick 已注册
 function ____exports.startCastBar(colorId, totalTime, customString)
@@ -235,7 +233,7 @@ function ____exports.startCastBar(colorId, totalTime, customString)
     if not data then
         return
     end
-    local handleId = getNextHandleId(nil)
+    local handleId = getNextHandleId()
     ____exports.castBarDataMap:set(handleId, data)
     ensureRegisteredToCenterTimer()
 end

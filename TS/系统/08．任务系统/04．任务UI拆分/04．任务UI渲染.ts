@@ -26,7 +26,7 @@ const frameToQuestIdMap: Record<number, string> = {};
 // 命名函数替代匿名闭包 - 任务行点击
 function onQuestRowClick(): void {
   const japi = require("jass.japi") as any;
-  const frame = typeof japi.DzGetTriggerUIEventFrame === "function" ? japi.DzGetTriggerUIEventFrame() : 0;
+  const frame = japi.DzGetTriggerUIEventFrame();
   if (!frame) return;
   const questId = frameToQuestIdMap[frame];
   if (questId === undefined || questId === "") return;

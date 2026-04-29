@@ -1,5 +1,8 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
+const { safeTimerStart } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+};
 
 import { setActivePlayerId } from "./16．对话框同步状态";
 import type { Frame, Player, PlayerDialogState, Timer } from "./05．对话框业务逻辑";
@@ -47,7 +50,7 @@ export function dzGetLocalPlayer(): Player { return jass.GetLocalPlayer(); }
 export function dzGetPlayerId(p: Player): number { return jass.GetPlayerId(p) as number; }
 export function dzPlayer(index: number): Player { return jass.Player(index); }
 export function dzTimerCreate(): Timer { return jass.CreateTimer(); }
-export function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void { if (t) jass.TimerStart(t, timeout, periodic, cb); }
+export function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void { if (t) safeTimerStart(t, timeout, periodic, cb); }
 export function dzTimerPause(t: Timer): void { if (t) jass.PauseTimer(t); }
 export function dzLoadToc(): void { japi.DzLoadToc(TOC_PATH); }
 let g_tocLoaded = false;

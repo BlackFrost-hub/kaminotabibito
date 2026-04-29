@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local getProgressBarUnitType, angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, fireStesEvent, cleanupOpening, startOpening, updateAllOpening, ensureRegisteredToCenterTimer, jass, forEachSorted, BJ_RADTODEG, String2OrderIdBJ, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_SCALE, PROGRESS_BAR_HEIGHT_OFFSET, EVENT_PLAYER_PREPARE_OPEN_CHEST, EVENT_CHEST_OPENED, YDLOCAL_VAR_OPENER, YDLOCAL_VAR_CHEST, YDLOCAL_VAR_PRE_OPENER, YDLOCAL_VAR_PRE_CHEST, TEXT_OPENING, TEXT_SUCCESS, TEXT_INTERRUPTED, isChestType, getChestConfig, dropItemsFromChest, STES_GetTable, YDLocalExecuteTrigger, saveParentIndex, YDTriggerExecuteTrigger, YDLocal5Set, YDUserDataGet, CreateFloatTextOnUnit, openingMap, movingMap, _progressBarUnitType, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
+local getProgressBarUnitType, angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, fireStesEvent, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, forEachSorted, BJ_RADTODEG, String2OrderIdBJ, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_SCALE, PROGRESS_BAR_HEIGHT_OFFSET, EVENT_PLAYER_PREPARE_OPEN_CHEST, EVENT_CHEST_OPENED, YDLOCAL_VAR_OPENER, YDLOCAL_VAR_CHEST, YDLOCAL_VAR_PRE_OPENER, YDLOCAL_VAR_PRE_CHEST, TEXT_OPENING, TEXT_SUCCESS, TEXT_INTERRUPTED, isChestType, getChestConfig, dropItemsFromChest, STES_GetTable, YDLocalExecuteTrigger, saveParentIndex, YDTriggerExecuteTrigger, YDLocal5Set, YDUserDataGet, CreateFloatTextOnUnit, openingMap, movingMap, _progressBarUnitType, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 function getProgressBarUnitType()
     if _progressBarUnitType ~= 0 then
         return _progressBarUnitType
@@ -209,6 +209,16 @@ function updateAllOpening()
         end
     )
 end
+function onChestCenterTimerTick()
+    if openingMap.size == 0 and movingMap.size == 0 then
+        return
+    end
+    _tickCounter = _tickCounter + 1
+    if _tickCounter >= CENTER_TIMER_TICKS then
+        _tickCounter = 0
+        updateAllOpening()
+    end
+end
 function ensureRegisteredToCenterTimer()
     if _registeredToCenterTimer then
         return
@@ -216,19 +226,7 @@ function ensureRegisteredToCenterTimer()
     _registeredToCenterTimer = true
     local ____G_20 = _G
     local onTick10ms = ____G_20.onTick10ms
-    onTick10ms(
-        nil,
-        function()
-            if openingMap.size == 0 and movingMap.size == 0 then
-                return
-            end
-            _tickCounter = _tickCounter + 1
-            if _tickCounter >= CENTER_TIMER_TICKS then
-                _tickCounter = 0
-                updateAllOpening()
-            end
-        end
-    )
+    onTick10ms(nil, onChestCenterTimerTick)
 end
 jass = require("jass.common")
 local jglobals = require("jass.globals")

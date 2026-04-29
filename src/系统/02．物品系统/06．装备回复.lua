@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- 装备回复：使用物品时解析 hot/abilList，按段 **STES「物品治疗事件」** 分发。
 -- 
@@ -36,15 +37,17 @@ local ____require_result_3 = require("lib.扩展函数.YDWE函数.04．YDWE_trig
 local YDLocalExecuteTrigger = ____require_result_3.YDLocalExecuteTrigger
 local YDTriggerExecuteTrigger = ____require_result_3.YDTriggerExecuteTrigger
 local saveParentIndex = ____require_result_3.saveParentIndex
+local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_4.safeTimerStart
+local safeDestroyTimer = ____require_result_4.safeDestroyTimer
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local fourCCToString = ____require_result_4.fourCCToString
-local isSpecialUnit = ____require_result_4.isSpecialUnit
-local withTimer = ____require_result_4.withTimer
-local ____require_result_5 = require("系统.02．物品系统.06．装备回复_hot")
-local parseEquipHealSegments = ____require_result_5.parseEquipHealSegments
-local calcEquipHealHpMp = ____require_result_5.calcEquipHealHpMp
-local sumHealFromItemData = ____require_result_5.sumHealFromItemData
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local fourCCToString = ____require_result_5.fourCCToString
+local isSpecialUnit = ____require_result_5.isSpecialUnit
+local ____require_result_6 = require("系统.02．物品系统.06．装备回复_hot")
+local parseEquipHealSegments = ____require_result_6.parseEquipHealSegments
+local calcEquipHealHpMp = ____require_result_6.calcEquipHealHpMp
+local sumHealFromItemData = ____require_result_6.sumHealFromItemData
 --- 与地图 STES / JASS `StringHash` 一致
 ____exports.ITEM_HEAL_STES_EVENT = "物品治疗事件"
 --- YDLocal5 / YDLocal7 同名键（5=传参，7=返回值）
@@ -151,7 +154,7 @@ local function onItemHealStesChild()
                     unit,
                     item,
                     itemsData,
-                    fourCCToString
+                    function(n) return fourCCToString(nil, n) end
                 )
                 if inf.ok then
                     hp = inf.hp
@@ -159,9 +162,9 @@ local function onItemHealStesChild()
                     filledFromItemData = true
                 end
             end
-            local ____applyHpMpToUnitAndGetApplied_result_6 = applyHpMpToUnitAndGetApplied(unit, hp, mp)
-            local hpApplied = ____applyHpMpToUnitAndGetApplied_result_6.hpApplied
-            local mpApplied = ____applyHpMpToUnitAndGetApplied_result_6.mpApplied
+            local ____applyHpMpToUnitAndGetApplied_result_7 = applyHpMpToUnitAndGetApplied(unit, hp, mp)
+            local hpApplied = ____applyHpMpToUnitAndGetApplied_result_7.hpApplied
+            local mpApplied = ____applyHpMpToUnitAndGetApplied_result_7.mpApplied
             local hp7 = filledFromItemData and hp or hpApplied
             local mp7 = filledFromItemData and mp or mpApplied
             YDLocal7Set(nil, "real", YL_HP, hp7)
@@ -174,10 +177,10 @@ local function onItemHealStesChild()
         end
     end
 end
-local function executeSegment(self, unit, item, seg)
-    local ____calcEquipHealHpMp_result_7 = calcEquipHealHpMp(nil, seg.tokens, unit)
-    local hp = ____calcEquipHealHpMp_result_7.hp
-    local mp = ____calcEquipHealHpMp_result_7.mp
+local function executeSegment(unit, item, seg)
+    local ____calcEquipHealHpMp_result_8 = calcEquipHealHpMp(nil, seg.tokens, unit)
+    local hp = ____calcEquipHealHpMp_result_8.hp
+    local mp = ____calcEquipHealHpMp_result_8.mp
     fireItemHealEvent(
         unit,
         item,
@@ -185,6 +188,34 @@ local function executeSegment(self, unit, item, seg)
         mp,
         seg.abilId
     )
+end
+local equipHealDebounceKeyByTimerHid = {}
+local equipHealDelayCtxByTimerHid = {}
+local function onEquipHealDebounceTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local key = equipHealDebounceKeyByTimerHid[hid]
+    __TS__Delete(equipHealDebounceKeyByTimerHid, hid)
+    if key then
+        _G.__EquipHealExecutedKey = nil
+    end
+    safeDestroyTimer(nil, t)
+end
+local function onEquipHealDelayTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = equipHealDelayCtxByTimerHid[hid]
+    __TS__Delete(equipHealDelayCtxByTimerHid, hid)
+    if ctx then
+        executeSegment(ctx.unit, ctx.item, ctx.seg)
+    end
+    safeDestroyTimer(nil, t)
 end
 local function onUseItem()
     local unit = jass.GetManipulatingUnit()
@@ -210,35 +241,40 @@ local function onUseItem()
         return
     end
     glob.__EquipHealExecutedKey = key
-    withTimer(
-        nil,
-        0.5,
-        function()
-            glob.__EquipHealExecutedKey = nil
-        end
-    )
+    local debounceTimer = jass.CreateTimer()
+    if debounceTimer then
+        equipHealDebounceKeyByTimerHid[jass.GetHandleId(debounceTimer)] = key
+        safeTimerStart(
+            nil,
+            debounceTimer,
+            0.5,
+            false,
+            onEquipHealDebounceTimerExpire
+        )
+    end
     local segments = parseEquipHealSegments(nil, entry.hot, entry.abilList)
     for ____, seg in ipairs(segments) do
         do
             if seg.abilId == "" then
-                goto __continue29
+                goto __continue36
             end
             if seg.waitSec <= 0 then
-                executeSegment(nil, unit, item, seg)
+                executeSegment(unit, item, seg)
             else
-                local capturedSeg = seg
-                local capturedUnit = unit
-                local capturedItem = item
-                withTimer(
-                    nil,
-                    seg.waitSec,
-                    function()
-                        executeSegment(nil, capturedUnit, capturedItem, capturedSeg)
-                    end
-                )
+                local delayTimer = jass.CreateTimer()
+                if delayTimer then
+                    equipHealDelayCtxByTimerHid[jass.GetHandleId(delayTimer)] = {unit = unit, item = item, seg = seg}
+                    safeTimerStart(
+                        nil,
+                        delayTimer,
+                        seg.waitSec,
+                        false,
+                        onEquipHealDelayTimerExpire
+                    )
+                end
             end
         end
-        ::__continue29::
+        ::__continue36::
     end
 end
 local INIT_KEY = "__EquipHealInited"
@@ -259,7 +295,7 @@ local function init()
         )
         glob[STES_REG_KEY] = true
     end
-    itemEventCenter:onItemUse(function(____, unit, item)
+    itemEventCenter:onItemUse(function(unit, item)
         onUseItem()
     end)
 end

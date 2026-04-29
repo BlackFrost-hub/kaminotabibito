@@ -1,81 +1,85 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
-local collectHidsInTab = ____04_FF0EDOT_5DE5_5177.collectHidsInTab
+local collectActiveDotPairs = ____04_FF0EDOT_5DE5_5177.collectActiveDotPairs
+local deleteDotState = ____04_FF0EDOT_5DE5_5177.deleteDotState
+local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
+local ignoredTargetFlat = ____04_FF0EDOT_5DE5_5177.ignoredTargetFlat
 local isValidDotStateRow = ____04_FF0EDOT_5DE5_5177.isValidDotStateRow
-local tabDeleteHid = ____04_FF0EDOT_5DE5_5177.tabDeleteHid
-local tabRowForHid = ____04_FF0EDOT_5DE5_5177.tabRowForHid
+local makeDotFlatKey = ____04_FF0EDOT_5DE5_5177.makeDotFlatKey
 local BUFF_ID_TO_DOT_TYPE = {D001 = "antiHeal", D002 = "burn", D003 = "poison", D004 = "trollCurse"}
 local function dotTypeIdFromBuffId(self, buffID)
     return BUFF_ID_TO_DOT_TYPE[buffID] or nil
 end
 function ____exports.createDotStateSync(self, deps)
+    local dotTypes = deps.dotTypes
+    local notifyBuffPool = deps.notifyBuffPool
+    local removeDotTicksForTargetHid = deps.removeDotTicksForTargetHid
     local function syncDotRemainingFromBuffPool(self)
         local buffM = require("系统.05．Buff系统.00．Buff系统")
+        local _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid
         local map = buffM.DOT_TYPE_TO_BUFF_ID
-        if map == nil or type(buffM.getBuffRuntimeByHid) ~= "function" then
+        if map == nil or type(_getBuffRuntimeByHid) ~= "function" then
             return
         end
-        for typeId in pairs(deps.stateByType) do
-            do
-                local tab = deps.stateByType[typeId]
-                if tab == nil then
-                    goto __continue6
-                end
-                local buffID = map[typeId]
-                if buffID == nil or buffID == "" then
-                    goto __continue6
-                end
-                local hids = collectHidsInTab(nil, tab)
+        local ____pairs = collectActiveDotPairs(nil)
+        do
+            local pi = 0
+            while pi < #____pairs do
                 do
-                    local hi = 0
-                    while hi < #hids do
-                        do
-                            local kn = hids[hi + 1]
-                            local v = tabRowForHid(nil, tab, kn)
-                            if v == nil or not isValidDotStateRow(nil, v) then
-                                tabDeleteHid(nil, tab, kn)
-                                goto __continue10
-                            end
-                            local rt = buffM:getBuffRuntimeByHid(kn, buffID)
-                            if rt == nil or rt.remaining <= 0 then
-                                local cfg = __TS__ArrayFind(
-                                    deps.dotTypes,
-                                    function(____, c) return c.id == typeId end
-                                )
-                                if cfg ~= nil and type(cfg.onEnd) == "function" then
-                                    local uref = v._dotUnitRef
-                                    local ____self_1 = cfg
-                                    local ____self_1_onEnd_2 = ____self_1.onEnd
-                                    local ____temp_0
-                                    if uref ~= nil then
-                                        ____temp_0 = uref
-                                    else
-                                        ____temp_0 = kn
-                                    end
-                                    ____self_1_onEnd_2(____self_1, ____temp_0, v)
-                                end
-                                deps:notifyBuffPool(typeId, kn, nil)
-                                tabDeleteHid(nil, tab, kn)
-                                deps:removeDotTicksForTargetHid(typeId, kn)
-                                goto __continue10
-                            end
-                            v.remaining = rt.remaining
-                            v.effect = rt.effect
-                            if rt.sourceName ~= nil then
-                                v.sourceName = rt.sourceName
-                            end
-                            if rt._dotParsedDuration ~= nil then
-                                v._dotParsedDuration = rt._dotParsedDuration
-                            end
-                        end
-                        ::__continue10::
-                        hi = hi + 1
+                    local ____pairs_index_0 = ____pairs[pi + 1]
+                    local typeId = ____pairs_index_0.typeId
+                    local hid = ____pairs_index_0.hid
+                    local buffID = map[typeId]
+                    if buffID == nil or buffID == "" then
+                        goto __continue7
                     end
+                    local state = getDotState(nil, typeId, hid)
+                    if state == nil or not isValidDotStateRow(nil, state) then
+                        deleteDotState(nil, typeId, hid)
+                        goto __continue7
+                    end
+                    local rt = _getBuffRuntimeByHid(nil, hid, buffID)
+                    if rt == nil or rt.remaining <= 0 then
+                        local cfg = __TS__ArrayFind(
+                            dotTypes,
+                            function(____, c) return c.id == typeId end
+                        )
+                        if cfg ~= nil and type(cfg.onEnd) == "function" then
+                            local uref = state._dotUnitRef
+                            local ____self_2 = cfg
+                            local ____self_2_onEnd_3 = ____self_2.onEnd
+                            local ____temp_1
+                            if uref ~= nil then
+                                ____temp_1 = uref
+                            else
+                                ____temp_1 = hid
+                            end
+                            ____self_2_onEnd_3(____self_2, ____temp_1, state)
+                        end
+                        notifyBuffPool(nil, typeId, hid, nil)
+                        deleteDotState(nil, typeId, hid)
+                        removeDotTicksForTargetHid(nil, typeId, hid)
+                        local key = makeDotFlatKey(nil, typeId, hid)
+                        __TS__Delete(ignoredTargetFlat, key)
+                        goto __continue7
+                    end
+                    state.remaining = rt.remaining
+                    state.effect = rt.effect
+                    if rt.sourceName ~= nil then
+                        state.sourceName = rt.sourceName
+                    end
+                    if rt._dotParsedDuration ~= nil then
+                        state._dotParsedDuration = rt._dotParsedDuration
+                    end
+                    local key = makeDotFlatKey(nil, typeId, hid)
+                    ignoredTargetFlat[key] = true
                 end
+                ::__continue7::
+                pi = pi + 1
             end
-            ::__continue6::
         end
     end
     local function clearDotByBuffPoolExpire(self, buffID, hid)
@@ -83,31 +87,29 @@ function ____exports.createDotStateSync(self, deps)
         if typeId == nil or hid == 0 then
             return
         end
-        local tab = deps.stateByType[typeId]
-        if tab == nil then
-            return
-        end
-        local v = tabRowForHid(nil, tab, hid)
-        if v ~= nil and isValidDotStateRow(nil, v) then
+        local state = getDotState(nil, typeId, hid)
+        if state ~= nil and isValidDotStateRow(nil, state) then
             local cfg = __TS__ArrayFind(
-                deps.dotTypes,
+                dotTypes,
                 function(____, c) return c.id == typeId end
             )
             if cfg ~= nil and type(cfg.onEnd) == "function" then
-                local uref = v._dotUnitRef
-                local ____self_4 = cfg
-                local ____self_4_onEnd_5 = ____self_4.onEnd
-                local ____temp_3
+                local uref = state._dotUnitRef
+                local ____self_5 = cfg
+                local ____self_5_onEnd_6 = ____self_5.onEnd
+                local ____temp_4
                 if uref ~= nil then
-                    ____temp_3 = uref
+                    ____temp_4 = uref
                 else
-                    ____temp_3 = hid
+                    ____temp_4 = hid
                 end
-                ____self_4_onEnd_5(____self_4, ____temp_3, v)
+                ____self_5_onEnd_6(____self_5, ____temp_4, state)
             end
         end
-        tabDeleteHid(nil, tab, hid)
-        deps:removeDotTicksForTargetHid(typeId, hid)
+        deleteDotState(nil, typeId, hid)
+        local key = makeDotFlatKey(nil, typeId, hid)
+        __TS__Delete(ignoredTargetFlat, key)
+        removeDotTicksForTargetHid(nil, typeId, hid)
     end
     return {syncDotRemainingFromBuffPool = syncDotRemainingFromBuffPool, clearDotByBuffPoolExpire = clearDotByBuffPoolExpire}
 end

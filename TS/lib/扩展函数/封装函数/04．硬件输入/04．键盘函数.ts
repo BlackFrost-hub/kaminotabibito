@@ -18,8 +18,10 @@ declare const string: { char: (n: number) => string } | undefined;
 import { createTriggerOrNull, runFalseLocalRegistration } from "./02．内部工具";
 import { KEY_STATE } from "./01．常量定义";
 
+const syncKeyUpCallbackByTriggerHid: Record<number, ((player: any, key: number) => void) | undefined> = {};
+
 export function isKeyDown(keyCode: number): boolean {
-  return typeof japi.DzIsKeyDown === "function" ? !!japi.DzIsKeyDown(keyCode) : false;
+  return !!japi.DzIsKeyDown(keyCode);
 }
 
 function keyCodeToTrgChar(keyCode: number): string {
@@ -65,10 +67,6 @@ function registerKeyBindToTriggerLocal(
   action: () => void,
   playerId?: number
 ): void {
-  if (typeof japi.DzTriggerRegisterKeyEventByCode !== "function") {
-    registerKeyBindToTrigger(trig, status, keyCode);
-    return;
-  }
   runFalseLocalRegistration(() => {
     japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, false, action);
   }, playerId);
@@ -129,10 +127,17 @@ export function registerKeyUpSync(keyCode: number, callback: (player: any, key: 
   const trig = createTriggerOrNull();
   if (!trig) return null;
   DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.UP, keyCode);
-  jass.TriggerAddAction(trig, () => {
-    callback(japi.DzGetTriggerKeyPlayer(), japi.DzGetTriggerKey());
-  });
+  syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig) as number] = callback;
+  jass.TriggerAddAction(trig, onSyncKeyUp);
   return trig;
+}
+
+function onSyncKeyUp(): void {
+  const trig = jass.GetTriggeringTrigger();
+  if (!trig) return;
+  const cb = syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig) as number];
+  if (typeof cb !== "function") return;
+  cb(japi.DzGetTriggerKeyPlayer(), japi.DzGetTriggerKey());
 }
 
 export function registerKeyEventRawStatus(keyCode: number, status: number, sync: boolean, action: () => void, playerId?: number): any {

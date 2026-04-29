@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Star扩展库 - 移动速度突破系统
  *
@@ -89,6 +90,40 @@ const entryMap: Record<number, SpeedEntry> = {};
 const entryList: SpeedEntry[] = [];
 let systemTimer: any = null;
 let isRunning = false;
+const triggerUnitSpeedEntryUidByTriggerHid: Record<number, number> = {};
+const speedBreakTempTimerCtxByHid: Record<number, number> = {};
+
+function onSpeedBreakTempTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  const uid = speedBreakTempTimerCtxByHid[hid(t)];
+  delete speedBreakTempTimerCtxByHid[hid(t)];
+  const e = entryMap[uid];
+  if (e == null || e.tempTimer !== t) return;
+  e.tempTimer = null;
+  if (e.originalSpeed > ENGINE_SPEED_LIMIT) {
+    e.speed = e.originalSpeed;
+  } else {
+    removeEntry(uid);
+  }
+  safeDestroyTimer(t);
+}
+
+function onMoveSpeedBreakTick(this: void): void {
+  if (!isRunning) return;
+
+  _tickCounter = _tickCounter + 1;
+  if (_tickCounter >= CENTER_TIMER_TICKS) {
+    _tickCounter = 0;
+
+    const count = entryList.length;
+    for (let i = 0; i < count; i++) {
+      const entry = entryList[i];
+      if (entry && entryMap[entry.uid] === entry) {
+        doEvent(entry);
+      }
+    }
+  }
+}
 
 /**
  * 为单位添加移动速度突破特效
@@ -196,23 +231,7 @@ const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 
-  onTick10ms(() => {
-    if (!isRunning) return;
-
-    _tickCounter = _tickCounter + 1;
-    if (_tickCounter >= CENTER_TIMER_TICKS) {  // 每2次tick执行一次（0.02秒）
-      _tickCounter = 0;
-
-      const count = entryList.length;
-      for (let i = 0; i < count; i++) {
-        const entry = entryList[i];
-        if (entry && entryMap[entry.uid] === entry) {
-          doEvent(entry);
-        }
-      }
-      // 注意：使用中心计时器后无法停止，但如果没有entry会跳过逻辑
-    }
-  });
+  onTick10ms(onMoveSpeedBreakTick);
 }
 
 function stopTimer(): void {
@@ -235,6 +254,7 @@ function removeEntry(uid: number): void {
     entry.tempTimer = null;
   }
   if (entry.t) {
+    delete triggerUnitSpeedEntryUidByTriggerHid[hid(entry.t)];
     jass.DestroyTrigger(entry.t);
     entry.t = null;
   }
@@ -274,6 +294,16 @@ function syncEntryOrderDestination(e: SpeedEntry): void {
   e.ty = (jass.GetOrderPointY() as number) || 0;
 }
 
+function onSpeedEntryOrderTargetChanged(): void {
+  const trig = jass.GetTriggeringTrigger();
+  if (trig == null || trig === 0) return;
+  const uid = triggerUnitSpeedEntryUidByTriggerHid[hid(trig)];
+  if (!uid) return;
+  const e = entryMap[uid];
+  if (e == null) return;
+  syncEntryOrderDestination(e);
+}
+
 function createTriggerForEntry(entry: SpeedEntry): void {
   const t = jass.CreateTrigger();
   entry.t = t;
@@ -281,17 +311,14 @@ function createTriggerForEntry(entry: SpeedEntry): void {
   if (t == null) return;
 
   const uid = entry.uid;
+  triggerUnitSpeedEntryUidByTriggerHid[hid(t)] = uid;
 
   unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER);
   const evTarget = (jass as any).EVENT_UNIT_ISSUED_TARGET_ORDER;
   if (evTarget != null) {
     unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, evTarget);
   }
-  jass.TriggerAddAction(t, () => {
-    const e = entryMap[uid];
-    if (e == null) return;
-    syncEntryOrderDestination(e);
-  });
+  jass.TriggerAddAction(t, onSpeedEntryOrderTargetChanged);
 }
 
 /**
@@ -424,16 +451,8 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
   current.tempTimer = tempT;
 
   if (tempT) {
-    safeTimerStart(tempT, duration, false, () => {
-      const e = entryMap[uid];
-      if (e == null || e.tempTimer !== tempT) return;
-      e.tempTimer = null;
-      if (e.originalSpeed > ENGINE_SPEED_LIMIT) {
-        e.speed = e.originalSpeed;
-      } else {
-        removeEntry(uid);
-      }
-    });
+    speedBreakTempTimerCtxByHid[hid(tempT)] = uid;
+    safeTimerStart(tempT, duration, false, onSpeedBreakTempTimerExpire);
   }
 }
 

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 装备回复：使用物品时解析 hot/abilList，按段 **STES「物品治疗事件」** 分发。
  *
@@ -63,11 +64,15 @@ const { YDLocalExecuteTrigger, YDTriggerExecuteTrigger, saveParentIndex } = requ
   saveParentIndex: (trg: any) => void;
 };
 
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
+
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
-const { fourCCToString, isSpecialUnit, withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
-  withTimer: (delaySec: number, callback: () => void) => void;
 };
 
 const {
@@ -186,7 +191,7 @@ function onItemHealStesChild(this: void): void {
     let mp = rawMp;
     let filledFromItemData = false;
     if (rawHp === 0 && rawMp === 0 && !isSpecialUnit(unit)) {
-      const inf = sumHealFromItemData(unit, item, itemsData as Record<string, { hot?: string; abilList?: string }>, fourCCToString);
+      const inf = sumHealFromItemData(unit, item, itemsData as Record<string, { hot?: string; abilList?: string }>, (n) => fourCCToString(n));
       if (inf.ok) {
         hp = inf.hp;
         mp = inf.mp;
@@ -216,6 +221,29 @@ function executeSegment(
   fireItemHealEvent(unit, item, hp, mp, seg.abilId);
 }
 
+const equipHealDebounceKeyByTimerHid: Record<number, string> = {};
+const equipHealDelayCtxByTimerHid: Record<number, { unit: any; item: any; seg: { tokens: string[]; abilId: string; waitSec: number } }> = {};
+
+function onEquipHealDebounceTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  if (!t) return;
+  const hid = jass.GetHandleId(t) as number;
+  const key = equipHealDebounceKeyByTimerHid[hid];
+  delete equipHealDebounceKeyByTimerHid[hid];
+  if (key) (globalThis as any).__EquipHealExecutedKey = undefined;
+  safeDestroyTimer(t);
+}
+
+function onEquipHealDelayTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  if (!t) return;
+  const hid = jass.GetHandleId(t) as number;
+  const ctx = equipHealDelayCtxByTimerHid[hid];
+  delete equipHealDelayCtxByTimerHid[hid];
+  if (ctx) executeSegment(ctx.unit, ctx.item, ctx.seg);
+  safeDestroyTimer(t);
+}
+
 function onUseItem(this: void): void {
   let unit: any = jass.GetManipulatingUnit();
   if (unit == null) unit = jass.GetTriggerUnit();
@@ -231,9 +259,11 @@ function onUseItem(this: void): void {
   const key = tostring(unit) + "_" + idStr;
   if (glob.__EquipHealExecutedKey === key) return;
   glob.__EquipHealExecutedKey = key;
-  withTimer(0.5, () => {
-    glob.__EquipHealExecutedKey = undefined;
-  });
+  const debounceTimer = jass.CreateTimer();
+  if (debounceTimer) {
+    equipHealDebounceKeyByTimerHid[jass.GetHandleId(debounceTimer) as number] = key;
+    safeTimerStart(debounceTimer, 0.5, false, onEquipHealDebounceTimerExpire);
+  }
 
   const segments = parseEquipHealSegments(entry.hot, entry.abilList);
   for (const seg of segments) {
@@ -241,12 +271,11 @@ function onUseItem(this: void): void {
     if (seg.waitSec <= 0) {
       executeSegment(unit, item, seg);
     } else {
-      const capturedSeg = seg;
-      const capturedUnit = unit;
-      const capturedItem = item;
-      withTimer(seg.waitSec, () => {
-        executeSegment(capturedUnit, capturedItem, capturedSeg);
-      });
+      const delayTimer = jass.CreateTimer();
+      if (delayTimer) {
+        equipHealDelayCtxByTimerHid[jass.GetHandleId(delayTimer) as number] = { unit, item, seg };
+        safeTimerStart(delayTimer, seg.waitSec, false, onEquipHealDelayTimerExpire);
+      }
     }
   }
 }

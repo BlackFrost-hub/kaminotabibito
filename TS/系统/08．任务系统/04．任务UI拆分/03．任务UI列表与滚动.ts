@@ -81,7 +81,7 @@ export function isDescendantOf(japi: any, frame: number, ancestor: number): bool
   let cur: number = frame;
   for (let i = 0; i < 64; i++) {
     if (cur === ancestor) return true;
-    const p = typeof (japi as any).DzFrameGetParent === "function" ? (japi as any).DzFrameGetParent(cur) : 0;
+    const p = (japi as any).DzFrameGetParent(cur);
     if (!p || p === 0) return false;
     cur = p;
   }

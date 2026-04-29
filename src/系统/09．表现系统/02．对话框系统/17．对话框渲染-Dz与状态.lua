@@ -4,6 +4,8 @@ local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表�
 local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActivePlayerId
 local japi = require("jass.japi")
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
 ____exports.DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 对话框系统固定为 4 个玩家槽位：P1~P4。
 ____exports.MAX_PLAYERS = 4
@@ -97,7 +99,13 @@ function ____exports.dzTimerCreate(self)
 end
 function ____exports.dzTimerStart(self, t, timeout, periodic, cb)
     if t then
-        jass.TimerStart(t, timeout, periodic, cb)
+        safeTimerStart(
+            nil,
+            t,
+            timeout,
+            periodic,
+            cb
+        )
     end
 end
 function ____exports.dzTimerPause(self, t)

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 玩家单位管理器 - 基础核心
  * 职责：
@@ -27,6 +28,14 @@ function runAllFeatureSyncs(): void {
   }
 }
 
+function onPlayerUnitManagerTick(this: void): void {
+  _tickCounter++;
+  if (_tickCounter >= C.EXEC_EVERY_TICKS) {
+    _tickCounter = 0;
+    runAllFeatureSyncs();
+  }
+}
+
 export function initPlayerUnitManager(): void {
   if (_inited) return;
   _inited = true;
@@ -38,13 +47,7 @@ export function initPlayerUnitManager(): void {
     heroLinkage.initPlayerHeroGetBridge();
   }
 
-  onTick10ms(() => {
-    _tickCounter++;
-    if (_tickCounter >= C.EXEC_EVERY_TICKS) {
-      _tickCounter = 0;
-      runAllFeatureSyncs();
-    }
-  });
+  onTick10ms(onPlayerUnitManagerTick);
 }
 
 export {};

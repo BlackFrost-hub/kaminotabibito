@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * MP3音效播放
  * 播放MP3音效（可指定玩家）
@@ -21,6 +22,22 @@ setDebug("Sound3DII", false);
 // 导入最后播放的音效变量
 import { lastPlayedSound } from "./03．3D音效播放";
 
+const soundDestroyFallbackByTimerHid: Record<number, any> = {};
+
+function onSoundDestroyFallbackTimerExpire(this: void): void {
+  const expired = (jass as any).GetExpiredTimer();
+  const hid = (jass as any).GetHandleId(expired) as number;
+  const sound = soundDestroyFallbackByTimerHid[hid];
+  delete soundDestroyFallbackByTimerHid[hid];
+  (jass as any).DestroySound(sound);
+  const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
+  if (Leak && Leak.LeakWatcher && typeof Leak.LeakWatcher.destroyTimer === "function") {
+    Leak.LeakWatcher.destroyTimer(expired);
+  } else {
+    safeDestroyTimer(expired);
+  }
+}
+
 /**
  * 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积
  */
@@ -33,15 +50,8 @@ function scheduleDestroySoundIfNeeded(sound: any): void {
       ? LW.createTimer("sound_ui_fallback_destroy")
       : (jass as any).CreateTimer();
   if (!t) return;
-  safeTimerStart(t, 0.55, false, () => {
-    const expired = (jass as any).GetExpiredTimer();
-    (jass as any).DestroySound(sound);
-    if (LW && typeof LW.destroyTimer === "function") {
-      LW.destroyTimer(expired);
-    } else {
-      safeDestroyTimer(expired);
-    }
-  });
+  soundDestroyFallbackByTimerHid[(jass as any).GetHandleId(t) as number] = sound;
+  safeTimerStart(t, 0.55, false, onSoundDestroyFallbackTimerExpire);
 }
 
 /**

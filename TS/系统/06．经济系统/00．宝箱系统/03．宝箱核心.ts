@@ -332,6 +332,16 @@ function updateAllOpening(this: void): void {
   });
 }
 
+function onChestCenterTimerTick(this: void): void {
+  if (openingMap.size === 0 && movingMap.size === 0) return;
+
+  _tickCounter = _tickCounter + 1;
+  if (_tickCounter >= CENTER_TIMER_TICKS) {
+    _tickCounter = 0;
+    updateAllOpening();
+  }
+}
+
 function ensureRegisteredToCenterTimer(this: void): void {
   if (_registeredToCenterTimer) return;
   _registeredToCenterTimer = true;
@@ -340,15 +350,7 @@ const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 
-  onTick10ms(() => {
-    if (openingMap.size === 0 && movingMap.size === 0) return;
-
-    _tickCounter = _tickCounter + 1;
-    if (_tickCounter >= CENTER_TIMER_TICKS) {
-      _tickCounter = 0;
-      updateAllOpening();
-    }
-  });
+  onTick10ms(onChestCenterTimerTick);
 }
 
 // ==========================================================================================

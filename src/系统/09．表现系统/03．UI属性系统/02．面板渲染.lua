@@ -129,13 +129,7 @@ local function showDetailSlot(index, visible)
     end
 end
 local function getTriggerUiEventFrame()
-    local ____temp_2
-    if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_2 = japi.DzGetTriggerUIEventFrame()
-    else
-        ____temp_2 = 0
-    end
-    return ____temp_2
+    return japi.DzGetTriggerUIEventFrame()
 end
 local function onDetailHoverEnter()
     local frame = getTriggerUiEventFrame()

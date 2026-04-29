@@ -7,7 +7,7 @@ local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local ensureRegisteredToCenterTimer, jass, DISPLAY_DURATION_TICKS, RISE_SPEED, activeDigits, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
+local onDamageDisplayCenterTimerTick, ensureRegisteredToCenterTimer, jass, DISPLAY_DURATION_TICKS, RISE_SPEED, activeDigits, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 --- 更新所有伤害数字（由中心计时器调用）
 function ____exports.updateAllDamageDigits()
     do
@@ -33,6 +33,16 @@ end
 function ____exports.hasActiveDigits()
     return #activeDigits > 0
 end
+function onDamageDisplayCenterTimerTick()
+    if not ____exports.hasActiveDigits() then
+        return
+    end
+    _tickCounter = _tickCounter + 1
+    if _tickCounter >= CENTER_TIMER_TICKS then
+        _tickCounter = 0
+        ____exports.updateAllDamageDigits()
+    end
+end
 function ensureRegisteredToCenterTimer()
     if _registeredToCenterTimer then
         return
@@ -40,19 +50,7 @@ function ensureRegisteredToCenterTimer()
     _registeredToCenterTimer = true
     local ____G_3 = _G
     local onTick10ms = ____G_3.onTick10ms
-    onTick10ms(
-        nil,
-        function()
-            if not ____exports.hasActiveDigits() then
-                return
-            end
-            _tickCounter = _tickCounter + 1
-            if _tickCounter >= CENTER_TIMER_TICKS then
-                _tickCounter = 0
-                ____exports.updateAllDamageDigits()
-            end
-        end
-    )
+    onTick10ms(nil, onDamageDisplayCenterTimerTick)
 end
 jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")

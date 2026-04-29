@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Star扩展库 - 快速Buff系统
  *
@@ -108,6 +109,20 @@ export function SFB_Init(): void {
   (globalThis as any).SFB_Unit = SFB_Unit;
 }
 
+function onSfbPauseTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  jass.PauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
+  jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
+  safeDestroyTimer(t);
+}
+
+function onSfbExpauseTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
+  jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
+  safeDestroyTimer(t);
+}
+
 /**
  * 设置单位Buff效果
  * @param sourceUnit 来源单位（用于BuffUI显示来源信息和玩家名）
@@ -142,22 +157,12 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
       const tempTimer = jass.CreateTimer();
       jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
       jass.PauseUnit(u, true);
-      safeTimerStart(tempTimer, time, false, () => {
-        const t = jass.GetExpiredTimer();
-        jass.PauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
-        jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-        safeDestroyTimer(t);
-      });
+      safeTimerStart(tempTimer, time, false, onSfbPauseTimerExpire);
     } else if (id === 23) {
       const tempTimer = jass.CreateTimer();
       jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
       japi.EXPauseUnit(u, true);
-      safeTimerStart(tempTimer, time, false, () => {
-        const t = jass.GetExpiredTimer();
-        japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
-        jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-        safeDestroyTimer(t);
-      });
+      safeTimerStart(tempTimer, time, false, onSfbExpauseTimerExpire);
     }
     return;
   }

@@ -27,8 +27,7 @@ function handleCategoryTabClick(category: QuestType): void {
   if (!handler) return;
   const onSwitchCategory = handler.onSwitchCategory;
   onSwitchCategory(category);
-  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
-    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
   if (triggerPlayer === jass.GetLocalPlayer()) {
     const onClickSound = handler.onClickSound;
     onClickSound();
@@ -145,7 +144,7 @@ function createTaskTab(opts: {
 
   const bg = tryCreateFromFdfOnly(bgName, tabParent, contextId);
   if (bg) {
-    if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(bg);
+    (japi as any).DzFrameClearAllPoints(bg);
     setFramePointRelative(bg, FramePoint.TOPLEFT, tabParent, FramePoint.TOPLEFT, x, TAB_REL_Y);
     setFrameSize(bg, { width: TAB_FRAME_W, height: TAB_FRAME_H });
     pcallDzFrameShow(bg, true);
@@ -157,7 +156,7 @@ function createTaskTab(opts: {
 
   const tab = tryCreateFromFdfOnly(tabName, tabParent, contextId);
   if (tab) {
-    if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(tab);
+    (japi as any).DzFrameClearAllPoints(tab);
     if (bg) {
       setupTransparentGlueHitLayer(bg, tab);
     } else {

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 漂浮文字 - 回收机制
  */
@@ -14,6 +15,30 @@ let _registeredToCenterTimer = false;
 let _tickCounter = 0;
 export const RECYCLE_TICK = 0.05; // 20Hz 足够平滑且开销低
 
+function onFloatTextRecycleTick(this: void): void {
+  if (floatTextQueue.length === 0) return;
+
+  _tickCounter = _tickCounter + 1;
+  if (_tickCounter >= 5) {  // 5 * 10ms = 50ms = 0.05秒
+    _tickCounter = 0;
+
+    // 倒序遍历，便于删除
+    for (let i = floatTextQueue.length - 1; i >= 0; i--) {
+      const it = floatTextQueue[i];
+      it.ticksLeft--;
+      if (it.ticksLeft <= 0) {
+        const tt = it.tt;
+        if (tt) {
+          if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") LeakWatcher.destroyTextTag(tt);
+          else (jass as any).DestroyTextTag(tt);
+        }
+        floatTextQueue.splice(i, 1);
+      }
+    }
+    // 使用中心计时器后无法停止，但如果没有item会跳过逻辑
+  }
+}
+
 export function ensureFloatTextRecycleTimer(): void {
   if (_registeredToCenterTimer) return;
   _registeredToCenterTimer = true;
@@ -23,27 +48,5 @@ const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 
-  onTick10ms(() => {
-    if (floatTextQueue.length === 0) return;
-
-    _tickCounter = _tickCounter + 1;
-    if (_tickCounter >= 5) {  // 5 * 10ms = 50ms = 0.05秒
-      _tickCounter = 0;
-
-      // 倒序遍历，便于删除
-      for (let i = floatTextQueue.length - 1; i >= 0; i--) {
-        const it = floatTextQueue[i];
-        it.ticksLeft--;
-        if (it.ticksLeft <= 0) {
-          const tt = it.tt;
-          if (tt) {
-            if (LeakWatcher && typeof LeakWatcher.destroyTextTag === "function") LeakWatcher.destroyTextTag(tt);
-            else (jass as any).DestroyTextTag(tt);
-          }
-          floatTextQueue.splice(i, 1);
-        }
-      }
-      // 使用中心计时器后无法停止，但如果没有item会跳过逻辑
-    }
-  });
+  onTick10ms(onFloatTextRecycleTick);
 }

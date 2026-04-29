@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 镜头震动计时器封装
  */
@@ -11,8 +12,30 @@ import { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } from "./01．镜
 
 // 震动时长封装（内部使用计时器）
 const cameraTimers: Map<number, any> = new Map();
+const cameraShakeCtxByTimerHid: Record<number, { whichPlayer: any; playerId: number }> = {};
 
-export function CameraShakeForPlayer(whichPlayer: any, magnitude: number, duration: number): void {
+function onCameraShakeTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t) as number;
+  const ctx = cameraShakeCtxByTimerHid[hid];
+  delete cameraShakeCtxByTimerHid[hid];
+  if (ctx) {
+    CameraClearNoiseForPlayer(ctx.whichPlayer);
+    cameraTimers.delete(ctx.playerId);
+  }
+  safeDestroyTimer(t);
+}
+
+export function CameraShakeForPlayer(
+  whichPlayerOrSelf: any,
+  magnitudeOrPlayer: any,
+  durationOrMagnitude: any,
+  maybeDuration?: number
+): void {
+  const whichPlayer = maybeDuration !== undefined ? magnitudeOrPlayer : whichPlayerOrSelf;
+  const magnitude = maybeDuration !== undefined ? durationOrMagnitude : magnitudeOrPlayer;
+  const duration = maybeDuration !== undefined ? maybeDuration : durationOrMagnitude;
   CameraSetEQNoiseForPlayer(whichPlayer, magnitude);
   const playerId = (jass as any).GetPlayerId(whichPlayer);
   const existing = cameraTimers.get(playerId);
@@ -21,9 +44,6 @@ export function CameraShakeForPlayer(whichPlayer: any, magnitude: number, durati
   }
   const t = (jass as any).CreateTimer();
   cameraTimers.set(playerId, t);
-  safeTimerStart(t, duration, false, () => {
-    CameraClearNoiseForPlayer(whichPlayer);
-    cameraTimers.delete(playerId);
-    safeDestroyTimer(t);
-  });
+  cameraShakeCtxByTimerHid[(jass as any).GetHandleId(t) as number] = { whichPlayer, playerId };
+  safeTimerStart(t, duration, false, onCameraShakeTimerExpire);
 }

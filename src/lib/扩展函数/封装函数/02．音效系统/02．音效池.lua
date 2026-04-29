@@ -15,15 +15,38 @@ local KEY_PATH = 1004
 local KEY_ENABLED = 1005
 local KEY_ENABLED_SLOT_BASE = 2000
 local POOL_MAX = 4
+local function onSoundPoolTimerExpire()
+    local expiredTimer = jass.GetExpiredTimer()
+    local s = jass.LoadSoundHandle(
+        hash,
+        jass.GetHandleId(expiredTimer),
+        KEY_SOUND
+    )
+    if s then
+        local idx = jass.LoadInteger(
+            hash,
+            jass.GetHandleId(s),
+            KEY_INDEX
+        )
+        local p = jass.LoadStr(
+            hash,
+            jass.GetHandleId(s),
+            KEY_PATH
+        )
+        local ph = jass.StringHash(p)
+        jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
+    end
+    safeDestroyTimer(nil, expiredTimer)
+end
 local defaultSoundModel
-function ____exports.setDefaultSoundModel(self, model)
+function ____exports.setDefaultSoundModel(model)
     defaultSoundModel = model
 end
-function ____exports.getDefaultSoundModel(self)
+function ____exports.getDefaultSoundModel()
     return defaultSoundModel
 end
 --- 创建新音效（内部使用）
-function ____exports.createSoundInternal(self, path, cutoff, index, x, y, z, is3d, model)
+function ____exports.createSoundInternal(path, cutoff, index, x, y, z, is3d, model)
     if model == nil then
         model = defaultSoundModel
     end
@@ -83,34 +106,12 @@ function ____exports.createSoundInternal(self, path, cutoff, index, x, y, z, is3
         timer,
         duration,
         false,
-        function()
-            local expiredTimer = jass.GetExpiredTimer()
-            local s = jass.LoadSoundHandle(
-                hash,
-                jass.GetHandleId(expiredTimer),
-                KEY_SOUND
-            )
-            if s then
-                local idx = jass.LoadInteger(
-                    hash,
-                    jass.GetHandleId(s),
-                    KEY_INDEX
-                )
-                local p = jass.LoadStr(
-                    hash,
-                    jass.GetHandleId(s),
-                    KEY_PATH
-                )
-                local ph = jass.StringHash(p)
-                jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
-            end
-            safeDestroyTimer(nil, expiredTimer)
-        end
+        onSoundPoolTimerExpire
     )
     return sound
 end
 --- 获取已存在的音效（内部使用）
-function ____exports.getSoundInternal(self, path, cutoff, index, x, y, z, model)
+function ____exports.getSoundInternal(path, cutoff, index, x, y, z, model)
     if model == nil then
         model = defaultSoundModel
     end
@@ -155,29 +156,7 @@ function ____exports.getSoundInternal(self, path, cutoff, index, x, y, z, model)
             newTimer,
             duration,
             false,
-            function()
-                local expiredTimer = jass.GetExpiredTimer()
-                local s = jass.LoadSoundHandle(
-                    hash,
-                    jass.GetHandleId(expiredTimer),
-                    KEY_SOUND
-                )
-                if s then
-                    local idx = jass.LoadInteger(
-                        hash,
-                        jass.GetHandleId(s),
-                        KEY_INDEX
-                    )
-                    local p = jass.LoadStr(
-                        hash,
-                        jass.GetHandleId(s),
-                        KEY_PATH
-                    )
-                    local ph = jass.StringHash(p)
-                    jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
-                end
-                safeDestroyTimer(nil, expiredTimer)
-            end
+            onSoundPoolTimerExpire
         )
     end
     jass.SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)

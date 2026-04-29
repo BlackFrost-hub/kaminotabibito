@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 任务管理器（单例）
  *
@@ -89,17 +90,7 @@ export class QuestManager {
       ((globalThis as any).__questTimers = new Map<number, { playerId: number; questId: string }>());
     timerData.set(timer, { playerId, questId });
 
-    safeTimerStart(timer, quest.timeLimit, false, () => {
-      const expired = jass.GetExpiredTimer();
-      const data = (globalThis as any).__questTimers?.get(expired);
-      if (data) {
-        questDebugPrint(`任务 ${data.questId} 时间到期`);
-        QuestManager.getInstance().onQuestFailed(data.playerId, data.questId);
-        (globalThis as any).__questTimers.delete(expired);
-      }
-      jass.PauseTimer(expired);
-      safeDestroyTimer(expired);
-    });
+    safeTimerStart(timer, quest.timeLimit, false, onQuestTimeLimitTimerExpire);
 
     questDebugPrint(`已为任务 ${questId} 设置 ${quest.timeLimit} 秒时间限制`);
   }
@@ -275,6 +266,18 @@ export class QuestManager {
       questCount: allQuests.length,
     };
   }
+}
+
+function onQuestTimeLimitTimerExpire(this: void): void {
+  const expired = jass.GetExpiredTimer();
+  const data = (globalThis as any).__questTimers?.get(expired);
+  if (data) {
+    questDebugPrint(`任务 ${data.questId} 时间到期`);
+    questManager.onQuestFailed(data.playerId, data.questId);
+    (globalThis as any).__questTimers.delete(expired);
+  }
+  jass.PauseTimer(expired);
+  safeDestroyTimer(expired);
 }
 
 /** 模块加载后即存在的单例引用；`05．事件桥接` 与其它系统统一使用此变量 */

@@ -44,12 +44,14 @@ function dispatchPlayerUnitEvent(key: string): void {
   }
 }
 
+function dispatchPlayerUnitEventMaster(): void {
+  dispatchPlayerUnitEvent(currentEventKey());
+}
+
 function ensureMasterTrigger(): any {
   if (masterTrigger) return masterTrigger;
   masterTrigger = jass.CreateTrigger();
-  jass.TriggerAddAction(masterTrigger, () => {
-    dispatchPlayerUnitEvent(currentEventKey());
-  });
+  jass.TriggerAddAction(masterTrigger, dispatchPlayerUnitEventMaster);
   return masterTrigger;
 }
 

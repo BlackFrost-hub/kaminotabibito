@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 技能吟唱条系统 - 渲染层
  *
@@ -263,6 +264,16 @@ let _registeredToCenterTimer = false;
 let _tickCounter = 0;
 const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 
+function onCastBarCenterTimerTick(this: void): void {
+  if (castBarDataMap.size === 0) return;
+
+  _tickCounter = _tickCounter + 1;
+  if (_tickCounter >= CENTER_TIMER_TICKS) {
+    _tickCounter = 0;
+    updateAllCastBars();
+  }
+}
+
 function ensureRegisteredToCenterTimer(this: void): void {
   if (_registeredToCenterTimer) return;
   _registeredToCenterTimer = true;
@@ -271,15 +282,7 @@ const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 
-  onTick10ms(() => {
-    if (castBarDataMap.size === 0) return;
-
-    _tickCounter = _tickCounter + 1;
-    if (_tickCounter >= CENTER_TIMER_TICKS) {
-      _tickCounter = 0;
-      updateAllCastBars();
-    }
-  });
+  onTick10ms(onCastBarCenterTimerTick);
 }
 
 // ==========================================================================================

@@ -2,10 +2,21 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
+local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
+local setIgnoredTarget = ____04_FF0EDOT_5DE5_5177.setIgnoredTarget
 local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWETimerDestroyEffect = ____require_result_0.YDWETimerDestroyEffect
 --- DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致）
+local __pcallPausedUnit = 0
+local __pcallPausedResult = false
+local function __pcallIsUnitPausedBody(self)
+    local fn = unitBjExt.IsUnitPausedBJ
+    if fn ~= nil then
+        __pcallPausedResult = fn(nil, __pcallPausedUnit) == true
+    end
+end
 local function isDotTargetPaused(self, u)
     if u == nil or u == 0 then
         return false
@@ -14,14 +25,18 @@ local function isDotTargetPaused(self, u)
     if fn == nil then
         return false
     end
-    local paused = false
-    pcall(function ()
-            paused = fn(nil, u) == true
-        end
-    )
-    return paused
+    __pcallPausedUnit = u
+    __pcallPausedResult = false
+    pcall(__pcallIsUnitPausedBody)
+    return __pcallPausedResult
 end
 function ____exports.createDotExecutor(self, deps)
+    local jass = deps.jass
+    local LeakWatcher = deps.LeakWatcher
+    local dotTypes = deps.dotTypes
+    local dotTicks = deps.dotTicks
+    local unitHid = deps.unitHid
+    local damageEventModule = deps.damageEventModule
     local dotTimer = nil
     local dotTickBatchTargetHids = nil
     local dotBatchSnapForClear = nil
@@ -30,7 +45,7 @@ function ____exports.createDotExecutor(self, deps)
         if not unit or not model or model == "" then
             return
         end
-        local eff = deps.jass.AddSpecialEffectTarget(model, unit, "origin")
+        local eff = jass.AddSpecialEffectTarget(model, unit, "origin")
         if eff == nil then
             return
         end
@@ -41,70 +56,69 @@ function ____exports.createDotExecutor(self, deps)
             return
         end
         local cfg = __TS__ArrayFind(
-            deps.dotTypes,
+            dotTypes,
             function(____, c) return c.id == typeId end
         )
         if cfg == nil then
             return
         end
-        local dh = deps:unitHid(target)
+        local dh = unitHid(nil, target)
         do
             local di = 0
-            while di < #deps.dotTypes do
-                local tid = deps.dotTypes[di + 1].id
-                if deps.ignoredTargetByType[tid] == nil then
-                    deps.ignoredTargetByType[tid] = {}
-                end
-                deps.ignoredTargetByType[tid][dh] = true
+            while di < #dotTypes do
+                local tid = dotTypes[di + 1].id
+                setIgnoredTarget(nil, tid, dh)
                 di = di + 1
             end
         end
-        if type(deps.damageEventModule.markNextPendingDamageAsDotTickBatch) == "function" then
-            deps.damageEventModule:markNextPendingDamageAsDotTickBatch()
+        if type(damageEventModule.markNextPendingDamageAsDotTickBatch) == "function" then
+            damageEventModule:markNextPendingDamageAsDotTickBatch()
         end
-        deps.jass.UnitDamageTarget(
+        jass.UnitDamageTarget(
             source,
             target,
             amount,
             false,
             false,
-            deps.jass.ATTACK_TYPE_NORMAL,
+            jass.ATTACK_TYPE_NORMAL,
             cfg.damageType,
-            deps.jass.WEAPON_TYPE_WHOKNOWS
+            jass.WEAPON_TYPE_WHOKNOWS
         )
     end
     local function dotTickRun(self)
         local buffM = require("系统.05．Buff系统.00．Buff系统")
+        local _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid
+        local _DOT_TYPE_TO_BUFF_ID = buffM.DOT_TYPE_TO_BUFF_ID
         do
-            local i = #deps.dotTicks - 1
+            local i = #dotTicks - 1
             while i >= 0 do
-                local e = deps.dotTicks[i + 1]
-                local eh = deps:unitHid(e.target)
+                local e = dotTicks[i + 1]
+                local eh = unitHid(nil, e.target)
                 local ____temp_1
-                if buffM.DOT_TYPE_TO_BUFF_ID ~= nil then
-                    ____temp_1 = buffM.DOT_TYPE_TO_BUFF_ID[e.typeId]
+                if _DOT_TYPE_TO_BUFF_ID ~= nil then
+                    ____temp_1 = _DOT_TYPE_TO_BUFF_ID[e.typeId]
                 else
                     ____temp_1 = nil
                 end
                 local bid = ____temp_1
                 local ____temp_2
-                if bid ~= nil and bid ~= "" and type(buffM.getBuffRuntimeByHid) == "function" then
-                    ____temp_2 = buffM:getBuffRuntimeByHid(eh, bid)
+                if bid ~= nil and bid ~= "" and type(_getBuffRuntimeByHid) == "function" then
+                    ____temp_2 = _getBuffRuntimeByHid(nil, eh, bid)
                 else
                     ____temp_2 = nil
                 end
                 local rt = ____temp_2
                 if rt == nil or rt.remaining <= 0.001 then
-                    __TS__ArraySplice(deps.dotTicks, i, 1)
+                    __TS__ArraySplice(dotTicks, i, 1)
                 end
                 i = i - 1
             end
         end
         local toRun = {}
         do
-            local i = #deps.dotTicks - 1
+            local i = #dotTicks - 1
             while i >= 0 do
-                local e = deps.dotTicks[i + 1]
+                local e = dotTicks[i + 1]
                 if not isDotTargetPaused(nil, e.target) then
                     toRun[#toRun + 1] = e
                 end
@@ -115,7 +129,7 @@ function ____exports.createDotExecutor(self, deps)
         do
             local bi = 0
             while bi < #toRun do
-                local bh = deps:unitHid(toRun[bi + 1].target)
+                local bh = unitHid(nil, toRun[bi + 1].target)
                 if bh ~= 0 then
                     batch[bh] = true
                 end
@@ -131,7 +145,7 @@ function ____exports.createDotExecutor(self, deps)
             local ri = 0
             while ri < #toRun do
                 local e = toRun[ri + 1]
-                local eh = deps:unitHid(e.target)
+                local eh = unitHid(nil, e.target)
                 dealDamageForType(
                     nil,
                     e.typeId,
@@ -141,22 +155,10 @@ function ____exports.createDotExecutor(self, deps)
                 )
                 addDotEffectOnUnit(nil, e.target, e.effectModel, e.effectDuration)
                 local cfg = __TS__ArrayFind(
-                    deps.dotTypes,
+                    dotTypes,
                     function(____, c) return c.id == e.typeId end
                 )
-                local stTab = deps.stateByType[e.typeId]
-                local ____temp_4
-                if stTab ~= nil then
-                    local ____temp_3 = deps:tabRowForHid(stTab, eh)
-                    if ____temp_3 == nil then
-                        ____temp_3 = stTab[e.target]
-                    end
-                    ____temp_4 = ____temp_3
-                else
-                    ____temp_4 = nil
-                end
-                local stateRaw = ____temp_4
-                local state = deps:isValidDotStateRow(stateRaw) and stateRaw or nil
+                local state = getDotState(nil, e.typeId, eh)
                 if cfg ~= nil and type(cfg.onTick) == "function" and state ~= nil then
                     cfg:onTick(e.target, state)
                 end
@@ -168,8 +170,8 @@ function ____exports.createDotExecutor(self, deps)
             dotBatchSnapForClear = nil
             dotBatchDeferredRemaining = 0
         end
-        if #deps.dotTicks == 0 and dotTimer ~= nil then
-            deps.LeakWatcher:destroyTimer(dotTimer)
+        if #dotTicks == 0 and dotTimer ~= nil then
+            LeakWatcher:destroyTimer(dotTimer)
             dotTimer = nil
         end
     end
@@ -179,8 +181,8 @@ function ____exports.createDotExecutor(self, deps)
             return
         end
         _registeredToCenterTimer = true
-        local ____G_5 = _G
-        local onSecond = ____G_5.onSecond
+        local ____G_3 = _G
+        local onSecond = ____G_3.onSecond
         onSecond(nil, dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)

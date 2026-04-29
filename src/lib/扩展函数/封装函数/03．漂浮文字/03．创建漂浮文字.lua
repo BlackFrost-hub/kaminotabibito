@@ -98,7 +98,7 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
             jass.R2I(duration / RECYCLE_TICK + 0.999)
         )
         floatTextQueue[#floatTextQueue + 1] = {tt = textTag, ticksLeft = ticks}
-        ensureFloatTextRecycleTimer(nil)
+        ensureFloatTextRecycleTimer()
     end
     _G.lastCreatedTextTag = textTag
     return textTag

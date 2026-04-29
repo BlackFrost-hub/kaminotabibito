@@ -65,9 +65,7 @@ function ____exports.createHiddenText(self, ctx, name, parent, width, height)
     if not frame then
         return nil
     end
-    if type(japi.DzFrameShow) == "function" then
-        japi.DzFrameShow(frame, false)
-    end
+    japi.DzFrameShow(frame, false)
     return frame
 end
 function ____exports.createHiddenBackdrop(self, ctx, templateName, frameName, parent, texture, contextId)

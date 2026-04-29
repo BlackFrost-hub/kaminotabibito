@@ -56,3 +56,92 @@ export function getDotSourceDisplayName(u: any): string {
   return "未知";
 }
 
+// ========== 虚拟分区：扁平化存储（禁止 state[x][y] 二级链式） ==========
+/**
+ * 扁平化存储：key 格式 "typeId|hid"（typeId 字符串，hid 纯数字）
+ * 禁止使用 stateByType[typeId][hid] 形式的二级链式索引
+ * 排序规则：先按 typeId 字符串字典序，再按 hid 数值（固定语义，勿改）
+ */
+export const dotStateFlat: Record<string, DotState> = {};
+export const ignoredTargetFlat: Record<string, boolean> = {};
+
+/** 生成扁平 key */
+export function makeDotFlatKey(typeId: string, hid: number): string {
+  return `${typeId}|${hid}`;
+}
+
+/** 严格纯数字解析：整串必须为十进制数字且 > 0，不接受 "123abc" 之类 */
+function parseStrictPositiveInt(s: string): number | null {
+  if (s === "") return null;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s.substring(i, i + 1);
+    if (ch < "0" || ch > "9") return null;
+  }
+  const n = parseInt(s, 10);
+  if (isNaN(n) || n <= 0) return null;
+  return n;
+}
+
+/** 解析扁平 key - 使用字符串操作而非正则（TSTL 不支持正则） */
+export function parseDotFlatKey(key: string): { typeId: string; hid: number } | null {
+  const idx = key.indexOf("|");
+  if (idx <= 0) return null;
+  const typeId = key.substring(0, idx);
+  const hidStr = key.substring(idx + 1);
+  const hid = parseStrictPositiveInt(hidStr);
+  if (typeId === "" || hid === null) return null;
+  return { typeId, hid };
+}
+
+/** 读取 DOT 状态 */
+export function getDotState(typeId: string, hid: number): DotState | null {
+  const key = makeDotFlatKey(typeId, hid);
+  const state = dotStateFlat[key];
+  return isValidDotStateRow(state) ? state : null;
+}
+
+/** 写入 DOT 状态 */
+export function setDotState(typeId: string, hid: number, state: DotState): void {
+  const key = makeDotFlatKey(typeId, hid);
+  dotStateFlat[key] = state;
+}
+
+/** 删除 DOT 状态 */
+export function deleteDotState(typeId: string, hid: number): void {
+  const key = makeDotFlatKey(typeId, hid);
+  delete dotStateFlat[key];
+}
+
+/** 设置忽略目标 */
+export function setIgnoredTarget(typeId: string, hid: number): void {
+  ignoredTargetFlat[makeDotFlatKey(typeId, hid)] = true;
+}
+
+/** 清除忽略目标 */
+export function clearIgnoredTarget(typeId: string, hid: number): void {
+  delete ignoredTargetFlat[makeDotFlatKey(typeId, hid)];
+}
+
+/** 检查忽略目标 */
+export function isIgnoredTarget(typeId: string, hid: number): boolean {
+  return ignoredTargetFlat[makeDotFlatKey(typeId, hid)] === true;
+}
+
+/**
+ * 收集所有活跃的 (typeId, hid) 对，按数值排���
+ * 排序：先按 typeId 字符串字典序，再按 hid 数值（固定语义）
+ */
+export function collectActiveDotPairs(): { typeId: string; hid: number }[] {
+  const out: { typeId: string; hid: number }[] = [];
+  for (const k in dotStateFlat) {
+    const p = parseDotFlatKey(k);
+    if (p) out.push(p);
+  }
+  // 固定排序语义：先 typeId 字典序，再 hid 数值
+  out.sort((a, b) => {
+    if (a.typeId !== b.typeId) return a.typeId < b.typeId ? -1 : (a.typeId > b.typeId ? 1 : 0);
+    return a.hid - b.hid;
+  });
+  return out;
+}
+

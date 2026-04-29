@@ -76,9 +76,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
         )
     end
     if entryText ~= nil and entryText ~= 0 then
-        if type(japi.DzFrameSetText) == "function" then
-            japi.DzFrameSetText(entryText, "|cffffcc00任务(J)|r")
-        end
+        japi.DzFrameSetText(entryText, "|cffffcc00任务(J)|r")
         applyDzTextFontAndCenterAlignment(nil, entryText)
     end
     local ____createFrame_result_2 = createFrame(nil, {
@@ -95,9 +93,7 @@ function ____exports.buildTaskEntryIcon(self, opts)
     end
     local btn = ____createFrame_result_2
     if btn then
-        if type(japi.DzFrameSetAllPoints) == "function" then
-            japi.DzFrameSetAllPoints(btn, entryFrame)
-        end
+        japi.DzFrameSetAllPoints(btn, entryFrame)
         setFrameClickEvent(nil, btn, onTogglePanel, true)
     end
     return {entryFrame = entryFrame, entryText = entryText}

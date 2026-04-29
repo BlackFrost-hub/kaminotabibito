@@ -55,7 +55,6 @@ function findTaskRowBindingFrame(frame: number): number {
   for (let i = 0; i < 16; i++) {
     if (!cur || cur === 0) return 0;
     if (taskRowBindingByFrameId[cur] !== undefined) return cur;
-    if (typeof (japi as any).DzFrameGetParent !== "function") return 0;
     cur = (japi as any).DzFrameGetParent(cur);
   }
   return 0;
@@ -278,12 +277,12 @@ export interface TaskUIListControlContext {
 
 function setText(frame: number | null, text: string): void {
   if (!frame || frame === 0) return;
-  if (typeof (japi as any).DzFrameSetText === "function") (japi as any).DzFrameSetText(frame, text);
+  (japi as any).DzFrameSetText(frame, text);
 }
 
 export function setVisible(frame: number | null, visible: boolean): void {
   if (!frame || frame === 0) return;
-  if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(frame, visible);
+  (japi as any).DzFrameShow(frame, visible);
 }
 
 function hideFrames(frames: Array<number | null>): void {
@@ -291,9 +290,8 @@ function hideFrames(frames: Array<number | null>): void {
 }
 
 export function handleTaskRowClick(): void {
-  let frame =
-    typeof (japi as any).DzGetTriggerUIEventFrame === "function" ? (japi as any).DzGetTriggerUIEventFrame() : 0;
-  if (!frame && typeof (japi as any).DzGetMouseFocus === "function") {
+  let frame = (japi as any).DzGetTriggerUIEventFrame();
+  if (!frame) {
     frame = (japi as any).DzGetMouseFocus();
   }
   const bindingFrame = findTaskRowBindingFrame(frame);
@@ -303,8 +301,7 @@ export function handleTaskRowClick(): void {
   const questId = binding.page.questIds[binding.rowIndex];
   if (!questId) return;
   currentTaskRowExpandHandler?.(binding.rowIndex);
-  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
-    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
   if (triggerPlayer === jass.GetLocalPlayer()) {
     currentTaskRowClickSound?.();
   }
@@ -312,8 +309,7 @@ export function handleTaskRowClick(): void {
 
 function handleTaskRowClickByRowIndex(rowIndex: number): void {
   currentTaskRowExpandHandler?.(rowIndex);
-  const triggerPlayer = typeof (japi as any).DzGetTriggerKeyPlayer === "function"
-    ? (japi as any).DzGetTriggerKeyPlayer() : jass.GetLocalPlayer();
+  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
   if (triggerPlayer === jass.GetLocalPlayer()) {
     currentTaskRowClickSound?.();
   }

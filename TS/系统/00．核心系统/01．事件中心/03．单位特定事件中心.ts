@@ -14,10 +14,12 @@ type Listener = {
 const unitEventListeners: Record<string, Listener[]> = {};
 const unitEventRegistered: Record<string, boolean> = {};
 const unitEventMasters: Record<string, any> = {};
+const unitEventKeyByMasterHid: Record<string, string> = {};
 
 const unitInRangeListeners: Record<string, Listener[]> = {};
 const unitInRangeRegistered: Record<string, boolean> = {};
 const unitInRangeMasters: Record<string, any> = {};
+const unitInRangeKeyByMasterHid: Record<string, string> = {};
 
 function handleKey(handle: any): string {
   return tostring(handle);
@@ -66,6 +68,22 @@ function dispatchListeners(list: Listener[]): void {
   }
 }
 
+function dispatchUnitEventMaster(): void {
+  const trig = jass.GetTriggeringTrigger();
+  if (!trig) return;
+  const key = unitEventKeyByMasterHid[tostring(jass.GetHandleId(trig))];
+  if (!key) return;
+  dispatchListeners(unitEventListeners[key] || []);
+}
+
+function dispatchUnitInRangeMaster(): void {
+  const trig = jass.GetTriggeringTrigger();
+  if (!trig) return;
+  const key = unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(trig))];
+  if (!key) return;
+  dispatchListeners(unitInRangeListeners[key] || []);
+}
+
 function addListener(store: Record<string, Listener[]>, key: string, trigger: any, once: boolean): () => void {
   store[key] = store[key] || [];
   const list = store[key];
@@ -98,10 +116,9 @@ export function registerUnitEventTrigger(
     unitEventMasters[key] = master;
     unitEventRegistered[key] = true;
     unitEventListeners[key] = unitEventListeners[key] || [];
+    unitEventKeyByMasterHid[tostring(jass.GetHandleId(master))] = key;
     jass.TriggerRegisterUnitEvent(master, unit, eventId);
-    jass.TriggerAddAction(master, () => {
-      dispatchListeners(unitEventListeners[key]);
-    });
+    jass.TriggerAddAction(master, dispatchUnitEventMaster);
   }
 
   return addListener(unitEventListeners, key, trigger, once);
@@ -123,10 +140,9 @@ export function registerUnitInRangeTrigger(
     unitInRangeMasters[key] = master;
     unitInRangeRegistered[key] = true;
     unitInRangeListeners[key] = unitInRangeListeners[key] || [];
+    unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(master))] = key;
     jass.TriggerRegisterUnitInRange(master, unit, range, normalizedFilter);
-    jass.TriggerAddAction(master, () => {
-      dispatchListeners(unitInRangeListeners[key]);
-    });
+    jass.TriggerAddAction(master, dispatchUnitInRangeMaster);
   }
 
   return addListener(unitInRangeListeners, key, trigger, once);

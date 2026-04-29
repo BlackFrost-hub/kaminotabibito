@@ -89,7 +89,7 @@ function ____exports.buildBuffBarViewModel(unit)
         )
         return {slots = slots}
     end
-    local inBuffPool = buffPoolMod:isUnitInBuffPool(unit)
+    local inBuffPool = buffPoolMod.isUnitInBuffPool(unit)
     if not inBuffPool then
         debugLog(
             nil,
@@ -100,7 +100,7 @@ function ____exports.buildBuffBarViewModel(unit)
         )
         return {slots = slots}
     end
-    local ids = buffPoolMod:getBuffIdsOnUnit(unit)
+    local ids = buffPoolMod.getBuffIdsOnUnit(unit)
     debugLog(
         nil,
         "BuffUI.VM",
@@ -113,14 +113,14 @@ function ____exports.buildBuffBarViewModel(unit)
         local i = 0
         while i < #ids do
             local bid = ids[i + 1]
-            local rt = buffPoolMod:getBuffRuntime(unit, bid)
+            local rt = buffPoolMod.getBuffRuntime(unit, bid)
             if rt then
                 rows[#rows + 1] = {
                     id = bid,
                     state = {
                         effect = rt.effect,
                         remaining = rt.remaining,
-                        iconRemaining = buffPoolMod:getDotIconDisplayRemaining(unit, bid, rt.remaining),
+                        iconRemaining = buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
                         sourceName = rt.sourceName,
                         _dotParsedDuration = rt._dotParsedDuration
                     },

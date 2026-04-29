@@ -265,6 +265,10 @@ export function autoRegisterNeutralAggressive(unit: any): void {
   }
 }
 
+function onAutoRegisterNeutralAggressive(): void {
+  autoRegisterNeutralAggressive(jass.GetTriggerUnit());
+}
+
 function initAutoRegister(): void {
   if (!unitCreatedTrigger) {
     unitCreatedTrigger = jass.CreateTrigger();
@@ -277,9 +281,7 @@ function initAutoRegister(): void {
     const neutralAggressive = (jass as any).Player(AI_PLAYER_NEUTRAL_AGGRESSIVE);
     playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent);
 
-    jass.TriggerAddAction(unitCreatedTrigger, () => {
-      autoRegisterNeutralAggressive(jass.GetTriggerUnit());
-    });
+    jass.TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive);
   }
 }
 

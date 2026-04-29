@@ -240,6 +240,16 @@ let _registeredToCenterTimer = false;
 let _tickCounter = 0;
 const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 
+function onDamageDisplayCenterTimerTick(this: void): void {
+  if (!hasActiveDigits()) return;
+
+  _tickCounter = _tickCounter + 1;
+  if (_tickCounter >= CENTER_TIMER_TICKS) {
+    _tickCounter = 0;
+    updateAllDamageDigits();
+  }
+}
+
 function ensureRegisteredToCenterTimer(this: void): void {
   if (_registeredToCenterTimer) return;
   _registeredToCenterTimer = true;
@@ -248,13 +258,5 @@ const { onTick10ms } = globalThis as unknown as {
     onTick10ms: (callback: () => void) => void;
   };
 
-  onTick10ms(() => {
-    if (!hasActiveDigits()) return;
-
-    _tickCounter = _tickCounter + 1;
-    if (_tickCounter >= CENTER_TIMER_TICKS) {
-      _tickCounter = 0;
-      updateAllDamageDigits();
-    }
-  });
+  onTick10ms(onDamageDisplayCenterTimerTick);
 }

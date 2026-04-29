@@ -30,7 +30,6 @@ function ____exports.createBubbleEffect(self, playerId, npcUnit)
         return
     end
     if createUnitEffect(
-        nil,
         npcUnit,
         "overhead",
         BUBBLE_EFFECT_PATH,
@@ -44,7 +43,7 @@ function ____exports.destroyBubbleEffect(self, playerId)
     cancelBubbleEffectSchedule(nil, playerId)
     local bubbleUnit = g_bubbleEffects[playerId + 1]
     if bubbleUnit then
-        destroyUnitEffect(nil, bubbleUnit, NPC_BUBBLE_EFFECT_KEY)
+        destroyUnitEffect(bubbleUnit, NPC_BUBBLE_EFFECT_KEY)
     end
     g_bubbleEffects[playerId + 1] = nil
 end
@@ -125,7 +124,7 @@ local function destroyNpcPromptEffectInternal(self, unit)
         return false
     end
     local hadQuestMarker = g_npcPromptEffectByHandle:get(key) == true
-    destroyUnitEffect(nil, unit, NPC_PROMPT_EFFECT_KEY)
+    destroyUnitEffect(unit, NPC_PROMPT_EFFECT_KEY)
     g_npcPromptEffectByHandle:delete(key)
     return hadQuestMarker
 end
@@ -139,7 +138,6 @@ local function attachNpcPromptEffect(self, unit, modelPath)
     end
     destroyNpcPromptEffectInternal(nil, unit)
     if createUnitEffect(
-        nil,
         unit,
         "overhead",
         modelPath,

@@ -5,7 +5,7 @@ local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local initAutoRegister, jass, playerUnitEvent, aiUnitRegistry, unitCreatedTrigger
+local onAutoRegisterNeutralAggressive, initAutoRegister, jass, playerUnitEvent, aiUnitRegistry, unitCreatedTrigger
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.00．常量定义")
 local AI_SKILL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_SKILL_SYSTEM_ENABLED
 local AI_CHECK_INTERVAL = ____00_FF0E_5E38_91CF_5B9A_4E49.AI_CHECK_INTERVAL
@@ -54,6 +54,12 @@ function ____exports.autoRegisterNeutralAggressive(self, unit)
         end
     end
 end
+function onAutoRegisterNeutralAggressive(self)
+    ____exports.autoRegisterNeutralAggressive(
+        nil,
+        jass.GetTriggerUnit()
+    )
+end
 function initAutoRegister(self)
     if not unitCreatedTrigger then
         unitCreatedTrigger = jass.CreateTrigger()
@@ -67,15 +73,7 @@ function initAutoRegister(self)
         end
         local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
         playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent)
-        jass.TriggerAddAction(
-            unitCreatedTrigger,
-            function()
-                ____exports.autoRegisterNeutralAggressive(
-                    nil,
-                    jass.GetTriggerUnit()
-                )
-            end
-        )
+        jass.TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive)
     end
 end
 jass = require("jass.common")

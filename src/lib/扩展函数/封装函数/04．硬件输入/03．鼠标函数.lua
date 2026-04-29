@@ -13,57 +13,30 @@ local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____require_result_0.RMaxBJ
 function ____exports.getMouseTerrainX(self)
-    if type(japi.DzGetMouseTerrainX) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseTerrainX()
 end
 function ____exports.getMouseTerrainY(self)
-    if type(japi.DzGetMouseTerrainY) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseTerrainY()
 end
 function ____exports.getMouseTerrainZ(self)
-    if type(japi.DzGetMouseTerrainZ) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseTerrainZ()
 end
 function ____exports.isMouseOverUI(self)
-    if type(japi.DzIsMouseOverUI) ~= "function" then
-        return false
-    end
     return not not japi.DzIsMouseOverUI()
 end
 function ____exports.getMouseX(self)
-    if type(japi.DzGetMouseX) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseX()
 end
 function ____exports.getMouseY(self)
-    if type(japi.DzGetMouseY) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseY()
 end
 function ____exports.getMouseXRelative(self)
-    if type(japi.DzGetMouseXRelative) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseXRelative()
 end
 function ____exports.getMouseYRelative(self)
-    if type(japi.DzGetMouseYRelative) ~= "function" then
-        return 0
-    end
     return japi.DzGetMouseYRelative()
 end
 function ____exports.setMousePos(self, x, y)
-    if type(japi.DzSetMousePos) ~= "function" then
-        return
-    end
     japi.DzSetMousePos(x, y)
 end
 --- 纵向 UI 归一化行程（如 LIST_VIEW_H - thumb）→ 与 Dz 纵向 0..0.6 对应的像素行程（任务分页滑块拖拽等）
@@ -76,7 +49,7 @@ end
 -- 
 -- @param sync `true` 直接注册；`false` 必须经 `runFalseLocalRegistration`（禁止业务裸调 `DzTriggerRegisterMouseEventByCode`）
 function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, sync, action, playerId)
-    if not trig or type(japi.DzTriggerRegisterMouseEventByCode) ~= "function" then
+    if not trig then
         return
     end
     if sync then
@@ -105,7 +78,7 @@ function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, syn
 end
 --- 全局鼠标移动 ByCode；契约同 `registerMouseWheel` / `registerMouseButtonEventByCode`。
 function ____exports.registerMouseMoveEventByCode(self, trig, sync, action, playerId)
-    if not trig or type(japi.DzTriggerRegisterMouseMoveEventByCode) ~= "function" then
+    if not trig then
         return
     end
     if sync then

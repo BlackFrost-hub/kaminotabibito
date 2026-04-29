@@ -1,11 +1,13 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- 控制抗性系统初始化
 -- 
 -- 通过统一技能事件系统监听控制技能
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local createDelayedCall = ____require_result_0.createDelayedCall
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
 local isExcludedFromControlResist = ____require_result_1.isExcludedFromControlResist
 local isControlAbility = ____require_result_1.isControlAbility
@@ -25,7 +27,30 @@ local ALLOWED_PLAYERS = {
     7,
     jass.PLAYER_NEUTRAL_AGGRESSIVE
 }
-local function isAllowedPlayer(self, player)
+local controlResistCtxByTimerHid = {}
+local function onControlResistTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = controlResistCtxByTimerHid[hid]
+    __TS__Delete(controlResistCtxByTimerHid, hid)
+    safeDestroyTimer(nil, t)
+    if not ctx then
+        return
+    end
+    if isUnitControlled(nil, ctx.target) then
+        recastControlAbility(
+            nil,
+            ctx.caster,
+            ctx.target,
+            ctx.abilityId,
+            ctx.duration
+        )
+    end
+end
+local function isAllowedPlayer(player)
     local id = jass.GetPlayerId(player)
     do
         local i = 0
@@ -38,11 +63,8 @@ local function isAllowedPlayer(self, player)
     end
     return false
 end
-local function onSpellChannel(self, caster, abilityId)
-    if not isAllowedPlayer(
-        nil,
-        jass.GetOwningPlayer(caster)
-    ) then
+local function onSpellChannel(caster, abilityId)
+    if not isAllowedPlayer(jass.GetOwningPlayer(caster)) then
         return
     end
     if isExcludedFromControlResist(nil, caster) then
@@ -59,24 +81,20 @@ local function onSpellChannel(self, caster, abilityId)
         return
     end
     local duration = calcReducedControlTime(nil, target, abilityId)
-    createDelayedCall(
-        nil,
-        0,
-        function()
-            if isUnitControlled(nil, target) then
-                recastControlAbility(
-                    nil,
-                    caster,
-                    target,
-                    abilityId,
-                    duration
-                )
-            end
-        end
-    )
+    local t = jass.CreateTimer()
+    if t then
+        controlResistCtxByTimerHid[jass.GetHandleId(t)] = {caster = caster, target = target, abilityId = abilityId, duration = duration}
+        safeTimerStart(
+            nil,
+            t,
+            0,
+            false,
+            onControlResistTimerExpire
+        )
+    end
 end
 local _initialized = false
-function ____exports.initControlResist(self)
+function ____exports.initControlResist()
     if _initialized then
         return
     end

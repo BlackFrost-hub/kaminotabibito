@@ -18,7 +18,7 @@ local function getOrCreateReuseSound(self, path)
     if hit then
         return hit
     end
-    local m = getDefaultSoundModel(nil)
+    local m = getDefaultSoundModel()
     local s = jass.CreateSound(
         path,
         false,
@@ -43,7 +43,7 @@ end
 --- 同一路径重复播放（UI 点击、1 秒内多连同一 wav）
 function ____exports.Sound3DII_Mp3PlayReuse(self, path, player, model)
     if model == nil then
-        model = getDefaultSoundModel(nil)
+        model = getDefaultSoundModel()
     end
     local ____temp_0
     if player == 0 then

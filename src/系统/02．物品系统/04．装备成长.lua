@@ -7,15 +7,49 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
---- 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
--- 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
--- 效果类型：Nstat / N%stat / Nexp / Nlevel / (level*N)stat / (level*N)exp
--- 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
-local jass = require("jass.common")
+local applyStats, onEquipStatReverseTimerExpire, onEquipDebounceTimerExpire, jass, safeDestroyTimer, applyEquipStatsTS, equipStatReverseByTimerHid, equipDebounceKeyByTimerHid
+function applyStats(unit, statEffects, isAdd)
+    if #statEffects == 0 then
+        return
+    end
+    local payload = isAdd and statEffects or __TS__ArrayMap(
+        statEffects,
+        function(____, x) return __TS__ObjectAssign({}, x, {value = -x.value}) end
+    )
+    applyEquipStatsTS(nil, unit, payload)
+end
+function onEquipStatReverseTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = equipStatReverseByTimerHid[hid]
+    __TS__Delete(equipStatReverseByTimerHid, hid)
+    if ctx then
+        applyStats(ctx.unit, ctx.stats, false)
+    end
+    safeDestroyTimer(nil, t)
+end
+function onEquipDebounceTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local key = equipDebounceKeyByTimerHid[hid]
+    __TS__Delete(equipDebounceKeyByTimerHid, hid)
+    if key then
+        _G[key] = nil
+    end
+    safeDestroyTimer(nil, t)
+end
+jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local round = ____require_result_1.round
 local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
@@ -30,11 +64,11 @@ local KEY_TO_NAME = ____require_result_4.KEY_TO_NAME
 local findStatKey = ____require_result_4.findStatKey
 local getItemDataEntry = ____require_result_4.getItemDataEntry
 local ____require_result_5 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-local applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
+applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
 local ____G_6 = _G
 local onSecond = ____G_6.onSecond
 local offSecond = ____G_6.offSecond
-local function parsePowerUP(self, powerUpStr)
+local function parsePowerUP(powerUpStr)
     local segments = {}
     local rawSegs = __TS__StringSplit(powerUpStr, "+")
     do
@@ -191,19 +225,8 @@ local function parsePowerUP(self, powerUpStr)
     end
     return segments
 end
---- 通过 TS 装备属性应用器批量加/减属性
-local function applyStats(self, unit, statEffects, isAdd)
-    if #statEffects == 0 then
-        return
-    end
-    local payload = isAdd and statEffects or __TS__ArrayMap(
-        statEffects,
-        function(____, x) return __TS__ObjectAssign({}, x, {value = -x.value}) end
-    )
-    applyEquipStatsTS(nil, unit, payload)
-end
 --- 分 10 份给经验，避免跳级触发不到
-local function addHeroXP(self, unit, amount)
+local function addHeroXP(unit, amount)
     if amount <= 0 then
         return
     end
@@ -220,13 +243,13 @@ local function addHeroXP(self, unit, amount)
         jass.AddHeroXP(unit, remainder, true)
     end
 end
-local function getHeroLevel(self, unit)
+local function getHeroLevel(unit)
     return jass.GetHeroLevel(unit)
 end
 --- 获取单位当前属性的绝对值，用于百分比计算。
 -- str/agi/int 用 GetHeroStr/Agi/Int；hp/mp 用 GetUnitState+ConvertUnitState；
 -- dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
-local function getPctStatValue(self, unit, key)
+local function getPctStatValue(unit, key)
     if key == "int" then
         return jass.GetHeroInt(unit, true)
     end
@@ -263,7 +286,7 @@ local function getPctStatValue(self, unit, key)
     return 0
 end
 --- 对 unit 所属玩家的金币做一次百分比加减（pct 可负）
-local function applyGoldPct(self, unit, pct)
+local function applyGoldPct(unit, pct)
     local player = jass.GetOwningPlayer(unit)
     if not player then
         return
@@ -274,7 +297,7 @@ local function applyGoldPct(self, unit, pct)
     local newVal = cur + delta < 0 and 0 or cur + delta
     jass.SetPlayerState(player, stateGold, newVal)
 end
-local function executeSegment(self, unit, seg)
+local function executeSegment(unit, seg)
     local statEffects = {}
     local goldPct = 0
     local goldFixed = {}
@@ -291,14 +314,14 @@ local function executeSegment(self, unit, seg)
             elseif eff.type == "exp" then
                 local ____eff_isLevelMult_7
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(nil, unit) * eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(unit) * eff.value)
                 else
                     ____eff_isLevelMult_7 = jass.R2I(eff.value)
                 end
                 local amount = ____eff_isLevelMult_7
-                addHeroXP(nil, unit, amount)
+                addHeroXP(unit, amount)
             elseif eff.type == "level" then
-                local cur = getHeroLevel(nil, unit)
+                local cur = getHeroLevel(unit)
                 local ____eff_isLevelMult_8
                 if eff.isLevelMult then
                     ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
@@ -316,9 +339,9 @@ local function executeSegment(self, unit, seg)
                 end
                 local val
                 if eff.isPct then
-                    val = getPctStatValue(nil, unit, eff.key) * eff.value
+                    val = getPctStatValue(unit, eff.key) * eff.value
                 elseif eff.isLevelMult then
-                    val = getHeroLevel(nil, unit) * eff.value
+                    val = getHeroLevel(unit) * eff.value
                 else
                     val = eff.value
                 end
@@ -329,7 +352,7 @@ local function executeSegment(self, unit, seg)
     end
     if goldPct ~= 0 then
         if seg.timeSec <= 0 then
-            applyGoldPct(nil, unit, goldPct)
+            applyGoldPct(unit, goldPct)
         else
             local capturedUnit = unit
             local capturedPct = goldPct
@@ -340,7 +363,7 @@ local function executeSegment(self, unit, seg)
                     offSecond(nil, cb)
                     return
                 end
-                applyGoldPct(nil, capturedUnit, capturedPct)
+                applyGoldPct(capturedUnit, capturedPct)
                 remaining = remaining - 1
                 if remaining <= 0 then
                     offSecond(nil, cb)
@@ -381,28 +404,26 @@ local function executeSegment(self, unit, seg)
         end
     end
     if #statEffects > 0 then
-        applyStats(nil, unit, statEffects, true)
+        applyStats(unit, statEffects, true)
         if seg.timeSec > 0 then
             local capturedStats = statEffects
             local capturedUnit = unit
             local dt = jass.CreateTimer()
             if dt then
                 local t = dt
+                equipStatReverseByTimerHid[jass.GetHandleId(t)] = {unit = capturedUnit, stats = capturedStats}
                 safeTimerStart(
                     nil,
                     t,
                     seg.timeSec,
                     false,
-                    function()
-                        applyStats(nil, capturedUnit, capturedStats, false)
-                        safeDestroyTimer(nil, t)
-                    end
+                    onEquipStatReverseTimerExpire
                 )
             end
         end
     end
 end
-local function onUseItem(self)
+local function onUseItem()
     local unit = jass.GetManipulatingUnit()
     local item = jass.GetManipulatedItem()
     if not unit or not item then
@@ -431,31 +452,31 @@ local function onUseItem(self)
     local ct = jass.CreateTimer()
     if ct then
         local t = ct
+        equipDebounceKeyByTimerHid[jass.GetHandleId(t)] = key
         safeTimerStart(
             nil,
             t,
             0.5,
             false,
-            function()
-                glob[key] = nil
-                safeDestroyTimer(nil, t)
-            end
+            onEquipDebounceTimerExpire
         )
     end
-    local segments = parsePowerUP(nil, entry.PowerUP)
+    local segments = parsePowerUP(entry.PowerUP)
     for ____, seg in ipairs(segments) do
-        executeSegment(nil, unit, seg)
+        executeSegment(unit, seg)
     end
 end
 local INIT_KEY = "__EquipPowerUPInited"
-local function init(self)
+equipStatReverseByTimerHid = {}
+equipDebounceKeyByTimerHid = {}
+local function init()
     if g[INIT_KEY] then
         return
     end
     g[INIT_KEY] = true
-    itemEventCenter:onItemUse(function(____, unit, item)
-        onUseItem(nil)
+    itemEventCenter:onItemUse(function(unit, item)
+        onUseItem()
     end)
 end
-init(nil)
+init()
 return ____exports

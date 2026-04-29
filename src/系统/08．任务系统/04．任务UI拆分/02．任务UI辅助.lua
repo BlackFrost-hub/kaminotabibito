@@ -32,9 +32,6 @@ local function __dzPcallFrameShowBody(self)
     japi.DzFrameShow(__dzPcallFrame, __dzPcallVis)
 end
 function ____exports.pcallDzFrameShow(self, frame, visible)
-    if type(japi.DzFrameShow) ~= "function" then
-        return
-    end
     __dzPcallFrame = frame
     __dzPcallVis = visible
     pcall(__dzPcallFrameShowBody)
@@ -44,9 +41,6 @@ local function __dzPcallFrameSetAlphaBody(self)
     japi.DzFrameSetAlpha(__dzPcallFrame, __dzPcallAlphaVal)
 end
 function ____exports.pcallDzFrameSetAlpha(self, frame, alpha)
-    if type(japi.DzFrameSetAlpha) ~= "function" then
-        return
-    end
     __dzPcallFrame = frame
     __dzPcallAlphaVal = alpha
     pcall(__dzPcallFrameSetAlphaBody)
@@ -233,13 +227,13 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
         do
             local template = questDB:getQuest(id)
             if not template or template.type ~= ____type or template.uiReserved then
-                goto __continue51
+                goto __continue49
             end
             if __TS__ArraySome(
                 active,
                 function(____, q) return q.id == id end
             ) then
-                goto __continue51
+                goto __continue49
             end
             result[#result + 1] = __TS__ObjectAssign(
                 {},
@@ -253,7 +247,7 @@ function ____exports.getQuestsForUI(self, playerId, ____type)
                 }
             )
         end
-        ::__continue51::
+        ::__continue49::
     end
     __TS__ArraySort(
         result,

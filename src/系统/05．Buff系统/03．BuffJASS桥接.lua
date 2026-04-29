@@ -82,7 +82,6 @@ function ____exports.buffBridgeApplyFromYdlocal(self, _self)
             end
             local srcName = resolveSourceDisplayName(nil, source)
             registerManualBuff(
-                nil,
                 target,
                 buffID,
                 duration,

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
  * 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
@@ -288,10 +289,8 @@ function executeSegment(unit: any, seg: Segment): void {
       const dt = (jass as any).CreateTimer();
       if (dt) {
         const t = dt;
-        safeTimerStart(t, seg.timeSec, false, () => {
-          applyStats(capturedUnit, capturedStats, false);
-          safeDestroyTimer(t);
-        });
+        equipStatReverseByTimerHid[(jass as any).GetHandleId(t) as number] = { unit: capturedUnit, stats: capturedStats };
+        safeTimerStart(t, seg.timeSec, false, onEquipStatReverseTimerExpire);
       }
     }
   }
@@ -314,10 +313,8 @@ function onUseItem(): void {
   const ct = (jass as any).CreateTimer();
   if (ct) {
     const t = ct;
-    safeTimerStart(t, 0.5, false, () => {
-      glob[key] = undefined;
-      safeDestroyTimer(t);
-    });
+    equipDebounceKeyByTimerHid[(jass as any).GetHandleId(t) as number] = key;
+    safeTimerStart(t, 0.5, false, onEquipDebounceTimerExpire);
   }
 
   const segments = parsePowerUP(entry.PowerUP);
@@ -327,6 +324,35 @@ function onUseItem(): void {
 }
 
 const INIT_KEY = "__EquipPowerUPInited";
+
+const equipStatReverseByTimerHid: Record<number, { unit: any; stats: { name: string; key: string; value: number }[] }> = {};
+
+function onEquipStatReverseTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t) as number;
+  const ctx = equipStatReverseByTimerHid[hid];
+  delete equipStatReverseByTimerHid[hid];
+  if (ctx) {
+    applyStats(ctx.unit, ctx.stats, false);
+  }
+  safeDestroyTimer(t);
+}
+
+const equipDebounceKeyByTimerHid: Record<number, string> = {};
+
+function onEquipDebounceTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t) as number;
+  const key = equipDebounceKeyByTimerHid[hid];
+  delete equipDebounceKeyByTimerHid[hid];
+  if (key) {
+    (globalThis as any)[key] = undefined;
+  }
+  safeDestroyTimer(t);
+}
+
 function init(): void {
   if ((g as any)[INIT_KEY]) return;
   (g as any)[INIT_KEY] = true;

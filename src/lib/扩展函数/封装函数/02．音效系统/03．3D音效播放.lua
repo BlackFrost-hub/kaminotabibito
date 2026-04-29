@@ -23,7 +23,7 @@ ____exports.lastPlayedSound = nil
 -- @returns 播放的音效句柄
 function ____exports.Sound3DII_CooPlay(self, path, x, y, z, cutoff, model)
     if model == nil then
-        model = getDefaultSoundModel(nil)
+        model = getDefaultSoundModel()
     end
     local pathHash = jass.StringHash(path)
     local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
@@ -35,7 +35,6 @@ function ____exports.Sound3DII_CooPlay(self, path, x, y, z, cutoff, model)
     local sound
     if slot >= count then
         sound = createSoundInternal(
-            nil,
             path,
             cutoff,
             slot,
@@ -51,7 +50,6 @@ function ____exports.Sound3DII_CooPlay(self, path, x, y, z, cutoff, model)
         end
     else
         sound = getSoundInternal(
-            nil,
             path,
             cutoff,
             slot,

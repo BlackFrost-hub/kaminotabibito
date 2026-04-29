@@ -1,13 +1,28 @@
 local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____02_FF0E_8BA1_65F6_5668 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
-local withTimer = ____02_FF0E_8BA1_65F6_5668.withTimer
 --- 特效封装函数
 -- 创建和管理特效
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local effectDestroyCtxByTimerHid = {}
+local function onTimedEffectTimerExpire()
+    local t = jass.GetExpiredTimer()
+    local eff = effectDestroyCtxByTimerHid[jass.GetHandleId(t)]
+    __TS__Delete(
+        effectDestroyCtxByTimerHid,
+        jass.GetHandleId(t)
+    )
+    if eff then
+        jass.DestroyEffect(eff)
+    end
+    safeDestroyTimer(nil, t)
+end
 --- 创建特效并在指定时间后自动销毁
 -- 
 -- @param modelPath 特效模型路径
@@ -16,7 +31,7 @@ local japi = require("jass.japi")
 -- @param z z坐标，可选，默认 0
 -- @param duration 持续时间秒数，默认 2 秒
 -- @returns 特效句柄
-function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
+function ____exports.createTimedEffect(modelPath, x, y, z, duration)
     if z == nil then
         z = 0
     end
@@ -30,34 +45,56 @@ function ____exports.createTimedEffect(self, modelPath, x, y, z, duration)
     if z ~= 0 then
         japi.EXSetEffectZ(eff, z)
     end
-    withTimer(
-        nil,
-        duration,
-        function()
-            jass.DestroyEffect(eff)
-        end
-    )
+    local t = jass.CreateTimer()
+    if t then
+        effectDestroyCtxByTimerHid[jass.GetHandleId(t)] = eff
+        safeTimerStart(
+            nil,
+            t,
+            duration,
+            false,
+            onTimedEffectTimerExpire
+        )
+    end
     return eff
 end
 local unitEffectMap = __TS__New(Map)
-local function getUnitEffectHandleId(self, unit)
+local function getUnitEffectHandleId(unit)
     if not unit then
         return 0
     end
     return jass.GetHandleId(unit)
 end
-local function getUnitEffectKey(self, unit, effectKey)
-    local handleId = getUnitEffectHandleId(nil, unit)
+local function getUnitEffectKey(unit, effectKey)
+    local handleId = getUnitEffectHandleId(unit)
     if not handleId then
         return ""
     end
     return (tostring(handleId) .. ":") .. effectKey
 end
-local function destroyBoundEffect(self, effect)
+local function destroyBoundEffect(effect)
     if not effect then
         return
     end
     jass.DestroyEffect(effect)
+end
+local boundEffectCtxByTimerHid = {}
+local function onBoundEffectTimerExpire()
+    local t = jass.GetExpiredTimer()
+    local ctx = boundEffectCtxByTimerHid[jass.GetHandleId(t)]
+    __TS__Delete(
+        boundEffectCtxByTimerHid,
+        jass.GetHandleId(t)
+    )
+    if not ctx then
+        return
+    end
+    local currentEffect = unitEffectMap:get(ctx.key)
+    if currentEffect == ctx.effect then
+        destroyBoundEffect(ctx.effect)
+        unitEffectMap:delete(ctx.key)
+    end
+    safeDestroyTimer(nil, t)
 end
 --- 在单位上创建绑定特效
 -- 
@@ -66,20 +103,20 @@ end
 -- @param modelPath 特效模型路径
 -- @param duration 持续时间；不传则常驻，直到手动销毁
 -- @returns 特效句柄；创建失败返回 null
-function ____exports.createUnitEffect(self, unit, attachPoint, modelPath, duration, effectKey)
+function ____exports.createUnitEffect(unit, attachPoint, modelPath, duration, effectKey)
     if effectKey == nil then
         effectKey = "default"
     end
     if not unit then
         return nil
     end
-    local key = getUnitEffectKey(nil, unit, effectKey)
+    local key = getUnitEffectKey(unit, effectKey)
     if key == "" then
         return nil
     end
     local existingEffect = unitEffectMap:get(key)
     if existingEffect then
-        destroyBoundEffect(nil, existingEffect)
+        destroyBoundEffect(existingEffect)
     end
     local effect = jass.AddSpecialEffectTarget(modelPath, unit, attachPoint)
     if not effect then
@@ -87,37 +124,37 @@ function ____exports.createUnitEffect(self, unit, attachPoint, modelPath, durati
     end
     unitEffectMap:set(key, effect)
     if duration ~= nil and duration > 0 then
-        withTimer(
-            nil,
-            duration,
-            function()
-                local currentEffect = unitEffectMap:get(key)
-                if currentEffect == effect then
-                    destroyBoundEffect(nil, effect)
-                    unitEffectMap:delete(key)
-                end
-            end
-        )
+        local t = jass.CreateTimer()
+        if t then
+            boundEffectCtxByTimerHid[jass.GetHandleId(t)] = {key = key, effect = effect}
+            safeTimerStart(
+                nil,
+                t,
+                duration,
+                false,
+                onBoundEffectTimerExpire
+            )
+        end
     end
     return effect
 end
 --- 销毁单位上的绑定特效
 -- 
 -- @param unit 目标单位
-function ____exports.destroyUnitEffect(self, unit, effectKey)
+function ____exports.destroyUnitEffect(unit, effectKey)
     if effectKey == nil then
         effectKey = "default"
     end
     if not unit then
         return
     end
-    local key = getUnitEffectKey(nil, unit, effectKey)
+    local key = getUnitEffectKey(unit, effectKey)
     if key == "" then
         return
     end
     local effect = unitEffectMap:get(key)
     if effect then
-        destroyBoundEffect(nil, effect)
+        destroyBoundEffect(effect)
     end
     unitEffectMap:delete(key)
 end

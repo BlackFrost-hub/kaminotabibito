@@ -76,17 +76,15 @@ local function dispatchPlayerUnitEvent(key)
         end
     end
 end
+local function dispatchPlayerUnitEventMaster()
+    dispatchPlayerUnitEvent(currentEventKey())
+end
 local function ensureMasterTrigger()
     if masterTrigger then
         return masterTrigger
     end
     masterTrigger = jass.CreateTrigger()
-    jass.TriggerAddAction(
-        masterTrigger,
-        function()
-            dispatchPlayerUnitEvent(currentEventKey())
-        end
-    )
+    jass.TriggerAddAction(masterTrigger, dispatchPlayerUnitEventMaster)
     return masterTrigger
 end
 local function ensureNativeRegistration(player, eventId, key)

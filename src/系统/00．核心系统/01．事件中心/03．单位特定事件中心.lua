@@ -6,9 +6,11 @@ local jass = require("jass.common")
 local unitEventListeners = {}
 local unitEventRegistered = {}
 local unitEventMasters = {}
+local unitEventKeyByMasterHid = {}
 local unitInRangeListeners = {}
 local unitInRangeRegistered = {}
 local unitInRangeMasters = {}
+local unitInRangeKeyByMasterHid = {}
 local function handleKey(handle)
     return tostring(handle)
 end
@@ -76,6 +78,30 @@ local function dispatchListeners(list)
         end
     end
 end
+local function dispatchUnitEventMaster()
+    local trig = jass.GetTriggeringTrigger()
+    if not trig then
+        return
+    end
+    local key = unitEventKeyByMasterHid[tostring(jass.GetHandleId(trig)
+    )]
+    if not key then
+        return
+    end
+    dispatchListeners(unitEventListeners[key] or ({}))
+end
+local function dispatchUnitInRangeMaster()
+    local trig = jass.GetTriggeringTrigger()
+    if not trig then
+        return
+    end
+    local key = unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(trig)
+    )]
+    if not key then
+        return
+    end
+    dispatchListeners(unitInRangeListeners[key] or ({}))
+end
 local function addListener(store, key, trigger, once)
     store[key] = store[key] or ({})
     local list = store[key]
@@ -112,13 +138,10 @@ function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
         unitEventMasters[key] = master
         unitEventRegistered[key] = true
         unitEventListeners[key] = unitEventListeners[key] or ({})
+        unitEventKeyByMasterHid[tostring(jass.GetHandleId(master)
+        )] = key
         jass.TriggerRegisterUnitEvent(master, unit, eventId)
-        jass.TriggerAddAction(
-            master,
-            function()
-                dispatchListeners(unitEventListeners[key])
-            end
-        )
+        jass.TriggerAddAction(master, dispatchUnitEventMaster)
     end
     return addListener(unitEventListeners, key, trigger, once)
 end
@@ -137,13 +160,10 @@ function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, on
         unitInRangeMasters[key] = master
         unitInRangeRegistered[key] = true
         unitInRangeListeners[key] = unitInRangeListeners[key] or ({})
+        unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(master)
+        )] = key
         jass.TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
-        jass.TriggerAddAction(
-            master,
-            function()
-                dispatchListeners(unitInRangeListeners[key])
-            end
-        )
+        jass.TriggerAddAction(master, dispatchUnitInRangeMaster)
     end
     return addListener(unitInRangeListeners, key, trigger, once)
 end

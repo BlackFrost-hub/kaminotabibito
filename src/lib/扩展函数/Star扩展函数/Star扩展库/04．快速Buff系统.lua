@@ -25,7 +25,7 @@ local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_1.registerManualBuff
 local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
 local calcReducedControlDuration = ____require_result_2.calcReducedControlDuration
-local function sym(self, name)
+local function sym(name)
     local ____G_name_4 = _G[name]
     if ____G_name_4 == nil then
         local ____jglobals_3
@@ -48,26 +48,26 @@ local function sym(self, name)
     end
     return ____G_name_4_6
 end
-local function getYDHT(self)
-    local ____sym_result_7 = sym(nil, "StarBaseHT")
+local function getYDHT()
+    local ____sym_result_7 = sym("StarBaseHT")
     if ____sym_result_7 == nil then
-        ____sym_result_7 = sym(nil, "YDHASH_HANDLE")
+        ____sym_result_7 = sym("YDHASH_HANDLE")
     end
     local ____sym_result_7_8 = ____sym_result_7
     if ____sym_result_7_8 == nil then
-        ____sym_result_7_8 = sym(nil, "YDHT")
+        ____sym_result_7_8 = sym("YDHT")
     end
     local ____sym_result_7_8_9 = ____sym_result_7_8
     if ____sym_result_7_8_9 == nil then
-        ____sym_result_7_8_9 = sym(nil, "udg_YDHASH_HANDLE")
+        ____sym_result_7_8_9 = sym("udg_YDHASH_HANDLE")
     end
     local ____sym_result_7_8_9_10 = ____sym_result_7_8_9
     if ____sym_result_7_8_9_10 == nil then
-        ____sym_result_7_8_9_10 = sym(nil, "udg_YDHT")
+        ____sym_result_7_8_9_10 = sym("udg_YDHT")
     end
     return ____sym_result_7_8_9_10
 end
-local YDHT = getYDHT(nil)
+local YDHT = getYDHT()
 ____exports.SFB_Unit = nil
 local SFB_UNIT_ID = 1648915822
 local ABILITY = {
@@ -98,23 +98,23 @@ local SFB_BUFF_ID = {
     [22] = "C009",
     [23] = "C010"
 }
-local function getUnitSourceName(self, sourceUnit)
+local function getUnitSourceName(sourceUnit)
     if sourceUnit == nil or sourceUnit == 0 then
         return ""
     end
     local n = jass.GetUnitName(sourceUnit)
     return type(n) == "string" and n ~= "" and n or ""
 end
-local function shouldApplyControlReduction(self, id)
+local function shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5
 end
-local function getAngleBetweenUnits(self, u, tu)
+local function getAngleBetweenUnits(u, tu)
     return jass.Atan2(
         jass.GetUnitY(tu) - jass.GetUnitY(u),
         jass.GetUnitX(tu) - jass.GetUnitX(u)
     )
 end
-function ____exports.SFB_Init(self)
+function ____exports.SFB_Init()
     ____exports.SFB_Unit = jass.CreateUnit(
         jass.Player(15),
         SFB_UNIT_ID,
@@ -130,6 +130,40 @@ function ____exports.SFB_Init(self)
     jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.FREEZE)
     _G.SFB_Unit = ____exports.SFB_Unit
 end
+local function onSfbPauseTimerExpire()
+    local t = jass.GetExpiredTimer()
+    jass.PauseUnit(
+        jass.LoadUnitHandle(
+            YDHT,
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
+        ),
+        false
+    )
+    jass.RemoveSavedHandle(
+        YDHT,
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
+    )
+    safeDestroyTimer(nil, t)
+end
+local function onSfbExpauseTimerExpire()
+    local t = jass.GetExpiredTimer()
+    japi.EXPauseUnit(
+        jass.LoadUnitHandle(
+            YDHT,
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
+        ),
+        false
+    )
+    jass.RemoveSavedHandle(
+        YDHT,
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
+    )
+    safeDestroyTimer(nil, t)
+end
 --- 设置单位Buff效果
 -- 
 -- @param sourceUnit 来源单位（用于BuffUI显示来源信息和玩家名）
@@ -138,7 +172,7 @@ end
 -- 0=击晕, 1=冰冻, 2=沉默, 3=变形, 4=隐身, 5=缴械
 -- 21=硬直, 22=暂停, 23=EX暂停
 -- @param time 持续时间（秒）
-function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
+function ____exports.SFB_setBuff(sourceUnit, u, id, time)
     if not SUC_IsValidUnit(nil, u) or time == 0 then
         return
     end
@@ -151,8 +185,8 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
     if time <= 0 then
         return
     end
-    local sourceName = getUnitSourceName(nil, sourceUnit)
-    if shouldApplyControlReduction(nil, id) then
+    local sourceName = getUnitSourceName(sourceUnit)
+    if shouldApplyControlReduction(id) then
         time = calcReducedControlDuration(nil, u, time)
         if time <= 0 then
             return
@@ -171,7 +205,7 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
             )
         end
         if id == 21 then
-            GS_Suspend(nil, u, time)
+            GS_Suspend(u, time)
         elseif id == 22 then
             local tempTimer = jass.CreateTimer()
             jass.SaveUnitHandle(
@@ -186,23 +220,7 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
                 tempTimer,
                 time,
                 false,
-                function()
-                    local t = jass.GetExpiredTimer()
-                    jass.PauseUnit(
-                        jass.LoadUnitHandle(
-                            YDHT,
-                            jass.GetHandleId(t),
-                            jass.StringHash("单位")
-                        ),
-                        false
-                    )
-                    jass.RemoveSavedHandle(
-                        YDHT,
-                        jass.GetHandleId(t),
-                        jass.StringHash("单位")
-                    )
-                    safeDestroyTimer(nil, t)
-                end
+                onSfbPauseTimerExpire
             )
         elseif id == 23 then
             local tempTimer = jass.CreateTimer()
@@ -218,23 +236,7 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
                 tempTimer,
                 time,
                 false,
-                function()
-                    local t = jass.GetExpiredTimer()
-                    japi.EXPauseUnit(
-                        jass.LoadUnitHandle(
-                            YDHT,
-                            jass.GetHandleId(t),
-                            jass.StringHash("单位")
-                        ),
-                        false
-                    )
-                    jass.RemoveSavedHandle(
-                        YDHT,
-                        jass.GetHandleId(t),
-                        jass.StringHash("单位")
-                    )
-                    safeDestroyTimer(nil, t)
-                end
+                onSfbExpauseTimerExpire
             )
         end
         return
@@ -243,7 +245,7 @@ function ____exports.SFB_setBuff(self, sourceUnit, u, id, time)
     if caster == nil or caster == 0 then
         return
     end
-    local fac = getAngleBetweenUnits(nil, caster, u)
+    local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     local abilityId
@@ -346,7 +348,7 @@ end
 -- @param as 降低攻速百分比
 -- @param ms 降低移速百分比
 -- @param time 持续时间（秒）
-function ____exports.SFB_setSlow(self, sourceUnit, u, as, ms, time)
+function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
     if not SUC_IsValidUnit(nil, u) or time == 0 then
         return
     end
@@ -363,7 +365,7 @@ function ____exports.SFB_setSlow(self, sourceUnit, u, as, ms, time)
     if caster == nil or caster == 0 then
         return
     end
-    local fac = getAngleBetweenUnits(nil, caster, u)
+    local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     YDWESetUnitAbilityDataReal(
@@ -398,7 +400,7 @@ function ____exports.SFB_setSlow(self, sourceUnit, u, as, ms, time)
         103,
         time
     )
-    local sourceName = getUnitSourceName(nil, sourceUnit)
+    local sourceName = getUnitSourceName(sourceUnit)
     registerManualBuff(
         nil,
         u,

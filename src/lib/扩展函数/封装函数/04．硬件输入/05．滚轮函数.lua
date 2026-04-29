@@ -11,20 +11,11 @@ local runFalseLocalRegistration = ____02_FF0E_5185_90E8_5DE5_5177.runFalseLocalR
 --   `runFalseLocalRegistration(...)` 包装，并支持可选 `playerId`
 local japi = require("jass.japi")
 function ____exports.getWheelDelta(self)
-    local ____temp_0
-    if type(japi.DzGetWheelDelta) == "function" then
-        ____temp_0 = japi.DzGetWheelDelta()
-    else
-        ____temp_0 = 0
-    end
-    return ____temp_0
+    return japi.DzGetWheelDelta()
 end
 function ____exports.registerMouseWheel(self, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
     if not trig then
-        return nil
-    end
-    if type(japi.DzTriggerRegisterMouseWheelEventByCode) ~= "function" then
         return nil
     end
     if sync then

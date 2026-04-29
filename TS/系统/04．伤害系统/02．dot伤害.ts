@@ -27,10 +27,7 @@ import {
 import { registerBuiltInDotTypes } from "./01．DOT定义/03．DOT类型定义";
 import {
   getDotSourceDisplayName,
-  isValidDotStateRow,
-  tabDeleteHid,
-  tabRowForHid,
-  tabSetHid,
+  getDotState,
   unitHid,
 } from "./01．DOT定义/04．DOT工具";
 import { createDotStateSync } from "./01．DOT定义/05．DOT状态同步";
@@ -61,29 +58,32 @@ export function registerDotType(config: DotTypeConfig): void {
 }
 
 // ========== 虚拟分区：Buff 池桥接 ==========
+// pcall 具名函数体模式：禁止 (pcall as any)(匿名)，避免 TSTL 生成 pcall(nil, func)
+let __pcallNotifyTypeId = "";
+let __pcallNotifyTarget: any = null;
+let __pcallNotifyState: DotState | null = null;
+function __pcallNotifyBuffPoolBody(): void {
+  const m = require("系统.05．Buff系统.00．Buff系统") as {
+    syncDotBuff?: (
+      tid: string,
+      u: any,
+      s: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
+    ) => void;
+  };
+  if (m != null && typeof m.syncDotBuff === "function") m.syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState);
+}
 /** Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统 */
 function notifyBuffPool(typeId: string, target: any, state: DotState | null): void {
-  (pcall as any)(() => {
-    const m = require("系统.05．Buff系统.00．Buff系统") as {
-      syncDotBuff?: (
-        tid: string,
-        u: any,
-        s: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
-      ) => void;
-    };
-    if (m != null && typeof m.syncDotBuff === "function") m.syncDotBuff(typeId, target, state);
-  });
+  __pcallNotifyTypeId = typeId;
+  __pcallNotifyTarget = target;
+  __pcallNotifyState = state;
+  pcall(__pcallNotifyBuffPoolBody);
 }
 
 // ========== 虚拟分区：运行时状态 ==========
-/** 按类型、再按目标存状态。stateByType[typeId][GetHandleId(target)] = { effect, remaining, _dotUnitRef?, ... } */
-const stateByType: Record<string, Record<any, DotState>> = {};
 /** 每 1 秒执行一次的伤害条：typeId、来源、目标、每跳伤害、特效用模型与时长（是否仍持续以 Buff 池 remaining 为准） */
 interface DotTickEntry { typeId: string; source: any; target: any; amount: number; effectModel: string; effectDuration: number }
 const dotTicks: DotTickEntry[] = [];
-
-/** 刚被我们「某类型」伤害打到的单位，下一帧伤害回调里跳过对该类型施加，避免 DOT 触发的伤害再次叠 DOT */
-const ignoredTargetByType: Record<string, Record<any, boolean>> = {};
 
 // ========== 虚拟分区：装备数据源 ==========
 const equipDataMod = require("系统.02．物品系统.01．装备数据") as {
@@ -108,7 +108,6 @@ function removeDotTicksForTargetHid(typeId: string, tgtHid: number): void {
 
 // ========== 虚拟分区：子模块装配（sync / executor / strategy） ==========
 const dotStateSync = createDotStateSync({
-  stateByType,
   dotTypes,
   removeDotTicksForTargetHid,
   notifyBuffPool,
@@ -119,26 +118,16 @@ const dotExecutor = createDotExecutor({
   LeakWatcher,
   dotTypes,
   dotTicks,
-  stateByType,
-  ignoredTargetByType,
   damageEventModule,
   unitHid,
-  tabRowForHid,
-  isValidDotStateRow,
 });
 
 const dotApplyStrategy = createDotApplyStrategy({
   dotTypes,
-  stateByType,
   dotTicks,
-  ignoredTargetByType,
   unitHid,
   isSourceHeroPlayer1to4: dotBaseUtils.isSourceHeroPlayer1to4,
   isDebuffDotTargetOk: dotBaseUtils.isDebuffDotTargetOk,
-  tabRowForHid,
-  tabSetHid,
-  tabDeleteHid,
-  isValidDotStateRow,
   getDotSourceDisplayName,
   notifyBuffPool,
   ensureDotTimers: () => dotExecutor.ensureDotTimers(),
@@ -197,12 +186,9 @@ registerBuiltInDotTypes({
 let registered = false;
 
 function getDotStateByTypeId(typeId: string, unit: any): DotState | null {
-  const tab = (stateByType as any)[typeId];
-  if (tab == null || unit == null || unit === 0) return null;
   const h = unitHid(unit);
   if (h === 0) return null;
-  const raw = tabRowForHid(tab, h);
-  return raw != null && isValidDotStateRow(raw) ? (raw as DotState) : null;
+  return getDotState(typeId, h);
 }
 
 /** 供治疗等系统读取：单位当前反恢复状态，无则返回 null */

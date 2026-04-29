@@ -57,6 +57,7 @@ const TRIG_KEY = "__syzl_equipExtract_trig";
 const ATTEMPT_KEY = "__syzl_equipRegAttempt";
 const MAX_REG_ATTEMPTS = 30;
 const RETRY_SEC = 0.1;
+const EQUIP_EXTRACT_EVENT_NAME = "装备提取事件";
 
 const itemsTable = dataMod.items ?? dataMod.default ?? {};
 
@@ -185,6 +186,10 @@ function runEquipExtract(this: void): void {
   );
 }
 
+function onEquipExtractTriggerAction(this: void): void {
+  runEquipExtract();
+}
+
 function scheduleRetry(this: void, fn: () => void): void {
   createDelayedCall(RETRY_SEC, fn);
 }
@@ -204,16 +209,14 @@ function tryRegisterEquipStes(this: void): void {
 
   if (g[TRIG_KEY] == null) {
     const trig = jass.CreateTrigger();
-    jass.TriggerAddAction(trig, () => {
-      runEquipExtract();
-    });
+    jass.TriggerAddAction(trig, onEquipExtractTriggerAction);
     g[TRIG_KEY] = trig;
   }
 
   const trig = g[TRIG_KEY];
-  ydlStes_registerAfterGetTable(undefined, trig, "装备提取事件");
+  ydlStes_registerAfterGetTable(undefined, trig, EQUIP_EXTRACT_EVENT_NAME);
 
-  const jCount = countOnJassStesTable("装备提取事件");
+  const jCount = countOnJassStesTable(EQUIP_EXTRACT_EVENT_NAME);
   const attempt = (g[ATTEMPT_KEY] as number) || 0;
   g[ATTEMPT_KEY] = attempt + 1;
 

@@ -115,7 +115,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     return empty;
   }
 
-  if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(mainPanel);
+  (japi as any).DzFrameClearAllPoints(mainPanel);
   if (entryFrame) {
     setFramePointRelative(mainPanel, FramePoint.TOPLEFT, entryFrame, FramePoint.TOPLEFT, PANEL_REL_TO_ENTRY_X, PANEL_REL_TO_ENTRY_Y);
   } else {
@@ -129,7 +129,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
 
   const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
   if (listContainer) {
-    if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(listContainer);
+    (japi as any).DzFrameClearAllPoints(listContainer);
     setFramePointRelative(
       listContainer,
       FramePoint.TOPLEFT,
@@ -177,8 +177,8 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     });
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
-      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollBarFrame, true);
-      if (typeof (japi as any).DzFrameClearAllPoints === "function") (japi as any).DzFrameClearAllPoints(scrollBarFrame);
+      (japi as any).DzFrameShow(scrollBarFrame, true);
+      (japi as any).DzFrameClearAllPoints(scrollBarFrame);
       setFramePointRelative(scrollBarFrame, FramePoint.TOPRIGHT, mainPanel, FramePoint.TOPRIGHT, SCROLLBAR_REL_X, -SCROLLBAR_TOP_INSET);
       setFramePointRelative(scrollBarFrame, FramePoint.BOTTOMRIGHT, mainPanel, FramePoint.BOTTOMRIGHT, SCROLLBAR_REL_X, SCROLLBAR_BOTTOM_INSET);
       setFrameSize(scrollBarFrame, { width: SCROLLBAR_W, height: LIST_VIEW_H });
@@ -205,7 +205,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
           0
         );
       }
-      if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbFrame, true);
+      (japi as any).DzFrameShow(scrollThumbFrame, true);
 
       scrollThumbHitBtn =
         createFrame({
@@ -217,7 +217,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
         }) ?? 0;
       if (scrollThumbHitBtn && scrollThumbHitBtn !== 0) {
         setupTransparentGlueHitLayer(scrollThumbFrame, scrollThumbHitBtn);
-        if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(scrollThumbHitBtn, true);
+        (japi as any).DzFrameShow(scrollThumbHitBtn, true);
       }
     }
   }

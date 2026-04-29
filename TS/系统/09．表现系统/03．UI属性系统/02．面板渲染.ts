@@ -119,7 +119,7 @@ function showDetailSlot(index: number, visible: boolean): void {
 }
 
 function getTriggerUiEventFrame(): number {
-  return typeof japi.DzGetTriggerUIEventFrame === "function" ? japi.DzGetTriggerUIEventFrame() : 0;
+  return japi.DzGetTriggerUIEventFrame();
 }
 
 function onDetailHoverEnter(): void {

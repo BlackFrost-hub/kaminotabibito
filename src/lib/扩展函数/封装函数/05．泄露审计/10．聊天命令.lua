@@ -6,6 +6,20 @@ local ____09_FF0E_6253_5370_7EDF_8BA1 = require("lib.扩展函数.封装函数.0
 local dump = ____09_FF0E_6253_5370_7EDF_8BA1.dump
 --- 泄露审计 - 聊天命令触发器
 local jass = require("jass.common")
+local function onLeakWatcherChat(self)
+    local tag
+    local raw = jass.GetEventPlayerChatString()
+    if raw ~= nil and #raw > 5 then
+        local idx = (string.find(raw, " ", nil, true) or 0) - 1
+        if idx >= 0 and idx < #raw - 1 then
+            tag = __TS__StringTrim(__TS__StringSubstring(raw, idx + 1))
+            if tag == "" then
+                tag = nil
+            end
+        end
+    end
+    dump(nil, tag)
+end
 --- 注册聊天 "-leak" 触发方式，方便临时查看
 function ____exports.initLeakWatcherTriggers(self)
     local trChat = jass.CreateTrigger()
@@ -15,23 +29,7 @@ function ____exports.initLeakWatcherTriggers(self)
         "-leak",
         false
     )
-    jass.TriggerAddAction(
-        trChat,
-        function()
-            local tag
-            local raw = jass.GetEventPlayerChatString()
-            if raw ~= nil and #raw > 5 then
-                local idx = (string.find(raw, " ", nil, true) or 0) - 1
-                if idx >= 0 and idx < #raw - 1 then
-                    tag = __TS__StringTrim(__TS__StringSubstring(raw, idx + 1))
-                    if tag == "" then
-                        tag = nil
-                    end
-                end
-            end
-            dump(nil, tag)
-        end
-    )
+    jass.TriggerAddAction(trChat, onLeakWatcherChat)
 end
 ____exports.initLeakWatcherTriggers(nil)
 return ____exports

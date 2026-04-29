@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 物品加工系统（篝火 h00C）
  *
@@ -62,6 +63,75 @@ type ItemState = {
 
 const itemState = new Map<any, ItemState>();          // item -> state
 const campfireItems = new Map<any, Set<any>>();       // campfire -> items
+
+const burnTimerCtxByHid: Record<number, { item: any; campfire: any }> = {};
+const cookTimerCtxByHid: Record<number, { item: any; campfire: any; timeoutSec: number; results: ResultOpt[] }> = {};
+
+function onBurnTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t) as number;
+  const ctx = burnTimerCtxByHid[hid];
+  delete burnTimerCtxByHid[hid];
+  if (!ctx) return;
+  const { item, campfire } = ctx;
+  if (!itemState.has(item)) return;
+  const name = getItemNameSafe(item);
+  floatBurnText(campfire, name);
+  (jass as any).RemoveItem(item);
+  untrackItem(item);
+  safeDestroyTimer(t);
+}
+
+function onCookTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t) as number;
+  const ctx = cookTimerCtxByHid[hid];
+  delete cookTimerCtxByHid[hid];
+  if (!ctx) return;
+  const { item, campfire, timeoutSec, results } = ctx;
+  if (!itemState.has(item)) return;
+  // 加工完成：替换物品
+  playFinishEffect(campfire);
+
+  const chosen = pickResult(results);
+  const inputCharges = getItemChargesSafe(item); // 例如"生鱼大"堆叠 10 次
+  // 删除原物品
+  (jass as any).RemoveItem(item);
+  // 从追踪中移除原 item（会销毁 cookTimer）
+  untrackItem(item);
+
+  // 生成结果：必须优先留在篝火物品栏（先删原材料，保证至少空 1 格）
+  // 若一次产出多个：尽量塞进篝火；塞不下的"多余产物"按 20% 概率掉在篝火脚下，否则不生成。
+  const timeout = timeoutSec > 0 ? timeoutSec : 0;
+  let remaining = chosen.qty * inputCharges;
+
+  // 先尽量塞进篝火
+  while (remaining > 0) {
+    const it = createItemAtCampfire(campfire, chosen.itemId);
+    if (!it) break;
+    // 优先把数量塞到 charges，减少占格；一次尽量放完
+    setItemChargesSafe(it, remaining);
+    const ok = tryGiveItemToCampfire(campfire, it);
+    if (!ok) {
+      // 放不进：这是"多余产物"，按 20% 概率留地上，否则移除
+      const roll = (jass as any).GetRandomInt(1, 100);
+      if (roll > 20) (jass as any).RemoveItem(it);
+      // 若 roll<=20，就留在地上（不计入篝火超时烤焦）
+    } else {
+      // 在篝火内：开始超时烤焦
+      itemState.set(it, { campfire, stage: "done" });
+      let set = campfireItems.get(campfire);
+      if (!set) { set = new Set<any>(); campfireItems.set(campfire, set); }
+      set.add(it);
+      if (timeout > 0) startBurnTimer(it, campfire, timeout);
+    }
+    // 这次创建的 item 已承载 remaining（charges），认为全部产出已处理
+    remaining = 0;
+    // 若篝火满了，会进入 !ok 分支，后续都会按 20% 掉地上处理
+  }
+}
 
 function isCampfire(u: any): boolean {
   return (jass as any).GetUnitTypeId(u) === CAMPFIRE_ID;
@@ -230,15 +300,10 @@ function untrackItem(item: any): void {
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
   const st = itemState.get(item);
-  const t = withTimer(sec, () => {
-    if (!itemState.has(item)) {
-      return;
-    }
-    const name = getItemNameSafe(item);
-    floatBurnText(campfire, name);
-    (jass as any).RemoveItem(item);
-    untrackItem(item);
-  });
+  const t = (jass as any).CreateTimer();
+  if (!t) return;
+  burnTimerCtxByHid[(jass as any).GetHandleId(t) as number] = { item, campfire };
+  safeTimerStart(t, sec, false, onBurnTimerExpire);
   if (st) st.burnTimer = t;
 }
 
@@ -247,51 +312,13 @@ function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
   if (!t) return;
   const st = itemState.get(item);
   if (st) st.cookTimer = t;
-  safeTimerStart(t, recipe.cookSec, false, () => {
-    if (!itemState.has(item)) {
-      return;
-    }
-    // 加工完成：替换物品
-    playFinishEffect(campfire);
-
-    const chosen = pickResult(recipe.results);
-    const inputCharges = getItemChargesSafe(item); // 例如“生鱼大”堆叠 10 次
-    // 删除原物品
-    (jass as any).RemoveItem(item);
-    // 从追踪中移除原 item（会销毁 cookTimer）
-    untrackItem(item);
-
-    // 生成结果：必须优先留在篝火物品栏（先删原材料，保证至少空 1 格）
-    // 若一次产出多个：尽量塞进篝火；塞不下的“多余产物”按 20% 概率掉在篝火脚下，否则不生成。
-    const timeout = recipe.timeoutSec > 0 ? recipe.timeoutSec : 0;
-    let remaining = chosen.qty * inputCharges;
-
-    // 先尽量塞进篝火
-    while (remaining > 0) {
-      const it = createItemAtCampfire(campfire, chosen.itemId);
-      if (!it) break;
-      // 优先把数量塞到 charges，减少占格；一次尽量放完
-      setItemChargesSafe(it, remaining);
-      const ok = tryGiveItemToCampfire(campfire, it);
-      if (!ok) {
-        // 放不进：这是“多余产物”，按 20% 概率留地上，否则移除
-        const roll = (jass as any).GetRandomInt(1, 100);
-        if (roll > 20) (jass as any).RemoveItem(it);
-        // 若 roll<=20，就留在地上（不计入篝火超时烤焦）
-      } else {
-        // 在篝火内：开始超时烤焦
-        itemState.set(it, { campfire, stage: "done" });
-        let set = campfireItems.get(campfire);
-        if (!set) { set = new Set<any>(); campfireItems.set(campfire, set); }
-        set.add(it);
-        if (timeout > 0) startBurnTimer(it, campfire, timeout);
-      }
-      // 这次创建的 item 已承载 remaining（charges），认为全部产出已处理
-      remaining = 0;
-      // 若篝火满了，会进入 !ok 分支，后续都会按 20% 掉地上处理
-    }
-    safeDestroyTimer(t);
-  });
+  cookTimerCtxByHid[(jass as any).GetHandleId(t) as number] = {
+    item,
+    campfire,
+    timeoutSec: recipe.timeoutSec,
+    results: recipe.results,
+  };
+  safeTimerStart(t, recipe.cookSec, false, onCookTimerExpire);
 }
 
 function onAnyPickup(): void {

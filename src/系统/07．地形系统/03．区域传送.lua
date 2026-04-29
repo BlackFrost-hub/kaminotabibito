@@ -14,21 +14,22 @@ local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
 -- - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local withTimer = ____require_result_0.withTimer
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
 local regionMap = __TS__New(Map)
-local function dbg(self, _msg)
+local function dbg(_msg)
 end
-local function checkRegionCondition(self, cond, _unit)
+local function checkRegionCondition(cond, _unit)
     if not cond or cond == "always" then
         return true
     end
     return true
 end
-local function runRegionRule(self, rule, unit, owner)
+local function runRegionRule(rule, unit, owner)
     if not rule then
         return
     end
@@ -91,7 +92,7 @@ local function runRegionRule(self, rule, unit, owner)
     if n ~= nil then
         unitName = tostring(n)
     end
-    local function formatText(____, raw)
+    local function formatText(raw)
         if not raw then
             return nil
         end
@@ -102,7 +103,7 @@ local function runRegionRule(self, rule, unit, owner)
     end
     if chosen.action == "KillUnit" then
         jass.KillUnit(unit)
-        local msg = formatText(nil, chosen.text)
+        local msg = formatText(chosen.text)
         if msg and owner ~= nil then
             jass.DisplayTimedTextToPlayer(
                 owner,
@@ -116,7 +117,7 @@ local function runRegionRule(self, rule, unit, owner)
         if chosen.x ~= nil and chosen.y ~= nil then
             jass.SetUnitPosition(unit, chosen.x, chosen.y)
         end
-        local msg = formatText(nil, nil)
+        local msg = formatText(nil)
         if msg and owner ~= nil then
             jass.DisplayTimedTextToPlayer(
                 owner,
@@ -128,7 +129,7 @@ local function runRegionRule(self, rule, unit, owner)
         end
     end
 end
-local function initRegionTeleport(self)
+local function initRegionTeleport()
     local trig = jass.CreateTrigger()
     local total = 0
     local enabledCount = 0
@@ -180,7 +181,7 @@ local function initRegionTeleport(self)
         end
         local useRule = cfg.teleportX == 0 and cfg.teleportY == 0 and type(cfg.rule) == "string" and #cfg.rule > 0
         if useRule then
-            runRegionRule(nil, cfg.rule, unit, owner)
+            runRegionRule(cfg.rule, unit, owner)
             return
         end
         jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
@@ -205,14 +206,22 @@ local function initRegionTeleport(self)
     end
     jass.TriggerAddAction(trig, onEnter)
 end
+local function onInitRegionTeleportTimerExpire()
+    local t = jass.GetExpiredTimer()
+    initRegionTeleport()
+    safeDestroyTimer(nil, t)
+end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
-____exports["init区域传送"] = function(self)
-    withTimer(
-        nil,
-        0,
-        function()
-            initRegionTeleport(nil)
-        end
-    )
+____exports["init区域传送"] = function()
+    local t = jass.CreateTimer()
+    if t then
+        safeTimerStart(
+            nil,
+            t,
+            0,
+            false,
+            onInitRegionTeleportTimerExpire
+        )
+    end
 end
 return ____exports

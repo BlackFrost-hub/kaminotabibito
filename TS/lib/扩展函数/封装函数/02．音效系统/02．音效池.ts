@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 音效池管理
  * 同一音效路径最多4个同时播放
@@ -22,6 +23,18 @@ const KEY_ENABLED_SLOT_BASE = 2000;
 const POOL_MAX = 4;
 
 import { SoundModel } from "./01．声音模型";
+
+function onSoundPoolTimerExpire(this: void): void {
+  const expiredTimer = (jass as any).GetExpiredTimer();
+  const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
+  if (s) {
+    const idx = (jass as any).LoadInteger(hash, (jass as any).GetHandleId(s), KEY_INDEX);
+    const p = (jass as any).LoadStr(hash, (jass as any).GetHandleId(s), KEY_PATH);
+    const ph = (jass as any).StringHash(p);
+    (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
+  }
+  safeDestroyTimer(expiredTimer);
+}
 
 // 默认音效模型
 let defaultSoundModel: SoundModel;
@@ -72,17 +85,7 @@ export function createSoundInternal(
 
   let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
   if (duration <= 0 || duration > 3600) duration = 1;
-  safeTimerStart(timer, duration, false, () => {
-    const expiredTimer = (jass as any).GetExpiredTimer();
-    const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
-    if (s) {
-      const idx = (jass as any).LoadInteger(hash, (jass as any).GetHandleId(s), KEY_INDEX);
-      const p = (jass as any).LoadStr(hash, (jass as any).GetHandleId(s), KEY_PATH);
-      const ph = (jass as any).StringHash(p);
-      (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
-    }
-    safeDestroyTimer(expiredTimer);
-  });
+  safeTimerStart(timer, duration, false, onSoundPoolTimerExpire);
 
   return sound;
 }
@@ -116,17 +119,7 @@ export function getSoundInternal(
 
     let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
     if (duration <= 0 || duration > 3600) duration = 1;
-    safeTimerStart(newTimer, duration, false, () => {
-      const expiredTimer = (jass as any).GetExpiredTimer();
-      const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
-      if (s) {
-        const idx = (jass as any).LoadInteger(hash, (jass as any).GetHandleId(s), KEY_INDEX);
-        const p = (jass as any).LoadStr(hash, (jass as any).GetHandleId(s), KEY_PATH);
-        const ph = (jass as any).StringHash(p);
-        (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
-      }
-      safeDestroyTimer(expiredTimer);
-    });
+    safeTimerStart(newTimer, duration, false, onSoundPoolTimerExpire);
   }
 
   (jass as any).SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false);

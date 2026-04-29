@@ -13,6 +13,7 @@ type Listener = {
 const enterRegionListeners: Record<string, Listener[]> = {};
 const enterRegionRegistered: Record<string, boolean> = {};
 const enterRegionMasters: Record<string, any> = {};
+const enterRegionKeyByMasterHid: Record<string, string> = {};
 
 function handleKey(handle: any): string {
   return tostring(handle);
@@ -57,6 +58,14 @@ function dispatchListeners(list: Listener[]): void {
   }
 }
 
+function dispatchEnterRegionMaster(): void {
+  const trig = jass.GetTriggeringTrigger();
+  if (!trig) return;
+  const key = enterRegionKeyByMasterHid[tostring(jass.GetHandleId(trig))];
+  if (!key) return;
+  dispatchListeners(enterRegionListeners[key] || []);
+}
+
 function addListener(store: Record<string, Listener[]>, key: string, trigger: any, once: boolean): () => void {
   store[key] = store[key] || [];
   const list = store[key];
@@ -89,10 +98,9 @@ export function registerEnterRegionTrigger(
     enterRegionMasters[key] = master;
     enterRegionRegistered[key] = true;
     enterRegionListeners[key] = enterRegionListeners[key] || [];
+    enterRegionKeyByMasterHid[tostring(jass.GetHandleId(master))] = key;
     jass.TriggerRegisterEnterRegion(master, region, normalizedFilter);
-    jass.TriggerAddAction(master, () => {
-      dispatchListeners(enterRegionListeners[key]);
-    });
+    jass.TriggerAddAction(master, dispatchEnterRegionMaster);
   }
 
   return addListener(enterRegionListeners, key, trigger, false);

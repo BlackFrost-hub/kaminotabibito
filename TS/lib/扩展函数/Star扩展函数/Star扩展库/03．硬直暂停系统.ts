@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Star扩展库 - 硬直/暂停系统
  *
@@ -33,6 +34,24 @@ function hid(h: any): number {
   return (jass.GetHandleId(h) as number) || 0;
 }
 
+function onHardStraightTimerExpire(this: void): void {
+  const expiredTimer = jass.GetExpiredTimer();
+  const tid = hid(expiredTimer);
+  const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
+
+  if (savedUnit != null && savedUnit !== 0) {
+    if (japi != null) {
+      japi.EXPauseUnit(savedUnit, false);
+    }
+  }
+
+  jass.FlushChildHashtable(HS_S, tid);
+  if (savedUnit != null && savedUnit !== 0) {
+    jass.FlushChildHashtable(HS_S, hid(savedUnit));
+  }
+  safeDestroyTimer(expiredTimer);
+}
+
 /**
  * 暂停单位一段时间
  * 若单位已在暂停中，会重置暂停时间
@@ -58,24 +77,7 @@ export function GS_Suspend(u: any, time: number): void {
     jass.SaveTimerHandle(HS_S, uid, 1, T);
   }
 
-  const timerRef = T;
-  safeTimerStart(timerRef, time, false, () => {
-    const expiredTimer = jass.GetExpiredTimer();
-    const tid = hid(expiredTimer);
-    const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
-
-    if (savedUnit != null && savedUnit !== 0) {
-      if (japi != null) {
-        japi.EXPauseUnit(savedUnit, false);
-      }
-    }
-
-    jass.FlushChildHashtable(HS_S, tid);
-    if (savedUnit != null && savedUnit !== 0) {
-      jass.FlushChildHashtable(HS_S, hid(savedUnit));
-    }
-    safeDestroyTimer(expiredTimer);
-  });
+  safeTimerStart(T, time, false, onHardStraightTimerExpire);
 }
 
 /**

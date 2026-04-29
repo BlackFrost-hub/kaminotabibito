@@ -3,6 +3,7 @@ local __TS__Number = ____lualib.__TS__Number
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__Delete = ____lualib.__TS__Delete
 local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local Set = ____lualib.Set
@@ -10,10 +11,13 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local createDelayedCall = ____require_result_0.createDelayedCall
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_0.safeTimerStart
+local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
 local QuestMessageBJ = ____require_result_1.QuestMessageBJ
 local ____require_result_2 = require("lib.扩展函数.BJ函数.05A．电影函数")
@@ -41,22 +45,15 @@ local YDSet = _G.YDUserDataSet
 local RUNTIME_QUEST_ID = "main_story_runtime"
 local running = false
 local mainQuestTickRegistered = false
-local function getStage(self)
+local function getStage()
     if type(YDGet) == "function" then
-        return __TS__Number(YDGet(
-            nil,
-            "string",
-            "剧情进度",
-            "整数",
-            "integer"
-        )) or 0
+        return __TS__Number(YDGet("string", "剧情进度", "整数", "integer")) or 0
     end
     return 0
 end
-local function setStage(self, v)
+local function setStage(v)
     if type(YDSet) == "function" then
         YDSet(
-            nil,
             "string",
             "剧情进度",
             "整数",
@@ -65,7 +62,7 @@ local function setStage(self, v)
         )
     end
 end
-local function ensureRuntimeQuest(self)
+local function ensureRuntimeQuest()
     if questDB:getQuest(RUNTIME_QUEST_ID) then
         return
     end
@@ -89,7 +86,7 @@ local function ensureRuntimeQuest(self)
     })
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
-local function refreshQuestUI(self, desc, msg)
+local function refreshQuestUI(desc, msg)
     local ____opt_12 = questDB.globalData
     if ____opt_12 ~= nil then
         ____opt_12 = ____opt_12.quests
@@ -118,7 +115,7 @@ local function refreshQuestUI(self, desc, msg)
         )
     end
 end
-local function parseDialogLines(self, dialogPreview)
+local function parseDialogLines(dialogPreview)
     if not dialogPreview then
         return {}
     end
@@ -157,7 +154,7 @@ local function parseDialogLines(self, dialogPreview)
     end
     return out
 end
-local function calcDialogDuration(self, text)
+local function calcDialogDuration(text)
     local n = #text
     local t = 1 + jass.R2I(n / 10)
     if t < 2 then
@@ -168,8 +165,8 @@ local function calcDialogDuration(self, text)
     end
     return t
 end
-local function playDialog(self, dialogPreview)
-    local lines = parseDialogLines(nil, dialogPreview)
+local function playDialog(dialogPreview)
+    local lines = parseDialogLines(dialogPreview)
     for ____, line in ipairs(lines) do
         TransmissionFromUnitWithNameBJ(
             nil,
@@ -179,12 +176,12 @@ local function playDialog(self, dialogPreview)
             nil,
             line.text,
             g.bj_TIMETYPE_SET,
-            calcDialogDuration(nil, line.text),
+            calcDialogDuration(line.text),
             true
         )
     end
 end
-local function removeInlineBlockComments(self, s)
+local function removeInlineBlockComments(s)
     local out = s
     while true do
         local l = (string.find(out, "/*", nil, true) or 0) - 1
@@ -205,8 +202,8 @@ local function removeInlineBlockComments(self, s)
     end
     return out
 end
-local function sanitizeActionCode(self, raw)
-    local s = __TS__StringTrim(removeInlineBlockComments(nil, raw))
+local function sanitizeActionCode(raw)
+    local s = __TS__StringTrim(removeInlineBlockComments(raw))
     if s == "" then
         return ""
     end
@@ -221,7 +218,7 @@ local function sanitizeActionCode(self, raw)
     end
     return s
 end
-local function parseTimelineEntries(self, timeline)
+local function parseTimelineEntries(timeline)
     if not timeline then
         return {}
     end
@@ -242,10 +239,7 @@ local function parseTimelineEntries(self, timeline)
             if delay ~= delay then
                 goto __continue40
             end
-            local code = sanitizeActionCode(
-                nil,
-                __TS__StringSubstring(line, dot + 1)
-            )
+            local code = sanitizeActionCode(__TS__StringSubstring(line, dot + 1))
             if code == "" then
                 goto __continue40
             end
@@ -255,10 +249,10 @@ local function parseTimelineEntries(self, timeline)
     end
     return out
 end
-local function createEvalEnv(self, triggerUnit)
+local function createEvalEnv(triggerUnit)
     local gAny = _G
     local cachedLoc = nil
-    local function local1GetFallback(____, ty, key)
+    local function local1GetFallback(ty, key)
         if type(gAny.YDLocal1Get) == "function" then
             return gAny:YDLocal1Get(ty, key)
         end
@@ -287,7 +281,7 @@ local function createEvalEnv(self, triggerUnit)
     end
     return env
 end
-local function normalizeConditionExpr(self, expr)
+local function normalizeConditionExpr(expr)
     local s = expr
     s = table.concat(
         __TS__StringSplit(s, "\\\""),
@@ -299,38 +293,38 @@ local function normalizeConditionExpr(self, expr)
     )
     return s
 end
-local function evalCondition(self, expr, triggerUnit)
-    local source = ("return (" .. normalizeConditionExpr(nil, expr)) .. ")"
+local function evalCondition(expr, triggerUnit)
+    local source = ("return (" .. normalizeConditionExpr(expr)) .. ")"
     local loadFn = _G.loadstring
     local setfenvFn = _G.setfenv
     if type(loadFn) ~= "function" or type(setfenvFn) ~= "function" then
         return false
     end
-    local fn = loadFn(nil, source)
+    local fn = loadFn(source)
     if fn == nil then
         return false
     end
-    local env = createEvalEnv(nil, triggerUnit)
-    setfenvFn(nil, fn, env)
+    local env = createEvalEnv(triggerUnit)
+    setfenvFn(fn, env)
     local ok = pcall(nil, fn)
     if ok[0] ~= true then
         return false
     end
     return ok[1] == true
 end
-local function executeActionCode(self, code, triggerUnit)
+local function executeActionCode(code, triggerUnit)
     local loadFn = _G.loadstring
     local setfenvFn = _G.setfenv
     if type(loadFn) ~= "function" or type(setfenvFn) ~= "function" then
         return
     end
-    local chunk = loadFn(nil, code)
+    local chunk = loadFn(code)
     if chunk == nil then
         debugLog(nil, "主线配置驱动", "action编译失败:", code)
         return
     end
-    local env = createEvalEnv(nil, triggerUnit)
-    setfenvFn(nil, chunk, env)
+    local env = createEvalEnv(triggerUnit)
+    setfenvFn(chunk, env)
     local ok = pcall(nil, chunk)
     if ok[0] ~= true then
         debugLog(
@@ -342,35 +336,47 @@ local function executeActionCode(self, code, triggerUnit)
         )
     end
 end
-local function runActionTimeline(self, timeline, triggerUnit)
-    local entries = parseTimelineEntries(nil, timeline)
+local storyActionCtxByTimerHid = {}
+local function onStoryActionTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = storyActionCtxByTimerHid[hid]
+    __TS__Delete(storyActionCtxByTimerHid, hid)
+    safeDestroyTimer(nil, t)
+    if ctx then
+        executeActionCode(ctx.code, ctx.triggerUnit)
+    end
+end
+local function runActionTimeline(timeline, triggerUnit)
+    local entries = parseTimelineEntries(timeline)
     for ____, e in ipairs(entries) do
         do
             if e.delay <= 0 then
-                executeActionCode(nil, e.code, triggerUnit)
-                goto __continue63
+                executeActionCode(e.code, triggerUnit)
+                goto __continue66
             end
-            createDelayedCall(
-                nil,
-                e.delay,
-                function()
-                    executeActionCode(nil, e.code, triggerUnit)
-                end
-            )
+            local t = jass.CreateTimer()
+            if t then
+                storyActionCtxByTimerHid[jass.GetHandleId(t)] = {code = e.code, triggerUnit = triggerUnit}
+                safeTimerStart(
+                    nil,
+                    t,
+                    e.delay,
+                    false,
+                    onStoryActionTimerExpire
+                )
+            end
         end
-        ::__continue63::
+        ::__continue66::
     end
 end
-local function getHeroes(self)
+local function getHeroes()
     local ____temp_15
     if type(YDGet) == "function" then
-        ____temp_15 = YDGet(
-            nil,
-            "string",
-            "玩家英雄",
-            "单位组",
-            "group"
-        )
+        ____temp_15 = YDGet("string", "玩家英雄", "单位组", "group")
     else
         ____temp_15 = nil
     end
@@ -382,7 +388,7 @@ local function getHeroes(self)
     forEachUnitInGroup(
         nil,
         group,
-        function(____, u)
+        function(u)
             if u then
                 arr[#arr + 1] = u
             end
@@ -390,29 +396,29 @@ local function getHeroes(self)
     )
     return arr
 end
-local function hitFromStage(self, cfg, stage)
+local function hitFromStage(cfg, stage)
     if cfg.fromStage == nil or cfg.fromStage == "*" then
         return true
     end
     return __TS__Number(cfg.fromStage) == stage
 end
-local function tick(self)
+local function tick()
     if running then
         return
     end
     running = true
-    local stage = getStage(nil)
-    local heroes = getHeroes(nil)
+    local stage = getStage()
+    local heroes = getHeroes()
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         do
             if cfg.enabled == false then
-                goto __continue75
+                goto __continue78
             end
             if not cfg.condition or cfg.condition == "" then
-                goto __continue75
+                goto __continue78
             end
-            if not hitFromStage(nil, cfg, stage) then
-                goto __continue75
+            if not hitFromStage(cfg, stage) then
+                goto __continue78
             end
             local matchedHero = nil
             for ____, hero in ipairs(heroes) do
@@ -422,22 +428,22 @@ local function tick(self)
                 end
             end
             if not matchedHero then
-                goto __continue75
+                goto __continue78
             end
             local triggerUnit = matchedHero
             if type(cfg.toStage) == "number" then
-                setStage(nil, cfg.toStage)
+                setStage(cfg.toStage)
             end
-            runActionTimeline(nil, cfg.actionTimeline, triggerUnit)
-            playDialog(nil, cfg.dialogPreview)
-            refreshQuestUI(nil, cfg.questDescText, cfg.questMsgText)
+            runActionTimeline(cfg.actionTimeline, triggerUnit)
+            playDialog(cfg.dialogPreview)
+            refreshQuestUI(cfg.questDescText, cfg.questMsgText)
             break
         end
-        ::__continue75::
+        ::__continue78::
     end
     running = false
 end
-local function extractFunctionNames(self, text)
+local function extractFunctionNames(text)
     local names = {}
     local n = #text
     local i = 0
@@ -447,7 +453,7 @@ local function extractFunctionNames(self, text)
             local isStart = ch >= 65 and ch <= 90 or ch >= 97 and ch <= 122 or ch == 95
             if not isStart then
                 i = i + 1
-                goto __continue86
+                goto __continue89
             end
             local start = i
             i = i + 1
@@ -467,11 +473,11 @@ local function extractFunctionNames(self, text)
                 names[#names + 1] = __TS__StringSubstring(text, start, i)
             end
         end
-        ::__continue86::
+        ::__continue89::
     end
     return names
 end
-local function isKnownFunction(self, name)
+local function isKnownFunction(name)
     local gAny = _G
     if type(gAny[name]) == "function" then
         return true
@@ -481,19 +487,19 @@ local function isKnownFunction(self, name)
     end
     return false
 end
-local function reportMissingFunctions(self)
+local function reportMissingFunctions()
     local missCond = __TS__New(Set)
     local missAction = __TS__New(Set)
     for ____, cfg in ipairs(MAIN_STORY_QUEST_CONFIGS) do
         local cond = cfg.condition or ""
         local act = cfg.actionTimeline or ""
-        for ____, fn in ipairs(extractFunctionNames(nil, cond)) do
-            if not isKnownFunction(nil, fn) then
+        for ____, fn in ipairs(extractFunctionNames(cond)) do
+            if not isKnownFunction(fn) then
                 missCond:add(fn)
             end
         end
-        for ____, fn in ipairs(extractFunctionNames(nil, act)) do
-            if not isKnownFunction(nil, fn) then
+        for ____, fn in ipairs(extractFunctionNames(act)) do
+            if not isKnownFunction(fn) then
                 missAction:add(fn)
             end
         end
@@ -515,12 +521,12 @@ local function reportMissingFunctions(self)
         tostring(_G.__mainQuestMissingReport.actionTimeline.length)
     )
 end
-local function init(self)
+local function init()
     if not ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER then
         return
     end
-    ensureRuntimeQuest(nil)
-    reportMissingFunctions(nil)
+    ensureRuntimeQuest()
+    reportMissingFunctions()
     if mainQuestTickRegistered then
         return
     end
@@ -528,6 +534,6 @@ local function init(self)
     addPeriodicCallback(nil, 300, tick)
 end
 if ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER then
-    init(nil)
+    init()
 end
 return ____exports

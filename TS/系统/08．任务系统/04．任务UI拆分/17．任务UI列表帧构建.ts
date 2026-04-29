@@ -60,7 +60,7 @@ export function createHiddenText(
       { width, height }
     ) || 0;
   if (!frame) return null;
-  if (typeof (japi as any).DzFrameShow === "function") (japi as any).DzFrameShow(frame, false);
+  (japi as any).DzFrameShow(frame, false);
   return frame;
 }
 

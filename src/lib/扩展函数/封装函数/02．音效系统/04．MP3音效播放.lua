@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____02_FF0E_97F3_6548_6C60 = require("lib.扩展函数.封装函数.02．音效系统.02．音效池")
 local createSoundInternal = ____02_FF0E_97F3_6548_6C60.createSoundInternal
@@ -20,8 +21,22 @@ local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.ind
 local debugLog = ____require_result_1.debugLog
 local setDebug = ____require_result_1.setDebug
 setDebug(nil, "Sound3DII", false)
+local soundDestroyFallbackByTimerHid = {}
+local function onSoundDestroyFallbackTimerExpire()
+    local expired = jass.GetExpiredTimer()
+    local hid = jass.GetHandleId(expired)
+    local sound = soundDestroyFallbackByTimerHid[hid]
+    __TS__Delete(soundDestroyFallbackByTimerHid, hid)
+    jass.DestroySound(sound)
+    local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
+    if Leak and Leak.LeakWatcher and type(Leak.LeakWatcher.destroyTimer) == "function" then
+        Leak.LeakWatcher:destroyTimer(expired)
+    else
+        safeDestroyTimer(nil, expired)
+    end
+end
 --- 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积
-local function scheduleDestroySoundIfNeeded(self, sound)
+local function scheduleDestroySoundIfNeeded(sound)
     if not sound then
         return
     end
@@ -43,20 +58,13 @@ local function scheduleDestroySoundIfNeeded(self, sound)
     if not t then
         return
     end
+    soundDestroyFallbackByTimerHid[jass.GetHandleId(t)] = sound
     safeTimerStart(
         nil,
         t,
         0.55,
         false,
-        function()
-            local expired = jass.GetExpiredTimer()
-            jass.DestroySound(sound)
-            if LW and type(LW.destroyTimer) == "function" then
-                LW:destroyTimer(expired)
-            else
-                safeDestroyTimer(nil, expired)
-            end
-        end
+        onSoundDestroyFallbackTimerExpire
     )
 end
 --- 播放MP3音效（可指定玩家）
@@ -64,9 +72,9 @@ end
 -- @param path 音效路径
 -- @param player 指定玩家（为null时所有玩家都能听到）
 -- @param model 声音模型（可选）
-function ____exports.Sound3DII_Mp3Play(self, path, player, model)
+function ____exports.Sound3DII_Mp3Play(path, player, model)
     if model == nil then
-        model = getDefaultSoundModel(nil)
+        model = getDefaultSoundModel()
     end
     do
         local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
@@ -147,7 +155,6 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
             return nil
         end
         sound = createSoundInternal(
-            nil,
             path,
             4000,
             count,
@@ -162,7 +169,6 @@ function ____exports.Sound3DII_Mp3Play(self, path, player, model)
         end
     else
         sound = getSoundInternal(
-            nil,
             path,
             4000,
             availableIndex,

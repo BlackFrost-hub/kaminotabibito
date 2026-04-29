@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 特效封装函数
  * 创建和管理特效
@@ -5,8 +6,20 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
+};
 
-import { withTimer } from "./02．计时器";
+const effectDestroyCtxByTimerHid: Record<number, any> = {};
+
+function onTimedEffectTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  const eff = effectDestroyCtxByTimerHid[jass.GetHandleId(t)];
+  delete effectDestroyCtxByTimerHid[jass.GetHandleId(t)];
+  if (eff) jass.DestroyEffect(eff);
+  safeDestroyTimer(t);
+}
 
 /**
  * 创建特效并在指定时间后自动销毁
@@ -31,9 +44,11 @@ export function createTimedEffect(
     japi.EXSetEffectZ(eff, z);
   }
 
-  withTimer(duration, () => {
-    jass.DestroyEffect(eff);
-  });
+  const t = jass.CreateTimer();
+  if (t) {
+    effectDestroyCtxByTimerHid[jass.GetHandleId(t)] = eff;
+    safeTimerStart(t, duration, false, onTimedEffectTimerExpire);
+  }
   return eff;
 }
 
@@ -53,6 +68,21 @@ function getUnitEffectKey(unit: any, effectKey: string): string {
 function destroyBoundEffect(effect: any): void {
   if (!effect) return;
   jass.DestroyEffect(effect);
+}
+
+const boundEffectCtxByTimerHid: Record<number, { key: string; effect: any }> = {};
+
+function onBoundEffectTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  const ctx = boundEffectCtxByTimerHid[jass.GetHandleId(t)];
+  delete boundEffectCtxByTimerHid[jass.GetHandleId(t)];
+  if (!ctx) return;
+  const currentEffect = unitEffectMap.get(ctx.key);
+  if (currentEffect === ctx.effect) {
+    destroyBoundEffect(ctx.effect);
+    unitEffectMap.delete(ctx.key);
+  }
+  safeDestroyTimer(t);
 }
 
 /**
@@ -78,13 +108,11 @@ export function createUnitEffect(unit: any, attachPoint: string, modelPath: stri
   unitEffectMap.set(key, effect);
 
   if (duration != null && duration > 0) {
-    withTimer(duration, () => {
-      const currentEffect = unitEffectMap.get(key);
-      if (currentEffect === effect) {
-        destroyBoundEffect(effect);
-        unitEffectMap.delete(key);
-      }
-    });
+    const t = jass.CreateTimer();
+    if (t) {
+      boundEffectCtxByTimerHid[jass.GetHandleId(t)] = { key, effect };
+      safeTimerStart(t, duration, false, onBoundEffectTimerExpire);
+    }
   }
 
   return effect;

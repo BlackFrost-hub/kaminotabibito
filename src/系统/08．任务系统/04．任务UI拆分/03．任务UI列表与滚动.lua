@@ -92,13 +92,7 @@ function ____exports.isDescendantOf(self, japi, frame, ancestor)
             if cur == ancestor then
                 return true
             end
-            local ____temp_1
-            if type(japi.DzFrameGetParent) == "function" then
-                ____temp_1 = japi.DzFrameGetParent(cur)
-            else
-                ____temp_1 = 0
-            end
-            local p = ____temp_1
+            local p = japi.DzFrameGetParent(cur)
             if not p or p == 0 then
                 return false
             end
@@ -202,21 +196,21 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
     return visibleRows
 end
 function ____exports.refreshTaskUIList(self, opts)
-    local ____opts_2 = opts
-    local currentPlayerId = ____opts_2.currentPlayerId
-    local currentCategory = ____opts_2.currentCategory
-    local scrollOffset = ____opts_2.scrollOffset
-    local setScrollOffset = ____opts_2.setScrollOffset
-    local setTotalContentHeight = ____opts_2.setTotalContentHeight
-    local listContainer = ____opts_2.listContainer
-    local expandedQuestIds = ____opts_2.expandedQuestIds
-    local createTextLabel = ____opts_2.createTextLabel
-    local FramePoint = ____opts_2.FramePoint
-    local applyDzTextFontAndCenterAlignment = ____opts_2.applyDzTextFontAndCenterAlignment
-    local pushListItemFrame = ____opts_2.pushListItemFrame
-    local syncScrollThumb = ____opts_2.syncScrollThumb
-    local updateScrollBarVis = ____opts_2.updateScrollBarVisibility
-    local createListItem = ____opts_2.createListItem
+    local ____opts_1 = opts
+    local currentPlayerId = ____opts_1.currentPlayerId
+    local currentCategory = ____opts_1.currentCategory
+    local scrollOffset = ____opts_1.scrollOffset
+    local setScrollOffset = ____opts_1.setScrollOffset
+    local setTotalContentHeight = ____opts_1.setTotalContentHeight
+    local listContainer = ____opts_1.listContainer
+    local expandedQuestIds = ____opts_1.expandedQuestIds
+    local createTextLabel = ____opts_1.createTextLabel
+    local FramePoint = ____opts_1.FramePoint
+    local applyDzTextFontAndCenterAlignment = ____opts_1.applyDzTextFontAndCenterAlignment
+    local pushListItemFrame = ____opts_1.pushListItemFrame
+    local syncScrollThumb = ____opts_1.syncScrollThumb
+    local updateScrollBarVis = ____opts_1.updateScrollBarVisibility
+    local createListItem = ____opts_1.createListItem
     local quests = getQuestsForUI(nil, currentPlayerId, currentCategory)
     if #quests == 0 then
         setTotalContentHeight(nil, 0)

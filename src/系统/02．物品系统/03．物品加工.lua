@@ -1,63 +1,41 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local __TS__Delete = ____lualib.__TS__Delete
+local Set = ____lualib.Set
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Iterator = ____lualib.__TS__Iterator
-local Set = ____lualib.Set
 local ____exports = {}
---- 物品加工系统（篝火 h00C）
--- 
--- 触发：
--- - 玩家1-4（Player(0..3)）单位拾取物品：EVENT_PLAYER_UNIT_PICKUP_ITEM
--- 
--- 规则：
--- - 只有“篝火单位（h00C）”拾取物品才进入加工/烤焦逻辑
--- - 玩家从篝火取回物品：表现为“其他单位拾取该 item”，此时取消对应计时器
--- 
--- recipe 格式：
---   h00C:加工秒数->结果:超时秒数
---   结果支持多项，用 ; 分隔；支持概率：20%I036*1；支持数量：I02H*2
---   示例：
---   - h00C:10->I02H*2:5
---   - h00C:20->I034*1;20%I036*1:5
-local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
-local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
-local ____require_result_1 = require("lib.扩展函数.物品相关函数.index")
-local getItemDataEntry = ____require_result_1.getItemDataEntry
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local withTimer = ____require_result_2.withTimer
-local stopTimer = ____require_result_2.stopTimer
-local createTimedEffect = ____require_result_2.createTimedEffect
-local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-local CreateFloatTextAtPoint = ____require_result_3.CreateFloatTextAtPoint
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_4.stringToFourCC
-local ____require_result_5 = require("系统.02．物品系统.09．装备排泄")
-local setLastCreatedItem = ____require_result_5.setLastCreatedItem
-local ____require_result_6 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
-local registerDeathListener = ____require_result_6.registerDeathListener
-local CAMPFIRE_ID = 1747988547
-local EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
-local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
-local itemState = __TS__New(Map)
-local campfireItems = __TS__New(Map)
-local function isCampfire(self, u)
-    return jass.GetUnitTypeId(u) == CAMPFIRE_ID
+local onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, setLastCreatedItem, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
+function onBurnTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = burnTimerCtxByHid[hid]
+    __TS__Delete(burnTimerCtxByHid, hid)
+    if not ctx then
+        return
+    end
+    local item = ctx.item
+    local campfire = ctx.campfire
+    if not itemState:has(item) then
+        return
+    end
+    local name = getItemNameSafe(item)
+    floatBurnText(campfire, name)
+    jass.RemoveItem(item)
+    untrackItem(item)
+    safeDestroyTimer(nil, t)
 end
---- 使用 01．封装函数.ts 中的 stringToFourCC
-local function fourCCToInt(self, id)
-    return stringToFourCC(nil, id)
-end
-local function getItemNameSafe(self, item)
+function getItemNameSafe(item)
     return jass.GetItemName(item)
 end
-local function getItemChargesSafe(self, item)
+function getItemChargesSafe(item)
     local n = jass.GetItemCharges(item)
     local ____jass_R2I_8 = jass.R2I
     local ____TS__Number_result_7 = __TS__Number(n)
@@ -73,7 +51,7 @@ local function getItemChargesSafe(self, item)
     end
     return ____temp_9
 end
-local function setItemChargesSafe(self, item, n)
+function setItemChargesSafe(item, n)
     if not item then
         return
     end
@@ -89,13 +67,13 @@ local function setItemChargesSafe(self, item, n)
     end
     ____self_12_SetItemCharges_13(____self_12, ____item_11, ____temp_10)
 end
-local function getUnitXY(self, u)
+function getUnitXY(u)
     local x = jass.GetUnitX(u)
     local y = jass.GetUnitY(u)
     return {x = x, y = y}
 end
-local function floatBurnText(self, campfire, itemName)
-    local ____getUnitXY_result_14 = getUnitXY(nil, campfire)
+function floatBurnText(campfire, itemName)
+    local ____getUnitXY_result_14 = getUnitXY(campfire)
     local x = ____getUnitXY_result_14.x
     local y = ____getUnitXY_result_14.y
     CreateFloatTextAtPoint(
@@ -115,8 +93,8 @@ local function floatBurnText(self, campfire, itemName)
         }
     )
 end
-local function playFinishEffect(self, campfire)
-    local ____getUnitXY_result_15 = getUnitXY(nil, campfire)
+function playFinishEffect(campfire)
+    local ____getUnitXY_result_15 = getUnitXY(campfire)
     local x = ____getUnitXY_result_15.x
     local y = ____getUnitXY_result_15.y
     createTimedEffect(
@@ -128,89 +106,7 @@ local function playFinishEffect(self, campfire)
         2
     )
 end
-local function getRecipeForItem(self, item)
-    local entry = getItemDataEntry(nil, item)
-    local ____temp_16
-    if entry and entry.recipe then
-        ____temp_16 = entry.recipe
-    else
-        ____temp_16 = nil
-    end
-    local recipe = ____temp_16
-    if not recipe then
-        return nil
-    end
-    local prefix = "h00C:"
-    if recipe:indexOf(prefix) ~= 0 then
-        return nil
-    end
-    local rest = recipe:substring(#prefix)
-    local arrowIdx = rest:indexOf("->")
-    local colonIdx = -1
-    do
-        local i = rest.length - 1
-        while i >= 0 do
-            if rest:substring(i, i + 1) == ":" then
-                colonIdx = i
-                break
-            end
-            i = i - 1
-        end
-    end
-    if arrowIdx < 0 or colonIdx < 0 or colonIdx <= arrowIdx + 2 then
-        return nil
-    end
-    local cookStr = rest:substring(0, arrowIdx):trim()
-    local resultsStr = rest:substring(arrowIdx + 2, colonIdx):trim()
-    local timeoutStr = rest:substring(colonIdx + 1):trim()
-    local cookSec = jass.R2I(__TS__ParseFloat(cookStr) or 0)
-    local timeoutSec = jass.R2I(__TS__ParseFloat(timeoutStr) or 0)
-    if cookSec <= 0 then
-        return nil
-    end
-    local rawOpts = resultsStr:split(";"):map(function(____, s) return __TS__StringTrim(s) end):filter(function(____, s) return s ~= "" end)
-    if rawOpts.length == 0 then
-        return nil
-    end
-    local opts = {}
-    for ____, raw in __TS__Iterator(rawOpts) do
-        local s = raw
-        local prob = nil
-        local pctIdx = s:indexOf("%")
-        if pctIdx > 0 then
-            local p = __TS__ParseFloat(s:substring(0, pctIdx):trim())
-            if not __TS__NumberIsNaN(__TS__Number(p)) and p > 0 then
-                prob = p
-            end
-            s = s:substring(pctIdx + 1):trim()
-        end
-        local starIdx = s:indexOf("*")
-        local ____temp_17
-        if starIdx >= 0 then
-            ____temp_17 = s:substring(0, starIdx)
-        else
-            ____temp_17 = s
-        end
-        local idPart = ____temp_17:trim()
-        local ____temp_18
-        if starIdx >= 0 then
-            ____temp_18 = s:substring(starIdx + 1)
-        else
-            ____temp_18 = ""
-        end
-        local qtyPart = ____temp_18:trim()
-        local qty = jass.R2I(__TS__ParseFloat(qtyPart) or 1)
-        local itemId = fourCCToInt(nil, idPart)
-        if itemId ~= 0 and qty > 0 then
-            opts[#opts + 1] = {prob = prob, itemId = itemId, qty = qty}
-        end
-    end
-    if #opts == 0 then
-        return nil
-    end
-    return {cookSec = cookSec, timeoutSec = timeoutSec, results = opts}
-end
-local function pickResult(self, results)
+function pickResult(results)
     local sumExplicit = 0
     local unspecified = 0
     for ____, r in ipairs(results) do
@@ -254,8 +150,8 @@ local function pickResult(self, results)
     end
     return results[#results]
 end
-local function createItemAtCampfire(self, campfire, itemId)
-    local ____getUnitXY_result_19 = getUnitXY(nil, campfire)
+function createItemAtCampfire(campfire, itemId)
+    local ____getUnitXY_result_19 = getUnitXY(campfire)
     local x = ____getUnitXY_result_19.x
     local y = ____getUnitXY_result_19.y
     local item = jass.CreateItem(itemId, x, y)
@@ -264,29 +160,29 @@ local function createItemAtCampfire(self, campfire, itemId)
     end
     return item
 end
-local function tryGiveItemToCampfire(self, campfire, item)
+function tryGiveItemToCampfire(campfire, item)
     if not item then
         return false
     end
     return not not jass.UnitAddItem(campfire, item)
 end
-local function stopAndDestroyTimer(self, t)
+function stopAndDestroyTimer(t)
     if not t then
         return
     end
     stopTimer(nil, t)
     jass.DestroyTimer(t)
 end
-local function untrackItem(self, item)
+function untrackItem(item)
     local st = itemState:get(item)
     if not st then
         return
     end
     if st.cookTimer then
-        stopAndDestroyTimer(nil, st.cookTimer)
+        stopAndDestroyTimer(st.cookTimer)
     end
     if st.burnTimer then
-        stopAndDestroyTimer(nil, st.burnTimer)
+        stopAndDestroyTimer(st.burnTimer)
     end
     itemState:delete(item)
     local set = campfireItems:get(st.campfire)
@@ -297,26 +193,192 @@ local function untrackItem(self, item)
         end
     end
 end
-local function startBurnTimer(self, item, campfire, sec)
+function startBurnTimer(item, campfire, sec)
     local st = itemState:get(item)
-    local t = withTimer(
+    local t = jass.CreateTimer()
+    if not t then
+        return
+    end
+    burnTimerCtxByHid[jass.GetHandleId(t)] = {item = item, campfire = campfire}
+    safeTimerStart(
         nil,
+        t,
         sec,
-        function()
-            if not itemState:has(item) then
-                return
-            end
-            local name = getItemNameSafe(nil, item)
-            floatBurnText(nil, campfire, name)
-            jass.RemoveItem(item)
-            untrackItem(nil, item)
-        end
+        false,
+        onBurnTimerExpire
     )
     if st then
         st.burnTimer = t
     end
 end
-local function startCookTimer(self, item, campfire, recipe)
+jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
+safeTimerStart = ____require_result_0.safeTimerStart
+safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.index")
+local getItemDataEntry = ____require_result_1.getItemDataEntry
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local withTimer = ____require_result_2.withTimer
+stopTimer = ____require_result_2.stopTimer
+createTimedEffect = ____require_result_2.createTimedEffect
+local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+CreateFloatTextAtPoint = ____require_result_3.CreateFloatTextAtPoint
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_4.stringToFourCC
+local ____require_result_5 = require("系统.02．物品系统.09．装备排泄")
+setLastCreatedItem = ____require_result_5.setLastCreatedItem
+local ____require_result_6 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local registerDeathListener = ____require_result_6.registerDeathListener
+local CAMPFIRE_ID = 1747988547
+EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
+local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
+itemState = __TS__New(Map)
+campfireItems = __TS__New(Map)
+burnTimerCtxByHid = {}
+local cookTimerCtxByHid = {}
+local function onCookTimerExpire()
+    local t = jass.GetExpiredTimer()
+    if not t then
+        return
+    end
+    local hid = jass.GetHandleId(t)
+    local ctx = cookTimerCtxByHid[hid]
+    __TS__Delete(cookTimerCtxByHid, hid)
+    if not ctx then
+        return
+    end
+    local item = ctx.item
+    local campfire = ctx.campfire
+    local timeoutSec = ctx.timeoutSec
+    local results = ctx.results
+    if not itemState:has(item) then
+        return
+    end
+    playFinishEffect(campfire)
+    local chosen = pickResult(results)
+    local inputCharges = getItemChargesSafe(item)
+    jass.RemoveItem(item)
+    untrackItem(item)
+    local timeout = timeoutSec > 0 and timeoutSec or 0
+    local remaining = chosen.qty * inputCharges
+    while remaining > 0 do
+        local it = createItemAtCampfire(campfire, chosen.itemId)
+        if not it then
+            break
+        end
+        setItemChargesSafe(it, remaining)
+        local ok = tryGiveItemToCampfire(campfire, it)
+        if not ok then
+            local roll = jass.GetRandomInt(1, 100)
+            if roll > 20 then
+                jass.RemoveItem(it)
+            end
+        else
+            itemState:set(it, {campfire = campfire, stage = "done"})
+            local set = campfireItems:get(campfire)
+            if not set then
+                set = __TS__New(Set)
+                campfireItems:set(campfire, set)
+            end
+            set:add(it)
+            if timeout > 0 then
+                startBurnTimer(it, campfire, timeout)
+            end
+        end
+        remaining = 0
+    end
+end
+local function isCampfire(u)
+    return jass.GetUnitTypeId(u) == CAMPFIRE_ID
+end
+--- 使用 01．封装函数.ts 中的 stringToFourCC
+local function fourCCToInt(id)
+    return stringToFourCC(nil, id)
+end
+local function getRecipeForItem(item)
+    local entry = getItemDataEntry(nil, item)
+    local ____temp_16
+    if entry and entry.recipe then
+        ____temp_16 = entry.recipe
+    else
+        ____temp_16 = nil
+    end
+    local recipe = ____temp_16
+    if not recipe then
+        return nil
+    end
+    local prefix = "h00C:"
+    if recipe:indexOf(prefix) ~= 0 then
+        return nil
+    end
+    local rest = recipe:substring(#prefix)
+    local arrowIdx = rest:indexOf("->")
+    local colonIdx = -1
+    do
+        local i = rest.length - 1
+        while i >= 0 do
+            if rest:substring(i, i + 1) == ":" then
+                colonIdx = i
+                break
+            end
+            i = i - 1
+        end
+    end
+    if arrowIdx < 0 or colonIdx < 0 or colonIdx <= arrowIdx + 2 then
+        return nil
+    end
+    local cookStr = rest:substring(0, arrowIdx):trim()
+    local resultsStr = rest:substring(arrowIdx + 2, colonIdx):trim()
+    local timeoutStr = rest:substring(colonIdx + 1):trim()
+    local cookSec = jass.R2I(__TS__ParseFloat(cookStr) or 0)
+    local timeoutSec = jass.R2I(__TS__ParseFloat(timeoutStr) or 0)
+    if cookSec <= 0 then
+        return nil
+    end
+    local rawOpts = resultsStr:split(";"):map(function(s) return __TS__StringTrim(s) end):filter(function(s) return s ~= "" end)
+    if rawOpts.length == 0 then
+        return nil
+    end
+    local opts = {}
+    for ____, raw in __TS__Iterator(rawOpts) do
+        local s = raw
+        local prob = nil
+        local pctIdx = s:indexOf("%")
+        if pctIdx > 0 then
+            local p = __TS__ParseFloat(s:substring(0, pctIdx):trim())
+            if not __TS__NumberIsNaN(__TS__Number(p)) and p > 0 then
+                prob = p
+            end
+            s = s:substring(pctIdx + 1):trim()
+        end
+        local starIdx = s:indexOf("*")
+        local ____temp_17
+        if starIdx >= 0 then
+            ____temp_17 = s:substring(0, starIdx)
+        else
+            ____temp_17 = s
+        end
+        local idPart = ____temp_17:trim()
+        local ____temp_18
+        if starIdx >= 0 then
+            ____temp_18 = s:substring(starIdx + 1)
+        else
+            ____temp_18 = ""
+        end
+        local qtyPart = ____temp_18:trim()
+        local qty = jass.R2I(__TS__ParseFloat(qtyPart) or 1)
+        local itemId = fourCCToInt(idPart)
+        if itemId ~= 0 and qty > 0 then
+            opts[#opts + 1] = {prob = prob, itemId = itemId, qty = qty}
+        end
+    end
+    if #opts == 0 then
+        return nil
+    end
+    return {cookSec = cookSec, timeoutSec = timeoutSec, results = opts}
+end
+local function startCookTimer(item, campfire, recipe)
     local t = jass.CreateTimer()
     if not t then
         return
@@ -325,68 +387,31 @@ local function startCookTimer(self, item, campfire, recipe)
     if st then
         st.cookTimer = t
     end
+    cookTimerCtxByHid[jass.GetHandleId(t)] = {item = item, campfire = campfire, timeoutSec = recipe.timeoutSec, results = recipe.results}
     safeTimerStart(
         nil,
         t,
         recipe.cookSec,
         false,
-        function()
-            if not itemState:has(item) then
-                return
-            end
-            playFinishEffect(nil, campfire)
-            local chosen = pickResult(nil, recipe.results)
-            local inputCharges = getItemChargesSafe(nil, item)
-            jass.RemoveItem(item)
-            untrackItem(nil, item)
-            local timeout = recipe.timeoutSec > 0 and recipe.timeoutSec or 0
-            local remaining = chosen.qty * inputCharges
-            while remaining > 0 do
-                local it = createItemAtCampfire(nil, campfire, chosen.itemId)
-                if not it then
-                    break
-                end
-                setItemChargesSafe(nil, it, remaining)
-                local ok = tryGiveItemToCampfire(nil, campfire, it)
-                if not ok then
-                    local roll = jass.GetRandomInt(1, 100)
-                    if roll > 20 then
-                        jass.RemoveItem(it)
-                    end
-                else
-                    itemState:set(it, {campfire = campfire, stage = "done"})
-                    local set = campfireItems:get(campfire)
-                    if not set then
-                        set = __TS__New(Set)
-                        campfireItems:set(campfire, set)
-                    end
-                    set:add(it)
-                    if timeout > 0 then
-                        startBurnTimer(nil, it, campfire, timeout)
-                    end
-                end
-                remaining = 0
-            end
-            safeDestroyTimer(nil, t)
-        end
+        onCookTimerExpire
     )
 end
-local function onAnyPickup(self)
+local function onAnyPickup()
     local u = jass.GetTriggerUnit()
     local item = jass.GetManipulatedItem()
     if not u or not item then
         return
     end
-    if not isCampfire(nil, u) then
+    if not isCampfire(u) then
         if itemState:has(item) then
-            untrackItem(nil, item)
+            untrackItem(item)
         end
         return
     end
     if itemState:has(item) then
         return
     end
-    local recipe = getRecipeForItem(nil, item)
+    local recipe = getRecipeForItem(item)
     local campfire = u
     itemState:set(item, {campfire = campfire, stage = "raw"})
     local set = campfireItems:get(campfire)
@@ -396,13 +421,13 @@ local function onAnyPickup(self)
     end
     set:add(item)
     if not recipe then
-        startBurnTimer(nil, item, campfire, 15)
+        startBurnTimer(item, campfire, 15)
     else
-        startCookTimer(nil, item, campfire, recipe)
+        startCookTimer(item, campfire, recipe)
     end
 end
-local function onCampfireDeath(self, dyingUnit)
-    if not dyingUnit or not isCampfire(nil, dyingUnit) then
+local function onCampfireDeath(dyingUnit)
+    if not dyingUnit or not isCampfire(dyingUnit) then
         return
     end
     local set = campfireItems:get(dyingUnit)
@@ -410,20 +435,20 @@ local function onCampfireDeath(self, dyingUnit)
         return
     end
     for ____, it in __TS__Iterator(set) do
-        untrackItem(nil, it)
+        untrackItem(it)
     end
     campfireItems:delete(dyingUnit)
 end
-____exports["init物品加工"] = function(self)
-    itemEventCenter:onItemPickup(function(____, unit, item)
-        onAnyPickup(nil)
+____exports["init物品加工"] = function()
+    itemEventCenter:onItemPickup(function(unit, item)
+        onAnyPickup()
     end)
-    itemEventCenter:onItemDrop(function(____, unit, item)
-        if unit and item and isCampfire(nil, unit) and itemState:has(item) then
-            untrackItem(nil, item)
+    itemEventCenter:onItemDrop(function(unit, item)
+        if unit and item and isCampfire(unit) and itemState:has(item) then
+            untrackItem(item)
         end
     end)
     registerDeathListener(nil, onCampfireDeath)
 end
-____exports["init物品加工"](nil)
+____exports["init物品加工"]()
 return ____exports

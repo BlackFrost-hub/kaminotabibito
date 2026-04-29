@@ -17,11 +17,17 @@ export function createDotBaseUtils(deps: {
   getUnitMaxHp: (targetUnit: any) => number;
   getTargetRegenHP: (targetUnit: any) => number;
 } {
+  // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
+  const jass = deps.jass;
+  const g = deps.g;
+  const itemsData = deps.itemsData;
+  const fourCCToString = deps.fourCCToString;
+
   // ========== 虚拟分区：目标合法性判断 ==========
   function getStructureUnitTypeHandle(): any {
-    const direct = deps.jass.UNIT_TYPE_STRUCTURE ?? deps.g.UNIT_TYPE_STRUCTURE;
+    const direct = jass.UNIT_TYPE_STRUCTURE ?? g.UNIT_TYPE_STRUCTURE;
     if (direct != null) return direct;
-    if (typeof deps.jass.ConvertUnitType === "function") return deps.jass.ConvertUnitType(64);
+    if (typeof jass.ConvertUnitType === "function") return jass.ConvertUnitType(64);
     return null;
   }
 
@@ -29,43 +35,43 @@ export function createDotBaseUtils(deps: {
     if (source == null || target == null || target === 0) return false;
     const utStruct = getStructureUnitTypeHandle();
     if (utStruct != null) {
-      if (deps.jass.IsUnitType(target, utStruct) === true) return false;
+      if (jass.IsUnitType(target, utStruct) === true) return false;
     }
-    const srcP = deps.jass.GetOwningPlayer(source);
+    const srcP = jass.GetOwningPlayer(source);
     if (srcP == null) return false;
-    return deps.jass.IsUnitEnemy(target, srcP) === true;
+    return jass.IsUnitEnemy(target, srcP) === true;
   }
 
   function heroUnitTypeForIsUnitType(): any {
-    const direct = deps.jass.UNIT_TYPE_HERO ?? deps.g.UNIT_TYPE_HERO;
+    const direct = jass.UNIT_TYPE_HERO ?? g.UNIT_TYPE_HERO;
     if (direct != null) return direct;
-    return deps.jass.ConvertUnitType(2);
+    return jass.ConvertUnitType(2);
   }
 
   function isSourceHeroPlayer1to4(unit: any): boolean {
     if (!unit) return false;
-    const owner = deps.jass.GetOwningPlayer(unit);
+    const owner = jass.GetOwningPlayer(unit);
     let playerIdx = -1;
     for (let i = 0; i <= 15; i++) {
-      if (deps.jass.Player(i) === owner) {
+      if (jass.Player(i) === owner) {
         playerIdx = i;
         break;
       }
     }
     if (playerIdx < 0 || playerIdx > 3) return false;
     const utHero = heroUnitTypeForIsUnitType();
-    if (utHero != null && deps.jass.IsUnitType(unit, utHero) === true) return true;
-    if (deps.jass.GetHeroLevel(unit) > 0) return true;
+    if (utHero != null && jass.IsUnitType(unit, utHero) === true) return true;
+    if (jass.GetHeroLevel(unit) > 0) return true;
     return false;
   }
 
   // ========== 虚拟分区：装备读取 ==========
   function unitItemInSlot(unit: any, slot: number): any {
-    return deps.jass.UnitItemInSlot(unit, slot);
+    return jass.UnitItemInSlot(unit, slot);
   }
 
   function getItemTypeId(item: any): number {
-    return deps.jass.GetItemTypeId(item);
+    return jass.GetItemTypeId(item);
   }
 
   function getBestDotFromUnit<T extends { duration: number; attackOnly: boolean }>(
@@ -77,8 +83,8 @@ export function createDotBaseUtils(deps: {
     for (let slot = 0; slot <= 5; slot++) {
       const item = unitItemInSlot(unit, slot);
       if (!item) continue;
-      const idStr = deps.fourCCToString(getItemTypeId(item));
-      const entry = deps.itemsData[idStr];
+      const idStr = fourCCToString(getItemTypeId(item));
+      const entry = itemsData[idStr];
       const segments = entry?.Buff != null ? splitItemBuffSegments(entry.Buff) : [];
       for (let si = 0; si < segments.length; si++) {
         const parsed = parseBuff(segments[si]);
@@ -97,21 +103,21 @@ export function createDotBaseUtils(deps: {
   // ========== 虚拟分区：数值读取 ==========
   function getUnitMaxHp(targetUnit: any): number {
     if (!targetUnit) return 0;
-    const m = deps.jass.BlzGetUnitMaxHP(targetUnit);
+    const m = jass.BlzGetUnitMaxHP(targetUnit);
     if (typeof m === "number" && isFinite(m) && m > 0) return m;
     let maxLifeState: any = null;
-    if (deps.jass.UNIT_STATE_MAX_LIFE != null) maxLifeState = deps.jass.UNIT_STATE_MAX_LIFE;
-    else if (deps.g.UNIT_STATE_MAX_LIFE != null) maxLifeState = deps.g.UNIT_STATE_MAX_LIFE;
-    else maxLifeState = deps.jass.ConvertUnitState(1);
+    if (jass.UNIT_STATE_MAX_LIFE != null) maxLifeState = jass.UNIT_STATE_MAX_LIFE;
+    else if (g.UNIT_STATE_MAX_LIFE != null) maxLifeState = g.UNIT_STATE_MAX_LIFE;
+    else maxLifeState = jass.ConvertUnitState(1);
     if (maxLifeState == null) return 0;
-    const v = deps.jass.GetUnitState(targetUnit, maxLifeState);
+    const v = jass.GetUnitState(targetUnit, maxLifeState);
     return typeof v === "number" && isFinite(v) && v > 0 ? v : 0;
   }
 
   function getTargetRegenHP(targetUnit: any): number {
     if (!targetUnit) return 0;
-    const typeId = deps.jass.GetUnitTypeId(targetUnit);
-    const idStr = deps.fourCCToString(typeId);
+    const typeId = jass.GetUnitTypeId(targetUnit);
+    const idStr = fourCCToString(typeId);
     const slk = (globalThis as any).slk as { unit?: Record<string, Record<string, string>> } | undefined;
     const slkUnit = slk != null && slk.unit ? slk.unit[idStr] : undefined;
     if (slkUnit == null) return 0;

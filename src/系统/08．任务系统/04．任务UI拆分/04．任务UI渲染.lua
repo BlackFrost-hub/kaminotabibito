@@ -24,13 +24,7 @@ local questRowClickHandlers = {}
 local frameToQuestIdMap = {}
 local function onQuestRowClick(self)
     local japi = require("jass.japi")
-    local ____temp_0
-    if type(japi.DzGetTriggerUIEventFrame) == "function" then
-        ____temp_0 = japi.DzGetTriggerUIEventFrame()
-    else
-        ____temp_0 = 0
-    end
-    local frame = ____temp_0
+    local frame = japi.DzGetTriggerUIEventFrame()
     if not frame then
         return
     end
@@ -141,23 +135,23 @@ local function buildFailText(self, timeLimit)
     return ("|cffff4444失败:|r 时间限制 " .. tostring(timeLimit)) .. "秒"
 end
 function ____exports.renderExpandedQuestDetails(self, opts)
-    local ____opts_1 = opts
-    local japi = ____opts_1.japi
-    local quest = ____opts_1.quest
-    local listParent = ____opts_1.listParent
-    local rowTopRel = ____opts_1.rowTopRel
-    local textXRel = ____opts_1.textXRel
-    local textW = ____opts_1.textW
-    local listTextAlign = ____opts_1.listTextAlign
-    local FramePoint = ____opts_1.FramePoint
-    local createTextLabel = ____opts_1.createTextLabel
-    local setFramePointRelative = ____opts_1.setFramePointRelative
-    local setFrameSize = ____opts_1.setFrameSize
-    local applyDzTextFontAndAlignment = ____opts_1.applyDzTextFontAndAlignment
-    local showFrame = ____opts_1.showFrame
-    local objFrameByKey = ____opts_1.objFrameByKey
-    local failFrameByQuestId = ____opts_1.failFrameByQuestId
-    local listItemFrames = ____opts_1.listItemFrames
+    local ____opts_0 = opts
+    local japi = ____opts_0.japi
+    local quest = ____opts_0.quest
+    local listParent = ____opts_0.listParent
+    local rowTopRel = ____opts_0.rowTopRel
+    local textXRel = ____opts_0.textXRel
+    local textW = ____opts_0.textW
+    local listTextAlign = ____opts_0.listTextAlign
+    local FramePoint = ____opts_0.FramePoint
+    local createTextLabel = ____opts_0.createTextLabel
+    local setFramePointRelative = ____opts_0.setFramePointRelative
+    local setFrameSize = ____opts_0.setFrameSize
+    local applyDzTextFontAndAlignment = ____opts_0.applyDzTextFontAndAlignment
+    local showFrame = ____opts_0.showFrame
+    local objFrameByKey = ____opts_0.objFrameByKey
+    local failFrameByQuestId = ____opts_0.failFrameByQuestId
+    local listItemFrames = ____opts_0.listItemFrames
     local objYRel = rowTopRel - EXPANDED_OBJECTIVE_START_OFFSET
     for ____, obj in ipairs(quest.objectives) do
         do
@@ -355,41 +349,41 @@ function ____exports.renderExpandedQuestDetails(self, opts)
     return true
 end
 function ____exports.renderQuestRow(self, opts)
-    local ____opts_2 = opts
-    local japi = ____opts_2.japi
-    local quest = ____opts_2.quest
-    local rowTopRel = ____opts_2.rowTopRel
-    local expanded = ____opts_2.expanded
-    local listParent = ____opts_2.listParent
-    local FrameType = ____opts_2.FrameType
-    local FramePoint = ____opts_2.FramePoint
-    local createFrame = ____opts_2.createFrame
-    local createTextLabel = ____opts_2.createTextLabel
-    local setFrameTexture = ____opts_2.setFrameTexture
-    local setFramePointRelative = ____opts_2.setFramePointRelative
-    local setFrameSize = ____opts_2.setFrameSize
-    local setFrameClickEvent = ____opts_2.setFrameClickEvent
-    local showFrame = ____opts_2.showFrame
-    local applyDzTextFontAndAlignment = ____opts_2.applyDzTextFontAndAlignment
-    local onToggleExpand = ____opts_2.onToggleExpand
-    local onClickSound = ____opts_2.onClickSound
-    local rowBackdropByQuestId = ____opts_2.rowBackdropByQuestId
-    local titleByQuestId = ____opts_2.titleByQuestId
-    local clickBtnByQuestId = ____opts_2.clickBtnByQuestId
-    local objFrameByKey = ____opts_2.objFrameByKey
-    local failFrameByQuestId = ____opts_2.failFrameByQuestId
-    local rowIconByQuestId = ____opts_2.rowIconByQuestId
-    local listItemFrames = ____opts_2.listItemFrames
+    local ____opts_1 = opts
+    local japi = ____opts_1.japi
+    local quest = ____opts_1.quest
+    local rowTopRel = ____opts_1.rowTopRel
+    local expanded = ____opts_1.expanded
+    local listParent = ____opts_1.listParent
+    local FrameType = ____opts_1.FrameType
+    local FramePoint = ____opts_1.FramePoint
+    local createFrame = ____opts_1.createFrame
+    local createTextLabel = ____opts_1.createTextLabel
+    local setFrameTexture = ____opts_1.setFrameTexture
+    local setFramePointRelative = ____opts_1.setFramePointRelative
+    local setFrameSize = ____opts_1.setFrameSize
+    local setFrameClickEvent = ____opts_1.setFrameClickEvent
+    local showFrame = ____opts_1.showFrame
+    local applyDzTextFontAndAlignment = ____opts_1.applyDzTextFontAndAlignment
+    local onToggleExpand = ____opts_1.onToggleExpand
+    local onClickSound = ____opts_1.onClickSound
+    local rowBackdropByQuestId = ____opts_1.rowBackdropByQuestId
+    local titleByQuestId = ____opts_1.titleByQuestId
+    local clickBtnByQuestId = ____opts_1.clickBtnByQuestId
+    local objFrameByKey = ____opts_1.objFrameByKey
+    local failFrameByQuestId = ____opts_1.failFrameByQuestId
+    local rowIconByQuestId = ____opts_1.rowIconByQuestId
+    local listItemFrames = ____opts_1.listItemFrames
     local itemH = getQuestItemHeight(nil, quest, expanded)
     local statusText = getStatusText(nil, quest.status)
     local showMainRowIcon = isQuestWithRowIconLayout(nil, quest)
-    local ____exports_calcTaskListItemLayout_result_3 = ____exports.calcTaskListItemLayout(nil, showMainRowIcon)
-    local rowWidth = ____exports_calcTaskListItemLayout_result_3.rowWidth
-    local rowLeftRel = ____exports_calcTaskListItemLayout_result_3.rowLeftRel
-    local iconHLayout = ____exports_calcTaskListItemLayout_result_3.iconHLayout
-    local textXRel = ____exports_calcTaskListItemLayout_result_3.textXRel
-    local listTextAlign = ____exports_calcTaskListItemLayout_result_3.listTextAlign
-    local textW = ____exports_calcTaskListItemLayout_result_3.textW
+    local ____exports_calcTaskListItemLayout_result_2 = ____exports.calcTaskListItemLayout(nil, showMainRowIcon)
+    local rowWidth = ____exports_calcTaskListItemLayout_result_2.rowWidth
+    local rowLeftRel = ____exports_calcTaskListItemLayout_result_2.rowLeftRel
+    local iconHLayout = ____exports_calcTaskListItemLayout_result_2.iconHLayout
+    local textXRel = ____exports_calcTaskListItemLayout_result_2.textXRel
+    local listTextAlign = ____exports_calcTaskListItemLayout_result_2.listTextAlign
+    local textW = ____exports_calcTaskListItemLayout_result_2.textW
     local rowBackdrop = rowBackdropByQuestId[quest.id] or 0
     if rowBackdrop == 0 then
         rowBackdrop = tryCreateFromFdfOnly(nil, "TaskButtonBackdrop", listParent) or 0

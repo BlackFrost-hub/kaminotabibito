@@ -36,6 +36,7 @@ local TRIG_KEY = "__syzl_equipExtract_trig"
 local ATTEMPT_KEY = "__syzl_equipRegAttempt"
 local MAX_REG_ATTEMPTS = 30
 local RETRY_SEC = 0.1
+local EQUIP_EXTRACT_EVENT_NAME = "装备提取事件"
 local itemsTable = dataMod.items or dataMod.default or ({})
 local function log(msg)
     debugLog(nil, "装备提取", msg)
@@ -162,6 +163,9 @@ local function runEquipExtract()
     ydlStes_finishChildCleanup(nil, nil)
     log((((((((((((("[装备提取] 读参 ScoreMin=" .. formatDbgVal(rawMin)) .. " ScoreMax=") .. formatDbgVal(rawMax)) .. " → 区间[") .. tostring(lo)) .. ",") .. tostring(hi)) .. "] 候选") .. tostring(#pool)) .. "件 抽到id=") .. pickedId) .. " ItemType(rawcode)=") .. tostring(raw))
 end
+local function onEquipExtractTriggerAction()
+    runEquipExtract()
+end
 local function scheduleRetry(fn)
     createDelayedCall(nil, RETRY_SEC, fn)
 end
@@ -178,17 +182,12 @@ local function tryRegisterEquipStes()
     end
     if g[TRIG_KEY] == nil then
         local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(
-            trig,
-            function()
-                runEquipExtract()
-            end
-        )
+        jass.TriggerAddAction(trig, onEquipExtractTriggerAction)
         g[TRIG_KEY] = trig
     end
     local trig = g[TRIG_KEY]
-    ydlStes_registerAfterGetTable(nil, nil, trig, "装备提取事件")
-    local jCount = countOnJassStesTable("装备提取事件")
+    ydlStes_registerAfterGetTable(nil, nil, trig, EQUIP_EXTRACT_EVENT_NAME)
+    local jCount = countOnJassStesTable(EQUIP_EXTRACT_EVENT_NAME)
     local attempt = g[ATTEMPT_KEY] or 0
     g[ATTEMPT_KEY] = attempt + 1
     if jCount >= 1 then

@@ -22,6 +22,13 @@ export function registerBuiltInDotTypes(deps: {
   getUnitMaxHp: (target: any) => number;
   dotEffectModelFromBuffRow: (rowId: "D001" | "D002" | "D003" | "D004") => string;
 }): void {
+  // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
+  const registerDotType = deps.registerDotType;
+  const getBestDotFromUnit = deps.getBestDotFromUnit;
+  const getTargetRegenHP = deps.getTargetRegenHP;
+  const getUnitMaxHp = deps.getUnitMaxHp;
+  const dotEffectModelFromBuffRow = deps.dotEffectModelFromBuffRow;
+
   // ========== 虚拟分区：antiHeal ==========
   function parseAntiHealBuff(buffStr: string): AntiHealParsed | null {
     return parseStandardDotBuff(
@@ -33,20 +40,20 @@ export function registerBuiltInDotTypes(deps: {
   }
 
   function getBestAntiHealFromUnit(unit: any): AntiHealParsed | null {
-    return deps.getBestDotFromUnit(unit, parseAntiHealBuff, (parsed) => parsed.effectPct * parsed.duration);
+    return getBestDotFromUnit(unit, parseAntiHealBuff, (parsed) => parsed.effectPct * parsed.duration);
   }
 
-  deps.registerDotType({
+  registerDotType({
     id: "antiHeal",
     debuffDotEnemyNoStructure: true,
     parseBuff: parseAntiHealBuff,
     getBestFromUnit: getBestAntiHealFromUnit,
     computeAmount: (target: any, parsed: any) => {
-      const regenHP = deps.getTargetRegenHP(target);
+      const regenHP = getTargetRegenHP(target);
       return regenHP * ((parsed.effectPct as number) / 100);
     },
     damageType: jass.DAMAGE_TYPE_MIND,
-    effectModel: deps.dotEffectModelFromBuffRow(getDotBuffRow("antiHeal")),
+    effectModel: dotEffectModelFromBuffRow(getDotBuffRow("antiHeal")),
     effectDuration: 0.8,
   });
 
@@ -61,17 +68,17 @@ export function registerBuiltInDotTypes(deps: {
   }
 
   function getBestBurnFromUnit(unit: any): BurnParsed | null {
-    return deps.getBestDotFromUnit(unit, parseBurnBuff, (parsed) => parsed.damagePerSec * parsed.duration);
+    return getBestDotFromUnit(unit, parseBurnBuff, (parsed) => parsed.damagePerSec * parsed.duration);
   }
 
-  deps.registerDotType({
+  registerDotType({
     id: "burn",
     debuffDotEnemyNoStructure: true,
     parseBuff: parseBurnBuff,
     getBestFromUnit: getBestBurnFromUnit,
     computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
     damageType: jass.DAMAGE_TYPE_FIRE,
-    effectModel: deps.dotEffectModelFromBuffRow(getDotBuffRow("burn")),
+    effectModel: dotEffectModelFromBuffRow(getDotBuffRow("burn")),
     effectDuration: 0.75,
   });
 
@@ -86,17 +93,17 @@ export function registerBuiltInDotTypes(deps: {
   }
 
   function getBestPoisonFromUnit(unit: any): PoisonParsed | null {
-    return deps.getBestDotFromUnit(unit, parsePoisonBuff, (parsed) => parsed.damagePerSec * parsed.duration);
+    return getBestDotFromUnit(unit, parsePoisonBuff, (parsed) => parsed.damagePerSec * parsed.duration);
   }
 
-  deps.registerDotType({
+  registerDotType({
     id: "poison",
     debuffDotEnemyNoStructure: true,
     parseBuff: parsePoisonBuff,
     getBestFromUnit: getBestPoisonFromUnit,
     computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
     damageType: jass.DAMAGE_TYPE_ACID,
-    effectModel: deps.dotEffectModelFromBuffRow(getDotBuffRow("poison")),
+    effectModel: dotEffectModelFromBuffRow(getDotBuffRow("poison")),
     effectDuration: 0.8,
   });
 
@@ -132,20 +139,20 @@ export function registerBuiltInDotTypes(deps: {
   }
 
   function getBestTrollCurseFromUnit(unit: any): TrollCurseParsed | null {
-    return deps.getBestDotFromUnit(unit, parseTrollCurseBuff, (parsed) => parsed.pctMaxHpPerSec * parsed.duration);
+    return getBestDotFromUnit(unit, parseTrollCurseBuff, (parsed) => parsed.pctMaxHpPerSec * parsed.duration);
   }
 
-  deps.registerDotType({
+  registerDotType({
     id: "trollCurse",
     debuffDotEnemyNoStructure: true,
     parseBuff: parseTrollCurseBuff,
     getBestFromUnit: getBestTrollCurseFromUnit,
     computeAmount: (target: any, parsed: any) => {
-      const maxHp = deps.getUnitMaxHp(target);
+      const maxHp = getUnitMaxHp(target);
       return maxHp * ((parsed.pctMaxHpPerSec as number) / 100);
     },
     damageType: jass.DAMAGE_TYPE_NORMAL,
-    effectModel: deps.dotEffectModelFromBuffRow(getDotBuffRow("trollCurse")),
+    effectModel: dotEffectModelFromBuffRow(getDotBuffRow("trollCurse")),
     effectDuration: 0.8,
   });
 }

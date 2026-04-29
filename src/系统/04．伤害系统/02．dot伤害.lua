@@ -7,10 +7,7 @@ local ____03_FF0EDOT_7C7B_578B_5B9A_4E49 = require("系统.04．伤害系统.01�
 local registerBuiltInDotTypes = ____03_FF0EDOT_7C7B_578B_5B9A_4E49.registerBuiltInDotTypes
 local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
 local getDotSourceDisplayName = ____04_FF0EDOT_5DE5_5177.getDotSourceDisplayName
-local isValidDotStateRow = ____04_FF0EDOT_5DE5_5177.isValidDotStateRow
-local tabDeleteHid = ____04_FF0EDOT_5DE5_5177.tabDeleteHid
-local tabRowForHid = ____04_FF0EDOT_5DE5_5177.tabRowForHid
-local tabSetHid = ____04_FF0EDOT_5DE5_5177.tabSetHid
+local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
 local unitHid = ____04_FF0EDOT_5DE5_5177.unitHid
 local ____05_FF0EDOT_72B6_6001_540C_6B65 = require("系统.04．伤害系统.01．DOT定义.05．DOT状态同步")
 local createDotStateSync = ____05_FF0EDOT_72B6_6001_540C_6B65.createDotStateSync
@@ -50,21 +47,23 @@ local dotTypes = {}
 function ____exports.registerDotType(self, config)
     dotTypes[#dotTypes + 1] = config
 end
+local __pcallNotifyTypeId = ""
+local __pcallNotifyTarget = nil
+local __pcallNotifyState = nil
+local function __pcallNotifyBuffPoolBody(self)
+    local m = require("系统.05．Buff系统.00．Buff系统")
+    if m ~= nil and type(m.syncDotBuff) == "function" then
+        m:syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState)
+    end
+end
 --- Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统
 local function notifyBuffPool(self, typeId, target, state)
-    pcall(function ()
-            local m = require("系统.05．Buff系统.00．Buff系统")
-            if m ~= nil and type(m.syncDotBuff) == "function" then
-                m:syncDotBuff(typeId, target, state)
-            end
-        end
-    )
+    __pcallNotifyTypeId = typeId
+    __pcallNotifyTarget = target
+    __pcallNotifyState = state
+    pcall(__pcallNotifyBuffPoolBody)
 end
---- 按类型、再按目标存状态。stateByType[typeId][GetHandleId(target)] = { effect, remaining, _dotUnitRef?, ... }
-local stateByType = {}
 local dotTicks = {}
---- 刚被我们「某类型」伤害打到的单位，下一帧伤害回调里跳过对该类型施加，避免 DOT 触发的伤害再次叠 DOT
-local ignoredTargetByType = {}
 local equipDataMod = require("系统.02．物品系统.01．装备数据")
 local itemsData = equipDataMod.items or equipDataMod.default or ({})
 local dotBaseUtils = createDotBaseUtils(nil, {jass = jass, g = g, itemsData = itemsData, fourCCToString = fourCCToString})
@@ -80,33 +79,23 @@ local function removeDotTicksForTargetHid(self, typeId, tgtHid)
         end
     end
 end
-local dotStateSync = createDotStateSync(nil, {stateByType = stateByType, dotTypes = dotTypes, removeDotTicksForTargetHid = removeDotTicksForTargetHid, notifyBuffPool = notifyBuffPool})
+local dotStateSync = createDotStateSync(nil, {dotTypes = dotTypes, removeDotTicksForTargetHid = removeDotTicksForTargetHid, notifyBuffPool = notifyBuffPool})
 local dotExecutor = createDotExecutor(nil, {
     jass = jass,
     LeakWatcher = LeakWatcher,
     dotTypes = dotTypes,
     dotTicks = dotTicks,
-    stateByType = stateByType,
-    ignoredTargetByType = ignoredTargetByType,
     damageEventModule = damageEventModule,
-    unitHid = unitHid,
-    tabRowForHid = tabRowForHid,
-    isValidDotStateRow = isValidDotStateRow
+    unitHid = unitHid
 })
 local dotApplyStrategy = createDotApplyStrategy(
     nil,
     {
         dotTypes = dotTypes,
-        stateByType = stateByType,
         dotTicks = dotTicks,
-        ignoredTargetByType = ignoredTargetByType,
         unitHid = unitHid,
         isSourceHeroPlayer1to4 = dotBaseUtils.isSourceHeroPlayer1to4,
         isDebuffDotTargetOk = dotBaseUtils.isDebuffDotTargetOk,
-        tabRowForHid = tabRowForHid,
-        tabSetHid = tabSetHid,
-        tabDeleteHid = tabDeleteHid,
-        isValidDotStateRow = isValidDotStateRow,
         getDotSourceDisplayName = getDotSourceDisplayName,
         notifyBuffPool = notifyBuffPool,
         ensureDotTimers = function() return dotExecutor:ensureDotTimers() end,
@@ -152,16 +141,11 @@ registerBuiltInDotTypes(nil, {
 })
 local registered = false
 local function getDotStateByTypeId(self, typeId, unit)
-    local tab = stateByType[typeId]
-    if tab == nil or unit == nil or unit == 0 then
-        return nil
-    end
     local h = unitHid(nil, unit)
     if h == 0 then
         return nil
     end
-    local raw = tabRowForHid(nil, tab, h)
-    return raw ~= nil and isValidDotStateRow(nil, raw) and raw or nil
+    return getDotState(nil, typeId, h)
 end
 --- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
 function ____exports.getUnitAntiHeal(self, unit)

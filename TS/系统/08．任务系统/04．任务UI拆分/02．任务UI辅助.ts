@@ -23,7 +23,6 @@ function __dzPcallFrameShowBody(): void {
 }
 
 export function pcallDzFrameShow(frame: number, visible: boolean): void {
-  if (typeof japi.DzFrameShow !== "function") return;
   __dzPcallFrame = frame;
   __dzPcallVis = visible;
   pcall(__dzPcallFrameShowBody);
@@ -36,7 +35,6 @@ function __dzPcallFrameSetAlphaBody(): void {
 }
 
 export function pcallDzFrameSetAlpha(frame: number, alpha: number): void {
-  if (typeof japi.DzFrameSetAlpha !== "function") return;
   __dzPcallFrame = frame;
   __dzPcallAlphaVal = alpha;
   pcall(__dzPcallFrameSetAlphaBody);

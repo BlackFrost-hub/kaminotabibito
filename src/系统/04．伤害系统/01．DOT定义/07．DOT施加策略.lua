@@ -1,8 +1,21 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
+local clearIgnoredTarget = ____04_FF0EDOT_5DE5_5177.clearIgnoredTarget
+local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
+local isIgnoredTarget = ____04_FF0EDOT_5DE5_5177.isIgnoredTarget
+local setDotState = ____04_FF0EDOT_5DE5_5177.setDotState
 function ____exports.createDotApplyStrategy(self, deps)
+    local dotTypes = deps.dotTypes
+    local dotTicks = deps.dotTicks
+    local unitHid = deps.unitHid
+    local isSourceHeroPlayer1to4 = deps.isSourceHeroPlayer1to4
+    local isDebuffDotTargetOk = deps.isDebuffDotTargetOk
+    local getDotSourceDisplayName = deps.getDotSourceDisplayName
+    local notifyBuffPool = deps.notifyBuffPool
+    local ensureDotTimers = deps.ensureDotTimers
+    local getDotTickBatchTargetHids = deps.getDotTickBatchTargetHids
     local DURATION_TIER_EPS = 0.05
     local function abs(self, value)
         return value < 0 and -value or value
@@ -12,17 +25,16 @@ function ____exports.createDotApplyStrategy(self, deps)
     end
     local function pushDotTickForTarget(self, typeId, source, target, tgtHid, amount, _duration, cfg)
         do
-            local i = #deps.dotTicks - 1
+            local i = #dotTicks - 1
             while i >= 0 do
-                local e = deps.dotTicks[i + 1]
-                if e.typeId == typeId and deps:unitHid(e.target) == tgtHid then
-                    __TS__ArraySplice(deps.dotTicks, i, 1)
+                local e = dotTicks[i + 1]
+                if e.typeId == typeId and unitHid(nil, e.target) == tgtHid then
+                    __TS__ArraySplice(dotTicks, i, 1)
                 end
                 i = i - 1
             end
         end
-        local ____deps_dotTicks_0 = deps.dotTicks
-        ____deps_dotTicks_0[#____deps_dotTicks_0 + 1] = {
+        dotTicks[#dotTicks + 1] = {
             typeId = typeId,
             source = source,
             target = target,
@@ -36,9 +48,9 @@ function ____exports.createDotApplyStrategy(self, deps)
         cur.remaining = bestDuration
         cur._dotParsedDuration = bestDuration
         cur._dotUnitRef = target
-        cur.sourceName = deps:getDotSourceDisplayName(source)
+        cur.sourceName = getDotSourceDisplayName(nil, source)
     end
-    local function applyEquipmentDotOnHeroAttack(self, typeId, cfg, tab, tgtHid, target, source, amount, bestDuration, cur)
+    local function applyEquipmentDotOnHeroAttack(self, typeId, cfg, tgtHid, target, source, amount, bestDuration, cur)
         if cur ~= nil then
             fillDotStateRow(
                 nil,
@@ -58,16 +70,17 @@ function ____exports.createDotApplyStrategy(self, deps)
                 bestDuration,
                 cfg
             )
-            deps:notifyBuffPool(typeId, target, cur)
+            notifyBuffPool(nil, typeId, target, cur)
+            setDotState(nil, typeId, tgtHid, cur)
         else
             local state = {
                 effect = amount,
                 remaining = bestDuration,
                 _dotUnitRef = target,
-                sourceName = deps:getDotSourceDisplayName(source),
+                sourceName = getDotSourceDisplayName(nil, source),
                 _dotParsedDuration = bestDuration
             }
-            deps:tabSetHid(tab, tgtHid, state)
+            setDotState(nil, typeId, tgtHid, state)
             pushDotTickForTarget(
                 nil,
                 typeId,
@@ -78,23 +91,23 @@ function ____exports.createDotApplyStrategy(self, deps)
                 bestDuration,
                 cfg
             )
-            deps:notifyBuffPool(typeId, target, state)
+            notifyBuffPool(nil, typeId, target, state)
             if type(cfg.onApply) == "function" then
                 cfg:onApply(target, state)
             end
         end
-        deps:ensureDotTimers()
+        ensureDotTimers(nil)
     end
-    local function applyEquipmentDotOnNonAttack(self, typeId, cfg, tab, tgtHid, target, source, amount, bestDuration, cur)
+    local function applyEquipmentDotOnNonAttack(self, typeId, cfg, tgtHid, target, source, amount, bestDuration, cur)
         if cur == nil then
             local state = {
                 effect = amount,
                 remaining = bestDuration,
                 _dotUnitRef = target,
-                sourceName = deps:getDotSourceDisplayName(source),
+                sourceName = getDotSourceDisplayName(nil, source),
                 _dotParsedDuration = bestDuration
             }
-            deps:tabSetHid(tab, tgtHid, state)
+            setDotState(nil, typeId, tgtHid, state)
             pushDotTickForTarget(
                 nil,
                 typeId,
@@ -105,11 +118,11 @@ function ____exports.createDotApplyStrategy(self, deps)
                 bestDuration,
                 cfg
             )
-            deps:notifyBuffPool(typeId, target, state)
+            notifyBuffPool(nil, typeId, target, state)
             if type(cfg.onApply) == "function" then
                 cfg:onApply(target, state)
             end
-            deps:ensureDotTimers()
+            ensureDotTimers(nil)
             return
         end
         if sameDurationTier(nil, cur, bestDuration) then
@@ -131,8 +144,9 @@ function ____exports.createDotApplyStrategy(self, deps)
                 bestDuration,
                 cfg
             )
-            deps:notifyBuffPool(typeId, target, cur)
-            deps:ensureDotTimers()
+            notifyBuffPool(nil, typeId, target, cur)
+            setDotState(nil, typeId, tgtHid, cur)
+            ensureDotTimers(nil)
             return
         end
         local currentProduct = cur.effect * cur.remaining
@@ -147,10 +161,10 @@ function ____exports.createDotApplyStrategy(self, deps)
             effect = amount,
             remaining = bestDuration,
             _dotUnitRef = target,
-            sourceName = deps:getDotSourceDisplayName(source),
+            sourceName = getDotSourceDisplayName(nil, source),
             _dotParsedDuration = bestDuration
         }
-        deps:tabSetHid(tab, tgtHid, state)
+        setDotState(nil, typeId, tgtHid, state)
         pushDotTickForTarget(
             nil,
             typeId,
@@ -161,27 +175,27 @@ function ____exports.createDotApplyStrategy(self, deps)
             bestDuration,
             cfg
         )
-        deps:notifyBuffPool(typeId, target, state)
+        notifyBuffPool(nil, typeId, target, state)
         if type(cfg.onApply) == "function" then
             cfg:onApply(target, state)
         end
-        deps:ensureDotTimers()
+        ensureDotTimers(nil)
     end
     local function tryApplyHeroAttackGearDots(self, source, target, _damage)
         if not target or not source then
             return
         end
-        if not deps:isSourceHeroPlayer1to4(source) then
+        if not isSourceHeroPlayer1to4(nil, source) then
             return
         end
-        local tgtHid = deps:unitHid(target)
+        local tgtHid = unitHid(nil, target)
         do
             local t = 0
-            while t < #deps.dotTypes do
+            while t < #dotTypes do
                 do
-                    local cfg = deps.dotTypes[t + 1]
+                    local cfg = dotTypes[t + 1]
                     local typeId = cfg.id
-                    if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
+                    if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
                         goto __continue25
                     end
                     local best = cfg:getBestFromUnit(source)
@@ -192,20 +206,11 @@ function ____exports.createDotApplyStrategy(self, deps)
                     if amount <= 0 then
                         goto __continue25
                     end
-                    if deps.stateByType[typeId] == nil then
-                        deps.stateByType[typeId] = {}
-                    end
-                    local tab = deps.stateByType[typeId]
-                    local curRaw = deps:tabRowForHid(tab, tgtHid)
-                    local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
-                    if curRaw ~= nil and cur == nil then
-                        deps:tabDeleteHid(tab, tgtHid)
-                    end
+                    local cur = getDotState(nil, typeId, tgtHid)
                     applyEquipmentDotOnHeroAttack(
                         nil,
                         typeId,
                         cfg,
-                        tab,
                         tgtHid,
                         target,
                         source,
@@ -230,59 +235,50 @@ function ____exports.createDotApplyStrategy(self, deps)
         if not source then
             return
         end
-        if not deps:isSourceHeroPlayer1to4(source) then
+        if not isSourceHeroPlayer1to4(nil, source) then
             return
         end
-        local tgtHid = deps:unitHid(target)
-        local dotTickBatchTargetHids = deps:getDotTickBatchTargetHids()
+        local tgtHid = unitHid(nil, target)
+        local dotTickBatchTargetHids = getDotTickBatchTargetHids(nil)
         local suppressDotApplyForBatch = fromDotTickBatch == true and dotTickBatchTargetHids ~= nil and dotTickBatchTargetHids[tgtHid] == true and not isAttackHitForDot
         do
             local t = 0
-            while t < #deps.dotTypes do
+            while t < #dotTypes do
                 do
-                    local cfg = deps.dotTypes[t + 1]
+                    local cfg = dotTypes[t + 1]
                     local typeId = cfg.id
-                    if deps.ignoredTargetByType[typeId] ~= nil and deps.ignoredTargetByType[typeId][tgtHid] == true then
-                        __TS__Delete(deps.ignoredTargetByType[typeId], tgtHid)
-                        goto __continue37
+                    if isIgnoredTarget(nil, typeId, tgtHid) then
+                        clearIgnoredTarget(nil, typeId, tgtHid)
+                        goto __continue35
                     end
                     if suppressDotApplyForBatch then
-                        goto __continue37
+                        goto __continue35
                     end
                     if isAttackHitForDot then
-                        goto __continue37
+                        goto __continue35
                     end
-                    if cfg.debuffDotEnemyNoStructure == true and not deps:isDebuffDotTargetOk(source, target) then
-                        goto __continue37
+                    if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
+                        goto __continue35
                     end
                     local best = cfg:getBestFromUnit(source)
                     if best == nil then
-                        goto __continue37
+                        goto __continue35
                     end
                     if best.attackOnly == true or cfg.attackOnlyTrigger == true then
                         if not isAttackHitForDot then
-                            goto __continue37
+                            goto __continue35
                         end
                     end
                     local amount = cfg:computeAmount(target, best)
                     if amount <= 0 then
-                        goto __continue37
+                        goto __continue35
                     end
-                    if deps.stateByType[typeId] == nil then
-                        deps.stateByType[typeId] = {}
-                    end
-                    local tab = deps.stateByType[typeId]
-                    local curRaw = deps:tabRowForHid(tab, tgtHid)
-                    local cur = deps:isValidDotStateRow(curRaw) and curRaw or nil
-                    if curRaw ~= nil and cur == nil then
-                        deps:tabDeleteHid(tab, tgtHid)
-                    end
+                    local cur = getDotState(nil, typeId, tgtHid)
                     if isAttackHitForDot then
                         applyEquipmentDotOnHeroAttack(
                             nil,
                             typeId,
                             cfg,
-                            tab,
                             tgtHid,
                             target,
                             source,
@@ -295,7 +291,6 @@ function ____exports.createDotApplyStrategy(self, deps)
                             nil,
                             typeId,
                             cfg,
-                            tab,
                             tgtHid,
                             target,
                             source,
@@ -305,7 +300,7 @@ function ____exports.createDotApplyStrategy(self, deps)
                         )
                     end
                 end
-                ::__continue37::
+                ::__continue35::
                 t = t + 1
             end
         end

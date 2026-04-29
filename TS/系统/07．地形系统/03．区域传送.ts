@@ -1,12 +1,14 @@
-﻿/**
+﻿/** @noSelfInFile */
+/**
  * 区域传送：
  * - 开局按 `区域传送配置` 批量创建 Region 并注册进入事件
  * - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
-const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  withTimer: (delaySec: number, callback: () => void) => void;
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
 };
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
@@ -200,10 +202,14 @@ function initRegionTeleport(): void {
   (jass as any).TriggerAddAction(trig, onEnter);
 }
 
+function onInitRegionTeleportTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  initRegionTeleport();
+  safeDestroyTimer(t);
+}
+
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */
 export function init区域传送(): void {
-  // dbg("【区域传送】初始化开始");
-  withTimer(0.00, () => {
-    initRegionTeleport();
-  });
+  const t = (jass as any).CreateTimer();
+  if (t) safeTimerStart(t, 0.00, false, onInitRegionTeleportTimerExpire);
 }

@@ -6,12 +6,19 @@ local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index")
 local _inited = false
 local _tickCounter = 0
-local function runAllFeatureSyncs(self)
+local function runAllFeatureSyncs()
     if type(heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes) == "function" then
         heroLinkage:syncTornadoSpeedEffectsByRegisteredHeroes()
     end
 end
-function ____exports.initPlayerUnitManager(self)
+local function onPlayerUnitManagerTick()
+    _tickCounter = _tickCounter + 1
+    if _tickCounter >= C.EXEC_EVERY_TICKS then
+        _tickCounter = 0
+        runAllFeatureSyncs()
+    end
+end
+function ____exports.initPlayerUnitManager()
     if _inited then
         return
     end
@@ -22,15 +29,6 @@ function ____exports.initPlayerUnitManager(self)
     if type(heroLinkage.initPlayerHeroGetBridge) == "function" then
         heroLinkage:initPlayerHeroGetBridge()
     end
-    onTick10ms(
-        nil,
-        function()
-            _tickCounter = _tickCounter + 1
-            if _tickCounter >= C.EXEC_EVERY_TICKS then
-                _tickCounter = 0
-                runAllFeatureSyncs(nil)
-            end
-        end
-    )
+    onTick10ms(nil, onPlayerUnitManagerTick)
 end
 return ____exports

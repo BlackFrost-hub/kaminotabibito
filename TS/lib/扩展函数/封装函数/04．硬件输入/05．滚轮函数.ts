@@ -13,13 +13,12 @@ const japi = require("jass.japi") as any;
 import { createTriggerOrNull, runFalseLocalRegistration } from "./02．内部工具";
 
 export function getWheelDelta(): number {
-  return typeof japi.DzGetWheelDelta === "function" ? japi.DzGetWheelDelta() : 0;
+  return japi.DzGetWheelDelta();
 }
 
 export function registerMouseWheel(sync: boolean, action: () => void, playerId?: number): any {
   const trig = createTriggerOrNull();
   if (!trig) return null;
-  if (typeof japi.DzTriggerRegisterMouseWheelEventByCode !== "function") return null;
   if (sync) {
     japi.DzTriggerRegisterMouseWheelEventByCode(trig, true, action);
   } else {

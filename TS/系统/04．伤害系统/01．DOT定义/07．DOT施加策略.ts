@@ -1,4 +1,5 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
+import { clearIgnoredTarget, deleteDotState, getDotState, isIgnoredTarget, isValidDotStateRow, setDotState } from "./04．DOT工具";
 
 // ========== 虚拟分区：类型 ==========
 interface DotTickEntry {
@@ -13,16 +14,10 @@ interface DotTickEntry {
 // ========== 虚拟分区：策略工厂 ==========
 export function createDotApplyStrategy(deps: {
   dotTypes: DotTypeConfig[];
-  stateByType: Record<string, Record<any, DotState>>;
   dotTicks: DotTickEntry[];
-  ignoredTargetByType: Record<string, Record<any, boolean>>;
   unitHid: (u: any) => number;
   isSourceHeroPlayer1to4: (unit: any) => boolean;
   isDebuffDotTargetOk: (source: any, target: any) => boolean;
-  tabRowForHid: (tab: Record<any, any>, hid: number) => any;
-  tabSetHid: (tab: Record<any, any>, hid: number, state: DotState) => void;
-  tabDeleteHid: (tab: Record<any, any>, hid: number) => void;
-  isValidDotStateRow: (v: any) => boolean;
   getDotSourceDisplayName: (u: any) => string;
   notifyBuffPool: (typeId: string, target: any, state: DotState | null) => void;
   ensureDotTimers: () => void;
@@ -31,6 +26,17 @@ export function createDotApplyStrategy(deps: {
   tryApplyHeroAttackGearDots: (source: any, target: any, damage: number) => void;
   onDamage: (target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttackHit?: boolean) => void;
 } {
+  // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
+  const dotTypes = deps.dotTypes;
+  const dotTicks = deps.dotTicks;
+  const unitHid = deps.unitHid;
+  const isSourceHeroPlayer1to4 = deps.isSourceHeroPlayer1to4;
+  const isDebuffDotTargetOk = deps.isDebuffDotTargetOk;
+  const getDotSourceDisplayName = deps.getDotSourceDisplayName;
+  const notifyBuffPool = deps.notifyBuffPool;
+  const ensureDotTimers = deps.ensureDotTimers;
+  const getDotTickBatchTargetHids = deps.getDotTickBatchTargetHids;
+
   // ========== 虚拟分区：常量 ==========
   const DURATION_TIER_EPS = 0.05;
   function abs(value: number): number {
@@ -52,11 +58,11 @@ export function createDotApplyStrategy(deps: {
     _duration: number,
     cfg: DotTypeConfig
   ): void {
-    for (let i = deps.dotTicks.length - 1; i >= 0; i--) {
-      const e = deps.dotTicks[i];
-      if (e.typeId === typeId && deps.unitHid(e.target) === tgtHid) deps.dotTicks.splice(i, 1);
+    for (let i = dotTicks.length - 1; i >= 0; i--) {
+      const e = dotTicks[i];
+      if (e.typeId === typeId && unitHid(e.target) === tgtHid) dotTicks.splice(i, 1);
     }
-    deps.dotTicks.push({
+    dotTicks.push({
       typeId,
       source,
       target,
@@ -72,14 +78,13 @@ export function createDotApplyStrategy(deps: {
     cur.remaining = bestDuration;
     cur._dotParsedDuration = bestDuration;
     (cur as any)._dotUnitRef = target;
-    cur.sourceName = deps.getDotSourceDisplayName(source);
+    cur.sourceName = getDotSourceDisplayName(source);
   }
 
   // ========== 虚拟分区：普攻施加策略 ==========
   function applyEquipmentDotOnHeroAttack(
     typeId: string,
     cfg: DotTypeConfig,
-    tab: Record<any, any>,
     tgtHid: number,
     target: any,
     source: any,
@@ -90,28 +95,29 @@ export function createDotApplyStrategy(deps: {
     if (cur != null) {
       fillDotStateRow(cur, target, source, amount, bestDuration);
       pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
-      deps.notifyBuffPool(typeId, target, cur);
+      notifyBuffPool(typeId, target, cur);
+      // 写回扁平存储
+      setDotState(typeId, tgtHid, cur);
     } else {
       const state: DotState = {
         effect: amount,
         remaining: bestDuration,
         _dotUnitRef: target,
-        sourceName: deps.getDotSourceDisplayName(source),
+        sourceName: getDotSourceDisplayName(source),
         _dotParsedDuration: bestDuration,
       };
-      deps.tabSetHid(tab, tgtHid, state);
+      setDotState(typeId, tgtHid, state);
       pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
-      deps.notifyBuffPool(typeId, target, state);
+      notifyBuffPool(typeId, target, state);
       if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
     }
-    deps.ensureDotTimers();
+    ensureDotTimers();
   }
 
   // ========== 虚拟分区：非普攻施加策略 ==========
   function applyEquipmentDotOnNonAttack(
     typeId: string,
     cfg: DotTypeConfig,
-    tab: Record<any, any>,
     tgtHid: number,
     target: any,
     source: any,
@@ -124,21 +130,23 @@ export function createDotApplyStrategy(deps: {
         effect: amount,
         remaining: bestDuration,
         _dotUnitRef: target,
-        sourceName: deps.getDotSourceDisplayName(source),
+        sourceName: getDotSourceDisplayName(source),
         _dotParsedDuration: bestDuration,
       };
-      deps.tabSetHid(tab, tgtHid, state);
+      setDotState(typeId, tgtHid, state);
       pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
-      deps.notifyBuffPool(typeId, target, state);
+      notifyBuffPool(typeId, target, state);
       if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
-      deps.ensureDotTimers();
+      ensureDotTimers();
       return;
     }
     if (sameDurationTier(cur, bestDuration)) {
       fillDotStateRow(cur, target, source, amount, bestDuration);
       pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
-      deps.notifyBuffPool(typeId, target, cur);
-      deps.ensureDotTimers();
+      notifyBuffPool(typeId, target, cur);
+      // 写回扁平存储
+      setDotState(typeId, tgtHid, cur);
+      ensureDotTimers();
       return;
     }
     const currentProduct = cur.effect * cur.remaining;
@@ -149,35 +157,32 @@ export function createDotApplyStrategy(deps: {
       effect: amount,
       remaining: bestDuration,
       _dotUnitRef: target,
-      sourceName: deps.getDotSourceDisplayName(source),
+      sourceName: getDotSourceDisplayName(source),
       _dotParsedDuration: bestDuration,
     };
-    deps.tabSetHid(tab, tgtHid, state);
+    setDotState(typeId, tgtHid, state);
     pushDotTickForTarget(typeId, source, target, tgtHid, amount, bestDuration, cfg);
-    deps.notifyBuffPool(typeId, target, state);
+    notifyBuffPool(typeId, target, state);
     if (typeof cfg.onApply === "function") (cfg as any).onApply(target, state);
-    deps.ensureDotTimers();
+    ensureDotTimers();
   }
 
   // ========== 虚拟分区：普攻装备入口 ==========
   function tryApplyHeroAttackGearDots(source: any, target: any, _damage: number): void {
     if (!target || !source) return;
-    if (!deps.isSourceHeroPlayer1to4(source)) return;
-    const tgtHid = deps.unitHid(target);
-    for (let t = 0; t < deps.dotTypes.length; t++) {
-      const cfg = deps.dotTypes[t];
+    if (!isSourceHeroPlayer1to4(source)) return;
+    const tgtHid = unitHid(target);
+    for (let t = 0; t < dotTypes.length; t++) {
+      const cfg = dotTypes[t];
       const typeId = cfg.id;
-      if (cfg.debuffDotEnemyNoStructure === true && !deps.isDebuffDotTargetOk(source, target)) continue;
+      if (cfg.debuffDotEnemyNoStructure === true && !isDebuffDotTargetOk(source, target)) continue;
       const best = cfg.getBestFromUnit(source);
       if (best == null) continue;
       const amount = cfg.computeAmount(target, best);
       if (amount <= 0) continue;
-      if ((deps.stateByType as any)[typeId] == null) (deps.stateByType as any)[typeId] = {};
-      const tab = (deps.stateByType as any)[typeId];
-      const curRaw = deps.tabRowForHid(tab, tgtHid);
-      let cur: DotState | null = deps.isValidDotStateRow(curRaw) ? (curRaw as DotState) : null;
-      if (curRaw != null && cur == null) deps.tabDeleteHid(tab, tgtHid);
-      applyEquipmentDotOnHeroAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
+      // 使用扁平化 API 获取当前状态
+      const cur = getDotState(typeId, tgtHid);
+      applyEquipmentDotOnHeroAttack(typeId, cfg, tgtHid, target, source, amount, best.duration, cur);
     }
   }
 
@@ -194,23 +199,24 @@ export function createDotApplyStrategy(deps: {
     const isAttackHitForDot = isNormalAttackHit === true;
     if (damage <= 0 && !isAttackHitForDot) return;
     if (!source) return;
-    if (!deps.isSourceHeroPlayer1to4(source)) return;
+    if (!isSourceHeroPlayer1to4(source)) return;
 
-    const tgtHid = deps.unitHid(target);
-    const dotTickBatchTargetHids = deps.getDotTickBatchTargetHids();
+    const tgtHid = unitHid(target);
+    const dotTickBatchTargetHids = getDotTickBatchTargetHids();
     const suppressDotApplyForBatch =
       fromDotTickBatch === true && dotTickBatchTargetHids != null && dotTickBatchTargetHids[tgtHid] === true && !isAttackHitForDot;
 
-    for (let t = 0; t < deps.dotTypes.length; t++) {
-      const cfg = deps.dotTypes[t];
+    for (let t = 0; t < dotTypes.length; t++) {
+      const cfg = dotTypes[t];
       const typeId = cfg.id;
-      if ((deps.ignoredTargetByType as any)[typeId] != null && (deps.ignoredTargetByType as any)[typeId][tgtHid] === true) {
-        delete (deps.ignoredTargetByType as any)[typeId][tgtHid];
+      // 使用扁平化 API 检查忽略目标
+      if (isIgnoredTarget(typeId, tgtHid)) {
+        clearIgnoredTarget(typeId, tgtHid);
         continue;
       }
       if (suppressDotApplyForBatch) continue;
       if (isAttackHitForDot) continue;
-      if (cfg.debuffDotEnemyNoStructure === true && !deps.isDebuffDotTargetOk(source, target)) continue;
+      if (cfg.debuffDotEnemyNoStructure === true && !isDebuffDotTargetOk(source, target)) continue;
       const best = cfg.getBestFromUnit(source);
       if (best == null) continue;
       if ((best as any).attackOnly === true || cfg.attackOnlyTrigger === true) {
@@ -219,16 +225,13 @@ export function createDotApplyStrategy(deps: {
       const amount = cfg.computeAmount(target, best);
       if (amount <= 0) continue;
 
-      if ((deps.stateByType as any)[typeId] == null) (deps.stateByType as any)[typeId] = {};
-      const tab = (deps.stateByType as any)[typeId];
-      const curRaw = deps.tabRowForHid(tab, tgtHid);
-      let cur: DotState | null = deps.isValidDotStateRow(curRaw) ? (curRaw as DotState) : null;
-      if (curRaw != null && cur == null) deps.tabDeleteHid(tab, tgtHid);
+      // 使用扁平化 API 获取当前状态
+      const cur = getDotState(typeId, tgtHid);
 
       if (isAttackHitForDot) {
-        applyEquipmentDotOnHeroAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
+        applyEquipmentDotOnHeroAttack(typeId, cfg, tgtHid, target, source, amount, best.duration, cur);
       } else {
-        applyEquipmentDotOnNonAttack(typeId, cfg, tab, tgtHid, target, source, amount, best.duration, cur);
+        applyEquipmentDotOnNonAttack(typeId, cfg, tgtHid, target, source, amount, best.duration, cur);
       }
     }
   }

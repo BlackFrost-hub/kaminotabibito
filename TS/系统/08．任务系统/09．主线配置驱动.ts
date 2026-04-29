@@ -1,7 +1,9 @@
+/** @noSelfInFile */
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as any;
-const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
 };
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (f: any, messageType: number, message: string) => void;
@@ -262,6 +264,18 @@ function executeActionCode(code: string, triggerUnit: any): void {
   }
 }
 
+const storyActionCtxByTimerHid: Record<number, { code: string; triggerUnit: any }> = {};
+
+function onStoryActionTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  if (!t) return;
+  const hid = jass.GetHandleId(t) as number;
+  const ctx = storyActionCtxByTimerHid[hid];
+  delete storyActionCtxByTimerHid[hid];
+  safeDestroyTimer(t);
+  if (ctx) executeActionCode(ctx.code, ctx.triggerUnit);
+}
+
 function runActionTimeline(timeline: string | undefined, triggerUnit: any): void {
   const entries = parseTimelineEntries(timeline);
   for (const e of entries) {
@@ -269,9 +283,11 @@ function runActionTimeline(timeline: string | undefined, triggerUnit: any): void
       executeActionCode(e.code, triggerUnit);
       continue;
     }
-    createDelayedCall(e.delay, () => {
-      executeActionCode(e.code, triggerUnit);
-    });
+    const t = jass.CreateTimer();
+    if (t) {
+      storyActionCtxByTimerHid[jass.GetHandleId(t) as number] = { code: e.code, triggerUnit };
+      safeTimerStart(t, e.delay, false, onStoryActionTimerExpire);
+    }
   }
 }
 

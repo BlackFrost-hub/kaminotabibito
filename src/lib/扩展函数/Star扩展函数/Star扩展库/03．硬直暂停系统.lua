@@ -30,19 +30,37 @@ do
     end
 end
 local HS_S = jass.InitHashtable()
-local function hid(self, h)
+local function hid(h)
     return jass.GetHandleId(h) or 0
+end
+local function onHardStraightTimerExpire()
+    local expiredTimer = jass.GetExpiredTimer()
+    local tid = hid(expiredTimer)
+    local savedUnit = jass.LoadUnitHandle(HS_S, tid, 1)
+    if savedUnit ~= nil and savedUnit ~= 0 then
+        if japi ~= nil then
+            japi.EXPauseUnit(savedUnit, false)
+        end
+    end
+    jass.FlushChildHashtable(HS_S, tid)
+    if savedUnit ~= nil and savedUnit ~= 0 then
+        jass.FlushChildHashtable(
+            HS_S,
+            hid(savedUnit)
+        )
+    end
+    safeDestroyTimer(nil, expiredTimer)
 end
 --- 暂停单位一段时间
 -- 若单位已在暂停中，会重置暂停时间
 -- 
 -- @param u 目标单位
 -- @param time 暂停时间（秒）
-function ____exports.GS_Suspend(self, u, time)
+function ____exports.GS_Suspend(u, time)
     if u == nil or u == 0 then
         return
     end
-    local uid = hid(nil, u)
+    local uid = hid(u)
     local T = jass.LoadTimerHandle(HS_S, uid, 1)
     local ____temp_2
     if T ~= nil then
@@ -61,49 +79,31 @@ function ____exports.GS_Suspend(self, u, time)
         end
         jass.SaveUnitHandle(
             HS_S,
-            hid(nil, T),
+            hid(T),
             1,
             u
         )
         jass.SaveTimerHandle(HS_S, uid, 1, T)
     end
-    local timerRef = T
     safeTimerStart(
         nil,
-        timerRef,
+        T,
         time,
         false,
-        function()
-            local expiredTimer = jass.GetExpiredTimer()
-            local tid = hid(nil, expiredTimer)
-            local savedUnit = jass.LoadUnitHandle(HS_S, tid, 1)
-            if savedUnit ~= nil and savedUnit ~= 0 then
-                if japi ~= nil then
-                    japi.EXPauseUnit(savedUnit, false)
-                end
-            end
-            jass.FlushChildHashtable(HS_S, tid)
-            if savedUnit ~= nil and savedUnit ~= 0 then
-                jass.FlushChildHashtable(
-                    HS_S,
-                    hid(nil, savedUnit)
-                )
-            end
-            safeDestroyTimer(nil, expiredTimer)
-        end
+        onHardStraightTimerExpire
     )
 end
 --- 检查单位是否处于暂停状态
 -- 
 -- @param u 目标单位
 -- @returns 是否正在暂停中
-function ____exports.GS_IsUnitSuspending(self, u)
+function ____exports.GS_IsUnitSuspending(u)
     if u == nil or u == 0 then
         return false
     end
     local T = jass.LoadTimerHandle(
         HS_S,
-        hid(nil, u),
+        hid(u),
         1
     )
     if T == nil then
@@ -116,13 +116,13 @@ end
 -- 
 -- @param u 目标单位
 -- @returns 剩余暂停时间（秒）
-function ____exports.GS_LoadSuspend(self, u)
+function ____exports.GS_LoadSuspend(u)
     if u == nil or u == 0 then
         return 0
     end
     local T = jass.LoadTimerHandle(
         HS_S,
-        hid(nil, u),
+        hid(u),
         1
     )
     if T == nil then
@@ -136,22 +136,20 @@ end
 -- @param u 目标单位
 -- @param i 操作类型：0=增加时间，1=减少时间，2=取最大值
 -- @param r 时间值（秒）
-function ____exports.GS_UnitSuspend(self, u, i, r)
+function ____exports.GS_UnitSuspend(u, i, r)
     if u == nil or u == 0 then
         return
     end
-    local currentRemain = ____exports.GS_LoadSuspend(nil, u)
+    local currentRemain = ____exports.GS_LoadSuspend(u)
     if i == 0 then
-        ____exports.GS_Suspend(nil, u, currentRemain + r)
+        ____exports.GS_Suspend(u, currentRemain + r)
     elseif i == 1 then
         ____exports.GS_Suspend(
-            nil,
             u,
             RMaxBJ(nil, 0, currentRemain - r)
         )
     elseif i == 2 then
         ____exports.GS_Suspend(
-            nil,
             u,
             RMaxBJ(nil, currentRemain, r)
         )

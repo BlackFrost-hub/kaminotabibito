@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * NPC 生成器
  * 根据 NPC 配置表统一创建 NPC，并维护“配置 -> 已创建单位”的索引。
@@ -6,8 +7,9 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const BJ_DEGTORAD = 0.017453292519943295;
-const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
 };
 
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
@@ -18,7 +20,7 @@ import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．�
 // ── pcall 槽位：具名函数体 + 模块变量 ──
 let __pcallModelUnit: any = 0;
 let __pcallModelPath = "";
-function __pcallSetUnitModelBody(): void { japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath); }
+function __pcallSetUnitModelBody(this: any): void { japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath); }
 
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
@@ -51,22 +53,50 @@ function registerCreatedNpcUnit(npcConfig: NPCData, unit: any): void {
   }
 }
 
+const npcQuestMarkerCtxByTimerHid: Record<number, { unit: any; npcConfig: NPCData }> = {};
+const npcSetModelCtxByTimerHid: Record<number, { unit: any; modelPath: string; npcLabel: string }> = {};
+
+function onNpcQuestMarkerTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  if (!t) return;
+  const hid = jass.GetHandleId(t) as number;
+  const ctx = npcQuestMarkerCtxByTimerHid[hid];
+  delete npcQuestMarkerCtxByTimerHid[hid];
+  safeDestroyTimer(t);
+  if (ctx) tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig);
+}
+
+function onNpcSetModelTimerExpire(this: void): void {
+  const t = jass.GetExpiredTimer();
+  if (!t) return;
+  const hid = jass.GetHandleId(t) as number;
+  const ctx = npcSetModelCtxByTimerHid[hid];
+  delete npcSetModelCtxByTimerHid[hid];
+  safeDestroyTimer(t);
+  if (!ctx) return;
+  __pcallModelUnit = ctx.unit;
+  __pcallModelPath = ctx.modelPath;
+  const ok = pcall(__pcallSetUnitModelBody);
+  if (!ok) {
+    debugLog("NPC生成器", "设置单位模型失败（已忽略）", ctx.npcLabel, "model=" + tostring(ctx.modelPath));
+  }
+}
+
 function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
   const delaySec = npcConfig.modelFIle ? DELAY_QUEST_MARKER_AFTER_SET_MODEL : DELAY_QUEST_MARKER_NO_CUSTOM_MODEL;
-  createDelayedCall(delaySec, () => {
-    tryAttachQuestMarkerForConfigNpc(unit, npcConfig);
-  });
+  const t = jass.CreateTimer();
+  if (t) {
+    npcQuestMarkerCtxByTimerHid[jass.GetHandleId(t) as number] = { unit, npcConfig };
+    safeTimerStart(t, delaySec, false, onNpcQuestMarkerTimerExpire);
+  }
 }
 
 function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): void {
-  createDelayedCall(0.01, () => {
-    __pcallModelUnit = unit;
-    __pcallModelPath = modelPath;
-    const ok = pcall(__pcallSetUnitModelBody);
-    if (!ok) {
-      debugLog("NPC生成器", "设置单位模型失败（已忽略）", npcLabel, "model=" + tostring(modelPath));
-    }
-  });
+  const t = jass.CreateTimer();
+  if (t) {
+    npcSetModelCtxByTimerHid[jass.GetHandleId(t) as number] = { unit, modelPath, npcLabel };
+    safeTimerStart(t, 0.01, false, onNpcSetModelTimerExpire);
+  }
 }
 
 function createSingleNPC(npcConfig: NPCData): any {

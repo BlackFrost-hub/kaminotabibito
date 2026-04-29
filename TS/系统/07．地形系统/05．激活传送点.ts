@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 激活传送点系统（按《激活传送点配置》）：
  * - **enabled: false**：该条不启用，不创建单位、不注册任何触发器（与配置中其它字段无关）。
@@ -7,9 +8,12 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
-const { stringToFourCC, withTimer } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
-  withTimer: (delaySec: number, callback: () => void) => void;
+};
+const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (timer: any) => void;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
@@ -31,6 +35,11 @@ const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中
 };
 
 const ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav";
+const activationPointTriggerKeyByHid: Record<number, string> = {};
+const activationPointTriggerFiredByKey: Record<string, boolean> = {};
+const activationPointTriggerWatchUnitByKey: Record<string, any> = {};
+const activationPointTriggerHandleByKey: Record<string, any> = {};
+const activationPointTriggerUnregisterByKey: Record<string, (() => void) | undefined> = {};
 
 /**
  * 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
@@ -75,39 +84,73 @@ function formatGgUnitProbe(u: any): string {
   return "ok" + tail;
 }
 
+function onDebugSnapshot0sTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  const gAny = g as any;
+  const jc = jass as any;
+  const G = globalThis as any;
+  const key = DEBUG_GG_UNIT_HTOW_KEY;
+  const vg = gAny[key];
+  const vj = jc[key];
+  const vG = G[key];
+  const msg =
+    "[激活传送点调试] " +
+    "0s" +
+    " " +
+    key +
+    " | g=" +
+    formatGgUnitProbe(vg) +
+    " | jass.common=" +
+    formatGgUnitProbe(vj) +
+    " | globalThis=" +
+    formatGgUnitProbe(vG);
+  for (let pi = 0; pi < 4; pi++) {
+    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
+  }
+  debugLog("激活传送点", msg);
+  safeDestroyTimer(t);
+}
+
+function onDebugSnapshot1sTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  const gAny = g as any;
+  const jc = jass as any;
+  const G = globalThis as any;
+  const key = DEBUG_GG_UNIT_HTOW_KEY;
+  const vg = gAny[key];
+  const vj = jc[key];
+  const vG = G[key];
+  const msg =
+    "[激活传送点调试] " +
+    "1s" +
+    " " +
+    key +
+    " | g=" +
+    formatGgUnitProbe(vg) +
+    " | jass.common=" +
+    formatGgUnitProbe(vj) +
+    " | globalThis=" +
+    formatGgUnitProbe(vG);
+  for (let pi = 0; pi < 4; pi++) {
+    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
+  }
+  debugLog("激活传送点", msg);
+  safeDestroyTimer(t);
+}
+
+function onInitActivationPointsTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  initActivationPointsInternal();
+  safeDestroyTimer(t);
+}
+
 /** 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil） */
 function scheduleDebugGgUnitHtow0030(): void {
   if (!DEBUG_GG_UNIT_HTOW_0030) return;
-  const key = DEBUG_GG_UNIT_HTOW_KEY;
-  const runSnapshot = (label: string): void => {
-    const gg = g as any;
-    const jc = jass as any;
-    const G = globalThis as any;
-    const vg = gg[key];
-    const vj = jc[key];
-    const vG = G[key];
-    const msg =
-      "[激活传送点调试] " +
-      label +
-      " " +
-      key +
-      " | g=" +
-      formatGgUnitProbe(vg) +
-      " | jass.common=" +
-      formatGgUnitProbe(vj) +
-      " | globalThis=" +
-      formatGgUnitProbe(vG);
-    for (let pi = 0; pi < 4; pi++) {
-      (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
-    }
-    debugLog("激活传送点", msg);
-  };
-  withTimer(0.0, () => {
-    runSnapshot("0s");
-  });
-  withTimer(1.0, () => {
-    runSnapshot("1s");
-  });
+  const t0 = (jass as any).CreateTimer();
+  if (t0) safeTimerStart(t0, 0.0, false, onDebugSnapshot0sTimerExpire);
+  const t1 = (jass as any).CreateTimer();
+  if (t1) safeTimerStart(t1, 1.0, false, onDebugSnapshot1sTimerExpire);
 }
 
 function parseCoord(v: string | number | undefined): number | null {
@@ -184,6 +227,32 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
   }
 }
 
+function onActivationPointEnter(): void {
+  const trig = (jass as any).GetTriggeringTrigger();
+  if (trig == null || trig === 0) return;
+  const trigHid = (jass as any).GetHandleId(trig) as number;
+  const key = activationPointTriggerKeyByHid[trigHid];
+  if (!key) return;
+  if (activationPointTriggerFiredByKey[key] === true) return;
+  const enterer = (jass as any).GetTriggerUnit();
+  if (enterer == null || enterer === 0) return;
+  const cfg = 激活传送点配置[key];
+  const watchUnit = activationPointTriggerWatchUnitByKey[key];
+  if (!cfg || watchUnit == null || watchUnit === 0) return;
+  activationPointTriggerFiredByKey[key] = true;
+  runActivationEffects(cfg, watchUnit);
+  const unregister = activationPointTriggerUnregisterByKey[key];
+  if (typeof unregister === "function") unregister();
+  const handle = activationPointTriggerHandleByKey[key];
+  if (handle != null && handle !== 0) {
+    delete activationPointTriggerKeyByHid[(jass as any).GetHandleId(handle) as number];
+    (jass as any).DestroyTrigger(handle);
+  }
+  delete activationPointTriggerHandleByKey[key];
+  delete activationPointTriggerWatchUnitByKey[key];
+  delete activationPointTriggerUnregisterByKey[key];
+}
+
 function registerOnePoint(cfg: PointConfig, key: string): void {
   const watchUnit = resolveWatchUnit(cfg);
   if (watchUnit == null || watchUnit === 0) {
@@ -200,16 +269,12 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
     true
   );
 
-  let fired = false;
-  (jass as any).TriggerAddAction(trig, () => {
-    if (fired) return;
-    const enterer = (jass as any).GetTriggerUnit();
-    if (enterer == null || enterer === 0) return;
-    fired = true;
-    runActivationEffects(cfg, watchUnit);
-    unregister();
-    (jass as any).DestroyTrigger(trig);
-  });
+  activationPointTriggerKeyByHid[(jass as any).GetHandleId(trig) as number] = key;
+  activationPointTriggerFiredByKey[key] = false;
+  activationPointTriggerWatchUnitByKey[key] = watchUnit;
+  activationPointTriggerHandleByKey[key] = trig;
+  activationPointTriggerUnregisterByKey[key] = unregister;
+  (jass as any).TriggerAddAction(trig, onActivationPointEnter);
 }
 
 function initActivationPointsInternal(): void {
@@ -227,7 +292,6 @@ function initActivationPointsInternal(): void {
 /** 在地图初始化时调用（建议用 0.00 秒计时器） */
 export function init激活传送点(): void {
   scheduleDebugGgUnitHtow0030();
-  withTimer(0.0, () => {
-    initActivationPointsInternal();
-  });
+  const t = (jass as any).CreateTimer();
+  if (t) safeTimerStart(t, 0.0, false, onInitActivationPointsTimerExpire);
 }

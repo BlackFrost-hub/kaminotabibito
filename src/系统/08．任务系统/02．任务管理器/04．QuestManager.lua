@@ -5,6 +5,7 @@ local Map = ____lualib.Map
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
+local onQuestTimeLimitTimerExpire, jass, safeDestroyTimer
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local ____01_FF0E_8C03_8BD5 = require("系统.08．任务系统.02．任务管理器.01．调试")
@@ -16,19 +17,28 @@ local showQuestAcceptedMessage = ____02_FF0E_4EFB_52A1_63D0_793A_4E0E_5956_52B1.
 local showQuestCompletedMessage = ____02_FF0E_4EFB_52A1_63D0_793A_4E0E_5956_52B1.showQuestCompletedMessage
 local showQuestFailedMessage = ____02_FF0E_4EFB_52A1_63D0_793A_4E0E_5956_52B1.showQuestFailedMessage
 local showQuestTrackingNotice = ____02_FF0E_4EFB_52A1_63D0_793A_4E0E_5956_52B1.showQuestTrackingNotice
---- 任务管理器（单例）
--- 
--- 职责概览：
--- - 与 `questDB` 打交道：接取、完成、失败、放弃、目标进度、查询
--- - 协调 `02．任务提示与奖励`：何时浮字、何时发奖
--- - 维护 `uiRefreshCallbacks`：任务状态变化时通知自定义 UI（如任务面板）
--- - 可选限时：`timeLimit` > 0 时挂一次性计时器，到期调用 `onQuestFailed`
--- 
--- 不负责：从 JASS 全局读 udg_*（见 `05．事件桥接`）；F9 原生任务同步（见 `03．原生任务同步`，需自行接入）。
-local jass = require("jass.common")
+function onQuestTimeLimitTimerExpire()
+    local expired = jass.GetExpiredTimer()
+    local ____opt_15 = _G.__questTimers
+    if ____opt_15 ~= nil then
+        ____opt_15 = ____opt_15:get(expired)
+    end
+    local data = ____opt_15
+    if data then
+        questDebugPrint(
+            nil,
+            ("任务 " .. tostring(data.questId)) .. " 时间到期"
+        )
+        ____exports.questManager:onQuestFailed(data.playerId, data.questId)
+        _G.__questTimers:delete(expired)
+    end
+    jass.PauseTimer(expired)
+    safeDestroyTimer(nil, expired)
+end
+jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+safeDestroyTimer = ____require_result_0.safeDestroyTimer
 --- 单例类。计时器到期回调里必须用 `QuestManager.getInstance()`，
 -- 避免在模块顶层 `questManager` 尚未完成初始化时闭包引用未定义。
 ____exports.QuestManager = __TS__Class()
@@ -88,24 +98,7 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
         timer,
         quest.timeLimit,
         false,
-        function()
-            local expired = jass.GetExpiredTimer()
-            local ____opt_5 = _G.__questTimers
-            if ____opt_5 ~= nil then
-                ____opt_5 = ____opt_5:get(expired)
-            end
-            local data = ____opt_5
-            if data then
-                questDebugPrint(
-                    nil,
-                    ("任务 " .. tostring(data.questId)) .. " 时间到期"
-                )
-                ____exports.QuestManager:getInstance():onQuestFailed(data.playerId, data.questId)
-                _G.__questTimers:delete(expired)
-            end
-            jass.PauseTimer(expired)
-            safeDestroyTimer(nil, expired)
-        end
+        onQuestTimeLimitTimerExpire
     )
     questDebugPrint(
         nil,
@@ -134,15 +127,15 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
         nil,
         (("玩家 " .. tostring(playerId)) .. " 放弃任务 ") .. questId
     )
-    local ____opt_9 = questDB.globalData
-    if ____opt_9 ~= nil then
-        ____opt_9 = ____opt_9.quests:get(questId)
+    local ____opt_7 = questDB.globalData
+    if ____opt_7 ~= nil then
+        ____opt_7 = ____opt_7.quests:get(questId)
     end
-    local ____opt_result_11
-    if ____opt_9 ~= nil then
-        ____opt_result_11 = ____opt_9.nativeHandle
+    local ____opt_result_9
+    if ____opt_7 ~= nil then
+        ____opt_result_9 = ____opt_7.nativeHandle
     end
-    local nativeHandle = ____opt_result_11
+    local nativeHandle = ____opt_result_9
     local success = questDB:abandonQuest(playerId, questId)
     if success then
         if nativeHandle then
@@ -159,11 +152,11 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     return success
 end
 function QuestManager.prototype.toggleQuestTracking(self, playerId, questId)
-    local ____opt_12 = questDB.globalData
-    if ____opt_12 ~= nil then
-        ____opt_12 = ____opt_12.quests:get(questId)
+    local ____opt_10 = questDB.globalData
+    if ____opt_10 ~= nil then
+        ____opt_10 = ____opt_10.quests:get(questId)
     end
-    local questData = ____opt_12
+    local questData = ____opt_10
     if not questData then
         return false
     end
@@ -173,8 +166,8 @@ function QuestManager.prototype.toggleQuestTracking(self, playerId, questId)
     return true
 end
 function QuestManager.prototype.registerUIRefreshCallback(self, callback)
-    local ____self_uiRefreshCallbacks_14 = self.uiRefreshCallbacks
-    ____self_uiRefreshCallbacks_14[#____self_uiRefreshCallbacks_14 + 1] = callback
+    local ____self_uiRefreshCallbacks_12 = self.uiRefreshCallbacks
+    ____self_uiRefreshCallbacks_12[#____self_uiRefreshCallbacks_12 + 1] = callback
 end
 function QuestManager.prototype.triggerUIRefresh(self, playerId, questId)
     for ____, callback in ipairs(self.uiRefreshCallbacks) do
@@ -186,7 +179,7 @@ function QuestManager.prototype.triggerUIRefresh(self, playerId, questId)
                 )
             end
             local ____try, ____hasReturned = pcall(function()
-                callback(nil, playerId, questId)
+                callback(playerId, questId)
             end)
             if not ____try then
                 ____catch(____hasReturned)
@@ -234,11 +227,11 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
     local success = questDB:updateObjective(playerId, questId, objectiveId, progress)
     if success then
         self:triggerUIRefresh(playerId, questId)
-        local ____opt_15 = questDB.globalData
-        if ____opt_15 ~= nil then
-            ____opt_15 = ____opt_15.quests:get(questId)
+        local ____opt_13 = questDB.globalData
+        if ____opt_13 ~= nil then
+            ____opt_13 = ____opt_13.quests:get(questId)
         end
-        local quest = ____opt_15
+        local quest = ____opt_13
         if quest and quest.objectives then
             local allCompleted = true
             for ____, obj in __TS__Iterator(quest.objectives) do

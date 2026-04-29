@@ -177,6 +177,9 @@ local function runRegisterPlayerHero()
         end
     end
 end
+local function runRegisterPlayerHeroTriggerAction()
+    runRegisterPlayerHero()
+end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(fn)
     createDelayedCall(nil, RETRY_SEC, fn)
@@ -189,12 +192,7 @@ local function tryRegisterPlayerHeroStes()
     end
     if g[TRIG_KEY] == nil then
         local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(
-            trig,
-            function()
-                runRegisterPlayerHero()
-            end
-        )
+        jass.TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction)
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], C.STES_EVENT_REGISTER_PLAYER_HERO)

@@ -83,9 +83,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
   }
 
   if (entryText != null && entryText !== 0) {
-    if (typeof (japi as any).DzFrameSetText === "function") {
-      (japi as any).DzFrameSetText(entryText, "|cffffcc00任务(J)|r");
-    }
+    (japi as any).DzFrameSetText(entryText, "|cffffcc00任务(J)|r");
     applyDzTextFontAndCenterAlignment(entryText);
   }
 
@@ -100,9 +98,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
       alpha: 0,
     }) ?? 0;
   if (btn) {
-    if (typeof (japi as any).DzFrameSetAllPoints === "function") {
-      (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    }
+    (japi as any).DzFrameSetAllPoints(btn, entryFrame);
     // sync=true：帧点击全房触发，回调内部做全局状态+本地UI分层
     setFrameClickEvent(btn, onTogglePanel, true);
   }

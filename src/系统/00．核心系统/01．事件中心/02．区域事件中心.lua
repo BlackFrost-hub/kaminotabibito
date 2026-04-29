@@ -6,6 +6,7 @@ local jass = require("jass.common")
 local enterRegionListeners = {}
 local enterRegionRegistered = {}
 local enterRegionMasters = {}
+local enterRegionKeyByMasterHid = {}
 local function handleKey(handle)
     return tostring(handle)
 end
@@ -70,6 +71,18 @@ local function dispatchListeners(list)
         end
     end
 end
+local function dispatchEnterRegionMaster()
+    local trig = jass.GetTriggeringTrigger()
+    if not trig then
+        return
+    end
+    local key = enterRegionKeyByMasterHid[tostring(jass.GetHandleId(trig)
+    )]
+    if not key then
+        return
+    end
+    dispatchListeners(enterRegionListeners[key] or ({}))
+end
 local function addListener(store, key, trigger, once)
     store[key] = store[key] or ({})
     local list = store[key]
@@ -104,13 +117,10 @@ function ____exports.registerEnterRegionTrigger(trigger, region, filter)
         enterRegionMasters[key] = master
         enterRegionRegistered[key] = true
         enterRegionListeners[key] = enterRegionListeners[key] or ({})
+        enterRegionKeyByMasterHid[tostring(jass.GetHandleId(master)
+        )] = key
         jass.TriggerRegisterEnterRegion(master, region, normalizedFilter)
-        jass.TriggerAddAction(
-            master,
-            function()
-                dispatchListeners(enterRegionListeners[key])
-            end
-        )
+        jass.TriggerAddAction(master, dispatchEnterRegionMaster)
     end
     return addListener(enterRegionListeners, key, trigger, false)
 end

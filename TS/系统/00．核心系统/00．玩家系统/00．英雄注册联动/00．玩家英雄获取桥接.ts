@@ -216,6 +216,10 @@ function runRegisterPlayerHero(): void {
   }
 }
 
+function runRegisterPlayerHeroTriggerAction(): void {
+  runRegisterPlayerHero();
+}
+
 /**
  * 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
  */
@@ -232,9 +236,7 @@ function tryRegisterPlayerHeroStes(): void {
 
   if (g[TRIG_KEY] == null) {
     const trig = jass.CreateTrigger();
-    jass.TriggerAddAction(trig, () => {
-      runRegisterPlayerHero();
-    });
+    jass.TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction);
     g[TRIG_KEY] = trig;
   }
 

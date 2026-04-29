@@ -11,43 +11,41 @@ local _registeredToCenterTimer = false
 --- tick计数器（每5个10毫秒=0.05秒执行一次）
 local _tickCounter = 0
 ____exports.RECYCLE_TICK = 0.05
-function ____exports.ensureFloatTextRecycleTimer(self)
+local function onFloatTextRecycleTick()
+    if #____exports.floatTextQueue == 0 then
+        return
+    end
+    _tickCounter = _tickCounter + 1
+    if _tickCounter >= 5 then
+        _tickCounter = 0
+        do
+            local i = #____exports.floatTextQueue - 1
+            while i >= 0 do
+                local it = ____exports.floatTextQueue[i + 1]
+                it.ticksLeft = it.ticksLeft - 1
+                if it.ticksLeft <= 0 then
+                    local tt = it.tt
+                    if tt then
+                        if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
+                            LeakWatcher:destroyTextTag(tt)
+                        else
+                            jass.DestroyTextTag(tt)
+                        end
+                    end
+                    __TS__ArraySplice(____exports.floatTextQueue, i, 1)
+                end
+                i = i - 1
+            end
+        end
+    end
+end
+function ____exports.ensureFloatTextRecycleTimer()
     if _registeredToCenterTimer then
         return
     end
     _registeredToCenterTimer = true
     local ____G_1 = _G
     local onTick10ms = ____G_1.onTick10ms
-    onTick10ms(
-        nil,
-        function()
-            if #____exports.floatTextQueue == 0 then
-                return
-            end
-            _tickCounter = _tickCounter + 1
-            if _tickCounter >= 5 then
-                _tickCounter = 0
-                do
-                    local i = #____exports.floatTextQueue - 1
-                    while i >= 0 do
-                        local it = ____exports.floatTextQueue[i + 1]
-                        it.ticksLeft = it.ticksLeft - 1
-                        if it.ticksLeft <= 0 then
-                            local tt = it.tt
-                            if tt then
-                                if LeakWatcher and type(LeakWatcher.destroyTextTag) == "function" then
-                                    LeakWatcher:destroyTextTag(tt)
-                                else
-                                    jass.DestroyTextTag(tt)
-                                end
-                            end
-                            __TS__ArraySplice(____exports.floatTextQueue, i, 1)
-                        end
-                        i = i - 1
-                    end
-                end
-            end
-        end
-    )
+    onTick10ms(nil, onFloatTextRecycleTick)
 end
 return ____exports

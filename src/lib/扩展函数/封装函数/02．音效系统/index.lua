@@ -48,10 +48,7 @@ do
     end
 end
 function ____exports.initSound3DII(self)
-    setDefaultSoundModel(
-        nil,
-        SoundModel:create()
-    )
+    setDefaultSoundModel(SoundModel:create())
     prewarmUiClickSound(nil, DEFAULT_UI_CLICK_SOUND)
 end
 ____exports.initSound3DII(nil)

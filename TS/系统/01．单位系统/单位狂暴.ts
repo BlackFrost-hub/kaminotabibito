@@ -8,9 +8,10 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.index") as {
   EXSetUnitFacing: (u: any, angle: number) => void;
 };
-const { CameraShakeForPlayer } = require("lib.扩展函数.封装函数.07．镜头函数.index") as {
-  CameraShakeForPlayer: (p: any, magnitude: number, duration: number) => void;
+const cameraShakeMod = require("lib.扩展函数.封装函数.07．镜头函数.index") as {
+  CameraShakeForPlayer?: any;
 };
+const cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer as any;
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -52,7 +53,7 @@ function onDeath(dying: any, killer: any): void {
   const killerPlayer = killer ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
     EXSetUnitFacing(created, facingDeg);
-    CameraShakeForPlayer(killerPlayer, 20, 3.0);
+    if (typeof cameraShakeForPlayerRaw === "function") cameraShakeForPlayerRaw(killerPlayer, 20, 3.0);
   }
 }
 

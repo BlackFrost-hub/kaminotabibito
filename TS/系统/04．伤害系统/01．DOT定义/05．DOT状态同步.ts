@@ -1,5 +1,14 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
-import { collectHidsInTab, isValidDotStateRow, tabDeleteHid, tabRowForHid } from "./04．DOT工具";
+import {
+  collectActiveDotPairs,
+  deleteDotState,
+  getDotState,
+  ignoredTargetFlat,
+  isValidDotStateRow,
+  makeDotFlatKey,
+  parseDotFlatKey,
+  setIgnoredTarget,
+} from "./04．DOT工具";
 
 // ========== 虚拟分区：buffID -> dotTypeId 映射 ==========
 const BUFF_ID_TO_DOT_TYPE: Record<string, string> = {
@@ -15,7 +24,6 @@ function dotTypeIdFromBuffId(buffID: string): string | null {
 
 // ========== 虚拟分区：创建同步器 ==========
 export function createDotStateSync(deps: {
-  stateByType: Record<string, Record<any, DotState>>;
   dotTypes: DotTypeConfig[];
   removeDotTicksForTargetHid: (typeId: string, tgtHid: number) => void;
   notifyBuffPool: (typeId: string, target: any, state: DotState | null) => void;
@@ -23,6 +31,11 @@ export function createDotStateSync(deps: {
   syncDotRemainingFromBuffPool: () => void;
   clearDotByBuffPoolExpire: (buffID: string, hid: number) => void;
 } {
+  // 提取 deps 方法到局部变量，避免 TSTL 生成冒号调用
+  const dotTypes = deps.dotTypes;
+  const notifyBuffPool = deps.notifyBuffPool;
+  const removeDotTicksForTargetHid = deps.removeDotTicksForTargetHid;
+
   function syncDotRemainingFromBuffPool(): void {
     const buffM = require("系统.05．Buff系统.00．Buff系统") as {
       getBuffRuntimeByHid?: (
@@ -31,57 +44,65 @@ export function createDotStateSync(deps: {
       ) => { remaining: number; effect: number; sourceName?: string; _dotParsedDuration?: number } | null;
       DOT_TYPE_TO_BUFF_ID?: Record<string, string>;
     };
+    // 提取模块方法到局部变量，避免 TSTL 生成冒号调用
+    const _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid;
     const map = buffM.DOT_TYPE_TO_BUFF_ID;
-    if (map == null || typeof buffM.getBuffRuntimeByHid !== "function") return;
+    if (map == null || typeof _getBuffRuntimeByHid !== "function") return;
 
-    for (const typeId in deps.stateByType) {
-      const tab = (deps.stateByType as any)[typeId];
-      if (tab == null) continue;
+    // 使用 collectActiveDotPairs 获取排序后的活跃 DOT 对
+    const pairs = collectActiveDotPairs();
+    for (let pi = 0; pi < pairs.length; pi++) {
+      const { typeId, hid } = pairs[pi];
       const buffID = (map as any)[typeId] as string | undefined;
       if (buffID == null || buffID === "") continue;
-      const hids = collectHidsInTab(tab);
-      for (let hi = 0; hi < hids.length; hi++) {
-        const kn = hids[hi];
-        const v = tabRowForHid(tab, kn);
-        if (v == null || !isValidDotStateRow(v)) {
-          tabDeleteHid(tab, kn);
-          continue;
-        }
-        const rt = buffM.getBuffRuntimeByHid(kn, buffID);
-        if (rt == null || rt.remaining <= 0) {
-          const cfg = deps.dotTypes.find(c => c.id === typeId);
-          if (cfg != null && typeof cfg.onEnd === "function") {
-            const uref = (v as any)._dotUnitRef;
-            (cfg as any).onEnd(uref != null ? uref : kn, v);
-          }
-          deps.notifyBuffPool(typeId, kn, null);
-          tabDeleteHid(tab, kn);
-          deps.removeDotTicksForTargetHid(typeId, kn);
-          continue;
-        }
-        (v as any).remaining = rt.remaining;
-        (v as any).effect = rt.effect;
-        if (rt.sourceName !== undefined) (v as any).sourceName = rt.sourceName;
-        if (rt._dotParsedDuration !== undefined) (v as any)._dotParsedDuration = rt._dotParsedDuration;
+
+      const state = getDotState(typeId, hid);
+      if (state == null || !isValidDotStateRow(state)) {
+        deleteDotState(typeId, hid);
+        continue;
       }
+      const rt = _getBuffRuntimeByHid(hid, buffID);
+      if (rt == null || rt.remaining <= 0) {
+        const cfg = dotTypes.find(c => c.id === typeId);
+        if (cfg != null && typeof cfg.onEnd === "function") {
+          const uref = (state as any)._dotUnitRef;
+          (cfg as any).onEnd(uref != null ? uref : hid, state);
+        }
+        notifyBuffPool(typeId, hid, null);
+        deleteDotState(typeId, hid);
+        removeDotTicksForTargetHid(typeId, hid);
+        // 清除忽略标记
+        const key = makeDotFlatKey(typeId, hid);
+        delete ignoredTargetFlat[key];
+        continue;
+      }
+      // 同步 remaining 和 effect
+      (state as any).remaining = rt.remaining;
+      (state as any).effect = rt.effect;
+      if (rt.sourceName !== undefined) (state as any).sourceName = rt.sourceName;
+      if (rt._dotParsedDuration !== undefined) (state as any)._dotParsedDuration = rt._dotParsedDuration;
+      // 写回扁平存储
+      const key = makeDotFlatKey(typeId, hid);
+      ignoredTargetFlat[key] = true;
     }
   }
 
   function clearDotByBuffPoolExpire(buffID: string, hid: number): void {
     const typeId = dotTypeIdFromBuffId(buffID);
     if (typeId == null || hid === 0) return;
-    const tab = (deps.stateByType as any)[typeId];
-    if (tab == null) return;
-    const v = tabRowForHid(tab, hid);
-    if (v != null && isValidDotStateRow(v)) {
-      const cfg = deps.dotTypes.find(c => c.id === typeId);
+    const state = getDotState(typeId, hid);
+    if (state != null && isValidDotStateRow(state)) {
+      const cfg = dotTypes.find(c => c.id === typeId);
       if (cfg != null && typeof cfg.onEnd === "function") {
-        const uref = (v as any)._dotUnitRef;
-        (cfg as any).onEnd(uref != null ? uref : hid, v);
+        const uref = (state as any)._dotUnitRef;
+        (cfg as any).onEnd(uref != null ? uref : hid, state);
       }
     }
-    tabDeleteHid(tab, hid);
-    deps.removeDotTicksForTargetHid(typeId, hid);
+    deleteDotState(typeId, hid);
+    // 清除忽略标记
+    const key = makeDotFlatKey(typeId, hid);
+    delete ignoredTargetFlat[key];
+    removeDotTicksForTargetHid(typeId, hid);
   }
 
   return {
