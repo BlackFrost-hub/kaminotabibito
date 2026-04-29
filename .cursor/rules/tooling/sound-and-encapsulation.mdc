@@ -1,5 +1,7 @@
 ---
-description: 音效与漂浮字封装路径约定；若与仓库当前目录不一致，以 TS/lib/扩展函数 与 TS/系统 下实际模块为准
+description: 音效与漂浮字封装路径约定
+globs: TS/**/*.ts
+alwaysApply: false
 ---
 
 # 音效与封装函数约定

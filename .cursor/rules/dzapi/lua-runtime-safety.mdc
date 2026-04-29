@@ -31,6 +31,8 @@ alwaysApply: false
 
 - **优先在业务层收敛**，不要把匿名闭包、`Condition`、`Filter`、高频 JASS 回调直接送进引擎。
 - **模块级具名函数 + 稳定 key 分发**，按具体子系统局部治理。
+- **传给 JASS 的函数必须是长寿的模块级具名函数**，生命周期视为整个地图；不要创建临时闭包再传给 `TimerStart`、`Condition`、`Filter`、`ForGroup`、`Dz*ByCode`、触发器动作/条件等 JASS 注册点。
+- **TS/Lua 传给 JASS 的闭包默认按“不释放”处理**，因此要尽量减少这类跨边界回调数量；`Filter` 优先做成单例具名函数，不要手动销毁。
 - **不要在项目入口全局重写 `TimerStart` / `TriggerAddAction` / `ForGroup`**，除非专门做运行时实验并完整评估兼容性。
 
 ## 历史模板做的事（一览）
