@@ -34,6 +34,7 @@ import { createDotStateSync } from "./01．DOT定义/05．DOT状态同步";
 import { createDotExecutor } from "./01．DOT定义/06．DOT执行器";
 import { createDotApplyStrategy } from "./01．DOT定义/07．DOT施加策略";
 import { createDotBaseUtils } from "./01．DOT定义/08．DOT基础工具";
+import { syncDotBuff } from "../05．Buff系统/00．Buff系统";
 
 // ========== 虚拟分区：其它依赖 ==========
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
@@ -63,14 +64,7 @@ let __pcallNotifyTypeId = "";
 let __pcallNotifyTarget: any = null;
 let __pcallNotifyState: DotState | null = null;
 function __pcallNotifyBuffPoolBody(): void {
-  const m = require("系统.05．Buff系统.00．Buff系统") as {
-    syncDotBuff?: (
-      tid: string,
-      u: any,
-      s: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
-    ) => void;
-  };
-  if (m != null && typeof m.syncDotBuff === "function") m.syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState);
+  syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState);
 }
 /** Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统 */
 function notifyBuffPool(typeId: string, target: any, state: DotState | null): void {

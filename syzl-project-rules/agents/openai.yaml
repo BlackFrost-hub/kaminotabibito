@@ -1,4 +1,4 @@
 interface:
   display_name: "Syzl Project Rules"
-  short_description: "Route work through repo rules, War3 UI boundaries, UTF-8-safe patching, and named-only JASS callbacks."
-  default_prompt: "Use $syzl-project-rules to work inside this repository while following its project-specific rules, Warcraft III shared UI constraints, UTF-8-safe patch discipline for Chinese-heavy files, and the repo-wide named-function-only rule for any JASS engine callback path."
+  short_description: "Route work through .cursor rules, War3 UI boundaries, UTF-8-safe patching, and named-only JASS callbacks."
+  default_prompt: "Use $syzl-project-rules to work inside this repository by reading `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`, `.cursor/rules/README.md`, and the most specific subsystem rules needed for the files being changed."

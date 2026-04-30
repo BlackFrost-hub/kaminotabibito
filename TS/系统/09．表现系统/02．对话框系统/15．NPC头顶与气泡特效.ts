@@ -125,9 +125,6 @@ export function attachQuestMarkerToUnit(unit: any): void {
   attachNpcPromptEffect(unit, NPC_OVERHEAD_YELLOW_EXCL);
 }
 
-export function attachQuestMarkersToMainStoryNpcMap(_map: Record<string, any>): void {
-}
-
 export function setNpcQuestPromptAcceptedState(npcUnit: any): void {
   const key = npcPromptHandleKey(npcUnit);
   if (key !== 0) {
@@ -266,13 +263,6 @@ export function releaseNpcOccupation(playerId: number): void {
 
 export function getNpcUnit(playerId: number): any {
   return g_npcUnits[playerId];
-}
-
-export function isNpcOccupied(npcUnit: any): number {
-  if (!npcUnit) return -1;
-  const key = npcOccupationKey(npcUnit);
-  if (key === 0) return -1;
-  return g_npcOccupiedBy.get(key) ?? -1;
 }
 
 export function tryOccupyNpc(p: Player, npcUnit: any): boolean {

@@ -1,11 +1,25 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____07_FF0E_8054_673A_5B89_5168_5DE5_5177 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeTimerStart
 local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
 local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActivePlayerId
+--- 从当前页往后找第一个任务行。
+-- 不再从 queue 头开始，避免 ~ 跳回前面已经看过的任务页。
+function ____exports.findFirstQuestEntryIndex(self, state)
+    do
+        local i = state.currentIndex
+        while i < #state.queue do
+            if state.queue[i + 1].isQuest and state.queue[i + 1].questCallbacks then
+                return i
+            end
+            i = i + 1
+        end
+    end
+    return -1
+end
 local japi = require("jass.japi")
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
 ____exports.DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 对话框系统固定为 4 个玩家槽位：P1~P4。
 ____exports.MAX_PLAYERS = 4
@@ -99,13 +113,7 @@ function ____exports.dzTimerCreate(self)
 end
 function ____exports.dzTimerStart(self, t, timeout, periodic, cb)
     if t then
-        safeTimerStart(
-            nil,
-            t,
-            timeout,
-            periodic,
-            cb
-        )
+        safeTimerStart(t, timeout, periodic, cb)
     end
 end
 function ____exports.dzTimerPause(self, t)
@@ -124,32 +132,21 @@ function ____exports.dzLoadTocOnce(self)
     g_tocLoaded = true
     ____exports.dzLoadToc(nil)
 end
---- 联机：~ / DzSync 交错时保证 g_questCallbacksByPlayer 与 queue[0].questCallbacks 同源；否则接受/拒绝 resolve 不对称 → 掉线
+--- 联机：~ / DzSync 交错时保证 g_questCallbacksByPlayer 与 queue 中任务条目同源；否则接受/拒绝 resolve 不对称 → 掉线
 function ____exports.syncQuestCallbacksTableFromQueueHead(self, state)
     if #state.queue == 0 then
         return
     end
-    local e = state.queue[1]
+    local questIdx = ____exports.findFirstQuestEntryIndex(nil, state)
+    if questIdx < 0 then
+        return
+    end
+    local e = state.queue[questIdx + 1]
     if not e.isQuest or not e.questCallbacks then
         return
     end
     ____exports.g_questCallbacksByPlayer[state.playerId + 1] = {onAccept = e.questCallbacks.onAccept, onReject = e.questCallbacks.onReject}
     setActivePlayerId(nil, state.playerId)
-end
---- 在玩家队列中找第一个任务行（不要求必须是队首）。
--- ~ 键跳过后队首可能仍是普通行（本地视觉快进不修改队列），
--- 接受/拒绝时需要从整个队列里找到任务行来执行回调。
-function ____exports.findFirstQuestEntryIndex(self, state)
-    do
-        local i = 0
-        while i < #state.queue do
-            if state.queue[i + 1].isQuest and state.queue[i + 1].questCallbacks then
-                return i
-            end
-            i = i + 1
-        end
-    end
-    return -1
 end
 ____exports.japi = japi
 ____exports.jass = jass

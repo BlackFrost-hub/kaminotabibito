@@ -183,8 +183,6 @@ function ____exports.attachQuestMarkerToUnit(self, unit)
     end
     attachNpcPromptEffect(nil, unit, NPC_OVERHEAD_YELLOW_EXCL)
 end
-function ____exports.attachQuestMarkersToMainStoryNpcMap(self, _map)
-end
 function ____exports.setNpcQuestPromptAcceptedState(self, npcUnit)
     local key = npcPromptHandleKey(nil, npcUnit)
     if key ~= 0 then
@@ -288,24 +286,24 @@ local function startBubbleScheduleTimer(self, playerId, delay)
     local t = jass.CreateTimer()
     g_bubbleScheduleTimers[playerId + 1] = t
     repeat
-        local ____switch67 = playerId
-        local ____cond67 = ____switch67 == 0
-        if ____cond67 then
+        local ____switch66 = playerId
+        local ____cond66 = ____switch66 == 0
+        if ____cond66 then
             jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0)
             return
         end
-        ____cond67 = ____cond67 or ____switch67 == 1
-        if ____cond67 then
+        ____cond66 = ____cond66 or ____switch66 == 1
+        if ____cond66 then
             jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1)
             return
         end
-        ____cond67 = ____cond67 or ____switch67 == 2
-        if ____cond67 then
+        ____cond66 = ____cond66 or ____switch66 == 2
+        if ____cond66 then
             jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2)
             return
         end
-        ____cond67 = ____cond67 or ____switch67 == 3
-        if ____cond67 then
+        ____cond66 = ____cond66 or ____switch66 == 3
+        if ____cond66 then
             jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3)
             return
         end
@@ -340,16 +338,6 @@ function ____exports.releaseNpcOccupation(self, playerId)
 end
 function ____exports.getNpcUnit(self, playerId)
     return g_npcUnits[playerId + 1]
-end
-function ____exports.isNpcOccupied(self, npcUnit)
-    if not npcUnit then
-        return -1
-    end
-    local key = npcOccupationKey(nil, npcUnit)
-    if key == 0 then
-        return -1
-    end
-    return g_npcOccupiedBy:get(key) or -1
 end
 function ____exports.tryOccupyNpc(self, p, npcUnit)
     if not npcUnit then

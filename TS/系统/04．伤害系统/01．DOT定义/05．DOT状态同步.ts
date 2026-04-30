@@ -1,4 +1,5 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
+import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
 import {
   collectActiveDotPairs,
   deleteDotState,
@@ -37,23 +38,11 @@ export function createDotStateSync(deps: {
   const removeDotTicksForTargetHid = deps.removeDotTicksForTargetHid;
 
   function syncDotRemainingFromBuffPool(): void {
-    const buffM = require("系统.05．Buff系统.00．Buff系统") as {
-      getBuffRuntimeByHid?: (
-        hid: number,
-        buffID: string
-      ) => { remaining: number; effect: number; sourceName?: string; _dotParsedDuration?: number } | null;
-      DOT_TYPE_TO_BUFF_ID?: Record<string, string>;
-    };
-    // 提取模块方法到局部变量，避免 TSTL 生成冒号调用
-    const _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid;
-    const map = buffM.DOT_TYPE_TO_BUFF_ID;
-    if (map == null || typeof _getBuffRuntimeByHid !== "function") return;
-
     // 使用 collectActiveDotPairs 获取排序后的活跃 DOT 对
     const pairs = collectActiveDotPairs();
     for (let pi = 0; pi < pairs.length; pi++) {
       const { typeId, hid } = pairs[pi];
-      const buffID = (map as any)[typeId] as string | undefined;
+      const buffID = (DOT_TYPE_TO_BUFF_ID as any)[typeId] as string | undefined;
       if (buffID == null || buffID === "") continue;
 
       const state = getDotState(typeId, hid);
@@ -61,7 +50,7 @@ export function createDotStateSync(deps: {
         deleteDotState(typeId, hid);
         continue;
       }
-      const rt = _getBuffRuntimeByHid(hid, buffID);
+      const rt = getBuffRuntimeByHid(hid, buffID);
       if (rt == null || rt.remaining <= 0) {
         const cfg = dotTypes.find(c => c.id === typeId);
         if (cfg != null && typeof cfg.onEnd === "function") {

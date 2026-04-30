@@ -246,7 +246,13 @@ const typeNames = ["ability", "buff", "unit", "item", "upgrade", "doodad", "dest
  */
 export function getObjectProperty(objectType: number, objectId: number | string, property: string): string {
   if (typeof objectId === "number") {
-    const script = "(require'jass.slk')." + typeNames[objectType] + "[" + objectId.toString() + "]." + property;
+    const script = "(function() local _t=(require'jass.slk')." +
+      typeNames[objectType] +
+      "; local _u=_t and _t[" +
+      objectId.toString() +
+      "]; if _u then return _u." +
+      property +
+      " else return '' end end)()";
     return japi.EXExecuteScript(script) || "";
   }
 

@@ -262,7 +262,7 @@ local typeNames = {
 -- 实现为 `EXExecuteScript`：在引擎内**同步**求值，不是异步回调；但不宜在联机「每 10ms/高频计时器」里对大量单位反复调用，应在业务侧缓存。
 function ____exports.getObjectProperty(self, objectType, objectId, property)
     if type(objectId) == "number" then
-        local script = (((("(require'jass.slk')." .. typeNames[objectType + 1]) .. "[") .. tostring(objectId)) .. "].") .. property
+        local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t[") .. tostring(objectId)) .. "]; if _u then return _u.") .. property) .. " else return '' end end)()"
         return japi.EXExecuteScript(script) or ""
     end
     local script = ((((("(function() local _t=(require'jass.slk')." .. typeNames[objectType + 1]) .. "; local _u=_t and _t['") .. objectId) .. "']; if _u then return _u.") .. property) .. " else return '' end end)()"

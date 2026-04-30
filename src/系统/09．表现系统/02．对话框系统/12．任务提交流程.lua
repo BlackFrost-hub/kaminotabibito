@@ -304,7 +304,7 @@ function ____exports.handleQuestSubmit(self, params)
             removeQuestMarkerAfterNpcTriggered(nil, npcUnit)
         end
         broadcastQuestComplete(nil)
-        refreshTaskUIForAllClientsSoon(nil)
+        refreshTaskUIForAllClientsSoon(nil, dialogOwnerId, questId)
         if quest.NpcCompleteText then
             local completeRaw = pickNpcCompleteTextByBranch(nil, quest.NpcCompleteText, rewardBranchIndex)
             local completeLines = parseDialogText(nil, completeRaw, npcName, heroName)

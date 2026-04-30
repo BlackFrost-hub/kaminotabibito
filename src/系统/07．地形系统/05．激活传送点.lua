@@ -238,7 +238,7 @@ activationPointTriggerHandleByKey = {}
 activationPointTriggerUnregisterByKey = {}
 --- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
 -- 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
-local DEBUG_GG_UNIT_HTOW_0030 = false
+local DEBUG_GG_UNIT_HTOW_0030 = true
 setDebug(nil, "激活传送点", DEBUG_GG_UNIT_HTOW_0030)
 local DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030"
 ACTIVATION_RANGE = 300

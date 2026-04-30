@@ -170,12 +170,14 @@ export function createDotApplyStrategy(deps: {
   // ========== 虚拟分区：普攻装备入口 ==========
   function tryApplyHeroAttackGearDots(source: any, target: any, _damage: number): void {
     if (!target || !source) return;
-    if (!isSourceHeroPlayer1to4(source)) return;
+    const isHeroSource = isSourceHeroPlayer1to4(source);
+    if (!isHeroSource) return;
     const tgtHid = unitHid(target);
     for (let t = 0; t < dotTypes.length; t++) {
       const cfg = dotTypes[t];
       const typeId = cfg.id;
-      if (cfg.debuffDotEnemyNoStructure === true && !isDebuffDotTargetOk(source, target)) continue;
+      const targetOk = !(cfg.debuffDotEnemyNoStructure === true) || isDebuffDotTargetOk(source, target);
+      if (!targetOk) continue;
       const best = cfg.getBestFromUnit(source);
       if (best == null) continue;
       const amount = cfg.computeAmount(target, best);

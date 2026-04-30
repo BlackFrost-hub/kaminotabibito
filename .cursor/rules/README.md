@@ -7,7 +7,6 @@
 | 目录 | 内容 |
 |------|------|
 | [`war3-tstl/`](war3-tstl/) | War3 + TSTL 编译坑：jass/japi 调用、回调注册、随机数、全局数组、伤害事件等 |
-| [`tstl-recent/`](tstl-recent/) | 近期已复现的 TSTL 增量坑（no-self 参数右移、核心依赖环、缺失 API 中断初始化、机制混用） |
 | [`dzapi/`](dzapi/) | DzAPI UI Frame 类型、联机 desync / 对称执行 / N 槽、Lua GC 安全、运行时安全代码 |
 | [`equipment/`](equipment/) | 装备恢复、hot 字段、USE_ITEM 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
@@ -27,3 +26,7 @@
 2. 全局规则放到 `agent-shared/*.mdc` 并使用 `alwaysApply: true`。
 3. 子系统规则放到最相关的子目录中。
 4. 新增项目规则时，在这里补一条入口。
+
+说明：
+
+- 近期高优先级、跨子系统反复出现的 TSTL / desync / JASS-Dz 关键坑，已收敛进 `GLOBAL_AGENT_PROMPT.mdc`，不再单独维护一份 `tstl-recent/` 增量规则目录。

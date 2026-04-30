@@ -1,8 +1,6 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
-const { safeTimerStart } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-};
+import { safeTimerStart } from "../../../系统/00．核心系统/07．联机安全工具";
 
 import { setActivePlayerId } from "./16．对话框同步状态";
 import type { Frame, Player, PlayerDialogState, Timer } from "./05．对话框业务逻辑";
@@ -56,10 +54,12 @@ export function dzLoadToc(): void { japi.DzLoadToc(TOC_PATH); }
 let g_tocLoaded = false;
 export function dzLoadTocOnce(): void { if (g_tocLoaded) return; g_tocLoaded = true; dzLoadToc(); }
 
-/** 联机：~ / DzSync 交错时保证 g_questCallbacksByPlayer 与 queue[0].questCallbacks 同源；否则接受/拒绝 resolve 不对称 → 掉线 */
+/** 联机：~ / DzSync 交错时保证 g_questCallbacksByPlayer 与 queue 中任务条目同源；否则接受/拒绝 resolve 不对称 → 掉线 */
 export function syncQuestCallbacksTableFromQueueHead(state: PlayerDialogState): void {
   if (state.queue.length === 0) return;
-  const e = state.queue[0];
+  const questIdx = findFirstQuestEntryIndex(state);
+  if (questIdx < 0) return;
+  const e = state.queue[questIdx];
   if (!e.isQuest || !e.questCallbacks) return;
   g_questCallbacksByPlayer[state.playerId] = {
     onAccept: e.questCallbacks.onAccept,
@@ -69,12 +69,11 @@ export function syncQuestCallbacksTableFromQueueHead(state: PlayerDialogState): 
 }
 
 /**
- * 在玩家队列中找第一个任务行（不要求必须是队首）。
- * ~ 键跳过后队首可能仍是普通行（本地视觉快进不修改队列），
- * 接受/拒绝时需要从整个队列里找到任务行来执行回调。
+ * 从当前页往后找第一个任务行。
+ * 不再从 queue 头开始，避免 ~ 跳回前面已经看过的任务页。
  */
 export function findFirstQuestEntryIndex(state: PlayerDialogState): number {
-  for (let i = 0; i < state.queue.length; i++) {
+  for (let i = state.currentIndex; i < state.queue.length; i++) {
     if (state.queue[i].isQuest && state.queue[i].questCallbacks) return i;
   }
   return -1;

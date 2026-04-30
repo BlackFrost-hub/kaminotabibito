@@ -35,6 +35,8 @@ local stringToFourCC = ____require_result_0.stringToFourCC
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
 local ____G_1 = _G
 local addDelayedCallback = ____G_1.addDelayedCallback
+local ____require_result_2 = require("系统.08．任务系统.02．任务管理器.index")
+local questManager = ____require_result_2.questManager
 local function scheduleOpenDialogLater(self, player, data)
     addDelayedCallback(
         nil,
@@ -47,7 +49,8 @@ end
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1
 end
-local function refreshTaskUIForAllClientsSoon(self)
+local function refreshTaskUIForAllClientsSoon(self, playerId, questId)
+    questManager:triggerUIRefresh(playerId, questId)
 end
 local function grantQuestItems(self, hero, questItems)
     if not hero or not questItems or questItems == "" then
@@ -184,20 +187,20 @@ function ____exports.buildQuestCompletedDialog(self, quest, npcName)
 end
 function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, npcUnit)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_2
+    local ____dialogOwner_3
     if dialogOwner then
-        ____dialogOwner_2 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_3 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_2 = nil
+        ____dialogOwner_3 = nil
     end
-    local ownerHero = ____dialogOwner_2
-    local ____ownerHero_3
+    local ownerHero = ____dialogOwner_3
+    local ____ownerHero_4
     if ownerHero then
-        ____ownerHero_3 = jass.GetUnitName(ownerHero)
+        ____ownerHero_4 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_3 = "你"
+        ____ownerHero_4 = "你"
     end
-    local heroName = ____ownerHero_3
+    local heroName = ____ownerHero_4
     local questDesc = quest.desc or quest.name or "未知任务"
     local rewardText = getQuestRewardDisplayText(nil, quest)
     local startLines = quest.NpcStartText and ____exports.parseDialogText(nil, quest.NpcStartText, npcName, heroName) or ({{
@@ -214,13 +217,13 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
             onAccept = function()
                 local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
                 local playerObj = jass.Player(dialogOwnerId)
-                local ____playerObj_4
+                local ____playerObj_5
                 if playerObj then
-                    ____playerObj_4 = getPlayerFirstHero(nil, playerObj)
+                    ____playerObj_5 = getPlayerFirstHero(nil, playerObj)
                 else
-                    ____playerObj_4 = nil
+                    ____playerObj_5 = nil
                 end
-                local hero = ____playerObj_4
+                local hero = ____playerObj_5
                 local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 if not canAcceptQuestByRequirements(nil, quest, hero) then
                     local failRaw = quest.AcceptFailedText or "当前条件不满足，无法接受该任务。"
@@ -246,7 +249,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                         playerName
                     )
                     grantQuestItems(nil, hero, quest.questItems)
-                    refreshTaskUIForAllClientsSoon(nil)
+                    refreshTaskUIForAllClientsSoon(nil, dialogOwnerId, questId)
                 end
                 local acceptedRaw = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
                 local acceptedLines = ____exports.parseDialogText(nil, acceptedRaw, npcName, heroName)
@@ -275,20 +278,20 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
 end
 function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_5
+    local ____dialogOwner_6
     if dialogOwner then
-        ____dialogOwner_5 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_6 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_5 = nil
+        ____dialogOwner_6 = nil
     end
-    local ownerHero = ____dialogOwner_5
-    local ____ownerHero_6
+    local ownerHero = ____dialogOwner_6
+    local ____ownerHero_7
     if ownerHero then
-        ____ownerHero_6 = jass.GetUnitName(ownerHero)
+        ____ownerHero_7 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_6 = "你"
+        ____ownerHero_7 = "你"
     end
-    local heroName = ____ownerHero_6
+    local heroName = ____ownerHero_7
     local questDesc = quest.desc or quest.name or ""
     local rewardText = getQuestRewardDisplayText(nil, quest)
     local requireCount = normalizeRequireCount(nil, quest.requireCount)

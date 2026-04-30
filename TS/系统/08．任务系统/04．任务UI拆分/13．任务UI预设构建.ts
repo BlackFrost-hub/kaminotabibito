@@ -1,11 +1,3 @@
-/**
- * 13．任务UI预设构建
- * 职责：初始化阶段一次性创建所有 page/variant/row 帧。
- * 不在交互时创建或销毁帧。
- */
-
-const japi = require("jass.japi") as any;
-
 import { QuestType } from "../01．任务数据";
 import {
   TaskUIListControlContext,
@@ -14,7 +6,6 @@ import {
   TaskUIPageVariantFrames,
   TaskUIRowSlotFrames,
   TaskUIPrecreatedListPool,
-  setVisible,
   taskRowClickHandlersByIndex,
   taskRowBindingByFrameId,
 } from "./09．任务UI列表控制";
@@ -24,64 +15,25 @@ import {
   MAX_PAGES_PER_CATEGORY,
   BG_TEX,
 } from "./01．任务UI常量";
-import { tryCreateFromFdfOnly } from "./02．任务UI辅助";
-import { DZ_TEXT_ALIGN_LEFT } from "../../00．核心系统/03．UI函数";
+import {
+  createHiddenRoot,
+  createHiddenText,
+  createHiddenBackdrop,
+  createPlainHiddenBackdrop,
+  createHiddenButton,
+} from "./17．任务UI列表帧构建";
+import {
+  ROWS_PER_PAGE,
+  PAGE_VARIANT_COUNT,
+  createEmptyQuestIdList,
+} from "./11．任务UI列表控制辅助";
 
-const ROWS_PER_PAGE = 7;
-const PAGE_VARIANT_COUNT = ROWS_PER_PAGE + 1;
 const PAGE_ROOT_HEIGHT = LIST_VIEW_H;
 const LIST_ITEM_H = LIST_VIEW_H * 0.14;
 const TITLE_HEIGHT = LIST_ITEM_H * 0.38;
 const OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25;
 const FAIL_HEIGHT = LIST_ITEM_H * 0.2;
 const DETAIL_HEIGHT = LIST_ITEM_H * 0.22;
-function createEmptyQuestIdList(): string[] {
-  const questIds: string[] = [];
-  for (let i = 0; i < ROWS_PER_PAGE; i++) questIds.push("");
-  return questIds;
-}
-
-function createHiddenRoot(
-  ctx: TaskUIListControlContext,
-  name: string,
-  parent: number,
-  width: number = LIST_CONTAINER_W,
-  height: number = PAGE_ROOT_HEIGHT
-): number | null {
-  const frame = ctx.createFrame({ type: "FRAME", name, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
-  if (!frame) return null;
-  ctx.setFramePointRelative(frame, ctx.FramePoint.TOPLEFT, parent, ctx.FramePoint.TOPLEFT, 0, 0);
-  ctx.setFrameSize(frame, { width, height });
-  return frame;
-}
-
-function createHiddenText(ctx: TaskUIListControlContext, name: string, parent: number, width: number, height: number): number | null {
-  const frame = ctx.createTextLabel(name, parent, "", { relativeTo: parent, point: ctx.FramePoint.TOPLEFT, relativePoint: ctx.FramePoint.TOPLEFT, x: 0, y: 0 }, { width, height }) || 0;
-  if (!frame) return null;
-  setVisible(frame, false);
-  return frame;
-}
-
-function createHiddenBackdrop(ctx: TaskUIListControlContext, templateName: string, frameName: string, parent: number, texture?: string, contextId?: number): number | null {
-  let frame = tryCreateFromFdfOnly(templateName, parent, contextId ?? 0) || 0;
-  if (!frame) {
-    frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name: frameName, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
-    if (frame && texture) ctx.setFrameTexture(frame, texture);
-  }
-  return frame || null;
-}
-
-function createPlainHiddenBackdrop(ctx: TaskUIListControlContext, name: string, parent: number): number | null {
-  const frame = ctx.createFrame({ type: ctx.FrameType.BACKDROP, name, parent, template: "template", visible: false, id: ctx.contextId }) || 0;
-  return frame || null;
-}
-
-function createHiddenButton(ctx: TaskUIListControlContext, name: string, parent: number, onClick: () => void): number | null {
-  const frame = ctx.createFrame({ type: ctx.FrameType.GLUETEXTBUTTON, name, parent, template: "template", visible: false, enable: true, alpha: 0, id: ctx.contextId }) || 0;
-  if (!frame) return null;
-  ctx.setFrameClickEvent(frame, onClick, true);
-  return frame;
-}
 
 function createRowSlot(ctx: TaskUIListControlContext, parent: number, prefix: string, rowIndex: number, onClick: () => void): TaskUIRowSlotFrames {
   const objectiveFrames: number[] = [];
@@ -129,7 +81,6 @@ function createCategory(ctx: TaskUIListControlContext, category: QuestType): Tas
   const emptyText = createHiddenText(ctx, "TaskEmpty_" + category, root as number, LIST_CONTAINER_W * 0.85, 0.08) || 0;
   if (emptyText !== 0) {
     ctx.applyDzTextFontAndCenterAlignment(emptyText);
-    setVisible(emptyText, false);
   }
   const pages: TaskUIPageFrames[] = [];
   for (let pageIndex = 0; pageIndex < MAX_PAGES_PER_CATEGORY; pageIndex++) {

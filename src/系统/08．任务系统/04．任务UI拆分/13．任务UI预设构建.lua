@@ -3,7 +3,6 @@ local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.04．任务UI拆分.09．任务UI列表控制")
-local setVisible = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.setVisible
 local taskRowClickHandlersByIndex = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.taskRowClickHandlersByIndex
 local taskRowBindingByFrameId = ____09_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.taskRowBindingByFrameId
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
@@ -11,125 +10,22 @@ local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
 local LIST_CONTAINER_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_CONTAINER_W
 local MAX_PAGES_PER_CATEGORY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.MAX_PAGES_PER_CATEGORY
 local BG_TEX = ____01_FF0E_4EFB_52A1UI_5E38_91CF.BG_TEX
-local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
-local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
---- 13．任务UI预设构建
--- 职责：初始化阶段一次性创建所有 page/variant/row 帧。
--- 不在交互时创建或销毁帧。
-local japi = require("jass.japi")
-local ROWS_PER_PAGE = 7
-local PAGE_VARIANT_COUNT = ROWS_PER_PAGE + 1
+local ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA = require("系统.08．任务系统.04．任务UI拆分.17．任务UI列表帧构建")
+local createHiddenRoot = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createHiddenRoot
+local createHiddenText = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createHiddenText
+local createHiddenBackdrop = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createHiddenBackdrop
+local createPlainHiddenBackdrop = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createPlainHiddenBackdrop
+local createHiddenButton = ____17_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createHiddenButton
+local ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.11．任务UI列表控制辅助")
+local ROWS_PER_PAGE = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.ROWS_PER_PAGE
+local PAGE_VARIANT_COUNT = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.PAGE_VARIANT_COUNT
+local createEmptyQuestIdList = ____11_FF0E_4EFB_52A1UI_5217_8868_63A7_5236_8F85_52A9.createEmptyQuestIdList
 local PAGE_ROOT_HEIGHT = LIST_VIEW_H
 local LIST_ITEM_H = LIST_VIEW_H * 0.14
 local TITLE_HEIGHT = LIST_ITEM_H * 0.38
 local OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25
 local FAIL_HEIGHT = LIST_ITEM_H * 0.2
 local DETAIL_HEIGHT = LIST_ITEM_H * 0.22
-local function createEmptyQuestIdList(self)
-    local questIds = {}
-    do
-        local i = 0
-        while i < ROWS_PER_PAGE do
-            questIds[#questIds + 1] = ""
-            i = i + 1
-        end
-    end
-    return questIds
-end
-local function createHiddenRoot(self, ctx, name, parent, width, height)
-    if width == nil then
-        width = LIST_CONTAINER_W
-    end
-    if height == nil then
-        height = PAGE_ROOT_HEIGHT
-    end
-    local frame = ctx:createFrame({
-        type = "FRAME",
-        name = name,
-        parent = parent,
-        template = "template",
-        visible = false,
-        id = ctx.contextId
-    }) or 0
-    if not frame then
-        return nil
-    end
-    ctx:setFramePointRelative(
-        frame,
-        ctx.FramePoint.TOPLEFT,
-        parent,
-        ctx.FramePoint.TOPLEFT,
-        0,
-        0
-    )
-    ctx:setFrameSize(frame, {width = width, height = height})
-    return frame
-end
-local function createHiddenText(self, ctx, name, parent, width, height)
-    local frame = ctx:createTextLabel(
-        name,
-        parent,
-        "",
-        {
-            relativeTo = parent,
-            point = ctx.FramePoint.TOPLEFT,
-            relativePoint = ctx.FramePoint.TOPLEFT,
-            x = 0,
-            y = 0
-        },
-        {width = width, height = height}
-    ) or 0
-    if not frame then
-        return nil
-    end
-    setVisible(nil, frame, false)
-    return frame
-end
-local function createHiddenBackdrop(self, ctx, templateName, frameName, parent, texture, contextId)
-    local frame = tryCreateFromFdfOnly(nil, templateName, parent, contextId or 0) or 0
-    if not frame then
-        frame = ctx:createFrame({
-            type = ctx.FrameType.BACKDROP,
-            name = frameName,
-            parent = parent,
-            template = "template",
-            visible = false,
-            id = ctx.contextId
-        }) or 0
-        if frame and texture then
-            ctx:setFrameTexture(frame, texture)
-        end
-    end
-    return frame or nil
-end
-local function createPlainHiddenBackdrop(self, ctx, name, parent)
-    local frame = ctx:createFrame({
-        type = ctx.FrameType.BACKDROP,
-        name = name,
-        parent = parent,
-        template = "template",
-        visible = false,
-        id = ctx.contextId
-    }) or 0
-    return frame or nil
-end
-local function createHiddenButton(self, ctx, name, parent, onClick)
-    local frame = ctx:createFrame({
-        type = ctx.FrameType.GLUETEXTBUTTON,
-        name = name,
-        parent = parent,
-        template = "template",
-        visible = false,
-        enable = true,
-        alpha = 0,
-        id = ctx.contextId
-    }) or 0
-    if not frame then
-        return nil
-    end
-    ctx:setFrameClickEvent(frame, onClick, true)
-    return frame
-end
 local function createRowSlot(self, ctx, parent, prefix, rowIndex, onClick)
     local objectiveFrames = {}
     local detailFrames = {}
@@ -280,7 +176,6 @@ local function createCategory(self, ctx, category)
     ) or 0
     if emptyText ~= 0 then
         ctx:applyDzTextFontAndCenterAlignment(emptyText)
-        setVisible(nil, emptyText, false)
     end
     local pages = {}
     do

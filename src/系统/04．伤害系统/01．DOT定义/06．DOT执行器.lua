@@ -5,6 +5,9 @@ local ____exports = {}
 local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
 local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
 local setIgnoredTarget = ____04_FF0EDOT_5DE5_5177.setIgnoredTarget
+local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+local DOT_TYPE_TO_BUFF_ID = ____00_FF0EBuff_7CFB_7EDF.DOT_TYPE_TO_BUFF_ID
+local getBuffRuntimeByHid = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntimeByHid
 local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWETimerDestroyEffect = ____require_result_0.YDWETimerDestroyEffect
@@ -86,28 +89,19 @@ function ____exports.createDotExecutor(self, deps)
         )
     end
     local function dotTickRun(self)
-        local buffM = require("系统.05．Buff系统.00．Buff系统")
-        local _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid
-        local _DOT_TYPE_TO_BUFF_ID = buffM.DOT_TYPE_TO_BUFF_ID
         do
             local i = #dotTicks - 1
             while i >= 0 do
                 local e = dotTicks[i + 1]
                 local eh = unitHid(nil, e.target)
+                local bid = DOT_TYPE_TO_BUFF_ID[e.typeId]
                 local ____temp_1
-                if _DOT_TYPE_TO_BUFF_ID ~= nil then
-                    ____temp_1 = _DOT_TYPE_TO_BUFF_ID[e.typeId]
+                if bid ~= nil and bid ~= "" then
+                    ____temp_1 = getBuffRuntimeByHid(eh, bid)
                 else
                     ____temp_1 = nil
                 end
-                local bid = ____temp_1
-                local ____temp_2
-                if bid ~= nil and bid ~= "" and type(_getBuffRuntimeByHid) == "function" then
-                    ____temp_2 = _getBuffRuntimeByHid(nil, eh, bid)
-                else
-                    ____temp_2 = nil
-                end
-                local rt = ____temp_2
+                local rt = ____temp_1
                 if rt == nil or rt.remaining <= 0.001 then
                     __TS__ArraySplice(dotTicks, i, 1)
                 end
@@ -181,8 +175,8 @@ function ____exports.createDotExecutor(self, deps)
             return
         end
         _registeredToCenterTimer = true
-        local ____G_3 = _G
-        local onSecond = ____G_3.onSecond
+        local ____G_2 = _G
+        local onSecond = ____G_2.onSecond
         onSecond(nil, dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)

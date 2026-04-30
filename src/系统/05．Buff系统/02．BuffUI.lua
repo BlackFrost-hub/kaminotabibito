@@ -131,20 +131,6 @@ end
 jass = require("jass.common")
 japi = require("jass.japi")
 local ____UI_5DE5_5177 = require("系统.09．表现系统.01．UI工具.index")
-local ____uiCreateMod = require("系统.09．表现系统.01．UI工具.01．帧创建")
-local createFrameDirect = ____uiCreateMod.createFrame
-local ____uiLayoutMod = require("系统.09．表现系统.01．UI工具.02．位置尺寸")
-local setFramePositionDirect = ____uiLayoutMod.setFramePosition
-local setFrameSizeDirect = ____uiLayoutMod.setFrameSize
-local setFramePointRelativeDirect = ____uiLayoutMod.setFramePointRelative
-local ____uiContentMod = require("系统.09．表现系统.01．UI工具.03．内容设置")
-local setFrameTextureDirect = ____uiContentMod.setFrameTexture
-local setFrameHoverEventsDirect = ____uiContentMod.setFrameHoverEvents
-local ____uiCompositeMod = require("系统.09．表现系统.01．UI工具.04．复合组件")
-local createTextLabelDirect = ____uiCompositeMod.createTextLabel
-local ____uiControlMod = require("系统.09．表现系统.01．UI工具.05．帧控制")
-local hideFrameDirect = ____uiControlMod.hideFrame
-local showFrameDirect = ____uiControlMod.showFrame
 local ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local getGameUI = ____hwMod.getGameUI
 local ____safeUtils = require("系统.00．核心系统.07．联机安全工具")
@@ -171,15 +157,6 @@ local refreshTimer = nil
 local pendingInitDelayTimer = nil
 buffBarViewModelByPlayerId = {}
 local hoverSlotIndexByFrameId = {}
-local uiCreateFrameRaw = ____UI_5DE5_5177.createFrame
-local uiSetFramePositionRaw = ____UI_5DE5_5177.setFramePosition
-local uiSetFrameSizeRaw = ____UI_5DE5_5177.setFrameSize
-local uiSetFrameTextureRaw = ____UI_5DE5_5177.setFrameTexture
-local uiSetFrameHoverEventsRaw = ____UI_5DE5_5177.setFrameHoverEvents
-local uiSetFramePointRelativeRaw = ____UI_5DE5_5177.setFramePointRelative
-local uiCreateTextLabelRaw = ____UI_5DE5_5177.createTextLabel
-local uiHideFrameRaw = ____UI_5DE5_5177.hideFrame
-local uiShowFrameRaw = ____UI_5DE5_5177.showFrame
 local function uiCreateFrame(options)
     return createFrameImported(nil, options)
 end
@@ -220,15 +197,7 @@ local function uiCreateTextLabel(name, parent, text, position, size)
     )
 end
 local function getTriggerUiEventFrame()
-    local frame = japi.DzGetTriggerUIEventFrame()
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        5,
-        "[getTriggerUiEventFrame] frame=" .. tostring(frame)
-    )
-    return frame
+    return japi.DzGetTriggerUIEventFrame()
 end
 local function setFrameLevelSafe(frame, level)
     if frame == 0 then
@@ -238,13 +207,6 @@ local function setFrameLevelSafe(frame, level)
 end
 local function showSlotTooltipByIndex(index)
     local s = slots[index + 1]
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        5,
-        (((((("[showSlotTooltip] index=" .. tostring(index)) .. " s=") .. (s and "yes" or "no")) .. " tipBox=") .. tostring(s and s.tipBox or "n/a")) .. " tipText=") .. tostring(s and s.tipText or "n/a")
-    )
     if s and s.tipBox ~= 0 then
         uiShowFrame(s.tipBox)
     end
@@ -267,13 +229,6 @@ local function onSlotHoverEnter(self)
         return
     end
     local index = hoverSlotIndexByFrameId[frame]
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        5,
-        "[BuffUI Hover] index=" .. tostring(index)
-    )
     if index == nil then
         return
     end
@@ -419,13 +374,6 @@ local function createUi()
             i = i + 1
         end
     end
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        10,
-        "[BuffUI] slots created=" .. tostring(#slots)
-    )
 end
 local function startRefreshTimer()
     if refreshTimer ~= nil then
@@ -435,13 +383,6 @@ local function startRefreshTimer()
     jass.TimerStart(refreshTimer, 0.1, true, onBuffUiRefreshTick)
 end
 local function onBuffUiInitDelayTimer()
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
-        0,
-        0,
-        10,
-        "[BuffUI] initDelayTimer fired, buffUiInit=" .. tostring(buffUiInitialized)
-    )
     createUi()
     startRefreshTimer()
     if pendingInitDelayTimer ~= nil then
@@ -463,7 +404,5 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     buffUiInitialized = true
     pendingInitDelayTimer = jass.CreateTimer()
     jass.TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
-end
-function ____exports.setDebugMode(enabled)
 end
 return ____exports

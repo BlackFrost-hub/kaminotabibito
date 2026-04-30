@@ -227,36 +227,6 @@ export function registerManualBuff(
   ensureSyncTimer();
 }
 
-export function removeBuffById(target: any, buffID: string): void {
-  const hid = toHid(target);
-  if (hid === 0) return;
-  removeBuffFromFlat(hid, buffID);
-  // 如果该 hid 下没有其他 buff 了，清理 unitRef
-  const hasOtherBuff = (() => {
-    for (const k in buffByUnitAndId) {
-      const p = parseBuffKey(k);
-      if (p && p.hid === hid) return true;
-    }
-    return false;
-  })();
-  if (!hasOtherBuff) delete unitRefByHid[hid];
-  maybeStopSyncTimer();
-}
-
-export function clearAllBuffsOnUnit(target: any): void {
-  const hid = toHid(target);
-  if (hid === 0) return;
-  // 清理该 hid 下所有 buff
-  const keysToDelete: string[] = [];
-  for (const k in buffByUnitAndId) {
-    const p = parseBuffKey(k);
-    if (p && p.hid === hid) keysToDelete.push(k);
-  }
-  for (let i = 0; i < keysToDelete.length; i++) delete buffByUnitAndId[keysToDelete[i]];
-  delete unitRefByHid[hid];
-  maybeStopSyncTimer();
-}
-
 export function isUnitInBuffPool(unit: any): boolean {
   const hid = toHid(unit);
   if (hid === 0) return false;

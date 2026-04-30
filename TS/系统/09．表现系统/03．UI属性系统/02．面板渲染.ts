@@ -270,10 +270,11 @@ function createDetailSlotForPlayer(gameUI: number, player: any, hero: any, index
   if (button !== 0) {
     japi.DzFrameSetPoint(button, 常量.ABSOLUTE_POINT_BOTTOMLEFT, icon, 常量.ABSOLUTE_POINT_BOTTOMLEFT, 0, 0);
     japi.DzFrameSetSize(button, 常量.HERO_BUTTON_SIZE, 常量.HERO_BUTTON_SIZE);
-    const playerId = jass.GetPlayerId(player);
     detailHoverSlotByFrameId[button] = index;
-    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_ENTER, onDetailHoverEnter, false, playerId);
-    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_LEAVE, onDetailHoverLeave, false, playerId);
+    // 不传 playerId：所有客户端的鼠标进入/离开任何玩家英雄头像都注册 hover 事件
+    // 回调只做纯显示隐藏（DzFrameShow），符合异步安全规则
+    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_ENTER, onDetailHoverEnter, false);
+    frameSetScriptByCode(button, 常量.FRAME_EVENT_MOUSE_LEAVE, onDetailHoverLeave, false);
   }
 
   detailSlots.push({ player, hero, functionKey: 常量.KEY_F[index], icon, box, lines, separators });

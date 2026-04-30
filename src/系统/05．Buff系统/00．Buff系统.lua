@@ -323,48 +323,6 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
     end
     ensureSyncTimer()
 end
-function ____exports.removeBuffById(target, buffID)
-    local hid = toHid(target)
-    if hid == 0 then
-        return
-    end
-    removeBuffFromFlat(hid, buffID)
-    local hasOtherBuff = (function()
-        for k in pairs(buffByUnitAndId) do
-            local p = parseBuffKey(k)
-            if p and p.hid == hid then
-                return true
-            end
-        end
-        return false
-    end)()
-    if not hasOtherBuff then
-        __TS__Delete(unitRefByHid, hid)
-    end
-    maybeStopSyncTimer()
-end
-function ____exports.clearAllBuffsOnUnit(target)
-    local hid = toHid(target)
-    if hid == 0 then
-        return
-    end
-    local keysToDelete = {}
-    for k in pairs(buffByUnitAndId) do
-        local p = parseBuffKey(k)
-        if p and p.hid == hid then
-            keysToDelete[#keysToDelete + 1] = k
-        end
-    end
-    do
-        local i = 0
-        while i < #keysToDelete do
-            __TS__Delete(buffByUnitAndId, keysToDelete[i + 1])
-            i = i + 1
-        end
-    end
-    __TS__Delete(unitRefByHid, hid)
-    maybeStopSyncTimer()
-end
 function ____exports.isUnitInBuffPool(unit)
     local hid = toHid(unit)
     if hid == 0 then

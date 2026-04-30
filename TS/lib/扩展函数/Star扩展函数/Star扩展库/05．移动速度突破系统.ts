@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 /**
  * Star扩展库 - 移动速度突破系统
  *
@@ -93,7 +92,7 @@ let isRunning = false;
 const triggerUnitSpeedEntryUidByTriggerHid: Record<number, number> = {};
 const speedBreakTempTimerCtxByHid: Record<number, number> = {};
 
-function onSpeedBreakTempTimerExpire(this: void): void {
+function onSpeedBreakTempTimerExpire(): void {
   const t = jass.GetExpiredTimer();
   const uid = speedBreakTempTimerCtxByHid[hid(t)];
   delete speedBreakTempTimerCtxByHid[hid(t)];
@@ -108,7 +107,7 @@ function onSpeedBreakTempTimerExpire(this: void): void {
   safeDestroyTimer(t);
 }
 
-function onMoveSpeedBreakTick(this: void): void {
+function onMoveSpeedBreakTick(): void {
   if (!isRunning) return;
 
   _tickCounter = _tickCounter + 1;

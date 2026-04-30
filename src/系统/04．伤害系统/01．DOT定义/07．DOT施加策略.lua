@@ -185,7 +185,8 @@ function ____exports.createDotApplyStrategy(self, deps)
         if not target or not source then
             return
         end
-        if not isSourceHeroPlayer1to4(nil, source) then
+        local isHeroSource = isSourceHeroPlayer1to4(nil, source)
+        if not isHeroSource then
             return
         end
         local tgtHid = unitHid(nil, target)
@@ -195,7 +196,8 @@ function ____exports.createDotApplyStrategy(self, deps)
                 do
                     local cfg = dotTypes[t + 1]
                     local typeId = cfg.id
-                    if cfg.debuffDotEnemyNoStructure == true and not isDebuffDotTargetOk(nil, source, target) then
+                    local targetOk = not (cfg.debuffDotEnemyNoStructure == true) or isDebuffDotTargetOk(nil, source, target)
+                    if not targetOk then
                         goto __continue25
                     end
                     local best = cfg:getBestFromUnit(source)

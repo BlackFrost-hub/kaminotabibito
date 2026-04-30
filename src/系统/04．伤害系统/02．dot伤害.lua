@@ -17,6 +17,8 @@ local ____07_FF0EDOT_65BD_52A0_7B56_7565 = require("系统.04．伤害系统.01�
 local createDotApplyStrategy = ____07_FF0EDOT_65BD_52A0_7B56_7565.createDotApplyStrategy
 local ____08_FF0EDOT_57FA_7840_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.08．DOT基础工具")
 local createDotBaseUtils = ____08_FF0EDOT_57FA_7840_5DE5_5177.createDotBaseUtils
+local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+local syncDotBuff = ____00_FF0EBuff_7CFB_7EDF.syncDotBuff
 --- 【通用 DOT 框架】持续伤害/减益（如反恢复、燃烧、中毒等）统一在此注册与驱动。
 -- 
 -- 设计说明（给后续维护或 AI 参考）：
@@ -51,10 +53,7 @@ local __pcallNotifyTypeId = ""
 local __pcallNotifyTarget = nil
 local __pcallNotifyState = nil
 local function __pcallNotifyBuffPoolBody(self)
-    local m = require("系统.05．Buff系统.00．Buff系统")
-    if m ~= nil and type(m.syncDotBuff) == "function" then
-        m:syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState)
-    end
+    syncDotBuff(__pcallNotifyTypeId, __pcallNotifyTarget, __pcallNotifyState)
 end
 --- Buff 池同步：避免顶层 require 循环，运行时加载 05．Buff系统.00．Buff系统
 local function notifyBuffPool(self, typeId, target, state)

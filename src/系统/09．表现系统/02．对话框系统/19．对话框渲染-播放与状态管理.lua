@@ -125,7 +125,7 @@ function onTypingTick(self, state)
     end
     state.strNow = nextTypingProgress(nil, state.strNow, STEP_LEN)
     state.clickCooldown = false
-    local entry = state.queue[1]
+    local entry = state.queue[state.currentIndex + 1]
     if not entry then
         dzTimerPause(nil, state.tickTimer)
         return
@@ -172,6 +172,7 @@ function ____exports.ensureState(self, playerId)
     local state = {
         playerId = playerId,
         queue = {},
+        currentIndex = 0,
         tickTimer = dzTimerCreate(nil),
         frames = {},
         strNow = 0,
@@ -243,6 +244,7 @@ function ____exports.clearState(self, state)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     state.queue = {}
+    state.currentIndex = 0
     onDialogFinished(nil, state)
     ____exports.showDialogFrames(nil, state, false)
 end
@@ -268,7 +270,7 @@ function ____exports.playEntry(self, state)
             dzPlayer(nil, state.playerId)
         )
     end
-    local entry = state.queue[1]
+    local entry = state.queue[state.currentIndex + 1]
     setActivePlayerId(nil, state.playerId)
     if entry.isQuest and entry.questCallbacks then
         syncQuestCallbacksTableFromQueueHead(nil, state)
@@ -296,7 +298,7 @@ function ____exports.skipTyping(self, state)
     if #state.queue == 0 then
         return
     end
-    local entry = state.queue[1]
+    local entry = state.queue[state.currentIndex + 1]
     if state.strNow < state.strLen then
         dzTimerPause(nil, state.tickTimer)
         state.strNow = state.strLen
@@ -329,8 +331,8 @@ function ____exports.advanceDialog(self, state)
         dzShow
     )
     showContinueHint(nil, state, false)
-    table.remove(state.queue, 1)
-    if #state.queue == 0 then
+    state.currentIndex = state.currentIndex + 1
+    if state.currentIndex >= #state.queue then
         resetActivePlayerIdIfMatch(nil, state.playerId)
         onDialogFinished(nil, state)
         ____exports.showDialogFrames(nil, state, false)
@@ -343,6 +345,7 @@ function ____exports.enqueue(self, state, entry)
     local ____state_queue_0 = state.queue
     ____state_queue_0[#____state_queue_0 + 1] = entry
     if wasEmpty then
+        state.currentIndex = 0
         ____exports.playEntry(nil, state)
     end
 end

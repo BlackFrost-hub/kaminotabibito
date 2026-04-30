@@ -1,4 +1,4 @@
-import { QuestData, QuestType } from "../01．任务数据";
+import { QuestData } from "../01．任务数据";
 const { clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   clampMin: (value: number, minValue: number) => number;
   clampRange: (value: number, minValue: number, maxValue: number) => number;
@@ -7,9 +7,8 @@ import {
   LIST_ITEM_H,
   LIST_VIEW_H,
   LIST_CONTENT_TOP_INSET,
-  LIST_CONTAINER_W,
 } from "./01．任务UI常量";
-import { EMPTY_TEXTS, getQuestsForUI, pcallDzFrameShow } from "./02．任务UI辅助";
+import { pcallDzFrameShow } from "./02．任务UI辅助";
 
 // ────────────────────────────────────────────────
 // 行高与总高度
@@ -124,25 +123,6 @@ export function isTaskScrollThumbDragHit(
 }
 
 // ────────────────────────────────────────────────
-// 滚轮滚动计算
-// ────────────────────────────────────────────────
-
-export function computeNextScrollOffsetByWheel(
-  getWheelDelta: (() => number) | undefined,
-  currentOffset: number,
-  totalContentHeight: number,
-  listViewHeight: number
-): number {
-  const delta = typeof getWheelDelta === "function" ? getWheelDelta() : 0;
-  if (delta === 0) return currentOffset;
-  const step = LIST_ITEM_H + 0.01;
-  const maxScroll = clampMin(totalContentHeight - listViewHeight, 0);
-  if (delta > 0) return clampMin(currentOffset - step, 0);
-  if (delta < 0) return currentOffset + step < maxScroll ? currentOffset + step : maxScroll;
-  return currentOffset;
-}
-
-// ────────────────────────────────────────────────
 // 滚动条显隐
 // ────────────────────────────────────────────────
 
@@ -203,81 +183,4 @@ export function calcVisibleQuestRows(
   return visibleRows;
 }
 
-// ────────────────────────────────────────────────
-// 列表刷新
-// ────────────────────────────────────────────────
 
-export function refreshTaskUIList(opts: {
-  currentPlayerId: number;
-  currentCategory: QuestType;
-  scrollOffset: number;
-  setScrollOffset: (v: number) => void;
-  setTotalContentHeight: (v: number) => void;
-  listContainer: number;
-  expandedQuestIds: Set<string>;
-  createTextLabel: any;
-  FramePoint: any;
-  applyDzTextFontAndCenterAlignment: any;
-  pushListItemFrame: (f: number) => void;
-  syncScrollThumb: (maxScroll: number) => void;
-  updateScrollBarVisibility: (maxScroll: number, hasQuestRows: boolean) => void;
-  createListItem: (quest: any, rowTopRel: number, expanded: boolean) => void;
-}): void {
-  const {
-    currentPlayerId,
-    currentCategory,
-    scrollOffset,
-    setScrollOffset,
-    setTotalContentHeight,
-    listContainer,
-    expandedQuestIds,
-    createTextLabel,
-    FramePoint,
-    applyDzTextFontAndCenterAlignment,
-    pushListItemFrame,
-    syncScrollThumb,
-    updateScrollBarVisibility: updateScrollBarVis,
-    createListItem,
-  } = opts;
-
-  const quests = getQuestsForUI(currentPlayerId, currentCategory);
-  if (quests.length === 0) {
-    setTotalContentHeight(0);
-    setScrollOffset(0);
-    const empty = createTextLabel(
-      "TaskEmpty",
-      listContainer,
-      EMPTY_TEXTS[currentCategory],
-      {
-        relativeTo: listContainer,
-        point: FramePoint.CENTER,
-        relativePoint: FramePoint.CENTER,
-        x: 0,
-        y: 0,
-      },
-      { width: LIST_CONTAINER_W * 0.85, height: 0.08 }
-    );
-    if (empty) {
-      pushListItemFrame(empty);
-      applyDzTextFontAndCenterAlignment(empty);
-    }
-    syncScrollThumb(0);
-    updateScrollBarVis(0, false);
-    return;
-  }
-
-  const totalH = calcTotalContentHeight(quests, (questId: string) => expandedQuestIds.has(questId));
-  setTotalContentHeight(totalH);
-  const maxScroll = getMaxScroll(totalH);
-  const clamped = clampScrollOffset(scrollOffset, maxScroll);
-  setScrollOffset(clamped);
-  syncScrollThumb(maxScroll);
-  updateScrollBarVis(maxScroll, true);
-
-  const visibleRows = calcVisibleQuestRows(quests, clamped, (questId: string) => expandedQuestIds.has(questId));
-  for (let i = 0; i < visibleRows.length; i++) {
-    const row = visibleRows[i];
-    if (!row) continue;
-    createListItem(row.quest, row.rowTopRel, row.expanded);
-  }
-}

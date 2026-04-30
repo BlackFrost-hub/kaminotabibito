@@ -19,22 +19,13 @@ local ENABLE_TASK_UI_RIGHT_SCROLLBAR = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
 local tryCreateFromFdfOnly = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfOnly
 local tryCreateFromFdfWithSource = ____02_FF0E_4EFB_52A1UI_8F85_52A9.tryCreateFromFdfWithSource
+local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 local ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E = require("系统.08．任务系统.04．任务UI拆分.07．任务UI分类标签")
 local buildTaskPanelCategoryTabs = ____07_FF0E_4EFB_52A1UI_5206_7C7B_6807_7B7E.buildTaskPanelCategoryTabs
 --- 任务主面板壳体 + 列表容器 + 右侧滚动条
 -- 
 -- 架构：全局1套UI，不再区分 slotPid。
 local japi = require("jass.japi")
-local __pcallShowFrame = 0
-local __pcallShowVis = false
-local function __pcallFrameShowBody(self)
-    japi.DzFrameShow(__pcallShowFrame, __pcallShowVis)
-end
-local function pcallDzFrameShow(self, frame, visible)
-    __pcallShowFrame = frame
-    __pcallShowVis = visible
-    pcall(__pcallFrameShowBody)
-end
 function ____exports.buildTaskMainPanel(self, opts)
     local ____opts_0 = opts
     local japi = ____opts_0.japi
@@ -68,8 +59,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         tabDaily = nil,
         scrollBarFrame = nil,
         scrollThumbFrame = nil,
-        scrollThumbHitBtn = nil,
-        vScrollTrack = nil
+        scrollThumbHitBtn = nil
     }
     local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
     if not mainPanel then
@@ -222,8 +212,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         tabDaily = tabs.tabDaily,
         scrollBarFrame = scrollBarFrame or nil,
         scrollThumbFrame = scrollThumbFrame or nil,
-        scrollThumbHitBtn = scrollThumbHitBtn,
-        vScrollTrack = nil
+        scrollThumbHitBtn = scrollThumbHitBtn
     }
     return result
 end

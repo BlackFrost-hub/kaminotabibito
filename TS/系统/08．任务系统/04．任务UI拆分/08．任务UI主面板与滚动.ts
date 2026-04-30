@@ -6,12 +6,6 @@
 
 const japi = require("jass.japi") as any;
 
-// ── pcall 槽位：具名函数体，禁止 (pcall as any)(匿名) ──
-let __pcallShowFrame = 0;
-let __pcallShowVis = false;
-function __pcallFrameShowBody(): void { japi.DzFrameShow(__pcallShowFrame, __pcallShowVis); }
-function pcallDzFrameShow(frame: number, visible: boolean): void { __pcallShowFrame = frame; __pcallShowVis = visible; pcall(__pcallFrameShowBody); }
-
 import {
   ENTRY_X,
   ENTRY_Y,
@@ -30,7 +24,7 @@ import {
   ENABLE_TASK_UI_RIGHT_SCROLLBAR,
 } from "./01．任务UI常量";
 import { QuestType } from "../01．任务数据";
-import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource } from "./02．任务UI辅助";
+import { tryCreateFromFdfOnly, tryCreateFromFdfWithSource, pcallDzFrameShow } from "./02．任务UI辅助";
 import { buildTaskPanelCategoryTabs } from "./07．任务UI分类标签";
 
 export interface BuildMainPanelResult {
@@ -45,7 +39,6 @@ export interface BuildMainPanelResult {
   scrollBarFrame: number | null;
   scrollThumbFrame: number | null;
   scrollThumbHitBtn: number | null;
-  vScrollTrack: null;
 }
 
 export interface BuildTaskMainPanelOpts {
@@ -107,7 +100,6 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollBarFrame: null,
     scrollThumbFrame: null,
     scrollThumbHitBtn: null,
-    vScrollTrack: null,
   };
 
   const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
@@ -234,7 +226,6 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollBarFrame: scrollBarFrame ?? null,
     scrollThumbFrame: scrollThumbFrame ?? null,
     scrollThumbHitBtn,
-    vScrollTrack: null,
   };
   return result;
 }

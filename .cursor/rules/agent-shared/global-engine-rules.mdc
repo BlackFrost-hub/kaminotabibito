@@ -90,3 +90,15 @@ alwaysApply: true
 - **`03．技能系统/00．技能事件/01．核心功能.ts` 的 `init`**：对 SPELL_CHANNEL/EFFECT 的注册（唯一入口）。
 - **Timer 到期、STES 子触发、Dz 键鼠等**：与「多玩家同一 event」不是同一类；能收进中心计时器/事件中心的按对应中心入口走，不能收的按子系统既有方式保留。
 - **仅作封装的 lib**（如 `lib/扩展函数/BJ函数/01．触发与事件.ts`）：新增功能仍应优先走事件中心，避免再叠一层独立注册习惯。
+
+## 14. 重复语义的单一事实来源
+
+以下规则以后**不要**在别的规则文件里大段重复展开，只保留一句引用：
+
+| 主题 | 单一事实来源 |
+|------|--------------|
+| JASS / Dz 回调必须使用长寿具名函数、禁止匿名闭包、`pcall` 体收束、表表索引禁令 | `dzapi/lua-gc-desync-heuristics.mdc` |
+| Dz 联机 UI 的全端执行次数、`GetLocalPlayer()` 分层、N 槽对称执行 | `dzapi/n-slot-ui-symmetric-execution.mdc` |
+| no-self / `nil` 首参 / 依赖环 / 缺失 API / 机制混用等近期 TSTL 复现坑 | `tstl-recent/recent-pitfalls.mdc` |
+
+本文件只保留全局入口与边界，不再复制上述规则正文。

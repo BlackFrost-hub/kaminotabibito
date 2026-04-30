@@ -9,7 +9,7 @@ alwaysApply: false
 本文件是 **Dz 帧 + 联机生命周期 + 同步参数** 的**单一事实来源**（与 `ui-frame-types.mdc` 分工：`ui-frame-types` 偏 Frame 类型、对齐、滚动数值、事件 ID；本文件偏 **全端执行次数、Timer、sync、N 槽**）。
 
 相关：`loadtoc-ui.mdc`、`fdf-crash.mdc`。  
-**UI 闭包 / `pcall` 收束与「最易掉线」档约束**：见 `lua-gc-desync-heuristics.mdc` 文件**顶部**「最高优先级（Dz / 任务面板等一切联机 UI）」。
+**UI 闭包 / `pcall` / JASS 回调具名函数规则**：统一以 `lua-gc-desync-heuristics.mdc` 为准；本文件不再重复正文，只讨论联机 UI 的执行次数与分层。
 
 ---
 
@@ -282,7 +282,7 @@ function startRefreshTimer(): void {
 2. `sync=true` 回调在**所有玩家**注册，建议初始化阶段一次性注册。
 3. 回调优先**全局具名函数**，避免 sync 链依赖难控的闭包句柄。
 4. 回调体分层：**全局同步逻辑**在本地判断外；**帧/音效等**在 `GetLocalPlayer()` 内。
-5. 凡是会进入 JASS 引擎的回调——计时器、触发器、单位组、帧事件——一律用命名函数，绝不用匿名闭包。
+5. JASS / Dz 回调的具名函数约束，统一见 `lua-gc-desync-heuristics.mdc`。
 
 ### 严禁
 

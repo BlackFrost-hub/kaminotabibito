@@ -45,6 +45,7 @@ export function ensureState(playerId: number): PlayerDialogState {
   const state: PlayerDialogState = {
     playerId,
     queue: [],
+    currentIndex: 0,
     tickTimer: dzTimerCreate(),
     frames: [],
     strNow: 0,
@@ -92,6 +93,7 @@ export function clearState(state: PlayerDialogState): void {
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue = [];
+  state.currentIndex = 0;
   onDialogFinished(state);
   showDialogFrames(state, false);
 }
@@ -113,7 +115,7 @@ export function playEntry(state: PlayerDialogState): void {
   showDialogFrames(state, true);
   if (isFirstOpen) Sound3DII_Mp3PlayReuse(DIALOG_OPEN_SOUND, dzPlayer(state.playerId));
 
-  const entry = state.queue[0];
+  const entry = state.queue[state.currentIndex];
   setActivePlayerId(state.playerId);
 
   if (entry.isQuest && entry.questCallbacks) {
@@ -135,7 +137,7 @@ export function playEntry(state: PlayerDialogState): void {
 
 export function skipTyping(state: PlayerDialogState): void {
   if (state.queue.length === 0) return;
-  const entry = state.queue[0];
+  const entry = state.queue[state.currentIndex];
 
   if (state.strNow < state.strLen) {
     dzTimerPause(state.tickTimer);
@@ -191,7 +193,7 @@ function onTypingTick(state: PlayerDialogState): void {
   }
   state.strNow = nextTypingProgress(state.strNow, STEP_LEN);
   state.clickCooldown = false;
-  const entry = state.queue[0];
+  const entry = state.queue[state.currentIndex];
   if (!entry) {
     dzTimerPause(state.tickTimer);
     return;
@@ -215,8 +217,8 @@ function onTypingTick(state: PlayerDialogState): void {
 export function advanceDialog(state: PlayerDialogState): void {
   showQuestButtons(state, false, dzGetLocalPlayer, dzPlayer, dzShow);
   showContinueHint(state, false);
-  state.queue.shift();
-  if (state.queue.length === 0) {
+  state.currentIndex++;
+  if (state.currentIndex >= state.queue.length) {
     resetActivePlayerIdIfMatch(state.playerId);
     onDialogFinished(state);
     showDialogFrames(state, false);
@@ -228,5 +230,8 @@ export function advanceDialog(state: PlayerDialogState): void {
 export function enqueue(state: PlayerDialogState, entry: DialogEntry): void {
   const wasEmpty = state.queue.length === 0;
   state.queue.push(entry);
-  if (wasEmpty) playEntry(state);
+  if (wasEmpty) {
+    state.currentIndex = 0;
+    playEntry(state);
+  }
 }

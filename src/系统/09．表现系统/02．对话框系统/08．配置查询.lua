@@ -49,14 +49,6 @@ function ____exports.findDialogConfig(self, npcName)
         function(____, config) return config.NPC == npcName end
     )
 end
-function ____exports.findNpcConfigByUnitName(self, unitName)
-    for ____, npc in ipairs(NPC_CONFIGS) do
-        if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
-            return npc
-        end
-    end
-    return nil
-end
 function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     if not unit or not unitName then
         return nil
@@ -68,30 +60,16 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     for ____, npc in ipairs(NPC_CONFIGS) do
         do
             if npc.enabled ~= true then
-                goto __continue19
+                goto __continue15
             end
             if npc.unitcode and npc.unitcode ~= selectedUnitCode then
-                goto __continue19
+                goto __continue15
             end
             if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
                 return npc
             end
         end
-        ::__continue19::
-    end
-    return nil
-end
-function ____exports.findEnabledNpcConfigByRequireId(self, requireID)
-    for ____, npc in ipairs(NPC_CONFIGS) do
-        do
-            if npc.enabled ~= true then
-                goto __continue25
-            end
-            if npc.requireID == requireID then
-                return npc
-            end
-        end
-        ::__continue25::
+        ::__continue15::
     end
     return nil
 end

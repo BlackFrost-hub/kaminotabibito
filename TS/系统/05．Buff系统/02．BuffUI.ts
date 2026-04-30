@@ -1,7 +1,4 @@
-﻿// BuffUI 閲嶆瀯鐗堬細鍏ㄧ璁＄畻 + 鏈湴娓叉煋
-// 閫変腑鍗曚綅鏉ユ簮鐢变簨浠朵腑蹇冪淮鎶わ紝涓嶅啀鏈湴 GroupEnumUnitsSelected
-
-const jass = require("jass.common") as any;
+﻿const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 import { getSoleSelectedUnitForPlayer as getSoleSelectedUnitForPlayerImported } from "../00．核心系统/01．事件中心/05．玩家选中单位事件中心";
 import { buildBuffBarViewModel as buildBuffBarViewModelImported, getMaxSlots as getMaxSlotsImported } from "./04．BuffUIViewModel";
@@ -18,50 +15,9 @@ import {
 import { createTextLabel as createTextLabelImported } from "../09．表现系统/01．UI工具/04．复合组件";
 import { hideFrame as hideFrameImported, showFrame as showFrameImported } from "../09．表现系统/01．UI工具/05．帧控制";
 const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
-  createFrame: (this: void, options: any) => number;
-  setFramePosition: (this: void, frame: number, options: any) => void;
-  setFrameSize: (this: void, frame: number, options: any) => void;
-  setFrameTexture: (this: void, frame: number, texture: string) => void;
-  setFrameHoverEvents: (this: void, frame: number, onHover: (this: void) => void, onUnhover: (this: void) => void, enable: boolean) => void;
-  setFramePointRelative: (this: void, frame: number, point: number, relativeTo: number, relativePoint: number, x: number, y: number) => void;
-  createTextLabel: (this: void, name: string, parent: number, text: string, position: any, size: any) => number;
   FrameType: { BACKDROP: number; GLUETEXTBUTTON: number };
   FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number };
-  hideFrame: (this: void, frame: number) => void;
-  showFrame: (this: void, frame: number) => void;
 };
-const ____uiCreateMod = require("系统.09．表现系统.01．UI工具.01．帧创建") as any;
-const createFrameDirect = ____uiCreateMod.createFrame as (options: any) => number | null;
-const ____uiLayoutMod = require("系统.09．表现系统.01．UI工具.02．位置尺寸") as any;
-const setFramePositionDirect = ____uiLayoutMod.setFramePosition as (frame: number, options: any) => boolean;
-const setFrameSizeDirect = ____uiLayoutMod.setFrameSize as (frame: number, options: any) => boolean;
-const setFramePointRelativeDirect = ____uiLayoutMod.setFramePointRelative as (
-  frame: number,
-  point: number,
-  relativeTo: number,
-  relativePoint: number,
-  x: number,
-  y: number
-) => boolean;
-const ____uiContentMod = require("系统.09．表现系统.01．UI工具.03．内容设置") as any;
-const setFrameTextureDirect = ____uiContentMod.setFrameTexture as (frame: number, texture: string) => boolean;
-const setFrameHoverEventsDirect = ____uiContentMod.setFrameHoverEvents as (
-  frame: number,
-  onEnter: (this: void) => void,
-  onLeave: (this: void) => void,
-  sync?: boolean
-) => boolean;
-const ____uiCompositeMod = require("系统.09．表现系统.01．UI工具.04．复合组件") as any;
-const createTextLabelDirect = ____uiCompositeMod.createTextLabel as (
-  name: string,
-  parent: number,
-  text: string,
-  position: any,
-  size: any
-) => number | null;
-const ____uiControlMod = require("系统.09．表现系统.01．UI工具.05．帧控制") as any;
-const hideFrameDirect = ____uiControlMod.hideFrame as (frame: number) => boolean;
-const showFrameDirect = ____uiControlMod.showFrame as (frame: number) => boolean;
 const ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index");
 const getGameUI = ____hwMod.getGameUI as () => number;
 const ____safeUtils = require("系统.00．核心系统.07．联机安全工具");
@@ -72,8 +28,6 @@ const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.i
   setDebug: (module: string, on: boolean) => void;
 };
 
-
-// 关闭调试
 setDebug("BuffUI", false);
 
 const MAX_SLOTS = getMaxSlotsImported();
@@ -102,36 +56,6 @@ let refreshTimer: any = null;
 let pendingInitDelayTimer: any = null;
 const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipText: string }> } | undefined> = {};
 const hoverSlotIndexByFrameId: Record<number, number | undefined> = {};
-const uiCreateFrameRaw = (UI工具 as any).createFrame as (self: any, options: any) => number | null;
-const uiSetFramePositionRaw = (UI工具 as any).setFramePosition as (self: any, frame: number, options: any) => boolean;
-const uiSetFrameSizeRaw = (UI工具 as any).setFrameSize as (self: any, frame: number, options: any) => boolean;
-const uiSetFrameTextureRaw = (UI工具 as any).setFrameTexture as (self: any, frame: number, texture: string) => boolean;
-const uiSetFrameHoverEventsRaw = (UI工具 as any).setFrameHoverEvents as (
-  self: any,
-  frame: number,
-  onEnter: (this: void) => void,
-  onLeave: (this: void) => void,
-  sync: boolean
-) => boolean;
-const uiSetFramePointRelativeRaw = (UI工具 as any).setFramePointRelative as (
-  self: any,
-  frame: number,
-  point: number,
-  relativeTo: number,
-  relativePoint: number,
-  x: number,
-  y: number
-) => boolean;
-const uiCreateTextLabelRaw = (UI工具 as any).createTextLabel as (
-  self: any,
-  name: string,
-  parent: number,
-  text: string,
-  position: any,
-  size: any
-) => number | null;
-const uiHideFrameRaw = (UI工具 as any).hideFrame as (self: any, frame: number) => boolean;
-const uiShowFrameRaw = (UI工具 as any).showFrame as (self: any, frame: number) => boolean;
 
 function uiCreateFrame(this: void, options: any): number | null {
   return createFrameImported(options);
@@ -177,9 +101,7 @@ function uiShowFrame(this: void, frame: number): boolean {
 }
 
 function getTriggerUiEventFrame(this: void): number {
-  const frame = japi.DzGetTriggerUIEventFrame();
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "[getTriggerUiEventFrame] frame=" + frame);
-  return frame;
+  return japi.DzGetTriggerUIEventFrame();
 }
 
 function setFrameLevelSafe(this: void, frame: number, level: number): void {
@@ -189,8 +111,6 @@ function setFrameLevelSafe(this: void, frame: number, level: number): void {
 
 function showSlotTooltipByIndex(this: void, index: number): void {
   const s = slots[index];
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "[showSlotTooltip] index=" + index + " s=" + (s ? "yes" : "no") + " tipBox=" + (s ? s.tipBox : "n/a") + " tipText=" + (s ? s.tipText : "n/a"));
-  // 手动显示提示框
   if (s && s.tipBox !== 0) {
     uiShowFrame(s.tipBox);
   }
@@ -200,7 +120,6 @@ function showSlotTooltipByIndex(this: void, index: number): void {
 }
 
 function hideSlotTooltipByIndex(this: void, index: number): void {
-  // 手动隐藏提示框
   const s = slots[index];
   if (s && s.tipText !== 0) uiHideFrame(s.tipText);
   if (s && s.tipBox !== 0) uiHideFrame(s.tipBox);
@@ -210,7 +129,6 @@ function onSlotHoverEnter(this: any): void {
   const frame = getTriggerUiEventFrame();
   if (frame === 0) return;
   const index = hoverSlotIndexByFrameId[frame];
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 5, "[BuffUI Hover] index=" + index);
   if (index == null) return;
   showSlotTooltipByIndex(index);
 }
@@ -297,7 +215,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
     );
     uiSetFrameSize(tipBox, { width: boxW, height: boxH });
     uiSetFrameTexture(tipBox, TIP_BOX_TEX);
-    setFrameLevelSafe(tipBox, 200); // 提高层级，确保显示在最上层
+    setFrameLevelSafe(tipBox, 200);
     uiHideFrame(tipBox);
   }
 
@@ -313,7 +231,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
     ) || 0;
   if (tipText && tipText !== 0) {
     japi.DzFrameSetTextAlignment(tipText, 0);
-    setFrameLevelSafe(tipText, 201); // 提高层级，确保显示在最上层
+    setFrameLevelSafe(tipText, 201);
     uiHideFrame(tipText);
   }
 
@@ -391,7 +309,6 @@ function createUi(this: void): void {
     const s = createOneSlot(i, parent);
     if (s) slots[i] = s;
   }
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[BuffUI] slots created=" + slots.length);
 }
 
 function startRefreshTimer(this: void): void {
@@ -405,7 +322,6 @@ function onBuffUiRefreshTick(this: void): void {
 }
 
 function onBuffUiInitDelayTimer(this: void): void {
-  jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 10, "[BuffUI] initDelayTimer fired, buffUiInit=" + buffUiInitialized);
   createUi();
   startRefreshTimer();
   if (pendingInitDelayTimer !== null) {
@@ -425,20 +341,4 @@ export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: 
   jass.TimerStart(pendingInitDelayTimer, 1.0, false, onBuffUiInitDelayTimer);
 }
 
-export function setDebugMode(this: void, enabled: boolean): void {
-}
-
 export {};
-
-
-
-
-
-
-
-
-
-
-
-
-

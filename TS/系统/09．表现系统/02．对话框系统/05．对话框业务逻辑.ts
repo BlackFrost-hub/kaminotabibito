@@ -24,6 +24,7 @@ export interface DialogEntry {
 export interface PlayerDialogState {
   playerId: number;
   queue: DialogEntry[];
+  currentIndex: number;
   tickTimer: Timer;
   frames: Frame[];
   strNow: number;

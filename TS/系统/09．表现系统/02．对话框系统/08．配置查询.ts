@@ -31,13 +31,6 @@ export function findDialogConfig(npcName: string): DialogNPCData | undefined {
   return DIALOG_NPC_CONFIGS.find(config => config.NPC === npcName);
 }
 
-export function findNpcConfigByUnitName(unitName: string): NPCData | null {
-  for (const npc of NPC_CONFIGS) {
-    if (npc.NPCrequireName === unitName || npc.NpcNameID === unitName) return npc;
-  }
-  return null;
-}
-
 export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): NPCData | null {
   if (!unit || !unitName) return null;
   const selectedUnitCode = fourCCToString((jass as any).GetUnitTypeId(unit) as number);
@@ -49,10 +42,4 @@ export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string):
   return null;
 }
 
-export function findEnabledNpcConfigByRequireId(requireID: number): NPCData | null {
-  for (const npc of NPC_CONFIGS) {
-    if (npc.enabled !== true) continue;
-    if (npc.requireID === requireID) return npc;
-  }
-  return null;
-}
+

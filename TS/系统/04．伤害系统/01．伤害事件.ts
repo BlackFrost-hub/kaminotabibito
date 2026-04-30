@@ -15,7 +15,6 @@ const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函�
 const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
 };
-
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
 
 /** 事件句柄：common.j 全局 unitevent `EVENT_UNIT_DAMAGED`；TriggerRegisterUnitEvent 第3参要 jhandle_t 不能传数字 */

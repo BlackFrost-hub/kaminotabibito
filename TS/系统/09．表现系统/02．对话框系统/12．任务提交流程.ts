@@ -166,7 +166,7 @@ export function handleQuestSubmit(params: {
   npcUnit?: any;
   parseDialogText: (raw: string, npcName: string, heroName: string) => Array<{ title: string; text: string; duration: number }>;
   openDialog: (player: any, data: any) => void;
-  refreshTaskUIForAllClientsSoon: () => void;
+  refreshTaskUIForAllClientsSoon: (playerId: number, questId?: string) => void;
 }): void {
   const { quest, npcName, heroName, dialogOwnerId, npcUnit, parseDialogText, openDialog, refreshTaskUIForAllClientsSoon } = params;
   const callbackOwner = jass.Player(dialogOwnerId);
@@ -224,7 +224,7 @@ export function handleQuestSubmit(params: {
       removeQuestMarkerAfterNpcTriggered(npcUnit);
     }
     broadcastQuestComplete();
-    refreshTaskUIForAllClientsSoon();
+    refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
     if (quest.NpcCompleteText) {
       const completeRaw = pickNpcCompleteTextByBranch(quest.NpcCompleteText, rewardBranchIndex);
       const completeLines = parseDialogText(completeRaw, npcName, heroName);

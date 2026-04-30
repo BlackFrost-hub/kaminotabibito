@@ -359,23 +359,20 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
             0
         )
         japi.DzFrameSetSize(button, _____5E38_91CF.HERO_BUTTON_SIZE, _____5E38_91CF.HERO_BUTTON_SIZE)
-        local playerId = jass.GetPlayerId(player)
         detailHoverSlotByFrameId[button] = index
         frameSetScriptByCode(
             nil,
             button,
             _____5E38_91CF.FRAME_EVENT_MOUSE_ENTER,
             onDetailHoverEnter,
-            false,
-            playerId
+            false
         )
         frameSetScriptByCode(
             nil,
             button,
             _____5E38_91CF.FRAME_EVENT_MOUSE_LEAVE,
             onDetailHoverLeave,
-            false,
-            playerId
+            false
         )
     end
     detailSlots[#detailSlots + 1] = {

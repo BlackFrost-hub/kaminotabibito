@@ -7,7 +7,7 @@ import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
-import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, giveQuestReward, showLocalHint } from "./06．常量与工具";
+import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, showLocalHint } from "./06．常量与工具";
 const ____npcEffect = require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡特效") as {
   getNpcUnit: (this: void, playerId: number) => any;
   scheduleYellowQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
@@ -28,6 +28,9 @@ type NpcDialogData = any;
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (delayMs: number, callback: () => void) => number;
 };
+const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as {
+  questManager: { triggerUIRefresh: (playerId: number, questId?: string) => void };
+};
 
 function scheduleOpenDialogLater(player: any, data: NpcDialogData): void {
   addDelayedCallback(10, () => {
@@ -39,9 +42,8 @@ function normalizeRequireCount(count?: number): number {
   return count != null && count > 1 ? count : 1;
 }
 
-function refreshTaskUIForAllClientsSoon(): void {
-  // 任务UI刷新已由 questManager.registerUIRefreshCallback 自动处理，
-  // 不再需要手动调用旧 taskUI.refreshList。
+function refreshTaskUIForAllClientsSoon(playerId: number, questId?: string): void {
+  questManager.triggerUIRefresh(playerId, questId);
 }
 
 function grantQuestItems(hero: any, questItems?: string): void {
@@ -189,7 +191,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
           const playerName = jass.GetPlayerName(playerObj) || "冒险者";
           setQuestState(dialogOwnerId, questId, 1, playerName);
           grantQuestItems(hero, quest.questItems);
-          refreshTaskUIForAllClientsSoon();
+          refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
         }
         const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);

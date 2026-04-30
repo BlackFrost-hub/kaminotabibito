@@ -45,7 +45,65 @@ local advanceDialog = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B
 local showDialogFrames = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.showDialogFrames
 local skipTyping = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.skipTyping
 local playEntry = ____19_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.playEntry
+local ____07_FF0E_8054_673A_5B89_5168_5DE5_5177 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeTimerStart
+local safeDestroyTimer = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeDestroyTimer
 local jass = require("jass.common")
+local function getCurrentEntry(self, state)
+    return state.queue[state.currentIndex + 1]
+end
+local function findLastNormalEntryIndex(self, state)
+    do
+        local i = #state.queue - 1
+        while i >= 0 do
+            if not state.queue[i + 1].isQuest then
+                return i
+            end
+            i = i - 1
+        end
+    end
+    return -1
+end
+--- 统一渲染当前页（标题/正文/字体/立绘），不包含 quest buttons / continue hint（由调用方决定）
+local function renderCurrentEntry(self, state, revealFullText)
+    local entry = state.queue[state.currentIndex + 1]
+    if not entry then
+        return
+    end
+    if revealFullText then
+        state.strLen = stringLengthCompat(nil, entry.text)
+        state.strNow = state.strLen
+        state.waitingClick = true
+        state.clickCooldown = false
+    end
+    setActivePlayerId(nil, state.playerId)
+    dzSetFont(nil, state.frames[3], DEFAULT_FONT, entry.titleFontSize or DEFAULT_TITLE_FONT_SIZE)
+    dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize or DEFAULT_BODY_FONT_SIZE)
+    dzSetText(nil, state.frames[3], entry.title)
+    dzSetText(nil, state.frames[4], revealFullText and entry.text or "")
+    showDialogFrames(nil, state, true)
+    applyPortraitFrames(
+        nil,
+        entry,
+        state,
+        dzGetLocalPlayer,
+        dzPlayer,
+        dzSetTexture,
+        dzShow
+    )
+end
+--- 统一收尾：清空 queue/索引/活跃标记 → finish → 隐藏 UI
+local function finishDialogAndCleanup(self, state)
+    dzTimerPause(nil, state.tickTimer)
+    resetActivePlayerIdIfMatch(nil, state.playerId)
+    g_questCallbacksByPlayer[state.playerId + 1] = nil
+    state.queue = {}
+    state.currentIndex = 0
+    state.strNow = 0
+    state.strLen = 0
+    onDialogFinished(nil, state)
+    showDialogFrames(nil, state, false)
+end
 local function resolveQuestCallbackByPlayerId(self, playerId)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return nil
@@ -75,6 +133,7 @@ local function runQuestAcceptForPlayer(self, playerId)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     __TS__ArraySplice(state.queue, 0, questIdx + 1)
+    state.currentIndex = 0
     state.strNow = 0
     state.strLen = 0
     resetDialogActiveFlagsKeepOnFinish(nil, state)
@@ -115,6 +174,7 @@ local function runQuestRejectForPlayer(self, playerId)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     __TS__ArraySplice(state.queue, 0, questIdx + 1)
+    state.currentIndex = 0
     state.strNow = 0
     state.strLen = 0
     resetDialogActiveFlagsKeepOnFinish(nil, state)
@@ -182,8 +242,16 @@ local function handleDialogPanelClick(self, state)
     if state.clickCooldown then
         return
     end
-    if state.waitingClick and #state.queue > 0 and not state.queue[1].isQuest then
+    local entry = state.queue[state.currentIndex + 1]
+    if entry.isQuest then
+        return
+    end
+    if state.waitingClick then
         state.waitingClick = false
+        if state.currentIndex >= #state.queue - 1 then
+            finishDialogAndCleanup(nil, state)
+            return
+        end
         advanceDialog(nil, state)
     end
 end
@@ -238,7 +306,7 @@ local function finishSkipKeyCooldownForPlayer(self, pid)
         return
     end
     jass.PauseTimer(t)
-    jass.DestroyTimer(t)
+    safeDestroyTimer(t)
 end
 local function skipKeyCooldownCallbackP0(self)
     finishSkipKeyCooldownForPlayer(nil, 0)
@@ -260,76 +328,35 @@ local function startSkipKeyCooldown(self, pid)
     local t = jass.CreateTimer()
     g_skipKeyCooldownTimers[pid + 1] = t
     repeat
-        local ____switch51 = pid
-        local ____cond51 = ____switch51 == 0
-        if ____cond51 then
-            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0)
+        local ____switch62 = pid
+        local ____cond62 = ____switch62 == 0
+        if ____cond62 then
+            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0)
             return
         end
-        ____cond51 = ____cond51 or ____switch51 == 1
-        if ____cond51 then
-            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1)
+        ____cond62 = ____cond62 or ____switch62 == 1
+        if ____cond62 then
+            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1)
             return
         end
-        ____cond51 = ____cond51 or ____switch51 == 2
-        if ____cond51 then
-            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2)
+        ____cond62 = ____cond62 or ____switch62 == 2
+        if ____cond62 then
+            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2)
             return
         end
-        ____cond51 = ____cond51 or ____switch51 == 3
-        if ____cond51 then
-            jass.TimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3)
+        ____cond62 = ____cond62 or ____switch62 == 3
+        if ____cond62 then
+            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3)
             return
         end
         do
             jass.PauseTimer(t)
-            jass.DestroyTimer(t)
+            safeDestroyTimer(t)
             g_skipKeyCooldownTimers[pid + 1] = nil
             g_skipKeyCooldown[pid + 1] = false
             return
         end
     until true
-end
-local function fastForwardQueueToLastNormalLine(self, state)
-    if #state.queue <= 1 then
-        return
-    end
-    local last = state.queue[#state.queue]
-    if not last or last.isQuest then
-        return
-    end
-    state.queue = {last}
-    showQuestButtons(
-        nil,
-        state,
-        false,
-        dzGetLocalPlayer,
-        dzPlayer,
-        dzShow
-    )
-    showContinueHintLocal(nil, state, false)
-    dzTimerPause(nil, state.tickTimer)
-    local entry = state.queue[1]
-    state.strLen = stringLengthCompat(nil, entry.text)
-    state.strNow = state.strLen
-    state.waitingClick = true
-    state.clickCooldown = false
-    setActivePlayerId(nil, state.playerId)
-    dzSetFont(nil, state.frames[3], DEFAULT_FONT, entry.titleFontSize or DEFAULT_TITLE_FONT_SIZE)
-    dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize or DEFAULT_BODY_FONT_SIZE)
-    dzSetText(nil, state.frames[3], entry.title)
-    dzSetText(nil, state.frames[4], entry.text)
-    showDialogFrames(nil, state, true)
-    applyPortraitFrames(
-        nil,
-        entry,
-        state,
-        dzGetLocalPlayer,
-        dzPlayer,
-        dzSetTexture,
-        dzShow
-    )
-    showContinueHintLocal(nil, state, true)
 end
 local function skipDialogLocal(self)
     local triggerPlayer = japi.DzGetTriggerKeyPlayer()
@@ -347,33 +374,20 @@ local function skipDialogLocal(self)
     if not state or #state.queue == 0 then
         return
     end
-    local isLocal = dzGetLocalPlayer(nil) == triggerPlayer
     startSkipKeyCooldown(nil, triggerPid)
     dzTimerPause(nil, state.tickTimer)
     local questIdx = findFirstQuestEntryIndex(nil, state)
-    if questIdx >= 0 then
-        if state.strNow < state.strLen then
-            state.strNow = state.strLen
-            local head = state.queue[1]
-            if head ~= nil then
-                dzSetText(nil, state.frames[4], head.text)
-            end
+    local currentEntry = state.queue[state.currentIndex + 1]
+    if state.strNow < state.strLen then
+        state.strNow = state.strLen
+        if currentEntry ~= nil then
+            dzSetText(nil, state.frames[4], currentEntry.text)
         end
+    end
+    if questIdx >= 0 then
+        state.currentIndex = questIdx
+        renderCurrentEntry(nil, state, true)
         local questEntry = state.queue[questIdx + 1]
-        dzSetFont(nil, state.frames[3], DEFAULT_FONT, questEntry.titleFontSize or DEFAULT_TITLE_FONT_SIZE)
-        dzSetFont(nil, state.frames[4], DEFAULT_FONT, questEntry.bodyFontSize or DEFAULT_BODY_FONT_SIZE)
-        dzSetText(nil, state.frames[3], questEntry.title)
-        dzSetText(nil, state.frames[4], questEntry.text)
-        showDialogFrames(nil, state, true)
-        applyPortraitFrames(
-            nil,
-            questEntry,
-            state,
-            dzGetLocalPlayer,
-            dzPlayer,
-            dzSetTexture,
-            dzShow
-        )
         local buttonTexts = resolveQuestButtonTexts(nil, questEntry.acceptText, questEntry.rejectText)
         setQuestButtonTexts(nil, state, buttonTexts.accept, buttonTexts.reject)
         showQuestButtons(
@@ -386,16 +400,24 @@ local function skipDialogLocal(self)
         )
         return
     end
-    if #state.queue > 1 then
-        fastForwardQueueToLastNormalLine(nil, state)
+    local lastNormalIdx = findLastNormalEntryIndex(nil, state)
+    if lastNormalIdx >= 0 and lastNormalIdx ~= state.currentIndex then
+        state.currentIndex = lastNormalIdx
+        renderCurrentEntry(nil, state, true)
+        showQuestButtons(
+            nil,
+            state,
+            false,
+            dzGetLocalPlayer,
+            dzPlayer,
+            dzShow
+        )
+        showContinueHintLocal(nil, state, true)
         return
     end
-    if state.strNow < state.strLen then
-        skipTyping(nil, state)
+    if currentEntry ~= nil and not currentEntry.isQuest then
+        finishDialogAndCleanup(nil, state)
         return
-    end
-    if #state.queue > 0 and not state.queue[1].isQuest then
-        handleDialogPanelClick(nil, state)
     end
 end
 local g_skipKeyInitialized = false
@@ -420,30 +442,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch70 = state.playerId
-        local ____cond70 = ____switch70 == 0
-        if ____cond70 then
+        local ____switch77 = state.playerId
+        local ____cond77 = ____switch77 == 0
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond70 = ____cond70 or ____switch70 == 1
-        if ____cond70 then
+        ____cond77 = ____cond77 or ____switch77 == 1
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond70 = ____cond70 or ____switch70 == 2
-        if ____cond70 then
+        ____cond77 = ____cond77 or ____switch77 == 2
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond70 = ____cond70 or ____switch70 == 3
-        if ____cond70 then
+        ____cond77 = ____cond77 or ____switch77 == 3
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

@@ -1,5 +1,6 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
+import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
 
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
@@ -98,20 +99,11 @@ export function createDotExecutor(deps: {
 
   // ========== 虚拟分区：每秒 tick 执行 ==========
   function dotTickRun(): void {
-    const buffM = require("系统.05．Buff系统.00．Buff系统") as {
-      getBuffRuntimeByHid?: (hid: number, buffID: string) => { remaining: number } | null;
-      DOT_TYPE_TO_BUFF_ID?: Record<string, string>;
-    };
-    // 提取模块方法到局部变量，避免 TSTL 生成冒号调用
-    const _getBuffRuntimeByHid = buffM.getBuffRuntimeByHid;
-    const _DOT_TYPE_TO_BUFF_ID = buffM.DOT_TYPE_TO_BUFF_ID;
     for (let i = dotTicks.length - 1; i >= 0; i--) {
       const e = dotTicks[i];
       const eh = unitHid(e.target);
-      const bid =
-        _DOT_TYPE_TO_BUFF_ID != null ? ((_DOT_TYPE_TO_BUFF_ID as any)[e.typeId] as string | undefined) : undefined;
-      const rt =
-        bid != null && bid !== "" && typeof _getBuffRuntimeByHid === "function" ? _getBuffRuntimeByHid(eh, bid) : null;
+      const bid = (DOT_TYPE_TO_BUFF_ID as any)[e.typeId] as string | undefined;
+      const rt = bid != null && bid !== "" ? getBuffRuntimeByHid(eh, bid) : null;
       if (rt == null || rt.remaining <= 0.001) dotTicks.splice(i, 1);
     }
     const toRun: DotTickEntry[] = [];
@@ -157,8 +149,8 @@ export function createDotExecutor(deps: {
     if (_registeredToCenterTimer) return;
     _registeredToCenterTimer = true;
 
-    // 使用中心计时器的每秒回调
-const { onSecond } = globalThis as unknown as {
+    // 走核心系统挂到 globalThis 的桥，避免 TSTL 把 require 对象字段函数编成少参调用
+    const { onSecond } = globalThis as unknown as {
       onSecond: (callback: () => void) => void;
     };
     onSecond(dotTickRun);

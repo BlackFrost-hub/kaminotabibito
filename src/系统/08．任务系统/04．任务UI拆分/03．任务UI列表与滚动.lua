@@ -1,14 +1,10 @@
-local ____lualib = require("lualib_bundle")
-local Set = ____lualib.Set
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.04．任务UI拆分.01．任务UI常量")
 local LIST_ITEM_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_ITEM_H
 local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
 local LIST_CONTENT_TOP_INSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_CONTENT_TOP_INSET
-local LIST_CONTAINER_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_CONTAINER_W
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.04．任务UI拆分.02．任务UI辅助")
-local EMPTY_TEXTS = ____02_FF0E_4EFB_52A1UI_8F85_52A9.EMPTY_TEXTS
-local getQuestsForUI = ____02_FF0E_4EFB_52A1UI_8F85_52A9.getQuestsForUI
 local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local clampMin = ____require_result_0.clampMin
@@ -135,21 +131,6 @@ function ____exports.isTaskScrollThumbDragHit(self, japi, getMouseFocus, scrollT
     end
     return false
 end
-function ____exports.computeNextScrollOffsetByWheel(self, getWheelDelta, currentOffset, totalContentHeight, listViewHeight)
-    local delta = type(getWheelDelta) == "function" and getWheelDelta(nil) or 0
-    if delta == 0 then
-        return currentOffset
-    end
-    local step = LIST_ITEM_H + 0.01
-    local maxScroll = clampMin(nil, totalContentHeight - listViewHeight, 0)
-    if delta > 0 then
-        return clampMin(nil, currentOffset - step, 0)
-    end
-    if delta < 0 then
-        return currentOffset + step < maxScroll and currentOffset + step or maxScroll
-    end
-    return currentOffset
-end
 --- 滚动条显隐：内容不足一屏时 maxScroll 为 0，但仍应显示轨道与滑块（滑块贴顶/不可用），否则用户以为滚动条坏了。
 -- 仅当当前分类下没有任何任务行（空列表占位）时隐藏。
 function ____exports.updateScrollBarVisibility(self, japi, maxScroll, frames, hasQuestRows)
@@ -172,7 +153,7 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
             do
                 local q = quests[i + 1]
                 if not q then
-                    goto __continue47
+                    goto __continue43
                 end
                 local expanded = isExpanded(nil, q.id)
                 local itemHeight = ____exports.getQuestItemHeight(nil, q, expanded)
@@ -189,84 +170,10 @@ function ____exports.calcVisibleQuestRows(self, quests, scrollOffset, isExpanded
                 end
                 rowTopRel = rowTopRel - (itemHeight + 0.01)
             end
-            ::__continue47::
+            ::__continue43::
             i = i + 1
         end
     end
     return visibleRows
-end
-function ____exports.refreshTaskUIList(self, opts)
-    local ____opts_1 = opts
-    local currentPlayerId = ____opts_1.currentPlayerId
-    local currentCategory = ____opts_1.currentCategory
-    local scrollOffset = ____opts_1.scrollOffset
-    local setScrollOffset = ____opts_1.setScrollOffset
-    local setTotalContentHeight = ____opts_1.setTotalContentHeight
-    local listContainer = ____opts_1.listContainer
-    local expandedQuestIds = ____opts_1.expandedQuestIds
-    local createTextLabel = ____opts_1.createTextLabel
-    local FramePoint = ____opts_1.FramePoint
-    local applyDzTextFontAndCenterAlignment = ____opts_1.applyDzTextFontAndCenterAlignment
-    local pushListItemFrame = ____opts_1.pushListItemFrame
-    local syncScrollThumb = ____opts_1.syncScrollThumb
-    local updateScrollBarVis = ____opts_1.updateScrollBarVisibility
-    local createListItem = ____opts_1.createListItem
-    local quests = getQuestsForUI(nil, currentPlayerId, currentCategory)
-    if #quests == 0 then
-        setTotalContentHeight(nil, 0)
-        setScrollOffset(nil, 0)
-        local empty = createTextLabel(
-            nil,
-            "TaskEmpty",
-            listContainer,
-            EMPTY_TEXTS[currentCategory],
-            {
-                relativeTo = listContainer,
-                point = FramePoint.CENTER,
-                relativePoint = FramePoint.CENTER,
-                x = 0,
-                y = 0
-            },
-            {width = LIST_CONTAINER_W * 0.85, height = 0.08}
-        )
-        if empty then
-            pushListItemFrame(nil, empty)
-            applyDzTextFontAndCenterAlignment(nil, empty)
-        end
-        syncScrollThumb(nil, 0)
-        updateScrollBarVis(nil, 0, false)
-        return
-    end
-    local totalH = ____exports.calcTotalContentHeight(
-        nil,
-        quests,
-        function(____, questId) return expandedQuestIds:has(questId) end
-    )
-    setTotalContentHeight(nil, totalH)
-    local maxScroll = ____exports.getMaxScroll(nil, totalH)
-    local clamped = ____exports.clampScrollOffset(nil, scrollOffset, maxScroll)
-    setScrollOffset(nil, clamped)
-    syncScrollThumb(nil, maxScroll)
-    updateScrollBarVis(nil, maxScroll, true)
-    local visibleRows = ____exports.calcVisibleQuestRows(
-        nil,
-        quests,
-        clamped,
-        function(____, questId) return expandedQuestIds:has(questId) end
-    )
-    do
-        local i = 0
-        while i < #visibleRows do
-            do
-                local row = visibleRows[i + 1]
-                if not row then
-                    goto __continue56
-                end
-                createListItem(nil, row.quest, row.rowTopRel, row.expanded)
-            end
-            ::__continue56::
-            i = i + 1
-        end
-    end
 end
 return ____exports

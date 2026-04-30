@@ -6,9 +6,6 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_0.debugLog
-local setDebug = ____require_result_0.setDebug
 local selectedUnit = {}
 local selectedCount = {}
 local selectedUnitsByPlayer = {}
@@ -17,11 +14,6 @@ local registeredPlayers = {}
 local selectedTrigger = nil
 local deselectedTrigger = nil
 local initialized = false
-local hasDeselectEvent = jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil and jass.EVENT_PLAYER_UNIT_DESELECTED ~= nil
-setDebug(nil, "SelectionCenter", true)
-local function dbg(tag, ...)
-    debugLog(nil, "SelectionCenter", tag, ...)
-end
 local function isValidPlayer(whichPlayer)
     return not not whichPlayer and whichPlayer ~= 0
 end
@@ -32,13 +24,13 @@ local function getUnitHandleId(whichUnit)
     if not whichUnit or whichUnit == 0 then
         return 0
     end
-    local ____temp_1
+    local ____temp_0
     if type(jass.GetHandleId) == "function" then
-        ____temp_1 = jass.GetHandleId(whichUnit)
+        ____temp_0 = jass.GetHandleId(whichUnit)
     else
-        ____temp_1 = 0
+        ____temp_0 = 0
     end
-    return ____temp_1
+    return ____temp_0
 end
 local function getSelectedUnitList(playerId)
     local list = selectedUnitsByPlayer[playerId]
@@ -56,14 +48,14 @@ local function refreshPlayerSelectionSummary(playerId)
         return
     end
     selectedCount[playerId] = #list
-    local ____playerId_3 = playerId
-    local ____temp_2
+    local ____playerId_2 = playerId
+    local ____temp_1
     if #list == 1 then
-        ____temp_2 = list[1]
+        ____temp_1 = list[1]
     else
-        ____temp_2 = nil
+        ____temp_1 = nil
     end
-    selectedUnit[____playerId_3] = ____temp_2
+    selectedUnit[____playerId_2] = ____temp_1
 end
 local function findSelectedUnitIndex(list, whichUnit)
     local hid = getUnitHandleId(whichUnit)
@@ -114,23 +106,11 @@ local function handleSelectionEvent(isSelected)
         if findSelectedUnitIndex(list, unit) < 0 then
             list[#list + 1] = unit
         end
-        dbg(
-            "SELECTED",
-            "playerId=" .. tostring(playerId),
-            "unit=" .. tostring(unit),
-            "hid=" .. tostring(hid)
-        )
     else
         local index = findSelectedUnitIndex(list, unit)
         if index >= 0 then
             __TS__ArraySplice(list, index, 1)
         end
-        dbg(
-            "DESELECTED",
-            "playerId=" .. tostring(playerId),
-            "unit=" .. tostring(unit),
-            "hid=" .. tostring(hid)
-        )
     end
     refreshPlayerSelectionSummary(playerId)
     dispatchSelectionListeners(player, playerId, unit, isSelected)
@@ -146,7 +126,7 @@ local function ensureSelectionTriggers()
         selectedTrigger = jass.CreateTrigger()
         jass.TriggerAddAction(selectedTrigger, onPlayerUnitSelectedAction)
     end
-    if hasDeselectEvent and (deselectedTrigger == nil or deselectedTrigger == 0) then
+    if deselectedTrigger == nil or deselectedTrigger == 0 then
         deselectedTrigger = jass.CreateTrigger()
         jass.TriggerAddAction(deselectedTrigger, onPlayerUnitDeselectedAction)
     end
@@ -162,13 +142,8 @@ local function registerSelectionTriggersForPlayer(whichPlayer)
     ensureSelectionTriggers()
     if selectedTrigger ~= nil and selectedTrigger ~= 0 then
         jass.TriggerRegisterPlayerUnitEvent(selectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
-        dbg(
-            "REGISTER",
-            "playerId=" .. tostring(playerId),
-            "trigger=" .. tostring(selectedTrigger)
-        )
     end
-    if hasDeselectEvent and deselectedTrigger ~= nil and deselectedTrigger ~= 0 then
+    if deselectedTrigger ~= nil and deselectedTrigger ~= 0 then
         jass.TriggerRegisterPlayerUnitEvent(deselectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, nil)
     end
     registeredPlayers[playerId] = true

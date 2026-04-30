@@ -67,9 +67,6 @@ export const SCROLLBAR_REL_X = -0.006 - 0.005 - 0.004;
 export const SCROLL_THUMB_SIZE = 0.02;
 export const SCROLL_THUMB_TOP_COMPENSATION = 0;
 export const SCROLL_THUMB_BOTTOM_COMPENSATION = 0;
-export const THUMB_DRAG_TICK = 0.03;
-export const THUMB_DRAG_SENSITIVITY = 1;
-
 export const QUEST_ROW_ICON_HEIGHT_FACTOR = 0.84;
 export const QUEST_ROW_ICON_PAD_LEFT = 0.003;
 export const QUEST_ROW_TEXT_GAP_AFTER_ICON = 0.006;

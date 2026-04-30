@@ -1,10 +1,6 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-  setDebug: (module: string, on: boolean) => void;
-};
 
 type SelectionListener = (player: any, playerId: number, unit: any, isSelected: boolean) => void;
 
@@ -17,17 +13,6 @@ const registeredPlayers: Record<number, true | undefined> = {};
 let selectedTrigger: any = null;
 let deselectedTrigger: any = null;
 let initialized = false;
-
-const hasDeselectEvent =
-  (jass as any).EVENT_PLAYER_UNIT_DESELECTED !== undefined &&
-  (jass as any).EVENT_PLAYER_UNIT_DESELECTED !== null;
-
-// 启用调试（仅关键事件）
-setDebug("SelectionCenter", true);
-
-function dbg(tag: string, ...args: any[]): void {
-  debugLog("SelectionCenter", tag, ...args);
-}
 
 function isValidPlayer(whichPlayer: any): boolean {
   return !!whichPlayer && whichPlayer !== 0;
@@ -101,13 +86,11 @@ function handleSelectionEvent(isSelected: boolean): void {
     if (findSelectedUnitIndex(list, unit) < 0) {
       list.push(unit);
     }
-    dbg("SELECTED", "playerId=" + playerId, "unit=" + unit, "hid=" + hid);
   } else {
     const index = findSelectedUnitIndex(list, unit);
     if (index >= 0) {
       list.splice(index, 1);
     }
-    dbg("DESELECTED", "playerId=" + playerId, "unit=" + unit, "hid=" + hid);
   }
 
   refreshPlayerSelectionSummary(playerId);
@@ -127,7 +110,7 @@ function ensureSelectionTriggers(): void {
     selectedTrigger = jass.CreateTrigger();
     jass.TriggerAddAction(selectedTrigger, onPlayerUnitSelectedAction);
   }
-  if (hasDeselectEvent && (deselectedTrigger == null || deselectedTrigger === 0)) {
+  if (deselectedTrigger == null || deselectedTrigger === 0) {
     deselectedTrigger = jass.CreateTrigger();
     jass.TriggerAddAction(deselectedTrigger, onPlayerUnitDeselectedAction);
   }
@@ -142,9 +125,8 @@ function registerSelectionTriggersForPlayer(whichPlayer: any): void {
 
   if (selectedTrigger != null && selectedTrigger !== 0) {
     jass.TriggerRegisterPlayerUnitEvent(selectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, null);
-    dbg("REGISTER", "playerId=" + playerId, "trigger=" + selectedTrigger);
   }
-  if (hasDeselectEvent && deselectedTrigger != null && deselectedTrigger !== 0) {
+  if (deselectedTrigger != null && deselectedTrigger !== 0) {
     jass.TriggerRegisterPlayerUnitEvent(deselectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, null);
   }
 
@@ -180,8 +162,6 @@ export function getSoleSelectedUnitForPlayer(playerId: number): any | null {
   if (!initialized) return null;
   const unit = selectedUnit[playerId];
   const count = selectedCount[playerId] || 0;
-  // 注：GET 调试已禁用，避免每0.1秒刷屏
-  // dbg("GET", "playerId=" + playerId, "count=" + count, "unit=" + unit);
   if (!unit || unit === 0) return null;
   if (count !== 1) return null;
   return unit;
