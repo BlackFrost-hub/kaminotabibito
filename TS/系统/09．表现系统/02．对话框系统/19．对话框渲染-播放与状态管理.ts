@@ -40,6 +40,7 @@ function showContinueHint(state: PlayerDialogState, visible: boolean): void {
   dzShow(state.frames[11], visible);
 }
 
+// ========== 虚拟分区：状态保障/帧显隐/清除/入队 ==========
 export function ensureState(playerId: number): PlayerDialogState {
   if (g_states[playerId]) return g_states[playerId];
   const state: PlayerDialogState = {

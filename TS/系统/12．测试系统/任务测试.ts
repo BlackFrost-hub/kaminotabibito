@@ -8,8 +8,8 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
   withTimer: (delaySec: number, callback: () => void) => any;
 };
 
-import { questManager } from "../08．任务系统/02．任务管理器/index";
-const taskUIManager = require("../08．任务系统/04．任务UI拆分/12．任务UI管理器") as {
+import { questManager } from "../08．任务系统/01．任务管理器/index";
+const taskUIManager = require("../08．任务系统/02．任务UI拆分/11．任务UI管理器") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 import { questDB, QuestType } from "../08．任务系统/01．任务数据";
@@ -32,7 +32,8 @@ export function testQuestAcceptComplete(): void {
   const playerId = 0;
 
   // 重置玩家任务数据
-  questManager.resetPlayerQuests(playerId);
+  questDB.resetPlayerData(playerId);
+  debugPrint(`已重置玩家 ${playerId} 的任务数据`);
 
   // 1) 接受主线 01~20：保持 04~20 为进行中
   for (let i = 1; i <= 20; i++) {
@@ -98,9 +99,9 @@ export function testQuestData(): void {
   const allQuests = questDB.getAllQuests();
   debugPrint(`总任务数量: ${allQuests.length}`);
 
-  const mainQuests = questDB.getQuestsByType(QuestType.MAIN);
-  const sideQuests = questDB.getQuestsByType(QuestType.SIDE);
-  const dailyQuests = questDB.getQuestsByType(QuestType.DAILY);
+  const mainQuests = allQuests.filter(q => q.type === QuestType.MAIN);
+  const sideQuests = allQuests.filter(q => q.type === QuestType.SIDE);
+  const dailyQuests = allQuests.filter(q => q.type === QuestType.DAILY);
 
   debugPrint(`主线任务: ${mainQuests.length}`);
   debugPrint(`支线任务: ${sideQuests.length}`);

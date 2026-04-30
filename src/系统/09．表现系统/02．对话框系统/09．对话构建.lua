@@ -35,7 +35,7 @@ local stringToFourCC = ____require_result_0.stringToFourCC
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
 local ____G_1 = _G
 local addDelayedCallback = ____G_1.addDelayedCallback
-local ____require_result_2 = require("系统.08．任务系统.02．任务管理器.index")
+local ____require_result_2 = require("系统.08．任务系统.01．任务管理器.index")
 local questManager = ____require_result_2.questManager
 local function scheduleOpenDialogLater(self, player, data)
     addDelayedCallback(

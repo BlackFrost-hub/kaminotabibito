@@ -25,7 +25,7 @@ const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (delayMs: number, callback: () => void) => number;
 };
 
-// ========== 虚拟分区：提交流程工具 ==========
+// ========== 虚拟分区：提交工具（资源扣除/物品解析/条件匹配） ==========
 function normalizeRequireCount(count?: number): number {
   return count != null && count > 1 ? count : 1;
 }
@@ -157,7 +157,7 @@ function shouldUseGenericGiveFailHint(quest: QuestConfig): boolean {
   return reward.indexOf(":") >= 0;
 }
 
-// ========== 虚拟分区：任务提交主流程 ==========
+// ========== 虚拟分区：任务提交流程入口（击杀/收集/给予三合一） ==========
 export function handleQuestSubmit(params: {
   quest: QuestConfig;
   npcName: string;

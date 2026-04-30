@@ -19,16 +19,16 @@ export const DEFAULT_TITLE_TEX = "UI\\wenbenkuang.blp";
 /** ~ 键 VK_OEM_3（192）；注册须走数字 VK，见 `封装函数/04．硬件输入/04．键盘函数` 中 registerKeyBindToTrigger */
 export const KEY_SKIP_DIALOG = 192;
 
-// ========== 虚拟分区：运行时状态 ==========
+// ========== 虚拟分区：4 槽位玩家运行时状态表 ==========
 export const g_states: PlayerDialogState[] = [];
 export const g_questCallbacksByPlayer: Array<{ onAccept: () => void; onReject: () => void } | undefined> = [];
 
-// ========== 虚拟分区：pcall 槽位（具名体 + 模块变量，禁止 (pcall as any)(匿名)） ==========
+// ========== 虚拟分区：pcall 具名体槽位 ==========
 let __dzPcallFrame = 0;
 let __dzPcallPriority = 0;
 function __dzSetPriorityPcallBody(): void { japi.DzFrameSetPriority(__dzPcallFrame, __dzPcallPriority); }
 
-// ========== 虚拟分区：Dz / JASS 封装 ==========
+// ========== 虚拟分区：Dz/JASS API 安全封装 ==========
 export function dzShow(f: Frame, b: boolean): void { if (f && f !== 0) japi.DzFrameShow(f, b); }
 export function dzSetText(f: Frame, s: string): void { if (f && f !== 0) japi.DzFrameSetText(f, s); }
 export function dzSetTexture(f: Frame, path: string): void { if (f && f !== 0) japi.DzFrameSetTexture(f, path, 0); }

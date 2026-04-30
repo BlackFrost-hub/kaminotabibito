@@ -6,7 +6,7 @@ import { QUEST_CONFIGS, QuestData as QuestConfig } from "../../08．任务系统
 import { hasPlayerAcceptedQuest } from "./07．任务状态";
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
-// ========== 虚拟分区：配置查询 ==========
+// ========== 虚拟分区：NPC/任务/对话配置查询 ==========
 export function findQuestByNpc(npcName: string): QuestConfig | undefined {
   return QUEST_CONFIGS.find(quest => quest.enabled === true && quest.startNpc === npcName && quest.requireID);
 }

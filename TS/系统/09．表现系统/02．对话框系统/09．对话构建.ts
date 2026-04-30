@@ -28,7 +28,7 @@ type NpcDialogData = any;
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (delayMs: number, callback: () => void) => number;
 };
-const { questManager } = require("系统.08．任务系统.02．任务管理器.index") as {
+const { questManager } = require("系统.08．任务系统.01．任务管理器.index") as {
   questManager: { triggerUIRefresh: (playerId: number, questId?: string) => void };
 };
 
@@ -89,7 +89,7 @@ function getQuestRewardDisplayText(quest: QuestConfig): string {
   return resolveRewardDisplayText(quest);
 }
 
-// ========== 虚拟分区：文本解析 ==========
+// ========== 虚拟分区：对话框文本行解析 ==========
 export function parseDialogText(raw: string, npcName: string, heroName: string): Array<{ title: string; text: string; duration: number }> {
   const lines: Array<{ title: string; text: string; duration: number }> = [];
   const parts = raw.split("\n");
@@ -135,7 +135,7 @@ export function parseDialogText(raw: string, npcName: string, heroName: string):
   return lines.length > 0 ? lines : [{ title: npcName, text: raw, duration: 4 }];
 }
 
-// ========== 虚拟分区：通用对话 ==========
+// ========== 虚拟分区：通用/任务/已接取对话数据构建 ==========
 export function buildDialogData(npcName: string, heroName: string): NpcDialogData | null {
   const dialogConfig = findDialogConfig(npcName);
   if (!dialogConfig) {

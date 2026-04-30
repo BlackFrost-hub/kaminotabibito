@@ -53,14 +53,11 @@ end
 function QuestDatabase.prototype.getAllQuests(self)
     return __TS__ArrayFrom(self.questDefinitions:values())
 end
-function QuestDatabase.prototype.getQuestsByType(self, ____type)
-    return __TS__ArrayFilter(
+function QuestDatabase.prototype.getAvailableQuests(self, playerId, ____type)
+    local source = ____type and __TS__ArrayFilter(
         __TS__ArrayFrom(self.questDefinitions:values()),
         function(____, quest) return quest.type == ____type end
-    )
-end
-function QuestDatabase.prototype.getAvailableQuests(self, playerId, ____type)
-    local source = ____type and self:getQuestsByType(____type) or self:getAllQuests()
+    ) or self:getAllQuests()
     return __TS__ArrayFilter(
         source,
         function(____, quest)

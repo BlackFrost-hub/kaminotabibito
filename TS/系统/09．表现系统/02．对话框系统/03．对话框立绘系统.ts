@@ -1,11 +1,11 @@
 import type { DialogEntry, PlayerDialogState, Frame } from "./05．对话框业务逻辑";
 
-// ========== 虚拟分区：常量 ==========
+// ========== 虚拟分区：立绘帧索引常量（左/中/右） ==========
 export const LEFT_PORTRAIT_INDEX = 101;
 export const MID_PORTRAIT_INDEX = 102;
 export const RIGHT_PORTRAIT_INDEX = 103;
 
-// ========== 虚拟分区：立绘渲染 ==========
+// ========== 虚拟分区：立绘帧显隐与贴图切换渲染 ==========
 export function applyPortraitFrames(
   entry: DialogEntry,
   state: PlayerDialogState,

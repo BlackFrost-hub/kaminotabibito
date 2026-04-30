@@ -1,6 +1,7 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____index = require("系统.08．任务系统.02．任务管理器.index")
+local ____index = require("系统.08．任务系统.01．任务管理器.index")
 local questManager = ____index.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
@@ -12,7 +13,7 @@ local KEY_LETTER = ____index.KEY_LETTER
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local withTimer = ____require_result_0.withTimer
-local taskUIManager = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器")
+local taskUIManager = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_1.debugLogForce
 local function debugPrint(self, msg)
@@ -22,7 +23,11 @@ end
 function ____exports.testQuestAcceptComplete(self)
     debugPrint(nil, "开始任务接受/完成测试...")
     local playerId = 0
-    questManager:resetPlayerQuests(playerId)
+    questDB:resetPlayerData(playerId)
+    debugPrint(
+        nil,
+        ("已重置玩家 " .. tostring(playerId)) .. " 的任务数据"
+    )
     do
         local i = 1
         while i <= 20 do
@@ -96,9 +101,18 @@ function ____exports.testQuestData(self)
         nil,
         "总任务数量: " .. tostring(#allQuests)
     )
-    local mainQuests = questDB:getQuestsByType(QuestType.MAIN)
-    local sideQuests = questDB:getQuestsByType(QuestType.SIDE)
-    local dailyQuests = questDB:getQuestsByType(QuestType.DAILY)
+    local mainQuests = __TS__ArrayFilter(
+        allQuests,
+        function(____, q) return q.type == QuestType.MAIN end
+    )
+    local sideQuests = __TS__ArrayFilter(
+        allQuests,
+        function(____, q) return q.type == QuestType.SIDE end
+    )
+    local dailyQuests = __TS__ArrayFilter(
+        allQuests,
+        function(____, q) return q.type == QuestType.DAILY end
+    )
     debugPrint(
         nil,
         "主线任务: " .. tostring(#mainQuests)

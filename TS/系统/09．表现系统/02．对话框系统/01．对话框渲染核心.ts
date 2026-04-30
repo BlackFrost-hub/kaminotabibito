@@ -17,7 +17,7 @@ import { bindQuestSyncHandlersImpl, initSkipKeyListener } from "./20．对话框
 /** 播放模块在首帧 createDialogFrames 前需能绑定接受/拒绝 sync 脚本（避免与回调模块循环依赖） */
 setQuestSyncHandlersBinder(bindQuestSyncHandlersImpl);
 
-// ========== 虚拟分区：API ==========
+// ========== 虚拟分区：对话框系统对外 API（显示文本/任务/清理/纹理设置） ==========
 export function initDialogSystem(): void {
   dzLoadTocOnce();
   initSkipKeyListener();

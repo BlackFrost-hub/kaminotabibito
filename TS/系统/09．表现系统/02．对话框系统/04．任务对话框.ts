@@ -2,7 +2,7 @@ import type { PlayerDialogState } from "./05．对话框业务逻辑";
 
 const japi = require("jass.japi") as any;
 
-// ========== 虚拟分区：任务回调类型 ==========
+// ========== 虚拟分区：任务接受/拒绝回调签名类型 ==========
 export interface QuestCallbacks {
   onAccept: () => void;
   onReject: () => void;

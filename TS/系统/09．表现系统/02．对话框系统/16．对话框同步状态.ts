@@ -5,6 +5,7 @@
 
 const MAX_PLAYERS = 4;
 
+// ========== 虚拟分区：活跃玩家标志管理 ==========
 const g_activePlayerFlags: boolean[] = [];
 
 export function setActivePlayerId(playerId: number): void {

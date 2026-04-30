@@ -8,7 +8,7 @@ function normalizeRequireCount(count?: number): number {
   return count != null && count > 1 ? count : 1;
 }
 
-// ========== 虚拟分区：任务注册 ==========
+// ========== 虚拟分区：任务配置注册到 questDB ==========
 export function ensureQuestConfigsRegistered(): void {
   const g = globalThis as any;
   if (g.__questConfigsRegistered) return;
@@ -50,7 +50,7 @@ export function ensureQuestConfigsRegistered(): void {
   }
 }
 
-// ========== 虚拟分区：任务状态 ==========
+// ========== 虚拟分区：任务状态查询与设置（0=未接/1=进行中/2=已完成） ==========
 export function getQuestState(playerId: number, questId: string): number {
   const status = questDB.getPlayerQuestStatus(playerId, questId);
   if (status === QuestStatus.COMPLETED) return 2;

@@ -11,6 +11,7 @@ export interface RewardExecResult {
   matchedCondition: string;
 }
 
+// ========== 虚拟分区：条件匹配（装备等级/物品ID/英雄等级） ==========
 function readFirstNumber(s: string): number {
   let found = false;
   let n = 0;

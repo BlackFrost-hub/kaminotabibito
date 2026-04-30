@@ -9,6 +9,7 @@ import {
   RewardExecResult,
 } from "./11．任务奖励解析";
 
+// ========== 虚拟分区：奖励执行（资源/经验/属性） ==========
 function getUserPlayers(): any[] {
   const out: any[] = [];
   for (let i = 0; i < 4; i++) {

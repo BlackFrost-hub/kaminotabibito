@@ -9,12 +9,4 @@ ____exports.ENABLE_QUEST_RUNTIME_CORE = true
 ____exports.ENABLE_QUEST_UI_MODULE = true
 --- 加载 `09．主线配置驱动`
 ____exports.ENABLE_QUEST_MAINLINE_DRIVER = false
---- 加载 `07．任务事件桥接`
-____exports.ENABLE_QUEST_EVENT_BRIDGE = false
---- 是否启用任务STES目标桥接（`05`/`06` 配套）
-____exports.ENABLE_QUEST_STES_OBJECTIVE_BRIDGE = false
---- 是否启用任务STES接受/完成桥接
-____exports.ENABLE_QUEST_STES_ACCEPT_COMPLETE_BRIDGE = false
---- 加载 `08．任务目标更新` 并在其模块内执行 init
-____exports.ENABLE_QUEST_OBJECTIVE_UPDATE_EVENT = false
 return ____exports

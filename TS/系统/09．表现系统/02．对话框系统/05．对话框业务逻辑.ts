@@ -5,7 +5,7 @@ export type Player = any;
 export type Timer = any;
 export type Frame = number;
 
-// ========== 虚拟分区：数据结构 ==========
+// ========== 虚拟分区：基础类型别名与数据接口 ==========
 export interface DialogEntry {
   title: string;
   text: string;

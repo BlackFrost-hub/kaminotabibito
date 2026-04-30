@@ -64,7 +64,7 @@ function bindDialogPanelHitFrame(hitFrame: Frame): void {
 
 const TAG_SLOT_OFFSET = 1000;
 
-// ========== 虚拟分区：初始化 ==========
+// ========== 虚拟分区：创建对话框 UI 帧层级（背景/标题/正文/按钮/立绘/提示） ==========
 export function createDialogFrames(slotId: number = 0): Frame[] {
   const frames: Frame[] = [];
   for (let i = 0; i <= 11; i++) frames[i] = 0;

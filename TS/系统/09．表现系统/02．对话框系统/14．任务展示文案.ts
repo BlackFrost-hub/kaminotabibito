@@ -1,6 +1,6 @@
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 
-// ========== 虚拟分区：展示文案 ==========
+// ========== 虚拟分区：奖励展示文案解析 ==========
 export function resolveRewardDisplayText(quest: Partial<QuestConfig> | null | undefined): string {
   if (!quest) return "无";
   if (quest.rewardDisplay && quest.rewardDisplay !== "") return quest.rewardDisplay;

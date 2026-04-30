@@ -79,6 +79,8 @@ export function cancelPendingNpcMarkerSchedules(npcUnit: any): void {
   cancelPendingYellowMarkerTimerForHandle(key);
 }
 
+// ========== 虚拟分区：NPC 头顶叹号/问号特效 ==========
+// ========== 虚拟分区：NPC 头顶叹号/问号特效 ==========
 function destroyNpcPromptEffectInternal(unit: any): boolean {
   const key = npcPromptHandleKey(unit);
   if (key === 0) return false;

@@ -130,17 +130,12 @@ export class QuestDatabase {
   }
 
   /**
-   * 根据类型获取任务定义
-   */
-  public getQuestsByType(type: QuestType): QuestData[] {
-    return Array.from(this.questDefinitions.values()).filter(quest => quest.type === type);
-  }
-
-  /**
    * 获取可接任务（未接受、前置已完成）
    */
   public getAvailableQuests(playerId: number, type?: QuestType): QuestData[] {
-    const source = type ? this.getQuestsByType(type) : this.getAllQuests();
+    const source = type
+      ? Array.from(this.questDefinitions.values()).filter(quest => quest.type === type)
+      : this.getAllQuests();
     return source.filter(quest => {
       if (quest.uiReserved) return false;
       if (this.globalData.quests.has(quest.id) ||

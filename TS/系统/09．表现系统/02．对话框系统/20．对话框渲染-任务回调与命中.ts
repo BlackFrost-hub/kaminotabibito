@@ -30,7 +30,7 @@ import {
 import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./19．对话框渲染-播放与状态管理";
 import { safeTimerStart, safeDestroyTimer } from "../../../系统/00．核心系统/07．联机安全工具";
 
-// ========== 虚拟分区：索引辅助函数 ==========
+// ========== 虚拟分区：队列索引/当前页查找辅助 ==========
 
 function getCurrentEntry(state: PlayerDialogState): DialogEntry | undefined {
   return state.queue[state.currentIndex];
@@ -77,7 +77,7 @@ function finishDialogAndCleanup(state: PlayerDialogState): void {
   showDialogFrames(state, false);
 }
 
-// ========== 虚拟分区：任务接受/拒绝回调 ==========
+// ========== 虚拟分区：任务接受/拒绝按钮回调调度 ==========
 
 function resolveQuestCallbackByPlayerId(playerId: number): { state: PlayerDialogState; questIdx: number; onAccept: () => void; onReject: () => void } | undefined {
   if (playerId < 0 || playerId >= MAX_PLAYERS) return undefined;
@@ -166,7 +166,7 @@ function questRejectCallbackP3(): void { runQuestRejectForPlayer(3); }
 (globalThis as any).QuestRejectCallbackP2 = questRejectCallbackP2;
 (globalThis as any).QuestRejectCallbackP3 = questRejectCallbackP3;
 
-// ========== 虚拟分区：面板点击 ==========
+// ========== 虚拟分区：面板点击交互处理 ==========
 
 function handleDialogPanelClick(state: PlayerDialogState): void {
   // 情况 A：打字中 → 只补全
@@ -222,7 +222,7 @@ export function bindDialogPanelHitFrame(_hitFrame: Frame): void {
   return;
 }
 
-// ========== 虚拟分区：skip 冷却 timer ==========
+// ========== 虚拟分区：~ 键跳过冷却 timer ==========
 
 const SKIP_KEY_COOLDOWN_SECONDS = 0.12;
 const g_skipKeyCooldown: boolean[] = [];
@@ -270,7 +270,7 @@ function startSkipKeyCooldown(pid: number): void {
   }
 }
 
-// ========== 虚拟分区：~ 键 skip 核心逻辑 ==========
+// ========== 虚拟分区：~ 键 skip 核心（跳到任务页/最后一页/结束对话） ==========
 // ~ 保持 sync=true，但只用 currentIndex 跳页，不再裁剪 queue。
 
 function skipDialogLocal(): void {
@@ -331,7 +331,7 @@ export function initSkipKeyListener(): void {
   registerKeyEventByCode(KEY_SKIP_DIALOG, KEY_STATE.DOWN, true, skipDialogLocal);
 }
 
-// ========== 虚拟分区：任务 sync 处理器绑定 ==========
+// ========== 虚拟分区：任务按钮/面板/文本帧的点击回调绑定 ==========
 
 export function bindQuestSyncHandlersImpl(state: PlayerDialogState): void {
   if (state.questSyncHandlersBound || !state.frames || state.frames.length === 0) return;

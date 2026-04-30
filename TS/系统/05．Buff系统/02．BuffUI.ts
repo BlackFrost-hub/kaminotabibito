@@ -281,8 +281,10 @@ function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; i
   }
 }
 
+const MAX_PLAYER_ID = 6;
+
 function rebuildAllBuffBarViewModels(this: void): void {
-  for (let playerId = 0; playerId < 16; playerId++) {
+  for (let playerId = 0; playerId < MAX_PLAYER_ID; playerId++) {
     const targetUnit = getSoleSelectedUnitForPlayerImported(playerId);
     buffBarViewModelByPlayerId[playerId] = buildBuffBarViewModelImported(targetUnit);
   }
