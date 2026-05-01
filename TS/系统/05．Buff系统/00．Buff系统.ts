@@ -92,7 +92,7 @@ function collectActiveBuffPairs(): { hid: number; buffID: string; row: BuffRunti
     const p = parseBuffKey(k);
     if (!p) continue;
     const row = buffByUnitAndId[k];
-    if (row) out.push({ hid: p.hid, buffID: p.buffID, row });
+    if (row !== undefined) out.push({ hid: p.hid, buffID: p.buffID, row });
   }
   // 固定排序语义：先 hid 数值，再 buffID 字典序
   out.sort((a, b) => {

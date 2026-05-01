@@ -18,10 +18,10 @@ ____exports.ENABLE_MOUSE_WHEEL_SCROLL = true
 ____exports.MAX_PAGES_PER_CATEGORY = 50
 --- 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中
 ____exports.ENABLE_TASK_UI_RIGHT_SCROLLBAR = true
-____exports.ENTRY_W = 0.059 * 1.3
-____exports.ENTRY_H = 0.0156 * 1.4
-____exports.ENTRY_X = 0.005
-____exports.ENTRY_Y = 0.6
+____exports.ENTRY_W = 0.088
+____exports.ENTRY_H = 0.0227
+____exports.ENTRY_X = 0
+____exports.ENTRY_Y = 0.599
 ____exports.ENTRY_TITLE_TEXT_BOX_W = 0.82
 ____exports.ENTRY_TITLE_TEXT_BOX_H = 0.46
 ____exports.PANEL_W = 0.35

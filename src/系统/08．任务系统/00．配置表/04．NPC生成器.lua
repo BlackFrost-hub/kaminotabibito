@@ -61,7 +61,7 @@ local function onNpcQuestMarkerTimerExpire()
     local ctx = npcQuestMarkerCtxByTimerHid[hid]
     __TS__Delete(npcQuestMarkerCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
-    if ctx then
+    if ctx ~= nil then
         tryAttachQuestMarkerForConfigNpc(nil, ctx.unit, ctx.npcConfig)
     end
 end

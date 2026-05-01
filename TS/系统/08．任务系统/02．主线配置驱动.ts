@@ -273,7 +273,7 @@ function onStoryActionTimerExpire(this: void): void {
   const ctx = storyActionCtxByTimerHid[hid];
   delete storyActionCtxByTimerHid[hid];
   safeDestroyTimer(t);
-  if (ctx) executeActionCode(ctx.code, ctx.triggerUnit);
+  if (ctx !== undefined) executeActionCode(ctx.code, ctx.triggerUnit);
 }
 
 function runActionTimeline(timeline: string | undefined, triggerUnit: any): void {

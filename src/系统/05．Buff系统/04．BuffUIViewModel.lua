@@ -157,7 +157,7 @@ function ____exports.buildBuffBarViewModel(unit)
                 local pd = row.state._dotParsedDuration
                 local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
                 local tooltipText
-                if meta then
+                if meta ~= nil then
                     tooltipText = formatDotTooltip(
                         meta.tooltip,
                         durationForTip,

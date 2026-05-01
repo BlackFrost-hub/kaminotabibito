@@ -230,7 +230,7 @@ function onEquipHealDebounceTimerExpire(this: void): void {
   const hid = jass.GetHandleId(t) as number;
   const key = equipHealDebounceKeyByTimerHid[hid];
   delete equipHealDebounceKeyByTimerHid[hid];
-  if (key) (globalThis as any).__EquipHealExecutedKey = undefined;
+  if (key !== undefined) (globalThis as any).__EquipHealExecutedKey = undefined;
   safeDestroyTimer(t);
 }
 
@@ -240,7 +240,7 @@ function onEquipHealDelayTimerExpire(this: void): void {
   const hid = jass.GetHandleId(t) as number;
   const ctx = equipHealDelayCtxByTimerHid[hid];
   delete equipHealDelayCtxByTimerHid[hid];
-  if (ctx) executeSegment(ctx.unit, ctx.item, ctx.seg);
+  if (ctx !== undefined) executeSegment(ctx.unit, ctx.item, ctx.seg);
   safeDestroyTimer(t);
 }
 

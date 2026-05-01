@@ -63,7 +63,7 @@ function onNpcQuestMarkerTimerExpire(this: void): void {
   const ctx = npcQuestMarkerCtxByTimerHid[hid];
   delete npcQuestMarkerCtxByTimerHid[hid];
   safeDestroyTimer(t);
-  if (ctx) tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig);
+  if (ctx !== undefined) tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig);
 }
 
 function onNpcSetModelTimerExpire(this: void): void {

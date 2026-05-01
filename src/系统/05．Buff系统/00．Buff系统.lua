@@ -62,7 +62,7 @@ function collectActiveBuffPairs()
                 goto __continue16
             end
             local row = buffByUnitAndId[k]
-            if row then
+            if row ~= nil then
                 out[#out + 1] = {hid = p.hid, buffID = p.buffID, row = row}
             end
         end

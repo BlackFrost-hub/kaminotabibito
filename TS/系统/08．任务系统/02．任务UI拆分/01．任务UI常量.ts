@@ -23,10 +23,10 @@ export const MAX_PAGES_PER_CATEGORY = 50;
 /** 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中 */
 export const ENABLE_TASK_UI_RIGHT_SCROLLBAR = true;
 
-export const ENTRY_W = 0.059 * 1.3;
-export const ENTRY_H = 0.0156 * 1.4;
-export const ENTRY_X = 0.005;
-export const ENTRY_Y = 0.60;
+export const ENTRY_W = 0.0880;
+export const ENTRY_H = 0.0227;
+export const ENTRY_X = 0.000;
+export const ENTRY_Y = 0.599;
 export const ENTRY_TITLE_TEXT_BOX_W = 0.82;
 export const ENTRY_TITLE_TEXT_BOX_H = 0.46;
 export const PANEL_W = 0.35;

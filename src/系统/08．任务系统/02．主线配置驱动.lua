@@ -346,7 +346,7 @@ local function onStoryActionTimerExpire()
     local ctx = storyActionCtxByTimerHid[hid]
     __TS__Delete(storyActionCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
-    if ctx then
+    if ctx ~= nil then
         executeActionCode(ctx.code, ctx.triggerUnit)
     end
 end

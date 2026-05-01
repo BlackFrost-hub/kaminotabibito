@@ -21,7 +21,7 @@ local function onCameraShakeTimerExpire()
     local hid = jass.GetHandleId(t)
     local ctx = cameraShakeCtxByTimerHid[hid]
     __TS__Delete(cameraShakeCtxByTimerHid, hid)
-    if ctx then
+    if ctx ~= nil then
         CameraClearNoiseForPlayer(nil, ctx.whichPlayer)
         cameraTimers:delete(ctx.playerId)
     end

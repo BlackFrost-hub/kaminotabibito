@@ -199,7 +199,7 @@ local function onEquipHealDebounceTimerExpire()
     local hid = jass.GetHandleId(t)
     local key = equipHealDebounceKeyByTimerHid[hid]
     __TS__Delete(equipHealDebounceKeyByTimerHid, hid)
-    if key then
+    if key ~= nil then
         _G.__EquipHealExecutedKey = nil
     end
     safeDestroyTimer(nil, t)
@@ -212,7 +212,7 @@ local function onEquipHealDelayTimerExpire()
     local hid = jass.GetHandleId(t)
     local ctx = equipHealDelayCtxByTimerHid[hid]
     __TS__Delete(equipHealDelayCtxByTimerHid, hid)
-    if ctx then
+    if ctx ~= nil then
         executeSegment(ctx.unit, ctx.item, ctx.seg)
     end
     safeDestroyTimer(nil, t)

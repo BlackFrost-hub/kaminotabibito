@@ -14,8 +14,8 @@ Frame "BACKDROP" "TaskEntryIcon" {
     BackdropCornerSize 0.0128,                    // 边框厚度（*1.6）
     BackdropBackgroundInsets 0.004 0.004 0.004 0.004,  // 背景内边距（左/下/右/上）
     BackdropEdgeFile "UI\Widgets\EscMenu\Human\human-options-menu-border.blp",  // 边框纹理
-    Width 0.04,                                   // 宽度
-    Height 0.04,                                   // 高度
+    Width 0.088,                                  // 宽度（与顶部菜单按钮一致）
+    Height 0.0227,                                  // 高度（与顶部菜单按钮一致）
     SetPoint BOTTOMLEFT, "GameUI", BOTTOMLEFT, 0.01, 0.15  // 放在F9任务栏下方
 }
 

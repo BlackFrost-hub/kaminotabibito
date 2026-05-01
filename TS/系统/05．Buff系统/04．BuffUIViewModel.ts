@@ -139,7 +139,7 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
     const pd = row.state._dotParsedDuration;
     const durationForTip = typeof pd === "number" && isFinite(pd) && pd > 0 ? pd : row.state.remaining;
     let tooltipText: string;
-    if (meta) {
+    if (meta !== undefined) {
       tooltipText = formatDotTooltip(
         meta.tooltip,
         durationForTip,

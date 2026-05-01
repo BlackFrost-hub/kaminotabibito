@@ -333,7 +333,7 @@ function onEquipStatReverseTimerExpire(this: void): void {
   const hid = (jass as any).GetHandleId(t) as number;
   const ctx = equipStatReverseByTimerHid[hid];
   delete equipStatReverseByTimerHid[hid];
-  if (ctx) {
+  if (ctx !== undefined) {
     applyStats(ctx.unit, ctx.stats, false);
   }
   safeDestroyTimer(t);
@@ -347,7 +347,7 @@ function onEquipDebounceTimerExpire(this: void): void {
   const hid = (jass as any).GetHandleId(t) as number;
   const key = equipDebounceKeyByTimerHid[hid];
   delete equipDebounceKeyByTimerHid[hid];
-  if (key) {
+  if (key !== undefined) {
     (globalThis as any)[key] = undefined;
   }
   safeDestroyTimer(t);

@@ -20,7 +20,7 @@ function onCameraShakeTimerExpire(this: void): void {
   const hid = (jass as any).GetHandleId(t) as number;
   const ctx = cameraShakeCtxByTimerHid[hid];
   delete cameraShakeCtxByTimerHid[hid];
-  if (ctx) {
+  if (ctx !== undefined) {
     CameraClearNoiseForPlayer(ctx.whichPlayer);
     cameraTimers.delete(ctx.playerId);
   }

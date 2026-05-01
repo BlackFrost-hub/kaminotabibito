@@ -28,7 +28,7 @@ function onEquipStatReverseTimerExpire()
     local hid = jass.GetHandleId(t)
     local ctx = equipStatReverseByTimerHid[hid]
     __TS__Delete(equipStatReverseByTimerHid, hid)
-    if ctx then
+    if ctx ~= nil then
         applyStats(ctx.unit, ctx.stats, false)
     end
     safeDestroyTimer(nil, t)
@@ -41,7 +41,7 @@ function onEquipDebounceTimerExpire()
     local hid = jass.GetHandleId(t)
     local key = equipDebounceKeyByTimerHid[hid]
     __TS__Delete(equipDebounceKeyByTimerHid, hid)
-    if key then
+    if key ~= nil then
         _G[key] = nil
     end
     safeDestroyTimer(nil, t)
