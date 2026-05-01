@@ -56,7 +56,7 @@ const 经济系统 = require("系统.06．经济系统.index") as { init?: () =>
 if (typeof 经济系统.init === "function") 经济系统.init();
 
 // // ---------- 08．任务系统 ----------
-const 任务系统 = require("系统.08．任务系统.10．index") as { init?: () => void };
+const 任务系统 = require("系统.08．任务系统.03．index") as { init?: () => void };
 if (typeof 任务系统.init === "function") 任务系统.init();
 
 // // ---------- 09．表现系统 ----------

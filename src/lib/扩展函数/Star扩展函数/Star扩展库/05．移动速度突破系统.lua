@@ -43,6 +43,11 @@ function doEvent(self, entry)
     local x = getUnitX(nil, u)
     local y = getUnitY(nil, u)
     local f = getUnitFacing(nil, u)
+    local tgtU = jass.GetOrderTargetUnit()
+    if tgtU ~= nil and tgtU ~= 0 then
+        entry.tx = getUnitX(nil, tgtU)
+        entry.ty = getUnitY(nil, tgtU)
+    end
     local dx = entry.tx - x
     local dy = entry.ty - y
     local dist = X_GDBC(

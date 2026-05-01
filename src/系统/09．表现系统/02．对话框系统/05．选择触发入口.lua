@@ -2,21 +2,21 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local resolveNpcDialogName, openDialogForConfiguredNpc, onPlayerSelectedUnit, jass, openNpcDialog, DIALOG_PLAYER_SLOTS
-local ____07_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.07．任务状态")
-local ensureQuestConfigsRegistered = ____07_FF0E_4EFB_52A1_72B6_6001.ensureQuestConfigsRegistered
-local hasPlayerAcceptedQuest = ____07_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
-local hasPlayerCompletedQuest = ____07_FF0E_4EFB_52A1_72B6_6001.hasPlayerCompletedQuest
-local ____08_FF0E_914D_7F6E_67E5_8BE2 = require("系统.09．表现系统.02．对话框系统.08．配置查询")
-local findAcceptedQuestBySubmitNpc = ____08_FF0E_914D_7F6E_67E5_8BE2.findAcceptedQuestBySubmitNpc
-local findEnabledNpcConfigBySelectedUnit = ____08_FF0E_914D_7F6E_67E5_8BE2.findEnabledNpcConfigBySelectedUnit
-local findQuestByNpc = ____08_FF0E_914D_7F6E_67E5_8BE2.findQuestByNpc
-local ____13_FF0E_4EFB_52A1_5956_52B1_6267_884C = require("系统.09．表现系统.02．对话框系统.13．任务奖励执行")
-local getPlayerFirstHero = ____13_FF0E_4EFB_52A1_5956_52B1_6267_884C.getPlayerFirstHero
-local ____09_FF0E_5BF9_8BDD_6784_5EFA = require("系统.09．表现系统.02．对话框系统.09．对话构建")
-local buildDialogData = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildDialogData
-local buildQuestCompletedDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestCompletedDialog
-local buildQuestInProgressDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
-local buildQuestOfferDialog = ____09_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
+local ____03_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.03．任务状态")
+local ensureQuestConfigsRegistered = ____03_FF0E_4EFB_52A1_72B6_6001.ensureQuestConfigsRegistered
+local hasPlayerAcceptedQuest = ____03_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
+local hasPlayerCompletedQuest = ____03_FF0E_4EFB_52A1_72B6_6001.hasPlayerCompletedQuest
+local ____03_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.03．任务状态")
+local findAcceptedQuestBySubmitNpc = ____03_FF0E_4EFB_52A1_72B6_6001.findAcceptedQuestBySubmitNpc
+local findEnabledNpcConfigBySelectedUnit = ____03_FF0E_4EFB_52A1_72B6_6001.findEnabledNpcConfigBySelectedUnit
+local findQuestByNpc = ____03_FF0E_4EFB_52A1_72B6_6001.findQuestByNpc
+local ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C = require("系统.09．表现系统.02．对话框系统.08．任务奖励执行")
+local getPlayerFirstHero = ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C.getPlayerFirstHero
+local ____04_FF0E_5BF9_8BDD_6784_5EFA = require("系统.09．表现系统.02．对话框系统.04．对话构建")
+local buildDialogData = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildDialogData
+local buildQuestCompletedDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestCompletedDialog
+local buildQuestInProgressDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
+local buildQuestOfferDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
 function resolveNpcDialogName(npcConfig)
     if npcConfig.NPCrequireName ~= nil and npcConfig.NPCrequireName ~= "" then
         return npcConfig.NPCrequireName

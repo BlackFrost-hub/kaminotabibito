@@ -1,4 +1,4 @@
-import { createNormalDialogEntry, createQuestDialogEntry, Player } from "./05．对话框业务逻辑";
+import { createNormalDialogEntry, createQuestDialogEntry, Player } from "./02．对话框业务逻辑";
 import {
   DEFAULT_BODY_FONT_SIZE,
   DEFAULT_TITLE_FONT_SIZE,
@@ -9,10 +9,10 @@ import {
   dzShow,
   g_states,
   MAX_PLAYERS,
-} from "./17．对话框渲染-Dz与状态";
-import { createDialogFrames } from "./18．对话框渲染-创建帧";
-import { clearState, enqueue, ensureState, setQuestSyncHandlersBinder } from "./19．对话框渲染-播放与状态管理";
-import { bindQuestSyncHandlersImpl, initSkipKeyListener } from "./20．对话框渲染-任务回调与命中";
+} from "./10．对话框渲染-Dz与状态";
+import { createDialogFrames } from "./11．对话框渲染-创建帧";
+import { clearState, enqueue, ensureState, setQuestSyncHandlersBinder } from "./12．对话框渲染-播放与状态管理";
+import { bindQuestSyncHandlersImpl, initSkipKeyListener } from "./13．对话框渲染-任务回调与命中";
 
 /** 播放模块在首帧 createDialogFrames 前需能绑定接受/拒绝 sync 脚本（避免与回调模块循环依赖） */
 setQuestSyncHandlersBinder(bindQuestSyncHandlersImpl);

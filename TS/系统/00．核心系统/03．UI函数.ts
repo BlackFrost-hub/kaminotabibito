@@ -21,7 +21,7 @@ const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 
 import { createFrame, setButtonText, FrameType } from "../09．表现系统/01．UI工具/index";
-import { displayText, displayQuest, isDialogActive, setDialogFinishCallback } from "../09．表现系统/02．对话框系统/00．对话框UI入口";
+import { displayText, displayQuest, isDialogActive, setDialogFinishCallback } from "../09．表现系统/02．对话框系统/00．对话框渲染核心";
 import {
   destroyBubbleEffect,
   releaseNpcOccupation,
@@ -32,7 +32,7 @@ import {
   setDialogNpcUnit,
   shouldSkipNewBubbleSchedule,
   tryOccupyNpc,
-} from "../09．表现系统/02．对话框系统/15．NPC头顶与气泡特效";
+} from "../09．表现系统/02．对话框系统/09．NPC头顶与气泡特效";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 对话框入口封装

@@ -8,19 +8,19 @@ const ____selectionCenter = require("系统.00．核心系统.01．事件中心.
   addSelectionListener?: (listener: (player: any, playerId: number, unit: any, isSelected: boolean) => void) => void;
 };
 
-import { ensureQuestConfigsRegistered, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./07．任务状态";
+import { ensureQuestConfigsRegistered, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./03．任务状态";
 import {
   findAcceptedQuestBySubmitNpc,
   findEnabledNpcConfigBySelectedUnit,
   findQuestByNpc,
-} from "./08．配置查询";
-import { getPlayerFirstHero } from "./13．任务奖励执行";
+} from "./03．任务状态";
+import { getPlayerFirstHero } from "./08．任务奖励执行";
 import {
   buildDialogData,
   buildQuestCompletedDialog,
   buildQuestInProgressDialog,
   buildQuestOfferDialog,
-} from "./09．对话构建";
+} from "./04．对话构建";
 
 const { openNpcDialog } = UI函数;
 const DIALOG_PLAYER_SLOTS = 4;

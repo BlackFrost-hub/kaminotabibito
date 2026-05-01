@@ -8,9 +8,9 @@ local ____index = require("lib.扩展函数.BJ函数.index")
 local IMaxBJ = ____index.IMaxBJ
 local ____index = require("lib.扩展函数.自定义扩展函数.index")
 local getPlayerFirstHero = ____index.getPlayerFirstHero
-local ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790 = require("系统.09．表现系统.02．对话框系统.11．任务奖励解析")
-local bindRewardParseHeroResolver = ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790.bindRewardParseHeroResolver
-local isConditionMatchedWithContext = ____11_FF0E_4EFB_52A1_5956_52B1_89E3_6790.isConditionMatchedWithContext
+local ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790 = require("系统.09．表现系统.02．对话框系统.06．任务奖励解析")
+local bindRewardParseHeroResolver = ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790.bindRewardParseHeroResolver
+local isConditionMatchedWithContext = ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790.isConditionMatchedWithContext
 local jass = require("jass.common")
 local function getUserPlayers(self)
     local out = {}

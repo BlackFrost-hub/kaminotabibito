@@ -7,7 +7,7 @@ import {
   isConditionMatchedWithContext,
   RewardExecContext,
   RewardExecResult,
-} from "./11．任务奖励解析";
+} from "./06．任务奖励解析";
 
 // ========== 虚拟分区：奖励执行（资源/经验/属性） ==========
 function getUserPlayers(): any[] {

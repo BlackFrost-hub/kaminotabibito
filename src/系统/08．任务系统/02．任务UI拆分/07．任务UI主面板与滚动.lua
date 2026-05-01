@@ -66,6 +66,7 @@ function ____exports.buildTaskMainPanel(self, opts)
     if not mainPanel then
         return empty
     end
+    japi.DzFrameSetPriority(mainPanel, 200)
     japi.DzFrameClearAllPoints(mainPanel)
     if entryFrame then
         setFramePointRelative(

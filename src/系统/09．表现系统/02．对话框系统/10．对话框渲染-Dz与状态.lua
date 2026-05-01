@@ -2,8 +2,6 @@
 local ____exports = {}
 local ____07_FF0E_8054_673A_5B89_5168_5DE5_5177 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeTimerStart
-local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
-local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActivePlayerId
 --- 从当前页往后找第一个任务行。
 -- 不再从 queue 头开始，避免 ~ 跳回前面已经看过的任务页。
 function ____exports.findFirstQuestEntryIndex(self, state)
@@ -23,6 +21,19 @@ local jass = require("jass.common")
 ____exports.DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav"
 --- 对话框系统固定为 4 个玩家槽位：P1~P4。
 ____exports.MAX_PLAYERS = 4
+local g_activePlayerFlags = {}
+function ____exports.setActivePlayerId(self, playerId)
+    if playerId < 0 or playerId >= ____exports.MAX_PLAYERS then
+        return
+    end
+    g_activePlayerFlags[playerId + 1] = true
+end
+function ____exports.resetActivePlayerIdIfMatch(self, playerId)
+    if playerId < 0 or playerId >= ____exports.MAX_PLAYERS then
+        return
+    end
+    g_activePlayerFlags[playerId + 1] = false
+end
 ____exports.TOC_PATH = "ui\\StarGameUI.toc"
 ____exports.TAG_BASE_MAIN = 1024
 ____exports.TAG_BASE_PORTRAIT = 1125
@@ -146,7 +157,7 @@ function ____exports.syncQuestCallbacksTableFromQueueHead(self, state)
         return
     end
     ____exports.g_questCallbacksByPlayer[state.playerId + 1] = {onAccept = e.questCallbacks.onAccept, onReject = e.questCallbacks.onReject}
-    setActivePlayerId(nil, state.playerId)
+    ____exports.setActivePlayerId(nil, state.playerId)
 end
 ____exports.japi = japi
 ____exports.jass = jass

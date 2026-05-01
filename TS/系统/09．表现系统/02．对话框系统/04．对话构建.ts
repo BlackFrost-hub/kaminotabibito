@@ -7,8 +7,8 @@ import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
-import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, showLocalHint } from "./06．常量与工具";
-const ____npcEffect = require("系统.09．表现系统.02．对话框系统.15．NPC头顶与气泡特效") as {
+import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, showLocalHint } from "./02．对话框业务逻辑";
+const ____npcEffect = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
   getNpcUnit: (this: void, playerId: number) => any;
   scheduleYellowQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
   scheduleGrayQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
@@ -17,12 +17,12 @@ function getDialogNpcUnit(this: void, playerId: number): any { return ____npcEff
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
-import { findDialogConfig } from "./08．配置查询";
-import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./07．任务状态";
-import { getPlayerFirstHero } from "./13．任务奖励执行";
-import { handleQuestSubmit } from "./12．任务提交流程";
-import { resolveRewardDisplayText } from "./14．任务展示文案";
-import { scheduleGrayQuestMarkerAfterBubbleFade, scheduleYellowQuestMarkerAfterBubbleFade } from "./15．NPC头顶与气泡特效";
+import { findDialogConfig } from "./03．任务状态";
+import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./03．任务状态";
+import { getPlayerFirstHero } from "./08．任务奖励执行";
+import { handleQuestSubmit } from "./07．任务提交流程";
+import { resolveRewardDisplayText } from "./03．任务状态";
+import { scheduleGrayQuestMarkerAfterBubbleFade, scheduleYellowQuestMarkerAfterBubbleFade } from "./09．NPC头顶与气泡特效";
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
 const { addDelayedCallback } = globalThis as unknown as {

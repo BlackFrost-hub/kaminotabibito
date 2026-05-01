@@ -107,7 +107,7 @@ function invokeUiAttrOnPlayerHeroRegistered(whichPlayer: any, whichHero: any): v
 const uiRegisteredPlayers = new Set<number>();
 
 // 对话框系统
-const dialogSystem = require("系统.09．表现系统.02．对话框系统.01．对话框渲染核心") as {
+const dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 
@@ -117,7 +117,7 @@ const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
 };
 
 // 任务UI系统
-const taskUISystem = require("系统.08．任务系统.04．任务UI拆分.12．任务UI管理器") as {
+const taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => boolean;
 };
 

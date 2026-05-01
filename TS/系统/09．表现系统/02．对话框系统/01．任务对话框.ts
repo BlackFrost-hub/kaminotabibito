@@ -1,4 +1,4 @@
-import type { PlayerDialogState } from "./05．对话框业务逻辑";
+import type { PlayerDialogState } from "./02．对话框业务逻辑";
 
 const japi = require("jass.japi") as any;
 

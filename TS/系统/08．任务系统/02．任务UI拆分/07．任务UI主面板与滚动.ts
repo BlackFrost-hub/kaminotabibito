@@ -110,6 +110,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     return empty;
   }
 
+  (japi as any).DzFrameSetPriority(mainPanel, 200);
   (japi as any).DzFrameClearAllPoints(mainPanel);
   if (entryFrame) {
     setFramePointRelative(mainPanel, FramePoint.TOPLEFT, entryFrame, FramePoint.TOPLEFT, PANEL_REL_TO_ENTRY_X, PANEL_REL_TO_ENTRY_Y);

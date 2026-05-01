@@ -2,12 +2,25 @@ const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 import { safeTimerStart } from "../../../系统/00．核心系统/07．联机安全工具";
 
-import { setActivePlayerId } from "./16．对话框同步状态";
-import type { Frame, Player, PlayerDialogState, Timer } from "./05．对话框业务逻辑";
+import type { Frame, Player, PlayerDialogState, Timer } from "./02．对话框业务逻辑";
 
 export const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
 /** 对话框系统固定为 4 个玩家槽位：P1~P4。 */
 export const MAX_PLAYERS = 4;
+
+// ========== 虚拟分区：活跃玩家标志管理 ==========
+const g_activePlayerFlags: boolean[] = [];
+
+export function setActivePlayerId(playerId: number): void {
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  g_activePlayerFlags[playerId] = true;
+}
+
+export function resetActivePlayerIdIfMatch(playerId: number): void {
+  if (playerId < 0 || playerId >= MAX_PLAYERS) return;
+  g_activePlayerFlags[playerId] = false;
+}
+
 export const TOC_PATH = "ui\\StarGameUI.toc";
 export const TAG_BASE_MAIN = 1024;
 export const TAG_BASE_PORTRAIT = 1125;

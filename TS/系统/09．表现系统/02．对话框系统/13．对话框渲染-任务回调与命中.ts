@@ -2,12 +2,12 @@ const jass = require("jass.common") as any;
 
 import { frameSetScriptByCode, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { KEY_STATE } from "../../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
-import { stringLengthCompat } from "./02．打字机效果";
-import { applyPortraitFrames } from "./03．对话框立绘系统";
-import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "./04．任务对话框";
-import { DialogEntry, Frame, PlayerDialogState, onDialogFinished, resetDialogActiveFlagsKeepOnFinish } from "./05．对话框业务逻辑";
-import { resetActivePlayerIdIfMatch, setActivePlayerId } from "./16．对话框同步状态";
-import { setDialogPanelHitBinder } from "./18．对话框渲染-创建帧";
+import { stringLengthCompat } from "./12．对话框渲染-播放与状态管理";
+import { applyPortraitFrames } from "./12．对话框渲染-播放与状态管理";
+import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "./01．任务对话框";
+import { DialogEntry, Frame, PlayerDialogState, onDialogFinished, resetDialogActiveFlagsKeepOnFinish } from "./02．对话框业务逻辑";
+import { resetActivePlayerIdIfMatch, setActivePlayerId } from "./10．对话框渲染-Dz与状态";
+import { setDialogPanelHitBinder } from "./11．对话框渲染-创建帧";
 import {
   DEFAULT_BODY_FONT_SIZE,
   DEFAULT_FONT,
@@ -26,8 +26,8 @@ import {
   japi,
   KEY_SKIP_DIALOG,
   MAX_PLAYERS,
-} from "./17．对话框渲染-Dz与状态";
-import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./19．对话框渲染-播放与状态管理";
+} from "./10．对话框渲染-Dz与状态";
+import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./12．对话框渲染-播放与状态管理";
 import { safeTimerStart, safeDestroyTimer } from "../../../系统/00．核心系统/07．联机安全工具";
 
 // ========== 虚拟分区：队列索引/当前页查找辅助 ==========

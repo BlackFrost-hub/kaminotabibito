@@ -87,7 +87,7 @@ local function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
     cb(whichPlayer, whichHero)
 end
 local uiRegisteredPlayers = __TS__New(Set)
-local dialogSystem = require("系统.09．表现系统.02．对话框系统.01．对话框渲染核心")
+local dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心")
 local buffUISystem = require("系统.05．Buff系统.02．BuffUI")
 local taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")

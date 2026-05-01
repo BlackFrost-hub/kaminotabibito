@@ -1,7 +1,7 @@
 const japi = require("jass.japi") as any;
 
 import { createFrame, FrameType } from "../01．UI工具/index";
-import type { Frame } from "./05．对话框业务逻辑";
+import type { Frame } from "./02．对话框业务逻辑";
 
 // ── pcall 槽位：具名函数体 + 模块变量，禁止 (pcall as any)(匿名) ──
 let __pcallFrameA: number = 0;
@@ -49,7 +49,7 @@ import {
   dzShow,
   TAG_BASE_MAIN,
   TAG_BASE_PORTRAIT,
-} from "./17．对话框渲染-Dz与状态";
+} from "./10．对话框渲染-Dz与状态";
 
 /** 由「任务回调与命中」模块在加载末尾注入，避免 createDialogFrames ↔ dialogPanelHitCallback 循环依赖 */
 let g_bindDialogPanelHitFrame: ((hitFrame: Frame) => void) | undefined;

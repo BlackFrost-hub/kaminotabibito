@@ -5,6 +5,8 @@ local ____exports = {}
 local ____00_FF0EYDWE_51FD_6570 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local getObjectProperty = ____00_FF0EYDWE_51FD_6570.getObjectProperty
 local ObjectType = ____00_FF0EYDWE_51FD_6570.ObjectType
+local ____01_FF0E_5BF9_8BDD_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.01．对话配置表")
+local DIALOG_NPC_CONFIGS = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868.DIALOG_NPC_CONFIGS
 local ____03_FF0ENPC_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.03．NPC配置表")
 local NPC_CONFIGS = ____03_FF0ENPC_914D_7F6E_8868.NPC_CONFIGS
 local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.02．任务配置表")
@@ -13,8 +15,23 @@ local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．�
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
-local ____14_FF0E_4EFB_52A1_5C55_793A_6587_6848 = require("系统.09．表现系统.02．对话框系统.14．任务展示文案")
-local resolveRewardDisplayText = ____14_FF0E_4EFB_52A1_5C55_793A_6587_6848.resolveRewardDisplayText
+local ____01_FF0EFourCC_8F6C_6362 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+local fourCCToString = ____01_FF0EFourCC_8F6C_6362.fourCCToString
+local jass = require("jass.common")
+function ____exports.resolveRewardDisplayText(self, quest)
+    if not quest then
+        return "无"
+    end
+    if quest.rewardDisplay and quest.rewardDisplay ~= "" then
+        return quest.rewardDisplay
+    end
+    local ____type = quest.type or ""
+    local reward = quest.reward or ""
+    if ____type == "给予" and (string.find(reward, ":", nil, true) or 0) - 1 >= 0 then
+        return "给予未知奖励"
+    end
+    return reward ~= "" and reward or "无"
+end
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1
 end
@@ -27,14 +44,14 @@ function ____exports.ensureQuestConfigsRegistered(self)
     for ____, cfg in ipairs(QUEST_CONFIGS) do
         do
             if cfg.enabled ~= true then
-                goto __continue5
+                goto __continue9
             end
             if not cfg.requireID then
-                goto __continue5
+                goto __continue9
             end
             local questId = tostring(cfg.requireID)
             if questDB:getQuest(questId) then
-                goto __continue5
+                goto __continue9
             end
             local iconPath = ""
             if cfg.startNpc then
@@ -61,7 +78,7 @@ function ____exports.ensureQuestConfigsRegistered(self)
                 rewards = {{
                     type = "gold",
                     value = 0,
-                    description = resolveRewardDisplayText(nil, cfg)
+                    description = ____exports.resolveRewardDisplayText(nil, cfg)
                 }},
                 status = QuestStatus.UNDISCOVERED,
                 startNpc = cfg.startNpc,
@@ -70,7 +87,7 @@ function ____exports.ensureQuestConfigsRegistered(self)
                 updatedAt = 0
             })
         end
-        ::__continue5::
+        ::__continue9::
     end
 end
 function ____exports.getQuestState(self, playerId, questId)
@@ -148,5 +165,66 @@ function ____exports.hasPlayerAcceptedQuest(self, playerId, questId)
 end
 function ____exports.hasPlayerCompletedQuest(self, playerId, questId)
     return ____exports.getQuestState(nil, playerId, questId) == 2
+end
+function ____exports.findQuestByNpc(self, npcName)
+    return __TS__ArrayFind(
+        QUEST_CONFIGS,
+        function(____, quest) return quest.enabled == true and quest.startNpc == npcName and quest.requireID end
+    )
+end
+function ____exports.resolveQuestEndNpc(self, quest)
+    local endNpc = quest.endNpc
+    if not endNpc or endNpc == "没有" then
+        return quest.startNpc or ""
+    end
+    return endNpc
+end
+function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId)
+    return __TS__ArrayFind(
+        QUEST_CONFIGS,
+        function(____, quest)
+            if quest.enabled ~= true then
+                return false
+            end
+            if not quest.requireID then
+                return false
+            end
+            local questId = tostring(quest.requireID)
+            if not ____exports.hasPlayerAcceptedQuest(nil, playerId, questId) then
+                return false
+            end
+            return ____exports.resolveQuestEndNpc(nil, quest) == npcName
+        end
+    )
+end
+function ____exports.findDialogConfig(self, npcName)
+    return __TS__ArrayFind(
+        DIALOG_NPC_CONFIGS,
+        function(____, config) return config.NPC == npcName end
+    )
+end
+function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
+    if not unit or not unitName then
+        return nil
+    end
+    local selectedUnitCode = fourCCToString(
+        nil,
+        jass.GetUnitTypeId(unit)
+    )
+    for ____, npc in ipairs(NPC_CONFIGS) do
+        do
+            if npc.enabled ~= true then
+                goto __continue48
+            end
+            if npc.unitcode and npc.unitcode ~= selectedUnitCode then
+                goto __continue48
+            end
+            if npc.NPCrequireName == unitName or npc.NpcNameID == unitName then
+                return npc
+            end
+        end
+        ::__continue48::
+    end
+    return nil
 end
 return ____exports

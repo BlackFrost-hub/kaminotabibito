@@ -15,7 +15,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
 import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
 import { runNpcInitAction } from "./05．NPC初始化动作";
-import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/15．NPC头顶与气泡特效";
+import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/09．NPC头顶与气泡特效";
 
 // ── pcall 槽位：具名函数体 + 模块变量 ──
 let __pcallModelUnit: any = 0;

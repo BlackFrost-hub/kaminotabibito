@@ -1,44 +1,45 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local showContinueHint, runTypingTickForPlayer, typingTickCallbackP0, typingTickCallbackP1, typingTickCallbackP2, typingTickCallbackP3, startTyping, onTypingTick
+local showContinueHint, runTypingTickForPlayer, typingTickCallbackP0, typingTickCallbackP1, typingTickCallbackP2, typingTickCallbackP3, startTyping, onTypingTick, jass
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____index.Sound3DII_Mp3PlayReuse
-local ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001 = require("系统.09．表现系统.02．对话框系统.16．对话框同步状态")
-local resetActivePlayerIdIfMatch = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.resetActivePlayerIdIfMatch
-local setActivePlayerId = ____16_FF0E_5BF9_8BDD_6846_540C_6B65_72B6_6001.setActivePlayerId
-local ____02_FF0E_6253_5B57_673A_6548_679C = require("系统.09．表现系统.02．对话框系统.02．打字机效果")
-local STEP_LEN = ____02_FF0E_6253_5B57_673A_6548_679C.STEP_LEN
-local TICK = ____02_FF0E_6253_5B57_673A_6548_679C.TICK
-local nextTypingProgress = ____02_FF0E_6253_5B57_673A_6548_679C.nextTypingProgress
-local stringLengthCompat = ____02_FF0E_6253_5B57_673A_6548_679C.stringLengthCompat
-local substringCompat = ____02_FF0E_6253_5B57_673A_6548_679C.substringCompat
-local ____03_FF0E_5BF9_8BDD_6846_7ACB_7ED8_7CFB_7EDF = require("系统.09．表现系统.02．对话框系统.03．对话框立绘系统")
-local applyPortraitFrames = ____03_FF0E_5BF9_8BDD_6846_7ACB_7ED8_7CFB_7EDF.applyPortraitFrames
-local ____04_FF0E_4EFB_52A1_5BF9_8BDD_6846 = require("系统.09．表现系统.02．对话框系统.04．任务对话框")
-local resolveQuestButtonTexts = ____04_FF0E_4EFB_52A1_5BF9_8BDD_6846.resolveQuestButtonTexts
-local setQuestButtonTexts = ____04_FF0E_4EFB_52A1_5BF9_8BDD_6846.setQuestButtonTexts
-local showQuestButtons = ____04_FF0E_4EFB_52A1_5BF9_8BDD_6846.showQuestButtons
-local ____05_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91 = require("系统.09．表现系统.02．对话框系统.05．对话框业务逻辑")
-local onDialogFinished = ____05_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91.onDialogFinished
-local ____18_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27 = require("系统.09．表现系统.02．对话框系统.18．对话框渲染-创建帧")
-local createDialogFrames = ____18_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27.createDialogFrames
-local ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001 = require("系统.09．表现系统.02．对话框系统.17．对话框渲染-Dz与状态")
-local DEFAULT_FONT = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.DEFAULT_FONT
-local DIALOG_OPEN_SOUND = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.DIALOG_OPEN_SOUND
-local dzGetLocalPlayer = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzGetLocalPlayer
-local dzPlayer = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzPlayer
-local dzSetAlpha = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetAlpha
-local dzSetFont = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetFont
-local dzSetText = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetText
-local dzSetTexture = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetTexture
-local dzShow = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzShow
-local dzTimerCreate = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerCreate
-local dzTimerPause = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerPause
-local dzTimerStart = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerStart
-local dzLoadTocOnce = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzLoadTocOnce
-local g_questCallbacksByPlayer = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
-local g_states = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
-local syncQuestCallbacksTableFromQueueHead = ____17_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.syncQuestCallbacksTableFromQueueHead
+local ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001 = require("系统.09．表现系统.02．对话框系统.10．对话框渲染-Dz与状态")
+local resetActivePlayerIdIfMatch = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.resetActivePlayerIdIfMatch
+local setActivePlayerId = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.setActivePlayerId
+local ____01_FF0E_4EFB_52A1_5BF9_8BDD_6846 = require("系统.09．表现系统.02．对话框系统.01．任务对话框")
+local resolveQuestButtonTexts = ____01_FF0E_4EFB_52A1_5BF9_8BDD_6846.resolveQuestButtonTexts
+local setQuestButtonTexts = ____01_FF0E_4EFB_52A1_5BF9_8BDD_6846.setQuestButtonTexts
+local showQuestButtons = ____01_FF0E_4EFB_52A1_5BF9_8BDD_6846.showQuestButtons
+local ____02_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91 = require("系统.09．表现系统.02．对话框系统.02．对话框业务逻辑")
+local onDialogFinished = ____02_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91.onDialogFinished
+local ____11_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27 = require("系统.09．表现系统.02．对话框系统.11．对话框渲染-创建帧")
+local createDialogFrames = ____11_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_521B_5EFA_5E27.createDialogFrames
+local ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001 = require("系统.09．表现系统.02．对话框系统.10．对话框渲染-Dz与状态")
+local DEFAULT_FONT = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.DEFAULT_FONT
+local DIALOG_OPEN_SOUND = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.DIALOG_OPEN_SOUND
+local dzGetLocalPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzGetLocalPlayer
+local dzPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzPlayer
+local dzSetAlpha = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetAlpha
+local dzSetFont = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetFont
+local dzSetText = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetText
+local dzSetTexture = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetTexture
+local dzShow = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzShow
+local dzTimerCreate = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerCreate
+local dzTimerPause = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerPause
+local dzTimerStart = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerStart
+local dzLoadTocOnce = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzLoadTocOnce
+local g_questCallbacksByPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
+local g_states = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
+local syncQuestCallbacksTableFromQueueHead = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.syncQuestCallbacksTableFromQueueHead
+function ____exports.nextTypingProgress(self, current, step)
+    if step == nil then
+        step = ____exports.STEP_LEN
+    end
+    return current + step
+end
+function ____exports.substringCompat(self, text, start, ____end)
+    return jass.SubString(text, start, ____end)
+end
 function showContinueHint(self, state, visible)
     local localPlayer = dzGetLocalPlayer(nil)
     local targetPlayer = dzPlayer(nil, state.playerId)
@@ -68,46 +69,46 @@ function typingTickCallbackP3(self)
 end
 function startTyping(self, state)
     repeat
-        local ____switch40 = state.playerId
-        local ____cond40 = ____switch40 == 0
-        if ____cond40 then
+        local ____switch56 = state.playerId
+        local ____cond56 = ____switch56 == 0
+        if ____cond56 then
             dzTimerStart(
                 nil,
                 state.tickTimer,
-                TICK,
+                ____exports.TICK,
                 true,
                 typingTickCallbackP0
             )
             return
         end
-        ____cond40 = ____cond40 or ____switch40 == 1
-        if ____cond40 then
+        ____cond56 = ____cond56 or ____switch56 == 1
+        if ____cond56 then
             dzTimerStart(
                 nil,
                 state.tickTimer,
-                TICK,
+                ____exports.TICK,
                 true,
                 typingTickCallbackP1
             )
             return
         end
-        ____cond40 = ____cond40 or ____switch40 == 2
-        if ____cond40 then
+        ____cond56 = ____cond56 or ____switch56 == 2
+        if ____cond56 then
             dzTimerStart(
                 nil,
                 state.tickTimer,
-                TICK,
+                ____exports.TICK,
                 true,
                 typingTickCallbackP2
             )
             return
         end
-        ____cond40 = ____cond40 or ____switch40 == 3
-        if ____cond40 then
+        ____cond56 = ____cond56 or ____switch56 == 3
+        if ____cond56 then
             dzTimerStart(
                 nil,
                 state.tickTimer,
-                TICK,
+                ____exports.TICK,
                 true,
                 typingTickCallbackP3
             )
@@ -123,7 +124,7 @@ function onTypingTick(self, state)
         dzTimerPause(nil, state.tickTimer)
         return
     end
-    state.strNow = nextTypingProgress(nil, state.strNow, STEP_LEN)
+    state.strNow = ____exports.nextTypingProgress(nil, state.strNow, ____exports.STEP_LEN)
     state.clickCooldown = false
     local entry = state.queue[state.currentIndex + 1]
     if not entry then
@@ -152,8 +153,51 @@ function onTypingTick(self, state)
         dzSetText(
             nil,
             state.frames[4],
-            substringCompat(nil, entry.text, 0, state.strNow)
+            ____exports.substringCompat(nil, entry.text, 0, state.strNow)
         )
+    end
+end
+jass = require("jass.common")
+____exports.STEP_LEN = 2
+____exports.TICK = 0.03
+function ____exports.stringLengthCompat(self, text)
+    return jass.StringLength(text)
+end
+____exports.LEFT_PORTRAIT_INDEX = 101
+____exports.MID_PORTRAIT_INDEX = 102
+____exports.RIGHT_PORTRAIT_INDEX = 103
+function ____exports.applyPortraitFrames(self, entry, state, getLocalPlayer, getPlayerById, dzSetTexture, dzShow)
+    local frames = state.frames
+    local isLocalSlot = getLocalPlayer(nil) == getPlayerById(nil, state.playerId)
+    if entry.leftTex ~= "" then
+        dzSetTexture(nil, frames[____exports.LEFT_PORTRAIT_INDEX + 1], entry.leftTex)
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.LEFT_PORTRAIT_INDEX + 1], true)
+        end
+    else
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.LEFT_PORTRAIT_INDEX + 1], false)
+        end
+    end
+    if entry.midTex ~= "" then
+        dzSetTexture(nil, frames[____exports.MID_PORTRAIT_INDEX + 1], entry.midTex)
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.MID_PORTRAIT_INDEX + 1], true)
+        end
+    else
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.MID_PORTRAIT_INDEX + 1], false)
+        end
+    end
+    if entry.rightTex ~= "" then
+        dzSetTexture(nil, frames[____exports.RIGHT_PORTRAIT_INDEX + 1], entry.rightTex)
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.RIGHT_PORTRAIT_INDEX + 1], true)
+        end
+    else
+        if isLocalSlot then
+            dzShow(nil, frames[____exports.RIGHT_PORTRAIT_INDEX + 1], false)
+        end
     end
 end
 local g_bindQuestSyncHandlers
@@ -281,7 +325,7 @@ function ____exports.playEntry(self, state)
     dzSetFont(nil, state.frames[4], DEFAULT_FONT, entry.bodyFontSize)
     dzSetText(nil, state.frames[3], entry.title)
     dzSetText(nil, state.frames[4], "")
-    applyPortraitFrames(
+    ____exports.applyPortraitFrames(
         nil,
         entry,
         state,
@@ -291,7 +335,7 @@ function ____exports.playEntry(self, state)
         dzShow
     )
     state.strNow = 0
-    state.strLen = stringLengthCompat(nil, entry.text)
+    state.strLen = ____exports.stringLengthCompat(nil, entry.text)
     startTyping(nil, state)
 end
 function ____exports.skipTyping(self, state)

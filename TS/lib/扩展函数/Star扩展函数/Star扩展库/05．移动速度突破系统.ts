@@ -168,6 +168,12 @@ function doEvent(entry: SpeedEntry): void {
   const y = getUnitY(u);
   const f = getUnitFacing(u);
 
+  const tgtU = jass.GetOrderTargetUnit();
+  if (tgtU != null && tgtU !== 0) {
+    entry.tx = getUnitX(tgtU);
+    entry.ty = getUnitY(tgtU);
+  }
+
   const dx = entry.tx - x;
   const dy = entry.ty - y;
   const dist = X_GDBC(x, y, entry.tx, entry.ty);

@@ -1,10 +1,64 @@
 import { Sound3DII_Mp3PlayReuse } from "../../../lib/扩展函数/封装函数/02．音效系统/index";
-import { resetActivePlayerIdIfMatch, setActivePlayerId } from "./16．对话框同步状态";
-import { STEP_LEN, TICK, nextTypingProgress, stringLengthCompat, substringCompat } from "./02．打字机效果";
-import { applyPortraitFrames } from "./03．对话框立绘系统";
-import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "./04．任务对话框";
-import { DialogEntry, onDialogFinished, PlayerDialogState } from "./05．对话框业务逻辑";
-import { createDialogFrames } from "./18．对话框渲染-创建帧";
+import { resetActivePlayerIdIfMatch, setActivePlayerId } from "./10．对话框渲染-Dz与状态";
+import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "./01．任务对话框";
+import { DialogEntry, Frame, onDialogFinished, PlayerDialogState } from "./02．对话框业务逻辑";
+
+const jass = require("jass.common") as any;
+
+// ========== 虚拟分区：打字机步进长度与刷新间隔常量 ==========
+export const STEP_LEN = 2;
+export const TICK = 0.03;
+
+// ========== 虚拟分区：打字机逐字推进计算 ==========
+export function nextTypingProgress(current: number, step: number = STEP_LEN): number {
+  return current + step;
+}
+
+// ========== 虚拟分区：JASS 字符串截取/长度兼容封装 ==========
+export function substringCompat(text: string, start: number, end: number): string {
+  return jass.SubString(text, start, end) as string;
+}
+
+export function stringLengthCompat(text: string): number {
+  return jass.StringLength(text) as number;
+}
+
+// ========== 虚拟分区：立绘帧索引常量（左/中/右） ==========
+export const LEFT_PORTRAIT_INDEX = 101;
+export const MID_PORTRAIT_INDEX = 102;
+export const RIGHT_PORTRAIT_INDEX = 103;
+
+// ========== 虚拟分区：立绘帧显隐与贴图切换渲染 ==========
+export function applyPortraitFrames(
+  entry: DialogEntry,
+  state: PlayerDialogState,
+  getLocalPlayer: () => any,
+  getPlayerById: (id: number) => any,
+  dzSetTexture: (f: Frame, path: string) => void,
+  dzShow: (f: Frame, visible: boolean) => void,
+): void {
+  const frames = state.frames;
+  const isLocalSlot = getLocalPlayer() === getPlayerById(state.playerId);
+  if (entry.leftTex !== "") {
+    dzSetTexture(frames[LEFT_PORTRAIT_INDEX], entry.leftTex);
+    if (isLocalSlot) dzShow(frames[LEFT_PORTRAIT_INDEX], true);
+  } else {
+    if (isLocalSlot) dzShow(frames[LEFT_PORTRAIT_INDEX], false);
+  }
+  if (entry.midTex !== "") {
+    dzSetTexture(frames[MID_PORTRAIT_INDEX], entry.midTex);
+    if (isLocalSlot) dzShow(frames[MID_PORTRAIT_INDEX], true);
+  } else {
+    if (isLocalSlot) dzShow(frames[MID_PORTRAIT_INDEX], false);
+  }
+  if (entry.rightTex !== "") {
+    dzSetTexture(frames[RIGHT_PORTRAIT_INDEX], entry.rightTex);
+    if (isLocalSlot) dzShow(frames[RIGHT_PORTRAIT_INDEX], true);
+  } else {
+    if (isLocalSlot) dzShow(frames[RIGHT_PORTRAIT_INDEX], false);
+  }
+}
+import { createDialogFrames } from "./11．对话框渲染-创建帧";
 import {
   DEFAULT_FONT,
   DIALOG_OPEN_SOUND,
@@ -22,7 +76,7 @@ import {
   g_questCallbacksByPlayer,
   g_states,
   syncQuestCallbacksTableFromQueueHead,
-} from "./17．对话框渲染-Dz与状态";
+} from "./10．对话框渲染-Dz与状态";
 
 let g_bindQuestSyncHandlers: ((state: PlayerDialogState) => void) | undefined;
 export function setQuestSyncHandlersBinder(fn: (state: PlayerDialogState) => void): void {

@@ -14,13 +14,13 @@ import {
 import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import itemsData from "../../02．物品系统/01．装备数据";
 import { questDB } from "../../08．任务系统/01．任务数据";
-import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./13．任务奖励执行";
-import { showLocalHint } from "./06．常量与工具";
+import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./08．任务奖励执行";
+import { showLocalHint } from "./02．对话框业务逻辑";
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
-import { setQuestState } from "./07．任务状态";
-import { removeQuestMarkerAfterNpcTriggered } from "./15．NPC头顶与气泡特效";
+import { setQuestState } from "./03．任务状态";
+import { removeQuestMarkerAfterNpcTriggered } from "./09．NPC头顶与气泡特效";
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (delayMs: number, callback: () => void) => number;
 };
