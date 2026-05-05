@@ -237,7 +237,7 @@ local function startTimer(self)
     _registeredToCenterTimer = true
     local ____G_3 = _G
     local onTick10ms = ____G_3.onTick10ms
-    onTick10ms(nil, onMoveSpeedBreakTick)
+    onTick10ms(onMoveSpeedBreakTick)
 end
 local function stopTimer(self)
     isRunning = false

@@ -16,7 +16,7 @@ local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.0
 local calcReducedControlTime = ____require_result_2.calcReducedControlTime
 local ____require_result_3 = require("系统.05．Buff系统.01．控制抗性.03．控制重施放")
 local recastControlAbility = ____require_result_3.recastControlAbility
-local ____require_result_4 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local ____require_result_4 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellChannelListener = ____require_result_4.registerSpellChannelListener
 local ALLOWED_PLAYERS = {
     0,

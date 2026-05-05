@@ -1,4 +1,5 @@
 local ____lualib = require("lualib_bundle")
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
 local ____exports = {}
@@ -17,17 +18,28 @@ local ____require_result_2 = require("系统.03．技能系统.01．技能冷却
 local COOLDOWN_REDUCTION_CAP = ____require_result_2.COOLDOWN_REDUCTION_CAP
 local SKILL_COOLDOWN_CAPS = ____require_result_2.SKILL_COOLDOWN_CAPS
 local COOLDOWN_BLACKLIST = ____require_result_2.COOLDOWN_BLACKLIST
+local EXCLUDED_COOLDOWN_UNIT = ____require_result_2.EXCLUDED_COOLDOWN_UNIT
+local function _____63D0_53D6_5185_90E8ID(self, _____914D_7F6E_952E_540D)
+    local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
+    return _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868] or _____914D_7F6E_952E_540D
+end
 --- 检查技能是否在黑名单中
 function ____exports.isBlacklistedSkill(self, abilityId)
     return __TS__ArraySome(
         COOLDOWN_BLACKLIST,
-        function(____, id) return stringToFourCC(nil, id) == abilityId end
+        function(____, _____914D_7F6E_952E_540D) return stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D)
+        ) == abilityId end
     )
 end
 --- 检查单位是否为特殊单位（E001不参与冷却缩减）
 function ____exports.isExcludedUnit(self, unit)
     local unitTypeId = jass.GetUnitTypeId(unit)
-    return unitTypeId == stringToFourCC(nil, "E001")
+    return unitTypeId == stringToFourCC(
+        nil,
+        _____63D0_53D6_5185_90E8ID(nil, EXCLUDED_COOLDOWN_UNIT)
+    )
 end
 --- 获取冷却缩减属性
 function ____exports.getCooldownReduction(self, unit)
@@ -64,9 +76,12 @@ end
 -- @returns 冷却上限
 function ____exports.getCooldownCap(self, abilityId, hasBonus)
     for ____, ____value in ipairs(__TS__ObjectEntries(SKILL_COOLDOWN_CAPS)) do
-        local idStr = ____value[1]
+        local _____914D_7F6E_952E_540D = ____value[1]
         local cap = ____value[2]
-        if stringToFourCC(nil, idStr) == abilityId then
+        if stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D)
+        ) == abilityId then
             return cap
         end
     end
@@ -79,9 +94,12 @@ end
 --- 应用冷却缩减上限
 function ____exports.applyCooldownCap(self, reduction, abilityId, bonus)
     for ____, ____value in ipairs(__TS__ObjectEntries(SKILL_COOLDOWN_CAPS)) do
-        local idStr = ____value[1]
+        local _____914D_7F6E_952E_540D = ____value[1]
         local cap = ____value[2]
-        if stringToFourCC(nil, idStr) == abilityId then
+        if stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D)
+        ) == abilityId then
             return reduction < cap and reduction or cap
         end
     end

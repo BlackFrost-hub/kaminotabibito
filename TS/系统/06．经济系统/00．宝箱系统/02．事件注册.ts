@@ -13,7 +13,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
 
 const { onUnitTargetInteractable, isInteractable } = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心") as {

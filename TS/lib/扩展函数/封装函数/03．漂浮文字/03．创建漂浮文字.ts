@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 漂浮文字 - 创建漂浮文字
  */
@@ -5,7 +6,7 @@
 const jass = require("jass.common") as any;
 const { LeakWatcher } = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher: any };
 const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
-  RMaxBJ: (a: number, b: number) => number;
+  RMaxBJ: (this: void, a: number, b: number) => number;
 };
 import { floatTextQueue, ensureFloatTextRecycleTimer, RECYCLE_TICK } from "./01．回收机制";
 import { lastCreatedTextTag, FloatTextOptions } from "./02．类型定义";
@@ -19,6 +20,7 @@ import { lastCreatedTextTag, FloatTextOptions } from "./02．类型定义";
  * @returns 创建的漂浮文字句柄
  */
 export function CreateFloatText(
+  this: void,
   targetUnit: any | null,
   x: number,
   y: number,
@@ -76,6 +78,7 @@ export function CreateFloatText(
  * 创建漂浮文字（简化版，仅单位）
  */
 export function CreateFloatTextOnUnit(
+  this: void,
   unit: any,
   text: string,
   options?: Partial<FloatTextOptions>
@@ -90,6 +93,7 @@ export function CreateFloatTextOnUnit(
  * 创建漂浮文字（简化版，仅坐标）
  */
 export function CreateFloatTextAtPoint(
+  this: void,
   x: number,
   y: number,
   text: string,

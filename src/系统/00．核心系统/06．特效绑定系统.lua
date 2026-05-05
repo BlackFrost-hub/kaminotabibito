@@ -69,7 +69,7 @@ local function updateBoundEffects()
         ::__continue7::
     end
     if boundEffects.size == 0 and _isRegistered then
-        offTick10ms(nil, updateBoundEffects)
+        offTick10ms(updateBoundEffects)
         _isRegistered = false
     end
 end
@@ -78,7 +78,7 @@ local function ensureRegistered()
         return
     end
     _isRegistered = true
-    onTick10ms(nil, updateBoundEffects)
+    onTick10ms(updateBoundEffects)
 end
 --- 创建绑定到单位的特效
 -- 
@@ -180,7 +180,7 @@ function ____exports.clearAllBoundEffects()
     boundEffects:clear()
     unitToEffectMap:clear()
     if _isRegistered then
-        offTick10ms(nil, updateBoundEffects)
+        offTick10ms(updateBoundEffects)
         _isRegistered = false
     end
 end

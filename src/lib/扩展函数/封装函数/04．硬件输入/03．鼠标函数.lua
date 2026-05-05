@@ -43,7 +43,7 @@ end
 function ____exports.getScrollbarTrackThumbTravelPx(self, travelNorm)
     local ch = getClientHeight(nil)
     local clientH = ch > 0 and ch or (getWindowHeight(nil) or 600)
-    return RMaxBJ(nil, 1, clientH * travelNorm / 0.6)
+    return RMaxBJ(1, clientH * travelNorm / 0.6)
 end
 --- 全局鼠标键 ByCode 注册；与 `registerMouseWheel` 同一套 sync / 本地玩家契约。
 -- 

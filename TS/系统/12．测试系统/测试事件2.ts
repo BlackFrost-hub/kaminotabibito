@@ -6,16 +6,19 @@ const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通�
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3PlayReuse: (path: string, player?: any) => void;
 };
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-  CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
+const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
 };
+const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
+  | ((this: void, unit: any, text: string, options?: any) => any)
+  | undefined;
 
 /** 每条 +1000 各一条漂浮字；duration>0 入队，到期 DestroyTextTag（排泄） */
 const GOLD_FLOAT_DURATION_SEC = 1.25;
 
 function spawnGoldFloatPlus1000(): void {
   const u = g.gg_unit_Hamg_0002;
-  if (u == null) return;
+  if (u == null || typeof CreateFloatTextOnUnit !== "function") return;
   CreateFloatTextOnUnit(u, "+1000", {
     size: 12,
     red: GOLD_R,

@@ -7,7 +7,7 @@
 
 const jass = require("jass.common") as any;
 const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  round: (value: number) => number;
+  round: (this: void, value: number) => number;
 };
 
 // 导入常量

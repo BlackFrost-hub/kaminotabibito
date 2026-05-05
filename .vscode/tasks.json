@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open StarWE",
+      "type": "process",
+      "command": "D:\\StarWE v1.32fix1\\WorldEdit.exe",
+      "options": {
+        "cwd": "D:\\StarWE v1.32fix1"
+      },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

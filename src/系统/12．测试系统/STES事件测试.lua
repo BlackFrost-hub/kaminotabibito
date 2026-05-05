@@ -49,8 +49,8 @@ local function tryRegisterLuaListenerForJassStes()
                     local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
                     local b = type(from5) == "number" and from5 or 0
                     local quad = (b * b + 13 * b + 42) / (b + 1.0001)
-                    local root = jass.SquareRoot(max(nil, 0, b + 16)) * 2.25
-                    local ret = quad + root - min(nil, b, 5) * 0.5 + 3.14159
+                    local root = jass.SquareRoot(max(0, b + 16)) * 2.25
+                    local ret = quad + root - min(b, 5) * 0.5 + 3.14159
                     YDLocal7Set(nil, "real", YD_LOCAL_REAL_KEY, ret)
                     log((((((("[STES事件测试-Lua] YDLocal5Get(real,\"" .. YD_LOCAL_REAL_KEY) .. "\")=") .. tostring(b)) .. " → YDLocal7Set 写回 real,\"") .. YD_LOCAL_REAL_KEY) .. "\"=") .. tostring(ret))
                 end)

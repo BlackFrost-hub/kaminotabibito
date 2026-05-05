@@ -1,7 +1,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { PercentTo255 } = require("lib.扩展函数.BJ函数.12．数学函数") as {
-  PercentTo255: (percentage: number) => number;
+  PercentTo255: (this: void, percentage: number) => number;
 };
 
 // ===========================================================================

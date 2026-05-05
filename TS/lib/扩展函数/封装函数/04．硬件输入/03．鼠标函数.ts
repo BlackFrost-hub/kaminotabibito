@@ -8,7 +8,7 @@
 
 const japi = require("jass.japi") as any;
 const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
-  RMaxBJ: (a: number, b: number) => number;
+  RMaxBJ: (this: void, a: number, b: number) => number;
 };
 
 import { runFalseLocalRegistration } from "./02．内部工具";

@@ -30,7 +30,7 @@ function suppressPendingMoveAfterGroundStack(self, u)
         return
     end
     jass.IssueImmediateOrder(u, "stop")
-    centerTimer:addDelayedCallback(
+    centerTimer.addDelayedCallback(
         STOP_QUEUE_DEFER_MS,
         function()
             if u == nil or u == 0 then
@@ -156,7 +156,7 @@ function isItemInRange(self, unit, item, range)
     return dx * dx + dy * dy <= range * range
 end
 function schedulePickUpCheck(self, triggeringTrigger)
-    centerTimer:addDelayedCallback(
+    centerTimer.addDelayedCallback(
         PICKUP_RECHECK_DELAY_MS,
         function()
             if CheakPickUpForTrigger(nil, triggeringTrigger, true) then

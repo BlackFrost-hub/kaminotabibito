@@ -37,35 +37,35 @@ function getItemNameSafe(item)
 end
 function getItemChargesSafe(item)
     local n = jass.GetItemCharges(item)
-    local ____jass_R2I_8 = jass.R2I
-    local ____TS__Number_result_7 = __TS__Number(n)
-    if ____TS__Number_result_7 == nil then
-        ____TS__Number_result_7 = 0
+    local ____jass_R2I_7 = jass.R2I
+    local ____TS__Number_result_6 = __TS__Number(n)
+    if ____TS__Number_result_6 == nil then
+        ____TS__Number_result_6 = 0
     end
-    local v = ____jass_R2I_8(jass, ____TS__Number_result_7) or 0
-    local ____temp_9
+    local v = ____jass_R2I_7(jass, ____TS__Number_result_6) or 0
+    local ____temp_8
     if v > 0 then
-        ____temp_9 = v
+        ____temp_8 = v
     else
-        ____temp_9 = 1
+        ____temp_8 = 1
     end
-    return ____temp_9
+    return ____temp_8
 end
 function setItemChargesSafe(item, n)
     if not item then
         return
     end
     local v = jass.R2I(n) or 1
-    local ____self_12 = jass
-    local ____self_12_SetItemCharges_13 = ____self_12.SetItemCharges
-    local ____item_11 = item
-    local ____temp_10
+    local ____self_11 = jass
+    local ____self_11_SetItemCharges_12 = ____self_11.SetItemCharges
+    local ____item_10 = item
+    local ____temp_9
     if v > 0 then
-        ____temp_10 = v
+        ____temp_9 = v
     else
-        ____temp_10 = 1
+        ____temp_9 = 1
     end
-    ____self_12_SetItemCharges_13(____self_12, ____item_11, ____temp_10)
+    ____self_11_SetItemCharges_12(____self_11, ____item_10, ____temp_9)
 end
 function getUnitXY(u)
     local x = jass.GetUnitX(u)
@@ -73,30 +73,27 @@ function getUnitXY(u)
     return {x = x, y = y}
 end
 function floatBurnText(campfire, itemName)
+    if type(CreateFloatTextAtPoint) ~= "function" then
+        return
+    end
+    local ____getUnitXY_result_13 = getUnitXY(campfire)
+    local x = ____getUnitXY_result_13.x
+    local y = ____getUnitXY_result_13.y
+    CreateFloatTextAtPoint(x, y, itemName .. "被烤焦了！", {
+        red = 255,
+        green = 0,
+        blue = 0,
+        alpha = 0,
+        duration = 3,
+        speedY = 0.07,
+        size = 10,
+        height = 50
+    })
+end
+function playFinishEffect(campfire)
     local ____getUnitXY_result_14 = getUnitXY(campfire)
     local x = ____getUnitXY_result_14.x
     local y = ____getUnitXY_result_14.y
-    CreateFloatTextAtPoint(
-        nil,
-        x,
-        y,
-        itemName .. "被烤焦了！",
-        {
-            red = 255,
-            green = 0,
-            blue = 0,
-            alpha = 0,
-            duration = 3,
-            speedY = 0.07,
-            size = 10,
-            height = 50
-        }
-    )
-end
-function playFinishEffect(campfire)
-    local ____getUnitXY_result_15 = getUnitXY(campfire)
-    local x = ____getUnitXY_result_15.x
-    local y = ____getUnitXY_result_15.y
     createTimedEffect(
         nil,
         EFFECT_FIREBOMB,
@@ -151,9 +148,9 @@ function pickResult(results)
     return results[#results]
 end
 function createItemAtCampfire(campfire, itemId)
-    local ____getUnitXY_result_19 = getUnitXY(campfire)
-    local x = ____getUnitXY_result_19.x
-    local y = ____getUnitXY_result_19.y
+    local ____getUnitXY_result_18 = getUnitXY(campfire)
+    local x = ____getUnitXY_result_18.x
+    local y = ____getUnitXY_result_18.y
     local item = jass.CreateItem(itemId, x, y)
     if item then
         setLastCreatedItem(nil, item)
@@ -222,14 +219,14 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local withTimer = ____require_result_2.withTimer
 stopTimer = ____require_result_2.stopTimer
 createTimedEffect = ____require_result_2.createTimedEffect
-local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-CreateFloatTextAtPoint = ____require_result_3.CreateFloatTextAtPoint
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_4.stringToFourCC
-local ____require_result_5 = require("系统.02．物品系统.09．装备排泄")
-setLastCreatedItem = ____require_result_5.setLastCreatedItem
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_6.registerDeathListener
+local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+CreateFloatTextAtPoint = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextAtPoint
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_3.stringToFourCC
+local ____require_result_4 = require("系统.02．物品系统.09．装备排泄")
+setLastCreatedItem = ____require_result_4.setLastCreatedItem
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_5.registerDeathListener
 local CAMPFIRE_ID = 1747988547
 EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
 local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
@@ -298,13 +295,13 @@ local function fourCCToInt(id)
 end
 local function getRecipeForItem(item)
     local entry = getItemDataEntry(nil, item)
-    local ____temp_16
+    local ____temp_15
     if entry and entry.recipe then
-        ____temp_16 = entry.recipe
+        ____temp_15 = entry.recipe
     else
-        ____temp_16 = nil
+        ____temp_15 = nil
     end
-    local recipe = ____temp_16
+    local recipe = ____temp_15
     if not recipe then
         return nil
     end
@@ -353,20 +350,20 @@ local function getRecipeForItem(item)
             s = s:substring(pctIdx + 1):trim()
         end
         local starIdx = s:indexOf("*")
+        local ____temp_16
+        if starIdx >= 0 then
+            ____temp_16 = s:substring(0, starIdx)
+        else
+            ____temp_16 = s
+        end
+        local idPart = ____temp_16:trim()
         local ____temp_17
         if starIdx >= 0 then
-            ____temp_17 = s:substring(0, starIdx)
+            ____temp_17 = s:substring(starIdx + 1)
         else
-            ____temp_17 = s
+            ____temp_17 = ""
         end
-        local idPart = ____temp_17:trim()
-        local ____temp_18
-        if starIdx >= 0 then
-            ____temp_18 = s:substring(starIdx + 1)
-        else
-            ____temp_18 = ""
-        end
-        local qtyPart = ____temp_18:trim()
+        local qtyPart = ____temp_17:trim()
         local qty = jass.R2I(__TS__ParseFloat(qtyPart) or 1)
         local itemId = fourCCToInt(idPart)
         if itemId ~= 0 and qty > 0 then

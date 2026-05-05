@@ -36,9 +36,9 @@ const {
   OperatorResistReduction,
   createValueHolder,
 } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  OperatorRealMultiply: (value: number, addValue: { value: number }, multiplier: { value: number }) => void;
-  OperatorResistReduction: (resist: number, multiplier: { value: number }) => void;
-  createValueHolder: (initialValue: number) => { value: number };
+  OperatorRealMultiply: (this: void, value: number, addValue: { value: number }, multiplier: { value: number }) => void;
+  OperatorResistReduction: (this: void, resist: number, multiplier: { value: number }) => void;
+  createValueHolder: (this: void, initialValue: number) => { value: number };
 };
 
 //=============================================================================

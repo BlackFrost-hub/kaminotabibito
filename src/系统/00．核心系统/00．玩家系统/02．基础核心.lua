@@ -29,6 +29,6 @@ function ____exports.initPlayerUnitManager()
     if type(heroLinkage.initPlayerHeroGetBridge) == "function" then
         heroLinkage:initPlayerHeroGetBridge()
     end
-    onTick10ms(nil, onPlayerUnitManagerTick)
+    onTick10ms(onPlayerUnitManagerTick)
 end
 return ____exports

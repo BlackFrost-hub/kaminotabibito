@@ -18,7 +18,7 @@ local RMaxBJ = ____require_result_1.RMaxBJ
 -- @param y Y坐标（当targetUnit为null时使用）
 -- @param options 文字配置选项
 -- @returns 创建的漂浮文字句柄
-function ____exports.CreateFloatText(self, targetUnit, x, y, options)
+function ____exports.CreateFloatText(targetUnit, x, y, options)
     local ____options_2 = options
     local text = ____options_2.text
     local size = ____options_2.size
@@ -93,7 +93,6 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
         jass.SetTextTagLifespan(textTag, duration)
         jass.SetTextTagFadepoint(textTag, duration - 0.5)
         local ticks = RMaxBJ(
-            nil,
             1,
             jass.R2I(duration / RECYCLE_TICK + 0.999)
         )
@@ -104,9 +103,8 @@ function ____exports.CreateFloatText(self, targetUnit, x, y, options)
     return textTag
 end
 --- 创建漂浮文字（简化版，仅单位）
-function ____exports.CreateFloatTextOnUnit(self, unit, text, options)
+function ____exports.CreateFloatTextOnUnit(unit, text, options)
     return ____exports.CreateFloatText(
-        nil,
         unit,
         0,
         0,
@@ -114,9 +112,8 @@ function ____exports.CreateFloatTextOnUnit(self, unit, text, options)
     )
 end
 --- 创建漂浮文字（简化版，仅坐标）
-function ____exports.CreateFloatTextAtPoint(self, x, y, text, options)
+function ____exports.CreateFloatTextAtPoint(x, y, text, options)
     return ____exports.CreateFloatText(
-        nil,
         nil,
         x,
         y,

@@ -32,8 +32,8 @@ const {
 };
 
 const { onSecond, offSecond } = globalThis as unknown as {
-  onSecond: (callback: () => void) => void;
-  offSecond: (callback: () => void) => void;
+  onSecond: (this: void, callback: () => void) => void;
+  offSecond: (this: void, callback: () => void) => void;
 };
 
 // 导入核心治疗功能

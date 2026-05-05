@@ -178,7 +178,7 @@ function ____exports.formatNumber(self, value)
     if intValue == value then
         return tostring(intValue)
     end
-    local rounded = round(nil, value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER
+    local rounded = round(value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER
     local intRounded = jass.R2I(rounded)
     if intRounded == rounded then
         return tostring(intRounded)

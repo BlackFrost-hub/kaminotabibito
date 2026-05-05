@@ -293,7 +293,7 @@ local function applyGoldPct(unit, pct)
     end
     local stateGold = jass.ConvertPlayerState(1)
     local cur = jass.GetPlayerState(player, stateGold)
-    local delta = round(nil, cur * pct)
+    local delta = round(cur * pct)
     local newVal = cur + delta < 0 and 0 or cur + delta
     jass.SetPlayerState(player, stateGold, newVal)
 end
@@ -360,16 +360,16 @@ local function executeSegment(unit, seg)
             local cb
             cb = function()
                 if capturedUnit and jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
-                    offSecond(nil, cb)
+                    offSecond(cb)
                     return
                 end
                 applyGoldPct(capturedUnit, capturedPct)
                 remaining = remaining - 1
                 if remaining <= 0 then
-                    offSecond(nil, cb)
+                    offSecond(cb)
                 end
             end
-            onSecond(nil, cb)
+            onSecond(cb)
         end
     end
     if #goldFixed > 0 then

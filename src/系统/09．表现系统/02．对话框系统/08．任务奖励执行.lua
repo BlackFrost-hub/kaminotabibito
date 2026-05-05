@@ -123,7 +123,7 @@ local function resolveAmountExpr(self, expr, triggerPlayerId)
         local hero = ____player_1
         local level = hero and jass.GetHeroLevel(hero) or 1
         local a = 20000 - (level - 20) * 1000
-        return IMaxBJ(nil, a, 10000)
+        return IMaxBJ(a, 10000)
     end
     return readFirstNumber(nil, text)
 end

@@ -1,7 +1,7 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const { clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  clampRange: (value: number, minValue: number, maxValue: number) => number;
+  clampRange: (this: void, value: number, minValue: number, maxValue: number) => number;
 };
 
 import { QuestData, QuestType } from "../01．任务数据";
@@ -520,5 +520,4 @@ export function applyTaskUICategorySwitchVisibleState(ctx: TaskUIListControlCont
   pcall(pcallApplyTaskUICategorySwitchVisibleStateBody);
   pcallTaskUIListCtx = null;
 }
-
 

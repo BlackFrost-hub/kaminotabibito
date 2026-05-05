@@ -218,7 +218,7 @@ function ____exports.SU_DotBehindUnit(self, fac, x, y, a, b)
         a,
         b
     ) - fac
-    return CosBJ(nil, angle) <= -0.707106
+    return CosBJ(angle) <= -0.707106
 end
 function ____exports.SU_GetUnitOfUnit(self, u, tu)
     if not SUC_IsValidUnit(nil, u) or not SUC_IsValidUnit(nil, tu) then
@@ -236,7 +236,7 @@ function ____exports.SU_GetUnitOfUnit(self, u, tu)
         a,
         b
     ) - facing
-    local c = CosBJ(nil, angle)
+    local c = CosBJ(angle)
     if c >= 0.866025 then
         return 1
     end
@@ -267,7 +267,7 @@ function ____exports.SU_IsUnitInfrontUnit2(self, u, tu)
         a,
         b
     ) - facing
-    return CosBJ(nil, angle) > 0
+    return CosBJ(angle) > 0
 end
 function ____exports.SU_IsUnitInfrontUnit(self, u, tu)
     return ____exports.SU_GetUnitOfUnit(nil, u, tu) == 1

@@ -153,7 +153,7 @@ export function initSkillButtonHover(this: any): void {
   periodicInstalled = true;
 
   const { addPeriodicCallback } = globalThis as unknown as {
-    addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+    addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   };
   addPeriodicCallback(UPDATE_INTERVAL_MS, onPeriodicUpdate);
 }

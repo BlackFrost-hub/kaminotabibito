@@ -8,7 +8,7 @@ export * from "./02．特殊技能处理";
 
 const jass = require("jass.common") as any;
 
-const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
@@ -35,12 +35,17 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
   stringToFourCC: (s: string) => number;
 };
 
+function 提取内部ID(配置键名: string): string {
+  const 片段列表 = 配置键名.split("|");
+  return 片段列表[片段列表.length - 1] ?? 配置键名;
+}
+
 function onSpellEffectForCooldown(castingUnit: any, spellAbilityId: number): void {
   if (isBlacklistedSkill(spellAbilityId)) return;
   if (isExcludedUnit(castingUnit)) return;
 
-  for (const idStr of INDEPENDENT_COOLDOWN_SKILLS) {
-    if (stringToFourCC(idStr) === spellAbilityId) return;
+  for (const 配置键名 of INDEPENDENT_COOLDOWN_SKILLS) {
+    if (stringToFourCC(提取内部ID(配置键名)) === spellAbilityId) return;
   }
 
   const reduction = getCooldownReduction(castingUnit);

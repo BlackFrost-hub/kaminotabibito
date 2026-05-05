@@ -167,7 +167,7 @@ local function onEquipExtractTriggerAction()
     runEquipExtract()
 end
 local function scheduleRetry(fn)
-    createDelayedCall(nil, RETRY_SEC, fn)
+    createDelayedCall(RETRY_SEC, fn)
 end
 --- 反复 STES_GetTable + Register，直到 **JASS 全局表** 上该事件监听数 >= 1，或超出次数。
 -- 字面量事件名供 fix-lua-for-pack 10b 去掉多余 nil。

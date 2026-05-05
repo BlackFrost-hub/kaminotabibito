@@ -8,7 +8,7 @@
  */
 
 const { onTick10ms } = globalThis as unknown as {
-  onTick10ms: (callback: () => void) => void;
+  onTick10ms: (this: void, callback: () => void) => void;
 };
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("./00．常量");

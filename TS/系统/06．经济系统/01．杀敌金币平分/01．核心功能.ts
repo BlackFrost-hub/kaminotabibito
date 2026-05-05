@@ -30,9 +30,12 @@ const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．�
   Sound3DII_Mp3PlayReuse: (path: string, player?: any) => void;
 };
 
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-  CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
+const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
 };
+const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
+  | ((this: void, unit: any, text: string, options?: any) => any)
+  | undefined;
 
 const { getUnitOwnerId } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   getUnitOwnerId: (unit: any) => number;
@@ -138,14 +141,16 @@ function giveGoldToPlayer(this: void, unit: any, player: any, baseGold: number, 
 
   // 显示漂浮文字
   const text = "+" + finalGold;
-  CreateFloatTextOnUnit(unit, text, {
-    size: 12,
-    red: GOLD_R,
-    green: GOLD_G,
-    blue: GOLD_B,
-    alpha: 0,
-    duration: GOLD_FLOAT_DURATION_SEC,
-  });
+  if (typeof CreateFloatTextOnUnit === "function") {
+    CreateFloatTextOnUnit(unit, text, {
+      size: 12,
+      red: GOLD_R,
+      green: GOLD_G,
+      blue: GOLD_B,
+      alpha: 0,
+      duration: GOLD_FLOAT_DURATION_SEC,
+    });
+  }
 }
 
 // ==========================================================================================

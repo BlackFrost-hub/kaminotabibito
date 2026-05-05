@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 联机安全 Map 遍历工具
  * Lua pairs 遍历顺序不确定，跨客户端可能不一致导致 desync。

@@ -7,16 +7,16 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local AdjustPlayerStateBJ = ____require_result_0.AdjustPlayerStateBJ
 local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____require_result_1.Sound3DII_Mp3PlayReuse
-local ____require_result_2 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-local CreateFloatTextOnUnit = ____require_result_2.CreateFloatTextOnUnit
+local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
 --- 每条 +1000 各一条漂浮字；duration>0 入队，到期 DestroyTextTag（排泄）
 local GOLD_FLOAT_DURATION_SEC = 1.25
 local function spawnGoldFloatPlus1000(self)
     local u = g.gg_unit_Hamg_0002
-    if u == nil then
+    if u == nil or type(CreateFloatTextOnUnit) ~= "function" then
         return
     end
-    CreateFloatTextOnUnit(nil, u, "+1000", {
+    CreateFloatTextOnUnit(u, "+1000", {
         size = 12,
         red = GOLD_R,
         green = GOLD_G,

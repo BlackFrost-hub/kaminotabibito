@@ -1,31 +1,41 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 通用冷却缩减上限
--- 玩家的「冷却缩减」属性上限
--- 默认：0.33（33%）
--- 修改示例：改为0.40表示40%上限
--- 
--- 注意：可通过「冷却缩减加成」属性突破此上限
 ____exports.COOLDOWN_REDUCTION_CAP = 0.33
 --- 技能独立冷却上限配置
--- 
--- key: 技能ID（字符串形式，如 'A0IM'）
--- value: 冷却上限
-____exports.SKILL_COOLDOWN_CAPS = {A0IM = 0.25, A0IP = 0.2, A0DG = 0.33}
---- 完全排除的技能ID（不参与冷却缩减）
+-- key: 游戏中显示名|内部技能ID
+____exports.SKILL_COOLDOWN_CAPS = {["|cffff99cc切换|r（Y）|A0IM"] = 0.25, ["极限复苏|A0IP"] = 0.2, ["Saber魔力放出（C）|A0DG"] = 0.33}
+--- 完全排除的技能
+-- 元素格式：游戏中显示名|内部技能ID
 ____exports.COOLDOWN_BLACKLIST = {
-    "A0FW",
-    "A01W",
-    "A0IN",
-    "A0IO",
-    "A0J8",
-    "A0K5",
-    "A0JP",
-    "A0J3",
-    "A0K6",
-    "A0KR",
-    "0005"
+    "YakumoYukari网两“八云紫的神隐”（E）|A0FW",
+    "YY-神之力（R）|A01W",
+    "闪烁|A0IN",
+    "迅捷|A0IO",
+    "天赋技-守护屏障|A0J8",
+    "天赋技-吸魔权杖|A0K5",
+    "天赋技-调查|A0JP",
+    "天赋技-剑骑士|A0J3",
+    "天赋技-旅行商人|A0K6",
+    "A-蕾米莉亚-恶魔突袭（V）|A0KR",
+    "A蕾米莉亚-绯色命运/千年吸血鬼（F）|0005"
 }
---- 独立设置冷却的技能（在各自技能触发中处理）
-____exports.INDEPENDENT_COOLDOWN_SKILLS = {"A0EA", "A0DB", "A0DG"}
+--- 独立设置冷却的技能
+-- 元素格式：游戏中显示名|内部技能ID
+____exports.INDEPENDENT_COOLDOWN_SKILLS = {"Sakaiyuuji-Grammatica（语法）（C）|A0EA", "Saber风王结界（V）|A0DB", "Saber魔力放出（C）|A0DG"}
+--- 不参与冷却缩减的特殊单位
+-- 格式：游戏中显示名|内部单位ID
+____exports.EXCLUDED_COOLDOWN_UNIT = "完美潇洒的女仆|E001"
+--- 风暴之刃系列技能
+____exports.STORM_BLADE_SKILLS = {"普里姆萝洁-孔雀之舞（E）|A0JJ", "普里姆萝洁-狮子之舞（W）|A0JI", "普里姆萝洁-土竜之舞（R）|A0JK"}
+--- 风暴之刃基础冷却
+____exports.STORM_BLADE_BASE_CD = 12
+--- 风暴之刃联动技能
+____exports.STORM_BLADE_LINKED_ABILITY = "普里姆萝洁-舞蹈集合（Q）|A0JH"
+--- 三连斩识别标记
+____exports.TRIPLE_SLASH_SKILL_MARKERS = {"塞拉斯-火焰魔法（W）|SLSQW", "塞拉斯-冰冻魔法（E）|SLSQE", "塞拉斯-雷击魔法（R）|SLSQR"}
+--- 三连斩基础冷却
+____exports.TRIPLE_SLASH_BASE_CD = 9
+--- 三连斩联动技能
+____exports.TRIPLE_SLASH_LINKED_ABILITY = "塞拉斯-魔法知识（Q）|A0JT"
 return ____exports

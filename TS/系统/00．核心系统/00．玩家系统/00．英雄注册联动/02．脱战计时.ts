@@ -26,13 +26,16 @@ const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害
   registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
 };
 const centerTimer = globalThis as unknown as {
-  addDelayedCallback: (delayMs: number, callback: () => void) => number;
-  removeDelayedCallback: (id: number) => void;
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
 };
 
 //=============================================================================
 // 一、常量配置
 //=============================================================================
+
+/** 脱战计时系统开关 */
+const OUT_OF_COMBAT_ENABLED = false;
 
 /** 脱战计时时间（秒） */
 const OUT_OF_COMBAT_TIME = 18.0;
@@ -187,6 +190,8 @@ let _initialized = false;
 export function initOutOfCombat(): void {
   if (_initialized) return;
   _initialized = true;
+
+  if (!OUT_OF_COMBAT_ENABLED) return;
 
   registerDamageCallback(onUnitDamaged);
 }

@@ -24,7 +24,7 @@ const jglobals = require("jass.globals") as any;
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
   registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
 };
-const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 

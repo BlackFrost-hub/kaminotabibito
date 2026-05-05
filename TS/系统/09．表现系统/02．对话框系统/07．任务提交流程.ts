@@ -22,7 +22,7 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 import { setQuestState } from "./03．任务状态";
 import { removeQuestMarkerAfterNpcTriggered } from "./09．NPC头顶与气泡特效";
 const { addDelayedCallback } = globalThis as unknown as {
-  addDelayedCallback: (delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
 
 // ========== 虚拟分区：提交工具（资源扣除/物品解析/条件匹配） ==========
@@ -355,4 +355,3 @@ export function handleQuestSubmit(params: {
 }
 
 export {};
-

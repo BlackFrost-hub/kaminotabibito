@@ -146,12 +146,12 @@ function ____exports.GS_UnitSuspend(u, i, r)
     elseif i == 1 then
         ____exports.GS_Suspend(
             u,
-            RMaxBJ(nil, 0, currentRemain - r)
+            RMaxBJ(0, currentRemain - r)
         )
     elseif i == 2 then
         ____exports.GS_Suspend(
             u,
-            RMaxBJ(nil, currentRemain, r)
+            RMaxBJ(currentRemain, r)
         )
     end
 end

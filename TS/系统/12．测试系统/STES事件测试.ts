@@ -17,8 +17,8 @@ const ENABLED = false;
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { max, min } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-    max: (a: number, b: number) => number;
-    min: (a: number, b: number) => number;
+    max: (this: void, a: number, b: number) => number;
+    min: (this: void, a: number, b: number) => number;
 };
 /** 本图 JASS 里 YDLocal5Set/YDLocal1Get 使用的实数变量名字符串（须与触发器里完全一致） */
 const YD_LOCAL_REAL_KEY = "实数";

@@ -29,7 +29,7 @@ end
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
-local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
 lastItemAbilityContext = {
     abilityId = 0,

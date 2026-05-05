@@ -26,8 +26,7 @@ local EMPTY_ICON = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 local DAMAGE_ATTRS = {"造成伤害", "承受伤害", "治疗量"}
 local function maxNum3(a, b, c)
     return max(
-        nil,
-        max(nil, a, b),
+        max(a, b),
         c
     )
 end
@@ -135,8 +134,8 @@ function ____exports.updatePlayerRealtimeStats(player)
         ____temp_3 = oldMoveSpeed
     end
     local moveSpeed = ____temp_3
-    local apsQuant = round(nil, attacksPerSecond * 10000) / 10000
-    local moveQuant = round(nil, moveSpeed * 100) / 100
+    local apsQuant = round(attacksPerSecond * 10000) / 10000
+    local moveQuant = round(moveSpeed * 100) / 100
     if apsQuant > 0 then
         YDUserDataSet(
             nil,
@@ -179,16 +178,13 @@ function ____exports.getHeroIcon(hero)
     return EMPTY_ICON
 end
 function ____exports.formatInteger(value)
-    return tostring(round(
-        nil,
-        max(nil, 0, value)
-    ))
+    return tostring(round(max(0, value)))
 end
 function ____exports.formatPercent(value)
-    return tostring(round(nil, value * 100)) .. "%"
+    return tostring(round(value * 100)) .. "%"
 end
 function ____exports.formatRate(value)
-    return tostring(round(nil, value * 100) / 100)
+    return tostring(round(value * 100) / 100)
 end
 local function dualLine(leftColor, leftLabel, leftValue, rightColor, rightLabel, rightValue)
     if rightLabel == "" then

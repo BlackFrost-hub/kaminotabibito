@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * @file 系统/00．核心系统/05．中心计时器.ts
  * @module 中心计时器

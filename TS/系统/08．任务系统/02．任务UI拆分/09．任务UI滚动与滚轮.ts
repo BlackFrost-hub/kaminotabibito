@@ -1,8 +1,8 @@
 const japi = require("jass.japi") as any;
 const { round, clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  round: (value: number) => number;
-  clampMin: (value: number, minValue: number) => number;
-  clampRange: (value: number, minValue: number, maxValue: number) => number;
+  round: (this: void, value: number) => number;
+  clampMin: (this: void, value: number, minValue: number) => number;
+  clampRange: (this: void, value: number, minValue: number, maxValue: number) => number;
 };
 declare const print: ((msg: string) => void) | undefined;
 

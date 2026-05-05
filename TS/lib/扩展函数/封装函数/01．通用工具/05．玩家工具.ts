@@ -42,14 +42,19 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
     Sound3DII_Mp3Play: (path: string, player?: any) => any;
     Sound3DII_UnitPlay: (path: string, unit: any, cutoff: number, model?: any) => any;
   };
-  const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-    CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
+  const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+    CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
   };
+  const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
+    | ((this: void, unit: any, text: string, options?: any) => any)
+    | undefined;
 
   if (unit != null) {
     // 漂浮字：金色，显示 +N / -N
     const txt = delta > 0 ? "+" + tostring(delta) : tostring(delta);
-    CreateFloatTextOnUnit(unit, txt, { red: 255, green: 215, blue: 0, alpha: 0 });
+    if (typeof CreateFloatTextOnUnit === "function") {
+      CreateFloatTextOnUnit(unit, txt, { red: 255, green: 215, blue: 0, alpha: 0 });
+    }
     // 3D 音效：在单位附近，1500 裁断距离
     Sound3DII_UnitPlay(SOUND_GOLD, unit, 1500);
   } else {

@@ -3,7 +3,7 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => unknown;
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => unknown;
 };
 
 const { frameSetScriptByCode } = require("lib.扩展函数.封装函数.04．硬件输入.index") as {

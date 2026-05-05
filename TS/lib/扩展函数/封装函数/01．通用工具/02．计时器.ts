@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 计时器封装函数
  * 自动创建/销毁计时器
@@ -10,15 +11,15 @@
 
 const jass = require("jass.common") as any;
 const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
-  ceil: (value: number) => number;
+  ceil: (this: void, value: number) => number;
 };
 const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (this: void, timer: any) => void;
 };
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (delayMs: number, callback: () => void) => number;
-  removeDelayedCallback: (id: number) => void;
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
 };
 
 export interface DelayedCallHandle {

@@ -69,7 +69,7 @@ function onRefreshLoopTick()
     refreshAllUi()
 end
 function startRefreshLoop()
-    onTick10ms(nil, onRefreshLoopTick)
+    onTick10ms(onRefreshLoopTick)
 end
 --- UI属性系统总入口。
 function ____exports.initUiAttributeSystem()
@@ -80,7 +80,7 @@ function ____exports.initUiAttributeSystem()
         return
     end
     if startupTickHandler ~= nil then
-        offTick10ms(nil, startupTickHandler)
+        offTick10ms(startupTickHandler)
         startupTickHandler = nil
     end
     initialized = true
@@ -130,7 +130,7 @@ local function scheduleUiStartup()
     end
     startupScheduled = true
     startupTickHandler = onStartupTick
-    onTick10ms(nil, startupTickHandler)
+    onTick10ms(startupTickHandler)
 end
 function ____exports.isUiAttributeSystemEnabled()
     return _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED

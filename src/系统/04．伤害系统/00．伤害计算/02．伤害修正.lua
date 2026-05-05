@@ -90,27 +90,27 @@ end
 function ____exports.getPhysicalDamageModifier(self, attacker, target, isPlayer)
     local physDmg = getRealAttr(nil, attacker, "物理伤害", 0)
     local physResist = getRealAttrWithLimit(nil, target, "物理抗性", isPlayer)
-    local addDamage = createValueHolder(nil, 0)
-    local multiplier = createValueHolder(nil, 1 - physResist)
-    OperatorRealMultiply(nil, physDmg, addDamage, multiplier)
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1 - physResist)
+    OperatorRealMultiply(physDmg, addDamage, multiplier)
     return {addDamage = addDamage.value, multiplier = multiplier.value}
 end
 --- 获取技能伤害修正
 function ____exports.getSkillDamageModifier(self, attacker, target, isPlayer)
     local skillDmg = getRealAttr(nil, attacker, "技能伤害", 0)
     local skillResist = getRealAttr(nil, target, "技能抗性", 0)
-    local addDamage = createValueHolder(nil, 0)
-    local multiplier = createValueHolder(nil, 1 - skillResist)
-    OperatorRealMultiply(nil, skillDmg, addDamage, multiplier)
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1 - skillResist)
+    OperatorRealMultiply(skillDmg, addDamage, multiplier)
     return {addDamage = addDamage.value, multiplier = multiplier.value}
 end
 --- 获取普攻伤害修正
 function ____exports.getNormalAttackModifier(self, attacker, target, isPlayer)
     local atkDmg = getRealAttr(nil, attacker, "普攻伤害", 0)
     local atkResist = getRealAttr(nil, target, "普攻抗性", 0)
-    local addDamage = createValueHolder(nil, 0)
-    local multiplier = createValueHolder(nil, 1 - atkResist)
-    OperatorRealMultiply(nil, atkDmg, addDamage, multiplier)
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1 - atkResist)
+    OperatorRealMultiply(atkDmg, addDamage, multiplier)
     return {addDamage = addDamage.value, multiplier = multiplier.value}
 end
 --- 获取魔法伤害修正
@@ -158,9 +158,9 @@ function ____exports.getSummonDamageModifier(self, attacker, target, isPlayer)
     end
     local summonDmg = getRealAttr(nil, attacker, "召唤物伤害", 0)
     local summonResist = getRealAttr(nil, target, "召唤物抗性", 0)
-    local addDamage = createValueHolder(nil, 0)
-    local multiplier = createValueHolder(nil, 1 - summonResist)
-    OperatorRealMultiply(nil, summonDmg, addDamage, multiplier)
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1 - summonResist)
+    OperatorRealMultiply(summonDmg, addDamage, multiplier)
     return {addDamage = addDamage.value, multiplier = multiplier.value}
 end
 return ____exports

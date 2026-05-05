@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 吸血与吸魔系统
  *
@@ -26,9 +27,12 @@ const { STAT_LIMITS, ENEMY_STAT_LIMITS } = require("系统.04．伤害系统.00�
   STAT_LIMITS: Record<string, { max: number; min: number }>;
   ENEMY_STAT_LIMITS: Record<string, { max: number; min: number }>;
 };
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-  CreateFloatTextOnUnit: (unit: any, text: string, options: any) => any;
+const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options: any) => any;
 };
+const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
+  | ((this: void, unit: any, text: string, options: any) => any)
+  | undefined;
 const { isAncientUnit, formatNumber, forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isAncientUnit: (unit: any) => boolean;
   formatNumber: (num: number) => string;
@@ -340,7 +344,8 @@ const MANA_STEAL_TEXT_COLOR = { red: 0, green: 150, blue: 255, alpha: 0 };
 /**
  * 显示吸血漂浮文字
  */
-function showLifeStealText(unit: any, heal: number): void {
+function showLifeStealText(this: void, unit: any, heal: number): void {
+  if (typeof CreateFloatTextOnUnit !== "function") return;
   const text = "+" + formatNumber(heal);
   CreateFloatTextOnUnit(unit, text, {
     size: 10,
@@ -357,7 +362,8 @@ function showLifeStealText(unit: any, heal: number): void {
 /**
  * 显示吸魔漂浮文字
  */
-function showManaStealText(unit: any, mana: number): void {
+function showManaStealText(this: void, unit: any, mana: number): void {
+  if (typeof CreateFloatTextOnUnit !== "function") return;
   const text = "+" + formatNumber(mana);
   CreateFloatTextOnUnit(unit, text, {
     size: 10,

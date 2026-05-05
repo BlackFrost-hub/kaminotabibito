@@ -14,7 +14,7 @@ local ____exports = {}
 -- 1. 治疗命令ID列表可根据需要扩展
 -- 2. 直接调用 doHeal，不需要手动触发STES事件
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellChannelListener = ____require_result_0.registerSpellChannelListener
 local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetSpellAbilityId = ____require_result_1.GetSpellAbilityId

@@ -46,6 +46,6 @@ function ____exports.ensureFloatTextRecycleTimer()
     _registeredToCenterTimer = true
     local ____G_1 = _G
     local onTick10ms = ____G_1.onTick10ms
-    onTick10ms(nil, onFloatTextRecycleTick)
+    onTick10ms(onFloatTextRecycleTick)
 end
 return ____exports

@@ -309,7 +309,6 @@ function ____exports.handleQuestSubmit(self, params)
             local completeRaw = pickNpcCompleteTextByBranch(nil, quest.NpcCompleteText, rewardBranchIndex)
             local completeLines = parseDialogText(nil, completeRaw, npcName, heroName)
             addDelayedCallback(
-                nil,
                 10,
                 function()
                     openDialog(

@@ -5,7 +5,10 @@
  */
 
 const jass = require("jass.common") as any;
-const { CosBJ, BJ_DEGTORAD } = require("lib.扩展函数.BJ函数.00．BJ全局兜底");
+const { CosBJ, BJ_DEGTORAD } = require("lib.扩展函数.BJ函数.00．BJ全局兜底") as {
+  CosBJ: (this: void, degrees: number) => number;
+  BJ_DEGTORAD: number;
+};
 
 import { SUC_IsValidUnit } from "./08．单位判定与筛选函数";
 

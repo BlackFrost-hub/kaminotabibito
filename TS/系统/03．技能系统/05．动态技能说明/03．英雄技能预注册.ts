@@ -92,13 +92,13 @@ function onPeriodicRefresh(): void {
 export function initHeroSkillPreregistration(): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
 
-  const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+  const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
     registerSpellEffectListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
   };
   registerSpellEffectListener(onSpellEffect);
 
   const { addPeriodicCallback } = globalThis as unknown as {
-    addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+    addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   };
   periodicCallbackId = addPeriodicCallback(2000, onPeriodicRefresh);
 }

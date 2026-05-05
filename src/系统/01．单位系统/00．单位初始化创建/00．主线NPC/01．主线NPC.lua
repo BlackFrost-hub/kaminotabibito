@@ -127,7 +127,7 @@ function ____exports.initMainStoryNPCsWithDelay(self, delaySec)
     if delaySec == nil then
         delaySec = 1
     end
-    createDelayedCall(nil, delaySec, ____exports.createMainStoryNPCs)
+    createDelayedCall(delaySec, ____exports.createMainStoryNPCs)
 end
 ____exports.default = {createMainStoryNPCs = ____exports.createMainStoryNPCs, initMainStoryNPCsWithDelay = ____exports.initMainStoryNPCsWithDelay}
 return ____exports

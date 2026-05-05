@@ -11,7 +11,7 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  ceil: (value: number) => number;
+  ceil: (this: void, value: number) => number;
 };
 const jglobals = require("jass.globals") as any;
 
@@ -364,7 +364,7 @@ export function YDWETimerDestroyEffect(duration: number, effect: any): void {
   if (!_effectRecycleRegistered) {
     _effectRecycleRegistered = true;
 const { onTick10ms } = globalThis as unknown as {
-      onTick10ms: (callback: () => void) => void;
+      onTick10ms: (this: void, callback: () => void) => void;
     };
     onTick10ms(_tickEffectRecycle);
   }

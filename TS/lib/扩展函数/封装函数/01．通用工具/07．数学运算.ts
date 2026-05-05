@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 数学运算工具函数
  * 加法/乘法叠加等通用计算
@@ -15,14 +16,17 @@ const jass = require("jass.common") as any;
  * @param multiplier 乘法叠加引用对象
  */
 export function OperatorRealMultiply(
-  value: number,
-  addValue: { value: number },
-  multiplier: { value: number }
+  value: number | undefined,
+  addValue: { value: number } | undefined,
+  multiplier: { value: number } | undefined
 ): void {
-  if (value >= 0) {
-    addValue.value += value;
+  const 安全值 = value ?? 0;
+  if (!addValue || typeof addValue.value !== "number") return;
+  if (!multiplier || typeof multiplier.value !== "number") return;
+  if (安全值 >= 0) {
+    addValue.value += 安全值;
   } else {
-    multiplier.value *= (1 + value);
+    multiplier.value *= (1 + 安全值);
   }
 }
 
@@ -33,53 +37,66 @@ export function OperatorRealMultiply(
  * @param multiplier 乘法叠加引用对象
  */
 export function OperatorResistReduction(
-  resist: number,
-  multiplier: { value: number }
+  resist: number | undefined,
+  multiplier: { value: number } | undefined
 ): void {
-  multiplier.value *= (1 - resist);
+  const 安全抗性 = resist ?? 0;
+  if (!multiplier || typeof multiplier.value !== "number") return;
+  multiplier.value *= (1 - 安全抗性);
 }
 
 /**
  * 创建可变数值容器
  * 用于传递引用
  */
-export function createValueHolder(initialValue: number = 0): { value: number } {
-  return { value: initialValue };
+export function createValueHolder(initialValue: number | undefined = 0): { value: number } {
+  return { value: initialValue ?? 0 };
 }
 
 /**
  * 四舍五入到最近整数。
  */
-export function round(value: number): number {
-  if (value >= 0) return jass.R2I(value + 0.5);
-  return -jass.R2I(-value + 0.5);
+export function round(value: number | undefined): number {
+  const 安全值 = value ?? 0;
+  if (安全值 >= 0) return jass.R2I(安全值 + 0.5);
+  return -jass.R2I(-安全值 + 0.5);
 }
 
 /**
  * 向上取整到整数。
  */
-export function ceil(value: number): number {
-  const truncated = jass.R2I(value);
-  if (value > 0 && truncated < value) return truncated + 1;
+export function ceil(value: number | undefined): number {
+  const 安全值 = value ?? 0;
+  const truncated = jass.R2I(安全值);
+  if (安全值 > 0 && truncated < 安全值) return truncated + 1;
   return truncated;
 }
 
-export function clampMin(value: number, minValue: number): number {
-  return value < minValue ? minValue : value;
+export function clampMin(value: number | undefined, minValue: number | undefined): number {
+  const 安全最小值 = minValue ?? 0;
+  const 安全值 = value ?? 安全最小值;
+  return 安全值 < 安全最小值 ? 安全最小值 : 安全值;
 }
 
-export function clampRange(value: number, minValue: number, maxValue: number): number {
-  if (value < minValue) return minValue;
-  if (value > maxValue) return maxValue;
-  return value;
+export function clampRange(value: number | undefined, minValue: number | undefined, maxValue: number | undefined): number {
+  const 安全最小值 = minValue ?? 0;
+  const 安全最大值 = maxValue ?? 安全最小值;
+  const 安全值 = value ?? 安全最小值;
+  if (安全值 < 安全最小值) return 安全最小值;
+  if (安全值 > 安全最大值) return 安全最大值;
+  return 安全值;
 }
 
-export function max(a: number, b: number): number {
-  return a >= b ? a : b;
+export function max(a: number | undefined, b: number | undefined): number {
+  const 安全A = a ?? 0;
+  const 安全B = b ?? 0;
+  return 安全A >= 安全B ? 安全A : 安全B;
 }
 
-export function min(a: number, b: number): number {
-  return a <= b ? a : b;
+export function min(a: number | undefined, b: number | undefined): number {
+  const 安全A = a ?? 0;
+  const 安全B = b ?? 0;
+  return 安全A <= 安全B ? 安全A : 安全B;
 }
 
 export {};

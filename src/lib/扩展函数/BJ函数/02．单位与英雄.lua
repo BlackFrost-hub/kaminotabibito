@@ -103,13 +103,6 @@ function ____exports.ModifyHeroStat(self, whichStat, whichHero, modifyMethod, va
         jass.SetHeroStat(whichHero, whichStat, value)
     end
 end
-function ____exports.SetUnitFacingToFaceUnitTimed(self, whichUnit, target, duration)
-    local angle = jglobals.bj_RADTODEG * jass.Atan2(
-        jass.GetUnitY(target) - jass.GetUnitY(whichUnit),
-        jass.GetUnitX(target) - jass.GetUnitX(whichUnit)
-    )
-    jass.SetUnitFacingTimed(whichUnit, angle, duration)
-end
 function ____exports.GetUnitManaPercentBJ(self, whichUnit)
     local maxMana = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA)
     if maxMana <= 0 then
@@ -121,7 +114,7 @@ function ____exports.SetUnitManaPercentBJ(self, whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_MANA,
-        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(nil, 0, percent) * 0.01
+        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01
     )
 end
 function ____exports.GetUnitLifePercentBJ(self, whichUnit)
@@ -135,7 +128,7 @@ function ____exports.SetUnitLifePercentBJ(self, whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_LIFE,
-        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(nil, 0, percent) * 0.01
+        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01
     )
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API）
@@ -151,7 +144,7 @@ function ____exports.SetUnitLifeBJ(self, whichUnit, value)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_LIFE,
-        RMaxBJ(nil, 0, value)
+        RMaxBJ(0, value)
     )
 end
 --- 对齐 Blizzard.j：`SetUnitState(MANA, RMaxBJ(0, value))`
@@ -159,7 +152,7 @@ function ____exports.SetUnitManaBJ(self, whichUnit, value)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_MANA,
-        RMaxBJ(nil, 0, value)
+        RMaxBJ(0, value)
     )
 end
 --- 设置英雄等级（可选择是否显示升级动画）

@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 do
     local ____export = require("系统.03．技能系统.01．技能冷却.00．冷却常量")
@@ -25,7 +26,7 @@ do
     end
 end
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
 local ____require_result_1 = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算")
 local isBlacklistedSkill = ____require_result_1.isBlacklistedSkill
@@ -42,6 +43,10 @@ local ____require_result_3 = require("系统.03．技能系统.01．技能冷却
 local INDEPENDENT_COOLDOWN_SKILLS = ____require_result_3.INDEPENDENT_COOLDOWN_SKILLS
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_4.stringToFourCC
+local function _____63D0_53D6_5185_90E8ID(self, _____914D_7F6E_952E_540D)
+    local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
+    return _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868] or _____914D_7F6E_952E_540D
+end
 local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
     if isBlacklistedSkill(nil, spellAbilityId) then
         return
@@ -49,8 +54,11 @@ local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
     if isExcludedUnit(nil, castingUnit) then
         return
     end
-    for ____, idStr in ipairs(INDEPENDENT_COOLDOWN_SKILLS) do
-        if stringToFourCC(nil, idStr) == spellAbilityId then
+    for ____, _____914D_7F6E_952E_540D in ipairs(INDEPENDENT_COOLDOWN_SKILLS) do
+        if stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D)
+        ) == spellAbilityId then
             return
         end
     end

@@ -115,12 +115,12 @@ function ____exports.initHeroSkillPreregistration(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
-    local ____require_result_1 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+    local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
     local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
     registerSpellEffectListener(nil, onSpellEffect)
     local ____G_2 = _G
     local addPeriodicCallback = ____G_2.addPeriodicCallback
-    periodicCallbackId = addPeriodicCallback(nil, 2000, onPeriodicRefresh)
+    periodicCallbackId = addPeriodicCallback(2000, onPeriodicRefresh)
 end
 function ____exports.onHeroRegisteredPreregistration(whichPlayer, whichHero)
     if not DYNAMIC_SKILL_TIP_ENABLED then

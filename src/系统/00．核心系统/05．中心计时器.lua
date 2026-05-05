@@ -78,31 +78,31 @@ local _timeCache = {
 local _secondCallbacks = {}
 local _tickCallbacks = {}
 --- 当前逻辑毫秒（与 getServerTime 一致）
-local function nowMs(self)
+local function nowMs()
     return _serverTime + _millisCounter * 10
 end
-local function intFloor(self, value)
+local function intFloor(value)
     return jass.R2I(value)
 end
-local function maxNum(self, a, b)
+local function maxNum(a, b)
     return a > b and a or b
 end
-local function mathMod(self, dividend, divisor)
-    local m = dividend - intFloor(nil, dividend / divisor) * divisor
+local function mathMod(dividend, divisor)
+    local m = dividend - intFloor(dividend / divisor) * divisor
     if m < 0 then
         m = m + divisor
     end
     return m
 end
-local function isLeapYear(self, y)
+local function isLeapYear(y)
     return y % 4 == 0 and y % 100 ~= 0 or y % 400 == 0
 end
-local function getMonthDays(self, y, m)
-    return m == 2 and isLeapYear(nil, y) and 29 or NORMAL_MON_DAYS[m + 1]
+local function getMonthDays(y, m)
+    return m == 2 and isLeapYear(y) and 29 or NORMAL_MON_DAYS[m + 1]
 end
-local function updateDate(self, y, remainSec, dayBy2015)
+local function updateDate(y, remainSec, dayBy2015)
     local dayNum = remainSec / 86400
-    local totalDay = intFloor(nil, dayNum)
+    local totalDay = intFloor(dayNum)
     if dayNum - totalDay > 0 then
         totalDay = totalDay + 1
     end
@@ -114,26 +114,23 @@ local function updateDate(self, y, remainSec, dayBy2015)
     do
         local m = 1
         while m <= 12 do
-            local curMonDay = getMonthDays(nil, y, m)
+            local curMonDay = getMonthDays(y, m)
             if remainDay <= curMonDay then
                 _timeCache.year = y
                 _timeCache.month = m
                 _timeCache.day = remainDay
                 _timeCache.hour = mathMod(
-                    nil,
-                    intFloor(nil, remainSec / 3600),
+                    intFloor(remainSec / 3600),
                     24
                 )
                 _timeCache.minute = mathMod(
-                    nil,
-                    intFloor(nil, remainSec / 60),
+                    intFloor(remainSec / 60),
                     60
                 )
-                _timeCache.second = mathMod(nil, remainSec, 60)
+                _timeCache.second = mathMod(remainSec, 60)
                 _timeCache.millisecond = _millisCounter * 10
                 _timeCache.weekday = mathMod(
-                    nil,
-                    mathMod(nil, dayBy2015, 7) + 4,
+                    mathMod(dayBy2015, 7) + 4,
                     7
                 )
                 return
@@ -143,14 +140,14 @@ local function updateDate(self, y, remainSec, dayBy2015)
         end
     end
 end
-local function calcDate(self, now)
+local function calcDate(now)
     local remain = now - BASE_TIMESTAMP + TIMEZONE_OFFSET
     local y = 2016
     local dayBy2015 = 0
     while y <= 3000 do
         local baseRemain = remain
         local baseDayBy2015 = dayBy2015
-        if isLeapYear(nil, y) then
+        if isLeapYear(y) then
             remain = remain - 31622400
             dayBy2015 = dayBy2015 + 366
         else
@@ -158,7 +155,7 @@ local function calcDate(self, now)
             dayBy2015 = dayBy2015 + 365
         end
         if remain < 0 then
-            updateDate(nil, y, baseRemain, baseDayBy2015)
+            updateDate(y, baseRemain, baseDayBy2015)
             return
         end
         y = y + 1
@@ -174,20 +171,20 @@ local TIME_GET_KEYS = {
     "weekday",
     "millisecond"
 }
-local function removeFnFromArray(self, arr, fn)
+local function removeFnFromArray(arr, fn)
     local i = __TS__ArrayIndexOf(arr, fn)
     if i > -1 then
         __TS__ArraySplice(arr, i, 1)
     end
 end
-local function pad2(self, n)
+local function pad2(n)
     return __TS__StringPadStart(
         tostring(n),
         2,
         "0"
     )
 end
-local function pad3(self, n)
+local function pad3(n)
     return __TS__StringPadStart(
         tostring(n),
         3,
@@ -198,8 +195,8 @@ local _periodicCallbackIdCounter = 0
 local _periodicCallbacks = {}
 local _delayedCallbackIdCounter = 0
 local _delayedCallbacks = {}
-local function runPeriodicCallbacks(self)
-    local now = nowMs(nil)
+local function runPeriodicCallbacks()
+    local now = nowMs()
     for ____, p in ipairs(_periodicCallbacks) do
         if now - p.lastRunTime >= p.intervalMs then
             p.lastRunTime = now
@@ -207,8 +204,8 @@ local function runPeriodicCallbacks(self)
         end
     end
 end
-local function runDelayedCallbacks(self)
-    local now = nowMs(nil)
+local function runDelayedCallbacks()
+    local now = nowMs()
     local writeIndex = 0
     do
         local i = 0
@@ -238,23 +235,23 @@ local function runDelayedCallbacks(self)
         end
     end
 end
-local function onTick(self)
+local function onTick()
     _millisCounter = _millisCounter + 1
     _gameElapsedTime = _gameElapsedTime + 0.01
     if jassGlobals.udg_Elapsed ~= nil then
         jassGlobals.udg_Elapsed = _gameElapsedTime
     end
     for ____, cb in ipairs(_tickCallbacks) do
-        cb(nil)
+        cb()
     end
-    runPeriodicCallbacks(nil)
-    runDelayedCallbacks(nil)
+    runPeriodicCallbacks()
+    runDelayedCallbacks()
     if _millisCounter < 100 then
         return
     end
     _millisCounter = 0
     _serverTime = _serverTime + 1000
-    calcDate(nil, _serverTime / 1000)
+    calcDate(_serverTime / 1000)
     _gameTimeHMS[1] = _gameTimeHMS[1] + 1
     if _gameTimeHMS[1] >= 60 then
         _gameTimeHMS[1] = 0
@@ -271,54 +268,54 @@ local function onTick(self)
         jt[2] = _gameTimeHMS[3]
     end
     for ____, cb in ipairs(_secondCallbacks) do
-        cb(nil)
+        cb()
     end
 end
-function ____exports.getServerTime(self)
-    return nowMs(nil)
+function ____exports.getServerTime()
+    return nowMs()
 end
-function ____exports.getTime(self, i)
+function ____exports.getTime(i)
     if i < 0 or i > 7 then
         return 0
     end
     return _timeCache[TIME_GET_KEYS[i + 1]]
 end
-function ____exports.getGameTime(self)
-    return nowMs(nil) - (_initialized and _serverTime or 0)
+function ____exports.getGameTime()
+    return nowMs() - (_initialized and _serverTime or 0)
 end
-function ____exports.getGameElapsedTime(self)
+function ____exports.getGameElapsedTime()
     return _gameElapsedTime
 end
-function ____exports.getGameTimeHMS(self)
+function ____exports.getGameTimeHMS()
     return {_gameTimeHMS[1], _gameTimeHMS[2], _gameTimeHMS[3]}
 end
-function ____exports.getGameTimeFormatted(self)
-    local totalMs = nowMs(nil)
-    local totalSec = intFloor(nil, totalMs / 1000)
+function ____exports.getGameTimeFormatted()
+    local totalMs = nowMs()
+    local totalSec = intFloor(totalMs / 1000)
     return {
-        hours = intFloor(nil, totalSec / 3600),
-        minutes = intFloor(nil, totalSec % 3600 / 60),
-        seconds = intFloor(nil, totalSec % 60),
+        hours = intFloor(totalSec / 3600),
+        minutes = intFloor(totalSec % 3600 / 60),
+        seconds = intFloor(totalSec % 60),
         milliseconds = totalMs % 1000,
         totalMs = totalMs
     }
 end
-function ____exports.getGameTimeString(self)
-    local ____exports_getGameTimeFormatted_result_0 = ____exports.getGameTimeFormatted(nil)
+function ____exports.getGameTimeString()
+    local ____exports_getGameTimeFormatted_result_0 = ____exports.getGameTimeFormatted()
     local hours = ____exports_getGameTimeFormatted_result_0.hours
     local minutes = ____exports_getGameTimeFormatted_result_0.minutes
     local seconds = ____exports_getGameTimeFormatted_result_0.seconds
     return ((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒"
 end
-function ____exports.getGameTimeStringWithMs(self)
-    local ____exports_getGameTimeFormatted_result_1 = ____exports.getGameTimeFormatted(nil)
+function ____exports.getGameTimeStringWithMs()
+    local ____exports_getGameTimeFormatted_result_1 = ____exports.getGameTimeFormatted()
     local hours = ____exports_getGameTimeFormatted_result_1.hours
     local minutes = ____exports_getGameTimeFormatted_result_1.minutes
     local seconds = ____exports_getGameTimeFormatted_result_1.seconds
     local milliseconds = ____exports_getGameTimeFormatted_result_1.milliseconds
     return ((((((tostring(hours) .. "小时") .. tostring(minutes)) .. "分") .. tostring(seconds)) .. "秒") .. tostring(milliseconds)) .. "毫秒"
 end
-function ____exports.getDateTimeString(self)
+function ____exports.getDateTimeString()
     local ____timeCache_2 = _timeCache
     local year = ____timeCache_2.year
     local month = ____timeCache_2.month
@@ -326,9 +323,9 @@ function ____exports.getDateTimeString(self)
     local hour = ____timeCache_2.hour
     local minute = ____timeCache_2.minute
     local second = ____timeCache_2.second
-    return (((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)
+    return (((((((((tostring(year) .. "-") .. pad2(month)) .. "-") .. pad2(day)) .. " ") .. pad2(hour)) .. ":") .. pad2(minute)) .. ":") .. pad2(second)
 end
-function ____exports.getDateTimeStringWithMs(self)
+function ____exports.getDateTimeStringWithMs()
     local ____timeCache_3 = _timeCache
     local year = ____timeCache_3.year
     local month = ____timeCache_3.month
@@ -337,26 +334,26 @@ function ____exports.getDateTimeStringWithMs(self)
     local minute = ____timeCache_3.minute
     local second = ____timeCache_3.second
     local millisecond = ____timeCache_3.millisecond
-    return (((((((((((tostring(year) .. "-") .. pad2(nil, month)) .. "-") .. pad2(nil, day)) .. " ") .. pad2(nil, hour)) .. ":") .. pad2(nil, minute)) .. ":") .. pad2(nil, second)) .. ".") .. pad3(nil, millisecond)
+    return (((((((((((tostring(year) .. "-") .. pad2(month)) .. "-") .. pad2(day)) .. " ") .. pad2(hour)) .. ":") .. pad2(minute)) .. ":") .. pad2(second)) .. ".") .. pad3(millisecond)
 end
-function ____exports.setGameDifficulty(self, difficulty)
+function ____exports.setGameDifficulty(difficulty)
     _gameDifficulty = difficulty
 end
-function ____exports.getGameDifficulty(self)
+function ____exports.getGameDifficulty()
     return _gameDifficulty
 end
-function ____exports.addPeriodicCallback(self, intervalMs, callback)
+function ____exports.addPeriodicCallback(intervalMs, callback)
     _periodicCallbackIdCounter = _periodicCallbackIdCounter + 1
     local id = _periodicCallbackIdCounter
     _periodicCallbacks[#_periodicCallbacks + 1] = {
         id = id,
         intervalMs = intervalMs,
-        lastRunTime = nowMs(nil),
+        lastRunTime = nowMs(),
         callback = callback
     }
     return id
 end
-function ____exports.removePeriodicCallback(self, id)
+function ____exports.removePeriodicCallback(id)
     local idx = __TS__ArrayFindIndex(
         _periodicCallbacks,
         function(____, c) return c.id == id end
@@ -365,42 +362,41 @@ function ____exports.removePeriodicCallback(self, id)
         __TS__ArraySplice(_periodicCallbacks, idx, 1)
     end
 end
-function ____exports.addDelayedCallback(self, delayMs, callback)
+function ____exports.addDelayedCallback(delayMs, callback)
     _delayedCallbackIdCounter = _delayedCallbackIdCounter + 1
     local id = _delayedCallbackIdCounter
     local safeDelay = maxNum(
-        nil,
         0,
-        intFloor(nil, delayMs)
+        intFloor(delayMs)
     )
     _delayedCallbacks[#_delayedCallbacks + 1] = {
         id = id,
-        dueTime = nowMs(nil) + safeDelay,
+        dueTime = nowMs() + safeDelay,
         active = true,
         callback = callback
     }
     return id
 end
-function ____exports.removeDelayedCallback(self, id)
+function ____exports.removeDelayedCallback(id)
     for ____, d in ipairs(_delayedCallbacks) do
         if d.id == id then
             d.active = false
         end
     end
 end
-function ____exports.onSecond(self, callback)
+function ____exports.onSecond(callback)
     _secondCallbacks[#_secondCallbacks + 1] = callback
 end
-function ____exports.onTick10ms(self, callback)
+function ____exports.onTick10ms(callback)
     _tickCallbacks[#_tickCallbacks + 1] = callback
 end
-function ____exports.offSecond(self, callback)
-    removeFnFromArray(nil, _secondCallbacks, callback)
+function ____exports.offSecond(callback)
+    removeFnFromArray(_secondCallbacks, callback)
 end
-function ____exports.offTick10ms(self, callback)
-    removeFnFromArray(nil, _tickCallbacks, callback)
+function ____exports.offTick10ms(callback)
+    removeFnFromArray(_tickCallbacks, callback)
 end
-function ____exports.initCenterTimer(self)
+function ____exports.initCenterTimer()
     if _initialized then
         return
     end
@@ -414,12 +410,11 @@ function ____exports.initCenterTimer(self)
     local dr = jassGlobals.udg_N
     if dr ~= nil then
         _gameDifficulty = maxNum(
-            nil,
             1,
-            intFloor(nil, dr)
+            intFloor(dr)
         )
     end
-    calcDate(nil, _serverTime / 1000)
+    calcDate(_serverTime / 1000)
     local timer = jass.CreateTimer()
     jass.TimerStart(timer, 0.01, true, onTick)
 end

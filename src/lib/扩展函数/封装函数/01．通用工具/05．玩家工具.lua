@@ -40,11 +40,13 @@ function ____exports.AddGoldWithFeedback(self, params)
     local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.index")
     local Sound3DII_Mp3Play = ____require_result_3.Sound3DII_Mp3Play
     local Sound3DII_UnitPlay = ____require_result_3.Sound3DII_UnitPlay
-    local ____require_result_4 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-    local CreateFloatTextOnUnit = ____require_result_4.CreateFloatTextOnUnit
+    local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+    local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
     if unit ~= nil then
         local txt = delta > 0 and "+" .. tostring(delta) or tostring(delta)
-        CreateFloatTextOnUnit(nil, unit, txt, {red = 255, green = 215, blue = 0, alpha = 0})
+        if type(CreateFloatTextOnUnit) == "function" then
+            CreateFloatTextOnUnit(unit, txt, {red = 255, green = 215, blue = 0, alpha = 0})
+        end
         Sound3DII_UnitPlay(nil, SOUND_GOLD, unit, 1500)
     else
         Sound3DII_Mp3Play(nil, SOUND_GOLD, p)
@@ -107,11 +109,11 @@ function ____exports.forEachPlayingPlayer(self, action, maxPlayers)
             do
                 local p = jass.Player(i)
                 if not p or p == 0 then
-                    goto __continue17
+                    goto __continue18
                 end
                 action(nil, p, i)
             end
-            ::__continue17::
+            ::__continue18::
             i = i + 1
         end
     end

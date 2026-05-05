@@ -233,7 +233,7 @@ function startTimer(): void {
 
   // 使用中心计时器的每10毫秒回调
 const { onTick10ms } = globalThis as unknown as {
-    onTick10ms: (callback: () => void) => void;
+    onTick10ms: (this: void, callback: () => void) => void;
   };
 
   onTick10ms(onMoveSpeedBreakTick);

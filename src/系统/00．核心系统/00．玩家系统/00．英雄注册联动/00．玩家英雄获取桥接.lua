@@ -194,7 +194,7 @@ local function runRegisterPlayerHeroTriggerAction()
 end
 --- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(fn)
-    createDelayedCall(nil, RETRY_SEC, fn)
+    createDelayedCall(RETRY_SEC, fn)
 end
 --- 向 JASS 侧 STES 表注册“玩家英雄注册”监听。
 local function tryRegisterPlayerHeroStes()

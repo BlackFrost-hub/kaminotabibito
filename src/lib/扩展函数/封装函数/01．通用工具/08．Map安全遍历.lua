@@ -6,7 +6,7 @@ local ____exports = {}
 --- 联机安全 Map 遍历工具
 -- Lua pairs 遍历顺序不确定，跨客户端可能不一致导致 desync。
 -- 安全做法：收集 keys → 排序 → 按序遍历。
-function ____exports.forEachSorted(self, map, callback)
+function ____exports.forEachSorted(map, callback)
     local keys = {}
     for ____, k in __TS__Iterator(map:keys()) do
         keys[#keys + 1] = k
@@ -34,7 +34,7 @@ function ____exports.forEachSorted(self, map, callback)
             local key = keys[i + 1]
             local value = map:get(key)
             if value ~= nil then
-                callback(nil, key, value)
+                callback(key, value)
             end
             i = i + 1
         end

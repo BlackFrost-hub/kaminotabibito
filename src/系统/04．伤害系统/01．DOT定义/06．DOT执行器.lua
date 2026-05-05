@@ -177,7 +177,7 @@ function ____exports.createDotExecutor(self, deps)
         _registeredToCenterTimer = true
         local ____G_2 = _G
         local onSecond = ____G_2.onSecond
-        onSecond(nil, dotTickRun)
+        onSecond(dotTickRun)
     end
     local function notifyDotTickBatchDamageDisplayed(self)
         if dotBatchDeferredRemaining <= 0 then

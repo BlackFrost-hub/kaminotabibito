@@ -151,7 +151,7 @@ export function createDotExecutor(deps: {
 
     // 走核心系统挂到 globalThis 的桥，避免 TSTL 把 require 对象字段函数编成少参调用
     const { onSecond } = globalThis as unknown as {
-      onSecond: (callback: () => void) => void;
+      onSecond: (this: void, callback: () => void) => void;
     };
     onSecond(dotTickRun);
   }

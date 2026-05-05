@@ -8,7 +8,7 @@ export * from "./02．特殊单位消耗";
 
 const jass = require("jass.common") as any;
 
-const { registerSpellEffectListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 

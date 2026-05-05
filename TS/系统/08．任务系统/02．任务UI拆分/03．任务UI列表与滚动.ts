@@ -1,7 +1,7 @@
 import { QuestData } from "../01．任务数据";
 const { clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  clampMin: (value: number, minValue: number) => number;
-  clampRange: (value: number, minValue: number, maxValue: number) => number;
+  clampMin: (this: void, value: number, minValue: number) => number;
+  clampRange: (this: void, value: number, minValue: number, maxValue: number) => number;
 };
 import {
   LIST_ITEM_H,
@@ -185,4 +185,3 @@ export function calcVisibleQuestRows(
   }
   return visibleRows;
 }
-

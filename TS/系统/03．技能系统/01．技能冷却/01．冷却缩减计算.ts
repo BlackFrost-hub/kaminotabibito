@@ -23,11 +23,18 @@ const {
   COOLDOWN_REDUCTION_CAP,
   SKILL_COOLDOWN_CAPS,
   COOLDOWN_BLACKLIST,
+  EXCLUDED_COOLDOWN_UNIT,
 } = require("系统.03．技能系统.01．技能冷却.00．冷却常量") as {
   COOLDOWN_REDUCTION_CAP: number;
   SKILL_COOLDOWN_CAPS: Record<string, number>;
   COOLDOWN_BLACKLIST: string[];
+  EXCLUDED_COOLDOWN_UNIT: string;
 };
+
+function 提取内部ID(配置键名: string): string {
+  const 片段列表 = 配置键名.split("|");
+  return 片段列表[片段列表.length - 1] ?? 配置键名;
+}
 
 //=============================================================================
 // 一、技能黑名单检测
@@ -37,7 +44,7 @@ const {
  * 检查技能是否在黑名单中
  */
 export function isBlacklistedSkill(abilityId: number): boolean {
-  return COOLDOWN_BLACKLIST.some(id => stringToFourCC(id) === abilityId);
+  return COOLDOWN_BLACKLIST.some(配置键名 => stringToFourCC(提取内部ID(配置键名)) === abilityId);
 }
 
 /**
@@ -45,7 +52,7 @@ export function isBlacklistedSkill(abilityId: number): boolean {
  */
 export function isExcludedUnit(unit: any): boolean {
   const unitTypeId = jass.GetUnitTypeId(unit);
-  return unitTypeId === stringToFourCC('E001');
+  return unitTypeId === stringToFourCC(提取内部ID(EXCLUDED_COOLDOWN_UNIT));
 }
 
 //=============================================================================
@@ -83,8 +90,8 @@ export function getCooldownReductionBonus(unit: any): number {
  */
 export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
   // 检查技能独立上限
-  for (const [idStr, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
-    if (stringToFourCC(idStr) === abilityId) {
+  for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
+    if (stringToFourCC(提取内部ID(配置键名)) === abilityId) {
       return cap;
     }
   }
@@ -107,8 +114,8 @@ export function applyCooldownCap(
   bonus: number
 ): number {
   // 检查技能独立上限
-  for (const [idStr, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
-    if (stringToFourCC(idStr) === abilityId) {
+  for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
+    if (stringToFourCC(提取内部ID(配置键名)) === abilityId) {
       return reduction < cap ? reduction : cap;
     }
   }

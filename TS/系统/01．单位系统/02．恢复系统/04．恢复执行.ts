@@ -235,7 +235,7 @@ function registerToCenterTimer(): void {
   _registered = true;
 
 const { onSecond } = globalThis as unknown as {
-    onSecond: (callback: () => void) => void;
+    onSecond: (this: void, callback: () => void) => void;
   };
 
   // 注册每秒回调

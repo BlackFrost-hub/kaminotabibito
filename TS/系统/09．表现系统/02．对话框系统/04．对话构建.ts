@@ -26,7 +26,7 @@ import { scheduleGrayQuestMarkerAfterBubbleFade, scheduleYellowQuestMarkerAfterB
 const { openNpcDialog } = UI函数;
 type NpcDialogData = any;
 const { addDelayedCallback } = globalThis as unknown as {
-  addDelayedCallback: (delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
 const { questManager } = require("系统.08．任务系统.01．任务管理器.index") as {
   questManager: { triggerUIRefresh: (playerId: number, questId?: string) => void };
@@ -262,4 +262,3 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
     },
   };
 }
-

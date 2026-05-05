@@ -14,7 +14,7 @@ const { YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.inde
   YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
 };
 
-const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+const { registerSpellChannelListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellChannelListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {

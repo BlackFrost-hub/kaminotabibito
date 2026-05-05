@@ -13,8 +13,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const { round, max } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  round: (value: number) => number;
-  max: (a: number, b: number) => number;
+  round: (this: void, value: number) => number;
+  max: (this: void, a: number, b: number) => number;
 };
 
 const 玩家常量 = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../../00．核心系统/00．玩家系统/00．常量");

@@ -38,7 +38,7 @@ function setTaskScrollThumbByRatio(self, ctx, ratio)
     if travelRange < 0 then
         travelRange = 0
     end
-    local r = clampRange(nil, ratio, 0, 1)
+    local r = clampRange(ratio, 0, 1)
     local topOffset = SCROLL_THUMB_TOP_COMPENSATION + travelRange * r
     ctx:setFramePointRelative(
         ctx.scrollThumbFrame,
@@ -55,7 +55,6 @@ function updateTaskUIScrollThumbPosition(self, ctx, pageCount)
         return
     end
     local currentPage = clampRange(
-        nil,
         ctx:getCurrentPage(),
         0,
         pageCount - 1
@@ -75,7 +74,7 @@ function ____exports.handleTaskUIListWheel(self, ctx)
     local currentPage = ctx:getCurrentPage()
     local nextPage = currentPage
     if delta > 0 then
-        nextPage = clampMin(nil, currentPage - 1, 0)
+        nextPage = clampMin(currentPage - 1, 0)
     end
     if delta < 0 then
         nextPage = currentPage + 1 < pageCount and currentPage + 1 or pageCount - 1
@@ -94,7 +93,7 @@ function ratioFromThumbDragMouseY(self, pageCount, mouseYPx)
     end
     local travelPx = getScrollbarTrackThumbTravelPx(nil, travelNorm)
     local startRatio = pageCount > 1 and thumbDragStartPage / (pageCount - 1) or 0
-    return clampRange(nil, startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1)
+    return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1)
 end
 function onThumbDragMove(self)
     if not thumbDragActive or not dragCtx then
@@ -111,8 +110,7 @@ function onThumbDragMove(self)
     )
     setTaskScrollThumbByRatio(nil, dragCtx, ratio)
     local targetPage = clampRange(
-        nil,
-        round(nil, ratio * (pageCount - 1)),
+        round(ratio * (pageCount - 1)),
         0,
         pageCount - 1
     )
@@ -213,8 +211,7 @@ local function onThumbDragEnd(self)
         getMouseY(nil)
     )
     local targetPage = clampRange(
-        nil,
-        round(nil, ratio * (pageCount - 1)),
+        round(ratio * (pageCount - 1)),
         0,
         pageCount - 1
     )
@@ -247,7 +244,7 @@ local function getTaskScrollTrackClickRatio(self)
     if topY <= bottomY then
         return 0
     end
-    local ratio = clampRange(nil, (topY - mouseY) / (topY - bottomY), 0, 1)
+    local ratio = clampRange((topY - mouseY) / (topY - bottomY), 0, 1)
     return ratio
 end
 local function onScrollBarTrackClick(self, ctx)
@@ -257,8 +254,7 @@ local function onScrollBarTrackClick(self, ctx)
     end
     local ratio = getTaskScrollTrackClickRatio(nil)
     local targetPage = clampRange(
-        nil,
-        round(nil, ratio * (pageCount - 1)),
+        round(ratio * (pageCount - 1)),
         0,
         pageCount - 1
     )

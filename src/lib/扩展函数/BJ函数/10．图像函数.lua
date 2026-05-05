@@ -53,10 +53,10 @@ function ____exports.SetImageColorBJ(self, whichImage, red, green, blue, alpha)
     end
     jass.SetImageColor(
         whichImage,
-        PercentTo255(nil, red),
-        PercentTo255(nil, green),
-        PercentTo255(nil, blue),
-        PercentTo255(nil, 100 - alpha)
+        PercentTo255(red),
+        PercentTo255(green),
+        PercentTo255(blue),
+        PercentTo255(100 - alpha)
     )
 end
 function ____exports.GetLastCreatedImage(self)

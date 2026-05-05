@@ -213,7 +213,7 @@ local function registerToCenterTimer(self)
     _registered = true
     local ____G_6 = _G
     local onSecond = ____G_6.onSecond
-    onSecond(nil, ____exports.onRegenTimer)
+    onSecond(____exports.onRegenTimer)
 end
 registerToCenterTimer(nil)
 return ____exports

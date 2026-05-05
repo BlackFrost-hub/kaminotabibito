@@ -58,10 +58,10 @@ function ____exports.MultiboardSetTitleTextColorBJ(self, mb, red, green, blue, t
     end
     jass.MultiboardSetTitleTextColor(
         mb,
-        PercentTo255(nil, red),
-        PercentTo255(nil, green),
-        PercentTo255(nil, blue),
-        PercentTo255(nil, 100 - transparency)
+        PercentTo255(red),
+        PercentTo255(green),
+        PercentTo255(blue),
+        PercentTo255(100 - transparency)
     )
 end
 --- 允许/禁止多面板显示 - MultiboardAllowDisplayBJ
@@ -167,10 +167,10 @@ function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, bl
                             if item ~= nil then
                                 jass.MultiboardSetItemValueColor(
                                     item,
-                                    PercentTo255(nil, red),
-                                    PercentTo255(nil, green),
-                                    PercentTo255(nil, blue),
-                                    PercentTo255(nil, 100 - transparency)
+                                    PercentTo255(red),
+                                    PercentTo255(green),
+                                    PercentTo255(blue),
+                                    PercentTo255(100 - transparency)
                                 )
                                 jass.MultiboardReleaseItem(item)
                             end

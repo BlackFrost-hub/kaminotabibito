@@ -19,12 +19,12 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local AdjustPlayerStateBJ = ____require_result_3.AdjustPlayerStateBJ
 local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____require_result_4.Sound3DII_Mp3PlayReuse
-local ____require_result_5 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-local CreateFloatTextOnUnit = ____require_result_5.CreateFloatTextOnUnit
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local getUnitOwnerId = ____require_result_6.getUnitOwnerId
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_7.registerDeathListener
+local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local getUnitOwnerId = ____require_result_5.getUnitOwnerId
+local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_6.registerDeathListener
 local SOUND_GOLD = "Abilities\\Spells\\Items\\ResourceItems\\ReceiveGold.wav"
 local GOLD_R = 255
 local GOLD_G = 215
@@ -80,14 +80,16 @@ local function giveGoldToPlayer(unit, player, baseGold, isShared)
     AdjustPlayerStateBJ(nil, finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD)
     Sound3DII_Mp3PlayReuse(nil, SOUND_GOLD, player)
     local text = "+" .. tostring(finalGold)
-    CreateFloatTextOnUnit(nil, unit, text, {
-        size = 12,
-        red = GOLD_R,
-        green = GOLD_G,
-        blue = GOLD_B,
-        alpha = 0,
-        duration = GOLD_FLOAT_DURATION_SEC
-    })
+    if type(CreateFloatTextOnUnit) == "function" then
+        CreateFloatTextOnUnit(unit, text, {
+            size = 12,
+            red = GOLD_R,
+            green = GOLD_G,
+            blue = GOLD_B,
+            alpha = 0,
+            duration = GOLD_FLOAT_DURATION_SEC
+        })
+    end
 end
 --- 处理单位死亡事件
 local function onUnitDeathHandler(dyingUnit, killer)
@@ -115,63 +117,63 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if shareGold <= 0 then
         return
     end
-    local ____temp_8 = jass.GetUnitX(dyingUnit)
+    local ____temp_7 = jass.GetUnitX(dyingUnit)
+    if ____temp_7 == nil then
+        ____temp_7 = 0
+    end
+    local dyingX = ____temp_7
+    local ____temp_8 = jass.GetUnitY(dyingUnit)
     if ____temp_8 == nil then
         ____temp_8 = 0
     end
-    local dyingX = ____temp_8
-    local ____temp_9 = jass.GetUnitY(dyingUnit)
-    if ____temp_9 == nil then
-        ____temp_9 = 0
-    end
-    local dyingY = ____temp_9
+    local dyingY = ____temp_8
     local killerPlayer = jass.GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
     if killerPlayer == nil or heroGroup == nil then
         return
     end
-    local ____temp_10 = jass.BlzGroupGetSize(heroGroup)
-    if ____temp_10 == nil then
-        ____temp_10 = 0
+    local ____temp_9 = jass.BlzGroupGetSize(heroGroup)
+    if ____temp_9 == nil then
+        ____temp_9 = 0
     end
-    local heroCount = ____temp_10
+    local heroCount = ____temp_9
     do
         local i = 0
         while i < heroCount do
             do
                 local hero = jass.BlzGroupUnitAt(heroGroup, i)
                 if not hero then
-                    goto __continue21
+                    goto __continue22
                 end
                 if hero == killer then
-                    goto __continue21
+                    goto __continue22
                 end
                 if jass.IsUnitAlly(hero, killerPlayer) ~= true then
-                    goto __continue21
+                    goto __continue22
                 end
-                local ____temp_11 = jass.GetUnitX(hero)
+                local ____temp_10 = jass.GetUnitX(hero)
+                if ____temp_10 == nil then
+                    ____temp_10 = 0
+                end
+                local heroX = ____temp_10
+                local ____temp_11 = jass.GetUnitY(hero)
                 if ____temp_11 == nil then
                     ____temp_11 = 0
                 end
-                local heroX = ____temp_11
-                local ____temp_12 = jass.GetUnitY(hero)
-                if ____temp_12 == nil then
-                    ____temp_12 = 0
-                end
-                local heroY = ____temp_12
+                local heroY = ____temp_11
                 local dx = heroX - dyingX
                 local dy = heroY - dyingY
                 local dist = jass.SquareRoot(dx * dx + dy * dy)
                 if dist > SHARE_RANGE then
-                    goto __continue21
+                    goto __continue22
                 end
                 local heroPlayer = jass.GetOwningPlayer(hero)
                 if heroPlayer == nil then
-                    goto __continue21
+                    goto __continue22
                 end
                 giveGoldToPlayer(hero, heroPlayer, shareGold, true)
             end
-            ::__continue21::
+            ::__continue22::
             i = i + 1
         end
     end

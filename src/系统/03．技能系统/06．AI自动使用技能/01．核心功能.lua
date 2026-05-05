@@ -253,7 +253,6 @@ function ____exports.initAISkillSystem(self)
     if not aiCheckRegistered then
         aiCheckRegistered = true
         addPeriodicCallback(
-            nil,
             clampMinInt(nil, AI_CHECK_INTERVAL * 1000, 1),
             onAICheck
         )

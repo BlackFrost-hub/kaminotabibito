@@ -4,7 +4,7 @@
 import * as buffPoolMod from "./00．Buff系统";
 import * as buffTableMod from "./01．Buff表";
 const 数学运算 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
-  round: (value: number) => number;
+  round: (this: void, value: number) => number;
 };
 const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;

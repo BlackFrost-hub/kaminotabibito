@@ -39,7 +39,6 @@ local ____require_result_2 = require("系统.08．任务系统.01．任务管理
 local questManager = ____require_result_2.questManager
 local function scheduleOpenDialogLater(self, player, data)
     addDelayedCallback(
-        nil,
         10,
         function()
             openNpcDialog(nil, player, data)

@@ -458,7 +458,7 @@ function registerToCenterTimer(self)
         return
     end
     _registered = true
-    onTick10ms(nil, onRefreshTick)
+    onTick10ms(onRefreshTick)
 end
 jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
@@ -885,6 +885,6 @@ local function delayedInit(self)
     ____exports.initMultiboardSystem(nil)
 end
 if MULTIBOARD_SYSTEM_ENABLED then
-    createDelayedCall(nil, 2, delayedInit)
+    createDelayedCall(2, delayedInit)
 end
 return ____exports

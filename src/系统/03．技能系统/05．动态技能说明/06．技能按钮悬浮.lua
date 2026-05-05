@@ -199,7 +199,7 @@ function ____exports.initSkillButtonHover(self)
     periodicInstalled = true
     local ____G_3 = _G
     local addPeriodicCallback = ____G_3.addPeriodicCallback
-    addPeriodicCallback(nil, UPDATE_INTERVAL_MS, onPeriodicUpdate)
+    addPeriodicCallback(UPDATE_INTERVAL_MS, onPeriodicUpdate)
 end
 function ____exports.onPlayerHeroRegistered(self, whichPlayer, whichHero)
     if not whichPlayer or whichPlayer == 0 or not whichHero or whichHero == 0 then

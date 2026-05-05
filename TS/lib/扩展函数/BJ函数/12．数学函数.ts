@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 const jass = require("jass.common") as any;
 
 const DEFAULT_BJ_PI = 3.141592653589793;
@@ -23,38 +24,38 @@ const BJ_DEGTORAD = DEFAULT_BJ_DEGTORAD;
 // ===========================================================================
 
 /** 余弦（角度） */
-export function CosBJ(degrees: number): number {
+export function CosBJ(this: void, degrees: number): number {
   return jass.Cos(degrees * BJ_DEGTORAD);
 }
 
 /** 正弦（角度） */
-export function SinBJ(degrees: number): number {
+export function SinBJ(this: void, degrees: number): number {
   return jass.Sin(degrees * BJ_DEGTORAD);
 }
 
 /** 正切（角度） */
-export function TanBJ(degrees: number): number {
+export function TanBJ(this: void, degrees: number): number {
   const rad = degrees * BJ_DEGTORAD;
   return jass.Sin(rad) / jass.Cos(rad);
 }
 
 /** 反余弦（返回角度） */
-export function AcosBJ(value: number): number {
+export function AcosBJ(this: void, value: number): number {
   return jass.Acos(value) * BJ_RADTODEG;
 }
 
 /** 反正弦（返回角度） */
-export function AsinBJ(value: number): number {
+export function AsinBJ(this: void, value: number): number {
   return jass.Asin(value) * BJ_RADTODEG;
 }
 
 /** 反正切（返回角度） */
-export function AtanBJ(value: number): number {
+export function AtanBJ(this: void, value: number): number {
   return jass.Atan(value) * BJ_RADTODEG;
 }
 
 /** 反正切2（返回角度） */
-export function Atan2BJ(y: number, x: number): number {
+export function Atan2BJ(this: void, y: number, x: number): number {
   return jass.Atan2(y, x) * BJ_RADTODEG;
 }
 
@@ -63,23 +64,23 @@ export function Atan2BJ(y: number, x: number): number {
 // ===========================================================================
 
 /** 实数绝对值 - RAbsBJ */
-export function RAbsBJ(a: number): number {
+export function RAbsBJ(this: void, a: number): number {
   return a < 0 ? -a : a;
 }
 
 /** 实数符号 - RSignBJ（返回 ±1） */
-export function RSignBJ(a: number): number {
+export function RSignBJ(this: void, a: number): number {
   return a < 0 ? -1 : (a > 0 ? 1 : 0);
 }
 
 /** 整数绝对值 - IAbsBJ */
-export function IAbsBJ(a: number): number {
+export function IAbsBJ(this: void, a: number): number {
   const ia = jass.R2I(a);
   return ia < 0 ? -ia : ia;
 }
 
 /** 整数符号 - ISignBJ（返回 ±1） */
-export function ISignBJ(a: number): number {
+export function ISignBJ(this: void, a: number): number {
   const ia = jass.R2I(a);
   return ia < 0 ? -1 : (ia > 0 ? 1 : 0);
 }
@@ -89,7 +90,7 @@ export function ISignBJ(a: number): number {
 // ===========================================================================
 
 /** 随机百分比 (0-100) - GetRandomPercentageBJ */
-export function GetRandomPercentageBJ(): number {
+export function GetRandomPercentageBJ(this: void): number {
   return jass.GetRandomReal(0, 100);
 }
 
@@ -98,14 +99,14 @@ export function GetRandomPercentageBJ(): number {
 // ===========================================================================
 
 /** 整数取模 - ModuloInteger */
-export function ModuloInteger(dividend: number, divisor: number): number {
+export function ModuloInteger(this: void, dividend: number, divisor: number): number {
   const d = jass.R2I(divisor);
   if (d === 0) return 0;
   return jass.R2I(dividend) % d;
 }
 
 /** 实数取模 - ModuloReal */
-export function ModuloReal(dividend: number, divisor: number): number {
+export function ModuloReal(this: void, dividend: number, divisor: number): number {
   if (divisor === 0) return 0;
   return dividend % divisor;
 }
@@ -118,7 +119,7 @@ export function ModuloReal(dividend: number, divisor: number): number {
  * 两点之间角度 - AngleBetweenPoints（返回角度）
  * 对应 Blizzard.j: AngleBetweenPoints
  */
-export function AngleBetweenPoints(locA: any, locB: any): number {
+export function AngleBetweenPoints(this: void, locA: any, locB: any): number {
   if (locA == null || locB == null) return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
@@ -129,7 +130,7 @@ export function AngleBetweenPoints(locA: any, locB: any): number {
  * 两点之间距离 - DistanceBetweenPoints
  * 对应 Blizzard.j: DistanceBetweenPoints
  */
-export function DistanceBetweenPoints(locA: any, locB: any): number {
+export function DistanceBetweenPoints(this: void, locA: any, locB: any): number {
   if (locA == null || locB == null) return 0;
   const dx = jass.GetLocationX(locB) - jass.GetLocationX(locA);
   const dy = jass.GetLocationY(locB) - jass.GetLocationY(locA);
@@ -141,22 +142,22 @@ export function DistanceBetweenPoints(locA: any, locB: any): number {
 // ===========================================================================
 
 /** 整数最大值 - IMaxBJ */
-export function IMaxBJ(a: number, b: number): number {
+export function IMaxBJ(this: void, a: number, b: number): number {
   return a >= b ? a : b;
 }
 
 /** 整数最小值 - IMinBJ */
-export function IMinBJ(a: number, b: number): number {
+export function IMinBJ(this: void, a: number, b: number): number {
   return a <= b ? a : b;
 }
 
 /** 实数最大值 - RMaxBJ */
-export function RMaxBJ(a: number, b: number): number {
+export function RMaxBJ(this: void, a: number, b: number): number {
   return a < b ? b : a;
 }
 
 /** 实数最小值 - RMinBJ */
-export function RMinBJ(a: number, b: number): number {
+export function RMinBJ(this: void, a: number, b: number): number {
   return a < b ? a : b;
 }
 
@@ -165,12 +166,12 @@ export function RMinBJ(a: number, b: number): number {
 // ===========================================================================
 
 /** 百分比转整数 - PercentToInt */
-export function PercentToInt(percentage: number, max: number): number {
+export function PercentToInt(this: void, percentage: number, max: number): number {
   return jass.R2I(percentage * 0.01 * max);
 }
 
 /** 百分比转255 - PercentTo255 */
-export function PercentTo255(percentage: number): number {
+export function PercentTo255(this: void, percentage: number): number {
   return PercentToInt(percentage, 255);
 }
 

@@ -34,9 +34,12 @@ const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.�
   stopTimer: (t: any) => void;
   createTimedEffect: (modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
-const { CreateFloatTextAtPoint } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-  CreateFloatTextAtPoint: (x: number, y: number, text: string, options?: any) => any;
+const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+  CreateFloatTextAtPoint: (this: void, x: number, y: number, text: string, options?: any) => any;
 };
+const CreateFloatTextAtPoint = 漂浮文字模块.CreateFloatTextAtPoint as
+  | ((this: void, x: number, y: number, text: string, options?: any) => any)
+  | undefined;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (s: string) => number;
 };
@@ -165,6 +168,7 @@ function getUnitXY(u: any): { x: number; y: number } {
 }
 
 function floatBurnText(campfire: any, itemName: string): void {
+  if (typeof CreateFloatTextAtPoint !== "function") return;
   const { x, y } = getUnitXY(campfire);
   CreateFloatTextAtPoint(x, y, `${itemName}被烤焦了！`, {
     red: 255,

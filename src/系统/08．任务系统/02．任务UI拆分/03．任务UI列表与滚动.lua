@@ -67,10 +67,10 @@ function ____exports.calcTotalContentHeight(self, quests, isExpanded)
     return totalH
 end
 function ____exports.getMaxScroll(self, totalContentHeight)
-    return clampMin(nil, totalContentHeight - LIST_VIEW_H, 0)
+    return clampMin(totalContentHeight - LIST_VIEW_H, 0)
 end
 function ____exports.clampScrollOffset(self, scrollOffset, maxScroll)
-    return clampRange(nil, scrollOffset, 0, maxScroll)
+    return clampRange(scrollOffset, 0, maxScroll)
 end
 function ____exports.isQuestRowFullyInsideView(self, rowTopRel, itemHeight, visibleTopRel, visibleBottomRel, eps)
     local itemTopRel = rowTopRel

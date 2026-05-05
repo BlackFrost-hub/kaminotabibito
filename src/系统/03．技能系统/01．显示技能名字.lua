@@ -8,10 +8,10 @@ local ____exports = {}
 -- 排除：机械单位、古树单位、使用物品（物品栏命令ID 852008-852013, 852622）
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-local CreateFloatTextOnUnit = ____require_result_0.CreateFloatTextOnUnit
-local ____require_result_1 = require("系统.03．技能系统.00．技能事件.01．核心功能")
-local registerSpellChannelListener = ____require_result_1.registerSpellChannelListener
+local _____6D6E_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+local _____6280_80FD_4E8B_4EF6_6A21_5757 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local CreateFloatTextOnUnit = _____6D6E_5B57_6A21_5757.CreateFloatTextOnUnit
+local registerSpellChannelListener = _____6280_80FD_4E8B_4EF6_6A21_5757.registerSpellChannelListener
 local ABILITY_DATA_TIP = 215
 local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852008,
@@ -22,14 +22,17 @@ local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852013,
     852622
 })
-local function getAbilityName(self, unit, abilityId, level)
+local function getAbilityName(unit, abilityId, level)
     local abil = japi.EXGetUnitAbility(unit, abilityId)
     if not abil then
         return ""
     end
     return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) or ""
 end
-local function onSpellChannel(self, castingUnit, spellAbilityId)
+local function onSpellChannel(castingUnit, spellAbilityId)
+    if type(CreateFloatTextOnUnit) ~= "function" then
+        return
+    end
     if jass.IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL) then
         return
     end
@@ -41,11 +44,11 @@ local function onSpellChannel(self, castingUnit, spellAbilityId)
         return
     end
     local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
-    local skillName = getAbilityName(nil, castingUnit, spellAbilityId, level)
+    local skillName = getAbilityName(castingUnit, spellAbilityId, level)
     if not skillName then
         return
     end
-    CreateFloatTextOnUnit(nil, castingUnit, skillName, {
+    CreateFloatTextOnUnit(castingUnit, skillName, {
         size = 9,
         red = 255,
         green = 255,
@@ -57,5 +60,7 @@ local function onSpellChannel(self, castingUnit, spellAbilityId)
         height = 20
     })
 end
-registerSpellChannelListener(nil, onSpellChannel)
+if type(registerSpellChannelListener) == "function" then
+    registerSpellChannelListener(onSpellChannel)
+end
 return ____exports

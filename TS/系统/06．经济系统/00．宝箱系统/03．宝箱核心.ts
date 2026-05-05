@@ -14,8 +14,8 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { ceil, forEachSorted } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  ceil: (value: number) => number;
-  forEachSorted: <K extends number | string, V>(map: Map<K, V>, callback: (key: K, value: V) => void) => void;
+  ceil: (this: void, value: number) => number;
+  forEachSorted: <K extends number | string, V>(this: void, map: Map<K, V>, callback: (key: K, value: V) => void) => void;
 };
 const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
@@ -69,9 +69,12 @@ const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData�
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
 
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
-  CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
+const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
+  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
 };
+const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
+  | ((this: void, unit: any, text: string, options?: any) => any)
+  | undefined;
 
 // ==========================================================================================
 // 类型定义
@@ -127,15 +130,17 @@ function angleBetweenPoints(this: void, x1: number, y1: number, x2: number, y2: 
 
 /** 显示漂浮文字 */
 function showTextTag(this: void, unit: any, text: string, red: number, green: number, blue: number): void {
-  CreateFloatTextOnUnit(unit, text, {
-    size: 10,
-    red,
-    green,
-    blue,
-    alpha: 0,
-    duration: 1.0,
-    speedY: 0.03,
-  });
+  if (typeof CreateFloatTextOnUnit === "function") {
+    CreateFloatTextOnUnit(unit, text, {
+      size: 10,
+      red,
+      green,
+      blue,
+      alpha: 0,
+      duration: 1.0,
+      speedY: 0.03,
+    });
+  }
 }
 
 /** 获取单位HandleId */
@@ -347,7 +352,7 @@ function ensureRegisteredToCenterTimer(this: void): void {
   _registeredToCenterTimer = true;
 
 const { onTick10ms } = globalThis as unknown as {
-    onTick10ms: (callback: () => void) => void;
+    onTick10ms: (this: void, callback: () => void) => void;
   };
 
   onTick10ms(onChestCenterTimerTick);

@@ -5,8 +5,6 @@
 // ========== 子系统导出 ==========
 export * from "./01．DOT定义/index";
 export * from "./02．治疗系统/index";
-export * from "./04．伤害显示/index";
-
 // ========== 核心模块导出 ==========
 export * from "./01．伤害事件";
 export * from "./02．dot伤害";

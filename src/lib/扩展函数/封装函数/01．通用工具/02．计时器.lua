@@ -18,36 +18,32 @@ local addDelayedCallback = ____require_result_2.addDelayedCallback
 local removeDelayedCallback = ____require_result_2.removeDelayedCallback
 --- 通过中心计时器安排一次性延迟回调。
 -- 适用于“不需要真实 JASS timer 句柄”的延迟执行、注册重试、延迟初始化等场景。
-function ____exports.createDelayedCall(self, delaySec, callback)
-    local delayMs = delaySec <= 0 and 0 or ceil(nil, delaySec * 1000)
-    return {id = addDelayedCallback(nil, delayMs, callback)}
+function ____exports.createDelayedCall(delaySec, callback)
+    local delayMs = delaySec <= 0 and 0 or ceil(delaySec * 1000)
+    return {id = addDelayedCallback(delayMs, callback)}
 end
-function ____exports.cancelDelayedCall(self, handle)
+function ____exports.cancelDelayedCall(handle)
     if handle == nil then
         return
     end
-    removeDelayedCallback(
-        nil,
-        type(handle) == "number" and handle or handle.id
-    )
+    removeDelayedCallback(type(handle) == "number" and handle or handle.id)
 end
 --- 在已有计时器句柄上启动一次性回调，触发后销毁该计时器。
 -- 回调内可使用 GetExpiredTimer()，与手写 TimerStart(..., false, ...) 等价，仅收敛重复代码。
 -- 
 -- @param timer 已创建的计时器；为 null 时直接同步执行 callback（与 withTimer 行为一致）
-function ____exports.runTimerOnce(self, timer, delaySec, callback)
+function ____exports.runTimerOnce(timer, delaySec, callback)
     if not timer then
-        callback(nil)
+        callback()
         return
     end
     safeTimerStart(
-        nil,
         timer,
         delaySec,
         false,
         function()
-            callback(nil)
-            safeDestroyTimer(nil, timer)
+            callback()
+            safeDestroyTimer(timer)
         end
     )
 end
@@ -58,34 +54,32 @@ end
 -- @param periodic 是否重复执行（默认 false）
 -- @param name 调试用名称（可选）
 -- @returns 计时器句柄（periodic=true 时可用，用于停止），不需要可忽略
-function ____exports.withTimer(self, delaySec, callback, periodic, name)
+function ____exports.withTimer(delaySec, callback, periodic, name)
     if periodic == nil then
         periodic = false
     end
     local t = jass.CreateTimer()
     if not t then
-        callback(nil)
+        callback()
         return nil
     end
     if periodic then
         safeTimerStart(
-            nil,
             t,
             delaySec,
             true,
             function()
-                callback(nil)
+                callback()
             end
         )
     else
         safeTimerStart(
-            nil,
             t,
             delaySec,
             false,
             function()
-                callback(nil)
-                safeDestroyTimer(nil, t)
+                callback()
+                safeDestroyTimer(t)
             end
         )
     end
@@ -94,11 +88,11 @@ end
 --- 停止并销毁指定的周期性计时器
 -- 
 -- @param t 计时器句柄（withTimer 返回的）
-function ____exports.stopTimer(self, t)
+function ____exports.stopTimer(t)
     if not t then
         return
     end
     jass.PauseTimer(t)
-    safeDestroyTimer(nil, t)
+    safeDestroyTimer(t)
 end
 return ____exports

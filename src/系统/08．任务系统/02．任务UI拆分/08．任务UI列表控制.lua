@@ -400,7 +400,6 @@ local function pcallApplyTaskUIFacadeVisibleStateBody(self)
             end
             ____exports.setVisible(nil, categoryView.emptyText, false)
             local clampedPage = clampRange(
-                nil,
                 ctx:getCurrentPage(category),
                 0,
                 pageCount - 1

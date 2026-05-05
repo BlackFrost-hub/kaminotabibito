@@ -8,7 +8,7 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
   registerPlayerUnitEventById: (this: void, trig: any, playerId: number, eventId: any, filter?: any) => void;
 };
 const { addPeriodicCallback } = globalThis as unknown as {
-  addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
 
 // 导入常量

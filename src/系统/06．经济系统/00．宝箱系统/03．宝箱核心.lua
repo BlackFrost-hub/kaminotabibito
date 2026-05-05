@@ -23,15 +23,17 @@ function angleBetweenPoints(x1, y1, x2, y2)
     return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
 function showTextTag(unit, text, red, green, blue)
-    CreateFloatTextOnUnit(nil, unit, text, {
-        size = 10,
-        red = red,
-        green = green,
-        blue = blue,
-        alpha = 0,
-        duration = 1,
-        speedY = 0.03
-    })
+    if type(CreateFloatTextOnUnit) == "function" then
+        CreateFloatTextOnUnit(unit, text, {
+            size = 10,
+            red = red,
+            green = green,
+            blue = blue,
+            alpha = 0,
+            duration = 1,
+            speedY = 0.03
+        })
+    end
 end
 function getUnitId(unit)
     if not unit then
@@ -146,7 +148,6 @@ function startOpening(unit, target, openTime)
 end
 function updateAllOpening()
     forEachSorted(
-        nil,
         openingMap,
         function(unitId, data)
             local currentOrder = jass.GetUnitCurrentOrder(data.unit)
@@ -189,7 +190,6 @@ function updateAllOpening()
         end
     )
     forEachSorted(
-        nil,
         movingMap,
         function(unitId, data)
             local currentOrder = jass.GetUnitCurrentOrder(data.unit)
@@ -224,9 +224,9 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_20 = _G
-    local onTick10ms = ____G_20.onTick10ms
-    onTick10ms(nil, onChestCenterTimerTick)
+    local ____G_19 = _G
+    local onTick10ms = ____G_19.onTick10ms
+    onTick10ms(onChestCenterTimerTick)
 end
 jass = require("jass.common")
 local jglobals = require("jass.globals")
@@ -270,14 +270,14 @@ local ____require_result_7 = require("lib.扩展函数.YDWE函数.02．YDLocal�
 YDLocal5Set = ____require_result_7.YDLocal5Set
 local ____require_result_8 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 YDUserDataGet = ____require_result_8.YDUserDataGet
-local ____require_result_9 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
-CreateFloatTextOnUnit = ____require_result_9.CreateFloatTextOnUnit
+local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
+CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
 openingMap = __TS__New(Map)
 movingMap = __TS__New(Map)
 _progressBarUnitType = 0
 _registeredToCenterTimer = false
 _tickCounter = 0
-CENTER_TIMER_TICKS = ceil(nil, UPDATE_INTERVAL / 0.01)
+CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01)
 --- 处理单位对可交互目标的命令
 -- 
 -- @param unit 触发单位
@@ -312,13 +312,13 @@ function ____exports.isUnitOpening(unit)
         return false
     end
     local unitId = getUnitId(unit)
-    local ____temp_21
+    local ____temp_20
     if unitId ~= 0 then
-        ____temp_21 = openingMap:has(unitId)
+        ____temp_20 = openingMap:has(unitId)
     else
-        ____temp_21 = false
+        ____temp_20 = false
     end
-    return ____temp_21
+    return ____temp_20
 end
 --- 中断单位开启
 function ____exports.interruptOpening(unit)
@@ -326,13 +326,13 @@ function ____exports.interruptOpening(unit)
         return
     end
     local unitId = getUnitId(unit)
-    local ____temp_22
+    local ____temp_21
     if unitId ~= 0 then
-        ____temp_22 = openingMap:get(unitId)
+        ____temp_21 = openingMap:get(unitId)
     else
-        ____temp_22 = nil
+        ____temp_21 = nil
     end
-    local data = ____temp_22
+    local data = ____temp_21
     if data ~= nil then
         cleanupOpening(data, true)
     end

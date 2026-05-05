@@ -10,7 +10,7 @@ const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中
     registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
 };
 const centerTimer = globalThis as unknown as {
-    addDelayedCallback: (delayMs: number, callback: () => void) => number;
+    addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
     registerPlayerUnitEventForPlayerIds: (

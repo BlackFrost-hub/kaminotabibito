@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 显示技能名字系统
  *
@@ -7,12 +8,18 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
-  CreateFloatTextOnUnit: (unit: any, text: string, options?: any) => any;
+const 浮字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
+  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
 };
-const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
-  registerSpellChannelListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
+const 技能事件模块 = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+  registerSpellChannelListener: (this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
+const CreateFloatTextOnUnit = 浮字模块.CreateFloatTextOnUnit as
+  | ((this: void, unit: any, text: string, options?: any) => any)
+  | undefined;
+const registerSpellChannelListener = 技能事件模块.registerSpellChannelListener as
+  | ((this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void)
+  | undefined;
 
 const ABILITY_DATA_TIP = 215;
 
@@ -20,13 +27,14 @@ const ITEM_USE_ORDER_IDS = new Set([
   852008, 852009, 852010, 852011, 852012, 852013, 852622,
 ]);
 
-function getAbilityName(unit: any, abilityId: number, level: number): string {
+function getAbilityName(this: void, unit: any, abilityId: number, level: number): string {
   const abil = japi.EXGetUnitAbility(unit, abilityId);
   if (!abil) return "";
   return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) || "";
 }
 
-function onSpellChannel(castingUnit: any, spellAbilityId: number): void {
+function onSpellChannel(this: void, castingUnit: any, spellAbilityId: number): void {
+  if (typeof CreateFloatTextOnUnit !== "function") return;
   if (jass.IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL)) return;
   if (jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT)) return;
 
@@ -50,6 +58,8 @@ function onSpellChannel(castingUnit: any, spellAbilityId: number): void {
   });
 }
 
-registerSpellChannelListener(onSpellChannel);
+if (typeof registerSpellChannelListener === "function") {
+  registerSpellChannelListener(onSpellChannel);
+}
 
 export {};

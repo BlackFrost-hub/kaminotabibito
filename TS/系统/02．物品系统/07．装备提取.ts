@@ -12,7 +12,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
 
 const { STES_Register } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {

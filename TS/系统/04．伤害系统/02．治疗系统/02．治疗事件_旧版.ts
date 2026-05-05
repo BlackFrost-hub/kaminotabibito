@@ -15,7 +15,7 @@
 
 const jass = require("jass.common") as any;
 
-const { registerSpellChannelListener } = require("系统.03．技能系统.00．技能事件.01．核心功能") as {
+const { registerSpellChannelListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellChannelListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 

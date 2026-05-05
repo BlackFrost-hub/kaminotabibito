@@ -347,9 +347,9 @@ function ____exports.YDWETimerDestroyEffect(self, duration, effect)
         _effectRecycleRegistered = true
         local ____G_1 = _G
         local onTick10ms = ____G_1.onTick10ms
-        onTick10ms(nil, _tickEffectRecycle)
+        onTick10ms(_tickEffectRecycle)
     end
-    local ticks = ceil(nil, duration / 0.01)
+    local ticks = ceil(duration / 0.01)
     _pendingEffects[#_pendingEffects + 1] = {eff = effect, ticksLeft = ticks}
 end
 return ____exports

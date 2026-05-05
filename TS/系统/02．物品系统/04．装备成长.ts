@@ -11,7 +11,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeDestroyTimer: (timer: any) => void;
 };
 const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  round: (value: number) => number;
+  round: (this: void, value: number) => number;
 };
 const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemUse: (callback: (unit: any, item: any) => void) => number;
@@ -33,8 +33,8 @@ const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．�
   applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
 };
 const { onSecond, offSecond } = globalThis as unknown as {
-  onSecond: (cb: () => void) => void;
-  offSecond: (cb: () => void) => void;
+  onSecond: (this: void, cb: () => void) => void;
+  offSecond: (this: void, cb: () => void) => void;
 };
 
 interface Effect {

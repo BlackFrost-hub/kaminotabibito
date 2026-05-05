@@ -15,7 +15,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");

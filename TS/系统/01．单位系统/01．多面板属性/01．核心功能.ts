@@ -7,7 +7,7 @@
 
 const jass = require("jass.common") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (delaySec: number, callback: () => void) => { id: number };
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
 
 import {
@@ -21,7 +21,7 @@ import {
 const { getGameTimeFormatted, getGameDifficulty, onTick10ms } = globalThis as unknown as {
   getGameTimeFormatted: () => { hours: number; minutes: number; seconds: number; total: number };
   getGameDifficulty: () => number;
-  onTick10ms: (callback: () => void) => void;
+  onTick10ms: (this: void, callback: () => void) => void;
 };
 
 const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.index") as {

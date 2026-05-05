@@ -1,22 +1,32 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
+local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__ArraySome = ____lualib.__TS__ArraySome
 local ____exports = {}
---- 特殊技能冷却处理
--- 
--- 处理通魔类技能的独立冷却设置
-local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDWESetUnitAbilityState = ____require_result_0.YDWESetUnitAbilityState
 local YDWEGetUnitAbilityDataString = ____require_result_0.YDWEGetUnitAbilityDataString
---- 风暴之刃技能ID
-local STORM_BLADE_SKILLS = {1093683786, 1093683785, 1093683787}
---- 风暴之刃基础冷却
-local STORM_BLADE_BASE_CD = 12
---- 风暴之刃关联技能ID
-local STORM_BLADE_LINKED_ABILITY = 1093683784
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_1.stringToFourCC
+local ____require_result_2 = require("系统.03．技能系统.01．技能冷却.00．冷却常量")
+local STORM_BLADE_SKILLS = ____require_result_2.STORM_BLADE_SKILLS
+local STORM_BLADE_BASE_CD = ____require_result_2.STORM_BLADE_BASE_CD
+local STORM_BLADE_LINKED_ABILITY = ____require_result_2.STORM_BLADE_LINKED_ABILITY
+local TRIPLE_SLASH_SKILL_MARKERS = ____require_result_2.TRIPLE_SLASH_SKILL_MARKERS
+local TRIPLE_SLASH_BASE_CD = ____require_result_2.TRIPLE_SLASH_BASE_CD
+local TRIPLE_SLASH_LINKED_ABILITY = ____require_result_2.TRIPLE_SLASH_LINKED_ABILITY
+local function _____63D0_53D6_5185_90E8ID(self, _____914D_7F6E_952E_540D)
+    local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
+    return _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868] or _____914D_7F6E_952E_540D
+end
 --- 检查是否为风暴之刃技能
 function ____exports.isStormBladeSkill(self, abilityId)
-    return __TS__ArrayIncludes(STORM_BLADE_SKILLS, abilityId)
+    return __TS__ArraySome(
+        STORM_BLADE_SKILLS,
+        function(____, _____914D_7F6E_952E_540D) return stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D)
+        ) == abilityId end
+    )
 end
 --- 处理风暴之刃冷却
 function ____exports.handleStormBladeCooldown(self, unit, reduction)
@@ -24,12 +34,15 @@ function ____exports.handleStormBladeCooldown(self, unit, reduction)
     YDWESetUnitAbilityState(
         nil,
         unit,
-        STORM_BLADE_LINKED_ABILITY,
+        stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, STORM_BLADE_LINKED_ABILITY)
+        ),
         1,
         cd
     )
 end
---- 检查是否为三连斩技能（通过技能数据字符串判断）
+--- 检查是否为三连斩技能
 function ____exports.isTripleSlashSkill(self, unit, abilityId)
     local skillString = YDWEGetUnitAbilityDataString(
         nil,
@@ -38,29 +51,26 @@ function ____exports.isTripleSlashSkill(self, unit, abilityId)
         1,
         216
     )
-    return skillString == "SLSQW" or skillString == "SLSQE" or skillString == "SLSQR"
+    return __TS__ArraySome(
+        TRIPLE_SLASH_SKILL_MARKERS,
+        function(____, _____914D_7F6E_952E_540D) return _____63D0_53D6_5185_90E8ID(nil, _____914D_7F6E_952E_540D) == skillString end
+    )
 end
---- 三连斩基础冷却
-local TRIPLE_SLASH_BASE_CD = 9
---- 三连斩关联技能ID
-local TRIPLE_SLASH_LINKED_ABILITY = 1093683796
 --- 处理三连斩冷却
 function ____exports.handleTripleSlashCooldown(self, unit, reduction)
     local cd = TRIPLE_SLASH_BASE_CD - TRIPLE_SLASH_BASE_CD * reduction
     YDWESetUnitAbilityState(
         nil,
         unit,
-        TRIPLE_SLASH_LINKED_ABILITY,
+        stringToFourCC(
+            nil,
+            _____63D0_53D6_5185_90E8ID(nil, TRIPLE_SLASH_LINKED_ABILITY)
+        ),
         1,
         cd
     )
 end
 --- 处理特殊技能冷却
--- 
--- @param unit 施法单位
--- @param abilityId 技能ID
--- @param reduction 冷却缩减比例
--- @returns 是否为特殊技能
 function ____exports.handleSpecialSkillCooldown(self, unit, abilityId, reduction)
     if ____exports.isStormBladeSkill(nil, abilityId) then
         ____exports.handleStormBladeCooldown(nil, unit, reduction)

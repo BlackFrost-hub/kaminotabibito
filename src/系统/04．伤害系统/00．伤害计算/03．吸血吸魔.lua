@@ -1,9 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local showLifeStealText, showManaStealText, CreateFloatTextOnUnit, formatNumber, LIFE_STEAL_TEXT_COLOR, MANA_STEAL_TEXT_COLOR
-function showLifeStealText(self, unit, heal)
+function showLifeStealText(unit, heal)
+    if type(CreateFloatTextOnUnit) ~= "function" then
+        return
+    end
     local text = "+" .. formatNumber(nil, heal)
-    CreateFloatTextOnUnit(nil, unit, text, {
+    CreateFloatTextOnUnit(unit, text, {
         size = 10,
         red = LIFE_STEAL_TEXT_COLOR.red,
         green = LIFE_STEAL_TEXT_COLOR.green,
@@ -14,9 +17,12 @@ function showLifeStealText(self, unit, heal)
         height = 0.5
     })
 end
-function showManaStealText(self, unit, mana)
+function showManaStealText(unit, mana)
+    if type(CreateFloatTextOnUnit) ~= "function" then
+        return
+    end
     local text = "+" .. formatNumber(nil, mana)
-    CreateFloatTextOnUnit(nil, unit, text, {
+    CreateFloatTextOnUnit(unit, text, {
         size = 10,
         red = MANA_STEAL_TEXT_COLOR.red,
         green = MANA_STEAL_TEXT_COLOR.green,
@@ -44,15 +50,15 @@ local canBreakManaStealLimit = ____require_result_1.canBreakManaStealLimit
 local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.00．伤害常量")
 local STAT_LIMITS = ____require_result_2.STAT_LIMITS
 local ENEMY_STAT_LIMITS = ____require_result_2.ENEMY_STAT_LIMITS
-local ____require_result_3 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
-CreateFloatTextOnUnit = ____require_result_3.CreateFloatTextOnUnit
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local isAncientUnit = ____require_result_4.isAncientUnit
-formatNumber = ____require_result_4.formatNumber
-local forEachUnitInGroup = ____require_result_4.forEachUnitInGroup
+local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
+CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local isAncientUnit = ____require_result_3.isAncientUnit
+formatNumber = ____require_result_3.formatNumber
+local forEachUnitInGroup = ____require_result_3.forEachUnitInGroup
 --- 获取玩家英雄组
 -- 存储位置：YDUserDataGet("string", "玩家英雄", "单位组", "group")
-function ____exports.getPlayerHeroGroup(self)
+function ____exports.getPlayerHeroGroup()
     do
         local function ____catch(_e)
             return true, nil
@@ -76,7 +82,7 @@ function ____exports.getPlayerHeroGroup(self)
 end
 --- 获取马甲单位所属玩家的英雄
 -- 遍历玩家英雄组，找到属于同一玩家的英雄
-function ____exports.getHeroForAncientUnit(self, ancientUnit)
+function ____exports.getHeroForAncientUnit(ancientUnit)
     if ancientUnit == nil then
         return nil
     end
@@ -84,7 +90,7 @@ function ____exports.getHeroForAncientUnit(self, ancientUnit)
     if owner == nil then
         return nil
     end
-    local heroGroup = ____exports.getPlayerHeroGroup(nil)
+    local heroGroup = ____exports.getPlayerHeroGroup()
     if heroGroup == nil then
         return nil
     end
@@ -92,7 +98,7 @@ function ____exports.getHeroForAncientUnit(self, ancientUnit)
     forEachUnitInGroup(
         nil,
         heroGroup,
-        function(____, enumUnit)
+        function(enumUnit)
             if enumUnit ~= nil and jass.GetOwningPlayer(enumUnit) == owner then
                 if jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
                     foundHero = enumUnit
@@ -105,12 +111,12 @@ end
 --- 获取吸血/吸魔的实际受益单位
 -- - 普通单位：返回自身
 -- - 马甲单位：返回所属玩家的英雄
-function ____exports.getStealBeneficiary(self, source)
+function ____exports.getStealBeneficiary(source)
     if source == nil then
         return nil
     end
     if isAncientUnit(nil, source) then
-        return ____exports.getHeroForAncientUnit(nil, source)
+        return ____exports.getHeroForAncientUnit(source)
     end
     return source
 end
@@ -119,7 +125,7 @@ end
 -- @param attacker 攻击者
 -- @param isPlayer 是否为玩家
 -- @returns 吸血百分比
-function ____exports.calcLifeSteal(self, attacker, isPlayer)
+function ____exports.calcLifeSteal(attacker, isPlayer)
     local lifeSteal = getRealAttr(nil, attacker, "伤害吸血", 0)
     local limit = isPlayer and STAT_LIMITS["伤害吸血"] or ENEMY_STAT_LIMITS["伤害吸血"]
     if limit ~= nil then
@@ -140,7 +146,7 @@ end
 -- @param attacker 攻击者
 -- @param isPlayer 是否为玩家
 -- @returns 吸血百分比
-function ____exports.calcMagicLifeSteal(self, attacker, isPlayer)
+function ____exports.calcMagicLifeSteal(attacker, isPlayer)
     local magicLifeSteal = getRealAttr(nil, attacker, "魔法伤害吸血", 0)
     local limit = isPlayer and STAT_LIMITS["魔法伤害吸血"] or ENEMY_STAT_LIMITS["魔法伤害吸血"]
     if limit ~= nil then
@@ -158,7 +164,7 @@ end
 -- @param attacker 攻击者
 -- @param isPlayer 是否为玩家
 -- @returns 吸血百分比
-function ____exports.calcNormalAttackLifeSteal(self, attacker, isPlayer)
+function ____exports.calcNormalAttackLifeSteal(attacker, isPlayer)
     local atkLifeSteal = getRealAttr(nil, attacker, "普攻伤害吸血", 0)
     local limit = isPlayer and STAT_LIMITS["普攻伤害吸血"] or ENEMY_STAT_LIMITS["普攻伤害吸血"]
     if limit ~= nil then
@@ -177,13 +183,13 @@ end
 -- @param isPlayer 是否为玩家
 -- @param isMagic 是否魔法伤害
 -- @param isNormalAttack 是否普攻
-function ____exports.calcTotalLifeSteal(self, attacker, isPlayer, isMagic, isNormalAttack)
-    local total = ____exports.calcLifeSteal(nil, attacker, isPlayer)
+function ____exports.calcTotalLifeSteal(attacker, isPlayer, isMagic, isNormalAttack)
+    local total = ____exports.calcLifeSteal(attacker, isPlayer)
     if isMagic then
-        total = total + ____exports.calcMagicLifeSteal(nil, attacker, isPlayer)
+        total = total + ____exports.calcMagicLifeSteal(attacker, isPlayer)
     end
     if isNormalAttack then
-        total = total + ____exports.calcNormalAttackLifeSteal(nil, attacker, isPlayer)
+        total = total + ____exports.calcNormalAttackLifeSteal(attacker, isPlayer)
     end
     return total
 end
@@ -194,15 +200,9 @@ end
 -- @param isMagic 是否魔法伤害
 -- @param isNormalAttack 是否普攻
 -- @returns 回复值
-function ____exports.calcLifeStealHeal(self, attacker, damage, isMagic, isNormalAttack)
+function ____exports.calcLifeStealHeal(attacker, damage, isMagic, isNormalAttack)
     local isPlayer = isPlayerUnit(nil, attacker)
-    local lifeStealPercent = ____exports.calcTotalLifeSteal(
-        nil,
-        attacker,
-        isPlayer,
-        isMagic,
-        isNormalAttack
-    )
+    local lifeStealPercent = ____exports.calcTotalLifeSteal(attacker, isPlayer, isMagic, isNormalAttack)
     if lifeStealPercent <= 0 then
         return 0
     end
@@ -218,7 +218,7 @@ end
 -- @param attacker 攻击者
 -- @param heal 回复值
 -- @param showText 是否显示漂浮文字
-function ____exports.applyLifeSteal(self, attacker, heal, showText)
+function ____exports.applyLifeSteal(attacker, heal, showText)
     if showText == nil then
         showText = true
     end
@@ -234,7 +234,7 @@ function ____exports.applyLifeSteal(self, attacker, heal, showText)
     end
     jass.SetUnitState(attacker, jass.UNIT_STATE_LIFE, currentLife + actualHeal)
     if showText then
-        showLifeStealText(nil, attacker, actualHeal)
+        showLifeStealText(attacker, actualHeal)
     end
 end
 --- 计算伤害吸魔
@@ -242,7 +242,7 @@ end
 -- @param attacker 攻击者
 -- @param damage 最终伤害
 -- @returns 吸魔值
-function ____exports.calcManaSteal(self, attacker, damage)
+function ____exports.calcManaSteal(attacker, damage)
     if not jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO) then
         return 0
     end
@@ -269,7 +269,7 @@ end
 -- @param attacker 攻击者
 -- @param mana 回复值
 -- @param showText 是否显示漂浮文字
-function ____exports.applyManaSteal(self, attacker, mana, showText)
+function ____exports.applyManaSteal(attacker, mana, showText)
     if showText == nil then
         showText = true
     end
@@ -285,7 +285,7 @@ function ____exports.applyManaSteal(self, attacker, mana, showText)
     end
     jass.SetUnitState(attacker, jass.UNIT_STATE_MANA, currentMana + actualMana)
     if showText then
-        showManaStealText(nil, attacker, actualMana)
+        showManaStealText(attacker, actualMana)
     end
 end
 LIFE_STEAL_TEXT_COLOR = {red = 0, green = 255, blue = 0, alpha = 0}
@@ -297,27 +297,21 @@ MANA_STEAL_TEXT_COLOR = {red = 0, green = 150, blue = 255, alpha = 0}
 -- @param isMagic 是否魔法伤害
 -- @param isNormalAttack 是否普攻
 -- @param showText 是否显示漂浮文字
-function ____exports.applyLifeAndManaSteal(self, attacker, damage, isMagic, isNormalAttack, showText)
+function ____exports.applyLifeAndManaSteal(attacker, damage, isMagic, isNormalAttack, showText)
     if showText == nil then
         showText = true
     end
-    local beneficiary = ____exports.getStealBeneficiary(nil, attacker)
+    local beneficiary = ____exports.getStealBeneficiary(attacker)
     if beneficiary == nil then
         return
     end
-    local heal = ____exports.calcLifeStealHeal(
-        nil,
-        beneficiary,
-        damage,
-        isMagic,
-        isNormalAttack
-    )
+    local heal = ____exports.calcLifeStealHeal(beneficiary, damage, isMagic, isNormalAttack)
     if heal > 0 then
-        ____exports.applyLifeSteal(nil, beneficiary, heal, showText)
+        ____exports.applyLifeSteal(beneficiary, heal, showText)
     end
-    local mana = ____exports.calcManaSteal(nil, beneficiary, damage)
+    local mana = ____exports.calcManaSteal(beneficiary, damage)
     if mana > 0 then
-        ____exports.applyManaSteal(nil, beneficiary, mana, showText)
+        ____exports.applyManaSteal(beneficiary, mana, showText)
     end
 end
 return ____exports

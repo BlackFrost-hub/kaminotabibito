@@ -531,7 +531,7 @@ local function init()
         return
     end
     mainQuestTickRegistered = true
-    addPeriodicCallback(nil, 300, tick)
+    addPeriodicCallback(300, tick)
 end
 if ____exports.ENABLE_MAIN_QUEST_CONFIG_DRIVER then
     init()

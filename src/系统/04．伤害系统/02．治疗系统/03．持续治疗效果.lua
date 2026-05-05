@@ -12,7 +12,7 @@ function unregisterCenterTimerIfNeeded(self)
         return
     end
     if hotTickCallback then
-        offSecond(nil, hotTickCallback)
+        offSecond(hotTickCallback)
         hotTickCallback = nil
     end
     registeredToCenterTimer = false
@@ -172,7 +172,7 @@ local function ensureCenterTimerRegistered(self)
         return
     end
     hotTickCallback = onHotTick
-    onSecond(nil, hotTickCallback)
+    onSecond(hotTickCallback)
     registeredToCenterTimer = true
 end
 --- 启动持续治疗效果

@@ -21,8 +21,8 @@ const 硬件函数 = require("系统.00．核心系统.02．硬件函数") as {
   getTriggerKeyPlayer: () => any;
 };
 const 中心计时器 = globalThis as unknown as {
-  onTick10ms: (callback: () => void) => void;
-  offTick10ms: (callback: () => void) => void;
+  onTick10ms: (this: void, callback: () => void) => void;
+  offTick10ms: (this: void, callback: () => void) => void;
 };
 const registerKeyEventRawStatus = 硬件函数.registerKeyEventRawStatus;
 const getTriggerKey = 硬件函数.getTriggerKey;

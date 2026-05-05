@@ -85,7 +85,7 @@ function ____exports.TryInitCinematicBehaviorBJ(self)
 end
 function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, unitName, soundHandle, message, timeType, timeVal, wait)
     ____exports.TryInitCinematicBehaviorBJ(nil)
-    local safeTime = RMaxBJ(nil, timeVal, 0)
+    local safeTime = RMaxBJ(timeVal, 0)
     local duration = 0
     duration = GetTransmissionDuration(nil, soundHandle, timeType, safeTime)
     jglobals.bj_lastTransmissionDuration = duration
@@ -208,16 +208,16 @@ function ____exports.CinematicFilterGenericBJ(self, duration, bmode, tex, red0, 
     jass.SetCineFilterStartUV(0, 0, 1, 1)
     jass.SetCineFilterEndUV(0, 0, 1, 1)
     jass.SetCineFilterStartColor(
-        PercentTo255(nil, red0),
-        PercentTo255(nil, green0),
-        PercentTo255(nil, blue0),
-        PercentTo255(nil, 100 - trans0)
+        PercentTo255(red0),
+        PercentTo255(green0),
+        PercentTo255(blue0),
+        PercentTo255(100 - trans0)
     )
     jass.SetCineFilterEndColor(
-        PercentTo255(nil, red1),
-        PercentTo255(nil, green1),
-        PercentTo255(nil, blue1),
-        PercentTo255(nil, 100 - trans1)
+        PercentTo255(red1),
+        PercentTo255(green1),
+        PercentTo255(blue1),
+        PercentTo255(100 - trans1)
     )
     jass.SetCineFilterDuration(duration)
     jass.DisplayCineFilter(true)

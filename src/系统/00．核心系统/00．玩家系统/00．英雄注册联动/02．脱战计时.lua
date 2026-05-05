@@ -49,6 +49,8 @@ forEachUnitInGroup = ____require_result_2.forEachUnitInGroup
 local ____require_result_3 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_3.registerDamageCallback
 local centerTimer = _G
+--- 脱战计时系统开关
+local OUT_OF_COMBAT_ENABLED = false
 --- 脱战计时时间（秒）
 local OUT_OF_COMBAT_TIME = 18
 OUT_OF_COMBAT_SPEED_ABILITY = 1093677378
@@ -113,9 +115,9 @@ local function startOutOfCombatTimer(self, playerId)
     local timerIndex = playerId + 1
     local oldTaskId = outOfCombatTaskIds[timerIndex + 1]
     if oldTaskId ~= 0 then
-        centerTimer:removeDelayedCallback(oldTaskId)
+        centerTimer.removeDelayedCallback(oldTaskId)
     end
-    outOfCombatTaskIds[timerIndex + 1] = centerTimer:addDelayedCallback(
+    outOfCombatTaskIds[timerIndex + 1] = centerTimer.addDelayedCallback(
         OUT_OF_COMBAT_TIME * 1000,
         function()
             if outOfCombatTaskIds[timerIndex + 1] == 0 then
@@ -168,6 +170,9 @@ function ____exports.initOutOfCombat(self)
         return
     end
     _initialized = true
+    if not OUT_OF_COMBAT_ENABLED then
+        return
+    end
     registerDamageCallback(nil, onUnitDamaged)
 end
 return ____exports

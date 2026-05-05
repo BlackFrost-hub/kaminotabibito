@@ -69,7 +69,7 @@ local function countOnJassStesTable(eventName)
     )
 end
 local function scheduleRetry(fn)
-    createDelayedCall(nil, RETRY_SEC, fn)
+    createDelayedCall(RETRY_SEC, fn)
 end
 --- 注册单位目标命令事件监听
 local function tryRegisterTargetOrderStes()

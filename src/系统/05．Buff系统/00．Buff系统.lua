@@ -217,7 +217,7 @@ function ensureSyncTimer()
     _registeredToCenterTimer = true
     local ____G_3 = _G
     local onTick10ms = ____G_3.onTick10ms
-    onTick10ms(nil, onBuffPoolCenterTimerTick)
+    onTick10ms(onBuffPoolCenterTimerTick)
 end
 function maybeStopSyncTimer()
 end

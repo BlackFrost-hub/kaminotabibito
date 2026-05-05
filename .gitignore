@@ -1,6 +1,7 @@
 /.build
 /.def
 /.JASS
+/imports
 /.w3x/
 *.w3x
 ~$*

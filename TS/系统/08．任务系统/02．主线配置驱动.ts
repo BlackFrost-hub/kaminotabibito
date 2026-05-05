@@ -45,7 +45,7 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as 
   debugLog: (module: string, ...args: any[]) => void;
 };
 const { addPeriodicCallback } = globalThis as unknown as {
-  addPeriodicCallback: (intervalMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
 
 /**

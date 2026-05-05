@@ -15,7 +15,7 @@
 
 const jass = require("jass.common") as any;
 const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
-  RMaxBJ: (a: number, b: number) => number;
+  RMaxBJ: (this: void, a: number, b: number) => number;
 };
 const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;

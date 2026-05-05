@@ -59,10 +59,7 @@ local function formatBuffRemainOneDecimal(rem)
     if type(rem) ~= "number" or not __TS__NumberIsFinite(__TS__Number(rem)) then
         return "0.0"
     end
-    local scaled = round(
-        nil,
-        clampMin(rem, 0) * 10
-    )
+    local scaled = round(clampMin(rem, 0) * 10)
     local intPart = jass.R2I(scaled / 10)
     local fracPart = scaled % 10
     return (tostring(intPart) .. ".") .. tostring(fracPart)
