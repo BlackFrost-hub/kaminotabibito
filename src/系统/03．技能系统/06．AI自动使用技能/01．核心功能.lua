@@ -244,7 +244,7 @@ local function onAICheck(self)
         updateAIUnit(nil, unitInfo)
     end
 end
-local ____require_result_5 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
 function ____exports.initAISkillSystem(self)
     if not AI_SKILL_SYSTEM_ENABLED then

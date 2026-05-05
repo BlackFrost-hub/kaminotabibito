@@ -134,6 +134,10 @@ function registerSelectionTriggersForPlayer(whichPlayer: any): void {
   initialized = true;
 }
 
+/**
+ * 为指定玩家初始化“选中/取消选中”事件中心。
+ * 只会对同一玩家注册一次原生事件，后续查询与监听都依赖这里维护的缓存。
+ */
 export function initPlayerSelectionCenter(whichPlayer: any): void {
   registerSelectionTriggersForPlayer(whichPlayer);
 }
@@ -144,6 +148,10 @@ function normalizeSelectionListener(arg1: any, arg2?: any): SelectionListener | 
   return null;
 }
 
+/**
+ * 添加选中状态监听。
+ * 回调会在单位被选中或取消选中后触发，参数里会给出玩家、playerId、单位和当前是否为选中动作。
+ */
 export function addSelectionListener(arg1: any, arg2?: any): void {
   const listener = normalizeSelectionListener(arg1, arg2);
   if (typeof listener !== "function") return;
@@ -151,6 +159,9 @@ export function addSelectionListener(arg1: any, arg2?: any): void {
   selectionListeners.push(listener);
 }
 
+/**
+ * 移除之前注册的选中状态监听。
+ */
 export function removeSelectionListener(arg1: any, arg2?: any): void {
   const listener = normalizeSelectionListener(arg1, arg2);
   if (typeof listener !== "function") return;
@@ -158,6 +169,10 @@ export function removeSelectionListener(arg1: any, arg2?: any): void {
   if (index >= 0) selectionListeners.splice(index, 1);
 }
 
+/**
+ * 只在“恰好选中 1 个单位”时返回该单位。
+ * 多选、未选中或事件中心尚未初始化时都会返回 null。
+ */
 export function getSoleSelectedUnitForPlayer(playerId: number): any | null {
   if (!initialized) return null;
   const unit = selectedUnit[playerId];
@@ -165,4 +180,37 @@ export function getSoleSelectedUnitForPlayer(playerId: number): any | null {
   if (!unit || unit === 0) return null;
   if (count !== 1) return null;
   return unit;
+}
+
+/**
+ * 在外部已知玩家当前唯一选中单位时，手动把状态种进事件中心。
+ * 主要用于补齐“先有选中态，后初始化事件中心”这类不会补发原生事件的场景。
+ */
+export function seedSoleSelectedUnitForPlayer(whichPlayer: any, whichUnit: any): void {
+  if (!isValidPlayer(whichPlayer)) return;
+
+  const playerId = jass.GetPlayerId(whichPlayer);
+  jass.DisplayTextToPlayer(whichPlayer, 0, 0, `SEL_SEED_PID_${playerId}`);
+  if (!isRealUnit(whichUnit)) {
+    jass.DisplayTextToPlayer(whichPlayer, 0, 0, "SEL_SEED_UNIT_INVALID");
+    selectedCount[playerId] = 0;
+    selectedUnit[playerId] = null;
+    delete selectedUnitsByPlayer[playerId];
+    return;
+  }
+
+  selectedUnitsByPlayer[playerId] = [whichUnit];
+  selectedCount[playerId] = 1;
+  selectedUnit[playerId] = whichUnit;
+  jass.DisplayTextToPlayer(whichPlayer, 0, 0, `SEL_SEED_UNIT_${getUnitHandleId(whichUnit)}`);
+}
+
+/**
+ * 返回指定玩家当前选中缓存的摘要，便于调试事件中心是否成功记录状态。
+ */
+export function getSelectionDebugForPlayer(playerId: number): string {
+  const count = selectedCount[playerId] || 0;
+  const unit = selectedUnit[playerId];
+  const handleId = getUnitHandleId(unit);
+  return `init=${initialized ? 1 : 0},count=${count},unit=${handleId}`;
 }

@@ -6,36 +6,14 @@
 export * from "./00．单位初始化创建/index";
 export * from "./01．多面板属性/index";
 export * from "./02．恢复系统/index";
-export * from "./03．单位死亡事件/index";
 export * from "./04．多杀检测系统/index";
 
 // ========== 核心模块导出 ==========
-export * from "./单位狂暴";
-
-// ========== 初始化 ==========
-// 单位初始化创建子系统（通过index自动加载）
-require("系统.01．单位系统.00．单位初始化创建.index");
-
-// 多面板属性系统（通过index自动加载）
-require("系统.01．单位系统.01．多面板属性.index");
-
-// 恢复系统
-require("系统.01．单位系统.02．恢复系统.index");
-
-// 单位死亡事件系统
-require("系统.01．单位系统.03．单位死亡事件.index");
-
-// 多杀检测系统
-require("系统.01．单位系统.04．多杀检测系统.index");
-
-// 单位狂暴
-require("系统.01．单位系统.单位狂暴");
+export * from "./05．单位狂暴/index";
 
 /**
  * 初始化单位系统
+ * 各子系统已在各自 index.ts 中自动初始化
  */
 export function init(): void {
 }
-
-// 自动初始化（可选）
-// init();

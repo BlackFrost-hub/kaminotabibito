@@ -1,0 +1,187 @@
+//===========================================================================
+// Trigger: main
+//===========================================================================
+function Trig_mainActions takes nothing returns nothing
+	local integer ydul_i
+	local integer ydul_y
+	local integer ydul_x
+	YDLocalInitialize()
+	set udg_UI[0] = DzCreateFrameByTagName( "BACKDROP", "提示背景", DzGetGameUI(), "template", 0)
+	set udg_UI[1] = DzCreateFrameByTagName( "TEXT", "物品描述", udg_UI[0], "template", 0)
+	set udg_UI[2] = DzCreateFrameByTagName( "TEXT", "物品属性", udg_UI[0], "template", 0)
+	set udg_UI[3] = DzCreateFrameByTagName( "TEXT", "物品名字", udg_UI[0], "template", 0)
+	set udg_UI[4] = DzCreateFrameByTagName( "BACKDROP", "物品贴图", udg_UI[0], "template", 0)
+	call DzFrameSetSize( udg_UI[0], 0.20, 0.20)
+	call DzFrameSetSize( udg_UI[1], 0.21, 0.00)
+	call DzFrameSetSize( udg_UI[2], 0.21, 0.00)
+	call DzFrameSetSize( udg_UI[4], 0.032, 0.032)
+	call DzFrameSetTexture( udg_UI[0], "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+	call DzFrameSetTexture( udg_UI[4], "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp", 0)
+	call DzFrameSetText( udg_UI[1], "这里显示物品的说明")
+	call DzFrameSetText( udg_UI[2], "物品属性这里显示物品的属性")
+	call DzFrameSetText( udg_UI[3], "物品名字")
+	call DzFrameSetPoint( udg_UI[1], 7, DzFrameGetCommandBarButton( 0, 1), 1, 0.01, 0.04)
+	call DzFrameSetPoint( udg_UI[2], 6, udg_UI[1], 0, 0, 0.01)
+	call DzFrameSetPoint( udg_UI[3], 0, udg_UI[2], 0, 0.037, 0.042)
+	call DzFrameSetPoint( udg_UI[4], 6, udg_UI[2], 0, 0, 0.01)
+	call DzFrameSetPoint( udg_UI[0], 1, udg_UI[3], 1, 0, 0.005)
+	call DzFrameSetPoint( udg_UI[0], 3, udg_UI[2], 3, -0.005, 0)
+	call DzFrameSetPoint( udg_UI[0], 5, udg_UI[2], 5, 0.005, 0)
+	call DzFrameSetPoint( udg_UI[0], 7, udg_UI[1], 7, 0, -0.005)
+	call DzFrameShow( udg_UI[0], false)
+	set udg_Unit[0] = gg_unit_Hpal_0000
+	set ydul_i = 0
+	loop
+		exitwhen ydul_i > 5
+		call DzFrameSetScript( DzFrameGetItemBarButton( ydul_i), 2, "Trig_call_FrameOvActions", false)
+		call DzFrameSetScript( DzFrameGetItemBarButton( ydul_i), 3, "Trig_call_FrameOutActions", false)
+		call YDUserDataSet(integer, DzF2I( DzFrameGetItemBarButton( ydul_i)),"id", integer, ydul_i)
+		set ydul_i = ydul_i + 1
+	endloop
+	set ydul_y = 0
+	loop
+		exitwhen ydul_y > 2
+		set ydul_x = 0
+		loop
+			exitwhen ydul_x > 3
+			call YDLocal1Set(frame, "ui", DzFrameGetCommandBarButton( ydul_y, ydul_x))
+			call DzFrameSetScript( YDLocal1Get(frame, "ui"), 2, "Trig_call_SkillFrameOvActions", false)
+			call DzFrameSetScript( YDLocal1Get(frame, "ui"), 3, "Trig_call_FrameOutActions", false)
+			call YDUserDataSet(integer, DzF2I( YDLocal1Get(frame, "ui")),"x", integer, ydul_x)
+			call YDUserDataSet(integer, DzF2I( YDLocal1Get(frame, "ui")),"y", integer, ydul_y)
+			set ydul_x = ydul_x + 1
+		endloop
+		set ydul_y = ydul_y + 1
+	endloop
+	call YDLocal1Release()
+endfunction
+
+//===========================================================================
+function InitTrig_main takes nothing returns nothing
+	set gg_trg_main = CreateTrigger()
+#ifdef DEBUG
+	call YDWESaveTriggerName(gg_trg_main,"main")
+#endif
+	call TriggerRegisterTimerEventSingle(gg_trg_main, 0.01)
+	call TriggerAddAction(gg_trg_main, function Trig_mainActions)
+endfunction
+
+//===========================================================================
+// Trigger: call_FrameOv
+//===========================================================================
+function Trig_call_FrameOvActions takes nothing returns nothing
+	YDLocalInitialize()
+	call YDLocal1Set(frame, "f", DzGetTriggerUIEventFrame())
+	call YDLocal1Set(player, "p", DzGetTriggerUIEventPlayer())
+	call YDLocal1Set(item, "it", UnitItemInSlot( udg_Unit[GetPlayerId( YDLocal1Get(player, "p"))], YDUserDataGet(integer, DzF2I( YDLocal1Get(frame, "f")),"id", integer)))
+	if ((YDLocal1Get(item, "it") != null)) then
+		call DzFrameShow( udg_UI[0], true)
+		call DzFrameSetText( udg_UI[1], "这里显示的是作者设置的物品描述")
+		call DzFrameSetText( udg_UI[2], YDWEGetItemDataString( GetItemTypeId( YDLocal1Get(item, "it")), 3))
+		call DzFrameSetText( udg_UI[3], GetItemName( YDLocal1Get(item, "it")))
+		call DzFrameSetTexture( udg_UI[4], YDWEGetItemDataString( GetItemTypeId( YDLocal1Get(item, "it")), 1), 0)
+		call DzFrameClearAllPoints( DzFrameGetTooltip())
+		call DzFrameSetPoint( DzFrameGetTooltip(), 7, DzGetGameUI(), 7, 0, -0.60)
+		call YDLocal1Release()
+		return
+	else
+	endif
+	call YDLocal1Release()
+endfunction
+
+//===========================================================================
+function InitTrig_call_FrameOv takes nothing returns nothing
+	set gg_trg_call_FrameOv = CreateTrigger()
+#ifdef DEBUG
+	call YDWESaveTriggerName(gg_trg_call_FrameOv,"call_FrameOv")
+#endif
+	call TriggerAddAction(gg_trg_call_FrameOv, function Trig_call_FrameOvActions)
+endfunction
+
+//===========================================================================
+// Trigger: call_FrameOut
+//===========================================================================
+function Trig_call_FrameOutActions takes nothing returns nothing
+	call DzFrameShow( udg_UI[0], false)
+	call DzFrameClearAllPoints( DzFrameGetTooltip())
+	call DzFrameSetPoint( DzFrameGetTooltip(), 8, DzGetGameUI(), 8, 0, 0.16)
+endfunction
+
+//===========================================================================
+function InitTrig_call_FrameOut takes nothing returns nothing
+	set gg_trg_call_FrameOut = CreateTrigger()
+#ifdef DEBUG
+	call YDWESaveTriggerName(gg_trg_call_FrameOut,"call_FrameOut")
+#endif
+	call TriggerAddAction(gg_trg_call_FrameOut, function Trig_call_FrameOutActions)
+endfunction
+
+//===========================================================================
+// Trigger: call_SkillFrameOv
+//===========================================================================
+function Trig_call_SkillFrameOvActions takes nothing returns nothing
+	YDLocalInitialize()
+	call YDLocal1Set(frame, "f", DzGetTriggerUIEventFrame())
+	call YDLocal1Set(player, "p", DzGetTriggerUIEventPlayer())
+	call KKAPISetLocalVariables( 1, x, YDUserDataGet(integer, DzF2I( YDLocal1Get(frame, "f")),"x", Null))
+	call KKAPISetLocalVariables( 1, y, YDUserDataGet(integer, DzF2I( YDLocal1Get(frame, "f")),"y", Null))
+	call YDLocal1Set(integer, "orderID", S2I(EXExecuteScript("(function() local _, o = require 'jass.message'.button(" + I2S(x) + "," + I2S(y) + ") return o end)()")))
+	call YDLocal1Set(abilcode, "skillID",          ( S2I(EXExecuteScript("require 'jass.message'.button(" + I2S(x) + "," + I2S(y) + ")"))))
+	//技能文本提示
+	if ((YDWEGetAbilityTypeID( YDLocal1Get(abilcode, "skillID")) != 0)) then
+		call DzFrameShow( udg_UI[0], true)
+		call DzFrameSetText( udg_UI[2], "")
+		call DzFrameSetTexture( udg_UI[4], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 204), 0)
+		call DzFrameSetText( udg_UI[3], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 215))
+		call DzFrameSetText( udg_UI[1], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 218))
+		call DzFrameClearAllPoints( DzFrameGetTooltip())
+		call DzFrameSetPoint( DzFrameGetTooltip(), 7, DzGetGameUI(), 7, 0, -0.60)
+		call YDLocal1Release()
+		return
+	else
+	endif
+	//攻击命令按钮示例
+	if ((YDWEGetAbilityTypeID( YDLocal1Get(abilcode, "orderID")) == 851986)) then
+		call DisplayTextToPlayer( Player(0), 0, 0, I2S( YDLocal1Get(integer, "orderID")))
+		call DzFrameShow( udg_UI[0], true)
+		call DzFrameSetText( udg_UI[2], GetItemName( YDLocal1Get(item, "it")))
+		call DzFrameSetTexture( udg_UI[4], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 204), 0)
+		call DzFrameSetText( udg_UI[3], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 215))
+		call DzFrameSetText( udg_UI[1], YDWEGetUnitAbilityDataString( DzGetSelectedLeaderUnit(), YDLocal1Get(abilcode, "skillID"), 1, 218))
+		call DzFrameClearAllPoints( DzFrameGetTooltip())
+		call DzFrameSetPoint( DzFrameGetTooltip(), 7, DzGetGameUI(), 7, 0, -0.60)
+		call YDLocal1Release()
+		return
+	else
+	endif
+	call YDLocal1Release()
+endfunction
+
+//===========================================================================
+function InitTrig_call_SkillFrameOv takes nothing returns nothing
+	set gg_trg_call_SkillFrameOv = CreateTrigger()
+#ifdef DEBUG
+	call YDWESaveTriggerName(gg_trg_call_SkillFrameOv,"call_SkillFrameOv")
+#endif
+	call TriggerAddAction(gg_trg_call_SkillFrameOv, function Trig_call_SkillFrameOvActions)
+endfunction
+
+//===========================================================================
+// Trigger: unit
+//===========================================================================
+function Trig_unitActions takes nothing returns nothing
+	set udg_Unit[GetPlayerId( GetTriggerPlayer())] = GetTriggerUnit()
+endfunction
+
+//===========================================================================
+function InitTrig_unit takes nothing returns nothing
+	set gg_trg_unit = CreateTrigger()
+#ifdef DEBUG
+	call YDWESaveTriggerName(gg_trg_unit,"unit")
+#endif
+#define YDTRIGGER_COMMON_LOOP(n) 	call TriggerRegisterPlayerSelectionEventBJ(gg_trg_unit, Player(n), true)
+#define YDTRIGGER_COMMON_LOOP_LIMITS (0, 15)
+#include <YDTrigger/Common/loop.h>
+	call TriggerAddAction(gg_trg_unit, function Trig_unitActions)
+endfunction
+

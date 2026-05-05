@@ -50,6 +50,9 @@ const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．
 const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
   registerChestSystemHero: (whichHero: any) => void;
 };
+const dynamicSkillTipSystem = require("系统.03．技能系统.05．动态技能说明.index") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
 };
@@ -123,14 +126,23 @@ const taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．
 
 const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   initPlayerSelectionCenter?: (this: void, whichPlayer: any) => void;
+  seedSoleSelectedUnitForPlayer?: (this: void, whichPlayer: any, whichUnit: any) => void;
 };
 const initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter as
   | ((this: void, whichPlayer: any) => void)
+  | undefined;
+const seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnitForPlayer as
+  | ((this: void, whichPlayer: any, whichUnit: any) => void)
   | undefined;
 
 function invokeSelectionCenterInit(whichPlayer: any): void {
   if (typeof initPlayerSelectionCenter !== "function") return;
   initPlayerSelectionCenter(whichPlayer);
+}
+
+function invokeSelectionCenterSeed(whichPlayer: any, whichUnit: any): void {
+  if (typeof seedSoleSelectedUnitForPlayer !== "function") return;
+  seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit);
 }
 
 /**
@@ -148,10 +160,15 @@ function registerHeroDependents(whichHero: any): void {
   }
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner != null && owner !== 0) {
+    if (typeof dynamicSkillTipSystem.onPlayerHeroRegistered === "function") {
+      dynamicSkillTipSystem.onPlayerHeroRegistered(owner, whichHero);
+    }
+
     const playerId = jass.GetPlayerId(owner);
     debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
 
     invokeSelectionCenterInit(owner);
+    invokeSelectionCenterSeed(owner, whichHero);
 
     // UI系统只注册一次，防止重复注册
     if (!uiRegisteredPlayers.has(playerId)) {

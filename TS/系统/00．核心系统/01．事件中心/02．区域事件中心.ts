@@ -84,6 +84,11 @@ function addListener(store: Record<string, Listener[]>, key: string, trigger: an
   };
 }
 
+/**
+ * 为区域进入事件注册监听。
+ * 相同 region + filter 只会创建一个原生总触发器，后续监听统一走内部派发。
+ * 返回值用于取消当前监听，不会影响同 key 下的其他监听者。
+ */
 export function registerEnterRegionTrigger(
   trigger: any,
   region: any,

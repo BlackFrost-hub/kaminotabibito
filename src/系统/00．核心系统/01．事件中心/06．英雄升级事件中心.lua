@@ -19,6 +19,8 @@ function dispatchHeroLevelEvent()
         end
     end
 end
+--- 初始化英雄升级事件中心。
+-- 对项目约定的玩家集合统一注册升级事件，并把原生事件集中派发给监听列表。
 function ____exports.initHeroLevelEventCenter()
     if _initialized then
         return
@@ -68,6 +70,8 @@ local function hasListener(list, callback)
     end
     return false
 end
+--- 注册英雄升级监听。
+-- 第一次调用时会自动初始化事件中心，后续同一回调不会重复加入。
 function ____exports.registerHeroLevelListener(callback)
     if type(callback) ~= "function" then
         return
@@ -77,6 +81,7 @@ function ____exports.registerHeroLevelListener(callback)
         heroLevelListeners[#heroLevelListeners + 1] = callback
     end
 end
+--- 取消英雄升级监听。
 function ____exports.unregisterHeroLevelListener(callback)
     local idx = __TS__ArrayIndexOf(heroLevelListeners, callback)
     if idx >= 0 then

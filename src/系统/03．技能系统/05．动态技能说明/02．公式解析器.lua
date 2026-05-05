@@ -115,9 +115,9 @@ function ____exports.normalizeExpression(self, expr)
         local i = 0
         while i < #expr do
             local c = __TS__StringAccess(expr, i)
-            if c == OPERATOR_MULTIPLY_CN then
+            if c == OPERATOR_MULTIPLY_CN or c == "×" then
                 result = result .. OPERATOR_MULTIPLY_EN
-            elseif c == OPERATOR_DIVIDE_CN then
+            elseif c == OPERATOR_DIVIDE_CN or c == "÷" then
                 result = result .. OPERATOR_DIVIDE_EN
             else
                 result = result .. c

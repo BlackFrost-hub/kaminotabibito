@@ -63,6 +63,11 @@ function ensureNativeRegistration(player: any, eventId: any, key: string): void 
   jass.TriggerRegisterPlayerUnitEvent(master, player, eventId, null);
 }
 
+/**
+ * 为“玩家 + 单位事件”建立统一派发。
+ * 无 filter 时会复用内部总触发器，避免为同类事件重复注册原生触发。
+ * 有 filter 时保持原生逐触发器注册，避免改变 filter 语义。
+ */
 export function registerPlayerUnitEvent(trig: any, player: any, eventId: any, filter?: any): void {
   if (!trig || !player || !eventId) return;
   const normalizedFilter = normalizeFilter(filter);
@@ -76,10 +81,16 @@ export function registerPlayerUnitEvent(trig: any, player: any, eventId: any, fi
   if (!hasTrigger(list, trig)) list.push(trig);
 }
 
+/**
+ * 按玩家 id 注册玩家单位事件。
+ */
 export function registerPlayerUnitEventById(trig: any, playerId: number, eventId: any, filter?: any): void {
   registerPlayerUnitEvent(trig, jass.Player(playerId), eventId, filter);
 }
 
+/**
+ * 为一组玩家批量注册相同的玩家单位事件。
+ */
 export function registerPlayerUnitEventForPlayerIds(
   trig: any,
   playerIds: readonly number[],
@@ -92,6 +103,9 @@ export function registerPlayerUnitEventForPlayerIds(
   }
 }
 
+/**
+ * 对项目默认需要监听的玩家集合批量注册事件。
+ */
 export function registerDefaultPlayerUnitEvent(trig: any, eventId: any, filter?: any): void {
   registerPlayerUnitEventForPlayerIds(trig, DEFAULT_PLAYER_UNIT_EVENT_PLAYER_IDS, eventId, filter);
 }

@@ -124,6 +124,9 @@ local function addListener(store, key, trigger, once)
         listener.active = false
     end
 end
+--- 为指定单位注册特定原生事件。
+-- 相同 unit + eventId 只保留一个原生总触发器，其余监听都复用内部派发。
+-- 返回值可用于取消当前监听；once=true 时首次命中后会自动失效。
 function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
     if once == nil then
         once = false
@@ -145,6 +148,9 @@ function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
     end
     return addListener(unitEventListeners, key, trigger, once)
 end
+--- 为指定单位注册“单位进入范围”事件。
+-- key 由 unit + range + filter 组成，保证同一组监听共享一个原生注册。
+-- 返回值可用于取消当前监听；once=true 时首次命中后自动移除。
 function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, once)
     if once == nil then
         once = false

@@ -118,30 +118,24 @@ local function initUseTrigger(self)
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(useTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_USE_ITEM)
     jass.TriggerAddAction(useTrigger, dispatchUseEvent)
 end
---- 注册物品拾取事件监听器
--- 
--- @param callback 回调函数 (unit, item) => void
--- @returns 监听器ID，用于取消注册
+--- 注册物品拾取事件监听。
+-- 监听器会复用统一的拾取总触发器，返回值是当前监听的内部 id。
 function ____exports.onItemPickup(self, callback)
     initPickupTrigger(nil)
     local id = getNextListenerId(nil)
     pickupListeners[#pickupListeners + 1] = {id = id, callback = callback}
     return id
 end
---- 注册物品丢弃事件监听器
--- 
--- @param callback 回调函数 (unit, item) => void
--- @returns 监听器ID，用于取消注册
+--- 注册物品丢弃事件监听。
+-- 监听器会复用统一的丢弃总触发器，返回值是当前监听的内部 id。
 function ____exports.onItemDrop(self, callback)
     initDropTrigger(nil)
     local id = getNextListenerId(nil)
     dropListeners[#dropListeners + 1] = {id = id, callback = callback}
     return id
 end
---- 注册物品使用事件监听器
--- 
--- @param callback 回调函数 (unit, item) => void
--- @returns 监听器ID，用于取消注册
+--- 注册物品使用事件监听。
+-- 监听器会复用统一的使用总触发器，返回值是当前监听的内部 id。
 function ____exports.onItemUse(self, callback)
     initUseTrigger(nil)
     local id = getNextListenerId(nil)
@@ -193,7 +187,7 @@ function ____exports.offItemUse(self, id)
         end
     end
 end
---- 获取当前监听器数量（用于调试）
+--- 返回当前三类物品事件的监听器数量，主要用于调试排查重复注册。
 function ____exports.getListenerCounts(self)
     return {pickup = #pickupListeners, drop = #dropListeners, use = #useListeners}
 end

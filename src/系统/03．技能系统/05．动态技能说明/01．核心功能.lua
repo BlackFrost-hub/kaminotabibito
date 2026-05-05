@@ -1,9 +1,9 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__ArraySort = ____lualib.__TS__ArraySort
+local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__StringAccess = ____lualib.__TS__StringAccess
@@ -11,12 +11,14 @@ local __TS__StringSlice = ____lualib.__TS__StringSlice
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local evaluateFormula, processTemplate, updateSkillTip, EXGetUnitAbility, EXSetAbilityDataString, attributeGetters
+local normalizeFormulaTemplate, denormalizeFormulaTemplate, evaluateFormula, processTemplate, updateSkillTip, matchFormulaToken, isInlineFormulaChar, hasFormulaOperatorOrDigit, processInlineFormulas, jass, EXGetUnitAbility, FORMULA_TOKEN_SKILL_LEVEL, formulaAliases, aliasedAttributeGetters, formulaTokenNames
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.05．动态技能说明.00．常量定义")
 local DYNAMIC_SKILL_TIP_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.DYNAMIC_SKILL_TIP_ENABLED
 local UNIT_STATE_ATTACK1_BASE = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BASE
 local UNIT_STATE_ATTACK1_BONUS = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ATTACK1_BONUS
 local UNIT_STATE_ARMOR = ____00_FF0E_5E38_91CF_5B9A_4E49.UNIT_STATE_ARMOR
+local OPERATOR_MULTIPLY_CN = ____00_FF0E_5E38_91CF_5B9A_4E49.OPERATOR_MULTIPLY_CN
+local OPERATOR_DIVIDE_CN = ____00_FF0E_5E38_91CF_5B9A_4E49.OPERATOR_DIVIDE_CN
 local BRACKET_LEFT_EN = ____00_FF0E_5E38_91CF_5B9A_4E49.BRACKET_LEFT_EN
 local BRACKET_RIGHT_EN = ____00_FF0E_5E38_91CF_5B9A_4E49.BRACKET_RIGHT_EN
 local BRACKET_LEFT_CN = ____00_FF0E_5E38_91CF_5B9A_4E49.BRACKET_LEFT_CN
@@ -43,26 +45,41 @@ local safeEval = ____02_FF0E_516C_5F0F_89E3_6790_5668.safeEval
 local replaceAll = ____02_FF0E_516C_5F0F_89E3_6790_5668.replaceAll
 local indexOfChar = ____02_FF0E_516C_5F0F_89E3_6790_5668.indexOfChar
 local formatNumber = ____02_FF0E_516C_5F0F_89E3_6790_5668.formatNumber
+local isDigit = ____02_FF0E_516C_5F0F_89E3_6790_5668.isDigit
+function normalizeFormulaTemplate(self, template)
+    local result = template
+    for ____, alias in ipairs(formulaAliases) do
+        result = replaceAll(nil, result, alias.source, alias.token)
+    end
+    return result
+end
+function denormalizeFormulaTemplate(self, template)
+    local result = template
+    for ____, alias in ipairs(formulaAliases) do
+        result = replaceAll(nil, result, alias.token, alias.source)
+    end
+    return result
+end
 function evaluateFormula(self, formula, unit, skillLevel)
     if not formula then
         return 0
     end
-    local expr = __TS__StringTrim(formula)
+    local expr = __TS__StringTrim(normalizeFormulaTemplate(nil, formula))
     if expr == "" then
         return 0
     end
     expr = replaceAll(
         nil,
         expr,
-        ATTR_SKILL_LEVEL,
+        FORMULA_TOKEN_SKILL_LEVEL,
         tostring(skillLevel)
     )
     local sortedAttrs = __TS__ArraySort(
-        __TS__ObjectKeys(attributeGetters),
+        __TS__ObjectKeys(aliasedAttributeGetters),
         function(____, a, b) return #b - #a end
     )
     for ____, attrName in ipairs(sortedAttrs) do
-        local getter = attributeGetters[attrName]
+        local getter = aliasedAttributeGetters[attrName]
         local value = getter(nil, unit)
         expr = replaceAll(
             nil,
@@ -88,6 +105,7 @@ function evaluateFormula(self, formula, unit, skillLevel)
     end
 end
 function processTemplate(self, template, unit, skillLevel)
+    template = normalizeFormulaTemplate(nil, template)
     local result = ""
     local i = 0
     while i < #template do
@@ -101,51 +119,111 @@ function processTemplate(self, template, unit, skillLevel)
                     local value = evaluateFormula(nil, formula, unit, skillLevel)
                     result = result .. formatNumber(nil, value)
                     i = endIdx + 1
-                    goto __continue27
+                    goto __continue34
                 end
             end
             result = result .. __TS__StringAccess(template, i)
             i = i + 1
         end
-        ::__continue27::
+        ::__continue34::
     end
-    return result
+    return denormalizeFormulaTemplate(
+        nil,
+        processInlineFormulas(nil, result, unit, skillLevel)
+    )
 end
 function updateSkillTip(self, skillInfo)
-    local ____skillInfo_2 = skillInfo
-    local unit = ____skillInfo_2.unit
-    local abilityId = ____skillInfo_2.abilityId
-    local level = ____skillInfo_2.level
-    local template = ____skillInfo_2.template
-    local tipType = ____skillInfo_2.tipType
+    local ____skillInfo_1 = skillInfo
+    local unit = ____skillInfo_1.unit
+    local abilityId = ____skillInfo_1.abilityId
+    local template = ____skillInfo_1.template
     local abil = EXGetUnitAbility(nil, unit, abilityId)
     if not abil then
         return
     end
-    local tipText = processTemplate(nil, template, unit, level)
-    EXSetAbilityDataString(
-        nil,
-        abil,
-        level,
-        tipType,
-        tipText
-    )
+    local currentLevel = jass.GetUnitAbilityLevel(unit, abilityId) or skillInfo.level or 1
+    skillInfo.level = currentLevel
+    skillInfo.renderedText = processTemplate(nil, template, unit, currentLevel)
 end
---- 动态技能说明系统 - 核心功能
--- 
--- 功能：注册动态技能说明、公式解析、自动刷新
--- 后续接手者：开关 DYNAMIC_SKILL_TIP_ENABLED 在常量文件
-local jass = require("jass.common")
+function matchFormulaToken(self, text, start)
+    for ____, token in ipairs(formulaTokenNames) do
+        if __TS__StringSlice(text, start, start + #token) == token then
+            return token
+        end
+    end
+    return nil
+end
+function isInlineFormulaChar(self, c)
+    return isDigit(nil, c) or c == "." or c == "+" or c == "-" or c == "*" or c == "/" or c == "×" or c == "÷" or c == OPERATOR_MULTIPLY_CN or c == OPERATOR_DIVIDE_CN or c == "脳" or c == "梅" or c == "(" or c == ")"
+end
+function hasFormulaOperatorOrDigit(self, formula)
+    do
+        local i = 0
+        while i < #formula do
+            local c = __TS__StringAccess(formula, i)
+            if isDigit(nil, c) or c == "+" or c == "-" or c == "*" or c == "/" or c == "×" or c == "÷" or c == OPERATOR_MULTIPLY_CN or c == OPERATOR_DIVIDE_CN or c == "脳" or c == "梅" then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
+function processInlineFormulas(self, template, unit, skillLevel)
+    local result = ""
+    local i = 0
+    while i < #template do
+        do
+            local startToken = matchFormulaToken(nil, template, i)
+            if startToken == nil then
+                result = result .. __TS__StringAccess(template, i)
+                i = i + 1
+                goto __continue100
+            end
+            local ____end = i + #startToken
+            while ____end < #template do
+                do
+                    local nextToken = matchFormulaToken(nil, template, ____end)
+                    if nextToken ~= nil then
+                        ____end = ____end + #nextToken
+                        goto __continue102
+                    end
+                    if not isInlineFormulaChar(
+                        nil,
+                        __TS__StringAccess(template, ____end)
+                    ) then
+                        break
+                    end
+                    ____end = ____end + 1
+                end
+                ::__continue102::
+            end
+            local formula = __TS__StringSlice(template, i, ____end)
+            if not hasFormulaOperatorOrDigit(nil, formula) then
+                result = result .. __TS__StringAccess(template, i)
+                i = i + 1
+                goto __continue100
+            end
+            result = result .. formatNumber(
+                nil,
+                evaluateFormula(nil, formula, unit, skillLevel)
+            )
+            i = ____end
+        end
+        ::__continue100::
+    end
+    return result
+end
+jass = require("jass.common")
 local heroLevelEventCenter = require("系统.00．核心系统.01．事件中心.06．英雄升级事件中心")
 local registerHeroLevelListener = heroLevelEventCenter.registerHeroLevelListener
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 EXGetUnitAbility = ____require_result_0.EXGetUnitAbility
-EXSetAbilityDataString = ____require_result_0.EXSetAbilityDataString
 local ABILITY_DATA_TIP = ____require_result_0.ABILITY_DATA_TIP
 local ABILITY_DATA_UBERTIP = ____require_result_0.ABILITY_DATA_UBERTIP
 ____exports.ABILITY_DATA_TIP = ABILITY_DATA_TIP
 ____exports.ABILITY_DATA_UBERTIP = ABILITY_DATA_UBERTIP
-attributeGetters = {
+local attributeGetters = {
     [ATTR_STR] = function(____, u) return jass.GetHeroStr(u, true) or 0 end,
     [ATTR_AGI] = function(____, u) return jass.GetHeroAgi(u, true) or 0 end,
     [ATTR_INT] = function(____, u) return jass.GetHeroInt(u, true) or 0 end,
@@ -172,8 +250,69 @@ attributeGetters = {
     [ATTR_HERO_LEVEL] = function(____, u) return jass.GetHeroLevel(u) or 0 end,
     [ATTR_XP] = function(____, u) return jass.GetHeroXP(u) or 0 end
 }
+FORMULA_TOKEN_SKILL_LEVEL = "__SKILL_LEVEL__"
+local FORMULA_TOKEN_STR = "__STR__"
+local FORMULA_TOKEN_AGI = "__AGI__"
+local FORMULA_TOKEN_INT = "__INT__"
+local FORMULA_TOKEN_STR_WHITE = "__STR_WHITE__"
+local FORMULA_TOKEN_AGI_WHITE = "__AGI_WHITE__"
+local FORMULA_TOKEN_INT_WHITE = "__INT_WHITE__"
+local FORMULA_TOKEN_HP = "__HP__"
+local FORMULA_TOKEN_HP_MAX = "__HP_MAX__"
+local FORMULA_TOKEN_MP = "__MP__"
+local FORMULA_TOKEN_MP_MAX = "__MP_MAX__"
+local FORMULA_TOKEN_ATTACK = "__ATTACK__"
+local FORMULA_TOKEN_ARMOR = "__ARMOR__"
+local FORMULA_TOKEN_MOVE_SPEED = "__MOVE_SPEED__"
+local FORMULA_TOKEN_LEVEL = "__LEVEL__"
+local FORMULA_TOKEN_HERO_LEVEL = "__HERO_LEVEL__"
+local FORMULA_TOKEN_XP = "__XP__"
+formulaAliases = {
+    {source = ATTR_SKILL_LEVEL, token = FORMULA_TOKEN_SKILL_LEVEL},
+    {source = ATTR_STR_WHITE, token = FORMULA_TOKEN_STR_WHITE},
+    {source = ATTR_AGI_WHITE, token = FORMULA_TOKEN_AGI_WHITE},
+    {source = ATTR_INT_WHITE, token = FORMULA_TOKEN_INT_WHITE},
+    {source = ATTR_HP_MAX, token = FORMULA_TOKEN_HP_MAX},
+    {source = ATTR_MP_MAX, token = FORMULA_TOKEN_MP_MAX},
+    {source = ATTR_MOVE_SPEED, token = FORMULA_TOKEN_MOVE_SPEED},
+    {source = ATTR_HERO_LEVEL, token = FORMULA_TOKEN_HERO_LEVEL},
+    {source = ATTR_ATTACK, token = FORMULA_TOKEN_ATTACK},
+    {source = ATTR_ARMOR, token = FORMULA_TOKEN_ARMOR},
+    {source = ATTR_LEVEL, token = FORMULA_TOKEN_LEVEL},
+    {source = ATTR_STR, token = FORMULA_TOKEN_STR},
+    {source = ATTR_AGI, token = FORMULA_TOKEN_AGI},
+    {source = ATTR_INT, token = FORMULA_TOKEN_INT},
+    {source = ATTR_HP, token = FORMULA_TOKEN_HP},
+    {source = ATTR_MP, token = FORMULA_TOKEN_MP},
+    {source = ATTR_XP, token = FORMULA_TOKEN_XP}
+}
+aliasedAttributeGetters = {
+    [FORMULA_TOKEN_STR] = attributeGetters[ATTR_STR],
+    [FORMULA_TOKEN_AGI] = attributeGetters[ATTR_AGI],
+    [FORMULA_TOKEN_INT] = attributeGetters[ATTR_INT],
+    [FORMULA_TOKEN_STR_WHITE] = attributeGetters[ATTR_STR_WHITE],
+    [FORMULA_TOKEN_AGI_WHITE] = attributeGetters[ATTR_AGI_WHITE],
+    [FORMULA_TOKEN_INT_WHITE] = attributeGetters[ATTR_INT_WHITE],
+    [FORMULA_TOKEN_HP] = attributeGetters[ATTR_HP],
+    [FORMULA_TOKEN_HP_MAX] = attributeGetters[ATTR_HP_MAX],
+    [FORMULA_TOKEN_MP] = attributeGetters[ATTR_MP],
+    [FORMULA_TOKEN_MP_MAX] = attributeGetters[ATTR_MP_MAX],
+    [FORMULA_TOKEN_ATTACK] = attributeGetters[ATTR_ATTACK],
+    [FORMULA_TOKEN_ARMOR] = attributeGetters[ATTR_ARMOR],
+    [FORMULA_TOKEN_MOVE_SPEED] = attributeGetters[ATTR_MOVE_SPEED],
+    [FORMULA_TOKEN_LEVEL] = attributeGetters[ATTR_LEVEL],
+    [FORMULA_TOKEN_HERO_LEVEL] = attributeGetters[ATTR_HERO_LEVEL],
+    [FORMULA_TOKEN_XP] = attributeGetters[ATTR_XP]
+}
 local skillRegistry = __TS__New(Map)
 local unitHandleMap = __TS__New(Map)
+formulaTokenNames = __TS__ArraySort(
+    {
+        FORMULA_TOKEN_SKILL_LEVEL,
+        table.unpack(__TS__ObjectKeys(aliasedAttributeGetters))
+    },
+    function(____, a, b) return #b - #a end
+)
 function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, level, tipType)
     if level == nil then
         level = 1
@@ -200,7 +339,8 @@ function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, le
         abilityId = abilityId,
         level = level,
         template = template,
-        tipType = tipType
+        tipType = tipType,
+        renderedText = ""
     }
     if not skillRegistry:has(handleId) then
         skillRegistry:set(
@@ -213,9 +353,30 @@ function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, le
     if not unitSkills:has(abilityId) then
         unitSkills:set(abilityId, {})
     end
-    local ____temp_1 = unitSkills:get(abilityId)
-    ____temp_1[#____temp_1 + 1] = skillInfo
-    updateSkillTip(nil, skillInfo)
+    local skillList = unitSkills:get(abilityId)
+    local replaced = false
+    do
+        local i = 0
+        while i < #skillList do
+            do
+                if skillList[i + 1].tipType ~= tipType then
+                    goto __continue45
+                end
+                skillList[i + 1].level = level
+                skillList[i + 1].template = template
+                skillList[i + 1].unit = unit
+                updateSkillTip(nil, skillList[i + 1])
+                replaced = true
+                break
+            end
+            ::__continue45::
+            i = i + 1
+        end
+    end
+    if not replaced then
+        skillList[#skillList + 1] = skillInfo
+        updateSkillTip(nil, skillInfo)
+    end
     return true
 end
 function ____exports.unregisterDynamicSkillTip(self, unit, abilityId)
@@ -242,6 +403,38 @@ function ____exports.unregisterDynamicSkillTip(self, unit, abilityId)
     end
     return false
 end
+function ____exports.getDynamicSkillTipText(self, unit, abilityId, tipType)
+    if not unit or not abilityId then
+        return nil
+    end
+    local handleId = jass.GetHandleId(unit)
+    if not handleId or not skillRegistry:has(handleId) then
+        return nil
+    end
+    local unitSkills = skillRegistry:get(handleId)
+    local skillList = unitSkills:get(abilityId)
+    if skillList == nil then
+        return nil
+    end
+    do
+        local i = 0
+        while i < #skillList do
+            do
+                local skillInfo = skillList[i + 1]
+                if skillInfo.tipType ~= tipType then
+                    goto __continue61
+                end
+                if skillInfo.renderedText == "" then
+                    updateSkillTip(nil, skillInfo)
+                end
+                return skillInfo.renderedText or nil
+            end
+            ::__continue61::
+            i = i + 1
+        end
+    end
+    return nil
+end
 function ____exports.refreshUnitSkillTips(self, unit)
     if not unit then
         return
@@ -264,7 +457,7 @@ function ____exports.refreshAllSkillTips(self)
         do
             local unit = unitHandleMap:get(handleId)
             if not unit then
-                goto __continue53
+                goto __continue72
             end
             for ____, skillList in __TS__Iterator(unitSkills:values()) do
                 for ____, skillInfo in ipairs(skillList) do
@@ -272,7 +465,7 @@ function ____exports.refreshAllSkillTips(self)
                 end
             end
         end
-        ::__continue53::
+        ::__continue72::
     end
 end
 function ____exports.registerSkillTip(self, unit, abilityId, template, level)
@@ -321,8 +514,8 @@ function ____exports.registerSkillTips(self, unit, abilityId, tipTemplate, ubert
     )
     return success1 or success2
 end
-local ____require_result_3 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
-local registerDeathListener = ____require_result_3.registerDeathListener
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_2.registerDeathListener
 local _heroLevelListenerBound = false
 local _deathListenerBound = false
 function ____exports.initDynamicSkillTipSystem(self)
@@ -344,6 +537,12 @@ function ____exports.initDynamicSkillTipSystem(self)
             end
         )
     end
+end
+function ____exports.renderDynamicSkillTemplate(self, template, unit, skillLevel)
+    if not template then
+        return ""
+    end
+    return processTemplate(nil, template, unit, skillLevel)
 end
 function ____exports.registerAttributeGetter(self, attrName, getter)
     attributeGetters[attrName] = getter

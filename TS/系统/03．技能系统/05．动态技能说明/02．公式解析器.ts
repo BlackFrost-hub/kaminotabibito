@@ -67,9 +67,9 @@ export function normalizeExpression(expr: string): string {
   let result = "";
   for (let i = 0; i < expr.length; i++) {
     const c = expr[i];
-    if (c === OPERATOR_MULTIPLY_CN) {
+    if (c === OPERATOR_MULTIPLY_CN || c === "×") {
       result += OPERATOR_MULTIPLY_EN;
-    } else if (c === OPERATOR_DIVIDE_CN) {
+    } else if (c === OPERATOR_DIVIDE_CN || c === "÷") {
       result += OPERATOR_DIVIDE_EN;
     } else {
       result += c;

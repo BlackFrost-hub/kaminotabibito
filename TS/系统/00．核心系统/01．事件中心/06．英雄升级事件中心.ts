@@ -37,17 +37,28 @@ function dispatchHeroLevelEvent(): void {
   }
 }
 
+/**
+ * 注册英雄升级监听。
+ * 第一次调用时会自动初始化事件中心，后续同一回调不会重复加入。
+ */
 export function registerHeroLevelListener(callback: HeroLevelCallback): void {
   if (typeof callback !== "function") return;
   initHeroLevelEventCenter();
   if (!hasListener(heroLevelListeners, callback)) heroLevelListeners.push(callback);
 }
 
+/**
+ * 取消英雄升级监听。
+ */
 export function unregisterHeroLevelListener(callback: HeroLevelCallback): void {
   const idx = heroLevelListeners.indexOf(callback);
   if (idx >= 0) heroLevelListeners.splice(idx, 1);
 }
 
+/**
+ * 初始化英雄升级事件中心。
+ * 对项目约定的玩家集合统一注册升级事件，并把原生事件集中派发给监听列表。
+ */
 export function initHeroLevelEventCenter(): void {
   if (_initialized) return;
   _initialized = true;

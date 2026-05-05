@@ -96,6 +96,9 @@ local function ensureNativeRegistration(player, eventId, key)
     dispatchTriggers[key] = dispatchTriggers[key] or ({})
     jass.TriggerRegisterPlayerUnitEvent(master, player, eventId, nil)
 end
+--- 为“玩家 + 单位事件”建立统一派发。
+-- 无 filter 时会复用内部总触发器，避免为同类事件重复注册原生触发。
+-- 有 filter 时保持原生逐触发器注册，避免改变 filter 语义。
 function ____exports.registerPlayerUnitEvent(trig, player, eventId, filter)
     if not trig or not player or not eventId then
         return
@@ -112,6 +115,7 @@ function ____exports.registerPlayerUnitEvent(trig, player, eventId, filter)
         list[#list + 1] = trig
     end
 end
+--- 按玩家 id 注册玩家单位事件。
 function ____exports.registerPlayerUnitEventById(trig, playerId, eventId, filter)
     ____exports.registerPlayerUnitEvent(
         trig,
@@ -120,6 +124,7 @@ function ____exports.registerPlayerUnitEventById(trig, playerId, eventId, filter
         filter
     )
 end
+--- 为一组玩家批量注册相同的玩家单位事件。
 function ____exports.registerPlayerUnitEventForPlayerIds(trig, playerIds, eventId, filter)
     if not trig or not eventId then
         return
@@ -132,6 +137,7 @@ function ____exports.registerPlayerUnitEventForPlayerIds(trig, playerIds, eventI
         end
     end
 end
+--- 对项目默认需要监听的玩家集合批量注册事件。
 function ____exports.registerDefaultPlayerUnitEvent(trig, eventId, filter)
     ____exports.registerPlayerUnitEventForPlayerIds(trig, ____exports.DEFAULT_PLAYER_UNIT_EVENT_PLAYER_IDS, eventId, filter)
 end

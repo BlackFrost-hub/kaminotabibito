@@ -21,14 +21,15 @@ export interface UnitRegenTrait {
 /**
  * 单位恢复特性配置表
  *
- * key: 单位类型ID（字符串形式，如 'H00R'）
+ * key: 游戏内单位名|内部物体ID
  * value: 恢复特性配置
  */
+
 export const UNIT_REGEN_TRAITS: Record<string, UnitRegenTrait> = {
   /**
-   * H00R: 生命恢复 × 1.6
+   * 游戏内单位名写在前面，内部物体 ID 写在后面，编辑时一眼能看懂。
    */
-  'H00R': {
+  "炎杀姬|H00R": {
     lifeMultiplier: 1.6,
     manaMultiplier: 1.0,
   },
@@ -44,6 +45,11 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
   stringToFourCC: (s: string) => number;
 };
 
+function 提取内部物体ID(配置键名: string): string {
+  const 片段列表 = 配置键名.split("|");
+  return 片段列表[片段列表.length - 1] ?? 配置键名;
+}
+
 /**
  * 获取单位生命恢复倍率
  *
@@ -54,8 +60,8 @@ export function getUnitLifeRegenMultiplier(unit: any): number {
   const unitTypeId = jass.GetUnitTypeId(unit);
 
   // 遍历配置，将字符串ID转换为FourCC后比较
-  for (const [idStr, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
-    if (stringToFourCC(idStr) === unitTypeId) {
+  for (const [配置键名, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
+    if (stringToFourCC(提取内部物体ID(配置键名)) === unitTypeId) {
       return trait.lifeMultiplier;
     }
   }
@@ -73,8 +79,8 @@ export function getUnitManaRegenMultiplier(unit: any): number {
   const unitTypeId = jass.GetUnitTypeId(unit);
 
   // 遍历配置，将字符串ID转换为FourCC后比较
-  for (const [idStr, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
-    if (stringToFourCC(idStr) === unitTypeId) {
+  for (const [配置键名, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
+    if (stringToFourCC(提取内部物体ID(配置键名)) === unitTypeId) {
       return trait.manaMultiplier;
     }
   }

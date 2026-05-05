@@ -149,6 +149,8 @@ local function registerSelectionTriggersForPlayer(whichPlayer)
     registeredPlayers[playerId] = true
     initialized = true
 end
+--- 为指定玩家初始化“选中/取消选中”事件中心。
+-- 只会对同一玩家注册一次原生事件，后续查询与监听都依赖这里维护的缓存。
 function ____exports.initPlayerSelectionCenter(whichPlayer)
     registerSelectionTriggersForPlayer(whichPlayer)
 end
@@ -161,6 +163,8 @@ local function normalizeSelectionListener(arg1, arg2)
     end
     return nil
 end
+--- 添加选中状态监听。
+-- 回调会在单位被选中或取消选中后触发，参数里会给出玩家、playerId、单位和当前是否为选中动作。
 function ____exports.addSelectionListener(arg1, arg2)
     local listener = normalizeSelectionListener(arg1, arg2)
     if type(listener) ~= "function" then
@@ -171,6 +175,7 @@ function ____exports.addSelectionListener(arg1, arg2)
     end
     selectionListeners[#selectionListeners + 1] = listener
 end
+--- 移除之前注册的选中状态监听。
 function ____exports.removeSelectionListener(arg1, arg2)
     local listener = normalizeSelectionListener(arg1, arg2)
     if type(listener) ~= "function" then
@@ -181,6 +186,8 @@ function ____exports.removeSelectionListener(arg1, arg2)
         __TS__ArraySplice(selectionListeners, index, 1)
     end
 end
+--- 只在“恰好选中 1 个单位”时返回该单位。
+-- 多选、未选中或事件中心尚未初始化时都会返回 null。
 function ____exports.getSoleSelectedUnitForPlayer(playerId)
     if not initialized then
         return nil
@@ -194,5 +201,42 @@ function ____exports.getSoleSelectedUnitForPlayer(playerId)
         return nil
     end
     return unit
+end
+--- 在外部已知玩家当前唯一选中单位时，手动把状态种进事件中心。
+-- 主要用于补齐“先有选中态，后初始化事件中心”这类不会补发原生事件的场景。
+function ____exports.seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
+    if not isValidPlayer(whichPlayer) then
+        return
+    end
+    local playerId = jass.GetPlayerId(whichPlayer)
+    jass.DisplayTextToPlayer(
+        whichPlayer,
+        0,
+        0,
+        "SEL_SEED_PID_" .. tostring(playerId)
+    )
+    if not isRealUnit(whichUnit) then
+        jass.DisplayTextToPlayer(whichPlayer, 0, 0, "SEL_SEED_UNIT_INVALID")
+        selectedCount[playerId] = 0
+        selectedUnit[playerId] = nil
+        __TS__Delete(selectedUnitsByPlayer, playerId)
+        return
+    end
+    selectedUnitsByPlayer[playerId] = {whichUnit}
+    selectedCount[playerId] = 1
+    selectedUnit[playerId] = whichUnit
+    jass.DisplayTextToPlayer(
+        whichPlayer,
+        0,
+        0,
+        "SEL_SEED_UNIT_" .. tostring(getUnitHandleId(whichUnit))
+    )
+end
+--- 返回指定玩家当前选中缓存的摘要，便于调试事件中心是否成功记录状态。
+function ____exports.getSelectionDebugForPlayer(playerId)
+    local count = selectedCount[playerId] or 0
+    local unit = selectedUnit[playerId]
+    local handleId = getUnitHandleId(unit)
+    return (((("init=" .. tostring(initialized and 1 or 0)) .. ",count=") .. tostring(count)) .. ",unit=") .. tostring(handleId)
 end
 return ____exports

@@ -20,7 +20,7 @@ const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
 };
-const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
 };
 const idData =

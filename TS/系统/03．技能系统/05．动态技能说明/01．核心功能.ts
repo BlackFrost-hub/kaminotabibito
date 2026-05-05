@@ -19,6 +19,8 @@ import {
   UNIT_STATE_ATTACK1_BASE,
   UNIT_STATE_ATTACK1_BONUS,
   UNIT_STATE_ARMOR,
+  OPERATOR_MULTIPLY_CN,
+  OPERATOR_DIVIDE_CN,
   BRACKET_LEFT_EN,
   BRACKET_RIGHT_EN,
   BRACKET_LEFT_CN,
@@ -43,12 +45,10 @@ import {
 // 导入YDWE函数
 const {
   EXGetUnitAbility,
-  EXSetAbilityDataString,
   ABILITY_DATA_TIP,
   ABILITY_DATA_UBERTIP,
 } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   EXGetUnitAbility: (u: any, abilcode: number) => any;
-  EXSetAbilityDataString: (abil: any, level: number, data_type: number, value: string) => boolean;
   ABILITY_DATA_TIP: number;
   ABILITY_DATA_UBERTIP: number;
 };
@@ -61,6 +61,7 @@ export { ABILITY_DATA_TIP, ABILITY_DATA_UBERTIP };
 // ==========================================================================================
 
 type AttributeGetter = (u: any) => number;
+type FormulaAlias = { source: string; token: string };
 
 interface RegisteredSkill {
   unit: any;
@@ -68,6 +69,7 @@ interface RegisteredSkill {
   level: number;
   template: string;
   tipType: number;
+  renderedText: string;
 }
 
 type UnitSkillRegistry = Map<number, Map<number, RegisteredSkill[]>>;
@@ -96,12 +98,86 @@ const attributeGetters: Record<string, AttributeGetter> = {
   [ATTR_XP]: (u) => jass.GetHeroXP(u) || 0,
 };
 
+const FORMULA_TOKEN_SKILL_LEVEL = "__SKILL_LEVEL__";
+const FORMULA_TOKEN_STR = "__STR__";
+const FORMULA_TOKEN_AGI = "__AGI__";
+const FORMULA_TOKEN_INT = "__INT__";
+const FORMULA_TOKEN_STR_WHITE = "__STR_WHITE__";
+const FORMULA_TOKEN_AGI_WHITE = "__AGI_WHITE__";
+const FORMULA_TOKEN_INT_WHITE = "__INT_WHITE__";
+const FORMULA_TOKEN_HP = "__HP__";
+const FORMULA_TOKEN_HP_MAX = "__HP_MAX__";
+const FORMULA_TOKEN_MP = "__MP__";
+const FORMULA_TOKEN_MP_MAX = "__MP_MAX__";
+const FORMULA_TOKEN_ATTACK = "__ATTACK__";
+const FORMULA_TOKEN_ARMOR = "__ARMOR__";
+const FORMULA_TOKEN_MOVE_SPEED = "__MOVE_SPEED__";
+const FORMULA_TOKEN_LEVEL = "__LEVEL__";
+const FORMULA_TOKEN_HERO_LEVEL = "__HERO_LEVEL__";
+const FORMULA_TOKEN_XP = "__XP__";
+
+const formulaAliases: FormulaAlias[] = [
+  { source: ATTR_SKILL_LEVEL, token: FORMULA_TOKEN_SKILL_LEVEL },
+  { source: ATTR_STR_WHITE, token: FORMULA_TOKEN_STR_WHITE },
+  { source: ATTR_AGI_WHITE, token: FORMULA_TOKEN_AGI_WHITE },
+  { source: ATTR_INT_WHITE, token: FORMULA_TOKEN_INT_WHITE },
+  { source: ATTR_HP_MAX, token: FORMULA_TOKEN_HP_MAX },
+  { source: ATTR_MP_MAX, token: FORMULA_TOKEN_MP_MAX },
+  { source: ATTR_MOVE_SPEED, token: FORMULA_TOKEN_MOVE_SPEED },
+  { source: ATTR_HERO_LEVEL, token: FORMULA_TOKEN_HERO_LEVEL },
+  { source: ATTR_ATTACK, token: FORMULA_TOKEN_ATTACK },
+  { source: ATTR_ARMOR, token: FORMULA_TOKEN_ARMOR },
+  { source: ATTR_LEVEL, token: FORMULA_TOKEN_LEVEL },
+  { source: ATTR_STR, token: FORMULA_TOKEN_STR },
+  { source: ATTR_AGI, token: FORMULA_TOKEN_AGI },
+  { source: ATTR_INT, token: FORMULA_TOKEN_INT },
+  { source: ATTR_HP, token: FORMULA_TOKEN_HP },
+  { source: ATTR_MP, token: FORMULA_TOKEN_MP },
+  { source: ATTR_XP, token: FORMULA_TOKEN_XP },
+];
+
+const aliasedAttributeGetters: Record<string, AttributeGetter> = {
+  [FORMULA_TOKEN_STR]: attributeGetters[ATTR_STR],
+  [FORMULA_TOKEN_AGI]: attributeGetters[ATTR_AGI],
+  [FORMULA_TOKEN_INT]: attributeGetters[ATTR_INT],
+  [FORMULA_TOKEN_STR_WHITE]: attributeGetters[ATTR_STR_WHITE],
+  [FORMULA_TOKEN_AGI_WHITE]: attributeGetters[ATTR_AGI_WHITE],
+  [FORMULA_TOKEN_INT_WHITE]: attributeGetters[ATTR_INT_WHITE],
+  [FORMULA_TOKEN_HP]: attributeGetters[ATTR_HP],
+  [FORMULA_TOKEN_HP_MAX]: attributeGetters[ATTR_HP_MAX],
+  [FORMULA_TOKEN_MP]: attributeGetters[ATTR_MP],
+  [FORMULA_TOKEN_MP_MAX]: attributeGetters[ATTR_MP_MAX],
+  [FORMULA_TOKEN_ATTACK]: attributeGetters[ATTR_ATTACK],
+  [FORMULA_TOKEN_ARMOR]: attributeGetters[ATTR_ARMOR],
+  [FORMULA_TOKEN_MOVE_SPEED]: attributeGetters[ATTR_MOVE_SPEED],
+  [FORMULA_TOKEN_LEVEL]: attributeGetters[ATTR_LEVEL],
+  [FORMULA_TOKEN_HERO_LEVEL]: attributeGetters[ATTR_HERO_LEVEL],
+  [FORMULA_TOKEN_XP]: attributeGetters[ATTR_XP],
+};
+
 // ==========================================================================================
 // 全局注册表
 // ==========================================================================================
 
 const skillRegistry: UnitSkillRegistry = new Map();
 const unitHandleMap: Map<number, any> = new Map();
+const formulaTokenNames = [FORMULA_TOKEN_SKILL_LEVEL, ...Object.keys(aliasedAttributeGetters)].sort((a, b) => b.length - a.length);
+
+function normalizeFormulaTemplate(template: string): string {
+  let result = template;
+  for (const alias of formulaAliases) {
+    result = replaceAll(result, alias.source, alias.token);
+  }
+  return result;
+}
+
+function denormalizeFormulaTemplate(template: string): string {
+  let result = template;
+  for (const alias of formulaAliases) {
+    result = replaceAll(result, alias.token, alias.source);
+  }
+  return result;
+}
 
 // ==========================================================================================
 // 公式计算
@@ -110,14 +186,14 @@ const unitHandleMap: Map<number, any> = new Map();
 function evaluateFormula(formula: string, unit: any, skillLevel: number): number {
   if (!formula) return 0;
 
-  let expr = formula.trim();
+  let expr = normalizeFormulaTemplate(formula).trim();
   if (expr === "") return 0;
 
-  expr = replaceAll(expr, ATTR_SKILL_LEVEL, skillLevel.toString());
+  expr = replaceAll(expr, FORMULA_TOKEN_SKILL_LEVEL, skillLevel.toString());
 
-  const sortedAttrs = Object.keys(attributeGetters).sort((a, b) => b.length - a.length);
+  const sortedAttrs = Object.keys(aliasedAttributeGetters).sort((a, b) => b.length - a.length);
   for (const attrName of sortedAttrs) {
-    const getter = attributeGetters[attrName];
+    const getter = aliasedAttributeGetters[attrName];
     const value = getter(unit);
     expr = replaceAll(expr, attrName, value.toString());
   }
@@ -131,6 +207,7 @@ function evaluateFormula(formula: string, unit: any, skillLevel: number): number
 }
 
 function processTemplate(template: string, unit: any, skillLevel: number): string {
+  template = normalizeFormulaTemplate(template);
   let result = "";
   let i = 0;
 
@@ -151,7 +228,7 @@ function processTemplate(template: string, unit: any, skillLevel: number): strin
     i++;
   }
 
-  return result;
+  return denormalizeFormulaTemplate(processInlineFormulas(result, unit, skillLevel));
 }
 
 // ==========================================================================================
@@ -174,7 +251,7 @@ export function registerDynamicSkillTip(
   const abil = EXGetUnitAbility(unit, abilityId);
   if (!abil) return false;
 
-  const skillInfo: RegisteredSkill = { unit, abilityId, level, template, tipType };
+  const skillInfo: RegisteredSkill = { unit, abilityId, level, template, tipType, renderedText: "" };
 
   if (!skillRegistry.has(handleId)) {
     skillRegistry.set(handleId, new Map());
@@ -186,8 +263,21 @@ export function registerDynamicSkillTip(
     unitSkills.set(abilityId, []);
   }
 
-  unitSkills.get(abilityId)!.push(skillInfo);
-  updateSkillTip(skillInfo);
+  const skillList = unitSkills.get(abilityId)!;
+  let replaced = false;
+  for (let i = 0; i < skillList.length; i++) {
+    if (skillList[i].tipType !== tipType) continue;
+    skillList[i].level = level;
+    skillList[i].template = template;
+    skillList[i].unit = unit;
+    updateSkillTip(skillList[i]);
+    replaced = true;
+    break;
+  }
+  if (!replaced) {
+    skillList.push(skillInfo);
+    updateSkillTip(skillInfo);
+  }
 
   return true;
 }
@@ -219,12 +309,35 @@ export function unregisterDynamicSkillTip(unit: any, abilityId?: number): boolea
 }
 
 function updateSkillTip(skillInfo: RegisteredSkill): void {
-  const { unit, abilityId, level, template, tipType } = skillInfo;
+  const { unit, abilityId, template } = skillInfo;
   const abil = EXGetUnitAbility(unit, abilityId);
   if (!abil) return;
 
-  const tipText = processTemplate(template, unit, level);
-  EXSetAbilityDataString(abil, level, tipType, tipText);
+  const currentLevel = jass.GetUnitAbilityLevel(unit, abilityId) || skillInfo.level || 1;
+  skillInfo.level = currentLevel;
+  skillInfo.renderedText = processTemplate(template, unit, currentLevel);
+}
+
+export function getDynamicSkillTipText(unit: any, abilityId: number, tipType: number): string | null {
+  if (!unit || !abilityId) return null;
+
+  const handleId = jass.GetHandleId(unit);
+  if (!handleId || !skillRegistry.has(handleId)) return null;
+
+  const unitSkills = skillRegistry.get(handleId)!;
+  const skillList = unitSkills.get(abilityId);
+  if (skillList == null) return null;
+
+  for (let i = 0; i < skillList.length; i++) {
+    const skillInfo = skillList[i];
+    if (skillInfo.tipType !== tipType) continue;
+    if (skillInfo.renderedText === "") {
+      updateSkillTip(skillInfo);
+    }
+    return skillInfo.renderedText || null;
+  }
+
+  return null;
 }
 
 export function refreshUnitSkillTips(unit: any): void {
@@ -292,7 +405,7 @@ export function registerSkillTips(
 // 事件处理
 // ==========================================================================================
 
-const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
 };
 
@@ -315,6 +428,77 @@ export function initDynamicSkillTipSystem(): void {
       unregisterDynamicSkillTip(dyingUnit);
     });
   }
+}
+
+function matchFormulaToken(text: string, start: number): string | null {
+  for (const token of formulaTokenNames) {
+    if (text.slice(start, start + token.length) === token) {
+      return token;
+    }
+  }
+  return null;
+}
+
+function isInlineFormulaChar(c: string): boolean {
+  return isDigit(c) || c === "." || c === "+" || c === "-" ||
+         c === "*" || c === "/" || c === "×" || c === "÷" ||
+         c === OPERATOR_MULTIPLY_CN || c === OPERATOR_DIVIDE_CN ||
+         c === "脳" || c === "梅" || c === "(" || c === ")";
+}
+
+function hasFormulaOperatorOrDigit(formula: string): boolean {
+  for (let i = 0; i < formula.length; i++) {
+    const c = formula[i];
+    if (isDigit(c) || c === "+" || c === "-" ||
+        c === "*" || c === "/" || c === "×" || c === "÷" ||
+        c === OPERATOR_MULTIPLY_CN || c === OPERATOR_DIVIDE_CN ||
+        c === "脳" || c === "梅") {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function renderDynamicSkillTemplate(template: string, unit: any, skillLevel: number): string {
+  if (!template) return "";
+  return processTemplate(template, unit, skillLevel);
+}
+
+function processInlineFormulas(template: string, unit: any, skillLevel: number): string {
+  let result = "";
+  let i = 0;
+
+  while (i < template.length) {
+    const startToken = matchFormulaToken(template, i);
+    if (startToken == null) {
+      result += template[i];
+      i++;
+      continue;
+    }
+
+    let end = i + startToken.length;
+    while (end < template.length) {
+      const nextToken = matchFormulaToken(template, end);
+      if (nextToken != null) {
+        end += nextToken.length;
+        continue;
+      }
+      if (!isInlineFormulaChar(template[end])) break;
+      end++;
+    }
+
+    const formula = template.slice(i, end);
+    if (!hasFormulaOperatorOrDigit(formula)) {
+      result += template[i];
+      i++;
+      continue;
+    }
+
+    result += formatNumber(evaluateFormula(formula, unit, skillLevel));
+    i = end;
+  }
+
+  return result;
 }
 
 // ==========================================================================================

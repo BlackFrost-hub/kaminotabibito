@@ -21,14 +21,15 @@ export interface ItemRegenEffect {
 /**
  * 装备恢复效果配置表
  *
- * key: 物品ID（字符串形式，如 'I0BR'）
+ * key: 游戏内装备名|内部物体ID
  * value: 恢复效果配置
  */
+
 export const ITEM_REGEN_EFFECTS: Record<string, ItemRegenEffect> = {
   /**
-   * I0BR: 增加12%最大生命恢复
+   * 游戏内装备名写在前面，内部物体 ID 写在后面，编辑时一眼能看懂。
    */
-  'I0BR': {
+  "熊王腰带|I0BR": {
     type: "life_percent",
     value: 0.12,
   },
@@ -44,11 +45,16 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
   stringToFourCC: (s: string) => number;
 };
 
+function 提取内部物体ID(配置键名: string): string {
+  const 片段列表 = 配置键名.split("|");
+  return 片段列表[片段列表.length - 1] ?? 配置键名;
+}
+
 /**
  * 检查单位是否拥有指定物品
  */
-function hasItem(unit: any, itemIdStr: string): boolean {
-  const targetItemId = stringToFourCC(itemIdStr);
+function hasItem(unit: any, 配置键名: string): boolean {
+  const targetItemId = stringToFourCC(提取内部物体ID(配置键名));
   // 遍历6个物品栏
   for (let i = 0; i < 6; i++) {
     const item = jass.UnitItemInSlot(unit, i);

@@ -12,7 +12,7 @@ const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函�
   isHeroUnit: (unit: any) => boolean;
   forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
-const { registerDeathListener } = require("系统.01．单位系统.03．单位死亡事件.01．核心功能") as {
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
 };
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫

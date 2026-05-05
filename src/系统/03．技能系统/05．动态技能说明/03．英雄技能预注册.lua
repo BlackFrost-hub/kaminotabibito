@@ -8,28 +8,16 @@ local ____01_FF0E_6838_5FC3_529F_80FD = require("系统.03．技能系统.05．�
 local registerDynamicSkillTip = ____01_FF0E_6838_5FC3_529F_80FD.registerDynamicSkillTip
 local refreshAllSkillTips = ____01_FF0E_6838_5FC3_529F_80FD.refreshAllSkillTips
 local ABILITY_DATA_UBERTIP = ____01_FF0E_6838_5FC3_529F_80FD.ABILITY_DATA_UBERTIP
---- ==========================================================================================
--- 动态技能说明系统 - 英雄技能预注册
--- ==========================================================================================
--- 
--- 【功能】
--- 为玩家英雄桥接的单位自动预注册技能动态描述。
--- - 监听技能释放事件（走技能事件系统统一入口）
--- - 过滤物品技能（852008-852013）
--- - 自动为英雄技能注册动态描述
--- - 每2秒使用中心计时器自动刷新所有技能描述
--- 
--- 【使用方式】
--- 系统自动初始化，无需手动调用。
--- 
--- ==========================================================================================
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local EXGetUnitAbilityByIndex = ____require_result_0.EXGetUnitAbilityByIndex
+local EXGetAbilityId = ____require_result_0.EXGetAbilityId
+local getObjectProperty = ____require_result_0.getObjectProperty
+local ObjectType = ____require_result_0.ObjectType
 local ITEM_SKILL_MIN = 852008
 local ITEM_SKILL_MAX = 852013
 local registeredSkills = __TS__New(Set)
-local _periodicCallbackId = nil
---- 判断是否是物品技能
--- 直接检查命令ID是否在物品技能范围内
+local periodicCallbackId = nil
 local function isItemSkillByOrder(self, unit)
     if not unit then
         return false
@@ -40,41 +28,35 @@ local function isItemSkillByOrder(self, unit)
     end
     return currentOrder >= ITEM_SKILL_MIN and currentOrder <= ITEM_SKILL_MAX
 end
---- 获取技能唯一标识
 local function getSkillKey(self, unit, abilityId)
     return (tostring(jass.GetHandleId(unit)) .. "_") .. tostring(abilityId)
 end
---- 获取技能描述模板
--- 可以根据技能ID返回不同的模板
-local function getSkillTemplate(self, abilityId)
-    local abilityIdStr = tostring(abilityId)
-    return "造成伤害: [100+{力量}*2+{等级}*10]|n消耗魔法: [{等级}*5]|n冷却时间: [10-{等级}*0.5]秒"
+local function getSkillTemplate(self, unit, abilityId, level)
+    if not unit or not abilityId or level <= 0 then
+        return nil
+    end
+    local researchUbertip = getObjectProperty(nil, ObjectType.ABILITY, abilityId, "Researchubertip")
+    if researchUbertip == nil or researchUbertip == "" then
+        return nil
+    end
+    return researchUbertip
 end
---- 处理技能释放事件
--- 技能获取走技能事件系统统一入口
-local function onSpellEffect(self, castingUnit, spellAbilityId)
-    if not DYNAMIC_SKILL_TIP_ENABLED then
+local function registerOneSkillTemplate(self, unit, abilityId, level)
+    if not unit or not abilityId or level <= 0 then
         return
     end
-    if isItemSkillByOrder(nil, castingUnit) then
-        return
-    end
-    local skillKey = getSkillKey(nil, castingUnit, spellAbilityId)
+    local skillKey = getSkillKey(nil, unit, abilityId)
     if registeredSkills:has(skillKey) then
         return
     end
-    local template = getSkillTemplate(nil, spellAbilityId)
+    local template = getSkillTemplate(nil, unit, abilityId, level)
     if not template then
-        return
-    end
-    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
-    if level <= 0 then
         return
     end
     local success = registerDynamicSkillTip(
         nil,
-        castingUnit,
-        spellAbilityId,
+        unit,
+        abilityId,
         template,
         level,
         ABILITY_DATA_UBERTIP
@@ -83,8 +65,46 @@ local function onSpellEffect(self, castingUnit, spellAbilityId)
         registeredSkills:add(skillKey)
     end
 end
---- 定期刷新所有技能描述
--- 每2秒执行一次
+local function registerExistingHeroSkills(self, unit)
+    if not unit or unit == 0 then
+        return
+    end
+    do
+        local i = 0
+        while i <= 15 do
+            do
+                local ability = EXGetUnitAbilityByIndex(nil, unit, i)
+                if not ability then
+                    goto __continue17
+                end
+                local abilityId = EXGetAbilityId(nil, ability)
+                if not abilityId then
+                    goto __continue17
+                end
+                local level = jass.GetUnitAbilityLevel(unit, abilityId)
+                if level <= 0 then
+                    goto __continue17
+                end
+                registerOneSkillTemplate(nil, unit, abilityId, level)
+            end
+            ::__continue17::
+            i = i + 1
+        end
+    end
+end
+local function onSpellEffect(self, castingUnit, spellAbilityId)
+    if not DYNAMIC_SKILL_TIP_ENABLED then
+        return
+    end
+    if isItemSkillByOrder(nil, castingUnit) then
+        return
+    end
+    local currentLevel = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    if currentLevel <= 0 then
+        return
+    end
+    registerOneSkillTemplate(nil, castingUnit, spellAbilityId, currentLevel)
+end
 local function onPeriodicRefresh(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
@@ -95,11 +115,20 @@ function ____exports.initHeroSkillPreregistration(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
-    local ____require_result_0 = require("系统.03．技能系统.00．技能事件.01．核心功能")
-    local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
+    local ____require_result_1 = require("系统.03．技能系统.00．技能事件.01．核心功能")
+    local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
     registerSpellEffectListener(nil, onSpellEffect)
-    local ____G_1 = _G
-    local addPeriodicCallback = ____G_1.addPeriodicCallback
-    _periodicCallbackId = addPeriodicCallback(nil, 2000, onPeriodicRefresh)
+    local ____G_2 = _G
+    local addPeriodicCallback = ____G_2.addPeriodicCallback
+    periodicCallbackId = addPeriodicCallback(nil, 2000, onPeriodicRefresh)
+end
+function ____exports.onHeroRegisteredPreregistration(whichPlayer, whichHero)
+    if not DYNAMIC_SKILL_TIP_ENABLED then
+        return
+    end
+    if not whichPlayer or whichPlayer == 0 or not whichHero or whichHero == 0 then
+        return
+    end
+    registerExistingHeroSkills(nil, whichHero)
 end
 return ____exports

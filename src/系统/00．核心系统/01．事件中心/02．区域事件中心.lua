@@ -105,6 +105,9 @@ local function addListener(store, key, trigger, once)
         listener.active = false
     end
 end
+--- 为区域进入事件注册监听。
+-- 相同 region + filter 只会创建一个原生总触发器，后续监听统一走内部派发。
+-- 返回值用于取消当前监听，不会影响同 key 下的其他监听者。
 function ____exports.registerEnterRegionTrigger(trigger, region, filter)
     if not trigger or not region then
         return function()

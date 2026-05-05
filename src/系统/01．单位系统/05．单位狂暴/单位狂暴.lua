@@ -10,7 +10,7 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 local EXSetUnitFacing = ____require_result_1.EXSetUnitFacing
 local cameraShakeMod = require("lib.扩展函数.封装函数.07．镜头函数.index")
 local cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer
-local ____require_result_2 = require("系统.01．单位系统.03．单位死亡事件.01．核心功能")
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_2.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
 local function typeIdToUnitId(self, typeId)

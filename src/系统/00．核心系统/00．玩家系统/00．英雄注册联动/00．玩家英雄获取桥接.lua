@@ -26,6 +26,7 @@ local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
+local dynamicSkillTipSystem = require("系统.03．技能系统.05．动态技能说明.index")
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_3.debugLog
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
@@ -92,11 +93,18 @@ local buffUISystem = require("系统.05．Buff系统.02．BuffUI")
 local taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter
+local seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnitForPlayer
 local function invokeSelectionCenterInit(whichPlayer)
     if type(initPlayerSelectionCenter) ~= "function" then
         return
     end
     initPlayerSelectionCenter(whichPlayer)
+end
+local function invokeSelectionCenterSeed(whichPlayer, whichUnit)
+    if type(seedSoleSelectedUnitForPlayer) ~= "function" then
+        return
+    end
+    seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
 end
 --- 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
 local function registerHeroDependents(whichHero)
@@ -111,6 +119,9 @@ local function registerHeroDependents(whichHero)
     end
     local owner = jass.GetOwningPlayer(whichHero)
     if owner ~= nil and owner ~= 0 then
+        if type(dynamicSkillTipSystem.onPlayerHeroRegistered) == "function" then
+            dynamicSkillTipSystem.onPlayerHeroRegistered(owner, whichHero)
+        end
         local playerId = jass.GetPlayerId(owner)
         debugLog(
             nil,
@@ -118,6 +129,7 @@ local function registerHeroDependents(whichHero)
             (("registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
         )
         invokeSelectionCenterInit(owner)
+        invokeSelectionCenterSeed(owner, whichHero)
         if not uiRegisteredPlayers:has(playerId) then
             local taskUiReady = true
             invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
