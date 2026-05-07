@@ -67,7 +67,11 @@ function onResumeTestUnit(): void {
   PauseUnit(testUnit, false);
 }
 
-debugLogForce("jump-test", "loaded", "delay=2.0");
-createDelayedCall(4.0, runJumpTest);
+const 启用测试 = false;
+
+if (启用测试) {
+  debugLogForce("jump-test", "loaded", "delay=2.0");
+  createDelayedCall(4.0, runJumpTest);
+}
 
 export {};

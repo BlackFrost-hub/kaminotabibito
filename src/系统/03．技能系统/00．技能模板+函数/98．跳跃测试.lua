@@ -58,6 +58,9 @@ local function runJumpTest()
     })
     createDelayedCall(1.8, onPauseTestUnit)
 end
-debugLogForce(nil, "jump-test", "loaded", "delay=2.0")
-createDelayedCall(4, runJumpTest)
+local _____542F_7528_6D4B_8BD5 = false
+if _____542F_7528_6D4B_8BD5 then
+    debugLogForce(nil, "jump-test", "loaded", "delay=2.0")
+    createDelayedCall(4, runJumpTest)
+end
 return ____exports

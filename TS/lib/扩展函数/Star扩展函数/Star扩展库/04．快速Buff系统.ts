@@ -7,6 +7,10 @@
  *
  * 所有接口均接受 sourceUnit（来源单位）参数，用于在 BuffUI 中显示来源信息：
  * - sourceName：来源单位名称
+ *
+ * 使用方式：
+ * - 直接调用 SFB_setBuff / SFB_setSlow 即可，不需要在外部额外调用 SFB_Init。
+ * - SFB_Init 由系统内部自行管理，外部请勿重复调用，否则会泄漏马甲单位。
  */
 
 const jass = require("jass.common") as any;
@@ -97,6 +101,8 @@ function getAngleBetweenUnits(u: any, tu: any): number {
 }
 
 export function SFB_Init(): void {
+  if (SFB_Unit != null && SFB_Unit !== 0) return;
+
   SFB_Unit = jass.CreateUnit(jass.Player(15), SFB_UNIT_ID, 0, 0, 0);
 
   jass.UnitAddAbility(SFB_Unit, ABILITY.POLYMORPH);
@@ -255,5 +261,7 @@ export function SFB_setSlow(sourceUnit: any, u: any, as: number, ms: number, tim
 
   jass.IssueTargetOrderById(caster, ORDER.SLOW, u);
 }
+
+SFB_Init();
 
 export {};

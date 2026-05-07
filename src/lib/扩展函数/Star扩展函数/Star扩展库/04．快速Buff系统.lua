@@ -15,6 +15,10 @@ local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570
 -- 
 -- 所有接口均接受 sourceUnit（来源单位）参数，用于在 BuffUI 中显示来源信息：
 -- - sourceName：来源单位名称
+-- 
+-- 使用方式：
+-- - 直接调用 SFB_setBuff / SFB_setSlow 即可，不需要在外部额外调用 SFB_Init。
+-- - SFB_Init 由系统内部自行管理，外部请勿重复调用，否则会泄漏马甲单位。
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
@@ -115,6 +119,9 @@ local function getAngleBetweenUnits(u, tu)
     )
 end
 function ____exports.SFB_Init()
+    if ____exports.SFB_Unit ~= nil and ____exports.SFB_Unit ~= 0 then
+        return
+    end
     ____exports.SFB_Unit = jass.CreateUnit(
         jass.Player(15),
         SFB_UNIT_ID,
@@ -251,21 +258,21 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
     local abilityId
     local orderStr
     repeat
-        local ____switch24 = id
-        local ____cond24 = ____switch24 == 0
-        if ____cond24 then
+        local ____switch25 = id
+        local ____cond25 = ____switch25 == 0
+        if ____cond25 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 1
-        if ____cond24 then
+        ____cond25 = ____cond25 or ____switch25 == 1
+        if ____cond25 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 2
-        if ____cond24 then
+        ____cond25 = ____cond25 or ____switch25 == 2
+        if ____cond25 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -278,20 +285,20 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
             )
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 3
-        if ____cond24 then
+        ____cond25 = ____cond25 or ____switch25 == 3
+        if ____cond25 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 4
-        if ____cond24 then
+        ____cond25 = ____cond25 or ____switch25 == 4
+        if ____cond25 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond24 = ____cond24 or ____switch24 == 5
-        if ____cond24 then
+        ____cond25 = ____cond25 or ____switch25 == 5
+        if ____cond25 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -411,4 +418,5 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
     )
     jass.IssueTargetOrderById(caster, ORDER.SLOW, u)
 end
+____exports.SFB_Init()
 return ____exports

@@ -43,5 +43,8 @@ local function _____6267_884C_51B2_950B_51FB_9000_6D4B_8BD5()
     })
     createDelayedCall(1.8, _____6682_505C_6D4B_8BD5_5355_4F4D)
 end
-createDelayedCall(2, _____6267_884C_51B2_950B_51FB_9000_6D4B_8BD5)
+local _____542F_7528_6D4B_8BD5 = false
+if _____542F_7528_6D4B_8BD5 then
+    createDelayedCall(2, _____6267_884C_51B2_950B_51FB_9000_6D4B_8BD5)
+end
 return ____exports

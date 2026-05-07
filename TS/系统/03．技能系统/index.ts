@@ -17,6 +17,7 @@ export * from "./01．显示技能名字";
 require("系统.03．技能系统.00．技能模板+函数.index");
 require("系统.03．技能系统.01．技能冷却.index");
 require("系统.03．技能系统.02．技能消耗.index");
+require("系统.03．技能系统.快速Buff测试");
 
 const bbTeleportMod = require("系统.03．技能系统.04．快捷键技能.index") as { initBBTeleport?: () => void };
 bbTeleportMod.initBBTeleport!();

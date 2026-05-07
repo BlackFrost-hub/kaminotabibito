@@ -55,15 +55,16 @@ export interface 区域效果参数 {
   半径: number;
   持续时间: number;
   检测间隔?: number;
+  防抖间隔?: number;
   影响目标?: "敌方" | "友方" | "全部";
   所有者?: any;
   模型路径?: string;
   特效高度?: number;
   周期伤害?: number;
-  on进入?: (单位: any) => void;
-  on离开?: (单位: any) => void;
-  on周期?: (区域内单位: any[]) => void;
-  on销毁?: () => void;
+  on进入?: (this: void, 单位: any) => void;
+  on离开?: (this: void, 单位: any) => void;
+  on周期?: (this: void, 区域内单位: any[]) => void;
+  on销毁?: (this: void) => void;
 }
 
 // ─── 实例接口 ────────────────────────────────────────────
@@ -95,6 +96,10 @@ class 区域效果实现 implements 区域效果实例 {
   private 检测间隔毫秒值: number;
   private 下次检测时间毫秒: number;
   private 销毁时间毫秒: number;
+  private 首次检测值: boolean = true;
+  private 防抖间隔毫秒值: number;
+  private 单位最后进入时间: Record<number, number> = {};
+  private 单位最后离开时间: Record<number, number> = {};
 
   constructor(参数: 区域效果参数) {
     this.实例ID = ++区域效果实例ID计数器;
@@ -102,9 +107,10 @@ class 区域效果实现 implements 区域效果实例 {
     this.当前X = 参数.X;
     this.当前Y = 参数.Y;
     this.剩余时间值 = 参数.持续时间;
-    this.检测间隔秒值 = 参数.检测间隔 ?? 0.5;
+    this.检测间隔秒值 = 参数.检测间隔 ?? 0.02;
     const 原始毫秒 = this.检测间隔秒值 * 1000;
-    this.检测间隔毫秒值 = 原始毫秒 > 100 ? 原始毫秒 : 100;
+    this.检测间隔毫秒值 = 原始毫秒 > 20 ? 原始毫秒 : 20;
+    this.防抖间隔毫秒值 = (参数.防抖间隔 ?? 0.2) * 1000;
     const 当前时间毫秒 = getServerTime();
     this.下次检测时间毫秒 = 当前时间毫秒 + this.检测间隔毫秒值;
     this.销毁时间毫秒 = 参数.持续时间 > 0 ? 当前时间毫秒 + 参数.持续时间 * 1000 : 0;
@@ -160,19 +166,34 @@ class 区域效果实现 implements 区域效果实例 {
 
     const 当前单位 = getUnitsInRange(this.当前X, this.当前Y, this.参数.半径);
     const 新集合: Record<number, any> = {};
+    const 是首次 = this.首次检测值;
+    if (是首次) {
+      this.首次检测值 = false;
+    }
+
+    const 当前时间 = getServerTime();
+    const 防抖毫秒 = this.防抖间隔毫秒值;
 
     for (const 单位 of 当前单位) {
       const hid = GetHandleId(单位);
       if (!this.是否影响目标(单位)) continue;
       新集合[hid] = 单位;
-      if (!this.当前单位集合[hid]) {
-        this.参数.on进入?.(单位);
+      if (!是首次 && !this.当前单位集合[hid]) {
+        const 上次离开 = this.单位最后离开时间[hid];
+        if (上次离开 == null || 当前时间 - 上次离开 >= 防抖毫秒) {
+          this.参数.on进入?.(单位);
+        }
+        this.单位最后进入时间[hid] = 当前时间;
       }
     }
 
     for (const hid in this.当前单位集合) {
       if (!新集合[hid]) {
-        this.参数.on离开?.(this.当前单位集合[hid]);
+        const 上次进入 = this.单位最后进入时间[hid];
+        if (上次进入 == null || 当前时间 - 上次进入 >= 防抖毫秒) {
+          this.参数.on离开?.(this.当前单位集合[hid]);
+        }
+        this.单位最后离开时间[hid] = 当前时间;
       }
     }
 
@@ -214,11 +235,10 @@ class 区域效果实现 implements 区域效果实例 {
       DestroyEffect(this.特效句柄);
       this.特效句柄 = null;
     }
-    for (const hid in this.当前单位集合) {
-      this.参数.on离开?.(this.当前单位集合[hid]);
-    }
     this.参数.on销毁?.();
     this.当前单位集合 = {};
+    this.单位最后进入时间 = {};
+    this.单位最后离开时间 = {};
   }
 
   暂停(): void {
@@ -239,8 +259,14 @@ class 区域效果实现 implements 区域效果实例 {
         EXSetEffectZ(this.特效句柄, this.参数.特效高度);
       }
     }
+    const 当前时间 = getServerTime();
+    const 防抖毫秒 = this.防抖间隔毫秒值;
     for (const hid in this.当前单位集合) {
-      this.参数.on离开?.(this.当前单位集合[hid]);
+      const 上次进入 = this.单位最后进入时间[hid];
+      if (上次进入 == null || 当前时间 - 上次进入 >= 防抖毫秒) {
+        this.参数.on离开?.(this.当前单位集合[hid]);
+      }
+      this.单位最后离开时间[hid] = 当前时间;
     }
     this.当前单位集合 = {};
   }

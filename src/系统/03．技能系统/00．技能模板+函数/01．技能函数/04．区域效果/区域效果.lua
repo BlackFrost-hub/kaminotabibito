@@ -72,15 +72,19 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
     self["已暂停值"] = false
     self["已销毁值"] = false
     self["特效句柄"] = nil
+    self["首次检测值"] = true
+    self["单位最后进入时间"] = {}
+    self["单位最后离开时间"] = {}
     _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668 = _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668 + 1
     self["实例ID"] = _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668
     self["参数"] = _____53C2_6570
     self["当前X"] = _____53C2_6570.X
     self["当前Y"] = _____53C2_6570.Y
     self["剩余时间值"] = _____53C2_6570["持续时间"]
-    self["检测间隔秒值"] = _____53C2_6570["检测间隔"] or 0.5
+    self["检测间隔秒值"] = _____53C2_6570["检测间隔"] or 0.02
     local _____539F_59CB_6BEB_79D2 = self["检测间隔秒值"] * 1000
-    self["检测间隔毫秒值"] = _____539F_59CB_6BEB_79D2 > 100 and _____539F_59CB_6BEB_79D2 or 100
+    self["检测间隔毫秒值"] = _____539F_59CB_6BEB_79D2 > 20 and _____539F_59CB_6BEB_79D2 or 20
+    self["防抖间隔毫秒值"] = (_____53C2_6570["防抖间隔"] or 0.2) * 1000
     local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
     self["下次检测时间毫秒"] = _____5F53_524D_65F6_95F4_6BEB_79D2 + self["检测间隔毫秒值"]
     self["销毁时间毫秒"] = _____53C2_6570["持续时间"] > 0 and _____5F53_524D_65F6_95F4_6BEB_79D2 + _____53C2_6570["持续时间"] * 1000 or 0
@@ -120,32 +124,42 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
     end
     local _____5F53_524D_5355_4F4D = getUnitsInRange(self["当前X"], self["当前Y"], self["参数"]["半径"])
     local _____65B0_96C6_5408 = {}
+    local _____662F_9996_6B21 = self["首次检测值"]
+    if _____662F_9996_6B21 then
+        self["首次检测值"] = false
+    end
+    local _____5F53_524D_65F6_95F4 = getServerTime()
+    local _____9632_6296_6BEB_79D2 = self["防抖间隔毫秒值"]
     for ____, _____5355_4F4D in ipairs(_____5F53_524D_5355_4F4D) do
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue13
+                goto __continue14
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
-            if not self["当前单位集合"][hid] then
-                local ____this_4
-                ____this_4 = self["参数"]
-                local ____opt_3 = ____this_4["on进入"]
-                if ____opt_3 ~= nil then
-                    ____opt_3(____this_4, _____5355_4F4D)
+            if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
+                local _____4E0A_6B21_79BB_5F00 = self["单位最后离开时间"][hid]
+                if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
+                    local ____opt_3 = self["参数"]["on进入"]
+                    if ____opt_3 ~= nil then
+                        ____opt_3(_____5355_4F4D)
+                    end
                 end
+                self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue13::
+        ::__continue14::
     end
     for hid in pairs(self["当前单位集合"]) do
         if not _____65B0_96C6_5408[hid] then
-            local ____this_6
-            ____this_6 = self["参数"]
-            local ____opt_5 = ____this_6["on离开"]
-            if ____opt_5 ~= nil then
-                ____opt_5(____this_6, self["当前单位集合"][hid])
+            local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
+            if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
+                local ____opt_5 = self["参数"]["on离开"]
+                if ____opt_5 ~= nil then
+                    ____opt_5(self["当前单位集合"][hid])
+                end
             end
+            self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
         end
     end
     self["当前单位集合"] = _____65B0_96C6_5408
@@ -168,11 +182,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             )
         end
     end
-    local ____this_9
-    ____this_9 = self["参数"]
-    local ____opt_8 = ____this_9["on周期"]
+    local ____opt_8 = self["参数"]["on周期"]
     if ____opt_8 ~= nil then
-        ____opt_8(____this_9, _____5F53_524D_5355_4F4D_6570_7EC4)
+        ____opt_8(_____5F53_524D_5355_4F4D_6570_7EC4)
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -199,21 +211,13 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["特效句柄"])
         self["特效句柄"] = nil
     end
-    for hid in pairs(self["当前单位集合"]) do
-        local ____this_11
-        ____this_11 = self["参数"]
-        local ____opt_10 = ____this_11["on离开"]
-        if ____opt_10 ~= nil then
-            ____opt_10(____this_11, self["当前单位集合"][hid])
-        end
-    end
-    local ____this_13
-    ____this_13 = self["参数"]
-    local ____opt_12 = ____this_13["on销毁"]
-    if ____opt_12 ~= nil then
-        ____opt_12(____this_13)
+    local ____opt_10 = self["参数"]["on销毁"]
+    if ____opt_10 ~= nil then
+        ____opt_10()
     end
     self["当前单位集合"] = {}
+    self["单位最后进入时间"] = {}
+    self["单位最后离开时间"] = {}
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["暂停"] = function(self)
     self["已暂停值"] = true
@@ -231,13 +235,17 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
             EXSetEffectZ(self["特效句柄"], self["参数"]["特效高度"])
         end
     end
+    local _____5F53_524D_65F6_95F4 = getServerTime()
+    local _____9632_6296_6BEB_79D2 = self["防抖间隔毫秒值"]
     for hid in pairs(self["当前单位集合"]) do
-        local ____this_15
-        ____this_15 = self["参数"]
-        local ____opt_14 = ____this_15["on离开"]
-        if ____opt_14 ~= nil then
-            ____opt_14(____this_15, self["当前单位集合"][hid])
+        local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
+        if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
+            local ____opt_12 = self["参数"]["on离开"]
+            if ____opt_12 ~= nil then
+                ____opt_12(self["当前单位集合"][hid])
+            end
         end
+        self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
     end
     self["当前单位集合"] = {}
 end

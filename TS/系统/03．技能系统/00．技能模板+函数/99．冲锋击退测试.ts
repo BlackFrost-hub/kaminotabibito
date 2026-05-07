@@ -54,6 +54,10 @@ function 执行冲锋击退测试(): void {
   createDelayedCall(1.8, 暂停测试单位);
 }
 
-createDelayedCall(2.0, 执行冲锋击退测试);
+const 启用测试 = false;
+
+if (启用测试) {
+  createDelayedCall(2.0, 执行冲锋击退测试);
+}
 
 export {};
