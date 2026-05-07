@@ -7,7 +7,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, onTick10ms, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
+local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
 function makeBuffKey(hid, buffID)
     return (tostring(hid) .. "|") .. buffID
 end
@@ -137,10 +137,10 @@ function tickBuffPool()
     do
         local i = 0
         while i < #____pairs do
-            local ____pairs_index_2 = ____pairs[i + 1]
-            local hid = ____pairs_index_2.hid
-            local buffID = ____pairs_index_2.buffID
-            local row = ____pairs_index_2.row
+            local ____pairs_index_1 = ____pairs[i + 1]
+            local hid = ____pairs_index_1.hid
+            local buffID = ____pairs_index_1.buffID
+            local row = ____pairs_index_1.row
             if hid ~= currentHid then
                 if currentHid > 0 and #currentBuffs > 0 then
                     processBuffsForUnit(currentHid, currentBuffs)
@@ -170,9 +170,9 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #buffs do
-            local ____buffs_index_3 = buffs[i + 1]
-            local buffID = ____buffs_index_3.buffID
-            local row = ____buffs_index_3.row
+            local ____buffs_index_2 = buffs[i + 1]
+            local buffID = ____buffs_index_2.buffID
+            local row = ____buffs_index_2.row
             row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
             if row.remaining <= 0 then
                 if row.source == "dot" then
@@ -215,6 +215,8 @@ function ensureSyncTimer()
         return
     end
     _registeredToCenterTimer = true
+    local ____G_3 = _G
+    local onTick10ms = ____G_3.onTick10ms
     onTick10ms(onBuffPoolCenterTimerTick)
 end
 function maybeStopSyncTimer()
@@ -236,8 +238,6 @@ if ____leakCore_LeakWatcher_0 == nil then
     ____leakCore_LeakWatcher_0 = leakCore
 end
 local LeakWatcher = ____leakCore_LeakWatcher_0
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-onTick10ms = ____require_result_1.onTick10ms
 --- Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s）
 ____exports.BUFF_POOL_TICK = 0.1
 --- dot伤害 里的 typeId → 01．Buff表 buffID
@@ -263,7 +263,7 @@ local function toHid(u)
         local n = __TS__ParseInt(u, 10)
         return __TS__NumberIsNaN(__TS__Number(n)) and 0 or n
     end
-    return jass:GetHandleId(u)
+    return jass.GetHandleId(u)
 end
 --- 由 dot伤害 调用：施加、覆盖或到期清除。
 -- target 可为单位或 **GetHandleId**。

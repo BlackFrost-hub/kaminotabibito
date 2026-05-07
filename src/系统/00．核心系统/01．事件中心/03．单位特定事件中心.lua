@@ -12,10 +12,10 @@ local unitInRangeRegistered = {}
 local unitInRangeMasters = {}
 local unitInRangeKeyByMasterHid = {}
 local function handleKey(handle)
-    return tostring(nil, handle)
+    return tostring(handle)
 end
 local function filterKey(filter)
-    return filter == nil and "null" or tostring(nil, filter)
+    return filter == nil and "null" or tostring(filter)
 end
 local function normalizeFilter(filter)
     local ____temp_0
@@ -27,10 +27,10 @@ local function normalizeFilter(filter)
     return ____temp_0
 end
 local function unitEventKey(unit, eventId)
-    return (handleKey(unit) .. ":") .. tostring(nil, eventId)
+    return (handleKey(unit) .. ":") .. tostring(eventId)
 end
 local function unitRangeKey(unit, range, filter)
-    return (((handleKey(unit) .. ":") .. tostring(nil, range)) .. ":") .. filterKey(filter)
+    return (((handleKey(unit) .. ":") .. tostring(range)) .. ":") .. filterKey(filter)
 end
 local function hasListener(list, trigger)
     do
@@ -54,9 +54,9 @@ local function dispatchListeners(list)
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue13
                 end
-                local passed = jass:TriggerEvaluate(listener.trigger)
+                local passed = jass.TriggerEvaluate(listener.trigger)
                 if passed then
-                    jass:TriggerExecute(listener.trigger)
+                    jass.TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
@@ -79,13 +79,11 @@ local function dispatchListeners(list)
     end
 end
 local function dispatchUnitEventMaster()
-    local trig = jass:GetTriggeringTrigger()
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = unitEventKeyByMasterHid[tostring(
-        nil,
-        jass:GetHandleId(trig)
+    local key = unitEventKeyByMasterHid[tostring(jass.GetHandleId(trig)
     )]
     if not key then
         return
@@ -93,13 +91,11 @@ local function dispatchUnitEventMaster()
     dispatchListeners(unitEventListeners[key] or ({}))
 end
 local function dispatchUnitInRangeMaster()
-    local trig = jass:GetTriggeringTrigger()
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = unitInRangeKeyByMasterHid[tostring(
-        nil,
-        jass:GetHandleId(trig)
+    local key = unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(trig)
     )]
     if not key then
         return
@@ -141,16 +137,14 @@ function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
     end
     local key = unitEventKey(unit, eventId)
     if not unitEventRegistered[key] then
-        local master = jass:CreateTrigger()
+        local master = jass.CreateTrigger()
         unitEventMasters[key] = master
         unitEventRegistered[key] = true
         unitEventListeners[key] = unitEventListeners[key] or ({})
-        unitEventKeyByMasterHid[tostring(
-            nil,
-            jass:GetHandleId(master)
+        unitEventKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
-        jass:TriggerRegisterUnitEvent(master, unit, eventId)
-        jass:TriggerAddAction(master, dispatchUnitEventMaster)
+        jass.TriggerRegisterUnitEvent(master, unit, eventId)
+        jass.TriggerAddAction(master, dispatchUnitEventMaster)
     end
     return addListener(unitEventListeners, key, trigger, once)
 end
@@ -168,16 +162,14 @@ function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, on
     local key = unitRangeKey(unit, range, filter)
     if not unitInRangeRegistered[key] then
         local normalizedFilter = normalizeFilter(filter)
-        local master = jass:CreateTrigger()
+        local master = jass.CreateTrigger()
         unitInRangeMasters[key] = master
         unitInRangeRegistered[key] = true
         unitInRangeListeners[key] = unitInRangeListeners[key] or ({})
-        unitInRangeKeyByMasterHid[tostring(
-            nil,
-            jass:GetHandleId(master)
+        unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
-        jass:TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
-        jass:TriggerAddAction(master, dispatchUnitInRangeMaster)
+        jass.TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
+        jass.TriggerAddAction(master, dispatchUnitInRangeMaster)
     end
     return addListener(unitInRangeListeners, key, trigger, once)
 end

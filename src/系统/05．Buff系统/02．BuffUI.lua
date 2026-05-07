@@ -73,10 +73,10 @@ function renderBuffBarLocal(vm)
                         uiShowFrame(slot.root)
                     end
                     if slot.remainText ~= 0 then
-                        japi:DzFrameSetText(slot.remainText, slotVM.remainText)
+                        japi.DzFrameSetText(slot.remainText, slotVM.remainText)
                     end
                     if slot.tipText ~= 0 then
-                        japi:DzFrameSetText(slot.tipText, slotVM.tooltipText)
+                        japi.DzFrameSetText(slot.tipText, slotVM.tooltipText)
                     end
                     if slot.hit ~= 0 then
                         uiShowFrame(slot.hit)
@@ -101,7 +101,7 @@ function rebuildAllBuffBarViewModels()
     end
 end
 function syncBuffBar()
-    local localPlayerId = jass:GetPlayerId(jass:GetLocalPlayer())
+    local localPlayerId = jass.GetPlayerId(jass.GetLocalPlayer())
     rebuildAllBuffBarViewModels()
     local ____temp_1
     if localPlayerId >= 0 then
@@ -119,9 +119,9 @@ function syncBuffBar()
         "BuffUI",
         (((((("pid=" .. tostring(localPlayerId)) .. " vm=") .. (viewModel and "yes" or "nil")) .. " vis=") .. tostring(visCount)) .. " slotsLen=") .. tostring(#slots)
     )
-    if jass:GetLocalPlayer() == jass:Player(localPlayerId) and viewModel then
+    if jass.GetLocalPlayer() == jass.Player(localPlayerId) and viewModel then
         renderBuffBarLocal(viewModel)
-    elseif jass:GetLocalPlayer() == jass:Player(localPlayerId) then
+    elseif jass.GetLocalPlayer() == jass.Player(localPlayerId) then
         hideAllSlots()
     end
 end
@@ -197,13 +197,13 @@ local function uiCreateTextLabel(name, parent, text, position, size)
     )
 end
 local function getTriggerUiEventFrame()
-    return japi:DzGetTriggerUIEventFrame()
+    return japi.DzGetTriggerUIEventFrame()
 end
 local function setFrameLevelSafe(frame, level)
     if frame == 0 then
         return
     end
-    japi:DzFrameSetPriority(frame, level)
+    japi.DzFrameSetPriority(frame, level)
 end
 local function showSlotTooltipByIndex(index)
     local s = slots[index + 1]
@@ -280,7 +280,7 @@ local function createOneSlot(index, parent)
         {width = ICON_W, height = 0.014}
     ) or 0
     if remainText and remainText ~= 0 then
-        japi:DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
+        japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
         setFrameLevelSafe(remainText, 182)
     end
     local hit = uiCreateFrame({
@@ -294,7 +294,7 @@ local function createOneSlot(index, parent)
     }) or 0
     if hit and hit ~= 0 then
         hoverSlotIndexByFrameId[hit] = index
-        japi:DzFrameSetAllPoints(hit, bd)
+        japi.DzFrameSetAllPoints(hit, bd)
         setFrameLevelSafe(hit, 181)
         uiSetFrameHoverEvents(hit, onSlotHoverEnter, onSlotHoverLeave, false)
     end
@@ -341,7 +341,7 @@ local function createOneSlot(index, parent)
         {width = boxW * 0.92, height = boxH * 0.88}
     ) or 0
     if tipText and tipText ~= 0 then
-        japi:DzFrameSetTextAlignment(tipText, 0)
+        japi.DzFrameSetTextAlignment(tipText, 0)
         setFrameLevelSafe(tipText, 201)
         uiHideFrame(tipText)
     end
@@ -380,14 +380,14 @@ local function startRefreshTimer()
     if refreshTimer ~= nil then
         return
     end
-    refreshTimer = jass:CreateTimer()
-    jass:TimerStart(refreshTimer, 0.1, true, onBuffUiRefreshTick)
+    refreshTimer = jass.CreateTimer()
+    jass.TimerStart(refreshTimer, 0.1, true, onBuffUiRefreshTick)
 end
 local function onBuffUiInitDelayTimer()
     createUi()
     startRefreshTimer()
     if pendingInitDelayTimer ~= nil then
-        jass:DestroyTimer(pendingInitDelayTimer)
+        jass.DestroyTimer(pendingInitDelayTimer)
         pendingInitDelayTimer = nil
     end
 end
@@ -403,7 +403,7 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
         return
     end
     buffUiInitialized = true
-    pendingInitDelayTimer = jass:CreateTimer()
-    jass:TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
+    pendingInitDelayTimer = jass.CreateTimer()
+    jass.TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
 end
 return ____exports

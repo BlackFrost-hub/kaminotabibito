@@ -47,7 +47,7 @@ function ____exports.OperatorIntegerMultiply(self, a, b)
     return a * b
 end
 function ____exports.OperatorIntegerDivide(self, a, b)
-    return jass:R2I(a / b)
+    return jass.R2I(a / b)
 end
 function ____exports.OperatorRealAdd(self, a, b)
     return a + b
@@ -78,14 +78,14 @@ local function applyOp(self, a, op, b)
 end
 function ____exports.YDWEOperatorInt3(self, a1, op1, a2, op2, a3)
     if op2 == "*" or op2 == "/" then
-        return jass:R2I(applyOp(
+        return jass.R2I(applyOp(
             nil,
             a1,
             op1,
             applyOp(nil, a2, op2, a3)
         ))
     end
-    return jass:R2I(applyOp(
+    return jass.R2I(applyOp(
         nil,
         applyOp(nil, a1, op1, a2),
         op2,
@@ -128,13 +128,13 @@ function ____exports.YDWERad2R(self, rad)
     return rad
 end
 function ____exports.YDWEInitHashtable(self)
-    return jass:InitHashtable()
+    return jass.InitHashtable()
 end
 function ____exports.YDWEIsTriggerEventId(self, eventid)
-    return eventid == jass:GetTriggerEventId()
+    return eventid == jass.GetTriggerEventId()
 end
 function ____exports.YDWEH2I(self, handle)
-    return jass:GetHandleId(handle)
+    return jass.GetHandleId(handle)
 end
 function ____exports.YDWEGetUnitID(self, a)
     return ____exports.YDWEH2I(nil, a)

@@ -48,9 +48,9 @@ function ____exports.isUnitAlly(self, targetUnit, sourceUnit)
     if sourceUnit == nil or sourceUnit == 0 then
         return false
     end
-    return jass:IsPlayerAlly(
-        jass:GetOwningPlayer(targetUnit),
-        jass:GetOwningPlayer(sourceUnit)
+    return jass.IsPlayerAlly(
+        jass.GetOwningPlayer(targetUnit),
+        jass.GetOwningPlayer(sourceUnit)
     ) == true
 end
 function ____exports.isValidAllyUnit(self, targetUnit, sourceUnit)

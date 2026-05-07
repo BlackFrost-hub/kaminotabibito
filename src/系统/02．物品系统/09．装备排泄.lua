@@ -1,25 +1,25 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local registerItemForCleanup, jass
-function registerItemForCleanup(self, item)
+function registerItemForCleanup(item)
     if item == nil then
         return
     end
-    local trig = jass:CreateTrigger()
+    local trig = jass.CreateTrigger()
     if not trig then
         return
     end
-    jass:TriggerRegisterDeathEvent(trig, item)
+    jass.TriggerRegisterDeathEvent(trig, item)
     local capturedItem = item
     local taHandle = nil
     local function onDeath()
-        jass:RemoveItem(capturedItem)
+        jass.RemoveItem(capturedItem)
         if taHandle ~= nil then
-            jass:TriggerRemoveAction(trig, taHandle)
+            jass.TriggerRemoveAction(trig, taHandle)
         end
-        jass:DestroyTrigger(trig)
+        jass.DestroyTrigger(trig)
     end
-    taHandle = jass:TriggerAddAction(trig, onDeath)
+    taHandle = jass.TriggerAddAction(trig, onDeath)
 end
 jass = require("jass.common")
 local _lastCreatedItem = nil
@@ -32,6 +32,6 @@ end
 --   2. 注册死亡清理（RemoveItem + DestroyTrigger）
 function ____exports.setLastCreatedItem(self, item)
     _lastCreatedItem = item
-    registerItemForCleanup(nil, item)
+    registerItemForCleanup(item)
 end
 return ____exports

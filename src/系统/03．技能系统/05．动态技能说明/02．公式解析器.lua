@@ -174,12 +174,12 @@ function ____exports.formatNumber(self, value)
     if not __TS__NumberIsFinite(__TS__Number(value)) then
         return "0"
     end
-    local intValue = jass:R2I(value)
+    local intValue = jass.R2I(value)
     if intValue == value then
         return tostring(intValue)
     end
     local rounded = round(value * DECIMAL_MULTIPLIER) / DECIMAL_MULTIPLIER
-    local intRounded = jass:R2I(rounded)
+    local intRounded = jass.R2I(rounded)
     if intRounded == rounded then
         return tostring(intRounded)
     end

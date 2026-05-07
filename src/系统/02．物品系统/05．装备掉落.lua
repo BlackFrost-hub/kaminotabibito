@@ -128,7 +128,7 @@ local function getEffectivePicks(basePicks, unitType)
         return basePicks
     end
     local mult = 1 + 0.334 * (T - 1)
-    return jass:R2I(basePicks * mult + 0.5)
+    return jass.R2I(basePicks * mult + 0.5)
 end
 --- 加权随机取一个（权重不必归一化）
 local function weightedPickOne(pool)
@@ -140,13 +140,13 @@ local function weightedPickOne(pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_3 = pool[jass:GetRandomInt(1, #pool)]
+        local ____opt_3 = pool[jass.GetRandomInt(1, #pool)]
         if ____opt_3 ~= nil then
             ____opt_3 = ____opt_3.id
         end
         return ____opt_3
     end
-    local r = jass:GetRandomReal(0, 1) * sum
+    local r = jass.GetRandomReal(0, 1) * sum
     local acc = 0
     for ____, p in ipairs(pool) do
         acc = acc + p.weight
@@ -178,7 +178,7 @@ local function pickFromWeightedPool(pool, picks)
             )
             out[#out + 1] = p.id
         else
-            local r = jass:GetRandomReal(0, 1)
+            local r = jass.GetRandomReal(0, 1)
             debugLog(
                 nil,
                 "装备掉落",
@@ -200,7 +200,7 @@ local function pickFromWeightedPool(pool, picks)
         do
             local i = #out - 1
             while i >= 1 do
-                local j = jass:GetRandomInt(1, i + 1)
+                local j = jass.GetRandomInt(1, i + 1)
                 local t = out[i + 1]
                 out[i + 1] = out[j]
                 out[j] = t
@@ -241,7 +241,7 @@ local function pickFromEqualPool(ids, picks)
     do
         local i = 0
         while i < firstPicks do
-            local idx = jass:GetRandomInt(1, #list)
+            local idx = jass.GetRandomInt(1, #list)
             local id = list[idx - 1]
             out[#out + 1] = id
             __TS__ArraySplice(list, idx - 1, 1)
@@ -252,7 +252,7 @@ local function pickFromEqualPool(ids, picks)
     do
         local i = 0
         while i < needMore do
-            local idx = jass:GetRandomInt(1, #ids)
+            local idx = jass.GetRandomInt(1, #ids)
             out[#out + 1] = ids[idx - 1]
             i = i + 1
         end
@@ -261,16 +261,16 @@ local function pickFromEqualPool(ids, picks)
 end
 local function createItemAtUnit(unit, itemId)
     local four = stringToFourCC(nil, itemId)
-    local loc = jass:GetUnitLoc(unit)
+    local loc = jass.GetUnitLoc(unit)
     if loc then
         equipExcrete:setLastCreatedItem(itemInv:CreateItemLoc(four, loc))
     elseif jass.GetUnitX ~= nil then
-        local x = jass:GetUnitX(unit)
-        local y = jass:GetUnitY(unit)
-        equipExcrete:setLastCreatedItem(jass:CreateItem(four, x, y))
+        local x = jass.GetUnitX(unit)
+        local y = jass.GetUnitY(unit)
+        equipExcrete:setLastCreatedItem(jass.CreateItem(four, x, y))
     end
     if loc then
-        jass:RemoveLocation(loc)
+        jass.RemoveLocation(loc)
     end
 end
 local function onUnitDeath(unit, _killer)
@@ -280,7 +280,7 @@ local function onUnitDeath(unit, _killer)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local typeId = jass:GetUnitTypeId(unit)
+    local typeId = jass.GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(typeId)
     local entry = unitId and idData[unitId] or nil
     debugLog(
@@ -296,7 +296,7 @@ local function onUnitDeath(unit, _killer)
     if entry and entry.itemIds ~= nil then
         debugLog(nil, "装备掉落", "找到掉落表 itemIds:", entry.itemIds)
         local dropProc = entry.dropProc ~= nil and __TS__Number(entry.dropProc) or 1
-        local r = jass:GetRandomInt(1, 10000)
+        local r = jass.GetRandomInt(1, 10000)
         if r > dropProc * 10000 then
             return
         end
@@ -305,7 +305,7 @@ local function onUnitDeath(unit, _killer)
         if #pool == 0 then
             return
         end
-        local picksNum = jass:R2I(__TS__Number(entry.picks) or 1)
+        local picksNum = jass.R2I(__TS__Number(entry.picks) or 1)
         if picksNum < 1 then
             picksNum = 1
         end
@@ -327,7 +327,7 @@ local function onUnitDeath(unit, _killer)
             if typeId ~= stringToFourCC(nil, rule.unitId) then
                 goto __continue71
             end
-            local r = jass:GetRandomInt(1, 10000)
+            local r = jass.GetRandomInt(1, 10000)
             if r > rule.proc * 10000 then
                 goto __continue71
             end
@@ -335,7 +335,7 @@ local function onUnitDeath(unit, _killer)
             if #list == 0 then
                 goto __continue71
             end
-            local idx = jass:GetRandomInt(1, #list)
+            local idx = jass.GetRandomInt(1, #list)
             local itemId = list[idx]
             if itemId ~= nil and itemId ~= "" then
                 createItemAtUnit(unit, itemId)

@@ -13,12 +13,12 @@ local LIFE_REGEN_PERCENT_CAP = ____require_result_1.LIFE_REGEN_PERCENT_CAP
 local MANA_REGEN_PERCENT_CAP = ____require_result_1.MANA_REGEN_PERCENT_CAP
 --- 计算基础生命恢复（力量 × 0.32）
 function ____exports.calcBaseLifeRegen(self, unit)
-    local strength = jass:GetHeroStr(unit, true)
+    local strength = jass.GetHeroStr(unit, true)
     return strength * STRENGTH_TO_LIFE_REGEN
 end
 --- 计算基础魔法恢复（智力 × 0.15）
 function ____exports.calcBaseManaRegen(self, unit)
-    local intelligence = jass:GetHeroInt(unit, true)
+    local intelligence = jass.GetHeroInt(unit, true)
     return intelligence * INTELLIGENCE_TO_MANA_REGEN
 end
 --- 读取单位/玩家属性
@@ -33,7 +33,7 @@ local function getAttr(self, unit, attrName)
     if unitValue ~= 0 then
         return unitValue
     end
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player ~= nil then
         return YDUserDataGet(
             nil,
@@ -47,7 +47,7 @@ local function getAttr(self, unit, attrName)
 end
 --- 读取玩家属性
 local function getPlayerAttr(self, unit, attrName)
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return 0
     end
@@ -75,7 +75,7 @@ end
 function ____exports.calcTotalLifeRegen(self, unit, baseRegen, itemBonus, unitMultiplier)
     local fixedRegen = getAttr(nil, unit, "生命恢复")
     local percentRegen = ____exports.getPercentLifeRegen(nil, unit)
-    local maxLife = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     local percentRegenValue = maxLife * percentRegen
     local amplify = getPlayerAttr(nil, unit, "生命恢复属性增幅")
     local totalBase = (baseRegen + itemBonus) * unitMultiplier + fixedRegen
@@ -88,7 +88,7 @@ end
 function ____exports.calcTotalManaRegen(self, unit, baseRegen)
     local fixedRegen = getAttr(nil, unit, "魔法恢复")
     local percentRegen = ____exports.getPercentManaRegen(nil, unit)
-    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     local percentRegenValue = maxMana * percentRegen
     return baseRegen + fixedRegen + percentRegenValue
 end

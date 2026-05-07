@@ -58,6 +58,53 @@ export function isValidEnemyUnit(targetUnit: any, sourceUnit: any): boolean {
 }
 
 /**
+ * 判断两个单位是否是同一单位
+ * @param unitA 单位A
+ * @param unitB 单位B
+ * @returns 如果是同一单位返回 true，否则返回 false
+ */
+export function isSameUnit(unitA: any, unitB: any): boolean {
+    if (!unitA || !unitB) return false;
+    return unitA === unitB;
+}
+
+/**
+ * 判断目标单位是否是源单位的友军单位
+ * @param targetUnit 目标单位
+ * @param sourceUnit 源单位
+ * @returns 如果是友军单位返回 true，否则返回 false
+ */
+export function isUnitAlly(targetUnit: any, sourceUnit: any): boolean {
+    if (!targetUnit || !sourceUnit) return false;
+
+    const targetPlayer = jass.GetOwningPlayer(targetUnit);
+    const sourcePlayer = jass.GetOwningPlayer(sourceUnit);
+    if (!targetPlayer || !sourcePlayer) return false;
+
+    return jass.IsPlayerAlly(targetPlayer, sourcePlayer);
+}
+
+/**
+ * 判断单位是否有效且是友军单位
+ * @param targetUnit 目标单位
+ * @param sourceUnit 源单位
+ * @returns 如果单位有效且是友军单位返回 true，否则返回 false
+ */
+export function isValidAllyUnit(targetUnit: any, sourceUnit: any): boolean {
+    return isValidUnit(targetUnit) && isUnitAlly(targetUnit, sourceUnit);
+}
+
+/**
+ * 判断单位是否有效且是友军单位，并且排除源单位自身
+ * @param targetUnit 目标单位
+ * @param sourceUnit 源单位
+ * @returns 如果单位有效且是友军单位且不是自身返回 true，否则返回 false
+ */
+export function isValidAllyUnitExcludeSelf(targetUnit: any, sourceUnit: any): boolean {
+    return isValidAllyUnit(targetUnit, sourceUnit) && !isSameUnit(targetUnit, sourceUnit);
+}
+
+/**
  * 判断单位当前命令是否不是使用物品栏第1-6格
  * 使用物品栏的命令ID范围：852008-852013
  * @param unit 要判断的单位

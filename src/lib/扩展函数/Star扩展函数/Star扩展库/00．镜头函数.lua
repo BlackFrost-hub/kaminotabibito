@@ -7,10 +7,10 @@ local jass = require("jass.common")
 -- @param u 目标单位
 -- @param duration 平移时间
 function ____exports.StarOther_PanCameraToTimedUnitForPlayer(self, whichPlayer, u, duration)
-    if jass:GetLocalPlayer() == whichPlayer then
-        jass:PanCameraToTimed(
-            jass:GetUnitX(u),
-            jass:GetUnitY(u),
+    if jass.GetLocalPlayer() == whichPlayer then
+        jass.PanCameraToTimed(
+            jass.GetUnitX(u),
+            jass.GetUnitY(u),
             duration
         )
     end
@@ -23,10 +23,10 @@ end
 -- @param y 目标 Y 坐标
 -- @param duration 平移耗时（秒）
 function ____exports.StarOther_PanCameraToTimedForPlayer(self, whichPlayer, x, y, duration)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer ~= whichPlayer then
         return
     end
-    jass:PanCameraToTimed(x, y, duration)
+    jass.PanCameraToTimed(x, y, duration)
 end
 return ____exports

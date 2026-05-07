@@ -65,21 +65,21 @@ end
 local dotTicks = {}
 local equipDataMod = require("系统.02．物品系统.01．装备数据")
 local itemsData = equipDataMod.items or equipDataMod.default or ({})
-local dotBaseUtils = createDotBaseUtils({jass = jass, g = g, itemsData = itemsData, fourCCToString = fourCCToString})
+local dotBaseUtils = createDotBaseUtils(nil, {jass = jass, g = g, itemsData = itemsData, fourCCToString = fourCCToString})
 local function removeDotTicksForTargetHid(self, typeId, tgtHid)
     do
         local i = #dotTicks - 1
         while i >= 0 do
             local e = dotTicks[i + 1]
-            if e.typeId == typeId and unitHid(e.target) == tgtHid then
+            if e.typeId == typeId and unitHid(nil, e.target) == tgtHid then
                 __TS__ArraySplice(dotTicks, i, 1)
             end
             i = i - 1
         end
     end
 end
-local dotStateSync = createDotStateSync({dotTypes = dotTypes, removeDotTicksForTargetHid = removeDotTicksForTargetHid, notifyBuffPool = notifyBuffPool})
-local dotExecutor = createDotExecutor({
+local dotStateSync = createDotStateSync(nil, {dotTypes = dotTypes, removeDotTicksForTargetHid = removeDotTicksForTargetHid, notifyBuffPool = notifyBuffPool})
+local dotExecutor = createDotExecutor(nil, {
     jass = jass,
     LeakWatcher = LeakWatcher,
     dotTypes = dotTypes,
@@ -87,36 +87,39 @@ local dotExecutor = createDotExecutor({
     damageEventModule = damageEventModule,
     unitHid = unitHid
 })
-local dotApplyStrategy = createDotApplyStrategy({
-    dotTypes = dotTypes,
-    dotTicks = dotTicks,
-    unitHid = unitHid,
-    isSourceHeroPlayer1to4 = dotBaseUtils.isSourceHeroPlayer1to4,
-    isDebuffDotTargetOk = dotBaseUtils.isDebuffDotTargetOk,
-    getDotSourceDisplayName = getDotSourceDisplayName,
-    notifyBuffPool = notifyBuffPool,
-    ensureDotTimers = function() return dotExecutor.ensureDotTimers() end,
-    getDotTickBatchTargetHids = function() return dotExecutor.getDotTickBatchTargetHids() end
-})
+local dotApplyStrategy = createDotApplyStrategy(
+    nil,
+    {
+        dotTypes = dotTypes,
+        dotTicks = dotTicks,
+        unitHid = unitHid,
+        isSourceHeroPlayer1to4 = dotBaseUtils.isSourceHeroPlayer1to4,
+        isDebuffDotTargetOk = dotBaseUtils.isDebuffDotTargetOk,
+        getDotSourceDisplayName = getDotSourceDisplayName,
+        notifyBuffPool = notifyBuffPool,
+        ensureDotTimers = function() return dotExecutor:ensureDotTimers() end,
+        getDotTickBatchTargetHids = function() return dotExecutor:getDotTickBatchTargetHids() end
+    }
+)
 --- Buff 池每 0.1s 递减后调用：把池内 remaining/effect 写回 `stateByType`；池已无行则清理逻辑层与秒跳队列。
 function ____exports.syncDotRemainingFromBuffPool(self)
-    dotStateSync.syncDotRemainingFromBuffPool()
+    dotStateSync:syncDotRemainingFromBuffPool()
 end
 --- Buff 池判定某 DOT 到期时调用（池行已删，勿再 syncDotBuff null）
 function ____exports.clearDotByBuffPoolExpire(self, buffID, hid)
-    dotStateSync.clearDotByBuffPoolExpire(buffID, hid)
+    dotStateSync:clearDotByBuffPoolExpire(buffID, hid)
 end
 --- 伤害事件延后展示前调用：用 entry.gearDotAttackRefreshHint 判定普攻位（已在事件同步阶段快照，不依赖 jass 全局），每刀只叠一次装备 DOT，避免多段伤害丢 8192/16384。
 -- 与 `onDamage` 内普攻分支互斥：回调里 `isAttackHitForDot` 为真时不再叠层。
 function ____exports.tryApplyHeroAttackGearDots(self, source, target, _damage)
-    dotApplyStrategy.tryApplyHeroAttackGearDots(source, target, _damage)
+    dotApplyStrategy:tryApplyHeroAttackGearDots(source, target, _damage)
 end
 --- 由 伤害事件.runDeferredDamageDisplay 在每段 DOT 伤害展示回调结束后调用，替代 Timer(0) 清空 batch（避免早于 deferred onDamage）
 function ____exports.notifyDotTickBatchDamageDisplayed(self)
-    dotExecutor.notifyDotTickBatchDamageDisplayed()
+    dotExecutor:notifyDotTickBatchDamageDisplayed()
 end
 local function onDamage(self, target, damage, damageType, fromDotTickBatch, source, isNormalAttackHit)
-    dotApplyStrategy.onDamage(
+    dotApplyStrategy:onDamage(
         target,
         damage,
         damageType,
@@ -128,7 +131,7 @@ end
 local getBestDotFromUnit = dotBaseUtils.getBestDotFromUnit
 local getUnitMaxHp = dotBaseUtils.getUnitMaxHp
 local getTargetRegenHP = dotBaseUtils.getTargetRegenHP
-registerBuiltInDotTypes({
+registerBuiltInDotTypes(nil, {
     registerDotType = ____exports.registerDotType,
     getBestDotFromUnit = getBestDotFromUnit,
     getTargetRegenHP = getTargetRegenHP,
@@ -137,11 +140,11 @@ registerBuiltInDotTypes({
 })
 local registered = false
 local function getDotStateByTypeId(self, typeId, unit)
-    local h = unitHid(unit)
+    local h = unitHid(nil, unit)
     if h == 0 then
         return nil
     end
-    return getDotState(typeId, h)
+    return getDotState(nil, typeId, h)
 end
 --- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
 function ____exports.getUnitAntiHeal(self, unit)
@@ -161,11 +164,11 @@ function ____exports.getUnitTrollCurse(self, unit)
 end
 --- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。
 function ____exports.dealSpiritDamage(self, source, target, amount)
-    dotExecutor.dealDamageForType("antiHeal", source, target, amount)
+    dotExecutor:dealDamageForType("antiHeal", source, target, amount)
 end
 --- 造成火焰伤害（外部技能与 burn DOT 同源类型时可调用）
 function ____exports.dealBurnDamage(self, source, target, amount)
-    dotExecutor.dealDamageForType("burn", source, target, amount)
+    dotExecutor:dealDamageForType("burn", source, target, amount)
 end
 if not registered then
     registered = true

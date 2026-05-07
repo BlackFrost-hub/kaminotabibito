@@ -13,15 +13,15 @@ local ignoredTargetFlat = ____04_FF0EDOT_5DE5_5177.ignoredTargetFlat
 local isValidDotStateRow = ____04_FF0EDOT_5DE5_5177.isValidDotStateRow
 local makeDotFlatKey = ____04_FF0EDOT_5DE5_5177.makeDotFlatKey
 local BUFF_ID_TO_DOT_TYPE = {D001 = "antiHeal", D002 = "burn", D003 = "poison", D004 = "trollCurse"}
-local function dotTypeIdFromBuffId(buffID)
+local function dotTypeIdFromBuffId(self, buffID)
     return BUFF_ID_TO_DOT_TYPE[buffID] or nil
 end
-function ____exports.createDotStateSync(deps)
+function ____exports.createDotStateSync(self, deps)
     local dotTypes = deps.dotTypes
     local notifyBuffPool = deps.notifyBuffPool
     local removeDotTicksForTargetHid = deps.removeDotTicksForTargetHid
-    local function syncDotRemainingFromBuffPool()
-        local ____pairs = collectActiveDotPairs()
+    local function syncDotRemainingFromBuffPool(self)
+        local ____pairs = collectActiveDotPairs(nil)
         do
             local pi = 0
             while pi < #____pairs do
@@ -33,9 +33,9 @@ function ____exports.createDotStateSync(deps)
                     if buffID == nil or buffID == "" then
                         goto __continue6
                     end
-                    local state = getDotState(typeId, hid)
-                    if state == nil or not isValidDotStateRow(state) then
-                        deleteDotState(typeId, hid)
+                    local state = getDotState(nil, typeId, hid)
+                    if state == nil or not isValidDotStateRow(nil, state) then
+                        deleteDotState(nil, typeId, hid)
                         goto __continue6
                     end
                     local rt = getBuffRuntimeByHid(hid, buffID)
@@ -56,10 +56,10 @@ function ____exports.createDotStateSync(deps)
                             end
                             ____self_2_onEnd_3(____self_2, ____temp_1, state)
                         end
-                        notifyBuffPool(typeId, hid, nil)
-                        deleteDotState(typeId, hid)
-                        removeDotTicksForTargetHid(typeId, hid)
-                        local key = makeDotFlatKey(typeId, hid)
+                        notifyBuffPool(nil, typeId, hid, nil)
+                        deleteDotState(nil, typeId, hid)
+                        removeDotTicksForTargetHid(nil, typeId, hid)
+                        local key = makeDotFlatKey(nil, typeId, hid)
                         __TS__Delete(ignoredTargetFlat, key)
                         goto __continue6
                     end
@@ -71,7 +71,7 @@ function ____exports.createDotStateSync(deps)
                     if rt._dotParsedDuration ~= nil then
                         state._dotParsedDuration = rt._dotParsedDuration
                     end
-                    local key = makeDotFlatKey(typeId, hid)
+                    local key = makeDotFlatKey(nil, typeId, hid)
                     ignoredTargetFlat[key] = true
                 end
                 ::__continue6::
@@ -79,13 +79,13 @@ function ____exports.createDotStateSync(deps)
             end
         end
     end
-    local function clearDotByBuffPoolExpire(buffID, hid)
-        local typeId = dotTypeIdFromBuffId(buffID)
+    local function clearDotByBuffPoolExpire(self, buffID, hid)
+        local typeId = dotTypeIdFromBuffId(nil, buffID)
         if typeId == nil or hid == 0 then
             return
         end
-        local state = getDotState(typeId, hid)
-        if state ~= nil and isValidDotStateRow(state) then
+        local state = getDotState(nil, typeId, hid)
+        if state ~= nil and isValidDotStateRow(nil, state) then
             local cfg = __TS__ArrayFind(
                 dotTypes,
                 function(____, c) return c.id == typeId end
@@ -103,10 +103,10 @@ function ____exports.createDotStateSync(deps)
                 ____self_5_onEnd_6(____self_5, ____temp_4, state)
             end
         end
-        deleteDotState(typeId, hid)
-        local key = makeDotFlatKey(typeId, hid)
+        deleteDotState(nil, typeId, hid)
+        local key = makeDotFlatKey(nil, typeId, hid)
         __TS__Delete(ignoredTargetFlat, key)
-        removeDotTicksForTargetHid(typeId, hid)
+        removeDotTicksForTargetHid(nil, typeId, hid)
     end
     return {syncDotRemainingFromBuffPool = syncDotRemainingFromBuffPool, clearDotByBuffPoolExpire = clearDotByBuffPoolExpire}
 end

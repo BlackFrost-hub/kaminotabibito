@@ -71,7 +71,7 @@ local function onSpellEffectForCooldown(castingUnit, spellAbilityId)
     if handleSpecialSkillCooldown(nil, castingUnit, spellAbilityId, cappedReduction) then
         return
     end
-    local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
     if level <= 0 then
         return
     end
