@@ -10,115 +10,91 @@ local ____02_FF0EDOT_89E3_6790 = require("系统.04．伤害系统.01．DOT定�
 local parseStandardDotBuff = ____02_FF0EDOT_89E3_6790.parseStandardDotBuff
 local readNumberFromString = ____02_FF0EDOT_89E3_6790.readNumberFromString
 local jass = require("jass.common")
-function ____exports.registerBuiltInDotTypes(self, deps)
+function ____exports.registerBuiltInDotTypes(deps)
     local registerDotType = deps.registerDotType
     local getBestDotFromUnit = deps.getBestDotFromUnit
     local getTargetRegenHP = deps.getTargetRegenHP
     local getUnitMaxHp = deps.getUnitMaxHp
     local dotEffectModelFromBuffRow = deps.dotEffectModelFromBuffRow
-    local function parseAntiHealBuff(self, buffStr)
+    local function parseAntiHealBuff(buffStr)
         return parseStandardDotBuff(
-            nil,
             buffStr,
             "AntiHeal",
-            function(____, effectPct, duration, attackOnly) return {effectPct = effectPct, duration = duration, attackOnly = attackOnly} end,
+            function(effectPct, duration, attackOnly) return {effectPct = effectPct, duration = duration, attackOnly = attackOnly} end,
             false
         )
     end
-    local function getBestAntiHealFromUnit(self, unit)
+    local function getBestAntiHealFromUnit(unit)
         return getBestDotFromUnit(
-            nil,
             unit,
             parseAntiHealBuff,
-            function(____, parsed) return parsed.effectPct * parsed.duration end
+            function(parsed) return parsed.effectPct * parsed.duration end
         )
     end
-    registerDotType(
-        nil,
-        {
-            id = "antiHeal",
-            debuffDotEnemyNoStructure = true,
-            parseBuff = parseAntiHealBuff,
-            getBestFromUnit = getBestAntiHealFromUnit,
-            computeAmount = function(____, target, parsed)
-                local regenHP = getTargetRegenHP(nil, target)
-                return regenHP * (parsed.effectPct / 100)
-            end,
-            damageType = jass.DAMAGE_TYPE_MIND,
-            effectModel = dotEffectModelFromBuffRow(
-                nil,
-                getDotBuffRow(nil, "antiHeal")
-            ),
-            effectDuration = 0.8
-        }
-    )
-    local function parseBurnBuff(self, buffStr)
+    registerDotType({
+        id = "antiHeal",
+        debuffDotEnemyNoStructure = true,
+        parseBuff = parseAntiHealBuff,
+        getBestFromUnit = getBestAntiHealFromUnit,
+        computeAmount = function(target, parsed)
+            local regenHP = getTargetRegenHP(target)
+            return regenHP * (parsed.effectPct / 100)
+        end,
+        damageType = jass.DAMAGE_TYPE_MIND,
+        effectModel = dotEffectModelFromBuffRow(getDotBuffRow("antiHeal")),
+        effectDuration = 0.8
+    })
+    local function parseBurnBuff(buffStr)
         return parseStandardDotBuff(
-            nil,
             buffStr,
             "Burn",
-            function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
+            function(damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
             true
         )
     end
-    local function getBestBurnFromUnit(self, unit)
+    local function getBestBurnFromUnit(unit)
         return getBestDotFromUnit(
-            nil,
             unit,
             parseBurnBuff,
-            function(____, parsed) return parsed.damagePerSec * parsed.duration end
+            function(parsed) return parsed.damagePerSec * parsed.duration end
         )
     end
-    registerDotType(
-        nil,
-        {
-            id = "burn",
-            debuffDotEnemyNoStructure = true,
-            parseBuff = parseBurnBuff,
-            getBestFromUnit = getBestBurnFromUnit,
-            computeAmount = function(____, _target, parsed) return parsed.damagePerSec or 0 end,
-            damageType = jass.DAMAGE_TYPE_FIRE,
-            effectModel = dotEffectModelFromBuffRow(
-                nil,
-                getDotBuffRow(nil, "burn")
-            ),
-            effectDuration = 0.75
-        }
-    )
-    local function parsePoisonBuff(self, buffStr)
+    registerDotType({
+        id = "burn",
+        debuffDotEnemyNoStructure = true,
+        parseBuff = parseBurnBuff,
+        getBestFromUnit = getBestBurnFromUnit,
+        computeAmount = function(_target, parsed) return parsed.damagePerSec or 0 end,
+        damageType = jass.DAMAGE_TYPE_FIRE,
+        effectModel = dotEffectModelFromBuffRow(getDotBuffRow("burn")),
+        effectDuration = 0.75
+    })
+    local function parsePoisonBuff(buffStr)
         return parseStandardDotBuff(
-            nil,
             buffStr,
             "Poison",
-            function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
+            function(damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
             true
         )
     end
-    local function getBestPoisonFromUnit(self, unit)
+    local function getBestPoisonFromUnit(unit)
         return getBestDotFromUnit(
-            nil,
             unit,
             parsePoisonBuff,
-            function(____, parsed) return parsed.damagePerSec * parsed.duration end
+            function(parsed) return parsed.damagePerSec * parsed.duration end
         )
     end
-    registerDotType(
-        nil,
-        {
-            id = "poison",
-            debuffDotEnemyNoStructure = true,
-            parseBuff = parsePoisonBuff,
-            getBestFromUnit = getBestPoisonFromUnit,
-            computeAmount = function(____, _target, parsed) return parsed.damagePerSec or 0 end,
-            damageType = jass.DAMAGE_TYPE_ACID,
-            effectModel = dotEffectModelFromBuffRow(
-                nil,
-                getDotBuffRow(nil, "poison")
-            ),
-            effectDuration = 0.8
-        }
-    )
-    local function parseTrollCurseBuff(self, buffStr)
+    registerDotType({
+        id = "poison",
+        debuffDotEnemyNoStructure = true,
+        parseBuff = parsePoisonBuff,
+        getBestFromUnit = getBestPoisonFromUnit,
+        computeAmount = function(_target, parsed) return parsed.damagePerSec or 0 end,
+        damageType = jass.DAMAGE_TYPE_ACID,
+        effectModel = dotEffectModelFromBuffRow(getDotBuffRow("poison")),
+        effectDuration = 0.8
+    })
+    local function parseTrollCurseBuff(buffStr)
         if not buffStr or type(buffStr) ~= "string" then
             return nil
         end
@@ -157,38 +133,31 @@ function ____exports.registerBuiltInDotTypes(self, deps)
         if timeIdx < 0 then
             return nil
         end
-        local duration = readNumberFromString(nil, rest, timeIdx + 4)
+        local duration = readNumberFromString(rest, timeIdx + 4)
         if duration <= 0 or pctMaxHpPerSec <= 0 then
             return nil
         end
         return {pctMaxHpPerSec = pctMaxHpPerSec, duration = duration, attackOnly = attackOnly}
     end
-    local function getBestTrollCurseFromUnit(self, unit)
+    local function getBestTrollCurseFromUnit(unit)
         return getBestDotFromUnit(
-            nil,
             unit,
             parseTrollCurseBuff,
-            function(____, parsed) return parsed.pctMaxHpPerSec * parsed.duration end
+            function(parsed) return parsed.pctMaxHpPerSec * parsed.duration end
         )
     end
-    registerDotType(
-        nil,
-        {
-            id = "trollCurse",
-            debuffDotEnemyNoStructure = true,
-            parseBuff = parseTrollCurseBuff,
-            getBestFromUnit = getBestTrollCurseFromUnit,
-            computeAmount = function(____, target, parsed)
-                local maxHp = getUnitMaxHp(nil, target)
-                return maxHp * (parsed.pctMaxHpPerSec / 100)
-            end,
-            damageType = jass.DAMAGE_TYPE_NORMAL,
-            effectModel = dotEffectModelFromBuffRow(
-                nil,
-                getDotBuffRow(nil, "trollCurse")
-            ),
-            effectDuration = 0.8
-        }
-    )
+    registerDotType({
+        id = "trollCurse",
+        debuffDotEnemyNoStructure = true,
+        parseBuff = parseTrollCurseBuff,
+        getBestFromUnit = getBestTrollCurseFromUnit,
+        computeAmount = function(target, parsed)
+            local maxHp = getUnitMaxHp(target)
+            return maxHp * (parsed.pctMaxHpPerSec / 100)
+        end,
+        damageType = jass.DAMAGE_TYPE_NORMAL,
+        effectModel = dotEffectModelFromBuffRow(getDotBuffRow("trollCurse")),
+        effectDuration = 0.8
+    })
 end
 return ____exports

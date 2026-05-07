@@ -27,8 +27,8 @@ local function handleCategoryTabClick(self, category)
     end
     local onSwitchCategory = handler.onSwitchCategory
     onSwitchCategory(category)
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass.GetLocalPlayer() then
+    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
+    if triggerPlayer == jass:GetLocalPlayer() then
         local onClickSound = handler.onClickSound
         onClickSound()
     end
@@ -111,7 +111,7 @@ local function createTaskTab(self, opts)
     local nameSuffix = ____opts_7.nameSuffix
     local bg = tryCreateFromFdfOnly(nil, bgName, tabParent, contextId)
     if bg then
-        japi.DzFrameClearAllPoints(bg)
+        japi:DzFrameClearAllPoints(bg)
         setFramePointRelative(
             nil,
             bg,
@@ -135,7 +135,7 @@ local function createTaskTab(self, opts)
     end
     local tab = tryCreateFromFdfOnly(nil, tabName, tabParent, contextId)
     if tab then
-        japi.DzFrameClearAllPoints(tab)
+        japi:DzFrameClearAllPoints(tab)
         if bg then
             setupTransparentGlueHitLayer(nil, bg, tab)
         else

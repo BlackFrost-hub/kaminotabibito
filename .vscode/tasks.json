@@ -8,6 +8,42 @@
       "options": {
         "cwd": "D:\\StarWE v1.32fix1"
       },
+      "problemMatcher": []
+    },
+    {
+      "label": "W2L: map.w3x -> OBJ",
+      "type": "process",
+      "command": "w2l.exe",
+      "args": [
+        "obj",
+        "map.w3x"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "Path": "F:\\w3x2lni_zhCN_v2.5.2;${env:Path}"
+        }
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "W2L: map.w3x -> Lni",
+      "type": "process",
+      "command": "w2l.exe",
+      "args": [
+        "lni",
+        "map.w3x"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "Path": "F:\\w3x2lni_zhCN_v2.5.2;${env:Path}"
+        }
+      },
       "group": "test",
       "problemMatcher": []
     }

@@ -5,6 +5,8 @@ local Map = ____lualib.Map
 local ____exports = {}
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local stringToFourCC = ____require_result_0.stringToFourCC
+--- 宝箱系统开关（设为 false 可关闭整个宝箱系统）
+____exports["宝箱系统开关"] = false
 --- 宝箱类型配置表（在此添加所有宝箱类型）
 ____exports.CHEST_TYPES = {{
     destructableType = "B00Z",

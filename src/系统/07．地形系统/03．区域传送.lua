@@ -1,11 +1,11 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__StringSplit = ____lualib.__TS__StringSplit
-local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
+local __TS__StringTrim = ____lualib.__TS__StringTrim
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E = require("系统.07．地形系统.02．区域传送配置")
 local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E.default
@@ -19,12 +19,89 @@ local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataGet = ____require_result_2.YDUserDataGet
 local regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
 local regionMap = __TS__New(Map)
 local function dbg(_msg)
 end
+local function getStoryProgress()
+    local raw = YDUserDataGet(
+        nil,
+        "string",
+        "剧情进度",
+        "整数",
+        "integer"
+    )
+    local numeric = raw == nil and 0 or __TS__Number(raw)
+    return __TS__NumberIsFinite(__TS__Number(numeric)) and numeric or 0
+end
 local function checkRegionCondition(cond, _unit)
     if not cond or cond == "always" then
+        return true
+    end
+    local text = __TS__StringTrim(cond)
+    local current = getStoryProgress()
+    local function evalByPrefix(prefix, matcher)
+        if (string.find(text, prefix, nil, true) or 0) - 1 ~= 0 then
+            return nil
+        end
+        local target = __TS__Number(__TS__StringTrim(__TS__StringSubstring(text, #prefix)))
+        if not __TS__NumberIsFinite(__TS__Number(target)) then
+            return true
+        end
+        return matcher(current, target)
+    end
+    local gte = evalByPrefix(
+        "zhuxian≥",
+        function(a, b) return a >= b end
+    )
+    if gte ~= nil then
+        return gte
+    end
+    local lte = evalByPrefix(
+        "zhuxian≤",
+        function(a, b) return a <= b end
+    )
+    if lte ~= nil then
+        return lte
+    end
+    local gteAscii = evalByPrefix(
+        "zhuxian>=",
+        function(a, b) return a >= b end
+    )
+    if gteAscii ~= nil then
+        return gteAscii
+    end
+    local lteAscii = evalByPrefix(
+        "zhuxian<=",
+        function(a, b) return a <= b end
+    )
+    if lteAscii ~= nil then
+        return lteAscii
+    end
+    local gt = evalByPrefix(
+        "zhuxian>",
+        function(a, b) return a > b end
+    )
+    if gt ~= nil then
+        return gt
+    end
+    local lt = evalByPrefix(
+        "zhuxian<",
+        function(a, b) return a < b end
+    )
+    if lt ~= nil then
+        return lt
+    end
+    local eq = evalByPrefix(
+        "zhuxian=",
+        function(a, b) return a == b end
+    )
+    if eq ~= nil then
+        return eq
+    end
+    if (string.find(text, "zhuxian", nil, true) or 0) - 1 == 0 then
         return true
     end
     return true
@@ -40,17 +117,17 @@ local function runRegionRule(rule, unit, owner)
         do
             local s = __TS__StringTrim(raw)
             if not s then
-                goto __continue7
+                goto __continue26
             end
             local percentIdx = (string.find(s, "%", nil, true) or 0) - 1
             if percentIdx <= 0 then
-                goto __continue7
+                goto __continue26
             end
             local weightStr = __TS__StringTrim(__TS__StringSubstring(s, 0, percentIdx))
             local rest = __TS__StringTrim(__TS__StringSubstring(s, percentIdx + 1))
             local weight = __TS__Number(weightStr)
             if not weight or not __TS__NumberIsFinite(__TS__Number(weight)) or weight <= 0 then
-                goto __continue7
+                goto __continue26
             end
             local colonIdx = (string.find(rest, ":", nil, true) or 0) - 1
             local actionName = __TS__StringTrim(colonIdx >= 0 and __TS__StringSubstring(rest, 0, colonIdx) or rest)
@@ -70,12 +147,12 @@ local function runRegionRule(rule, unit, owner)
                 end
             end
         end
-        ::__continue7::
+        ::__continue26::
     end
     if #items == 0 or totalWeight <= 0 then
         return
     end
-    local r = jass.GetRandomInt(1, totalWeight)
+    local r = jass:GetRandomInt(1, totalWeight)
     local chosen
     for ____, it in ipairs(items) do
         if r <= it.weight then
@@ -88,9 +165,9 @@ local function runRegionRule(rule, unit, owner)
         chosen = items[#items]
     end
     local unitName = "单位"
-    local n = jass.GetUnitName(unit)
+    local n = jass:GetUnitName(unit)
     if n ~= nil then
-        unitName = tostring(n)
+        unitName = tostring(nil, n)
     end
     local function formatText(raw)
         if not raw then
@@ -102,10 +179,10 @@ local function runRegionRule(rule, unit, owner)
         )
     end
     if chosen.action == "KillUnit" then
-        jass.KillUnit(unit)
+        jass:KillUnit(unit)
         local msg = formatText(chosen.text)
         if msg and owner ~= nil then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0,
@@ -115,11 +192,11 @@ local function runRegionRule(rule, unit, owner)
         end
     elseif chosen.action == "Teleport" then
         if chosen.x ~= nil and chosen.y ~= nil then
-            jass.SetUnitPosition(unit, chosen.x, chosen.y)
+            jass:SetUnitPosition(unit, chosen.x, chosen.y)
         end
         local msg = formatText(nil)
         if msg and owner ~= nil then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0,
@@ -130,7 +207,7 @@ local function runRegionRule(rule, unit, owner)
     end
 end
 local function initRegionTeleport()
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     local total = 0
     local enabledCount = 0
     for k in pairs(_____533A_57DF_4F20_9001_914D_7F6E) do
@@ -145,34 +222,34 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue33
+                goto __continue52
             end
-            local region = jass.CreateRegion()
-            local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
-            jass.RegionAddRect(region, rect)
-            jass.RemoveRect(rect)
+            local region = jass:CreateRegion()
+            local rect = jass:Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
+            jass:RegionAddRect(region, rect)
+            jass:RemoveRect(rect)
             regionEventCenter.registerEnterRegionTrigger(trig, region, nil)
             regionMap:set(
-                jass.GetHandleId(region),
+                jass:GetHandleId(region),
                 cfg
             )
         end
-        ::__continue33::
+        ::__continue52::
     end
     local function onEnter()
-        local unit = jass.GetTriggerUnit()
-        local region = jass.GetTriggeringRegion()
+        local unit = jass:GetTriggerUnit()
+        local region = jass:GetTriggeringRegion()
         if unit == nil or region == nil then
             return
         end
-        local owner = jass.GetOwningPlayer(unit)
+        local owner = jass:GetOwningPlayer(unit)
         if owner ~= nil and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
-            local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+            local neutralAgg = jass:Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
             if owner == neutralAgg then
                 return
             end
         end
-        local cfg = regionMap:get(jass.GetHandleId(region))
+        local cfg = regionMap:get(jass:GetHandleId(region))
         if cfg == nil then
             return
         end
@@ -184,8 +261,8 @@ local function initRegionTeleport()
             runRegionRule(cfg.rule, unit, owner)
             return
         end
-        jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
-        jass.IssueImmediateOrder(unit, "stop")
+        jass:SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
+        jass:IssueImmediateOrder(unit, "stop")
         local player = owner
         if player ~= nil then
             StarOther_PanCameraToTimedForPlayer(
@@ -195,7 +272,7 @@ local function initRegionTeleport()
                 cfg.teleportY,
                 cfg.cameraTime
             )
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 player,
                 0,
                 0,
@@ -204,16 +281,16 @@ local function initRegionTeleport()
             )
         end
     end
-    jass.TriggerAddAction(trig, onEnter)
+    jass:TriggerAddAction(trig, onEnter)
 end
 local function onInitRegionTeleportTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     initRegionTeleport()
     safeDestroyTimer(nil, t)
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function()
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if t then
         safeTimerStart(
             nil,

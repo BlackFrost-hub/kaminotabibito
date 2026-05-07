@@ -1,4 +1,4 @@
-// 自动生成 - 激活传送点配置
+﻿// 自动生成 - 激活传送点配置
 export interface PointConfig {
   name: string;
   teleportX?: string;
@@ -7,7 +7,6 @@ export interface PointConfig {
   text?: string;
   reveal?: string;
   condition?: string;
-  /** 为 false 时本条完全不启用：不 CreateUnit、不取 gg_unit、不注册接近检测与触发器 */
   enabled?: boolean;
 }
 
@@ -24,7 +23,7 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     UnitID: "gg_unit_n025_0373",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『精灵森』|r传送点。",
     reveal: "gg_rct________________RYEMC",
-    enabled: false
+    enabled: true
   },
   "3": {
     name: "地精洞窟",
@@ -32,7 +31,7 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     teleportY: "-17510.6",
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『地精洞窟』|r传送点。",
-    enabled: false
+    enabled: true
   },
   "4": {
     name: "飓风沙漠",
@@ -40,7 +39,7 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     teleportY: "-26331.1",
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『飓风沙漠』|r传送点。",
-    enabled: false
+    enabled: true
   },
   "5": {
     name: "蛇人部落",
@@ -48,7 +47,7 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     teleportY: "3022.2",
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『蛇人部落』|r传送点。",
-    enabled: false
+    enabled: true
   },
   "6": {
     name: "沙漠营地",
@@ -56,7 +55,7 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     teleportY: "-26039.5",
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『沙漠营地』|r传送点。",
-    enabled: false
+    enabled: true
   },
   "7": {
     name: "飓风峡谷",
@@ -64,25 +63,25 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     teleportY: "-25520",
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活|cffff8080『沙漠营地』|r传送点。",
-    enabled: false
+    enabled: true
   },
   "8": {
     name: "恶魔领地",
     UnitID: "gg_unit_ndrr_0005",
     text: "|cffffff00『系统提示』|r：激活『恶魔领地』传送点。",
-    enabled: false
+    enabled: true
   },
   "9": {
     name: "恶魔迷宫口",
     UnitID: "gg_unit_ndrr_0036",
     text: "|cffffff00『系统提示』|r：激活『恶魔迷宫口』传送点。",
-    enabled: false
+    enabled: true
   },
   "10": {
     name: "王之墓冢",
     UnitID: "gg_unit_ndrr_0069",
     text: "|cffffff00『系统提示』|r：激活『王之墓冢』传送点。",
-    enabled: false
+    enabled: true
   }
 };
 export default 激活传送点配置;

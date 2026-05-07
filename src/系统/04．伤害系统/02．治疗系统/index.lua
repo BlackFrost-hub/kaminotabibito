@@ -17,7 +17,7 @@ do
     end
 end
 do
-    local ____export = require("系统.04．伤害系统.02．治疗系统.02．治疗事件_旧版")
+    local ____export = require("系统.04．伤害系统.02．治疗系统.02．原生治疗入口")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -25,7 +25,7 @@ do
     end
 end
 do
-    local ____export = require("系统.04．伤害系统.02．治疗系统.03．持续治疗效果")
+    local ____export = require("系统.04．伤害系统.02．治疗系统.03．治疗事件入口")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -33,7 +33,7 @@ do
     end
 end
 do
-    local ____export = require("系统.04．伤害系统.02．治疗系统.04．物品治疗效果")
+    local ____export = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -41,7 +41,7 @@ do
     end
 end
 do
-    local ____export = require("系统.04．伤害系统.02．治疗系统.05．魔法恢复")
+    local ____export = require("系统.04．伤害系统.02．治疗系统.05．物品治疗效果")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -49,7 +49,7 @@ do
     end
 end
 do
-    local ____export = require("系统.04．伤害系统.02．治疗系统.06．施法治疗事件")
+    local ____export = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -58,17 +58,17 @@ do
 end
 --- 初始化治疗系统
 function ____exports.init(self)
-    local healEventOld = require("系统.04．伤害系统.02．治疗系统.02．治疗事件_旧版")
-    if type(healEventOld.initHealEventOld) == "function" then
-        healEventOld:initHealEventOld()
+    local nativeHealEntry = require("系统.04．伤害系统.02．治疗系统.02．原生治疗入口")
+    if type(nativeHealEntry.initNativeHealEntry) == "function" then
+        nativeHealEntry:initNativeHealEntry()
     end
-    local hotSystem = require("系统.04．伤害系统.02．治疗系统.03．持续治疗效果")
+    local hotSystem = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
     if type(hotSystem.initHotSystem) == "function" then
         hotSystem:initHotSystem()
     end
-    local healEvent = require("系统.04．伤害系统.02．治疗系统.06．施法治疗事件")
-    if type(healEvent.initHealEvent) == "function" then
-        healEvent:initHealEvent()
+    local healRequestEntry = require("系统.04．伤害系统.02．治疗系统.03．治疗事件入口")
+    if type(healRequestEntry.initHealRequestEntry) == "function" then
+        healRequestEntry:initHealRequestEntry()
     end
 end
 return ____exports

@@ -43,6 +43,13 @@ Required discipline:
 - do not assume a wrapper is safe because it is short
 - do not assume a TS fix is real unless the generated Lua behavior changes in the intended way
 
+Hard rule for `jass` / `japi` module calls:
+
+- when using `require("jass.common")` or `require("jass.japi")`, do not directly call members as `jass.Xxx(...)` or `japi.Xxx(...)` in runtime-sensitive code
+- first bind a local function alias such as `const PauseUnit = jass.PauseUnit as ...`, then call `PauseUnit(...)`
+- this rule also applies to test files and temporary test code
+- reason: TSTL may generate `jass:Xxx(...)` / `japi:Xxx(...)`, which injects the module table as `self` and shifts parameters
+
 ### 3. Runtime math must use JASS math, not Lua / TS `Math`
 
 Do not introduce or rely on Lua / TS `Math.*` in gameplay, UI, timer, damage, buff, movement, or any runtime-sensitive path.
@@ -237,3 +244,15 @@ When reviewing changes, always ask:
 You are not a generic coding assistant.
 
 You are an engineer maintaining a Warcraft 3 map codebase under TSTL / Lua / JASS / DzAPI constraints, where code generation correctness, callback lifetime, runtime semantics, and multiplayer safety matter as much as the TypeScript source itself.
+### 5. Debug Output Discipline
+
+For normal debugging, test logs, and temporary runtime inspection, default to:
+
+- `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`
+
+Preferred APIs:
+
+- `debugLogForce(module, ...args)` for always-on logs
+- `setDebug(module, true/false)` with `debugLog(module, ...args)` for switchable logs
+
+Do not default to scattered `DisplayTimedTextToPlayer` calls in business or test code just to print diagnostics, unless the task explicitly requires player-facing on-screen text rather than the project debug channel.

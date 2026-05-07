@@ -42,6 +42,9 @@ export interface ChestTypeConfig {
   dropMode: DropMode;
 }
 
+/** 宝箱系统开关（设为 false 可关闭整个宝箱系统） */
+export const 宝箱系统开关 = false;
+
 /** 宝箱类型配置表（在此添加所有宝箱类型） */
 export const CHEST_TYPES: ChestTypeConfig[] = [
   // 普通宝箱 - 低分掉落

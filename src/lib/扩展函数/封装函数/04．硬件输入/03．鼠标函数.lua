@@ -13,31 +13,31 @@ local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____require_result_0.RMaxBJ
 function ____exports.getMouseTerrainX(self)
-    return japi.DzGetMouseTerrainX()
+    return japi:DzGetMouseTerrainX()
 end
 function ____exports.getMouseTerrainY(self)
-    return japi.DzGetMouseTerrainY()
+    return japi:DzGetMouseTerrainY()
 end
 function ____exports.getMouseTerrainZ(self)
-    return japi.DzGetMouseTerrainZ()
+    return japi:DzGetMouseTerrainZ()
 end
 function ____exports.isMouseOverUI(self)
-    return not not japi.DzIsMouseOverUI()
+    return not not japi:DzIsMouseOverUI()
 end
 function ____exports.getMouseX(self)
-    return japi.DzGetMouseX()
+    return japi:DzGetMouseX()
 end
 function ____exports.getMouseY(self)
-    return japi.DzGetMouseY()
+    return japi:DzGetMouseY()
 end
 function ____exports.getMouseXRelative(self)
-    return japi.DzGetMouseXRelative()
+    return japi:DzGetMouseXRelative()
 end
 function ____exports.getMouseYRelative(self)
-    return japi.DzGetMouseYRelative()
+    return japi:DzGetMouseYRelative()
 end
 function ____exports.setMousePos(self, x, y)
-    japi.DzSetMousePos(x, y)
+    japi:DzSetMousePos(x, y)
 end
 --- 纵向 UI 归一化行程（如 LIST_VIEW_H - thumb）→ 与 Dz 纵向 0..0.6 对应的像素行程（任务分页滑块拖拽等）
 function ____exports.getScrollbarTrackThumbTravelPx(self, travelNorm)
@@ -53,7 +53,7 @@ function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, syn
         return
     end
     if sync then
-        japi.DzTriggerRegisterMouseEventByCode(
+        japi:DzTriggerRegisterMouseEventByCode(
             trig,
             btn,
             status,
@@ -64,7 +64,7 @@ function ____exports.registerMouseButtonEventByCode(self, trig, btn, status, syn
         runFalseLocalRegistration(
             nil,
             function()
-                japi.DzTriggerRegisterMouseEventByCode(
+                japi:DzTriggerRegisterMouseEventByCode(
                     trig,
                     btn,
                     status,
@@ -82,12 +82,12 @@ function ____exports.registerMouseMoveEventByCode(self, trig, sync, action, play
         return
     end
     if sync then
-        japi.DzTriggerRegisterMouseMoveEventByCode(trig, true, action)
+        japi:DzTriggerRegisterMouseMoveEventByCode(trig, true, action)
     else
         runFalseLocalRegistration(
             nil,
             function()
-                japi.DzTriggerRegisterMouseMoveEventByCode(trig, false, action)
+                japi:DzTriggerRegisterMouseMoveEventByCode(trig, false, action)
             end,
             playerId
         )

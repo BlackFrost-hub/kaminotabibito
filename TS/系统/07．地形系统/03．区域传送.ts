@@ -15,6 +15,9 @@ import type { RegionConfig } from "./02．区域传送配置";
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (whichPlayer: any, x: number, y: number, duration: number) => void;
 };
+const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
+  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
 const regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
   registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => () => void;
 };
@@ -30,12 +33,48 @@ const regionMap = new Map<number, RegionConfig>();
 // }
 function dbg(_msg: string): void {}
 
-// 解析并判断区域传送的 condition；目前仅支持：
+function getStoryProgress(): number {
+  const raw = YDUserDataGet("string", "剧情进度", "整数", "integer");
+  const numeric = raw == null ? 0 : Number(raw);
+  return isFinite(numeric) ? numeric : 0;
+}
+
+// 解析并判断区域传送的 condition。
+// 当前支持：
 // - "" 或 "always"：无条件允许
-// 其它复杂条件（如 "zhuxian≤2"）预留，暂时一律视为允许，后续再按剧情/存档系统接入
+// - zhuxian≥N / zhuxian≤N / zhuxian>N / zhuxian<N / zhuxian=N
+// 通过动态读取 `YDUserData("剧情进度","整数")` 与旧 JASS 对齐。
 function checkRegionCondition(cond: string, _unit: any): boolean {
   if (!cond || cond === "always") return true;
-  // TODO: 在接入剧情/进度系统后，根据约定语法真正解析 condition
+  const text = cond.trim();
+  const current = getStoryProgress();
+  const evalByPrefix = (prefix: string, matcher: (current: number, target: number) => boolean): boolean | null => {
+    if (text.indexOf(prefix) !== 0) return null;
+    const target = Number(text.substring(prefix.length).trim());
+    if (!isFinite(target)) return true;
+    return matcher(current, target);
+  };
+
+  const gte = evalByPrefix("zhuxian≥", (a, b) => a >= b);
+  if (gte != null) return gte;
+  const lte = evalByPrefix("zhuxian≤", (a, b) => a <= b);
+  if (lte != null) return lte;
+  const gteAscii = evalByPrefix("zhuxian>=", (a, b) => a >= b);
+  if (gteAscii != null) return gteAscii;
+  const lteAscii = evalByPrefix("zhuxian<=", (a, b) => a <= b);
+  if (lteAscii != null) return lteAscii;
+  const gt = evalByPrefix("zhuxian>", (a, b) => a > b);
+  if (gt != null) return gt;
+  const lt = evalByPrefix("zhuxian<", (a, b) => a < b);
+  if (lt != null) return lt;
+  const eq = evalByPrefix("zhuxian=", (a, b) => a === b);
+  if (eq != null) return eq;
+
+  if (text.indexOf("zhuxian") === 0) {
+    // 无法识别的 zhuxian 条件，保守放行，避免把旧表意外锁死。
+    return true;
+  }
+
   return true;
 }
 
@@ -172,7 +211,6 @@ function initRegionTeleport(): void {
     const cfg = regionMap.get((jass as any).GetHandleId(region));
     // dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
     if (cfg == null) return;
-
     // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
     if (!checkRegionCondition(cfg.condition, unit)) return;
 

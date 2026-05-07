@@ -5,6 +5,9 @@ local ____exports = {}
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.04．伤害系统.02．治疗系统.00．常量定义")
 local HEAL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SYSTEM_ENABLED
 local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
+local HEAL_RESULT_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_RESULT_KEYS
+local HEAL_SHOW_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SHOW_KEYS
+local HEAL_STATS_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_STATS_KEYS
 local DEFAULT_HEAL_EFFECT_PATH = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_HEAL_EFFECT_PATH
 local HEAL_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_TEXT_COLOR
 local ATTR_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_HEAL_RATE
@@ -111,8 +114,8 @@ local function getMissingLife(self, target)
     if target == nil then
         return 0
     end
-    local maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
-    local curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+    local maxLife = jass:GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
+    local curLife = jass:GetUnitState(target, jass.UNIT_STATE_LIFE)
     local missing = maxLife - curLife
     return missing > 0 and missing or 0
 end
@@ -122,11 +125,11 @@ local function playHealEffect(self, target, effectPath)
         return
     end
     local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_HEAL_EFFECT_PATH
-    local x = jass.GetUnitX(target)
-    local y = jass.GetUnitY(target)
-    local eff = jass.AddSpecialEffect(path, x, y)
+    local x = jass:GetUnitX(target)
+    local y = jass:GetUnitY(target)
+    local eff = jass:AddSpecialEffect(path, x, y)
     if eff ~= nil then
-        jass.DestroyEffect(eff)
+        jass:DestroyEffect(eff)
     end
 end
 --- 触发数值显示事件
@@ -138,11 +141,11 @@ end
 -- @param green 绿色分量（可选）
 -- @param blue 蓝色分量（可选）
 function ____exports.fireShowDamageEvent(self, target, amount, red, green, blue)
-    YDLocal5Set(nil, "real", "伤害值", amount)
-    YDLocal5Set(nil, "unit", "目标单位", target)
-    YDLocal5Set(nil, "integer", "红色", red or HEAL_TEXT_COLOR.red)
-    YDLocal5Set(nil, "integer", "绿色", green or HEAL_TEXT_COLOR.green)
-    YDLocal5Set(nil, "integer", "蓝色", blue or HEAL_TEXT_COLOR.blue)
+    YDLocal5Set(nil, "real", HEAL_SHOW_KEYS.AMOUNT, amount)
+    YDLocal5Set(nil, "unit", HEAL_SHOW_KEYS.TARGET, target)
+    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.RED, red or HEAL_TEXT_COLOR.red)
+    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.GREEN, green or HEAL_TEXT_COLOR.green)
+    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.BLUE, blue or HEAL_TEXT_COLOR.blue)
     STES_Fire(nil, nil, HEAL_EVENTS.SHOW_DAMAGE)
 end
 --- 触发"任意单位被治疗"事件
@@ -152,9 +155,9 @@ end
 -- @param target 治疗目标
 -- @param amount 治疗量
 function ____exports.fireHealEvent(self, source, target, amount)
-    YDLocal5Set(nil, "real", "HealAmount", amount)
-    YDLocal5Set(nil, "unit", "HealUnit", target)
-    YDLocal5Set(nil, "unit", "HealSource", source)
+    YDLocal5Set(nil, "real", HEAL_RESULT_KEYS.AMOUNT, amount)
+    YDLocal5Set(nil, "unit", HEAL_RESULT_KEYS.TARGET, target)
+    YDLocal5Set(nil, "unit", HEAL_RESULT_KEYS.SOURCE, source)
     STES_Fire(nil, nil, HEAL_EVENTS.HEAL)
 end
 --- 累计治疗统计
@@ -162,13 +165,69 @@ local function addHealStats(self, target, amount)
     if target == nil or amount <= 0 then
         return
     end
-    local hid = jass.GetHandleId(target)
+    local hid = jass:GetHandleId(target)
     if hid == nil or hid == 0 then
         return
     end
     totalHealStats:set(
         hid,
         (totalHealStats:get(hid) or 0) + amount
+    )
+end
+--- 与旧 JASS 对齐：只在 Boss战 激活、目标属于玩家组且来源对目标友方时累计玩家治疗量
+local function shouldRecordPlayerHeal(self, target, sourcePlayer)
+    if target == nil or sourcePlayer == nil then
+        return false
+    end
+    local bossBattleUnit = YDUserDataGet(
+        nil,
+        "string",
+        HEAL_STATS_KEYS.BOSS_BATTLE_TABLE,
+        HEAL_STATS_KEYS.BOSS_BATTLE_UNIT,
+        "unit"
+    )
+    if bossBattleUnit == nil then
+        return false
+    end
+    local playerForce = YDUserDataGet(
+        nil,
+        "string",
+        HEAL_STATS_KEYS.PLAYER_GROUP_TABLE,
+        HEAL_STATS_KEYS.PLAYER_GROUP_FORCE,
+        "force"
+    )
+    if playerForce == nil then
+        return false
+    end
+    local targetPlayer = jass:GetOwningPlayer(target)
+    if not jass:IsPlayerInForce(targetPlayer, playerForce) then
+        return false
+    end
+    return jass:IsUnitAlly(target, sourcePlayer) or sourcePlayer == targetPlayer
+end
+--- 与旧 JASS「治疗事件.j」对齐：直接按 HealSource 的所属玩家累计「治疗量」
+local function addPlayerHealStats(self, target, source, amount)
+    if source == nil or amount <= 0 then
+        return
+    end
+    local sourcePlayer = jass:GetOwningPlayer(source)
+    if not shouldRecordPlayerHeal(nil, target, sourcePlayer) then
+        return
+    end
+    local current = YDUserDataGet(
+        nil,
+        "player",
+        sourcePlayer,
+        HEAL_STATS_KEYS.PLAYER_TOTAL_HEAL,
+        "real"
+    )
+    local base = type(current) == "number" and current or 0
+    YDUserDataSet(
+        nil,
+        "player",
+        sourcePlayer,
+        HEAL_STATS_KEYS.PLAYER_TOTAL_HEAL,
+        base + amount
     )
 end
 --- 执行治疗
@@ -189,7 +248,7 @@ function ____exports.doHeal(self, params)
     if HealTarget == nil or HealAmount <= 0 then
         return 0
     end
-    if jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
         return 0
     end
     local amount = calcHealAmount(nil, HealSource, HealTarget, HealAmount)
@@ -214,14 +273,15 @@ function ____exports.doHeal(self, params)
     if actualHeal <= 0 then
         return 0
     end
-    local curLife = jass.GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
-    jass.SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
+    local curLife = jass:GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
+    jass:SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
     if HealEffect then
         playHealEffect(nil, HealTarget, HealEffectPath)
     end
     ____exports.fireShowDamageEvent(nil, HealTarget, actualHeal)
     ____exports.fireHealEvent(nil, HealSource, HealTarget, actualHeal)
     addHealStats(nil, HealTarget, actualHeal)
+    addPlayerHealStats(nil, HealTarget, HealSource, actualHeal)
     for ____, listener in ipairs(healEventListeners) do
         do
             pcall(function()
@@ -280,7 +340,7 @@ function ____exports.getTotalHealed(self, unit)
     if unit == nil then
         return 0
     end
-    local hid = jass.GetHandleId(unit)
+    local hid = jass:GetHandleId(unit)
     if hid == nil or hid == 0 then
         return 0
     end

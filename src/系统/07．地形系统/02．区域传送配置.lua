@@ -13,7 +13,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "你触发了传送",
         condition = "always",
-        enabled = true
+        enabled = false
     },
     ["2"] = {
         id = "2",
@@ -28,7 +28,7 @@ ____exports["区域传送配置"] = {
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff00ff00『精灵村』|r",
         condition = "always",
         firstEnterActions = "UpdateMapUI",
-        enabled = false
+        enabled = true
     },
     ["3"] = {
         id = "3",
@@ -42,7 +42,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffccffcc『静灵森』|r",
         condition = "zhuxian≤2",
-        enabled = false
+        enabled = true
     },
     ["4"] = {
         id = "4",
@@ -56,7 +56,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffccffcc『精灵村族长房』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["5"] = {
         id = "5",
@@ -70,7 +70,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffccffcc『精灵村』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["6"] = {
         id = "6",
@@ -84,7 +84,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffccffcc『精灵村』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["7"] = {
         id = "7",
@@ -99,7 +99,7 @@ ____exports["区域传送配置"] = {
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff339966『地精洞窟』|r",
         condition = "always",
         firstEnterActions = "UpdateMapUI",
-        enabled = false
+        enabled = true
     },
     ["8"] = {
         id = "8",
@@ -113,7 +113,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff339966『精灵森』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["9"] = {
         id = "9",
@@ -127,7 +127,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff339966『地精洞窟』|r|cffff0000（深处）|r",
         condition = "zhuxian≥1",
-        enabled = false
+        enabled = true
     },
     ["10"] = {
         id = "10",
@@ -141,7 +141,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff339966『地精洞窟』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["11"] = {
         id = "11",
@@ -155,7 +155,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『蛇人领地』|r",
         condition = "zhuxian≥7",
-        enabled = false
+        enabled = true
     },
     ["12"] = {
         id = "12",
@@ -169,7 +169,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffffcc99『飓风沙漠』|r",
         condition = "always",
-        enabled = false
+        enabled = true
     },
     ["13"] = {
         id = "13",
@@ -181,8 +181,9 @@ ____exports["区域传送配置"] = {
         teleportX = 29791.9,
         teleportY = 11914.5,
         cameraTime = 0.1,
+        text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『食人魔Boss房』|r",
         condition = "zhuxian≥10",
-        enabled = false
+        enabled = true
     },
     ["14"] = {
         id = "14",
@@ -196,7 +197,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『西里尔村圣物处』|r",
         condition = "zhuxian≥19",
-        enabled = false
+        enabled = true
     },
     ["15"] = {
         id = "15",
@@ -210,7 +211,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffccffcc『精灵村族长房』|r",
         condition = "zhuxian≥19",
-        enabled = false
+        enabled = true
     },
     ["16"] = {
         id = "16",
@@ -224,7 +225,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『克林姆德王宫』|r",
         condition = "zhuxian≥20",
-        enabled = false
+        enabled = true
     },
     ["17"] = {
         id = "17",
@@ -238,7 +239,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『克林姆德城』|r",
         condition = "zhuxian≥20",
-        enabled = false
+        enabled = true
     },
     ["18"] = {
         id = "18",
@@ -252,8 +253,8 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff993366『万浴熔灵』|r",
         condition = "always",
-        rule = "40%KillUnit:跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
-        enabled = false
+        rule = "40%KillUnit:|cffffff00『系统提示』|r：触发单位跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
+        enabled = true
     },
     ["19"] = {
         id = "19",
@@ -267,7 +268,7 @@ ____exports["区域传送配置"] = {
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cff993366『王之墓冢』|r",
         condition = "zhuxian≥99",
-        enabled = false
+        enabled = true
     }
 }
 ____exports.default = ____exports["区域传送配置"]

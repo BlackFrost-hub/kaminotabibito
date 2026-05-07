@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 控制时间计算模块
  *
@@ -78,7 +79,7 @@ export function applyBossControlLimit(unit: any, duration: number): number {
  *
  * 供快速Buff等直接传入持续时间的场景复用。
  */
-export function calcReducedControlDuration(target: any, originalDuration: number): number {
+export function calcReducedControlDuration(this: void, target: any, originalDuration: number): number {
   let duration = originalDuration;
 
   let reduction = getControlReduction(target);

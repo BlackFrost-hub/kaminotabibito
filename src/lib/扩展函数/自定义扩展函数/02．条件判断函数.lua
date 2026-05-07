@@ -11,16 +11,16 @@ function ____exports.isValidUnit(self, unit)
     if not unit then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
     return true
@@ -34,11 +34,11 @@ function ____exports.isUnitEnemy(self, targetUnit, sourceUnit)
     if not targetUnit or not sourceUnit then
         return false
     end
-    local sourcePlayer = jass.GetOwningPlayer(sourceUnit)
+    local sourcePlayer = jass:GetOwningPlayer(sourceUnit)
     if not sourcePlayer then
         return false
     end
-    return jass.IsUnitEnemy(targetUnit, sourcePlayer)
+    return jass:IsUnitEnemy(targetUnit, sourcePlayer)
 end
 --- 判断单位是否有效且是敌对单位
 -- 
@@ -57,7 +57,7 @@ function ____exports.isNotUsingInventoryItem(self, unit)
     if not unit then
         return true
     end
-    local orderId = jass.GetUnitCurrentOrder(unit)
+    local orderId = jass:GetUnitCurrentOrder(unit)
     local ITEM_USE_MIN = 852008
     local ITEM_USE_MAX = 852013
     return orderId < ITEM_USE_MIN or orderId > ITEM_USE_MAX

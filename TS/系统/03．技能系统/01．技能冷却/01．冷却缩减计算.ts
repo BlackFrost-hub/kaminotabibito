@@ -60,21 +60,33 @@ export function isExcludedUnit(unit: any): boolean {
 //=============================================================================
 
 /**
+ * 冷却属性读取规则：
+ * 1. 先看单位属性。若单位值大于 0.01，优先使用，通常代表这是单独配置过属性的敌对单位。
+ * 2. 否则回退到玩家属性。玩家侧默认只有一个英雄，因此玩家属性可视为该英雄的冷却属性来源。
+ */
+function getCooldownAttrValue(unit: any, attrName: string): number {
+  if (unit == null) return 0;
+
+  const unitValue = YDUserDataGet("unit", unit, attrName, "real");
+  if (unitValue > 0.01) return unitValue;
+
+  const player = jass.GetOwningPlayer(unit);
+  if (player == null) return 0;
+  return YDUserDataGet("player", player, attrName, "real");
+}
+
+/**
  * 获取冷却缩减属性
  */
 export function getCooldownReduction(unit: any): number {
-  const player = jass.GetOwningPlayer(unit);
-  if (player == null) return 0;
-  return YDUserDataGet("player", player, "冷却缩减", "real");
+  return getCooldownAttrValue(unit, "冷却缩减");
 }
 
 /**
  * 获取冷却缩减加成属性（突破上限）
  */
 export function getCooldownReductionBonus(unit: any): number {
-  const player = jass.GetOwningPlayer(unit);
-  if (player == null) return 0;
-  return YDUserDataGet("player", player, "冷却缩减加成", "real");
+  return getCooldownAttrValue(unit, "冷却缩减加成");
 }
 
 //=============================================================================

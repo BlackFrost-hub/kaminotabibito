@@ -21,10 +21,10 @@ do
 end
 --- 初始化AI自动使用技能系统
 function ____exports.init(self)
-    initAISkillSystem(nil)
+    initAISkillSystem()
 end
 --- 检查系统是否启用
 function ____exports.isEnabled(self)
-    return isSystemEnabled(nil)
+    return isSystemEnabled()
 end
 return ____exports

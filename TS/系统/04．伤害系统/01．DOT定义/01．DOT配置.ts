@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 import type { BuffData } from "../../05．Buff系统/01．Buff表";
 
 // ========== 虚拟分区：Buff 表数据源 ==========
@@ -35,15 +36,15 @@ export function getDotBuffRow(typeId: DotBuffTypeId): "D001" | "D002" | "D003" |
 export interface DotTypeConfig {
   id: string;
   debuffDotEnemyNoStructure?: boolean;
-  parseBuff: (buffStr: string) => { duration: number; [key: string]: any } | null;
-  getBestFromUnit: (unit: any) => { duration: number; [key: string]: any } | null;
-  computeAmount: (target: any, parsed: any) => number;
+  parseBuff: (this: void, buffStr: string) => { duration: number; [key: string]: any } | null;
+  getBestFromUnit: (this: void, unit: any) => { duration: number; [key: string]: any } | null;
+  computeAmount: (this: void, target: any, parsed: any) => number;
   damageType: any;
   effectModel: string;
   effectDuration: number;
-  onApply?: (target: any, state: any) => void;
-  onTick?: (target: any, state: any) => void;
-  onEnd?: (target: any, state: any) => void;
+  onApply?: (this: void, target: any, state: any) => void;
+  onTick?: (this: void, target: any, state: any) => void;
+  onEnd?: (this: void, target: any, state: any) => void;
   attackOnlyTrigger?: boolean;
 }
 

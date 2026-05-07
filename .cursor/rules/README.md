@@ -30,3 +30,16 @@
 说明：
 
 - 近期高优先级、跨子系统反复出现的 TSTL / desync / JASS-Dz 关键坑，已收敛进 `GLOBAL_AGENT_PROMPT.mdc`，不再单独维护一份 `tstl-recent/` 增量规则目录。
+## 调试输出约定
+
+- 默认统一使用 `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`
+- 需要强制输出时优先使用 `debugLogForce`
+- 需要模块级开关调试时使用 `setDebug` 与 `debugLog`
+- 不要在普通业务代码、测试代码里继续把 `DisplayTimedTextToPlayer` 当作默认调试输出手段
+
+## JASS 调用约定
+
+- 对 `require("jass.common")`、`require("jass.japi")` 得到的模块表，默认不要直接写 `jass.Xxx(...)`、`japi.Xxx(...)`
+- 统一先绑定局部函数别名，再调用别名，例如 `const PauseUnit = jass.PauseUnit as ...`，随后调用 `PauseUnit(...)`
+- 这样做是为了避免 TSTL 把点调用错误生成为 `jass:Xxx(...)` / `japi:Xxx(...)`
+- 这条规则同样适用于测试文件、临时代码、技能文件，不允许因为“只是测试”就省略

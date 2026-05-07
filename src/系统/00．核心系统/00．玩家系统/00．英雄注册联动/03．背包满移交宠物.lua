@@ -14,19 +14,19 @@ function ensureSmartOrderId(self)
     return smartOrderId
 end
 function onPetItemHandoff(self)
-    local targetItem = jass.GetOrderTargetItem()
+    local targetItem = jass:GetOrderTargetItem()
     if not isValidHandle(nil, targetItem) then
         return
     end
-    local issuedOrderId = jass.GetIssuedOrderId() or 0
+    local issuedOrderId = jass:GetIssuedOrderId() or 0
     if issuedOrderId ~= ensureSmartOrderId(nil) then
         return
     end
-    local hero = jass.GetTriggerUnit()
+    local hero = jass:GetTriggerUnit()
     if not isValidHandle(nil, hero) or SoHeroHatm(nil, hero) < 6 then
         return
     end
-    local owner = jass.GetOwningPlayer(hero)
+    local owner = jass:GetOwningPlayer(hero)
     if not isValidHandle(nil, owner) then
         return
     end
@@ -44,7 +44,7 @@ function onPetItemHandoff(self)
         GS_news(nil, owner, MSG_BOTH_FULL)
         return
     end
-    jass.UnitAddItem(pet, targetItem)
+    jass:UnitAddItem(pet, targetItem)
     GS_news(nil, owner, MSG_MOVED_TO_PET)
 end
 jass = require("jass.common")
@@ -67,14 +67,14 @@ local function getHandleId(self, handle)
     if not isValidHandle(nil, handle) then
         return 0
     end
-    return jass.GetHandleId(handle) or 0
+    return jass:GetHandleId(handle) or 0
 end
 local function ensurePetItemHandoffTrigger(self)
     if petItemHandoffTrigger ~= nil then
         return petItemHandoffTrigger
     end
-    petItemHandoffTrigger = jass.CreateTrigger()
-    jass.TriggerAddAction(petItemHandoffTrigger, onPetItemHandoff)
+    petItemHandoffTrigger = jass:CreateTrigger()
+    jass:TriggerAddAction(petItemHandoffTrigger, onPetItemHandoff)
     return petItemHandoffTrigger
 end
 --- 由英雄注册桥接调用。

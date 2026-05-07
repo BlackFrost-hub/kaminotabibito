@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 // 装备掉落.ts - 优先按装备掉落表；无则走旧 DROP_RULES（hfoo 等）
 // 自动生成 - 单位数据表
 /**
@@ -21,7 +22,7 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as 
   debugLog: (module: string, ...args: any[]) => void;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const idData =
   (require("系统.02．物品系统.02．装备掉落表") as { default?: Record<string, UnitDataEntry> }).default ??
@@ -182,7 +183,7 @@ function createItemAtUnit(unit: any, itemId: string): void {
   if (loc) (jass as any).RemoveLocation(loc);
 }
 
-function onUnitDeath(unit: any, _killer: any): void {
+function onUnitDeath(this: void, unit: any, _killer: any): void {
   if (!unit) return;
   if (isSpecialUnit(unit)) return;
   const typeId = (jass as any).GetUnitTypeId(unit) as number;

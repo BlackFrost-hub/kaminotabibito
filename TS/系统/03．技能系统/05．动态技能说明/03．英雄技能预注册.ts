@@ -74,7 +74,7 @@ function registerExistingHeroSkills(unit: any): void {
   }
 }
 
-function onSpellEffect(castingUnit: any, spellAbilityId: number): void {
+function onSpellEffect(this: void, castingUnit: any, spellAbilityId: number): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
   if (isItemSkillByOrder(castingUnit)) return;
 
@@ -93,7 +93,7 @@ export function initHeroSkillPreregistration(): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
 
   const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-    registerSpellEffectListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
+    registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
   };
   registerSpellEffectListener(onSpellEffect);
 

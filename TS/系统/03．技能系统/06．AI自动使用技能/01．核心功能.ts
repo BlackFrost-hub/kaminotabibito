@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * AI自动使用技能系统 - 核心功能
  */
@@ -235,8 +236,12 @@ function onAICheck(): void {
 // ==========================================================================================
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+
+function onAIDeath(this: void, dyingUnit: any): void {
+  unregisterAIUnit(dyingUnit);
+}
 
 export function initAISkillSystem(): void {
   if (!AI_SKILL_SYSTEM_ENABLED) return;
@@ -246,9 +251,7 @@ export function initAISkillSystem(): void {
     addPeriodicCallback(clampMinInt(AI_CHECK_INTERVAL * 1000, 1), onAICheck);
   }
 
-  registerDeathListener((dyingUnit) => {
-    unregisterAIUnit(dyingUnit);
-  });
+  registerDeathListener(onAIDeath);
 
   initAutoRegister();
 }

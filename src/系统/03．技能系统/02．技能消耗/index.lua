@@ -33,15 +33,15 @@ local calcTotalManaCost = ____require_result_1.calcTotalManaCost
 local ____require_result_2 = require("系统.03．技能系统.02．技能消耗.02．特殊单位消耗")
 local isEdwardUnit = ____require_result_2.isEdwardUnit
 local handleEdwardPassiveCost = ____require_result_2.handleEdwardPassiveCost
-local function onSpellEffectForCost(self, castingUnit, spellAbilityId)
+local function onSpellEffectForCost(castingUnit, spellAbilityId)
     handleManaRefund(nil, castingUnit, spellAbilityId)
     if isEdwardUnit(nil, castingUnit) then
-        local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+        local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
         local manaCost = calcTotalManaCost(nil, castingUnit, spellAbilityId, level)
         if manaCost > 0 then
             handleEdwardPassiveCost(nil, castingUnit, manaCost)
         end
     end
 end
-registerSpellEffectListener(nil, onSpellEffectForCost)
+registerSpellEffectListener(onSpellEffectForCost)
 return ____exports

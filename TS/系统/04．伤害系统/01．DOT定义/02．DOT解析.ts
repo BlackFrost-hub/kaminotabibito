@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 // ========== 虚拟分区：字符串切分 ==========
 /** 装备 `Buff` 可多段，用 `+` 连接，例如：`Buff:dmg:...;timeN+Buff:dmg:...;timeN` */
 export function splitItemBuffSegments(buff: string): string[] {
@@ -28,7 +29,7 @@ export function readNumberFromString(s: string, startIdx: number): number {
 export function parseStandardDotBuff<T>(
   buffStr: string,
   keyword: string,
-  createResult: (value: number, duration: number, attackOnly: boolean) => T,
+  createResult: (this: void, value: number, duration: number, attackOnly: boolean) => T,
   requireValuePositive: boolean = true
 ): T | null {
   if (!buffStr || typeof buffStr !== "string") return null;

@@ -8,14 +8,14 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local jass = require("jass.common")
 --- Lua 下单位作表键时，伤害回调的 target 与选中枚举的 sole 可能不是同一 userdata；统一用 GetHandleId 作键。
-function ____exports.unitHid(self, u)
+function ____exports.unitHid(u)
     if u == nil or u == 0 then
         return 0
     end
-    return jass.GetHandleId(u)
+    return jass:GetHandleId(u)
 end
 --- pairs 迭代可能混用 number / string 键，不合并会导致「同目标两行状态」或 onDamage 读不到 cur、乘积误判。
-function ____exports.tabRowForHid(self, tab, hid)
+function ____exports.tabRowForHid(tab, hid)
     if hid == 0 then
         return nil
     end
@@ -25,7 +25,7 @@ function ____exports.tabRowForHid(self, tab, hid)
     end
     return tab[tostring(hid)]
 end
-function ____exports.tabSetHid(self, tab, hid, state)
+function ____exports.tabSetHid(tab, hid, state)
     if hid == 0 then
         return
     end
@@ -35,7 +35,7 @@ function ____exports.tabSetHid(self, tab, hid, state)
     )
     tab[hid] = state
 end
-function ____exports.tabDeleteHid(self, tab, hid)
+function ____exports.tabDeleteHid(tab, hid)
     if hid == 0 then
         return
     end
@@ -45,7 +45,7 @@ function ____exports.tabDeleteHid(self, tab, hid)
         tostring(hid)
     )
 end
-function ____exports.collectHidsInTab(self, tab)
+function ____exports.collectHidsInTab(tab)
     local seen = {}
     local out = {}
     for k in pairs(tab) do
@@ -65,14 +65,14 @@ function ____exports.collectHidsInTab(self, tab)
     return out
 end
 --- stateByType 槽位应为 DotState 表；若被污染为数字等则剔除，避免 cur.remaining 报错
-function ____exports.isValidDotStateRow(self, v)
+function ____exports.isValidDotStateRow(v)
     return v ~= nil and type(v) == "table" and type(v.remaining) == "number" and type(v.effect) == "number"
 end
-function ____exports.getDotSourceDisplayName(self, u)
+function ____exports.getDotSourceDisplayName(u)
     if u == nil or u == 0 then
         return "未知"
     end
-    local n = jass.GetUnitName(u)
+    local n = jass:GetUnitName(u)
     if n ~= nil and n ~= nil and tostring(n) ~= "" then
         return tostring(n)
     end
@@ -84,11 +84,11 @@ end
 ____exports.dotStateFlat = {}
 ____exports.ignoredTargetFlat = {}
 --- 生成扁平 key
-function ____exports.makeDotFlatKey(self, typeId, hid)
+function ____exports.makeDotFlatKey(typeId, hid)
     return (typeId .. "|") .. tostring(hid)
 end
 --- 严格纯数字解析：整串必须为十进制数字且 > 0，不接受 "123abc" 之类
-local function parseStrictPositiveInt(self, s)
+local function parseStrictPositiveInt(s)
     if s == "" then
         return nil
     end
@@ -109,56 +109,56 @@ local function parseStrictPositiveInt(self, s)
     return n
 end
 --- 解析扁平 key - 使用字符串操作而非正则（TSTL 不支持正则）
-function ____exports.parseDotFlatKey(self, key)
+function ____exports.parseDotFlatKey(key)
     local idx = (string.find(key, "|", nil, true) or 0) - 1
     if idx <= 0 then
         return nil
     end
     local typeId = __TS__StringSubstring(key, 0, idx)
     local hidStr = __TS__StringSubstring(key, idx + 1)
-    local hid = parseStrictPositiveInt(nil, hidStr)
+    local hid = parseStrictPositiveInt(hidStr)
     if typeId == "" or hid == nil then
         return nil
     end
     return {typeId = typeId, hid = hid}
 end
 --- 读取 DOT 状态
-function ____exports.getDotState(self, typeId, hid)
-    local key = ____exports.makeDotFlatKey(nil, typeId, hid)
+function ____exports.getDotState(typeId, hid)
+    local key = ____exports.makeDotFlatKey(typeId, hid)
     local state = ____exports.dotStateFlat[key]
-    return ____exports.isValidDotStateRow(nil, state) and state or nil
+    return ____exports.isValidDotStateRow(state) and state or nil
 end
 --- 写入 DOT 状态
-function ____exports.setDotState(self, typeId, hid, state)
-    local key = ____exports.makeDotFlatKey(nil, typeId, hid)
+function ____exports.setDotState(typeId, hid, state)
+    local key = ____exports.makeDotFlatKey(typeId, hid)
     ____exports.dotStateFlat[key] = state
 end
 --- 删除 DOT 状态
-function ____exports.deleteDotState(self, typeId, hid)
-    local key = ____exports.makeDotFlatKey(nil, typeId, hid)
+function ____exports.deleteDotState(typeId, hid)
+    local key = ____exports.makeDotFlatKey(typeId, hid)
     __TS__Delete(____exports.dotStateFlat, key)
 end
 --- 设置忽略目标
-function ____exports.setIgnoredTarget(self, typeId, hid)
-    ____exports.ignoredTargetFlat[____exports.makeDotFlatKey(nil, typeId, hid)] = true
+function ____exports.setIgnoredTarget(typeId, hid)
+    ____exports.ignoredTargetFlat[____exports.makeDotFlatKey(typeId, hid)] = true
 end
 --- 清除忽略目标
-function ____exports.clearIgnoredTarget(self, typeId, hid)
+function ____exports.clearIgnoredTarget(typeId, hid)
     __TS__Delete(
         ____exports.ignoredTargetFlat,
-        ____exports.makeDotFlatKey(nil, typeId, hid)
+        ____exports.makeDotFlatKey(typeId, hid)
     )
 end
 --- 检查忽略目标
-function ____exports.isIgnoredTarget(self, typeId, hid)
-    return ____exports.ignoredTargetFlat[____exports.makeDotFlatKey(nil, typeId, hid)] == true
+function ____exports.isIgnoredTarget(typeId, hid)
+    return ____exports.ignoredTargetFlat[____exports.makeDotFlatKey(typeId, hid)] == true
 end
 --- 收集所有活跃的 (typeId, hid) 对，按数值排���
 -- 排序：先按 typeId 字符串字典序，再按 hid 数值（固定语义）
-function ____exports.collectActiveDotPairs(self)
+function ____exports.collectActiveDotPairs()
     local out = {}
     for k in pairs(____exports.dotStateFlat) do
-        local p = ____exports.parseDotFlatKey(nil, k)
+        local p = ____exports.parseDotFlatKey(k)
         if p then
             out[#out + 1] = p
         end

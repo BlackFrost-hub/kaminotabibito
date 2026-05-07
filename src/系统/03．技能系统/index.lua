@@ -1,6 +1,14 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.01．技能冷却.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -48,6 +56,7 @@ do
         end
     end
 end
+require("系统.03．技能系统.00．技能模板+函数.index")
 require("系统.03．技能系统.01．技能冷却.index")
 require("系统.03．技能系统.02．技能消耗.index")
 local bbTeleportMod = require("系统.03．技能系统.04．快捷键技能.index")

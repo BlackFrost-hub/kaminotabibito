@@ -9,7 +9,7 @@ export * from "./02．特殊单位消耗";
 const jass = require("jass.common") as any;
 
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellEffectListener: (this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
 const { handleManaRefund, calcTotalManaCost } = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as {
@@ -22,7 +22,7 @@ const { isEdwardUnit, handleEdwardPassiveCost } = require("系统.03．技能系
   handleEdwardPassiveCost: (unit: any, manaCost: number) => void;
 };
 
-function onSpellEffectForCost(castingUnit: any, spellAbilityId: number): void {
+function onSpellEffectForCost(this: void, castingUnit: any, spellAbilityId: number): void {
   handleManaRefund(castingUnit, spellAbilityId);
 
   if (isEdwardUnit(castingUnit)) {

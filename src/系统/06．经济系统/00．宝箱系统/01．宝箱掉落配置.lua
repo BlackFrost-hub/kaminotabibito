@@ -17,10 +17,10 @@ local getChestConfigByString = ____require_result_0.getChestConfigByString
 local ____require_result_1 = require("系统.02．物品系统.01．装备数据")
 local items = ____require_result_1.items
 local function randomReal01()
-    return jass.GetRandomReal(0, 1) or 0
+    return jass:GetRandomReal(0, 1) or 0
 end
 local function randomInt(min, max)
-    return jass.GetRandomInt(min, max) or min
+    return jass:GetRandomInt(min, max) or min
 end
 local function parseItemPool(poolStr)
     local entries = {}
@@ -205,8 +205,8 @@ end
 -- @returns 创建的物品
 function ____exports.createDropItem(itemId, x, y)
     local jass = require("jass.common")
-    local item = jass.CreateItem(
-        jass.FourCC(itemId),
+    local item = jass:CreateItem(
+        jass:FourCC(itemId),
         x,
         y
     )

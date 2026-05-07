@@ -22,7 +22,7 @@ local getUnitLevel = ____02_FF0E_5DE5_5177_51FD_6570.getUnitLevel
 local getSkillCooldown = ____02_FF0E_5DE5_5177_51FD_6570.getSkillCooldown
 local isValidUnit = ____02_FF0E_5DE5_5177_51FD_6570.isValidUnit
 local isUnitDead = ____02_FF0E_5DE5_5177_51FD_6570.isUnitDead
-function ____exports.registerAIUnit(self, unit)
+function ____exports.registerAIUnit(unit)
     if not unit then
         return false
     end
@@ -41,28 +41,25 @@ function ____exports.registerAIUnit(self, unit)
     end
     return true
 end
-function ____exports.autoRegisterNeutralAggressive(self, unit)
+function ____exports.autoRegisterNeutralAggressive(unit)
     if not unit then
         return
     end
-    local owner = jass.GetOwningPlayer(unit)
-    local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
+    local owner = jass:GetOwningPlayer(unit)
+    local neutralAggressive = jass:Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
     if owner == neutralAggressive then
-        local isHero = jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
+        local isHero = jass:IsUnitType(unit, jass.UNIT_TYPE_HERO)
         if not isHero then
-            ____exports.registerAIUnit(nil, unit)
+            ____exports.registerAIUnit(unit)
         end
     end
 end
-function onAutoRegisterNeutralAggressive(self)
-    ____exports.autoRegisterNeutralAggressive(
-        nil,
-        jass.GetTriggerUnit()
-    )
+function onAutoRegisterNeutralAggressive()
+    ____exports.autoRegisterNeutralAggressive(jass:GetTriggerUnit())
 end
-function initAutoRegister(self)
+function initAutoRegister()
     if not unitCreatedTrigger then
-        unitCreatedTrigger = jass.CreateTrigger()
+        unitCreatedTrigger = jass:CreateTrigger()
         local enterRegionEvent = jass.EVENT_PLAYER_UNIT_SUMMON
         do
             local i = 0
@@ -71,9 +68,9 @@ function initAutoRegister(self)
                 i = i + 1
             end
         end
-        local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
+        local neutralAggressive = jass:Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
         playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent)
-        jass.TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive)
+        jass:TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive)
     end
 end
 jass = require("jass.common")
@@ -83,11 +80,11 @@ local addPeriodicCallback = ____G_0.addPeriodicCallback
 aiUnitRegistry = __TS__New(Map)
 local aiCheckRegistered = false
 unitCreatedTrigger = nil
-local function clampMinInt(self, value, minValue)
-    local intValue = jass.R2I(value)
+local function clampMinInt(value, minValue)
+    local intValue = jass:R2I(value)
     return intValue < minValue and minValue or intValue
 end
-function ____exports.registerAISkill(self, unit, config)
+function ____exports.registerAISkill(unit, config)
     if not unit or not config.abilityId then
         return false
     end
@@ -107,16 +104,16 @@ function ____exports.registerAISkill(self, unit, config)
     aiUnitRegistry:get(handleId).skills:set(config.abilityId, {config = config, lastCastTime = 0})
     return true
 end
-function ____exports.registerAISkills(self, unit, configs)
+function ____exports.registerAISkills(unit, configs)
     local count = 0
     for ____, config in ipairs(configs) do
-        if ____exports.registerAISkill(nil, unit, config) then
+        if ____exports.registerAISkill(unit, config) then
             count = count + 1
         end
     end
     return count
 end
-function ____exports.unregisterAISkill(self, unit, abilityId)
+function ____exports.unregisterAISkill(unit, abilityId)
     if not unit then
         return false
     end
@@ -138,7 +135,7 @@ function ____exports.unregisterAISkill(self, unit, abilityId)
     end
     return false
 end
-function ____exports.unregisterAIUnit(self, unit)
+function ____exports.unregisterAIUnit(unit)
     if not unit then
         return false
     end
@@ -149,7 +146,7 @@ function ____exports.unregisterAIUnit(self, unit)
     aiUnitRegistry:delete(handleId)
     return true
 end
-local function canCastSkill(self, unit, skillInfo)
+local function canCastSkill(unit, skillInfo)
     local ____skillInfo_1 = skillInfo
     local config = ____skillInfo_1.config
     if not isValidUnit(nil, unit) or isUnitDead(nil, unit) then
@@ -170,7 +167,7 @@ local function canCastSkill(self, unit, skillInfo)
     end
     return true
 end
-local function findBestTarget(self, unit, skillInfo)
+local function findBestTarget(unit, skillInfo)
     local ____skillInfo_2 = skillInfo
     local config = ____skillInfo_2.config
     if config.targetType == TARGET_TYPE_NONE then
@@ -181,7 +178,7 @@ local function findBestTarget(self, unit, skillInfo)
     end
     return nil
 end
-local function castSkill(self, unit, skillInfo, target)
+local function castSkill(unit, skillInfo, target)
     local ____skillInfo_3 = skillInfo
     local config = ____skillInfo_3.config
     do
@@ -191,16 +188,16 @@ local function castSkill(self, unit, skillInfo, target)
         local ____try, ____hasReturned, ____returnValue = pcall(function()
             if config.targetType == TARGET_TYPE_NONE then
                 if config.orderId ~= 0 then
-                    jass.IssueImmediateOrderById(unit, config.orderId)
+                    jass:IssueImmediateOrderById(unit, config.orderId)
                 end
             elseif config.targetType == TARGET_TYPE_POINT then
                 local point = target
                 if point ~= nil and point ~= nil and config.orderId ~= 0 then
-                    jass.IssuePointOrderById(unit, config.orderId, point.x, point.y)
+                    jass:IssuePointOrderById(unit, config.orderId, point.x, point.y)
                 end
             elseif config.targetType == TARGET_TYPE_UNIT then
                 if target ~= nil and target ~= nil and isValidUnit(nil, target) and config.orderId ~= 0 then
-                    jass.IssueTargetOrderById(unit, config.orderId, target)
+                    jass:IssueTargetOrderById(unit, config.orderId, target)
                 end
             end
             skillInfo.lastCastTime = getGameTime(nil)
@@ -214,7 +211,7 @@ local function castSkill(self, unit, skillInfo, target)
         end
     end
 end
-local function updateAIUnit(self, unitInfo)
+local function updateAIUnit(unitInfo)
     local ____unitInfo_4 = unitInfo
     local unit = ____unitInfo_4.unit
     local skills = ____unitInfo_4.skills
@@ -227,48 +224,46 @@ local function updateAIUnit(self, unitInfo)
     )
     for ____, skillInfo in ipairs(sortedSkills) do
         do
-            if not canCastSkill(nil, unit, skillInfo) then
+            if not canCastSkill(unit, skillInfo) then
                 goto __continue45
             end
-            local target = findBestTarget(nil, unit, skillInfo)
+            local target = findBestTarget(unit, skillInfo)
             if target then
-                castSkill(nil, unit, skillInfo, target)
+                castSkill(unit, skillInfo, target)
                 break
             end
         end
         ::__continue45::
     end
 end
-local function onAICheck(self)
+local function onAICheck()
     for ____, unitInfo in __TS__Iterator(aiUnitRegistry:values()) do
-        updateAIUnit(nil, unitInfo)
+        updateAIUnit(unitInfo)
     end
 end
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
-function ____exports.initAISkillSystem(self)
+local function onAIDeath(dyingUnit)
+    ____exports.unregisterAIUnit(dyingUnit)
+end
+function ____exports.initAISkillSystem()
     if not AI_SKILL_SYSTEM_ENABLED then
         return
     end
     if not aiCheckRegistered then
         aiCheckRegistered = true
         addPeriodicCallback(
-            clampMinInt(nil, AI_CHECK_INTERVAL * 1000, 1),
+            clampMinInt(AI_CHECK_INTERVAL * 1000, 1),
             onAICheck
         )
     end
-    registerDeathListener(
-        nil,
-        function(____, dyingUnit)
-            ____exports.unregisterAIUnit(nil, dyingUnit)
-        end
-    )
-    initAutoRegister(nil)
+    registerDeathListener(onAIDeath)
+    initAutoRegister()
 end
-function ____exports.getAIUnitCount(self)
+function ____exports.getAIUnitCount()
     return aiUnitRegistry.size
 end
-function ____exports.getAISkillCount(self, unit)
+function ____exports.getAISkillCount(unit)
     if not unit then
         return 0
     end
@@ -278,7 +273,7 @@ function ____exports.getAISkillCount(self, unit)
     end
     return aiUnitRegistry:get(handleId).skills.size
 end
-function ____exports.isSystemEnabled(self)
+function ____exports.isSystemEnabled()
     return AI_SKILL_SYSTEM_ENABLED
 end
 return ____exports

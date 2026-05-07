@@ -9,7 +9,7 @@ export * from "./02．特殊技能处理";
 const jass = require("jass.common") as any;
 
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (cb: (castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellEffectListener: (this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
 const { isBlacklistedSkill, isExcludedUnit, getCooldownReduction, getCooldownReductionBonus, applyCooldownCap, calcActualCooldown, setAbilityCooldown, getBaseCooldown } = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算") as {
@@ -40,7 +40,7 @@ function 提取内部ID(配置键名: string): string {
   return 片段列表[片段列表.length - 1] ?? 配置键名;
 }
 
-function onSpellEffectForCooldown(castingUnit: any, spellAbilityId: number): void {
+function onSpellEffectForCooldown(this: void, castingUnit: any, spellAbilityId: number): void {
   if (isBlacklistedSkill(spellAbilityId)) return;
   if (isExcludedUnit(castingUnit)) return;
 
@@ -49,7 +49,7 @@ function onSpellEffectForCooldown(castingUnit: any, spellAbilityId: number): voi
   }
 
   const reduction = getCooldownReduction(castingUnit);
-  if (reduction < 0.001) return;
+  if (reduction < 0.01) return;
 
   const bonus = getCooldownReductionBonus(castingUnit);
   const cappedReduction = applyCooldownCap(reduction, spellAbilityId, bonus);

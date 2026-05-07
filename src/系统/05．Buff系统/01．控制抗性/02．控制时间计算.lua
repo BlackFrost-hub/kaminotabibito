@@ -17,7 +17,7 @@ local getHeroDuration = ____require_result_3.getHeroDuration
 --- 获取单位的减少控制时间属性
 -- 
 -- 优先级：单位属性 > 玩家属性
-function ____exports.getControlReduction(self, unit)
+function ____exports.getControlReduction(unit)
     local unitValue = YDUserDataGet(
         nil,
         "unit",
@@ -28,7 +28,7 @@ function ____exports.getControlReduction(self, unit)
     if unitValue > 0.01 then
         return unitValue
     end
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if player ~= nil then
         local playerValue = YDUserDataGet(
             nil,
@@ -44,12 +44,12 @@ function ____exports.getControlReduction(self, unit)
     return 0
 end
 --- 应用控制时间削减上限
-function ____exports.applyControlReductionCap(self, reduction)
+function ____exports.applyControlReductionCap(reduction)
     return reduction < CONTROL_REDUCTION_CAP and reduction or CONTROL_REDUCTION_CAP
 end
 --- 检查并应用Boss控制时间上限
-function ____exports.applyBossControlLimit(self, unit, duration)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+function ____exports.applyBossControlLimit(unit, duration)
+    local unitTypeId = jass:GetUnitTypeId(unit)
     for ____, ____value in ipairs(__TS__ObjectEntries(BOSS_CONTROL_LIMITS)) do
         local idStr = ____value[1]
         local limit = ____value[2]
@@ -62,22 +62,22 @@ end
 --- 基于原始持续时间计算削减后的控制时长
 -- 
 -- 供快速Buff等直接传入持续时间的场景复用。
-function ____exports.calcReducedControlDuration(self, target, originalDuration)
+function ____exports.calcReducedControlDuration(target, originalDuration)
     local duration = originalDuration
-    local reduction = ____exports.getControlReduction(nil, target)
+    local reduction = ____exports.getControlReduction(target)
     if reduction > 0.01 then
-        reduction = ____exports.applyControlReductionCap(nil, reduction)
+        reduction = ____exports.applyControlReductionCap(reduction)
         duration = originalDuration * (1 - reduction)
     end
-    return ____exports.applyBossControlLimit(nil, target, duration)
+    return ____exports.applyBossControlLimit(target, duration)
 end
 --- 计算削减后的控制时间
 -- 
 -- @param target 目标单位
 -- @param abilityId 技能ID
 -- @returns 实际控制时间
-function ____exports.calcReducedControlTime(self, target, abilityId)
+function ____exports.calcReducedControlTime(target, abilityId)
     local originalDuration = getHeroDuration(nil, abilityId)
-    return ____exports.calcReducedControlDuration(nil, target, originalDuration)
+    return ____exports.calcReducedControlDuration(target, originalDuration)
 end
 return ____exports

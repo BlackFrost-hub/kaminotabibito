@@ -15,6 +15,9 @@ const jass = require("jass.common") as any;
 import {
   HEAL_SYSTEM_ENABLED,
   HEAL_EVENTS,
+  HEAL_RESULT_KEYS,
+  HEAL_SHOW_KEYS,
+  HEAL_STATS_KEYS,
   DEFAULT_HEAL_EFFECT_PATH,
   HEAL_TEXT_COLOR,
   ATTR_HEAL_RATE,
@@ -160,11 +163,11 @@ export function fireShowDamageEvent(
   green?: number,
   blue?: number
 ): void {
-  YDLocal5Set("real", "伤害值", amount);
-  YDLocal5Set("unit", "目标单位", target);
-  YDLocal5Set("integer", "红色", red ?? HEAL_TEXT_COLOR.red);
-  YDLocal5Set("integer", "绿色", green ?? HEAL_TEXT_COLOR.green);
-  YDLocal5Set("integer", "蓝色", blue ?? HEAL_TEXT_COLOR.blue);
+  YDLocal5Set("real", HEAL_SHOW_KEYS.AMOUNT, amount);
+  YDLocal5Set("unit", HEAL_SHOW_KEYS.TARGET, target);
+  YDLocal5Set("integer", HEAL_SHOW_KEYS.RED, red ?? HEAL_TEXT_COLOR.red);
+  YDLocal5Set("integer", HEAL_SHOW_KEYS.GREEN, green ?? HEAL_TEXT_COLOR.green);
+  YDLocal5Set("integer", HEAL_SHOW_KEYS.BLUE, blue ?? HEAL_TEXT_COLOR.blue);
   STES_Fire(null, HEAL_EVENTS.SHOW_DAMAGE);
 }
 
@@ -177,9 +180,9 @@ export function fireShowDamageEvent(
  * @param amount 治疗量
  */
 export function fireHealEvent(source: any, target: any, amount: number): void {
-  YDLocal5Set("real", "HealAmount", amount);
-  YDLocal5Set("unit", "HealUnit", target);
-  YDLocal5Set("unit", "HealSource", source);
+  YDLocal5Set("real", HEAL_RESULT_KEYS.AMOUNT, amount);
+  YDLocal5Set("unit", HEAL_RESULT_KEYS.TARGET, target);
+  YDLocal5Set("unit", HEAL_RESULT_KEYS.SOURCE, source);
   STES_Fire(null, HEAL_EVENTS.HEAL);
 }
 
@@ -189,6 +192,44 @@ function addHealStats(target: any, amount: number): void {
   const hid = jass.GetHandleId(target);
   if (hid == null || hid === 0) return;
   totalHealStats.set(hid, (totalHealStats.get(hid) || 0) + amount);
+}
+
+/** 与旧 JASS 对齐：只在 Boss战 激活、目标属于玩家组且来源对目标友方时累计玩家治疗量 */
+function shouldRecordPlayerHeal(target: any, sourcePlayer: any): boolean {
+  if (target == null || sourcePlayer == null) return false;
+
+  const bossBattleUnit = YDUserDataGet(
+    "string",
+    HEAL_STATS_KEYS.BOSS_BATTLE_TABLE,
+    HEAL_STATS_KEYS.BOSS_BATTLE_UNIT,
+    "unit"
+  );
+  if (bossBattleUnit == null) return false;
+
+  const playerForce = YDUserDataGet(
+    "string",
+    HEAL_STATS_KEYS.PLAYER_GROUP_TABLE,
+    HEAL_STATS_KEYS.PLAYER_GROUP_FORCE,
+    "force"
+  );
+  if (playerForce == null) return false;
+
+  const targetPlayer = jass.GetOwningPlayer(target);
+  if (!jass.IsPlayerInForce(targetPlayer, playerForce)) return false;
+
+  return jass.IsUnitAlly(target, sourcePlayer) || sourcePlayer === targetPlayer;
+}
+
+/** 与旧 JASS「治疗事件.j」对齐：直接按 HealSource 的所属玩家累计「治疗量」 */
+function addPlayerHealStats(target: any, source: any, amount: number): void {
+  if (source == null || amount <= 0) return;
+
+  const sourcePlayer = jass.GetOwningPlayer(source);
+  if (!shouldRecordPlayerHeal(target, sourcePlayer)) return;
+
+  const current = YDUserDataGet("player", sourcePlayer, HEAL_STATS_KEYS.PLAYER_TOTAL_HEAL, "real");
+  const base = typeof current === "number" ? current : 0;
+  YDUserDataSet("player", sourcePlayer, HEAL_STATS_KEYS.PLAYER_TOTAL_HEAL, base + amount);
 }
 
 // ==========================================================================================
@@ -236,6 +277,7 @@ export function doHeal(params: HealParams): number {
 
   // 统计
   addHealStats(HealTarget, actualHeal);
+  addPlayerHealStats(HealTarget, HealSource, actualHeal);
 
   // 通知监听器
   for (const listener of healEventListeners) {

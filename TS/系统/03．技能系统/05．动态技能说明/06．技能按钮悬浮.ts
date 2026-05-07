@@ -116,12 +116,12 @@ function refreshOneSlot(hero: any, slotKey: typeof SLOT_KEYS[number], column: nu
   if (!hero || hero === 0) return;
 
   let abilityId = resolveAbilityIdBySlot(column);
-  if (abilityId) {
+  if (abilityId !== 0) {
     recordHeroSlotAbility(hero, slotKey, abilityId);
   } else {
     abilityId = getHeroSlotAbility(hero, slotKey);
   }
-  if (!abilityId) return;
+  if (abilityId === 0) return;
 
   const level = jass.GetUnitAbilityLevel(hero, abilityId) || 0;
   if (level <= 0) return;

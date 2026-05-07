@@ -31,20 +31,20 @@ local _____6280_80FD_6309_94AE_69FD_4F4D_8868 = {}
 local _____5DF2_5B89_88C5_6280_80FD_6309_94AE_60AC_6D6E_4E8B_4EF6 = false
 local _____5F53_524D_72B6_6001 = nil
 local function _____83B7_53D6_5F53_524D_89E6_53D1Frame()
-    local frame = japi.DzGetTriggerUIEventFrame()
+    local frame = japi:DzGetTriggerUIEventFrame()
     if frame and frame ~= 0 then
         return frame
     end
-    return japi.DzGetMouseFocus()
+    return japi:DzGetMouseFocus()
 end
 local function _____83B7_53D6_672C_673A_552F_4E00_9009_4E2D_5355_4F4D()
-    local _____672C_673A_73A9_5BB6 = jass.GetLocalPlayer()
+    local _____672C_673A_73A9_5BB6 = jass:GetLocalPlayer()
     if not _____672C_673A_73A9_5BB6 or _____672C_673A_73A9_5BB6 == 0 then
         return nil
     end
     return getSoleSelectedUnitForPlayer(
         nil,
-        jass.GetPlayerId(_____672C_673A_73A9_5BB6)
+        jass:GetPlayerId(_____672C_673A_73A9_5BB6)
     )
 end
 local function _____89E3_6790_6280_80FD_6309_94AE_80FD_529BId(x, y)
@@ -87,7 +87,7 @@ local function _____5E94_7528_52A8_6001_6280_80FD_6587_672C_52AB_6301(unit, abil
     if not ability then
         return
     end
-    local level = jass.GetUnitAbilityLevel(unit, abilityId) or 1
+    local level = jass:GetUnitAbilityLevel(unit, abilityId) or 1
     EXSetAbilityDataString(
         nil,
         ability,
@@ -95,8 +95,8 @@ local function _____5E94_7528_52A8_6001_6280_80FD_6587_672C_52AB_6301(unit, abil
         ABILITY_DATA_UBERTIP,
         "【悬浮劫持测试】123456"
     )
-    local _____52A8_6001_540D_79F0 = getDynamicSkillTipText(nil, unit, abilityId, ABILITY_DATA_TIP)
-    local _____52A8_6001_8BF4_660E = getDynamicSkillTipText(nil, unit, abilityId, ABILITY_DATA_UBERTIP)
+    local _____52A8_6001_540D_79F0 = getDynamicSkillTipText(unit, abilityId, ABILITY_DATA_TIP)
+    local _____52A8_6001_8BF4_660E = getDynamicSkillTipText(unit, abilityId, ABILITY_DATA_UBERTIP)
     if _____52A8_6001_540D_79F0 == nil and _____52A8_6001_8BF4_660E == nil then
         return
     end
@@ -150,8 +150,8 @@ local function onSkillButtonHoverEnter()
     if not abilityId then
         return
     end
-    jass.DisplayTextToPlayer(
-        jass.GetLocalPlayer(),
+    jass:DisplayTextToPlayer(
+        jass:GetLocalPlayer(),
         0,
         0,
         "HOVER_OK_" .. tostring(abilityId)
@@ -173,7 +173,7 @@ local function _____5B89_88C5_6280_80FD_6309_94AE_60AC_6D6E_4E8B_4EF6()
                 local x = 0
                 while x <= 3 do
                     do
-                        local frame = japi.DzFrameGetCommandBarButton(y, x)
+                        local frame = japi:DzFrameGetCommandBarButton(y, x)
                         if not frame or frame == 0 then
                             goto __continue28
                         end
@@ -208,7 +208,7 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     if not whichPlayer or whichPlayer == 0 or not whichHero or whichHero == 0 then
         return
     end
-    refreshUnitSkillTips(nil, whichHero)
+    refreshUnitSkillTips(whichHero)
     _____5B89_88C5_6280_80FD_6309_94AE_60AC_6D6E_4E8B_4EF6()
 end
 return ____exports

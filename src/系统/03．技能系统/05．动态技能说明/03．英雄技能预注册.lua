@@ -22,14 +22,14 @@ local function isItemSkillByOrder(self, unit)
     if not unit then
         return false
     end
-    local currentOrder = jass.GetUnitCurrentOrder(unit)
+    local currentOrder = jass:GetUnitCurrentOrder(unit)
     if not currentOrder then
         return false
     end
     return currentOrder >= ITEM_SKILL_MIN and currentOrder <= ITEM_SKILL_MAX
 end
 local function getSkillKey(self, unit, abilityId)
-    return (tostring(jass.GetHandleId(unit)) .. "_") .. tostring(abilityId)
+    return (tostring(jass:GetHandleId(unit)) .. "_") .. tostring(abilityId)
 end
 local function getSkillTemplate(self, unit, abilityId, level)
     if not unit or not abilityId or level <= 0 then
@@ -54,7 +54,6 @@ local function registerOneSkillTemplate(self, unit, abilityId, level)
         return
     end
     local success = registerDynamicSkillTip(
-        nil,
         unit,
         abilityId,
         template,
@@ -81,7 +80,7 @@ local function registerExistingHeroSkills(self, unit)
                 if not abilityId then
                     goto __continue17
                 end
-                local level = jass.GetUnitAbilityLevel(unit, abilityId)
+                local level = jass:GetUnitAbilityLevel(unit, abilityId)
                 if level <= 0 then
                     goto __continue17
                 end
@@ -92,14 +91,14 @@ local function registerExistingHeroSkills(self, unit)
         end
     end
 end
-local function onSpellEffect(self, castingUnit, spellAbilityId)
+local function onSpellEffect(castingUnit, spellAbilityId)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
     if isItemSkillByOrder(nil, castingUnit) then
         return
     end
-    local currentLevel = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local currentLevel = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     if currentLevel <= 0 then
         return
     end
@@ -109,7 +108,7 @@ local function onPeriodicRefresh(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
-    refreshAllSkillTips(nil)
+    refreshAllSkillTips()
 end
 function ____exports.initHeroSkillPreregistration(self)
     if not DYNAMIC_SKILL_TIP_ENABLED then
@@ -117,7 +116,7 @@ function ____exports.initHeroSkillPreregistration(self)
     end
     local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
     local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
-    registerSpellEffectListener(nil, onSpellEffect)
+    registerSpellEffectListener(onSpellEffect)
     local ____G_2 = _G
     local addPeriodicCallback = ____G_2.addPeriodicCallback
     periodicCallbackId = addPeriodicCallback(2000, onPeriodicRefresh)

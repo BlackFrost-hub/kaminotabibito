@@ -1,4 +1,5 @@
 {
     "warcraft.warcraftVersion": "Classic",
-    "warcraft.wePathClassic": "D:\\StarWE v1.32fix1\\WorldEdit.exe"
+    "warcraft.wePathClassic": "D:\\StarWE v1.32fix1\\WorldEdit.exe",
+    "lua.targetVersion": "5.1"
 }

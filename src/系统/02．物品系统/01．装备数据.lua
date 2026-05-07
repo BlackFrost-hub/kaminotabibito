@@ -57,6 +57,8 @@ ____exports.items.I00P = {
     level = "E-",
     dmg = 2,
     all = 2,
+    cdReduction = 0.5,
+    mpCost = -0.2,
     Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
 }
 ____exports.items.I01K = {

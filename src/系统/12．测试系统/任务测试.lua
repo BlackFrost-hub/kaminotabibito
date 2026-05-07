@@ -69,8 +69,10 @@ end
 --- 测试UI显示
 function ____exports.testUI(self)
     debugPrint(nil, "测试任务UI...")
-    pcall(function ()
-            local p0 = jass.Player(0)
+    pcall(
+        nil,
+        function()
+            local p0 = jass:Player(0)
             if type(taskUIManager.onPlayerHeroRegistered) == "function" then
                 taskUIManager.onPlayerHeroRegistered(p0, nil)
             end
@@ -142,7 +144,7 @@ function ____exports.registerTestCommand(self)
             function(____, player, key)
                 local ____player_2
                 if player then
-                    ____player_2 = jass.GetPlayerId(player)
+                    ____player_2 = jass:GetPlayerId(player)
                 else
                     ____player_2 = 0
                 end

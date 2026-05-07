@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 选取中心范围
  * 以单位或坐标为中心，获取指定半径范围内的有效单位
@@ -16,7 +17,7 @@ const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展�
  * @param radius 搜索半径
  * @returns 符合条件的单位数组
  */
-export function getUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
+export function getUnitsInRangeOfUnit(this: void, centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
     const x = jass.GetUnitX(centerUnit);
@@ -30,17 +31,20 @@ export function getUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
  * (非机械、非古树、非建筑、非死亡)
  * @param x x坐标
  * @param y y坐标
- * @param radius 搜索半径
+ * @param radius 搜索半径x
  * @returns 符合条件的单位数组
  */
-export function getUnitsInRange(x: number, y: number, radius: number): any[] {
+export function getUnitsInRange(this: void, x: number, y: number, radius: number): any[] {
     const group = jass.CreateGroup();
     jass.GroupEnumUnitsInRange(group, x, y, radius, null);
 
     const units: any[] = [];
     let unit = jass.FirstOfGroup(group);
 
-    while (unit) {
+    while (true) {
+        if (unit == null || unit === 0) {
+            break;
+        }
         if (isValidUnit(unit)) {
             units.push(unit);
         }
@@ -59,7 +63,7 @@ export function getUnitsInRange(x: number, y: number, radius: number): any[] {
  * @param radius 搜索半径
  * @returns 符合条件的敌对单位数组
  */
-export function getEnemyUnitsInRangeOfUnit(centerUnit: any, radius: number): any[] {
+export function getEnemyUnitsInRangeOfUnit(this: void, centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
     const x = jass.GetUnitX(centerUnit);
@@ -76,14 +80,17 @@ export function getEnemyUnitsInRangeOfUnit(centerUnit: any, radius: number): any
  * @param radius 搜索半径
  * @returns 符合条件的敌对单位数组
  */
-export function getEnemyUnitsInRange(centerUnit: any, x: number, y: number, radius: number): any[] {
+export function getEnemyUnitsInRange(this: void, centerUnit: any, x: number, y: number, radius: number): any[] {
     const group = jass.CreateGroup();
     jass.GroupEnumUnitsInRange(group, x, y, radius, null);
 
     const units: any[] = [];
     let unit = jass.FirstOfGroup(group);
 
-    while (unit) {
+    while (true) {
+        if (unit == null || unit === 0) {
+            break;
+        }
         if (isUnitEnemy(unit, centerUnit)) {
             units.push(unit);
         }

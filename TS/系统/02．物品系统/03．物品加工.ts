@@ -47,7 +47,7 @@ const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排�
   setLastCreatedItem: (item: any) => void;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 
 const CAMPFIRE_ID = 0x68303043; // 'h00C'
@@ -357,7 +357,7 @@ function onAnyPickup(): void {
   }
 }
 
-function onCampfireDeath(dyingUnit: any): void {
+function onCampfireDeath(this: void, dyingUnit: any): void {
   if (!dyingUnit || !isCampfire(dyingUnit)) return;
   const set = campfireItems.get(dyingUnit);
   if (!set) return;

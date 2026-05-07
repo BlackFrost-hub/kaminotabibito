@@ -96,6 +96,8 @@ items["I00P"] = {
   level: "E-",
   dmg: 2,
   all: 2,
+  cdReduction: 0.5,
+  mpCost: -0.2,
   Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
 };
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};

@@ -4,6 +4,7 @@
  * 功能：注册动态技能说明、公式解析、自动刷新
  * 后续接手者：开关 DYNAMIC_SKILL_TIP_ENABLED 在常量文件
  */
+/** @noSelfInFile */
 
 const jass = require("jass.common") as any;
 const heroLevelEventCenter = require("系统.00．核心系统.01．事件中心.06．英雄升级事件中心") as {
@@ -406,11 +407,15 @@ export function registerSkillTips(
 // ==========================================================================================
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 
 let _heroLevelListenerBound = false;
 let _deathListenerBound = false;
+
+function onDynamicSkillTipDeath(this: void, dyingUnit: any): void {
+  unregisterDynamicSkillTip(dyingUnit);
+}
 
 export function initDynamicSkillTipSystem(): void {
   if (!DYNAMIC_SKILL_TIP_ENABLED) return;
@@ -424,9 +429,7 @@ export function initDynamicSkillTipSystem(): void {
 
   if (!_deathListenerBound) {
     _deathListenerBound = true;
-    registerDeathListener((dyingUnit) => {
-      unregisterDynamicSkillTip(dyingUnit);
-    });
+    registerDeathListener(onDynamicSkillTipDeath);
   }
 }
 

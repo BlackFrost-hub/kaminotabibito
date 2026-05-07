@@ -92,13 +92,13 @@ export const ATTR_AGI = "敏捷";
 export const ATTR_INT = "智力";
 
 /** 力量白字 */
-export const ATTR_STR_WHITE = "力量白";
+export const ATTR_STR_WHITE = "基础力量";
 
 /** 敏捷白字 */
-export const ATTR_AGI_WHITE = "敏捷白";
+export const ATTR_AGI_WHITE = "基础敏捷";
 
 /** 智力白字 */
-export const ATTR_INT_WHITE = "智力白";
+export const ATTR_INT_WHITE = "基础智力";
 
 /** 当前生命 */
 export const ATTR_HP = "生命";

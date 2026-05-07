@@ -13,7 +13,7 @@ local cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_2.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
-local function typeIdToUnitId(self, typeId)
+local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
         if stringToFourCC(nil, id) == typeId then
             return id
@@ -21,12 +21,12 @@ local function typeIdToUnitId(self, typeId)
     end
     return nil
 end
-local function onDeath(self, dying, killer)
+local function onDeath(dying, killer)
     if dying == nil then
         return
     end
-    local typeId = jass.GetUnitTypeId(dying)
-    local unitId = typeIdToUnitId(nil, typeId)
+    local typeId = jass:GetUnitTypeId(dying)
+    local unitId = typeIdToUnitId(typeId)
     local entry = unitId and idData[unitId] or nil
     local spawnRaw = entry and entry.berserkUnit or entry and entry.berserk
     if spawnRaw == nil then
@@ -37,22 +37,22 @@ local function onDeath(self, dying, killer)
         return
     end
     local BERSERK_PROC = 1
-    if jass.GetRandomInt(1, 10000) > BERSERK_PROC * 10000 then
+    if jass:GetRandomInt(1, 10000) > BERSERK_PROC * 10000 then
         return
     end
     local x = 0
     local y = 0
     local facingDeg = 270
-    x = jass.GetUnitX(dying)
-    y = jass.GetUnitY(dying)
-    facingDeg = jass.GetUnitFacing(dying) * (180 / 3.14159265359)
+    x = jass:GetUnitX(dying)
+    y = jass:GetUnitY(dying)
+    facingDeg = jass:GetUnitFacing(dying) * (180 / 3.14159265359)
     local four = stringToFourCC(
         nil,
         __TS__StringSubstring(spawnUnitId, 0, 4)
     )
-    local owner = jass.GetOwningPlayer(dying)
+    local owner = jass:GetOwningPlayer(dying)
     local created = nil
-    created = jass.CreateUnit(
+    created = jass:CreateUnit(
         owner,
         four,
         x,
@@ -61,7 +61,7 @@ local function onDeath(self, dying, killer)
     )
     local ____killer_7
     if killer then
-        ____killer_7 = jass.GetOwningPlayer(killer)
+        ____killer_7 = jass:GetOwningPlayer(killer)
     else
         ____killer_7 = nil
     end
@@ -69,9 +69,9 @@ local function onDeath(self, dying, killer)
     if created and killerPlayer then
         EXSetUnitFacing(nil, created, facingDeg)
         if type(cameraShakeForPlayerRaw) == "function" then
-            cameraShakeForPlayerRaw(nil, killerPlayer, 20, 3)
+            cameraShakeForPlayerRaw(killerPlayer, 20, 3)
         end
     end
 end
-registerDeathListener(nil, onDeath)
+registerDeathListener(onDeath)
 return ____exports

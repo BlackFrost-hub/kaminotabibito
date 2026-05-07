@@ -15,8 +15,10 @@ local createDelayedCall = ____require_result_0.createDelayedCall
 local ____require_result_1 = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心")
 local onUnitTargetInteractable = ____require_result_1.onUnitTargetInteractable
 local isInteractable = ____require_result_1.isInteractable
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Get = ____require_result_2.YDLocal5Get
+local ____require_result_2 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
+local _____5B9D_7BB1_7CFB_7EDF_5F00_5173 = ____require_result_2["宝箱系统开关"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_3.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
 local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 local EVENT_UNIT_ISSUED_TARGET_ORDER = 19
@@ -29,15 +31,15 @@ local RETRY_SEC = 0.1
 local STES_EVENT_UNIT_TARGET_ORDER = "单位发布目标命令"
 --- 处理单位发布目标命令事件
 local function onUnitIssuedTargetOrder()
-    local unit = jass.GetTriggerUnit()
+    local unit = jass:GetTriggerUnit()
     if not unit then
         return
     end
-    local target = jass.GetOrderTargetDestructable()
+    local target = jass:GetOrderTargetDestructable()
     if not target then
         return
     end
-    local targetType = jass.GetDestructableTypeId(target)
+    local targetType = jass:GetDestructableTypeId(target)
     if not isInteractable(nil, targetType) then
         return
     end
@@ -62,9 +64,9 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass.LoadInteger(
+    return jass:LoadInteger(
         ht,
-        jass.StringHash(eventName),
+        jass:StringHash(eventName),
         helper:ydlStes_skeyIndex(nil)
     )
 end
@@ -78,8 +80,8 @@ local function tryRegisterTargetOrderStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], STES_EVENT_UNIT_TARGET_ORDER)
@@ -97,20 +99,26 @@ end
 --- 为英雄注册目标命令事件
 -- 当英雄被登记时调用
 function ____exports.registerChestSystemHero(hero)
+    if not _____5B9D_7BB1_7CFB_7EDF_5F00_5173 then
+        return
+    end
     if not hero then
         return
     end
     local g = _G
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
-    local ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
+    local ev = jass:ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
     unitSpecificEventCenter.registerUnitEventTrigger(g[TRIG_KEY], hero, ev)
 end
 --- 初始化宝箱系统
 function ____exports.initChestSystem()
+    if not _____5B9D_7BB1_7CFB_7EDF_5F00_5173 then
+        return
+    end
     tryRegisterTargetOrderStes()
 end
 ____exports.STES_EVENT_UNIT_TARGET_ORDER = STES_EVENT_UNIT_TARGET_ORDER

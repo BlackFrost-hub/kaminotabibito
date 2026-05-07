@@ -42,7 +42,7 @@ const { getUnitOwnerId } = require("lib.扩展函数.封装函数.01．通用工
 };
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 
 // ==========================================================================================

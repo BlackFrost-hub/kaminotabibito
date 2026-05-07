@@ -20,10 +20,46 @@ export const HEAL_SYSTEM_ENABLED = true;
 
 /** STES 事件名称（必须与JASS端一致） */
 export const HEAL_EVENTS = {
+  /** 治疗入口事件 */
+  REQUEST: "治疗事件",
   /** 任意单位被治疗事件 */
   HEAL: "任意单位被治疗",
   /** 数值显示事件 */
   SHOW_DAMAGE: "数值显示",
+} as const;
+
+/** STES「治疗事件」入口参数键名 */
+export const HEAL_REQUEST_KEYS = {
+  AMOUNT: "HealAmount",
+  TARGET: "HealTarget",
+  SOURCE: "HealSource",
+  SOURCE_PLAYER: "HealSourcePlayer",
+  EFFECT: "HealEffect",
+} as const;
+
+/** STES「任意单位被治疗」结果事件参数键名 */
+export const HEAL_RESULT_KEYS = {
+  AMOUNT: "HealAmount",
+  TARGET: "HealUnit",
+  SOURCE: "HealSource",
+} as const;
+
+/** STES「数值显示」事件参数键名 */
+export const HEAL_SHOW_KEYS = {
+  AMOUNT: "Real",
+  TARGET: "Unit",
+  RED: "red",
+  GREEN: "green",
+  BLUE: "blue",
+} as const;
+
+/** 治疗统计与旧 JASS 对齐用到的键名 */
+export const HEAL_STATS_KEYS = {
+  PLAYER_TOTAL_HEAL: "治疗量",
+  PLAYER_GROUP_TABLE: "玩家",
+  PLAYER_GROUP_FORCE: "玩家组",
+  BOSS_BATTLE_TABLE: "Boss战",
+  BOSS_BATTLE_UNIT: "单位",
 } as const;
 
 // ==========================================================================================

@@ -21,6 +21,10 @@ const { onUnitTargetInteractable, isInteractable } = require("系统.06．经济
   isInteractable: (destructableType: number) => boolean;
 };
 
+const { 宝箱系统开关 } = require("系统.06．经济系统.00．宝箱系统.00．常量定义") as {
+  宝箱系统开关: boolean;
+};
+
 const { YDLocal5Get } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
   YDLocal5Get: (ty: string, name: string) => any;
 };
@@ -130,6 +134,7 @@ function tryRegisterTargetOrderStes(this: void): void {
  * 当英雄被登记时调用
  */
 export function registerChestSystemHero(this: void, hero: any): void {
+  if (!宝箱系统开关) return;
   if (!hero) return;
 
   // 注册单位目标命令事件
@@ -148,6 +153,7 @@ export function registerChestSystemHero(this: void, hero: any): void {
  * 初始化宝箱系统
  */
 export function initChestSystem(this: void): void {
+  if (!宝箱系统开关) return;
   tryRegisterTargetOrderStes();
 }
 

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 任意单位受到伤害事件系统（由 MNEVENT JASS 库逻辑转写）。
  * 非蝗虫单位进入地图或已存在时注册 EVENT_UNIT_DAMAGED，死亡（非英雄）从组移除；
@@ -5,6 +6,7 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
+const luaPcall: any = pcall;
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   isNormalAttack: () => boolean;
 };
@@ -13,7 +15,7 @@ const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函�
   forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
 
@@ -24,6 +26,7 @@ function getEventUnitDamaged(): any {
 
 const DamageEventQueue: any[] = [];
 const DamageCallbacks: ((
+  this: void,
   unit: any,
   damage: number,
   damageType: number,
@@ -62,7 +65,7 @@ function getUnitTypeHero(): any {
   return (jass as any).UNIT_TYPE_HERO ?? (jass as any).ConvertUnitType(2);
 }
 
-function onUnitDeathForDamage(dyingUnit: any): void {
+function onUnitDeathForDamage(this: void, dyingUnit: any): void {
   if (!UnitGroup || !dyingUnit) return;
   if (isHeroUnit(dyingUnit)) return;
   (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
@@ -76,15 +79,15 @@ function onAnyUnitDamagedAction(): void {
   let savedDamage = (jass as any).GetEventDamage();
   let savedSource: any = null;
   /** 直接调用 jass.GetEventDamageSource()，不能赋局部变量再调用（TSTL/Lua 坑2：会编成 jass:xxx() 加 self 参数） */
-  (pcall as any)(() => { savedSource = (jass as any).GetEventDamageSource(); });
+  luaPcall(() => { savedSource = (jass as any).GetEventDamageSource(); });
   if (savedSource == null) {
-    (pcall as any)(() => { savedSource = GetEventDamageSource(); });
+    luaPcall(() => { savedSource = GetEventDamageSource(); });
   }
 
   // 在TriggerExecute之前先执行伤害计算（确保YDWESetEventDamage在同步阶段生效）
   const fromDotTickBatchForEvent = dotBatchMarkQueue.length > 0 ? dotBatchMarkQueue.shift() === true : false;
   if (!fromDotTickBatchForEvent && savedUnit != null && savedDamage > 0.1) {
-    (pcall as any)(() => {
+    luaPcall(() => {
       const dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as { onDamageEvent?: (target: any, attacker: any, baseDamage: number) => void };
       // 先取出再调用，避免 TSTL 生成 dmgCalc:onDamageEvent；生成物首参 nil 由 fix-lua-for-pack 去掉（与 05．事件注册 中 onDamageEvent 一致）
       const onDamageEvent = dmgCalc != null ? dmgCalc.onDamageEvent : undefined;
@@ -100,15 +103,15 @@ function onAnyUnitDamagedAction(): void {
     if (trg != null) {
       let enabled = false;
       let evaluated = false;
-      (pcall as any)(() => {
+      luaPcall(() => {
         if ((jass as any).IsTriggerEnabled(trg)) enabled = true;
       });
       if (enabled) {
-        (pcall as any)(() => {
+        luaPcall(() => {
           if ((jass as any).TriggerEvaluate(trg)) evaluated = true;
         });
         if (evaluated) {
-          (pcall as any)(() => {
+          luaPcall(() => {
             (jass as any).TriggerExecute(trg);
           });
         }
@@ -119,7 +122,7 @@ function onAnyUnitDamagedAction(): void {
 
   let isNormalAttackSnap = false;
   if (!fromDotTickBatchForEvent) {
-    (pcall as any)(() => { if (伤害函数.isNormalAttack() === true) isNormalAttackSnap = true; });
+    luaPcall(() => { if (伤害函数.isNormalAttack() === true) isNormalAttackSnap = true; });
   }
 
   const entry = {
@@ -139,12 +142,13 @@ function processDamageEntry(entry: any): void {
   const isDotTickDamage = entry.fromDotTickBatch === true;
 
   if (entry.isNormalAttack === true && !isDotTickDamage) {
-    (pcall as any)(() => {
+    luaPcall(() => {
       const dm = require("系统.04．伤害系统.02．dot伤害") as {
-        tryApplyHeroAttackGearDots?: (src: any, tgt: any, dmg: number) => void;
+        tryApplyHeroAttackGearDots?: (this: void, src: any, tgt: any, dmg: number) => void;
       };
       if (dm != null && typeof dm.tryApplyHeroAttackGearDots === "function") {
-        dm.tryApplyHeroAttackGearDots(entry.source != null ? entry.source : null, su, sd);
+        const tryApplyHeroAttackGearDots = dm.tryApplyHeroAttackGearDots as unknown as ((src: any, tgt: any, dmg: number) => void);
+        tryApplyHeroAttackGearDots(entry.source != null ? entry.source : null, su, sd);
       }
     });
   }
@@ -157,15 +161,19 @@ function processDamageEntry(entry: any): void {
       // 跳过伤害计算回调（已经在前面执行过了）
       const cbStr = tostring(cb);
       if (cbStr.indexOf("damageCallback") === -1 && cbStr.indexOf("damageCalculation") === -1) {
-        (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
+        const invokeCallback: any = cb;
+        invokeCallback(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
       }
     }
   }
 
   if (isDotTickDamage) {
-    (pcall as any)(() => {
-      const m = require("系统.04．伤害系统.02．dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
-      if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
+    luaPcall(() => {
+      const m = require("系统.04．伤害系统.02．dot伤害") as { notifyDotTickBatchDamageDisplayed?: (this: void) => void };
+      if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") {
+        const notifyDotTickBatchDamageDisplayed = m.notifyDotTickBatchDamageDisplayed as unknown as (() => void);
+        notifyDotTickBatchDamageDisplayed();
+      }
     });
   }
 }
@@ -281,6 +289,7 @@ function initDamageEventOnce(intervalSeconds?: number): void {
 /** 注册 Lua 回调：单位受伤时直接调用，不依赖 TriggerExecute（引擎可能不执行 Lua 动作） */
 export function registerDamageCallback(
   cb: (
+    this: void,
     unit: any,
     damage: number,
     damageType: number,

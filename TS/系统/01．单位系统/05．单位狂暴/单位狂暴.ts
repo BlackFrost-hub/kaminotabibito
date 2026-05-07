@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 单位狂暴：装备掉落表里 `berserkUnit`（旧名 `berserk`）非空的单位死亡时，按默认 6.25% 概率在原地创建该四码单位、继承面向，并震动击杀者镜头。
  */
@@ -13,7 +14,7 @@ const cameraShakeMod = require("lib.扩展函数.封装函数.07．镜头函数.
 };
 const cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer as any;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (cb: (dyingUnit: any, killingUnit: any) => void) => void;
+  registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
@@ -26,7 +27,7 @@ function typeIdToUnitId(typeId: number): string | undefined {
   return undefined;
 }
 
-function onDeath(dying: any, killer: any): void {
+function onDeath(this: void, dying: any, killer: any): void {
   if (dying == null) return;
   const typeId = (jass as any).GetUnitTypeId(dying) as number;
   const unitId = typeIdToUnitId(typeId);

@@ -47,7 +47,7 @@ local function _____63D0_53D6_5185_90E8ID(self, _____914D_7F6E_952E_540D)
     local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
     return _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868] or _____914D_7F6E_952E_540D
 end
-local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
+local function onSpellEffectForCooldown(castingUnit, spellAbilityId)
     if isBlacklistedSkill(nil, spellAbilityId) then
         return
     end
@@ -63,7 +63,7 @@ local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
         end
     end
     local reduction = getCooldownReduction(nil, castingUnit)
-    if reduction < 0.001 then
+    if reduction < 0.01 then
         return
     end
     local bonus = getCooldownReductionBonus(nil, castingUnit)
@@ -71,7 +71,7 @@ local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
     if handleSpecialSkillCooldown(nil, castingUnit, spellAbilityId, cappedReduction) then
         return
     end
-    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     if level <= 0 then
         return
     end
@@ -88,5 +88,5 @@ local function onSpellEffectForCooldown(self, castingUnit, spellAbilityId)
         actualCooldown
     )
 end
-registerSpellEffectListener(nil, onSpellEffectForCooldown)
+registerSpellEffectListener(onSpellEffectForCooldown)
 return ____exports

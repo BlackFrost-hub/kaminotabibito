@@ -56,5 +56,9 @@ require("系统.04．伤害系统.00．伤害计算.05．事件注册")
 require("系统.04．伤害系统.02．治疗系统.index")
 --- 初始化伤害系统
 function ____exports.init(self)
+    local healSystem = require("系统.04．伤害系统.02．治疗系统.index")
+    if type(healSystem.init) == "function" then
+        healSystem:init()
+    end
 end
 return ____exports

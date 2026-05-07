@@ -1,4 +1,5 @@
 /** @noSelfInFile */
+/** @noSelfInFile */
 /**
  * Buff 池 / Buff 系统框架（`00` 前缀便于在 `05．Buff系统` 目录内统一排序管理）
  *
@@ -15,6 +16,9 @@ const jass = require("jass.common") as Record<string, unknown>;
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
+const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+  onTick10ms: (this: void, callback: () => void) => void;
+};
 
 /** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */
 export const BUFF_POOL_TICK = 0.1;
@@ -206,6 +210,7 @@ export interface RegisterManualBuffExtras {
 }
 
 export function registerManualBuff(
+  this: void,
   target: any,
   buffID: string,
   durationSec: number,
@@ -342,12 +347,6 @@ function onBuffPoolCenterTimerTick(): void {
 function ensureSyncTimer(): void {
   if (_registeredToCenterTimer) return;
   _registeredToCenterTimer = true;
-
-  // 使用中心计时器的每10毫秒回调
-const { onTick10ms } = globalThis as unknown as {
-    onTick10ms: (this: void, callback: () => void) => void;
-  };
-
   onTick10ms(onBuffPoolCenterTimerTick);
 }
 
@@ -356,4 +355,4 @@ function maybeStopSyncTimer(): void {
   // 这个函数保留用于兼容性
 }
 
-export function initBuffSystem(): void {}
+export function initBuffSystem(this: void): void {}

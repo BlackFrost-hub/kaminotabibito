@@ -43,11 +43,11 @@ ____exports.ATTR_AGI = "敏捷"
 --- 智力（含绿字）
 ____exports.ATTR_INT = "智力"
 --- 力量白字
-____exports.ATTR_STR_WHITE = "力量白"
+____exports.ATTR_STR_WHITE = "基础力量"
 --- 敏捷白字
-____exports.ATTR_AGI_WHITE = "敏捷白"
+____exports.ATTR_AGI_WHITE = "基础敏捷"
 --- 智力白字
-____exports.ATTR_INT_WHITE = "智力白"
+____exports.ATTR_INT_WHITE = "基础智力"
 --- 当前生命
 ____exports.ATTR_HP = "生命"
 --- 最大生命

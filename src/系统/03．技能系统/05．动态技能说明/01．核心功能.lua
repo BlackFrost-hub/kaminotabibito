@@ -46,25 +46,25 @@ local replaceAll = ____02_FF0E_516C_5F0F_89E3_6790_5668.replaceAll
 local indexOfChar = ____02_FF0E_516C_5F0F_89E3_6790_5668.indexOfChar
 local formatNumber = ____02_FF0E_516C_5F0F_89E3_6790_5668.formatNumber
 local isDigit = ____02_FF0E_516C_5F0F_89E3_6790_5668.isDigit
-function normalizeFormulaTemplate(self, template)
+function normalizeFormulaTemplate(template)
     local result = template
     for ____, alias in ipairs(formulaAliases) do
         result = replaceAll(nil, result, alias.source, alias.token)
     end
     return result
 end
-function denormalizeFormulaTemplate(self, template)
+function denormalizeFormulaTemplate(template)
     local result = template
     for ____, alias in ipairs(formulaAliases) do
         result = replaceAll(nil, result, alias.token, alias.source)
     end
     return result
 end
-function evaluateFormula(self, formula, unit, skillLevel)
+function evaluateFormula(formula, unit, skillLevel)
     if not formula then
         return 0
     end
-    local expr = __TS__StringTrim(normalizeFormulaTemplate(nil, formula))
+    local expr = __TS__StringTrim(normalizeFormulaTemplate(formula))
     if expr == "" then
         return 0
     end
@@ -80,7 +80,7 @@ function evaluateFormula(self, formula, unit, skillLevel)
     )
     for ____, attrName in ipairs(sortedAttrs) do
         local getter = aliasedAttributeGetters[attrName]
-        local value = getter(nil, unit)
+        local value = getter(unit)
         expr = replaceAll(
             nil,
             expr,
@@ -104,8 +104,8 @@ function evaluateFormula(self, formula, unit, skillLevel)
         end
     end
 end
-function processTemplate(self, template, unit, skillLevel)
-    template = normalizeFormulaTemplate(nil, template)
+function processTemplate(template, unit, skillLevel)
+    template = normalizeFormulaTemplate(template)
     local result = ""
     local i = 0
     while i < #template do
@@ -116,7 +116,7 @@ function processTemplate(self, template, unit, skillLevel)
                 local endIdx = indexOfChar(nil, template, closeBracket, i + 1)
                 if endIdx > i + 1 then
                     local formula = __TS__StringSlice(template, i + 1, endIdx)
-                    local value = evaluateFormula(nil, formula, unit, skillLevel)
+                    local value = evaluateFormula(formula, unit, skillLevel)
                     result = result .. formatNumber(nil, value)
                     i = endIdx + 1
                     goto __continue34
@@ -127,12 +127,9 @@ function processTemplate(self, template, unit, skillLevel)
         end
         ::__continue34::
     end
-    return denormalizeFormulaTemplate(
-        nil,
-        processInlineFormulas(nil, result, unit, skillLevel)
-    )
+    return denormalizeFormulaTemplate(processInlineFormulas(result, unit, skillLevel))
 end
-function updateSkillTip(self, skillInfo)
+function updateSkillTip(skillInfo)
     local ____skillInfo_1 = skillInfo
     local unit = ____skillInfo_1.unit
     local abilityId = ____skillInfo_1.abilityId
@@ -141,11 +138,11 @@ function updateSkillTip(self, skillInfo)
     if not abil then
         return
     end
-    local currentLevel = jass.GetUnitAbilityLevel(unit, abilityId) or skillInfo.level or 1
+    local currentLevel = jass:GetUnitAbilityLevel(unit, abilityId) or skillInfo.level or 1
     skillInfo.level = currentLevel
-    skillInfo.renderedText = processTemplate(nil, template, unit, currentLevel)
+    skillInfo.renderedText = processTemplate(template, unit, currentLevel)
 end
-function matchFormulaToken(self, text, start)
+function matchFormulaToken(text, start)
     for ____, token in ipairs(formulaTokenNames) do
         if __TS__StringSlice(text, start, start + #token) == token then
             return token
@@ -153,10 +150,10 @@ function matchFormulaToken(self, text, start)
     end
     return nil
 end
-function isInlineFormulaChar(self, c)
+function isInlineFormulaChar(c)
     return isDigit(nil, c) or c == "." or c == "+" or c == "-" or c == "*" or c == "/" or c == "×" or c == "÷" or c == OPERATOR_MULTIPLY_CN or c == OPERATOR_DIVIDE_CN or c == "脳" or c == "梅" or c == "(" or c == ")"
 end
-function hasFormulaOperatorOrDigit(self, formula)
+function hasFormulaOperatorOrDigit(formula)
     do
         local i = 0
         while i < #formula do
@@ -169,12 +166,12 @@ function hasFormulaOperatorOrDigit(self, formula)
     end
     return false
 end
-function processInlineFormulas(self, template, unit, skillLevel)
+function processInlineFormulas(template, unit, skillLevel)
     local result = ""
     local i = 0
     while i < #template do
         do
-            local startToken = matchFormulaToken(nil, template, i)
+            local startToken = matchFormulaToken(template, i)
             if startToken == nil then
                 result = result .. __TS__StringAccess(template, i)
                 i = i + 1
@@ -183,15 +180,12 @@ function processInlineFormulas(self, template, unit, skillLevel)
             local ____end = i + #startToken
             while ____end < #template do
                 do
-                    local nextToken = matchFormulaToken(nil, template, ____end)
+                    local nextToken = matchFormulaToken(template, ____end)
                     if nextToken ~= nil then
                         ____end = ____end + #nextToken
                         goto __continue102
                     end
-                    if not isInlineFormulaChar(
-                        nil,
-                        __TS__StringAccess(template, ____end)
-                    ) then
+                    if not isInlineFormulaChar(__TS__StringAccess(template, ____end)) then
                         break
                     end
                     ____end = ____end + 1
@@ -199,14 +193,14 @@ function processInlineFormulas(self, template, unit, skillLevel)
                 ::__continue102::
             end
             local formula = __TS__StringSlice(template, i, ____end)
-            if not hasFormulaOperatorOrDigit(nil, formula) then
+            if not hasFormulaOperatorOrDigit(formula) then
                 result = result .. __TS__StringAccess(template, i)
                 i = i + 1
                 goto __continue100
             end
             result = result .. formatNumber(
                 nil,
-                evaluateFormula(nil, formula, unit, skillLevel)
+                evaluateFormula(formula, unit, skillLevel)
             )
             i = ____end
         end
@@ -224,31 +218,31 @@ local ABILITY_DATA_UBERTIP = ____require_result_0.ABILITY_DATA_UBERTIP
 ____exports.ABILITY_DATA_TIP = ABILITY_DATA_TIP
 ____exports.ABILITY_DATA_UBERTIP = ABILITY_DATA_UBERTIP
 local attributeGetters = {
-    [ATTR_STR] = function(____, u) return jass.GetHeroStr(u, true) or 0 end,
-    [ATTR_AGI] = function(____, u) return jass.GetHeroAgi(u, true) or 0 end,
-    [ATTR_INT] = function(____, u) return jass.GetHeroInt(u, true) or 0 end,
-    [ATTR_STR_WHITE] = function(____, u) return jass.GetHeroStr(u, false) or 0 end,
-    [ATTR_AGI_WHITE] = function(____, u) return jass.GetHeroAgi(u, false) or 0 end,
-    [ATTR_INT_WHITE] = function(____, u) return jass.GetHeroInt(u, false) or 0 end,
-    [ATTR_HP] = function(____, u) return jass.GetUnitState(u, jass.UNIT_STATE_LIFE) or 0 end,
-    [ATTR_HP_MAX] = function(____, u) return jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) or 0 end,
-    [ATTR_MP] = function(____, u) return jass.GetUnitState(u, jass.UNIT_STATE_MANA) or 0 end,
-    [ATTR_MP_MAX] = function(____, u) return jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0 end,
-    [ATTR_ATTACK] = function(____, u) return (jass.GetUnitState(
+    [ATTR_STR] = function(u) return jass:GetHeroStr(u, true) or 0 end,
+    [ATTR_AGI] = function(u) return jass:GetHeroAgi(u, true) or 0 end,
+    [ATTR_INT] = function(u) return jass:GetHeroInt(u, true) or 0 end,
+    [ATTR_STR_WHITE] = function(u) return jass:GetHeroStr(u, false) or 0 end,
+    [ATTR_AGI_WHITE] = function(u) return jass:GetHeroAgi(u, false) or 0 end,
+    [ATTR_INT_WHITE] = function(u) return jass:GetHeroInt(u, false) or 0 end,
+    [ATTR_HP] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_LIFE) or 0 end,
+    [ATTR_HP_MAX] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) or 0 end,
+    [ATTR_MP] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MANA) or 0 end,
+    [ATTR_MP_MAX] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0 end,
+    [ATTR_ATTACK] = function(u) return (jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
-    ) or 0) + (jass.GetUnitState(
+        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
+    ) or 0) + (jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
+        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
     ) or 0) end,
-    [ATTR_ARMOR] = function(____, u) return jass.GetUnitState(
+    [ATTR_ARMOR] = function(u) return jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ARMOR)
+        jass:ConvertUnitState(UNIT_STATE_ARMOR)
     ) or 0 end,
-    [ATTR_MOVE_SPEED] = function(____, u) return jass.GetUnitMoveSpeed(u) or 0 end,
-    [ATTR_LEVEL] = function(____, u) return jass.GetHeroLevel(u) or 0 end,
-    [ATTR_HERO_LEVEL] = function(____, u) return jass.GetHeroLevel(u) or 0 end,
-    [ATTR_XP] = function(____, u) return jass.GetHeroXP(u) or 0 end
+    [ATTR_MOVE_SPEED] = function(u) return jass:GetUnitMoveSpeed(u) or 0 end,
+    [ATTR_LEVEL] = function(u) return jass:GetHeroLevel(u) or 0 end,
+    [ATTR_HERO_LEVEL] = function(u) return jass:GetHeroLevel(u) or 0 end,
+    [ATTR_XP] = function(u) return jass:GetHeroXP(u) or 0 end
 }
 FORMULA_TOKEN_SKILL_LEVEL = "__SKILL_LEVEL__"
 local FORMULA_TOKEN_STR = "__STR__"
@@ -313,7 +307,7 @@ formulaTokenNames = __TS__ArraySort(
     },
     function(____, a, b) return #b - #a end
 )
-function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, level, tipType)
+function ____exports.registerDynamicSkillTip(unit, abilityId, template, level, tipType)
     if level == nil then
         level = 1
     end
@@ -326,7 +320,7 @@ function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, le
     if not unit or not abilityId or not template then
         return false
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId then
         return false
     end
@@ -365,7 +359,7 @@ function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, le
                 skillList[i + 1].level = level
                 skillList[i + 1].template = template
                 skillList[i + 1].unit = unit
-                updateSkillTip(nil, skillList[i + 1])
+                updateSkillTip(skillList[i + 1])
                 replaced = true
                 break
             end
@@ -375,15 +369,15 @@ function ____exports.registerDynamicSkillTip(self, unit, abilityId, template, le
     end
     if not replaced then
         skillList[#skillList + 1] = skillInfo
-        updateSkillTip(nil, skillInfo)
+        updateSkillTip(skillInfo)
     end
     return true
 end
-function ____exports.unregisterDynamicSkillTip(self, unit, abilityId)
+function ____exports.unregisterDynamicSkillTip(unit, abilityId)
     if not unit then
         return false
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return false
     end
@@ -403,11 +397,11 @@ function ____exports.unregisterDynamicSkillTip(self, unit, abilityId)
     end
     return false
 end
-function ____exports.getDynamicSkillTipText(self, unit, abilityId, tipType)
+function ____exports.getDynamicSkillTipText(unit, abilityId, tipType)
     if not unit or not abilityId then
         return nil
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return nil
     end
@@ -425,7 +419,7 @@ function ____exports.getDynamicSkillTipText(self, unit, abilityId, tipType)
                     goto __continue61
                 end
                 if skillInfo.renderedText == "" then
-                    updateSkillTip(nil, skillInfo)
+                    updateSkillTip(skillInfo)
                 end
                 return skillInfo.renderedText or nil
             end
@@ -435,22 +429,22 @@ function ____exports.getDynamicSkillTipText(self, unit, abilityId, tipType)
     end
     return nil
 end
-function ____exports.refreshUnitSkillTips(self, unit)
+function ____exports.refreshUnitSkillTips(unit)
     if not unit then
         return
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return
     end
     local unitSkills = skillRegistry:get(handleId)
     for ____, skillList in __TS__Iterator(unitSkills:values()) do
         for ____, skillInfo in ipairs(skillList) do
-            updateSkillTip(nil, skillInfo)
+            updateSkillTip(skillInfo)
         end
     end
 end
-function ____exports.refreshAllSkillTips(self)
+function ____exports.refreshAllSkillTips()
     for ____, ____value in __TS__Iterator(skillRegistry) do
         local handleId = ____value[1]
         local unitSkills = ____value[2]
@@ -461,19 +455,18 @@ function ____exports.refreshAllSkillTips(self)
             end
             for ____, skillList in __TS__Iterator(unitSkills:values()) do
                 for ____, skillInfo in ipairs(skillList) do
-                    updateSkillTip(nil, skillInfo)
+                    updateSkillTip(skillInfo)
                 end
             end
         end
         ::__continue72::
     end
 end
-function ____exports.registerSkillTip(self, unit, abilityId, template, level)
+function ____exports.registerSkillTip(unit, abilityId, template, level)
     if level == nil then
         level = 1
     end
     return ____exports.registerDynamicSkillTip(
-        nil,
         unit,
         abilityId,
         template,
@@ -481,12 +474,11 @@ function ____exports.registerSkillTip(self, unit, abilityId, template, level)
         ABILITY_DATA_TIP
     )
 end
-function ____exports.registerSkillUbertip(self, unit, abilityId, template, level)
+function ____exports.registerSkillUbertip(unit, abilityId, template, level)
     if level == nil then
         level = 1
     end
     return ____exports.registerDynamicSkillTip(
-        nil,
         unit,
         abilityId,
         template,
@@ -494,74 +486,60 @@ function ____exports.registerSkillUbertip(self, unit, abilityId, template, level
         ABILITY_DATA_UBERTIP
     )
 end
-function ____exports.registerSkillTips(self, unit, abilityId, tipTemplate, ubertipTemplate, level)
+function ____exports.registerSkillTips(unit, abilityId, tipTemplate, ubertipTemplate, level)
     if level == nil then
         level = 1
     end
-    local success1 = ____exports.registerSkillTip(
-        nil,
-        unit,
-        abilityId,
-        tipTemplate,
-        level
-    )
-    local success2 = ____exports.registerSkillUbertip(
-        nil,
-        unit,
-        abilityId,
-        ubertipTemplate,
-        level
-    )
+    local success1 = ____exports.registerSkillTip(unit, abilityId, tipTemplate, level)
+    local success2 = ____exports.registerSkillUbertip(unit, abilityId, ubertipTemplate, level)
     return success1 or success2
 end
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_2.registerDeathListener
 local _heroLevelListenerBound = false
 local _deathListenerBound = false
-function ____exports.initDynamicSkillTipSystem(self)
+local function onDynamicSkillTipDeath(dyingUnit)
+    ____exports.unregisterDynamicSkillTip(dyingUnit)
+end
+function ____exports.initDynamicSkillTipSystem()
     if not DYNAMIC_SKILL_TIP_ENABLED then
         return
     end
     if not _heroLevelListenerBound then
         _heroLevelListenerBound = true
-        registerHeroLevelListener(function(____, unit)
-            ____exports.refreshUnitSkillTips(nil, unit)
+        registerHeroLevelListener(function(unit)
+            ____exports.refreshUnitSkillTips(unit)
         end)
     end
     if not _deathListenerBound then
         _deathListenerBound = true
-        registerDeathListener(
-            nil,
-            function(____, dyingUnit)
-                ____exports.unregisterDynamicSkillTip(nil, dyingUnit)
-            end
-        )
+        registerDeathListener(onDynamicSkillTipDeath)
     end
 end
-function ____exports.renderDynamicSkillTemplate(self, template, unit, skillLevel)
+function ____exports.renderDynamicSkillTemplate(template, unit, skillLevel)
     if not template then
         return ""
     end
-    return processTemplate(nil, template, unit, skillLevel)
+    return processTemplate(template, unit, skillLevel)
 end
-function ____exports.registerAttributeGetter(self, attrName, getter)
+function ____exports.registerAttributeGetter(attrName, getter)
     attributeGetters[attrName] = getter
 end
-function ____exports.unregisterAttributeGetter(self, attrName)
+function ____exports.unregisterAttributeGetter(attrName)
     if rawget(attributeGetters, attrName) ~= nil then
         __TS__Delete(attributeGetters, attrName)
         return true
     end
     return false
 end
-function ____exports.getSupportedAttributes(self)
+function ____exports.getSupportedAttributes()
     return __TS__ObjectKeys(attributeGetters)
 end
-function ____exports.getRegisteredSkillCount(self, unit)
+function ____exports.getRegisteredSkillCount(unit)
     if not unit then
         return 0
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return 0
     end
@@ -572,7 +550,7 @@ function ____exports.getRegisteredSkillCount(self, unit)
     end
     return count
 end
-function ____exports.getTotalRegisteredCount(self)
+function ____exports.getTotalRegisteredCount()
     local count = 0
     for ____, unitSkills in __TS__Iterator(skillRegistry:values()) do
         for ____, skillList in __TS__Iterator(unitSkills:values()) do

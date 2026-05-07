@@ -35,15 +35,30 @@ function ____exports.isBlacklistedSkill(self, abilityId)
 end
 --- 检查单位是否为特殊单位（E001不参与冷却缩减）
 function ____exports.isExcludedUnit(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+    local unitTypeId = jass:GetUnitTypeId(unit)
     return unitTypeId == stringToFourCC(
         nil,
         _____63D0_53D6_5185_90E8ID(nil, EXCLUDED_COOLDOWN_UNIT)
     )
 end
---- 获取冷却缩减属性
-function ____exports.getCooldownReduction(self, unit)
-    local player = jass.GetOwningPlayer(unit)
+--- 冷却属性读取规则：
+-- 1. 先看单位属性。若单位值大于 0.01，优先使用，通常代表这是单独配置过属性的敌对单位。
+-- 2. 否则回退到玩家属性。玩家侧默认只有一个英雄，因此玩家属性可视为该英雄的冷却属性来源。
+local function getCooldownAttrValue(self, unit, attrName)
+    if unit == nil then
+        return 0
+    end
+    local unitValue = YDUserDataGet(
+        nil,
+        "unit",
+        unit,
+        attrName,
+        "real"
+    )
+    if unitValue > 0.01 then
+        return unitValue
+    end
+    local player = jass:GetOwningPlayer(unit)
     if player == nil then
         return 0
     end
@@ -51,23 +66,17 @@ function ____exports.getCooldownReduction(self, unit)
         nil,
         "player",
         player,
-        "冷却缩减",
+        attrName,
         "real"
     )
 end
+--- 获取冷却缩减属性
+function ____exports.getCooldownReduction(self, unit)
+    return getCooldownAttrValue(nil, unit, "冷却缩减")
+end
 --- 获取冷却缩减加成属性（突破上限）
 function ____exports.getCooldownReductionBonus(self, unit)
-    local player = jass.GetOwningPlayer(unit)
-    if player == nil then
-        return 0
-    end
-    return YDUserDataGet(
-        nil,
-        "player",
-        player,
-        "冷却缩减加成",
-        "real"
-    )
+    return getCooldownAttrValue(nil, unit, "冷却缩减加成")
 end
 --- 获取技能冷却上限
 -- 

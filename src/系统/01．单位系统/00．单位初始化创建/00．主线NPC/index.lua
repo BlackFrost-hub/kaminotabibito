@@ -8,15 +8,23 @@ do
         end
     end
 end
+--- 主线NPC总开关：默认关闭，便于临时禁用整套创建流程
+____exports.ENABLE_MAIN_STORY_NPC = false
 local ____require_result_0 = require("系统.01．单位系统.00．单位初始化创建.00．主线NPC.01．主线NPC")
 local initMainStoryNPCsWithDelay = ____require_result_0.initMainStoryNPCsWithDelay
 --- 初始化主线NPC
 function ____exports.init(self)
+    if not ____exports.ENABLE_MAIN_STORY_NPC then
+        return
+    end
     if type(initMainStoryNPCsWithDelay) == "function" then
         initMainStoryNPCsWithDelay(nil, 1)
     end
 end
 function ____exports.initMainStoryNpcEntry(self)
+    if not ____exports.ENABLE_MAIN_STORY_NPC then
+        return
+    end
     ____exports.init(nil)
 end
 return ____exports
