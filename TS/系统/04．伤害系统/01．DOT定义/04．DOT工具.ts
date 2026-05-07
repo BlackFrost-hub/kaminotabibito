@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 import type { DotState } from "./01．DOT配置";
 
 const jass = require("jass.common") as any;

@@ -1,22 +1,17 @@
-/** @noSelfInFile */
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
 import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
-const { onSecond } = require("系统.00．核心系统.05．中心计时器") as {
-  onSecond: (this: void, callback: () => void) => void;
-};
 
-const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (this: void, unit: any) => boolean };
+const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWETimerDestroyEffect: (duration: number, effect: any) => void;
 };
-const luaPcall: any = pcall;
 
 /** DOT 秒跳目标被 `PauseUnit` 暂停时不结算伤害/特效/onTick（与 Buff 池不计时一致） */
 // pcall 具名函数体模式：禁止 (pcall as any)(匿名)，避免 TSTL 生成 pcall(nil, func)
 let __pcallPausedUnit: any = 0;
 let __pcallPausedResult = false;
-function __pcallIsUnitPausedBody(this: void): void {
+function __pcallIsUnitPausedBody(): void {
   const fn = unitBjExt.IsUnitPausedBJ;
   if (fn != null) __pcallPausedResult = fn(__pcallPausedUnit) === true;
 }
@@ -26,7 +21,7 @@ function isDotTargetPaused(u: any): boolean {
   if (fn == null) return false;
   __pcallPausedUnit = u;
   __pcallPausedResult = false;
-  luaPcall(__pcallIsUnitPausedBody);
+  pcall(__pcallIsUnitPausedBody);
   return __pcallPausedResult;
 }
 
@@ -46,13 +41,13 @@ export function createDotExecutor(deps: {
   LeakWatcher: any;
   dotTypes: DotTypeConfig[];
   dotTicks: DotTickEntry[];
-  damageEventModule: { markNextPendingDamageAsDotTickBatch?: (this: void) => void };
-  unitHid: (this: void, u: any) => number;
+  damageEventModule: { markNextPendingDamageAsDotTickBatch?: () => void };
+  unitHid: (u: any) => number;
 }): {
-  ensureDotTimers: (this: void) => void;
-  dealDamageForType: (this: void, typeId: string, source: any, target: any, amount: number) => void;
-  notifyDotTickBatchDamageDisplayed: (this: void) => void;
-  getDotTickBatchTargetHids: (this: void) => Record<number, boolean> | null;
+  ensureDotTimers: () => void;
+  dealDamageForType: (typeId: string, source: any, target: any, amount: number) => void;
+  notifyDotTickBatchDamageDisplayed: () => void;
+  getDotTickBatchTargetHids: () => Record<number, boolean> | null;
 } {
   // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
   const jass = deps.jass;
@@ -77,7 +72,7 @@ export function createDotExecutor(deps: {
   }
 
   // ========== 虚拟分区：造成 DOT 伤害 ==========
-  function dealDamageForType(this: void, typeId: string, source: any, target: any, amount: number): void {
+  function dealDamageForType(typeId: string, source: any, target: any, amount: number): void {
     if (isDotTargetPaused(target)) return;
     const cfg = dotTypes.find(c => c.id === typeId);
     if (cfg == null) return;
@@ -150,14 +145,19 @@ export function createDotExecutor(deps: {
   // ========== 虚拟分区：计时器保障（使用中心计时器） ==========
   let _registeredToCenterTimer = false;
 
-  function ensureDotTimers(this: void): void {
+  function ensureDotTimers(): void {
     if (_registeredToCenterTimer) return;
     _registeredToCenterTimer = true;
+
+    // 走核心系统挂到 globalThis 的桥，避免 TSTL 把 require 对象字段函数编成少参调用
+    const { onSecond } = globalThis as unknown as {
+      onSecond: (this: void, callback: () => void) => void;
+    };
     onSecond(dotTickRun);
   }
 
   // ========== 虚拟分区：批次清理通知 ==========
-  function notifyDotTickBatchDamageDisplayed(this: void): void {
+  function notifyDotTickBatchDamageDisplayed(): void {
     if (dotBatchDeferredRemaining <= 0) return;
     dotBatchDeferredRemaining -= 1;
     if (dotBatchDeferredRemaining <= 0) {
@@ -168,7 +168,7 @@ export function createDotExecutor(deps: {
   }
 
   // ========== 虚拟分区：对外读 batch ==========
-  function getDotTickBatchTargetHids(this: void): Record<number, boolean> | null {
+  function getDotTickBatchTargetHids(): Record<number, boolean> | null {
     return dotTickBatchTargetHids;
   }
 

@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 import { splitItemBuffSegments } from "./02．DOT解析";
 
 // ========== 虚拟分区：工厂 ==========
@@ -6,18 +5,17 @@ export function createDotBaseUtils(deps: {
   jass: any;
   g: any;
   itemsData: Record<string, { Buff?: string }>;
-  fourCCToString: (this: void, four: number) => string;
+  fourCCToString: (four: number) => string;
 }): {
-  isDebuffDotTargetOk: (this: void, source: any, target: any) => boolean;
-  isSourceHeroPlayer1to4: (this: void, unit: any) => boolean;
+  isDebuffDotTargetOk: (source: any, target: any) => boolean;
+  isSourceHeroPlayer1to4: (unit: any) => boolean;
   getBestDotFromUnit: <T extends { duration: number; attackOnly: boolean }>(
-    this: void,
     unit: any,
-    parseBuff: (this: void, s: string) => T | null,
-    getProduct: (this: void, parsed: T) => number
+    parseBuff: (s: string) => T | null,
+    getProduct: (parsed: T) => number
   ) => T | null;
-  getUnitMaxHp: (this: void, targetUnit: any) => number;
-  getTargetRegenHP: (this: void, targetUnit: any) => number;
+  getUnitMaxHp: (targetUnit: any) => number;
+  getTargetRegenHP: (targetUnit: any) => number;
 } {
   // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
   const jass = deps.jass;

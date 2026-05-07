@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 import { getDotBuffRow, type DotTypeConfig } from "./01．DOT配置";
 import { parseStandardDotBuff, readNumberFromString } from "./02．DOT解析";
 
@@ -13,16 +12,15 @@ type TrollCurseParsed = { pctMaxHpPerSec: number; duration: number; attackOnly: 
 
 // ========== 虚拟分区：内置 DOT 统一注册入口 ==========
 export function registerBuiltInDotTypes(deps: {
-  registerDotType: (this: void, cfg: DotTypeConfig) => void;
+  registerDotType: (cfg: DotTypeConfig) => void;
   getBestDotFromUnit: <T extends { duration: number; attackOnly: boolean }>(
-    this: void,
     unit: any,
-    parseBuff: (this: void, s: string) => T | null,
-    getProduct: (this: void, parsed: T) => number
+    parseBuff: (s: string) => T | null,
+    getProduct: (parsed: T) => number
   ) => T | null;
-  getTargetRegenHP: (this: void, target: any) => number;
-  getUnitMaxHp: (this: void, target: any) => number;
-  dotEffectModelFromBuffRow: (this: void, rowId: "D001" | "D002" | "D003" | "D004") => string;
+  getTargetRegenHP: (target: any) => number;
+  getUnitMaxHp: (target: any) => number;
+  dotEffectModelFromBuffRow: (rowId: "D001" | "D002" | "D003" | "D004") => string;
 }): void {
   // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
   const registerDotType = deps.registerDotType;

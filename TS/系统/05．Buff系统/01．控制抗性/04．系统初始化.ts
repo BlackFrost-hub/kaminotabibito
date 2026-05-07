@@ -23,7 +23,7 @@ const { recastControlAbility } = require("系统.05．Buff系统.01．控制抗�
   recastControlAbility: (caster: any, target: any, abilityId: number, duration: number) => void;
 };
 const { registerSpellChannelListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellChannelListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellChannelListener: (callback: (castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
 const ALLOWED_PLAYERS: number[] = [0, 1, 2, 3, 6, 7, jass.PLAYER_NEUTRAL_AGGRESSIVE];

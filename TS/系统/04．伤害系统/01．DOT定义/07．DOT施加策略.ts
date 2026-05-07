@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { clearIgnoredTarget, deleteDotState, getDotState, isIgnoredTarget, isValidDotStateRow, setDotState } from "./04．DOT工具";
 
@@ -16,16 +15,16 @@ interface DotTickEntry {
 export function createDotApplyStrategy(deps: {
   dotTypes: DotTypeConfig[];
   dotTicks: DotTickEntry[];
-  unitHid: (this: void, u: any) => number;
-  isSourceHeroPlayer1to4: (this: void, unit: any) => boolean;
-  isDebuffDotTargetOk: (this: void, source: any, target: any) => boolean;
-  getDotSourceDisplayName: (this: void, u: any) => string;
-  notifyBuffPool: (this: void, typeId: string, target: any, state: DotState | null) => void;
-  ensureDotTimers: (this: void) => void;
-  getDotTickBatchTargetHids: (this: void) => Record<number, boolean> | null;
+  unitHid: (u: any) => number;
+  isSourceHeroPlayer1to4: (unit: any) => boolean;
+  isDebuffDotTargetOk: (source: any, target: any) => boolean;
+  getDotSourceDisplayName: (u: any) => string;
+  notifyBuffPool: (typeId: string, target: any, state: DotState | null) => void;
+  ensureDotTimers: () => void;
+  getDotTickBatchTargetHids: () => Record<number, boolean> | null;
 }): {
-  tryApplyHeroAttackGearDots: (this: void, source: any, target: any, damage: number) => void;
-  onDamage: (this: void, target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttackHit?: boolean) => void;
+  tryApplyHeroAttackGearDots: (source: any, target: any, damage: number) => void;
+  onDamage: (target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttackHit?: boolean) => void;
 } {
   // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
   const dotTypes = deps.dotTypes;
@@ -169,7 +168,7 @@ export function createDotApplyStrategy(deps: {
   }
 
   // ========== 虚拟分区：普攻装备入口 ==========
-  function tryApplyHeroAttackGearDots(this: void, source: any, target: any, _damage: number): void {
+  function tryApplyHeroAttackGearDots(source: any, target: any, _damage: number): void {
     if (!target || !source) return;
     const isHeroSource = isSourceHeroPlayer1to4(source);
     if (!isHeroSource) return;
@@ -191,7 +190,6 @@ export function createDotApplyStrategy(deps: {
 
   // ========== 虚拟分区：伤害回调入口 ==========
   function onDamage(
-    this: void,
     target: any,
     damage: number,
     _damageType: number,

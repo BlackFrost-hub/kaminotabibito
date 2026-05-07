@@ -1,4 +1,3 @@
-/** @noSelfInFile */
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
 import {
@@ -27,18 +26,18 @@ function dotTypeIdFromBuffId(buffID: string): string | null {
 // ========== 虚拟分区：创建同步器 ==========
 export function createDotStateSync(deps: {
   dotTypes: DotTypeConfig[];
-  removeDotTicksForTargetHid: (this: void, typeId: string, tgtHid: number) => void;
-  notifyBuffPool: (this: void, typeId: string, target: any, state: DotState | null) => void;
+  removeDotTicksForTargetHid: (typeId: string, tgtHid: number) => void;
+  notifyBuffPool: (typeId: string, target: any, state: DotState | null) => void;
 }): {
-  syncDotRemainingFromBuffPool: (this: void) => void;
-  clearDotByBuffPoolExpire: (this: void, buffID: string, hid: number) => void;
+  syncDotRemainingFromBuffPool: () => void;
+  clearDotByBuffPoolExpire: (buffID: string, hid: number) => void;
 } {
   // 提取 deps 方法到局部变量，避免 TSTL 生成冒号调用
   const dotTypes = deps.dotTypes;
   const notifyBuffPool = deps.notifyBuffPool;
   const removeDotTicksForTargetHid = deps.removeDotTicksForTargetHid;
 
-  function syncDotRemainingFromBuffPool(this: void): void {
+  function syncDotRemainingFromBuffPool(): void {
     // 使用 collectActiveDotPairs 获取排序后的活跃 DOT 对
     const pairs = collectActiveDotPairs();
     for (let pi = 0; pi < pairs.length; pi++) {
@@ -77,7 +76,7 @@ export function createDotStateSync(deps: {
     }
   }
 
-  function clearDotByBuffPoolExpire(this: void, buffID: string, hid: number): void {
+  function clearDotByBuffPoolExpire(buffID: string, hid: number): void {
     const typeId = dotTypeIdFromBuffId(buffID);
     if (typeId == null || hid === 0) return;
     const state = getDotState(typeId, hid);
