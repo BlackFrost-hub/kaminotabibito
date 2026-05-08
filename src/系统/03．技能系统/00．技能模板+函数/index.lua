@@ -33,7 +33,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.区域效果测试")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.96．无敌帧测试")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -58,6 +58,14 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.00．技能模板+函数.99．冲锋击退测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.充能测试")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

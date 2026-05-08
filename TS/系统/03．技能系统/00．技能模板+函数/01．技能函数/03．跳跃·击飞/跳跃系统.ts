@@ -67,6 +67,7 @@ export type 跳跃结束原因 = "完成" | "中断" | "死亡" | "阻挡" | "�
 
 type 跳跃结束回调 = (单位: any, 原因: 跳跃结束原因, 跳跃ID: number) => void;
 type 跳跃落点过滤 = (x: number, y: number, 单位: any, 跳跃ID: number) => boolean;
+type 跳跃开始回调 = (单位: any, 跳跃ID: number) => void;
 
 export interface 通用跳跃参数 {
   距离: number;
@@ -78,6 +79,7 @@ export interface 通用跳跃参数 {
   跳跃特效?: string;
   落点过滤?: 跳跃落点过滤;
   结束回调?: 跳跃结束回调;
+  开始回调?: 跳跃开始回调;
 }
 
 export interface 跳跃参数 extends 通用跳跃参数 {
@@ -103,6 +105,7 @@ interface 跳跃实例 {
   跳跃特效: string;
   落点过滤?: 跳跃落点过滤;
   结束回调?: 跳跃结束回调;
+  开始回调?: 跳跃开始回调;
 }
 
 const 活动跳跃列表: 跳跃实例[] = [];
@@ -420,12 +423,18 @@ function 创建跳跃实例(单位: any, 角度: number, 参数: 通用跳跃参
     跳跃特效: 参数.跳跃特效 ?? DEFAULT_JUMP_EFFECT_MODEL,
     落点过滤: 参数.落点过滤,
     结束回调: 参数.结束回调,
+    开始回调: 参数.开始回调,
   };
 
   跳跃映射[跳跃ID] = 实例;
   单位当前跳跃[单位ID] = 跳跃ID;
   活动跳跃列表.push(实例);
   注册到中心计时器();
+
+  if (typeof 参数.开始回调 === "function") {
+    参数.开始回调(单位, 跳跃ID);
+  }
+
   return 跳跃ID;
 }
 

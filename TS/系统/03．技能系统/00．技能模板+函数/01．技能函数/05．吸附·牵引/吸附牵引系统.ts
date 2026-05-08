@@ -24,7 +24,9 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 const GetHandleId = jass["GetHandleId"] as (h: any) => number;
 const GetUnitX = jass["GetUnitX"] as (u: any) => number;
 const GetUnitY = jass["GetUnitY"] as (u: any) => number;
+const GetUnitTypeId = jass["GetUnitTypeId"] as (u: any) => number;
 const GetUnitState = jass["GetUnitState"] as (u: any, state: any) => number;
+const IsUnitType = jass["IsUnitType"] as (u: any, unitType: any) => boolean;
 const GetRectMinX = jass["GetRectMinX"] as (r: any) => number;
 const GetRectMinY = jass["GetRectMinY"] as (r: any) => number;
 const GetRectMaxX = jass["GetRectMaxX"] as (r: any) => number;
@@ -95,6 +97,7 @@ export type 牵引结束原因 = "完成" | "中断" | "死亡" | "阻挡" | "�
 type 牵引结束回调 = (单位: any, 原因: 牵引结束原因, 牵引ID: number) => void;
 type 牵引目标筛选器 = (单位: any) => boolean;
 type 牵引到达回调 = (单位: any, 牵引ID: number) => void;
+type 牵引开始回调 = (单位: any, 牵引ID: number) => void;
 
 export interface 牵引参数 {
   中心单位?: any;
@@ -119,6 +122,7 @@ export interface 牵引参数 {
   闪电高度?: number;
   启用闪电效果?: boolean;
   结束回调?: 牵引结束回调;
+  开始回调?: 牵引开始回调;
 }
 
 interface 牵引实例 {
@@ -149,6 +153,7 @@ interface 牵引实例 {
   启用闪电效果: boolean;
   闪电句柄?: any;
   结束回调?: 牵引结束回调;
+  开始回调?: 牵引开始回调;
 }
 
 const 活动牵引列表: 牵引实例[] = [];
@@ -164,7 +169,10 @@ function 取句柄ID(h: any): number {
 }
 
 function 单位存活(u: any): boolean {
-  return u != null && u !== 0 && GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE;
+  if (u == null || u === 0) return false;
+  if (GetUnitTypeId(u) === 0) return false;
+  if (IsUnitType(u, jass.UNIT_TYPE_DEAD) === true) return false;
+  return GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE;
 }
 
 function 在可玩区域内(x: number, y: number): boolean {
@@ -433,6 +441,7 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
   if (!单位存活(单位)) return null;
   if (typeof 参数.目标筛选 === "function" && 参数.目标筛选(单位) !== true) return null;
 
+  const 主单位 = 参数.主单位 ?? 参数.中心单位;
   const 中心坐标 = 解析中心坐标(参数);
   if (!中心坐标) return null;
 
@@ -449,7 +458,7 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
     listIndex: 活动牵引列表.length,
     单位,
     单位ID,
-    主单位: 参数.主单位,
+    主单位,
     主单位死亡时中断: 参数.主单位死亡时中断 !== false,
     中心单位: 参数.中心单位,
     中心X: 中心坐标.x,
@@ -471,6 +480,7 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
     闪电高度: 参数.闪电高度 != null ? 参数.闪电高度 : 60,
     启用闪电效果: 参数.启用闪电效果 !== false,
     结束回调: 参数.结束回调,
+    开始回调: 参数.开始回调,
   };
 
   if (实例.禁用碰撞) {
@@ -485,6 +495,11 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
   单位当前牵引[单位ID] = 实例.id;
   更新闪电(实例);
   注册到中心计时器();
+
+  if (typeof 参数.开始回调 === "function") {
+    参数.开始回调(单位, 实例.id);
+  }
+
   return 实例;
 }
 

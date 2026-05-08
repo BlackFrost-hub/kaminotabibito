@@ -559,6 +559,9 @@ local function _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
         _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001(_____5355_4F4D, true)
     end
     _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
+    if type(_____53C2_6570["开始回调"]) == "function" then
+        _____53C2_6570["开始回调"](_____5355_4F4D, _____4F4D_79FBID)
+    end
     return _____4F4D_79FBID
 end
 local function _____89E3_6790_51B2_950B_89D2_5EA6(_____5355_4F4D, _____53C2_6570)

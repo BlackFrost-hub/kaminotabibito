@@ -1,9 +1,18 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____8BA1_7B97_671D_5411_89D2_5EA6, _____5C1D_8BD5_89E6_53D1_5230_8FBE_56DE_8C03, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____9500_6BC1_95EA_7535, _____66F4_65B0_95EA_7535, _____5185_90E8_79FB_9664_7275_5F15, _____7ED3_675F_7275_5F15_5B9E_4F8B, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_7275_5F15_5B9E_4F8B, ____on_5438_9644_7275_5F15_7CFB_7EDFTick, jass, jglobals, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, GetUnitX, GetUnitY, GetUnitState, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY, SetUnitX, SetUnitY, SetUnitFacing, PauseUnit, IsUnitPaused, SetUnitPathing, SquareRoot, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, AddLightning, MoveLightning, MoveLightningEx, DestroyLightning, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, _____6D3B_52A8_7275_5F15_5217_8868, _____7275_5F15_6620_5C04, _____5355_4F4D_5F53_524D_7275_5F15, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
+local _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____8BA1_7B97_671D_5411_89D2_5EA6, _____5C1D_8BD5_89E6_53D1_5230_8FBE_56DE_8C03, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____9500_6BC1_95EA_7535, _____66F4_65B0_95EA_7535, _____5185_90E8_79FB_9664_7275_5F15, _____7ED3_675F_7275_5F15_5B9E_4F8B, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_7275_5F15_5B9E_4F8B, ____on_5438_9644_7275_5F15_7CFB_7EDFTick, jass, jglobals, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, GetUnitX, GetUnitY, GetUnitTypeId, GetUnitState, IsUnitType, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY, SetUnitX, SetUnitY, SetUnitFacing, PauseUnit, IsUnitPaused, SetUnitPathing, SquareRoot, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, AddLightning, MoveLightning, MoveLightningEx, DestroyLightning, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, _____6D3B_52A8_7275_5F15_5217_8868, _____7275_5F15_6620_5C04, _____5355_4F4D_5F53_524D_7275_5F15, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
 function _____5355_4F4D_5B58_6D3B(u)
-    return u ~= nil and u ~= 0 and GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
+    if u == nil or u == 0 then
+        return false
+    end
+    if GetUnitTypeId(u) == 0 then
+        return false
+    end
+    if IsUnitType(u, jass.UNIT_TYPE_DEAD) == true then
+        return false
+    end
+    return GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
 end
 function _____5728_53EF_73A9_533A_57DF_5185(x, y)
     return x >= GetRectMinX(jglobals.bj_mapInitialPlayableArea) and y >= GetRectMinY(jglobals.bj_mapInitialPlayableArea) and x <= GetRectMaxX(jglobals.bj_mapInitialPlayableArea) and y <= GetRectMaxY(jglobals.bj_mapInitialPlayableArea)
@@ -233,7 +242,9 @@ offTick10ms = ____require_result_1.offTick10ms
 local GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
+GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
+IsUnitType = jass.IsUnitType
 GetRectMinX = jass.GetRectMinX
 GetRectMinY = jass.GetRectMinY
 GetRectMaxX = jass.GetRectMaxX
@@ -378,6 +389,11 @@ local function _____521B_5EFA_7275_5F15_5B9E_4F8B(_____5355_4F4D, _____53C2_6570
     if type(_____53C2_6570["目标筛选"]) == "function" and _____53C2_6570["目标筛选"](_____5355_4F4D) ~= true then
         return nil
     end
+    local ____53C2_6570__4E3B_5355_4F4D_4 = _____53C2_6570["主单位"]
+    if ____53C2_6570__4E3B_5355_4F4D_4 == nil then
+        ____53C2_6570__4E3B_5355_4F4D_4 = _____53C2_6570["中心单位"]
+    end
+    local _____4E3B_5355_4F4D = ____53C2_6570__4E3B_5355_4F4D_4
     local _____4E2D_5FC3_5750_6807 = _____89E3_6790_4E2D_5FC3_5750_6807(_____53C2_6570)
     if not _____4E2D_5FC3_5750_6807 then
         return nil
@@ -396,7 +412,7 @@ local function _____521B_5EFA_7275_5F15_5B9E_4F8B(_____5355_4F4D, _____53C2_6570
         listIndex = #_____6D3B_52A8_7275_5F15_5217_8868,
         ["单位"] = _____5355_4F4D,
         ["单位ID"] = _____5355_4F4DID,
-        ["主单位"] = _____53C2_6570["主单位"],
+        ["主单位"] = _____4E3B_5355_4F4D,
         ["主单位死亡时中断"] = _____53C2_6570["主单位死亡时中断"] ~= false,
         ["中心单位"] = _____53C2_6570["中心单位"],
         ["中心X"] = _____4E2D_5FC3_5750_6807.x,
@@ -417,7 +433,8 @@ local function _____521B_5EFA_7275_5F15_5B9E_4F8B(_____5355_4F4D, _____53C2_6570
         ["闪电效果代码"] = _____53C2_6570["闪电效果代码"] and _____53C2_6570["闪电效果代码"] ~= "" and _____53C2_6570["闪电效果代码"] or DEFAULT_LIGHTNING_CODE,
         ["闪电高度"] = _____53C2_6570["闪电高度"] ~= nil and _____53C2_6570["闪电高度"] or 60,
         ["启用闪电效果"] = _____53C2_6570["启用闪电效果"] ~= false,
-        ["结束回调"] = _____53C2_6570["结束回调"]
+        ["结束回调"] = _____53C2_6570["结束回调"],
+        ["开始回调"] = _____53C2_6570["开始回调"]
     }
     if _____5B9E_4F8B["禁用碰撞"] then
         SetUnitPathing(_____5355_4F4D, false)
@@ -430,6 +447,9 @@ local function _____521B_5EFA_7275_5F15_5B9E_4F8B(_____5355_4F4D, _____53C2_6570
     _____5355_4F4D_5F53_524D_7275_5F15[_____5355_4F4DID] = _____5B9E_4F8B.id
     _____66F4_65B0_95EA_7535(_____5B9E_4F8B)
     _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
+    if type(_____53C2_6570["开始回调"]) == "function" then
+        _____53C2_6570["开始回调"](_____5355_4F4D, _____5B9E_4F8B.id)
+    end
     return _____5B9E_4F8B
 end
 ____exports["开始牵引"] = function(_____5355_4F4D, _____53C2_6570)

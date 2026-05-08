@@ -7,3 +7,4 @@ export * from "./02．冲锋·击退/index";
 export * from "./03．跳跃·击飞/index";
 export * from "./04．区域效果/index";
 export * from "./05．吸附·牵引/index";
+export * from "./06．充能/index";

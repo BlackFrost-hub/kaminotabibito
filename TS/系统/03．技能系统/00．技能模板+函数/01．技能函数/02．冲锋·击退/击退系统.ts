@@ -59,6 +59,7 @@ type 命中过滤函数 = (移动单位: any, 目标单位: any, 位移ID: numbe
 type 命中回调函数 = (移动单位: any, 目标单位: any, 位移ID: number) => void;
 type 撞墙回调函数 = (this: void, 移动单位: any, 位移ID: number) => void;
 type 结束回调函数 = (移动单位: any, 原因: 位移结束原因, 位移ID: number, 命中目标?: any) => void;
+type 开始回调函数 = (单位: any, ID: number) => void;
 
 export interface 通用位移参数 {
   距离: number;
@@ -88,6 +89,7 @@ export interface 通用位移参数 {
   命中回调?: 命中回调函数;
   撞墙回调?: 撞墙回调函数;
   结束回调?: 结束回调函数;
+  开始回调?: 开始回调函数;
 }
 
 export interface 冲锋参数 extends 通用位移参数 {
@@ -133,6 +135,7 @@ interface 位移实例 {
   命中回调?: 命中回调函数;
   撞墙回调?: 撞墙回调函数;
   结束回调?: 结束回调函数;
+  开始回调?: 开始回调函数;
 }
 
 const 活动位移列表: 位移实例[] = [];
@@ -587,6 +590,11 @@ function 创建位移实例(单位: any, 角度: number, 参数: 通用位移参
     设置单位暂停状态(单位, true);
   }
   注册到中心计时器();
+
+  if (typeof 参数.开始回调 === "function") {
+    参数.开始回调(单位, 位移ID);
+  }
+
   return 位移ID;
 }
 
