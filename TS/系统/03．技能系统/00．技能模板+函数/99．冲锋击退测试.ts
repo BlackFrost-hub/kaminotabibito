@@ -14,7 +14,7 @@ const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用
   createDelayedCall: (this: void, delaySec: number, callback: () => { id: number } | unknown) => unknown;
 };
 
-import { 开始击退 } from "./01．技能函数/02．冲锋/index";
+import { 开始击退 } from "./01．技能函数/02．冲锋·击退/index";
 
 let 当前测试单位: any | undefined;
 

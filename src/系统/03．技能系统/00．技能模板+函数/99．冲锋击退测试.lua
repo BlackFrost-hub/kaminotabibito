@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋.index")
+local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.index")
 local _____5F00_59CB_51FB_9000 = ____index["开始击退"]
 --- 冲锋/击退系统测试
 -- 

@@ -8,4 +8,5 @@ export * from "./02．单位与范围";
 export * from "./03．移动速度";
 export * from "./04．调试输出";
 export * from "./05．召唤物";
+export * from "./06．闪烁";
 export * from "./07．单位组工具";

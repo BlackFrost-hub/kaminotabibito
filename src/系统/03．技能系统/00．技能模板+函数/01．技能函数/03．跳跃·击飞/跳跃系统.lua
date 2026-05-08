@@ -188,6 +188,10 @@ function ____on_8DF3_8DC3_7CFB_7EDFTick()
                 _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, "死亡")
                 goto __continue53
             end
+            if _____5B9E_4F8B["主单位死亡时中断"] and _____5B9E_4F8B["主单位"] ~= nil and _____5B9E_4F8B["主单位"] ~= 0 and not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["主单位"]) then
+                _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, "主单位死亡")
+                goto __continue53
+            end
             if IsUnitPaused(_____5B9E_4F8B["单位"]) == true then
                 i = i + 1
                 goto __continue53
@@ -338,6 +342,8 @@ local function _____521B_5EFA_8DF3_8DC3_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
         listIndex = #_____6D3B_52A8_8DF3_8DC3_5217_8868,
         ["单位"] = _____5355_4F4D,
         ["单位ID"] = _____5355_4F4DID,
+        ["主单位"] = _____53C2_6570["主单位"],
+        ["主单位死亡时中断"] = _____53C2_6570["主单位死亡时中断"] ~= false,
         ["角度"] = _____89D2_5EA6,
         ["总距离"] = _____53C2_6570["距离"],
         ["已移动"] = 0,

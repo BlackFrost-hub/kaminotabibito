@@ -53,7 +53,7 @@ const DEFAULT_ATTACK_TYPE = jass.ATTACK_TYPE_NORMAL;
 const DEFAULT_DAMAGE_TYPE = jass.DAMAGE_TYPE_NORMAL;
 const DEFAULT_WEAPON_TYPE = jass.WEAPON_TYPE_WHOKNOWS;
 
-export type 位移结束原因 = "完成" | "撞墙" | "命中" | "中断" | "死亡";
+export type 位移结束原因 = "完成" | "撞墙" | "命中" | "中断" | "死亡" | "主单位死亡";
 
 type 命中过滤函数 = (移动单位: any, 目标单位: any, 位移ID: number) => boolean;
 type 命中回调函数 = (移动单位: any, 目标单位: any, 位移ID: number) => void;
@@ -62,6 +62,8 @@ type 结束回调函数 = (移动单位: any, 原因: 位移结束原因, 位移
 
 export interface 通用位移参数 {
   距离: number;
+  主单位?: any;
+  主单位死亡时中断?: boolean;
   持续时间?: number;
   每秒速度?: number;
   检查地形?: boolean;
@@ -106,6 +108,8 @@ interface 位移实例 {
   listIndex: number;
   单位: any;
   单位ID: number;
+  主单位?: any;
+  主单位死亡时中断: boolean;
   角度: number;
   每Tick位移: number;
   总距离: number;
@@ -135,7 +139,7 @@ const 活动位移列表: 位移实例[] = [];
 const 位移映射: Record<number, 位移实例 | undefined> = {};
 const 单位当前位移: Record<number, number | undefined> = {};
 const 命中记录: Record<string, true | undefined> = {};
-const 枚举组 = jass.CreateGroup();
+let 枚举组: any = null;
 let 单位组快照缓存: any[] = [];
 
 let 下一个位移ID = 0;
@@ -339,23 +343,39 @@ function 记录命中(实例: 位移实例, 目标单位: any): void {
   命中记录[生成命中键(实例.id, 目标单位)] = true;
 }
 
+function 获取枚举组(): any {
+  if (枚举组 == null || 枚举组 === 0) {
+    枚举组 = jass.CreateGroup();
+  }
+  return 枚举组;
+}
+
 function 清空枚举组(): void {
+  const g = 获取枚举组();
   while (true) {
-    const u = jass.FirstOfGroup(枚举组);
+    const u = jass.FirstOfGroup(g);
     if (u == null || u === 0) break;
-    jass.GroupRemoveUnit(枚举组, u);
+    jass.GroupRemoveUnit(g, u);
+  }
+}
+
+function 销毁枚举组(): void {
+  if (枚举组 != null && 枚举组 !== 0) {
+    jass.DestroyGroup(枚举组);
+    枚举组 = null;
   }
 }
 
 function 检查命中(实例: 位移实例): any {
   if (实例.命中半径 <= 0) return null;
 
-  jass.GroupEnumUnitsInRange(枚举组, jass.GetUnitX(实例.单位), jass.GetUnitY(实例.单位), 实例.命中半径, null);
+  const 枚举用组 = 获取枚举组();
+  jass.GroupEnumUnitsInRange(枚举用组, jass.GetUnitX(实例.单位), jass.GetUnitY(实例.单位), 实例.命中半径, null);
 
   while (true) {
-    const 目标单位 = jass.FirstOfGroup(枚举组);
+    const 目标单位 = jass.FirstOfGroup(枚举用组);
     if (目标单位 == null || 目标单位 === 0) break;
-    jass.GroupRemoveUnit(枚举组, 目标单位);
+    jass.GroupRemoveUnit(枚举用组, 目标单位);
 
     if (!可命中目标(实例, 目标单位)) continue;
 
@@ -492,6 +512,11 @@ function on冲锋击退系统Tick(): void {
       continue;
     }
 
+    if (实例.主单位死亡时中断 && 实例.主单位 != null && 实例.主单位 !== 0 && !单位存活(实例.主单位)) {
+      结束位移实例(实例, "主单位死亡");
+      continue;
+    }
+
     if (!实例.暂停单位 && 单位已被暂停(实例.单位)) {
       结束位移实例(实例, "中断");
       continue;
@@ -525,6 +550,8 @@ function 创建位移实例(单位: any, 角度: number, 参数: 通用位移参
     listIndex: 活动位移列表.length,
     单位,
     单位ID,
+    主单位: 参数.主单位,
+    主单位死亡时中断: 参数.主单位死亡时中断 !== false,
     角度,
     每Tick位移,
     总距离: 参数.距离,
@@ -599,6 +626,9 @@ export function 开始冲锋(单位: any, 参数: 冲锋参数): number {
 export function 开始击退(单位: any, 参数: 击退参数): number {
   const 角度 = 解析击退角度(单位, 参数);
   if (角度 == null) return 0;
+  if (参数.主单位 == null && 参数.来源单位 != null && 参数.来源单位 !== 0) {
+    return 创建位移实例(单位, 角度, { ...参数, 主单位: 参数.来源单位 });
+  }
   return 创建位移实例(单位, 角度, 参数);
 }
 

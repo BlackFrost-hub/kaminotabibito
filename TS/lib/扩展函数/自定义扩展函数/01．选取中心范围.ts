@@ -53,7 +53,6 @@ export function getUnitsInRange(this: void, x: number, y: number, radius: number
     }
 
     jass.DestroyGroup(group);
-
     return units;
 }
 

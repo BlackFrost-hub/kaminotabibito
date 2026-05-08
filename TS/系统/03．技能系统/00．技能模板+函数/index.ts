@@ -7,5 +7,6 @@ export * from "./01．技能函数/index";
 export * from "./02．通用函数/index";
 export * from "./创建步兵测试";
 export * from "./区域效果测试";
+export * from "./97．吸附牵引测试";
 export * from "./98．跳跃测试";
 export * from "./99．冲锋击退测试";

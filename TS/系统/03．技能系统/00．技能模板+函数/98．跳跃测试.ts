@@ -18,7 +18,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index"
   debugLogForce: (module: string, ...args: any[]) => void;
 };
 
-import { 开始跳跃 } from "./01．技能函数/03．跳跃/index";
+import { 开始跳跃 } from "./01．技能函数/03．跳跃·击飞/index";
 
 const GetUnitFacing = jass["GetUnitFacing"] as (u: any) => number;
 const PauseUnit = jass["PauseUnit"] as (u: any, flag: boolean) => void;

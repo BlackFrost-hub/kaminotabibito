@@ -24,6 +24,14 @@ export {
   isValidUnit,
   isUnitEnemy,
   isValidEnemyUnit,
+  isValidEnemyUnitExcludeSelf,
+  isValidEnemyUnitExcludeInvincible,
+  isValidEnemyUnitExcludeAncient,
+  isValidEnemyUnitExcludeSelfAncientInvincible,
+  isInvincibleUnit,
+  isAncientUnit,
+  matchUnitFilter,
+  createUnitFilter,
   isNotUsingInventoryItem,
 } from "../../../../lib/扩展函数/自定义扩展函数/02．条件判断函数";
 
@@ -43,6 +51,14 @@ import {
   isValidUnit,
   isUnitEnemy,
   isValidEnemyUnit,
+  isValidEnemyUnitExcludeSelf,
+  isValidEnemyUnitExcludeInvincible,
+  isValidEnemyUnitExcludeAncient,
+  isValidEnemyUnitExcludeSelfAncientInvincible,
+  isInvincibleUnit,
+  isAncientUnit,
+  matchUnitFilter,
+  createUnitFilter,
   isNotUsingInventoryItem,
 } from "../../../../lib/扩展函数/自定义扩展函数/02．条件判断函数";
 
@@ -79,4 +95,12 @@ export const 单位是否有效且友军 = isValidAllyUnit;
 export const 单位是否有效友军且排除自身 = isValidAllyUnitExcludeSelf;
 export const 单位是否敌对 = isUnitEnemy;
 export const 单位是否有效且敌对 = isValidEnemyUnit;
+export const 单位是否有效敌对且排除自身 = isValidEnemyUnitExcludeSelf;
+export const 单位是否有效敌对且排除无敌 = isValidEnemyUnitExcludeInvincible;
+export const 单位是否有效敌对且排除古树 = isValidEnemyUnitExcludeAncient;
+export const 单位是否有效敌对且排除自身古树无敌 = isValidEnemyUnitExcludeSelfAncientInvincible;
+export const 单位是否无敌 = isInvincibleUnit;
+export const 单位是否古树 = isAncientUnit;
+export const 单位是否符合筛选配置 = matchUnitFilter;
+export const 创建单位筛选器 = createUnitFilter;
 export const 单位当前是否未在用物品 = isNotUsingInventoryItem;

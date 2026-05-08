@@ -1,8 +1,31 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- 判断两个单位是否是同一单位
+-- 
+-- @param unitA 单位A
+-- @param unitB 单位B
+-- @returns 如果是同一单位返回 true，否则返回 false
+function ____exports.isSameUnit(self, unitA, unitB)
+    if not unitA or not unitB then
+        return false
+    end
+    return unitA == unitB
+end
 --- 条件判断函数
 -- 单位类型判断和敌对关系判断
 local jass = require("jass.common")
+local function isInvincibleUnit(self, unit)
+    if not unit then
+        return false
+    end
+    return jass.IsUnitInvulnerable(unit)
+end
+local function isAncientUnit(self, unit)
+    if not unit then
+        return false
+    end
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
+end
 --- 判断单位是否不是机械单位、不是古树单位、非建筑、非死亡
 -- 
 -- @param unit 要判断的单位
@@ -48,16 +71,21 @@ end
 function ____exports.isValidEnemyUnit(self, targetUnit, sourceUnit)
     return ____exports.isValidUnit(nil, targetUnit) and ____exports.isUnitEnemy(nil, targetUnit, sourceUnit)
 end
---- 判断两个单位是否是同一单位
--- 
--- @param unitA 单位A
--- @param unitB 单位B
--- @returns 如果是同一单位返回 true，否则返回 false
-function ____exports.isSameUnit(self, unitA, unitB)
-    if not unitA or not unitB then
-        return false
-    end
-    return unitA == unitB
+--- 判断单位是否有效且是敌对单位，并且排除源单位自身
+function ____exports.isValidEnemyUnitExcludeSelf(self, targetUnit, sourceUnit)
+    return ____exports.isValidEnemyUnit(nil, targetUnit, sourceUnit) and not ____exports.isSameUnit(nil, targetUnit, sourceUnit)
+end
+--- 判断单位是否有效且是敌对单位，并且排除无敌单位
+function ____exports.isValidEnemyUnitExcludeInvincible(self, targetUnit, sourceUnit)
+    return ____exports.isValidEnemyUnit(nil, targetUnit, sourceUnit) and not isInvincibleUnit(nil, targetUnit)
+end
+--- 判断单位是否有效且是敌对单位，并且排除古树单位
+function ____exports.isValidEnemyUnitExcludeAncient(self, targetUnit, sourceUnit)
+    return ____exports.isValidEnemyUnit(nil, targetUnit, sourceUnit) and not isAncientUnit(nil, targetUnit)
+end
+--- 判断单位是否有效且是敌对单位，并且排除自身、无敌和古树单位
+function ____exports.isValidEnemyUnitExcludeSelfAncientInvincible(self, targetUnit, sourceUnit)
+    return ____exports.isValidEnemyUnit(nil, targetUnit, sourceUnit) and not ____exports.isSameUnit(nil, targetUnit, sourceUnit) and not isInvincibleUnit(nil, targetUnit) and not isAncientUnit(nil, targetUnit)
 end
 --- 判断目标单位是否是源单位的友军单位
 -- 
@@ -91,6 +119,8 @@ end
 function ____exports.isValidAllyUnitExcludeSelf(self, targetUnit, sourceUnit)
     return ____exports.isValidAllyUnit(nil, targetUnit, sourceUnit) and not ____exports.isSameUnit(nil, targetUnit, sourceUnit)
 end
+____exports.isInvincibleUnit = isInvincibleUnit
+____exports.isAncientUnit = isAncientUnit
 --- 判断单位当前命令是否不是使用物品栏第1-6格
 -- 使用物品栏的命令ID范围：852008-852013
 -- 
@@ -104,5 +134,49 @@ function ____exports.isNotUsingInventoryItem(self, unit)
     local ITEM_USE_MIN = 852008
     local ITEM_USE_MAX = 852013
     return orderId < ITEM_USE_MIN or orderId > ITEM_USE_MAX
+end
+function ____exports.matchUnitFilter(self, targetUnit, sourceUnit, options)
+    if not targetUnit then
+        return false
+    end
+    if options["排除自身"] and sourceUnit and ____exports.isSameUnit(nil, targetUnit, sourceUnit) then
+        return false
+    end
+    if options["要求有效单位"] ~= false then
+        if jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
+            return false
+        end
+        if not options["允许建筑"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_STRUCTURE) then
+            return false
+        end
+        if not options["允许机械"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_MECHANICAL) then
+            return false
+        end
+        if not options["允许古树"] and isAncientUnit(nil, targetUnit) then
+            return false
+        end
+    elseif not options["允许死亡"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
+        return false
+    end
+    if not options["允许无敌"] and isInvincibleUnit(nil, targetUnit) then
+        return false
+    end
+    if options["仅敌人"] then
+        if not sourceUnit or not ____exports.isUnitEnemy(nil, targetUnit, sourceUnit) then
+            return false
+        end
+    end
+    if options["仅友军"] then
+        if not sourceUnit or not ____exports.isUnitAlly(nil, targetUnit, sourceUnit) then
+            return false
+        end
+    end
+    if type(options["自定义条件"]) == "function" and not options["自定义条件"](options, targetUnit, sourceUnit) then
+        return false
+    end
+    return true
+end
+function ____exports.createUnitFilter(self, options)
+    return function(____, targetUnit, sourceUnit) return ____exports.matchUnitFilter(nil, targetUnit, sourceUnit, options) end
 end
 return ____exports

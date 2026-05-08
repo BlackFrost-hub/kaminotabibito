@@ -63,13 +63,15 @@ const UNIT_ALIVE_LIFE = 0.405;
 const DEFAULT_JUMP_EFFECT_MODEL = "";
 const CROW_FORM_ABILITY_ID = 1097691750;
 
-export type 跳跃结束原因 = "完成" | "中断" | "死亡" | "阻挡";
+export type 跳跃结束原因 = "完成" | "中断" | "死亡" | "阻挡" | "主单位死亡";
 
 type 跳跃结束回调 = (单位: any, 原因: 跳跃结束原因, 跳跃ID: number) => void;
 type 跳跃落点过滤 = (x: number, y: number, 单位: any, 跳跃ID: number) => boolean;
 
 export interface 通用跳跃参数 {
   距离: number;
+  主单位?: any;
+  主单位死亡时中断?: boolean;
   持续时间: number;
   跳跃高度: number;
   朝向跟随跳跃?: boolean;
@@ -89,6 +91,8 @@ interface 跳跃实例 {
   listIndex: number;
   单位: any;
   单位ID: number;
+  主单位?: any;
+  主单位死亡时中断: boolean;
   角度: number;
   总距离: number;
   已移动: number;
@@ -351,6 +355,11 @@ function on跳跃系统Tick(): void {
       continue;
     }
 
+    if (实例.主单位死亡时中断 && 实例.主单位 != null && 实例.主单位 !== 0 && !单位存活(实例.主单位)) {
+      结束跳跃实例(实例, "主单位死亡");
+      continue;
+    }
+
     if (IsUnitPaused(实例.单位) === true) {
       i += 1;
       continue;
@@ -399,6 +408,8 @@ function 创建跳跃实例(单位: any, 角度: number, 参数: 通用跳跃参
     listIndex: 活动跳跃列表.length,
     单位,
     单位ID,
+    主单位: 参数.主单位,
+    主单位死亡时中断: 参数.主单位死亡时中断 !== false,
     角度,
     总距离: 参数.距离,
     已移动: 0,

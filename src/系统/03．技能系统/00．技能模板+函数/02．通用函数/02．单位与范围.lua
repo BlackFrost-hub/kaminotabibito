@@ -12,6 +12,14 @@ local ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570 = require("lib.扩展函数.自�
 local isValidUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidUnit
 local isUnitEnemy = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isUnitEnemy
 local isValidEnemyUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnit
+local isValidEnemyUnitExcludeSelf = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeSelf
+local isValidEnemyUnitExcludeInvincible = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeInvincible
+local isValidEnemyUnitExcludeAncient = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeAncient
+local isValidEnemyUnitExcludeSelfAncientInvincible = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeSelfAncientInvincible
+local isInvincibleUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isInvincibleUnit
+local isAncientUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isAncientUnit
+local matchUnitFilter = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.matchUnitFilter
+local createUnitFilter = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.createUnitFilter
 local isNotUsingInventoryItem = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isNotUsingInventoryItem
 --- 通用函数 - 单位与范围便捷入口
 -- 
@@ -36,6 +44,14 @@ do
     ____exports.isValidUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidUnit
     ____exports.isUnitEnemy = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isUnitEnemy
     ____exports.isValidEnemyUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnit
+    ____exports.isValidEnemyUnitExcludeSelf = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeSelf
+    ____exports.isValidEnemyUnitExcludeInvincible = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeInvincible
+    ____exports.isValidEnemyUnitExcludeAncient = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeAncient
+    ____exports.isValidEnemyUnitExcludeSelfAncientInvincible = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidEnemyUnitExcludeSelfAncientInvincible
+    ____exports.isInvincibleUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isInvincibleUnit
+    ____exports.isAncientUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isAncientUnit
+    ____exports.matchUnitFilter = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.matchUnitFilter
+    ____exports.createUnitFilter = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.createUnitFilter
     ____exports.isNotUsingInventoryItem = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isNotUsingInventoryItem
 end
 function ____exports.isSameUnit(self, a, b)
@@ -72,5 +88,13 @@ ____exports["单位是否有效且友军"] = ____exports.isValidAllyUnit
 ____exports["单位是否有效友军且排除自身"] = ____exports.isValidAllyUnitExcludeSelf
 ____exports["单位是否敌对"] = isUnitEnemy
 ____exports["单位是否有效且敌对"] = isValidEnemyUnit
+____exports["单位是否有效敌对且排除自身"] = isValidEnemyUnitExcludeSelf
+____exports["单位是否有效敌对且排除无敌"] = isValidEnemyUnitExcludeInvincible
+____exports["单位是否有效敌对且排除古树"] = isValidEnemyUnitExcludeAncient
+____exports["单位是否有效敌对且排除自身古树无敌"] = isValidEnemyUnitExcludeSelfAncientInvincible
+____exports["单位是否无敌"] = isInvincibleUnit
+____exports["单位是否古树"] = isAncientUnit
+____exports["单位是否符合筛选配置"] = matchUnitFilter
+____exports["创建单位筛选器"] = createUnitFilter
 ____exports["单位当前是否未在用物品"] = isNotUsingInventoryItem
 return ____exports

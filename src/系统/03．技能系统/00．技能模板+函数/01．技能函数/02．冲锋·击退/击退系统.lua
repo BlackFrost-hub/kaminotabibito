@@ -1,7 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____6E05_7406_547D_4E2D_8BB0_5F55, _____751F_6210_547D_4E2D_952E, _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001, _____5355_4F4D_5DF2_88AB_6682_505C, _____64AD_653E_4F4D_79FB_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_4F4D_79FB, _____7ED3_675F_4F4D_79FB_5B9E_4F8B, _____7ED3_675F_4F4D_79FBID, _____7ED3_7B97_547D_4E2D_4F24_5BB3, _____53EF_547D_4E2D_76EE_6807, _____8BB0_5F55_547D_4E2D, _____6E05_7A7A_679A_4E3E_7EC4, _____68C0_67E5_547D_4E2D, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_4E00_6B65, ____on_51B2_950B_51FB_9000_7CFB_7EDFTick, jass, jglobals, japi, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, BJ_DEGTORAD, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, DEFAULT_ATTACK_TYPE, DEFAULT_DAMAGE_TYPE, DEFAULT_WEAPON_TYPE, _____6D3B_52A8_4F4D_79FB_5217_8868, _____4F4D_79FB_6620_5C04, _____5355_4F4D_5F53_524D_4F4D_79FB, _____547D_4E2D_8BB0_5F55, _____679A_4E3E_7EC4, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
+local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____6E05_7406_547D_4E2D_8BB0_5F55, _____751F_6210_547D_4E2D_952E, _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001, _____5355_4F4D_5DF2_88AB_6682_505C, _____64AD_653E_4F4D_79FB_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_4F4D_79FB, _____7ED3_675F_4F4D_79FB_5B9E_4F8B, _____7ED3_675F_4F4D_79FBID, _____7ED3_7B97_547D_4E2D_4F24_5BB3, _____53EF_547D_4E2D_76EE_6807, _____8BB0_5F55_547D_4E2D, _____83B7_53D6_679A_4E3E_7EC4, _____6E05_7A7A_679A_4E3E_7EC4, _____68C0_67E5_547D_4E2D, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_4E00_6B65, ____on_51B2_950B_51FB_9000_7CFB_7EDFTick, jass, jglobals, japi, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, BJ_DEGTORAD, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, DEFAULT_ATTACK_TYPE, DEFAULT_DAMAGE_TYPE, DEFAULT_WEAPON_TYPE, _____6D3B_52A8_4F4D_79FB_5217_8868, _____4F4D_79FB_6620_5C04, _____5355_4F4D_5F53_524D_4F4D_79FB, _____547D_4E2D_8BB0_5F55, _____679A_4E3E_7EC4, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
 function _____53D6_53E5_67C4ID(h)
     return h ~= nil and h ~= 0 and jass.GetHandleId(h) or 0 or 0
 end
@@ -194,21 +195,29 @@ function _____8BB0_5F55_547D_4E2D(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
     end
     _____547D_4E2D_8BB0_5F55[_____751F_6210_547D_4E2D_952E(_____5B9E_4F8B.id, _____76EE_6807_5355_4F4D)] = true
 end
+function _____83B7_53D6_679A_4E3E_7EC4()
+    if _____679A_4E3E_7EC4 == nil or _____679A_4E3E_7EC4 == 0 then
+        _____679A_4E3E_7EC4 = jass.CreateGroup()
+    end
+    return _____679A_4E3E_7EC4
+end
 function _____6E05_7A7A_679A_4E3E_7EC4()
+    local g = _____83B7_53D6_679A_4E3E_7EC4()
     while true do
-        local u = jass.FirstOfGroup(_____679A_4E3E_7EC4)
+        local u = jass.FirstOfGroup(g)
         if u == nil or u == 0 then
             break
         end
-        jass.GroupRemoveUnit(_____679A_4E3E_7EC4, u)
+        jass.GroupRemoveUnit(g, u)
     end
 end
 function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
     if _____5B9E_4F8B["命中半径"] <= 0 then
         return nil
     end
+    local _____679A_4E3E_7528_7EC4 = _____83B7_53D6_679A_4E3E_7EC4()
     jass.GroupEnumUnitsInRange(
-        _____679A_4E3E_7EC4,
+        _____679A_4E3E_7528_7EC4,
         jass.GetUnitX(_____5B9E_4F8B["单位"]),
         jass.GetUnitY(_____5B9E_4F8B["单位"]),
         _____5B9E_4F8B["命中半径"],
@@ -216,13 +225,13 @@ function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
     )
     while true do
         do
-            local _____76EE_6807_5355_4F4D = jass.FirstOfGroup(_____679A_4E3E_7EC4)
+            local _____76EE_6807_5355_4F4D = jass.FirstOfGroup(_____679A_4E3E_7528_7EC4)
             if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____679A_4E3E_7EC4, _____76EE_6807_5355_4F4D)
+            jass.GroupRemoveUnit(_____679A_4E3E_7528_7EC4, _____76EE_6807_5355_4F4D)
             if not _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355_4F4D) then
-                goto __continue62
+                goto __continue66
             end
             _____8BB0_5F55_547D_4E2D(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
             _____7ED3_7B97_547D_4E2D_4F24_5BB3(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
@@ -239,7 +248,7 @@ function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
                 return _____76EE_6807_5355_4F4D
             end
         end
-        ::__continue62::
+        ::__continue66::
     end
     return nil
 end
@@ -337,24 +346,28 @@ function ____on_51B2_950B_51FB_9000_7CFB_7EDFTick()
             local _____5B9E_4F8B = _____6D3B_52A8_4F4D_79FB_5217_8868[i + 1]
             if _____4F4D_79FB_6620_5C04[_____5B9E_4F8B.id] ~= _____5B9E_4F8B then
                 i = i + 1
-                goto __continue91
+                goto __continue95
             end
             if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
                 _____7ED3_675F_4F4D_79FB_5B9E_4F8B(_____5B9E_4F8B, "死亡")
-                goto __continue91
+                goto __continue95
+            end
+            if _____5B9E_4F8B["主单位死亡时中断"] and _____5B9E_4F8B["主单位"] ~= nil and _____5B9E_4F8B["主单位"] ~= 0 and not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["主单位"]) then
+                _____7ED3_675F_4F4D_79FB_5B9E_4F8B(_____5B9E_4F8B, "主单位死亡")
+                goto __continue95
             end
             if not _____5B9E_4F8B["暂停单位"] and _____5355_4F4D_5DF2_88AB_6682_505C(_____5B9E_4F8B["单位"]) then
                 _____7ED3_675F_4F4D_79FB_5B9E_4F8B(_____5B9E_4F8B, "中断")
-                goto __continue91
+                goto __continue95
             end
             local _____7ED3_679C = _____63A8_8FDB_4E00_6B65(_____5B9E_4F8B)
             if _____7ED3_679C["停止"] then
                 _____7ED3_675F_4F4D_79FB_5B9E_4F8B(_____5B9E_4F8B, _____7ED3_679C["原因"] or "完成", _____7ED3_679C["命中目标"])
-                goto __continue91
+                goto __continue95
             end
             i = i + 1
         end
-        ::__continue91::
+        ::__continue95::
     end
 end
 ____exports["停止单位位移"] = function(_____5355_4F4D, _____539F_56E0)
@@ -409,7 +422,7 @@ _____6D3B_52A8_4F4D_79FB_5217_8868 = {}
 _____4F4D_79FB_6620_5C04 = {}
 _____5355_4F4D_5F53_524D_4F4D_79FB = {}
 _____547D_4E2D_8BB0_5F55 = {}
-_____679A_4E3E_7EC4 = jass.CreateGroup()
+_____679A_4E3E_7EC4 = nil
 local _____5355_4F4D_7EC4_5FEB_7167_7F13_5B58 = {}
 local _____4E0B_4E00_4E2A_4F4D_79FBID = 0
 _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668 = false
@@ -446,6 +459,12 @@ local function _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
     _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668 = true
     onTick10ms(____on_51B2_950B_51FB_9000_7CFB_7EDFTick)
 end
+local function _____9500_6BC1_679A_4E3E_7EC4()
+    if _____679A_4E3E_7EC4 ~= nil and _____679A_4E3E_7EC4 ~= 0 then
+        jass.DestroyGroup(_____679A_4E3E_7EC4)
+        _____679A_4E3E_7EC4 = nil
+    end
+end
 local function _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6, _____53C2_6570)
     if not _____5355_4F4D_5B58_6D3B(_____5355_4F4D) then
         return 0
@@ -467,20 +486,22 @@ local function _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
     local ____temp_15 = #_____6D3B_52A8_4F4D_79FB_5217_8868
     local ____5355_4F4D_16 = _____5355_4F4D
     local ____5355_4F4DID_17 = _____5355_4F4DID
-    local ____89D2_5EA6_18 = _____89D2_5EA6
-    local ____6BCFTick_4F4D_79FB_19 = _____6BCFTick_4F4D_79FB
-    local ____53C2_6570__8DDD_79BB_20 = _____53C2_6570["距离"]
-    local ____temp_21 = _____53C2_6570["检查地形"] ~= false
-    local ____temp_22 = _____53C2_6570["朝向跟随位移"] ~= false
-    local ____temp_23 = _____53C2_6570["暂停单位"] == true
-    local ____temp_24 = _____53C2_6570["禁用碰撞"] == true
-    local ____temp_25 = _____53C2_6570["位移特效"] or DEFAULT_MOVE_EFFECT_MODEL
-    local ____temp_26 = _____53C2_6570["命中半径"] or 0
-    local ____temp_27 = _____53C2_6570["只命中敌人"] == true
-    local ____temp_28 = _____53C2_6570["允许命中自己"] == true
-    local ____temp_29 = _____53C2_6570["允许重复命中"] == true
-    local ____temp_30 = _____53C2_6570["命中后结束"] == true
-    local ____temp_31 = _____53C2_6570["命中伤害"] or 0
+    local ____53C2_6570__4E3B_5355_4F4D_18 = _____53C2_6570["主单位"]
+    local ____temp_19 = _____53C2_6570["主单位死亡时中断"] ~= false
+    local ____89D2_5EA6_20 = _____89D2_5EA6
+    local ____6BCFTick_4F4D_79FB_21 = _____6BCFTick_4F4D_79FB
+    local ____53C2_6570__8DDD_79BB_22 = _____53C2_6570["距离"]
+    local ____temp_23 = _____53C2_6570["检查地形"] ~= false
+    local ____temp_24 = _____53C2_6570["朝向跟随位移"] ~= false
+    local ____temp_25 = _____53C2_6570["暂停单位"] == true
+    local ____temp_26 = _____53C2_6570["禁用碰撞"] == true
+    local ____temp_27 = _____53C2_6570["位移特效"] or DEFAULT_MOVE_EFFECT_MODEL
+    local ____temp_28 = _____53C2_6570["命中半径"] or 0
+    local ____temp_29 = _____53C2_6570["只命中敌人"] == true
+    local ____temp_30 = _____53C2_6570["允许命中自己"] == true
+    local ____temp_31 = _____53C2_6570["允许重复命中"] == true
+    local ____temp_32 = _____53C2_6570["命中后结束"] == true
+    local ____temp_33 = _____53C2_6570["命中伤害"] or 0
     local ____53C2_6570__4F24_5BB3_6765_6E90_11 = _____53C2_6570["伤害来源"]
     if ____53C2_6570__4F24_5BB3_6765_6E90_11 == nil then
         ____53C2_6570__4F24_5BB3_6765_6E90_11 = _____5355_4F4D
@@ -502,21 +523,23 @@ local function _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
         listIndex = ____temp_15,
         ["单位"] = ____5355_4F4D_16,
         ["单位ID"] = ____5355_4F4DID_17,
-        ["角度"] = ____89D2_5EA6_18,
-        ["每Tick位移"] = ____6BCFTick_4F4D_79FB_19,
-        ["总距离"] = ____53C2_6570__8DDD_79BB_20,
+        ["主单位"] = ____53C2_6570__4E3B_5355_4F4D_18,
+        ["主单位死亡时中断"] = ____temp_19,
+        ["角度"] = ____89D2_5EA6_20,
+        ["每Tick位移"] = ____6BCFTick_4F4D_79FB_21,
+        ["总距离"] = ____53C2_6570__8DDD_79BB_22,
         ["已移动"] = 0,
-        ["检查地形"] = ____temp_21,
-        ["朝向跟随位移"] = ____temp_22,
-        ["暂停单位"] = ____temp_23,
-        ["禁用碰撞"] = ____temp_24,
-        ["位移特效"] = ____temp_25,
-        ["命中半径"] = ____temp_26,
-        ["只命中敌人"] = ____temp_27,
-        ["允许命中自己"] = ____temp_28,
-        ["允许重复命中"] = ____temp_29,
-        ["命中后结束"] = ____temp_30,
-        ["命中伤害"] = ____temp_31,
+        ["检查地形"] = ____temp_23,
+        ["朝向跟随位移"] = ____temp_24,
+        ["暂停单位"] = ____temp_25,
+        ["禁用碰撞"] = ____temp_26,
+        ["位移特效"] = ____temp_27,
+        ["命中半径"] = ____temp_28,
+        ["只命中敌人"] = ____temp_29,
+        ["允许命中自己"] = ____temp_30,
+        ["允许重复命中"] = ____temp_31,
+        ["命中后结束"] = ____temp_32,
+        ["命中伤害"] = ____temp_33,
         ["伤害来源"] = ____53C2_6570__4F24_5BB3_6765_6E90_11,
         ["攻击类型"] = ____53C2_6570__653B_51FB_7C7B_578B_12,
         ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_13,
@@ -588,6 +611,13 @@ ____exports["开始击退"] = function(_____5355_4F4D, _____53C2_6570)
     local _____89D2_5EA6 = _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570)
     if _____89D2_5EA6 == nil then
         return 0
+    end
+    if _____53C2_6570["主单位"] == nil and _____53C2_6570["来源单位"] ~= nil and _____53C2_6570["来源单位"] ~= 0 then
+        return _____521B_5EFA_4F4D_79FB_5B9E_4F8B(
+            _____5355_4F4D,
+            _____89D2_5EA6,
+            __TS__ObjectAssign({}, _____53C2_6570, {["主单位"] = _____53C2_6570["来源单位"]})
+        )
     end
     return _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6, _____53C2_6570)
 end

@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local onPauseTestUnit, onResumeTestUnit, g, createDelayedCall, debugLogForce, PauseUnit
-local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃.index")
+local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.index")
 local _____5F00_59CB_8DF3_8DC3 = ____index["开始跳跃"]
 function onPauseTestUnit()
     local testUnit = g.gg_unit_Hamg_0002

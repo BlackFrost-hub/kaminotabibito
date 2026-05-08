@@ -5,6 +5,29 @@
 
 const jass = require("jass.common") as any;
 
+export interface UnitFilterOptions {
+    仅敌人?: boolean;
+    仅友军?: boolean;
+    排除自身?: boolean;
+    要求有效单位?: boolean;
+    允许建筑?: boolean;
+    允许机械?: boolean;
+    允许古树?: boolean;
+    允许无敌?: boolean;
+    允许死亡?: boolean;
+    自定义条件?: (targetUnit: any, sourceUnit?: any) => boolean;
+}
+
+function isInvincibleUnit(unit: any): boolean {
+    if (!unit) return false;
+    return jass.IsUnitInvulnerable(unit);
+}
+
+function isAncientUnit(unit: any): boolean {
+    if (!unit) return false;
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT);
+}
+
 /**
  * 判断单位是否不是机械单位、不是古树单位、非建筑、非死亡
  * @param unit 要判断的单位
@@ -58,6 +81,37 @@ export function isValidEnemyUnit(targetUnit: any, sourceUnit: any): boolean {
 }
 
 /**
+ * 判断单位是否有效且是敌对单位，并且排除源单位自身
+ */
+export function isValidEnemyUnitExcludeSelf(targetUnit: any, sourceUnit: any): boolean {
+    return isValidEnemyUnit(targetUnit, sourceUnit) && !isSameUnit(targetUnit, sourceUnit);
+}
+
+/**
+ * 判断单位是否有效且是敌对单位，并且排除无敌单位
+ */
+export function isValidEnemyUnitExcludeInvincible(targetUnit: any, sourceUnit: any): boolean {
+    return isValidEnemyUnit(targetUnit, sourceUnit) && !isInvincibleUnit(targetUnit);
+}
+
+/**
+ * 判断单位是否有效且是敌对单位，并且排除古树单位
+ */
+export function isValidEnemyUnitExcludeAncient(targetUnit: any, sourceUnit: any): boolean {
+    return isValidEnemyUnit(targetUnit, sourceUnit) && !isAncientUnit(targetUnit);
+}
+
+/**
+ * 判断单位是否有效且是敌对单位，并且排除自身、无敌和古树单位
+ */
+export function isValidEnemyUnitExcludeSelfAncientInvincible(targetUnit: any, sourceUnit: any): boolean {
+    return isValidEnemyUnit(targetUnit, sourceUnit)
+        && !isSameUnit(targetUnit, sourceUnit)
+        && !isInvincibleUnit(targetUnit)
+        && !isAncientUnit(targetUnit);
+}
+
+/**
  * 判断两个单位是否是同一单位
  * @param unitA 单位A
  * @param unitB 单位B
@@ -104,6 +158,8 @@ export function isValidAllyUnitExcludeSelf(targetUnit: any, sourceUnit: any): bo
     return isValidAllyUnit(targetUnit, sourceUnit) && !isSameUnit(targetUnit, sourceUnit);
 }
 
+export { isInvincibleUnit, isAncientUnit };
+
 /**
  * 判断单位当前命令是否不是使用物品栏第1-6格
  * 使用物品栏的命令ID范围：852008-852013
@@ -118,6 +174,57 @@ export function isNotUsingInventoryItem(unit: any): boolean {
     const ITEM_USE_MAX = 852013;
 
     return orderId < ITEM_USE_MIN || orderId > ITEM_USE_MAX;
+}
+
+export function matchUnitFilter(targetUnit: any, sourceUnit: any, options: UnitFilterOptions): boolean {
+    if (!targetUnit) return false;
+
+    if (options.排除自身 && sourceUnit && isSameUnit(targetUnit, sourceUnit)) {
+        return false;
+    }
+
+    if (options.要求有效单位 !== false) {
+        if (jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD)) {
+            return false;
+        }
+        if (!options.允许建筑 && jass.IsUnitType(targetUnit, jass.UNIT_TYPE_STRUCTURE)) {
+            return false;
+        }
+        if (!options.允许机械 && jass.IsUnitType(targetUnit, jass.UNIT_TYPE_MECHANICAL)) {
+            return false;
+        }
+        if (!options.允许古树 && isAncientUnit(targetUnit)) {
+            return false;
+        }
+    } else if (!options.允许死亡 && jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD)) {
+        return false;
+    }
+
+    if (!options.允许无敌 && isInvincibleUnit(targetUnit)) {
+        return false;
+    }
+
+    if (options.仅敌人) {
+        if (!sourceUnit || !isUnitEnemy(targetUnit, sourceUnit)) {
+            return false;
+        }
+    }
+
+    if (options.仅友军) {
+        if (!sourceUnit || !isUnitAlly(targetUnit, sourceUnit)) {
+            return false;
+        }
+    }
+
+    if (typeof options.自定义条件 === "function" && !options.自定义条件(targetUnit, sourceUnit)) {
+        return false;
+    }
+
+    return true;
+}
+
+export function createUnitFilter(options: UnitFilterOptions): (targetUnit: any, sourceUnit?: any) => boolean {
+    return (targetUnit: any, sourceUnit?: any) => matchUnitFilter(targetUnit, sourceUnit, options);
 }
 
 export {};
