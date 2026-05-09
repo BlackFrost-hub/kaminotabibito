@@ -9,20 +9,20 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local slk = require("jass.slk")
 _G.slk = slk
-_G.print = function(____, ...)
+_G.print = function(...)
     local args = {...}
     local str = ""
     do
         local i = 0
         while i < #args do
-            str = str .. tostring(nil, args[i + 1])
+            str = str .. tostring(args[i + 1])
             if i < #args - 1 then
                 str = str .. "\t"
             end
             i = i + 1
         end
     end
-    jassConsole:write(str .. "\n")
+    jassConsole.write(str .. "\n")
 end
 local _____6838_5FC3_7CFB_7EDF = require("系统.00．核心系统.index")
 if type(_____6838_5FC3_7CFB_7EDF.init) == "function" then

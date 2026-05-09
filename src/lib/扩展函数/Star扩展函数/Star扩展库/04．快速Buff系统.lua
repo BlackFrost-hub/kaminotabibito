@@ -106,68 +106,68 @@ local function getUnitSourceName(sourceUnit)
     if sourceUnit == nil or sourceUnit == 0 then
         return ""
     end
-    local n = jass:GetUnitName(sourceUnit)
+    local n = jass.GetUnitName(sourceUnit)
     return type(n) == "string" and n ~= "" and n or ""
 end
 local function shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5
 end
 local function getAngleBetweenUnits(u, tu)
-    return jass:Atan2(
-        jass:GetUnitY(tu) - jass:GetUnitY(u),
-        jass:GetUnitX(tu) - jass:GetUnitX(u)
+    return jass.Atan2(
+        jass.GetUnitY(tu) - jass.GetUnitY(u),
+        jass.GetUnitX(tu) - jass.GetUnitX(u)
     )
 end
 function ____exports.SFB_Init()
     if ____exports.SFB_Unit ~= nil and ____exports.SFB_Unit ~= 0 then
         return
     end
-    ____exports.SFB_Unit = jass:CreateUnit(
-        jass:Player(15),
+    ____exports.SFB_Unit = jass.CreateUnit(
+        jass.Player(15),
         SFB_UNIT_ID,
         0,
         0,
         0
     )
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.POLYMORPH)
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.STUN)
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.SLOW)
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.SILENCE)
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.INVIS)
-    jass:UnitAddAbility(____exports.SFB_Unit, ABILITY.FREEZE)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.POLYMORPH)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.STUN)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.SLOW)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.SILENCE)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.INVIS)
+    jass.UnitAddAbility(____exports.SFB_Unit, ABILITY.FREEZE)
     _G.SFB_Unit = ____exports.SFB_Unit
 end
 local function onSfbPauseTimerExpire()
-    local t = jass:GetExpiredTimer()
-    jass:PauseUnit(
-        jass:LoadUnitHandle(
+    local t = jass.GetExpiredTimer()
+    jass.PauseUnit(
+        jass.LoadUnitHandle(
             YDHT,
-            jass:GetHandleId(t),
-            jass:StringHash("单位")
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
         ),
         false
     )
-    jass:RemoveSavedHandle(
+    jass.RemoveSavedHandle(
         YDHT,
-        jass:GetHandleId(t),
-        jass:StringHash("单位")
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
     )
     safeDestroyTimer(nil, t)
 end
 local function onSfbExpauseTimerExpire()
-    local t = jass:GetExpiredTimer()
-    japi:EXPauseUnit(
-        jass:LoadUnitHandle(
+    local t = jass.GetExpiredTimer()
+    japi.EXPauseUnit(
+        jass.LoadUnitHandle(
             YDHT,
-            jass:GetHandleId(t),
-            jass:StringHash("单位")
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
         ),
         false
     )
-    jass:RemoveSavedHandle(
+    jass.RemoveSavedHandle(
         YDHT,
-        jass:GetHandleId(t),
-        jass:StringHash("单位")
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
     )
     safeDestroyTimer(nil, t)
 end
@@ -214,14 +214,14 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         if id == 21 then
             GS_Suspend(u, time)
         elseif id == 22 then
-            local tempTimer = jass:CreateTimer()
-            jass:SaveUnitHandle(
+            local tempTimer = jass.CreateTimer()
+            jass.SaveUnitHandle(
                 YDHT,
-                jass:GetHandleId(tempTimer),
-                jass:StringHash("单位"),
+                jass.GetHandleId(tempTimer),
+                jass.StringHash("单位"),
                 u
             )
-            jass:PauseUnit(u, true)
+            jass.PauseUnit(u, true)
             safeTimerStart(
                 nil,
                 tempTimer,
@@ -230,14 +230,14 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
                 onSfbPauseTimerExpire
             )
         elseif id == 23 then
-            local tempTimer = jass:CreateTimer()
-            jass:SaveUnitHandle(
+            local tempTimer = jass.CreateTimer()
+            jass.SaveUnitHandle(
                 YDHT,
-                jass:GetHandleId(tempTimer),
-                jass:StringHash("单位"),
+                jass.GetHandleId(tempTimer),
+                jass.StringHash("单位"),
                 u
             )
-            japi:EXPauseUnit(u, true)
+            japi.EXPauseUnit(u, true)
             safeTimerStart(
                 nil,
                 tempTimer,
@@ -254,7 +254,7 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
     end
     local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
-    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     local abilityId
     local orderStr
     repeat
@@ -343,9 +343,9 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         )
     end
     if type(orderStr) == "string" then
-        jass:IssueTargetOrder(caster, orderStr, u)
+        jass.IssueTargetOrder(caster, orderStr, u)
     else
-        jass:IssueTargetOrderById(caster, orderStr, u)
+        jass.IssueTargetOrderById(caster, orderStr, u)
     end
 end
 --- 设置单位减速效果
@@ -374,7 +374,7 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
     end
     local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
-    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     YDWESetUnitAbilityDataReal(
         nil,
         caster,
@@ -416,7 +416,7 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
         ms,
         {sourceName = sourceName}
     )
-    jass:IssueTargetOrderById(caster, ORDER.SLOW, u)
+    jass.IssueTargetOrderById(caster, ORDER.SLOW, u)
 end
 ____exports.SFB_Init()
 return ____exports

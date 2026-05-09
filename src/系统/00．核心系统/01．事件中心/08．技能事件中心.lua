@@ -16,22 +16,22 @@ function dispatchSpellListeners(list, castingUnit, spellAbilityId)
     end
 end
 function onSpellChannel()
-    local castingUnit = jass:GetTriggerUnit()
+    local castingUnit = jass.GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass:GetSpellAbilityId()
+    local spellAbilityId = jass.GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
     dispatchSpellListeners(channelListeners, castingUnit, spellAbilityId)
 end
 function onSpellEffect()
-    local castingUnit = jass:GetTriggerUnit()
+    local castingUnit = jass.GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass:GetSpellAbilityId()
+    local spellAbilityId = jass.GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
@@ -44,12 +44,12 @@ function ____exports.initSpellEventCenter()
         return
     end
     initialized = true
-    local channelTrigger = jass:CreateTrigger()
+    local channelTrigger = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(channelTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
-    jass:TriggerAddAction(channelTrigger, onSpellChannel)
-    local effectTrigger = jass:CreateTrigger()
+    jass.TriggerAddAction(channelTrigger, onSpellChannel)
+    local effectTrigger = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    jass:TriggerAddAction(effectTrigger, onSpellEffect)
+    jass.TriggerAddAction(effectTrigger, onSpellEffect)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

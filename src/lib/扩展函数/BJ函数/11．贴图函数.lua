@@ -11,9 +11,9 @@ function ____exports.CreateUbersplatBJ(self, file, where, red, green, blue, alph
     if where == nil or where == 0 then
         return nil
     end
-    local x = jass:GetLocationX(where)
-    local y = jass:GetLocationY(where)
-    ____exports.bj_lastCreatedUbersplat = jass:CreateUbersplat(
+    local x = jass.GetLocationX(where)
+    local y = jass.GetLocationY(where)
+    ____exports.bj_lastCreatedUbersplat = jass.CreateUbersplat(
         x,
         y,
         red,
@@ -29,7 +29,7 @@ function ____exports.ShowUbersplatBJ(self, flag, whichUbersplat)
     if whichUbersplat == nil or whichUbersplat == 0 then
         return
     end
-    jass:ShowUbersplat(whichUbersplat, flag)
+    jass.ShowUbersplat(whichUbersplat, flag)
 end
 function ____exports.GetLastCreatedUbersplat(self)
     return ____exports.bj_lastCreatedUbersplat

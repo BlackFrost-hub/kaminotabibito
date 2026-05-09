@@ -30,7 +30,7 @@ const UnitDamageTarget = jass.UnitDamageTarget as (
 const 模块名 = "充能测试";
 const 测试开关 = true;
 const 充能测试命令 = "113";
-const 充能伤害半径 = 300;
+const 充能伤害半径 = 500;
 const 充能伤害 = 100;
 let 已注册 = false;
 

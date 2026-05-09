@@ -14,19 +14,19 @@ local function _____64AD_653E_4E0A_4E0B_6587_52A8_753B(ctx)
         return
     end
     if type(ctx["动画序号"]) == "number" then
-        jass:SetUnitAnimationByIndex(ctx["单位"], ctx["动画序号"])
+        jass.SetUnitAnimationByIndex(ctx["单位"], ctx["动画序号"])
         return
     end
     if type(ctx["动画名"]) == "string" and ctx["动画名"] ~= "" then
-        jass:SetUnitAnimation(ctx["单位"], ctx["动画名"])
+        jass.SetUnitAnimation(ctx["单位"], ctx["动画名"])
     end
 end
 local function ____on_5355_4F4D_52A8_753B_7B49_5F85_5230_671F()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local ctx = _____52A8_753B_7B49_5F85_4E0A_4E0B_6587_8868[hid]
     __TS__Delete(_____52A8_753B_7B49_5F85_4E0A_4E0B_6587_8868, hid)
     safeDestroyTimer(nil, t)
@@ -35,18 +35,18 @@ local function ____on_5355_4F4D_52A8_753B_7B49_5F85_5230_671F()
     end
     _____64AD_653E_4E0A_4E0B_6587_52A8_753B(ctx)
     if ctx["恢复待机"] == true and ctx["单位"] ~= nil and ctx["单位"] ~= 0 then
-        jass:SetUnitAnimationByIndex(ctx["单位"], 0)
+        jass.SetUnitAnimationByIndex(ctx["单位"], 0)
     end
     if type(ctx["下一步"]) == "function" then
         ctx["下一步"]()
     end
 end
 local function _____521B_5EFA_52A8_753B_7B49_5F85_8BA1_65F6_5668(ctx, _____7B49_5F85_79D2_6570)
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     if not t then
         return nil
     end
-    _____52A8_753B_7B49_5F85_4E0A_4E0B_6587_8868[jass:GetHandleId(t)] = ctx
+    _____52A8_753B_7B49_5F85_4E0A_4E0B_6587_8868[jass.GetHandleId(t)] = ctx
     safeTimerStart(
         nil,
         t,
@@ -63,7 +63,7 @@ ____exports["播放单位动画并等待"] = function(_____5355_4F4D, _____52A8_
     if _____7B49_5F85_79D2_6570 < 0 then
         _____7B49_5F85_79D2_6570 = 0
     end
-    jass:SetUnitAnimationByIndex(_____5355_4F4D, _____52A8_753B_5E8F_53F7)
+    jass.SetUnitAnimationByIndex(_____5355_4F4D, _____52A8_753B_5E8F_53F7)
     return _____521B_5EFA_52A8_753B_7B49_5F85_8BA1_65F6_5668({["单位"] = _____5355_4F4D, ["下一步"] = _____4E0B_4E00_6B65}, _____7B49_5F85_79D2_6570)
 end
 ____exports["播放单位动作并等待"] = function(_____5355_4F4D, _____52A8_753B_540D, _____7B49_5F85_79D2_6570, _____4E0B_4E00_6B65)
@@ -76,7 +76,7 @@ ____exports["播放单位动作并等待"] = function(_____5355_4F4D, _____52A8_
     if _____7B49_5F85_79D2_6570 < 0 then
         _____7B49_5F85_79D2_6570 = 0
     end
-    jass:SetUnitAnimation(_____5355_4F4D, _____52A8_753B_540D)
+    jass.SetUnitAnimation(_____5355_4F4D, _____52A8_753B_540D)
     return _____521B_5EFA_52A8_753B_7B49_5F85_8BA1_65F6_5668({["单位"] = _____5355_4F4D, ["下一步"] = _____4E0B_4E00_6B65}, _____7B49_5F85_79D2_6570)
 end
 ____exports["播放单位动画并等待后恢复待机"] = function(_____5355_4F4D, _____52A8_753B_5E8F_53F7, _____7B49_5F85_79D2_6570, _____4E0B_4E00_6B65)
@@ -86,7 +86,7 @@ ____exports["播放单位动画并等待后恢复待机"] = function(_____5355_4
     if _____7B49_5F85_79D2_6570 < 0 then
         _____7B49_5F85_79D2_6570 = 0
     end
-    jass:SetUnitAnimationByIndex(_____5355_4F4D, _____52A8_753B_5E8F_53F7)
+    jass.SetUnitAnimationByIndex(_____5355_4F4D, _____52A8_753B_5E8F_53F7)
     return _____521B_5EFA_52A8_753B_7B49_5F85_8BA1_65F6_5668({["单位"] = _____5355_4F4D, ["恢复待机"] = true, ["下一步"] = _____4E0B_4E00_6B65}, _____7B49_5F85_79D2_6570)
 end
 ____exports["延迟播放单位动画"] = function(_____5355_4F4D, _____52A8_753B_5E8F_53F7, _____5EF6_8FDF_79D2_6570, _____4E0B_4E00_6B65)

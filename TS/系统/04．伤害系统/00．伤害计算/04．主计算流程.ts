@@ -56,6 +56,21 @@ const {
 const { applyLifeAndManaSteal } = require("系统.04．伤害系统.00．伤害计算.03．吸血吸魔") as {
   applyLifeAndManaSteal: (attacker: any, damage: number, isMagic: boolean, isNormalAttack: boolean, showText: boolean) => void;
 };
+const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  applyDamageModifiers: (context: {
+    target: any;
+    attacker: any;
+    baseDamage: number;
+    currentDamage: number;
+    isPhysicalDamage: boolean;
+    isMagicDamage: boolean;
+    isEnhancedDamage: boolean;
+    isTrueDamage: boolean;
+    isNormalAttack: boolean;
+    isSkillAttack: boolean;
+    isSkillDamage: boolean;
+  }) => number;
+};
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   isPhysicalDamage: () => boolean;
   isMagicDamage: () => boolean;
@@ -412,16 +427,33 @@ export function onDamageEvent(
     return;
   }
 
-  // 设置最终伤害
-  if (result.finalDamage !== baseDamage) {
-    伤害函数.YDWESetEventDamage(result.finalDamage);
+  let finalDamage = result.finalDamage;
+  if (finalDamage > 0) {
+    finalDamage = applyDamageModifiers({
+      target,
+      attacker,
+      baseDamage,
+      currentDamage: finalDamage,
+      isPhysicalDamage: 伤害函数.isPhysicalDamage(),
+      isMagicDamage: 伤害函数.isMagicDamage(),
+      isEnhancedDamage: 伤害函数.isEnhancedDamage(),
+      isTrueDamage: 伤害函数.isTrueDamage(),
+      isNormalAttack: 伤害函数.isNormalAttack(),
+      isSkillAttack: 伤害函数.isSkillAttack(),
+      isSkillDamage: 伤害函数.isSkillDamage(),
+    });
   }
-  notifyAppliedFinalDamageListeners(target, attacker, result.finalDamage);
+
+  // 设置最终伤害
+  if (finalDamage !== baseDamage) {
+    伤害函数.YDWESetEventDamage(finalDamage);
+  }
+  notifyAppliedFinalDamageListeners(target, attacker, finalDamage);
 
   // 吸血吸魔
   const isMagic = 伤害函数.isMagicDamage();
   const isNormalAtk = 伤害函数.isNormalAttack();
-  applyLifeAndManaSteal(attacker, result.finalDamage, isMagic, isNormalAtk, true);
+  applyLifeAndManaSteal(attacker, finalDamage, isMagic, isNormalAtk, true);
 }
 
 export {};

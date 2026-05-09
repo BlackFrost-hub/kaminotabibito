@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 /** 伤害测试开关（默认关闭，伤害判断已合并到伤害显示系统） */
-const ENABLED = false;
+const ENABLED = true;
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;

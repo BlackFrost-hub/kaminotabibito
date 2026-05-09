@@ -138,22 +138,22 @@ local function _____6309_4F24_5BB3_7C7B_578B_56DE_586B_5E03_5C14_6807_8BB0(_____
 end
 local function _____8BBE_7F6E_5F39_5E55_5916_89C2(_____5F39_5E55_5355_4F4D, _____53C2_6570)
     if _____53C2_6570["模型"] and _____53C2_6570["模型"] ~= "" then
-        japi:DzSetUnitModel(_____5F39_5E55_5355_4F4D, _____53C2_6570["模型"])
+        japi.DzSetUnitModel(_____5F39_5E55_5355_4F4D, _____53C2_6570["模型"])
     end
     local _____7F29_653EX = _____53C2_6570["缩放X"] or _____53C2_6570["缩放"] or nil
     local _____7F29_653EY = _____53C2_6570["缩放Y"] or _____53C2_6570["缩放"] or nil
     local _____7F29_653EZ = _____53C2_6570["缩放Z"] or _____53C2_6570["缩放"] or nil
     if _____7F29_653EX ~= nil or _____7F29_653EY ~= nil or _____7F29_653EZ ~= nil then
-        jass:SetUnitScale(_____5F39_5E55_5355_4F4D, _____7F29_653EX or 1, _____7F29_653EY or 1, _____7F29_653EZ or 1)
+        jass.SetUnitScale(_____5F39_5E55_5355_4F4D, _____7F29_653EX or 1, _____7F29_653EY or 1, _____7F29_653EZ or 1)
     end
     if _____53C2_6570["飞行高度"] ~= nil then
-        jass:SetUnitFlyHeight(_____5F39_5E55_5355_4F4D, _____53C2_6570["飞行高度"], 0)
+        jass.SetUnitFlyHeight(_____5F39_5E55_5355_4F4D, _____53C2_6570["飞行高度"], 0)
     end
     if _____53C2_6570["禁用碰撞"] ~= false then
-        jass:SetUnitPathing(_____5F39_5E55_5355_4F4D, false)
+        jass.SetUnitPathing(_____5F39_5E55_5355_4F4D, false)
     end
     if _____53C2_6570["生命周期"] ~= nil and _____53C2_6570["生命周期"] > 0 then
-        jass:UnitApplyTimedLife(
+        jass.UnitApplyTimedLife(
             _____5F39_5E55_5355_4F4D,
             _____5F52_4E00_5316_751F_547D_5468_671FBuff(_____53C2_6570["生命周期Buff"]),
             _____53C2_6570["生命周期"]
@@ -221,8 +221,8 @@ local function _____542F_52A8_5F39_5E55_7CFB_7EDF_89E6_53D1_5668()
     if trig == nil then
         return
     end
-    if not jass:IsTriggerEnabled(trig) then
-        jass:EnableTrigger(trig)
+    if not jass.IsTriggerEnabled(trig) then
+        jass.EnableTrigger(trig)
     end
 end
 ____exports["注册单位到弹幕系统"] = function(_____5F39_5E55_5355_4F4D, _____53C2_6570)
@@ -236,7 +236,7 @@ ____exports["注册单位到弹幕系统"] = function(_____5F39_5E55_5355_4F4D, 
     _____8BBE_7F6E_5F39_5E55_7CFB_7EDF_5C5E_6027(_____5F39_5E55_5355_4F4D, _____53C2_6570)
     local _____5355_4F4D_7EC4 = _____83B7_53D6_5F39_5E55_7CFB_7EDF_5355_4F4D_7EC4()
     if _____5355_4F4D_7EC4 ~= nil then
-        jass:GroupAddUnit(_____5355_4F4D_7EC4, _____5F39_5E55_5355_4F4D)
+        jass.GroupAddUnit(_____5355_4F4D_7EC4, _____5F39_5E55_5355_4F4D)
     end
     _____542F_52A8_5F39_5E55_7CFB_7EDF_89E6_53D1_5668()
     return _____5F39_5E55_5355_4F4D

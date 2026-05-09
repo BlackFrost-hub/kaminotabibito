@@ -25,7 +25,7 @@ local UnitDamageTarget = jass.UnitDamageTarget
 local _____6A21_5757_540D = "充能测试"
 local _____6D4B_8BD5_5F00_5173 = true
 local _____5145_80FD_6D4B_8BD5_547D_4EE4 = "113"
-local _____5145_80FD_4F24_5BB3_534A_5F84 = 300
+local _____5145_80FD_4F24_5BB3_534A_5F84 = 500
 local _____5145_80FD_4F24_5BB3 = 100
 local _____5DF2_6CE8_518C = false
 local function _____5BF9_5468_56F4_654C_4EBA_9020_6210_4F24_5BB3(_____4E2D_5FC3_5355_4F4D)

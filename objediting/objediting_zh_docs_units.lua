@@ -24,6 +24,10 @@ function ObjEditingUnitBase:setTooltipExtended(value) end
 ---@param value string 编辑器描述
 function ObjEditingUnitBase:setDescription(value) end
 
+---@param value string 游戏界面图标路径，对应物编字段 `uico`
+---真实定义可在 `.def/def/UnitOrBuildingOrHeroDefinition.lua` 中查 `setIconGameInterface`
+function ObjEditingUnitBase:setIconGameInterface(value) end
+
 ---@param value string 热键，例如 `'Q'`
 function ObjEditingUnitBase:setHotkey(value) end
 

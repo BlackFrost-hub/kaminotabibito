@@ -7,18 +7,18 @@ local runFalseLocalRegistration = ____02_FF0E_5185_90E8_5DE5_5177.runFalseLocalR
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
 function onSyncKeyUp(self)
-    local trig = jass:GetTriggeringTrigger()
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
         return
     end
-    local cb = syncKeyUpCallbackByTriggerHid[jass:GetHandleId(trig)]
+    local cb = syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig)]
     if type(cb) ~= "function" then
         return
     end
     cb(
         nil,
-        japi:DzGetTriggerKeyPlayer(),
-        japi:DzGetTriggerKey()
+        japi.DzGetTriggerKeyPlayer(),
+        japi.DzGetTriggerKey()
     )
 end
 jass = require("jass.common")
@@ -27,7 +27,7 @@ local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
 local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
 syncKeyUpCallbackByTriggerHid = {}
 function ____exports.isKeyDown(self, keyCode)
-    return not not japi:DzIsKeyDown(keyCode)
+    return not not japi.DzIsKeyDown(keyCode)
 end
 local function keyCodeToTrgChar(self, keyCode)
     if string and type(string.char) == "function" and keyCode >= 1 and keyCode <= 255 then
@@ -36,7 +36,7 @@ local function keyCodeToTrgChar(self, keyCode)
                 return true, ""
             end
             local ____try, ____hasReturned, ____returnValue = pcall(function()
-                return true, string:char(keyCode)
+                return true, string.char(keyCode)
             end)
             if not ____try then
                 ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -82,7 +82,7 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
     runFalseLocalRegistration(
         nil,
         function()
-            japi:DzTriggerRegisterKeyEventByCode(
+            japi.DzTriggerRegisterKeyEventByCode(
                 trig,
                 keyCode,
                 status,
@@ -100,7 +100,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action,
     end
     if sync then
         registerKeyBindToTrigger(nil, trig, status, keyCode)
-        jass:TriggerAddAction(trig, action)
+        jass.TriggerAddAction(trig, action)
     else
         registerKeyBindToTriggerLocal(
             nil,
@@ -122,8 +122,8 @@ function ____exports.registerKeyDown(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -141,8 +141,8 @@ function ____exports.registerKeyUp(self, keyCode, callback, playerId)
         function()
             callback(
                 nil,
-                japi:DzGetTriggerKeyPlayer(),
-                japi:DzGetTriggerKey()
+                japi.DzGetTriggerKeyPlayer(),
+                japi.DzGetTriggerKey()
             )
         end,
         playerId
@@ -157,8 +157,8 @@ function ____exports.registerKeyUpSync(self, keyCode, callback)
         return nil
     end
     DzTriggerRegisterKeyEventTrg(nil, trig, KEY_STATE.UP, keyCode)
-    syncKeyUpCallbackByTriggerHid[jass:GetHandleId(trig)] = callback
-    jass:TriggerAddAction(trig, onSyncKeyUp)
+    syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig)] = callback
+    jass.TriggerAddAction(trig, onSyncKeyUp)
     return trig
 end
 function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, action, playerId)
@@ -172,9 +172,9 @@ function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, acti
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
-    return japi:DzGetTriggerKeyPlayer()
+    return japi.DzGetTriggerKeyPlayer()
 end
 function ____exports.getTriggerKey(self)
-    return japi:DzGetTriggerKey()
+    return japi.DzGetTriggerKey()
 end
 return ____exports

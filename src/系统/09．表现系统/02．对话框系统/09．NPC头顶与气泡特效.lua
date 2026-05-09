@@ -17,8 +17,8 @@ function cancelBubbleEffectSchedule(self, playerId)
     end
     local t = g_bubbleScheduleTimers[playerId + 1]
     if t then
-        jass:PauseTimer(t)
-        jass:DestroyTimer(t)
+        jass.PauseTimer(t)
+        jass.DestroyTimer(t)
         g_bubbleScheduleTimers[playerId + 1] = nil
     end
 end
@@ -67,28 +67,28 @@ local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
     end
-    local id = jass:GetUnitTypeId(unit)
+    local id = jass.GetUnitTypeId(unit)
     if id ~= nil and id ~= 0 then
         return id
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 --- 占用表 key：用 GetHandleId（同类型多 NPC 需独立占用，不能用 UnitTypeId）
 local function npcOccupationKey(self, unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 local function dzGetPlayerId(self, p)
-    return jass:GetPlayerId(p)
+    return jass.GetPlayerId(p)
 end
 local function cancelTimerHandle(self, t)
     if not t then
         return
     end
-    jass:PauseTimer(t)
-    jass:DestroyTimer(t)
+    jass.PauseTimer(t)
+    jass.DestroyTimer(t)
 end
 local function cancelPendingGrayMarkerTimerForHandle(self, key)
     if key == 0 then
@@ -225,8 +225,8 @@ local function npcUnitsSameForBubble(self, a, b)
     if not a or not b then
         return false
     end
-    local ha = jass:GetHandleId(a)
-    local hb = jass:GetHandleId(b)
+    local ha = jass.GetHandleId(a)
+    local hb = jass.GetHandleId(b)
     if ha ~= 0 and ha == hb then
         return true
     end
@@ -258,8 +258,8 @@ local function runBubbleScheduleForPlayer(self, playerId)
     local t = g_bubbleScheduleTimers[playerId + 1]
     g_bubbleScheduleTimers[playerId + 1] = nil
     if t then
-        jass:PauseTimer(t)
-        jass:DestroyTimer(t)
+        jass.PauseTimer(t)
+        jass.DestroyTimer(t)
     end
     local uNow = g_npcUnits[playerId + 1]
     if not npcUnitsSameForBubble(nil, uNow, npcUnit) then
@@ -283,33 +283,33 @@ local function bubbleScheduleCallbackP3(self)
     runBubbleScheduleForPlayer(nil, 3)
 end
 local function startBubbleScheduleTimer(self, playerId, delay)
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     g_bubbleScheduleTimers[playerId + 1] = t
     repeat
         local ____switch66 = playerId
         local ____cond66 = ____switch66 == 0
         if ____cond66 then
-            jass:TimerStart(t, delay, false, bubbleScheduleCallbackP0)
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0)
             return
         end
         ____cond66 = ____cond66 or ____switch66 == 1
         if ____cond66 then
-            jass:TimerStart(t, delay, false, bubbleScheduleCallbackP1)
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1)
             return
         end
         ____cond66 = ____cond66 or ____switch66 == 2
         if ____cond66 then
-            jass:TimerStart(t, delay, false, bubbleScheduleCallbackP2)
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2)
             return
         end
         ____cond66 = ____cond66 or ____switch66 == 3
         if ____cond66 then
-            jass:TimerStart(t, delay, false, bubbleScheduleCallbackP3)
+            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3)
             return
         end
         do
-            jass:PauseTimer(t)
-            jass:DestroyTimer(t)
+            jass.PauseTimer(t)
+            jass.DestroyTimer(t)
             return
         end
     until true

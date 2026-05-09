@@ -52,8 +52,8 @@ function ____exports.showLocalHint(self, playerId, msg, duration)
     if duration == nil then
         duration = 5
     end
-    jass:DisplayTimedTextToPlayer(
-        jass:Player(playerId),
+    jass.DisplayTimedTextToPlayer(
+        jass.Player(playerId),
         0,
         0,
         duration,

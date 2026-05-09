@@ -1,0 +1,130 @@
+/** @noSelfInFile */
+/**
+ * 护盾伤害结算
+ *
+ * 职责：
+ * - 在伤害计算完成后、YDWESetEventDamage 之前介入
+ * - 按优先级吸收伤害
+ * - 处理护盾破碎
+ * - 返回剩余伤害
+ */
+
+import { 护盾实例, ShieldType, 护盾破碎回调 } from "./01．护盾类型";
+import { 获取单位护盾实例列表, 删除护盾实例, 取句柄ID, 获取所有活动护盾实例 } from "./02．护盾实例";
+import { 获取可匹配护盾列表 } from "./03．护盾优先级";
+
+const jass = require("jass.common") as any;
+const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  registerDamageModifier: (callback: (context: {
+    target: any;
+    attacker: any;
+    baseDamage: number;
+    currentDamage: number;
+    isPhysicalDamage: boolean;
+    isMagicDamage: boolean;
+    isEnhancedDamage: boolean;
+    isTrueDamage: boolean;
+    isNormalAttack: boolean;
+    isSkillAttack: boolean;
+    isSkillDamage: boolean;
+  }) => number, priority?: number) => number;
+};
+
+const RMin = jass.RMin as (a: number, b: number) => number;
+const RMax = jass.RMax as (a: number, b: number) => number;
+let shieldModifierRegistered = false;
+
+/**
+ * 护盾吸收结果
+ */
+export interface 护盾吸收结果 {
+  /** 剩余伤害（未被护盾吸收的部分） */
+  剩余伤害: number;
+  /** 总吸收量 */
+  总吸收量: number;
+  /** 被破碎的护盾列表 */
+  破碎护盾: 护盾实例[];
+}
+
+/**
+ * 用护盾吸收伤害
+ *
+ * @param 目标 受伤单位
+ * @param 伤害值 待结算伤害
+ * @param 是物理伤害 是否物理伤害
+ * @param 是魔法伤害 是否魔法伤害
+ * @param 攻击者 攻击者（可选，用于破碎回调）
+ * @returns 吸收结果
+ */
+export function 吸收伤害(
+  目标: any,
+  伤害值: number,
+  是物理伤害: boolean,
+  是魔法伤害: boolean,
+  攻击者?: any
+): 护盾吸收结果 {
+  const 结果: 护盾吸收结果 = {
+    剩余伤害: 伤害值,
+    总吸收量: 0,
+    破碎护盾: [],
+  };
+
+  const 单位ID = 取句柄ID(目标);
+  if (单位ID === 0) return 结果;
+
+  // 获取单位所有护盾
+  const 全部护盾 = 获取单位护盾实例列表(单位ID);
+  if (全部护盾.length === 0) return 结果;
+
+  // 获取按优先级排序的可匹配护盾（通用护盾吸收所有伤害，包括真实伤害）
+  const 可用护盾 = 获取可匹配护盾列表(全部护盾, 是物理伤害, 是魔法伤害);
+
+  // 按优先级依次吸收
+  for (const 护盾 of 可用护盾) {
+    if (结果.剩余伤害 <= 0) break;
+
+    const 吸收量 = RMin(护盾.当前值, 结果.剩余伤害);
+    护盾.当前值 -= 吸收量;
+    结果.剩余伤害 -= 吸收量;
+    结果.总吸收量 += 吸收量;
+
+    // 护盾破碎
+    if (护盾.当前值 <= 0) {
+      结果.破碎护盾.push(护盾);
+      删除护盾实例(护盾.id);
+
+      // 触发破碎回调
+      if (typeof 护盾.破碎回调 === "function") {
+        护盾.破碎回调(目标, 护盾.id, 吸收量);
+      }
+
+      // 触发结束回调
+      if (typeof 护盾.结束回调 === "function") {
+        护盾.结束回调(目标, 护盾.id, "破碎");
+      }
+    }
+  }
+
+  return 结果;
+}
+
+/**
+ * 注册护盾吸收到伤害系统
+ *
+ * 在主计算流程的 YDWESetEventDamage 之前调用
+ */
+export function 注册护盾吸收钩子(): void {
+  if (shieldModifierRegistered) return;
+  shieldModifierRegistered = true;
+  registerDamageModifier((context) => {
+    return 吸收伤害(
+      context.target,
+      context.currentDamage,
+      context.isPhysicalDamage,
+      context.isMagicDamage,
+      context.attacker
+    ).剩余伤害;
+  }, 100);
+}
+
+export {};

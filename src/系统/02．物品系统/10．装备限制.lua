@@ -40,14 +40,14 @@ local function getEntry(self, itemTypeId)
     return getItemDataEntryByTypeId(nil, itemTypeId)
 end
 local function safeGetItemTypeId(self, it)
-    local a = jass:GetItemTypeId(it)
+    local a = jass.GetItemTypeId(it)
     if type(a) == "number" then
         return a
     end
     return nil
 end
 local function safeUnitItemInSlot(self, unit, slot)
-    local a = jass:UnitItemInSlot(unit, slot)
+    local a = jass.UnitItemInSlot(unit, slot)
     if a then
         return a
     end
@@ -204,8 +204,8 @@ local function onPickup(self, unit, item)
     name = __TS__StringTrim(stripColor(nil, name))
     local nameColored = ((COLOR_NAME .. "『") .. name) .. "』|r"
     local msg = ""
-    local player = jass:Player(0)
-    local p = jass:GetOwningPlayer(unit)
+    local player = jass.Player(0)
+    local p = jass.GetOwningPlayer(unit)
     if p then
         player = p
     end
@@ -269,8 +269,8 @@ local function onPickup(self, unit, item)
         return
     end
     ____exports.equipShared.skipNextDrop = true
-    jass:UnitRemoveItem(unit, item)
-    jass:DisplayTimedTextToPlayer(
+    jass.UnitRemoveItem(unit, item)
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,

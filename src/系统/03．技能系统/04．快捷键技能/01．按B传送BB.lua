@@ -19,11 +19,11 @@ local BB_TELEPORT_ABILITY = "A0FC"
 local bbTeleportTrigger = nil
 --- 按B传送BB事件处理
 local function onBKeyTeleport(self)
-    local key = japi:DzGetTriggerKey()
+    local key = japi.DzGetTriggerKey()
     if key ~= "B" then
         return
     end
-    local player = japi:DzGetTriggerKeyPlayer()
+    local player = japi.DzGetTriggerKeyPlayer()
     local bbUnit = YDUserDataGet(
         nil,
         "player",
@@ -34,10 +34,10 @@ local function onBKeyTeleport(self)
     if bbUnit == nil then
         return
     end
-    local mouseX = japi:DzGetMouseTerrainX()
-    local mouseY = japi:DzGetMouseTerrainY()
+    local mouseX = japi.DzGetMouseTerrainX()
+    local mouseY = japi.DzGetMouseTerrainY()
     local abilityId = stringToFourCC(nil, BB_TELEPORT_ABILITY)
-    jass:IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY)
+    jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY)
     SelectUnitForPlayerSingle(nil, bbUnit, player)
 end
 --- 初始化按B传送BB功能
@@ -45,8 +45,8 @@ function ____exports.initBBTeleport(self)
     if bbTeleportTrigger ~= nil then
         return
     end
-    bbTeleportTrigger = jass:CreateTrigger()
+    bbTeleportTrigger = jass.CreateTrigger()
     DzTriggerRegisterKeyEventTrg(nil, bbTeleportTrigger, 0, "B")
-    jass:TriggerAddAction(bbTeleportTrigger, onBKeyTeleport)
+    jass.TriggerAddAction(bbTeleportTrigger, onBKeyTeleport)
 end
 return ____exports

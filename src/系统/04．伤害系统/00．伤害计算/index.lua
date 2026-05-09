@@ -48,5 +48,13 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 require("系统.04．伤害系统.00．伤害计算.05．事件注册")
 return ____exports
