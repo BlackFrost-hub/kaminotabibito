@@ -29,11 +29,11 @@ local ALLOWED_PLAYERS = {
 }
 local controlResistCtxByTimerHid = {}
 local function onControlResistTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass.GetHandleId(t)
+    local hid = jass:GetHandleId(t)
     local ctx = controlResistCtxByTimerHid[hid]
     __TS__Delete(controlResistCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
@@ -51,7 +51,7 @@ local function onControlResistTimerExpire()
     end
 end
 local function isAllowedPlayer(player)
-    local id = jass.GetPlayerId(player)
+    local id = jass:GetPlayerId(player)
     do
         local i = 0
         while i < #ALLOWED_PLAYERS do
@@ -64,13 +64,13 @@ local function isAllowedPlayer(player)
     return false
 end
 local function onSpellChannel(caster, abilityId)
-    if not isAllowedPlayer(jass.GetOwningPlayer(caster)) then
+    if not isAllowedPlayer(jass:GetOwningPlayer(caster)) then
         return
     end
     if isExcludedFromControlResist(nil, caster) then
         return
     end
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if target == nil then
         return
     end
@@ -81,9 +81,9 @@ local function onSpellChannel(caster, abilityId)
         return
     end
     local duration = calcReducedControlTime(nil, target, abilityId)
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if t then
-        controlResistCtxByTimerHid[jass.GetHandleId(t)] = {caster = caster, target = target, abilityId = abilityId, duration = duration}
+        controlResistCtxByTimerHid[jass:GetHandleId(t)] = {caster = caster, target = target, abilityId = abilityId, duration = duration}
         safeTimerStart(
             nil,
             t,

@@ -5,7 +5,6 @@ local _____5F00_59CB_5145_80FD = ____index["开始充能"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_0.debugLogForce
@@ -63,7 +62,7 @@ local function _____5BF9_5468_56F4_654C_4EBA_9020_6210_4F24_5BB3(_____4E2D_5FC3_
     DestroyGroup(_____679A_4E3E_7EC4)
 end
 local function _____5145_80FD_5B8C_6210_56DE_8C03(_____5355_4F4D, ______5145_80FDID)
-    debugLogForce(_____6A21_5757_540D, "充能完成，对周围敌人造成", _____5145_80FD_4F24_5BB3, "伤害")
+    debugLogForce(_____6A21_5757_540D, "充能完成！对周围敌人造成", _____5145_80FD_4F24_5BB3, "伤害")
     _____5BF9_5468_56F4_654C_4EBA_9020_6210_4F24_5BB3(_____5355_4F4D)
 end
 local function _____6267_884C_5145_80FD_6D4B_8BD5()
@@ -72,8 +71,9 @@ local function _____6267_884C_5145_80FD_6D4B_8BD5()
         debugLogForce(_____6A21_5757_540D, "未找到 gg_unit_Hamg_0002")
         return
     end
-    local _____5145_80FDID = _____5F00_59CB_5145_80FD(_____5927_6CD5_5E08, {["持续时间"] = 3, ["充能完成回调"] = _____5145_80FD_5B8C_6210_56DE_8C03})
-    debugLogForce(_____6A21_5757_540D, "开始充能，id=", _____5145_80FDID)
+    debugLogForce(_____6A21_5757_540D, "找到大法师，开始充能...")
+    local _____5145_80FDID = _____5F00_59CB_5145_80FD(_____5927_6CD5_5E08, {["持续时间"] = 3, ["过程特效"] = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", ["过程特效播放次数"] = 4, ["充能完成回调"] = _____5145_80FD_5B8C_6210_56DE_8C03})
+    debugLogForce(_____6A21_5757_540D, "充能ID:", _____5145_80FDID)
 end
 local function ____on_804A_5929113_6D4B_8BD5()
     _____6267_884C_5145_80FD_6D4B_8BD5()
@@ -83,15 +83,15 @@ local function _____6CE8_518C_804A_5929_6D4B_8BD5()
         return
     end
     _____5DF2_6CE8_518C = true
-    local trig113 = CreateTrigger()
+    local trig = CreateTrigger()
     TriggerRegisterPlayerChatEvent(
-        trig113,
+        trig,
         Player(0),
         _____5145_80FD_6D4B_8BD5_547D_4EE4,
         true
     )
-    TriggerAddAction(trig113, ____on_804A_5929113_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：113=开始3秒充能")
+    TriggerAddAction(trig, ____on_804A_5929113_6D4B_8BD5)
+    debugLogForce(_____6A21_5757_540D, "已注册测试：113=开始3秒充能，4次复活特效")
 end
 _____6CE8_518C_804A_5929_6D4B_8BD5()
 return ____exports

@@ -55,7 +55,7 @@ function ____exports.openNpcDialog(self, p, data)
         end
         setDialogNpcUnit(nil, p, data.npcUnit)
         local removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(nil, data.npcUnit)
-        local pid = jass.GetPlayerId(p)
+        local pid = jass:GetPlayerId(p)
         --- 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync
         local waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen == true
         if not shouldSkipNewBubbleSchedule(nil, pid, data.npcUnit) then
@@ -65,7 +65,7 @@ function ____exports.openNpcDialog(self, p, data)
             nil,
             p,
             function()
-                local pid = jass.GetPlayerId(p)
+                local pid = jass:GetPlayerId(p)
                 releaseNpcOccupation(nil, pid)
                 destroyBubbleEffect(nil, pid)
                 if data.applyGrayQuestMarkerAfterDialog == true and data.npcUnit then
@@ -123,9 +123,9 @@ function ____exports.applyDzTextFontAndAlignment(self, frame, textAlignment, fon
         return
     end
     local scale = fontScale ~= nil and fontScale ~= nil and fontScale or ____exports.DEFAULT_UI_FONT_SCALE
-    japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
-    japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
-    japi.DzFrameSetTextAlignment(frame, textAlignment)
+    japi:DzFrameSetFont(frame, fontFile, scale, fontFlag)
+    japi:DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
+    japi:DzFrameSetTextAlignment(frame, textAlignment)
 end
 function ____exports.applyDzTextFontAndCenterAlignment(self, frame, fontScale, fontFile, fontFlag)
     if fontFile == nil then
@@ -158,11 +158,15 @@ function ____exports.createTextFrameFillBackdrop(self, backdrop, name, text)
     if not tf or tf == 0 then
         return nil
     end
-    pcall(function () return japi.DzFrameClearAllPoints(tf) end
+    pcall(
+        nil,
+        function() return japi:DzFrameClearAllPoints(tf) end
     )
-    pcall(function () return japi.DzFrameSetAllPoints(tf, backdrop) end
+    pcall(
+        nil,
+        function() return japi:DzFrameSetAllPoints(tf, backdrop) end
     )
-    japi.DzFrameSetText(tf, text)
+    japi:DzFrameSetText(tf, text)
     return tf
 end
 --- Tab 标签：`TEXT` 铺满背景 + 居中 + 指定 Tab 字号。
@@ -192,18 +196,26 @@ function ____exports.layoutGlueTextButtonOverBackdrop(self, backdrop, button)
     if not backdrop or backdrop == 0 or not button or button == 0 then
         return
     end
-    pcall(function () return japi.DzFrameSetParent(button, backdrop) end
+    pcall(
+        nil,
+        function() return japi:DzFrameSetParent(button, backdrop) end
     )
-    pcall(function () return japi.DzFrameClearAllPoints(button) end
+    pcall(
+        nil,
+        function() return japi:DzFrameClearAllPoints(button) end
     )
-    pcall(function () return japi.DzFrameSetAllPoints(button, backdrop) end
+    pcall(
+        nil,
+        function() return japi:DzFrameSetAllPoints(button, backdrop) end
     )
 end
 --- 透明命中层：铺满背景后清空按钮字并 `alpha=0`（文案由同背景的 `TEXT` 负责）。
 function ____exports.setupTransparentGlueHitLayer(self, backdrop, button)
     ____exports.layoutGlueTextButtonOverBackdrop(nil, backdrop, button)
     setButtonText(nil, button, "")
-    pcall(function () return japi.DzFrameSetAlpha(button, 0) end
+    pcall(
+        nil,
+        function() return japi:DzFrameSetAlpha(button, 0) end
     )
 end
 return ____exports

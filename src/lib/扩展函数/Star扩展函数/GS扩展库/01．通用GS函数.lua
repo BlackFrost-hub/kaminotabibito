@@ -19,14 +19,14 @@ function ____exports.SoHeroHatm(self, c)
         return 0
     end
     local inventoryAbilityId = 1095658094
-    if jass.GetUnitAbilityLevel(c, inventoryAbilityId) <= 0 then
+    if jass:GetUnitAbilityLevel(c, inventoryAbilityId) <= 0 then
         return 0
     end
     local n = 0
     do
         local i = 0
         while i <= 5 do
-            if jass.UnitItemInSlot(c, i) ~= nil then
+            if jass:UnitItemInSlot(c, i) ~= nil then
                 n = n + 1
             end
             i = i + 1
@@ -38,24 +38,24 @@ function ____exports.GS_news(self, P, S)
     if P == nil or P == 0 or S == nil then
         return
     end
-    local F = jass.CreateForce()
+    local F = jass:CreateForce()
     if F == nil or F == 0 then
         return
     end
-    jass.ForceAddPlayer(F, P)
+    jass:ForceAddPlayer(F, P)
     local ____QuestMessageBJ_4 = QuestMessageBJ
     local ____jglobals_bj_QUESTMESSAGE_UPDATED_3 = jglobals.bj_QUESTMESSAGE_UPDATED
     if ____jglobals_bj_QUESTMESSAGE_UPDATED_3 == nil then
         ____jglobals_bj_QUESTMESSAGE_UPDATED_3 = 1
     end
     ____QuestMessageBJ_4(nil, F, ____jglobals_bj_QUESTMESSAGE_UPDATED_3, S)
-    jass.DestroyForce(F)
+    jass:DestroyForce(F)
 end
 function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
     if ply == nil or ply == 0 or str == nil then
         return
     end
-    jass.DisplayTimedTextToPlayer(
+    jass:DisplayTimedTextToPlayer(
         ply,
         0,
         0,
@@ -67,10 +67,10 @@ function ____exports.GS_UnitSector(self, u1, u2, r)
     if u1 == nil or u1 == 0 or u2 == nil or u2 == 0 then
         return false
     end
-    local angle1 = jass.GetUnitFacing(u1) or 0
-    local dy = (jass.GetUnitY(u1) or 0) - (jass.GetUnitY(u2) or 0)
-    local dx = (jass.GetUnitX(u1) or 0) - (jass.GetUnitX(u2) or 0)
-    local angle2 = BJ_RADTODEG * jass.Atan2(dy, dx)
+    local angle1 = jass:GetUnitFacing(u1) or 0
+    local dy = (jass:GetUnitY(u1) or 0) - (jass:GetUnitY(u2) or 0)
+    local dx = (jass:GetUnitX(u1) or 0) - (jass:GetUnitX(u2) or 0)
+    local angle2 = BJ_RADTODEG * jass:Atan2(dy, dx)
     return abs(
         nil,
         abs(nil, angle1 - angle2 - 180) - 180

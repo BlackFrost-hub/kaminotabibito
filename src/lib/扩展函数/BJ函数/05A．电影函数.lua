@@ -29,10 +29,10 @@ function ____exports.AbortCinematicFadeBJ(self)
     local t1 = jglobals.bj_cineFadeContinueTimer
     local t2 = jglobals.bj_cineFadeFinishTimer
     if t1 ~= nil then
-        jass.DestroyTimer(t1)
+        jass:DestroyTimer(t1)
     end
     if t2 ~= nil then
-        jass.DestroyTimer(t2)
+        jass:DestroyTimer(t2)
     end
 end
 jass = require("jass.common")
@@ -40,7 +40,7 @@ jglobals = require("jass.globals")
 function ____exports.SetCinematicSceneBJ(self, soundHandle, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
     jglobals.bj_cineSceneLastSound = soundHandle
     PlaySoundBJ(nil, soundHandle)
-    jass.SetCinematicScene(
+    jass:SetCinematicScene(
         portraitUnitId,
         color,
         speakerTitle,
@@ -62,26 +62,26 @@ function ____exports.DoTransmissionBasicsXYBJ(self, unitId, color, x, y, soundHa
         duration
     )
     if unitId ~= 0 then
-        jass.PingMinimap(x, y, bj_TRANSMISSION_PING_TIME)
+        jass:PingMinimap(x, y, bj_TRANSMISSION_PING_TIME)
     end
 end
 function ____exports.TryInitCinematicBehaviorBJ(self)
     if jglobals.bj_cineSceneBeingSkipped ~= nil then
         return
     end
-    jglobals.bj_cineSceneBeingSkipped = jass.CreateTrigger()
+    jglobals.bj_cineSceneBeingSkipped = jass:CreateTrigger()
     do
         local index = 0
         while index < bj_MAX_PLAYERS do
-            jass.TriggerRegisterPlayerEvent(
+            jass:TriggerRegisterPlayerEvent(
                 jglobals.bj_cineSceneBeingSkipped,
-                jass.Player(index),
+                jass:Player(index),
                 EVENT_PLAYER_END_CINEMATIC
             )
             index = index + 1
         end
     end
-    jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ)
+    jass:TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ)
 end
 function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, unitName, soundHandle, message, timeType, timeVal, wait)
     ____exports.TryInitCinematicBehaviorBJ(nil)
@@ -90,8 +90,8 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
     duration = GetTransmissionDuration(nil, soundHandle, timeType, safeTime)
     jglobals.bj_lastTransmissionDuration = duration
     jglobals.bj_lastPlayedSound = soundHandle
-    if jass.IsPlayerInForce(
-        jass.GetLocalPlayer(),
+    if jass:IsPlayerInForce(
+        jass:GetLocalPlayer(),
         toForce
     ) then
         if whichUnit == nil then
@@ -114,11 +114,11 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
                 duration
             )
         else
-            local unitTypeId = jass.GetUnitTypeId(whichUnit)
-            local owner = jass.GetOwningPlayer(whichUnit)
-            local color = jass.GetPlayerColor(owner)
-            local x = jass.GetUnitX(whichUnit)
-            local y = jass.GetUnitY(whichUnit)
+            local unitTypeId = jass:GetUnitTypeId(whichUnit)
+            local owner = jass:GetOwningPlayer(whichUnit)
+            local color = jass:GetPlayerColor(owner)
+            local x = jass:GetUnitX(whichUnit)
+            local y = jass:GetUnitY(whichUnit)
             ____exports.DoTransmissionBasicsXYBJ(
                 nil,
                 unitTypeId,
@@ -130,8 +130,8 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
                 message,
                 duration
             )
-            if not jass.IsUnitHidden(whichUnit) then
-                jass.UnitAddIndicator(
+            if not jass:IsUnitHidden(whichUnit) then
+                jass:UnitAddIndicator(
                     whichUnit,
                     bj_TRANSMISSION_IND_RED,
                     bj_TRANSMISSION_IND_BLUE,
@@ -152,74 +152,74 @@ function ____exports.CinematicModeExBJ(self, cineMode, forForce, interfaceFadeTi
     if cineMode then
         if not jglobals.bj_cineModeAlreadyIn then
             jglobals.bj_cineModeAlreadyIn = true
-            jglobals.bj_cineModePriorSpeed = jass.GetGameSpeed()
-            jglobals.bj_cineModePriorFogSetting = jass.IsFogEnabled()
-            jglobals.bj_cineModePriorMaskSetting = jass.IsFogMaskEnabled()
+            jglobals.bj_cineModePriorSpeed = jass:GetGameSpeed()
+            jglobals.bj_cineModePriorFogSetting = jass:IsFogEnabled()
+            jglobals.bj_cineModePriorMaskSetting = jass:IsFogMaskEnabled()
             jglobals.bj_cineModePriorDawnDusk = IsDawnDuskEnabled(nil)
-            jglobals.bj_cineModeSavedSeed = jass.GetRandomInt(0, 1000000)
+            jglobals.bj_cineModeSavedSeed = jass:GetRandomInt(0, 1000000)
         end
-        if jass.IsPlayerInForce(
-            jass.GetLocalPlayer(),
+        if jass:IsPlayerInForce(
+            jass:GetLocalPlayer(),
             forForce
         ) then
-            jass.ClearTextMessages()
-            jass.ShowInterface(false, interfaceFadeTime)
-            jass.EnableUserControl(false)
-            jass.EnableOcclusion(false)
+            jass:ClearTextMessages()
+            jass:ShowInterface(false, interfaceFadeTime)
+            jass:EnableUserControl(false)
+            jass:EnableOcclusion(false)
             SetCineModeVolumeGroupsBJ(nil)
         end
-        jass.SetGameSpeed(bj_CINEMODE_GAMESPEED)
-        jass.SetMapFlag(MAP_LOCK_SPEED, true)
-        jass.FogMaskEnable(false)
-        jass.FogEnable(false)
-        jass.EnableWorldFogBoundary(false)
+        jass:SetGameSpeed(bj_CINEMODE_GAMESPEED)
+        jass:SetMapFlag(MAP_LOCK_SPEED, true)
+        jass:FogMaskEnable(false)
+        jass:FogEnable(false)
+        jass:EnableWorldFogBoundary(false)
         EnableDawnDusk(nil, false)
-        jass.SetRandomSeed(0)
+        jass:SetRandomSeed(0)
         return
     end
     jglobals.bj_cineModeAlreadyIn = false
-    if jass.IsPlayerInForce(
-        jass.GetLocalPlayer(),
+    if jass:IsPlayerInForce(
+        jass:GetLocalPlayer(),
         forForce
     ) then
-        jass.ShowInterface(true, interfaceFadeTime)
-        jass.EnableUserControl(true)
-        jass.EnableOcclusion(true)
-        jass.VolumeGroupReset()
-        jass.EndThematicMusic()
+        jass:ShowInterface(true, interfaceFadeTime)
+        jass:EnableUserControl(true)
+        jass:EnableOcclusion(true)
+        jass:VolumeGroupReset()
+        jass:EndThematicMusic()
         CameraResetSmoothingFactorBJ(nil)
     end
-    jass.SetMapFlag(MAP_LOCK_SPEED, false)
-    jass.SetGameSpeed(jglobals.bj_cineModePriorSpeed)
-    jass.FogMaskEnable(jglobals.bj_cineModePriorMaskSetting)
-    jass.FogEnable(jglobals.bj_cineModePriorFogSetting)
-    jass.EnableWorldFogBoundary(true)
+    jass:SetMapFlag(MAP_LOCK_SPEED, false)
+    jass:SetGameSpeed(jglobals.bj_cineModePriorSpeed)
+    jass:FogMaskEnable(jglobals.bj_cineModePriorMaskSetting)
+    jass:FogEnable(jglobals.bj_cineModePriorFogSetting)
+    jass:EnableWorldFogBoundary(true)
     EnableDawnDusk(nil, jglobals.bj_cineModePriorDawnDusk)
-    jass.SetRandomSeed(jglobals.bj_cineModeSavedSeed)
+    jass:SetRandomSeed(jglobals.bj_cineModeSavedSeed)
 end
 function ____exports.CinematicModeBJ(self, cineMode, forForce)
     ____exports.CinematicModeExBJ(nil, cineMode, forForce, bj_CINEMODE_INTERFACEFADE)
 end
 function ____exports.CinematicFilterGenericBJ(self, duration, bmode, tex, red0, green0, blue0, trans0, red1, green1, blue1, trans1)
     ____exports.AbortCinematicFadeBJ(nil)
-    jass.SetCineFilterTexture(tex)
-    jass.SetCineFilterBlendMode(bmode)
-    jass.SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
-    jass.SetCineFilterStartUV(0, 0, 1, 1)
-    jass.SetCineFilterEndUV(0, 0, 1, 1)
-    jass.SetCineFilterStartColor(
+    jass:SetCineFilterTexture(tex)
+    jass:SetCineFilterBlendMode(bmode)
+    jass:SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
+    jass:SetCineFilterStartUV(0, 0, 1, 1)
+    jass:SetCineFilterEndUV(0, 0, 1, 1)
+    jass:SetCineFilterStartColor(
         PercentTo255(red0),
         PercentTo255(green0),
         PercentTo255(blue0),
         PercentTo255(100 - trans0)
     )
-    jass.SetCineFilterEndColor(
+    jass:SetCineFilterEndColor(
         PercentTo255(red1),
         PercentTo255(green1),
         PercentTo255(blue1),
         PercentTo255(100 - trans1)
     )
-    jass.SetCineFilterDuration(duration)
-    jass.DisplayCineFilter(true)
+    jass:SetCineFilterDuration(duration)
+    jass:DisplayCineFilter(true)
 end
 return ____exports

@@ -22,16 +22,16 @@ local function getHandleId(self, handle)
     if not isValidHandle(nil, handle) then
         return 0
     end
-    return jass.GetHandleId(handle) or 0
+    return jass:GetHandleId(handle) or 0
 end
 local function createTornadoEffect(self, whichUnit)
-    return jass.AddSpecialEffectTarget(C.TORNADO_EFFECT_MODEL, whichUnit, C.TORNADO_ATTACH_POINT)
+    return jass:AddSpecialEffectTarget(C.TORNADO_EFFECT_MODEL, whichUnit, C.TORNADO_ATTACH_POINT)
 end
 local function destroyTornadoEffect(self, effect)
     if not isValidHandle(nil, effect) then
         return
     end
-    jass.DestroyEffect(effect)
+    jass:DestroyEffect(effect)
 end
 local function removeTrackedHero(self, heroId)
     trackedHeroes:delete(heroId)
@@ -60,11 +60,11 @@ function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
         local heroId = ____value[1]
         local hero = ____value[2]
         do
-            if not isValidHandle(nil, hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
+            if not isValidHandle(nil, hero) or jass:IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
                 removeTrackedHero(nil, heroId)
                 goto __continue14
             end
-            local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
+            local moveSpeed = jass:GetUnitMoveSpeed(hero) or 0
             local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
             local currentEffect = tornadoEffects:get(heroId)
             if shouldHaveEffect then

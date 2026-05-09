@@ -91,7 +91,7 @@ local function _____88C1_526A_5230_5B57_8282(value)
     if value >= 255 then
         return 255
     end
-    return jass.R2I(value)
+    return jass:R2I(value)
 end
 local function _____8BBE_7F6E_8FDB_5EA6_6761_4F4D_7F6E(_____8FDB_5EA6_6761_5355_4F4D, _____8DDF_968F_5355_4F4D, _____9AD8_5EA6_504F_79FB)
     if not _____5355_4F4D_5B58_6D3B(_____8FDB_5EA6_6761_5355_4F4D) or not _____5355_4F4D_5B58_6D3B(_____8DDF_968F_5355_4F4D) then

@@ -31,10 +31,10 @@ end
 function ____exports.Star_CoordinateX(self, x)
     local minX = -10000
     local maxX = 10000
-    local mapRect = jass.GetWorldBounds()
+    local mapRect = jass:GetWorldBounds()
     if mapRect then
-        minX = jass.GetRectMinX(mapRect)
-        maxX = jass.GetRectMaxX(mapRect)
+        minX = jass:GetRectMinX(mapRect)
+        maxX = jass:GetRectMaxX(mapRect)
     end
     if x < minX then
         return minX
@@ -51,10 +51,10 @@ end
 function ____exports.Star_CoordinateY(self, y)
     local minY = -10000
     local maxY = 10000
-    local mapRect = jass.GetWorldBounds()
+    local mapRect = jass:GetWorldBounds()
     if mapRect then
-        minY = jass.GetRectMinY(mapRect)
-        maxY = jass.GetRectMaxY(mapRect)
+        minY = jass:GetRectMinY(mapRect)
+        maxY = jass:GetRectMaxY(mapRect)
     end
     if y < minY then
         return minY
@@ -71,13 +71,13 @@ end
 -- @returns Z轴高度
 function ____exports.Star_GetLocZ(self, x, y)
     if Star_Location == nil then
-        Star_Location = jass.Location(0, 0)
+        Star_Location = jass:Location(0, 0)
     end
     if Star_Location == nil then
         return 0
     end
-    jass.MoveLocation(Star_Location, x, y)
-    return jass.GetLocationZ(Star_Location)
+    jass:MoveLocation(Star_Location, x, y)
+    return jass:GetLocationZ(Star_Location)
 end
 --- 整数地址转矩形
 -- 
@@ -91,13 +91,13 @@ function ____exports.GetRectByHandle(self, i)
     if tempHT == nil then
         tempHT = StarBaseHT
     end
-    jass.FlushChildHashtable(tempHT, 2)
-    jass.SaveFogStateHandle(
+    jass:FlushChildHashtable(tempHT, 2)
+    jass:SaveFogStateHandle(
         tempHT,
         2,
         1,
-        jass.ConvertFogState(i)
+        jass:ConvertFogState(i)
     )
-    return jass.LoadRectHandle(tempHT, 2, 1)
+    return jass:LoadRectHandle(tempHT, 2, 1)
 end
 return ____exports

@@ -33,8 +33,8 @@ function ____exports.YDWEGetUnitArmor(self, u)
     if u == nil then
         return 0
     end
-    local armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR)
-    return jass.GetUnitState(u, armorState)
+    local armorState = jass:ConvertUnitState(UNIT_STATE_ARMOR)
+    return jass:GetUnitState(u, armorState)
 end
 --- 获取单位护甲值（伤害测试法）
 -- 通过造成测试伤害反算护甲值
@@ -45,7 +45,7 @@ function ____exports.YDWEGetUnitArmorByDamageTest(self, u)
     if u == nil then
         return 0
     end
-    local life = jass.GetWidgetLife(u)
+    local life = jass:GetWidgetLife(u)
     if life < 0.405 then
         return 0
     end
@@ -54,28 +54,28 @@ function ____exports.YDWEGetUnitArmorByDamageTest(self, u)
     local enab = false
     local ____jass_GetTriggeringTrigger_0
     if jass.GetTriggeringTrigger then
-        ____jass_GetTriggeringTrigger_0 = jass.GetTriggeringTrigger()
+        ____jass_GetTriggeringTrigger_0 = jass:GetTriggeringTrigger()
     else
         ____jass_GetTriggeringTrigger_0 = nil
     end
     local trig = ____jass_GetTriggeringTrigger_0
-    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
     if maxLife <= DAMAGE_LIFE then
-        jass.UnitAddAbility(u, ARMOR_TEST_ABILITY)
+        jass:UnitAddAbility(u, ARMOR_TEST_ABILITY)
     end
     if life <= DAMAGE_LIFE then
-        jass.SetWidgetLife(u, DAMAGE_LIFE)
+        jass:SetWidgetLife(u, DAMAGE_LIFE)
         test = DAMAGE_LIFE
     end
-    if trig ~= nil and jass.IsTriggerEnabled(trig) then
-        jass.DisableTrigger(trig)
+    if trig ~= nil and jass:IsTriggerEnabled(trig) then
+        jass:DisableTrigger(trig)
         enab = true
     end
     local dmgTrigger = g.yd_DamageEventTrigger
     if dmgTrigger ~= nil then
-        jass.DisableTrigger(dmgTrigger)
+        jass:DisableTrigger(dmgTrigger)
     end
-    jass.UnitDamageTarget(
+    jass:UnitDamageTarget(
         u,
         u,
         DAMAGE_TEST,
@@ -86,15 +86,15 @@ function ____exports.YDWEGetUnitArmorByDamageTest(self, u)
         nil
     )
     if dmgTrigger ~= nil then
-        jass.EnableTrigger(dmgTrigger)
+        jass:EnableTrigger(dmgTrigger)
     end
-    local newLife = jass.GetWidgetLife(u)
+    local newLife = jass:GetWidgetLife(u)
     redc = (DAMAGE_TEST - test + newLife) / DAMAGE_TEST
     if enab then
-        jass.EnableTrigger(trig)
+        jass:EnableTrigger(trig)
     end
-    jass.UnitRemoveAbility(u, ARMOR_TEST_ABILITY)
-    jass.SetWidgetLife(u, life)
+    jass:UnitRemoveAbility(u, ARMOR_TEST_ABILITY)
+    jass:SetWidgetLife(u, life)
     if redc >= 1 then
         return ARMOR_INVULNERABLE
     elseif redc < 0 then
