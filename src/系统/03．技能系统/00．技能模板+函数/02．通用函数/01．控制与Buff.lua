@@ -65,7 +65,7 @@ local function _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, BuffID)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or BuffID == nil or BuffID == 0 then
         return false
     end
-    return jass.GetUnitAbilityLevel(_____5355_4F4D, BuffID) > 0
+    return jass:GetUnitAbilityLevel(_____5355_4F4D, BuffID) > 0
 end
 --- 施法硬直效果
 -- 

@@ -23,9 +23,9 @@ local function hasItem(self, unit, _____914D_7F6E_952E_540D)
     do
         local i = 0
         while i < 6 do
-            local item = jass.UnitItemInSlot(unit, i)
+            local item = jass:UnitItemInSlot(unit, i)
             if item ~= nil then
-                local itemTypeId = jass.GetItemTypeId(item)
+                local itemTypeId = jass:GetItemTypeId(item)
                 if itemTypeId == targetItemId then
                     return true
                 end
@@ -41,7 +41,7 @@ end
 -- @returns 生命恢复加成值
 function ____exports.calcItemLifeRegenBonus(self, unit)
     local totalBonus = 0
-    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     for ____, ____value in ipairs(__TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS)) do
         local itemIdStr = ____value[1]
         local effect = ____value[2]
@@ -65,7 +65,7 @@ end
 -- @returns 魔法恢复加成值
 function ____exports.calcItemManaRegenBonus(self, unit)
     local totalBonus = 0
-    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     for ____, ____value in ipairs(__TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS)) do
         local itemIdStr = ____value[1]
         local effect = ____value[2]

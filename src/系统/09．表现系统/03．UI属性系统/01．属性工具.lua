@@ -41,13 +41,13 @@ function ____exports.isPlayingPlayer(player)
     if player == nil then
         return false
     end
-    return jass.GetPlayerSlotState(player) == jass.PLAYER_SLOT_STATE_PLAYING
+    return jass:GetPlayerSlotState(player) == jass.PLAYER_SLOT_STATE_PLAYING
 end
 function ____exports.isHumanPlayer(player)
     if player == nil then
         return false
     end
-    return jass.GetPlayerController(player) ~= jass.MAP_CONTROL_COMPUTER
+    return jass:GetPlayerController(player) ~= jass.MAP_CONTROL_COMPUTER
 end
 function ____exports.getDisplayPlayers()
     local players = {}
@@ -55,7 +55,7 @@ function ____exports.getDisplayPlayers()
         local i = 0
         while i < MAX_DISPLAY_PLAYERS do
             do
-                local player = jass.Player(i)
+                local player = jass:Player(i)
                 if not ____exports.isPlayingPlayer(player) then
                     goto __continue11
                 end
@@ -117,16 +117,16 @@ function ____exports.updatePlayerRealtimeStats(player)
     if hero == nil then
         return
     end
-    local intervalState = jass.ConvertUnitState(37)
-    local speedState = jass.ConvertUnitState(81)
-    local baseInterval = japi.GetUnitState(hero, intervalState)
-    local speedScale = japi.GetUnitState(hero, speedState)
+    local intervalState = jass:ConvertUnitState(37)
+    local speedState = jass:ConvertUnitState(81)
+    local baseInterval = japi:GetUnitState(hero, intervalState)
+    local speedScale = japi:GetUnitState(hero, speedState)
     local oldAps = ____exports.getPlayerAttr(player, "每秒攻速")
     local oldMoveSpeed = ____exports.getPlayerAttr(player, "移动速度")
     local attackIntervalSafe = baseInterval > 0 and speedScale > 0 and baseInterval / speedScale or 0
     local computedApsSafe = attackIntervalSafe > 0 and 1 / attackIntervalSafe or 0
     local attacksPerSecond = computedApsSafe > 0 and computedApsSafe or oldAps
-    local rawMoveSpeed = jass.GetUnitMoveSpeed(hero)
+    local rawMoveSpeed = jass:GetUnitMoveSpeed(hero)
     local ____temp_3
     if rawMoveSpeed > 0 then
         ____temp_3 = rawMoveSpeed
@@ -163,7 +163,7 @@ function ____exports.getHeroIcon(hero)
     if hero == nil then
         return EMPTY_ICON
     end
-    local typeId = jass.GetUnitTypeId(hero)
+    local typeId = jass:GetUnitTypeId(hero)
     if typeId == nil or typeId == 0 then
         return EMPTY_ICON
     end

@@ -4,18 +4,18 @@ local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____6E05_7406_547D_4E2D_8BB0_5F55, _____751F_6210_547D_4E2D_952E, _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001, _____5355_4F4D_5DF2_88AB_6682_505C, _____64AD_653E_4F4D_79FB_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_4F4D_79FB, _____7ED3_675F_4F4D_79FB_5B9E_4F8B, _____7ED3_675F_4F4D_79FBID, _____7ED3_7B97_547D_4E2D_4F24_5BB3, _____53EF_547D_4E2D_76EE_6807, _____8BB0_5F55_547D_4E2D, _____83B7_53D6_679A_4E3E_7EC4, _____6E05_7A7A_679A_4E3E_7EC4, _____68C0_67E5_547D_4E2D, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_4E00_6B65, ____on_51B2_950B_51FB_9000_7CFB_7EDFTick, jass, jglobals, japi, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, BJ_DEGTORAD, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, DEFAULT_ATTACK_TYPE, DEFAULT_DAMAGE_TYPE, DEFAULT_WEAPON_TYPE, _____6D3B_52A8_4F4D_79FB_5217_8868, _____4F4D_79FB_6620_5C04, _____5355_4F4D_5F53_524D_4F4D_79FB, _____547D_4E2D_8BB0_5F55, _____679A_4E3E_7EC4, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
 function _____53D6_53E5_67C4ID(h)
-    return h ~= nil and h ~= 0 and jass.GetHandleId(h) or 0 or 0
+    return h ~= nil and h ~= 0 and jass:GetHandleId(h) or 0 or 0
 end
 function _____5355_4F4D_5B58_6D3B(u)
-    return u ~= nil and u ~= 0 and jass.GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
+    return u ~= nil and u ~= 0 and jass:GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
 end
 function _____5728_53EF_73A9_533A_57DF_5185(x, y)
-    return x >= jass.GetRectMinX(jglobals.bj_mapInitialPlayableArea) and y >= jass.GetRectMinY(jglobals.bj_mapInitialPlayableArea) and x <= jass.GetRectMaxX(jglobals.bj_mapInitialPlayableArea) and y <= jass.GetRectMaxY(jglobals.bj_mapInitialPlayableArea)
+    return x >= jass:GetRectMinX(jglobals.bj_mapInitialPlayableArea) and y >= jass:GetRectMinY(jglobals.bj_mapInitialPlayableArea) and x <= jass:GetRectMaxX(jglobals.bj_mapInitialPlayableArea) and y <= jass:GetRectMaxY(jglobals.bj_mapInitialPlayableArea)
 end
 function _____8BA1_7B97_5750_6807_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass.SquareRoot(dx * dx + dy * dy)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 function _____6E05_7406_547D_4E2D_8BB0_5F55(_____4F4D_79FBID)
     local _____524D_7F00 = tostring(_____4F4D_79FBID) .. ":"
@@ -33,29 +33,29 @@ function _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001(_____5355_4F4D, _____662F_
         return
     end
     if japi ~= nil and type(japi.EXPauseUnit) == "function" then
-        japi.EXPauseUnit(_____5355_4F4D, _____662F_5426_6682_505C)
+        japi:EXPauseUnit(_____5355_4F4D, _____662F_5426_6682_505C)
         return
     end
-    jass.PauseUnit(_____5355_4F4D, _____662F_5426_6682_505C)
+    jass:PauseUnit(_____5355_4F4D, _____662F_5426_6682_505C)
 end
 function _____5355_4F4D_5DF2_88AB_6682_505C(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return false
     end
-    return jass.IsUnitPaused(_____5355_4F4D) == true
+    return jass:IsUnitPaused(_____5355_4F4D) == true
 end
 function _____64AD_653E_4F4D_79FB_7279_6548(_____5B9E_4F8B)
     local _____6A21_578B = _____5B9E_4F8B["位移特效"]
     if _____6A21_578B == nil or _____6A21_578B == "" then
         return
     end
-    local _____7279_6548 = jass.AddSpecialEffect(
+    local _____7279_6548 = jass:AddSpecialEffect(
         _____6A21_578B,
-        jass.GetUnitX(_____5B9E_4F8B["单位"]),
-        jass.GetUnitY(_____5B9E_4F8B["单位"])
+        jass:GetUnitX(_____5B9E_4F8B["单位"]),
+        jass:GetUnitY(_____5B9E_4F8B["单位"])
     )
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
-        jass.DestroyEffect(_____7279_6548)
+        jass:DestroyEffect(_____7279_6548)
     end
 end
 function _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500()
@@ -98,7 +98,7 @@ function _____7ED3_675F_4F4D_79FB_5B9E_4F8B(_____5B9E_4F8B, _____539F_56E0, ____
     local _____4F4D_79FBID = _____5B9E_4F8B.id
     local _____7ED3_675F_56DE_8C03 = _____5B9E_4F8B["结束回调"]
     if _____5B9E_4F8B["禁用碰撞"] then
-        jass.SetUnitPathing(_____5355_4F4D, true)
+        jass:SetUnitPathing(_____5355_4F4D, true)
     end
     if _____5B9E_4F8B["暂停单位"] then
         _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001(_____5355_4F4D, false)
@@ -178,8 +178,8 @@ function _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
             ____temp_10 = _____5B9E_4F8B["单位"]
         end
         local _____53C2_8003_5355_4F4D = ____temp_10
-        local _____6240_5C5E_73A9_5BB6 = jass.GetOwningPlayer(_____53C2_8003_5355_4F4D)
-        if not jass.IsUnitEnemy(_____76EE_6807_5355_4F4D, _____6240_5C5E_73A9_5BB6) then
+        local _____6240_5C5E_73A9_5BB6 = jass:GetOwningPlayer(_____53C2_8003_5355_4F4D)
+        if not jass:IsUnitEnemy(_____76EE_6807_5355_4F4D, _____6240_5C5E_73A9_5BB6) then
             return false
         end
     end
@@ -197,18 +197,18 @@ function _____8BB0_5F55_547D_4E2D(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
 end
 function _____83B7_53D6_679A_4E3E_7EC4()
     if _____679A_4E3E_7EC4 == nil or _____679A_4E3E_7EC4 == 0 then
-        _____679A_4E3E_7EC4 = jass.CreateGroup()
+        _____679A_4E3E_7EC4 = jass:CreateGroup()
     end
     return _____679A_4E3E_7EC4
 end
 function _____6E05_7A7A_679A_4E3E_7EC4()
     local g = _____83B7_53D6_679A_4E3E_7EC4()
     while true do
-        local u = jass.FirstOfGroup(g)
+        local u = jass:FirstOfGroup(g)
         if u == nil or u == 0 then
             break
         end
-        jass.GroupRemoveUnit(g, u)
+        jass:GroupRemoveUnit(g, u)
     end
 end
 function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
@@ -216,20 +216,20 @@ function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
         return nil
     end
     local _____679A_4E3E_7528_7EC4 = _____83B7_53D6_679A_4E3E_7EC4()
-    jass.GroupEnumUnitsInRange(
+    jass:GroupEnumUnitsInRange(
         _____679A_4E3E_7528_7EC4,
-        jass.GetUnitX(_____5B9E_4F8B["单位"]),
-        jass.GetUnitY(_____5B9E_4F8B["单位"]),
+        jass:GetUnitX(_____5B9E_4F8B["单位"]),
+        jass:GetUnitY(_____5B9E_4F8B["单位"]),
         _____5B9E_4F8B["命中半径"],
         nil
     )
     while true do
         do
-            local _____76EE_6807_5355_4F4D = jass.FirstOfGroup(_____679A_4E3E_7528_7EC4)
+            local _____76EE_6807_5355_4F4D = jass:FirstOfGroup(_____679A_4E3E_7528_7EC4)
             if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____679A_4E3E_7528_7EC4, _____76EE_6807_5355_4F4D)
+            jass:GroupRemoveUnit(_____679A_4E3E_7528_7EC4, _____76EE_6807_5355_4F4D)
             if not _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355_4F4D) then
                 goto __continue66
             end
@@ -254,11 +254,11 @@ function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
 end
 function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB_8DDD_79BB)
     local _____5355_4F4D = _____5B9E_4F8B["单位"]
-    local _____5F53_524DX = jass.GetUnitX(_____5355_4F4D)
-    local _____5F53_524DY = jass.GetUnitY(_____5355_4F4D)
+    local _____5F53_524DX = jass:GetUnitX(_____5355_4F4D)
+    local _____5F53_524DY = jass:GetUnitY(_____5355_4F4D)
     local _____5F27_5EA6 = _____5B9E_4F8B["角度"] * BJ_DEGTORAD
-    local _____65B0X = _____5F53_524DX + _____4F4D_79FB_8DDD_79BB * jass.Cos(_____5F27_5EA6)
-    local _____65B0Y = _____5F53_524DY + _____4F4D_79FB_8DDD_79BB * jass.Sin(_____5F27_5EA6)
+    local _____65B0X = _____5F53_524DX + _____4F4D_79FB_8DDD_79BB * jass:Cos(_____5F27_5EA6)
+    local _____65B0Y = _____5F53_524DY + _____4F4D_79FB_8DDD_79BB * jass:Sin(_____5F27_5EA6)
     if _____5B9E_4F8B["检查地形"] then
         if not _____5728_53EF_73A9_533A_57DF_5185(_____65B0X, _____65B0Y) then
             local _____649E_5899_56DE_8C03 = _____5B9E_4F8B["撞墙回调"]
@@ -287,10 +287,10 @@ function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB_8DDD_
         end
     end
     if _____5B9E_4F8B["朝向跟随位移"] then
-        jass.SetUnitFacing(_____5355_4F4D, _____5B9E_4F8B["角度"])
+        jass:SetUnitFacing(_____5355_4F4D, _____5B9E_4F8B["角度"])
     end
-    jass.SetUnitX(_____5355_4F4D, _____65B0X)
-    jass.SetUnitY(_____5355_4F4D, _____65B0Y)
+    jass:SetUnitX(_____5355_4F4D, _____65B0X)
+    jass:SetUnitY(_____5355_4F4D, _____65B0Y)
     _____5B9E_4F8B["已移动"] = _____5B9E_4F8B["已移动"] + _____4F4D_79FB_8DDD_79BB
     local _____547D_4E2D_76EE_6807 = _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
     if _____547D_4E2D_76EE_6807 ~= nil and _____547D_4E2D_76EE_6807 ~= 0 then
@@ -461,7 +461,7 @@ local function _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
 end
 local function _____9500_6BC1_679A_4E3E_7EC4()
     if _____679A_4E3E_7EC4 ~= nil and _____679A_4E3E_7EC4 ~= 0 then
-        jass.DestroyGroup(_____679A_4E3E_7EC4)
+        jass:DestroyGroup(_____679A_4E3E_7EC4)
         _____679A_4E3E_7EC4 = nil
     end
 end
@@ -553,7 +553,7 @@ local function _____521B_5EFA_4F4D_79FB_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
     _____5355_4F4D_5F53_524D_4F4D_79FB[_____5355_4F4DID] = _____4F4D_79FBID
     _____6D3B_52A8_4F4D_79FB_5217_8868[#_____6D3B_52A8_4F4D_79FB_5217_8868 + 1] = _____5B9E_4F8B
     if _____5B9E_4F8B["禁用碰撞"] then
-        jass.SetUnitPathing(_____5355_4F4D, false)
+        jass:SetUnitPathing(_____5355_4F4D, false)
     end
     if _____5B9E_4F8B["暂停单位"] then
         _____8BBE_7F6E_5355_4F4D_6682_505C_72B6_6001(_____5355_4F4D, true)
@@ -571,8 +571,8 @@ local function _____89E3_6790_51B2_950B_89D2_5EA6(_____5355_4F4D, _____53C2_6570
     if _____53C2_6570["目标X"] ~= nil and _____53C2_6570["目标Y"] ~= nil then
         return X_GAFC(
             nil,
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D),
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D),
             _____53C2_6570["目标X"],
             _____53C2_6570["目标Y"]
         )
@@ -586,10 +586,10 @@ local function _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570
     if _____53C2_6570["来源单位"] ~= nil and _____53C2_6570["来源单位"] ~= 0 then
         return X_GAFC(
             nil,
-            jass.GetUnitX(_____53C2_6570["来源单位"]),
-            jass.GetUnitY(_____53C2_6570["来源单位"]),
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D)
+            jass:GetUnitX(_____53C2_6570["来源单位"]),
+            jass:GetUnitY(_____53C2_6570["来源单位"]),
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D)
         )
     end
     if _____53C2_6570["来源X"] ~= nil and _____53C2_6570["来源Y"] ~= nil then
@@ -597,8 +597,8 @@ local function _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570
             nil,
             _____53C2_6570["来源X"],
             _____53C2_6570["来源Y"],
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D)
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D)
         )
     end
     return nil

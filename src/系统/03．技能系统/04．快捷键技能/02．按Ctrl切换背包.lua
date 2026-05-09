@@ -31,15 +31,15 @@ local function swapItems(self, unit1, unit2, slot)
         UnitRemoveItemSwapped(nil, item2, unit2)
     end
     if item1 ~= nil then
-        jass.UnitAddItem(unit2, item1)
+        jass:UnitAddItem(unit2, item1)
     end
     if item2 ~= nil then
-        jass.UnitAddItem(unit1, item2)
+        jass:UnitAddItem(unit1, item2)
     end
 end
 --- 按Ctrl切换背包事件处理
 local function onCtrlSwitchBag(self)
-    local player = japi.DzGetTriggerKeyPlayer()
+    local player = japi:DzGetTriggerKeyPlayer()
     local hero = YDUserDataGet(
         nil,
         "player",
@@ -50,13 +50,13 @@ local function onCtrlSwitchBag(self)
     if hero == nil then
         return
     end
-    if not jass.IsUnitSelected(hero, player) then
+    if not jass:IsUnitSelected(hero, player) then
         return
     end
     local helperUnit = YDUserDataGet(
         nil,
         "player",
-        jass.GetOwningPlayer(hero),
+        jass:GetOwningPlayer(hero),
         "切换背包辅助",
         "unit"
     )
@@ -82,8 +82,8 @@ function ____exports.initSwitchBag(self)
     if switchBagTrigger ~= nil then
         return
     end
-    switchBagTrigger = jass.CreateTrigger()
+    switchBagTrigger = jass:CreateTrigger()
     DzTriggerRegisterKeyEventTrg(nil, switchBagTrigger, 0, 17)
-    jass.TriggerAddAction(switchBagTrigger, onCtrlSwitchBag)
+    jass:TriggerAddAction(switchBagTrigger, onCtrlSwitchBag)
 end
 return ____exports

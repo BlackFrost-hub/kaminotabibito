@@ -130,7 +130,7 @@ local function isHeroLevelConditionMatched(self, text, triggerPlayerId)
         local limit = readFirstNumber(nil, text)
         local ____temp_0
         if triggerPlayerId ~= nil then
-            ____temp_0 = jass.Player(triggerPlayerId)
+            ____temp_0 = jass:Player(triggerPlayerId)
         else
             ____temp_0 = nil
         end
@@ -142,14 +142,14 @@ local function isHeroLevelConditionMatched(self, text, triggerPlayerId)
             ____p_1 = nil
         end
         local hero = ____p_1
-        local lv = hero and jass.GetHeroLevel(hero) or 0
+        local lv = hero and jass:GetHeroLevel(hero) or 0
         return lv > limit
     end
     if (string.find(text, "英雄等级≤", nil, true) or 0) - 1 == 0 or (string.find(text, "英雄等级<=", nil, true) or 0) - 1 == 0 then
         local limit = readFirstNumber(nil, text)
         local ____temp_2
         if triggerPlayerId ~= nil then
-            ____temp_2 = jass.Player(triggerPlayerId)
+            ____temp_2 = jass:Player(triggerPlayerId)
         else
             ____temp_2 = nil
         end
@@ -161,7 +161,7 @@ local function isHeroLevelConditionMatched(self, text, triggerPlayerId)
             ____p_3 = nil
         end
         local hero = ____p_3
-        local lv = hero and jass.GetHeroLevel(hero) or 0
+        local lv = hero and jass:GetHeroLevel(hero) or 0
         return lv <= limit
     end
     return true

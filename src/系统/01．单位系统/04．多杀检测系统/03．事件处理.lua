@@ -50,7 +50,7 @@ function ____exports.fireMultiKillEvent(self)
     local healSource = YDLocal5Get(nil, "unit", "HealSource")
     local resolvedEffectSource = effectSource
     if resolvedEffectSource == nil or resolvedEffectSource == 0 then
-        resolvedEffectSource = jass.FirstOfGroup(killGroup)
+        resolvedEffectSource = jass:FirstOfGroup(killGroup)
         if resolvedEffectSource ~= nil and resolvedEffectSource ~= 0 then
             dbg(nil, "effectSource 未传，已用 killGroup 内第一个单位作为 effectSource")
         end
@@ -108,7 +108,7 @@ function ____exports.fireMultiKillEvent(self)
     local ____dbg_10 = dbg
     local ____temp_9
     if killGroup ~= 0 and killGroup ~= nil then
-        ____temp_9 = jass.CountUnitsInGroup(killGroup)
+        ____temp_9 = jass:CountUnitsInGroup(killGroup)
     else
         ____temp_9 = "N/A"
     end

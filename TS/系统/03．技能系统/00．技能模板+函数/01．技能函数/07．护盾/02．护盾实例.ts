@@ -10,7 +10,7 @@
 
 const jass = require("jass.common") as any;
 
-import { 护盾实例, 护盾参数, ShieldType, 类型优先级, 默认抵挡优先级 } from "./01．护盾类型";
+import { 护盾实例, 护盾参数, 护盾类型, 类型优先级, 默认抵挡优先级 } from "./01．护盾类型";
 
 // ==========================================================================================
 // JASS 函数别名
@@ -57,12 +57,12 @@ export function 创建护盾实例(单位: any, 参数: 护盾参数): 护盾实
     单位,
     单位ID,
     来源单位: 参数.来源单位,
-    类型: 参数.类型 ?? ShieldType.General,
+    类型: 参数.类型 ?? 护盾类型.通用,
     初始值: 参数.数值,
     当前值: 参数.数值,
     总持续时间: 参数.持续时间 ?? 0,
     剩余时间: 参数.持续时间 ?? 0,
-    类型优先级: 参数.类型优先级 ?? 类型优先级[参数.类型 ?? ShieldType.General],
+    类型优先级: 参数.类型优先级 ?? 类型优先级[参数.类型 ?? 护盾类型.通用],
     抵挡优先级: 参数.抵挡优先级 ?? 默认抵挡优先级,
     显示护盾条: 参数.显示护盾条 !== false,
     可驱散: 参数.可驱散 !== false,
@@ -185,7 +185,7 @@ export function 获取单位总护盾值(单位ID: number): number {
 /**
  * 获取单位指定类型护盾值
  */
-export function 获取单位类型护盾值(单位ID: number, 类型: ShieldType): number {
+export function 获取单位类型护盾值(单位ID: number, 类型: 护盾类型): number {
   const ids = 获取单位护盾列表(单位ID);
   let total = 0;
   for (const id of ids) {

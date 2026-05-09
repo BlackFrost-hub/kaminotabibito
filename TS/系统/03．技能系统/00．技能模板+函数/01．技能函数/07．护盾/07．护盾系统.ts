@@ -9,7 +9,7 @@
  * - 接入伤害系统
  */
 
-import { ShieldType, 护盾参数, 护盾结束原因 } from "./01．护盾类型";
+import { 护盾类型, 护盾参数, 护盾结束原因 } from "./01．护盾类型";
 import {
   创建护盾实例,
   获取护盾实例,
@@ -148,7 +148,7 @@ export function 移除单位全部护盾(单位: any): void {
  * 获取护盾信息
  */
 export function 获取护盾信息(护盾ID: number): {
-  类型: ShieldType;
+  类型: 护盾类型;
   当前值: number;
   初始值: number;
   剩余时间: number;
@@ -177,7 +177,7 @@ export function 查询单位总护盾值(单位: any): number {
 /**
  * 查询单位指定类型护盾值
  */
-export function 查询单位类型护盾值(单位: any, 类型: ShieldType): number {
+export function 查询单位类型护盾值(单位: any, 类型: 护盾类型): number {
   const 单位ID = 取句柄ID(单位);
   return 获取单位类型护盾值(单位ID, 类型);
 }
@@ -195,7 +195,7 @@ export function 查询单位是否有护盾(单位: any): boolean {
  */
 export function 查询单位护盾列表(单位: any): Array<{
   id: number;
-  类型: ShieldType;
+  类型: 护盾类型;
   当前值: number;
   初始值: number;
   剩余时间: number;

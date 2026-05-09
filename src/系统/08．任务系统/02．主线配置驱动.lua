@@ -81,8 +81,8 @@ local function ensureRuntimeQuest()
         rewards = {},
         status = QuestStatus.UNDISCOVERED,
         icon = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp",
-        createdAt = os.time(),
-        updatedAt = os.time()
+        createdAt = os:time(),
+        updatedAt = os:time()
     })
     questDB:acceptQuest(0, RUNTIME_QUEST_ID)
 end
@@ -100,7 +100,7 @@ local function refreshQuestUI(desc, msg)
         if type(desc) == "string" and desc ~= "" then
             q.description = desc
         end
-        q.updatedAt = os.time()
+        q.updatedAt = os:time()
     end
     local triggerUIRefresh = questManager.triggerUIRefresh
     if type(triggerUIRefresh) == "function" then
@@ -156,7 +156,7 @@ local function parseDialogLines(dialogPreview)
 end
 local function calcDialogDuration(text)
     local n = #text
-    local t = 1 + jass.R2I(n / 10)
+    local t = 1 + jass:R2I(n / 10)
     if t < 2 then
         return 2
     end
@@ -258,7 +258,7 @@ local function createEvalEnv(triggerUnit)
         end
         if ty == "location" and key == "单位位置" and triggerUnit then
             if not cachedLoc then
-                cachedLoc = jass.GetUnitLoc(triggerUnit)
+                cachedLoc = jass:GetUnitLoc(triggerUnit)
             end
             return cachedLoc
         end
@@ -332,17 +332,17 @@ local function executeActionCode(code, triggerUnit)
             "主线配置驱动",
             "action执行失败:",
             code,
-            "| err=" .. tostring(ok[1])
+            "| err=" .. tostring(nil, ok[1])
         )
     end
 end
 local storyActionCtxByTimerHid = {}
 local function onStoryActionTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass.GetHandleId(t)
+    local hid = jass:GetHandleId(t)
     local ctx = storyActionCtxByTimerHid[hid]
     __TS__Delete(storyActionCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
@@ -358,9 +358,9 @@ local function runActionTimeline(timeline, triggerUnit)
                 executeActionCode(e.code, triggerUnit)
                 goto __continue66
             end
-            local t = jass.CreateTimer()
+            local t = jass:CreateTimer()
             if t then
-                storyActionCtxByTimerHid[jass.GetHandleId(t)] = {code = e.code, triggerUnit = triggerUnit}
+                storyActionCtxByTimerHid[jass:GetHandleId(t)] = {code = e.code, triggerUnit = triggerUnit}
                 safeTimerStart(
                     nil,
                     t,
@@ -512,13 +512,13 @@ local function reportMissingFunctions()
         nil,
         "主线配置驱动",
         "缺失函数统计 - condition:",
-        tostring(_G.__mainQuestMissingReport.condition.length)
+        tostring(nil, _G.__mainQuestMissingReport.condition.length)
     )
     debugLog(
         nil,
         "主线配置驱动",
         "缺失函数统计 - actionTimeline:",
-        tostring(_G.__mainQuestMissingReport.actionTimeline.length)
+        tostring(nil, _G.__mainQuestMissingReport.actionTimeline.length)
     )
 end
 local function init()

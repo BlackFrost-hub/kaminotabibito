@@ -138,7 +138,7 @@ function updateSkillTip(skillInfo)
     if not abil then
         return
     end
-    local currentLevel = jass.GetUnitAbilityLevel(unit, abilityId) or skillInfo.level or 1
+    local currentLevel = jass:GetUnitAbilityLevel(unit, abilityId) or skillInfo.level or 1
     skillInfo.level = currentLevel
     skillInfo.renderedText = processTemplate(template, unit, currentLevel)
 end
@@ -218,31 +218,31 @@ local ABILITY_DATA_UBERTIP = ____require_result_0.ABILITY_DATA_UBERTIP
 ____exports.ABILITY_DATA_TIP = ABILITY_DATA_TIP
 ____exports.ABILITY_DATA_UBERTIP = ABILITY_DATA_UBERTIP
 local attributeGetters = {
-    [ATTR_STR] = function(u) return jass.GetHeroStr(u, true) or 0 end,
-    [ATTR_AGI] = function(u) return jass.GetHeroAgi(u, true) or 0 end,
-    [ATTR_INT] = function(u) return jass.GetHeroInt(u, true) or 0 end,
-    [ATTR_STR_WHITE] = function(u) return jass.GetHeroStr(u, false) or 0 end,
-    [ATTR_AGI_WHITE] = function(u) return jass.GetHeroAgi(u, false) or 0 end,
-    [ATTR_INT_WHITE] = function(u) return jass.GetHeroInt(u, false) or 0 end,
-    [ATTR_HP] = function(u) return jass.GetUnitState(u, jass.UNIT_STATE_LIFE) or 0 end,
-    [ATTR_HP_MAX] = function(u) return jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) or 0 end,
-    [ATTR_MP] = function(u) return jass.GetUnitState(u, jass.UNIT_STATE_MANA) or 0 end,
-    [ATTR_MP_MAX] = function(u) return jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0 end,
-    [ATTR_ATTACK] = function(u) return (jass.GetUnitState(
+    [ATTR_STR] = function(u) return jass:GetHeroStr(u, true) or 0 end,
+    [ATTR_AGI] = function(u) return jass:GetHeroAgi(u, true) or 0 end,
+    [ATTR_INT] = function(u) return jass:GetHeroInt(u, true) or 0 end,
+    [ATTR_STR_WHITE] = function(u) return jass:GetHeroStr(u, false) or 0 end,
+    [ATTR_AGI_WHITE] = function(u) return jass:GetHeroAgi(u, false) or 0 end,
+    [ATTR_INT_WHITE] = function(u) return jass:GetHeroInt(u, false) or 0 end,
+    [ATTR_HP] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_LIFE) or 0 end,
+    [ATTR_HP_MAX] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) or 0 end,
+    [ATTR_MP] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MANA) or 0 end,
+    [ATTR_MP_MAX] = function(u) return jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0 end,
+    [ATTR_ATTACK] = function(u) return (jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
-    ) or 0) + (jass.GetUnitState(
+        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
+    ) or 0) + (jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
+        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
     ) or 0) end,
-    [ATTR_ARMOR] = function(u) return jass.GetUnitState(
+    [ATTR_ARMOR] = function(u) return jass:GetUnitState(
         u,
-        jass.ConvertUnitState(UNIT_STATE_ARMOR)
+        jass:ConvertUnitState(UNIT_STATE_ARMOR)
     ) or 0 end,
-    [ATTR_MOVE_SPEED] = function(u) return jass.GetUnitMoveSpeed(u) or 0 end,
-    [ATTR_LEVEL] = function(u) return jass.GetHeroLevel(u) or 0 end,
-    [ATTR_HERO_LEVEL] = function(u) return jass.GetHeroLevel(u) or 0 end,
-    [ATTR_XP] = function(u) return jass.GetHeroXP(u) or 0 end
+    [ATTR_MOVE_SPEED] = function(u) return jass:GetUnitMoveSpeed(u) or 0 end,
+    [ATTR_LEVEL] = function(u) return jass:GetHeroLevel(u) or 0 end,
+    [ATTR_HERO_LEVEL] = function(u) return jass:GetHeroLevel(u) or 0 end,
+    [ATTR_XP] = function(u) return jass:GetHeroXP(u) or 0 end
 }
 FORMULA_TOKEN_SKILL_LEVEL = "__SKILL_LEVEL__"
 local FORMULA_TOKEN_STR = "__STR__"
@@ -320,7 +320,7 @@ function ____exports.registerDynamicSkillTip(unit, abilityId, template, level, t
     if not unit or not abilityId or not template then
         return false
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId then
         return false
     end
@@ -377,7 +377,7 @@ function ____exports.unregisterDynamicSkillTip(unit, abilityId)
     if not unit then
         return false
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return false
     end
@@ -401,7 +401,7 @@ function ____exports.getDynamicSkillTipText(unit, abilityId, tipType)
     if not unit or not abilityId then
         return nil
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return nil
     end
@@ -433,7 +433,7 @@ function ____exports.refreshUnitSkillTips(unit)
     if not unit then
         return
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return
     end
@@ -539,7 +539,7 @@ function ____exports.getRegisteredSkillCount(unit)
     if not unit then
         return 0
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     if not handleId or not skillRegistry:has(handleId) then
         return 0
     end

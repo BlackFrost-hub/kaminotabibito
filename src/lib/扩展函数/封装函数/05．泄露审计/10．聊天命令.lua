@@ -8,7 +8,7 @@ local dump = ____09_FF0E_6253_5370_7EDF_8BA1.dump
 local jass = require("jass.common")
 local function onLeakWatcherChat(self)
     local tag
-    local raw = jass.GetEventPlayerChatString()
+    local raw = jass:GetEventPlayerChatString()
     if raw ~= nil and #raw > 5 then
         local idx = (string.find(raw, " ", nil, true) or 0) - 1
         if idx >= 0 and idx < #raw - 1 then
@@ -22,14 +22,14 @@ local function onLeakWatcherChat(self)
 end
 --- 注册聊天 "-leak" 触发方式，方便临时查看
 function ____exports.initLeakWatcherTriggers(self)
-    local trChat = jass.CreateTrigger()
-    jass.TriggerRegisterPlayerChatEvent(
+    local trChat = jass:CreateTrigger()
+    jass:TriggerRegisterPlayerChatEvent(
         trChat,
-        jass.Player(0),
+        jass:Player(0),
         "-leak",
         false
     )
-    jass.TriggerAddAction(trChat, onLeakWatcherChat)
+    jass:TriggerAddAction(trChat, onLeakWatcherChat)
 end
 ____exports.initLeakWatcherTriggers(nil)
 return ____exports

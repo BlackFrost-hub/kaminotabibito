@@ -3,7 +3,7 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____01_FF0E_62A4_76FE_7C7B_578B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.01．护盾类型")
-local ShieldType = ____01_FF0E_62A4_76FE_7C7B_578B.ShieldType
+local _____62A4_76FE_7C7B_578B = ____01_FF0E_62A4_76FE_7C7B_578B["护盾类型"]
 --- 对护盾列表按优先级排序（返回新数组，不修改原数组）
 -- 
 -- 排序规则：
@@ -36,13 +36,13 @@ ____exports["筛选可匹配护盾"] = function(_____62A4_76FE_5217_8868, _____6
     return __TS__ArrayFilter(
         _____62A4_76FE_5217_8868,
         function(____, _____5B9E_4F8B)
-            if _____5B9E_4F8B["类型"] == ShieldType.General then
+            if _____5B9E_4F8B["类型"] == _____62A4_76FE_7C7B_578B["通用"] then
                 return true
             end
-            if _____5B9E_4F8B["类型"] == ShieldType.Physical and _____662F_7269_7406_4F24_5BB3 then
+            if _____5B9E_4F8B["类型"] == _____62A4_76FE_7C7B_578B["物理"] and _____662F_7269_7406_4F24_5BB3 then
                 return true
             end
-            if _____5B9E_4F8B["类型"] == ShieldType.Magical and _____662F_9B54_6CD5_4F24_5BB3 then
+            if _____5B9E_4F8B["类型"] == _____62A4_76FE_7C7B_578B["魔法"] and _____662F_9B54_6CD5_4F24_5BB3 then
                 return true
             end
             return false

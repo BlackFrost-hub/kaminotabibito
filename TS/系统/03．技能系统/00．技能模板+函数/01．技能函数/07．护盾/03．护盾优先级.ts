@@ -8,7 +8,7 @@
  * 3. 到期时间：最早到期的优先（同优先级时）
  */
 
-import { 护盾实例, ShieldType } from "./01．护盾类型";
+import { 护盾实例, 护盾类型 } from "./01．护盾类型";
 
 /**
  * 对护盾列表按优先级排序（返回新数组，不修改原数组）
@@ -47,11 +47,11 @@ export function 排序护盾列表(护盾列表: 护盾实例[]): 护盾实例[]
 export function 筛选可匹配护盾(护盾列表: 护盾实例[], 是物理伤害: boolean, 是魔法伤害: boolean): 护盾实例[] {
   return 护盾列表.filter(实例 => {
     // 通用护盾可吸收所有伤害
-    if (实例.类型 === ShieldType.General) return true;
+    if (实例.类型 === 护盾类型.通用) return true;
     // 物理护盾只吸收物理伤害
-    if (实例.类型 === ShieldType.Physical && 是物理伤害) return true;
+    if (实例.类型 === 护盾类型.物理 && 是物理伤害) return true;
     // 魔法护盾只吸收魔法伤害
-    if (实例.类型 === ShieldType.Magical && 是魔法伤害) return true;
+    if (实例.类型 === 护盾类型.魔法 && 是魔法伤害) return true;
     return false;
   });
 }

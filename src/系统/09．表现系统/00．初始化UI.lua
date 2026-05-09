@@ -12,26 +12,26 @@ local japi = require("jass.japi")
 -- 
 -- 注意：按钮文字已经在地图编辑器的【高级-游戏界面】中改成空格了
 function ____exports.initNativeUI(self)
-    local backdrop = japi.DzCreateFrameByTagName(
+    local backdrop = japi:DzCreateFrameByTagName(
         "BACKDROP",
         "name",
-        japi.DzGetGameUI(),
+        japi:DzGetGameUI(),
         "template",
         0
     )
-    japi.DzFrameSetSize(backdrop, 1 / 2400, 1 / 1800)
-    japi.DzFrameSetPoint(
+    japi:DzFrameSetSize(backdrop, 1 / 2400, 1 / 1800)
+    japi:DzFrameSetPoint(
         backdrop,
         0,
-        japi.DzGetGameUI(),
+        japi:DzGetGameUI(),
         0,
         205.5 / 2400,
         -19.3 / 1800
     )
-    local button = japi.DzFrameGetUpperButtonBarButton(0)
-    japi.DzFrameClearAllPoints(button)
-    japi.DzFrameSetSize(button, 1 / 2400, 1 / 1800)
-    japi.DzFrameSetPoint(
+    local button = japi:DzFrameGetUpperButtonBarButton(0)
+    japi:DzFrameClearAllPoints(button)
+    japi:DzFrameSetSize(button, 1 / 2400, 1 / 1800)
+    japi:DzFrameSetPoint(
         button,
         4,
         backdrop,
@@ -39,6 +39,6 @@ function ____exports.initNativeUI(self)
         0,
         0
     )
-    japi.DzFrameSetTexture(backdrop, "UI\\toumingtietu.tga", 0)
+    japi:DzFrameSetTexture(backdrop, "UI\\toumingtietu.tga", 0)
 end
 return ____exports

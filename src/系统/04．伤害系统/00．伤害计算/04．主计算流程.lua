@@ -4,7 +4,7 @@ local applyElementalDamage, getRealAttrWithLimit, calcElementalDamageBonus, ____
 function applyElementalDamage(attacker, target, isPlayer)
     local addDamage = 0
     local multiplier = 1
-    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
+    if _____4F24_5BB3_51FD_6570:isMetalDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "金属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "金属性抗性", isPlayer)
         if dmg >= 0 then
@@ -14,7 +14,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
+    if _____4F24_5BB3_51FD_6570:isWoodDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "木属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "木属性抗性", isPlayer)
         if dmg >= 0 then
@@ -24,7 +24,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
+    if _____4F24_5BB3_51FD_6570:isWaterDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "水属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "水属性抗性", isPlayer)
         if dmg >= 0 then
@@ -34,7 +34,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isFireDamage() then
+    if _____4F24_5BB3_51FD_6570:isFireDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "火属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "火属性抗性", isPlayer)
         if dmg >= 0 then
@@ -44,7 +44,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
+    if _____4F24_5BB3_51FD_6570:isThunderDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "雷属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "雷属性抗性", isPlayer)
         if dmg >= 0 then
@@ -54,7 +54,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isLightDamage() then
+    if _____4F24_5BB3_51FD_6570:isLightDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "光属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "光属性抗性", isPlayer)
         if dmg >= 0 then
@@ -64,7 +64,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
+    if _____4F24_5BB3_51FD_6570:isDarkDamage() then
         local dmg = calcElementalDamageBonus(nil, attacker, "暗属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "暗属性抗性", isPlayer)
         if dmg >= 0 then
@@ -122,7 +122,9 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied)
                 if cb == nil then
                     goto __continue5
                 end
-                pcall(function () return cb(target, attacker, applied) end
+                pcall(
+                    nil,
+                    function() return cb(target, attacker, applied) end
                 )
             end
             ::__continue5::
@@ -149,11 +151,11 @@ end
 function ____exports.calculateDamage(target, attacker, baseDamage)
     local damage = baseDamage
     local isPlayer = isPlayerUnit(nil, target)
-    local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
-    local isPhysDmg = _____4F24_5BB3_51FD_6570.isPhysicalDamage()
-    local isMagicDmg = _____4F24_5BB3_51FD_6570.isMagicDamage()
-    local isEnhanceDmg = _____4F24_5BB3_51FD_6570.isEnhancedDamage()
-    local isTrueDmg = _____4F24_5BB3_51FD_6570.isTrueDamage()
+    local isNormalAtk = _____4F24_5BB3_51FD_6570:isNormalAttack()
+    local isPhysDmg = _____4F24_5BB3_51FD_6570:isPhysicalDamage()
+    local isMagicDmg = _____4F24_5BB3_51FD_6570:isMagicDamage()
+    local isEnhanceDmg = _____4F24_5BB3_51FD_6570:isEnhancedDamage()
+    local isTrueDmg = _____4F24_5BB3_51FD_6570:isTrueDamage()
     if isTrueDmg then
         return {finalDamage = damage, immune = false, showDodge = false}
     end
@@ -209,7 +211,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
             finalMultiplier = finalMultiplier * (1 + enhanceDmg)
         end
     end
-    if _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() then
+    if _____4F24_5BB3_51FD_6570:isSkillAttack() or _____4F24_5BB3_51FD_6570:isSkillDamage() then
         local skillMod = getSkillDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + skillMod.addDamage
         finalMultiplier = finalMultiplier * skillMod.multiplier
@@ -254,7 +256,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
     end
     local result = ____exports.calculateDamage(target, attacker, baseDamage)
     if result.immune then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
+        _____4F24_5BB3_51FD_6570:YDWESetEventDamage(0)
         notifyAppliedFinalDamageListeners(target, attacker, 0)
         if result.showDodge then
         end
@@ -269,22 +271,22 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
                 attacker = attacker,
                 baseDamage = baseDamage,
                 currentDamage = finalDamage,
-                isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
-                isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
-                isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
-                isTrueDamage = _____4F24_5BB3_51FD_6570.isTrueDamage(),
-                isNormalAttack = _____4F24_5BB3_51FD_6570.isNormalAttack(),
-                isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
-                isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage()
+                isPhysicalDamage = _____4F24_5BB3_51FD_6570:isPhysicalDamage(),
+                isMagicDamage = _____4F24_5BB3_51FD_6570:isMagicDamage(),
+                isEnhancedDamage = _____4F24_5BB3_51FD_6570:isEnhancedDamage(),
+                isTrueDamage = _____4F24_5BB3_51FD_6570:isTrueDamage(),
+                isNormalAttack = _____4F24_5BB3_51FD_6570:isNormalAttack(),
+                isSkillAttack = _____4F24_5BB3_51FD_6570:isSkillAttack(),
+                isSkillDamage = _____4F24_5BB3_51FD_6570:isSkillDamage()
             }
         )
     end
     if finalDamage ~= baseDamage then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(finalDamage)
+        _____4F24_5BB3_51FD_6570:YDWESetEventDamage(finalDamage)
     end
     notifyAppliedFinalDamageListeners(target, attacker, finalDamage)
-    local isMagic = _____4F24_5BB3_51FD_6570.isMagicDamage()
-    local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
+    local isMagic = _____4F24_5BB3_51FD_6570:isMagicDamage()
+    local isNormalAtk = _____4F24_5BB3_51FD_6570:isNormalAttack()
     applyLifeAndManaSteal(
         nil,
         attacker,

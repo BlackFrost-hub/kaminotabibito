@@ -9,7 +9,7 @@
  * 4. 护盾耗尽或单位死亡时删除
  */
 
-import { ShieldType } from "./01．护盾类型";
+import { 护盾类型 } from "./01．护盾类型";
 import { 获取单位总护盾值, 获取单位护盾实例列表, 取句柄ID } from "./02．护盾实例";
 
 const jass = require("jass.common") as any;
@@ -46,8 +46,8 @@ const R2I = jass.R2I as (r: number) => number;
 // 常量
 // ==========================================================================================
 
-const PROGRESSBAR_UNIT_ID = 1697657137; // 'e011'
-const PROGRESSBAR_OWNER_PLAYER_ID = 4;
+const SHIELD_BAR_UNIT_ID = 1935764066; // 'sbar'
+const SHIELD_BAR_OWNER_PLAYER_ID = 4;
 const DEFAULT_HEIGHT_OFFSET = 290.0; // 比进度条略高
 const UNIT_ALIVE_LIFE = 0.405;
 
@@ -204,8 +204,8 @@ export function 创建护盾条(单位: any): void {
   // 创建新的护盾条单位
   const x = GetUnitX(单位);
   const y = GetUnitY(单位);
-  const owner = Player(PROGRESSBAR_OWNER_PLAYER_ID);
-  const 护盾条单位 = CreateUnit(owner, PROGRESSBAR_UNIT_ID, x, y, 0);
+  const owner = Player(SHIELD_BAR_OWNER_PLAYER_ID);
+  const 护盾条单位 = CreateUnit(owner, SHIELD_BAR_UNIT_ID, x, y, 0);
   if (!单位存活(护盾条单位)) return;
 
   SetUnitScale(护盾条单位, 1, 1, 1);

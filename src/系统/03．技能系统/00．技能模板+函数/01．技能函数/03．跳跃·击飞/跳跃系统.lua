@@ -14,7 +14,7 @@ end
 function _____8BA1_7B97_5750_6807_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass.SquareRoot(dx * dx + dy * dy)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 function _____9650_5236_8FDB_5EA6(v)
     if v <= 0 then

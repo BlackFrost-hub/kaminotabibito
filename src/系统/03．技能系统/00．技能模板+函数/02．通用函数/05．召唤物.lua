@@ -75,7 +75,7 @@ local jass = require("jass.common")
 jglobals = require("jass.globals")
 local STES_Fire_Global = _G.STES_Fire
 local function _____5B57_7B26_4E32_54C8_5E0C(name)
-    return jass.StringHash(name) or 0
+    return jass:StringHash(name) or 0
 end
 local function _____5199_5C40_90E8(____type, name, value)
     local ydloc = _____83B7_53D6YDLOC()
@@ -88,22 +88,22 @@ local function _____5199_5C40_90E8(____type, name, value)
         local ____switch5 = ____type
         local ____cond5 = ____switch5 == "unit"
         if ____cond5 then
-            jass.SaveUnitHandle(ydloc, page, key, value)
+            jass:SaveUnitHandle(ydloc, page, key, value)
             return
         end
         ____cond5 = ____cond5 or ____switch5 == "integer"
         if ____cond5 then
-            jass.SaveInteger(ydloc, page, key, value)
+            jass:SaveInteger(ydloc, page, key, value)
             return
         end
         ____cond5 = ____cond5 or ____switch5 == "real"
         if ____cond5 then
-            jass.SaveReal(ydloc, page, key, value)
+            jass:SaveReal(ydloc, page, key, value)
             return
         end
         ____cond5 = ____cond5 or ____switch5 == "string"
         if ____cond5 then
-            jass.SaveStr(ydloc, page, key, value)
+            jass:SaveStr(ydloc, page, key, value)
             return
         end
     until true
@@ -119,19 +119,19 @@ local function _____8BFB_5C40_90E8(____type, name)
         local ____switch8 = ____type
         local ____cond8 = ____switch8 == "unit"
         if ____cond8 then
-            return jass.LoadUnitHandle(ydloc, page, key)
+            return jass:LoadUnitHandle(ydloc, page, key)
         end
         ____cond8 = ____cond8 or ____switch8 == "integer"
         if ____cond8 then
-            return jass.LoadInteger(ydloc, page, key)
+            return jass:LoadInteger(ydloc, page, key)
         end
         ____cond8 = ____cond8 or ____switch8 == "real"
         if ____cond8 then
-            return jass.LoadReal(ydloc, page, key)
+            return jass:LoadReal(ydloc, page, key)
         end
         ____cond8 = ____cond8 or ____switch8 == "string"
         if ____cond8 then
-            return jass.LoadStr(ydloc, page, key)
+            return jass:LoadStr(ydloc, page, key)
         end
     until true
 end
@@ -227,7 +227,7 @@ ____exports["创建召唤物并套用JASS模板"] = function(_____53C2_6570)
     _____5199_5165_53EC_5524_53C2_6570(_____53C2_6570)
     _____89E6_53D1STES_4E8B_4EF6(SUMMON_STES_EVENT)
     local _____53EC_5524_7269 = _____8BFB_5C40_90E8("unit", "Summon")
-    jass.FlushChildHashtable(YDLOC, parentPage)
+    jass:FlushChildHashtable(YDLOC, parentPage)
     _____8BBEGSIndex(prevSIndex)
     _____8BBEGLIndex(prevLIndex)
     local ____temp_12

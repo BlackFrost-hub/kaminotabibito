@@ -28,8 +28,8 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local R2I = jass.R2I
-local PROGRESSBAR_UNIT_ID = 1697657137
-local PROGRESSBAR_OWNER_PLAYER_ID = 4
+local SHIELD_BAR_UNIT_ID = 1935764066
+local SHIELD_BAR_OWNER_PLAYER_ID = 4
 local DEFAULT_HEIGHT_OFFSET = 290
 local UNIT_ALIVE_LIFE = 0.405
 local COLOR_DEFAULT = {r = 255, g = 255, b = 0, a = 255}
@@ -94,7 +94,7 @@ local function _____8BBE_7F6E_62A4_76FE_6761_6BD4_4F8B(_____6570_636E, _____6BD4
     if not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) then
         return
     end
-    local _____5E27_7D22_5F15 = jass.R2I(_____6BD4_4F8B * 99)
+    local _____5E27_7D22_5F15 = jass:R2I(_____6BD4_4F8B * 99)
     if _____5E27_7D22_5F15 < 0 then
         _____5E27_7D22_5F15 = 0
     end
@@ -173,10 +173,10 @@ ____exports["创建护盾条"] = function(_____5355_4F4D)
     end
     local x = GetUnitX(_____5355_4F4D)
     local y = GetUnitY(_____5355_4F4D)
-    local owner = Player(PROGRESSBAR_OWNER_PLAYER_ID)
+    local owner = Player(SHIELD_BAR_OWNER_PLAYER_ID)
     local _____62A4_76FE_6761_5355_4F4D = CreateUnit(
         owner,
-        PROGRESSBAR_UNIT_ID,
+        SHIELD_BAR_UNIT_ID,
         x,
         y,
         0

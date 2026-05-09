@@ -20,7 +20,7 @@ local function damageCallback(self, target, damage, damageType, fromDotTickBatch
     if fromDotTickBatch then
         return
     end
-    onDamageEvent(target, source, damage)
+    onDamageEvent(nil, target, source, damage)
 end
 --- 初始化伤害计算系统
 -- 
