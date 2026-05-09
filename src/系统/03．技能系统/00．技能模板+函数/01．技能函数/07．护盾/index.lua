@@ -25,12 +25,11 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.04．护盾伤害结算")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
+    local ____04_FF0E_62A4_76FE_4F24_5BB3_7ED3_7B97 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.04．护盾伤害结算")
+    ____exports["吸收伤害"] = ____04_FF0E_62A4_76FE_4F24_5BB3_7ED3_7B97["吸收伤害"]
+    ____exports["注册护盾吸收钩子"] = ____04_FF0E_62A4_76FE_4F24_5BB3_7ED3_7B97["注册护盾吸收钩子"]
+    ____exports["最近护盾吸收量"] = ____04_FF0E_62A4_76FE_4F24_5BB3_7ED3_7B97["最近护盾吸收量"]
+    ____exports["最近护盾吸收类型"] = ____04_FF0E_62A4_76FE_4F24_5BB3_7ED3_7B97["最近护盾吸收类型"]
 end
 do
     local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.05．护盾生命周期")

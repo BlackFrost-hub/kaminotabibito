@@ -45,21 +45,21 @@ function ____exports.autoRegisterNeutralAggressive(unit)
     if not unit then
         return
     end
-    local owner = jass:GetOwningPlayer(unit)
-    local neutralAggressive = jass:Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
+    local owner = jass.GetOwningPlayer(unit)
+    local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
     if owner == neutralAggressive then
-        local isHero = jass:IsUnitType(unit, jass.UNIT_TYPE_HERO)
+        local isHero = jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
         if not isHero then
             ____exports.registerAIUnit(unit)
         end
     end
 end
 function onAutoRegisterNeutralAggressive()
-    ____exports.autoRegisterNeutralAggressive(jass:GetTriggerUnit())
+    ____exports.autoRegisterNeutralAggressive(jass.GetTriggerUnit())
 end
 function initAutoRegister()
     if not unitCreatedTrigger then
-        unitCreatedTrigger = jass:CreateTrigger()
+        unitCreatedTrigger = jass.CreateTrigger()
         local enterRegionEvent = jass.EVENT_PLAYER_UNIT_SUMMON
         do
             local i = 0
@@ -68,9 +68,9 @@ function initAutoRegister()
                 i = i + 1
             end
         end
-        local neutralAggressive = jass:Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
+        local neutralAggressive = jass.Player(AI_PLAYER_NEUTRAL_AGGRESSIVE)
         playerUnitEvent.registerPlayerUnitEvent(unitCreatedTrigger, neutralAggressive, enterRegionEvent)
-        jass:TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive)
+        jass.TriggerAddAction(unitCreatedTrigger, onAutoRegisterNeutralAggressive)
     end
 end
 jass = require("jass.common")
@@ -81,7 +81,7 @@ aiUnitRegistry = __TS__New(Map)
 local aiCheckRegistered = false
 unitCreatedTrigger = nil
 local function clampMinInt(value, minValue)
-    local intValue = jass:R2I(value)
+    local intValue = jass.R2I(value)
     return intValue < minValue and minValue or intValue
 end
 function ____exports.registerAISkill(unit, config)
@@ -188,16 +188,16 @@ local function castSkill(unit, skillInfo, target)
         local ____try, ____hasReturned, ____returnValue = pcall(function()
             if config.targetType == TARGET_TYPE_NONE then
                 if config.orderId ~= 0 then
-                    jass:IssueImmediateOrderById(unit, config.orderId)
+                    jass.IssueImmediateOrderById(unit, config.orderId)
                 end
             elseif config.targetType == TARGET_TYPE_POINT then
                 local point = target
                 if point ~= nil and point ~= nil and config.orderId ~= 0 then
-                    jass:IssuePointOrderById(unit, config.orderId, point.x, point.y)
+                    jass.IssuePointOrderById(unit, config.orderId, point.x, point.y)
                 end
             elseif config.targetType == TARGET_TYPE_UNIT then
                 if target ~= nil and target ~= nil and isValidUnit(nil, target) and config.orderId ~= 0 then
-                    jass:IssueTargetOrderById(unit, config.orderId, target)
+                    jass.IssueTargetOrderById(unit, config.orderId, target)
                 end
             end
             skillInfo.lastCastTime = getGameTime(nil)

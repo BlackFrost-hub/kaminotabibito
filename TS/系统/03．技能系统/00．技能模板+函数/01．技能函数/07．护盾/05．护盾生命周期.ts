@@ -8,19 +8,16 @@
  * - 处理单位死亡时清理护盾
  */
 
-import { 护盾实例 } from "./01．护盾类型";
+import { 护盾实例, 护盾类型 } from "./01．护盾类型";
 import { 获取单位护盾实例列表, 删除护盾实例, 取句柄ID, 删除单位所有护盾, 获取所有活动护盾实例 } from "./02．护盾实例";
 import { 删除护盾条 } from "./06．护盾条表现";
+import { 显示护盾到期漂浮文字 } from "./08．护盾回调模板";
 
 const jass = require("jass.common") as any;
 
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: () => void) => void;
   offTick10ms: (this: void, callback: () => void) => void;
-};
-
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
@@ -40,7 +37,6 @@ const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
 // 常量
 // ==========================================================================================
 
-const 调试模块名 = "护盾系统";
 const TICK_INTERVAL = 0.02; // 与充能系统一致，每2 tick = 0.02秒
 const CENTER_TIMER_TICKS = 2;
 const UNIT_ALIVE_LIFE = 0.405;
@@ -73,7 +69,12 @@ function 处理护盾到期(实例: 护盾实例, 原因: "到期" | "单位死�
   // 删除实例
   删除护盾实例(实例.id);
 
-  // 触发到期回调（仅到期时）
+  // 到期时自动显示漂浮文字
+  if (原因 === "到期") {
+    显示护盾到期漂浮文字(单位, 实例.类型);
+  }
+
+  // 触发到期回调
   if (原因 === "到期" && typeof 实例.到期回调 === "function") {
     实例.到期回调(单位, 实例.id);
   }

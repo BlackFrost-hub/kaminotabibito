@@ -10,18 +10,18 @@ function ____exports.CameraSetEQNoiseForPlayer(self, whichPlayer, magnitude)
     if richter < 2 then
         richter = 2
     end
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer == whichPlayer then
-        local pow10richter = jass:Pow(10, richter)
-        jass:CameraSetTargetNoiseEx(magnitude * 2, magnitude * pow10richter, true)
-        jass:CameraSetSourceNoiseEx(magnitude * 2, magnitude * pow10richter, true)
+        local pow10richter = jass.Pow(10, richter)
+        jass.CameraSetTargetNoiseEx(magnitude * 2, magnitude * pow10richter, true)
+        jass.CameraSetSourceNoiseEx(magnitude * 2, magnitude * pow10richter, true)
     end
 end
 function ____exports.CameraClearNoiseForPlayer(self, whichPlayer)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer == whichPlayer then
-        jass:CameraSetSourceNoise(0, 0)
-        jass:CameraSetTargetNoise(0, 0)
+        jass.CameraSetSourceNoise(0, 0)
+        jass.CameraSetTargetNoise(0, 0)
     end
 end
 return ____exports

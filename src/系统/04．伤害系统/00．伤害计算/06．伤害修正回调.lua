@@ -4,7 +4,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local damageModifiers = {}
 local nextModifierId = 1
-local function sortDamageModifiers(self)
+local function sortDamageModifiers()
     __TS__ArraySort(
         damageModifiers,
         function(____, a, b)
@@ -15,7 +15,7 @@ local function sortDamageModifiers(self)
         end
     )
 end
-function ____exports.registerDamageModifier(self, callback, priority)
+function ____exports.registerDamageModifier(callback, priority)
     if priority == nil then
         priority = 0
     end
@@ -25,10 +25,10 @@ function ____exports.registerDamageModifier(self, callback, priority)
     local id = nextModifierId
     nextModifierId = nextModifierId + 1
     damageModifiers[#damageModifiers + 1] = {id = id, priority = priority, callback = callback}
-    sortDamageModifiers(nil)
+    sortDamageModifiers()
     return id
 end
-function ____exports.unregisterDamageModifier(self, id)
+function ____exports.unregisterDamageModifier(id)
     do
         local i = 0
         while i < #damageModifiers do
@@ -45,7 +45,7 @@ function ____exports.unregisterDamageModifier(self, id)
     end
     return false
 end
-function ____exports.applyDamageModifiers(self, context)
+function ____exports.applyDamageModifiers(context)
     local currentDamage = context.currentDamage
     do
         local i = 0
@@ -67,7 +67,7 @@ function ____exports.applyDamageModifiers(self, context)
     end
     return currentDamage
 end
-function ____exports.getDamageModifierCount(self)
+function ____exports.getDamageModifierCount()
     return #damageModifiers
 end
 return ____exports

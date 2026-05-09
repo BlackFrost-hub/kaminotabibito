@@ -28,7 +28,7 @@ local function tooltipIntStr(n)
     if type(n) ~= "number" or not __TS__NumberIsFinite(__TS__Number(n)) then
         return "0"
     end
-    return tostring(jass:R2I(clampMin(n, 0)))
+    return tostring(jass.R2I(clampMin(n, 0)))
 end
 local TIP_COLOR_BODY = "|cfffff2d9"
 local TIP_COLOR_SOURCE = "|cffffd700"
@@ -60,7 +60,7 @@ local function formatBuffRemainOneDecimal(rem)
         return "0.0"
     end
     local scaled = round(clampMin(rem, 0) * 10)
-    local intPart = jass:R2I(scaled / 10)
+    local intPart = jass.R2I(scaled / 10)
     local fracPart = scaled % 10
     return (tostring(intPart) .. ".") .. tostring(fracPart)
 end

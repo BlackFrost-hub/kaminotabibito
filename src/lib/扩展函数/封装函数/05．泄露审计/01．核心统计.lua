@@ -34,7 +34,7 @@ function ____exports.leakKey(self, leakType, handle)
     if type(handle) == "table" and handle ~= nil then
         return handle
     end
-    return (leakType .. ":") .. tostring(jass:GetHandleId(handle))
+    return (leakType .. ":") .. tostring(jass.GetHandleId(handle))
 end
 function ____exports.track(self, ____type, handle, tag)
     if not handle then

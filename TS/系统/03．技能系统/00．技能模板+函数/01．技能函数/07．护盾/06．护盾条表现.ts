@@ -46,13 +46,13 @@ const R2I = jass.R2I as (r: number) => number;
 // 常量
 // ==========================================================================================
 
-const SHIELD_BAR_UNIT_ID = 1935764066; // 'sbar'
+const SHIELD_BAR_UNIT_ID = 1935827314; // 'sbar'
 const SHIELD_BAR_OWNER_PLAYER_ID = 4;
-const DEFAULT_HEIGHT_OFFSET = 290.0; // 比进度条略高
+const DEFAULT_HEIGHT_OFFSET = 100.0; // 比施法进度条低一些
 const UNIT_ALIVE_LIFE = 0.405;
 
-// 颜色定义
-const COLOR_DEFAULT = { r: 255, g: 255, b: 0, a: 255 };    // 黄色（默认）
+// 颜色定义（与物体编辑器 sbar 单位颜色一致）
+const COLOR_DEFAULT = { r: 100, g: 200, b: 255, a: 255 };  // 蓝白色（默认，匹配物编 red=100,green=200,blue=255）
 const COLOR_PHYSICAL = { r: 180, g: 100, b: 30, a: 255 };  // 棕色（物理伤害）
 const COLOR_MAGICAL = { r: 30, g: 30, b: 180, a: 255 };    // 深蓝色（魔法伤害）
 const COLOR_GENERAL = { r: 200, g: 200, b: 200, a: 255 };  // 灰白色（其他/通用伤害）
@@ -91,6 +91,10 @@ function 裁剪到字节(value: number): number {
   return R2I(value);
 }
 
+function 实数转整数(value: number): number {
+  return R2I(value);
+}
+
 // ==========================================================================================
 // 护盾条管理
 // ==========================================================================================
@@ -117,8 +121,8 @@ function 设置护盾条颜色(数据: 护盾条数据, 颜色: { r: number; g: 
 function 设置护盾条比例(数据: 护盾条数据, 比例: number): void {
   if (!单位存活(数据.护盾条单位)) return;
   // 通过动画帧控制显示比例
-  // e011 进度条模型有 100 帧对应 0%-100%
-  let 帧索引 = jass.R2I(比例 * 99);
+  // S_Shiled.mdl 有 100 帧对应 0%-100%
+  let 帧索引 = 实数转整数(比例 * 99);
   if (帧索引 < 0) 帧索引 = 0;
   if (帧索引 > 99) 帧索引 = 99;
   if (typeof SetUnitAnimationByIndex === "function") {
@@ -148,19 +152,29 @@ function 更新所有护盾条位置(): void {
       continue;
     }
 
-    // 检查护盾是否还存在
+    // 更新位置
+    设置护盾条位置(数据);
+
+    // 更新比例：当前总护盾 / 初始总护盾
     const 当前总护盾 = 获取单位总护盾值(单位ID);
     if (当前总护盾 <= 0) {
       移除护盾条(单位ID);
       continue;
     }
-
-    // 更新位置
-    设置护盾条位置(数据);
-
-    // 更新比例
+    // 动态修正初始总护盾（防止创建时漏读后续护盾）
+    if (当前总护盾 > 数据.初始总护盾) {
+      数据.初始总护盾 = 当前总护盾;
+    }
     const 比例 = 数据.初始总护盾 > 0 ? 当前总护盾 / 数据.初始总护盾 : 1;
     设置护盾条比例(数据, 比例);
+
+    // 颜色恢复倒计时
+    if (数据.颜色恢复倒计时 > 0) {
+      数据.颜色恢复倒计时 -= 0.02;
+      if (数据.颜色恢复倒计时 <= 0) {
+        设置护盾条颜色(数据, COLOR_DEFAULT);
+      }
+    }
 
     // 颜色恢复倒计时
     if (数据.颜色恢复倒计时 > 0) {
@@ -194,7 +208,7 @@ export function 创建护盾条(单位: any): void {
   const 单位ID = 取句柄ID(单位);
   if (单位ID === 0) return;
 
-  // 已有护盾条则更新
+  // 已有护盾条则更新初始总护盾值
   const 已有 = 护盾条映射.get(单位ID);
   if (已有 != null) {
     已有.初始总护盾 = 获取单位总护盾值(单位ID);
@@ -289,6 +303,16 @@ export function 清除所有护盾条(): void {
     已注册计时器 = false;
     offTick10ms(更新所有护盾条位置);
   }
+}
+
+/** 供伤害系统调用的闪色入口 */
+function 护盾条闪色入口(单位: any, 伤害类型: number): void {
+  护盾条闪色(单位, 伤害类型);
+}
+
+const g = globalThis as any;
+if (typeof g._shieldBarFlashColor !== "function") {
+  g._shieldBarFlashColor = 护盾条闪色入口;
 }
 
 export {};

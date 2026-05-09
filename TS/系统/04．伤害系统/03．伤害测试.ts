@@ -29,6 +29,10 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
   isLightDamage: () => boolean;
   isDarkDamage: () => boolean;
 };
+const 护盾模块 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.index") as {
+  查询单位是否有护盾: (this: void, 单位: any) => boolean;
+  查询单位总护盾值: (this: void, 单位: any) => number;
+};
 
 function sendMsg(msg: string): void {
   for (let i = 0; i <= 15; i++) {
@@ -49,13 +53,32 @@ function readEventDamageForDisplay(): number {
   return 0;
 }
 
+/** 读取原始伤害（GetEventDamage 在某些环境可能返回改写前的值） */
+function readOriginalDamage(): number {
+  let v: number | undefined;
+  (pcall as any)(() => {
+    v = (jass as any).GetEventDamage();
+  });
+  if (v !== undefined && typeof v === "number" && !Number.isNaN(v)) {
+    return v;
+  }
+  return 0;
+}
+
 function TrigActions(): void {
   const unit = jass.GetTriggerUnit();
-  const damage = readEventDamageForDisplay();
+  const finalDamage = readEventDamageForDisplay();
   if (!unit) return;
 
   const name = (jass as any).GetUnitName(unit);
-  const damageStr = (jass as any).R2S(damage);
+  const finalDamageStr = (jass as any).R2S(finalDamage);
+
+  // 护盾检测
+  const 有护盾 = 护盾模块.查询单位是否有护盾(unit);
+  const 护盾值 = 有护盾 ? 护盾模块.查询单位总护盾值(unit) : 0;
+  const g = (globalThis as any);
+  const 护盾吸收 = (typeof g._shieldAbsorbAmount === "number") ? g._shieldAbsorbAmount : 0;
+  const 护盾吸收类型文本 = (typeof g._shieldAbsorbType === "string") ? g._shieldAbsorbType : "";
 
   let damageTypeParts: string[] = [];
   if (伤害函数.isFireDamage()) {
@@ -114,17 +137,24 @@ function TrigActions(): void {
 
   let msg: string;
   if (prefix !== "" && typeText !== "") {
-    msg = name + "受到了" + damageStr + "点" + prefix + typeText + "伤害";
+    msg = name + "受到了" + finalDamageStr + "点" + prefix + typeText + "伤害";
   } else if (prefix !== "") {
-    msg = name + "受到了" + damageStr + "点" + prefix + "伤害";
+    msg = name + "受到了" + finalDamageStr + "点" + prefix + "伤害";
   } else if (typeText !== "") {
-    msg = name + "受到了" + damageStr + "点" + typeText + "伤害";
+    msg = name + "受到了" + finalDamageStr + "点" + typeText + "伤害";
   } else {
-    msg = name + "受到了" + damageStr + "点伤害";
+    msg = name + "受到了" + finalDamageStr + "点伤害";
   }
 
   if (伤害函数.YDWEIsEventRangedDamage()) {
     msg = msg + "（远程）";
+  }
+
+  // 护盾吸收信息
+  if (有护盾 && 护盾吸收 > 0) {
+    msg = msg + " [护盾吸收" + (jass as any).R2S(护盾吸收) + "点" + 护盾吸收类型文本 + "伤害, 剩余护盾:" + (jass as any).R2S(护盾值) + "]";
+  } else if (有护盾) {
+    msg = msg + " [护盾:" + (jass as any).R2S(护盾值) + "]";
   }
 
   let source: any = null;

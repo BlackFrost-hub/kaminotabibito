@@ -28,11 +28,11 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local R2I = jass.R2I
-local SHIELD_BAR_UNIT_ID = 1935764066
+local SHIELD_BAR_UNIT_ID = 1935827314
 local SHIELD_BAR_OWNER_PLAYER_ID = 4
-local DEFAULT_HEIGHT_OFFSET = 290
+local DEFAULT_HEIGHT_OFFSET = 100
 local UNIT_ALIVE_LIFE = 0.405
-local COLOR_DEFAULT = {r = 255, g = 255, b = 0, a = 255}
+local COLOR_DEFAULT = {r = 100, g = 200, b = 255, a = 255}
 local COLOR_PHYSICAL = {r = 180, g = 100, b = 30, a = 255}
 local COLOR_MAGICAL = {r = 30, g = 30, b = 180, a = 255}
 local COLOR_GENERAL = {r = 200, g = 200, b = 200, a = 255}
@@ -57,6 +57,9 @@ local function _____88C1_526A_5230_5B57_8282(value)
     if value >= 255 then
         return 255
     end
+    return R2I(value)
+end
+local function _____5B9E_6570_8F6C_6574_6570(value)
     return R2I(value)
 end
 local function _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
@@ -94,7 +97,7 @@ local function _____8BBE_7F6E_62A4_76FE_6761_6BD4_4F8B(_____6570_636E, _____6BD4
     if not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) then
         return
     end
-    local _____5E27_7D22_5F15 = jass:R2I(_____6BD4_4F8B * 99)
+    local _____5E27_7D22_5F15 = _____5B9E_6570_8F6C_6574_6570(_____6BD4_4F8B * 99)
     if _____5E27_7D22_5F15 < 0 then
         _____5E27_7D22_5F15 = 0
     end
@@ -129,14 +132,17 @@ local function _____66F4_65B0_6240_6709_62A4_76FE_6761_4F4D_7F6E()
         do
             if not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) or not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) then
                 _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
-                goto __continue24
+                goto __continue25
             end
+            _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
             local _____5F53_524D_603B_62A4_76FE = _____83B7_53D6_5355_4F4D_603B_62A4_76FE_503C(_____5355_4F4DID)
             if _____5F53_524D_603B_62A4_76FE <= 0 then
                 _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
-                goto __continue24
+                goto __continue25
             end
-            _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
+            if _____5F53_524D_603B_62A4_76FE > _____6570_636E["初始总护盾"] then
+                _____6570_636E["初始总护盾"] = _____5F53_524D_603B_62A4_76FE
+            end
             local _____6BD4_4F8B = _____6570_636E["初始总护盾"] > 0 and _____5F53_524D_603B_62A4_76FE / _____6570_636E["初始总护盾"] or 1
             _____8BBE_7F6E_62A4_76FE_6761_6BD4_4F8B(_____6570_636E, _____6BD4_4F8B)
             if _____6570_636E["颜色恢复倒计时"] > 0 then
@@ -145,8 +151,14 @@ local function _____66F4_65B0_6240_6709_62A4_76FE_6761_4F4D_7F6E()
                     _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
                 end
             end
+            if _____6570_636E["颜色恢复倒计时"] > 0 then
+                _____6570_636E["颜色恢复倒计时"] = _____6570_636E["颜色恢复倒计时"] - 0.02
+                if _____6570_636E["颜色恢复倒计时"] <= 0 then
+                    _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
+                end
+            end
         end
-        ::__continue24::
+        ::__continue25::
     end
     if _____62A4_76FE_6761_6620_5C04.size == 0 and _____5DF2_6CE8_518C_8BA1_65F6_5668 then
         _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
@@ -253,5 +265,13 @@ ____exports["清除所有护盾条"] = function()
         _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
         offTick10ms(_____66F4_65B0_6240_6709_62A4_76FE_6761_4F4D_7F6E)
     end
+end
+--- 供伤害系统调用的闪色入口
+local function _____62A4_76FE_6761_95EA_8272_5165_53E3(_____5355_4F4D, _____4F24_5BB3_7C7B_578B)
+    ____exports["护盾条闪色"](_____5355_4F4D, _____4F24_5BB3_7C7B_578B)
+end
+local g = _G
+if type(g._shieldBarFlashColor) ~= "function" then
+    g._shieldBarFlashColor = _____62A4_76FE_6761_95EA_8272_5165_53E3
 end
 return ____exports

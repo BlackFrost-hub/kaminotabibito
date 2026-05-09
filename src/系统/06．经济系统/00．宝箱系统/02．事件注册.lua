@@ -31,15 +31,15 @@ local RETRY_SEC = 0.1
 local STES_EVENT_UNIT_TARGET_ORDER = "单位发布目标命令"
 --- 处理单位发布目标命令事件
 local function onUnitIssuedTargetOrder()
-    local unit = jass:GetTriggerUnit()
+    local unit = jass.GetTriggerUnit()
     if not unit then
         return
     end
-    local target = jass:GetOrderTargetDestructable()
+    local target = jass.GetOrderTargetDestructable()
     if not target then
         return
     end
-    local targetType = jass:GetDestructableTypeId(target)
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(nil, targetType) then
         return
     end
@@ -64,9 +64,9 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass:LoadInteger(
+    return jass.LoadInteger(
         ht,
-        jass:StringHash(eventName),
+        jass.StringHash(eventName),
         helper:ydlStes_skeyIndex(nil)
     )
 end
@@ -80,8 +80,8 @@ local function tryRegisterTargetOrderStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], STES_EVENT_UNIT_TARGET_ORDER)
@@ -107,11 +107,11 @@ function ____exports.registerChestSystemHero(hero)
     end
     local g = _G
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
-    local ev = jass:ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
+    local ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
     unitSpecificEventCenter.registerUnitEventTrigger(g[TRIG_KEY], hero, ev)
 end
 --- 初始化宝箱系统

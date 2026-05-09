@@ -5,19 +5,19 @@ local ____exports = {}
 -- 禁止 japiFn 取出再调：TSTL 会编成 f(nil, ...) 导致参数错位。
 local japi = require("jass.japi")
 function ____exports.getWindowWidth(self)
-    return japi:DzGetWindowWidth()
+    return japi.DzGetWindowWidth()
 end
 function ____exports.getWindowHeight(self)
-    return japi:DzGetWindowHeight()
+    return japi.DzGetWindowHeight()
 end
 function ____exports.getWindowX(self)
-    return japi:DzGetWindowX()
+    return japi.DzGetWindowX()
 end
 function ____exports.getWindowY(self)
-    return japi:DzGetWindowY()
+    return japi.DzGetWindowY()
 end
 function ____exports.isWindowActive(self)
-    return not not japi:DzIsWindowActive()
+    return not not japi.DzIsWindowActive()
 end
 function ____exports.getClientHeight(self)
     local ____opt_0 = japi.DzGetClientHeight

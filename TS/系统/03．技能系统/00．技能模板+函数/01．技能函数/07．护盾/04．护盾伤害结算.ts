@@ -12,10 +12,13 @@
 import { 护盾实例, 护盾类型, 护盾破碎回调 } from "./01．护盾类型";
 import { 获取单位护盾实例列表, 删除护盾实例, 取句柄ID, 获取所有活动护盾实例 } from "./02．护盾实例";
 import { 获取可匹配护盾列表 } from "./03．护盾优先级";
+import { 显示护盾破碎漂浮文字 } from "./08．护盾回调模板";
+const { RMinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  RMinBJ: (this: void, a: number, b: number) => number;
+};
 
-const jass = require("jass.common") as any;
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (callback: (context: {
+  registerDamageModifier: (this: void, callback: (context: {
     target: any;
     attacker: any;
     baseDamage: number;
@@ -30,8 +33,11 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
   }) => number, priority?: number) => number;
 };
 
-const RMin = jass.RMin as (a: number, b: number) => number;
-const RMax = jass.RMax as (a: number, b: number) => number;
+/** 最近一次护盾吸收量（供伤害测试读取） */
+export let 最近护盾吸收量 = 0;
+/** 最近一次护盾吸收类型（供伤害测试读取） */
+export let 最近护盾吸收类型 = "";
+
 let shieldModifierRegistered = false;
 
 /**
@@ -42,6 +48,8 @@ export interface 护盾吸收结果 {
   剩余伤害: number;
   /** 总吸收量 */
   总吸收量: number;
+  /** 实际参与吸收的首个护盾类型：0=通用/其他，1=物理，2=魔法 */
+  闪色类型: number;
   /** 被破碎的护盾列表 */
   破碎护盾: 护盾实例[];
 }
@@ -66,8 +74,16 @@ export function 吸收伤害(
   const 结果: 护盾吸收结果 = {
     剩余伤害: 伤害值,
     总吸收量: 0,
+    闪色类型: 0,
     破碎护盾: [],
   };
+
+  // 重置上次吸收记录
+  最近护盾吸收量 = 0;
+  最近护盾吸收类型 = "";
+  const gReset = globalThis as any;
+  gReset._shieldAbsorbAmount = 0;
+  gReset._shieldAbsorbType = "";
 
   const 单位ID = 取句柄ID(目标);
   if (单位ID === 0) return 结果;
@@ -83,15 +99,47 @@ export function 吸收伤害(
   for (const 护盾 of 可用护盾) {
     if (结果.剩余伤害 <= 0) break;
 
-    const 吸收量 = RMin(护盾.当前值, 结果.剩余伤害);
+    const 吸收量 = RMinBJ(护盾.当前值, 结果.剩余伤害);
+    if (吸收量 > 0 && 结果.总吸收量 <= 0) {
+      if (护盾.类型 === 护盾类型.物理) {
+        结果.闪色类型 = 1;
+      } else if (护盾.类型 === 护盾类型.魔法) {
+        结果.闪色类型 = 2;
+      } else {
+        结果.闪色类型 = 0;
+      }
+    }
     护盾.当前值 -= 吸收量;
     结果.剩余伤害 -= 吸收量;
     结果.总吸收量 += 吸收量;
+
+    // 记录最近吸收信息（供伤害测试显示）
+    最近护盾吸收量 = 结果.总吸收量;
+    if (是物理伤害) {
+      最近护盾吸收类型 = "物理";
+    } else if (是魔法伤害) {
+      最近护盾吸收类型 = "魔法";
+    } else {
+      最近护盾吸收类型 = "通用";
+    }
+    if (护盾.类型 === 护盾类型.物理) {
+      最近护盾吸收类型 = "物理";
+    } else if (护盾.类型 === 护盾类型.魔法) {
+      最近护盾吸收类型 = "魔法";
+    } else if (护盾.类型 === 护盾类型.通用) {
+      最近护盾吸收类型 = "通用";
+    }
+    const g = globalThis as any;
+    g._shieldAbsorbAmount = 最近护盾吸收量;
+    g._shieldAbsorbType = 最近护盾吸收类型;
 
     // 护盾破碎
     if (护盾.当前值 <= 0) {
       结果.破碎护盾.push(护盾);
       删除护盾实例(护盾.id);
+
+      // 自动显示破碎漂浮文字
+      显示护盾破碎漂浮文字(目标, 护盾.类型);
 
       // 触发破碎回调
       if (typeof 护盾.破碎回调 === "function") {
@@ -117,13 +165,22 @@ export function 注册护盾吸收钩子(): void {
   if (shieldModifierRegistered) return;
   shieldModifierRegistered = true;
   registerDamageModifier((context) => {
-    return 吸收伤害(
+    const 结果 = 吸收伤害(
       context.target,
       context.currentDamage,
       context.isPhysicalDamage,
       context.isMagicDamage,
       context.attacker
-    ).剩余伤害;
+    );
+    // 护盾条闪色
+    if (结果.总吸收量 > 0) {
+      const g = globalThis as any;
+      const 护盾条闪色 = (g as any)._shieldBarFlashColor;
+      if (typeof 护盾条闪色 === "function") {
+        护盾条闪色(context.target, 结果.闪色类型);
+      }
+    }
+    return 结果.剩余伤害;
   }, 100);
 }
 

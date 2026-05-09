@@ -23,7 +23,7 @@ function ____exports.createDotBaseUtils(self, deps)
             return direct
         end
         if type(jass.ConvertUnitType) == "function" then
-            return jass:ConvertUnitType(64)
+            return jass.ConvertUnitType(64)
         end
         return nil
     end
@@ -33,15 +33,15 @@ function ____exports.createDotBaseUtils(self, deps)
         end
         local utStruct = getStructureUnitTypeHandle(nil)
         if utStruct ~= nil then
-            if jass:IsUnitType(target, utStruct) == true then
+            if jass.IsUnitType(target, utStruct) == true then
                 return false
             end
         end
-        local srcP = jass:GetOwningPlayer(source)
+        local srcP = jass.GetOwningPlayer(source)
         if srcP == nil then
             return false
         end
-        return jass:IsUnitEnemy(target, srcP) == true
+        return jass.IsUnitEnemy(target, srcP) == true
     end
     local function heroUnitTypeForIsUnitType(self)
         local ____jass_UNIT_TYPE_HERO_1 = jass.UNIT_TYPE_HERO
@@ -52,18 +52,18 @@ function ____exports.createDotBaseUtils(self, deps)
         if direct ~= nil then
             return direct
         end
-        return jass:ConvertUnitType(2)
+        return jass.ConvertUnitType(2)
     end
     local function isSourceHeroPlayer1to4(self, unit)
         if not unit then
             return false
         end
-        local owner = jass:GetOwningPlayer(unit)
+        local owner = jass.GetOwningPlayer(unit)
         local playerIdx = -1
         do
             local i = 0
             while i <= 15 do
-                if jass:Player(i) == owner then
+                if jass.Player(i) == owner then
                     playerIdx = i
                     break
                 end
@@ -74,19 +74,19 @@ function ____exports.createDotBaseUtils(self, deps)
             return false
         end
         local utHero = heroUnitTypeForIsUnitType(nil)
-        if utHero ~= nil and jass:IsUnitType(unit, utHero) == true then
+        if utHero ~= nil and jass.IsUnitType(unit, utHero) == true then
             return true
         end
-        if jass:GetHeroLevel(unit) > 0 then
+        if jass.GetHeroLevel(unit) > 0 then
             return true
         end
         return false
     end
     local function unitItemInSlot(self, unit, slot)
-        return jass:UnitItemInSlot(unit, slot)
+        return jass.UnitItemInSlot(unit, slot)
     end
     local function getItemTypeId(self, item)
-        return jass:GetItemTypeId(item)
+        return jass.GetItemTypeId(item)
     end
     local function getBestDotFromUnit(self, unit, parseBuff, getProduct)
         local best = nil
@@ -138,7 +138,7 @@ function ____exports.createDotBaseUtils(self, deps)
         if not targetUnit then
             return 0
         end
-        local m = jass:BlzGetUnitMaxHP(targetUnit)
+        local m = jass.BlzGetUnitMaxHP(targetUnit)
         if type(m) == "number" and __TS__NumberIsFinite(__TS__Number(m)) and m > 0 then
             return m
         end
@@ -148,19 +148,19 @@ function ____exports.createDotBaseUtils(self, deps)
         elseif g.UNIT_STATE_MAX_LIFE ~= nil then
             maxLifeState = g.UNIT_STATE_MAX_LIFE
         else
-            maxLifeState = jass:ConvertUnitState(1)
+            maxLifeState = jass.ConvertUnitState(1)
         end
         if maxLifeState == nil then
             return 0
         end
-        local v = jass:GetUnitState(targetUnit, maxLifeState)
+        local v = jass.GetUnitState(targetUnit, maxLifeState)
         return type(v) == "number" and __TS__NumberIsFinite(__TS__Number(v)) and v > 0 and v or 0
     end
     local function getTargetRegenHP(self, targetUnit)
         if not targetUnit then
             return 0
         end
-        local typeId = jass:GetUnitTypeId(targetUnit)
+        local typeId = jass.GetUnitTypeId(targetUnit)
         local idStr = fourCCToString(nil, typeId)
         local slk = _G.slk
         local slkUnit = slk ~= nil and slk.unit and slk.unit[idStr] or nil

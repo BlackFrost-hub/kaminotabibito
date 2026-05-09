@@ -21,10 +21,7 @@ local _____521B_5EFA_62A4_76FE_6761 = ____06_FF0E_62A4_76FE_6761_8868_73B0["创�
 local _____5220_9664_62A4_76FE_6761 = ____06_FF0E_62A4_76FE_6761_8868_73B0["删除护盾条"]
 local _____62A4_76FE_6761_95EA_8272 = ____06_FF0E_62A4_76FE_6761_8868_73B0["护盾条闪色"]
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLogForce = ____require_result_0.debugLogForce
 local GetHandleId = jass.GetHandleId
-local _____8C03_8BD5_6A21_5757_540D = "护盾系统"
 local _____5DF2_521D_59CB_5316 = false
 local function _____786E_4FDD_521D_59CB_5316()
     if _____5DF2_521D_59CB_5316 then
@@ -33,7 +30,6 @@ local function _____786E_4FDD_521D_59CB_5316()
     _____5DF2_521D_59CB_5316 = true
     _____521D_59CB_5316_62A4_76FE_751F_547D_5468_671F()
     _____6CE8_518C_62A4_76FE_5438_6536_94A9_5B50()
-    debugLogForce(_____8C03_8BD5_6A21_5757_540D, "护盾系统初始化完成")
 end
 --- 为单位创建护盾
 -- 
@@ -58,16 +54,6 @@ ____exports["开始护盾"] = function(_____5355_4F4D, _____53C2_6570)
     if type(_____5B9E_4F8B["开始回调"]) == "function" then
         _____5B9E_4F8B["开始回调"](_____5355_4F4D, _____5B9E_4F8B.id)
     end
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757_540D,
-        "创建护盾",
-        "id=",
-        _____5B9E_4F8B.id,
-        "类型=",
-        _____5B9E_4F8B["类型"],
-        "数值=",
-        _____5B9E_4F8B["当前值"]
-    )
     return _____5B9E_4F8B.id
 end
 --- 移除指定护盾
@@ -163,8 +149,7 @@ ____exports["处理护盾吸收"] = function(_____76EE_6807, _____4F24_5BB3_503C
         _____653B_51FB_8005
     )
     if _____7ED3_679C["总吸收量"] > 0 then
-        local _____4F24_5BB3_7C7B_578B = _____662F_7269_7406_4F24_5BB3 and 1 or (_____662F_9B54_6CD5_4F24_5BB3 and 2 or 0)
-        _____62A4_76FE_6761_95EA_8272(_____76EE_6807, _____4F24_5BB3_7C7B_578B)
+        _____62A4_76FE_6761_95EA_8272(_____76EE_6807, _____7ED3_679C["闪色类型"])
     end
     if #_____7ED3_679C["破碎护盾"] > 0 then
         local _____5355_4F4DID = _____53D6_53E5_67C4ID(_____76EE_6807)

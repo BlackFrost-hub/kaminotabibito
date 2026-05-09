@@ -57,7 +57,7 @@ const { applyLifeAndManaSteal } = require("系统.04．伤害系统.00．伤害�
   applyLifeAndManaSteal: (attacker: any, damage: number, isMagic: boolean, isNormalAttack: boolean, showText: boolean) => void;
 };
 const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  applyDamageModifiers: (context: {
+  applyDamageModifiers: (this: void, context: {
     target: any;
     attacker: any;
     baseDamage: number;

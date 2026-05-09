@@ -184,11 +184,26 @@ function ObjEditingUnitBase:setDeathType(value) end
 ---@param value number 选择圈缩放
 function ObjEditingUnitBase:setSelectionScale(value) end
 
+---@param value number 染色红色值 (0-255)
+function ObjEditingUnitBase:setTintingColorRed(value) end
+
+---@param value number 染色绿色值 (0-255)
+function ObjEditingUnitBase:setTintingColorGreen(value) end
+
+---@param value number 染色蓝色值 (0-255)
+function ObjEditingUnitBase:setTintingColorBlue(value) end
+
 ---@param value number 投射物发射 Z
 function ObjEditingUnitBase:setProjectileLaunchZ(value) end
 
 ---@param value number 投射物命中 Z
 function ObjEditingUnitBase:setProjectileImpactZ(value) end
+
+---@param value number 是否允许自定义队伍颜色 (0/1)
+function ObjEditingUnitBase:setAllowCustomTeamColor(value) end
+
+---@param value number 队伍颜色 (-1=无, 0-11=玩家颜色)
+function ObjEditingUnitBase:setTeamColor(value) end
 
 ---@param value string 出售物品列表
 function ObjEditingUnitBase:setItemsSold(value) end

@@ -62,16 +62,16 @@ local function applyHpMpToUnit(unit, hp, mp)
         return
     end
     if hp > 0 and jass.UNIT_STATE_LIFE ~= nil and jass.UNIT_STATE_MAX_LIFE ~= nil then
-        local cur = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
-        local maxL = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+        local cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+        local maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
         local nextLife = cur + hp
-        jass:SetUnitState(unit, jass.UNIT_STATE_LIFE, nextLife < maxL and nextLife or maxL)
+        jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, nextLife < maxL and nextLife or maxL)
     end
     if mp > 0 and jass.UNIT_STATE_MANA ~= nil and jass.UNIT_STATE_MAX_MANA ~= nil then
-        local curM = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
-        local maxM = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+        local curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
+        local maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
         local nextMana = curM + mp
-        jass:SetUnitState(unit, jass.UNIT_STATE_MANA, nextMana < maxM and nextMana or maxM)
+        jass.SetUnitState(unit, jass.UNIT_STATE_MANA, nextMana < maxM and nextMana or maxM)
     end
 end
 --- 治疗前后差值，供 YDLocal7 与父 `YDLocal1Get(real,…)` 对齐手写 JASS 子触发的「有效回复量」语义
@@ -81,11 +81,11 @@ local function applyHpMpToUnitAndGetApplied(unit, hp, mp)
     end
     local lifeBefore = 0
     local manaBefore = 0
-    lifeBefore = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    manaBefore = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
+    lifeBefore = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    manaBefore = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
     applyHpMpToUnit(unit, hp, mp)
-    local lifeAfter = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
-    local manaAfter = jass:GetUnitState(unit, jass.UNIT_STATE_MANA)
+    local lifeAfter = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local manaAfter = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
     return {hpApplied = lifeAfter > lifeBefore and lifeAfter - lifeBefore or 0, mpApplied = manaAfter > manaBefore and manaAfter - manaBefore or 0}
 end
 --- 与 JASS 遍历 `物品治疗事件` 等价：对每张注册的子触发器写入 YDLocal5 后 Execute。
@@ -94,8 +94,8 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
     if stesHT == nil or stesHT == 0 then
         return
     end
-    local hash = jass:StringHash(____exports.ITEM_HEAL_STES_EVENT)
-    local loopIndex = jass:LoadInteger(
+    local hash = jass.StringHash(____exports.ITEM_HEAL_STES_EVENT)
+    local loopIndex = jass.LoadInteger(
         stesHT,
         hash,
         ydlStes_skeyIndex(nil, nil)
@@ -105,7 +105,7 @@ local function fireItemHealEvent(unit, item, hp, mp, abilId)
         local i = 0
         while i < loopIndex do
             do
-                local trg = jass:LoadTriggerHandle(stesHT, hash, i)
+                local trg = jass.LoadTriggerHandle(stesHT, hash, i)
                 if trg == nil or trg == 0 then
                     goto __continue11
                 end
@@ -137,13 +137,13 @@ local function onItemHealStesChild()
             local item = YDLocal5Get(nil, "item", YL_ITEM)
             ydlStes_readString5(nil, nil, YL_ABIL)
             if unit == nil or unit == 0 then
-                unit = jass:GetManipulatingUnit()
+                unit = jass.GetManipulatingUnit()
                 if unit == nil or unit == 0 then
-                    unit = jass:GetTriggerUnit()
+                    unit = jass.GetTriggerUnit()
                 end
             end
             if item == nil or item == 0 then
-                item = jass:GetManipulatedItem()
+                item = jass.GetManipulatedItem()
             end
             local hp = rawHp
             local mp = rawMp
@@ -192,11 +192,11 @@ end
 local equipHealDebounceKeyByTimerHid = {}
 local equipHealDelayCtxByTimerHid = {}
 local function onEquipHealDebounceTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local key = equipHealDebounceKeyByTimerHid[hid]
     __TS__Delete(equipHealDebounceKeyByTimerHid, hid)
     if key ~= nil then
@@ -205,11 +205,11 @@ local function onEquipHealDebounceTimerExpire()
     safeDestroyTimer(nil, t)
 end
 local function onEquipHealDelayTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local ctx = equipHealDelayCtxByTimerHid[hid]
     __TS__Delete(equipHealDelayCtxByTimerHid, hid)
     if ctx ~= nil then
@@ -218,32 +218,32 @@ local function onEquipHealDelayTimerExpire()
     safeDestroyTimer(nil, t)
 end
 local function onUseItem()
-    local unit = jass:GetManipulatingUnit()
+    local unit = jass.GetManipulatingUnit()
     if unit == nil then
-        unit = jass:GetTriggerUnit()
+        unit = jass.GetTriggerUnit()
     end
-    local item = jass:GetManipulatedItem()
+    local item = jass.GetManipulatedItem()
     if not unit or not item then
         return
     end
     if isSpecialUnit(nil, unit) then
         return
     end
-    local itemId = jass:GetItemTypeId(item)
+    local itemId = jass.GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
         return
     end
     local glob = _G
-    local key = (tostring(nil, unit) .. "_") .. idStr
+    local key = (tostring(unit) .. "_") .. idStr
     if glob.__EquipHealExecutedKey == key then
         return
     end
     glob.__EquipHealExecutedKey = key
-    local debounceTimer = jass:CreateTimer()
+    local debounceTimer = jass.CreateTimer()
     if debounceTimer then
-        equipHealDebounceKeyByTimerHid[jass:GetHandleId(debounceTimer)] = key
+        equipHealDebounceKeyByTimerHid[jass.GetHandleId(debounceTimer)] = key
         safeTimerStart(
             nil,
             debounceTimer,
@@ -261,9 +261,9 @@ local function onUseItem()
             if seg.waitSec <= 0 then
                 executeSegment(unit, item, seg)
             else
-                local delayTimer = jass:CreateTimer()
+                local delayTimer = jass.CreateTimer()
                 if delayTimer then
-                    equipHealDelayCtxByTimerHid[jass:GetHandleId(delayTimer)] = {unit = unit, item = item, seg = seg}
+                    equipHealDelayCtxByTimerHid[jass.GetHandleId(delayTimer)] = {unit = unit, item = item, seg = seg}
                     safeTimerStart(
                         nil,
                         delayTimer,

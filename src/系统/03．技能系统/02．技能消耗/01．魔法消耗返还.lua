@@ -18,25 +18,25 @@ local ____require_result_2 = require("系统.03．技能系统.02．技能消耗
 local PERCENT_COST_THRESHOLD = ____require_result_2.PERCENT_COST_THRESHOLD
 local pendingManaRefundByTimerHid = {}
 local function onManaRefundTimerExpire()
-    local timer = jass:GetExpiredTimer()
+    local timer = jass.GetExpiredTimer()
     if not timer then
         return
     end
-    local timerHid = jass:GetHandleId(timer)
+    local timerHid = jass.GetHandleId(timer)
     local pending = pendingManaRefundByTimerHid[timerHid]
     __TS__Delete(pendingManaRefundByTimerHid, timerHid)
     safeDestroyTimer(timer)
     if not pending or not pending.unit then
         return
     end
-    local currentMana = jass:GetUnitState(pending.unit, jass.UNIT_STATE_MANA)
-    local maxMana = jass:GetUnitState(pending.unit, jass.UNIT_STATE_MAX_MANA)
+    local currentMana = jass.GetUnitState(pending.unit, jass.UNIT_STATE_MANA)
+    local maxMana = jass.GetUnitState(pending.unit, jass.UNIT_STATE_MAX_MANA)
     local manaGap = maxMana - currentMana
     local actualRefund = pending.refund < manaGap and pending.refund or manaGap
     if actualRefund <= 0 then
         return
     end
-    jass:SetUnitState(pending.unit, jass.UNIT_STATE_MANA, currentMana + actualRefund)
+    jass.SetUnitState(pending.unit, jass.UNIT_STATE_MANA, currentMana + actualRefund)
 end
 --- 检查技能是否可参与返蓝逻辑
 -- 默认仅处理 nightelf 技能
@@ -71,12 +71,12 @@ function ____exports.calcTotalManaCost(self, unit, abilityId, level)
     if percentCost >= PERCENT_COST_THRESHOLD then
         return -1
     end
-    local maxMana = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     return fixedCost + maxMana * percentCost
 end
 --- 获取魔法消耗属性
 function ____exports.getManaCostReduction(self, unit)
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return 0
     end
@@ -101,11 +101,11 @@ function ____exports.applyManaRefund(self, unit, manaCost)
         return
     end
     local refund = manaCost * refundRatio
-    local timer = jass:CreateTimer()
+    local timer = jass.CreateTimer()
     if not timer then
         return
     end
-    local timerHid = jass:GetHandleId(timer)
+    local timerHid = jass.GetHandleId(timer)
     pendingManaRefundByTimerHid[timerHid] = {unit = unit, refund = refund}
     safeTimerStart(timer, 0, false, onManaRefundTimerExpire)
 end
@@ -121,7 +121,7 @@ function ____exports.handleManaRefund(self, unit, abilityId)
     if not ____exports.hasEffectiveManaCostReduction(nil, unit) then
         return false
     end
-    local level = jass:GetUnitAbilityLevel(unit, abilityId)
+    local level = jass.GetUnitAbilityLevel(unit, abilityId)
     local manaCost = ____exports.calcTotalManaCost(nil, unit, abilityId, level)
     if manaCost < 0 then
         return false

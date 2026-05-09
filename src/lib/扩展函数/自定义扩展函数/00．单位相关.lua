@@ -39,8 +39,8 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     if unitTypeId == nil then
         return nil
     end
-    local unit = jass:CreateUnit(
-        jass:Player(playerId),
+    local unit = jass.CreateUnit(
+        jass.Player(playerId),
         unitTypeId,
         x,
         y,
@@ -50,12 +50,12 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
         return nil
     end
     if facing ~= nil then
-        jass:SetUnitFacing(unit, facing * BJ_RADTODEG)
+        jass.SetUnitFacing(unit, facing * BJ_RADTODEG)
     end
     local scaleX = scale or 1
     local scaleY2 = scaleY or 1
     local scaleZ2 = scaleZ or 1
-    jass:SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
+    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
     return unit
 end
 --- 获取玩家的第一个英雄
@@ -84,8 +84,8 @@ function ____exports.getPlayerFirstHero(self, player)
             if hero ~= nil then
                 return
             end
-            if jass:GetOwningPlayer(u) == player then
-                if jass:IsUnitType(u, jass.UNIT_TYPE_HERO) then
+            if jass.GetOwningPlayer(u) == player then
+                if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
                     hero = u
                 end
             end

@@ -7,19 +7,18 @@ local _____5220_9664_5355_4F4D_6240_6709_62A4_76FE = ____02_FF0E_62A4_76FE_5B9E_
 local _____83B7_53D6_6240_6709_6D3B_52A8_62A4_76FE_5B9E_4F8B = ____02_FF0E_62A4_76FE_5B9E_4F8B["获取所有活动护盾实例"]
 local ____06_FF0E_62A4_76FE_6761_8868_73B0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.06．护盾条表现")
 local _____5220_9664_62A4_76FE_6761 = ____06_FF0E_62A4_76FE_6761_8868_73B0["删除护盾条"]
+local ____08_FF0E_62A4_76FE_56DE_8C03_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.08．护盾回调模板")
+local _____663E_793A_62A4_76FE_5230_671F_6F02_6D6E_6587_5B57 = ____08_FF0E_62A4_76FE_56DE_8C03_6A21_677F["显示护盾到期漂浮文字"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 local offTick10ms = ____require_result_0.offTick10ms
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLogForce = ____require_result_1.debugLogForce
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
-local _____8C03_8BD5_6A21_5757_540D = "护盾系统"
 local TICK_INTERVAL = 0.02
 local CENTER_TIMER_TICKS = 2
 local UNIT_ALIVE_LIFE = 0.405
@@ -40,6 +39,9 @@ end
 local function _____5904_7406_62A4_76FE_5230_671F(_____5B9E_4F8B, _____539F_56E0)
     local _____5355_4F4D = _____5B9E_4F8B["单位"]
     _____5220_9664_62A4_76FE_5B9E_4F8B(_____5B9E_4F8B.id)
+    if _____539F_56E0 == "到期" then
+        _____663E_793A_62A4_76FE_5230_671F_6F02_6D6E_6587_5B57(_____5355_4F4D, _____5B9E_4F8B["类型"])
+    end
     if _____539F_56E0 == "到期" and type(_____5B9E_4F8B["到期回调"]) == "function" then
         _____5B9E_4F8B["到期回调"](_____5355_4F4D, _____5B9E_4F8B.id)
     end
@@ -59,7 +61,7 @@ local function ____on_62A4_76FE_7CFB_7EDFTick()
         do
             if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
                 _____5230_671F_5217_8868[#_____5230_671F_5217_8868 + 1] = {["实例"] = _____5B9E_4F8B, ["原因"] = "单位死亡"}
-                goto __continue11
+                goto __continue12
             end
             if _____5B9E_4F8B["总持续时间"] > 0 then
                 _____5B9E_4F8B["剩余时间"] = _____5B9E_4F8B["剩余时间"] - TICK_INTERVAL
@@ -68,7 +70,7 @@ local function ____on_62A4_76FE_7CFB_7EDFTick()
                 end
             end
         end
-        ::__continue11::
+        ::__continue12::
     end
     for ____, ____value in ipairs(_____5230_671F_5217_8868) do
         local _____5B9E_4F8B = ____value["实例"]
