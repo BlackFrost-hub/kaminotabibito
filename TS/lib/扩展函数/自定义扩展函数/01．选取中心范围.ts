@@ -6,8 +6,8 @@
 
 const jass = require("jass.common") as any;
 const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
-    isValidUnit: (unit: any) => boolean;
-    isUnitEnemy: (targetUnit: any, sourceUnit: any) => boolean;
+    isValidUnit: (this: void, unit: any) => boolean;
+    isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 
 /**

@@ -387,6 +387,10 @@ AbilityDefinitionMountainKingThunderBolt = {}
 ---@return AbilityDefinitionMountainKingThunderBolt
 function AbilityDefinitionMountainKingThunderBolt:new(newId) end
 
+---@param level number 技能等级
+---@param value number 伤害值
+function AbilityDefinitionMountainKingThunderBolt:setDamage(level, value) end
+
 ---隐形模板
 ---@class AbilityDefinitionInvisibility: AbilityDefinition
 AbilityDefinitionInvisibility = {}
@@ -402,6 +406,10 @@ AbilityDefinitionThunderBoltCreep = {}
 ---@param newId string 4 字符新技能原始 ID
 ---@return AbilityDefinitionThunderBoltCreep
 function AbilityDefinitionThunderBoltCreep:new(newId) end
+
+---@param level number 技能等级
+---@param value number 伤害值
+function AbilityDefinitionThunderBoltCreep:setDamage(level, value) end
 
 ---减速模板
 ---@class AbilityDefinitionSlow: AbilityDefinition

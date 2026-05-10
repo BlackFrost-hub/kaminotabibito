@@ -65,6 +65,8 @@ local getUnitsInRange = ____require_result_1.getUnitsInRange
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
+local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708 = ____require_result_3["创建渐变圆形提示圈"]
 local _____533A_57DF_6548_679C_5B9E_73B0 = __TS__Class()
 _____533A_57DF_6548_679C_5B9E_73B0.name = "区域效果实现"
 function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
@@ -72,6 +74,7 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
     self["已暂停值"] = false
     self["已销毁值"] = false
     self["特效句柄"] = nil
+    self["提示圈特效"] = nil
     self["首次检测值"] = true
     self["单位最后进入时间"] = {}
     self["单位最后离开时间"] = {}
@@ -93,6 +96,9 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
         if self["特效句柄"] and _____53C2_6570["特效高度"] then
             EXSetEffectZ(self["特效句柄"], _____53C2_6570["特效高度"])
         end
+    end
+    if _____53C2_6570["持续时间"] > 0 then
+        self["提示圈特效"] = _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708(self["当前X"], self["当前Y"], _____53C2_6570["半径"], _____53C2_6570["持续时间"])
     end
     _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(self)
 end
@@ -134,29 +140,29 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue14
+                goto __continue15
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
                 local _____4E0A_6B21_79BB_5F00 = self["单位最后离开时间"][hid]
                 if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
-                    local ____opt_3 = self["参数"]["on进入"]
-                    if ____opt_3 ~= nil then
-                        ____opt_3(_____5355_4F4D)
+                    local ____opt_4 = self["参数"]["on进入"]
+                    if ____opt_4 ~= nil then
+                        ____opt_4(_____5355_4F4D)
                     end
                 end
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue14::
+        ::__continue15::
     end
     for hid in pairs(self["当前单位集合"]) do
         if not _____65B0_96C6_5408[hid] then
             local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
             if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                local ____opt_5 = self["参数"]["on离开"]
-                if ____opt_5 ~= nil then
-                    ____opt_5(self["当前单位集合"][hid])
+                local ____opt_6 = self["参数"]["on离开"]
+                if ____opt_6 ~= nil then
+                    ____opt_6(self["当前单位集合"][hid])
                 end
             end
             self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -166,12 +172,12 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
     local _____5F53_524D_5355_4F4D_6570_7EC4 = __TS__ObjectValues(_____65B0_96C6_5408)
     if self["参数"]["周期伤害"] and self["参数"]["周期伤害"] > 0 and ATTACK_TYPE_NORMAL then
         for ____, _____5355_4F4D in ipairs(_____5F53_524D_5355_4F4D_6570_7EC4) do
-            local ____self__53C2_6570__6240_6709_8005_7 = self["参数"]["所有者"]
-            if ____self__53C2_6570__6240_6709_8005_7 == nil then
-                ____self__53C2_6570__6240_6709_8005_7 = _____5355_4F4D
+            local ____self__53C2_6570__6240_6709_8005_8 = self["参数"]["所有者"]
+            if ____self__53C2_6570__6240_6709_8005_8 == nil then
+                ____self__53C2_6570__6240_6709_8005_8 = _____5355_4F4D
             end
             UnitDamageTarget(
-                ____self__53C2_6570__6240_6709_8005_7,
+                ____self__53C2_6570__6240_6709_8005_8,
                 _____5355_4F4D,
                 self["参数"]["周期伤害"],
                 false,
@@ -182,9 +188,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             )
         end
     end
-    local ____opt_8 = self["参数"]["on周期"]
-    if ____opt_8 ~= nil then
-        ____opt_8(_____5F53_524D_5355_4F4D_6570_7EC4)
+    local ____opt_9 = self["参数"]["on周期"]
+    if ____opt_9 ~= nil then
+        ____opt_9(_____5F53_524D_5355_4F4D_6570_7EC4)
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -211,9 +217,13 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["特效句柄"])
         self["特效句柄"] = nil
     end
-    local ____opt_10 = self["参数"]["on销毁"]
-    if ____opt_10 ~= nil then
-        ____opt_10()
+    if self["提示圈特效"] then
+        DestroyEffect(self["提示圈特效"])
+        self["提示圈特效"] = nil
+    end
+    local ____opt_11 = self["参数"]["on销毁"]
+    if ____opt_11 ~= nil then
+        ____opt_11()
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -240,9 +250,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
     for hid in pairs(self["当前单位集合"]) do
         local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
         if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-            local ____opt_12 = self["参数"]["on离开"]
-            if ____opt_12 ~= nil then
-                ____opt_12(self["当前单位集合"][hid])
+            local ____opt_13 = self["参数"]["on离开"]
+            if ____opt_13 ~= nil then
+                ____opt_13(self["当前单位集合"][hid])
             end
         end
         self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4

@@ -330,12 +330,17 @@ export function YDWEAngleBetweenUnits(fromUnit: any, toUnit: any): number {
 
 /** 待销毁特效列表 */
 const _pendingEffects: Array<{ eff: any; ticksLeft: number }> = [];
+const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
+  onTick10ms: (this: void, callback: () => void) => void;
+};
 
 /** 是否已注册到中心计时器 */
 let _effectRecycleRegistered = false;
 
 /** 每10毫秒检查待销毁特效 */
-function _tickEffectRecycle(): void {
+const _tickEffectRecycle = (): void => {
+  (globalThis as any).__ydweTickCount = ((globalThis as any).__ydweTickCount || 0) + 1;
+  const oldLen = _pendingEffects.length;
   for (let i = _pendingEffects.length - 1; i >= 0; i--) {
     const entry = _pendingEffects[i];
     entry.ticksLeft = entry.ticksLeft - 1;
@@ -346,7 +351,12 @@ function _tickEffectRecycle(): void {
       _pendingEffects.splice(i, 1);
     }
   }
-}
+  const newLen = _pendingEffects.length;
+  if (oldLen !== newLen) {
+    (globalThis as any).__ydweDestroyed = ((globalThis as any).__ydweDestroyed || 0) + (oldLen - newLen);
+  }
+  (globalThis as any).__ydweEffectDebug = newLen;
+};
 
 /**
  * 延时销毁特效（使用中心计时器，避免频繁创建计时器）
@@ -363,15 +373,15 @@ export function YDWETimerDestroyEffect(duration: number, effect: any): void {
   // 注册到中心计时器（只注册一次）
   if (!_effectRecycleRegistered) {
     _effectRecycleRegistered = true;
-const { onTick10ms } = globalThis as unknown as {
-      onTick10ms: (this: void, callback: () => void) => void;
-    };
     onTick10ms(_tickEffectRecycle);
+    (globalThis as any).__ydweRegistered = true;
   }
 
   // 计算tick数（每10毫秒一个tick）
   const ticks = ceil(duration / 0.01);
   _pendingEffects.push({ eff: effect, ticksLeft: ticks });
+
+  (globalThis as any).__ydweEffectDebug = _pendingEffects.length;
 }
 
 export {};

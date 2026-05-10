@@ -23,7 +23,7 @@ function ____exports.getUnitsInRange(x, y, radius)
         if unit == nil or unit == 0 then
             break
         end
-        if isValidUnit(nil, unit) then
+        if isValidUnit(unit) then
             units[#units + 1] = unit
         end
         jass.GroupRemoveUnit(group, unit)
@@ -54,7 +54,7 @@ function ____exports.getEnemyUnitsInRange(centerUnit, x, y, radius)
         if unit == nil or unit == 0 then
             break
         end
-        if isUnitEnemy(nil, unit, centerUnit) then
+        if isUnitEnemy(unit, centerUnit) then
             units[#units + 1] = unit
         end
         jass.GroupRemoveUnit(group, unit)

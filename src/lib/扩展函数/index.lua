@@ -22,6 +22,15 @@ require("lib.扩展函数.Star扩展函数.index")
 require("lib.扩展函数.物品相关函数.index")
 require("lib.扩展函数.自定义扩展函数.index")
 --- 初始化扩展函数
-function ____exports.init(self)
+function ____exports.init()
+    do
+        pcall(function()
+            local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
+            local registerBridge = ____require_result_0.registerBridge
+            if type(registerBridge) == "function" then
+                registerBridge(nil)
+            end
+        end)
+    end
 end
 return ____exports

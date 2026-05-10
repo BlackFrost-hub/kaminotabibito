@@ -11,3 +11,4 @@ export * from "./05．召唤物";
 export * from "./06．闪烁";
 export * from "./07．单位组工具";
 export * from "./08．无敌帧";
+export * from "./09．提示特效";

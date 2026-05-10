@@ -25,7 +25,23 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.创建步兵测试")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.93．创建步兵测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.94．扩散伤害测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.95．护盾测试")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -65,7 +81,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.充能测试")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.100．充能测试")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -73,7 +89,31 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.95．护盾测试")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.101．区域效果测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.102．动态范围测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.103．提示特效测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.104．矩形提示特效测试")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

@@ -42,7 +42,7 @@ local HOT_TICK_RATIO = 0.1
 local HEAL_ITEM_SYSTEM_ENABLED = true
 --- 检查单位是否可以被治疗（有效单位 + 友方或自身）
 local function canBeHealed(self, unit, sourcePlayer, source)
-    if not isValidUnit(nil, unit) then
+    if not isValidUnit(unit) then
         return false
     end
     if not jass.IsUnitAlly(unit, sourcePlayer) and unit ~= source then

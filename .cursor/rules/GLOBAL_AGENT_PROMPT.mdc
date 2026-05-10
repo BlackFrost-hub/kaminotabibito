@@ -174,6 +174,8 @@ Rules:
 
 - prefer tiny local patches
 - avoid whole-file rewrites unless required
+- when using shell, PowerShell, Node scripts, or any non-patch write path, explicitly read and write repository text as UTF-8
+- never rely on platform-default encoding for Chinese-heavy files or Chinese paths
 - terminal mojibake does not prove file bytes are damaged
 - verify with build, generated Lua, and runtime behavior
 

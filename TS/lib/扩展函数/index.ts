@@ -24,5 +24,11 @@ require("lib.扩展函数.自定义扩展函数.index");
 /**
  * 初始化扩展函数
  */
-export function init(): void {
+export function init(this: void): void {
+  try {
+    const { registerBridge } = require("lib.扩展函数.YDWE函数.index") as { registerBridge?: () => void };
+    if (typeof registerBridge === "function") {
+      registerBridge();
+    }
+  } catch (e) {}
 }

@@ -47,6 +47,10 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 
+const { 创建渐变圆形提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
+  创建渐变圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
+};
+
 // ─── 参数接口 ────────────────────────────────────────────
 
 export interface 区域效果参数 {
@@ -90,6 +94,7 @@ class 区域效果实现 implements 区域效果实例 {
   private 已暂停值: boolean = false;
   private 已销毁值: boolean = false;
   private 特效句柄: any = null;
+  private 提示圈特效: any = null;
   private 当前X: number;
   private 当前Y: number;
   private 检测间隔秒值: number;
@@ -121,6 +126,12 @@ class 区域效果实现 implements 区域效果实例 {
         EXSetEffectZ(this.特效句柄, 参数.特效高度);
       }
     }
+
+    // 创建渐变圆形提示圈（白→红），半径=区域半径，持续时间=效果持续时间
+    if (参数.持续时间 > 0) {
+      this.提示圈特效 = 创建渐变圆形提示圈(this.当前X, this.当前Y, 参数.半径, 参数.持续时间);
+    }
+
     注册区域效果实例(this);
   }
 
@@ -234,6 +245,10 @@ class 区域效果实现 implements 区域效果实例 {
     if (this.特效句柄) {
       DestroyEffect(this.特效句柄);
       this.特效句柄 = null;
+    }
+    if (this.提示圈特效) {
+      DestroyEffect(this.提示圈特效);
+      this.提示圈特效 = null;
     }
     this.参数.on销毁?.();
     this.当前单位集合 = {};

@@ -70,7 +70,7 @@ function ____exports.isUnitAlly(self, targetUnit, sourceUnit)
     ) == true
 end
 function ____exports.isValidAllyUnit(self, targetUnit, sourceUnit)
-    return isValidUnit(nil, targetUnit) and ____exports.isUnitAlly(nil, targetUnit, sourceUnit)
+    return isValidUnit(targetUnit) and ____exports.isUnitAlly(nil, targetUnit, sourceUnit)
 end
 function ____exports.isValidAllyUnitExcludeSelf(self, targetUnit, sourceUnit)
     return ____exports.isValidAllyUnit(nil, targetUnit, sourceUnit) and not ____exports.isSameUnit(nil, targetUnit, sourceUnit)

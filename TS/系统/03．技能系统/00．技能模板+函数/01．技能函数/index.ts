@@ -9,3 +9,4 @@ export * from "./04．区域效果/index";
 export * from "./05．吸附·牵引/index";
 export * from "./06．充能/index";
 export * from "./07．护盾/index";
+export * from "./08．扩散伤害/index";
