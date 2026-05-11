@@ -6,7 +6,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index"
   debugLogForce: (module: string, ...args: any[]) => void;
 };
 
-import { 开始单位组牵引 } from "../01．技能函数/05．吸附·牵引/index";
+import { 开始单位组牵引, type 牵引结束原因 } from "../01．技能函数/05．吸附·牵引/index";
 
 const CreateTrigger = jass["CreateTrigger"] as () => any;
 const TriggerRegisterPlayerChatEvent = jass["TriggerRegisterPlayerChatEvent"] as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
@@ -20,7 +20,12 @@ const GetUnitY = jass["GetUnitY"] as (u: any) => number;
 
 const 模块名 = "吸附牵引测试";
 const 聊天命令 = "111";
+const 最大牵引距离 = 600;
 let 已注册 = false;
+
+function 吸附牵引测试_结束回调(单位: any, 原因: 牵引结束原因, 牵引ID: number): void {
+  debugLogForce(模块名, "牵引结束", "ID=", 牵引ID, " 原因=", 原因, " 单位=", 单位);
+}
 
 function 执行吸附测试(): void {
   const 大法师 = g.gg_unit_Hamg_0002;
@@ -36,6 +41,7 @@ function 执行吸附测试(): void {
     每秒速度: 220,
     持续时间: 4.0,
     最小距离: 140,
+    最大牵引距离,
     检查地形: true,
     禁用碰撞: true,
     暂停单位: false,
@@ -44,10 +50,11 @@ function 执行吸附测试(): void {
     启用闪电效果: true,
     闪电效果代码: "CLPB",
     闪电高度: 60,
+    结束回调: 吸附牵引测试_结束回调,
   });
   DestroyGroup(group);
 
-  debugLogForce(模块名, "已开始测试", "输入=" + 聊天命令);
+  debugLogForce(模块名, "已开始测试", "输入=" + 聊天命令, " 最大牵引距离=", 最大牵引距离);
 }
 
 function on聊天111测试(): void {

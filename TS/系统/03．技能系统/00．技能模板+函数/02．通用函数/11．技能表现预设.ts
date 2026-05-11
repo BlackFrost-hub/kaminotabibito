@@ -1,0 +1,89 @@
+/** @noSelfInFile */
+/**
+ * 通用函数 - 技能表现预设
+ *
+ * 说明：
+ * 1. 这里只提供高频可复用的技能表现预设，不承担技能逻辑。
+ * 2. 预设分两类：区域预警预设、结果反馈预设。
+ * 3. 目标是减少后续技能里反复手写“常见提示圈 + 常见命中/成功/中断特效”。
+ */
+
+const jass = require("jass.common") as any;
+
+const GetUnitX = jass.GetUnitX as (u: any) => number;
+const GetUnitY = jass.GetUnitY as (u: any) => number;
+
+const {
+  createTimedEffect,
+  createUnitEffect,
+} = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
+};
+
+const {
+  创建薄圆形提示圈,
+  创建白色圆形提示圈,
+  创建渐变圆形提示圈,
+  创建双环提示圈,
+} = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
+  创建薄圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
+  创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
+  创建渐变圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
+  创建双环提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
+};
+
+const 命中反馈特效 = "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl";
+const 成功反馈特效 = "Abilities\\Spells\\Items\\AIil\\AIilTarget.mdl";
+const 中断反馈特效 = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
+const 失败反馈特效 = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+
+export function 创建敌方危险圆圈预设(x: number, y: number, 半径: number, 持续时间: number, speed?: number): void {
+  创建薄圆形提示圈(x, y, 半径, 持续时间, speed);
+}
+
+export function 创建友方安全圆圈预设(x: number, y: number, 半径: number, 持续时间: number, speed?: number): void {
+  创建白色圆形提示圈(x, y, 半径, 持续时间, speed);
+}
+
+export function 创建敌方渐变圆圈预设(x: number, y: number, 半径: number, 持续时间: number, speed?: number): any {
+  return 创建渐变圆形提示圈(x, y, 半径, 持续时间, speed);
+}
+
+export function 创建双环区域预设(x: number, y: number, 外圈半径: number, 持续时间: number, speed?: number): any {
+  return 创建双环提示圈(x, y, 外圈半径, 持续时间, speed);
+}
+
+export function 播放命中反馈预设(x: number, y: number, 持续时间: number = 1.0): any {
+  return createTimedEffect(命中反馈特效, x, y, 0, 持续时间);
+}
+
+export function 播放单位命中反馈预设(单位: any, 持续时间: number = 0.8, 挂点: string = "origin"): any {
+  if (单位 == null || 单位 === 0) return null;
+  return createUnitEffect(单位, 挂点, 命中反馈特效, 持续时间, "skill_hit_feedback");
+}
+
+export function 播放成功反馈预设(单位: any, 持续时间: number = 1.0, 挂点: string = "origin"): any {
+  if (单位 == null || 单位 === 0) return null;
+  return createUnitEffect(单位, 挂点, 成功反馈特效, 持续时间, "skill_success_feedback");
+}
+
+export function 播放中断反馈预设(单位: any, 持续时间: number = 0.8, 挂点: string = "origin"): any {
+  if (单位 == null || 单位 === 0) return null;
+  return createUnitEffect(单位, 挂点, 中断反馈特效, 持续时间, "skill_interrupt_feedback");
+}
+
+export function 播放失败反馈预设(单位: any, 持续时间: number = 1.0, 挂点: string = "overhead"): any {
+  if (单位 == null || 单位 === 0) return null;
+  return createUnitEffect(单位, 挂点, 失败反馈特效, 持续时间, "skill_fail_feedback");
+}
+
+export function 播放坐标命中反馈预设(X: number, Y: number, 持续时间: number = 1.0): any {
+  return 播放命中反馈预设(X, Y, 持续时间);
+}
+
+export function 播放单位脚下命中反馈预设(单位: any, 持续时间: number = 1.0): any {
+  if (单位 == null || 单位 === 0) return null;
+  return 播放命中反馈预设(GetUnitX(单位), GetUnitY(单位), 持续时间);
+}
+

@@ -88,7 +88,7 @@ ____exports["创建薄圆形提示圈特效"] = function(x, y, r, speed, _____67
 end
 --- 按半径更新提示圈尺寸
 ____exports["设置提示圈半径"] = function(e, r)
-    EXSetEffectSize(e, r / 200)
+    EXSetEffectSize(e, r / 178)
 end
 --- 立即隐藏并销毁提示特效，避免模型自身尾动画继续可见
 ____exports["立即隐藏并销毁提示特效"] = function(e)

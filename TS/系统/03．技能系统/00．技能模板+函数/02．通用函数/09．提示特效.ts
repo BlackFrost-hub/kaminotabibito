@@ -330,7 +330,7 @@ export function 创建薄圆形提示圈特效(
  * 按半径更新提示圈尺寸
  */
 export function 设置提示圈半径(e: any, r: number): void {
-  EXSetEffectSize(e, r / 200);
+  EXSetEffectSize(e, r / 178);
 }
 
 /**

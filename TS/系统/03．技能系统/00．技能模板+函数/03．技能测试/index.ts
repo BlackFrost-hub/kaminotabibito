@@ -15,3 +15,4 @@ export * from "./106．动态扇形测试";
 export * from "./107．冲锋路径区域结算测试";
 export * from "./108．落点打击测试";
 export * from "./109．地面路径持续区域测试";
+export * from "./110．跳链测试";

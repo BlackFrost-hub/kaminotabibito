@@ -11,4 +11,5 @@ export * from "./06．施法·蓄力·充能/index";
 export * from "./07．护盾/index";
 export * from "./08．扩散伤害/index";
 export * from "./09．形状区域/index";
+export * from "./10．跳链/index";
 export * from "./14．落点打击/index";
