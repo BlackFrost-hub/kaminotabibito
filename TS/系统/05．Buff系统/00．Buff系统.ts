@@ -15,6 +15,7 @@ const jass = require("jass.common") as Record<string, unknown>;
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
+const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityId: number) => boolean;
 
 /** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */
 export const BUFF_POOL_TICK = 0.1;
@@ -40,6 +41,8 @@ export interface BuffRuntime {
   iconOverride?: string;
   /** 预留：与桥接传入的特效路径一致（可用于后续挂点逻辑） */
   effectModelOverride?: string;
+  /** Buff 池到期时一并移除的原生魔法效果 rawId，用于清理单位状态栏图标/效果。 */
+  nativeBuffAbilityIds?: number[];
 }
 
 // ========== 虚拟分区：扁平化存储（禁止 state[x][y] 二级链式） ==========
@@ -83,6 +86,14 @@ function setBuffToFlat(hid: number, buffID: string, row: BuffRuntime): void {
 }
 function removeBuffFromFlat(hid: number, buffID: string): void {
   delete buffByUnitAndId[makeBuffKey(hid, buffID)];
+}
+
+function hasAnyBuffOnHid(hid: number): boolean {
+  for (const k in buffByUnitAndId) {
+    const p = parseBuffKey(k);
+    if (p && p.hid === hid) return true;
+  }
+  return false;
 }
 
 /** 收集所有活跃对，按数值排序（排序：先 hid 数值，再 buffID 字典序） */
@@ -203,6 +214,7 @@ export interface RegisterManualBuffExtras {
   sourceName?: string;
   iconOverride?: string;
   effectModelOverride?: string;
+  nativeBuffAbilityIds?: number[];
 }
 
 export function registerManualBuff(
@@ -221,6 +233,8 @@ export function registerManualBuff(
     if (extras.iconOverride !== undefined && extras.iconOverride !== "") row.iconOverride = extras.iconOverride;
     if (extras.effectModelOverride !== undefined && extras.effectModelOverride !== "")
       row.effectModelOverride = extras.effectModelOverride;
+    if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
+      row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
   }
   setBuffToFlat(hid, buffID, row);
   if (typeof target !== "number") unitRefByHid[hid] = target;
@@ -308,6 +322,7 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
     row.remaining = row.remaining - BUFF_POOL_TICK;
     if (row.remaining <= 0) {
       if (row.source === "dot") notifyDotBuffExpiredFromPool(buffID, hid);
+      cleanupExpiredNativeBuffs(unitRef, row);
       expired.push(buffID);
     }
   }
@@ -316,14 +331,36 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
     removeBuffFromFlat(hid, expired[i]);
   }
   // 如果该 hid 下没有其他 buff 了，清理 unitRef
-  const hasRemainingBuff = (() => {
-    for (const k in buffByUnitAndId) {
-      const p = parseBuffKey(k);
-      if (p && p.hid === hid) return true;
-    }
-    return false;
-  })();
-  if (!hasRemainingBuff) delete unitRefByHid[hid];
+  if (!hasAnyBuffOnHid(hid)) delete unitRefByHid[hid];
+}
+
+function cleanupExpiredNativeBuffs(unitRef: any, row: BuffRuntime): void {
+  if (unitRef == null || unitRef === 0) return;
+  const ids = row.nativeBuffAbilityIds;
+  if (ids == null || ids.length === 0) return;
+  for (let i = 0; i < ids.length; i++) {
+    const rawId = ids[i];
+    if (rawId != null && rawId !== 0) UnitRemoveAbility(unitRef, rawId);
+  }
+}
+
+function removeBuffRuntimeByKey(hid: number, buffID: string, row: BuffRuntime, unitRef: any): void {
+  if (row.source === "dot") notifyDotBuffExpiredFromPool(buffID, hid);
+  cleanupExpiredNativeBuffs(unitRef, row);
+  removeBuffFromFlat(hid, buffID);
+}
+
+/** 删除单位身上的指定 buffID，并同步清理 DOT 与原生魔法效果。 */
+export function 移除单位指定Buff(unit: any, buffID: string): boolean {
+  const hid = toHid(unit);
+  if (hid === 0 || buffID === "") return false;
+  const row = getBuffFromFlat(hid, buffID);
+  if (row == null) return false;
+  const unitRef = typeof unit !== "number" ? unit : unitRefByHid[hid];
+  removeBuffRuntimeByKey(hid, buffID, row, unitRef);
+  if (!hasAnyBuffOnHid(hid)) delete unitRefByHid[hid];
+  maybeStopSyncTimer();
+  return true;
 }
 
 /** 是否已注册到中心计时器 */

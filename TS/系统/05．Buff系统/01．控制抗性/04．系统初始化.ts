@@ -17,7 +17,7 @@ const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = requ
   isUnitControlled: (unit: any) => boolean;
 };
 const { calcReducedControlTime } = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算") as {
-  calcReducedControlTime: (target: any, abilityId: number) => number;
+  calcReducedControlTime: (this: void, target: any, abilityId: number) => number;
 };
 const { recastControlAbility } = require("系统.05．Buff系统.01．控制抗性.03．控制重施放") as {
   recastControlAbility: (caster: any, target: any, abilityId: number, duration: number) => void;

@@ -41,6 +41,10 @@ local function formatDotTooltip(template, durationForDisplay, dps, sourceName, i
     local iStr = tooltipIntStr(intv)
     local s = template
     s = table.concat(
+        __TS__StringSplit(s, "time"),
+        rStr or ","
+    )
+    s = table.concat(
         __TS__StringSplit(s, "持续时间"),
         rStr or ","
     )

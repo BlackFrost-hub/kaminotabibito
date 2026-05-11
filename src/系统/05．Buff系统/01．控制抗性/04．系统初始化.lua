@@ -80,7 +80,7 @@ local function onSpellChannel(caster, abilityId)
     if not isUnitControlled(nil, target) then
         return
     end
-    local duration = calcReducedControlTime(nil, target, abilityId)
+    local duration = calcReducedControlTime(target, abilityId)
     local t = jass.CreateTimer()
     if t then
         controlResistCtxByTimerHid[jass.GetHandleId(t)] = {caster = caster, target = target, abilityId = abilityId, duration = duration}

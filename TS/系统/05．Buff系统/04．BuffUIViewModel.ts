@@ -53,6 +53,7 @@ function formatDotTooltip(
   const dStr = tooltipIntStr(dpsN);
   const iStr = tooltipIntStr(intv);
   let s = template;
+  s = s.split("time").join(rStr);
   s = s.split("持续时间").join(rStr);
   s = s.split("interval").join(iStr);
   s = s.split("damage").join(dStr);

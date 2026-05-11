@@ -491,6 +491,122 @@ AbilityDefinitionInnerFire = {}
 ---@return AbilityDefinitionInnerFire
 function AbilityDefinitionInnerFire:new(newId) end
 
+---@param level integer
+---@param value number 攻击力提升
+function AbilityDefinitionInnerFire:setDamageIncrease(level, value) end
+
+---@param level integer
+---@param value integer 护甲提升
+function AbilityDefinitionInnerFire:setDefenseIncrease(level, value) end
+
+---@param level integer
+---@param value number 生命恢复
+function AbilityDefinitionInnerFire:setLifeRegenRate(level, value) end
+
+---嗜血术模板
+---@class AbilityDefinitionBloodlust: AbilityDefinition
+AbilityDefinitionBloodlust = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionBloodlust
+function AbilityDefinitionBloodlust:new(newId) end
+
+---@param level integer
+---@param value number 攻速提升
+function AbilityDefinitionBloodlust:setAttackSpeedIncrease(level, value) end
+
+---@param level integer
+---@param value number 移速提升
+function AbilityDefinitionBloodlust:setMovementSpeedIncrease(level, value) end
+
+---@param level integer
+---@param value number 缩放倍率
+function AbilityDefinitionBloodlust:setScalingFactor(level, value) end
+
+---残废模板
+---@class AbilityDefinitionCripple: AbilityDefinition
+AbilityDefinitionCripple = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionCripple
+function AbilityDefinitionCripple:new(newId) end
+
+---@param level integer
+---@param value number 移速降低
+function AbilityDefinitionCripple:setMovementSpeedReduction(level, value) end
+
+---@param level integer
+---@param value number 攻速降低
+function AbilityDefinitionCripple:setAttackSpeedReduction(level, value) end
+
+---@param level integer
+---@param value number 伤害降低
+function AbilityDefinitionCripple:setDamageReduction(level, value) end
+
+---精灵之火模板
+---@class AbilityDefinitionFaerieFire: AbilityDefinition
+AbilityDefinitionFaerieFire = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionFaerieFire
+function AbilityDefinitionFaerieFire:new(newId) end
+
+---@param level integer
+---@param value integer 护甲降低
+function AbilityDefinitionFaerieFire:setDefenseReduction(level, value) end
+
+---@param level integer
+---@param value boolean 是否自动施放
+function AbilityDefinitionFaerieFire:setAlwaysAutocast(level, value) end
+
+---诅咒模板
+---@class AbilityDefinitionCurse: AbilityDefinition
+AbilityDefinitionCurse = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionCurse
+function AbilityDefinitionCurse:new(newId) end
+
+---@param level integer
+---@param value number 丢失概率
+function AbilityDefinitionCurse:setChancetoMiss(level, value) end
+
+---睡眠模板
+---@class AbilityDefinitionDreadlordSleep: AbilityDefinition
+AbilityDefinitionDreadlordSleep = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionDreadlordSleep
+function AbilityDefinitionDreadlordSleep:new(newId) end
+
+---@param level integer
+---@param value number 昏迷持续时间
+function AbilityDefinitionDreadlordSleep:setStunDuration(level, value) end
+
+---纠缠根须模板
+---@class AbilityDefinitionEntanglingRootscreep: AbilityDefinition
+AbilityDefinitionEntanglingRootscreep = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionEntanglingRootscreep
+function AbilityDefinitionEntanglingRootscreep:new(newId) end
+
+---@param level integer
+---@param value number 每秒伤害
+function AbilityDefinitionEntanglingRootscreep:setDamageperSecond(level, value) end
+
+---飓风模板
+---@class AbilityDefinitionCyclone: AbilityDefinition
+AbilityDefinitionCyclone = {}
+
+---@param newId string 4 字符新技能原始 ID
+---@return AbilityDefinitionCyclone
+function AbilityDefinitionCyclone:new(newId) end
+
+---@param level integer
+---@param value boolean 是否可驱散
+function AbilityDefinitionCyclone:setCanBeDispelled(level, value) end
+
 ---法力护盾模板
 ---@class AbilityDefinitionManaShield: AbilityDefinition
 AbilityDefinitionManaShield = {}

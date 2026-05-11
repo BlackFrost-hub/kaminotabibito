@@ -1,6 +1,9 @@
 ﻿const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-import { getSoleSelectedUnitForPlayer as getSoleSelectedUnitForPlayerImported } from "../00．核心系统/01．事件中心/05．玩家选中单位事件中心";
+import {
+  getSoleSelectedUnitForPlayer as getSoleSelectedUnitForPlayerImported,
+  initPlayerSelectionCenter as initPlayerSelectionCenterImported,
+} from "../00．核心系统/01．事件中心/05．玩家选中单位事件中心";
 import { buildBuffBarViewModel as buildBuffBarViewModelImported, getMaxSlots as getMaxSlotsImported } from "./04．BuffUIViewModel";
 import { createFrame as createFrameImported } from "../09．表现系统/01．UI工具/01．帧创建";
 import {
@@ -283,6 +286,12 @@ function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; i
 
 const MAX_PLAYER_ID = 6;
 
+function initSelectionCentersForBuffUi(this: void): void {
+  for (let playerId = 0; playerId < MAX_PLAYER_ID; playerId++) {
+    initPlayerSelectionCenterImported(jass.Player(playerId));
+  }
+}
+
 function rebuildAllBuffBarViewModels(this: void): void {
   for (let playerId = 0; playerId < MAX_PLAYER_ID; playerId++) {
     const targetUnit = getSoleSelectedUnitForPlayerImported(playerId);
@@ -332,15 +341,21 @@ function onBuffUiInitDelayTimer(this: void): void {
   }
 }
 
-export function init(this: void): void {
-}
-
-export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
-  debugLog("BuffUI", "onPlayerHeroRegistered called, init=" + buffUiInitialized);
+function startBuffUiSystem(this: void): void {
+  initSelectionCentersForBuffUi();
   if (buffUiInitialized) return;
   buffUiInitialized = true;
   pendingInitDelayTimer = jass.CreateTimer();
   jass.TimerStart(pendingInitDelayTimer, 1.0, false, onBuffUiInitDelayTimer);
+}
+
+export function init(this: void): void {
+  startBuffUiSystem();
+}
+
+export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
+  debugLog("BuffUI", "onPlayerHeroRegistered called, init=" + buffUiInitialized);
+  startBuffUiSystem();
 }
 
 export {};

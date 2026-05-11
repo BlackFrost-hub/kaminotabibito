@@ -36,6 +36,7 @@ const UnitAddAbility = jass["UnitAddAbility"] as (u: any, abilityId: number) => 
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (u: any, abilityId: number) => void;
 const AddSpecialEffect = jass["AddSpecialEffect"] as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass["DestroyEffect"] as (effect: any) => void;
+const GetRandomReal = jass["GetRandomReal"] as (low: number, high: number) => number;
 const GetUnitX = jass["GetUnitX"] as (u: any) => number;
 const GetUnitY = jass["GetUnitY"] as (u: any) => number;
 const GetUnitFlyHeight = jass["GetUnitFlyHeight"] as (u: any) => number;
@@ -54,7 +55,7 @@ export { 申请单位暂停占用, 释放单位暂停占用, 单位是否存在�
 export { 零秒后重置单位动画 };
 export {
   GetHandleId, GetUnitState, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY,
-  UnitAddAbility, UnitRemoveAbility, AddSpecialEffect, DestroyEffect,
+  UnitAddAbility, UnitRemoveAbility, AddSpecialEffect, DestroyEffect, GetRandomReal,
   GetUnitX, GetUnitY, GetUnitFlyHeight, SetUnitFlyHeight,
   SetUnitFacing, SetUnitX, SetUnitY, Cos, Sin, IsUnitPaused,
   ForGroup, GetEnumUnit,

@@ -8,12 +8,15 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
 };
 
 type SpellCallback = (castingUnit: any, spellAbilityId: number) => void;
+type SkillLearnCallback = (learningUnit: any, learnedAbilityId: number) => void;
 
 export const SPELL_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 const channelListeners: SpellCallback[] = [];
 const effectListeners: SpellCallback[] = [];
+const skillLearnListeners: SkillLearnCallback[] = [];
 let initialized = false;
+let skillLearnInitialized = false;
 
 function hasListener(list: SpellCallback[], callback: SpellCallback): boolean {
   for (let i = 0; i < list.length; i++) {
@@ -26,6 +29,13 @@ function dispatchSpellListeners(list: SpellCallback[], castingUnit: any, spellAb
   for (let i = 0; i < list.length; i++) {
     const callback = list[i];
     if (callback != null) callback(castingUnit, spellAbilityId);
+  }
+}
+
+function dispatchSkillLearnListeners(list: SkillLearnCallback[], learningUnit: any, learnedAbilityId: number): void {
+  for (let i = 0; i < list.length; i++) {
+    const callback = list[i];
+    if (callback != null) callback(learningUnit, learnedAbilityId);
   }
 }
 
@@ -45,6 +55,15 @@ function onSpellEffect(): void {
   if (spellAbilityId == null) return;
 
   dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId);
+}
+
+function onSkillLearn(): void {
+  const learningUnit = jass.GetTriggerUnit();
+  if (learningUnit == null) return;
+  const learnedAbilityId = jass.GetLearnedSkill();
+  if (learnedAbilityId == null) return;
+
+  dispatchSkillLearnListeners(skillLearnListeners, learningUnit, learnedAbilityId);
 }
 
 /**
@@ -84,6 +103,24 @@ export function unregisterSpellEffectListener(callback: SpellCallback): void {
 }
 
 /**
+ * 注册学习技能监听。
+ * 第一次使用时会自动初始化事件；同一回调不会重复注册。
+ */
+export function registerSkillLearnListener(callback: SkillLearnCallback): void {
+  if (typeof callback !== "function") return;
+  initSkillLearnEvent();
+  if (!hasListener(skillLearnListeners, callback as any)) skillLearnListeners.push(callback);
+}
+
+/**
+ * 取消学习技能监听。
+ */
+export function unregisterSkillLearnListener(callback: SkillLearnCallback): void {
+  const index = skillLearnListeners.indexOf(callback);
+  if (index >= 0) skillLearnListeners.splice(index, 1);
+}
+
+/**
  * 初始化技能事件中心。
  * 统一注册 SPELL_CHANNEL / SPELL_EFFECT 两类原生事件，并集中派发给监听器。
  */
@@ -98,6 +135,18 @@ export function initSpellEventCenter(): void {
   const effectTrigger = jass.CreateTrigger();
   playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrigger, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
   jass.TriggerAddAction(effectTrigger, onSpellEffect);
+}
+
+/**
+ * 初始化学习技能事件。
+ */
+export function initSkillLearnEvent(): void {
+  if (skillLearnInitialized) return;
+  skillLearnInitialized = true;
+
+  const learnTrigger = jass.CreateTrigger();
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(learnTrigger, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_HERO_SKILL);
+  jass.TriggerAddAction(learnTrigger, onSkillLearn);
 }
 
 export {};

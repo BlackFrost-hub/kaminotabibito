@@ -13,6 +13,7 @@ export const GetHandleId = jass.GetHandleId as (h: any) => number;
 export const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 export const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 export const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
+export const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 export const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 export const GetUnitX = jass.GetUnitX as (unit: any) => number;
 export const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -24,9 +25,15 @@ export const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 export const SetUnitFacing = jass.SetUnitFacing as (unit: any, face: number) => void;
 export const SetUnitFlyHeight = jass.SetUnitFlyHeight as (unit: any, height: number, rate: number) => void;
 export const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
+export const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 export const SetUnitScale = jass.SetUnitScale as (unit: any, x: number, y: number, z: number) => void;
 export const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 export const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
+export const SquareRoot = jass.SquareRoot as (value: number) => number;
+export const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => boolean;
+export const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
+export const UnitAddType = jass.UnitAddType as (unit: any, unitType: any) => boolean;
+export const UnitRemoveType = jass.UnitRemoveType as (unit: any, unitType: any) => boolean;
 export const UnitDamageTarget = jass.UnitDamageTarget as (
   source: any, target: any, amount: number,
   attack: boolean, ranged: boolean,
@@ -48,10 +55,14 @@ export const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 export const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 export const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 export const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
+export const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT;
+export const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL;
+export const UNIT_TYPE_TAUREN = jass.UNIT_TYPE_TAUREN;
 export const PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY;
 export const bj_RADTODEG = jass.bj_RADTODEG ?? 57.29577951308232;
 
-export const 默认弹幕单位类型 = 1697656880; // 'e000'，调用方可显式传入地图内专用马甲单位
+export const 蝗虫技能ID = 0x416c6f63; // 'Aloc'
+export const 默认弹幕单位类型 = 1700880737; // 'eaaa'，objediting/units.lua 中的 TS 原生弹幕马甲
 export const 弹幕Tick间隔 = 0.01;
 
 export function 取句柄ID(this: void, handle: any): number {
@@ -81,3 +92,8 @@ export function 限制范围(this: void, value: number, min: number, max: number
   return value;
 }
 
+export function 计算距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  return SquareRoot(dx * dx + dy * dy);
+}

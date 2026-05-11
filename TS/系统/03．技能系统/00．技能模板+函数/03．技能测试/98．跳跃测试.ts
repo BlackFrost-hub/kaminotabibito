@@ -67,7 +67,7 @@ function onResumeTestUnit(): void {
   PauseUnit(testUnit, false);
 }
 
-const 启用测试 = true;
+const 启用测试 = false; // Set to true to enable the jump test.
 
 if (启用测试) {
   debugLogForce("jump-test", "loaded", "delay=2.0");

@@ -136,6 +136,12 @@ function ObjEditingUnitBase:setCollisionSize(value) end
 ---@param value string 模型路径，例如 `'units\\nightelf\\Wisp\\Wisp.mdl'`
 function ObjEditingUnitBase:setModelFile(value) end
 
+---@param value string 模型文件额外版本，例如 `'0'`
+function ObjEditingUnitBase:setModelFileExtraVersions(value) end
+
+---@param value string 特殊效果模型路径
+function ObjEditingUnitBase:setSpecial(value) end
+
 ---@param value number 模型缩放
 function ObjEditingUnitBase:setScalingValue(value) end
 
@@ -184,6 +190,15 @@ function ObjEditingUnitBase:setDeathType(value) end
 ---@param value number 选择圈缩放
 function ObjEditingUnitBase:setSelectionScale(value) end
 
+---@param value number 选择圈高度
+function ObjEditingUnitBase:setSelectionCircleHeight(value) end
+
+---@param value boolean 选择圈是否显示在水面
+function ObjEditingUnitBase:setSelectionCircleOnWater(value) end
+
+---@param value boolean 是否缩放投射物
+function ObjEditingUnitBase:setScaleProjectiles(value) end
+
 ---@param value number 染色红色值 (0-255)
 function ObjEditingUnitBase:setTintingColorRed(value) end
 
@@ -213,6 +228,54 @@ function ObjEditingUnitBase:setUnitsSold(value) end
 
 ---@param value integer 商店库存上限
 function ObjEditingUnitBase:setStockMaximum(value) end
+
+---@param value integer 库存开始延迟
+function ObjEditingUnitBase:setStockStartDelay(value) end
+
+---@param value integer 库存补货间隔
+function ObjEditingUnitBase:setStockReplenishInterval(value) end
+
+---@param value integer 修理时间
+function ObjEditingUnitBase:setRepairTime(value) end
+
+---@param value integer 修理金币消耗
+function ObjEditingUnitBase:setRepairGoldCost(value) end
+
+---@param value integer 修理木材消耗
+function ObjEditingUnitBase:setRepairLumberCost(value) end
+
+---@param value integer 金币奖励基础值
+function ObjEditingUnitBase:setGoldBountyAwardedBase(value) end
+
+---@param value integer 金币奖励骰子数
+function ObjEditingUnitBase:setGoldBountyAwardedNumberofDice(value) end
+
+---@param value integer 金币奖励骰面
+function ObjEditingUnitBase:setGoldBountyAwardedSidesperDie(value) end
+
+---@param value integer 木材奖励基础值
+function ObjEditingUnitBase:setLumberBountyAwardedBase(value) end
+
+---@param value integer 木材奖励骰子数
+function ObjEditingUnitBase:setLumberBountyAwardedNumberofDice(value) end
+
+---@param value integer 木材奖励骰面
+function ObjEditingUnitBase:setLumberBountyAwardedSidesperDie(value) end
+
+---@param value integer 高度采样点数
+function ObjEditingUnitBase:setElevationSamplePoints(value) end
+
+---@param value number 高度采样半径
+function ObjEditingUnitBase:setElevationSampleRadius(value) end
+
+---@param value number 战争迷雾采样半径
+function ObjEditingUnitBase:setFogOfWarSampleRadius(value) end
+
+---@param value number 死亡时间
+function ObjEditingUnitBase:setDeathTimeseconds(value) end
+
+---@param value integer 编队优先级
+function ObjEditingUnitBase:setFormationRank(value) end
 
 ---@param value string 可训练单位列表
 function ObjEditingUnitBase:setUnitsTrained(value) end

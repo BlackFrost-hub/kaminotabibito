@@ -4,6 +4,7 @@ local ____exports = {}
 local uiSetFrameTexture, uiHideFrame, uiShowFrame, hideSlot, hideAllSlots, renderBuffBarLocal, rebuildAllBuffBarViewModels, syncBuffBar, onBuffUiRefreshTick, jass, japi, debugLog, MAX_SLOTS, slots, buffBarViewModelByPlayerId, MAX_PLAYER_ID
 local ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local getSoleSelectedUnitForPlayerImported = ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3.getSoleSelectedUnitForPlayer
+local initPlayerSelectionCenterImported = ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3.initPlayerSelectionCenter
 local ____04_FF0EBuffUIViewModel = require("系统.05．Buff系统.04．BuffUIViewModel")
 local buildBuffBarViewModelImported = ____04_FF0EBuffUIViewModel.buildBuffBarViewModel
 local getMaxSlotsImported = ____04_FF0EBuffUIViewModel.getMaxSlots
@@ -355,6 +356,15 @@ local function createOneSlot(index, parent)
     }
 end
 MAX_PLAYER_ID = 6
+local function initSelectionCentersForBuffUi()
+    do
+        local playerId = 0
+        while playerId < MAX_PLAYER_ID do
+            initPlayerSelectionCenterImported(jass.Player(playerId))
+            playerId = playerId + 1
+        end
+    end
+end
 local function createUi()
     local parent = getGameUI(nil)
     debugLog(
@@ -391,7 +401,17 @@ local function onBuffUiInitDelayTimer()
         pendingInitDelayTimer = nil
     end
 end
+local function startBuffUiSystem()
+    initSelectionCentersForBuffUi()
+    if buffUiInitialized then
+        return
+    end
+    buffUiInitialized = true
+    pendingInitDelayTimer = jass.CreateTimer()
+    jass.TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
+end
 function ____exports.init()
+    startBuffUiSystem()
 end
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     debugLog(
@@ -399,11 +419,6 @@ function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
         "BuffUI",
         "onPlayerHeroRegistered called, init=" .. tostring(buffUiInitialized)
     )
-    if buffUiInitialized then
-        return
-    end
-    buffUiInitialized = true
-    pendingInitDelayTimer = jass.CreateTimer()
-    jass.TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
+    startBuffUiSystem()
 end
 return ____exports

@@ -1,15 +1,43 @@
 -- System abilities
 
-local asg1 = AbilityDefinitionAttackBonusPlus1:new('ASG1')
-asg1:setName('[系统]攻击力增加')
+local function createNamedAbility(definition, id, name)
+  local ability = definition:new(id)
+  ability:setName(name)
+  return ability
+end
+
+local function createNamedAbilityFromBase(id, baseId, name)
+  local ability = AbilityDefinition:new(id, baseId)
+  ability:setName(name)
+  return ability
+end
+
+local function applyCommonBuffAbility(ability, options)
+  options = options or {}
+  if options.missileArt ~= nil then
+    ability:setMissileArt(options.missileArt)
+  end
+  if options.missileSpeed ~= nil then
+    ability:setMissileSpeed(options.missileSpeed)
+  end
+  ability:setAnimationNames(options.animationNames or '')
+  ability:setLevels(options.levels or 1)
+  ability:setCooldown(1, options.cooldown or 0)
+  ability:setManaCost(1, options.manaCost or 0)
+  ability:setCastRange(1, options.castRange or 999999)
+  ability:setDurationNormal(1, options.durationNormal or 1)
+  ability:setDurationHero(1, options.durationHero or 1)
+  ability:setRequirements(options.requirements or '')
+  ability:setTargetsAllowed(1, options.targetsAllowed or 'ground,air')
+end
+
+local asg1 = createNamedAbility(AbilityDefinitionAttackBonusPlus1, 'ASG1', '[系统]攻击力增加')
 asg1:setAttackBonus(1, 0)
 
-local asg2 = AbilityDefinitionDefenseBonusPlus1:new('ASG2')
-asg2:setName('[系统]护甲增加')
+local asg2 = createNamedAbility(AbilityDefinitionDefenseBonusPlus1, 'ASG2', '[系统]护甲增加')
 asg2:setDefenseBonus(1, 0)
 
-local asg3 = AbilityDefinitionAttributeModifierSkill:new('ASG3')
-asg3:setName('[系统]属性增加')
+local asg3 = createNamedAbility(AbilityDefinitionAttributeModifierSkill, 'ASG3', '[系统]属性增加')
 asg3:setStrengthBonus(1, 0)
 asg3:setAgilityBonus(1, 0)
 asg3:setIntelligenceBonus(1, 0)
@@ -19,100 +47,119 @@ asg3:setHeroAbility(false)
 asg3:setItemAbility(true)
 asg3:setArtCaster('')
 
-local asg6 = AbilityDefinitionMoveSpeedBonus:new('ASG6')
-asg6:setName('[系统]移动速度增加')
+local asg6 = createNamedAbility(AbilityDefinitionMoveSpeedBonus, 'ASG6', '[系统]移动速度增加')
 asg6:setMovementSpeedBonus(1, 0)
 
-local asg7 = AbilityDefinitionAttackSpeedIncrease:new('ASG7')
-asg7:setName('[系统]攻击速度增加')
+local asg7 = createNamedAbility(AbilityDefinitionAttackSpeedIncrease, 'ASG7', '[系统]攻击速度增加')
 asg7:setAttackSpeedIncrease(1, 0)
 
 -- Buff abilities
 
-local asby = AbilityDefinitionPolymorph:new('ASBy')
-asby:setName('[Buff系统]变羊')
-asby:setMissileArt('')
-asby:setMissileSpeed(10000)
-asby:setAnimationNames('')
-asby:setLevels(1)
-asby:setCooldown(1, 0)
-asby:setManaCost(1, 0)
-asby:setCastRange(1, 999999)
-asby:setDurationNormal(1, 1)
-asby:setDurationHero(1, 1)
-asby:setRequirements('')
-asby:setTargetsAllowed(1, 'ground,air')
+local asby = createNamedAbility(AbilityDefinitionPolymorph, 'ASBy', '[Buff系统]变羊')
+applyCommonBuffAbility(asby, {
+  missileArt = '',
+  missileSpeed = 10000,
+})
 asby:setMaximumCreepLevel(1, 0)
 
-local asb0 = AbilityDefinitionMountainKingThunderBolt:new('ASB0')
-asb0:setName('[Buff系统]击晕')
-asb0:setMissileArt('')
-asb0:setMissileSpeed(0)
-asb0:setAnimationNames('')
-asb0:setLevels(1)
-asb0:setCooldown(1, 0)
-asb0:setManaCost(1, 0)
-asb0:setCastRange(1, 999999)
-asb0:setDurationNormal(1, 1)
-asb0:setDurationHero(1, 1)
-asb0:setRequirements('')
-asb0:setTargetsAllowed(1, 'ground,air')
+local asb0 = createNamedAbility(AbilityDefinitionMountainKingThunderBolt, 'ASB0', '[Buff系统]击晕')
+applyCommonBuffAbility(asb0, {
+  missileArt = '',
+  missileSpeed = 0,
+})
 asb0:setDamage(1, 0)
 
-local asbx = AbilityDefinitionInvisibility:new('ASBX')
-asbx:setName('[Buff系统]隐形')
-asbx:setMissileArt('')
-asbx:setMissileSpeed(0)
-asbx:setAnimationNames('')
-asbx:setLevels(1)
-asbx:setCooldown(1, 0)
-asbx:setManaCost(1, 0)
-asbx:setCastRange(1, 999999)
-asbx:setDurationNormal(1, 1)
-asbx:setDurationHero(1, 1)
-asbx:setRequirements('')
-asbx:setTargetsAllowed(1, 'ground,air')
+local asbx = createNamedAbility(AbilityDefinitionInvisibility, 'ASBX', '[Buff系统]隐形')
+applyCommonBuffAbility(asbx, {
+  missileArt = '',
+  missileSpeed = 0,
+})
 
-local asb4 = AbilityDefinitionThunderBoltCreep:new('ASB4')
-asb4:setName('[Buff系统]冰冻')
-asb4:setMissileArt('')
-asb4:setMissileSpeed(0)
-asb4:setLevels(1)
-asb4:setCooldown(1, 0)
-asb4:setManaCost(1, 0)
-asb4:setCastRange(1, 999999)
-asb4:setDurationNormal(1, 1)
-asb4:setDurationHero(1, 1)
-asb4:setRequirements('')
+local asb4 = createNamedAbility(AbilityDefinitionThunderBoltCreep, 'ASB4', '[Buff系统]冰冻')
+applyCommonBuffAbility(asb4, {
+  missileArt = '',
+  missileSpeed = 0,
+})
 asb4:setBuffs(1, 'Bfrz')
-asb4:setTargetsAllowed(1, 'ground,air')
 asb4:setDamage(1, 0)
 
-local asb9 = AbilityDefinitionSlow:new('ASB9')
-asb9:setName('[Buff系统]减速')
-asb9:setAnimationNames('')
+local asb9 = createNamedAbility(AbilityDefinitionSlow, 'ASB9', '[Buff系统]减速')
+applyCommonBuffAbility(asb9)
 asb9:setMovementSpeedFactor(1, 0.1)
 asb9:setAttackSpeedFactor(1, 0)
-asb9:setLevels(1)
-asb9:setCooldown(1, 0)
-asb9:setManaCost(1, 0)
-asb9:setCastRange(1, 999999)
-asb9:setDurationNormal(1, 1)
-asb9:setDurationHero(1, 1)
-asb9:setRequirements('')
-asb9:setTargetsAllowed(1, 'ground,air')
 
-local asb8 = AbilityDefinitionSilenceCreep:new('ASB8')
-asb8:setName('[Buff系统]沉默')
-asb8:setAnimationNames('')
+local asb8 = createNamedAbility(AbilityDefinitionSilenceCreep, 'ASB8', '[Buff系统]沉默')
+applyCommonBuffAbility(asb8)
 asb8:setAttacksPrevented(1, 8)
 asb8:setChanceToMiss(1, 0)
-asb8:setLevels(1)
-asb8:setCooldown(1, 0)
-asb8:setManaCost(1, 0)
-asb8:setCastRange(1, 999999)
-asb8:setDurationNormal(1, 1)
-asb8:setDurationHero(1, 1)
-asb8:setRequirements('')
 asb8:setAreaofEffect(1, 1)
-asb8:setTargetsAllowed(1, 'ground,air')
+
+-- 新增原生 Buff 技能必须逐个验证母技能和 setter；错误母技能或三字符字段会导致加载闪退/ObjEditing 读入断言。
+
+local asbi = createNamedAbility(AbilityDefinitionInnerFire, 'ASBI', '[Buff系统]心灵之火')
+applyCommonBuffAbility(asbi, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbi:setDamageIncrease(1, 0.1)
+asbi:setDefenseIncrease(1, 5)
+asbi:setLifeRegenRate(1, 0)
+
+local asbl = createNamedAbility(AbilityDefinitionBloodlust, 'ASBL', '[Buff系统]嗜血术')
+applyCommonBuffAbility(asbl, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbl:setAttackSpeedIncrease(1, 0.4)
+asbl:setMovementSpeedIncrease(1, 0.25)
+asbl:setScalingFactor(1, 1.0)
+
+local asbc = createNamedAbility(AbilityDefinitionCripple, 'ASBC', '[Buff系统]残废')
+applyCommonBuffAbility(asbc, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbc:setMovementSpeedReduction(1, 0.5)
+asbc:setAttackSpeedReduction(1, 0.5)
+asbc:setDamageReduction(1, 0.5)
+
+local asbf = createNamedAbility(AbilityDefinitionFaerieFire, 'ASBF', '[Buff系统]精灵之火')
+applyCommonBuffAbility(asbf, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbf:setDefenseReduction(1, 5)
+asbf:setAlwaysAutocast(1, false)
+
+local asbr = createNamedAbility(AbilityDefinitionCursecreep, 'ASBR', '[Buff系统]诅咒')
+applyCommonBuffAbility(asbr, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+-- Curse 的 setChancetoMiss 在当前 ObjEditing 定义里会写出 3 字节字段 Crs，导致 w3a 读入断言。
+
+local asbs = createNamedAbility(AbilityDefinitionSleepcreep, 'ASBS', '[Buff系统]睡眠')
+applyCommonBuffAbility(asbs, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbs:setStunDuration(1, 0)
+
+local asbt = createNamedAbilityFromBase('ASBT', 'Aenr', '[Buff系统]纠缠根须')
+-- Aenr 本身是中立敌对非英雄纠缠；这里不要再写 heroAbility 字段，否则 ObjEditing 读对象会断言失败。
+applyCommonBuffAbility(asbt, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+
+-- ASBH 飓风：Cyclonecreep 生成母技能 ACcy 会导致地图加载闪退，改测普通 Cyclone(Acyc)。
+local asbh = createNamedAbility(AbilityDefinitionCyclone, 'ASBH', '[Buff系统]飓风')
+applyCommonBuffAbility(asbh, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asbh:setCanBeDispelled(1, true)
+
+local asil = createNamedAbility(AbilityDefinitionItemIllusion, 'ASIL', '[系统]幻象物品')
+applyCommonBuffAbility(asil, {
+  missileArt = '',
+  missileSpeed = 0,
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+})
+asil:setLevels(1)
+asil:setHeroAbility(false)
+asil:setItemAbility(false)
+asil:setDamageReceivedMultiplier(1, 2.0)
+asil:setDamageDealtofnormal(1, 0.0)
