@@ -123,6 +123,11 @@ export function IsUnitPausedBJ(unit: any): boolean {
     return jass.IsUnitPaused(unit);
 }
 
+export function ResetUnitAnimation(this: void, whichUnit: any): void {
+    if (whichUnit == null || whichUnit === 0) return;
+    jass.SetUnitAnimation(whichUnit, "stand");
+}
+
 export function UnitPauseTimedLifeBJ(flag: boolean, unit: any): void {
     jass.UnitPauseTimedLife(unit, flag);
 }

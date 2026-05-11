@@ -41,10 +41,8 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 
-const { 创建薄圆形提示圈特效, 设置提示圈半径, 重播提示圈动画, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
+const { 创建薄圆形提示圈特效, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
   创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
-  设置提示圈半径: (this: void, e: any, r: number) => void;
-  重播提示圈动画: (this: void, e: any, 动画序号?: number, 动画名?: string) => void;
   立即销毁提示圈特效: (this: void, e: any) => void;
 };
 
@@ -84,9 +82,10 @@ class 动态范围实现 implements 动态范围实例 {
   private 当前Y: number;
   private 半径差值: number;
   private 检测间隔毫秒值: number;
-  private 下次检测时间毫秒: number;
+  private 当前段目标时间毫秒: number;
   private 变化时间毫秒: number;
   private 创建时间毫秒: number;
+  private 结束时间毫秒: number;
 
   constructor(参数: 动态范围参数) {
     this.实例ID = ++动态范围实例ID计数器;
@@ -102,7 +101,8 @@ class 动态范围实现 implements 动态范围实例 {
 
     const 当前时间毫秒 = getServerTime();
     this.创建时间毫秒 = 当前时间毫秒;
-    this.下次检测时间毫秒 = 当前时间毫秒 + this.检测间隔毫秒值;
+    this.结束时间毫秒 = 当前时间毫秒 + this.变化时间毫秒;
+    this.当前段目标时间毫秒 = 取较小值(this.创建时间毫秒 + this.检测间隔毫秒值, this.结束时间毫秒);
 
     if (参数.模型路径) {
       this.特效句柄 = AddSpecialEffect(参数.模型路径, this.当前X, this.当前Y);
@@ -112,13 +112,7 @@ class 动态范围实现 implements 动态范围实例 {
     }
 
     if (参数.变化时间 > 0) {
-      this.提示圈特效 = 创建薄圆形提示圈特效(
-        this.当前X,
-        this.当前Y,
-        this.当前半径值,
-        1 / 参数.变化时间,
-        参数.所有者
-      );
+      this.创建当前段提示特效(this.创建时间毫秒);
     }
 
     注册动态范围实例(this);
@@ -142,27 +136,25 @@ class 动态范围实现 implements 动态范围实例 {
     }
 
     this.已过时间值 = (当前时间毫秒 - this.创建时间毫秒) / 1000;
+    if (当前时间毫秒 < this.当前段目标时间毫秒) {
+      return;
+    }
 
-    if (当前时间毫秒 - this.创建时间毫秒 >= this.变化时间毫秒) {
-      this.当前半径值 = this.参数.结束半径;
+    while (!this.已销毁值 && 当前时间毫秒 >= this.当前段目标时间毫秒) {
+      this.销毁当前段提示特效();
+      this.当前半径值 = this.取指定时间半径(this.当前段目标时间毫秒);
       this.执行检测();
-      this.销毁();
-      return;
+
+      if (this.当前段目标时间毫秒 >= this.结束时间毫秒) {
+        this.销毁();
+        return;
+      }
+
+      this.当前段目标时间毫秒 = 取较小值(this.当前段目标时间毫秒 + this.检测间隔毫秒值, this.结束时间毫秒);
+      if (当前时间毫秒 < this.当前段目标时间毫秒) {
+        this.创建当前段提示特效(当前时间毫秒);
+      }
     }
-
-    if (当前时间毫秒 < this.下次检测时间毫秒) {
-      return;
-    }
-
-    this.下次检测时间毫秒 = 当前时间毫秒 + this.检测间隔毫秒值;
-
-    const 进度 = (当前时间毫秒 - this.创建时间毫秒) / this.变化时间毫秒;
-    this.当前半径值 = this.参数.起始半径 + this.半径差值 * 进度;
-    if (this.当前半径值 < 0) {
-      this.当前半径值 = 0;
-    }
-
-    this.执行检测();
   }
 
   private 执行检测(): void {
@@ -173,11 +165,6 @@ class 动态范围实现 implements 动态范围实例 {
     const 当前半径 = this.当前半径值;
     if (当前半径 <= 0) {
       return;
-    }
-
-    if (this.提示圈特效) {
-      设置提示圈半径(this.提示圈特效, 当前半径);
-      重播提示圈动画(this.提示圈特效, 0);
     }
 
     const 所有单位 = getUnitsInRange(this.当前X, this.当前Y, 当前半径);
@@ -216,6 +203,56 @@ class 动态范围实现 implements 动态范围实例 {
     return isUnitAlly(单位, 所有者);
   }
 
+  private 取指定时间半径(目标时间毫秒: number): number {
+    if (this.变化时间毫秒 <= 0) {
+      return this.参数.结束半径;
+    }
+
+    let 进度 = (目标时间毫秒 - this.创建时间毫秒) / this.变化时间毫秒;
+    if (进度 < 0) {
+      进度 = 0;
+    } else if (进度 > 1) {
+      进度 = 1;
+    }
+
+    const 半径 = this.参数.起始半径 + this.半径差值 * 进度;
+    return 半径 < 0 ? 0 : 半径;
+  }
+
+  private 创建当前段提示特效(当前时间毫秒: number): void {
+    if (this.参数.变化时间 <= 0) {
+      return;
+    }
+
+    const 当前段目标半径 = this.取指定时间半径(this.当前段目标时间毫秒);
+    if (当前段目标半径 <= 0) {
+      return;
+    }
+
+    const 剩余持续时间毫秒 = this.当前段目标时间毫秒 - 当前时间毫秒;
+    if (剩余持续时间毫秒 <= 0) {
+      return;
+    }
+
+    const 剩余持续时间秒 = 剩余持续时间毫秒 / 1000;
+    this.提示圈特效 = 创建薄圆形提示圈特效(
+      this.当前X,
+      this.当前Y,
+      当前段目标半径,
+      1 / 剩余持续时间秒,
+      this.参数.所有者
+    );
+  }
+
+  private 销毁当前段提示特效(): void {
+    if (!this.提示圈特效) {
+      return;
+    }
+
+    立即销毁提示圈特效(this.提示圈特效);
+    this.提示圈特效 = null;
+  }
+
   销毁(): void {
     if (this.已销毁值) {
       return;
@@ -229,10 +266,7 @@ class 动态范围实现 implements 动态范围实例 {
       this.特效句柄 = null;
     }
 
-    if (this.提示圈特效) {
-      立即销毁提示圈特效(this.提示圈特效);
-      this.提示圈特效 = null;
-    }
+    this.销毁当前段提示特效();
 
     this.参数.on销毁?.();
   }
@@ -246,7 +280,7 @@ function 确保动态范围系统已启动(): void {
   if (动态范围系统回调ID !== 0) {
     return;
   }
-  动态范围系统回调ID = addPeriodicCallback(100, 动态范围系统Tick);
+  动态范围系统回调ID = addPeriodicCallback(20, 动态范围系统Tick);
 }
 
 function 注册动态范围实例(实例: 动态范围实现): void {
@@ -282,6 +316,10 @@ function 动态范围系统Tick(): void {
 
 export function 创建动态范围(参数: 动态范围参数): 动态范围实例 {
   return new 动态范围实现(参数);
+}
+
+function 取较小值(a: number, b: number): number {
+  return a < b ? a : b;
 }
 
 export {};

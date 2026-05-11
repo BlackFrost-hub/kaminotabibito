@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272
+local _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE2X, MODEL_SQUARE3X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272
 function _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, color)
     if not e then
         return
@@ -24,6 +24,56 @@ ____exports["按所属单位设置提示圈颜色"] = function(e, _____6765_6E90
         return
     end
     _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, _____63D0_793A_5708_654C_65B9_8272)
+end
+--- 创建一个需要手动销毁的矩形提示圈特效句柄
+____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, speed)
+    if width > 1500 then
+        width = 1500
+    end
+    if long > 7500 then
+        long = 7500
+    end
+    local sw = width / 1000
+    local dis = long / 2
+    x = x + CosBJ(fac) * dis
+    y = y + SinBJ(fac) * dis
+    local model
+    local sl
+    local ratio = long / width
+    if ratio <= 1 then
+        model = MODEL_SQUARE1X
+        sl = long / 1000
+    elseif ratio <= 2 then
+        model = MODEL_SQUARE2X
+        sl = long / 2000
+    elseif ratio <= 3 then
+        model = MODEL_SQUARE3X
+        sl = long / 3000
+    elseif ratio <= 4 then
+        model = MODEL_SQUARE4X
+        sl = long / 4000
+    elseif ratio <= 5 then
+        model = MODEL_SQUARE5X
+        sl = long / 5000
+    else
+        model = MODEL_SQUARE6X
+        sl = long / 6000
+    end
+    local e = AddSpecialEffect(model, x, y)
+    if not e then
+        return
+    end
+    local s = speed or 1
+    EXEffectMatRotateZ(e, fac + 270)
+    EXEffectMatScale(e, sl, sw, 1)
+    EXSetEffectSpeed(e, s)
+    return e
+end
+--- 更新扇形提示圈朝向与尺寸。
+-- `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+____exports["设置扇形提示圈朝向与尺寸"] = function(e, fac, size)
+    EXEffectMatRotateZ(e, fac)
+    EXSetEffectSize(e, size)
 end
 --- 创建一个需要手动销毁的薄圆形提示圈特效句柄
 ____exports["创建薄圆形提示圈特效"] = function(x, y, r, speed, _____6765_6E90_5355_4F4D)
@@ -69,8 +119,8 @@ local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____require_result_1.RMaxBJ
 local RMinBJ = ____require_result_1.RMinBJ
-local CosBJ = ____require_result_1.CosBJ
-local SinBJ = ____require_result_1.SinBJ
+CosBJ = ____require_result_1.CosBJ
+SinBJ = ____require_result_1.SinBJ
 AddSpecialEffect = jass.AddSpecialEffect
 local CreateTimer = jass.CreateTimer
 DestroyEffect = jass.DestroyEffect
@@ -81,8 +131,8 @@ GetPlayerId = jass.GetPlayerId
 local Player = jass.Player
 EXSetEffectSpeed = japi.EXSetEffectSpeed
 EXSetEffectSize = japi.EXSetEffectSize
-local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
-local EXEffectMatScale = japi.EXEffectMatScale
+EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+EXEffectMatScale = japi.EXEffectMatScale
 DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
 local DzSetEffectAnimation = japi.DzSetEffectAnimation
@@ -94,12 +144,12 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local RemoveUnit = jass.RemoveUnit
 local MODEL_DIR = "resource\\models\\Tip\\skillTip\\"
-local MODEL_SQUARE1X = MODEL_DIR .. "Abiltip_Square1x.mdx"
-local MODEL_SQUARE2X = MODEL_DIR .. "Abiltip_Square2x.mdx"
-local MODEL_SQUARE3X = MODEL_DIR .. "Abiltip_Square3x.mdx"
-local MODEL_SQUARE4X = MODEL_DIR .. "Abiltip_Square4x.mdx"
-local MODEL_SQUARE5X = MODEL_DIR .. "Abiltip_Square5x.mdx"
-local MODEL_SQUARE6X = MODEL_DIR .. "Abiltip_Square6x.mdx"
+MODEL_SQUARE1X = MODEL_DIR .. "Abiltip_Square1x.mdx"
+MODEL_SQUARE2X = MODEL_DIR .. "Abiltip_Square2x.mdx"
+MODEL_SQUARE3X = MODEL_DIR .. "Abiltip_Square3x.mdx"
+MODEL_SQUARE4X = MODEL_DIR .. "Abiltip_Square4x.mdx"
+MODEL_SQUARE5X = MODEL_DIR .. "Abiltip_Square5x.mdx"
+MODEL_SQUARE6X = MODEL_DIR .. "Abiltip_Square6x.mdx"
 local MODEL_SECTOR = MODEL_DIR .. "AbilTipSX.mdx"
 MODEL_RING = MODEL_DIR .. "mr.war3_ring.mdx"
 local MODEL_RING_THICK = MODEL_DIR .. "Abiltip_ring.mdx"
@@ -150,50 +200,22 @@ end
 -- @param speed 动画速率（可选，默认 1/time）
 -- 严格且仅支持宽长比 1:1~1:6，否则会出现菱形视觉错误
 ____exports["创建矩形提示圈"] = function(x, y, width, long, fac, time, speed)
-    if width > 1500 then
-        width = 1500
-    end
-    if long > 7500 then
-        long = 7500
-    end
-    local sw = width / 1000
-    local dis = long / 2
-    x = x + CosBJ(fac) * dis
-    y = y + SinBJ(fac) * dis
-    local model
-    local sl
-    local ratio = long / width
-    if ratio <= 1 then
-        model = MODEL_SQUARE1X
-        sl = long / 1000
-    elseif ratio <= 2 then
-        model = MODEL_SQUARE2X
-        sl = long / 2000
-    elseif ratio <= 3 then
-        model = MODEL_SQUARE3X
-        sl = long / 3000
-    elseif ratio <= 4 then
-        model = MODEL_SQUARE4X
-        sl = long / 4000
-    elseif ratio <= 5 then
-        model = MODEL_SQUARE5X
-        sl = long / 5000
-    else
-        model = MODEL_SQUARE6X
-        sl = long / 6000
-    end
-    local e = AddSpecialEffect(model, x, y)
+    local e = ____exports["创建矩形提示圈特效"](
+        x,
+        y,
+        width,
+        long,
+        fac,
+        speed
+    )
     if not e then
         return
     end
-    local s = speed or (time <= 0 and 1 or 1 / time)
-    local duration = time <= 0 and 1 or time + 0.5
-    EXEffectMatRotateZ(e, fac + 270)
-    EXEffectMatScale(e, sl, sw, 1)
-    EXSetEffectSpeed(e, s)
+    local duration = time <= 0 and 1 or time + 0.05
     _____5B89_5168_9500_6BC1_7279_6548(duration, e)
 end
 --- 白色扇形提示圈
+-- `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
 ____exports["创建白色扇形提示圈"] = function(x, y, fac, size, time, speed)
     x = x + CosBJ(fac) * 10
     y = y + SinBJ(fac) * 10
@@ -205,10 +227,11 @@ ____exports["创建白色扇形提示圈"] = function(x, y, fac, size, time, spe
     EXEffectMatRotateZ(e, fac)
     EXSetEffectSize(e, size)
     EXSetEffectSpeed(e, speed or 1)
-    local duration = time <= 0 and 0.5 or time + 0.1
+    local duration = time <= 0 and 0.5 or time + 0.05
     _____5B89_5168_9500_6BC1_7279_6548(duration, e)
 end
 --- 红色扇形提示圈
+-- `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
 ____exports["创建红色扇形提示圈"] = function(x, y, fac, size, time, speed)
     x = x + CosBJ(fac) * 10
     y = y + SinBJ(fac) * 10
@@ -220,8 +243,22 @@ ____exports["创建红色扇形提示圈"] = function(x, y, fac, size, time, spe
     EXEffectMatRotateZ(e, fac)
     EXSetEffectSize(e, size)
     EXSetEffectSpeed(e, speed or 1)
-    local duration = time <= 0 and 0.5 or time + 0.1
+    local duration = time <= 0 and 0.5 or time + 0.05
     _____5B89_5168_9500_6BC1_7279_6548(duration, e)
+end
+--- 创建一个需要手动销毁的红色扇形提示圈特效句柄。
+-- `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+____exports["创建红色扇形提示圈特效"] = function(x, y, fac, size, speed)
+    x = x + CosBJ(fac) * 10
+    y = y + SinBJ(fac) * 10
+    local e = AddSpecialEffect(MODEL_SECTOR, x, y)
+    if not e then
+        return
+    end
+    _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, _____63D0_793A_5708_654C_65B9_8272)
+    ____exports["设置扇形提示圈朝向与尺寸"](e, fac, size)
+    EXSetEffectSpeed(e, speed or 1)
+    return e
 end
 --- 快速创建薄红色圆形提示圈
 -- 
@@ -235,7 +272,7 @@ ____exports["创建薄圆形提示圈"] = function(x, y, r, time, speed)
     if not e then
         return
     end
-    local duration = time <= 0 and 0.5 or time
+    local duration = time <= 0 and 0.5 or time + 0.05
     _____5B89_5168_9500_6BC1_7279_6548(duration, e)
 end
 --- 安全重播提示圈动画。
@@ -269,12 +306,13 @@ ____exports["创建厚圆形提示圈"] = function(x, y, r, time, speed)
     end
     local size = r / 200
     local s = speed or (time <= 0 and 1 or 1 / time)
-    local duration = time <= 0 and 0.5 or time
+    local duration = time <= 0 and 0.5 or time + 0.05
     EXSetEffectSize(e, size)
     EXSetEffectSpeed(e, s)
     _____5B89_5168_9500_6BC1_7279_6548(duration, e)
 end
 --- 快速创建白色圆形提示圈
+-- 固定表示安全区域，不参与按所属单位着色。
 ____exports["创建白色圆形提示圈"] = function(x, y, r, time, speed)
     local e = AddSpecialEffect(MODEL_RING_A, x, y)
     if not e then
@@ -301,7 +339,7 @@ ____exports["创建渐变圆形提示圈"] = function(x, y, r, time, speed)
     end
     EXSetEffectSize(e, size)
     EXSetEffectSpeed(e, speed or 1)
-    local duration = time <= 0 and 0.1 or time - 0.5
+    local duration = time <= 0 and 0.1 or time + 0.05
     if duration < 0.1 then
         duration = 0.1
     end

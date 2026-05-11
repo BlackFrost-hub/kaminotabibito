@@ -18,6 +18,7 @@
 ## 全局高优先级规则
 
 - [`agent-shared/global-engine-rules.mdc`](agent-shared/global-engine-rules.mdc) — `alwaysApply: true`，包含 jass/japi/BJ 边界、require 路径、事件中心、安全检查等
+- [`agent-shared/tstl-hard-rules.mdc`](agent-shared/tstl-hard-rules.mdc) — `alwaysApply: true`，包含 TSTL 生成 Lua 的硬规则、`self/nil` 错位、回调形态、`@noSelfInFile`、UTF-8 补丁纪律
 - [`agent-shared/中文命名.mdc`](agent-shared/中文命名.mdc) — `alwaysApply: true`，新代码中文命名偏好
 
 ## 维护约定
@@ -29,7 +30,7 @@
 
 说明：
 
-- 近期高优先级、跨子系统反复出现的 TSTL / desync / JASS-Dz 关键坑，已收敛进 `GLOBAL_AGENT_PROMPT.mdc`，不再单独维护一份 `tstl-recent/` 增量规则目录。
+- 高优先级、跨子系统反复出现的 TSTL 硬规则，统一收敛到 `agent-shared/tstl-hard-rules.mdc`。
 ## 调试输出约定
 
 - 默认统一使用 `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`

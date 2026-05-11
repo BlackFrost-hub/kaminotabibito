@@ -25,6 +25,18 @@ const { X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩
   X_GetAbleX: () => number;
   X_GetAbleY: () => number;
 };
+const {
+  申请单位暂停占用,
+  释放单位暂停占用,
+  单位是否存在其他暂停占用,
+} = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  申请单位暂停占用: (this: void, 单位: any, 来源: string) => boolean;
+  释放单位暂停占用: (this: void, 单位: any, 来源: string) => boolean;
+  单位是否存在其他暂停占用: (this: void, 单位: any, 自身来源: string) => boolean;
+};
+const { 零秒后重置单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
+  零秒后重置单位动画: (this: void, 单位: any, 下一步?: () => void) => any;
+};
 
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: () => void) => void;
@@ -75,6 +87,7 @@ export interface 通用跳跃参数 {
   主单位死亡时中断?: boolean;
   持续时间: number;
   跳跃高度: number;
+  暂停单位?: boolean;
   朝向跟随跳跃?: boolean;
   跳跃特效?: string;
   落点过滤?: 跳跃落点过滤;
@@ -101,6 +114,8 @@ interface 跳跃实例 {
   每tick位移: number;
   跳跃高度: number;
   上次附加高度: number;
+  暂停单位: boolean;
+  暂停来源: string;
   朝向跟随跳跃: boolean;
   跳跃特效: string;
   落点过滤?: 跳跃落点过滤;
@@ -238,6 +253,12 @@ function 结束跳跃实例(实例: 跳跃实例, 原因: 跳跃结束原因): v
     SetUnitFlyHeight(单位, 当前高度 - 实例.上次附加高度, 0);
     实例.上次附加高度 = 0;
   }
+  if (实例.暂停单位) {
+    释放单位暂停占用(单位, 实例.暂停来源);
+  }
+  if (单位存活(单位) && 原因 !== "死亡" && 原因 !== "主单位死亡") {
+    零秒后重置单位动画(单位);
+  }
 
   内部移除跳跃(实例);
 
@@ -364,8 +385,10 @@ function on跳跃系统Tick(): void {
     }
 
     if (IsUnitPaused(实例.单位) === true) {
-      i += 1;
-      continue;
+      if (!实例.暂停单位 || 单位是否存在其他暂停占用(实例.单位, 实例.暂停来源)) {
+        i += 1;
+        continue;
+      }
     }
 
     const 结果 = 推进一步(实例);
@@ -419,6 +442,8 @@ function 创建跳跃实例(单位: any, 角度: number, 参数: 通用跳跃参
     每tick位移,
     跳跃高度: 参数.跳跃高度 ?? 0,
     上次附加高度: 0,
+    暂停单位: 参数.暂停单位 !== false,
+    暂停来源: `跳跃系统:${跳跃ID}`,
     朝向跟随跳跃: 参数.朝向跟随跳跃 === true,
     跳跃特效: 参数.跳跃特效 ?? DEFAULT_JUMP_EFFECT_MODEL,
     落点过滤: 参数.落点过滤,
@@ -429,6 +454,9 @@ function 创建跳跃实例(单位: any, 角度: number, 参数: 通用跳跃参
   跳跃映射[跳跃ID] = 实例;
   单位当前跳跃[单位ID] = 跳跃ID;
   活动跳跃列表.push(实例);
+  if (实例.暂停单位) {
+    申请单位暂停占用(单位, 实例.暂停来源);
+  }
   注册到中心计时器();
 
   if (typeof 参数.开始回调 === "function") {

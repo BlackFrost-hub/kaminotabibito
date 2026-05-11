@@ -99,7 +99,7 @@ alwaysApply: true
 |------|--------------|
 | JASS / Dz 回调必须使用长寿具名函数、禁止匿名闭包、`pcall` 体收束、表表索引禁令 | `dzapi/lua-gc-desync-heuristics.mdc` |
 | Dz 联机 UI 的全端执行次数、`GetLocalPlayer()` 分层、N 槽对称执行 | `dzapi/n-slot-ui-symmetric-execution.mdc` |
-| no-self / `nil` 首参 / 依赖环 / 缺失 API / 机制混用等近期 TSTL 复现坑 | `tstl-recent/recent-pitfalls.mdc` |
+| no-self / `nil` 首参 / `.`/`:` 漂移 / 回调错位等 TSTL 实战硬规则 | `agent-shared/tstl-hard-rules.mdc` |
 
 本文件只保留全局入口与边界，不再复制上述规则正文。
 

@@ -6,6 +6,9 @@
  */
 
 const jass = require("jass.common") as any;
+const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
+  EXSetUnitFacing: (this: void, u: any, angle: number) => void;
+};
 const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
@@ -23,6 +26,11 @@ interface 动画等待上下文 {
 
 const 动画等待上下文表: Record<number, 动画等待上下文 | undefined> = {};
 
+function 重置单位待机动画(this: void, 单位: any): void {
+  if (单位 == null || 单位 === 0) return;
+  jass.SetUnitAnimation(单位, "stand");
+}
+
 function 播放上下文动画(ctx: 动画等待上下文): void {
   if (ctx.单位 == null || ctx.单位 === 0) return;
   if (typeof ctx.动画序号 === "number") {
@@ -31,7 +39,9 @@ function 播放上下文动画(ctx: 动画等待上下文): void {
   }
   if (typeof ctx.动画名 === "string" && ctx.动画名 !== "") {
     jass.SetUnitAnimation(ctx.单位, ctx.动画名);
+    return;
   }
+  重置单位待机动画(ctx.单位);
 }
 
 function on单位动画等待到期(): void {
@@ -137,6 +147,41 @@ export function 零秒后播放单位动画(
   下一步?: VoidCallback
 ): any {
   return 延迟播放单位动画(单位, 动画序号, 0.0, 下一步);
+}
+
+export function 零秒后播放单位动作(
+  单位: any,
+  动画名: string,
+  下一步?: VoidCallback
+): any {
+  return 延迟播放单位动作(单位, 动画名, 0.0, 下一步);
+}
+
+export function 零秒后重置单位动画(
+  单位: any,
+  下一步?: VoidCallback
+): any {
+  if (单位 == null || 单位 === 0) return null;
+  return 创建动画等待计时器({
+    单位,
+    下一步,
+  }, 0.0);
+}
+
+/**
+ * 立即设置单位朝向。
+ *
+ * 说明：
+ * - 技能层统一传角度制，与 `GetUnitFacing` / `SetUnitFacing` 保持一致。
+ * - 内部会同步调用 `EXSetUnitFacing`，用弧度制立即修正朝向。
+ */
+export function 立即设置单位朝向(
+  单位: any,
+  朝向角度: number
+): void {
+  if (单位 == null || 单位 === 0) return;
+  jass.SetUnitFacing(单位, 朝向角度);
+  EXSetUnitFacing(单位, 朝向角度 * jass.bj_DEGTORAD);
 }
 
 export function 技能延迟执行(

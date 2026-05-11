@@ -1,0 +1,158 @@
+/** @noSelfInFile */
+/**
+ * 生效帧、后摇、收尾
+ *
+ * 说明：
+ * 1. 这是基于“前摇与持续施法”的轻量阶段组合，不是完整阶段链执行器
+ * 2. 适合“前摇到某个时点生效 -> 可选后摇 -> 统一收尾”这类技能
+ * 3. 若后续需要“前摇 -> 执行 -> 再前摇 -> 再执行”，再升级到真正的多阶段串联执行器
+ */
+
+const jass = require("jass.common") as any;
+
+const SetUnitAnimation = jass.SetUnitAnimation as (u: any, name: string) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (u: any, index: number) => void;
+
+import {
+  开始技能前摇,
+  停止技能前摇,
+  type 技能前摇参数,
+  type 技能前摇结束原因,
+} from "./01．前摇与持续施法";
+
+export type 技能阶段结束原因 = 技能前摇结束原因;
+
+export interface 技能收尾参数 {
+  恢复动作名?: string;
+  恢复动画序号?: number;
+  清理函数列表?: Array<(this: void, 单位: any, 阶段ID: number, 原因: 技能阶段结束原因) => void>;
+  结束回调?: (this: void, 单位: any, 原因: 技能阶段结束原因, 阶段ID: number) => void;
+}
+
+export interface 技能后摇参数 extends 技能收尾参数 {
+  持续时间: number;
+  显示进度条特效?: boolean;
+  开始回调?: (this: void, 单位: any, 后摇ID: number) => void;
+  完成回调?: (this: void, 单位: any, 后摇ID: number) => void;
+}
+
+export interface 技能生效帧参数 extends 技能前摇参数, 技能收尾参数 {
+  生效时间: number;
+  生效回调: (this: void, 单位: any, 阶段ID: number) => void;
+  后摇时间?: number;
+  生效后执行?: (this: void, 单位: any, 阶段ID: number) => void;
+}
+
+function 执行恢复动作(单位: any, 参数: 技能收尾参数): void {
+  if (typeof 参数.恢复动画序号 === "number") {
+    SetUnitAnimationByIndex(单位, 参数.恢复动画序号);
+    return;
+  }
+
+  if (typeof 参数.恢复动作名 === "string" && 参数.恢复动作名 !== "") {
+    SetUnitAnimation(单位, 参数.恢复动作名);
+  }
+}
+
+export function 执行技能收尾(
+  单位: any,
+  阶段ID: number,
+  原因: 技能阶段结束原因,
+  参数?: 技能收尾参数,
+): void {
+  if (参数 == null) return;
+
+  执行恢复动作(单位, 参数);
+
+  const 清理函数列表 = 参数.清理函数列表;
+  if (清理函数列表 != null) {
+    for (const 清理函数 of 清理函数列表) {
+      清理函数(单位, 阶段ID, 原因);
+    }
+  }
+
+  const 结束回调 = 参数.结束回调;
+  if (结束回调 != null) {
+    结束回调(单位, 原因, 阶段ID);
+  }
+}
+
+export function 开始技能后摇(单位: any, 参数: 技能后摇参数): number {
+  return 开始技能前摇(单位, {
+    持续时间: 参数.持续时间,
+    显示进度条特效: 参数.显示进度条特效,
+    开始回调: 参数.开始回调,
+    前摇完成回调: 参数.完成回调,
+    结束回调: function (this: void, 当前单位: any, 原因: 技能阶段结束原因, 后摇ID: number): void {
+      执行技能收尾(当前单位, 后摇ID, 原因, 参数);
+    },
+  });
+}
+
+export function 停止技能后摇(后摇ID: number): boolean {
+  return 停止技能前摇(后摇ID);
+}
+
+function 计算后摇时间(参数: 技能生效帧参数): number {
+  if (参数.后摇时间 != null && 参数.后摇时间 > 0) {
+    return 参数.后摇时间;
+  }
+  return 0;
+}
+
+export function 开始技能生效帧(单位: any, 参数: 技能生效帧参数): number {
+  return 开始技能前摇(单位, {
+    持续时间: 参数.生效时间,
+    主单位: 参数.主单位,
+    主单位死亡时中断: 参数.主单位死亡时中断,
+    显示进度条特效: 参数.显示进度条特效,
+    进度条特效高度偏移: 参数.进度条特效高度偏移,
+    进度条特效动画序号: 参数.进度条特效动画序号,
+    进度条特效动画速度: 参数.进度条特效动画速度,
+    过程特效: 参数.过程特效,
+    过程特效播放次数: 参数.过程特效播放次数,
+    过程特效间隔: 参数.过程特效间隔,
+    过程特效生命周期: 参数.过程特效生命周期,
+    完成特效: 参数.完成特效,
+    完成特效生命周期: 参数.完成特效生命周期,
+    创建提示特效: 参数.创建提示特效,
+    销毁提示特效: 参数.销毁提示特效,
+    施法动作名: 参数.施法动作名,
+    施法动画序号: 参数.施法动画序号,
+    首段零秒后播放动画: 参数.首段零秒后播放动画,
+    开始回调: 参数.开始回调,
+    前摇完成回调: 参数.前摇完成回调,
+    完成后执行: function (this: void, 当前单位: any, 阶段ID: number): void {
+      参数.生效回调(当前单位, 阶段ID);
+
+      const 生效后执行 = 参数.生效后执行;
+      if (生效后执行 != null) {
+        生效后执行(当前单位, 阶段ID);
+      }
+
+      const 后摇时间 = 计算后摇时间(参数);
+      if (后摇时间 > 0) {
+        开始技能后摇(当前单位, {
+          持续时间: 后摇时间,
+          显示进度条特效: false,
+          恢复动作名: 参数.恢复动作名,
+          恢复动画序号: 参数.恢复动画序号,
+          清理函数列表: 参数.清理函数列表,
+          结束回调: 参数.结束回调,
+        });
+      }
+    },
+    结束回调: function (this: void, 当前单位: any, 原因: 技能阶段结束原因, 阶段ID: number): void {
+      if (原因 !== "完成") {
+        执行技能收尾(当前单位, 阶段ID, 原因, 参数);
+        return;
+      }
+
+      const 后摇时间 = 计算后摇时间(参数);
+      if (后摇时间 <= 0) {
+        执行技能收尾(当前单位, 阶段ID, 原因, 参数);
+      }
+    },
+  });
+}
+

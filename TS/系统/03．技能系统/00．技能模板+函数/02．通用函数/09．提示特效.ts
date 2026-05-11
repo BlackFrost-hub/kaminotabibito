@@ -158,6 +158,19 @@ export function 按所属单位设置提示圈颜色(e: any, 来源单位: any):
 export function 创建矩形提示圈(
   x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number
 ): void {
+  const e = 创建矩形提示圈特效(x, y, width, long, fac, speed);
+  if (!e) return;
+
+  const duration = time <= 0 ? 1 : time + 0.05;
+  安全销毁特效(duration, e);
+}
+
+/**
+ * 创建一个需要手动销毁的矩形提示圈特效句柄
+ */
+export function 创建矩形提示圈特效(
+  x: number, y: number, width: number, long: number, fac: number, speed?: number
+): any {
   if (width > 1500) width = 1500;
   if (long > 7500) long = 7500;
 
@@ -193,20 +206,22 @@ export function 创建矩形提示圈(
   const e = AddSpecialEffect(model, x, y);
   if (!e) return;
 
-  const s = speed ?? (time <= 0 ? 1 : 1 / time);
-  const duration = time <= 0 ? 1 : time + 0.5;
+  const s = speed ?? 1.0;
 
   EXEffectMatRotateZ(e, fac + 270);
   EXEffectMatScale(e, sl, sw, 1.0);
   EXSetEffectSpeed(e, s);
-  安全销毁特效(duration, e);
+  return e;
 }
 
 // ==========================================================================================
 // 扇形提示圈
 // ==========================================================================================
 
-/** 白色扇形提示圈 */
+/**
+ * 白色扇形提示圈
+ * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+ */
 export function 创建白色扇形提示圈(
   x: number, y: number, fac: number, size: number, time: number, speed?: number
 ): void {
@@ -221,11 +236,14 @@ export function 创建白色扇形提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
 
-  const duration = time <= 0 ? 0.5 : time + 0.1;
+  const duration = time <= 0 ? 0.5 : time + 0.05;
   安全销毁特效(duration, e);
 }
 
-/** 红色扇形提示圈 */
+/**
+ * 红色扇形提示圈
+ * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+ */
 export function 创建红色扇形提示圈(
   x: number, y: number, fac: number, size: number, time: number, speed?: number
 ): void {
@@ -240,8 +258,36 @@ export function 创建红色扇形提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
 
-  const duration = time <= 0 ? 0.5 : time + 0.1;
+  const duration = time <= 0 ? 0.5 : time + 0.05;
   安全销毁特效(duration, e);
+}
+
+/**
+ * 创建一个需要手动销毁的红色扇形提示圈特效句柄。
+ * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+ */
+export function 创建红色扇形提示圈特效(
+  x: number, y: number, fac: number, size: number, speed?: number
+): any {
+  x += CosBJ(fac) * 10;
+  y += SinBJ(fac) * 10;
+
+  const e = AddSpecialEffect(MODEL_SECTOR, x, y);
+  if (!e) return;
+
+  设置提示特效顶点颜色(e, 提示圈敌方色);
+  设置扇形提示圈朝向与尺寸(e, fac, size);
+  EXSetEffectSpeed(e, speed ?? 1.0);
+  return e;
+}
+
+/**
+ * 更新扇形提示圈朝向与尺寸。
+ * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
+ */
+export function 设置扇形提示圈朝向与尺寸(e: any, fac: number, size: number): void {
+  EXEffectMatRotateZ(e, fac);
+  EXSetEffectSize(e, size);
 }
 
 // ==========================================================================================
@@ -261,7 +307,7 @@ export function 创建薄圆形提示圈(
 ): void {
   const e = 创建薄圆形提示圈特效(x, y, r, speed);
   if (!e) return;
-  const duration = time <= 0 ? 0.5 : time;
+  const duration = time <= 0 ? 0.5 : time + 0.05;
   安全销毁特效(duration, e);
 }
 
@@ -339,7 +385,7 @@ export function 创建厚圆形提示圈(
 
   const size = r / 200;
   const s = speed ?? (time <= 0 ? 1 : 1 / time);
-  const duration = time <= 0 ? 0.5 : time;
+  const duration = time <= 0 ? 0.5 : time + 0.05;
 
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, s);
@@ -380,7 +426,7 @@ export function 创建渐变圆形提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
 
-  let duration = time <= 0 ? 0.1 : time - 0.5;
+  let duration = time <= 0 ? 0.1 : time + 0.05;
   if (duration < 0.1) duration = 0.1;
   安全销毁特效(duration, e);
 
@@ -409,7 +455,7 @@ export function 创建双环提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
 
-  let duration = time <= 0 ? 1 : time + 0.05;
+  const duration = time <= 0 ? 1 : time + 0.05;
   安全销毁特效(duration, e);
 
   return e;

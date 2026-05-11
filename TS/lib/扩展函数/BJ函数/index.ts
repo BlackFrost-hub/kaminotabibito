@@ -136,6 +136,7 @@ export function registerBridge(): void {
   expose("UnitGenerateAlarms", unitBjExt.UnitGenerateAlarms);
   expose("PauseUnitBJ", unitBjExt.PauseUnitBJ);
   expose("IsUnitPausedBJ", unitBjExt.IsUnitPausedBJ);
+  expose("ResetUnitAnimation", unitBjExt.ResetUnitAnimation);
   expose("UnitPauseTimedLifeBJ", unitBjExt.UnitPauseTimedLifeBJ);
   expose("UnitApplyTimedLifeBJ", unitBjExt.UnitApplyTimedLifeBJ);
   expose("UnitShareVisionBJ", unitBjExt.UnitShareVisionBJ);

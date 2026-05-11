@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____9650_5236_8FDB_5EA6, _____8BA1_7B97_629B_7269_7EBF_9AD8_5EA6, _____64AD_653E_8DF3_8DC3_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_8DF3_8DC3, _____7ED3_675F_8DF3_8DC3_5B9E_4F8B, _____7ED3_675F_8DF3_8DC3ID, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_4E00_6B65, ____on_8DF3_8DC3_7CFB_7EDFTick, jass, jglobals, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, offTick10ms, GetHandleId, GetUnitState, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY, AddSpecialEffect, DestroyEffect, GetUnitX, GetUnitY, GetUnitFlyHeight, SetUnitFlyHeight, SetUnitFacing, SetUnitX, SetUnitY, Cos, Sin, IsUnitPaused, BJ_DEGTORAD, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, _____6D3B_52A8_8DF3_8DC3_5217_8868, _____8DF3_8DC3_6620_5C04, _____5355_4F4D_5F53_524D_8DF3_8DC3, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
+local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____5728_53EF_73A9_533A_57DF_5185, _____8BA1_7B97_5750_6807_8DDD_79BB, _____9650_5236_8FDB_5EA6, _____8BA1_7B97_629B_7269_7EBF_9AD8_5EA6, _____64AD_653E_8DF3_8DC3_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_8DF3_8DC3, _____7ED3_675F_8DF3_8DC3_5B9E_4F8B, _____7ED3_675F_8DF3_8DC3ID, _____5C1D_8BD5_79FB_52A8_4E00_6B65, _____63A8_8FDB_4E00_6B65, ____on_8DF3_8DC3_7CFB_7EDFTick, jass, jglobals, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, _____91CA_653E_5355_4F4D_6682_505C_5360_7528, _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528, _____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B, offTick10ms, GetHandleId, GetUnitState, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY, AddSpecialEffect, DestroyEffect, GetUnitX, GetUnitY, GetUnitFlyHeight, SetUnitFlyHeight, SetUnitFacing, SetUnitX, SetUnitY, Cos, Sin, IsUnitPaused, BJ_DEGTORAD, CENTER_TIMER_TICKS, MAX_SUB_STEP, WALKABLE_TOLERANCE, UNIT_ALIVE_LIFE, _____6D3B_52A8_8DF3_8DC3_5217_8868, _____8DF3_8DC3_6620_5C04, _____5355_4F4D_5F53_524D_8DF3_8DC3, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
 function _____53D6_53E5_67C4ID(h)
     return h ~= nil and h ~= 0 and GetHandleId(h) or 0 or 0
 end
@@ -85,6 +85,12 @@ function _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, _____539F_56E0)
         local _____5F53_524D_9AD8_5EA6 = GetUnitFlyHeight(_____5355_4F4D)
         SetUnitFlyHeight(_____5355_4F4D, _____5F53_524D_9AD8_5EA6 - _____5B9E_4F8B["上次附加高度"], 0)
         _____5B9E_4F8B["上次附加高度"] = 0
+    end
+    if _____5B9E_4F8B["暂停单位"] then
+        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____5B9E_4F8B["暂停来源"])
+    end
+    if _____5355_4F4D_5B58_6D3B(_____5355_4F4D) and _____539F_56E0 ~= "死亡" and _____539F_56E0 ~= "主单位死亡" then
+        _____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B(_____5355_4F4D)
     end
     _____5185_90E8_79FB_9664_8DF3_8DC3(_____5B9E_4F8B)
     if type(_____7ED3_675F_56DE_8C03) == "function" then
@@ -182,28 +188,30 @@ function ____on_8DF3_8DC3_7CFB_7EDFTick()
             local _____5B9E_4F8B = _____6D3B_52A8_8DF3_8DC3_5217_8868[i + 1]
             if _____8DF3_8DC3_6620_5C04[_____5B9E_4F8B.id] ~= _____5B9E_4F8B then
                 i = i + 1
-                goto __continue53
+                goto __continue55
             end
             if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
                 _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, "死亡")
-                goto __continue53
+                goto __continue55
             end
             if _____5B9E_4F8B["主单位死亡时中断"] and _____5B9E_4F8B["主单位"] ~= nil and _____5B9E_4F8B["主单位"] ~= 0 and not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["主单位"]) then
                 _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, "主单位死亡")
-                goto __continue53
+                goto __continue55
             end
             if IsUnitPaused(_____5B9E_4F8B["单位"]) == true then
-                i = i + 1
-                goto __continue53
+                if not _____5B9E_4F8B["暂停单位"] or _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528(_____5B9E_4F8B["单位"], _____5B9E_4F8B["暂停来源"]) then
+                    i = i + 1
+                    goto __continue55
+                end
             end
             local _____7ED3_679C = _____63A8_8FDB_4E00_6B65(_____5B9E_4F8B)
             if _____7ED3_679C["停止"] then
                 _____7ED3_675F_8DF3_8DC3_5B9E_4F8B(_____5B9E_4F8B, _____7ED3_679C["原因"] or "完成")
-                goto __continue53
+                goto __continue55
             end
             i = i + 1
         end
-        ::__continue53::
+        ::__continue55::
     end
 end
 ____exports["停止单位跳跃"] = function(_____5355_4F4D, _____539F_56E0)
@@ -223,9 +231,15 @@ local X_GAFC = ____require_result_0.X_GAFC
 X_IsTerrainWalkable = ____require_result_0.X_IsTerrainWalkable
 X_GetAbleX = ____require_result_0.X_GetAbleX
 X_GetAbleY = ____require_result_0.X_GetAbleY
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local onTick10ms = ____require_result_1.onTick10ms
-offTick10ms = ____require_result_1.offTick10ms
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_1["申请单位暂停占用"]
+_____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_1["释放单位暂停占用"]
+_____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528 = ____require_result_1["单位是否存在其他暂停占用"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+_____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B = ____require_result_2["零秒后重置单位动画"]
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local onTick10ms = ____require_result_3.onTick10ms
+offTick10ms = ____require_result_3.offTick10ms
 GetHandleId = jass.GetHandleId
 GetUnitState = jass.GetUnitState
 GetRectMinX = jass.GetRectMinX
@@ -248,11 +262,11 @@ Sin = jass.Sin
 IsUnitPaused = jass.IsUnitPaused
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
-local ____jglobals_bj_DEGTORAD_2 = jglobals.bj_DEGTORAD
-if ____jglobals_bj_DEGTORAD_2 == nil then
-    ____jglobals_bj_DEGTORAD_2 = 0.017453292519943295
+local ____jglobals_bj_DEGTORAD_4 = jglobals.bj_DEGTORAD
+if ____jglobals_bj_DEGTORAD_4 == nil then
+    ____jglobals_bj_DEGTORAD_4 = 0.017453292519943295
 end
-BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_2
+BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_4
 local TICK_INTERVAL = 0.02
 CENTER_TIMER_TICKS = 2
 MAX_SUB_STEP = 31
@@ -350,6 +364,8 @@ local function _____521B_5EFA_8DF3_8DC3_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
         ["每tick位移"] = _____6BCFtick_4F4D_79FB,
         ["跳跃高度"] = _____53C2_6570["跳跃高度"] or 0,
         ["上次附加高度"] = 0,
+        ["暂停单位"] = _____53C2_6570["暂停单位"] ~= false,
+        ["暂停来源"] = "跳跃系统:" .. tostring(_____8DF3_8DC3ID),
         ["朝向跟随跳跃"] = _____53C2_6570["朝向跟随跳跃"] == true,
         ["跳跃特效"] = _____53C2_6570["跳跃特效"] or DEFAULT_JUMP_EFFECT_MODEL,
         ["落点过滤"] = _____53C2_6570["落点过滤"],
@@ -359,6 +375,9 @@ local function _____521B_5EFA_8DF3_8DC3_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6
     _____8DF3_8DC3_6620_5C04[_____8DF3_8DC3ID] = _____5B9E_4F8B
     _____5355_4F4D_5F53_524D_8DF3_8DC3[_____5355_4F4DID] = _____8DF3_8DC3ID
     _____6D3B_52A8_8DF3_8DC3_5217_8868[#_____6D3B_52A8_8DF3_8DC3_5217_8868 + 1] = _____5B9E_4F8B
+    if _____5B9E_4F8B["暂停单位"] then
+        _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____5B9E_4F8B["暂停来源"])
+    end
     _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
     if type(_____53C2_6570["开始回调"]) == "function" then
         _____53C2_6570["开始回调"](_____5355_4F4D, _____8DF3_8DC3ID)

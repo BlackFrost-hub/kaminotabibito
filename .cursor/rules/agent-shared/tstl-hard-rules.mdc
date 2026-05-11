@@ -1,0 +1,211 @@
+---
+description: 全局高优先级：TSTL 生成 Lua 的硬规则与本仓库实战坑点总表
+alwaysApply: true
+---
+
+# TSTL Hard Rules
+
+适用：本仓库所有 TypeScriptToLua 改动。目标不是“TS 看起来对”，而是“生成 Lua 和游戏内行为真的对”。
+
+## 1. 先怀疑 codegen，再怀疑源码
+
+- TSTL 的最高风险不是 TS 编译报错，而是生成 Lua 后的：
+  - `self` / `nil` 首参错位
+  - `.` / `:` 调用形态漂移
+  - 回调注册形态变化
+  - Lua 1-based / TS 0-based 语义错位
+- 只要改到了 helper、导出函数、回调、计时器、桥接、事件中心、UI 注册、Dz/JASS 交互，就必须在 build 后看生成 Lua。
+
+## 2. 不准直接依赖记忆改 TSTL 敏感点
+
+- 先读：
+  - `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`
+  - 本文件
+  - 对应子系统规则
+- 不要凭“以前这里好像这么修过”直接下手。
+
+## 3. `jass` / `japi` / 本地导出，统一防 `self`
+
+- `require("jass.common")`、`require("jass.japi")` 的成员，先绑定局部别名再调用。
+- 禁止在运行时敏感路径里直接写 `jass.Xxx(...)` / `japi.Xxx(...)`。
+- 禁止把模块导出函数挂到对象字段后再以“方法”形式调用，除非该字段声明了 `this: void` 包装。
+- 禁止对模块导出函数、注册函数、本地 helper 使用冒号调用。
+
+## 4. JASS / Dz 回调只允许长寿命具名函数
+
+- 进入 JASS / DzAPI 的回调，一律模块顶层具名函数。
+- 禁止：
+  - 匿名闭包
+  - 箭头函数
+  - `() => namedFn()` 这种浅包装
+  - 本地捕获上下文后直接塞进 `TimerStart` / `TriggerAddAction` / `ForGroup` / `DzFrameSetScript*`
+- 动态上下文统一放模块级表，用 handle id / player id / timer id / stable key 取回。
+- JASS 回调尤其严格，不允许匿名闭包。
+
+## 5. `@noSelfInFile` 不是默认解法
+
+- 不准因为 TSTL 难受就随便给底层 lib 加 `@noSelfInFile`。
+- 先尝试：
+  - `this: void`
+  - 局部包装函数
+  - 局部别名
+  - 调整调用点签名
+- 只有引用面很小、且确认不会波及大量调用方时，才考虑 `@noSelfInFile`。
+
+### 5.1 `this: void` 什么时候加
+
+- 这个函数会被放进对象字段里再调用。
+- 这个函数会被别的模块解构后调用。
+- 这个函数本质上不是“方法”，不应该吃到 `self`。
+- 这个函数要传进注册器、分发表、上下文对象、管理器字段。
+
+### 5.2 `this: void` 怎么加
+
+- 给函数签名显式写 `this: void`：
+
+```ts
+function 注册滚轮(this: void, sync: boolean, cb: () => void): void {
+  registerMouseWheelHardware(sync, cb);
+}
+```
+
+- 给对象字段里的包装函数也写 `this: void`：
+
+```ts
+const ctx = {
+  registerMouseWheel: function (this: void, sync: boolean, cb: () => void): void {
+    registerMouseWheelHardware(sync, cb);
+  },
+};
+```
+
+- 给类型 / 接口也同步写 `this: void`，避免调用点又被当成方法：
+
+```ts
+interface ScrollCtx {
+  registerMouseWheel(this: void, sync: boolean, cb: () => void): void;
+}
+```
+
+### 5.3 什么时候走本地函数包装绕开 TSTL
+
+- 模块导出函数被挂到对象字段后，Lua 容易从 `.` 变 `:`。
+- `require("...")` 解构出来的函数，生成 Lua 后出现 `f(nil, x)`。
+- 底层库不适合加 `@noSelfInFile`，因为引用面太大。
+- 只需要在当前文件或当前子系统里修一个调用形态，不值得改全局。
+
+### 5.4 本地函数包装怎么写
+
+- 最常用的是“当前文件本地 wrapper + 直接转发”：
+
+```ts
+function 安全注册滚轮(this: void, sync: boolean, cb: () => void): void {
+  registerMouseWheelHardware(sync, cb);
+}
+```
+
+- 对没有 `@noSelfInFile` 的底层导出，必要时在本地包一层，避免直接把原函数继续往外传：
+
+```ts
+function 安全销毁特效(this: void, duration: number, effect: any): void {
+  YDWETimerDestroyEffect(duration, effect);
+}
+```
+
+- 对 `jass` / `japi` 调用，优先局部别名，不要继续把模块表透传到别处：
+
+```ts
+const DestroyEffect = jass.DestroyEffect as (e: any) => void;
+```
+
+### 5.5 什么时候不要立刻加 `@noSelfInFile`
+
+- 底层 `lib` 文件被很多地方引用。
+- 文件里既有导出函数，又有可能依赖隐式 `this` 的旧代码。
+- 只是某一个调用点错位，而不是整文件导出全坏。
+- 可以通过本地 wrapper、`this: void`、局部别名解决。
+
+### 5.6 改完这些后必须验证什么
+
+- TS 过编译不算完。
+- 必须 build 后看生成 Lua 是否真的变成了你想要的形态：
+  - `foo(x)` 不是 `foo(nil, x)`
+  - `ctx.fn(...)` 没被编成 `ctx:fn(...)`
+  - 注册回调参数没有整体右移
+  - 导出函数签名没有继续带错位 `self`
+
+## 6. 禁止为了 TSTL 去改 `fix-lua-for-pack.js`
+
+- 默认策略：优先改 TS 源码，避免生成错误形态。
+- 只有已确认是“编译器 / 运行时缝隙，且源码层确实无合理规避”的历史遗留场景，才允许延续现有 fix 规则。
+- 新问题默认不要再把 `fix-lua-for-pack.js` 当第一反应。
+
+## 7. `pcall`、回调值、可调用 table 都是高危点
+
+- 禁止：
+  - `(pcall as any)(fn)`
+  - `pcall(...)[0]`
+  - `const [ok] = pcall(...)`
+  - `typeof cb === "function"` 过滤 TSTL 回调
+- 推荐：
+  - `pcall(模块顶层具名 void 函数)`
+  - 回调判空用 `cb == null`
+  - 若 `pcall` 形态仍不稳，直接 `try/catch`
+
+## 8. 数学、随机数、Lua 语义不要想当然
+
+- 不准在运行时敏感路径里用 Lua / TS `Math.*`。
+- 随机数、取整、三角函数走项目数学封装或 JASS 对齐函数。
+- Lua 表是 1-based；任何 `random(1, n)` 后接 `[idx - 1]` 都要高度警惕。
+- Lua 里 `""` 为真，空字符串判断必须显式写。
+
+## 9. 常见 TSTL 具体坑点
+
+- 禁止对 `jass` / `japi` API 使用可选链调用 `?.(...)`。
+- 避免把 `jass.xxx` / `japi.xxx` 先赋给局部变量，再以普通函数形式调用。
+- 避免 `Object.keys(luaTable)` 这类 TS 直觉写法；Lua table 遍历优先稳定数组或显式有序 key。
+- 随机下标、Lua 1-based、TS 0-based 混用时，必须在生成 Lua 后核对。
+- `DzTriggerRegisterKeyEvent` 这类键码注册，不要把数字 VK 误写成字符路径。
+- `CreateUnit` 后立刻挂头顶特效，再异步 `DzSetUnitModel`，容易把头顶特效冲掉；先换模，再挂特效。
+- `TriggerRegisterPlayerUnitEvent` 业务代码不要直连，统一走事件中心，避免重复注册与回调错位。
+
+## 10. 平台扩展 API 必须区分“原生必有”与“平台才有”
+
+- 已确认在 `jass表.txt` / `japi表.txt` 稳定存在的 API，不要滥加存在性判断。
+- 明确是平台扩展、并且仓库已有先例要求保护的 API，例如部分 `Dz*` / `EX*` 动画、染色、UI 扩展，才加 `typeof xxx === "function"` 或等价保护。
+- “业务判空”和“API 存在性判断”不是一回事，不要混。
+
+## 11. 中文文件规则：局部补丁 + UTF-8
+
+- 中文文件优先 `apply_patch` 小补丁。
+- shell / PowerShell / 脚本读写仓库文本时必须显式 UTF-8。
+- 不准因为终端乱码就整文件重写。
+
+## 12. 生成 Lua 才是 TSTL 问题的验收标准
+
+- 改完后至少确认以下一项是否已按预期变化：
+  - 调用从 `:` 变成 `.`
+  - 多余的 `nil` / `self` 消失
+  - 回调注册参数位置正确
+  - 导出函数签名不再错位
+- Lua 里没有继续保留旧错误分支
+- 如果生成 Lua 没变到你想要的形态，这个修复通常就还不算成立。
+
+## 13. `fix-lua-for-pack.js` 的定位
+
+- 它是历史兼容层，不是默认修复入口。
+- 本仓库明确禁止“因为 TSTL 就先去改 `fix-lua-for-pack.js`”。
+- 只有源码层无法合理规避、且已确认是固定编译缝隙时，才允许保留或微调既有规则。
+
+## 14. 本仓库的 TSTL 实战口令
+
+- 先读规则，再动代码。
+- 先改 TS，再 build，再看 Lua。
+- 能用 `this: void`，就别乱加 `@noSelfInFile`。
+- 能改源码规避，就别先想到 `fix-lua-for-pack.js`。
+- JASS / Dz 回调不用匿名闭包。
+- 中文文件只做 UTF-8 局部补丁。
+
+## 15. 交叉规则
+- 编码补丁：`.cursor/rules/tooling/encoding-and-patch-safety.mdc`
+- JASS / Dz 回调与 UI GC：`.cursor/rules/dzapi/lua-gc-desync-heuristics.mdc`

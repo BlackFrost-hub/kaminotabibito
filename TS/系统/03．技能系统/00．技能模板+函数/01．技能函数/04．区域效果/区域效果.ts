@@ -64,7 +64,10 @@ export interface 区域效果参数 {
   所有者?: any;
   模型路径?: string;
   特效高度?: number;
+  显示提示圈?: boolean;
   周期伤害?: number;
+  周期伤害去重组?: number;
+  周期伤害去重间隔?: number;
   on进入?: (this: void, 单位: any) => void;
   on离开?: (this: void, 单位: any) => void;
   on周期?: (this: void, 区域内单位: any[]) => void;
@@ -128,7 +131,7 @@ class 区域效果实现 implements 区域效果实例 {
     }
 
     // 创建渐变圆形提示圈（白→红），半径=区域半径，持续时间=效果持续时间
-    if (参数.持续时间 > 0) {
+    if (参数.显示提示圈 !== false && 参数.持续时间 > 0) {
       this.提示圈特效 = 创建渐变圆形提示圈(this.当前X, this.当前Y, 参数.半径, 参数.持续时间);
     }
 
@@ -212,7 +215,22 @@ class 区域效果实现 implements 区域效果实例 {
 
     const 当前单位数组 = Object.values(新集合);
     if (this.参数.周期伤害 && this.参数.周期伤害 > 0 && ATTACK_TYPE_NORMAL) {
+      const 去重组 = this.参数.周期伤害去重组 ?? 0;
+      const 去重间隔毫秒 = (this.参数.周期伤害去重间隔 ?? this.检测间隔秒值) * 1000;
+      const 去重组记录 = 去重组 > 0
+        ? (区域效果周期伤害去重记录[去重组] ?? (区域效果周期伤害去重记录[去重组] = {}))
+        : null;
+
       for (const 单位 of 当前单位数组) {
+        if (去重组记录 != null) {
+          const 单位ID = GetHandleId(单位);
+          const 上次伤害时间 = 去重组记录[单位ID];
+          if (上次伤害时间 != null && 当前时间 - 上次伤害时间 < 去重间隔毫秒) {
+            continue;
+          }
+          去重组记录[单位ID] = 当前时间;
+        }
+
         UnitDamageTarget(
           this.参数.所有者 ?? 单位,
           单位,
@@ -290,6 +308,7 @@ class 区域效果实现 implements 区域效果实例 {
 let 区域效果实例ID计数器 = 0;
 let 区域效果系统回调ID = 0;
 const 活跃区域效果实例: 区域效果实现[] = [];
+const 区域效果周期伤害去重记录: Record<number, Record<number, number | undefined> | undefined> = {};
 
 function 确保区域效果系统已启动(): void {
   if (区域效果系统回调ID !== 0) {
@@ -333,6 +352,13 @@ function 区域效果系统Tick(): void {
 
 export function 创建区域效果(参数: 区域效果参数): 区域效果实例 {
   return new 区域效果实现(参数);
+}
+
+export function 清理区域效果周期伤害去重组(去重组ID: number): void {
+  if (去重组ID <= 0) {
+    return;
+  }
+  delete 区域效果周期伤害去重记录[去重组ID];
 }
 
 export {};

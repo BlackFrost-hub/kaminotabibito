@@ -98,6 +98,12 @@ end
 function ____exports.IsUnitPausedBJ(self, unit)
     return jass.IsUnitPaused(unit)
 end
+function ____exports.ResetUnitAnimation(whichUnit)
+    if whichUnit == nil or whichUnit == 0 then
+        return
+    end
+    jass.SetUnitAnimation(whichUnit, "stand")
+end
 function ____exports.UnitPauseTimedLifeBJ(self, flag, unit)
     jass.UnitPauseTimedLife(unit, flag)
 end

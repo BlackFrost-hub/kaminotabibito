@@ -5,8 +5,9 @@ local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__New = ____lualib.__TS__New
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B
+local _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55
 function _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8()
     if _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID ~= 0 then
         return
@@ -97,7 +98,7 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
             EXSetEffectZ(self["特效句柄"], _____53C2_6570["特效高度"])
         end
     end
-    if _____53C2_6570["持续时间"] > 0 then
+    if _____53C2_6570["显示提示圈"] ~= false and _____53C2_6570["持续时间"] > 0 then
         self["提示圈特效"] = _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708(self["当前X"], self["当前Y"], _____53C2_6570["半径"], _____53C2_6570["持续时间"])
     end
     _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(self)
@@ -171,26 +172,52 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
     self["当前单位集合"] = _____65B0_96C6_5408
     local _____5F53_524D_5355_4F4D_6570_7EC4 = __TS__ObjectValues(_____65B0_96C6_5408)
     if self["参数"]["周期伤害"] and self["参数"]["周期伤害"] > 0 and ATTACK_TYPE_NORMAL then
-        for ____, _____5355_4F4D in ipairs(_____5F53_524D_5355_4F4D_6570_7EC4) do
-            local ____self__53C2_6570__6240_6709_8005_8 = self["参数"]["所有者"]
-            if ____self__53C2_6570__6240_6709_8005_8 == nil then
-                ____self__53C2_6570__6240_6709_8005_8 = _____5355_4F4D
+        local _____53BB_91CD_7EC4 = self["参数"]["周期伤害去重组"] or 0
+        local _____53BB_91CD_95F4_9694_6BEB_79D2 = (self["参数"]["周期伤害去重间隔"] or self["检测间隔秒值"]) * 1000
+        local ____temp_10
+        if _____53BB_91CD_7EC4 > 0 then
+            local ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CD_7EC4]
+            if ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 == nil then
+                local ____temp_8 = {}
+                _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CD_7EC4] = ____temp_8
+                ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 = ____temp_8
             end
-            UnitDamageTarget(
-                ____self__53C2_6570__6240_6709_8005_8,
-                _____5355_4F4D,
-                self["参数"]["周期伤害"],
-                false,
-                false,
-                ATTACK_TYPE_NORMAL,
-                DAMAGE_TYPE_NORMAL,
-                nil
-            )
+            ____temp_10 = ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9
+        else
+            ____temp_10 = nil
+        end
+        local _____53BB_91CD_7EC4_8BB0_5F55 = ____temp_10
+        for ____, _____5355_4F4D in ipairs(_____5F53_524D_5355_4F4D_6570_7EC4) do
+            do
+                if _____53BB_91CD_7EC4_8BB0_5F55 ~= nil then
+                    local _____5355_4F4DID = GetHandleId(_____5355_4F4D)
+                    local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____53BB_91CD_7EC4_8BB0_5F55[_____5355_4F4DID]
+                    if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
+                        goto __continue25
+                    end
+                    _____53BB_91CD_7EC4_8BB0_5F55[_____5355_4F4DID] = _____5F53_524D_65F6_95F4
+                end
+                local ____self__53C2_6570__6240_6709_8005_11 = self["参数"]["所有者"]
+                if ____self__53C2_6570__6240_6709_8005_11 == nil then
+                    ____self__53C2_6570__6240_6709_8005_11 = _____5355_4F4D
+                end
+                UnitDamageTarget(
+                    ____self__53C2_6570__6240_6709_8005_11,
+                    _____5355_4F4D,
+                    self["参数"]["周期伤害"],
+                    false,
+                    false,
+                    ATTACK_TYPE_NORMAL,
+                    DAMAGE_TYPE_NORMAL,
+                    nil
+                )
+            end
+            ::__continue25::
         end
     end
-    local ____opt_9 = self["参数"]["on周期"]
-    if ____opt_9 ~= nil then
-        ____opt_9(_____5F53_524D_5355_4F4D_6570_7EC4)
+    local ____opt_12 = self["参数"]["on周期"]
+    if ____opt_12 ~= nil then
+        ____opt_12(_____5F53_524D_5355_4F4D_6570_7EC4)
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -221,9 +248,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["提示圈特效"])
         self["提示圈特效"] = nil
     end
-    local ____opt_11 = self["参数"]["on销毁"]
-    if ____opt_11 ~= nil then
-        ____opt_11()
+    local ____opt_14 = self["参数"]["on销毁"]
+    if ____opt_14 ~= nil then
+        ____opt_14()
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -250,9 +277,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
     for hid in pairs(self["当前单位集合"]) do
         local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
         if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-            local ____opt_13 = self["参数"]["on离开"]
-            if ____opt_13 ~= nil then
-                ____opt_13(self["当前单位集合"][hid])
+            local ____opt_16 = self["参数"]["on离开"]
+            if ____opt_16 ~= nil then
+                ____opt_16(self["当前单位集合"][hid])
             end
         end
         self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -286,7 +313,14 @@ __TS__SetDescriptor(
 _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668 = 0
 _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID = 0
 _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B = {}
+_____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55 = {}
 ____exports["创建区域效果"] = function(_____53C2_6570)
     return __TS__New(_____533A_57DF_6548_679C_5B9E_73B0, _____53C2_6570)
+end
+____exports["清理区域效果周期伤害去重组"] = function(_____53BB_91CD_7EC4ID)
+    if _____53BB_91CD_7EC4ID <= 0 then
+        return
+    end
+    __TS__Delete(_____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55, _____53BB_91CD_7EC4ID)
 end
 return ____exports

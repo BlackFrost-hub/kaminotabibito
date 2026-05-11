@@ -29,9 +29,98 @@ try {
 }
 
 const HS_S = jass.InitHashtable();
+const PauseUnit = jass.PauseUnit as (u: any, flag: boolean) => void;
+const 单位暂停占用总表: Record<number, number | undefined> = {};
+const 单位暂停占用来源表: Record<string, number | undefined> = {};
 
 function hid(h: any): number {
   return (jass.GetHandleId(h) as number) || 0;
+}
+
+function 设置底层暂停状态(u: any, 是否暂停: boolean): void {
+  if (u == null || u === 0) return;
+
+  if (japi != null && typeof japi.EXPauseUnit === "function") {
+    const EXPauseUnit = japi.EXPauseUnit as (u: any, flag: boolean) => void;
+    EXPauseUnit(u, 是否暂停);
+    return;
+  }
+
+  PauseUnit(u, 是否暂停);
+}
+
+function 生成暂停来源键(单位ID: number, 来源: string): string {
+  return `${单位ID}:${来源}`;
+}
+
+export function 申请单位暂停占用(u: any, 来源: string): boolean {
+  if (u == null || u === 0 || 来源 == null || 来源 === "") return false;
+
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+
+  const 来源键 = 生成暂停来源键(单位ID, 来源);
+  const 原来源计数 = 单位暂停占用来源表[来源键] ?? 0;
+  单位暂停占用来源表[来源键] = 原来源计数 + 1;
+
+  if (原来源计数 > 0) {
+    return true;
+  }
+
+  const 原总计数 = 单位暂停占用总表[单位ID] ?? 0;
+  单位暂停占用总表[单位ID] = 原总计数 + 1;
+  if (原总计数 <= 0) {
+    设置底层暂停状态(u, true);
+  }
+  return true;
+}
+
+export function 释放单位暂停占用(u: any, 来源: string): boolean {
+  if (u == null || u === 0 || 来源 == null || 来源 === "") return false;
+
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+
+  const 来源键 = 生成暂停来源键(单位ID, 来源);
+  const 原来源计数 = 单位暂停占用来源表[来源键] ?? 0;
+  if (原来源计数 <= 0) return false;
+
+  if (原来源计数 <= 1) {
+    delete 单位暂停占用来源表[来源键];
+  } else {
+    单位暂停占用来源表[来源键] = 原来源计数 - 1;
+  }
+
+  const 原总计数 = 单位暂停占用总表[单位ID] ?? 0;
+  if (原总计数 <= 1) {
+    delete 单位暂停占用总表[单位ID];
+    设置底层暂停状态(u, false);
+  } else {
+    单位暂停占用总表[单位ID] = 原总计数 - 1;
+  }
+  return true;
+}
+
+export function 单位是否存在暂停占用(u: any): boolean {
+  if (u == null || u === 0) return false;
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+  return (单位暂停占用总表[单位ID] ?? 0) > 0;
+}
+
+export function 单位是否存在其他暂停占用(u: any, 自身来源: string): boolean {
+  if (u == null || u === 0) return false;
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+
+  const 总计数 = 单位暂停占用总表[单位ID] ?? 0;
+  if (总计数 <= 0) return false;
+
+  const 自身来源计数 = 自身来源 != null && 自身来源 !== ""
+    ? (单位暂停占用来源表[生成暂停来源键(单位ID, 自身来源)] ?? 0)
+    : 0;
+
+  return 总计数 > 自身来源计数;
 }
 
 function onHardStraightTimerExpire(this: void): void {
@@ -40,9 +129,7 @@ function onHardStraightTimerExpire(this: void): void {
   const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
 
   if (savedUnit != null && savedUnit !== 0) {
-    if (japi != null) {
-      japi.EXPauseUnit(savedUnit, false);
-    }
+    释放单位暂停占用(savedUnit, "GS_Suspend");
   }
 
   jass.FlushChildHashtable(HS_S, tid);
@@ -70,9 +157,7 @@ export function GS_Suspend(u: any, time: number): void {
     T = jass.CreateTimer();
     if (T == null) return;
 
-    if (japi != null) {
-      japi.EXPauseUnit(u, true);
-    }
+    申请单位暂停占用(u, "GS_Suspend");
     jass.SaveUnitHandle(HS_S, hid(T), 1, u);
     jass.SaveTimerHandle(HS_S, uid, 1, T);
   }

@@ -52,6 +52,14 @@ export type 充能结束原因 = "完成" | "中断" | "死亡" | "主单位死�
 type 充能开始回调 = (单位: any, 充能ID: number) => void;
 type 充能完成回调 = (单位: any, 充能ID: number) => void;
 type 充能结束回调 = (单位: any, 原因: 充能结束原因, 充能ID: number) => void;
+type 充能周期回调 = (
+  单位: any,
+  充能ID: number,
+  已进行时间: number,
+  剩余时间: number,
+  进度: number,
+) => void;
+export type 充能打断回调 = (单位: any, 原因: Exclude<充能结束原因, "完成">, 充能ID: number) => void;
 
 export interface 充能参数 {
   持续时间: number;
@@ -72,6 +80,8 @@ export interface 充能参数 {
   完成特效生命周期?: number;
 
   开始回调?: 充能开始回调;
+  周期回调?: 充能周期回调;
+  周期回调间隔?: number;
   充能完成回调?: 充能完成回调;
   结束回调?: 充能结束回调;
 }
@@ -92,6 +102,9 @@ interface 充能实例 {
   完成特效?: string;
   完成特效生命周期: number;
   下次过程特效倒计时: number;
+  周期回调?: 充能周期回调;
+  周期回调间隔: number;
+  下次周期回调倒计时: number;
 
   开始回调?: 充能开始回调;
   充能完成回调?: 充能完成回调;
@@ -101,6 +114,7 @@ interface 充能实例 {
 const 活动充能列表: 充能实例[] = [];
 const 充能映射: Record<number, 充能实例 | undefined> = {};
 const 单位当前充能: Record<number, number | undefined> = {};
+const 充能打断回调列表: 充能打断回调[] = [];
 let 下一个充能ID = 1;
 let 已注册到中心计时器 = false;
 let tick计数 = 0;
@@ -149,6 +163,15 @@ function 计算进度条动画速度(持续时间: number, 参数: 充能参数)
   return 1;
 }
 
+function 计算充能进度(实例: 充能实例): number {
+  if (实例.总持续时间 <= 0) return 0;
+  const 已进行时间 = 实例.总持续时间 - 实例.剩余时间;
+  const 百分比 = 已进行时间 / 实例.总持续时间;
+  if (百分比 <= 0) return 0;
+  if (百分比 >= 1) return 1;
+  return 百分比;
+}
+
 function 播放单位坐标特效(单位: any, 模型: string | undefined, 生命周期: number): void {
   if (!单位存活(单位) || 模型 == null || 模型 === "") return;
 
@@ -181,6 +204,16 @@ function 尝试关闭中心计时器(): void {
   从中心计时器注销();
 }
 
+function 触发充能打断回调(
+  单位: any,
+  原因: Exclude<充能结束原因, "完成">,
+  充能ID: number
+): void {
+  for (const 回调 of 充能打断回调列表) {
+    回调(单位, 原因, 充能ID);
+  }
+}
+
 function 结束充能实例(实例: 充能实例, 原因: 充能结束原因): void {
   delete 充能映射[实例.id];
   if (单位当前充能[实例.单位ID] === 实例.id) {
@@ -205,6 +238,10 @@ function 结束充能实例(实例: 充能实例, 原因: 充能结束原因): v
 
   if (typeof 实例.结束回调 === "function") {
     实例.结束回调(实例.单位, 原因, 实例.id);
+  }
+
+  if (原因 !== "完成") {
+    触发充能打断回调(实例.单位, 原因, 实例.id);
   }
 }
 
@@ -250,6 +287,18 @@ export function 获取充能进度(充能ID: number): number {
   return 百分比;
 }
 
+export function 注册充能打断回调(回调: 充能打断回调): void {
+  if (回调 == null) return;
+  if (充能打断回调列表.indexOf(回调) >= 0) return;
+  充能打断回调列表.push(回调);
+}
+
+export function 取消注册充能打断回调(回调: 充能打断回调): void {
+  const 索引 = 充能打断回调列表.indexOf(回调);
+  if (索引 < 0) return;
+  充能打断回调列表.splice(索引, 1);
+}
+
 export function 开始充能(单位: any, 参数: 充能参数): number {
   debugLogForce(调试模块名, "开始充能被调用");
 
@@ -268,6 +317,7 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
   const 过程特效生命周期 = 归一化时间(参数.过程特效生命周期, DEFAULT_EFFECT_DURATION);
   const 完成特效 = 参数.完成特效;
   const 完成特效生命周期 = 归一化时间(参数.完成特效生命周期, DEFAULT_EFFECT_DURATION);
+  const 周期回调间隔 = 归一化时间(参数.周期回调间隔, TICK_INTERVAL);
 
   const 新实例: 充能实例 = {
     id: 充能ID,
@@ -284,6 +334,9 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
     完成特效,
     完成特效生命周期,
     下次过程特效倒计时: 0,
+    周期回调: 参数.周期回调,
+    周期回调间隔,
+    下次周期回调倒计时: 0,
     开始回调: 参数.开始回调,
     充能完成回调: 参数.充能完成回调,
     结束回调: 参数.结束回调,
@@ -335,10 +388,17 @@ function on充能系统Tick(): void {
 
     实例.剩余时间 -= TICK_INTERVAL;
     实例.下次过程特效倒计时 -= TICK_INTERVAL;
+    实例.下次周期回调倒计时 -= TICK_INTERVAL;
 
     if (实例.过程特效 != null && 实例.过程特效 !== "" && 实例.下次过程特效倒计时 <= 0) {
       播放单位坐标特效(实例.单位, 实例.过程特效, 实例.过程特效生命周期);
       实例.下次过程特效倒计时 = 实例.过程特效间隔;
+    }
+
+    if (typeof 实例.周期回调 === "function" && 实例.下次周期回调倒计时 <= 0) {
+      const 已进行时间 = 实例.总持续时间 - 实例.剩余时间;
+      实例.周期回调(实例.单位, 实例.id, 已进行时间, 实例.剩余时间, 计算充能进度(实例));
+      实例.下次周期回调倒计时 = 实例.周期回调间隔;
     }
 
     if (实例.剩余时间 <= 0) {

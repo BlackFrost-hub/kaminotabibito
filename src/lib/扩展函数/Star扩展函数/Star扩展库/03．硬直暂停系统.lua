@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- Star扩展库 - 硬直/暂停系统
 -- 
@@ -30,17 +31,105 @@ do
     end
 end
 local HS_S = jass.InitHashtable()
+local PauseUnit = jass.PauseUnit
+local _____5355_4F4D_6682_505C_5360_7528_603B_8868 = {}
+local _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868 = {}
 local function hid(h)
     return jass.GetHandleId(h) or 0
+end
+local function _____8BBE_7F6E_5E95_5C42_6682_505C_72B6_6001(u, _____662F_5426_6682_505C)
+    if u == nil or u == 0 then
+        return
+    end
+    if japi ~= nil and type(japi.EXPauseUnit) == "function" then
+        local EXPauseUnit = japi.EXPauseUnit
+        EXPauseUnit(u, _____662F_5426_6682_505C)
+        return
+    end
+    PauseUnit(u, _____662F_5426_6682_505C)
+end
+local function _____751F_6210_6682_505C_6765_6E90_952E(_____5355_4F4DID, _____6765_6E90)
+    return (tostring(_____5355_4F4DID) .. ":") .. _____6765_6E90
+end
+____exports["申请单位暂停占用"] = function(u, _____6765_6E90)
+    if u == nil or u == 0 or _____6765_6E90 == nil or _____6765_6E90 == "" then
+        return false
+    end
+    local _____5355_4F4DID = hid(u)
+    if _____5355_4F4DID == 0 then
+        return false
+    end
+    local _____6765_6E90_952E = _____751F_6210_6682_505C_6765_6E90_952E(_____5355_4F4DID, _____6765_6E90)
+    local _____539F_6765_6E90_8BA1_6570 = _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____6765_6E90_952E] or 0
+    _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____6765_6E90_952E] = _____539F_6765_6E90_8BA1_6570 + 1
+    if _____539F_6765_6E90_8BA1_6570 > 0 then
+        return true
+    end
+    local _____539F_603B_8BA1_6570 = _____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] or 0
+    _____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] = _____539F_603B_8BA1_6570 + 1
+    if _____539F_603B_8BA1_6570 <= 0 then
+        _____8BBE_7F6E_5E95_5C42_6682_505C_72B6_6001(u, true)
+    end
+    return true
+end
+____exports["释放单位暂停占用"] = function(u, _____6765_6E90)
+    if u == nil or u == 0 or _____6765_6E90 == nil or _____6765_6E90 == "" then
+        return false
+    end
+    local _____5355_4F4DID = hid(u)
+    if _____5355_4F4DID == 0 then
+        return false
+    end
+    local _____6765_6E90_952E = _____751F_6210_6682_505C_6765_6E90_952E(_____5355_4F4DID, _____6765_6E90)
+    local _____539F_6765_6E90_8BA1_6570 = _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____6765_6E90_952E] or 0
+    if _____539F_6765_6E90_8BA1_6570 <= 0 then
+        return false
+    end
+    if _____539F_6765_6E90_8BA1_6570 <= 1 then
+        __TS__Delete(_____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868, _____6765_6E90_952E)
+    else
+        _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____6765_6E90_952E] = _____539F_6765_6E90_8BA1_6570 - 1
+    end
+    local _____539F_603B_8BA1_6570 = _____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] or 0
+    if _____539F_603B_8BA1_6570 <= 1 then
+        __TS__Delete(_____5355_4F4D_6682_505C_5360_7528_603B_8868, _____5355_4F4DID)
+        _____8BBE_7F6E_5E95_5C42_6682_505C_72B6_6001(u, false)
+    else
+        _____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] = _____539F_603B_8BA1_6570 - 1
+    end
+    return true
+end
+____exports["单位是否存在暂停占用"] = function(u)
+    if u == nil or u == 0 then
+        return false
+    end
+    local _____5355_4F4DID = hid(u)
+    if _____5355_4F4DID == 0 then
+        return false
+    end
+    return (_____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] or 0) > 0
+end
+____exports["单位是否存在其他暂停占用"] = function(u, _____81EA_8EAB_6765_6E90)
+    if u == nil or u == 0 then
+        return false
+    end
+    local _____5355_4F4DID = hid(u)
+    if _____5355_4F4DID == 0 then
+        return false
+    end
+    local _____603B_8BA1_6570 = _____5355_4F4D_6682_505C_5360_7528_603B_8868[_____5355_4F4DID] or 0
+    if _____603B_8BA1_6570 <= 0 then
+        return false
+    end
+    local _____81EA_8EAB_6765_6E90_8BA1_6570 = _____81EA_8EAB_6765_6E90 ~= nil and _____81EA_8EAB_6765_6E90 ~= "" and (_____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____751F_6210_6682_505C_6765_6E90_952E(_____5355_4F4DID, _____81EA_8EAB_6765_6E90)] or 0) or 0
+    return _____603B_8BA1_6570 > _____81EA_8EAB_6765_6E90_8BA1_6570
 end
 local function onHardStraightTimerExpire()
     local expiredTimer = jass.GetExpiredTimer()
     local tid = hid(expiredTimer)
     local savedUnit = jass.LoadUnitHandle(HS_S, tid, 1)
     if savedUnit ~= nil and savedUnit ~= 0 then
-        if japi ~= nil then
-            japi.EXPauseUnit(savedUnit, false)
-        end
+        ____exports["释放单位暂停占用"](savedUnit, "GS_Suspend")
     end
     jass.FlushChildHashtable(HS_S, tid)
     if savedUnit ~= nil and savedUnit ~= 0 then
@@ -74,9 +163,7 @@ function ____exports.GS_Suspend(u, time)
         if T == nil then
             return
         end
-        if japi ~= nil then
-            japi.EXPauseUnit(u, true)
-        end
+        ____exports["申请单位暂停占用"](u, "GS_Suspend")
         jass.SaveUnitHandle(
             HS_S,
             hid(T),
