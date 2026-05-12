@@ -24,12 +24,13 @@ import { SUC_IsUnitStructure, SUC_IsValidUnit } from "./08．单位判定与筛�
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-const summonEvent = require("系统.00．核心系统.01．事件中心.09．单位召唤事件中心") as {
-  registerSummonListener: (this: void, callback: (summonedUnit: any, summoningUnit: any) => void) => void;
-};
 const ydweObject = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (this: void, objectType: number, objectId: number | string, property: string) => string;
   ObjectType: { ABILITY: number };
+};
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 const miscBj = require("lib.扩展函数.BJ函数.07．杂项") as {
   String2OrderIdBJ: (this: void, orderIdString: string) => number;
@@ -48,6 +49,8 @@ const 物体类型 = ydweObject.ObjectType;
 const 字符串转命令ID = miscBj.String2OrderIdBJ;
 const 四色码转字符串 = fourCcUtil.fourCCToString;
 const 获取玩家首个英雄 = unitRelated.getPlayerFirstHero;
+const YDUserDataGet = YDUserDataGetSafe;
+const YDUserDataSet = YDUserDataSetSafe;
 
 function sym(name: string): any {
   return (globalThis as any)[name]
@@ -73,11 +76,8 @@ const GetHandleId = jass["GetHandleId"] as (whichHandle: any) => number;
 export const IssueTargetOrder = jass["IssueTargetOrder"] as (whichUnit: any, order: string, targetWidget: any) => boolean;
 export const IssueTargetOrderById = jass["IssueTargetOrderById"] as (whichUnit: any, order: number, targetWidget: any) => boolean;
 const GetUnitName = jass["GetUnitName"] as (whichUnit: any) => string;
-const GetUnitTypeId = jass["GetUnitTypeId"] as (whichUnit: any) => number;
 const GetOwningPlayer = jass["GetOwningPlayer"] as (whichUnit: any) => any;
 const GetPlayerId = jass["GetPlayerId"] as (whichPlayer: any) => number;
-const IsUnitIllusion = jass["IsUnitIllusion"] as (whichUnit: any) => boolean;
-const SetUnitOwner = jass["SetUnitOwner"] as (whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SFB_已添加技能: Record<number, boolean> = {};
 
 export const ABILITY = {
@@ -172,19 +172,6 @@ const NATIVE_BUFF = {
   ITEM_ILLUSION: 0x4249696c,
 };
 
-const ITEM_ILLUSION_BUFF_ID = "C019";
-
-interface PendingItemIllusionContext {
-  sourceUnit: any;
-  targetUnit: any;
-  duration: number;
-  targetOwner: any;
-  targetTypeId: number;
-  targetHandleId: number;
-}
-
-let pendingItemIllusionContext: PendingItemIllusionContext | null = null;
-let itemIllusionSummonBridgeInited = false;
 const abilityOrderIdCache: Record<number, number> = {};
 
 const SFB_NATIVE_BUFF_IDS: Record<number, number[]> = {
@@ -218,7 +205,7 @@ function getBuffDisplaySourceUnit(sourceUnit: any): any {
   return sourceUnit;
 }
 
-function getUnitSourceName(sourceUnit: any, fallbackUnit: any): string {
+export function getUnitSourceName(sourceUnit: any, fallbackUnit: any): string {
   let displayUnit = getBuffDisplaySourceUnit(sourceUnit);
   if (displayUnit == null || displayUnit === 0 || displayUnit === "") {
     displayUnit = getBuffDisplaySourceUnit(fallbackUnit);
@@ -226,6 +213,12 @@ function getUnitSourceName(sourceUnit: any, fallbackUnit: any): string {
   if (displayUnit == null || displayUnit === 0) return "";
   const n = GetUnitName(displayUnit);
   return typeof n === "string" && n !== "" ? n : "";
+}
+
+export function normalizeRealValue(value: any): number {
+  if (value == null || value === false || value === "") return 0;
+  const n = typeof value === "number" ? value : Number(value);
+  return n !== n ? 0 : n;
 }
 
 export function shouldApplyControlReduction(id: number): boolean {
@@ -244,55 +237,8 @@ export function registerSfbManualBuff(this: void, sourceUnit: any, u: any, id: n
   });
 }
 
-function isMatchingPendingItemIllusionContext(summonedUnit: any, summoningUnit: any, ctx: PendingItemIllusionContext): boolean {
-  if (summonedUnit == null || summonedUnit === 0) return false;
-  if (!IsUnitIllusion(summonedUnit)) return false;
-  if (GetUnitTypeId(summonedUnit) !== ctx.targetTypeId) return false;
-  if (summoningUnit == null || summoningUnit === 0) return true;
-  if (summoningUnit === ctx.targetUnit) return true;
-  if (summoningUnit === SFB_Unit) return true;
-  return GetHandleId(summoningUnit) === ctx.targetHandleId;
-}
-
-function applyItemIllusionSummonBuff(summonedUnit: any, ctx: PendingItemIllusionContext): void {
-  if (ctx.duration <= 0) return;
-  SetUnitOwner(summonedUnit, ctx.targetOwner, true);
-  registerManualBuff(summonedUnit, ITEM_ILLUSION_BUFF_ID, ctx.duration, 0, {
-    sourceName: getUnitSourceName(ctx.sourceUnit, ctx.targetUnit),
-  });
-}
-
-function onItemIllusionSummoned(summonedUnit: any, summoningUnit: any): void {
-  const ctx = pendingItemIllusionContext;
-  if (ctx == null) return;
-  if (!isMatchingPendingItemIllusionContext(summonedUnit, summoningUnit, ctx)) return;
-  pendingItemIllusionContext = null;
-  applyItemIllusionSummonBuff(summonedUnit, ctx);
-}
-
-function initItemIllusionSummonBridge(): void {
-  if (itemIllusionSummonBridgeInited) return;
-  itemIllusionSummonBridgeInited = true;
-  summonEvent.registerSummonListener(onItemIllusionSummoned);
-}
-
-export function SFB_记录幻象物品上下文(this: void, sourceUnit: any, targetUnit: any, duration: number): void {
-  if (targetUnit == null || targetUnit === 0 || duration <= 0) {
-    pendingItemIllusionContext = null;
-    return;
-  }
-  pendingItemIllusionContext = {
-    sourceUnit,
-    targetUnit,
-    duration,
-    targetOwner: GetOwningPlayer(targetUnit),
-    targetTypeId: GetUnitTypeId(targetUnit),
-    targetHandleId: GetHandleId(targetUnit),
-  };
-}
-
-export function SFB_清空幻象物品上下文(this: void): void {
-  pendingItemIllusionContext = null;
+export function getSfbBuffId(id: number): string | undefined {
+  return SFB_BUFF_ID[id];
 }
 
 export function getAngleBetweenUnits(u: any, tu: any): number {
@@ -343,7 +289,6 @@ export function SFB_Init(): void {
   SFB_已添加技能[ABILITY.ITEM_ILLUSION] = true;
 
   (globalThis as any).SFB_Unit = SFB_Unit;
-  initItemIllusionSummonBridge();
 }
 
 function SFB_确保马甲技能(this: void, abilityId: number): boolean {

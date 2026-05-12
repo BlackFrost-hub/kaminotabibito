@@ -22,12 +22,18 @@ const 玩家常量 = require("系统.00．核心系统.00．玩家系统.00．�
 const { MAX_DISPLAY_PLAYERS } = require("系统.09．表现系统.03．UI属性系统.00．常量定义") as {
   MAX_DISPLAY_PLAYERS: number;
 };
-const { YDUserDataGet, YDUserDataSet, getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSet: (tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+const ydweIndex = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
 };
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+const getObjectProperty = ydweIndex.getObjectProperty;
+const ObjectType = ydweIndex.ObjectType;
+const YDUserDataGet = YDUserDataGetSafe;
+const YDUserDataSet = YDUserDataSetSafe;
 
 const EMPTY_ICON = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
 const DAMAGE_ATTRS = ["造成伤害", "承受伤害", "治疗量"] as const;
@@ -295,7 +301,7 @@ export function buildDetailTexts(player: any): string[] {
     singleLine("|cffff6d5b", "暴击率：", pct(player, "暴击率")),
     singleLine("|cffff4b4b", "暴击伤害：", formatPercent((150 + getPlayerAttr(player, "暴击伤害") * 100) / 100)),
     // --- 【命中组】进攻方（第15-16行）与中列闪避组对齐 ---
-    singleLine("|cffffa7af", "命中率：", pct(player, "命中率")),
+    singleLine("|cffffa7af", "命中率：", pctPlus100(player, "命中率")),
     singleLine("|cffd4c7ff", "闪避率：", pct(player, "闪避率")),
     // --- 【重伤组】进攻方（第17-18行）与中列恢复效率对齐 ---
     singleLine("|cffff967d", "重伤：", pct(player, "重伤")),

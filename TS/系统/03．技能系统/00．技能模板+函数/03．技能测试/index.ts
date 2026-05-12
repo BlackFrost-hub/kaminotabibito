@@ -23,3 +23,6 @@ export * from "./114．弹道跳链测试";
 export * from "./115．回旋回收弹幕测试";
 export * from "./116．原地击飞水流冲击测试";
 export * from "./117．幻象物品测试";
+export * from "./118．隐身破隐测试";
+export * from "./119．嘲讽测试";
+export * from "./120．诅咒命中率测试";

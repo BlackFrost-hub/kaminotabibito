@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____00_FF0EYDWE_51FD_6570 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWESetUnitAbilityDataReal = ____00_FF0EYDWE_51FD_6570.YDWESetUnitAbilityDataReal
@@ -23,59 +24,63 @@ local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_1.registerManualBuff
-local summonEvent = require("系统.00．核心系统.01．事件中心.09．单位召唤事件中心")
 local ydweObject = require("lib.扩展函数.YDWE函数.index")
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
 local miscBj = require("lib.扩展函数.BJ函数.07．杂项")
 local fourCcUtil = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
-local calcReducedControlDuration = ____require_result_2.calcReducedControlDuration
+local ____require_result_3 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
+local calcReducedControlDuration = ____require_result_3.calcReducedControlDuration
 local unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位相关")
 local _____83B7_53D6_5BF9_8C61_5C5E_6027 = ydweObject.getObjectProperty
 local _____7269_4F53_7C7B_578B = ydweObject.ObjectType
 local _____5B57_7B26_4E32_8F6C_547D_4EE4ID = miscBj.String2OrderIdBJ
 local _____56DB_8272_7801_8F6C_5B57_7B26_4E32 = fourCcUtil.fourCCToString
 local _____83B7_53D6_73A9_5BB6_9996_4E2A_82F1_96C4 = unitRelated.getPlayerFirstHero
+local YDUserDataGet = YDUserDataGetSafe
+local YDUserDataSet = YDUserDataSetSafe
 local function sym(name)
-    local ____G_name_4 = _G[name]
-    if ____G_name_4 == nil then
-        local ____jglobals_3
+    local ____G_name_5 = _G[name]
+    if ____G_name_5 == nil then
+        local ____jglobals_4
         if jglobals then
-            ____jglobals_3 = jglobals[name]
+            ____jglobals_4 = jglobals[name]
         else
-            ____jglobals_3 = nil
+            ____jglobals_4 = nil
         end
-        ____G_name_4 = ____jglobals_3
+        ____G_name_5 = ____jglobals_4
     end
-    local ____G_name_4_6 = ____G_name_4
-    if ____G_name_4_6 == nil then
-        local ____jass_5
+    local ____G_name_5_7 = ____G_name_5
+    if ____G_name_5_7 == nil then
+        local ____jass_6
         if jass then
-            ____jass_5 = jass[name]
+            ____jass_6 = jass[name]
         else
-            ____jass_5 = nil
+            ____jass_6 = nil
         end
-        ____G_name_4_6 = ____jass_5
+        ____G_name_5_7 = ____jass_6
     end
-    return ____G_name_4_6
+    return ____G_name_5_7
 end
 local function getYDHT()
-    local ____sym_result_7 = sym("StarBaseHT")
-    if ____sym_result_7 == nil then
-        ____sym_result_7 = sym("YDHASH_HANDLE")
+    local ____sym_result_8 = sym("StarBaseHT")
+    if ____sym_result_8 == nil then
+        ____sym_result_8 = sym("YDHASH_HANDLE")
     end
-    local ____sym_result_7_8 = ____sym_result_7
-    if ____sym_result_7_8 == nil then
-        ____sym_result_7_8 = sym("YDHT")
+    local ____sym_result_8_9 = ____sym_result_8
+    if ____sym_result_8_9 == nil then
+        ____sym_result_8_9 = sym("YDHT")
     end
-    local ____sym_result_7_8_9 = ____sym_result_7_8
-    if ____sym_result_7_8_9 == nil then
-        ____sym_result_7_8_9 = sym("udg_YDHASH_HANDLE")
+    local ____sym_result_8_9_10 = ____sym_result_8_9
+    if ____sym_result_8_9_10 == nil then
+        ____sym_result_8_9_10 = sym("udg_YDHASH_HANDLE")
     end
-    local ____sym_result_7_8_9_10 = ____sym_result_7_8_9
-    if ____sym_result_7_8_9_10 == nil then
-        ____sym_result_7_8_9_10 = sym("udg_YDHT")
+    local ____sym_result_8_9_10_11 = ____sym_result_8_9_10
+    if ____sym_result_8_9_10_11 == nil then
+        ____sym_result_8_9_10_11 = sym("udg_YDHT")
     end
-    return ____sym_result_7_8_9_10
+    return ____sym_result_8_9_10_11
 end
 ____exports.YDHT = getYDHT()
 ____exports.SFB_Unit = nil
@@ -85,11 +90,8 @@ local GetHandleId = jass.GetHandleId
 ____exports.IssueTargetOrder = jass.IssueTargetOrder
 ____exports.IssueTargetOrderById = jass.IssueTargetOrderById
 local GetUnitName = jass.GetUnitName
-local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
-local IsUnitIllusion = jass.IsUnitIllusion
-local SetUnitOwner = jass.SetUnitOwner
 local ____SFB__5DF2_6DFB_52A0_6280_80FD = {}
 ____exports.ABILITY = {
     STUN = 1095975472,
@@ -174,9 +176,6 @@ local NATIVE_BUFF = {
     CYCLONE_EXTRA = 1113815346,
     ITEM_ILLUSION = 1112107372
 }
-local ITEM_ILLUSION_BUFF_ID = "C019"
-local pendingItemIllusionContext = nil
-local itemIllusionSummonBridgeInited = false
 local abilityOrderIdCache = {}
 local SFB_NATIVE_BUFF_IDS = {
     [0] = {NATIVE_BUFF.STUN},
@@ -211,7 +210,7 @@ local function getBuffDisplaySourceUnit(sourceUnit)
     end
     return sourceUnit
 end
-local function getUnitSourceName(sourceUnit, fallbackUnit)
+function ____exports.getUnitSourceName(sourceUnit, fallbackUnit)
     local displayUnit = getBuffDisplaySourceUnit(sourceUnit)
     if displayUnit == nil or displayUnit == 0 or displayUnit == "" then
         displayUnit = getBuffDisplaySourceUnit(fallbackUnit)
@@ -221,6 +220,13 @@ local function getUnitSourceName(sourceUnit, fallbackUnit)
     end
     local n = GetUnitName(displayUnit)
     return type(n) == "string" and n ~= "" and n or ""
+end
+function ____exports.normalizeRealValue(value)
+    if value == nil or value == false or value == "" then
+        return 0
+    end
+    local n = type(value) == "number" and value or __TS__Number(value)
+    return n ~= n and 0 or n
 end
 function ____exports.shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5 or id == ____exports["SFB_负面BUFF"]["睡眠"] or id == ____exports["SFB_负面BUFF"]["纠缠根须"] or id == ____exports["SFB_负面BUFF"]["飓风"]
@@ -236,79 +242,13 @@ function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue)
         time,
         effectValue,
         {
-            sourceName = getUnitSourceName(sourceUnit, u),
+            sourceName = ____exports.getUnitSourceName(sourceUnit, u),
             nativeBuffAbilityIds = SFB_NATIVE_BUFF_IDS[id]
         }
     )
 end
-local function isMatchingPendingItemIllusionContext(summonedUnit, summoningUnit, ctx)
-    if summonedUnit == nil or summonedUnit == 0 then
-        return false
-    end
-    if not IsUnitIllusion(summonedUnit) then
-        return false
-    end
-    if GetUnitTypeId(summonedUnit) ~= ctx.targetTypeId then
-        return false
-    end
-    if summoningUnit == nil or summoningUnit == 0 then
-        return true
-    end
-    if summoningUnit == ctx.targetUnit then
-        return true
-    end
-    if summoningUnit == ____exports.SFB_Unit then
-        return true
-    end
-    return GetHandleId(summoningUnit) == ctx.targetHandleId
-end
-local function applyItemIllusionSummonBuff(summonedUnit, ctx)
-    if ctx.duration <= 0 then
-        return
-    end
-    SetUnitOwner(summonedUnit, ctx.targetOwner, true)
-    registerManualBuff(
-        summonedUnit,
-        ITEM_ILLUSION_BUFF_ID,
-        ctx.duration,
-        0,
-        {sourceName = getUnitSourceName(ctx.sourceUnit, ctx.targetUnit)}
-    )
-end
-local function onItemIllusionSummoned(summonedUnit, summoningUnit)
-    local ctx = pendingItemIllusionContext
-    if ctx == nil then
-        return
-    end
-    if not isMatchingPendingItemIllusionContext(summonedUnit, summoningUnit, ctx) then
-        return
-    end
-    pendingItemIllusionContext = nil
-    applyItemIllusionSummonBuff(summonedUnit, ctx)
-end
-local function initItemIllusionSummonBridge()
-    if itemIllusionSummonBridgeInited then
-        return
-    end
-    itemIllusionSummonBridgeInited = true
-    summonEvent.registerSummonListener(onItemIllusionSummoned)
-end
-____exports["SFB_记录幻象物品上下文"] = function(sourceUnit, targetUnit, duration)
-    if targetUnit == nil or targetUnit == 0 or duration <= 0 then
-        pendingItemIllusionContext = nil
-        return
-    end
-    pendingItemIllusionContext = {
-        sourceUnit = sourceUnit,
-        targetUnit = targetUnit,
-        duration = duration,
-        targetOwner = GetOwningPlayer(targetUnit),
-        targetTypeId = GetUnitTypeId(targetUnit),
-        targetHandleId = GetHandleId(targetUnit)
-    }
-end
-____exports["SFB_清空幻象物品上下文"] = function()
-    pendingItemIllusionContext = nil
+function ____exports.getSfbBuffId(id)
+    return SFB_BUFF_ID[id]
 end
 function ____exports.getAngleBetweenUnits(u, tu)
     return jass.Atan2(
@@ -368,7 +308,6 @@ function ____exports.SFB_Init()
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.FREEZE] = true
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.ITEM_ILLUSION] = true
     _G.SFB_Unit = ____exports.SFB_Unit
-    initItemIllusionSummonBridge()
 end
 local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
     if ____SFB__5DF2_6DFB_52A0_6280_80FD[abilityId] then
@@ -508,13 +447,13 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     if orderId ~= 0 then
         return ____exports.IssueTargetOrderById(caster, orderId, u) == true
     end
-    local ____temp_11
+    local ____temp_12
     if type(orderStr) == "string" then
-        ____temp_11 = ____exports.IssueTargetOrder(caster, orderStr, u) == true
+        ____temp_12 = ____exports.IssueTargetOrder(caster, orderStr, u) == true
     else
-        ____temp_11 = false
+        ____temp_12 = false
     end
-    return ____temp_11
+    return ____temp_12
 end
 ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
     ____exports.registerSfbManualBuff(

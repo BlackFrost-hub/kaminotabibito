@@ -7,8 +7,6 @@ local IssueTargetOrder = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.IssueTargetOrder
 local IssueTargetOrderById = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.IssueTargetOrderById
 local ORDER = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.ORDER
 local SFB_Init = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.SFB_Init
-local ____SFB__8BB0_5F55_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04A_FF0E_5FEB_901FBuff_5171_4EAB["SFB_记录幻象物品上下文"]
-local ____SFB__6E05_7A7A_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04A_FF0E_5FEB_901FBuff_5171_4EAB["SFB_清空幻象物品上下文"]
 local ____SFB__65BD_52A0_539F_751F_76EE_6807_6280_80FD = ____04A_FF0E_5FEB_901FBuff_5171_4EAB["SFB_施加原生目标技能"]
 local SFB_Unit = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.SFB_Unit
 local ____SFB__589E_76CABUFF = ____04A_FF0E_5FEB_901FBuff_5171_4EAB["SFB_增益BUFF"]
@@ -24,6 +22,12 @@ local jass = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.jass
 local jglobals = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.jglobals
 local registerSfbManualBuff = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.registerSfbManualBuff
 local shouldApplyControlReduction = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.shouldApplyControlReduction
+local ____04C_FF0E_5FEB_901FBuff_8BC5_5492 = require("lib.扩展函数.Star扩展函数.Star扩展库.04C．快速Buff诅咒")
+local ____SFB__65BD_52A0_81EA_5B9A_4E49_8BC5_5492Buff = ____04C_FF0E_5FEB_901FBuff_8BC5_5492["SFB_施加自定义诅咒Buff"]
+local ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1 = require("lib.扩展函数.Star扩展函数.Star扩展库.04D．快速Buff幻象物品")
+local initItemIllusionSummonBridge = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1.initItemIllusionSummonBridge
+local ____SFB__6E05_7A7A_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_清空幻象物品上下文"]
+local ____SFB__8BB0_5F55_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_记录幻象物品上下文"]
 function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
     if id == ____SFB__589E_76CABUFF["心灵之火"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -71,14 +75,7 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             ORDER.FAERIE_FIRE
         )
     elseif id == ____SFB__8D1F_9762BUFF["诅咒"] then
-        ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
-            sourceUnit,
-            u,
-            id,
-            time,
-            ABILITY.CURSE,
-            ORDER.CURSE
-        )
+        ____SFB__65BD_52A0_81EA_5B9A_4E49_8BC5_5492Buff(sourceUnit, u, time)
     elseif id == ____SFB__8D1F_9762BUFF["睡眠"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
             sourceUnit,
@@ -239,6 +236,7 @@ ____exports["SFB_增益BUFF"] = ____SFB__589E_76CABUFF
 ____exports["SFB_负面BUFF"] = ____SFB__8D1F_9762BUFF
 ____exports.SFB_Unit = SFB_Unit
 ____exports.SFB_Init = SFB_Init
+initItemIllusionSummonBridge()
 function ____exports.SFB_setInnerFire(sourceUnit, u, time)
     ____exports.SFB_setPositiveBuff(sourceUnit, u, ____SFB__589E_76CABUFF["心灵之火"], time)
 end

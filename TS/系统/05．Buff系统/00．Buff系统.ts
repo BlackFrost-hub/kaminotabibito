@@ -43,6 +43,8 @@ export interface BuffRuntime {
   effectModelOverride?: string;
   /** Buff 池到期时一并移除的原生魔法效果 rawId，用于清理单位状态栏图标/效果。 */
   nativeBuffAbilityIds?: number[];
+  /** Buff 被移除或到期时触发的纯 TS 清理回调。 */
+  onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
 }
 
 // ========== 虚拟分区：扁平化存储（禁止 state[x][y] 二级链式） ==========
@@ -215,6 +217,7 @@ export interface RegisterManualBuffExtras {
   iconOverride?: string;
   effectModelOverride?: string;
   nativeBuffAbilityIds?: number[];
+  onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
 }
 
 export function registerManualBuff(
@@ -235,6 +238,7 @@ export function registerManualBuff(
       row.effectModelOverride = extras.effectModelOverride;
     if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
       row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
+    if (extras.onRemove !== undefined) row.onRemove = extras.onRemove;
   }
   setBuffToFlat(hid, buffID, row);
   if (typeof target !== "number") unitRefByHid[hid] = target;
@@ -316,19 +320,18 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
   const unitRef = unitRefByHid[hid];
   if (unitRef != null && isBuffPoolUnitPaused(unitRef)) return;
 
-  const expired: string[] = [];
+  const expired: { buffID: string; row: BuffRuntime }[] = [];
   for (let i = 0; i < buffs.length; i++) {
     const { buffID, row } = buffs[i];
     row.remaining = row.remaining - BUFF_POOL_TICK;
     if (row.remaining <= 0) {
-      if (row.source === "dot") notifyDotBuffExpiredFromPool(buffID, hid);
-      cleanupExpiredNativeBuffs(unitRef, row);
-      expired.push(buffID);
+      expired.push({ buffID, row });
     }
   }
   // 删除过期的 buff
   for (let i = 0; i < expired.length; i++) {
-    removeBuffFromFlat(hid, expired[i]);
+    const { buffID, row } = expired[i];
+    removeBuffRuntimeByKey(hid, buffID, row, unitRef);
   }
   // 如果该 hid 下没有其他 buff 了，清理 unitRef
   if (!hasAnyBuffOnHid(hid)) delete unitRefByHid[hid];
@@ -344,8 +347,16 @@ function cleanupExpiredNativeBuffs(unitRef: any, row: BuffRuntime): void {
   }
 }
 
+function cleanupBuffOnRemove(unitRef: any, hid: number, buffID: string, row: BuffRuntime): void {
+  const onRemove = row.onRemove;
+  if (onRemove == null) return;
+  const unitOrHid = (unitRef == null || unitRef === 0) ? hid : unitRef;
+  onRemove(unitOrHid, buffID, row);
+}
+
 function removeBuffRuntimeByKey(hid: number, buffID: string, row: BuffRuntime, unitRef: any): void {
   if (row.source === "dot") notifyDotBuffExpiredFromPool(buffID, hid);
+  cleanupBuffOnRemove(unitRef, hid, buffID, row);
   cleanupExpiredNativeBuffs(unitRef, row);
   removeBuffFromFlat(hid, buffID);
 }

@@ -9,3 +9,5 @@
 
 export * from "./04A．快速Buff共享";
 export * from "./04B．快速Buff接口";
+export * from "./04C．快速Buff诅咒";
+export * from "./04D．快速Buff幻象物品";

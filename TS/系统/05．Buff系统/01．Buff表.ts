@@ -86,7 +86,7 @@ export const buffs: Record<string, BuffData> = {
     canPurge: true,
     tooltip: "该单位受到了『巨魔头颅诅咒』，在time秒内每1秒造成damage点物理伤害。"
   },
-  // C001-C019 为快速 Buff 的自定义 UI 行；原生魔法效果和附着特效由魔兽技能自身管理，不在 Buff 表里配置周期特效。
+  // C001-C020 为快速 Buff / 纯 TS 控制效果的自定义 UI 行；原生魔法效果和附着特效由魔兽技能自身管理，不在 Buff 表里配置周期特效。
   "C001": {
     buffID: "C001",
     buffName: "击晕",
@@ -371,6 +371,21 @@ export const buffs: Record<string, BuffData> = {
     priority: 4,
     canPurge: false,
     tooltip: "该单位由幻象物品制造，为幻象单位，持续time秒。"
+  },
+  "C020": {
+    buffID: "C020",
+    buffName: "嘲讽",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNTaunt.blp",
+    effect: "",
+    type: "Debuff:control",
+    interval: 0,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 2,
+    priority: 10,
+    canPurge: true,
+    tooltip: "该单位被嘲讽，强制攻击来源单位，持续time秒。"
   },
 };
 

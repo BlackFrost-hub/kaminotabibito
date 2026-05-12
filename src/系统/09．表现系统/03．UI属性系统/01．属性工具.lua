@@ -17,11 +17,14 @@ local max = ____require_result_0.max
 local _____73A9_5BB6_5E38_91CF = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_1 = require("系统.09．表现系统.03．UI属性系统.00．常量定义")
 local MAX_DISPLAY_PLAYERS = ____require_result_1.MAX_DISPLAY_PLAYERS
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_2.YDUserDataGet
-local YDUserDataSet = ____require_result_2.YDUserDataSet
-local getObjectProperty = ____require_result_2.getObjectProperty
-local ObjectType = ____require_result_2.ObjectType
+local ydweIndex = require("lib.扩展函数.YDWE函数.index")
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local getObjectProperty = ydweIndex.getObjectProperty
+local ObjectType = ydweIndex.ObjectType
+local YDUserDataGet = YDUserDataGetSafe
+local YDUserDataSet = YDUserDataSetSafe
 local EMPTY_ICON = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 local DAMAGE_ATTRS = {"造成伤害", "承受伤害", "治疗量"}
 local function maxNum3(a, b, c)
@@ -77,25 +80,13 @@ function ____exports.getPlayerHero(player)
     if player == nil then
         return nil
     end
-    return YDUserDataGet(
-        nil,
-        "player",
-        player,
-        _____73A9_5BB6_5E38_91CF.YD_ATTR_PLAYER_HERO_UNIT,
-        "unit"
-    )
+    return YDUserDataGet("player", player, _____73A9_5BB6_5E38_91CF.YD_ATTR_PLAYER_HERO_UNIT, "unit")
 end
 function ____exports.getPlayerAttr(player, attrName)
     if player == nil or attrName == "" then
         return 0
     end
-    local value = YDUserDataGet(
-        nil,
-        "player",
-        player,
-        attrName,
-        "real"
-    )
+    local value = YDUserDataGet("player", player, attrName, "real")
     return type(value) == "number" and value or 0
 end
 function ____exports.getDamageValues(player)
@@ -138,7 +129,6 @@ function ____exports.updatePlayerRealtimeStats(player)
     local moveQuant = round(moveSpeed * 100) / 100
     if apsQuant > 0 then
         YDUserDataSet(
-            nil,
             "player",
             player,
             "每秒攻速",
@@ -148,7 +138,6 @@ function ____exports.updatePlayerRealtimeStats(player)
     end
     if moveQuant > 0 then
         YDUserDataSet(
-            nil,
             "player",
             player,
             "移动速度",
@@ -356,7 +345,7 @@ function ____exports.buildDetailTexts(player)
         singleLine(
             "|cffffa7af",
             "命中率：",
-            pct(player, "命中率")
+            pctPlus100(player, "命中率")
         ),
         singleLine(
             "|cffd4c7ff",

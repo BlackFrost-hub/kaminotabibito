@@ -7,3 +7,4 @@ export * from "./05．STES子触发公共工具";
 export * from "./06．护甲获取";
 export * from "./07．YDWETimerDestroyUnit";
 export * from "./08．YDWEBridge";
+export * from "./09．YDUserData安全版";

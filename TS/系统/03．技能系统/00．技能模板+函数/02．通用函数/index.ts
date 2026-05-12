@@ -14,3 +14,5 @@ export * from "./08．无敌帧";
 export * from "./09．提示特效";
 export * from "./10．命中规则/index";
 export * from "./11．技能表现预设";
+
+export * from "./01．便捷短函数集合/index";

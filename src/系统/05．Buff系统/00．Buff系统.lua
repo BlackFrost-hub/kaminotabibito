@@ -7,7 +7,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, UnitRemoveAbility, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
+local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, cleanupBuffOnRemove, removeBuffRuntimeByKey, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, UnitRemoveAbility, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
 function makeBuffKey(hid, buffID)
     return (tostring(hid) .. "|") .. buffID
 end
@@ -184,11 +184,7 @@ function processBuffsForUnit(hid, buffs)
             local row = ____buffs_index_2.row
             row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
             if row.remaining <= 0 then
-                if row.source == "dot" then
-                    notifyDotBuffExpiredFromPool(buffID, hid)
-                end
-                cleanupExpiredNativeBuffs(unitRef, row)
-                expired[#expired + 1] = buffID
+                expired[#expired + 1] = {buffID = buffID, row = row}
             end
             i = i + 1
         end
@@ -196,7 +192,10 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #expired do
-            removeBuffFromFlat(hid, expired[i + 1])
+            local ____expired_index_3 = expired[i + 1]
+            local buffID = ____expired_index_3.buffID
+            local row = ____expired_index_3.row
+            removeBuffRuntimeByKey(hid, buffID, row, unitRef)
             i = i + 1
         end
     end
@@ -223,6 +222,22 @@ function cleanupExpiredNativeBuffs(unitRef, row)
         end
     end
 end
+function cleanupBuffOnRemove(unitRef, hid, buffID, row)
+    local onRemove = row.onRemove
+    if onRemove == nil then
+        return
+    end
+    local unitOrHid = (unitRef == nil or unitRef == 0) and hid or unitRef
+    onRemove(unitOrHid, buffID, row)
+end
+function removeBuffRuntimeByKey(hid, buffID, row, unitRef)
+    if row.source == "dot" then
+        notifyDotBuffExpiredFromPool(buffID, hid)
+    end
+    cleanupBuffOnRemove(unitRef, hid, buffID, row)
+    cleanupExpiredNativeBuffs(unitRef, row)
+    removeBuffFromFlat(hid, buffID)
+end
 function onBuffPoolCenterTimerTick()
     _tickCounter = _tickCounter + 1
     if _tickCounter >= 10 then
@@ -235,8 +250,8 @@ function ensureSyncTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_4 = _G
-    local onTick10ms = ____G_4.onTick10ms
+    local ____G_5 = _G
+    local onTick10ms = ____G_5.onTick10ms
     onTick10ms(onBuffPoolCenterTimerTick)
 end
 function maybeStopSyncTimer()
@@ -340,6 +355,9 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
         if extras.nativeBuffAbilityIds ~= nil and #extras.nativeBuffAbilityIds > 0 then
             row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds
         end
+        if extras.onRemove ~= nil then
+            row.onRemove = extras.onRemove
+        end
     end
     setBuffToFlat(hid, buffID, row)
     if type(target) ~= "number" then
@@ -391,13 +409,6 @@ end
 function ____exports.getDotIconDisplayRemaining(_unit, _buffID, realRemaining)
     return type(realRemaining) == "number" and __TS__NumberIsFinite(__TS__Number(realRemaining)) and realRemaining or 0
 end
-local function removeBuffRuntimeByKey(hid, buffID, row, unitRef)
-    if row.source == "dot" then
-        notifyDotBuffExpiredFromPool(buffID, hid)
-    end
-    cleanupExpiredNativeBuffs(unitRef, row)
-    removeBuffFromFlat(hid, buffID)
-end
 --- 删除单位身上的指定 buffID，并同步清理 DOT 与原生魔法效果。
 ____exports["移除单位指定Buff"] = function(unit, buffID)
     local hid = toHid(unit)
@@ -408,13 +419,13 @@ ____exports["移除单位指定Buff"] = function(unit, buffID)
     if row == nil then
         return false
     end
-    local ____temp_3
+    local ____temp_4
     if type(unit) ~= "number" then
-        ____temp_3 = unit
+        ____temp_4 = unit
     else
-        ____temp_3 = unitRefByHid[hid]
+        ____temp_4 = unitRefByHid[hid]
     end
-    local unitRef = ____temp_3
+    local unitRef = ____temp_4
     removeBuffRuntimeByKey(hid, buffID, row, unitRef)
     if not hasAnyBuffOnHid(hid) then
         __TS__Delete(unitRefByHid, hid)

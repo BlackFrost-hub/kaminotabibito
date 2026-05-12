@@ -11,3 +11,4 @@ export * from "./07．单位死亡事件中心";
 export * from "./08．技能事件中心";
 export * from "./09．单位召唤事件中心";
 export * from "./10．单位所有者变更事件中心";
+export * from "./11．单位指令事件中心";

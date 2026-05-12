@@ -345,6 +345,21 @@ ____exports.buffs = {
         priority = 4,
         canPurge = false,
         tooltip = "该单位由幻象物品制造，为幻象单位，持续time秒。"
+    },
+    C020 = {
+        buffID = "C020",
+        buffName = "嘲讽",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNTaunt.blp",
+        effect = "",
+        type = "Debuff:control",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 10,
+        canPurge = true,
+        tooltip = "该单位被嘲讽，强制攻击来源单位，持续time秒。"
     }
 }
 ____exports.default = ____exports.buffs
