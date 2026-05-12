@@ -41,11 +41,11 @@ function ____exports.isHeroUnit(self, unit)
     end
     return jass.GetHeroLevel(unit) > 0
 end
---- 判断单位是否为玩家英雄（玩家0-7）
+--- 判断单位是否为玩家单位（玩家0-4）
 -- 用于区分玩家单位和敌对单位
 -- 
 -- @param unit 目标单位
--- @returns 是否为玩家英雄
+-- @returns 是否为玩家单位
 function ____exports.isPlayerUnit(self, unit)
     if unit == nil then
         return false
@@ -55,7 +55,7 @@ function ____exports.isPlayerUnit(self, unit)
         return false
     end
     local playerId = jass.GetPlayerId(owner)
-    return playerId >= 0 and playerId <= 7
+    return playerId >= 0 and playerId <= 4
 end
 --- 判断单位是否为马甲单位（古老单位）
 -- 马甲单位造成的伤害，吸血/吸魔效果转给玩家英雄

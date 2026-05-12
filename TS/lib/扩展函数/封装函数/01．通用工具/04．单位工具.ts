@@ -38,18 +38,18 @@ export function isHeroUnit(unit: any): boolean {
 }
 
 /**
- * 判断单位是否为玩家英雄（玩家0-7）
+ * 判断单位是否为玩家单位（玩家0-4）
  * 用于区分玩家单位和敌对单位
  *
  * @param unit 目标单位
- * @returns 是否为玩家英雄
+ * @returns 是否为玩家单位
  */
 export function isPlayerUnit(unit: any): boolean {
   if (unit == null) return false;
   const owner = jass.GetOwningPlayer(unit);
   if (owner == null) return false;
   const playerId = jass.GetPlayerId(owner);
-  return playerId >= 0 && playerId <= 7;
+  return playerId >= 0 && playerId <= 4;
 }
 
 /**

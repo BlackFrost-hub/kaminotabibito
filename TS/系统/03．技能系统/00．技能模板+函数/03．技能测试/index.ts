@@ -26,3 +26,4 @@ export * from "./117．幻象物品测试";
 export * from "./118．隐身破隐测试";
 export * from "./119．嘲讽测试";
 export * from "./120．诅咒命中率测试";
+export * from "./121．仇恨测试";

@@ -14,7 +14,13 @@ alwaysApply: true
   - `.` / `:` 调用形态漂移
   - 回调注册形态变化
   - Lua 1-based / TS 0-based 语义错位
-- 只要改到了 helper、导出函数、回调、计时器、桥接、事件中心、UI 注册、Dz/JASS 交互，就必须在 build 后看生成 Lua。
+- 默认不要为了“谨慎”去逐段人工审查生成 Lua 的全部业务逻辑。
+- 生成 Lua 的强制检查，聚焦在以下高风险点：
+  - `self` / `nil` 首参错位
+  - `.` / `:` 调用形态漂移
+  - 导入/导出函数参数整体右移
+  - 回调注册参数错位
+- 只有当改动触达 helper、导出函数、回调、计时器、桥接、事件中心、UI 注册、Dz/JASS 交互这些敏感面时，才要求在 build 后专门核对上述 call-shape 风险。
 
 ## 2. 不准直接依赖记忆改 TSTL 敏感点
 
@@ -128,11 +134,12 @@ const DestroyEffect = jass.DestroyEffect as (e: any) => void;
 ### 5.6 改完这些后必须验证什么
 
 - TS 过编译不算完。
-- 必须 build 后看生成 Lua 是否真的变成了你想要的形态：
+- 必须 build 后按需检查生成 Lua 的 call-shape 风险是否真的变成了你想要的形态：
   - `foo(x)` 不是 `foo(nil, x)`
   - `ctx.fn(...)` 没被编成 `ctx:fn(...)`
   - 注册回调参数没有整体右移
   - 导出函数签名没有继续带错位 `self`
+- 默认不要求每次都去逐段核对普通业务 Lua 是否“整体长得顺眼”；重点只看 `nil/self`、参数错位、调用形态这几类高风险项。
 
 ## 6. 禁止为了 TSTL 去改 `fix-lua-for-pack.js`
 

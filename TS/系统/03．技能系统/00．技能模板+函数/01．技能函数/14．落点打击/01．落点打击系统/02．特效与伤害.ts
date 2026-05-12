@@ -19,7 +19,7 @@ const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01�
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
 
-const { 单位是否还能命中, 记录单位命中 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则.00．命中规则模板") as {
+const { 单位是否还能命中, 记录单位命中 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则") as {
   单位是否还能命中: (this: void, 状态: any, 单位: any) => boolean;
   记录单位命中: (this: void, 状态: any, 单位: any) => boolean;
 };

@@ -28,6 +28,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.09．表现系统.05．仇恨面板.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 require("系统.09．表现系统.02．对话框系统.index")
 local _____539F_751FUI = require("系统.09．表现系统.00．初始化UI")
 function ____exports.init(self)

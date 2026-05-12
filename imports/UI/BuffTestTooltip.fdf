@@ -1,5 +1,6 @@
 //============================================================================
-// Buff 测试：悬停提示（原生 Tooltip 背景 + 金边，需 FDF 的 EdgeFile 切片，勿用单 BACKDROP 平铺边框图）
+// Buff 测试：悬停提示
+// 使用 Tooltip 系列原生纹理。
 //============================================================================
 Frame "BACKDROP" "BuffTestTooltipPanel" {
     BackdropBackground "UI\Widgets\ToolTips\Human\human-tooltip-background.blp",
@@ -17,4 +18,22 @@ Frame "BACKDROP" "BuffTestTooltipPanel" {
         FontJustificationH JUSTIFYCENTER,
         FontJustificationV JUSTIFYMIDDLE,
     }
+}
+
+//============================================================================
+// 仇恨 UI 预研：外层面板
+// 使用你给的 EscMenu/EditBox 系列原生纹理，不和上面的 Buff Tooltip 混用。
+//============================================================================
+Frame "BACKDROP" "ThreatUiResearchPanelFrame" 
+{
+    Width 0.294,
+    Height 0.188,
+    BackdropTileBackground,
+    BackdropBackground "UI\Widgets\EscMenu\Human\editbox-background.blp",
+    BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
+    BackdropCornerSize 0.012,
+    BackdropBackgroundSize 0.032,
+    BackdropBackgroundInsets 0.004f 0.004f 0.004f 0.004f,
+    BackdropEdgeFile "UI\Widgets\EscMenu\Human\editbox-border.blp",
+    BackdropBlendAll,
 }

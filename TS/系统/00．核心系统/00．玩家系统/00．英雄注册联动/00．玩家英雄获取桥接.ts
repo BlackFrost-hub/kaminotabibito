@@ -123,6 +123,9 @@ const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
 const taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => boolean;
 };
+const threatPanelSystem = require("系统.09．表现系统.05．仇恨面板.index") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
 
 const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   initPlayerSelectionCenter?: (this: void, whichPlayer: any) => void;
@@ -189,6 +192,10 @@ function registerHeroDependents(whichHero: any): void {
       // 任务UI系统 - 为玩家创建N槽任务UI
       if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
         taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
+      }
+
+      if (typeof threatPanelSystem.onPlayerHeroRegistered === "function") {
+        threatPanelSystem.onPlayerHeroRegistered(owner, whichHero);
       }
 
       if (taskUiReady) {

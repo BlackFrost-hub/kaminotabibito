@@ -8,6 +8,7 @@
 export * from "./01．UI工具/index";
 export * from "./00．初始化UI";
 export * from "./04．翻页UI预研/index";
+export * from "./05．仇恨面板/index";
 
 // 对话框子系统在自身 index 侧载执行初始化；不在此 `export *`，避免与下方 `init` 同名符号合并冲突
 require("系统.09．表现系统.02．对话框系统.index");

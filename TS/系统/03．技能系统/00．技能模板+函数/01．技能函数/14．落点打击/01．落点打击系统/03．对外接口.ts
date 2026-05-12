@@ -19,7 +19,7 @@ const {
   safeDestroyTimer: (this: void, timer: any) => void;
 };
 
-const { 创建命中规则状态 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则.00．命中规则模板") as {
+const { 创建命中规则状态 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则") as {
   创建命中规则状态: (this: void, 参数?: any) => any;
 };
 

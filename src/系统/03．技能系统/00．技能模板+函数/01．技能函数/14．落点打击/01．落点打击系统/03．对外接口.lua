@@ -16,7 +16,7 @@ local _____521B_5EFA_843D_70B9_63D0_793A_7279_6548 = ____02_FF0E_7279_6548_4E0E_
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则.00．命中规则模板")
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则")
 local _____521B_5EFA_547D_4E2D_89C4_5219_72B6_6001 = ____require_result_1["创建命中规则状态"]
 local function _____7ED3_675F_843D_70B9_6253_51FB_5B9E_4F8B(_____5B9E_4F8BID)
     local _____5B9E_4F8B = _____843D_70B9_6253_51FB_5B9E_4F8B_8868[_____5B9E_4F8BID]

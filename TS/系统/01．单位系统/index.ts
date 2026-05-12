@@ -10,6 +10,7 @@ export * from "./04．多杀检测系统/index";
 
 // ========== 核心模块导出 ==========
 export * from "./05．单位狂暴/index";
+export * from "./06．仇恨系统/index";
 
 /**
  * 初始化单位系统

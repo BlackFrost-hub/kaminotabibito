@@ -40,6 +40,8 @@ High-risk patterns:
 Required discipline:
 
 - if you touch exported helpers, imported helpers, callback registration, timers, frame helpers, event centers, bridges, or wrappers, inspect generated Lua after build
+- that inspection is primarily for call-shape risks such as extra `nil`, accidental `self`, `.` / `:` drift, or parameter-position shifts
+- do not default to manually reviewing unrelated generated-Lua business logic line by line unless the task specifically requires it
 - do not assume a wrapper is safe because it is short
 - do not assume a TS fix is real unless the generated Lua behavior changes in the intended way
 
@@ -190,7 +192,7 @@ When working on a task:
 3. identify whether the real risk is source code, codegen, callback shape, Lua module wiring, runtime semantics, or multiplayer symmetry
 4. patch the smallest relevant surface
 5. run the build after actual code changes
-6. inspect generated Lua whenever helper shape, callback shape, timer behavior, frame behavior, or bridge behavior may have changed
+6. inspect generated Lua whenever helper shape, callback shape, timer behavior, frame behavior, or bridge behavior may have changed; default the inspection scope to `nil/self` and parameter-alignment risks unless a broader Lua audit is actually needed
 7. report what changed, what was verified, what remains risky
 
 Do not rely on this prompt alone when a more specific rule exists.
