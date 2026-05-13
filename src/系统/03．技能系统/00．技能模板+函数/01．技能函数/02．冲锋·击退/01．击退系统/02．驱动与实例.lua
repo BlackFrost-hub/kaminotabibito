@@ -64,7 +64,7 @@ ____exports["结束位移实例"] = function(_____5B9E_4F8B, _____539F_56E0, ___
     local _____4F4D_79FBID = _____5B9E_4F8B.id
     local _____7ED3_675F_56DE_8C03 = _____5B9E_4F8B["结束回调"]
     if _____5B9E_4F8B["禁用碰撞"] then
-        jass:SetUnitPathing(_____5355_4F4D, true)
+        jass.SetUnitPathing(_____5355_4F4D, true)
     end
     if _____5B9E_4F8B["暂停单位"] then
         _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____5B9E_4F8B["暂停来源"])
@@ -240,7 +240,7 @@ ____exports["创建位移实例"] = function(_____5355_4F4D, _____89D2_5EA6, ___
     _____5355_4F4D_5F53_524D_4F4D_79FB[_____5355_4F4DID] = _____4F4D_79FBID
     _____6D3B_52A8_4F4D_79FB_5217_8868[#_____6D3B_52A8_4F4D_79FB_5217_8868 + 1] = _____5B9E_4F8B
     if _____5B9E_4F8B["禁用碰撞"] then
-        jass:SetUnitPathing(_____5355_4F4D, false)
+        jass.SetUnitPathing(_____5355_4F4D, false)
     end
     if _____5B9E_4F8B["暂停单位"] then
         _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____5B9E_4F8B["暂停来源"])

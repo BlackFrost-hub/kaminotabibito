@@ -29,15 +29,15 @@ local HEAL_DATA_FIELD = 108
 --- 系统开关
 local NATIVE_HEAL_ENTRY_ENABLED = true
 --- 检查命令ID是否为治疗命令
-local function isHealOrder(self, orderId)
+local function isHealOrder(orderId)
     return __TS__ArrayIncludes(HEAL_ORDER_IDS, orderId)
 end
 --- 检查单位是否为马甲单位（古树类型）
-local function isProxyUnit(self, unit)
+local function isProxyUnit(unit)
     if unit == nil then
         return false
     end
-    return jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) == true
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) == true
 end
 --- 触发器实例
 local nativeHealEntryInitialized = false
@@ -54,18 +54,18 @@ local function onSpellChannel(castingUnit, spellAbilityId)
     if castingUnit ~= nil then
         ____temp_4 = castingUnit
     else
-        ____temp_4 = jass:GetTriggerUnit()
+        ____temp_4 = jass.GetTriggerUnit()
     end
     local caster = ____temp_4
     local abilityId = spellAbilityId ~= nil and spellAbilityId or GetSpellAbilityId(nil)
-    if not isProxyUnit(nil, caster) then
+    if not isProxyUnit(caster) then
         return
     end
-    local currentOrder = jass:GetUnitCurrentOrder(caster)
-    if not isHealOrder(nil, currentOrder) then
+    local currentOrder = jass.GetUnitCurrentOrder(caster)
+    if not isHealOrder(currentOrder) then
         return
     end
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     if target == nil then
         return
     end
@@ -76,8 +76,8 @@ local function onSpellChannel(castingUnit, spellAbilityId)
         1,
         HEAL_DATA_FIELD
     )
-    jass:IssueImmediateOrder(caster, "stop")
-    jass:UnitRemoveAbility(caster, abilityId)
+    jass.IssueImmediateOrder(caster, "stop")
+    jass.UnitRemoveAbility(caster, abilityId)
     doHeal(nil, {
         HealSource = caster,
         HealTarget = target,
@@ -90,7 +90,7 @@ end
 -- 
 -- 注册 EVENT_PLAYER_UNIT_SPELL_CHANNEL 事件
 -- 当任意马甲单位施放治疗技能时触发
-function ____exports.initNativeHealEntry(self)
+function ____exports.initNativeHealEntry()
     if not NATIVE_HEAL_ENTRY_ENABLED then
         return
     end
@@ -101,7 +101,7 @@ function ____exports.initNativeHealEntry(self)
     registerSpellChannelListener(onSpellChannel)
 end
 --- 检查系统是否已初始化
-function ____exports.isNativeHealEntryInitialized(self)
+function ____exports.isNativeHealEntryInitialized()
     return nativeHealEntryInitialized
 end
 return ____exports

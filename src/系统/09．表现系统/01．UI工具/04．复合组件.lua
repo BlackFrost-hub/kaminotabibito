@@ -41,7 +41,7 @@ function ____exports.createClickableIcon(self, name, parent, texture, position, 
     if not button then
         return nil
     end
-    japi:DzFrameSetAllPoints(button, backdrop)
+    japi.DzFrameSetAllPoints(button, backdrop)
     setFrameClickEvent(nil, button, onClick)
     return {backdrop = backdrop, button = button}
 end
@@ -93,7 +93,7 @@ function ____exports.createTextLabel(self, name, parent, text, position, size)
     if frame then
         setPos(nil, frame)
         setFrameSize(nil, frame, size)
-        japi:DzFrameSetText(frame, text)
+        japi.DzFrameSetText(frame, text)
         return frame
     end
     local fallback = createFrame(nil, {
@@ -123,7 +123,7 @@ function ____exports.createTextArea(self, name, parent, text, position, size, ba
         setFramePosition(nil, backdrop, position)
         setFrameSize(nil, backdrop, size)
         if backgroundTexture then
-            japi:DzFrameSetTexture(backdrop, backgroundTexture, 0)
+            japi.DzFrameSetTexture(backdrop, backgroundTexture, 0)
         end
     end
     local frame = createFrame(nil, {
@@ -135,12 +135,12 @@ function ____exports.createTextArea(self, name, parent, text, position, size, ba
     })
     if frame then
         if backdrop then
-            japi:DzFrameSetAllPoints(frame, backdrop)
+            japi.DzFrameSetAllPoints(frame, backdrop)
         else
             setFramePosition(nil, frame, position)
             setFrameSize(nil, frame, size)
         end
-        japi:DzFrameSetText(frame, text)
+        japi.DzFrameSetText(frame, text)
         return frame
     end
     return ____exports.createTextLabel(
@@ -181,7 +181,7 @@ function ____exports.createTextBox(self, name, parent, text, position, size, bac
     local innerSize = {width = size.width - 0.01, height = size.height - 0.01}
     setFramePosition(nil, textFrame, innerPos)
     setFrameSize(nil, textFrame, innerSize)
-    japi:DzFrameSetText(textFrame, text)
+    japi.DzFrameSetText(textFrame, text)
     return {backdrop = backdrop, text = textFrame}
 end
 return ____exports

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 施法治疗事件（迁移自 核心系统/04．治疗事件）
  *
@@ -167,3 +168,4 @@ export function initHealRequestEntry(): void {
 }
 
 export {};
+/** @noSelfInFile */

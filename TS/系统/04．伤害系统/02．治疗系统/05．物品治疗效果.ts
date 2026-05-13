@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 物品治疗效果系统
  *
@@ -229,3 +230,4 @@ export function isHealItemAbility(abilId: number): boolean {
 }
 
 export {};
+/** @noSelfInFile */

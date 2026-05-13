@@ -5,7 +5,10 @@ import {
   initPlayerSelectionCenter as initPlayerSelectionCenterImported,
 } from "../00．核心系统/01．事件中心/05．玩家选中单位事件中心";
 import { buildBuffBarViewModel as buildBuffBarViewModelImported, getMaxSlots as getMaxSlotsImported } from "./04．BuffUIViewModel";
-import { createFrame as createFrameImported } from "../09．表现系统/01．UI工具/01．帧创建";
+import {
+  createFrame as createFrameImported,
+  tryCreateFromFdfSafe as tryCreateFromFdfSafeImported,
+} from "../09．表现系统/01．UI工具/01．帧创建";
 import {
   setFramePointRelative as setFramePointRelativeImported,
   setFramePosition as setFramePositionImported,
@@ -19,7 +22,7 @@ import { createTextLabel as createTextLabelImported } from "../09．表现系统
 import { hideFrame as hideFrameImported, showFrame as showFrameImported } from "../09．表现系统/01．UI工具/05．帧控制";
 const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
   FrameType: { BACKDROP: number; GLUETEXTBUTTON: number };
-  FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number };
+  FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number; BOTTOMLEFT: number };
 };
 const ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index");
 const getGameUI = ____hwMod.getGameUI as () => number;
@@ -40,24 +43,29 @@ const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
 const TIP_BOX_TEX = "UI\\wenbenkuang.blp";
-const TIP_W = 0.22;
-const TIP_H = 0.056;
-const TIP_PAD = 0.005;
+const TIP_W = 0.13;
+const TIP_H = 0.036;
+const TIP_PAD_X = 0.006;
+const TIP_PAD_TOP = 0.004;
+const TIP_PAD_BOTTOM = 0.004;
 const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
+const BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip";
+const BUFF_TOOLTIP_TOC_PATHS = ["imports\\UI\\BuffTestTooltip.toc", "UI\\BuffTestTooltip.toc"];
 
 interface SlotFrames {
   root: number;
   remainText: number;
   hit: number;
   tipBox: number;
-  tipText: number;
+  tipBodyText: number;
+  tipSourceText: number;
 }
 
 const slots: SlotFrames[] = [];
 let buffUiInitialized = false;
 let refreshTimer: any = null;
 let pendingInitDelayTimer: any = null;
-const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipText: string }> } | undefined> = {};
+const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> } | undefined> = {};
 const hoverSlotIndexByFrameId: Record<number, number | undefined> = {};
 
 function uiCreateFrame(this: void, options: any): number | null {
@@ -95,6 +103,15 @@ function uiCreateTextLabel(this: void, name: string, parent: number, text: strin
   return createTextLabelImported(name, parent, text, position, size);
 }
 
+function uiTryCreateFromFdfSafe(this: void, frameName: string, parent: number, fallback: () => number | null, contextId: number): number | null {
+  return tryCreateFromFdfSafeImported(frameName, parent, fallback, {
+    tocLoadKey: BUFF_TOOLTIP_TOC_KEY,
+    tocPaths: BUFF_TOOLTIP_TOC_PATHS,
+    debugPrefix: "BuffUI",
+    contextId,
+  });
+}
+
 function uiHideFrame(this: void, frame: number): boolean {
   return hideFrameImported(frame);
 }
@@ -117,14 +134,18 @@ function showSlotTooltipByIndex(this: void, index: number): void {
   if (s && s.tipBox !== 0) {
     uiShowFrame(s.tipBox);
   }
-  if (s && s.tipText !== 0) {
-    uiShowFrame(s.tipText);
+  if (s && s.tipBodyText !== 0) {
+    uiShowFrame(s.tipBodyText);
+  }
+  if (s && s.tipSourceText !== 0) {
+    uiShowFrame(s.tipSourceText);
   }
 }
 
 function hideSlotTooltipByIndex(this: void, index: number): void {
   const s = slots[index];
-  if (s && s.tipText !== 0) uiHideFrame(s.tipText);
+  if (s && s.tipBodyText !== 0) uiHideFrame(s.tipBodyText);
+  if (s && s.tipSourceText !== 0) uiHideFrame(s.tipSourceText);
   if (s && s.tipBox !== 0) uiHideFrame(s.tipBox);
 }
 
@@ -197,16 +218,27 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       uiSetFrameHoverEvents(hit, onSlotHoverEnter, onSlotHoverLeave, false);
     }
 
-  const boxW = TIP_W + TIP_PAD * 2;
-  const boxH = TIP_H + TIP_PAD * 2;
+  const boxW = TIP_W;
+  const boxH = TIP_H;
   const tipBox =
-    uiCreateFrame({
-      type: UI工具.FrameType.BACKDROP,
-      name: "BuffUIBarTip" + index,
+    uiTryCreateFromFdfSafe(
+      "BuffTestTooltipPanel",
       parent,
-      template: "template",
-      visible: false,
-    }) || 0;
+      () => {
+        const fallbackFrame = uiCreateFrame({
+          type: UI工具.FrameType.BACKDROP,
+          name: "BuffUIBarTip" + index,
+          parent,
+          template: "template",
+          visible: false,
+        });
+        if (fallbackFrame && fallbackFrame !== 0) {
+          uiSetFrameTexture(fallbackFrame, TIP_BOX_TEX);
+        }
+        return fallbackFrame;
+      },
+      index + 1
+    ) || 0;
   if (tipBox && tipBox !== 0) {
     uiSetFramePointRelative(
       tipBox,
@@ -217,25 +249,42 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       TIP_OFFSET_Y_FROM_ICON_TOP
     );
     uiSetFrameSize(tipBox, { width: boxW, height: boxH });
-    uiSetFrameTexture(tipBox, TIP_BOX_TEX);
     setFrameLevelSafe(tipBox, 200);
     uiHideFrame(tipBox);
   }
 
-  const tipText =
+  const tipBodyText =
     uiCreateTextLabel(
-      "BuffUIBarTipTxt" + index,
+      "BuffUIBarTipBodyTxt" + index,
       tipBox && tipBox !== 0 ? tipBox : bd,
       "",
       tipBox && tipBox !== 0
-        ? { relativeTo: tipBox, point: UI工具.FramePoint.CENTER, relativePoint: UI工具.FramePoint.CENTER, x: 0, y: 0 }
+        ? { relativeTo: tipBox, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPLEFT, x: TIP_PAD_X, y: -TIP_PAD_TOP }
         : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP },
-      { width: boxW * 0.92, height: boxH * 0.88 }
+      { width: boxW - TIP_PAD_X * 2, height: 0.016 }
     ) || 0;
-  if (tipText && tipText !== 0) {
-    japi.DzFrameSetTextAlignment(tipText, 0);
-    setFrameLevelSafe(tipText, 201);
-    uiHideFrame(tipText);
+  if (tipBodyText && tipBodyText !== 0) {
+    japi.DzFrameSetTextAlignment(tipBodyText, -1);
+    japi.DzFrameSetTextAlignment(tipBodyText, 0);
+    setFrameLevelSafe(tipBodyText, 201);
+    uiHideFrame(tipBodyText);
+  }
+
+  const tipSourceText =
+    uiCreateTextLabel(
+      "BuffUIBarTipSourceTxt" + index,
+      tipBox && tipBox !== 0 ? tipBox : bd,
+      "",
+      tipBox && tipBox !== 0
+        ? { relativeTo: tipBox, point: UI工具.FramePoint.BOTTOMLEFT, relativePoint: UI工具.FramePoint.BOTTOMLEFT, x: TIP_PAD_X, y: TIP_PAD_BOTTOM }
+        : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP - 0.016 },
+      { width: boxW - TIP_PAD_X * 2, height: 0.014 }
+    ) || 0;
+  if (tipSourceText && tipSourceText !== 0) {
+    japi.DzFrameSetTextAlignment(tipSourceText, -1);
+    japi.DzFrameSetTextAlignment(tipSourceText, 6);
+    setFrameLevelSafe(tipSourceText, 201);
+    uiHideFrame(tipSourceText);
   }
 
   uiHideFrame(bd);
@@ -244,14 +293,16 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
     remainText: remainText || 0,
     hit: hit || 0,
     tipBox: tipBox || 0,
-    tipText: tipText || 0,
+    tipBodyText: tipBodyText || 0,
+    tipSourceText: tipSourceText || 0,
   };
 }
 
 function hideSlot(this: void, i: number): void {
   const s = slots[i];
   if (!s) return;
-  if (s.tipText !== 0) uiHideFrame(s.tipText);
+  if (s.tipBodyText !== 0) uiHideFrame(s.tipBodyText);
+  if (s.tipSourceText !== 0) uiHideFrame(s.tipSourceText);
   if (s.tipBox !== 0) uiHideFrame(s.tipBox);
   if (s.hit !== 0) uiHideFrame(s.hit);
   if (s.root !== 0) uiHideFrame(s.root);
@@ -261,7 +312,7 @@ function hideAllSlots(this: void): void {
   for (let i = 0; i < MAX_SLOTS; i++) hideSlot(i);
 }
 
-function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipText: string }> }): void {
+function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> }): void {
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slotVM = vm.slots[i];
     const slot = slots[i];
@@ -274,8 +325,11 @@ function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; i
       if (slot.remainText !== 0) {
         japi.DzFrameSetText(slot.remainText, slotVM.remainText);
       }
-      if (slot.tipText !== 0) {
-        japi.DzFrameSetText(slot.tipText, slotVM.tooltipText);
+      if (slot.tipBodyText !== 0) {
+        japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText);
+      }
+      if (slot.tipSourceText !== 0) {
+        japi.DzFrameSetText(slot.tipSourceText, slotVM.tooltipSourceText);
       }
       if (slot.hit !== 0) uiShowFrame(slot.hit);
     } else {

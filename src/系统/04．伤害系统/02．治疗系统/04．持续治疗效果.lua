@@ -4,7 +4,7 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 local unregisterCenterTimerIfNeeded, YDUserDataClear, offSecond, ATTR_COUNTDOWN, ATTR_TICK_HP, ATTR_TICK_MP, ATTR_SOURCE, hotUnits, registeredToCenterTimer, hotTickCallback
-function unregisterCenterTimerIfNeeded(self)
+function unregisterCenterTimerIfNeeded()
     if not registeredToCenterTimer then
         return
     end
@@ -18,7 +18,7 @@ function unregisterCenterTimerIfNeeded(self)
     registeredToCenterTimer = false
 end
 --- 停止持续治疗效果
-function ____exports.stopHot(self, target)
+function ____exports.stopHot(target)
     if target == nil then
         return
     end
@@ -51,7 +51,7 @@ function ____exports.stopHot(self, target)
         ATTR_SOURCE,
         "unit"
     )
-    unregisterCenterTimerIfNeeded(nil)
+    unregisterCenterTimerIfNeeded()
 end
 --- 持续治疗效果（HOT）系统
 -- 
@@ -88,7 +88,7 @@ ATTR_SOURCE = "hotSource"
 --- 系统开关
 local HOT_SYSTEM_ENABLED = true
 --- 检查单位是否有任意一个持续恢复Buff
-local function hasAnyHotBuff(self, unit)
+local function hasAnyHotBuff(unit)
     for ____, buffId in ipairs(HOT_BUFF_IDS) do
         if UnitHasBuffBJ(nil, unit, buffId) then
             return true
@@ -101,7 +101,7 @@ registeredToCenterTimer = false
 hotTickCallback = nil
 --- 中心计时器每秒回调
 -- 遍历所有HOT单位，执行恢复逻辑
-local function onHotTick(self)
+local function onHotTick()
     local toRemove = {}
     for ____, target in __TS__Iterator(hotUnits) do
         do
@@ -155,7 +155,7 @@ local function onHotTick(self)
             if tickMP > 0 then
                 doManaRegen(nil, target, tickMP, false)
             end
-            local shouldEnd = not hasAnyHotBuff(nil, target) or countdown <= 0 or IsUnitDeadBJ(nil, target)
+            local shouldEnd = not hasAnyHotBuff(target) or countdown <= 0 or IsUnitDeadBJ(nil, target)
             if shouldEnd then
                 toRemove[#toRemove + 1] = target
             end
@@ -163,11 +163,11 @@ local function onHotTick(self)
         ::__continue7::
     end
     for ____, target in ipairs(toRemove) do
-        ____exports.stopHot(nil, target)
+        ____exports.stopHot(target)
     end
 end
 --- 注册中心计时器回调（延迟注册，只在有HOT单位时才运行）
-local function ensureCenterTimerRegistered(self)
+local function ensureCenterTimerRegistered()
     if registeredToCenterTimer then
         return
     end
@@ -182,7 +182,7 @@ end
 -- @param tickHP 每秒恢复生命量
 -- @param tickMP 每秒恢复魔法量
 -- @param duration 持续时间（秒）
-function ____exports.startHot(self, target, source, tickHP, tickMP, duration)
+function ____exports.startHot(target, source, tickHP, tickMP, duration)
     if not HOT_SYSTEM_ENABLED then
         return
     end
@@ -223,15 +223,15 @@ function ____exports.startHot(self, target, source, tickHP, tickMP, duration)
     local isNew = not hotUnits:has(target)
     hotUnits:add(target)
     if isNew then
-        ensureCenterTimerRegistered(nil)
+        ensureCenterTimerRegistered()
     end
 end
 --- 检查单位是否正在受HOT效果影响
-function ____exports.isHotActive(self, target)
+function ____exports.isHotActive(target)
     return hotUnits:has(target)
 end
 --- 获取当前HOT单位数量
-function ____exports.getHotUnitCount(self)
+function ____exports.getHotUnitCount()
     return hotUnits.size
 end
 local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
@@ -248,7 +248,7 @@ ____exports.HOT_EVENT_NAME = "持续治疗效果"
 -- @param tickHP 每秒恢复生命量
 -- @param tickMP 每秒恢复魔法量
 -- @param duration 持续时间（秒，可选，默认从YDUserData读取或使用tickHP）
-function ____exports.fireHotEvent(self, target, source, tickHP, tickMP, duration)
+function ____exports.fireHotEvent(target, source, tickHP, tickMP, duration)
     YDLocal5Set(nil, "unit", "HealTarget", target)
     YDLocal5Set(nil, "unit", "HealSource", source)
     YDLocal5Set(nil, "real", "hotTickHP", tickHP)
@@ -268,7 +268,7 @@ end
 local hotTrigger = nil
 --- STES事件处理函数
 -- 接收参数：HealTarget, HealSource, hotTickHP, hotTickMP
-local function onHotEvent(self)
+local function onHotEvent()
     local ____require_result_8 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
     local YDLocal1Get = ____require_result_8.YDLocal1Get
     local target = YDLocal1Get(nil, "unit", "HealTarget")
@@ -292,7 +292,6 @@ local function onHotEvent(self)
         duration = ____temp_9
     end
     ____exports.startHot(
-        nil,
         target,
         source,
         tickHP,
@@ -301,7 +300,7 @@ local function onHotEvent(self)
     )
 end
 --- 初始化持续治疗效果系统
-function ____exports.initHotSystem(self)
+function ____exports.initHotSystem()
     if not HOT_SYSTEM_ENABLED then
         return
     end
@@ -313,7 +312,7 @@ function ____exports.initHotSystem(self)
     hotTrigger = registerStesListener(nil, ____exports.HOT_EVENT_NAME, onHotEvent)
 end
 --- 检查系统是否已初始化
-function ____exports.isHotSystemInitialized(self)
+function ____exports.isHotSystemInitialized()
     return hotTrigger ~= nil
 end
 return ____exports

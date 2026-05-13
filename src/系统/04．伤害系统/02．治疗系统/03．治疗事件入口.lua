@@ -5,24 +5,24 @@ local skeyIndex, dispatchHealRequestEvent, jass, jglobals, STES_GetTable, YDLoca
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.04．伤害系统.02．治疗系统.00．常量定义")
 local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
 local HEAL_REQUEST_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_REQUEST_KEYS
-function skeyIndex(self)
+function skeyIndex()
     if type(jglobals.STES_skey_index) == "number" and jglobals.STES_skey_index ~= 0 then
         return jglobals.STES_skey_index
     end
-    return jass:StringHash("index")
+    return jass.StringHash("index")
 end
-function dispatchHealRequestEvent(self, target, healAmount, sourceUnit)
+function dispatchHealRequestEvent(target, healAmount, sourceUnit)
     local ht = STES_GetTable(nil)
     if ht == nil then
         return
     end
-    local hash = jass:StringHash(HEAL_EVENTS.REQUEST)
-    local sk = skeyIndex(nil)
-    local loopIndex = jass:LoadInteger(ht, hash, sk)
+    local hash = jass.StringHash(HEAL_EVENTS.REQUEST)
+    local sk = skeyIndex()
+    local loopIndex = jass.LoadInteger(ht, hash, sk)
     do
         local i = 0
         while i < loopIndex do
-            local trg = jass:LoadTriggerHandle(ht, hash, i)
+            local trg = jass.LoadTriggerHandle(ht, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -33,7 +33,7 @@ function dispatchHealRequestEvent(self, target, healAmount, sourceUnit)
                     nil,
                     "player",
                     HEAL_REQUEST_KEYS.SOURCE_PLAYER,
-                    jass:GetOwningPlayer(sourceUnit)
+                    jass.GetOwningPlayer(sourceUnit)
                 )
                 YDLocal5Set(nil, "boolean", HEAL_REQUEST_KEYS.EFFECT, true)
                 YDTriggerExecuteTrigger(nil, trg, false)
@@ -69,19 +69,19 @@ saveParentIndex = ____require_result_6.saveParentIndex
 local HEAL_ORDER_IDS = {852092, 852063, 852501, 852160}
 --- 技能数据字段：治疗量
 local HEAL_DATA_FIELD = 108
-local function isHealOrder(self, orderId)
+local function isHealOrder(orderId)
     return __TS__ArrayIndexOf(HEAL_ORDER_IDS, orderId) >= 0
 end
 --- 命中古老马甲 + 治疗命令时，停手/移除技能，并对「治疗事件」所有注册子触发器派发 YDLocal5
 local function onSpellChannel(castingUnit, spellAbilityId)
-    if not jass:IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
+    if not jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
         return
     end
-    local currentOrder = jass:GetUnitCurrentOrder(castingUnit)
-    if not isHealOrder(nil, currentOrder) then
+    local currentOrder = jass.GetUnitCurrentOrder(castingUnit)
+    if not isHealOrder(currentOrder) then
         return
     end
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     local healAmount = YDWEGetUnitAbilityDataReal(
         nil,
         target,
@@ -89,9 +89,9 @@ local function onSpellChannel(castingUnit, spellAbilityId)
         1,
         HEAL_DATA_FIELD
     )
-    jass:IssueImmediateOrder(castingUnit, "stop")
-    jass:UnitRemoveAbility(castingUnit, spellAbilityId)
-    dispatchHealRequestEvent(nil, target, healAmount, castingUnit)
+    jass.IssueImmediateOrder(castingUnit, "stop")
+    jass.UnitRemoveAbility(castingUnit, spellAbilityId)
+    dispatchHealRequestEvent(target, healAmount, castingUnit)
 end
 --- STES「治疗事件」统一桥。
 -- 约定：JASS/Lua 只要按同名参数写入 YDLocal5 并触发「治疗事件」，这里就会统一转入 doHeal。
@@ -126,13 +126,13 @@ local function onHealEventStes()
     end
 end
 --- 具名 STES 桥接动作，避免匿名闭包进入 JASS/Lua 侧。
-local function onHealEventStesAction(self)
+local function onHealEventStesAction()
     onHealEventStes()
 end
 local healRequestEntryInitialized = false
 local healRequestBridgeRegistered = false
 --- 初始化「施法治疗事件」分发器，通过统一技能事件回调工作
-function ____exports.initHealRequestEntry(self)
+function ____exports.initHealRequestEntry()
     if healRequestEntryInitialized then
         return
     end

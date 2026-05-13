@@ -69,6 +69,12 @@ import {
   二级驱散单位Buff,
 } from "../../../05．Buff系统/05．Buff清除函数";
 
+import {
+  获取单位重伤,
+  施加重伤,
+  移除单位重伤,
+} from "../../../04．伤害系统/03．重伤系统/index";
+
 export const 开始硬直 = GS_Suspend;
 export const 单位是否硬直中 = GS_IsUnitSuspending;
 export const 获取单位硬直剩余时间 = GS_LoadSuspend;
@@ -78,6 +84,9 @@ export const 初始化快速Buff系统 = SFB_Init;
 export const 施加快速Buff = SFB_施加通用Buff;
 export const 施加快速控制Buff = SFB_setBuff;
 export const 施加快速减速Buff = SFB_setSlow;
+export const 读取单位重伤 = 获取单位重伤;
+export const 施加单位重伤 = 施加重伤;
+export const 清除单位重伤 = 移除单位重伤;
 
 export const 清除单位指定类型Buff = 移除单位指定类型Buff;
 export const 清除单位增益Buff = 移除单位增益Buff;

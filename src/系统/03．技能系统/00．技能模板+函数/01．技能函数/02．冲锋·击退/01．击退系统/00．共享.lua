@@ -60,7 +60,7 @@ ____exports["分配新位移ID"] = function()
     return _____4E0B_4E00_4E2A_4F4D_79FBID
 end
 ____exports["取句柄ID"] = function(h)
-    return h ~= nil and h ~= 0 and jass:GetHandleId(h) or 0 or 0
+    return h ~= nil and h ~= 0 and jass.GetHandleId(h) or 0 or 0
 end
 local function _____6536_96C6_5355_4F4D_7EC4_6210_5458()
     local _____5355_4F4D = GetEnumUnit()
@@ -79,15 +79,15 @@ ____exports["快照单位组"] = function(_____5355_4F4D_7EC4)
     return _____7ED3_679C
 end
 ____exports["单位存活"] = function(u)
-    return u ~= nil and u ~= 0 and jass:GetUnitState(u, jass.UNIT_STATE_LIFE) > ____exports.UNIT_ALIVE_LIFE
+    return u ~= nil and u ~= 0 and jass.GetUnitState(u, jass.UNIT_STATE_LIFE) > ____exports.UNIT_ALIVE_LIFE
 end
 ____exports["在可玩区域内"] = function(x, y)
-    return x >= jass:GetRectMinX(jglobals.bj_mapInitialPlayableArea) and y >= jass:GetRectMinY(jglobals.bj_mapInitialPlayableArea) and x <= jass:GetRectMaxX(jglobals.bj_mapInitialPlayableArea) and y <= jass:GetRectMaxY(jglobals.bj_mapInitialPlayableArea)
+    return x >= jass.GetRectMinX(jglobals.bj_mapInitialPlayableArea) and y >= jass.GetRectMinY(jglobals.bj_mapInitialPlayableArea) and x <= jass.GetRectMaxX(jglobals.bj_mapInitialPlayableArea) and y <= jass.GetRectMaxY(jglobals.bj_mapInitialPlayableArea)
 end
 ____exports["计算坐标距离"] = function(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass:SquareRoot(dx * dx + dy * dy)
+    return jass.SquareRoot(dx * dx + dy * dy)
 end
 ____exports["清理命中记录"] = function(_____4F4D_79FBID)
     local _____524D_7F00 = tostring(_____4F4D_79FBID) .. ":"
@@ -113,41 +113,41 @@ ____exports["单位已被暂停"] = function(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return false
     end
-    return jass:IsUnitPaused(_____5355_4F4D) == true
+    return jass.IsUnitPaused(_____5355_4F4D) == true
 end
 ____exports["播放位移特效"] = function(_____5B9E_4F8B)
     local _____6A21_578B = _____5B9E_4F8B["位移特效"]
     if _____6A21_578B == nil or _____6A21_578B == "" then
         return
     end
-    local _____7279_6548 = jass:AddSpecialEffect(
+    local _____7279_6548 = jass.AddSpecialEffect(
         _____6A21_578B,
-        jass:GetUnitX(_____5B9E_4F8B["单位"]),
-        jass:GetUnitY(_____5B9E_4F8B["单位"])
+        jass.GetUnitX(_____5B9E_4F8B["单位"]),
+        jass.GetUnitY(_____5B9E_4F8B["单位"])
     )
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
-        jass:DestroyEffect(_____7279_6548)
+        jass.DestroyEffect(_____7279_6548)
     end
 end
 ____exports["获取枚举组"] = function()
     if _____679A_4E3E_7EC4 == nil or _____679A_4E3E_7EC4 == 0 then
-        _____679A_4E3E_7EC4 = jass:CreateGroup()
+        _____679A_4E3E_7EC4 = jass.CreateGroup()
     end
     return _____679A_4E3E_7EC4
 end
 ____exports["清空枚举组"] = function()
     local g = ____exports["获取枚举组"]()
     while true do
-        local u = jass:FirstOfGroup(g)
+        local u = jass.FirstOfGroup(g)
         if u == nil or u == 0 then
             break
         end
-        jass:GroupRemoveUnit(g, u)
+        jass.GroupRemoveUnit(g, u)
     end
 end
 ____exports["销毁枚举组"] = function()
     if _____679A_4E3E_7EC4 ~= nil and _____679A_4E3E_7EC4 ~= 0 then
-        jass:DestroyGroup(_____679A_4E3E_7EC4)
+        jass.DestroyGroup(_____679A_4E3E_7EC4)
         _____679A_4E3E_7EC4 = nil
     end
 end

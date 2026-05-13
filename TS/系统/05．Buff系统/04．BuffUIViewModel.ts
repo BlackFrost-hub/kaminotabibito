@@ -3,6 +3,7 @@
 
 import * as buffPoolMod from "./00．Buff系统";
 import * as buffTableMod from "./01．Buff表";
+
 const 数学运算 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
   round: (this: void, value: number) => number;
 };
@@ -20,16 +21,12 @@ export interface BuffSlotViewModel {
   visible: boolean;
   iconPath: string;
   remainText: string;
-  tooltipText: string;
+  tooltipBodyText: string;
+  tooltipSourceText: string;
 }
 
 export interface BuffBarViewModel {
-  slots: BuffSlotViewModel[]; // 长度固定为 MAX_SLOTS
-}
-
-function tooltipIntStr(n: number): string {
-  if (typeof n !== "number" || !isFinite(n)) return "0";
-  return `${jass.R2I(clampMin(n, 0))}`;
+  slots: BuffSlotViewModel[];
 }
 
 const TIP_COLOR_BODY = "|cfffff2d9";
@@ -39,39 +36,49 @@ function clampMin(value: number, min: number): number {
   return value < min ? min : value;
 }
 
-function formatDotTooltip(
-  template: string,
-  durationForDisplay: number,
-  dps: number,
-  sourceName: string | undefined,
-  intervalSec: number
-): string {
-  const rem = typeof durationForDisplay === "number" && isFinite(durationForDisplay) ? clampMin(durationForDisplay, 0) : 0;
-  const dpsN = typeof dps === "number" && isFinite(dps) ? dps : 0;
-  const intv = typeof intervalSec === "number" && isFinite(intervalSec) && intervalSec > 0 ? intervalSec : 1;
-  const rStr = tooltipIntStr(rem);
-  const dStr = tooltipIntStr(dpsN);
-  const iStr = tooltipIntStr(intv);
-  let s = template;
-  s = s.split("time").join(rStr);
-  s = s.split("持续时间").join(rStr);
-  s = s.split("interval").join(iStr);
-  s = s.split("damage").join(dStr);
-  const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未知";
-  return TIP_COLOR_BODY + s + "|r\n" + TIP_COLOR_SOURCE + "buff来源为「" + src + "」|r";
-}
-
-function formatBuffRemainOneDecimal(rem: number): string {
-  if (typeof rem !== "number" || !isFinite(rem)) return "0.0";
-  const scaled = round(clampMin(rem, 0) * 10);
+function formatOneDecimal(n: number): string {
+  if (typeof n !== "number" || !isFinite(n)) return "0.0";
+  const scaled = round(clampMin(n, 0) * 10);
   const intPart = jass.R2I(scaled / 10);
   const fracPart = scaled % 10;
   return `${intPart}.${fracPart}`;
 }
 
+function formatDotTooltip(
+  template: string,
+  durationForDisplay: number,
+  effectValue: number,
+  sourceName: string | undefined,
+  intervalSec: number
+): { bodyText: string; sourceText: string } {
+  const rem = typeof durationForDisplay === "number" && isFinite(durationForDisplay) ? clampMin(durationForDisplay, 0) : 0;
+  const val = typeof effectValue === "number" && isFinite(effectValue) ? effectValue : 0;
+  const intv = typeof intervalSec === "number" && isFinite(intervalSec) && intervalSec > 0 ? intervalSec : 1;
+
+  const timeStr = formatOneDecimal(rem);
+  const damageStr = formatOneDecimal(val);
+  const intervalStr = formatOneDecimal(intv);
+  const dataStr = formatOneDecimal(val <= 1 ? val * 100 : val);
+
+  let s = template;
+  s = s.split("time").join(timeStr);
+  s = s.split("持续时间").join(timeStr);
+  s = s.split("interval").join(intervalStr);
+  s = s.split("damage").join(damageStr);
+  s = s.split("data").join(dataStr);
+
+  const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未知";
+  return {
+    bodyText: TIP_COLOR_BODY + s + "|r",
+    sourceText: TIP_COLOR_SOURCE + "buff来源为『" + src + "』|r",
+  };
+}
+
+function formatBuffRemainOneDecimal(rem: number): string {
+  return formatOneDecimal(rem);
+}
+
 function isUnitValid(unit: any): boolean {
-  // 放宽有效性检查：只要 unit 非空且 handle 非 0 即认为有效
-  // 避免因 GetUnitTypeId 在单位刚被选中时返回 0 导致误判
   return !!(unit && unit !== 0);
 }
 
@@ -82,7 +89,8 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
       visible: false,
       iconPath: "",
       remainText: "",
-      tooltipText: "",
+      tooltipBodyText: "",
+      tooltipSourceText: "",
     });
   }
 
@@ -134,33 +142,38 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
   for (let i = 0; i < MAX_SLOTS && i < rows.length; i++) {
     const row = rows[i];
     const meta = buffs[row.id];
-    let iconPath = row.iconOverride && row.iconOverride !== "" ? row.iconOverride : meta?.icon ?? "";
+    const iconPath = row.iconOverride && row.iconOverride !== "" ? row.iconOverride : meta?.icon ?? "";
     if (iconPath === "") continue;
 
     const pd = row.state._dotParsedDuration;
     const durationForTip = typeof pd === "number" && isFinite(pd) && pd > 0 ? pd : row.state.remaining;
-    let tooltipText: string;
+
+    let tooltipBodyText = "";
+    let tooltipSourceText = "";
     if (meta !== undefined) {
-      tooltipText = formatDotTooltip(
+      const tooltipParts = formatDotTooltip(
         meta.tooltip,
         durationForTip,
         row.state.effect,
         row.state.sourceName,
         meta.interval
       );
+      tooltipBodyText = tooltipParts.bodyText;
+      tooltipSourceText = tooltipParts.sourceText;
     } else {
-      tooltipText =
+      tooltipBodyText =
         TIP_COLOR_BODY +
         row.id +
         " 剩余 " +
-        tooltipIntStr(row.state.remaining) +
+        formatOneDecimal(row.state.remaining) +
         " 秒，伤害/秒 " +
-        tooltipIntStr(row.state.effect) +
-        "|r\n" +
+        formatOneDecimal(row.state.effect) +
+        "|r";
+      tooltipSourceText =
         TIP_COLOR_SOURCE +
-        "buff来源为「" +
+        "buff来源为『" +
         (row.state.sourceName && row.state.sourceName !== "" ? row.state.sourceName : "未知") +
-        "」|r";
+        "』|r";
     }
 
     const remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
@@ -170,7 +183,8 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
       visible: true,
       iconPath,
       remainText,
-      tooltipText,
+      tooltipBodyText,
+      tooltipSourceText,
     };
   }
 

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 治疗系统 - 核心功能
  *
@@ -324,3 +325,4 @@ export function isHealSystemEnabled(): boolean {
 }
 
 export {};
+/** @noSelfInFile */

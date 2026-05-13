@@ -24,7 +24,7 @@ local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local __pcallModelUnit = 0
 local __pcallModelPath = ""
 local function __pcallSetUnitModelBody(self)
-    japi:DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
+    japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
 end
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_1.debugLog
@@ -53,11 +53,11 @@ end
 local npcQuestMarkerCtxByTimerHid = {}
 local npcSetModelCtxByTimerHid = {}
 local function onNpcQuestMarkerTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local ctx = npcQuestMarkerCtxByTimerHid[hid]
     __TS__Delete(npcQuestMarkerCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
@@ -66,11 +66,11 @@ local function onNpcQuestMarkerTimerExpire()
     end
 end
 local function onNpcSetModelTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local ctx = npcSetModelCtxByTimerHid[hid]
     __TS__Delete(npcSetModelCtxByTimerHid, hid)
     safeDestroyTimer(nil, t)
@@ -86,15 +86,15 @@ local function onNpcSetModelTimerExpire()
             "NPC生成器",
             "设置单位模型失败（已忽略）",
             ctx.npcLabel,
-            "model=" .. tostring(nil, ctx.modelPath)
+            "model=" .. tostring(ctx.modelPath)
         )
     end
 end
 local function scheduleTryAttachQuestMarker(unit, npcConfig)
     local delaySec = npcConfig.modelFIle and DELAY_QUEST_MARKER_AFTER_SET_MODEL or DELAY_QUEST_MARKER_NO_CUSTOM_MODEL
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     if t then
-        npcQuestMarkerCtxByTimerHid[jass:GetHandleId(t)] = {unit = unit, npcConfig = npcConfig}
+        npcQuestMarkerCtxByTimerHid[jass.GetHandleId(t)] = {unit = unit, npcConfig = npcConfig}
         safeTimerStart(
             nil,
             t,
@@ -105,9 +105,9 @@ local function scheduleTryAttachQuestMarker(unit, npcConfig)
     end
 end
 local function scheduleSetUnitModel(unit, modelPath, npcLabel)
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     if t then
-        npcSetModelCtxByTimerHid[jass:GetHandleId(t)] = {unit = unit, modelPath = modelPath, npcLabel = npcLabel}
+        npcSetModelCtxByTimerHid[jass.GetHandleId(t)] = {unit = unit, modelPath = modelPath, npcLabel = npcLabel}
         safeTimerStart(
             nil,
             t,
@@ -123,7 +123,7 @@ local function createSingleNPC(npcConfig)
             nil,
             "NPC生成器",
             "配置不完整，跳过:",
-            tostring(nil, npcConfig.NpcNameID)
+            tostring(npcConfig.NpcNameID)
         )
         return nil
     end
@@ -147,7 +147,7 @@ local function createSingleNPC(npcConfig)
             nil,
             "NPC生成器",
             "创建单位失败:",
-            tostring(nil, npcConfig.NpcNameID),
+            tostring(npcConfig.NpcNameID),
             ("(" .. unitCode) .. ")"
         )
         return nil
@@ -156,7 +156,7 @@ local function createSingleNPC(npcConfig)
         scheduleSetUnitModel(
             unit,
             npcConfig.modelFIle,
-            tostring(nil, npcConfig.NpcNameID)
+            tostring(npcConfig.NpcNameID)
         )
     end
     runNpcInitAction(nil, unit, npcConfig.initAction)
@@ -166,9 +166,9 @@ local function createSingleNPC(npcConfig)
         nil,
         "NPC生成器",
         "成功创建NPC:",
-        tostring(nil, npcConfig.NpcNameID),
+        tostring(npcConfig.NpcNameID),
         "at",
-        ((("(" .. tostring(nil, npcConfig.X)) .. ", ") .. tostring(nil, npcConfig.Y)) .. ")"
+        ((("(" .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"
     )
     return unit
 end
@@ -208,7 +208,7 @@ function ____exports.createNPCByQuestId(requireID)
             nil,
             "NPC生成器",
             "未找到任务ID对应的NPC:",
-            tostring(nil, requireID)
+            tostring(requireID)
         )
         return nil
     end
@@ -217,9 +217,9 @@ function ____exports.createNPCByQuestId(requireID)
             nil,
             "NPC生成器",
             "NPC未启用:",
-            tostring(nil, npcConfig.NpcNameID),
+            tostring(npcConfig.NpcNameID),
             "(任务ID:",
-            tostring(nil, requireID) .. ")"
+            tostring(requireID) .. ")"
         )
         return nil
     end

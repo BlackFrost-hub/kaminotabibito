@@ -22,9 +22,9 @@ function ____exports.GS_PolarProjectionBJ(self, source, dist, angle)
         return nil
     end
     local rad = angle * bj_DEGTORAD
-    local x = jass:GetLocationX(source) + dist * jass:Cos(rad)
-    local y = jass:GetLocationY(source) + dist * jass:Sin(rad)
-    jass:RemoveLocation(source)
-    return jass:Location(x, y)
+    local x = jass.GetLocationX(source) + dist * jass.Cos(rad)
+    local y = jass.GetLocationY(source) + dist * jass.Sin(rad)
+    jass.RemoveLocation(source)
+    return jass.Location(x, y)
 end
 return ____exports

@@ -65,13 +65,13 @@ function setText(self, frame, text)
     if not frame or frame == 0 then
         return
     end
-    japi:DzFrameSetText(frame, text)
+    japi.DzFrameSetText(frame, text)
 end
 function ____exports.setVisible(self, frame, visible)
     if not frame or frame == 0 then
         return
     end
-    japi:DzFrameShow(frame, visible)
+    japi.DzFrameShow(frame, visible)
 end
 function hideFrames(self, frames)
     for ____, frame in ipairs(frames) do
@@ -314,7 +314,7 @@ local function findTaskRowBindingFrame(self, frame)
             if ____exports.taskRowBindingByFrameId[cur] ~= nil then
                 return cur
             end
-            cur = japi:DzFrameGetParent(cur)
+            cur = japi.DzFrameGetParent(cur)
             i = i + 1
         end
     end
@@ -463,9 +463,9 @@ QUEST_ROW_GAP = 0.01
 VIEW_BOTTOM_REL = LIST_CONTENT_TOP_INSET - LIST_VIEW_H
 VIEW_EPS = 0.002
 function ____exports.handleTaskRowClick(self)
-    local frame = japi:DzGetTriggerUIEventFrame()
+    local frame = japi.DzGetTriggerUIEventFrame()
     if not frame then
-        frame = japi:DzGetMouseFocus()
+        frame = japi.DzGetMouseFocus()
     end
     local bindingFrame = findTaskRowBindingFrame(nil, frame)
     if not bindingFrame then
@@ -483,8 +483,8 @@ function ____exports.handleTaskRowClick(self)
     if ____opt_1 ~= nil then
         ____exports.currentTaskRowExpandHandler(binding.rowIndex)
     end
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass:GetLocalPlayer() then
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
+    if triggerPlayer == jass.GetLocalPlayer() then
         local ____opt_3 = ____exports.currentTaskRowClickSound
         if ____opt_3 ~= nil then
             ____exports.currentTaskRowClickSound()
@@ -496,8 +496,8 @@ local function handleTaskRowClickByRowIndex(self, rowIndex)
     if ____opt_5 ~= nil then
         ____exports.currentTaskRowExpandHandler(rowIndex)
     end
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass:GetLocalPlayer() then
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
+    if triggerPlayer == jass.GetLocalPlayer() then
         local ____opt_7 = ____exports.currentTaskRowClickSound
         if ____opt_7 ~= nil then
             ____exports.currentTaskRowClickSound()

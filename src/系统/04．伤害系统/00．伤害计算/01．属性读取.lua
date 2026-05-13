@@ -27,11 +27,11 @@ function ____exports.getPlayerId(self, unit)
     if unit == nil then
         return -1
     end
-    local owner = jass:GetOwningPlayer(unit)
+    local owner = jass.GetOwningPlayer(unit)
     if owner == nil then
         return -1
     end
-    return jass:GetPlayerId(owner)
+    return jass.GetPlayerId(owner)
 end
 --- 读取单位属性（优先单位属性，其次玩家属性）
 -- 
@@ -66,7 +66,7 @@ function ____exports.getUnitAttr(self, unit, attrName, valueType, defaultValue)
             return false
         end
     end
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player ~= nil then
         local playerValue = YDUserDataGet(
             nil,

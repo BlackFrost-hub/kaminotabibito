@@ -57,7 +57,7 @@ do
     end
 end
 --- 初始化治疗系统
-function ____exports.init(self)
+function ____exports.init()
     local nativeHealEntry = require("系统.04．伤害系统.02．治疗系统.02．原生治疗入口")
     if type(nativeHealEntry.initNativeHealEntry) == "function" then
         nativeHealEntry:initNativeHealEntry()

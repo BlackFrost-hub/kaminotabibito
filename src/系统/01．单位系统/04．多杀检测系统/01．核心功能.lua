@@ -77,29 +77,29 @@ local function killAllInGroup(self, instance)
         return
     end
     local group = instance.killGroup
-    local unit = jass:FirstOfGroup(group)
+    local unit = jass.FirstOfGroup(group)
     while unit ~= nil do
-        jass:GroupRemoveUnit(group, unit)
+        jass.GroupRemoveUnit(group, unit)
         groupUnitMap:delete(unit)
-        jass:KillUnit(unit)
-        unit = jass:FirstOfGroup(group)
+        jass.KillUnit(unit)
+        unit = jass.FirstOfGroup(group)
     end
     if instance.isOwnKillGroup then
-        jass:DestroyGroup(group)
+        jass.DestroyGroup(group)
     end
     instance.killGroup = nil
     onMultiKillSuccess(nil, instance)
 end
 local function removeGroupMonitor(self, instance)
     if instance.killGroup ~= nil then
-        local unit = jass:FirstOfGroup(instance.killGroup)
+        local unit = jass.FirstOfGroup(instance.killGroup)
         while unit ~= nil do
             groupUnitMap:delete(unit)
-            jass:GroupRemoveUnit(instance.killGroup, unit)
-            unit = jass:FirstOfGroup(instance.killGroup)
+            jass.GroupRemoveUnit(instance.killGroup, unit)
+            unit = jass.FirstOfGroup(instance.killGroup)
         end
         if instance.isOwnKillGroup then
-            jass:DestroyGroup(instance.killGroup)
+            jass.DestroyGroup(instance.killGroup)
         end
         instance.killGroup = nil
     end
@@ -116,7 +116,7 @@ local function onUnitDamage(self, targetUnit, damage, damageType, fromDotTickBat
     if sourceUnit == nil or sourceUnit == 0 then
         return
     end
-    local isFatal = damage >= jass:GetUnitState(targetUnit, jass.UNIT_STATE_LIFE)
+    local isFatal = damage >= jass.GetUnitState(targetUnit, jass.UNIT_STATE_LIFE)
     if not isFatal then
         return
     end
@@ -199,15 +199,15 @@ function ____exports.startMultiKillMonitor(self, config)
         healTarget = ____config_healTarget_8,
         healSource = ____config_healSource_9
     }
-    local tempGroup = jass:CreateGroup()
+    local tempGroup = jass.CreateGroup()
     GroupAddGroup(nil, instance.killGroup, tempGroup)
-    local unit = jass:FirstOfGroup(tempGroup)
+    local unit = jass.FirstOfGroup(tempGroup)
     while unit ~= nil do
         groupUnitMap:set(unit, instance)
-        jass:GroupRemoveUnit(tempGroup, unit)
-        unit = jass:FirstOfGroup(tempGroup)
+        jass.GroupRemoveUnit(tempGroup, unit)
+        unit = jass.FirstOfGroup(tempGroup)
     end
-    jass:DestroyGroup(tempGroup)
+    jass.DestroyGroup(tempGroup)
     groupMonitors[#groupMonitors + 1] = instance
     if not damageCallbackRegistered then
         registerDamageCallback(nil, onUnitDamage)
@@ -234,10 +234,10 @@ function ____exports.addToKillGroup(self, effectSource, unit)
         return
     end
     if instance.killGroup == nil then
-        instance.killGroup = jass:CreateGroup()
+        instance.killGroup = jass.CreateGroup()
         instance.isOwnKillGroup = true
     end
-    jass:GroupAddUnit(instance.killGroup, unit)
+    jass.GroupAddUnit(instance.killGroup, unit)
     groupUnitMap:set(unit, instance)
 end
 function ____exports.removeFromKillGroup(self, effectSource, unit)
@@ -248,7 +248,7 @@ function ____exports.removeFromKillGroup(self, effectSource, unit)
     if instance == nil or instance.killGroup == nil then
         return
     end
-    jass:GroupRemoveUnit(instance.killGroup, unit)
+    jass.GroupRemoveUnit(instance.killGroup, unit)
     groupUnitMap:delete(unit)
 end
 function ____exports.isMultiKillMonitored(self, unit)

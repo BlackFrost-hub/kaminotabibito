@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 治疗事件系统（旧版兼容）
  *
@@ -152,3 +153,4 @@ export function isNativeHealEntryInitialized(): boolean {
 }
 
 export {};
+/** @noSelfInFile */

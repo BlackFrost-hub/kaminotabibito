@@ -37,7 +37,7 @@ export const buffs: Record<string, BuffData> = {
     stackRule: 'highest',
     stackRefresh: true,
     dispelLevel: 1,
-    priority: 7,
+    priority: 5,
     canPurge: true,
     tooltip: "该单位受到了『反恢复』，在time秒内每1秒造成damage点精神伤害。"
   },
@@ -203,7 +203,7 @@ export const buffs: Record<string, BuffData> = {
     stackRule: 'highest',
     stackRefresh: true,
     dispelLevel: 2,
-    priority: 8,
+    priority: 9,
     canPurge: true,
     tooltip: "该单位处于硬直状态，无法行动，持续time秒。"
   },
@@ -278,7 +278,7 @@ export const buffs: Record<string, BuffData> = {
     stackRule: 'highest',
     stackRefresh: true,
     dispelLevel: 1,
-    priority: 7,
+    priority: 8,
     canPurge: true,
     tooltip: "该单位受到残废影响，攻击、攻速与移速降低，持续time秒。"
   },
@@ -386,6 +386,21 @@ export const buffs: Record<string, BuffData> = {
     priority: 10,
     canPurge: true,
     tooltip: "该单位被嘲讽，强制攻击来源单位，持续time秒。"
+  },
+  "C021": {
+    buffID: "C021",
+    buffName: "重伤",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+    effect: "Abilities\\Spells\\Other\\Doom\\DoomTarget.mdl",
+    type: "Debuff:wound",
+    interval: 0,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 7,
+    canPurge: true,
+    tooltip: "该单位受到『重伤』，持续time秒内治疗效果降低data%。"
   },
 };
 

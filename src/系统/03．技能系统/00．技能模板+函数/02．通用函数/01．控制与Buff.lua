@@ -17,6 +17,10 @@ local _____79FB_9664_5355_4F4D_8D1F_9762Buff = ____05_FF0EBuff_6E05_9664_51FD_65
 local _____6309_9A71_6563_7B49_7EA7_79FB_9664_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["按驱散等级移除单位Buff"]
 local _____4E00_7EA7_9A71_6563_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["一级驱散单位Buff"]
 local _____4E8C_7EA7_9A71_6563_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["二级驱散单位Buff"]
+local ____index = require("系统.04．伤害系统.03．重伤系统.index")
+local _____83B7_53D6_5355_4F4D_91CD_4F24 = ____index["获取单位重伤"]
+local _____65BD_52A0_91CD_4F24 = ____index["施加重伤"]
+local _____79FB_9664_5355_4F4D_91CD_4F24 = ____index["移除单位重伤"]
 --- 通用函数 - 控制与 Buff 便捷入口
 -- 
 -- 说明：
@@ -68,6 +72,9 @@ ____exports["初始化快速Buff系统"] = SFB_Init
 ____exports["施加快速Buff"] = ____SFB__65BD_52A0_901A_7528Buff
 ____exports["施加快速控制Buff"] = SFB_setBuff
 ____exports["施加快速减速Buff"] = SFB_setSlow
+____exports["读取单位重伤"] = _____83B7_53D6_5355_4F4D_91CD_4F24
+____exports["施加单位重伤"] = _____65BD_52A0_91CD_4F24
+____exports["清除单位重伤"] = _____79FB_9664_5355_4F4D_91CD_4F24
 ____exports["清除单位指定类型Buff"] = _____79FB_9664_5355_4F4D_6307_5B9A_7C7B_578BBuff
 ____exports["清除单位增益Buff"] = _____79FB_9664_5355_4F4D_589E_76CABuff
 ____exports["清除单位负面Buff"] = _____79FB_9664_5355_4F4D_8D1F_9762Buff

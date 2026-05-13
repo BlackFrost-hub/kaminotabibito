@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local fireManaShowEvent, STES_Fire, YDLocal5Set, SHOW_DAMAGE_EVENT, MANA_REGEN_COLOR
-function fireManaShowEvent(self, target, amount)
+function fireManaShowEvent(target, amount)
     YDLocal5Set(nil, "real", "Real", amount)
     YDLocal5Set(nil, "unit", "Unit", target)
     YDLocal5Set(nil, "real", "red", MANA_REGEN_COLOR.red)
@@ -31,7 +31,7 @@ local MANA_REGEN_SYSTEM_ENABLED = true
 -- @param amount 恢复量
 -- @param showEffect 是否显示数值
 -- @returns 实际恢复量
-function ____exports.doManaRegen(self, target, amount, showEffect)
+function ____exports.doManaRegen(target, amount, showEffect)
     if showEffect == nil then
         showEffect = true
     end
@@ -41,20 +41,20 @@ function ____exports.doManaRegen(self, target, amount, showEffect)
     if target == nil or amount <= 0 then
         return 0
     end
-    if jass:IsUnitType(target, jass.UNIT_TYPE_DEAD) then
+    if jass.IsUnitType(target, jass.UNIT_TYPE_DEAD) then
         return 0
     end
-    local currentMana = jass:GetUnitState(target, jass.UNIT_STATE_MANA)
-    local maxMana = jass:GetUnitState(target, jass.UNIT_STATE_MAX_MANA)
+    local currentMana = jass.GetUnitState(target, jass.UNIT_STATE_MANA)
+    local maxMana = jass.GetUnitState(target, jass.UNIT_STATE_MAX_MANA)
     local manaGap = maxMana - currentMana
     local safeGap = manaGap > 0 and manaGap or 0
     local actualRegen = amount < safeGap and amount or safeGap
     if actualRegen <= 0 then
         return 0
     end
-    jass:SetUnitState(target, jass.UNIT_STATE_MANA, currentMana + actualRegen)
+    jass.SetUnitState(target, jass.UNIT_STATE_MANA, currentMana + actualRegen)
     if showEffect then
-        fireManaShowEvent(nil, target, actualRegen)
+        fireManaShowEvent(target, actualRegen)
     end
     return actualRegen
 end
@@ -64,10 +64,10 @@ end
 -- @param target 目标单位
 -- @param amount 恢复量
 -- @param source 来源单位（可为null）
-function ____exports.fireManaRegenEvent(self, target, amount, source)
+function ____exports.fireManaRegenEvent(target, amount, source)
     YDLocal5Set(nil, "real", "HealAmount", amount)
     YDLocal5Set(nil, "unit", "HealTarget", target)
     YDLocal5Set(nil, "unit", "HealSource", source)
-    STES_Fire(nil, nil, "恢复魔法事件")
+    STES_Fire(nil, "恢复魔法事件")
 end
 return ____exports

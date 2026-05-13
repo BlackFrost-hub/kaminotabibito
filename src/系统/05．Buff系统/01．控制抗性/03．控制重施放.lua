@@ -16,25 +16,25 @@ function ____exports.getControlHelperUnitType(self)
 end
 --- 移除原控制技能
 function ____exports.removeOriginalControl(self, unit, abilityId)
-    jass:UnitRemoveAbility(unit, abilityId)
-    jass:IssueImmediateOrder(unit, "stop")
+    jass.UnitRemoveAbility(unit, abilityId)
+    jass.IssueImmediateOrder(unit, "stop")
 end
 --- 创建辅助马甲
 function ____exports.createControlHelper(self, caster, target)
-    local targetLoc = jass:GetUnitLoc(target)
+    local targetLoc = jass.GetUnitLoc(target)
     local helperType = ____exports.getControlHelperUnitType(nil)
-    local helper = jass:CreateUnitAtLoc(
-        jass:GetOwningPlayer(caster),
+    local helper = jass.CreateUnitAtLoc(
+        jass.GetOwningPlayer(caster),
         helperType,
         targetLoc,
         0
     )
-    jass:RemoveLocation(targetLoc)
+    jass.RemoveLocation(targetLoc)
     return helper
 end
 --- 设置马甲控制技能持续时间
 function ____exports.setHelperAbilityDuration(self, helper, duration)
-    jass:UnitAddAbility(helper, CONTROL_ABILITY_ID)
+    jass.UnitAddAbility(helper, CONTROL_ABILITY_ID)
     YDWESetUnitAbilityDataReal(
         nil,
         helper,
@@ -54,7 +54,7 @@ function ____exports.setHelperAbilityDuration(self, helper, duration)
 end
 --- 马甲施放控制技能
 function ____exports.helperCastControl(self, helper, target)
-    jass:IssueTargetOrder(helper, "thunderbolt", target)
+    jass.IssueTargetOrder(helper, "thunderbolt", target)
 end
 --- 执行控制重施放
 -- 

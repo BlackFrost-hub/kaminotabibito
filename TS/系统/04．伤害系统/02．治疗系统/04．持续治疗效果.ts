@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 持续治疗效果（HOT）系统
  *
@@ -350,3 +351,4 @@ export function isHotSystemInitialized(): boolean {
 }
 
 export {};
+/** @noSelfInFile */

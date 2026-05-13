@@ -305,7 +305,7 @@ local function finishSkipKeyCooldownForPlayer(self, pid)
     if not t then
         return
     end
-    jass:PauseTimer(t)
+    jass.PauseTimer(t)
     safeDestroyTimer(t)
 end
 local function skipKeyCooldownCallbackP0(self)
@@ -325,7 +325,7 @@ local function startSkipKeyCooldown(self, pid)
         return
     end
     g_skipKeyCooldown[pid + 1] = true
-    local t = jass:CreateTimer()
+    local t = jass.CreateTimer()
     g_skipKeyCooldownTimers[pid + 1] = t
     repeat
         local ____switch62 = pid
@@ -350,7 +350,7 @@ local function startSkipKeyCooldown(self, pid)
             return
         end
         do
-            jass:PauseTimer(t)
+            jass.PauseTimer(t)
             safeDestroyTimer(t)
             g_skipKeyCooldownTimers[pid + 1] = nil
             g_skipKeyCooldown[pid + 1] = false
@@ -359,7 +359,7 @@ local function startSkipKeyCooldown(self, pid)
     until true
 end
 local function skipDialogLocal(self)
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     if not triggerPlayer then
         return
     end

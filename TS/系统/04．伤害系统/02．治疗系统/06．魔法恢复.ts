@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 魔法恢复系统
  *
@@ -109,3 +110,4 @@ export function fireManaRegenEvent(target: any, amount: number, source: any = nu
 }
 
 export {};
+/** @noSelfInFile */

@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 治疗系统 - 统一导出和初始化入口
  */
@@ -45,3 +46,4 @@ export function init(): void {
   };
   if (typeof healRequestEntry.initHealRequestEntry === "function") healRequestEntry.initHealRequestEntry();
 }
+/** @noSelfInFile */

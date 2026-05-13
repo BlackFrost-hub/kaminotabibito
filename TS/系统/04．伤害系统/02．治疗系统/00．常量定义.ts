@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 治疗系统 - 常量定义
  *
@@ -87,3 +88,4 @@ export const ATTR_HEAL_RATE = "治疗率";
 export const ATTR_RECEIVED_HEAL_RATE = "受到的治疗率";
 
 export {};
+/** @noSelfInFile */

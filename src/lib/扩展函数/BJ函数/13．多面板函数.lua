@@ -16,14 +16,14 @@ end
 ____exports.bj_lastCreatedMultiboardItem = ____jglobals_bj_lastCreatedMultiboardItem_2
 --- 创建多面板 - CreateMultiboardBJ
 function ____exports.CreateMultiboardBJ(self, cols, rows, title)
-    ____exports.bj_lastCreatedMultiboard = jass:CreateMultiboard()
+    ____exports.bj_lastCreatedMultiboard = jass.CreateMultiboard()
     if ____exports.bj_lastCreatedMultiboard == nil then
         return nil
     end
-    jass:MultiboardSetRowCount(____exports.bj_lastCreatedMultiboard, rows)
-    jass:MultiboardSetColumnCount(____exports.bj_lastCreatedMultiboard, cols)
-    jass:MultiboardSetTitleText(____exports.bj_lastCreatedMultiboard, title)
-    jass:MultiboardDisplay(____exports.bj_lastCreatedMultiboard, true)
+    jass.MultiboardSetRowCount(____exports.bj_lastCreatedMultiboard, rows)
+    jass.MultiboardSetColumnCount(____exports.bj_lastCreatedMultiboard, cols)
+    jass.MultiboardSetTitleText(____exports.bj_lastCreatedMultiboard, title)
+    jass.MultiboardDisplay(____exports.bj_lastCreatedMultiboard, true)
     return ____exports.bj_lastCreatedMultiboard
 end
 --- 销毁多面板 - DestroyMultiboardBJ
@@ -31,7 +31,7 @@ function ____exports.DestroyMultiboardBJ(self, mb)
     if mb == nil then
         return
     end
-    jass:DestroyMultiboard(mb)
+    jass.DestroyMultiboard(mb)
 end
 --- 获取最后创建的多面板 - GetLastCreatedMultiboard
 function ____exports.GetLastCreatedMultiboard(self)
@@ -42,21 +42,21 @@ function ____exports.MultiboardDisplayBJ(self, show, mb)
     if mb == nil then
         return
     end
-    jass:MultiboardDisplay(mb, show)
+    jass.MultiboardDisplay(mb, show)
 end
 --- 最小化/还原多面板 - MultiboardMinimizeBJ
 function ____exports.MultiboardMinimizeBJ(self, minimize, mb)
     if mb == nil then
         return
     end
-    jass:MultiboardMinimize(mb, minimize)
+    jass.MultiboardMinimize(mb, minimize)
 end
 --- 设置多面板标题颜色 - MultiboardSetTitleTextColorBJ
 function ____exports.MultiboardSetTitleTextColorBJ(self, mb, red, green, blue, transparency)
     if mb == nil then
         return
     end
-    jass:MultiboardSetTitleTextColor(
+    jass.MultiboardSetTitleTextColor(
         mb,
         PercentTo255(red),
         PercentTo255(green),
@@ -66,15 +66,15 @@ function ____exports.MultiboardSetTitleTextColorBJ(self, mb, red, green, blue, t
 end
 --- 允许/禁止多面板显示 - MultiboardAllowDisplayBJ
 function ____exports.MultiboardAllowDisplayBJ(self, flag)
-    jass:MultiboardSuppressDisplay(not flag)
+    jass.MultiboardSuppressDisplay(not flag)
 end
 --- 设置多面板项目样式 - MultiboardSetItemStyleBJ
 function ____exports.MultiboardSetItemStyleBJ(self, mb, col, row, showValue, showIcon)
     if mb == nil then
         return
     end
-    local numRows = jass:MultiboardGetRowCount(mb)
-    local numCols = jass:MultiboardGetColumnCount(mb)
+    local numRows = jass.MultiboardGetRowCount(mb)
+    local numCols = jass.MultiboardGetColumnCount(mb)
     do
         local curRow = 1
         while curRow <= numRows do
@@ -89,10 +89,10 @@ function ____exports.MultiboardSetItemStyleBJ(self, mb, col, row, showValue, sho
                             if col ~= 0 and col ~= curCol then
                                 goto __continue20
                             end
-                            local item = jass:MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
                             if item ~= nil then
-                                jass:MultiboardSetItemStyle(item, showValue, showIcon)
-                                jass:MultiboardReleaseItem(item)
+                                jass.MultiboardSetItemStyle(item, showValue, showIcon)
+                                jass.MultiboardReleaseItem(item)
                             end
                         end
                         ::__continue20::
@@ -110,8 +110,8 @@ function ____exports.MultiboardSetItemValueBJ(self, mb, col, row, val)
     if mb == nil then
         return
     end
-    local numRows = jass:MultiboardGetRowCount(mb)
-    local numCols = jass:MultiboardGetColumnCount(mb)
+    local numRows = jass.MultiboardGetRowCount(mb)
+    local numCols = jass.MultiboardGetColumnCount(mb)
     do
         local curRow = 1
         while curRow <= numRows do
@@ -126,10 +126,10 @@ function ____exports.MultiboardSetItemValueBJ(self, mb, col, row, val)
                             if col ~= 0 and col ~= curCol then
                                 goto __continue29
                             end
-                            local item = jass:MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
                             if item ~= nil then
-                                jass:MultiboardSetItemValue(item, val)
-                                jass:MultiboardReleaseItem(item)
+                                jass.MultiboardSetItemValue(item, val)
+                                jass.MultiboardReleaseItem(item)
                             end
                         end
                         ::__continue29::
@@ -147,8 +147,8 @@ function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, bl
     if mb == nil then
         return
     end
-    local numRows = jass:MultiboardGetRowCount(mb)
-    local numCols = jass:MultiboardGetColumnCount(mb)
+    local numRows = jass.MultiboardGetRowCount(mb)
+    local numCols = jass.MultiboardGetColumnCount(mb)
     do
         local curRow = 1
         while curRow <= numRows do
@@ -163,16 +163,16 @@ function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, bl
                             if col ~= 0 and col ~= curCol then
                                 goto __continue38
                             end
-                            local item = jass:MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
                             if item ~= nil then
-                                jass:MultiboardSetItemValueColor(
+                                jass.MultiboardSetItemValueColor(
                                     item,
                                     PercentTo255(red),
                                     PercentTo255(green),
                                     PercentTo255(blue),
                                     PercentTo255(100 - transparency)
                                 )
-                                jass:MultiboardReleaseItem(item)
+                                jass.MultiboardReleaseItem(item)
                             end
                         end
                         ::__continue38::
@@ -190,8 +190,8 @@ function ____exports.MultiboardSetItemWidthBJ(self, mb, col, row, width)
     if mb == nil then
         return
     end
-    local numRows = jass:MultiboardGetRowCount(mb)
-    local numCols = jass:MultiboardGetColumnCount(mb)
+    local numRows = jass.MultiboardGetRowCount(mb)
+    local numCols = jass.MultiboardGetColumnCount(mb)
     do
         local curRow = 1
         while curRow <= numRows do
@@ -206,10 +206,10 @@ function ____exports.MultiboardSetItemWidthBJ(self, mb, col, row, width)
                             if col ~= 0 and col ~= curCol then
                                 goto __continue47
                             end
-                            local item = jass:MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
                             if item ~= nil then
-                                jass:MultiboardSetItemWidth(item, width / 100)
-                                jass:MultiboardReleaseItem(item)
+                                jass.MultiboardSetItemWidth(item, width / 100)
+                                jass.MultiboardReleaseItem(item)
                             end
                         end
                         ::__continue47::
@@ -227,8 +227,8 @@ function ____exports.MultiboardSetItemIconBJ(self, mb, col, row, iconFileName)
     if mb == nil then
         return
     end
-    local numRows = jass:MultiboardGetRowCount(mb)
-    local numCols = jass:MultiboardGetColumnCount(mb)
+    local numRows = jass.MultiboardGetRowCount(mb)
+    local numCols = jass.MultiboardGetColumnCount(mb)
     do
         local curRow = 1
         while curRow <= numRows do
@@ -243,10 +243,10 @@ function ____exports.MultiboardSetItemIconBJ(self, mb, col, row, iconFileName)
                             if col ~= 0 and col ~= curCol then
                                 goto __continue56
                             end
-                            local item = jass:MultiboardGetItem(mb, curRow - 1, curCol - 1)
+                            local item = jass.MultiboardGetItem(mb, curRow - 1, curCol - 1)
                             if item ~= nil then
-                                jass:MultiboardSetItemIcon(item, iconFileName)
-                                jass:MultiboardReleaseItem(item)
+                                jass.MultiboardSetItemIcon(item, iconFileName)
+                                jass.MultiboardReleaseItem(item)
                             end
                         end
                         ::__continue56::
