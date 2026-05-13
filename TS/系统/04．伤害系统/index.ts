@@ -27,9 +27,6 @@ require("系统.04．伤害系统.03．重伤系统.index");
  * 初始化伤害系统
  */
 export function init(): void {
-  const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-    debugLogForce: (this: void, module: string, ...args: any[]) => void;
-  };
   const { init: initHealSystem } = require("系统.04．伤害系统.02．治疗系统.index") as {
     init?: () => void;
   };
@@ -37,17 +34,11 @@ export function init(): void {
     init?: () => void;
   };
 
-  debugLogForce("伤害系统", "伤害系统init开始");
-
   if (typeof initHealSystem === "function") {
-    debugLogForce("伤害系统", "调用治疗系统.init");
     initHealSystem();
   }
 
   if (typeof initWoundSystem === "function") {
-    debugLogForce("伤害系统", "调用重伤系统.init");
     initWoundSystem();
   }
-
-  debugLogForce("伤害系统", "伤害系统init完成");
 }

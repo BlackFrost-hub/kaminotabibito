@@ -52,6 +52,9 @@ const {
   清除仇恨显示ById: (this: void, 敌人ID: number) => void;
   清除所有仇恨显示: (this: void) => void;
 };
+const { 自动展开仇恨面板一次 } = require("系统.09．表现系统.05．仇恨面板.05．仇恨面板") as {
+  自动展开仇恨面板一次: (this: void, playerId: number) => void;
+};
 
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -62,6 +65,8 @@ const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const IssueTargetOrder = jass.IssueTargetOrder as (u: any, orderStr: string, target: any) => boolean;
+const GetOwningPlayer = jass.GetOwningPlayer as (u: any) => any;
+const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD;
 
 const MAX_DISTANCE_SQ = 2500 * 2500;
@@ -85,6 +90,14 @@ function 清理敌人仇恨状态(敌人ID: number): void {
   debugLogForce(模块名, "清理敌人仇恨状态 敌人ID=", 敌人ID);
   清除仇恨显示ById(敌人ID);
   clearAllThreatById(敌人ID);
+}
+
+function 尝试自动展开目标玩家仇恨面板(this: void, target: any): void {
+  if (target == null || target === 0) return;
+  const owner = GetOwningPlayer(target);
+  if (owner == null || owner === 0) return;
+  const playerId = GetPlayerId(owner);
+  自动展开仇恨面板一次(playerId);
 }
 
 /** 过滤回调：单位死亡或超距时排除 */
@@ -151,6 +164,7 @@ function onTick(): void {
     }
 
     更新仇恨显示(敌人, best.targetRef, best.threat);
+    尝试自动展开目标玩家仇恨面板(best.targetRef);
 
     if (当前目标ID !== best.targetHid) {
       // 目标变更：发命令 + 更新缓存
@@ -205,6 +219,7 @@ export function 驱动单个敌人(敌人: any): void {
   }
 
   更新仇恨显示(敌人, best.targetRef, best.threat);
+  尝试自动展开目标玩家仇恨面板(best.targetRef);
 
   if (当前目标ID !== best.targetHid) {
     debugLogForce(模块名, "切换目标 敌人ID=", 敌人ID, "新目标=", best.targetHid, "仇恨=", best.threat);

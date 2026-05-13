@@ -50,7 +50,7 @@ const TIP_PAD_TOP = 0.007;
 const TIP_PAD_BOTTOM = 0.006;
 const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
 const BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip";
-const BUFF_TOOLTIP_TOC_PATHS = ["imports\\UI\\BuffTestTooltip.toc", "UI\\BuffTestTooltip.toc"];
+const BUFF_TOOLTIP_TOC_PATHS = ["UI\\BuffTestTooltip.toc"];
 
 interface SlotFrames {
   root: number;

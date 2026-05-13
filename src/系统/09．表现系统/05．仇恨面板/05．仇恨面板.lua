@@ -8,6 +8,7 @@ local ____01_FF0E_5171_4EAB = require("系统.09．表现系统.05．仇恨面�
 local DzGetGameUI = ____01_FF0E_5171_4EAB.DzGetGameUI
 local GetLocalPlayer = ____01_FF0E_5171_4EAB.GetLocalPlayer
 local GetPlayerId = ____01_FF0E_5171_4EAB.GetPlayerId
+local Player = ____01_FF0E_5171_4EAB.Player
 local _____73A9_5BB6_9762_677F_663E_793A_72B6_6001_8868 = ____01_FF0E_5171_4EAB["玩家面板显示状态表"]
 local ____02_FF0E_9762_677F_521B_5EFA = require("系统.09．表现系统.05．仇恨面板.02．面板创建")
 local _____52A0_8F7D_4EC7_6068_9762_677FToc = ____02_FF0E_9762_677F_521B_5EFA["加载仇恨面板Toc"]
@@ -32,12 +33,14 @@ local CreateTrigger = jass.CreateTrigger
 local DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode
 local DzGetTriggerKeyPlayer = japi.DzGetTriggerKeyPlayer
 local DzGetTriggerKey = japi.DzGetTriggerKey
+local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
+local _____5DF2_81EA_52A8_5C55_5F00_63D0_793A_73A9_5BB6_8868 = {}
 local function _____521D_59CB_5316_73A9_5BB6_663E_793A_72B6_6001()
     do
         local playerId = 0
         while playerId < THREAT_PANEL_PLAYER_SLOTS do
             if _____73A9_5BB6_9762_677F_663E_793A_72B6_6001_8868[playerId] == nil then
-                _____73A9_5BB6_9762_677F_663E_793A_72B6_6001_8868[playerId] = true
+                _____73A9_5BB6_9762_677F_663E_793A_72B6_6001_8868[playerId] = false
             end
             playerId = playerId + 1
         end
@@ -103,6 +106,31 @@ function ____exports.initThreatPanel()
     if _____5237_65B0_56DE_8C03ID == 0 then
         _____5237_65B0_56DE_8C03ID = addPeriodicCallback(THREAT_PANEL_REFRESH_MS, ____on_4EC7_6068_9762_677F_5237_65B0Tick)
     end
+end
+____exports["自动展开仇恨面板一次"] = function(playerId)
+    if playerId < 0 or playerId >= THREAT_PANEL_PLAYER_SLOTS then
+        return
+    end
+    if _____5DF2_81EA_52A8_5C55_5F00_63D0_793A_73A9_5BB6_8868[playerId] == true then
+        return
+    end
+    _____5DF2_81EA_52A8_5C55_5F00_63D0_793A_73A9_5BB6_8868[playerId] = true
+    _____73A9_5BB6_9762_677F_663E_793A_72B6_6001_8868[playerId] = true
+    ____on_4EC7_6068_9762_677F_5237_65B0Tick()
+    local _____672C_5730_73A9_5BB6 = GetLocalPlayer()
+    if _____672C_5730_73A9_5BB6 == nil or _____672C_5730_73A9_5BB6 == 0 then
+        return
+    end
+    if GetPlayerId(_____672C_5730_73A9_5BB6) ~= playerId then
+        return
+    end
+    DisplayTimedTextToPlayer(
+        Player(playerId),
+        0,
+        0,
+        8,
+        "|cffffcc33首次进入战斗时会自动打开仇恨面板，之后不再自动展开，按 V 可随时开关。|r"
+    )
 end
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 then

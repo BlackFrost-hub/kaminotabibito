@@ -16,6 +16,7 @@ import {
   DzGetGameUI,
   GetLocalPlayer,
   GetPlayerId,
+  Player,
   玩家面板显示状态表,
 } from "./01．共享";
 import { 加载仇恨面板Toc, 创建全部玩家面板 } from "./02．面板创建";
@@ -38,11 +39,20 @@ const DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode as 
 ) => void;
 const DzGetTriggerKeyPlayer = japi.DzGetTriggerKeyPlayer as () => any;
 const DzGetTriggerKey = japi.DzGetTriggerKey as () => number;
+const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
+  toPlayer: any,
+  x: number,
+  y: number,
+  duration: number,
+  message: string
+) => void;
+
+const 已自动展开提示玩家表: Record<number, boolean | undefined> = {};
 
 function 初始化玩家显示状态(): void {
   for (let playerId = 0; playerId < THREAT_PANEL_PLAYER_SLOTS; playerId++) {
     if (玩家面板显示状态表[playerId] == null) {
-      玩家面板显示状态表[playerId] = true;
+      玩家面板显示状态表[playerId] = false;
     }
   }
 }
@@ -84,6 +94,27 @@ export function initThreatPanel(): void {
   if (刷新回调ID === 0) {
     刷新回调ID = addPeriodicCallback(THREAT_PANEL_REFRESH_MS, on仇恨面板刷新Tick);
   }
+}
+
+export function 自动展开仇恨面板一次(this: void, playerId: number): void {
+  if (playerId < 0 || playerId >= THREAT_PANEL_PLAYER_SLOTS) return;
+  if (已自动展开提示玩家表[playerId] === true) return;
+
+  已自动展开提示玩家表[playerId] = true;
+  玩家面板显示状态表[playerId] = true;
+  on仇恨面板刷新Tick();
+
+  const 本地玩家 = GetLocalPlayer();
+  if (本地玩家 == null || 本地玩家 === 0) return;
+  if (GetPlayerId(本地玩家) !== playerId) return;
+
+  DisplayTimedTextToPlayer(
+    Player(playerId),
+    0,
+    0,
+    8,
+    "|cffffcc33首次进入战斗时会自动打开仇恨面板，之后不再自动展开，按 V 可随时开关。|r"
+  );
 }
 
 export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
