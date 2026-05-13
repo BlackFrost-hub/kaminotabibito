@@ -1,7 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ParseInt = ____lualib.__TS__ParseInt
-local __TS__Number = ____lualib.__TS__Number
-local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_6838_5FC3_529F_80FD = require("系统.03．技能系统.05．动态技能说明.01．核心功能")
 local ABILITY_DATA_TIP = ____01_FF0E_6838_5FC3_529F_80FD.ABILITY_DATA_TIP
@@ -20,9 +17,9 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.00．YDWE函�
 local EXGetUnitAbility = ____require_result_2.EXGetUnitAbility
 local EXGetAbilityDataString = ____require_result_2.EXGetAbilityDataString
 local EXSetAbilityDataString = ____require_result_2.EXSetAbilityDataString
-local EXExecuteScript = ____require_result_2.EXExecuteScript
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local getSoleSelectedUnitForPlayer = ____require_result_3.getSoleSelectedUnitForPlayer
+local commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位")
 local FRAME_EVENT_MOUSE_ENTER = 2
 local FRAME_EVENT_MOUSE_LEAVE = 3
 local HOVER_INSTALL_RETRY_SEC = 0.1
@@ -48,12 +45,7 @@ local function _____83B7_53D6_672C_673A_552F_4E00_9009_4E2D_5355_4F4D()
     )
 end
 local function _____89E3_6790_6280_80FD_6309_94AE_80FD_529BId(x, y)
-    local _____811A_672C_7ED3_679C = EXExecuteScript(
-        nil,
-        ((("(function() return require 'jass.message'.button(" .. tostring(x)) .. ",") .. tostring(y)) .. ") end)()"
-    )
-    local abilityId = __TS__ParseInt(_____811A_672C_7ED3_679C, 10)
-    return __TS__NumberIsFinite(__TS__Number(abilityId)) and abilityId or 0
+    return commandBarAbility["读取命令卡按钮能力Id"](x, y)
 end
 local function _____6062_590D_5F53_524D_52AB_6301_6587_672C()
     if _____5F53_524D_72B6_6001 == nil then

@@ -13,15 +13,16 @@ const {
   EXGetUnitAbility,
   EXGetAbilityDataString,
   EXSetAbilityDataString,
-  EXExecuteScript,
 } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   EXGetUnitAbility: (u: any, abilcode: number) => any;
   EXGetAbilityDataString: (abil: any, level: number, dataType: number) => string;
   EXSetAbilityDataString: (abil: any, level: number, dataType: number, value: string) => boolean;
-  EXExecuteScript: (script: string) => string;
 };
 const { getSoleSelectedUnitForPlayer } = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   getSoleSelectedUnitForPlayer: (playerId: number) => any | null;
+};
+const commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位") as {
+  读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
 };
 
 import {
@@ -65,9 +66,7 @@ function 获取本机唯一选中单位(): any | null {
 }
 
 function 解析技能按钮能力Id(x: number, y: number): number {
-  const 脚本结果 = EXExecuteScript(`(function() return require 'jass.message'.button(${x},${y}) end)()`);
-  const abilityId = parseInt(脚本结果, 10);
-  return isFinite(abilityId) ? abilityId : 0;
+  return commandBarAbility.读取命令卡按钮能力Id(x, y);
 }
 
 function 恢复当前劫持文本(): void {

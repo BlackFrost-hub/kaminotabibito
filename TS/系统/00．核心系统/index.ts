@@ -14,6 +14,7 @@ export * from "../../lib/扩展函数/封装函数/index";
 export * from "./01．颜色常量";
 export * from "./03．UI函数";
 export * from "./01．事件中心/index";
+export * from "./02．功能开关/index";
 export * from "./05．中心计时器";
 export * from "./06．特效绑定系统";
 
@@ -83,6 +84,7 @@ function registerCoreGlobals(): void {
 // 这里仅加载核心系统特有的模块
 require("系统.00．核心系统.01．颜色常量");
 require("系统.00．核心系统.02．硬件函数");
+require("系统.00．核心系统.02．功能开关.index");
 require("系统.00．核心系统.03．UI函数");
 require("系统.00．核心系统.01．事件中心.index");
 

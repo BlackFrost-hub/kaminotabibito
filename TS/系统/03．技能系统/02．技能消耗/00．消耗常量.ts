@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 技能消耗常量配置
  */
@@ -20,11 +21,8 @@ export interface SpecialUnitCostConfig {
   description?: string;
 }
 
-/**
- * 爱德华配置键。
- * 当前逻辑仍使用前半段显示名作为 YDUserData 缓存键，后半段用于统一格式预留。
- */
-export const EDWARD_UNIT_CONFIG_KEY = "爱德华|H00Q";
+/** 爱德华玩家英雄 rawcode。 */
+export const EDWARD_HERO_ID = "H00Q";
 
 /**
  * 特殊单位消耗处理配置表

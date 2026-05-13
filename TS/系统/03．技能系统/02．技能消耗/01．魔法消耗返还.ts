@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 魔法消耗返还模块
  *
@@ -46,7 +47,7 @@ function onManaRefundTimerExpire(this: void): void {
  * 检查技能是否可参与返蓝逻辑
  * 默认仅处理 nightelf 技能
  */
-export function isRefundableAbility(abilityId: number): boolean {
+export function isRefundableAbility(this: void, abilityId: number): boolean {
   const race = getObjectProperty(ObjectType.ABILITY, abilityId, "race");
   return race === "nightelf";
 }
@@ -58,14 +59,14 @@ export function isRefundableAbility(abilityId: number): boolean {
 /**
  * 获取技能固定消耗
  */
-export function getAbilityManaCost(unit: any, abilityId: number, level: number): number {
+export function getAbilityManaCost(this: void, unit: any, abilityId: number, level: number): number {
   return YDWEGetUnitAbilityDataInteger(unit, abilityId, level, 104);
 }
 
 /**
  * 获取技能百分比消耗
  */
-export function getAbilityPercentCost(unit: any, abilityId: number, level: number): number {
+export function getAbilityPercentCost(this: void, unit: any, abilityId: number, level: number): number {
   return YDWEGetUnitAbilityDataReal(unit, abilityId, level, 102);
 }
 
@@ -73,6 +74,7 @@ export function getAbilityPercentCost(unit: any, abilityId: number, level: numbe
  * 计算技能总消耗
  */
 export function calcTotalManaCost(
+  this: void,
   unit: any,
   abilityId: number,
   level: number
@@ -96,13 +98,13 @@ export function calcTotalManaCost(
 /**
  * 获取魔法消耗属性
  */
-export function getManaCostReduction(unit: any): number {
+export function getManaCostReduction(this: void, unit: any): number {
   const player = jass.GetOwningPlayer(unit);
   if (player == null) return 0;
   return YDUserDataGet("player", player, "魔法消耗", "real");
 }
 
-export function hasEffectiveManaCostReduction(unit: any): boolean {
+export function hasEffectiveManaCostReduction(this: void, unit: any): boolean {
   const reduction = getManaCostReduction(unit);
   const refundRatio = reduction < 0 ? -reduction : reduction;
   return refundRatio >= 0.01;
@@ -111,7 +113,7 @@ export function hasEffectiveManaCostReduction(unit: any): boolean {
 /**
  * 执行魔法返还
  */
-export function applyManaRefund(unit: any, manaCost: number): void {
+export function applyManaRefund(this: void, unit: any, manaCost: number): void {
   const reduction = getManaCostReduction(unit);
   const refundRatio = reduction < 0 ? -reduction : reduction;
   if (refundRatio < 0.01) return;
@@ -136,7 +138,7 @@ export function applyManaRefund(unit: any, manaCost: number): void {
  * @param abilityId 技能ID
  * @returns 是否执行了返还
  */
-export function handleManaRefund(unit: any, abilityId: number): boolean {
+export function handleManaRefund(this: void, unit: any, abilityId: number): boolean {
   if (!isRefundableAbility(abilityId)) return false;
   if (!hasEffectiveManaCostReduction(unit)) return false;
 

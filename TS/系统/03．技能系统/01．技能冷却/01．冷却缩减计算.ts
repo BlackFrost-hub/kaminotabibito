@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 冷却缩减计算模块
  *
@@ -5,20 +6,53 @@
  */
 
 const jass = require("jass.common") as any;
-const {
-  YDUserDataGet,
-  YDWESetUnitAbilityDataReal,
-  getObjectPropertyReal,
-  ObjectType,
-} = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;
-  getObjectPropertyReal: (objectType: number, objectId: number | string, property: string) => number;
-  ObjectType: { ABILITY: number };
+const YD安全模块 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (
+    this: void,
+    tableType: string,
+    tableKey: any,
+    attr: string,
+    valueType: string
+  ) => any;
+  getObjectPropertyRealSafe: (
+    this: void,
+    objectType: number,
+    objectId: number | string,
+    property: string
+  ) => number;
+  YDWESetUnitAbilityDataRealSafe: (
+    this: void,
+    unit: any,
+    abilityId: number,
+    level: number,
+    dataType: number,
+    value: number
+  ) => boolean;
 };
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
-};
+const 通用工具模块 = require("lib.扩展函数.封装函数.01．通用工具.index") as any;
+const YD读取用户数据 = YD安全模块.YDUserDataGetSafe as (
+  this: void,
+  tableType: string,
+  tableKey: any,
+  attr: string,
+  valueType: string
+) => any;
+const YD设置技能冷却数据 = YD安全模块.YDWESetUnitAbilityDataRealSafe as (
+  this: void,
+  unit: any,
+  abilityId: number,
+  level: number,
+  dataType: number,
+  value: number
+) => boolean;
+const YD读取对象实数属性 = YD安全模块.getObjectPropertyRealSafe as (
+  this: void,
+  objectType: number,
+  objectId: number | string,
+  property: string
+) => number;
+const 转四字节 = 通用工具模块.stringToFourCC as (this: void, raw: string) => number;
+const 技能对象类型 = 0;
 const {
   COOLDOWN_REDUCTION_CAP,
   SKILL_COOLDOWN_CAPS,
@@ -32,8 +66,9 @@ const {
 };
 
 function 提取内部ID(配置键名: string): string {
+  if (!配置键名) return "";
   const 片段列表 = 配置键名.split("|");
-  return 片段列表[片段列表.length - 1] ?? 配置键名;
+  return 片段列表[片段列表.length - 1] ?? "";
 }
 
 //=============================================================================
@@ -44,7 +79,7 @@ function 提取内部ID(配置键名: string): string {
  * 检查技能是否在黑名单中
  */
 export function isBlacklistedSkill(abilityId: number): boolean {
-  return COOLDOWN_BLACKLIST.some(配置键名 => stringToFourCC(提取内部ID(配置键名)) === abilityId);
+  return COOLDOWN_BLACKLIST.some(配置键名 => 转四字节(提取内部ID(配置键名)) === abilityId);
 }
 
 /**
@@ -52,7 +87,7 @@ export function isBlacklistedSkill(abilityId: number): boolean {
  */
 export function isExcludedUnit(unit: any): boolean {
   const unitTypeId = jass.GetUnitTypeId(unit);
-  return unitTypeId === stringToFourCC(提取内部ID(EXCLUDED_COOLDOWN_UNIT));
+  return unitTypeId === 转四字节(提取内部ID(EXCLUDED_COOLDOWN_UNIT));
 }
 
 //=============================================================================
@@ -67,12 +102,12 @@ export function isExcludedUnit(unit: any): boolean {
 function getCooldownAttrValue(unit: any, attrName: string): number {
   if (unit == null) return 0;
 
-  const unitValue = YDUserDataGet("unit", unit, attrName, "real");
+  const unitValue = YD读取用户数据("unit", unit, attrName, "real");
   if (unitValue > 0.01) return unitValue;
 
   const player = jass.GetOwningPlayer(unit);
   if (player == null) return 0;
-  return YDUserDataGet("player", player, attrName, "real");
+  return YD读取用户数据("player", player, attrName, "real");
 }
 
 /**
@@ -103,7 +138,7 @@ export function getCooldownReductionBonus(unit: any): number {
 export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
   // 检查技能独立上限
   for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
-    if (stringToFourCC(提取内部ID(配置键名)) === abilityId) {
+    if (转四字节(提取内部ID(配置键名)) === abilityId) {
       return cap;
     }
   }
@@ -127,7 +162,7 @@ export function applyCooldownCap(
 ): number {
   // 检查技能独立上限
   for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
-    if (stringToFourCC(提取内部ID(配置键名)) === abilityId) {
+    if (转四字节(提取内部ID(配置键名)) === abilityId) {
       return reduction < cap ? reduction : cap;
     }
   }
@@ -147,7 +182,7 @@ export function applyCooldownCap(
 export function getBaseCooldown(abilityId: number, level: number): number {
   // 使用YDWE函数读取技能冷却
   const coolKey = "Cool" + level;
-  return getObjectPropertyReal(ObjectType.ABILITY, abilityId, coolKey);
+  return YD读取对象实数属性(技能对象类型, abilityId, coolKey);
 }
 
 /**
@@ -176,7 +211,7 @@ export function setAbilityCooldown(
   cooldown: number
 ): void {
   // YDWESetUnitAbilityDataReal 参数105为冷却时间
-  YDWESetUnitAbilityDataReal(unit, abilityId, level, 105, cooldown);
+  YD设置技能冷却数据(unit, abilityId, level, 105, cooldown);
 }
 
 export {};

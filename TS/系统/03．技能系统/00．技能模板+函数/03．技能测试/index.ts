@@ -29,3 +29,4 @@ export * from "./120．诅咒命中率测试";
 export * from "./121．仇恨测试";
 export * from "./122．重伤测试";
 export * from "./123．重伤装备测试";
+export * from "./124．英雄技能记录测试";

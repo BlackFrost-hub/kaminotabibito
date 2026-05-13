@@ -20,7 +20,8 @@ const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");
 
-const { YDUserDataSet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
+const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
+  YDUserDataGet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
   YDUserDataSet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
 };
 
@@ -214,6 +215,11 @@ function registerPlayerHero(whichPlayer: any, whichHero: any): void {
   if (whichPlayer == null || whichPlayer === 0 || whichHero == null || whichHero === 0) return;
   YDUserDataSet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit", whichHero);
   registerHeroDependents(whichHero);
+}
+
+export function getRegisteredPlayerHero(this: void, whichPlayer: any): any {
+  if (whichPlayer == null || whichPlayer === 0) return null;
+  return YDUserDataGet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit");
 }
 
 /**

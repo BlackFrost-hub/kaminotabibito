@@ -18,6 +18,7 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local createDelayedCall = ____require_result_0.createDelayedCall
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataGet = ____require_result_1.YDUserDataGet
 local YDUserDataSet = ____require_result_1.YDUserDataSet
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
 local YDLocal5Get = ____require_result_2.YDLocal5Get
@@ -168,6 +169,18 @@ local function registerPlayerHero(whichPlayer, whichHero)
         whichHero
     )
     registerHeroDependents(whichHero)
+end
+function ____exports.getRegisteredPlayerHero(whichPlayer)
+    if whichPlayer == nil or whichPlayer == 0 then
+        return nil
+    end
+    return YDUserDataGet(
+        nil,
+        "player",
+        whichPlayer,
+        C.YD_ATTR_PLAYER_HERO_UNIT,
+        "unit"
+    )
 end
 --- 从 JASS 传入的单个英雄单位完成一次登记。
 -- 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。

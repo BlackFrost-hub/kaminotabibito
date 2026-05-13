@@ -5,6 +5,9 @@ local ____exports = {}
 local jass = require("jass.common")
 --- 将 4 字符字符串转换为 FourCC 数字（用于物品/单位 ID）
 function ____exports.stringToFourCC(self, s)
+    if not s or #s < 4 then
+        return 0
+    end
     local b1 = string.byte(s, 1)
     local b2 = string.byte(s, 2)
     local b3 = string.byte(s, 3)

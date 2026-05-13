@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 技能消耗系统 - 统一导出和初始化入口
  */
@@ -5,6 +6,7 @@
 export * from "./00．消耗常量";
 export * from "./01．魔法消耗返还";
 export * from "./02．特殊单位消耗";
+export * from "./03．QWERD魔法消耗显示";
 
 const jass = require("jass.common") as any;
 
@@ -12,15 +14,24 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
-const { handleManaRefund, calcTotalManaCost } = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as {
-  handleManaRefund: (unit: any, abilityId: number) => boolean;
-  calcTotalManaCost: (unit: any, abilityId: number, level: number) => number;
-};
+const 魔法消耗返还模块 = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as any;
+const 特殊单位消耗模块 = require("系统.03．技能系统.02．技能消耗.02．特殊单位消耗") as any;
 
-const { isEdwardUnit, handleEdwardPassiveCost } = require("系统.03．技能系统.02．技能消耗.02．特殊单位消耗") as {
-  isEdwardUnit: (unit: any) => boolean;
-  handleEdwardPassiveCost: (unit: any, manaCost: number) => void;
-};
+function handleManaRefund(this: void, unit: any, abilityId: number): boolean {
+  return 魔法消耗返还模块["handleManaRefund"](unit, abilityId);
+}
+
+function calcTotalManaCost(this: void, unit: any, abilityId: number, level: number): number {
+  return 魔法消耗返还模块["calcTotalManaCost"](unit, abilityId, level);
+}
+
+function isEdwardUnit(this: void, unit: any): boolean {
+  return 特殊单位消耗模块["isEdwardUnit"](unit);
+}
+
+function handleEdwardPassiveCost(this: void, unit: any, manaCost: number): void {
+  特殊单位消耗模块["handleEdwardPassiveCost"](unit, manaCost);
+}
 
 function onSpellEffectForCost(this: void, castingUnit: any, spellAbilityId: number): void {
   handleManaRefund(castingUnit, spellAbilityId);
@@ -35,3 +46,4 @@ function onSpellEffectForCost(this: void, castingUnit: any, spellAbilityId: numb
 }
 
 registerSpellEffectListener(onSpellEffectForCost);
+require("系统.03．技能系统.02．技能消耗.03．QWERD魔法消耗显示").初始化QWERD魔法消耗显示();

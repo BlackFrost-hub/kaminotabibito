@@ -33,6 +33,14 @@ do
     end
 end
 do
+    local ____export = require("系统.00．核心系统.02．功能开关.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.00．核心系统.05．中心计时器")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -84,6 +92,7 @@ local function registerCoreGlobals(self)
 end
 require("系统.00．核心系统.01．颜色常量")
 require("系统.00．核心系统.02．硬件函数")
+require("系统.00．核心系统.02．功能开关.index")
 require("系统.00．核心系统.03．UI函数")
 require("系统.00．核心系统.01．事件中心.index")
 registerCoreGlobals(nil)

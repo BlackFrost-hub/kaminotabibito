@@ -1,36 +1,35 @@
-local ____lualib = require("lualib_bundle")
-local __TS__StringSplit = ____lualib.__TS__StringSplit
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 特殊单位消耗处理
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
+local ____require_result_0 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
+local _____662F_5426_6307_5B9A_73A9_5BB6_82F1_96C4 = ____require_result_0["是否指定玩家英雄"]
+local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.00．消耗常量")
-local EDWARD_UNIT_CONFIG_KEY = ____require_result_1.EDWARD_UNIT_CONFIG_KEY
+local EDWARD_HERO_ID = ____require_result_1.EDWARD_HERO_ID
 local SPECIAL_UNIT_COST_CONFIG = ____require_result_1.SPECIAL_UNIT_COST_CONFIG
-local function _____63D0_53D6_663E_793A_540D(self, _____914D_7F6E_952E_540D)
-    local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
-    return _____7247_6BB5_5217_8868[1] or _____914D_7F6E_952E_540D
-end
 --- 获取爱德华单位。
--- 当前仍沿用前半段显示名作为缓存键，避免你尚未填写真实内部 ID 时改坏行为。
-function ____exports.getEdwardUnit(self)
-    return YDUserDataGet(
-        nil,
-        "string",
-        _____63D0_53D6_663E_793A_540D(nil, EDWARD_UNIT_CONFIG_KEY),
-        "单位",
-        "unit"
-    )
+-- 通过玩家英雄注册桥接查当前已登记的玩家英雄，再按配置 rawcode 过滤。
+function ____exports.getEdwardUnit()
+    do
+        local playerId = 0
+        while playerId <= 4 do
+            local hero = heroBridge.getRegisteredPlayerHero(jass.Player(playerId))
+            if _____662F_5426_6307_5B9A_73A9_5BB6_82F1_96C4(hero, EDWARD_HERO_ID) then
+                return hero
+            end
+            playerId = playerId + 1
+        end
+    end
+    return nil
 end
 --- 检查单位是否为爱德华。
-function ____exports.isEdwardUnit(self, unit)
-    local edward = ____exports.getEdwardUnit(nil)
-    return edward ~= nil and unit == edward
+function ____exports.isEdwardUnit(unit)
+    return _____662F_5426_6307_5B9A_73A9_5BB6_82F1_96C4(unit, EDWARD_HERO_ID)
 end
 --- 爱德华被动处理：扣血代替扣蓝。
-function ____exports.handleEdwardPassiveCost(self, unit, manaCost)
-    if not ____exports.isEdwardUnit(nil, unit) then
+function ____exports.handleEdwardPassiveCost(unit, manaCost)
+    if not ____exports.isEdwardUnit(unit) then
         return
     end
     local currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)

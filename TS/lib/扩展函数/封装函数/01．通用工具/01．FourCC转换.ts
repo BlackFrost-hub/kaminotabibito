@@ -8,7 +8,8 @@ const jass = require("jass.common") as any;
 /**
  * 将 4 字符字符串转换为 FourCC 数字（用于物品/单位 ID）
  */
-export function stringToFourCC(s: string): number {
+export function stringToFourCC(s: string | undefined | null): number {
+  if (!s || s.length < 4) return 0;
   const b1 = (string as any).byte(s, 1) as number;
   const b2 = (string as any).byte(s, 2) as number;
   const b3 = (string as any).byte(s, 3) as number;

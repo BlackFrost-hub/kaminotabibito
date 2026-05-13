@@ -1,8 +1,5 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
-local __TS__ParseInt = ____lualib.__TS__ParseInt
-local __TS__Number = ____lualib.__TS__Number
-local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__StringSlice = ____lualib.__TS__StringSlice
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
@@ -11,16 +8,13 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWESetUnitAbilityDataString = ____require_result_0.YDWESetUnitAbilityDataString
-local EXExecuteScript = ____require_result_0.EXExecuteScript
 local getObjectProperty = ____require_result_0.getObjectProperty
 local ObjectType = ____require_result_0.ObjectType
 local ABILITY_DATA_UBERTIP = ____require_result_0.ABILITY_DATA_UBERTIP
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataGet = ____require_result_1.YDUserDataGet
-local YDUserDataSet = ____require_result_1.YDUserDataSet
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
-local getSoleSelectedUnitForPlayer = ____require_result_2.getSoleSelectedUnitForPlayer
-local PLAYER_HERO_ATTR = "英雄"
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
+local getSoleSelectedUnitForPlayer = ____require_result_1.getSoleSelectedUnitForPlayer
+local commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位")
+local heroSkillRecord = require("系统.03．技能系统.05．动态技能说明.05．英雄技能记录")
 local SLOT_ROW = 2
 local UPDATE_INTERVAL_MS = 1000
 local SLOT_KEYS = {"Q技能", "W技能", "E技能", "R技能"}
@@ -35,19 +29,6 @@ local function replaceAllText(text, search, replacement)
         replacement or ","
     )
 end
-local function getRegisteredHeroForLocalPlayer()
-    local localPlayer = jass.GetLocalPlayer()
-    if not localPlayer or localPlayer == 0 then
-        return nil
-    end
-    return YDUserDataGet(
-        nil,
-        "player",
-        localPlayer,
-        PLAYER_HERO_ATTR,
-        "unit"
-    )
-end
 local function getSelectedRegisteredHeroForLocalPlayer()
     local localPlayer = jass.GetLocalPlayer()
     if not localPlayer or localPlayer == 0 then
@@ -58,22 +39,16 @@ local function getSelectedRegisteredHeroForLocalPlayer()
     if not selectedUnit or selectedUnit == 0 then
         return nil
     end
-    local registeredHero = getRegisteredHeroForLocalPlayer()
-    if not registeredHero or registeredHero == 0 then
+    if jass.GetOwningPlayer(selectedUnit) ~= localPlayer then
         return nil
     end
-    if selectedUnit ~= registeredHero then
+    if jass.IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
         return nil
     end
-    return registeredHero
+    return selectedUnit
 end
 local function resolveAbilityIdBySlot(column)
-    local rawAbility = EXExecuteScript(
-        nil,
-        ((("require 'jass.message'.button(" .. tostring(column)) .. ",") .. tostring(SLOT_ROW)) .. ")"
-    )
-    local abilityId = __TS__ParseInt(rawAbility, 10)
-    return __TS__NumberIsFinite(__TS__Number(abilityId)) and abilityId or 0
+    return commandBarAbility["读取命令卡按钮能力Id"](column, SLOT_ROW)
 end
 local function extractCurrentLevelSegment(template, level)
     if not template then
@@ -122,37 +97,30 @@ local function renderTooltipText(hero, rawTemplate, level)
     )
     return result
 end
-local function recordHeroSlotAbility(hero, slotKey, abilityId)
-    if not hero or hero == 0 or not abilityId then
-        return
-    end
-    YDUserDataSet(
-        nil,
-        "unit",
-        hero,
-        slotKey,
-        "integer",
-        abilityId
-    )
-end
 local function getHeroSlotAbility(hero, slotKey)
-    local abilityId = YDUserDataGet(
-        nil,
-        "unit",
-        hero,
-        slotKey,
-        "integer"
-    )
-    return type(abilityId) == "number" and abilityId or 0
+    if not hero or hero == 0 then
+        return 0
+    end
+    if slotKey == SLOT_KEYS[1] then
+        return heroSkillRecord.getHeroRecordedSkill(hero, "Q")
+    end
+    if slotKey == SLOT_KEYS[2] then
+        return heroSkillRecord.getHeroRecordedSkill(hero, "W")
+    end
+    if slotKey == SLOT_KEYS[3] then
+        return heroSkillRecord.getHeroRecordedSkill(hero, "E")
+    end
+    if slotKey == SLOT_KEYS[4] then
+        return heroSkillRecord.getHeroRecordedSkill(hero, "R")
+    end
+    return 0
 end
 local function refreshOneSlot(hero, slotKey, column)
     if not hero or hero == 0 then
         return
     end
     local abilityId = resolveAbilityIdBySlot(column)
-    if abilityId ~= 0 then
-        recordHeroSlotAbility(hero, slotKey, abilityId)
-    else
+    if abilityId == 0 then
         abilityId = getHeroSlotAbility(hero, slotKey)
     end
     if abilityId == 0 then
@@ -197,45 +165,13 @@ function ____exports.initSkillButtonHover(self)
         return
     end
     periodicInstalled = true
-    local ____G_3 = _G
-    local addPeriodicCallback = ____G_3.addPeriodicCallback
+    local ____G_2 = _G
+    local addPeriodicCallback = ____G_2.addPeriodicCallback
     addPeriodicCallback(UPDATE_INTERVAL_MS, onPeriodicUpdate)
 end
 function ____exports.onPlayerHeroRegistered(self, whichPlayer, whichHero)
     if not whichPlayer or whichPlayer == 0 or not whichHero or whichHero == 0 then
         return
     end
-    YDUserDataSet(
-        nil,
-        "unit",
-        whichHero,
-        SLOT_KEYS[1],
-        "integer",
-        0
-    )
-    YDUserDataSet(
-        nil,
-        "unit",
-        whichHero,
-        SLOT_KEYS[2],
-        "integer",
-        0
-    )
-    YDUserDataSet(
-        nil,
-        "unit",
-        whichHero,
-        SLOT_KEYS[3],
-        "integer",
-        0
-    )
-    YDUserDataSet(
-        nil,
-        "unit",
-        whichHero,
-        SLOT_KEYS[4],
-        "integer",
-        0
-    )
 end
 return ____exports

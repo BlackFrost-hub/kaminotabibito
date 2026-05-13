@@ -40,12 +40,12 @@ local function onManaRefundTimerExpire()
 end
 --- 检查技能是否可参与返蓝逻辑
 -- 默认仅处理 nightelf 技能
-function ____exports.isRefundableAbility(self, abilityId)
+function ____exports.isRefundableAbility(abilityId)
     local race = getObjectProperty(nil, ObjectType.ABILITY, abilityId, "race")
     return race == "nightelf"
 end
 --- 获取技能固定消耗
-function ____exports.getAbilityManaCost(self, unit, abilityId, level)
+function ____exports.getAbilityManaCost(unit, abilityId, level)
     return YDWEGetUnitAbilityDataInteger(
         nil,
         unit,
@@ -55,7 +55,7 @@ function ____exports.getAbilityManaCost(self, unit, abilityId, level)
     )
 end
 --- 获取技能百分比消耗
-function ____exports.getAbilityPercentCost(self, unit, abilityId, level)
+function ____exports.getAbilityPercentCost(unit, abilityId, level)
     return YDWEGetUnitAbilityDataReal(
         nil,
         unit,
@@ -65,9 +65,9 @@ function ____exports.getAbilityPercentCost(self, unit, abilityId, level)
     )
 end
 --- 计算技能总消耗
-function ____exports.calcTotalManaCost(self, unit, abilityId, level)
-    local fixedCost = ____exports.getAbilityManaCost(nil, unit, abilityId, level)
-    local percentCost = ____exports.getAbilityPercentCost(nil, unit, abilityId, level)
+function ____exports.calcTotalManaCost(unit, abilityId, level)
+    local fixedCost = ____exports.getAbilityManaCost(unit, abilityId, level)
+    local percentCost = ____exports.getAbilityPercentCost(unit, abilityId, level)
     if percentCost >= PERCENT_COST_THRESHOLD then
         return -1
     end
@@ -75,7 +75,7 @@ function ____exports.calcTotalManaCost(self, unit, abilityId, level)
     return fixedCost + maxMana * percentCost
 end
 --- 获取魔法消耗属性
-function ____exports.getManaCostReduction(self, unit)
+function ____exports.getManaCostReduction(unit)
     local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return 0
@@ -88,14 +88,14 @@ function ____exports.getManaCostReduction(self, unit)
         "real"
     )
 end
-function ____exports.hasEffectiveManaCostReduction(self, unit)
-    local reduction = ____exports.getManaCostReduction(nil, unit)
+function ____exports.hasEffectiveManaCostReduction(unit)
+    local reduction = ____exports.getManaCostReduction(unit)
     local refundRatio = reduction < 0 and -reduction or reduction
     return refundRatio >= 0.01
 end
 --- 执行魔法返还
-function ____exports.applyManaRefund(self, unit, manaCost)
-    local reduction = ____exports.getManaCostReduction(nil, unit)
+function ____exports.applyManaRefund(unit, manaCost)
+    local reduction = ____exports.getManaCostReduction(unit)
     local refundRatio = reduction < 0 and -reduction or reduction
     if refundRatio < 0.01 then
         return
@@ -114,19 +114,19 @@ end
 -- @param unit 施法单位
 -- @param abilityId 技能ID
 -- @returns 是否执行了返还
-function ____exports.handleManaRefund(self, unit, abilityId)
-    if not ____exports.isRefundableAbility(nil, abilityId) then
+function ____exports.handleManaRefund(unit, abilityId)
+    if not ____exports.isRefundableAbility(abilityId) then
         return false
     end
-    if not ____exports.hasEffectiveManaCostReduction(nil, unit) then
+    if not ____exports.hasEffectiveManaCostReduction(unit) then
         return false
     end
     local level = jass.GetUnitAbilityLevel(unit, abilityId)
-    local manaCost = ____exports.calcTotalManaCost(nil, unit, abilityId, level)
+    local manaCost = ____exports.calcTotalManaCost(unit, abilityId, level)
     if manaCost < 0 then
         return false
     end
-    ____exports.applyManaRefund(nil, unit, manaCost)
+    ____exports.applyManaRefund(unit, manaCost)
     return true
 end
 return ____exports
