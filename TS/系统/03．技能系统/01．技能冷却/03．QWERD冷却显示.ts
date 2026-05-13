@@ -18,7 +18,7 @@ const 功能开关模块 = require("系统.00．核心系统.02．功能开关.0
 const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
-const commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位") as {
+const commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位") as {
   读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
   获取D技能槽位: (this: void, whichHero: any) => readonly [number, number];
 };

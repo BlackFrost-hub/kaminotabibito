@@ -27,7 +27,6 @@ local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
-local dynamicSkillTipSystem = require("系统.03．技能系统.05．动态技能说明.index")
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_3.debugLog
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
@@ -79,7 +78,6 @@ local function isPlayableHero(whichUnit)
     local playerId = jass.GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
---- 经局部变量再调，避免 TSTL 编成 `mod:fn(...)`；`onPlayerHeroRegistered` 在面板模块已标 `this: void`，勿再注入 nil 首参
 local function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
     local mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
     local cb = mod.onPlayerHeroRegistered
@@ -108,7 +106,6 @@ local function invokeSelectionCenterSeed(whichPlayer, whichUnit)
     end
     seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
 end
---- 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
 local function registerHeroDependents(whichHero)
     if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
         moveTornado:registerMoveSpeedTornadoHero(whichHero)
@@ -121,9 +118,6 @@ local function registerHeroDependents(whichHero)
     end
     local owner = jass.GetOwningPlayer(whichHero)
     if owner ~= nil and owner ~= 0 then
-        if type(dynamicSkillTipSystem.onPlayerHeroRegistered) == "function" then
-            dynamicSkillTipSystem.onPlayerHeroRegistered(owner, whichHero)
-        end
         local playerId = jass.GetPlayerId(owner)
         debugLog(
             nil,
@@ -153,9 +147,6 @@ local function registerHeroDependents(whichHero)
         end
     end
 end
---- 为单个玩家登记英雄：
--- 1. 写入玩家侧 YDUserData
--- 2. 触发后续联动模块注册
 local function registerPlayerHero(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 or whichHero == nil or whichHero == 0 then
         return
@@ -182,8 +173,6 @@ function ____exports.getRegisteredPlayerHero(whichPlayer)
         "unit"
     )
 end
---- 从 JASS 传入的单个英雄单位完成一次登记。
--- 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。
 local function registerSingleHero(whichHero)
     if not isPlayableHero(whichHero) then
         return
@@ -194,7 +183,6 @@ local function registerSingleHero(whichHero)
     end
     registerPlayerHero(owner, whichHero)
 end
---- STES 子触发真正执行的核心入口。
 local function runRegisterPlayerHero()
     helper:ydlStes_syncTriggerStep(nil)
     do
@@ -209,11 +197,9 @@ end
 local function runRegisterPlayerHeroTriggerAction()
     runRegisterPlayerHero()
 end
---- 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
 local function scheduleRetry(fn)
     createDelayedCall(RETRY_SEC, fn)
 end
---- 向 JASS 侧 STES 表注册“玩家英雄注册”监听。
 local function tryRegisterPlayerHeroStes()
     local g = _G
     if g[REG_GUARD] then
@@ -236,7 +222,6 @@ local function tryRegisterPlayerHeroStes()
         tryRegisterPlayerHeroStes()
     end)
 end
---- 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
 function ____exports.initPlayerHeroGetBridge()
     if type(outOfCombat.initOutOfCombat) == "function" then
         outOfCombat:initOutOfCombat()

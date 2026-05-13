@@ -51,9 +51,6 @@ const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．
 const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
   registerChestSystemHero: (whichHero: any) => void;
 };
-const dynamicSkillTipSystem = require("系统.03．技能系统.05．动态技能说明.index") as {
-  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
-};
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
 };
@@ -90,14 +87,12 @@ function isPlayableHero(whichUnit: any): boolean {
   const owner = jass.GetOwningPlayer(whichUnit);
   if (owner == null || owner === 0) return false;
 
-  // 排除电脑玩家 (MAP_CONTROL_COMPUTER = 2)
   if (jass.GetPlayerController(owner) === jass.MAP_CONTROL_COMPUTER) return false;
 
   const playerId = (jass.GetPlayerId(owner) as number) || -1;
   return playerId >= 0 && playerId <= 4;
 }
 
-/** 经局部变量再调，避免 TSTL 编成 `mod:fn(...)`；`onPlayerHeroRegistered` 在面板模块已标 `this: void`，勿再注入 nil 首参 */
 function invokeUiAttrOnPlayerHeroRegistered(whichPlayer: any, whichHero: any): void {
   const mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染") as {
     onPlayerHeroRegistered?: (this: void, w: any, h: any) => void;
@@ -107,20 +102,16 @@ function invokeUiAttrOnPlayerHeroRegistered(whichPlayer: any, whichHero: any): v
   cb(whichPlayer, whichHero);
 }
 
-// 记录已注册UI的玩家，防止重复注册
 const uiRegisteredPlayers = new Set<number>();
 
-// 对话框系统
 const dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 
-// BuffUI系统
 const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 
-// 任务UI系统
 const taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => boolean;
 };
@@ -149,9 +140,6 @@ function invokeSelectionCenterSeed(whichPlayer: any, whichUnit: any): void {
   seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit);
 }
 
-/**
- * 在英雄登记完成后，把它继续分发给依赖英雄注册结果的子模块。
- */
 function registerHeroDependents(whichHero: any): void {
   if (typeof moveTornado.registerMoveSpeedTornadoHero === "function") {
     moveTornado.registerMoveSpeedTornadoHero(whichHero);
@@ -164,33 +152,25 @@ function registerHeroDependents(whichHero: any): void {
   }
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner != null && owner !== 0) {
-    if (typeof dynamicSkillTipSystem.onPlayerHeroRegistered === "function") {
-      dynamicSkillTipSystem.onPlayerHeroRegistered(owner, whichHero);
-    }
-
     const playerId = jass.GetPlayerId(owner);
     debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
 
     invokeSelectionCenterInit(owner);
     invokeSelectionCenterSeed(owner, whichHero);
 
-    // UI系统只注册一次，防止重复注册
     if (!uiRegisteredPlayers.has(playerId)) {
       let taskUiReady = true;
 
       invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
 
-      // 对话框系统 - 为玩家创建对话框UI
       if (typeof dialogSystem.onPlayerHeroRegistered === "function") {
         dialogSystem.onPlayerHeroRegistered(owner, whichHero);
       }
 
-      // BuffUI系统 - 为玩家创建BuffUI
       if (typeof buffUISystem.onPlayerHeroRegistered === "function") {
         buffUISystem.onPlayerHeroRegistered(owner, whichHero);
       }
 
-      // 任务UI系统 - 为玩家创建N槽任务UI
       if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
         taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
       }
@@ -206,11 +186,6 @@ function registerHeroDependents(whichHero: any): void {
   }
 }
 
-/**
- * 为单个玩家登记英雄：
- * 1. 写入玩家侧 YDUserData
- * 2. 触发后续联动模块注册
- */
 function registerPlayerHero(whichPlayer: any, whichHero: any): void {
   if (whichPlayer == null || whichPlayer === 0 || whichHero == null || whichHero === 0) return;
   YDUserDataSet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit", whichHero);
@@ -222,10 +197,6 @@ export function getRegisteredPlayerHero(this: void, whichPlayer: any): any {
   return YDUserDataGet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit");
 }
 
-/**
- * 从 JASS 传入的单个英雄单位完成一次登记。
- * 现在桥接的粒度改为“每次 STES 只注册一个英雄”，避免重复扫组。
- */
 function registerSingleHero(whichHero: any): void {
   if (!isPlayableHero(whichHero)) return;
 
@@ -234,9 +205,6 @@ function registerSingleHero(whichHero: any): void {
   registerPlayerHero(owner, whichHero);
 }
 
-/**
- * STES 子触发真正执行的核心入口。
- */
 function runRegisterPlayerHero(): void {
   helper.ydlStes_syncTriggerStep(undefined);
   try {
@@ -250,16 +218,10 @@ function runRegisterPlayerHeroTriggerAction(): void {
   runRegisterPlayerHero();
 }
 
-/**
- * 由于 STES 表绑定时机可能晚于 Lua 模块加载，这里用短延迟重试注册。
- */
 function scheduleRetry(fn: () => void): void {
   createDelayedCall(RETRY_SEC, fn);
 }
 
-/**
- * 向 JASS 侧 STES 表注册“玩家英雄注册”监听。
- */
 function tryRegisterPlayerHeroStes(): void {
   const g = globalThis as any;
   if (g[REG_GUARD]) return;
@@ -286,11 +248,7 @@ function tryRegisterPlayerHeroStes(): void {
   });
 }
 
-/**
- * 玩家系统初始化时调用，建立 JASS -> Lua 的玩家英雄注册桥接。
- */
 export function initPlayerHeroGetBridge(): void {
-  // 初始化脱战计时系统。
   if (typeof outOfCombat.initOutOfCombat === "function") {
     outOfCombat.initOutOfCombat();
   }

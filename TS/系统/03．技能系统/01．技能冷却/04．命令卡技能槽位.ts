@@ -20,6 +20,7 @@ export const 命令卡热键槽位表: ReadonlyArray<readonly [number, number, �
   [3, 2, "R"],
   [0, 1, "D"],
 ] as const;
+
 export const D技能候选槽位表: ReadonlyArray<readonly [number, number]> = [
   [0, 1],
   [2, 1],
