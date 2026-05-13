@@ -6,16 +6,13 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_1.debugLogForce
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSystem.getSoleSelectedUnitForPlayer
-local _____83B7_53D6_73A9_5BB6_9009_4E2D_8C03_8BD5_4FE1_606F = selectionCenterSystem.getSelectionDebugForPlayer
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local ____require_result_2 = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还")
-local calcTotalManaCost = ____require_result_2.calcTotalManaCost
-local getAbilityManaCost = ____require_result_2.getAbilityManaCost
+local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还")
+local calcTotalManaCost = ____require_result_1.calcTotalManaCost
+local getAbilityManaCost = ____require_result_1.getAbilityManaCost
 local commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位")
 local DzGetGameUI = japi.DzGetGameUI
 local DzCreateFrameByTagName = japi.DzCreateFrameByTagName
@@ -43,10 +40,8 @@ local TEXT_OFFSET_Y = -0.0013
 local SHADOW_OFFSET_X = 0.0006
 local SHADOW_OFFSET_Y = -0.0006
 local _____56FA_5B9A_69FD_4F4D_8868 = {Q = {x = 0, y = 2}, W = {x = 1, y = 2}, E = {x = 2, y = 2}, R = {x = 3, y = 2}}
-local MODULE_NAME = "QWERD魔法消耗显示"
 local initialized = false
 local _____663E_793A_7F13_5B58 = nil
-local lastDebugSignature = ""
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -86,12 +81,6 @@ local function _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
         return nil
     end
     return _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
-end
-local function _____8BFB_53D6_73A9_5BB6_9009_4E2D_8C03_8BD5_4FE1_606F(playerId)
-    if type(_____83B7_53D6_73A9_5BB6_9009_4E2D_8C03_8BD5_4FE1_606F) ~= "function" then
-        return "no_selection_debug"
-    end
-    return _____83B7_53D6_73A9_5BB6_9009_4E2D_8C03_8BD5_4FE1_606F(playerId)
 end
 local function getHeroSource(localPlayer)
     local playerId = jass.GetPlayerId(localPlayer)
@@ -310,119 +299,6 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, ui)
     )
     _____5B89_5168_663E_793A_6846_4F53(ui.text, true)
 end
-local function emitDebug(whichHero)
-    local qId = _____83B7_53D6_6280_80FDId(whichHero, "Q")
-    local wId = _____83B7_53D6_6280_80FDId(whichHero, "W")
-    local eId = _____83B7_53D6_6280_80FDId(whichHero, "E")
-    local rId = _____83B7_53D6_6280_80FDId(whichHero, "R")
-    local dId = _____83B7_53D6_6280_80FDId(whichHero, "D")
-    local qLevel = qId == 0 and 0 or jass.GetUnitAbilityLevel(whichHero, qId)
-    local wLevel = wId == 0 and 0 or jass.GetUnitAbilityLevel(whichHero, wId)
-    local eLevel = eId == 0 and 0 or jass.GetUnitAbilityLevel(whichHero, eId)
-    local rLevel = rId == 0 and 0 or jass.GetUnitAbilityLevel(whichHero, rId)
-    local dLevel = dId == 0 and 0 or jass.GetUnitAbilityLevel(whichHero, dId)
-    local qCost = qLevel <= 0 and -999 or calcDisplayManaCost(whichHero, qId, qLevel)
-    local wCost = wLevel <= 0 and -999 or calcDisplayManaCost(whichHero, wId, wLevel)
-    local eCost = eLevel <= 0 and -999 or calcDisplayManaCost(whichHero, eId, eLevel)
-    local rCost = rLevel <= 0 and -999 or calcDisplayManaCost(whichHero, rId, rLevel)
-    local dCost = dLevel <= 0 and -999 or calcDisplayManaCost(whichHero, dId, dLevel)
-    local signature = table.concat(
-        {
-            tostring(whichHero),
-            tostring(qId),
-            tostring(qLevel),
-            tostring(qCost),
-            tostring(wId),
-            tostring(wLevel),
-            tostring(wCost),
-            tostring(eId),
-            tostring(eLevel),
-            tostring(eCost),
-            tostring(rId),
-            tostring(rLevel),
-            tostring(rCost),
-            tostring(dId),
-            tostring(dLevel),
-            tostring(dCost)
-        },
-        "|"
-    )
-    if signature == lastDebugSignature then
-        return
-    end
-    lastDebugSignature = signature
-    debugLogForce(
-        MODULE_NAME,
-        "hero=",
-        whichHero,
-        "Q=",
-        qId,
-        "level=",
-        qLevel,
-        "cost=",
-        qCost,
-        "W=",
-        wId,
-        "level=",
-        wLevel,
-        "cost=",
-        wCost,
-        "E=",
-        eId,
-        "level=",
-        eLevel,
-        "cost=",
-        eCost,
-        "R=",
-        rId,
-        "level=",
-        rLevel,
-        "cost=",
-        rCost,
-        "D=",
-        dId,
-        "level=",
-        dLevel,
-        "cost=",
-        dCost
-    )
-end
-local function emitNoHeroDebug()
-    local localPlayer = jass.GetLocalPlayer()
-    if not isValidHandle(localPlayer) then
-        return
-    end
-    local playerId = jass.GetPlayerId(localPlayer)
-    local registeredHero = heroBridge.getRegisteredPlayerHero(localPlayer)
-    local selectedUnit = _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
-    local selectionDebug = _____8BFB_53D6_73A9_5BB6_9009_4E2D_8C03_8BD5_4FE1_606F(playerId)
-    local signature = table.concat(
-        {
-            "NO_HERO",
-            tostring(playerId),
-            tostring(registeredHero),
-            tostring(selectedUnit),
-            selectionDebug
-        },
-        "|"
-    )
-    if signature == lastDebugSignature then
-        return
-    end
-    lastDebugSignature = signature
-    debugLogForce(
-        MODULE_NAME,
-        "NO_HERO",
-        "pid=",
-        playerId,
-        "registered=",
-        registeredHero,
-        "selected=",
-        selectedUnit,
-        "selection=",
-        selectionDebug
-    )
-end
 local function hideAll()
     if _____663E_793A_7F13_5B58 == nil then
         return
@@ -445,7 +321,6 @@ local function onTick()
     local hero = getLocalHero()
     if not isValidHandle(hero) then
         hideAll()
-        emitNoHeroDebug()
         return
     end
     _____5237_65B0_5355_4E2A_6280_80FD(hero, "Q", currentUi.Q)
@@ -453,14 +328,12 @@ local function onTick()
     _____5237_65B0_5355_4E2A_6280_80FD(hero, "E", currentUi.E)
     _____5237_65B0_5355_4E2A_6280_80FD(hero, "R", currentUi.R)
     _____5237_65B0_5355_4E2A_6280_80FD(hero, "D", currentUi.D)
-    emitDebug(hero)
 end
 ____exports["初始化QWERD魔法消耗显示"] = function()
     if initialized then
         return
     end
     initialized = true
-    debugLogForce(MODULE_NAME, "初始化完成")
     addPeriodicCallback(REFRESH_MS, onTick)
 end
 return ____exports

@@ -7,7 +7,6 @@ export * from "./00．冷却常量";
 export * from "./01．冷却缩减计算";
 export * from "./02．特殊技能处理";
 export * from "./03．QWERD冷却显示";
-export * from "./04．冷却记录";
 
 const jass = require("jass.common") as any;
 
@@ -38,11 +37,6 @@ const {
   handleSpecialSkillCooldown: 处理特殊技能冷却,
 } = require("系统.03．技能系统.01．技能冷却.02．特殊技能处理") as {
   handleSpecialSkillCooldown: (this: void, unit: any, abilityId: number, reduction: number) => boolean;
-};
-const {
-  记录技能冷却: 写入技能冷却记录,
-} = require("系统.03．技能系统.01．技能冷却.04．冷却记录") as {
-  记录技能冷却: (this: void, whichUnit: any, abilityId: number, cooldownSeconds: number) => void;
 };
 const { INDEPENDENT_COOLDOWN_SKILLS } = require("系统.03．技能系统.01．技能冷却.00．冷却常量") as {
   INDEPENDENT_COOLDOWN_SKILLS: string[];
@@ -94,10 +88,6 @@ function handleSpecialSkillCooldown(this: void, unit: any, abilityId: number, re
   return 处理特殊技能冷却(unit, abilityId, reduction);
 }
 
-function 记录技能冷却(this: void, whichUnit: any, abilityId: number, cooldownSeconds: number): void {
-  写入技能冷却记录(whichUnit, abilityId, cooldownSeconds);
-}
-
 function 提取内部ID(配置键名: string): string {
   if (!配置键名) return "";
   const 片段列表 = 配置键名.split("|");
@@ -119,22 +109,15 @@ function onSpellEffectForCooldown(this: void, castingUnit: any, spellAbilityId: 
   if (baseCooldown <= 0) return;
 
   const reduction = getCooldownReduction(castingUnit);
-  if (reduction < 0.01) {
-    记录技能冷却(castingUnit, spellAbilityId, baseCooldown);
-    return;
-  }
+  if (reduction < 0.01) return;
 
   const bonus = getCooldownReductionBonus(castingUnit);
   const cappedReduction = applyCooldownCap(reduction, spellAbilityId, bonus);
   const actualCooldown = calcActualCooldown(baseCooldown, cappedReduction);
 
-  if (handleSpecialSkillCooldown(castingUnit, spellAbilityId, cappedReduction)) {
-    记录技能冷却(castingUnit, spellAbilityId, actualCooldown);
-    return;
-  }
+  if (handleSpecialSkillCooldown(castingUnit, spellAbilityId, cappedReduction)) return;
 
   setAbilityCooldown(castingUnit, spellAbilityId, level, actualCooldown);
-  记录技能冷却(castingUnit, spellAbilityId, actualCooldown);
 }
 
 registerSpellEffectListener(onSpellEffectForCooldown);

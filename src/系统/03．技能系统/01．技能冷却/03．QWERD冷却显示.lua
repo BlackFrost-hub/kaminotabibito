@@ -10,9 +10,6 @@ local selectionCenterSystem = require("系统.00．核心系统.01．事件中�
 local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSystem.getSoleSelectedUnitForPlayer
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local heroSkillRecord = require("系统.03．技能系统.05．动态技能说明.05．英雄技能记录")
-local cooldownRecord = require("系统.03．技能系统.01．技能冷却.04．冷却记录")
-local _____83B7_53D6_6280_80FD_5269_4F59_51B7_5374 = cooldownRecord["获取技能剩余冷却"]
 local commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位")
 local ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWEGetUnitAbilityState = ydweAbility.YDWEGetUnitAbilityState
@@ -163,10 +160,6 @@ local function getCooldown(whichHero, abilityId)
     if not isValidHandle(whichHero) or abilityId == 0 then
         return 0
     end
-    local trackedCooldown = _____83B7_53D6_6280_80FD_5269_4F59_51B7_5374(whichHero, abilityId)
-    if trackedCooldown >= 0 then
-        return trackedCooldown
-    end
     return YDWEGetUnitAbilityState(nil, whichHero, abilityId, ydweAbility.ABILITY_STATE_COOLDOWN) or 0
 end
 local function formatCooldown(cooldown)
@@ -200,33 +193,20 @@ local function _____6784_5EFA_663E_793A_6587_672C(hotkey, abilityId, cooldown)
     end
     return ""
 end
-local function _____89E3_6790D_69FD_4F4D(recordedDAbilityId)
-    local leftId = commandBarAbility["读取命令卡按钮能力Id"](0, 1)
-    if recordedDAbilityId ~= 0 and leftId == recordedDAbilityId then
-        return {x = 0, y = 1}
-    end
-    local rightId = commandBarAbility["读取命令卡按钮能力Id"](2, 1)
-    if recordedDAbilityId ~= 0 and rightId == recordedDAbilityId then
-        return {x = 2, y = 1}
-    end
-    if leftId ~= 0 and rightId == 0 then
-        return {x = 0, y = 1}
-    end
-    if rightId ~= 0 and leftId == 0 then
-        return {x = 2, y = 1}
-    end
-    return {x = 0, y = 1}
-end
 local function _____89E3_6790_69FD_4F4D(whichHero, hotkey)
     if hotkey == "D" then
-        local dId = heroSkillRecord.getHeroRecordedSkill(whichHero, "D")
-        return _____89E3_6790D_69FD_4F4D(dId)
+        local dSlot = commandBarAbility["获取D技能槽位"](whichHero)
+        return {x = dSlot[1], y = dSlot[2]}
     end
     return _____56FA_5B9A_69FD_4F4D_8868[hotkey]
 end
 local function _____83B7_53D6_6309_94AE_6846(whichHero, hotkey)
     local slot = _____89E3_6790_69FD_4F4D(whichHero, hotkey)
     return DzFrameGetCommandBarButton(slot.y, slot.x)
+end
+local function _____83B7_53D6_6280_80FDId(whichHero, hotkey)
+    local slot = _____89E3_6790_69FD_4F4D(whichHero, hotkey)
+    return commandBarAbility["读取命令卡按钮能力Id"](slot.x, slot.y)
 end
 local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, textFrame, shadowFrame)
     local buttonFrame = _____83B7_53D6_6309_94AE_6846(whichHero, hotkey)
@@ -271,7 +251,7 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, textFrame, 
     end
     _____5B89_5168_8BBE_7F6E_951A_70B9(currentShadowFrame, buttonFrame, OFFSET_X + SHADOW_OFFSET_X, OFFSET_Y + SHADOW_OFFSET_Y)
     _____5B89_5168_8BBE_7F6E_951A_70B9(currentTextFrame, buttonFrame, OFFSET_X, OFFSET_Y)
-    local abilityId = heroSkillRecord.getHeroRecordedSkill(whichHero, hotkey)
+    local abilityId = _____83B7_53D6_6280_80FDId(whichHero, hotkey)
     if abilityId == 0 then
         _____5B89_5168_8BBE_7F6E_6587_672C(currentTextFrame, "")
         _____5B89_5168_663E_793A_6846_4F53(currentTextFrame, false)
@@ -342,11 +322,11 @@ ____exports["获取QWERD冷却调试快照"] = function()
     if not isValidHandle(hero) then
         return "NO_HERO"
     end
-    local qId = heroSkillRecord.getHeroRecordedSkill(hero, "Q")
-    local wId = heroSkillRecord.getHeroRecordedSkill(hero, "W")
-    local eId = heroSkillRecord.getHeroRecordedSkill(hero, "E")
-    local rId = heroSkillRecord.getHeroRecordedSkill(hero, "R")
-    local dId = heroSkillRecord.getHeroRecordedSkill(hero, "D")
+    local qId = _____83B7_53D6_6280_80FDId(hero, "Q")
+    local wId = _____83B7_53D6_6280_80FDId(hero, "W")
+    local eId = _____83B7_53D6_6280_80FDId(hero, "E")
+    local rId = _____83B7_53D6_6280_80FDId(hero, "R")
+    local dId = _____83B7_53D6_6280_80FDId(hero, "D")
     local qCd = getCooldown(hero, qId)
     local wCd = getCooldown(hero, wId)
     local eCd = getCooldown(hero, eId)

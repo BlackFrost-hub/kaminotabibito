@@ -6,18 +6,11 @@ const japi = require("jass.japi") as any;
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   getSoleSelectedUnitForPlayer: (this: void, playerId: number) => any | null;
-  getSelectionDebugForPlayer?: (this: void, playerId: number) => string;
 };
 const 获取玩家唯一选中单位 = selectionCenterSystem.getSoleSelectedUnitForPlayer as
   | ((this: void, playerId: number) => any | null)
-  | undefined;
-const 获取玩家选中调试信息 = selectionCenterSystem.getSelectionDebugForPlayer as
-  | ((this: void, playerId: number) => string)
   | undefined;
 const 功能开关模块 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关") as {
   本地玩家是否开启魔法消耗显示: (this: void) => boolean;
@@ -75,11 +68,8 @@ const 固定槽位表: Record<"Q" | "W" | "E" | "R", 按钮槽位> = {
   E: { x: 2, y: 2 },
   R: { x: 3, y: 2 },
 };
-const MODULE_NAME = "QWERD魔法消耗显示";
-
 let initialized = false;
 let 显示缓存: 显示表 | null = null;
-let lastDebugSignature = "";
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
@@ -108,11 +98,6 @@ function 安全设置锚点(this: void, frame: number, relativeFrame: number, x:
 function 读取玩家唯一选中单位(this: void, playerId: number): any | null {
   if (typeof 获取玩家唯一选中单位 !== "function") return null;
   return 获取玩家唯一选中单位(playerId);
-}
-
-function 读取玩家选中调试信息(this: void, playerId: number): string {
-  if (typeof 获取玩家选中调试信息 !== "function") return "no_selection_debug";
-  return 获取玩家选中调试信息(playerId);
 }
 
 function getHeroSource(this: void, localPlayer: any): any | null {
@@ -283,75 +268,6 @@ function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, ui: �
   安全显示框体(ui.text, true);
 }
 
-function emitDebug(this: void, whichHero: any): void {
-  const qId = 获取技能Id(whichHero, "Q");
-  const wId = 获取技能Id(whichHero, "W");
-  const eId = 获取技能Id(whichHero, "E");
-  const rId = 获取技能Id(whichHero, "R");
-  const dId = 获取技能Id(whichHero, "D");
-
-  const qLevel = qId === 0 ? 0 : jass.GetUnitAbilityLevel(whichHero, qId);
-  const wLevel = wId === 0 ? 0 : jass.GetUnitAbilityLevel(whichHero, wId);
-  const eLevel = eId === 0 ? 0 : jass.GetUnitAbilityLevel(whichHero, eId);
-  const rLevel = rId === 0 ? 0 : jass.GetUnitAbilityLevel(whichHero, rId);
-  const dLevel = dId === 0 ? 0 : jass.GetUnitAbilityLevel(whichHero, dId);
-
-  const qCost = qLevel <= 0 ? -999 : calcDisplayManaCost(whichHero, qId, qLevel);
-  const wCost = wLevel <= 0 ? -999 : calcDisplayManaCost(whichHero, wId, wLevel);
-  const eCost = eLevel <= 0 ? -999 : calcDisplayManaCost(whichHero, eId, eLevel);
-  const rCost = rLevel <= 0 ? -999 : calcDisplayManaCost(whichHero, rId, rLevel);
-  const dCost = dLevel <= 0 ? -999 : calcDisplayManaCost(whichHero, dId, dLevel);
-
-  const signature = [
-    tostring(whichHero),
-    tostring(qId), tostring(qLevel), tostring(qCost),
-    tostring(wId), tostring(wLevel), tostring(wCost),
-    tostring(eId), tostring(eLevel), tostring(eCost),
-    tostring(rId), tostring(rLevel), tostring(rCost),
-    tostring(dId), tostring(dLevel), tostring(dCost),
-  ].join("|");
-  if (signature === lastDebugSignature) return;
-  lastDebugSignature = signature;
-
-  debugLogForce(
-    MODULE_NAME,
-    "hero=", whichHero,
-    "Q=", qId, "level=", qLevel, "cost=", qCost,
-    "W=", wId, "level=", wLevel, "cost=", wCost,
-    "E=", eId, "level=", eLevel, "cost=", eCost,
-    "R=", rId, "level=", rLevel, "cost=", rCost,
-    "D=", dId, "level=", dLevel, "cost=", dCost,
-  );
-}
-
-function emitNoHeroDebug(this: void): void {
-  const localPlayer = jass.GetLocalPlayer();
-  if (!isValidHandle(localPlayer)) return;
-  const playerId = jass.GetPlayerId(localPlayer);
-  const registeredHero = heroBridge.getRegisteredPlayerHero(localPlayer);
-  const selectedUnit = 读取玩家唯一选中单位(playerId);
-  const selectionDebug = 读取玩家选中调试信息(playerId);
-
-  const signature = [
-    "NO_HERO",
-    tostring(playerId),
-    tostring(registeredHero),
-    tostring(selectedUnit),
-    selectionDebug,
-  ].join("|");
-  if (signature === lastDebugSignature) return;
-  lastDebugSignature = signature;
-
-  debugLogForce(
-    MODULE_NAME,
-    "NO_HERO",
-    "pid=", playerId,
-    "registered=", registeredHero,
-    "selected=", selectedUnit,
-    "selection=", selectionDebug,
-  );
-}
-
 function hideAll(this: void): void {
   if (显示缓存 == null) return;
   隐藏单元(显示缓存.Q);
@@ -372,7 +288,6 @@ function onTick(this: void): void {
   const hero = getLocalHero();
   if (!isValidHandle(hero)) {
     hideAll();
-    emitNoHeroDebug();
     return;
   }
 
@@ -381,13 +296,11 @@ function onTick(this: void): void {
   刷新单个技能(hero, "E", currentUi.E);
   刷新单个技能(hero, "R", currentUi.R);
   刷新单个技能(hero, "D", currentUi.D);
-  emitDebug(hero);
 }
 
 export function 初始化QWERD魔法消耗显示(this: void): void {
   if (initialized) return;
   initialized = true;
-  debugLogForce(MODULE_NAME, "初始化完成");
   addPeriodicCallback(REFRESH_MS, onTick);
 }
 

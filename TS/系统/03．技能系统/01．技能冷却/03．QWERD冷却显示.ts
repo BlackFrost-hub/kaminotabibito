@@ -18,19 +18,9 @@ const 功能开关模块 = require("系统.00．核心系统.02．功能开关.0
 const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
-const heroSkillRecord = require("系统.03．技能系统.05．动态技能说明.05．英雄技能记录") as {
-  getHeroRecordedSkill: (this: void, whichHero: any, hotkey: "Q" | "W" | "E" | "R" | "D") => number;
-};
-const cooldownRecord = require("系统.03．技能系统.01．技能冷却.04．冷却记录") as {
-  获取技能剩余冷却: (this: void, whichUnit: any, abilityId: number) => number;
-};
-const 获取技能剩余冷却 = cooldownRecord.获取技能剩余冷却 as (
-  this: void,
-  whichUnit: any,
-  abilityId: number
-) => number;
 const commandBarAbility = require("系统.03．技能系统.05．动态技能说明.07．命令卡技能槽位") as {
   读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
+  获取D技能槽位: (this: void, whichHero: any) => readonly [number, number];
 };
 const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   ABILITY_STATE_COOLDOWN: number;
@@ -159,8 +149,6 @@ function fourCCText(this: void, abilityId: number): string {
 
 function getCooldown(this: void, whichHero: any, abilityId: number): number {
   if (!isValidHandle(whichHero) || abilityId === 0) return 0;
-  const trackedCooldown = 获取技能剩余冷却(whichHero, abilityId);
-  if (trackedCooldown >= 0) return trackedCooldown;
   return YDWEGetUnitAbilityState(whichHero, abilityId, ydweAbility.ABILITY_STATE_COOLDOWN) || 0;
 }
 
@@ -190,22 +178,10 @@ function 构建显示文本(this: void, hotkey: 热键位, abilityId: number, co
   return "";
 }
 
-function 解析D槽位(this: void, recordedDAbilityId: number): 按钮槽位 {
-  const leftId = commandBarAbility.读取命令卡按钮能力Id(0, 1);
-  if (recordedDAbilityId !== 0 && leftId === recordedDAbilityId) return { x: 0, y: 1 };
-
-  const rightId = commandBarAbility.读取命令卡按钮能力Id(2, 1);
-  if (recordedDAbilityId !== 0 && rightId === recordedDAbilityId) return { x: 2, y: 1 };
-
-  if (leftId !== 0 && rightId === 0) return { x: 0, y: 1 };
-  if (rightId !== 0 && leftId === 0) return { x: 2, y: 1 };
-  return { x: 0, y: 1 };
-}
-
 function 解析槽位(this: void, whichHero: any, hotkey: 热键位): 按钮槽位 {
   if (hotkey === "D") {
-    const dId = heroSkillRecord.getHeroRecordedSkill(whichHero, "D");
-    return 解析D槽位(dId);
+    const dSlot = commandBarAbility.获取D技能槽位(whichHero);
+    return { x: dSlot[0], y: dSlot[1] };
   }
   return 固定槽位表[hotkey];
 }
@@ -213,6 +189,11 @@ function 解析槽位(this: void, whichHero: any, hotkey: 热键位): 按钮槽�
 function 获取按钮框(this: void, whichHero: any, hotkey: 热键位): number {
   const slot = 解析槽位(whichHero, hotkey);
   return DzFrameGetCommandBarButton(slot.y, slot.x);
+}
+
+function 获取技能Id(this: void, whichHero: any, hotkey: 热键位): number {
+  const slot = 解析槽位(whichHero, hotkey);
+  return commandBarAbility.读取命令卡按钮能力Id(slot.x, slot.y);
 }
 
 function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, textFrame: number, shadowFrame: number): void {
@@ -241,7 +222,7 @@ function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, textF
   安全设置锚点(currentShadowFrame, buttonFrame, OFFSET_X + SHADOW_OFFSET_X, OFFSET_Y + SHADOW_OFFSET_Y);
   安全设置锚点(currentTextFrame, buttonFrame, OFFSET_X, OFFSET_Y);
 
-  const abilityId = heroSkillRecord.getHeroRecordedSkill(whichHero, hotkey);
+  const abilityId = 获取技能Id(whichHero, hotkey);
   if (abilityId === 0) {
     安全设置文本(currentTextFrame, "");
     安全显示框体(currentTextFrame, false);
@@ -307,11 +288,11 @@ export function 获取QWERD冷却调试快照(this: void): string {
   const hero = getLocalHero();
   if (!isValidHandle(hero)) return `NO_HERO`;
 
-  const qId = heroSkillRecord.getHeroRecordedSkill(hero, "Q");
-  const wId = heroSkillRecord.getHeroRecordedSkill(hero, "W");
-  const eId = heroSkillRecord.getHeroRecordedSkill(hero, "E");
-  const rId = heroSkillRecord.getHeroRecordedSkill(hero, "R");
-  const dId = heroSkillRecord.getHeroRecordedSkill(hero, "D");
+  const qId = 获取技能Id(hero, "Q");
+  const wId = 获取技能Id(hero, "W");
+  const eId = 获取技能Id(hero, "E");
+  const rId = 获取技能Id(hero, "R");
+  const dId = 获取技能Id(hero, "D");
 
   const qCd = getCooldown(hero, qId);
   const wCd = getCooldown(hero, wId);
