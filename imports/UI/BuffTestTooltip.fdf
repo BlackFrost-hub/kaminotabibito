@@ -6,11 +6,11 @@ Frame "BACKDROP" "BuffTestTooltipPanel" {
     BackdropBackground "UI\Widgets\ToolTips\Human\human-tooltip-background.blp",
     BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
     BackdropCornerSize 0.007,
-    BackdropBackgroundInsets 0.005 0.005 0.005 0.005,
+    BackdropBackgroundInsets 0.000 0.000 0.000 0.000,
     BackdropEdgeFile "UI\Widgets\ToolTips\Human\human-tooltip-border.blp",
     BackdropBlendAll,
-    Width 0.13,
-    Height 0.036,
+    Width 0.22,
+    Height 0.068,
 
     Frame "TEXT" "BuffTestTooltipText" {
         SetAllPoints,

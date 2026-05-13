@@ -43,11 +43,11 @@ const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
 const TIP_BOX_TEX = "UI\\wenbenkuang.blp";
-const TIP_W = 0.13;
-const TIP_H = 0.036;
-const TIP_PAD_X = 0.006;
-const TIP_PAD_TOP = 0.004;
-const TIP_PAD_BOTTOM = 0.004;
+const TIP_W = 0.22;
+const TIP_H = 0.068;
+const TIP_PAD_X = 0.009;
+const TIP_PAD_TOP = 0.007;
+const TIP_PAD_BOTTOM = 0.006;
 const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
 const BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip";
 const BUFF_TOOLTIP_TOC_PATHS = ["imports\\UI\\BuffTestTooltip.toc", "UI\\BuffTestTooltip.toc"];
@@ -261,7 +261,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       tipBox && tipBox !== 0
         ? { relativeTo: tipBox, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPLEFT, x: TIP_PAD_X, y: -TIP_PAD_TOP }
         : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP },
-      { width: boxW - TIP_PAD_X * 2, height: 0.016 }
+      { width: boxW - TIP_PAD_X * 2, height: 0.037 }
     ) || 0;
   if (tipBodyText && tipBodyText !== 0) {
     japi.DzFrameSetTextAlignment(tipBodyText, -1);
@@ -278,7 +278,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       tipBox && tipBox !== 0
         ? { relativeTo: tipBox, point: UI工具.FramePoint.BOTTOMLEFT, relativePoint: UI工具.FramePoint.BOTTOMLEFT, x: TIP_PAD_X, y: TIP_PAD_BOTTOM }
         : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP - 0.016 },
-      { width: boxW - TIP_PAD_X * 2, height: 0.014 }
+      { width: boxW - TIP_PAD_X * 2, height: 0.019 }
     ) || 0;
   if (tipSourceText && tipSourceText !== 0) {
     japi.DzFrameSetTextAlignment(tipSourceText, -1);

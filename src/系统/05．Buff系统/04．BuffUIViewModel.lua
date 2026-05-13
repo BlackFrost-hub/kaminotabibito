@@ -4,12 +4,9 @@ local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
-local clampMin, tostringCompat
+local tostringCompat
 local buffPoolMod = require("系统.05．Buff系统.00．Buff系统")
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
-function clampMin(value, min)
-    return value < min and min or value
-end
 function tostringCompat(value)
     if value == nil then
         return "nil"
@@ -24,49 +21,54 @@ local MAX_SLOTS = 20
 local jass = require("jass.common")
 local round = _____6570_5B66_8FD0_7B97.round
 setDebug(nil, "BuffUI.VM", false)
-local function tooltipIntStr(n)
-    if type(n) ~= "number" or not __TS__NumberIsFinite(__TS__Number(n)) then
-        return "0"
-    end
-    return tostring(jass.R2I(clampMin(n, 0)))
-end
 local TIP_COLOR_BODY = "|cfffff2d9"
 local TIP_COLOR_SOURCE = "|cffffd700"
-local function formatDotTooltip(template, durationForDisplay, dps, sourceName, intervalSec)
-    local rem = type(durationForDisplay) == "number" and __TS__NumberIsFinite(__TS__Number(durationForDisplay)) and clampMin(durationForDisplay, 0) or 0
-    local dpsN = type(dps) == "number" and __TS__NumberIsFinite(__TS__Number(dps)) and dps or 0
-    local intv = type(intervalSec) == "number" and __TS__NumberIsFinite(__TS__Number(intervalSec)) and intervalSec > 0 and intervalSec or 1
-    local rStr = tooltipIntStr(rem)
-    local dStr = tooltipIntStr(dpsN)
-    local iStr = tooltipIntStr(intv)
-    local s = template
-    s = table.concat(
-        __TS__StringSplit(s, "time"),
-        rStr or ","
-    )
-    s = table.concat(
-        __TS__StringSplit(s, "持续时间"),
-        rStr or ","
-    )
-    s = table.concat(
-        __TS__StringSplit(s, "interval"),
-        iStr or ","
-    )
-    s = table.concat(
-        __TS__StringSplit(s, "damage"),
-        dStr or ","
-    )
-    local src = sourceName ~= nil and sourceName ~= "" and sourceName or "未知"
-    return (((((TIP_COLOR_BODY .. s) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「") .. src) .. "」|r"
+local function clampMin(value, min)
+    return value < min and min or value
 end
-local function formatBuffRemainOneDecimal(rem)
-    if type(rem) ~= "number" or not __TS__NumberIsFinite(__TS__Number(rem)) then
+local function formatOneDecimal(n)
+    if type(n) ~= "number" or not __TS__NumberIsFinite(__TS__Number(n)) then
         return "0.0"
     end
-    local scaled = round(clampMin(rem, 0) * 10)
+    local scaled = round(clampMin(n, 0) * 10)
     local intPart = jass.R2I(scaled / 10)
     local fracPart = scaled % 10
     return (tostring(intPart) .. ".") .. tostring(fracPart)
+end
+local function formatDotTooltip(template, durationForDisplay, effectValue, sourceName, intervalSec)
+    local rem = type(durationForDisplay) == "number" and __TS__NumberIsFinite(__TS__Number(durationForDisplay)) and clampMin(durationForDisplay, 0) or 0
+    local val = type(effectValue) == "number" and __TS__NumberIsFinite(__TS__Number(effectValue)) and effectValue or 0
+    local intv = type(intervalSec) == "number" and __TS__NumberIsFinite(__TS__Number(intervalSec)) and intervalSec > 0 and intervalSec or 1
+    local timeStr = formatOneDecimal(rem)
+    local damageStr = formatOneDecimal(val)
+    local intervalStr = formatOneDecimal(intv)
+    local dataStr = formatOneDecimal(val <= 1 and val * 100 or val)
+    local s = template
+    s = table.concat(
+        __TS__StringSplit(s, "time"),
+        timeStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "持续时间"),
+        timeStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "interval"),
+        intervalStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "damage"),
+        damageStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "data"),
+        dataStr or ","
+    )
+    local src = sourceName ~= nil and sourceName ~= "" and sourceName or "未记录"
+    return {bodyText = (TIP_COLOR_BODY .. s) .. "|r", sourceText = ((TIP_COLOR_SOURCE .. "来源：") .. src) .. "|r"}
+end
+local function formatBuffRemainOneDecimal(rem)
+    return formatOneDecimal(rem)
 end
 local function isUnitValid(unit)
     return not not (unit and unit ~= 0)
@@ -76,7 +78,13 @@ function ____exports.buildBuffBarViewModel(unit)
     do
         local i = 0
         while i < MAX_SLOTS do
-            slots[#slots + 1] = {visible = false, iconPath = "", remainText = "", tooltipText = ""}
+            slots[#slots + 1] = {
+                visible = false,
+                iconPath = "",
+                remainText = "",
+                tooltipBodyText = "",
+                tooltipSourceText = ""
+            }
             i = i + 1
         end
     end
@@ -153,34 +161,44 @@ function ____exports.buildBuffBarViewModel(unit)
                 local meta = buffs[row.id]
                 local iconPath = row.iconOverride and row.iconOverride ~= "" and row.iconOverride or (meta and meta.icon or "")
                 if iconPath == "" then
-                    goto __continue20
+                    goto __continue19
                 end
                 local pd = row.state._dotParsedDuration
                 local durationForTip = type(pd) == "number" and __TS__NumberIsFinite(__TS__Number(pd)) and pd > 0 and pd or row.state.remaining
-                local tooltipText
+                local tooltipBodyText = ""
+                local tooltipSourceText = ""
                 if meta ~= nil then
-                    tooltipText = formatDotTooltip(
+                    local tooltipParts = formatDotTooltip(
                         meta.tooltip,
                         durationForTip,
                         row.state.effect,
                         row.state.sourceName,
                         meta.interval
                     )
+                    tooltipBodyText = tooltipParts.bodyText
+                    tooltipSourceText = tooltipParts.sourceText
                 else
-                    local ____temp_8 = (((((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. tooltipIntStr(row.state.remaining)) .. " 秒，伤害/秒 ") .. tooltipIntStr(row.state.effect)) .. "|r\n") .. TIP_COLOR_SOURCE) .. "buff来源为「"
+                    tooltipBodyText = (((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. formatOneDecimal(row.state.remaining)) .. " 秒，伤害/秒 ") .. formatOneDecimal(row.state.effect)) .. "|r"
+                    local ____temp_8 = TIP_COLOR_SOURCE .. "来源："
                     local ____temp_7
                     if row.state.sourceName and row.state.sourceName ~= "" then
                         ____temp_7 = row.state.sourceName
                     else
-                        ____temp_7 = "未知"
+                        ____temp_7 = "未记录"
                     end
-                    tooltipText = (____temp_8 .. tostring(____temp_7)) .. "」|r"
+                    tooltipSourceText = (____temp_8 .. tostring(____temp_7)) .. "|r"
                 end
                 local remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining)
                 local remainText = ("|cffffffff" .. remainStr) .. "|r"
-                slots[i + 1] = {visible = true, iconPath = iconPath, remainText = remainText, tooltipText = tooltipText}
+                slots[i + 1] = {
+                    visible = true,
+                    iconPath = iconPath,
+                    remainText = remainText,
+                    tooltipBodyText = tooltipBodyText,
+                    tooltipSourceText = tooltipSourceText
+                }
             end
-            ::__continue20::
+            ::__continue19::
             i = i + 1
         end
     end

@@ -15,11 +15,40 @@ local _____73A9_5BB6_89C6_56FE_6A21_578B_8868 = ____01_FF0E_5171_4EAB["玩家视
 local ____00_FF0E_4EC7_6068_5B58_50A8 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local getEnemyThreatCount = ____00_FF0E_4EC7_6068_5B58_50A8.getEnemyThreatCount
 local getEnemyThreats = ____00_FF0E_4EC7_6068_5B58_50A8.getEnemyThreats
+local _____4EC7_6068_6574_8868_8D85_65F6_6BEB_79D2 = ____00_FF0E_4EC7_6068_5B58_50A8["仇恨整表超时毫秒"]
+local _____4EC7_6068_6761_76EE_8D85_65F6_6BEB_79D2 = ____00_FF0E_4EC7_6068_5B58_50A8["仇恨条目超时毫秒"]
+local getEnemyLastThreatUpdateTimeById = ____00_FF0E_4EC7_6068_5B58_50A8.getEnemyLastThreatUpdateTimeById
 local ____01_FF0E_5171_4EAB = require("系统.09．表现系统.05．仇恨面板.01．共享")
+local GetHandleId = ____01_FF0E_5171_4EAB.GetHandleId
 local GetUnitName = ____01_FF0E_5171_4EAB.GetUnitName
 local GetUnitTypeId = ____01_FF0E_5171_4EAB.GetUnitTypeId
 local IsUnitType = ____01_FF0E_5171_4EAB.IsUnitType
+local R2I = ____01_FF0E_5171_4EAB.R2I
 local UNIT_TYPE_DEAD = ____01_FF0E_5171_4EAB.UNIT_TYPE_DEAD
+local _nowMs = nil
+local function nowMs()
+    if _nowMs == nil then
+        _nowMs = require("系统.00．核心系统.05．中心计时器").getServerTime
+    end
+    return _nowMs()
+end
+local function _____4E00_4F4D_5C0F_6570_6587_672C(value)
+    local _____5341_500D_6574_6570 = R2I(value * 10 + 0.5)
+    local _____6574_6570_90E8_5206 = R2I(_____5341_500D_6574_6570 / 10)
+    local _____5C0F_6570_90E8_5206 = _____5341_500D_6574_6570 - _____6574_6570_90E8_5206 * 10
+    return (tostring(_____6574_6570_90E8_5206) .. ".") .. tostring(_____5C0F_6570_90E8_5206)
+end
+local function _____5269_4F59_8131_79BB_65F6_95F4_6587_672C(_____6700_8FD1_66F4_65B0_65F6_95F4, _____8D85_65F6_6BEB_79D2)
+    if _____6700_8FD1_66F4_65B0_65F6_95F4 <= 0 then
+        return "0.0s"
+    end
+    local _____5269_4F59_6BEB_79D2 = _____8D85_65F6_6BEB_79D2 - (nowMs() - _____6700_8FD1_66F4_65B0_65F6_95F4)
+    local _____5269_4F59_79D2 = _____5269_4F59_6BEB_79D2 > 0 and _____5269_4F59_6BEB_79D2 / 1000 or 0
+    return _____4E00_4F4D_5C0F_6570_6587_672C(_____5269_4F59_79D2) .. "s"
+end
+local function _____4EC7_6068_4E0E_8131_79BB_65F6_95F4_6587_672C(entry)
+    return (_____5341_500D_7CBE_5EA6_6587_672C(entry.threat) .. " / ") .. _____5269_4F59_8131_79BB_65F6_95F4_6587_672C(entry.lastUpdateTime, _____4EC7_6068_6761_76EE_8D85_65F6_6BEB_79D2)
+end
 local function _____6784_5EFA_7A7A_9762_677F_6A21_578B(_____63D0_793A)
     local rowNames = {}
     local rowPercents = {}
@@ -35,10 +64,10 @@ local function _____6784_5EFA_7A7A_9762_677F_6A21_578B(_____63D0_793A)
     end
     return {
         selectedText = ("|cffd8d8d8" .. _____63D0_793A) .. "|r",
-        summaryText = "|cff8f8f8f这里会显示当前所选敌人的仇恨池摘要|r",
+        summaryText = "|cffffcc66这里会显示当前目标的仇恨和脱离时间|r",
         headerNameText = "|cffc8c8c8目标|r",
         headerPercentText = "|cffc8c8c8占比|r",
-        headerThreatText = "|cffc8c8c8仇恨|r",
+        headerThreatText = "|cffc8c8c8仇恨/脱离时间|r",
         rowNameTexts = rowNames,
         rowPercentTexts = rowPercents,
         rowThreatTexts = rowThreats
@@ -56,10 +85,10 @@ local function _____6784_5EFA_73A9_5BB6_4EC7_6068_9762_677F_6A21_578B(playerId)
     if #_____539F_59CB_5217_8868 == 0 or getEnemyThreatCount(_____9009_4E2D_5355_4F4D) <= 0 then
         return {
             selectedText = ("|cffffe6a0目标：" .. GetUnitName(_____9009_4E2D_5355_4F4D)) .. "|r",
-            summaryText = "|cff8f8f8f当前还没有仇恨数据|r",
+            summaryText = "|cffffcc66当前还没有仇恨记录|r",
             headerNameText = "|cffc8c8c8目标|r",
             headerPercentText = "|cffc8c8c8占比|r",
-            headerThreatText = "|cffc8c8c8仇恨|r",
+            headerThreatText = "|cffc8c8c8仇恨/脱离时间|r",
             rowNameTexts = {
                 EMPTY_ROW,
                 EMPTY_ROW,
@@ -93,27 +122,27 @@ local function _____6784_5EFA_73A9_5BB6_4EC7_6068_9762_677F_6A21_578B(playerId)
             do
                 local entry = _____539F_59CB_5217_8868[i + 1]
                 if entry == nil or entry.targetRef == nil or entry.targetRef == 0 then
-                    goto __continue10
+                    goto __continue16
                 end
                 if GetUnitTypeId(entry.targetRef) == 0 then
-                    goto __continue10
+                    goto __continue16
                 end
                 if IsUnitType(entry.targetRef, UNIT_TYPE_DEAD) then
-                    goto __continue10
+                    goto __continue16
                 end
                 _____6709_6548_5217_8868[#_____6709_6548_5217_8868 + 1] = entry
             end
-            ::__continue10::
+            ::__continue16::
             i = i + 1
         end
     end
     if #_____6709_6548_5217_8868 == 0 then
         return {
             selectedText = ("|cffffe6a0目标：" .. GetUnitName(_____9009_4E2D_5355_4F4D)) .. "|r",
-            summaryText = "|cff8f8f8f仇恨表存在，但当前没有有效目标|r",
+            summaryText = "|cffffcc66当前没有可显示的仇恨目标|r",
             headerNameText = "|cffc8c8c8目标|r",
             headerPercentText = "|cffc8c8c8占比|r",
-            headerThreatText = "|cffc8c8c8仇恨|r",
+            headerThreatText = "|cffc8c8c8仇恨/脱离时间|r",
             rowNameTexts = {
                 EMPTY_ROW,
                 EMPTY_ROW,
@@ -160,7 +189,7 @@ local function _____6784_5EFA_73A9_5BB6_4EC7_6068_9762_677F_6A21_578B(playerId)
                     rowNames[#rowNames + 1] = EMPTY_ROW
                     rowPercents[#rowPercents + 1] = EMPTY_ROW
                     rowThreats[#rowThreats + 1] = EMPTY_ROW
-                    goto __continue18
+                    goto __continue24
                 end
                 local entry = _____6392_5E8F_540E_5217_8868[i + 1]
                 local _____5355_4F4D_540D = (tostring(i + 1) .. ". ") .. _____622A_65AD_540D_79F0(
@@ -168,7 +197,7 @@ local function _____6784_5EFA_73A9_5BB6_4EC7_6068_9762_677F_6A21_578B(playerId)
                     12
                 )
                 local _____5360_6BD4_6587_672C = _____767E_5206_6BD4_6587_672C(entry.threat)
-                local _____4EC7_6068_6587_672C = _____5341_500D_7CBE_5EA6_6587_672C(entry.threat)
+                local _____4EC7_6068_6587_672C = _____4EC7_6068_4E0E_8131_79BB_65F6_95F4_6587_672C(entry)
                 if i == 0 then
                     rowNames[#rowNames + 1] = ("|cffffcc33" .. _____5355_4F4D_540D) .. "|r"
                     rowPercents[#rowPercents + 1] = ("|cffffcc33" .. _____5360_6BD4_6587_672C) .. "|r"
@@ -179,16 +208,21 @@ local function _____6784_5EFA_73A9_5BB6_4EC7_6068_9762_677F_6A21_578B(playerId)
                     rowThreats[#rowThreats + 1] = ("|cffd8d8d8" .. _____4EC7_6068_6587_672C) .. "|r"
                 end
             end
-            ::__continue18::
+            ::__continue24::
             i = i + 1
         end
     end
+    local _____654C_4EBAID = GetHandleId(_____9009_4E2D_5355_4F4D) or 0
+    local _____6574_8868_8131_79BB_65F6_95F4 = _____5269_4F59_8131_79BB_65F6_95F4_6587_672C(
+        getEnemyLastThreatUpdateTimeById(_____654C_4EBAID),
+        _____4EC7_6068_6574_8868_8D85_65F6_6BEB_79D2
+    )
     return {
         selectedText = ("|cffffe6a0目标：" .. GetUnitName(_____9009_4E2D_5355_4F4D)) .. "|r",
-        summaryText = ((("|cffb8b8b8总仇恨 " .. _____5341_500D_7CBE_5EA6_6587_672C(_____603B_4EC7_6068)) .. "/1000  目标数 ") .. tostring(#_____6392_5E8F_540E_5217_8868)) .. "|r",
+        summaryText = ((((("|cffffcc66总仇恨 " .. _____5341_500D_7CBE_5EA6_6587_672C(_____603B_4EC7_6068)) .. "/1000  目标：") .. tostring(#_____6392_5E8F_540E_5217_8868)) .. "  仇恨脱离：") .. _____6574_8868_8131_79BB_65F6_95F4) .. "|r",
         headerNameText = "|cffc8c8c8目标|r",
         headerPercentText = "|cffc8c8c8占比|r",
-        headerThreatText = "|cffc8c8c8仇恨|r",
+        headerThreatText = "|cffc8c8c8仇恨/脱离时间|r",
         rowNameTexts = rowNames,
         rowPercentTexts = rowPercents,
         rowThreatTexts = rowThreats

@@ -10,6 +10,7 @@ local buildBuffBarViewModelImported = ____04_FF0EBuffUIViewModel.buildBuffBarVie
 local getMaxSlotsImported = ____04_FF0EBuffUIViewModel.getMaxSlots
 local ____01_FF0E_5E27_521B_5EFA = require("系统.09．表现系统.01．UI工具.01．帧创建")
 local createFrameImported = ____01_FF0E_5E27_521B_5EFA.createFrame
+local tryCreateFromFdfSafeImported = ____01_FF0E_5E27_521B_5EFA.tryCreateFromFdfSafe
 local ____02_FF0E_4F4D_7F6E_5C3A_5BF8 = require("系统.09．表现系统.01．UI工具.02．位置尺寸")
 local setFramePointRelativeImported = ____02_FF0E_4F4D_7F6E_5C3A_5BF8.setFramePointRelative
 local setFramePositionImported = ____02_FF0E_4F4D_7F6E_5C3A_5BF8.setFramePosition
@@ -36,8 +37,11 @@ function hideSlot(i)
     if not s then
         return
     end
-    if s.tipText ~= 0 then
-        uiHideFrame(s.tipText)
+    if s.tipBodyText ~= 0 then
+        uiHideFrame(s.tipBodyText)
+    end
+    if s.tipSourceText ~= 0 then
+        uiHideFrame(s.tipSourceText)
     end
     if s.tipBox ~= 0 then
         uiHideFrame(s.tipBox)
@@ -66,7 +70,7 @@ function renderBuffBarLocal(vm)
                 local slotVM = vm.slots[i + 1]
                 local slot = slots[i + 1]
                 if not slot then
-                    goto __continue43
+                    goto __continue50
                 end
                 if slotVM.visible then
                     if slot.root ~= 0 then
@@ -76,8 +80,11 @@ function renderBuffBarLocal(vm)
                     if slot.remainText ~= 0 then
                         japi.DzFrameSetText(slot.remainText, slotVM.remainText)
                     end
-                    if slot.tipText ~= 0 then
-                        japi.DzFrameSetText(slot.tipText, slotVM.tooltipText)
+                    if slot.tipBodyText ~= 0 then
+                        japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText)
+                    end
+                    if slot.tipSourceText ~= 0 then
+                        japi.DzFrameSetText(slot.tipSourceText, slotVM.tooltipSourceText)
                     end
                     if slot.hit ~= 0 then
                         uiShowFrame(slot.hit)
@@ -86,7 +93,7 @@ function renderBuffBarLocal(vm)
                     hideSlot(i)
                 end
             end
-            ::__continue43::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -149,9 +156,13 @@ local ICON_H = 16 / 600
 local ICON_GAP = 0.0005
 local TIP_BOX_TEX = "UI\\wenbenkuang.blp"
 local TIP_W = 0.22
-local TIP_H = 0.056
-local TIP_PAD = 0.005
+local TIP_H = 0.068
+local TIP_PAD_X = 0.009
+local TIP_PAD_TOP = 0.007
+local TIP_PAD_BOTTOM = 0.006
 local TIP_OFFSET_Y_FROM_ICON_TOP = 0.07
+local BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip"
+local BUFF_TOOLTIP_TOC_PATHS = {"imports\\UI\\BuffTestTooltip.toc", "UI\\BuffTestTooltip.toc"}
 slots = {}
 local buffUiInitialized = false
 local refreshTimer = nil
@@ -197,6 +208,15 @@ local function uiCreateTextLabel(name, parent, text, position, size)
         size
     )
 end
+local function uiTryCreateFromFdfSafe(frameName, parent, fallback, contextId)
+    return tryCreateFromFdfSafeImported(
+        nil,
+        frameName,
+        parent,
+        fallback,
+        {tocLoadKey = BUFF_TOOLTIP_TOC_KEY, tocPaths = BUFF_TOOLTIP_TOC_PATHS, debugPrefix = "BuffUI", contextId = contextId}
+    )
+end
 local function getTriggerUiEventFrame()
     return japi.DzGetTriggerUIEventFrame()
 end
@@ -211,14 +231,20 @@ local function showSlotTooltipByIndex(index)
     if s and s.tipBox ~= 0 then
         uiShowFrame(s.tipBox)
     end
-    if s and s.tipText ~= 0 then
-        uiShowFrame(s.tipText)
+    if s and s.tipBodyText ~= 0 then
+        uiShowFrame(s.tipBodyText)
+    end
+    if s and s.tipSourceText ~= 0 then
+        uiShowFrame(s.tipSourceText)
     end
 end
 local function hideSlotTooltipByIndex(index)
     local s = slots[index + 1]
-    if s and s.tipText ~= 0 then
-        uiHideFrame(s.tipText)
+    if s and s.tipBodyText ~= 0 then
+        uiHideFrame(s.tipBodyText)
+    end
+    if s and s.tipSourceText ~= 0 then
+        uiHideFrame(s.tipSourceText)
     end
     if s and s.tipBox ~= 0 then
         uiHideFrame(s.tipBox)
@@ -299,15 +325,26 @@ local function createOneSlot(index, parent)
         setFrameLevelSafe(hit, 181)
         uiSetFrameHoverEvents(hit, onSlotHoverEnter, onSlotHoverLeave, false)
     end
-    local boxW = TIP_W + TIP_PAD * 2
-    local boxH = TIP_H + TIP_PAD * 2
-    local tipBox = uiCreateFrame({
-        type = ____UI_5DE5_5177.FrameType.BACKDROP,
-        name = "BuffUIBarTip" .. tostring(index),
-        parent = parent,
-        template = "template",
-        visible = false
-    }) or 0
+    local boxW = TIP_W
+    local boxH = TIP_H
+    local tipBox = uiTryCreateFromFdfSafe(
+        "BuffTestTooltipPanel",
+        parent,
+        function()
+            local fallbackFrame = uiCreateFrame({
+                type = ____UI_5DE5_5177.FrameType.BACKDROP,
+                name = "BuffUIBarTip" .. tostring(index),
+                parent = parent,
+                template = "template",
+                visible = false
+            })
+            if fallbackFrame and fallbackFrame ~= 0 then
+                uiSetFrameTexture(fallbackFrame, TIP_BOX_TEX)
+            end
+            return fallbackFrame
+        end,
+        index + 1
+    ) or 0
     if tipBox and tipBox ~= 0 then
         uiSetFramePointRelative(
             tipBox,
@@ -318,20 +355,19 @@ local function createOneSlot(index, parent)
             TIP_OFFSET_Y_FROM_ICON_TOP
         )
         uiSetFrameSize(tipBox, {width = boxW, height = boxH})
-        uiSetFrameTexture(tipBox, TIP_BOX_TEX)
         setFrameLevelSafe(tipBox, 200)
         uiHideFrame(tipBox)
     end
-    local tipText = uiCreateTextLabel(
-        "BuffUIBarTipTxt" .. tostring(index),
+    local tipBodyText = uiCreateTextLabel(
+        "BuffUIBarTipBodyTxt" .. tostring(index),
         tipBox and tipBox ~= 0 and tipBox or bd,
         "",
         tipBox and tipBox ~= 0 and ({
             relativeTo = tipBox,
-            point = ____UI_5DE5_5177.FramePoint.CENTER,
-            relativePoint = ____UI_5DE5_5177.FramePoint.CENTER,
-            x = 0,
-            y = 0
+            point = ____UI_5DE5_5177.FramePoint.TOPLEFT,
+            relativePoint = ____UI_5DE5_5177.FramePoint.TOPLEFT,
+            x = TIP_PAD_X,
+            y = -TIP_PAD_TOP
         }) or ({
             relativeTo = bd,
             point = ____UI_5DE5_5177.FramePoint.TOPLEFT,
@@ -339,12 +375,38 @@ local function createOneSlot(index, parent)
             x = 0.002,
             y = TIP_OFFSET_Y_FROM_ICON_TOP
         }),
-        {width = boxW * 0.92, height = boxH * 0.88}
+        {width = boxW - TIP_PAD_X * 2, height = 0.037}
     ) or 0
-    if tipText and tipText ~= 0 then
-        japi.DzFrameSetTextAlignment(tipText, 0)
-        setFrameLevelSafe(tipText, 201)
-        uiHideFrame(tipText)
+    if tipBodyText and tipBodyText ~= 0 then
+        japi.DzFrameSetTextAlignment(tipBodyText, -1)
+        japi.DzFrameSetTextAlignment(tipBodyText, 0)
+        setFrameLevelSafe(tipBodyText, 201)
+        uiHideFrame(tipBodyText)
+    end
+    local tipSourceText = uiCreateTextLabel(
+        "BuffUIBarTipSourceTxt" .. tostring(index),
+        tipBox and tipBox ~= 0 and tipBox or bd,
+        "",
+        tipBox and tipBox ~= 0 and ({
+            relativeTo = tipBox,
+            point = ____UI_5DE5_5177.FramePoint.BOTTOMLEFT,
+            relativePoint = ____UI_5DE5_5177.FramePoint.BOTTOMLEFT,
+            x = TIP_PAD_X,
+            y = TIP_PAD_BOTTOM
+        }) or ({
+            relativeTo = bd,
+            point = ____UI_5DE5_5177.FramePoint.TOPLEFT,
+            relativePoint = ____UI_5DE5_5177.FramePoint.TOPRIGHT,
+            x = 0.002,
+            y = TIP_OFFSET_Y_FROM_ICON_TOP - 0.016
+        }),
+        {width = boxW - TIP_PAD_X * 2, height = 0.019}
+    ) or 0
+    if tipSourceText and tipSourceText ~= 0 then
+        japi.DzFrameSetTextAlignment(tipSourceText, -1)
+        japi.DzFrameSetTextAlignment(tipSourceText, 6)
+        setFrameLevelSafe(tipSourceText, 201)
+        uiHideFrame(tipSourceText)
     end
     uiHideFrame(bd)
     return {
@@ -352,7 +414,8 @@ local function createOneSlot(index, parent)
         remainText = remainText or 0,
         hit = hit or 0,
         tipBox = tipBox or 0,
-        tipText = tipText or 0
+        tipBodyText = tipBodyText or 0,
+        tipSourceText = tipSourceText or 0
     }
 end
 MAX_PLAYER_ID = 6

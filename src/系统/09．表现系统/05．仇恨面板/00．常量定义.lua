@@ -69,7 +69,7 @@ ____exports.THREAT_PANEL_PERCENT_COL_WIDTH = 0.034
 --- "仇恨"列 X 偏移
 ____exports.THREAT_PANEL_THREAT_COL_X = 0.13
 --- "仇恨"列宽度
-____exports.THREAT_PANEL_THREAT_COL_WIDTH = 0.04
+____exports.THREAT_PANEL_THREAT_COL_WIDTH = 0.07
 --- 内部背景 X 偏移
 ____exports.THREAT_PANEL_INNER_OFFSET_X = 0.01
 --- 内部背景 Y 偏移

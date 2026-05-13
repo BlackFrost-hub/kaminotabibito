@@ -27,6 +27,7 @@ ____exports.Player = jass.Player
 ____exports.GetLocalPlayer = jass.GetLocalPlayer
 ____exports.GetPlayerId = jass.GetPlayerId
 ____exports.GetOwningPlayer = jass.GetOwningPlayer
+____exports.GetHandleId = jass.GetHandleId
 ____exports.GetUnitName = jass.GetUnitName
 ____exports.GetUnitTypeId = jass.GetUnitTypeId
 ____exports.IsUnitType = jass.IsUnitType

@@ -30,11 +30,6 @@ const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (t
 const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
 const Player = jass.Player as (playerId: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (u: any) => any;
-const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
-const StringHash = jass.StringHash as (value: string) => number;
-const SaveReal = jass.SaveReal as (table: any, parentKey: number, childKey: number, value: number) => void;
-const LoadReal = jass.LoadReal as (table: any, parentKey: number, childKey: number) => number;
 
 const WOUND_BUFF_ID = "C021";
 const 模块名 = "重伤装备测试";
@@ -42,45 +37,11 @@ const 测试命令 = "1023";
 let 已注册 = false;
 
 function 写入YD用户数据(this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any): void {
-  debugLogForce(模块名, "测试写入YD用户数据：tableType=", tableType, "tableKey=", tostring(tableKey), "attr=", attr, "valueType=", valueType, "value=", value);
   YDUserDataSetSafe(tableType, tableKey, attr, valueType, value);
 }
 
 function 读取YD用户数据(this: void, tableType: string, tableKey: any, attr: string, valueType: string): any {
-  const value = YDUserDataGetSafe(tableType, tableKey, attr, valueType);
-  debugLogForce(模块名, "测试读取YD用户数据：tableType=", tableType, "tableKey=", tostring(tableKey), "attr=", attr, "valueType=", valueType, "value=", value);
-  return value;
-}
-
-function 获取YD哈希表(this: void): any {
-  const 候选 = [
-    (g as any).YDHASH_HANDLE,
-    (g as any).YDHT,
-    (g as any).udg_YDHASH_HANDLE,
-    (g as any).udg_YDHT,
-  ];
-  for (const 哈希表 of 候选) {
-    if (哈希表 != null && 哈希表 !== 0) return 哈希表;
-  }
-  return null;
-}
-
-function 输出原始哈希诊断(this: void, owner: any): void {
-  const 哈希表 = 获取YD哈希表();
-  const 玩家句柄ID = GetHandleId(owner);
-  const 玩家ID = GetPlayerId(owner);
-  const 属性键 = StringHash("重伤");
-  debugLogForce(模块名, "原始哈希诊断：hash=", tostring(哈希表), "playerHandleId=", 玩家句柄ID, "playerId=", 玩家ID, "attrHash=", 属性键);
-  if (哈希表 == null || 哈希表 === 0) {
-    debugLogForce(模块名, "原始哈希诊断：未找到YDHASH句柄");
-    return;
-  }
-
-  SaveReal(哈希表, 玩家句柄ID, 属性键, 0.75);
-  debugLogForce(模块名, "原始哈希诊断：按handleId写0.75后读取=", LoadReal(哈希表, 玩家句柄ID, 属性键));
-
-  SaveReal(哈希表, 玩家ID, 属性键, 0.25);
-  debugLogForce(模块名, "原始哈希诊断：按playerId写0.25后读取=", LoadReal(哈希表, 玩家ID, 属性键));
+  return YDUserDataGetSafe(tableType, tableKey, attr, valueType);
 }
 
 function on聊天测试(): void {
@@ -99,7 +60,6 @@ function on聊天测试(): void {
   debugLogForce(模块名, "英雄owner：", owner);
   写入YD用户数据("player", owner, "重伤", "real", 0.5);
   debugLogForce(模块名, "已设置英雄装备重伤：", 读取YD用户数据("player", owner, "重伤", "real"));
-  输出原始哈希诊断(owner);
 
   debugLogForce(模块名, "===== 请攻击任意敌人 =====");
   debugLogForce(模块名, "攻击后敌人会获得重伤buff");

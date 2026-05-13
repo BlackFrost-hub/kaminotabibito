@@ -86,7 +86,7 @@ export const THREAT_PANEL_PERCENT_COL_WIDTH = 0.0340;
 /** "仇恨"列 X 偏移 */
 export const THREAT_PANEL_THREAT_COL_X = 0.13;
 /** "仇恨"列宽度 */
-export const THREAT_PANEL_THREAT_COL_WIDTH = 0.0400;
+export const THREAT_PANEL_THREAT_COL_WIDTH = 0.0700;
 
 // ===== 内部背景面板 =====
 /** 内部背景 X 偏移 */

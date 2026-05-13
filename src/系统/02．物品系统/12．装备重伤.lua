@@ -9,26 +9,10 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 fourCCToString = ____require_result_0.fourCCToString
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_2.debugLogForce
-local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
 ____ATTR__91CD_4F24 = "重伤"
-_____6A21_5757_540D = "装备重伤"
 function _____5199_5165YD_7528_6237_6570_636E(tableType, tableKey, attr, valueType, value)
-    debugLogForce(
-        _____6A21_5757_540D,
-        "写入YD用户数据：tableType=",
-        tableType,
-        "tableKey=",
-        tostring(tableKey),
-        "attr=",
-        attr,
-        "valueType=",
-        valueType,
-        "value=",
-        value
-    )
     YDUserDataSetSafe(
         tableType,
         tableKey,
@@ -71,17 +55,6 @@ end
 function applyWound(unit, newValue)
     local owner = jass.GetOwningPlayer(unit)
     local playerId = jass.GetPlayerId(owner)
-    debugLogForce(
-        _____6A21_5757_540D,
-        "applyWound：unit=",
-        tostring(unit),
-        "owner=",
-        tostring(owner),
-        "playerId=",
-        playerId,
-        "newValue=",
-        newValue
-    )
     if playerId < 0 or playerId > 3 then
         return
     end
@@ -115,17 +88,6 @@ function onItemChange(unit, item, isPickup)
     end
     local isDrop = not isPickup
     local newWound = isDrop and getMaxWound(unit, item) or getMaxWound(unit)
-    debugLogForce(
-        _____6A21_5757_540D,
-        "onItemChange：unit=",
-        tostring(unit),
-        "item=",
-        tostring(item),
-        "isPickup=",
-        isPickup,
-        "newWound=",
-        newWound
-    )
     applyWound(unit, newWound)
 end
 function init()

@@ -67,10 +67,10 @@ function formatDotTooltip(
   s = s.split("damage").join(damageStr);
   s = s.split("data").join(dataStr);
 
-  const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未知";
+  const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未记录";
   return {
     bodyText: TIP_COLOR_BODY + s + "|r",
-    sourceText: TIP_COLOR_SOURCE + "buff来源为『" + src + "』|r",
+    sourceText: TIP_COLOR_SOURCE + "来源：" + src + "|r",
   };
 }
 
@@ -171,9 +171,9 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         "|r";
       tooltipSourceText =
         TIP_COLOR_SOURCE +
-        "buff来源为『" +
-        (row.state.sourceName && row.state.sourceName !== "" ? row.state.sourceName : "未知") +
-        "』|r";
+        "来源：" +
+        (row.state.sourceName && row.state.sourceName !== "" ? row.state.sourceName : "未记录") +
+        "|r";
     }
 
     const remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining);

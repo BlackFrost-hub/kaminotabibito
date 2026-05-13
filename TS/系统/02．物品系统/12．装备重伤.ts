@@ -16,18 +16,13 @@ const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
 };
 
 const ATTR_重伤 = "重伤";
-const 模块名 = "装备重伤";
 
 function 写入YD用户数据(this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any): void {
-  debugLogForce(模块名, "写入YD用户数据：tableType=", tableType, "tableKey=", tostring(tableKey), "attr=", attr, "valueType=", valueType, "value=", value);
   YDUserDataSetSafe(tableType, tableKey, attr, valueType, value);
 }
 
@@ -53,7 +48,6 @@ function getMaxWound(unit: any, ignoreItem?: any): number {
 function applyWound(unit: any, newValue: number): void {
   const owner = jass.GetOwningPlayer(unit);
   const playerId = jass.GetPlayerId(owner);
-  debugLogForce(模块名, "applyWound：unit=", tostring(unit), "owner=", tostring(owner), "playerId=", playerId, "newValue=", newValue);
   if (playerId < 0 || playerId > 3) return;
 
   // 英雄：存储到玩家；非英雄：存储到单位
@@ -70,7 +64,6 @@ function onItemChange(unit: any, item: any, isPickup: boolean): void {
   if (IsUnitIllusionBJ(unit)) return;
   const isDrop = !isPickup;
   const newWound = isDrop ? getMaxWound(unit, item) : getMaxWound(unit);
-  debugLogForce(模块名, "onItemChange：unit=", tostring(unit), "item=", tostring(item), "isPickup=", isPickup, "newWound=", newWound);
   applyWound(unit, newWound);
 }
 

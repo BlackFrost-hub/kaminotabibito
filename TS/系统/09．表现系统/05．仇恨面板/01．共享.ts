@@ -44,6 +44,7 @@ export const Player = jass.Player as (playerId: number) => any;
 export const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 export const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 export const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
+export const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 export const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
 export const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 export const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: any) => boolean;
