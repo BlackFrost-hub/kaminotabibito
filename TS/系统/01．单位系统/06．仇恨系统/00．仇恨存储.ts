@@ -162,6 +162,8 @@ export function addThreat(敌人: any, 仇恨目标: any, 数值: number): void 
     list = [];
     threatTables[敌人ID] = list;
   }
+  enemyRefTable[敌人ID] = 敌人;
+  enemyLastThreatUpdateMs[敌人ID] = 当前时间;
 
   for (let i = 0; i < list.length; i++) {
     if (list[i].targetHid === 目标ID) {
@@ -201,6 +203,8 @@ export function setThreat(敌人: any, 仇恨目标: any, 数值: number): void 
     list = [];
     threatTables[敌人ID] = list;
   }
+  enemyRefTable[敌人ID] = 敌人;
+  enemyLastThreatUpdateMs[敌人ID] = 当前时间;
 
   for (let i = 0; i < list.length; i++) {
     if (list[i].targetHid === 目标ID) {

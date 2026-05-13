@@ -19,21 +19,21 @@ function onOutOfCombat(self, playerId)
             if unit == nil then
                 return
             end
-            local owner = jass.GetOwningPlayer(unit)
-            if jass.GetPlayerId(owner) ~= playerId then
+            local owner = jass:GetOwningPlayer(unit)
+            if jass:GetPlayerId(owner) ~= playerId then
                 return
             end
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0,
                 30,
                 "脱战成功！生命和魔法已恢复。"
             )
-            jass.UnitAddAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY)
+            jass:UnitAddAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY)
             SetUnitLifePercentBJ(nil, unit, 100)
             SetUnitManaPercentBJ(nil, unit, 100)
-            jass.SetUnitPathing(unit, true)
+            jass:SetUnitPathing(unit, true)
         end
     )
 end
@@ -71,7 +71,7 @@ local function isPlayerHero(self, unit)
     if unit == nil then
         return false
     end
-    if not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) then
+    if not jass:IsUnitType(unit, jass.UNIT_TYPE_HERO) then
         return false
     end
     local heroGroup = YDUserDataGet(
@@ -101,11 +101,11 @@ local function getPlayerId(self, unit)
     if unit == nil then
         return -1
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     if owner == nil then
         return -1
     end
-    return jass.GetPlayerId(owner)
+    return jass:GetPlayerId(owner)
 end
 --- 启动脱战计时器
 local function startOutOfCombatTimer(self, playerId)
@@ -133,13 +133,13 @@ local function checkRemoveOutOfCombatBuff(self, unit, damage)
     if not UnitHasBuffBJ(nil, unit, OUT_OF_COMBAT_BUFF) then
         return
     end
-    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = jass:GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     local threshold = maxLife * DAMAGE_THRESHOLD_RATIO
     if damage >= threshold then
-        jass.UnitRemoveAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY)
-        jass.UnitRemoveAbility(unit, OUT_OF_COMBAT_BUFF)
-        local owner = jass.GetOwningPlayer(unit)
-        jass.DisplayTimedTextToPlayer(
+        jass:UnitRemoveAbility(unit, OUT_OF_COMBAT_SPEED_ABILITY)
+        jass:UnitRemoveAbility(unit, OUT_OF_COMBAT_BUFF)
+        local owner = jass:GetOwningPlayer(unit)
+        jass:DisplayTimedTextToPlayer(
             owner,
             0,
             0,
@@ -150,7 +150,7 @@ local function checkRemoveOutOfCombatBuff(self, unit, damage)
 end
 --- 单位受伤事件处理（通过统一伤害事件回调）
 local function onUnitDamaged(self, unit, damage, _damageType, _fromDotTickBatch, _source, _isNormalAttack)
-    if jass.IsUnitIllusion(unit) then
+    if jass:IsUnitIllusion(unit) then
         return
     end
     if damage < 1 then

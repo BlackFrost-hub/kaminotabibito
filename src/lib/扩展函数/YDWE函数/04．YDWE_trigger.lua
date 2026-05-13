@@ -94,8 +94,8 @@ function ____exports.YDLocalExecuteTrigger(self, trg)
         return
     end
     local YDLOC = findYDLOC(nil)
-    local hd = jass.GetHandleId(trg)
-    if YDLOC and jass.HaveSavedInteger(
+    local hd = jass:GetHandleId(trg)
+    if YDLOC and jass:HaveSavedInteger(
         YDLOC,
         hd,
         getSKey_Trigger(nil)
@@ -105,7 +105,7 @@ function ____exports.YDLocalExecuteTrigger(self, trg)
     end
     local ____YDLOC_9
     if YDLOC then
-        ____YDLOC_9 = jass.LoadInteger(YDLOC, hd, STEP_KEY)
+        ____YDLOC_9 = jass:LoadInteger(YDLOC, hd, STEP_KEY)
     else
         ____YDLOC_9 = 0
     end
@@ -124,7 +124,7 @@ function ____exports.YDTriggerExecuteTrigger(self, trg, flag)
     if flag then
         ConditionalTriggerExecute(nil, trg)
     else
-        jass.TriggerExecute(trg)
+        jass:TriggerExecute(trg)
     end
 end
 --- 保存父索引到 YDHT，使子触发器可以通过 YDLocal7Set 写返回值
@@ -142,9 +142,9 @@ function ____exports.saveParentIndex(self, trg)
     if not YDHT then
         return
     end
-    local childHd = jass.GetHandleId(trg)
+    local childHd = jass:GetHandleId(trg)
     local parentIndex = getG_SIndex(nil)
-    jass.SaveInteger(
+    jass:SaveInteger(
         YDHT,
         childHd,
         getSKey_PIndex(nil),
@@ -163,8 +163,8 @@ function ____exports.removeParentIndex(self, trg)
     if not YDHT then
         return
     end
-    local childHd = jass.GetHandleId(trg)
-    jass.RemoveSavedInteger(
+    local childHd = jass:GetHandleId(trg)
+    jass:RemoveSavedInteger(
         YDHT,
         childHd,
         getSKey_PIndex(nil)

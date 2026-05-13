@@ -16,7 +16,7 @@ function neutralPassivePlayer()
         ____temp_4 = 15
     end
     local pid = ____temp_4
-    return jass.Player(pid)
+    return jass:Player(pid)
 end
 function dbg(_msg)
 end
@@ -74,7 +74,7 @@ function resolveWatchUnit(cfg)
             ____temp_5 = 270
         end
         local face = ____temp_5
-        local u = jass.CreateUnit(
+        local u = jass:CreateUnit(
             passive,
             four,
             tx,
@@ -97,17 +97,17 @@ end
 function runActivationEffects(cfg, watchUnit)
     local gg = g
     if cfg.UnitID ~= nil and watchUnit ~= nil and watchUnit ~= 0 then
-        local p6 = jass.Player(6)
+        local p6 = jass:Player(6)
         if p6 then
-            jass.SetUnitOwner(watchUnit, p6, true)
+            jass:SetUnitOwner(watchUnit, p6, true)
         end
     end
     if cfg.reveal ~= nil then
         local revealRect = gg[cfg.reveal]
         if revealRect then
             local mode = jass.FOG_OF_WAR_VISIBLE
-            jass.SetFogStateRect(
-                jass.Player(0),
+            jass:SetFogStateRect(
+                jass:Player(0),
                 mode,
                 revealRect,
                 true
@@ -118,8 +118,8 @@ function runActivationEffects(cfg, watchUnit)
         do
             local i = 0
             while i < 4 do
-                jass.DisplayTimedTextToPlayer(
-                    jass.Player(i),
+                jass:DisplayTimedTextToPlayer(
+                    jass:Player(i),
                     0,
                     0,
                     8,
@@ -129,11 +129,11 @@ function runActivationEffects(cfg, watchUnit)
             end
         end
     end
-    local localPlayer = jass.GetLocalPlayer()
+    local localPlayer = jass:GetLocalPlayer()
     do
         local i = 0
         while i < 4 do
-            if localPlayer == jass.Player(i) then
+            if localPlayer == jass:Player(i) then
                 Sound3DII_Mp3Play(nil, ACTIVATION_SOUND)
                 break
             end
@@ -142,11 +142,11 @@ function runActivationEffects(cfg, watchUnit)
     end
 end
 function onActivationPointEnter()
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if trig == nil or trig == 0 then
         return
     end
-    local trigHid = jass.GetHandleId(trig)
+    local trigHid = jass:GetHandleId(trig)
     local key = activationPointTriggerKeyByHid[trigHid]
     if not key then
         return
@@ -154,7 +154,7 @@ function onActivationPointEnter()
     if activationPointTriggerFiredByKey[key] == true then
         return
     end
-    local enterer = jass.GetTriggerUnit()
+    local enterer = jass:GetTriggerUnit()
     if enterer == nil or enterer == 0 then
         return
     end
@@ -173,9 +173,9 @@ function onActivationPointEnter()
     if handle ~= nil and handle ~= 0 then
         __TS__Delete(
             activationPointTriggerKeyByHid,
-            jass.GetHandleId(handle)
+            jass:GetHandleId(handle)
         )
-        jass.DestroyTrigger(handle)
+        jass:DestroyTrigger(handle)
     end
     __TS__Delete(activationPointTriggerHandleByKey, key)
     __TS__Delete(activationPointTriggerWatchUnitByKey, key)
@@ -187,7 +187,7 @@ function registerOnePoint(cfg, key)
         dbg("跳过：无有效监视单位 " .. key)
         return
     end
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     local unregister = unitSpecificEventCenter.registerUnitInRangeTrigger(
         trig,
         watchUnit,
@@ -195,12 +195,12 @@ function registerOnePoint(cfg, key)
         nil,
         true
     )
-    activationPointTriggerKeyByHid[jass.GetHandleId(trig)] = key
+    activationPointTriggerKeyByHid[jass:GetHandleId(trig)] = key
     activationPointTriggerFiredByKey[key] = false
     activationPointTriggerWatchUnitByKey[key] = watchUnit
     activationPointTriggerHandleByKey[key] = trig
     activationPointTriggerUnregisterByKey[key] = unregister
-    jass.TriggerAddAction(trig, onActivationPointEnter)
+    jass:TriggerAddAction(trig, onActivationPointEnter)
 end
 function initActivationPointsInternal()
     local count = 0
@@ -247,14 +247,14 @@ local function formatGgUnitProbe(u)
         return "nil/0"
     end
     local tail = ""
-    tail = " typeId=" .. tostring(jass.GetUnitTypeId(u))
+    tail = " typeId=" .. tostring(jass:GetUnitTypeId(u))
     if jass.UNIT_STATE_LIFE ~= nil then
-        tail = (tail .. " life=") .. tostring(jass.GetUnitState(u, jass.UNIT_STATE_LIFE))
+        tail = (tail .. " life=") .. tostring(jass:GetUnitState(u, jass.UNIT_STATE_LIFE))
     end
     return "ok" .. tail
 end
 local function onDebugSnapshot0sTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     local gAny = g
     local jc = jass
     local G = _G
@@ -266,8 +266,8 @@ local function onDebugSnapshot0sTimerExpire()
     do
         local pi = 0
         while pi < 4 do
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(pi),
+            jass:DisplayTimedTextToPlayer(
+                jass:Player(pi),
                 0,
                 0,
                 14,
@@ -280,7 +280,7 @@ local function onDebugSnapshot0sTimerExpire()
     safeDestroyTimer(nil, t)
 end
 local function onDebugSnapshot1sTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     local gAny = g
     local jc = jass
     local G = _G
@@ -292,8 +292,8 @@ local function onDebugSnapshot1sTimerExpire()
     do
         local pi = 0
         while pi < 4 do
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(pi),
+            jass:DisplayTimedTextToPlayer(
+                jass:Player(pi),
                 0,
                 0,
                 14,
@@ -306,7 +306,7 @@ local function onDebugSnapshot1sTimerExpire()
     safeDestroyTimer(nil, t)
 end
 local function onInitActivationPointsTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     initActivationPointsInternal()
     safeDestroyTimer(nil, t)
 end
@@ -315,7 +315,7 @@ local function scheduleDebugGgUnitHtow0030()
     if not DEBUG_GG_UNIT_HTOW_0030 then
         return
     end
-    local t0 = jass.CreateTimer()
+    local t0 = jass:CreateTimer()
     if t0 then
         safeTimerStart(
             nil,
@@ -325,7 +325,7 @@ local function scheduleDebugGgUnitHtow0030()
             onDebugSnapshot0sTimerExpire
         )
     end
-    local t1 = jass.CreateTimer()
+    local t1 = jass:CreateTimer()
     if t1 then
         safeTimerStart(
             nil,
@@ -339,7 +339,7 @@ end
 --- 在地图初始化时调用（建议用 0.00 秒计时器）
 ____exports["init激活传送点"] = function()
     scheduleDebugGgUnitHtow0030()
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if t then
         safeTimerStart(
             nil,

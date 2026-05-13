@@ -82,6 +82,7 @@ function nowMs(): number {
 }
 
 function 清理敌人仇恨状态(敌人ID: number): void {
+  debugLogForce(模块名, "清理敌人仇恨状态 敌人ID=", 敌人ID);
   清除仇恨显示ById(敌人ID);
   clearAllThreatById(敌人ID);
 }
@@ -108,17 +109,20 @@ function onTick(): void {
     const 敌人ID = 敌人ID列表[i];
     const 敌人 = getEnemyRef(敌人ID);
     if (敌人 == null || 敌人 === 0) {
+      debugLogForce(模块名, "驱动清理：敌人引用丢失 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }
 
     if (IsUnitType(敌人, UNIT_TYPE_DEAD)) {
+      debugLogForce(模块名, "驱动清理：敌人已死亡 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }
 
     清理敌人过期仇恨条目ById(敌人ID);
     if (!hasThreatTable(敌人ID)) {
+      debugLogForce(模块名, "驱动清理：过期条目清完后已无仇恨表 敌人ID=", 敌人ID);
       清除仇恨显示ById(敌人ID);
       continue;
     }
@@ -135,6 +139,7 @@ function onTick(): void {
     const best = 获取应攻击目标(敌人, filter);
 
     if (best == null) {
+      debugLogForce(模块名, "驱动清理：未找到有效目标 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }
@@ -171,6 +176,7 @@ export function 驱动单个敌人(敌人: any): void {
 
   清理敌人过期仇恨条目ById(敌人ID);
   if (!hasThreatTable(敌人ID)) {
+    debugLogForce(模块名, "单体驱动清理：过期条目清完后已无仇恨表 敌人ID=", 敌人ID);
     清除仇恨显示ById(敌人ID);
     return;
   }
@@ -187,6 +193,7 @@ export function 驱动单个敌人(敌人: any): void {
   const best = 获取应攻击目标(敌人, filter);
 
   if (best == null) {
+    debugLogForce(模块名, "单体驱动清理：未找到有效目标 敌人ID=", 敌人ID);
     清理敌人仇恨状态(敌人ID);
     return;
   }

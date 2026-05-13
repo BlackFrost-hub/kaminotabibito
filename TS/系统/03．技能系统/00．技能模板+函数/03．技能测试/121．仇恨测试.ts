@@ -18,8 +18,10 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 
 const {
   初始化仇恨系统,
+  驱动单个敌人,
 } = require("系统.01．单位系统.06．仇恨系统.index") as {
   初始化仇恨系统: (this: void) => void;
+  驱动单个敌人: (this: void, 敌人: any) => void;
 };
 
 const { addThreat, clearAllThreat } = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储") as {
@@ -62,19 +64,19 @@ function on聊天测试(): void {
     return;
   }
 
-  // 先清空旧仇恨，再手动加仇恨（addThreat 会自动维护敌人引用表）
-  for (let i = 0; i < 敌人列表.length; i++) {
-    const 敌人 = 敌人列表[i];
-    if (敌人 == null || 敌人 === 0) continue;
-
-    clearAllThreat(敌人);
-
-    // 加 30 仇恨（≈打掉30%血），让敌人攻击大法师
-    addThreat(敌人, 大法师, 30);
-    debugLogForce(模块名, "加仇恨 敌人ID=", jass.GetHandleId(敌人), "对大法师 仇恨=30");
+  const 敌人 = 敌人列表[0];
+  if (敌人 == null || 敌人 === 0) {
+    debugLogForce(模块名, "错误：找到的第一个敌人无效");
+    return;
   }
 
-  debugLogForce(模块名, "步骤1完成：已在", 敌人列表.length, "个敌人上注册仇恨，驱动将使其攻击大法师");
+  clearAllThreat(敌人);
+
+  // 这里只是手动加 30 点仇恨，不是“造成 30 点伤害后的换算值”。
+  addThreat(敌人, 大法师, 30);
+  驱动单个敌人(敌人);
+  debugLogForce(模块名, "加仇恨 敌人ID=", jass.GetHandleId(敌人), "对大法师 仇恨=30");
+  debugLogForce(模块名, "步骤1完成：仅对第一个敌人注册30仇恨，并立即驱动其攻击大法师");
 }
 
 function 注册聊天测试(): void {

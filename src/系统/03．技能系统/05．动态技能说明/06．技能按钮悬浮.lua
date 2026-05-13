@@ -36,7 +36,7 @@ local function replaceAllText(text, search, replacement)
     )
 end
 local function getRegisteredHeroForLocalPlayer()
-    local localPlayer = jass.GetLocalPlayer()
+    local localPlayer = jass:GetLocalPlayer()
     if not localPlayer or localPlayer == 0 then
         return nil
     end
@@ -49,11 +49,11 @@ local function getRegisteredHeroForLocalPlayer()
     )
 end
 local function getSelectedRegisteredHeroForLocalPlayer()
-    local localPlayer = jass.GetLocalPlayer()
+    local localPlayer = jass:GetLocalPlayer()
     if not localPlayer or localPlayer == 0 then
         return nil
     end
-    local playerId = jass.GetPlayerId(localPlayer)
+    local playerId = jass:GetPlayerId(localPlayer)
     local selectedUnit = getSoleSelectedUnitForPlayer(nil, playerId)
     if not selectedUnit or selectedUnit == 0 then
         return nil
@@ -106,7 +106,7 @@ local function renderTooltipText(hero, rawTemplate, level)
     if result == "" then
         return ""
     end
-    local intelligence = jass.GetHeroInt(hero, true) or 0
+    local intelligence = jass:GetHeroInt(hero, true) or 0
     local intTimes3 = tostring(intelligence * 3)
     local intTimes3AndLevel = tostring(intelligence * 3 * level)
     result = replaceAllText(result, "智力×3×技能等级", intTimes3AndLevel)
@@ -158,7 +158,7 @@ local function refreshOneSlot(hero, slotKey, column)
     if abilityId == 0 then
         return
     end
-    local level = jass.GetUnitAbilityLevel(hero, abilityId) or 0
+    local level = jass:GetUnitAbilityLevel(hero, abilityId) or 0
     if level <= 0 then
         return
     end

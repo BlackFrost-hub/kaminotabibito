@@ -27,7 +27,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not triggerPlayer or not npcConfig or not npcUnit then
         return
     end
-    local playerId = jass.GetPlayerId(triggerPlayer)
+    local playerId = jass:GetPlayerId(triggerPlayer)
     if playerId < 0 or playerId >= DIALOG_PLAYER_SLOTS then
         return
     end
@@ -35,7 +35,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not hero then
         return
     end
-    if not jass.IsUnitInRange(hero, npcUnit, 350) then
+    if not jass:IsUnitInRange(hero, npcUnit, 350) then
         return
     end
     local npcName = resolveNpcDialogName(npcConfig)
@@ -99,7 +99,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
         )
         return
     end
-    local heroName = jass.GetUnitName(hero)
+    local heroName = jass:GetUnitName(hero)
     local dialogData = buildDialogData(nil, npcName, heroName)
     if dialogData then
         openNpcDialog(
@@ -119,11 +119,11 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
     if not selectedUnit or selectedUnit == 0 then
         return
     end
-    local selectedOwner = jass.GetOwningPlayer(selectedUnit)
-    if not selectedOwner or selectedOwner ~= jass.Player(15) then
+    local selectedOwner = jass:GetOwningPlayer(selectedUnit)
+    if not selectedOwner or selectedOwner ~= jass:Player(15) then
         return
     end
-    local unitName = jass.GetUnitName(selectedUnit)
+    local unitName = jass:GetUnitName(selectedUnit)
     local npcConfig = findEnabledNpcConfigBySelectedUnit(nil, selectedUnit, unitName)
     if not npcConfig or npcConfig.requireID == nil then
         return
@@ -132,7 +132,7 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
     if not hero then
         return
     end
-    if not jass.IsUnitInRange(hero, selectedUnit, 350) then
+    if not jass:IsUnitInRange(hero, selectedUnit, 350) then
         return
     end
     openDialogForConfiguredNpc(triggerPlayer, npcConfig, selectedUnit)

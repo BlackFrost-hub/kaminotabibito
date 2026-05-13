@@ -11,19 +11,19 @@ local __safeAlpha = 0
 local __safeLevel = 0
 local __safeTocPath = ""
 local function __safeShowFramePcallBody(self)
-    japi.DzFrameShow(__safeFrame, __safeVisible)
+    japi:DzFrameShow(__safeFrame, __safeVisible)
 end
 local function __safeSetEnableFalsePcallBody(self)
-    japi.DzFrameSetEnable(__safeFrame, false)
+    japi:DzFrameSetEnable(__safeFrame, false)
 end
 local function __safeSetAlphaPcallBody(self)
-    japi.DzFrameSetAlpha(__safeFrame, __safeAlpha)
+    japi:DzFrameSetAlpha(__safeFrame, __safeAlpha)
 end
 local function __safeSetLevelPcallBody(self)
-    japi.DzFrameSetPriority(__safeFrame, __safeLevel)
+    japi:DzFrameSetPriority(__safeFrame, __safeLevel)
 end
 local function __safeLoadTocPcallBody(self)
-    japi.DzLoadToc(__safeTocPath)
+    japi:DzLoadToc(__safeTocPath)
 end
 function ____exports.createFrame(self, config)
     local ____config_1 = config
@@ -44,7 +44,7 @@ function ____exports.createFrame(self, config)
     if ____type == FrameType.SIMPLEFRAME then
         return nil
     end
-    local frame = japi.DzCreateFrameByTagName(
+    local frame = japi:DzCreateFrameByTagName(
         ____type,
         name,
         parent,
@@ -97,7 +97,7 @@ local __fdfSafeParent = 0
 local __fdfSafeContextId = 0
 local __fdfSafeOutFrame = 0
 local function __fdfSafeCreateFramePcallBody(self)
-    __fdfSafeOutFrame = japi.DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId)
+    __fdfSafeOutFrame = japi:DzCreateFrame(__fdfSafeFrameName, __fdfSafeParent, __fdfSafeContextId)
 end
 function ____exports.tryCreateFromFdfSafe(self, frameName, parent, fallback, opts)
     ____exports.loadTocOnce(nil, opts.tocLoadKey, opts.tocPaths, opts.debugPrefix or "UI")

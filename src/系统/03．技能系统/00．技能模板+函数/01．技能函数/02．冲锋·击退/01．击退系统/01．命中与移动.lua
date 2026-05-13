@@ -83,8 +83,8 @@ local function _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355
             ____temp_8 = _____5B9E_4F8B["单位"]
         end
         local _____53C2_8003_5355_4F4D = ____temp_8
-        local _____6240_5C5E_73A9_5BB6 = jass.GetOwningPlayer(_____53C2_8003_5355_4F4D)
-        if not jass.IsUnitEnemy(_____76EE_6807_5355_4F4D, _____6240_5C5E_73A9_5BB6) then
+        local _____6240_5C5E_73A9_5BB6 = jass:GetOwningPlayer(_____53C2_8003_5355_4F4D)
+        if not jass:IsUnitEnemy(_____76EE_6807_5355_4F4D, _____6240_5C5E_73A9_5BB6) then
             return false
         end
     end
@@ -105,20 +105,20 @@ local function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
         return nil
     end
     local _____679A_4E3E_7528_7EC4 = _____83B7_53D6_679A_4E3E_7EC4()
-    jass.GroupEnumUnitsInRange(
+    jass:GroupEnumUnitsInRange(
         _____679A_4E3E_7528_7EC4,
-        jass.GetUnitX(_____5B9E_4F8B["单位"]),
-        jass.GetUnitY(_____5B9E_4F8B["单位"]),
+        jass:GetUnitX(_____5B9E_4F8B["单位"]),
+        jass:GetUnitY(_____5B9E_4F8B["单位"]),
         _____5B9E_4F8B["命中半径"],
         nil
     )
     while true do
         do
-            local _____76EE_6807_5355_4F4D = jass.FirstOfGroup(_____679A_4E3E_7528_7EC4)
+            local _____76EE_6807_5355_4F4D = jass:FirstOfGroup(_____679A_4E3E_7528_7EC4)
             if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____679A_4E3E_7528_7EC4, _____76EE_6807_5355_4F4D)
+            jass:GroupRemoveUnit(_____679A_4E3E_7528_7EC4, _____76EE_6807_5355_4F4D)
             if not _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355_4F4D) then
                 goto __continue17
             end
@@ -143,11 +143,11 @@ local function _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
 end
 local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB_8DDD_79BB)
     local _____5355_4F4D = _____5B9E_4F8B["单位"]
-    local _____5F53_524DX = jass.GetUnitX(_____5355_4F4D)
-    local _____5F53_524DY = jass.GetUnitY(_____5355_4F4D)
+    local _____5F53_524DX = jass:GetUnitX(_____5355_4F4D)
+    local _____5F53_524DY = jass:GetUnitY(_____5355_4F4D)
     local _____5F27_5EA6 = _____5B9E_4F8B["角度"] * BJ_DEGTORAD
-    local _____65B0X = _____5F53_524DX + _____4F4D_79FB_8DDD_79BB * jass.Cos(_____5F27_5EA6)
-    local _____65B0Y = _____5F53_524DY + _____4F4D_79FB_8DDD_79BB * jass.Sin(_____5F27_5EA6)
+    local _____65B0X = _____5F53_524DX + _____4F4D_79FB_8DDD_79BB * jass:Cos(_____5F27_5EA6)
+    local _____65B0Y = _____5F53_524DY + _____4F4D_79FB_8DDD_79BB * jass:Sin(_____5F27_5EA6)
     if _____5B9E_4F8B["检查地形"] then
         if not _____5728_53EF_73A9_533A_57DF_5185(_____65B0X, _____65B0Y) then
             local _____649E_5899_56DE_8C03 = _____5B9E_4F8B["撞墙回调"]
@@ -176,10 +176,10 @@ local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB
         end
     end
     if _____5B9E_4F8B["朝向跟随位移"] then
-        jass.SetUnitFacing(_____5355_4F4D, _____5B9E_4F8B["角度"])
+        jass:SetUnitFacing(_____5355_4F4D, _____5B9E_4F8B["角度"])
     end
-    jass.SetUnitX(_____5355_4F4D, _____65B0X)
-    jass.SetUnitY(_____5355_4F4D, _____65B0Y)
+    jass:SetUnitX(_____5355_4F4D, _____65B0X)
+    jass:SetUnitY(_____5355_4F4D, _____65B0Y)
     _____5B9E_4F8B["已移动"] = _____5B9E_4F8B["已移动"] + _____4F4D_79FB_8DDD_79BB
     local _____547D_4E2D_76EE_6807 = _____68C0_67E5_547D_4E2D(_____5B9E_4F8B)
     if _____547D_4E2D_76EE_6807 ~= nil and _____547D_4E2D_76EE_6807 ~= 0 then

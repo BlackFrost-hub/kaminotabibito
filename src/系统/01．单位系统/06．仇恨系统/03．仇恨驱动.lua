@@ -52,6 +52,7 @@ local function nowMs()
     return _nowMs()
 end
 local function _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
+    debugLogForce(_____6A21_5757_540D, "清理敌人仇恨状态 敌人ID=", _____654C_4EBAID)
     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
     clearAllThreatById(_____654C_4EBAID)
 end
@@ -82,15 +83,18 @@ local function onTick()
                 local _____654C_4EBAID = _____654C_4EBAID_5217_8868[i + 1]
                 local _____654C_4EBA = getEnemyRef(_____654C_4EBAID)
                 if _____654C_4EBA == nil or _____654C_4EBA == 0 then
+                    debugLogForce(_____6A21_5757_540D, "驱动清理：敌人引用丢失 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue13
                 end
                 if IsUnitType(_____654C_4EBA, UNIT_TYPE_DEAD) then
+                    debugLogForce(_____6A21_5757_540D, "驱动清理：敌人已死亡 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue13
                 end
                 _____6E05_7406_654C_4EBA_8FC7_671F_4EC7_6068_6761_76EEById(_____654C_4EBAID)
                 if not hasThreatTable(_____654C_4EBAID) then
+                    debugLogForce(_____6A21_5757_540D, "驱动清理：过期条目清完后已无仇恨表 敌人ID=", _____654C_4EBAID)
                     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
                     goto __continue13
                 end
@@ -104,6 +108,7 @@ local function onTick()
                 local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
                 local best = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, filter)
                 if best == nil then
+                    debugLogForce(_____6A21_5757_540D, "驱动清理：未找到有效目标 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue13
                 end
@@ -149,6 +154,7 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     end
     _____6E05_7406_654C_4EBA_8FC7_671F_4EC7_6068_6761_76EEById(_____654C_4EBAID)
     if not hasThreatTable(_____654C_4EBAID) then
+        debugLogForce(_____6A21_5757_540D, "单体驱动清理：过期条目清完后已无仇恨表 敌人ID=", _____654C_4EBAID)
         _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
         return
     end
@@ -162,6 +168,7 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
     local best = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, filter)
     if best == nil then
+        debugLogForce(_____6A21_5757_540D, "单体驱动清理：未找到有效目标 敌人ID=", _____654C_4EBAID)
         _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
         return
     end

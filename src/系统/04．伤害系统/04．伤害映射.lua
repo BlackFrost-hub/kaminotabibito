@@ -24,7 +24,7 @@ local function _____53D6_73A9_5BB6_82F1_96C4(playerId)
     if _____73A9_5BB6_82F1_96C4_7F13_5B58[playerId] ~= nil then
         return _____73A9_5BB6_82F1_96C4_7F13_5B58[playerId]
     end
-    local player = jass.Player(playerId)
+    local player = jass:Player(playerId)
     local hero = YDUserDataGet(
         nil,
         "player",

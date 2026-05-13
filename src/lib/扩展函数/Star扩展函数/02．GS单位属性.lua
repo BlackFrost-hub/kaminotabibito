@@ -8,52 +8,52 @@ local SetUnitManaPercentBJ = ____require_result_0.SetUnitManaPercentBJ
 local GetUnitLifePercent = ____require_result_0.GetUnitLifePercent
 local GetUnitManaPercent = ____require_result_0.GetUnitManaPercent
 local ModifyHeroStat = ____require_result_0.ModifyHeroStat
-local HS = jass.InitHashtable()
+local HS = jass:InitHashtable()
 local function hid(self, h)
-    return jass.GetHandleId(h) or 0
+    return jass:GetHandleId(h) or 0
 end
 local function loadReal(self, handle, parent, child)
     if not handle then
         return 0
     end
-    return jass.LoadReal(handle, parent, child) or 0
+    return jass:LoadReal(handle, parent, child) or 0
 end
 local function saveReal(self, handle, parent, child, value)
     if not handle then
         return
     end
-    jass.SaveReal(handle, parent, child, value)
+    jass:SaveReal(handle, parent, child, value)
 end
 function ____exports.GS_LoadUintProperty(self, u, i)
     if not u then
         return 0
     end
     if i == 0 then
-        return jass.GetUnitState(u, jass.UNIT_STATE_LIFE) or 0
+        return jass:GetUnitState(u, jass.UNIT_STATE_LIFE) or 0
     end
     if i == 1 then
-        return jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0
+        return jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0
     end
     if i == 2 then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             u,
-            jass.ConvertUnitState(18)
+            jass:ConvertUnitState(18)
         ) or 0
     end
     if i == 3 then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             u,
-            jass.ConvertUnitState(32)
+            jass:ConvertUnitState(32)
         ) or 0
     end
     if i == 4 then
-        return jass.GetUnitState(
+        return jass:GetUnitState(
             u,
-            jass.ConvertUnitState(81)
+            jass:ConvertUnitState(81)
         ) or 0
     end
     if i == 5 then
-        return jass.GetUnitMoveSpeed(u) or 0
+        return jass:GetUnitMoveSpeed(u) or 0
     end
     return loadReal(
         nil,
@@ -73,53 +73,53 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
     local hp = 0
     if i == 0 then
         hp = GetUnitLifePercent(nil, u) or 0
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
-            jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) + r * (1 + loadReal(nil, HS, uid, 15))
+            jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) + r * (1 + loadReal(nil, HS, uid, 15))
         )
         SetUnitLifePercentBJ(nil, u, hp)
         return
     end
     if i == 1 then
         hp = GetUnitManaPercent(nil, u) or 0
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
             jass.UNIT_STATE_MAX_MANA,
-            jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) + r
+            jass:GetUnitState(u, jass.UNIT_STATE_MAX_MANA) + r
         )
         SetUnitManaPercentBJ(nil, u, hp)
         return
     end
     if i == 2 then
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
-            jass.ConvertUnitState(18),
-            jass.GetUnitState(
+            jass:ConvertUnitState(18),
+            jass:GetUnitState(
                 u,
-                jass.ConvertUnitState(18)
+                jass:ConvertUnitState(18)
             ) + r * (1 + loadReal(nil, HS, uid, 16))
         )
         return
     end
     if i == 3 then
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
-            jass.ConvertUnitState(32),
-            jass.GetUnitState(
+            jass:ConvertUnitState(32),
+            jass:GetUnitState(
                 u,
-                jass.ConvertUnitState(32)
+                jass:ConvertUnitState(32)
             ) + r * (1 + loadReal(nil, HS, uid, 17))
         )
         return
     end
     if i == 4 then
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
-            jass.ConvertUnitState(81),
-            jass.GetUnitState(
+            jass:ConvertUnitState(81),
+            jass:GetUnitState(
                 u,
-                jass.ConvertUnitState(81)
+                jass:ConvertUnitState(81)
             ) + r
         )
         return
@@ -133,18 +133,18 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
             i,
             ms
         )
-        jass.SetUnitMoveSpeed(
+        jass:SetUnitMoveSpeed(
             u,
-            jass.GetUnitDefaultMoveSpeed(u) * (1 + ms)
+            jass:GetUnitDefaultMoveSpeed(u) * (1 + ms)
         )
         return
     end
     if i == 13 then
         hp = GetUnitLifePercent(nil, u) or 0
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
-            jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r)
+            jass:GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r)
         )
         SetUnitLifePercentBJ(nil, u, hp)
         saveReal(
@@ -158,21 +158,21 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
     end
     if i == 14 then
         if r < 0 then
-            jass.SetUnitState(
+            jass:SetUnitState(
                 u,
-                jass.ConvertUnitState(18),
-                jass.GetUnitState(
+                jass:ConvertUnitState(18),
+                jass:GetUnitState(
                     u,
-                    jass.ConvertUnitState(18)
+                    jass:ConvertUnitState(18)
                 ) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r)
             )
         else
-            jass.SetUnitState(
+            jass:SetUnitState(
                 u,
-                jass.ConvertUnitState(18),
-                jass.GetUnitState(
+                jass:ConvertUnitState(18),
+                jass:GetUnitState(
                     u,
-                    jass.ConvertUnitState(18)
+                    jass:ConvertUnitState(18)
                 ) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r) + 1
             )
         end
@@ -186,12 +186,12 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
         return
     end
     if i == 15 then
-        jass.SetUnitState(
+        jass:SetUnitState(
             u,
-            jass.ConvertUnitState(32),
-            jass.GetUnitState(
+            jass:ConvertUnitState(32),
+            jass:GetUnitState(
                 u,
-                jass.ConvertUnitState(32)
+                jass:ConvertUnitState(32)
             ) / (1 + loadReal(nil, HS, uid, i)) * (1 + loadReal(nil, HS, uid, i) + r)
         )
         saveReal(
@@ -209,7 +209,7 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
             jglobals.bj_HEROSTAT_STR,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,
-            jass.R2I(r)
+            jass:R2I(r)
         )
         ____exports.GS_Unit_Pry_change(nil, u, 0, r * 5)
         return
@@ -220,7 +220,7 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
             jglobals.bj_HEROSTAT_AGI,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,
-            jass.R2I(r)
+            jass:R2I(r)
         )
         ____exports.GS_Unit_Pry_change(nil, u, 2, r * 0.3)
         ____exports.GS_Unit_Pry_change(nil, u, 3, r)
@@ -232,7 +232,7 @@ function ____exports.GS_Unit_Pry_change(self, u, i, r)
             jglobals.bj_HEROSTAT_INT,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,
-            jass.R2I(r)
+            jass:R2I(r)
         )
         ____exports.GS_Unit_Pry_change(nil, u, 5, r * 0.5)
         return

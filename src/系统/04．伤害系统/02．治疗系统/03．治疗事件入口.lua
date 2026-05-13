@@ -9,20 +9,20 @@ function skeyIndex(self)
     if type(jglobals.STES_skey_index) == "number" and jglobals.STES_skey_index ~= 0 then
         return jglobals.STES_skey_index
     end
-    return jass.StringHash("index")
+    return jass:StringHash("index")
 end
 function dispatchHealRequestEvent(self, target, healAmount, sourceUnit)
     local ht = STES_GetTable(nil)
     if ht == nil then
         return
     end
-    local hash = jass.StringHash(HEAL_EVENTS.REQUEST)
+    local hash = jass:StringHash(HEAL_EVENTS.REQUEST)
     local sk = skeyIndex(nil)
-    local loopIndex = jass.LoadInteger(ht, hash, sk)
+    local loopIndex = jass:LoadInteger(ht, hash, sk)
     do
         local i = 0
         while i < loopIndex do
-            local trg = jass.LoadTriggerHandle(ht, hash, i)
+            local trg = jass:LoadTriggerHandle(ht, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -33,7 +33,7 @@ function dispatchHealRequestEvent(self, target, healAmount, sourceUnit)
                     nil,
                     "player",
                     HEAL_REQUEST_KEYS.SOURCE_PLAYER,
-                    jass.GetOwningPlayer(sourceUnit)
+                    jass:GetOwningPlayer(sourceUnit)
                 )
                 YDLocal5Set(nil, "boolean", HEAL_REQUEST_KEYS.EFFECT, true)
                 YDTriggerExecuteTrigger(nil, trg, false)
@@ -74,14 +74,14 @@ local function isHealOrder(self, orderId)
 end
 --- 命中古老马甲 + 治疗命令时，停手/移除技能，并对「治疗事件」所有注册子触发器派发 YDLocal5
 local function onSpellChannel(castingUnit, spellAbilityId)
-    if not jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
+    if not jass:IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
         return
     end
-    local currentOrder = jass.GetUnitCurrentOrder(castingUnit)
+    local currentOrder = jass:GetUnitCurrentOrder(castingUnit)
     if not isHealOrder(nil, currentOrder) then
         return
     end
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     local healAmount = YDWEGetUnitAbilityDataReal(
         nil,
         target,
@@ -89,8 +89,8 @@ local function onSpellChannel(castingUnit, spellAbilityId)
         1,
         HEAL_DATA_FIELD
     )
-    jass.IssueImmediateOrder(castingUnit, "stop")
-    jass.UnitRemoveAbility(castingUnit, spellAbilityId)
+    jass:IssueImmediateOrder(castingUnit, "stop")
+    jass:UnitRemoveAbility(castingUnit, spellAbilityId)
     dispatchHealRequestEvent(nil, target, healAmount, castingUnit)
 end
 --- STES「治疗事件」统一桥。

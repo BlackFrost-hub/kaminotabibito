@@ -193,6 +193,8 @@ function ____exports.addThreat(_____654C_4EBA, _____4EC7_6068_76EE_6807, _____65
         list = {}
         threatTables[_____654C_4EBAID] = list
     end
+    enemyRefTable[_____654C_4EBAID] = _____654C_4EBA
+    enemyLastThreatUpdateMs[_____654C_4EBAID] = _____5F53_524D_65F6_95F4
     do
         local i = 0
         while i < #list do
@@ -234,6 +236,8 @@ function ____exports.setThreat(_____654C_4EBA, _____4EC7_6068_76EE_6807, _____65
         list = {}
         threatTables[_____654C_4EBAID] = list
     end
+    enemyRefTable[_____654C_4EBAID] = _____654C_4EBA
+    enemyLastThreatUpdateMs[_____654C_4EBAID] = _____5F53_524D_65F6_95F4
     do
         local i = 0
         while i < #list do

@@ -36,8 +36,8 @@ local function _____89E3_6790_51B2_950B_89D2_5EA6(_____5355_4F4D, _____53C2_6570
     if _____53C2_6570["目标X"] ~= nil and _____53C2_6570["目标Y"] ~= nil then
         return X_GAFC(
             nil,
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D),
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D),
             _____53C2_6570["目标X"],
             _____53C2_6570["目标Y"]
         )
@@ -51,10 +51,10 @@ local function _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570
     if _____53C2_6570["来源单位"] ~= nil and _____53C2_6570["来源单位"] ~= 0 then
         return X_GAFC(
             nil,
-            jass.GetUnitX(_____53C2_6570["来源单位"]),
-            jass.GetUnitY(_____53C2_6570["来源单位"]),
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D)
+            jass:GetUnitX(_____53C2_6570["来源单位"]),
+            jass:GetUnitY(_____53C2_6570["来源单位"]),
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D)
         )
     end
     if _____53C2_6570["来源X"] ~= nil and _____53C2_6570["来源Y"] ~= nil then
@@ -62,8 +62,8 @@ local function _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570
             nil,
             _____53C2_6570["来源X"],
             _____53C2_6570["来源Y"],
-            jass.GetUnitX(_____5355_4F4D),
-            jass.GetUnitY(_____5355_4F4D)
+            jass:GetUnitX(_____5355_4F4D),
+            jass:GetUnitY(_____5355_4F4D)
         )
     end
     return nil

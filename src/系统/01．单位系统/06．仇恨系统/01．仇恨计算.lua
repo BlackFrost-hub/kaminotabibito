@@ -16,10 +16,15 @@ local ____require_result_2 = require("系统.04．伤害系统.04．伤害映射
 local _____83B7_53D6_6620_5C04_653B_51FB_8005 = ____require_result_2["获取映射攻击者"]
 local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local addThreat = ____require_result_3.addThreat
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_4.debugLogForce
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local GetUnitState = jass.GetUnitState
+local GetHandleId = jass.GetHandleId
+local R2I = jass.R2I
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local _____6A21_5757_540D = "仇恨计算"
 --- 仇恨系统自己的玩家判定：玩家 0-4 为玩家单位，其余为 NPC/电脑
 local function _____662F_73A9_5BB6_5355_4F4D(unit)
     if unit == nil or unit == 0 then
@@ -33,6 +38,17 @@ local function _____662F_73A9_5BB6_5355_4F4D(unit)
     return pid >= 0 and pid <= 4
 end
 local _____5DF2_6CE8_518C = false
+local _nowMs = nil
+local _____4E0A_6B21_4E8B_4EF6_6BEB_79D2 = -1
+local _____4E0A_6B21_76EE_6807ID = 0
+local _____4E0A_6B21_653B_51FB_8005ID = 0
+local _____4E0A_6B21_4F24_5BB3_6BEB_6570 = 0
+local function nowMs()
+    if _nowMs == nil then
+        _nowMs = require("系统.00．核心系统.05．中心计时器").getServerTime
+    end
+    return _nowMs()
+end
 local function onDamage(target, attacker, applied)
     if attacker == nil or attacker == 0 then
         return
@@ -63,7 +79,40 @@ local function onDamage(target, attacker, applied)
     if maxHp <= 0 then
         return
     end
+    local _____5F53_524D_76EE_6807ID = GetHandleId(target)
+    local _____5F53_524D_653B_51FB_8005ID = GetHandleId(attacker)
+    local _____5F53_524D_4F24_5BB3_6BEB_6570 = R2I(applied * 1000 + 0.5)
+    local _____5F53_524D_6BEB_79D2 = nowMs()
+    if _____5F53_524D_6BEB_79D2 == _____4E0A_6B21_4E8B_4EF6_6BEB_79D2 and _____5F53_524D_76EE_6807ID == _____4E0A_6B21_76EE_6807ID and _____5F53_524D_653B_51FB_8005ID == _____4E0A_6B21_653B_51FB_8005ID and _____5F53_524D_4F24_5BB3_6BEB_6570 == _____4E0A_6B21_4F24_5BB3_6BEB_6570 then
+        debugLogForce(
+            _____6A21_5757_540D,
+            "忽略重复最终伤害回调 targetID=",
+            _____5F53_524D_76EE_6807ID,
+            "attackerID=",
+            _____5F53_524D_653B_51FB_8005ID,
+            "applied=",
+            applied
+        )
+        return
+    end
+    _____4E0A_6B21_4E8B_4EF6_6BEB_79D2 = _____5F53_524D_6BEB_79D2
+    _____4E0A_6B21_76EE_6807ID = _____5F53_524D_76EE_6807ID
+    _____4E0A_6B21_653B_51FB_8005ID = _____5F53_524D_653B_51FB_8005ID
+    _____4E0A_6B21_4F24_5BB3_6BEB_6570 = _____5F53_524D_4F24_5BB3_6BEB_6570
     local threat = applied / maxHp * 1000
+    debugLogForce(
+        _____6A21_5757_540D,
+        "最终伤害回调 targetID=",
+        _____5F53_524D_76EE_6807ID,
+        "attackerID=",
+        _____5F53_524D_653B_51FB_8005ID,
+        "applied=",
+        applied,
+        "maxHp=",
+        maxHp,
+        "threat=",
+        threat
+    )
     addThreat(target, attacker, threat)
 end
 ____exports["注册伤害仇恨回调"] = function()

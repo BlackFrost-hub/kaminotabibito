@@ -14,11 +14,11 @@ local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local cameraTimers = __TS__New(Map)
 local cameraShakeCtxByTimerHid = {}
 local function onCameraShakeTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass.GetHandleId(t)
+    local hid = jass:GetHandleId(t)
     local ctx = cameraShakeCtxByTimerHid[hid]
     __TS__Delete(cameraShakeCtxByTimerHid, hid)
     if ctx ~= nil then
@@ -44,14 +44,14 @@ function ____exports.CameraShakeForPlayer(whichPlayerOrSelf, magnitudeOrPlayer, 
     local magnitude = ____temp_2
     local duration = maybeDuration ~= nil and maybeDuration or durationOrMagnitude
     CameraSetEQNoiseForPlayer(nil, whichPlayer, magnitude)
-    local playerId = jass.GetPlayerId(whichPlayer)
+    local playerId = jass:GetPlayerId(whichPlayer)
     local existing = cameraTimers:get(playerId)
     if existing then
         safeDestroyTimer(nil, existing)
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     cameraTimers:set(playerId, t)
-    cameraShakeCtxByTimerHid[jass.GetHandleId(t)] = {whichPlayer = whichPlayer, playerId = playerId}
+    cameraShakeCtxByTimerHid[jass:GetHandleId(t)] = {whichPlayer = whichPlayer, playerId = playerId}
     safeTimerStart(
         nil,
         t,

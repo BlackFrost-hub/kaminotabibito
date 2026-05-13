@@ -98,6 +98,9 @@ const appliedFinalDamageListeners: AppliedFinalDamageListener[] = [];
 
 /** 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)` */
 export function registerAppliedFinalDamageListener(cb: AppliedFinalDamageListener): void {
+  for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
+    if (appliedFinalDamageListeners[i] === cb) return;
+  }
   appliedFinalDamageListeners.push(cb);
 }
 

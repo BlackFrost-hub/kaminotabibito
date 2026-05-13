@@ -11,18 +11,18 @@ local function acquireScratchGroup(self)
     if scratch then
         return scratch
     end
-    return jass.CreateGroup()
+    return jass:CreateGroup()
 end
 local function releaseScratchGroup(self, group)
     if not group or group == 0 then
         return
     end
     while true do
-        local unit = jass.FirstOfGroup(group)
+        local unit = jass:FirstOfGroup(group)
         if not unit or unit == 0 then
             break
         end
-        jass.GroupRemoveUnit(group, unit)
+        jass:GroupRemoveUnit(group, unit)
     end
     groupScratchPool[#groupScratchPool + 1] = group
 end
@@ -37,9 +37,9 @@ function ____exports.isHeroUnit(self, unit)
     end
     local utHero = ____jass_UNIT_TYPE_HERO_0
     if utHero ~= nil then
-        return jass.IsUnitType(unit, utHero) == true
+        return jass:IsUnitType(unit, utHero) == true
     end
-    return jass.GetHeroLevel(unit) > 0
+    return jass:GetHeroLevel(unit) > 0
 end
 --- 判断单位是否为玩家单位（玩家0-4）
 -- 用于区分玩家单位和敌对单位
@@ -50,11 +50,11 @@ function ____exports.isPlayerUnit(self, unit)
     if unit == nil then
         return false
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     if owner == nil then
         return false
     end
-    local playerId = jass.GetPlayerId(owner)
+    local playerId = jass:GetPlayerId(owner)
     return playerId >= 0 and playerId <= 4
 end
 --- 判断单位是否为马甲单位（古老单位）
@@ -66,17 +66,17 @@ function ____exports.isAncientUnit(self, unit)
     if unit == nil then
         return false
     end
-    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
+    return jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
 end
 --- 判断单位是否为"特殊单位"（召唤物/幻象），这些单位通常不触发装备等功能
 function ____exports.isSpecialUnit(self, unit)
     if not unit then
         return true
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return true
     end
-    if jass.IsUnitIllusion(unit) then
+    if jass:IsUnitIllusion(unit) then
         return true
     end
     return false
@@ -86,14 +86,14 @@ end
 -- @param playerId 玩家索引（0-15）
 -- @returns 英雄单位，如果没有找到返回 null
 function ____exports.findHeroOfPlayer(self, playerId)
-    local group = jass.CreateGroup()
-    jass.GroupEnumUnitsOfPlayer(
+    local group = jass:CreateGroup()
+    jass:GroupEnumUnitsOfPlayer(
         group,
-        jass.Player(playerId),
+        jass:Player(playerId),
         nil
     )
-    local unit = jass.FirstOfGroup(group)
-    jass.DestroyGroup(group)
+    local unit = jass:FirstOfGroup(group)
+    jass:DestroyGroup(group)
     if unit and ____exports.isHeroUnit(nil, unit) then
         return unit
     end
@@ -109,21 +109,21 @@ function ____exports.forEachUnitInGroup(self, group, action)
     do
         pcall(function()
             while true do
-                local unit = jass.FirstOfGroup(group)
+                local unit = jass:FirstOfGroup(group)
                 if not unit or unit == 0 then
                     break
                 end
-                jass.GroupRemoveUnit(group, unit)
-                jass.GroupAddUnit(scratch, unit)
+                jass:GroupRemoveUnit(group, unit)
+                jass:GroupAddUnit(scratch, unit)
                 action(nil, unit)
             end
             while true do
-                local unit = jass.FirstOfGroup(scratch)
+                local unit = jass:FirstOfGroup(scratch)
                 if not unit or unit == 0 then
                     break
                 end
-                jass.GroupRemoveUnit(scratch, unit)
-                jass.GroupAddUnit(group, unit)
+                jass:GroupRemoveUnit(scratch, unit)
+                jass:GroupAddUnit(group, unit)
             end
         end)
         do
@@ -134,15 +134,15 @@ end
 --- 获取单位的攻击类型（Attack Type）
 -- 单位状态0x23对应攻击类型，使用ConvertUnitState转换
 function ____exports.Ir_GetUnitAttackType(self, u)
-    return jass.R2I(japi.GetUnitState(
+    return jass:R2I(japi:GetUnitState(
         u,
-        jass.ConvertUnitState(35)
+        jass:ConvertUnitState(35)
     ))
 end
 function ____exports.Ir_SetUnitAttackType(self, u, atp)
-    japi.SetUnitState(
+    japi:SetUnitState(
         u,
-        jass.ConvertUnitState(35),
+        jass:ConvertUnitState(35),
         atp
     )
 end
@@ -154,11 +154,11 @@ function ____exports.getUnitOwnerId(self, unit)
     if not unit or unit == 0 then
         return -1
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     if not owner or owner == 0 then
         return -1
     end
-    return jass.GetPlayerId(owner)
+    return jass:GetPlayerId(owner)
 end
 --- 检查句柄是否有效（非 null、非 0、非 undefined）
 -- 

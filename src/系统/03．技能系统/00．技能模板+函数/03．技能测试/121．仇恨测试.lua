@@ -13,6 +13,7 @@ local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03�
 local debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.index")
 local _____521D_59CB_5316_4EC7_6068_7CFB_7EDF = ____require_result_1["初始化仇恨系统"]
+local _____9A71_52A8_5355_4E2A_654C_4EBA = ____require_result_1["驱动单个敌人"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local addThreat = ____require_result_2.addThreat
 local clearAllThreat = ____require_result_2.clearAllThreat
@@ -41,28 +42,21 @@ local function ____on_804A_5929_6D4B_8BD5()
         debugLogForce(_____6A21_5757_540D, "错误：大法师周围1000码内没有敌人")
         return
     end
-    do
-        local i = 0
-        while i < #_____654C_4EBA_5217_8868 do
-            do
-                local _____654C_4EBA = _____654C_4EBA_5217_8868[i + 1]
-                if _____654C_4EBA == nil or _____654C_4EBA == 0 then
-                    goto __continue6
-                end
-                clearAllThreat(_____654C_4EBA)
-                addThreat(_____654C_4EBA, _____5927_6CD5_5E08, 30)
-                debugLogForce(
-                    _____6A21_5757_540D,
-                    "加仇恨 敌人ID=",
-                    jass.GetHandleId(_____654C_4EBA),
-                    "对大法师 仇恨=30"
-                )
-            end
-            ::__continue6::
-            i = i + 1
-        end
+    local _____654C_4EBA = _____654C_4EBA_5217_8868[1]
+    if _____654C_4EBA == nil or _____654C_4EBA == 0 then
+        debugLogForce(_____6A21_5757_540D, "错误：找到的第一个敌人无效")
+        return
     end
-    debugLogForce(_____6A21_5757_540D, "步骤1完成：已在", #_____654C_4EBA_5217_8868, "个敌人上注册仇恨，驱动将使其攻击大法师")
+    clearAllThreat(_____654C_4EBA)
+    addThreat(_____654C_4EBA, _____5927_6CD5_5E08, 30)
+    _____9A71_52A8_5355_4E2A_654C_4EBA(_____654C_4EBA)
+    debugLogForce(
+        _____6A21_5757_540D,
+        "加仇恨 敌人ID=",
+        jass:GetHandleId(_____654C_4EBA),
+        "对大法师 仇恨=30"
+    )
+    debugLogForce(_____6A21_5757_540D, "步骤1完成：仅对第一个敌人注册30仇恨，并立即驱动其攻击大法师")
 end
 local function _____6CE8_518C_804A_5929_6D4B_8BD5()
     if _____5DF2_6CE8_518C then

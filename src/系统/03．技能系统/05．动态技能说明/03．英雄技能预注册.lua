@@ -22,14 +22,14 @@ local function isItemSkillByOrder(self, unit)
     if not unit then
         return false
     end
-    local currentOrder = jass.GetUnitCurrentOrder(unit)
+    local currentOrder = jass:GetUnitCurrentOrder(unit)
     if not currentOrder then
         return false
     end
     return currentOrder >= ITEM_SKILL_MIN and currentOrder <= ITEM_SKILL_MAX
 end
 local function getSkillKey(self, unit, abilityId)
-    return (tostring(jass.GetHandleId(unit)) .. "_") .. tostring(abilityId)
+    return (tostring(jass:GetHandleId(unit)) .. "_") .. tostring(abilityId)
 end
 local function getSkillTemplate(self, unit, abilityId, level)
     if not unit or not abilityId or level <= 0 then
@@ -80,7 +80,7 @@ local function registerExistingHeroSkills(self, unit)
                 if not abilityId then
                     goto __continue17
                 end
-                local level = jass.GetUnitAbilityLevel(unit, abilityId)
+                local level = jass:GetUnitAbilityLevel(unit, abilityId)
                 if level <= 0 then
                     goto __continue17
                 end
@@ -98,7 +98,7 @@ local function onSpellEffect(castingUnit, spellAbilityId)
     if isItemSkillByOrder(nil, castingUnit) then
         return
     end
-    local currentLevel = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local currentLevel = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     if currentLevel <= 0 then
         return
     end

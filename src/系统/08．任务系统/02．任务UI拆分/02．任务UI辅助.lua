@@ -29,7 +29,7 @@ local japi = require("jass.japi")
 local __dzPcallFrame = 0
 local __dzPcallVis = false
 local function __dzPcallFrameShowBody(self)
-    japi.DzFrameShow(__dzPcallFrame, __dzPcallVis)
+    japi:DzFrameShow(__dzPcallFrame, __dzPcallVis)
 end
 function ____exports.pcallDzFrameShow(self, frame, visible)
     __dzPcallFrame = frame
@@ -38,7 +38,7 @@ function ____exports.pcallDzFrameShow(self, frame, visible)
 end
 local __dzPcallAlphaVal = 0
 local function __dzPcallFrameSetAlphaBody(self)
-    japi.DzFrameSetAlpha(__dzPcallFrame, __dzPcallAlphaVal)
+    japi:DzFrameSetAlpha(__dzPcallFrame, __dzPcallAlphaVal)
 end
 function ____exports.pcallDzFrameSetAlpha(self, frame, alpha)
     __dzPcallFrame = frame
@@ -46,10 +46,10 @@ function ____exports.pcallDzFrameSetAlpha(self, frame, alpha)
     pcall(__dzPcallFrameSetAlphaBody)
 end
 function ____exports.dzGetLocalPlayer(self)
-    return jass.GetLocalPlayer()
+    return jass:GetLocalPlayer()
 end
 function ____exports.dzPlayer(self, index)
-    return jass.Player(index)
+    return jass:Player(index)
 end
 function ____exports.questIdTailInRange01to20(self, id, prefix)
     if #id ~= #prefix + 3 then
@@ -108,7 +108,7 @@ local __dzCreateParent = 0
 local __dzCreateContextId = 0
 local __dzCreateResultFrame = 0
 local function __dzCreateFramePcallBody(self)
-    __dzCreateResultFrame = japi.DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId)
+    __dzCreateResultFrame = japi:DzCreateFrame(__dzCreateName, __dzCreateParent, __dzCreateContextId)
 end
 function ____exports.tryCreateFromFdfWithSource(self, name, parent, fallback, contextId)
     if contextId == nil then
