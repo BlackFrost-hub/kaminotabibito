@@ -50,17 +50,7 @@ function on聊天1004测试(): void {
   debugLogForce(模块名, "已创建矩形提示特效 x=", x, "y=", y, "宽=200 长=600");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1004测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "在大法师面前创建矩形提示圈");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天1004测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "在大法师面前创建矩形提示圈");
 
 export {};
