@@ -7,6 +7,7 @@ local DEFAULT_WEAPON_TYPE = ____00_FF0E_5171_4EAB.DEFAULT_WEAPON_TYPE
 local X_GetAbleX = ____00_FF0E_5171_4EAB.X_GetAbleX
 local X_GetAbleY = ____00_FF0E_5171_4EAB.X_GetAbleY
 local X_IsTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsTerrainWalkable
+local X_IsUnitTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsUnitTerrainWalkable
 local jass = ____00_FF0E_5171_4EAB.jass
 local BJ_DEGTORAD = ____00_FF0E_5171_4EAB.BJ_DEGTORAD
 local MAX_SUB_STEP = ____00_FF0E_5171_4EAB.MAX_SUB_STEP
@@ -173,6 +174,16 @@ local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB
                 end
                 return {["停止"] = true, ["原因"] = "撞墙"}
             end
+        end
+        if not X_IsUnitTerrainWalkable(_____5355_4F4D, _____65B0X, _____65B0Y) then
+            local _____649E_5899_56DE_8C03 = _____5B9E_4F8B["撞墙回调"]
+            if type(_____649E_5899_56DE_8C03) == "function" then
+                _____649E_5899_56DE_8C03(_____5355_4F4D, _____5B9E_4F8B.id)
+                if _____4F4D_79FB_6620_5C04[_____5B9E_4F8B.id] ~= _____5B9E_4F8B then
+                    return {["停止"] = true, ["原因"] = "中断"}
+                end
+            end
+            return {["停止"] = true, ["原因"] = "撞墙"}
         end
     end
     if _____5B9E_4F8B["朝向跟随位移"] then

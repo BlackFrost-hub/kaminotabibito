@@ -42,6 +42,7 @@ ____exports.MoveLightningEx = jass.MoveLightningEx
 ____exports.DestroyLightning = jass.DestroyLightning
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 ____exports.X_IsTerrainWalkable = ____require_result_2.X_IsTerrainWalkable
+____exports.X_IsUnitTerrainWalkable = ____require_result_2.X_IsUnitTerrainWalkable
 ____exports.X_GetAbleX = ____require_result_2.X_GetAbleX
 ____exports.X_GetAbleY = ____require_result_2.X_GetAbleY
 ____exports.TICK_INTERVAL = 0.02

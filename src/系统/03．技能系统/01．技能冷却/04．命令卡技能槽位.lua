@@ -3,11 +3,14 @@ local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local ____exports = {}
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local EXExecuteScript = ____require_result_0.EXExecuteScript
+---
+-- @noSelfInFile
+local japi = require("jass.japi")
 local ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWEGetUnitAbilityDataString = ____require_result_1.YDWEGetUnitAbilityDataString
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWEGetUnitAbilityDataString = ____require_result_0.YDWEGetUnitAbilityDataString
+local DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton
+local KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId
 ____exports["命令卡热键槽位表"] = {
     {0, 2, "Q"},
     {1, 2, "W"},
@@ -30,11 +33,11 @@ ____exports["解析脚本返回整数"] = function(raw)
     return __TS__NumberIsFinite(__TS__Number(value)) and value or 0
 end
 ____exports["读取命令卡按钮能力Id"] = function(x, y)
-    local _____811A_672C_7ED3_679C = EXExecuteScript(
-        nil,
-        ((("(function() return require 'jass.message'.button(" .. tostring(x)) .. ",") .. tostring(y)) .. ") end)()"
-    )
-    return ____exports["解析脚本返回整数"](_____811A_672C_7ED3_679C)
+    local _____6309_94AE_6846_4F53 = DzFrameGetCommandBarButton(y, x)
+    if _____6309_94AE_6846_4F53 == 0 then
+        return 0
+    end
+    return KKCommandButtonGetAbilityId(_____6309_94AE_6846_4F53) or 0
 end
 ____exports["按命令卡推断热键"] = function(abilityId)
     if abilityId == 0 then

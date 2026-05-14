@@ -37,8 +37,9 @@ export const MoveLightning = jass["MoveLightning"] as ((whichLightning: any, che
 export const MoveLightningEx = jass["MoveLightningEx"] as ((whichLightning: any, checkVisibility: boolean, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) => boolean) | undefined;
 export const DestroyLightning = jass["DestroyLightning"] as ((whichLightning: any) => boolean) | undefined;
 
-export const { X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
+export const { X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_IsTerrainWalkable: (x: number, y: number) => boolean;
+  X_IsUnitTerrainWalkable: (this: void, unit: any, x: number, y: number) => boolean;
   X_GetAbleX: () => number;
   X_GetAbleY: () => number;
 };

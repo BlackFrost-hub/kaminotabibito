@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, removeEntry, jass, safeDestroyTimer, X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, _tickCounter
+local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, removeEntry, jass, safeDestroyTimer, X_GDBC, X_GAFC, X_IsUnitTerrainWalkable, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, _tickCounter
 function hid(self, h)
     return jass.GetHandleId(h) or 0
 end
@@ -72,23 +72,14 @@ function doEvent(self, entry)
             local rad = angle * BJ_DEGTORAD
             local nx = x + moveDist * jass.Cos(rad)
             local ny = y + moveDist * jass.Sin(rad)
-            if X_IsTerrainWalkable(nil, nx, ny) then
+            if X_IsUnitTerrainWalkable(u, nx, ny) then
                 jass.SetUnitX(u, nx)
                 jass.SetUnitY(u, ny)
                 entry.lx = nx
                 entry.ly = ny
             else
-                local ableX = X_GetAbleX(nil)
-                local ableY = X_GetAbleY(nil)
-                if ableX ~= 0 or ableY ~= 0 then
-                    jass.SetUnitX(u, ableX)
-                    jass.SetUnitY(u, ableY)
-                    entry.lx = ableX
-                    entry.ly = ableY
-                else
-                    entry.lx = x
-                    entry.ly = y
-                end
+                entry.lx = x
+                entry.ly = y
             end
         else
             entry.lx = x
@@ -140,9 +131,7 @@ safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 X_GDBC = ____require_result_1.X_GDBC
 X_GAFC = ____require_result_1.X_GAFC
-X_IsTerrainWalkable = ____require_result_1.X_IsTerrainWalkable
-X_GetAbleX = ____require_result_1.X_GetAbleX
-X_GetAbleY = ____require_result_1.X_GetAbleY
+X_IsUnitTerrainWalkable = ____require_result_1.X_IsUnitTerrainWalkable
 local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 ORDER_MOVE = 851971
 ORDER_SMART = 851986

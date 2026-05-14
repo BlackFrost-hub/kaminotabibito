@@ -20,39 +20,34 @@ const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilcode: nu
 const DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip as (unit: any, abilityId: number) => string;
 const DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip as (unit: any, abilityId: number, tip: string) => boolean;
 const DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate as (unit: any, abilityId: number) => boolean;
-const DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton as (row: number, column: number) => number;
-const KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId as (frame: number) => number;
+const EXGetUnitAbilityByIndex = japi.EXGetUnitAbilityByIndex as (unit: any, index: number) => any;
+const EXGetAbilityId = japi.EXGetAbilityId as (ability: any) => number;
 
 const MODULE_NAME = "动态技能文本";
-
-/** 命令卡技能槽位坐标映射：[列, 行] */
-const 命令卡技能槽位: ReadonlyArray<readonly [number, number]> = [
-  [0, 2],
-  [1, 2],
-  [2, 2],
-  [3, 2],
-  [0, 1],
-];
+const 技能槽遍历上限 = 64;
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
 }
 
 /**
- * 通过命令卡面板XY坐标获取技能ID
+ * 遍历英雄实际技能列表，避免命令卡/物品技能遮挡导致漏改提示。
  */
-function getUnitAbilityIds(): number[] {
+function getUnitAbilityIds(this: void, hero: any): number[] {
   const ids: number[] = [];
-  for (let i = 0; i < 命令卡技能槽位.length; i++) {
-    const [x, y] = 命令卡技能槽位[i];
-    const btn = DzFrameGetCommandBarButton(y, x);
-    if (btn !== 0) {
-      const abilId = KKCommandButtonGetAbilityId(btn);
-      if (abilId !== 0) {
-        ids.push(abilId);
-      }
-    }
+  const seen: Record<number, boolean | undefined> = {};
+
+  for (let slot = 0; slot < 技能槽遍历上限; slot++) {
+    const ability = EXGetUnitAbilityByIndex(hero, slot);
+    if (!isValidHandle(ability)) continue;
+
+    const abilityId = EXGetAbilityId(ability);
+    if (abilityId == null || abilityId === 0 || seen[abilityId] === true) continue;
+
+    seen[abilityId] = true;
+    ids.push(abilityId);
   }
+
   return ids;
 }
 
@@ -133,7 +128,7 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
 export function 检查英雄技能(this: void, hero: any): void {
   if (!isValidHandle(hero)) return;
 
-  const abilityIds = getUnitAbilityIds();
+  const abilityIds = getUnitAbilityIds(hero);
   for (let i = 0; i < abilityIds.length; i++) {
     const level = GetUnitAbilityLevel(hero, abilityIds[i]);
     if (level > 0) {

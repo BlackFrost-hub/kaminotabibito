@@ -26,6 +26,7 @@ local _____5728_53EF_73A9_533A_57DF_5185 = ____00_FF0E_5171_4EAB["在可玩区�
 local _____8BA1_7B97_5750_6807_8DDD_79BB = ____00_FF0E_5171_4EAB["计算坐标距离"]
 local _____8BA1_7B97_671D_5411_89D2_5EA6 = ____00_FF0E_5171_4EAB["计算朝向角度"]
 local X_IsTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsTerrainWalkable
+local X_IsUnitTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsUnitTerrainWalkable
 local X_GetAbleX = ____00_FF0E_5171_4EAB.X_GetAbleX
 local X_GetAbleY = ____00_FF0E_5171_4EAB.X_GetAbleY
 ____exports["销毁闪电"] = function(_____5B9E_4F8B)
@@ -138,6 +139,9 @@ local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB
         if ableDist > 8 then
             return {["停止"] = true, ["原因"] = "阻挡"}
         end
+    end
+    if _____5B9E_4F8B["检查地形"] and not X_IsUnitTerrainWalkable(_____5B9E_4F8B["单位"], _____65B0X, _____65B0Y) then
+        return {["停止"] = true, ["原因"] = "阻挡"}
     end
     SetUnitX(_____5B9E_4F8B["单位"], _____65B0X)
     SetUnitY(_____5B9E_4F8B["单位"], _____65B0Y)

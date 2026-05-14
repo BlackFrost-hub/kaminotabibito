@@ -409,8 +409,11 @@ end
 ____exports["物品_玩家当前选择的物品同步"] = function(_____73A9_5BB6)
     return _____539F_751F_51FD_6570_8868.DzGetPlayerLastSelectedItem(_____73A9_5BB6)
 end
-____exports["当前选择的单位异步"] = function()
+____exports["当前选择的单位"] = function()
     return _____539F_751F_51FD_6570_8868.DzGetSelectedLeaderUnit()
+end
+____exports["当前选择的单位异步"] = function()
+    return ____exports["当前选择的单位"]()
 end
 ____exports["硬件_获取屏幕设备高度"] = function()
     return _____539F_751F_51FD_6570_8868.DzGetSystemMetricsHeight()

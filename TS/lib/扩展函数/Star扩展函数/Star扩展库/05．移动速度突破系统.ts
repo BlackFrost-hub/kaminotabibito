@@ -18,12 +18,10 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
 };
-const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
+const { X_GDBC, X_GAFC, X_IsUnitTerrainWalkable } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GDBC: (x1: number, y1: number, x2: number, y2: number) => number;
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
-  X_IsTerrainWalkable: (x: number, y: number) => boolean;
-  X_GetAbleX: () => number;
-  X_GetAbleY: () => number;
+  X_IsUnitTerrainWalkable: (this: void, unit: any, x: number, y: number) => boolean;
 };
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
@@ -189,23 +187,14 @@ function doEvent(entry: SpeedEntry): void {
       const nx = x + moveDist * jass.Cos(rad);
       const ny = y + moveDist * jass.Sin(rad);
 
-      if (X_IsTerrainWalkable(nx, ny)) {
+      if (X_IsUnitTerrainWalkable(u, nx, ny)) {
         jass.SetUnitX(u, nx);
         jass.SetUnitY(u, ny);
         entry.lx = nx;
         entry.ly = ny;
       } else {
-        const ableX = X_GetAbleX();
-        const ableY = X_GetAbleY();
-        if (ableX !== 0 || ableY !== 0) {
-          jass.SetUnitX(u, ableX);
-          jass.SetUnitY(u, ableY);
-          entry.lx = ableX;
-          entry.ly = ableY;
-        } else {
-          entry.lx = x;
-          entry.ly = y;
-        }
+        entry.lx = x;
+        entry.ly = y;
       }
     } else {
       entry.lx = x;

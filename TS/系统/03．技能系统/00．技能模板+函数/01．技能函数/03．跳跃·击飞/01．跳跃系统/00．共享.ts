@@ -7,9 +7,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
+const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
   X_IsTerrainWalkable: (x: number, y: number) => boolean;
+  X_IsUnitTerrainWalkable: (this: void, unit: any, x: number, y: number) => boolean;
   X_GetAbleX: () => number;
   X_GetAbleY: () => number;
 };
@@ -50,7 +51,7 @@ const IsUnitPaused = jass["IsUnitPaused"] as (u: any) => boolean;
 const ForGroup = jass["ForGroup"] as (whichGroup: any, callback: () => void) => void;
 const GetEnumUnit = jass["GetEnumUnit"] as () => any;
 
-export { jass, jglobals, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY };
+export { jass, jglobals, X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY };
 export { 申请单位暂停占用, 释放单位暂停占用, 单位是否存在其他暂停占用 };
 export { 零秒后重置单位动画 };
 export {

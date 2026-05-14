@@ -566,8 +566,12 @@ export function 物品_玩家当前选择的物品同步(this: void, 玩家: 玩
   return (原生函数表["DzGetPlayerLastSelectedItem"] as (玩家: 玩家句柄) => 物品句柄)(玩家);
 }
 
-export function 当前选择的单位异步(this: void): 单位句柄 {
+export function 当前选择的单位(this: void): 单位句柄 {
   return (原生函数表["DzGetSelectedLeaderUnit"] as () => 单位句柄)();
+}
+
+export function 当前选择的单位异步(this: void): 单位句柄 {
+  return 当前选择的单位();
 }
 
 export function 硬件_获取屏幕设备高度(this: void): number {

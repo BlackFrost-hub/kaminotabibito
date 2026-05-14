@@ -1,8 +1,6 @@
 /** @noSelfInFile */
 
-const { EXExecuteScript } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  EXExecuteScript: (script: string) => string;
-};
+const japi = require("jass.japi") as any;
 const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   ABILITY_DATA_HOTKEY: number;
   YDWEGetUnitAbilityDataString: (u: any, abilcode: number, level: number, dataType: number) => string;
@@ -10,6 +8,9 @@ const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
 const { YDWEGetUnitAbilityDataString } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWEGetUnitAbilityDataString: (u: any, abilcode: number, level: number, dataType: number) => string;
 };
+
+const DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton as (row: number, column: number) => number;
+const KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId as (frame: number) => number;
 
 export type 命令卡技能热键位 = "Q" | "W" | "E" | "R" | "D";
 
@@ -34,8 +35,9 @@ export function 解析脚本返回整数(this: void, raw: any): number {
 }
 
 export function 读取命令卡按钮能力Id(this: void, x: number, y: number): number {
-  const 脚本结果 = EXExecuteScript(`(function() return require 'jass.message'.button(${x},${y}) end)()`);
-  return 解析脚本返回整数(脚本结果);
+  const 按钮框体 = DzFrameGetCommandBarButton(y, x);
+  if (按钮框体 === 0) return 0;
+  return KKCommandButtonGetAbilityId(按钮框体) || 0;
 }
 
 export function 按命令卡推断热键(this: void, abilityId: number): 命令卡技能热键位 | null {

@@ -2,6 +2,7 @@
 local ____exports = {}
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
 local X_IsTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsTerrainWalkable
+local X_IsUnitTerrainWalkable = ____00_FF0E_5171_4EAB.X_IsUnitTerrainWalkable
 local X_GetAbleX = ____00_FF0E_5171_4EAB.X_GetAbleX
 local X_GetAbleY = ____00_FF0E_5171_4EAB.X_GetAbleY
 local BJ_DEGTORAD = ____00_FF0E_5171_4EAB.BJ_DEGTORAD
@@ -38,6 +39,9 @@ local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB
         if ableDist > WALKABLE_TOLERANCE then
             return {["停止"] = true, ["原因"] = "阻挡"}
         end
+    end
+    if not X_IsUnitTerrainWalkable(_____5355_4F4D, _____65B0X, _____65B0Y) then
+        return {["停止"] = true, ["原因"] = "阻挡"}
     end
     local _____843D_70B9_8FC7_6EE4 = _____5B9E_4F8B["落点过滤"]
     if type(_____843D_70B9_8FC7_6EE4) == "function" and not _____843D_70B9_8FC7_6EE4(_____65B0X, _____65B0Y, _____5355_4F4D, _____5B9E_4F8B.id) then

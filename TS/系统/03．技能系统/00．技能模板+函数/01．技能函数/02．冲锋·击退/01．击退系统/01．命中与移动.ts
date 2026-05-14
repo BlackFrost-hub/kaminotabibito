@@ -6,6 +6,7 @@ import {
   X_GetAbleX,
   X_GetAbleY,
   X_IsTerrainWalkable,
+  X_IsUnitTerrainWalkable,
   jass,
   BJ_DEGTORAD,
   MAX_SUB_STEP,
@@ -137,6 +138,17 @@ function 尝试移动一步(实例: 位移实例, 位移距离: number): { 停�
         }
         return { 停止: true, 原因: "撞墙" };
       }
+    }
+
+    if (!X_IsUnitTerrainWalkable(单位, 新X, 新Y)) {
+      const 撞墙回调 = 实例.撞墙回调;
+      if (typeof 撞墙回调 === "function") {
+        撞墙回调(单位, 实例.id);
+        if (位移映射[实例.id] !== 实例) {
+          return { 停止: true, 原因: "中断" };
+        }
+      }
+      return { 停止: true, 原因: "撞墙" };
     }
   }
 

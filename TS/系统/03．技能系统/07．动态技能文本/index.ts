@@ -5,13 +5,8 @@
  * 功能：动态修改技能提示扩展文本
  * - 将描述中的公式替换为实际伤害数值
  * - 例如"智力×3"替换为实际智力×3的数值
- * - 支持：攻击力、最大生命值、当前生命值、智力、敏捷、力量的倍率公式
+ * - 支持复杂表达式：(攻击力×30%×技能等级)
  */
-
-const 平台扩展取值 = require("平台扩展API.取值") as {
-  当前选择的单位异步: (this: void) => any;
-};
-const 当前选择的单位异步 = 平台扩展取值["当前选择的单位异步"] as (this: void) => any;
 
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
@@ -34,11 +29,9 @@ function isValidHandle(handle: any): boolean {
 }
 
 function onTick(this: void): void {
-  const unit = 当前选择的单位异步();
-  if (!isValidHandle(unit)) return;
-  if (!registeredHeroes.has(unit)) return;
-
-  检查英雄技能(unit);
+  registeredHeroes.forEach(function (hero: any) {
+    检查英雄技能(hero);
+  });
 }
 
 export function registerDynamicSkillTextHero(this: void, whichHero: any): void {

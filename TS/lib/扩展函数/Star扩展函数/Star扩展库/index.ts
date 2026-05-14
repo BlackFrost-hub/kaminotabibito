@@ -62,6 +62,7 @@ export function registerBridge(): void {
   expose("SOS_UnSetUnitSpeed", overSpeed.SOS_UnSetUnitSpeed);
   // X库函数
   expose("X_IsTerrainWalkable", xLib.X_IsTerrainWalkable);
+  expose("X_IsUnitTerrainWalkable", xLib.X_IsUnitTerrainWalkable);
   expose("X_GetAbleX", xLib.X_GetAbleX);
   expose("X_GetAbleY", xLib.X_GetAbleY);
   expose("X_IsTerrainDeepWater", xLib.X_IsTerrainDeepWater);

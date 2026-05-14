@@ -18,35 +18,34 @@ local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip
 local DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip
 local DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate
-local DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton
-local KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId
+local EXGetUnitAbilityByIndex = japi.EXGetUnitAbilityByIndex
+local EXGetAbilityId = japi.EXGetAbilityId
 local MODULE_NAME = "动态技能文本"
---- 命令卡技能槽位坐标映射：[列, 行]
-local _____547D_4EE4_5361_6280_80FD_69FD_4F4D = {
-    {0, 2},
-    {1, 2},
-    {2, 2},
-    {3, 2},
-    {0, 1}
-}
+local _____6280_80FD_69FD_904D_5386_4E0A_9650 = 64
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
---- 通过命令卡面板XY坐标获取技能ID
-local function getUnitAbilityIds()
+--- 遍历英雄实际技能列表，避免命令卡/物品技能遮挡导致漏改提示。
+local function getUnitAbilityIds(hero)
     local ids = {}
+    local seen = {}
     do
-        local i = 0
-        while i < #_____547D_4EE4_5361_6280_80FD_69FD_4F4D do
-            local x, y = table.unpack(_____547D_4EE4_5361_6280_80FD_69FD_4F4D[i + 1], 1, 2)
-            local btn = DzFrameGetCommandBarButton(y, x)
-            if btn ~= 0 then
-                local abilId = KKCommandButtonGetAbilityId(btn)
-                if abilId ~= 0 then
-                    ids[#ids + 1] = abilId
+        local slot = 0
+        while slot < _____6280_80FD_69FD_904D_5386_4E0A_9650 do
+            do
+                local ability = EXGetUnitAbilityByIndex(hero, slot)
+                if not isValidHandle(ability) then
+                    goto __continue5
                 end
+                local abilityId = EXGetAbilityId(ability)
+                if abilityId == nil or abilityId == 0 or seen[abilityId] == true then
+                    goto __continue5
+                end
+                seen[abilityId] = true
+                ids[#ids + 1] = abilityId
             end
-            i = i + 1
+            ::__continue5::
+            slot = slot + 1
         end
     end
     return ids
@@ -118,7 +117,7 @@ ____exports["检查英雄技能"] = function(hero)
     if not isValidHandle(hero) then
         return
     end
-    local abilityIds = getUnitAbilityIds()
+    local abilityIds = getUnitAbilityIds(hero)
     do
         local i = 0
         while i < #abilityIds do
