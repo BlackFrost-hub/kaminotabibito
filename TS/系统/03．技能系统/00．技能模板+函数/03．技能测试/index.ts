@@ -30,3 +30,4 @@ export * from "./121．仇恨测试";
 export * from "./122．重伤测试";
 export * from "./123．重伤装备测试";
 export * from "./124．扩展控制测试";
+export * from "./125．广播提示消息测试";

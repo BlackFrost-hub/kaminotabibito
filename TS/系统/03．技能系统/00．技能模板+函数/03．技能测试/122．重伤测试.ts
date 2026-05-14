@@ -11,6 +11,9 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 const {
   获取单位重伤,
@@ -26,16 +29,11 @@ const { spellHeal } = require("系统.04．伤害系统.02．治疗系统.01．�
   spellHeal: (this: void, source: any, target: any, amount: number, showEffect?: boolean) => number;
 };
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
 
 const 模块名 = "重伤测试";
 const 测试命令 = "1022";
-let 已注册 = false;
 
 function on聊天测试(): void {
   const 大法师 = g.gg_unit_Hamg_0002;
@@ -62,16 +60,7 @@ function on聊天测试(): void {
   }
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天测试);
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "测试重伤对治疗的影响");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "测试重伤对治疗的影响");
 
 export {};

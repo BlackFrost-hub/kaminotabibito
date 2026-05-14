@@ -15,6 +15,9 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 const {
   初始化仇恨系统,
@@ -33,16 +36,11 @@ const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数
   getEnemyUnitsInRange: (this: void, centerUnit: any, x: number, y: number, radius: number) => any[];
 };
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 
 const 模块名 = "仇恨测试";
 const 测试命令 = "1021";
-let 已注册 = false;
 
 function on聊天测试(): void {
   const 大法师 = g.gg_unit_Hamg_0002;
@@ -79,15 +77,7 @@ function on聊天测试(): void {
   debugLogForce(模块名, "步骤1完成：仅对第一个敌人注册30仇恨，并立即驱动其攻击大法师");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天测试);
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "给周围敌人加30仇恨，验证驱动攻击");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "给周围敌人加30仇恨，验证驱动攻击");
 
 export {};

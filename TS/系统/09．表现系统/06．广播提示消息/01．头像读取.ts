@@ -2,14 +2,16 @@
 
 const jass = require("jass.common") as any;
 const ydwe = require("lib.扩展函数.YDWE函数.index") as {
-  getObjectProperty: (this: void, objectType: number, objectId: number | string, property: string) => string;
   ObjectType: { UNIT: number };
+};
+const ydweSafe = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  getObjectPropertySafe: (this: void, objectType: number, objectId: number | string, property: string) => string;
 };
 
 import { 广播提示默认头像 } from "./00．常量定义";
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
-const getObjectProperty = ydwe.getObjectProperty;
+const getObjectProperty = ydweSafe.getObjectPropertySafe;
 const ObjectType = ydwe.ObjectType;
 
 const 单位头像缓存: Record<number, string | undefined> = {};

@@ -3,10 +3,6 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
@@ -15,6 +11,9 @@ const SquareRoot = jass.SquareRoot as (x: number) => number;
 
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
 };
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
@@ -35,7 +34,6 @@ const 每跳最大距离 = 500;
 const 初始伤害 = 60;
 const 衰减系数 = 0.8;
 const 跳跃间隔 = 0.15;
-let 已注册 = false;
 
 function 查找最近敌人(来源单位: any, x: number, y: number): any {
   const 候选单位 = getUnitsInRange(x, y, 搜索半径);
@@ -123,15 +121,7 @@ function on聊天1010测试(): void {
   );
 }
 
-function 注册聊天1010测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1010测试);
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "启动纯跳链测试");
-}
-
-注册聊天1010测试();
+注册聊天命令监听(测试命令, on聊天1010测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "启动纯跳链测试");
 
 export {};

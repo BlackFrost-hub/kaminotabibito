@@ -68,5 +68,9 @@ local _____8868_73B0_7CFB_7EDF = require("系统.09．表现系统.index")
 if type(_____8868_73B0_7CFB_7EDF.init) == "function" then
     _____8868_73B0_7CFB_7EDF:init()
 end
+local _____5B58_6863_7CFB_7EDF = require("系统.10．存档系统.index")
+if type(_____5B58_6863_7CFB_7EDF.init) == "function" then
+    _____5B58_6863_7CFB_7EDF.init()
+end
 require("系统.12．测试系统.index")
 return ____exports

@@ -6,6 +6,7 @@ import {
   广播提示玩家槽数,
   每玩家广播提示槽数,
   取广播提示槽索引,
+  取广播提示槽位Y,
   广播提示背景贴图,
   广播提示默认头像,
   广播提示字体,
@@ -15,8 +16,6 @@ import {
   广播提示文字宽度,
   广播提示文字高度,
   广播提示起始X,
-  广播提示基准Y,
-  广播提示槽间距Y,
   广播提示最大透明度,
   广播提示优先级,
   帧点左,
@@ -61,10 +60,6 @@ export const 广播提示槽帧表: Array<广播提示槽帧 | undefined> = [];
 
 let 已创建广播提示UI = false;
 
-function 取槽位Y(this: void, 槽位ID: number): number {
-  return 广播提示基准Y - 槽位ID * 广播提示槽间距Y;
-}
-
 function 创建背景帧(this: void, 名称: string, 父级: number): number {
   return DzCreateFrameByTagName("BACKDROP", 名称, 父级, "template", 0);
 }
@@ -82,7 +77,7 @@ function 创建单槽(this: void, 玩家ID: number, 槽位ID: number, 游戏UI: 
   const text = 创建文本帧("BroadcastNoticeText_P" + 玩家ID + "_S" + 槽位ID, root);
   if (icon === 0 || text === 0) return undefined;
 
-  DzFrameSetAbsolutePoint(root, 帧点左, 广播提示起始X, 取槽位Y(槽位ID));
+  DzFrameSetAbsolutePoint(root, 帧点左, 广播提示起始X, 取广播提示槽位Y(槽位ID));
   DzFrameSetSize(root, 广播提示宽度, 广播提示高度);
   DzFrameSetTexture(root, 广播提示背景贴图, 0);
   DzFrameSetAlpha(root, 0);

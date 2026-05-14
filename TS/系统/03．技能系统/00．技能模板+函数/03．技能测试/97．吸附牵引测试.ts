@@ -3,15 +3,14 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLogForce: (module: string, ...args: any[]) => void;
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
 };
 
 import { 开始单位组牵引, type 牵引结束原因 } from "../01．技能函数/05．吸附·牵引/index";
 
-const CreateTrigger = jass["CreateTrigger"] as () => any;
-const TriggerRegisterPlayerChatEvent = jass["TriggerRegisterPlayerChatEvent"] as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass["TriggerAddAction"] as (trig: any, action: () => void) => void;
-const Player = jass["Player"] as (playerId: number) => any;
 const CreateGroup = jass["CreateGroup"] as () => any;
 const GroupEnumUnitsInRange = jass["GroupEnumUnitsInRange"] as (whichGroup: any, x: number, y: number, radius: number, filter: any) => void;
 const DestroyGroup = jass["DestroyGroup"] as (whichGroup: any) => void;
@@ -21,7 +20,6 @@ const GetUnitY = jass["GetUnitY"] as (u: any) => number;
 const 模块名 = "吸附牵引测试";
 const 聊天命令 = "111";
 const 最大牵引距离 = 600;
-let 已注册 = false;
 
 function 吸附牵引测试_结束回调(单位: any, 原因: 牵引结束原因, 牵引ID: number): void {
   debugLogForce(模块名, "牵引结束", "ID=", 牵引ID, " 原因=", 原因, " 单位=", 单位);
@@ -61,15 +59,7 @@ function on聊天111测试(): void {
   执行吸附测试();
 }
 
-function 注册聊天111测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 聊天命令, true);
-  TriggerAddAction(trig, on聊天111测试);
-  debugLogForce(模块名, "已注册聊天测试", "输入 " + 聊天命令 + " 开始");
-}
-
-注册聊天111测试();
+注册聊天命令监听(聊天命令, on聊天111测试);
+debugLogForce(模块名, "已注册聊天测试", "输入 " + 聊天命令 + " 开始");
 
 export {};

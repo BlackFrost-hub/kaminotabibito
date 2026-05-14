@@ -6,12 +6,11 @@ import {
   广播提示玩家槽数,
   每玩家广播提示槽数,
   取广播提示槽索引,
+  取广播提示槽位Y,
   广播提示状态_隐藏,
   广播提示状态_滑入,
   广播提示默认停留毫秒,
   广播提示起始X,
-  广播提示基准Y,
-  广播提示槽间距Y,
 } from "./00．常量定义";
 import { 广播提示槽帧表 } from "./02．UI创建";
 
@@ -36,10 +35,6 @@ export interface 广播提示槽状态 {
 export const 广播提示槽状态表: Array<广播提示槽状态 | undefined> = [];
 
 const 玩家下一个槽位表: number[] = [];
-
-function 取槽位Y(this: void, 槽位ID: number): number {
-  return 广播提示基准Y - 槽位ID * 广播提示槽间距Y;
-}
 
 function 取安全持续时间(this: void, 持续时间: number | undefined): number {
   if (持续时间 == null || 持续时间 <= 0) return 广播提示默认停留毫秒;
@@ -75,7 +70,7 @@ function 写入槽帧内容(this: void, 序号: number, 状态: 广播提示槽�
 
   DzFrameSetTexture(帧组.icon, 状态.iconPath, 0);
   DzFrameSetText(帧组.text, 状态.text);
-  DzFrameSetAbsolutePoint(帧组.root, 3, 广播提示起始X, 取槽位Y(状态.slotId));
+  DzFrameSetAbsolutePoint(帧组.root, 3, 广播提示起始X, 取广播提示槽位Y(状态.slotId));
   DzFrameSetAlpha(帧组.root, 0);
 }
 

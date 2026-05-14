@@ -13,15 +13,14 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 import { 开始冲锋并在结束时结算路径区域 } from "../01．技能函数/02．冲锋·击退/index";
 import { 开始技能前摇, 创建冲锋路径前摇提示 } from "../00．技能模板/01．多阶段技能编排/index";
 import { 开始硬直 } from "../02．通用函数/01．控制与Buff";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
@@ -34,7 +33,6 @@ const 路径半径 = 200;
 const 路径宽度 = 路径半径 * 2;
 const 前摇时间 = 1.0;
 const 冲锋路径前摇提示 = 创建冲锋路径前摇提示(冲锋距离, 路径宽度, 前摇时间);
-let 已注册 = false;
 
 function 取朝向终点X(x: number, 朝向角: number, 距离: number): number {
   return x + (jass.Cos(朝向角 * jass.bj_DEGTORAD) as number) * 距离;
@@ -139,17 +137,7 @@ function on聊天1007测试(): void {
   debugLogForce(模块名, "已启动测试：前摇ID=", 前摇ID, "attack 1秒后执行冲锋路径斩杀");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1007测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "触发 attack前摇1秒 + 冲锋路径斩杀");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天1007测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "触发 attack前摇1秒 + 冲锋路径斩杀");
 
 export {};

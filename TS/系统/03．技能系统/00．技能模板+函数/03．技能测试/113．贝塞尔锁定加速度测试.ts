@@ -14,6 +14,9 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
@@ -29,10 +32,6 @@ import {
   type 原生弹幕结束原因,
 } from "../01．技能函数/01．弹幕/01．TS原生弹幕/index";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
@@ -45,7 +44,6 @@ const Sin = jass.Sin as (radians: number) => number;
 const 模块名 = "贝塞尔锁定加速度测试";
 const 测试命令 = "1013";
 const 搜索半径 = 1000;
-let 已注册 = false;
 
 function 查找最近敌人(this: void, 来源单位: any): any {
   const x = GetUnitX(来源单位);
@@ -134,15 +132,7 @@ function on聊天1013测试(): void {
   debugLogForce(模块名, "已发射锁定加速度贝塞尔弹幕", "弹幕ID=", 实例.弹幕ID, "目标=", GetUnitName(目标), "#", GetHandleId(目标));
 }
 
-function 注册聊天1013测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1013测试);
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "发射锁定加速度贝塞尔弹幕");
-}
-
-注册聊天1013测试();
+注册聊天命令监听(测试命令, on聊天1013测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "发射锁定加速度贝塞尔弹幕");
 
 export {};

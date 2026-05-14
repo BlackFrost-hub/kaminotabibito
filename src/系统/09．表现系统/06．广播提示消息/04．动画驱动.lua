@@ -4,6 +4,7 @@ local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.09．表现系统.06．�
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示玩家槽数"]
 local _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["每玩家广播提示槽数"]
 local _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15 = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽索引"]
+local _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽位Y"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__9690_85CF = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_隐藏"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__6ED1_5165 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_滑入"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__505C_7559 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_停留"]
@@ -13,8 +14,6 @@ local _____5E7F_64AD_63D0_793A_6DE1_51FA_6BEB_79D2 = ____00_FF0E_5E38_91CF_5B9A_
 local _____5E7F_64AD_63D0_793A_5237_65B0_6BEB_79D2 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示刷新毫秒"]
 local _____5E7F_64AD_63D0_793A_8D77_59CBX = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示起始X"]
 local _____5E7F_64AD_63D0_793A_505C_7559X = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示停留X"]
-local _____5E7F_64AD_63D0_793A_57FA_51C6Y = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示基准Y"]
-local _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示槽间距Y"]
 local _____5E7F_64AD_63D0_793A_6700_5927_900F_660E_5EA6 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示最大透明度"]
 local _____5E27_70B9_5DE6 = ____00_FF0E_5E38_91CF_5B9A_4E49["帧点左"]
 local ____02_FF0EUI_521B_5EFA = require("系统.09．表现系统.06．广播提示消息.02．UI创建")
@@ -42,9 +41,6 @@ local function _____9650_523601(_____503C)
         return 1
     end
     return _____503C
-end
-local function _____53D6_69FD_4F4DY(_____69FD_4F4DID)
-    return _____5E7F_64AD_63D0_793A_57FA_51C6Y - _____69FD_4F4DID * _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY
 end
 local function _____53D6_672C_673A_73A9_5BB6ID()
     local _____672C_673A_73A9_5BB6 = GetLocalPlayer()
@@ -106,7 +102,7 @@ local function _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, ___
         _____5E27_7EC4.root,
         _____5E27_70B9_5DE6,
         _____72B6_6001.x,
-        _____53D6_69FD_4F4DY(_____72B6_6001.slotId)
+        _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY(_____72B6_6001.slotId)
     )
     DzFrameSetAlpha(
         _____5E27_7EC4.root,
@@ -126,12 +122,12 @@ ____exports["on广播提示消息Tick"] = function()
                         local _____5E8F_53F7 = _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15(_____73A9_5BB6ID, _____69FD_4F4DID)
                         local _____72B6_6001 = _____5E7F_64AD_63D0_793A_69FD_72B6_6001_8868[_____5E8F_53F7 + 1]
                         if _____72B6_6001 == nil then
-                            goto __continue25
+                            goto __continue24
                         end
                         _____63A8_8FDB_69FD_4F4D_72B6_6001(_____72B6_6001)
                         _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, _____672C_673A_73A9_5BB6ID)
                     end
-                    ::__continue25::
+                    ::__continue24::
                     _____69FD_4F4DID = _____69FD_4F4DID + 1
                 end
             end

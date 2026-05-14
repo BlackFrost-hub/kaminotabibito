@@ -8,10 +8,8 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_0.debugLogForce
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local CreateGroup = jass.CreateGroup
 local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
 local DestroyGroup = jass.DestroyGroup
@@ -20,10 +18,8 @@ local GetUnitY = jass.GetUnitY
 local _____6A21_5757_540D = "吸附牵引测试"
 local _____804A_5929_547D_4EE4 = "111"
 local _____6700_5927_7275_5F15_8DDD_79BB = 600
-local _____5DF2_6CE8_518C = false
 local function _____5438_9644_7275_5F15_6D4B_8BD5__7ED3_675F_56DE_8C03(_____5355_4F4D, _____539F_56E0, _____7275_5F15ID)
     debugLogForce(
-        nil,
         _____6A21_5757_540D,
         "牵引结束",
         "ID=",
@@ -37,7 +33,7 @@ end
 local function _____6267_884C_5438_9644_6D4B_8BD5()
     local _____5927_6CD5_5E08 = g.gg_unit_Hamg_0002
     if _____5927_6CD5_5E08 == nil or _____5927_6CD5_5E08 == 0 then
-        debugLogForce(nil, _____6A21_5757_540D, "未找到 gg_unit_Hamg_0002")
+        debugLogForce(_____6A21_5757_540D, "未找到 gg_unit_Hamg_0002")
         return
     end
     local group = CreateGroup()
@@ -66,7 +62,6 @@ local function _____6267_884C_5438_9644_6D4B_8BD5()
     })
     DestroyGroup(group)
     debugLogForce(
-        nil,
         _____6A21_5757_540D,
         "已开始测试",
         "输入=" .. _____804A_5929_547D_4EE4,
@@ -77,20 +72,6 @@ end
 local function ____on_804A_5929111_6D4B_8BD5()
     _____6267_884C_5438_9644_6D4B_8BD5()
 end
-local function _____6CE8_518C_804A_5929111_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____804A_5929_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_5929111_6D4B_8BD5)
-    debugLogForce(nil, _____6A21_5757_540D, "已注册聊天测试", ("输入 " .. _____804A_5929_547D_4EE4) .. " 开始")
-end
-_____6CE8_518C_804A_5929111_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____804A_5929_547D_4EE4, ____on_804A_5929111_6D4B_8BD5)
+debugLogForce(_____6A21_5757_540D, "已注册聊天测试", ("输入 " .. _____804A_5929_547D_4EE4) .. " 开始")
 return ____exports

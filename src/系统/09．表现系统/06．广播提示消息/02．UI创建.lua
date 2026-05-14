@@ -4,6 +4,7 @@ local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.09．表现系统.06．�
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示玩家槽数"]
 local _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["每玩家广播提示槽数"]
 local _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15 = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽索引"]
+local _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽位Y"]
 local _____5E7F_64AD_63D0_793A_80CC_666F_8D34_56FE = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示背景贴图"]
 local _____5E7F_64AD_63D0_793A_9ED8_8BA4_5934_50CF = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示默认头像"]
 local _____5E7F_64AD_63D0_793A_5B57_4F53 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示字体"]
@@ -13,8 +14,6 @@ local _____5E7F_64AD_63D0_793A_5934_50CF_5927_5C0F = ____00_FF0E_5E38_91CF_5B9A_
 local _____5E7F_64AD_63D0_793A_6587_5B57_5BBD_5EA6 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示文字宽度"]
 local _____5E7F_64AD_63D0_793A_6587_5B57_9AD8_5EA6 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示文字高度"]
 local _____5E7F_64AD_63D0_793A_8D77_59CBX = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示起始X"]
-local _____5E7F_64AD_63D0_793A_57FA_51C6Y = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示基准Y"]
-local _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示槽间距Y"]
 local _____5E7F_64AD_63D0_793A_6700_5927_900F_660E_5EA6 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示最大透明度"]
 local _____5E7F_64AD_63D0_793A_4F18_5148_7EA7 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示优先级"]
 local _____5E27_70B9_5DE6 = ____00_FF0E_5E38_91CF_5B9A_4E49["帧点左"]
@@ -37,9 +36,6 @@ local DzFrameSetPriority = japi.DzFrameSetPriority
 local DzFrameShow = japi.DzFrameShow
 ____exports["广播提示槽帧表"] = {}
 local _____5DF2_521B_5EFA_5E7F_64AD_63D0_793AUI = false
-local function _____53D6_69FD_4F4DY(_____69FD_4F4DID)
-    return _____5E7F_64AD_63D0_793A_57FA_51C6Y - _____69FD_4F4DID * _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY
-end
 local function _____521B_5EFA_80CC_666F_5E27(_____540D_79F0, _____7236_7EA7)
     return DzCreateFrameByTagName(
         "BACKDROP",
@@ -82,7 +78,7 @@ local function _____521B_5EFA_5355_69FD(_____73A9_5BB6ID, _____69FD_4F4DID, ____
         root,
         _____5E27_70B9_5DE6,
         _____5E7F_64AD_63D0_793A_8D77_59CBX,
-        _____53D6_69FD_4F4DY(_____69FD_4F4DID)
+        _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY(_____69FD_4F4DID)
     )
     DzFrameSetSize(root, _____5E7F_64AD_63D0_793A_5BBD_5EA6, _____5E7F_64AD_63D0_793A_9AD8_5EA6)
     DzFrameSetTexture(root, _____5E7F_64AD_63D0_793A_80CC_666F_8D34_56FE, 0)

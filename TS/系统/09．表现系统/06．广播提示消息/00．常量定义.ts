@@ -15,7 +15,7 @@ export const 广播提示文字高度 = 0.018;
 
 export const 广播提示起始X = 0.22;
 export const 广播提示停留X = 0.105;
-export const 广播提示基准Y = 0.285;
+export const 广播提示基准Y = 0.225;
 export const 广播提示槽间距Y = 0.038;
 
 export const 广播提示滑入毫秒 = 300;
@@ -38,4 +38,8 @@ export const 广播提示状态_淡出 = 3;
 
 export function 取广播提示槽索引(this: void, 玩家ID: number, 槽位ID: number): number {
   return 玩家ID * 每玩家广播提示槽数 + 槽位ID;
+}
+
+export function 取广播提示槽位Y(this: void, 槽位ID: number): number {
+  return 广播提示基准Y + 槽位ID * 广播提示槽间距Y;
 }

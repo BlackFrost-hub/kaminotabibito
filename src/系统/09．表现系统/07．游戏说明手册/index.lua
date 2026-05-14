@@ -10,7 +10,28 @@ local _____5207_6362_6E38_620F_8BF4_660E_624B_518C = ____05_FF0E_4EA4_4E92_63A7_
 local ____03_FF0E_624B_518CUI_521B_5EFA = require("系统.09．表现系统.07．游戏说明手册.03．手册UI创建")
 local _____521B_5EFA_6E38_620F_8BF4_660E_624B_518CUI = ____03_FF0E_624B_518CUI_521B_5EFA["创建游戏说明手册UI"]
 local _____8BBE_7F6E_624B_518C_5E27_663E_793A = ____03_FF0E_624B_518CUI_521B_5EFA["设置手册帧显示"]
+local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local KEY = ____index.KEY
+local KEY_STATE = ____index.KEY_STATE
+local registerKeyEventByCode = ____index.registerKeyEventByCode
 local _____5DF2_521D_59CB_5316 = false
+local _____5DF2_6CE8_518CK_952E = false
+local function ____on_6E38_620F_8BF4_660E_624B_518CK_952E_62AC_8D77()
+    _____5207_6362_6E38_620F_8BF4_660E_624B_518C()
+end
+local function _____6CE8_518C_6E38_620F_8BF4_660E_624B_518CK_952E()
+    if _____5DF2_6CE8_518CK_952E then
+        return
+    end
+    _____5DF2_6CE8_518CK_952E = true
+    registerKeyEventByCode(
+        nil,
+        KEY.K,
+        KEY_STATE.UP,
+        false,
+        ____on_6E38_620F_8BF4_660E_624B_518CK_952E_62AC_8D77
+    )
+end
 function ____exports.init()
     if _____5DF2_521D_59CB_5316 then
         return
@@ -20,7 +41,7 @@ function ____exports.init()
     _____521D_59CB_5316_7FFB_9875_52A8_753B(ui)
     _____521D_59CB_5316_624B_518C_4EA4_4E92(ui)
     _____8BBE_7F6E_624B_518C_5E27_663E_793A(ui, false)
-    _____6253_5F00_6E38_620F_8BF4_660E_624B_518C()
+    _____6CE8_518C_6E38_620F_8BF4_660E_624B_518CK_952E()
 end
 ____exports["打开游戏说明手册"] = _____6253_5F00_6E38_620F_8BF4_660E_624B_518C
 ____exports["关闭游戏说明手册"] = _____5173_95ED_6E38_620F_8BF4_660E_624B_518C

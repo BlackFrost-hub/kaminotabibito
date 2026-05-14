@@ -19,17 +19,15 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
-local SFB_setCurse = ____require_result_2.SFB_setCurse
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
+local SFB_setCurse = ____require_result_3.SFB_setCurse
 local YDUserDataGet = YDUserDataGetSafe
 local YDUserDataSet = YDUserDataSetSafe
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local CreateTimer = jass.CreateTimer
@@ -41,7 +39,6 @@ local _____6A21_5757_540D = "诅咒命中率测试"
 local _____6D4B_8BD5_547D_4EE4 = "1020"
 local ____ATTR__547D_4E2D_7387 = "命中率"
 local ____BUFF__6301_7EED_65F6_95F4 = 3
-local _____5DF2_6CE8_518C = false
 local _____5230_671F_68C0_67E5_4E0A_4E0B_6587 = {}
 local function _____5F52_4E00_5316_5B9E_6570(value)
     if value == nil or value == false or value == "" then
@@ -147,20 +144,6 @@ local function ____on_804A_5929_6D4B_8BD5()
     _____5B89_6392_5230_671F_68C0_67E5(_____5927_6CD5_5E08, ____BUFF__6301_7EED_65F6_95F4 + 0.1)
     debugLogForce(_____6A21_5757_540D, "已施加3秒诅咒，预期：100% -> 67% -> 100%")
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_5929_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "测试自定义诅咒命中率")
-end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_5929_6D4B_8BD5)
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "测试自定义诅咒命中率")
 return ____exports

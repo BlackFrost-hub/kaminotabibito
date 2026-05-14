@@ -73,14 +73,13 @@ local function _____521B_5EFA_80CC_666F_5E27(name, texture, priority)
     return frame
 end
 local function _____521B_5EFA_6587_672C_5E27(name, baseFrame, width, height, x, y, fontSize, priority)
-    local parent = DzGetGameUI()
-    if not _____6709_6548_5E27(parent) or not _____6709_6548_5E27(baseFrame) then
+    if not _____6709_6548_5E27(baseFrame) then
         return 0
     end
     local frame = DzCreateFrameByTagName(
         "TEXT",
         name,
-        parent,
+        baseFrame,
         "template",
         0
     )
@@ -178,6 +177,8 @@ ____exports["创建游戏说明手册UI"] = function()
     local base = _____521B_5EFA_80CC_666F_5E27("GameManualBase", MANUAL_BASE_TEXTURE, MANUAL_BASE_PRIORITY)
     local indicator = _____521B_5EFA_80CC_666F_5E27("GameManualIndicator", MANUAL_INDICATOR_TEXTURE, MANUAL_INDICATOR_PRIORITY)
     local overlays = {}
+    local overlayTitleTexts = {}
+    local overlayBodyTexts = {}
     do
         local i = 0
         while i < #MANUAL_FLIP_TEXTURES do
@@ -187,6 +188,28 @@ ____exports["创建游戏说明手册UI"] = function()
                 MANUAL_FLIP_PRIORITY_START + i
             )
             if _____6709_6548_5E27(frame) then
+                local overlayTitleText = i == 0 and _____521B_5EFA_6587_672C_5E27(
+                    "GameManualOverlayTitleText1",
+                    frame,
+                    MANUAL_TITLE_WIDTH,
+                    MANUAL_TITLE_HEIGHT,
+                    MANUAL_TITLE_OFFSET_X,
+                    MANUAL_TITLE_OFFSET_Y,
+                    MANUAL_TITLE_FONT_SIZE,
+                    MANUAL_BODY_PRIORITY
+                ) or 0
+                local overlayBodyText = i == 0 and _____521B_5EFA_6587_672C_5E27(
+                    "GameManualOverlayBodyText1",
+                    frame,
+                    MANUAL_BODY_TEXT_WIDTH,
+                    MANUAL_BODY_TEXT_HEIGHT,
+                    MANUAL_BODY_TEXT_OFFSET_X,
+                    MANUAL_BODY_TEXT_OFFSET_Y,
+                    MANUAL_BODY_FONT_SIZE,
+                    MANUAL_BODY_PRIORITY
+                ) or 0
+                overlayTitleTexts[#overlayTitleTexts + 1] = overlayTitleText
+                overlayBodyTexts[#overlayBodyTexts + 1] = overlayBodyText
                 DzFrameShow(frame, false)
                 overlays[#overlays + 1] = frame
             end
@@ -241,6 +264,8 @@ ____exports["创建游戏说明手册UI"] = function()
         base = base,
         indicator = indicator,
         overlays = overlays,
+        overlayTitleTexts = overlayTitleTexts,
+        overlayBodyTexts = overlayBodyTexts,
         nextHotspot = nextHotspot,
         closeHotspot = closeHotspot,
         titleText = titleText,

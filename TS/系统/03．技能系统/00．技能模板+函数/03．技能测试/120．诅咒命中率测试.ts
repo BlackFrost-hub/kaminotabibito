@@ -20,6 +20,10 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
+
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -30,10 +34,6 @@ const { SFB_setCurse } = require("lib.扩展函数.Star扩展函数.Star扩展�
 const YDUserDataGet = YDUserDataGetSafe;
 const YDUserDataSet = YDUserDataSetSafe;
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 const CreateTimer = jass.CreateTimer as () => any;
@@ -46,7 +46,6 @@ const 模块名 = "诅咒命中率测试";
 const 测试命令 = "1020";
 const ATTR_命中率 = "命中率";
 const BUFF_持续时间 = 3.0;
-let 已注册 = false;
 const 到期检查上下文: Record<number, any> = {};
 
 function 归一化实数(this: void, value: any): number {
@@ -139,15 +138,7 @@ function on聊天测试(): void {
   debugLogForce(模块名, "已施加3秒诅咒，预期：100% -> 67% -> 100%");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天测试);
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "测试自定义诅咒命中率");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "测试自定义诅咒命中率");
 
 export {};

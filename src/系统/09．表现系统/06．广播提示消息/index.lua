@@ -81,20 +81,4 @@ ____exports["广播单位提示"] = function(_____6765_6E90_5355_4F4D, _____6587
         end
     end
 end
-do
-    local ____export = require("系统.09．表现系统.06．广播提示消息.00．常量定义")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.09．表现系统.06．广播提示消息.01．头像读取")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
 return ____exports

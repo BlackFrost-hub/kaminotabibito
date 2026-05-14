@@ -70,6 +70,8 @@ export interface 手册UI帧 {
   base: number;
   indicator: number;
   overlays: number[];
+  overlayTitleTexts: number[];
+  overlayBodyTexts: number[];
   nextHotspot: number;
   closeHotspot: number;
   titleText: number;
@@ -96,10 +98,9 @@ function 创建背景帧(this: void, name: string, texture: string, priority: nu
 }
 
 function 创建文本帧(this: void, name: string, baseFrame: number, width: number, height: number, x: number, y: number, fontSize: number, priority: number): number {
-  const parent = DzGetGameUI();
-  if (!有效帧(parent) || !有效帧(baseFrame)) return 0;
+  if (!有效帧(baseFrame)) return 0;
 
-  const frame = DzCreateFrameByTagName("TEXT", name, parent, "template", 0);
+  const frame = DzCreateFrameByTagName("TEXT", name, baseFrame, "template", 0);
   if (!有效帧(frame)) return 0;
 
   DzFrameSetSize(frame, width, height);
@@ -147,10 +148,20 @@ export function 创建游戏说明手册UI(this: void): 手册UI帧 {
   const base = 创建背景帧("GameManualBase", MANUAL_BASE_TEXTURE, MANUAL_BASE_PRIORITY);
   const indicator = 创建背景帧("GameManualIndicator", MANUAL_INDICATOR_TEXTURE, MANUAL_INDICATOR_PRIORITY);
   const overlays: number[] = [];
+  const overlayTitleTexts: number[] = [];
+  const overlayBodyTexts: number[] = [];
 
   for (let i = 0; i < MANUAL_FLIP_TEXTURES.length; i++) {
     const frame = 创建背景帧("GameManualFlipOverlay" + (i + 1).toString(), MANUAL_FLIP_TEXTURES[i], MANUAL_FLIP_PRIORITY_START + i);
     if (有效帧(frame)) {
+      const overlayTitleText = i === 0
+        ? 创建文本帧("GameManualOverlayTitleText1", frame, MANUAL_TITLE_WIDTH, MANUAL_TITLE_HEIGHT, MANUAL_TITLE_OFFSET_X, MANUAL_TITLE_OFFSET_Y, MANUAL_TITLE_FONT_SIZE, MANUAL_BODY_PRIORITY)
+        : 0;
+      const overlayBodyText = i === 0
+        ? 创建文本帧("GameManualOverlayBodyText1", frame, MANUAL_BODY_TEXT_WIDTH, MANUAL_BODY_TEXT_HEIGHT, MANUAL_BODY_TEXT_OFFSET_X, MANUAL_BODY_TEXT_OFFSET_Y, MANUAL_BODY_FONT_SIZE, MANUAL_BODY_PRIORITY)
+        : 0;
+      overlayTitleTexts.push(overlayTitleText);
+      overlayBodyTexts.push(overlayBodyText);
       DzFrameShow(frame, false);
       overlays.push(frame);
     }
@@ -168,7 +179,7 @@ export function 创建游戏说明手册UI(this: void): 手册UI帧 {
     DzFrameShow(hintText, false);
   }
 
-  return { base, indicator, overlays, nextHotspot, closeHotspot, titleText, bodyText, hintText };
+  return { base, indicator, overlays, overlayTitleTexts, overlayBodyTexts, nextHotspot, closeHotspot, titleText, bodyText, hintText };
 }
 
 export function 设置手册帧显示(this: void, ui: 手册UI帧, visible: boolean): void {

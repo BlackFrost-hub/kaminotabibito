@@ -13,10 +13,8 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -26,7 +24,6 @@ local Cos = jass.Cos
 local Sin = jass.Sin
 local _____6A21_5757_540D = "原生弹幕直线测试"
 local _____6D4B_8BD5_547D_4EE4 = "1011"
-local _____5DF2_6CE8_518C = false
 local function _____53D6_524D_65B9X(_____5355_4F4D, _____8DDD_79BB)
     local _____671D_5411 = GetUnitFacing(_____5355_4F4D) * jass.bj_DEGTORAD
     return GetUnitX(_____5355_4F4D) + Cos(_____671D_5411) * _____8DDD_79BB
@@ -105,20 +102,6 @@ local function ____on_804A_59291011_6D4B_8BD5()
         ")"
     )
 end
-local function _____6CE8_518C_804A_59291011_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_59291011_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "发射原生直线弹幕")
-end
-_____6CE8_518C_804A_59291011_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_59291011_6D4B_8BD5)
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "发射原生直线弹幕")
 return ____exports

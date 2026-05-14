@@ -19,11 +19,15 @@ const {
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+const 功能开关 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关") as {
+  本地玩家是否开启仇恨文字: (this: void) => boolean;
+};
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitName = jass.GetUnitName as (u: any) => string;
 const SetTextTagText = (jass as any).SetTextTagText as (tt: any, text: string, height: number) => void;
 const SetTextTagPosUnit = (jass as any).SetTextTagPosUnit as (tt: any, unit: any, height: number) => void;
+const SetTextTagVisibility = (jass as any).SetTextTagVisibility as (tt: any, visible: boolean) => void;
 const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD;
 const R2I = jass.R2I as (value: number) => number;
@@ -56,6 +60,16 @@ function 构建仇恨文本(目标单位: any, 仇恨值: number): string {
   return `目标：${GetUnitName(目标单位)}|n仇恨值：${格式化仇恨值(仇恨值)}`;
 }
 
+function 本地玩家是否显示仇恨文字(): boolean {
+  return 功能开关.本地玩家是否开启仇恨文字();
+}
+
+function 应用本机仇恨文字可见性(textTag: any): void {
+  if (textTag == null || textTag === 0) return;
+  // 只改本机表现层可见性；TextTag 的创建、更新、移动、销毁仍保持全端对称。
+  SetTextTagVisibility(textTag, 本地玩家是否显示仇恨文字());
+}
+
 function 获取或创建仇恨文字(敌人ID: number, 敌人: any): any | null {
   const 现有 = 仇恨显示表[敌人ID];
   if (现有 != null && 现有.textTag != null) {
@@ -76,6 +90,7 @@ function 获取或创建仇恨文字(敌人ID: number, 敌人: any): any | null 
     height: 文字高度,
   });
   if (新文字 == null) return null;
+  应用本机仇恨文字可见性(新文字);
 
   仇恨显示表[敌人ID] = { textTag: 新文字, 跟随单位: 敌人 };
   return 新文字;
@@ -103,6 +118,7 @@ function on仇恨显示Tick(): void {
       continue;
     }
     SetTextTagPosUnit(数据.textTag, 数据.跟随单位, 文字高度);
+    应用本机仇恨文字可见性(数据.textTag);
     仍有显示 = true;
   }
 
@@ -141,6 +157,7 @@ export function 更新仇恨显示(敌人: any, 目标单位: any, 仇恨值: nu
 
   SetTextTagText(文字, 构建仇恨文本(目标单位, 仇恨值), 文字尺寸高度);
   SetTextTagPosUnit(文字, 敌人, 文字高度);
+  应用本机仇恨文字可见性(文字);
   确保仇恨显示Tick已启动();
 }
 

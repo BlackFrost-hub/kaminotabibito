@@ -21,6 +21,10 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
+
 const 扩展控制系统 = require("../01．技能函数/16．扩展控制/index") as {
   施加魅惑: (来源单位: any, 目标单位: any, 参数: { 持续时间: number; 跟随半径?: number }) => number;
   施加恐惧: (来源单位: any, 目标单位: any, 参数: { 持续时间: number; 模式?: "逃离施法者" | "随机乱跑"; 逃离距离?: number; 随机半径?: number; 移动速度?: number }) => number;
@@ -29,10 +33,6 @@ const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数
   getEnemyUnitsInRange: (this: void, centerUnit: any, x: number, y: number, radius: number) => any[];
 };
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 
@@ -40,7 +40,6 @@ const 模块名 = "扩展控制测试";
 const 魅惑命令 = "1024";
 const 恐惧逃离命令 = "1025";
 const 恐惧随机命令 = "1026";
-let 已注册 = false;
 
 function 施加单体魅惑(this: void, 来源单位: any, 目标单位: any, 参数: { 持续时间: number; 跟随半径?: number }): number {
   return 扩展控制系统["施加魅惑"](来源单位, 目标单位, 参数);
@@ -104,26 +103,11 @@ function on恐惧随机测试(): void {
   debugLogForce(模块名, "恐惧随机结果=", 结果, "来源=", 上下文.敌人, "目标=gg_unit_Hamg_0002");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-  const 魅惑触发器 = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(魅惑触发器, Player(0), 魅惑命令, true);
-  TriggerAddAction(魅惑触发器, on魅惑测试);
-
-  const 恐惧逃离触发器 = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(恐惧逃离触发器, Player(0), 恐惧逃离命令, true);
-  TriggerAddAction(恐惧逃离触发器, on恐惧逃离测试);
-
-  const 恐惧随机触发器 = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(恐惧随机触发器, Player(0), 恐惧随机命令, true);
-  TriggerAddAction(恐惧随机触发器, on恐惧随机测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 魅惑命令, "让周围第一个敌人魅惑大法师");
-  debugLogForce(模块名, "已注册测试：输入", 恐惧逃离命令, "让周围第一个敌人恐惧大法师-逃离施法者");
-  debugLogForce(模块名, "已注册测试：输入", 恐惧随机命令, "让周围第一个敌人恐惧大法师-随机乱跑");
-}
-
-注册聊天测试();
+注册聊天命令监听(魅惑命令, on魅惑测试);
+注册聊天命令监听(恐惧逃离命令, on恐惧逃离测试);
+注册聊天命令监听(恐惧随机命令, on恐惧随机测试);
+debugLogForce(模块名, "已注册测试：输入", 魅惑命令, "让周围第一个敌人魅惑大法师");
+debugLogForce(模块名, "已注册测试：输入", 恐惧逃离命令, "让周围第一个敌人恐惧大法师-逃离施法者");
+debugLogForce(模块名, "已注册测试：输入", 恐惧随机命令, "让周围第一个敌人恐惧大法师-随机乱跑");
 
 export {};

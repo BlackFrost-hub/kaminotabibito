@@ -7,8 +7,9 @@ local _____5E7F_64AD_63D0_793A_9ED8_8BA4_5934_50CF = ____00_FF0E_5E38_91CF_5B9A_
 -- @noSelfInFile
 local jass = require("jass.common")
 local ydwe = require("lib.扩展函数.YDWE函数.index")
+local ydweSafe = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local GetUnitTypeId = jass.GetUnitTypeId
-local getObjectProperty = ydwe.getObjectProperty
+local getObjectProperty = ydweSafe.getObjectPropertySafe
 local ObjectType = ydwe.ObjectType
 local _____5355_4F4D_5934_50CF_7F13_5B58 = {}
 local function _____662F_8D34_56FE_8DEF_5F84(_____8DEF_5F84)

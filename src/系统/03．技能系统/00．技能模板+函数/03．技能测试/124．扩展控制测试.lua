@@ -17,20 +17,17 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local _____6269_5C55_63A7_5236_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.index")
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getEnemyUnitsInRange = ____require_result_1.getEnemyUnitsInRange
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getEnemyUnitsInRange = ____require_result_2.getEnemyUnitsInRange
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local _____6A21_5757_540D = "扩展控制测试"
 local _____9B45_60D1_547D_4EE4 = "1024"
 local _____6050_60E7_9003_79BB_547D_4EE4 = "1025"
 local _____6050_60E7_968F_673A_547D_4EE4 = "1026"
-local _____5DF2_6CE8_518C = false
 local function _____65BD_52A0_5355_4F53_9B45_60D1(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, _____53C2_6570)
     return _____6269_5C55_63A7_5236_7CFB_7EDF["施加魅惑"](_____6269_5C55_63A7_5236_7CFB_7EDF, _____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, _____53C2_6570)
 end
@@ -98,38 +95,10 @@ local function ____on_6050_60E7_968F_673A_6D4B_8BD5()
         "目标=gg_unit_Hamg_0002"
     )
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local _____9B45_60D1_89E6_53D1_5668 = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        _____9B45_60D1_89E6_53D1_5668,
-        Player(0),
-        _____9B45_60D1_547D_4EE4,
-        true
-    )
-    TriggerAddAction(_____9B45_60D1_89E6_53D1_5668, ____on_9B45_60D1_6D4B_8BD5)
-    local _____6050_60E7_9003_79BB_89E6_53D1_5668 = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        _____6050_60E7_9003_79BB_89E6_53D1_5668,
-        Player(0),
-        _____6050_60E7_9003_79BB_547D_4EE4,
-        true
-    )
-    TriggerAddAction(_____6050_60E7_9003_79BB_89E6_53D1_5668, ____on_6050_60E7_9003_79BB_6D4B_8BD5)
-    local _____6050_60E7_968F_673A_89E6_53D1_5668 = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        _____6050_60E7_968F_673A_89E6_53D1_5668,
-        Player(0),
-        _____6050_60E7_968F_673A_547D_4EE4,
-        true
-    )
-    TriggerAddAction(_____6050_60E7_968F_673A_89E6_53D1_5668, ____on_6050_60E7_968F_673A_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____9B45_60D1_547D_4EE4, "让周围第一个敌人魅惑大法师")
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6050_60E7_9003_79BB_547D_4EE4, "让周围第一个敌人恐惧大法师-逃离施法者")
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6050_60E7_968F_673A_547D_4EE4, "让周围第一个敌人恐惧大法师-随机乱跑")
-end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____9B45_60D1_547D_4EE4, ____on_9B45_60D1_6D4B_8BD5)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6050_60E7_9003_79BB_547D_4EE4, ____on_6050_60E7_9003_79BB_6D4B_8BD5)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6050_60E7_968F_673A_547D_4EE4, ____on_6050_60E7_968F_673A_6D4B_8BD5)
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____9B45_60D1_547D_4EE4, "让周围第一个敌人魅惑大法师")
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6050_60E7_9003_79BB_547D_4EE4, "让周围第一个敌人恐惧大法师-逃离施法者")
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6050_60E7_968F_673A_547D_4EE4, "让周围第一个敌人恐惧大法师-随机乱跑")
 return ____exports

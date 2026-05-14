@@ -9,18 +9,17 @@
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, player: any, command: string) => void) => void;
 };
 
 import { 创建红色扇形提示圈 } from "../02．通用函数/09．提示特效";
 import { 获取扇形区域单位 } from "../01．技能函数/09．形状区域/index";
 import { isUnitEnemy } from "../02．通用函数/02．单位与范围";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
@@ -39,9 +38,8 @@ const 扇形角度 = 90;
 const 扇形外半径 = 512;
 const 扇形模型尺寸 = 1.0;
 const 测试伤害 = 100;
-let 已注册 = false;
 
-function on聊天1005测试(): void {
+function on聊天1005测试(this: void): void {
   const 大法师 = g.gg_unit_Hamg_0002;
   if (大法师 == null || 大法师 === 0) {
     debugLogForce(模块名, "错误：未找到 gg_unit_Hamg_0002");
@@ -86,7 +84,7 @@ function on聊天1005测试(): void {
   );
 }
 
-function 扇形区域测试_敌方筛选(单位: any): boolean {
+function 扇形区域测试_敌方筛选(this: void, 单位: any): boolean {
   const 大法师 = g.gg_unit_Hamg_0002;
   if (大法师 == null || 大法师 === 0) {
     return false;
@@ -94,17 +92,7 @@ function 扇形区域测试_敌方筛选(单位: any): boolean {
   return isUnitEnemy(单位, 大法师);
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1005测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "创建扇形提示特效并统计敌方单位");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天1005测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "创建扇形提示特效并统计敌方单位");
 
 export {};

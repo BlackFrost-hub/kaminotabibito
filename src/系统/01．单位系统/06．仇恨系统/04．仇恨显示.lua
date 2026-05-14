@@ -30,10 +30,12 @@ local CreateFloatTextOnUnit = ____require_result_0.CreateFloatTextOnUnit
 DestroyFloatText = ____require_result_0.DestroyFloatText
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_1.registerDeathListener
+local _____529F_80FD_5F00_5173 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local GetHandleId = jass.GetHandleId
 local GetUnitName = jass.GetUnitName
 local SetTextTagText = jass.SetTextTagText
 local SetTextTagPosUnit = jass.SetTextTagPosUnit
+local SetTextTagVisibility = jass.SetTextTagVisibility
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local R2I = jass.R2I
@@ -58,6 +60,18 @@ end
 local function _____6784_5EFA_4EC7_6068_6587_672C(_____76EE_6807_5355_4F4D, _____4EC7_6068_503C)
     return (("目标：" .. GetUnitName(_____76EE_6807_5355_4F4D)) .. "|n仇恨值：") .. _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
 end
+local function _____672C_5730_73A9_5BB6_662F_5426_663E_793A_4EC7_6068_6587_5B57()
+    return _____529F_80FD_5F00_5173["本地玩家是否开启仇恨文字"]()
+end
+local function _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(textTag)
+    if textTag == nil or textTag == 0 then
+        return
+    end
+    SetTextTagVisibility(
+        textTag,
+        _____672C_5730_73A9_5BB6_662F_5426_663E_793A_4EC7_6068_6587_5B57()
+    )
+end
 local function _____83B7_53D6_6216_521B_5EFA_4EC7_6068_6587_5B57(_____654C_4EBAID, _____654C_4EBA)
     local _____73B0_6709 = _____4EC7_6068_663E_793A_8868[_____654C_4EBAID]
     if _____73B0_6709 ~= nil and _____73B0_6709.textTag ~= nil then
@@ -79,6 +93,7 @@ local function _____83B7_53D6_6216_521B_5EFA_4EC7_6068_6587_5B57(_____654C_4EBAI
     if _____65B0_6587_5B57 == nil then
         return nil
     end
+    _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____65B0_6587_5B57)
     _____4EC7_6068_663E_793A_8868[_____654C_4EBAID] = {textTag = _____65B0_6587_5B57, ["跟随单位"] = _____654C_4EBA}
     return _____65B0_6587_5B57
 end
@@ -98,21 +113,22 @@ local function ____on_4EC7_6068_663E_793ATick()
             do
                 local _____654C_4EBAID = __TS__ParseInt(keys[i + 1], 10)
                 if __TS__NumberIsNaN(__TS__Number(_____654C_4EBAID)) then
-                    goto __continue13
+                    goto __continue16
                 end
                 local _____6570_636E = _____4EC7_6068_663E_793A_8868[_____654C_4EBAID]
                 if _____6570_636E == nil or _____6570_636E.textTag == nil or _____6570_636E["跟随单位"] == nil or _____6570_636E["跟随单位"] == 0 then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue13
+                    goto __continue16
                 end
                 if IsUnitType(_____6570_636E["跟随单位"], UNIT_TYPE_DEAD) then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue13
+                    goto __continue16
                 end
                 SetTextTagPosUnit(_____6570_636E.textTag, _____6570_636E["跟随单位"], _____6587_5B57_9AD8_5EA6)
+                _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____6570_636E.textTag)
                 _____4ECD_6709_663E_793A = true
             end
-            ::__continue13::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -157,6 +173,7 @@ ____exports["更新仇恨显示"] = function(_____654C_4EBA, _____76EE_6807_5355
         _____6587_5B57_5C3A_5BF8_9AD8_5EA6
     )
     SetTextTagPosUnit(_____6587_5B57, _____654C_4EBA, _____6587_5B57_9AD8_5EA6)
+    _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____6587_5B57)
     _____786E_4FDD_4EC7_6068_663E_793ATick_5DF2_542F_52A8()
 end
 ____exports["清除所有仇恨显示"] = function()

@@ -14,7 +14,7 @@ ____exports["广播提示文字宽度"] = 0.185
 ____exports["广播提示文字高度"] = 0.018
 ____exports["广播提示起始X"] = 0.22
 ____exports["广播提示停留X"] = 0.105
-____exports["广播提示基准Y"] = 0.285
+____exports["广播提示基准Y"] = 0.225
 ____exports["广播提示槽间距Y"] = 0.038
 ____exports["广播提示滑入毫秒"] = 300
 ____exports["广播提示默认停留毫秒"] = 3000
@@ -32,5 +32,8 @@ ____exports["广播提示状态_停留"] = 2
 ____exports["广播提示状态_淡出"] = 3
 ____exports["取广播提示槽索引"] = function(_____73A9_5BB6ID, _____69FD_4F4DID)
     return _____73A9_5BB6ID * ____exports["每玩家广播提示槽数"] + _____69FD_4F4DID
+end
+____exports["取广播提示槽位Y"] = function(_____69FD_4F4DID)
+    return ____exports["广播提示基准Y"] + _____69FD_4F4DID * ____exports["广播提示槽间距Y"]
 end
 return ____exports

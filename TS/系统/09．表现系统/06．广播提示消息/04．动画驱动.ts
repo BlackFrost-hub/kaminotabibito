@@ -7,6 +7,7 @@ import {
   广播提示玩家槽数,
   每玩家广播提示槽数,
   取广播提示槽索引,
+  取广播提示槽位Y,
   广播提示状态_隐藏,
   广播提示状态_滑入,
   广播提示状态_停留,
@@ -16,8 +17,6 @@ import {
   广播提示刷新毫秒,
   广播提示起始X,
   广播提示停留X,
-  广播提示基准Y,
-  广播提示槽间距Y,
   广播提示最大透明度,
   帧点左,
 } from "./00．常量定义";
@@ -39,10 +38,6 @@ function 限制01(this: void, 值: number): number {
   if (值 <= 0) return 0;
   if (值 >= 1) return 1;
   return 值;
-}
-
-function 取槽位Y(this: void, 槽位ID: number): number {
-  return 广播提示基准Y - 槽位ID * 广播提示槽间距Y;
 }
 
 function 取本机玩家ID(this: void): number {
@@ -101,7 +96,7 @@ function 应用槽位帧(this: void, 序号: number, 状态: 广播提示槽状�
   if (帧组 == null) return;
 
   const 可见 = 状态.active && 本机玩家ID === 状态.playerId;
-  DzFrameSetAbsolutePoint(帧组.root, 帧点左, 状态.x, 取槽位Y(状态.slotId));
+  DzFrameSetAbsolutePoint(帧组.root, 帧点左, 状态.x, 取广播提示槽位Y(状态.slotId));
   DzFrameSetAlpha(帧组.root, R2I(状态.alpha));
   DzFrameShow(帧组.root, 可见);
 }

@@ -15,13 +15,8 @@ local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注�
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
 local _____6A21_5757_540D = "矩形提示特效测试"
 local _____6D4B_8BD5_547D_4EE4 = "1004"
-local _____5DF2_6CE8_518C = false
 local function ____on_804A_59291004_6D4B_8BD5()
     local _____5927_6CD5_5E08 = g.gg_unit_Hamg_0002
     if _____5927_6CD5_5E08 == nil or _____5927_6CD5_5E08 == 0 then
@@ -48,20 +43,6 @@ local function ____on_804A_59291004_6D4B_8BD5()
         "宽=200 长=600"
     )
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_59291004_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "在大法师面前创建矩形提示圈")
-end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_59291004_6D4B_8BD5)
+debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "在大法师面前创建矩形提示圈")
 return ____exports

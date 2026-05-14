@@ -4,12 +4,11 @@ local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.09．表现系统.06．�
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示玩家槽数"]
 local _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["每玩家广播提示槽数"]
 local _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15 = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽索引"]
+local _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽位Y"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__9690_85CF = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_隐藏"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__6ED1_5165 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_滑入"]
 local _____5E7F_64AD_63D0_793A_9ED8_8BA4_505C_7559_6BEB_79D2 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示默认停留毫秒"]
 local _____5E7F_64AD_63D0_793A_8D77_59CBX = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示起始X"]
-local _____5E7F_64AD_63D0_793A_57FA_51C6Y = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示基准Y"]
-local _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示槽间距Y"]
 local ____02_FF0EUI_521B_5EFA = require("系统.09．表现系统.06．广播提示消息.02．UI创建")
 local _____5E7F_64AD_63D0_793A_69FD_5E27_8868 = ____02_FF0EUI_521B_5EFA["广播提示槽帧表"]
 ---
@@ -21,9 +20,6 @@ local DzFrameSetAbsolutePoint = japi.DzFrameSetAbsolutePoint
 local DzFrameSetAlpha = japi.DzFrameSetAlpha
 ____exports["广播提示槽状态表"] = {}
 local _____73A9_5BB6_4E0B_4E00_4E2A_69FD_4F4D_8868 = {}
-local function _____53D6_69FD_4F4DY(_____69FD_4F4DID)
-    return _____5E7F_64AD_63D0_793A_57FA_51C6Y - _____69FD_4F4DID * _____5E7F_64AD_63D0_793A_69FD_95F4_8DDDY
-end
 local function _____53D6_5B89_5168_6301_7EED_65F6_95F4(_____6301_7EED_65F6_95F4)
     if _____6301_7EED_65F6_95F4 == nil or _____6301_7EED_65F6_95F4 <= 0 then
         return _____5E7F_64AD_63D0_793A_9ED8_8BA4_505C_7559_6BEB_79D2
@@ -71,7 +67,7 @@ local function _____5199_5165_69FD_5E27_5185_5BB9(_____5E8F_53F7, _____72B6_6001
         _____5E27_7EC4.root,
         3,
         _____5E7F_64AD_63D0_793A_8D77_59CBX,
-        _____53D6_69FD_4F4DY(_____72B6_6001.slotId)
+        _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY(_____72B6_6001.slotId)
     )
     DzFrameSetAlpha(_____5E27_7EC4.root, 0)
 end
