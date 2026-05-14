@@ -13,7 +13,7 @@ ____exports["应用提升等级学习技能"] = function(whichHero)
     if not whichHero or whichHero == 0 then
         return
     end
-    local level = jass.GetHeroLevel(whichHero) or 0
+    local level = jass:GetHeroLevel(whichHero) or 0
     local heroRawcode = _____83B7_53D6_5355_4F4D_82F1_96C4Rawcode(whichHero)
     local heroConfig = _____83B7_53D6_82F1_96C4_5347_7EA7_914D_7F6E(heroRawcode)
     local rules = heroConfig and heroConfig.learnedSkills
@@ -32,11 +32,11 @@ ____exports["应用提升等级学习技能"] = function(whichHero)
                 if abilityId == 0 then
                     goto __continue6
                 end
-                if jass.GetUnitAbilityLevel(whichHero, abilityId) <= 0 then
-                    jass.UnitAddAbility(whichHero, abilityId)
+                if jass:GetUnitAbilityLevel(whichHero, abilityId) <= 0 then
+                    jass:UnitAddAbility(whichHero, abilityId)
                 end
                 if rule.targetLevel ~= nil and rule.targetLevel > 0 then
-                    jass.SetUnitAbilityLevel(whichHero, abilityId, rule.targetLevel)
+                    jass:SetUnitAbilityLevel(whichHero, abilityId, rule.targetLevel)
                 end
             end
             ::__continue6::

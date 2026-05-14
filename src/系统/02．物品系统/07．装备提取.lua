@@ -88,8 +88,8 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    local h = jass.StringHash(eventName)
-    return jass.LoadInteger(
+    local h = jass:StringHash(eventName)
+    return jass:LoadInteger(
         ht,
         h,
         ydlStes_skeyIndex(nil, nil)
@@ -126,7 +126,7 @@ local function pickFromScorePool(ids)
     if #ids == 0 then
         return {raw = 0, id = ""}
     end
-    local idx = jass.GetRandomInt(1, #ids)
+    local idx = jass:GetRandomInt(1, #ids)
     local id = ids[idx]
     if type(id) ~= "string" or #id ~= 4 then
         return {raw = 0, id = ""}
@@ -181,8 +181,8 @@ local function tryRegisterEquipStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(trig, onEquipExtractTriggerAction)
+        local trig = jass:CreateTrigger()
+        jass:TriggerAddAction(trig, onEquipExtractTriggerAction)
         g[TRIG_KEY] = trig
     end
     local trig = g[TRIG_KEY]

@@ -15,7 +15,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
-const 嘲讽系统 = require("../01．技能函数/16．嘲讽/index") as {
+const 嘲讽系统 = require("../01．技能函数/16．扩展控制/index") as {
   施加嘲讽: (sourceUnit: any, targetUnit: any, options: { 持续时间: number; 反伤倍率?: number }) => number;
 };
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {

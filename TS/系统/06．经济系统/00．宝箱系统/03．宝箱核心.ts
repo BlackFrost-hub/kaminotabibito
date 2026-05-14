@@ -11,6 +11,8 @@
  * 支持任意可交互目标类型（通过INTERACTABLE_TYPES配置）
  */
 
+const japi = require("jass.japi") as any;
+
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { ceil, forEachSorted } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
@@ -200,7 +202,7 @@ function fireStesEvent(this: void, eventName: string, opener: any, target: any):
 // ==========================================================================================
 
 function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void {
-  jass.DzUnitDisableAttack(data.unit, false);
+  japi.DzUnitDisableAttack(data.unit, false);
 
   if (data.progressBar) {
     jass.RemoveUnit(data.progressBar);
@@ -235,7 +237,7 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
     jass.SetUnitFlyHeight(progressBar, flyHeight, 0);
   }
 
-  jass.DzUnitDisableAttack(unit, true);
+  japi.DzUnitDisableAttack(unit, true);
 
   const targetX = jass.GetDestructableX(target);
   const targetY = jass.GetDestructableY(target);

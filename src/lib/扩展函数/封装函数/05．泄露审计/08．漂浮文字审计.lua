@@ -7,7 +7,7 @@ local untrack = ____01_FF0E_6838_5FC3_7EDF_8BA1.untrack
 local jass = require("jass.common")
 --- 创建漂浮文字 texttag（建议搭配 destroyTextTag 回收）
 function ____exports.createTextTag(self, tag)
-    local tt = jass.CreateTextTag()
+    local tt = jass:CreateTextTag()
     track(nil, "texttag", tt, tag)
     return tt
 end
@@ -16,6 +16,6 @@ function ____exports.destroyTextTag(self, tt)
         return
     end
     untrack(nil, "texttag", tt)
-    jass.DestroyTextTag(tt)
+    jass:DestroyTextTag(tt)
 end
 return ____exports

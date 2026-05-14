@@ -64,6 +64,8 @@ end
 require("系统.03．技能系统.01．显示技能名字")
 local ____ai_6280_80FD_7CFB_7EDF = require("系统.03．技能系统.06．AI自动使用技能.index")
 ____ai_6280_80FD_7CFB_7EDF.init()
+local _____52A8_6001_6280_80FD_6587_672C = require("系统.03．技能系统.07．动态技能文本.index")
+_____52A8_6001_6280_80FD_6587_672C.initDynamicSkillTextSystem()
 function ____exports.init()
 end
 return ____exports

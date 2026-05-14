@@ -27,14 +27,14 @@ function getMaxWound(unit, ignoreItem)
         local slot = 0
         while slot <= 5 do
             do
-                local item = jass.UnitItemInSlot(unit, slot)
+                local item = jass:UnitItemInSlot(unit, slot)
                 if not item then
                     goto __continue5
                 end
                 if ignoreItem and item == ignoreItem then
                     goto __continue5
                 end
-                local tid = jass.GetItemTypeId(item)
+                local tid = jass:GetItemTypeId(item)
                 local idStr = fourCCToString(nil, tid)
                 local entry = itemsData[idStr]
                 local typ = entry and entry.type
@@ -53,12 +53,12 @@ function getMaxWound(unit, ignoreItem)
     return max
 end
 function applyWound(unit, newValue)
-    local owner = jass.GetOwningPlayer(unit)
-    local playerId = jass.GetPlayerId(owner)
+    local owner = jass:GetOwningPlayer(unit)
+    local playerId = jass:GetPlayerId(owner)
     if playerId < 0 or playerId > 3 then
         return
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_HERO) then
         _____5199_5165YD_7528_6237_6570_636E(
             "player",
             owner,
@@ -80,7 +80,7 @@ function onItemChange(unit, item, isPickup)
     if unit == nil or unit == 0 then
         return
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
     if IsUnitIllusionBJ(nil, unit) then

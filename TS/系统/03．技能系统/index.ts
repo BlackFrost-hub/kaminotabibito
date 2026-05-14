@@ -29,5 +29,10 @@ const ai技能系统 = require("系统.03．技能系统.06．AI自动使用技�
 };
 ai技能系统.init();
 
+const 动态技能文本 = require("系统.03．技能系统.07．动态技能文本.index") as {
+  initDynamicSkillTextSystem: (this: void) => void;
+};
+动态技能文本.initDynamicSkillTextSystem();
+
 export function init(this: void): void {
 }

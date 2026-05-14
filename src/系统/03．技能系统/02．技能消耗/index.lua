@@ -52,7 +52,7 @@ end
 local function onSpellEffectForCost(castingUnit, spellAbilityId)
     handleManaRefund(castingUnit, spellAbilityId)
     if isEdwardUnit(castingUnit) then
-        local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+        local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
         local manaCost = calcTotalManaCost(castingUnit, spellAbilityId, level)
         if manaCost > 0 then
             handleEdwardPassiveCost(castingUnit, manaCost)

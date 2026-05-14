@@ -114,8 +114,8 @@ local function getMissingLife(target)
     if target == nil then
         return 0
     end
-    local maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
-    local curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+    local maxLife = jass:GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
+    local curLife = jass:GetUnitState(target, jass.UNIT_STATE_LIFE)
     local missing = maxLife - curLife
     return missing > 0 and missing or 0
 end
@@ -125,11 +125,11 @@ local function playHealEffect(target, effectPath)
         return
     end
     local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_HEAL_EFFECT_PATH
-    local x = jass.GetUnitX(target)
-    local y = jass.GetUnitY(target)
-    local eff = jass.AddSpecialEffect(path, x, y)
+    local x = jass:GetUnitX(target)
+    local y = jass:GetUnitY(target)
+    local eff = jass:AddSpecialEffect(path, x, y)
     if eff ~= nil then
-        jass.DestroyEffect(eff)
+        jass:DestroyEffect(eff)
     end
 end
 --- 触发数值显示事件
@@ -165,7 +165,7 @@ local function addHealStats(target, amount)
     if target == nil or amount <= 0 then
         return
     end
-    local hid = jass.GetHandleId(target)
+    local hid = jass:GetHandleId(target)
     if hid == nil or hid == 0 then
         return
     end
@@ -199,18 +199,18 @@ local function shouldRecordPlayerHeal(target, sourcePlayer)
     if playerForce == nil then
         return false
     end
-    local targetPlayer = jass.GetOwningPlayer(target)
-    if not jass.IsPlayerInForce(targetPlayer, playerForce) then
+    local targetPlayer = jass:GetOwningPlayer(target)
+    if not jass:IsPlayerInForce(targetPlayer, playerForce) then
         return false
     end
-    return jass.IsUnitAlly(target, sourcePlayer) or sourcePlayer == targetPlayer
+    return jass:IsUnitAlly(target, sourcePlayer) or sourcePlayer == targetPlayer
 end
 --- 与旧 JASS「治疗事件.j」对齐：直接按 HealSource 的所属玩家累计「治疗量」
 local function addPlayerHealStats(target, source, amount)
     if source == nil or amount <= 0 then
         return
     end
-    local sourcePlayer = jass.GetOwningPlayer(source)
+    local sourcePlayer = jass:GetOwningPlayer(source)
     if not shouldRecordPlayerHeal(target, sourcePlayer) then
         return
     end
@@ -248,7 +248,7 @@ function ____exports.doHeal(params)
     if HealTarget == nil or HealAmount <= 0 then
         return 0
     end
-    if jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
         return 0
     end
     local amount = calcHealAmount(HealSource, HealTarget, HealAmount)
@@ -267,8 +267,8 @@ function ____exports.doHeal(params)
     if actualHeal <= 0 then
         return 0
     end
-    local curLife = jass.GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
-    jass.SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
+    local curLife = jass:GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
+    jass:SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
     if HealEffect then
         playHealEffect(HealTarget, HealEffectPath)
     end
@@ -328,7 +328,7 @@ function ____exports.getTotalHealed(unit)
     if unit == nil then
         return 0
     end
-    local hid = jass.GetHandleId(unit)
+    local hid = jass:GetHandleId(unit)
     if hid == nil or hid == 0 then
         return 0
     end

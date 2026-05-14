@@ -13,3 +13,4 @@ export * from "./08．扩散伤害/index";
 export * from "./09．形状区域/index";
 export * from "./10．跳链/index";
 export * from "./14．落点打击/index";
+export * from "./16．扩展控制/index";

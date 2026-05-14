@@ -17,7 +17,7 @@ ____exports["获取单位英雄Rawcode"] = function(unit)
     if unit == nil or unit == 0 then
         return ""
     end
-    local typeId = jass.GetUnitTypeId(unit) or 0
+    local typeId = jass:GetUnitTypeId(unit) or 0
     if typeId == 0 then
         return ""
     end

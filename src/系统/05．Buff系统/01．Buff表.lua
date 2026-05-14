@@ -375,6 +375,36 @@ ____exports.buffs = {
         priority = 7,
         canPurge = true,
         tooltip = "该单位受到『重伤』，持续time秒内治疗效果降低data%。"
+    },
+    C022 = {
+        buffID = "C022",
+        buffName = "魅惑",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNCharm.blp",
+        effect = "Abilities\\Spells\\Other\\SoulBurn\\SoulBurnbuff.mdl",
+        type = "Debuff:control",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 10,
+        canPurge = true,
+        tooltip = "该单位被魅惑，失去控制并贴身跟随来源单位，持续time秒。"
+    },
+    C023 = {
+        buffID = "C023",
+        buffName = "恐惧",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp",
+        effect = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl",
+        type = "Debuff:control",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 10,
+        canPurge = true,
+        tooltip = "该单位陷入恐惧，失去控制并四散逃跑，持续time秒。"
     }
 }
 ____exports.default = ____exports.buffs

@@ -51,6 +51,11 @@ const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．
 const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
   registerChestSystemHero: (whichHero: any) => void;
 };
+
+const dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index") as {
+  registerDynamicSkillTextHero: (this: void, whichHero: any) => void;
+};
+
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
 };
@@ -149,6 +154,9 @@ function registerHeroDependents(whichHero: any): void {
   }
   if (typeof chestSystem.registerChestSystemHero === "function") {
     chestSystem.registerChestSystemHero(whichHero);
+  }
+  if (typeof dynamicSkillText.registerDynamicSkillTextHero === "function") {
+    dynamicSkillText.registerDynamicSkillTextHero(whichHero);
   }
   const owner = jass.GetOwningPlayer(whichHero);
   if (owner != null && owner !== 0) {

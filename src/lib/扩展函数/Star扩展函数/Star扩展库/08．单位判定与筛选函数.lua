@@ -12,13 +12,13 @@ function ____exports.SUC_IsValidUnit(self, u)
     return u ~= nil and u ~= 0
 end
 function ____exports.SUC_GetFilterUnitOrNull(self)
-    return jass.GetFilterUnit()
+    return jass:GetFilterUnit()
 end
 function ____exports.SUC_GetUnitLife(self, u)
     if not ____exports.SUC_IsValidUnit(nil, u) then
         return 0
     end
-    return jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
+    return jass:GetUnitState(u, jass.UNIT_STATE_LIFE)
 end
 function ____exports.SUC_IsUnitAlive(self, u)
     return ____exports.SUC_GetUnitLife(nil, u) > ALIVE_LIFE_THRESHOLD
@@ -27,33 +27,33 @@ function ____exports.SUC_IsUnitStructure(self, u)
     if not ____exports.SUC_IsValidUnit(nil, u) then
         return false
     end
-    return jass.IsUnitType(u, jass.UNIT_TYPE_STRUCTURE)
+    return jass:IsUnitType(u, jass.UNIT_TYPE_STRUCTURE)
 end
 function ____exports.SUC_IsUnitInvincible(self, u)
     if not ____exports.SUC_IsValidUnit(nil, u) then
         return false
     end
-    local avul = jass.GetUnitAbilityLevel(u, AVUL)
-    local bvul = jass.GetUnitAbilityLevel(u, BVUL)
-    local bhds = jass.GetUnitAbilityLevel(u, BHDS)
+    local avul = jass:GetUnitAbilityLevel(u, AVUL)
+    local bvul = jass:GetUnitAbilityLevel(u, BVUL)
+    local bhds = jass:GetUnitAbilityLevel(u, BHDS)
     return avul ~= 0 or bvul ~= 0 or bhds ~= 0
 end
 function ____exports.SUC_IsUnitEnemyToUnit(self, target, source)
     if not ____exports.SUC_IsValidUnit(nil, target) or not ____exports.SUC_IsValidUnit(nil, source) then
         return false
     end
-    return jass.IsUnitEnemy(
+    return jass:IsUnitEnemy(
         target,
-        jass.GetOwningPlayer(source)
+        jass:GetOwningPlayer(source)
     )
 end
 function ____exports.SUC_IsUnitAllyToUnit(self, target, source)
     if not ____exports.SUC_IsValidUnit(nil, target) or not ____exports.SUC_IsValidUnit(nil, source) then
         return false
     end
-    return not jass.IsUnitEnemy(
+    return not jass:IsUnitEnemy(
         target,
-        jass.GetOwningPlayer(source)
+        jass:GetOwningPlayer(source)
     )
 end
 function ____exports.SUC_MatchBasicTarget(self, target, source, wantEnemy)

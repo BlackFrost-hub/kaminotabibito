@@ -37,7 +37,7 @@ local function isProxyUnit(unit)
     if unit == nil then
         return false
     end
-    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) == true
+    return jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) == true
 end
 --- 触发器实例
 local nativeHealEntryInitialized = false
@@ -54,18 +54,18 @@ local function onSpellChannel(castingUnit, spellAbilityId)
     if castingUnit ~= nil then
         ____temp_4 = castingUnit
     else
-        ____temp_4 = jass.GetTriggerUnit()
+        ____temp_4 = jass:GetTriggerUnit()
     end
     local caster = ____temp_4
     local abilityId = spellAbilityId ~= nil and spellAbilityId or GetSpellAbilityId(nil)
     if not isProxyUnit(caster) then
         return
     end
-    local currentOrder = jass.GetUnitCurrentOrder(caster)
+    local currentOrder = jass:GetUnitCurrentOrder(caster)
     if not isHealOrder(currentOrder) then
         return
     end
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if target == nil then
         return
     end
@@ -76,8 +76,8 @@ local function onSpellChannel(castingUnit, spellAbilityId)
         1,
         HEAL_DATA_FIELD
     )
-    jass.IssueImmediateOrder(caster, "stop")
-    jass.UnitRemoveAbility(caster, abilityId)
+    jass:IssueImmediateOrder(caster, "stop")
+    jass:UnitRemoveAbility(caster, abilityId)
     doHeal(nil, {
         HealSource = caster,
         HealTarget = target,

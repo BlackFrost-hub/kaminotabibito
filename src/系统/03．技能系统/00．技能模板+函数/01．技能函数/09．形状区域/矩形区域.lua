@@ -20,7 +20,7 @@ local function _____7EDD_5BF9_503C(_____503C)
     return _____503C < 0 and -_____503C or _____503C
 end
 local function _____8BA1_7B97_5E73_65B9_6839(_____503C)
-    return jass.SquareRoot(_____503C)
+    return jass:SquareRoot(_____503C)
 end
 local function _____8BA1_7B97_5750_6807_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
@@ -34,8 +34,8 @@ local function _____8BA1_7B97_77E9_5F62_7C97_7B5B_534A_5F84(_____957F_5EA6, ____
 end
 local function _____8BA1_7B97_65B9_5411_5355_4F4D_5411_91CF(_____65B9_5411_89D2)
     return {
-        X = jass.Cos(_____65B9_5411_89D2 * jass.bj_DEGTORAD),
-        Y = jass.Sin(_____65B9_5411_89D2 * jass.bj_DEGTORAD)
+        X = jass:Cos(_____65B9_5411_89D2 * jass.bj_DEGTORAD),
+        Y = jass:Sin(_____65B9_5411_89D2 * jass.bj_DEGTORAD)
     }
 end
 local function _____5355_4F4D_662F_5426_5728_5DF2_5F52_4E00_77E9_5F62_533A_57DF(_____5355_4F4D, _____4E2D_5FC3X, _____4E2D_5FC3Y, _____534A_957F, _____534A_5BBD, _____65B9_5411X, _____65B9_5411Y, _____5305_542B_8FB9_754C)

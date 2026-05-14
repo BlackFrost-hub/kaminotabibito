@@ -52,14 +52,14 @@ end
 function ____exports.calcEquipHealHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local maxHp = jass.GetUnitState(
+    local maxHp = jass:GetUnitState(
         unit,
-        jass.ConvertUnitState(1)
+        jass:ConvertUnitState(1)
     )
-    local curHp = jass.GetWidgetLife(unit)
-    local maxMp = jass.GetUnitState(
+    local curHp = jass:GetWidgetLife(unit)
+    local maxMp = jass:GetUnitState(
         unit,
-        jass.ConvertUnitState(3)
+        jass:ConvertUnitState(3)
     )
     local lostHp = maxHp - curHp
     for ____, rawToken in ipairs(tokens) do
@@ -99,7 +99,7 @@ function ____exports.sumHealFromItemData(self, unit, item, itemsData, fourCCToSt
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return {hp = 0, mp = 0, ok = false}
     end
-    local itemId = jass.GetItemTypeId(item)
+    local itemId = jass:GetItemTypeId(item)
     local idStr = fourCCToString(nil, itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
