@@ -8,10 +8,10 @@ local enterRegionRegistered = {}
 local enterRegionMasters = {}
 local enterRegionKeyByMasterHid = {}
 local function handleKey(handle)
-    return tostring(nil, handle)
+    return tostring(handle)
 end
 local function filterKey(filter)
-    return filter == nil and "null" or tostring(nil, filter)
+    return filter == nil and "null" or tostring(filter)
 end
 local function normalizeFilter(filter)
     local ____temp_0
@@ -47,9 +47,9 @@ local function dispatchListeners(list)
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue12
                 end
-                local passed = jass:TriggerEvaluate(listener.trigger)
+                local passed = jass.TriggerEvaluate(listener.trigger)
                 if passed then
-                    jass:TriggerExecute(listener.trigger)
+                    jass.TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
@@ -72,13 +72,11 @@ local function dispatchListeners(list)
     end
 end
 local function dispatchEnterRegionMaster()
-    local trig = jass:GetTriggeringTrigger()
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = enterRegionKeyByMasterHid[tostring(
-        nil,
-        jass:GetHandleId(trig)
+    local key = enterRegionKeyByMasterHid[tostring(jass.GetHandleId(trig)
     )]
     if not key then
         return
@@ -118,16 +116,14 @@ function ____exports.registerEnterRegionTrigger(trigger, region, filter)
     local key = regionKey(region, filter)
     if not enterRegionRegistered[key] then
         local normalizedFilter = normalizeFilter(filter)
-        local master = jass:CreateTrigger()
+        local master = jass.CreateTrigger()
         enterRegionMasters[key] = master
         enterRegionRegistered[key] = true
         enterRegionListeners[key] = enterRegionListeners[key] or ({})
-        enterRegionKeyByMasterHid[tostring(
-            nil,
-            jass:GetHandleId(master)
+        enterRegionKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
-        jass:TriggerRegisterEnterRegion(master, region, normalizedFilter)
-        jass:TriggerAddAction(master, dispatchEnterRegionMaster)
+        jass.TriggerRegisterEnterRegion(master, region, normalizedFilter)
+        jass.TriggerAddAction(master, dispatchEnterRegionMaster)
     end
     return addListener(enterRegionListeners, key, trigger, false)
 end

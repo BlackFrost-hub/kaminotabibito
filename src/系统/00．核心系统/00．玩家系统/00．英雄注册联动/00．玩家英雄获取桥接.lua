@@ -54,9 +54,9 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass:LoadInteger(
+    return jass.LoadInteger(
         ht,
-        jass:StringHash(eventName),
+        jass.StringHash(eventName),
         helper:ydlStes_skeyIndex(nil)
     )
 end
@@ -66,17 +66,17 @@ local function isPlayableHero(whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
-    if jass:IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass.IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
         return false
     end
-    local owner = jass:GetOwningPlayer(whichUnit)
+    local owner = jass.GetOwningPlayer(whichUnit)
     if owner == nil or owner == 0 then
         return false
     end
-    if jass:GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
+    if jass.GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
         return false
     end
-    local playerId = jass:GetPlayerId(owner) or -1
+    local playerId = jass.GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
 local function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
@@ -120,9 +120,9 @@ local function registerHeroDependents(whichHero)
     if type(dynamicSkillText.registerDynamicSkillTextHero) == "function" then
         dynamicSkillText.registerDynamicSkillTextHero(whichHero)
     end
-    local owner = jass:GetOwningPlayer(whichHero)
+    local owner = jass.GetOwningPlayer(whichHero)
     if owner ~= nil and owner ~= 0 then
-        local playerId = jass:GetPlayerId(owner)
+        local playerId = jass.GetPlayerId(owner)
         debugLog(
             nil,
             "Bridge",
@@ -181,7 +181,7 @@ local function registerSingleHero(whichHero)
     if not isPlayableHero(whichHero) then
         return
     end
-    local owner = jass:GetOwningPlayer(whichHero)
+    local owner = jass.GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
     end
@@ -210,8 +210,8 @@ local function tryRegisterPlayerHeroStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction)
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], C.STES_EVENT_REGISTER_PLAYER_HERO)

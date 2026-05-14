@@ -251,9 +251,9 @@ function ____exports.getSfbBuffId(id)
     return SFB_BUFF_ID[id]
 end
 function ____exports.getAngleBetweenUnits(u, tu)
-    return jass:Atan2(
-        jass:GetUnitY(tu) - jass:GetUnitY(u),
-        jass:GetUnitX(tu) - jass:GetUnitX(u)
+    return jass.Atan2(
+        jass.GetUnitY(tu) - jass.GetUnitY(u),
+        jass.GetUnitX(tu) - jass.GetUnitX(u)
     )
 end
 local function getAbilityOrderId(abilityId, fallbackOrderStr)
@@ -286,8 +286,8 @@ function ____exports.SFB_Init()
     if ____exports.SFB_Unit ~= nil and ____exports.SFB_Unit ~= 0 then
         return
     end
-    ____exports.SFB_Unit = jass:CreateUnit(
-        jass:Player(15),
+    ____exports.SFB_Unit = jass.CreateUnit(
+        jass.Player(15),
         SFB_UNIT_ID,
         0,
         0,
@@ -324,36 +324,36 @@ local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
     return true
 end
 local function onSfbPauseTimerExpire()
-    local t = jass:GetExpiredTimer()
-    jass:PauseUnit(
-        jass:LoadUnitHandle(
+    local t = jass.GetExpiredTimer()
+    jass.PauseUnit(
+        jass.LoadUnitHandle(
             ____exports.YDHT,
-            jass:GetHandleId(t),
-            jass:StringHash("单位")
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
         ),
         false
     )
-    jass:RemoveSavedHandle(
+    jass.RemoveSavedHandle(
         ____exports.YDHT,
-        jass:GetHandleId(t),
-        jass:StringHash("单位")
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
     )
     safeDestroyTimer(nil, t)
 end
 local function onSfbExpauseTimerExpire()
-    local t = jass:GetExpiredTimer()
-    japi:EXPauseUnit(
-        jass:LoadUnitHandle(
+    local t = jass.GetExpiredTimer()
+    japi.EXPauseUnit(
+        jass.LoadUnitHandle(
             ____exports.YDHT,
-            jass:GetHandleId(t),
-            jass:StringHash("单位")
+            jass.GetHandleId(t),
+            jass.StringHash("单位")
         ),
         false
     )
-    jass:RemoveSavedHandle(
+    jass.RemoveSavedHandle(
         ____exports.YDHT,
-        jass:GetHandleId(t),
-        jass:StringHash("单位")
+        jass.GetHandleId(t),
+        jass.StringHash("单位")
     )
     safeDestroyTimer(nil, t)
 end
@@ -376,7 +376,7 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
-    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     YDWESetUnitAbilityDataReal(
         nil,
         caster,
@@ -424,7 +424,7 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
-    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     if _____6301_7EED_65F6_95F4 > 0 then
         YDWESetUnitAbilityDataReal(
             nil,
@@ -466,14 +466,14 @@ ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
     if id == 21 then
         GS_Suspend(u, time)
     elseif id == 22 then
-        local tempTimer = jass:CreateTimer()
-        jass:SaveUnitHandle(
+        local tempTimer = jass.CreateTimer()
+        jass.SaveUnitHandle(
             ____exports.YDHT,
-            jass:GetHandleId(tempTimer),
-            jass:StringHash("单位"),
+            jass.GetHandleId(tempTimer),
+            jass.StringHash("单位"),
             u
         )
-        jass:PauseUnit(u, true)
+        jass.PauseUnit(u, true)
         safeTimerStart(
             nil,
             tempTimer,
@@ -482,14 +482,14 @@ ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
             onSfbPauseTimerExpire
         )
     elseif id == 23 then
-        local tempTimer = jass:CreateTimer()
-        jass:SaveUnitHandle(
+        local tempTimer = jass.CreateTimer()
+        jass.SaveUnitHandle(
             ____exports.YDHT,
-            jass:GetHandleId(tempTimer),
-            jass:StringHash("单位"),
+            jass.GetHandleId(tempTimer),
+            jass.StringHash("单位"),
             u
         )
-        japi:EXPauseUnit(u, true)
+        japi.EXPauseUnit(u, true)
         safeTimerStart(
             nil,
             tempTimer,

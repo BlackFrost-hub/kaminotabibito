@@ -25,9 +25,9 @@ function ____exports.initUnitSummonEventCenter()
         return
     end
     initialized = true
-    local trigger = jass:CreateTrigger()
+    local trigger = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trigger, ____exports.SUMMON_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SUMMON)
-    jass:TriggerAddAction(trigger, dispatchUnitSummon)
+    jass.TriggerAddAction(trigger, dispatchUnitSummon)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

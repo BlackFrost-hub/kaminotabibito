@@ -83,15 +83,15 @@ local function _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
     return _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
 end
 local function getHeroSource(localPlayer)
-    local playerId = jass:GetPlayerId(localPlayer)
+    local playerId = jass.GetPlayerId(localPlayer)
     local selectedUnit = _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
     if not isValidHandle(selectedUnit) then
         return nil
     end
-    if jass:IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass.IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
         return nil
     end
-    local owner = jass:GetOwningPlayer(selectedUnit)
+    local owner = jass.GetOwningPlayer(selectedUnit)
     if not isValidHandle(owner) then
         return nil
     end
@@ -105,7 +105,7 @@ local function getHeroSource(localPlayer)
     return selectedUnit
 end
 local function getLocalHero()
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if not isValidHandle(localPlayer) then
         return nil
     end
@@ -177,13 +177,13 @@ local function formatManaCost(value)
     if not (value > 0.05) then
         return ""
     end
-    local tenth = jass:R2I(value * 10 + 0.5)
-    local sec = jass:R2I(tenth / 10)
+    local tenth = jass.R2I(value * 10 + 0.5)
+    local sec = jass.R2I(tenth / 10)
     local decimal = tenth - sec * 10
     if decimal == 0 then
-        return jass:I2S(sec)
+        return jass.I2S(sec)
     end
-    return (tostring(jass:I2S(sec)) .. ".") .. tostring(jass:I2S(decimal))
+    return (tostring(jass.I2S(sec)) .. ".") .. tostring(jass.I2S(decimal))
 end
 local function calcDisplayManaCost(unit, abilityId, level)
     local totalCost = calcTotalManaCost(unit, abilityId, level)
@@ -268,7 +268,7 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, ui)
         _____9690_85CF_5355_5143(ui)
         return
     end
-    local level = jass:GetUnitAbilityLevel(whichHero, abilityId)
+    local level = jass.GetUnitAbilityLevel(whichHero, abilityId)
     if level <= 0 then
         _____9690_85CF_5355_5143(ui)
         return

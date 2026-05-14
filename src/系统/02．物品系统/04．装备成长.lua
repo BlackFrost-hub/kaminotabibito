@@ -21,11 +21,11 @@ function applyStats(unit, statEffects, isAdd)
     applyEquipStatsTS(nil, unit, payload)
 end
 function onEquipStatReverseTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local ctx = equipStatReverseByTimerHid[hid]
     __TS__Delete(equipStatReverseByTimerHid, hid)
     if ctx ~= nil then
@@ -34,11 +34,11 @@ function onEquipStatReverseTimerExpire()
     safeDestroyTimer(nil, t)
 end
 function onEquipDebounceTimerExpire()
-    local t = jass:GetExpiredTimer()
+    local t = jass.GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass:GetHandleId(t)
+    local hid = jass.GetHandleId(t)
     local key = equipDebounceKeyByTimerHid[hid]
     __TS__Delete(equipDebounceKeyByTimerHid, hid)
     if key ~= nil then
@@ -230,72 +230,72 @@ local function addHeroXP(unit, amount)
     if amount <= 0 then
         return
     end
-    local chunk = jass:R2I(amount / 10)
+    local chunk = jass.R2I(amount / 10)
     do
         local i = 0
         while i < 10 do
-            jass:AddHeroXP(unit, chunk, true)
+            jass.AddHeroXP(unit, chunk, true)
             i = i + 1
         end
     end
     local remainder = amount - chunk * 10
     if remainder > 0 then
-        jass:AddHeroXP(unit, remainder, true)
+        jass.AddHeroXP(unit, remainder, true)
     end
 end
 local function getHeroLevel(unit)
-    return jass:GetHeroLevel(unit)
+    return jass.GetHeroLevel(unit)
 end
 --- 获取单位当前属性的绝对值，用于百分比计算。
 -- str/agi/int 用 GetHeroStr/Agi/Int；hp/mp 用 GetUnitState+ConvertUnitState；
 -- dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
 local function getPctStatValue(unit, key)
     if key == "int" then
-        return jass:GetHeroInt(unit, true)
+        return jass.GetHeroInt(unit, true)
     end
     if key == "str" then
-        return jass:GetHeroStr(unit, true)
+        return jass.GetHeroStr(unit, true)
     end
     if key == "agi" then
-        return jass:GetHeroAgi(unit, true)
+        return jass.GetHeroAgi(unit, true)
     end
     if key == "hp" then
-        return jass:GetUnitState(
+        return jass.GetUnitState(
             unit,
-            jass:ConvertUnitState(1)
+            jass.ConvertUnitState(1)
         )
     end
     if key == "mp" then
-        return jass:GetUnitState(
+        return jass.GetUnitState(
             unit,
-            jass:ConvertUnitState(3)
+            jass.ConvertUnitState(3)
         )
     end
     if key == "dmg" then
-        return jass:GetUnitState(
+        return jass.GetUnitState(
             unit,
-            jass:ConvertUnitState(21)
+            jass.ConvertUnitState(21)
         )
     end
     if key == "armor" then
-        return jass:GetUnitState(
+        return jass.GetUnitState(
             unit,
-            jass:ConvertUnitState(32)
+            jass.ConvertUnitState(32)
         )
     end
     return 0
 end
 --- 对 unit 所属玩家的金币做一次百分比加减（pct 可负）
 local function applyGoldPct(unit, pct)
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if not player then
         return
     end
-    local stateGold = jass:ConvertPlayerState(1)
-    local cur = jass:GetPlayerState(player, stateGold)
+    local stateGold = jass.ConvertPlayerState(1)
+    local cur = jass.GetPlayerState(player, stateGold)
     local delta = round(cur * pct)
     local newVal = cur + delta < 0 and 0 or cur + delta
-    jass:SetPlayerState(player, stateGold, newVal)
+    jass.SetPlayerState(player, stateGold, newVal)
 end
 local function executeSegment(unit, seg)
     local statEffects = {}
@@ -314,9 +314,9 @@ local function executeSegment(unit, seg)
             elseif eff.type == "exp" then
                 local ____eff_isLevelMult_7
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass:R2I(getHeroLevel(unit) * eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(unit) * eff.value)
                 else
-                    ____eff_isLevelMult_7 = jass:R2I(eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(eff.value)
                 end
                 local amount = ____eff_isLevelMult_7
                 addHeroXP(unit, amount)
@@ -324,13 +324,13 @@ local function executeSegment(unit, seg)
                 local cur = getHeroLevel(unit)
                 local ____eff_isLevelMult_8
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_8 = jass:R2I(cur * eff.value)
+                    ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
                 else
-                    ____eff_isLevelMult_8 = jass:R2I(eff.value)
+                    ____eff_isLevelMult_8 = jass.R2I(eff.value)
                 end
                 local add = ____eff_isLevelMult_8
                 if add > 0 then
-                    jass:SetHeroLevel(unit, cur + add, true)
+                    jass.SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                 local name = KEY_TO_NAME[eff.key]
@@ -356,10 +356,10 @@ local function executeSegment(unit, seg)
         else
             local capturedUnit = unit
             local capturedPct = goldPct
-            local remaining = jass:R2I(seg.timeSec)
+            local remaining = jass.R2I(seg.timeSec)
             local cb
             cb = function()
-                if capturedUnit and jass:IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
+                if capturedUnit and jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
                     offSecond(cb)
                     return
                 end
@@ -376,8 +376,8 @@ local function executeSegment(unit, seg)
         do
             local i = 0
             while i < #goldFixed do
-                local mn = jass:R2I(goldFixed[i + 1].min)
-                local mx = jass:R2I(goldFixed[i + 1].max)
+                local mn = jass.R2I(goldFixed[i + 1].min)
+                local mx = jass.R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
                     local ____temp_9
@@ -394,7 +394,7 @@ local function executeSegment(unit, seg)
                         ____temp_10 = mn
                     end
                     local b = ____temp_10
-                    delta = jass:GetRandomInt(a, b)
+                    delta = jass.GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
                     AddGoldWithFeedback(nil, {delta = delta, unit = unit})
@@ -408,10 +408,10 @@ local function executeSegment(unit, seg)
         if seg.timeSec > 0 then
             local capturedStats = statEffects
             local capturedUnit = unit
-            local dt = jass:CreateTimer()
+            local dt = jass.CreateTimer()
             if dt then
                 local t = dt
-                equipStatReverseByTimerHid[jass:GetHandleId(t)] = {unit = capturedUnit, stats = capturedStats}
+                equipStatReverseByTimerHid[jass.GetHandleId(t)] = {unit = capturedUnit, stats = capturedStats}
                 safeTimerStart(
                     nil,
                     t,
@@ -424,12 +424,12 @@ local function executeSegment(unit, seg)
     end
 end
 local function onUseItem()
-    local unit = jass:GetManipulatingUnit()
-    local item = jass:GetManipulatedItem()
+    local unit = jass.GetManipulatingUnit()
+    local item = jass.GetManipulatedItem()
     if not unit or not item then
         return
     end
-    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
     if IsUnitIllusionBJ(nil, unit) then
@@ -442,17 +442,17 @@ local function onUseItem()
     local glob = _G
     local idStr = fourCCToString(
         nil,
-        jass:GetItemTypeId(item)
+        jass.GetItemTypeId(item)
     )
-    local key = (("__EquipPowerUP_" .. tostring(nil, unit)) .. "_") .. idStr
+    local key = (("__EquipPowerUP_" .. tostring(unit)) .. "_") .. idStr
     if glob[key] then
         return
     end
     glob[key] = true
-    local ct = jass:CreateTimer()
+    local ct = jass.CreateTimer()
     if ct then
         local t = ct
-        equipDebounceKeyByTimerHid[jass:GetHandleId(t)] = key
+        equipDebounceKeyByTimerHid[jass.GetHandleId(t)] = key
         safeTimerStart(
             nil,
             t,

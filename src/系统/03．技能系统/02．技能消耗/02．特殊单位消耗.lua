@@ -14,7 +14,7 @@ function ____exports.getEdwardUnit()
     do
         local playerId = 0
         while playerId <= 4 do
-            local hero = heroBridge.getRegisteredPlayerHero(jass:Player(playerId))
+            local hero = heroBridge.getRegisteredPlayerHero(jass.Player(playerId))
             if _____662F_5426_6307_5B9A_73A9_5BB6_82F1_96C4(hero, EDWARD_HERO_ID) then
                 return hero
             end
@@ -32,11 +32,11 @@ function ____exports.handleEdwardPassiveCost(unit, manaCost)
     if not ____exports.isEdwardUnit(unit) then
         return
     end
-    local currentLife = jass:GetUnitState(unit, jass.UNIT_STATE_LIFE)
+    local currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
     local lifeKeep = currentLife - 1
     local deductAmount = manaCost < lifeKeep and manaCost or lifeKeep
     if deductAmount > 0 then
-        jass:SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife - deductAmount)
+        jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife - deductAmount)
     end
 end
 return ____exports

@@ -82,7 +82,7 @@ ____exports["施加重伤"] = function(unit, _____91CD_4F24_503C, _____6301_7EED
     end
     local ____temp_3
     if source ~= nil and source ~= 0 then
-        ____temp_3 = jass:GetUnitName(source)
+        ____temp_3 = jass.GetUnitName(source)
     else
         ____temp_3 = nil
     end

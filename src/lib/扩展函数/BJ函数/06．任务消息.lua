@@ -173,30 +173,30 @@ if ____jglobals_bj_questWarningSound_33 == nil then
 end
 local bj_questWarningSound = ____jglobals_bj_questWarningSound_33
 function ____exports.QuestMessageBJ(self, f, messageType, message)
-    if not jass:IsPlayerInForce(
-        jass:GetLocalPlayer(),
+    if not jass.IsPlayerInForce(
+        jass.GetLocalPlayer(),
         f
     ) then
         return
     end
-    local lp = jass:GetLocalPlayer()
+    local lp = jass.GetLocalPlayer()
     local function play(____, s)
         if s ~= nil then
-            jass:StartSound(s)
+            jass.StartSound(s)
         end
     end
     local function flash()
-        jass:FlashQuestDialogButton()
+        jass.FlashQuestDialogButton()
     end
     if messageType == bj_QUESTMESSAGE_DISCOVERED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_QUEST,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -208,14 +208,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_UPDATED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_QUESTUPDATE,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -227,14 +227,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_COMPLETED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_QUESTDONE,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -246,14 +246,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_FAILED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_QUESTFAILED,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -265,7 +265,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_REQUIREMENT then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -275,14 +275,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_MISSIONFAILED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_MISSIONFAILED,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -293,14 +293,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_HINT then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_HINT,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -311,14 +311,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_ALWAYSHINT then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_ALWAYSHINT,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -329,14 +329,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_SECRET then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_SECRET,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -347,14 +347,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_UNITACQUIRED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_UNITACQUIRED,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -365,14 +365,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_UNITAVAILABLE then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_UNITAVAILABLE,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -383,14 +383,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_ITEMACQUIRED then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_ITEMACQUIRED,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
@@ -401,14 +401,14 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     if messageType == bj_QUESTMESSAGE_WARNING then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,
             bj_TEXT_DELAY_WARNING,
             " "
         )
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             lp,
             0,
             0,

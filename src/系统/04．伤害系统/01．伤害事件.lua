@@ -11,25 +11,21 @@ function onUnitDeathForDamage(self, dyingUnit)
     if isHeroUnit(nil, dyingUnit) then
         return
     end
-    jass:GroupRemoveUnit(UnitGroup, dyingUnit)
-    recreateDamageTrigger(nil)
+    jass.GroupRemoveUnit(UnitGroup, dyingUnit)
+    recreateDamageTrigger()
 end
 function onAnyUnitDamagedAction(self)
     local j = jass
-    local savedUnit = jass:GetTriggerUnit()
-    local savedDamage = jass:GetEventDamage()
+    local savedUnit = jass.GetTriggerUnit()
+    local savedDamage = jass.GetEventDamage()
     local savedSource = nil
-    pcall(
-        nil,
-        function()
-            savedSource = jass:GetEventDamageSource()
+    pcall(function ()
+            savedSource = jass.GetEventDamageSource()
         end
     )
     if savedSource == nil then
-        pcall(
-            nil,
-            function()
-                savedSource = GetEventDamageSource(nil)
+        pcall(function ()
+                savedSource = GetEventDamageSource()
             end
         )
     end
@@ -41,9 +37,7 @@ function onAnyUnitDamagedAction(self)
     end
     local fromDotTickBatchForEvent = ____temp_3
     if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
-        pcall(
-            nil,
-            function()
+        pcall(function ()
                 local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
                 local ____temp_4
                 if dmgCalc ~= nil then
@@ -53,7 +47,7 @@ function onAnyUnitDamagedAction(self)
                 end
                 local onDamageEvent = ____temp_4
                 if onDamageEvent ~= nil then
-                    onDamageEvent(nil, savedUnit, savedSource, savedDamage)
+                    onDamageEvent(savedUnit, savedSource, savedDamage)
                 end
             end
         )
@@ -64,28 +58,22 @@ function onAnyUnitDamagedAction(self)
         if trg ~= nil then
             local enabled = false
             local evaluated = false
-            pcall(
-                nil,
-                function()
-                    if jass:IsTriggerEnabled(trg) then
+            pcall(function ()
+                    if jass.IsTriggerEnabled(trg) then
                         enabled = true
                     end
                 end
             )
             if enabled then
-                pcall(
-                    nil,
-                    function()
-                        if jass:TriggerEvaluate(trg) then
+                pcall(function ()
+                        if jass.TriggerEvaluate(trg) then
                             evaluated = true
                         end
                     end
                 )
                 if evaluated then
-                    pcall(
-                        nil,
-                        function()
-                            jass:TriggerExecute(trg)
+                    pcall(function ()
+                            jass.TriggerExecute(trg)
                         end
                     )
                 end
@@ -95,10 +83,8 @@ function onAnyUnitDamagedAction(self)
     end
     local isNormalAttackSnap = false
     if not fromDotTickBatchForEvent then
-        pcall(
-            nil,
-            function()
-                if _____4F24_5BB3_51FD_6570:isNormalAttack() == true then
+        pcall(function ()
+                if _____4F24_5BB3_51FD_6570.isNormalAttack() == true then
                     isNormalAttackSnap = true
                 end
             end
@@ -118,9 +104,7 @@ function processDamageEntry(self, entry)
     local sd = entry.damage
     local isDotTickDamage = entry.fromDotTickBatch == true
     if entry.isNormalAttack == true and not isDotTickDamage then
-        pcall(
-            nil,
-            function()
+        pcall(function ()
                 local dm = require("系统.04．伤害系统.02．dot伤害")
                 if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
                     local ____dm_tryApplyHeroAttackGearDots_6 = dm.tryApplyHeroAttackGearDots
@@ -140,7 +124,7 @@ function processDamageEntry(self, entry)
         while c < #DamageCallbacks do
             local cb = DamageCallbacks[c + 1]
             if cb ~= nil then
-                local cbStr = tostring(nil, cb)
+                local cbStr = tostring(cb)
                 if (string.find(cbStr, "damageCallback", nil, true) or 0) - 1 == -1 and (string.find(cbStr, "damageCalculation", nil, true) or 0) - 1 == -1 then
                     cb(
                         nil,
@@ -157,9 +141,7 @@ function processDamageEntry(self, entry)
         end
     end
     if isDotTickDamage then
-        pcall(
-            nil,
-            function()
+        pcall(function ()
                 local m = require("系统.04．伤害系统.02．dot伤害")
                 if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
                     m:notifyDotTickBatchDamageDisplayed()
@@ -169,48 +151,48 @@ function processDamageEntry(self, entry)
     end
 end
 function anyUnitDamagedFilter(self)
-    local u = jass:GetFilterUnit()
+    local u = jass.GetFilterUnit()
     if not u then
         return false
     end
-    local lvl = jass:GetUnitAbilityLevel(u, ALOC)
+    local lvl = jass.GetUnitAbilityLevel(u, ALOC)
     if lvl > 0 then
         return false
     end
-    if UnitGroup and jass:IsUnitInGroup(u, UnitGroup) then
+    if UnitGroup and jass.IsUnitInGroup(u, UnitGroup) then
         return false
     end
     if UnitGroup then
-        jass:GroupAddUnit(UnitGroup, u)
+        jass.GroupAddUnit(UnitGroup, u)
     end
     if MNDamageEventTrigger then
-        local ev = getEventUnitDamaged(nil)
+        local ev = getEventUnitDamaged()
         if ev ~= nil then
-            jass:TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
+            jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
         end
     end
     return false
 end
 function initEnumUnit(self)
-    local t = jass:CreateTrigger()
-    local r = jass:CreateRegion()
-    local grp = jass:CreateGroup()
-    local bounds = jass:GetWorldBounds()
+    local t = jass.CreateTrigger()
+    local r = jass.CreateRegion()
+    local grp = jass.CreateGroup()
+    local bounds = jass.GetWorldBounds()
     if bounds then
-        jass:RegionAddRect(r, bounds)
+        jass.RegionAddRect(r, bounds)
     end
-    jass:TriggerRegisterEnterRegion(
+    jass.TriggerRegisterEnterRegion(
         t,
         r,
-        jass:Condition(anyUnitDamagedFilter)
+        jass.Condition(anyUnitDamagedFilter)
     )
     local function alwaysTrue()
         return true
     end
-    jass:GroupEnumUnitsInRect(
+    jass.GroupEnumUnitsInRect(
         grp,
         bounds,
-        jass:Condition(alwaysTrue)
+        jass.Condition(alwaysTrue)
     )
     if UnitGroup and MNDamageEventTrigger then
         forEachUnitInGroup(
@@ -220,45 +202,45 @@ function initEnumUnit(self)
                 if not u then
                     return
                 end
-                local lvl = jass:GetUnitAbilityLevel(u, ALOC)
+                local lvl = jass.GetUnitAbilityLevel(u, ALOC)
                 if lvl > 0 then
                     return
                 end
-                if jass:IsUnitInGroup(u, UnitGroup) then
+                if jass.IsUnitInGroup(u, UnitGroup) then
                     return
                 end
-                jass:GroupAddUnit(UnitGroup, u)
-                local ev = getEventUnitDamaged(nil)
+                jass.GroupAddUnit(UnitGroup, u)
+                local ev = getEventUnitDamaged()
                 if ev ~= nil then
-                    jass:TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
+                    jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
                 end
             end
         )
     end
     if grp then
-        jass:DestroyGroup(grp)
+        jass.DestroyGroup(grp)
     end
 end
 function recreateDamageTrigger(self)
     if MNDamageEventTrigger and ta ~= nil then
-        jass:TriggerRemoveAction(MNDamageEventTrigger, ta)
+        jass.TriggerRemoveAction(MNDamageEventTrigger, ta)
     end
     if MNDamageEventTrigger then
-        jass:DestroyTrigger(MNDamageEventTrigger)
+        jass.DestroyTrigger(MNDamageEventTrigger)
     end
-    MNDamageEventTrigger = jass:CreateTrigger()
+    MNDamageEventTrigger = jass.CreateTrigger()
     if MNDamageEventTrigger then
-        ta = jass:TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
+        ta = jass.TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
     end
     if UnitGroup and MNDamageEventTrigger then
-        local ev = getEventUnitDamaged(nil)
+        local ev = getEventUnitDamaged()
         if ev ~= nil then
             forEachUnitInGroup(
                 nil,
                 UnitGroup,
                 function(____, u)
                     if u then
-                        jass:TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
+                        jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
                     end
                 end
             )
@@ -266,24 +248,24 @@ function recreateDamageTrigger(self)
     end
 end
 function timeout(self)
-    recreateDamageTrigger(nil)
+    recreateDamageTrigger()
 end
 function initDamageEventOnce(self, intervalSeconds)
     if MNDamageEventTrigger ~= nil then
         return
     end
-    MNDamageEventTrigger = jass:CreateTrigger()
-    UnitGroup = jass:CreateGroup()
+    MNDamageEventTrigger = jass.CreateTrigger()
+    UnitGroup = jass.CreateGroup()
     if MNDamageEventTrigger then
-        ta = jass:TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
+        ta = jass.TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
     end
-    initEnumUnit(nil)
+    initEnumUnit()
     registerDeathListener(nil, onUnitDeathForDamage)
     local sec = type(intervalSeconds) == "number" and intervalSeconds > 0 and intervalSeconds or 60
     if TimerHandle == nil then
-        TimerHandle = jass:CreateTimer()
+        TimerHandle = jass.CreateTimer()
         if TimerHandle then
-            jass:TimerStart(TimerHandle, sec, true, timeout)
+            jass.TimerStart(TimerHandle, sec, true, timeout)
         end
     end
 end
@@ -314,7 +296,7 @@ end
 local function getUnitTypeHero(self)
     local ____jass_UNIT_TYPE_HERO_2 = jass.UNIT_TYPE_HERO
     if ____jass_UNIT_TYPE_HERO_2 == nil then
-        ____jass_UNIT_TYPE_HERO_2 = jass:ConvertUnitType(2)
+        ____jass_UNIT_TYPE_HERO_2 = jass.ConvertUnitType(2)
     end
     return ____jass_UNIT_TYPE_HERO_2
 end

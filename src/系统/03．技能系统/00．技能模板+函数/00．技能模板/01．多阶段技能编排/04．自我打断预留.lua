@@ -129,7 +129,7 @@ local function ____on_6280_80FD_81EA_6211_6253_65AD_S_952E_6309_4E0B()
     if japi == nil or type(japi.DzGetTriggerKeyPlayer) ~= "function" then
         return
     end
-    local _____6309_952E_73A9_5BB6 = japi:DzGetTriggerKeyPlayer()
+    local _____6309_952E_73A9_5BB6 = japi.DzGetTriggerKeyPlayer()
     local _____5355_4F4D = _____83B7_53D6_73A9_5BB6_5F53_524D_53EF_6253_65AD_5355_4F4D(_____6309_952E_73A9_5BB6)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return

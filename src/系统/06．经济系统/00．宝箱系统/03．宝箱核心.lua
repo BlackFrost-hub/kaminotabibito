@@ -20,7 +20,7 @@ function getProgressBarUnitType()
     return _progressBarUnitType
 end
 function angleBetweenPoints(x1, y1, x2, y2)
-    return jass:Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
+    return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
 function showTextTag(unit, text, red, green, blue)
     if type(CreateFloatTextOnUnit) == "function" then
@@ -39,7 +39,7 @@ function getUnitId(unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 function isInteractable(destructableType)
     return isChestType(destructableType)
@@ -53,13 +53,13 @@ function fireStesEvent(eventName, opener, target)
     if not ht then
         return
     end
-    local hash = jass:StringHash(eventName)
-    local skeyIndex = jass:StringHash("index")
-    local count = jass:LoadInteger(ht, hash, skeyIndex)
+    local hash = jass.StringHash(eventName)
+    local skeyIndex = jass.StringHash("index")
+    local count = jass.LoadInteger(ht, hash, skeyIndex)
     do
         local i = 0
         while i < count do
-            local trg = jass:LoadTriggerHandle(ht, hash, i)
+            local trg = jass.LoadTriggerHandle(ht, hash, i)
             if trg then
                 if eventName == EVENT_CHEST_OPENED then
                     YDLocal5Set(nil, "unit", YDLOCAL_VAR_OPENER, opener)
@@ -77,12 +77,12 @@ function fireStesEvent(eventName, opener, target)
     end
 end
 function cleanupOpening(data, interrupted)
-    japi:DzUnitDisableAttack(data.unit, false)
+    japi.DzUnitDisableAttack(data.unit, false)
     if data.progressBar then
-        jass:RemoveUnit(data.progressBar)
+        jass.RemoveUnit(data.progressBar)
     end
     if interrupted then
-        local cfg = getChestConfig(jass:GetDestructableTypeId(data.target))
+        local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
         showTextTag(
             data.unit,
             TEXT_INTERRUPTED(cfg and cfg.name or "宝箱"),
@@ -97,33 +97,33 @@ function cleanupOpening(data, interrupted)
     end
 end
 function startOpening(unit, target, openTime)
-    jass:IssueImmediateOrder(unit, "stop")
+    jass.IssueImmediateOrder(unit, "stop")
     if openTime <= 0 then
         openTime = 1
     end
     local speed = 1 / openTime
-    local unitX = jass:GetUnitX(unit)
-    local unitY = jass:GetUnitY(unit)
+    local unitX = jass.GetUnitX(unit)
+    local unitY = jass.GetUnitY(unit)
     local progressType = getProgressBarUnitType()
-    local progressBar = jass:CreateUnit(
-        jass:Player(4),
+    local progressBar = jass.CreateUnit(
+        jass.Player(4),
         progressType,
         unitX,
         unitY,
         0
     )
     if progressBar then
-        jass:SetUnitTimeScale(progressBar, speed)
-        jass:SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE)
-        local flyHeight = jass:GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET
-        jass:SetUnitFlyHeight(progressBar, flyHeight, 0)
+        jass.SetUnitTimeScale(progressBar, speed)
+        jass.SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE)
+        local flyHeight = jass.GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET
+        jass.SetUnitFlyHeight(progressBar, flyHeight, 0)
     end
-    japi:DzUnitDisableAttack(unit, true)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
+    japi.DzUnitDisableAttack(unit, true)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
     local angle = angleBetweenPoints(unitX, unitY, targetX, targetY)
-    jass:SetUnitFacing(unit, angle)
-    local config = getChestConfig(jass:GetDestructableTypeId(target))
+    jass.SetUnitFacing(unit, angle)
+    local config = getChestConfig(jass.GetDestructableTypeId(target))
     local chestName = config and config.name or "宝箱"
     fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target)
     showTextTag(
@@ -150,14 +150,14 @@ function updateAllOpening()
     forEachSorted(
         openingMap,
         function(unitId, data)
-            local currentOrder = jass:GetUnitCurrentOrder(data.unit)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
             local smartOrder = String2OrderIdBJ(nil, "smart")
             local attackOrder = String2OrderIdBJ(nil, "attack")
             local completed = data.elapsed >= data.openTime
             local interrupted = currentOrder == smartOrder or currentOrder == attackOrder
             if completed or interrupted then
                 if completed then
-                    local cfg = getChestConfig(jass:GetDestructableTypeId(data.target))
+                    local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
                     local chestName = cfg and cfg.name or "宝箱"
                     showTextTag(
                         data.unit,
@@ -168,13 +168,13 @@ function updateAllOpening()
                     )
                     local targetTypeStr = cfg and cfg.destructableType
                     if targetTypeStr then
-                        local x = jass:GetDestructableX(data.target)
-                        local y = jass:GetDestructableY(data.target)
+                        local x = jass.GetDestructableX(data.target)
+                        local y = jass.GetDestructableY(data.target)
                         dropItemsFromChest(nil, targetTypeStr, x, y)
                     end
                     fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target)
                     if data.target then
-                        jass:KillDestructable(data.target)
+                        jass.KillDestructable(data.target)
                     end
                 end
                 cleanupOpening(data, not completed and interrupted)
@@ -182,23 +182,23 @@ function updateAllOpening()
             end
             data.elapsed = data.elapsed + UPDATE_INTERVAL
             if data.progressBar then
-                local unitX = jass:GetUnitX(data.unit)
-                local unitY = jass:GetUnitY(data.unit)
-                jass:SetUnitX(data.progressBar, unitX)
-                jass:SetUnitY(data.progressBar, unitY)
+                local unitX = jass.GetUnitX(data.unit)
+                local unitY = jass.GetUnitY(data.unit)
+                jass.SetUnitX(data.progressBar, unitX)
+                jass.SetUnitY(data.progressBar, unitY)
             end
         end
     )
     forEachSorted(
         movingMap,
         function(unitId, data)
-            local currentOrder = jass:GetUnitCurrentOrder(data.unit)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
             local moveOrder = String2OrderIdBJ(nil, "move")
-            local inRange = jass:IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
+            local inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
             local orderChanged = currentOrder ~= moveOrder
             if inRange or orderChanged then
                 if inRange then
-                    local targetType = jass:GetDestructableTypeId(data.target)
+                    local targetType = jass.GetDestructableTypeId(data.target)
                     if targetType and isInteractable(targetType) then
                         local openTime = getOpenTime(targetType)
                         startOpening(data.unit, data.target, openTime)
@@ -287,16 +287,16 @@ function ____exports.onUnitTargetInteractable(unit, target)
     if not unit or not target then
         return
     end
-    local targetType = jass:GetDestructableTypeId(target)
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(targetType) then
         return
     end
     local openTime = getOpenTime(targetType)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
-    local inRange = jass:IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
+    local inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
     if not inRange then
-        jass:IssuePointOrder(unit, "move", targetX, targetY)
+        jass.IssuePointOrder(unit, "move", targetX, targetY)
         local data = {unit = unit, target = target, targetX = targetX, targetY = targetY}
         local unitId = getUnitId(unit)
         if unitId ~= 0 then

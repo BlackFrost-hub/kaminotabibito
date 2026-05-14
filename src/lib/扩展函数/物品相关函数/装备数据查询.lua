@@ -107,7 +107,7 @@ function ____exports.getItemDataEntry(self, item)
     if item == nil or item == 0 then
         return nil
     end
-    local itemId = jass:GetItemTypeId(item)
+    local itemId = jass.GetItemTypeId(item)
     if itemId == nil or itemId == 0 then
         return nil
     end

@@ -105,7 +105,7 @@ function ____exports.safeForForce(forceOrSelf, actionOrForce, maybeAction)
     forForceStack[#forForceStack + 1] = action
     do
         pcall(function()
-            jass:ForForce(force, forForceTrampoline)
+            jass.ForForce(force, forForceTrampoline)
         end)
         do
             table.remove(forForceStack)
@@ -170,11 +170,11 @@ end
 -- - 高频/周期逻辑仍优先使用 `05．中心计时器.ts`
 local timerActionByHandleId = {}
 local function timerTrampoline()
-    local timer = jass:GetExpiredTimer()
+    local timer = jass.GetExpiredTimer()
     if not timer then
         return
     end
-    local hid = jass:GetHandleId(timer)
+    local hid = jass.GetHandleId(timer)
     runSafely(timerActionByHandleId[hid])
 end
 function ____exports.safeTimerStart(timerOrSelf, timeoutOrTimer, periodicOrTimeout, actionOrPeriodic, maybeAction)
@@ -192,28 +192,28 @@ function ____exports.safeTimerStart(timerOrSelf, timeoutOrTimer, periodicOrTimeo
     if not timer or type(action) ~= "function" then
         return
     end
-    local hid = jass:GetHandleId(timer)
+    local hid = jass.GetHandleId(timer)
     timerActionByHandleId[hid] = action
-    jass:TimerStart(timer, timeout, periodic, timerTrampoline)
+    jass.TimerStart(timer, timeout, periodic, timerTrampoline)
 end
 function ____exports.safeDestroyTimer(timerOrSelf, maybeTimer)
     local timer = normalizeUnaryHandleArg(timerOrSelf, maybeTimer)
     if not timer then
         return
     end
-    local hid = jass:GetHandleId(timer)
+    local hid = jass.GetHandleId(timer)
     timerActionByHandleId[hid] = nil
     __TS__Delete(timerActionByHandleId, hid)
-    jass:DestroyTimer(timer)
+    jass.DestroyTimer(timer)
 end
 local triggerRegistryByHandleId = {}
 local safeTriggerActionIdCounter = 0
 local function triggerActionTrampoline()
-    local currentTrigger = jass:GetTriggeringTrigger()
+    local currentTrigger = jass.GetTriggeringTrigger()
     if not currentTrigger then
         return
     end
-    local currentHid = jass:GetHandleId(currentTrigger)
+    local currentHid = jass.GetHandleId(currentTrigger)
     local currentRegistry = triggerRegistryByHandleId[currentHid]
     if not currentRegistry then
         return
@@ -230,13 +230,13 @@ local function getOrCreateSafeTriggerRegistry(trigger)
     if not trigger then
         return nil
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if registry then
         return registry
     end
     registry = {
-        actionHandle = jass:TriggerAddAction(trigger, triggerActionTrampoline),
+        actionHandle = jass.TriggerAddAction(trigger, triggerActionTrampoline),
         actions = {}
     }
     triggerRegistryByHandleId[hid] = registry
@@ -282,7 +282,7 @@ function ____exports.safeTriggerRemoveAction(triggerOrSelf, actionOrTrigger, may
     if not trigger or not action then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if not registry then
         return
@@ -303,7 +303,7 @@ function ____exports.safeTriggerClearActions(triggerOrSelf, maybeTrigger)
     if not trigger then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if not registry then
         return
@@ -315,13 +315,13 @@ function ____exports.safeDestroyTrigger(triggerOrSelf, maybeTrigger)
     if not trigger then
         return
     end
-    local hid = jass:GetHandleId(trigger)
+    local hid = jass.GetHandleId(trigger)
     local registry = triggerRegistryByHandleId[hid]
     if registry and registry.actionHandle then
-        jass:TriggerRemoveAction(trigger, registry.actionHandle)
+        jass.TriggerRemoveAction(trigger, registry.actionHandle)
     end
     triggerRegistryByHandleId[hid] = nil
     __TS__Delete(triggerRegistryByHandleId, hid)
-    jass:DestroyTrigger(trigger)
+    jass.DestroyTrigger(trigger)
 end
 return ____exports

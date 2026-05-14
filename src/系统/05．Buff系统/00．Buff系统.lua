@@ -299,7 +299,7 @@ local function toHid(u)
         local n = __TS__ParseInt(u, 10)
         return __TS__NumberIsNaN(__TS__Number(n)) and 0 or n
     end
-    return jass:GetHandleId(u)
+    return jass.GetHandleId(u)
 end
 --- 由 dot伤害 调用：施加、覆盖或到期清除。
 -- target 可为单位或 **GetHandleId**。

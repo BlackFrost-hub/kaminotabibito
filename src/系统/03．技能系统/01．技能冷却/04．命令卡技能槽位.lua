@@ -24,7 +24,7 @@ ____exports["解析脚本返回整数"] = function(raw)
         return raw
     end
     local value = __TS__ParseInt(
-        tostring(nil, raw),
+        tostring(raw),
         10
     )
     return __TS__NumberIsFinite(__TS__Number(value)) and value or 0
@@ -53,7 +53,7 @@ ____exports["按命令卡推断热键"] = function(abilityId)
     return nil
 end
 local function _____5F52_4E00_5316_70ED_952E(rawHotkey)
-    local hotkey = tostring(nil, rawHotkey)
+    local hotkey = tostring(rawHotkey)
     if hotkey == "Q" or hotkey == "q" then
         return "Q"
     end

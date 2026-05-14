@@ -88,7 +88,7 @@ function ____exports.isDescendantOf(self, japi, frame, ancestor)
             if cur == ancestor then
                 return true
             end
-            local p = japi:DzFrameGetParent(cur)
+            local p = japi.DzFrameGetParent(cur)
             if not p or p == 0 then
                 return false
             end

@@ -14,6 +14,6 @@ function ____exports.destroyEffect(self, eff)
         return
     end
     untrack(nil, "effect", eff)
-    jass:DestroyEffect(eff)
+    jass.DestroyEffect(eff)
 end
 return ____exports

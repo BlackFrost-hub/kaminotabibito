@@ -16,7 +16,7 @@ function dispatchChangeOwnerListeners(list, changingUnit)
     end
 end
 function onChangeOwner()
-    local changingUnit = jass:GetTriggerUnit()
+    local changingUnit = jass.GetTriggerUnit()
     if changingUnit == nil then
         return
     end
@@ -28,9 +28,9 @@ function ____exports.initChangeOwnerEvent()
         return
     end
     initialized = true
-    local trig = jass:CreateTrigger()
+    local trig = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, ____exports.CHANGE_OWNER_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_CHANGE_OWNER)
-    jass:TriggerAddAction(trig, onChangeOwner)
+    jass.TriggerAddAction(trig, onChangeOwner)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
