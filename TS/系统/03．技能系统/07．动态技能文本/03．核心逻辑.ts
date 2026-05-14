@@ -16,6 +16,7 @@ import { 属性名称列表 } from "./01．公式配置";
 import { 计算公式伤害 } from "./02．属性计算";
 
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilcode: number) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 const DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip as (unit: any, abilityId: number) => string;
 const DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip as (unit: any, abilityId: number, tip: string) => boolean;
@@ -25,6 +26,7 @@ const EXGetAbilityId = japi.EXGetAbilityId as (ability: any) => number;
 
 const MODULE_NAME = "动态技能文本";
 const 技能槽遍历上限 = 64;
+const 原始提示缓存: Record<string, string | undefined> = {};
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
@@ -49,6 +51,10 @@ function getUnitAbilityIds(this: void, hero: any): number[] {
   }
 
   return ids;
+}
+
+function 生成提示缓存键(this: void, unit: any, abilityId: number): string {
+  return GetHandleId(unit).toString() + ":" + abilityId.toString();
 }
 
 /**
@@ -111,7 +117,14 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   const currentTip = DzGetUnitAbilityUberTip(unit, abilityId);
   if (!currentTip) return false;
 
-  const newTip = 替换公式(unit, currentTip);
+  const 缓存键 = 生成提示缓存键(unit, abilityId);
+  let originalTip = 原始提示缓存[缓存键];
+  if (originalTip == null) {
+    originalTip = currentTip;
+    原始提示缓存[缓存键] = originalTip;
+  }
+
+  const newTip = 替换公式(unit, originalTip);
 
   if (newTip !== currentTip) {
     DzSetUnitAbilityUberTip(unit, abilityId, newTip);
@@ -120,6 +133,18 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   }
 
   return false;
+}
+
+function 恢复单个技能原始文本(this: void, unit: any, abilityId: number): boolean {
+  const originalTip = 原始提示缓存[生成提示缓存键(unit, abilityId)];
+  if (!originalTip) return false;
+
+  const currentTip = DzGetUnitAbilityUberTip(unit, abilityId);
+  if (currentTip === originalTip) return false;
+
+  DzSetUnitAbilityUberTip(unit, abilityId, originalTip);
+  DzSetUnitAbilityUpdate(unit, abilityId);
+  return true;
 }
 
 /**
@@ -134,5 +159,14 @@ export function 检查英雄技能(this: void, hero: any): void {
     if (level > 0) {
       处理技能提示(hero, abilityIds[i]);
     }
+  }
+}
+
+export function 恢复英雄技能原始文本(this: void, hero: any): void {
+  if (!isValidHandle(hero)) return;
+
+  const abilityIds = getUnitAbilityIds(hero);
+  for (let i = 0; i < abilityIds.length; i++) {
+    恢复单个技能原始文本(hero, abilityIds[i]);
   }
 }

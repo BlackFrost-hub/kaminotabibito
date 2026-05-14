@@ -11,17 +11,14 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; gg_unit_hfoo_002
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 import { 扩散伤害 } from "../01．技能函数/08．扩散伤害/index";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
-
 const 模块名 = "扩散伤害测试";
 const 测试命令 = "1002";
-let 已注册 = false;
 
 function on聊天1002测试(): void {
   const 来源单位 = g.gg_unit_Hamg_0002;
@@ -46,17 +43,6 @@ function on聊天1002测试(): void {
   debugLogForce(模块名, "已执行扩散伤害，主目标全额500，半径300内敌方扩散250");
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1002测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "对 hfoo_0021 造成扩散伤害");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天1002测试);
 
 export {};

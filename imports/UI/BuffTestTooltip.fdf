@@ -37,3 +37,40 @@ Frame "BACKDROP" "ThreatUiResearchPanelFrame"
     BackdropEdgeFile "UI\Widgets\EscMenu\Human\editbox-border.blp",
     BackdropBlendAll,
 }
+
+//============================================================================
+// 广播提示消息：文本模板
+// 来源：JASS/1111/myUI.fdf；已合并到公共 TOC，后续广播提示系统可直接复用。
+// 用途：带阴影的黄字提示文本。运行时仍建议用代码创建 TEXT 并设置字体，
+// 这里保留模板是为了兼容后续 FDF 方案或渐进替换。
+//============================================================================
+Frame "TEXT" "textmoban" {
+    FontFlags "FIXEDSIZE",
+    FontColor 0.952 0.827 0.0805 1.0,
+    FontHighlightColor 1.0 1.0 1.0 1.0,
+    FontDisabledColor 0.5 0.5 0.5 1.0,
+    FontShadowColor 0.0 0.0 0.0 0.9,
+    FontShadowOffset 0.002 -0.002,
+}
+
+//============================================================================
+// 广播提示消息：边框背景模板
+// 来源：JASS/1111/myUI.fdf；作为可选边框样式保留。
+// 注意：实际广播消息的长条背景资源迁入 UI\xiaoxi\UInoticebackdrop.tga；
+// 原喇叭图标 UI\xiaoxi\UInotice.tga 仅保留资源，不作为默认图标使用。
+// 新系统中图标位应动态设置为单位 Art/uico 头像贴图。
+//============================================================================
+Frame "BACKDROP" "Demo_BorderBack"
+{
+    Width 0.0745,
+    Height 0.04325,
+
+    BackdropTileBackground,
+    BackdropBackground "UI\Widgets\ToolTips\Human\human-tooltip-background.blp",
+    BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
+    BackdropCornerSize 0.012,
+    BackdropBackgroundSize 0.04,
+    BackdropBackgroundInsets 0.004f 0.004f 0.004f 0.004f,
+    BackdropEdgeFile "ui\widgets\escmenu\human\human-options-menu-border.blp",
+    BackdropBlendAll,
+}

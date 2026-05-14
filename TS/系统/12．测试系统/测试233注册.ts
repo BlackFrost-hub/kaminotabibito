@@ -3,6 +3,7 @@ const jass = require("jass.common") as any;
 import { registerKeyEventByCode } from "../../lib/扩展函数/封装函数/04．硬件输入/04．键盘函数";
 import { KEY_STATE } from "../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
 import { forEachPlayingPlayer } from "../../lib/扩展函数/封装函数/01．通用工具/05．玩家工具";
+import { 注册聊天命令监听 } from "../00．核心系统/01．事件中心/12．聊天命令事件中心";
 
 function dumpJapiKeys(): void {
   const pr = (globalThis as any).print as ((s: string) => void) | undefined;
@@ -105,18 +106,13 @@ function bindKeyBN_once_min(): void {
   bind(78, "N");
 }
 
-function onChat233(): void {
+function onChat233(this: void, player: any): void {
   dumpJapiKeys();
   dumpDzKeyEventTrgType();
   bindKeyBN_once_min();
-  (jass as any).DisplayTimedTextToPlayer((jass as any).Player(0), 0, 0, 6, "[japi] 已打印 jass.japi keys");
+  (jass as any).DisplayTimedTextToPlayer(player, 0, 0, 6, "[japi] 已打印 jass.japi keys");
 }
 
-function init(): void {
-  const tr = (jass as any).CreateTrigger();
-  (jass as any).TriggerRegisterPlayerChatEvent(tr, (jass as any).Player(0), "233", true);
-  (jass as any).TriggerAddAction(tr, onChat233);
-}
+注册聊天命令监听("233", onChat233);
 
-init();
 export {};

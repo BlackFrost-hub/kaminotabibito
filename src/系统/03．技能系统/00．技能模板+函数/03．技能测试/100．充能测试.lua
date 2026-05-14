@@ -8,10 +8,8 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_0.debugLogForce
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -27,7 +25,6 @@ local _____6D4B_8BD5_5F00_5173 = true
 local _____5145_80FD_6D4B_8BD5_547D_4EE4 = "113"
 local _____5145_80FD_4F24_5BB3_534A_5F84 = 500
 local _____5145_80FD_4F24_5BB3 = 100
-local _____5DF2_6CE8_518C = false
 local function _____5BF9_5468_56F4_654C_4EBA_9020_6210_4F24_5BB3(_____4E2D_5FC3_5355_4F4D)
     local _____4E2D_5FC3X = GetUnitX(_____4E2D_5FC3_5355_4F4D)
     local _____4E2D_5FC3Y = GetUnitY(_____4E2D_5FC3_5355_4F4D)
@@ -78,20 +75,8 @@ end
 local function ____on_804A_5929113_6D4B_8BD5()
     _____6267_884C_5145_80FD_6D4B_8BD5()
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if not _____6D4B_8BD5_5F00_5173 or _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____5145_80FD_6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_5929113_6D4B_8BD5)
+if _____6D4B_8BD5_5F00_5173 then
+    _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____5145_80FD_6D4B_8BD5_547D_4EE4, ____on_804A_5929113_6D4B_8BD5)
     debugLogForce(_____6A21_5757_540D, "已注册测试：113=开始3秒充能，4次复活特效")
 end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
 return ____exports

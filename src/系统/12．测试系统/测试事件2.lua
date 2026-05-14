@@ -7,6 +7,8 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local AdjustPlayerStateBJ = ____require_result_0.AdjustPlayerStateBJ
 local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____require_result_1.Sound3DII_Mp3PlayReuse
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_2["注册聊天命令监听"]
 local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
 local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
 --- 每条 +1000 各一条漂浮字；duration>0 入队，到期 DestroyTextTag（排泄）
@@ -105,23 +107,6 @@ local function onChat555(self)
         "[测试事件2] 555：1s内12×+1000+12条漂浮字+12次音，间隔1/11s；首按可能少1声"
     )
 end
-local function init(self)
-    local tr = jass.CreateTrigger()
-    jass.TriggerRegisterPlayerChatEvent(
-        tr,
-        jass.Player(0),
-        "2222",
-        true
-    )
-    jass.TriggerAddAction(tr, onChat2222)
-    local tr555 = jass.CreateTrigger()
-    jass.TriggerRegisterPlayerChatEvent(
-        tr555,
-        jass.Player(0),
-        "555",
-        true
-    )
-    jass.TriggerAddAction(tr555, onChat555)
-end
-init(nil)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C("2222", onChat2222)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C("555", onChat555)
 return ____exports

@@ -16,7 +16,11 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as 
   debugLog: (module: string, ...args: any[]) => void;
 };
 
-import { 检查英雄技能 } from "./03．核心逻辑";
+const 功能开关模块 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关") as {
+  本地玩家是否开启动态技能文本: (this: void) => boolean;
+};
+
+import { 恢复英雄技能原始文本, 检查英雄技能 } from "./03．核心逻辑";
 
 const MODULE_NAME = "动态技能文本";
 const REFRESH_MS = 500;
@@ -30,7 +34,11 @@ function isValidHandle(handle: any): boolean {
 
 function onTick(this: void): void {
   registeredHeroes.forEach(function (hero: any) {
-    检查英雄技能(hero);
+    if (功能开关模块.本地玩家是否开启动态技能文本()) {
+      检查英雄技能(hero);
+    } else {
+      恢复英雄技能原始文本(hero);
+    }
   });
 }
 
@@ -41,7 +49,9 @@ export function registerDynamicSkillTextHero(this: void, whichHero: any): void {
   registeredHeroes.add(whichHero);
   debugLog(MODULE_NAME, "注册英雄用于动态文本");
 
-  检查英雄技能(whichHero);
+  if (功能开关模块.本地玩家是否开启动态技能文本()) {
+    检查英雄技能(whichHero);
+  }
 }
 
 export function initDynamicSkillTextSystem(this: void): void {

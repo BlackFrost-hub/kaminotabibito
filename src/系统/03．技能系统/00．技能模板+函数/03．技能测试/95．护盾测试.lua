@@ -10,13 +10,10 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_0.debugLogForce
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local _____6A21_5757_540D = "护盾测试"
 local _____6D4B_8BD5_547D_4EE4 = "1001"
-local _____5DF2_6CE8_518C = false
 local function ____on_804A_59291001_6D4B_8BD5()
     local _____5927_6CD5_5E08 = g.gg_unit_Hamg_0002
     if _____5927_6CD5_5E08 == nil or _____5927_6CD5_5E08 == 0 then
@@ -28,20 +25,5 @@ local function ____on_804A_59291001_6D4B_8BD5()
     local _____603B_62A4_76FE = _____67E5_8BE2_5355_4F4D_603B_62A4_76FE_503C(_____5927_6CD5_5E08)
     debugLogForce(_____6A21_5757_540D, "当前总护盾值:", _____603B_62A4_76FE)
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_59291001_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "添加100通用+100物理护盾")
-end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_59291001_6D4B_8BD5)
 return ____exports

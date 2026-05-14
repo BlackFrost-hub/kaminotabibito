@@ -5,17 +5,14 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 import { 开始护盾, 查询单位总护盾值, 护盾类型 } from "../01．技能函数/07．护盾/index";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
-
 const 模块名 = "护盾测试";
 const 测试命令 = "1001";
-let 已注册 = false;
 
 function on聊天1001测试(): void {
   const 大法师 = g.gg_unit_Hamg_0002;
@@ -43,17 +40,6 @@ function on聊天1001测试(): void {
   debugLogForce(模块名, "当前总护盾值:", 总护盾);
 }
 
-function 注册聊天测试(): void {
-  if (已注册) return;
-  已注册 = true;
-
-  const trig = CreateTrigger();
-  TriggerRegisterPlayerChatEvent(trig, Player(0), 测试命令, true);
-  TriggerAddAction(trig, on聊天1001测试);
-
-  debugLogForce(模块名, "已注册测试：输入", 测试命令, "添加100通用+100物理护盾");
-}
-
-注册聊天测试();
+注册聊天命令监听(测试命令, on聊天1001测试);
 
 export {};

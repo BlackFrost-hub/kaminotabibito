@@ -7,6 +7,8 @@ local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.0
 local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
 local ____05_FF0E_73A9_5BB6_5DE5_5177 = require("lib.扩展函数.封装函数.01．通用工具.05．玩家工具")
 local forEachPlayingPlayer = ____05_FF0E_73A9_5BB6_5DE5_5177.forEachPlayingPlayer
+local ____12_FF0E_804A_5929_547D_4EE4_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____12_FF0E_804A_5929_547D_4EE4_4E8B_4EF6_4E2D_5FC3["注册聊天命令监听"]
 local jass = require("jass.common")
 local function dumpJapiKeys(self)
     local pr = _G.print
@@ -169,27 +171,17 @@ local function bindKeyBN_once_min(self)
     bind(nil, 66, "B")
     bind(nil, 78, "N")
 end
-local function onChat233(self)
+local function onChat233(player)
     dumpJapiKeys(nil)
     dumpDzKeyEventTrgType(nil)
     bindKeyBN_once_min(nil)
     jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
+        player,
         0,
         0,
         6,
         "[japi] 已打印 jass.japi keys"
     )
 end
-local function init(self)
-    local tr = jass.CreateTrigger()
-    jass.TriggerRegisterPlayerChatEvent(
-        tr,
-        jass.Player(0),
-        "233",
-        true
-    )
-    jass.TriggerAddAction(tr, onChat233)
-end
-init(nil)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C("233", onChat233)
 return ____exports

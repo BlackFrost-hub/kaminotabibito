@@ -11,16 +11,24 @@ const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: a
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 
 import { 创建矩形提示圈 } from "../02．通用函数/09．提示特效";
 
-const CreateTrigger = jass.CreateTrigger as () => any;
-const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (trig: any, whichPlayer: any, chatMessageToDetect: string, exactMatchOnly: boolean) => void;
-const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => void;
-const Player = jass.Player as (playerId: number) => any;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
+const CreateTrigger = jass.CreateTrigger as () => any;
+const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (
+  whichTrigger: any,
+  whichPlayer: any,
+  chatMessageToDetect: string,
+  exactMatchOnly: boolean
+) => any;
+const TriggerAddAction = jass.TriggerAddAction as (whichTrigger: any, actionFunc: () => void) => any;
+const Player = jass.Player as (playerId: number) => any;
 
 const 模块名 = "矩形提示特效测试";
 const 测试命令 = "1004";

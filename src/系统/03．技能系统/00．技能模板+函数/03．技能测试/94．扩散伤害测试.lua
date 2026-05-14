@@ -10,13 +10,10 @@ local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_0.debugLogForce
-local CreateTrigger = jass.CreateTrigger
-local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
-local TriggerAddAction = jass.TriggerAddAction
-local Player = jass.Player
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local _____6A21_5757_540D = "扩散伤害测试"
 local _____6D4B_8BD5_547D_4EE4 = "1002"
-local _____5DF2_6CE8_518C = false
 local function ____on_804A_59291002_6D4B_8BD5()
     local _____6765_6E90_5355_4F4D = g.gg_unit_Hamg_0002
     local _____4E3B_76EE_6807 = g.gg_unit_hfoo_0021
@@ -37,20 +34,5 @@ local function ____on_804A_59291002_6D4B_8BD5()
     })
     debugLogForce(_____6A21_5757_540D, "已执行扩散伤害，主目标全额500，半径300内敌方扩散250")
 end
-local function _____6CE8_518C_804A_5929_6D4B_8BD5()
-    if _____5DF2_6CE8_518C then
-        return
-    end
-    _____5DF2_6CE8_518C = true
-    local trig = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(
-        trig,
-        Player(0),
-        _____6D4B_8BD5_547D_4EE4,
-        true
-    )
-    TriggerAddAction(trig, ____on_804A_59291002_6D4B_8BD5)
-    debugLogForce(_____6A21_5757_540D, "已注册测试：输入", _____6D4B_8BD5_547D_4EE4, "对 hfoo_0021 造成扩散伤害")
-end
-_____6CE8_518C_804A_5929_6D4B_8BD5()
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_59291002_6D4B_8BD5)
 return ____exports

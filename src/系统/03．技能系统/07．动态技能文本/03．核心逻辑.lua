@@ -15,6 +15,7 @@ local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_0.debugLog
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+local GetHandleId = jass.GetHandleId
 local DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip
 local DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip
 local DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate
@@ -22,6 +23,7 @@ local EXGetUnitAbilityByIndex = japi.EXGetUnitAbilityByIndex
 local EXGetAbilityId = japi.EXGetAbilityId
 local MODULE_NAME = "动态技能文本"
 local _____6280_80FD_69FD_904D_5386_4E0A_9650 = 64
+local _____539F_59CB_63D0_793A_7F13_5B58 = {}
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -49,6 +51,9 @@ local function getUnitAbilityIds(hero)
         end
     end
     return ids
+end
+local function _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
+    return (tostring(GetHandleId(unit)) .. ":") .. tostring(abilityId)
 end
 --- 从字符串中提取数字倍率
 -- 例如："×3" -> "3", "×50%" -> "50%"
@@ -104,13 +109,32 @@ local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
     if not currentTip then
         return false
     end
-    local newTip = _____66FF_6362_516C_5F0F(unit, currentTip)
+    local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
+    local originalTip = _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
+    if originalTip == nil then
+        originalTip = currentTip
+        _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E] = originalTip
+    end
+    local newTip = _____66FF_6362_516C_5F0F(unit, originalTip)
     if newTip ~= currentTip then
         DzSetUnitAbilityUberTip(unit, abilityId, newTip)
         DzSetUnitAbilityUpdate(unit, abilityId)
         return true
     end
     return false
+end
+local function _____6062_590D_5355_4E2A_6280_80FD_539F_59CB_6587_672C(unit, abilityId)
+    local originalTip = _____539F_59CB_63D0_793A_7F13_5B58[_____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)]
+    if not originalTip then
+        return false
+    end
+    local currentTip = DzGetUnitAbilityUberTip(unit, abilityId)
+    if currentTip == originalTip then
+        return false
+    end
+    DzSetUnitAbilityUberTip(unit, abilityId, originalTip)
+    DzSetUnitAbilityUpdate(unit, abilityId)
+    return true
 end
 --- 检查本地主控单位的命令卡技能
 ____exports["检查英雄技能"] = function(hero)
@@ -125,6 +149,19 @@ ____exports["检查英雄技能"] = function(hero)
             if level > 0 then
                 _____5904_7406_6280_80FD_63D0_793A(hero, abilityIds[i + 1])
             end
+            i = i + 1
+        end
+    end
+end
+____exports["恢复英雄技能原始文本"] = function(hero)
+    if not isValidHandle(hero) then
+        return
+    end
+    local abilityIds = getUnitAbilityIds(hero)
+    do
+        local i = 0
+        while i < #abilityIds do
+            _____6062_590D_5355_4E2A_6280_80FD_539F_59CB_6587_672C(hero, abilityIds[i + 1])
             i = i + 1
         end
     end

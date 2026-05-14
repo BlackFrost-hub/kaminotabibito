@@ -6,6 +6,9 @@ const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通�
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3PlayReuse: (path: string, player?: any) => void;
 };
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
+};
 const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
 };
@@ -95,26 +98,9 @@ function onChat555(): void {
   );
 }
 
-function init(): void {
-  const tr = (jass as any).CreateTrigger();
-  (jass as any).TriggerRegisterPlayerChatEvent(
-    tr,
-    (jass as any).Player(0),
-    "2222",
-    true
-  );
-  (jass as any).TriggerAddAction(tr, onChat2222);
-  const tr555 = (jass as any).CreateTrigger();
-  (jass as any).TriggerRegisterPlayerChatEvent(
-    tr555,
-    (jass as any).Player(0),
-    "555",
-    true
-  );
-  (jass as any).TriggerAddAction(tr555, onChat555);
-}
+注册聊天命令监听("2222", onChat2222);
+注册聊天命令监听("555", onChat555);
 
-init();
 export {};
 
 
