@@ -29,16 +29,19 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
+  stringToFourCC: (this: void, s: string) => number;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 import type { 规范化召唤物参数 } from "./01．类型";
 
-const KillUnit = jass.KillUnit as (unit: any) => void;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (i: number) => any;
+const UnitApplyTimedLife = jass.UnitApplyTimedLife as (unit: any, buffId: number, duration: number) => void;
 
 const CreateUnit = 共享.CreateUnit;
 const GetHandleId = 共享.GetHandleId;
@@ -58,12 +61,12 @@ const ATTACK_POWER_STATE = 0x12;
 const ARMOR_STATE = 0x20;
 const ATTACK_INTERVAL_STATE = 0x25;
 const DEFAULT_FLY_HEIGHT = 50.0;
-const 死亡后删除延迟 = 2.0;
+const 死亡删除延迟秒数 = 3.0;
 const 模块名 = "召唤物核心";
-const 限时召唤物死亡清理表: Record<number, true | undefined> = {};
-const 限时召唤物到期击杀表: Record<number, any | undefined> = {};
-const 限时召唤物延迟删除表: Record<number, any | undefined> = {};
-let 已注册召唤物死亡清理 = false;
+const DEFAULT_TIMED_LIFE_BUFF = stringToFourCC("BHwe");
+const 限时召唤物删除表: Record<number, true | undefined> = {};
+const 待延迟删除召唤物表: Record<number, any | undefined> = {};
+let 已注册限时召唤物删除监听 = false;
 
 function 设置最后创建单位(this: void, unit: any): void {
   (globalThis as any).bj_lastCreatedUnit = unit;
@@ -86,51 +89,35 @@ function 设置单位飞行高度(this: void, unit: any, height: number): void {
   SetUnitFlyHeight(unit, height, 0.0);
 }
 
-function 执行召唤物到期击杀(this: void, callbackId: number): void {
-  const unit = 限时召唤物到期击杀表[callbackId];
-  限时召唤物到期击杀表[callbackId] = undefined;
-  if (unit != null && unit !== 0) {
-    KillUnit(unit);
-  }
-}
-
 function 执行召唤物延迟删除(this: void, callbackId: number): void {
-  const unit = 限时召唤物延迟删除表[callbackId];
-  限时召唤物延迟删除表[callbackId] = undefined;
-  if (unit != null && unit !== 0) {
-    RemoveUnit(unit);
-  }
-}
-
-function 安排召唤物死亡后删除(this: void, unit: any): void {
+  const unit = 待延迟删除召唤物表[callbackId];
+  待延迟删除召唤物表[callbackId] = undefined;
   if (unit == null || unit === 0) return;
-  let callbackId = 0;
-  callbackId = addDelayedCallback(死亡后删除延迟 * 1000, () => 执行召唤物延迟删除(callbackId));
-  限时召唤物延迟删除表[callbackId] = unit;
+  RemoveUnit(unit);
 }
 
-function on召唤物死亡清理(this: void, 死亡单位: any, _击杀者: any): void {
+function on限时召唤物死亡删除(this: void, 死亡单位: any, _击杀者: any): void {
   if (死亡单位 == null || 死亡单位 === 0) return;
   const hid = GetHandleId(死亡单位);
-  if (限时召唤物死亡清理表[hid] == null) return;
-  限时召唤物死亡清理表[hid] = undefined;
-  安排召唤物死亡后删除(死亡单位);
+  if (限时召唤物删除表[hid] == null) return;
+  限时召唤物删除表[hid] = undefined;
+  let callbackId = 0;
+  callbackId = addDelayedCallback(死亡删除延迟秒数 * 1000, () => 执行召唤物延迟删除(callbackId));
+  待延迟删除召唤物表[callbackId] = 死亡单位;
 }
 
-function 确保召唤物死亡清理监听(this: void): void {
-  if (已注册召唤物死亡清理) return;
-  已注册召唤物死亡清理 = true;
-  registerDeathListener(on召唤物死亡清理);
+function 确保限时召唤物删除监听(this: void): void {
+  if (已注册限时召唤物删除监听) return;
+  已注册限时召唤物删除监听 = true;
+  registerDeathListener(on限时召唤物死亡删除);
 }
 
 function 应用召唤物限时生命(this: void, unit: any, duration: number): void {
   if (unit == null || unit === 0) return;
   if (!(duration > 0)) return;
-  确保召唤物死亡清理监听();
-  限时召唤物死亡清理表[GetHandleId(unit)] = true;
-  let callbackId = 0;
-  callbackId = addDelayedCallback(duration * 1000, () => 执行召唤物到期击杀(callbackId));
-  限时召唤物到期击杀表[callbackId] = unit;
+  确保限时召唤物删除监听();
+  限时召唤物删除表[GetHandleId(unit)] = true;
+  UnitApplyTimedLife(unit, DEFAULT_TIMED_LIFE_BUFF, duration);
 }
 
 function 应用单位颜色(this: void, unit: any, 参数: 规范化召唤物参数): void {

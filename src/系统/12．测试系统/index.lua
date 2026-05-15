@@ -11,6 +11,7 @@ local ENABLE_SHOP_TEST = false
 local ENABLE_TEST_233 = true
 local ENABLE_TEST_EVENT = false
 local ENABLE_TEST_EVENT_2 = true
+local ENABLE_DZ_CAN_PLACE_TEST = true
 local function loadTests(self)
     if ENABLE_MOVE_SPEED_TEST then
         require("系统.12．测试系统.移动速度突破测试")
@@ -35,6 +36,9 @@ local function loadTests(self)
     end
     if ENABLE_TEST_EVENT_2 then
         require("系统.12．测试系统.测试事件2")
+    end
+    if ENABLE_DZ_CAN_PLACE_TEST then
+        require("系统.12．测试系统.Dz通行判定测试")
     end
 end
 loadTests(nil)

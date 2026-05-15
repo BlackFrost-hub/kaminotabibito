@@ -7,7 +7,6 @@ local ____exports = {}
 -- 
 -- 公开接口：
 --   X_IsTerrainWalkable(x, y)     - 检测坐标是否可通行
---   X_IsUnitTerrainWalkable(u, x, y) - 检测单位是否可放置到坐标
 --   X_GetAbleX()                  - 获取最近可通行X坐标（需先调用IsTerrainWalkable）
 --   X_GetAbleY()                  - 获取最近可通行Y坐标（需先调用IsTerrainWalkable）
 --   X_IsTerrainDeepWater(x, y)    - 深水检测
@@ -19,7 +18,6 @@ local ____exports = {}
 --   X_GAFC(x1, y1, x2, y2)       - 坐标间角度
 --   X_R2I2(r)                     - 实数转整数（四舍五入）
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeEnumItemsInRect = ____require_result_0.safeEnumItemsInRect
@@ -39,7 +37,6 @@ end)(nil)
 local PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0)
 local PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1)
 local PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2)
-local DzUnitCanPlaceAround = japi.DzUnitCanPlaceAround
 local dummyItem = nil
 local searchRect = nil
 local lastAbleX = 0
@@ -116,16 +113,9 @@ function ____exports.X_IsTerrainWalkable(self, x, y)
     local distOk = dx * dx + dy * dy <= MAX_RANGE * MAX_RANGE
     return distOk and not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)
 end
---- 检测指定单位是否可放置到坐标。
--- 先保留旧坐标通行检测，再用平台单位放置检测兜底，避免强制位移越过地形。
+--- 兼容当前仓库调用面：单位地形判定先退化为坐标地形判定。
 function ____exports.X_IsUnitTerrainWalkable(unit, x, y)
-    if not ____exports.X_IsTerrainWalkable(nil, x, y) then
-        return false
-    end
-    if unit == nil or unit == 0 then
-        return true
-    end
-    return DzUnitCanPlaceAround(unit, x, y) == true
+    return ____exports.X_IsTerrainWalkable(nil, x, y)
 end
 --- 获取最近可通行X坐标（需先调用X_IsTerrainWalkable）
 function ____exports.X_GetAbleX(self)

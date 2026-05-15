@@ -1,55 +1,53 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, removeEntry, jass, safeDestroyTimer, X_GDBC, X_GAFC, X_IsUnitTerrainWalkable, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, _tickCounter
-function hid(self, h)
+local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, removeEntry, jass, safeDestroyTimer, X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, _tickCounter
+function hid(h)
     return jass.GetHandleId(h) or 0
 end
-function getUnitX(self, u)
+function getUnitX(u)
     return jass.GetUnitX(u) or 0
 end
-function getUnitY(self, u)
+function getUnitY(u)
     return jass.GetUnitY(u) or 0
 end
-function getUnitFacing(self, u)
+function getUnitFacing(u)
     return jass.GetUnitFacing(u) or 0
 end
-function getUnitMoveSpeed(self, u)
+function getUnitMoveSpeed(u)
     return jass.GetUnitMoveSpeed(u) or 0
 end
-function removeSpeedEffect(self, effect)
+function removeSpeedEffect(effect)
     if not effect then
         return
     end
     jass.DestroyEffect(effect)
 end
-function doEvent(self, entry)
+function doEvent(entry)
     local u = entry.u
     if u == nil or u == 0 then
         return
     end
     if entry.speed <= ENGINE_SPEED_LIMIT then
-        entry.lx = getUnitX(nil, u)
-        entry.ly = getUnitY(nil, u)
-        entry.lf = getUnitFacing(nil, u)
+        entry.lx = getUnitX(u)
+        entry.ly = getUnitY(u)
+        entry.lf = getUnitFacing(u)
         return
     end
     local currentOrder = jass.GetUnitCurrentOrder(u)
     if currentOrder ~= ORDER_MOVE and currentOrder ~= ORDER_SMART then
-        entry.lx = getUnitX(nil, u)
-        entry.ly = getUnitY(nil, u)
+        entry.lx = getUnitX(u)
+        entry.ly = getUnitY(u)
         return
     end
-    local x = getUnitX(nil, u)
-    local y = getUnitY(nil, u)
-    local f = getUnitFacing(nil, u)
+    local x = getUnitX(u)
+    local y = getUnitY(u)
+    local f = getUnitFacing(u)
     local tgtU = jass.GetOrderTargetUnit()
     if tgtU ~= nil and tgtU ~= 0 then
-        entry.tx = getUnitX(nil, tgtU)
-        entry.ty = getUnitY(nil, tgtU)
+        entry.tx = getUnitX(tgtU)
+        entry.ty = getUnitY(tgtU)
     end
-    local dx = entry.tx - x
-    local dy = entry.ty - y
     local dist = X_GDBC(
         nil,
         x,
@@ -57,29 +55,56 @@ function doEvent(self, entry)
         entry.tx,
         entry.ty
     )
+    local movedDist = X_GDBC(
+        nil,
+        entry.lx,
+        entry.ly,
+        x,
+        y
+    )
     if dist > 10 then
-        local angle = X_GAFC(
-            nil,
-            x,
-            y,
-            entry.tx,
-            entry.ty
-        )
-        local engineSpeed = getUnitMoveSpeed(nil, u)
+        local engineSpeed = getUnitMoveSpeed(u)
         local speedDiff = entry.speed - engineSpeed
         if speedDiff > 0 then
+            local angle = 0
+            if movedDist > 0.5 then
+                angle = X_GAFC(
+                    nil,
+                    entry.lx,
+                    entry.ly,
+                    x,
+                    y
+                )
+            else
+                angle = X_GAFC(
+                    nil,
+                    x,
+                    y,
+                    entry.tx,
+                    entry.ty
+                )
+            end
             local moveDist = speedDiff * TIMER_INTERVAL
             local rad = angle * BJ_DEGTORAD
             local nx = x + moveDist * jass.Cos(rad)
             local ny = y + moveDist * jass.Sin(rad)
-            if X_IsUnitTerrainWalkable(u, nx, ny) then
+            if X_IsTerrainWalkable(nil, nx, ny) then
                 jass.SetUnitX(u, nx)
                 jass.SetUnitY(u, ny)
                 entry.lx = nx
                 entry.ly = ny
             else
-                entry.lx = x
-                entry.ly = y
+                local ableX = X_GetAbleX(nil)
+                local ableY = X_GetAbleY(nil)
+                if ableX ~= 0 or ableY ~= 0 then
+                    jass.SetUnitX(u, ableX)
+                    jass.SetUnitY(u, ableY)
+                    entry.lx = ableX
+                    entry.ly = ableY
+                else
+                    entry.lx = x
+                    entry.ly = y
+                end
             end
         else
             entry.lx = x
@@ -91,13 +116,13 @@ function doEvent(self, entry)
     end
     entry.lf = f
 end
-function removeEntry(self, uid)
+function removeEntry(uid)
     local entry = entryMap[uid]
     if entry == nil then
         return
     end
     if entry.effect then
-        removeSpeedEffect(nil, entry.effect)
+        removeSpeedEffect(entry.effect)
         entry.effect = nil
     end
     if entry.tempTimer then
@@ -107,7 +132,7 @@ function removeEntry(self, uid)
     if entry.t then
         __TS__Delete(
             triggerUnitSpeedEntryUidByTriggerHid,
-            hid(nil, entry.t)
+            hid(entry.t)
         )
         jass.DestroyTrigger(entry.t)
         entry.t = nil
@@ -131,7 +156,9 @@ safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 X_GDBC = ____require_result_1.X_GDBC
 X_GAFC = ____require_result_1.X_GAFC
-X_IsUnitTerrainWalkable = ____require_result_1.X_IsUnitTerrainWalkable
+X_IsTerrainWalkable = ____require_result_1.X_IsTerrainWalkable
+X_GetAbleX = ____require_result_1.X_GetAbleX
+X_GetAbleY = ____require_result_1.X_GetAbleY
 local unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 ORDER_MOVE = 851971
 ORDER_SMART = 851986
@@ -149,7 +176,7 @@ end
 BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_2
 --- 移动速度突破特效模型路径
 local SPEED_EFFECT_MODEL = "resource\\models\\windwalk.mdx"
-local function clampSpeed(self, speed)
+local function clampSpeed(speed)
     if speed < SPEED_MIN then
         return SPEED_MIN
     end
@@ -164,12 +191,12 @@ local systemTimer = nil
 local isRunning = false
 triggerUnitSpeedEntryUidByTriggerHid = {}
 local speedBreakTempTimerCtxByHid = {}
-local function onSpeedBreakTempTimerExpire(self)
+local function onSpeedBreakTempTimerExpire()
     local t = jass.GetExpiredTimer()
-    local uid = speedBreakTempTimerCtxByHid[hid(nil, t)]
+    local uid = speedBreakTempTimerCtxByHid[hid(t)]
     __TS__Delete(
         speedBreakTempTimerCtxByHid,
-        hid(nil, t)
+        hid(t)
     )
     local e = entryMap[uid]
     if e == nil or e.tempTimer ~= t then
@@ -179,11 +206,11 @@ local function onSpeedBreakTempTimerExpire(self)
     if e.originalSpeed > ENGINE_SPEED_LIMIT then
         e.speed = e.originalSpeed
     else
-        removeEntry(nil, uid)
+        removeEntry(uid)
     end
     safeDestroyTimer(nil, t)
 end
-local function onMoveSpeedBreakTick(self)
+local function onMoveSpeedBreakTick()
     if not isRunning then
         return
     end
@@ -196,7 +223,7 @@ local function onMoveSpeedBreakTick(self)
             while i < count do
                 local entry = entryList[i + 1]
                 if entry and entryMap[entry.uid] == entry then
-                    doEvent(nil, entry)
+                    doEvent(entry)
                 end
                 i = i + 1
             end
@@ -204,7 +231,7 @@ local function onMoveSpeedBreakTick(self)
     end
 end
 --- 为单位添加移动速度突破特效
-local function addSpeedEffect(self, u)
+local function addSpeedEffect(u)
     if not u then
         return nil
     end
@@ -215,7 +242,7 @@ end
 local _registeredToCenterTimer = false
 --- tick计数器
 _tickCounter = 0
-local function startTimer(self)
+local function startTimer()
     if isRunning then
         return
     end
@@ -228,16 +255,16 @@ local function startTimer(self)
     local onTick10ms = ____G_3.onTick10ms
     onTick10ms(onMoveSpeedBreakTick)
 end
-local function stopTimer(self)
+local function stopTimer()
     isRunning = false
 end
 --- 同步「突破位移」用的目标点：仅监听点指令时，右键单位/物品不会刷新 tx/ty，
 -- 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
-local function syncEntryOrderDestination(self, e)
+local function syncEntryOrderDestination(e)
     local tgtU = jass.GetOrderTargetUnit()
     if tgtU ~= nil and tgtU ~= 0 then
-        e.tx = getUnitX(nil, tgtU)
-        e.ty = getUnitY(nil, tgtU)
+        e.tx = getUnitX(tgtU)
+        e.ty = getUnitY(tgtU)
         return
     end
     local tgtIt = jass.GetOrderTargetItem()
@@ -249,12 +276,12 @@ local function syncEntryOrderDestination(self, e)
     e.tx = jass.GetOrderPointX() or 0
     e.ty = jass.GetOrderPointY() or 0
 end
-local function onSpeedEntryOrderTargetChanged(self)
+local function onSpeedEntryOrderTargetChanged()
     local trig = jass.GetTriggeringTrigger()
     if trig == nil or trig == 0 then
         return
     end
-    local uid = triggerUnitSpeedEntryUidByTriggerHid[hid(nil, trig)]
+    local uid = triggerUnitSpeedEntryUidByTriggerHid[hid(trig)]
     if not uid then
         return
     end
@@ -262,16 +289,16 @@ local function onSpeedEntryOrderTargetChanged(self)
     if e == nil then
         return
     end
-    syncEntryOrderDestination(nil, e)
+    syncEntryOrderDestination(e)
 end
-local function createTriggerForEntry(self, entry)
+local function createTriggerForEntry(entry)
     local t = jass.CreateTrigger()
     entry.t = t
     if t == nil then
         return
     end
     local uid = entry.uid
-    triggerUnitSpeedEntryUidByTriggerHid[hid(nil, t)] = uid
+    triggerUnitSpeedEntryUidByTriggerHid[hid(t)] = uid
     unitSpecificEventCenter.registerUnitEventTrigger(t, entry.u, jass.EVENT_UNIT_ISSUED_POINT_ORDER)
     local evTarget = jass.EVENT_UNIT_ISSUED_TARGET_ORDER
     if evTarget ~= nil then
@@ -285,14 +312,14 @@ end
 -- 
 -- @param u 目标单位
 -- @param speed 目标移动速度（限制在1~2000）
-function ____exports.SOS_SetUnitSpeed(self, u, speed)
+function ____exports.SOS_SetUnitSpeed(u, speed)
     if u == nil or u == 0 then
         return
     end
-    speed = clampSpeed(nil, speed)
-    local uid = hid(nil, u)
+    speed = clampSpeed(speed)
+    local uid = hid(u)
     if speed <= ENGINE_SPEED_LIMIT then
-        removeEntry(nil, uid)
+        removeEntry(uid)
         return
     end
     local existing = entryMap[uid]
@@ -304,7 +331,7 @@ function ____exports.SOS_SetUnitSpeed(self, u, speed)
         existing.speed = speed
         existing.originalSpeed = speed
         if not existing.effect then
-            existing.effect = addSpeedEffect(nil, u)
+            existing.effect = addSpeedEffect(u)
         end
         return
     end
@@ -316,17 +343,17 @@ function ____exports.SOS_SetUnitSpeed(self, u, speed)
         t = nil,
         tx = 0,
         ty = 0,
-        lx = getUnitX(nil, u),
-        ly = getUnitY(nil, u),
-        lf = getUnitFacing(nil, u),
+        lx = getUnitX(u),
+        ly = getUnitY(u),
+        lf = getUnitFacing(u),
         tempTimer = nil,
         listIndex = #entryList,
-        effect = addSpeedEffect(nil, u)
+        effect = addSpeedEffect(u)
     }
-    createTriggerForEntry(nil, entry)
+    createTriggerForEntry(entry)
     entryMap[uid] = entry
     entryList[#entryList + 1] = entry
-    startTimer(nil)
+    startTimer()
 end
 --- 设置单位移动速度突破（临时，持续一段时间后恢复）
 -- 若单位已有永久速度，到期后恢复为永久速度；
@@ -335,16 +362,16 @@ end
 -- @param u 目标单位
 -- @param speed 目标移动速度（限制在1~2000）
 -- @param duration 持续时间（秒）
-function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
+function ____exports.SOS_SetUnitSpeedTemp(u, speed, duration)
     if u == nil or u == 0 then
         return
     end
     if duration <= 0 then
-        ____exports.SOS_SetUnitSpeed(nil, u, speed)
+        ____exports.SOS_SetUnitSpeed(u, speed)
         return
     end
-    speed = clampSpeed(nil, speed)
-    local uid = hid(nil, u)
+    speed = clampSpeed(speed)
+    local uid = hid(u)
     local existing = entryMap[uid]
     if speed <= ENGINE_SPEED_LIMIT and existing == nil then
         return
@@ -358,7 +385,7 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
         existing.speed = speed
         existing.originalSpeed = savedOriginal
         if not existing.effect then
-            existing.effect = addSpeedEffect(nil, u)
+            existing.effect = addSpeedEffect(u)
         end
     else
         local entry = {
@@ -369,17 +396,17 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
             t = nil,
             tx = 0,
             ty = 0,
-            lx = getUnitX(nil, u),
-            ly = getUnitY(nil, u),
-            lf = getUnitFacing(nil, u),
+            lx = getUnitX(u),
+            ly = getUnitY(u),
+            lf = getUnitFacing(u),
             tempTimer = nil,
             listIndex = #entryList,
-            effect = addSpeedEffect(nil, u)
+            effect = addSpeedEffect(u)
         }
-        createTriggerForEntry(nil, entry)
+        createTriggerForEntry(entry)
         entryMap[uid] = entry
         entryList[#entryList + 1] = entry
-        startTimer(nil)
+        startTimer()
     end
     local current = entryMap[uid]
     if current == nil then
@@ -388,7 +415,7 @@ function ____exports.SOS_SetUnitSpeedTemp(self, u, speed, duration)
     local tempT = jass.CreateTimer()
     current.tempTimer = tempT
     if tempT then
-        speedBreakTempTimerCtxByHid[hid(nil, tempT)] = uid
+        speedBreakTempTimerCtxByHid[hid(tempT)] = uid
         safeTimerStart(
             nil,
             tempT,
@@ -403,25 +430,25 @@ end
 -- 
 -- @param u 目标单位
 -- @returns 移动速度
-function ____exports.SOS_GetUnitSpeed(self, u)
+function ____exports.SOS_GetUnitSpeed(u)
     if u == nil or u == 0 then
         return 0
     end
-    local uid = hid(nil, u)
+    local uid = hid(u)
     local entry = entryMap[uid]
     if entry ~= nil then
         return entry.speed
     end
-    return getUnitMoveSpeed(nil, u)
+    return getUnitMoveSpeed(u)
 end
 --- 取消单位移动速度突破
 -- 
 -- @param u 目标单位
-function ____exports.SOS_UnSetUnitSpeed(self, u)
+function ____exports.SOS_UnSetUnitSpeed(u)
     if u == nil or u == 0 then
         return
     end
-    local uid = hid(nil, u)
-    removeEntry(nil, uid)
+    local uid = hid(u)
+    removeEntry(uid)
 end
 return ____exports

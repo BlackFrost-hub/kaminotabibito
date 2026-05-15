@@ -13,7 +13,7 @@ import {
   type 牵引实例, type 牵引结束原因,
   牵引映射, 单位当前牵引, 活动牵引列表,
   单位存活, 在可玩区域内, 计算坐标距离, 计算朝向角度,
-  X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY,
+  X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY,
 } from "./00．共享";
 
 function 尝试触发到达回调(实例: 牵引实例, 距离中心: number): boolean {
@@ -106,10 +106,6 @@ function 尝试移动一步(实例: 牵引实例, 位移距离: number): { 停�
     if (ableDist > 8.0) {
       return { 停止: true, 原因: "阻挡" };
     }
-  }
-
-  if (实例.检查地形 && !X_IsUnitTerrainWalkable(实例.单位, 新X, 新Y)) {
-    return { 停止: true, 原因: "阻挡" };
   }
 
   SetUnitX(实例.单位, 新X);

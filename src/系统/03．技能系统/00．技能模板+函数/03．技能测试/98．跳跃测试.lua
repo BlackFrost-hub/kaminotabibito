@@ -1,53 +1,31 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local onPauseTestUnit, onResumeTestUnit, g, createDelayedCall, debugLogForce, PauseUnit
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.index")
 local _____5F00_59CB_8DF3_8DC3 = ____index["开始跳跃"]
-function onPauseTestUnit()
-    local testUnit = g.gg_unit_Hamg_0002
-    if testUnit == nil or testUnit == 0 then
-        return
-    end
-    debugLogForce(nil, "jump-test", "pause")
-    PauseUnit(testUnit, true)
-    createDelayedCall(0.5, onResumeTestUnit)
-end
-function onResumeTestUnit()
-    local testUnit = g.gg_unit_Hamg_0002
-    if testUnit == nil or testUnit == 0 then
-        return
-    end
-    debugLogForce(nil, "jump-test", "resume")
-    PauseUnit(testUnit, false)
-end
---- Jump system temporary test.
+--- Jump system test.
 -- 
--- Flow:
--- 1. After 2s, make `gg_unit_Hamg_0002` jump once.
--- 2. After 1.8s, pause the unit.
--- 3. After 0.5s, unpause the unit.
--- 4. Verify jump resumes instead of ending.
+-- 输入 "1098"：让大法师跳跃1000距离，3秒持续，300高度
 local jass = require("jass.common")
-g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-createDelayedCall = ____require_result_0.createDelayedCall
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-debugLogForce = ____require_result_1.debugLogForce
+local g = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
+local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local GetUnitFacing = jass.GetUnitFacing
-PauseUnit = jass.PauseUnit
-local function runJumpTest()
-    debugLogForce(nil, "jump-test", "run")
+local _____6A21_5757_540D = "跳跃测试"
+local _____6D4B_8BD5_547D_4EE4 = "1098"
+local function ____on_804A_5929_6D4B_8BD5()
     local testUnit = g.gg_unit_Hamg_0002
     if testUnit == nil or testUnit == 0 then
-        debugLogForce(nil, "jump-test", "unit-missing", "gg_unit_Hamg_0002")
+        debugLogForce(nil, _____6A21_5757_540D, "错误：未找到 gg_unit_Hamg_0002")
         return
     end
     local angle = GetUnitFacing(testUnit) + 180
     debugLogForce(
         nil,
-        "jump-test",
-        "start-jump",
-        "angle=" .. tostring(angle)
+        _____6A21_5757_540D,
+        "开始跳跃",
+        "角度=" .. tostring(angle)
     )
     _____5F00_59CB_8DF3_8DC3(testUnit, {
         ["角度"] = angle,
@@ -56,11 +34,13 @@ local function runJumpTest()
         ["跳跃高度"] = 300,
         ["朝向跟随跳跃"] = false
     })
-    createDelayedCall(1.8, onPauseTestUnit)
 end
-local _____542F_7528_6D4B_8BD5 = false
-if _____542F_7528_6D4B_8BD5 then
-    debugLogForce(nil, "jump-test", "loaded", "delay=2.0")
-    createDelayedCall(4, runJumpTest)
-end
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____6D4B_8BD5_547D_4EE4, ____on_804A_5929_6D4B_8BD5)
+debugLogForce(
+    nil,
+    _____6A21_5757_540D,
+    "已注册测试：输入",
+    _____6D4B_8BD5_547D_4EE4,
+    "让大法师跳跃1000距离"
+)
 return ____exports

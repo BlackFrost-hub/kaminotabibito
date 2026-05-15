@@ -12,6 +12,7 @@ const ENABLE_SHOP_TEST = false;
 const ENABLE_TEST_233 = true;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_TEST_EVENT_2 = true;
+const ENABLE_DZ_CAN_PLACE_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_MOVE_SPEED_TEST) {
@@ -44,6 +45,10 @@ function loadTests(): void {
 
   if (ENABLE_TEST_EVENT_2) {
     require("系统.12．测试系统.测试事件2");
+  }
+
+  if (ENABLE_DZ_CAN_PLACE_TEST) {
+    require("系统.12．测试系统.Dz通行判定测试");
   }
 
 }

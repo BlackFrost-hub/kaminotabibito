@@ -6,7 +6,6 @@
  */
 import {
   X_IsTerrainWalkable,
-  X_IsUnitTerrainWalkable,
   X_GetAbleX,
   X_GetAbleY,
   BJ_DEGTORAD,
@@ -52,10 +51,6 @@ function 尝试移动一步(
     if (ableDist > WALKABLE_TOLERANCE) {
       return { 停止: true, 原因: "阻挡" };
     }
-  }
-
-  if (!X_IsUnitTerrainWalkable(单位, 新X, 新Y)) {
-    return { 停止: true, 原因: "阻挡" };
   }
 
   const 落点过滤 = 实例.落点过滤;

@@ -1,7 +1,7 @@
 /**
  * 任意单位受到伤害事件系统（由 MNEVENT JASS 库逻辑转写）。
- * 非蝗虫单位进入地图或已存在时注册 EVENT_UNIT_DAMAGED，死亡（非英雄）从组移除；
- * 定期重建主触发并重新为组内单位注册伤害事件；外部通过 MNAnyUnitDamaged(trigger, interval) 订阅。
+ * 非蝗虫单位进入地图或已存在时注册 EVENT_UNIT_DAMAGED，死亡（非英雄）从组移除并销毁对应触发；
+ * 外部通过 MNAnyUnitDamaged(trigger, interval) 订阅。
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
@@ -33,10 +33,10 @@ const DamageCallbacks: ((
 ) => void)[] = [];
 let DamageEventNumber = 0;
 
-let MNDamageEventTrigger: any = undefined;
-let ta: any = undefined;
-let TimerHandle: any = undefined;
 let UnitGroup: any = undefined;
+let DamageEventInitialized = false;
+const DamageTriggerByUnitHid: Record<string, any> = {};
+const DamageTriggerActionByUnitHid: Record<string, any> = {};
 
 /** 伤害事件队列 */
 const damagePendingQueue: {
@@ -66,7 +66,7 @@ function onUnitDeathForDamage(dyingUnit: any): void {
   if (!UnitGroup || !dyingUnit) return;
   if (isHeroUnit(dyingUnit)) return;
   (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
-  recreateDamageTrigger();
+  unregisterDamageUnit(dyingUnit);
 }
 
 
@@ -175,16 +175,48 @@ function anyUnitDamagedFilter(): boolean {
   if (!u) return false;
   const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
   if (lvl > 0) return false;
-  // GroupAddUnit 对已存在单位无二次加入，但 TriggerRegisterUnitEvent 会叠加订阅；进区可能重复触发
-  if (UnitGroup && (jass as any).IsUnitInGroup(u, UnitGroup)) return false;
-  if (UnitGroup) {
-    (jass as any).GroupAddUnit(UnitGroup, u);
-  }
-  if (MNDamageEventTrigger) {
-    const ev = getEventUnitDamaged();
-    if (ev != null) (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
-  }
+  registerDamageUnit(u);
   return false;
+}
+
+function unitHidKey(unit: any): string {
+  return tostring((jass as any).GetHandleId(unit));
+}
+
+function registerDamageUnit(unit: any): void {
+  if (!unit) return;
+  const hid = unitHidKey(unit);
+  if (DamageTriggerByUnitHid[hid] != null) return;
+
+  if (UnitGroup && !(jass as any).IsUnitInGroup(unit, UnitGroup)) {
+    (jass as any).GroupAddUnit(UnitGroup, unit);
+  }
+
+  const ev = getEventUnitDamaged();
+  if (ev == null) return;
+
+  const trigger = (jass as any).CreateTrigger();
+  if (!trigger) return;
+
+  const action = (jass as any).TriggerAddAction(trigger, onAnyUnitDamagedAction);
+  (jass as any).TriggerRegisterUnitEvent(trigger, unit, ev);
+  DamageTriggerByUnitHid[hid] = trigger;
+  DamageTriggerActionByUnitHid[hid] = action;
+}
+
+function unregisterDamageUnit(unit: any): void {
+  if (!unit) return;
+  const hid = unitHidKey(unit);
+  const trigger = DamageTriggerByUnitHid[hid];
+  if (trigger == null) return;
+
+  const action = DamageTriggerActionByUnitHid[hid];
+  if (action != null) {
+    (jass as any).TriggerRemoveAction(trigger, action);
+  }
+  (jass as any).DestroyTrigger(trigger);
+  DamageTriggerByUnitHid[hid] = undefined;
+  DamageTriggerActionByUnitHid[hid] = undefined;
 }
 
 function initEnumUnit(): void {
@@ -197,56 +229,22 @@ function initEnumUnit(): void {
   (jass as any).TriggerRegisterEnterRegion(t, r, (jass as any).Condition(anyUnitDamagedFilter));
   const alwaysTrue = (): boolean => true;
   (jass as any).GroupEnumUnitsInRect(grp, bounds, (jass as any).Condition(alwaysTrue));
-  if (UnitGroup && MNDamageEventTrigger) {
+  if (UnitGroup) {
         forEachUnitInGroup(grp, (u: any) => {
           if (!u) return;
           const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
           if (lvl > 0) return;
-      // 与 anyUnitDamagedFilter 对称：若 EnterRegion 已先于本 ForGroup 入组并 Register，避免二次 Register
-      if ((jass as any).IsUnitInGroup(u, UnitGroup)) return;
-      (jass as any).GroupAddUnit(UnitGroup, u);
-      const ev = getEventUnitDamaged();
-      if (ev != null) {
-        (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
-      }
+      registerDamageUnit(u);
     });
   }
 
   if (grp) (jass as any).DestroyGroup(grp);
 }
 
-/** 重建伤害触发并仅对 UnitGroup 内存活单位重新注册，释放死亡单位的注册（事件泄漏 -1） */
-function recreateDamageTrigger(): void {
-  if (MNDamageEventTrigger && ta != null) {
-    (jass as any).TriggerRemoveAction(MNDamageEventTrigger, ta);
-  }
-  if (MNDamageEventTrigger) {
-    (jass as any).DestroyTrigger(MNDamageEventTrigger);
-  }
-  MNDamageEventTrigger = (jass as any).CreateTrigger();
-  if (MNDamageEventTrigger) {
-    ta = (jass as any).TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction);
-  }
-  if (UnitGroup && MNDamageEventTrigger) {
-    const ev = getEventUnitDamaged();
-    if (ev != null) {
-        forEachUnitInGroup(UnitGroup, (u: any) => {
-          if (u) {
-            (jass as any).TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev);
-          }
-      });
-    }
-  }
-}
-
-function timeout(): void {
-  recreateDamageTrigger();
-}
-
 /**
  * 注册一个触发器：当任意单位受到伤害时，若该触发器启用且条件通过则执行。
  * @param trg 触发器（需在 JASS/TS 中创建并设置 condition/action）
- * @param intervalSeconds 定期重建伤害触发的间隔（秒），用于避免泄漏/堆积
+ * @param intervalSeconds 兼容旧接口；当前实现按单位死亡销毁对应伤害触发。
  */
 export function MNAnyUnitDamaged(trg: any, intervalSeconds: number): void {
   if (trg == null) {
@@ -261,21 +259,12 @@ export function MNAnyUnitDamaged(trg: any, intervalSeconds: number): void {
 
 /** 内部初始化函数，只执行一次 */
 function initDamageEventOnce(intervalSeconds?: number): void {
-  if (MNDamageEventTrigger != null) return;
-  MNDamageEventTrigger = (jass as any).CreateTrigger();
+  if (DamageEventInitialized) return;
+  DamageEventInitialized = true;
   UnitGroup = (jass as any).CreateGroup();
-  if (MNDamageEventTrigger) {
-    ta = (jass as any).TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction);
-  }
   initEnumUnit();
   registerDeathListener(onUnitDeathForDamage);
-  const sec = typeof intervalSeconds === "number" && intervalSeconds > 0 ? intervalSeconds : 60;
-  if (TimerHandle == null) {
-    TimerHandle = (jass as any).CreateTimer();
-    if (TimerHandle) {
-      (jass as any).TimerStart(TimerHandle, sec, true, timeout);
-    }
-  }
+  void intervalSeconds;
 }
 
 /** 注册 Lua 回调：单位受伤时直接调用，不依赖 TriggerExecute（引擎可能不执行 Lua 动作） */

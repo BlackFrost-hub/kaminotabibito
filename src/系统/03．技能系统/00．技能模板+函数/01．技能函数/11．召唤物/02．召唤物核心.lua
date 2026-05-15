@@ -11,12 +11,14 @@ local ____require_result_1 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_1.registerDeathListener
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_3.debugLogForce
-local KillUnit = jass.KillUnit
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+local stringToFourCC = ____require_result_3.stringToFourCC
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_4.debugLogForce
 local SetUnitState = jass.SetUnitState
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local ConvertUnitState = jass.ConvertUnitState
+local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local CreateUnit = _____5171_4EAB.CreateUnit
 local GetHandleId = _____5171_4EAB.GetHandleId
 local GetOwningPlayer = _____5171_4EAB.GetOwningPlayer
@@ -34,12 +36,12 @@ local ATTACK_POWER_STATE = 18
 local ARMOR_STATE = 32
 local ATTACK_INTERVAL_STATE = 37
 local DEFAULT_FLY_HEIGHT = 50
-local _____6B7B_4EA1_540E_5220_9664_5EF6_8FDF = 2
+local _____6B7B_4EA1_5220_9664_5EF6_8FDF_79D2_6570 = 3
 local _____6A21_5757_540D = "召唤物核心"
-local _____9650_65F6_53EC_5524_7269_6B7B_4EA1_6E05_7406_8868 = {}
-local _____9650_65F6_53EC_5524_7269_5230_671F_51FB_6740_8868 = {}
-local _____9650_65F6_53EC_5524_7269_5EF6_8FDF_5220_9664_8868 = {}
-local _____5DF2_6CE8_518C_53EC_5524_7269_6B7B_4EA1_6E05_7406 = false
+local DEFAULT_TIMED_LIFE_BUFF = stringToFourCC("BHwe")
+local _____9650_65F6_53EC_5524_7269_5220_9664_8868 = {}
+local _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868 = {}
+local _____5DF2_6CE8_518C_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C = false
 local function _____8BBE_7F6E_6700_540E_521B_5EFA_5355_4F4D(unit)
     _G.bj_lastCreatedUnit = unit
     jglobals.bj_lastCreatedUnit = unit
@@ -59,48 +61,36 @@ local function _____8BBE_7F6E_5355_4F4D_98DE_884C_9AD8_5EA6(unit, height)
     _____8D4B_4E88_98DE_884C_9AD8_5EA6_80FD_529B(unit)
     SetUnitFlyHeight(unit, height, 0)
 end
-local function _____6267_884C_53EC_5524_7269_5230_671F_51FB_6740(callbackId)
-    local unit = _____9650_65F6_53EC_5524_7269_5230_671F_51FB_6740_8868[callbackId]
-    _____9650_65F6_53EC_5524_7269_5230_671F_51FB_6740_8868[callbackId] = nil
-    if unit ~= nil and unit ~= 0 then
-        KillUnit(unit)
-    end
-end
 local function _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(callbackId)
-    local unit = _____9650_65F6_53EC_5524_7269_5EF6_8FDF_5220_9664_8868[callbackId]
-    _____9650_65F6_53EC_5524_7269_5EF6_8FDF_5220_9664_8868[callbackId] = nil
-    if unit ~= nil and unit ~= 0 then
-        RemoveUnit(unit)
-    end
-end
-local function _____5B89_6392_53EC_5524_7269_6B7B_4EA1_540E_5220_9664(unit)
+    local unit = _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId]
+    _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId] = nil
     if unit == nil or unit == 0 then
         return
     end
-    local callbackId = 0
-    callbackId = addDelayedCallback(
-        _____6B7B_4EA1_540E_5220_9664_5EF6_8FDF * 1000,
-        function() return _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(callbackId) end
-    )
-    _____9650_65F6_53EC_5524_7269_5EF6_8FDF_5220_9664_8868[callbackId] = unit
+    RemoveUnit(unit)
 end
-local function ____on_53EC_5524_7269_6B7B_4EA1_6E05_7406(_____6B7B_4EA1_5355_4F4D, ______51FB_6740_8005)
+local function ____on_9650_65F6_53EC_5524_7269_6B7B_4EA1_5220_9664(_____6B7B_4EA1_5355_4F4D, ______51FB_6740_8005)
     if _____6B7B_4EA1_5355_4F4D == nil or _____6B7B_4EA1_5355_4F4D == 0 then
         return
     end
     local hid = GetHandleId(_____6B7B_4EA1_5355_4F4D)
-    if _____9650_65F6_53EC_5524_7269_6B7B_4EA1_6E05_7406_8868[hid] == nil then
+    if _____9650_65F6_53EC_5524_7269_5220_9664_8868[hid] == nil then
         return
     end
-    _____9650_65F6_53EC_5524_7269_6B7B_4EA1_6E05_7406_8868[hid] = nil
-    _____5B89_6392_53EC_5524_7269_6B7B_4EA1_540E_5220_9664(_____6B7B_4EA1_5355_4F4D)
+    _____9650_65F6_53EC_5524_7269_5220_9664_8868[hid] = nil
+    local callbackId = 0
+    callbackId = addDelayedCallback(
+        _____6B7B_4EA1_5220_9664_5EF6_8FDF_79D2_6570 * 1000,
+        function() return _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(callbackId) end
+    )
+    _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId] = _____6B7B_4EA1_5355_4F4D
 end
-local function _____786E_4FDD_53EC_5524_7269_6B7B_4EA1_6E05_7406_76D1_542C()
-    if _____5DF2_6CE8_518C_53EC_5524_7269_6B7B_4EA1_6E05_7406 then
+local function _____786E_4FDD_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C()
+    if _____5DF2_6CE8_518C_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C then
         return
     end
-    _____5DF2_6CE8_518C_53EC_5524_7269_6B7B_4EA1_6E05_7406 = true
-    registerDeathListener(____on_53EC_5524_7269_6B7B_4EA1_6E05_7406)
+    _____5DF2_6CE8_518C_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C = true
+    registerDeathListener(____on_9650_65F6_53EC_5524_7269_6B7B_4EA1_5220_9664)
 end
 local function _____5E94_7528_53EC_5524_7269_9650_65F6_751F_547D(unit, duration)
     if unit == nil or unit == 0 then
@@ -109,14 +99,9 @@ local function _____5E94_7528_53EC_5524_7269_9650_65F6_751F_547D(unit, duration)
     if not (duration > 0) then
         return
     end
-    _____786E_4FDD_53EC_5524_7269_6B7B_4EA1_6E05_7406_76D1_542C()
-    _____9650_65F6_53EC_5524_7269_6B7B_4EA1_6E05_7406_8868[GetHandleId(unit)] = true
-    local callbackId = 0
-    callbackId = addDelayedCallback(
-        duration * 1000,
-        function() return _____6267_884C_53EC_5524_7269_5230_671F_51FB_6740(callbackId) end
-    )
-    _____9650_65F6_53EC_5524_7269_5230_671F_51FB_6740_8868[callbackId] = unit
+    _____786E_4FDD_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C()
+    _____9650_65F6_53EC_5524_7269_5220_9664_8868[GetHandleId(unit)] = true
+    UnitApplyTimedLife(unit, DEFAULT_TIMED_LIFE_BUFF, duration)
 end
 local function _____5E94_7528_5355_4F4D_989C_8272(unit, _____53C2_6570)
     local alpha = _____53C2_6570["透明度"]
@@ -217,17 +202,17 @@ ____exports["创建召唤物核心"] = function(_____53C2_6570)
         _____53C2_6570["朝向"]
     )
     if summon == nil or summon == 0 then
-        local ____53C2_6570__6240_5C5E_73A9_5BB6_5 = _____53C2_6570["所属玩家"]
-        if ____53C2_6570__6240_5C5E_73A9_5BB6_5 == nil then
-            local ____temp_4
+        local ____53C2_6570__6240_5C5E_73A9_5BB6_6 = _____53C2_6570["所属玩家"]
+        if ____53C2_6570__6240_5C5E_73A9_5BB6_6 == nil then
+            local ____temp_5
             if _____53C2_6570["主人单位"] ~= nil and _____53C2_6570["主人单位"] ~= 0 then
-                ____temp_4 = GetOwningPlayer(_____53C2_6570["主人单位"])
+                ____temp_5 = GetOwningPlayer(_____53C2_6570["主人单位"])
             else
-                ____temp_4 = nil
+                ____temp_5 = nil
             end
-            ____53C2_6570__6240_5C5E_73A9_5BB6_5 = ____temp_4
+            ____53C2_6570__6240_5C5E_73A9_5BB6_6 = ____temp_5
         end
-        local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_5
+        local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_6
         if owner == nil or owner == 0 then
             debugLogForce(_____6A21_5757_540D, "创建失败：owner 无效", owner)
             return nil

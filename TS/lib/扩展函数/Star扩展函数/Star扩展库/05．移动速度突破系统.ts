@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Star扩展库 - 移动速度突破系统
  *
@@ -18,10 +19,12 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
 };
-const { X_GDBC, X_GAFC, X_IsUnitTerrainWalkable } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
+const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GDBC: (x1: number, y1: number, x2: number, y2: number) => number;
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
-  X_IsUnitTerrainWalkable: (this: void, unit: any, x: number, y: number) => boolean;
+  X_IsTerrainWalkable: (x: number, y: number) => boolean;
+  X_GetAbleX: () => number;
+  X_GetAbleY: () => number;
 };
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
@@ -61,7 +64,7 @@ function getUnitMoveSpeed(u: any): number {
   return (jass.GetUnitMoveSpeed(u) as number) || 0;
 }
 
-function clampSpeed(speed: number): number {
+function clampSpeed(this: void, speed: number): number {
   if (speed < SPEED_MIN) return SPEED_MIN;
   if (speed > SPEED_MAX) return SPEED_MAX;
   return speed;
@@ -172,29 +175,42 @@ function doEvent(entry: SpeedEntry): void {
     entry.ty = getUnitY(tgtU);
   }
 
-  const dx = entry.tx - x;
-  const dy = entry.ty - y;
   const dist = X_GDBC(x, y, entry.tx, entry.ty);
+  const movedDist = X_GDBC(entry.lx, entry.ly, x, y);
 
   if (dist > 10) {
-    const angle = X_GAFC(x, y, entry.tx, entry.ty);
     const engineSpeed = getUnitMoveSpeed(u);
     const speedDiff = entry.speed - engineSpeed;
 
     if (speedDiff > 0) {
+      let angle = 0;
+      if (movedDist > 0.5) {
+        angle = X_GAFC(entry.lx, entry.ly, x, y);
+      } else {
+        angle = X_GAFC(x, y, entry.tx, entry.ty);
+      }
       const moveDist = speedDiff * TIMER_INTERVAL;
       const rad = angle * BJ_DEGTORAD;
       const nx = x + moveDist * jass.Cos(rad);
       const ny = y + moveDist * jass.Sin(rad);
 
-      if (X_IsUnitTerrainWalkable(u, nx, ny)) {
+      if (X_IsTerrainWalkable(nx, ny)) {
         jass.SetUnitX(u, nx);
         jass.SetUnitY(u, ny);
         entry.lx = nx;
         entry.ly = ny;
       } else {
-        entry.lx = x;
-        entry.ly = y;
+        const ableX = X_GetAbleX();
+        const ableY = X_GetAbleY();
+        if (ableX !== 0 || ableY !== 0) {
+          jass.SetUnitX(u, ableX);
+          jass.SetUnitY(u, ableY);
+          entry.lx = ableX;
+          entry.ly = ableY;
+        } else {
+          entry.lx = x;
+          entry.ly = y;
+        }
       }
     } else {
       entry.lx = x;

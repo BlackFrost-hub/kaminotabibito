@@ -210,6 +210,11 @@ export function 投射物_发射箭矢溅射(this: void, 来源: 单位句柄, �
   return (原生函数表["DzLaunchMissileSplash"] as (来源: 单位句柄, 目标: 控件句柄, 模型路径: string, 队伍颜色: number, 颜色: number, x: number, y: number, z: number, 缩放: number, 速度: number, 攻击类型: any, 伤害类型: any, 参数13: any, 伤害: number, 弧度: number, 追踪: boolean, 布尔17: boolean, 布尔18: boolean, 攻击: boolean, 标记: number, 目标标记: number, 实数22: number, 实数23: number, 实数24: number, 实数25: number, 实数26: number) => boolean)(来源, 目标, 模型路径, 队伍颜色, 颜色, x, y, z, 缩放, 速度, 攻击类型, 伤害类型, 参数13, 伤害, 弧度, 追踪, 布尔17, 布尔18, 攻击, 标记, 目标标记, 实数22, 实数23, 实数24, 实数25, 实数26);
 }
 
+// 注意:
+// 1. DzPositionCanPlaceAround 更像“固定碰撞体能否放在该点”，不完全等于“当前单位能否连续位移到该点”。
+// 2. 连续位移时它可能把单位自己当前占用的碰撞也算进去，出现前方空地但首步被自己卡住的误判。
+// 3. 如必须把它用于强制位移判定，通常要先配合 EXSetUnitCollisionType 或同类碰撞设置一起处理。
+// 4. 给其他 AI 的建议：默认优先考虑别的 API 或专用位移判定，不要直接把它当作所有单位位移的最终裁决。
 export function 坐标_是否可以能够通过物体(this: void, x: number, y: number, 碰撞大小: number, 碰撞类型: number): boolean {
   return (原生函数表["DzPositionCanPlaceAround"] as (x: number, y: number, 碰撞大小: number, 碰撞类型: number) => boolean)(x, y, 碰撞大小, 碰撞类型);
 }
@@ -254,6 +259,8 @@ export function 队列_下达目标命令按编号(this: void, 单位: 单位句
   return (原生函数表["DzQueueIssueTargetOrderById"] as (单位: 单位句柄, 命令ID: number, 目标控件: 控件句柄) => boolean)(单位, 命令ID, 目标控件);
 }
 
+// 这个接口更接近“具体单位能否放到坐标”的语义；如果是连续位移，通常会比 DzPositionCanPlaceAround 更稳。
+// 这个接口更接近“具体单位能否放到坐标”的语义；如果是连续位移，通常会比 DzPositionCanPlaceAround 更稳。
 export function 单位_是否可以被放置到坐标(this: void, 对象: 控件句柄, x: number, y: number): boolean {
   return (原生函数表["DzUnitCanPlaceAround"] as (对象: 控件句柄, x: number, y: number) => boolean)(对象, x, y);
 }

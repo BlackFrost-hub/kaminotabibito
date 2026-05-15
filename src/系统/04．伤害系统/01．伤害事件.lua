@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, initEnumUnit, recreateDamageTrigger, timeout, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, MNDamageEventTrigger, ta, TimerHandle, UnitGroup, dotBatchMarkQueue
+local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue
 function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
 end
@@ -12,7 +12,7 @@ function onUnitDeathForDamage(self, dyingUnit)
         return
     end
     jass.GroupRemoveUnit(UnitGroup, dyingUnit)
-    recreateDamageTrigger()
+    unregisterDamageUnit(nil, dyingUnit)
 end
 function onAnyUnitDamagedAction(self)
     local j = jass
@@ -159,19 +159,53 @@ function anyUnitDamagedFilter(self)
     if lvl > 0 then
         return false
     end
-    if UnitGroup and jass.IsUnitInGroup(u, UnitGroup) then
-        return false
-    end
-    if UnitGroup then
-        jass.GroupAddUnit(UnitGroup, u)
-    end
-    if MNDamageEventTrigger then
-        local ev = getEventUnitDamaged()
-        if ev ~= nil then
-            jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
-        end
-    end
+    registerDamageUnit(nil, u)
     return false
+end
+function unitHidKey(self, unit)
+    return tostring(jass.GetHandleId(unit)
+    )
+end
+function registerDamageUnit(self, unit)
+    if not unit then
+        return
+    end
+    local hid = unitHidKey(nil, unit)
+    if DamageTriggerByUnitHid[hid] ~= nil then
+        return
+    end
+    if UnitGroup and not jass.IsUnitInGroup(unit, UnitGroup) then
+        jass.GroupAddUnit(UnitGroup, unit)
+    end
+    local ev = getEventUnitDamaged()
+    if ev == nil then
+        return
+    end
+    local trigger = jass.CreateTrigger()
+    if not trigger then
+        return
+    end
+    local action = jass.TriggerAddAction(trigger, onAnyUnitDamagedAction)
+    jass.TriggerRegisterUnitEvent(trigger, unit, ev)
+    DamageTriggerByUnitHid[hid] = trigger
+    DamageTriggerActionByUnitHid[hid] = action
+end
+function unregisterDamageUnit(self, unit)
+    if not unit then
+        return
+    end
+    local hid = unitHidKey(nil, unit)
+    local trigger = DamageTriggerByUnitHid[hid]
+    if trigger == nil then
+        return
+    end
+    local action = DamageTriggerActionByUnitHid[hid]
+    if action ~= nil then
+        jass.TriggerRemoveAction(trigger, action)
+    end
+    jass.DestroyTrigger(trigger)
+    DamageTriggerByUnitHid[hid] = nil
+    DamageTriggerActionByUnitHid[hid] = nil
 end
 function initEnumUnit(self)
     local t = jass.CreateTrigger()
@@ -194,7 +228,7 @@ function initEnumUnit(self)
         bounds,
         jass.Condition(alwaysTrue)
     )
-    if UnitGroup and MNDamageEventTrigger then
+    if UnitGroup then
         forEachUnitInGroup(
             nil,
             grp,
@@ -206,14 +240,7 @@ function initEnumUnit(self)
                 if lvl > 0 then
                     return
                 end
-                if jass.IsUnitInGroup(u, UnitGroup) then
-                    return
-                end
-                jass.GroupAddUnit(UnitGroup, u)
-                local ev = getEventUnitDamaged()
-                if ev ~= nil then
-                    jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
-                end
+                registerDamageUnit(nil, u)
             end
         )
     end
@@ -221,53 +248,15 @@ function initEnumUnit(self)
         jass.DestroyGroup(grp)
     end
 end
-function recreateDamageTrigger(self)
-    if MNDamageEventTrigger and ta ~= nil then
-        jass.TriggerRemoveAction(MNDamageEventTrigger, ta)
-    end
-    if MNDamageEventTrigger then
-        jass.DestroyTrigger(MNDamageEventTrigger)
-    end
-    MNDamageEventTrigger = jass.CreateTrigger()
-    if MNDamageEventTrigger then
-        ta = jass.TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
-    end
-    if UnitGroup and MNDamageEventTrigger then
-        local ev = getEventUnitDamaged()
-        if ev ~= nil then
-            forEachUnitInGroup(
-                nil,
-                UnitGroup,
-                function(____, u)
-                    if u then
-                        jass.TriggerRegisterUnitEvent(MNDamageEventTrigger, u, ev)
-                    end
-                end
-            )
-        end
-    end
-end
-function timeout(self)
-    recreateDamageTrigger()
-end
 function initDamageEventOnce(self, intervalSeconds)
-    if MNDamageEventTrigger ~= nil then
+    if DamageEventInitialized then
         return
     end
-    MNDamageEventTrigger = jass.CreateTrigger()
+    DamageEventInitialized = true
     UnitGroup = jass.CreateGroup()
-    if MNDamageEventTrigger then
-        ta = jass.TriggerAddAction(MNDamageEventTrigger, onAnyUnitDamagedAction)
-    end
     initEnumUnit()
     registerDeathListener(nil, onUnitDeathForDamage)
-    local sec = type(intervalSeconds) == "number" and intervalSeconds > 0 and intervalSeconds or 60
-    if TimerHandle == nil then
-        TimerHandle = jass.CreateTimer()
-        if TimerHandle then
-            jass.TimerStart(TimerHandle, sec, true, timeout)
-        end
-    end
+    local ____ = intervalSeconds
 end
 jass = require("jass.common")
 local g = require("jass.globals")
@@ -281,10 +270,10 @@ ALOC = 1097625443
 DamageEventQueue = {}
 DamageCallbacks = {}
 DamageEventNumber = 0
-MNDamageEventTrigger = nil
-ta = nil
-TimerHandle = nil
 UnitGroup = nil
+DamageEventInitialized = false
+DamageTriggerByUnitHid = {}
+DamageTriggerActionByUnitHid = {}
 --- 伤害事件队列
 local damagePendingQueue = {}
 dotBatchMarkQueue = {}
@@ -303,7 +292,7 @@ end
 --- 注册一个触发器：当任意单位受到伤害时，若该触发器启用且条件通过则执行。
 -- 
 -- @param trg 触发器（需在 JASS/TS 中创建并设置 condition/action）
--- @param intervalSeconds 定期重建伤害触发的间隔（秒），用于避免泄漏/堆积
+-- @param intervalSeconds 兼容旧接口；当前实现按单位死亡销毁对应伤害触发。
 function ____exports.MNAnyUnitDamaged(self, trg, intervalSeconds)
     if trg == nil then
         return

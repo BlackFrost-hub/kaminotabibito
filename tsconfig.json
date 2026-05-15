@@ -10,9 +10,16 @@
   "include": ["TS/**/*.ts", "TS/**/*.d.ts"],
   "tstl": {
     "luaTarget": "5.4",
-    "noResolvePaths": ["jass.*", "lib.*", "系统.*"]
+    "noResolvePaths": [
+      "jass.*",
+      "lib.*",
+      "系统.*",
+      "平台扩展API",
+      "平台扩展API动作",
+      "平台扩展API取值",
+      "平台扩展API条件",
+      "平台扩展API事件",
+      "平台扩展API条件桥接"
+    ]
   }
 }
-
-
-

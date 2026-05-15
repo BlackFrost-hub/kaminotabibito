@@ -5,7 +5,6 @@
  *
  * 公开接口：
  *   X_IsTerrainWalkable(x, y)     - 检测坐标是否可通行
- *   X_IsUnitTerrainWalkable(u, x, y) - 检测单位是否可放置到坐标
  *   X_GetAbleX()                  - 获取最近可通行X坐标（需先调用IsTerrainWalkable）
  *   X_GetAbleY()                  - 获取最近可通行Y坐标（需先调用IsTerrainWalkable）
  *   X_IsTerrainDeepWater(x, y)    - 深水检测
@@ -19,7 +18,6 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
 const { safeEnumItemsInRect } = require("系统.00．核心系统.07．联机安全工具") as {
   safeEnumItemsInRect: (rect: any, filter: any, action: () => void) => void;
@@ -39,7 +37,6 @@ const DUMMY_ITEM_ID = (function () {
 const PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0);
 const PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1);
 const PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2);
-const DzUnitCanPlaceAround = japi["DzUnitCanPlaceAround"] as (this: void, unit: any, x: number, y: number) => boolean;
 
 let dummyItem: any = null;
 let searchRect: any = null;
@@ -129,17 +126,10 @@ export function X_IsTerrainWalkable(x: number, y: number): boolean {
 }
 
 /**
- * 检测指定单位是否可放置到坐标。
- * 先保留旧坐标通行检测，再用平台单位放置检测兜底，避免强制位移越过地形。
+ * 兼容当前仓库调用面：单位地形判定先退化为坐标地形判定。
  */
 export function X_IsUnitTerrainWalkable(this: void, unit: any, x: number, y: number): boolean {
-  if (!X_IsTerrainWalkable(x, y)) {
-    return false;
-  }
-  if (unit == null || unit === 0) {
-    return true;
-  }
-  return DzUnitCanPlaceAround(unit, x, y) === true;
+  return X_IsTerrainWalkable(x, y);
 }
 
 /**
