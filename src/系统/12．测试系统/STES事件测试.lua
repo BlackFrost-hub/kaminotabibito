@@ -29,6 +29,25 @@ local function log(msg)
     local debugLogForce = ____require_result_2.debugLogForce
     debugLogForce(nil, "STES测试", msg)
 end
+local function onLuaStesListenerAction()
+    do
+        local ____try, ____error = pcall(function()
+            local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
+            local b = type(from5) == "number" and from5 or 0
+            local quad = (b * b + 13 * b + 42) / (b + 1.0001)
+            local root = jass.SquareRoot(max(0, b + 16)) * 2.25
+            local ret = quad + root - min(b, 5) * 0.5 + 3.14159
+            YDLocal7Set(nil, "real", YD_LOCAL_REAL_KEY, ret)
+            log((((((("[STES事件测试-Lua] YDLocal5Get(real,\"" .. YD_LOCAL_REAL_KEY) .. "\")=") .. tostring(b)) .. " → YDLocal7Set 写回 real,\"") .. YD_LOCAL_REAL_KEY) .. "\"=") .. tostring(ret))
+        end)
+        do
+            clearStar_PIndex(nil)
+        end
+        if not ____try then
+            error(____error, 0)
+        end
+    end
+end
 --- 向「测试」再挂一个 Lua 创建的触发器：JASS 侧用 STES_GetTable 遍历 + TriggerExecute 时会执行到（如聊天 333）。
 local function tryRegisterLuaListenerForJassStes()
     local g = _G
@@ -41,28 +60,7 @@ local function tryRegisterLuaListenerForJassStes()
     end
     g[LUA_STES_REG_KEY] = true
     local trig = jass.CreateTrigger()
-    jass.TriggerAddAction(
-        trig,
-        function()
-            do
-                local ____try, ____error = pcall(function()
-                    local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
-                    local b = type(from5) == "number" and from5 or 0
-                    local quad = (b * b + 13 * b + 42) / (b + 1.0001)
-                    local root = jass.SquareRoot(max(0, b + 16)) * 2.25
-                    local ret = quad + root - min(b, 5) * 0.5 + 3.14159
-                    YDLocal7Set(nil, "real", YD_LOCAL_REAL_KEY, ret)
-                    log((((((("[STES事件测试-Lua] YDLocal5Get(real,\"" .. YD_LOCAL_REAL_KEY) .. "\")=") .. tostring(b)) .. " → YDLocal7Set 写回 real,\"") .. YD_LOCAL_REAL_KEY) .. "\"=") .. tostring(ret))
-                end)
-                do
-                    clearStar_PIndex(nil)
-                end
-                if not ____try then
-                    error(____error, 0)
-                end
-            end
-        end
-    )
+    jass.TriggerAddAction(trig, onLuaStesListenerAction)
     stesMod:STES_Register(trig, TEST_EVENT)
     log(("[STES事件测试] 已向「" .. TEST_EVENT) .. "」STES_Register Lua 触发器；与 JASS 注册共用同一张表，输入 333 可测 JASS→Lua")
 end

@@ -91,16 +91,12 @@ local function testYDLocalReturn(self)
     end
     debugLogForce(nil, "YDLocal测试", "===== 测试结束 =====")
 end
+local function onYDLocalReturnTimerExpire()
+    testYDLocalReturn(nil)
+    jass.DestroyTimer(jass.GetExpiredTimer())
+end
 if ENABLED then
     local tm = jass.CreateTimer()
-    jass.TimerStart(
-        tm,
-        1,
-        false,
-        function()
-            testYDLocalReturn(nil)
-            jass.DestroyTimer(tm)
-        end
-    )
+    jass.TimerStart(tm, 1, false, onYDLocalReturnTimerExpire)
 end
 return ____exports

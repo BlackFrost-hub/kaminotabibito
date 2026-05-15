@@ -46,23 +46,48 @@ const GOLD_BURST_INTERVAL_SEC = 0.25;
 const GOLD_BURST_555_TIMES = 12;
 const GOLD_BURST_555_INTERVAL_SEC = 1 / 11;
 
+interface GoldBurstCtx {
+  kind: "2222" | "555";
+  times: number;
+  interval: number;
+  count: number;
+}
+
+const goldBurstCtxByTimerHid: Record<number, GoldBurstCtx | undefined> = {};
+
+function playGoldBurstStep(this: void, ctx: GoldBurstCtx, p0: any): void {
+  if (ctx.count >= ctx.times) return;
+  AdjustPlayerStateBJ(1000, p0, (jass as any).PLAYER_STATE_RESOURCE_GOLD);
+  Sound3DII_Mp3PlayReuse(SOUND_GOLD, p0);
+  spawnGoldFloatPlus1000();
+  ctx.count++;
+  if (ctx.count >= ctx.times) return;
+  const t = (jass as any).CreateTimer();
+  if (!t) return;
+  goldBurstCtxByTimerHid[(jass as any).GetHandleId(t)] = ctx;
+  (jass as any).TimerStart(t, ctx.interval, false, onGoldBurstTimerExpire);
+}
+
+function onGoldBurstTimerExpire(this: void): void {
+  const t = (jass as any).GetExpiredTimer();
+  if (!t) return;
+  const hid = (jass as any).GetHandleId(t);
+  const ctx = goldBurstCtxByTimerHid[hid];
+  delete goldBurstCtxByTimerHid[hid];
+  (jass as any).DestroyTimer(t);
+  if (!ctx) return;
+  playGoldBurstStep(ctx, (jass as any).Player(0));
+}
+
 function onChat2222(): void {
   const p0 = (jass as any).Player(0);
-  let n = 0;
-  const step = (): void => {
-    if (n >= GOLD_BURST_TIMES) return;
-    AdjustPlayerStateBJ(1000, p0, (jass as any).PLAYER_STATE_RESOURCE_GOLD);
-    Sound3DII_Mp3PlayReuse(SOUND_GOLD, p0);
-    spawnGoldFloatPlus1000();
-    n++;
-    if (n >= GOLD_BURST_TIMES) return;
-    const t = (jass as any).CreateTimer();
-    (jass as any).TimerStart(t, GOLD_BURST_INTERVAL_SEC, false, () => {
-      (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
-      step();
-    });
+  const ctx: GoldBurstCtx = {
+    kind: "2222",
+    times: GOLD_BURST_TIMES,
+    interval: GOLD_BURST_INTERVAL_SEC,
+    count: 0,
   };
-  step();
+  playGoldBurstStep(ctx, p0);
   (jass as any).DisplayTimedTextToPlayer(
     (jass as any).Player(0),
     0,
@@ -74,21 +99,13 @@ function onChat2222(): void {
 
 function onChat555(): void {
   const p0 = (jass as any).Player(0);
-  let n = 0;
-  const step = (): void => {
-    if (n >= GOLD_BURST_555_TIMES) return;
-    AdjustPlayerStateBJ(1000, p0, (jass as any).PLAYER_STATE_RESOURCE_GOLD);
-    Sound3DII_Mp3PlayReuse(SOUND_GOLD, p0);
-    spawnGoldFloatPlus1000();
-    n++;
-    if (n >= GOLD_BURST_555_TIMES) return;
-    const t = (jass as any).CreateTimer();
-    (jass as any).TimerStart(t, GOLD_BURST_555_INTERVAL_SEC, false, () => {
-      (jass as any).DestroyTimer((jass as any).GetExpiredTimer());
-      step();
-    });
+  const ctx: GoldBurstCtx = {
+    kind: "555",
+    times: GOLD_BURST_555_TIMES,
+    interval: GOLD_BURST_555_INTERVAL_SEC,
+    count: 0,
   };
-  step();
+  playGoldBurstStep(ctx, p0);
   (jass as any).DisplayTimedTextToPlayer(
     (jass as any).Player(0),
     0,

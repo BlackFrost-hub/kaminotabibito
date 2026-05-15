@@ -7,10 +7,9 @@ local ENABLE_MOVE_SPEED_TEST = true
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_QUEST_TEST = false
-local ENABLE_SHOP_TEST = false
 local ENABLE_TEST_233 = true
 local ENABLE_TEST_EVENT = false
-local ENABLE_TEST_EVENT_2 = true
+local ENABLE_GOLD_BURST_TEST = true
 local ENABLE_DZ_CAN_PLACE_TEST = true
 local function loadTests(self)
     if ENABLE_MOVE_SPEED_TEST then
@@ -25,17 +24,14 @@ local function loadTests(self)
     if ENABLE_QUEST_TEST then
         require("系统.12．测试系统.任务测试")
     end
-    if ENABLE_SHOP_TEST then
-        require("系统.12．测试系统.模拟商店")
-    end
     if ENABLE_TEST_233 then
-        require("系统.12．测试系统.测试233注册")
+        require("系统.12．测试系统.02．平台API测试")
     end
     if ENABLE_TEST_EVENT then
-        require("系统.12．测试系统.测试事件")
+        require("系统.12．测试系统.03．伤害事件测试")
     end
-    if ENABLE_TEST_EVENT_2 then
-        require("系统.12．测试系统.测试事件2")
+    if ENABLE_GOLD_BURST_TEST then
+        require("系统.12．测试系统.01．金币爆发测试")
     end
     if ENABLE_DZ_CAN_PLACE_TEST then
         require("系统.12．测试系统.Dz通行判定测试")

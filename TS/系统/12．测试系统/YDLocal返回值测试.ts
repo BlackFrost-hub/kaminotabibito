@@ -73,12 +73,14 @@ function testYDLocalReturn(): void {
     debugLogForce("YDLocal测试", "===== 测试结束 =====");
 }
 
+function onYDLocalReturnTimerExpire(this: void): void {
+    testYDLocalReturn();
+    jass.DestroyTimer(jass.GetExpiredTimer());
+}
+
 if (ENABLED) {
     const tm = jass.CreateTimer();
-    jass.TimerStart(tm, 1.0, false, () => {
-        testYDLocalReturn();
-        jass.DestroyTimer(tm);
-    });
+    jass.TimerStart(tm, 1.0, false, onYDLocalReturnTimerExpire);
 }
 
 export {};

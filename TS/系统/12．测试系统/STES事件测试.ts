@@ -60,6 +60,29 @@ function log(this: void, msg: string): void {
     debugLogForce("STES测试", msg);
 }
 
+function onLuaStesListenerAction(this: void): void {
+    try {
+        const from5 = YDLocal5Get("real", YD_LOCAL_REAL_KEY);
+        const b = typeof from5 === "number" ? from5 : 0;
+        const quad = (b * b + 13 * b + 42) / (b + 1.0001);
+        const root = jass.SquareRoot(max(0, b + 16)) * 2.25;
+        const ret = quad + root - min(b, 5) * 0.5 + 3.14159;
+        YDLocal7Set("real", YD_LOCAL_REAL_KEY, ret);
+        log(
+            "[STES事件测试-Lua] YDLocal5Get(real,\"" +
+                YD_LOCAL_REAL_KEY +
+                "\")=" +
+                b +
+                " → YDLocal7Set 写回 real,\"" +
+                YD_LOCAL_REAL_KEY +
+                "\"=" +
+                ret,
+        );
+    } finally {
+        clearStar_PIndex();
+    }
+}
+
 /**
  * 向「测试」再挂一个 Lua 创建的触发器：JASS 侧用 STES_GetTable 遍历 + TriggerExecute 时会执行到（如聊天 333）。
  */
@@ -73,28 +96,7 @@ function tryRegisterLuaListenerForJassStes(this: void): void {
     g[LUA_STES_REG_KEY] = true;
 
     const trig = jass.CreateTrigger();
-    jass.TriggerAddAction(trig, () => {
-        try {
-            const from5 = YDLocal5Get("real", YD_LOCAL_REAL_KEY);
-            const b = typeof from5 === "number" ? from5 : 0;
-            const quad = (b * b + 13 * b + 42) / (b + 1.0001);
-            const root = jass.SquareRoot(max(0, b + 16)) * 2.25;
-            const ret = quad + root - min(b, 5) * 0.5 + 3.14159;
-            YDLocal7Set("real", YD_LOCAL_REAL_KEY, ret);
-            log(
-                "[STES事件测试-Lua] YDLocal5Get(real,\"" +
-                    YD_LOCAL_REAL_KEY +
-                    "\")=" +
-                    b +
-                    " → YDLocal7Set 写回 real,\"" +
-                    YD_LOCAL_REAL_KEY +
-                    "\"=" +
-                    ret,
-            );
-        } finally {
-            clearStar_PIndex();
-        }
-    });
+    jass.TriggerAddAction(trig, onLuaStesListenerAction);
     stesMod.STES_Register(trig, TEST_EVENT);
 
     log(
@@ -157,7 +159,7 @@ function boot(this: void): void {
     runAfterDelay();
 
     // const timer = jass.CreateTimer();
-    // jass.TimerStart(timer, ENTRY_DELAY_SEC, false, () => {
+    // jass.TimerStart(timer, ENTRY_DELAY_SEC, false, onEntryDelayTimerExpire);
     //     runAfterDelay();
     //     if (typeof jass.PauseTimer === "function") {
     //         jass.PauseTimer(timer);

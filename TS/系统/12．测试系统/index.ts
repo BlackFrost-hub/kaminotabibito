@@ -8,10 +8,9 @@ const ENABLE_MOVE_SPEED_TEST = true;
 const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_QUEST_TEST = false;
-const ENABLE_SHOP_TEST = false;
 const ENABLE_TEST_233 = true;
 const ENABLE_TEST_EVENT = false;
-const ENABLE_TEST_EVENT_2 = true;
+const ENABLE_GOLD_BURST_TEST = true;
 const ENABLE_DZ_CAN_PLACE_TEST = true;
 
 function loadTests(): void {
@@ -31,20 +30,16 @@ function loadTests(): void {
     require("系统.12．测试系统.任务测试");
   }
 
-  if (ENABLE_SHOP_TEST) {
-    require("系统.12．测试系统.模拟商店");
-  }
-
   if (ENABLE_TEST_233) {
-    require("系统.12．测试系统.测试233注册");
+    require("系统.12．测试系统.02．平台API测试");
   }
 
   if (ENABLE_TEST_EVENT) {
-    require("系统.12．测试系统.测试事件");
+    require("系统.12．测试系统.03．伤害事件测试");
   }
 
-  if (ENABLE_TEST_EVENT_2) {
-    require("系统.12．测试系统.测试事件2");
+  if (ENABLE_GOLD_BURST_TEST) {
+    require("系统.12．测试系统.01．金币爆发测试");
   }
 
   if (ENABLE_DZ_CAN_PLACE_TEST) {

@@ -20,7 +20,7 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
 const trg = jass.CreateTrigger();
 const redPlayer = jass.Player(0);
 playerUnitEvent.registerPlayerUnitEvent(trg, redPlayer, jass.EVENT_PLAYER_UNIT_SELECTED);
-jass.TriggerAddAction(trg, () => {
+function onSelectEventAction(this: void): void {
   const u = jass.GetTriggerUnit();
   if (!u) return;
 
@@ -66,6 +66,8 @@ jass.TriggerAddAction(trg, () => {
 
   // const line = "[SelectEvent] 单位=" + jass.GetUnitName(u) + " 找到=" + found + " 文本=" + ok1 + "," + ok2 + " 持续时间=" + okDur1 + "," + okDur2 + "," + okDur3;
   // jass.DisplayTimedTextToPlayer(redPlayer, 0, 0, 15, line);
-});
+}
+
+jass.TriggerAddAction(trg, onSelectEventAction);
 
 export {};
