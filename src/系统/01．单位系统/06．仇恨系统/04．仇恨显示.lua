@@ -1,8 +1,8 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local DestroyFloatText, _____4EC7_6068_663E_793A_8868
@@ -50,6 +50,20 @@ local function _____53D6_5355_4F4DID(u)
         return 0
     end
     return GetHandleId(u) or 0
+end
+local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+local function _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_8868()
+    local result = {}
+    for key in pairs(_____4EC7_6068_663E_793A_8868) do
+        local id = __TS__ParseInt(key, 10)
+        if not __TS__NumberIsNaN(__TS__Number(id)) then
+            result[#result + 1] = id
+        end
+    end
+    __TS__ArraySort(result, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return result
 end
 local function _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
     local _____5341_500D_6574_6570 = R2I(_____4EC7_6068_503C * 10 + 0.5)
@@ -105,30 +119,27 @@ local function ____on_4EC7_6068_663E_793A_5355_4F4D_6B7B_4EA1(dyingUnit, _killin
     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
 end
 local function ____on_4EC7_6068_663E_793ATick()
-    local keys = __TS__ObjectKeys(_____4EC7_6068_663E_793A_8868)
+    local _____654C_4EBAID_5217_8868 = _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_8868()
     local _____4ECD_6709_663E_793A = false
     do
         local i = 0
-        while i < #keys do
+        while i < #_____654C_4EBAID_5217_8868 do
             do
-                local _____654C_4EBAID = __TS__ParseInt(keys[i + 1], 10)
-                if __TS__NumberIsNaN(__TS__Number(_____654C_4EBAID)) then
-                    goto __continue16
-                end
+                local _____654C_4EBAID = _____654C_4EBAID_5217_8868[i + 1]
                 local _____6570_636E = _____4EC7_6068_663E_793A_8868[_____654C_4EBAID]
                 if _____6570_636E == nil or _____6570_636E.textTag == nil or _____6570_636E["跟随单位"] == nil or _____6570_636E["跟随单位"] == 0 then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue16
+                    goto __continue21
                 end
                 if IsUnitType(_____6570_636E["跟随单位"], UNIT_TYPE_DEAD) then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue16
+                    goto __continue21
                 end
                 SetTextTagPosUnit(_____6570_636E.textTag, _____6570_636E["跟随单位"], _____6587_5B57_9AD8_5EA6)
                 _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____6570_636E.textTag)
                 _____4ECD_6709_663E_793A = true
             end
-            ::__continue16::
+            ::__continue21::
             i = i + 1
         end
     end
@@ -177,14 +188,11 @@ ____exports["更新仇恨显示"] = function(_____654C_4EBA, _____76EE_6807_5355
     _____786E_4FDD_4EC7_6068_663E_793ATick_5DF2_542F_52A8()
 end
 ____exports["清除所有仇恨显示"] = function()
-    local keys = __TS__ObjectKeys(_____4EC7_6068_663E_793A_8868)
+    local _____654C_4EBAID_5217_8868 = _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_8868()
     do
         local i = 0
-        while i < #keys do
-            local _____654C_4EBAID = __TS__ParseInt(keys[i + 1], 10)
-            if not __TS__NumberIsNaN(__TS__Number(_____654C_4EBAID)) then
-                ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-            end
+        while i < #_____654C_4EBAID_5217_8868 do
+            ____exports["清除仇恨显示ById"](_____654C_4EBAID_5217_8868[i + 1])
             i = i + 1
         end
     end

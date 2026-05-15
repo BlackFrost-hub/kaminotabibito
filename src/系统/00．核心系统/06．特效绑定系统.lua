@@ -2,13 +2,20 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
-local getUnitId, destroyEffect, jass, boundEffects, unitToEffectMap
+local getUnitId, getEffectId, destroyEffect, jass, boundEffects, unitToEffectMap
 function getUnitId(unit)
     if not unit then
         return 0
     end
     return jass.GetHandleId(unit)
+end
+function getEffectId(effect)
+    if not effect then
+        return 0
+    end
+    return jass.GetHandleId(effect) or 0
 end
 function destroyEffect(effect)
     if not effect then
@@ -20,12 +27,12 @@ function ____exports.removeBoundEffect(effect)
     if not effect then
         return
     end
-    local data = boundEffects:get(effect)
+    local data = boundEffects:get(getEffectId(effect))
     if data then
         local unitId = getUnitId(data.unit)
         unitToEffectMap:delete(unitId)
     end
-    boundEffects:delete(effect)
+    boundEffects:delete(getEffectId(effect))
     destroyEffect(effect)
 end
 jass = require("jass.common")
@@ -49,24 +56,43 @@ ____exports.DEFAULT_ANIM_SPEED = 1
 boundEffects = __TS__New(Map)
 unitToEffectMap = __TS__New(Map)
 local _isRegistered = false
+local function getSortedBoundEffectIds()
+    local ids = {}
+    for ____, effectId in __TS__Iterator(boundEffects:keys()) do
+        ids[#ids + 1] = effectId
+    end
+    __TS__ArraySort(
+        ids,
+        function(____, a, b) return a - b end
+    )
+    return ids
+end
 --- 更新所有绑定特效的位置（世界 Z = 地形 + 飞行高度 + 记录的高度偏移）
 local function updateBoundEffects()
-    for ____, ____value in __TS__Iterator(boundEffects) do
-        local effect = ____value[1]
-        local data = ____value[2]
-        do
-            if not data.unit then
-                ____exports.removeBoundEffect(effect)
-                goto __continue7
+    local effectIds = getSortedBoundEffectIds()
+    do
+        local i = 0
+        while i < #effectIds do
+            do
+                local data = boundEffects:get(effectIds[i + 1])
+                if not data then
+                    goto __continue14
+                end
+                local effect = data.effect
+                if not data.unit then
+                    ____exports.removeBoundEffect(effect)
+                    goto __continue14
+                end
+                local unitX = jass.GetUnitX(data.unit)
+                local unitY = jass.GetUnitY(data.unit)
+                local unitFlyHeight = jass.GetUnitFlyHeight(data.unit)
+                local z = EC_GetPointZ(nil, unitX, unitY) + unitFlyHeight + data.heightOffset
+                japi.EXSetEffectXY(effect, unitX, unitY)
+                japi.EXSetEffectZ(effect, z)
             end
-            local unitX = jass.GetUnitX(data.unit)
-            local unitY = jass.GetUnitY(data.unit)
-            local unitFlyHeight = jass.GetUnitFlyHeight(data.unit)
-            local z = EC_GetPointZ(nil, unitX, unitY) + unitFlyHeight + data.heightOffset
-            japi.EXSetEffectXY(effect, unitX, unitY)
-            japi.EXSetEffectZ(effect, z)
+            ::__continue14::
+            i = i + 1
         end
-        ::__continue7::
     end
     if boundEffects.size == 0 and _isRegistered then
         offTick10ms(updateBoundEffects)
@@ -126,7 +152,12 @@ function ____exports.createBoundEffect(unit, modelPath, options)
         facing = facing,
         animSpeed = animSpeed
     }
-    boundEffects:set(effect, data)
+    local effectId = getEffectId(effect)
+    if effectId == 0 then
+        destroyEffect(effect)
+        return nil
+    end
+    boundEffects:set(effectId, data)
     unitToEffectMap:set(unitId, effect)
     ensureRegistered()
     return effect
@@ -167,15 +198,22 @@ function ____exports.setEffectAnimSpeed(effect, speed)
         return
     end
     japi.EXSetEffectSpeed(effect, speed)
-    local data = boundEffects:get(effect)
+    local data = boundEffects:get(getEffectId(effect))
     if data then
         data.animSpeed = speed
     end
 end
 function ____exports.clearAllBoundEffects()
-    for ____, ____value in __TS__Iterator(boundEffects) do
-        local effect = ____value[1]
-        destroyEffect(effect)
+    local effectIds = getSortedBoundEffectIds()
+    do
+        local i = 0
+        while i < #effectIds do
+            local data = boundEffects:get(effectIds[i + 1])
+            if data then
+                destroyEffect(data.effect)
+            end
+            i = i + 1
+        end
     end
     boundEffects:clear()
     unitToEffectMap:clear()

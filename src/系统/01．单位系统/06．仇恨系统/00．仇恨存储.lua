@@ -1,10 +1,10 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__Delete = ____lualib.__TS__Delete
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local nowMs, _nowMs
 function nowMs()
@@ -34,6 +34,20 @@ local function _____53D6_5355_4F4DID(u)
         return 0
     end
     return GetHandleId(u) or 0
+end
+local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+local function _____83B7_53D6_6709_5E8F_654C_4EBAID_5217_8868()
+    local result = {}
+    for key in pairs(threatTables) do
+        local id = __TS__ParseInt(key, 10)
+        if not __TS__NumberIsNaN(__TS__Number(id)) then
+            result[#result + 1] = id
+        end
+    end
+    __TS__ArraySort(result, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return result
 end
 local ______6E05_9664_5F53_524D_76EE_6807 = nil
 local function _____9650_5236_4EC7_6068_503C(value)
@@ -316,13 +330,13 @@ function ____exports.getHighestThreat(_____654C_4EBA, filter)
         while i < #list do
             do
                 if filter ~= nil and not filter(list[i + 1]) then
-                    goto __continue76
+                    goto __continue81
                 end
                 if best == nil or list[i + 1].threat > best.threat then
                     best = list[i + 1]
                 end
             end
-            ::__continue76::
+            ::__continue81::
             i = i + 1
         end
     end
@@ -419,19 +433,7 @@ function ____exports.getEnemyThreats(_____654C_4EBA)
 end
 --- 获取所有有仇恨记录的敌人 ID（稳定数组）
 function ____exports.getAllTrackedEnemyIds()
-    local keys = __TS__ObjectKeys(threatTables)
-    local result = {}
-    do
-        local i = 0
-        while i < #keys do
-            local id = __TS__ParseInt(keys[i + 1], 10)
-            if not __TS__NumberIsNaN(__TS__Number(id)) then
-                result[#result + 1] = id
-            end
-            i = i + 1
-        end
-    end
-    return result
+    return _____83B7_53D6_6709_5E8F_654C_4EBAID_5217_8868()
 end
 --- 按 ID 取敌人仇恨表是否还有记录（驱动层用）
 function ____exports.hasThreatTable(_____654C_4EBAID)

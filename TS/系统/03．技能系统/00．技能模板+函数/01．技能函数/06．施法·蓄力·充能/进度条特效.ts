@@ -63,13 +63,22 @@ interface 进度条特效数据 {
   高度偏移: number;
 }
 
-const 进度条映射 = new Map<any, 进度条特效数据>();
+const 进度条映射 = new Map<number, 进度条特效数据>();
 const 单位进度条映射 = new Map<number, any>();
 let 已注册计时器 = false;
 
 function 取句柄ID(h: any): number {
   if (h == null || h === 0) return 0;
   return GetHandleId(h);
+}
+
+function 获取有序进度条单位ID列表(): number[] {
+  const ids: number[] = [];
+  for (const id of 进度条映射.keys()) {
+    ids.push(id);
+  }
+  ids.sort((a, b) => a - b);
+  return ids;
 }
 
 function 单位存活(u: any): boolean {
@@ -99,7 +108,11 @@ function 立即移除进度条单位(进度条单位: any): void {
 }
 
 function 更新所有进度条位置(): void {
-  for (const [进度条单位, 数据] of 进度条映射) {
+  const 进度条单位ID列表 = 获取有序进度条单位ID列表();
+  for (let i = 0; i < 进度条单位ID列表.length; i++) {
+    const 数据 = 进度条映射.get(进度条单位ID列表[i]);
+    if (数据 == null) continue;
+    const 进度条单位 = 数据.进度条单位;
     if (!单位存活(数据.跟随单位) || !单位存活(进度条单位)) {
       移除进度条特效(进度条单位);
       continue;
@@ -122,12 +135,13 @@ function 确保注册计时器(): void {
 function 移除进度条特效(进度条单位: any): void {
   if (进度条单位 == null || 进度条单位 === 0) return;
 
-  const 数据 = 进度条映射.get(进度条单位);
+  const 进度条单位ID = 取句柄ID(进度条单位);
+  const 数据 = 进度条映射.get(进度条单位ID);
   if (数据 != null) {
     单位进度条映射.delete(数据.跟随单位ID);
   }
 
-  进度条映射.delete(进度条单位);
+  进度条映射.delete(进度条单位ID);
   立即移除进度条单位(进度条单位);
 }
 
@@ -176,7 +190,7 @@ export function 创建进度条特效(单位: any, 选项?: 进度条特效选�
     高度偏移,
   };
 
-  进度条映射.set(进度条单位, 数据);
+  进度条映射.set(取句柄ID(进度条单位), 数据);
   单位进度条映射.set(单位ID, 进度条单位);
   确保注册计时器();
 
@@ -215,8 +229,12 @@ export function 获取单位进度条特效(单位: any): any {
 }
 
 export function 清除所有进度条特效(): void {
-  for (const [进度条单位] of 进度条映射) {
-    立即移除进度条单位(进度条单位);
+  const 进度条单位ID列表 = 获取有序进度条单位ID列表();
+  for (let i = 0; i < 进度条单位ID列表.length; i++) {
+    const 数据 = 进度条映射.get(进度条单位ID列表[i]);
+    if (数据 != null) {
+      立即移除进度条单位(数据.进度条单位);
+    }
   }
   进度条映射.clear();
   单位进度条映射.clear();

@@ -57,12 +57,24 @@ const dotBatchMarkQueue: boolean[] = [];
 export function markNextPendingDamageAsDotTickBatch(): void {
   dotBatchMarkQueue.push(true);
 }
+
+const GetFilterUnit = (jass as any)["GetFilterUnit"] as (this: void) => any;
+const GetUnitAbilityLevel = (jass as any)["GetUnitAbilityLevel"] as (this: void, unit: any, abilityId: number) => number;
+const CreateTrigger = (jass as any)["CreateTrigger"] as (this: void) => any;
+const CreateRegion = (jass as any)["CreateRegion"] as (this: void) => any;
+const CreateGroup = (jass as any)["CreateGroup"] as (this: void) => any;
+const GetWorldBounds = (jass as any)["GetWorldBounds"] as (this: void) => any;
+const RegionAddRect = (jass as any)["RegionAddRect"] as (this: void, whichRegion: any, r: any) => void;
+/** 这里只修 JASS Condition / 枚举链的调用形态，避免匿名回调和 self 漂移；本文件其他生成物首参问题若已有别处兼容，勿顺手扩修。 */
+const Condition = (jass as any)["Condition"] as (this: void, func: (this: void) => boolean) => any;
+const TriggerRegisterEnterRegion = (jass as any)["TriggerRegisterEnterRegion"] as (this: void, whichTrigger: any, region: any, filter: any) => any;
+const GroupEnumUnitsInRect = (jass as any)["GroupEnumUnitsInRect"] as (this: void, whichGroup: any, r: any, filter: any) => void;
 /** 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致 */
 function getUnitTypeHero(): any {
   return (jass as any).UNIT_TYPE_HERO ?? (jass as any).ConvertUnitType(2);
 }
 
-function onUnitDeathForDamage(dyingUnit: any): void {
+function onUnitDeathForDamage(this: void, dyingUnit: any): void {
   if (!UnitGroup || !dyingUnit) return;
   if (isHeroUnit(dyingUnit)) return;
   (jass as any).GroupRemoveUnit(UnitGroup, dyingUnit);
@@ -70,7 +82,7 @@ function onUnitDeathForDamage(dyingUnit: any): void {
 }
 
 
-function onAnyUnitDamagedAction(): void {
+function onAnyUnitDamagedAction(this: void): void {
   const j = jass as any;
   const savedUnit = (jass as any).GetTriggerUnit();
   let savedDamage = (jass as any).GetEventDamage();
@@ -170,13 +182,18 @@ function processDamageEntry(entry: any): void {
   }
 }
 
-function anyUnitDamagedFilter(): boolean {
-  const u = (jass as any).GetFilterUnit();
+function anyUnitDamagedFilter(this: void): boolean {
+  const u = GetFilterUnit();
   if (!u) return false;
-  const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
+  const lvl = GetUnitAbilityLevel(u, ALOC);
   if (lvl > 0) return false;
   registerDamageUnit(u);
   return false;
+}
+
+/** 用于 GroupEnumUnitsInRect：枚举时无条件收集单位，必须是模块级具名函数，不能传匿名闭包进 JASS Condition。 */
+function alwaysCollectUnitFilter(this: void): boolean {
+  return true;
 }
 
 function unitHidKey(unit: any): string {
@@ -220,15 +237,14 @@ function unregisterDamageUnit(unit: any): void {
 }
 
 function initEnumUnit(): void {
-  const t = (jass as any).CreateTrigger();
-  const r = (jass as any).CreateRegion();
-  const grp = (jass as any).CreateGroup();
-  const bounds = (jass as any).GetWorldBounds();
+  const t = CreateTrigger();
+  const r = CreateRegion();
+  const grp = CreateGroup();
+  const bounds = GetWorldBounds();
 
-  if (bounds) (jass as any).RegionAddRect(r, bounds);
-  (jass as any).TriggerRegisterEnterRegion(t, r, (jass as any).Condition(anyUnitDamagedFilter));
-  const alwaysTrue = (): boolean => true;
-  (jass as any).GroupEnumUnitsInRect(grp, bounds, (jass as any).Condition(alwaysTrue));
+  if (bounds) RegionAddRect(r, bounds);
+  TriggerRegisterEnterRegion(t, r, Condition(anyUnitDamagedFilter));
+  GroupEnumUnitsInRect(grp, bounds, Condition(alwaysCollectUnitFilter));
   if (UnitGroup) {
         forEachUnitInGroup(grp, (u: any) => {
           if (!u) return;
@@ -263,7 +279,7 @@ function initDamageEventOnce(intervalSeconds?: number): void {
   DamageEventInitialized = true;
   UnitGroup = (jass as any).CreateGroup();
   initEnumUnit();
-  registerDeathListener(onUnitDeathForDamage);
+  registerDeathListener(onUnitDeathForDamage as unknown as (dyingUnit: any, killingUnit: any) => void);
   void intervalSeconds;
 }
 

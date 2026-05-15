@@ -89,6 +89,30 @@ export interface 区域效果实例 {
 
 // ─── 内部实现 ────────────────────────────────────────────
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取单位集合有序单位数组(单位集合: Record<number, any>): any[] {
+  const 单位ID列表: number[] = [];
+  for (const key in 单位集合) {
+    const 单位ID = parseInt(key, 10);
+    if (!isNaN(单位ID)) {
+      单位ID列表.push(单位ID);
+    }
+  }
+  单位ID列表.sort(数字升序排序);
+
+  const result: any[] = [];
+  for (let i = 0; i < 单位ID列表.length; i++) {
+    const 单位 = 单位集合[单位ID列表[i]];
+    if (单位 != null) {
+      result.push(单位);
+    }
+  }
+  return result;
+}
+
 class 区域效果实现 implements 区域效果实例 {
   readonly 参数: 区域效果参数;
   readonly 实例ID: number;
@@ -143,7 +167,7 @@ class 区域效果实现 implements 区域效果实例 {
   }
 
   get 当前区域内单位(): any[] {
-    return Object.values(this.当前单位集合);
+    return 获取单位集合有序单位数组(this.当前单位集合);
   }
 
   get 已暂停(): boolean {
@@ -213,22 +237,21 @@ class 区域效果实现 implements 区域效果实例 {
 
     this.当前单位集合 = 新集合;
 
-    const 当前单位数组 = Object.values(新集合);
+    const 当前单位数组 = 获取单位集合有序单位数组(新集合);
     if (this.参数.周期伤害 && this.参数.周期伤害 > 0 && ATTACK_TYPE_NORMAL) {
       const 去重组 = this.参数.周期伤害去重组 ?? 0;
       const 去重间隔毫秒 = (this.参数.周期伤害去重间隔 ?? this.检测间隔秒值) * 1000;
-      const 去重组记录 = 去重组 > 0
-        ? (区域效果周期伤害去重记录[去重组] ?? (区域效果周期伤害去重记录[去重组] = {}))
-        : null;
+      const 启用去重 = 去重组 > 0;
 
       for (const 单位 of 当前单位数组) {
-        if (去重组记录 != null) {
+        if (启用去重) {
           const 单位ID = GetHandleId(单位);
-          const 上次伤害时间 = 去重组记录[单位ID];
+          const 去重Key = make区域效果去重Key(去重组, 单位ID);
+          const 上次伤害时间 = 区域效果周期伤害去重记录[去重Key];
           if (上次伤害时间 != null && 当前时间 - 上次伤害时间 < 去重间隔毫秒) {
             continue;
           }
-          去重组记录[单位ID] = 当前时间;
+          区域效果周期伤害去重记录[去重Key] = 当前时间;
         }
 
         UnitDamageTarget(
@@ -308,7 +331,11 @@ class 区域效果实现 implements 区域效果实例 {
 let 区域效果实例ID计数器 = 0;
 let 区域效果系统回调ID = 0;
 const 活跃区域效果实例: 区域效果实现[] = [];
-const 区域效果周期伤害去重记录: Record<number, Record<number, number | undefined> | undefined> = {};
+const 区域效果周期伤害去重记录: Record<string, number | undefined> = {};
+
+function make区域效果去重Key(去重组: number, 单位ID: number): string {
+  return `${去重组}:${单位ID}`;
+}
 
 function 确保区域效果系统已启动(): void {
   if (区域效果系统回调ID !== 0) {
@@ -358,7 +385,12 @@ export function 清理区域效果周期伤害去重组(去重组ID: number): vo
   if (去重组ID <= 0) {
     return;
   }
-  delete 区域效果周期伤害去重记录[去重组ID];
+  const 前缀 = `${去重组ID}:`;
+  for (const key in 区域效果周期伤害去重记录) {
+    if (key.indexOf(前缀) === 0) {
+      delete 区域效果周期伤害去重记录[key];
+    }
+  }
 }
 
 export {};

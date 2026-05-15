@@ -1,13 +1,19 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ParseInt = ____lualib.__TS__ParseInt
+local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectValues = ____lualib.__TS__ObjectValues
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__New = ____lualib.__TS__New
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55
+local ____make_533A_57DF_6548_679C_53BB_91CDKey, _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55
+function ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
+    return (tostring(_____53BB_91CD_7EC4) .. ":") .. tostring(_____5355_4F4DID)
+end
 function _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8()
     if _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID ~= 0 then
         return
@@ -68,6 +74,31 @@ local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
 local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708 = ____require_result_3["创建渐变圆形提示圈"]
+local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+local function _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(_____5355_4F4D_96C6_5408)
+    local _____5355_4F4DID_5217_8868 = {}
+    for key in pairs(_____5355_4F4D_96C6_5408) do
+        local _____5355_4F4DID = __TS__ParseInt(key, 10)
+        if not __TS__NumberIsNaN(__TS__Number(_____5355_4F4DID)) then
+            _____5355_4F4DID_5217_8868[#_____5355_4F4DID_5217_8868 + 1] = _____5355_4F4DID
+        end
+    end
+    __TS__ArraySort(_____5355_4F4DID_5217_8868, _____6570_5B57_5347_5E8F_6392_5E8F)
+    local result = {}
+    do
+        local i = 0
+        while i < #_____5355_4F4DID_5217_8868 do
+            local _____5355_4F4D = _____5355_4F4D_96C6_5408[_____5355_4F4DID_5217_8868[i + 1]]
+            if _____5355_4F4D ~= nil then
+                result[#result + 1] = _____5355_4F4D
+            end
+            i = i + 1
+        end
+    end
+    return result
+end
 local _____533A_57DF_6548_679C_5B9E_73B0 = __TS__Class()
 _____533A_57DF_6548_679C_5B9E_73B0.name = "区域效果实现"
 function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
@@ -141,7 +172,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue15
+                goto __continue23
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
@@ -155,7 +186,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue15::
+        ::__continue23::
     end
     for hid in pairs(self["当前单位集合"]) do
         if not _____65B0_96C6_5408[hid] then
@@ -170,39 +201,28 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         end
     end
     self["当前单位集合"] = _____65B0_96C6_5408
-    local _____5F53_524D_5355_4F4D_6570_7EC4 = __TS__ObjectValues(_____65B0_96C6_5408)
+    local _____5F53_524D_5355_4F4D_6570_7EC4 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(_____65B0_96C6_5408)
     if self["参数"]["周期伤害"] and self["参数"]["周期伤害"] > 0 and ATTACK_TYPE_NORMAL then
         local _____53BB_91CD_7EC4 = self["参数"]["周期伤害去重组"] or 0
         local _____53BB_91CD_95F4_9694_6BEB_79D2 = (self["参数"]["周期伤害去重间隔"] or self["检测间隔秒值"]) * 1000
-        local ____temp_10
-        if _____53BB_91CD_7EC4 > 0 then
-            local ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CD_7EC4]
-            if ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 == nil then
-                local ____temp_8 = {}
-                _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CD_7EC4] = ____temp_8
-                ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9 = ____temp_8
-            end
-            ____temp_10 = ____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55______53BB_91CD_7EC4_9
-        else
-            ____temp_10 = nil
-        end
-        local _____53BB_91CD_7EC4_8BB0_5F55 = ____temp_10
+        local _____542F_7528_53BB_91CD = _____53BB_91CD_7EC4 > 0
         for ____, _____5355_4F4D in ipairs(_____5F53_524D_5355_4F4D_6570_7EC4) do
             do
-                if _____53BB_91CD_7EC4_8BB0_5F55 ~= nil then
+                if _____542F_7528_53BB_91CD then
                     local _____5355_4F4DID = GetHandleId(_____5355_4F4D)
-                    local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____53BB_91CD_7EC4_8BB0_5F55[_____5355_4F4DID]
+                    local _____53BB_91CDKey = ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
+                    local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey]
                     if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
-                        goto __continue25
+                        goto __continue33
                     end
-                    _____53BB_91CD_7EC4_8BB0_5F55[_____5355_4F4DID] = _____5F53_524D_65F6_95F4
+                    _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
-                local ____self__53C2_6570__6240_6709_8005_11 = self["参数"]["所有者"]
-                if ____self__53C2_6570__6240_6709_8005_11 == nil then
-                    ____self__53C2_6570__6240_6709_8005_11 = _____5355_4F4D
+                local ____self__53C2_6570__6240_6709_8005_8 = self["参数"]["所有者"]
+                if ____self__53C2_6570__6240_6709_8005_8 == nil then
+                    ____self__53C2_6570__6240_6709_8005_8 = _____5355_4F4D
                 end
                 UnitDamageTarget(
-                    ____self__53C2_6570__6240_6709_8005_11,
+                    ____self__53C2_6570__6240_6709_8005_8,
                     _____5355_4F4D,
                     self["参数"]["周期伤害"],
                     false,
@@ -212,12 +232,12 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     nil
                 )
             end
-            ::__continue25::
+            ::__continue33::
         end
     end
-    local ____opt_12 = self["参数"]["on周期"]
-    if ____opt_12 ~= nil then
-        ____opt_12(_____5F53_524D_5355_4F4D_6570_7EC4)
+    local ____opt_9 = self["参数"]["on周期"]
+    if ____opt_9 ~= nil then
+        ____opt_9(_____5F53_524D_5355_4F4D_6570_7EC4)
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -248,9 +268,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["提示圈特效"])
         self["提示圈特效"] = nil
     end
-    local ____opt_14 = self["参数"]["on销毁"]
-    if ____opt_14 ~= nil then
-        ____opt_14()
+    local ____opt_11 = self["参数"]["on销毁"]
+    if ____opt_11 ~= nil then
+        ____opt_11()
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -277,9 +297,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
     for hid in pairs(self["当前单位集合"]) do
         local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
         if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-            local ____opt_16 = self["参数"]["on离开"]
-            if ____opt_16 ~= nil then
-                ____opt_16(self["当前单位集合"][hid])
+            local ____opt_13 = self["参数"]["on离开"]
+            if ____opt_13 ~= nil then
+                ____opt_13(self["当前单位集合"][hid])
             end
         end
         self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -298,7 +318,7 @@ __TS__SetDescriptor(
     _____533A_57DF_6548_679C_5B9E_73B0.prototype,
     "当前区域内单位",
     {get = function(self)
-        return __TS__ObjectValues(self["当前单位集合"])
+        return _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(self["当前单位集合"])
     end},
     true
 )
@@ -321,6 +341,11 @@ ____exports["清理区域效果周期伤害去重组"] = function(_____53BB_91CD
     if _____53BB_91CD_7EC4ID <= 0 then
         return
     end
-    __TS__Delete(_____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55, _____53BB_91CD_7EC4ID)
+    local _____524D_7F00 = tostring(_____53BB_91CD_7EC4ID) .. ":"
+    for key in pairs(_____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55) do
+        if (string.find(key, _____524D_7F00, nil, true) or 0) - 1 == 0 then
+            __TS__Delete(_____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55, key)
+        end
+    end
 end
 return ____exports

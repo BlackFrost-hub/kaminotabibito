@@ -1,6 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local Map = ____lualib.Map
-local __TS__Iterator = ____lualib.__TS__Iterator
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_6838_5FC3_7EDF_8BA1 = require("lib.扩展函数.封装函数.05．泄露审计.01．核心统计")
 local alive = ____01_FF0E_6838_5FC3_7EDF_8BA1.alive
@@ -34,13 +32,12 @@ function ____exports.dump(self, tagFilter)
     end
     if tagFilter then
         printLine(nil, ("--- 详情 tag=" .. tagFilter) .. " ---")
-        for ____, ____value in __TS__Iterator(alive) do
-            local handle = ____value[1]
-            local info = ____value[2]
-            if info.tag == tagFilter then
+        for key in pairs(alive) do
+            local info = alive[key]
+            if info ~= nil and info.tag == tagFilter then
                 printLine(
                     nil,
-                    ((((((info.type .. "#") .. tostring(info.createdIndex)) .. " (") .. info.tag) .. ") [") .. tostring(handle)) .. "]"
+                    ((((((info.type .. "#") .. tostring(info.createdIndex)) .. " (") .. info.tag) .. ") [") .. info.handleText) .. "]"
                 )
             end
         end

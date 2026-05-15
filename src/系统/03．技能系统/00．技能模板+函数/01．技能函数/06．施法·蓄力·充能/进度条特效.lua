@@ -2,8 +2,15 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
-local _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D, _____79FB_9664_8FDB_5EA6_6761_7279_6548, RemoveUnit, GetUnitTypeId, _____8FDB_5EA6_6761_6620_5C04, _____5355_4F4D_8FDB_5EA6_6761_6620_5C04
+local _____53D6_53E5_67C4ID, _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D, _____79FB_9664_8FDB_5EA6_6761_7279_6548, GetHandleId, RemoveUnit, GetUnitTypeId, _____8FDB_5EA6_6761_6620_5C04, _____5355_4F4D_8FDB_5EA6_6761_6620_5C04
+function _____53D6_53E5_67C4ID(h)
+    if h == nil or h == 0 then
+        return 0
+    end
+    return GetHandleId(h)
+end
 function _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D(_____8FDB_5EA6_6761_5355_4F4D)
     if _____8FDB_5EA6_6761_5355_4F4D == nil or _____8FDB_5EA6_6761_5355_4F4D == 0 then
         return
@@ -17,11 +24,12 @@ function _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____8FDB_5EA6_6761_5355_4F4D)
     if _____8FDB_5EA6_6761_5355_4F4D == nil or _____8FDB_5EA6_6761_5355_4F4D == 0 then
         return
     end
-    local _____6570_636E = _____8FDB_5EA6_6761_6620_5C04:get(_____8FDB_5EA6_6761_5355_4F4D)
+    local _____8FDB_5EA6_6761_5355_4F4DID = _____53D6_53E5_67C4ID(_____8FDB_5EA6_6761_5355_4F4D)
+    local _____6570_636E = _____8FDB_5EA6_6761_6620_5C04:get(_____8FDB_5EA6_6761_5355_4F4DID)
     if _____6570_636E ~= nil then
         _____5355_4F4D_8FDB_5EA6_6761_6620_5C04:delete(_____6570_636E["跟随单位ID"])
     end
-    _____8FDB_5EA6_6761_6620_5C04:delete(_____8FDB_5EA6_6761_5355_4F4D)
+    _____8FDB_5EA6_6761_6620_5C04:delete(_____8FDB_5EA6_6761_5355_4F4DID)
     _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D(_____8FDB_5EA6_6761_5355_4F4D)
 end
 --- 进度条特效模块（施法进度条）
@@ -46,7 +54,7 @@ local DEFAULT_SCALE = 1
 local DEFAULT_ANIM_INDEX = 0
 local DEFAULT_COLOR_RGBA = {r = 255, g = 255, b = 0, a = 255}
 local UNIT_ALIVE_LIFE = 0.405
-local GetHandleId = jass.GetHandleId
+GetHandleId = jass.GetHandleId
 local Player = jass.Player
 local CreateUnit = jass.CreateUnit
 RemoveUnit = jass.RemoveUnit
@@ -66,11 +74,16 @@ local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 _____8FDB_5EA6_6761_6620_5C04 = __TS__New(Map)
 _____5355_4F4D_8FDB_5EA6_6761_6620_5C04 = __TS__New(Map)
 local _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
-local function _____53D6_53E5_67C4ID(h)
-    if h == nil or h == 0 then
-        return 0
+local function _____83B7_53D6_6709_5E8F_8FDB_5EA6_6761_5355_4F4DID_5217_8868()
+    local ids = {}
+    for ____, id in __TS__Iterator(_____8FDB_5EA6_6761_6620_5C04:keys()) do
+        ids[#ids + 1] = id
     end
-    return GetHandleId(h)
+    __TS__ArraySort(
+        ids,
+        function(____, a, b) return a - b end
+    )
+    return ids
 end
 local function _____5355_4F4D_5B58_6D3B(u)
     if u == nil or u == 0 then
@@ -112,17 +125,25 @@ local function _____8BBE_7F6E_8FDB_5EA6_6761_4F4D_7F6E(_____8FDB_5EA6_6761_5355_
     )
 end
 local function _____66F4_65B0_6240_6709_8FDB_5EA6_6761_4F4D_7F6E()
-    for ____, ____value in __TS__Iterator(_____8FDB_5EA6_6761_6620_5C04) do
-        local _____8FDB_5EA6_6761_5355_4F4D = ____value[1]
-        local _____6570_636E = ____value[2]
-        do
-            if not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) or not _____5355_4F4D_5B58_6D3B(_____8FDB_5EA6_6761_5355_4F4D) then
-                _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____8FDB_5EA6_6761_5355_4F4D)
-                goto __continue17
+    local _____8FDB_5EA6_6761_5355_4F4DID_5217_8868 = _____83B7_53D6_6709_5E8F_8FDB_5EA6_6761_5355_4F4DID_5217_8868()
+    do
+        local i = 0
+        while i < #_____8FDB_5EA6_6761_5355_4F4DID_5217_8868 do
+            do
+                local _____6570_636E = _____8FDB_5EA6_6761_6620_5C04:get(_____8FDB_5EA6_6761_5355_4F4DID_5217_8868[i + 1])
+                if _____6570_636E == nil then
+                    goto __continue22
+                end
+                local _____8FDB_5EA6_6761_5355_4F4D = _____6570_636E["进度条单位"]
+                if not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) or not _____5355_4F4D_5B58_6D3B(_____8FDB_5EA6_6761_5355_4F4D) then
+                    _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____8FDB_5EA6_6761_5355_4F4D)
+                    goto __continue22
+                end
+                _____8BBE_7F6E_8FDB_5EA6_6761_4F4D_7F6E(_____8FDB_5EA6_6761_5355_4F4D, _____6570_636E["跟随单位"], _____6570_636E["高度偏移"])
             end
-            _____8BBE_7F6E_8FDB_5EA6_6761_4F4D_7F6E(_____8FDB_5EA6_6761_5355_4F4D, _____6570_636E["跟随单位"], _____6570_636E["高度偏移"])
+            ::__continue22::
+            i = i + 1
         end
-        ::__continue17::
     end
     if _____8FDB_5EA6_6761_6620_5C04.size == 0 and _____5DF2_6CE8_518C_8BA1_65F6_5668 then
         _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
@@ -182,7 +203,10 @@ ____exports["创建进度条特效"] = function(_____5355_4F4D, _____9009_9879)
     )
     _____8BBE_7F6E_8FDB_5EA6_6761_4F4D_7F6E(_____8FDB_5EA6_6761_5355_4F4D, _____5355_4F4D, _____9AD8_5EA6_504F_79FB)
     local _____6570_636E = {["进度条单位"] = _____8FDB_5EA6_6761_5355_4F4D, ["跟随单位"] = _____5355_4F4D, ["跟随单位ID"] = _____5355_4F4DID, ["高度偏移"] = _____9AD8_5EA6_504F_79FB}
-    _____8FDB_5EA6_6761_6620_5C04:set(_____8FDB_5EA6_6761_5355_4F4D, _____6570_636E)
+    _____8FDB_5EA6_6761_6620_5C04:set(
+        _____53D6_53E5_67C4ID(_____8FDB_5EA6_6761_5355_4F4D),
+        _____6570_636E
+    )
     _____5355_4F4D_8FDB_5EA6_6761_6620_5C04:set(_____5355_4F4DID, _____8FDB_5EA6_6761_5355_4F4D)
     _____786E_4FDD_6CE8_518C_8BA1_65F6_5668()
     debugLogForce(
@@ -228,9 +252,16 @@ ____exports["获取单位进度条特效"] = function(_____5355_4F4D)
     return _____5355_4F4D_8FDB_5EA6_6761_6620_5C04:get(_____53D6_53E5_67C4ID(_____5355_4F4D))
 end
 ____exports["清除所有进度条特效"] = function()
-    for ____, ____value in __TS__Iterator(_____8FDB_5EA6_6761_6620_5C04) do
-        local _____8FDB_5EA6_6761_5355_4F4D = ____value[1]
-        _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D(_____8FDB_5EA6_6761_5355_4F4D)
+    local _____8FDB_5EA6_6761_5355_4F4DID_5217_8868 = _____83B7_53D6_6709_5E8F_8FDB_5EA6_6761_5355_4F4DID_5217_8868()
+    do
+        local i = 0
+        while i < #_____8FDB_5EA6_6761_5355_4F4DID_5217_8868 do
+            local _____6570_636E = _____8FDB_5EA6_6761_6620_5C04:get(_____8FDB_5EA6_6761_5355_4F4DID_5217_8868[i + 1])
+            if _____6570_636E ~= nil then
+                _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D(_____6570_636E["进度条单位"])
+            end
+            i = i + 1
+        end
     end
     _____8FDB_5EA6_6761_6620_5C04:clear()
     _____5355_4F4D_8FDB_5EA6_6761_6620_5C04:clear()

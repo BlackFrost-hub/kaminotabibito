@@ -58,17 +58,23 @@ type ResultOpt = { prob?: number; itemId: number; qty: number };
 type RecipeParsed = { cookSec: number; timeoutSec: number; results: ResultOpt[] };
 
 type ItemState = {
+  item: any;
   campfire: any;
   stage: "raw" | "done";
   cookTimer?: any;
   burnTimer?: any;
 };
 
-const itemState = new Map<any, ItemState>();          // item -> state
-const campfireItems = new Map<any, Set<any>>();       // campfire -> items
+const itemState = new Map<number, ItemState>();       // itemHandleId -> state
+const campfireItems = new Map<number, Set<number>>(); // campfireHandleId -> itemHandleId 集合
 
 const burnTimerCtxByHid: Record<number, { item: any; campfire: any }> = {};
 const cookTimerCtxByHid: Record<number, { item: any; campfire: any; timeoutSec: number; results: ResultOpt[] }> = {};
+
+function getHandleIdSafe(handle: any): number {
+  if (!handle) return 0;
+  return ((jass as any).GetHandleId(handle) as number) || 0;
+}
 
 function onBurnTimerExpire(this: void): void {
   const t = (jass as any).GetExpiredTimer();
@@ -78,7 +84,8 @@ function onBurnTimerExpire(this: void): void {
   delete burnTimerCtxByHid[hid];
   if (!ctx) return;
   const { item, campfire } = ctx;
-  if (!itemState.has(item)) return;
+  const itemId = getHandleIdSafe(item);
+  if (itemId === 0 || !itemState.has(itemId)) return;
   const name = getItemNameSafe(item);
   floatBurnText(campfire, name);
   (jass as any).RemoveItem(item);
@@ -94,7 +101,8 @@ function onCookTimerExpire(this: void): void {
   delete cookTimerCtxByHid[hid];
   if (!ctx) return;
   const { item, campfire, timeoutSec, results } = ctx;
-  if (!itemState.has(item)) return;
+  const itemId = getHandleIdSafe(item);
+  if (itemId === 0 || !itemState.has(itemId)) return;
   // 加工完成：替换物品
   playFinishEffect(campfire);
 
@@ -124,10 +132,14 @@ function onCookTimerExpire(this: void): void {
       // 若 roll<=20，就留在地上（不计入篝火超时烤焦）
     } else {
       // 在篝火内：开始超时烤焦
-      itemState.set(it, { campfire, stage: "done" });
-      let set = campfireItems.get(campfire);
-      if (!set) { set = new Set<any>(); campfireItems.set(campfire, set); }
-      set.add(it);
+      const itemId = getHandleIdSafe(it);
+      const campfireId = getHandleIdSafe(campfire);
+      if (itemId !== 0 && campfireId !== 0) {
+        itemState.set(itemId, { item: it, campfire, stage: "done" });
+        let set = campfireItems.get(campfireId);
+        if (!set) { set = new Set<number>(); campfireItems.set(campfireId, set); }
+        set.add(itemId);
+      }
       if (timeout > 0) startBurnTimer(it, campfire, timeout);
     }
     // 这次创建的 item 已承载 remaining（charges），认为全部产出已处理
@@ -289,21 +301,24 @@ function stopAndDestroyTimer(t: any): void {
 }
 
 function untrackItem(item: any): void {
-  const st = itemState.get(item);
+  const itemId = getHandleIdSafe(item);
+  if (itemId === 0) return;
+  const st = itemState.get(itemId);
   if (!st) return;
   if (st.cookTimer) stopAndDestroyTimer(st.cookTimer);
   if (st.burnTimer) stopAndDestroyTimer(st.burnTimer);
-  itemState.delete(item);
+  itemState.delete(itemId);
 
-  const set = campfireItems.get(st.campfire);
+  const campfireId = getHandleIdSafe(st.campfire);
+  const set = campfireItems.get(campfireId);
   if (set) {
-    set.delete(item);
-    if (set.size === 0) campfireItems.delete(st.campfire);
+    set.delete(itemId);
+    if (set.size === 0) campfireItems.delete(campfireId);
   }
 }
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
-  const st = itemState.get(item);
+  const st = itemState.get(getHandleIdSafe(item));
   const t = (jass as any).CreateTimer();
   if (!t) return;
   burnTimerCtxByHid[(jass as any).GetHandleId(t) as number] = { item, campfire };
@@ -314,7 +329,7 @@ function startBurnTimer(item: any, campfire: any, sec: number): void {
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
   const t = (jass as any).CreateTimer();
   if (!t) return;
-  const st = itemState.get(item);
+  const st = itemState.get(getHandleIdSafe(item));
   if (st) st.cookTimer = t;
   cookTimerCtxByHid[(jass as any).GetHandleId(t) as number] = {
     item,
@@ -332,21 +347,25 @@ function onAnyPickup(): void {
 
   // 取回：其他单位拾取了处于追踪中的 item
   if (!isCampfire(u)) {
-    if (itemState.has(item)) {
+    const itemId = getHandleIdSafe(item);
+    if (itemId !== 0 && itemState.has(itemId)) {
       untrackItem(item);
     }
     return;
   }
 
   // 放入篝火
-  if (itemState.has(item)) return;
+  const itemId = getHandleIdSafe(item);
+  const campfireId = getHandleIdSafe(u);
+  if (itemId === 0 || campfireId === 0) return;
+  if (itemState.has(itemId)) return;
 
   const recipe = getRecipeForItem(item);
   const campfire = u;
-  itemState.set(item, { campfire, stage: "raw" });
-  let set = campfireItems.get(campfire);
-  if (!set) { set = new Set<any>(); campfireItems.set(campfire, set); }
-  set.add(item);
+  itemState.set(itemId, { item, campfire, stage: "raw" });
+  let set = campfireItems.get(campfireId);
+  if (!set) { set = new Set<number>(); campfireItems.set(campfireId, set); }
+  set.add(itemId);
 
   if (!recipe) {
     // 无 recipe：15 秒烤焦倒计时
@@ -359,12 +378,17 @@ function onAnyPickup(): void {
 
 function onCampfireDeath(this: void, dyingUnit: any): void {
   if (!dyingUnit || !isCampfire(dyingUnit)) return;
-  const set = campfireItems.get(dyingUnit);
+  const campfireId = getHandleIdSafe(dyingUnit);
+  const set = campfireItems.get(campfireId);
   if (!set) return;
-  for (const it of set) {
-    untrackItem(it);
+  const itemIds = Array.from(set.values());
+  for (let i = 0; i < itemIds.length; i++) {
+    const st = itemState.get(itemIds[i]);
+    if (st) {
+      untrackItem(st.item);
+    }
   }
-  campfireItems.delete(dyingUnit);
+  campfireItems.delete(campfireId);
 }
 
 export function init物品加工(): void {
@@ -374,7 +398,8 @@ export function init物品加工(): void {
   });
 
   itemEventCenter.onItemDrop((unit, item) => {
-    if (unit && item && isCampfire(unit) && itemState.has(item)) {
+    const itemId = getHandleIdSafe(item);
+    if (unit && item && isCampfire(unit) && itemId !== 0 && itemState.has(itemId)) {
       untrackItem(item);
     }
   });

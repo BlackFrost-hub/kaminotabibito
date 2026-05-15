@@ -13,9 +13,10 @@ export interface LeakInfo {
   type: LeakType;
   tag: string;
   createdIndex: number;
+  handleText: string;
 }
 
-export const alive = new Map<any, LeakInfo>();
+export const alive: Record<string, LeakInfo | undefined> = {};
 export const types: LeakType[] = ["timer", "group", "trigger", "effect", "rect", "sound", "texttag"];
 
 export const stats: Record<LeakType, { created: number; destroyed: number }> = {
@@ -29,15 +30,15 @@ export const stats: Record<LeakType, { created: number; destroyed: number }> = {
 };
 
 /**
- * Lua 里同一句柄可能以不同引用传入；用 leakType+GetHandleId 作键，避免 delete 对不上导致假 alive。
+ * Lua 里同一句柄可能以不同引用传入；用 leakType+稳定字符串 作键，避免 delete 对不上导致假 alive。
  * 禁止 `local j=jass; j.GetHandleId(h)`：TSTL 会编成 `j:GetHandleId(h)`，self 传成 jass 表会崩 → 只用 `(jass as any).GetHandleId(h)`。
- * CreateSound 等若返回 table 包装，GetHandleId 会报错 → 用 table 引用当 key（track/untrack 同一对象即可）。
+ * CreateSound 等若返回 table 包装，GetHandleId 会报错 → 退回 tostring(handle) 作为稳定调试键。
  * 用 TS 的 typeof：Lua 里 table→__TS__TypeOf 为 "object"，userdata 为 "userdata"，不会误判。
  */
-export function leakKey(leakType: LeakType, handle: any): any {
-  if (handle == null) return handle;
+export function leakKey(leakType: LeakType, handle: any): string {
+  if (handle == null) return `${leakType}:nil`;
   if (typeof handle === "object" && handle !== null) {
-    return handle;
+    return `${leakType}:obj:${tostring(handle)}`;
   }
   return `${leakType}:${(jass as any).GetHandleId(handle)}`;
 }
@@ -46,13 +47,15 @@ export function track(type: LeakType, handle: any, tag: string): void {
   if (!handle) return;
   const s = stats[type];
   s.created++;
-  alive.set(leakKey(type, handle), { type, tag, createdIndex: s.created });
+  alive[leakKey(type, handle)] = { type, tag, createdIndex: s.created, handleText: tostring(handle) };
 }
 
 export function untrack(type: LeakType, handle: any): void {
   if (!handle) return;
   const s = stats[type];
-  if (alive.delete(leakKey(type, handle))) {
+  const key = leakKey(type, handle);
+  if (alive[key] != null) {
+    delete alive[key];
     s.destroyed++;
   }
 }

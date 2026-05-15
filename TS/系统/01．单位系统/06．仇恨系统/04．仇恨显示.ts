@@ -49,6 +49,22 @@ function 取单位ID(u: any): number {
   return GetHandleId(u) || 0;
 }
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取有序仇恨显示敌人ID列表(): number[] {
+  const result: number[] = [];
+  for (const key in 仇恨显示表) {
+    const id = parseInt(key, 10);
+    if (!isNaN(id)) {
+      result.push(id);
+    }
+  }
+  result.sort(数字升序排序);
+  return result;
+}
+
 function 格式化仇恨值(仇恨值: number): string {
   const 十倍整数 = R2I(仇恨值 * 10 + 0.5);
   const 整数部分 = R2I(十倍整数 / 10);
@@ -103,11 +119,10 @@ function on仇恨显示单位死亡(this: void, dyingUnit: any, _killingUnit: an
 }
 
 function on仇恨显示Tick(): void {
-  const keys = Object.keys(仇恨显示表);
+  const 敌人ID列表 = 获取有序仇恨显示敌人ID列表();
   let 仍有显示 = false;
-  for (let i = 0; i < keys.length; i++) {
-    const 敌人ID = parseInt(keys[i], 10);
-    if (isNaN(敌人ID)) continue;
+  for (let i = 0; i < 敌人ID列表.length; i++) {
+    const 敌人ID = 敌人ID列表[i];
     const 数据 = 仇恨显示表[敌人ID];
     if (数据 == null || 数据.textTag == null || 数据.跟随单位 == null || 数据.跟随单位 === 0) {
       清除仇恨显示ById(敌人ID);
@@ -172,12 +187,9 @@ export function 清除仇恨显示ById(敌人ID: number): void {
 }
 
 export function 清除所有仇恨显示(): void {
-  const keys = Object.keys(仇恨显示表);
-  for (let i = 0; i < keys.length; i++) {
-    const 敌人ID = parseInt(keys[i], 10);
-    if (!isNaN(敌人ID)) {
-      清除仇恨显示ById(敌人ID);
-    }
+  const 敌人ID列表 = 获取有序仇恨显示敌人ID列表();
+  for (let i = 0; i < 敌人ID列表.length; i++) {
+    清除仇恨显示ById(敌人ID列表[i]);
   }
   if (跟随回调ID !== 0) {
     const { removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {

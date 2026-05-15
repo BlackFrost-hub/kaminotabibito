@@ -1,10 +1,10 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue
+local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
 function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
 end
-function onUnitDeathForDamage(self, dyingUnit)
+function onUnitDeathForDamage(dyingUnit)
     if not UnitGroup or not dyingUnit then
         return
     end
@@ -14,7 +14,7 @@ function onUnitDeathForDamage(self, dyingUnit)
     jass.GroupRemoveUnit(UnitGroup, dyingUnit)
     unregisterDamageUnit(nil, dyingUnit)
 end
-function onAnyUnitDamagedAction(self)
+function onAnyUnitDamagedAction()
     local j = jass
     local savedUnit = jass.GetTriggerUnit()
     local savedDamage = jass.GetEventDamage()
@@ -150,17 +150,20 @@ function processDamageEntry(self, entry)
         )
     end
 end
-function anyUnitDamagedFilter(self)
-    local u = jass.GetFilterUnit()
+function anyUnitDamagedFilter()
+    local u = GetFilterUnit()
     if not u then
         return false
     end
-    local lvl = jass.GetUnitAbilityLevel(u, ALOC)
+    local lvl = GetUnitAbilityLevel(u, ALOC)
     if lvl > 0 then
         return false
     end
     registerDamageUnit(nil, u)
     return false
+end
+function alwaysCollectUnitFilter()
+    return true
 end
 function unitHidKey(self, unit)
     return tostring(jass.GetHandleId(unit)
@@ -208,25 +211,22 @@ function unregisterDamageUnit(self, unit)
     DamageTriggerActionByUnitHid[hid] = nil
 end
 function initEnumUnit(self)
-    local t = jass.CreateTrigger()
-    local r = jass.CreateRegion()
-    local grp = jass.CreateGroup()
-    local bounds = jass.GetWorldBounds()
+    local t = CreateTrigger()
+    local r = CreateRegion()
+    local grp = CreateGroup()
+    local bounds = GetWorldBounds()
     if bounds then
-        jass.RegionAddRect(r, bounds)
+        RegionAddRect(r, bounds)
     end
-    jass.TriggerRegisterEnterRegion(
+    TriggerRegisterEnterRegion(
         t,
         r,
-        jass.Condition(anyUnitDamagedFilter)
+        Condition(anyUnitDamagedFilter)
     )
-    local function alwaysTrue()
-        return true
-    end
-    jass.GroupEnumUnitsInRect(
+    GroupEnumUnitsInRect(
         grp,
         bounds,
-        jass.Condition(alwaysTrue)
+        Condition(alwaysCollectUnitFilter)
     )
     if UnitGroup then
         forEachUnitInGroup(
@@ -281,6 +281,16 @@ dotBatchMarkQueue = {}
 function ____exports.markNextPendingDamageAsDotTickBatch(self)
     dotBatchMarkQueue[#dotBatchMarkQueue + 1] = true
 end
+GetFilterUnit = jass.GetFilterUnit
+GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+CreateTrigger = jass.CreateTrigger
+CreateRegion = jass.CreateRegion
+CreateGroup = jass.CreateGroup
+GetWorldBounds = jass.GetWorldBounds
+RegionAddRect = jass.RegionAddRect
+Condition = jass.Condition
+TriggerRegisterEnterRegion = jass.TriggerRegisterEnterRegion
+GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 --- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致
 local function getUnitTypeHero(self)
     local ____jass_UNIT_TYPE_HERO_2 = jass.UNIT_TYPE_HERO

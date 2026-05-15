@@ -25,12 +25,11 @@ export function dump(tagFilter?: string): void {
 
   if (tagFilter) {
     printLine(`--- 详情 tag=${tagFilter} ---`);
-    for (const [handle, info] of alive) {
-      if (info.tag === tagFilter) {
+    for (const key in alive) {
+      const info = alive[key];
+      if (info != null && info.tag === tagFilter) {
         printLine(
-          `${info.type}#${info.createdIndex} (${info.tag}) [${tostring(
-            handle,
-          )}]`,
+          `${info.type}#${info.createdIndex} (${info.tag}) [${info.handleText}]`,
         );
       }
     }

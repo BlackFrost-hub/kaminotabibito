@@ -8,8 +8,15 @@ local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local ____exports = {}
-local onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, setLastCreatedItem, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
+local getHandleIdSafe, onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, setLastCreatedItem, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
+function getHandleIdSafe(handle)
+    if not handle then
+        return 0
+    end
+    return jass.GetHandleId(handle) or 0
+end
 function onBurnTimerExpire()
     local t = jass.GetExpiredTimer()
     if not t then
@@ -23,7 +30,8 @@ function onBurnTimerExpire()
     end
     local item = ctx.item
     local campfire = ctx.campfire
-    if not itemState:has(item) then
+    local itemId = getHandleIdSafe(item)
+    if itemId == 0 or not itemState:has(itemId) then
         return
     end
     local name = getItemNameSafe(item)
@@ -171,7 +179,11 @@ function stopAndDestroyTimer(t)
     jass.DestroyTimer(t)
 end
 function untrackItem(item)
-    local st = itemState:get(item)
+    local itemId = getHandleIdSafe(item)
+    if itemId == 0 then
+        return
+    end
+    local st = itemState:get(itemId)
     if not st then
         return
     end
@@ -181,17 +193,18 @@ function untrackItem(item)
     if st.burnTimer then
         stopAndDestroyTimer(st.burnTimer)
     end
-    itemState:delete(item)
-    local set = campfireItems:get(st.campfire)
+    itemState:delete(itemId)
+    local campfireId = getHandleIdSafe(st.campfire)
+    local set = campfireItems:get(campfireId)
     if set then
-        set:delete(item)
+        set:delete(itemId)
         if set.size == 0 then
-            campfireItems:delete(st.campfire)
+            campfireItems:delete(campfireId)
         end
     end
 end
 function startBurnTimer(item, campfire, sec)
-    local st = itemState:get(item)
+    local st = itemState:get(getHandleIdSafe(item))
     local t = jass.CreateTimer()
     if not t then
         return
@@ -249,7 +262,8 @@ local function onCookTimerExpire()
     local campfire = ctx.campfire
     local timeoutSec = ctx.timeoutSec
     local results = ctx.results
-    if not itemState:has(item) then
+    local itemId = getHandleIdSafe(item)
+    if itemId == 0 or not itemState:has(itemId) then
         return
     end
     playFinishEffect(campfire)
@@ -272,13 +286,17 @@ local function onCookTimerExpire()
                 jass.RemoveItem(it)
             end
         else
-            itemState:set(it, {campfire = campfire, stage = "done"})
-            local set = campfireItems:get(campfire)
-            if not set then
-                set = __TS__New(Set)
-                campfireItems:set(campfire, set)
+            local itemId = getHandleIdSafe(it)
+            local campfireId = getHandleIdSafe(campfire)
+            if itemId ~= 0 and campfireId ~= 0 then
+                itemState:set(itemId, {item = it, campfire = campfire, stage = "done"})
+                local set = campfireItems:get(campfireId)
+                if not set then
+                    set = __TS__New(Set)
+                    campfireItems:set(campfireId, set)
+                end
+                set:add(itemId)
             end
-            set:add(it)
             if timeout > 0 then
                 startBurnTimer(it, campfire, timeout)
             end
@@ -380,7 +398,7 @@ local function startCookTimer(item, campfire, recipe)
     if not t then
         return
     end
-    local st = itemState:get(item)
+    local st = itemState:get(getHandleIdSafe(item))
     if st then
         st.cookTimer = t
     end
@@ -400,23 +418,29 @@ local function onAnyPickup()
         return
     end
     if not isCampfire(u) then
-        if itemState:has(item) then
+        local itemId = getHandleIdSafe(item)
+        if itemId ~= 0 and itemState:has(itemId) then
             untrackItem(item)
         end
         return
     end
-    if itemState:has(item) then
+    local itemId = getHandleIdSafe(item)
+    local campfireId = getHandleIdSafe(u)
+    if itemId == 0 or campfireId == 0 then
+        return
+    end
+    if itemState:has(itemId) then
         return
     end
     local recipe = getRecipeForItem(item)
     local campfire = u
-    itemState:set(item, {campfire = campfire, stage = "raw"})
-    local set = campfireItems:get(campfire)
+    itemState:set(itemId, {item = item, campfire = campfire, stage = "raw"})
+    local set = campfireItems:get(campfireId)
     if not set then
         set = __TS__New(Set)
-        campfireItems:set(campfire, set)
+        campfireItems:set(campfireId, set)
     end
-    set:add(item)
+    set:add(itemId)
     if not recipe then
         startBurnTimer(item, campfire, 15)
     else
@@ -427,21 +451,31 @@ local function onCampfireDeath(dyingUnit)
     if not dyingUnit or not isCampfire(dyingUnit) then
         return
     end
-    local set = campfireItems:get(dyingUnit)
+    local campfireId = getHandleIdSafe(dyingUnit)
+    local set = campfireItems:get(campfireId)
     if not set then
         return
     end
-    for ____, it in __TS__Iterator(set) do
-        untrackItem(it)
+    local itemIds = __TS__ArrayFrom(set:values())
+    do
+        local i = 0
+        while i < #itemIds do
+            local st = itemState:get(itemIds[i + 1])
+            if st then
+                untrackItem(st.item)
+            end
+            i = i + 1
+        end
     end
-    campfireItems:delete(dyingUnit)
+    campfireItems:delete(campfireId)
 end
 ____exports["init物品加工"] = function()
     itemEventCenter:onItemPickup(function(unit, item)
         onAnyPickup()
     end)
     itemEventCenter:onItemDrop(function(unit, item)
-        if unit and item and isCampfire(unit) and itemState:has(item) then
+        local itemId = getHandleIdSafe(item)
+        if unit and item and isCampfire(unit) and itemId ~= 0 and itemState:has(itemId) then
             untrackItem(item)
         end
     end)

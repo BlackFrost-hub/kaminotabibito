@@ -113,7 +113,7 @@ interface MonitorInstance {
 // ==========================================================================================
 
 let groupMonitors: MonitorInstance[] = [];
-let groupUnitMap: Map<any, MonitorInstance> = new Map();
+let groupUnitMap: Map<number, MonitorInstance> = new Map();
 let damageCallbackRegistered = false;
 
 // ==========================================================================================
@@ -137,13 +137,18 @@ const { getServerTime } = globalThis as unknown as {
   return getServerTime() / 1000;
 }
 
+function getUnitId(unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  return (jass.GetHandleId(unit) as number) || 0;
+}
+
 function killAllInGroup(instance: MonitorInstance): void {
   if (instance.killGroup == null) return;
-  const group = instance.killGroup;
+    const group = instance.killGroup;
   let unit = jass.FirstOfGroup(group);
   while (unit != null) {
     jass.GroupRemoveUnit(group, unit);
-    groupUnitMap.delete(unit);
+    groupUnitMap.delete(getUnitId(unit));
     jass.KillUnit(unit);
     unit = jass.FirstOfGroup(group);
   }
@@ -160,7 +165,7 @@ function removeGroupMonitor(instance: MonitorInstance): void {
   if (instance.killGroup != null) {
     let unit = jass.FirstOfGroup(instance.killGroup);
     while (unit != null) {
-      groupUnitMap.delete(unit);
+      groupUnitMap.delete(getUnitId(unit));
       jass.GroupRemoveUnit(instance.killGroup, unit);
       unit = jass.FirstOfGroup(instance.killGroup);
     }
@@ -188,7 +193,7 @@ function onUnitDamage(
   isNormalAttack?: boolean
 ): void {
   // 检查目标单位是否在监控列表中
-  const instance = groupUnitMap.get(targetUnit);
+  const instance = groupUnitMap.get(getUnitId(targetUnit));
   if (instance == null) return;
 
   // 必须有凶手单位（排除自然死亡/系统击杀）
@@ -290,7 +295,7 @@ export function startMultiKillMonitor(config: MultiKillConfig): void {
   GroupAddGroup(instance.killGroup, tempGroup);
   let unit = jass.FirstOfGroup(tempGroup);
   while (unit != null) {
-    groupUnitMap.set(unit, instance);
+    groupUnitMap.set(getUnitId(unit), instance);
     jass.GroupRemoveUnit(tempGroup, unit);
     unit = jass.FirstOfGroup(tempGroup);
   }
@@ -321,18 +326,18 @@ export function addToKillGroup(effectSource: any, unit: any): void {
     instance.isOwnKillGroup = true;
   }
   jass.GroupAddUnit(instance.killGroup, unit);
-  groupUnitMap.set(unit, instance);
+  groupUnitMap.set(getUnitId(unit), instance);
 }
 
 export function removeFromKillGroup(effectSource: any, unit: any): void {
   const instance = groupMonitors.find((m) => m.effectSource === effectSource);
   if (instance == null || instance.killGroup == null) return;
   jass.GroupRemoveUnit(instance.killGroup, unit);
-  groupUnitMap.delete(unit);
+  groupUnitMap.delete(getUnitId(unit));
 }
 
 export function isMultiKillMonitored(unit: any): boolean {
-  return groupUnitMap.has(unit);
+  return groupUnitMap.has(getUnitId(unit));
 }
 
 export function getMultiKillMonitorCount(): number {

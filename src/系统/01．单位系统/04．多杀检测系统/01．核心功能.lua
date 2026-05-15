@@ -72,6 +72,12 @@ local function getGameTime(self)
     local getServerTime = ____G_5.getServerTime
     return getServerTime(nil) / 1000
 end
+local function getUnitId(self, unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return jass.GetHandleId(unit) or 0
+end
 local function killAllInGroup(self, instance)
     if instance.killGroup == nil then
         return
@@ -80,7 +86,7 @@ local function killAllInGroup(self, instance)
     local unit = jass.FirstOfGroup(group)
     while unit ~= nil do
         jass.GroupRemoveUnit(group, unit)
-        groupUnitMap:delete(unit)
+        groupUnitMap:delete(getUnitId(nil, unit))
         jass.KillUnit(unit)
         unit = jass.FirstOfGroup(group)
     end
@@ -94,7 +100,7 @@ local function removeGroupMonitor(self, instance)
     if instance.killGroup ~= nil then
         local unit = jass.FirstOfGroup(instance.killGroup)
         while unit ~= nil do
-            groupUnitMap:delete(unit)
+            groupUnitMap:delete(getUnitId(nil, unit))
             jass.GroupRemoveUnit(instance.killGroup, unit)
             unit = jass.FirstOfGroup(instance.killGroup)
         end
@@ -109,7 +115,7 @@ local function removeGroupMonitor(self, instance)
     end
 end
 local function onUnitDamage(self, targetUnit, damage, damageType, fromDotTickBatch, sourceUnit, isNormalAttack)
-    local instance = groupUnitMap:get(targetUnit)
+    local instance = groupUnitMap:get(getUnitId(nil, targetUnit))
     if instance == nil then
         return
     end
@@ -203,7 +209,10 @@ function ____exports.startMultiKillMonitor(self, config)
     GroupAddGroup(nil, instance.killGroup, tempGroup)
     local unit = jass.FirstOfGroup(tempGroup)
     while unit ~= nil do
-        groupUnitMap:set(unit, instance)
+        groupUnitMap:set(
+            getUnitId(nil, unit),
+            instance
+        )
         jass.GroupRemoveUnit(tempGroup, unit)
         unit = jass.FirstOfGroup(tempGroup)
     end
@@ -238,7 +247,10 @@ function ____exports.addToKillGroup(self, effectSource, unit)
         instance.isOwnKillGroup = true
     end
     jass.GroupAddUnit(instance.killGroup, unit)
-    groupUnitMap:set(unit, instance)
+    groupUnitMap:set(
+        getUnitId(nil, unit),
+        instance
+    )
 end
 function ____exports.removeFromKillGroup(self, effectSource, unit)
     local instance = __TS__ArrayFind(
@@ -249,10 +261,10 @@ function ____exports.removeFromKillGroup(self, effectSource, unit)
         return
     end
     jass.GroupRemoveUnit(instance.killGroup, unit)
-    groupUnitMap:delete(unit)
+    groupUnitMap:delete(getUnitId(nil, unit))
 end
 function ____exports.isMultiKillMonitored(self, unit)
-    return groupUnitMap:has(unit)
+    return groupUnitMap:has(getUnitId(nil, unit))
 end
 function ____exports.getMultiKillMonitorCount(self)
     return #groupMonitors

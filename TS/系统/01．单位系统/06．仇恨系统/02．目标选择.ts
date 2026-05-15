@@ -29,6 +29,22 @@ function 取单位ID(u: any): number {
   return GetHandleId(u) || 0;
 }
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取有序当前目标敌人ID列表(): number[] {
+  const result: number[] = [];
+  for (const key in 当前目标表) {
+    const id = parseInt(key, 10);
+    if (!isNaN(id)) {
+      result.push(id);
+    }
+  }
+  result.sort(数字升序排序);
+  return result;
+}
+
 function 清除当前目标(敌人ID: number, 目标ID: number): void {
   if (敌人ID === 0) return;
   if (目标ID === 0) {
@@ -94,9 +110,9 @@ export function 设置当前目标(敌人ID: number, 目标ID: number): void {
 
 /** 清除所有当前目标缓存 */
 export function 清除所有当前目标(): void {
-  const keys = Object.keys(当前目标表);
-  for (let i = 0; i < keys.length; i++) {
-    delete 当前目标表[parseInt(keys[i], 10)];
+  const 敌人ID列表 = 获取有序当前目标敌人ID列表();
+  for (let i = 0; i < 敌人ID列表.length; i++) {
+    delete 当前目标表[敌人ID列表[i]];
   }
 }
 

@@ -1,4 +1,9 @@
 /** @noSelfInFile */
+/**
+ * 区域效果测试
+ *
+ * 输入 "1101"：在大法师位置创建区域效果，测试进入/离开事件
+ */
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
@@ -12,15 +17,19 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
-const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (this: void, delaySec: number, callback: () => void) => void;
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
+  注册聊天命令监听: (this: void, 命令: string, 回调: (player: any, command: string) => void) => void;
 };
+
 const sfbModule = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统") as {
   SFB_setBuff: (this: void, sourceUnit: any, u: any, id: number, time: number) => void;
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
   SFB_Unit: any;
 };
 const { SFB_setBuff, SFB_setSlow } = sfbModule;
+
+const 模块名 = "区域效果测试";
+const 测试命令 = "1101";
 
 function getSFBUnit(): any {
   return sfbModule.SFB_Unit;
@@ -39,8 +48,6 @@ function safeHid(h: any): number {
 
 import { 创建区域效果 } from "../01．技能函数/04．区域效果/区域效果";
 
-const 启用测试 = false;
-const 模块名 = "区域效果测试";
 let 当前测试单位: any | undefined;
 
 function 区域效果测试_进入(单位: any): void {
@@ -73,11 +80,14 @@ function 区域效果测试_销毁(): void {
   debugLogForce(模块名, "区域效果已结束");
 }
 
-function 区域效果测试_创建(): void {
-  const 测试单位 = 当前测试单位;
+function on聊天测试(): void {
+  const 测试单位 = g.gg_unit_Hamg_0002;
   if (测试单位 == null || 测试单位 === 0) {
+    debugLogForce(模块名, "错误：未找到 gg_unit_Hamg_0002");
     return;
   }
+
+  当前测试单位 = 测试单位;
 
   创建区域效果({
     X: GetUnitX(测试单位),
@@ -93,18 +103,11 @@ function 区域效果测试_创建(): void {
     on销毁: 区域效果测试_销毁,
   });
 
-  debugLogForce(模块名, "完整效果已创建");
+  debugLogForce(模块名, "完整效果已创建", "位置=(" + GetUnitX(测试单位) + "," + GetUnitY(测试单位) + ")");
+  debugLogForce(模块名, "请让其他单位进入/离开区域测试");
 }
 
-if (启用测试) {
-  const 测试单位 = g.gg_unit_Hamg_0002;
-  if (测试单位) {
-    当前测试单位 = 测试单位;
-    debugLogForce(模块名, "[初始化] 测试单位=" + safeUnitName(测试单位) + " 2秒后创建区域效果");
-    createDelayedCall(2.0, 区域效果测试_创建);
-  } else {
-    debugLogForce(模块名, "[初始化] 错误: gg_unit_Hamg_0002 不存在!");
-  }
-}
+注册聊天命令监听(测试命令, on聊天测试);
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "在大法师位置创建区域效果");
 
 export {};

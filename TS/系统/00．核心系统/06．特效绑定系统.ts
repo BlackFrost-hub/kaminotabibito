@@ -60,7 +60,7 @@ export const DEFAULT_ANIM_SPEED = 1.0;
 // 数据存储
 // ==========================================================================================
 
-const boundEffects = new Map<any, BoundEffectData>();
+const boundEffects = new Map<number, BoundEffectData>();
 const unitToEffectMap = new Map<number, any>();
 let _isRegistered = false;
 
@@ -73,6 +73,20 @@ function getUnitId(unit: any): number {
   return jass.GetHandleId(unit);
 }
 
+function getEffectId(effect: any): number {
+  if (!effect) return 0;
+  return (jass.GetHandleId(effect) as number) || 0;
+}
+
+function getSortedBoundEffectIds(): number[] {
+  const ids: number[] = [];
+  for (const effectId of boundEffects.keys()) {
+    ids.push(effectId);
+  }
+  ids.sort((a, b) => a - b);
+  return ids;
+}
+
 function destroyEffect(effect: any): void {
   if (!effect) return;
   jass.DestroyEffect(effect);
@@ -82,7 +96,11 @@ function destroyEffect(effect: any): void {
  * 更新所有绑定特效的位置（世界 Z = 地形 + 飞行高度 + 记录的高度偏移）
  */
 function updateBoundEffects(): void {
-  for (const [effect, data] of boundEffects) {
+  const effectIds = getSortedBoundEffectIds();
+  for (let i = 0; i < effectIds.length; i++) {
+    const data = boundEffects.get(effectIds[i]);
+    if (!data) continue;
+    const effect = data.effect;
     if (!data.unit) {
       removeBoundEffect(effect);
       continue;
@@ -166,7 +184,13 @@ export function createBoundEffect(
     animSpeed,
   };
 
-  boundEffects.set(effect, data);
+  const effectId = getEffectId(effect);
+  if (effectId === 0) {
+    destroyEffect(effect);
+    return null;
+  }
+
+  boundEffects.set(effectId, data);
   unitToEffectMap.set(unitId, effect);
 
   ensureRegistered();
@@ -189,13 +213,13 @@ export function createProgressBarEffect(unit: any, animSpeed: number = 1.0): any
 export function removeBoundEffect(effect: any): void {
   if (!effect) return;
 
-  const data = boundEffects.get(effect);
+  const data = boundEffects.get(getEffectId(effect));
   if (data) {
     const unitId = getUnitId(data.unit);
     unitToEffectMap.delete(unitId);
   }
 
-  boundEffects.delete(effect);
+  boundEffects.delete(getEffectId(effect));
   destroyEffect(effect);
 }
 
@@ -224,15 +248,19 @@ export function setEffectAnimSpeed(effect: any, speed: number): void {
   if (!effect) return;
   japi.EXSetEffectSpeed(effect, speed);
 
-  const data = boundEffects.get(effect);
+  const data = boundEffects.get(getEffectId(effect));
   if (data) {
     data.animSpeed = speed;
   }
 }
 
 export function clearAllBoundEffects(): void {
-  for (const [effect] of boundEffects) {
-    destroyEffect(effect);
+  const effectIds = getSortedBoundEffectIds();
+  for (let i = 0; i < effectIds.length; i++) {
+    const data = boundEffects.get(effectIds[i]);
+    if (data) {
+      destroyEffect(data.effect);
+    }
   }
   boundEffects.clear();
   unitToEffectMap.clear();

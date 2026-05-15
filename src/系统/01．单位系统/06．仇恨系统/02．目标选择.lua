@@ -1,7 +1,9 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__ParseInt = ____lualib.__TS__ParseInt
+local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- 02．目标选择
 -- 
@@ -21,6 +23,20 @@ local function _____53D6_5355_4F4DID(u)
         return 0
     end
     return GetHandleId(u) or 0
+end
+local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+local function _____83B7_53D6_6709_5E8F_5F53_524D_76EE_6807_654C_4EBAID_5217_8868()
+    local result = {}
+    for key in pairs(_____5F53_524D_76EE_6807_8868) do
+        local id = __TS__ParseInt(key, 10)
+        if not __TS__NumberIsNaN(__TS__Number(id)) then
+            result[#result + 1] = id
+        end
+    end
+    __TS__ArraySort(result, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return result
 end
 local function _____6E05_9664_5F53_524D_76EE_6807(_____654C_4EBAID, _____76EE_6807ID)
     if _____654C_4EBAID == 0 then
@@ -85,14 +101,11 @@ ____exports["设置当前目标"] = function(_____654C_4EBAID, _____76EE_6807ID)
 end
 --- 清除所有当前目标缓存
 ____exports["清除所有当前目标"] = function()
-    local keys = __TS__ObjectKeys(_____5F53_524D_76EE_6807_8868)
+    local _____654C_4EBAID_5217_8868 = _____83B7_53D6_6709_5E8F_5F53_524D_76EE_6807_654C_4EBAID_5217_8868()
     do
         local i = 0
-        while i < #keys do
-            __TS__Delete(
-                _____5F53_524D_76EE_6807_8868,
-                __TS__ParseInt(keys[i + 1], 10)
-            )
+        while i < #_____654C_4EBAID_5217_8868 do
+            __TS__Delete(_____5F53_524D_76EE_6807_8868, _____654C_4EBAID_5217_8868[i + 1])
             i = i + 1
         end
     end

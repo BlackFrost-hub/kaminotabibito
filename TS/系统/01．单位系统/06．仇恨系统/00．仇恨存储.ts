@@ -34,6 +34,22 @@ function 取单位ID(u: any): number {
   return GetHandleId(u) || 0;
 }
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取有序敌人ID列表(): number[] {
+  const result: number[] = [];
+  for (const key in threatTables) {
+    const id = parseInt(key, 10);
+    if (!isNaN(id)) {
+      result.push(id);
+    }
+  }
+  result.sort(数字升序排序);
+  return result;
+}
+
 let _清除当前目标: ((敌人ID: number, 目标ID: number) => void) | null = null;
 
 function 限制仇恨值(value: number): number {
@@ -343,13 +359,7 @@ export function getEnemyThreats(敌人: any): ThreatEntry[] {
 
 /** 获取所有有仇恨记录的敌人 ID（稳定数组） */
 export function getAllTrackedEnemyIds(): number[] {
-  const keys = Object.keys(threatTables);
-  const result: number[] = [];
-  for (let i = 0; i < keys.length; i++) {
-    const id = parseInt(keys[i], 10);
-    if (!isNaN(id)) result.push(id);
-  }
-  return result;
+  return 获取有序敌人ID列表();
 }
 
 /** 按 ID 取敌人仇恨表是否还有记录（驱动层用） */
