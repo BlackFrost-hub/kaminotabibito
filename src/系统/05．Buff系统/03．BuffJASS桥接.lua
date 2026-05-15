@@ -95,6 +95,9 @@ function ____exports.buffBridgeApplyFromYdlocal(self, _self)
         do
             ydlStes_finishChildCleanup(nil, nil)
         end
+        if not ____try then
+            error(____hasReturned, 0)
+        end
         if ____try and ____hasReturned then
             return ____returnValue
         end

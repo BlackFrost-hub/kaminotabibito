@@ -190,11 +190,14 @@ end
 local function runRegisterPlayerHero()
     helper:ydlStes_syncTriggerStep(nil)
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             registerSingleHero(YDLocal5Get(nil, "unit", C.STES_PARAM_HERO_UNIT))
         end)
         do
             helper:ydlStes_finishChildCleanup(nil)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end

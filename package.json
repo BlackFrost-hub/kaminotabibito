@@ -9,7 +9,7 @@
     "fix:pack": "node scripts/fix-lua-for-pack.js"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "typescript-to-lua": "^1.0.0"
+    "typescript": "^6.0.2",
+    "typescript-to-lua": "^1.36.0"
   }
 }

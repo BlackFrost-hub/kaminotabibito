@@ -129,7 +129,7 @@ end
 --- STES 子触发：读参 →（缺参则从使用物品事件 / 装备表补全）→ 治疗 → 四路 YDLocal7 写回父
 local function onItemHealStesChild()
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             ydlStes_syncTriggerStep(nil, nil)
             local rawHp = ydlStes_readReal5(nil, nil, YL_HP)
             local rawMp = ydlStes_readReal5(nil, nil, YL_MP)
@@ -174,6 +174,9 @@ local function onItemHealStesChild()
         end)
         do
             ydlStes_finishChildCleanup(nil, nil)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end

@@ -4,7 +4,7 @@ local ____index = require("系统.03．技能系统.00．技能模板+函数.01�
 local _____5F00_59CB_8DF3_8DC3 = ____index["开始跳跃"]
 --- Jump system test.
 -- 
--- 输入 "1098"：让大法师跳跃1000距离，3秒持续，300高度
+-- 输入 "1098"：让大法师朝向跳跃1000距离，3秒持续，300高度
 local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
@@ -20,7 +20,7 @@ local function ____on_804A_5929_6D4B_8BD5()
         debugLogForce(nil, _____6A21_5757_540D, "错误：未找到 gg_unit_Hamg_0002")
         return
     end
-    local angle = GetUnitFacing(testUnit) + 180
+    local angle = GetUnitFacing(testUnit)
     debugLogForce(
         nil,
         _____6A21_5757_540D,

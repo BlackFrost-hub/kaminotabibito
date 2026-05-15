@@ -71,6 +71,9 @@ ____exports["根据Stes事件创建召唤物"] = function()
         do
             ydlStes_finishChildCleanup(nil, nil)
         end
+        if not ____try then
+            error(____hasReturned, 0)
+        end
         if ____try and ____hasReturned then
             return ____returnValue
         end

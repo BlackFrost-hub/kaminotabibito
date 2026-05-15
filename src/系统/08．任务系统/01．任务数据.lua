@@ -12,13 +12,13 @@ local ____exports = {}
 local function now(self)
     return os.time()
 end
-____exports.QuestType = QuestType or ({})
+____exports.QuestType = ____exports.QuestType or ({})
 ____exports.QuestType.MAIN = "主线"
 ____exports.QuestType.SIDE = "支线"
 ____exports.QuestType.DAILY = "小任务"
 --- 任务状态枚举（与War3原生状态对应）
 -- 参考：bj_QUESTTYPE_REQ_DISCOVERED, bj_QUESTTYPE_REQ_UNDISCOVERED
-____exports.QuestStatus = QuestStatus or ({})
+____exports.QuestStatus = ____exports.QuestStatus or ({})
 ____exports.QuestStatus.UNDISCOVERED = "未发现"
 ____exports.QuestStatus.DISCOVERED = "已发现"
 ____exports.QuestStatus.IN_PROGRESS = "进行中"

@@ -45,7 +45,7 @@ local function tryRegisterLuaListenerForJassStes()
         trig,
         function()
             do
-                pcall(function()
+                local ____try, ____error = pcall(function()
                     local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
                     local b = type(from5) == "number" and from5 or 0
                     local quad = (b * b + 13 * b + 42) / (b + 1.0001)
@@ -56,6 +56,9 @@ local function tryRegisterLuaListenerForJassStes()
                 end)
                 do
                     clearStar_PIndex(nil)
+                end
+                if not ____try then
+                    error(____error, 0)
                 end
             end
         end

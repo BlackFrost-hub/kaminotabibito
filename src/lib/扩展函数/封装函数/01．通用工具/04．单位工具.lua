@@ -107,7 +107,7 @@ function ____exports.forEachUnitInGroup(self, group, action)
     end
     local scratch = acquireScratchGroup(nil)
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             while true do
                 local unit = jass.FirstOfGroup(group)
                 if not unit or unit == 0 then
@@ -128,6 +128,9 @@ function ____exports.forEachUnitInGroup(self, group, action)
         end)
         do
             releaseScratchGroup(nil, scratch)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end

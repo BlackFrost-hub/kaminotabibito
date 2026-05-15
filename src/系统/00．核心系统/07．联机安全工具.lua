@@ -104,11 +104,14 @@ function ____exports.safeForForce(forceOrSelf, actionOrForce, maybeAction)
     end
     forForceStack[#forForceStack + 1] = action
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             jass.ForForce(force, forForceTrampoline)
         end)
         do
             table.remove(forForceStack)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end
@@ -124,7 +127,7 @@ function ____exports.safeEnumItemsInRect(rectOrSelf, filterOrRect, actionOrFilte
     end
     enumItemsStack[#enumItemsStack + 1] = action
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             local ____jass_EnumItemsInRect_9 = jass.EnumItemsInRect
             local ____rect_8 = rect
             local ____filter_7 = filter
@@ -135,6 +138,9 @@ function ____exports.safeEnumItemsInRect(rectOrSelf, filterOrRect, actionOrFilte
         end)
         do
             table.remove(enumItemsStack)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end
@@ -150,7 +156,7 @@ function ____exports.safeEnumDestructablesInRect(rectOrSelf, filterOrRect, actio
     end
     enumDestructablesStack[#enumDestructablesStack + 1] = action
     do
-        pcall(function()
+        local ____try, ____error = pcall(function()
             local ____jass_EnumDestructablesInRect_13 = jass.EnumDestructablesInRect
             local ____rect_12 = rect
             local ____filter_11 = filter
@@ -161,6 +167,9 @@ function ____exports.safeEnumDestructablesInRect(rectOrSelf, filterOrRect, actio
         end)
         do
             table.remove(enumDestructablesStack)
+        end
+        if not ____try then
+            error(____error, 0)
         end
     end
 end
