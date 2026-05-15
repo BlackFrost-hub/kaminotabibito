@@ -1,21 +1,14 @@
 local ____lualib = require("lualib_bundle")
-local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
-local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
-local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5730_5F62_9AD8_5EA6, _____8BA1_7B97_5145_80FD_8FDB_5EA6, _____64AD_653E_5355_4F4D_5750_6807_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____89E6_53D1_5145_80FD_6253_65AD_56DE_8C03, _____8F93_51FA_5145_80FD_8BCA_65AD, _____7ED3_675F_5145_80FD_5B9E_4F8B, ____on_5145_80FD_7CFB_7EDFTick, jass, offTick10ms, YDWETimerDestroyEffect, debugLogForce, _____8C03_8BD5_6A21_5757_540D, GetHandleId, GetUnitTypeId, GetUnitState, IsUnitType, IsUnitPaused, GetUnitCurrentOrder, GetUnitX, GetUnitY, GetUnitFlyHeight, AddSpecialEffect, Location, MoveLocation, GetLocationZ, EXSetEffectZ, TICK_INTERVAL, CENTER_TIMER_TICKS, UNIT_ALIVE_LIFE, _____6D3B_52A8_5145_80FD_5217_8868, _____5145_80FD_6620_5C04, _____5355_4F4D_5F53_524D_5145_80FD, _____5145_80FD_6253_65AD_56DE_8C03_5217_8868, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570, _____5730_5F62_91C7_6837_70B9
+local _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5730_5F62_9AD8_5EA6, _____8BA1_7B97_5145_80FD_8FDB_5EA6, _____64AD_653E_5355_4F4D_5750_6807_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____89E6_53D1_5145_80FD_6253_65AD_56DE_8C03, _____7ED3_675F_5145_80FD_5B9E_4F8B, ____on_5145_80FD_7CFB_7EDFTick, jass, offTick10ms, YDWETimerDestroyEffect, GetUnitTypeId, GetUnitState, IsUnitType, GetUnitX, GetUnitY, GetUnitFlyHeight, AddSpecialEffect, Location, MoveLocation, GetLocationZ, EXSetEffectZ, TICK_INTERVAL, CENTER_TIMER_TICKS, UNIT_ALIVE_LIFE, _____6D3B_52A8_5145_80FD_5217_8868, _____5145_80FD_6620_5C04, _____5355_4F4D_5F53_524D_5145_80FD, _____5145_80FD_6253_65AD_56DE_8C03_5217_8868, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570, _____5730_5F62_91C7_6837_70B9
 local _____8FDB_5EA6_6761_7279_6548 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效")
 local _____521B_5EFA_8FDB_5EA6_6761_7279_6548 = _____8FDB_5EA6_6761_7279_6548["创建进度条特效"]
 local _____9500_6BC1_5355_4F4D_8FDB_5EA6_6761_7279_6548 = _____8FDB_5EA6_6761_7279_6548["销毁单位进度条特效"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6 = ____01_FF0E_63A7_5236_4E0EBuff["单位是否处于硬控制效果合集"]
-local _____5355_4F4D_662F_5426_5904_4E8E_65BD_6CD5_786C_76F4_6548_679C = ____01_FF0E_63A7_5236_4E0EBuff["单位是否处于施法硬直效果"]
-function _____53D6_53E5_67C4ID(h)
-    return h ~= nil and h ~= 0 and GetHandleId(h) or 0
-end
 function _____5355_4F4D_5B58_6D3B(u)
     if u == nil or u == 0 then
         return false
@@ -86,55 +79,7 @@ function _____89E6_53D1_5145_80FD_6253_65AD_56DE_8C03(_____5355_4F4D, _____539F_
         _____56DE_8C03(_____5355_4F4D, _____539F_56E0, _____5145_80FDID)
     end
 end
-function _____8F93_51FA_5145_80FD_8BCA_65AD(_____6807_7B7E, _____5B9E_4F8B, _____989D_5916_539F_56E0)
-    local _____5355_4F4D = _____5B9E_4F8B["单位"]
-    local _____4E3B_5355_4F4D = _____5B9E_4F8B["主单位"]
-    local ____debugLogForce_6 = debugLogForce
-    local ____array_5 = __TS__SparseArrayNew(
-        _____8C03_8BD5_6A21_5757_540D,
-        _____6807_7B7E,
-        "充能ID=",
-        _____5B9E_4F8B.id,
-        "单位ID=",
-        _____53D6_53E5_67C4ID(_____5355_4F4D),
-        "剩余=",
-        _____5B9E_4F8B["剩余时间"],
-        "总时长=",
-        _____5B9E_4F8B["总持续时间"],
-        "paused="
-    )
-    local ____temp_3
-    if _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 then
-        ____temp_3 = IsUnitPaused(_____5355_4F4D) == true
-    else
-        ____temp_3 = false
-    end
-    __TS__SparseArrayPush(
-        ____array_5,
-        ____temp_3,
-        "硬控=",
-        _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6(_____5355_4F4D),
-        "施法硬直=",
-        _____5355_4F4D_662F_5426_5904_4E8E_65BD_6CD5_786C_76F4_6548_679C(_____5355_4F4D),
-        "当前命令=",
-        _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 and (GetUnitCurrentOrder(_____5355_4F4D) or 0) or 0,
-        "主单位ID=",
-        _____53D6_53E5_67C4ID(_____4E3B_5355_4F4D),
-        "主单位存活="
-    )
-    local ____temp_4
-    if _____4E3B_5355_4F4D == nil then
-        ____temp_4 = true
-    else
-        ____temp_4 = _____5355_4F4D_5B58_6D3B(_____4E3B_5355_4F4D)
-    end
-    __TS__SparseArrayPush(____array_5, ____temp_4, _____989D_5916_539F_56E0 ~= nil and "说明=" or "", _____989D_5916_539F_56E0 ~= nil and _____989D_5916_539F_56E0 or "")
-    ____debugLogForce_6(__TS__SparseArraySpread(____array_5))
-end
 function _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, _____539F_56E0)
-    if _____539F_56E0 ~= "完成" then
-        _____8F93_51FA_5145_80FD_8BCA_65AD("结束充能", _____5B9E_4F8B, _____539F_56E0)
-    end
     __TS__Delete(_____5145_80FD_6620_5C04, _____5B9E_4F8B.id)
     if _____5355_4F4D_5F53_524D_5145_80FD[_____5B9E_4F8B["单位ID"]] == _____5B9E_4F8B.id then
         __TS__Delete(_____5355_4F4D_5F53_524D_5145_80FD, _____5B9E_4F8B["单位ID"])
@@ -170,19 +115,16 @@ function ____on_5145_80FD_7CFB_7EDFTick()
         do
             local _____5B9E_4F8B = _____6D3B_52A8_5145_80FD_5217_8868[i + 1]
             if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
-                _____8F93_51FA_5145_80FD_8BCA_65AD("Tick结束：单位死亡", _____5B9E_4F8B, "死亡")
                 _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, "死亡")
-                goto __continue69
+                goto __continue67
             end
             if _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6(_____5B9E_4F8B["单位"]) then
-                _____8F93_51FA_5145_80FD_8BCA_65AD("Tick结束：命中硬控合集", _____5B9E_4F8B, "中断")
                 _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, "中断")
-                goto __continue69
+                goto __continue67
             end
             if _____5B9E_4F8B["主单位死亡时中断"] and _____5B9E_4F8B["主单位"] ~= nil and not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["主单位"]) then
-                _____8F93_51FA_5145_80FD_8BCA_65AD("Tick结束：主单位死亡", _____5B9E_4F8B, "主单位死亡")
                 _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, "主单位死亡")
-                goto __continue69
+                goto __continue67
             end
             _____5B9E_4F8B["剩余时间"] = _____5B9E_4F8B["剩余时间"] - TICK_INTERVAL
             _____5B9E_4F8B["下次过程特效倒计时"] = _____5B9E_4F8B["下次过程特效倒计时"] - TICK_INTERVAL
@@ -204,11 +146,11 @@ function ____on_5145_80FD_7CFB_7EDFTick()
             end
             if _____5B9E_4F8B["剩余时间"] <= 0 then
                 _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, "完成")
-                goto __continue69
+                goto __continue67
             end
             i = i + 1
         end
-        ::__continue69::
+        ::__continue67::
     end
     _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668()
 end
@@ -220,14 +162,12 @@ offTick10ms = ____require_result_0.offTick10ms
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 YDWETimerDestroyEffect = ____require_result_1.YDWETimerDestroyEffect
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
-debugLogForce = ____require_result_2.debugLogForce
-_____8C03_8BD5_6A21_5757_540D = "充能系统"
-GetHandleId = jass.GetHandleId
+local debugLogForce = ____require_result_2.debugLogForce
+local _____8C03_8BD5_6A21_5757_540D = "充能系统"
+local GetHandleId = jass.GetHandleId
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
 IsUnitType = jass.IsUnitType
-IsUnitPaused = jass.IsUnitPaused
-GetUnitCurrentOrder = jass.GetUnitCurrentOrder
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -250,6 +190,9 @@ local _____4E0B_4E00_4E2A_5145_80FDID = 1
 _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668 = false
 ____tick_8BA1_6570 = 0
 _____5730_5F62_91C7_6837_70B9 = nil
+local function _____53D6_53E5_67C4ID(h)
+    return h ~= nil and h ~= 0 and GetHandleId(h) or 0
+end
 local function _____5F52_4E00_5316_65F6_95F4(value, defaultValue)
     if value ~= nil and value > 0 then
         return value
@@ -285,7 +228,6 @@ ____exports["停止充能"] = function(_____5145_80FDID)
     if _____5B9E_4F8B == nil then
         return false
     end
-    _____8F93_51FA_5145_80FD_8BCA_65AD("外部停止充能", _____5B9E_4F8B, "Stop")
     _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, "中断")
     _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668()
     return true
@@ -358,9 +300,9 @@ ____exports["开始充能"] = function(_____5355_4F4D, _____53C2_6570)
     ____exports["停止单位充能"](_____5355_4F4D)
     local _____5355_4F4DID = _____53D6_53E5_67C4ID(_____5355_4F4D)
     local _____6301_7EED_65F6_95F4 = _____53C2_6570["持续时间"]
-    local ____4E0B_4E00_4E2A_5145_80FDID_7 = _____4E0B_4E00_4E2A_5145_80FDID
-    _____4E0B_4E00_4E2A_5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_7 + 1
-    local _____5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_7
+    local ____4E0B_4E00_4E2A_5145_80FDID_3 = _____4E0B_4E00_4E2A_5145_80FDID
+    _____4E0B_4E00_4E2A_5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_3 + 1
+    local _____5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_3
     local _____663E_793A_8FDB_5EA6_6761_7279_6548 = _____53C2_6570["显示进度条特效"] ~= false
     local _____8FC7_7A0B_7279_6548 = _____53C2_6570["过程特效"]
     local _____8FC7_7A0B_7279_6548_751F_547D_5468_671F = _____5F52_4E00_5316_65F6_95F4(_____53C2_6570["过程特效生命周期"], DEFAULT_EFFECT_DURATION)

@@ -2,7 +2,7 @@
 /**
  * Jump system test.
  *
- * 输入 "1098"：让大法师跳跃1000距离，3秒持续，300高度
+ * 输入 "1098"：让大法师朝向跳跃1000距离，3秒持续，300高度
  */
 
 const jass = require("jass.common") as any;
@@ -28,7 +28,7 @@ function on聊天测试(): void {
     return;
   }
 
-  const angle = GetUnitFacing(testUnit) + 180.0;
+  const angle = GetUnitFacing(testUnit);
   debugLogForce(模块名, "开始跳跃", "角度=" + angle);
 
   开始跳跃(testUnit, {
