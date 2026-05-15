@@ -58,9 +58,10 @@ function 提取内部物体ID(配置键名: string): string {
  */
 export function getUnitLifeRegenMultiplier(unit: any): number {
   const unitTypeId = jass.GetUnitTypeId(unit);
+  const entries = Object.entries(UNIT_REGEN_TRAITS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   // 遍历配置，将字符串ID转换为FourCC后比较
-  for (const [配置键名, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
+  for (const [配置键名, trait] of entries) {
     if (stringToFourCC(提取内部物体ID(配置键名)) === unitTypeId) {
       return trait.lifeMultiplier;
     }
@@ -77,9 +78,10 @@ export function getUnitLifeRegenMultiplier(unit: any): number {
  */
 export function getUnitManaRegenMultiplier(unit: any): number {
   const unitTypeId = jass.GetUnitTypeId(unit);
+  const entries = Object.entries(UNIT_REGEN_TRAITS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   // 遍历配置，将字符串ID转换为FourCC后比较
-  for (const [配置键名, trait] of Object.entries(UNIT_REGEN_TRAITS)) {
+  for (const [配置键名, trait] of entries) {
     if (stringToFourCC(提取内部物体ID(配置键名)) === unitTypeId) {
       return trait.manaMultiplier;
     }

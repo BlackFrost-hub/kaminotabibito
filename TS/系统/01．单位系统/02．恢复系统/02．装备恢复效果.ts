@@ -77,8 +77,9 @@ function hasItem(unit: any, 配置键名: string): boolean {
 export function calcItemLifeRegenBonus(unit: any): number {
   let totalBonus = 0;
   const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
-  for (const [itemIdStr, effect] of Object.entries(ITEM_REGEN_EFFECTS)) {
+  for (const [itemIdStr, effect] of entries) {
     if (!hasItem(unit, itemIdStr)) continue;
 
     if (effect.type === "life_percent") {
@@ -100,8 +101,9 @@ export function calcItemLifeRegenBonus(unit: any): number {
 export function calcItemManaRegenBonus(unit: any): number {
   let totalBonus = 0;
   const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
-  for (const [itemIdStr, effect] of Object.entries(ITEM_REGEN_EFFECTS)) {
+  for (const [itemIdStr, effect] of entries) {
     if (!hasItem(unit, itemIdStr)) continue;
 
     if (effect.type === "mana_percent") {

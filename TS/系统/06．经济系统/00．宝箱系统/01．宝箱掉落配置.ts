@@ -88,7 +88,8 @@ function drawByEqualWithoutRepeat(pool: ItemPoolEntry[], picks: number): string[
 
 function filterItemsByScore(min: number, max: number): string[] {
   const result: string[] = [];
-  for (const [id, data] of Object.entries(items)) {
+  const entries = Object.entries(items).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+  for (const [id, data] of entries) {
     const score = data?.score;
     if (score != null && score >= min && score <= max) {
       result.push(id);

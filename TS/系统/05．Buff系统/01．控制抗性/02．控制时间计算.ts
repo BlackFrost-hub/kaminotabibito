@@ -65,7 +65,8 @@ export function applyBossControlLimit(unit: any, duration: number): number {
   const unitTypeId = jass.GetUnitTypeId(unit);
 
   // 遍历Boss配置，将字符串ID转换为FourCC后比较
-  for (const [idStr, limit] of Object.entries(BOSS_CONTROL_LIMITS)) {
+  const entries = Object.entries(BOSS_CONTROL_LIMITS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+  for (const [idStr, limit] of entries) {
     if (stringToFourCC(idStr) === unitTypeId && duration > limit) {
       return limit;
     }

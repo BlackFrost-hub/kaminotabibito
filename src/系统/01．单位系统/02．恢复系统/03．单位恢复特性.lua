@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 单位恢复特性配置表
 -- 
@@ -20,7 +21,17 @@ end
 -- @returns 生命恢复倍率（默认1.0）
 function ____exports.getUnitLifeRegenMultiplier(self, unit)
     local unitTypeId = jass.GetUnitTypeId(unit)
-    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local trait = ____value[2]
         if stringToFourCC(
@@ -38,7 +49,17 @@ end
 -- @returns 魔法恢复倍率（默认1.0）
 function ____exports.getUnitManaRegenMultiplier(self, unit)
     local unitTypeId = jass.GetUnitTypeId(unit)
-    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local trait = ____value[2]
         if stringToFourCC(

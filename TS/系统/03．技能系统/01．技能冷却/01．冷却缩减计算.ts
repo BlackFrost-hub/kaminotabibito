@@ -136,8 +136,9 @@ export function getCooldownReductionBonus(unit: any): number {
  * @returns 冷却上限
  */
 export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
+  const entries = Object.entries(SKILL_COOLDOWN_CAPS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
   // 检查技能独立上限
-  for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
+  for (const [配置键名, cap] of entries) {
     if (转四字节(提取内部ID(配置键名)) === abilityId) {
       return cap;
     }
@@ -160,8 +161,9 @@ export function applyCooldownCap(
   abilityId: number,
   bonus: number
 ): number {
+  const entries = Object.entries(SKILL_COOLDOWN_CAPS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
   // 检查技能独立上限
-  for (const [配置键名, cap] of Object.entries(SKILL_COOLDOWN_CAPS)) {
+  for (const [配置键名, cap] of entries) {
     if (转四字节(提取内部ID(配置键名)) === abilityId) {
       return reduction < cap ? reduction : cap;
     }

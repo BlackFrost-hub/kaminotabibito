@@ -7,6 +7,7 @@ local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__ArrayPushArray = ____lualib.__TS__ArrayPushArray
@@ -90,7 +91,17 @@ local function drawByEqualWithoutRepeat(pool, picks)
 end
 local function filterItemsByScore(min, max)
     local result = {}
-    for ____, ____value in ipairs(__TS__ObjectEntries(items)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(items),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local id = ____value[1]
         local data = ____value[2]
         local score = data and data.score
@@ -121,9 +132,9 @@ local function executeDropByMode(dropMode, picks)
         end
     end
     repeat
-        local ____switch33 = dropMode.type
-        local ____cond33 = ____switch33 == "pool"
-        if ____cond33 then
+        local ____switch34 = dropMode.type
+        local ____cond34 = ____switch34 == "pool"
+        if ____cond34 then
             do
                 local pool = parseItemPool(dropMode.items)
                 if #pool > 0 and picks > 0 then
@@ -137,8 +148,8 @@ local function executeDropByMode(dropMode, picks)
                 break
             end
         end
-        ____cond33 = ____cond33 or ____switch33 == "mixed"
-        if ____cond33 then
+        ____cond34 = ____cond34 or ____switch34 == "mixed"
+        if ____cond34 then
             do
                 local pool = parseItemPool(dropMode.items)
                 if #pool > 0 then
@@ -161,8 +172,8 @@ local function executeDropByMode(dropMode, picks)
                 break
             end
         end
-        ____cond33 = ____cond33 or ____switch33 == "score"
-        if ____cond33 then
+        ____cond34 = ____cond34 or ____switch34 == "score"
+        if ____cond34 then
             do
                 local itemIds = filterItemsByScore(dropMode.range.min, dropMode.range.max)
                 if #itemIds > 0 and picks > 0 then

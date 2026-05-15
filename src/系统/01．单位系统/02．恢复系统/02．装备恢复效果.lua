@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 装备恢复效果配置表
 -- 
@@ -42,12 +43,22 @@ end
 function ____exports.calcItemLifeRegenBonus(self, unit)
     local totalBonus = 0
     local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
-    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local itemIdStr = ____value[1]
         local effect = ____value[2]
         do
             if not hasItem(nil, unit, itemIdStr) then
-                goto __continue9
+                goto __continue10
             end
             if effect.type == "life_percent" then
                 totalBonus = totalBonus + maxLife * effect.value
@@ -55,7 +66,7 @@ function ____exports.calcItemLifeRegenBonus(self, unit)
                 totalBonus = totalBonus + effect.value
             end
         end
-        ::__continue9::
+        ::__continue10::
     end
     return totalBonus
 end
@@ -66,12 +77,22 @@ end
 function ____exports.calcItemManaRegenBonus(self, unit)
     local totalBonus = 0
     local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
-    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local itemIdStr = ____value[1]
         local effect = ____value[2]
         do
             if not hasItem(nil, unit, itemIdStr) then
-                goto __continue15
+                goto __continue17
             end
             if effect.type == "mana_percent" then
                 totalBonus = totalBonus + maxMana * effect.value
@@ -79,7 +100,7 @@ function ____exports.calcItemManaRegenBonus(self, unit)
                 totalBonus = totalBonus + effect.value
             end
         end
-        ::__continue15::
+        ::__continue17::
     end
     return totalBonus
 end

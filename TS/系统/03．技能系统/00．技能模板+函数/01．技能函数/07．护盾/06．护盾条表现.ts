@@ -309,8 +309,9 @@ export function 是否有护盾条(单位: any): boolean {
  * 清除所有护盾条
  */
 export function 清除所有护盾条(): void {
-  for (const [单位ID] of 护盾条映射) {
-    移除护盾条(单位ID);
+  const 单位ID列表 = 获取有序护盾条单位ID列表();
+  for (let i = 0; i < 单位ID列表.length; i++) {
+    移除护盾条(单位ID列表[i]);
   }
   护盾条映射.clear();
 

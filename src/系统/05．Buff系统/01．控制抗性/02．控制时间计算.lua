@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 控制时间计算模块
 -- 
@@ -50,7 +51,17 @@ end
 --- 检查并应用Boss控制时间上限
 function ____exports.applyBossControlLimit(unit, duration)
     local unitTypeId = jass.GetUnitTypeId(unit)
-    for ____, ____value in ipairs(__TS__ObjectEntries(BOSS_CONTROL_LIMITS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(BOSS_CONTROL_LIMITS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local idStr = ____value[1]
         local limit = ____value[2]
         if stringToFourCC(nil, idStr) == unitTypeId and duration > limit then

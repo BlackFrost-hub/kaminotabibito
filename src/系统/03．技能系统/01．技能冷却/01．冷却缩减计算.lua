@@ -2,6 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 冷却缩减计算模块
 -- 
@@ -69,7 +70,17 @@ end
 -- @param hasBonus 是否有突破上限属性
 -- @returns 冷却上限
 function ____exports.getCooldownCap(abilityId, hasBonus)
-    for ____, ____value in ipairs(__TS__ObjectEntries(SKILL_COOLDOWN_CAPS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(SKILL_COOLDOWN_CAPS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local cap = ____value[2]
         if _____8F6C_56DB_5B57_8282(_____63D0_53D6_5185_90E8ID(_____914D_7F6E_952E_540D)) == abilityId then
@@ -84,7 +95,17 @@ function ____exports.getCooldownCap(abilityId, hasBonus)
 end
 --- 应用冷却缩减上限
 function ____exports.applyCooldownCap(reduction, abilityId, bonus)
-    for ____, ____value in ipairs(__TS__ObjectEntries(SKILL_COOLDOWN_CAPS)) do
+    local entries = __TS__ArraySort(
+        __TS__ObjectEntries(SKILL_COOLDOWN_CAPS),
+        function(____, ____bindingPattern0, ____bindingPattern1)
+            local a
+            a = ____bindingPattern0[1]
+            local b
+            b = ____bindingPattern1[1]
+            return a < b and -1 or (a > b and 1 or 0)
+        end
+    )
+    for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local cap = ____value[2]
         if _____8F6C_56DB_5B57_8282(_____63D0_53D6_5185_90E8ID(_____914D_7F6E_952E_540D)) == abilityId then
