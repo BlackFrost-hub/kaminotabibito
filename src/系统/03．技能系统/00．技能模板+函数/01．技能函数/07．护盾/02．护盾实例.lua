@@ -1,9 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 local ____01_FF0E_62A4_76FE_7C7B_578B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.01．护盾类型")
 local _____62A4_76FE_7C7B_578B = ____01_FF0E_62A4_76FE_7C7B_578B["护盾类型"]
@@ -28,6 +29,17 @@ ____exports["取句柄ID"] = function(h)
         return 0
     end
     return GetHandleId(h)
+end
+local function _____83B7_53D6_6709_5E8F_62A4_76FEID_5217_8868()
+    local result = {}
+    for ____, _____62A4_76FEID in __TS__Iterator(_____62A4_76FE_6620_5C04:keys()) do
+        result[#result + 1] = _____62A4_76FEID
+    end
+    __TS__ArraySort(
+        result,
+        function(____, a, b) return a - b end
+    )
+    return result
 end
 --- 创建护盾实例（不触发开始回调，由调用方负责）
 ____exports["创建护盾实例"] = function(_____5355_4F4D, _____53C2_6570)
@@ -158,9 +170,16 @@ end
 --- 获取所有活动护盾实例（供生命周期模块使用）
 ____exports["获取所有活动护盾实例"] = function()
     local result = {}
-    for ____, ____value in __TS__Iterator(_____62A4_76FE_6620_5C04) do
-        local _____5B9E_4F8B = ____value[2]
-        result[#result + 1] = _____5B9E_4F8B
+    local _____62A4_76FEID_5217_8868 = _____83B7_53D6_6709_5E8F_62A4_76FEID_5217_8868()
+    do
+        local i = 0
+        while i < #_____62A4_76FEID_5217_8868 do
+            local _____5B9E_4F8B = _____62A4_76FE_6620_5C04:get(_____62A4_76FEID_5217_8868[i + 1])
+            if _____5B9E_4F8B ~= nil then
+                result[#result + 1] = _____5B9E_4F8B
+            end
+            i = i + 1
+        end
     end
     return result
 end

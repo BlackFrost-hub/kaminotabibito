@@ -37,8 +37,9 @@ const helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工�
 };
 
 const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效") as {
-  registerMoveSpeedTornadoHero: (whichHero: any) => void;
+  registerMoveSpeedTornadoHero?: (this: void, whichHero: any) => void;
 };
+const registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero;
 
 const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时") as {
   initOutOfCombat: () => void;
@@ -146,8 +147,8 @@ function invokeSelectionCenterSeed(whichPlayer: any, whichUnit: any): void {
 }
 
 function registerHeroDependents(whichHero: any): void {
-  if (typeof moveTornado.registerMoveSpeedTornadoHero === "function") {
-    moveTornado.registerMoveSpeedTornadoHero(whichHero);
+  if (typeof registerMoveSpeedTornadoHero === "function") {
+    registerMoveSpeedTornadoHero(whichHero);
   }
   if (typeof petItemHandoff.registerPetItemHandoffHero === "function") {
     petItemHandoff.registerPetItemHandoffHero(whichHero);

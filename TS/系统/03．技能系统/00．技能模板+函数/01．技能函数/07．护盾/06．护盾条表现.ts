@@ -95,6 +95,15 @@ function 实数转整数(value: number): number {
   return R2I(value);
 }
 
+function 获取有序护盾条单位ID列表(): number[] {
+  const result: number[] = [];
+  for (const 单位ID of 护盾条映射.keys()) {
+    result.push(单位ID);
+  }
+  result.sort((a, b) => a - b);
+  return result;
+}
+
 // ==========================================================================================
 // 护盾条管理
 // ==========================================================================================
@@ -145,7 +154,13 @@ function 移除护盾条(单位ID: number): void {
 }
 
 function 更新所有护盾条位置(): void {
-  for (const [单位ID, 数据] of 护盾条映射) {
+  const 单位ID列表 = 获取有序护盾条单位ID列表();
+  for (let i = 0; i < 单位ID列表.length; i++) {
+    const 单位ID = 单位ID列表[i];
+    const 数据 = 护盾条映射.get(单位ID);
+    if (数据 == null) {
+      continue;
+    }
     // 检查单位是否存活
     if (!单位存活(数据.跟随单位) || !单位存活(数据.护盾条单位)) {
       移除护盾条(单位ID);

@@ -2,6 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 玩家系统 - 英雄注册联动 - 移速龙卷特效
 -- 职责：
@@ -15,39 +16,50 @@ local japi = require("jass.japi")
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local trackedHeroes = __TS__New(Map)
 local tornadoEffects = __TS__New(Map)
-local function isValidHandle(self, handle)
+local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
-local function getHandleId(self, handle)
-    if not isValidHandle(nil, handle) then
+local function getHandleId(handle)
+    if not isValidHandle(handle) then
         return 0
     end
     return jass.GetHandleId(handle) or 0
 end
-local function createTornadoEffect(self, whichUnit)
+local function _____83B7_53D6_6709_5E8F_82F1_96C4ID_5217_8868()
+    local result = {}
+    for ____, heroId in __TS__Iterator(trackedHeroes:keys()) do
+        result[#result + 1] = heroId
+    end
+    __TS__ArraySort(
+        result,
+        function(____, a, b) return a - b end
+    )
+    return result
+end
+local function createTornadoEffect(whichUnit)
     return jass.AddSpecialEffectTarget(C.TORNADO_EFFECT_MODEL, whichUnit, C.TORNADO_ATTACH_POINT)
 end
-local function destroyTornadoEffect(self, effect)
-    if not isValidHandle(nil, effect) then
+local function destroyTornadoEffect(effect)
+    if not isValidHandle(effect) then
         return
     end
     jass.DestroyEffect(effect)
 end
-local function removeTrackedHero(self, heroId)
+local function removeTrackedHero(heroId)
     trackedHeroes:delete(heroId)
     local effect = tornadoEffects:get(heroId)
     if effect ~= nil then
-        destroyTornadoEffect(nil, effect)
+        destroyTornadoEffect(effect)
         tornadoEffects:delete(heroId)
     end
 end
 --- 由英雄注册桥接调用。
 -- 当某个玩家英雄被确认后，把它加入龙卷特效跟踪表。
-function ____exports.registerMoveSpeedTornadoHero(self, whichHero)
-    if not isValidHandle(nil, whichHero) then
+function ____exports.registerMoveSpeedTornadoHero(whichHero)
+    if not isValidHandle(whichHero) then
         return
     end
-    local heroId = getHandleId(nil, whichHero)
+    local heroId = getHandleId(whichHero)
     if heroId == 0 then
         return
     end
@@ -55,33 +67,41 @@ function ____exports.registerMoveSpeedTornadoHero(self, whichHero)
 end
 --- 周期同步已注册英雄的移速特效状态。
 -- 这里只处理“已被桥接模块确认过”的英雄，不再自己扫描全局英雄组。
-function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes(self)
-    for ____, ____value in __TS__Iterator(trackedHeroes) do
-        local heroId = ____value[1]
-        local hero = ____value[2]
-        do
-            if not isValidHandle(nil, hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
-                removeTrackedHero(nil, heroId)
-                goto __continue14
-            end
-            local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
-            local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
-            local currentEffect = tornadoEffects:get(heroId)
-            if shouldHaveEffect then
-                if currentEffect == nil then
-                    local effect = createTornadoEffect(nil, hero)
-                    if effect ~= nil then
-                        tornadoEffects:set(heroId, effect)
-                    end
+function ____exports.syncTornadoSpeedEffectsByRegisteredHeroes()
+    local heroIds = _____83B7_53D6_6709_5E8F_82F1_96C4ID_5217_8868()
+    do
+        local i = 0
+        while i < #heroIds do
+            do
+                local heroId = heroIds[i + 1]
+                local hero = trackedHeroes:get(heroId)
+                if hero == nil then
+                    goto __continue19
                 end
-                goto __continue14
+                if not isValidHandle(hero) or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) == true then
+                    removeTrackedHero(heroId)
+                    goto __continue19
+                end
+                local moveSpeed = jass.GetUnitMoveSpeed(hero) or 0
+                local shouldHaveEffect = moveSpeed > C.MOVE_SPEED_THRESHOLD
+                local currentEffect = tornadoEffects:get(heroId)
+                if shouldHaveEffect then
+                    if currentEffect == nil then
+                        local effect = createTornadoEffect(hero)
+                        if effect ~= nil then
+                            tornadoEffects:set(heroId, effect)
+                        end
+                    end
+                    goto __continue19
+                end
+                if currentEffect ~= nil then
+                    destroyTornadoEffect(currentEffect)
+                    tornadoEffects:delete(heroId)
+                end
             end
-            if currentEffect ~= nil then
-                destroyTornadoEffect(nil, currentEffect)
-                tornadoEffects:delete(heroId)
-            end
+            ::__continue19::
+            i = i + 1
         end
-        ::__continue14::
     end
 end
 return ____exports

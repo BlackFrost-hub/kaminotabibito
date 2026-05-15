@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 玩家系统 - 英雄注册联动 - 移速龙卷特效
  * 职责：
@@ -24,6 +25,15 @@ function isValidHandle(handle: any): boolean {
 function getHandleId(handle: any): number {
   if (!isValidHandle(handle)) return 0;
   return (jass.GetHandleId(handle) as number) || 0;
+}
+
+function 获取有序英雄ID列表(): number[] {
+  const result: number[] = [];
+  for (const heroId of trackedHeroes.keys()) {
+    result.push(heroId);
+  }
+  result.sort((a, b) => a - b);
+  return result;
 }
 
 function createTornadoEffect(whichUnit: any): any {
@@ -60,7 +70,13 @@ export function registerMoveSpeedTornadoHero(whichHero: any): void {
  * 这里只处理“已被桥接模块确认过”的英雄，不再自己扫描全局英雄组。
  */
 export function syncTornadoSpeedEffectsByRegisteredHeroes(): void {
-  for (const [heroId, hero] of trackedHeroes) {
+  const heroIds = 获取有序英雄ID列表();
+  for (let i = 0; i < heroIds.length; i++) {
+    const heroId = heroIds[i];
+    const hero = trackedHeroes.get(heroId);
+    if (hero == null) {
+      continue;
+    }
     if (!isValidHandle(hero) || jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) === true) {
       removeTrackedHero(heroId);
       continue;

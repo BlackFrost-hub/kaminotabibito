@@ -14,17 +14,20 @@ const { onTick10ms } = globalThis as unknown as {
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("./00．常量");
 
 const heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index") as {
-  syncTornadoSpeedEffectsByRegisteredHeroes: () => void;
-  initPlayerHeroGetBridge: () => void;
-  initPetItemHandoff: () => void;
+  syncTornadoSpeedEffectsByRegisteredHeroes?: (this: void) => void;
+  initPlayerHeroGetBridge?: (this: void) => void;
+  initPetItemHandoff?: (this: void) => void;
 };
+const syncTornadoSpeedEffectsByRegisteredHeroes = heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes;
+const initPlayerHeroGetBridge = heroLinkage.initPlayerHeroGetBridge;
+const initPetItemHandoff = heroLinkage.initPetItemHandoff;
 
 let _inited = false;
 let _tickCounter = 0;
 
 function runAllFeatureSyncs(): void {
-  if (typeof heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes === "function") {
-    heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes();
+  if (typeof syncTornadoSpeedEffectsByRegisteredHeroes === "function") {
+    syncTornadoSpeedEffectsByRegisteredHeroes();
   }
 }
 
@@ -40,11 +43,11 @@ export function initPlayerUnitManager(): void {
   if (_inited) return;
   _inited = true;
 
-  if (typeof heroLinkage.initPetItemHandoff === "function") {
-    heroLinkage.initPetItemHandoff();
+  if (typeof initPetItemHandoff === "function") {
+    initPetItemHandoff();
   }
-  if (typeof heroLinkage.initPlayerHeroGetBridge === "function") {
-    heroLinkage.initPlayerHeroGetBridge();
+  if (typeof initPlayerHeroGetBridge === "function") {
+    initPlayerHeroGetBridge();
   }
 
   onTick10ms(onPlayerUnitManagerTick);

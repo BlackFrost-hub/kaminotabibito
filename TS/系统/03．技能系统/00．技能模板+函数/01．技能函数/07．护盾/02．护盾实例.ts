@@ -40,6 +40,15 @@ export function 取句柄ID(h: any): number {
   return GetHandleId(h);
 }
 
+function 获取有序护盾ID列表(): number[] {
+  const result: number[] = [];
+  for (const 护盾ID of 护盾映射.keys()) {
+    result.push(护盾ID);
+  }
+  result.sort((a, b) => a - b);
+  return result;
+}
+
 // ==========================================================================================
 // 护盾实例管理
 // ==========================================================================================
@@ -211,8 +220,12 @@ export function 清除所有护盾数据(): void {
  */
 export function 获取所有活动护盾实例(): 护盾实例[] {
   const result: 护盾实例[] = [];
-  for (const [, 实例] of 护盾映射) {
-    result.push(实例);
+  const 护盾ID列表 = 获取有序护盾ID列表();
+  for (let i = 0; i < 护盾ID列表.length; i++) {
+    const 实例 = 护盾映射.get(护盾ID列表[i]);
+    if (实例 != null) {
+      result.push(实例);
+    }
   }
   return result;
 }

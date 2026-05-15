@@ -24,6 +24,7 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal�
 local YDLocal5Get = ____require_result_2.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
+local registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
@@ -108,8 +109,8 @@ local function invokeSelectionCenterSeed(whichPlayer, whichUnit)
     seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
 end
 local function registerHeroDependents(whichHero)
-    if type(moveTornado.registerMoveSpeedTornadoHero) == "function" then
-        moveTornado:registerMoveSpeedTornadoHero(whichHero)
+    if type(registerMoveSpeedTornadoHero) == "function" then
+        registerMoveSpeedTornadoHero(whichHero)
     end
     if type(petItemHandoff.registerPetItemHandoffHero) == "function" then
         petItemHandoff:registerPetItemHandoffHero(whichHero)

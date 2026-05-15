@@ -2,6 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local ____02_FF0E_62A4_76FE_5B9E_4F8B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.02．护盾实例")
 local _____83B7_53D6_5355_4F4D_603B_62A4_76FE_503C = ____02_FF0E_62A4_76FE_5B9E_4F8B["获取单位总护盾值"]
@@ -61,6 +62,17 @@ local function _____88C1_526A_5230_5B57_8282(value)
 end
 local function _____5B9E_6570_8F6C_6574_6570(value)
     return R2I(value)
+end
+local function _____83B7_53D6_6709_5E8F_62A4_76FE_6761_5355_4F4DID_5217_8868()
+    local result = {}
+    for ____, _____5355_4F4DID in __TS__Iterator(_____62A4_76FE_6761_6620_5C04:keys()) do
+        result[#result + 1] = _____5355_4F4DID
+    end
+    __TS__ArraySort(
+        result,
+        function(____, a, b) return a - b end
+    )
+    return result
 end
 local function _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
     if not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) or not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) then
@@ -126,39 +138,47 @@ local function _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
     _____62A4_76FE_6761_6620_5C04:delete(_____5355_4F4DID)
 end
 local function _____66F4_65B0_6240_6709_62A4_76FE_6761_4F4D_7F6E()
-    for ____, ____value in __TS__Iterator(_____62A4_76FE_6761_6620_5C04) do
-        local _____5355_4F4DID = ____value[1]
-        local _____6570_636E = ____value[2]
-        do
-            if not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) or not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) then
-                _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
-                goto __continue25
-            end
-            _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
-            local _____5F53_524D_603B_62A4_76FE = _____83B7_53D6_5355_4F4D_603B_62A4_76FE_503C(_____5355_4F4DID)
-            if _____5F53_524D_603B_62A4_76FE <= 0 then
-                _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
-                goto __continue25
-            end
-            if _____5F53_524D_603B_62A4_76FE > _____6570_636E["初始总护盾"] then
-                _____6570_636E["初始总护盾"] = _____5F53_524D_603B_62A4_76FE
-            end
-            local _____6BD4_4F8B = _____6570_636E["初始总护盾"] > 0 and _____5F53_524D_603B_62A4_76FE / _____6570_636E["初始总护盾"] or 1
-            _____8BBE_7F6E_62A4_76FE_6761_6BD4_4F8B(_____6570_636E, _____6BD4_4F8B)
-            if _____6570_636E["颜色恢复倒计时"] > 0 then
-                _____6570_636E["颜色恢复倒计时"] = _____6570_636E["颜色恢复倒计时"] - 0.02
-                if _____6570_636E["颜色恢复倒计时"] <= 0 then
-                    _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
+    local _____5355_4F4DID_5217_8868 = _____83B7_53D6_6709_5E8F_62A4_76FE_6761_5355_4F4DID_5217_8868()
+    do
+        local i = 0
+        while i < #_____5355_4F4DID_5217_8868 do
+            do
+                local _____5355_4F4DID = _____5355_4F4DID_5217_8868[i + 1]
+                local _____6570_636E = _____62A4_76FE_6761_6620_5C04:get(_____5355_4F4DID)
+                if _____6570_636E == nil then
+                    goto __continue30
+                end
+                if not _____5355_4F4D_5B58_6D3B(_____6570_636E["跟随单位"]) or not _____5355_4F4D_5B58_6D3B(_____6570_636E["护盾条单位"]) then
+                    _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
+                    goto __continue30
+                end
+                _____8BBE_7F6E_62A4_76FE_6761_4F4D_7F6E(_____6570_636E)
+                local _____5F53_524D_603B_62A4_76FE = _____83B7_53D6_5355_4F4D_603B_62A4_76FE_503C(_____5355_4F4DID)
+                if _____5F53_524D_603B_62A4_76FE <= 0 then
+                    _____79FB_9664_62A4_76FE_6761(_____5355_4F4DID)
+                    goto __continue30
+                end
+                if _____5F53_524D_603B_62A4_76FE > _____6570_636E["初始总护盾"] then
+                    _____6570_636E["初始总护盾"] = _____5F53_524D_603B_62A4_76FE
+                end
+                local _____6BD4_4F8B = _____6570_636E["初始总护盾"] > 0 and _____5F53_524D_603B_62A4_76FE / _____6570_636E["初始总护盾"] or 1
+                _____8BBE_7F6E_62A4_76FE_6761_6BD4_4F8B(_____6570_636E, _____6BD4_4F8B)
+                if _____6570_636E["颜色恢复倒计时"] > 0 then
+                    _____6570_636E["颜色恢复倒计时"] = _____6570_636E["颜色恢复倒计时"] - 0.02
+                    if _____6570_636E["颜色恢复倒计时"] <= 0 then
+                        _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
+                    end
+                end
+                if _____6570_636E["颜色恢复倒计时"] > 0 then
+                    _____6570_636E["颜色恢复倒计时"] = _____6570_636E["颜色恢复倒计时"] - 0.02
+                    if _____6570_636E["颜色恢复倒计时"] <= 0 then
+                        _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
+                    end
                 end
             end
-            if _____6570_636E["颜色恢复倒计时"] > 0 then
-                _____6570_636E["颜色恢复倒计时"] = _____6570_636E["颜色恢复倒计时"] - 0.02
-                if _____6570_636E["颜色恢复倒计时"] <= 0 then
-                    _____8BBE_7F6E_62A4_76FE_6761_989C_8272(_____6570_636E, COLOR_DEFAULT)
-                end
-            end
+            ::__continue30::
+            i = i + 1
         end
-        ::__continue25::
     end
     if _____62A4_76FE_6761_6620_5C04.size == 0 and _____5DF2_6CE8_518C_8BA1_65F6_5668 then
         _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
