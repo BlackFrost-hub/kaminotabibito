@@ -96,6 +96,18 @@ function ____exports.ydlStes_readInteger5(self, _self, name)
     end
     return 0
 end
+function ____exports.ydlStes_readUnitcode5(self, _self, name)
+    local v = YDLocal5Get(nil, "unitcode", name)
+    if type(v) == "number" and v == v then
+        return jass.R2I(v)
+    end
+    local tn = _G.tonumber
+    local t = tn(nil, v)
+    if type(t) == "number" and t == t then
+        return jass.R2I(t)
+    end
+    return 0
+end
 function ____exports.ydlStes_readUnit5(self, _self, name)
     return YDLocal5Get(nil, "unit", name)
 end

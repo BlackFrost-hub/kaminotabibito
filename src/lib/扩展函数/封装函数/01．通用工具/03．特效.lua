@@ -11,6 +11,13 @@ local ____require_result_0 = require("系统.00．核心系统.07．联机安全
 local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local effectDestroyCtxByTimerHid = {}
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local AddSpecialEffect = jass.AddSpecialEffect
+local DestroyEffect = jass.DestroyEffect
+local DzBindEffect = japi.DzBindEffect
+local DzUnbindEffect = japi.DzUnbindEffect
+local EXSetEffectSize = japi.EXSetEffectSize
 local function onTimedEffectTimerExpire()
     local t = jass.GetExpiredTimer()
     local eff = effectDestroyCtxByTimerHid[jass.GetHandleId(t)]
@@ -157,5 +164,72 @@ function ____exports.destroyUnitEffect(unit, effectKey)
         destroyBoundEffect(effect)
     end
     unitEffectMap:delete(key)
+end
+local ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868 = __TS__New(Map)
+local function _____9690_85CF_5E76_9500_6BC1Dz_7ED1_5B9A_7279_6548(effect)
+    if not effect then
+        return
+    end
+    DzUnbindEffect(effect)
+    EXSetEffectSize(effect, 0)
+    DestroyEffect(effect)
+end
+____exports["创建Dz绑定单位特效"] = function(unit, attachPoint, modelPath, effectKey)
+    if effectKey == nil then
+        effectKey = "default"
+    end
+    if not unit or modelPath == "" then
+        return nil
+    end
+    local key = getUnitEffectKey(unit, effectKey)
+    if key == "" then
+        return nil
+    end
+    local existingEffect = ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:get(key)
+    if existingEffect then
+        _____9690_85CF_5E76_9500_6BC1Dz_7ED1_5B9A_7279_6548(existingEffect)
+    end
+    local effect = AddSpecialEffect(
+        modelPath,
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+    if not effect then
+        return nil
+    end
+    DzBindEffect(unit, attachPoint, effect)
+    ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:set(key, effect)
+    return effect
+end
+____exports["是否已有Dz绑定单位特效"] = function(unit, effectKey)
+    if effectKey == nil then
+        effectKey = "default"
+    end
+    if not unit then
+        return false
+    end
+    local key = getUnitEffectKey(unit, effectKey)
+    if key == "" then
+        return false
+    end
+    local effect = ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:get(key)
+    return effect ~= nil and effect ~= 0
+end
+____exports["销毁Dz绑定单位特效"] = function(unit, effectKey)
+    if effectKey == nil then
+        effectKey = "default"
+    end
+    if not unit then
+        return
+    end
+    local key = getUnitEffectKey(unit, effectKey)
+    if key == "" then
+        return
+    end
+    local effect = ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:get(key)
+    if effect then
+        _____9690_85CF_5E76_9500_6BC1Dz_7ED1_5B9A_7279_6548(effect)
+    end
+    ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:delete(key)
 end
 return ____exports

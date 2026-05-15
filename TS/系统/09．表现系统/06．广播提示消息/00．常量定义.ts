@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 export const 广播提示玩家槽数 = 4;
-export const 每玩家广播提示槽数 = 5;
+export const 每玩家广播提示槽数 = 7;
 
 export const 广播提示背景贴图 = "UI\\xiaoxi\\UInoticebackdrop.tga";
 export const 广播提示默认头像 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
@@ -15,7 +15,7 @@ export const 广播提示文字高度 = 0.018;
 
 export const 广播提示起始X = 0.22;
 export const 广播提示停留X = 0.105;
-export const 广播提示基准Y = 0.225;
+export const 广播提示基准Y = 0.2;
 export const 广播提示槽间距Y = 0.038;
 
 export const 广播提示滑入毫秒 = 300;

@@ -3,7 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 ____exports["广播提示玩家槽数"] = 4
-____exports["每玩家广播提示槽数"] = 5
+____exports["每玩家广播提示槽数"] = 7
 ____exports["广播提示背景贴图"] = "UI\\xiaoxi\\UInoticebackdrop.tga"
 ____exports["广播提示默认头像"] = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 ____exports["广播提示字体"] = "UI\\uizt.ttf"
@@ -14,7 +14,7 @@ ____exports["广播提示文字宽度"] = 0.185
 ____exports["广播提示文字高度"] = 0.018
 ____exports["广播提示起始X"] = 0.22
 ____exports["广播提示停留X"] = 0.105
-____exports["广播提示基准Y"] = 0.225
+____exports["广播提示基准Y"] = 0.2
 ____exports["广播提示槽间距Y"] = 0.038
 ____exports["广播提示滑入毫秒"] = 300
 ____exports["广播提示默认停留毫秒"] = 3000

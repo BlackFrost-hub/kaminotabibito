@@ -20,7 +20,7 @@
 ]=]
 
 
-local wantPrintInGame = false
+local wantPrintInGame = true
 
 local dbg = require 'jass.debug'
 local jass = require 'jass.common'

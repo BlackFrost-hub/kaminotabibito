@@ -8,6 +8,9 @@
  */
 
 const jass = require("jass.common") as any;
+const { buffs } = require("系统.05．Buff系统.01．Buff表") as {
+  buffs: Record<string, { effect: string }>;
+};
 
 import {
   重伤系统开关,
@@ -33,17 +36,45 @@ const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("
     buffID: string,
     durationSec: number,
     effectValue: number,
-    extras?: { sourceName?: string }
+    extras?: { sourceName?: string; onRemove?: (this: void, unit: any, buffID: string, row: { effect: number; remaining: number }) => void }
   ) => void;
   getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; remaining: number } | null;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
+const {
+  创建Dz绑定单位特效,
+  销毁Dz绑定单位特效,
+  是否已有Dz绑定单位特效,
+} = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string) => any;
+  销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
+  是否已有Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => boolean;
+};
 
 const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
+const 重伤特效挂点 = "overhead";
+const 重伤特效Key = "buff_wound_c021";
+const 重伤特效模型 = buffs[重伤BuffID]?.effect ?? "";
 
 function 读取YD用户数据(this: void, tableType: string, tableKey: any, attr: string, valueType: string): any {
   return YDUserDataGetSafe(tableType, tableKey, attr, valueType);
+}
+
+function 清理重伤附着特效(this: void, unit: any): void {
+  if (unit == null || unit === 0) return;
+  销毁Dz绑定单位特效(unit, 重伤特效Key);
+}
+
+function 重伤Buff移除回调(this: void, unit: any): void {
+  清理重伤附着特效(unit);
+}
+
+function 刷新重伤附着特效(this: void, unit: any): void {
+  if (unit == null || unit === 0) return;
+  if (重伤特效模型 === "") return;
+  if (是否已有Dz绑定单位特效(unit, 重伤特效Key)) return;
+  创建Dz绑定单位特效(unit, 重伤特效挂点, 重伤特效模型, 重伤特效Key);
 }
 
 /** 限制重伤值在有效范围内 */
@@ -88,7 +119,9 @@ export function 施加重伤(unit: any, 重伤值: number, 持续时间: number 
   const sourceName = source != null && source !== 0 ? jass.GetUnitName(source) : undefined;
   registerManualBuff(unit, 重伤BuffID, 持续时间, 最终值 * 重伤效果系数, {
     sourceName: typeof sourceName === "string" && sourceName !== "" ? sourceName : undefined,
+    onRemove: 重伤Buff移除回调,
   });
+  刷新重伤附着特效(unit);
 }
 
 /** 移除单位重伤 */

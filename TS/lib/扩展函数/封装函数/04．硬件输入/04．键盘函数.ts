@@ -19,7 +19,7 @@ import { createTriggerOrNull, runFalseLocalRegistration } from "./02．内部工
 import { KEY_STATE } from "./01．常量定义";
 
 const syncKeyUpCallbackByTriggerHid: Record<number, ((player: any, key: number) => void) | undefined> = {};
-const localKeyCallbackByTriggerHid: Record<number, ((this: any) => void) | undefined> = {};
+const localKeyCallbacksByKeyAndStatus: Record<string, Array<(this: any) => void> | undefined> = {};
 
 export function isKeyDown(keyCode: number): boolean {
   return !!japi.DzIsKeyDown(keyCode);
@@ -68,9 +68,21 @@ function registerKeyBindToTriggerLocal(
   action: (this: any) => void,
   playerId?: number
 ): void {
-  localKeyCallbackByTriggerHid[jass.GetHandleId(trig) as number] = action;
+  const dispatchKey = getLocalDispatchKey(keyCode, status);
+  let list = localKeyCallbacksByKeyAndStatus[dispatchKey];
+  if (list == null) {
+    list = [];
+    localKeyCallbacksByKeyAndStatus[dispatchKey] = list;
+  }
+  list.push(action);
   runFalseLocalRegistration(() => {
-    japi.DzTriggerRegisterKeyEventByCode(trig, keyCode, status, false, onLocalKeyEvent);
+    japi.DzTriggerRegisterKeyEventByCode(
+      trig,
+      keyCode,
+      status,
+      false,
+      status === KEY_STATE.UP ? onLocalKeyUpEvent : onLocalKeyDownEvent
+    );
   }, playerId);
 }
 
@@ -162,14 +174,28 @@ function isChatInputActive(): boolean {
   return false;
 }
 
-function onLocalKeyEvent(): void {
+function getLocalDispatchKey(this: void, keyCode: number, status: number): string {
+  return tostring(keyCode) + ":" + tostring(status);
+}
+
+function dispatchLocalKeyEvent(this: void, status: number): void {
   if (isChatInputActive()) return;
 
-  const trig = jass.GetTriggeringTrigger();
-  if (!trig) return;
-  const cb = localKeyCallbackByTriggerHid[jass.GetHandleId(trig) as number] as ((this: void) => void) | undefined;
-  if (typeof cb !== "function") return;
-  cb();
+  const key = japi.DzGetTriggerKey();
+  const callbacks = localKeyCallbacksByKeyAndStatus[getLocalDispatchKey(key, status)];
+  if (callbacks == null) return;
+  for (let i = 0; i < callbacks.length; i++) {
+    const cb = callbacks[i];
+    if (typeof cb === "function") cb();
+  }
+}
+
+function onLocalKeyDownEvent(this: void): void {
+  dispatchLocalKeyEvent(KEY_STATE.DOWN);
+}
+
+function onLocalKeyUpEvent(this: void): void {
+  dispatchLocalKeyEvent(KEY_STATE.UP);
 }
 
 export function registerKeyEventRawStatus(keyCode: number, status: number, sync: boolean, action: (this: any) => void, playerId?: number): any {

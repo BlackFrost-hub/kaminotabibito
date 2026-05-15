@@ -119,7 +119,7 @@ end
 local function loadByHash(self, ____type, h, p, c)
     repeat
         local ____switch18 = ____type
-        local ____cond18 = ____switch18 == "integer"
+        local ____cond18 = ____switch18 == "integer" or ____switch18 == "unitcode" or ____switch18 == "abilcode" or ____switch18 == "itemcode"
         if ____cond18 then
             return jass.LoadInteger(h, p, c)
         end
@@ -195,7 +195,7 @@ end
 local function saveByHash(self, ____type, h, p, c, value)
     repeat
         local ____switch20 = ____type
-        local ____cond20 = ____switch20 == "integer"
+        local ____cond20 = ____switch20 == "integer" or ____switch20 == "unitcode" or ____switch20 == "abilcode" or ____switch20 == "itemcode"
         if ____cond20 then
             jass.SaveInteger(
                 h,
@@ -300,7 +300,7 @@ end
 local function defaultForType(self, ____type)
     repeat
         local ____switch22 = ____type
-        local ____cond22 = ____switch22 == "integer"
+        local ____cond22 = ____switch22 == "integer" or ____switch22 == "unitcode" or ____switch22 == "abilcode" or ____switch22 == "itemcode"
         if ____cond22 then
             return 0
         end

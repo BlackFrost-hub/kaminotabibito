@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const Frame工具 = require("lib.扩展函数.封装函数.04．硬件输入.index") as {
   frameSetScriptByCode: (frame: number, eventId: number, action: () => void, sync: boolean, playerId?: number) => void;
@@ -10,9 +11,12 @@ import { 游戏说明页面 } from "./02．内容数据";
 import type { 手册UI帧 } from "./03．手册UI创建";
 import { 设置手册帧显示 } from "./03．手册UI创建";
 import { 开始翻页动画, 是否正在翻页, 停止翻页动画, 显示翻页预览, 隐藏翻页预览 } from "./04．翻页动画";
+import { Sound3DII_Mp3PlayReuse } from "../../../lib/扩展函数/封装函数/02．音效系统/index";
 
 const DzFrameSetText = japi.DzFrameSetText as (frame: number, text: string) => void;
 const DzFrameShow = japi.DzFrameShow as (frame: number, visible: boolean) => void;
+const 获取本地玩家 = jass.GetLocalPlayer as () => any;
+const 翻页音效路径 = "Sound\\UIeffect\\fanye\\fanye.mp3";
 
 let 手册UI: 手册UI帧 | null = null;
 let 当前页 = 0;
@@ -72,6 +76,7 @@ function onNextClick(this: void): void {
   if (手册UI == null || !是否打开 || 是否正在翻页()) return;
   if (有效帧(手册UI.indicator)) DzFrameShow(手册UI.indicator, false);
   if (有效帧(手册UI.hintText)) DzFrameShow(手册UI.hintText, false);
+  Sound3DII_Mp3PlayReuse(翻页音效路径, 获取本地玩家());
   当前页 = 规范页码(当前页 + 1);
   开始翻页动画(翻页结束);
 }

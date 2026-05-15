@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local onSyncKeyUp, isChatInputActive, onLocalKeyEvent, jass, japi, syncKeyUpCallbackByTriggerHid, localKeyCallbackByTriggerHid
+local onSyncKeyUp, isChatInputActive, getLocalDispatchKey, dispatchLocalKeyEvent, onLocalKeyDownEvent, onLocalKeyUpEvent, jass, japi, syncKeyUpCallbackByTriggerHid, localKeyCallbacksByKeyAndStatus
 local ____02_FF0E_5185_90E8_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.02．内部工具")
 local createTriggerOrNull = ____02_FF0E_5185_90E8_5DE5_5177.createTriggerOrNull
 local runFalseLocalRegistration = ____02_FF0E_5185_90E8_5DE5_5177.runFalseLocalRegistration
@@ -36,26 +36,41 @@ function isChatInputActive(self)
     end
     return false
 end
-function onLocalKeyEvent(self)
+function getLocalDispatchKey(keyCode, status)
+    return (tostring(keyCode) .. ":") .. tostring(status)
+end
+function dispatchLocalKeyEvent(status)
     if isChatInputActive(nil) then
         return
     end
-    local trig = jass.GetTriggeringTrigger()
-    if not trig then
+    local key = japi.DzGetTriggerKey()
+    local callbacks = localKeyCallbacksByKeyAndStatus[getLocalDispatchKey(key, status)]
+    if callbacks == nil then
         return
     end
-    local cb = localKeyCallbackByTriggerHid[jass.GetHandleId(trig)]
-    if type(cb) ~= "function" then
-        return
+    do
+        local i = 0
+        while i < #callbacks do
+            local cb = callbacks[i + 1]
+            if type(cb) == "function" then
+                cb(nil)
+            end
+            i = i + 1
+        end
     end
-    cb()
+end
+function onLocalKeyDownEvent()
+    dispatchLocalKeyEvent(KEY_STATE.DOWN)
+end
+function onLocalKeyUpEvent()
+    dispatchLocalKeyEvent(KEY_STATE.UP)
 end
 jass = require("jass.common")
 japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
 local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
 syncKeyUpCallbackByTriggerHid = {}
-localKeyCallbackByTriggerHid = {}
+localKeyCallbacksByKeyAndStatus = {}
 function ____exports.isKeyDown(self, keyCode)
     return not not japi.DzIsKeyDown(keyCode)
 end
@@ -109,7 +124,13 @@ local function registerKeyBindToTrigger(self, trig, status, keyCode)
     end
 end
 local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action, playerId)
-    localKeyCallbackByTriggerHid[jass.GetHandleId(trig)] = action
+    local dispatchKey = getLocalDispatchKey(keyCode, status)
+    local list = localKeyCallbacksByKeyAndStatus[dispatchKey]
+    if list == nil then
+        list = {}
+        localKeyCallbacksByKeyAndStatus[dispatchKey] = list
+    end
+    list[#list + 1] = action
     runFalseLocalRegistration(
         nil,
         function()
@@ -118,7 +139,7 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
                 keyCode,
                 status,
                 false,
-                onLocalKeyEvent
+                status == KEY_STATE.UP and onLocalKeyUpEvent or onLocalKeyDownEvent
             )
         end,
         playerId

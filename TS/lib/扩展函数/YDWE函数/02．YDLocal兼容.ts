@@ -89,12 +89,16 @@ function sh(s: string): number {
 
 type YDTypeName =
   | "integer" | "real" | "boolean" | "string"
+  | "unitcode" | "abilcode" | "itemcode"
   | "timer" | "trigger" | "unit" | "item" | "group" | "player" | "location"
   | "destructable" | "force" | "rect" | "region" | "sound" | "effect";
 
 function loadByHash(type: YDTypeName, h: any, p: number, c: number): any {
   switch (type) {
     case "integer":
+    case "unitcode":
+    case "abilcode":
+    case "itemcode":
       return jass.LoadInteger(h, p, c);
     case "real":
       return jass.LoadReal(h, p, c);
@@ -136,6 +140,9 @@ function loadByHash(type: YDTypeName, h: any, p: number, c: number): any {
 function saveByHash(type: YDTypeName, h: any, p: number, c: number, value: any): void {
   switch (type) {
     case "integer":
+    case "unitcode":
+    case "abilcode":
+    case "itemcode":
       jass.SaveInteger(h, p, c, Number(value) || 0);
       return;
     case "real":
@@ -191,7 +198,11 @@ function saveByHash(type: YDTypeName, h: any, p: number, c: number, value: any):
 
 function defaultForType(type: YDTypeName): any {
   switch (type) {
-    case "integer": return 0;
+    case "integer":
+    case "unitcode":
+    case "abilcode":
+    case "itemcode":
+      return 0;
     case "real": return 0;
     case "boolean": return false;
     case "string": return "";

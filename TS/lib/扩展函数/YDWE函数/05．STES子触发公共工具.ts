@@ -98,6 +98,15 @@ export function ydlStes_readInteger5(_self: any, name: string): number {
   return 0;
 }
 
+export function ydlStes_readUnitcode5(_self: any, name: string): number {
+  const v = YDLocal5Get("unitcode", name);
+  if (typeof v === "number" && v === v) return jass.R2I(v);
+  const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
+  const t = tn(v);
+  if (typeof t === "number" && t === t) return jass.R2I(t);
+  return 0;
+}
+
 export function ydlStes_readUnit5(_self: any, name: string): any {
   return YDLocal5Get("unit", name);
 }

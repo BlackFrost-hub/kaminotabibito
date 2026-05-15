@@ -15,6 +15,8 @@ local _____662F_5426_6B63_5728_7FFB_9875 = ____04_FF0E_7FFB_9875_52A8_753B["是�
 local _____505C_6B62_7FFB_9875_52A8_753B = ____04_FF0E_7FFB_9875_52A8_753B["停止翻页动画"]
 local _____663E_793A_7FFB_9875_9884_89C8 = ____04_FF0E_7FFB_9875_52A8_753B["显示翻页预览"]
 local _____9690_85CF_7FFB_9875_9884_89C8 = ____04_FF0E_7FFB_9875_52A8_753B["隐藏翻页预览"]
+local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
+local Sound3DII_Mp3PlayReuse = ____index.Sound3DII_Mp3PlayReuse
 ____exports["关闭游戏说明手册"] = function()
     if _____624B_518CUI == nil then
         return
@@ -25,10 +27,13 @@ ____exports["关闭游戏说明手册"] = function()
 end
 ---
 -- @noSelfInFile
+local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____Frame_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local DzFrameSetText = japi.DzFrameSetText
 local DzFrameShow = japi.DzFrameShow
+local _____83B7_53D6_672C_5730_73A9_5BB6 = jass.GetLocalPlayer
+local _____7FFB_9875_97F3_6548_8DEF_5F84 = "Sound\\UIeffect\\fanye\\fanye.mp3"
 _____624B_518CUI = nil
 local _____5F53_524D_9875 = 0
 _____662F_5426_6253_5F00 = false
@@ -130,6 +135,11 @@ local function onNextClick()
     if _____6709_6548_5E27(_____624B_518CUI.hintText) then
         DzFrameShow(_____624B_518CUI.hintText, false)
     end
+    Sound3DII_Mp3PlayReuse(
+        nil,
+        _____7FFB_9875_97F3_6548_8DEF_5F84,
+        _____83B7_53D6_672C_5730_73A9_5BB6()
+    )
     _____5F53_524D_9875 = _____89C4_8303_9875_7801(_____5F53_524D_9875 + 1)
     _____5F00_59CB_7FFB_9875_52A8_753B(_____7FFB_9875_7ED3_675F)
 end

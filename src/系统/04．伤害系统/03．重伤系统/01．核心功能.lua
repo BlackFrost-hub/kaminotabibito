@@ -13,18 +13,49 @@ local _____91CD_4F24_9ED8_8BA4_6301_7EED_65F6_95F4 = ____00_FF0E_5E38_91CF_5B9A_
 -- 2. 造成伤害时，给被伤害的单位添加buffUI重伤（C021），每次造成伤害刷新持续时间
 -- 3. 重伤减少目标受到的治疗效果
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local registerHealCallback = ____require_result_1.registerHealCallback
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local getBuffRuntime = ____require_result_2.getBuffRuntime
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
+local ____require_result_0 = require("系统.05．Buff系统.01．Buff表")
+local buffs = ____require_result_0.buffs
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local registerHealCallback = ____require_result_2.registerHealCallback
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_3.registerManualBuff
+local getBuffRuntime = ____require_result_3.getBuffRuntime
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["创建Dz绑定单位特效"]
+local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["销毁Dz绑定单位特效"]
+local _____662F_5426_5DF2_6709Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["是否已有Dz绑定单位特效"]
 local GetPlayerId = jass.GetPlayerId
 local GetOwningPlayer = jass.GetOwningPlayer
+local _____91CD_4F24_7279_6548_6302_70B9 = "overhead"
+local _____91CD_4F24_7279_6548Key = "buff_wound_c021"
+local ____opt_5 = buffs[_____91CD_4F24BuffID]
+local _____91CD_4F24_7279_6548_6A21_578B = ____opt_5 and ____opt_5.effect or ""
 local function _____8BFB_53D6YD_7528_6237_6570_636E(tableType, tableKey, attr, valueType)
     return YDUserDataGetSafe(tableType, tableKey, attr, valueType)
+end
+local function _____6E05_7406_91CD_4F24_9644_7740_7279_6548(unit)
+    if unit == nil or unit == 0 then
+        return
+    end
+    _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548(unit, _____91CD_4F24_7279_6548Key)
+end
+local function _____91CD_4F24Buff_79FB_9664_56DE_8C03(unit)
+    _____6E05_7406_91CD_4F24_9644_7740_7279_6548(unit)
+end
+local function _____5237_65B0_91CD_4F24_9644_7740_7279_6548(unit)
+    if unit == nil or unit == 0 then
+        return
+    end
+    if _____91CD_4F24_7279_6548_6A21_578B == "" then
+        return
+    end
+    if _____662F_5426_5DF2_6709Dz_7ED1_5B9A_5355_4F4D_7279_6548(unit, _____91CD_4F24_7279_6548Key) then
+        return
+    end
+    _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548(unit, _____91CD_4F24_7279_6548_6302_70B9, _____91CD_4F24_7279_6548_6A21_578B, _____91CD_4F24_7279_6548Key)
 end
 --- 限制重伤值在有效范围内
 local function _____9650_5236_91CD_4F24_503C(value)
@@ -80,20 +111,24 @@ ____exports["施加重伤"] = function(unit, _____91CD_4F24_503C, _____6301_7EED
     if _____6700_7EC8_503C <= 0 then
         return
     end
-    local ____temp_3
+    local ____temp_7
     if source ~= nil and source ~= 0 then
-        ____temp_3 = jass.GetUnitName(source)
+        ____temp_7 = jass.GetUnitName(source)
     else
-        ____temp_3 = nil
+        ____temp_7 = nil
     end
-    local sourceName = ____temp_3
+    local sourceName = ____temp_7
     registerManualBuff(
         unit,
         _____91CD_4F24BuffID,
         _____6301_7EED_65F6_95F4,
         _____6700_7EC8_503C * _____91CD_4F24_6548_679C_7CFB_6570,
-        {sourceName = type(sourceName) == "string" and sourceName ~= "" and sourceName or nil}
+        {
+            sourceName = type(sourceName) == "string" and sourceName ~= "" and sourceName or nil,
+            onRemove = _____91CD_4F24Buff_79FB_9664_56DE_8C03
+        }
     )
+    _____5237_65B0_91CD_4F24_9644_7740_7279_6548(unit)
 end
 --- 移除单位重伤
 ____exports["移除单位重伤"] = function(unit)

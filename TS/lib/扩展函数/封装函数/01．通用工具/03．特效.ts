@@ -12,6 +12,13 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 };
 
 const effectDestroyCtxByTimerHid: Record<number, any> = {};
+const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
+const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
+const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
+const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, effect: any) => void;
+const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 function onTimedEffectTimerExpire(this: void): void {
   const t = jass.GetExpiredTimer();
@@ -132,4 +139,50 @@ export function destroyUnitEffect(unit: any, effectKey: string = "default"): voi
     destroyBoundEffect(effect);
   }
   unitEffectMap.delete(key);
+}
+
+const Dz绑定单位特效表: Map<string, any> = new Map();
+
+function 隐藏并销毁Dz绑定特效(effect: any): void {
+  if (!effect) return;
+  DzUnbindEffect(effect);
+  EXSetEffectSize(effect, 0);
+  DestroyEffect(effect);
+}
+
+export function 创建Dz绑定单位特效(unit: any, attachPoint: string, modelPath: string, effectKey: string = "default"): any {
+  if (!unit || modelPath === "") return null;
+  const key = getUnitEffectKey(unit, effectKey);
+  if (key === "") return null;
+
+  const existingEffect = Dz绑定单位特效表.get(key);
+  if (existingEffect) {
+    隐藏并销毁Dz绑定特效(existingEffect);
+  }
+
+  const effect = AddSpecialEffect(modelPath, GetUnitX(unit), GetUnitY(unit));
+  if (!effect) return null;
+  DzBindEffect(unit, attachPoint, effect);
+  Dz绑定单位特效表.set(key, effect);
+  return effect;
+}
+
+export function 是否已有Dz绑定单位特效(unit: any, effectKey: string = "default"): boolean {
+  if (!unit) return false;
+  const key = getUnitEffectKey(unit, effectKey);
+  if (key === "") return false;
+  const effect = Dz绑定单位特效表.get(key);
+  return effect != null && effect !== 0;
+}
+
+export function 销毁Dz绑定单位特效(unit: any, effectKey: string = "default"): void {
+  if (!unit) return;
+  const key = getUnitEffectKey(unit, effectKey);
+  if (key === "") return;
+
+  const effect = Dz绑定单位特效表.get(key);
+  if (effect) {
+    隐藏并销毁Dz绑定特效(effect);
+  }
+  Dz绑定单位特效表.delete(key);
 }
