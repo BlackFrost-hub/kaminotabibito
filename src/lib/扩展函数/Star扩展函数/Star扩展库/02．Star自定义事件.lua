@@ -271,6 +271,40 @@ function ____exports.STES_Fire(name)
     setG_SIndex(nil, prevIndex)
     setG_LIndex(nil, prevIndex)
 end
+--- STES_FireWithParams：每个子触发先 YDLocalExecuteTrigger，再写 YDLocal5 参数，避免写到旧 ydl_triggerstep。
+function ____exports.STES_FireWithParams(name, params)
+    init(nil)
+    refreshStesBinding(nil)
+    if not StarBaseHT then
+        return
+    end
+    local hash = jass.StringHash(name)
+    local loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index)
+    _indexStack[#_indexStack + 1] = getG_SIndex(nil)
+    do
+        local i = 0
+        while i < loopIndex do
+            local trg = jass.LoadTriggerHandle(StarBaseHT, hash, i)
+            if trg then
+                YDLocalExecuteTrigger(nil, trg)
+                saveParentIndex(nil, trg)
+                do
+                    local paramIndex = 0
+                    while paramIndex < #params do
+                        local param = params[paramIndex + 1]
+                        YDLocal5Set(nil, param.type, param.name, param.value)
+                        paramIndex = paramIndex + 1
+                    end
+                end
+                YDTriggerExecuteTrigger(nil, trg, false)
+            end
+            i = i + 1
+        end
+    end
+    local prevIndex = #_indexStack > 0 and table.remove(_indexStack) or 0
+    setG_SIndex(nil, prevIndex)
+    setG_LIndex(nil, prevIndex)
+end
 --- 与 JASS 遍历 STES：每轮 YDLocal5Set(real, realParamKey, 0) 后 YDTriggerExecuteTrigger(false)。
 -- 子触发内对同名变量名做 YDLocal5Get / YDLocal7Set，父用 YDLocal1Get(real, realParamKey) 读回。
 -- realParamKey 必须与 GUI/JASS 里 YDLocal 局部变量名字符串完全一致（可为数字、英文、中文等）。
@@ -348,11 +382,11 @@ function ____exports.STES_RemoveEvent(t, targetName)
                 if i >= evCount then
                     break
                 end
-                goto __continue55
+                goto __continue62
             end
             i = i + 1
         end
-        ::__continue55::
+        ::__continue62::
     end
 end
 --- 清除触发器上绑定的所有 STES 事件

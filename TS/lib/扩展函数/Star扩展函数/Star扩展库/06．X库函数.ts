@@ -199,7 +199,27 @@ export function X_SetUnitMovable(u: any, b: boolean): void {
 /**
  * 坐标间距离
  */
-export function X_GDBC(x1: number, y1: number, x2: number, y2: number): number {
+function 归位四坐标参数(thisArg: any, x1OrY1: any, y1OrX2: any, x2OrY2: any, y2Maybe: any): { x1: number; y1: number; x2: number; y2: number } {
+  let x1 = x1OrY1;
+  let y1 = y1OrX2;
+  let x2 = x2OrY2;
+  let y2 = y2Maybe;
+  // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：X_GDBC(x1, y1, x2, y2) / X_GAFC(x1, y1, x2, y2)
+  if (y2 == null && typeof thisArg === "number" && typeof x1OrY1 === "number" && typeof y1OrX2 === "number" && typeof x2OrY2 === "number") {
+    x1 = thisArg;
+    y1 = x1OrY1;
+    x2 = y1OrX2;
+    y2 = x2OrY2;
+  }
+  if (x1 == null || x1 === false || x1 === "") x1 = 0;
+  if (y1 == null || y1 === false || y1 === "") y1 = 0;
+  if (x2 == null || x2 === false || x2 === "") x2 = 0;
+  if (y2 == null || y2 === false || y2 === "") y2 = 0;
+  return { x1, y1, x2, y2 };
+}
+
+export function X_GDBC(this: any, x1OrY1: any, y1OrX2: any, x2OrY2: any, y2Maybe: any): number {
+  const { x1, y1, x2, y2 } = 归位四坐标参数(this, x1OrY1, y1OrX2, x2OrY2, y2Maybe);
   const dx = x2 - x1;
   const dy = y2 - y1;
   return jass.SquareRoot(dx * dx + dy * dy);
@@ -208,15 +228,24 @@ export function X_GDBC(x1: number, y1: number, x2: number, y2: number): number {
 /**
  * 坐标间角度（度数）
  */
-export function X_GAFC(x1: number, y1: number, x2: number, y2: number): number {
+export function X_GAFC(this: any, x1OrY1: any, y1OrX2: any, x2OrY2: any, y2Maybe: any): number {
+  const { x1, y1, x2, y2 } = 归位四坐标参数(this, x1OrY1, y1OrX2, x2OrY2, y2Maybe);
   return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG;
 }
 
 /**
  * 实数转整数（四舍五入）
  */
-export function X_R2I2(r: number): number {
-  return jass.R2I(r + 0.5);
+export function X_R2I2(this: any, r: any): number {
+  let value = r;
+  // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：X_R2I2(r)
+  if ((value == null || value === false || value === "") && typeof this === "number") {
+    value = this;
+  }
+  if (value == null || value === false || value === "") {
+    value = 0;
+  }
+  return jass.R2I(value + 0.5);
 }
 
 export {};

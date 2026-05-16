@@ -103,6 +103,15 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             ABILITY.CYCLONE,
             ORDER.CYCLONE
         )
+    elseif id == ____SFB__8D1F_9762BUFF["寄生"] then
+        ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
+            sourceUnit,
+            u,
+            id,
+            time,
+            ABILITY.PARASITE,
+            ORDER.PARASITE
+        )
     end
 end
 function ____exports.SFB_setBuff(sourceUnit, u, id, time)
@@ -122,7 +131,7 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
         return
     end
-    if id == ____SFB__8D1F_9762BUFF["残废"] or id == ____SFB__8D1F_9762BUFF["精灵之火"] or id == ____SFB__8D1F_9762BUFF["诅咒"] or id == ____SFB__8D1F_9762BUFF["睡眠"] or id == ____SFB__8D1F_9762BUFF["纠缠根须"] or id == ____SFB__8D1F_9762BUFF["飓风"] then
+    if id == ____SFB__8D1F_9762BUFF["残废"] or id == ____SFB__8D1F_9762BUFF["精灵之火"] or id == ____SFB__8D1F_9762BUFF["诅咒"] or id == ____SFB__8D1F_9762BUFF["睡眠"] or id == ____SFB__8D1F_9762BUFF["纠缠根须"] or id == ____SFB__8D1F_9762BUFF["飓风"] or id == ____SFB__8D1F_9762BUFF["寄生"] then
         ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
         return
     end
@@ -146,21 +155,21 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
     local abilityId
     local orderStr
     repeat
-        local ____switch36 = id
-        local ____cond36 = ____switch36 == 0
-        if ____cond36 then
+        local ____switch38 = id
+        local ____cond38 = ____switch38 == 0
+        if ____cond38 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond36 = ____cond36 or ____switch36 == 1
-        if ____cond36 then
+        ____cond38 = ____cond38 or ____switch38 == 1
+        if ____cond38 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond36 = ____cond36 or ____switch36 == 2
-        if ____cond36 then
+        ____cond38 = ____cond38 or ____switch38 == 2
+        if ____cond38 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -173,20 +182,20 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
             )
             break
         end
-        ____cond36 = ____cond36 or ____switch36 == 3
-        if ____cond36 then
+        ____cond38 = ____cond38 or ____switch38 == 3
+        if ____cond38 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond36 = ____cond36 or ____switch36 == 4
-        if ____cond36 then
+        ____cond38 = ____cond38 or ____switch38 == 4
+        if ____cond38 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond36 = ____cond36 or ____switch36 == 5
-        if ____cond36 then
+        ____cond38 = ____cond38 or ____switch38 == 5
+        if ____cond38 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -260,6 +269,9 @@ function ____exports.SFB_setEntanglingRoots(sourceUnit, u, time)
 end
 function ____exports.SFB_setCyclone(sourceUnit, u, time)
     ____exports.SFB_setNegativeBuff(sourceUnit, u, ____SFB__8D1F_9762BUFF["飓风"], time)
+end
+function ____exports.SFB_setParasite(sourceUnit, u, time)
+    ____exports.SFB_setNegativeBuff(sourceUnit, u, ____SFB__8D1F_9762BUFF["寄生"], time)
 end
 --- 对目标施放“幻象物品”技能。
 -- 

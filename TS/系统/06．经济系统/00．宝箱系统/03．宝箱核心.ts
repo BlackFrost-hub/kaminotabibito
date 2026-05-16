@@ -181,7 +181,9 @@ function fireStesEvent(this: void, eventName: string, opener: any, target: any):
     for (let i = 0; i < count; i++) {
         const trg = jass.LoadTriggerHandle(ht, hash, i);
         if (trg) {
-            // 先设置变量，再执行触发器
+            YDLocalExecuteTrigger(trg);
+            saveParentIndex(trg);
+
             if (eventName === EVENT_CHEST_OPENED) {
                 YDLocal5Set("unit", YDLOCAL_VAR_OPENER, opener);
                 YDLocal5Set("destructable", YDLOCAL_VAR_CHEST, target);
@@ -190,8 +192,6 @@ function fireStesEvent(this: void, eventName: string, opener: any, target: any):
                 YDLocal5Set("destructable", YDLOCAL_VAR_PRE_CHEST, target);
             }
 
-            YDLocalExecuteTrigger(trg);
-            saveParentIndex(trg);
             YDTriggerExecuteTrigger(trg, false);
         }
     }

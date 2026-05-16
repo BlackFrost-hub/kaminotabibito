@@ -65,7 +65,21 @@ end
 function ____exports.GS_LoadUintProperty_B(self, u, i)
     return ____exports.GS_LoadUintProperty(nil, u, i)
 end
-function ____exports.GS_Unit_Pry_change(self, u, i, r)
+function ____exports.GS_Unit_Pry_change(self, uOrI, iOrR, rMaybe)
+    local u = uOrI
+    local i = iOrR
+    local r = rMaybe
+    if r == nil and type(uOrI) == "number" and type(iOrR) == "number" then
+        u = self
+        i = uOrI
+        r = iOrR
+    end
+    if i == nil or i == false or i == "" then
+        i = 0
+    end
+    if r == nil or r == false or r == "" then
+        r = 0
+    end
     if not u or r == 0 then
         return
     end

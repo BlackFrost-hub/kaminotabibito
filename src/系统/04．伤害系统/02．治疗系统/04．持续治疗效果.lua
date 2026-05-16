@@ -235,9 +235,7 @@ function ____exports.getHotUnitCount()
     return hotUnits.size
 end
 local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Fire = ____require_result_6.STES_Fire
-local ____require_result_7 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Set = ____require_result_7.YDLocal5Set
+local STES_FireWithParams = ____require_result_6.STES_FireWithParams
 --- STES事件名称
 ____exports.HOT_EVENT_NAME = "持续治疗效果"
 --- 触发"持续治疗效果"事件
@@ -249,10 +247,6 @@ ____exports.HOT_EVENT_NAME = "持续治疗效果"
 -- @param tickMP 每秒恢复魔法量
 -- @param duration 持续时间（秒，可选，默认从YDUserData读取或使用tickHP）
 function ____exports.fireHotEvent(target, source, tickHP, tickMP, duration)
-    YDLocal5Set(nil, "unit", "HealTarget", target)
-    YDLocal5Set(nil, "unit", "HealSource", source)
-    YDLocal5Set(nil, "real", "hotTickHP", tickHP)
-    YDLocal5Set(nil, "real", "hotTickMP", tickMP)
     if duration ~= nil then
         YDUserDataSet(
             nil,
@@ -262,15 +256,15 @@ function ____exports.fireHotEvent(target, source, tickHP, tickMP, duration)
             duration
         )
     end
-    STES_Fire(nil, nil, ____exports.HOT_EVENT_NAME)
+    STES_FireWithParams(____exports.HOT_EVENT_NAME, {{type = "unit", name = "HealTarget", value = target}, {type = "unit", name = "HealSource", value = source}, {type = "real", name = "hotTickHP", value = tickHP}, {type = "real", name = "hotTickMP", value = tickMP}})
 end
 --- 触发器实例
 local hotTrigger = nil
 --- STES事件处理函数
 -- 接收参数：HealTarget, HealSource, hotTickHP, hotTickMP
 local function onHotEvent()
-    local ____require_result_8 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-    local YDLocal1Get = ____require_result_8.YDLocal1Get
+    local ____require_result_7 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+    local YDLocal1Get = ____require_result_7.YDLocal1Get
     local target = YDLocal1Get(nil, "unit", "HealTarget")
     local source = YDLocal1Get(nil, "unit", "HealSource")
     local tickHP = YDLocal1Get(nil, "real", "hotTickHP")
@@ -283,13 +277,13 @@ local function onHotEvent()
         "real"
     )
     if duration <= 0 then
-        local ____temp_9
+        local ____temp_8
         if tickHP > 0 then
-            ____temp_9 = tickHP
+            ____temp_8 = tickHP
         else
-            ____temp_9 = 10
+            ____temp_8 = 10
         end
-        duration = ____temp_9
+        duration = ____temp_8
     end
     ____exports.startHot(
         target,
@@ -307,8 +301,8 @@ function ____exports.initHotSystem()
     if hotTrigger ~= nil then
         return
     end
-    local ____require_result_10 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-    local registerStesListener = ____require_result_10.registerStesListener
+    local ____require_result_9 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+    local registerStesListener = ____require_result_9.registerStesListener
     hotTrigger = registerStesListener(nil, ____exports.HOT_EVENT_NAME, onHotEvent)
 end
 --- 检查系统是否已初始化

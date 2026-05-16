@@ -75,6 +75,10 @@ const UnitAddAbility = jass["UnitAddAbility"] as (whichUnit: any, abilityId: num
 const GetHandleId = jass["GetHandleId"] as (whichHandle: any) => number;
 export const IssueTargetOrder = jass["IssueTargetOrder"] as (whichUnit: any, order: string, targetWidget: any) => boolean;
 export const IssueTargetOrderById = jass["IssueTargetOrderById"] as (whichUnit: any, order: number, targetWidget: any) => boolean;
+const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
+const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
+const SetUnitX = jass["SetUnitX"] as (whichUnit: any, newX: number) => void;
+const SetUnitY = jass["SetUnitY"] as (whichUnit: any, newY: number) => void;
 const GetUnitName = jass["GetUnitName"] as (whichUnit: any) => string;
 const GetOwningPlayer = jass["GetOwningPlayer"] as (whichUnit: any) => any;
 const GetPlayerId = jass["GetPlayerId"] as (whichPlayer: any) => number;
@@ -96,6 +100,7 @@ export const ABILITY = {
   SLEEP: 0x41534253,
   ENTANGLING_ROOTS: 0x41534254,
   CYCLONE: 0x41534248,
+  PARASITE: 0x41534250,
 };
 
 export const ORDER = {
@@ -114,6 +119,7 @@ export const ORDER = {
   SLEEP: "sleep",
   ENTANGLING_ROOTS: "entanglingroots",
   CYCLONE: "cyclone",
+  PARASITE: "parasite",
 };
 
 export const SFB_增益BUFF = {
@@ -128,6 +134,7 @@ export const SFB_负面BUFF = {
   睡眠: 44,
   纠缠根须: 45,
   飓风: 46,
+  寄生: 47,
 } as const;
 
 const SFB_BUFF_ID: Record<number, string> = {
@@ -149,6 +156,7 @@ const SFB_BUFF_ID: Record<number, string> = {
   44: "C016",
   45: "C017",
   46: "C018",
+  47: "C024",
 };
 
 const NATIVE_BUFF = {
@@ -169,6 +177,7 @@ const NATIVE_BUFF = {
   ENTANGLING_ROOTS: 1111844210,
   CYCLONE_MAIN: 1113815395,
   CYCLONE_EXTRA: 1113815346,
+  PARASITE: 0x424E7061,
   ITEM_ILLUSION: 0x4249696c,
 };
 
@@ -190,6 +199,7 @@ const SFB_NATIVE_BUFF_IDS: Record<number, number[]> = {
   44: [NATIVE_BUFF.SLEEP_MAIN, NATIVE_BUFF.SLEEP_PAUSE, NATIVE_BUFF.SLEEP_STUN],
   45: [NATIVE_BUFF.ENTANGLING_ROOTS],
   46: [NATIVE_BUFF.CYCLONE_MAIN, NATIVE_BUFF.CYCLONE_EXTRA],
+  47: [NATIVE_BUFF.PARASITE],
 };
 
 function getBuffDisplaySourceUnit(sourceUnit: any): any {
@@ -280,6 +290,7 @@ export function SFB_Init(): void {
   UnitAddAbility(SFB_Unit, ABILITY.INVIS);
   UnitAddAbility(SFB_Unit, ABILITY.FREEZE);
   UnitAddAbility(SFB_Unit, ABILITY.ITEM_ILLUSION);
+  UnitAddAbility(SFB_Unit, ABILITY.PARASITE);
   SFB_已添加技能[ABILITY.POLYMORPH] = true;
   SFB_已添加技能[ABILITY.STUN] = true;
   SFB_已添加技能[ABILITY.SLOW] = true;
@@ -287,6 +298,7 @@ export function SFB_Init(): void {
   SFB_已添加技能[ABILITY.INVIS] = true;
   SFB_已添加技能[ABILITY.FREEZE] = true;
   SFB_已添加技能[ABILITY.ITEM_ILLUSION] = true;
+  SFB_已添加技能[ABILITY.PARASITE] = true;
 
   (globalThis as any).SFB_Unit = SFB_Unit;
 }
@@ -326,9 +338,15 @@ export function SFB_施加原生目标Buff(this: void, sourceUnit: any, u: any, 
   const fac = getAngleBetweenUnits(caster, u);
   EXSetUnitFacing(caster, fac);
   jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac);
+  SetUnitX(caster, GetUnitX(u));
+  SetUnitY(caster, GetUnitY(u));
 
   YDWESetUnitAbilityDataReal(caster, abilityId, 1, 102, time);
   YDWESetUnitAbilityDataReal(caster, abilityId, 1, 103, time);
+  if (abilityId === ABILITY.PARASITE) {
+    YDWESetUnitAbilityDataReal(caster, abilityId, 1, 105, 0);
+    YDWESetUnitAbilityDataReal(caster, abilityId, 1, 107, 999999);
+  }
 
   registerSfbManualBuff(sourceUnit, u, id, time, 0);
 

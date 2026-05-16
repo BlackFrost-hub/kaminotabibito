@@ -158,17 +158,73 @@ function ____exports.X_SetUnitMovable(self, u, b)
     end
 end
 --- 坐标间距离
-function ____exports.X_GDBC(self, x1, y1, x2, y2)
+local function _____5F52_4F4D_56DB_5750_6807_53C2_6570(self, thisArg, x1OrY1, y1OrX2, x2OrY2, y2Maybe)
+    local x1 = x1OrY1
+    local y1 = y1OrX2
+    local x2 = x2OrY2
+    local y2 = y2Maybe
+    if y2 == nil and type(thisArg) == "number" and type(x1OrY1) == "number" and type(y1OrX2) == "number" and type(x2OrY2) == "number" then
+        x1 = thisArg
+        y1 = x1OrY1
+        x2 = y1OrX2
+        y2 = x2OrY2
+    end
+    if x1 == nil or x1 == false or x1 == "" then
+        x1 = 0
+    end
+    if y1 == nil or y1 == false or y1 == "" then
+        y1 = 0
+    end
+    if x2 == nil or x2 == false or x2 == "" then
+        x2 = 0
+    end
+    if y2 == nil or y2 == false or y2 == "" then
+        y2 = 0
+    end
+    return {x1 = x1, y1 = y1, x2 = x2, y2 = y2}
+end
+function ____exports.X_GDBC(self, x1OrY1, y1OrX2, x2OrY2, y2Maybe)
+    local ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_2 = _____5F52_4F4D_56DB_5750_6807_53C2_6570(
+        nil,
+        self,
+        x1OrY1,
+        y1OrX2,
+        x2OrY2,
+        y2Maybe
+    )
+    local x1 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_2.x1
+    local y1 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_2.y1
+    local x2 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_2.x2
+    local y2 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_2.y2
     local dx = x2 - x1
     local dy = y2 - y1
     return jass.SquareRoot(dx * dx + dy * dy)
 end
 --- 坐标间角度（度数）
-function ____exports.X_GAFC(self, x1, y1, x2, y2)
+function ____exports.X_GAFC(self, x1OrY1, y1OrX2, x2OrY2, y2Maybe)
+    local ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_3 = _____5F52_4F4D_56DB_5750_6807_53C2_6570(
+        nil,
+        self,
+        x1OrY1,
+        y1OrX2,
+        x2OrY2,
+        y2Maybe
+    )
+    local x1 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_3.x1
+    local y1 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_3.y1
+    local x2 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_3.x2
+    local y2 = ____5F52_4F4D_56DB_5750_6807_53C2_6570_result_3.y2
     return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
 --- 实数转整数（四舍五入）
 function ____exports.X_R2I2(self, r)
-    return jass.R2I(r + 0.5)
+    local value = r
+    if (value == nil or value == false or value == "") and type(self) == "number" then
+        value = self
+    end
+    if value == nil or value == false or value == "" then
+        value = 0
+    end
+    return jass.R2I(value + 0.5)
 end
 return ____exports

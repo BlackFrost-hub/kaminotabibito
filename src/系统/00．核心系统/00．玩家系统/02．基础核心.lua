@@ -3,10 +3,13 @@ local ____exports = {}
 local ____G_0 = _G
 local onTick10ms = ____G_0.onTick10ms
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
-local heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index")
-local syncTornadoSpeedEffectsByRegisteredHeroes = heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes
-local initPlayerHeroGetBridge = heroLinkage.initPlayerHeroGetBridge
-local initPetItemHandoff = heroLinkage.initPetItemHandoff
+local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
+local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
+local heroRevive = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.04．英雄复活系统")
+local syncTornadoSpeedEffectsByRegisteredHeroes = moveTornado.syncTornadoSpeedEffectsByRegisteredHeroes
+local initPlayerHeroGetBridge = heroBridge.initPlayerHeroGetBridge
+local initPetItemHandoff = petItemHandoff.initPetItemHandoff or petItemHandoff["初始化宠物移交"]
 local _inited = false
 local _tickCounter = 0
 local function runAllFeatureSyncs()
@@ -31,6 +34,9 @@ function ____exports.initPlayerUnitManager()
     end
     if type(initPlayerHeroGetBridge) == "function" then
         initPlayerHeroGetBridge()
+    end
+    if type(heroRevive["初始化英雄复活"]) == "function" then
+        heroRevive["初始化英雄复活"]()
     end
     onTick10ms(onPlayerUnitManagerTick)
 end

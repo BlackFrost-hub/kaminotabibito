@@ -275,7 +275,16 @@ end
 function ____exports.SU_IsUnitBehindUnit(self, u, tu)
     return ____exports.SU_GetUnitOfUnit(nil, u, tu) == 2
 end
-function ____exports.SU_GetUnitWhiteAtk(self, u, a)
+function ____exports.SU_GetUnitWhiteAtk(self, uOrA, aMaybe)
+    local u = uOrA
+    local a = aMaybe
+    if a == nil and (type(uOrA) == "number" or uOrA == nil) then
+        u = self
+        a = uOrA
+    end
+    if a == nil or a == false or a == "" then
+        a = 0
+    end
     if not SUC_IsValidUnit(nil, u) then
         return 0
     end

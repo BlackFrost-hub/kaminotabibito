@@ -17,9 +17,23 @@ local bj_DEGTORAD = ____jglobals_bj_DEGTORAD_0
 -- @param dist 距离
 -- @param angle 角度（度）
 -- @returns 新的位置（location）
-function ____exports.GS_PolarProjectionBJ(self, source, dist, angle)
+function ____exports.GS_PolarProjectionBJ(self, sourceOrDist, distOrAngle, angleMaybe)
+    local source = sourceOrDist
+    local dist = distOrAngle
+    local angle = angleMaybe
+    if angle == nil and type(distOrAngle) == "number" and type(sourceOrDist) == "number" then
+        source = self
+        dist = sourceOrDist
+        angle = distOrAngle
+    end
     if not source then
         return nil
+    end
+    if dist == nil or dist == false or dist == "" then
+        dist = 0
+    end
+    if angle == nil or angle == false or angle == "" then
+        angle = 0
     end
     local rad = angle * bj_DEGTORAD
     local x = jass.GetLocationX(source) + dist * jass.Cos(rad)

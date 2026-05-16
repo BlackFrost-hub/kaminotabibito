@@ -1,33 +1,33 @@
+/** @noSelfInFile */
 /**
- * Buff系统 - 统一导出和初始化入口
+ * Buff系统 - 初始化入口
+ *
+ * 不在这里做 export * 聚合，避免加载期把 BuffUI / Buff表 / 控制抗性
+ * 卷入同一条导出链，触发运行时 critical dependency。
  */
 
-// 导出核心模块
-export * from "./00．Buff系统";
-export * from "./01．Buff表";
-export * from "./02．BuffUI";
-export * from "./03．BuffJASS桥接";
-export * from "./05．Buff清除函数";
-export * from "./01．控制抗性/index";
+const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as {
+  initBuffSystem: (this: void) => void;
+};
+const buffUIMod = require("系统.05．Buff系统.02．BuffUI") as {
+  init: (this: void) => void;
+};
+const controlResistMod = require("系统.05．Buff系统.01．控制抗性.index") as {
+  initControlResist: (this: void) => void;
+};
 
-// 加载所有子模块
-const buffPoolCore = require("系统.05．Buff系统.00．Buff系统") as { initBuffSystem: () => void };
-buffPoolCore.initBuffSystem();
-require("系统.05．Buff系统.01．Buff表");
-const buffUIMod = require("系统.05．Buff系统.02．BuffUI") as { init: () => void };
-buffUIMod.init();
-require("系统.05．Buff系统.03．BuffJASS桥接");
-require("系统.05．Buff系统.05．Buff清除函数");
+let Buff系统已初始化 = false;
 
-// 初始化控制抗性系统
-const controlResistMod = require("系统.05．Buff系统.01．控制抗性.index") as { initControlResist: () => void };
-controlResistMod.initControlResist();
+export function init(this: void): void {
+  if (Buff系统已初始化) return;
+  Buff系统已初始化 = true;
 
-/**
- * 初始化Buff系统
- */
-export function init(): void {
+  buffPoolCore.initBuffSystem();
+  require("系统.05．Buff系统.01．Buff表");
+  buffUIMod.init();
+  require("系统.05．Buff系统.03．BuffJASS桥接");
+  require("系统.05．Buff系统.05．Buff清除函数");
+  controlResistMod.initControlResist();
 }
 
-// 自动初始化（可选）
-// init();
+export {};

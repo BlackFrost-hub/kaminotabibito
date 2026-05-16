@@ -1,31 +1,38 @@
+/** @noSelfInFile */
 /**
- * 表现系统 - 统一导出和初始化入口
+ * 表现系统 - main 初始化入口
  *
- * 须导出 `init`：`main.lua` 对 `require("系统.09．表现系统.index")` 的返回值做 `:init()` 调用。
- * 若本文件无任何 `export`，TSTL 可能生成无 `return ____exports` 的 chunk，`require` 得到 `true`，下一行索引即报错。
+ * main 只依赖 init。这里不做 export * 聚合，避免加载期把 UI 工具、
+ * 对话框、仇恨面板、广播提示、手册等模块卷进同一条导出链。
  */
 
-export * from "./01．UI工具/index";
-export * from "./00．初始化UI";
-export * from "./04．翻页UI预研/index";
-export * from "./05．仇恨面板/index";
-export * from "./06．广播提示消息/index";
-export * from "./07．游戏说明手册/index";
+const 原生UI = require("系统.09．表现系统.00．初始化UI") as {
+  initNativeUI: (this: void) => void;
+};
+const UI属性系统 = require("系统.09．表现系统.03．UI属性系统.03．系统入口") as {
+  initUiAttributeSystem: (this: void) => void;
+};
+const 广播提示消息系统 = require("系统.09．表现系统.06．广播提示消息.index") as {
+  初始化广播提示消息系统: (this: void) => void;
+};
+const 游戏说明手册 = require("系统.09．表现系统.07．游戏说明手册.index") as {
+  init: (this: void) => void;
+};
 
-// 对话框子系统在自身 index 侧载执行初始化；不在此 `export *`，避免与下方 `init` 同名符号合并冲突
-require("系统.09．表现系统.02．对话框系统.index");
+let 表现系统已初始化 = false;
 
-import { init as initUiAttributeSystem } from "./03．UI属性系统/index";
-import { 初始化广播提示消息系统 } from "./06．广播提示消息/index";
-import { init as initGameManual } from "./07．游戏说明手册/index";
+export function init(this: void): void {
+  if (表现系统已初始化) return;
+  表现系统已初始化 = true;
 
-const 原生UI = require("系统.09．表现系统.00．初始化UI") as { initNativeUI: () => void };
-
-export function init(): void {
   if (typeof 原生UI.initNativeUI === "function") {
     原生UI.initNativeUI();
   }
-  initUiAttributeSystem();
-  初始化广播提示消息系统();
-  initGameManual();
+
+  UI属性系统.initUiAttributeSystem();
+  require("系统.09．表现系统.02．对话框系统.index");
+  广播提示消息系统.初始化广播提示消息系统();
+  游戏说明手册.init();
 }
+
+export {};

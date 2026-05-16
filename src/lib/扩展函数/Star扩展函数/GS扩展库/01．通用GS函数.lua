@@ -63,7 +63,18 @@ function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
         str
     )
 end
-function ____exports.GS_UnitSector(self, u1, u2, r)
+function ____exports.GS_UnitSector(self, u1OrU2, u2OrR, rMaybe)
+    local u1 = u1OrU2
+    local u2 = u2OrR
+    local r = rMaybe
+    if r == nil and type(u2OrR) == "number" then
+        u1 = self
+        u2 = u1OrU2
+        r = u2OrR
+    end
+    if r == nil or r == false or r == "" then
+        r = 0
+    end
     if u1 == nil or u1 == 0 or u2 == nil or u2 == 0 then
         return false
     end
@@ -76,7 +87,19 @@ function ____exports.GS_UnitSector(self, u1, u2, r)
         abs(nil, angle1 - angle2 - 180) - 180
     ) > r
 end
-function ____exports.GS_Sector(self, angle1, angle2)
+function ____exports.GS_Sector(self, angle1Or2, angle2Maybe)
+    local angle1 = angle1Or2
+    local angle2 = angle2Maybe
+    if angle2 == nil and type(self) == "number" and type(angle1Or2) == "number" then
+        angle1 = self
+        angle2 = angle1Or2
+    end
+    if angle1 == nil or angle1 == false or angle1 == "" then
+        angle1 = 0
+    end
+    if angle2 == nil or angle2 == false or angle2 == "" then
+        angle2 = 0
+    end
     return abs(
         nil,
         abs(nil, angle1 - angle2 - 180) - 180

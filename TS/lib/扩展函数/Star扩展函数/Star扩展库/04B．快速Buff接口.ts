@@ -64,6 +64,8 @@ export function SFB_setNegativeBuff(sourceUnit: any, u: any, id: number, time: n
     SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.ENTANGLING_ROOTS, ORDER.ENTANGLING_ROOTS);
   } else if (id === SFB_负面BUFF.飓风) {
     SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.CYCLONE, ORDER.CYCLONE);
+  } else if (id === SFB_负面BUFF.寄生) {
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.PARASITE, ORDER.PARASITE);
   }
 }
 
@@ -97,6 +99,10 @@ export function SFB_setEntanglingRoots(sourceUnit: any, u: any, time: number): v
 
 export function SFB_setCyclone(sourceUnit: any, u: any, time: number): void {
   SFB_setNegativeBuff(sourceUnit, u, SFB_负面BUFF.飓风, time);
+}
+
+export function SFB_setParasite(sourceUnit: any, u: any, time: number): void {
+  SFB_setNegativeBuff(sourceUnit, u, SFB_负面BUFF.寄生, time);
 }
 
 /**
@@ -139,6 +145,7 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
     || id === SFB_负面BUFF.睡眠
     || id === SFB_负面BUFF.纠缠根须
     || id === SFB_负面BUFF.飓风
+    || id === SFB_负面BUFF.寄生
   ) {
     SFB_setNegativeBuff(sourceUnit, u, id, time);
     return;

@@ -24,7 +24,7 @@ const { max, min } = require("lib.扩展函数.封装函数.01．通用工具.in
 const YD_LOCAL_REAL_KEY = "实数";
 
 const stesMod = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-    STES_FireWithReal11Step: (name: string, realParamKey: string) => void;
+    STES_FireWithReal11Step: (this: void, name: string, realParamKey: string) => void;
     STES_GetTable: () => any;
     STES_Register: (t: any, name: string) => void;
 };

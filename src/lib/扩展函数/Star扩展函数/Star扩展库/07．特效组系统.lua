@@ -221,7 +221,16 @@ end
 -- @param id 特效组ID
 -- @param i 索引（0-based）
 -- @returns 特效句柄，越界返回null
-function ____exports.EG_GetAt(self, id, i)
+function ____exports.EG_GetAt(self, idOrI, iMaybe)
+    local id = idOrI
+    local i = iMaybe
+    if i == nil and type(self) == "number" and type(idOrI) == "number" then
+        id = self
+        i = idOrI
+    end
+    if type(id) ~= "number" or type(i) ~= "number" then
+        return nil
+    end
     local g = groups[id]
     if g == nil then
         return nil

@@ -14,3 +14,5 @@ export * from "./01．回收机制";
 export * from "./02．类型定义";
 export * from "./03．创建漂浮文字";
 export * from "./04．销毁与修改";
+export * from "./05．数值漂浮文字";
+export * from "./06．数值显示STES桥接";

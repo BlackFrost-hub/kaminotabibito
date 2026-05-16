@@ -1,4 +1,7 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
 local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
@@ -17,10 +20,10 @@ local _____79FB_9664_5355_4F4D_8D1F_9762Buff = ____05_FF0EBuff_6E05_9664_51FD_65
 local _____6309_9A71_6563_7B49_7EA7_79FB_9664_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["按驱散等级移除单位Buff"]
 local _____4E00_7EA7_9A71_6563_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["一级驱散单位Buff"]
 local _____4E8C_7EA7_9A71_6563_5355_4F4DBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["二级驱散单位Buff"]
-local ____index = require("系统.04．伤害系统.03．重伤系统.index")
-local _____83B7_53D6_5355_4F4D_91CD_4F24 = ____index["获取单位重伤"]
-local _____65BD_52A0_91CD_4F24 = ____index["施加重伤"]
-local _____79FB_9664_5355_4F4D_91CD_4F24 = ____index["移除单位重伤"]
+local ____01_FF0E_6838_5FC3_529F_80FD = require("系统.04．伤害系统.03．重伤系统.01．核心功能")
+local _____83B7_53D6_5355_4F4D_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["获取单位重伤"]
+local _____65BD_52A0_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["施加重伤"]
+local _____79FB_9664_5355_4F4D_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["移除单位重伤"]
 --- 通用函数 - 控制与 Buff 便捷入口
 -- 
 -- 说明：
@@ -133,11 +136,66 @@ local _____786C_63A7_5236Buff__7761_7720_7729_6655 = 1114993524
 local _____786C_63A7_5236Buff__7EA0_7F20_6839_987B = 1111844210
 local _____786C_63A7_5236Buff__98D3_98CE_4E3B_6548_679C = 1113815395
 local _____786C_63A7_5236Buff__98D3_98CE_9644_52A0 = 1113815346
+local _____8F6F_63A7_5236Buff__51CF_901F = 1114860655
+local _____8F6F_63A7_5236Buff__6B8B_5E9F = 1113813609
+local _____8F6F_63A7_5236Buff__8BC5_5492 = 1113813619
+local _____524A_5F31Buff__6B8B_5E9F = 1113813609
+local _____524A_5F31Buff__7CBE_7075_4E4B_706B = 1114005861
+local _____524A_5F31Buff__8BC5_5492 = 1113813619
+local _____6301_7EED_4F24_5BB3Buff__5BC4_751F = 1112436833
+local _____786C_63A7_5236Buff_5408_96C6 = {
+    _____786C_63A7_5236Buff__7729_6655,
+    _____786C_63A7_5236Buff__7834_51FB_6655_7729,
+    _____786C_63A7_5236Buff__65F6_95F4_505C_6B62,
+    _____786C_63A7_5236Buff__6C89_9ED8,
+    _____786C_63A7_5236Buff__706B_9ED1_9ED8_8BA4_7075_9B42_71C3_70E7,
+    _____786C_63A7_5236Buff__786C_76F4,
+    _____786C_63A7_5236Buff__51B0_51BB_55B7_5410,
+    _____786C_63A7_5236Buff__53D8_5F62,
+    _____786C_63A7_5236Buff__7761_7720_4E3B_6548_679C,
+    _____786C_63A7_5236Buff__7761_7720_6682_505C,
+    _____786C_63A7_5236Buff__7761_7720_7729_6655,
+    _____786C_63A7_5236Buff__7EA0_7F20_6839_987B,
+    _____786C_63A7_5236Buff__98D3_98CE_4E3B_6548_679C,
+    _____786C_63A7_5236Buff__98D3_98CE_9644_52A0
+}
+local _____8F6F_63A7_5236Buff_5408_96C6 = {_____8F6F_63A7_5236Buff__51CF_901F, _____8F6F_63A7_5236Buff__6B8B_5E9F, _____8F6F_63A7_5236Buff__8BC5_5492}
+local _____524A_5F31Buff_5408_96C6 = {_____524A_5F31Buff__6B8B_5E9F, _____524A_5F31Buff__7CBE_7075_4E4B_706B, _____524A_5F31Buff__8BC5_5492}
+local _____6301_7EED_4F24_5BB3Buff_5408_96C6 = {_____6301_7EED_4F24_5BB3Buff__5BC4_751F}
+local ____array_0 = __TS__SparseArrayNew(table.unpack(_____786C_63A7_5236Buff_5408_96C6))
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____8F6F_63A7_5236Buff_5408_96C6)
+)
+local _____8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_0)}
+local ____array_1 = __TS__SparseArrayNew(table.unpack(_____8D1F_9762Buff_5408_96C6))
+__TS__SparseArrayPush(
+    ____array_1,
+    table.unpack(_____524A_5F31Buff_5408_96C6)
+)
+__TS__SparseArrayPush(
+    ____array_1,
+    table.unpack(_____6301_7EED_4F24_5BB3Buff_5408_96C6)
+)
+local _____5168_90E8_8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_1)}
 local function _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, BuffID)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or BuffID == nil or BuffID == 0 then
         return false
     end
     return GetUnitAbilityLevel(_____5355_4F4D, BuffID) > 0
+end
+local function _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, ____Buff_5217_8868)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return false
+    end
+    local index = 0
+    while index < #____Buff_5217_8868 do
+        if _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, ____Buff_5217_8868[index + 1]) then
+            return true
+        end
+        index = index + 1
+    end
+    return false
 end
 --- 施法硬直效果
 -- 
@@ -154,9 +212,21 @@ ____exports["单位是否处于施法硬直效果"] = function(_____5355_4F4D)
     return _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____65BD_6CD5_786C_76F4Buff__9B54_6CD5_6548_679C)
 end
 ____exports["单位是否处于硬控制效果合集"] = function(_____5355_4F4D)
-    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
-        return false
-    end
-    return _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7729_6655) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7834_51FB_6655_7729) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__65F6_95F4_505C_6B62) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__6C89_9ED8) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__706B_9ED1_9ED8_8BA4_7075_9B42_71C3_70E7) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__786C_76F4) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__51B0_51BB_55B7_5410) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__53D8_5F62) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7761_7720_4E3B_6548_679C) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7761_7720_6682_505C) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7761_7720_7729_6655) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__7EA0_7F20_6839_987B) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__98D3_98CE_4E3B_6548_679C) or _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, _____786C_63A7_5236Buff__98D3_98CE_9644_52A0)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____786C_63A7_5236Buff_5408_96C6)
+end
+____exports["单位是否处于软控制效果合集"] = function(_____5355_4F4D)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____8F6F_63A7_5236Buff_5408_96C6)
+end
+____exports["单位是否处于削弱Buff合集"] = function(_____5355_4F4D)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____524A_5F31Buff_5408_96C6)
+end
+____exports["单位是否处于持续伤害Buff合集"] = function(_____5355_4F4D)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____6301_7EED_4F24_5BB3Buff_5408_96C6)
+end
+____exports["单位是否处于负面Buff合集"] = function(_____5355_4F4D)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____8D1F_9762Buff_5408_96C6)
+end
+____exports["单位是否处于全部负面Buff合集"] = function(_____5355_4F4D)
+    return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____5168_90E8_8D1F_9762Buff_5408_96C6)
 end
 return ____exports

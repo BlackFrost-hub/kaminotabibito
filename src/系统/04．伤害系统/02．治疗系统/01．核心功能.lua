@@ -6,7 +6,6 @@ local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.04．伤害系统.02．�
 local HEAL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SYSTEM_ENABLED
 local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
 local HEAL_RESULT_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_RESULT_KEYS
-local HEAL_SHOW_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SHOW_KEYS
 local HEAL_STATS_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_STATS_KEYS
 local DEFAULT_HEAL_EFFECT_PATH = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_HEAL_EFFECT_PATH
 local HEAL_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_TEXT_COLOR
@@ -26,9 +25,9 @@ local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_Fire = ____require_result_1.STES_Fire
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Set = ____require_result_2.YDLocal5Set
+local STES_FireWithParams = ____require_result_1.STES_FireWithParams
+local ____require_result_2 = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字")
+local _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57 = ____require_result_2["显示单位数值漂浮文字"]
 local healCallbacks = {}
 local healEventListeners = {}
 local totalHealStats = __TS__New(Map)
@@ -141,12 +140,7 @@ end
 -- @param green 绿色分量（可选）
 -- @param blue 蓝色分量（可选）
 function ____exports.fireShowDamageEvent(target, amount, red, green, blue)
-    YDLocal5Set(nil, "real", HEAL_SHOW_KEYS.AMOUNT, amount)
-    YDLocal5Set(nil, "unit", HEAL_SHOW_KEYS.TARGET, target)
-    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.RED, red or HEAL_TEXT_COLOR.red)
-    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.GREEN, green or HEAL_TEXT_COLOR.green)
-    YDLocal5Set(nil, "integer", HEAL_SHOW_KEYS.BLUE, blue or HEAL_TEXT_COLOR.blue)
-    STES_Fire(nil, nil, HEAL_EVENTS.SHOW_DAMAGE)
+    _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57(target, amount, {["红"] = red or HEAL_TEXT_COLOR.red, ["绿"] = green or HEAL_TEXT_COLOR.green, ["蓝"] = blue or HEAL_TEXT_COLOR.blue})
 end
 --- 触发"任意单位被治疗"事件
 -- 供Lua端/JASS端调用
@@ -155,10 +149,7 @@ end
 -- @param target 治疗目标
 -- @param amount 治疗量
 function ____exports.fireHealEvent(source, target, amount)
-    YDLocal5Set(nil, "real", HEAL_RESULT_KEYS.AMOUNT, amount)
-    YDLocal5Set(nil, "unit", HEAL_RESULT_KEYS.TARGET, target)
-    YDLocal5Set(nil, "unit", HEAL_RESULT_KEYS.SOURCE, source)
-    STES_Fire(nil, nil, HEAL_EVENTS.HEAL)
+    STES_FireWithParams(HEAL_EVENTS.HEAL, {{type = "real", name = HEAL_RESULT_KEYS.AMOUNT, value = amount}, {type = "unit", name = HEAL_RESULT_KEYS.TARGET, value = target}, {type = "unit", name = HEAL_RESULT_KEYS.SOURCE, value = source}})
 end
 --- 累计治疗统计
 local function addHealStats(target, amount)

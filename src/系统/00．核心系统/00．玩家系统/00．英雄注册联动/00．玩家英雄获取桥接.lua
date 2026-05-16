@@ -25,7 +25,6 @@ local YDLocal5Get = ____require_result_2.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
 local registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
-local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
 local dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index")
@@ -112,11 +111,11 @@ local function registerHeroDependents(whichHero)
     if type(registerMoveSpeedTornadoHero) == "function" then
         registerMoveSpeedTornadoHero(whichHero)
     end
-    if type(petItemHandoff.registerPetItemHandoffHero) == "function" then
-        petItemHandoff:registerPetItemHandoffHero(whichHero)
+    if type(petItemHandoff["注册宠物移交英雄"]) == "function" then
+        petItemHandoff["注册宠物移交英雄"](whichHero)
     end
     if type(chestSystem.registerChestSystemHero) == "function" then
-        chestSystem:registerChestSystemHero(whichHero)
+        chestSystem.registerChestSystemHero(whichHero)
     end
     if type(dynamicSkillText.registerDynamicSkillTextHero) == "function" then
         dynamicSkillText.registerDynamicSkillTextHero(whichHero)
@@ -230,10 +229,15 @@ local function tryRegisterPlayerHeroStes()
         tryRegisterPlayerHeroStes()
     end)
 end
-function ____exports.initPlayerHeroGetBridge()
-    if type(outOfCombat.initOutOfCombat) == "function" then
-        outOfCombat:initOutOfCombat()
+local function initOutOfCombatSystem()
+    local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
+    local init = outOfCombat["初始化脱战系统"]
+    if type(init) == "function" then
+        init()
     end
+end
+function ____exports.initPlayerHeroGetBridge()
+    initOutOfCombatSystem()
     tryRegisterPlayerHeroStes()
 end
 return ____exports

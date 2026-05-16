@@ -81,7 +81,7 @@ local function runAfterDelay()
         return
     end
     log(("[STES事件测试] 执行 STES_FireWithReal11Step，realParamKey=\"" .. YD_LOCAL_REAL_KEY) .. "\"（与 GUI 333）")
-    stesMod:STES_FireWithReal11Step(TEST_EVENT, YD_LOCAL_REAL_KEY)
+    stesMod.STES_FireWithReal11Step(TEST_EVENT, YD_LOCAL_REAL_KEY)
     log("[STES事件测试] STES_FireWithReal11Step 已返回")
 end
 local function boot()

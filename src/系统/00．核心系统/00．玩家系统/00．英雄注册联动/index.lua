@@ -32,4 +32,12 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.04．英雄复活系统")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

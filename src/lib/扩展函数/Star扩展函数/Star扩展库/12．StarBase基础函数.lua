@@ -29,6 +29,13 @@ end
 -- @param x X坐标
 -- @returns 修正后的X坐标
 function ____exports.Star_CoordinateX(self, x)
+    local value = x
+    if (value == nil or value == "" or value == false) and type(self) == "number" then
+        value = self
+    end
+    if value == nil or value == "" or value == false then
+        value = 0
+    end
     local minX = -10000
     local maxX = 10000
     local mapRect = jass.GetWorldBounds()
@@ -36,19 +43,26 @@ function ____exports.Star_CoordinateX(self, x)
         minX = jass.GetRectMinX(mapRect)
         maxX = jass.GetRectMaxX(mapRect)
     end
-    if x < minX then
+    if value < minX then
         return minX
     end
-    if x > maxX then
+    if value > maxX then
         return maxX
     end
-    return x
+    return value
 end
 --- 修正Y坐标到地图边界内
 -- 
 -- @param y Y坐标
 -- @returns 修正后的Y坐标
 function ____exports.Star_CoordinateY(self, y)
+    local value = y
+    if (value == nil or value == "" or value == false) and type(self) == "number" then
+        value = self
+    end
+    if value == nil or value == "" or value == false then
+        value = 0
+    end
     local minY = -10000
     local maxY = 10000
     local mapRect = jass.GetWorldBounds()
@@ -56,13 +70,13 @@ function ____exports.Star_CoordinateY(self, y)
         minY = jass.GetRectMinY(mapRect)
         maxY = jass.GetRectMaxY(mapRect)
     end
-    if y < minY then
+    if value < minY then
         return minY
     end
-    if y > maxY then
+    if value > maxY then
         return maxY
     end
-    return y
+    return value
 end
 --- 获取坐标Z轴高度
 -- 

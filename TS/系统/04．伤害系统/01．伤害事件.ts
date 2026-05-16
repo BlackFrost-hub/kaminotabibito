@@ -86,6 +86,7 @@ function onAnyUnitDamagedAction(this: void): void {
   const j = jass as any;
   const savedUnit = (jass as any).GetTriggerUnit();
   let savedDamage = (jass as any).GetEventDamage();
+  if (savedDamage <= 0) return;
   let savedSource: any = null;
   /** 直接调用 jass.GetEventDamageSource()，不能赋局部变量再调用（TSTL/Lua 坑2：会编成 jass:xxx() 加 self 参数） */
   (pcall as any)(() => { savedSource = (jass as any).GetEventDamageSource(); });

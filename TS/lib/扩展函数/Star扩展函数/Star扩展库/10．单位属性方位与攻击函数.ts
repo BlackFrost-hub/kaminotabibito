@@ -204,7 +204,17 @@ export function SU_IsUnitBehindUnit(u: any, tu: any): boolean {
 }
 
 // 计算单位白字攻击力。
-export function SU_GetUnitWhiteAtk(u: any, a: number): number {
+export function SU_GetUnitWhiteAtk(this: any, uOrA: any, aMaybe: any): number {
+  let u = uOrA;
+  let a = aMaybe;
+  // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：SU_GetUnitWhiteAtk(u, a)
+  if (a == null && (typeof uOrA === "number" || uOrA == null)) {
+    u = this;
+    a = uOrA;
+  }
+  if (a == null || a === false || a === "") {
+    a = 0;
+  }
   if (!SUC_IsValidUnit(u)) return 0;
 
   const primaryGreen = getHeroPrimaryGreenValue(u);

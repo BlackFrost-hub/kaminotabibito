@@ -25,8 +25,6 @@ export const HEAL_EVENTS = {
   REQUEST: "治疗事件",
   /** 任意单位被治疗事件 */
   HEAL: "任意单位被治疗",
-  /** 数值显示事件 */
-  SHOW_DAMAGE: "数值显示",
 } as const;
 
 /** STES「治疗事件」入口参数键名 */
@@ -43,15 +41,6 @@ export const HEAL_RESULT_KEYS = {
   AMOUNT: "HealAmount",
   TARGET: "HealUnit",
   SOURCE: "HealSource",
-} as const;
-
-/** STES「数值显示」事件参数键名 */
-export const HEAL_SHOW_KEYS = {
-  AMOUNT: "Real",
-  TARGET: "Unit",
-  RED: "red",
-  GREEN: "green",
-  BLUE: "blue",
 } as const;
 
 /** 治疗统计与旧 JASS 对齐用到的键名 */

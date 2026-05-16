@@ -11,6 +11,7 @@ local SFB_setCurse = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setCurse
 local SFB_setSleep = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setSleep
 local SFB_setEntanglingRoots = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setEntanglingRoots
 local SFB_setCyclone = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setCyclone
+local SFB_setParasite = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setParasite
 local SFB_setItemIllusion = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setItemIllusion
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____65BD_52A0_5FEB_901FBuff = ____01_FF0E_63A7_5236_4E0EBuff["施加快速Buff"]
@@ -19,6 +20,9 @@ local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____01_FF0E_63A7_5236_4E0EBuff["�
 local _____8BFB_53D6_5355_4F4D_91CD_4F24 = ____01_FF0E_63A7_5236_4E0EBuff["读取单位重伤"]
 local _____65BD_52A0_5355_4F4D_91CD_4F24 = ____01_FF0E_63A7_5236_4E0EBuff["施加单位重伤"]
 local _____6E05_9664_5355_4F4D_91CD_4F24 = ____01_FF0E_63A7_5236_4E0EBuff["清除单位重伤"]
+local ____03_FF0E_7981_9522_5BC4_751F = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.18．周期范围效果.03．禁锢寄生")
+local _____65BD_52A0_7981_9522 = ____03_FF0E_7981_9522_5BC4_751F["施加禁锢"]
+local _____65BD_52A0_5BC4_751F = ____03_FF0E_7981_9522_5BC4_751F["施加寄生"]
 ____exports["快速增益Buff"] = ____SFB__589E_76CABUFF
 ____exports["快速负面Buff"] = ____SFB__8D1F_9762BUFF
 --- 通用快速Buff。参数顺序：来源单位 -> 目标单位 -> Buff类型 -> 持续时间
@@ -41,5 +45,8 @@ ____exports["快速诅咒"] = SFB_setCurse
 ____exports["快速睡眠"] = SFB_setSleep
 ____exports["快速纠缠根须"] = SFB_setEntanglingRoots
 ____exports["快速飓风"] = SFB_setCyclone
+____exports["快速寄生"] = SFB_setParasite
 ____exports["快速幻象物品"] = SFB_setItemIllusion
+____exports["快速禁锢"] = _____65BD_52A0_7981_9522
+____exports["快速寄生虫"] = _____65BD_52A0_5BC4_751F
 return ____exports

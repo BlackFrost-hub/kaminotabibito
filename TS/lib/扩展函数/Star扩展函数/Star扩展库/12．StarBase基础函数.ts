@@ -32,7 +32,14 @@ export function getStarBaseHT(): any {
  * @param x X坐标
  * @returns 修正后的X坐标
  */
-export function Star_CoordinateX(x: number): number {
+export function Star_CoordinateX(this: any, x: any): number {
+  let value = x;
+  if ((value == null || value === "" || value === false) && typeof this === "number") {
+    value = this;
+  }
+  if (value == null || value === "" || value === false) {
+    value = 0;
+  }
   let minX = -10000;
   let maxX = 10000;
 
@@ -42,9 +49,9 @@ export function Star_CoordinateX(x: number): number {
     maxX = jass.GetRectMaxX(mapRect);
   }
 
-  if (x < minX) return minX;
-  if (x > maxX) return maxX;
-  return x;
+  if (value < minX) return minX;
+  if (value > maxX) return maxX;
+  return value;
 }
 
 /**
@@ -52,7 +59,14 @@ export function Star_CoordinateX(x: number): number {
  * @param y Y坐标
  * @returns 修正后的Y坐标
  */
-export function Star_CoordinateY(y: number): number {
+export function Star_CoordinateY(this: any, y: any): number {
+  let value = y;
+  if ((value == null || value === "" || value === false) && typeof this === "number") {
+    value = this;
+  }
+  if (value == null || value === "" || value === false) {
+    value = 0;
+  }
   let minY = -10000;
   let maxY = 10000;
 
@@ -62,9 +76,9 @@ export function Star_CoordinateY(y: number): number {
     maxY = jass.GetRectMaxY(mapRect);
   }
 
-  if (y < minY) return minY;
-  if (y > maxY) return maxY;
-  return y;
+  if (value < minY) return minY;
+  if (value > maxY) return maxY;
+  return value;
 }
 
 /**

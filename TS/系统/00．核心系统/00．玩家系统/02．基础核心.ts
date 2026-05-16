@@ -13,14 +13,22 @@ const { onTick10ms } = globalThis as unknown as {
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("./00．常量");
 
-const heroLinkage = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.index") as {
+const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效") as {
   syncTornadoSpeedEffectsByRegisteredHeroes?: (this: void) => void;
-  initPlayerHeroGetBridge?: (this: void) => void;
-  initPetItemHandoff?: (this: void) => void;
 };
-const syncTornadoSpeedEffectsByRegisteredHeroes = heroLinkage.syncTornadoSpeedEffectsByRegisteredHeroes;
-const initPlayerHeroGetBridge = heroLinkage.initPlayerHeroGetBridge;
-const initPetItemHandoff = heroLinkage.initPetItemHandoff;
+const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  initPlayerHeroGetBridge?: (this: void) => void;
+};
+const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物") as {
+  initPetItemHandoff?: (this: void) => void;
+  初始化宠物移交?: (this: void) => void;
+};
+const heroRevive = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.04．英雄复活系统") as {
+  初始化英雄复活?: (this: void) => void;
+};
+const syncTornadoSpeedEffectsByRegisteredHeroes = moveTornado.syncTornadoSpeedEffectsByRegisteredHeroes;
+const initPlayerHeroGetBridge = heroBridge.initPlayerHeroGetBridge;
+const initPetItemHandoff = petItemHandoff.initPetItemHandoff ?? petItemHandoff.初始化宠物移交;
 
 let _inited = false;
 let _tickCounter = 0;
@@ -48,6 +56,9 @@ export function initPlayerUnitManager(): void {
   }
   if (typeof initPlayerHeroGetBridge === "function") {
     initPlayerHeroGetBridge();
+  }
+  if (typeof heroRevive.初始化英雄复活 === "function") {
+    heroRevive.初始化英雄复活();
   }
 
   onTick10ms(onPlayerUnitManagerTick);

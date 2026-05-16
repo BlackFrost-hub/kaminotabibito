@@ -74,7 +74,7 @@ local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
 local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708 = ____require_result_3["创建渐变圆形提示圈"]
-local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+local function _____6570_5B57_5347_5E8F_6392_5E8F(self, a, b)
     return a - b
 end
 local function _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(_____5355_4F4D_96C6_5408)
@@ -180,7 +180,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
                     local ____opt_4 = self["参数"]["on进入"]
                     if ____opt_4 ~= nil then
-                        ____opt_4(_____5355_4F4D)
+                        ____opt_4(_____5355_4F4D, self["参数"]["回调上下文ID"])
                     end
                 end
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
@@ -194,7 +194,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
                 local ____opt_6 = self["参数"]["on离开"]
                 if ____opt_6 ~= nil then
-                    ____opt_6(self["当前单位集合"][hid])
+                    ____opt_6(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
                 end
             end
             self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -237,7 +237,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
     end
     local ____opt_9 = self["参数"]["on周期"]
     if ____opt_9 ~= nil then
-        ____opt_9(_____5F53_524D_5355_4F4D_6570_7EC4)
+        ____opt_9(_____5F53_524D_5355_4F4D_6570_7EC4, self["参数"]["回调上下文ID"])
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -270,7 +270,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
     end
     local ____opt_11 = self["参数"]["on销毁"]
     if ____opt_11 ~= nil then
-        ____opt_11()
+        ____opt_11(self["参数"]["回调上下文ID"])
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -299,7 +299,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
         if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
             local ____opt_13 = self["参数"]["on离开"]
             if ____opt_13 ~= nil then
-                ____opt_13(self["当前单位集合"][hid])
+                ____opt_13(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
             end
         end
         self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4

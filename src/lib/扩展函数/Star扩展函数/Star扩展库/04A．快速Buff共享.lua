@@ -89,6 +89,10 @@ local UnitAddAbility = jass.UnitAddAbility
 local GetHandleId = jass.GetHandleId
 ____exports.IssueTargetOrder = jass.IssueTargetOrder
 ____exports.IssueTargetOrderById = jass.IssueTargetOrderById
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local SetUnitX = jass.SetUnitX
+local SetUnitY = jass.SetUnitY
 local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
@@ -108,7 +112,8 @@ ____exports.ABILITY = {
     CURSE = 1095975506,
     SLEEP = 1095975507,
     ENTANGLING_ROOTS = 1095975508,
-    CYCLONE = 1095975496
+    CYCLONE = 1095975496,
+    PARASITE = 1095975504
 }
 ____exports.ORDER = {
     STUN = "thunderbolt",
@@ -125,7 +130,8 @@ ____exports.ORDER = {
     CURSE = "curse",
     SLEEP = "sleep",
     ENTANGLING_ROOTS = "entanglingroots",
-    CYCLONE = "cyclone"
+    CYCLONE = "cyclone",
+    PARASITE = "parasite"
 }
 ____exports["SFB_增益BUFF"] = {["心灵之火"] = 31, ["嗜血术"] = 32}
 ____exports["SFB_负面BUFF"] = {
@@ -134,7 +140,8 @@ ____exports["SFB_负面BUFF"] = {
     ["诅咒"] = 43,
     ["睡眠"] = 44,
     ["纠缠根须"] = 45,
-    ["飓风"] = 46
+    ["飓风"] = 46,
+    ["寄生"] = 47
 }
 local SFB_BUFF_ID = {
     [0] = "C001",
@@ -154,7 +161,8 @@ local SFB_BUFF_ID = {
     [43] = "C015",
     [44] = "C016",
     [45] = "C017",
-    [46] = "C018"
+    [46] = "C018",
+    [47] = "C024"
 }
 local NATIVE_BUFF = {
     STUN = 1112560453,
@@ -174,6 +182,7 @@ local NATIVE_BUFF = {
     ENTANGLING_ROOTS = 1111844210,
     CYCLONE_MAIN = 1113815395,
     CYCLONE_EXTRA = 1113815346,
+    PARASITE = 1112436833,
     ITEM_ILLUSION = 1112107372
 }
 local abilityOrderIdCache = {}
@@ -192,7 +201,8 @@ local SFB_NATIVE_BUFF_IDS = {
     [43] = {NATIVE_BUFF.CURSE},
     [44] = {NATIVE_BUFF.SLEEP_MAIN, NATIVE_BUFF.SLEEP_PAUSE, NATIVE_BUFF.SLEEP_STUN},
     [45] = {NATIVE_BUFF.ENTANGLING_ROOTS},
-    [46] = {NATIVE_BUFF.CYCLONE_MAIN, NATIVE_BUFF.CYCLONE_EXTRA}
+    [46] = {NATIVE_BUFF.CYCLONE_MAIN, NATIVE_BUFF.CYCLONE_EXTRA},
+    [47] = {NATIVE_BUFF.PARASITE}
 }
 local function getBuffDisplaySourceUnit(sourceUnit)
     if sourceUnit == nil or sourceUnit == 0 then
@@ -300,6 +310,7 @@ function ____exports.SFB_Init()
     UnitAddAbility(____exports.SFB_Unit, ____exports.ABILITY.INVIS)
     UnitAddAbility(____exports.SFB_Unit, ____exports.ABILITY.FREEZE)
     UnitAddAbility(____exports.SFB_Unit, ____exports.ABILITY.ITEM_ILLUSION)
+    UnitAddAbility(____exports.SFB_Unit, ____exports.ABILITY.PARASITE)
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.POLYMORPH] = true
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.STUN] = true
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.SLOW] = true
@@ -307,6 +318,7 @@ function ____exports.SFB_Init()
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.INVIS] = true
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.FREEZE] = true
     ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.ITEM_ILLUSION] = true
+    ____SFB__5DF2_6DFB_52A0_6280_80FD[____exports.ABILITY.PARASITE] = true
     _G.SFB_Unit = ____exports.SFB_Unit
 end
 local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
@@ -377,6 +389,14 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
     local fac = ____exports.getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(nil, caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    SetUnitX(
+        caster,
+        GetUnitX(u)
+    )
+    SetUnitY(
+        caster,
+        GetUnitY(u)
+    )
     YDWESetUnitAbilityDataReal(
         nil,
         caster,
@@ -393,6 +413,24 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
         103,
         time
     )
+    if abilityId == ____exports.ABILITY.PARASITE then
+        YDWESetUnitAbilityDataReal(
+            nil,
+            caster,
+            abilityId,
+            1,
+            105,
+            0
+        )
+        YDWESetUnitAbilityDataReal(
+            nil,
+            caster,
+            abilityId,
+            1,
+            107,
+            999999
+        )
+    end
     ____exports.registerSfbManualBuff(
         sourceUnit,
         u,

@@ -32,4 +32,20 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.封装函数.03．漂浮文字.06．数值显示STES桥接")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

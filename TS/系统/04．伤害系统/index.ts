@@ -1,37 +1,28 @@
+/** @noSelfInFile */
 /**
- * 伤害系统 - 统一导出和初始化入口
+ * 伤害系统 - 初始化入口
+ *
+ * main 只需要 init，不在这里做 export * 聚合，避免把 DOT / 治疗 / 重伤 / 测试
+ * 在加载期卷成一条导出链，触发 critical dependency。
  */
 
-// ========== 子系统导出 ==========
-export * from "./01．DOT定义/index";
-export * from "./02．治疗系统/index";
+let 伤害系统已初始化 = false;
 
-// ========== 核心模块导出 ==========
-export * from "./01．伤害事件";
-export * from "./02．dot伤害";
-export * from "./03．伤害测试";
+export function init(this: void): void {
+  if (伤害系统已初始化) return;
+  伤害系统已初始化 = true;
 
-// ========== 伤害计算模块导出 ==========
-export * from "./00．伤害计算/index";
+  require("系统.04．伤害系统.01．伤害事件");
+  require("系统.04．伤害系统.02．dot伤害");
+  require("系统.04．伤害系统.01．DOT定义.index");
+  require("系统.04．伤害系统.03．伤害测试");
+  require("系统.04．伤害系统.00．伤害计算.05．事件注册");
 
-// ========== 预加载 ==========
-require("系统.04．伤害系统.01．伤害事件");
-require("系统.04．伤害系统.02．dot伤害");
-require("系统.04．伤害系统.01．DOT定义.index");
-require("系统.04．伤害系统.03．伤害测试");
-require("系统.04．伤害系统.00．伤害计算.05．事件注册");
-require("系统.04．伤害系统.02．治疗系统.index");
-require("系统.04．伤害系统.03．重伤系统.index");
-
-/**
- * 初始化伤害系统
- */
-export function init(): void {
   const { init: initHealSystem } = require("系统.04．伤害系统.02．治疗系统.index") as {
-    init?: () => void;
+    init?: (this: void) => void;
   };
   const { init: initWoundSystem } = require("系统.04．伤害系统.03．重伤系统.index") as {
-    init?: () => void;
+    init?: (this: void) => void;
   };
 
   if (typeof initHealSystem === "function") {
@@ -42,3 +33,5 @@ export function init(): void {
     initWoundSystem();
   }
 }
+
+export {};

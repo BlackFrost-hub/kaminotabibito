@@ -41,16 +41,12 @@ const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 };
 const registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero;
 
-const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时") as {
-  initOutOfCombat: () => void;
-};
-
 const petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物") as {
-  registerPetItemHandoffHero: (whichHero: any) => void;
+  注册宠物移交英雄: (this: void, whichHero: any) => void;
 };
 
 const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册") as {
-  registerChestSystemHero: (whichHero: any) => void;
+  registerChestSystemHero: (this: void, whichHero: any) => void;
 };
 
 const dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index") as {
@@ -150,8 +146,8 @@ function registerHeroDependents(whichHero: any): void {
   if (typeof registerMoveSpeedTornadoHero === "function") {
     registerMoveSpeedTornadoHero(whichHero);
   }
-  if (typeof petItemHandoff.registerPetItemHandoffHero === "function") {
-    petItemHandoff.registerPetItemHandoffHero(whichHero);
+  if (typeof petItemHandoff.注册宠物移交英雄 === "function") {
+    petItemHandoff.注册宠物移交英雄(whichHero);
   }
   if (typeof chestSystem.registerChestSystemHero === "function") {
     chestSystem.registerChestSystemHero(whichHero);
@@ -257,10 +253,18 @@ function tryRegisterPlayerHeroStes(): void {
   });
 }
 
-export function initPlayerHeroGetBridge(): void {
-  if (typeof outOfCombat.initOutOfCombat === "function") {
-    outOfCombat.initOutOfCombat();
+function initOutOfCombatSystem(this: void): void {
+  const outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时") as {
+    初始化脱战系统?: (this: void) => void;
+  };
+  const init = outOfCombat.初始化脱战系统;
+  if (typeof init === "function") {
+    init();
   }
+}
+
+export function initPlayerHeroGetBridge(): void {
+  initOutOfCombatSystem();
   tryRegisterPlayerHeroStes();
 }
 

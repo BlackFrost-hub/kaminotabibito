@@ -18,6 +18,9 @@ function onAnyUnitDamagedAction()
     local j = jass
     local savedUnit = jass.GetTriggerUnit()
     local savedDamage = jass.GetEventDamage()
+    if savedDamage <= 0 then
+        return
+    end
     local savedSource = nil
     pcall(function ()
             savedSource = jass.GetEventDamageSource()

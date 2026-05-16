@@ -9,11 +9,18 @@ let starLocation: any = null;
 /**
  * 获取坐标点地形高度（对齐 EC_GetPointZ）
  */
-export function EC_GetPointZ(x: number, y: number): number {
+export function EC_GetPointZ(this: any, x: any, y: any): number {
+  let px = x;
+  let py = y;
+  // 兼容被当作普通函数调用时的 self 参数错位：EC_GetPointZ(x, y)
+  if (typeof this === "number" && typeof x === "number" && y == null) {
+    px = this;
+    py = x;
+  }
   if (starLocation == null) {
-    starLocation = jass.Location(x, y);
+    starLocation = jass.Location(px, py);
   } else {
-    jass.MoveLocation(starLocation, x, y);
+    jass.MoveLocation(starLocation, px, py);
   }
   return (jass.GetLocationZ(starLocation) as number) || 0;
 }
@@ -26,15 +33,46 @@ export function EC_GetPointZ(x: number, y: number): number {
  * - 其它负数: 立即销毁
  */
 export function EC_CreateEffect(
-  path: string,
-  x: number,
-  y: number,
-  z: number,
-  fac: number,
-  size: number,
-  s: number,
-  time: number
+  this: any,
+  pathOrX: any,
+  xOrY: any,
+  yOrZ: any,
+  zOrFac: any,
+  facOrSize: any,
+  sizeOrS: any,
+  sOrTime: any,
+  timeMaybe?: any
 ): any {
+  let path = pathOrX;
+  let x = xOrY;
+  let y = yOrZ;
+  let z = zOrFac;
+  let fac = facOrSize;
+  let size = sizeOrS;
+  let s = sOrTime;
+  let time = timeMaybe;
+
+  // 兼容被当作普通函数调用时的 self 参数错位：EC_CreateEffect(path, x, y, z, fac, size, s, time)
+  if (typeof this === "string" && typeof pathOrX === "number" && timeMaybe == null) {
+    path = this;
+    x = pathOrX;
+    y = xOrY;
+    z = yOrZ;
+    fac = zOrFac;
+    size = facOrSize;
+    s = sizeOrS;
+    time = sOrTime;
+  }
+
+  if (path == null || path === "") return null;
+  if (x == null || x === false || x === "") x = 0;
+  if (y == null || y === false || y === "") y = 0;
+  if (z == null || z === false || z === "") z = 0;
+  if (fac == null || fac === false || fac === "") fac = 0;
+  if (size == null || size === false || size === "") size = 1;
+  if (s == null || s === false || s === "") s = 1;
+  if (time == null || time === false || time === "") time = -1;
+
   const g = globalThis as any;
   const eff = jass.AddSpecialEffect(path, x, y);
   g.bj_lastCreatedEffect = eff;

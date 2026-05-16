@@ -17,7 +17,6 @@ import {
   HEAL_SYSTEM_ENABLED,
   HEAL_EVENTS,
   HEAL_RESULT_KEYS,
-  HEAL_SHOW_KEYS,
   HEAL_STATS_KEYS,
   DEFAULT_HEAL_EFFECT_PATH,
   HEAL_TEXT_COLOR,
@@ -30,12 +29,12 @@ const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.in
   YDUserDataSet: (tableType: string, tableKey: any, attr: string, value: any) => void;
 };
 
-const { STES_Fire } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Fire: (self: any, name: string) => void;
+const { STES_FireWithParams } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+  STES_FireWithParams: (this: void, name: string, params: Array<{ type: string; name: string; value: any }>) => void;
 };
 
-const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Set: (ty: string, name: string, value: any) => void;
+const { 显示单位数值漂浮文字 } = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字") as {
+  显示单位数值漂浮文字: (this: void, unit: any, value: number, options?: any) => any;
 };
 
 // ==========================================================================================
@@ -164,12 +163,11 @@ export function fireShowDamageEvent(
   green?: number,
   blue?: number
 ): void {
-  YDLocal5Set("real", HEAL_SHOW_KEYS.AMOUNT, amount);
-  YDLocal5Set("unit", HEAL_SHOW_KEYS.TARGET, target);
-  YDLocal5Set("integer", HEAL_SHOW_KEYS.RED, red ?? HEAL_TEXT_COLOR.red);
-  YDLocal5Set("integer", HEAL_SHOW_KEYS.GREEN, green ?? HEAL_TEXT_COLOR.green);
-  YDLocal5Set("integer", HEAL_SHOW_KEYS.BLUE, blue ?? HEAL_TEXT_COLOR.blue);
-  STES_Fire(null, HEAL_EVENTS.SHOW_DAMAGE);
+  显示单位数值漂浮文字(target, amount, {
+    红: red ?? HEAL_TEXT_COLOR.red,
+    绿: green ?? HEAL_TEXT_COLOR.green,
+    蓝: blue ?? HEAL_TEXT_COLOR.blue,
+  });
 }
 
 /**
@@ -181,10 +179,11 @@ export function fireShowDamageEvent(
  * @param amount 治疗量
  */
 export function fireHealEvent(source: any, target: any, amount: number): void {
-  YDLocal5Set("real", HEAL_RESULT_KEYS.AMOUNT, amount);
-  YDLocal5Set("unit", HEAL_RESULT_KEYS.TARGET, target);
-  YDLocal5Set("unit", HEAL_RESULT_KEYS.SOURCE, source);
-  STES_Fire(null, HEAL_EVENTS.HEAL);
+  STES_FireWithParams(HEAL_EVENTS.HEAL, [
+    { type: "real", name: HEAL_RESULT_KEYS.AMOUNT, value: amount },
+    { type: "unit", name: HEAL_RESULT_KEYS.TARGET, value: target },
+    { type: "unit", name: HEAL_RESULT_KEYS.SOURCE, value: source },
+  ]);
 }
 
 /** 累计治疗统计 */

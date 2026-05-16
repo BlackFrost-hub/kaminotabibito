@@ -27,8 +27,14 @@ const {
     getG_LIndex: () => number;
     setG_LIndex: (v: number) => void;
     _indexStack: number[];
-    YDLocal5Set: (ty: "real", name: string, value: any) => void;
+    YDLocal5Set: (ty: string, name: string, value: any) => void;
 };
+
+export interface StesLocal5Param {
+    type: string;
+    name: string;
+    value: any;
+}
 
 /** 与 war3map 中 `STES___HT` / `STES_GetTable` 指向的同一张表；导出名保留历史兼容 */
 let StarBaseHT: any = null;
@@ -228,7 +234,7 @@ export function STES_Execute(self: any, name: string): void {
 /**
  * STES_Fire：逆天传参 / 返回值链（对应 YDTriggerExecuteTrigger(..., false)）
  */
-export function STES_Fire(self: any, name: string): void {
+export function STES_Fire(this: void, name: string): void {
     init();
     refreshStesBinding();
     if (!StarBaseHT) return;
@@ -253,11 +259,42 @@ export function STES_Fire(self: any, name: string): void {
 }
 
 /**
+ * STES_FireWithParams：每个子触发先 YDLocalExecuteTrigger，再写 YDLocal5 参数，避免写到旧 ydl_triggerstep。
+ */
+export function STES_FireWithParams(this: void, name: string, params: StesLocal5Param[]): void {
+    init();
+    refreshStesBinding();
+    if (!StarBaseHT) return;
+
+    const hash = jass.StringHash(name);
+    const loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index);
+
+    _indexStack.push(getG_SIndex());
+
+    for (let i = 0; i < loopIndex; i++) {
+        const trg = jass.LoadTriggerHandle(StarBaseHT, hash, i);
+        if (trg) {
+            YDLocalExecuteTrigger(trg);
+            saveParentIndex(trg);
+            for (let paramIndex = 0; paramIndex < params.length; paramIndex++) {
+                const param = params[paramIndex];
+                YDLocal5Set(param.type as any, param.name, param.value);
+            }
+            YDTriggerExecuteTrigger(trg, false);
+        }
+    }
+
+    const prevIndex = _indexStack.length > 0 ? _indexStack.pop()! : 0;
+    setG_SIndex(prevIndex);
+    setG_LIndex(prevIndex);
+}
+
+/**
  * 与 JASS 遍历 STES：每轮 YDLocal5Set(real, realParamKey, 0) 后 YDTriggerExecuteTrigger(false)。
  * 子触发内对同名变量名做 YDLocal5Get / YDLocal7Set，父用 YDLocal1Get(real, realParamKey) 读回。
  * realParamKey 必须与 GUI/JASS 里 YDLocal 局部变量名字符串完全一致（可为数字、英文、中文等）。
  */
-export function STES_FireWithReal11Step(self: any, name: string, realParamKey: string): void {
+export function STES_FireWithReal11Step(this: void, name: string, realParamKey: string): void {
     init();
     refreshStesBinding();
     if (!StarBaseHT) return;

@@ -45,7 +45,18 @@ export function GS_LoadUintProperty_B(u: any, i: number): number {
   return GS_LoadUintProperty(u, i);
 }
 
-export function GS_Unit_Pry_change(u: any, i: number, r: number): void {
+export function GS_Unit_Pry_change(this: any, uOrI: any, iOrR: any, rMaybe: any): void {
+  let u = uOrI;
+  let i = iOrR;
+  let r = rMaybe;
+  // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：GS_Unit_Pry_change(u, i, r)
+  if (r == null && typeof uOrI === "number" && typeof iOrR === "number") {
+    u = this;
+    i = uOrI;
+    r = iOrR;
+  }
+  if (i == null || i === false || i === "") i = 0;
+  if (r == null || r === false || r === "") r = 0;
   if (!u || r === 0) return;
   const uid = hid(u);
   let hp = 0;

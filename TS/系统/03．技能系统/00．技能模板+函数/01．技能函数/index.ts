@@ -15,3 +15,5 @@ export * from "./10．跳链/index";
 export * from "./11．召唤物/index";
 export * from "./14．落点打击/index";
 export * from "./16．扩展控制/index";
+export * from "./17．单位倒计时/index";
+export * from "./18．周期范围效果/index";

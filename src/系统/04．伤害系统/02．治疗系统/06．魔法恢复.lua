@@ -1,13 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local fireManaShowEvent, STES_Fire, YDLocal5Set, SHOW_DAMAGE_EVENT, MANA_REGEN_COLOR
+local fireManaShowEvent, _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57, MANA_REGEN_COLOR
 function fireManaShowEvent(target, amount)
-    YDLocal5Set(nil, "real", "Real", amount)
-    YDLocal5Set(nil, "unit", "Unit", target)
-    YDLocal5Set(nil, "real", "red", MANA_REGEN_COLOR.red)
-    YDLocal5Set(nil, "real", "green", MANA_REGEN_COLOR.green)
-    YDLocal5Set(nil, "real", "blue", MANA_REGEN_COLOR.blue)
-    STES_Fire(nil, nil, SHOW_DAMAGE_EVENT)
+    _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57(target, amount, {["红"] = MANA_REGEN_COLOR.red, ["绿"] = MANA_REGEN_COLOR.green, ["蓝"] = MANA_REGEN_COLOR.blue})
 end
 --- 魔法恢复系统
 -- 
@@ -15,13 +10,12 @@ end
 -- 
 -- 后续接手者注意：
 -- 1. 直接调用 doManaRegen 执行魔法恢复
--- 2. 内部会触发 STES "数值显示" 事件
+-- 2. 内部会直接显示数值漂浮文字
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-STES_Fire = ____require_result_0.STES_Fire
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-YDLocal5Set = ____require_result_1.YDLocal5Set
-SHOW_DAMAGE_EVENT = "数值显示"
+local STES_FireWithParams = ____require_result_0.STES_FireWithParams
+local ____require_result_1 = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字")
+_____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57 = ____require_result_1["显示单位数值漂浮文字"]
 MANA_REGEN_COLOR = {red = 53, green = 80, blue = 92}
 --- 系统开关
 local MANA_REGEN_SYSTEM_ENABLED = true
@@ -65,9 +59,6 @@ end
 -- @param amount 恢复量
 -- @param source 来源单位（可为null）
 function ____exports.fireManaRegenEvent(target, amount, source)
-    YDLocal5Set(nil, "real", "HealAmount", amount)
-    YDLocal5Set(nil, "unit", "HealTarget", target)
-    YDLocal5Set(nil, "unit", "HealSource", source)
-    STES_Fire(nil, "恢复魔法事件")
+    STES_FireWithParams("恢复魔法事件", {{type = "real", name = "HealAmount", value = amount}, {type = "unit", name = "HealTarget", value = target}, {type = "unit", name = "HealSource", value = source}})
 end
 return ____exports

@@ -432,6 +432,21 @@ export const buffs: Record<string, BuffData> = {
     canPurge: true,
     tooltip: "受到了『恐惧』，内心被惊骇吞没，在time秒内会失去控制并四散逃跑。"
   },
+  "C024": {
+    buffID: "C024",
+    buffName: "寄生",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNParasite.blp",
+    effect: "",
+    type: "Debuff:magic:dot",
+    interval: 0,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 7,
+    canPurge: true,
+    tooltip: "受到了『寄生』，虫群会在time秒内侵蚀目标。"
+  },
 };
 
 export default buffs;

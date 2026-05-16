@@ -31,3 +31,7 @@ export * from "./122．重伤测试";
 export * from "./123．重伤装备测试";
 export * from "./124．扩展控制测试";
 export * from "./125．广播提示消息测试";
+export * from "./126．单位倒计时测试";
+export * from "./127．数值漂浮文字测试";
+export * from "./128．周期范围效果测试";
+export * from "./129．禁锢寄生测试";

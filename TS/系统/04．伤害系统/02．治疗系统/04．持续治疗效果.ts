@@ -258,12 +258,8 @@ export function getHotUnitCount(): number {
 // 五、STES事件触发函数（供Lua/JASS端调用）
 //=============================================================================
 
-const { STES_Fire } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Fire: (self: any, name: string) => void;
-};
-
-const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Set: (ty: string, name: string, value: any) => void;
+const { STES_FireWithParams } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+  STES_FireWithParams: (this: void, name: string, params: Array<{ type: string; name: string; value: any }>) => void;
 };
 
 /** STES事件名称 */
@@ -286,14 +282,15 @@ export function fireHotEvent(
   tickMP: number,
   duration?: number
 ): void {
-  YDLocal5Set("unit", "HealTarget", target);
-  YDLocal5Set("unit", "HealSource", source);
-  YDLocal5Set("real", "hotTickHP", tickHP);
-  YDLocal5Set("real", "hotTickMP", tickMP);
   if (duration != null) {
     YDUserDataSet("unit", target, ATTR_COUNTDOWN, duration);
   }
-  STES_Fire(null, HOT_EVENT_NAME);
+  STES_FireWithParams(HOT_EVENT_NAME, [
+    { type: "unit", name: "HealTarget", value: target },
+    { type: "unit", name: "HealSource", value: source },
+    { type: "real", name: "hotTickHP", value: tickHP },
+    { type: "real", name: "hotTickMP", value: tickMP },
+  ]);
 }
 
 //=============================================================================

@@ -222,7 +222,16 @@ export function EG_GetCount(id: number): number {
  * @param i 索引（0-based）
  * @returns 特效句柄，越界返回null
  */
-export function EG_GetAt(id: number, i: number): any {
+export function EG_GetAt(this: any, idOrI: any, iMaybe: any): any {
+  let id = idOrI;
+  let i = iMaybe;
+  // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：EG_GetAt(id, i)
+  if (i == null && typeof this === "number" && typeof idOrI === "number") {
+    id = this;
+    i = idOrI;
+  }
+  if (typeof id !== "number" || typeof i !== "number") return null;
+
   const g = groups[id];
   if (g == null) return null;
   if (i < 0 || i >= g.length) return null;

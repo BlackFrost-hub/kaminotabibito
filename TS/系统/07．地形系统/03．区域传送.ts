@@ -13,7 +13,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
-  StarOther_PanCameraToTimedForPlayer: (whichPlayer: any, x: number, y: number, duration: number) => void;
+  StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;

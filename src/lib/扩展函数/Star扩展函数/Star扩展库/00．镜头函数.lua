@@ -1,12 +1,14 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 --- 平移玩家镜头到单位
 -- 
 -- @param whichPlayer 目标玩家
 -- @param u 目标单位
 -- @param duration 平移时间
-function ____exports.StarOther_PanCameraToTimedUnitForPlayer(self, whichPlayer, u, duration)
+function ____exports.StarOther_PanCameraToTimedUnitForPlayer(whichPlayer, u, duration)
     if jass.GetLocalPlayer() == whichPlayer then
         jass.PanCameraToTimed(
             jass.GetUnitX(u),
@@ -22,7 +24,7 @@ end
 -- @param x 目标 X 坐标
 -- @param y 目标 Y 坐标
 -- @param duration 平移耗时（秒）
-function ____exports.StarOther_PanCameraToTimedForPlayer(self, whichPlayer, x, y, duration)
+function ____exports.StarOther_PanCameraToTimedForPlayer(whichPlayer, x, y, duration)
     local localPlayer = jass.GetLocalPlayer()
     if localPlayer ~= whichPlayer then
         return

@@ -265,13 +265,7 @@ local function initRegionTeleport()
         jass.IssueImmediateOrder(unit, "stop")
         local player = owner
         if player ~= nil then
-            StarOther_PanCameraToTimedForPlayer(
-                nil,
-                player,
-                cfg.teleportX,
-                cfg.teleportY,
-                cfg.cameraTime
-            )
+            StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime)
             jass.DisplayTimedTextToPlayer(
                 player,
                 0,

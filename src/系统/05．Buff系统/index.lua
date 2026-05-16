@@ -1,63 +1,23 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-do
-    local ____export = require("系统.05．Buff系统.00．Buff系统")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.05．Buff系统.01．Buff表")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.05．Buff系统.02．BuffUI")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.05．Buff系统.03．BuffJASS桥接")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.05．Buff系统.05．Buff清除函数")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.05．Buff系统.01．控制抗性.index")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
+--- Buff系统 - 初始化入口
+-- 
+-- 不在这里做 export * 聚合，避免加载期把 BuffUI / Buff表 / 控制抗性
+-- 卷入同一条导出链，触发运行时 critical dependency。
 local buffPoolCore = require("系统.05．Buff系统.00．Buff系统")
-buffPoolCore:initBuffSystem()
-require("系统.05．Buff系统.01．Buff表")
 local buffUIMod = require("系统.05．Buff系统.02．BuffUI")
-buffUIMod:init()
-require("系统.05．Buff系统.03．BuffJASS桥接")
-require("系统.05．Buff系统.05．Buff清除函数")
 local controlResistMod = require("系统.05．Buff系统.01．控制抗性.index")
-controlResistMod:initControlResist()
---- 初始化Buff系统
-function ____exports.init(self)
+local ____Buff_7CFB_7EDF_5DF2_521D_59CB_5316 = false
+function ____exports.init()
+    if ____Buff_7CFB_7EDF_5DF2_521D_59CB_5316 then
+        return
+    end
+    ____Buff_7CFB_7EDF_5DF2_521D_59CB_5316 = true
+    buffPoolCore.initBuffSystem()
+    require("系统.05．Buff系统.01．Buff表")
+    buffUIMod.init()
+    require("系统.05．Buff系统.03．BuffJASS桥接")
+    require("系统.05．Buff系统.05．Buff清除函数")
+    controlResistMod.initControlResist()
 end
 return ____exports

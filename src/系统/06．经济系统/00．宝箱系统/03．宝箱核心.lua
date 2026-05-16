@@ -61,6 +61,8 @@ function fireStesEvent(eventName, opener, target)
         while i < count do
             local trg = jass.LoadTriggerHandle(ht, hash, i)
             if trg then
+                YDLocalExecuteTrigger(nil, trg)
+                saveParentIndex(nil, trg)
                 if eventName == EVENT_CHEST_OPENED then
                     YDLocal5Set(nil, "unit", YDLOCAL_VAR_OPENER, opener)
                     YDLocal5Set(nil, "destructable", YDLOCAL_VAR_CHEST, target)
@@ -68,8 +70,6 @@ function fireStesEvent(eventName, opener, target)
                     YDLocal5Set(nil, "unit", YDLOCAL_VAR_PRE_OPENER, opener)
                     YDLocal5Set(nil, "destructable", YDLOCAL_VAR_PRE_CHEST, target)
                 end
-                YDLocalExecuteTrigger(nil, trg)
-                saveParentIndex(nil, trg)
                 YDTriggerExecuteTrigger(nil, trg, false)
             end
             i = i + 1

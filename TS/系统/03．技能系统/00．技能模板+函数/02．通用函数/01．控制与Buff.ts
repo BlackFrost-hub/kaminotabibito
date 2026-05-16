@@ -73,7 +73,7 @@ import {
   获取单位重伤,
   施加重伤,
   移除单位重伤,
-} from "../../../04．伤害系统/03．重伤系统/index";
+} from "../../../04．伤害系统/03．重伤系统/01．核心功能";
 
 export const 开始硬直 = GS_Suspend;
 export const 单位是否硬直中 = GS_IsUnitSuspending;
@@ -147,10 +147,71 @@ const 硬控制Buff_睡眠眩晕 = 1114993524; // 'Bust'
 const 硬控制Buff_纠缠根须 = 1111844210; // 'BEer'
 const 硬控制Buff_飓风主效果 = 1113815395; // 'Bcyc'
 const 硬控制Buff_飓风附加 = 1113815346; // 'Bcy2'
+const 软控制Buff_减速 = 1114860655; // 'Bslo'
+const 软控制Buff_残废 = 1113813609; // 'Bcri'
+const 软控制Buff_诅咒 = 1113813619; // 'Bcrs'
+const 削弱Buff_残废 = 1113813609; // 'Bcri'
+const 削弱Buff_精灵之火 = 1114005861; // 'Bfae'
+const 削弱Buff_诅咒 = 1113813619; // 'Bcrs'
+const 持续伤害Buff_寄生 = 1112436833; // 'BNpa'
+
+const 硬控制Buff合集: number[] = [
+  硬控制Buff_眩晕,
+  硬控制Buff_破击晕眩,
+  硬控制Buff_时间停止,
+  硬控制Buff_沉默,
+  硬控制Buff_火黑默认灵魂燃烧,
+  硬控制Buff_硬直,
+  硬控制Buff_冰冻喷吐,
+  硬控制Buff_变形,
+  硬控制Buff_睡眠主效果,
+  硬控制Buff_睡眠暂停,
+  硬控制Buff_睡眠眩晕,
+  硬控制Buff_纠缠根须,
+  硬控制Buff_飓风主效果,
+  硬控制Buff_飓风附加,
+];
+
+const 软控制Buff合集: number[] = [
+  软控制Buff_减速,
+  软控制Buff_残废,
+  软控制Buff_诅咒,
+];
+
+const 削弱Buff合集: number[] = [
+  削弱Buff_残废,
+  削弱Buff_精灵之火,
+  削弱Buff_诅咒,
+];
+
+const 持续伤害Buff合集: number[] = [
+  持续伤害Buff_寄生,
+];
+
+const 负面Buff合集: number[] = [
+  ...硬控制Buff合集,
+  ...软控制Buff合集,
+];
+
+const 全部负面Buff合集: number[] = [
+  ...负面Buff合集,
+  ...削弱Buff合集,
+  ...持续伤害Buff合集,
+];
 
 function 单位拥有Buff效果(单位: any, BuffID: number): boolean {
   if (单位 == null || 单位 === 0 || BuffID == null || BuffID === 0) return false;
   return GetUnitAbilityLevel(单位, BuffID) > 0;
+}
+
+function 单位拥有任意Buff效果合集(单位: any, Buff列表: number[]): boolean {
+  if (单位 == null || 单位 === 0) return false;
+  let index = 0;
+  while (index < Buff列表.length) {
+    if (单位拥有Buff效果(单位, Buff列表[index])) return true;
+    index++;
+  }
+  return false;
 }
 
 /**
@@ -169,19 +230,25 @@ export function 单位是否处于施法硬直效果(单位: any): boolean {
 }
 
 export function 单位是否处于硬控制效果合集(单位: any): boolean {
-  if (单位 == null || 单位 === 0) return false;
-  return 单位拥有Buff效果(单位, 硬控制Buff_眩晕)
-    || 单位拥有Buff效果(单位, 硬控制Buff_破击晕眩)
-    || 单位拥有Buff效果(单位, 硬控制Buff_时间停止)
-    || 单位拥有Buff效果(单位, 硬控制Buff_沉默)
-    || 单位拥有Buff效果(单位, 硬控制Buff_火黑默认灵魂燃烧)
-    || 单位拥有Buff效果(单位, 硬控制Buff_硬直)
-    || 单位拥有Buff效果(单位, 硬控制Buff_冰冻喷吐)
-    || 单位拥有Buff效果(单位, 硬控制Buff_变形)
-    || 单位拥有Buff效果(单位, 硬控制Buff_睡眠主效果)
-    || 单位拥有Buff效果(单位, 硬控制Buff_睡眠暂停)
-    || 单位拥有Buff效果(单位, 硬控制Buff_睡眠眩晕)
-    || 单位拥有Buff效果(单位, 硬控制Buff_纠缠根须)
-    || 单位拥有Buff效果(单位, 硬控制Buff_飓风主效果)
-    || 单位拥有Buff效果(单位, 硬控制Buff_飓风附加);
+  return 单位拥有任意Buff效果合集(单位, 硬控制Buff合集);
+}
+
+export function 单位是否处于软控制效果合集(单位: any): boolean {
+  return 单位拥有任意Buff效果合集(单位, 软控制Buff合集);
+}
+
+export function 单位是否处于削弱Buff合集(单位: any): boolean {
+  return 单位拥有任意Buff效果合集(单位, 削弱Buff合集);
+}
+
+export function 单位是否处于持续伤害Buff合集(单位: any): boolean {
+  return 单位拥有任意Buff效果合集(单位, 持续伤害Buff合集);
+}
+
+export function 单位是否处于负面Buff合集(单位: any): boolean {
+  return 单位拥有任意Buff效果合集(单位, 负面Buff合集);
+}
+
+export function 单位是否处于全部负面Buff合集(单位: any): boolean {
+  return 单位拥有任意Buff效果合集(单位, 全部负面Buff合集);
 }

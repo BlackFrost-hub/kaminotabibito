@@ -6,25 +6,22 @@
  *
  * 后续接手者注意：
  * 1. 直接调用 doManaRegen 执行魔法恢复
- * 2. 内部会触发 STES "数值显示" 事件
+ * 2. 内部会直接显示数值漂浮文字
  */
 
 const jass = require("jass.common") as any;
 
-const { STES_Fire } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Fire: (self: any, name: string) => void;
+const { STES_FireWithParams } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+  STES_FireWithParams: (this: void, name: string, params: Array<{ type: string; name: string; value: any }>) => void;
 };
 
-const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Set: (ty: string, name: string, value: any) => void;
+const { 显示单位数值漂浮文字 } = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字") as {
+  显示单位数值漂浮文字: (this: void, unit: any, value: number, options?: any) => any;
 };
 
 //=============================================================================
 // 一、常量配置
 //=============================================================================
-
-/** 数值显示事件名 */
-const SHOW_DAMAGE_EVENT = "数值显示";
 
 /** 魔法恢复颜色 RGB */
 const MANA_REGEN_COLOR = {
@@ -82,12 +79,11 @@ export function doManaRegen(
  * 触发魔法数值显示事件
  */
 function fireManaShowEvent(target: any, amount: number): void {
-  YDLocal5Set("real", "Real", amount);
-  YDLocal5Set("unit", "Unit", target);
-  YDLocal5Set("real", "red", MANA_REGEN_COLOR.red);
-  YDLocal5Set("real", "green", MANA_REGEN_COLOR.green);
-  YDLocal5Set("real", "blue", MANA_REGEN_COLOR.blue);
-  STES_Fire(null, SHOW_DAMAGE_EVENT);
+  显示单位数值漂浮文字(target, amount, {
+    红: MANA_REGEN_COLOR.red,
+    绿: MANA_REGEN_COLOR.green,
+    蓝: MANA_REGEN_COLOR.blue,
+  });
 }
 
 //=============================================================================
@@ -103,10 +99,11 @@ function fireManaShowEvent(target: any, amount: number): void {
  * @param source 来源单位（可为null）
  */
 export function fireManaRegenEvent(target: any, amount: number, source: any = null): void {
-  YDLocal5Set("real", "HealAmount", amount);
-  YDLocal5Set("unit", "HealTarget", target);
-  YDLocal5Set("unit", "HealSource", source);
-  STES_Fire(null, "恢复魔法事件");
+  STES_FireWithParams("恢复魔法事件", [
+    { type: "real", name: "HealAmount", value: amount },
+    { type: "unit", name: "HealTarget", value: target },
+    { type: "unit", name: "HealSource", value: source },
+  ]);
 }
 
 export {};

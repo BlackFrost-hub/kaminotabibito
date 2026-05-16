@@ -152,6 +152,24 @@ applyCommonBuffAbility(asbh, {
 })
 asbh:setCanBeDispelled(1, true)
 
+local asbp = createNamedAbility(AbilityDefinitionParasite, 'ASBP', '[Buff系统]寄生')
+applyCommonBuffAbility(asbp, {
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  cooldown = 0.10,
+  manaCost = 0,
+  castRange = 999999,
+  durationNormal = 0.001,
+  durationHero = 0.001,
+})
+asbp:setCastingTime(1, 0.01)
+asbp:setBuffs(1, 'BNpa')
+asbp:setDamageperSecond(1, 0.0)
+asbp:setAttackSpeedFactor(1, 0.0)
+asbp:setMovementSpeedFactor(1, 0.0)
+asbp:setSummonedUnitDuration(1, 8.0)
+asbp:setSummonedUnitCount(1, 1)
+asbp:setUnitType(1, 'e00N')
+
 local asil = createNamedAbility(AbilityDefinitionItemIllusion, 'ASIL', '[系统]幻象物品')
 applyCommonBuffAbility(asil, {
   missileArt = '',

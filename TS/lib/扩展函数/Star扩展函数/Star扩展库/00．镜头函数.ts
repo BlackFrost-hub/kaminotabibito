@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
 
 /**

@@ -10,12 +10,8 @@
 
 import { MULTI_KILL_EFFECT_EVENT } from "./00．常量定义";
 
-const { STES_Fire } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_Fire: (self: any, name: string) => void;
-};
-
-const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Set: (ty: string, name: string, value: any) => void;
+const { STES_FireWithParams } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
+  STES_FireWithParams: (this: void, name: string, params: Array<{ type: string; name: string; value: any }>) => void;
 };
 
 // ==========================================================================================
@@ -44,14 +40,17 @@ export interface EffectEventParams {
  * - HealSource (unit): 治疗来源
  */
 export function fireMultiKillEffectEvent(params: EffectEventParams): void {
-  YDLocal5Set("integer", "EffectID", params.effectID);
-  YDLocal5Set("real", "HealAmount", params.healAmount);
-  YDLocal5Set("unit", "HealTarget", params.healTarget);
-  YDLocal5Set("unit", "HealSource", params.healSource);
-  STES_Fire(null, MULTI_KILL_EFFECT_EVENT);
+  const stesParams = [
+    { type: "integer", name: "EffectID", value: params.effectID },
+    { type: "real", name: "HealAmount", value: params.healAmount },
+    { type: "unit", name: "HealTarget", value: params.healTarget },
+    { type: "unit", name: "HealSource", value: params.healSource },
+  ];
+
+  STES_FireWithParams(MULTI_KILL_EFFECT_EVENT, stesParams);
 
   if (params.diyEvent && params.diyEventString) {
-    STES_Fire(null, params.diyEventString);
+    STES_FireWithParams(params.diyEventString, stesParams);
   }
 }
 

@@ -55,7 +55,7 @@ const {
   updateDetailPanels: (this: void) => void;
 };
 const Star扩展库 = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
-  StarOther_PanCameraToTimedForPlayer: (player: any, x: number, y: number, duration: number) => void;
+  StarOther_PanCameraToTimedForPlayer: (this: void, player: any, x: number, y: number, duration: number) => void;
 };
 const panCameraToTimedForPlayer = Star扩展库.StarOther_PanCameraToTimedForPlayer;
 

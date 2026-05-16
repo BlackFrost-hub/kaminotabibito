@@ -20,8 +20,19 @@ const bj_DEGTORAD = jglobals.bj_DEGTORAD ?? DEFAULT_BJ_DEGTORAD;
  * @param angle 角度（度）
  * @returns 新的位置（location）
  */
-export function GS_PolarProjectionBJ(source: any, dist: number, angle: number): any {
+export function GS_PolarProjectionBJ(this: any, sourceOrDist: any, distOrAngle: any, angleMaybe: any): any {
+    let source = sourceOrDist;
+    let dist = distOrAngle;
+    let angle = angleMaybe;
+    // 兼容被全局桥接后由 JASS 直接调用时的 self 参数错位：GS_PolarProjectionBJ(source, dist, angle)
+    if (angle == null && typeof distOrAngle === "number" && typeof sourceOrDist === "number") {
+        source = this;
+        dist = sourceOrDist;
+        angle = distOrAngle;
+    }
     if (!source) return null;
+    if (dist == null || dist === false || dist === "") dist = 0;
+    if (angle == null || angle === false || angle === "") angle = 0;
 
     const rad = angle * bj_DEGTORAD;
     const x = jass.GetLocationX(source) + dist * jass.Cos(rad);

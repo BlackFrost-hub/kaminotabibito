@@ -40,7 +40,6 @@ function dispatchFocusHotkey(keyCode)
         return
     end
     panCameraToTimedForPlayer(
-        nil,
         p,
         jass.GetUnitX(hero),
         jass.GetUnitY(hero),
