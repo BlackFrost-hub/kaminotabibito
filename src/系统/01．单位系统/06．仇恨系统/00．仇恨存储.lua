@@ -35,9 +35,6 @@ local function _____53D6_5355_4F4DID(u)
     end
     return GetHandleId(u) or 0
 end
-local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
-    return a - b
-end
 local function _____83B7_53D6_6709_5E8F_654C_4EBAID_5217_8868()
     local result = {}
     for key in pairs(threatTables) do
@@ -46,7 +43,7 @@ local function _____83B7_53D6_6709_5E8F_654C_4EBAID_5217_8868()
             result[#result + 1] = id
         end
     end
-    __TS__ArraySort(result, _____6570_5B57_5347_5E8F_6392_5E8F)
+    __TS__ArraySort(result)
     return result
 end
 local ______6E05_9664_5F53_524D_76EE_6807 = nil
@@ -330,13 +327,13 @@ function ____exports.getHighestThreat(_____654C_4EBA, filter)
         while i < #list do
             do
                 if filter ~= nil and not filter(list[i + 1]) then
-                    goto __continue81
+                    goto __continue80
                 end
                 if best == nil or list[i + 1].threat > best.threat then
                     best = list[i + 1]
                 end
             end
-            ::__continue81::
+            ::__continue80::
             i = i + 1
         end
     end

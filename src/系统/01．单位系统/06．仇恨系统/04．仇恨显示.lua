@@ -51,9 +51,6 @@ local function _____53D6_5355_4F4DID(u)
     end
     return GetHandleId(u) or 0
 end
-local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
-    return a - b
-end
 local function _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_8868()
     local result = {}
     for key in pairs(_____4EC7_6068_663E_793A_8868) do
@@ -62,7 +59,7 @@ local function _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_886
             result[#result + 1] = id
         end
     end
-    __TS__ArraySort(result, _____6570_5B57_5347_5E8F_6392_5E8F)
+    __TS__ArraySort(result)
     return result
 end
 local function _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
@@ -129,17 +126,17 @@ local function ____on_4EC7_6068_663E_793ATick()
                 local _____6570_636E = _____4EC7_6068_663E_793A_8868[_____654C_4EBAID]
                 if _____6570_636E == nil or _____6570_636E.textTag == nil or _____6570_636E["跟随单位"] == nil or _____6570_636E["跟随单位"] == 0 then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue21
+                    goto __continue20
                 end
                 if IsUnitType(_____6570_636E["跟随单位"], UNIT_TYPE_DEAD) then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue21
+                    goto __continue20
                 end
                 SetTextTagPosUnit(_____6570_636E.textTag, _____6570_636E["跟随单位"], _____6587_5B57_9AD8_5EA6)
                 _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____6570_636E.textTag)
                 _____4ECD_6709_663E_793A = true
             end
-            ::__continue21::
+            ::__continue20::
             i = i + 1
         end
     end

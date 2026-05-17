@@ -49,10 +49,6 @@ function 取单位ID(u: any): number {
   return GetHandleId(u) || 0;
 }
 
-function 数字升序排序(this: void, a: number, b: number): number {
-  return a - b;
-}
-
 function 获取有序仇恨显示敌人ID列表(): number[] {
   const result: number[] = [];
   for (const key in 仇恨显示表) {
@@ -61,7 +57,7 @@ function 获取有序仇恨显示敌人ID列表(): number[] {
       result.push(id);
     }
   }
-  result.sort(数字升序排序);
+  result.sort();
   return result;
 }
 
