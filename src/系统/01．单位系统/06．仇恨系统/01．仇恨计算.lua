@@ -49,7 +49,7 @@ local function nowMs()
     end
     return _nowMs()
 end
-local function onDamage(target, attacker, applied)
+local function onDamage(target, attacker, applied, _damageType)
     if attacker == nil or attacker == 0 then
         return
     end

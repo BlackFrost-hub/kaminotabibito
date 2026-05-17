@@ -15,7 +15,18 @@ export function init(this: void): void {
   require("系统.04．伤害系统.01．伤害事件");
   require("系统.04．伤害系统.02．dot伤害");
   require("系统.04．伤害系统.01．DOT定义.index");
-  require("系统.04．伤害系统.03．伤害测试");
+  const 模型伤害数字 = require("系统.09．表现系统.09．伤害数字模型.index") as {
+    initDamageNumberModelDisplay?: (this: void) => void;
+  };
+  const Boss战伤害统计 = require("系统.04．伤害系统.00．伤害计算.07．Boss战伤害统计") as {
+    initBossBattleDamageStats?: (this: void) => void;
+  };
+  if (typeof 模型伤害数字.initDamageNumberModelDisplay === "function") {
+    模型伤害数字.initDamageNumberModelDisplay();
+  }
+  if (typeof Boss战伤害统计.initBossBattleDamageStats === "function") {
+    Boss战伤害统计.initBossBattleDamageStats();
+  }
   require("系统.04．伤害系统.00．伤害计算.05．事件注册");
 
   const { init: initHealSystem } = require("系统.04．伤害系统.02．治疗系统.index") as {

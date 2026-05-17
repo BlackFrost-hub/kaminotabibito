@@ -808,6 +808,9 @@ end
 ____exports["平台扩展_转化_转整数为颜色"] = function(_____6574_6570_503C)
     return _____539F_751F_51FD_6570_8868.KKConvertInt2Color(_____6574_6570_503C)
 end
+____exports["界面_取颜色"] = function(_____900F_660E_5EA6, _____7EA2, _____7EFF, _____84DD)
+    return _____539F_751F_51FD_6570_8868.DzGetColor(_____900F_660E_5EA6, _____7EA2, _____7EFF, _____84DD)
+end
 ____exports["平台扩展_技能_创建技能按钮控件"] = function()
     return _____539F_751F_51FD_6570_8868.KKCreateCommandButton()
 end

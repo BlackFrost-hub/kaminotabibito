@@ -1,4 +1,5 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringReplace = ____lualib.__TS__StringReplace
@@ -24,6 +25,10 @@ local EXGetAbilityId = japi.EXGetAbilityId
 local MODULE_NAME = "动态技能文本"
 local _____6280_80FD_69FD_904D_5386_4E0A_9650 = 64
 local _____539F_59CB_63D0_793A_7F13_5B58 = {}
+local _____6392_5E8F_5C5E_6027_540D_79F0_5217_8868 = __TS__ArraySort(
+    {table.unpack(_____5C5E_6027_540D_79F0_5217_8868)},
+    function(____, a, b) return #b - #a end
+)
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -37,16 +42,16 @@ local function getUnitAbilityIds(hero)
             do
                 local ability = EXGetUnitAbilityByIndex(hero, slot)
                 if not isValidHandle(ability) then
-                    goto __continue5
+                    goto __continue6
                 end
                 local abilityId = EXGetAbilityId(ability)
                 if abilityId == nil or abilityId == 0 or seen[abilityId] == true then
-                    goto __continue5
+                    goto __continue6
                 end
                 seen[abilityId] = true
                 ids[#ids + 1] = abilityId
             end
-            ::__continue5::
+            ::__continue6::
             slot = slot + 1
         end
     end
@@ -55,15 +60,9 @@ end
 local function _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
     return (tostring(GetHandleId(unit)) .. ":") .. tostring(abilityId)
 end
---- 从字符串中提取数字倍率
--- 例如："×3" -> "3", "×50%" -> "50%"
-local function _____63D0_53D6_500D_7387(text, _____5C5E_6027_540D_79F0)
-    local _____524D_7F00 = _____5C5E_6027_540D_79F0 .. "×"
-    local _____8D77_59CB_4F4D_7F6E = (string.find(text, _____524D_7F00, nil, true) or 0) - 1
-    if _____8D77_59CB_4F4D_7F6E < 0 then
-        return nil
-    end
-    local _____6570_5B57_8D77_59CB = _____8D77_59CB_4F4D_7F6E + #_____524D_7F00
+--- 从指定位置读取倍率字符串
+-- 例如："3"、"50%"
+local function _____63D0_53D6_500D_7387(text, _____6570_5B57_8D77_59CB)
     local _____6570_5B57_7ED3_675F = _____6570_5B57_8D77_59CB
     while _____6570_5B57_7ED3_675F < #text do
         local _____5B57_7B26 = __TS__StringCharAt(text, _____6570_5B57_7ED3_675F)
@@ -81,22 +80,53 @@ local function _____63D0_53D6_500D_7387(text, _____5C5E_6027_540D_79F0)
     end
     return __TS__StringSubstring(text, _____6570_5B57_8D77_59CB, _____6570_5B57_7ED3_675F)
 end
+--- 提取一个可替换的公式片段
+-- 支持：
+-- 1. 属性名×数字 / 属性名×数字%
+-- 2. 属性名数字 / 属性名数字%
+local function _____63D0_53D6_516C_5F0F_5339_914D(text, _____5C5E_6027_540D_79F0)
+    local _____4E58_53F7_524D_7F00 = _____5C5E_6027_540D_79F0 .. "×"
+    local _____4E58_53F7_4F4D_7F6E = (string.find(text, _____4E58_53F7_524D_7F00, nil, true) or 0) - 1
+    if _____4E58_53F7_4F4D_7F6E >= 0 then
+        local _____500D_7387 = _____63D0_53D6_500D_7387(text, _____4E58_53F7_4F4D_7F6E + #_____4E58_53F7_524D_7F00)
+        if _____500D_7387 ~= nil then
+            return {["完整匹配"] = _____4E58_53F7_524D_7F00 .. _____500D_7387, ["倍率"] = _____500D_7387}
+        end
+    end
+    local _____5C5E_6027_4F4D_7F6E = (string.find(text, _____5C5E_6027_540D_79F0, nil, true) or 0) - 1
+    while _____5C5E_6027_4F4D_7F6E >= 0 do
+        local _____6570_5B57_8D77_59CB = _____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_540D_79F0
+        local _____9996_5B57_7B26 = _____6570_5B57_8D77_59CB < #text and __TS__StringCharAt(text, _____6570_5B57_8D77_59CB) or ""
+        if _____9996_5B57_7B26 >= "0" and _____9996_5B57_7B26 <= "9" or _____9996_5B57_7B26 == "." then
+            local _____500D_7387 = _____63D0_53D6_500D_7387(text, _____6570_5B57_8D77_59CB)
+            if _____500D_7387 ~= nil then
+                return {["完整匹配"] = _____5C5E_6027_540D_79F0 .. _____500D_7387, ["倍率"] = _____500D_7387}
+            end
+        end
+        _____5C5E_6027_4F4D_7F6E = (string.find(
+            text,
+            _____5C5E_6027_540D_79F0,
+            math.max(_____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_540D_79F0 + 1, 1),
+            true
+        ) or 0) - 1
+    end
+    return nil
+end
 --- 动态替换技能提示中的公式
 -- 例如：智力×3 -> 150（假设英雄智力50）
 local function _____66FF_6362_516C_5F0F(unit, tip)
     local result = tip
     do
         local i = 0
-        while i < #_____5C5E_6027_540D_79F0_5217_8868 do
-            local _____5C5E_6027_540D_79F0 = _____5C5E_6027_540D_79F0_5217_8868[i + 1]
-            local _____500D_7387 = _____63D0_53D6_500D_7387(result, _____5C5E_6027_540D_79F0)
-            while _____500D_7387 ~= nil do
-                local _____5B8C_6574_5339_914D = (_____5C5E_6027_540D_79F0 .. "×") .. _____500D_7387
-                local _____4F24_5BB3 = _____8BA1_7B97_516C_5F0F_4F24_5BB3(unit, _____5C5E_6027_540D_79F0, _____500D_7387)
+        while i < #_____6392_5E8F_5C5E_6027_540D_79F0_5217_8868 do
+            local _____5C5E_6027_540D_79F0 = _____6392_5E8F_5C5E_6027_540D_79F0_5217_8868[i + 1]
+            local _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_540D_79F0)
+            while _____5339_914D_7ED3_679C ~= nil do
+                local _____4F24_5BB3 = _____8BA1_7B97_516C_5F0F_4F24_5BB3(unit, _____5C5E_6027_540D_79F0, _____5339_914D_7ED3_679C["倍率"])
                 local _____66FF_6362_503C = tostring(_____4F24_5BB3)
-                result = __TS__StringReplace(result, _____5B8C_6574_5339_914D, _____66FF_6362_503C)
-                debugLog(nil, MODULE_NAME, (("替换 " .. _____5B8C_6574_5339_914D) .. " -> ") .. _____66FF_6362_503C)
-                _____500D_7387 = _____63D0_53D6_500D_7387(result, _____5C5E_6027_540D_79F0)
+                result = __TS__StringReplace(result, _____5339_914D_7ED3_679C["完整匹配"], _____66FF_6362_503C)
+                debugLog(nil, MODULE_NAME, (("替换 " .. _____5339_914D_7ED3_679C["完整匹配"]) .. " -> ") .. _____66FF_6362_503C)
+                _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_540D_79F0)
             end
             i = i + 1
         end

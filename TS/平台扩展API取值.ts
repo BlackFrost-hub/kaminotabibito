@@ -1090,6 +1090,10 @@ export function 平台扩展_转化_转整数为颜色(this: void, 整数值: nu
   return (原生函数表["KKConvertInt2Color"] as (整数值: number) => number)(整数值);
 }
 
+export function 界面_取颜色(this: void, 透明度: number, 红: number, 绿: number, 蓝: number): number {
+  return (原生函数表["DzGetColor"] as (透明度: number, 红: number, 绿: number, 蓝: number) => number)(透明度, 红, 绿, 蓝);
+}
+
 export function 平台扩展_技能_创建技能按钮控件(this: void): number {
   return (原生函数表["KKCreateCommandButton"] as () => number)();
 }

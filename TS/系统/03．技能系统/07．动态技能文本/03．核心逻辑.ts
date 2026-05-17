@@ -27,6 +27,12 @@ const EXGetAbilityId = japi.EXGetAbilityId as (ability: any) => number;
 const MODULE_NAME = "动态技能文本";
 const 技能槽遍历上限 = 64;
 const 原始提示缓存: Record<string, string | undefined> = {};
+const 排序属性名称列表 = [...属性名称列表].sort((a, b) => b.length - a.length);
+
+type 公式匹配结果 = {
+  完整匹配: string;
+  倍率: string;
+};
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
@@ -58,15 +64,10 @@ function 生成提示缓存键(this: void, unit: any, abilityId: number): string
 }
 
 /**
- * 从字符串中提取数字倍率
- * 例如："×3" -> "3", "×50%" -> "50%"
+ * 从指定位置读取倍率字符串
+ * 例如："3"、"50%"
  */
-function 提取倍率(this: void, text: string, 属性名称: string): string | null {
-  const 前缀 = 属性名称 + "×";
-  const 起始位置 = text.indexOf(前缀);
-  if (起始位置 < 0) return null;
-
-  const 数字起始 = 起始位置 + 前缀.length;
+function 提取倍率(this: void, text: string, 数字起始: number): string | null {
   let 数字结束 = 数字起始;
 
   while (数字结束 < text.length) {
@@ -87,23 +88,60 @@ function 提取倍率(this: void, text: string, 属性名称: string): string | 
 }
 
 /**
+ * 提取一个可替换的公式片段
+ * 支持：
+ * 1. 属性名×数字 / 属性名×数字%
+ * 2. 属性名数字 / 属性名数字%
+ */
+function 提取公式匹配(this: void, text: string, 属性名称: string): 公式匹配结果 | null {
+  const 乘号前缀 = 属性名称 + "×";
+  const 乘号位置 = text.indexOf(乘号前缀);
+  if (乘号位置 >= 0) {
+    const 倍率 = 提取倍率(text, 乘号位置 + 乘号前缀.length);
+    if (倍率 != null) {
+      return {
+        完整匹配: 乘号前缀 + 倍率,
+        倍率,
+      };
+    }
+  }
+
+  let 属性位置 = text.indexOf(属性名称);
+  while (属性位置 >= 0) {
+    const 数字起始 = 属性位置 + 属性名称.length;
+    const 首字符 = 数字起始 < text.length ? text.charAt(数字起始) : "";
+    if ((首字符 >= "0" && 首字符 <= "9") || 首字符 === ".") {
+      const 倍率 = 提取倍率(text, 数字起始);
+      if (倍率 != null) {
+        return {
+          完整匹配: 属性名称 + 倍率,
+          倍率,
+        };
+      }
+    }
+    属性位置 = text.indexOf(属性名称, 属性位置 + 属性名称.length);
+  }
+
+  return null;
+}
+
+/**
  * 动态替换技能提示中的公式
  * 例如：智力×3 -> 150（假设英雄智力50）
  */
 function 替换公式(this: void, unit: any, tip: string): string {
   let result = tip;
 
-  for (let i = 0; i < 属性名称列表.length; i++) {
-    const 属性名称 = 属性名称列表[i];
+  for (let i = 0; i < 排序属性名称列表.length; i++) {
+    const 属性名称 = 排序属性名称列表[i];
 
-    let 倍率 = 提取倍率(result, 属性名称);
-    while (倍率 != null) {
-      const 完整匹配 = 属性名称 + "×" + 倍率;
-      const 伤害 = 计算公式伤害(unit, 属性名称, 倍率);
+    let 匹配结果 = 提取公式匹配(result, 属性名称);
+    while (匹配结果 != null) {
+      const 伤害 = 计算公式伤害(unit, 属性名称, 匹配结果.倍率);
       const 替换值 = 伤害.toString();
-      result = result.replace(完整匹配, 替换值);
-      debugLog(MODULE_NAME, "替换 " + 完整匹配 + " -> " + 替换值);
-      倍率 = 提取倍率(result, 属性名称);
+      result = result.replace(匹配结果.完整匹配, 替换值);
+      debugLog(MODULE_NAME, "替换 " + 匹配结果.完整匹配 + " -> " + 替换值);
+      匹配结果 = 提取公式匹配(result, 属性名称);
     }
   }
 

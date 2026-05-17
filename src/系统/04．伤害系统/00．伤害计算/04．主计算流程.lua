@@ -122,7 +122,7 @@ function ____exports.registerAppliedFinalDamageListener(cb)
     end
     appliedFinalDamageListeners[#appliedFinalDamageListeners + 1] = cb
 end
-local function notifyAppliedFinalDamageListeners(target, attacker, applied)
+local function notifyAppliedFinalDamageListeners(target, attacker, applied, snapshot)
     do
         local i = 0
         while i < #appliedFinalDamageListeners do
@@ -131,13 +131,34 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied)
                 if cb == nil then
                     goto __continue8
                 end
-                pcall(function () return cb(target, attacker, applied) end
-                )
+                do
+                    pcall(function()
+                        cb(target, attacker, applied, snapshot)
+                    end)
+                end
             end
             ::__continue8::
             i = i + 1
         end
     end
+end
+local function captureDamageTypeSnapshot()
+    return {
+        isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
+        isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
+        isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
+        isTrueDamage = _____4F24_5BB3_51FD_6570.isTrueDamage(),
+        isNormalAttack = _____4F24_5BB3_51FD_6570.isNormalAttack(),
+        isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
+        isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage(),
+        isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
+        isWoodDamage = _____4F24_5BB3_51FD_6570.isWoodDamage(),
+        isWaterDamage = _____4F24_5BB3_51FD_6570.isWaterDamage(),
+        isFireDamage = _____4F24_5BB3_51FD_6570.isFireDamage(),
+        isThunderDamage = _____4F24_5BB3_51FD_6570.isThunderDamage(),
+        isLightDamage = _____4F24_5BB3_51FD_6570.isLightDamage(),
+        isDarkDamage = _____4F24_5BB3_51FD_6570.isDarkDamage()
+    }
 end
 --- 检查是否免疫伤害
 local function checkImmune(target, isNormalAtk)
@@ -261,10 +282,11 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
     if target == nil or baseDamage < 0.1 then
         return
     end
+    local snapshot = captureDamageTypeSnapshot()
     local result = ____exports.calculateDamage(target, attacker, baseDamage)
     if result.immune then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
-        notifyAppliedFinalDamageListeners(target, attacker, 0)
+        notifyAppliedFinalDamageListeners(target, attacker, 0, snapshot)
         if result.showDodge then
         end
         return
@@ -276,27 +298,25 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             attacker = attacker,
             baseDamage = baseDamage,
             currentDamage = finalDamage,
-            isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
-            isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
-            isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
-            isTrueDamage = _____4F24_5BB3_51FD_6570.isTrueDamage(),
-            isNormalAttack = _____4F24_5BB3_51FD_6570.isNormalAttack(),
-            isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
-            isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage()
+            isPhysicalDamage = snapshot.isPhysicalDamage,
+            isMagicDamage = snapshot.isMagicDamage,
+            isEnhancedDamage = snapshot.isEnhancedDamage,
+            isTrueDamage = snapshot.isTrueDamage,
+            isNormalAttack = snapshot.isNormalAttack,
+            isSkillAttack = snapshot.isSkillAttack,
+            isSkillDamage = snapshot.isSkillDamage
         })
     end
     if finalDamage ~= baseDamage then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(finalDamage)
     end
-    notifyAppliedFinalDamageListeners(target, attacker, finalDamage)
-    local isMagic = _____4F24_5BB3_51FD_6570.isMagicDamage()
-    local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
+    notifyAppliedFinalDamageListeners(target, attacker, finalDamage, snapshot)
     applyLifeAndManaSteal(
         nil,
         attacker,
         finalDamage,
-        isMagic,
-        isNormalAtk,
+        snapshot.isMagicDamage,
+        snapshot.isNormalAttack,
         true
     )
 end

@@ -172,7 +172,7 @@ export function createBoundEffect(
 
   if (!effect) return null;
 
-  const colorValue = japi.DzGetColor(color.r, color.g, color.b, color.a);
+  const colorValue = japi.DzGetColor(color.a, color.r, color.g, color.b);
   japi.DzSetEffectVertexColor(effect, colorValue);
 
   const data: BoundEffectData = {

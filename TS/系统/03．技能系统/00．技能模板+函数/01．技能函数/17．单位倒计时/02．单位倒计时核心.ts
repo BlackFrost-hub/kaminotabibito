@@ -36,7 +36,7 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const R2I = jass.R2I as (value: number) => number;
 const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, effect: any) => void;
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
-const DzGetColor = japi.DzGetColor as (red: number, green: number, blue: number, alpha: number) => number;
+const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
 const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 const DzSetEffectVisible = japi.DzSetEffectVisible as (effect: any, enable: boolean) => void;
 const DzSetEffectScale = japi.DzSetEffectScale as (effect: any, scale: number) => void;
@@ -116,10 +116,10 @@ function 限制到颜色字节(this: void, value: number): number {
 function 设置倒计时特效颜色(this: void, effect: any, 参数: 规范化单位倒计时参数): void {
   if (effect == null || effect === 0) return;
   const color = DzGetColor(
+    限制到颜色字节(参数.透明度),
     限制到颜色字节(参数.红),
     限制到颜色字节(参数.绿),
-    限制到颜色字节(参数.蓝),
-    限制到颜色字节(参数.透明度)
+    限制到颜色字节(参数.蓝)
   );
   DzSetEffectVertexColor(effect, color);
 }

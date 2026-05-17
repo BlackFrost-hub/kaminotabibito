@@ -1,26 +1,38 @@
 /** @noSelfInFile */
+
 import {
   DEFAULT_ATTACK_TYPE,
   DEFAULT_DAMAGE_TYPE,
   DEFAULT_WEAPON_TYPE,
-  X_GetAbleX,
-  X_GetAbleY,
-  X_IsTerrainWalkable,
   jass,
   BJ_DEGTORAD,
-  MAX_SUB_STEP,
-  WALKABLE_TOLERANCE,
   位移实例,
   位移映射,
   命中记录,
   单位存活,
-  在可玩区域内,
-  计算坐标距离,
   生成命中键,
   播放位移特效,
   获取枚举组,
   清空枚举组,
 } from "./00．共享";
+
+const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进") as {
+  沿角度步进直到地形阻挡: (this: void, 参数: {
+    起点X: number;
+    起点Y: number;
+    角度度: number;
+    单步距离: number;
+    步数: number;
+    检测单位?: any;
+  }) => {
+    最终X: number;
+    最终Y: number;
+    实际步数: number;
+    是否提前停止: boolean;
+  };
+};
+
+const 最小冲锋步进距离 = 30.0;
 
 function 结算命中伤害(实例: 位移实例, 目标单位: any): void {
   if (实例.命中伤害 <= 0) return;
@@ -51,15 +63,11 @@ function 可命中目标(实例: 位移实例, 目标单位: any): boolean {
   if (实例.只命中敌人) {
     const 参考单位 = (实例.伤害来源 != null && 实例.伤害来源 !== 0) ? 实例.伤害来源 : 实例.单位;
     const 所属玩家 = jass.GetOwningPlayer(参考单位);
-    if (!jass.IsUnitEnemy(目标单位, 所属玩家)) {
-      return false;
-    }
+    if (!jass.IsUnitEnemy(目标单位, 所属玩家)) return false;
   }
 
   const 命中过滤 = 实例.命中过滤;
-  if (typeof 命中过滤 === "function" && !命中过滤(实例.单位, 目标单位, 实例.id)) {
-    return false;
-  }
+  if (typeof 命中过滤 === "function" && !命中过滤(实例.单位, 目标单位, 实例.id)) return false;
 
   return true;
 }
@@ -108,11 +116,19 @@ function 尝试移动一步(实例: 位移实例, 位移距离: number): { 停�
   const 当前X = jass.GetUnitX(单位) as number;
   const 当前Y = jass.GetUnitY(单位) as number;
   const 弧度 = 实例.角度 * BJ_DEGTORAD;
-  const 新X = 当前X + 位移距离 * jass.Cos(弧度);
-  const 新Y = 当前Y + 位移距离 * jass.Sin(弧度);
+  let 新X = 当前X + 位移距离 * jass.Cos(弧度);
+  let 新Y = 当前Y + 位移距离 * jass.Sin(弧度);
 
   if (实例.检查地形) {
-    if (!在可玩区域内(新X, 新Y)) {
+    const 步进结果 = 沿角度步进直到地形阻挡({
+      起点X: 当前X,
+      起点Y: 当前Y,
+      角度度: 实例.角度,
+      单步距离: 位移距离,
+      步数: 1,
+      检测单位: 单位,
+    });
+    if (步进结果.实际步数 <= 0) {
       const 撞墙回调 = 实例.撞墙回调;
       if (typeof 撞墙回调 === "function") {
         撞墙回调(单位, 实例.id);
@@ -122,23 +138,8 @@ function 尝试移动一步(实例: 位移实例, 位移距离: number): { 停�
       }
       return { 停止: true, 原因: "撞墙" };
     }
-
-    if (!X_IsTerrainWalkable(新X, 新Y)) {
-      const 可通行X = X_GetAbleX();
-      const 可通行Y = X_GetAbleY();
-      const ableDist = 计算坐标距离(新X, 新Y, 可通行X, 可通行Y);
-      if (ableDist > WALKABLE_TOLERANCE) {
-        const 撞墙回调 = 实例.撞墙回调;
-        if (typeof 撞墙回调 === "function") {
-          撞墙回调(单位, 实例.id);
-          if (位移映射[实例.id] !== 实例) {
-            return { 停止: true, 原因: "中断" };
-          }
-        }
-        return { 停止: true, 原因: "撞墙" };
-      }
-    }
-
+    新X = 步进结果.最终X;
+    新Y = 步进结果.最终Y;
   }
 
   if (实例.朝向跟随位移) {
@@ -171,24 +172,23 @@ export function 推进一步(实例: 位移实例): { 停止: boolean; 原因?: 
   if (本Tick位移 > 剩余距离) {
     本Tick位移 = 剩余距离;
   }
+  if (本Tick位移 < 最小冲锋步进距离 && 剩余距离 > 最小冲锋步进距离) {
+    本Tick位移 = 最小冲锋步进距离;
+  }
   if (本Tick位移 <= 0) {
     return { 停止: true, 原因: "完成" };
   }
 
-  let 剩余步长 = 本Tick位移;
-  while (剩余步长 > 0) {
-    const 子步长 = 剩余步长 > MAX_SUB_STEP ? MAX_SUB_STEP : 剩余步长;
-    const 结果 = 尝试移动一步(实例, 子步长);
-    if (结果.停止) {
-      if (实例.已移动 > 起始已移动) {
-        播放位移特效(实例);
-      }
-      return 结果;
+  const 结果 = 尝试移动一步(实例, 本Tick位移);
+  if (结果.停止) {
+    if (实例.已移动 > 起始已移动) {
+      播放位移特效(实例);
     }
-    if (位移映射[实例.id] !== 实例) {
-      return { 停止: true, 原因: "中断" };
-    }
-    剩余步长 -= 子步长;
+    return 结果;
+  }
+
+  if (位移映射[实例.id] !== 实例) {
+    return { 停止: true, 原因: "中断" };
   }
 
   if (实例.已移动 > 起始已移动) {

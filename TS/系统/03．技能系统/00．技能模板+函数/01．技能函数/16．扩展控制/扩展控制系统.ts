@@ -10,7 +10,7 @@ const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as
   String2OrderIdBJ: (this: void, orderIdString: string) => number;
 };
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number) => void) => void;
+  registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, damageType: any) => void) => void;
 };
 const { calcReducedControlDuration, isExcludedFromControlResist } = require("系统.05．Buff系统.01．控制抗性.index") as {
   calcReducedControlDuration: (this: void, target: any, originalDuration: number) => number;
@@ -39,9 +39,6 @@ const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-const { isNormalAttack } = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
-  isNormalAttack: (this: void) => boolean;
 };
 const {
   获取扩展控制定义,
@@ -358,9 +355,9 @@ function schedule反伤(this: void, attacker: any, damage: number): void {
   addDelayedCallback(0, flush反伤队列);
 }
 
-function on反伤最终伤害(this: void, target: any, attacker: any, applied: number): void {
+function on反伤最终伤害(this: void, target: any, attacker: any, applied: number, damageType: any): void {
   if (applied <= 0 || !单位有效且存活(attacker) || !单位有效且存活(target)) return;
-  if (isNormalAttack() !== true) return;
+  if (damageType == null || damageType.isNormalAttack !== true) return;
   const 记录 = 扩展控制映射表[取单位ID(attacker)];
   if (记录 == null || 记录.类型 !== "taunt" || 记录.反伤倍率 <= 0) return;
   if (取单位ID(target) !== 记录.来源单位ID) return;

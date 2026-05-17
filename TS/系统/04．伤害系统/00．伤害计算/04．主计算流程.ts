@@ -72,6 +72,12 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
   }) => number;
 };
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
+  EXGetEventDamageData: (edd_type: number) => number;
+  EVENT_DAMAGE_DATA_IS_PHYSICAL: number;
+  EVENT_DAMAGE_DATA_IS_ATTACK: number;
+  EVENT_DAMAGE_DATA_IS_RANGED: number;
+  EVENT_DAMAGE_DATA_DAMAGE_TYPE: number;
+  EVENT_DAMAGE_DATA_ATTACK_TYPE: number;
   isPhysicalDamage: () => boolean;
   isMagicDamage: () => boolean;
   isEnhancedDamage: () => boolean;
@@ -92,7 +98,24 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 // 〇、最终伤害已应用回调（与 onDamageEvent 同文件）
 //=============================================================================
 
-export type AppliedFinalDamageListener = (target: any, attacker: any, applied: number) => void;
+export interface DamageTypeSnapshot {
+  isPhysicalDamage: boolean;
+  isMagicDamage: boolean;
+  isEnhancedDamage: boolean;
+  isTrueDamage: boolean;
+  isNormalAttack: boolean;
+  isSkillAttack: boolean;
+  isSkillDamage: boolean;
+  isMetalDamage: boolean;
+  isWoodDamage: boolean;
+  isWaterDamage: boolean;
+  isFireDamage: boolean;
+  isThunderDamage: boolean;
+  isLightDamage: boolean;
+  isDarkDamage: boolean;
+}
+
+export type AppliedFinalDamageListener = (target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot) => void;
 
 const appliedFinalDamageListeners: AppliedFinalDamageListener[] = [];
 
@@ -104,12 +127,33 @@ export function registerAppliedFinalDamageListener(cb: AppliedFinalDamageListene
   appliedFinalDamageListeners.push(cb);
 }
 
-function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: number): void {
+function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot): void {
   for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
     const cb = appliedFinalDamageListeners[i];
     if (cb == null) continue;
-    (pcall as any)(() => cb(target, attacker, applied));
+    try {
+      cb(target, attacker, applied, snapshot);
+    } catch (_e) {}
   }
+}
+
+function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
+  return {
+    isPhysicalDamage: 伤害函数.isPhysicalDamage(),
+    isMagicDamage: 伤害函数.isMagicDamage(),
+    isEnhancedDamage: 伤害函数.isEnhancedDamage(),
+    isTrueDamage: 伤害函数.isTrueDamage(),
+    isNormalAttack: 伤害函数.isNormalAttack(),
+    isSkillAttack: 伤害函数.isSkillAttack(),
+    isSkillDamage: 伤害函数.isSkillDamage(),
+    isMetalDamage: 伤害函数.isMetalDamage(),
+    isWoodDamage: 伤害函数.isWoodDamage(),
+    isWaterDamage: 伤害函数.isWaterDamage(),
+    isFireDamage: 伤害函数.isFireDamage(),
+    isThunderDamage: 伤害函数.isThunderDamage(),
+    isLightDamage: 伤害函数.isLightDamage(),
+    isDarkDamage: 伤害函数.isDarkDamage(),
+  };
 }
 
 //=============================================================================
@@ -415,6 +459,7 @@ export function onDamageEvent(
   baseDamage: number
 ): void {
   if (target == null || baseDamage < 0.1) return;
+  const snapshot = captureDamageTypeSnapshot();
 
   // 计算最终伤害
   const result = calculateDamage(target, attacker, baseDamage);
@@ -422,7 +467,7 @@ export function onDamageEvent(
   // 免疫
   if (result.immune) {
     伤害函数.YDWESetEventDamage(0);
-    notifyAppliedFinalDamageListeners(target, attacker, 0);
+    notifyAppliedFinalDamageListeners(target, attacker, 0, snapshot);
     // 显示闪避（可选）
     if (result.showDodge) {
       // TODO: 显示闪避漂浮文字
@@ -437,13 +482,13 @@ export function onDamageEvent(
       attacker,
       baseDamage,
       currentDamage: finalDamage,
-      isPhysicalDamage: 伤害函数.isPhysicalDamage(),
-      isMagicDamage: 伤害函数.isMagicDamage(),
-      isEnhancedDamage: 伤害函数.isEnhancedDamage(),
-      isTrueDamage: 伤害函数.isTrueDamage(),
-      isNormalAttack: 伤害函数.isNormalAttack(),
-      isSkillAttack: 伤害函数.isSkillAttack(),
-      isSkillDamage: 伤害函数.isSkillDamage(),
+      isPhysicalDamage: snapshot.isPhysicalDamage,
+      isMagicDamage: snapshot.isMagicDamage,
+      isEnhancedDamage: snapshot.isEnhancedDamage,
+      isTrueDamage: snapshot.isTrueDamage,
+      isNormalAttack: snapshot.isNormalAttack,
+      isSkillAttack: snapshot.isSkillAttack,
+      isSkillDamage: snapshot.isSkillDamage,
     });
   }
 
@@ -451,12 +496,10 @@ export function onDamageEvent(
   if (finalDamage !== baseDamage) {
     伤害函数.YDWESetEventDamage(finalDamage);
   }
-  notifyAppliedFinalDamageListeners(target, attacker, finalDamage);
+  notifyAppliedFinalDamageListeners(target, attacker, finalDamage, snapshot);
 
   // 吸血吸魔
-  const isMagic = 伤害函数.isMagicDamage();
-  const isNormalAtk = 伤害函数.isNormalAttack();
-  applyLifeAndManaSteal(attacker, finalDamage, isMagic, isNormalAtk, true);
+  applyLifeAndManaSteal(attacker, finalDamage, snapshot.isMagicDamage, snapshot.isNormalAttack, true);
 }
 
 export {};

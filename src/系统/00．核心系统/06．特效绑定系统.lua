@@ -142,7 +142,7 @@ function ____exports.createBoundEffect(unit, modelPath, options)
     if not effect then
         return nil
     end
-    local colorValue = japi.DzGetColor(color.r, color.g, color.b, color.a)
+    local colorValue = japi.DzGetColor(color.a, color.r, color.g, color.b)
     japi.DzSetEffectVertexColor(effect, colorValue)
     local data = {
         effect = effect,

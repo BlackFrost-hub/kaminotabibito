@@ -13,7 +13,14 @@ function ____exports.init()
     require("系统.04．伤害系统.01．伤害事件")
     require("系统.04．伤害系统.02．dot伤害")
     require("系统.04．伤害系统.01．DOT定义.index")
-    require("系统.04．伤害系统.03．伤害测试")
+    local _____6A21_578B_4F24_5BB3_6570_5B57 = require("系统.09．表现系统.09．伤害数字模型.index")
+    local ____Boss_6218_4F24_5BB3_7EDF_8BA1 = require("系统.04．伤害系统.00．伤害计算.07．Boss战伤害统计")
+    if type(_____6A21_578B_4F24_5BB3_6570_5B57.initDamageNumberModelDisplay) == "function" then
+        _____6A21_578B_4F24_5BB3_6570_5B57.initDamageNumberModelDisplay()
+    end
+    if type(____Boss_6218_4F24_5BB3_7EDF_8BA1.initBossBattleDamageStats) == "function" then
+        ____Boss_6218_4F24_5BB3_7EDF_8BA1.initBossBattleDamageStats()
+    end
     require("系统.04．伤害系统.00．伤害计算.05．事件注册")
     local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.index")
     local initHealSystem = ____require_result_0.init

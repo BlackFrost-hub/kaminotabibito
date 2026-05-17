@@ -3,43 +3,479 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local g = require("jass.globals")
 local ____YDWE_6A21_5757 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
-local X_IsTerrainWalkable = ____require_result_2.X_IsTerrainWalkable
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
+local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_2["沿角度步进直到地形阻挡"]
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_3.StarOther_PanCameraToTimedForPlayer
+local ____G_4 = _G
+local onTick10ms = ____G_4.onTick10ms
+local offTick10ms = ____G_4.offTick10ms
 local function _____79FB_52A8_955C_5934_5230_73A9_5BB6(_____73A9_5BB6, x, y)
     StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, x, y, 0.1)
 end
+local DzGetGameUI = japi.DzGetGameUI
+local DzCreateFrameByTagName = japi.DzCreateFrameByTagName
+local DzFrameGetHeroBarButton = japi.DzFrameGetHeroBarButton
+local DzFrameSetPoint = japi.DzFrameSetPoint
+local DzFrameSetSize = japi.DzFrameSetSize
+local DzFrameSetText = japi.DzFrameSetText
+local DzFrameSetTextAlignment = japi.DzFrameSetTextAlignment
+local DzFrameSetFont = japi.DzFrameSetFont
+local DzFrameSetTextColor = japi.DzFrameSetTextColor
+local DzFrameSetPriority = japi.DzFrameSetPriority
+local DzFrameShow = japi.DzFrameShow
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
 local ReviveHeroLoc = jass.ReviveHeroLoc
-local GetRandomReal = jass.GetRandomReal
 local GetRandomDirectionDeg = jass.GetRandomDirectionDeg
 local Cos = jass.Cos
 local Sin = jass.Sin
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local Location = jass.Location
 local RemoveLocation = jass.RemoveLocation
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
+local SetUnitX = jass.SetUnitX
+local SetUnitY = jass.SetUnitY
+local R2I = jass.R2I
 local _____590D_6D3B_5EF6_8FDF_79D2 = 10
 local _____590D_6D3B_534A_5F84 = 400
-local _____6700_5927_5C1D_8BD5_6B21_6570 = 8
+local _____590D_6D3B_63A8_8FDB_6B65_6570 = 20
 local _____590D_6D3B_6B21_6570_5C5E_6027 = "次数"
 local _____590D_6D3B_6B21_6570_8868 = "团队复活"
 local ____Boss_6218_8868 = "Boss战"
 local ____Boss_6218_5355_4F4D_5C5E_6027 = "单位"
+local _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF = 5
+local _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53 = "UI\\uizt.ttf"
+local _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6 = 0.056
+local _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6 = 0.02
+local _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F = 0.0175
+local _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX = -0.0055
+local _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY = 0.0006
+local _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_504F_79FBX = 0.0014
+local _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_504F_79FBY = -0.0018
+local _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_504F_79FBX = -0.0014
+local _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_504F_79FBY = -0.0014
+local _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_504F_79FBX = -0.0011
+local _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_504F_79FBY = 0
+local _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_504F_79FBX = 0.0011
+local _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_504F_79FBY = 0
+local _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7 = 6
+local _____5E27_70B9_4E2D_5FC3 = 4
+local _____6587_672C_5BF9_9F50_5C45_4E2D = 18
 local _____8BBE_7F6E_6D4B_8BD5_6B21_6570 = true
 local _____6D4B_8BD5_590D_6D3B_6B21_6570 = 10
 local _____5DF2_6CE8_518C_6B7B_4EA1 = false
+local _____5DF2_521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6 = false
+local _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick = false
+local _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
+local _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
+local _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
+local _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
+local _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
+local _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868 = {
+    0,
+    0,
+    0,
+    0,
+    0
+}
 local function _____662F_5426_6709_6548(handle)
     return handle ~= nil and handle ~= 0
+end
+local function _____53D6_82F1_96C4_680F_69FD_4F4D(unit)
+    if not _____662F_5426_6709_6548(unit) then
+        return -1
+    end
+    local owner = GetOwningPlayer(unit)
+    if not _____662F_5426_6709_6548(owner) then
+        return -1
+    end
+    local playerId = GetPlayerId(owner)
+    if playerId < 0 or playerId >= _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF then
+        return -1
+    end
+    return playerId
+end
+local function _____5341_500D_7CBE_5EA6_6587_672C(value)
+    local _____5341_500D_6574_6570 = R2I(value * 10 + 0.5)
+    local _____6574_6570_90E8_5206 = R2I(_____5341_500D_6574_6570 / 10)
+    local _____5C0F_6570_90E8_5206 = _____5341_500D_6574_6570 - _____6574_6570_90E8_5206 * 10
+    return (tostring(_____6574_6570_90E8_5206) .. ".") .. tostring(_____5C0F_6570_90E8_5206)
+end
+local function _____8F6C_767D_91D1_6587_672C(text)
+    if text == "" then
+        return ""
+    end
+    return ("|cfffff2d8" .. text) .. "|r"
+end
+local function _____8F6C_9634_5F71_6587_672C(text)
+    if text == "" then
+        return ""
+    end
+    return ("|cff101010" .. text) .. "|r"
+end
+local function _____8F6C_5E95_9634_5F71_6587_672C(text)
+    if text == "" then
+        return ""
+    end
+    return ("|cff080808" .. text) .. "|r"
+end
+local function _____8F6C_63CF_8FB9_6587_672C(text)
+    if text == "" then
+        return ""
+    end
+    return ("|cff3a2a18" .. text) .. "|r"
+end
+local function _____662F_5426_6709_82F1_96C4_680F_5012_8BA1_65F6_5728_8FD0_884C()
+    do
+        local i = 0
+        while i < #_____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868 do
+            if _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[i + 1] > 0 then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
+local function _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____69FD_4F4D)
+    if _____69FD_4F4D < 0 or _____69FD_4F4D >= #_____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868 then
+        return
+    end
+    _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[_____69FD_4F4D + 1] = 0
+    local _____5E95_9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____5DE6_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____53F3_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____6587_5B57_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868[_____69FD_4F4D + 1]
+    if _____5E95_9634_5F71_6846_4F53 ~= 0 then
+        DzFrameShow(_____5E95_9634_5F71_6846_4F53, false)
+    end
+    if _____5DE6_63CF_8FB9_6846_4F53 ~= 0 then
+        DzFrameShow(_____5DE6_63CF_8FB9_6846_4F53, false)
+    end
+    if _____53F3_63CF_8FB9_6846_4F53 ~= 0 then
+        DzFrameShow(_____53F3_63CF_8FB9_6846_4F53, false)
+    end
+    if _____9634_5F71_6846_4F53 ~= 0 then
+        DzFrameShow(_____9634_5F71_6846_4F53, false)
+    end
+    if _____6587_5B57_6846_4F53 ~= 0 then
+        DzFrameShow(_____6587_5B57_6846_4F53, false)
+    end
+end
+local function _____5237_65B0_82F1_96C4_680F_5012_8BA1_65F6_6587_672C(_____69FD_4F4D)
+    local _____5E95_9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____5DE6_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____53F3_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____6587_5B57_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868[_____69FD_4F4D + 1]
+    if _____5E95_9634_5F71_6846_4F53 == 0 or _____5DE6_63CF_8FB9_6846_4F53 == 0 or _____53F3_63CF_8FB9_6846_4F53 == 0 or _____9634_5F71_6846_4F53 == 0 or _____6587_5B57_6846_4F53 == 0 then
+        return
+    end
+    local _____6587_672C = _____5341_500D_7CBE_5EA6_6587_672C(_____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[_____69FD_4F4D + 1])
+    DzFrameSetText(
+        _____5E95_9634_5F71_6846_4F53,
+        _____8F6C_5E95_9634_5F71_6587_672C(_____6587_672C)
+    )
+    DzFrameSetText(
+        _____5DE6_63CF_8FB9_6846_4F53,
+        _____8F6C_63CF_8FB9_6587_672C(_____6587_672C)
+    )
+    DzFrameSetText(
+        _____53F3_63CF_8FB9_6846_4F53,
+        _____8F6C_63CF_8FB9_6587_672C(_____6587_672C)
+    )
+    DzFrameSetText(
+        _____9634_5F71_6846_4F53,
+        _____8F6C_9634_5F71_6587_672C(_____6587_672C)
+    )
+    DzFrameSetText(
+        _____6587_5B57_6846_4F53,
+        _____8F6C_767D_91D1_6587_672C(_____6587_672C)
+    )
+end
+local function _____521B_5EFA_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(_____69FD_4F4D)
+    local gameUI = DzGetGameUI()
+    if gameUI == 0 then
+        return 0
+    end
+    local button = DzFrameGetHeroBarButton(_____69FD_4F4D)
+    if button == 0 then
+        return 0
+    end
+    local _____5E95_9634_5F71_6846_4F53 = DzCreateFrameByTagName(
+        "TEXT",
+        "英雄复活倒计时底阴影_" .. tostring(_____69FD_4F4D),
+        gameUI,
+        "template",
+        0
+    )
+    local _____5DE6_63CF_8FB9_6846_4F53 = DzCreateFrameByTagName(
+        "TEXT",
+        "英雄复活倒计时左描边_" .. tostring(_____69FD_4F4D),
+        gameUI,
+        "template",
+        0
+    )
+    local _____53F3_63CF_8FB9_6846_4F53 = DzCreateFrameByTagName(
+        "TEXT",
+        "英雄复活倒计时右描边_" .. tostring(_____69FD_4F4D),
+        gameUI,
+        "template",
+        0
+    )
+    local _____9634_5F71_6846_4F53 = DzCreateFrameByTagName(
+        "TEXT",
+        "英雄复活倒计时阴影_" .. tostring(_____69FD_4F4D),
+        gameUI,
+        "template",
+        0
+    )
+    local _____6587_5B57_6846_4F53 = DzCreateFrameByTagName(
+        "TEXT",
+        "英雄复活倒计时_" .. tostring(_____69FD_4F4D),
+        gameUI,
+        "template",
+        0
+    )
+    if _____5E95_9634_5F71_6846_4F53 == 0 or _____5DE6_63CF_8FB9_6846_4F53 == 0 or _____53F3_63CF_8FB9_6846_4F53 == 0 or _____9634_5F71_6846_4F53 == 0 or _____6587_5B57_6846_4F53 == 0 then
+        return 0
+    end
+    DzFrameSetSize(_____5E95_9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6)
+    DzFrameSetPoint(
+        _____5E95_9634_5F71_6846_4F53,
+        _____5E27_70B9_4E2D_5FC3,
+        button,
+        _____5E27_70B9_4E2D_5FC3,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX + _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_504F_79FBX,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY + _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_504F_79FBY
+    )
+    DzFrameSetTextAlignment(_____5E95_9634_5F71_6846_4F53, -1)
+    DzFrameSetTextAlignment(_____5E95_9634_5F71_6846_4F53, _____6587_672C_5BF9_9F50_5C45_4E2D)
+    DzFrameSetFont(_____5E95_9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F, 0)
+    DzFrameSetTextColor(
+        _____5E95_9634_5F71_6846_4F53,
+        8,
+        8,
+        8,
+        255
+    )
+    DzFrameSetPriority(_____5E95_9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7 - 2)
+    DzFrameShow(_____5E95_9634_5F71_6846_4F53, false)
+    DzFrameSetSize(_____5DE6_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6)
+    DzFrameSetPoint(
+        _____5DE6_63CF_8FB9_6846_4F53,
+        _____5E27_70B9_4E2D_5FC3,
+        button,
+        _____5E27_70B9_4E2D_5FC3,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX + _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_504F_79FBX,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY + _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_504F_79FBY
+    )
+    DzFrameSetTextAlignment(_____5DE6_63CF_8FB9_6846_4F53, -1)
+    DzFrameSetTextAlignment(_____5DE6_63CF_8FB9_6846_4F53, _____6587_672C_5BF9_9F50_5C45_4E2D)
+    DzFrameSetFont(_____5DE6_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F, 0)
+    DzFrameSetTextColor(
+        _____5DE6_63CF_8FB9_6846_4F53,
+        58,
+        42,
+        24,
+        255
+    )
+    DzFrameSetPriority(_____5DE6_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7 - 1)
+    DzFrameShow(_____5DE6_63CF_8FB9_6846_4F53, false)
+    DzFrameSetSize(_____53F3_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6)
+    DzFrameSetPoint(
+        _____53F3_63CF_8FB9_6846_4F53,
+        _____5E27_70B9_4E2D_5FC3,
+        button,
+        _____5E27_70B9_4E2D_5FC3,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX + _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_504F_79FBX,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY + _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_504F_79FBY
+    )
+    DzFrameSetTextAlignment(_____53F3_63CF_8FB9_6846_4F53, -1)
+    DzFrameSetTextAlignment(_____53F3_63CF_8FB9_6846_4F53, _____6587_672C_5BF9_9F50_5C45_4E2D)
+    DzFrameSetFont(_____53F3_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F, 0)
+    DzFrameSetTextColor(
+        _____53F3_63CF_8FB9_6846_4F53,
+        58,
+        42,
+        24,
+        255
+    )
+    DzFrameSetPriority(_____53F3_63CF_8FB9_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7 - 1)
+    DzFrameShow(_____53F3_63CF_8FB9_6846_4F53, false)
+    DzFrameSetSize(_____9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6)
+    DzFrameSetPoint(
+        _____9634_5F71_6846_4F53,
+        _____5E27_70B9_4E2D_5FC3,
+        button,
+        _____5E27_70B9_4E2D_5FC3,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX + _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_504F_79FBX,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY + _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_504F_79FBY
+    )
+    DzFrameSetTextAlignment(_____9634_5F71_6846_4F53, -1)
+    DzFrameSetTextAlignment(_____9634_5F71_6846_4F53, _____6587_672C_5BF9_9F50_5C45_4E2D)
+    DzFrameSetFont(_____9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F, 0)
+    DzFrameSetTextColor(
+        _____9634_5F71_6846_4F53,
+        16,
+        16,
+        16,
+        255
+    )
+    DzFrameSetPriority(_____9634_5F71_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7 - 1)
+    DzFrameShow(_____9634_5F71_6846_4F53, false)
+    DzFrameSetSize(_____6587_5B57_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_5BBD_5EA6, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_9AD8_5EA6)
+    DzFrameSetPoint(
+        _____6587_5B57_6846_4F53,
+        _____5E27_70B9_4E2D_5FC3,
+        button,
+        _____5E27_70B9_4E2D_5FC3,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBX,
+        _____82F1_96C4_680F_5012_8BA1_65F6_504F_79FBY
+    )
+    DzFrameSetTextAlignment(_____6587_5B57_6846_4F53, -1)
+    DzFrameSetTextAlignment(_____6587_5B57_6846_4F53, _____6587_672C_5BF9_9F50_5C45_4E2D)
+    DzFrameSetFont(_____6587_5B57_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_5B57_4F53_5927_5C0F, 0)
+    DzFrameSetTextColor(
+        _____6587_5B57_6846_4F53,
+        255,
+        242,
+        216,
+        255
+    )
+    DzFrameSetPriority(_____6587_5B57_6846_4F53, _____82F1_96C4_680F_5012_8BA1_65F6_6587_5B57_4F18_5148_7EA7)
+    DzFrameShow(_____6587_5B57_6846_4F53, false)
+    _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1] = _____5E95_9634_5F71_6846_4F53
+    _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1] = _____5DE6_63CF_8FB9_6846_4F53
+    _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1] = _____53F3_63CF_8FB9_6846_4F53
+    _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1] = _____9634_5F71_6846_4F53
+    _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868[_____69FD_4F4D + 1] = _____6587_5B57_6846_4F53
+    return _____6587_5B57_6846_4F53
+end
+local function _____786E_4FDD_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(_____69FD_4F4D)
+    if _____69FD_4F4D < 0 or _____69FD_4F4D >= #_____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868 then
+        return 0
+    end
+    local oldFrame = _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868[_____69FD_4F4D + 1]
+    if oldFrame ~= 0 then
+        return oldFrame
+    end
+    return _____521B_5EFA_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(_____69FD_4F4D)
+end
+local function _____521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53()
+    if _____5DF2_521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6 then
+        return
+    end
+    _____5DF2_521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6 = true
+    do
+        local i = 0
+        while i < _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF do
+            _____786E_4FDD_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(i)
+            i = i + 1
+        end
+    end
+end
+local function ____on_82F1_96C4_680F_5012_8BA1_65F6Tick()
+    local _____4ECD_6709_5012_8BA1_65F6 = false
+    do
+        local i = 0
+        while i < #_____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868 do
+            do
+                local _____5269_4F59_79D2 = _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[i + 1]
+                if _____5269_4F59_79D2 <= 0 then
+                    goto __continue43
+                end
+                local _____65B0_5269_4F59_79D2 = _____5269_4F59_79D2 - 0.01
+                if _____65B0_5269_4F59_79D2 <= 0 then
+                    _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(i)
+                    goto __continue43
+                end
+                _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[i + 1] = _____65B0_5269_4F59_79D2
+                _____5237_65B0_82F1_96C4_680F_5012_8BA1_65F6_6587_672C(i)
+                _____4ECD_6709_5012_8BA1_65F6 = true
+            end
+            ::__continue43::
+            i = i + 1
+        end
+    end
+    if not _____4ECD_6709_5012_8BA1_65F6 and _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick then
+        _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick = false
+        offTick10ms(____on_82F1_96C4_680F_5012_8BA1_65F6Tick)
+    end
+end
+local function _____542F_52A8_82F1_96C4_680F_5012_8BA1_65F6(unit)
+    local _____69FD_4F4D = _____53D6_82F1_96C4_680F_69FD_4F4D(unit)
+    if _____69FD_4F4D < 0 then
+        return
+    end
+    local frame = _____786E_4FDD_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(_____69FD_4F4D)
+    if frame == 0 then
+        return
+    end
+    _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[_____69FD_4F4D + 1] = _____590D_6D3B_5EF6_8FDF_79D2
+    _____5237_65B0_82F1_96C4_680F_5012_8BA1_65F6_6587_672C(_____69FD_4F4D)
+    local _____5E95_9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____5DE6_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____53F3_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    if _____5E95_9634_5F71_6846_4F53 ~= 0 then
+        DzFrameShow(_____5E95_9634_5F71_6846_4F53, true)
+    end
+    if _____5DE6_63CF_8FB9_6846_4F53 ~= 0 then
+        DzFrameShow(_____5DE6_63CF_8FB9_6846_4F53, true)
+    end
+    if _____53F3_63CF_8FB9_6846_4F53 ~= 0 then
+        DzFrameShow(_____53F3_63CF_8FB9_6846_4F53, true)
+    end
+    if _____9634_5F71_6846_4F53 ~= 0 then
+        DzFrameShow(_____9634_5F71_6846_4F53, true)
+    end
+    DzFrameShow(frame, true)
+    if not _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick then
+        _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick = true
+        onTick10ms(____on_82F1_96C4_680F_5012_8BA1_65F6Tick)
+    end
 end
 local function _____662F_73A9_5BB6_82F1_96C4(unit)
     if not _____662F_5426_6709_6548(unit) then
@@ -47,23 +483,20 @@ local function _____662F_73A9_5BB6_82F1_96C4(unit)
     end
     return getRegisteredPlayerHero(GetOwningPlayer(unit)) == unit
 end
-local function _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss)
+local function _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, _____68C0_6D4B_5355_4F4D)
     local bx = GetUnitX(boss)
     local by = GetUnitY(boss)
-    do
-        local i = 0
-        while i < _____6700_5927_5C1D_8BD5_6B21_6570 do
-            local _____89D2_5EA6_5EA6 = GetRandomDirectionDeg()
-            local _____5F27_5EA6 = _____89D2_5EA6_5EA6 * 0.01745329252
-            local x = bx + GetRandomReal(0, _____590D_6D3B_534A_5F84) * Cos(_____5F27_5EA6)
-            local y = by + GetRandomReal(0, _____590D_6D3B_534A_5F84) * Sin(_____5F27_5EA6)
-            if X_IsTerrainWalkable(x, y) then
-                return {x = x, y = y}
-            end
-            i = i + 1
-        end
-    end
-    return nil
+    local _____89D2_5EA6_5EA6 = GetRandomDirectionDeg()
+    local _____6B65_8FDB_8DDD_79BB = _____590D_6D3B_534A_5F84 / _____590D_6D3B_63A8_8FDB_6B65_6570
+    local _____7ED3_679C = _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321({
+        ["起点X"] = bx,
+        ["起点Y"] = by,
+        ["角度度"] = _____89D2_5EA6_5EA6,
+        ["单步距离"] = _____6B65_8FDB_8DDD_79BB,
+        ["步数"] = _____590D_6D3B_63A8_8FDB_6B65_6570,
+        ["检测单位"] = _____68C0_6D4B_5355_4F4D
+    })
+    return {x = _____7ED3_679C["最终X"], y = _____7ED3_679C["最终Y"]}
 end
 local function _____6267_884C_590D_6D3B(dyingUnit)
     if not _____662F_5426_6709_6548(dyingUnit) then
@@ -75,6 +508,7 @@ local function _____6267_884C_590D_6D3B(dyingUnit)
     if jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
         return
     end
+    _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
     local _____5269_4F59_6B21_6570 = ____YDWE_6A21_5757:YDUserDataGet("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
     if _____5269_4F59_6B21_6570 ~= nil and _____5269_4F59_6B21_6570 <= 0 then
         return
@@ -90,13 +524,18 @@ local function _____6267_884C_590D_6D3B(dyingUnit)
     end
     local boss = ____YDWE_6A21_5757:YDUserDataGet("string", ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, "unit")
     if _____662F_5426_6709_6548(boss) then
-        local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss)
+        local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
         if pos == nil then
             return
         end
-        local loc = Location(pos.x, pos.y)
+        local loc = Location(
+            GetUnitX(boss),
+            GetUnitY(boss)
+        )
         ReviveHeroLoc(dyingUnit, loc, true)
         RemoveLocation(loc)
+        SetUnitX(dyingUnit, pos.x)
+        SetUnitY(dyingUnit, pos.y)
         SetUnitInvulnerable(dyingUnit, false)
         addDelayedCallback(
             0,
@@ -130,6 +569,7 @@ local function _____82F1_96C4_6B7B_4EA1_5EF6_8FDF_590D_6D3B(dyingUnit, _____51FB
     if not _____662F_73A9_5BB6_82F1_96C4(dyingUnit) then
         return
     end
+    _____542F_52A8_82F1_96C4_680F_5012_8BA1_65F6(dyingUnit)
     addDelayedCallback(
         _____590D_6D3B_5EF6_8FDF_79D2 * 1000,
         function()
@@ -142,6 +582,7 @@ ____exports["初始化英雄复活"] = function()
         return
     end
     _____5DF2_6CE8_518C_6B7B_4EA1 = true
+    _____521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53()
     if _____8BBE_7F6E_6D4B_8BD5_6B21_6570 then
         ____YDWE_6A21_5757:YDUserDataSet(
             "string",

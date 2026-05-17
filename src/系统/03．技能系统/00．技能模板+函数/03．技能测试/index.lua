@@ -296,4 +296,20 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.03．技能测试.131．吟唱条测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.03．技能测试.132．伤害数字模型序列测试")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

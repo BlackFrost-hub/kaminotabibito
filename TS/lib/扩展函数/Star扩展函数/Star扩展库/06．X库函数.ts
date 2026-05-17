@@ -34,9 +34,9 @@ const DUMMY_ITEM_ID = (function () {
   return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4;
 })();
 
-const PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0);
-const PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1);
-const PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2);
+const PATHING_TYPE_WALKABILITY = jass["PATHING_TYPE_WALKABILITY"] as any;
+const PATHING_TYPE_FLOATABILITY = jass["PATHING_TYPE_FLOATABILITY"] as any;
+const PATHING_TYPE_BUILDABILITY = jass["PATHING_TYPE_BUILDABILITY"] as any;
 
 let dummyItem: any = null;
 let searchRect: any = null;
@@ -95,7 +95,20 @@ function restoreHiddenItems(): void {
  * @param y Y坐标
  * @returns 是否可通行
  */
-export function X_IsTerrainWalkable(x: number, y: number): boolean {
+export function X_IsTerrainWalkable(xOrSelf: any, xOrY: any, yMaybe?: any): boolean {
+  let x = xOrSelf;
+  let y = xOrY;
+  // 兼容两种 Lua 调用形态：
+  // 1. X_IsTerrainWalkable(x, y)
+  // 2. X_IsTerrainWalkable(nil, x, y)
+  if (y == null && yMaybe == null && typeof xOrSelf === "number" && typeof xOrY === "number") {
+    x = xOrSelf;
+    y = xOrY;
+  }
+  if (yMaybe != null) {
+    x = xOrY;
+    y = yMaybe;
+  }
   initXLib();
 
   if (!dummyItem || !searchRect) {

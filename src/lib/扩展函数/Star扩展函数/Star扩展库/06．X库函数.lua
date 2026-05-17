@@ -34,9 +34,9 @@ local DUMMY_ITEM_ID = (function(self)
     local b4 = string.byte("wolg", 4)
     return b1 * 16777216 + b2 * 65536 + b3 * 256 + b4
 end)(nil)
-local PATHING_TYPE_WALKABILITY = jass.ConvertPathingType(0)
-local PATHING_TYPE_FLOATABILITY = jass.ConvertPathingType(1)
-local PATHING_TYPE_BUILDABILITY = jass.ConvertPathingType(2)
+local PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY
+local PATHING_TYPE_FLOATABILITY = jass.PATHING_TYPE_FLOATABILITY
+local PATHING_TYPE_BUILDABILITY = jass.PATHING_TYPE_BUILDABILITY
 local dummyItem = nil
 local searchRect = nil
 local lastAbleX = 0
@@ -94,7 +94,17 @@ end
 -- @param x X坐标
 -- @param y Y坐标
 -- @returns 是否可通行
-function ____exports.X_IsTerrainWalkable(self, x, y)
+function ____exports.X_IsTerrainWalkable(self, xOrSelf, xOrY, yMaybe)
+    local x = xOrSelf
+    local y = xOrY
+    if y == nil and yMaybe == nil and type(xOrSelf) == "number" and type(xOrY) == "number" then
+        x = xOrSelf
+        y = xOrY
+    end
+    if yMaybe ~= nil then
+        x = xOrY
+        y = yMaybe
+    end
     initXLib(nil)
     if not dummyItem or not searchRect then
         return not jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY)

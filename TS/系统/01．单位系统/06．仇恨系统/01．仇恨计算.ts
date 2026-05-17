@@ -12,7 +12,7 @@
 const jass = require("jass.common") as any;
 
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number) => void) => void;
+  registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, damageType: any) => void) => void;
 };
 
 const { isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
@@ -61,7 +61,7 @@ function nowMs(): number {
   return _nowMs();
 }
 
-function onDamage(this: void, target: any, attacker: any, applied: number): void {
+function onDamage(this: void, target: any, attacker: any, applied: number, _damageType: any): void {
   if (attacker == null || attacker === 0) return;
   if (target == null || target === 0) return;
   if (target === attacker) return;

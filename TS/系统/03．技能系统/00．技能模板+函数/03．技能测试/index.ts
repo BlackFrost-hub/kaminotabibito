@@ -35,3 +35,5 @@ export * from "./126．单位倒计时测试";
 export * from "./127．数值漂浮文字测试";
 export * from "./128．周期范围效果测试";
 export * from "./129．禁锢寄生测试";
+export * from "./131．吟唱条测试";
+export * from "./132．伤害数字模型序列测试";
