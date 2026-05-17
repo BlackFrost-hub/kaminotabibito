@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+require("系统.00．核心系统.08．同步随机种子")
 do
     local ____export = require("lib.扩展函数.封装函数.index")
     for ____exportKey, ____exportValue in pairs(____export) do

@@ -26,6 +26,15 @@ const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.i
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 装备等级颜色代码, 是否彩虹装备等级, 彩虹颜色文本, 去除颜色代码 } = require("系统.00．核心系统.01．颜色常量") as {
+  装备等级颜色代码: (this: void, _?: undefined, level?: string) => string;
+  是否彩虹装备等级: (this: void, _?: undefined, level?: string) => boolean;
+  彩虹颜色文本: (this: void, _?: undefined, text?: string) => string;
+  去除颜色代码: (this: void, text: string) => string;
+};
 
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
 
@@ -138,21 +147,29 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const playerName = ((jass as any).GetPlayerName(owner) as string) ?? "";
 
   const actionText = isAdd ? "获得" : "丢弃";
-  const levelText = itemData.level || "";
-  let levelColor: string;
-  if (levelText === "E-" || levelText === "E") levelColor = "|cFF808080";
-  else if (levelText === "D") levelColor = "|cFF00FF00";
-  else if (levelText === "C") levelColor = "|cFF0000FF";
-  else if (levelText === "B") levelColor = "|cFF800080";
-  else if (levelText === "A") levelColor = "|cFFFFA500";
-  else if (levelText === "S") levelColor = "|cFFFF0000";
-  else levelColor = "|cFFFFFFFF";
-
-  const coloredLevel = levelColor + levelText + "|r";
-  const coloredName = "|cFFFFD700" + (itemData.name || "未知") + "|r";
+  const levelText = String(itemData.level || "").trim();
+  debugLogForce(
+    "装备系统",
+    "装备数据调试",
+    "idStr=",
+    idStr,
+    "name=",
+    itemData.name ?? "nil",
+    "level=",
+    itemData.level ?? "nil",
+    "type=",
+    itemData.type ?? "nil"
+  );
+  debugLogForce("装备系统", "等级原始值", "text=", levelText, "len=", levelText.length);
+  const 装备原名 = itemData.name || "未知";
+  const 装备颜色代码 = 装备等级颜色代码(undefined, levelText);
+  const coloredLevel = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, levelText) : 装备颜色代码 + levelText + "|r";
+  const coloredName = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, 装备原名) : 装备颜色代码 + 装备原名 + "|r";
+  debugLogForce("装备系统", "装备提示调试", "coloredLevel=", coloredLevel, "coloredName=", coloredName);
   // 消耗品丢弃不显示消息，但仍计算属性
   if (!isConsumable) {
-    let msg = "|cffffff00『系统消息』：|r" +"|cFF87CEEB【装备】|r " + actionText + "[" + coloredLevel + "]" + "级" + "『" + coloredName + "』";
+    let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
+    debugLogForce("装备系统", "装备提示文本", "msg=", msg);
     for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
       const isPct = percentNames.indexOf(stat.name) >= 0;
@@ -190,8 +207,6 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   }
 }
 
-// (globalThis as any).print("【调试】事件监听器创建完成");
-
 // 立即执行：注册拾取/丢弃物品事件（require 时整块执行，initEvents 会运行）
 /**
  * 初始化事件：使用物品事件中心统一注册
@@ -207,5 +222,4 @@ function initEvents(): void {
 }
 
 initEvents();
-// (globalThis as any).print("【调试】equip_system 加载完成");
 export { }; // 保持为模块，使 jass/g/items 等为 local，且 require() 会执行本文件

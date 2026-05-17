@@ -40,6 +40,13 @@ ____exports["取单位类型头像"] = function(_____5355_4F4D_7C7B_578BID)
     _____5355_4F4D_5934_50CF_7F13_5B58[_____5355_4F4D_7C7B_578BID] = _____5E7F_64AD_63D0_793A_9ED8_8BA4_5934_50CF
     return _____5E7F_64AD_63D0_793A_9ED8_8BA4_5934_50CF
 end
+____exports["取单位类型Art头像"] = function(_____5355_4F4D_7C7B_578BID)
+    if _____5355_4F4D_7C7B_578BID == nil or _____5355_4F4D_7C7B_578BID == 0 then
+        return ""
+    end
+    local _____7F8E_672F_8DEF_5F84 = getObjectProperty(ObjectType.UNIT, _____5355_4F4D_7C7B_578BID, "Art")
+    return _____662F_8D34_56FE_8DEF_5F84(_____7F8E_672F_8DEF_5F84) and _____7F8E_672F_8DEF_5F84 or ""
+end
 ____exports["取单位头像"] = function(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return _____5E7F_64AD_63D0_793A_9ED8_8BA4_5934_50CF

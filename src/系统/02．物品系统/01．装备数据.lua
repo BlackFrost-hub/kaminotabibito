@@ -1,4 +1,7 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__StringCharAt = ____lualib.__TS__StringCharAt
+local __TS__StringTrim = ____lualib.__TS__StringTrim
+local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
 local ____exports = {}
 ____exports.items = {}
 ____exports.items.I00V = {
@@ -3652,5 +3655,42 @@ ____exports.items.tst2 = {
     PowerUP = "2str",
     abilList = "A0LH"
 }
+local function normalizeItemName(name)
+    local result = ""
+    do
+        local i = 0
+        while i < #name do
+            do
+                local ch = __TS__StringCharAt(name, i)
+                if ch == "|" then
+                    local next = __TS__StringCharAt(name, i + 1)
+                    if next == "r" or next == "R" then
+                        i = i + 1
+                        goto __continue4
+                    end
+                    if next == "c" or next == "C" then
+                        i = i + 9
+                        goto __continue4
+                    end
+                end
+                result = result .. ch
+            end
+            ::__continue4::
+            i = i + 1
+        end
+    end
+    return __TS__StringTrim(result)
+end
+function ____exports.resolveItemIdByName(name)
+    local normalized = normalizeItemName(name)
+    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.items)) do
+        local itemId = ____value[1]
+        local data = ____value[2]
+        if normalizeItemName(data.name or "") == normalized then
+            return itemId
+        end
+    end
+    return nil
+end
 ____exports.default = ____exports.items
 return ____exports

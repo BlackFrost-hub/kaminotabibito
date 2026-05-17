@@ -38,6 +38,7 @@ export const 分隔符文本 = "/";
 
 export const 默认颜色ID = 5;
 
+// 颜色ID: 1-gb(蓝绿), 2-t(青), 3-o(棕), 4-r(红), 5-p(紫), 6-g(金), 7-b(蓝)
 export const 颜色ID到前景模型: Record<number, string> = {
   1: "UI\\CastBar\\UI_shengmingzhi_gb2.mdx",
   2: "UI\\CastBar\\UI_shengmingzhi_t1.mdx",

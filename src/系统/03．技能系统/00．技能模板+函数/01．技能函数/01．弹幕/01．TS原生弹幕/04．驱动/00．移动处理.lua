@@ -103,7 +103,9 @@ ____exports["推进弹幕移动"] = function(_____5B9E_4F8B, delta)
     if _____5B9E_4F8B["参数"]["轨迹类型"] == "追踪" then
         _____66F4_65B0_8FFD_8E2A_65B9_5411(_____5B9E_4F8B, delta)
     else
-        _____5B9E_4F8B["当前方向角"] = _____6807_51C6_5316_89D2_5EA6(GetUnitFacing(_____5B9E_4F8B["弹幕单位"]))
+        if _____5B9E_4F8B["参数"]["显式改向后锁定方向"] ~= true then
+            _____5B9E_4F8B["当前方向角"] = _____6807_51C6_5316_89D2_5EA6(GetUnitFacing(_____5B9E_4F8B["弹幕单位"]))
+        end
     end
     local _____8DDD_79BB = _____5B9E_4F8B["当前速度"] * delta
     local nextX = _____5B9E_4F8B["当前X"] + CosBJ(_____5B9E_4F8B["当前方向角"]) * _____8DDD_79BB

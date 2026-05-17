@@ -105,7 +105,9 @@ export function 推进弹幕移动(this: void, 实例: 原生弹幕内部实例,
   if (实例.参数.轨迹类型 === "追踪") {
     更新追踪方向(实例, delta);
   } else {
-    实例.当前方向角 = 标准化角度(GetUnitFacing(实例.弹幕单位));
+    if (实例.参数.显式改向后锁定方向 !== true) {
+      实例.当前方向角 = 标准化角度(GetUnitFacing(实例.弹幕单位));
+    }
   }
 
   const 距离 = 实例.当前速度 * delta;

@@ -43,6 +43,12 @@ export function 取单位类型头像(this: void, 单位类型ID: number): strin
   return 广播提示默认头像;
 }
 
+export function 取单位类型Art头像(this: void, 单位类型ID: number): string {
+  if (单位类型ID == null || 单位类型ID === 0) return "";
+  const 美术路径 = getObjectProperty(ObjectType.UNIT, 单位类型ID, "Art");
+  return 是贴图路径(美术路径) ? 美术路径 : "";
+}
+
 export function 取单位头像(this: void, 单位: any): string {
   if (单位 == null || 单位 === 0) return 广播提示默认头像;
   return 取单位类型头像(GetUnitTypeId(单位));

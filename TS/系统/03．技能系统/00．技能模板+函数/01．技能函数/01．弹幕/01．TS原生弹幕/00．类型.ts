@@ -55,6 +55,7 @@ export interface 原生弹幕参数 {
   轨迹采样器?: 原生弹幕轨迹采样器;
   指定目标?: any;
   追踪转向速度?: number;
+  显式改向后锁定方向?: boolean;
 
   最大距离?: number;
   生命周期?: number;

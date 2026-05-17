@@ -4,6 +4,7 @@ export const 广播提示玩家槽数 = 4;
 export const 每玩家广播提示槽数 = 7;
 
 export const 广播提示背景贴图 = "UI\\xiaoxi\\UInoticebackdrop.tga";
+export const 广播提示喇叭头像 = "UI\\xiaoxi\\UInotice.tga";
 export const 广播提示默认头像 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
 export const 广播提示字体 = "UI\\uizt.ttf";
 
@@ -41,5 +42,5 @@ export function 取广播提示槽索引(this: void, 玩家ID: number, 槽位ID:
 }
 
 export function 取广播提示槽位Y(this: void, 槽位ID: number): number {
-  return 广播提示基准Y + 槽位ID * 广播提示槽间距Y;
+  return 广播提示基准Y + (每玩家广播提示槽数 - 1 - 槽位ID) * 广播提示槽间距Y;
 }

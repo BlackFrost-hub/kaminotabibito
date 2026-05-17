@@ -597,4 +597,34 @@ items["tint"] = {type: "提升属性的物品", name: "智力之书", goldPrice:
 items["tpow"] = {type: "提升属性的物品", name: "知识之书", goldPrice: 0, PowerUP: "1all", abilList: "A0LH"};
 items["tstr"] = {type: "提升属性的物品", name: "力量之书", goldPrice: 0, PowerUP: "1str", abilList: "A0LH"};
 items["tst2"] = {type: "提升属性的物品", name: "力量之书 +2", goldPrice: 0, PowerUP: "2str", abilList: "A0LH"};
+
+function normalizeItemName(this: void, name: string): string {
+  let result = "";
+  for (let i = 0; i < name.length; i++) {
+    const ch = name.charAt(i);
+    if (ch === "|") {
+      const next = name.charAt(i + 1);
+      if (next === "r" || next === "R") {
+        i = i + 1;
+        continue;
+      }
+      if (next === "c" || next === "C") {
+        i = i + 9;
+        continue;
+      }
+    }
+    result += ch;
+  }
+  return result.trim();
+}
+
+export function resolveItemIdByName(this: void, name: string): string | undefined {
+  const normalized = normalizeItemName(name);
+  for (const [itemId, data] of Object.entries(items)) {
+    if (normalizeItemName(data.name ?? "") === normalized) {
+      return itemId;
+    }
+  }
+  return undefined;
+}
 export default items;

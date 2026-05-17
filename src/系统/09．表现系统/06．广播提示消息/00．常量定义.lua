@@ -5,6 +5,7 @@ local ____exports = {}
 ____exports["广播提示玩家槽数"] = 4
 ____exports["每玩家广播提示槽数"] = 7
 ____exports["广播提示背景贴图"] = "UI\\xiaoxi\\UInoticebackdrop.tga"
+____exports["广播提示喇叭头像"] = "UI\\xiaoxi\\UInotice.tga"
 ____exports["广播提示默认头像"] = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 ____exports["广播提示字体"] = "UI\\uizt.ttf"
 ____exports["广播提示宽度"] = 0.235
@@ -34,6 +35,6 @@ ____exports["取广播提示槽索引"] = function(_____73A9_5BB6ID, _____69FD_4
     return _____73A9_5BB6ID * ____exports["每玩家广播提示槽数"] + _____69FD_4F4DID
 end
 ____exports["取广播提示槽位Y"] = function(_____69FD_4F4DID)
-    return ____exports["广播提示基准Y"] + _____69FD_4F4DID * ____exports["广播提示槽间距Y"]
+    return ____exports["广播提示基准Y"] + (____exports["每玩家广播提示槽数"] - 1 - _____69FD_4F4DID) * ____exports["广播提示槽间距Y"]
 end
 return ____exports

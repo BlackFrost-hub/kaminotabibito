@@ -1,162 +1,120 @@
 /** @noSelfInFile */
 /**
  * 宝箱系统 - 常量定义
- *
- * 配置说明：
- * - 一个宝箱类型包含：可破坏物ID、开启时间、名称、掉落模式
- * - 掉落模式支持：分数范围、指定物品池、混合模式、必掉物品
  */
 
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  stringToFourCC: (s: string) => number;
-};
-
-// ==========================================================================================
-// 掉落模式类型
-// ==========================================================================================
-
-/** 分数范围 */
-export interface ScoreRange { min: number; max: number; }
-
-/** 掉落模式类型 */
-export type DropMode =
-  | { type: "score"; range: ScoreRange; always?: string }           // 按分数范围随机，always为必掉物品
-  | { type: "pool"; items: string; always?: string } // 指定物品池（带权重或不带），always为必掉物品
-  | { type: "mixed"; range: ScoreRange; items: string; always?: string }; // 分数筛选+物品池权重，always为必掉物品
-
-// ==========================================================================================
-// 宝箱类型配置（核心配置，一个宝箱类型包含所有信息）
-// ==========================================================================================
-
-/** 宝箱类型配置 */
-export interface ChestTypeConfig {
-  /** 可破坏物类型ID（如 'B00Z'） */
-  destructableType: string;
-  /** 开启时间（秒） */
-  openTime: number;
-  /** 名称（用于日志和提示） */
-  name: string;
-  /** 掉落数量 */
-  picks: number;
-  /** 掉落模式 */
-  dropMode: DropMode;
+function stringToFourCC(this: void, s: string): number {
+  const a = s.length > 0 ? s.charCodeAt(0) : 0;
+  const b = s.length > 1 ? s.charCodeAt(1) : 0;
+  const c = s.length > 2 ? s.charCodeAt(2) : 0;
+  const d = s.length > 3 ? s.charCodeAt(3) : 0;
+  return a * 16777216 + b * 65536 + c * 256 + d;
 }
 
-/** 宝箱系统开关（设为 false 可关闭整个宝箱系统） */
-export const 宝箱系统开关 = false;
+export interface ScoreRange {
+  min: number;
+  max: number;
+}
 
-/** 宝箱类型配置表（在此添加所有宝箱类型） */
+export type DropMode =
+  | { type: "score"; range: ScoreRange; always?: string }
+  | { type: "pool"; items: string; always?: string }
+  | { type: "mixed"; range: ScoreRange; items: string; always?: string };
+
+export interface ChestOwnerConfig {
+  单位类型: string;
+  准备开启搜索半径: number;
+  开启完成搜索半径: number;
+}
+
+export interface 宝箱高级掉落等级池候选 {
+  池名: string;
+  权重: number;
+  广播等级文本: string;
+}
+
+export type 宝箱高级掉落动作 =
+  | { type: "创建物品"; 物品: string }
+  | { type: "创建物品二选一"; 物品1: string; 物品2: string }
+  | { type: "按装备等级随机创建"; 候选等级池: 宝箱高级掉落等级池候选[] }
+  | { type: "对开启者施加效果"; 保留当前生命比例?: number; BuffID?: number; Buff持续时间?: number }
+  | { type: "发送广播提示"; 文本前缀: string };
+
+export interface 宝箱高级掉落段 {
+  最小值: number;
+  最大值: number;
+  动作: 宝箱高级掉落动作[];
+}
+
+export interface 宝箱高级掉落配置 {
+  随机段: 宝箱高级掉落段[];
+}
+
+export interface ChestTypeConfig {
+  destructableType: string;
+  openTime: number;
+  name: string;
+  picks: number;
+  dropMode: DropMode;
+  主人配置?: ChestOwnerConfig;
+  高级掉落?: 宝箱高级掉落配置;
+}
+
+export const 宝箱系统开关 = true;
+
 export const CHEST_TYPES: ChestTypeConfig[] = [
-  // 普通宝箱 - 低分掉落
-  { destructableType: "B00Z", openTime: 3.0, name: "普通宝箱", picks: 1, dropMode: { type: "score", range: { min: 100, max: 500 } } },
-
-  // 另一个普通宝箱 - 同样配置
+  {
+    destructableType: "LTbs",
+    openTime: 3.0,
+    name: "盗贼宝箱",
+    picks: 1,
+    dropMode: { type: "score", range: { min: 100, max: 500 } },
+    主人配置: { 单位类型: "hfoo", 准备开启搜索半径: 3000, 开启完成搜索半径: 2500 },
+    高级掉落: { 随机段: [
+      { 最小值: 1, 最大值: 30, 动作: [{ type: "创建物品", 物品: "火把" }, { type: "创建物品二选一", 物品1: "盗贼神符（护甲）", 物品2: "盗贼神符（魔抗）" }] },
+      { 最小值: 31, 最大值: 55, 动作: [{ type: "创建物品", 物品: "金币" }] },
+      { 最小值: 56, 最大值: 80, 动作: [{ type: "按装备等级随机创建", 候选等级池: [{ 池名: "D+级物品池", 权重: 330, 广播等级文本: "D+级" }, { 池名: "D++级物品池", 权重: 220, 广播等级文本: "D++级" }, { 池名: "C-级物品池", 权重: 105, 广播等级文本: "C-级" }, { 池名: "C级物品池", 权重: 88, 广播等级文本: "C级" }, { 池名: "C+级物品池", 权重: 87, 广播等级文本: "C+级" }, { 池名: "C++级物品池", 权重: 70, 广播等级文本: "C++级" }, { 池名: "B-级物品", 权重: 100, 广播等级文本: "B-级" }] }, { type: "发送广播提示", 文本前缀: "通过盗贼宝箱开到了" }] },
+      { 最小值: 81, 最大值: 90, 动作: [{ type: "创建物品", 物品: "帝国货币" }] },
+      { 最小值: 91, 最大值: 100, 动作: [{ type: "对开启者施加效果", 保留当前生命比例: 0.3, BuffID: 0, Buff持续时间: 1.5 }] },
+    ] },
+  },
   { destructableType: "B003", openTime: 3.0, name: "普通宝箱", picks: 1, dropMode: { type: "score", range: { min: 100, max: 500 } } },
-
-  // 中级宝箱 - 中分掉落
-  // { destructableType: "B010", openTime: 5.0, name: "中级宝箱", picks: 2, dropMode: { type: "score", range: { min: 500, max: 1000 } } },
-
-  // 高级宝箱 - 高分掉落
-  // { destructableType: "B011", openTime: 5.0, name: "高级宝箱", picks: 2, dropMode: { type: "score", range: { min: 1000, max: 2000 } } },
-
-  // 特殊宝箱 - 指定物品池（带权重）+ 必掉物品
-  // { destructableType: "B012", openTime: 4.0, name: "特殊宝箱", picks: 2, dropMode: { type: "pool", items: "I01K:1.5;I06X:1;I06Y:2", always: "I00V" } },
-
-  // 混合宝箱 - 分数筛选+物品池 + 必掉物品
-  // { destructableType: "B013", openTime: 4.0, name: "混合宝箱", picks: 2, dropMode: { type: "mixed", range: { min: 500, max: 1500 }, items: "I01K:2;I06X:1", always: "I00V;I00W" } },
+  { destructableType: "LTbx", openTime: 3.0, name: "木桶", picks: 1, dropMode: { type: "pool", items: "初心戒指:1.5;初始生命药水:1;初始魔法药水:2", always: "精灵铁剑" } },
 ];
 
-// ==========================================================================================
-// 运行时生成的快速查找映射
-// ==========================================================================================
-
-/** 可破坏物类型ID集合（用于快速判断） */
 const _chestTypeIds = new Set<number>();
 for (const config of CHEST_TYPES) {
   _chestTypeIds.add(stringToFourCC(config.destructableType));
 }
 
-/** 可破坏物类型ID到配置的映射 */
 const _chestConfigMap = new Map<number, ChestTypeConfig>();
 for (const config of CHEST_TYPES) {
   _chestConfigMap.set(stringToFourCC(config.destructableType), config);
 }
 
-/**
- * 检查可破坏物类型ID是否为宝箱
- */
-export function isChestType(destructableTypeId: number): boolean {
+export function isChestType(this: void, destructableTypeId: number): boolean {
   return _chestTypeIds.has(destructableTypeId);
 }
 
-/**
- * 通过可破坏物类型ID获取宝箱配置
- */
-export function getChestConfig(destructableTypeId: number): ChestTypeConfig | undefined {
+export function getChestConfig(this: void, destructableTypeId: number): ChestTypeConfig | undefined {
   return _chestConfigMap.get(destructableTypeId);
 }
 
-/**
- * 通过可破坏物类型字符串获取宝箱配置
- */
-export function getChestConfigByString(destructableType: string): ChestTypeConfig | undefined {
+export function getChestConfigByString(this: void, destructableType: string): ChestTypeConfig | undefined {
   return _chestConfigMap.get(stringToFourCC(destructableType));
 }
 
-// ==========================================================================================
-// 基础配置
-// ==========================================================================================
-
-/** 默认开启时间（秒） */
 export const DEFAULT_OPEN_TIME = 3.0;
-
-/** 检测范围（单位与目标的距离） */
 export const INTERACT_RANGE = 150.0;
-
-/** 计时器检测间隔（秒） */
 export const UPDATE_INTERVAL = 0.05;
-
-/** 进度条单位缩放 */
 export const PROGRESS_BAR_SCALE = 3.0;
-
-/** 进度条飞行高度偏移 */
 export const PROGRESS_BAR_HEIGHT_OFFSET = 233.0;
 
-// ==========================================================================================
-// STES事件名
-// ==========================================================================================
-
-/** STES事件名：玩家准备开启宝箱 */
-export const EVENT_PLAYER_PREPARE_OPEN_CHEST = "玩家准备开启宝箱";
-
-/** STES事件名：宝箱被开启 */
-export const EVENT_CHEST_OPENED = "宝箱被开启";
-
-// ==========================================================================================
-// YDLocal变量名（用于STES事件传参）
-// ==========================================================================================
-
-/** YDLocal变量名：开启者 */
 export const YDLOCAL_VAR_OPENER = "开启者";
-
-/** YDLocal变量名：被开启的宝箱 */
 export const YDLOCAL_VAR_CHEST = "被开启的宝箱";
-
-/** YDLocal变量名：预开启者 */
 export const YDLOCAL_VAR_PRE_OPENER = "预开启者";
-
-/** YDLocal变量名：被预开启的宝箱 */
 export const YDLOCAL_VAR_PRE_CHEST = "被预开启的宝箱";
 
-// ==========================================================================================
-// 提示文字
-// ==========================================================================================
-
-/** 提示文字：正在开启 */
 export const TEXT_OPENING = (name: string) => `正在开启${name}...`;
-
-/** 提示文字：开启成功 */
 export const TEXT_SUCCESS = (name: string) => `${name}已开启！`;
-
-/** 提示文字：开启中断 */
 export const TEXT_INTERRUPTED = (name: string) => `${name}开启中断`;

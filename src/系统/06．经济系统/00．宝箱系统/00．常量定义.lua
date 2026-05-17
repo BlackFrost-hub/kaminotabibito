@@ -3,75 +3,80 @@ local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local Map = ____lualib.Map
 local ____exports = {}
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local stringToFourCC = ____require_result_0.stringToFourCC
---- 宝箱系统开关（设为 false 可关闭整个宝箱系统）
-____exports["宝箱系统开关"] = false
---- 宝箱类型配置表（在此添加所有宝箱类型）
+--- 宝箱系统 - 常量定义
+local function stringToFourCC(s)
+    local a = #s > 0 and (string.byte(s, 1) or 0 / 0) or 0
+    local b = #s > 1 and (string.byte(s, 2) or 0 / 0) or 0
+    local c = #s > 2 and (string.byte(s, 3) or 0 / 0) or 0
+    local d = #s > 3 and (string.byte(s, 4) or 0 / 0) or 0
+    return a * 16777216 + b * 65536 + c * 256 + d
+end
+____exports["宝箱系统开关"] = true
 ____exports.CHEST_TYPES = {{
-    destructableType = "B00Z",
+    destructableType = "LTbs",
     openTime = 3,
-    name = "普通宝箱",
+    name = "盗贼宝箱",
     picks = 1,
-    dropMode = {type = "score", range = {min = 100, max = 500}}
+    dropMode = {type = "score", range = {min = 100, max = 500}},
+    ["主人配置"] = {["单位类型"] = "hfoo", ["准备开启搜索半径"] = 3000, ["开启完成搜索半径"] = 2500},
+    ["高级掉落"] = {["随机段"] = {
+        {["最小值"] = 1, ["最大值"] = 30, ["动作"] = {{type = "创建物品", ["物品"] = "火把"}, {type = "创建物品二选一", ["物品1"] = "盗贼神符（护甲）", ["物品2"] = "盗贼神符（魔抗）"}}},
+        {["最小值"] = 31, ["最大值"] = 55, ["动作"] = {{type = "创建物品", ["物品"] = "金币"}}},
+        {["最小值"] = 56, ["最大值"] = 80, ["动作"] = {{type = "按装备等级随机创建", ["候选等级池"] = {
+            {["池名"] = "D+级物品池", ["权重"] = 330, ["广播等级文本"] = "D+级"},
+            {["池名"] = "D++级物品池", ["权重"] = 220, ["广播等级文本"] = "D++级"},
+            {["池名"] = "C-级物品池", ["权重"] = 105, ["广播等级文本"] = "C-级"},
+            {["池名"] = "C级物品池", ["权重"] = 88, ["广播等级文本"] = "C级"},
+            {["池名"] = "C+级物品池", ["权重"] = 87, ["广播等级文本"] = "C+级"},
+            {["池名"] = "C++级物品池", ["权重"] = 70, ["广播等级文本"] = "C++级"},
+            {["池名"] = "B-级物品", ["权重"] = 100, ["广播等级文本"] = "B-级"}
+        }}, {type = "发送广播提示", ["文本前缀"] = "通过盗贼宝箱开到了"}}},
+        {["最小值"] = 81, ["最大值"] = 90, ["动作"] = {{type = "创建物品", ["物品"] = "帝国货币"}}},
+        {["最小值"] = 91, ["最大值"] = 100, ["动作"] = {{type = "对开启者施加效果", ["保留当前生命比例"] = 0.3, BuffID = 0, ["Buff持续时间"] = 1.5}}}
+    }}
 }, {
     destructableType = "B003",
     openTime = 3,
     name = "普通宝箱",
     picks = 1,
     dropMode = {type = "score", range = {min = 100, max = 500}}
+}, {
+    destructableType = "LTbx",
+    openTime = 3,
+    name = "木桶",
+    picks = 1,
+    dropMode = {type = "pool", items = "初心戒指:1.5;初始生命药水:1;初始魔法药水:2", always = "精灵铁剑"}
 }}
---- 可破坏物类型ID集合（用于快速判断）
 local _chestTypeIds = __TS__New(Set)
 for ____, config in ipairs(____exports.CHEST_TYPES) do
-    _chestTypeIds:add(stringToFourCC(nil, config.destructableType))
+    _chestTypeIds:add(stringToFourCC(config.destructableType))
 end
---- 可破坏物类型ID到配置的映射
 local _chestConfigMap = __TS__New(Map)
 for ____, config in ipairs(____exports.CHEST_TYPES) do
     _chestConfigMap:set(
-        stringToFourCC(nil, config.destructableType),
+        stringToFourCC(config.destructableType),
         config
     )
 end
---- 检查可破坏物类型ID是否为宝箱
 function ____exports.isChestType(destructableTypeId)
     return _chestTypeIds:has(destructableTypeId)
 end
---- 通过可破坏物类型ID获取宝箱配置
 function ____exports.getChestConfig(destructableTypeId)
     return _chestConfigMap:get(destructableTypeId)
 end
---- 通过可破坏物类型字符串获取宝箱配置
 function ____exports.getChestConfigByString(destructableType)
-    return _chestConfigMap:get(stringToFourCC(nil, destructableType))
+    return _chestConfigMap:get(stringToFourCC(destructableType))
 end
---- 默认开启时间（秒）
 ____exports.DEFAULT_OPEN_TIME = 3
---- 检测范围（单位与目标的距离）
 ____exports.INTERACT_RANGE = 150
---- 计时器检测间隔（秒）
 ____exports.UPDATE_INTERVAL = 0.05
---- 进度条单位缩放
 ____exports.PROGRESS_BAR_SCALE = 3
---- 进度条飞行高度偏移
 ____exports.PROGRESS_BAR_HEIGHT_OFFSET = 233
---- STES事件名：玩家准备开启宝箱
-____exports.EVENT_PLAYER_PREPARE_OPEN_CHEST = "玩家准备开启宝箱"
---- STES事件名：宝箱被开启
-____exports.EVENT_CHEST_OPENED = "宝箱被开启"
---- YDLocal变量名：开启者
 ____exports.YDLOCAL_VAR_OPENER = "开启者"
---- YDLocal变量名：被开启的宝箱
 ____exports.YDLOCAL_VAR_CHEST = "被开启的宝箱"
---- YDLocal变量名：预开启者
 ____exports.YDLOCAL_VAR_PRE_OPENER = "预开启者"
---- YDLocal变量名：被预开启的宝箱
 ____exports.YDLOCAL_VAR_PRE_CHEST = "被预开启的宝箱"
---- 提示文字：正在开启
 ____exports.TEXT_OPENING = function(name) return ("正在开启" .. name) .. "..." end
---- 提示文字：开启成功
 ____exports.TEXT_SUCCESS = function(name) return name .. "已开启！" end
---- 提示文字：开启中断
 ____exports.TEXT_INTERRUPTED = function(name) return name .. "开启中断" end
 return ____exports

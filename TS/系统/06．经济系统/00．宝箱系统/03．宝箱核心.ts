@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 宝箱系统 - 核心功能
  *
@@ -15,60 +15,59 @@ const japi = require("jass.japi") as any;
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const DzUnitDisableAttack = japi.DzUnitDisableAttack as (this: void, unit: any, disabled: boolean) => void;
+const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBound: number) => number;
 const { ceil, forEachSorted } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   ceil: (this: void, value: number) => number;
   forEachSorted: <K extends number | string, V>(this: void, map: Map<K, V>, callback: (key: K, value: V) => void) => void;
 };
-const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
-
-const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  String2OrderIdBJ: (orderIdString: string) => number;
+const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  stringToFourCC: (this: void, s: string) => number;
 };
+const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
 
 const {
   CHEST_TYPES,
   DEFAULT_OPEN_TIME,
   INTERACT_RANGE,
   UPDATE_INTERVAL,
-  PROGRESS_BAR_SCALE,
   PROGRESS_BAR_HEIGHT_OFFSET,
-  EVENT_PLAYER_PREPARE_OPEN_CHEST,
-  EVENT_CHEST_OPENED,
   YDLOCAL_VAR_OPENER,
   YDLOCAL_VAR_CHEST,
   YDLOCAL_VAR_PRE_OPENER,
   YDLOCAL_VAR_PRE_CHEST,
-  TEXT_OPENING,
-  TEXT_SUCCESS,
-  TEXT_INTERRUPTED,
   isChestType,
   getChestConfig,
 } = require("系统.06．经济系统.00．宝箱系统.00．常量定义") as typeof import("./00．常量定义");
+const { 触发宝箱准备开启回调 } = require("系统.06．经济系统.00．宝箱系统.04．准备开启回调") as {
+  触发宝箱准备开启回调: (this: void, unit: any, target: any, progressBar: any, openTime: number, chestConfig: any, ownerUnit?: any) => void;
+};
+const { 触发宝箱开启中回调 } = require("系统.06．经济系统.00．宝箱系统.05．开启中回调") as {
+  触发宝箱开启中回调: (this: void, unit: any, target: any, progressBar: any, openTime: number, elapsed: number, chestConfig: any, ownerUnit?: any) => void;
+};
+const { 触发宝箱开启完成回调 } = require("系统.06．经济系统.00．宝箱系统.06．开启完成回调") as {
+  触发宝箱开启完成回调: (this: void, unit: any, target: any, progressBar: any, openTime: number, chestConfig: any, ownerUnit?: any) => void;
+};
+const { 创建进度条特效, 销毁进度条特效 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效") as {
+  创建进度条特效: (this: void, 单位: any, 选项?: { 高度偏移?: number; 缩放?: number; 动画序号?: number; 动画速度?: number }) => any;
+  销毁进度条特效: (this: void, 进度条单位: any) => void;
+};
+const { 广播单位类型提示 } = require("系统.06．经济系统.00．宝箱系统.07．主人广播") as {
+  广播单位类型提示: (this: void, 单位类型ID: number, 文本: string, 持续时间?: number) => void;
+};
 
 const { dropItemsFromChest } = require("系统.06．经济系统.00．宝箱系统.01．宝箱掉落配置") as {
-  dropItemsFromChest: (destructableType: string, x: number, y: number) => any[];
+  dropItemsFromChest: (this: void, destructableType: string, x: number, y: number) => any[];
+};
+const { dropItemsFromChestConfig } = require("系统.06．经济系统.00．宝箱系统.01．宝箱掉落配置") as {
+  dropItemsFromChestConfig: (this: void, config: any, x: number, y: number, opener?: any, ownerUnit?: any, highRoll?: number) => any[];
+};
+const { 查找宝箱主人 } = require("系统.06．经济系统.00．宝箱系统.08．宝箱主人") as {
+  查找宝箱主人: (this: void, 配置: any, 参考单位: any, 阶段: "准备开启" | "开启完成") => any | undefined;
 };
 
-const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
-  STES_GetTable: (self: any) => any;
-};
-
-const {
-  YDLocalExecuteTrigger,
-  saveParentIndex,
-  YDTriggerExecuteTrigger,
-} = require("lib.扩展函数.YDWE函数.04．YDWE_trigger") as {
-  YDLocalExecuteTrigger: (trg: any) => void;
-  saveParentIndex: (trg: any) => void;
-  YDTriggerExecuteTrigger: (trg: any, flag: boolean) => void;
-};
-
-const { YDLocal5Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Set: (type: string, name: string, value: any) => void;
-};
-
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
@@ -77,6 +76,12 @@ const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文
 const CreateFloatTextOnUnit = 漂浮文字模块.CreateFloatTextOnUnit as
   | ((this: void, unit: any, text: string, options?: any) => any)
   | undefined;
+const 调试模块 = "宝箱系统-核心";
+const ORDER_MOVE = 851971;
+const ORDER_SMART = 851986;
+const ORDER_ATTACK = 851983;
+const ORDER_STOP = 851972;
+const ORDER_HOLD_POSITION = 851993;
 
 // ==========================================================================================
 // 类型定义
@@ -89,6 +94,9 @@ interface OpenData {
   progressBar: any;
   openTime: number;
   elapsed: number;
+  chestConfig?: any;
+  ownerUnit?: any;
+  highRoll?: number;
 }
 
 /** 移动数据 */
@@ -112,18 +120,6 @@ const movingMap = new Map<number, MoveData>();
 // ==========================================================================================
 // 工具函数
 // ==========================================================================================
-
-/** 进度条单位类型缓存 */
-let _progressBarUnitType: number = 0;
-
-function getProgressBarUnitType(this: void): number {
-  if (_progressBarUnitType !== 0) return _progressBarUnitType;
-  const code = YDUserDataGet("string", "施法进度条", "单位类型", "unitcode");
-  if (typeof code === "number" && code !== 0) {
-    _progressBarUnitType = code;
-  }
-  return _progressBarUnitType;
-}
 
 /** 计算两点角度 */
 function angleBetweenPoints(this: void, x1: number, y1: number, x2: number, y2: number): number {
@@ -166,51 +162,77 @@ function getOpenTime(this: void, destructableType: number): number {
   return config?.openTime ?? DEFAULT_OPEN_TIME;
 }
 
+function isSamePoint(this: void, ax: number, ay: number, bx: number, by: number): boolean {
+  return ax <= bx + 1 && ax >= bx - 1 && ay <= by + 1 && ay >= by - 1;
+}
+
+export function onUnitTargetChestPointOrder(this: void, unit: any, x: number, y: number): void {
+  if (!unit) return;
+
+  const unitId = getUnitId(unit);
+  if (unitId === 0) return;
+
+  const movingData = movingMap.get(unitId);
+  if (movingData != null) {
+    if (isSamePoint(x, y, movingData.targetX, movingData.targetY)) {
+      return;
+    }
+    debugLogForce(调试模块, "外部点地改写移动", "unit=", unitId, "target=", jass.GetHandleId(movingData.target), "pointX=", x, "pointY=", y, "moveX=", movingData.targetX, "moveY=", movingData.targetY);
+    movingMap.delete(unitId);
+    return;
+  }
+
+  const openingData = openingMap.get(unitId);
+  if (openingData != null) {
+    debugLogForce(调试模块, "外部点地打断开启", "unit=", unitId, "target=", jass.GetHandleId(openingData.target), "pointX=", x, "pointY=", y);
+    interruptOpening(unit);
+  }
+}
+
+export function onUnitTargetChestImmediateOrder(this: void, unit: any, orderId: number): void {
+  if (!unit) return;
+
+  if (orderId !== ORDER_STOP && orderId !== ORDER_HOLD_POSITION) {
+    return;
+  }
+
+  const unitId = getUnitId(unit);
+  if (unitId === 0) return;
+
+  const movingData = movingMap.get(unitId);
+  if (movingData != null) {
+    debugLogForce(调试模块, "外部即时命令打断移动", "unit=", unitId, "target=", jass.GetHandleId(movingData.target), "orderId=", orderId);
+    movingMap.delete(unitId);
+  }
+
+  const openingData = openingMap.get(unitId);
+  if (openingData != null) {
+    debugLogForce(调试模块, "外部即时命令打断开启", "unit=", unitId, "target=", jass.GetHandleId(openingData.target), "orderId=", orderId);
+    interruptOpening(unit);
+  }
+}
+
 // ==========================================================================================
 // STES事件触发
 // ==========================================================================================
 
-function fireStesEvent(this: void, eventName: string, opener: any, target: any): void {
-    const ht = STES_GetTable(undefined);
-    if (!ht) return;
-
-    const hash = jass.StringHash(eventName);
-    const skeyIndex = jass.StringHash("index");
-    const count = jass.LoadInteger(ht, hash, skeyIndex);
-
-    for (let i = 0; i < count; i++) {
-        const trg = jass.LoadTriggerHandle(ht, hash, i);
-        if (trg) {
-            YDLocalExecuteTrigger(trg);
-            saveParentIndex(trg);
-
-            if (eventName === EVENT_CHEST_OPENED) {
-                YDLocal5Set("unit", YDLOCAL_VAR_OPENER, opener);
-                YDLocal5Set("destructable", YDLOCAL_VAR_CHEST, target);
-            } else if (eventName === EVENT_PLAYER_PREPARE_OPEN_CHEST) {
-                YDLocal5Set("unit", YDLOCAL_VAR_PRE_OPENER, opener);
-                YDLocal5Set("destructable", YDLOCAL_VAR_PRE_CHEST, target);
-            }
-
-            YDTriggerExecuteTrigger(trg, false);
-        }
-    }
-}
+function fireStesEvent(this: void, _eventName: string, _opener: any, _target: any): void {}
 
 // ==========================================================================================
 // 开启核心逻辑
 // ==========================================================================================
 
 function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void {
-  japi.DzUnitDisableAttack(data.unit, false);
+  debugLogForce(调试模块, "结束开启", "unit=", getUnitId(data.unit), "target=", jass.GetHandleId(data.target), "interrupted=", interrupted, "elapsed=", data.elapsed, "openTime=", data.openTime);
+  DzUnitDisableAttack(data.unit, false);
 
   if (data.progressBar) {
-    jass.RemoveUnit(data.progressBar);
+    销毁进度条特效(data.progressBar);
   }
 
   if (interrupted) {
     const cfg = getChestConfig(jass.GetDestructableTypeId(data.target));
-    showTextTag(data.unit, TEXT_INTERRUPTED(cfg?.name ?? "宝箱"), 85, 10, 10);
+    showTextTag(data.unit, "宝箱打开失败...", 85, 10, 10);
   }
 
   const unitId = getUnitId(data.unit);
@@ -220,6 +242,7 @@ function cleanupOpening(this: void, data: OpenData, interrupted: boolean): void 
 }
 
 function startOpening(this: void, unit: any, target: any, openTime: number): void {
+  debugLogForce(调试模块, "开始开启", "unit=", getUnitId(unit), "target=", jass.GetHandleId(target), "type=", jass.GetDestructableTypeId(target), "openTime=", openTime);
   jass.IssueImmediateOrder(unit, "stop");
 
   if (openTime <= 0) openTime = 1.0;
@@ -227,28 +250,37 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
 
   const unitX = jass.GetUnitX(unit);
   const unitY = jass.GetUnitY(unit);
-  const progressType = getProgressBarUnitType();
-  const progressBar = jass.CreateUnit(jass.Player(4), progressType, unitX, unitY, 0);
+  const progressBar = 创建进度条特效(unit, {
+    高度偏移: PROGRESS_BAR_HEIGHT_OFFSET,
+    动画序号: 0,
+    动画速度: speed,
+  });
+  debugLogForce(调试模块, "进度条创建后", "unit=", getUnitId(unit), "progressBar=", jass.GetHandleId(progressBar));
 
-  if (progressBar) {
-    jass.SetUnitTimeScale(progressBar, speed);
-    jass.SetUnitScale(progressBar, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE, PROGRESS_BAR_SCALE);
-    const flyHeight = jass.GetUnitFlyHeight(unit) + PROGRESS_BAR_HEIGHT_OFFSET;
-    jass.SetUnitFlyHeight(progressBar, flyHeight, 0);
-  }
-
-  japi.DzUnitDisableAttack(unit, true);
+  DzUnitDisableAttack(unit, true);
+  debugLogForce(调试模块, "开启瞬间禁攻已恢复");
 
   const targetX = jass.GetDestructableX(target);
   const targetY = jass.GetDestructableY(target);
+  debugLogForce(调试模块, "读取目标坐标", "targetX=", targetX, "targetY=", targetY);
   const angle = angleBetweenPoints(unitX, unitY, targetX, targetY);
+  debugLogForce(调试模块, "准备设置朝向", "angle=", angle);
   jass.SetUnitFacing(unit, angle);
+  debugLogForce(调试模块, "设置朝向完成");
 
   const config = getChestConfig(jass.GetDestructableTypeId(target));
+  debugLogForce(调试模块, "读取配置完成", "hasConfig=", config != null);
+  const highRoll = config?.高级掉落 ? GetRandomInt(1, 100) : undefined;
+  if (config != null && highRoll != null) {
+    debugLogForce(调试模块, "预掷高级掉落", "type=", config.destructableType, "roll=", highRoll);
+  }
+  const ownerUnit = config ? 查找宝箱主人(config, target, "准备开启") : undefined;
+  debugLogForce(调试模块, "准备开启主人", "owner=", ownerUnit ? getUnitId(ownerUnit) : 0);
   const chestName = config?.name ?? "宝箱";
 
-  fireStesEvent(EVENT_PLAYER_PREPARE_OPEN_CHEST, unit, target);
-  showTextTag(unit, TEXT_OPENING(chestName), 100, 100, 0);
+  debugLogForce(调试模块, "准备漂浮文字", "chestName=", chestName);
+  showTextTag(unit, "开启宝箱中...", 100, 100, 0);
+  debugLogForce(调试模块, "漂浮文字完成");
 
   const data: OpenData = {
     unit,
@@ -256,12 +288,18 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
     progressBar,
     openTime,
     elapsed: 0,
+    chestConfig: config,
+    ownerUnit,
+    highRoll,
   };
 
   const unitId = getUnitId(unit);
   if (unitId !== 0) {
     openingMap.set(unitId, data);
+    debugLogForce(调试模块, "写入 openingMap", "unit=", unitId, "openingSize=", openingMap.size, "movingSize=", movingMap.size);
   }
+
+  触发宝箱准备开启回调(unit, target, progressBar, openTime, config, ownerUnit);
 
   ensureRegisteredToCenterTimer();
 }
@@ -277,64 +315,67 @@ const CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01);
 function updateAllOpening(this: void): void {
   forEachSorted(openingMap, (unitId, data) => {
     const currentOrder = jass.GetUnitCurrentOrder(data.unit);
-    const smartOrder = String2OrderIdBJ("smart");
-    const attackOrder = String2OrderIdBJ("attack");
-
     const completed = data.elapsed >= data.openTime;
-    const interrupted = currentOrder === smartOrder || currentOrder === attackOrder;
+    const interrupted = currentOrder === ORDER_SMART || currentOrder === ORDER_ATTACK || currentOrder === ORDER_STOP || currentOrder === ORDER_HOLD_POSITION;
+    if (!completed && !interrupted) {
+      触发宝箱开启中回调(data.unit, data.target, data.progressBar, data.openTime, data.elapsed, data.chestConfig, data.ownerUnit);
+    }
 
     if (completed || interrupted) {
     if (completed) {
-        const cfg = getChestConfig(jass.GetDestructableTypeId(data.target));
+        const cfg = data.chestConfig ?? getChestConfig(jass.GetDestructableTypeId(data.target));
+        const ownerUnit = cfg ? 查找宝箱主人(cfg, data.target, "开启完成") : undefined;
         const chestName = cfg?.name ?? "宝箱";
-        showTextTag(data.unit, TEXT_SUCCESS(chestName), 100, 100, 0);
+        showTextTag(data.unit, "宝箱被打开了...", 100, 100, 0);
+        debugLogForce(调试模块, "开启完成", "unit=", unitId, "target=", jass.GetHandleId(data.target), "destructableType=", cfg?.destructableType ?? "unknown");
+        debugLogForce(调试模块, "开启完成主人", "owner=", ownerUnit ? getUnitId(ownerUnit) : 0);
 
-        // TS端执行掉落
-        const targetTypeStr = cfg?.destructableType;
-        if (targetTypeStr) {
-            const x = jass.GetDestructableX(data.target);
-            const y = jass.GetDestructableY(data.target);
-            dropItemsFromChest(targetTypeStr, x, y);
+        cleanupOpening(data, false);
+
+        debugLogForce(调试模块, "完成回调前");
+        触发宝箱开启完成回调(data.unit, data.target, data.progressBar, data.openTime, cfg, ownerUnit);
+        debugLogForce(调试模块, "完成回调后");
+
+        if (cfg) {
+          const dropX = jass.GetDestructableX(data.target);
+          const dropY = jass.GetDestructableY(data.target);
+          debugLogForce(调试模块, "掉落前", "type=", cfg.destructableType, "x=", dropX, "y=", dropY, "preRoll=", data.highRoll ?? "nil");
+          dropItemsFromChestConfig(cfg, dropX, dropY, data.unit, ownerUnit, data.highRoll);
+          debugLogForce(调试模块, "掉落后");
         }
-
-        // 触发STES事件（JASS端可监听）
-        fireStesEvent(EVENT_CHEST_OPENED, data.unit, data.target);
 
         // 开启成功后处理宝箱（杀死可破坏物）
         if (data.target) {
+            debugLogForce(调试模块, "KillDestructable前");
             jass.KillDestructable(data.target);
+            debugLogForce(调试模块, "KillDestructable后");
         }
     }
-      cleanupOpening(data, !completed && interrupted);
+      if (!completed) {
+        cleanupOpening(data, true);
+      }
       return;
     }
 
     data.elapsed += UPDATE_INTERVAL;
-
-    if (data.progressBar) {
-      const unitX = jass.GetUnitX(data.unit);
-      const unitY = jass.GetUnitY(data.unit);
-      jass.SetUnitX(data.progressBar, unitX);
-      jass.SetUnitY(data.progressBar, unitY);
-    }
   });
 
   forEachSorted(movingMap, (unitId, data) => {
     const currentOrder = jass.GetUnitCurrentOrder(data.unit);
-    const moveOrder = String2OrderIdBJ("move");
-
     const inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE);
-    const orderChanged = currentOrder !== moveOrder;
-
-    if (inRange || orderChanged) {
-      if (inRange) {
-        const targetType = jass.GetDestructableTypeId(data.target);
-        if (targetType && isInteractable(targetType)) {
-          const openTime = getOpenTime(targetType);
-          startOpening(data.unit, data.target, openTime);
-        }
+    const orderChanged = currentOrder !== ORDER_MOVE && currentOrder !== ORDER_SMART;
+    if (inRange) {
+      const targetType = jass.GetDestructableTypeId(data.target);
+      if (targetType && isInteractable(targetType)) {
+        const openTime = getOpenTime(targetType);
+        debugLogForce(调试模块, "移动到范围内，转入开启", "unit=", unitId, "target=", jass.GetHandleId(data.target), "targetType=", targetType, "openTime=", openTime);
+        startOpening(data.unit, data.target, openTime);
       }
       movingMap.delete(unitId);
+      debugLogForce(调试模块, "移除 movingMap", "unit=", unitId, "openingSize=", openingMap.size, "movingSize=", movingMap.size);
+    } else if (orderChanged) {
+      movingMap.delete(unitId);
+      debugLogForce(调试模块, "移动状态结束但未进范围", "unit=", unitId, "target=", jass.GetHandleId(data.target), "currentOrder=", currentOrder, "moveOrder=", ORDER_MOVE, "smartOrder=", ORDER_SMART, "openingSize=", openingMap.size, "movingSize=", movingMap.size);
     }
   });
 }
@@ -370,10 +411,16 @@ const { onTick10ms } = globalThis as unknown as {
  * @param target 目标可破坏物
  */
 export function onUnitTargetInteractable(this: void, unit: any, target: any): void {
-  if (!unit || !target) return;
+  if (!unit || !target) {
+    debugLogForce(调试模块, "进入交互失败: unit 或 target 为空");
+    return;
+  }
 
   const targetType = jass.GetDestructableTypeId(target);
-  if (!isInteractable(targetType)) return;
+  if (!isInteractable(targetType)) {
+    debugLogForce(调试模块, "进入交互失败: 目标不是宝箱/木桶", "unit=", getUnitId(unit), "target=", jass.GetHandleId(target), "targetType=", targetType);
+    return;
+  }
 
   const openTime = getOpenTime(targetType);
 
@@ -381,6 +428,7 @@ export function onUnitTargetInteractable(this: void, unit: any, target: any): vo
   const targetY = jass.GetDestructableY(target);
 
   const inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE);
+  debugLogForce(调试模块, "进入交互", "unit=", getUnitId(unit), "target=", jass.GetHandleId(target), "targetType=", targetType, "inRange=", inRange, "openTime=", openTime, "targetX=", targetX, "targetY=", targetY, "currentOrder=", jass.GetUnitCurrentOrder(unit));
 
   if (!inRange) {
     jass.IssuePointOrder(unit, "move", targetX, targetY);
@@ -395,10 +443,12 @@ export function onUnitTargetInteractable(this: void, unit: any, target: any): vo
     const unitId = getUnitId(unit);
     if (unitId !== 0) {
       movingMap.set(unitId, data);
+      debugLogForce(调试模块, "写入 movingMap", "unit=", unitId, "target=", jass.GetHandleId(target), "openingSize=", openingMap.size, "movingSize=", movingMap.size);
     }
 
     ensureRegisteredToCenterTimer();
   } else {
+    debugLogForce(调试模块, "已在范围内，直接开启", "unit=", getUnitId(unit), "target=", jass.GetHandleId(target));
     startOpening(unit, target, openTime);
   }
 }
@@ -430,8 +480,6 @@ export const isUnitOpeningChest = isUnitOpening;
 export const interruptChestOpening = interruptOpening;
 
 export {
-  EVENT_PLAYER_PREPARE_OPEN_CHEST as STES_EVENT_PREPARE,
-  EVENT_CHEST_OPENED as STES_EVENT_OPENED,
   YDLOCAL_VAR_OPENER,
   YDLOCAL_VAR_CHEST,
   YDLOCAL_VAR_PRE_OPENER,
@@ -439,3 +487,4 @@ export {
   isInteractable,
   getOpenTime,
 };
+

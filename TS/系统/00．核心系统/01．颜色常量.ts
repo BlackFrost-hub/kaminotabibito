@@ -8,6 +8,32 @@ export const COLOR = {
   RESET: "|r",
 } as const;
 
+/** 装备等级颜色映射 */
+const 装备等级颜色映射: Record<string, string> = {
+  "E-": "|cffC0C0C0",
+  E: "|cffFFFFFF",
+  "D-": "|cff3399FF",
+  D: "|cff0070DD",
+  "D+": "|cff0070DD",
+  "D++": "|cff800080",
+  "C-": "|cffA335EE",
+  C: "|cffA335EE",
+  "C+": "|cffA335EE",
+  "C++": "|cffFF8000",
+  "B-": "|cffFF8000",
+  B: "|cffFF8000",
+  "B+": "|cffFFD700",
+  "B++": "|cffFF0000",
+  A: "|cffFF0000",
+  "A+": "|cffFF66CC",
+  "A++": "|cff66FFFF",
+  S: "|cff00FFFF",
+  SS: "|cff00FFCC",
+  SSS: "|cffFF66FF",
+};
+
+const 彩虹颜色序列 = ["|cffFF0000", "|cffFF8000", "|cffFFD700", "|cff00FF00", "|cff00FFFF", "|cff3399FF", "|cffCC66FF"] as const;
+
 /** 品质颜色映射 */
 const QUALITY_COLORS: Record<string, string> = {
   common: "|cffffffff",     // 普通 - 白色
@@ -30,6 +56,28 @@ const ELEMENT_COLORS: Record<string, string> = {
   wind: "|cff40e0d0",       // 风元素 - 青绿
 };
 
+export type 装备等级 =
+  | "E-"
+  | "E"
+  | "D-"
+  | "D"
+  | "D+"
+  | "D++"
+  | "C-"
+  | "C"
+  | "C+"
+  | "C++"
+  | "B-"
+  | "B"
+  | "B+"
+  | "B++"
+  | "A"
+  | "A+"
+  | "A++"
+  | "S"
+  | "SS"
+  | "SSS";
+
 /** 品质颜色快捷函数 */
 export function qualityColor(text: string, quality: "common" | "uncommon" | "rare" | "epic" | "legendary" | "mythic"): string {
   return QUALITY_COLORS[quality] + text + COLOR.RESET;
@@ -39,3 +87,72 @@ export function qualityColor(text: string, quality: "common" | "uncommon" | "rar
 export function elementColor(text: string, element: "fire" | "ice" | "lightning" | "poison" | "dark" | "light" | "earth" | "wind"): string {
   return ELEMENT_COLORS[element] + text + COLOR.RESET;
 }
+
+/** 装备等级取颜色代码 */
+export const 装备等级颜色代码 = (level: string): string => {
+  return 装备等级颜色映射[level] ?? "|cffFFFFFF";
+};
+
+/** 装备等级文本着色 */
+export const 装备等级颜色文本 = (text: string, level: string): string => {
+  return 装备等级颜色代码(level) + text + COLOR.RESET;
+};
+
+/** 去掉文本中的颜色代码，保留纯文字与换行控制 */
+export const 去除颜色代码 = (text: string): string => {
+  if (text == null || text === "") return "";
+  let result = "";
+  let i = 0;
+  while (i < text.length) {
+    if (text.substring(i, i + 2) === "|r") {
+      i = i + 2;
+      continue;
+    }
+    if (text.substring(i, i + 2) === "|c" && i + 10 <= text.length) {
+      i = i + 10;
+      continue;
+    }
+    result += text.substring(i, i + 1);
+    i++;
+  }
+  return result;
+};
+
+/** 是否为彩色显示的高阶等级 */
+export const 是否彩虹装备等级 = (level: string): boolean => {
+  return level === "S" || level === "SS" || level === "SSS";
+};
+
+/** 逐字彩色文本 */
+export const 彩虹颜色文本 = (text: string): string => {
+  const plainText = 去除颜色代码(text);
+  if (plainText === "") return "";
+
+  let result = "";
+  let colorIndex = 0;
+  let i = 0;
+  while (i < plainText.length) {
+    const char = plainText.substring(i, i + 1);
+    if (char !== " " && char !== "『" && char !== "』" && char !== "《" && char !== "》" && char !== "（" && char !== "）" && char !== "[" && char !== "]") {
+      result += 彩虹颜色序列[colorIndex % 彩虹颜色序列.length] + char + COLOR.RESET;
+      colorIndex++;
+    } else {
+      result += char;
+    }
+    i++;
+  }
+  return result;
+};
+
+/** 装备等级显示文本 */
+export const 装备等级显示文本 = (text: string, level: string): string => {
+  if (是否彩虹装备等级(level)) return 彩虹颜色文本(text);
+  return 装备等级颜色文本(text, level);
+};
+
+/** 按装备等级给物品名着色 */
+export const 装备名字颜色文本 = (text: string, level: string): string => {
+  const plainText = 去除颜色代码(text);
+  if (是否彩虹装备等级(level)) return 彩虹颜色文本(plainText);
+  return 装备等级颜色文本(plainText, level);
+};
