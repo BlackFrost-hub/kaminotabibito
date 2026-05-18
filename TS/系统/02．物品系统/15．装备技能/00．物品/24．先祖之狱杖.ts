@@ -5,6 +5,10 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
+
 const jass = require("jass.common") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -19,11 +23,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
-const CreateTimer = jass.CreateTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
@@ -33,43 +32,26 @@ import type { 物品技能事件上下文 } from "../03．主动技能/03．物�
 import { 先祖之狱杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 先祖之狱杖配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
 
-interface 先祖延迟伤害上下文 {
-  施法单位: any;
-  目标单位: any;
-}
-
-const 延迟伤害表: Record<number, 先祖延迟伤害上下文 | undefined> = {};
-
 function 是否为先祖之狱杖(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
   return GetItemTypeId(物品) === 先祖之狱杖物品ID;
 }
 
-function on先祖之狱杖延迟伤害(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 上下文 = 延迟伤害表[timerID];
-  delete 延迟伤害表[timerID];
-  if (上下文 != null && 上下文.目标单位 != null && 上下文.目标单位 !== 0) {
-    UnitDamageTarget(
-      上下文.施法单位,
-      上下文.目标单位,
-      GetUnitState(上下文.目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例,
-      false,
-      true,
-      ATTACK_TYPE_NORMAL,
-      DAMAGE_TYPE_SHADOW_STRIKE,
-      WEAPON_TYPE_WHOKNOWS,
-    );
-  }
-  DestroyTimer(timer);
-}
-
 function 启动先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  延迟伤害表[GetHandleId(timer)] = { 施法单位, 目标单位 };
-  TimerStart(timer, 先祖之狱杖配置.延迟伤害时间, false, on先祖之狱杖延迟伤害);
+  addDelayedCallback(先祖之狱杖配置.延迟伤害时间 * 1000, function (this: void): void {
+    if (目标单位 != null && 目标单位 !== 0) {
+      UnitDamageTarget(
+        施法单位,
+        目标单位,
+        GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例,
+        false,
+        true,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_SHADOW_STRIKE,
+        WEAPON_TYPE_WHOKNOWS,
+      );
+    }
+  });
 }
 
 export function 处理先祖之狱杖使用(this: void, 上下文: 物品技能事件上下文): void {

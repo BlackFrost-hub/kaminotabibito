@@ -12,6 +12,8 @@ export interface BuffData {
   buffName: string;
   icon: string;
   effect: string;
+  effectMode?: 'attach' | 'point';
+  effectAttachPoint?: string;
   type: string;
   interval: number;
   maxStack: number;
@@ -22,7 +24,7 @@ export interface BuffData {
   priority: number;
   canPurge: boolean;
   tooltip: string;
-  [key: string]: string | number | boolean;
+  [key: string]: string | number | boolean | undefined;
 }
 
 export const buffs: Record<string, BuffData> = {
@@ -446,6 +448,23 @@ export const buffs: Record<string, BuffData> = {
     priority: 7,
     canPurge: true,
     tooltip: "受到了『寄生』，虫群会在time秒内侵蚀目标。"
+  },
+  "C025": {
+    buffID: "C025",
+    buffName: "暗影突袭",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+    effect: "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl",
+    effectMode: 'attach',
+    effectAttachPoint: "overhead",
+    type: "Debuff:magic:dot",
+    interval: 1,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 8,
+    canPurge: true,
+    tooltip: "受到「暗影突袭」，在time秒内持续受到伤害并被减速。"
   },
 };
 

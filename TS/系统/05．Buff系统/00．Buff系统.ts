@@ -16,6 +16,16 @@ const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { 
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityId: number) => boolean;
+const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
+  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string }>;
+};
+const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+};
+const AddSpecialEffect = jass["AddSpecialEffect"] as (modelName: string, x: number, y: number) => any;
+const AddSpecialEffectTarget = jass["AddSpecialEffectTarget"] as (modelName: string, targetWidget: any, attachPointName: string) => any;
+const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
+const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
 
 /** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */
 export const BUFF_POOL_TICK = 0.1;
@@ -220,6 +230,23 @@ export interface RegisterManualBuffExtras {
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
 }
 
+function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, durationSec: number): void {
+  if (target == null || target === 0) return;
+  const meta = buffTableMod.buffs[buffID];
+  const modelPath = row.effectModelOverride && row.effectModelOverride !== "" ? row.effectModelOverride : (meta?.effect ?? "");
+  if (modelPath === "") return;
+
+  let effect: any = null;
+  if (meta?.effectMode === "point") {
+    effect = AddSpecialEffect(modelPath, GetUnitX(target), GetUnitY(target));
+  } else {
+    effect = AddSpecialEffectTarget(modelPath, target, meta?.effectAttachPoint ?? "overhead");
+  }
+  if (effect != null && effect !== 0) {
+    YDWETimerDestroyEffectSafe(durationSec, effect);
+  }
+}
+
 export function registerManualBuff(
   target: any,
   buffID: string,
@@ -242,6 +269,7 @@ export function registerManualBuff(
   }
   setBuffToFlat(hid, buffID, row);
   if (typeof target !== "number") unitRefByHid[hid] = target;
+  playManualBuffEffect(target, buffID, row, durationSec);
   ensureSyncTimer();
 }
 

@@ -5,6 +5,11 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -27,10 +32,6 @@ const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
-const CreateTimer = jass.CreateTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -47,26 +48,17 @@ interface 魔刃扫掠上下文 {
   角度: number;
   次数: number;
   已命中: Record<number, boolean | undefined>;
+  timerID: number;
 }
-
-const 扫掠表: Record<number, 魔刃扫掠上下文 | undefined> = {};
 
 function 是否为史诗远古魔刃(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
   return GetItemTypeId(物品) === 史诗远古魔刃物品ID;
 }
 
-function on史诗远古魔刃扫掠(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 上下文 = 扫掠表[timerID];
-  if (上下文 == null) {
-    DestroyTimer(timer);
-    return;
-  }
+function on史诗远古魔刃扫掠(this: void, 上下文: 魔刃扫掠上下文): void {
   if (上下文.次数 >= 史诗远古魔刃配置.最大次数) {
-    delete 扫掠表[timerID];
-    DestroyTimer(timer);
+    removePeriodicCallback(上下文.timerID);
     return;
   }
 
@@ -97,17 +89,16 @@ export function 处理史诗远古魔刃使用(this: void, 上下文: 物品技�
 
   const 起点X = GetUnitX(施法单位);
   const 起点Y = GetUnitY(施法单位);
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  扫掠表[GetHandleId(timer)] = {
+  const 扫掠上下文: 魔刃扫掠上下文 = {
     施法单位,
     x: 起点X,
     y: 起点Y,
     角度: Atan2(上下文.目标Y - 起点Y, 上下文.目标X - 起点X),
     次数: 0,
     已命中: {},
+    timerID: 0,
   };
-  TimerStart(timer, 史诗远古魔刃配置.周期, true, on史诗远古魔刃扫掠);
+  扫掠上下文.timerID = addPeriodicCallback(史诗远古魔刃配置.周期 * 1000, () => on史诗远古魔刃扫掠(扫掠上下文));
 }
 
 export {};

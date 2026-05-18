@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____7194_5CA9_6076_9B54_4E4B_7075_773C_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["熔岩恶魔之灵眼物品ID"]
@@ -7,30 +6,26 @@ local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02�
 local _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["熔岩恶魔之灵眼配置"]
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local jass = require("jass.common")
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
-local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_1["创建单位绑定闪电"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_2.createUnitEffect
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_3.YDUserDataGet
-local YDUserDataSet = ____require_result_3.YDUserDataSet
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
+local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_2["创建单位绑定闪电"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_3.createUnitEffect
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataGet = ____require_result_4.YDUserDataGet
+local YDUserDataSet = ____require_result_4.YDUserDataSet
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local UnitDamageTarget = jass.UnitDamageTarget
-local CreateTimer = jass.CreateTimer
-local TimerStart = jass.TimerStart
-local GetExpiredTimer = jass.GetExpiredTimer
-local GetHandleId = jass.GetHandleId
-local DestroyTimer = jass.DestroyTimer
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____547D_4E2D_7387_5B57_6BB5 = "命中率"
-local _____7075_773C_6062_590D_8868 = {}
 local function _____662F_5426_4E3A_7194_5CA9_6076_9B54_4E4B_7075_773C(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -51,23 +46,15 @@ local function _____8C03_6574_547D_4E2D_7387(_____5355_4F4D, _____53D8_5316_503C
         _____5F53_524D_503C + _____53D8_5316_503C
     )
 end
-local function ____on_7075_773C_547D_4E2D_7387_6062_590D()
-    local timer = GetExpiredTimer()
-    local timerID = GetHandleId(timer)
-    local _____76EE_6807_5355_4F4D = _____7075_773C_6062_590D_8868[timerID]
-    __TS__Delete(_____7075_773C_6062_590D_8868, timerID)
-    if _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 then
-        _____8C03_6574_547D_4E2D_7387(_____76EE_6807_5355_4F4D, _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["命中率削减"])
-    end
-    DestroyTimer(timer)
-end
 local function _____5EF6_8FDF_6062_590D_547D_4E2D_7387(_____76EE_6807_5355_4F4D)
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    _____7075_773C_6062_590D_8868[GetHandleId(timer)] = _____76EE_6807_5355_4F4D
-    TimerStart(timer, _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["命中率恢复延迟"], false, ____on_7075_773C_547D_4E2D_7387_6062_590D)
+    addDelayedCallback(
+        _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["命中率恢复延迟"] * 1000,
+        function()
+            if _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 then
+                _____8C03_6574_547D_4E2D_7387(_____76EE_6807_5355_4F4D, _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["命中率削减"])
+            end
+        end
+    )
 end
 ____exports["处理熔岩恶魔之灵眼使用"] = function(_____4E0A_4E0B_6587)
     debugLogForce("16．熔岩恶魔之灵眼", "进入", "处理熔岩恶魔之灵眼使用")

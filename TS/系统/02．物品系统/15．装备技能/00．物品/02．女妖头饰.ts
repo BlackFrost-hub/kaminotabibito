@@ -18,6 +18,9 @@ const { 单位物品累伤次数, 获取单位指定装备 } = require("lib.扩�
 const { 创建暗影突袭追踪 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.01．暗影突袭") as {
   创建暗影突袭追踪: (this: void, source: any, target: any, 参数?: any) => void;
 };
+const { 延后一帧执行伤害派生效果 } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  延后一帧执行伤害派生效果: (this: void, callback: () => void) => void;
+};
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   doHeal: (this: void, params: {
     HealSource: any;
@@ -86,8 +89,11 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
     if (到达阈值) {
       debugLogForce("女妖头饰", "达到累计阈值，开始对伤害来源发射暗影突袭", "累计值:", 女妖头饰累计配置.累计阈值, "阈值:", 女妖头饰累计配置.累计阈值);
       debugLogForce("女妖头饰", "对伤害来源发射暗影突袭追踪", "source:", target, "target:", attacker);
-      创建暗影突袭追踪(target, attacker, {
-        减益: { duration: 2.0, damagePerSecond: 500 },
+      延后一帧执行伤害派生效果(() => {
+        debugLogForce("女妖头饰", "延后一帧发射暗影突袭", "source:", target, "target:", attacker);
+        创建暗影突袭追踪(target, attacker, {
+          减益: { duration: 2.0, damagePerSecond: 500 },
+        });
       });
       if (有女妖头饰强化 && 女妖头饰强化物品 != null) {
         const 当前次数 = GetItemCharges(女妖头饰强化物品);

@@ -5,6 +5,10 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
+
 const jass = require("jass.common") as any;
 
 const { 创建单位绑定闪电 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电") as {
@@ -22,11 +26,6 @@ const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
-const CreateTimer = jass.CreateTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -38,7 +37,6 @@ import { 熔岩恶魔之灵眼物品ID } from "../03．主动技能/00．公共/
 import { 熔岩恶魔之灵眼配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
 
 const 命中率字段 = "命中率";
-const 灵眼恢复表: Record<number, any | undefined> = {};
 
 function 是否为熔岩恶魔之灵眼(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
@@ -52,22 +50,12 @@ function 调整命中率(this: void, 单位: any, 变化值: number): void {
   YDUserDataSet("unit", 单位, 命中率字段, "real", 当前值 + 变化值);
 }
 
-function on灵眼命中率恢复(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 目标单位 = 灵眼恢复表[timerID];
-  delete 灵眼恢复表[timerID];
-  if (目标单位 != null && 目标单位 !== 0) {
-    调整命中率(目标单位, 熔岩恶魔之灵眼配置.命中率削减);
-  }
-  DestroyTimer(timer);
-}
-
 function 延迟恢复命中率(this: void, 目标单位: any): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  灵眼恢复表[GetHandleId(timer)] = 目标单位;
-  TimerStart(timer, 熔岩恶魔之灵眼配置.命中率恢复延迟, false, on灵眼命中率恢复);
+  addDelayedCallback(熔岩恶魔之灵眼配置.命中率恢复延迟 * 1000, function (this: void): void {
+    if (目标单位 != null && 目标单位 !== 0) {
+      调整命中率(目标单位, 熔岩恶魔之灵眼配置.命中率削减);
+    }
+  });
 }
 
 export function 处理熔岩恶魔之灵眼使用(this: void, 上下文: 物品技能事件上下文): void {

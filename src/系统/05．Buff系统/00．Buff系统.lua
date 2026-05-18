@@ -146,10 +146,10 @@ function tickBuffPool()
     do
         local i = 0
         while i < #____pairs do
-            local ____pairs_index_1 = ____pairs[i + 1]
-            local hid = ____pairs_index_1.hid
-            local buffID = ____pairs_index_1.buffID
-            local row = ____pairs_index_1.row
+            local ____pairs_index_8 = ____pairs[i + 1]
+            local hid = ____pairs_index_8.hid
+            local buffID = ____pairs_index_8.buffID
+            local row = ____pairs_index_8.row
             if hid ~= currentHid then
                 if currentHid > 0 and #currentBuffs > 0 then
                     processBuffsForUnit(currentHid, currentBuffs)
@@ -179,9 +179,9 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #buffs do
-            local ____buffs_index_2 = buffs[i + 1]
-            local buffID = ____buffs_index_2.buffID
-            local row = ____buffs_index_2.row
+            local ____buffs_index_9 = buffs[i + 1]
+            local buffID = ____buffs_index_9.buffID
+            local row = ____buffs_index_9.row
             row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
             if row.remaining <= 0 then
                 expired[#expired + 1] = {buffID = buffID, row = row}
@@ -192,9 +192,9 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #expired do
-            local ____expired_index_3 = expired[i + 1]
-            local buffID = ____expired_index_3.buffID
-            local row = ____expired_index_3.row
+            local ____expired_index_10 = expired[i + 1]
+            local buffID = ____expired_index_10.buffID
+            local row = ____expired_index_10.row
             removeBuffRuntimeByKey(hid, buffID, row, unitRef)
             i = i + 1
         end
@@ -250,8 +250,8 @@ function ensureSyncTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_5 = _G
-    local onTick10ms = ____G_5.onTick10ms
+    local ____G_12 = _G
+    local onTick10ms = ____G_12.onTick10ms
     onTick10ms(onBuffPoolCenterTimerTick)
 end
 function maybeStopSyncTimer()
@@ -274,6 +274,13 @@ if ____leakCore_LeakWatcher_0 == nil then
 end
 local LeakWatcher = ____leakCore_LeakWatcher_0
 UnitRemoveAbility = jass.UnitRemoveAbility
+local buffTableMod = require("系统.05．Buff系统.01．Buff表")
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_1.YDWETimerDestroyEffectSafe
+local AddSpecialEffect = jass.AddSpecialEffect
+local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 --- Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s）
 ____exports.BUFF_POOL_TICK = 0.1
 --- dot伤害 里的 typeId → 01．Buff表 buffID
@@ -333,6 +340,29 @@ function ____exports.syncDotBuff(typeId, target, state)
     end
     ensureSyncTimer()
 end
+local function playManualBuffEffect(target, buffID, row, durationSec)
+    if target == nil or target == 0 then
+        return
+    end
+    local meta = buffTableMod.buffs[buffID]
+    local modelPath = row.effectModelOverride and row.effectModelOverride ~= "" and row.effectModelOverride or (meta and meta.effect or "")
+    if modelPath == "" then
+        return
+    end
+    local effect = nil
+    if (meta and meta.effectMode) == "point" then
+        effect = AddSpecialEffect(
+            modelPath,
+            GetUnitX(target),
+            GetUnitY(target)
+        )
+    else
+        effect = AddSpecialEffectTarget(modelPath, target, meta and meta.effectAttachPoint or "overhead")
+    end
+    if effect ~= nil and effect ~= 0 then
+        YDWETimerDestroyEffectSafe(durationSec, effect)
+    end
+end
 function ____exports.registerManualBuff(target, buffID, durationSec, effectValue, extras)
     if target == nil or target == 0 or not buffID or durationSec <= 0 then
         return
@@ -363,6 +393,7 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
     if type(target) ~= "number" then
         unitRefByHid[hid] = target
     end
+    playManualBuffEffect(target, buffID, row, durationSec)
     ensureSyncTimer()
 end
 function ____exports.isUnitInBuffPool(unit)
@@ -419,13 +450,13 @@ ____exports["移除单位指定Buff"] = function(unit, buffID)
     if row == nil then
         return false
     end
-    local ____temp_4
+    local ____temp_11
     if type(unit) ~= "number" then
-        ____temp_4 = unit
+        ____temp_11 = unit
     else
-        ____temp_4 = unitRefByHid[hid]
+        ____temp_11 = unitRefByHid[hid]
     end
-    local unitRef = ____temp_4
+    local unitRef = ____temp_11
     removeBuffRuntimeByKey(hid, buffID, row, unitRef)
     if not hasAnyBuffOnHid(hid) then
         __TS__Delete(unitRefByHid, hid)

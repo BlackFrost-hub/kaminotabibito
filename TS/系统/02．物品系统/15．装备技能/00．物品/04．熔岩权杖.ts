@@ -13,6 +13,9 @@ const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模�
 const { 施加扩展控制 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统") as {
   施加扩展控制: (this: void, 来源单位: any, 目标单位: any, 类型: string, 参数?: any) => number;
 };
+const { 延后一帧执行伤害派生效果 } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  延后一帧执行伤害派生效果: (this: void, callback: () => void) => void;
+};
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -68,7 +71,10 @@ export function 处理熔岩权杖使用(this: void, 上下文: 物品技能事�
   debugLogForce("04．熔岩权杖", "进入", "处理熔岩权杖使用");
 
   if (!是否为熔岩权杖(上下文.物品)) return;
-  发射熔岩弹幕(上下文.施法单位, 上下文.目标单位);
+  延后一帧执行伤害派生效果(() => {
+    debugLogForce("04．熔岩权杖", "延后一帧发射熔岩弹幕");
+    发射熔岩弹幕(上下文.施法单位, 上下文.目标单位);
+  });
 }
 
 export {};

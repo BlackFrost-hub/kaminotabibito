@@ -35,47 +35,15 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     ManaShowText?: boolean;
   }) => number;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
-const CreateTimer = jass.CreateTimer as () => any;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, target: any, point: string) => any;
 
 const 回沙CD表: Record<number, boolean | undefined> = {};
-const 回沙CD计时器表: Record<number, number | undefined> = {};
-const 回沙免疫开启计时器表: Record<number, number | undefined> = {};
 const 回沙之书ID = stringToFourCCSafe(resolveItemIdByName(回沙之书累计配置.物品名));
-
-function 回沙CD结束(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerId = GetHandleId(timer);
-  const hid = 回沙CD计时器表[timerId];
-  delete 回沙CD计时器表[timerId];
-  DestroyTimer(timer);
-  if (hid != null) {
-    delete 回沙CD表[hid];
-  }
-}
-
-function 回沙免疫开启(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerId = GetHandleId(timer);
-  const hid = 回沙免疫开启计时器表[timerId];
-  delete 回沙免疫开启计时器表[timerId];
-  DestroyTimer(timer);
-  if (hid == null) return;
-
-  const unit = hid as any;
-  // 旧免伤方案先停用，改为直接走无敌帧。
-  // YDUserDataSet("unit", unit, "免疫伤害", "boolean", true);
-  // const endTimer = CreateTimer();
-  // const endTimerId = GetHandleId(endTimer);
-  // 回沙免疫结束计时器表[endTimerId] = unit;
-  // TimerStart(endTimer, 1.25, false, 回沙免疫结束);
-  开始无敌帧(unit, 1.25);
-}
 
 export function 处理回沙之书累计(this: void, target: any, _attacker: any, applied: number): void {
   if (target == null || target === 0 || !(applied > 0)) {
@@ -113,18 +81,14 @@ export function 处理回沙之书累计(this: void, target: any, _attacker: any
     if (eff != null) {
       YDWETimerDestroyEffectSafe(回沙之书累计配置.特效持续时间, eff);
     }
-    if (!回沙CD表[hid]) {
-      回沙CD表[hid] = true;
-      const timer = CreateTimer();
-      const timerId = GetHandleId(timer);
-      回沙CD计时器表[timerId] = hid;
-      TimerStart(timer, 回沙之书累计配置.冷却时间, false, 回沙CD结束);
-    }
+    回沙CD表[hid] = true;
+    addDelayedCallback(回沙之书累计配置.冷却时间 * 1000, () => {
+      delete 回沙CD表[hid];
+    });
 
-    const immuneTimer = CreateTimer();
-    const immuneTimerId = GetHandleId(immuneTimer);
-    回沙免疫开启计时器表[immuneTimerId] = target;
-    TimerStart(immuneTimer, 0.50, false, 回沙免疫开启);
+    addDelayedCallback(500, () => {
+      开始无敌帧(target, 1.25);
+    });
   }
 }
 

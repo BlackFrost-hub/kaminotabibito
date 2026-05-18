@@ -11,6 +11,8 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_1["创建原生弹幕"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
 local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_2["施加扩展控制"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_3["延后一帧执行伤害派生效果"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetItemTypeId = jass.GetItemTypeId
@@ -65,6 +67,9 @@ ____exports["处理熔岩权杖使用"] = function(_____4E0A_4E0B_6587)
     if not _____662F_5426_4E3A_7194_5CA9_6743_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end
-    _____53D1_5C04_7194_5CA9_5F39_5E55(_____4E0A_4E0B_6587["施法单位"], _____4E0A_4E0B_6587["目标单位"])
+    _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C(function()
+        debugLogForce("04．熔岩权杖", "延后一帧发射熔岩弹幕")
+        _____53D1_5C04_7194_5CA9_5F39_5E55(_____4E0A_4E0B_6587["施法单位"], _____4E0A_4E0B_6587["目标单位"])
+    end)
 end
 return ____exports

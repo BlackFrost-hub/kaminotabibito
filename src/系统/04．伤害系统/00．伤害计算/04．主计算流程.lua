@@ -107,8 +107,13 @@ local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算
 local applyLifeAndManaSteal = ____require_result_2.applyLifeAndManaSteal
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local applyDamageModifiers = ____require_result_3.applyDamageModifiers
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
+local createDelayedCall = ____require_result_4.createDelayedCall
 _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local appliedFinalDamageListeners = {}
+____exports["延后一帧执行伤害派生效果"] = function(callback)
+    createDelayedCall(0, callback)
+end
 --- 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)`
 function ____exports.registerAppliedFinalDamageListener(cb)
     do
@@ -129,7 +134,7 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
             do
                 local cb = appliedFinalDamageListeners[i + 1]
                 if cb == nil then
-                    goto __continue8
+                    goto __continue9
                 end
                 do
                     pcall(function()
@@ -137,7 +142,7 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
                     end)
                 end
             end
-            ::__continue8::
+            ::__continue9::
             i = i + 1
         end
     end

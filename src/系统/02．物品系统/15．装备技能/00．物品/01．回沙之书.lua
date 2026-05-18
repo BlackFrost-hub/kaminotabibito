@@ -19,38 +19,12 @@ local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_6.doHeal
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_7.addDelayedCallback
 local GetHandleId = jass.GetHandleId
-local CreateTimer = jass.CreateTimer
-local GetExpiredTimer = jass.GetExpiredTimer
-local DestroyTimer = jass.DestroyTimer
-local TimerStart = jass.TimerStart
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local _____56DE_6C99CD_8868 = {}
-local _____56DE_6C99CD_8BA1_65F6_5668_8868 = {}
-local _____56DE_6C99_514D_75AB_5F00_542F_8BA1_65F6_5668_8868 = {}
 local _____56DE_6C99_4E4B_4E66ID = stringToFourCCSafe(resolveItemIdByName(_____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["物品名"]))
-local function _____56DE_6C99CD_7ED3_675F()
-    local timer = GetExpiredTimer()
-    local timerId = GetHandleId(timer)
-    local hid = _____56DE_6C99CD_8BA1_65F6_5668_8868[timerId]
-    __TS__Delete(_____56DE_6C99CD_8BA1_65F6_5668_8868, timerId)
-    DestroyTimer(timer)
-    if hid ~= nil then
-        __TS__Delete(_____56DE_6C99CD_8868, hid)
-    end
-end
-local function _____56DE_6C99_514D_75AB_5F00_542F()
-    local timer = GetExpiredTimer()
-    local timerId = GetHandleId(timer)
-    local hid = _____56DE_6C99_514D_75AB_5F00_542F_8BA1_65F6_5668_8868[timerId]
-    __TS__Delete(_____56DE_6C99_514D_75AB_5F00_542F_8BA1_65F6_5668_8868, timerId)
-    DestroyTimer(timer)
-    if hid == nil then
-        return
-    end
-    local unit = hid
-    _____5F00_59CB_65E0_654C_5E27(unit, 1.25)
-end
 ____exports["处理回沙之书累计"] = function(target, _attacker, applied)
     if target == nil or target == 0 or not (applied > 0) then
         return
@@ -92,17 +66,19 @@ ____exports["处理回沙之书累计"] = function(target, _attacker, applied)
         if eff ~= nil then
             YDWETimerDestroyEffectSafe(_____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["特效持续时间"], eff)
         end
-        if not _____56DE_6C99CD_8868[hid] then
-            _____56DE_6C99CD_8868[hid] = true
-            local timer = CreateTimer()
-            local timerId = GetHandleId(timer)
-            _____56DE_6C99CD_8BA1_65F6_5668_8868[timerId] = hid
-            TimerStart(timer, _____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["冷却时间"], false, _____56DE_6C99CD_7ED3_675F)
-        end
-        local immuneTimer = CreateTimer()
-        local immuneTimerId = GetHandleId(immuneTimer)
-        _____56DE_6C99_514D_75AB_5F00_542F_8BA1_65F6_5668_8868[immuneTimerId] = target
-        TimerStart(immuneTimer, 0.5, false, _____56DE_6C99_514D_75AB_5F00_542F)
+        _____56DE_6C99CD_8868[hid] = true
+        addDelayedCallback(
+            _____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["冷却时间"] * 1000,
+            function()
+                __TS__Delete(_____56DE_6C99CD_8868, hid)
+            end
+        )
+        addDelayedCallback(
+            500,
+            function()
+                _____5F00_59CB_65E0_654C_5E27(target, 1.25)
+            end
+        )
     end
 end
 return ____exports

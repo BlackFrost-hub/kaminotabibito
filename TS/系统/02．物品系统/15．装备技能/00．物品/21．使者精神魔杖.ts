@@ -5,6 +5,10 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
+
 const jass = require("jass.common") as any;
 
 const { YDUserDataGet, YDUserDataSet, YDUserDataHas, YDUserDataClear } = require("lib.扩展函数.YDWE函数.index") as {
@@ -28,18 +32,12 @@ const IsHeroUnitId = jass.IsHeroUnitId as (unitId: number) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
 const CreateUnit = jass.CreateUnit as (player: any, unitId: number, x: number, y: number, facing: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (unit: any, buffId: number, duration: number) => void;
-const CreateTimer = jass.CreateTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const RACE_DEMON = jass.RACE_DEMON as any;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 使者精神魔杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 使者精神魔杖配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
 
-const 清理表: Record<number, any | undefined> = {};
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 
 function 是否为使者精神魔杖(this: void, 物品: any): boolean {
@@ -53,22 +51,12 @@ function 目标可存储(this: void, 目标单位: any): boolean {
   return !IsHeroUnitId(GetUnitTypeId(目标单位));
 }
 
-function on使者精神魔杖存储过期(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 施法单位 = 清理表[timerID];
-  delete 清理表[timerID];
-  if (施法单位 != null && 施法单位 !== 0) {
-    YDUserDataClear("unit", 施法单位, 使者精神魔杖配置.存储字段, "unitcode");
-  }
-  DestroyTimer(timer);
-}
-
 function 启动存储过期计时(this: void, 施法单位: any): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  清理表[GetHandleId(timer)] = 施法单位;
-  TimerStart(timer, 使者精神魔杖配置.存储持续时间, false, on使者精神魔杖存储过期);
+  addDelayedCallback(使者精神魔杖配置.存储持续时间 * 1000, function (this: void): void {
+    if (施法单位 != null && 施法单位 !== 0) {
+      YDUserDataClear("unit", 施法单位, 使者精神魔杖配置.存储字段, "unitcode");
+    }
+  });
 }
 
 export function 处理使者精神魔杖使用(this: void, 上下文: 物品技能事件上下文): void {

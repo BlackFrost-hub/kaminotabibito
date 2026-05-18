@@ -5,6 +5,12 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { addPeriodicCallback, removePeriodicCallback, addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -22,11 +28,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, attachPoint: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
-const CreateTimer = jass.CreateTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
@@ -38,15 +39,13 @@ const 命中率字段 = "命中率";
 interface 使者魔炉特效上下文 {
   特效: any;
   次数: number;
+  timerID: number;
 }
 
 interface 使者魔炉恢复上下文 {
   特效: any;
   目标列表: any[];
 }
-
-const 特效放大表: Record<number, 使者魔炉特效上下文 | undefined> = {};
-const 命中恢复表: Record<number, 使者魔炉恢复上下文 | undefined> = {};
 
 function 是否为使者魔炉(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
@@ -60,51 +59,29 @@ function 调整命中率(this: void, 单位: any, 变化值: number): void {
   YDUserDataSet("unit", 单位, 命中率字段, "real", 当前值 + 变化值);
 }
 
-function on使者魔炉特效放大(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 上下文 = 特效放大表[timerID];
-  if (上下文 == null) {
-    DestroyTimer(timer);
-    return;
-  }
+function on使者魔炉特效放大(this: void, 上下文: 使者魔炉特效上下文): void {
   上下文.次数 += 1;
   if (上下文.次数 >= 使者魔炉配置.特效放大次数) {
-    delete 特效放大表[timerID];
-    DestroyTimer(timer);
+    removePeriodicCallback(上下文.timerID);
     return;
   }
   EXSetEffectSize(上下文.特效, 使者魔炉配置.特效放大基值 + 上下文.次数);
 }
 
-function on使者魔炉命中恢复(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerID = GetHandleId(timer);
-  const 上下文 = 命中恢复表[timerID];
-  delete 命中恢复表[timerID];
-  if (上下文 != null) {
-    for (let i = 0; i < 上下文.目标列表.length; i++) {
-      调整命中率(上下文.目标列表[i], 使者魔炉配置.命中率削减);
-    }
-    if (上下文.特效 != null && 上下文.特效 !== 0) {
-      DestroyEffect(上下文.特效);
-    }
-  }
-  DestroyTimer(timer);
-}
-
 function 启动特效放大(this: void, 特效: any): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  特效放大表[GetHandleId(timer)] = { 特效, 次数: 0 };
-  TimerStart(timer, 使者魔炉配置.特效放大周期, true, on使者魔炉特效放大);
+  const 上下文: 使者魔炉特效上下文 = { 特效, 次数: 0, timerID: 0 };
+  上下文.timerID = addPeriodicCallback(使者魔炉配置.特效放大周期 * 1000, () => on使者魔炉特效放大(上下文));
 }
 
 function 启动命中恢复(this: void, 特效: any, 目标列表: any[]): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  命中恢复表[GetHandleId(timer)] = { 特效, 目标列表 };
-  TimerStart(timer, 使者魔炉配置.恢复延迟, false, on使者魔炉命中恢复);
+  addDelayedCallback(使者魔炉配置.恢复延迟 * 1000, function (this: void): void {
+    for (let i = 0; i < 目标列表.length; i++) {
+      调整命中率(目标列表[i], 使者魔炉配置.命中率削减);
+    }
+    if (特效 != null && 特效 !== 0) {
+      DestroyEffect(特效);
+    }
+  });
 }
 
 export function 处理使者魔炉使用(this: void, 上下文: 物品技能事件上下文): void {

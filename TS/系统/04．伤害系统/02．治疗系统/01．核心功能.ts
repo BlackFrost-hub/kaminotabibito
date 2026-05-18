@@ -315,6 +315,8 @@ function addPlayerHealStats(target: any, source: any, amount: number): void {
 export function doHeal(params: HealParams): number {
   if (!HEAL_SYSTEM_ENABLED) return 0;
 
+  const manaEffectEnabled = params.ManaEffect ?? ((params.HealManaAmount ?? 0) > 0);
+
   const {
     HealSource,
     HealTarget,
@@ -323,7 +325,6 @@ export function doHeal(params: HealParams): number {
     ItemHeal,
     HealEffect,
     HealEffectPath,
-    ManaEffect = false,
     ManaEffectPath,
     ManaShowText = true,
   } = params;
@@ -369,7 +370,7 @@ export function doHeal(params: HealParams): number {
   }
 
   if (HealManaAmount > 0) {
-    restoreMana(HealTarget, HealManaAmount, ManaEffect, ManaEffectPath, ManaShowText);
+    restoreMana(HealTarget, HealManaAmount, manaEffectEnabled, ManaEffectPath, ManaShowText);
   }
 
   return actualHeal;

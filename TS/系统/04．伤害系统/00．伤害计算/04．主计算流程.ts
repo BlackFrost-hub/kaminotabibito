@@ -71,6 +71,9 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
     isSkillDamage: boolean;
   }) => number;
 };
+const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.02．计时器") as {
+  createDelayedCall: (this: void, delaySec: number, callback: () => void) => any;
+};
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   EXGetEventDamageData: (edd_type: number) => number;
   EVENT_DAMAGE_DATA_IS_PHYSICAL: number;
@@ -118,6 +121,10 @@ export interface DamageTypeSnapshot {
 export type AppliedFinalDamageListener = (target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot) => void;
 
 const appliedFinalDamageListeners: AppliedFinalDamageListener[] = [];
+
+export function 延后一帧执行伤害派生效果(this: void, callback: () => void): void {
+  createDelayedCall(0.0, callback);
+}
 
 /** 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)` */
 export function registerAppliedFinalDamageListener(cb: AppliedFinalDamageListener): void {

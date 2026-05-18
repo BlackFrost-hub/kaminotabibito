@@ -19,17 +19,25 @@ const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
 };
+const { 创建追踪插值轨迹 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index") as {
+  创建追踪插值轨迹: (this: void, 目标单位: any, 到达距离?: number) => any;
+};
+const { isSameUnit } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
+  isSameUnit: (this: void, unitA: any, unitB: any) => boolean;
+};
 
-const GetHandleId = (globalThis as any).GetHandleId as (h: any) => number;
-const GetUnitState = (globalThis as any).GetUnitState as (u: any, state: any) => number;
-const GetUnitX = (globalThis as any).GetUnitX as (u: any) => number;
-const GetUnitY = (globalThis as any).GetUnitY as (u: any) => number;
-const GetUnitName = (globalThis as any).GetUnitName as (u: any) => string;
-const UnitDamageTarget = (globalThis as any).UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
-const CreateTimer = (globalThis as any).CreateTimer as () => any;
-const DestroyTimer = (globalThis as any).DestroyTimer as (timer: any) => void;
-const GetExpiredTimer = (globalThis as any).GetExpiredTimer as () => any;
-const TimerStart = (globalThis as any).TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
+const GetHandleId = jass.GetHandleId as (h: any) => number;
+const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
+const GetUnitX = jass.GetUnitX as (u: any) => number;
+const GetUnitY = jass.GetUnitY as (u: any) => number;
+const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
+const GetUnitName = jass.GetUnitName as (u: any) => string;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
+const CreateTimer = jass.CreateTimer as () => any;
+const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
+const GetExpiredTimer = jass.GetExpiredTimer as () => any;
+const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
+const R2I = jass.R2I as (value: number) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
@@ -37,8 +45,8 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 暗影突袭BuffID = "C025";
 const 暗影突袭图标 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
-const 暗影突袭特效 = "Abilities\Spells\NightElf\shadowstrike\shadowstrike.mdl";
-const 暗影突袭弹幕模型 = "Abilities\Spells\NightElf\shadowstrike\ShadowStrikeMissile.mdl";
+const 暗影突袭特效 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl";
+const 暗影突袭弹幕模型 = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl";
 
 export interface 暗影突袭减益参数 {
   buffID?: string;
@@ -71,6 +79,12 @@ interface 暗影突袭毒素状态 {
 const 暗影突袭毒素计时表: Record<number, 暗影突袭毒素状态 | undefined> = {};
 const 暗影突袭毒素标记表: Record<number, number | undefined> = {};
 
+function 暗影突袭向上取整秒数(this: void, duration: number): number {
+  const 整秒 = R2I(duration);
+  if (duration > 整秒) return 整秒 + 1;
+  return 整秒 > 0 ? 整秒 : 1;
+}
+
 function 暗影突袭毒素结束(this: void): void {
   const timer = GetExpiredTimer();
   const timerId = GetHandleId(timer);
@@ -95,6 +109,7 @@ function 暗影突袭毒素tick(this: void): void {
   if (target != null && target !== 0 && GetUnitState(target, UNIT_STATE_LIFE) > 0.405) {
     const targetHid = GetHandleId(target);
     暗影突袭毒素标记表[targetHid] = (暗影突袭毒素标记表[targetHid] ?? 0) + 1;
+    debugLogForce("暗影突袭", "毒素tick", "source:", state.source, "target:", target, "damage:", state.damagePerTick, "remaining:", state.remainingTicks);
     UnitDamageTarget(state.source, target, state.damagePerTick, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS);
     const current = 暗影突袭毒素标记表[targetHid] ?? 0;
     if (current <= 1) {
@@ -137,8 +152,8 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   if (source == null || source === 0 || target == null || target === 0) return;
   const duration = 参数.duration ?? 2.0;
   const damagePerSecond = 参数.damagePerSecond ?? 500;
-  const slowAttack = 参数.slowAttack ?? 30;
-  const slowMove = 参数.slowMove ?? 30;
+  const slowAttack = 参数.slowAttack ?? 0.3;
+  const slowMove = 参数.slowMove ?? 0.3;
   debugLogForce("暗影突袭", "施加减益", "source:", source, "target:", target, "duration:", duration, "dps:", damagePerSecond);
   registerManualBuff(target, 参数.buffID ?? 暗影突袭BuffID, duration, 0, {
     sourceName: 参数.sourceName ?? GetUnitName(source),
@@ -152,7 +167,7 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   暗影突袭毒素计时表[timerId] = {
     source,
     target,
-    remainingTicks: Math.max(1, Math.ceil(duration)),
+    remainingTicks: 暗影突袭向上取整秒数(duration),
     damagePerTick: damagePerSecond,
   };
   TimerStart(timer, 1.0, true, 暗影突袭毒素tick);
@@ -160,22 +175,66 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
 
 export function 创建暗影突袭追踪(this: void, source: any, target: any, 参数: 暗影突袭追踪参数 = {}): void {
   if (source == null || source === 0 || target == null || target === 0) return;
+  debugLogForce(
+    "暗影突袭",
+    "准备创建追踪弹幕",
+    "source:",
+    source,
+    "target:",
+    target,
+    "sourcePos=(",
+    GetUnitX(source),
+    ",",
+    GetUnitY(source),
+    ")",
+    "targetPos=(",
+    GetUnitX(target),
+    ",",
+    GetUnitY(target),
+    ")",
+  );
+  let 已施加 = false;
   function 暗影突袭弹幕命中(this: void, 命中单位: any): void {
+    if (已施加) return;
+    已施加 = true;
+    debugLogForce("暗影突袭", "弹幕命中", "source:", source, "target:", 命中单位);
     施加暗影突袭减益(source, 命中单位, 参数.减益 ?? {});
+  }
+  function 暗影突袭到达目标点(this: void): void {
+    if (已施加) return;
+    if (target == null || target === 0) return;
+    已施加 = true;
+    debugLogForce("暗影突袭", "到达目标点补命中", "source:", source, "target:", target);
+    施加暗影突袭减益(source, target, 参数.减益 ?? {});
+  }
+  function 暗影突袭结束(this: void, 原因: string): void {
+    debugLogForce("暗影突袭", "结束", "source:", source, "target:", target, "原因:", 原因);
+  }
+  function 暗影突袭目标筛选(this: void, 目标单位: any): boolean {
+    return isSameUnit(目标单位, target);
   }
   创建原生弹幕({
     所有者: source,
     X: GetUnitX(source),
     Y: GetUnitY(source),
-    速度: 参数.速度 ?? 1500,
-    轨迹类型: 参数.轨迹类型 ?? "追踪",
+    方向角: GetUnitFacing(source),
     指定目标: target,
-    命中半径: 参数.命中半径 ?? 80,
-    生命周期: 参数.生命周期 ?? 4,
+    速度: 参数.速度 ?? 1500,
+    轨迹采样器: 创建追踪插值轨迹(target, 参数.命中半径 ?? 100),
+    命中半径: 参数.命中半径 ?? 100,
+    生命周期: 参数.生命周期 ?? 8,
     碰撞消失: true,
     最大距离: 参数.最大距离 ?? 5000,
     模型: 参数.模型 ?? 暗影突袭弹幕模型,
+    附着特效模型: 参数.模型 ?? 暗影突袭弹幕模型,
+    影响目标: "全部",
+    目标筛选: 暗影突袭目标筛选,
+    最大总命中次数: 1,
+    每单位最大命中次数: 1,
+    on到达目标点: 暗影突袭到达目标点,
+    on命中: 暗影突袭弹幕命中,
     on命中单位: 暗影突袭弹幕命中,
+    on结束: 暗影突袭结束,
   });
 }
 

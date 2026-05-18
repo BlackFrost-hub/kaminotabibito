@@ -304,23 +304,24 @@ function ____exports.doHeal(params)
     if not HEAL_SYSTEM_ENABLED then
         return 0
     end
-    local ____params_3 = params
-    local HealSource = ____params_3.HealSource
-    local HealTarget = ____params_3.HealTarget
-    local HealAmount = ____params_3.HealAmount
-    local HealManaAmount = ____params_3.HealManaAmount
+    local ____params_ManaEffect_3 = params.ManaEffect
+    if ____params_ManaEffect_3 == nil then
+        ____params_ManaEffect_3 = (params.HealManaAmount or 0) > 0
+    end
+    local manaEffectEnabled = ____params_ManaEffect_3
+    local ____params_4 = params
+    local HealSource = ____params_4.HealSource
+    local HealTarget = ____params_4.HealTarget
+    local HealAmount = ____params_4.HealAmount
+    local HealManaAmount = ____params_4.HealManaAmount
     if HealManaAmount == nil then
         HealManaAmount = 0
     end
-    local ItemHeal = ____params_3.ItemHeal
-    local HealEffect = ____params_3.HealEffect
-    local HealEffectPath = ____params_3.HealEffectPath
-    local ManaEffect = ____params_3.ManaEffect
-    if ManaEffect == nil then
-        ManaEffect = false
-    end
-    local ManaEffectPath = ____params_3.ManaEffectPath
-    local ManaShowText = ____params_3.ManaShowText
+    local ItemHeal = ____params_4.ItemHeal
+    local HealEffect = ____params_4.HealEffect
+    local HealEffectPath = ____params_4.HealEffectPath
+    local ManaEffectPath = ____params_4.ManaEffectPath
+    local ManaShowText = ____params_4.ManaShowText
     if ManaShowText == nil then
         ManaShowText = true
     end
@@ -370,7 +371,7 @@ function ____exports.doHeal(params)
         ____exports.restoreMana(
             HealTarget,
             HealManaAmount,
-            ManaEffect,
+            manaEffectEnabled,
             ManaEffectPath,
             ManaShowText
         )
