@@ -6,23 +6,23 @@ local ____00_FF0E_6CBB_7597_89E6_53D1_914D_7F6E = require("系统.02．物品系
 local _____9ED1_7267_6756_914D_7F6E = ____00_FF0E_6CBB_7597_89E6_53D1_914D_7F6E["黑牧杖配置"]
 local ____01_FF0E_6CBB_7597_89E6_53D1_5E38_91CF = require("系统.02．物品系统.15．装备技能.03．主动技能.01．治疗触发.01．治疗触发常量")
 local _____9ED1_7267_6756_6700_5C0F_6CBB_7597_89E6_53D1_503C = ____01_FF0E_6CBB_7597_89E6_53D1_5E38_91CF["黑牧杖最小治疗触发值"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_0.createTimedEffect
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local getEnemyUnitsInRange = ____require_result_1.getEnemyUnitsInRange
-local isValidUnit = ____require_result_1.isValidUnit
-local isUnitEnemy = ____require_result_1.isUnitEnemy
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_1.createTimedEffect
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local getEnemyUnitsInRange = ____require_result_2.getEnemyUnitsInRange
+local isValidUnit = ____require_result_2.isValidUnit
+local isUnitEnemy = ____require_result_2.isUnitEnemy
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_2.UnitHasItemOfTypeBJ
+local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_3.UnitHasItemOfTypeBJ
 local function _____5355_4F4D_662F_5426_6301_6709_9ED1_7267_6756(unit)
     if not isValidUnit(unit) then
         return false
@@ -55,6 +55,7 @@ local function _____5BF9_654C_4EBA_9020_6210_9ED1_7267_6756_4F24_5BB3(_____65BD_
     )
 end
 ____exports["处理黑牧杖治疗"] = function(______6765_6E90, _____76EE_6807, _____6CBB_7597_91CF, ______662F_5426_7269_54C1_6CBB_7597)
+    debugLogForce("03．黑牧杖", "进入", "处理黑牧杖治疗")
     if not isValidUnit(_____76EE_6807) or _____6CBB_7597_91CF <= _____9ED1_7267_6756_6700_5C0F_6CBB_7597_89E6_53D1_503C then
         return _____6CBB_7597_91CF
     end

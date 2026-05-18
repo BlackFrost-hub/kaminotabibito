@@ -97,16 +97,8 @@ function 开始破血之戒充能(this: void, 施法单位: any): void {
   });
 }
 
-export function 处理破血之戒使用(this: void, 上下文: {
+export function 处理破血之戒使用(this: void, 上下文: 物品技能事件上下文): void {
   debugLogForce("05．破血之戒", "进入", "处理破血之戒使用");
-
-  施法单位: any;
-  物品: any;
-  技能ID: number;
-  目标X: number;
-  目标Y: number;
-  目标单位: any;
-}): void {
   if (!是否为破血之戒(上下文.物品)) return;
   if (上下文.目标单位 == null || 上下文.目标单位 === 0) return;
 

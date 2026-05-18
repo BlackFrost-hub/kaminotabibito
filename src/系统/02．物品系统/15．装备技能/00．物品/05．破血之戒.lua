@@ -8,17 +8,17 @@ local _____7834_8840_4E4B_6212_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_
 local ____01_FF0E_7269_54C1_4F7F_7528_89E6_53D1_5E38_91CF = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.01．物品使用触发常量")
 local _____7834_8840_4E4B_6212_7279_6548_952E = ____01_FF0E_7269_54C1_4F7F_7528_89E6_53D1_5E38_91CF["破血之戒特效键"]
 local _____7834_8840_4E4B_6212_7ED1_5B9A_9644_7740_70B9 = ____01_FF0E_7269_54C1_4F7F_7528_89E6_53D1_5E38_91CF["破血之戒绑定附着点"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_0.createTimedEffect
-local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_0["创建Dz绑定单位特效"]
-local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_0["销毁Dz绑定单位特效"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_1["开始充能"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_2["获取坐标范围敌人"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_1.createTimedEffect
+local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_1["创建Dz绑定单位特效"]
+local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_1["销毁Dz绑定单位特效"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_2["开始充能"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_3["获取坐标范围敌人"]
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local UnitDamageTarget = jass.UnitDamageTarget
@@ -112,6 +112,7 @@ local function _____5F00_59CB_7834_8840_4E4B_6212_5145_80FD(_____65BD_6CD5_5355_
     )
 end
 ____exports["处理破血之戒使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("05．破血之戒", "进入", "处理破血之戒使用")
     if not _____662F_5426_4E3A_7834_8840_4E4B_6212(_____4E0A_4E0B_6587["物品"]) then
         return
     end

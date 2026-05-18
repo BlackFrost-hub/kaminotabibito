@@ -8,24 +8,22 @@ local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_1.registerManualBuff
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
 local SFB_setSlow = ____require_result_2.SFB_setSlow
-local ____jass_3 = jass
-local GetHandleId = ____jass_3.GetHandleId
-local GetUnitState = ____jass_3.GetUnitState
-local GetUnitX = ____jass_3.GetUnitX
-local GetUnitY = ____jass_3.GetUnitY
-local GetUnitName = ____jass_3.GetUnitName
-local GetOwningPlayer = ____jass_3.GetOwningPlayer
-local UnitDamageTarget = ____jass_3.UnitDamageTarget
-local CreateTimer = ____jass_3.CreateTimer
-local DestroyTimer = ____jass_3.DestroyTimer
-local GetExpiredTimer = ____jass_3.GetExpiredTimer
-local TimerStart = ____jass_3.TimerStart
-local UNIT_STATE_LIFE = ____jass_3.UNIT_STATE_LIFE
-local ATTACK_TYPE_NORMAL = ____jass_3.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_POISON = ____jass_3.DAMAGE_TYPE_POISON
-local WEAPON_TYPE_WHOKNOWS = ____jass_3.WEAPON_TYPE_WHOKNOWS
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
+local GetHandleId = _G.GetHandleId
+local GetUnitState = _G.GetUnitState
+local GetUnitX = _G.GetUnitX
+local GetUnitY = _G.GetUnitY
+local GetUnitName = _G.GetUnitName
+local UnitDamageTarget = _G.UnitDamageTarget
+local CreateTimer = _G.CreateTimer
+local DestroyTimer = _G.DestroyTimer
+local GetExpiredTimer = _G.GetExpiredTimer
+local TimerStart = _G.TimerStart
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____6697_5F71_7A81_88ADBuffID = "C025"
 local _____6697_5F71_7A81_88AD_56FE_6807 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp"
 local _____6697_5F71_7A81_88AD_7279_6548 = "AbilitiesSpellsNightElfshadowstrikeshadowstrike.mdl"
@@ -33,17 +31,17 @@ local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "AbilitiesSpellsNightElfsha
 local _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868 = {}
 local _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868 = {}
 local function _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
-    local timer = GetExpiredTimer(nil)
-    local timerId = GetHandleId(nil, timer)
+    local timer = GetExpiredTimer()
+    local timerId = GetHandleId(timer)
     __TS__Delete(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868, timerId)
-    DestroyTimer(nil, timer)
+    DestroyTimer(timer)
 end
 local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
-    local timer = GetExpiredTimer(nil)
-    local timerId = GetHandleId(nil, timer)
+    local timer = GetExpiredTimer()
+    local timerId = GetHandleId(timer)
     local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId]
     if state == nil then
-        DestroyTimer(nil, timer)
+        DestroyTimer(timer)
         return
     end
     if state.remainingTicks <= 0 then
@@ -52,11 +50,10 @@ local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
     end
     state.remainingTicks = state.remainingTicks - 1
     local target = state.target
-    if target ~= nil and target ~= 0 and GetUnitState(nil, target, UNIT_STATE_LIFE) > 0.405 then
-        local targetHid = GetHandleId(nil, target)
+    if target ~= nil and target ~= 0 and GetUnitState(target, UNIT_STATE_LIFE) > 0.405 then
+        local targetHid = GetHandleId(target)
         _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[targetHid] = (_____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[targetHid] or 0) + 1
         UnitDamageTarget(
-            nil,
             state.source,
             target,
             state.damagePerTick,
@@ -81,7 +78,7 @@ ____exports["是否为暗影突袭毒素伤害"] = function(unit)
     if unit == nil or unit == 0 then
         return false
     end
-    local hid = GetHandleId(nil, unit)
+    local hid = GetHandleId(unit)
     return (_____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[hid] or 0) > 0
 end
 ____exports["标记暗影突袭毒素伤害"] = function(unit, callback)
@@ -89,7 +86,7 @@ ____exports["标记暗影突袭毒素伤害"] = function(unit, callback)
         callback()
         return
     end
-    local hid = GetHandleId(nil, unit)
+    local hid = GetHandleId(unit)
     _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[hid] = (_____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[hid] or 0) + 1
     do
         local ____try, ____error = pcall(function()
@@ -137,7 +134,7 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         duration,
         0,
         {
-            sourceName = _____53C2_6570.sourceName or GetUnitName(nil, source),
+            sourceName = _____53C2_6570.sourceName or GetUnitName(source),
             iconOverride = _____53C2_6570.iconOverride or _____6697_5F71_7A81_88AD_56FE_6807,
             effectModelOverride = _____53C2_6570.effectModelOverride or _____6697_5F71_7A81_88AD_7279_6548
         }
@@ -149,8 +146,8 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         slowMove,
         duration
     )
-    local timer = CreateTimer(nil)
-    local timerId = GetHandleId(nil, timer)
+    local timer = CreateTimer()
+    local timerId = GetHandleId(timer)
     _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId] = {
         source = source,
         target = target,
@@ -160,13 +157,7 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         ),
         damagePerTick = damagePerSecond
     }
-    TimerStart(
-        nil,
-        timer,
-        1,
-        true,
-        _____6697_5F71_7A81_88AD_6BD2_7D20tick
-    )
+    TimerStart(timer, 1, true, _____6697_5F71_7A81_88AD_6BD2_7D20tick)
 end
 ____exports["创建暗影突袭追踪"] = function(source, target, _____53C2_6570)
     if _____53C2_6570 == nil then
@@ -180,8 +171,8 @@ ____exports["创建暗影突袭追踪"] = function(source, target, _____53C2_657
     end
     _____521B_5EFA_539F_751F_5F39_5E55({
         ["所有者"] = source,
-        X = GetUnitX(nil, source),
-        Y = GetUnitY(nil, source),
+        X = GetUnitX(source),
+        Y = GetUnitY(source),
         ["速度"] = _____53C2_6570["速度"] or 1500,
         ["轨迹类型"] = _____53C2_6570["轨迹类型"] or "追踪",
         ["指定目标"] = target,

@@ -1,17 +1,10 @@
 /** @noSelfInFile */
 
 const { 注册物品技能事件监听 } = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心") as {
-  注册物品技能事件监听: (this: void, callback: (this: void, 上下文: {
-    施法单位: any;
-    物品: any;
-    技能ID: number;
-    目标X: number;
-    目标Y: number;
-    目标单位: any;
-    目标可破坏物: any;
-  }) => void) => void;
+  注册物品技能事件监听: (this: void, callback: (this: void, 上下文: 物品技能事件上下文) => void) => void;
 };
 
+import type { 物品技能事件上下文 } from "./01．物品使用触发常量";
 import { 处理破血之戒使用 } from "../../00．物品/05．破血之戒";
 import { 处理熔岩权杖使用 } from "../../00．物品/04．熔岩权杖";
 import { 处理地狱火卡牌使用 } from "../../00．物品/09．地狱火卡牌";
@@ -33,15 +26,7 @@ import { 处理咆哮之心使用 } from "../../00．物品/25．咆哮之心";
 
 let 已初始化物品主动技能核心 = false;
 
-function on物品主动技能生效(this: void, 上下文: {
-  施法单位: any;
-  物品: any;
-  技能ID: number;
-  目标X: number;
-  目标Y: number;
-  目标单位: any;
-  目标可破坏物: any;
-}): void {
+function on物品主动技能生效(this: void, 上下文: 物品技能事件上下文): void {
   处理破血之戒使用(上下文);
   处理熔岩权杖使用(上下文);
   处理地狱火卡牌使用(上下文);

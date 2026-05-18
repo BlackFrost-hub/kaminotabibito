@@ -5,16 +5,16 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____4F7F_8005_9B54_7089_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["使者魔炉物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____4F7F_8005_9B54_7089_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["使者魔炉配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_0["获取坐标范围敌人"]
-local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_0["单位是否有效且敌对"]
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_1.YDUserDataGet
-local YDUserDataSet = ____require_result_1.YDUserDataSet
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_1["获取坐标范围敌人"]
+local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_1["单位是否有效且敌对"]
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataGet = ____require_result_2.YDUserDataGet
+local YDUserDataSet = ____require_result_2.YDUserDataSet
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -101,6 +101,7 @@ local function _____542F_52A8_547D_4E2D_6062_590D(_____7279_6548, _____76EE_6807
     TimerStart(timer, _____4F7F_8005_9B54_7089_914D_7F6E["恢复延迟"], false, ____on_4F7F_8005_9B54_7089_547D_4E2D_6062_590D)
 end
 ____exports["处理使者魔炉使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("18．使者魔炉", "进入", "处理使者魔炉使用")
     if not _____662F_5426_4E3A_4F7F_8005_9B54_7089(_____4E0A_4E0B_6587["物品"]) then
         return
     end

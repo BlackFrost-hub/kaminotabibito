@@ -16,26 +16,24 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
 };
-const { GetHandleId, GetUnitState, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, UnitDamageTarget, CreateTimer, DestroyTimer, GetExpiredTimer, TimerStart, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS } = jass as {
-  GetHandleId: (h: any) => number;
-  GetUnitState: (u: any, state: any) => number;
-  GetUnitX: (u: any) => number;
-  GetUnitY: (u: any) => number;
-  GetUnitName: (u: any) => string;
-  GetOwningPlayer: (u: any) => any;
-  UnitDamageTarget: (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
-  CreateTimer: () => any;
-  DestroyTimer: (timer: any) => void;
-  GetExpiredTimer: () => any;
-  TimerStart: (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
-  UNIT_STATE_LIFE: any;
-  ATTACK_TYPE_NORMAL: any;
-  DAMAGE_TYPE_POISON: any;
-  WEAPON_TYPE_WHOKNOWS: any;
-};
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
 };
+
+const GetHandleId = (globalThis as any).GetHandleId as (h: any) => number;
+const GetUnitState = (globalThis as any).GetUnitState as (u: any, state: any) => number;
+const GetUnitX = (globalThis as any).GetUnitX as (u: any) => number;
+const GetUnitY = (globalThis as any).GetUnitY as (u: any) => number;
+const GetUnitName = (globalThis as any).GetUnitName as (u: any) => string;
+const UnitDamageTarget = (globalThis as any).UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
+const CreateTimer = (globalThis as any).CreateTimer as () => any;
+const DestroyTimer = (globalThis as any).DestroyTimer as (timer: any) => void;
+const GetExpiredTimer = (globalThis as any).GetExpiredTimer as () => any;
+const TimerStart = (globalThis as any).TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 暗影突袭BuffID = "C025";
 const 暗影突袭图标 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";

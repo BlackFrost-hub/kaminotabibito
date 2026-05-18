@@ -4,11 +4,11 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____6697_5E7D_4EA1_6212_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["暗幽亡戒物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____6697_5E7D_4EA1_6212_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["暗幽亡戒配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_0.createUnitEffect
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_1.createUnitEffect
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
@@ -20,6 +20,7 @@ local function _____662F_5426_4E3A_6697_5E7D_4EA1_6212(_____7269_54C1)
     return GetItemTypeId(_____7269_54C1) == _____6697_5E7D_4EA1_6212_7269_54C1ID
 end
 ____exports["处理暗幽亡戒使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("17．暗幽亡戒", "进入", "处理暗幽亡戒使用")
     if not _____662F_5426_4E3A_6697_5E7D_4EA1_6212(_____4E0A_4E0B_6587["物品"]) then
         return
     end

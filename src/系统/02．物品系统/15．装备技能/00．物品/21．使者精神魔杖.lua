@@ -5,16 +5,16 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____4F7F_8005_7CBE_795E_9B54_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["使者精神魔杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____4F7F_8005_7CBE_795E_9B54_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["使者精神魔杖配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
-local YDUserDataSet = ____require_result_0.YDUserDataSet
-local YDUserDataHas = ____require_result_0.YDUserDataHas
-local YDUserDataClear = ____require_result_0.YDUserDataClear
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataGet = ____require_result_1.YDUserDataGet
+local YDUserDataSet = ____require_result_1.YDUserDataSet
+local YDUserDataHas = ____require_result_1.YDUserDataHas
+local YDUserDataClear = ____require_result_1.YDUserDataClear
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -68,6 +68,7 @@ local function _____542F_52A8_5B58_50A8_8FC7_671F_8BA1_65F6(_____65BD_6CD5_5355_
     TimerStart(timer, _____4F7F_8005_7CBE_795E_9B54_6756_914D_7F6E["存储持续时间"], false, ____on_4F7F_8005_7CBE_795E_9B54_6756_5B58_50A8_8FC7_671F)
 end
 ____exports["处理使者精神魔杖使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("21．使者精神魔杖", "进入", "处理使者精神魔杖使用")
     if not _____662F_5426_4E3A_4F7F_8005_7CBE_795E_9B54_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end

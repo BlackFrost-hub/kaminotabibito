@@ -114,7 +114,8 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
   施加汭冥血杖恢复(施法单位, 生命恢复值, 魔法恢复值);
 }
 
-export function 处理汭冥血杖使用(this: void, 上下文: 物品技能事件上下文): void {
+export function 处理汭冥血杖使用(this: void, 上下文: 物品技能事件上下文): void {  debugLogForce("19．汭冥血杖", "进入", "处理汭冥血杖使用");
+
   if (!是否为汭冥血杖(上下文.物品)) return;
   执行汭冥血杖献祭(上下文, false);
 }

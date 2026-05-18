@@ -5,13 +5,13 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____5148_7956_4E4B_72F1_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["先祖之狱杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____5148_7956_4E4B_72F1_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["先祖之狱杖配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_0.createTimedEffect
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_1["施加扩展控制"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_1.createTimedEffect
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_2["施加扩展控制"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -61,6 +61,7 @@ local function _____542F_52A8_5148_7956_5EF6_8FDF_4F24_5BB3(_____65BD_6CD5_5355_
     TimerStart(timer, _____5148_7956_4E4B_72F1_6756_914D_7F6E["延迟伤害时间"], false, ____on_5148_7956_4E4B_72F1_6756_5EF6_8FDF_4F24_5BB3)
 end
 ____exports["处理先祖之狱杖使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("24．先祖之狱杖", "进入", "处理先祖之狱杖使用")
     if not _____662F_5426_4E3A_5148_7956_4E4B_72F1_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end

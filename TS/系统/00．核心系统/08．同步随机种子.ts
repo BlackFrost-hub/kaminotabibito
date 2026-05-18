@@ -21,7 +21,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 
 const 调试模块 = "同步随机种子";
 const 最大种子 = 2147483647;
-const 最多等待日志次数 = 10;
+const 最多等待日志次数 = 6;
 
 let 已设置 = false;
 let 重试计时器: any = null;

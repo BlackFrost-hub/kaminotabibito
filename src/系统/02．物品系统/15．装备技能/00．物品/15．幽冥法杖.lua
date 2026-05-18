@@ -4,15 +4,15 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____5E7D_51A5_6CD5_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["幽冥法杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____5E7D_51A5_6CD5_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["幽冥法杖配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_0.createUnitEffect
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local getObjectPropertyRealSafe = ____require_result_1.getObjectPropertyRealSafe
-local ObjectType = ____require_result_1.ObjectType
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_1.createUnitEffect
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertyRealSafe = ____require_result_2.getObjectPropertyRealSafe
+local ObjectType = ____require_result_2.ObjectType
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -27,6 +27,7 @@ local function _____662F_5426_4E3A_5E7D_51A5_6CD5_6756(_____7269_54C1)
     return GetItemTypeId(_____7269_54C1) == _____5E7D_51A5_6CD5_6756_7269_54C1ID
 end
 ____exports["处理幽冥法杖使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("15．幽冥法杖", "进入", "处理幽冥法杖使用")
     if not _____662F_5426_4E3A_5E7D_51A5_6CD5_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end

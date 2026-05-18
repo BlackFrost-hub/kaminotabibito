@@ -5,16 +5,16 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____53F2_8BD7_8FDC_53E4_9B54_5203_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["史诗远古魔刃物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____53F2_8BD7_8FDC_53E4_9B54_5203_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["史诗远古魔刃配置"]
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_0.createTimedEffect
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_1["获取坐标范围敌人"]
-local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_1["单位是否有效且敌对"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_2["施加扩展控制"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_1.createTimedEffect
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_2["获取坐标范围敌人"]
+local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_2["单位是否有效且敌对"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_3["施加扩展控制"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -98,6 +98,7 @@ local function ____on_53F2_8BD7_8FDC_53E4_9B54_5203_626B_63A0()
     end
 end
 ____exports["处理史诗远古魔刃使用"] = function(_____4E0A_4E0B_6587)
+    debugLogForce("22．史诗远古魔刃", "进入", "处理史诗远古魔刃使用")
     if not _____662F_5426_4E3A_53F2_8BD7_8FDC_53E4_9B54_5203(_____4E0A_4E0B_6587["物品"]) then
         return
     end
