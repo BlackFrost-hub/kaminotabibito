@@ -46,18 +46,7 @@ local function _____5355_4F4D_62E5_6709_88C5_5907(unit, itemTypeId)
     return false
 end
 ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
-    debugLogForce(
-        "女妖头饰",
-        "进入处理",
-        "target:",
-        target,
-        "attacker:",
-        attacker,
-        "applied:",
-        applied
-    )
     if target == nil or target == 0 or attacker == nil or attacker == 0 or not (applied > 0) then
-        debugLogForce("女妖头饰", "提前返回: 参数无效")
         return
     end
     local _____5973_5996_5934_9970_7269_54C1 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970ID)
@@ -70,15 +59,6 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
     local _____5973_5996_5934_9970_5F3A_5316_7269_54C1 = ____temp_9
     local _____6709_5973_5996_5934_9970 = _____5973_5996_5934_9970_7269_54C1 ~= nil
     local _____6709_5973_5996_5934_9970_5F3A_5316 = _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil
-    debugLogForce(
-        "女妖头饰",
-        "有女妖头饰:",
-        _____6709_5973_5996_5934_9970,
-        "有强化:",
-        _____6709_5973_5996_5934_9970_5F3A_5316,
-        "女妖头饰ID:",
-        _____5973_5996_5934_9970ID
-    )
     if not _____6709_5973_5996_5934_9970 and not _____6709_5973_5996_5934_9970_5F3A_5316 then
         return
     end
@@ -93,31 +73,7 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
             {["是否在CD中"] = false, ["达到阈值后重置"] = true}
         )
         if _____5230_8FBE_9608_503C then
-            debugLogForce(
-                "女妖头饰",
-                "达到累计阈值，开始对伤害来源发射暗影突袭",
-                "累计值:",
-                _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"],
-                "阈值:",
-                _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"]
-            )
-            debugLogForce(
-                "女妖头饰",
-                "对伤害来源发射暗影突袭追踪",
-                "source:",
-                target,
-                "target:",
-                attacker
-            )
             _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C(function()
-                debugLogForce(
-                    "女妖头饰",
-                    "延后一帧发射暗影突袭",
-                    "source:",
-                    target,
-                    "target:",
-                    attacker
-                )
                 _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A(target, attacker, {["减益"] = {duration = 2, damagePerSecond = 500}})
             end)
             if _____6709_5973_5996_5934_9970_5F3A_5316 and _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil then
@@ -126,18 +82,7 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
                 local _____8FBE_5230_6B21_6570_9608_503C = _____4E0B_6B21_6B21_6570 >= _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["命中次数阈值"]
                 local _____5199_56DE_6B21_6570 = _____8FBE_5230_6B21_6570_9608_503C and 1 or _____4E0B_6B21_6B21_6570
                 SetItemCharges(_____5973_5996_5934_9970_5F3A_5316_7269_54C1, _____5199_56DE_6B21_6570)
-                debugLogForce(
-                    "女妖头饰",
-                    "强化物品次数累加",
-                    "旧值:",
-                    _____5F53_524D_6B21_6570,
-                    "新值:",
-                    _____4E0B_6B21_6B21_6570,
-                    "写回:",
-                    _____5199_56DE_6B21_6570
-                )
                 if _____8FBE_5230_6B21_6570_9608_503C then
-                    debugLogForce("女妖头饰", "强化达到5次妖毒触发，使用doHeal恢复自身生命", "恢复值: 1000")
                     doHeal({
                         HealSource = target,
                         HealTarget = target,

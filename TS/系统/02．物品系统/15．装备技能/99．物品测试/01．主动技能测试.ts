@@ -28,7 +28,6 @@ const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
-const RemoveItem = jass.RemoveItem as (item: any) => void;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
 
 const 模块名 = "物品主动技能测试";
@@ -37,8 +36,12 @@ function 获取测试单位(this: void): any {
   return g.gg_unit_Hamg_0002 ?? (globalThis as any).bj_lastCreatedUnit ?? null;
 }
 
-function 清理测试装备(this: void, unit: any): void {
+const SetItemPosition = jass.SetItemPosition as (item: any, x: number, y: number) => void;
+
+function 丢弃测试装备(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
   for (let i = 0; i < 6; i++) {
     const item = UnitItemInSlot(unit, i);
     if (item == null || item === 0) continue;
@@ -49,7 +52,7 @@ function 清理测试装备(this: void, unit: any): void {
       if (rawId == null || rawId === "") continue;
       if (stringToFourCCSafe(rawId) === itemTypeId) {
         UnitRemoveItem(unit, item);
-        RemoveItem(item);
+        SetItemPosition(item, x, y);
         break;
       }
     }
@@ -70,12 +73,12 @@ function 发放装备(this: void, unit: any, 装备名: string): void {
   UnitAddItem(unit, item);
 }
 
-function 执行测试包(this: void, unit: any, 包序号: number): void {
-  清理测试装备(unit);
-  for (let i = 0; i < 包序号 && i < 物品主动技能测试发放顺序.length; i++) {
-    发放装备(unit, 物品主动技能测试发放顺序[i]);
+function 发放单个装备(this: void, unit: any, 序号: number): void {
+  丢弃测试装备(unit);
+  if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
+    发放装备(unit, 物品主动技能测试发放顺序[序号 - 1]);
+    debugLogForce(模块名, "已发放测试装备", 序号, 物品主动技能测试发放顺序[序号 - 1]);
   }
-  debugLogForce(模块名, "已发放测试装备包", 包序号);
 }
 
 function on聊天wp测试(this: void, _player: any, command: string): void {
@@ -87,7 +90,7 @@ function on聊天wp测试(this: void, _player: any, command: string): void {
 
   for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
     if (command === 物品主动技能测试命令列表[i]) {
-      执行测试包(unit, i + 1);
+      发放单个装备(unit, i + 1);
       return;
     }
   }

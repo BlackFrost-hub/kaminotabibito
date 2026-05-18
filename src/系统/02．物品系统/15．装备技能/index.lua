@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+require("系统.02．物品系统.15．装备技能.99．物品测试.index")
 do
     local ____export = require("系统.02．物品系统.15．装备技能.01．死亡事件.index")
     for ____exportKey, ____exportValue in pairs(____export) do

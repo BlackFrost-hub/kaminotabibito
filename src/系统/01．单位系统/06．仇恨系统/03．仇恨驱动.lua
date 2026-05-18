@@ -133,15 +133,6 @@ local function onTick()
                 _____66F4_65B0_4EC7_6068_663E_793A(_____654C_4EBA, best.targetRef, best.threat)
                 _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(best.targetRef)
                 if _____5F53_524D_76EE_6807ID ~= best.targetHid then
-                    debugLogForce(
-                        _____6A21_5757_540D,
-                        "切换目标 敌人ID=",
-                        _____654C_4EBAID,
-                        "新目标=",
-                        best.targetHid,
-                        "仇恨=",
-                        best.threat
-                    )
                     IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
                     _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, best.targetHid)
                 else
@@ -194,15 +185,6 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     _____66F4_65B0_4EC7_6068_663E_793A(_____654C_4EBA, best.targetRef, best.threat)
     _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(best.targetRef)
     if _____5F53_524D_76EE_6807ID ~= best.targetHid then
-        debugLogForce(
-            _____6A21_5757_540D,
-            "切换目标 敌人ID=",
-            _____654C_4EBAID,
-            "新目标=",
-            best.targetHid,
-            "仇恨=",
-            best.threat
-        )
         IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
         _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, best.targetHid)
     else

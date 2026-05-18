@@ -43,6 +43,7 @@ export interface 扩散伤害参数 {
   伤害值: number;
   扩散半径: number;
   扩散百分比: number;
+  是否包含主目标?: boolean;
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
@@ -55,6 +56,7 @@ export function 扩散伤害(参数: 扩散伤害参数): void {
     伤害值,
     扩散半径,
     扩散百分比,
+    是否包含主目标 = true,
     攻击类型 = ATTACK_TYPE_NORMAL,
     伤害类型 = DAMAGE_TYPE_NORMAL,
     武器类型 = null,
@@ -65,9 +67,13 @@ export function 扩散伤害(参数: 扩散伤害参数): void {
   debugLogForce("扩散伤害", "开始 主目标hid=", GetHandleId(主目标), "伤害=", 伤害值);
 
   const 主目标初始血量 = GetUnitState(主目标, UNIT_STATE_LIFE);
-  UnitDamageTarget(来源单位, 主目标, 伤害值, false, false, 攻击类型, 伤害类型, 武器类型);
-  const 主目标剩余血量 = GetUnitState(主目标, UNIT_STATE_LIFE);
-  debugLogForce("扩散伤害", "主目标 初始血量=", 主目标初始血量, "剩余血量=", 主目标剩余血量);
+  if (是否包含主目标) {
+    UnitDamageTarget(来源单位, 主目标, 伤害值, false, false, 攻击类型, 伤害类型, 武器类型);
+    const 主目标剩余血量 = GetUnitState(主目标, UNIT_STATE_LIFE);
+    debugLogForce("扩散伤害", "主目标 初始血量=", 主目标初始血量, "剩余血量=", 主目标剩余血量);
+  } else {
+    debugLogForce("扩散伤害", "跳过主目标", "初始血量=", 主目标初始血量);
+  }
 
   if (扩散半径 <= 0 || 扩散百分比 <= 0) {
     debugLogForce("扩散伤害", "跳过扩散 半径=", 扩散半径, "百分比=", 扩散百分比);

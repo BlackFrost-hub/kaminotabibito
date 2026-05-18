@@ -19,7 +19,7 @@ const {
   获取单位重伤,
   施加重伤,
   移除单位重伤,
-} = require("系统.04．伤害系统.03．重伤系统.index") as {
+} = require("系统.04．伤害系统.03．重伤系统.01．核心功能") as {
   获取单位重伤: (this: void, unit: any) => number;
   施加重伤: (this: void, unit: any, 重伤值: number, 持续时间?: number) => void;
   移除单位重伤: (this: void, unit: any) => void;
@@ -44,13 +44,13 @@ function on聊天测试(): void {
 
   debugLogForce(模块名, "===== 重伤测试 =====");
 
-  // 给大法师施加50%重伤（3秒）
-  施加重伤(大法师, 0.5, 3);
+  // 给大法师施加30%重伤（3秒）
+  施加重伤(大法师, 0.3, 3);
   debugLogForce(模块名, "重伤值：", 获取单位重伤(大法师));
   debugLogForce(模块名, "治疗前血量：", GetUnitState(大法师, UNIT_STATE_LIFE));
 
   // 重伤下治疗100
-  const heal = spellHeal(null, 大法师, 100, false);
+  const heal = spellHeal(null, 大法师, 150, false);
   debugLogForce(模块名, "治疗量：", heal, "治疗后血量：", GetUnitState(大法师, UNIT_STATE_LIFE));
 
   if (heal < 100) {

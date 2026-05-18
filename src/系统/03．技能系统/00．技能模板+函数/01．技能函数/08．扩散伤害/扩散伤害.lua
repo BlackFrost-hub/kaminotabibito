@@ -30,6 +30,10 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
     local _____4F24_5BB3_503C = ____53C2_6570_3["伤害值"]
     local _____6269_6563_534A_5F84 = ____53C2_6570_3["扩散半径"]
     local _____6269_6563_767E_5206_6BD4 = ____53C2_6570_3["扩散百分比"]
+    local _____662F_5426_5305_542B_4E3B_76EE_6807 = ____53C2_6570_3["是否包含主目标"]
+    if _____662F_5426_5305_542B_4E3B_76EE_6807 == nil then
+        _____662F_5426_5305_542B_4E3B_76EE_6807 = true
+    end
     local _____653B_51FB_7C7B_578B = ____53C2_6570_3["攻击类型"]
     if _____653B_51FB_7C7B_578B == nil then
         _____653B_51FB_7C7B_578B = ATTACK_TYPE_NORMAL
@@ -53,24 +57,28 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
         _____4F24_5BB3_503C
     )
     local _____4E3B_76EE_6807_521D_59CB_8840_91CF = GetUnitState(_____4E3B_76EE_6807, UNIT_STATE_LIFE)
-    UnitDamageTarget(
-        _____6765_6E90_5355_4F4D,
-        _____4E3B_76EE_6807,
-        _____4F24_5BB3_503C,
-        false,
-        false,
-        _____653B_51FB_7C7B_578B,
-        _____4F24_5BB3_7C7B_578B,
-        _____6B66_5668_7C7B_578B
-    )
-    local _____4E3B_76EE_6807_5269_4F59_8840_91CF = GetUnitState(_____4E3B_76EE_6807, UNIT_STATE_LIFE)
-    debugLogForce(
-        "扩散伤害",
-        "主目标 初始血量=",
-        _____4E3B_76EE_6807_521D_59CB_8840_91CF,
-        "剩余血量=",
-        _____4E3B_76EE_6807_5269_4F59_8840_91CF
-    )
+    if _____662F_5426_5305_542B_4E3B_76EE_6807 then
+        UnitDamageTarget(
+            _____6765_6E90_5355_4F4D,
+            _____4E3B_76EE_6807,
+            _____4F24_5BB3_503C,
+            false,
+            false,
+            _____653B_51FB_7C7B_578B,
+            _____4F24_5BB3_7C7B_578B,
+            _____6B66_5668_7C7B_578B
+        )
+        local _____4E3B_76EE_6807_5269_4F59_8840_91CF = GetUnitState(_____4E3B_76EE_6807, UNIT_STATE_LIFE)
+        debugLogForce(
+            "扩散伤害",
+            "主目标 初始血量=",
+            _____4E3B_76EE_6807_521D_59CB_8840_91CF,
+            "剩余血量=",
+            _____4E3B_76EE_6807_5269_4F59_8840_91CF
+        )
+    else
+        debugLogForce("扩散伤害", "跳过主目标", "初始血量=", _____4E3B_76EE_6807_521D_59CB_8840_91CF)
+    end
     if _____6269_6563_534A_5F84 <= 0 or _____6269_6563_767E_5206_6BD4 <= 0 then
         debugLogForce(
             "扩散伤害",
@@ -101,7 +109,7 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
             local _____526F_76EE_6807hid = GetHandleId(_____526F_76EE_6807)
             if _____526F_76EE_6807 == _____4E3B_76EE_6807 then
                 debugLogForce("扩散伤害", "跳过主目标 hid=", _____526F_76EE_6807hid)
-                goto __continue5
+                goto __continue7
             end
             local _____662F_654C_4EBA = isUnitEnemy(_____526F_76EE_6807, _____6765_6E90_5355_4F4D)
             debugLogForce(
@@ -112,7 +120,7 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
                 _____662F_654C_4EBA
             )
             if not _____662F_654C_4EBA then
-                goto __continue5
+                goto __continue7
             end
             local _____526F_76EE_6807_521D_59CB_8840_91CF = GetUnitState(_____526F_76EE_6807, UNIT_STATE_LIFE)
             UnitDamageTarget(
@@ -136,7 +144,7 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
                 _____526F_76EE_6807_5269_4F59_8840_91CF
             )
         end
-        ::__continue5::
+        ::__continue7::
     end
     debugLogForce("扩散伤害", "结束")
 end

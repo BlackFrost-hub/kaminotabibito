@@ -9,7 +9,7 @@ local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03�
 local debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
-local ____require_result_2 = require("系统.04．伤害系统.03．重伤系统.index")
+local ____require_result_2 = require("系统.04．伤害系统.03．重伤系统.01．核心功能")
 local _____83B7_53D6_5355_4F4D_91CD_4F24 = ____require_result_2["获取单位重伤"]
 local _____65BD_52A0_91CD_4F24 = ____require_result_2["施加重伤"]
 local _____79FB_9664_5355_4F4D_91CD_4F24 = ____require_result_2["移除单位重伤"]
@@ -26,7 +26,7 @@ local function ____on_804A_5929_6D4B_8BD5()
         return
     end
     debugLogForce(_____6A21_5757_540D, "===== 重伤测试 =====")
-    _____65BD_52A0_91CD_4F24(_____5927_6CD5_5E08, 0.5, 3)
+    _____65BD_52A0_91CD_4F24(_____5927_6CD5_5E08, 0.3, 3)
     debugLogForce(
         _____6A21_5757_540D,
         "重伤值：",
@@ -37,7 +37,7 @@ local function ____on_804A_5929_6D4B_8BD5()
         "治疗前血量：",
         GetUnitState(_____5927_6CD5_5E08, UNIT_STATE_LIFE)
     )
-    local heal = spellHeal(nil, _____5927_6CD5_5E08, 100, false)
+    local heal = spellHeal(nil, _____5927_6CD5_5E08, 150, false)
     debugLogForce(
         _____6A21_5757_540D,
         "治疗量：",

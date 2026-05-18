@@ -177,6 +177,15 @@ export function isNotUsingInventoryItem(unit: any): boolean {
     return orderId < ITEM_USE_MIN || orderId > ITEM_USE_MAX;
 }
 
+/**
+ * 判断是否为单体目标技能
+ * 约定：有目标单位就算单体，没有目标单位就不是单体
+ * @param targetUnit 目标单位
+ */
+export function isSingleTargetSpell(targetUnit: any): boolean {
+    return targetUnit != null && targetUnit !== 0;
+}
+
 export function matchUnitFilter(targetUnit: any, sourceUnit: any, options: UnitFilterOptions): boolean {
     if (!targetUnit) return false;
 

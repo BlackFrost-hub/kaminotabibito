@@ -92,15 +92,6 @@ function onDamage(this: void, target: any, attacker: any, applied: number, _dama
     当前攻击者ID === 上次攻击者ID &&
     当前伤害毫数 === 上次伤害毫数
   ) {
-    debugLogForce(
-      模块名,
-      "忽略重复最终伤害回调 targetID=",
-      当前目标ID,
-      "attackerID=",
-      当前攻击者ID,
-      "applied=",
-      applied
-    );
     return;
   }
   上次事件毫秒 = 当前毫秒;
@@ -109,19 +100,6 @@ function onDamage(this: void, target: any, attacker: any, applied: number, _dama
   上次伤害毫数 = 当前伤害毫数;
 
   const threat = (applied / maxHp) * 1000;
-  debugLogForce(
-    模块名,
-    "最终伤害回调 targetID=",
-    当前目标ID,
-    "attackerID=",
-    当前攻击者ID,
-    "applied=",
-    applied,
-    "maxHp=",
-    maxHp,
-    "threat=",
-    threat
-  );
   addThreat(target, attacker, threat);
 }
 

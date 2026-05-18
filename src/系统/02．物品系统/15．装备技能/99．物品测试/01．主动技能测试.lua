@@ -23,7 +23,6 @@ local UnitRemoveItem = jass.UnitRemoveItem
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetItemTypeId = jass.GetItemTypeId
-local RemoveItem = jass.RemoveItem
 local UnitItemInSlot = jass.UnitItemInSlot
 local _____6A21_5757_540D = "物品主动技能测试"
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
@@ -37,10 +36,13 @@ local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
     end
     return ____g_gg_unit_Hamg_0002_4_5
 end
-local function _____6E05_7406_6D4B_8BD5_88C5_5907(unit)
+local SetItemPosition = jass.SetItemPosition
+local function _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
     if unit == nil or unit == 0 then
         return
     end
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
     do
         local i = 0
         while i < 6 do
@@ -61,7 +63,7 @@ local function _____6E05_7406_6D4B_8BD5_88C5_5907(unit)
                             end
                             if stringToFourCCSafe(rawId) == itemTypeId then
                                 UnitRemoveItem(unit, item)
-                                RemoveItem(item)
+                                SetItemPosition(item, x, y)
                                 break
                             end
                         end
@@ -92,16 +94,12 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
     end
     UnitAddItem(unit, item)
 end
-local function _____6267_884C_6D4B_8BD5_5305(unit, _____5305_5E8F_53F7)
-    _____6E05_7406_6D4B_8BD5_88C5_5907(unit)
-    do
-        local i = 0
-        while i < _____5305_5E8F_53F7 and i < #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F do
-            _____53D1_653E_88C5_5907(unit, _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[i + 1])
-            i = i + 1
-        end
+local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
+    _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
+    if _____5E8F_53F7 > 0 and _____5E8F_53F7 <= #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F then
+        _____53D1_653E_88C5_5907(unit, _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7])
+        debugLogForce(_____6A21_5757_540D, "已发放测试装备", _____5E8F_53F7, _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7])
     end
-    debugLogForce(_____6A21_5757_540D, "已发放测试装备包", _____5305_5E8F_53F7)
 end
 local function ____on_804A_5929wp_6D4B_8BD5(_player, command)
     local unit = _____83B7_53D6_6D4B_8BD5_5355_4F4D()
@@ -113,7 +111,7 @@ local function ____on_804A_5929wp_6D4B_8BD5(_player, command)
         local i = 0
         while i < #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868 do
             if command == _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868[i + 1] then
-                _____6267_884C_6D4B_8BD5_5305(unit, i + 1)
+                _____53D1_653E_5355_4E2A_88C5_5907(unit, i + 1)
                 return
             end
             i = i + 1

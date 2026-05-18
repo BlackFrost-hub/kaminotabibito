@@ -18,6 +18,10 @@ export const 巨魔大剑配置 = {
   装备名称: 主动技能装备名称.巨魔大剑,
   标记名: "JMDJ11",
   持续时间: 1,
+  扩散半径: 300,
+  扩散百分比: 0.8,
+  扩散特效路径: "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl",
+  扩散特效持续时间: 1,
 } as const;
 
 export {};

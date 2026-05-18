@@ -27,6 +27,8 @@ local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_3["装�
 local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_3["是否彩虹装备等级"]
 local _____5F69_8679_989C_8272_6587_672C = ____require_result_3["彩虹颜色文本"]
 local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_3["去除颜色代码"]
+local ____require_result_4 = require("系统.02．物品系统.12．装备次数叠加配置")
+local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_4["是否允许装备次数叠加"]
 local EQUIP_EVENT_PLAYER_IDS = {
     0,
     1,
@@ -155,12 +157,12 @@ local function handleItemEvent(self, unit, item, isPickup)
     local itemData = itemRelatedFns.getItemDataEntry(item)
     if not itemData then
         if isPickup then
-            local ____temp_6 = type(slk) ~= "nil" and slk.item
-            if ____temp_6 then
-                local ____opt_4 = slk.item[idStr]
-                ____temp_6 = ____opt_4 and ____opt_4.name
+            local ____temp_7 = type(slk) ~= "nil" and slk.item
+            if ____temp_7 then
+                local ____opt_5 = slk.item[idStr]
+                ____temp_7 = ____opt_5 and ____opt_5.name
             end
-            local displayName = ____temp_6 or idStr
+            local displayName = ____temp_7 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
             jass.DisplayTimedTextToPlayer(
@@ -182,13 +184,20 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local charges = jass.GetItemCharges(item)
-    local ____temp_7
-    if charges > 0 then
-        ____temp_7 = charges
+    local itemNamePlain = _____53BB_9664_989C_8272_4EE3_7801(tostring(itemData.name or ""))
+    local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9
+    if _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0(itemNamePlain) then
+        local ____temp_8
+        if charges > 0 then
+            ____temp_8 = charges
+        else
+            ____temp_8 = 1
+        end
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9 = ____temp_8
     else
-        ____temp_7 = 1
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9 = 1
     end
-    local mult = ____temp_7
+    local mult = _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
@@ -200,18 +209,18 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local merged = {}
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
-        local ____e_key_9 = e.key
-        local ____itemData_e_key_8 = itemData[e.key]
-        if ____itemData_e_key_8 == nil then
-            ____itemData_e_key_8 = 0
+        local ____e_key_11 = e.key
+        local ____itemData_e_key_10 = itemData[e.key]
+        if ____itemData_e_key_10 == nil then
+            ____itemData_e_key_10 = 0
         end
-        merged[____e_key_9] = ____itemData_e_key_8 + (primary[e.key] or 0)
+        merged[____e_key_11] = ____itemData_e_key_10 + (primary[e.key] or 0)
     end
-    local ____itemData_moveSpeed_10 = itemData.moveSpeed
-    if ____itemData_moveSpeed_10 == nil then
-        ____itemData_moveSpeed_10 = 0
+    local ____itemData_moveSpeed_12 = itemData.moveSpeed
+    if ____itemData_moveSpeed_12 == nil then
+        ____itemData_moveSpeed_12 = 0
     end
-    merged.moveSpeed = ____itemData_moveSpeed_10 + (primary.moveSpeed or 0)
+    merged.moveSpeed = ____itemData_moveSpeed_12 + (primary.moveSpeed or 0)
     local playerStats = {}
     local function addStat(____, val, name)
         if val == nil or val == 0 then
@@ -276,15 +285,15 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_13 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_12 = unit
-        local ____isDrop_11
+        local ____equipMovespeed_getMaxMovespeed2Info_15 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_14 = unit
+        local ____isDrop_13
         if isDrop then
-            ____isDrop_11 = item
+            ____isDrop_13 = item
         else
-            ____isDrop_11 = nil
+            ____isDrop_13 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_13(equipMovespeed, ____unit_12, ____isDrop_11)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_15(equipMovespeed, ____unit_14, ____isDrop_13)
         if ms.value > 0 then
             test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end

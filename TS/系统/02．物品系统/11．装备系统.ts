@@ -32,6 +32,9 @@ const { 装备等级颜色代码, 是否彩虹装备等级, 彩虹颜色文本, 
   彩虹颜色文本: (this: void, _?: undefined, text?: string) => string;
   去除颜色代码: (this: void, text: string) => string;
 };
+const { 是否允许装备次数叠加 } = require("系统.02．物品系统.12．装备次数叠加配置") as {
+  是否允许装备次数叠加: (this: void, 装备名: string) => boolean;
+};
 
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
 
@@ -113,7 +116,8 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   }
 
   const charges = jass.GetItemCharges(item);
-  const mult = charges > 0 ? charges : 1;
+  const itemNamePlain = 去除颜色代码(String(itemData.name || ""));
+  const mult = 是否允许装备次数叠加(itemNamePlain) ? (charges > 0 ? charges : 1) : 1;
 
   const isAdd = isPickup;
   const primaryBonus = itemData.primaryBonus;

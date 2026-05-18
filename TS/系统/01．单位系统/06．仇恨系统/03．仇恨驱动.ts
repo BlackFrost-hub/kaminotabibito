@@ -166,7 +166,6 @@ function onTick(): void {
 
     if (当前目标ID !== best.targetHid) {
       // 目标变更：发命令 + 更新缓存
-      debugLogForce(模块名, "切换目标 敌人ID=", 敌人ID, "新目标=", best.targetHid, "仇恨=", best.threat);
       IssueTargetOrder(敌人, "attack", best.targetRef);
       设置当前目标(敌人ID, best.targetHid);
     } else {
@@ -220,7 +219,6 @@ export function 驱动单个敌人(敌人: any): void {
   尝试自动展开目标玩家仇恨面板(best.targetRef);
 
   if (当前目标ID !== best.targetHid) {
-    debugLogForce(模块名, "切换目标 敌人ID=", 敌人ID, "新目标=", best.targetHid, "仇恨=", best.threat);
     IssueTargetOrder(敌人, "attack", best.targetRef);
     设置当前目标(敌人ID, best.targetHid);
   } else {

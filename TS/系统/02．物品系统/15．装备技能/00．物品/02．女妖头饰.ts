@@ -66,9 +66,7 @@ function 单位拥有装备(this: void, unit: any, itemTypeId: number): boolean 
 }
 
 export function 处理女妖头饰累计(this: void, target: any, attacker: any, applied: number): void {
-  debugLogForce("女妖头饰", "进入处理", "target:", target, "attacker:", attacker, "applied:", applied);
   if (target == null || target === 0 || attacker == null || attacker === 0 || !(applied > 0)) {
-    debugLogForce("女妖头饰", "提前返回: 参数无效");
     return;
   }
   const 女妖头饰物品 = 获取单位指定装备(target, 女妖头饰ID);
@@ -77,7 +75,6 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
     : null;
   const 有女妖头饰 = 女妖头饰物品 != null;
   const 有女妖头饰强化 = 女妖头饰强化物品 != null;
-  debugLogForce("女妖头饰", "有女妖头饰:", 有女妖头饰, "有强化:", 有女妖头饰强化, "女妖头饰ID:", 女妖头饰ID);
   if (!有女妖头饰 && !有女妖头饰强化) return;
 
   const hid = GetHandleId(target);
@@ -87,10 +84,7 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
       达到阈值后重置: true,
     });
     if (到达阈值) {
-      debugLogForce("女妖头饰", "达到累计阈值，开始对伤害来源发射暗影突袭", "累计值:", 女妖头饰累计配置.累计阈值, "阈值:", 女妖头饰累计配置.累计阈值);
-      debugLogForce("女妖头饰", "对伤害来源发射暗影突袭追踪", "source:", target, "target:", attacker);
       延后一帧执行伤害派生效果(() => {
-        debugLogForce("女妖头饰", "延后一帧发射暗影突袭", "source:", target, "target:", attacker);
         创建暗影突袭追踪(target, attacker, {
           减益: { duration: 2.0, damagePerSecond: 500 },
         });
@@ -101,9 +95,7 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
         const 达到次数阈值 = 下次次数 >= 女妖头饰强化累计配置.命中次数阈值;
         const 写回次数 = 达到次数阈值 ? 1 : 下次次数;
         SetItemCharges(女妖头饰强化物品, 写回次数);
-        debugLogForce("女妖头饰", "强化物品次数累加", "旧值:", 当前次数, "新值:", 下次次数, "写回:", 写回次数);
         if (达到次数阈值) {
-          debugLogForce("女妖头饰", "强化达到5次妖毒触发，使用doHeal恢复自身生命", "恢复值: 1000");
           doHeal({
             HealSource: target,
             HealTarget: target,

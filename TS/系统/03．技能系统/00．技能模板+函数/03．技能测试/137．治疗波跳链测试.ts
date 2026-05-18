@@ -30,7 +30,7 @@ const { isUnitAlly } = require("lib.扩展函数.自定义扩展函数.02．条�
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 
-const { 发起治疗波跳链 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.index") as {
+const { 发起治疗波跳链 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.治疗波跳链") as {
   发起治疗波跳链: (this: void, 参数: any) => any;
 };
 

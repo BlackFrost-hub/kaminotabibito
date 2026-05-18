@@ -135,6 +135,13 @@ function ____exports.isNotUsingInventoryItem(unit)
     local ITEM_USE_MAX = 852013
     return orderId < ITEM_USE_MIN or orderId > ITEM_USE_MAX
 end
+--- 判断是否为单体目标技能
+-- 约定：有目标单位就算单体，没有目标单位就不是单体
+-- 
+-- @param targetUnit 目标单位
+function ____exports.isSingleTargetSpell(targetUnit)
+    return targetUnit ~= nil and targetUnit ~= 0
+end
 function ____exports.matchUnitFilter(targetUnit, sourceUnit, options)
     if not targetUnit then
         return false
