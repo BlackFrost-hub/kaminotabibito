@@ -59,15 +59,12 @@ local AddGoldWithFeedback = ____require_result_2.AddGoldWithFeedback
 local fourCCToString = ____require_result_2.fourCCToString
 local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
-local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
-local KEY_TO_NAME = ____require_result_4.KEY_TO_NAME
-local findStatKey = ____require_result_4.findStatKey
-local getItemDataEntry = ____require_result_4.getItemDataEntry
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
-local ____G_6 = _G
-local onSecond = ____G_6.onSecond
-local offSecond = ____G_6.offSecond
+local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+applyEquipStatsTS = ____require_result_4.applyEquipStatsTS
+local ____G_5 = _G
+local onSecond = ____G_5.onSecond
+local offSecond = ____G_5.offSecond
 local function parsePowerUP(powerUpStr)
     local segments = {}
     local rawSegs = __TS__StringSplit(powerUpStr, "+")
@@ -155,7 +152,7 @@ local function parsePowerUP(powerUpStr)
                             elseif kl == "level" then
                                 effects[#effects + 1] = {type = "level", isPct = false, value = mult, isLevelMult = true}
                             else
-                                local ak = findStatKey(nil, rawKey)
+                                local ak = itemRelatedFns.findStatKey(rawKey)
                                 if ak ~= "" then
                                     effects[#effects + 1] = {
                                         type = "stat",
@@ -201,7 +198,7 @@ local function parsePowerUP(powerUpStr)
                                 }
                             end
                         else
-                            local ak = findStatKey(nil, rawKey)
+                            local ak = itemRelatedFns.findStatKey(rawKey)
                             if ak ~= "" then
                                 effects[#effects + 1] = {
                                     type = "stat",
@@ -312,28 +309,28 @@ local function executeSegment(unit, seg)
                     goldFixed[#goldFixed + 1] = {min = mn, max = mx}
                 end
             elseif eff.type == "exp" then
-                local ____eff_isLevelMult_7
+                local ____eff_isLevelMult_6
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(unit) * eff.value)
+                    ____eff_isLevelMult_6 = jass.R2I(getHeroLevel(unit) * eff.value)
                 else
-                    ____eff_isLevelMult_7 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_6 = jass.R2I(eff.value)
                 end
-                local amount = ____eff_isLevelMult_7
+                local amount = ____eff_isLevelMult_6
                 addHeroXP(unit, amount)
             elseif eff.type == "level" then
                 local cur = getHeroLevel(unit)
-                local ____eff_isLevelMult_8
+                local ____eff_isLevelMult_7
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(cur * eff.value)
                 else
-                    ____eff_isLevelMult_8 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(eff.value)
                 end
-                local add = ____eff_isLevelMult_8
+                local add = ____eff_isLevelMult_7
                 if add > 0 then
                     jass.SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
-                local name = KEY_TO_NAME[eff.key]
+                local name = itemRelatedFns.KEY_TO_NAME[eff.key]
                 if name == nil then
                     goto __continue56
                 end
@@ -380,20 +377,20 @@ local function executeSegment(unit, seg)
                 local mx = jass.R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
+                    local ____temp_8
+                    if mn < mx then
+                        ____temp_8 = mn
+                    else
+                        ____temp_8 = mx
+                    end
+                    local a = ____temp_8
                     local ____temp_9
                     if mn < mx then
-                        ____temp_9 = mn
-                    else
                         ____temp_9 = mx
-                    end
-                    local a = ____temp_9
-                    local ____temp_10
-                    if mn < mx then
-                        ____temp_10 = mx
                     else
-                        ____temp_10 = mn
+                        ____temp_9 = mn
                     end
-                    local b = ____temp_10
+                    local b = ____temp_9
                     delta = jass.GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
@@ -435,7 +432,7 @@ local function onUseItem()
     if IsUnitIllusionBJ(nil, unit) then
         return
     end
-    local entry = getItemDataEntry(nil, item)
+    local entry = itemRelatedFns.getItemDataEntry(item)
     if not entry or not entry.PowerUP then
         return
     end

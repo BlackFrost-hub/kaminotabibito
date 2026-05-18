@@ -17,17 +17,14 @@ const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数
   fourCCToString: (four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
 };
-const { STAT_CONFIG, NAME_TO_KEY, getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
+const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   STAT_CONFIG: { name: string; key: string }[];
   NAME_TO_KEY: Record<string, string>;
-  getItemDataEntry: (item: any) => any | null;
+  getItemDataEntry: (this: void, item: any) => any | null;
 };
 const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
-};
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 const { 装备等级颜色代码, 是否彩虹装备等级, 彩虹颜色文本, 去除颜色代码 } = require("系统.00．核心系统.01．颜色常量") as {
   装备等级颜色代码: (this: void, _?: undefined, level?: string) => string;
@@ -58,7 +55,7 @@ function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number
     if (idx < 0) continue;
     const name = p.substring(0, idx).trim();
     const valStr = p.substring(idx + 1).trim();
-    const key = NAME_TO_KEY[name];
+    const key = itemRelatedFns.NAME_TO_KEY[name];
     if (!key) continue;
     const isPct = valStr.indexOf("%") >= 0;
     const num = parseFloat(valStr) || 0;
@@ -95,7 +92,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     return;
   }
   const idStr = fourCCToString(jass.GetItemTypeId(item));
-  const itemData = getItemDataEntry(item);
+  const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) {
     if (isPickup) {
       const displayName = (typeof slk !== "undefined" && slk.item && (slk.item as Record<string, { name?: string }>)[idStr]?.name) || idStr;
@@ -128,7 +125,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     primary = parsePrimaryBonus(primaryBonus, primaryStr);
   }
   const merged: Record<string, number> = {};
-  for (const e of STAT_CONFIG) {
+  for (const e of itemRelatedFns.STAT_CONFIG) {
     merged[e.key] = (itemData[e.key] ?? 0) + (primary[e.key] ?? 0);
   }
   merged["moveSpeed"] = (itemData.moveSpeed ?? 0) + (primary["moveSpeed"] ?? 0);
@@ -140,7 +137,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     if (!isAdd) value = -value;
     playerStats.push({ name, value });
   };
-  for (const e of STAT_CONFIG) {
+  for (const e of itemRelatedFns.STAT_CONFIG) {
     addStat(merged[e.key], e.name);
   }
   const owner = jass.GetOwningPlayer(unit);
@@ -148,29 +145,14 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
 
   const actionText = isAdd ? "获得" : "丢弃";
   const levelText = String(itemData.level || "").trim();
-  debugLogForce(
-    "装备系统",
-    "装备数据调试",
-    "idStr=",
-    idStr,
-    "name=",
-    itemData.name ?? "nil",
-    "level=",
-    itemData.level ?? "nil",
-    "type=",
-    itemData.type ?? "nil"
-  );
-  debugLogForce("装备系统", "等级原始值", "text=", levelText, "len=", levelText.length);
-  const 装备原名 = itemData.name || "未知";
+      const 装备原名 = itemData.name || "未知";
   const 装备颜色代码 = 装备等级颜色代码(undefined, levelText);
   const coloredLevel = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, levelText) : 装备颜色代码 + levelText + "|r";
   const coloredName = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, 装备原名) : 装备颜色代码 + 装备原名 + "|r";
-  debugLogForce("装备系统", "装备提示调试", "coloredLevel=", coloredLevel, "coloredName=", coloredName);
-  // 消耗品丢弃不显示消息，但仍计算属性
+    // 消耗品丢弃不显示消息，但仍计算属性
   if (!isConsumable) {
     let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
-    debugLogForce("装备系统", "装备提示文本", "msg=", msg);
-    for (const stat of playerStats) {
+        for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
       const isPct = percentNames.indexOf(stat.name) >= 0;
       const v = isPct ? stat.value * 100 : stat.value;

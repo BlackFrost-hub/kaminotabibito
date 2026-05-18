@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
  * 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
@@ -24,10 +24,10 @@ const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
 };
-const { KEY_TO_NAME, findStatKey, getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
+const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   KEY_TO_NAME: Record<string, string>;
-  findStatKey: (raw: string) => string;
-  getItemDataEntry: (item: any) => any | null;
+  findStatKey: (this: void, raw: string) => string;
+  getItemDataEntry: (this: void, item: any) => any | null;
 };
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
   applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
@@ -109,7 +109,7 @@ function parsePowerUP(powerUpStr: string): Segment[] {
         } else if (kl === "level") {
           effects.push({ type: "level", isPct: false, value: mult, isLevelMult: true });
         } else {
-          const ak = findStatKey(rawKey);
+          const ak = itemRelatedFns.findStatKey(rawKey);
           if (ak !== "") effects.push({ type: "stat", key: ak, isPct: false, value: mult, isLevelMult: true });
         }
         continue;
@@ -140,7 +140,7 @@ function parsePowerUP(powerUpStr: string): Segment[] {
         if (isPct) effects.push({ type: "gold", isPct: true, value: num / 100, isLevelMult: false });
         else effects.push({ type: "gold", isPct: false, value: 0, isLevelMult: false, min: num, max: num });
       } else {
-        const ak = findStatKey(rawKey);
+        const ak = itemRelatedFns.findStatKey(rawKey);
         if (ak !== "") effects.push({ type: "stat", key: ak, isPct, value: isPct ? num / 100 : num, isLevelMult: false });
       }
     }
@@ -227,7 +227,7 @@ function executeSegment(unit: any, seg: Segment): void {
         (jass as any).SetHeroLevel(unit, cur + add, true);
       }
     } else if (eff.type === "stat" && eff.key !== undefined && eff.key !== "") {
-      const name = KEY_TO_NAME[eff.key];
+      const name = itemRelatedFns.KEY_TO_NAME[eff.key];
       if (name === undefined) continue;
       let val: number;
       if (eff.isPct) {
@@ -302,7 +302,7 @@ function onUseItem(): void {
   if (!unit || !item) return;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
   if (IsUnitIllusionBJ(unit)) return;
-  const entry = getItemDataEntry(item);
+  const entry = itemRelatedFns.getItemDataEntry(item);
   if (!entry || !entry.PowerUP) return;
 
   const glob = globalThis as any;

@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 物品加工系统（篝火 h00C）
  *
@@ -26,8 +26,8 @@ const itemEventCenter = require("系统.00．核心系统.01．事件中心.04�
   onItemPickup: (callback: (unit: any, item: any) => void) => number;
   onItemDrop: (callback: (unit: any, item: any) => void) => number;
 };
-const { getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as {
-  getItemDataEntry: (item: any) => any | null;
+const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
+  getItemDataEntry: (this: void, item: any) => any | null;
 };
 const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   withTimer: (delaySec: number, callback: () => void) => any;
@@ -200,7 +200,7 @@ function playFinishEffect(campfire: any): void {
 }
 
 function getRecipeForItem(item: any): RecipeParsed | null {
-  const entry = getItemDataEntry(item);
+  const entry = itemRelatedFns.getItemDataEntry(item);
   const recipe = entry && entry.recipe ? entry.recipe : undefined;
   if (!recipe) return null;
 

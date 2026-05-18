@@ -1,7 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
-function ____exports.UnitHasItemOfTypeBJ(self, whichUnit, itemTypeId)
+____exports["物品是否存在"] = function(item)
+    return item ~= nil and item ~= 0
+end
+function ____exports.UnitHasItemOfTypeBJ(whichUnit, itemTypeId)
     if not whichUnit then
         return false
     end
@@ -17,7 +22,7 @@ function ____exports.UnitHasItemOfTypeBJ(self, whichUnit, itemTypeId)
     end
     return false
 end
-function ____exports.UnitGetItemByTypeId(self, whichUnit, itemTypeId)
+function ____exports.UnitGetItemByTypeId(whichUnit, itemTypeId)
     if not whichUnit then
         return nil
     end
@@ -33,7 +38,7 @@ function ____exports.UnitGetItemByTypeId(self, whichUnit, itemTypeId)
     end
     return nil
 end
-function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
+function ____exports.GetInventoryIndexOfItemTypeBJ(whichUnit, itemId)
     if not whichUnit then
         return 0
     end
@@ -49,14 +54,14 @@ function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
     end
     return 0
 end
-function ____exports.GetItemOfTypeFromUnitBJ(self, whichUnit, itemId)
-    local index = ____exports.GetInventoryIndexOfItemTypeBJ(nil, whichUnit, itemId)
+function ____exports.GetItemOfTypeFromUnitBJ(whichUnit, itemId)
+    local index = ____exports.GetInventoryIndexOfItemTypeBJ(whichUnit, itemId)
     if index == 0 then
         return nil
     end
     return jass.UnitItemInSlot(whichUnit, index - 1)
 end
-function ____exports.GetItemTypeTotalCountByChargesBJ(self, whichUnit, itemId)
+function ____exports.GetItemTypeTotalCountByChargesBJ(whichUnit, itemId)
     if not whichUnit then
         return 0
     end
@@ -67,25 +72,25 @@ function ____exports.GetItemTypeTotalCountByChargesBJ(self, whichUnit, itemId)
             do
                 local item = jass.UnitItemInSlot(whichUnit, i)
                 if not item then
-                    goto __continue22
+                    goto __continue23
                 end
                 if jass.GetItemTypeId(item) ~= itemId then
-                    goto __continue22
+                    goto __continue23
                 end
                 local ch = jass.GetItemCharges(item)
                 total = total + (ch > 0 and ch or 1)
             end
-            ::__continue22::
+            ::__continue23::
             i = i + 1
         end
     end
     return total
 end
-function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, needCount)
+function ____exports.ConsumeItemTypeCountByChargesBJ(whichUnit, itemId, needCount)
     if not whichUnit or itemId == 0 or needCount <= 0 then
         return false
     end
-    local total = ____exports.GetItemTypeTotalCountByChargesBJ(nil, whichUnit, itemId)
+    local total = ____exports.GetItemTypeTotalCountByChargesBJ(whichUnit, itemId)
     if total < needCount then
         return false
     end
@@ -99,10 +104,10 @@ function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, ne
                 end
                 local item = jass.UnitItemInSlot(whichUnit, i)
                 if not item then
-                    goto __continue29
+                    goto __continue30
                 end
                 if jass.GetItemTypeId(item) ~= itemId then
-                    goto __continue29
+                    goto __continue30
                 end
                 local ch = jass.GetItemCharges(item)
                 if ch > 0 then
@@ -118,24 +123,24 @@ function ____exports.ConsumeItemTypeCountByChargesBJ(self, whichUnit, itemId, ne
                     jass.RemoveItem(item)
                 end
             end
-            ::__continue29::
+            ::__continue30::
             i = i + 1
         end
     end
     return remain <= 0
 end
-function ____exports.TryGiveItemToUnitBJ(self, targetUnit, item)
+function ____exports.TryGiveItemToUnitBJ(targetUnit, item)
     if not targetUnit or not item then
         return false
     end
     local ok = jass.UnitAddItem(targetUnit, item)
     return ok == true or ok == 1
 end
-function ____exports.ReturnItemToHeroOrDropBJ(self, item, fromUnit, hero)
+function ____exports.ReturnItemToHeroOrDropBJ(item, fromUnit, hero)
     if not item or not fromUnit or not hero then
         return "failed"
     end
-    if ____exports.TryGiveItemToUnitBJ(nil, hero, item) then
+    if ____exports.TryGiveItemToUnitBJ(hero, item) then
         return "added"
     end
     jass.UnitRemoveItem(fromUnit, item)

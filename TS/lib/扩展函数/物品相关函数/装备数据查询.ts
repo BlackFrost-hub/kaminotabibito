@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;

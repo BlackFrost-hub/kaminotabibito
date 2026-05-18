@@ -159,7 +159,7 @@ local function resolveSubmitItem(self, hero, requireItem)
                     goto __continue33
                 end
                 local testId = stringToFourCC(nil, c)
-                if UnitHasItemOfTypeBJ(nil, hero, testId) then
+                if UnitHasItemOfTypeBJ(hero, testId) then
                     local data = itemsData[c]
                     local itemLevel = data ~= nil and (data.level or "") or ""
                     return {itemId = testId, itemCode = c, itemLevel = itemLevel}
@@ -373,9 +373,9 @@ function ____exports.handleQuestSubmit(self, params)
             return
         end
         if quest.type == "给予" and not isSubmitItemMatchedRequire(nil, submitInfo, requireItem) then
-            local wrongItem = UnitGetItemByTypeId(nil, sourceUnit, itemId)
+            local wrongItem = UnitGetItemByTypeId(sourceUnit, itemId)
             if wrongItem then
-                local back = ReturnItemToHeroOrDropBJ(nil, wrongItem, sourceUnit, hero)
+                local back = ReturnItemToHeroOrDropBJ(wrongItem, sourceUnit, hero)
                 if useGenericGiveFailHint then
                     showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。")
                 else
@@ -394,14 +394,14 @@ function ____exports.handleQuestSubmit(self, params)
             end
             return
         end
-        local itemCount = GetItemTypeTotalCountByChargesBJ(nil, sourceUnit, itemId)
+        local itemCount = GetItemTypeTotalCountByChargesBJ(sourceUnit, itemId)
         if itemCount >= requireCount then
             if quest.type == "给予" then
                 local preview = previewRewardMatchWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
                 if preview.matchedRuleIndex < 0 and (string.find(quest.reward or "", ":", nil, true) or 0) - 1 >= 0 then
-                    local backItem = UnitGetItemByTypeId(nil, sourceUnit, itemId)
+                    local backItem = UnitGetItemByTypeId(sourceUnit, itemId)
                     if backItem then
-                        local back = ReturnItemToHeroOrDropBJ(nil, backItem, sourceUnit, hero)
+                        local back = ReturnItemToHeroOrDropBJ(backItem, sourceUnit, hero)
                         if useGenericGiveFailHint then
                             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。")
                         else
@@ -421,7 +421,7 @@ function ____exports.handleQuestSubmit(self, params)
                     return
                 end
             end
-            local consumed = ConsumeItemTypeCountByChargesBJ(nil, sourceUnit, itemId, requireCount)
+            local consumed = ConsumeItemTypeCountByChargesBJ(sourceUnit, itemId, requireCount)
             if consumed then
                 setQuestState(
                     nil,

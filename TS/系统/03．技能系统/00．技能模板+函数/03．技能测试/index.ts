@@ -39,3 +39,7 @@ export * from "./131．吟唱条测试";
 export * from "./132．伤害数字模型序列测试";
 export * from "./133．贝塞尔外部改向测试";
 export * from "./134．JASS随机数测试";
+export * from "./135．装备死亡事件测试";
+export * from "./137．治疗波跳链测试";
+export * from "./138．累计伤害装备测试";
+

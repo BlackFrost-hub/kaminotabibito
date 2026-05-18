@@ -18,20 +18,15 @@ local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_1.fourCCToString
 local isSpecialUnit = ____require_result_1.isSpecialUnit
-local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
-local STAT_CONFIG = ____require_result_2.STAT_CONFIG
-local NAME_TO_KEY = ____require_result_2.NAME_TO_KEY
-local getItemDataEntry = ____require_result_2.getItemDataEntry
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.index")
-local getObjectProperty = ____require_result_3.getObjectProperty
-local ObjectType = ____require_result_3.ObjectType
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_4.debugLogForce
-local ____require_result_5 = require("系统.00．核心系统.01．颜色常量")
-local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_5["装备等级颜色代码"]
-local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_5["是否彩虹装备等级"]
-local _____5F69_8679_989C_8272_6587_672C = ____require_result_5["彩虹颜色文本"]
-local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_5["去除颜色代码"]
+local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_2.getObjectProperty
+local ObjectType = ____require_result_2.ObjectType
+local ____require_result_3 = require("系统.00．核心系统.01．颜色常量")
+local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_3["装备等级颜色代码"]
+local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_3["是否彩虹装备等级"]
+local _____5F69_8679_989C_8272_6587_672C = ____require_result_3["彩虹颜色文本"]
+local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_3["去除颜色代码"]
 local EQUIP_EVENT_PLAYER_IDS = {
     0,
     1,
@@ -65,7 +60,7 @@ local function parsePrimaryBonus(self, s, primaryStr)
             end
             local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
             local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
-            local key = NAME_TO_KEY[name]
+            local key = itemRelatedFns.NAME_TO_KEY[name]
             if not key then
                 goto __continue5
             end
@@ -157,15 +152,15 @@ local function handleItemEvent(self, unit, item, isPickup)
         nil,
         jass.GetItemTypeId(item)
     )
-    local itemData = getItemDataEntry(nil, item)
+    local itemData = itemRelatedFns.getItemDataEntry(item)
     if not itemData then
         if isPickup then
-            local ____temp_8 = type(slk) ~= "nil" and slk.item
-            if ____temp_8 then
-                local ____opt_6 = slk.item[idStr]
-                ____temp_8 = ____opt_6 and ____opt_6.name
+            local ____temp_6 = type(slk) ~= "nil" and slk.item
+            if ____temp_6 then
+                local ____opt_4 = slk.item[idStr]
+                ____temp_6 = ____opt_4 and ____opt_4.name
             end
-            local displayName = ____temp_8 or idStr
+            local displayName = ____temp_6 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
             jass.DisplayTimedTextToPlayer(
@@ -187,13 +182,13 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local charges = jass.GetItemCharges(item)
-    local ____temp_9
+    local ____temp_7
     if charges > 0 then
-        ____temp_9 = charges
+        ____temp_7 = charges
     else
-        ____temp_9 = 1
+        ____temp_7 = 1
     end
-    local mult = ____temp_9
+    local mult = ____temp_7
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
@@ -204,19 +199,19 @@ local function handleItemEvent(self, unit, item, isPickup)
         primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
     end
     local merged = {}
-    for ____, e in ipairs(STAT_CONFIG) do
-        local ____e_key_11 = e.key
-        local ____itemData_e_key_10 = itemData[e.key]
-        if ____itemData_e_key_10 == nil then
-            ____itemData_e_key_10 = 0
+    for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
+        local ____e_key_9 = e.key
+        local ____itemData_e_key_8 = itemData[e.key]
+        if ____itemData_e_key_8 == nil then
+            ____itemData_e_key_8 = 0
         end
-        merged[____e_key_11] = ____itemData_e_key_10 + (primary[e.key] or 0)
+        merged[____e_key_9] = ____itemData_e_key_8 + (primary[e.key] or 0)
     end
-    local ____itemData_moveSpeed_12 = itemData.moveSpeed
-    if ____itemData_moveSpeed_12 == nil then
-        ____itemData_moveSpeed_12 = 0
+    local ____itemData_moveSpeed_10 = itemData.moveSpeed
+    if ____itemData_moveSpeed_10 == nil then
+        ____itemData_moveSpeed_10 = 0
     end
-    merged.moveSpeed = ____itemData_moveSpeed_12 + (primary.moveSpeed or 0)
+    merged.moveSpeed = ____itemData_moveSpeed_10 + (primary.moveSpeed or 0)
     local playerStats = {}
     local function addStat(____, val, name)
         if val == nil or val == 0 then
@@ -228,61 +223,19 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
         playerStats[#playerStats + 1] = {name = name, value = value}
     end
-    for ____, e in ipairs(STAT_CONFIG) do
+    for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
         addStat(nil, merged[e.key], e.name)
     end
     local owner = jass.GetOwningPlayer(unit)
     local playerName = jass.GetPlayerName(owner) or ""
     local actionText = isAdd and "获得" or "丢弃"
     local levelText = __TS__StringTrim(tostring(itemData.level or ""))
-    local ____debugLogForce_16 = debugLogForce
-    local ____itemData_name_13 = itemData.name
-    if ____itemData_name_13 == nil then
-        ____itemData_name_13 = "nil"
-    end
-    local ____itemData_level_14 = itemData.level
-    if ____itemData_level_14 == nil then
-        ____itemData_level_14 = "nil"
-    end
-    local ____itemData_type_15 = itemData.type
-    if ____itemData_type_15 == nil then
-        ____itemData_type_15 = "nil"
-    end
-    ____debugLogForce_16(
-        "装备系统",
-        "装备数据调试",
-        "idStr=",
-        idStr,
-        "name=",
-        ____itemData_name_13,
-        "level=",
-        ____itemData_level_14,
-        "type=",
-        ____itemData_type_15
-    )
-    debugLogForce(
-        "装备系统",
-        "等级原始值",
-        "text=",
-        levelText,
-        "len=",
-        #levelText
-    )
     local _____88C5_5907_539F_540D = itemData.name or "未知"
     local _____88C5_5907_989C_8272_4EE3_7801 = _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801(nil, levelText)
     local coloredLevel = _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7(nil, levelText) and _____5F69_8679_989C_8272_6587_672C(nil, levelText) or (_____88C5_5907_989C_8272_4EE3_7801 .. levelText) .. "|r"
     local coloredName = _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7(nil, levelText) and _____5F69_8679_989C_8272_6587_672C(nil, _____88C5_5907_539F_540D) or (_____88C5_5907_989C_8272_4EE3_7801 .. tostring(_____88C5_5907_539F_540D)) .. "|r"
-    debugLogForce(
-        "装备系统",
-        "装备提示调试",
-        "coloredLevel=",
-        coloredLevel,
-        "coloredName=",
-        coloredName
-    )
     if not isConsumable then
         local msg = ((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. coloredLevel) .. "级装备『") .. coloredName) .. "』"
-        debugLogForce("装备系统", "装备提示文本", "msg=", msg)
         for ____, stat in ipairs(playerStats) do
             local sign = stat.value > 0 and "+" or ""
             local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
@@ -323,15 +276,15 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_19 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_18 = unit
-        local ____isDrop_17
+        local ____equipMovespeed_getMaxMovespeed2Info_13 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_12 = unit
+        local ____isDrop_11
         if isDrop then
-            ____isDrop_17 = item
+            ____isDrop_11 = item
         else
-            ____isDrop_17 = nil
+            ____isDrop_11 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_19(equipMovespeed, ____unit_18, ____isDrop_17)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_13(equipMovespeed, ____unit_12, ____isDrop_11)
         if ms.value > 0 then
             test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end

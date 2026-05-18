@@ -1,0 +1,82 @@
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
+local ____exports = {}
+local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
+local _____5DE8_9B54_5927_5251_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["巨魔大剑物品ID"]
+local ____00_FF0E_65BD_6CD5_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.02．施法触发.00．施法触发配置")
+local _____5DE8_9B54_5927_5251_914D_7F6E = ____00_FF0E_65BD_6CD5_89E6_53D1_914D_7F6E["巨魔大剑配置"]
+---
+-- @noSelfInFile
+local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataSet = ____require_result_0.YDUserDataSet
+local YDUserDataClear = ____require_result_0.YDUserDataClear
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
+local getObjectPropertyInteger = ____require_result_1.getObjectPropertyInteger
+local ObjectType = ____require_result_1.ObjectType
+local CreateTimer = jass.CreateTimer
+local GetExpiredTimer = jass.GetExpiredTimer
+local GetHandleId = jass.GetHandleId
+local DestroyTimer = jass.DestroyTimer
+local TimerStart = jass.TimerStart
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
+local UnitHasItemOfTypeBJ = jass.UnitHasItemOfTypeBJ
+local _____5DE8_9B54_5927_5251_8BA1_65F6_5668_8868 = {}
+local function _____5355_4F4D_6301_6709_5DE8_9B54_5927_5251(_____5355_4F4D)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return false
+    end
+    if _____5DE8_9B54_5927_5251_7269_54C1ID <= 0 then
+        return false
+    end
+    return UnitHasItemOfTypeBJ(_____5355_4F4D, _____5DE8_9B54_5927_5251_7269_54C1ID) == true
+end
+local function _____5DE8_9B54_5927_5251_6761_4EF6_6210_7ACB(_____65BD_6CD5_5355_4F4D, _____6280_80FDID)
+    if not IsUnitType(_____65BD_6CD5_5355_4F4D, UNIT_TYPE_HERO) then
+        return false
+    end
+    if not _____5355_4F4D_6301_6709_5DE8_9B54_5927_5251(_____65BD_6CD5_5355_4F4D) then
+        return false
+    end
+    local DataB1 = getObjectPropertyInteger(ObjectType.ABILITY, _____6280_80FDID, "DataB1")
+    return DataB1 == 1 or DataB1 == 3
+end
+local function ____on_5DE8_9B54_5927_5251_6807_8BB0_7ED3_675F()
+    local _____8BA1_65F6_5668 = GetExpiredTimer()
+    if _____8BA1_65F6_5668 == nil or _____8BA1_65F6_5668 == 0 then
+        return
+    end
+    local _____8BA1_65F6_5668ID = GetHandleId(_____8BA1_65F6_5668)
+    local _____5355_4F4D = _____5DE8_9B54_5927_5251_8BA1_65F6_5668_8868[_____8BA1_65F6_5668ID]
+    __TS__Delete(_____5DE8_9B54_5927_5251_8BA1_65F6_5668_8868, _____8BA1_65F6_5668ID)
+    DestroyTimer(_____8BA1_65F6_5668)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return
+    end
+    YDUserDataSet(
+        "unit",
+        _____5355_4F4D,
+        _____5DE8_9B54_5927_5251_914D_7F6E["标记名"],
+        "boolean",
+        false
+    )
+    YDUserDataClear("unit", _____5355_4F4D, _____5DE8_9B54_5927_5251_914D_7F6E["标记名"], "boolean")
+end
+____exports["处理巨魔大剑施法"] = function(_____65BD_6CD5_5355_4F4D, _____6280_80FDID)
+    if not _____5DE8_9B54_5927_5251_6761_4EF6_6210_7ACB(_____65BD_6CD5_5355_4F4D, _____6280_80FDID) then
+        return
+    end
+    YDUserDataSet(
+        "unit",
+        _____65BD_6CD5_5355_4F4D,
+        _____5DE8_9B54_5927_5251_914D_7F6E["标记名"],
+        "boolean",
+        true
+    )
+    local _____8BA1_65F6_5668 = CreateTimer()
+    local _____8BA1_65F6_5668ID = GetHandleId(_____8BA1_65F6_5668)
+    _____5DE8_9B54_5927_5251_8BA1_65F6_5668_8868[_____8BA1_65F6_5668ID] = _____65BD_6CD5_5355_4F4D
+    TimerStart(_____8BA1_65F6_5668, _____5DE8_9B54_5927_5251_914D_7F6E["持续时间"], false, ____on_5DE8_9B54_5927_5251_6807_8BB0_7ED3_675F)
+end
+return ____exports

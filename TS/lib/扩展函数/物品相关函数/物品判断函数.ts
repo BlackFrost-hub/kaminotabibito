@@ -1,4 +1,11 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
+
+// 检查物品句柄是否有效（非null且非0）
+export function 物品是否存在(this: void, item: any): boolean {
+  return item != null && item !== 0;
+}
 
 // ========== 虚拟分区：物品判断 ==========
 // 判断单位背包中是否存在指定类型物品。

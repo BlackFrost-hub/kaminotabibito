@@ -1,0 +1,42 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+local jass = require("jass.common")
+local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_0.registerManualBuff
+local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
+local startHot = ____require_result_1.startHot
+local GetUnitName = jass.GetUnitName
+local function _____5730_72F1_706B_5361_724C_7ED3_675F_6761_4EF6_6052_771F(______76EE_6807_5355_4F4D)
+    return true
+end
+____exports["施加地狱火卡牌持续恢复"] = function(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, _____53C2_6570)
+    if _____6765_6E90_5355_4F4D == nil or _____6765_6E90_5355_4F4D == 0 then
+        return
+    end
+    if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
+        return
+    end
+    registerManualBuff(
+        _____76EE_6807_5355_4F4D,
+        _____53C2_6570.BuffID,
+        _____53C2_6570["持续时间"],
+        _____53C2_6570["每跳生命恢复"],
+        {
+            sourceName = GetUnitName(_____6765_6E90_5355_4F4D),
+            iconOverride = _____53C2_6570["图标路径"],
+            effectModelOverride = _____53C2_6570["特效路径"]
+        }
+    )
+    startHot(
+        _____76EE_6807_5355_4F4D,
+        _____6765_6E90_5355_4F4D,
+        _____53C2_6570["每跳生命恢复"],
+        0,
+        _____53C2_6570["持续时间"],
+        _____53C2_6570["间隔"],
+        {["结束条件检测"] = _____5730_72F1_706B_5361_724C_7ED3_675F_6761_4EF6_6052_771F, ["特效"] = {["特效路径"] = _____53C2_6570["特效路径"], ["特效挂点"] = _____53C2_6570["特效挂点"], ["是否绑定单位"] = true, ["特效键"] = _____53C2_6570["特效键"]}}
+    )
+end
+return ____exports

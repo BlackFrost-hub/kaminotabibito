@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
@@ -91,7 +93,7 @@ end
 if not ____exports.NAME_TO_KEY["移速"] then
     ____exports.NAME_TO_KEY["移速"] = "moveSpeed"
 end
-function ____exports.findStatKey(self, raw)
+function ____exports.findStatKey(raw)
     if ____exports.KEY_TO_NAME[raw] ~= nil then
         return raw
     end
@@ -103,7 +105,7 @@ function ____exports.findStatKey(self, raw)
     end
     return ""
 end
-function ____exports.getItemDataEntry(self, item)
+function ____exports.getItemDataEntry(item)
     if item == nil or item == 0 then
         return nil
     end
@@ -118,7 +120,7 @@ function ____exports.getItemDataEntry(self, item)
     end
     return entry
 end
-function ____exports.getItemDataEntryByIdStr(self, idStr)
+function ____exports.getItemDataEntryByIdStr(idStr)
     if not idStr then
         return nil
     end
@@ -128,11 +130,11 @@ function ____exports.getItemDataEntryByIdStr(self, idStr)
     end
     return entry
 end
-function ____exports.getItemDataEntryByTypeId(self, itemTypeId)
+function ____exports.getItemDataEntryByTypeId(itemTypeId)
     if itemTypeId == nil or itemTypeId == 0 then
         return nil
     end
     local idStr = fourCCToString(nil, itemTypeId)
-    return ____exports.getItemDataEntryByIdStr(nil, idStr)
+    return ____exports.getItemDataEntryByIdStr(idStr)
 end
 return ____exports
