@@ -12,6 +12,12 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+
+/** 当前生命/魔法：jass；最大生命/魔法及扩展属性：japi（与 SGSS / 物编面板一致） */
+const GetUnitStateJass = jass.GetUnitState as (unit: any, state: any) => number;
+const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 
 import {
   HEAL_SYSTEM_ENABLED,
@@ -19,7 +25,9 @@ import {
   HEAL_RESULT_KEYS,
   HEAL_STATS_KEYS,
   DEFAULT_HEAL_EFFECT_PATH,
+  DEFAULT_MANA_HEAL_EFFECT_PATH,
   HEAL_TEXT_COLOR,
+  MANA_TEXT_COLOR,
   ATTR_HEAL_RATE,
   ATTR_RECEIVED_HEAL_RATE,
 } from "./00．常量定义";
@@ -49,12 +57,16 @@ type HealEventListener = (source: any, target: any, amount: number, isItemHeal: 
 
 /** 治疗参数（与JASS端参数名一致） */
 export interface HealParams {
-  HealSource: any;       // 治疗来源（可为null）
-  HealTarget: any;       // 治疗目标
-  HealAmount: number;    // 基础治疗量
-  ItemHeal: boolean;     // 是否物品治疗
-  HealEffect: boolean;   // 是否播放特效
-  HealEffectPath?: string; // 特效路径（可选）
+  HealSource: any;         // 治疗来源（可为null）
+  HealTarget: any;         // 治疗目标
+  HealAmount: number;      // 基础治疗量（可为0，仅回魔时）
+  HealManaAmount?: number; // 基础魔法恢复量（可选，默认0）
+  ItemHeal: boolean;       // 是否物品治疗
+  HealEffect: boolean;     // 是否播放生命治疗特效
+  HealEffectPath?: string; // 生命治疗特效路径（可选）
+  ManaEffect?: boolean;    // 是否播放魔法恢复特效
+  ManaEffectPath?: string; // 魔法恢复特效路径（可选）
+  ManaShowText?: boolean;  // 是否显示魔法恢复漂浮字（默认true）
 }
 
 // ==========================================================================================
@@ -130,8 +142,8 @@ function calcHealAmount(source: any, target: any, baseAmount: number): number {
 /** 获取已损失生命值 */
 function getMissingLife(target: any): number {
   if (target == null) return 0;
-  const maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE);
-  const curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE);
+  const maxLife = GetUnitStateJapi(target, jass.UNIT_STATE_MAX_LIFE);
+  const curLife = GetUnitStateJass(target, jass.UNIT_STATE_LIFE);
   const missing = maxLife - curLife;
   return missing > 0 ? missing : 0;
 }
@@ -144,6 +156,65 @@ function playHealEffect(target: any, effectPath?: string): void {
   const y = jass.GetUnitY(target);
   const eff = jass.AddSpecialEffect(path, x, y);
   if (eff != null) jass.DestroyEffect(eff);
+}
+
+/** 获取已损失魔法值 */
+function getMissingMana(target: any): number {
+  if (target == null) return 0;
+  const maxMana = GetUnitStateJapi(target, jass.UNIT_STATE_MAX_MANA);
+  const curMana = GetUnitStateJass(target, jass.UNIT_STATE_MANA);
+  const missing = maxMana - curMana;
+  return missing > 0 ? missing : 0;
+}
+
+/** 播放魔法恢复特效 */
+function playManaEffect(target: any, effectPath?: string): void {
+  if (target == null) return;
+  const path = (effectPath != null && effectPath !== "") ? effectPath : DEFAULT_MANA_HEAL_EFFECT_PATH;
+  const eff = jass.AddSpecialEffectTarget(path, target, "origin");
+  if (eff != null) jass.DestroyEffect(eff);
+}
+
+/** 显示魔法恢复漂浮字 */
+function fireManaShowEvent(target: any, amount: number): void {
+  显示单位数值漂浮文字(target, amount, {
+    红: MANA_TEXT_COLOR.red,
+    绿: MANA_TEXT_COLOR.green,
+    蓝: MANA_TEXT_COLOR.blue,
+  });
+}
+
+/** 执行魔法恢复（不超过已损失魔法） */
+function applyManaRestore(target: any, baseAmount: number): number {
+  if (target == null || baseAmount <= 0) return 0;
+
+  const missingMana = getMissingMana(target);
+  const actualMana = baseAmount < missingMana ? baseAmount : missingMana;
+  if (actualMana <= 0) return 0;
+
+  const curMana = GetUnitStateJass(target, jass.UNIT_STATE_MANA);
+  SetUnitStateJass(target, jass.UNIT_STATE_MANA, curMana + actualMana);
+  return actualMana;
+}
+
+/** 仅执行魔法恢复（供 doManaRegen 等便捷入口） */
+export function restoreMana(
+  target: any,
+  amount: number,
+  manaEffect: boolean = false,
+  manaEffectPath?: string,
+  manaShowText: boolean = true
+): number {
+  if (!HEAL_SYSTEM_ENABLED) return 0;
+  if (target == null || amount <= 0) return 0;
+  if (jass.IsUnitType(target, jass.UNIT_TYPE_DEAD)) return 0;
+
+  const actualMana = applyManaRestore(target, amount);
+  if (actualMana <= 0) return 0;
+
+  if (manaEffect) playManaEffect(target, manaEffectPath);
+  if (manaShowText) fireManaShowEvent(target, actualMana);
+  return actualMana;
 }
 
 /**
@@ -244,44 +315,61 @@ function addPlayerHealStats(target: any, source: any, amount: number): void {
 export function doHeal(params: HealParams): number {
   if (!HEAL_SYSTEM_ENABLED) return 0;
 
-  const { HealSource, HealTarget, HealAmount, ItemHeal, HealEffect, HealEffectPath } = params;
+  const {
+    HealSource,
+    HealTarget,
+    HealAmount,
+    HealManaAmount = 0,
+    ItemHeal,
+    HealEffect,
+    HealEffectPath,
+    ManaEffect = false,
+    ManaEffectPath,
+    ManaShowText = true,
+  } = params;
 
   // 参数校验
-  if (HealTarget == null || HealAmount <= 0) return 0;
+  if (HealTarget == null) return 0;
   if (jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD)) return 0;
+  if (HealAmount <= 0 && HealManaAmount <= 0) return 0;
 
-  // 计算治疗量
-  let amount = calcHealAmount(HealSource, HealTarget, HealAmount);
+  let actualHeal = 0;
 
-  // 执行回调
-  for (const cb of healCallbacks) {
-    try { amount = cb(HealSource, HealTarget, amount, ItemHeal); } catch (_e) {}
+  if (HealAmount > 0) {
+    // 计算治疗量
+    let amount = calcHealAmount(HealSource, HealTarget, HealAmount);
+
+    // 执行回调
+    for (const cb of healCallbacks) {
+      try { amount = cb(HealSource, HealTarget, amount, ItemHeal); } catch (_e) {}
+    }
+
+    if (amount > 0) {
+      // 限制不超过已损失生命
+      const missingLife = getMissingLife(HealTarget);
+      actualHeal = amount < missingLife ? amount : missingLife;
+
+      if (actualHeal > 0) {
+        const curLife = GetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE);
+        SetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal);
+
+        if (HealEffect) playHealEffect(HealTarget, HealEffectPath);
+
+        fireShowDamageEvent(HealTarget, actualHeal);
+        fireHealEvent(HealSource, HealTarget, actualHeal);
+
+        addHealStats(HealTarget, actualHeal);
+        addPlayerHealStats(HealTarget, HealSource, actualHeal);
+
+        for (const listener of healEventListeners) {
+          try { listener(HealSource, HealTarget, actualHeal, ItemHeal); } catch (_e) {}
+        }
+      }
+    }
   }
-  if (amount <= 0) return 0;
 
-  // 限制不超过已损失生命
-  const missingLife = getMissingLife(HealTarget);
-  const actualHeal = amount < missingLife ? amount : missingLife;
-  if (actualHeal <= 0) return 0;
-
-  // 设置生命值
-  const curLife = jass.GetUnitState(HealTarget, jass.UNIT_STATE_LIFE);
-  jass.SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal);
-
-  // 播放特效
-  if (HealEffect) playHealEffect(HealTarget, HealEffectPath);
-
-  // 触发事件
-  fireShowDamageEvent(HealTarget, actualHeal);
-  fireHealEvent(HealSource, HealTarget, actualHeal);
-
-  // 统计
-  addHealStats(HealTarget, actualHeal);
-  addPlayerHealStats(HealTarget, HealSource, actualHeal);
-
-  // 通知监听器
-  for (const listener of healEventListeners) {
-    try { listener(HealSource, HealTarget, actualHeal, ItemHeal); } catch (_e) {}
+  if (HealManaAmount > 0) {
+    restoreMana(HealTarget, HealManaAmount, ManaEffect, ManaEffectPath, ManaShowText);
   }
 
   return actualHeal;
@@ -293,16 +381,50 @@ export function doHeal(params: HealParams): number {
 
 /** 技能治疗 */
 export function spellHeal(
-  source: any, target: any, amount: number, showEffect: boolean = true, effectPath?: string
+  source: any,
+  target: any,
+  amount: number,
+  showEffect: boolean = true,
+  effectPath?: string,
+  manaAmount: number = 0,
+  showManaEffect: boolean = false,
+  manaEffectPath?: string
 ): number {
-  return doHeal({ HealSource: source, HealTarget: target, HealAmount: amount, ItemHeal: false, HealEffect: showEffect, HealEffectPath: effectPath });
+  return doHeal({
+    HealSource: source,
+    HealTarget: target,
+    HealAmount: amount,
+    HealManaAmount: manaAmount,
+    ItemHeal: false,
+    HealEffect: showEffect,
+    HealEffectPath: effectPath,
+    ManaEffect: showManaEffect,
+    ManaEffectPath: manaEffectPath,
+  });
 }
 
 /** 物品治疗 */
 export function itemHeal(
-  source: any, target: any, amount: number, showEffect: boolean = true, effectPath?: string
+  source: any,
+  target: any,
+  amount: number,
+  showEffect: boolean = true,
+  effectPath?: string,
+  manaAmount: number = 0,
+  showManaEffect: boolean = false,
+  manaEffectPath?: string
 ): number {
-  return doHeal({ HealSource: source, HealTarget: target, HealAmount: amount, ItemHeal: true, HealEffect: showEffect, HealEffectPath: effectPath });
+  return doHeal({
+    HealSource: source,
+    HealTarget: target,
+    HealAmount: amount,
+    HealManaAmount: manaAmount,
+    ItemHeal: true,
+    HealEffect: showEffect,
+    HealEffectPath: effectPath,
+    ManaEffect: showManaEffect,
+    ManaEffectPath: manaEffectPath,
+  });
 }
 
 /** 生命恢复（无特效无来源） */
@@ -324,4 +446,3 @@ export function isHealSystemEnabled(): boolean {
 }
 
 export {};
-/** @noSelfInFile */

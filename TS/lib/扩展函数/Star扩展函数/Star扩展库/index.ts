@@ -9,7 +9,6 @@ export * from "./07．特效组系统";
 export * from "./08．单位判定与筛选函数";
 export * from "./09．单位基础与生命周期函数";
 export * from "./10．单位属性方位与攻击函数";
-export * from "./11．物品技能事件";
 export * from "./12．StarBase基础函数";
 
 import * as cameraFunc from "./00．镜头函数";
@@ -23,7 +22,6 @@ import * as effectGroup from "./07．特效组系统";
 import * as unitCondition from "./08．单位判定与筛选函数";
 import * as unitBase from "./09．单位基础与生命周期函数";
 import * as unitAttr from "./10．单位属性方位与攻击函数";
-import * as itemAbility from "./11．物品技能事件";
 import * as starBase from "./12．StarBase基础函数";
 
 function expose(name: string, fn: any): void {
@@ -130,14 +128,6 @@ export function registerBridge(): void {
   expose("SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit);
   expose("SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit);
   expose("SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk);
-  // 物品技能事件
-  expose("SU_AddItemAbilityEvent", itemAbility.SU_AddItemAbilityEvent);
-  expose("SU_InititemAbilityListener", itemAbility.SU_InititemAbilityListener);
-  expose("SU_GetLastSpellItemAbility", itemAbility.SU_GetLastSpellItemAbility);
-  expose("SU_GetLastSpellItemAbilityTargetX", itemAbility.SU_GetLastSpellItemAbilityTargetX);
-  expose("SU_GetLastSpellItemAbilityTargetY", itemAbility.SU_GetLastSpellItemAbilityTargetY);
-  expose("SU_GetLastSpellItemAbilityTargetUnit", itemAbility.SU_GetLastSpellItemAbilityTargetUnit);
-  expose("SU_GetLastSpellItemAbilityTargetPoint", itemAbility.SU_GetLastSpellItemAbilityTargetPoint);
   // StarBase基础函数
   expose("Star_CoordinateX", starBase.Star_CoordinateX);
   expose("Star_CoordinateY", starBase.Star_CoordinateY);

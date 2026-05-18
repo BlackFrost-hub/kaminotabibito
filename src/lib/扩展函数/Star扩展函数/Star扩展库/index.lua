@@ -11,7 +11,6 @@ local effectGroup = require("lib.扩展函数.Star扩展函数.Star扩展库.07�
 local unitCondition = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
 local unitBase = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
 local unitAttr = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
-local itemAbility = require("lib.扩展函数.Star扩展函数.Star扩展库.11．物品技能事件")
 local starBase = require("lib.扩展函数.Star扩展函数.Star扩展库.12．StarBase基础函数")
 do
     local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
@@ -95,14 +94,6 @@ do
 end
 do
     local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.11．物品技能事件")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -216,13 +207,6 @@ function ____exports.registerBridge(self)
     expose(nil, "SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit)
     expose(nil, "SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit)
     expose(nil, "SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk)
-    expose(nil, "SU_AddItemAbilityEvent", itemAbility.SU_AddItemAbilityEvent)
-    expose(nil, "SU_InititemAbilityListener", itemAbility.SU_InititemAbilityListener)
-    expose(nil, "SU_GetLastSpellItemAbility", itemAbility.SU_GetLastSpellItemAbility)
-    expose(nil, "SU_GetLastSpellItemAbilityTargetX", itemAbility.SU_GetLastSpellItemAbilityTargetX)
-    expose(nil, "SU_GetLastSpellItemAbilityTargetY", itemAbility.SU_GetLastSpellItemAbilityTargetY)
-    expose(nil, "SU_GetLastSpellItemAbilityTargetUnit", itemAbility.SU_GetLastSpellItemAbilityTargetUnit)
-    expose(nil, "SU_GetLastSpellItemAbilityTargetPoint", itemAbility.SU_GetLastSpellItemAbilityTargetPoint)
     expose(nil, "Star_CoordinateX", starBase.Star_CoordinateX)
     expose(nil, "Star_CoordinateY", starBase.Star_CoordinateY)
     expose(nil, "Star_GetLocZ", starBase.Star_GetLocZ)

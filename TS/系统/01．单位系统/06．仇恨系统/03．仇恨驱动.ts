@@ -87,7 +87,6 @@ function nowMs(): number {
 }
 
 function 清理敌人仇恨状态(敌人ID: number): void {
-  debugLogForce(模块名, "清理敌人仇恨状态 敌人ID=", 敌人ID);
   清除仇恨显示ById(敌人ID);
   clearAllThreatById(敌人ID);
 }
@@ -128,7 +127,6 @@ function onTick(): void {
     }
 
     if (IsUnitType(敌人, UNIT_TYPE_DEAD)) {
-      debugLogForce(模块名, "驱动清理：敌人已死亡 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }

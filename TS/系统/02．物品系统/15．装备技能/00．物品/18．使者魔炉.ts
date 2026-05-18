@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -103,6 +108,8 @@ function 启动命中恢复(this: void, 特效: any, 目标列表: any[]): void 
 }
 
 export function 处理使者魔炉使用(this: void, 上下文: 物品技能事件上下文): void {
+  debugLogForce("18．使者魔炉", "进入", "处理使者魔炉使用");
+
   if (!是否为使者魔炉(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;
   const 目标单位 = 上下文.目标单位;

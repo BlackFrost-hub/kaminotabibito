@@ -1,7 +1,22 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
 const slk = require("jass.slk") as any;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const StringHash = jass.StringHash as (value: string) => number;
+const LoadReal = jass.LoadReal as (table: any, parent: number, child: number) => number;
+const SaveReal = jass.SaveReal as (table: any, parent: number, child: number, value: number) => void;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
+const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => void;
+const IncUnitAbilityLevel = jass.IncUnitAbilityLevel as (unit: any, abilityId: number) => void;
+const DecUnitAbilityLevel = jass.DecUnitAbilityLevel as (unit: any, abilityId: number) => void;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
+const EXGetUnitAbility = japi.EXGetUnitAbility as (unit: any, abilityId: number) => any;
+const EXSetAbilityDataReal = japi.EXSetAbilityDataReal as (ability: any, level: number, field: number, value: number) => void;
 
 function hashHandle(): any {
   const g = globalThis as any;
@@ -20,23 +35,23 @@ function hashHandle(): any {
 }
 
 function h2i(u: any): number {
-  return (jass.GetHandleId(u) as number) || 0;
+  return GetHandleId(u) || 0;
 }
 
 function sh(name: string): number {
-  return (jass.StringHash(name) as number) || 0;
+  return StringHash(name) || 0;
 }
 
 function loadReal(u: any, key: number): number {
   const hh = hashHandle();
   if (!hh) return 0;
-  return (jass.LoadReal(hh, h2i(u), key) as number) || 0;
+  return LoadReal(hh, h2i(u), key) || 0;
 }
 
 function saveReal(u: any, key: number, value: number): void {
   const hh = hashHandle();
   if (!hh) return;
-  jass.SaveReal(hh, h2i(u), key, value);
+  SaveReal(hh, h2i(u), key, value);
 }
 
 function resolveAbilityCode(raw: string): number {
@@ -61,29 +76,29 @@ function resolveAbilityCode(raw: string): number {
 function setAbilityDataA(u: any, raw: string, value: number): void {
   const code = resolveAbilityCode(raw);
   if (!u || code === 0) return;
-  if (jass.GetUnitAbilityLevel(u, code) === 0) {
-    jass.UnitAddAbility(u, code);
+  if (GetUnitAbilityLevel(u, code) === 0) {
+    UnitAddAbility(u, code);
   }
-  const abil = japi.EXGetUnitAbility(u, code);
-  if (abil) japi.EXSetAbilityDataReal(abil, 1, 108, value);
-  jass.IncUnitAbilityLevel(u, code);
-  jass.DecUnitAbilityLevel(u, code);
+  const abil = EXGetUnitAbility(u, code);
+  if (abil) EXSetAbilityDataReal(abil, 1, 108, value);
+  IncUnitAbilityLevel(u, code);
+  DecUnitAbilityLevel(u, code);
 }
 
 function setAbilityDataABC(u: any, raw: string, a: number, b: number, c: number): void {
   const code = resolveAbilityCode(raw);
   if (!u || code === 0) return;
-  if (jass.GetUnitAbilityLevel(u, code) === 0) {
-    jass.UnitAddAbility(u, code);
+  if (GetUnitAbilityLevel(u, code) === 0) {
+    UnitAddAbility(u, code);
   }
-  const abil = japi.EXGetUnitAbility(u, code);
+  const abil = EXGetUnitAbility(u, code);
   if (abil) {
-    japi.EXSetAbilityDataReal(abil, 1, 110, a);
-    japi.EXSetAbilityDataReal(abil, 1, 108, b);
-    japi.EXSetAbilityDataReal(abil, 1, 109, c);
+    EXSetAbilityDataReal(abil, 1, 110, a);
+    EXSetAbilityDataReal(abil, 1, 108, b);
+    EXSetAbilityDataReal(abil, 1, 109, c);
   }
-  jass.IncUnitAbilityLevel(u, code);
-  jass.DecUnitAbilityLevel(u, code);
+  IncUnitAbilityLevel(u, code);
+  DecUnitAbilityLevel(u, code);
 }
 
 function setAtk(u: any, v: number): void {
@@ -117,26 +132,26 @@ function setState3(u: any, s: number, a: number, i: number): void {
 function setHp(u: any, v: number): void {
   const key = sh("生命");
   const oldAdd = loadReal(u, key);
-  const oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
-  const oldLife = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
+  const oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const oldLife = GetUnitState(u, jass.UNIT_STATE_LIFE);
   const ratio = oldMax > 0.405 ? oldLife / oldMax : 1.0;
   const newAdd = oldAdd + v;
   const newMax = oldMax - oldAdd + newAdd;
-  jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, newMax);
-  if (oldLife > 0.405) jass.SetUnitState(u, jass.UNIT_STATE_LIFE, newMax * ratio);
+  SetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE, newMax);
+  if (oldLife > 0.405) SetUnitStateJass(u, jass.UNIT_STATE_LIFE, newMax * ratio);
   saveReal(u, key, newAdd);
 }
 
 function setMp(u: any, v: number): void {
   const key = sh("法力");
   const oldAdd = loadReal(u, key);
-  const oldMax = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA);
-  const oldMana = jass.GetUnitState(u, jass.UNIT_STATE_MANA);
+  const oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_MANA);
+  const oldMana = GetUnitState(u, jass.UNIT_STATE_MANA);
   const ratio = oldMax > 0 ? oldMana / oldMax : 1.0;
   const newAdd = oldAdd + v;
   const newMax = oldMax - oldAdd + newAdd;
-  jass.SetUnitState(u, jass.UNIT_STATE_MAX_MANA, newMax);
-  jass.SetUnitState(u, jass.UNIT_STATE_MANA, newMax * ratio);
+  SetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA, newMax);
+  SetUnitStateJass(u, jass.UNIT_STATE_MANA, newMax * ratio);
   saveReal(u, key, newAdd);
 }
 
@@ -176,7 +191,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
   if (id === 7) {
     const pv = loadReal(u, hpPct);
     const av = loadReal(u, hpAdd);
-    const base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av;
+    const base = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av;
     const npv = pv + v;
     const nav = base * npv;
     if (av !== nav) {
@@ -188,7 +203,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
   } else if (id === 8) {
     const pv = loadReal(u, mpPct);
     const av = loadReal(u, mpAdd);
-    const base = jass.GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av;
+    const base = GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av;
     const npv = pv + v;
     const nav = base * npv;
     if (av !== nav) {

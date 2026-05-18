@@ -11,7 +11,7 @@ const equipLimit = require("系统.02．物品系统.10．装备限制") as { eq
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
-  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
+  applyEquipStatsTS: (this: void, unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
 };
 const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (four: number) => string;

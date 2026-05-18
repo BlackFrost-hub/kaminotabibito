@@ -1,5 +1,5 @@
 const { SGSS_SetStatePercentumEX2 } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
-    SGSS_SetStatePercentumEX2: (u: any, id: number, v: number) => void;
+    SGSS_SetStatePercentumEX2: (this: void, u: any, id: number, v: number) => void;
 };
 
 /**
@@ -34,8 +34,8 @@ const basePercentRegistry: Record<string, PercentApply> = {
   "护甲": (unit, value) => callGSUnitPry(unit, 15, value),
 };
 
-function callGSUnitPry(unit: any, id: number, value: number): void {
-  const fn = (globalThis as any).GS_UnitPry;
+function callGSUnitPry(this: void, unit: any, id: number, value: number): void {
+  const fn = (globalThis as any).GS_UnitPry as ((this: void, unit: any, change: number, ptytype: number, value: number) => void) | undefined;
   if (typeof fn === "function") fn(unit, 0, id, value);
 }
 
@@ -71,7 +71,7 @@ function applyFromRegistry(mode: PercentMode, base: string, unit: any, value: nu
   return false;
 }
 
-export function registerDynamicPercentProperty(mode: PercentMode, key: string, applier: PercentApply): void {
+export function registerDynamicPercentProperty(this: void, mode: PercentMode, key: string, applier: PercentApply): void {
   const normalized = normalizeKey(key);
   if (normalized === "") return;
   if (mode === "max") {
@@ -81,7 +81,7 @@ export function registerDynamicPercentProperty(mode: PercentMode, key: string, a
   }
 }
 
-export function applyDynamicPercentProperty(unit: any, statName: string, value: number): boolean {
+export function applyDynamicPercentProperty(this: void, unit: any, statName: string, value: number): boolean {
   if (!unit || value === 0) return false;
   const parsed = trimPercentName(statName);
   if (parsed.mode === "none" || parsed.base === "") return false;
@@ -89,3 +89,4 @@ export function applyDynamicPercentProperty(unit: any, statName: string, value: 
 }
 
 export {};
+/** @noSelfInFile */

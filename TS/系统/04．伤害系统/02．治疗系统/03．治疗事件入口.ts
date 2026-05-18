@@ -28,8 +28,11 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
+    HealManaAmount?: number;
     ItemHeal: boolean;
     HealEffect: boolean;
+    ManaEffect?: boolean;
+    ManaEffectPath?: string;
   }) => number;
 };
 const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
@@ -128,17 +131,21 @@ function onHealEventStes(this: void): void {
     const target = ydlStes_readUnit5(undefined, HEAL_REQUEST_KEYS.TARGET);
     const source = ydlStes_readUnit5(undefined, HEAL_REQUEST_KEYS.SOURCE);
     const amount = ydlStes_readReal5(undefined, HEAL_REQUEST_KEYS.AMOUNT);
+    const manaAmount = ydlStes_readReal5(undefined, HEAL_REQUEST_KEYS.MANA_AMOUNT);
     const healEffect = ydlStes_readBoolean5(undefined, HEAL_REQUEST_KEYS.EFFECT);
+    const manaEffect = ydlStes_readBoolean5(undefined, HEAL_REQUEST_KEYS.MANA_EFFECT);
 
     if (target == null || target === 0) return;
-    if (amount <= 0) return;
+    if (amount <= 0 && manaAmount <= 0) return;
 
     doHeal({
       HealSource: source,
       HealTarget: target,
       HealAmount: amount,
+      HealManaAmount: manaAmount,
       ItemHeal: false,
       HealEffect: healEffect,
+      ManaEffect: manaEffect,
     });
   } finally {
     ydlStes_finishChildCleanup(undefined);

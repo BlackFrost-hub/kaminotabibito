@@ -102,19 +102,23 @@ local function onHealEventStes()
             local target = ydlStes_readUnit5(nil, nil, HEAL_REQUEST_KEYS.TARGET)
             local source = ydlStes_readUnit5(nil, nil, HEAL_REQUEST_KEYS.SOURCE)
             local amount = ydlStes_readReal5(nil, nil, HEAL_REQUEST_KEYS.AMOUNT)
+            local manaAmount = ydlStes_readReal5(nil, nil, HEAL_REQUEST_KEYS.MANA_AMOUNT)
             local healEffect = ydlStes_readBoolean5(nil, nil, HEAL_REQUEST_KEYS.EFFECT)
+            local manaEffect = ydlStes_readBoolean5(nil, nil, HEAL_REQUEST_KEYS.MANA_EFFECT)
             if target == nil or target == 0 then
                 return true
             end
-            if amount <= 0 then
+            if amount <= 0 and manaAmount <= 0 then
                 return true
             end
             doHeal(nil, {
                 HealSource = source,
                 HealTarget = target,
                 HealAmount = amount,
+                HealManaAmount = manaAmount,
                 ItemHeal = false,
-                HealEffect = healEffect
+                HealEffect = healEffect,
+                ManaEffect = manaEffect
             })
         end)
         do

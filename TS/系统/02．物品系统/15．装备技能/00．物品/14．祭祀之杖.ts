@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -17,6 +22,8 @@ function 是否为祭祀之杖(this: void, 物品: any): boolean {
 }
 
 export function 处理祭祀之杖使用(this: void, 上下文: 物品技能事件上下文): void {
+  debugLogForce("14．祭祀之杖", "进入", "处理祭祀之杖使用");
+
   if (!是否为祭祀之杖(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;
   if (施法单位 == null || 施法单位 === 0) return;

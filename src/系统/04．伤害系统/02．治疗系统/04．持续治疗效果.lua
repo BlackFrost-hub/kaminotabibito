@@ -77,8 +77,6 @@ local onSecond = ____G_3.onSecond
 offSecond = ____G_3.offSecond
 local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_4.doHeal
-local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
-local doManaRegen = ____require_result_5.doManaRegen
 --- 持续恢复相关Buff ID（没有这些Buff时效果结束）
 local HOT_BUFF_IDS = {1112109677, 1112109671, 1112109676, 1114793322}
 ATTR_COUNTDOWN = "持续恢复倒计时"
@@ -143,17 +141,30 @@ local function onHotTick()
                 ATTR_SOURCE,
                 "unit"
             )
-            if tickHP > 0 then
-                doHeal(nil, {
+            if tickHP > 0 or tickMP > 0 then
+                local ____doHeal_7 = doHeal
+                local ____temp_5
+                if tickHP > 0 then
+                    ____temp_5 = tickHP
+                else
+                    ____temp_5 = 0
+                end
+                local ____temp_6
+                if tickMP > 0 then
+                    ____temp_6 = tickMP
+                else
+                    ____temp_6 = 0
+                end
+                ____doHeal_7(nil, {
                     HealSource = source,
                     HealTarget = target,
-                    HealAmount = tickHP,
+                    HealAmount = ____temp_5,
+                    HealManaAmount = ____temp_6,
                     ItemHeal = true,
-                    HealEffect = false
+                    HealEffect = false,
+                    ManaEffect = false,
+                    ManaShowText = tickMP > 0
                 })
-            end
-            if tickMP > 0 then
-                doManaRegen(nil, target, tickMP, false)
             end
             local shouldEnd = not hasAnyHotBuff(target) or countdown <= 0 or IsUnitDeadBJ(nil, target)
             if shouldEnd then
@@ -234,8 +245,8 @@ end
 function ____exports.getHotUnitCount()
     return hotUnits.size
 end
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_FireWithParams = ____require_result_6.STES_FireWithParams
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_FireWithParams = ____require_result_8.STES_FireWithParams
 --- STES事件名称
 ____exports.HOT_EVENT_NAME = "持续治疗效果"
 --- 触发"持续治疗效果"事件
@@ -263,8 +274,8 @@ local hotTrigger = nil
 --- STES事件处理函数
 -- 接收参数：HealTarget, HealSource, hotTickHP, hotTickMP
 local function onHotEvent()
-    local ____require_result_7 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-    local YDLocal1Get = ____require_result_7.YDLocal1Get
+    local ____require_result_9 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+    local YDLocal1Get = ____require_result_9.YDLocal1Get
     local target = YDLocal1Get(nil, "unit", "HealTarget")
     local source = YDLocal1Get(nil, "unit", "HealSource")
     local tickHP = YDLocal1Get(nil, "real", "hotTickHP")
@@ -277,13 +288,13 @@ local function onHotEvent()
         "real"
     )
     if duration <= 0 then
-        local ____temp_8
+        local ____temp_10
         if tickHP > 0 then
-            ____temp_8 = tickHP
+            ____temp_10 = tickHP
         else
-            ____temp_8 = 10
+            ____temp_10 = 10
         end
-        duration = ____temp_8
+        duration = ____temp_10
     end
     ____exports.startHot(
         target,
@@ -301,8 +312,8 @@ function ____exports.initHotSystem()
     if hotTrigger ~= nil then
         return
     end
-    local ____require_result_9 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-    local registerStesListener = ____require_result_9.registerStesListener
+    local ____require_result_11 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+    local registerStesListener = ____require_result_11.registerStesListener
     hotTrigger = registerStesListener(nil, ____exports.HOT_EVENT_NAME, onHotEvent)
 end
 --- 检查系统是否已初始化

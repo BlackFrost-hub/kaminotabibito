@@ -30,10 +30,12 @@ export const HEAL_EVENTS = {
 /** STES「治疗事件」入口参数键名 */
 export const HEAL_REQUEST_KEYS = {
   AMOUNT: "HealAmount",
+  MANA_AMOUNT: "HealManaAmount",
   TARGET: "HealTarget",
   SOURCE: "HealSource",
   SOURCE_PLAYER: "HealSourcePlayer",
   EFFECT: "HealEffect",
+  MANA_EFFECT: "ManaEffect",
 } as const;
 
 /** STES「任意单位被治疗」结果事件参数键名 */
@@ -59,11 +61,21 @@ export const HEAL_STATS_KEYS = {
 /** 默认治疗特效路径 */
 export const DEFAULT_HEAL_EFFECT_PATH = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl";
 
+/** 默认魔法恢复特效路径 */
+export const DEFAULT_MANA_HEAL_EFFECT_PATH = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl";
+
 /** 治疗漂浮文字颜色 RGB */
 export const HEAL_TEXT_COLOR = {
   red: 20,
   green: 100,
   blue: 20,
+} as const;
+
+/** 魔法恢复漂浮文字颜色 RGB */
+export const MANA_TEXT_COLOR = {
+  red: 53,
+  green: 80,
+  blue: 92,
 } as const;
 
 // ==========================================================================================

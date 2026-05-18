@@ -22,6 +22,7 @@ local function damageCallback(self, target, damage, damageType, fromDotTickBatch
     end
     onDamageEvent(target, source, damage)
 end
+____exports["伤害计算回调"] = damageCallback
 --- 初始化伤害计算系统
 -- 
 -- @param intervalSeconds 重建触发间隔（秒），默认60秒

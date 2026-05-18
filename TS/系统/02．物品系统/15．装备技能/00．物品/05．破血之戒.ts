@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const { createTimedEffect, 创建Dz绑定单位特效, 销毁Dz绑定单位特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -93,6 +98,8 @@ function 开始破血之戒充能(this: void, 施法单位: any): void {
 }
 
 export function 处理破血之戒使用(this: void, 上下文: {
+  debugLogForce("05．破血之戒", "进入", "处理破血之戒使用");
+
   施法单位: any;
   物品: any;
   技能ID: number;

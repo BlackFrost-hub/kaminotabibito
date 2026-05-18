@@ -5,22 +5,28 @@ local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local ____require_result_1 = require("系统.02．物品系统.13．物品名反查")
 local resolveItemIdByName = ____require_result_1.resolveItemIdByName
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.01．暗影突袭")
-local _____65BD_52A0_6697_5F71_7A81_88AD_51CF_76CA = ____require_result_2["施加暗影突袭减益"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.治疗波跳链")
-local _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE = ____require_result_3["发起治疗波跳链"]
-local ____require_result_4 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
-local _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E = ____require_result_4["女妖头饰累计配置"]
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品累伤次数函数")
+local _____5355_4F4D_7269_54C1_7D2F_4F24_6B21_6570 = ____require_result_2["单位物品累伤次数"]
+local _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907 = ____require_result_2["获取单位指定装备"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.01．暗影突袭")
+local _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A = ____require_result_3["创建暗影突袭追踪"]
+local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_4.doHeal
 local ____require_result_5 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
-local _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E = ____require_result_5["女妖头饰强化累计配置"]
+local _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E = ____require_result_5["女妖头饰累计配置"]
+local ____require_result_6 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
+local _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E = ____require_result_6["女妖头饰强化累计配置"]
 local GetHandleId = jass.GetHandleId
+local GetUnitState = jass.GetUnitState
+local SetUnitState = jass.SetUnitState
+local GetItemCharges = jass.GetItemCharges
+local SetItemCharges = jass.SetItemCharges
 local GetItemTypeId = jass.GetItemTypeId
 local UnitItemInSlot = jass.UnitItemInSlot
-local stringToFourCC = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换").stringToFourCC
-local _____5973_5996_5934_9970ID = stringToFourCC(resolveItemIdByName(_____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"]) or "")
-local _____5973_5996_5934_9970_7D2F_8BA1_8868 = {}
-local _____5973_5996_5934_9970_5F3A_5316ID = stringToFourCC(resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]) or "")
-local _____5973_5996_5934_9970_5F3A_5316_547D_4E2D_8868 = {}
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local _____5973_5996_5934_9970ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"]))
+local _____5973_5996_5934_9970_5F3A_5316ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]))
 local function _____5355_4F4D_62E5_6709_88C5_5907(unit, itemTypeId)
     if unit == nil or unit == 0 or itemTypeId <= 0 then
         return false
@@ -52,17 +58,16 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
         debugLogForce("女妖头饰", "提前返回: 参数无效")
         return
     end
-    local _____6709_5973_5996_5934_9970 = _____5355_4F4D_62E5_6709_88C5_5907(target, _____5973_5996_5934_9970ID)
-    local ____temp_6
+    local _____5973_5996_5934_9970_7269_54C1 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970ID)
+    local ____temp_8
     if resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]) ~= nil then
-        ____temp_6 = _____5355_4F4D_62E5_6709_88C5_5907(
-            target,
-            stringToFourCC(resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]) or "")
-        )
+        ____temp_8 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970_5F3A_5316ID)
     else
-        ____temp_6 = false
+        ____temp_8 = nil
     end
-    local _____6709_5973_5996_5934_9970_5F3A_5316 = ____temp_6
+    local _____5973_5996_5934_9970_5F3A_5316_7269_54C1 = ____temp_8
+    local _____6709_5973_5996_5934_9970 = _____5973_5996_5934_9970_7269_54C1 ~= nil
+    local _____6709_5973_5996_5934_9970_5F3A_5316 = _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil
     debugLogForce(
         "女妖头饰",
         "有女妖头饰:",
@@ -76,44 +81,62 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
         return
     end
     local hid = GetHandleId(target)
-    if _____6709_5973_5996_5934_9970 then
-        _____5973_5996_5934_9970_7D2F_8BA1_8868[hid] = (_____5973_5996_5934_9970_7D2F_8BA1_8868[hid] or 0) + applied
-        if (_____5973_5996_5934_9970_7D2F_8BA1_8868[hid] or 0) >= _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"] then
-            _____5973_5996_5934_9970_7D2F_8BA1_8868[hid] = 0
-            _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE({
-                ["起始目标"] = target,
-                ["来源单位"] = attacker,
-                ["影响目标"] = "敌方",
-                ["最大跳数"] = 7,
-                ["初始治疗量"] = 1,
-                ["每跳最大距离"] = 600,
-                ["每跳衰减系数"] = 0,
-                ["允许重复治疗"] = false,
-                ["跳跃间隔"] = 0.05,
-                ["每跳回调"] = function(_____5355_4F4D)
-                    _____65BD_52A0_6697_5F71_7A81_88AD_51CF_76CA(attacker, _____5355_4F4D, {duration = 2, damagePerSecond = 500})
+    if _____6709_5973_5996_5934_9970 or _____6709_5973_5996_5934_9970_5F3A_5316 then
+        local _____5230_8FBE_9608_503C = _____5355_4F4D_7269_54C1_7D2F_4F24_6B21_6570(
+            target,
+            _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"],
+            applied,
+            1,
+            _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"],
+            {["是否在CD中"] = false, ["达到阈值后重置"] = true}
+        )
+        if _____5230_8FBE_9608_503C then
+            debugLogForce(
+                "女妖头饰",
+                "达到累计阈值，开始对伤害来源发射暗影突袭",
+                "累计值:",
+                _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"],
+                "阈值:",
+                _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["累计阈值"]
+            )
+            debugLogForce(
+                "女妖头饰",
+                "对伤害来源发射暗影突袭追踪",
+                "source:",
+                target,
+                "target:",
+                attacker
+            )
+            _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A(target, attacker, {["减益"] = {duration = 2, damagePerSecond = 500}})
+            if _____6709_5973_5996_5934_9970_5F3A_5316 and _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil then
+                local _____5F53_524D_6B21_6570 = GetItemCharges(_____5973_5996_5934_9970_5F3A_5316_7269_54C1)
+                local _____4E0B_6B21_6B21_6570 = _____5F53_524D_6B21_6570 + 1
+                local _____8FBE_5230_6B21_6570_9608_503C = _____4E0B_6B21_6B21_6570 >= _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["命中次数阈值"]
+                local _____5199_56DE_6B21_6570 = _____8FBE_5230_6B21_6570_9608_503C and 1 or _____4E0B_6B21_6B21_6570
+                SetItemCharges(_____5973_5996_5934_9970_5F3A_5316_7269_54C1, _____5199_56DE_6B21_6570)
+                debugLogForce(
+                    "女妖头饰",
+                    "强化物品次数累加",
+                    "旧值:",
+                    _____5F53_524D_6B21_6570,
+                    "新值:",
+                    _____4E0B_6B21_6B21_6570,
+                    "写回:",
+                    _____5199_56DE_6B21_6570
+                )
+                if _____8FBE_5230_6B21_6570_9608_503C then
+                    debugLogForce("女妖头饰", "强化达到5次妖毒触发，使用doHeal恢复自身生命", "恢复值: 1000")
+                    doHeal({
+                        HealSource = target,
+                        HealTarget = target,
+                        HealAmount = 1000,
+                        HealManaAmount = 1000,
+                        ItemHeal = true,
+                        HealEffect = true,
+                        ManaEffect = true
+                    })
                 end
-            })
-        end
-    end
-    if _____6709_5973_5996_5934_9970_5F3A_5316 then
-        _____5973_5996_5934_9970_5F3A_5316_547D_4E2D_8868[hid] = (_____5973_5996_5934_9970_5F3A_5316_547D_4E2D_8868[hid] or 0) + 1
-        if (_____5973_5996_5934_9970_5F3A_5316_547D_4E2D_8868[hid] or 0) >= _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["命中次数阈值"] then
-            _____5973_5996_5934_9970_5F3A_5316_547D_4E2D_8868[hid] = 0
-            _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE({
-                ["起始目标"] = target,
-                ["来源单位"] = target,
-                ["影响目标"] = "敌方",
-                ["最大跳数"] = 7,
-                ["初始治疗量"] = 1,
-                ["每跳最大距离"] = 600,
-                ["每跳衰减系数"] = 0,
-                ["允许重复治疗"] = false,
-                ["跳跃间隔"] = 0.05,
-                ["每跳回调"] = function(_____5355_4F4D)
-                    _____65BD_52A0_6697_5F71_7A81_88AD_51CF_76CA(target, _____5355_4F4D, {duration = 2, damagePerSecond = 500})
-                end
-            })
+            end
         end
     end
 end

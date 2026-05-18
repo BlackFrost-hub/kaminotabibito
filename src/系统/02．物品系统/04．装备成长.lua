@@ -18,7 +18,7 @@ function applyStats(unit, statEffects, isAdd)
         statEffects,
         function(____, x) return __TS__ObjectAssign({}, x, {value = -x.value}) end
     )
-    applyEquipStatsTS(nil, unit, payload)
+    applyEquipStatsTS(unit, payload)
 end
 function onEquipStatReverseTimerExpire()
     local t = jass.GetExpiredTimer()

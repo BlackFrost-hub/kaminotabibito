@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -10,8 +15,8 @@ const { 获取坐标范围敌人, 单位是否有效且敌对 } = require("系�
 const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
 };
-const { getObjectPropertyReal, ObjectType } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  getObjectPropertyReal: (this: void, objectType: number, objectId: number | string, property: string) => number;
+const { getObjectPropertyRealSafe, ObjectType } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  getObjectPropertyRealSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
   ObjectType: { UNIT: number };
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
@@ -78,6 +83,8 @@ function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值
 }
 
 export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事件上下文, 是否强化: boolean): void {
+  debugLogForce("19．汭冥血杖", "进入", "执行汭冥血杖献祭");
+
   const 施法单位 = 上下文.施法单位;
   const 目标单位 = 上下文.目标单位;
   if (施法单位 == null || 施法单位 === 0 || 目标单位 == null || 目标单位 === 0) return;
@@ -93,7 +100,7 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
 
   const 特效 = createUnitEffect(目标单位, 汭冥血杖配置.特效挂点, 汭冥血杖配置.特效路径, 汭冥血杖配置.特效持续时间, "汭冥血杖");
   if (特效 != null && 特效 !== 0) {
-    EXSetEffectSize(特效, getObjectPropertyReal(ObjectType.UNIT, GetUnitTypeId(目标单位), "modelScale"));
+    EXSetEffectSize(特效, getObjectPropertyRealSafe(ObjectType.UNIT, GetUnitTypeId(目标单位), "modelScale"));
   }
 
   const 敌人列表 = 获取坐标范围敌人(施法单位, 目标X, 目标Y, 汭冥血杖配置.作用范围);

@@ -19,13 +19,11 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCC = ____require_result_1.stringToFourCC
 local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_2.doHeal
-local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
-local doManaRegen = ____require_result_3.doManaRegen
-local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
-local startHot = ____require_result_4.startHot
-local isHotActive = ____require_result_4.isHotActive
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_5.YDUserDataGet
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
+local startHot = ____require_result_3.startHot
+local isHotActive = ____require_result_3.isHotActive
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.index")
+local YDUserDataGet = ____require_result_4.YDUserDataGet
 --- 技能ID
 local ABIL_A002 = stringToFourCC(nil, "A002")
 local ABIL_A0LF = stringToFourCC(nil, "A0LF")
@@ -75,7 +73,15 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A0LF then
-        doManaRegen(nil, target, healMP, true)
+        doHeal(nil, {
+            HealSource = target,
+            HealTarget = target,
+            HealAmount = 0,
+            HealManaAmount = healMP,
+            ItemHeal = true,
+            HealEffect = false,
+            ManaEffect = true
+        })
         return
     end
     if abilId == ABIL_A015 then
@@ -83,10 +89,11 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
             HealSource = target,
             HealTarget = target,
             HealAmount = healHP,
+            HealManaAmount = healMP,
             ItemHeal = true,
-            HealEffect = true
+            HealEffect = true,
+            ManaEffect = true
         })
-        doManaRegen(nil, target, healMP, true)
         return
     end
     if abilId == ABIL_A0B8 then
@@ -108,10 +115,11 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
                     HealSource = target,
                     HealTarget = unit,
                     HealAmount = healHP,
+                    HealManaAmount = healMP,
                     ItemHeal = true,
-                    HealEffect = true
+                    HealEffect = true,
+                    ManaEffect = true
                 })
-                doManaRegen(nil, unit, healMP, true)
             end
             unit = jass.FirstOfGroup(group)
         end

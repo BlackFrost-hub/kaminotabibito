@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
@@ -11,30 +13,30 @@ local SGSS_SetState = ____require_result_1.SGSS_SetState
 local SGSS_SetStatePercentumEX2 = ____require_result_1.SGSS_SetStatePercentumEX2
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.03．动态百分比属性")
 local applyDynamicPercentProperty = ____require_result_2.applyDynamicPercentProperty
-local function applyBaseState(self, unit, name, value)
+local function applyBaseState(unit, name, value)
     if name == "攻击力" then
-        SGSS_SetState(nil, unit, 1, value)
+        SGSS_SetState(unit, 1, value)
     elseif name == "护甲" then
-        SGSS_SetState(nil, unit, 2, value)
+        SGSS_SetState(unit, 2, value)
     elseif name == "力量" then
-        SGSS_SetState(nil, unit, 3, value)
+        SGSS_SetState(unit, 3, value)
     elseif name == "敏捷" then
-        SGSS_SetState(nil, unit, 4, value)
+        SGSS_SetState(unit, 4, value)
     elseif name == "智力" then
-        SGSS_SetState(nil, unit, 5, value)
+        SGSS_SetState(unit, 5, value)
     elseif name == "全属性" then
-        SGSS_SetState(nil, unit, 6, value)
+        SGSS_SetState(unit, 6, value)
     elseif name == "生命值" then
-        SGSS_SetState(nil, unit, 7, value)
+        SGSS_SetState(unit, 7, value)
     elseif name == "魔法值" then
-        SGSS_SetState(nil, unit, 8, value)
+        SGSS_SetState(unit, 8, value)
     elseif name == "叠加移动速度" then
-        SGSS_SetState(nil, unit, 9, value)
+        SGSS_SetState(unit, 9, value)
     elseif name == "攻速" then
-        SGSS_SetState(nil, unit, 10, value)
+        SGSS_SetState(unit, 10, value)
     end
 end
-local function getHeroGroup(self)
+local function getHeroGroup()
     do
         local function ____catch(_e)
             return true, nil
@@ -56,13 +58,13 @@ local function getHeroGroup(self)
         end
     end
 end
-function ____exports.applyEquipStatsTS(self, unit, stats)
+function ____exports.applyEquipStatsTS(unit, stats)
     local readBack = {}
     if not unit or not stats or #stats == 0 then
         return readBack
     end
     local owner = jass.GetOwningPlayer(unit)
-    local heroGroup = getHeroGroup(nil)
+    local heroGroup = getHeroGroup()
     local isHeroByGroup = not not (heroGroup and jass.IsUnitInGroup(unit, heroGroup))
     local isHeroByType = not not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
     local isHero = isHeroByGroup or not heroGroup and isHeroByType
@@ -74,7 +76,7 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
                 readBack[name] = 0
                 goto __continue18
             end
-            applyBaseState(nil, unit, name, value)
+            applyBaseState(unit, name, value)
             if not isHero then
                 local cur = __TS__Number(YDUserDataGet2(
                     nil,
@@ -114,7 +116,7 @@ function ____exports.applyEquipStatsTS(self, unit, stats)
                 )
                 readBack[name] = next
             end
-            if applyDynamicPercentProperty(nil, unit, name, value) then
+            if applyDynamicPercentProperty(unit, name, value) then
             elseif name == "经验获取率" and owner then
                 local t = __TS__Number(g.udg_T) or 1
                 local base = 0.35 + 0.65 * t

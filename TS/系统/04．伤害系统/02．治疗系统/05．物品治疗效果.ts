@@ -30,14 +30,11 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
+    HealManaAmount?: number;
     ItemHeal: boolean;
     HealEffect: boolean;
+    ManaEffect?: boolean;
   }) => number;
-};
-
-// 导入魔法恢复功能
-const { doManaRegen } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
-  doManaRegen: (target: any, amount: number, showEffect?: boolean) => number;
 };
 
 // 导入HOT系统
@@ -125,7 +122,15 @@ export function doHealItemEffect(
 
   // A0LF: 单体瞬间回复魔法值
   if (abilId === ABIL_A0LF) {
-    doManaRegen(target, healMP, true);
+    doHeal({
+      HealSource: target,
+      HealTarget: target,
+      HealAmount: 0,
+      HealManaAmount: healMP,
+      ItemHeal: true,
+      HealEffect: false,
+      ManaEffect: true,
+    });
     return;
   }
 
@@ -135,10 +140,11 @@ export function doHealItemEffect(
       HealSource: target,
       HealTarget: target,
       HealAmount: healHP,
+      HealManaAmount: healMP,
       ItemHeal: true,
       HealEffect: true,
+      ManaEffect: true,
     });
-    doManaRegen(target, healMP, true);
     return;
   }
 
@@ -159,10 +165,11 @@ export function doHealItemEffect(
           HealSource: target,
           HealTarget: unit,
           HealAmount: healHP,
+          HealManaAmount: healMP,
           ItemHeal: true,
           HealEffect: true,
+          ManaEffect: true,
         });
-        doManaRegen(unit, healMP, true);
       }
 
       unit = jass.FirstOfGroup(group);

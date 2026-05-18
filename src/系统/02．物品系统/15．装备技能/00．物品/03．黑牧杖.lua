@@ -21,7 +21,8 @@ local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local UnitHasItemOfTypeBJ = jass.UnitHasItemOfTypeBJ
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_2.UnitHasItemOfTypeBJ
 local function _____5355_4F4D_662F_5426_6301_6709_9ED1_7267_6756(unit)
     if not isValidUnit(unit) then
         return false

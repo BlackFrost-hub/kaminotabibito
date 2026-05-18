@@ -1,15 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
----
--- @noSelfInFile
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_0.registerManualBuff
-local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_1.SFB_setSlow
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local stringToFourCC = ____require_result_2.stringToFourCC
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_2.SFB_setSlow
 local ____jass_3 = jass
 local GetHandleId = ____jass_3.GetHandleId
 local GetUnitState = ____jass_3.GetUnitState
@@ -30,9 +28,8 @@ local ____require_result_4 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
 local _____6697_5F71_7A81_88ADBuffID = "C025"
 local _____6697_5F71_7A81_88AD_56FE_6807 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp"
-local _____6697_5F71_7A81_88AD_7279_6548 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl"
-local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl"
-local _____6697_5F71_7A81_88AD_5F39_5E55_5355_4F4D = stringToFourCC(nil, "e02B")
+local _____6697_5F71_7A81_88AD_7279_6548 = "AbilitiesSpellsNightElfshadowstrikeshadowstrike.mdl"
+local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "AbilitiesSpellsNightElfshadowstrikeShadowStrikeMissile.mdl"
 local _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868 = {}
 local _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868 = {}
 local function _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
@@ -122,6 +119,18 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
     local damagePerSecond = _____53C2_6570.damagePerSecond or 500
     local slowAttack = _____53C2_6570.slowAttack or 30
     local slowMove = _____53C2_6570.slowMove or 30
+    debugLogForce(
+        "暗影突袭",
+        "施加减益",
+        "source:",
+        source,
+        "target:",
+        target,
+        "duration:",
+        duration,
+        "dps:",
+        damagePerSecond
+    )
     registerManualBuff(
         target,
         _____53C2_6570.buffID or _____6697_5F71_7A81_88ADBuffID,
@@ -169,10 +178,8 @@ ____exports["创建暗影突袭追踪"] = function(source, target, _____53C2_657
     local function _____6697_5F71_7A81_88AD_5F39_5E55_547D_4E2D(_____547D_4E2D_5355_4F4D)
         ____exports["施加暗影突袭减益"](source, _____547D_4E2D_5355_4F4D, _____53C2_6570["减益"] or ({}))
     end
-    local _____5F39_5E55_5355_4F4D_7C7B_578B = _____53C2_6570["弹幕单位类型"] ~= nil and _____53C2_6570["弹幕单位类型"] ~= "" and stringToFourCC(nil, _____53C2_6570["弹幕单位类型"]) or _____6697_5F71_7A81_88AD_5F39_5E55_5355_4F4D
     _____521B_5EFA_539F_751F_5F39_5E55({
         ["所有者"] = source,
-        ["弹幕单位类型"] = _____5F39_5E55_5355_4F4D_7C7B_578B,
         X = GetUnitX(nil, source),
         Y = GetUnitY(nil, source),
         ["速度"] = _____53C2_6570["速度"] or 1500,

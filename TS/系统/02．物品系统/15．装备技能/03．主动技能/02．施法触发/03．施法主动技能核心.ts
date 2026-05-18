@@ -6,8 +6,10 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { isNotUsingInventoryItem } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isNotUsingInventoryItem: (this: void, unit: any) => boolean;
 };
-const { getObjectPropertyReal, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
-  getObjectPropertyReal: (this: void, objectType: number, objectId: number | string, property: string) => number;
+const { getObjectPropertyRealSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  getObjectPropertyRealSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
+};
+const { ObjectType } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   ObjectType: { ABILITY: number };
 };
 
@@ -22,7 +24,7 @@ function 满足施法主动技能公共前置条件(this: void, 施法单位: an
   if (施法单位 == null || 施法单位 === 0) return false;
   if (技能ID == null || 技能ID === 0) return false;
   if (!isNotUsingInventoryItem(施法单位)) return false;
-  return getObjectPropertyReal(ObjectType.ABILITY, 技能ID, "Cool1") >= 施法主动技能最小冷却;
+  return getObjectPropertyRealSafe(ObjectType.ABILITY, 技能ID, "Cool1") >= 施法主动技能最小冷却;
 }
 
 function on施法主动技能生效(this: void, 施法单位: any, 技能ID: number): void {

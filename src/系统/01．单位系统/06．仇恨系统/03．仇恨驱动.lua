@@ -56,7 +56,6 @@ local function nowMs()
     return _nowMs()
 end
 local function _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-    debugLogForce(_____6A21_5757_540D, "清理敌人仇恨状态 敌人ID=", _____654C_4EBAID)
     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
     clearAllThreatById(_____654C_4EBAID)
 end
@@ -103,7 +102,6 @@ local function onTick()
                     goto __continue16
                 end
                 if IsUnitType(_____654C_4EBA, UNIT_TYPE_DEAD) then
-                    debugLogForce(_____6A21_5757_540D, "驱动清理：敌人已死亡 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue16
                 end

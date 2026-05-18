@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -33,6 +38,8 @@ function 计算每跳生命恢复(this: void, 单位: any): number {
 }
 
 export function 处理地狱火卡牌使用(this: void, 上下文: 物品技能事件上下文): void {
+  debugLogForce("09．地狱火卡牌", "进入", "处理地狱火卡牌使用");
+
   if (!是否为地狱火卡牌(上下文.物品)) return;
 
   const 施法单位 = 上下文.施法单位;

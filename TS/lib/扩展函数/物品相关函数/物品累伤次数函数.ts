@@ -20,7 +20,7 @@ function 生成累伤键(this: void, unit: any, itemTypeId: number): string {
   return String(GetHandleId(unit)) + ":" + String(itemTypeId);
 }
 
-function 查找单位指定装备(this: void, unit: any, itemTypeId: number): any | null {
+export function 获取单位指定装备(this: void, unit: any, itemTypeId: number): any | null {
   if (unit == null || unit === 0 || itemTypeId === 0) return null;
   for (let slot = 0; slot < 6; slot++) {
     const item = UnitItemInSlot(unit, slot);
@@ -29,6 +29,11 @@ function 查找单位指定装备(this: void, unit: any, itemTypeId: number): an
     }
   }
   return null;
+}
+
+export interface 单位物品累伤次数选项 {
+  是否在CD中?: boolean;
+  达到阈值后重置?: boolean;
 }
 
 /**
@@ -47,10 +52,12 @@ export function 单位物品累伤次数(
   受到伤害: number,
   比例: number = 1,
   阈值: number = 0,
+  选项?: 单位物品累伤次数选项,
 ): boolean {
   if (unit == null || unit === 0) return false;
   if (受到伤害 <= 0) return false;
   if (比例 <= 0) return false;
+  if (选项?.是否在CD中 === true) return false;
 
   const itemId = resolveItemIdByName(装备名);
   if (itemId == null) return false;
@@ -58,21 +65,27 @@ export function 单位物品累伤次数(
   const itemTypeId = stringToFourCCSafe(itemId);
   if (itemTypeId === 0) return false;
 
-  const item = 查找单位指定装备(unit, itemTypeId);
+  const item = 获取单位指定装备(unit, itemTypeId);
   if (item == null) return false;
 
   const key = 生成累伤键(unit, itemTypeId);
   const currentRemain = 单位物品累伤残留表[key] ?? 0;
   const total = currentRemain + 受到伤害;
   const addCount = R2I(total / 比例);
+  const 达到阈值后重置 = 选项?.达到阈值后重置 !== false;
+  const nextCharges = GetItemCharges(item) + addCount;
+  const 命中阈值 = 阈值 > 0 && nextCharges >= 阈值;
 
   if (addCount > 0) {
-    const currentCharges = GetItemCharges(item);
-    SetItemCharges(item, currentCharges + addCount);
+    if (命中阈值 && 达到阈值后重置) {
+      SetItemCharges(item, 1);
+    } else {
+      SetItemCharges(item, nextCharges);
+    }
   }
 
   单位物品累伤残留表[key] = total - addCount * 比例;
-  return GetItemCharges(item) > 阈值;
+  return 命中阈值;
 }
 
 export const ItemDamageStackByDamage = 单位物品累伤次数;

@@ -252,7 +252,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             msg
         )
     end
-    local tempReadMap = applyEquipStatsTS(nil, unit, playerStats)
+    local tempReadMap = applyEquipStatsTS(unit, playerStats)
     local test5Parts = {}
     do
         local i = 0

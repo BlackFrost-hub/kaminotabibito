@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -63,6 +68,8 @@ function on咆哮之心周期(this: void): void {
 }
 
 export function 处理咆哮之心使用(this: void, 上下文: 物品技能事件上下文): void {
+  debugLogForce("25．咆哮之心", "进入", "处理咆哮之心使用");
+
   if (!是否为咆哮之心(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;
   const 目标单位 = 上下文.目标单位;

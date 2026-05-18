@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 
 export interface 累计伤害上下文 {
   target: any;
@@ -29,7 +29,7 @@ export interface 女妖头饰配置 {
   累计阈值: number;
   追踪速度: number;
   追踪模型: string;
-  追踪单位类型: string;
+  追踪单位类型?: string;
   命中半径: number;
   生命周期: number;
   每秒毒伤: number;
@@ -42,7 +42,7 @@ export interface 女妖头饰配置 {
 export interface 女妖头饰强化配置 {
   物品名: string;
   命中次数阈值: number;
-  触发单位类型: string;
+  触发单位类型?: string;
 }
 
 export {};

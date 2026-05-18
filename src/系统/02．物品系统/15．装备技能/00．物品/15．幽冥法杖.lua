@@ -10,8 +10,8 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createUnitEffect = ____require_result_0.createUnitEffect
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local getObjectPropertyReal = ____require_result_1.getObjectPropertyReal
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertyRealSafe = ____require_result_1.getObjectPropertyRealSafe
 local ObjectType = ____require_result_1.ObjectType
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
@@ -48,7 +48,7 @@ ____exports["处理幽冥法杖使用"] = function(_____4E0A_4E0B_6587)
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
         EXSetEffectSize(
             _____7279_6548,
-            getObjectPropertyReal(
+            getObjectPropertyRealSafe(
                 ObjectType.UNIT,
                 GetUnitTypeId(_____76EE_6807_5355_4F4D),
                 "modelScale"

@@ -43,14 +43,12 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
+    HealManaAmount?: number;
     ItemHeal: boolean;
     HealEffect: boolean;
+    ManaEffect?: boolean;
+    ManaShowText?: boolean;
   }) => number;
-};
-
-// 导入魔法恢复功能
-const { doManaRegen } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
-  doManaRegen: (target: any, amount: number, showEffect?: boolean) => number;
 };
 
 //=============================================================================
@@ -123,20 +121,18 @@ function onHotTick(): void {
     const tickMP = YDUserDataGet("unit", target, ATTR_TICK_MP, "real");
     const source = YDUserDataGet("unit", target, ATTR_SOURCE, "unit");
 
-    // 执行生命恢复（直接调用 doHeal，TS参数传参）
-    if (tickHP > 0) {
+    // 执行生命/魔法恢复（直接调用 doHeal，TS参数传参）
+    if (tickHP > 0 || tickMP > 0) {
       doHeal({
         HealSource: source,
         HealTarget: target,
-        HealAmount: tickHP,
+        HealAmount: tickHP > 0 ? tickHP : 0,
+        HealManaAmount: tickMP > 0 ? tickMP : 0,
         ItemHeal: true,
         HealEffect: false, // HOT通常不播放特效
+        ManaEffect: false,
+        ManaShowText: tickMP > 0,
       });
-    }
-
-    // 执行魔法恢复
-    if (tickMP > 0) {
-      doManaRegen(target, tickMP, false);
     }
 
     // 检查结束条件

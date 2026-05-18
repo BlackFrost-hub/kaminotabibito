@@ -1,5 +1,8 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 const jass = require("jass.common") as any;
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: {
@@ -12,9 +15,6 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 };
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
-};
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  stringToFourCC: (s: string | undefined | null) => number;
 };
 const { GetHandleId, GetUnitState, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, UnitDamageTarget, CreateTimer, DestroyTimer, GetExpiredTimer, TimerStart, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS } = jass as {
   GetHandleId: (h: any) => number;
@@ -39,9 +39,8 @@ const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模�
 
 const 暗影突袭BuffID = "C025";
 const 暗影突袭图标 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
-const 暗影突袭特效 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl";
-const 暗影突袭弹幕模型 = "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl";
-const 暗影突袭弹幕单位 = stringToFourCC("e02B");
+const 暗影突袭特效 = "Abilities\Spells\NightElf\shadowstrike\shadowstrike.mdl";
+const 暗影突袭弹幕模型 = "Abilities\Spells\NightElf\shadowstrike\ShadowStrikeMissile.mdl";
 
 export interface 暗影突袭减益参数 {
   buffID?: string;
@@ -55,7 +54,6 @@ export interface 暗影突袭减益参数 {
 }
 
 export interface 暗影突袭追踪参数 {
-  弹幕单位类型?: string;
   模型?: string;
   速度?: number;
   命中半径?: number;
@@ -143,6 +141,7 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   const damagePerSecond = 参数.damagePerSecond ?? 500;
   const slowAttack = 参数.slowAttack ?? 30;
   const slowMove = 参数.slowMove ?? 30;
+  debugLogForce("暗影突袭", "施加减益", "source:", source, "target:", target, "duration:", duration, "dps:", damagePerSecond);
   registerManualBuff(target, 参数.buffID ?? 暗影突袭BuffID, duration, 0, {
     sourceName: 参数.sourceName ?? GetUnitName(source),
     iconOverride: 参数.iconOverride ?? 暗影突袭图标,
@@ -166,12 +165,8 @@ export function 创建暗影突袭追踪(this: void, source: any, target: any, �
   function 暗影突袭弹幕命中(this: void, 命中单位: any): void {
     施加暗影突袭减益(source, 命中单位, 参数.减益 ?? {});
   }
-  const 弹幕单位类型 = 参数.弹幕单位类型 != null && 参数.弹幕单位类型 !== ""
-    ? stringToFourCC(参数.弹幕单位类型)
-    : 暗影突袭弹幕单位;
   创建原生弹幕({
     所有者: source,
-    弹幕单位类型,
     X: GetUnitX(source),
     Y: GetUnitY(source),
     速度: 参数.速度 ?? 1500,

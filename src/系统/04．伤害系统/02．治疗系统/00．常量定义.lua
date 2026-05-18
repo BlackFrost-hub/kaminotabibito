@@ -8,10 +8,12 @@ ____exports.HEAL_EVENTS = {REQUEST = "治疗事件", HEAL = "任意单位被治�
 --- STES「治疗事件」入口参数键名
 ____exports.HEAL_REQUEST_KEYS = {
     AMOUNT = "HealAmount",
+    MANA_AMOUNT = "HealManaAmount",
     TARGET = "HealTarget",
     SOURCE = "HealSource",
     SOURCE_PLAYER = "HealSourcePlayer",
-    EFFECT = "HealEffect"
+    EFFECT = "HealEffect",
+    MANA_EFFECT = "ManaEffect"
 }
 --- STES「任意单位被治疗」结果事件参数键名
 ____exports.HEAL_RESULT_KEYS = {AMOUNT = "HealAmount", TARGET = "HealUnit", SOURCE = "HealSource"}
@@ -25,8 +27,12 @@ ____exports.HEAL_STATS_KEYS = {
 }
 --- 默认治疗特效路径
 ____exports.DEFAULT_HEAL_EFFECT_PATH = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl"
+--- 默认魔法恢复特效路径
+____exports.DEFAULT_MANA_HEAL_EFFECT_PATH = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl"
 --- 治疗漂浮文字颜色 RGB
 ____exports.HEAL_TEXT_COLOR = {red = 20, green = 100, blue = 20}
+--- 魔法恢复漂浮文字颜色 RGB
+____exports.MANA_TEXT_COLOR = {red = 53, green = 80, blue = 92}
 --- 治疗率属性名（治疗别人时生效，如0.2=+20%）
 ____exports.ATTR_HEAL_RATE = "治疗率"
 --- 受到治疗率属性名（被治疗时生效，如0.1=+10%）

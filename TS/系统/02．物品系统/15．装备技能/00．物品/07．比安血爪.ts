@@ -1,8 +1,13 @@
 /** @noSelfInFile */
 
-const jass = require("jass.common") as any;
 
-const UnitHasItemOfTypeBJ = jass.UnitHasItemOfTypeBJ as (whichUnit: any, itemTypeId: number) => boolean;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
+const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
+  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+};
 
 import { 比安血爪物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 比安血爪配置 } from "../03．主动技能/02．施法触发/00．施法触发配置";
@@ -15,6 +20,8 @@ function 单位持有比安血爪(this: void, 单位: any): boolean {
 }
 
 export function 处理比安血爪施法(this: void, 施法单位: any): void {
+  debugLogForce("07．比安血爪", "进入", "处理比安血爪施法");
+
   if (!单位持有比安血爪(施法单位)) return;
   施加临时附加攻击(施法单位, 比安血爪配置.附加攻击, 比安血爪配置.持续时间);
 }

@@ -23,13 +23,16 @@ local ydweCompat = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local ydweBase = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDUserDataGetUnsafe = ydweCompat.YDUserDataGet
 local YDUserDataSetUnsafe = ydweCompat.YDUserDataSet
+local YDUserDataClearUnsafe = ydweCompat.YDUserDataClear
 local getObjectPropertyUnsafe = ydweBase.getObjectProperty
 local getObjectPropertyRealUnsafe = ydweBase.getObjectPropertyReal
+local getObjectPropertyIntegerUnsafe = ydweBase.getObjectPropertyInteger
 local YDWEGetUnitAbilityDataStringUnsafe = ydweBase.YDWEGetUnitAbilityDataString
 local YDWEGetUnitAbilityDataIntegerUnsafe = ydweBase.YDWEGetUnitAbilityDataInteger
 local YDWEGetUnitAbilityDataRealUnsafe = ydweBase.YDWEGetUnitAbilityDataReal
 local YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState
 local YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal
+local YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect
 function ____exports.YDUserDataGetSafe(tableType, tableKey, attr, valueType)
     return YDUserDataGetUnsafe(
         nil,
@@ -49,11 +52,23 @@ function ____exports.YDUserDataSetSafe(tableType, tableKey, attr, valueType, val
         value
     )
 end
+function ____exports.YDUserDataClearSafe(tableType, tableKey, attr, valueType)
+    YDUserDataClearUnsafe(
+        nil,
+        tableType,
+        tableKey,
+        attr,
+        valueType
+    )
+end
 function ____exports.getObjectPropertySafe(objectType, objectId, property)
     return getObjectPropertyUnsafe(nil, objectType, objectId, property)
 end
 function ____exports.getObjectPropertyRealSafe(objectType, objectId, property)
     return getObjectPropertyRealUnsafe(nil, objectType, objectId, property)
+end
+function ____exports.getObjectPropertyIntegerSafe(objectType, objectId, property)
+    return getObjectPropertyIntegerUnsafe(nil, objectType, objectId, property)
 end
 function ____exports.YDWEGetUnitAbilityDataStringSafe(unit, abilityId, level, dataType)
     return YDWEGetUnitAbilityDataStringUnsafe(
@@ -101,13 +116,19 @@ function ____exports.YDWESetUnitAbilityDataRealSafe(unit, abilityId, level, data
         value
     )
 end
+function ____exports.YDWETimerDestroyEffectSafe(duration, effect)
+    YDWETimerDestroyEffectUnsafe(nil, duration, effect)
+end
 ____exports["安全YDUserDataGet"] = ____exports.YDUserDataGetSafe
 ____exports["安全YDUserDataSet"] = ____exports.YDUserDataSetSafe
+____exports["安全YDUserDataClear"] = ____exports.YDUserDataClearSafe
 ____exports["安全读取对象属性"] = ____exports.getObjectPropertySafe
 ____exports["安全读取对象实数属性"] = ____exports.getObjectPropertyRealSafe
+____exports["安全读取对象整数属性"] = ____exports.getObjectPropertyIntegerSafe
 ____exports["安全读取单位技能字符串"] = ____exports.YDWEGetUnitAbilityDataStringSafe
 ____exports["安全读取单位技能整数"] = ____exports.YDWEGetUnitAbilityDataIntegerSafe
 ____exports["安全读取单位技能实数"] = ____exports.YDWEGetUnitAbilityDataRealSafe
 ____exports["安全设置单位技能状态"] = ____exports.YDWESetUnitAbilityStateSafe
 ____exports["安全设置单位技能实数数据"] = ____exports.YDWESetUnitAbilityDataRealSafe
+____exports["安全延时销毁特效"] = ____exports.YDWETimerDestroyEffectSafe
 return ____exports

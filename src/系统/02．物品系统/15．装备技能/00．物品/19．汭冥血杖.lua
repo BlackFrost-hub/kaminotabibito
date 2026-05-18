@@ -13,8 +13,8 @@ local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_0["获�
 local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_0["单位是否有效且敌对"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createUnitEffect = ____require_result_1.createUnitEffect
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local getObjectPropertyReal = ____require_result_2.getObjectPropertyReal
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertyRealSafe = ____require_result_2.getObjectPropertyRealSafe
 local ObjectType = ____require_result_2.ObjectType
 local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_3.registerManualBuff
@@ -106,7 +106,7 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
         EXSetEffectSize(
             _____7279_6548,
-            getObjectPropertyReal(
+            getObjectPropertyRealSafe(
                 ObjectType.UNIT,
                 GetUnitTypeId(_____76EE_6807_5355_4F4D),
                 "modelScale"

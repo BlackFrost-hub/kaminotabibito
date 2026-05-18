@@ -75,10 +75,10 @@ local function applyMovespeed2(self, unit, newSpeed)
         return
     end
     if oldSpeed ~= 0 then
-        SGSS_SetState(nil, unit, 9, -oldSpeed)
+        SGSS_SetState(unit, 9, -oldSpeed)
     end
     if newSpeed ~= 0 then
-        SGSS_SetState(nil, unit, 9, newSpeed)
+        SGSS_SetState(unit, 9, newSpeed)
     end
     applied[key] = newSpeed
 end

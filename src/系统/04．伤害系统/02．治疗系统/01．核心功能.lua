@@ -8,7 +8,9 @@ local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
 local HEAL_RESULT_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_RESULT_KEYS
 local HEAL_STATS_KEYS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_STATS_KEYS
 local DEFAULT_HEAL_EFFECT_PATH = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_HEAL_EFFECT_PATH
+local DEFAULT_MANA_HEAL_EFFECT_PATH = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_MANA_HEAL_EFFECT_PATH
 local HEAL_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_TEXT_COLOR
+local MANA_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.MANA_TEXT_COLOR
 local ATTR_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_HEAL_RATE
 local ATTR_RECEIVED_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_RECEIVED_HEAL_RATE
 --- 治疗系统 - 核心功能
@@ -21,6 +23,11 @@ local ATTR_RECEIVED_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_RECEIVED_HE
 -- 1. 开关 HEAL_SYSTEM_ENABLED 在常量文件
 -- 2. STES事件参数通过 YDLocal5Set 传递，变量名须与JASS一致
 local jass = require("jass.common")
+local japi = require("jass.japi")
+--- 当前生命/魔法：jass；最大生命/魔法及扩展属性：japi（与 SGSS / 物编面板一致）
+local GetUnitStateJass = jass.GetUnitState
+local SetUnitStateJass = jass.SetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
@@ -113,8 +120,8 @@ local function getMissingLife(target)
     if target == nil then
         return 0
     end
-    local maxLife = jass.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
-    local curLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+    local maxLife = GetUnitStateJapi(target, jass.UNIT_STATE_MAX_LIFE)
+    local curLife = GetUnitStateJass(target, jass.UNIT_STATE_LIFE)
     local missing = maxLife - curLife
     return missing > 0 and missing or 0
 end
@@ -130,6 +137,74 @@ local function playHealEffect(target, effectPath)
     if eff ~= nil then
         jass.DestroyEffect(eff)
     end
+end
+--- 获取已损失魔法值
+local function getMissingMana(target)
+    if target == nil then
+        return 0
+    end
+    local maxMana = GetUnitStateJapi(target, jass.UNIT_STATE_MAX_MANA)
+    local curMana = GetUnitStateJass(target, jass.UNIT_STATE_MANA)
+    local missing = maxMana - curMana
+    return missing > 0 and missing or 0
+end
+--- 播放魔法恢复特效
+local function playManaEffect(target, effectPath)
+    if target == nil then
+        return
+    end
+    local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_MANA_HEAL_EFFECT_PATH
+    local eff = jass.AddSpecialEffectTarget(path, target, "origin")
+    if eff ~= nil then
+        jass.DestroyEffect(eff)
+    end
+end
+--- 显示魔法恢复漂浮字
+local function fireManaShowEvent(target, amount)
+    _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57(target, amount, {["红"] = MANA_TEXT_COLOR.red, ["绿"] = MANA_TEXT_COLOR.green, ["蓝"] = MANA_TEXT_COLOR.blue})
+end
+--- 执行魔法恢复（不超过已损失魔法）
+local function applyManaRestore(target, baseAmount)
+    if target == nil or baseAmount <= 0 then
+        return 0
+    end
+    local missingMana = getMissingMana(target)
+    local actualMana = baseAmount < missingMana and baseAmount or missingMana
+    if actualMana <= 0 then
+        return 0
+    end
+    local curMana = GetUnitStateJass(target, jass.UNIT_STATE_MANA)
+    SetUnitStateJass(target, jass.UNIT_STATE_MANA, curMana + actualMana)
+    return actualMana
+end
+--- 仅执行魔法恢复（供 doManaRegen 等便捷入口）
+function ____exports.restoreMana(target, amount, manaEffect, manaEffectPath, manaShowText)
+    if manaEffect == nil then
+        manaEffect = false
+    end
+    if manaShowText == nil then
+        manaShowText = true
+    end
+    if not HEAL_SYSTEM_ENABLED then
+        return 0
+    end
+    if target == nil or amount <= 0 then
+        return 0
+    end
+    if jass.IsUnitType(target, jass.UNIT_TYPE_DEAD) then
+        return 0
+    end
+    local actualMana = applyManaRestore(target, amount)
+    if actualMana <= 0 then
+        return 0
+    end
+    if manaEffect then
+        playManaEffect(target, manaEffectPath)
+    end
+    if manaShowText then
+        fireManaShowEvent(target, actualMana)
+    end
+    return actualMana
 end
 --- 触发数值显示事件
 -- 供Lua端/JASS端调用，显示治疗/伤害数值
@@ -233,75 +308,119 @@ function ____exports.doHeal(params)
     local HealSource = ____params_3.HealSource
     local HealTarget = ____params_3.HealTarget
     local HealAmount = ____params_3.HealAmount
+    local HealManaAmount = ____params_3.HealManaAmount
+    if HealManaAmount == nil then
+        HealManaAmount = 0
+    end
     local ItemHeal = ____params_3.ItemHeal
     local HealEffect = ____params_3.HealEffect
     local HealEffectPath = ____params_3.HealEffectPath
-    if HealTarget == nil or HealAmount <= 0 then
+    local ManaEffect = ____params_3.ManaEffect
+    if ManaEffect == nil then
+        ManaEffect = false
+    end
+    local ManaEffectPath = ____params_3.ManaEffectPath
+    local ManaShowText = ____params_3.ManaShowText
+    if ManaShowText == nil then
+        ManaShowText = true
+    end
+    if HealTarget == nil then
         return 0
     end
     if jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
         return 0
     end
-    local amount = calcHealAmount(HealSource, HealTarget, HealAmount)
-    for ____, cb in ipairs(healCallbacks) do
-        do
-            pcall(function()
-                amount = cb(HealSource, HealTarget, amount, ItemHeal)
-            end)
-        end
-    end
-    if amount <= 0 then
+    if HealAmount <= 0 and HealManaAmount <= 0 then
         return 0
     end
-    local missingLife = getMissingLife(HealTarget)
-    local actualHeal = amount < missingLife and amount or missingLife
-    if actualHeal <= 0 then
-        return 0
-    end
-    local curLife = jass.GetUnitState(HealTarget, jass.UNIT_STATE_LIFE)
-    jass.SetUnitState(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
-    if HealEffect then
-        playHealEffect(HealTarget, HealEffectPath)
-    end
-    ____exports.fireShowDamageEvent(HealTarget, actualHeal)
-    ____exports.fireHealEvent(HealSource, HealTarget, actualHeal)
-    addHealStats(HealTarget, actualHeal)
-    addPlayerHealStats(HealTarget, HealSource, actualHeal)
-    for ____, listener in ipairs(healEventListeners) do
-        do
-            pcall(function()
-                listener(HealSource, HealTarget, actualHeal, ItemHeal)
-            end)
+    local actualHeal = 0
+    if HealAmount > 0 then
+        local amount = calcHealAmount(HealSource, HealTarget, HealAmount)
+        for ____, cb in ipairs(healCallbacks) do
+            do
+                pcall(function()
+                    amount = cb(HealSource, HealTarget, amount, ItemHeal)
+                end)
+            end
         end
+        if amount > 0 then
+            local missingLife = getMissingLife(HealTarget)
+            actualHeal = amount < missingLife and amount or missingLife
+            if actualHeal > 0 then
+                local curLife = GetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE)
+                SetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
+                if HealEffect then
+                    playHealEffect(HealTarget, HealEffectPath)
+                end
+                ____exports.fireShowDamageEvent(HealTarget, actualHeal)
+                ____exports.fireHealEvent(HealSource, HealTarget, actualHeal)
+                addHealStats(HealTarget, actualHeal)
+                addPlayerHealStats(HealTarget, HealSource, actualHeal)
+                for ____, listener in ipairs(healEventListeners) do
+                    do
+                        pcall(function()
+                            listener(HealSource, HealTarget, actualHeal, ItemHeal)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+    if HealManaAmount > 0 then
+        ____exports.restoreMana(
+            HealTarget,
+            HealManaAmount,
+            ManaEffect,
+            ManaEffectPath,
+            ManaShowText
+        )
     end
     return actualHeal
 end
 --- 技能治疗
-function ____exports.spellHeal(source, target, amount, showEffect, effectPath)
+function ____exports.spellHeal(source, target, amount, showEffect, effectPath, manaAmount, showManaEffect, manaEffectPath)
     if showEffect == nil then
         showEffect = true
+    end
+    if manaAmount == nil then
+        manaAmount = 0
+    end
+    if showManaEffect == nil then
+        showManaEffect = false
     end
     return ____exports.doHeal({
         HealSource = source,
         HealTarget = target,
         HealAmount = amount,
+        HealManaAmount = manaAmount,
         ItemHeal = false,
         HealEffect = showEffect,
-        HealEffectPath = effectPath
+        HealEffectPath = effectPath,
+        ManaEffect = showManaEffect,
+        ManaEffectPath = manaEffectPath
     })
 end
 --- 物品治疗
-function ____exports.itemHeal(source, target, amount, showEffect, effectPath)
+function ____exports.itemHeal(source, target, amount, showEffect, effectPath, manaAmount, showManaEffect, manaEffectPath)
     if showEffect == nil then
         showEffect = true
+    end
+    if manaAmount == nil then
+        manaAmount = 0
+    end
+    if showManaEffect == nil then
+        showManaEffect = false
     end
     return ____exports.doHeal({
         HealSource = source,
         HealTarget = target,
         HealAmount = amount,
+        HealManaAmount = manaAmount,
         ItemHeal = true,
         HealEffect = showEffect,
-        HealEffectPath = effectPath
+        HealEffectPath = effectPath,
+        ManaEffect = showManaEffect,
+        ManaEffectPath = manaEffectPath
     })
 end
 --- 生命恢复（无特效无来源）

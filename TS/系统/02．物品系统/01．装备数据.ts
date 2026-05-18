@@ -95,6 +95,7 @@ items["I00P"] = {
   score: 295,
   level: "E-",
   dmg: 2,
+  hp: 50,
   all: 2,
   cdReduction: 0.5,
   mpCost: -0.2,

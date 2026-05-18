@@ -2,10 +2,6 @@
 
 import type { 回沙之书配置, 女妖头饰配置, 女妖头饰强化配置 } from "./00．类型定义";
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 export const 回沙之书累计配置: 回沙之书配置 = {
   物品名: "回沙之书",
   累计阈值: 400,
@@ -15,14 +11,11 @@ export const 回沙之书累计配置: 回沙之书配置 = {
   冷却时间: 8.0,
 };
 
-debugLogForce("累计伤害配置", "回沙之书配置已加载", "物品名:", 回沙之书累计配置.物品名);
-
 export const 女妖头饰累计配置: 女妖头饰配置 = {
   物品名: "女妖头饰",
   累计阈值: 1500,
   追踪速度: 1500,
   追踪模型: "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl",
-  追踪单位类型: "e02B",
   命中半径: 80,
   生命周期: 4,
   每秒毒伤: 500,
@@ -32,15 +25,11 @@ export const 女妖头饰累计配置: 女妖头饰配置 = {
   毒影BuffID: "C025",
 };
 
-debugLogForce("累计伤害配置", "女妖头饰配置已加载", "物品名:", 女妖头饰累计配置.物品名);
-
 export const 女妖头饰强化累计配置: 女妖头饰强化配置 = {
   物品名: "女妖头饰-强化",
   命中次数阈值: 5,
-  触发单位类型: "e02C",
 };
 
-debugLogForce("累计伤害配置", "女妖头饰强化配置已加载", "物品名:", 女妖头饰强化累计配置.物品名);
 
 export const 累计伤害物品名表 = {
   回沙之书: 回沙之书累计配置.物品名,

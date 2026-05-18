@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const jass = require("jass.common") as any;
 
 const { YDUserDataGet, YDUserDataSet, YDUserDataHas, YDUserDataClear } = require("lib.扩展函数.YDWE函数.index") as {
@@ -67,6 +72,8 @@ function 启动存储过期计时(this: void, 施法单位: any): void {
 }
 
 export function 处理使者精神魔杖使用(this: void, 上下文: 物品技能事件上下文): void {
+  debugLogForce("21．使者精神魔杖", "进入", "处理使者精神魔杖使用");
+
   if (!是否为使者精神魔杖(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;
   if (施法单位 == null || 施法单位 === 0) return;

@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { [k: string]: any };
 const { YDUserDataGet2, YDUserDataSet2 } = require("lib.扩展函数.YDWE函数.index") as {
@@ -5,11 +7,11 @@ const { YDUserDataGet2, YDUserDataSet2 } = require("lib.扩展函数.YDWE函数.
   YDUserDataSet2: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: any, value: any) => void;
 };
 const { SGSS_SetState, SGSS_SetStatePercentumEX2 } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
-  SGSS_SetState: (u: any, id: number, v: number) => void;
-  SGSS_SetStatePercentumEX2: (u: any, id: number, v: number) => void;
+  SGSS_SetState: (this: void, u: any, id: number, v: number) => void;
+  SGSS_SetStatePercentumEX2: (this: void, u: any, id: number, v: number) => void;
 };
 const { applyDynamicPercentProperty } = require("lib.扩展函数.Star扩展函数.03．动态百分比属性") as {
-  applyDynamicPercentProperty: (unit: any, statName: string, value: number) => boolean;
+  applyDynamicPercentProperty: (this: void, unit: any, statName: string, value: number) => boolean;
 };
 
 export interface EquipStatEntry {
@@ -38,7 +40,7 @@ function getHeroGroup(): any {
   }
 }
 
-export function applyEquipStatsTS(unit: any, stats: EquipStatEntry[]): Record<string, number> {
+export function applyEquipStatsTS(this: void, unit: any, stats: EquipStatEntry[]): Record<string, number> {
   const readBack: Record<string, number> = {};
   if (!unit || !stats || stats.length === 0) return readBack;
 

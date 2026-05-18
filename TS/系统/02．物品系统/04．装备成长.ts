@@ -30,7 +30,7 @@ const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   getItemDataEntry: (this: void, item: any) => any | null;
 };
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
-  applyEquipStatsTS: (unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
+  applyEquipStatsTS: (this: void, unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
 };
 const { onSecond, offSecond } = globalThis as unknown as {
   onSecond: (this: void, cb: () => void) => void;

@@ -8,12 +8,14 @@ local _____5DE8_9B54_5927_5251_914D_7F6E = ____00_FF0E_65BD_6CD5_89E6_53D1_914D_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataSet = ____require_result_0.YDUserDataSet
-local YDUserDataClear = ____require_result_0.YDUserDataClear
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
-local getObjectPropertyInteger = ____require_result_1.getObjectPropertyInteger
-local ObjectType = ____require_result_1.ObjectType
+local ____require_result_0 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_0.UnitHasItemOfTypeBJ
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
+local getObjectPropertyIntegerSafe = ____require_result_1.getObjectPropertyIntegerSafe
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local ObjectType = ____require_result_2.ObjectType
 local CreateTimer = jass.CreateTimer
 local GetExpiredTimer = jass.GetExpiredTimer
 local GetHandleId = jass.GetHandleId
@@ -21,7 +23,6 @@ local DestroyTimer = jass.DestroyTimer
 local TimerStart = jass.TimerStart
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
-local UnitHasItemOfTypeBJ = jass.UnitHasItemOfTypeBJ
 local _____5DE8_9B54_5927_5251_8BA1_65F6_5668_8868 = {}
 local function _____5355_4F4D_6301_6709_5DE8_9B54_5927_5251(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
@@ -39,7 +40,7 @@ local function _____5DE8_9B54_5927_5251_6761_4EF6_6210_7ACB(_____65BD_6CD5_5355_
     if not _____5355_4F4D_6301_6709_5DE8_9B54_5927_5251(_____65BD_6CD5_5355_4F4D) then
         return false
     end
-    local DataB1 = getObjectPropertyInteger(ObjectType.ABILITY, _____6280_80FDID, "DataB1")
+    local DataB1 = getObjectPropertyIntegerSafe(ObjectType.ABILITY, _____6280_80FDID, "DataB1")
     return DataB1 == 1 or DataB1 == 3
 end
 local function ____on_5DE8_9B54_5927_5251_6807_8BB0_7ED3_675F()
@@ -54,20 +55,20 @@ local function ____on_5DE8_9B54_5927_5251_6807_8BB0_7ED3_675F()
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return
     end
-    YDUserDataSet(
+    YDUserDataSetSafe(
         "unit",
         _____5355_4F4D,
         _____5DE8_9B54_5927_5251_914D_7F6E["标记名"],
         "boolean",
         false
     )
-    YDUserDataClear("unit", _____5355_4F4D, _____5DE8_9B54_5927_5251_914D_7F6E["标记名"], "boolean")
+    YDUserDataClearSafe("unit", _____5355_4F4D, _____5DE8_9B54_5927_5251_914D_7F6E["标记名"], "boolean")
 end
 ____exports["处理巨魔大剑施法"] = function(_____65BD_6CD5_5355_4F4D, _____6280_80FDID)
     if not _____5DE8_9B54_5927_5251_6761_4EF6_6210_7ACB(_____65BD_6CD5_5355_4F4D, _____6280_80FDID) then
         return
     end
-    YDUserDataSet(
+    YDUserDataSetSafe(
         "unit",
         _____65BD_6CD5_5355_4F4D,
         _____5DE8_9B54_5927_5251_914D_7F6E["标记名"],

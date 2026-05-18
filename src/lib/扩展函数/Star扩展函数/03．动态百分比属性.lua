@@ -3,16 +3,10 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 local callGSUnitPry
-function callGSUnitPry(self, unit, id, value)
+function callGSUnitPry(unit, id, value)
     local fn = _G.GS_UnitPry
     if type(fn) == "function" then
-        fn(
-            nil,
-            unit,
-            0,
-            id,
-            value
-        )
+        fn(unit, 0, id, value)
     end
 end
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.00．SGSS")
@@ -27,13 +21,13 @@ local aliasToCanonical = {
     ["防御"] = "护甲"
 }
 local maxPercentRegistry = {
-    ["生命值"] = function(____, unit, value) return SGSS_SetStatePercentumEX2(nil, unit, 7, value) end,
-    ["法力值"] = function(____, unit, value) return SGSS_SetStatePercentumEX2(nil, unit, 8, value) end
+    ["生命值"] = function(____, unit, value) return SGSS_SetStatePercentumEX2(unit, 7, value) end,
+    ["法力值"] = function(____, unit, value) return SGSS_SetStatePercentumEX2(unit, 8, value) end
 }
 local basePercentRegistry = {
-    ["生命值"] = function(____, unit, value) return callGSUnitPry(nil, unit, 13, value) end,
-    ["攻击力"] = function(____, unit, value) return callGSUnitPry(nil, unit, 14, value) end,
-    ["护甲"] = function(____, unit, value) return callGSUnitPry(nil, unit, 15, value) end
+    ["生命值"] = function(____, unit, value) return callGSUnitPry(unit, 13, value) end,
+    ["攻击力"] = function(____, unit, value) return callGSUnitPry(unit, 14, value) end,
+    ["护甲"] = function(____, unit, value) return callGSUnitPry(unit, 15, value) end
 }
 local function normalizeKey(self, base)
     local trimmed = __TS__StringTrim(base or "")
@@ -86,7 +80,7 @@ local function applyFromRegistry(self, mode, base, unit, value)
     end
     return false
 end
-function ____exports.registerDynamicPercentProperty(self, mode, key, applier)
+function ____exports.registerDynamicPercentProperty(mode, key, applier)
     local normalized = normalizeKey(nil, key)
     if normalized == "" then
         return
@@ -97,7 +91,7 @@ function ____exports.registerDynamicPercentProperty(self, mode, key, applier)
         basePercentRegistry[normalized] = applier
     end
 end
-function ____exports.applyDynamicPercentProperty(self, unit, statName, value)
+function ____exports.applyDynamicPercentProperty(unit, statName, value)
     if not unit or value == 0 then
         return false
     end

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
+local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
 function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
 end
@@ -122,13 +122,16 @@ function processDamageEntry(self, entry)
             end
         )
     end
+    local _____4F24_5BB3_8BA1_7B97_56DE_8C03 = _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03(nil)
     do
         local c = 0
         while c < #DamageCallbacks do
-            local cb = DamageCallbacks[c + 1]
-            if cb ~= nil then
-                local cbStr = tostring(cb)
-                if (string.find(cbStr, "damageCallback", nil, true) or 0) - 1 == -1 and (string.find(cbStr, "damageCalculation", nil, true) or 0) - 1 == -1 then
+            do
+                local cb = DamageCallbacks[c + 1]
+                if cb ~= nil then
+                    if _____4F24_5BB3_8BA1_7B97_56DE_8C03 ~= nil and cb == _____4F24_5BB3_8BA1_7B97_56DE_8C03 then
+                        goto __continue34
+                    end
                     cb(
                         nil,
                         su,
@@ -140,6 +143,7 @@ function processDamageEntry(self, entry)
                     )
                 end
             end
+            ::__continue34::
             c = c + 1
         end
     end
@@ -269,6 +273,10 @@ isHeroUnit = ____require_result_0.isHeroUnit
 forEachUnitInGroup = ____require_result_0.forEachUnitInGroup
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 registerDeathListener = ____require_result_1.registerDeathListener
+_____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03 = function()
+    local _____6A21_5757 = require("系统.04．伤害系统.00．伤害计算.05．事件注册")
+    return _____6A21_5757["伤害计算回调"]
+end
 ALOC = 1097625443
 DamageEventQueue = {}
 DamageCallbacks = {}

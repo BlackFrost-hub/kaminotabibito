@@ -12,7 +12,7 @@ const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工
   fourCCToString: (four: number) => string;
 };
 const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
-  SGSS_SetState: (u: any, id: number, v: number) => void;
+  SGSS_SetState: (this: void, u: any, id: number, v: number) => void;
 };
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;

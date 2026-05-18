@@ -15,6 +15,19 @@ const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
 };
+const 获取伤害计算回调 = () => {
+  const 模块 = require("系统.04．伤害系统.00．伤害计算.05．事件注册") as {
+    伤害计算回调?: (
+      unit: any,
+      damage: number,
+      damageType: number,
+      fromDotTickBatch?: boolean,
+      source?: any,
+      isNormalAttack?: boolean
+    ) => void;
+  };
+  return 模块.伤害计算回调;
+};
 const ALOC = 0x416c6f63; // 'Aloc' 蝗虫
 
 /** 事件句柄：common.j 全局 unitevent `EVENT_UNIT_DAMAGED`；TriggerRegisterUnitEvent 第3参要 jhandle_t 不能传数字 */
@@ -164,14 +177,13 @@ function processDamageEntry(entry: any): void {
 
   // 注意：伤害计算已经在TriggerExecute之前通过onDamageEvent执行过了
   // 这里只执行其他回调（如DOT伤害等）
+  const 伤害计算回调 = 获取伤害计算回调();
   for (let c = 0; c < DamageCallbacks.length; c++) {
     const cb = DamageCallbacks[c];
     if (cb != null) {
-      // 跳过伤害计算回调（已经在前面执行过了）
-      const cbStr = tostring(cb);
-      if (cbStr.indexOf("damageCallback") === -1 && cbStr.indexOf("damageCalculation") === -1) {
-        (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
-      }
+      // 跳过伤害计算回调（已经在前面同步执行过了）
+      if (伤害计算回调 != null && cb === 伤害计算回调) continue;
+      (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
     }
   }
 
