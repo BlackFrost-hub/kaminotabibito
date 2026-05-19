@@ -10,7 +10,8 @@ local xLib = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库�
 local effectGroup = require("lib.扩展函数.Star扩展函数.Star扩展库.07．特效组系统")
 local unitCondition = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
 local unitBase = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
-local unitAttr = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
+local heroAttr = require("lib.扩展函数.Star扩展函数.Star扩展库.10．英雄属性与攻击力函数")
+local dirFunc = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
 local starBase = require("lib.扩展函数.Star扩展函数.Star扩展库.12．StarBase基础函数")
 do
     local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
@@ -93,7 +94,15 @@ do
     end
 end
 do
-    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.10．单位属性方位与攻击函数")
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.10．英雄属性与攻击力函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -194,19 +203,29 @@ function ____exports.registerBridge(self)
     expose(nil, "IsWaterElement", unitBase.IsWaterElement)
     expose(nil, "GetUnitTimedLifeID", unitBase.GetUnitTimedLifeID)
     expose(nil, "I2TimedLifeID", unitBase.I2TimedLifeID)
-    expose(nil, "SU_GetUnitModel", unitAttr.SU_GetUnitModel)
-    expose(nil, "SU_GetHeroParmary", unitAttr.SU_GetHeroParmary)
-    expose(nil, "SU_AddHeroState", unitAttr.SU_AddHeroState)
-    expose(nil, "SU_GetHeroParmaryValue", unitAttr.SU_GetHeroParmaryValue)
-    expose(nil, "SU_AddHeroAllState", unitAttr.SU_AddHeroAllState)
-    expose(nil, "SU_SetHeroParmaryValue", unitAttr.SU_SetHeroParmaryValue)
-    expose(nil, "SU_HeroISParmary", unitAttr.SU_HeroISParmary)
-    expose(nil, "SU_DotBehindUnit", unitAttr.SU_DotBehindUnit)
-    expose(nil, "SU_GetUnitOfUnit", unitAttr.SU_GetUnitOfUnit)
-    expose(nil, "SU_IsUnitInfrontUnit2", unitAttr.SU_IsUnitInfrontUnit2)
-    expose(nil, "SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit)
-    expose(nil, "SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit)
-    expose(nil, "SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk)
+    expose(nil, "SU_GetUnitModel", heroAttr.SU_GetUnitModel)
+    expose(nil, "SU_GetHeroParmary", heroAttr.SU_GetHeroParmary)
+    expose(nil, "SU_AddHeroState", heroAttr.SU_AddHeroState)
+    expose(nil, "SU_GetHeroParmaryValue", heroAttr.SU_GetHeroParmaryValue)
+    expose(nil, "SU_AddHeroAllState", heroAttr.SU_AddHeroAllState)
+    expose(nil, "SU_SetHeroParmaryValue", heroAttr.SU_SetHeroParmaryValue)
+    expose(nil, "SU_HeroISParmary", heroAttr.SU_HeroISParmary)
+    expose(nil, "SU_GetUnitWhiteAtk", heroAttr.SU_GetUnitWhiteAtk)
+    expose(nil, "是否在指定角度范围内", dirFunc["是否在指定角度范围内"])
+    expose(nil, "是否在前方角度内", dirFunc["是否在前方角度内"])
+    expose(nil, "是否在后方角度内", dirFunc["是否在后方角度内"])
+    expose(nil, "是否在正前方", dirFunc["是否在正前方"])
+    expose(nil, "是否在正后方", dirFunc["是否在正后方"])
+    expose(nil, "是否在左侧", dirFunc["是否在左侧"])
+    expose(nil, "是否在右侧", dirFunc["是否在右侧"])
+    expose(nil, "是否在前方", dirFunc["是否在前方"])
+    expose(nil, "是否在后方", dirFunc["是否在后方"])
+    expose(nil, "获取方位区间", dirFunc["获取方位区间"])
+    expose(nil, "SU_DotBehindUnit", dirFunc.SU_DotBehindUnit)
+    expose(nil, "SU_GetUnitOfUnit", dirFunc.SU_GetUnitOfUnit)
+    expose(nil, "SU_IsUnitInfrontUnit2", dirFunc.SU_IsUnitInfrontUnit2)
+    expose(nil, "SU_IsUnitInfrontUnit", dirFunc.SU_IsUnitInfrontUnit)
+    expose(nil, "SU_IsUnitBehindUnit", dirFunc.SU_IsUnitBehindUnit)
     expose(nil, "Star_CoordinateX", starBase.Star_CoordinateX)
     expose(nil, "Star_CoordinateY", starBase.Star_CoordinateY)
     expose(nil, "Star_GetLocZ", starBase.Star_GetLocZ)

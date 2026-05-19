@@ -1,11 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local SDR_Index = 0
-local function hashHandle(self)
+local function hashHandle()
     local g = _G
-    local function pick(____, name)
+    local function pick(name)
         if g[name] ~= nil then
             return g[name]
         end
@@ -17,26 +19,26 @@ local function hashHandle(self)
         end
         return nil
     end
-    local ____pick_result_0 = pick(nil, "StarBaseHT")
+    local ____pick_result_0 = pick("StarBaseHT")
     if ____pick_result_0 == nil then
-        ____pick_result_0 = pick(nil, "YDHASH_HANDLE")
+        ____pick_result_0 = pick("YDHASH_HANDLE")
     end
     local ____pick_result_0_1 = ____pick_result_0
     if ____pick_result_0_1 == nil then
-        ____pick_result_0_1 = pick(nil, "YDHT")
+        ____pick_result_0_1 = pick("YDHT")
     end
     local ____pick_result_0_1_2 = ____pick_result_0_1
     if ____pick_result_0_1_2 == nil then
-        ____pick_result_0_1_2 = pick(nil, "udg_YDHASH_HANDLE")
+        ____pick_result_0_1_2 = pick("udg_YDHASH_HANDLE")
     end
     local ____pick_result_0_1_2_3 = ____pick_result_0_1_2
     if ____pick_result_0_1_2_3 == nil then
-        ____pick_result_0_1_2_3 = pick(nil, "udg_YDHT")
+        ____pick_result_0_1_2_3 = pick("udg_YDHT")
     end
     return ____pick_result_0_1_2_3
 end
-function ____exports.SDR_DebugTimer(self, t, time, isloop, Target, trig)
-    local ht = hashHandle(nil)
+function ____exports.SDR_DebugTimer(t, time, isloop, Target, trig)
+    local ht = hashHandle()
     if not ht then
         return
     end

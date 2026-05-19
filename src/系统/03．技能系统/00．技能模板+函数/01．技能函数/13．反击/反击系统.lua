@@ -363,6 +363,6 @@ ____exports["获取反击数量"] = function(_____5355_4F4D)
     end
     local hid = GetHandleId(_____5355_4F4D)
     local _____5217_8868 = _____53CD_51FB_5B9E_4F8B_6620_5C04[hid]
-    return _____5217_8868 and #_____5217_8868 or 0
+    return _____5217_8868 ~= nil and #_____5217_8868 or 0
 end
 return ____exports

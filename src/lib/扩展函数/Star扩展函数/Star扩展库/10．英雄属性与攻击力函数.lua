@@ -2,9 +2,9 @@
 local ____exports = {}
 local ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570 = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
 local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570.SUC_IsValidUnit
---- Star扩展库 - 单位属性方位与攻击函数
+--- Star扩展库 - 英雄属性与攻击力函数
 -- 
--- 提供单位模型、英雄主属性、方位判断与白字攻击力计算。
+-- 提供单位模型读取、英雄主属性操作与白字攻击力计算。
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.00．BJ全局兜底")
 local CosBJ = ____require_result_0.CosBJ
@@ -28,7 +28,7 @@ local UNIT_STATE_ATTACK1_BASE = 18
 local UNIT_STATE_ATTACK1_BONUS = 16
 local UNIT_STATE_ATTACK1_COUNT = 17
 local function getUnitPrimaryTypeFromSlk(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return -1
     end
     local unitId = jass.GetUnitTypeId(u)
@@ -74,7 +74,7 @@ local function getHeroPrimaryGreenValue(self, u)
     return 0
 end
 function ____exports.SU_GetUnitModel(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return ""
     end
     local unitId = jass.GetUnitTypeId(u)
@@ -95,7 +95,7 @@ function ____exports.SU_GetHeroParmary(self, u)
     return getUnitPrimaryTypeFromSlk(nil, u)
 end
 function ____exports.SU_AddHeroState(self, u, id, typ, value)
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return
     end
     local isAdd = typ == 0
@@ -135,7 +135,7 @@ function ____exports.SU_AddHeroState(self, u, id, typ, value)
     end
 end
 function ____exports.SU_GetHeroParmaryValue(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return -1
     end
     local typ = ____exports.SU_GetHeroParmary(nil, u)
@@ -174,7 +174,7 @@ function ____exports.SU_AddHeroAllState(self, u, a, b, c)
     )
 end
 function ____exports.SU_SetHeroParmaryValue(self, u, typ, value)
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return
     end
     local primaryType = ____exports.SU_GetHeroParmary(nil, u)
@@ -210,71 +210,6 @@ end
 function ____exports.SU_HeroISParmary(self, u, i)
     return ____exports.SU_GetHeroParmary(nil, u) == i
 end
-function ____exports.SU_DotBehindUnit(self, fac, x, y, a, b)
-    local angle = GAFC(
-        nil,
-        x,
-        y,
-        a,
-        b
-    ) - fac
-    return CosBJ(angle) <= -0.707106
-end
-function ____exports.SU_GetUnitOfUnit(self, u, tu)
-    if not SUC_IsValidUnit(nil, u) or not SUC_IsValidUnit(nil, tu) then
-        return 3
-    end
-    local x = jass.GetUnitX(u)
-    local y = jass.GetUnitY(u)
-    local a = jass.GetUnitX(tu)
-    local b = jass.GetUnitY(tu)
-    local facing = jass.GetUnitFacing(u)
-    local angle = GAFC(
-        nil,
-        x,
-        y,
-        a,
-        b
-    ) - facing
-    local c = CosBJ(angle)
-    if c >= 0.866025 then
-        return 1
-    end
-    if c >= 0.707106 then
-        return 4
-    end
-    if c <= -0.866025 then
-        return 2
-    end
-    if c <= -0.707106 then
-        return 5
-    end
-    return 3
-end
-function ____exports.SU_IsUnitInfrontUnit2(self, u, tu)
-    if not SUC_IsValidUnit(nil, u) or not SUC_IsValidUnit(nil, tu) then
-        return false
-    end
-    local x = jass.GetUnitX(u)
-    local y = jass.GetUnitY(u)
-    local a = jass.GetUnitX(tu)
-    local b = jass.GetUnitY(tu)
-    local facing = jass.GetUnitFacing(u)
-    local angle = GAFC(
-        nil,
-        x,
-        y,
-        a,
-        b
-    ) - facing
-    return CosBJ(angle) > 0
-end
-function ____exports.SU_IsUnitInfrontUnit(self, u, tu)
-    return ____exports.SU_GetUnitOfUnit(nil, u, tu) == 1
-end
-function ____exports.SU_IsUnitBehindUnit(self, u, tu)
-    return ____exports.SU_GetUnitOfUnit(nil, u, tu) == 2
-end
 function ____exports.SU_GetUnitWhiteAtk(self, uOrA, aMaybe)
     local u = uOrA
     local a = aMaybe
@@ -285,7 +220,7 @@ function ____exports.SU_GetUnitWhiteAtk(self, uOrA, aMaybe)
     if a == nil or a == false or a == "" then
         a = 0
     end
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return 0
     end
     local primaryGreen = getHeroPrimaryGreenValue(nil, u)

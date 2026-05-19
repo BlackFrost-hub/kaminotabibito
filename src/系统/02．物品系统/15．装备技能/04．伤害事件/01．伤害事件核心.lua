@@ -38,6 +38,7 @@ local _____65AF_5C14_6CD5_888D = require("系统.02．物品系统.15．装备�
 local _____950B_5229_5DE8_9B54_722A = require("系统.02．物品系统.15．装备技能.00．物品.46．锋利巨魔爪")
 local _____5DE8_9B54_6218_5251 = require("系统.02．物品系统.15．装备技能.00．物品.47．巨魔战剑")
 local _____7CBE_7CB9_6CD5_523A = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺")
+local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑")
 local ____B00H_6307_6325BuffID = stringToFourCCSafe("B00H")
 local ____B00V_6697_9ED1_4FB5_8680BuffID = stringToFourCCSafe("B00V")
 local _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID = stringToFourCCSafe("e00D")
@@ -123,10 +124,16 @@ local function _____5904_7406_6700_7EC8_4F24_5BB3(target, attacker, applied, sna
     _____5DE8_9B54_6218_5251["处理巨魔战剑强化触发"](ctx)
     _____7CBE_7CB9_6CD5_523A["处理精粹法刺魔法触发"](ctx)
     _____6C99_6F20_8725_8734_4E4B_9B42["处理沙漠蜥蜴之魂造成伤害"](ctx)
+    local ____opt_6 = _____55DC_72F1_6076_5251["处理嗜狱恶剑造成伤害"]
+    if ____opt_6 ~= nil then
+        ____opt_6(ctx)
+    end
     _____5904_7406_6307_6325_6613_4F24(ctx)
 end
 local function _____4F24_5BB3_4E8B_4EF6_4FEE_6B63(context)
     local _____7ED3_679C = _____65AF_5C14_6CD5_888D["处理斯尔法袍伤害修正"](context)
+    local ____opt_8 = _____55DC_72F1_6076_5251["处理嗜狱恶剑伤害修正"]
+    _____7ED3_679C = ____opt_8 and ____opt_8(context) or _____7ED3_679C
     if ____B00V_6697_9ED1_4FB5_8680BuffID ~= 0 and context.target ~= nil and UnitHasBuffBJ(context.target, ____B00V_6697_9ED1_4FB5_8680BuffID) then
         if context.currentDamage >= _____7ED3_679C and _____7ED3_679C >= _____53D6_5F53_524D_751F_547D(context.target) then
             _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(context.attacker, context.target)

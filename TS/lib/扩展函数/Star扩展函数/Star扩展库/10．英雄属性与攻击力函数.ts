@@ -1,7 +1,7 @@
 /**
- * Star扩展库 - 单位属性方位与攻击函数
+ * Star扩展库 - 英雄属性与攻击力函数
  *
- * 提供单位模型、英雄主属性、方位判断与白字攻击力计算。
+ * 提供单位模型读取、英雄主属性操作与白字攻击力计算。
  */
 
 const jass = require("jass.common") as any;
@@ -151,56 +151,6 @@ export function SU_SetHeroParmaryValue(u: any, typ: number, value: number): void
 // 判断是否匹配指定主属性。
 export function SU_HeroISParmary(u: any, i: number): boolean {
   return SU_GetHeroParmary(u) === i;
-}
-
-// 判断点是否落在单位背面。
-export function SU_DotBehindUnit(fac: number, x: number, y: number, a: number, b: number): boolean {
-  const angle = GAFC(x, y, a, b) - fac;
-  return CosBJ(angle) <= -0.707106;
-}
-
-// 获取目标相对单位的方位区间。
-export function SU_GetUnitOfUnit(u: any, tu: any): number {
-  if (!SUC_IsValidUnit(u) || !SUC_IsValidUnit(tu)) return 3;
-
-  const x = jass.GetUnitX(u);
-  const y = jass.GetUnitY(u);
-  const a = jass.GetUnitX(tu);
-  const b = jass.GetUnitY(tu);
-  const facing = jass.GetUnitFacing(u);
-
-  const angle = GAFC(x, y, a, b) - facing;
-  const c = CosBJ(angle);
-
-  if (c >= 0.866025) return 1;
-  if (c >= 0.707106) return 4;
-  if (c <= -0.866025) return 2;
-  if (c <= -0.707106) return 5;
-  return 3;
-}
-
-// 宽松判断目标是否在前方。
-export function SU_IsUnitInfrontUnit2(u: any, tu: any): boolean {
-  if (!SUC_IsValidUnit(u) || !SUC_IsValidUnit(tu)) return false;
-
-  const x = jass.GetUnitX(u);
-  const y = jass.GetUnitY(u);
-  const a = jass.GetUnitX(tu);
-  const b = jass.GetUnitY(tu);
-  const facing = jass.GetUnitFacing(u);
-
-  const angle = GAFC(x, y, a, b) - facing;
-  return CosBJ(angle) > 0;
-}
-
-// 严格判断目标是否在正前方。
-export function SU_IsUnitInfrontUnit(u: any, tu: any): boolean {
-  return SU_GetUnitOfUnit(u, tu) === 1;
-}
-
-// 严格判断目标是否在正后方。
-export function SU_IsUnitBehindUnit(u: any, tu: any): boolean {
-  return SU_GetUnitOfUnit(u, tu) === 2;
 }
 
 // 计算单位白字攻击力。

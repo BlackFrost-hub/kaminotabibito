@@ -101,10 +101,10 @@ local function onSfbCurseRemoved(unitOrHid)
     __TS__Delete(curseAccuracyStateByHid, hid)
 end
 ____exports["SFB_施加自定义诅咒Buff"] = function(sourceUnit, u, time)
-    if not SUC_IsValidUnit(nil, u) or time <= 0 then
+    if not SUC_IsValidUnit(u) or time <= 0 then
         return
     end
-    if SUC_IsUnitStructure(nil, u) then
+    if SUC_IsUnitStructure(u) then
         return
     end
     if u == SFB_Unit then

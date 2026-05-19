@@ -370,10 +370,10 @@ local function onSfbExpauseTimerExpire()
     safeDestroyTimer(nil, t)
 end
 ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, abilityId, orderStr)
-    if not SUC_IsValidUnit(nil, u) or time <= 0 then
+    if not SUC_IsValidUnit(u) or time <= 0 then
         return
     end
-    if SUC_IsUnitStructure(nil, u) then
+    if SUC_IsUnitStructure(u) then
         return
     end
     if u == ____exports.SFB_Unit then
@@ -444,10 +444,10 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     if _____6301_7EED_65F6_95F4 == nil then
         _____6301_7EED_65F6_95F4 = 0
     end
-    if not SUC_IsValidUnit(nil, u) then
+    if not SUC_IsValidUnit(u) then
         return false
     end
-    if SUC_IsUnitStructure(nil, u) then
+    if SUC_IsUnitStructure(u) then
         return false
     end
     if u == ____exports.SFB_Unit then

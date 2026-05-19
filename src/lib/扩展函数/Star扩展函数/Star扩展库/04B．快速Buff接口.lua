@@ -115,10 +115,10 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
     end
 end
 function ____exports.SFB_setBuff(sourceUnit, u, id, time)
-    if not SUC_IsValidUnit(nil, u) or time == 0 then
+    if not SUC_IsValidUnit(u) or time == 0 then
         return
     end
-    if SUC_IsUnitStructure(nil, u) then
+    if SUC_IsUnitStructure(u) then
         return
     end
     if u == SFB_Unit then
@@ -296,10 +296,10 @@ ____exports["SFB_施加通用Buff"] = function(_____6765_6E90_5355_4F4D, _____76
     ____exports.SFB_setBuff(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
 end
 function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
-    if not SUC_IsValidUnit(nil, u) or time == 0 then
+    if not SUC_IsValidUnit(u) or time == 0 then
         return
     end
-    if SUC_IsUnitStructure(nil, u) then
+    if SUC_IsUnitStructure(u) then
         return
     end
     if u == SFB_Unit then

@@ -16,11 +16,11 @@ ____exports.TIMED_LIFE_HEALING_WARD = 4
 ____exports.TIMED_LIFE_ANIMATE_DEAD = 5
 ____exports.TIMED_LIFE_WATER_ELEMENTAL = 6
 ____exports.TIMED_LIFE_TIMED = 7
-function ____exports.SU_IsUnitInvincible(self, u)
-    return SUC_IsUnitInvincible(nil, u)
+function ____exports.SU_IsUnitInvincible(u)
+    return SUC_IsUnitInvincible(u)
 end
-function ____exports.SU_SetUnitFlyHeight(self, whichUnit, newHeight, rate)
-    if not SUC_IsValidUnit(nil, whichUnit) then
+function ____exports.SU_SetUnitFlyHeight(whichUnit, newHeight, rate)
+    if not SUC_IsValidUnit(whichUnit) then
         return
     end
     local AMRF = 1097691750
@@ -28,8 +28,8 @@ function ____exports.SU_SetUnitFlyHeight(self, whichUnit, newHeight, rate)
     jass.UnitRemoveAbility(whichUnit, AMRF)
     jass.SetUnitFlyHeight(whichUnit, newHeight, rate)
 end
-function ____exports.SU_GetHeroAllState(self, u, b)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.SU_GetHeroAllState(u, b)
+    if not SUC_IsValidUnit(u) then
         return 0
     end
     local str = jass.GetHeroStr(u, b)
@@ -37,8 +37,8 @@ function ____exports.SU_GetHeroAllState(self, u, b)
     local int = jass.GetHeroInt(u, b)
     return str + agi + int
 end
-function ____exports.SU_GetUnitLostHPPercent(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.SU_GetUnitLostHPPercent(u)
+    if not SUC_IsValidUnit(u) then
         return 0
     end
     local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
@@ -48,16 +48,16 @@ function ____exports.SU_GetUnitLostHPPercent(self, u)
     end
     return (maxLife - life) / maxLife
 end
-function ____exports.SU_GetUnitLostHP(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.SU_GetUnitLostHP(u)
+    if not SUC_IsValidUnit(u) then
         return 0
     end
     local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
     local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     return maxLife - life
 end
-function ____exports.UnitAddHp(self, u, value, b)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.UnitAddHp(u, value, b)
+    if not SUC_IsValidUnit(u) then
         return
     end
     local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
@@ -67,11 +67,11 @@ function ____exports.UnitAddHp(self, u, value, b)
     jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
     jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
 end
-function ____exports.SU_IsUnitDie(self, u)
-    return SUC_IsUnitAlive(nil, u)
+function ____exports.SU_IsUnitDie(u)
+    return SUC_IsUnitAlive(u)
 end
-function ____exports.SU_ShowOrHideUnit(self, u, isShow)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.SU_ShowOrHideUnit(u, isShow)
+    if not SUC_IsValidUnit(u) then
         return
     end
     if isShow then
@@ -92,20 +92,20 @@ function ____exports.SU_ShowOrHideUnit(self, u, isShow)
         )
     end
     if isShow then
-        ____exports.SU_SetUnitFlyHeight(nil, u, 999999, 0)
+        ____exports.SU_SetUnitFlyHeight(u, 999999, 0)
     else
-        ____exports.SU_SetUnitFlyHeight(nil, u, 0, 0)
+        ____exports.SU_SetUnitFlyHeight(u, 0, 0)
     end
 end
-function ____exports.IsWaterElement(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.IsWaterElement(u)
+    if not SUC_IsValidUnit(u) then
         return false
     end
     local BHWE = 1112045413
     return jass.GetUnitAbilityLevel(u, BHWE) ~= 0
 end
-function ____exports.GetUnitTimedLifeID(self, u)
-    if not SUC_IsValidUnit(nil, u) then
+function ____exports.GetUnitTimedLifeID(u)
+    if not SUC_IsValidUnit(u) then
         return ____exports.TIMED_LIFE_NONE
     end
     if jass.GetUnitAbilityLevel(u, 1112891758) ~= 0 then
@@ -131,7 +131,7 @@ function ____exports.GetUnitTimedLifeID(self, u)
     end
     return ____exports.TIMED_LIFE_NONE
 end
-function ____exports.I2TimedLifeID(self, i)
+function ____exports.I2TimedLifeID(i)
     return i
 end
 return ____exports

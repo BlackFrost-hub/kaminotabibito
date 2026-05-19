@@ -475,7 +475,7 @@ export function 获取反击数量(单位: any): number {
   if (!单位) return 0;
   const hid = GetHandleId(单位);
   const 列表 = 反击实例映射[hid];
-  return 列表 ? 列表.length : 0;
+  return 列表 !== undefined ? 列表.length : 0;
 }
 
 //=============================================================================

@@ -8,7 +8,8 @@ export * from "./06．X库函数";
 export * from "./07．特效组系统";
 export * from "./08．单位判定与筛选函数";
 export * from "./09．单位基础与生命周期函数";
-export * from "./10．单位属性方位与攻击函数";
+export * from "./10．英雄属性与攻击力函数";
+export * from "./11．方位判断函数";
 export * from "./12．StarBase基础函数";
 
 import * as cameraFunc from "./00．镜头函数";
@@ -21,7 +22,8 @@ import * as xLib from "./06．X库函数";
 import * as effectGroup from "./07．特效组系统";
 import * as unitCondition from "./08．单位判定与筛选函数";
 import * as unitBase from "./09．单位基础与生命周期函数";
-import * as unitAttr from "./10．单位属性方位与攻击函数";
+import * as heroAttr from "./10．英雄属性与攻击力函数";
+import * as dirFunc from "./11．方位判断函数";
 import * as starBase from "./12．StarBase基础函数";
 
 function expose(name: string, fn: any): void {
@@ -114,20 +116,32 @@ export function registerBridge(): void {
   expose("IsWaterElement", unitBase.IsWaterElement);
   expose("GetUnitTimedLifeID", unitBase.GetUnitTimedLifeID);
   expose("I2TimedLifeID", unitBase.I2TimedLifeID);
-  // 单位属性方位与攻击函数
-  expose("SU_GetUnitModel", unitAttr.SU_GetUnitModel);
-  expose("SU_GetHeroParmary", unitAttr.SU_GetHeroParmary);
-  expose("SU_AddHeroState", unitAttr.SU_AddHeroState);
-  expose("SU_GetHeroParmaryValue", unitAttr.SU_GetHeroParmaryValue);
-  expose("SU_AddHeroAllState", unitAttr.SU_AddHeroAllState);
-  expose("SU_SetHeroParmaryValue", unitAttr.SU_SetHeroParmaryValue);
-  expose("SU_HeroISParmary", unitAttr.SU_HeroISParmary);
-  expose("SU_DotBehindUnit", unitAttr.SU_DotBehindUnit);
-  expose("SU_GetUnitOfUnit", unitAttr.SU_GetUnitOfUnit);
-  expose("SU_IsUnitInfrontUnit2", unitAttr.SU_IsUnitInfrontUnit2);
-  expose("SU_IsUnitInfrontUnit", unitAttr.SU_IsUnitInfrontUnit);
-  expose("SU_IsUnitBehindUnit", unitAttr.SU_IsUnitBehindUnit);
-  expose("SU_GetUnitWhiteAtk", unitAttr.SU_GetUnitWhiteAtk);
+  // 英雄属性与攻击力函数
+  expose("SU_GetUnitModel", heroAttr.SU_GetUnitModel);
+  expose("SU_GetHeroParmary", heroAttr.SU_GetHeroParmary);
+  expose("SU_AddHeroState", heroAttr.SU_AddHeroState);
+  expose("SU_GetHeroParmaryValue", heroAttr.SU_GetHeroParmaryValue);
+  expose("SU_AddHeroAllState", heroAttr.SU_AddHeroAllState);
+  expose("SU_SetHeroParmaryValue", heroAttr.SU_SetHeroParmaryValue);
+  expose("SU_HeroISParmary", heroAttr.SU_HeroISParmary);
+  expose("SU_GetUnitWhiteAtk", heroAttr.SU_GetUnitWhiteAtk);
+  // 方位判断函数（新）
+  expose("是否在指定角度范围内", dirFunc.是否在指定角度范围内);
+  expose("是否在前方角度内", dirFunc.是否在前方角度内);
+  expose("是否在后方角度内", dirFunc.是否在后方角度内);
+  expose("是否在正前方", dirFunc.是否在正前方);
+  expose("是否在正后方", dirFunc.是否在正后方);
+  expose("是否在左侧", dirFunc.是否在左侧);
+  expose("是否在右侧", dirFunc.是否在右侧);
+  expose("是否在前方", dirFunc.是否在前方);
+  expose("是否在后方", dirFunc.是否在后方);
+  expose("获取方位区间", dirFunc.获取方位区间);
+  // 旧函数兼容
+  expose("SU_DotBehindUnit", dirFunc.SU_DotBehindUnit);
+  expose("SU_GetUnitOfUnit", dirFunc.SU_GetUnitOfUnit);
+  expose("SU_IsUnitInfrontUnit2", dirFunc.SU_IsUnitInfrontUnit2);
+  expose("SU_IsUnitInfrontUnit", dirFunc.SU_IsUnitInfrontUnit);
+  expose("SU_IsUnitBehindUnit", dirFunc.SU_IsUnitBehindUnit);
   // StarBase基础函数
   expose("Star_CoordinateX", starBase.Star_CoordinateX);
   expose("Star_CoordinateY", starBase.Star_CoordinateY);
