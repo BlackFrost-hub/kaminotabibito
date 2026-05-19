@@ -16,8 +16,9 @@ const { 处理女妖头饰累计 } = require("系统.02．物品系统.15．装�
 
 let 已初始化 = false;
 
+//跳过精神伤害和≤1的伤害
 function onAppliedFinalDamage(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0)) {
+  if (!(applied >= 1)) {
     return;
   }
   if (snapshot != null && snapshot.isTrueDamage === true) {

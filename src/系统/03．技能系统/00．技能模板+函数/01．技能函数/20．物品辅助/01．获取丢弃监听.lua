@@ -8,6 +8,8 @@ local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetItemTypeId = jass.GetItemTypeId
 local UnitItemInSlot = jass.UnitItemInSlot
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local _____6307_5B9A_7269_54C1_76D1_542C_5217_8868 = {}
 local _____5355_4F4D_7269_54C1_6301_6709_6570_91CF_8868 = {}
 local _____5DF2_521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C = false
@@ -16,6 +18,9 @@ local function _____83B7_53D6_5355_4F4DID(unit)
         return 0
     end
     return GetHandleId(unit) or 0
+end
+local function _____5355_4F4D_662F_82F1_96C4(unit)
+    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_HERO) == true
 end
 local function _____83B7_53D6_5355_4F4D_6307_5B9A_7269_54C1_6301_6709_6570_91CF(unit, itemTypeId)
     if unit == nil or unit == 0 or itemTypeId == 0 then
@@ -74,7 +79,7 @@ local function _____5206_53D1_6307_5B9A_7269_54C1_53D8_5316(unit, item, itemType
             do
                 local listener = _____6307_5B9A_7269_54C1_76D1_542C_5217_8868[i + 1]
                 if listener["物品类型ID"] ~= itemTypeId then
-                    goto __continue21
+                    goto __continue22
                 end
                 if isPickup then
                     local ____opt_3 = listener["获取回调"]
@@ -88,13 +93,16 @@ local function _____5206_53D1_6307_5B9A_7269_54C1_53D8_5316(unit, item, itemType
                     end
                 end
             end
-            ::__continue21::
+            ::__continue22::
             i = i + 1
         end
     end
 end
 local function _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, isPickup)
     if unit == nil or unit == 0 or item == nil or item == 0 then
+        return
+    end
+    if not _____5355_4F4D_662F_82F1_96C4(unit) then
         return
     end
     local itemTypeId = GetItemTypeId(item)

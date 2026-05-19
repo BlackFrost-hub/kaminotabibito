@@ -37,6 +37,14 @@ local COLOR_DEFAULT = {r = 100, g = 200, b = 255, a = 255}
 local COLOR_PHYSICAL = {r = 180, g = 100, b = 30, a = 255}
 local COLOR_MAGICAL = {r = 30, g = 30, b = 180, a = 255}
 local COLOR_GENERAL = {r = 200, g = 200, b = 200, a = 255}
+local COLOR_ENHANCED = {r = 255, g = 140, b = 0, a = 255}
+local COLOR_FIRE = {r = 255, g = 66, b = 66, a = 255}
+local COLOR_WATER = {r = 80, g = 190, b = 255, a = 255}
+local COLOR_THUNDER = {r = 170, g = 220, b = 255, a = 255}
+local COLOR_METAL = {r = 255, g = 210, b = 80, a = 255}
+local COLOR_WOOD = {r = 120, g = 255, b = 120, a = 255}
+local COLOR_LIGHT = {r = 255, g = 255, b = 170, a = 255}
+local COLOR_DARK = {r = 180, g = 130, b = 255, a = 255}
 local _____62A4_76FE_6761_6620_5C04 = __TS__New(Map)
 local _____5DF2_6CE8_518C_8BA1_65F6_5668 = false
 local function _____5355_4F4D_5B58_6D3B(u)
@@ -251,7 +259,7 @@ ____exports["删除护盾条"] = function(_____5355_4F4D)
 end
 --- 护盾条闪色（受击反馈）
 -- 
--- @param 伤害类型 0=其他/通用, 1=物理, 2=魔法
+-- @param 伤害类型 0=其他/通用, 1=物理, 2=魔法, 3=强化, 4=火, 5=水/冰, 6=雷, 7=金/毒, 8=木/风, 9=光, 10=暗
 ____exports["护盾条闪色"] = function(_____5355_4F4D, _____4F24_5BB3_7C7B_578B)
     local _____5355_4F4DID = _____53D6_53E5_67C4ID(_____5355_4F4D)
     local _____6570_636E = _____62A4_76FE_6761_6620_5C04:get(_____5355_4F4DID)
@@ -263,6 +271,22 @@ ____exports["护盾条闪色"] = function(_____5355_4F4D, _____4F24_5BB3_7C7B_57
         _____989C_8272 = COLOR_PHYSICAL
     elseif _____4F24_5BB3_7C7B_578B == 2 then
         _____989C_8272 = COLOR_MAGICAL
+    elseif _____4F24_5BB3_7C7B_578B == 3 then
+        _____989C_8272 = COLOR_ENHANCED
+    elseif _____4F24_5BB3_7C7B_578B == 4 then
+        _____989C_8272 = COLOR_FIRE
+    elseif _____4F24_5BB3_7C7B_578B == 5 then
+        _____989C_8272 = COLOR_WATER
+    elseif _____4F24_5BB3_7C7B_578B == 6 then
+        _____989C_8272 = COLOR_THUNDER
+    elseif _____4F24_5BB3_7C7B_578B == 7 then
+        _____989C_8272 = COLOR_METAL
+    elseif _____4F24_5BB3_7C7B_578B == 8 then
+        _____989C_8272 = COLOR_WOOD
+    elseif _____4F24_5BB3_7C7B_578B == 9 then
+        _____989C_8272 = COLOR_LIGHT
+    elseif _____4F24_5BB3_7C7B_578B == 10 then
+        _____989C_8272 = COLOR_DARK
     else
         _____989C_8272 = COLOR_GENERAL
     end

@@ -14,22 +14,27 @@ local _____7279_5B9A_654C_65B9_73A9_5BB6ID = 7
 local _____8FDC_53E4_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_ANCIENT
 local _____673A_68B0_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_MECHANICAL
 local _____53EC_5524_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_SUMMONED
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
+local IsUnitType = jass.IsUnitType
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local function _____662F_5426_5C5E_4E8E_76D1_542C_6B7B_4EA1_5355_4F4D(_____5355_4F4D)
-    local _____6240_6709_8005 = jass.GetOwningPlayer(_____5355_4F4D)
-    local _____73A9_5BB6ID = jass.GetPlayerId(_____6240_6709_8005)
+    local _____6240_6709_8005 = GetOwningPlayer(_____5355_4F4D)
+    local _____73A9_5BB6ID = GetPlayerId(_____6240_6709_8005)
     return _____73A9_5BB6ID == _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID or _____73A9_5BB6ID == _____7279_5B9A_654C_65B9_73A9_5BB6ID
 end
 local function _____662F_5426_901A_8FC7_6B7B_4EA1_8FC7_6EE4(_____5355_4F4D)
     if not _____662F_5426_5C5E_4E8E_76D1_542C_6B7B_4EA1_5355_4F4D(_____5355_4F4D) then
         return false
     end
-    if jass.IsUnitType(_____5355_4F4D, _____8FDC_53E4_5355_4F4D_7C7B_578B) then
+    if IsUnitType(_____5355_4F4D, _____8FDC_53E4_5355_4F4D_7C7B_578B) then
         return false
     end
-    if jass.IsUnitType(_____5355_4F4D, _____673A_68B0_5355_4F4D_7C7B_578B) then
+    if IsUnitType(_____5355_4F4D, _____673A_68B0_5355_4F4D_7C7B_578B) then
         return false
     end
-    if jass.IsUnitType(_____5355_4F4D, _____53EC_5524_5355_4F4D_7C7B_578B) then
+    if IsUnitType(_____5355_4F4D, _____53EC_5524_5355_4F4D_7C7B_578B) then
         return false
     end
     return true
@@ -38,9 +43,9 @@ local function _____6784_5EFA_6B7B_4EA1_4E8B_4EF6_4E0A_4E0B_6587(_____6B7B_4EA1_
     return {
         ["死亡单位"] = _____6B7B_4EA1_5355_4F4D,
         ["击杀单位"] = _____51FB_6740_5355_4F4D,
-        ["死亡单位所有者"] = jass.GetOwningPlayer(_____6B7B_4EA1_5355_4F4D),
-        ["死亡坐标X"] = jass.GetUnitX(_____6B7B_4EA1_5355_4F4D),
-        ["死亡坐标Y"] = jass.GetUnitY(_____6B7B_4EA1_5355_4F4D)
+        ["死亡单位所有者"] = GetOwningPlayer(_____6B7B_4EA1_5355_4F4D),
+        ["死亡坐标X"] = GetUnitX(_____6B7B_4EA1_5355_4F4D),
+        ["死亡坐标Y"] = GetUnitY(_____6B7B_4EA1_5355_4F4D)
     }
 end
 local function ____on_88C5_5907_6B7B_4EA1_4E8B_4EF6(_____6B7B_4EA1_5355_4F4D, _____51FB_6740_5355_4F4D)

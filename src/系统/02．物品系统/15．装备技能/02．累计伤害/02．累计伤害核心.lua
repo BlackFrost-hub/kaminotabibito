@@ -10,7 +10,7 @@ local ____require_result_3 = require("系统.02．物品系统.15．装备技能
 local _____5904_7406_5973_5996_5934_9970_7D2F_8BA1 = ____require_result_3["处理女妖头饰累计"]
 local _____5DF2_521D_59CB_5316 = false
 local function onAppliedFinalDamage(target, attacker, applied, snapshot)
-    if not (applied > 0) then
+    if not (applied >= 1) then
         return
     end
     if snapshot ~= nil and snapshot.isTrueDamage == true then

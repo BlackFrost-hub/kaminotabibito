@@ -147,6 +147,12 @@ local function _____53D6_8F6C_79FB_627F_53D7_8005(target)
     return nil
 end
 local function ____on_5B88_62A4_4E4B_76FE_4F24_5BB3_4FEE_6B63(context)
+    if not (context.currentDamage >= 1) then
+        return context.currentDamage
+    end
+    if context.isTrueDamage == true then
+        return context.currentDamage
+    end
     local target = context.target
     if target == nil or target == 0 or not _____5355_4F4D_5B58_6D3B(target) then
         return context.currentDamage

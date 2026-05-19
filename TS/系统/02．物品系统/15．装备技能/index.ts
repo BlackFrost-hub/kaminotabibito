@@ -7,6 +7,7 @@ export * from "./03．主动技能";
 export * from "./04．伤害事件";
 export * from "./05．物品使用";
 export * from "./06．获取丢弃";
+export * from "./08．攻击效果";
 
 import "./99．物品测试/index";
  

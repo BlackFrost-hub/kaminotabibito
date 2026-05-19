@@ -42,6 +42,7 @@ const 锋利巨魔爪 = require("系统.02．物品系统.15．装备技能.00�
 const 巨魔战剑 = require("系统.02．物品系统.15．装备技能.00．物品.47．巨魔战剑") as { 处理巨魔战剑强化触发: (this: void, ctx: any) => void };
 const 精粹法刺 = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺") as { 处理精粹法刺魔法触发: (this: void, ctx: any) => void };
 const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑") as { 处理嗜狱恶剑使用?: (this: void, ctx: any) => void; 处理嗜狱恶剑伤害修正?: (this: void, context: any) => number; 处理嗜狱恶剑造成伤害?: (this: void, ctx: any) => void };
+const 精沙战斧 = require("系统.02．物品系统.15．装备技能.00．物品.83．精沙战斧") as { 处理精沙战斧伤害修正?: (this: void, context: any) => number };
 
 import { 伤害事件伤害类型, 是指定伤害类型, 取当前生命 } from "./00．公共/01．伤害事件工具";
 
@@ -118,8 +119,11 @@ function 处理最终伤害(this: void, target: any, attacker: any, applied: num
 }
 
 function 伤害事件修正(this: void, context: any): number {
+  if (!(context.currentDamage >= 1)) return context.currentDamage;
+  if (context.isTrueDamage === true) return context.currentDamage;
   let 结果 = 斯尔法袍.处理斯尔法袍伤害修正(context);
   结果 = 嗜狱恶剑.处理嗜狱恶剑伤害修正?.(context) ?? 结果;
+  结果 = 精沙战斧.处理精沙战斧伤害修正?.(context) ?? 结果;
   if (B00V暗黑侵蚀BuffID !== 0 && context.target != null && UnitHasBuffBJ(context.target, B00V暗黑侵蚀BuffID)) {
     if (context.currentDamage >= 结果 && 结果 >= 取当前生命(context.target)) {
       安排暗黑侵蚀复活(context.attacker, context.target);

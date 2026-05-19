@@ -13,6 +13,10 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 
+const jass = require("jass.common") as any;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
+
 export type 物品技能事件上下文 = {
   施法单位: any;
   物品: any;
@@ -61,10 +65,17 @@ const 浴灵药剂 = require("系统.02．物品系统.15．装备技能.00．�
 const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑") as { 处理嗜狱恶剑使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 盗贼神符魔抗 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗") as { 处理盗贼神符魔抗使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 火把 = require("系统.02．物品系统.15．装备技能.00．物品.71．火把") as { 处理火把使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 抗毒药水 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水") as { 处理抗毒药水使用: (this: void, ctx: 物品技能事件上下文) => void };
 
 let 已初始化 = false;
 
+function 物品使用单位是英雄(this: void, ctx: 物品技能事件上下文): boolean {
+  const unit = ctx.施法单位;
+  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_HERO) === true;
+}
+
 function on物品使用链路(this: void, ctx: 物品技能事件上下文): void {
+  if (!物品使用单位是英雄(ctx)) return;
   狱妖魔盾.处理狱妖魔盾使用(ctx);
   商人之书.处理商人之书使用(ctx);
   狂暴树枝.处理狂暴树枝使用(ctx);
@@ -88,6 +99,7 @@ function on物品使用链路(this: void, ctx: 物品技能事件上下文): voi
   嗜狱恶剑.处理嗜狱恶剑使用(ctx);
   盗贼神符魔抗.处理盗贼神符魔抗使用(ctx);
   火把.处理火把使用(ctx);
+  抗毒药水.处理抗毒药水使用(ctx);
 }
 
 function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any): void {
@@ -95,12 +107,15 @@ function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any
 }
 
 function on物品使用最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0)) return;
+  if (!(applied >= 1)) return;
+  if (snapshot != null && snapshot.isTrueDamage === true) return;
   焰混能量体.处理焰混能量体伤害(target, attacker, applied, snapshot);
   魔古战刃.处理魔古战刃伤害(target, attacker, applied, snapshot);
 }
 
 function on物品使用伤害修正(this: void, context: any): number {
+  if (!(context.currentDamage >= 1)) return context.currentDamage;
+  if (context.isTrueDamage === true) return context.currentDamage;
   return 恶斯胸甲.处理恶斯胸甲伤害修正(context);
 }
 

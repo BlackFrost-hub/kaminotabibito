@@ -8,6 +8,9 @@ local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算
 local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_3.registerDamageModifier
+local jass = require("jass.common")
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local _____72F1_5996_9B54_76FE = require("系统.02．物品系统.15．装备技能.00．物品.49．狱妖魔盾")
 local _____5546_4EBA_4E4B_4E66 = require("系统.02．物品系统.15．装备技能.00．物品.50．商人之书")
 local _____72C2_66B4_6811_679D = require("系统.02．物品系统.15．装备技能.00．物品.51．狂暴树枝")
@@ -31,8 +34,16 @@ local _____6D74_7075_836F_5242 = require("系统.02．物品系统.15．装备�
 local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑")
 local _____76D7_8D3C_795E_7B26_9B54_6297 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗")
 local _____706B_628A = require("系统.02．物品系统.15．装备技能.00．物品.71．火把")
+local _____6297_6BD2_836F_6C34 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水")
 local _____5DF2_521D_59CB_5316 = false
+local function _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx)
+    local unit = ctx["施法单位"]
+    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_HERO) == true
+end
 local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
+    if not _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx) then
+        return
+    end
     _____72F1_5996_9B54_76FE["处理狱妖魔盾使用"](ctx)
     _____5546_4EBA_4E4B_4E66["处理商人之书使用"](ctx)
     _____72C2_66B4_6811_679D["处理狂暴树枝使用"](ctx)
@@ -56,18 +67,28 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
     _____55DC_72F1_6076_5251["处理嗜狱恶剑使用"](ctx)
     _____76D7_8D3C_795E_7B26_9B54_6297["处理盗贼神符魔抗使用"](ctx)
     _____706B_628A["处理火把使用"](ctx)
+    _____6297_6BD2_836F_6C34["处理抗毒药水使用"](ctx)
 end
 local function ____on_7269_54C1_4F7F_7528_6B7B_4EA1_4E8B_4EF6(dyingUnit, killingUnit)
     _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心击杀"](dyingUnit, killingUnit)
 end
 local function ____on_7269_54C1_4F7F_7528_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
-    if not (applied > 0) then
+    if not (applied >= 1) then
+        return
+    end
+    if snapshot ~= nil and snapshot.isTrueDamage == true then
         return
     end
     _____7130_6DF7_80FD_91CF_4F53["处理焰混能量体伤害"](target, attacker, applied, snapshot)
     _____9B54_53E4_6218_5203["处理魔古战刃伤害"](target, attacker, applied, snapshot)
 end
 local function ____on_7269_54C1_4F7F_7528_4F24_5BB3_4FEE_6B63(context)
+    if not (context.currentDamage >= 1) then
+        return context.currentDamage
+    end
+    if context.isTrueDamage == true then
+        return context.currentDamage
+    end
     return _____6076_65AF_80F8_7532["处理恶斯胸甲伤害修正"](context)
 end
 ____exports["初始化装备物品使用链"] = function()

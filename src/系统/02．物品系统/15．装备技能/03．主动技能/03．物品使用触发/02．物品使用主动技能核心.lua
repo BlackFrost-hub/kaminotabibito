@@ -38,8 +38,18 @@ local ____26_FF0E_4F7F_8005_9B54_8F6E = require("系统.02．物品系统.15．�
 local _____5904_7406_4F7F_8005_9B54_8F6E_4F7F_7528 = ____26_FF0E_4F7F_8005_9B54_8F6E["处理使者魔轮使用"]
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心")
 local _____6CE8_518C_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C = ____require_result_0["注册物品技能事件监听"]
+local jass = require("jass.common")
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local _____5DF2_521D_59CB_5316_7269_54C1_4E3B_52A8_6280_80FD_6838_5FC3 = false
+local function _____65BD_6CD5_5355_4F4D_662F_82F1_96C4(_____4E0A_4E0B_6587)
+    local _____5355_4F4D = _____4E0A_4E0B_6587["施法单位"]
+    return _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 and IsUnitType(_____5355_4F4D, UNIT_TYPE_HERO) == true
+end
 local function ____on_7269_54C1_4E3B_52A8_6280_80FD_751F_6548(_____4E0A_4E0B_6587)
+    if not _____65BD_6CD5_5355_4F4D_662F_82F1_96C4(_____4E0A_4E0B_6587) then
+        return
+    end
     _____5904_7406_7834_8840_4E4B_6212_4F7F_7528(_____4E0A_4E0B_6587)
     _____5904_7406_8FDC_53E4_6BD2_5492_62A4_7B26_4F7F_7528(_____4E0A_4E0B_6587)
     _____5904_7406_53F2_83B1_59C6_7C98_6DB2_74F6_4F7F_7528(_____4E0A_4E0B_6587)

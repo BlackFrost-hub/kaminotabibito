@@ -4,6 +4,10 @@ const { 注册物品技能事件监听 } = require("系统.00．核心系统.01�
   注册物品技能事件监听: (this: void, callback: (this: void, 上下文: any) => void) => void;
 };
 
+const jass = require("jass.common") as any;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
+
 import type { 物品技能事件上下文 } from "./01．物品使用触发常量";
 import { 处理破血之戒使用 } from "../../00．物品/05．破血之戒";
 import { 处理远古毒咒护符使用 } from "../../00．物品/10．远古毒咒护符";
@@ -26,7 +30,13 @@ import { 处理使者魔轮使用 } from "../../00．物品/26．使者魔轮";
 
 let 已初始化物品主动技能核心 = false;
 
+function 施法单位是英雄(this: void, 上下文: 物品技能事件上下文): boolean {
+  const 单位 = 上下文.施法单位;
+  return 单位 != null && 单位 !== 0 && IsUnitType(单位, UNIT_TYPE_HERO) === true;
+}
+
 function on物品主动技能生效(this: void, 上下文: 物品技能事件上下文): void {
+  if (!施法单位是英雄(上下文)) return;
   处理破血之戒使用(上下文);
   处理远古毒咒护符使用(上下文);
   处理史莱姆粘液瓶使用(上下文);

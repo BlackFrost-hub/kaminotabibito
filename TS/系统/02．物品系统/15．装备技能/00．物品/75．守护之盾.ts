@@ -142,6 +142,8 @@ function 取转移承受者(this: void, target: any): any | null {
 }
 
 function on守护之盾伤害修正(this: void, context: any): number {
+  if (!(context.currentDamage >= 1)) return context.currentDamage;
+  if (context.isTrueDamage === true) return context.currentDamage;
   const target = context.target;
   if (target == null || target === 0 || !单位存活(target)) return context.currentDamage;
   const holder = 取转移承受者(target);

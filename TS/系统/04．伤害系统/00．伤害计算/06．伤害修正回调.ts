@@ -17,6 +17,14 @@ export interface DamageModifierContext {
   isMagicDamage: boolean;
   isEnhancedDamage: boolean;
   isTrueDamage: boolean;
+  isMetalDamage?: boolean;
+  isWoodDamage?: boolean;
+  isWaterDamage?: boolean;
+  isFireDamage?: boolean;
+  isThunderDamage?: boolean;
+  isLightDamage?: boolean;
+  isDarkDamage?: boolean;
+  rawDamageType?: any;
   isNormalAttack: boolean;
   isSkillAttack: boolean;
   isSkillDamage: boolean;

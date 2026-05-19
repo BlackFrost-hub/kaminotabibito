@@ -99,7 +99,10 @@ function 打开巨魔大剑窗口(this: void, 单位: any): void {
 }
 
 function 处理巨魔大剑首伤(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (target == null || attacker == null || !(applied > 0)) {
+  if (target == null || attacker == null || !(applied >= 1)) {
+    return;
+  }
+  if (snapshot != null && snapshot.isTrueDamage === true) {
     return;
   }
   if (!单位持有巨魔大剑(attacker)) {

@@ -16,6 +16,28 @@ const ShieldType = {
   物理: 1,
   /** 魔法护盾 - 优先吸收魔法伤害 */
   魔法: 2,
+  /** 强化护盾 - 只吸收强化伤害 */
+  强化: 3,
+  /** 金属性护盾 */
+  金: 4,
+  /** 木属性护盾 */
+  木: 5,
+  /** 水属性护盾 */
+  水: 6,
+  /** 火属性护盾 */
+  火: 7,
+  /** 冰属性护盾 */
+  冰: 8,
+  /** 雷属性护盾 */
+  雷: 9,
+  /** 风属性护盾 */
+  风: 10,
+  /** 暗属性护盾 */
+  暗: 11,
+  /** 光属性护盾 */
+  光: 12,
+  /** 毒属性护盾 */
+  毒: 13,
 } as const;
 
 // 说明：
@@ -23,6 +45,23 @@ const ShieldType = {
 // - 这里改成 ASCII 常量对象，再用中文名字导出，外部调用不变。
 export { ShieldType as 护盾类型 };
 export type 护盾类型 = (typeof ShieldType)[keyof typeof ShieldType];
+
+export type 护盾属性类型 = "强化" | "金" | "木" | "水" | "火" | "冰" | "雷" | "风" | "暗" | "光" | "毒";
+
+export function 护盾属性转类型(this: void, 属性: 护盾属性类型): 护盾类型 {
+  if (属性 === "强化") return ShieldType.强化;
+  if (属性 === "金") return ShieldType.金;
+  if (属性 === "木") return ShieldType.木;
+  if (属性 === "水") return ShieldType.水;
+  if (属性 === "火") return ShieldType.火;
+  if (属性 === "冰") return ShieldType.冰;
+  if (属性 === "雷") return ShieldType.雷;
+  if (属性 === "风") return ShieldType.风;
+  if (属性 === "暗") return ShieldType.暗;
+  if (属性 === "光") return ShieldType.光;
+  if (属性 === "毒") return ShieldType.毒;
+  return ShieldType.通用;
+}
 
 // ==========================================================================================
 // 优先级常量
@@ -32,6 +71,17 @@ export type 护盾类型 = (typeof ShieldType)[keyof typeof ShieldType];
 export const 类型优先级: Record<护盾类型, number> = {
   [ShieldType.物理]: 100,
   [ShieldType.魔法]: 100,
+  [ShieldType.强化]: 120,
+  [ShieldType.金]: 120,
+  [ShieldType.木]: 120,
+  [ShieldType.水]: 120,
+  [ShieldType.火]: 120,
+  [ShieldType.冰]: 120,
+  [ShieldType.雷]: 120,
+  [ShieldType.风]: 120,
+  [ShieldType.暗]: 120,
+  [ShieldType.光]: 120,
+  [ShieldType.毒]: 120,
   [ShieldType.通用]: 50,
 };
 
@@ -153,6 +203,28 @@ export interface 伤害信息 {
   是魔法伤害: boolean;
   /** 是否真实伤害 */
   是真实伤害: boolean;
+  /** 是否强化伤害 */
+  是强化伤害?: boolean;
+  /** 是否火属性伤害 */
+  是火属性伤害?: boolean;
+  /** 是否水属性伤害 */
+  是水属性伤害?: boolean;
+  /** 是否冰属性伤害 */
+  是冰属性伤害?: boolean;
+  /** 是否雷属性伤害 */
+  是雷属性伤害?: boolean;
+  /** 是否金属性伤害 */
+  是金属性伤害?: boolean;
+  /** 是否木属性伤害 */
+  是木属性伤害?: boolean;
+  /** 是否风属性伤害 */
+  是风属性伤害?: boolean;
+  /** 是否暗属性伤害 */
+  是暗属性伤害?: boolean;
+  /** 是否光属性伤害 */
+  是光属性伤害?: boolean;
+  /** 是否毒属性伤害 */
+  是毒属性伤害?: boolean;
   /** 是否普攻 */
   是普攻: boolean;
 }

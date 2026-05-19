@@ -88,7 +88,10 @@ local function _____6253_5F00_5DE8_9B54_5927_5251_7A97_53E3(_____5355_4F4D)
     _____5DE8_9B54_5927_5251_7A97_53E3_8BA1_65F6_5668:set(_____952E, _____53E5_67C4)
 end
 local function _____5904_7406_5DE8_9B54_5927_5251_9996_4F24(target, attacker, applied, snapshot)
-    if target == nil or attacker == nil or not (applied > 0) then
+    if target == nil or attacker == nil or not (applied >= 1) then
+        return
+    end
+    if snapshot ~= nil and snapshot.isTrueDamage == true then
         return
     end
     if not _____5355_4F4D_6301_6709_5DE8_9B54_5927_5251(attacker) then

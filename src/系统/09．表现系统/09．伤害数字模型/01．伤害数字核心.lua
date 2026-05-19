@@ -230,7 +230,7 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 120, g = 140, b = 255}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_NORMAL then
-        return {r = 160, g = 82, b = 45}
+        return {r = 255, g = 90, b = 90}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_UNIVERSAL then
         return {r = 255, g = 255, b = 255}

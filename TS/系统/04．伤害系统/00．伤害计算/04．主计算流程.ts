@@ -66,6 +66,14 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
     isMagicDamage: boolean;
     isEnhancedDamage: boolean;
     isTrueDamage: boolean;
+    isMetalDamage?: boolean;
+    isWoodDamage?: boolean;
+    isWaterDamage?: boolean;
+    isFireDamage?: boolean;
+    isThunderDamage?: boolean;
+    isLightDamage?: boolean;
+    isDarkDamage?: boolean;
+    rawDamageType?: any;
     isNormalAttack: boolean;
     isSkillAttack: boolean;
     isSkillDamage: boolean;
@@ -503,6 +511,14 @@ export function onDamageEvent(
       isMagicDamage: snapshot.isMagicDamage,
       isEnhancedDamage: snapshot.isEnhancedDamage,
       isTrueDamage: snapshot.isTrueDamage,
+      isMetalDamage: snapshot.isMetalDamage,
+      isWoodDamage: snapshot.isWoodDamage,
+      isWaterDamage: snapshot.isWaterDamage,
+      isFireDamage: snapshot.isFireDamage,
+      isThunderDamage: snapshot.isThunderDamage,
+      isLightDamage: snapshot.isLightDamage,
+      isDarkDamage: snapshot.isDarkDamage,
+      rawDamageType: snapshot.rawDamageType,
       isNormalAttack: snapshot.isNormalAttack,
       isSkillAttack: snapshot.isSkillAttack,
       isSkillDamage: snapshot.isSkillDamage,

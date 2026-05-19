@@ -10,6 +10,8 @@ const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 
 export type 获取丢弃回调 = (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void;
 
@@ -27,6 +29,10 @@ let 已初始化获取丢弃监听 = false;
 function 获取单位ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
   return GetHandleId(unit) || 0;
+}
+
+function 单位是英雄(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_HERO) === true;
 }
 
 function 获取单位指定物品持有数量(this: void, unit: any, itemTypeId: number): number {
@@ -88,6 +94,7 @@ function 分发指定物品变化(this: void, unit: any, item: any, itemTypeId: 
 
 function 同步并分发物品变化(this: void, unit: any, item: any, isPickup: boolean): void {
   if (unit == null || unit === 0 || item == null || item === 0) return;
+  if (!单位是英雄(unit)) return;
 
   const itemTypeId = GetItemTypeId(item);
   if (itemTypeId === 0) return;
@@ -145,4 +152,3 @@ export function 单位当前是否持有指定物品(this: void, unit: any, item
 }
 
 export {};
-

@@ -5,7 +5,7 @@
  * 说明：
  * 1. 复用进度条单位 e011 显示护盾条
  * 2. 第一版只显示总护盾值
- * 3. 护盾条颜色：通用=黄色，受物理伤害=棕色，受魔法伤害=深蓝色
+ * 3. 护盾条颜色：对齐伤害数字模型的伤害属性色
  * 4. 护盾耗尽或单位死亡时删除
  */
 
@@ -56,6 +56,14 @@ const COLOR_DEFAULT = { r: 100, g: 200, b: 255, a: 255 };  // 蓝白色（默认
 const COLOR_PHYSICAL = { r: 180, g: 100, b: 30, a: 255 };  // 棕色（物理伤害）
 const COLOR_MAGICAL = { r: 30, g: 30, b: 180, a: 255 };    // 深蓝色（魔法伤害）
 const COLOR_GENERAL = { r: 200, g: 200, b: 200, a: 255 };  // 灰白色（其他/通用伤害）
+const COLOR_ENHANCED = { r: 255, g: 140, b: 0, a: 255 };
+const COLOR_FIRE = { r: 255, g: 66, b: 66, a: 255 };
+const COLOR_WATER = { r: 80, g: 190, b: 255, a: 255 };
+const COLOR_THUNDER = { r: 170, g: 220, b: 255, a: 255 };
+const COLOR_METAL = { r: 255, g: 210, b: 80, a: 255 };
+const COLOR_WOOD = { r: 120, g: 255, b: 120, a: 255 };
+const COLOR_LIGHT = { r: 255, g: 255, b: 170, a: 255 };
+const COLOR_DARK = { r: 180, g: 130, b: 255, a: 255 };
 
 // ==========================================================================================
 // 护盾条数据
@@ -277,7 +285,7 @@ export function 删除护盾条(单位: any): void {
 
 /**
  * 护盾条闪色（受击反馈）
- * @param 伤害类型 0=其他/通用, 1=物理, 2=魔法
+ * @param 伤害类型 0=其他/通用, 1=物理, 2=魔法, 3=强化, 4=火, 5=水/冰, 6=雷, 7=金/毒, 8=木/风, 9=光, 10=暗
  */
 export function 护盾条闪色(单位: any, 伤害类型: number): void {
   const 单位ID = 取句柄ID(单位);
@@ -289,6 +297,22 @@ export function 护盾条闪色(单位: any, 伤害类型: number): void {
     颜色 = COLOR_PHYSICAL;
   } else if (伤害类型 === 2) {
     颜色 = COLOR_MAGICAL;
+  } else if (伤害类型 === 3) {
+    颜色 = COLOR_ENHANCED;
+  } else if (伤害类型 === 4) {
+    颜色 = COLOR_FIRE;
+  } else if (伤害类型 === 5) {
+    颜色 = COLOR_WATER;
+  } else if (伤害类型 === 6) {
+    颜色 = COLOR_THUNDER;
+  } else if (伤害类型 === 7) {
+    颜色 = COLOR_METAL;
+  } else if (伤害类型 === 8) {
+    颜色 = COLOR_WOOD;
+  } else if (伤害类型 === 9) {
+    颜色 = COLOR_LIGHT;
+  } else if (伤害类型 === 10) {
+    颜色 = COLOR_DARK;
   } else {
     颜色 = COLOR_GENERAL;
   }

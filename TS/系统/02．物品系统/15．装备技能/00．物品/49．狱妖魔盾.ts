@@ -21,6 +21,7 @@ import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品�
 import {
   是否为使用物品,
   单位持有物品,
+  单位是英雄,
   取句柄ID,
   单位存活,
   取当前生命,
@@ -65,11 +66,13 @@ function 移除持有者(this: void, 单位: any): void {
 
 function on拾取狱妖魔盾(this: void, 单位: any, 物品: any): void {
   if (!是否为使用物品(物品, 狱妖魔盾物品ID)) return;
+  if (!单位是英雄(单位)) return;
   加入持有者(单位);
 }
 
 function on丢弃狱妖魔盾(this: void, 单位: any, 物品: any): void {
   if (!是否为使用物品(物品, 狱妖魔盾物品ID)) return;
+  if (!单位是英雄(单位)) return;
   移除持有者(单位);
 }
 
@@ -134,6 +137,7 @@ export function 初始化狱妖魔盾持有充能(this: void): void {
 export function 处理狱妖魔盾使用(this: void, 上下文: 物品技能事件上下文): void {
   if (!是否为使用物品(上下文.物品, 狱妖魔盾物品ID)) return;
   const 单位 = 上下文.施法单位;
+  if (!单位是英雄(单位)) return;
   const id = 取句柄ID(单位);
   if (id === 0) return;
   const 冷却到期 = 冷却到期表[id] ?? 0;
