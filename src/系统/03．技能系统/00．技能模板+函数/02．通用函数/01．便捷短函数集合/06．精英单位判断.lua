@@ -31,4 +31,15 @@ ____exports["是否英雄单位"] = function(unit)
     end
     return IsUnitType(unit, UNIT_TYPE_HERO) == true
 end
+--- 判断是否是普通敌人（杂鱼/蝼蚁/普通敌人/野怪）
+-- 条件：恶魔种族 或 野兽种族
+-- RACE_DEMON = 恶魔种族
+-- ConvertRace(8) = 野兽种族
+____exports["是否普通敌人"] = function(unit)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local RACE_BEAST = jass.ConvertRace(8)
+    return IsUnitRace(unit, RACE_DEMON) == true or IsUnitRace(unit, RACE_BEAST) == true
+end
 return ____exports

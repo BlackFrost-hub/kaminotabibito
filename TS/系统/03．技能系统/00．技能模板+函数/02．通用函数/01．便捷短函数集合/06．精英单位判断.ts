@@ -38,4 +38,16 @@ export function 是否英雄单位(this: void, unit: any): boolean {
   return IsUnitType(unit, UNIT_TYPE_HERO) === true;
 }
 
+/**
+ * 判断是否是普通敌人（杂鱼/蝼蚁/普通敌人/野怪）
+ * 条件：恶魔种族 或 野兽种族
+ * RACE_DEMON = 恶魔种族
+ * ConvertRace(8) = 野兽种族
+ */
+export function 是否普通敌人(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  const RACE_BEAST = jass.ConvertRace(8);
+  return IsUnitRace(unit, RACE_DEMON) === true || IsUnitRace(unit, RACE_BEAST) === true;
+}
+
 export {};

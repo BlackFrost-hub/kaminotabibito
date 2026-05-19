@@ -81,7 +81,17 @@ ____exports["物品主动技能测试命令列表"] = {
     "wp69",
     "wp70",
     "wp71",
-    "wp72"
+    "wp72",
+    "wp73",
+    "wp74",
+    "wp75",
+    "wp76",
+    "wp77",
+    "wp78",
+    "wp79",
+    "wp80",
+    "wp81",
+    "wp82"
 }
 local ____array_0 = __TS__SparseArrayNew(
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["回沙之书"],
@@ -116,7 +126,20 @@ __TS__SparseArrayPush(
     ____array_0,
     table.unpack(_____7269_54C1_4F7F_7528_6D4B_8BD5_88C5_5907_987A_5E8F)
 )
-__TS__SparseArrayPush(____array_0, "冥炎之裙")
+__TS__SparseArrayPush(
+    ____array_0,
+    "冥炎之裙",
+    "邪恶之心",
+    "祭祀面具",
+    "守护之盾",
+    "高原魔力灯笼",
+    "熔岩宝石",
+    "亡之魔杯",
+    "熔墓守卫护符",
+    "狱生面具",
+    "狱生面具强化",
+    "史莱姆粘液"
+)
 ____exports["物品主动技能测试清理装备列表"] = {__TS__SparseArraySpread(____array_0)}
 local ____array_1 = __TS__SparseArrayNew(
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["回沙之书"],
@@ -151,7 +174,20 @@ __TS__SparseArrayPush(
     ____array_1,
     table.unpack(_____7269_54C1_4F7F_7528_6D4B_8BD5_88C5_5907_987A_5E8F)
 )
-__TS__SparseArrayPush(____array_1, "冥炎之裙")
+__TS__SparseArrayPush(
+    ____array_1,
+    "冥炎之裙",
+    "邪恶之心",
+    "祭祀面具",
+    "守护之盾",
+    "高原魔力灯笼",
+    "熔岩宝石",
+    "亡之魔杯",
+    "熔墓守卫护符",
+    "狱生面具",
+    "狱生面具强化",
+    "史莱姆粘液"
+)
 ____exports["物品主动技能测试发放顺序"] = {__TS__SparseArraySpread(____array_1)}
 local function _____751F_6210_6D4B_8BD5_547D_4EE4_8BF4_660E_5217_8868()
     local list = {}

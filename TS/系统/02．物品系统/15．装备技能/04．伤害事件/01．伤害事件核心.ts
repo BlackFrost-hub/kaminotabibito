@@ -22,7 +22,7 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const 豺狼皮甲 = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲") as { 处理豺狼皮甲受伤: (this: void, ctx: any) => void };
 const 灵石 = require("系统.02．物品系统.15．装备技能.00．物品.28．灵石") as { 处理灵石受伤: (this: void, ctx: any) => void };
 const 傀岩杖 = require("系统.02．物品系统.15．装备技能.00．物品.29．傀岩杖") as { 处理傀岩杖受伤: (this: void, ctx: any) => void };
-const 沙漠蜥蜴之魂 = require("系统.02．物品系统.15．装备技能.00．物品.30．沙漠蜥蜴之魂") as { 处理沙漠蜥蜴之魂受伤: (this: void, ctx: any) => void };
+const 沙漠蜥蜴之魂 = require("系统.02．物品系统.15．装备技能.00．物品.30．沙漠蜥蜴之魂") as { 处理沙漠蜥蜴之魂受伤: (this: void, ctx: any) => void; 处理沙漠蜥蜴之魂造成伤害: (this: void, ctx: any) => void };
 const 湖之袍 = require("系统.02．物品系统.15．装备技能.00．物品.31．湖之袍") as { 处理湖之袍受伤: (this: void, ctx: any) => void };
 const 龙虾硬甲 = require("系统.02．物品系统.15．装备技能.00．物品.32．龙虾硬甲") as { 处理龙虾硬甲受伤: (this: void, ctx: any) => void };
 const 湖之龙枪 = require("系统.02．物品系统.15．装备技能.00．物品.33．湖之龙枪") as { 处理湖之龙枪造成伤害: (this: void, ctx: any) => void };
@@ -111,6 +111,7 @@ function 处理最终伤害(this: void, target: any, attacker: any, applied: num
   锋利巨魔爪.处理锋利巨魔爪物理触发(ctx);
   巨魔战剑.处理巨魔战剑强化触发(ctx);
   精粹法刺.处理精粹法刺魔法触发(ctx);
+  沙漠蜥蜴之魂.处理沙漠蜥蜴之魂造成伤害(ctx);
   处理指挥易伤(ctx);
 }
 

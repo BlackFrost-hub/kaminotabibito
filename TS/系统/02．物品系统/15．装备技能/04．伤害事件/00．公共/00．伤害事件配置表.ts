@@ -30,6 +30,7 @@ export const 伤害事件装备名称 = {
   锋利巨魔爪: "|cffccffff锋利巨魔爪（只能携带一件）|n|r",
   巨魔战剑: "巨魔战剑",
   精粹法刺: "精粹法刺",
+  嗜狱恶剑: "嗜狱恶剑",
 } as const;
 
 function 取装备物品ID(this: void, 装备名称: string): number {
