@@ -370,7 +370,11 @@ export function doHeal(params: HealParams): number {
   }
 
   if (HealManaAmount > 0) {
-    restoreMana(HealTarget, HealManaAmount, manaEffectEnabled, ManaEffectPath, ManaShowText);
+    // 底层调用魔法增减函数
+    const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
+      魔法增减: (this: void, target: any, amount: number, showText?: boolean, showManaEffect?: boolean) => number;
+    };
+    魔法增减(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled);
   }
 
   return actualHeal;

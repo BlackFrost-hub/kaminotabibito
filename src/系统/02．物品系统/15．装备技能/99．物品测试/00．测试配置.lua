@@ -1,9 +1,14 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
 local ____00_FF0E_4E3B_52A8_6280_80FD_88C5_5907_540D = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.00．主动技能装备名")
 local _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0 = ____00_FF0E_4E3B_52A8_6280_80FD_88C5_5907_540D["主动技能装备名称"]
 local ____00_FF0E_4F24_5BB3_4E8B_4EF6_914D_7F6E_8868 = require("系统.02．物品系统.15．装备技能.04．伤害事件.00．公共.00．伤害事件配置表")
 local _____4F24_5BB3_4E8B_4EF6_6D4B_8BD5_88C5_5907_987A_5E8F = ____00_FF0E_4F24_5BB3_4E8B_4EF6_914D_7F6E_8868["伤害事件测试装备顺序"]
+local ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868 = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.01．物品使用配置表")
+local _____7269_54C1_4F7F_7528_6D4B_8BD5_88C5_5907_987A_5E8F = ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868["物品使用测试装备顺序"]
 ____exports["物品主动技能测试命令列表"] = {
     "wp1",
     "wp2",
@@ -52,9 +57,33 @@ ____exports["物品主动技能测试命令列表"] = {
     "wp45",
     "wp46",
     "wp47",
-    "wp48"
+    "wp48",
+    "wp49",
+    "wp50",
+    "wp51",
+    "wp52",
+    "wp53",
+    "wp54",
+    "wp55",
+    "wp56",
+    "wp57",
+    "wp58",
+    "wp59",
+    "wp60",
+    "wp61",
+    "wp62",
+    "wp63",
+    "wp64",
+    "wp65",
+    "wp66",
+    "wp67",
+    "wp68",
+    "wp69",
+    "wp70",
+    "wp71",
+    "wp72"
 }
-____exports["物品主动技能测试清理装备列表"] = {
+local ____array_0 = __TS__SparseArrayNew(
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["回沙之书"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["女妖头饰"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["黑牧杖"],
@@ -82,8 +111,14 @@ ____exports["物品主动技能测试清理装备列表"] = {
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["指挥之剑"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["使者魔轮"],
     table.unpack(_____4F24_5BB3_4E8B_4EF6_6D4B_8BD5_88C5_5907_987A_5E8F)
-}
-____exports["物品主动技能测试发放顺序"] = {
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____7269_54C1_4F7F_7528_6D4B_8BD5_88C5_5907_987A_5E8F)
+)
+__TS__SparseArrayPush(____array_0, "冥炎之裙")
+____exports["物品主动技能测试清理装备列表"] = {__TS__SparseArraySpread(____array_0)}
+local ____array_1 = __TS__SparseArrayNew(
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["回沙之书"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["女妖头饰"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["黑牧杖"],
@@ -111,7 +146,13 @@ ____exports["物品主动技能测试发放顺序"] = {
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["指挥之剑"],
     _____4E3B_52A8_6280_80FD_88C5_5907_540D_79F0["使者魔轮"],
     table.unpack(_____4F24_5BB3_4E8B_4EF6_6D4B_8BD5_88C5_5907_987A_5E8F)
-}
+)
+__TS__SparseArrayPush(
+    ____array_1,
+    table.unpack(_____7269_54C1_4F7F_7528_6D4B_8BD5_88C5_5907_987A_5E8F)
+)
+__TS__SparseArrayPush(____array_1, "冥炎之裙")
+____exports["物品主动技能测试发放顺序"] = {__TS__SparseArraySpread(____array_1)}
 local function _____751F_6210_6D4B_8BD5_547D_4EE4_8BF4_660E_5217_8868()
     local list = {}
     local count = #____exports["物品主动技能测试命令列表"] < #____exports["物品主动技能测试发放顺序"] and #____exports["物品主动技能测试命令列表"] or #____exports["物品主动技能测试发放顺序"]

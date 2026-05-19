@@ -368,13 +368,9 @@ function ____exports.doHeal(params)
         end
     end
     if HealManaAmount > 0 then
-        ____exports.restoreMana(
-            HealTarget,
-            HealManaAmount,
-            manaEffectEnabled,
-            ManaEffectPath,
-            ManaShowText
-        )
+        local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+        local _____9B54_6CD5_589E_51CF = ____require_result_5["魔法增减"]
+        _____9B54_6CD5_589E_51CF(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled)
     end
     return actualHeal
 end

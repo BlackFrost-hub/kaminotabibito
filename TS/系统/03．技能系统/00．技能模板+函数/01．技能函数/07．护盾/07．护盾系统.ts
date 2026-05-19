@@ -19,6 +19,10 @@ import {
   获取单位类型护盾值,
   单位是否有护盾,
   删除单位所有护盾,
+  获取单位指定标签护盾实例,
+  获取单位指定标签护盾值,
+  充能单位指定标签护盾,
+  删除单位指定标签护盾,
   取句柄ID,
 } from "./02．护盾实例";
 import { 吸收伤害, 注册护盾吸收钩子 } from "./04．护盾伤害结算";
@@ -170,6 +174,46 @@ export function 查询单位总护盾值(单位: any): number {
 export function 查询单位类型护盾值(单位: any, 类型: 护盾类型): number {
   const 单位ID = 取句柄ID(单位);
   return 获取单位类型护盾值(单位ID, 类型);
+}
+
+export function 查询单位标签护盾值(单位: any, 标签: string): number {
+  const 单位ID = 取句柄ID(单位);
+  return 获取单位指定标签护盾值(单位ID, 标签);
+}
+
+export function 充能单位标签护盾(单位: any, 标签: string, 数值: number, 最大值: number, 参数?: 护盾参数): number {
+  const 单位ID = 取句柄ID(单位);
+  if (单位ID === 0 || 标签 === "" || !(数值 > 0) || !(最大值 > 0)) return 0;
+
+  const 已有护盾 = 获取单位指定标签护盾实例(单位ID, 标签);
+  if (已有护盾 == null) {
+    const 初始值 = 数值 > 最大值 ? 最大值 : 数值;
+    if (!(初始值 > 0)) return 0;
+    开始护盾(单位, {
+      ...(参数 ?? {}),
+      数值: 初始值,
+      标签,
+    });
+    return 初始值;
+  }
+
+  return 充能单位指定标签护盾(单位ID, 标签, 数值, 最大值);
+}
+
+export function 移除单位标签护盾(单位: any, 标签: string): void {
+  const 单位ID = 取句柄ID(单位);
+  if (单位ID === 0 || 标签 === "") return;
+
+  const 删除列表 = 删除单位指定标签护盾(单位ID, 标签);
+  for (const 实例 of 删除列表) {
+    if (typeof 实例.结束回调 === "function") {
+      实例.结束回调(单位, 实例.id, "手动移除");
+    }
+  }
+
+  if (!单位是否有护盾(单位ID)) {
+    删除护盾条(单位);
+  }
 }
 
 /**

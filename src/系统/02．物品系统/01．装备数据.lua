@@ -2692,7 +2692,6 @@ ____exports.items.I07O = {
     name = "冥炎之裙",
     goldPrice = 1750,
     dmg = 40,
-    all = 15,
     hp = 1500,
     mp = 1000,
     abilList = "A09Y"

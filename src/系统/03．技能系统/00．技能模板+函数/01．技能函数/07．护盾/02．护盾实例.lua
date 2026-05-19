@@ -161,6 +161,56 @@ ____exports["获取单位类型护盾值"] = function(_____5355_4F4DID, _____7C7
     end
     return total
 end
+____exports["获取单位指定标签护盾实例"] = function(_____5355_4F4DID, _____6807_7B7E)
+    if _____5355_4F4DID == 0 or _____6807_7B7E == "" then
+        return nil
+    end
+    local ids = ____exports["获取单位护盾列表"](_____5355_4F4DID)
+    for ____, id in ipairs(ids) do
+        local _____5B9E_4F8B = _____62A4_76FE_6620_5C04:get(id)
+        if _____5B9E_4F8B ~= nil and _____5B9E_4F8B["标签"] == _____6807_7B7E then
+            return _____5B9E_4F8B
+        end
+    end
+    return nil
+end
+____exports["获取单位指定标签护盾值"] = function(_____5355_4F4DID, _____6807_7B7E)
+    local _____5B9E_4F8B = ____exports["获取单位指定标签护盾实例"](_____5355_4F4DID, _____6807_7B7E)
+    return _____5B9E_4F8B == nil and 0 or _____5B9E_4F8B["当前值"]
+end
+____exports["充能单位指定标签护盾"] = function(_____5355_4F4DID, _____6807_7B7E, _____6570_503C, _____6700_5927_503C)
+    local _____5B9E_4F8B = ____exports["获取单位指定标签护盾实例"](_____5355_4F4DID, _____6807_7B7E)
+    if _____5B9E_4F8B == nil or not (_____6570_503C > 0) then
+        return 0
+    end
+    local oldValue = _____5B9E_4F8B["当前值"]
+    local nextValue = oldValue + _____6570_503C
+    if nextValue > _____6700_5927_503C then
+        nextValue = _____6700_5927_503C
+    end
+    _____5B9E_4F8B["当前值"] = nextValue
+    if _____5B9E_4F8B["初始值"] < nextValue then
+        _____5B9E_4F8B["初始值"] = nextValue
+    end
+    return nextValue - oldValue
+end
+____exports["删除单位指定标签护盾"] = function(_____5355_4F4DID, _____6807_7B7E)
+    local ids = ____exports["获取单位护盾列表"](_____5355_4F4DID)
+    local deleted = {}
+    do
+        local i = #ids - 1
+        while i >= 0 do
+            local id = ids[i + 1]
+            local _____5B9E_4F8B = _____62A4_76FE_6620_5C04:get(id)
+            if _____5B9E_4F8B ~= nil and _____5B9E_4F8B["标签"] == _____6807_7B7E then
+                deleted[#deleted + 1] = _____5B9E_4F8B
+                ____exports["删除护盾实例"](id)
+            end
+            i = i - 1
+        end
+    end
+    return deleted
+end
 --- 清除所有护盾数据（用于测试或重置）
 ____exports["清除所有护盾数据"] = function()
     _____62A4_76FE_6620_5C04:clear()

@@ -206,6 +206,48 @@ export function 获取单位类型护盾值(单位ID: number, 类型: 护盾类�
   return total;
 }
 
+export function 获取单位指定标签护盾实例(单位ID: number, 标签: string): 护盾实例 | undefined {
+  if (单位ID === 0 || 标签 === "") return undefined;
+  const ids = 获取单位护盾列表(单位ID);
+  for (const id of ids) {
+    const 实例 = 护盾映射.get(id);
+    if (实例 != null && 实例.标签 === 标签) {
+      return 实例;
+    }
+  }
+  return undefined;
+}
+
+export function 获取单位指定标签护盾值(单位ID: number, 标签: string): number {
+  const 实例 = 获取单位指定标签护盾实例(单位ID, 标签);
+  return 实例 == null ? 0 : 实例.当前值;
+}
+
+export function 充能单位指定标签护盾(单位ID: number, 标签: string, 数值: number, 最大值: number): number {
+  const 实例 = 获取单位指定标签护盾实例(单位ID, 标签);
+  if (实例 == null || !(数值 > 0)) return 0;
+  const oldValue = 实例.当前值;
+  let nextValue = oldValue + 数值;
+  if (nextValue > 最大值) nextValue = 最大值;
+  实例.当前值 = nextValue;
+  if (实例.初始值 < nextValue) 实例.初始值 = nextValue;
+  return nextValue - oldValue;
+}
+
+export function 删除单位指定标签护盾(单位ID: number, 标签: string): 护盾实例[] {
+  const ids = 获取单位护盾列表(单位ID);
+  const deleted: 护盾实例[] = [];
+  for (let i = ids.length - 1; i >= 0; i--) {
+    const id = ids[i];
+    const 实例 = 护盾映射.get(id);
+    if (实例 != null && 实例.标签 === 标签) {
+      deleted.push(实例);
+      删除护盾实例(id);
+    }
+  }
+  return deleted;
+}
+
 /**
  * 清除所有护盾数据（用于测试或重置）
  */
