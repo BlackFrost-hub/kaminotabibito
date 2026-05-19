@@ -52,17 +52,17 @@ function _____9A71_52A8_4F24_5BB3_6570_5B57()
             local inst = _____5B9E_4F8B_8868[id]
             if inst == nil then
                 __TS__ArraySplice(_____5B9E_4F8BID_5217_8868, i, 1)
-                goto __continue49
+                goto __continue65
             end
             if not _____5355_4F4D_5B58_6D3B(inst.target) then
                 _____79FB_9664_4F24_5BB3_6570_5B57_5B9E_4F8B(id)
-                goto __continue49
+                goto __continue65
             end
             inst.elapsed = inst.elapsed + 0.01
             local t = inst.elapsed / inst.duration
             if t >= 1 then
                 _____79FB_9664_4F24_5BB3_6570_5B57_5B9E_4F8B(id)
-                goto __continue49
+                goto __continue65
             end
             local x = GetUnitX(inst.target)
             local y = GetUnitY(inst.target)
@@ -73,7 +73,7 @@ function _____9A71_52A8_4F24_5BB3_6570_5B57()
                     do
                         local d = inst.effects[k + 1]
                         if d.effect == nil or d.effect == 0 then
-                            goto __continue54
+                            goto __continue70
                         end
                         if type(EXSetEffectXY) == "function" then
                             EXSetEffectXY(d.effect, x + d.xOffset, y)
@@ -82,13 +82,13 @@ function _____9A71_52A8_4F24_5BB3_6570_5B57()
                             EXSetEffectZ(d.effect, z)
                         end
                     end
-                    ::__continue54::
+                    ::__continue70::
                     k = k + 1
                 end
             end
             i = i + 1
         end
-        ::__continue49::
+        ::__continue65::
     end
     _____5C1D_8BD5_505C_6B62_8BA1_65F6_5668()
 end
@@ -151,11 +151,11 @@ local function _____8F6C_4E3A_663E_793A_6574_6570_4F24_5BB3(applied)
     return R2I(applied + 0.5)
 end
 local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
-    if damageType.isTrueDamage then
-        return {r = 255, g = 240, b = 120}
-    end
     if damageType.isNormalAttack then
         return {r = 160, g = 82, b = 45}
+    end
+    if damageType.isTrueDamage then
+        return {r = 255, g = 240, b = 120}
     end
     if damageType.isEnhancedDamage then
         return {r = 255, g = 140, b = 0}
@@ -186,6 +186,54 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
     end
     if damageType.isMagicDamage then
         return {r = 120, g = 140, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_MIND then
+        return {r = 255, g = 240, b = 120}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_ENHANCED then
+        return {r = 255, g = 140, b = 0}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_FIRE then
+        return {r = 255, g = 66, b = 66}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_COLD then
+        return {r = 80, g = 190, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_LIGHTNING then
+        return {r = 170, g = 220, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_POISON then
+        return {r = 255, g = 210, b = 80}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_SLOW_POISON then
+        return {r = 255, g = 210, b = 80}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_ACID then
+        return {r = 255, g = 210, b = 80}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_DISEASE then
+        return {r = 255, g = 210, b = 80}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_PLANT then
+        return {r = 120, g = 255, b = 120}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_DIVINE then
+        return {r = 255, g = 255, b = 170}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_SHADOW_STRIKE then
+        return {r = 180, g = 130, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_SONIC then
+        return {r = 255, g = 160, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_MAGIC then
+        return {r = 120, g = 140, b = 255}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_NORMAL then
+        return {r = 160, g = 82, b = 45}
+    end
+    if damageType.rawDamageType == jass.DAMAGE_TYPE_UNIVERSAL then
+        return {r = 255, g = 255, b = 255}
     end
     return {r = 255, g = 255, b = 255}
 end
@@ -245,7 +293,7 @@ local function _____521B_5EFA_4F24_5BB3_6570_5B57(target, amount, source, damage
                 local digit = (string.byte(ch, 1) or 0 / 0) - 48
                 if digit < 0 or digit > 9 then
                     left = left + _____6570_5B57_95F4_8DDD
-                    goto __continue44
+                    goto __continue60
                 end
                 local x = startX + left
                 local e = _____521B_5EFA_6570_5B57_7279_6548(
@@ -261,7 +309,7 @@ local function _____521B_5EFA_4F24_5BB3_6570_5B57(target, amount, source, damage
                 end
                 left = left + _____6570_5B57_95F4_8DDD
             end
-            ::__continue44::
+            ::__continue60::
             i = i + 1
         end
     end

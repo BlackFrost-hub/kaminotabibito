@@ -111,7 +111,7 @@ local function onHealEventStes()
             if amount <= 0 and manaAmount <= 0 then
                 return true
             end
-            doHeal(nil, {
+            doHeal({
                 HealSource = source,
                 HealTarget = target,
                 HealAmount = amount,

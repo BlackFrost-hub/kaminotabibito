@@ -192,4 +192,196 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.25．指挥之剑")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.26．使者魔轮")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.28．灵石")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.29．傀岩杖")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.30．沙漠蜥蜴之魂")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.31．湖之袍")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.32．龙虾硬甲")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.33．湖之龙枪")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.34．银魔手套")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.35．异雷法袍")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.36．毒囊道具")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.37．地狱火卡牌魔法")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.38．熔灵大剑")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.39．安恶之鞋")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.40．灵墓之戒")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.41．瑞冥戒指")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.42．史诗远古魔刃伤害")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.43．魔力雷锤")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.44．闪电权杖")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.45．斯尔法袍")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.46．锋利巨魔爪")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.47．巨魔战剑")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

@@ -27,6 +27,25 @@ const AddSpecialEffectTarget = jass["AddSpecialEffectTarget"] as (modelName: str
 const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
 const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
 
+const DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID: Record<string, number[]> = {
+  C001: [1112560453], // 'BPSE'
+  C002: [1114010234], // 'Bfrz'
+  C003: [1112437609], // 'BNsi'
+  C004: [1114664057], // 'Bply'
+  C005: [1114205814], // 'Binv'
+  C006: [1112437609], // 'BNsi'
+  C007: [1114860655], // 'Bslo'
+  C011: [1114205798], // 'Binf'
+  C012: [1113746543], // 'Bblo'
+  C013: [1113813609], // 'Bcri'
+  C014: [1114005861], // 'Bfae'
+  C015: [1113813619], // 'Bcrs'
+  C016: [1112896364, 1112896368, 1114993524], // 'BUsl'/'BUsp'/'Bust'
+  C017: [1111844210], // 'BEer'
+  C018: [1113815395, 1113815346], // 'Bcyc'/'Bcy2'
+  C024: [1112436833], // 'BNpa'
+};
+
 /** Buff 条剩余秒数递减步长（与 UI 刷新粒度一致，0.1s） */
 export const BUFF_POOL_TICK = 0.1;
 
@@ -43,6 +62,7 @@ export interface BuffRuntime {
   buffID: string;
   remaining: number;
   effect: number;
+  effect2: number;
   source: "dot" | "manual";
   /** 来源单位名称 */
   sourceName?: string;
@@ -212,6 +232,7 @@ export function syncDotBuff(
     buffID,
     remaining: state.remaining,
     effect: state.effect,
+    effect2: 0,
     source: "dot",
     sourceName: state.sourceName,
     _dotParsedDuration: state._dotParsedDuration,
@@ -226,6 +247,7 @@ export interface RegisterManualBuffExtras {
   sourceName?: string;
   iconOverride?: string;
   effectModelOverride?: string;
+  effectValue2?: number;
   nativeBuffAbilityIds?: number[];
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
 }
@@ -257,12 +279,19 @@ export function registerManualBuff(
   if (target == null || target === 0 || !buffID || durationSec <= 0) return;
   const hid = toHid(target);
   if (hid === 0) return;
-  const row: BuffRuntime = { buffID, remaining: durationSec, effect: effectValue, source: "manual" };
+  const row: BuffRuntime = {
+    buffID,
+    remaining: durationSec,
+    effect: effectValue,
+    effect2: extras?.effectValue2 ?? 0,
+    source: "manual",
+  };
   if (extras != null) {
     if (extras.sourceName !== undefined && extras.sourceName !== "") row.sourceName = extras.sourceName;
     if (extras.iconOverride !== undefined && extras.iconOverride !== "") row.iconOverride = extras.iconOverride;
     if (extras.effectModelOverride !== undefined && extras.effectModelOverride !== "")
       row.effectModelOverride = extras.effectModelOverride;
+    if (extras.effectValue2 !== undefined) row.effect2 = extras.effectValue2;
     if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
       row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
     if (extras.onRemove !== undefined) row.onRemove = extras.onRemove;
@@ -367,7 +396,7 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
 
 function cleanupExpiredNativeBuffs(unitRef: any, row: BuffRuntime): void {
   if (unitRef == null || unitRef === 0) return;
-  const ids = row.nativeBuffAbilityIds;
+  const ids = row.nativeBuffAbilityIds ?? DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID[row.buffID];
   if (ids == null || ids.length === 0) return;
   for (let i = 0; i < ids.length; i++) {
     const rawId = ids[i];

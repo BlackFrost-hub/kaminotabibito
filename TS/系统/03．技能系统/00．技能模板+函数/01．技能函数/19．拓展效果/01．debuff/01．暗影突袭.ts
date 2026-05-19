@@ -13,6 +13,9 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
     onRemove?: (this: void, unit: any, buffID: string, row: any) => void;
   }) => void;
 };
+const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
+  getBuffRuntime: (this: void, unit: any, buffID: string) => any | null;
+};
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
 };
@@ -24,6 +27,9 @@ const { 创建追踪插值轨迹 } = require("系统.03．技能系统.00．技�
 };
 const { isSameUnit } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isSameUnit: (this: void, unitA: any, unitB: any) => boolean;
+};
+const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
+  buffs: Record<string, { icon?: string; effect?: string }>;
 };
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
@@ -44,9 +50,17 @@ const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 暗影突袭BuffID = "C025";
-const 暗影突袭图标 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
-const 暗影突袭特效 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl";
 const 暗影突袭弹幕模型 = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl";
+
+function 读取Buff图标(this: void, BuffID: string): string | undefined {
+  const meta = buffTableMod.buffs[BuffID];
+  return meta != null && meta.icon != null && meta.icon !== "" ? meta.icon : undefined;
+}
+
+function 读取Buff特效(this: void, BuffID: string): string | undefined {
+  const meta = buffTableMod.buffs[BuffID];
+  return meta != null && meta.effect != null && meta.effect !== "" ? meta.effect : undefined;
+}
 
 export interface 暗影突袭减益参数 {
   buffID?: string;
@@ -72,6 +86,7 @@ export interface 暗影突袭追踪参数 {
 interface 暗影突袭毒素状态 {
   source: any;
   target: any;
+  buffID: string;
   remainingTicks: number;
   damagePerTick: number;
 }
@@ -100,6 +115,10 @@ function 暗影突袭毒素tick(this: void): void {
     DestroyTimer(timer);
     return;
   }
+  if (getBuffRuntime(state.target, state.buffID) == null) {
+    暗影突袭毒素结束();
+    return;
+  }
   if (state.remainingTicks <= 0) {
     暗影突袭毒素结束();
     return;
@@ -120,6 +139,16 @@ function 暗影突袭毒素tick(this: void): void {
   }
   if (state.remainingTicks <= 0) {
     暗影突袭毒素结束();
+  }
+}
+
+function on暗影突袭Buff移除(this: void, unit: any, buffID: string, _row: any): void {
+  if (unit == null || unit === 0 || buffID === "") return;
+  for (const key in 暗影突袭毒素计时表) {
+    const state = 暗影突袭毒素计时表[key];
+    if (state == null) continue;
+    if (state.target !== unit || state.buffID !== buffID) continue;
+    delete 暗影突袭毒素计时表[key];
   }
 }
 
@@ -154,11 +183,13 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   const damagePerSecond = 参数.damagePerSecond ?? 500;
   const slowAttack = 参数.slowAttack ?? 0.3;
   const slowMove = 参数.slowMove ?? 0.3;
+  const buffID = 参数.buffID ?? 暗影突袭BuffID;
   debugLogForce("暗影突袭", "施加减益", "source:", source, "target:", target, "duration:", duration, "dps:", damagePerSecond);
-  registerManualBuff(target, 参数.buffID ?? 暗影突袭BuffID, duration, 0, {
+  registerManualBuff(target, buffID, duration, 0, {
     sourceName: 参数.sourceName ?? GetUnitName(source),
-    iconOverride: 参数.iconOverride ?? 暗影突袭图标,
-    effectModelOverride: 参数.effectModelOverride ?? 暗影突袭特效,
+    iconOverride: 参数.iconOverride ?? 读取Buff图标(buffID),
+    effectModelOverride: 参数.effectModelOverride ?? 读取Buff特效(buffID),
+    onRemove: on暗影突袭Buff移除,
   });
   SFB_setSlow(source, target, slowAttack, slowMove, duration);
 
@@ -167,6 +198,7 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   暗影突袭毒素计时表[timerId] = {
     source,
     target,
+    buffID,
     remainingTicks: 暗影突袭向上取整秒数(duration),
     damagePerTick: damagePerSecond,
   };

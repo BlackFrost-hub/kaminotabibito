@@ -38,6 +38,13 @@ export {
 } from "../../../../lib/扩展函数/Star扩展函数/Star扩展库/04．快速Buff系统";
 
 export {
+  getBuffRuntime,
+  getBuffIdsOnUnit,
+  isUnitInBuffPool,
+  移除单位指定Buff,
+} from "../../../05．Buff系统/00．Buff系统";
+
+export {
   移除单位指定类型Buff,
   移除单位增益Buff,
   移除单位负面Buff,
@@ -59,6 +66,13 @@ import {
   SFB_setSlow,
   SFB_施加通用Buff,
 } from "../../../../lib/扩展函数/Star扩展函数/Star扩展库/04．快速Buff系统";
+
+import {
+  getBuffRuntime,
+  getBuffIdsOnUnit,
+  isUnitInBuffPool,
+  移除单位指定Buff,
+} from "../../../05．Buff系统/00．Buff系统";
 
 import {
   移除单位指定类型Buff,
@@ -89,11 +103,21 @@ export const 施加单位重伤 = 施加重伤;
 export const 清除单位重伤 = 移除单位重伤;
 
 export const 清除单位指定类型Buff = 移除单位指定类型Buff;
+export const 清除单位指定Buff = 移除单位指定Buff;
 export const 清除单位增益Buff = 移除单位增益Buff;
 export const 清除单位负面Buff = 移除单位负面Buff;
 export const 按驱散等级清除单位Buff = 按驱散等级移除单位Buff;
 export const 一级驱散清除单位Buff = 一级驱散单位Buff;
 export const 二级驱散清除单位Buff = 二级驱散单位Buff;
+export const 获取单位Buff运行数据 = getBuffRuntime;
+export const 获取单位BuffID列表 = getBuffIdsOnUnit;
+export const 单位是否在Buff池中 = isUnitInBuffPool;
+
+/** 判断单位是否拥有指定 Buff 池条目。 */
+export function 单位是否拥有指定Buff(单位: any, BuffID: string): boolean {
+  if (单位 == null || 单位 === 0 || BuffID == null || BuffID === "") return false;
+  return getBuffRuntime(单位, BuffID) != null;
+}
 
 /** 清除单位可驱散增益 Buff（只清 Buff 表 `canPurge: true` 的 `Buff:` 条目）。 */
 export function 清除单位可驱散增益Buff(单位: any): number {

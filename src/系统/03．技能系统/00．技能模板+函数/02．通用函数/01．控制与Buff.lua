@@ -13,6 +13,11 @@ local SFB_Init = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_Init
 local SFB_setBuff = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setBuff
 local SFB_setSlow = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF.SFB_setSlow
 local ____SFB__65BD_52A0_901A_7528Buff = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF["SFB_施加通用Buff"]
+local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+local getBuffRuntime = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntime
+local getBuffIdsOnUnit = ____00_FF0EBuff_7CFB_7EDF.getBuffIdsOnUnit
+local isUnitInBuffPool = ____00_FF0EBuff_7CFB_7EDF.isUnitInBuffPool
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____00_FF0EBuff_7CFB_7EDF["移除单位指定Buff"]
 local ____05_FF0EBuff_6E05_9664_51FD_6570 = require("系统.05．Buff系统.05．Buff清除函数")
 local _____79FB_9664_5355_4F4D_6307_5B9A_7C7B_578BBuff = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位指定类型Buff"]
 local _____79FB_9664_5355_4F4D_589E_76CABuff = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位增益Buff"]
@@ -59,6 +64,13 @@ do
     ____exports["SFB_施加通用Buff"] = ____04_FF0E_5FEB_901FBuff_7CFB_7EDF["SFB_施加通用Buff"]
 end
 do
+    local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+    ____exports.getBuffRuntime = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntime
+    ____exports.getBuffIdsOnUnit = ____00_FF0EBuff_7CFB_7EDF.getBuffIdsOnUnit
+    ____exports.isUnitInBuffPool = ____00_FF0EBuff_7CFB_7EDF.isUnitInBuffPool
+    ____exports["移除单位指定Buff"] = ____00_FF0EBuff_7CFB_7EDF["移除单位指定Buff"]
+end
+do
     local ____05_FF0EBuff_6E05_9664_51FD_6570 = require("系统.05．Buff系统.05．Buff清除函数")
     ____exports["移除单位指定类型Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位指定类型Buff"]
     ____exports["移除单位增益Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位增益Buff"]
@@ -79,11 +91,22 @@ ____exports["读取单位重伤"] = _____83B7_53D6_5355_4F4D_91CD_4F24
 ____exports["施加单位重伤"] = _____65BD_52A0_91CD_4F24
 ____exports["清除单位重伤"] = _____79FB_9664_5355_4F4D_91CD_4F24
 ____exports["清除单位指定类型Buff"] = _____79FB_9664_5355_4F4D_6307_5B9A_7C7B_578BBuff
+____exports["清除单位指定Buff"] = _____79FB_9664_5355_4F4D_6307_5B9ABuff
 ____exports["清除单位增益Buff"] = _____79FB_9664_5355_4F4D_589E_76CABuff
 ____exports["清除单位负面Buff"] = _____79FB_9664_5355_4F4D_8D1F_9762Buff
 ____exports["按驱散等级清除单位Buff"] = _____6309_9A71_6563_7B49_7EA7_79FB_9664_5355_4F4DBuff
 ____exports["一级驱散清除单位Buff"] = _____4E00_7EA7_9A71_6563_5355_4F4DBuff
 ____exports["二级驱散清除单位Buff"] = _____4E8C_7EA7_9A71_6563_5355_4F4DBuff
+____exports["获取单位Buff运行数据"] = getBuffRuntime
+____exports["获取单位BuffID列表"] = getBuffIdsOnUnit
+____exports["单位是否在Buff池中"] = isUnitInBuffPool
+--- 判断单位是否拥有指定 Buff 池条目。
+____exports["单位是否拥有指定Buff"] = function(_____5355_4F4D, BuffID)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 or BuffID == nil or BuffID == "" then
+        return false
+    end
+    return getBuffRuntime(_____5355_4F4D, BuffID) ~= nil
+end
 --- 清除单位可驱散增益 Buff（只清 Buff 表 `canPurge: true` 的 `Buff:` 条目）。
 ____exports["清除单位可驱散增益Buff"] = function(_____5355_4F4D)
     return _____79FB_9664_5355_4F4D_589E_76CABuff(_____5355_4F4D, true)

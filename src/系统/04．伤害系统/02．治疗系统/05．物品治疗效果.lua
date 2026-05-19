@@ -63,7 +63,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
     end
     local sourcePlayer = jass.GetOwningPlayer(target)
     if abilId == ABIL_A002 then
-        doHeal(nil, {
+        doHeal({
             HealSource = target,
             HealTarget = target,
             HealAmount = healHP,
@@ -73,7 +73,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A0LF then
-        doHeal(nil, {
+        doHeal({
             HealSource = target,
             HealTarget = target,
             HealAmount = 0,
@@ -85,7 +85,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A015 then
-        doHeal(nil, {
+        doHeal({
             HealSource = target,
             HealTarget = target,
             HealAmount = healHP,
@@ -111,7 +111,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         while unit ~= nil do
             jass.GroupRemoveUnit(group, unit)
             if canBeHealed(unit, sourcePlayer, target) then
-                doHeal(nil, {
+                doHeal({
                     HealSource = target,
                     HealTarget = unit,
                     HealAmount = healHP,

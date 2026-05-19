@@ -1,10 +1,4 @@
 /** @noSelfInFile */
-
-
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const jass = require("jass.common") as any;
 
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
@@ -69,15 +63,11 @@ function 发射熔岩弹幕(this: void, 施法者: any, 目标单位: any): void
 }
 
 export function 处理熔岩权杖施法(this: void, 施法单位: any, 目标单位: any): void {
-  debugLogForce("04．熔岩权杖", "进入", "处理熔岩权杖施法");
-
   if (!是否为熔岩权杖(施法单位)) return;
   if (目标单位 == null || 目标单位 === 0) {
-    debugLogForce("04．熔岩权杖", "无目标单位，跳过");
     return;
   }
   延后一帧执行伤害派生效果(() => {
-    debugLogForce("04．熔岩权杖", "延后一帧发射熔岩弹幕");
     发射熔岩弹幕(施法单位, 目标单位);
   });
 }

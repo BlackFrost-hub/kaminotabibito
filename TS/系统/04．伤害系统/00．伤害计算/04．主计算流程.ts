@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 
 /**
  * 伤害计算主流程
@@ -74,6 +74,9 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.02．计时器") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => any;
 };
+const ConvertDamageType = jass.ConvertDamageType as (value: number) => any;
+const ConvertAttackType = jass.ConvertAttackType as (value: number) => any;
+const ConvertWeaponType = jass.ConvertWeaponType as (value: number) => any;
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   EXGetEventDamageData: (edd_type: number) => number;
   EVENT_DAMAGE_DATA_IS_PHYSICAL: number;
@@ -81,6 +84,7 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
   EVENT_DAMAGE_DATA_IS_RANGED: number;
   EVENT_DAMAGE_DATA_DAMAGE_TYPE: number;
   EVENT_DAMAGE_DATA_ATTACK_TYPE: number;
+  EVENT_DAMAGE_DATA_WEAPON_TYPE: number;
   isPhysicalDamage: () => boolean;
   isMagicDamage: () => boolean;
   isEnhancedDamage: () => boolean;
@@ -102,6 +106,9 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 //=============================================================================
 
 export interface DamageTypeSnapshot {
+  rawAttackType: any;
+  rawDamageType: any;
+  rawWeaponType: any;
   isPhysicalDamage: boolean;
   isMagicDamage: boolean;
   isEnhancedDamage: boolean;
@@ -146,6 +153,9 @@ function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: 
 
 function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
   return {
+    rawAttackType: ConvertAttackType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
+    rawDamageType: ConvertDamageType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
+    rawWeaponType: ConvertWeaponType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_WEAPON_TYPE)),
     isPhysicalDamage: 伤害函数.isPhysicalDamage(),
     isMagicDamage: 伤害函数.isMagicDamage(),
     isEnhancedDamage: 伤害函数.isEnhancedDamage(),

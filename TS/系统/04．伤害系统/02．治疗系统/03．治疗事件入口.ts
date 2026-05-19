@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 施法治疗事件（迁移自 核心系统/04．治疗事件）
  *
@@ -24,7 +24,7 @@ const { registerSpellChannelListener } = require("系统.00．核心系统.01．
   registerSpellChannelListener: (this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (params: {
+  doHeal: (this: void, params: {
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
@@ -176,3 +176,4 @@ export function initHealRequestEntry(): void {
 
 export {};
 /** @noSelfInFile */
+

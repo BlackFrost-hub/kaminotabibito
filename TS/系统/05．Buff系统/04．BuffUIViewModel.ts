@@ -48,6 +48,7 @@ function formatDotTooltip(
   template: string,
   durationForDisplay: number,
   effectValue: number,
+  effectValue2: number,
   sourceName: string | undefined,
   intervalSec: number
 ): { bodyText: string; sourceText: string } {
@@ -57,6 +58,7 @@ function formatDotTooltip(
 
   const timeStr = formatOneDecimal(rem);
   const damageStr = formatOneDecimal(val);
+  const damageStr2 = formatOneDecimal(typeof effectValue2 === "number" && isFinite(effectValue2) ? effectValue2 : 0);
   const intervalStr = formatOneDecimal(intv);
   const dataStr = formatOneDecimal(val <= 1 ? val * 100 : val);
 
@@ -65,6 +67,8 @@ function formatDotTooltip(
   s = s.split("持续时间").join(timeStr);
   s = s.split("interval").join(intervalStr);
   s = s.split("damage").join(damageStr);
+  s = s.split("data1").join(damageStr);
+  s = s.split("data2").join(damageStr2);
   s = s.split("data").join(dataStr);
 
   const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未记录";
@@ -121,6 +125,7 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         id: bid,
         state: {
           effect: rt.effect,
+          effect2: rt.effect2 ?? 0,
           remaining: rt.remaining,
           iconRemaining: buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
           sourceName: rt.sourceName,
@@ -155,6 +160,7 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         meta.tooltip,
         durationForTip,
         row.state.effect,
+        row.state.effect2 ?? 0,
         row.state.sourceName,
         meta.interval
       );
@@ -166,8 +172,10 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         row.id +
         " 剩余 " +
         formatOneDecimal(row.state.remaining) +
-        " 秒，伤害/秒 " +
+        " 秒，效果1 " +
         formatOneDecimal(row.state.effect) +
+        "，效果2 " +
+        formatOneDecimal(row.state.effect2 ?? 0) +
         "|r";
       tooltipSourceText =
         TIP_COLOR_SOURCE +

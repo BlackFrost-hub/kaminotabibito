@@ -1,9 +1,9 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ArrayJoin = ____lualib.__TS__ArrayJoin
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____00_FF0E_6D4B_8BD5_914D_7F6E = require("系统.02．物品系统.15．装备技能.99．物品测试.00．测试配置")
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试发放顺序"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令列表"]
+local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_8BF4_660E_6587_672C_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令说明文本列表"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试清理装备列表"]
 ---
 -- @noSelfInFile
@@ -128,6 +128,6 @@ end
 debugLogForce(
     _____6A21_5757_540D,
     "已注册测试命令",
-    __TS__ArrayJoin(_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868, ",")
+    table.concat(_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_8BF4_660E_6587_672C_5217_8868, " | ")
 )
 return ____exports

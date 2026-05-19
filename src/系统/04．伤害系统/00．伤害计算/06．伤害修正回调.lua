@@ -1,9 +1,15 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
+local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
+local getBuffRuntime = ____require_result_0.getBuffRuntime
 local damageModifiers = {}
 local nextModifierId = 1
+local vulnerableModifierRegistered = false
+local VULNERABLE_BUFF_ID = "C026"
 local function sortDamageModifiers()
     __TS__ArraySort(
         damageModifiers,
@@ -70,4 +76,32 @@ end
 function ____exports.getDamageModifierCount()
     return #damageModifiers
 end
+local function getVulnerableMultiplier(value)
+    if type(value) ~= "number" or not __TS__NumberIsFinite(__TS__Number(value)) or value == 0 then
+        return 0
+    end
+    if value > -1 and value < 1 then
+        return value
+    end
+    return value / 100
+end
+local function onVulnerableDamageModifier(context)
+    local buffRuntime = getBuffRuntime(context.target, VULNERABLE_BUFF_ID)
+    if buffRuntime == nil then
+        return context.currentDamage
+    end
+    local bonus = getVulnerableMultiplier(buffRuntime.effect)
+    if bonus <= 0 then
+        return context.currentDamage
+    end
+    return context.currentDamage * (1 + bonus)
+end
+local function ensureVulnerableModifierRegistered()
+    if vulnerableModifierRegistered then
+        return
+    end
+    vulnerableModifierRegistered = true
+    ____exports.registerDamageModifier(onVulnerableDamageModifier, 20)
+end
+ensureVulnerableModifierRegistered()
 return ____exports

@@ -64,22 +64,14 @@ function ____exports.processPlayerHeroRegen(self, unit)
     baseLifeRegen = baseLifeRegen + itemBonus
     local unitMultiplier = getUnitLifeRegenMultiplier(nil, unit)
     baseLifeRegen = baseLifeRegen * unitMultiplier
-    local fixedLifeRegen = YDUserDataGet(
-        nil,
-        "unit",
-        unit,
-        "生命恢复",
-        "real"
-    ) or 0
-    local totalFixedLifeRegen = fixedLifeRegen + baseLifeRegen
-    YDUserDataSet(
+    local equipBonus = YDUserDataGet(
         nil,
         "player",
         player,
         "生命恢复",
-        "real",
-        totalFixedLifeRegen
-    )
+        "real"
+    ) or 0
+    local totalFixedLifeRegen = equipBonus + baseLifeRegen
     local percentLifeRegen = getPercentLifeRegen(nil, unit)
     local lifeRegenAmplify = YDUserDataGet(
         nil,
@@ -90,23 +82,24 @@ function ____exports.processPlayerHeroRegen(self, unit)
     ) or 0
     local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     local totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen)
-    local baseManaRegen = calcBaseManaRegen(nil, unit)
-    local fixedManaRegen = YDUserDataGet(
-        nil,
-        "unit",
-        unit,
-        "魔法恢复",
-        "real"
-    ) or 0
-    local totalFixedManaRegen = fixedManaRegen + baseManaRegen
     YDUserDataSet(
         nil,
         "player",
         player,
-        "魔法恢复",
+        "总生命恢复",
         "real",
-        totalFixedManaRegen
+        totalLifeRegen
     )
+    local percentLifeRegenForDisplay = getPercentLifeRegen(nil, unit)
+    local baseManaRegen = calcBaseManaRegen(nil, unit)
+    local equipManaBonus = YDUserDataGet(
+        nil,
+        "player",
+        player,
+        "魔法恢复",
+        "real"
+    ) or 0
+    local totalFixedManaRegen = equipManaBonus + baseManaRegen
     local percentManaRegen = getPercentManaRegen(nil, unit)
     local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
     local totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen)
@@ -132,7 +125,7 @@ function ____exports.processPlayerHeroRegen(self, unit)
         player,
         "生命恢复%",
         "real",
-        percentLifeRegen
+        percentLifeRegenForDisplay
     )
     YDUserDataSet(
         nil,

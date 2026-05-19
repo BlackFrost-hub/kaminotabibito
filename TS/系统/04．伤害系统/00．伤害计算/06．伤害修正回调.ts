@@ -24,6 +24,10 @@ export interface DamageModifierContext {
 
 export type DamageModifier = (this: void, context: DamageModifierContext) => number;
 
+const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
+  getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; effect2?: number; remaining: number } | null;
+};
+
 interface DamageModifierEntry {
   id: number;
   priority: number;
@@ -32,6 +36,9 @@ interface DamageModifierEntry {
 
 const damageModifiers: DamageModifierEntry[] = [];
 let nextModifierId = 1;
+let vulnerableModifierRegistered = false;
+
+const VULNERABLE_BUFF_ID = "C026";
 
 function sortDamageModifiers(): void {
   damageModifiers.sort((a, b) => {
@@ -79,5 +86,27 @@ export function applyDamageModifiers(context: DamageModifierContext): number {
 export function getDamageModifierCount(): number {
   return damageModifiers.length;
 }
+
+function getVulnerableMultiplier(value: number): number {
+  if (typeof value !== "number" || !isFinite(value) || value === 0) return 0;
+  if (value > -1 && value < 1) return value;
+  return value / 100;
+}
+
+function onVulnerableDamageModifier(context: DamageModifierContext): number {
+  const buffRuntime = getBuffRuntime(context.target, VULNERABLE_BUFF_ID);
+  if (buffRuntime == null) return context.currentDamage;
+  const bonus = getVulnerableMultiplier(buffRuntime.effect);
+  if (bonus <= 0) return context.currentDamage;
+  return context.currentDamage * (1 + bonus);
+}
+
+function ensureVulnerableModifierRegistered(): void {
+  if (vulnerableModifierRegistered) return;
+  vulnerableModifierRegistered = true;
+  registerDamageModifier(onVulnerableDamageModifier, 20);
+}
+
+ensureVulnerableModifierRegistered();
 
 export {};

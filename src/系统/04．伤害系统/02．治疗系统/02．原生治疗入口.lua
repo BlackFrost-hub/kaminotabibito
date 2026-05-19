@@ -78,7 +78,7 @@ local function onSpellChannel(castingUnit, spellAbilityId)
     )
     jass.IssueImmediateOrder(caster, "stop")
     jass.UnitRemoveAbility(caster, abilityId)
-    doHeal(nil, {
+    doHeal({
         HealSource = caster,
         HealTarget = target,
         HealAmount = healAmount,

@@ -105,49 +105,50 @@ export function processPlayerHeroRegen(unit: any): void {
   const unitMultiplier = getUnitLifeRegenMultiplier(unit);
   baseLifeRegen *= unitMultiplier;
 
-  // 4. 读取固定生命恢复（来自装备、技能等）
-  const fixedLifeRegen = YDUserDataGet("unit", unit, "生命恢复", "real") || 0;
+  // 4. 读取装备加成的固定生命恢复（从player表读取，装备系统会写入这里）
+  const equipBonus = YDUserDataGet("player", player, "生命恢复", "real") || 0;
 
-  // 5. 计算总固定生命恢复 = 固定恢复 + 基础恢复
-  const totalFixedLifeRegen = fixedLifeRegen + baseLifeRegen;
+  // 5. 计算总固定生命恢复 = 装备加成 + 基础恢复
+  const totalFixedLifeRegen = equipBonus + baseLifeRegen;
 
-  // 6. 存储生命恢复到玩家属性（供多面板显示）
-  YDUserDataSet("player", player, "生命恢复", "real", totalFixedLifeRegen);
-
-  // 7. 读取百分比生命恢复（上限 0.06）
+  // 6. 读取百分比生命恢复（上限 0.06）
   const percentLifeRegen = getPercentLifeRegen(unit);
 
-  // 8. 读取生命恢复属性增幅
+  // 7. 读取生命恢复属性增幅
   const lifeRegenAmplify = YDUserDataGet("player", player, "生命恢复属性增幅", "real") || 0;
 
-  // 9. 计算总生命恢复 = (1 + 增幅) × (最大生命 × 百分比回复 + 生命恢复)
+  // 8. 计算总生命恢复 = (1 + 增幅) × (最大生命 × 百分比回复 + 生命恢复)
   const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
   const totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen);
+
+  // 9. 存储总生命恢复到玩家属性（供多面板显示）
+  YDUserDataSet("player", player, "总生命恢复", "real", totalLifeRegen);
+
+  // 10. 读取百分比生命恢复（上限 0.06）
+  const percentLifeRegenForDisplay = getPercentLifeRegen(unit);
 
   // ========== 魔法恢复计算 ==========
   // 1. 基础魔法恢复 = 智力 × 0.15
   const baseManaRegen = calcBaseManaRegen(unit);
 
-  // 2. 读取固定魔法恢复（来自装备、技能等）
-  const fixedManaRegen = YDUserDataGet("unit", unit, "魔法恢复", "real") || 0;
+  // 2. 读取装备加成的固定魔法恢复（从player表读取）
+  const equipManaBonus = YDUserDataGet("player", player, "魔法恢复", "real") || 0;
 
-  // 3. 计算总固定魔法恢复 = 固定恢复 + 基础恢复
-  const totalFixedManaRegen = fixedManaRegen + baseManaRegen;
+  // 3. 计算总固定魔法恢复 = 装备加成 + 基础恢复
+  const totalFixedManaRegen = equipManaBonus + baseManaRegen;
 
-  // 4. 存储魔法恢复到玩家属性（供多面板显示）
-  YDUserDataSet("player", player, "魔法恢复", "real", totalFixedManaRegen);
-
-  // 5. 读取百分比魔法恢复（上限 0.04）
+  // 4. 读取百分比魔法恢复（上限 0.04）
   const percentManaRegen = getPercentManaRegen(unit);
 
-  // 6. 计算总魔法恢复 = 1 × (最大魔法 × 百分比回复 + 魔法恢复)
+  // 5. 计算总魔法恢复 = 1 × (最大魔法 × 百分比回复 + 魔法恢复)
   const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
   const totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen);
 
   // ========== 存储总恢复值（供多面板显示） ==========
+  // 注意：不覆盖 "生命恢复" 和 "魔法恢复"，这两个由装备系统管理
   YDUserDataSet("player", player, "总生命恢复", "real", totalLifeRegen);
   YDUserDataSet("player", player, "总魔法恢复", "real", totalManaRegen);
-  YDUserDataSet("player", player, "生命恢复%", "real", percentLifeRegen);
+  YDUserDataSet("player", player, "生命恢复%", "real", percentLifeRegenForDisplay);
   YDUserDataSet("player", player, "魔法恢复%", "real", percentManaRegen);
 
   // ========== 执行恢复 ==========

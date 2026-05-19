@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 持续治疗效果（HOT）系统
  *
@@ -12,6 +12,12 @@
  */
 
 const jass = require("jass.common") as any;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
+  getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; effect2?: number; remaining: number } | null;
+};
 
 const { UnitHasBuffBJ, IsUnitDeadBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   UnitHasBuffBJ: (unit: any, buffId: number) => boolean;
@@ -23,13 +29,13 @@ const { IsUnitPausedBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩�
 };
 
 const {
-  YDUserDataGet,
-  YDUserDataSet,
-  YDUserDataClear,
-} = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, key: any, attr: string, valueType: string) => any;
-  YDUserDataSet: (tableType: string, key: any, attr: string, value: any) => void;
-  YDUserDataClear: (tableType: string, key: any, attr: string, valueType: string) => void;
+  YDUserDataGetSafe,
+  YDUserDataSetSafe,
+  YDUserDataClearSafe,
+} = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, key: any, attr: string, valueType: string) => any;
+  YDUserDataSetSafe: (this: void, tableType: string, key: any, attr: string, valueType: string, value: any) => void;
+  YDUserDataClearSafe: (this: void, tableType: string, key: any, attr: string, valueType: string) => void;
 };
 
 const { onSecond, offSecond } = globalThis as unknown as {
@@ -39,7 +45,7 @@ const { onSecond, offSecond } = globalThis as unknown as {
 
 // 导入核心治疗功能
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (params: {
+  doHeal: (this: void, params: {
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
@@ -63,11 +69,14 @@ const HOT_BUFF_IDS = [
   0x4272656A, // 'Brej' - 再生
 ];
 
+const HOT_BUFF_POOL_IDS = ["C027"];
+
 /** YDUserData属性名 */
 const ATTR_COUNTDOWN = "持续恢复倒计时";
 const ATTR_TICK_HP = "hotTickHP";
 const ATTR_TICK_MP = "hotTickMP";
 const ATTR_SOURCE = "hotSource";
+const ATTR_BUFF_ID = "hotBuffID";
 
 /** 系统开关 */
 const HOT_SYSTEM_ENABLED = true;
@@ -80,6 +89,13 @@ const HOT_SYSTEM_ENABLED = true;
  * 检查单位是否有任意一个持续恢复Buff
  */
 function hasAnyHotBuff(unit: any): boolean {
+  const 指定BuffID = YDUserDataGetSafe("unit", unit, ATTR_BUFF_ID, "string");
+  if (指定BuffID != null && 指定BuffID !== "") {
+    return getBuffRuntime(unit, 指定BuffID) != null;
+  }
+  for (const buffID of HOT_BUFF_POOL_IDS) {
+    if (getBuffRuntime(unit, buffID) != null) return true;
+  }
   for (const buffId of HOT_BUFF_IDS) {
     if (UnitHasBuffBJ(unit, buffId)) return true;
   }
@@ -104,26 +120,30 @@ let hotTickCallback: (() => void) | null = null;
  * 遍历所有HOT单位，执行恢复逻辑
  */
 function onHotTick(): void {
+  debugLogForce("持续治疗效果", "onHotTick", "hotUnits:", hotUnits.size);
   const toRemove: any[] = [];
 
   for (const target of hotUnits) {
+    debugLogForce("持续治疗效果", "tick开始", "target:", target);
     // 检查单位是否被暂停（暂停则跳过本次）
     if (IsUnitPausedBJ(target)) {
+      debugLogForce("持续治疗效果", "跳过暂停单位", "target:", target);
       continue;
     }
 
     // 减少持续恢复倒计时
-    const countdown = YDUserDataGet("unit", target, ATTR_COUNTDOWN, "real") - 1.0;
-    YDUserDataSet("unit", target, ATTR_COUNTDOWN, countdown);
+    const countdown = YDUserDataGetSafe("unit", target, ATTR_COUNTDOWN, "real") - 1.0;
+    YDUserDataSetSafe("unit", target, ATTR_COUNTDOWN, "real", countdown);
 
     // 获取恢复量和来源
-    const tickHP = YDUserDataGet("unit", target, ATTR_TICK_HP, "real");
-    const tickMP = YDUserDataGet("unit", target, ATTR_TICK_MP, "real");
-    const source = YDUserDataGet("unit", target, ATTR_SOURCE, "unit");
+    const tickHP = YDUserDataGetSafe("unit", target, ATTR_TICK_HP, "real");
+    const tickMP = YDUserDataGetSafe("unit", target, ATTR_TICK_MP, "real");
+    const source = YDUserDataGetSafe("unit", target, ATTR_SOURCE, "unit");
+    debugLogForce("持续治疗效果", "读取HOT数据", "target:", target, "countdown:", countdown, "tickHP:", tickHP, "tickMP:", tickMP, "source:", source);
 
     // 执行生命/魔法恢复（直接调用 doHeal，TS参数传参）
     if (tickHP > 0 || tickMP > 0) {
-      doHeal({
+      const healed = doHeal({
         HealSource: source,
         HealTarget: target,
         HealAmount: tickHP > 0 ? tickHP : 0,
@@ -133,13 +153,19 @@ function onHotTick(): void {
         ManaEffect: false,
         ManaShowText: tickMP > 0,
       });
+      debugLogForce("持续治疗效果", "doHeal完成", "target:", target, "healed:", healed);
+    } else {
+      debugLogForce("持续治疗效果", "跳过doHeal", "target:", target, "tickHP:", tickHP, "tickMP:", tickMP);
     }
 
     // 检查结束条件
+    const buffAlive = hasAnyHotBuff(target);
+    const dead = IsUnitDeadBJ(target);
     const shouldEnd =
-      !hasAnyHotBuff(target) ||
+      !buffAlive ||
       countdown <= 0 ||
-      IsUnitDeadBJ(target);
+      dead;
+    debugLogForce("持续治疗效果", "结束判定", "target:", target, "buffAlive:", buffAlive, "countdown:", countdown, "dead:", dead, "shouldEnd:", shouldEnd);
 
     if (shouldEnd) {
       toRemove.push(target);
@@ -195,21 +221,31 @@ export function startHot(
   source: any,
   tickHP: number,
   tickMP: number,
-  duration: number
+  duration: number,
+  _intervalOrOptions?: number | any,
+  extraOptions?: any
 ): void {
   if (!HOT_SYSTEM_ENABLED) return;
   if (target == null) return;
   if (duration <= 0) return;
+  debugLogForce("持续治疗效果", "startHot", "target:", target, "source:", source, "tickHP:", tickHP, "tickMP:", tickMP, "duration:", duration);
 
   // 设置倒计时和恢复量
-  YDUserDataSet("unit", target, ATTR_COUNTDOWN, duration);
-  YDUserDataSet("unit", target, ATTR_TICK_HP, tickHP);
-  YDUserDataSet("unit", target, ATTR_TICK_MP, tickMP);
-  YDUserDataSet("unit", target, ATTR_SOURCE, source);
+  YDUserDataSetSafe("unit", target, ATTR_COUNTDOWN, "real", duration);
+  YDUserDataSetSafe("unit", target, ATTR_TICK_HP, "real", tickHP);
+  YDUserDataSetSafe("unit", target, ATTR_TICK_MP, "real", tickMP);
+  YDUserDataSetSafe("unit", target, ATTR_SOURCE, "unit", source);
+  const options = extraOptions != null ? extraOptions : (typeof _intervalOrOptions === "number" ? null : _intervalOrOptions);
+  if (options != null && options.BuffID != null && options.BuffID !== "") {
+    YDUserDataSetSafe("unit", target, ATTR_BUFF_ID, "string", options.BuffID);
+  } else {
+    YDUserDataClearSafe("unit", target, ATTR_BUFF_ID, "string");
+  }
 
   // 添加到HOT单位集合
   const isNew = !hotUnits.has(target);
   hotUnits.add(target);
+  debugLogForce("持续治疗效果", "加入热集合", "target:", target, "isNew:", isNew, "size:", hotUnits.size);
 
   // 确保中心计时器回调已注册
   if (isNew) {
@@ -222,18 +258,21 @@ export function startHot(
  */
 export function stopHot(target: any): void {
   if (target == null) return;
+  debugLogForce("持续治疗效果", "stopHot", "target:", target, "beforeSize:", hotUnits.size);
 
   // 从HOT单位集合移除
   hotUnits.delete(target);
 
   // 清理YDUserData
-  YDUserDataClear("unit", target, ATTR_COUNTDOWN, "real");
-  YDUserDataClear("unit", target, ATTR_TICK_HP, "real");
-  YDUserDataClear("unit", target, ATTR_TICK_MP, "real");
-  YDUserDataClear("unit", target, ATTR_SOURCE, "unit");
+  YDUserDataClearSafe("unit", target, ATTR_COUNTDOWN, "real");
+  YDUserDataClearSafe("unit", target, ATTR_TICK_HP, "real");
+  YDUserDataClearSafe("unit", target, ATTR_TICK_MP, "real");
+  YDUserDataClearSafe("unit", target, ATTR_SOURCE, "unit");
+  YDUserDataClearSafe("unit", target, ATTR_BUFF_ID, "string");
 
   // 如果没有HOT单位了，注销中心计时器回调
   unregisterCenterTimerIfNeeded();
+  debugLogForce("持续治疗效果", "stopHot完成", "target:", target, "afterSize:", hotUnits.size);
 }
 
 /**
@@ -279,7 +318,7 @@ export function fireHotEvent(
   duration?: number
 ): void {
   if (duration != null) {
-    YDUserDataSet("unit", target, ATTR_COUNTDOWN, duration);
+    YDUserDataSetSafe("unit", target, ATTR_COUNTDOWN, "real", duration);
   }
   STES_FireWithParams(HOT_EVENT_NAME, [
     { type: "unit", name: "HealTarget", value: target },
@@ -311,7 +350,7 @@ function onHotEvent(): void {
   const tickMP = YDLocal1Get("real", "hotTickMP");
 
   // 获取持续时间（从YDUserData读取，或使用tickHP作为默认值）
-  let duration = YDUserDataGet("unit", target, ATTR_COUNTDOWN, "real");
+  let duration = YDUserDataGetSafe("unit", target, ATTR_COUNTDOWN, "real");
   if (duration <= 0) {
     duration = tickHP > 0 ? tickHP : 10; // 默认10秒
   }

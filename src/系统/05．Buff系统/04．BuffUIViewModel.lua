@@ -35,12 +35,13 @@ local function formatOneDecimal(n)
     local fracPart = scaled % 10
     return (tostring(intPart) .. ".") .. tostring(fracPart)
 end
-local function formatDotTooltip(template, durationForDisplay, effectValue, sourceName, intervalSec)
+local function formatDotTooltip(template, durationForDisplay, effectValue, effectValue2, sourceName, intervalSec)
     local rem = type(durationForDisplay) == "number" and __TS__NumberIsFinite(__TS__Number(durationForDisplay)) and clampMin(durationForDisplay, 0) or 0
     local val = type(effectValue) == "number" and __TS__NumberIsFinite(__TS__Number(effectValue)) and effectValue or 0
     local intv = type(intervalSec) == "number" and __TS__NumberIsFinite(__TS__Number(intervalSec)) and intervalSec > 0 and intervalSec or 1
     local timeStr = formatOneDecimal(rem)
     local damageStr = formatOneDecimal(val)
+    local damageStr2 = formatOneDecimal(type(effectValue2) == "number" and __TS__NumberIsFinite(__TS__Number(effectValue2)) and effectValue2 or 0)
     local intervalStr = formatOneDecimal(intv)
     local dataStr = formatOneDecimal(val <= 1 and val * 100 or val)
     local s = template
@@ -59,6 +60,14 @@ local function formatDotTooltip(template, durationForDisplay, effectValue, sourc
     s = table.concat(
         __TS__StringSplit(s, "damage"),
         damageStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "data1"),
+        damageStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "data2"),
+        damageStr2 or ","
     )
     s = table.concat(
         __TS__StringSplit(s, "data"),
@@ -128,6 +137,7 @@ function ____exports.buildBuffBarViewModel(unit)
                     id = bid,
                     state = {
                         effect = rt.effect,
+                        effect2 = rt.effect2 or 0,
                         remaining = rt.remaining,
                         iconRemaining = buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
                         sourceName = rt.sourceName,
@@ -168,25 +178,39 @@ function ____exports.buildBuffBarViewModel(unit)
                 local tooltipBodyText = ""
                 local tooltipSourceText = ""
                 if meta ~= nil then
-                    local tooltipParts = formatDotTooltip(
-                        meta.tooltip,
+                    local ____formatDotTooltip_10 = formatDotTooltip
+                    local ____meta_tooltip_8 = meta.tooltip
+                    local ____row_state_effect_9 = row.state.effect
+                    local ____row_state_effect2_7 = row.state.effect2
+                    if ____row_state_effect2_7 == nil then
+                        ____row_state_effect2_7 = 0
+                    end
+                    local tooltipParts = ____formatDotTooltip_10(
+                        ____meta_tooltip_8,
                         durationForTip,
-                        row.state.effect,
+                        ____row_state_effect_9,
+                        ____row_state_effect2_7,
                         row.state.sourceName,
                         meta.interval
                     )
                     tooltipBodyText = tooltipParts.bodyText
                     tooltipSourceText = tooltipParts.sourceText
                 else
-                    tooltipBodyText = (((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. formatOneDecimal(row.state.remaining)) .. " 秒，伤害/秒 ") .. formatOneDecimal(row.state.effect)) .. "|r"
-                    local ____temp_8 = TIP_COLOR_SOURCE .. "来源："
-                    local ____temp_7
-                    if row.state.sourceName and row.state.sourceName ~= "" then
-                        ____temp_7 = row.state.sourceName
-                    else
-                        ____temp_7 = "未记录"
+                    local ____temp_13 = (((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. formatOneDecimal(row.state.remaining)) .. " 秒，效果1 ") .. formatOneDecimal(row.state.effect)) .. "，效果2 "
+                    local ____formatOneDecimal_12 = formatOneDecimal
+                    local ____row_state_effect2_11 = row.state.effect2
+                    if ____row_state_effect2_11 == nil then
+                        ____row_state_effect2_11 = 0
                     end
-                    tooltipSourceText = (____temp_8 .. tostring(____temp_7)) .. "|r"
+                    tooltipBodyText = (____temp_13 .. ____formatOneDecimal_12(____row_state_effect2_11)) .. "|r"
+                    local ____temp_15 = TIP_COLOR_SOURCE .. "来源："
+                    local ____temp_14
+                    if row.state.sourceName and row.state.sourceName ~= "" then
+                        ____temp_14 = row.state.sourceName
+                    else
+                        ____temp_14 = "未记录"
+                    end
+                    tooltipSourceText = (____temp_15 .. tostring(____temp_14)) .. "|r"
                 end
                 local remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining)
                 local remainText = ("|cffffffff" .. remainStr) .. "|r"

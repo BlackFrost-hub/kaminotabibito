@@ -1,23 +1,23 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
+---
+-- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_1 = require("系统.02．物品系统.13．物品名反查")
-local resolveItemIdByName = ____require_result_1.resolveItemIdByName
-local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品累伤次数函数")
-local _____5355_4F4D_7269_54C1_7D2F_4F24_6B21_6570 = ____require_result_2["单位物品累伤次数"]
-local _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907 = ____require_result_2["获取单位指定装备"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.01．暗影突袭")
-local _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A = ____require_result_3["创建暗影突袭追踪"]
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_4["延后一帧执行伤害派生效果"]
-local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_5.doHeal
+local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
+local resolveItemIdByName = ____require_result_0.resolveItemIdByName
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.物品累伤次数函数")
+local _____5355_4F4D_7269_54C1_7D2F_4F24_6B21_6570 = ____require_result_1["单位物品累伤次数"]
+local _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907 = ____require_result_1["获取单位指定装备"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.01．暗影突袭")
+local _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A = ____require_result_2["创建暗影突袭追踪"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_3["延后一帧执行伤害派生效果"]
+local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_4.doHeal
+local ____require_result_5 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
+local _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E = ____require_result_5["女妖头饰累计配置"]
 local ____require_result_6 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
-local _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E = ____require_result_6["女妖头饰累计配置"]
-local ____require_result_7 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
-local _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E = ____require_result_7["女妖头饰强化累计配置"]
+local _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E = ____require_result_6["女妖头饰强化累计配置"]
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
@@ -25,8 +25,8 @@ local GetItemCharges = jass.GetItemCharges
 local SetItemCharges = jass.SetItemCharges
 local GetItemTypeId = jass.GetItemTypeId
 local UnitItemInSlot = jass.UnitItemInSlot
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 local _____5973_5996_5934_9970ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"]))
 local _____5973_5996_5934_9970_5F3A_5316ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]))
 local function _____5355_4F4D_62E5_6709_88C5_5907(unit, itemTypeId)
@@ -50,13 +50,13 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
         return
     end
     local _____5973_5996_5934_9970_7269_54C1 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970ID)
-    local ____temp_9
+    local ____temp_8
     if resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]) ~= nil then
-        ____temp_9 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970_5F3A_5316ID)
+        ____temp_8 = _____83B7_53D6_5355_4F4D_6307_5B9A_88C5_5907(target, _____5973_5996_5934_9970_5F3A_5316ID)
     else
-        ____temp_9 = nil
+        ____temp_8 = nil
     end
-    local _____5973_5996_5934_9970_5F3A_5316_7269_54C1 = ____temp_9
+    local _____5973_5996_5934_9970_5F3A_5316_7269_54C1 = ____temp_8
     local _____6709_5973_5996_5934_9970 = _____5973_5996_5934_9970_7269_54C1 ~= nil
     local _____6709_5973_5996_5934_9970_5F3A_5316 = _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil
     if not _____6709_5973_5996_5934_9970 and not _____6709_5973_5996_5934_9970_5F3A_5316 then

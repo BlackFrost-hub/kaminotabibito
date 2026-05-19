@@ -1,0 +1,88 @@
+---
+description: Buff / Debuff / HOT / DOT / 原生魔法效果新增与清理规则，避免只加 UI Buff 而漏掉实际效果、驱散中断或 UnitRemoveAbility
+globs: TS/系统/05．Buff系统/**/*.ts,TS/系统/03．技能系统/00．技能模板+函数/01．技能函数/19．拓展效果/**/*.ts,TS/系统/02．物品系统/15．装备技能/**/*.ts,objediting/abilities.lua
+alwaysApply: false
+---
+
+# Buff 系统硬规则
+
+新增或修改 Buff 前，必须先区分三层：
+
+- Buff 表/UI 层：`TS/系统/05．Buff系统/01．Buff表.ts`，只负责显示、分类、驱散字段和表现特效。
+- TS 运行逻辑层：HOT、DOT、属性修改、伤害修正、治疗、回蓝等实际效果。
+- 魔兽原生魔法效果层：`objediting/abilities.lua` 里由马甲技能施加的原生 Buff，例如减速、残废、心灵之火、精灵之火、睡眠、飓风、寄生等。
+
+禁止只新增 Buff 表条目就认为效果完成。
+
+## Buff 表
+
+`01．Buff表.ts` 新增条目必须明确：
+
+- `buffID`、`buffName`、`icon`、`effect`
+- `effectMode` / `effectAttachPoint`：挂点或坐标表现要写清楚
+- `type`：驱散逻辑依赖 `Buff:`、`Debuff:`、`Debuff:control`、`Debuff:magic` 等前缀
+- `interval`、`maxStack`、`stackRule`、`stackRefresh`
+- `dispelLevel`、`canPurge`
+- `tooltip` 必须和实际代码效果一致
+
+如果有真实数值效果，必须在 `19．拓展效果` 或对应技能/装备模块落地实现。
+
+## 原生 Buff 清理
+
+使用原生技能施加的 Buff，清除时必须兼容魔兽状态栏和原生效果：
+
+- 优先走快速 Buff 封装：`SFB_setBuff`、`SFB_setSlow`、`SFB_施加通用Buff`。
+- Buff 到期或被清除时必须最终触发 `UnitRemoveAbility(unit, 原生BuffRawId)`。
+- `C001-C018/C024` 这类快速 Buff 已在 Buff 池底层有默认原生 Buff rawId 映射；新增类型时必须同步补映射。
+- 如果不走默认映射，调用 `registerManualBuff` 时必须传 `nativeBuffAbilityIds`。
+
+禁止只删除 TS Buff 池/UI，而不删除目标身上的原生魔法效果。
+
+## 驱散与提前结束
+
+所有持续执行效果必须检查自己的 Buff 是否仍存在：
+
+- HOT 每跳前检查对应 BuffID，不存在就停止并清理。
+- DOT 每跳前检查对应 BuffID，不存在就停止并清理。
+- 持续属性修改必须用 `onRemove` 回滚属性；如果还有 tick，也要检查 Buff 是否存在。
+- 易伤、减伤、伤害百分比等不要永久缓存；计算时读 Buff 当前运行态，或在 `onRemove` 中回滚写入属性。
+
+`registerManualBuff` 只是注册 Buff 池，不等于持续逻辑已经支持驱散中断。
+
+## registerManualBuff
+
+`registerManualBuff(target, buffID, duration, effectValue, extras)` 使用时必须按语义补齐：
+
+- `sourceName`：来源显示
+- `effectValue2`：第二数值，例如同时回血回蓝
+- `effectModelOverride`：覆盖表现模型
+- `nativeBuffAbilityIds`：需要清理原生魔法效果时传入，或确认已有默认映射
+- `onRemove`：属性、状态、写表效果必须在这里回滚
+
+重复施加、刷新、最高值、叠层必须和 Buff 表里的 `stackRule` 一致。
+
+## 属性与治疗
+
+- 固定攻击力增加走属性底层加减，清除时 `onRemove` 反向回滚。
+- 伤害百分比增减必须对齐伤害系统读取层级：玩家英雄通常写玩家属性，非英雄写单位属性。
+- 生命/魔法恢复走治疗系统 `doHeal` 或 HOT 封装。
+- 持续恢复必须支持 Buff 被驱散后提前停止。
+
+## 清除入口
+
+业务代码清 Buff 优先走统一入口：
+
+- `移除单位指定Buff`
+- `移除单位增益Buff`
+- `移除单位负面Buff`
+- `按驱散等级移除单位Buff`
+- 技能侧优先从 `02．通用函数/01．控制与Buff.ts` 引用中文别名。
+
+统一入口负责触发 `onRemove`、停止运行态、清 Buff 池/UI、删除登记过的原生魔法效果。
+
+## TSTL 自检
+
+- JASS API 先绑局部别名，不直接 `jass.Xxx(...)`。
+- 定时器和 JASS 回调使用模块级具名函数。
+- 不准为了 TSTL 修改 `scripts/fix-lua-for-pack.js`。
+- 构建后检查 `src` 下 Lua：`registerManualBuff`、`onRemove`、`UnitRemoveAbility`、HOT/DOT tick、`self/nil` 参数形态。

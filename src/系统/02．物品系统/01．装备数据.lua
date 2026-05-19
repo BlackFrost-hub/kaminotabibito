@@ -60,6 +60,7 @@ ____exports.items.I00P = {
     level = "E-",
     dmg = 2,
     hp = 50,
+    hpRegen = 50,
     all = 2,
     cdReduction = 0.5,
     mpCost = -0.2,

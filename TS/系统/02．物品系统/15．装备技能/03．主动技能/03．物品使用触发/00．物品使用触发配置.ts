@@ -16,11 +16,27 @@ export const 地狱火卡牌配置 = {
   间隔: 0.5,
   生命恢复百分比: 0.1,
   固定生命恢复: 200,
-  BuffID: "C026",
+  魔法恢复比例: 0.5,
+  BuffID: "C027",
   图标路径: "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp",
   特效路径: "Abilities\\Spells\\NightElf\\Rejuvenation\\RejuvenationTarget.mdl",
   特效挂点: "origin",
   特效键: "地狱火卡牌",
+} as const;
+
+export const 指挥之剑配置 = {
+  装备名称: 主动技能装备名称.指挥之剑,
+  持续时间: 5,
+  易伤百分比: 15,
+} as const;
+
+export const 使者魔轮配置 = {
+  装备名称: 主动技能装备名称.使者魔轮,
+  消耗魔法比例: 0.25,
+  作用半径: 300,
+  持续时间: 10,
+  特效路径: "war3mapImported\\Energy Shield.mdl",
+  特效尺寸: 6.5,
 } as const;
 
 export const 破血之戒配置 = {
@@ -114,7 +130,7 @@ export const 汭冥血杖配置 = {
   特效路径: "war3mapImported\\CorpseBomb.mdl",
   特效挂点: "overhead",
   特效持续时间: 2,
-  BuffID: "C026",
+  BuffID: "C027",
   图标路径: "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp",
   恢复特效路径: "Abilities\\Spells\\NightElf\\Rejuvenation\\RejuvenationTarget.mdl",
   恢复特效挂点: "origin",

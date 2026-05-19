@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 物品治疗效果系统
  *
@@ -26,7 +26,7 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 
 // 导入核心治疗功能
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (params: {
+  doHeal: (this: void, params: {
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
@@ -238,3 +238,4 @@ export function isHealItemAbility(abilId: number): boolean {
 
 export {};
 /** @noSelfInFile */
+

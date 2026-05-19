@@ -6,14 +6,17 @@ local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_1.registerManualBuff
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_2.SFB_setSlow
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
-local _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_4["创建追踪插值轨迹"]
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isSameUnit = ____require_result_5.isSameUnit
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local getBuffRuntime = ____require_result_2.getBuffRuntime
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_3.SFB_setSlow
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
+local _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_5["创建追踪插值轨迹"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isSameUnit = ____require_result_6.isSameUnit
+local buffTableMod = require("系统.05．Buff系统.01．Buff表")
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
@@ -31,9 +34,15 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____6697_5F71_7A81_88ADBuffID = "C025"
-local _____6697_5F71_7A81_88AD_56FE_6807 = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp"
-local _____6697_5F71_7A81_88AD_7279_6548 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl"
 local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl"
+local function _____8BFB_53D6Buff_56FE_6807(BuffID)
+    local meta = buffTableMod.buffs[BuffID]
+    return meta ~= nil and meta.icon ~= nil and meta.icon ~= "" and meta.icon or nil
+end
+local function _____8BFB_53D6Buff_7279_6548(BuffID)
+    local meta = buffTableMod.buffs[BuffID]
+    return meta ~= nil and meta.effect ~= nil and meta.effect ~= "" and meta.effect or nil
+end
 local _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868 = {}
 local _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868 = {}
 local function _____6697_5F71_7A81_88AD_5411_4E0A_53D6_6574_79D2_6570(duration)
@@ -55,6 +64,10 @@ local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
     local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId]
     if state == nil then
         DestroyTimer(timer)
+        return
+    end
+    if getBuffRuntime(state.target, state.buffID) == nil then
+        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
         return
     end
     if state.remainingTicks <= 0 then
@@ -99,6 +112,24 @@ local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
         _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
     end
 end
+local function ____on_6697_5F71_7A81_88ADBuff_79FB_9664(unit, buffID, _row)
+    if unit == nil or unit == 0 or buffID == "" then
+        return
+    end
+    for key in pairs(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868) do
+        do
+            local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[key]
+            if state == nil then
+                goto __continue17
+            end
+            if state.target ~= unit or state.buffID ~= buffID then
+                goto __continue17
+            end
+            __TS__Delete(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868, key)
+        end
+        ::__continue17::
+    end
+end
 ____exports["是否为暗影突袭毒素伤害"] = function(unit)
     if unit == nil or unit == 0 then
         return false
@@ -141,6 +172,7 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
     local damagePerSecond = _____53C2_6570.damagePerSecond or 500
     local slowAttack = _____53C2_6570.slowAttack or 0.3
     local slowMove = _____53C2_6570.slowMove or 0.3
+    local buffID = _____53C2_6570.buffID or _____6697_5F71_7A81_88ADBuffID
     debugLogForce(
         "暗影突袭",
         "施加减益",
@@ -155,13 +187,14 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
     )
     registerManualBuff(
         target,
-        _____53C2_6570.buffID or _____6697_5F71_7A81_88ADBuffID,
+        buffID,
         duration,
         0,
         {
             sourceName = _____53C2_6570.sourceName or GetUnitName(source),
-            iconOverride = _____53C2_6570.iconOverride or _____6697_5F71_7A81_88AD_56FE_6807,
-            effectModelOverride = _____53C2_6570.effectModelOverride or _____6697_5F71_7A81_88AD_7279_6548
+            iconOverride = _____53C2_6570.iconOverride or _____8BFB_53D6Buff_56FE_6807(buffID),
+            effectModelOverride = _____53C2_6570.effectModelOverride or _____8BFB_53D6Buff_7279_6548(buffID),
+            onRemove = ____on_6697_5F71_7A81_88ADBuff_79FB_9664
         }
     )
     SFB_setSlow(
@@ -176,6 +209,7 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
     _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId] = {
         source = source,
         target = target,
+        buffID = buffID,
         remainingTicks = _____6697_5F71_7A81_88AD_5411_4E0A_53D6_6574_79D2_6570(duration),
         damagePerTick = damagePerSecond
     }

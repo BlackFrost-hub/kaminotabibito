@@ -1,10 +1,4 @@
 /** @noSelfInFile */
-
-
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
@@ -20,7 +14,6 @@ function 单位持有战士大衣(this: void, 单位: any): boolean {
 }
 
 export function 处理战士大衣施法(this: void, 施法单位: any): void {
-  debugLogForce("06．战士大衣", "进入", "处理战士大衣施法");
 
   if (!单位持有战士大衣(施法单位)) return;
   施加临时附加攻击(施法单位, 战士大衣配置.附加攻击, 战士大衣配置.持续时间);

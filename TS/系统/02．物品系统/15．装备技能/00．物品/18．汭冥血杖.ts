@@ -19,11 +19,18 @@ const { getObjectPropertyRealSafe, ObjectType } = require("lib.扩展函数.YDWE
   getObjectPropertyRealSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
   ObjectType: { UNIT: number };
 };
-const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
-  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
-};
-const { startHot } = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果") as {
-  startHot: (this: void, target: any, source: any, tickHP: number, tickMP: number, duration: number, intervalOrOptions?: number | any, extraOptions?: any) => void;
+const { 施加持续恢复生命魔法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法") as {
+  施加持续恢复生命魔法: (this: void, source: any, target: any, 参数: {
+    BuffID: string;
+    图标路径: string;
+    特效路径: string;
+    特效挂点: string;
+    特效键: string;
+    持续时间: number;
+    间隔: number;
+    每跳生命恢复: number;
+    每跳魔法恢复: number;
+  }) => void;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -32,7 +39,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitLevel = jass.GetUnitLevel as (unit: any) => number;
-const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const IsUnitRace = jass.IsUnitRace as (unit: any, race: any) => boolean;
 const IsHeroUnitId = jass.IsHeroUnitId as (unitId: number) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
@@ -61,24 +67,17 @@ function 目标可献祭(this: void, 目标单位: any, 等级上限: number): b
   return GetUnitLevel(目标单位) <= 等级上限;
 }
 
-function 汭冥血杖结束条件恒真(this: void, _目标单位: any): boolean {
-  return true;
-}
-
 function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值: number, 魔法恢复值: number): void {
-  registerManualBuff(施法单位, 汭冥血杖配置.BuffID, 汭冥血杖配置.恢复持续时间, 生命恢复值, {
-    sourceName: GetUnitName(施法单位),
-    iconOverride: 汭冥血杖配置.图标路径,
-    effectModelOverride: 汭冥血杖配置.恢复特效路径,
-  });
-  startHot(施法单位, 施法单位, 生命恢复值, 魔法恢复值, 汭冥血杖配置.恢复持续时间, 汭冥血杖配置.恢复间隔, {
-    结束条件检测: 汭冥血杖结束条件恒真,
-    特效: {
-      特效路径: 汭冥血杖配置.恢复特效路径,
-      特效挂点: 汭冥血杖配置.恢复特效挂点,
-      是否绑定单位: true,
-      特效键: 汭冥血杖配置.恢复特效键,
-    },
+  施加持续恢复生命魔法(施法单位, 施法单位, {
+    BuffID: 汭冥血杖配置.BuffID,
+    图标路径: 汭冥血杖配置.图标路径,
+    特效路径: 汭冥血杖配置.恢复特效路径,
+    特效挂点: 汭冥血杖配置.恢复特效挂点,
+    特效键: 汭冥血杖配置.恢复特效键,
+    持续时间: 汭冥血杖配置.恢复持续时间,
+    间隔: 汭冥血杖配置.恢复间隔,
+    每跳生命恢复: 生命恢复值,
+    每跳魔法恢复: 魔法恢复值,
   });
 }
 

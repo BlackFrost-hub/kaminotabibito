@@ -54,6 +54,9 @@ interface 伤害数字实例 {
 }
 
 interface 伤害类型快照 {
+  rawAttackType: any;
+  rawDamageType: any;
+  rawWeaponType: any;
   isPhysicalDamage: boolean;
   isMagicDamage: boolean;
   isEnhancedDamage: boolean;
@@ -106,9 +109,9 @@ function 单位存活(this: void, unit: any): boolean {
 }
 
 function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: number; g: number; b: number } {
-  if (damageType.isTrueDamage) return { r: 255, g: 240, b: 120 };
   // 与 JASS 逻辑对齐：普通攻击优先按普攻色，不被魔法标记抢色。
   if (damageType.isNormalAttack) return { r: 160, g: 82, b: 45 };
+  if (damageType.isTrueDamage) return { r: 255, g: 240, b: 120 };
   if (damageType.isEnhancedDamage) return { r: 255, g: 140, b: 0 };
   if (damageType.isFireDamage) return { r: 255, g: 66, b: 66 };
   if (damageType.isWaterDamage) return { r: 80, g: 190, b: 255 };
@@ -119,6 +122,22 @@ function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: nu
   if (damageType.isDarkDamage) return { r: 180, g: 130, b: 255 };
   if (damageType.isPhysicalDamage) return { r: 255, g: 90, b: 90 };
   if (damageType.isMagicDamage) return { r: 120, g: 140, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_MIND) return { r: 255, g: 240, b: 120 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_ENHANCED) return { r: 255, g: 140, b: 0 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_FIRE) return { r: 255, g: 66, b: 66 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_COLD) return { r: 80, g: 190, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_LIGHTNING) return { r: 170, g: 220, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_POISON) return { r: 255, g: 210, b: 80 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_SLOW_POISON) return { r: 255, g: 210, b: 80 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_ACID) return { r: 255, g: 210, b: 80 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_DISEASE) return { r: 255, g: 210, b: 80 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_PLANT) return { r: 120, g: 255, b: 120 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_DIVINE) return { r: 255, g: 255, b: 170 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_SHADOW_STRIKE) return { r: 180, g: 130, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_SONIC) return { r: 255, g: 160, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_MAGIC) return { r: 120, g: 140, b: 255 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_NORMAL) return { r: 160, g: 82, b: 45 };
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_UNIVERSAL) return { r: 255, g: 255, b: 255 };
   return { r: 255, g: 255, b: 255 };
 }
 

@@ -1,0 +1,38 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____00_FF0E_4F24_5BB3_4E8B_4EF6_914D_7F6E_8868 = require("系统.02．物品系统.15．装备技能.04．伤害事件.00．公共.00．伤害事件配置表")
+local _____4F24_5BB3_4E8B_4EF6_88C5_5907ID = ____00_FF0E_4F24_5BB3_4E8B_4EF6_914D_7F6E_8868["伤害事件装备ID"]
+local ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177 = require("系统.02．物品系统.15．装备技能.04．伤害事件.00．公共.01．伤害事件工具")
+local _____5355_4F4D_6301_6709_4F24_5BB3_4E8B_4EF6_88C5_5907 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["单位持有伤害事件装备"]
+local _____53D6_5F53_524D_9B54_6CD5 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["取当前魔法"]
+local _____53D6_6700_5927_9B54_6CD5 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["取最大魔法"]
+local _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["造成伤害事件伤害"]
+local _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["伤害事件伤害类型"]
+local ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001 = require("系统.02．物品系统.15．装备技能.04．伤害事件.00．公共.02．伤害事件状态")
+local _____5355_4F4D_51B7_5374_4E2D = ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001["单位冷却中"]
+local _____8BBE_7F6E_5355_4F4D_51B7_5374 = ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001["设置单位冷却"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
+local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_0["创建单位绑定闪电"]
+local jass = require("jass.common")
+local GetHandleId = jass.GetHandleId
+____exports["处理灵墓之戒造成伤害"] = function(ctx)
+    if not _____5355_4F4D_6301_6709_4F24_5BB3_4E8B_4EF6_88C5_5907(ctx.attacker, _____4F24_5BB3_4E8B_4EF6_88C5_5907ID["灵墓之戒"]) then
+        return
+    end
+    local _____51B7_5374_952E = "灵墓之戒:" .. tostring(GetHandleId(ctx.attacker))
+    if _____5355_4F4D_51B7_5374_4E2D(_____51B7_5374_952E) then
+        return
+    end
+    _____8BBE_7F6E_5355_4F4D_51B7_5374(_____51B7_5374_952E, 1)
+    local _____4F24_5BB3 = (_____53D6_6700_5927_9B54_6CD5(ctx.attacker) - _____53D6_5F53_524D_9B54_6CD5(ctx.attacker)) * 0.2
+    _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3(ctx.attacker, ctx.target, _____4F24_5BB3, _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B["暗影突袭"])
+    _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({
+        ["效果代码"] = "LEAS",
+        ["起点单位"] = ctx.target,
+        ["终点单位"] = ctx.attacker,
+        ["持续时间"] = 1,
+        ["起点高度偏移"] = 60,
+        ["终点高度偏移"] = 60
+    })
+end
+return ____exports

@@ -1,10 +1,4 @@
 /** @noSelfInFile */
-
-
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const jass = require("jass.common") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -52,8 +46,6 @@ function 对敌人造成黑牧杖伤害(this: void, 施法者: any, 目标: any)
 }
 
 export function 处理黑牧杖治疗(this: void, _来源: any, 目标: any, 治疗量: number, _是否物品治疗: boolean): number {
-  debugLogForce("03．黑牧杖", "进入", "处理黑牧杖治疗");
-
   if (!isValidUnit(目标) || 治疗量 <= 黑牧杖最小治疗触发值) return 治疗量;
   if (!单位是否持有黑牧杖(目标)) return 治疗量;
 

@@ -16,17 +16,14 @@ local createUnitEffect = ____require_result_2.createUnitEffect
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local getObjectPropertyRealSafe = ____require_result_3.getObjectPropertyRealSafe
 local ObjectType = ____require_result_3.ObjectType
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
-local startHot = ____require_result_5.startHot
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法")
+local _____65BD_52A0_6301_7EED_6062_590D_751F_547D_9B54_6CD5 = ____require_result_4["施加持续恢复生命魔法"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitLevel = jass.GetUnitLevel
-local GetUnitName = jass.GetUnitName
 local IsUnitRace = jass.IsUnitRace
 local IsHeroUnitId = jass.IsHeroUnitId
 local KillUnit = jass.KillUnit
@@ -56,30 +53,18 @@ local function _____76EE_6807_53EF_732E_796D(_____76EE_6807_5355_4F4D, _____7B49
     end
     return GetUnitLevel(_____76EE_6807_5355_4F4D) <= _____7B49_7EA7_4E0A_9650
 end
-local function _____6C6D_51A5_8840_6756_7ED3_675F_6761_4EF6_6052_771F(______76EE_6807_5355_4F4D)
-    return true
-end
 local function _____65BD_52A0_6C6D_51A5_8840_6756_6062_590D(_____65BD_6CD5_5355_4F4D, _____751F_547D_6062_590D_503C, _____9B54_6CD5_6062_590D_503C)
-    registerManualBuff(
-        _____65BD_6CD5_5355_4F4D,
-        _____6C6D_51A5_8840_6756_914D_7F6E.BuffID,
-        _____6C6D_51A5_8840_6756_914D_7F6E["恢复持续时间"],
-        _____751F_547D_6062_590D_503C,
-        {
-            sourceName = GetUnitName(_____65BD_6CD5_5355_4F4D),
-            iconOverride = _____6C6D_51A5_8840_6756_914D_7F6E["图标路径"],
-            effectModelOverride = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效路径"]
-        }
-    )
-    startHot(
-        _____65BD_6CD5_5355_4F4D,
-        _____65BD_6CD5_5355_4F4D,
-        _____751F_547D_6062_590D_503C,
-        _____9B54_6CD5_6062_590D_503C,
-        _____6C6D_51A5_8840_6756_914D_7F6E["恢复持续时间"],
-        _____6C6D_51A5_8840_6756_914D_7F6E["恢复间隔"],
-        {["结束条件检测"] = _____6C6D_51A5_8840_6756_7ED3_675F_6761_4EF6_6052_771F, ["特效"] = {["特效路径"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效路径"], ["特效挂点"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效挂点"], ["是否绑定单位"] = true, ["特效键"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效键"]}}
-    )
+    _____65BD_52A0_6301_7EED_6062_590D_751F_547D_9B54_6CD5(_____65BD_6CD5_5355_4F4D, _____65BD_6CD5_5355_4F4D, {
+        BuffID = _____6C6D_51A5_8840_6756_914D_7F6E.BuffID,
+        ["图标路径"] = _____6C6D_51A5_8840_6756_914D_7F6E["图标路径"],
+        ["特效路径"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效路径"],
+        ["特效挂点"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效挂点"],
+        ["特效键"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复特效键"],
+        ["持续时间"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复持续时间"],
+        ["间隔"] = _____6C6D_51A5_8840_6756_914D_7F6E["恢复间隔"],
+        ["每跳生命恢复"] = _____751F_547D_6062_590D_503C,
+        ["每跳魔法恢复"] = _____9B54_6CD5_6062_590D_503C
+    })
 end
 ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662F_5426_5F3A_5316)
     debugLogForce("19．汭冥血杖", "进入", "执行汭冥血杖献祭")
@@ -121,7 +106,7 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
             do
                 local _____654C_4EBA = _____654C_4EBA_5217_8868[i + 1]
                 if not _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9(_____654C_4EBA, _____65BD_6CD5_5355_4F4D) then
-                    goto __continue15
+                    goto __continue14
                 end
                 UnitDamageTarget(
                     _____65BD_6CD5_5355_4F4D,
@@ -134,7 +119,7 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
                     WEAPON_TYPE_WHOKNOWS
                 )
             end
-            ::__continue15::
+            ::__continue14::
             i = i + 1
         end
     end

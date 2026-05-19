@@ -1,11 +1,16 @@
 /** @noSelfInFile */
 
 import { 主动技能装备名称 } from "../03．主动技能/00．公共/00．主动技能装备名";
+import { 伤害事件测试装备顺序 } from "../04．伤害事件/00．公共/00．伤害事件配置表";
 
 export const 物品主动技能测试命令列表 = [
   "wp1", "wp2", "wp3", "wp4", "wp5", "wp6", "wp7", "wp8",
   "wp9", "wp10", "wp11", "wp12", "wp13", "wp14", "wp15", "wp16",
   "wp17", "wp18", "wp19", "wp20", "wp21", "wp22", "wp23", "wp24",
+  "wp25", "wp26",
+  "wp27", "wp28", "wp29", "wp30", "wp31", "wp32", "wp33", "wp34",
+  "wp35", "wp36", "wp37", "wp38", "wp39", "wp40", "wp41", "wp42",
+  "wp43", "wp44", "wp45", "wp46", "wp47", "wp48",
 ] as const;
 
 export const 物品主动技能测试清理装备列表 = [
@@ -33,6 +38,9 @@ export const 物品主动技能测试清理装备列表 = [
   主动技能装备名称.焰虚宝珠,
   主动技能装备名称.先祖之狱杖,
   主动技能装备名称.咆哮之心,
+  主动技能装备名称.指挥之剑,
+  主动技能装备名称.使者魔轮,
+  ...伤害事件测试装备顺序,
 ] as const;
 
 export const 物品主动技能测试发放顺序 = [
@@ -60,6 +68,45 @@ export const 物品主动技能测试发放顺序 = [
   主动技能装备名称.焰虚宝珠,
   主动技能装备名称.先祖之狱杖,
   主动技能装备名称.咆哮之心,
+  主动技能装备名称.指挥之剑,
+  主动技能装备名称.使者魔轮,
+  ...伤害事件测试装备顺序,
 ] as const;
+
+export interface 物品主动技能测试命令说明 {
+  序号: number;
+  命令: string;
+  装备名: string;
+}
+
+function 生成测试命令说明列表(this: void): 物品主动技能测试命令说明[] {
+  const list: 物品主动技能测试命令说明[] = [];
+  const count = 物品主动技能测试命令列表.length < 物品主动技能测试发放顺序.length
+    ? 物品主动技能测试命令列表.length
+    : 物品主动技能测试发放顺序.length;
+
+  for (let i = 0; i < count; i++) {
+    list.push({
+      序号: i + 1,
+      命令: 物品主动技能测试命令列表[i],
+      装备名: 物品主动技能测试发放顺序[i],
+    });
+  }
+
+  return list;
+}
+
+function 生成测试命令说明文本列表(this: void): string[] {
+  const list: string[] = [];
+  const 说明列表 = 生成测试命令说明列表();
+  for (let i = 0; i < 说明列表.length; i++) {
+    const 说明 = 说明列表[i];
+    list.push(说明.序号 + "." + 说明.命令 + "=" + 说明.装备名);
+  }
+  return list;
+}
+
+export const 物品主动技能测试命令说明列表 = 生成测试命令说明列表();
+export const 物品主动技能测试命令说明文本列表 = 生成测试命令说明文本列表();
 
 export {};

@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 治疗事件系统（旧版兼容）
  *
@@ -30,7 +30,7 @@ const { YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.inde
 
 // 导入核心治疗功能
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (params: {
+  doHeal: (this: void, params: {
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
@@ -154,3 +154,4 @@ export function isNativeHealEntryInitialized(): boolean {
 
 export {};
 /** @noSelfInFile */
+

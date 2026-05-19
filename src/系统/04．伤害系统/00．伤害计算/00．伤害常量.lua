@@ -103,12 +103,16 @@ ____exports.DAMAGE_TYPE_ATTRS = {
     DAMAGE_TYPE_SLOW_POISON = {damage = "金属性伤害", resist = "金属性抗性"},
     DAMAGE_TYPE_POISON = {damage = "金属性伤害", resist = "金属性抗性"},
     DAMAGE_TYPE_ACID = {damage = "金属性伤害", resist = "金属性抗性"},
+    DAMAGE_TYPE_DISEASE = {damage = "金属性伤害", resist = "金属性抗性"},
     DAMAGE_TYPE_PLANT = {damage = "木属性伤害", resist = "木属性抗性"},
     DAMAGE_TYPE_COLD = {damage = "水属性伤害", resist = "水属性抗性"},
     DAMAGE_TYPE_FIRE = {damage = "火属性伤害", resist = "火属性抗性"},
     DAMAGE_TYPE_LIGHTNING = {damage = "雷属性伤害", resist = "雷属性抗性"},
     DAMAGE_TYPE_DIVINE = {damage = "光属性伤害", resist = "光属性抗性"},
-    DAMAGE_TYPE_SHADOW_STRIKE = {damage = "暗属性伤害", resist = "暗属性抗性"}
+    DAMAGE_TYPE_MAGIC = {damage = "魔法伤害", resist = "魔抗"},
+    DAMAGE_TYPE_SHADOW_STRIKE = {damage = "暗属性伤害", resist = "暗属性抗性"},
+    DAMAGE_TYPE_SONIC = {damage = "音属性伤害", resist = "音属性抗性"},
+    DAMAGE_TYPE_UNIVERSAL = {damage = "最终伤害", resist = ""}
 }
 --- 护甲减伤公式常量
 -- 减伤比例 = 护甲 / (护甲 + ARMOR_FACTOR)

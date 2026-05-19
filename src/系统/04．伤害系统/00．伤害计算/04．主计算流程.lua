@@ -109,6 +109,9 @@ local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算
 local applyDamageModifiers = ____require_result_3.applyDamageModifiers
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
 local createDelayedCall = ____require_result_4.createDelayedCall
+local ConvertDamageType = jass.ConvertDamageType
+local ConvertAttackType = jass.ConvertAttackType
+local ConvertWeaponType = jass.ConvertWeaponType
 _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local appliedFinalDamageListeners = {}
 ____exports["延后一帧执行伤害派生效果"] = function(callback)
@@ -149,6 +152,9 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
 end
 local function captureDamageTypeSnapshot()
     return {
+        rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
+        rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
+        rawWeaponType = ConvertWeaponType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_WEAPON_TYPE)),
         isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
         isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
         isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),

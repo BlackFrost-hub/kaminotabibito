@@ -1,9 +1,4 @@
 /** @noSelfInFile */
-
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const jass = require("jass.common") as any;
 const { resolveItemIdByName } = require("系统.02．物品系统.13．物品名反查") as {
   resolveItemIdByName: (this: void, name: string) => string | undefined;
