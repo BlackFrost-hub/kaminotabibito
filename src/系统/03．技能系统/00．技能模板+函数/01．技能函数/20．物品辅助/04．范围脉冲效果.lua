@@ -1,0 +1,154 @@
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
+local __TS__Number = ____lualib.__TS__Number
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_1.getUnitsInRange
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
+local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_result_2["监听指定物品获取丢弃"]
+local _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF = ____require_result_2["获取单位当前持有指定物品数量"]
+local jass = require("jass.common")
+local GetHandleId = jass.GetHandleId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local _____8303_56F4_8109_51B2_5B9E_4F8B_8868 = {}
+local _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 = false
+local function _____83B7_53D6_5355_4F4DID(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return GetHandleId(unit) or 0
+end
+local function _____5904_7406_83B7_5F97(_____914D_7F6E, unit, _item, currentCount, previousCount)
+    local unitId = _____83B7_53D6_5355_4F4DID(unit)
+    if unitId == 0 then
+        return
+    end
+    if currentCount <= 0 then
+        __TS__Delete(_____914D_7F6E["单位状态"], unitId)
+        return
+    end
+    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = currentCount}
+    if previousCount <= 0 then
+        _____914D_7F6E["下次触发时间"] = getServerTime()
+    end
+end
+local function _____5904_7406_4E22_5F03(_____914D_7F6E, unit, _item, currentCount)
+    local unitId = _____83B7_53D6_5355_4F4DID(unit)
+    if unitId == 0 then
+        return
+    end
+    if currentCount <= 0 then
+        __TS__Delete(_____914D_7F6E["单位状态"], unitId)
+        return
+    end
+    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = currentCount}
+end
+local function ____on_8303_56F4_8109_51B2_6548_679CTick()
+    local now = getServerTime()
+    do
+        local i = 0
+        while i < #_____8303_56F4_8109_51B2_5B9E_4F8B_8868 do
+            do
+                local _____914D_7F6E = _____8303_56F4_8109_51B2_5B9E_4F8B_8868[i + 1]
+                if now < _____914D_7F6E["下次触发时间"] then
+                    goto __continue13
+                end
+                _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
+                local _____5F85_6E05_7406 = {}
+                for unitKey in pairs(_____914D_7F6E["单位状态"]) do
+                    do
+                        local unitId = __TS__Number(unitKey)
+                        local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+                        if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
+                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                            goto __continue15
+                        end
+                        local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
+                        if currentCount <= 0 then
+                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                            goto __continue15
+                        end
+                        _____72B6_6001["数量"] = currentCount
+                        local x = GetUnitX(_____72B6_6001["单位"])
+                        local y = GetUnitY(_____72B6_6001["单位"])
+                        local units = getUnitsInRange(x, y, _____914D_7F6E["半径"])
+                        do
+                            local j = 0
+                            while j < #units do
+                                do
+                                    local target = units[j + 1]
+                                    if target == nil or target == 0 then
+                                        goto __continue19
+                                    end
+                                    if _____914D_7F6E["排除自身"] ~= false and target == _____72B6_6001["单位"] then
+                                        goto __continue19
+                                    end
+                                    if IsUnitType(target, UNIT_TYPE_DEAD) == true then
+                                        goto __continue19
+                                    end
+                                    if _____914D_7F6E["目标过滤"] ~= nil and _____914D_7F6E["目标过滤"](_____72B6_6001["单位"], target, currentCount) ~= true then
+                                        goto __continue19
+                                    end
+                                    _____914D_7F6E["脉冲回调"](_____72B6_6001["单位"], target, currentCount)
+                                end
+                                ::__continue19::
+                                j = j + 1
+                            end
+                        end
+                    end
+                    ::__continue15::
+                end
+                do
+                    local j = 0
+                    while j < #_____5F85_6E05_7406 do
+                        __TS__Delete(_____914D_7F6E["单位状态"], _____5F85_6E05_7406[j + 1])
+                        j = j + 1
+                    end
+                end
+            end
+            ::__continue13::
+            i = i + 1
+        end
+    end
+end
+local function _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    if _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 then
+        return
+    end
+    _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 = true
+    addPeriodicCallback(100, ____on_8303_56F4_8109_51B2_6548_679CTick)
+end
+____exports["注册范围脉冲效果"] = function(_____53C2_6570)
+    if _____53C2_6570 == nil or _____53C2_6570["物品类型ID"] == 0 or _____53C2_6570["间隔毫秒"] <= 0 or _____53C2_6570["半径"] <= 0 or _____53C2_6570["脉冲回调"] == nil then
+        return
+    end
+    _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    local _____914D_7F6E = __TS__ObjectAssign(
+        {},
+        _____53C2_6570,
+        {
+            ["下次触发时间"] = getServerTime() + _____53C2_6570["间隔毫秒"],
+            ["单位状态"] = {}
+        }
+    )
+    _____8303_56F4_8109_51B2_5B9E_4F8B_8868[#_____8303_56F4_8109_51B2_5B9E_4F8B_8868 + 1] = _____914D_7F6E
+    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(
+        _____53C2_6570["物品类型ID"],
+        function(unit, item, currentCount, previousCount) return _____5904_7406_83B7_5F97(
+            _____914D_7F6E,
+            unit,
+            item,
+            currentCount,
+            previousCount
+        ) end,
+        function(unit, item, currentCount, _previousCount) return _____5904_7406_4E22_5F03(_____914D_7F6E, unit, item, currentCount) end
+    )
+end
+return ____exports

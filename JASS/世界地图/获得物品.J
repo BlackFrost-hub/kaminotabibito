@@ -24,7 +24,7 @@ function Trig_________________________HDFunc005Func003T takes nothing returns no
 		if ((IsUnitAliveBJ( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit")) == true) and ((GetUnitState( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"), UNIT_STATE_MAX_LIFE) < 1400.00) or (GetUnitState( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"), UNIT_STATE_LIFE) < 300.00))) then
 			call KillUnit( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"))
 			call YDUserDataSet(unit, YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"),"邪恶之心持有", boolean, false)
-			call DisplayTimedTextToPlayer( YDLocalGet(GetExpiredTimer(), player, "GetTriggerPlayer"), 0, 0, 20.00, "TRIGSTR_232")
+			call DisplayTimedTextToPlayer( YDLocalGet(GetExpiredTimer(), player, "GetTriggerPlayer"), 0, 0, 20.00, "TRIGSTR_9059")
 		else
 		endif
 	endif
@@ -53,7 +53,7 @@ function Trig_________________________HDFunc007Func003T takes nothing returns no
 		if ((IsUnitAliveBJ( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit")) == true) and ((GetUnitState( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"), UNIT_STATE_MAX_MANA) < 1250.00) or (GetUnitState( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"), UNIT_STATE_MANA) < 250.00))) then
 			call KillUnit( YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"))
 			call YDUserDataSet(unit, YDLocalGet(GetExpiredTimer(), unit, "GetTriggerUnit"),"祭祀面具持有", boolean, false)
-			call DisplayTimedTextToPlayer( YDLocalGet(GetExpiredTimer(), player, "GetTriggerPlayer"), 0, 0, 20.00, "TRIGSTR_233")
+			call DisplayTimedTextToPlayer( YDLocalGet(GetExpiredTimer(), player, "GetTriggerPlayer"), 0, 0, 20.00, "TRIGSTR_9060")
 		else
 		endif
 	endif
@@ -508,7 +508,7 @@ set G_SIndex = G_LIndex
 			else
 				if ((GetItemTypeId( YDLocal1Get(item, "物品")) == 'I05W')) then
 					call UnitRemoveItemSwapped( GetManipulatedItem(), GetTriggerUnit())
-					call QuestMessageBJ( GetPlayersByMapControl( GetPlayerController( GetOwningPlayer( GetTriggerUnit()))), bj_QUESTMESSAGE_HINT, "TRIGSTR_234")
+					call QuestMessageBJ( GetPlayersByMapControl( GetPlayerController( GetOwningPlayer( GetTriggerUnit()))), bj_QUESTMESSAGE_HINT, "TRIGSTR_9061")
 				else
 				endif
 			endif

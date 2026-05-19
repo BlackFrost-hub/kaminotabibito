@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.01．不死函数")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9,7 +9,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.02．地形检测")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.02．持有型周期效果")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -17,7 +17,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.04．快速治疗")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.03．条件开关效果")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -25,7 +25,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.05．昼夜状态")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.04．范围脉冲效果")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -33,7 +33,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.05．物品次数转移")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

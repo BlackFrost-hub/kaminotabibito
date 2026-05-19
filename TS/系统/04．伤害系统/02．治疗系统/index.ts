@@ -21,8 +21,11 @@ export * from "./04．持续治疗效果";
 // 导出魔法恢复
 export * from "./05．物品治疗效果";
 
-// 导出施法治疗事件（STES「治疗事件」分发，迁移自 核心系统/04．治疗事件）
+// 导出施法治疗事件（STES）
 export * from "./06．魔法恢复";
+
+// 导出生命减少
+export * from "./07．减少生命值";
 
 /**
  * 初始化治疗系统
@@ -40,10 +43,10 @@ export function init(): void {
   };
   if (typeof hotSystem.initHotSystem === "function") hotSystem.initHotSystem();
 
-  // 初始化施法治疗事件（STES「治疗事件」）
+  // 初始化施法治疗事件（STES）
   const healRequestEntry = require("系统.04．伤害系统.02．治疗系统.03．治疗事件入口") as {
     initHealRequestEntry?: () => void;
   };
   if (typeof healRequestEntry.initHealRequestEntry === "function") healRequestEntry.initHealRequestEntry();
 }
-/** @noSelfInFile */
+

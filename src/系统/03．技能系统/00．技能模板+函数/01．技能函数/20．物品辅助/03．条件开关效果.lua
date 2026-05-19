@@ -1,0 +1,182 @@
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
+local __TS__Number = ____lualib.__TS__Number
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
+local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_result_1["监听指定物品获取丢弃"]
+local _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF = ____require_result_1["获取单位当前持有指定物品数量"]
+local jass = require("jass.common")
+local GetHandleId = jass.GetHandleId
+local _____6761_4EF6_5F00_5173_5B9E_4F8B_8868 = {}
+local _____5DF2_6CE8_518C_6761_4EF6_5F00_5173_4E2D_5FC3 = false
+local function _____83B7_53D6_5355_4F4DID(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return GetHandleId(unit) or 0
+end
+local function _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
+    if _____72B6_6001["数量"] <= 0 then
+        if _____72B6_6001["已开启"] then
+            _____72B6_6001["已开启"] = false
+            local ____opt_2 = _____914D_7F6E["关闭回调"]
+            if ____opt_2 ~= nil then
+                ____opt_2(_____72B6_6001["单位"], _____72B6_6001["数量"])
+            end
+        end
+        return
+    end
+    local _____5E94_5F00_542F = _____914D_7F6E["条件回调"](_____72B6_6001["单位"], _____72B6_6001["数量"])
+    if _____5E94_5F00_542F and not _____72B6_6001["已开启"] then
+        _____72B6_6001["已开启"] = true
+        _____914D_7F6E["开启回调"](_____72B6_6001["单位"], _____72B6_6001["数量"])
+        return
+    end
+    if not _____5E94_5F00_542F and _____72B6_6001["已开启"] then
+        _____72B6_6001["已开启"] = false
+        local ____opt_4 = _____914D_7F6E["关闭回调"]
+        if ____opt_4 ~= nil then
+            ____opt_4(_____72B6_6001["单位"], _____72B6_6001["数量"])
+        end
+    end
+end
+local function _____5904_7406_83B7_5F97(_____914D_7F6E, unit, _item, currentCount, previousCount)
+    local unitId = _____83B7_53D6_5355_4F4DID(unit)
+    if unitId == 0 then
+        return
+    end
+    if currentCount <= 0 then
+        local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+        if _____72B6_6001 ~= nil and _____72B6_6001["已开启"] then
+            _____72B6_6001["已开启"] = false
+            local ____opt_6 = _____914D_7F6E["关闭回调"]
+            if ____opt_6 ~= nil then
+                ____opt_6(unit, previousCount)
+            end
+        end
+        __TS__Delete(_____914D_7F6E["单位状态"], unitId)
+        return
+    end
+    local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId] or ({["单位"] = unit, ["数量"] = currentCount, ["已开启"] = false})
+    _____72B6_6001["单位"] = unit
+    _____72B6_6001["数量"] = currentCount
+    _____914D_7F6E["单位状态"][unitId] = _____72B6_6001
+    _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
+end
+local function _____5904_7406_4E22_5F03(_____914D_7F6E, unit, _item, currentCount, previousCount)
+    local unitId = _____83B7_53D6_5355_4F4DID(unit)
+    if unitId == 0 then
+        return
+    end
+    if currentCount <= 0 then
+        local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+        if _____72B6_6001 ~= nil and _____72B6_6001["已开启"] then
+            _____72B6_6001["已开启"] = false
+            local ____opt_8 = _____914D_7F6E["关闭回调"]
+            if ____opt_8 ~= nil then
+                ____opt_8(unit, previousCount)
+            end
+        end
+        __TS__Delete(_____914D_7F6E["单位状态"], unitId)
+        return
+    end
+    local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId] or ({["单位"] = unit, ["数量"] = currentCount, ["已开启"] = false})
+    _____72B6_6001["单位"] = unit
+    _____72B6_6001["数量"] = currentCount
+    _____914D_7F6E["单位状态"][unitId] = _____72B6_6001
+    _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
+end
+local function ____on_6761_4EF6_5F00_5173_6548_679CTick()
+    local now = getServerTime()
+    do
+        local i = 0
+        while i < #_____6761_4EF6_5F00_5173_5B9E_4F8B_8868 do
+            do
+                local _____914D_7F6E = _____6761_4EF6_5F00_5173_5B9E_4F8B_8868[i + 1]
+                if now < _____914D_7F6E["下次触发时间"] then
+                    goto __continue19
+                end
+                _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["检查间隔毫秒"]
+                local _____5F85_6E05_7406 = {}
+                for unitKey in pairs(_____914D_7F6E["单位状态"]) do
+                    do
+                        local unitId = __TS__Number(unitKey)
+                        local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+                        if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
+                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                            goto __continue21
+                        end
+                        local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
+                        if currentCount <= 0 then
+                            if _____72B6_6001["已开启"] then
+                                _____72B6_6001["已开启"] = false
+                                local ____opt_10 = _____914D_7F6E["关闭回调"]
+                                if ____opt_10 ~= nil then
+                                    ____opt_10(_____72B6_6001["单位"], _____72B6_6001["数量"])
+                                end
+                            end
+                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                            goto __continue21
+                        end
+                        _____72B6_6001["数量"] = currentCount
+                        _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
+                    end
+                    ::__continue21::
+                end
+                do
+                    local j = 0
+                    while j < #_____5F85_6E05_7406 do
+                        __TS__Delete(_____914D_7F6E["单位状态"], _____5F85_6E05_7406[j + 1])
+                        j = j + 1
+                    end
+                end
+            end
+            ::__continue19::
+            i = i + 1
+        end
+    end
+end
+local function _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    if _____5DF2_6CE8_518C_6761_4EF6_5F00_5173_4E2D_5FC3 then
+        return
+    end
+    _____5DF2_6CE8_518C_6761_4EF6_5F00_5173_4E2D_5FC3 = true
+    addPeriodicCallback(100, ____on_6761_4EF6_5F00_5173_6548_679CTick)
+end
+____exports["注册持有型条件开关效果"] = function(_____53C2_6570)
+    if _____53C2_6570 == nil or _____53C2_6570["物品类型ID"] == 0 or _____53C2_6570["检查间隔毫秒"] <= 0 or _____53C2_6570["条件回调"] == nil or _____53C2_6570["开启回调"] == nil then
+        return
+    end
+    _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    local _____914D_7F6E = __TS__ObjectAssign(
+        {},
+        _____53C2_6570,
+        {
+            ["下次触发时间"] = getServerTime() + _____53C2_6570["检查间隔毫秒"],
+            ["单位状态"] = {}
+        }
+    )
+    _____6761_4EF6_5F00_5173_5B9E_4F8B_8868[#_____6761_4EF6_5F00_5173_5B9E_4F8B_8868 + 1] = _____914D_7F6E
+    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(
+        _____53C2_6570["物品类型ID"],
+        function(unit, item, currentCount, previousCount) return _____5904_7406_83B7_5F97(
+            _____914D_7F6E,
+            unit,
+            item,
+            currentCount,
+            previousCount
+        ) end,
+        function(unit, item, currentCount, previousCount) return _____5904_7406_4E22_5F03(
+            _____914D_7F6E,
+            unit,
+            item,
+            currentCount,
+            previousCount
+        ) end
+    )
+end
+return ____exports

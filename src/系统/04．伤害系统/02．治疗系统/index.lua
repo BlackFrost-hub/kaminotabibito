@@ -56,6 +56,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 --- 初始化治疗系统
 function ____exports.init()
     local nativeHealEntry = require("系统.04．伤害系统.02．治疗系统.02．原生治疗入口")

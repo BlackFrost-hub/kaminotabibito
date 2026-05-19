@@ -61,6 +61,21 @@ ____exports.buffs = {
         canPurge = true,
         tooltip = "受到了『巨魔头颅诅咒』，诅咒会缠身time秒，并且每1秒造成damage点物理伤害。"
     },
+    D005 = {
+        buffID = "D005",
+        buffName = "恶魔王爪",
+        icon = "BuffIcon\\emowangzhua.blp",
+        effect = "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
+        type = "Debuff:dot:soft",
+        interval = 1,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 1,
+        priority = 5,
+        canPurge = true,
+        tooltip = "受到了『恶魔王爪』，爪击会流血撕裂目标time秒，并且每1秒造成damage点精神伤害。"
+    },
     C001 = {
         buffID = "C001",
         buffName = "击晕",
