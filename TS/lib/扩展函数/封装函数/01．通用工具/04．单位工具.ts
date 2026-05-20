@@ -118,11 +118,11 @@ export function forEachUnitInGroup(group: any, action: (unit: any) => void): voi
  * 获取单位的攻击类型（Attack Type）
  * 单位状态0x23对应攻击类型，使用ConvertUnitState转换
  */
-export function Ir_GetUnitAttackType(u: any): number {
+export function Ir_GetUnitAttackType(this: void, u: any): number {
   return (jass as any).R2I(japi.GetUnitState(u, (jass as any).ConvertUnitState(0x23)));
 }
 
-export function Ir_SetUnitAttackType(u: any, atp: number): void {
+export function Ir_SetUnitAttackType(this: void, u: any, atp: number): void {
   japi.SetUnitState(u, (jass as any).ConvertUnitState(0x23), atp);
 }
 

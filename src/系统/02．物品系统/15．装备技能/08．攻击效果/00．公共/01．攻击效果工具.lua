@@ -29,9 +29,11 @@ local ____require_result_10 = require("lib.扩展函数.Star扩展函数.00．SG
 local SGSS_SetState = ____require_result_10.SGSS_SetState
 local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
 local _____662F_5426_7CBE_82F1_5355_4F4D = ____require_result_11["是否精英单位"]
-local ____require_result_12 = require("lib.扩展函数.封装函数.06．伤害函数.index")
-local YDWEIsEventDamageType = ____require_result_12.YDWEIsEventDamageType
-local YDWEIsEventAttackType = ____require_result_12.YDWEIsEventAttackType
+local ____require_result_12 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.07．武器类型")
+local _____83B7_53D6_5355_4F4D_82F1_96C4_6B66_5668_7C7B_578B = ____require_result_12["获取单位英雄武器类型"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local YDWEIsEventDamageType = ____require_result_13.YDWEIsEventDamageType
+local YDWEIsEventAttackType = ____require_result_13.YDWEIsEventAttackType
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -58,11 +60,11 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
-local ____jass_DAMAGE_TYPE_DIVINE_13 = jass.DAMAGE_TYPE_DIVINE
-if ____jass_DAMAGE_TYPE_DIVINE_13 == nil then
-    ____jass_DAMAGE_TYPE_DIVINE_13 = jass.DAMAGE_TYPE_UNIVERSAL
+local ____jass_DAMAGE_TYPE_DIVINE_14 = jass.DAMAGE_TYPE_DIVINE
+if ____jass_DAMAGE_TYPE_DIVINE_14 == nil then
+    ____jass_DAMAGE_TYPE_DIVINE_14 = jass.DAMAGE_TYPE_UNIVERSAL
 end
-local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_13
+local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_14
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -167,6 +169,15 @@ ____exports["攻击者类型满足"] = function(unit, ____type)
         return IsUnitType(unit, UNIT_TYPE_RANGED_ATTACKER) == true
     end
     return true
+end
+____exports["单位武器类型满足"] = function(unit, ____type)
+    if ____type == nil or ____type == "" then
+        return true
+    end
+    if not ____exports["单位是英雄"](unit) then
+        return false
+    end
+    return _____83B7_53D6_5355_4F4D_82F1_96C4_6B66_5668_7C7B_578B(unit) == ____type
 end
 ____exports["单位是精英目标"] = function(unit)
     if not ____exports["单位有效存活"](unit) then
@@ -322,17 +333,17 @@ ____exports["获取敌方范围单位"] = function(source, center, radius, inclu
             do
                 local unit = list[i + 1]
                 if not ____exports["单位有效存活"](unit) then
-                    goto __continue68
+                    goto __continue71
                 end
                 if not includeCenter and unit == center then
-                    goto __continue68
+                    goto __continue71
                 end
                 if isUnitEnemy(unit, source) ~= true then
-                    goto __continue68
+                    goto __continue71
                 end
                 result[#result + 1] = unit
             end
-            ::__continue68::
+            ::__continue71::
             i = i + 1
         end
     end

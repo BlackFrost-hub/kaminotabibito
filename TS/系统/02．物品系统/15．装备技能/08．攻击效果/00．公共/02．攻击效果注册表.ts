@@ -34,6 +34,7 @@ export const 攻击效果测试装备顺序 = [
   "火焰段刃",
   "比安断刃",
   "瑟尔之弓",
+  "|cffff6800地狱火手套|r",
 ] as const;
 
 export const 攻击效果测试命令列表 = [
@@ -41,6 +42,7 @@ export const 攻击效果测试命令列表 = [
   "wp92", "wp93", "wp94", "wp95", "wp96", "wp97", "wp98", "wp99",
   "wp100", "wp101", "wp102", "wp103", "wp104", "wp105", "wp106", "wp107",
   "wp108", "wp109", "wp110", "wp111", "wp112",
+  "wp114",
 ] as const;
 
 export function 注册攻击效果配置(this: void, 配置: 攻击效果配置项): void {

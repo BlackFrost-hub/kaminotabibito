@@ -1,7 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__StringCharAt = ____lualib.__TS__StringCharAt
-local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports.items = {}
 ____exports.items.I00V = {
@@ -30,27 +27,13 @@ ____exports.items.I00T = {
     dmg = 6,
     int = 1
 }
-____exports.items.pres = {
+____exports.items.I00S = {
     type = "道具/戒指/饰品",
-    name = "恢复药水",
+    name = "恢复指环",
     goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 75,
-    PowerUP = "50%int;time3",
-    abilList = "A08C"
-}
-____exports.items.rde3 = {
-    type = "守护指环 +4",
-    name = "恢复药水",
-    goldPrice = 50,
-    score = 400,
-    level = "E",
-    hot = "200hp",
-    movespeed2 = 150,
-    magicDmg = 1,
-    abilList = "A08C"
+    score = 250,
+    level = "E-",
+    hp = 50
 }
 ____exports.items.I00P = {
     type = "道具/戒指/饰品",
@@ -1180,7 +1163,9 @@ ____exports.items.I037 = {
     score = 3179,
     level = "C",
     hp = 1500,
-    mp = 1500
+    mp = 1500,
+    magicDmg = 0.2,
+    waterDmg = 0.2
 }
 ____exports.items.I04K = {
     type = "主武器",
@@ -1226,7 +1211,9 @@ ____exports.items.I041 = {
     dmg = 50,
     str = 20,
     critRate = 0.25,
-    critDmg = 0.2
+    critDmg = 0.2,
+    dmgBonus = 0.2,
+    dmgReductionPct = -0.2
 }
 ____exports.items.I0BD = {
     type = "副武器",
@@ -3656,42 +3643,5 @@ ____exports.items.tst2 = {
     PowerUP = "2str",
     abilList = "A0LH"
 }
-local function normalizeItemName(name)
-    local result = ""
-    do
-        local i = 0
-        while i < #name do
-            do
-                local ch = __TS__StringCharAt(name, i)
-                if ch == "|" then
-                    local next = __TS__StringCharAt(name, i + 1)
-                    if next == "r" or next == "R" then
-                        i = i + 1
-                        goto __continue4
-                    end
-                    if next == "c" or next == "C" then
-                        i = i + 9
-                        goto __continue4
-                    end
-                end
-                result = result .. ch
-            end
-            ::__continue4::
-            i = i + 1
-        end
-    end
-    return __TS__StringTrim(result)
-end
-function ____exports.resolveItemIdByName(name)
-    local normalized = normalizeItemName(name)
-    for ____, ____value in ipairs(__TS__ObjectEntries(____exports.items)) do
-        local itemId = ____value[1]
-        local data = ____value[2]
-        if normalizeItemName(data.name or "") == normalized then
-            return itemId
-        end
-    end
-    return nil
-end
 ____exports.default = ____exports.items
 return ____exports

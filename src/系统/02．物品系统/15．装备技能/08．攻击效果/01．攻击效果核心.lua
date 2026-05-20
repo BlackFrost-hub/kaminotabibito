@@ -8,6 +8,7 @@ local _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907 = ____01_FF0E_653B_
 local _____5355_4F4D_6709_6548_5B58_6D3B = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["单位有效存活"]
 local _____5355_4F4D_662F_7CBE_82F1_76EE_6807 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["单位是精英目标"]
 local _____653B_51FB_8005_7C7B_578B_6EE1_8DB3 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["攻击者类型满足"]
+local _____5355_4F4D_6B66_5668_7C7B_578B_6EE1_8DB3 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["单位武器类型满足"]
 local _____662F_5426_653B_51FB_6548_679C_5168_5C40_8DF3_8FC7 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["是否攻击效果全局跳过"]
 local _____8DDD_79BB_6EE1_8DB3_9650_5236 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["距离满足限制"]
 local _____547D_4E2D_6982_7387_901A_8FC7 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["命中概率通过"]
@@ -32,11 +33,11 @@ function ____on_653B_51FB_6548_679C_5EF6_8FDF_4F24_5BB3()
         do
             local record = table.remove(_____5EF6_8FDF_4F24_5BB3_961F_5217, 1)
             if record == nil then
-                goto __continue86
+                goto __continue87
             end
             _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(record.source, record.target, record.amount, record.damageType)
         end
-        ::__continue86::
+        ::__continue87::
     end
 end
 function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
@@ -48,7 +49,7 @@ function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
             do
                 local record = _____6301_7EED_4F24_5BB3_5217_8868[i + 1]
                 if record == nil or not _____5355_4F4D_6709_6548_5B58_6D3B(record.source) or not _____5355_4F4D_6709_6548_5B58_6D3B(record.target) or record.remainTicks <= 0 then
-                    goto __continue90
+                    goto __continue91
                 end
                 if now >= record.nextTime then
                     if record.effect ~= "" then
@@ -63,7 +64,7 @@ function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
                     write = write + 1
                 end
             end
-            ::__continue90::
+            ::__continue91::
             i = i + 1
         end
     end
@@ -140,6 +141,9 @@ local function _____57FA_7840_6761_4EF6_901A_8FC7(_____914D_7F6E, ctx)
         return false
     end
     if not _____653B_51FB_8005_7C7B_578B_6EE1_8DB3(ctx.source, _____914D_7F6E["攻击者类型"]) then
+        return false
+    end
+    if not _____5355_4F4D_6B66_5668_7C7B_578B_6EE1_8DB3(ctx.source, _____914D_7F6E["需要武器类型"]) then
         return false
     end
     if not _____8DDD_79BB_6EE1_8DB3_9650_5236(ctx.source, ctx.target, _____914D_7F6E["最小距离"], _____914D_7F6E["最大距离"]) then
@@ -348,11 +352,11 @@ local function ____on_653B_51FB_6548_679C_6700_7EC8_4F24_5BB3(target, attacker, 
             do
                 local cfg = list[i + 1]
                 if cfg == nil or cfg["触发侧"] == "伤害修正" then
-                    goto __continue71
+                    goto __continue72
                 end
                 _____6267_884C_653B_51FB_6548_679C_914D_7F6E(cfg, ctx)
             end
-            ::__continue71::
+            ::__continue72::
             i = i + 1
         end
     end
@@ -375,19 +379,19 @@ local function ____on_653B_51FB_6548_679C_4F24_5BB3_4FEE_6B63(context)
             do
                 local cfg = list[i + 1]
                 if cfg == nil or cfg["触发侧"] ~= "伤害修正" then
-                    goto __continue78
+                    goto __continue79
                 end
                 if cfg["效果类型"] ~= "转换火焰伤害" then
-                    goto __continue78
+                    goto __continue79
                 end
                 if context.isNormalAttack ~= true or context.isPhysicalDamage ~= true then
-                    goto __continue78
+                    goto __continue79
                 end
                 if not _____653B_51FB_8005_7C7B_578B_6EE1_8DB3(context.attacker, cfg["攻击者类型"]) then
-                    goto __continue78
+                    goto __continue79
                 end
                 if not _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907(context.attacker, cfg["装备名"]) then
-                    goto __continue78
+                    goto __continue79
                 end
                 local amount = result * (cfg["伤害倍率"] or 0.8)
                 if amount > 0 then
@@ -396,7 +400,7 @@ local function ____on_653B_51FB_6548_679C_4F24_5BB3_4FEE_6B63(context)
                 end
                 result = 0
             end
-            ::__continue78::
+            ::__continue79::
             i = i + 1
         end
     end

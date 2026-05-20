@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 攻击效果攻击者类型, 攻击效果伤害类型 } from "./00．攻击效果类型";
+import type { 英雄武器类型 } from "../../../../03．技能系统/00．技能模板+函数/02．通用函数/01．便捷短函数集合/07．武器类型";
 import { 攻击效果跳过配置表 } from "./03．攻击效果跳过配置表";
 
 const jass = require("jass.common") as any;
@@ -42,6 +43,9 @@ const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS")
 };
 const { 是否精英单位 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断") as {
   是否精英单位: (this: void, unit: any) => boolean;
+};
+const { 获取单位英雄武器类型 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.07．武器类型") as {
+  获取单位英雄武器类型: (this: void, unit: any) => 英雄武器类型;
 };
 const { YDWEIsEventDamageType, YDWEIsEventAttackType } = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   YDWEIsEventDamageType: (this: void, damageType: any) => boolean;
@@ -162,6 +166,12 @@ export function 攻击者类型满足(this: void, unit: any, type?: 攻击效果
   if (type === "近战") return IsUnitType(unit, UNIT_TYPE_MELEE_ATTACKER) === true;
   if (type === "远程") return IsUnitType(unit, UNIT_TYPE_RANGED_ATTACKER) === true;
   return true;
+}
+
+export function 单位武器类型满足(this: void, unit: any, type?: 英雄武器类型): boolean {
+  if (type == null || type === "") return true;
+  if (!单位是英雄(unit)) return false;
+  return 获取单位英雄武器类型(unit) === type;
 }
 
 export function 单位是精英目标(this: void, unit: any): boolean {

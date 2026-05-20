@@ -1,4 +1,4 @@
-﻿﻿export interface ItemDataEntry {
+﻿interface ItemDataEntry {
   name: string;
   type?: string;
   score?: number;
@@ -68,6 +68,8 @@
   maxDrops?: number;
   wound?: number;
   hpPct?: number;
+  PhysReduce?: number;
+  SpellReduce?: number;
   baseDmgPct?: number;
   onlyone?: boolean;
   primaryBonus?: string;
@@ -76,8 +78,6 @@
   recipe?: string;
   PowerUP?: string;
   abilList?: string;
-  SpellReduce?: number;
-  PhysReduce?: number;
   [key: string]: string | number | boolean | undefined;
 }
 
@@ -86,8 +86,7 @@ export const items: Record<string, ItemDataEntry> = {};
 items["I00V"] = {type: "主武器", name: "精灵铁剑", goldPrice: 100, score: 216, level: "E-", dmg: 8};
 items["I00E"] = {type: "道具/戒指/饰品", name: "生命树枝", goldPrice: 100, score: 220, level: "E-", hp: 200, hpRegen: 1};
 items["I00T"] = {type: "主武器", name: "小法杖", goldPrice: 100, score: 222, level: "E-", dmg: 6, int: 1};
-items["pres"] = {type: "道具/戒指/饰品", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 75,PowerUP: "50%int;time3", abilList: "A08C"};
-items["rde3"] = {type: "守护指环 +4", name: "恢复药水", goldPrice: 50, score: 400, level: "E", hot: "200hp",movespeed2: 150,magicDmg: 1.0,abilList: "A08C"};
+items["I00S"] = {type: "道具/戒指/饰品", name: "恢复指环", goldPrice: 50, score: 250, level: "E-", hp: 50};
 items["I00P"] = {
   type: "道具/戒指/饰品",
   name: "树枝",
@@ -216,12 +215,12 @@ items["I047"] = {type: "副武器", name: "德素之书", goldPrice: 5000, score
 items["I058"] = {type: "衣服", name: "高原战衣", goldPrice: 800, score: 2919, level: "C-", critDmg: -0.3, armor: 15, hp: 1900, hpRegen: 15};
 items["I04M"] = {type: "衣服", name: "矮人火枪披风", goldPrice: 1800, score: 3062, level: "C-", atkSpeed: 0.4, armor: 20, hp: 1200, dodge: 0.1, abilList: "A03A"};
 items["I05C"] = {type: "灵魂", name: "风鸟之心", goldPrice: 1000, score: 3150, level: "C-", int: 35, mp: 1000, accuracy: 0.05, magicPierce: 0.35};
-items["I037"] = {type: "灵魂", name: "水元素精魂", goldPrice: 1000, score: 3179, level: "C", hp: 1500, mp: 1500};
+items["I037"] = {type: "灵魂", name: "水元素精魂", goldPrice: 1000, score: 3179, level: "C", hp: 1500, mp: 1500, magicDmg: 0.2, waterDmg: 0.2};
 items["I04K"] = {type: "主武器", name: "矮人燧发枪", goldPrice: 5000, score: 3195, level: "C-", dmg: 85};
 items["I04L"] = {type: "主武器", name: "矮人火炮", goldPrice: 5000, score: 3236, level: "C-", dmg: 85};
 items["I0AM"] = {type: "道具/戒指/饰品", name: "炽热生物挂坠", goldPrice: 2500, score: 3300, level: "C", armor: 15, hp: 2000};
 items["I0BE"] = {type: "副武器", name: "德鲁伊指引灯笼（魔猎）", goldPrice: 10000, score: 3331, level: "C", int: 25, atkSpeed: 0.85, antMastery: 0.2};
-items["I041"] = {type: "主武器", name: "狂暴沙斧", goldPrice: 5000, score: 3350, level: "C", dmg: 50, str: 20, critRate: 0.25, critDmg: 0.2};
+items["I041"] = {type: "主武器", name: "狂暴沙斧", goldPrice: 5000, score: 3350, level: "C", dmg: 50, str: 20, critRate: 0.25, critDmg: 0.2, dmgBonus: 0.2, dmgReductionPct: -0.2};
 items["I0BD"] = {type: "副武器", name: "德鲁伊指引灯笼（净化）", goldPrice: 10000, score: 3363, level: "C", int: 35, hpRegen: 35, skillHeal: 0.15, mpRegen: 15, stunResist: 0.35};
 items["I043"] = {type: "主武器", name: "守卫大剑", goldPrice: 5000, score: 3400, level: "C-", dmg: 75, armor: 20, abilList: "A06B"};
 items["I0BF"] = {type: "副武器", name: "德鲁伊指引灯笼（智识）", goldPrice: 10000, score: 3400, level: "C", int: 45, mpRegen: 30, mpCost: -0.2, cdReduction: 0.15};
@@ -599,34 +598,4 @@ items["tint"] = {type: "提升属性的物品", name: "智力之书", goldPrice:
 items["tpow"] = {type: "提升属性的物品", name: "知识之书", goldPrice: 0, PowerUP: "1all", abilList: "A0LH"};
 items["tstr"] = {type: "提升属性的物品", name: "力量之书", goldPrice: 0, PowerUP: "1str", abilList: "A0LH"};
 items["tst2"] = {type: "提升属性的物品", name: "力量之书 +2", goldPrice: 0, PowerUP: "2str", abilList: "A0LH"};
-
-function normalizeItemName(this: void, name: string): string {
-  let result = "";
-  for (let i = 0; i < name.length; i++) {
-    const ch = name.charAt(i);
-    if (ch === "|") {
-      const next = name.charAt(i + 1);
-      if (next === "r" || next === "R") {
-        i = i + 1;
-        continue;
-      }
-      if (next === "c" || next === "C") {
-        i = i + 9;
-        continue;
-      }
-    }
-    result += ch;
-  }
-  return result.trim();
-}
-
-export function resolveItemIdByName(this: void, name: string): string | undefined {
-  const normalized = normalizeItemName(name);
-  for (const [itemId, data] of Object.entries(items)) {
-    if (normalizeItemName(data.name ?? "") === normalized) {
-      return itemId;
-    }
-  }
-  return undefined;
-}
 export default items;

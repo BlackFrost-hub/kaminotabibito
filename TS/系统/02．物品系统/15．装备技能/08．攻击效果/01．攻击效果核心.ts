@@ -7,6 +7,7 @@ import {
   单位有效存活,
   单位是精英目标,
   攻击者类型满足,
+  单位武器类型满足,
   是否攻击效果全局跳过,
   距离满足限制,
   命中概率通过,
@@ -107,6 +108,7 @@ function 基础条件通过(this: void, 配置: 攻击效果配置项, ctx: 攻�
   if (配置.仅普通攻击 === true && !(ctx.snapshot != null && ctx.snapshot.isNormalAttack === true)) return false;
   if (配置.仅物理 === true && !(ctx.snapshot != null && ctx.snapshot.isPhysicalDamage === true)) return false;
   if (!攻击者类型满足(ctx.source, 配置.攻击者类型)) return false;
+  if (!单位武器类型满足(ctx.source, 配置.需要武器类型)) return false;
   if (!距离满足限制(ctx.source, ctx.target, 配置.最小距离, 配置.最大距离)) return false;
   if (!命中概率通过(配置.概率)) return false;
   if (!冷却通过(配置, ctx.source)) return false;

@@ -136,13 +136,13 @@ function ____exports.forEachUnitInGroup(self, group, action)
 end
 --- 获取单位的攻击类型（Attack Type）
 -- 单位状态0x23对应攻击类型，使用ConvertUnitState转换
-function ____exports.Ir_GetUnitAttackType(self, u)
+function ____exports.Ir_GetUnitAttackType(u)
     return jass.R2I(japi.GetUnitState(
         u,
         jass.ConvertUnitState(35)
     ))
 end
-function ____exports.Ir_SetUnitAttackType(self, u, atp)
+function ____exports.Ir_SetUnitAttackType(u, atp)
     japi.SetUnitState(
         u,
         jass.ConvertUnitState(35),

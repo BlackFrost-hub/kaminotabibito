@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import type { 英雄武器类型 } from "../../../../03．技能系统/00．技能模板+函数/02．通用函数/01．便捷短函数集合/07．武器类型";
+
 export type 攻击效果触发侧 = "攻击者" | "受击者" | "伤害修正";
 
 export type 攻击效果类型 =
@@ -32,6 +34,7 @@ export interface 攻击效果配置项 {
   仅普通攻击?: boolean;
   仅物理?: boolean;
   攻击者类型?: 攻击效果攻击者类型;
+  需要武器类型?: 英雄武器类型;
   最小距离?: number;
   最大距离?: number;
   概率?: number;
