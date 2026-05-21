@@ -239,7 +239,7 @@ function updateMultiboard(mb: any, playerId: number): void {
   const totalHpRegen = getPlayerAttr(playerId, "总生命恢复");
   multiboardSetItemValue(mb, 1, 9, `当前生命恢复：${formatNumber(totalHpRegen)}/秒`);
 
-  const baseHpRegen = getPlayerAttr(playerId, "生命恢复");
+  const baseHpRegen = getPlayerAttr(playerId, "基础生命恢复");
   multiboardSetItemValue(mb, 2, 9, `基础生命恢复：${formatNumber(baseHpRegen)}/秒`);
 
   const pctHpRegen = getPlayerAttr(playerId, "生命恢复%") * 100;
@@ -259,7 +259,7 @@ function updateMultiboard(mb: any, playerId: number): void {
   const totalMpRegen = getPlayerAttr(playerId, "总魔法恢复");
   multiboardSetItemValue(mb, 1, 11, `当前魔法恢复：${formatNumber(totalMpRegen)}/秒`);
 
-  const baseMpRegen = getPlayerAttr(playerId, "魔法恢复");
+  const baseMpRegen = getPlayerAttr(playerId, "基础魔法恢复");
   multiboardSetItemValue(mb, 2, 11, `基础魔法恢复：${formatNumber(baseMpRegen)}/秒`);
 
   const pctMpRegen = getPlayerAttr(playerId, "魔法恢复%") * 100;

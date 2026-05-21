@@ -15,6 +15,10 @@ const equipMovespeed = require("系统.02．物品系统.08．装备移速") as 
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
   applyEquipStatsTS: (this: void, unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
 };
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: { sourceName?: string }) => void;
+  移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
+};
 const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
@@ -39,10 +43,23 @@ const { 是否允许装备次数叠加 } = require("系统.02．物品系统.12�
 };
 
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
+const 装备视野BuffID = "C034";
+const 装备视野Buff显示持续时间 = 999999;
 
 interface StatEntry {
   name: string;
   value: number;
+}
+
+function 刷新装备视野显示Buff(unit: any, 当前视野加成: number): void {
+  if (unit == null || unit === 0) return;
+  if (当前视野加成 !== 0) {
+    registerManualBuff(unit, 装备视野BuffID, 装备视野Buff显示持续时间, 当前视野加成, {
+      sourceName: "装备视野",
+    });
+  } else {
+    移除单位指定Buff(unit, 装备视野BuffID);
+  }
 }
 
 /** 解析 primaryBonus：格式 "力量+7/敏捷+10/智力+5,魔法伤害+5%"，按主属性 STR/AGI/INT 取对应段。返回 key->数值 */
@@ -80,7 +97,9 @@ const percentNames = [
   "金属性抗性", "召唤物伤害", "召唤物抗性", "伤害减少%", "被暴击率", "被暴击伤害",
   "眩晕抗性", "魔法普攻伤害", "蝼蚁专精", "伤害%", "最终伤害%", "经验获取率",
   "最大生命值%", "最大法力值%", "基础生命值%", "基础攻击力%", "基础护甲%",
-  "生命值%", "法力值%", "攻击力%", "护甲%"
+  "生命值%", "法力值%", "攻击力%", "护甲%",
+  "提高对Boss伤害%", "受到Boss伤害减少%", "提高对精英伤害%", "受到精英伤害减少%",
+  "提高对恶魔族伤害%", "受到恶魔族伤害减少%"
 ];
 
 /**
@@ -170,6 +189,9 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   }
 
   const tempReadMap = applyEquipStatsTS(unit, playerStats);
+  if (tempReadMap["视野"] != null) {
+    刷新装备视野显示Buff(unit, Number(tempReadMap["视野"]) || 0);
+  }
   const test5Parts: string[] = [];
   for (let i = 0; i < playerStats.length; i++) {
     const statName = playerStats[i].name;

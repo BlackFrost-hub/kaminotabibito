@@ -3,8 +3,26 @@ local ____exports = {}
 local _____8BFB_53D6_541F_5531_6761_4E8B_4EF6_53C2_6570, ____on_541F_5531_6761Stes_4E8B_4EF6Action, jassStesHashtable, countOnJassStesTable, _____91CD_8BD5_6CE8_518C_541F_5531_6761Stes, _____5B89_6392_91CD_8BD5_6CE8_518C, _____5C1D_8BD5_6CE8_518C_541F_5531_6761Stes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readReal5, ydlStes_readInteger5, ydlStes_readString5, createDelayedCall, debugLogForce, _____542F_52A8_541F_5531_6761, _____6A21_5757_540D, _____5168_5C40_5DF2_6CE8_518C_6807_8BB0_952E, _____5168_5C40_89E6_53D1_5668_952E, _____5168_5C40_91CD_8BD5_6B21_6570_952E, _____6700_5927_6CE8_518C_5C1D_8BD5_6B21_6570, _____91CD_8BD5_95F4_9694_79D2, _____541F_5531_6761Stes_89E6_53D1_5668
 function _____8BFB_53D6_541F_5531_6761_4E8B_4EF6_53C2_6570()
     local sj = ydlStes_readReal5(nil, "sj")
+    if sj == 0 then
+        sj = ydlStes_readReal5(nil, "总时长")
+    end
+    if sj == 0 then
+        sj = ydlStes_readReal5(nil, "time")
+    end
     local _____989C_8272ID = ydlStes_readInteger5(nil, "颜色ID")
+    if _____989C_8272ID == 0 then
+        _____989C_8272ID = ydlStes_readInteger5(nil, "颜色")
+    end
+    if _____989C_8272ID == 0 then
+        _____989C_8272ID = ydlStes_readInteger5(nil, "棰滆壊ID")
+    end
     local _____63D0_793A_5B57_7B26_4E32 = ydlStes_readString5(nil, "string")
+    if _____63D0_793A_5B57_7B26_4E32 == "" then
+        _____63D0_793A_5B57_7B26_4E32 = ydlStes_readString5(nil, "提示文本")
+    end
+    if _____63D0_793A_5B57_7B26_4E32 == "" then
+        _____63D0_793A_5B57_7B26_4E32 = ydlStes_readString5(nil, "文本")
+    end
     return {sj = sj, ["颜色ID"] = _____989C_8272ID, string = _____63D0_793A_5B57_7B26_4E32}
 end
 ____exports["根据Stes事件启动吟唱条"] = function()
@@ -15,23 +33,13 @@ ____exports["根据Stes事件启动吟唱条"] = function()
             local _____603B_65F6_957F = _____53C2_6570.sj
             local _____989C_8272ID = _____53C2_6570["颜色ID"]
             local ____temp_5
-            if _____53C2_6570.string and _____53C2_6570.string.length > 0 then
+            if _____53C2_6570.string ~= "" then
                 ____temp_5 = _____53C2_6570.string
             else
                 ____temp_5 = nil
             end
             local _____63D0_793A_6587_672C = ____temp_5
-            _____542F_52A8_541F_5531_6761({["总时长"] = _____603B_65F6_957F, ["颜色ID"] = _____989C_8272ID, ["提示文本"] = _____63D0_793A_6587_672C})
-            debugLogForce(
-                _____6A21_5757_540D,
-                "收到 注册吟唱条",
-                "总时长=",
-                _____603B_65F6_957F,
-                "颜色ID=",
-                _____989C_8272ID,
-                "提示=",
-                _____63D0_793A_6587_672C
-            )
+            _____542F_52A8_541F_5531_6761(nil, {["总时长"] = _____603B_65F6_957F, ["颜色ID"] = _____989C_8272ID, ["提示文本"] = _____63D0_793A_6587_672C})
         end)
         do
             ydlStes_finishChildCleanup(nil)
@@ -92,14 +100,6 @@ function _____5C1D_8BD5_6CE8_518C_541F_5531_6761Stes()
     g[_____5168_5C40_91CD_8BD5_6B21_6570_952E] = _____5DF2_5C1D_8BD5_6B21_6570 + 1
     if jCount >= 1 then
         g[_____5168_5C40_5DF2_6CE8_518C_6807_8BB0_952E] = true
-        debugLogForce(
-            _____6A21_5757_540D,
-            "注册成功",
-            "event=",
-            ____exports["吟唱条STES事件名"],
-            "count=",
-            jCount
-        )
         return
     end
     if g[_____5168_5C40_91CD_8BD5_6B21_6570_952E] >= _____6700_5927_6CE8_518C_5C1D_8BD5_6B21_6570 then
@@ -130,7 +130,7 @@ createDelayedCall = ____require_result_2.createDelayedCall
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 debugLogForce = ____require_result_3.debugLogForce
 local ____require_result_4 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-_____542F_52A8_541F_5531_6761 = ____require_result_4["启动吟唱条"]
+_____542F_52A8_541F_5531_6761 = ____require_result_4["显示吟唱条"]
 local _____5173_95ED_541F_5531_6761 = ____require_result_4["关闭吟唱条"]
 ____exports["吟唱条STES事件名"] = "注册吟唱条"
 _____6A21_5757_540D = "吟唱条桥接"

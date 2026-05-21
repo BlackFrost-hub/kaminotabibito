@@ -67,10 +67,17 @@ function ____exports.processPlayerHeroRegen(unit)
         return
     end
     local baseLifeRegen = calcBaseLifeRegen(unit)
+    YDUserDataSet(
+        nil,
+        "player",
+        player,
+        "基础生命恢复",
+        "real",
+        baseLifeRegen
+    )
     local itemBonus = calcItemLifeRegenBonus(unit)
-    baseLifeRegen = baseLifeRegen + itemBonus
     local unitMultiplier = getUnitLifeRegenMultiplier(unit)
-    baseLifeRegen = baseLifeRegen * unitMultiplier
+    local adjustedBaseLifeRegen = (baseLifeRegen + itemBonus) * unitMultiplier
     local equipBonus = YDUserDataGet(
         nil,
         "player",
@@ -78,7 +85,7 @@ function ____exports.processPlayerHeroRegen(unit)
         "生命恢复",
         "real"
     ) or 0
-    local totalFixedLifeRegen = equipBonus + baseLifeRegen
+    local totalFixedLifeRegen = equipBonus + adjustedBaseLifeRegen
     local percentLifeRegen = getPercentLifeRegen(unit)
     local lifeRegenAmplify = YDUserDataGet(
         nil,
@@ -99,6 +106,14 @@ function ____exports.processPlayerHeroRegen(unit)
     )
     local percentLifeRegenForDisplay = getPercentLifeRegen(unit)
     local baseManaRegen = calcBaseManaRegen(unit)
+    YDUserDataSet(
+        nil,
+        "player",
+        player,
+        "基础魔法恢复",
+        "real",
+        baseManaRegen
+    )
     local equipManaBonus = YDUserDataGet(
         nil,
         "player",

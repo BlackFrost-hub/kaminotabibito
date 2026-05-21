@@ -8,7 +8,7 @@
 |------|------|
 | [`war3-tstl/`](war3-tstl/) | War3 + TSTL 编译坑：jass/japi 调用、回调注册、随机数、全局数组、伤害事件等 |
 | [`dzapi/`](dzapi/) | DzAPI UI Frame 类型、联机 desync / 对称执行 / N 槽、Lua GC 安全、运行时安全代码 |
-| [`equipment/`](equipment/) | 装备恢复、hot 字段、USE_ITEM 双触发等约定 |
+| [`equipment/`](equipment/) | 装备属性、装备 Buff、hot 字段、USE_ITEM 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
 | [`tooling/`](tooling/) | 调试输出、音效与封装约定、编码与补丁安全 |
 | [`agent-shared/`](agent-shared/) | 跨代理共享规则、全局高优先级规则 |
@@ -17,20 +17,18 @@
 
 ## 全局高优先级规则
 
-- [`agent-shared/global-engine-rules.mdc`](agent-shared/global-engine-rules.mdc) — `alwaysApply: true`，包含 jass/japi/BJ 边界、require 路径、事件中心、安全检查等
-- [`agent-shared/tstl-hard-rules.mdc`](agent-shared/tstl-hard-rules.mdc) — `alwaysApply: true`，包含 TSTL 生成 Lua 的硬规则、`self/nil` 错位、回调形态、`@noSelfInFile`、UTF-8 补丁纪律
-- [`agent-shared/中文命名.mdc`](agent-shared/中文命名.mdc) — `alwaysApply: true`，新代码中文命名偏好
+- [`agent-shared/global-engine-rules.mdc`](agent-shared/global-engine-rules.mdc) - `alwaysApply: true`，包含 jass/japi/BJ 边界、require 路径、事件中心、安全检查等
+- [`agent-shared/tstl-hard-rules.mdc`](agent-shared/tstl-hard-rules.mdc) - `alwaysApply: true`，包含 TSTL 生成 Lua 的硬规则、`self/nil` 错位、回调形态、`@noSelfInFile`、UTF-8 补丁纪律
+- [`agent-shared/中文命名.mdc`](agent-shared/中文命名.mdc) - `alwaysApply: true`，新代码中文命名偏好
 
 ## 维护约定
 
-1. README 作为索引，不堆放大段具体规则。
+1. README 只做索引，不堆具体规则。
 2. 全局规则放到 `agent-shared/*.mdc` 并使用 `alwaysApply: true`。
 3. 子系统规则放到最相关的子目录中。
 4. 新增项目规则时，在这里补一条入口。
+5. Buff 相关规则统一以 `equipment/buff经验/00．Buff经验规则.mdc` 为唯一经验入口，旧的 `buff-system.md` / `buff-system.mdc` 不再单独维护。
 
-说明：
-
-- 高优先级、跨子系统反复出现的 TSTL 硬规则，统一收敛到 `agent-shared/tstl-hard-rules.mdc`。
 ## 调试输出约定
 
 - 默认统一使用 `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`

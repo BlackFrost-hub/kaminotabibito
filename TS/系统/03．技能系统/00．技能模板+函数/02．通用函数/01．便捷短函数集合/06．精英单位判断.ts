@@ -50,4 +50,15 @@ export function 是否普通敌人(this: void, unit: any): boolean {
   return IsUnitRace(unit, RACE_DEMON) === true || IsUnitRace(unit, RACE_BEAST) === true;
 }
 
+/**
+ * 判断是否是蝼蚁敌人（普通敌人 + 非恶魔 + 非英雄）
+ */
+export function 是否蝼蚁敌人(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  if (IsUnitRace(unit, RACE_DEMON) === true) return false;
+  if (IsUnitType(unit, UNIT_TYPE_HERO) === true) return false;
+  const RACE_BEAST = jass.ConvertRace(8);
+  return IsUnitRace(unit, RACE_BEAST) === true;
+}
+
 export {};

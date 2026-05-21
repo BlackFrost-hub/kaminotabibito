@@ -305,7 +305,7 @@ function updateMultiboard(self, mb, playerId)
         9,
         ("当前生命恢复：" .. formatNumber(nil, totalHpRegen)) .. "/秒"
     )
-    local baseHpRegen = getPlayerAttr(nil, playerId, "生命恢复")
+    local baseHpRegen = getPlayerAttr(nil, playerId, "基础生命恢复")
     multiboardSetItemValue(
         nil,
         mb,
@@ -353,7 +353,7 @@ function updateMultiboard(self, mb, playerId)
         11,
         ("当前魔法恢复：" .. formatNumber(nil, totalMpRegen)) .. "/秒"
     )
-    local baseMpRegen = getPlayerAttr(nil, playerId, "魔法恢复")
+    local baseMpRegen = getPlayerAttr(nil, playerId, "基础魔法恢复")
     multiboardSetItemValue(
         nil,
         mb,

@@ -21,7 +21,13 @@ ____exports.STAT_LIMITS = {
     ["伤害吸血"] = {max = 0.05, min = -1},
     ["魔法伤害吸血"] = {max = 0.15, min = -1},
     ["普攻伤害吸血"] = {max = 0.25, min = -1},
-    ["伤害吸魔"] = {max = 0.05, min = -1}
+    ["伤害吸魔"] = {max = 0.05, min = -1},
+    ["提高对Boss伤害%"] = {max = 1, min = -1},
+    ["受到Boss伤害减少%"] = {max = 1, min = -1},
+    ["提高对精英伤害%"] = {max = 1, min = -1},
+    ["受到精英伤害减少%"] = {max = 1, min = -1},
+    ["提高对恶魔族伤害%"] = {max = 1, min = -1},
+    ["受到恶魔族伤害减少%"] = {max = 1, min = -1}
 }
 --- 敌对单位属性上下限（仅对非玩家单位生效）
 -- 格式：{ max: 上限, min: 下限 }
@@ -44,7 +50,13 @@ ____exports.ENEMY_STAT_LIMITS = {
     ["伤害吸血"] = {max = 1, min = -1},
     ["魔法伤害吸血"] = {max = 1, min = -1},
     ["普攻伤害吸血"] = {max = 1, min = -1},
-    ["伤害吸魔"] = {max = 1, min = -1}
+    ["伤害吸魔"] = {max = 1, min = -1},
+    ["提高对Boss伤害%"] = {max = 1, min = -1},
+    ["受到Boss伤害减少%"] = {max = 1, min = -1},
+    ["提高对精英伤害%"] = {max = 1, min = -1},
+    ["受到精英伤害减少%"] = {max = 1, min = -1},
+    ["提高对恶魔族伤害%"] = {max = 1, min = -1},
+    ["受到恶魔族伤害减少%"] = {max = 1, min = -1}
 }
 --- 可突破上限的属性配置
 -- key: 属性名
@@ -76,6 +88,9 @@ ____exports.STAT_STACK_CONFIG = {
     ["召唤物伤害"] = ____exports.STACK_TYPE.ADDITIVE,
     ["蝼蚁专精"] = ____exports.STACK_TYPE.ADDITIVE,
     ["Boss专精"] = ____exports.STACK_TYPE.ADDITIVE,
+    ["提高对Boss伤害%"] = ____exports.STACK_TYPE.ADDITIVE,
+    ["提高对精英伤害%"] = ____exports.STACK_TYPE.ADDITIVE,
+    ["提高对恶魔族伤害%"] = ____exports.STACK_TYPE.ADDITIVE,
     ["魔抗"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
     ["物理抗性"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
     ["技能抗性"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
@@ -90,6 +105,9 @@ ____exports.STAT_STACK_CONFIG = {
     ["暗属性抗性"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
     ["召唤物抗性"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
     ["最终伤害%"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
+    ["受到Boss伤害减少%"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
+    ["受到精英伤害减少%"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
+    ["受到恶魔族伤害减少%"] = ____exports.STACK_TYPE.MULTIPLICATIVE,
     ["移动速度"] = ____exports.STACK_TYPE.MAX
 }
 --- JASS代码中的错误属性名 → 正确属性名映射

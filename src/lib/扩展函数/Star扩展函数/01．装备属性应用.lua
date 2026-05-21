@@ -34,6 +34,8 @@ local function applyBaseState(unit, name, value)
         SGSS_SetState(unit, 9, value)
     elseif name == "攻速" then
         SGSS_SetState(unit, 10, value)
+    elseif name == "视野" then
+        SGSS_SetState(unit, 11, value)
     end
 end
 local function getHeroGroup()
@@ -74,7 +76,7 @@ function ____exports.applyEquipStatsTS(unit, stats)
             local value = __TS__Number(s.value) or 0
             if value == 0 then
                 readBack[name] = 0
-                goto __continue18
+                goto __continue19
             end
             applyBaseState(unit, name, value)
             if not isHero then
@@ -95,7 +97,7 @@ function ____exports.applyEquipStatsTS(unit, stats)
                     next
                 )
                 readBack[name] = next
-                goto __continue18
+                goto __continue19
             end
             if name ~= "移动速度" and owner then
                 local cur = __TS__Number(YDUserDataGet2(
@@ -123,7 +125,7 @@ function ____exports.applyEquipStatsTS(unit, stats)
                 jass.SetPlayerHandicapXP(owner, base * value)
             end
         end
-        ::__continue18::
+        ::__continue19::
     end
     return readBack
 end

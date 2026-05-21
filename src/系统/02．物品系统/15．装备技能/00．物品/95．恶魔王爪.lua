@@ -8,15 +8,11 @@ local _____53D6_5F53_524D_751F_547D = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177[
 local _____53D6_6700_5927_751F_547D = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["取最大生命"]
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_1.registerDamageModifier
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local getServerTime = ____require_result_2.getServerTime
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
-local _____662F_5426_6076_9B54_5355_4F4D = ____require_result_3["是否恶魔单位"]
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_4.SFB_setSlow
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_2.SFB_setSlow
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local UnitDamageTarget = jass.UnitDamageTarget
@@ -139,21 +135,6 @@ local function _____65BD_52A0_6216_5237_65B0_6495_88C2(source, target)
     }
     _____786E_4FDD_6CE8_518C_6495_88C2Tick()
 end
-local function ____on_6076_9B54_738B_722A_4F24_5BB3_63D0_9AD8(context)
-    if context == nil or context.isTrueDamage == true then
-        return context.currentDamage
-    end
-    if not _____5355_4F4D_6709_6548_5B58_6D3B(context.attacker) or not _____5355_4F4D_6709_6548_5B58_6D3B(context.target) then
-        return context.currentDamage
-    end
-    if not _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907(context.attacker, _____88C5_5907_540D) then
-        return context.currentDamage
-    end
-    if _____662F_5426_6076_9B54_5355_4F4D(context.target) ~= true then
-        return context.currentDamage
-    end
-    return context.currentDamage * (1 + _____6076_9B54_4F24_5BB3_63D0_9AD8)
-end
 local function ____on_6076_9B54_738B_722A_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
     if not (applied > 0) then
         return
@@ -179,6 +160,5 @@ local function ____on_6076_9B54_738B_722A_6700_7EC8_4F24_5BB3(target, attacker, 
     )
     _____65BD_52A0_6216_5237_65B0_6495_88C2(attacker, target)
 end
-registerDamageModifier(____on_6076_9B54_738B_722A_4F24_5BB3_63D0_9AD8, 30)
 registerAppliedFinalDamageListener(____on_6076_9B54_738B_722A_6700_7EC8_4F24_5BB3)
 return ____exports

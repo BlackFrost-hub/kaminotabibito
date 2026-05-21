@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 表现系统 - main 初始化入口
  *
@@ -31,6 +31,7 @@ export function init(this: void): void {
 
   UI属性系统.initUiAttributeSystem();
   require("系统.09．表现系统.02．对话框系统.index");
+  require("系统.09．表现系统.08．吟唱条.index");
   广播提示消息系统.初始化广播提示消息系统();
   游戏说明手册.init();
 }

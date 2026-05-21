@@ -100,6 +100,12 @@ local getEnhancedDamageModifier = ____require_result_1.getEnhancedDamageModifier
 local getFinalDamageBonus = ____require_result_1.getFinalDamageBonus
 local getAntMasteryBonus = ____require_result_1.getAntMasteryBonus
 local getBossMasteryBonus = ____require_result_1.getBossMasteryBonus
+local getBossDmgPctBonus = ____require_result_1.getBossDmgPctBonus
+local getBossResistPct = ____require_result_1.getBossResistPct
+local getEliteDmgPctBonus = ____require_result_1.getEliteDmgPctBonus
+local getEliteResistPct = ____require_result_1.getEliteResistPct
+local getDemonDmgPctBonus = ____require_result_1.getDemonDmgPctBonus
+local getDemonResistPct = ____require_result_1.getDemonResistPct
 local getSummonDamageModifier = ____require_result_1.getSummonDamageModifier
 calcElementalDamageBonus = ____require_result_1.calcElementalDamageBonus
 local calcElementalResistReduction = ____require_result_1.calcElementalResistReduction
@@ -195,6 +201,15 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         return {finalDamage = damage, immune = false, showDodge = false}
     end
     local dmgReduction = getRealAttr(nil, target, "伤害减少", 0)
+    if isPhysDmg then
+        dmgReduction = dmgReduction + getRealAttr(nil, target, "物理固伤减少", 0)
+    end
+    if isMagicDmg then
+        dmgReduction = dmgReduction + getRealAttr(nil, target, "魔法固伤减少", 0)
+    end
+    if _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() then
+        dmgReduction = dmgReduction + getRealAttr(nil, target, "技能固伤减少", 0)
+    end
     damage = damage - dmgReduction
     local dmgIncrease = getRealAttr(nil, attacker, "伤害增加", 0)
     damage = damage + dmgIncrease
@@ -227,8 +242,6 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         local physMod = getPhysicalDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + physMod.addDamage
         finalMultiplier = finalMultiplier * physMod.multiplier
-        local physReduce = getRealAttr(nil, target, "受到物伤减少", 0)
-        damage = damage - physReduce
     end
     if isMagicDmg and not isEnhanceDmg then
         local magicDmg = getMagicDamageModifier(nil, attacker)
@@ -250,8 +263,6 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         local skillMod = getSkillDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + skillMod.addDamage
         finalMultiplier = finalMultiplier * skillMod.multiplier
-        local spellReduce = getRealAttr(nil, target, "受到技伤减少", 0)
-        damage = damage - spellReduce
     end
     if isNormalAtk then
         local atkMod = getNormalAttackModifier(nil, attacker, target, isPlayer)
@@ -278,6 +289,30 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
     else
         finalMultiplier = finalMultiplier * (1 + bossBonus)
     end
+    local bossDmgPct = getBossDmgPctBonus(nil, attacker, target)
+    if bossDmgPct >= 0 then
+        addDamage = addDamage + bossDmgPct
+    else
+        finalMultiplier = finalMultiplier * (1 + bossDmgPct)
+    end
+    local eliteDmgPct = getEliteDmgPctBonus(nil, attacker, target)
+    if eliteDmgPct >= 0 then
+        addDamage = addDamage + eliteDmgPct
+    else
+        finalMultiplier = finalMultiplier * (1 + eliteDmgPct)
+    end
+    local demonDmgPct = getDemonDmgPctBonus(nil, attacker, target)
+    if demonDmgPct >= 0 then
+        addDamage = addDamage + demonDmgPct
+    else
+        finalMultiplier = finalMultiplier * (1 + demonDmgPct)
+    end
+    local bossResist = getBossResistPct(nil, target, attacker)
+    finalMultiplier = finalMultiplier * (1 - bossResist)
+    local eliteResist = getEliteResistPct(nil, target, attacker)
+    finalMultiplier = finalMultiplier * (1 - eliteResist)
+    local demonResist = getDemonResistPct(nil, target, attacker)
+    finalMultiplier = finalMultiplier * (1 - demonResist)
     local finalDmgBonus = getFinalDamageBonus(nil, attacker)
     finalMultiplier = finalMultiplier * (1 + finalDmgBonus)
     local finalDamage = damage * (1 + addDamage) * finalMultiplier

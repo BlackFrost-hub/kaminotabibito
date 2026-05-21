@@ -44,6 +44,7 @@ local function formatDotTooltip(template, durationForDisplay, effectValue, effec
     local damageStr2 = formatOneDecimal(type(effectValue2) == "number" and __TS__NumberIsFinite(__TS__Number(effectValue2)) and effectValue2 or 0)
     local intervalStr = formatOneDecimal(intv)
     local dataStr = formatOneDecimal(val <= 1 and val * 100 or val)
+    local direction = val >= 0 and "增加" or "减少"
     local s = template
     s = table.concat(
         __TS__StringSplit(s, "time"),
@@ -60,6 +61,18 @@ local function formatDotTooltip(template, durationForDisplay, effectValue, effec
     s = table.concat(
         __TS__StringSplit(s, "damage"),
         damageStr or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "增加或减少"),
+        direction or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "增加/减少"),
+        direction or ","
+    )
+    s = table.concat(
+        __TS__StringSplit(s, "增减"),
+        direction or ","
     )
     s = table.concat(
         __TS__StringSplit(s, "data1"),

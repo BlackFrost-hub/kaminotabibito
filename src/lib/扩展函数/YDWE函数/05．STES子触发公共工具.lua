@@ -72,7 +72,8 @@ function ____exports.ydlStes_coerceReal(self, _self, v)
     return 0
 end
 function ____exports.ydlStes_readString5(self, _self, name)
-    local v = YDLocal5Get(nil, "string", name)
+    local realName = name or _self
+    local v = YDLocal5Get(nil, "string", realName)
     if type(v) == "string" then
         return v
     end
@@ -82,10 +83,12 @@ function ____exports.ydlStes_readString5(self, _self, name)
     return tostring(v)
 end
 function ____exports.ydlStes_readBoolean5(self, _self, name)
-    return YDLocal5Get(nil, "boolean", name) == true
+    local realName = name or _self
+    return YDLocal5Get(nil, "boolean", realName) == true
 end
 function ____exports.ydlStes_readInteger5(self, _self, name)
-    local v = YDLocal5Get(nil, "integer", name)
+    local realName = name or _self
+    local v = YDLocal5Get(nil, "integer", realName)
     if type(v) == "number" and v == v then
         return jass.R2I(v)
     end
@@ -97,7 +100,8 @@ function ____exports.ydlStes_readInteger5(self, _self, name)
     return 0
 end
 function ____exports.ydlStes_readUnitcode5(self, _self, name)
-    local v = YDLocal5Get(nil, "unitcode", name)
+    local realName = name or _self
+    local v = YDLocal5Get(nil, "unitcode", realName)
     if type(v) == "number" and v == v then
         return jass.R2I(v)
     end
@@ -109,13 +113,15 @@ function ____exports.ydlStes_readUnitcode5(self, _self, name)
     return 0
 end
 function ____exports.ydlStes_readUnit5(self, _self, name)
-    return YDLocal5Get(nil, "unit", name)
+    local realName = name or _self
+    return YDLocal5Get(nil, "unit", realName)
 end
 function ____exports.ydlStes_readReal5(self, _self, name)
+    local realName = name or _self
     return ____exports.ydlStes_coerceReal(
         nil,
         _self,
-        YDLocal5Get(nil, "real", name)
+        YDLocal5Get(nil, "real", realName)
     )
 end
 --- 与 JASS `LoadInteger(STES_GetTable(), …, skey_index)` 一致
@@ -146,7 +152,7 @@ end
 -- @param eventName STES 事件名（须与 JASS 端 StringHash 一致）
 -- @param callback 触发器动作（通常包含 ydlStes_syncTriggerStep + 业务逻辑 + ydlStes_finishChildCleanup）
 -- @returns 创建的触发器，或 null 表示 STES_Register 不可用
-function ____exports.registerStesListener(self, eventName, callback)
+function ____exports.registerStesListener(eventName, callback)
     local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
     local STES_Register = ____require_result_3.STES_Register
     local STES_GetTable = ____require_result_3.STES_GetTable

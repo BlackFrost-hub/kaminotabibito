@@ -600,6 +600,40 @@ export const buffs: Record<string, BuffData> = {
     canPurge: true,
     tooltip: "受到「移速提升」，在time秒内最终增加data1点移动速度"
   },
+    "C034": {
+    buffID: "C034",
+    buffName: "视野变化",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNTelescope.blp",
+    effect: "",
+    effectMode: 'attach',
+    effectAttachPoint: "origin",
+    type: "Buff:magic:combat",
+    interval: 1,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 0,
+    priority: 4,
+    canPurge: false,
+    tooltip: "装备提供视野变化，当前最终增减data1点视野值"
+  },
+    "C035": {
+    buffID: "C035",
+    buffName: "临时视野变化",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNTelescope.blp",
+    effect: "",
+    effectMode: 'attach',
+    effectAttachPoint: "origin",
+    type: "Buff:magic:combat",
+    interval: 1,
+    maxStack: 1,
+    stackRule: 'highest',
+    stackRefresh: true,
+    dispelLevel: 0,
+    priority: 4,
+    canPurge: false,
+    tooltip: "受到「视野变化」，在time秒内最终增减data1点视野值"
+  },
 };
 
 export default buffs;

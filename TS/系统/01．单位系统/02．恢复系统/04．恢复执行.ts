@@ -102,21 +102,21 @@ export function processPlayerHeroRegen(this: void, unit: any): void {
 
   // ========== 生命恢复计算 ==========
   // 1. 基础生命恢复 = 力量 × 0.32
-  let baseLifeRegen = calcBaseLifeRegen(unit);
+  const baseLifeRegen = calcBaseLifeRegen(unit);
+  YDUserDataSet("player", player, "基础生命恢复", "real", baseLifeRegen);
 
   // 2. 装备加成（如 I0BR：最大生命 × 0.12）
   const itemBonus = calcItemLifeRegenBonus(unit);
-  baseLifeRegen += itemBonus;
 
   // 3. 单位特性倍率
   const unitMultiplier = getUnitLifeRegenMultiplier(unit);
-  baseLifeRegen *= unitMultiplier;
+  const adjustedBaseLifeRegen = (baseLifeRegen + itemBonus) * unitMultiplier;
 
   // 4. 读取装备加成的固定生命恢复（从player表读取，装备系统会写入这里）
   const equipBonus = YDUserDataGet("player", player, "生命恢复", "real") || 0;
 
   // 5. 计算总固定生命恢复 = 装备加成 + 基础恢复
-  const totalFixedLifeRegen = equipBonus + baseLifeRegen;
+  const totalFixedLifeRegen = equipBonus + adjustedBaseLifeRegen;
 
   // 6. 读取百分比生命恢复（上限 0.06）
   const percentLifeRegen = getPercentLifeRegen(unit);
@@ -137,6 +137,7 @@ export function processPlayerHeroRegen(this: void, unit: any): void {
   // ========== 魔法恢复计算 ==========
   // 1. 基础魔法恢复 = 智力 × 0.15
   const baseManaRegen = calcBaseManaRegen(unit);
+  YDUserDataSet("player", player, "基础魔法恢复", "real", baseManaRegen);
 
   // 2. 读取装备加成的固定魔法恢复（从player表读取）
   const equipManaBonus = YDUserDataGet("player", player, "魔法恢复", "real") || 0;

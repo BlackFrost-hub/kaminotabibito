@@ -40,10 +40,6 @@ const { 格式化已过秒, 格式化一位小数 } = require("./04．数字格�
   格式化一位小数: (this: void, n: number) => string;
 };
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const R2I = jass.R2I as (value: number) => number;
 
 interface 吟唱条状态 {
@@ -92,11 +88,6 @@ function 驱动吟唱条(this: void): void {
   );
   设置吟唱条动画进度(吟唱条状态实例.进度);
 
-  if (吟唱条状态实例.已过时间 >= 下次调试已过时间) {
-    debugLogForce(常量.模块名, "推进中", "已过=", 吟唱条状态实例.已过时间, "进度=", 吟唱条状态实例.进度);
-    下次调试已过时间 += 1.0;
-  }
-
   if (吟唱条状态实例.已过时间 >= 吟唱条状态实例.总时长) {
     关闭吟唱条();
   }
@@ -104,7 +95,6 @@ function 驱动吟唱条(this: void): void {
 
 export function 启动吟唱条(this: void, 参数: 规范化吟唱条参数): void {
   if (!(参数.总时长 > 0)) {
-    debugLogForce(常量.模块名, "总时长无效", 参数.总时长);
     return;
   }
 
@@ -137,7 +127,6 @@ export function 启动吟唱条(this: void, 参数: 规范化吟唱条参数): v
   显示吟唱条UI();
 
   确保中心计时器();
-  debugLogForce(常量.模块名, "启动", "总时长=", 参数.总时长, "颜色ID=", 参数.颜色ID);
 }
 
 export function 关闭吟唱条(this: void): void {
@@ -147,7 +136,6 @@ export function 关闭吟唱条(this: void): void {
   隐藏吟唱条UI();
   尝试关闭中心计时器();
 
-  debugLogForce(常量.模块名, "关闭");
 }
 
 export function 获取吟唱条状态(this: void): 吟唱条状态 | null {

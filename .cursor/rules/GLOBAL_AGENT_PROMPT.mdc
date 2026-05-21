@@ -181,6 +181,15 @@ Rules:
 - terminal mojibake does not prove file bytes are damaged
 - verify with build, generated Lua, and runtime behavior
 
+### 11. Buff work must use the canonical buff experience rule
+
+When the task involves Buff, Debuff, HOT, DOT, native buff cleanup, stack refresh, or onRemove rollback:
+
+- read `.cursor/rules/equipment/buff经验/00．Buff经验规则.mdc` first
+- treat it as the canonical buff experience rule
+- do not maintain separate duplicate buff-system rule files with conflicting wording
+- if a task touches both buff tables and runtime logic, update the buff experience rule and the relevant subsystem file together
+
 ## Work Discipline
 
 ### 1. Default execution order

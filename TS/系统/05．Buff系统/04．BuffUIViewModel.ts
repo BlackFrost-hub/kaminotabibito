@@ -61,12 +61,16 @@ function formatDotTooltip(
   const damageStr2 = formatOneDecimal(typeof effectValue2 === "number" && isFinite(effectValue2) ? effectValue2 : 0);
   const intervalStr = formatOneDecimal(intv);
   const dataStr = formatOneDecimal(val <= 1 ? val * 100 : val);
+  const direction = val >= 0 ? "增加" : "减少";
 
   let s = template;
   s = s.split("time").join(timeStr);
   s = s.split("持续时间").join(timeStr);
   s = s.split("interval").join(intervalStr);
   s = s.split("damage").join(damageStr);
+  s = s.split("增加或减少").join(direction);
+  s = s.split("增加/减少").join(direction);
+  s = s.split("增减").join(direction);
   s = s.split("data1").join(damageStr);
   s = s.split("data2").join(damageStr2);
   s = s.split("data").join(dataStr);

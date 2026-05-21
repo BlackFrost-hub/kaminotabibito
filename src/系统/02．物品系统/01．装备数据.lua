@@ -130,7 +130,6 @@ ____exports.items.I070 = {
     goldPrice = 240,
     score = 544,
     level = "E+",
-    magicDmg = 0.3,
     abilList = "A0LH"
 }
 ____exports.items.I00O = {
@@ -174,8 +173,7 @@ ____exports.items.I022 = {
     goldPrice = 100,
     score = 710,
     level = "E+",
-    dmg = 20,
-    armorPierce = 0.2
+    dmg = 20
 }
 ____exports.items.I00I = {
     type = "道具/戒指/饰品",
@@ -450,7 +448,6 @@ ____exports.items.I0CV = {
     goldPrice = 700,
     score = 1244,
     level = "D-",
-    critRate = -0.2,
     magicResist = 0.1,
     armor = 5,
     hp = 450,
@@ -486,8 +483,6 @@ ____exports.items.I00J = {
     level = "D-",
     atkSpeed = 0.25,
     armor = 5,
-    PhysReduce = 10,
-    SpellReduce = 30,
     abilList = "A03I"
 }
 ____exports.items.I01G = {
@@ -575,8 +570,7 @@ ____exports.items.I025 = {
     goldPrice = 100,
     score = 1433,
     level = "D-",
-    dmg = 35,
-    armorPierce = 0.5
+    dmg = 35
 }
 ____exports.items.I05G = {
     type = "道具/戒指/饰品",
@@ -666,8 +660,7 @@ ____exports.items.I02L = {
     goldPrice = 200,
     score = 1480,
     level = "D-",
-    armor = 20,
-    PhysReduce = 30
+    armor = 20
 }
 ____exports.items.I03S = {
     type = "道具/戒指/饰品",
@@ -937,8 +930,7 @@ ____exports.items.I00R = {
     score = 2570,
     level = "D++",
     dmg = 10,
-    armor = 10,
-    dodge = 0.4
+    armor = 10
 }
 ____exports.items.I052 = {
     type = "副武器",
@@ -1129,7 +1121,6 @@ ____exports.items.I058 = {
     goldPrice = 800,
     score = 2919,
     level = "C-",
-    critDmg = -0.3,
     armor = 15,
     hp = 1900,
     hpRegen = 15
@@ -1215,8 +1206,7 @@ ____exports.items.I041 = {
     str = 20,
     critRate = 0.25,
     critDmg = 0.2,
-    dmgBonus = 0.2,
-    dmgReductionPct = -0.2
+    dmgBonus = 0.2
 }
 ____exports.items.I0BD = {
     type = "副武器",
@@ -1585,7 +1575,6 @@ ____exports.items.I0BZ = {
     level = "C",
     int = 40,
     atkSpeed = 0.4,
-    skillHeal = 0.2,
     healReceived = 0.2,
     accuracy = 0.15
 }
@@ -1776,7 +1765,6 @@ ____exports.items.I0BI = {
     level = "C++",
     int = 50,
     atkSpeed = 1,
-    atkDmg = 0.2,
     magicAtkDmg = 0.2,
     antMastery = 0.3
 }
@@ -1921,7 +1909,6 @@ ____exports.items.I01I = {
     level = "D",
     dmg = 40,
     hp = 1500,
-    lifeSteal = 0.05,
     magicLifeSteal = 0.05,
     onlyone = true
 }
@@ -1952,19 +1939,13 @@ ____exports.items.I023 = {type = "材料", name = "铁块", goldPrice = 500}
 ____exports.items.I024 = {type = "材料", name = "木材", goldPrice = 150}
 ____exports.items.I028 = {
     type = "图纸",
-    name = "精致木盾",
+    name = "精致木盾图纸",
     goldPrice = 300,
     armor = 5,
     hp = 500
 }
 ____exports.items.I029 = {type = "图纸", name = "火药弓图纸", goldPrice = 400, dmg = 35}
-____exports.items.I02A = {
-    type = "图纸",
-    name = "铁矛图纸",
-    goldPrice = 400,
-    dmg = 25,
-    armorPierce = 0.5
-}
+____exports.items.I02A = {type = "图纸", name = "铁矛图纸", goldPrice = 400, dmg = 25}
 ____exports.items.I02H = {
     type = "材料",
     name = "螃蟹肉（生）",
@@ -2201,9 +2182,7 @@ ____exports.items.I064 = {
     goldPrice = 1250,
     level = "E",
     dmg = 25,
-    hp = 1000,
-    lifeSteal = 0.2,
-    atkLifeSteal = 0.2
+    hp = 1000
 }
 ____exports.items.I065 = {type = "材料", name = "熔岩能量（极致）", goldPrice = 50}
 ____exports.items.I066 = {type = "材料", name = "恶魔能量", goldPrice = 50}
@@ -2361,8 +2340,7 @@ ____exports.items.I06N = {
     level = "D+",
     hp = 1000,
     magicPierce = 0.2,
-    magicDmg = 0.2,
-    fireDmg = 0.25
+    magicDmg = 0.2
 }
 ____exports.items.I06O = {
     type = "道具/戒指/饰品",
@@ -2427,10 +2405,6 @@ ____exports.items.I06U = {
     name = "|cffccffff斯尔法袍|r",
     goldPrice = 2000,
     level = "D-",
-    int = 20,
-    magicResist = 0.2,
-    armor = 20,
-    hp = 1000,
     mpRegen = 10
 }
 ____exports.items.I06V = {
@@ -2515,7 +2489,6 @@ ____exports.items.I077 = {
     goldPrice = 1000,
     level = "D++",
     all = 25,
-    critDmg = -0.5,
     critDmgTaken = -0.5
 }
 ____exports.items.I078 = {
@@ -2524,7 +2497,6 @@ ____exports.items.I078 = {
     goldPrice = 1500,
     level = "C-",
     all = 25,
-    critDmg = -0.5,
     critDmgTaken = -0.5
 }
 ____exports.items.I079 = {
@@ -2543,7 +2515,8 @@ ____exports.items.I07A = {
     goldPrice = 1000,
     level = "C-",
     hp = 1500,
-    magicDmg = 0.1
+    magicDmg = 0.1,
+    dmgBonus = 0.15
 }
 ____exports.items.I07B = {
     type = "主武器",
@@ -2562,7 +2535,6 @@ ____exports.items.I07C = {
     goldPrice = 1000,
     level = "C-",
     dmg = 60,
-    lifeSteal = 0.05,
     atkLifeSteal = 0.05,
     abilList = "A0AZ"
 }
@@ -2582,6 +2554,8 @@ ____exports.items.I07E = {
     level = "C-",
     dmg = 100,
     critDmg = 0.2,
+    demonDmgPct = 0.2,
+    demonResistPct = 0.1,
     abilList = "A09C"
 }
 ____exports.items.I07F = {
@@ -2626,8 +2600,7 @@ ____exports.items.I07J = {
     dmg = 1,
     all = 1,
     hpRegen = 1,
-    mpRegen = 1,
-    magicDmg = 0.45
+    mpRegen = 1
 }
 ____exports.items.I07K = {
     type = "衣服",
@@ -2637,7 +2610,6 @@ ____exports.items.I07K = {
     magicResist = 0.1,
     hpRegenPct = 0.02,
     mpRegenPct = 0.01,
-    magicDmg = 0.25,
     abilList = "A0AX"
 }
 ____exports.items.I07L = {
@@ -2763,7 +2735,6 @@ ____exports.items.I07Z = {
     dmg = 75,
     critRate = 0.15,
     hp = 1200,
-    lifeSteal = 0.1,
     atkLifeSteal = 0.1
 }
 ____exports.items.I080 = {
@@ -2783,7 +2754,8 @@ ____exports.items.I081 = {
     dmg = 100,
     cdReduction = 0.15,
     magicPierce = 0.15,
-    magicDmg = 0.25
+    magicDmg = 0.25,
+    eliteDmgPct = 0.2
 }
 ____exports.items.I082 = {
     type = "道具/戒指/饰品",
@@ -2802,6 +2774,7 @@ ____exports.items.I083 = {
     mpRegenPct = 0.01,
     cdReduction = 0.25,
     magicDmg = 0.15,
+    sight = 500,
     abilList = "A0AN,A0AM,A0AL"
 }
 ____exports.items.I084 = {
@@ -2842,7 +2815,6 @@ ____exports.items.I088 = {
     type = "道具/戒指/饰品",
     name = "统领护腕",
     goldPrice = 1000,
-    critDmg = -0.2,
     magicResist = 0.15,
     armor = 15,
     hp = 1800,
@@ -2895,6 +2867,7 @@ ____exports.items.I08E = {
     dmg = 200,
     critRate = 0.03,
     hpRegen = 50,
+    demonDmgPct = 0.15,
     abilList = "A0AC"
 }
 ____exports.items.I08F = {
@@ -2967,10 +2940,8 @@ ____exports.items.I08N = {
     type = "衣服",
     name = "虚空板甲",
     goldPrice = 2500,
-    critDmg = -0.35,
     armor = 40,
     hp = 3000,
-    magicDmg = 0.2,
     critDmgTaken = -0.35
 }
 ____exports.items.I08O = {
@@ -2980,9 +2951,7 @@ ____exports.items.I08O = {
     armor = 20,
     hp = 2500,
     hpRegenPct = 0.02,
-    skillHeal = 0.35,
-    healReceived = 0.35,
-    magicDmg = 0.2
+    healReceived = 0.35
 }
 ____exports.items.I08P = {
     type = "主武器",
@@ -3133,7 +3102,6 @@ ____exports.items.I09D = {
     agi = 75,
     atkSpeed = 0.4,
     hpRegen = 100,
-    lifeSteal = 0.15,
     atkLifeSteal = 0.15
 }
 ____exports.items.I09E = {
@@ -3141,15 +3109,12 @@ ____exports.items.I09E = {
     name = "熔狱头骷",
     goldPrice = 3000,
     dmg = 80,
-    hp = 1500,
-    lifeSteal = 0.2,
-    atkLifeSteal = 0.2
+    hp = 1500
 }
 ____exports.items.I09F = {
     type = "衣服",
     name = "虚空装甲",
     goldPrice = 2500,
-    critDmg = -0.3,
     magicResist = 0.25,
     armor = 50,
     hp = 3500,
@@ -3339,7 +3304,6 @@ ____exports.items.I0BL = {
     type = "任务",
     name = "接受试炼（血精灵大法师）",
     goldPrice = 0,
-    int = 2,
     mp = 200,
     magicDmg = 0.01
 }
@@ -3348,8 +3312,7 @@ ____exports.items.I0BM = {
     name = "接受试炼（卡金德）",
     goldPrice = 0,
     atkSpeed = 0.03,
-    cdReduction = 0.01,
-    movespeed2 = 1
+    cdReduction = 0.01
 }
 ____exports.items.I0BN = {type = "任务", name = "给予圣果", goldPrice = 0}
 ____exports.items.I0BO = {type = "任务", name = "补充生命力", goldPrice = 0, abilList = "A0LH"}
@@ -3447,7 +3410,7 @@ ____exports.items.I0CH = {
     cdReduction = 15,
     accuracy = -0.15
 }
-____exports.items.I0CI = {type = "任务", name = "消失的笛子", goldPrice = 0, dmg = 12}
+____exports.items.I0CI = {type = "任务", name = "消失的笛子", goldPrice = 0}
 ____exports.items.I0CJ = {
     type = "任务",
     name = "|cffff0000失踪的精灵村民（Boss战任务）|r",
@@ -3467,13 +3430,7 @@ ____exports.items.I0CP = {type = "任务", name = "|cffff00ff暗狱之书|r|cfff
 ____exports.items.I0CQ = {type = "任务", name = "|cffcc99ff暗狱之书|r", goldPrice = 0, maxDrops = 1}
 ____exports.items.I0CR = {type = "任务", name = "收集|cff99cc00有毒杂草|r", goldPrice = 0}
 ____exports.items.I0CS = {type = "材料", name = "有毒杂草", goldPrice = 150}
-____exports.items.I0CT = {
-    type = "任务",
-    name = "|cff99ccff驱散灵树邪气|r（|cffff000015级精英战斗|r）",
-    goldPrice = 0,
-    int = 1,
-    mpRegen = 1
-}
+____exports.items.I0CT = {type = "任务", name = "|cff99ccff驱散灵树邪气|r（|cffff000015级精英战斗|r）", goldPrice = 0, int = 1}
 ____exports.items.I0CW = {type = "任务", name = "领取技能", goldPrice = 2000}
 ____exports.items.I0CX = {type = "任务", name = "领悟暗之力", goldPrice = 2000}
 ____exports.items.I0CY = {type = "材料", name = "荧光草", goldPrice = 0}

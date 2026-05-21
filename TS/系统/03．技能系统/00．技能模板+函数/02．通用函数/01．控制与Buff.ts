@@ -57,6 +57,10 @@ export {
 } from "../01．技能函数/19．拓展效果/02．buff/04．移速提升";
 
 export {
+  施加视野变化Buff,
+} from "../01．技能函数/19．拓展效果/02．buff/05．视野变化";
+
+export {
   移除单位指定类型Buff,
   移除单位增益Buff,
   移除单位负面Buff,
@@ -149,6 +153,11 @@ export function 清除单位燃烧Buff(单位: any): number {
 /** 清除单位护甲降低 Buff（会触发 C032 的护甲回滚）。 */
 export function 清除单位护甲降低Buff(单位: any): number {
   return 移除单位指定Buff(单位, "C032") ? 1 : 0;
+}
+
+/** 清除单位视野变化 Buff（会回滚所有未到期的视野变化叠加）。 */
+export function 清除单位视野变化Buff(单位: any): number {
+  return 移除单位指定Buff(单位, "C035") ? 1 : 0;
 }
 
 /** 清除单位控制类负面 Buff（Buff 表 type 以 `Debuff:control` 开头）。 */

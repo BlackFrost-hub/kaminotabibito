@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 
 const jass = require("jass.common") as any;
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
@@ -35,6 +35,31 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 使者魔轮物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 使者魔轮配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
+const { 监听指定物品获取丢弃 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听") as {
+  监听指定物品获取丢弃: (
+    this: void,
+    itemTypeId: number,
+    获取回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
+    丢弃回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
+  ) => void;
+};
+const { 开始魔法吸收护盾, 移除单位魔法吸收护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.24．魔法吸收护盾") as {
+  开始魔法吸收护盾: (this: void, 参数: {
+    单位: any;
+    持续时间?: number;
+    伤害吸收比例?: number;
+    每点魔法吸收伤害: number;
+    最低魔法百分比?: number;
+    最低魔法固定值?: number;
+    仅非物理伤害?: boolean;
+    是否有特效?: boolean;
+    特效路径?: string;
+    特效挂点?: string;
+    显示文本?: boolean;
+    标签?: string;
+  }) => number;
+  移除单位魔法吸收护盾: (this: void, 单位: any, 标签: string) => void;
+};
 
 type 使者魔轮魔盾实例 = {
   id: number;
@@ -52,11 +77,71 @@ const 使者魔轮魔盾表: Record<number, 使者魔轮魔盾实例 | undefined
 const 使者魔轮魔盾ID列表: number[] = [];
 let 已注册使者魔轮伤害监听 = false;
 let 已注册使者魔轮中心计时器 = false;
+const 使者魔轮被动标签 = "装备:使者魔轮:魔盾被动";
+const 使者魔轮被动实例表: Record<number, number | undefined> = {};
 
 function 是否为使者魔轮(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
   if (使者魔轮物品ID <= 0) return false;
   return GetItemTypeId(物品) === 使者魔轮物品ID;
+}
+
+function 取单位ID(this: void, 单位: any): number {
+  if (单位 == null || 单位 === 0) return 0;
+  return GetHandleId(单位) || 0;
+}
+
+function 创建使者魔轮被动(this: void, 单位: any): void {
+  const 单位ID = 取单位ID(单位);
+  if (单位ID === 0) return;
+
+  const 旧护盾ID = 使者魔轮被动实例表[单位ID];
+  if (旧护盾ID != null && 旧护盾ID > 0) {
+    移除单位魔法吸收护盾(单位, 使者魔轮被动标签);
+  }
+
+  const 护盾ID = 开始魔法吸收护盾({
+    单位,
+    持续时间: 0,
+    伤害吸收比例: 使者魔轮配置.被动魔法吸收比例,
+    每点魔法吸收伤害: 使者魔轮配置.被动每点魔法吸收伤害,
+    最低魔法百分比: 使者魔轮配置.被动最低魔法百分比,
+    最低魔法固定值: 使者魔轮配置.被动最低魔法固定值,
+    仅非物理伤害: true,
+    是否有特效: 使者魔轮配置.被动是否有特效,
+    特效路径: 使者魔轮配置.被动特效路径,
+    特效挂点: 使者魔轮配置.被动特效挂点,
+    显示文本: false,
+    标签: 使者魔轮被动标签,
+  });
+  if (护盾ID > 0) {
+    使者魔轮被动实例表[单位ID] = 护盾ID;
+  }
+}
+
+function 移除使者魔轮被动(this: void, 单位: any): void {
+  const 单位ID = 取单位ID(单位);
+  if (单位ID === 0) return;
+  const 护盾ID = 使者魔轮被动实例表[单位ID];
+  if (护盾ID != null && 护盾ID > 0) {
+    移除单位魔法吸收护盾(单位, 使者魔轮被动标签);
+  }
+  delete 使者魔轮被动实例表[单位ID];
+}
+
+function on使者魔轮被动获取(this: void, 单位: any, _物品: any, currentCount: number, previousCount: number): void {
+  if (!(currentCount > 0 && previousCount <= 0)) return;
+  创建使者魔轮被动(单位);
+}
+
+function on使者魔轮被动丢弃(this: void, 单位: any, _物品: any, currentCount: number, previousCount: number): void {
+  if (!(currentCount <= 0 && previousCount > 0)) return;
+  移除使者魔轮被动(单位);
+}
+
+function 初始化使者魔轮被动(this: void): void {
+  if (使者魔轮物品ID <= 0) return;
+  监听指定物品获取丢弃(使者魔轮物品ID, on使者魔轮被动获取, on使者魔轮被动丢弃);
 }
 
 function 从列表移除魔盾ID(this: void, id: number): void {
@@ -186,5 +271,7 @@ export function 处理使者魔轮使用(this: void, 上下文: 物品技能事�
   SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - 消耗魔法);
   注册使者魔轮魔盾(施法单位, 上下文.目标X, 上下文.目标Y, 消耗魔法);
 }
+
+初始化使者魔轮被动();
 
 export {};

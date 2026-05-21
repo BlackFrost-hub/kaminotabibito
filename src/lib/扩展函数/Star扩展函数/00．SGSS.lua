@@ -14,6 +14,7 @@ local LoadReal = jass.LoadReal
 local SaveReal = jass.SaveReal
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local UnitAddAbility = jass.UnitAddAbility
+local UnitRemoveAbility = jass.UnitRemoveAbility
 local IncUnitAbilityLevel = jass.IncUnitAbilityLevel
 local DecUnitAbilityLevel = jass.DecUnitAbilityLevel
 local GetUnitState = jass.GetUnitState
@@ -21,6 +22,46 @@ local SetUnitStateJass = jass.SetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local EXGetUnitAbility = japi.EXGetUnitAbility
 local EXSetAbilityDataReal = japi.EXSetAbilityDataReal
+local R2I = jass.R2I
+local _____89C6_91CE_6280_80FD_6BCF_7EA7_6570_503C = 50
+local _____89C6_91CE_6280_80FDRawIds = {
+    "ASV1",
+    "ASV2",
+    "ASV3",
+    "ASV4",
+    "ASV5",
+    "ASV6",
+    "ASV7",
+    "ASV8",
+    "ASV9",
+    "ASV0",
+    "ASVA",
+    "ASVB",
+    "ASVC",
+    "ASVD",
+    "ASVE",
+    "ASVF",
+    "ASVG",
+    "ASVH",
+    "ASVI",
+    "ASVJ",
+    "ASVK",
+    "ASVL",
+    "ASVM",
+    "ASVN",
+    "ASVO",
+    "ASVP",
+    "ASVQ",
+    "ASVR",
+    "ASVS",
+    "ASVT",
+    "ASVU",
+    "ASVV",
+    "ASVW",
+    "ASVX",
+    "ASVY",
+    "ASVZ"
+}
 local function hashHandle()
     local g = _G
     local function pick(name)
@@ -205,6 +246,47 @@ local function setAtkSpeed(u, v)
     setAbilityDataA(u, "ASG7", next)
     saveReal(u, key, next)
 end
+local function _____79FB_9664_5168_90E8_89C6_91CE_6280_80FD(u)
+    if not u then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____89C6_91CE_6280_80FDRawIds do
+            local code = resolveAbilityCode(_____89C6_91CE_6280_80FDRawIds[i + 1])
+            if code ~= 0 and GetUnitAbilityLevel(u, code) > 0 then
+                UnitRemoveAbility(u, code)
+            end
+            i = i + 1
+        end
+    end
+end
+local function _____540C_6B65_5355_4F4D_89C6_91CE_6280_80FD(u, value)
+    if not u then
+        return
+    end
+    _____79FB_9664_5168_90E8_89C6_91CE_6280_80FD(u)
+    if not (value > 0) then
+        return
+    end
+    local level = R2I(value / _____89C6_91CE_6280_80FD_6BCF_7EA7_6570_503C + 0.5)
+    if level < 1 then
+        level = 1
+    end
+    if level > #_____89C6_91CE_6280_80FDRawIds then
+        level = #_____89C6_91CE_6280_80FDRawIds
+    end
+    local code = resolveAbilityCode(_____89C6_91CE_6280_80FDRawIds[level])
+    if code ~= 0 then
+        UnitAddAbility(u, code)
+    end
+end
+local function setSight(u, v)
+    local key = sh("视野")
+    local next = loadReal(u, key) + v
+    _____540C_6B65_5355_4F4D_89C6_91CE_6280_80FD(u, next)
+    saveReal(u, key, next)
+end
 function ____exports.SGSS_SetState(u, id, v)
     if id == 1 then
         setAtk(u, v)
@@ -226,6 +308,8 @@ function ____exports.SGSS_SetState(u, id, v)
         setMove(u, v)
     elseif id == 10 then
         setAtkSpeed(u, v)
+    elseif id == 11 then
+        setSight(u, v)
     end
 end
 function ____exports.SGSS_SetStatePercentumEX2(u, id, v)

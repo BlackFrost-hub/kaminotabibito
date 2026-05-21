@@ -147,6 +147,80 @@ function ____exports.getBossMasteryBonus(self, attacker, target)
     end
     return getRealAttr(nil, attacker, "Boss专精", 0)
 end
+--- 获取对Boss伤害%加成（攻击者属性）
+-- 目标为英雄或恶魔时生效
+function ____exports.getBossDmgPctBonus(self, attacker, target)
+    if attacker == nil or target == nil then
+        return 0
+    end
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
+    if not isHero and not isDemon then
+        return 0
+    end
+    return getRealAttr(nil, attacker, "提高对Boss伤害%", 0)
+end
+--- 获取受到Boss伤害减少%（目标属性）
+-- 攻击者为英雄或恶魔时生效
+function ____exports.getBossResistPct(self, target, attacker)
+    if target == nil or attacker == nil then
+        return 0
+    end
+    local isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(attacker) == jass.RACE_DEMON
+    if not isHero and not isDemon then
+        return 0
+    end
+    return getRealAttr(nil, target, "受到Boss伤害减少%", 0)
+end
+--- 获取对精英伤害%加成（攻击者属性）
+-- 目标为精英（恶魔或英雄）时生效
+function ____exports.getEliteDmgPctBonus(self, attacker, target)
+    if attacker == nil or target == nil then
+        return 0
+    end
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
+    if not isHero and not isDemon then
+        return 0
+    end
+    return getRealAttr(nil, attacker, "提高对精英伤害%", 0)
+end
+--- 获取受到精英伤害减少%（目标属性）
+-- 攻击者为精英（恶魔或英雄）时生效
+function ____exports.getEliteResistPct(self, target, attacker)
+    if target == nil or attacker == nil then
+        return 0
+    end
+    local isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(attacker) == jass.RACE_DEMON
+    if not isHero and not isDemon then
+        return 0
+    end
+    return getRealAttr(nil, target, "受到精英伤害减少%", 0)
+end
+--- 获取对恶魔族伤害%加成（攻击者属性）
+-- 目标为恶魔种族时生效
+function ____exports.getDemonDmgPctBonus(self, attacker, target)
+    if attacker == nil or target == nil then
+        return 0
+    end
+    if jass.GetUnitRace(target) ~= jass.RACE_DEMON then
+        return 0
+    end
+    return getRealAttr(nil, attacker, "提高对恶魔族伤害%", 0)
+end
+--- ��取受到恶魔族伤害减少%（目标属性）
+-- 攻击者为恶魔种族时生效
+function ____exports.getDemonResistPct(self, target, attacker)
+    if target == nil or attacker == nil then
+        return 0
+    end
+    if jass.GetUnitRace(attacker) ~= jass.RACE_DEMON then
+        return 0
+    end
+    return getRealAttr(nil, target, "受到恶魔族伤害减少%", 0)
+end
 --- 检查单位是否为召唤物
 function ____exports.isSummonedUnit(self, unit)
     return jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)

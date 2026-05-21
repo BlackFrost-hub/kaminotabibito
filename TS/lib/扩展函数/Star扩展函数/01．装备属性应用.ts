@@ -30,6 +30,7 @@ function applyBaseState(unit: any, name: string, value: number): void {
   else if (name === "魔法值") SGSS_SetState(unit, 8, value);
   else if (name === "叠加移动速度") SGSS_SetState(unit, 9, value);
   else if (name === "攻速") SGSS_SetState(unit, 10, value);
+  else if (name === "视野") SGSS_SetState(unit, 11, value);
 }
 
 function getHeroGroup(): any {

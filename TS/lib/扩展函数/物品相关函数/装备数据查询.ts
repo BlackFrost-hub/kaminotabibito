@@ -36,9 +36,13 @@ export const STAT_CONFIG: { name: string; key: string }[] = [
   { name: "魔法普攻伤害", key: "magicAtkDmg" }, { name: "蝼蚁专精", key: "antMastery" }, { name: "移动速度", key: "movespeed2" },
   { name: "伤害%", key: "dmgBonus" }, { name: "最终伤害%", key: "finalDmgBonus" }, { name: "经验获取率", key: "expGainRate" },
   { name: "最大生命值%", key: "hpPct" }, { name: "最大法力值%", key: "mpPct" },
+  { name: "视野", key: "sight" },
   { name: "基础生命值%", key: "baseHpPct" }, { name: "基础攻击力%", key: "baseDmgPct" }, { name: "基础护甲%", key: "baseArmorPct" },
   { name: "生命值%", key: "hpPercent" }, { name: "法力值%", key: "mpPercent" }, { name: "攻击力%", key: "dmgPercent" }, { name: "护甲%", key: "armorPercent" },
-  { name: "受到技伤减少", key: "SpellReduce" }, { name: "受到物伤减少", key: "PhysReduce" },
+  { name: "物理固伤减少", key: "PhysFixedReduce" }, { name: "魔法固伤减少", key: "MagicFixedReduce" }, { name: "技能固伤减少", key: "SpellFixedReduce" },
+  { name: "提高对Boss伤害%", key: "bossDmgPct" }, { name: "受到Boss伤害减少%", key: "bossResistPct" },
+  { name: "提高对精英伤害%", key: "eliteDmgPct" }, { name: "受到精英伤害减少%", key: "eliteResistPct" },
+  { name: "提高对恶魔族伤害%", key: "demonDmgPct" }, { name: "受到恶魔族伤害减少%", key: "demonResistPct" },
 ];
 
 export const KEY_TO_NAME: Record<string, string> = {};

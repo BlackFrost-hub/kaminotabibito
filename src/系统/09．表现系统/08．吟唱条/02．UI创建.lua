@@ -15,12 +15,9 @@ end
 --- 吟唱条系统 - UI创建（单壳复用）
 local japi = require("jass.japi")
 local _____5E38_91CF = require("系统.09．表现系统.08．吟唱条.00．常量定义")
-local function _____83B7_53D6_524D_666F_6A21_578B(_____989C_8272ID)
-    return _____5E38_91CF["获取前景模型"](_____5E38_91CF, _____989C_8272ID)
-end
-local function _____83B7_53D6_80CC_666F_6A21_578B(_____989C_8272ID)
-    return _____5E38_91CF["获取背景模型"](_____5E38_91CF, _____989C_8272ID)
-end
+local ____require_result_0 = require("系统.09．表现系统.08．吟唱条.00．常量定义")
+local _____83B7_53D6_524D_666F_6A21_578B = ____require_result_0["获取前景模型"]
+local _____83B7_53D6_80CC_666F_6A21_578B = ____require_result_0["获取背景模型"]
 local DzFrameSetAbsolutePoint = japi.DzFrameSetAbsolutePoint
 local DzFrameSetPoint = japi.DzFrameSetPoint
 local DzFrameSetText = japi.DzFrameSetText

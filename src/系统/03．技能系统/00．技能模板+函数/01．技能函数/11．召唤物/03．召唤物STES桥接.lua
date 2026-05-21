@@ -1,40 +1,40 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local _____8BFB_53D6_53EC_5524_7269_4E8B_4EF6_53C2_6570, onSummonStesEventAction, jassStesHashtable, countOnJassStesTable, onRetryRegisterSummonStes, scheduleRetry, tryRegisterSummonStes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readInteger5, ydlStes_readUnitcode5, ydlStes_readReal5, ydlStes_readString5, ydlStes_readUnit5, YDLocal7Set, createDelayedCall, debugLogForce, _____521B_5EFA_53EC_5524_7269, _____6A21_5757_540D, summonStesTrigger, REG_GUARD, TRIG_KEY, ATTEMPT_KEY, MAX_REG_ATTEMPTS, RETRY_SEC
-function _____8BFB_53D6_53EC_5524_7269_4E8B_4EF6_53C2_6570(self)
-    local moveHeight = ydlStes_readReal5(nil, nil, "moveHeight")
-    local attackInterval = ydlStes_readReal5(nil, nil, "atkCd")
-    local attackIntervalCompat = ydlStes_readReal5(nil, nil, "MoveHeight")
-    local facing = ydlStes_readReal5(nil, nil, "facing")
-    local unitTypeString = ydlStes_readString5(nil, nil, "unitType")
-    local unitTypeUnitcode = ydlStes_readUnitcode5(nil, nil, "unitType")
-    local unitTypeInteger = ydlStes_readInteger5(nil, nil, "unitType")
+function _____8BFB_53D6_53EC_5524_7269_4E8B_4EF6_53C2_6570()
+    local moveHeight = ydlStes_readReal5(nil, "moveHeight")
+    local attackInterval = ydlStes_readReal5(nil, "atkCd")
+    local attackIntervalCompat = ydlStes_readReal5(nil, "MoveHeight")
+    local facing = ydlStes_readReal5(nil, "facing")
+    local unitTypeString = ydlStes_readString5(nil, "unitType")
+    local unitTypeUnitcode = ydlStes_readUnitcode5(nil, "unitType")
+    local unitTypeInteger = ydlStes_readInteger5(nil, "unitType")
     local unitType = #unitTypeString == 4 and unitTypeString or (unitTypeUnitcode ~= 0 and unitTypeUnitcode or unitTypeInteger)
     return {
-        ["主人单位"] = ydlStes_readUnit5(nil, nil, "Master"),
-        ["召唤物单位"] = ydlStes_readUnit5(nil, nil, "Summon"),
+        ["主人单位"] = ydlStes_readUnit5(nil, "Master"),
+        ["召唤物单位"] = ydlStes_readUnit5(nil, "Summon"),
         ["单位类型"] = unitType,
         ["单位类型字符串"] = unitTypeString,
         ["单位类型unitcode"] = unitTypeUnitcode,
-        x = ydlStes_readReal5(nil, nil, "x"),
-        y = ydlStes_readReal5(nil, nil, "y"),
+        x = ydlStes_readReal5(nil, "x"),
+        y = ydlStes_readReal5(nil, "y"),
         ["面向"] = facing ~= 0 and facing or nil,
-        ["持续时间"] = ydlStes_readReal5(nil, nil, "time"),
-        ["模型文件"] = ydlStes_readString5(nil, nil, "ModelFileID"),
+        ["持续时间"] = ydlStes_readReal5(nil, "time"),
+        ["模型文件"] = ydlStes_readString5(nil, "ModelFileID"),
         ["飞行高度"] = moveHeight > 0 and moveHeight or nil,
-        ["生命值"] = ydlStes_readReal5(nil, nil, "HP"),
-        ["生命恢复"] = ydlStes_readReal5(nil, nil, "regenHP"),
-        ["攻击力"] = ydlStes_readReal5(nil, nil, "AttackPower"),
+        ["生命值"] = ydlStes_readReal5(nil, "HP"),
+        ["生命恢复"] = ydlStes_readReal5(nil, "regenHP"),
+        ["攻击力"] = ydlStes_readReal5(nil, "AttackPower"),
         ["攻击间隔"] = attackInterval > 0 and attackInterval or (attackIntervalCompat > 0 and attackIntervalCompat or nil),
-        ["护甲"] = ydlStes_readReal5(nil, nil, "def"),
-        ["缩放"] = ydlStes_readReal5(nil, nil, "size")
+        ["护甲"] = ydlStes_readReal5(nil, "def"),
+        ["缩放"] = ydlStes_readReal5(nil, "size")
     }
 end
 ____exports["根据Stes事件创建召唤物"] = function()
     do
         local ____try, ____hasReturned, ____returnValue = pcall(function()
-            ydlStes_syncTriggerStep(nil, nil)
-            local _____53C2_6570 = _____8BFB_53D6_53EC_5524_7269_4E8B_4EF6_53C2_6570(nil)
+            ydlStes_syncTriggerStep(nil)
+            local _____53C2_6570 = _____8BFB_53D6_53EC_5524_7269_4E8B_4EF6_53C2_6570()
             debugLogForce(
                 _____6A21_5757_540D,
                 "收到 OnSummonEvent",
@@ -69,7 +69,7 @@ ____exports["根据Stes事件创建召唤物"] = function()
             return true, _____53EC_5524_7269
         end)
         do
-            ydlStes_finishChildCleanup(nil, nil)
+            ydlStes_finishChildCleanup(nil)
         end
         if not ____try then
             error(____hasReturned, 0)
@@ -79,7 +79,7 @@ ____exports["根据Stes事件创建召唤物"] = function()
         end
     end
 end
-function onSummonStesEventAction(self)
+function onSummonStesEventAction()
     ____exports["根据Stes事件创建召唤物"]()
 end
 function jassStesHashtable()
@@ -108,7 +108,7 @@ function countOnJassStesTable(eventName)
         jass.StringHash("index")
     )
 end
-function onRetryRegisterSummonStes(self)
+function onRetryRegisterSummonStes()
     tryRegisterSummonStes()
 end
 function scheduleRetry()
@@ -120,7 +120,7 @@ function tryRegisterSummonStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        summonStesTrigger = registerStesListener(nil, ____exports.SUMMON_STES_EVENT, onSummonStesEventAction)
+        summonStesTrigger = registerStesListener(____exports.SUMMON_STES_EVENT, onSummonStesEventAction)
         g[TRIG_KEY] = summonStesTrigger
     else
         summonStesTrigger = g[TRIG_KEY]
@@ -128,16 +128,6 @@ function tryRegisterSummonStes()
     local jCount = countOnJassStesTable(____exports.SUMMON_STES_EVENT)
     local attempt = g[ATTEMPT_KEY] or 0
     g[ATTEMPT_KEY] = attempt + 1
-    debugLogForce(
-        _____6A21_5757_540D,
-        "注册检查",
-        "attempt=",
-        attempt + 1,
-        "jCount=",
-        jCount,
-        "trigger=",
-        summonStesTrigger
-    )
     if jCount >= 1 then
         g[REG_GUARD] = true
         debugLogForce(

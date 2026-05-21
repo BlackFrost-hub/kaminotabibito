@@ -35,6 +35,12 @@ const {
   getFinalDamageBonus,
   getAntMasteryBonus,
   getBossMasteryBonus,
+  getBossDmgPctBonus,
+  getBossResistPct,
+  getEliteDmgPctBonus,
+  getEliteResistPct,
+  getDemonDmgPctBonus,
+  getDemonResistPct,
   getSummonDamageModifier,
   calcElementalDamageBonus,
   calcElementalResistReduction,
@@ -49,6 +55,12 @@ const {
   getFinalDamageBonus: (attacker: any) => number;
   getAntMasteryBonus: (attacker: any, target: any) => number;
   getBossMasteryBonus: (attacker: any, target: any) => number;
+  getBossDmgPctBonus: (attacker: any, target: any) => number;
+  getBossResistPct: (target: any, attacker: any) => number;
+  getEliteDmgPctBonus: (attacker: any, target: any) => number;
+  getEliteResistPct: (target: any, attacker: any) => number;
+  getDemonDmgPctBonus: (attacker: any, target: any) => number;
+  getDemonResistPct: (target: any, attacker: any) => number;
   getSummonDamageModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
   calcElementalDamageBonus: (attacker: any, damageAttr: string) => number;
   calcElementalResistReduction: (target: any, resistAttr: string, isPlayer: boolean) => number;
@@ -250,7 +262,10 @@ export function calculateDamage(
   }
 
   // Step 1: 固定伤害减少/增加
-  const dmgReduction = getRealAttr(target, "伤害减少", 0);
+  let dmgReduction = getRealAttr(target, "伤害减少", 0);
+  if (isPhysDmg) dmgReduction += getRealAttr(target, "物理固伤减少", 0);
+  if (isMagicDmg) dmgReduction += getRealAttr(target, "魔法固伤减少", 0);
+  if (伤害函数.isSkillAttack() || 伤害函数.isSkillDamage()) dmgReduction += getRealAttr(target, "技能固伤减少", 0);
   damage -= dmgReduction;
   const dmgIncrease = getRealAttr(attacker, "伤害增加", 0);
   damage += dmgIncrease;
@@ -305,9 +320,6 @@ export function calculateDamage(
     const physMod = getPhysicalDamageModifier(attacker, target, isPlayer);
     addDamage += physMod.addDamage;
     finalMultiplier *= physMod.multiplier;
-    // 受到物伤减少（固定值）
-    const physReduce = getRealAttr(target, "受到物伤减少", 0);
-    damage -= physReduce;
   }
 
   // Step 8: 魔法伤害修正（装备「魔法伤害」等）
@@ -337,9 +349,6 @@ export function calculateDamage(
     const skillMod = getSkillDamageModifier(attacker, target, isPlayer);
     addDamage += skillMod.addDamage;
     finalMultiplier *= skillMod.multiplier;
-    // 受到技伤减少（固定值）
-    const spellReduce = getRealAttr(target, "受到技伤减少", 0);
-    damage -= spellReduce;
   }
 
   // Step 11-12: 普攻伤害修正
@@ -376,6 +385,29 @@ export function calculateDamage(
   } else {
     finalMultiplier *= (1 + bossBonus);
   }
+
+  // Step 15b: 对Boss/精英/恶魔族伤害%加成（加法）
+  const bossDmgPct = getBossDmgPctBonus(attacker, target);
+  if (bossDmgPct >= 0) addDamage += bossDmgPct;
+  else finalMultiplier *= (1 + bossDmgPct);
+
+  const eliteDmgPct = getEliteDmgPctBonus(attacker, target);
+  if (eliteDmgPct >= 0) addDamage += eliteDmgPct;
+  else finalMultiplier *= (1 + eliteDmgPct);
+
+  const demonDmgPct = getDemonDmgPctBonus(attacker, target);
+  if (demonDmgPct >= 0) addDamage += demonDmgPct;
+  else finalMultiplier *= (1 + demonDmgPct);
+
+  // 受到Boss/精英/恶魔族伤害减少%（乘法乘区）
+  const bossResist = getBossResistPct(target, attacker);
+  finalMultiplier *= (1 - bossResist);
+
+  const eliteResist = getEliteResistPct(target, attacker);
+  finalMultiplier *= (1 - eliteResist);
+
+  const demonResist = getDemonResistPct(target, attacker);
+  finalMultiplier *= (1 - demonResist);
 
   // Step 16: 最终伤害加成
   const finalDmgBonus = getFinalDamageBonus(attacker);

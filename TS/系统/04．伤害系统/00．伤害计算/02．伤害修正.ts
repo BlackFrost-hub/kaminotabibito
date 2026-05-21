@@ -273,6 +273,74 @@ export function getBossMasteryBonus(attacker: any, target: any): number {
   return getRealAttr(attacker, "Boss专精", 0);
 }
 
+/**
+ * 获取对Boss伤害%加成（攻击者属性）
+ * 目标为英雄或恶魔时生效
+ */
+export function getBossDmgPctBonus(attacker: any, target: any): number {
+  if (attacker == null || target == null) return 0;
+  const isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO);
+  const isDemon = jass.GetUnitRace(target) === jass.RACE_DEMON;
+  if (!isHero && !isDemon) return 0;
+  return getRealAttr(attacker, "提高对Boss伤害%", 0);
+}
+
+/**
+ * 获取受到Boss伤害减少%（目标属性）
+ * 攻击者为英雄或恶魔时生效
+ */
+export function getBossResistPct(target: any, attacker: any): number {
+  if (target == null || attacker == null) return 0;
+  const isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO);
+  const isDemon = jass.GetUnitRace(attacker) === jass.RACE_DEMON;
+  if (!isHero && !isDemon) return 0;
+  return getRealAttr(target, "受到Boss伤害减少%", 0);
+}
+
+/**
+ * 获取对精英伤害%加成（攻击者属性）
+ * 目标为精英（恶魔或英雄）时生效
+ */
+export function getEliteDmgPctBonus(attacker: any, target: any): number {
+  if (attacker == null || target == null) return 0;
+  const isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO);
+  const isDemon = jass.GetUnitRace(target) === jass.RACE_DEMON;
+  if (!isHero && !isDemon) return 0;
+  return getRealAttr(attacker, "提高对精英伤害%", 0);
+}
+
+/**
+ * 获取受到精英伤害减少%（目标属性）
+ * 攻击者为精英（恶魔或英雄）时生效
+ */
+export function getEliteResistPct(target: any, attacker: any): number {
+  if (target == null || attacker == null) return 0;
+  const isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO);
+  const isDemon = jass.GetUnitRace(attacker) === jass.RACE_DEMON;
+  if (!isHero && !isDemon) return 0;
+  return getRealAttr(target, "受到精英伤害减少%", 0);
+}
+
+/**
+ * 获取对恶魔族伤害%加成（攻击者属性）
+ * 目标为恶魔种族时生效
+ */
+export function getDemonDmgPctBonus(attacker: any, target: any): number {
+  if (attacker == null || target == null) return 0;
+  if (jass.GetUnitRace(target) !== jass.RACE_DEMON) return 0;
+  return getRealAttr(attacker, "提高对恶魔族伤害%", 0);
+}
+
+/**
+ * ��取受到恶魔族伤害减少%（目标属性）
+ * 攻击者为恶魔种族时生效
+ */
+export function getDemonResistPct(target: any, attacker: any): number {
+  if (target == null || attacker == null) return 0;
+  if (jass.GetUnitRace(attacker) !== jass.RACE_DEMON) return 0;
+  return getRealAttr(target, "受到恶魔族伤害减少%", 0);
+}
+
 //=============================================================================
 // 六、召唤物伤害修正
 //=============================================================================

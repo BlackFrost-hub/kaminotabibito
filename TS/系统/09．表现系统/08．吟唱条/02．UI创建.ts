@@ -19,12 +19,12 @@ const 常量 = require("./00．常量定义") as {
   默认标题文本: string;
   默认提示文本: string;
   分隔符文本: string;
-  获取前景模型: (颜色ID: number) => string;
-  获取背景模型: (颜色ID: number) => string;
 };
 
-const 获取前景模型 = (颜色ID: number): string => 常量.获取前景模型(颜色ID);
-const 获取背景模型 = (颜色ID: number): string => 常量.获取背景模型(颜色ID);
+const { 获取前景模型, 获取背景模型 } = require("./00．常量定义") as {
+  获取前景模型: (this: void, 颜色ID: number) => string;
+  获取背景模型: (this: void, 颜色ID: number) => string;
+};
 
 const DzFrameSetAbsolutePoint = japi.DzFrameSetAbsolutePoint as (frame: any, point: number, x: number, y: number) => void;
 const DzFrameSetPoint = japi.DzFrameSetPoint as (frame: any, point: number, relativeFrame: any, relativePoint: number, x: number, y: number) => void;

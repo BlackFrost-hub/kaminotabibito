@@ -53,6 +53,18 @@ asg6:setMovementSpeedBonus(1, 0)
 local asg7 = createNamedAbility(AbilityDefinitionAttackSpeedIncrease, 'ASG7', '[系统]攻击速度增加')
 asg7:setAttackSpeedIncrease(1, 0)
 
+local sightBonusAbilityIds = {
+  'ASV1', 'ASV2', 'ASV3', 'ASV4', 'ASV5', 'ASV6', 'ASV7', 'ASV8', 'ASV9',
+  'ASV0',
+  'ASVA', 'ASVB', 'ASVC', 'ASVD', 'ASVE', 'ASVF', 'ASVG', 'ASVH', 'ASVI', 'ASVJ',
+  'ASVK', 'ASVL', 'ASVM', 'ASVN', 'ASVO', 'ASVP', 'ASVQ', 'ASVR', 'ASVS', 'ASVT',
+  'ASVU', 'ASVV', 'ASVW', 'ASVX', 'ASVY', 'ASVZ',
+}
+for i, id in ipairs(sightBonusAbilityIds) do
+  local sight = createNamedAbility(AbilityDefinitionSightBonus, id, '[系统]视野增加' .. tostring(i * 50))
+  sight:setSightRangeBonus(1, i * 50)
+end
+
 -- Buff abilities
 
 local asby = createNamedAbility(AbilityDefinitionPolymorph, 'ASBy', '[Buff系统]变羊')

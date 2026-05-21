@@ -11,15 +11,9 @@ import {
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
-};
-const { 是否恶魔单位 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断") as {
-  是否恶魔单位: (this: void, unit: any) => boolean;
 };
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
@@ -129,14 +123,6 @@ function 施加或刷新撕裂(this: void, source: any, target: any): void {
   确保注册撕裂Tick();
 }
 
-function on恶魔王爪伤害提高(this: void, context: any): number {
-  if (context == null || context.isTrueDamage === true) return context.currentDamage;
-  if (!单位有效存活(context.attacker) || !单位有效存活(context.target)) return context.currentDamage;
-  if (!单位持有攻击效果装备(context.attacker, 装备名)) return context.currentDamage;
-  if (是否恶魔单位(context.target) !== true) return context.currentDamage;
-  return context.currentDamage * (1 + 恶魔伤害提高);
-}
-
 function on恶魔王爪最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
   if (!(applied > 0)) return;
   if (snapshot == null || snapshot.isPhysicalDamage !== true || snapshot.isTrueDamage === true) return;
@@ -147,7 +133,6 @@ function on恶魔王爪最终伤害(this: void, target: any, attacker: any, appl
   施加或刷新撕裂(attacker, target);
 }
 
-registerDamageModifier(on恶魔王爪伤害提高, 30);
 registerAppliedFinalDamageListener(on恶魔王爪最终伤害);
 
 export {};

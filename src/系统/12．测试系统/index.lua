@@ -9,7 +9,6 @@ local ENABLE_QUEST_TEST = false
 local ENABLE_TEST_233 = true
 local ENABLE_TEST_EVENT = false
 local ENABLE_GOLD_BURST_TEST = true
-local ENABLE_DZ_CAN_PLACE_TEST = true
 local function loadTests(self)
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -28,9 +27,6 @@ local function loadTests(self)
     end
     if ENABLE_GOLD_BURST_TEST then
         require("系统.12．测试系统.01．金币爆发测试")
-    end
-    if ENABLE_DZ_CAN_PLACE_TEST then
-        require("系统.12．测试系统.Dz通行判定测试")
     end
 end
 loadTests(nil)

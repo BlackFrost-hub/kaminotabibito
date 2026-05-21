@@ -78,19 +78,22 @@ export function ydlStes_coerceReal(_self: any, v: any): number {
   return 0;
 }
 
-export function ydlStes_readString5(_self: any, name: string): string {
-  const v = YDLocal5Get("string", name);
+export function ydlStes_readString5(_self: any, name?: string): string {
+  const realName = name ?? _self;
+  const v = YDLocal5Get("string", realName);
   if (typeof v === "string") return v;
   if (v == null) return "";
   return tostring(v);
 }
 
-export function ydlStes_readBoolean5(_self: any, name: string): boolean {
-  return YDLocal5Get("boolean", name) === true;
+export function ydlStes_readBoolean5(_self: any, name?: string): boolean {
+  const realName = name ?? _self;
+  return YDLocal5Get("boolean", realName) === true;
 }
 
-export function ydlStes_readInteger5(_self: any, name: string): number {
-  const v = YDLocal5Get("integer", name);
+export function ydlStes_readInteger5(_self: any, name?: string): number {
+  const realName = name ?? _self;
+  const v = YDLocal5Get("integer", realName);
   if (typeof v === "number" && v === v) return jass.R2I(v);
   const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
   const t = tn(v);
@@ -98,8 +101,9 @@ export function ydlStes_readInteger5(_self: any, name: string): number {
   return 0;
 }
 
-export function ydlStes_readUnitcode5(_self: any, name: string): number {
-  const v = YDLocal5Get("unitcode", name);
+export function ydlStes_readUnitcode5(_self: any, name?: string): number {
+  const realName = name ?? _self;
+  const v = YDLocal5Get("unitcode", realName);
   if (typeof v === "number" && v === v) return jass.R2I(v);
   const tn = (globalThis as any).tonumber as (x: any) => number | undefined;
   const t = tn(v);
@@ -107,12 +111,14 @@ export function ydlStes_readUnitcode5(_self: any, name: string): number {
   return 0;
 }
 
-export function ydlStes_readUnit5(_self: any, name: string): any {
-  return YDLocal5Get("unit", name);
+export function ydlStes_readUnit5(_self: any, name?: string): any {
+  const realName = name ?? _self;
+  return YDLocal5Get("unit", realName);
 }
 
-export function ydlStes_readReal5(_self: any, name: string): number {
-  return ydlStes_coerceReal(_self, YDLocal5Get("real", name));
+export function ydlStes_readReal5(_self: any, name?: string): number {
+  const realName = name ?? _self;
+  return ydlStes_coerceReal(_self, YDLocal5Get("real", realName));
 }
 
 /** 与 JASS `LoadInteger(STES_GetTable(), …, skey_index)` 一致 */
@@ -147,6 +153,7 @@ export function ydlStes_registerAfterGetTable(_self: any, trig: any, eventName: 
  * @returns 创建的触发器，或 null 表示 STES_Register 不可用
  */
 export function registerStesListener(
+  this: void,
   eventName: string,
   callback: () => void
 ): any | null {

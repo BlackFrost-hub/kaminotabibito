@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 吟唱条系统 - STES 桥接
  */
@@ -28,9 +28,9 @@ const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
-const { 启动吟唱条, 关闭吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
-  启动吟唱条: (this: void, 参数: any) => void;
-  关闭吟唱条: (this: void) => void;
+const { 显示吟唱条: 启动吟唱条, 关闭吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
+  显示吟唱条: (this: void, self: any, 参数: any) => void;
+  关闭吟唱条: (this: void, self: any) => void;
 };
 
 export const 吟唱条STES事件名 = "注册吟唱条";
@@ -44,9 +44,27 @@ const 重试间隔秒 = 0.1;
 let 吟唱条Stes触发器: any | null = null;
 
 function 读取吟唱条事件参数(this: void): any {
-  const sj = ydlStes_readReal5(undefined, "sj");
-  const 颜色ID = ydlStes_readInteger5(undefined, "颜色ID");
-  const 提示字符串 = ydlStes_readString5(undefined, "string");
+  let sj = ydlStes_readReal5(undefined, "sj");
+  if (sj === 0) {
+    sj = ydlStes_readReal5(undefined, "总时长");
+  }
+  if (sj === 0) {
+    sj = ydlStes_readReal5(undefined, "time");
+  }
+  let 颜色ID = ydlStes_readInteger5(undefined, "颜色ID");
+  if (颜色ID === 0) {
+    颜色ID = ydlStes_readInteger5(undefined, "颜色");
+  }
+  if (颜色ID === 0) {
+    颜色ID = ydlStes_readInteger5(undefined, "棰滆壊ID");
+  }
+  let 提示字符串 = ydlStes_readString5(undefined, "string");
+  if (提示字符串 === "") {
+    提示字符串 = ydlStes_readString5(undefined, "提示文本");
+  }
+  if (提示字符串 === "") {
+    提示字符串 = ydlStes_readString5(undefined, "文本");
+  }
   return {
     sj,
     颜色ID,
@@ -61,15 +79,14 @@ export function 根据Stes事件启动吟唱条(this: void): void {
 
     const 总时长 = 参数.sj;
     const 颜色ID = 参数.颜色ID;
-    const 提示文本 = 参数.string && 参数.string.length > 0 ? 参数.string : undefined;
+    const 提示文本 = 参数.string !== "" ? 参数.string : undefined;
 
-    启动吟唱条({
+    启动吟唱条(undefined, {
       总时长,
       颜色ID,
       提示文本,
     });
 
-    debugLogForce(模块名, "收到 注册吟唱条", "总时长=", 总时长, "颜色ID=", 颜色ID, "提示=", 提示文本);
   } finally {
     ydlStes_finishChildCleanup(undefined);
   }
@@ -120,7 +137,6 @@ function 尝试注册吟唱条Stes(this: void): void {
 
   if (jCount >= 1) {
     g[全局已注册标记键] = true;
-    debugLogForce(模块名, "注册成功", "event=", 吟唱条STES事件名, "count=", jCount);
     return;
   }
 

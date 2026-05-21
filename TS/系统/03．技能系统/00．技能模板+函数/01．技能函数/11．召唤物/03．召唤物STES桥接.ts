@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 召唤物系统 - STES / YDLocal 桥接
  */
@@ -5,7 +6,7 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { registerStesListener } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
-  registerStesListener: (eventName: string, callback: () => void) => any | null;
+  registerStesListener: (this: void, eventName: string, callback: () => void) => any | null;
 };
 const {
   ydlStes_syncTriggerStep,
@@ -16,13 +17,13 @@ const {
   ydlStes_readString5,
   ydlStes_readUnit5,
 } = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
-  ydlStes_syncTriggerStep: (self: any) => void;
-  ydlStes_finishChildCleanup: (self: any) => void;
-  ydlStes_readInteger5: (self: any, name: string) => number;
-  ydlStes_readUnitcode5: (self: any, name: string) => number;
-  ydlStes_readReal5: (self: any, name: string) => number;
-  ydlStes_readString5: (self: any, name: string) => string;
-  ydlStes_readUnit5: (self: any, name: string) => any;
+  ydlStes_syncTriggerStep: (this: void, self: any) => void;
+  ydlStes_finishChildCleanup: (this: void, self: any) => void;
+  ydlStes_readInteger5: (this: void, self: any, name: string) => number;
+  ydlStes_readUnitcode5: (this: void, self: any, name: string) => number;
+  ydlStes_readReal5: (this: void, self: any, name: string) => number;
+  ydlStes_readString5: (this: void, self: any, name: string) => string;
+  ydlStes_readUnit5: (this: void, self: any, name: string) => any;
 };
 const { YDLocal7Set } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
   YDLocal7Set: (type: "unit", name: string, value: any) => void;
@@ -154,7 +155,6 @@ function tryRegisterSummonStes(this: void): void {
   const jCount = countOnJassStesTable(SUMMON_STES_EVENT);
   const attempt = (g[ATTEMPT_KEY] as number) || 0;
   g[ATTEMPT_KEY] = attempt + 1;
-  debugLogForce(模块名, "注册检查", "attempt=", attempt + 1, "jCount=", jCount, "trigger=", summonStesTrigger);
 
   if (jCount >= 1) {
     g[REG_GUARD] = true;

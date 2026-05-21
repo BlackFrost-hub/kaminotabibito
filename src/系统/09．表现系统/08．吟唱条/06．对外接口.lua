@@ -3,8 +3,6 @@ local ____exports = {}
 local ____require_result_0 = require("系统.09．表现系统.08．吟唱条.03．吟唱条核心")
 local _____6838_5FC3_542F_52A8_541F_5531_6761 = ____require_result_0["启动吟唱条"]
 local _____6838_5FC3_5173_95ED_541F_5531_6761 = ____require_result_0["关闭吟唱条"]
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_1.debugLogForce
 local _____5E38_91CF = require("系统.09．表现系统.08．吟唱条.00．常量定义")
 local function _____89C4_8303_5316_53C2_6570(self, _____8F93_5165)
     if _____8F93_5165 == nil then
@@ -54,42 +52,7 @@ ____exports["显示吟唱条"] = function(self, _____7B2C_4E00_53C2_6570, _____7
     if _____8F93_5165 == nil then
         _____8F93_5165 = {}
     end
-    local ____debugLogForce_13 = debugLogForce
-    local ____opt_result_4
-    if self ~= nil then
-        ____opt_result_4 = self["总时长"]
-    end
-    local ____opt_result_7
-    if _____7B2C_4E00_53C2_6570 ~= nil then
-        ____opt_result_7 = _____7B2C_4E00_53C2_6570["总时长"]
-    end
-    local ____opt_result_10
-    if _____7B2C_4E00_53C2_6570 ~= nil then
-        ____opt_result_10 = _____7B2C_4E00_53C2_6570.sj
-    end
-    ____debugLogForce_13(
-        "吟唱条对外接口",
-        "收到显示请求",
-        "self总时长=",
-        ____opt_result_4,
-        "第一参数总时长=",
-        ____opt_result_7,
-        "第一参数sj=",
-        ____opt_result_10,
-        "第二参数总时长=",
-        _____7B2C_4E8C_53C2_6570 and _____7B2C_4E8C_53C2_6570["总时长"]
-    )
     local _____53C2_6570 = _____89C4_8303_5316_53C2_6570(nil, _____8F93_5165)
-    debugLogForce(
-        "吟唱条对外接口",
-        "规范化后",
-        "总时长=",
-        _____53C2_6570["总时长"],
-        "颜色ID=",
-        _____53C2_6570["颜色ID"],
-        "提示=",
-        _____53C2_6570["提示文本"]
-    )
     _____6838_5FC3_542F_52A8_541F_5531_6761(_____53C2_6570)
 end
 ____exports["关闭吟唱条"] = function(self, ______7B2C_4E00_53C2_6570)

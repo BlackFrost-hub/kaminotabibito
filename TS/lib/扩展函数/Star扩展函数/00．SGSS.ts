@@ -10,6 +10,7 @@ const LoadReal = jass.LoadReal as (table: any, parent: number, child: number) =>
 const SaveReal = jass.SaveReal as (table: any, parent: number, child: number, value: number) => void;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
 const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => void;
+const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 const IncUnitAbilityLevel = jass.IncUnitAbilityLevel as (unit: any, abilityId: number) => void;
 const DecUnitAbilityLevel = jass.DecUnitAbilityLevel as (unit: any, abilityId: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -17,6 +18,17 @@ const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: num
 const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
 const EXGetUnitAbility = japi.EXGetUnitAbility as (unit: any, abilityId: number) => any;
 const EXSetAbilityDataReal = japi.EXSetAbilityDataReal as (ability: any, level: number, field: number, value: number) => void;
+const R2I = jass.R2I as (value: number) => number;
+
+const 视野技能每级数值 = 50;
+// 视野分档：从 50 起步，36 档，每档 +50，最终覆盖 50 ~ 1800。
+const 视野技能RawIds = [
+  "ASV1", "ASV2", "ASV3", "ASV4", "ASV5", "ASV6", "ASV7", "ASV8", "ASV9",
+  "ASV0",
+  "ASVA", "ASVB", "ASVC", "ASVD", "ASVE", "ASVF", "ASVG", "ASVH", "ASVI", "ASVJ",
+  "ASVK", "ASVL", "ASVM", "ASVN", "ASVO", "ASVP", "ASVQ", "ASVR", "ASVS", "ASVT",
+  "ASVU", "ASVV", "ASVW", "ASVX", "ASVY", "ASVZ",
+];
 
 function hashHandle(): any {
   const g = globalThis as any;
@@ -169,6 +181,35 @@ function setAtkSpeed(u: any, v: number): void {
   saveReal(u, key, next);
 }
 
+function 移除全部视野技能(u: any): void {
+  if (!u) return;
+  for (let i = 0; i < 视野技能RawIds.length; i++) {
+    const code = resolveAbilityCode(视野技能RawIds[i]);
+    if (code !== 0 && GetUnitAbilityLevel(u, code) > 0) {
+      UnitRemoveAbility(u, code);
+    }
+  }
+}
+
+function 同步单位视野技能(u: any, value: number): void {
+  if (!u) return;
+  移除全部视野技能(u);
+  if (!(value > 0)) return;
+
+  let level = R2I(value / 视野技能每级数值 + 0.5);
+  if (level < 1) level = 1;
+  if (level > 视野技能RawIds.length) level = 视野技能RawIds.length;
+  const code = resolveAbilityCode(视野技能RawIds[level - 1]);
+  if (code !== 0) UnitAddAbility(u, code);
+}
+
+function setSight(u: any, v: number): void {
+  const key = sh("视野");
+  const next = loadReal(u, key) + v;
+  同步单位视野技能(u, next);
+  saveReal(u, key, next);
+}
+
 export function SGSS_SetState(u: any, id: number, v: number): void {
   if (id === 1) setAtk(u, v);
   else if (id === 2) setArmor(u, v);
@@ -180,6 +221,7 @@ export function SGSS_SetState(u: any, id: number, v: number): void {
   else if (id === 8) setMp(u, v);
   else if (id === 9) setMove(u, v);
   else if (id === 10) setAtkSpeed(u, v);
+  else if (id === 11) setSight(u, v);
 }
 
 export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {

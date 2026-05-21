@@ -38,6 +38,7 @@ local _____5DE8_9B54_6218_5251 = require("系统.02．物品系统.15．装备�
 local _____7CBE_7CB9_6CD5_523A = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺")
 local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑")
 local _____7CBE_6C99_6218_65A7 = require("系统.02．物品系统.15．装备技能.00．物品.83．精沙战斧")
+local ____WPSHJS_8FC1_79FB_6838_5FC3 = require("系统.02．物品系统.15．装备技能.04．伤害事件.02．WPSHJS迁移核心")
 local ____B00H_6307_6325BuffID = stringToFourCCSafe("B00H")
 local ____B00V_6697_9ED1_4FB5_8680BuffID = stringToFourCCSafe("B00V")
 local _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID = stringToFourCCSafe("e00D")
@@ -137,6 +138,7 @@ local function _____5904_7406_6700_7EC8_4F24_5BB3(target, attacker, applied, sna
     if ____opt_5 ~= nil then
         ____opt_5(ctx)
     end
+    ____WPSHJS_8FC1_79FB_6838_5FC3["处理WPSHJS最终伤害"](ctx)
     _____5904_7406_6307_6325_6613_4F24(ctx)
 end
 local function _____4F24_5BB3_4E8B_4EF6_4FEE_6B63(context)
@@ -151,6 +153,7 @@ local function _____4F24_5BB3_4E8B_4EF6_4FEE_6B63(context)
     _____7ED3_679C = ____opt_7 and ____opt_7(context) or _____7ED3_679C
     local ____opt_9 = _____7CBE_6C99_6218_65A7["处理精沙战斧伤害修正"]
     _____7ED3_679C = ____opt_9 and ____opt_9(context) or _____7ED3_679C
+    _____7ED3_679C = ____WPSHJS_8FC1_79FB_6838_5FC3["处理WPSHJS伤害修正"](context, _____7ED3_679C)
     if ____B00V_6697_9ED1_4FB5_8680BuffID ~= 0 and context.target ~= nil and _____5355_4F4D_62E5_6709Buff(context.target, ____B00V_6697_9ED1_4FB5_8680BuffID) then
         if context.currentDamage >= _____7ED3_679C and _____7ED3_679C >= _____53D6_5F53_524D_751F_547D(context.target) then
             _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(context.attacker, context.target)

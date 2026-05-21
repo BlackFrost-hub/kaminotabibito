@@ -29,10 +29,6 @@ const { 启动吟唱条: 核心启动吟唱条, 关闭吟唱条: 核心关闭吟
   关闭吟唱条: (this: void) => void;
 };
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const 常量 = require("./00．常量定义") as {
   默认颜色ID: number;
   默认标题文本: string;
@@ -97,9 +93,7 @@ export function 显示吟唱条(this: any, 第一参数?: any, 第二参数?: �
   if (输入 == null) {
     输入 = {} as 吟唱条输入参数;
   }
-  debugLogForce("吟唱条对外接口", "收到显示请求", "self总时长=", (this as any)?.总时长, "第一参数总时长=", 第一参数?.总时长, "第一参数sj=", 第一参数?.sj, "第二参数总时长=", 第二参数?.总时长);
   const 参数 = 规范化参数(输入);
-  debugLogForce("吟唱条对外接口", "规范化后", "总时长=", 参数.总时长, "颜色ID=", 参数.颜色ID, "提示=", 参数.提示文本);
   核心启动吟唱条(参数);
 }
 
