@@ -8,14 +8,12 @@ local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_1.registerDamageModifier
-local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local UnitHasBuffBJ = ____require_result_2.UnitHasBuffBJ
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.02．易伤")
-local _____65BD_52A0_6613_4F24 = ____require_result_4["施加易伤"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.02．易伤")
+local _____65BD_52A0_6613_4F24 = ____require_result_3["施加易伤"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
 local _____8C7A_72FC_76AE_7532 = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲")
 local _____7075_77F3 = require("系统.02．物品系统.15．装备技能.00．物品.28．灵石")
 local _____5080_5CA9_6756 = require("系统.02．物品系统.15．装备技能.00．物品.29．傀岩杖")
@@ -51,8 +49,18 @@ local CreateUnit = jass.CreateUnit
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local UnitAddAbility = jass.UnitAddAbility
 local IssueImmediateOrder = jass.IssueImmediateOrder
+local function _____5355_4F4D_62E5_6709Buff(unit, buffId)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    if not (buffId > 0) then
+        return false
+    end
+    return GetUnitAbilityLevel(unit, buffId) > 0
+end
 local function _____5904_7406_6307_6325_6613_4F24(ctx)
     if ____B00H_6307_6325BuffID == 0 then
         return
@@ -60,7 +68,7 @@ local function _____5904_7406_6307_6325_6613_4F24(ctx)
     if ctx.attacker == nil or ctx.attacker == 0 or ctx.target == nil or ctx.target == 0 then
         return
     end
-    if not UnitHasBuffBJ(ctx.attacker, ____B00H_6307_6325BuffID) then
+    if not _____5355_4F4D_62E5_6709Buff(ctx.attacker, ____B00H_6307_6325BuffID) then
         return
     end
     _____65BD_52A0_6613_4F24(ctx.attacker, ctx.target, {["持续时间"] = 5, ["伤害增加百分比"] = 0.15})
@@ -70,10 +78,10 @@ local function _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B()
         do
             local _____8BB0_5F55 = table.remove(_____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217, 1)
             if _____8BB0_5F55 == nil or _____8BB0_5F55["来源"] == nil or _____8BB0_5F55["目标"] == nil then
-                goto __continue7
+                goto __continue10
             end
             if _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID == 0 or _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID == 0 then
-                goto __continue7
+                goto __continue10
             end
             local _____9A6C_7532 = CreateUnit(
                 GetOwningPlayer(_____8BB0_5F55["来源"]),
@@ -83,12 +91,12 @@ local function _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B()
                 0
             )
             if _____9A6C_7532 == nil or _____9A6C_7532 == 0 then
-                goto __continue7
+                goto __continue10
             end
             UnitAddAbility(_____9A6C_7532, _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID)
             IssueImmediateOrder(_____9A6C_7532, "animatedead")
         end
-        ::__continue7::
+        ::__continue10::
     end
 end
 local function _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(_____6765_6E90, _____76EE_6807)
@@ -125,9 +133,9 @@ local function _____5904_7406_6700_7EC8_4F24_5BB3(target, attacker, applied, sna
     _____5DE8_9B54_6218_5251["处理巨魔战剑强化触发"](ctx)
     _____7CBE_7CB9_6CD5_523A["处理精粹法刺魔法触发"](ctx)
     _____6C99_6F20_8725_8734_4E4B_9B42["处理沙漠蜥蜴之魂造成伤害"](ctx)
-    local ____opt_6 = _____55DC_72F1_6076_5251["处理嗜狱恶剑造成伤害"]
-    if ____opt_6 ~= nil then
-        ____opt_6(ctx)
+    local ____opt_5 = _____55DC_72F1_6076_5251["处理嗜狱恶剑造成伤害"]
+    if ____opt_5 ~= nil then
+        ____opt_5(ctx)
     end
     _____5904_7406_6307_6325_6613_4F24(ctx)
 end
@@ -139,11 +147,11 @@ local function _____4F24_5BB3_4E8B_4EF6_4FEE_6B63(context)
         return context.currentDamage
     end
     local _____7ED3_679C = _____65AF_5C14_6CD5_888D["处理斯尔法袍伤害修正"](context)
-    local ____opt_8 = _____55DC_72F1_6076_5251["处理嗜狱恶剑伤害修正"]
-    _____7ED3_679C = ____opt_8 and ____opt_8(context) or _____7ED3_679C
-    local ____opt_10 = _____7CBE_6C99_6218_65A7["处理精沙战斧伤害修正"]
-    _____7ED3_679C = ____opt_10 and ____opt_10(context) or _____7ED3_679C
-    if ____B00V_6697_9ED1_4FB5_8680BuffID ~= 0 and context.target ~= nil and UnitHasBuffBJ(context.target, ____B00V_6697_9ED1_4FB5_8680BuffID) then
+    local ____opt_7 = _____55DC_72F1_6076_5251["处理嗜狱恶剑伤害修正"]
+    _____7ED3_679C = ____opt_7 and ____opt_7(context) or _____7ED3_679C
+    local ____opt_9 = _____7CBE_6C99_6218_65A7["处理精沙战斧伤害修正"]
+    _____7ED3_679C = ____opt_9 and ____opt_9(context) or _____7ED3_679C
+    if ____B00V_6697_9ED1_4FB5_8680BuffID ~= 0 and context.target ~= nil and _____5355_4F4D_62E5_6709Buff(context.target, ____B00V_6697_9ED1_4FB5_8680BuffID) then
         if context.currentDamage >= _____7ED3_679C and _____7ED3_679C >= _____53D6_5F53_524D_751F_547D(context.target) then
             _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(context.attacker, context.target)
         end

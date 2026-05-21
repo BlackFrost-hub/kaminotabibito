@@ -96,9 +96,9 @@ local function _____5F52_4E00_5316_751F_547D_5468_671FBuff(buff)
         return buff
     end
     if type(buff) == "string" and #buff == 4 then
-        return stringToFourCC(nil, buff)
+        return stringToFourCC(buff)
     end
-    return stringToFourCC(nil, "BHwe")
+    return stringToFourCC("BHwe")
 end
 local function _____6309_4F24_5BB3_7C7B_578B_56DE_586B_5E03_5C14_6807_8BB0(_____53C2_6570)
     if _____53C2_6570["伤害类型"] == nil then

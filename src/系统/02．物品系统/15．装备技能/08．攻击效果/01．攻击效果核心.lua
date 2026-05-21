@@ -27,17 +27,16 @@ local _____65BD_52A0_653B_51FB_6548_679C_51CF_901F = ____01_FF0E_653B_51FB_6548_
 local _____65BD_52A0_653B_51FB_6548_679C_7729_6655 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["施加攻击效果眩晕"]
 local _____65BD_52A0_653B_51FB_6548_679C_51FB_98DE = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["施加攻击效果击飞"]
 local _____4E34_65F6_4FEE_6539_653B_901F = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["临时修改攻速"]
-local _____4E34_65F6_4FEE_6539_62A4_7532 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["临时修改护甲"]
 function ____on_653B_51FB_6548_679C_5EF6_8FDF_4F24_5BB3()
     while #_____5EF6_8FDF_4F24_5BB3_961F_5217 > 0 do
         do
             local record = table.remove(_____5EF6_8FDF_4F24_5BB3_961F_5217, 1)
             if record == nil then
-                goto __continue87
+                goto __continue98
             end
             _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(record.source, record.target, record.amount, record.damageType)
         end
-        ::__continue87::
+        ::__continue98::
     end
 end
 function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
@@ -49,7 +48,7 @@ function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
             do
                 local record = _____6301_7EED_4F24_5BB3_5217_8868[i + 1]
                 if record == nil or not _____5355_4F4D_6709_6548_5B58_6D3B(record.source) or not _____5355_4F4D_6709_6548_5B58_6D3B(record.target) or record.remainTicks <= 0 then
-                    goto __continue91
+                    goto __continue102
                 end
                 if now >= record.nextTime then
                     if record.effect ~= "" then
@@ -64,7 +63,7 @@ function ____on_653B_51FB_6548_679C_6301_7EED_4F24_5BB3Tick()
                     write = write + 1
                 end
             end
-            ::__continue91::
+            ::__continue102::
             i = i + 1
         end
     end
@@ -77,11 +76,7 @@ function ____on_653B_51FB_6548_679C_4E34_65F6_5C5E_6027_7ED3_675F()
     if record == nil then
         return
     end
-    if record.type == "攻速" then
-        _____4E34_65F6_4FEE_6539_653B_901F(record.unit, record.value)
-    else
-        _____4E34_65F6_4FEE_6539_62A4_7532(record.unit, record.value)
-    end
+    _____4E34_65F6_4FEE_6539_653B_901F(record.unit, record.value)
 end
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
@@ -92,6 +87,10 @@ local ____require_result_2 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_2.addDelayedCallback
 local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.04．护甲降低")
+local _____65BD_52A0_5355_4F53_62A4_7532_964D_4F4EBuff = ____require_result_3["施加单体护甲降低Buff"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
+local _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7 = ____require_result_4["装备触发概率通过"]
 _____5EF6_8FDF_4F24_5BB3_961F_5217 = {}
 _____6301_7EED_4F24_5BB3_5217_8868 = {}
 _____4E34_65F6_5C5E_6027_961F_5217 = {}
@@ -130,6 +129,27 @@ local function _____51B7_5374_901A_8FC7(_____914D_7F6E, unit)
     _____653B_51FB_6548_679C_51B7_5374[key] = now
     return true
 end
+local function _____53D6_4F24_5BB3_6982_7387(_____914D_7F6E, ctx)
+    if _____914D_7F6E["伤害概率计算"] ~= nil then
+        return _____914D_7F6E["伤害概率计算"](ctx)
+    end
+    if _____914D_7F6E["伤害概率"] ~= nil then
+        return _____914D_7F6E["伤害概率"]
+    end
+    return 1
+end
+local function _____53D6_6CBB_7597_6982_7387(_____914D_7F6E, ctx)
+    if _____914D_7F6E["治疗概率计算"] ~= nil then
+        return _____914D_7F6E["治疗概率计算"](ctx)
+    end
+    if _____914D_7F6E["治疗概率"] ~= nil then
+        return _____914D_7F6E["治疗概率"]
+    end
+    return _____53D6_4F24_5BB3_6982_7387(_____914D_7F6E, ctx)
+end
+local function _____6982_7387_901A_8FC7(chance, source)
+    return _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7(chance, source)
+end
 local function _____57FA_7840_6761_4EF6_901A_8FC7(_____914D_7F6E, ctx)
     if not _____5355_4F4D_6709_6548_5B58_6D3B(ctx.source) or not _____5355_4F4D_6709_6548_5B58_6D3B(ctx.target) then
         return false
@@ -149,7 +169,8 @@ local function _____57FA_7840_6761_4EF6_901A_8FC7(_____914D_7F6E, ctx)
     if not _____8DDD_79BB_6EE1_8DB3_9650_5236(ctx.source, ctx.target, _____914D_7F6E["最小距离"], _____914D_7F6E["最大距离"]) then
         return false
     end
-    if not _____547D_4E2D_6982_7387_901A_8FC7(_____914D_7F6E["概率"]) then
+    local _____6982_7387_503C = _____914D_7F6E["概率计算"] ~= nil and _____914D_7F6E["概率计算"](ctx) or _____914D_7F6E["概率"]
+    if not _____547D_4E2D_6982_7387_901A_8FC7(_____6982_7387_503C, ctx.source) then
         return false
     end
     if not _____51B7_5374_901A_8FC7(_____914D_7F6E, ctx.source) then
@@ -158,15 +179,17 @@ local function _____57FA_7840_6761_4EF6_901A_8FC7(_____914D_7F6E, ctx)
     return true
 end
 local function _____8BA1_7B97_4F24_5BB3(_____914D_7F6E, ctx)
-    local amount = _____914D_7F6E["固定伤害"] or 0
+    local fixedDamage = ctx.snapshot ~= nil and ctx.snapshot.isSkillAttack == true and _____914D_7F6E["攻击效果固定伤害"] ~= nil and _____914D_7F6E["攻击效果固定伤害"] or (ctx.snapshot ~= nil and ctx.snapshot.isNormalAttack == true and _____914D_7F6E["普攻固定伤害"] ~= nil and _____914D_7F6E["普攻固定伤害"] or (_____914D_7F6E["固定伤害"] or 0))
+    local amount = fixedDamage
     if _____914D_7F6E["攻击系数"] ~= nil then
         amount = amount + _____53D6_653B_51FB_529B(ctx.source) * _____914D_7F6E["攻击系数"]
     end
     if _____914D_7F6E["力量系数"] ~= nil then
         amount = amount + _____53D6_529B_91CF(ctx.source) * _____914D_7F6E["力量系数"]
     end
-    if _____914D_7F6E["生命系数"] ~= nil then
-        amount = amount + _____53D6_6700_5927_751F_547D(ctx.target) * _____914D_7F6E["生命系数"]
+    local lifeFactor = _____914D_7F6E["生命系数计算"] ~= nil and _____914D_7F6E["生命系数计算"](ctx) or _____914D_7F6E["生命系数"]
+    if lifeFactor ~= nil then
+        amount = amount + _____53D6_6700_5927_751F_547D(ctx.target) * lifeFactor
     end
     if _____914D_7F6E["伤害倍率"] ~= nil then
         amount = amount + ctx.applied * _____914D_7F6E["伤害倍率"]
@@ -178,13 +201,19 @@ local function _____6267_884C_53CD_51FB_4F24_5BB3(_____914D_7F6E, ctx)
     _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.target, ctx.source, amount, _____914D_7F6E["伤害类型"])
 end
 local function _____6267_884C_989D_5916_4F24_5BB3(_____914D_7F6E, ctx)
-    local amount = _____8BA1_7B97_4F24_5BB3(_____914D_7F6E, ctx)
-    local _____8D44_6E90_5077_53D6_540C_65F6_9020_6210_4F24_5BB3 = _____914D_7F6E["固定伤害"] ~= nil or _____914D_7F6E["攻击系数"] ~= nil or _____914D_7F6E["力量系数"] ~= nil or _____914D_7F6E["生命系数"] ~= nil
-    if _____914D_7F6E["效果类型"] ~= "资源偷取" or _____8D44_6E90_5077_53D6_540C_65F6_9020_6210_4F24_5BB3 then
-        _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, amount, _____914D_7F6E["伤害类型"])
+    local damageChance = _____53D6_4F24_5BB3_6982_7387(_____914D_7F6E, ctx)
+    local healChance = _____53D6_6CBB_7597_6982_7387(_____914D_7F6E, ctx)
+    local _____8D44_6E90_5077_53D6_540C_65F6_9020_6210_4F24_5BB3 = _____914D_7F6E["固定伤害"] ~= nil or _____914D_7F6E["攻击系数"] ~= nil or _____914D_7F6E["力量系数"] ~= nil or _____914D_7F6E["生命系数"] ~= nil or _____914D_7F6E["生命系数计算"] ~= nil
+    if (_____914D_7F6E["效果类型"] ~= "资源偷取" or _____8D44_6E90_5077_53D6_540C_65F6_9020_6210_4F24_5BB3) and damageChance > 0 then
+        local amount = _____8BA1_7B97_4F24_5BB3(_____914D_7F6E, ctx)
+        if amount > 0 and _____6982_7387_901A_8FC7(damageChance, ctx.source) then
+            _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, amount, _____914D_7F6E["伤害类型"])
+        end
     end
-    if (_____914D_7F6E["治疗生命"] or 0) > 0 or (_____914D_7F6E["恢复魔法"] or 0) > 0 then
-        _____653B_51FB_6548_679C_6CBB_7597_751F_547D_9B54_6CD5(ctx.source, ctx.source, _____914D_7F6E["治疗生命"] or 0, _____914D_7F6E["恢复魔法"] or 0)
+    if ((_____914D_7F6E["治疗生命"] or 0) > 0 or (_____914D_7F6E["恢复魔法"] or 0) > 0) and healChance > 0 then
+        if _____6982_7387_901A_8FC7(healChance, ctx.source) then
+            _____653B_51FB_6548_679C_6CBB_7597_751F_547D_9B54_6CD5(ctx.source, ctx.source, _____914D_7F6E["治疗生命"] or 0, _____914D_7F6E["恢复魔法"] or 0)
+        end
     end
     if (_____914D_7F6E["抽取生命比例"] or 0) > 0 or (_____914D_7F6E["抽取魔法比例"] or 0) > 0 then
         local life = _____53D6_6700_5927_751F_547D(ctx.target) * (_____914D_7F6E["抽取生命比例"] or 0)
@@ -203,14 +232,19 @@ local function _____6267_884C_8303_56F4_4F24_5BB3(_____914D_7F6E, ctx)
     if not (radius > 0) then
         return
     end
-    local list = _____83B7_53D6_654C_65B9_8303_56F4_5355_4F4D(ctx.source, ctx.target, radius, true)
+    local list = _____83B7_53D6_654C_65B9_8303_56F4_5355_4F4D(ctx.source, ctx.target, radius, _____914D_7F6E["范围包含主目标"] == true)
     local amount = _____8BA1_7B97_4F24_5BB3(_____914D_7F6E, ctx)
+    local spreadCount = 0
     do
         local i = 0
         while i < #list do
             _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, list[i + 1], amount, _____914D_7F6E["伤害类型"])
+            spreadCount = spreadCount + 1
             i = i + 1
         end
+    end
+    if spreadCount > 0 and (_____914D_7F6E["扩散成功主目标伤害倍率"] or 0) > 0 then
+        _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, ctx.applied * (_____914D_7F6E["扩散成功主目标伤害倍率"] or 0), _____914D_7F6E["伤害类型"])
     end
 end
 local function _____6CE8_518C_6301_7EED_4F24_5BB3Tick()
@@ -290,9 +324,7 @@ local function _____6267_884C_62A4_7532_524A_51CF(_____914D_7F6E, ctx)
     if not (value > 0) then
         return
     end
-    _____4E34_65F6_4FEE_6539_62A4_7532(ctx.target, -value)
-    _____4E34_65F6_5C5E_6027_961F_5217[#_____4E34_65F6_5C5E_6027_961F_5217 + 1] = {unit = ctx.target, type = "护甲", value = value}
-    addDelayedCallback((_____914D_7F6E["持续时间"] or 5) * 1000, ____on_653B_51FB_6548_679C_4E34_65F6_5C5E_6027_7ED3_675F)
+    _____65BD_52A0_5355_4F53_62A4_7532_964D_4F4EBuff(ctx.source, ctx.target, {["持续时间"] = _____914D_7F6E["持续时间"] or 5, ["护甲"] = value, ["叠加键"] = _____914D_7F6E["护甲降低叠加键"]})
 end
 local function _____6267_884C_653B_51FB_6548_679C_914D_7F6E(_____914D_7F6E, ctx)
     if _____914D_7F6E["触发侧"] == "攻击者" and not _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907(ctx.source, _____914D_7F6E["装备名"]) then
@@ -310,6 +342,10 @@ local function _____6267_884C_653B_51FB_6548_679C_914D_7F6E(_____914D_7F6E, ctx)
     end
     if _____914D_7F6E["点特效"] ~= nil and _____914D_7F6E["点特效"] ~= "" then
         _____64AD_653E_5355_4F4D_5750_6807_7279_6548(effectCtx.target, _____914D_7F6E["点特效"], _____914D_7F6E["点特效缩放"])
+    end
+    if _____914D_7F6E["自定义执行"] ~= nil then
+        _____914D_7F6E["自定义执行"](effectCtx)
+        return
     end
     if _____914D_7F6E["效果类型"] == "反击伤害" then
         _____6267_884C_53CD_51FB_4F24_5BB3(_____914D_7F6E, ctx)
@@ -352,11 +388,11 @@ local function ____on_653B_51FB_6548_679C_6700_7EC8_4F24_5BB3(target, attacker, 
             do
                 local cfg = list[i + 1]
                 if cfg == nil or cfg["触发侧"] == "伤害修正" then
-                    goto __continue72
+                    goto __continue83
                 end
                 _____6267_884C_653B_51FB_6548_679C_914D_7F6E(cfg, ctx)
             end
-            ::__continue72::
+            ::__continue83::
             i = i + 1
         end
     end
@@ -379,19 +415,19 @@ local function ____on_653B_51FB_6548_679C_4F24_5BB3_4FEE_6B63(context)
             do
                 local cfg = list[i + 1]
                 if cfg == nil or cfg["触发侧"] ~= "伤害修正" then
-                    goto __continue79
+                    goto __continue90
                 end
                 if cfg["效果类型"] ~= "转换火焰伤害" then
-                    goto __continue79
+                    goto __continue90
                 end
                 if context.isNormalAttack ~= true or context.isPhysicalDamage ~= true then
-                    goto __continue79
+                    goto __continue90
                 end
                 if not _____653B_51FB_8005_7C7B_578B_6EE1_8DB3(context.attacker, cfg["攻击者类型"]) then
-                    goto __continue79
+                    goto __continue90
                 end
                 if not _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907(context.attacker, cfg["装备名"]) then
-                    goto __continue79
+                    goto __continue90
                 end
                 local amount = result * (cfg["伤害倍率"] or 0.8)
                 if amount > 0 then
@@ -400,7 +436,7 @@ local function ____on_653B_51FB_6548_679C_4F24_5BB3_4FEE_6B63(context)
                 end
                 result = 0
             end
-            ::__continue79::
+            ::__continue90::
             i = i + 1
         end
     end

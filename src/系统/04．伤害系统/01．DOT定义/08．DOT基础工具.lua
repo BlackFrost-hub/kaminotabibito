@@ -13,6 +13,8 @@ function ____exports.createDotBaseUtils(self, deps)
     local g = deps.g
     local itemsData = deps.itemsData
     local fourCCToString = deps.fourCCToString
+    local GetItemTypeId = jass.GetItemTypeId
+    local GetUnitTypeId = jass.GetUnitTypeId
     local function getStructureUnitTypeHandle(self)
         local ____jass_UNIT_TYPE_STRUCTURE_0 = jass.UNIT_TYPE_STRUCTURE
         if ____jass_UNIT_TYPE_STRUCTURE_0 == nil then
@@ -82,11 +84,11 @@ function ____exports.createDotBaseUtils(self, deps)
         end
         return false
     end
-    local function unitItemInSlot(self, unit, slot)
+    local function unitItemInSlot(unit, slot)
         return jass.UnitItemInSlot(unit, slot)
     end
-    local function getItemTypeId(self, item)
-        return jass.GetItemTypeId(item)
+    local function getItemTypeId(item)
+        return GetItemTypeId(item)
     end
     local function getBestDotFromUnit(self, unit, parseBuff, getProduct)
         local best = nil
@@ -94,14 +96,11 @@ function ____exports.createDotBaseUtils(self, deps)
             local slot = 0
             while slot <= 5 do
                 do
-                    local item = unitItemInSlot(nil, unit, slot)
+                    local item = unitItemInSlot(unit, slot)
                     if not item then
                         goto __continue25
                     end
-                    local idStr = fourCCToString(
-                        nil,
-                        getItemTypeId(nil, item)
-                    )
+                    local idStr = fourCCToString(getItemTypeId(item))
                     local entry = itemsData[idStr]
                     local segments = (entry and entry.Buff) ~= nil and splitItemBuffSegments(nil, entry.Buff) or ({})
                     do
@@ -160,8 +159,8 @@ function ____exports.createDotBaseUtils(self, deps)
         if not targetUnit then
             return 0
         end
-        local typeId = jass.GetUnitTypeId(targetUnit)
-        local idStr = fourCCToString(nil, typeId)
+        local typeId = GetUnitTypeId(targetUnit)
+        local idStr = fourCCToString(typeId)
         local slk = _G.slk
         local slkUnit = slk ~= nil and slk.unit and slk.unit[idStr] or nil
         if slkUnit == nil then

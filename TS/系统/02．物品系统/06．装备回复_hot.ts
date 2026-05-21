@@ -3,6 +3,7 @@
  */
 
 const jass = require("jass.common") as any;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 
 export interface EquipHealSegmentInfo {
   tokens: string[];
@@ -77,10 +78,10 @@ export function sumHealFromItemData(
   unit: any,
   item: any,
   itemsData: Record<string, { hot?: string; abilList?: string }>,
-  fourCCToString: (four: number) => string,
+  fourCCToString: (this: void, four: number) => string,
 ): { hp: number; mp: number; ok: boolean } {
   if (unit == null || unit === 0 || item == null || item === 0) return { hp: 0, mp: 0, ok: false };
-  const itemId = jass.GetItemTypeId(item) as number;
+  const itemId = GetItemTypeId(item) as number;
   const idStr = fourCCToString(itemId);
   const entry = itemsData[idStr];
   if (!entry || !entry.hot || !entry.abilList) return { hp: 0, mp: 0, ok: false };

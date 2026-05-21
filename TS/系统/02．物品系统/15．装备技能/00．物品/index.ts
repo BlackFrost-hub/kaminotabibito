@@ -115,3 +115,4 @@ export * from "./112．瑟尔之弓";
 export * from "./113．格挡大盾";
 export * from "./114．抗毒药水";
 export * from "./115．地狱火手套";
+export * from "./116．生命之吻";

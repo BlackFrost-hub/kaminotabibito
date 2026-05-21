@@ -14,7 +14,7 @@ const {
   SetUnitManaPercentBJ: (whichUnit: any, percent: number) => void;
   GetUnitLifePercent: (whichUnit: any) => number;
   GetUnitManaPercent: (whichUnit: any) => number;
-  ModifyHeroStat: (whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
+  ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
 };
 
 const HS = jass.InitHashtable();

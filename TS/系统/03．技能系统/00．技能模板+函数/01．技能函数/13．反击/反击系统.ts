@@ -55,7 +55,7 @@ export interface 伤害类型快照 {
 }
 
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (cb: (target: any, attacker: any, applied: number, snapshot: 伤害类型快照) => void) => void;
+  registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, snapshot: 伤害类型快照) => void) => void;
 };
 
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
@@ -256,6 +256,8 @@ function onFinalDamageApplied(
   const targetHid = GetHandleId(target);
   const 实例列表 = 反击实例映射[targetHid];
   if (!实例列表 || 实例列表.length === 0) return;
+
+  debugLogForce("反击系统", "伤害回调触发 targetHid=", targetHid, "attackerHid=", attacker ? GetHandleId(attacker) : 0, "applied=", applied);
 
   // 检查来源是否在反击黑名单中（防止死循环）
   if (attacker) {

@@ -2,19 +2,21 @@
 /** 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true */
 // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP === undefined) (globalThis as any).DEBUG_EQUIP_SKIP_DROP = true;
 const jass = require("jass.common") as any;
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemPickup: (callback: (unit: any, item: any) => void) => number;
-  onItemDrop: (callback: (unit: any, item: any) => void) => number;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
+  onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const g = require("jass.globals") as { udg_TempIsAdd: boolean; udg_TempScore: number;[key: string]: any };
-const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
+const equipLimit = require("系统.02．物品系统.10．装备限制") as { equipLimitWouldAllowPickup?: (this: void, unit: any, item: any) => boolean; equipShared: { skipNextDrop: boolean } };
 const equipShared = equipLimit.equipShared;
 const equipMovespeed = require("系统.02．物品系统.08．装备移速") as { getMaxMovespeed2Info?: (u: any, ignoreItem?: any) => { value: number; name: string; count: number } };
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
   applyEquipStatsTS: (this: void, unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
 };
 const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
 };
 const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
@@ -94,7 +96,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     equipShared.skipNextDrop = false;
     return;
   }
-  const idStr = fourCCToString(jass.GetItemTypeId(item));
+  const idStr = fourCCToString(GetItemTypeId(item));
   const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) {
     if (isPickup) {
@@ -123,7 +125,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const primaryBonus = itemData.primaryBonus;
   let primary: Record<string, number> = {};
   if (primaryBonus) {
-    const typeId = (jass as any).GetUnitTypeId(unit);
+    const typeId = GetUnitTypeId(unit);
     const unitId = typeId !== 0 ? fourCCToString(typeId) : "";
     const primaryStr = unitId !== "" ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
     primary = parsePrimaryBonus(primaryBonus, primaryStr);
@@ -199,10 +201,10 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
  */
 function initEvents(): void {
   // 使用物品事件中心注册，减少触发器数量
-  itemEventCenter.onItemPickup((unit, item) => {
+  onItemPickup((unit, item) => {
     handleItemEvent(unit, item, true);
   });
-  itemEventCenter.onItemDrop((unit, item) => {
+  onItemDrop((unit, item) => {
     handleItemEvent(unit, item, false);
   });
 }

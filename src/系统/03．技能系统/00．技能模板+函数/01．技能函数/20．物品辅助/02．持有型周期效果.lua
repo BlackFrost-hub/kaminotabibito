@@ -11,7 +11,9 @@ local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_resul
 local _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF = ____require_result_1["获取单位当前持有指定物品数量"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
+local GetItemTypeId = jass.GetItemTypeId
 local _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 = {}
+local _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B = {}
 local _____5DF2_6CE8_518C_6301_6709_578B_5468_671F_6548_679C_4E2D_5FC3 = false
 local function _____83B7_53D6_5355_4F4DID(unit)
     if unit == nil or unit == 0 then
@@ -34,11 +36,11 @@ local function _____5904_7406_83B7_5F97(_____914D_7F6E, unit, _item, currentCoun
         end
         return
     end
-    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = currentCount}
+    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
     if previousCount <= 0 then
         local ____opt_4 = _____914D_7F6E["获取回调"]
         if ____opt_4 ~= nil then
-            ____opt_4(unit, currentCount)
+            ____opt_4(unit, 1)
         end
     end
 end
@@ -57,7 +59,7 @@ local function _____5904_7406_4E22_5F03(_____914D_7F6E, unit, _item, currentCoun
         end
         return
     end
-    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = currentCount}
+    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
 end
 local function ____on_6301_6709_578B_5468_671F_6548_679CTick()
     local now = getServerTime()
@@ -88,8 +90,8 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick()
                             end
                             goto __continue17
                         end
-                        _____72B6_6001["数量"] = currentCount
-                        _____914D_7F6E["周期回调"](_____72B6_6001["单位"], currentCount)
+                        _____72B6_6001["数量"] = 1
+                        _____914D_7F6E["周期回调"](_____72B6_6001["单位"], 1)
                     end
                     ::__continue17::
                 end
@@ -113,6 +115,50 @@ local function _____786E_4FDD_6301_6709_578B_5468_671F_6548_679C_4E2D_5FC3_5DF2_
     _____5DF2_6CE8_518C_6301_6709_578B_5468_671F_6548_679C_4E2D_5FC3 = true
     addPeriodicCallback(100, ____on_6301_6709_578B_5468_671F_6548_679CTick)
 end
+local function ____on_6301_6709_578B_5468_671F_6548_679C_83B7_53D6(unit, item, currentCount, previousCount)
+    if item == nil or item == 0 then
+        return
+    end
+    local itemTypeId = GetItemTypeId(item)
+    do
+        local i = 0
+        while i < #_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 do
+            local _____914D_7F6E = _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[i + 1]
+            if _____914D_7F6E["物品类型ID"] == itemTypeId then
+                _____5904_7406_83B7_5F97(
+                    _____914D_7F6E,
+                    unit,
+                    item,
+                    currentCount,
+                    previousCount
+                )
+            end
+            i = i + 1
+        end
+    end
+end
+local function ____on_6301_6709_578B_5468_671F_6548_679C_4E22_5F03(unit, item, currentCount, previousCount)
+    if item == nil or item == 0 then
+        return
+    end
+    local itemTypeId = GetItemTypeId(item)
+    do
+        local i = 0
+        while i < #_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 do
+            local _____914D_7F6E = _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[i + 1]
+            if _____914D_7F6E["物品类型ID"] == itemTypeId then
+                _____5904_7406_4E22_5F03(
+                    _____914D_7F6E,
+                    unit,
+                    item,
+                    currentCount,
+                    previousCount
+                )
+            end
+            i = i + 1
+        end
+    end
+end
 ____exports["注册持有型周期效果"] = function(_____53C2_6570)
     if _____53C2_6570 == nil or _____53C2_6570["物品类型ID"] == 0 or _____53C2_6570["间隔毫秒"] <= 0 or _____53C2_6570["周期回调"] == nil then
         return
@@ -127,22 +173,9 @@ ____exports["注册持有型周期效果"] = function(_____53C2_6570)
         }
     )
     _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[#_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 + 1] = _____914D_7F6E
-    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(
-        _____53C2_6570["物品类型ID"],
-        function(unit, item, currentCount, previousCount) return _____5904_7406_83B7_5F97(
-            _____914D_7F6E,
-            unit,
-            item,
-            currentCount,
-            previousCount
-        ) end,
-        function(unit, item, currentCount, previousCount) return _____5904_7406_4E22_5F03(
-            _____914D_7F6E,
-            unit,
-            item,
-            currentCount,
-            previousCount
-        ) end
-    )
+    if _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B[_____53C2_6570["物品类型ID"]] ~= true then
+        _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B[_____53C2_6570["物品类型ID"]] = true
+        _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(_____53C2_6570["物品类型ID"], ____on_6301_6709_578B_5468_671F_6548_679C_83B7_53D6, ____on_6301_6709_578B_5468_671F_6548_679C_4E22_5F03)
+    end
 end
 return ____exports

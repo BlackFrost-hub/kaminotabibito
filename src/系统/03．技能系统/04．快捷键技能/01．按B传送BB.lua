@@ -36,7 +36,7 @@ local function onBKeyTeleport(self)
     end
     local mouseX = japi.DzGetMouseTerrainX()
     local mouseY = japi.DzGetMouseTerrainY()
-    local abilityId = stringToFourCC(nil, BB_TELEPORT_ABILITY)
+    local abilityId = stringToFourCC(BB_TELEPORT_ABILITY)
     jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY)
     SelectUnitForPlayerSingle(nil, bbUnit, player)
 end

@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 
 const jass = require("jass.common") as any;
 
@@ -35,12 +35,13 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 }).stringToFourCCSafe;
 
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const GetUnitX = jass.GetUnitX as (unit: any) => number;
-const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const GetUnitState = jass.GetUnitState as (unit: any, unitState: any) => number;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
+const GetUnitState = jass.GetUnitState as (this: void, unit: any, unitState: any) => number;
 const UnitDamageTarget = jass.UnitDamageTarget as (
+  this: void,
   source: any,
   target: any,
   amount: number,
@@ -131,14 +132,18 @@ function 调整冥炎之裙女性全属性(this: void, unit: any, deltaCount: nu
 
 function on获得冥炎之裙(this: void, unit: any, _item: any, currentCount: number, previousCount: number): void {
   if (!单位是英雄(unit)) return;
-  调整冥炎之裙女性全属性(unit, currentCount - previousCount);
-  同步冥炎之裙持有表现(unit, currentCount);
+  if (previousCount <= 0 && currentCount > 0) {
+    调整冥炎之裙女性全属性(unit, 1);
+  }
+  同步冥炎之裙持有表现(unit, currentCount > 0 ? 1 : 0);
 }
 
 function on失去冥炎之裙(this: void, unit: any, _item: any, currentCount: number, previousCount: number): void {
   if (!单位是英雄(unit)) return;
-  调整冥炎之裙女性全属性(unit, currentCount - previousCount);
-  同步冥炎之裙持有表现(unit, currentCount);
+  if (currentCount <= 0 && previousCount > 0) {
+    调整冥炎之裙女性全属性(unit, -1);
+  }
+  同步冥炎之裙持有表现(unit, currentCount > 0 ? 1 : 0);
 }
 
 function on冥炎之裙周期(this: void): void {
@@ -161,7 +166,7 @@ function on冥炎之裙周期(this: void): void {
 
     if (!单位存活(unit)) continue;
 
-    const damage = 冥炎之裙配置.每层每秒火焰伤害 * count;
+    const damage = 冥炎之裙配置.每层每秒火焰伤害;
     const targets = getUnitsInRange(GetUnitX(unit), GetUnitY(unit), 冥炎之裙配置.作用范围);
     for (let j = 0; j < targets.length; j++) {
       const target = targets[j];

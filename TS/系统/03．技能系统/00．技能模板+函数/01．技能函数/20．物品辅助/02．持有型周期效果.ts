@@ -18,7 +18,8 @@ const {
 };
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 
 export interface 持有型周期效果参数 {
   物品类型ID: number;
@@ -39,6 +40,7 @@ type 持有型周期效果实例 = 持有型周期效果参数 & {
 };
 
 const 持有型周期效果实例表: 持有型周期效果实例[] = [];
+const 已注册监听物品类型: Record<number, boolean | undefined> = {};
 let 已注册持有型周期效果中心 = false;
 
 function 获取单位ID(this: void, unit: any): number {
@@ -57,9 +59,9 @@ function 处理获得(this: void, 配置: 持有型周期效果实例, unit: any
     return;
   }
 
-  配置.单位状态[unitId] = { 单位: unit, 数量: currentCount };
+  配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
   if (previousCount <= 0) {
-    配置.获取回调?.(unit, currentCount);
+    配置.获取回调?.(unit, 1);
   }
 }
 
@@ -73,7 +75,7 @@ function 处理丢弃(this: void, 配置: 持有型周期效果实例, unit: any
     }
     return;
   }
-  配置.单位状态[unitId] = { 单位: unit, 数量: currentCount };
+  配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
 }
 
 function on持有型周期效果Tick(this: void): void {
@@ -99,8 +101,8 @@ function on持有型周期效果Tick(this: void): void {
         continue;
       }
 
-      状态.数量 = currentCount;
-      配置.周期回调(状态.单位, currentCount);
+      状态.数量 = 1;
+      配置.周期回调(状态.单位, 1);
     }
 
     for (let j = 0; j < 待清理.length; j++) {
@@ -115,6 +117,28 @@ function 确保持有型周期效果中心已注册(this: void): void {
   addPeriodicCallback(100, on持有型周期效果Tick);
 }
 
+function on持有型周期效果获取(this: void, unit: any, item: any, currentCount: number, previousCount: number): void {
+  if (item == null || item === 0) return;
+  const itemTypeId = GetItemTypeId(item);
+  for (let i = 0; i < 持有型周期效果实例表.length; i++) {
+    const 配置 = 持有型周期效果实例表[i];
+    if (配置.物品类型ID === itemTypeId) {
+      处理获得(配置, unit, item, currentCount, previousCount);
+    }
+  }
+}
+
+function on持有型周期效果丢弃(this: void, unit: any, item: any, currentCount: number, previousCount: number): void {
+  if (item == null || item === 0) return;
+  const itemTypeId = GetItemTypeId(item);
+  for (let i = 0; i < 持有型周期效果实例表.length; i++) {
+    const 配置 = 持有型周期效果实例表[i];
+    if (配置.物品类型ID === itemTypeId) {
+      处理丢弃(配置, unit, item, currentCount, previousCount);
+    }
+  }
+}
+
 export function 注册持有型周期效果(this: void, 参数: 持有型周期效果参数): void {
   if (参数 == null || 参数.物品类型ID === 0 || 参数.间隔毫秒 <= 0 || 参数.周期回调 == null) return;
   确保持有型周期效果中心已注册();
@@ -126,12 +150,10 @@ export function 注册持有型周期效果(this: void, 参数: 持有型周期�
   };
   持有型周期效果实例表.push(配置);
 
-  监听指定物品获取丢弃(
-    参数.物品类型ID,
-    (unit, item, currentCount, previousCount) => 处理获得(配置, unit, item, currentCount, previousCount),
-    (unit, item, currentCount, previousCount) => 处理丢弃(配置, unit, item, currentCount, previousCount),
-  );
+  if (已注册监听物品类型[参数.物品类型ID] !== true) {
+    已注册监听物品类型[参数.物品类型ID] = true;
+    监听指定物品获取丢弃(参数.物品类型ID, on持有型周期效果获取, on持有型周期效果丢弃);
+  }
 }
 
 export {};
-

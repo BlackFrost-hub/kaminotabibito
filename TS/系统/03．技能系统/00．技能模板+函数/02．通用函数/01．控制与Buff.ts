@@ -44,6 +44,18 @@ export {
   移除单位指定Buff,
 } from "../../../05．Buff系统/00．Buff系统";
 
+export { getUnitBurn } from "../../../04．伤害系统/02．dot伤害";
+
+export {
+  施加单体护甲降低Buff,
+  施加范围护甲降低Buff,
+} from "../01．技能函数/19．拓展效果/01．debuff/04．护甲降低";
+
+export {
+  施加移速提升Buff,
+  清除单位移速提升Buff,
+} from "../01．技能函数/19．拓展效果/02．buff/04．移速提升";
+
 export {
   移除单位指定类型Buff,
   移除单位增益Buff,
@@ -127,6 +139,16 @@ export function 清除单位可驱散增益Buff(单位: any): number {
 /** 清除单位可驱散负面 Buff（只清 Buff 表 `canPurge: true` 的 `Debuff:` 条目）。 */
 export function 清除单位可驱散负面Buff(单位: any): number {
   return 移除单位负面Buff(单位, true);
+}
+
+/** 清除单位燃烧 Buff（会同步结束 D002 对应的 DOT）。 */
+export function 清除单位燃烧Buff(单位: any): number {
+  return 移除单位指定Buff(单位, "D002") ? 1 : 0;
+}
+
+/** 清除单位护甲降低 Buff（会触发 C032 的护甲回滚）。 */
+export function 清除单位护甲降低Buff(单位: any): number {
+  return 移除单位指定Buff(单位, "C032") ? 1 : 0;
 }
 
 /** 清除单位控制类负面 Buff（Buff 表 type 以 `Debuff:control` 开头）。 */

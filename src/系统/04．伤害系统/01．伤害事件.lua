@@ -40,20 +40,17 @@ function onAnyUnitDamagedAction()
     end
     local fromDotTickBatchForEvent = ____temp_3
     if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
-        pcall(function ()
-                local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-                local ____temp_4
-                if dmgCalc ~= nil then
-                    ____temp_4 = dmgCalc.onDamageEvent
-                else
-                    ____temp_4 = nil
-                end
-                local onDamageEvent = ____temp_4
-                if onDamageEvent ~= nil then
-                    onDamageEvent(savedUnit, savedSource, savedDamage)
-                end
-            end
-        )
+        local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+        local ____temp_4
+        if dmgCalc ~= nil then
+            ____temp_4 = dmgCalc.onDamageEvent
+        else
+            ____temp_4 = nil
+        end
+        local onDamageEvent = ____temp_4
+        if onDamageEvent ~= nil then
+            onDamageEvent(savedUnit, savedSource, savedDamage)
+        end
     end
     local i = 0
     while i < DamageEventNumber do
@@ -130,7 +127,7 @@ function processDamageEntry(self, entry)
                 local cb = DamageCallbacks[c + 1]
                 if cb ~= nil then
                     if _____4F24_5BB3_8BA1_7B97_56DE_8C03 ~= nil and cb == _____4F24_5BB3_8BA1_7B97_56DE_8C03 then
-                        goto __continue34
+                        goto __continue33
                     end
                     cb(
                         nil,
@@ -143,7 +140,7 @@ function processDamageEntry(self, entry)
                     )
                 end
             end
-            ::__continue34::
+            ::__continue33::
             c = c + 1
         end
     end

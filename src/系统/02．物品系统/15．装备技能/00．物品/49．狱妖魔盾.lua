@@ -26,12 +26,16 @@ local onItemDrop = ____require_result_0.onItemDrop
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
-local _____5F00_59CB_62A4_76FE = ____require_result_2["开始护盾"]
-local _____62A4_76FE_7C7B_578B = ____require_result_2["护盾类型"]
-local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_2["查询单位标签护盾值"]
-local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_2["充能单位标签护盾"]
-local _____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_2["移除单位标签护盾"]
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.07．单位组工具")
+local _____5FEB_7167_5355_4F4D_7EC4 = ____require_result_3["快照单位组"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
+local _____5F00_59CB_62A4_76FE = ____require_result_4["开始护盾"]
+local _____62A4_76FE_7C7B_578B = ____require_result_4["护盾类型"]
+local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_4["查询单位标签护盾值"]
+local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_4["充能单位标签护盾"]
+local _____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_4["移除单位标签护盾"]
 local _____72F1_5996_9B54_76FE_914D_7F6E = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["狱妖魔盾"]
 local _____72F1_5996_9B54_76FE_7269_54C1ID = _____7269_54C1_4F7F_7528_88C5_5907ID["狱妖魔盾"]
 local _____72F1_5996_9B54_76FE_62A4_76FE_6807_7B7E = "装备:狱妖魔盾"
@@ -40,6 +44,9 @@ local _____6301_6709_8005_8868 = {}
 local _____51B7_5374_5230_671F_8868 = {}
 local _____5DF2_521D_59CB_5316 = false
 local _____5DF2_6CE8_518C_5145_80FD_8BA1_65F6_5668 = false
+local function _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4()
+    return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
+end
 local function _____52A0_5165_6301_6709_8005(_____5355_4F4D)
     local id = _____53D6_53E5_67C4ID(_____5355_4F4D)
     if id == 0 or _____6301_6709_8005_8868[id] ~= nil then
@@ -137,7 +144,32 @@ local function _____5C1D_8BD5_5145_80FD_72F1_5996_9B54_76FE(_____5355_4F4D)
         })
     end
 end
+local function _____8865_767B_8BB0_73B0_6709_6301_6709_8005()
+    local _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4()
+    if _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 == nil or _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 == 0 then
+        return
+    end
+    local _____5355_4F4D_5217_8868 = _____5FEB_7167_5355_4F4D_7EC4(_____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4)
+    do
+        local i = 0
+        while i < #_____5355_4F4D_5217_8868 do
+            do
+                local _____5355_4F4D = _____5355_4F4D_5217_8868[i + 1]
+                if not _____5355_4F4D_662F_82F1_96C4(_____5355_4F4D) then
+                    goto __continue27
+                end
+                if not _____5355_4F4D_6301_6709_7269_54C1(_____5355_4F4D, _____72F1_5996_9B54_76FE_7269_54C1ID) then
+                    goto __continue27
+                end
+                _____52A0_5165_6301_6709_8005(_____5355_4F4D)
+            end
+            ::__continue27::
+            i = i + 1
+        end
+    end
+end
 local function ____on_72F1_5996_9B54_76FE_5145_80FDTick()
+    _____8865_767B_8BB0_73B0_6709_6301_6709_8005()
     do
         local i = #_____6301_6709_8005_5217_8868 - 1
         while i >= 0 do

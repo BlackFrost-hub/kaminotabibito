@@ -34,6 +34,8 @@ local _____83B7_53D6_5355_4F4D_82F1_96C4_6B66_5668_7C7B_578B = ____require_resul
 local ____require_result_13 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local YDWEIsEventDamageType = ____require_result_13.YDWEIsEventDamageType
 local YDWEIsEventAttackType = ____require_result_13.YDWEIsEventAttackType
+local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
+local _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7 = ____require_result_14["装备触发概率通过"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -46,7 +48,6 @@ local UnitDamageTarget = jass.UnitDamageTarget
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
-local GetRandomReal = jass.GetRandomReal
 local EXSetEffectSize = japi.EXSetEffectSize
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -60,11 +61,11 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
-local ____jass_DAMAGE_TYPE_DIVINE_14 = jass.DAMAGE_TYPE_DIVINE
-if ____jass_DAMAGE_TYPE_DIVINE_14 == nil then
-    ____jass_DAMAGE_TYPE_DIVINE_14 = jass.DAMAGE_TYPE_UNIVERSAL
+local ____jass_DAMAGE_TYPE_DIVINE_15 = jass.DAMAGE_TYPE_DIVINE
+if ____jass_DAMAGE_TYPE_DIVINE_15 == nil then
+    ____jass_DAMAGE_TYPE_DIVINE_15 = jass.DAMAGE_TYPE_UNIVERSAL
 end
-local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_14
+local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_15
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -91,12 +92,16 @@ local function _____4F24_5BB3_5FEB_7167_662F_666E_901A_653B_51FB_7C7B_578B(snaps
     end
     return YDWEIsEventAttackType(ATTACK_TYPE_NORMAL) == true
 end
+--- 按装备名反查物品 FourCC（数字）
+-- 注意：按名字反查物品ID 返回的是 string raw id（如"I021"），
+-- 需要经 stringToFourCCSafe 转为数字才能传给 UnitHasItemOfTypeBJ。
 ____exports["获取攻击效果装备ID"] = function(_____88C5_5907_540D)
     local cached = _____88C5_5907ID_7F13_5B58[_____88C5_5907_540D]
     if cached ~= nil then
         return cached
     end
-    local id = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
+    local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
+    local id = type(rawId) == "string" and stringToFourCCSafe(rawId) or 0
     _____88C5_5907ID_7F13_5B58[_____88C5_5907_540D] = id
     return id
 end
@@ -230,14 +235,11 @@ ____exports["距离满足限制"] = function(source, target, minDistance, maxDis
     end
     return true
 end
-____exports["命中概率通过"] = function(probability)
-    if probability == nil or probability >= 1 then
+____exports["命中概率通过"] = function(probability, source)
+    if probability == nil then
         return true
     end
-    if probability <= 0 then
-        return false
-    end
-    return GetRandomReal(0, 1) <= probability
+    return _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7(probability, source)
 end
 ____exports["解析攻击效果伤害类型"] = function(_____7C7B_578B)
     if _____7C7B_578B == "火焰" then
@@ -333,17 +335,17 @@ ____exports["获取敌方范围单位"] = function(source, center, radius, inclu
             do
                 local unit = list[i + 1]
                 if not ____exports["单位有效存活"](unit) then
-                    goto __continue71
+                    goto __continue70
                 end
                 if not includeCenter and unit == center then
-                    goto __continue71
+                    goto __continue70
                 end
                 if isUnitEnemy(unit, source) ~= true then
-                    goto __continue71
+                    goto __continue70
                 end
                 result[#result + 1] = unit
             end
-            ::__continue71::
+            ::__continue70::
             i = i + 1
         end
     end

@@ -7,9 +7,10 @@ local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_0["按名�
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local RectContainsUnit = jass.RectContainsUnit
-local _____6C99_6F20_533A_57DF1 = _G.gg_rct______________u
-local _____6C99_6F20_533A_57DF2 = _G.gg_rct______________047
+local _____6C99_6F20_533A_57DF1 = jglobals.gg_rct______________u
+local _____6C99_6F20_533A_57DF2 = jglobals.gg_rct______________047
 local function _____53D6_88C5_5907_7269_54C1ID(_____88C5_5907_540D_79F0)
     local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D_79F0)
     if rawId == nil or rawId == "" then

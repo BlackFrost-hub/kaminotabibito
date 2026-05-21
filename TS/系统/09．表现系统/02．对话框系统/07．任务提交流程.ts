@@ -1,6 +1,7 @@
 const jass = require("jass.common") as any;
-const 封装函数 = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+  fourCCToString: (this: void, four: number) => string;
 };
 
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
@@ -17,7 +18,7 @@ import { questDB } from "../../08．任务系统/01．任务数据";
 import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./08．任务奖励执行";
 import { showLocalHint } from "./02．对话框业务逻辑";
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 import { setQuestState } from "./03．任务状态";
 import { removeQuestMarkerAfterNpcTriggered } from "./09．NPC头顶与气泡特效";
@@ -89,8 +90,8 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
     for (let slot = 0; slot < 6; slot++) {
       const item = jass.UnitItemInSlot(hero, slot);
       if (!item) continue;
-      const itemId = jass.GetItemTypeId(item) as number;
-      const itemCode = 封装函数.fourCCToString(itemId);
+      const itemId = GetItemTypeId(item) as number;
+      const itemCode = fourCCToString(itemId);
       const data = (itemsData as Record<string, any>)[itemCode];
       if (!data) continue;
       if ((data.type || "") !== "道具/戒指/饰品") continue;

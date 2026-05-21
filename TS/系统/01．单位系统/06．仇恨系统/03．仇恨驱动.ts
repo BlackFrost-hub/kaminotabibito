@@ -6,7 +6,7 @@
  * 1. 遍历所有有仇恨表的敌人
  * 2. 死亡清理
  * 3. 选择应攻击目标（filter 排除死亡/超距）
- * 4. 目标变更时更新缓存；同目标也每 tick 补发 attack 命令维持攻击
+ * 4. 目标变更时更新缓存并下发一次 attack 命令；同目标不重复抢命令
  *
  * 目标引用直接从仇恨表的 targetRef 获取，无需额外注册。
  */
@@ -56,10 +56,6 @@ const { 自动展开仇恨面板一次 } = require("系统.09．表现系统.05�
   自动展开仇恨面板一次: (this: void, playerId: number) => void;
 };
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -70,6 +66,7 @@ const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD;
 
 const MAX_DISTANCE_SQ = 2500 * 2500;
+const ISSUE_ORDER_DISTANCE_SQ = 1000 * 1000;
 let 周期回调ID = 0;
 const 模块名 = "仇恨系统";
 let _nowMs: (() => number) | null = null;
@@ -100,7 +97,7 @@ function 尝试自动展开目标玩家仇恨面板(this: void, target: any): vo
 }
 
 /** 过滤回调：单位死亡或超距时排除 */
-function 构建过滤函数(this: void, ex: number, ey: number): (entry: { targetHid: number; targetRef: any; threat: number }) => boolean {
+function 构建过滤函数(this: void, ex: number, ey: number, maxDistanceSq: number): (entry: { targetHid: number; targetRef: any; threat: number }) => boolean {
   return (entry): boolean => {
     const ref = entry.targetRef;
     if (ref == null || ref === 0) return false;
@@ -109,7 +106,7 @@ function 构建过滤函数(this: void, ex: number, ey: number): (entry: { targe
     const ty = GetUnitY(ref);
     const dx = tx - ex;
     const dy = ty - ey;
-    return dx * dx + dy * dy <= MAX_DISTANCE_SQ;
+    return dx * dx + dy * dy <= maxDistanceSq;
   };
 }
 
@@ -121,7 +118,6 @@ function onTick(): void {
     const 敌人ID = 敌人ID列表[i];
     const 敌人 = getEnemyRef(敌人ID);
     if (敌人 == null || 敌人 === 0) {
-      debugLogForce(模块名, "驱动清理：敌人引用丢失 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }
@@ -133,7 +129,6 @@ function onTick(): void {
 
     清理敌人过期仇恨条目ById(敌人ID);
     if (!hasThreatTable(敌人ID)) {
-      debugLogForce(模块名, "驱动清理：过期条目清完后已无仇恨表 敌人ID=", 敌人ID);
       清除仇恨显示ById(敌人ID);
       continue;
     }
@@ -146,11 +141,12 @@ function onTick(): void {
 
     const ex = GetUnitX(敌人);
     const ey = GetUnitY(敌人);
-    const filter = 构建过滤函数(ex, ey);
+    const filter = 构建过滤函数(ex, ey, MAX_DISTANCE_SQ);
+    const issueOrderFilter = 构建过滤函数(ex, ey, ISSUE_ORDER_DISTANCE_SQ);
     const best = 获取应攻击目标(敌人, filter);
+    const issueOrderBest = 获取应攻击目标(敌人, issueOrderFilter);
 
     if (best == null) {
-      debugLogForce(模块名, "驱动清理：未找到有效目标 敌人ID=", 敌人ID);
       清理敌人仇恨状态(敌人ID);
       continue;
     }
@@ -164,13 +160,14 @@ function onTick(): void {
     更新仇恨显示(敌人, best.targetRef, best.threat);
     尝试自动展开目标玩家仇恨面板(best.targetRef);
 
-    if (当前目标ID !== best.targetHid) {
-      // 目标变更：发命令 + 更新缓存
-      IssueTargetOrder(敌人, "attack", best.targetRef);
-      设置当前目标(敌人ID, best.targetHid);
-    } else {
-      // 目标没变，但每 tick 发一次命令维持攻击（引擎会过滤重复指令）
-      IssueTargetOrder(敌人, "attack", best.targetRef);
+    if (issueOrderBest == null || issueOrderBest.targetRef == null || issueOrderBest.targetRef === 0) {
+      continue;
+    }
+
+    if (当前目标ID !== issueOrderBest.targetHid) {
+      // 仅对 1000 码内存在的仇恨目标下攻击命令，避免远目标无视野时反复抢命令
+      IssueTargetOrder(敌人, "attack", issueOrderBest.targetRef);
+      设置当前目标(敌人ID, issueOrderBest.targetHid);
     }
   }
 }
@@ -187,7 +184,6 @@ export function 驱动单个敌人(敌人: any): void {
 
   清理敌人过期仇恨条目ById(敌人ID);
   if (!hasThreatTable(敌人ID)) {
-    debugLogForce(模块名, "单体驱动清理：过期条目清完后已无仇恨表 敌人ID=", 敌人ID);
     清除仇恨显示ById(敌人ID);
     return;
   }
@@ -200,11 +196,12 @@ export function 驱动单个敌人(敌人: any): void {
 
   const ex = GetUnitX(敌人);
   const ey = GetUnitY(敌人);
-  const filter = 构建过滤函数(ex, ey);
+  const filter = 构建过滤函数(ex, ey, MAX_DISTANCE_SQ);
+  const issueOrderFilter = 构建过滤函数(ex, ey, ISSUE_ORDER_DISTANCE_SQ);
   const best = 获取应攻击目标(敌人, filter);
+  const issueOrderBest = 获取应攻击目标(敌人, issueOrderFilter);
 
   if (best == null) {
-    debugLogForce(模块名, "单体驱动清理：未找到有效目标 敌人ID=", 敌人ID);
     清理敌人仇恨状态(敌人ID);
     return;
   }
@@ -218,12 +215,13 @@ export function 驱动单个敌人(敌人: any): void {
   更新仇恨显示(敌人, best.targetRef, best.threat);
   尝试自动展开目标玩家仇恨面板(best.targetRef);
 
-  if (当前目标ID !== best.targetHid) {
-    IssueTargetOrder(敌人, "attack", best.targetRef);
-    设置当前目标(敌人ID, best.targetHid);
-  } else {
-    // 目标没变也补发，和 onTick 保持一致
-    IssueTargetOrder(敌人, "attack", best.targetRef);
+  if (issueOrderBest == null || issueOrderBest.targetRef == null || issueOrderBest.targetRef === 0) {
+    return;
+  }
+
+  if (当前目标ID !== issueOrderBest.targetHid) {
+    IssueTargetOrder(敌人, "attack", issueOrderBest.targetRef);
+    设置当前目标(敌人ID, issueOrderBest.targetHid);
   }
 }
 
@@ -236,7 +234,6 @@ export function 初始化仇恨系统(): void {
   };
 
   周期回调ID = addPeriodicCallback(250, onTick);
-  debugLogForce(模块名, "初始化仇恨系统 周期ID=", 周期回调ID);
 }
 
 /** 停用仇恨系统 */
@@ -251,7 +248,6 @@ export function 停用仇恨系统(): void {
   周期回调ID = 0;
   清除所有当前目标();
   清除所有仇恨显示();
-  debugLogForce(模块名, "停用仇恨系统");
 }
 
 export {};

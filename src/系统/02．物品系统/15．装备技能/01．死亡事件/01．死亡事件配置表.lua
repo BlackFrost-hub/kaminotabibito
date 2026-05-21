@@ -55,6 +55,6 @@ ____exports["获取死亡事件配置"] = function()
     return _____7F13_5B58_914D_7F6E
 end
 ____exports["取物品四字码"] = function(_____7269_54C1ID)
-    return stringToFourCC(nil, _____7269_54C1ID)
+    return stringToFourCC(_____7269_54C1ID)
 end
 return ____exports

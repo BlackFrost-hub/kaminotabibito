@@ -45,6 +45,7 @@ ____exports.items.I00P = {
     hp = 50,
     hpRegen = 50,
     all = 2,
+    magicDmg = 0.5,
     cdReduction = 0.5,
     mpCost = -0.2,
     Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
@@ -1173,7 +1174,8 @@ ____exports.items.I04K = {
     goldPrice = 5000,
     score = 3195,
     level = "C-",
-    dmg = 85
+    dmg = 85,
+    atkSpeed = -0.33
 }
 ____exports.items.I04L = {
     type = "主武器",
@@ -1181,7 +1183,8 @@ ____exports.items.I04L = {
     goldPrice = 5000,
     score = 3236,
     level = "C-",
-    dmg = 85
+    dmg = 85,
+    atkSpeed = -0.75
 }
 ____exports.items.I0AM = {
     type = "道具/戒指/饰品",
@@ -2242,17 +2245,6 @@ ____exports.items.I06A = {
     magicResist = 0.1,
     physResist = 0.1
 }
-____exports.items.I06B = {
-    type = "鞋子",
-    name = "安恶之鞋",
-    goldPrice = 1000,
-    level = "D-",
-    dmg = 35,
-    armor = 10,
-    hp = 1000,
-    fireResist = 0.2,
-    movespeed2 = 75
-}
 ____exports.items.I06C = {
     type = "主武器",
     name = "瑟尔之弓",
@@ -2369,7 +2361,8 @@ ____exports.items.I06N = {
     level = "D+",
     hp = 1000,
     magicPierce = 0.2,
-    magicDmg = 0.2
+    magicDmg = 0.2,
+    fireDmg = 0.25
 }
 ____exports.items.I06O = {
     type = "道具/戒指/饰品",
@@ -2954,7 +2947,7 @@ ____exports.items.I08K = {
 }
 ____exports.items.I08L = {
     type = "道具/戒指/饰品",
-    name = "|cffcc99ff黑暗猎人手套|r",
+    name = "|cffcc99ff黑暗猎魔手套|r",
     goldPrice = 1000,
     dmg = 65,
     magicResist = 0.1,
@@ -3485,15 +3478,6 @@ ____exports.items.I0CW = {type = "任务", name = "领取技能", goldPrice = 20
 ____exports.items.I0CX = {type = "任务", name = "领悟暗之力", goldPrice = 2000}
 ____exports.items.I0CY = {type = "材料", name = "荧光草", goldPrice = 0}
 ____exports.items.I0D0 = {type = "任务", name = "接受任务-|cffff0000狩猎食人魔（等级24）|r", goldPrice = 0}
-____exports.items.I0D2 = {
-    type = "道具/戒指/饰品",
-    name = "|cffcc99ff黑暗猎人手套|r",
-    goldPrice = 1000,
-    dmg = 65,
-    magicResist = 0.1,
-    darkDmg = 0.25,
-    abilList = "A09Q"
-}
 ____exports.items.I0D3 = {
     type = "主武器",
     name = "|cffffcc99沙烈魔斧|r",

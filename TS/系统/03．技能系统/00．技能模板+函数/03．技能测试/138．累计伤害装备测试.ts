@@ -21,7 +21,7 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  stringToFourCC: (s: string | undefined | null) => number;
+  stringToFourCC: (this: void, s: string | undefined | null) => number;
 };
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;

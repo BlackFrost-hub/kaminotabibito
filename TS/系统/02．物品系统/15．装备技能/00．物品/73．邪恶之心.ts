@@ -25,7 +25,7 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, 
 
 function on邪恶之心周期(this: void, unit: any): void {
   const amount = 邪恶之心配置.固定扣血 + 取最大生命(unit) * 邪恶之心配置.最大生命扣血比例;
-  减少生命值(unit, amount, false, true, undefined, 1);
+  减少生命值(unit, amount, true, true, undefined, 1);
   if (!单位存活(unit)) return;
   if (取最大生命(unit) < 邪恶之心配置.死亡最小最大生命 || 取当前生命(unit) < 邪恶之心配置.死亡最小当前生命) {
     KillUnit(unit);

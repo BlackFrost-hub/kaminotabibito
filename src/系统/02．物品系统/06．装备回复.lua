@@ -15,39 +15,41 @@ local ____exports = {}
 -- 不再使用 `udg_TempReal` / `gg_trg_物品治疗触发` 等旧全局。
 -- 规则：`.cursor/rules/equipment/heal-hot-format.md` / `heal-use-item.md`
 local jass = require("jass.common")
-local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_GetTable = ____require_result_0.STES_GetTable
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Get = ____require_result_1.YDLocal5Get
-local YDLocal5Set = ____require_result_1.YDLocal5Set
-local YDLocal7Set = ____require_result_1.YDLocal7Set
-local getG_SIndex = ____require_result_1.getG_SIndex
-local setG_SIndex = ____require_result_1.setG_SIndex
-local setG_LIndex = ____require_result_1.setG_LIndex
-local _indexStack = ____require_result_1._indexStack
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-local ydlStes_syncTriggerStep = ____require_result_2.ydlStes_syncTriggerStep
-local ydlStes_finishChildCleanup = ____require_result_2.ydlStes_finishChildCleanup
-local ydlStes_readString5 = ____require_result_2.ydlStes_readString5
-local ydlStes_readReal5 = ____require_result_2.ydlStes_readReal5
-local ydlStes_skeyIndex = ____require_result_2.ydlStes_skeyIndex
-local registerStesListener = ____require_result_2.registerStesListener
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
-local YDLocalExecuteTrigger = ____require_result_3.YDLocalExecuteTrigger
-local YDTriggerExecuteTrigger = ____require_result_3.YDTriggerExecuteTrigger
-local saveParentIndex = ____require_result_3.saveParentIndex
-local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_4.safeTimerStart
-local safeDestroyTimer = ____require_result_4.safeDestroyTimer
+local GetItemTypeId = jass.GetItemTypeId
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local onItemUse = ____require_result_0.onItemUse
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_GetTable = ____require_result_1.STES_GetTable
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+local YDLocal5Get = ____require_result_2.YDLocal5Get
+local YDLocal5Set = ____require_result_2.YDLocal5Set
+local YDLocal7Set = ____require_result_2.YDLocal7Set
+local getG_SIndex = ____require_result_2.getG_SIndex
+local setG_SIndex = ____require_result_2.setG_SIndex
+local setG_LIndex = ____require_result_2.setG_LIndex
+local _indexStack = ____require_result_2._indexStack
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ydlStes_syncTriggerStep = ____require_result_3.ydlStes_syncTriggerStep
+local ydlStes_finishChildCleanup = ____require_result_3.ydlStes_finishChildCleanup
+local ydlStes_readString5 = ____require_result_3.ydlStes_readString5
+local ydlStes_readReal5 = ____require_result_3.ydlStes_readReal5
+local ydlStes_skeyIndex = ____require_result_3.ydlStes_skeyIndex
+local registerStesListener = ____require_result_3.registerStesListener
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.04．YDWE_trigger")
+local YDLocalExecuteTrigger = ____require_result_4.YDLocalExecuteTrigger
+local YDTriggerExecuteTrigger = ____require_result_4.YDTriggerExecuteTrigger
+local saveParentIndex = ____require_result_4.saveParentIndex
+local ____require_result_5 = require("系统.00．核心系统.07．联机安全工具")
+local safeTimerStart = ____require_result_5.safeTimerStart
+local safeDestroyTimer = ____require_result_5.safeDestroyTimer
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local fourCCToString = ____require_result_5.fourCCToString
-local isSpecialUnit = ____require_result_5.isSpecialUnit
-local ____require_result_6 = require("系统.02．物品系统.06．装备回复_hot")
-local parseEquipHealSegments = ____require_result_6.parseEquipHealSegments
-local calcEquipHealHpMp = ____require_result_6.calcEquipHealHpMp
-local sumHealFromItemData = ____require_result_6.sumHealFromItemData
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local fourCCToString = ____require_result_6.fourCCToString
+local isSpecialUnit = ____require_result_6.isSpecialUnit
+local ____require_result_7 = require("系统.02．物品系统.06．装备回复_hot")
+local parseEquipHealSegments = ____require_result_7.parseEquipHealSegments
+local calcEquipHealHpMp = ____require_result_7.calcEquipHealHpMp
+local sumHealFromItemData = ____require_result_7.sumHealFromItemData
 --- 与地图 STES / JASS `StringHash` 一致
 ____exports.ITEM_HEAL_STES_EVENT = "物品治疗事件"
 --- YDLocal5 / YDLocal7 同名键（5=传参，7=返回值）
@@ -154,7 +156,7 @@ local function onItemHealStesChild()
                     unit,
                     item,
                     itemsData,
-                    function(n) return fourCCToString(nil, n) end
+                    function(n) return fourCCToString(n) end
                 )
                 if inf.ok then
                     hp = inf.hp
@@ -162,9 +164,9 @@ local function onItemHealStesChild()
                     filledFromItemData = true
                 end
             end
-            local ____applyHpMpToUnitAndGetApplied_result_7 = applyHpMpToUnitAndGetApplied(unit, hp, mp)
-            local hpApplied = ____applyHpMpToUnitAndGetApplied_result_7.hpApplied
-            local mpApplied = ____applyHpMpToUnitAndGetApplied_result_7.mpApplied
+            local ____applyHpMpToUnitAndGetApplied_result_8 = applyHpMpToUnitAndGetApplied(unit, hp, mp)
+            local hpApplied = ____applyHpMpToUnitAndGetApplied_result_8.hpApplied
+            local mpApplied = ____applyHpMpToUnitAndGetApplied_result_8.mpApplied
             local hp7 = filledFromItemData and hp or hpApplied
             local mp7 = filledFromItemData and mp or mpApplied
             YDLocal7Set(nil, "real", YL_HP, hp7)
@@ -181,9 +183,9 @@ local function onItemHealStesChild()
     end
 end
 local function executeSegment(unit, item, seg)
-    local ____calcEquipHealHpMp_result_8 = calcEquipHealHpMp(nil, seg.tokens, unit)
-    local hp = ____calcEquipHealHpMp_result_8.hp
-    local mp = ____calcEquipHealHpMp_result_8.mp
+    local ____calcEquipHealHpMp_result_9 = calcEquipHealHpMp(nil, seg.tokens, unit)
+    local hp = ____calcEquipHealHpMp_result_9.hp
+    local mp = ____calcEquipHealHpMp_result_9.mp
     fireItemHealEvent(
         unit,
         item,
@@ -232,8 +234,8 @@ local function onUseItem()
     if isSpecialUnit(nil, unit) then
         return
     end
-    local itemId = jass.GetItemTypeId(item)
-    local idStr = fourCCToString(nil, itemId)
+    local itemId = GetItemTypeId(item)
+    local idStr = fourCCToString(itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
         return
@@ -298,7 +300,7 @@ local function init()
         )
         glob[STES_REG_KEY] = true
     end
-    itemEventCenter:onItemUse(function(unit, item)
+    onItemUse(function(unit, item)
         onUseItem()
     end)
 end

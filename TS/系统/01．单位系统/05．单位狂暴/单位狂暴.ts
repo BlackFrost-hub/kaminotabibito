@@ -4,7 +4,7 @@
  */
 const jass = require("jass.common") as JassCommon;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.index") as {
   EXSetUnitFacing: (u: any, angle: number) => void;

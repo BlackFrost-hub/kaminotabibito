@@ -15,7 +15,7 @@ const ____npcEffect = require("系统.09．表现系统.02．对话框系统.09�
 };
 function getDialogNpcUnit(this: void, playerId: number): any { return ____npcEffect.getNpcUnit(playerId); }
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 import { findDialogConfig } from "./03．任务状态";
 import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./03．任务状态";

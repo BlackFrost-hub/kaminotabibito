@@ -5,10 +5,11 @@ import { 单位持有伤害事件装备 } from "../04．伤害事件/00．公共
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as { 按名字反查物品ID: (this: void, name: string) => string | undefined };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as { stringToFourCCSafe: (this: void, s: string | undefined | null) => number };
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 const RectContainsUnit = jass.RectContainsUnit as (whichRect: any, whichUnit: any) => boolean;
 
-const 沙漠区域1 = (globalThis as any).gg_rct______________u;
-const 沙漠区域2 = (globalThis as any).gg_rct______________047;
+const 沙漠区域1 = jglobals.gg_rct______________u;
+const 沙漠区域2 = jglobals.gg_rct______________047;
 
 function 取装备物品ID(this: void, 装备名称: string): number {
   const rawId = 按名字反查物品ID(装备名称);

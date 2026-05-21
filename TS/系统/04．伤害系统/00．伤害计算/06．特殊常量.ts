@@ -5,7 +5,7 @@
  * 这里使用通用 FourCC 转换工具函数进行转换。
  */
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 
 //=============================================================================

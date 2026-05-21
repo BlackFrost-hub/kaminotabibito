@@ -2,7 +2,7 @@
 
 const jass = require("jass.common") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 const { 获取单位英雄Rawcode } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位英雄Rawcode: (this: void, unit: any) => string;

@@ -45,7 +45,7 @@ const dataMod = require("系统.02．物品系统.01．装备数据") as {
   default?: Record<string, { score?: number }>;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;

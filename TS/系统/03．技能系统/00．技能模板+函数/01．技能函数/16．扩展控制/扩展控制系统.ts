@@ -20,6 +20,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: { sourceName?: string }) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
+const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  施加快速控制Buff: (this: void, 来源单位: any, 目标单位: any, 控制ID: number, 持续时间: number) => void;
+};
 const { addDelayedCallback, addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
@@ -42,6 +45,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 };
 const {
   获取扩展控制定义,
+  获取控制效果定义,
   默认魅惑跟随半径,
   魅惑特效模型,
   恐惧特效模型,
@@ -51,6 +55,7 @@ const {
   扩展控制特效挂点,
 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.控制效果定义") as {
   获取扩展控制定义: (this: void, 类型: 扩展控制类型) => 控制效果定义;
+  获取控制效果定义: (this: void, 类型: 扩展控制兼容类型 | string) => 控制效果定义 | undefined;
   默认魅惑跟随半径: number;
   魅惑特效模型: string;
   恐惧特效模型: string;
@@ -61,6 +66,7 @@ const {
 };
 
 import type {
+  扩展控制兼容类型,
   扩展控制类型,
   扩展控制参数,
   嘲讽参数,
@@ -449,22 +455,21 @@ function 生效扩展控制首帧(记录: 扩展控制记录): void {
 export function 施加扩展控制(
   来源单位或Self: any,
   目标单位或来源单位: any,
-  类型或目标单位: 扩展控制类型 | any,
-  参数或类型: 扩展控制参数 | number | 扩展控制类型,
+  类型或目标单位: 扩展控制兼容类型 | any,
+  参数或类型: 扩展控制参数 | number | 扩展控制兼容类型,
   兼容参数?: 扩展控制参数 | number
 ): number {
   let 来源单位 = 来源单位或Self;
   let 目标单位 = 目标单位或来源单位;
-  let 类型 = 类型或目标单位 as 扩展控制类型;
+  let 类型 = 类型或目标单位 as 扩展控制兼容类型;
   let 参数 = 参数或类型 as 扩展控制参数 | number;
   if (兼容参数 != null) {
     来源单位 = 目标单位或来源单位;
     目标单位 = 类型或目标单位;
-    类型 = 参数或类型 as 扩展控制类型;
+    类型 = 参数或类型 as 扩展控制兼容类型;
     参数 = 兼容参数;
   }
   if (!单位有效且存活(来源单位) || !单位有效且存活(目标单位) || 参数 == null) return 0;
-  确保初始化();
   const 规范参数 = 规范化扩展控制参数(参数);
   let 实际持续时间 = 取持续时间(规范参数);
   if (实际持续时间 <= 0) return 0;
@@ -472,12 +477,21 @@ export function 施加扩展控制(
     实际持续时间 = calcReducedControlDuration(目标单位, 实际持续时间);
   }
   if (实际持续时间 <= 0) return 0;
+  const 定义 = 获取控制效果定义(类型);
+  if (定义 == null) return 0;
   const 目标ID = 取单位ID(目标单位);
   if (目标ID === 0) return 0;
+  if (定义.类型分类 === "快速控制") {
+    if (定义.快速控制ID == null) return 0;
+    施加快速控制Buff(来源单位, 目标单位, 定义.快速控制ID, 实际持续时间);
+    debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
+    return 目标ID;
+  }
+  确保初始化();
   if (扩展控制映射表[目标ID] != null) {
     内部清除扩展控制(目标ID);
   }
-  const 记录 = 构建扩展控制记录(类型, 来源单位, 目标单位, 实际持续时间, 规范参数);
+  const 记录 = 构建扩展控制记录(类型 as 扩展控制类型, 来源单位, 目标单位, 实际持续时间, 规范参数);
   扩展控制映射表[目标ID] = 记录;
   加入目标ID(目标ID);
   registerManualBuff(目标单位, 记录.BuffID, 实际持续时间, 0, { sourceName: GetUnitName(来源单位) });
@@ -491,22 +505,22 @@ export function AOE施加扩展控制(
   中心X或来源单位: number | any,
   中心Y或中心X: number,
   半径或中心Y: number,
-  类型或半径: 扩展控制类型 | number,
-  参数或类型: 扩展控制参数 | number | 扩展控制类型,
+  类型或半径: 扩展控制兼容类型 | number,
+  参数或类型: 扩展控制参数 | number | 扩展控制兼容类型,
   兼容参数?: 扩展控制参数 | number
 ): number[] {
   let 来源单位 = 来源单位或Self;
   let 中心X = 中心X或来源单位 as number;
   let 中心Y = 中心Y或中心X;
   let 半径 = 半径或中心Y;
-  let 类型 = 类型或半径 as 扩展控制类型;
+  let 类型 = 类型或半径 as 扩展控制兼容类型;
   let 参数 = 参数或类型 as 扩展控制参数 | number;
   if (兼容参数 != null) {
     来源单位 = 中心X或来源单位;
     中心X = 中心Y或中心X;
     中心Y = 半径或中心Y;
     半径 = 类型或半径 as number;
-    类型 = 参数或类型 as 扩展控制类型;
+    类型 = 参数或类型 as 扩展控制兼容类型;
     参数 = 兼容参数;
   }
   if (!单位有效且存活(来源单位)) return [];

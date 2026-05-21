@@ -3,7 +3,6 @@ local ____exports = {}
 --- 测试系统统一入口
 -- 
 -- 通过开关控制是否加载各个测试模块。
-local ENABLE_MOVE_SPEED_TEST = true
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_QUEST_TEST = false
@@ -12,9 +11,6 @@ local ENABLE_TEST_EVENT = false
 local ENABLE_GOLD_BURST_TEST = true
 local ENABLE_DZ_CAN_PLACE_TEST = true
 local function loadTests(self)
-    if ENABLE_MOVE_SPEED_TEST then
-        require("系统.12．测试系统.移动速度突破测试")
-    end
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
     end

@@ -1,14 +1,20 @@
 // 装备限制.ts - 玩家1-4英雄：按 type 仅一件、onlyone、双手与主/副互斥；多出的 UnitRemoveItem 丢脚下
 const jass = require("jass.common") as JassCommon;
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemPickup: (callback: (unit: any, item: any) => void) => number;
+const GetItemTypeId = (jass as any).GetItemTypeId as (this: void, item: any) => number;
+const UnitItemInSlot = (jass as any).UnitItemInSlot as (this: void, unit: any, slot: number) => any;
+const Player = (jass as any).Player as (this: void, playerId: number) => any;
+const GetOwningPlayer = (jass as any).GetOwningPlayer as (this: void, unit: any) => any;
+const UnitRemoveItem = (jass as any).UnitRemoveItem as (this: void, unit: any, item: any) => boolean;
+const DisplayTimedTextToPlayer = (jass as any).DisplayTimedTextToPlayer as (this: void, toPlayer: any, x: number, y: number, duration: number, message: string) => void;
+const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const { isHeroUnit, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
   isSpecialUnit: (unit: any) => boolean;
 };
 const { getItemDataEntryByTypeId } = require("lib.扩展函数.物品相关函数.index") as {
-  getItemDataEntryByTypeId: (itemTypeId: number) => any | null;
+  getItemDataEntryByTypeId: (this: void, itemTypeId: number) => any | null;
 };
 /** 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`） */
 const g = require("jass.globals") as { udg_Itmeboolean?: boolean | number; [key: string]: any };
@@ -36,20 +42,20 @@ function getEntry(itemTypeId: number): { type?: string; name?: string; onlyone?:
 }
 
 function safeGetItemTypeId(it: any): number | undefined {
-  const a = (jass as any).GetItemTypeId(it);
+  const a = GetItemTypeId(it);
   if (typeof a === "number") return a;
   return undefined;
 }
 
 function safeUnitItemInSlot(unit: any, slot: number): any | undefined {
-  const a = (jass as any).UnitItemInSlot(unit, slot);
+  const a = UnitItemInSlot(unit, slot);
   if (a) return a;
   return undefined;
 }
 
 /** 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
  * 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。 */
-export function equipLimitWouldAllowPickup(unit: any, item: any): boolean {
+export function equipLimitWouldAllowPickup(this: void, unit: any, item: any): boolean {
   if (isEquipLimitDisabledByJass()) return true;
   if (!unit || !item) return true;
   const pickedTypeId = safeGetItemTypeId(item);
@@ -123,8 +129,8 @@ function onPickup(unit: any, item: any): void {
   const nameColored = COLOR_NAME + "『" + name + "』|r";
   let msg = "";
 
-  let player = jass.Player(0);
-  const p = (jass as any).GetOwningPlayer(unit);
+  let player = Player(0);
+  const p = GetOwningPlayer(unit);
   if (p) player = p;
   let sameIdCount = 0;
   let sameSlotTypeCount = 0;
@@ -162,13 +168,13 @@ function onPickup(unit: any, item: any): void {
   if (msg === "") return;
 
   equipShared.skipNextDrop = true;
-  (jass as any).UnitRemoveItem(unit, item);
-  jass.DisplayTimedTextToPlayer(player, 0, 0, 6, msg);
+  UnitRemoveItem(unit, item);
+  DisplayTimedTextToPlayer(player, 0, 0, 6, msg);
 }
 
 function init(): void {
   // 使用物品事件中心注册，减少触发器数量
-  itemEventCenter.onItemPickup((unit, item) => {
+  onItemPickup((unit, item) => {
     // 只处理英雄单位
     if (unit !== null && unit !== 0 && isHeroUnit(unit)) {
       onPickup(unit, item);

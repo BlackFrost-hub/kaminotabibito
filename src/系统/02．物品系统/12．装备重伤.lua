@@ -3,14 +3,17 @@
 -- - 英雄单位：存储到玩家级 YDUserData
 -- - 非英雄单位：存储到单位级 YDUserData
 jass = require("jass.common")
-itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+GetItemTypeId = jass.GetItemTypeId
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+onItemPickup = ____require_result_0.onItemPickup
+onItemDrop = ____require_result_0.onItemDrop
 itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-fourCCToString = ____require_result_0.fourCCToString
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+fourCCToString = ____require_result_1.fourCCToString
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
 ____ATTR__91CD_4F24 = "重伤"
 function _____5199_5165YD_7528_6237_6570_636E(tableType, tableKey, attr, valueType, value)
     YDUserDataSetSafe(
@@ -34,8 +37,8 @@ function getMaxWound(unit, ignoreItem)
                 if ignoreItem and item == ignoreItem then
                     goto __continue5
                 end
-                local tid = jass.GetItemTypeId(item)
-                local idStr = fourCCToString(nil, tid)
+                local tid = GetItemTypeId(item)
+                local idStr = fourCCToString(tid)
                 local entry = itemsData[idStr]
                 local typ = entry and entry.type
                 if typ == "任务" or typ == "药剂" or typ == "食品" then
@@ -91,10 +94,10 @@ function onItemChange(unit, item, isPickup)
     applyWound(unit, newWound)
 end
 function init()
-    itemEventCenter:onItemPickup(function(unit, item)
+    onItemPickup(function(unit, item)
         onItemChange(unit, item, true)
     end)
-    itemEventCenter:onItemDrop(function(unit, item)
+    onItemDrop(function(unit, item)
         onItemChange(unit, item, false)
     end)
 end

@@ -28,6 +28,9 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { registerHealCallback } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   registerHealCallback: (this: void, cb: (source: any, target: any, amount: number, isItemHeal: boolean) => number) => void;
 };
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, snapshot: any) => void) => void;
+};
 
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (
@@ -139,21 +142,10 @@ function 计算重伤治疗量(source: any, target: any, amount: number): number
   return amount * (1 - wound);
 }
 
-/** 伤害事件回调：来源有装备重伤时，给目标施加重伤 */
-function on伤害事件(...args: any[]): void {
+/** 最终伤害回调：来源有装备重伤时，给目标施加重伤 */
+function on伤害事件(this: void, target: any, source: any, applied: number, _snapshot?: any): void {
   if (!重伤系统开关) return;
-
-  // 伤害事件可能传 self 作为第一个参数，需要兼容
-  let target: any, source: any;
-  if (args.length >= 6) {
-    // 带 self: nil, target, damage, damageType, fromDotTick, source
-    target = args[1];
-    source = args[5];
-  } else {
-    // 不带 self: target, damage, damageType, fromDotTick, source
-    target = args[0];
-    source = args[4];
-  }
+  if (!(applied > 0)) return;
 
   if (source == null || source === 0) return;
   if (target == null || target === 0) return;
@@ -168,11 +160,7 @@ function on伤害事件(...args: any[]): void {
 export function initWoundSystem(): void {
   if (!重伤系统开关) return;
   registerHealCallback(计算重伤治疗量);
-
-  // 伤害事件注册：显式传 damageEventModule 作为 self，避免 self 错位
-  const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as any;
-  const regCb = damageEventModule.registerDamageCallback;
-  regCb(damageEventModule, on伤害事件, 0);
+  registerAppliedFinalDamageListener(on伤害事件);
 }
 
 export {};

@@ -4,6 +4,8 @@ local ____exports = {}
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_0.onItemPickup
 local onItemDrop = ____require_result_0.onItemDrop
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetItemTypeId = jass.GetItemTypeId
@@ -44,8 +46,8 @@ local function _____8BFB_53D6_7F13_5B58_6301_6709_6570_91CF(unit, itemTypeId)
     if unitId == 0 then
         return -1
     end
-    local ____opt_1 = _____5355_4F4D_7269_54C1_6301_6709_6570_91CF_8868[unitId]
-    return ____opt_1 and ____opt_1[itemTypeId] or -1
+    local ____opt_2 = _____5355_4F4D_7269_54C1_6301_6709_6570_91CF_8868[unitId]
+    return ____opt_2 and ____opt_2[itemTypeId] or -1
 end
 local function _____5199_5165_7F13_5B58_6301_6709_6570_91CF(unit, itemTypeId, count)
     local unitId = _____83B7_53D6_5355_4F4DID(unit)
@@ -82,14 +84,14 @@ local function _____5206_53D1_6307_5B9A_7269_54C1_53D8_5316(unit, item, itemType
                     goto __continue22
                 end
                 if isPickup then
-                    local ____opt_3 = listener["获取回调"]
-                    if ____opt_3 ~= nil then
-                        ____opt_3(unit, item, currentCount, previousCount)
+                    local ____opt_4 = listener["获取回调"]
+                    if ____opt_4 ~= nil then
+                        ____opt_4(unit, item, currentCount, previousCount)
                     end
                 else
-                    local ____opt_5 = listener["丢弃回调"]
-                    if ____opt_5 ~= nil then
-                        ____opt_5(unit, item, currentCount, previousCount)
+                    local ____opt_6 = listener["丢弃回调"]
+                    if ____opt_6 ~= nil then
+                        ____opt_6(unit, item, currentCount, previousCount)
                     end
                 end
             end
@@ -143,10 +145,20 @@ local function _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, isP
     end
 end
 local function ____on_7269_54C1_83B7_53D6_76D1_542C(unit, item)
-    _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, true)
+    addDelayedCallback(
+        10,
+        function()
+            _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, true)
+        end
+    )
 end
 local function ____on_7269_54C1_4E22_5F03_76D1_542C(unit, item)
-    _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, false)
+    addDelayedCallback(
+        10,
+        function()
+            _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, false)
+        end
+    )
 end
 local function _____521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C()
     if _____5DF2_521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C then

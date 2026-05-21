@@ -5,12 +5,19 @@ local __TS__StringAccess = ____lualib.__TS__StringAccess
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
 local jass = require("jass.common")
-local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local isHeroUnit = ____require_result_0.isHeroUnit
-local isSpecialUnit = ____require_result_0.isSpecialUnit
-local ____require_result_1 = require("lib.扩展函数.物品相关函数.index")
-local getItemDataEntryByTypeId = ____require_result_1.getItemDataEntryByTypeId
+local GetItemTypeId = jass.GetItemTypeId
+local UnitItemInSlot = jass.UnitItemInSlot
+local Player = jass.Player
+local GetOwningPlayer = jass.GetOwningPlayer
+local UnitRemoveItem = jass.UnitRemoveItem
+local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local onItemPickup = ____require_result_0.onItemPickup
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local isHeroUnit = ____require_result_1.isHeroUnit
+local isSpecialUnit = ____require_result_1.isSpecialUnit
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
+local getItemDataEntryByTypeId = ____require_result_2.getItemDataEntryByTypeId
 --- 与 `11．装备系统.ts` 相同：`require("jass.globals")` 得到 `g`，GUI 变量一律 `g.udg_Xxx`（如 `g.udg_TempIsAdd`、`g.udg_TempHp`）
 local g = require("jass.globals")
 --- 地图 Jass：`set udg_Itmeboolean = true` → 此处 `g.udg_Itmeboolean`；为 true/1 时不做装备限制
@@ -37,17 +44,17 @@ local COLOR_TYPE = "|cff00ff00"
 local COLOR_NAME = "|cff00bfff"
 local COLOR_ERR = "|cffff0000"
 local function getEntry(self, itemTypeId)
-    return getItemDataEntryByTypeId(nil, itemTypeId)
+    return getItemDataEntryByTypeId(itemTypeId)
 end
 local function safeGetItemTypeId(self, it)
-    local a = jass.GetItemTypeId(it)
+    local a = GetItemTypeId(it)
     if type(a) == "number" then
         return a
     end
     return nil
 end
 local function safeUnitItemInSlot(self, unit, slot)
-    local a = jass.UnitItemInSlot(unit, slot)
+    local a = UnitItemInSlot(unit, slot)
     if a then
         return a
     end
@@ -55,7 +62,7 @@ local function safeUnitItemInSlot(self, unit, slot)
 end
 --- 仅判断：该拾取是否会被装备限制拒绝（true=允许保留，false=会被丢出）。供装备系统在加属性前调用。
 -- 事件触发时物品可能尚未入背包，故把“当前拾取的这件”也计入数量。
-function ____exports.equipLimitWouldAllowPickup(self, unit, item)
+function ____exports.equipLimitWouldAllowPickup(unit, item)
     if isEquipLimitDisabledByJass(nil) then
         return true
     end
@@ -204,8 +211,8 @@ local function onPickup(self, unit, item)
     name = __TS__StringTrim(stripColor(nil, name))
     local nameColored = ((COLOR_NAME .. "『") .. name) .. "』|r"
     local msg = ""
-    local player = jass.Player(0)
-    local p = jass.GetOwningPlayer(unit)
+    local player = Player(0)
+    local p = GetOwningPlayer(unit)
     if p then
         player = p
     end
@@ -269,8 +276,8 @@ local function onPickup(self, unit, item)
         return
     end
     ____exports.equipShared.skipNextDrop = true
-    jass.UnitRemoveItem(unit, item)
-    jass.DisplayTimedTextToPlayer(
+    UnitRemoveItem(unit, item)
+    DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -279,7 +286,7 @@ local function onPickup(self, unit, item)
     )
 end
 local function init(self)
-    itemEventCenter:onItemPickup(function(____, unit, item)
+    onItemPickup(function(unit, item)
         if unit ~= nil and unit ~= 0 and isHeroUnit(nil, unit) then
             onPickup(nil, unit, item)
         end

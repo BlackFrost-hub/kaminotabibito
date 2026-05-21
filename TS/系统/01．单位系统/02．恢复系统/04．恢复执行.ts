@@ -5,6 +5,13 @@
  */
 
 const jass = require("jass.common") as any;
+const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
+const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSet: (tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -21,19 +28,19 @@ const {
   getPercentLifeRegen,
   getPercentManaRegen,
 } = require("系统.01．单位系统.02．恢复系统.01．恢复计算") as {
-  calcBaseLifeRegen: (unit: any) => number;
-  calcBaseManaRegen: (unit: any) => number;
-  calcTotalLifeRegen: (unit: any, baseRegen: number, itemBonus: number, unitMultiplier: number) => number;
-  calcTotalManaRegen: (unit: any, baseRegen: number) => number;
-  calcBossTotalLifeRegen: (unit: any) => number;
-  getPercentLifeRegen: (unit: any) => number;
-  getPercentManaRegen: (unit: any) => number;
+  calcBaseLifeRegen: (this: void, unit: any) => number;
+  calcBaseManaRegen: (this: void, unit: any) => number;
+  calcTotalLifeRegen: (this: void, unit: any, baseRegen: number, itemBonus: number, unitMultiplier: number) => number;
+  calcTotalManaRegen: (this: void, unit: any, baseRegen: number) => number;
+  calcBossTotalLifeRegen: (this: void, unit: any) => number;
+  getPercentLifeRegen: (this: void, unit: any) => number;
+  getPercentManaRegen: (this: void, unit: any) => number;
 };
 const { calcItemLifeRegenBonus } = require("系统.01．单位系统.02．恢复系统.02．装备恢复效果") as {
-  calcItemLifeRegenBonus: (unit: any) => number;
+  calcItemLifeRegenBonus: (this: void, unit: any) => number;
 };
 const { getUnitLifeRegenMultiplier } = require("系统.01．单位系统.02．恢复系统.03．单位恢复特性") as {
-  getUnitLifeRegenMultiplier: (unit: any) => number;
+  getUnitLifeRegenMultiplier: (this: void, unit: any) => number;
 };
 const {
   REGEN_THRESHOLD,
@@ -50,35 +57,35 @@ const {
 /**
  * 执行单位生命恢复
  */
-function applyLifeRegen(unit: any, regen: number): void {
+function applyLifeRegen(this: void, unit: any, regen: number): void {
   if (regen <= 0) return;
 
-  const currentLife = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE);
-  const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const currentLife = GetUnitState(unit, UNIT_STATE_LIFE);
+  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
 
   // 不超过最大生命
   const lifeGap = maxLife - currentLife;
   const actualRegen = regen < lifeGap ? regen : lifeGap;
   if (actualRegen <= 0) return;
 
-  jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, currentLife + actualRegen);
+  SetUnitState(unit, UNIT_STATE_LIFE, currentLife + actualRegen);
 }
 
 /**
  * 执行单位魔法恢复
  */
-function applyManaRegen(unit: any, regen: number): void {
+function applyManaRegen(this: void, unit: any, regen: number): void {
   if (regen <= 0) return;
 
-  const currentMana = jass.GetUnitState(unit, jass.UNIT_STATE_MANA);
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const currentMana = GetUnitState(unit, UNIT_STATE_MANA);
+  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
 
   // 不超过最大魔法
   const manaGap = maxMana - currentMana;
   const actualRegen = regen < manaGap ? regen : manaGap;
   if (actualRegen <= 0) return;
 
-  jass.SetUnitState(unit, jass.UNIT_STATE_MANA, currentMana + actualRegen);
+  SetUnitState(unit, UNIT_STATE_MANA, currentMana + actualRegen);
 }
 
 //=============================================================================
@@ -89,8 +96,8 @@ function applyManaRegen(unit: any, regen: number): void {
  * 处理玩家英雄恢复
  * 与 JASS 源代码逻辑完全一致
  */
-export function processPlayerHeroRegen(unit: any): void {
-  const player = jass.GetOwningPlayer(unit);
+export function processPlayerHeroRegen(this: void, unit: any): void {
+  const player = GetOwningPlayer(unit);
   if (player == null) return;
 
   // ========== 生命恢复计算 ==========
@@ -118,7 +125,7 @@ export function processPlayerHeroRegen(unit: any): void {
   const lifeRegenAmplify = YDUserDataGet("player", player, "生命恢复属性增幅", "real") || 0;
 
   // 8. 计算总生命恢复 = (1 + 增幅) × (最大生命 × 百分比回复 + 生命恢复)
-  const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
   const totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen);
 
   // 9. 存储总生命恢复到玩家属性（供多面板显示）
@@ -141,7 +148,7 @@ export function processPlayerHeroRegen(unit: any): void {
   const percentManaRegen = getPercentManaRegen(unit);
 
   // 5. 计算总魔法恢复 = 1 × (最大魔法 × 百分比回复 + 魔法恢复)
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
   const totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen);
 
   // ========== 存储总恢复值（供多面板显示） ==========
@@ -170,7 +177,7 @@ export function processPlayerHeroRegen(unit: any): void {
 /**
  * 处理Boss单位恢复
  */
-export function processBossRegen(unit: any): void {
+export function processBossRegen(this: void, unit: any): void {
   const totalLifeRegen = calcBossTotalLifeRegen(unit);
 
   if (totalLifeRegen > REGEN_THRESHOLD) {
@@ -185,21 +192,21 @@ export function processBossRegen(unit: any): void {
 /**
  * 获取玩家英雄组
  */
-function getPlayerHeroGroup(): any {
+function getPlayerHeroGroup(this: void): any {
   return YDUserDataGet("string", "玩家英雄", "单位组", "group");
 }
 
 /**
  * 获取动漫Boss单位组
  */
-function getBossGroup(): any {
+function getBossGroup(this: void): any {
   return YDUserDataGet("string", "动漫Boss", "单位组", "group");
 }
 
 /**
  * 每秒恢复处理主函数
  */
-export function onRegenTimer(): void {
+export function onRegenTimer(this: void): void {
   // 处理玩家英雄
   const heroGroup = getPlayerHeroGroup();
   if (heroGroup != null) {
@@ -231,12 +238,12 @@ let _registered = false;
 /**
  * 注册恢复系统到中心计时器
  */
-function registerToCenterTimer(): void {
+function registerToCenterTimer(this: void): void {
   if (_registered) return;
   _registered = true;
 
 const { onSecond } = globalThis as unknown as {
-    onSecond: (this: void, callback: () => void) => void;
+    onSecond: (this: void, callback: (this: void) => void) => void;
   };
 
   // 注册每秒回调

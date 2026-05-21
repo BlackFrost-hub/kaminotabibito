@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -8,6 +9,11 @@ local ____require_result_0 = require("lib.扩展函数.物品相关函数.物品
 local UnitHasItemOfTypeBJ = ____require_result_0.UnitHasItemOfTypeBJ
 local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_1.doHeal
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_2.debugLogForce
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+local getServerTime = ____require_result_3.getServerTime
 local GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
 local UnitDamageTarget = jass.UnitDamageTarget
@@ -20,10 +26,47 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local GetRandomReal = jass.GetRandomReal
 local ConvertUnitState = jass.ConvertUnitState
+local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
+local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
+local function _____5904_7406_5F85_9500_6BC1_7279_6548()
+    local _____5F53_524D_65F6_95F4 = getServerTime()
+    do
+        local i = #_____5F85_9500_6BC1_7279_6548_5217_8868 - 1
+        while i >= 0 do
+            do
+                local _____8BB0_5F55 = _____5F85_9500_6BC1_7279_6548_5217_8868[i + 1]
+                if _____5F53_524D_65F6_95F4 < _____8BB0_5F55["到期时间"] then
+                    goto __continue4
+                end
+                DestroyEffect(_____8BB0_5F55["句柄"])
+                __TS__ArraySplice(_____5F85_9500_6BC1_7279_6548_5217_8868, i, 1)
+            end
+            ::__continue4::
+            i = i - 1
+        end
+    end
+end
+local function _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
+    end
+    if effect == nil or effect == 0 then
+        return
+    end
+    if not _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 then
+        _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = true
+        addPeriodicCallback(100, _____5904_7406_5F85_9500_6BC1_7279_6548)
+    end
+    _____5F85_9500_6BC1_7279_6548_5217_8868[#_____5F85_9500_6BC1_7279_6548_5217_8868 + 1] = {
+        ["句柄"] = effect,
+        ["到期时间"] = getServerTime() + _____6301_7EED_79D2 * 1000
+    }
+end
 ____exports["伤害事件攻击类型"] = {["普通"] = jass.ATTACK_TYPE_NORMAL, ["混乱"] = jass.ATTACK_TYPE_CHAOS}
 ____exports["伤害事件伤害类型"] = {
     ["普通"] = jass.DAMAGE_TYPE_NORMAL,
     ["强化"] = jass.DAMAGE_TYPE_ENHANCED,
+    ["魔法"] = jass.DAMAGE_TYPE_MAGIC,
     ["火焰"] = jass.DAMAGE_TYPE_FIRE,
     ["冰冷"] = jass.DAMAGE_TYPE_COLD,
     ["闪电"] = jass.DAMAGE_TYPE_LIGHTNING,
@@ -84,42 +127,77 @@ ____exports["造成伤害事件伤害"] = function(_____6765_6E90, _____76EE_680
         ____exports["伤害事件武器类型"]
     )
 end
-____exports["执行物品治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F_547D_503C, _____7279_6548_8DEF_5F84, _____9B54_6CD5_503C, _____9B54_6CD5_7279_6548_8DEF_5F84)
+____exports["执行物品治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F_547D_503C, _____7279_6548_8DEF_5F84, _____9B54_6CD5_503C, _____9B54_6CD5_7279_6548_8DEF_5F84, _____5EF6_8FDF_4E00_5E27, _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548, _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548)
     if _____9B54_6CD5_503C == nil then
         _____9B54_6CD5_503C = 0
     end
+    if _____5EF6_8FDF_4E00_5E27 == nil then
+        _____5EF6_8FDF_4E00_5E27 = false
+    end
+    if _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548 == nil then
+        _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548 = false
+    end
+    if _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548 == nil then
+        _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548 = false
+    end
+    debugLogForce(
+        "执行物品治疗",
+        "source=",
+        _____6765_6E90 ~= nil and _____6765_6E90 ~= 0 and GetUnitName(_____6765_6E90) or "nil",
+        "target=",
+        _____76EE_6807 ~= nil and _____76EE_6807 ~= 0 and GetUnitName(_____76EE_6807) or "nil",
+        "hp=",
+        _____751F_547D_503C,
+        "mp=",
+        _____9B54_6CD5_503C,
+        "healFx=",
+        _____7279_6548_8DEF_5F84 or "",
+        "manaFx=",
+        _____9B54_6CD5_7279_6548_8DEF_5F84 or "",
+        "delayOneTick=",
+        _____5EF6_8FDF_4E00_5E27,
+        "useDefaultHealFx=",
+        _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548,
+        "useDefaultManaFx=",
+        _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548
+    )
     doHeal({
         HealSource = _____6765_6E90,
         HealTarget = _____76EE_6807,
         HealAmount = _____751F_547D_503C,
         HealManaAmount = _____9B54_6CD5_503C,
         ItemHeal = true,
-        HealEffect = _____7279_6548_8DEF_5F84 ~= nil and _____7279_6548_8DEF_5F84 ~= "",
+        HealEffect = _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548 or _____7279_6548_8DEF_5F84 ~= nil and _____7279_6548_8DEF_5F84 ~= "",
         HealEffectPath = _____7279_6548_8DEF_5F84,
-        ManaEffect = _____9B54_6CD5_7279_6548_8DEF_5F84 ~= nil and _____9B54_6CD5_7279_6548_8DEF_5F84 ~= "",
-        ManaEffectPath = _____9B54_6CD5_7279_6548_8DEF_5F84
+        UseDefaultHealEffect = _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548,
+        ManaEffect = _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548 or _____9B54_6CD5_7279_6548_8DEF_5F84 ~= nil and _____9B54_6CD5_7279_6548_8DEF_5F84 ~= "",
+        ManaEffectPath = _____9B54_6CD5_7279_6548_8DEF_5F84,
+        UseDefaultManaEffect = _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548,
+        DelayOneTick = _____5EF6_8FDF_4E00_5E27
     })
 end
-____exports["播放点特效"] = function(_____6A21_578B, x, y)
+____exports["播放点特效"] = function(_____6A21_578B, x, y, _____6301_7EED_79D2)
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
+    end
     if _____6A21_578B == "" then
         return
     end
     local effect = AddSpecialEffect(_____6A21_578B, x, y)
-    if effect ~= nil and effect ~= 0 then
-        DestroyEffect(effect)
-    end
+    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
 end
-____exports["播放单位特效"] = function(_____5355_4F4D, _____6A21_578B, _____6302_70B9)
+____exports["播放单位特效"] = function(_____5355_4F4D, _____6A21_578B, _____6302_70B9, _____6301_7EED_79D2)
     if _____6302_70B9 == nil then
         _____6302_70B9 = "origin"
+    end
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
     end
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or _____6A21_578B == "" then
         return
     end
     local effect = AddSpecialEffectTarget(_____6A21_578B, _____5355_4F4D, _____6302_70B9)
-    if effect ~= nil and effect ~= 0 then
-        DestroyEffect(effect)
-    end
+    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
 end
 ____exports["取单位X"] = function(_____5355_4F4D)
     return GetUnitX(_____5355_4F4D)

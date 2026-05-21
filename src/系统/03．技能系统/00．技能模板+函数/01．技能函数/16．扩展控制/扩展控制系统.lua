@@ -16,27 +16,30 @@ local isExcludedFromControlResist = ____require_result_2.isExcludedFromControlRe
 local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_3.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
-local addPeriodicCallback = ____require_result_4.addPeriodicCallback
-local getServerTime = ____require_result_4.getServerTime
-local ____require_result_5 = require("系统.00．核心系统.01．事件中心.11．单位指令事件中心")
-local registerTargetOrderListener = ____require_result_5.registerTargetOrderListener
-local registerPointOrderListener = ____require_result_5.registerPointOrderListener
-local registerImmediateOrderListener = ____require_result_5.registerImmediateOrderListener
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getEnemyUnitsInRange = ____require_result_6.getEnemyUnitsInRange
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_7.debugLogForce
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.控制效果定义")
-local _____83B7_53D6_6269_5C55_63A7_5236_5B9A_4E49 = ____require_result_8["获取扩展控制定义"]
-local _____9ED8_8BA4_9B45_60D1_8DDF_968F_534A_5F84 = ____require_result_8["默认魅惑跟随半径"]
-local _____9B45_60D1_7279_6548_6A21_578B = ____require_result_8["魅惑特效模型"]
-local _____6050_60E7_7279_6548_6A21_578B = ____require_result_8["恐惧特效模型"]
-local _____9ED8_8BA4_6050_60E7_9003_79BB_8DDD_79BB = ____require_result_8["默认恐惧逃离距离"]
-local _____9ED8_8BA4_6050_60E7_79FB_52A8_901F_5EA6 = ____require_result_8["默认恐惧移动速度"]
-local _____9ED8_8BA4_6050_60E7_968F_673A_534A_5F84 = ____require_result_8["默认恐惧随机半径"]
-local _____6269_5C55_63A7_5236_7279_6548_6302_70B9 = ____require_result_8["扩展控制特效挂点"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_4["施加快速控制Buff"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_5.addDelayedCallback
+local addPeriodicCallback = ____require_result_5.addPeriodicCallback
+local getServerTime = ____require_result_5.getServerTime
+local ____require_result_6 = require("系统.00．核心系统.01．事件中心.11．单位指令事件中心")
+local registerTargetOrderListener = ____require_result_6.registerTargetOrderListener
+local registerPointOrderListener = ____require_result_6.registerPointOrderListener
+local registerImmediateOrderListener = ____require_result_6.registerImmediateOrderListener
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getEnemyUnitsInRange = ____require_result_7.getEnemyUnitsInRange
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_8.debugLogForce
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.控制效果定义")
+local _____83B7_53D6_6269_5C55_63A7_5236_5B9A_4E49 = ____require_result_9["获取扩展控制定义"]
+local _____83B7_53D6_63A7_5236_6548_679C_5B9A_4E49 = ____require_result_9["获取控制效果定义"]
+local _____9ED8_8BA4_9B45_60D1_8DDF_968F_534A_5F84 = ____require_result_9["默认魅惑跟随半径"]
+local _____9B45_60D1_7279_6548_6A21_578B = ____require_result_9["魅惑特效模型"]
+local _____6050_60E7_7279_6548_6A21_578B = ____require_result_9["恐惧特效模型"]
+local _____9ED8_8BA4_6050_60E7_9003_79BB_8DDD_79BB = ____require_result_9["默认恐惧逃离距离"]
+local _____9ED8_8BA4_6050_60E7_79FB_52A8_901F_5EA6 = ____require_result_9["默认恐惧移动速度"]
+local _____9ED8_8BA4_6050_60E7_968F_673A_534A_5F84 = ____require_result_9["默认恐惧随机半径"]
+local _____6269_5C55_63A7_5236_7279_6548_6302_70B9 = ____require_result_9["扩展控制特效挂点"]
 local GetHandleId = jass.GetHandleId
 local GetUnitName = jass.GetUnitName
 local GetUnitCurrentOrder = jass.GetUnitCurrentOrder
@@ -59,16 +62,16 @@ local DzGetUnitDisableControlOrder = japi.DzGetUnitDisableControlOrder
 local DzUnitOrdersForceStop = japi.DzUnitOrdersForceStop
 local DzUnitDisableAttack = japi.DzUnitDisableAttack
 local _____6A21_5757_540D = "扩展控制系统"
-local ____jglobals_bj_DEGTORAD_9 = jglobals.bj_DEGTORAD
-if ____jglobals_bj_DEGTORAD_9 == nil then
-    ____jglobals_bj_DEGTORAD_9 = 0.017453292519943295
+local ____jglobals_bj_DEGTORAD_10 = jglobals.bj_DEGTORAD
+if ____jglobals_bj_DEGTORAD_10 == nil then
+    ____jglobals_bj_DEGTORAD_10 = 0.017453292519943295
 end
-local bj_DEGTORAD = ____jglobals_bj_DEGTORAD_9
-local ____jglobals_bj_RADTODEG_10 = jglobals.bj_RADTODEG
-if ____jglobals_bj_RADTODEG_10 == nil then
-    ____jglobals_bj_RADTODEG_10 = 57.29577951308232
+local bj_DEGTORAD = ____jglobals_bj_DEGTORAD_10
+local ____jglobals_bj_RADTODEG_11 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_11 == nil then
+    ____jglobals_bj_RADTODEG_11 = 57.29577951308232
 end
-local bj_RADTODEG = ____jglobals_bj_RADTODEG_10
+local bj_RADTODEG = ____jglobals_bj_RADTODEG_11
 local _____6269_5C55_63A7_5236_6620_5C04_8868 = {}
 local _____6269_5C55_63A7_5236_76EE_6807ID_5217_8868 = {}
 local _____5F85_6267_884C_53CD_4F24_961F_5217 = {}
@@ -497,7 +500,6 @@ ____exports["施加扩展控制"] = function(_____6765_6E90_5355_4F4D_6216Self, 
     if not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(_____6765_6E90_5355_4F4D) or not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(_____76EE_6807_5355_4F4D) or _____53C2_6570 == nil then
         return 0
     end
-    _____786E_4FDD_521D_59CB_5316()
     local _____89C4_8303_53C2_6570 = _____89C4_8303_5316_6269_5C55_63A7_5236_53C2_6570(_____53C2_6570)
     local _____5B9E_9645_6301_7EED_65F6_95F4 = _____53D6_6301_7EED_65F6_95F4(_____89C4_8303_53C2_6570)
     if _____5B9E_9645_6301_7EED_65F6_95F4 <= 0 then
@@ -509,10 +511,34 @@ ____exports["施加扩展控制"] = function(_____6765_6E90_5355_4F4D_6216Self, 
     if _____5B9E_9645_6301_7EED_65F6_95F4 <= 0 then
         return 0
     end
+    local _____5B9A_4E49 = _____83B7_53D6_63A7_5236_6548_679C_5B9A_4E49(_____7C7B_578B)
+    if _____5B9A_4E49 == nil then
+        return 0
+    end
     local _____76EE_6807ID = _____53D6_5355_4F4DID(_____76EE_6807_5355_4F4D)
     if _____76EE_6807ID == 0 then
         return 0
     end
+    if _____5B9A_4E49["类型分类"] == "快速控制" then
+        if _____5B9A_4E49["快速控制ID"] == nil then
+            return 0
+        end
+        _____65BD_52A0_5FEB_901F_63A7_5236Buff(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, _____5B9A_4E49["快速控制ID"], _____5B9E_9645_6301_7EED_65F6_95F4)
+        debugLogForce(
+            _____6A21_5757_540D,
+            "施加扩展控制",
+            "类型=",
+            _____7C7B_578B,
+            "来源=",
+            _____53D6_5355_4F4DID(_____6765_6E90_5355_4F4D),
+            "目标=",
+            _____76EE_6807ID,
+            "持续=",
+            _____5B9E_9645_6301_7EED_65F6_95F4
+        )
+        return _____76EE_6807ID
+    end
+    _____786E_4FDD_521D_59CB_5316()
     if _____6269_5C55_63A7_5236_6620_5C04_8868[_____76EE_6807ID] ~= nil then
         _____5185_90E8_6E05_9664_6269_5C55_63A7_5236(_____76EE_6807ID)
     end
@@ -573,27 +599,27 @@ ____exports["AOE施加扩展控制"] = function(_____6765_6E90_5355_4F4D_6216Sel
             do
                 local _____76EE_6807 = _____76EE_6807_5217_8868[i + 1]
                 if not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(_____76EE_6807) then
-                    goto __continue103
+                    goto __continue106
                 end
                 local id = ____exports["施加扩展控制"](_____6765_6E90_5355_4F4D, _____76EE_6807, _____7C7B_578B, _____53C2_6570)
                 if id ~= 0 then
                     _____7ED3_679C[#_____7ED3_679C + 1] = id
                 end
             end
-            ::__continue103::
+            ::__continue106::
             i = i + 1
         end
     end
     return _____7ED3_679C
 end
 ____exports["移除扩展控制"] = function(_____76EE_6807_5355_4F4D_6216Self, _____7C7B_578B_6216_76EE_6807_5355_4F4D, _____517C_5BB9_7C7B_578B)
-    local ____temp_11
+    local ____temp_12
     if _____517C_5BB9_7C7B_578B == nil then
-        ____temp_11 = _____76EE_6807_5355_4F4D_6216Self
+        ____temp_12 = _____76EE_6807_5355_4F4D_6216Self
     else
-        ____temp_11 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
+        ____temp_12 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
     end
-    local _____76EE_6807_5355_4F4D = ____temp_11
+    local _____76EE_6807_5355_4F4D = ____temp_12
     local _____7C7B_578B = _____517C_5BB9_7C7B_578B or _____7C7B_578B_6216_76EE_6807_5355_4F4D
     local _____76EE_6807ID = _____53D6_5355_4F4DID(_____76EE_6807_5355_4F4D)
     if _____76EE_6807ID == 0 then
@@ -602,13 +628,13 @@ ____exports["移除扩展控制"] = function(_____76EE_6807_5355_4F4D_6216Self, 
     return _____5185_90E8_6E05_9664_6269_5C55_63A7_5236(_____76EE_6807ID, _____7C7B_578B)
 end
 ____exports["单位是否处于扩展控制"] = function(_____76EE_6807_5355_4F4D_6216Self, _____7C7B_578B_6216_76EE_6807_5355_4F4D, _____517C_5BB9_7C7B_578B)
-    local ____temp_12
+    local ____temp_13
     if _____517C_5BB9_7C7B_578B == nil then
-        ____temp_12 = _____76EE_6807_5355_4F4D_6216Self
+        ____temp_13 = _____76EE_6807_5355_4F4D_6216Self
     else
-        ____temp_12 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
+        ____temp_13 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
     end
-    local _____76EE_6807_5355_4F4D = ____temp_12
+    local _____76EE_6807_5355_4F4D = ____temp_13
     local _____7C7B_578B = _____517C_5BB9_7C7B_578B or _____7C7B_578B_6216_76EE_6807_5355_4F4D
     local _____8BB0_5F55 = _____6269_5C55_63A7_5236_6620_5C04_8868[_____53D6_5355_4F4DID(_____76EE_6807_5355_4F4D)]
     if _____8BB0_5F55 == nil then
@@ -620,13 +646,13 @@ ____exports["单位是否处于扩展控制"] = function(_____76EE_6807_5355_4F4
     return true
 end
 ____exports["获取扩展控制来源单位"] = function(_____76EE_6807_5355_4F4D_6216Self, _____7C7B_578B_6216_76EE_6807_5355_4F4D, _____517C_5BB9_7C7B_578B)
-    local ____temp_13
+    local ____temp_14
     if _____517C_5BB9_7C7B_578B == nil then
-        ____temp_13 = _____76EE_6807_5355_4F4D_6216Self
+        ____temp_14 = _____76EE_6807_5355_4F4D_6216Self
     else
-        ____temp_13 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
+        ____temp_14 = _____7C7B_578B_6216_76EE_6807_5355_4F4D
     end
-    local _____76EE_6807_5355_4F4D = ____temp_13
+    local _____76EE_6807_5355_4F4D = ____temp_14
     local _____7C7B_578B = _____517C_5BB9_7C7B_578B or _____7C7B_578B_6216_76EE_6807_5355_4F4D
     local _____8BB0_5F55 = _____6269_5C55_63A7_5236_6620_5C04_8868[_____53D6_5355_4F4DID(_____76EE_6807_5355_4F4D)]
     if _____8BB0_5F55 == nil or _____8BB0_5F55["类型"] ~= _____7C7B_578B then
@@ -668,28 +694,28 @@ ____exports["AOE施加嘲讽"] = function(_____6765_6E90_5355_4F4D_6216Self, ___
     )
 end
 ____exports["移除嘲讽"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__79FB_9664_6269_5C55_63A7_5236_15 = ____exports["移除扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_14 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_14 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_14 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__79FB_9664_6269_5C55_63A7_5236_16 = ____exports["移除扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_15 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_15 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_15 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__79FB_9664_6269_5C55_63A7_5236_15(____517C_5BB9_76EE_6807_5355_4F4D_14, "taunt")
+    return ____exports__79FB_9664_6269_5C55_63A7_5236_16(____517C_5BB9_76EE_6807_5355_4F4D_15, "taunt")
 end
 ____exports["单位是否被嘲讽"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_17 = ____exports["单位是否处于扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_16 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_16 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_16 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_18 = ____exports["单位是否处于扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_17 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_17 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_17 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_17(____517C_5BB9_76EE_6807_5355_4F4D_16, "taunt")
+    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_18(____517C_5BB9_76EE_6807_5355_4F4D_17, "taunt")
 end
 ____exports["获取嘲讽来源单位"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_19 = ____exports["获取扩展控制来源单位"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_18 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_18 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_18 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_20 = ____exports["获取扩展控制来源单位"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_19 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_19 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_19 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_19(____517C_5BB9_76EE_6807_5355_4F4D_18, "taunt")
+    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_20(____517C_5BB9_76EE_6807_5355_4F4D_19, "taunt")
 end
 ____exports["施加魅惑"] = function(_____6765_6E90_5355_4F4D_6216Self, _____76EE_6807_5355_4F4D_6216_6765_6E90_5355_4F4D, _____53C2_6570_6216_76EE_6807_5355_4F4D, _____517C_5BB9_53C2_6570)
     local _____6765_6E90_5355_4F4D = _____6765_6E90_5355_4F4D_6216Self
@@ -725,28 +751,28 @@ ____exports["AOE施加魅惑"] = function(_____6765_6E90_5355_4F4D_6216Self, ___
     )
 end
 ____exports["移除魅惑"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__79FB_9664_6269_5C55_63A7_5236_21 = ____exports["移除扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_20 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_20 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_20 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__79FB_9664_6269_5C55_63A7_5236_22 = ____exports["移除扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_21 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_21 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_21 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__79FB_9664_6269_5C55_63A7_5236_21(____517C_5BB9_76EE_6807_5355_4F4D_20, "charm")
+    return ____exports__79FB_9664_6269_5C55_63A7_5236_22(____517C_5BB9_76EE_6807_5355_4F4D_21, "charm")
 end
 ____exports["单位是否被魅惑"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_23 = ____exports["单位是否处于扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_22 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_22 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_22 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_24 = ____exports["单位是否处于扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_23 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_23 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_23 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_23(____517C_5BB9_76EE_6807_5355_4F4D_22, "charm")
+    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_24(____517C_5BB9_76EE_6807_5355_4F4D_23, "charm")
 end
 ____exports["获取魅惑来源单位"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_25 = ____exports["获取扩展控制来源单位"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_24 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_24 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_24 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_26 = ____exports["获取扩展控制来源单位"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_25 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_25 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_25 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_25(____517C_5BB9_76EE_6807_5355_4F4D_24, "charm")
+    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_26(____517C_5BB9_76EE_6807_5355_4F4D_25, "charm")
 end
 ____exports["施加恐惧"] = function(_____6765_6E90_5355_4F4D_6216Self, _____76EE_6807_5355_4F4D_6216_6765_6E90_5355_4F4D, _____53C2_6570_6216_76EE_6807_5355_4F4D, _____517C_5BB9_53C2_6570)
     local _____6765_6E90_5355_4F4D = _____6765_6E90_5355_4F4D_6216Self
@@ -782,27 +808,27 @@ ____exports["AOE施加恐惧"] = function(_____6765_6E90_5355_4F4D_6216Self, ___
     )
 end
 ____exports["移除恐惧"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__79FB_9664_6269_5C55_63A7_5236_27 = ____exports["移除扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_26 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_26 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_26 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__79FB_9664_6269_5C55_63A7_5236_28 = ____exports["移除扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_27 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_27 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_27 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__79FB_9664_6269_5C55_63A7_5236_27(____517C_5BB9_76EE_6807_5355_4F4D_26, "fear")
+    return ____exports__79FB_9664_6269_5C55_63A7_5236_28(____517C_5BB9_76EE_6807_5355_4F4D_27, "fear")
 end
 ____exports["单位是否被恐惧"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_29 = ____exports["单位是否处于扩展控制"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_28 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_28 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_28 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_30 = ____exports["单位是否处于扩展控制"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_29 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_29 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_29 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_29(____517C_5BB9_76EE_6807_5355_4F4D_28, "fear")
+    return ____exports__5355_4F4D_662F_5426_5904_4E8E_6269_5C55_63A7_5236_30(____517C_5BB9_76EE_6807_5355_4F4D_29, "fear")
 end
 ____exports["获取恐惧来源单位"] = function(_____76EE_6807_5355_4F4D_6216Self, _____517C_5BB9_76EE_6807_5355_4F4D)
-    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_31 = ____exports["获取扩展控制来源单位"]
-    local ____517C_5BB9_76EE_6807_5355_4F4D_30 = _____517C_5BB9_76EE_6807_5355_4F4D
-    if ____517C_5BB9_76EE_6807_5355_4F4D_30 == nil then
-        ____517C_5BB9_76EE_6807_5355_4F4D_30 = _____76EE_6807_5355_4F4D_6216Self
+    local ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_32 = ____exports["获取扩展控制来源单位"]
+    local ____517C_5BB9_76EE_6807_5355_4F4D_31 = _____517C_5BB9_76EE_6807_5355_4F4D
+    if ____517C_5BB9_76EE_6807_5355_4F4D_31 == nil then
+        ____517C_5BB9_76EE_6807_5355_4F4D_31 = _____76EE_6807_5355_4F4D_6216Self
     end
-    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_31(____517C_5BB9_76EE_6807_5355_4F4D_30, "fear")
+    return ____exports__83B7_53D6_6269_5C55_63A7_5236_6765_6E90_5355_4F4D_32(____517C_5BB9_76EE_6807_5355_4F4D_31, "fear")
 end
 return ____exports

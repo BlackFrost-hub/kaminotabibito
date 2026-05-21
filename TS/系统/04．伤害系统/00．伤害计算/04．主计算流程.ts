@@ -153,9 +153,7 @@ function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: 
   for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
     const cb = appliedFinalDamageListeners[i];
     if (cb == null) continue;
-    try {
-      cb(target, attacker, applied, snapshot);
-    } catch (_e) {}
+    cb(target, attacker, applied, snapshot);
   }
 }
 

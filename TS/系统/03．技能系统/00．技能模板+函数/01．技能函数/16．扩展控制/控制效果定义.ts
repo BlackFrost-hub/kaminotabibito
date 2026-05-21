@@ -3,7 +3,9 @@
  * 扩展控制 - 控制效果定义
  */
 
+export type 快速控制类型 = "stun" | "freeze" | "silence" | "polymorph" | "disarm" | "slow" | "stagger" | "pause" | "expause" | "sleep" | "roots" | "cyclone";
 export type 扩展控制类型 = "taunt" | "charm" | "fear";
+export type 扩展控制兼容类型 = 快速控制类型 | 扩展控制类型;
 export type 恐惧模式 = "逃离施法者" | "随机乱跑";
 
 export interface 嘲讽参数 {
@@ -63,11 +65,22 @@ export const 默认恐惧逃离距离 = 500;
 export const 默认恐惧随机半径 = 450;
 export const 默认恐惧移动速度 = 50;
 export const 魅惑特效模型 = "Abilities\\Spells\\Other\\SoulBurn\\SoulBurnbuff.mdl";
-export const 恐惧特效模型 = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl";
+export const 恐惧特效模型 = "BuffIcon\\model\\Grin Curse.mdx";
 export const 扩展控制特效挂点 = "overhead";
 
 export function 获取扩展控制定义(this: void, 类型: 扩展控制类型): 控制效果定义 {
   return 扩展控制效果定义表[类型];
+}
+
+export function 获取控制效果定义(this: void, 类型: 扩展控制兼容类型 | string): 控制效果定义 | undefined {
+  const 扩展定义 = 扩展控制效果定义表[类型 as 扩展控制类型];
+  if (扩展定义 != null) return 扩展定义;
+  const 快速键列表 = Object.keys(快速控制效果定义表) as Array<keyof typeof 快速控制效果定义表>;
+  for (let i = 0; i < 快速键列表.length; i++) {
+    const 定义 = 快速控制效果定义表[快速键列表[i]];
+    if (定义.类型键 === 类型) return 定义;
+  }
+  return undefined;
 }
 
 export {};

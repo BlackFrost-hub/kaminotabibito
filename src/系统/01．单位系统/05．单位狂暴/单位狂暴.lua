@@ -15,7 +15,7 @@ local registerDeathListener = ____require_result_2.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
 local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
-        if stringToFourCC(nil, id) == typeId then
+        if stringToFourCC(id) == typeId then
             return id
         end
     end
@@ -46,10 +46,7 @@ local function onDeath(dying, killer)
     x = jass.GetUnitX(dying)
     y = jass.GetUnitY(dying)
     facingDeg = jass.GetUnitFacing(dying) * (180 / 3.14159265359)
-    local four = stringToFourCC(
-        nil,
-        __TS__StringSubstring(spawnUnitId, 0, 4)
-    )
+    local four = stringToFourCC(__TS__StringSubstring(spawnUnitId, 0, 4))
     local owner = jass.GetOwningPlayer(dying)
     local created = nil
     created = jass.CreateUnit(

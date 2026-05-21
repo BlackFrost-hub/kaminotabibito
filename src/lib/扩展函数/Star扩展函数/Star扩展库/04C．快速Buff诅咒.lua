@@ -28,6 +28,12 @@ local YDUserDataSet = YDUserDataSetSafe
 local CURSE_ACCURACY_ATTR = "命中率"
 ____exports.SFB_CURSE_DEFAULT_ACCURACY_REDUCTION = 0.33
 local curseAccuracyStateByHid = {}
+local function getSafeHandleId(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return GetHandleId(unit)
+end
 local function getUnitRawAccuracyValue(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -125,11 +131,8 @@ ____exports["SFB_施加自定义诅咒Buff"] = function(sourceUnit, u, time)
             previousAccuracy = shouldUsePlayerAccuracy(u) and getOwnerRawAccuracyValue(owner) or getUnitRawAccuracyValue(u)
         }
         curseAccuracyStateByHid[hid] = state
-        writeTrackedAccuracy(
-            state,
-            getUnitEffectiveAccuracyValue(u) - ____exports.SFB_CURSE_DEFAULT_ACCURACY_REDUCTION,
-            u
-        )
+        local nextAccuracy = getUnitEffectiveAccuracyValue(u) - ____exports.SFB_CURSE_DEFAULT_ACCURACY_REDUCTION
+        writeTrackedAccuracy(state, nextAccuracy, u)
     end
     registerManualBuff(
         u,

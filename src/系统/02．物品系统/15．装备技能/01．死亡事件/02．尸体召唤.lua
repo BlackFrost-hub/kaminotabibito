@@ -19,20 +19,27 @@ local _____6700_5927_751F_547D_72B6_6001 = jass.UNIT_STATE_MAX_LIFE
 local _____673A_68B0_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_MECHANICAL
 local _____8FDC_53E4_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_ANCIENT
 local _____5F53_524D_751F_547D_72B6_6001 = jass.UNIT_STATE_LIFE
+local _____6B7B_4EA1_5355_4F4D_7C7B_578B = jass.UNIT_TYPE_DEAD
+local IsUnitType = jass.IsUnitType
+local IsUnitEnemy = jass.IsUnitEnemy
+local GetUnitState = jass.GetUnitState
 local function _____662F_5426_7B26_5408_6301_76FE_53EC_5524_6761_4EF6(_____5355_4F4D, _____4E0A_4E0B_6587, _____7269_54C1_56DB_5B57_7801)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return false
     end
-    if not jass.IsUnitAliveBJ(_____5355_4F4D) then
+    if IsUnitType(_____5355_4F4D, _____6B7B_4EA1_5355_4F4D_7C7B_578B) then
         return false
     end
-    if jass.IsUnitType(_____5355_4F4D, _____673A_68B0_5355_4F4D_7C7B_578B) then
+    if GetUnitState(_____5355_4F4D, _____5F53_524D_751F_547D_72B6_6001) <= 0.405 then
         return false
     end
-    if jass.IsUnitType(_____5355_4F4D, _____8FDC_53E4_5355_4F4D_7C7B_578B) then
+    if IsUnitType(_____5355_4F4D, _____673A_68B0_5355_4F4D_7C7B_578B) then
         return false
     end
-    if not jass.IsUnitEnemy(_____5355_4F4D, _____4E0A_4E0B_6587["死亡单位所有者"]) then
+    if IsUnitType(_____5355_4F4D, _____8FDC_53E4_5355_4F4D_7C7B_578B) then
+        return false
+    end
+    if not IsUnitEnemy(_____5355_4F4D, _____4E0A_4E0B_6587["死亡单位所有者"]) then
         return false
     end
     return itemJudgeFns.UnitHasItemOfTypeBJ(_____5355_4F4D, _____7269_54C1_56DB_5B57_7801)
@@ -64,7 +71,7 @@ local function _____521B_5EFA_5C38_4F53_53EC_5524_7269(_____6301_6709_8005, ____
     end
     jass.UnitApplyTimedLife(
         _____53EC_5524_7269,
-        stringToFourCC(nil, _____914D_7F6E["限时生命Buff"]),
+        stringToFourCC(_____914D_7F6E["限时生命Buff"]),
         _____914D_7F6E["持续时间"]
     )
     jass.SetUnitState(
@@ -91,11 +98,11 @@ ____exports["处理尸体召唤"] = function(_____4E0A_4E0B_6587)
     for ____, _____5355_4F4D in ipairs(_____8303_56F4_5355_4F4D_7EC4) do
         do
             if not _____662F_5426_7B26_5408_6301_76FE_53EC_5524_6761_4EF6(_____5355_4F4D, _____4E0A_4E0B_6587, _____7269_54C1_56DB_5B57_7801) then
-                goto __continue14
+                goto __continue15
             end
             _____521B_5EFA_5C38_4F53_53EC_5524_7269(_____5355_4F4D, _____4E0A_4E0B_6587)
         end
-        ::__continue14::
+        ::__continue15::
     end
 end
 return ____exports

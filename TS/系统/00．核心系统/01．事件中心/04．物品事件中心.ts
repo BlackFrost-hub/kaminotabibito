@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /**
  * 物品事件中心
  * 统一处理物品相关事件，减少触发器数量
@@ -5,6 +7,9 @@
  */
 
 const jass = require("jass.common") as any;
+const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
+const GetManipulatedItem = jass.GetManipulatedItem as (this: void) => any;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
   registerPlayerUnitEventForPlayerIds: (
     this: void,
@@ -18,12 +23,16 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
 const ITEM_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 13] as const;
 
 // 监听器类型定义
-type ItemEventCallback = (unit: any, item: any) => void;
+type ItemEventCallback = (this: void, unit: any, item: any) => void;
 
 // 存储监听器
-const pickupListeners: Array<{ id: number; callback: ItemEventCallback }> = [];
-const dropListeners: Array<{ id: number; callback: ItemEventCallback }> = [];
-const useListeners: Array<{ id: number; callback: ItemEventCallback }> = [];
+const pickupListenerIds: number[] = [];
+const dropListenerIds: number[] = [];
+const useListenerIds: number[] = [];
+const pickupListeners: ItemEventCallback[] = [];
+const dropListeners: ItemEventCallback[] = [];
+const useListeners: ItemEventCallback[] = [];
+const 模块实例ID = "item-center-" + String(GetHandleId(jass.CreateTrigger()) || 0);
 
 // 主触发器（每种事件只注册一次）
 let pickupTrigger: any = null;
@@ -44,14 +53,14 @@ function getNextListenerId(): number {
  * 分发拾取事件到所有监听器
  */
 function dispatchPickupEvent(): void {
-  const unit = jass.GetTriggerUnit();
-  const item = jass.GetManipulatedItem();
+  const unit = GetTriggerUnit();
+  const item = GetManipulatedItem();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < pickupListeners.length; i++) {
-    const listener = pickupListeners[i];
-    if (listener !== null && listener !== undefined) {
-      listener.callback(unit, item);
+    const callback = pickupListeners[i];
+    if (callback !== null && callback !== undefined) {
+      callback(unit, item);
     }
   }
 }
@@ -60,14 +69,14 @@ function dispatchPickupEvent(): void {
  * 分发丢弃事件到所有监听器
  */
 function dispatchDropEvent(): void {
-  const unit = jass.GetTriggerUnit();
-  const item = jass.GetManipulatedItem();
+  const unit = GetTriggerUnit();
+  const item = GetManipulatedItem();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < dropListeners.length; i++) {
-    const listener = dropListeners[i];
-    if (listener !== null && listener !== undefined) {
-      listener.callback(unit, item);
+    const callback = dropListeners[i];
+    if (callback !== null && callback !== undefined) {
+      callback(unit, item);
     }
   }
 }
@@ -76,14 +85,14 @@ function dispatchDropEvent(): void {
  * 分发使用事件到所有监听器
  */
 function dispatchUseEvent(): void {
-  const unit = jass.GetTriggerUnit();
-  const item = jass.GetManipulatedItem();
+  const unit = GetTriggerUnit();
+  const item = GetManipulatedItem();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < useListeners.length; i++) {
-    const listener = useListeners[i];
-    if (listener !== null && listener !== undefined) {
-      listener.callback(unit, item);
+    const callback = useListeners[i];
+    if (callback !== null && callback !== undefined) {
+      callback(unit, item);
     }
   }
 }
@@ -133,10 +142,11 @@ function initUseTrigger(): void {
  * 注册物品拾取事件监听。
  * 监听器会复用统一的拾取总触发器，返回值是当前监听的内部 id。
  */
-export function onItemPickup(callback: ItemEventCallback): number {
+export function onItemPickup(this: void, callback: ItemEventCallback): number {
   initPickupTrigger();
   const id = getNextListenerId();
-  pickupListeners.push({ id, callback });
+  pickupListenerIds.push(id);
+  pickupListeners.push(callback);
   return id;
 }
 
@@ -149,10 +159,11 @@ export function onItemPickup(callback: ItemEventCallback): number {
  * 注册物品丢弃事件监听。
  * 监听器会复用统一的丢弃总触发器，返回值是当前监听的内部 id。
  */
-export function onItemDrop(callback: ItemEventCallback): number {
+export function onItemDrop(this: void, callback: ItemEventCallback): number {
   initDropTrigger();
   const id = getNextListenerId();
-  dropListeners.push({ id, callback });
+  dropListenerIds.push(id);
+  dropListeners.push(callback);
   return id;
 }
 
@@ -165,10 +176,11 @@ export function onItemDrop(callback: ItemEventCallback): number {
  * 注册物品使用事件监听。
  * 监听器会复用统一的使用总触发器，返回值是当前监听的内部 id。
  */
-export function onItemUse(callback: ItemEventCallback): number {
+export function onItemUse(this: void, callback: ItemEventCallback): number {
   initUseTrigger();
   const id = getNextListenerId();
-  useListeners.push({ id, callback });
+  useListenerIds.push(id);
+  useListeners.push(callback);
   return id;
 }
 
@@ -176,9 +188,10 @@ export function onItemUse(callback: ItemEventCallback): number {
  * 取消注册物品拾取事件监听器
  * @param id 监听器ID
  */
-export function offItemPickup(id: number): void {
-  for (let i = 0; i < pickupListeners.length; i++) {
-    if (pickupListeners[i].id === id) {
+export function offItemPickup(this: void, id: number): void {
+  for (let i = 0; i < pickupListenerIds.length; i++) {
+    if (pickupListenerIds[i] === id) {
+      pickupListenerIds.splice(i, 1);
       pickupListeners.splice(i, 1);
       return;
     }
@@ -189,9 +202,10 @@ export function offItemPickup(id: number): void {
  * 取消注册物品丢弃事件监听器
  * @param id 监听器ID
  */
-export function offItemDrop(id: number): void {
-  for (let i = 0; i < dropListeners.length; i++) {
-    if (dropListeners[i].id === id) {
+export function offItemDrop(this: void, id: number): void {
+  for (let i = 0; i < dropListenerIds.length; i++) {
+    if (dropListenerIds[i] === id) {
+      dropListenerIds.splice(i, 1);
       dropListeners.splice(i, 1);
       return;
     }
@@ -202,9 +216,10 @@ export function offItemDrop(id: number): void {
  * 取消注册物品使用事件监听器
  * @param id 监听器ID
  */
-export function offItemUse(id: number): void {
-  for (let i = 0; i < useListeners.length; i++) {
-    if (useListeners[i].id === id) {
+export function offItemUse(this: void, id: number): void {
+  for (let i = 0; i < useListenerIds.length; i++) {
+    if (useListenerIds[i] === id) {
+      useListenerIds.splice(i, 1);
       useListeners.splice(i, 1);
       return;
     }
@@ -217,7 +232,7 @@ export function offItemUse(id: number): void {
 /**
  * 返回当前三类物品事件的监听器数量，主要用于调试排查重复注册。
  */
-export function getListenerCounts(): { pickup: number; drop: number; use: number } {
+export function getListenerCounts(this: void): { pickup: number; drop: number; use: number } {
   return {
     pickup: pickupListeners.length,
     drop: dropListeners.length,

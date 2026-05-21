@@ -1,0 +1,82 @@
+/** @noSelfInFile */
+const jass = require("jass.common");
+const g = require("jass.globals");
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出");
+const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心");
+const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查");
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版");
+import { 物品主动技能测试发放顺序, 物品主动技能测试命令列表, 物品主动技能测试命令说明文本列表, 物品主动技能测试清理装备列表, } from "./00．测试配置";
+const CreateItem = jass.CreateItem;
+const IssueTargetOrder = jass.IssueTargetOrder;
+const UnitAddItem = jass.UnitAddItem;
+const UnitRemoveItem = jass.UnitRemoveItem;
+const GetUnitX = jass.GetUnitX;
+const GetUnitY = jass.GetUnitY;
+const GetItemTypeId = jass.GetItemTypeId;
+const UnitItemInSlot = jass.UnitItemInSlot;
+const 模块名 = "物品主动技能测试";
+function 获取测试单位() {
+    return g.gg_unit_Hamg_0002 ?? globalThis.bj_lastCreatedUnit ?? null;
+}
+const SetItemPosition = jass.SetItemPosition;
+function 丢弃测试装备(unit) {
+    if (unit == null || unit === 0)
+        return;
+    const x = GetUnitX(unit);
+    const y = GetUnitY(unit);
+    for (let i = 0; i < 6; i++) {
+        const item = UnitItemInSlot(unit, i);
+        if (item == null || item === 0)
+            continue;
+        const itemTypeId = GetItemTypeId(item);
+        for (let j = 0; j < 物品主动技能测试清理装备列表.length; j++) {
+            const 装备名 = 物品主动技能测试清理装备列表[j];
+            const rawId = 按名字反查物品ID(装备名);
+            if (rawId == null || rawId === "")
+                continue;
+            if (stringToFourCCSafe(rawId) === itemTypeId) {
+                UnitRemoveItem(unit, item);
+                SetItemPosition(item, x, y);
+                break;
+            }
+        }
+    }
+}
+function 发放装备(unit, 装备名) {
+    const rawId = 按名字反查物品ID(装备名);
+    if (rawId == null || rawId === "") {
+        debugLogForce(模块名, "未找到装备ID", 装备名);
+        return;
+    }
+    const item = CreateItem(stringToFourCCSafe(rawId), GetUnitX(unit), GetUnitY(unit));
+    if (item == null || item === 0) {
+        debugLogForce(模块名, "创建装备失败", 装备名, rawId);
+        return;
+    }
+    const ok = IssueTargetOrder(unit, "smart", item);
+    debugLogForce(模块名, "已创建并下达拾取命令", 装备名, ok);
+}
+function 发放单个装备(unit, 序号) {
+    丢弃测试装备(unit);
+    if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
+        发放装备(unit, 物品主动技能测试发放顺序[序号 - 1]);
+        debugLogForce(模块名, "已发放测试装备", 序号, 物品主动技能测试发放顺序[序号 - 1]);
+    }
+}
+function on聊天wp测试(_player, command) {
+    const unit = 获取测试单位();
+    if (unit == null || unit === 0) {
+        debugLogForce(模块名, "未找到大法师单位");
+        return;
+    }
+    for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
+        if (command === 物品主动技能测试命令列表[i]) {
+            发放单个装备(unit, i + 1);
+            return;
+        }
+    }
+}
+for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
+    注册聊天命令监听(物品主动技能测试命令列表[i], on聊天wp测试);
+}
+debugLogForce(模块名, "已注册测试命令", 物品主动技能测试命令说明文本列表.join(" | "));

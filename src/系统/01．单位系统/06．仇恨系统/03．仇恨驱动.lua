@@ -6,7 +6,7 @@ local ____exports = {}
 -- 1. 遍历所有有仇恨表的敌人
 -- 2. 死亡清理
 -- 3. 选择应攻击目标（filter 排除死亡/超距）
--- 4. 目标变更时更新缓存；同目标也每 tick 补发 attack 命令维持攻击
+-- 4. 目标变更时更新缓存并下发一次 attack 命令；同目标不重复抢命令
 -- 
 -- 目标引用直接从仇恨表的 targetRef 获取，无需额外注册。
 local jass = require("jass.common")
@@ -29,8 +29,6 @@ local _____6E05_9664_4EC7_6068_663E_793AById = ____require_result_2["清除仇�
 local _____6E05_9664_6240_6709_4EC7_6068_663E_793A = ____require_result_2["清除所有仇恨显示"]
 local ____require_result_3 = require("系统.09．表现系统.05．仇恨面板.05．仇恨面板")
 local _____81EA_52A8_5C55_5F00_4EC7_6068_9762_677F_4E00_6B21 = ____require_result_3["自动展开仇恨面板一次"]
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_4.debugLogForce
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local GetUnitX = jass.GetUnitX
@@ -40,6 +38,7 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local MAX_DISTANCE_SQ = 2500 * 2500
+local ISSUE_ORDER_DISTANCE_SQ = 1000 * 1000
 local _____5468_671F_56DE_8C03ID = 0
 local _____6A21_5757_540D = "仇恨系统"
 local _nowMs = nil
@@ -71,7 +70,7 @@ local function _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_
     _____81EA_52A8_5C55_5F00_4EC7_6068_9762_677F_4E00_6B21(playerId)
 end
 --- 过滤回调：单位死亡或超距时排除
-local function _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
+local function _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, maxDistanceSq)
     return function(entry)
         local ref = entry.targetRef
         if ref == nil or ref == 0 then
@@ -84,7 +83,7 @@ local function _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
         local ty = GetUnitY(ref)
         local dx = tx - ex
         local dy = ty - ey
-        return dx * dx + dy * dy <= MAX_DISTANCE_SQ
+        return dx * dx + dy * dy <= maxDistanceSq
     end
 end
 --- 驱动 Tick：通过敌人引用表拿到敌人单位，再驱动攻击
@@ -97,7 +96,6 @@ local function onTick()
                 local _____654C_4EBAID = _____654C_4EBAID_5217_8868[i + 1]
                 local _____654C_4EBA = getEnemyRef(_____654C_4EBAID)
                 if _____654C_4EBA == nil or _____654C_4EBA == 0 then
-                    debugLogForce(_____6A21_5757_540D, "驱动清理：敌人引用丢失 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue16
                 end
@@ -107,7 +105,6 @@ local function onTick()
                 end
                 _____6E05_7406_654C_4EBA_8FC7_671F_4EC7_6068_6761_76EEById(_____654C_4EBAID)
                 if not hasThreatTable(_____654C_4EBAID) then
-                    debugLogForce(_____6A21_5757_540D, "驱动清理：过期条目清完后已无仇恨表 敌人ID=", _____654C_4EBAID)
                     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
                     goto __continue16
                 end
@@ -118,10 +115,11 @@ local function onTick()
                 end
                 local ex = GetUnitX(_____654C_4EBA)
                 local ey = GetUnitY(_____654C_4EBA)
-                local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
+                local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, MAX_DISTANCE_SQ)
+                local issueOrderFilter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, ISSUE_ORDER_DISTANCE_SQ)
                 local best = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, filter)
+                local issueOrderBest = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, issueOrderFilter)
                 if best == nil then
-                    debugLogForce(_____6A21_5757_540D, "驱动清理：未找到有效目标 敌人ID=", _____654C_4EBAID)
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
                     goto __continue16
                 end
@@ -132,11 +130,12 @@ local function onTick()
                 end
                 _____66F4_65B0_4EC7_6068_663E_793A(_____654C_4EBA, best.targetRef, best.threat)
                 _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(best.targetRef)
-                if _____5F53_524D_76EE_6807ID ~= best.targetHid then
-                    IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
-                    _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, best.targetHid)
-                else
-                    IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
+                if issueOrderBest == nil or issueOrderBest.targetRef == nil or issueOrderBest.targetRef == 0 then
+                    goto __continue16
+                end
+                if _____5F53_524D_76EE_6807ID ~= issueOrderBest.targetHid then
+                    IssueTargetOrder(_____654C_4EBA, "attack", issueOrderBest.targetRef)
+                    _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, issueOrderBest.targetHid)
                 end
             end
             ::__continue16::
@@ -159,7 +158,6 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     end
     _____6E05_7406_654C_4EBA_8FC7_671F_4EC7_6068_6761_76EEById(_____654C_4EBAID)
     if not hasThreatTable(_____654C_4EBAID) then
-        debugLogForce(_____6A21_5757_540D, "单体驱动清理：过期条目清完后已无仇恨表 敌人ID=", _____654C_4EBAID)
         _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
         return
     end
@@ -170,10 +168,11 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     end
     local ex = GetUnitX(_____654C_4EBA)
     local ey = GetUnitY(_____654C_4EBA)
-    local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey)
+    local filter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, MAX_DISTANCE_SQ)
+    local issueOrderFilter = _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, ISSUE_ORDER_DISTANCE_SQ)
     local best = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, filter)
+    local issueOrderBest = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, issueOrderFilter)
     if best == nil then
-        debugLogForce(_____6A21_5757_540D, "单体驱动清理：未找到有效目标 敌人ID=", _____654C_4EBAID)
         _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
         return
     end
@@ -184,11 +183,12 @@ ____exports["驱动单个敌人"] = function(_____654C_4EBA)
     end
     _____66F4_65B0_4EC7_6068_663E_793A(_____654C_4EBA, best.targetRef, best.threat)
     _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(best.targetRef)
-    if _____5F53_524D_76EE_6807ID ~= best.targetHid then
-        IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
-        _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, best.targetHid)
-    else
-        IssueTargetOrder(_____654C_4EBA, "attack", best.targetRef)
+    if issueOrderBest == nil or issueOrderBest.targetRef == nil or issueOrderBest.targetRef == 0 then
+        return
+    end
+    if _____5F53_524D_76EE_6807ID ~= issueOrderBest.targetHid then
+        IssueTargetOrder(_____654C_4EBA, "attack", issueOrderBest.targetRef)
+        _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, issueOrderBest.targetHid)
     end
 end
 --- 初始化仇恨系统：注册 0.25 秒周期回调
@@ -196,22 +196,20 @@ ____exports["初始化仇恨系统"] = function()
     if _____5468_671F_56DE_8C03ID ~= 0 then
         return
     end
-    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-    local addPeriodicCallback = ____require_result_5.addPeriodicCallback
+    local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+    local addPeriodicCallback = ____require_result_4.addPeriodicCallback
     _____5468_671F_56DE_8C03ID = addPeriodicCallback(250, onTick)
-    debugLogForce(_____6A21_5757_540D, "初始化仇恨系统 周期ID=", _____5468_671F_56DE_8C03ID)
 end
 --- 停用仇恨系统
 ____exports["停用仇恨系统"] = function()
     if _____5468_671F_56DE_8C03ID == 0 then
         return
     end
-    local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-    local removePeriodicCallback = ____require_result_6.removePeriodicCallback
+    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+    local removePeriodicCallback = ____require_result_5.removePeriodicCallback
     removePeriodicCallback(_____5468_671F_56DE_8C03ID)
     _____5468_671F_56DE_8C03ID = 0
     _____6E05_9664_6240_6709_5F53_524D_76EE_6807(nil)
     _____6E05_9664_6240_6709_4EC7_6068_663E_793A()
-    debugLogForce(_____6A21_5757_540D, "停用仇恨系统")
 end
 return ____exports

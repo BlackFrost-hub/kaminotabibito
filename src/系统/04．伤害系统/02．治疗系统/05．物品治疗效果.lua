@@ -25,11 +25,11 @@ local isHotActive = ____require_result_3.isHotActive
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_4.YDUserDataGet
 --- 技能ID
-local ABIL_A002 = stringToFourCC(nil, "A002")
-local ABIL_A0LF = stringToFourCC(nil, "A0LF")
-local ABIL_A015 = stringToFourCC(nil, "A015")
-local ABIL_A0B8 = stringToFourCC(nil, "A0B8")
-local ABIL_A08C = stringToFourCC(nil, "A08C")
+local ABIL_A002 = stringToFourCC("A002")
+local ABIL_A0LF = stringToFourCC("A0LF")
+local ABIL_A015 = stringToFourCC("A015")
+local ABIL_A0B8 = stringToFourCC("A0B8")
+local ABIL_A08C = stringToFourCC("A08C")
 --- 群体治疗范围
 local GROUP_HEAL_RADIUS = 1000
 --- HOT持续时间
@@ -178,7 +178,7 @@ function ____exports.doHealItemEffectById(abilIdStr, target, healHP, healMP)
     if type(abilIdStr) ~= "string" or #abilIdStr ~= 4 then
         return
     end
-    local abilId = stringToFourCC(nil, abilIdStr)
+    local abilId = stringToFourCC(abilIdStr)
     ____exports.doHealItemEffect(abilId, target, healHP, healMP)
 end
 --- 检查技能ID是否为物品治疗技能

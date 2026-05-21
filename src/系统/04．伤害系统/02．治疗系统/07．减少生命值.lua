@@ -78,7 +78,7 @@ local function _____663E_793A_6570_503C(target, amount, resourceType, showText)
         end
         fireShowDamageEvent(
             target,
-            -amount,
+            amount,
             255,
             0,
             0
@@ -97,7 +97,7 @@ local function _____663E_793A_6570_503C(target, amount, resourceType, showText)
     end
     fireShowDamageEvent(
         target,
-        -amount,
+        amount,
         150,
         50,
         255

@@ -1,16 +1,14 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
-  registerDamageCallback: (this: void, cb: (
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, cb: (
     this: void,
-    unit: any,
-    damage: number,
-    damageType: number,
-    fromDotTickBatch?: boolean,
-    source?: any,
-    isNormalAttack?: boolean
-  ) => void, intervalSeconds?: number) => void;
+    target: any,
+    attacker: any,
+    applied: number,
+    snapshot: any
+  ) => void) => void;
 };
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
@@ -110,7 +108,7 @@ function on使者魔轮中心计时器Tick(this: void): void {
 function 确保使者魔轮伤害监听(this: void): void {
   if (已注册使者魔轮伤害监听) return;
   已注册使者魔轮伤害监听 = true;
-  registerDamageCallback(on使者魔轮伤害事件);
+  registerAppliedFinalDamageListener(on使者魔轮伤害事件);
 }
 
 function 受伤单位在魔盾内(this: void, 实例: 使者魔轮魔盾实例, 受伤单位: any): boolean {
@@ -130,11 +128,9 @@ function 吸收使者魔轮伤害(this: void, 实例: 使者魔轮魔盾实例, 
 function on使者魔轮伤害事件(
   this: void,
   受伤单位: any,
+  _攻击者: any,
   伤害值: number,
-  _伤害类型: number,
-  _fromDotTickBatch?: boolean,
-  _source?: any,
-  _isNormalAttack?: boolean
+  _snapshot?: any
 ): void {
   if (受伤单位 == null || 受伤单位 === 0 || !(伤害值 > 0)) return;
 

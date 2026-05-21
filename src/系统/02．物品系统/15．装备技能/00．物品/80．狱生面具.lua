@@ -18,7 +18,7 @@ local function ____on_72F1_751F_9762_5177_5468_671F(unit)
     local consumed = -_____51CF_5C11_9B54_6CD5_503C(
         unit,
         _____53D6_6700_5927_9B54_6CD5(unit) * _____72F1_751F_9762_5177_914D_7F6E["最大魔法消耗比例"],
-        false,
+        true,
         false
     )
     if not (consumed > 0) then

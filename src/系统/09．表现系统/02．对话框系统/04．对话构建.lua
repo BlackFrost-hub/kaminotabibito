@@ -62,7 +62,7 @@ local function grantQuestItems(self, hero, questItems)
             if #itemCode ~= 4 then
                 goto __continue9
             end
-            local itemId = stringToFourCC(nil, itemCode)
+            local itemId = stringToFourCC(itemCode)
             if itemId == 0 then
                 goto __continue9
             end

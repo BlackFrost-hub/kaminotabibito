@@ -1,0 +1,130 @@
+---
+description: Buff 新增与维护经验规则，统一约定 Buff 表、运行时逻辑、驱散截断、原生 Buff 清理与 DOT/HOT 结束条件
+globs: TS/系统/05．Buff系统/**/*.ts,TS/系统/04．伤害系统/**/*.ts,TS/系统/03．技能系统/00．技能模板+函数/01．技能函数/19．拓展效果/**/*.ts,TS/系统/02．物品系统/15．装备技能/**/*.ts
+alwaysApply: false
+---
+
+# Buff 经验规则
+
+这条规则用于新增或修改任何 Buff / Debuff / HOT / DOT / 原生魔法效果时的统一判断。  
+核心目标只有一个：**不要只做 UI，不要只做表，不要只做一半。**
+
+## 1. 先判断 Buff 属于哪一层
+
+新增 Buff 前，先分清三层：
+
+- `Buff 表`：`TS/系统/05．Buff系统/01．Buff表.ts`，定义名称、图标、类型、驱散、叠层、提示。
+- `运行时逻辑`：真正的效果、持续、叠层、回调、DOT/HOT、属性变化、攻击效果等。
+- `原生魔法效果`：马甲技能自带的状态栏 / 图标 / 原生 Buff，需要时必须同步清理。
+
+禁止只加 `Buff 表` 就当成完成。
+
+## 2. Buff 表新增时必须写清楚
+
+`Buff表.ts` 新条目至少要明确这些字段：
+
+- `buffID`
+- `buffName`
+- `icon`
+- `effect`
+- `type`
+- `interval`
+- `maxStack`
+- `stackRule`
+- `stackRefresh`
+- `dispelLevel`
+- `canPurge`
+- `tooltip`
+
+要求：
+
+- `type` 必须能表达驱散语义，例如 `Buff:`、`Debuff:`、`Debuff:control`、`Debuff:magic`、`Debuff:dot:soft`。
+- `tooltip` 必须和实际代码一致。
+- 如果有真实效果，就必须在对应 TS 文件里实现，不允许只放表。
+
+## 3. 运行时效果必须绑定真实生命周期
+
+持续型效果必须在每次 tick 前检查自己是否还存在。
+
+常见原则：
+
+- DOT / HOT 每跳前都要检查对应 `BuffID` 是否还在 Buff 池。
+- `registerManualBuff` 只是登记，不代表逻辑已经自动支持驱散中断。
+- 属性型 Buff 必须通过 `onRemove` 回滚。
+- 如果效果和 `effect/effect2` 有语义，读写单位必须统一单位。
+
+## 4. 外部驱散 / 截断必须真的结束
+
+如果 Buff 会被外部驱散、清除、截断，那么必须满足下面至少一条：
+
+- 运行时每 tick 检查 Buff 是否还存在，没了就停。
+- 清除入口会真正调用 `移除单位指定Buff` / `UnitRemoveAbility` / 对应回调。
+- DOT 状态通过 `syncDotBuff(..., null)` 或等效路径清掉。
+
+### 燃烧经验
+
+- `D002` 燃烧是 DOT Buff。
+- 只要 Buff 池里对应项被删掉，燃烧就应提前结束。
+- 不允许只删 UI、只删图标、只删局部状态，却让伤害继续跑。
+
+## 5. `registerManualBuff` 的使用约束
+
+`registerManualBuff(target, buffID, duration, effectValue, extras)` 只负责注册 Buff 池记录。
+
+常用补充项：
+
+- `sourceName`：来源显示
+- `iconOverride`：图标覆盖
+- `effectModelOverride`：特效覆盖
+- `effectValue2`：第二数值
+- `nativeBuffAbilityIds`：需要同步清理的原生魔法效果 rawId
+- `onRemove`：移除时回滚逻辑
+
+如果是可驱散 Buff，必须先想清楚：
+
+- 清除时谁负责停逻辑
+- 谁负责回滚属性
+- 谁负责删原生效果
+- 谁负责删 DOT 状态
+
+## 6. 清除入口优先统一
+
+业务代码优先走统一入口，不要直接散写删除逻辑：
+
+- `移除单位指定Buff`
+- `移除单位增益Buff`
+- `移除单位负面Buff`
+- `按驱散等级移除单位Buff`
+- 技能侧的中文便捷入口 `TS/系统/03．技能系统/00．技能模板+函数/02．通用函数/01．控制与Buff.ts`
+
+如果是某个具体 Buff，优先补一个明确的清除入口，而不是让外部猜 `buffID`。
+
+## 7. 经验检查清单
+
+新增或修改 Buff 后，至少检查：
+
+- Buff 表字段是否完整
+- 是否有真实 TS 逻辑
+- 是否需要 `onRemove`
+- 是否要同步原生能力清理
+- 是否需要 tick 时检查存活
+- 是否会被外部驱散 / 截断
+- 是否会因为多个同类 Buff 只触发一个
+- `npm run build` 是否通过
+
+## 8. 技能侧统一入口必须同步更新
+
+每次新增 Buff、DOT、HOT 或和 Buff 相关的新效果时，都必须同步检查并更新：
+
+- `TS/系统/03．技能系统/00．技能模板+函数/02．通用函数/01．控制与Buff.ts`
+
+要求：
+
+- 新增的 Buff 读取函数要优先挂到这里，方便技能侧统一调用。
+- 新增的 Buff 清除函数也要优先挂到这里，避免业务侧直接散写 `buffID`。
+- 如果是 DOT 相关内容，还要确认 `dot伤害.ts` / `DOT定义` / 对应 Buff 表是否同步。
+- 之前已经存在的 DOT / Buff 经验函数，也要顺手检查是否需要补到这个统一入口里。
+
+一句话原则：
+
+**新增 Buff 不只改定义文件，必须把“读、加、清”都接进 `控制与Buff.ts`。**

@@ -28,9 +28,9 @@ const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
 };
 const { YDWEGetUnitAbilityState } = ydweAbility;
 const fourCCTools = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (self: any, four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 };
-const fourCCToStringRaw: any = fourCCTools.fourCCToString;
+const fourCCToStringRaw = fourCCTools.fourCCToString;
 
 type 热键位 = "Q" | "W" | "E" | "R" | "D";
 type 文本框表 = Record<热键位, number>;
@@ -144,7 +144,7 @@ function 确保文本框缓存(this: void): 分层文本框表 | null {
 
 function fourCCText(this: void, abilityId: number): string {
   if (abilityId === 0) return "0";
-  return fourCCToStringRaw(fourCCTools, abilityId);
+  return fourCCToStringRaw(abilityId);
 }
 
 function getCooldown(this: void, whichHero: any, abilityId: number): number {

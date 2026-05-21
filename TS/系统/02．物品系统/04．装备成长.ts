@@ -6,6 +6,7 @@
  * 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
  */
 const jass = require("jass.common") as JassCommon;
+const GetItemTypeId = (jass as any).GetItemTypeId as (this: void, item: any) => number;
 const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
@@ -13,13 +14,13 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   round: (this: void, value: number) => number;
 };
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemUse: (callback: (unit: any, item: any) => void) => number;
+const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const g = require("jass.globals") as { [k: string]: any };
 const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 };
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
@@ -306,7 +307,7 @@ function onUseItem(): void {
   if (!entry || !entry.PowerUP) return;
 
   const glob = globalThis as any;
-  const idStr = fourCCToString((jass as any).GetItemTypeId(item));
+  const idStr = fourCCToString(GetItemTypeId(item));
   const key = "__EquipPowerUP_" + tostring(unit) + "_" + idStr;
   if (glob[key]) return;
   glob[key] = true;
@@ -357,7 +358,7 @@ function init(): void {
   if ((g as any)[INIT_KEY]) return;
   (g as any)[INIT_KEY] = true;
   // 使用物品事件中心注册，减少触发器数量
-  itemEventCenter.onItemUse((unit, item) => {
+  onItemUse((unit, item) => {
     onUseItem();
   });
 }

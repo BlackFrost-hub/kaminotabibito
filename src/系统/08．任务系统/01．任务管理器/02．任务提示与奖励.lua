@@ -130,7 +130,7 @@ function ____exports.giveQuestRewards(self, playerId, questId)
             ____cond17 = ____cond17 or ____switch17 == "item"
             if ____cond17 then
                 if hero and reward.itemId then
-                    local itemTypeId = stringToFourCC(nil, reward.itemId)
+                    local itemTypeId = stringToFourCC(reward.itemId)
                     jass.UnitAddItemById(hero, itemTypeId)
                     questDebugPrint(
                         nil,

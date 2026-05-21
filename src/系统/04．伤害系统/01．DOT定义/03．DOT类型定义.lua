@@ -52,39 +52,6 @@ function ____exports.registerBuiltInDotTypes(self, deps)
             effectDuration = 0.8
         }
     )
-    local function parseBurnBuff(self, buffStr)
-        return parseStandardDotBuff(
-            nil,
-            buffStr,
-            "Burn",
-            function(____, damagePerSec, duration, attackOnly) return {damagePerSec = damagePerSec, duration = duration, attackOnly = attackOnly} end,
-            true
-        )
-    end
-    local function getBestBurnFromUnit(self, unit)
-        return getBestDotFromUnit(
-            nil,
-            unit,
-            parseBurnBuff,
-            function(____, parsed) return parsed.damagePerSec * parsed.duration end
-        )
-    end
-    registerDotType(
-        nil,
-        {
-            id = "burn",
-            debuffDotEnemyNoStructure = true,
-            parseBuff = parseBurnBuff,
-            getBestFromUnit = getBestBurnFromUnit,
-            computeAmount = function(____, _target, parsed) return parsed.damagePerSec or 0 end,
-            damageType = jass.DAMAGE_TYPE_FIRE,
-            effectModel = dotEffectModelFromBuffRow(
-                nil,
-                getDotBuffRow(nil, "burn")
-            ),
-            effectDuration = 0.75
-        }
-    )
     local function parsePoisonBuff(self, buffStr)
         return parseStandardDotBuff(
             nil,

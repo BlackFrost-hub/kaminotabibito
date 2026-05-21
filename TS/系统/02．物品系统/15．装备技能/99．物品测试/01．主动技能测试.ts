@@ -24,6 +24,7 @@ import {
 } from "./00．测试配置";
 
 const CreateItem = jass.CreateItem as (id: number, x: number, y: number) => any;
+const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -71,7 +72,8 @@ function 发放装备(this: void, unit: any, 装备名: string): void {
     debugLogForce(模块名, "创建装备失败", 装备名, rawId);
     return;
   }
-  UnitAddItem(unit, item);
+  const ok = IssueTargetOrder(unit, "smart", item);
+  debugLogForce(模块名, "已创建并下达拾取命令", 装备名, ok);
 }
 
 function 发放单个装备(this: void, unit: any, 序号: number): void {

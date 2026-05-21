@@ -54,7 +54,7 @@ itemsData = require("系统.02．物品系统.01．装备数据").default or ({}
 local PREFIX = "|cffffff00『系统提示』：|r"
 local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
-        if stringToFourCC(nil, id) == typeId then
+        if stringToFourCC(id) == typeId then
             return id
         end
     end
@@ -260,7 +260,7 @@ local function pickFromEqualPool(ids, picks)
     return out
 end
 local function createItemAtUnit(unit, itemId)
-    local four = stringToFourCC(nil, itemId)
+    local four = stringToFourCC(itemId)
     local loc = jass.GetUnitLoc(unit)
     if loc then
         equipExcrete:setLastCreatedItem(itemInv:CreateItemLoc(four, loc))
@@ -324,7 +324,7 @@ local function onUnitDeath(unit, _killer)
     local DROP_RULES = {{unitId = "hfoo", minScore = 150, maxScore = 250, proc = 1}}
     for ____, rule in ipairs(DROP_RULES) do
         do
-            if typeId ~= stringToFourCC(nil, rule.unitId) then
+            if typeId ~= stringToFourCC(rule.unitId) then
                 goto __continue71
             end
             local r = jass.GetRandomInt(1, 10000)

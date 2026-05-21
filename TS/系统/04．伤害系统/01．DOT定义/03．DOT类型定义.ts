@@ -57,31 +57,6 @@ export function registerBuiltInDotTypes(deps: {
     effectDuration: 0.8,
   });
 
-  // ========== 虚拟分区：burn ==========
-  function parseBurnBuff(buffStr: string): BurnParsed | null {
-    return parseStandardDotBuff(
-      buffStr,
-      "Burn",
-      (damagePerSec, duration, attackOnly) => ({ damagePerSec, duration, attackOnly }),
-      true
-    );
-  }
-
-  function getBestBurnFromUnit(unit: any): BurnParsed | null {
-    return getBestDotFromUnit(unit, parseBurnBuff, (parsed) => parsed.damagePerSec * parsed.duration);
-  }
-
-  registerDotType({
-    id: "burn",
-    debuffDotEnemyNoStructure: true,
-    parseBuff: parseBurnBuff,
-    getBestFromUnit: getBestBurnFromUnit,
-    computeAmount: (_target: any, parsed: any) => (parsed.damagePerSec as number) ?? 0,
-    damageType: jass.DAMAGE_TYPE_FIRE,
-    effectModel: dotEffectModelFromBuffRow(getDotBuffRow("burn")),
-    effectDuration: 0.75,
-  });
-
   // ========== 虚拟分区：poison ==========
   function parsePoisonBuff(buffStr: string): PoisonParsed | null {
     return parseStandardDotBuff(

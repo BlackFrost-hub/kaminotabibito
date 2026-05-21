@@ -44,6 +44,11 @@ const { STES_FireWithParams } = require("lib.扩展函数.Star扩展函数.Star�
 const { 显示单位数值漂浮文字 } = require("lib.扩展函数.封装函数.03．漂浮文字.05．数值漂浮文字") as {
   显示单位数值漂浮文字: (this: void, unit: any, value: number, options?: any) => any;
 };
+const { addDelayedCallback, addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  getServerTime: (this: void) => number;
+};
 
 // ==========================================================================================
 // 类型定义
@@ -64,9 +69,12 @@ export interface HealParams {
   ItemHeal: boolean;       // 是否物品治疗
   HealEffect: boolean;     // 是否播放生命治疗特效
   HealEffectPath?: string; // 生命治疗特效路径（可选）
+  UseDefaultHealEffect?: boolean; // 无自定义路径时是否强制播放默认治疗特效
   ManaEffect?: boolean;    // 是否播放魔法恢复特效
   ManaEffectPath?: string; // 魔法恢复特效路径（可选）
+  UseDefaultManaEffect?: boolean; // 无自定义路径时是否强制播放默认回蓝特效
   ManaShowText?: boolean;  // 是否显示魔法恢复漂浮字（默认true）
+  DelayOneTick?: boolean;  // 是否延后一帧执行（默认false）
 }
 
 // ==========================================================================================
@@ -76,6 +84,63 @@ export interface HealParams {
 const healCallbacks: HealCallback[] = [];
 const healEventListeners: HealEventListener[] = [];
 const totalHealStats: Map<number, number> = new Map();
+const delayedHealQueue: HealParams[] = [];
+let delayedHealScheduled = false;
+type 待销毁特效记录 = {
+  句柄: any;
+  到期时间: number;
+};
+const 待销毁治疗特效列表: 待销毁特效记录[] = [];
+let 已注册治疗特效驱动 = false;
+
+function 处理待销毁治疗特效(): void {
+  const 当前时间 = getServerTime();
+  for (let i = 待销毁治疗特效列表.length - 1; i >= 0; i--) {
+    const 记录 = 待销毁治疗特效列表[i];
+    if (当前时间 < 记录.到期时间) continue;
+    jass.DestroyEffect(记录.句柄);
+    待销毁治疗特效列表.splice(i, 1);
+  }
+}
+
+function 安排治疗特效销毁(effect: any, 持续秒: number = 1): void {
+  if (effect == null || effect === 0) return;
+  if (!已注册治疗特效驱动) {
+    已注册治疗特效驱动 = true;
+    addPeriodicCallback(100, 处理待销毁治疗特效);
+  }
+  待销毁治疗特效列表.push({
+    句柄: effect,
+    到期时间: getServerTime() + 持续秒 * 1000,
+  });
+}
+
+function cloneHealParams(params: HealParams): HealParams {
+  return {
+    HealSource: params.HealSource,
+    HealTarget: params.HealTarget,
+    HealAmount: params.HealAmount,
+    HealManaAmount: params.HealManaAmount,
+    ItemHeal: params.ItemHeal,
+    HealEffect: params.HealEffect,
+    HealEffectPath: params.HealEffectPath,
+    UseDefaultHealEffect: params.UseDefaultHealEffect,
+    ManaEffect: params.ManaEffect,
+    ManaEffectPath: params.ManaEffectPath,
+    UseDefaultManaEffect: params.UseDefaultManaEffect,
+    ManaShowText: params.ManaShowText,
+    DelayOneTick: false,
+  };
+}
+
+function 执行延迟治疗队列(): void {
+  delayedHealScheduled = false;
+  while (delayedHealQueue.length > 0) {
+    const params = delayedHealQueue.shift();
+    if (params == null) continue;
+    doHeal(params);
+  }
+}
 
 // ==========================================================================================
 // 治疗率存储API
@@ -155,7 +220,7 @@ function playHealEffect(target: any, effectPath?: string): void {
   const x = jass.GetUnitX(target);
   const y = jass.GetUnitY(target);
   const eff = jass.AddSpecialEffect(path, x, y);
-  if (eff != null) jass.DestroyEffect(eff);
+  安排治疗特效销毁(eff, 1);
 }
 
 /** 获取已损失魔法值 */
@@ -172,7 +237,7 @@ function playManaEffect(target: any, effectPath?: string): void {
   if (target == null) return;
   const path = (effectPath != null && effectPath !== "") ? effectPath : DEFAULT_MANA_HEAL_EFFECT_PATH;
   const eff = jass.AddSpecialEffectTarget(path, target, "origin");
-  if (eff != null) jass.DestroyEffect(eff);
+  安排治疗特效销毁(eff, 1);
 }
 
 /** 显示魔法恢复漂浮字 */
@@ -181,6 +246,7 @@ function fireManaShowEvent(target: any, amount: number): void {
     红: MANA_TEXT_COLOR.red,
     绿: MANA_TEXT_COLOR.green,
     蓝: MANA_TEXT_COLOR.blue,
+    大小: 15,
   });
 }
 
@@ -238,6 +304,7 @@ export function fireShowDamageEvent(
     红: red ?? HEAL_TEXT_COLOR.red,
     绿: green ?? HEAL_TEXT_COLOR.green,
     蓝: blue ?? HEAL_TEXT_COLOR.blue,
+    大小: 15,
   });
 }
 
@@ -312,8 +379,17 @@ function addPlayerHealStats(target: any, source: any, amount: number): void {
  * 流程：校验 -> 计算加成 -> 回调修改 -> 限制溢出 -> 设置生命 -> 特效 -> 事件 -> 统计
  * @returns 实际治疗量（系统关闭或无效返回0）
  */
-export function doHeal(params: HealParams): number {
+export function doHeal(this: void, params: HealParams): number {
   if (!HEAL_SYSTEM_ENABLED) return 0;
+
+  if (params.DelayOneTick === true) {
+    delayedHealQueue.push(cloneHealParams(params));
+    if (!delayedHealScheduled) {
+      delayedHealScheduled = true;
+      addDelayedCallback(10, 执行延迟治疗队列);
+    }
+    return 0;
+  }
 
   const manaEffectEnabled = params.ManaEffect ?? ((params.HealManaAmount ?? 0) > 0);
 
@@ -325,7 +401,9 @@ export function doHeal(params: HealParams): number {
     ItemHeal,
     HealEffect,
     HealEffectPath,
+    UseDefaultHealEffect = false,
     ManaEffectPath,
+    UseDefaultManaEffect = false,
     ManaShowText = true,
   } = params;
 
@@ -354,7 +432,7 @@ export function doHeal(params: HealParams): number {
         const curLife = GetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE);
         SetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal);
 
-        if (HealEffect) playHealEffect(HealTarget, HealEffectPath);
+        if (HealEffect || UseDefaultHealEffect) playHealEffect(HealTarget, HealEffectPath);
 
         fireShowDamageEvent(HealTarget, actualHeal);
         fireHealEvent(HealSource, HealTarget, actualHeal);
@@ -374,7 +452,7 @@ export function doHeal(params: HealParams): number {
     const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
       魔法增减: (this: void, target: any, amount: number, showText?: boolean, showManaEffect?: boolean) => number;
     };
-    魔法增减(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled);
+    魔法增减(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled || UseDefaultManaEffect);
   }
 
   return actualHeal;
@@ -386,6 +464,7 @@ export function doHeal(params: HealParams): number {
 
 /** 技能治疗 */
 export function spellHeal(
+  this: void,
   source: any,
   target: any,
   amount: number,
@@ -410,10 +489,11 @@ export function spellHeal(
 
 /** 物品治疗 */
 export function itemHeal(
+  this: void,
   source: any,
   target: any,
   amount: number,
-  showEffect: boolean = true,
+  showEffect: boolean = false,
   effectPath?: string,
   manaAmount: number = 0,
   showManaEffect: boolean = false,
@@ -433,7 +513,7 @@ export function itemHeal(
 }
 
 /** 生命恢复（无特效无来源） */
-export function regenHeal(target: any, amount: number): number {
+export function regenHeal(this: void, target: any, amount: number): number {
   return doHeal({ HealSource: null, HealTarget: target, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 

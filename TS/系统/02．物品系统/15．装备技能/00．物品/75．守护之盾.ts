@@ -150,7 +150,7 @@ function on守护之盾伤害修正(this: void, context: any): number {
   if (holder == null) return context.currentDamage;
   const transfer = context.currentDamage * 守护之盾配置.转移比例;
   if (!(transfer > 0)) return context.currentDamage;
-  变更资源值(holder, -transfer, "life", false, true, undefined, 0);
+  变更资源值(holder, -transfer, "life", true, true, undefined, 0);
   return context.currentDamage - transfer;
 }
 

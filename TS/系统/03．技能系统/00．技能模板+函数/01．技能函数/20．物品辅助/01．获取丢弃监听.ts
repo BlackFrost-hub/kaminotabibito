@@ -4,7 +4,9 @@ const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事�
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
   onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
-
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
 const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -121,11 +123,15 @@ function 同步并分发物品变化(this: void, unit: any, item: any, isPickup:
 }
 
 function on物品获取监听(this: void, unit: any, item: any): void {
-  同步并分发物品变化(unit, item, true);
+  addDelayedCallback(10, () => {
+    同步并分发物品变化(unit, item, true);
+  });
 }
 
 function on物品丢弃监听(this: void, unit: any, item: any): void {
-  同步并分发物品变化(unit, item, false);
+  addDelayedCallback(10, () => {
+    同步并分发物品变化(unit, item, false);
+  });
 }
 
 function 初始化获取丢弃监听(this: void): void {
@@ -139,6 +145,7 @@ export function 监听指定物品获取丢弃(this: void, itemTypeId: number, �
   if (itemTypeId === 0) return;
   初始化获取丢弃监听();
   指定物品监听列表.push({ 物品类型ID: itemTypeId, 获取回调, 丢弃回调 });
+
 }
 
 export function 获取单位当前持有指定物品数量(this: void, unit: any, itemTypeId: number): number {

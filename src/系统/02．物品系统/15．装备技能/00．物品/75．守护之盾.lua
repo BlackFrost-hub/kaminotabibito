@@ -169,7 +169,7 @@ local function ____on_5B88_62A4_4E4B_76FE_4F24_5BB3_4FEE_6B63(context)
         holder,
         -transfer,
         "life",
-        false,
+        true,
         true,
         nil,
         0

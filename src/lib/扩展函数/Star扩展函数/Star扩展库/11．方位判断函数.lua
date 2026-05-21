@@ -8,8 +8,9 @@ local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570
 -- 所有函数均基于单位面朝方向与目标位置的夹角计算。
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.00．BJ全局兜底")
-local CosBJ = ____require_result_0.CosBJ
 local BJ_DEGTORAD = ____require_result_0.BJ_DEGTORAD
+local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_1.CosBJ
 --- 内部工具：计算两点间角度（度）
 local function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
     return jass.Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD

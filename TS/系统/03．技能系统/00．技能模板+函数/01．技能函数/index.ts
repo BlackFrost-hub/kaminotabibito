@@ -23,3 +23,4 @@ export * from "./13．反击/index";
 export * from "./19．拓展效果/index";
 export * from "./20．物品辅助/index";
 export * from "./21．攻击效果/index";
+export * from "./22．幸运值/index";

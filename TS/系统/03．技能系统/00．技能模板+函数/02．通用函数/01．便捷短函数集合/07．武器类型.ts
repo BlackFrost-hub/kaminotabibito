@@ -12,7 +12,7 @@ const { 获取玩家英雄配置, 获取单位玩家英雄配置 } = require("�
 const { items } = require("系统.02．物品系统.01．装备数据") as {
   items: Record<string, Record<string, any>>;
 };
-const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   fourCCToString: (this: void, four: number) => string;
 };
 const { Ir_SetUnitAttackType } = require("lib.扩展函数.封装函数.01．通用工具.04．单位工具") as {

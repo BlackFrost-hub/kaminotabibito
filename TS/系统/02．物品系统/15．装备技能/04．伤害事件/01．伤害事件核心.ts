@@ -6,9 +6,6 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
-const { UnitHasBuffBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
-  UnitHasBuffBJ: (this: void, unit: any, buffId: number) => boolean;
-};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
@@ -59,13 +56,20 @@ const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: nu
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (whichUnit: any, abilcode: number) => number;
 const UnitAddAbility = jass.UnitAddAbility as (whichUnit: any, abilityId: number) => boolean;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (whichUnit: any, order: string) => boolean;
+
+function 单位拥有Buff(this: void, unit: any, buffId: number): boolean {
+  if (unit == null || unit === 0) return false;
+  if (!(buffId > 0)) return false;
+  return GetUnitAbilityLevel(unit, buffId) > 0;
+}
 
 function 处理指挥易伤(this: void, ctx: any): void {
   if (B00H指挥BuffID === 0) return;
   if (ctx.attacker == null || ctx.attacker === 0 || ctx.target == null || ctx.target === 0) return;
-  if (!UnitHasBuffBJ(ctx.attacker, B00H指挥BuffID)) return;
+  if (!单位拥有Buff(ctx.attacker, B00H指挥BuffID)) return;
   施加易伤(ctx.attacker, ctx.target, { 持续时间: 5, 伤害增加百分比: 0.15 });
 }
 
@@ -124,7 +128,7 @@ function 伤害事件修正(this: void, context: any): number {
   let 结果 = 斯尔法袍.处理斯尔法袍伤害修正(context);
   结果 = 嗜狱恶剑.处理嗜狱恶剑伤害修正?.(context) ?? 结果;
   结果 = 精沙战斧.处理精沙战斧伤害修正?.(context) ?? 结果;
-  if (B00V暗黑侵蚀BuffID !== 0 && context.target != null && UnitHasBuffBJ(context.target, B00V暗黑侵蚀BuffID)) {
+  if (B00V暗黑侵蚀BuffID !== 0 && context.target != null && 单位拥有Buff(context.target, B00V暗黑侵蚀BuffID)) {
     if (context.currentDamage >= 结果 && 结果 >= 取当前生命(context.target)) {
       安排暗黑侵蚀复活(context.attacker, context.target);
     }

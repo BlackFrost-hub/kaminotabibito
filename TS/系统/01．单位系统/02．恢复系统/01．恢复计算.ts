@@ -5,6 +5,12 @@
  */
 
 const jass = require("jass.common") as any;
+const GetHeroStr = jass.GetHeroStr as (this: void, unit: any, includeBonuses: boolean) => number;
+const GetHeroInt = jass.GetHeroInt as (this: void, unit: any, includeBonuses: boolean) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
@@ -27,16 +33,16 @@ const {
 /**
  * 计算基础生命恢复（力量 × 0.32）
  */
-export function calcBaseLifeRegen(unit: any): number {
-  const strength = jass.GetHeroStr(unit, true);
+export function calcBaseLifeRegen(this: void, unit: any): number {
+  const strength = GetHeroStr(unit, true);
   return strength * STRENGTH_TO_LIFE_REGEN;
 }
 
 /**
  * 计算基础魔法恢复（智力 × 0.15）
  */
-export function calcBaseManaRegen(unit: any): number {
-  const intelligence = jass.GetHeroInt(unit, true);
+export function calcBaseManaRegen(this: void, unit: any): number {
+  const intelligence = GetHeroInt(unit, true);
   return intelligence * INTELLIGENCE_TO_MANA_REGEN;
 }
 
@@ -47,13 +53,13 @@ export function calcBaseManaRegen(unit: any): number {
 /**
  * 读取单位/玩家属性
  */
-function getAttr(unit: any, attrName: string): number {
+function getAttr(this: void, unit: any, attrName: string): number {
   // 先读取单位属性
   const unitValue = YDUserDataGet("unit", unit, attrName, "real");
   if (unitValue !== 0) return unitValue;
 
   // 再读取玩家属性
-  const player = jass.GetOwningPlayer(unit);
+  const player = GetOwningPlayer(unit);
   if (player != null) {
     return YDUserDataGet("player", player, attrName, "real");
   }
@@ -64,8 +70,8 @@ function getAttr(unit: any, attrName: string): number {
 /**
  * 读取玩家属性
  */
-function getPlayerAttr(unit: any, attrName: string): number {
-  const player = jass.GetOwningPlayer(unit);
+function getPlayerAttr(this: void, unit: any, attrName: string): number {
+  const player = GetOwningPlayer(unit);
   if (player == null) return 0;
   return YDUserDataGet("player", player, attrName, "real");
 }
@@ -77,7 +83,7 @@ function getPlayerAttr(unit: any, attrName: string): number {
 /**
  * 获取百分比生命恢复（应用上限）
  */
-export function getPercentLifeRegen(unit: any): number {
+export function getPercentLifeRegen(this: void, unit: any): number {
   let value = getPlayerAttr(unit, "百分比生命回复");
   return value < LIFE_REGEN_PERCENT_CAP ? value : LIFE_REGEN_PERCENT_CAP;
 }
@@ -85,7 +91,7 @@ export function getPercentLifeRegen(unit: any): number {
 /**
  * 获取百分比魔法恢复（应用上限）
  */
-export function getPercentManaRegen(unit: any): number {
+export function getPercentManaRegen(this: void, unit: any): number {
   let value = getPlayerAttr(unit, "百分比魔法回复");
   return value < MANA_REGEN_PERCENT_CAP ? value : MANA_REGEN_PERCENT_CAP;
 }
@@ -100,6 +106,7 @@ export function getPercentManaRegen(unit: any): number {
  * 公式：(1 + 增幅) × (百分比恢复 + 固定恢复 + 基础恢复 + 装备加成 + 单位特性)
  */
 export function calcTotalLifeRegen(
+  this: void,
   unit: any,
   baseRegen: number,
   itemBonus: number,
@@ -110,7 +117,7 @@ export function calcTotalLifeRegen(
 
   // 百分比生命恢复
   const percentRegen = getPercentLifeRegen(unit);
-  const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
   const percentRegenValue = maxLife * percentRegen;
 
   // 生命恢复属性增幅
@@ -128,13 +135,13 @@ export function calcTotalLifeRegen(
  *
  * 公式：百分比恢复 + 固定恢复 + 基础恢复
  */
-export function calcTotalManaRegen(unit: any, baseRegen: number): number {
+export function calcTotalManaRegen(this: void, unit: any, baseRegen: number): number {
   // 固定魔法恢复属性
   const fixedRegen = getAttr(unit, "魔法恢复");
 
   // 百分比魔法恢复
   const percentRegen = getPercentManaRegen(unit);
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
   const percentRegenValue = maxMana * percentRegen;
 
   return baseRegen + fixedRegen + percentRegenValue;
@@ -147,7 +154,7 @@ export function calcTotalManaRegen(unit: any, baseRegen: number): number {
 /**
  * 计算Boss总生命恢复（无百分比恢复）
  */
-export function calcBossTotalLifeRegen(unit: any): number {
+export function calcBossTotalLifeRegen(this: void, unit: any): number {
   const fixedRegen = getAttr(unit, "生命恢复");
   const amplify = getAttr(unit, "生命恢复属性增幅");
 

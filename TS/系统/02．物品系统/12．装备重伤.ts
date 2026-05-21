@@ -5,13 +5,14 @@
  * - 非英雄单位：存储到单位级 YDUserData
  */
 const jass = require("jass.common") as any;
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemPickup: (callback: (unit: any, item: any) => void) => number;
-  onItemDrop: (callback: (unit: any, item: any) => void) => number;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
+  onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { wound?: number; name?: string; type?: string }> }).default;
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 };
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -32,7 +33,7 @@ function getMaxWound(unit: any, ignoreItem?: any): number {
     const item = (jass as any).UnitItemInSlot(unit, slot);
     if (!item) continue;
     if (ignoreItem && item === ignoreItem) continue;
-    const tid = (jass as any).GetItemTypeId(item) as number;
+    const tid = GetItemTypeId(item) as number;
     const idStr = fourCCToString(tid);
     const entry = (itemsData as Record<string, { wound?: number; type?: string }>)[idStr];
     const typ = entry?.type;
@@ -68,10 +69,10 @@ function onItemChange(unit: any, item: any, isPickup: boolean): void {
 }
 
 function init(): void {
-  itemEventCenter.onItemPickup((unit, item) => {
+  onItemPickup((unit, item) => {
     onItemChange(unit, item, true);
   });
-  itemEventCenter.onItemDrop((unit, item) => {
+  onItemDrop((unit, item) => {
     onItemChange(unit, item, false);
   });
 }

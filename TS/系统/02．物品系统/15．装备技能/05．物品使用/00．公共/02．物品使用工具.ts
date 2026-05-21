@@ -31,6 +31,10 @@ const { 清除单位负面Buff } = require("系统.03．技能系统.00．技能
 const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统") as {
   开始击退: (this: void, unit: any, params: any) => number;
 };
+const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  getServerTime: (this: void) => number;
+};
 
 const GetItemTypeId = jass.GetItemTypeId as (whichItem: any) => number;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
@@ -99,6 +103,36 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
 
 const 火把单位类型ID = stringToFourCCSafe("e00D");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
+
+type 待销毁特效记录 = {
+  句柄: any;
+  到期时间: number;
+};
+
+const 待销毁特效列表: 待销毁特效记录[] = [];
+let 已注册特效销毁驱动 = false;
+
+function 处理待销毁特效(): void {
+  const 当前时间 = getServerTime();
+  for (let i = 待销毁特效列表.length - 1; i >= 0; i--) {
+    const 记录 = 待销毁特效列表[i];
+    if (当前时间 < 记录.到期时间) continue;
+    DestroyEffect(记录.句柄);
+    待销毁特效列表.splice(i, 1);
+  }
+}
+
+function 安排特效销毁(effect: any, 持续秒: number = 1): void {
+  if (effect == null || effect === 0) return;
+  if (!已注册特效销毁驱动) {
+    已注册特效销毁驱动 = true;
+    addPeriodicCallback(100, 处理待销毁特效);
+  }
+  待销毁特效列表.push({
+    句柄: effect,
+    到期时间: getServerTime() + 持续秒 * 1000,
+  });
+}
 
 export function 是否为使用物品(this: void, 物品: any, 物品类型ID: number): boolean {
   if (物品 == null || 物品 === 0 || 物品类型ID === 0) return false;
@@ -273,23 +307,25 @@ export function 执行治疗(this: void, 来源: any, 目标: any, 生命: numbe
     HealAmount: 生命,
     HealManaAmount: 魔法,
     ItemHeal: true,
-    HealEffect: 生命 > 0,
-    HealEffectPath: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl",
-    ManaEffect: 魔法 > 0,
-    ManaEffectPath: "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl",
+    HealEffect: false,
+    UseDefaultHealEffect: false,
+    HealEffectPath: undefined,
+    ManaEffect: false,
+    UseDefaultManaEffect: false,
+    ManaEffectPath: undefined,
   });
 }
 
-export function 播放点特效(this: void, 模型: string, x: number, y: number): void {
+export function 播放点特效(this: void, 模型: string, x: number, y: number, 持续秒: number = 1): void {
   if (模型 === "") return;
   const effect = AddSpecialEffect(模型, x, y);
-  if (effect != null && effect !== 0) DestroyEffect(effect);
+  安排特效销毁(effect, 持续秒);
 }
 
-export function 播放单位特效(this: void, 模型: string, 单位: any, 挂点: string = "origin"): void {
+export function 播放单位特效(this: void, 模型: string, 单位: any, 挂点: string = "origin", 持续秒: number = 1): void {
   if (单位 == null || 单位 === 0 || 模型 === "") return;
   const effect = AddSpecialEffectTarget(模型, 单位, 挂点);
-  if (effect != null && effect !== 0) DestroyEffect(effect);
+  安排特效销毁(effect, 持续秒);
 }
 
 export function 施加眩晕(this: void, 来源: any, 目标: any, 持续时间: number): void {

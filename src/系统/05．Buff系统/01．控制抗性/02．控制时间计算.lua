@@ -64,7 +64,7 @@ function ____exports.applyBossControlLimit(unit, duration)
     for ____, ____value in ipairs(entries) do
         local idStr = ____value[1]
         local limit = ____value[2]
-        if stringToFourCC(nil, idStr) == unitTypeId and duration > limit then
+        if stringToFourCC(idStr) == unitTypeId and duration > limit then
             return limit
         end
     end

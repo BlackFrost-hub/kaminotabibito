@@ -213,7 +213,6 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
     end
     if i == 16 then
         ModifyHeroStat(
-            nil,
             jglobals.bj_HEROSTAT_STR,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,
@@ -224,7 +223,6 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
     end
     if i == 17 then
         ModifyHeroStat(
-            nil,
             jglobals.bj_HEROSTAT_AGI,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,
@@ -236,7 +234,6 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
     end
     if i == 18 then
         ModifyHeroStat(
-            nil,
             jglobals.bj_HEROSTAT_INT,
             u,
             jglobals.bj_MODIFYMETHOD_ADD,

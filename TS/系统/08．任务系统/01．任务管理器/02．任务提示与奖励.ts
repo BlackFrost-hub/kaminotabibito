@@ -12,7 +12,7 @@ const { findHeroOfPlayer } = require("lib.扩展函数.封装函数.01．通用�
   findHeroOfPlayer: (playerId: number) => any;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 
 import { questDB } from "../01．任务数据";

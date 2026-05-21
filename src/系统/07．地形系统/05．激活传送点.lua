@@ -56,10 +56,7 @@ function resolveWatchUnit(cfg)
     local ty = parseCoord(cfg.teleportY)
     local hasXY = tx ~= nil and ty ~= nil
     if hasXY and cfg.UnitID ~= nil and #cfg.UnitID >= 4 then
-        local four = stringToFourCC(
-            nil,
-            __TS__StringSubstring(cfg.UnitID, 0, 4)
-        )
+        local four = stringToFourCC(__TS__StringSubstring(cfg.UnitID, 0, 4))
         if four == 0 then
             return nil
         end

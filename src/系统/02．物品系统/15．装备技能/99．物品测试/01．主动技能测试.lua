@@ -18,6 +18,7 @@ local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_2["按名�
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local CreateItem = jass.CreateItem
+local IssueTargetOrder = jass.IssueTargetOrder
 local UnitAddItem = jass.UnitAddItem
 local UnitRemoveItem = jass.UnitRemoveItem
 local GetUnitX = jass.GetUnitX
@@ -92,7 +93,8 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
         debugLogForce(_____6A21_5757_540D, "创建装备失败", _____88C5_5907_540D, rawId)
         return
     end
-    UnitAddItem(unit, item)
+    local ok = IssueTargetOrder(unit, "smart", item)
+    debugLogForce(_____6A21_5757_540D, "已创建并下达拾取命令", _____88C5_5907_540D, ok)
 end
 local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
     _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)

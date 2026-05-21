@@ -66,9 +66,9 @@ export const DEFAULT_MANA_HEAL_EFFECT_PATH = "Abilities\\Spells\\Items\\AIma\\AI
 
 /** 治疗漂浮文字颜色 RGB */
 export const HEAL_TEXT_COLOR = {
-  red: 20,
-  green: 100,
-  blue: 20,
+  red: 80,
+  green: 255,
+  blue: 80,
 } as const;
 
 /** 魔法恢复漂浮文字颜色 RGB */

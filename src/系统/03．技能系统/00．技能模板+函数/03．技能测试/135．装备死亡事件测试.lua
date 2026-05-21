@@ -24,7 +24,7 @@ local function _____521B_5EFA_5E76_7ED9_4E88_88C5_5907(_____5355_4F4D, _____88C5
     local x = jass.GetUnitX(_____5355_4F4D)
     local y = jass.GetUnitY(_____5355_4F4D)
     local item = jass.CreateItem(
-        stringToFourCC(nil, _____7269_54C1ID),
+        stringToFourCC(_____7269_54C1ID),
         x,
         y
     )

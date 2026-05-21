@@ -5,6 +5,8 @@ local ____01_FF0EDOT_914D_7F6E = require("系统.04．伤害系统.01．DOT定�
 local dotEffectModelFromBuffRow = ____01_FF0EDOT_914D_7F6E.dotEffectModelFromBuffRow
 local ____03_FF0EDOT_7C7B_578B_5B9A_4E49 = require("系统.04．伤害系统.01．DOT定义.03．DOT类型定义")
 local registerBuiltInDotTypes = ____03_FF0EDOT_7C7B_578B_5B9A_4E49.registerBuiltInDotTypes
+local ____01_FF0E_71C3_70E7DOT_6CE8_518C = require("系统.04．伤害系统.01．DOT定义.09．单独DOT燃烧.01．燃烧DOT注册")
+local _____6CE8_518C_71C3_70E7DOT = ____01_FF0E_71C3_70E7DOT_6CE8_518C["注册燃烧DOT"]
 local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
 local getDotSourceDisplayName = ____04_FF0EDOT_5DE5_5177.getDotSourceDisplayName
 local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
@@ -138,29 +140,39 @@ registerBuiltInDotTypes(nil, {
     getUnitMaxHp = getUnitMaxHp,
     dotEffectModelFromBuffRow = dotEffectModelFromBuffRow
 })
+_____6CE8_518C_71C3_70E7DOT({registerDotType = ____exports.registerDotType, getBestDotFromUnit = getBestDotFromUnit})
 local registered = false
-local function getDotStateByTypeId(self, typeId, unit)
+--- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
+function ____exports.getUnitAntiHeal(self, unit)
     local h = unitHid(nil, unit)
     if h == 0 then
         return nil
     end
-    return getDotState(nil, typeId, h)
-end
---- 供治疗等系统读取：单位当前反恢复状态，无则返回 null
-function ____exports.getUnitAntiHeal(self, unit)
-    return getDotStateByTypeId(nil, "antiHeal", unit)
+    return getDotState(nil, "antiHeal", h)
 end
 --- 供 UI 等读取：单位当前燃烧 DOT 状态，无则返回 null
 function ____exports.getUnitBurn(self, unit)
-    return getDotStateByTypeId(nil, "burn", unit)
+    local h = unitHid(nil, unit)
+    if h == 0 then
+        return nil
+    end
+    return getDotState(nil, "burn", h)
 end
 --- 供 UI 等读取：单位当前中毒 DOT 状态，无则返回 null
 function ____exports.getUnitPoison(self, unit)
-    return getDotStateByTypeId(nil, "poison", unit)
+    local h = unitHid(nil, unit)
+    if h == 0 then
+        return nil
+    end
+    return getDotState(nil, "poison", h)
 end
 --- 供 UI 等读取：D004 巨魔头颅诅咒（`registerDotType` id `trollCurse` 注册后才有状态）
 function ____exports.getUnitTrollCurse(self, unit)
-    return getDotStateByTypeId(nil, "trollCurse", unit)
+    local h = unitHid(nil, unit)
+    if h == 0 then
+        return nil
+    end
+    return getDotState(nil, "trollCurse", h)
 end
 --- 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。
 function ____exports.dealSpiritDamage(self, source, target, amount)

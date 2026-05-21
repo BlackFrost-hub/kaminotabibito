@@ -28,7 +28,7 @@ ____exports["应用提升等级学习技能"] = function(whichHero)
                 if rule.level ~= level then
                     goto __continue6
                 end
-                local abilityId = stringToFourCC(nil, rule.abilityId)
+                local abilityId = stringToFourCC(rule.abilityId)
                 if abilityId == 0 then
                     goto __continue6
                 end

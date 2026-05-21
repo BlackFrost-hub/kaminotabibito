@@ -3,6 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local GetItemTypeId = jass.GetItemTypeId
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local itemsData = require("系统.02．物品系统.01．装备数据").default
@@ -109,11 +110,11 @@ function ____exports.getItemDataEntry(item)
     if item == nil or item == 0 then
         return nil
     end
-    local itemId = jass.GetItemTypeId(item)
+    local itemId = GetItemTypeId(item)
     if itemId == nil or itemId == 0 then
         return nil
     end
-    local idStr = fourCCToString(nil, itemId)
+    local idStr = fourCCToString(itemId)
     local entry = itemsData[idStr]
     if not entry then
         return nil
@@ -134,7 +135,7 @@ function ____exports.getItemDataEntryByTypeId(itemTypeId)
     if itemTypeId == nil or itemTypeId == 0 then
         return nil
     end
-    local idStr = fourCCToString(nil, itemTypeId)
+    local idStr = fourCCToString(itemTypeId)
     return ____exports.getItemDataEntryByIdStr(idStr)
 end
 return ____exports

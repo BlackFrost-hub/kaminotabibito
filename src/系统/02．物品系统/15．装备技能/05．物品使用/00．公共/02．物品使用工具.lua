@@ -1,4 +1,5 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 ---
@@ -25,6 +26,9 @@ local ____require_result_6 = require("系统.03．技能系统.00．技能模板
 local _____6E05_9664_5355_4F4D_8D1F_9762Buff = ____require_result_6["清除单位负面Buff"]
 local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51FB_9000 = ____require_result_7["开始击退"]
+local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_8.addPeriodicCallback
+local getServerTime = ____require_result_8.getServerTime
 local GetItemTypeId = jass.GetItemTypeId
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -88,6 +92,42 @@ local DzSetUnitModel = japi.DzSetUnitModel
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
 local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e00D")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
+local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
+local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
+local function _____5904_7406_5F85_9500_6BC1_7279_6548()
+    local _____5F53_524D_65F6_95F4 = getServerTime()
+    do
+        local i = #_____5F85_9500_6BC1_7279_6548_5217_8868 - 1
+        while i >= 0 do
+            do
+                local _____8BB0_5F55 = _____5F85_9500_6BC1_7279_6548_5217_8868[i + 1]
+                if _____5F53_524D_65F6_95F4 < _____8BB0_5F55["到期时间"] then
+                    goto __continue4
+                end
+                DestroyEffect(_____8BB0_5F55["句柄"])
+                __TS__ArraySplice(_____5F85_9500_6BC1_7279_6548_5217_8868, i, 1)
+            end
+            ::__continue4::
+            i = i - 1
+        end
+    end
+end
+local function _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
+    end
+    if effect == nil or effect == 0 then
+        return
+    end
+    if not _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 then
+        _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = true
+        addPeriodicCallback(100, _____5904_7406_5F85_9500_6BC1_7279_6548)
+    end
+    _____5F85_9500_6BC1_7279_6548_5217_8868[#_____5F85_9500_6BC1_7279_6548_5217_8868 + 1] = {
+        ["句柄"] = effect,
+        ["到期时间"] = getServerTime() + _____6301_7EED_79D2 * 1000
+    }
+end
 ____exports["是否为使用物品"] = function(_____7269_54C1, _____7269_54C1_7C7B_578BID)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 or _____7269_54C1_7C7B_578BID == 0 then
         return false
@@ -318,32 +358,36 @@ ____exports["执行治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F
         HealAmount = _____751F_547D,
         HealManaAmount = _____9B54_6CD5,
         ItemHeal = true,
-        HealEffect = _____751F_547D > 0,
-        HealEffectPath = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl",
-        ManaEffect = _____9B54_6CD5 > 0,
-        ManaEffectPath = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl"
+        HealEffect = false,
+        UseDefaultHealEffect = false,
+        HealEffectPath = nil,
+        ManaEffect = false,
+        UseDefaultManaEffect = false,
+        ManaEffectPath = nil
     })
 end
-____exports["播放点特效"] = function(_____6A21_578B, x, y)
+____exports["播放点特效"] = function(_____6A21_578B, x, y, _____6301_7EED_79D2)
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
+    end
     if _____6A21_578B == "" then
         return
     end
     local effect = AddSpecialEffect(_____6A21_578B, x, y)
-    if effect ~= nil and effect ~= 0 then
-        DestroyEffect(effect)
-    end
+    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
 end
-____exports["播放单位特效"] = function(_____6A21_578B, _____5355_4F4D, _____6302_70B9)
+____exports["播放单位特效"] = function(_____6A21_578B, _____5355_4F4D, _____6302_70B9, _____6301_7EED_79D2)
     if _____6302_70B9 == nil then
         _____6302_70B9 = "origin"
+    end
+    if _____6301_7EED_79D2 == nil then
+        _____6301_7EED_79D2 = 1
     end
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or _____6A21_578B == "" then
         return
     end
     local effect = AddSpecialEffectTarget(_____6A21_578B, _____5355_4F4D, _____6302_70B9)
-    if effect ~= nil and effect ~= 0 then
-        DestroyEffect(effect)
-    end
+    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
 end
 ____exports["施加眩晕"] = function(_____6765_6E90, _____76EE_6807, _____6301_7EED_65F6_95F4)
     SFB_setBuff(_____6765_6E90, _____76EE_6807, 0, _____6301_7EED_65F6_95F4)

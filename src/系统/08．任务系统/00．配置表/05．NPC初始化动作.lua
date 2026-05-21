@@ -94,7 +94,7 @@ local function execRemoveItemFromStock(self, whichUnit, arg, modifiers)
     end
     local targets = pickCount > 0 and pickRandomDistinct(nil, items, pickCount) or items
     for ____, code in ipairs(targets) do
-        local id = stringToFourCC(nil, code)
+        local id = stringToFourCC(code)
         if id ~= 0 then
             RemoveItemFromStockBJ(nil, id, whichUnit)
         end

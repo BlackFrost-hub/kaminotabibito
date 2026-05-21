@@ -16,8 +16,9 @@
  */
 
 const jass = require("jass.common") as any;
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemUse: (callback: (unit: any, item: any) => void) => number;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 
 const { STES_GetTable } = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件") as {
@@ -71,7 +72,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
 
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
 const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
 };
 
@@ -250,7 +251,7 @@ function onUseItem(this: void): void {
   let item: any = jass.GetManipulatedItem();
   if (!unit || !item) return;
   if (isSpecialUnit(unit)) return;
-  const itemId = jass.GetItemTypeId(item);
+  const itemId = GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
   const entry = (itemsData as Record<string, { hot?: string; abilList?: string }>)[idStr];
   if (!entry || !entry.hot || !entry.abilList) return;
@@ -296,7 +297,7 @@ function init(this: void): void {
   }
 
   // 使用物品事件中心注册，减少触发器数量
-  itemEventCenter.onItemUse((unit, item) => {
+  onItemUse((unit, item) => {
     onUseItem();
   });
 }

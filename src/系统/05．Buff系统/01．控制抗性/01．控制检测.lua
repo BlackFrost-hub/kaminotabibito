@@ -18,7 +18,7 @@ function ____exports.isExcludedFromControlResist(self, unit)
     local unitTypeId = jass.GetUnitTypeId(unit)
     return __TS__ArraySome(
         EXCLUDED_UNIT_TYPES,
-        function(____, id) return stringToFourCC(nil, id) == unitTypeId end
+        function(____, id) return stringToFourCC(id) == unitTypeId end
     )
 end
 --- 检查技能命令是否为排除类型

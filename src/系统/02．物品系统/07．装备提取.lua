@@ -132,7 +132,7 @@ local function pickFromScorePool(ids)
         return {raw = 0, id = ""}
     end
     return {
-        raw = stringToFourCC(nil, id),
+        raw = stringToFourCC(id),
         id = id
     }
 end

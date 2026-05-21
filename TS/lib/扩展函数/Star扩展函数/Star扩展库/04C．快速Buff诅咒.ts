@@ -45,6 +45,11 @@ interface CurseAccuracyState {
 
 const curseAccuracyStateByHid: Record<number, CurseAccuracyState | undefined> = {};
 
+function getSafeHandleId(unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  return GetHandleId(unit);
+}
+
 function getUnitRawAccuracyValue(unit: any): number {
   if (unit == null || unit === 0) return 0;
   return normalizeRealValue(YDUserDataGet("unit", unit, CURSE_ACCURACY_ATTR, "real"));
@@ -97,13 +102,21 @@ function onSfbCurseRemoved(this: void, unitOrHid: any): void {
 }
 
 export function SFB_施加自定义诅咒Buff(this: void, sourceUnit: any, u: any, time: number): void {
-  if (!SUC_IsValidUnit(u) || time <= 0) return;
-  if (SUC_IsUnitStructure(u)) return;
-  if (u === SFB_Unit) return;
+  if (!SUC_IsValidUnit(u) || time <= 0) {
+    return;
+  }
+  if (SUC_IsUnitStructure(u)) {
+    return;
+  }
+  if (u === SFB_Unit) {
+    return;
+  }
 
   const hid = GetHandleId(u);
   const buffID = getSfbBuffId(SFB_负面BUFF.诅咒);
-  if (hid === 0 || buffID == null || buffID === "") return;
+  if (hid === 0 || buffID == null || buffID === "") {
+    return;
+  }
 
   let state = curseAccuracyStateByHid[hid];
   if (state == null) {
@@ -115,7 +128,8 @@ export function SFB_施加自定义诅咒Buff(this: void, sourceUnit: any, u: an
       previousAccuracy: shouldUsePlayerAccuracy(u) ? getOwnerRawAccuracyValue(owner) : getUnitRawAccuracyValue(u),
     };
     curseAccuracyStateByHid[hid] = state;
-    writeTrackedAccuracy(state, getUnitEffectiveAccuracyValue(u) - SFB_CURSE_DEFAULT_ACCURACY_REDUCTION, u);
+    const nextAccuracy = getUnitEffectiveAccuracyValue(u) - SFB_CURSE_DEFAULT_ACCURACY_REDUCTION;
+    writeTrackedAccuracy(state, nextAccuracy, u);
   }
 
   registerManualBuff(u, buffID, time, 0, {

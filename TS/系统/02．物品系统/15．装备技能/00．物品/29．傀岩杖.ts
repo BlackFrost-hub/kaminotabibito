@@ -27,7 +27,7 @@ function 傀岩杖命中(this: void, 命中单位: any, 弹幕ID: number): void 
   const ctx = 傀岩杖弹幕表[弹幕ID];
   if (ctx == null) return;
   delete 傀岩杖弹幕表[弹幕ID];
-  造成伤害事件伤害(ctx.来源, 命中单位, 100, 伤害事件伤害类型.强化);
+  造成伤害事件伤害(ctx.来源, 命中单位, 100, 伤害事件伤害类型.魔法);
   施加扩展控制(ctx.来源, 命中单位, "stun", { 持续时间: 0.5 });
 }
 

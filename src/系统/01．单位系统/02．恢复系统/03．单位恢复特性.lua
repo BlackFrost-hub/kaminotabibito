@@ -9,9 +9,10 @@ local ____exports = {}
 -- value: 恢复特性配置
 ____exports.UNIT_REGEN_TRAITS = {["炎杀姬|H00R"] = {lifeMultiplier = 1.6, manaMultiplier = 1}}
 local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
-local function _____63D0_53D6_5185_90E8_7269_4F53ID(self, _____914D_7F6E_952E_540D)
+local function _____63D0_53D6_5185_90E8_7269_4F53ID(_____914D_7F6E_952E_540D)
     local _____7247_6BB5_5217_8868 = __TS__StringSplit(_____914D_7F6E_952E_540D, "|")
     return _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868] or _____914D_7F6E_952E_540D
 end
@@ -19,8 +20,8 @@ end
 -- 
 -- @param unit 目标单位
 -- @returns 生命恢复倍率（默认1.0）
-function ____exports.getUnitLifeRegenMultiplier(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+function ____exports.getUnitLifeRegenMultiplier(unit)
+    local unitTypeId = GetUnitTypeId(unit)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS),
         function(____, ____bindingPattern0, ____bindingPattern1)
@@ -34,10 +35,7 @@ function ____exports.getUnitLifeRegenMultiplier(self, unit)
     for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local trait = ____value[2]
-        if stringToFourCC(
-            nil,
-            _____63D0_53D6_5185_90E8_7269_4F53ID(nil, _____914D_7F6E_952E_540D)
-        ) == unitTypeId then
+        if stringToFourCC(_____63D0_53D6_5185_90E8_7269_4F53ID(_____914D_7F6E_952E_540D)) == unitTypeId then
             return trait.lifeMultiplier
         end
     end
@@ -47,8 +45,8 @@ end
 -- 
 -- @param unit 目标单位
 -- @returns 魔法恢复倍率（默认1.0）
-function ____exports.getUnitManaRegenMultiplier(self, unit)
-    local unitTypeId = jass.GetUnitTypeId(unit)
+function ____exports.getUnitManaRegenMultiplier(unit)
+    local unitTypeId = GetUnitTypeId(unit)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(____exports.UNIT_REGEN_TRAITS),
         function(____, ____bindingPattern0, ____bindingPattern1)
@@ -62,10 +60,7 @@ function ____exports.getUnitManaRegenMultiplier(self, unit)
     for ____, ____value in ipairs(entries) do
         local _____914D_7F6E_952E_540D = ____value[1]
         local trait = ____value[2]
-        if stringToFourCC(
-            nil,
-            _____63D0_53D6_5185_90E8_7269_4F53ID(nil, _____914D_7F6E_952E_540D)
-        ) == unitTypeId then
+        if stringToFourCC(_____63D0_53D6_5185_90E8_7269_4F53ID(_____914D_7F6E_952E_540D)) == unitTypeId then
             return trait.manaMultiplier
         end
     end

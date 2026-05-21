@@ -8,6 +8,12 @@ const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
+const { 快照单位组 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.07．单位组工具") as {
+  快照单位组: (this: void, group: any) => any[];
+};
 const { 开始护盾, 护盾类型, 查询单位标签护盾值, 充能单位标签护盾, 移除单位标签护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
   开始护盾: (this: void, unit: any, params: any) => number;
   护盾类型: { 通用: number };
@@ -44,6 +50,10 @@ const 持有者表: Record<number, any | undefined> = {};
 const 冷却到期表: Record<number, number | undefined> = {};
 let 已初始化 = false;
 let 已注册充能计时器 = false;
+
+function 获取玩家英雄单位组(this: void): any {
+  return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
+}
 
 function 加入持有者(this: void, 单位: any): void {
   const id = 取句柄ID(单位);
@@ -111,7 +121,21 @@ function 尝试充能狱妖魔盾(this: void, 单位: any): void {
   }
 }
 
+function 补登记现有持有者(this: void): void {
+  const 玩家英雄单位组 = 获取玩家英雄单位组();
+  if (玩家英雄单位组 == null || 玩家英雄单位组 === 0) return;
+
+  const 单位列表 = 快照单位组(玩家英雄单位组);
+  for (let i = 0; i < 单位列表.length; i++) {
+    const 单位 = 单位列表[i];
+    if (!单位是英雄(单位)) continue;
+    if (!单位持有物品(单位, 狱妖魔盾物品ID)) continue;
+    加入持有者(单位);
+  }
+}
+
 function on狱妖魔盾充能Tick(this: void): void {
+  补登记现有持有者();
   for (let i = 持有者列表.length - 1; i >= 0; i--) {
     尝试充能狱妖魔盾(持有者列表[i]);
   }

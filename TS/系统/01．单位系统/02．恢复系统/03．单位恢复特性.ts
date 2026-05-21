@@ -41,11 +41,12 @@ export const UNIT_REGEN_TRAITS: Record<string, UnitRegenTrait> = {
 //=============================================================================
 
 const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 
-function 提取内部物体ID(配置键名: string): string {
+function 提取内部物体ID(this: void, 配置键名: string): string {
   const 片段列表 = 配置键名.split("|");
   return 片段列表[片段列表.length - 1] ?? 配置键名;
 }
@@ -56,8 +57,8 @@ function 提取内部物体ID(配置键名: string): string {
  * @param unit 目标单位
  * @returns 生命恢复倍率（默认1.0）
  */
-export function getUnitLifeRegenMultiplier(unit: any): number {
-  const unitTypeId = jass.GetUnitTypeId(unit);
+export function getUnitLifeRegenMultiplier(this: void, unit: any): number {
+  const unitTypeId = GetUnitTypeId(unit);
   const entries = Object.entries(UNIT_REGEN_TRAITS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   // 遍历配置，将字符串ID转换为FourCC后比较
@@ -76,8 +77,8 @@ export function getUnitLifeRegenMultiplier(unit: any): number {
  * @param unit 目标单位
  * @returns 魔法恢复倍率（默认1.0）
  */
-export function getUnitManaRegenMultiplier(unit: any): number {
-  const unitTypeId = jass.GetUnitTypeId(unit);
+export function getUnitManaRegenMultiplier(this: void, unit: any): number {
+  const unitTypeId = GetUnitTypeId(unit);
   const entries = Object.entries(UNIT_REGEN_TRAITS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   // 遍历配置，将字符串ID转换为FourCC后比较

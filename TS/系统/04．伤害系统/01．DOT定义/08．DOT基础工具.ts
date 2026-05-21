@@ -5,7 +5,7 @@ export function createDotBaseUtils(deps: {
   jass: any;
   g: any;
   itemsData: Record<string, { Buff?: string }>;
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 }): {
   isDebuffDotTargetOk: (source: any, target: any) => boolean;
   isSourceHeroPlayer1to4: (unit: any) => boolean;
@@ -22,6 +22,8 @@ export function createDotBaseUtils(deps: {
   const g = deps.g;
   const itemsData = deps.itemsData;
   const fourCCToString = deps.fourCCToString;
+  const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+  const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
   // ========== 虚拟分区：目标合法性判断 ==========
   function getStructureUnitTypeHandle(): any {
@@ -66,12 +68,12 @@ export function createDotBaseUtils(deps: {
   }
 
   // ========== 虚拟分区：装备读取 ==========
-  function unitItemInSlot(unit: any, slot: number): any {
+  function unitItemInSlot(this: void, unit: any, slot: number): any {
     return jass.UnitItemInSlot(unit, slot);
   }
 
-  function getItemTypeId(item: any): number {
-    return jass.GetItemTypeId(item);
+  function getItemTypeId(this: void, item: any): number {
+    return GetItemTypeId(item);
   }
 
   function getBestDotFromUnit<T extends { duration: number; attackOnly: boolean }>(
@@ -116,7 +118,7 @@ export function createDotBaseUtils(deps: {
 
   function getTargetRegenHP(targetUnit: any): number {
     if (!targetUnit) return 0;
-    const typeId = jass.GetUnitTypeId(targetUnit);
+    const typeId = GetUnitTypeId(targetUnit);
     const idStr = fourCCToString(typeId);
     const slk = (globalThis as any).slk as { unit?: Record<string, Record<string, string>> } | undefined;
     const slkUnit = slk != null && slk.unit ? slk.unit[idStr] : undefined;

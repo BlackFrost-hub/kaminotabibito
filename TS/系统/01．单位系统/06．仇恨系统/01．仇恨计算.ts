@@ -26,10 +26,6 @@ const { 获取映射攻击者 } = require("系统.04．伤害系统.04．伤害�
 const { addThreat } = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储") as {
   addThreat: (this: void, 敌人: any, 仇恨目标: any, 数值: number) => void;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const GetOwningPlayer = jass.GetOwningPlayer as (u: any) => any;
 const GetPlayerId = jass.GetPlayerId as (p: any) => number;
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;

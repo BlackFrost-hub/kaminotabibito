@@ -22,7 +22,7 @@ const { 获取范围敌人, 取单位X, 取单位Y, 取最大魔法, 造成暗�
 };
 
 function on狱生面具周期(this: void, unit: any): void {
-  const consumed = -减少魔法值(unit, 取最大魔法(unit) * 狱生面具配置.最大魔法消耗比例, false, false);
+  const consumed = -减少魔法值(unit, 取最大魔法(unit) * 狱生面具配置.最大魔法消耗比例, true, false);
   if (!(consumed > 0)) return;
   const targets = 获取范围敌人(unit, 取单位X(unit), 取单位Y(unit), 狱生面具配置.作用范围);
   for (let i = 0; i < targets.length; i++) {

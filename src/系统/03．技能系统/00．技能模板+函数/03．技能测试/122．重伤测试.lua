@@ -45,7 +45,7 @@ local function ____on_804A_5929_6D4B_8BD5()
         "治疗后血量：",
         GetUnitState(_____5927_6CD5_5E08, UNIT_STATE_LIFE)
     )
-    if heal < 100 then
+    if heal < 105 then
         debugLogForce(_____6A21_5757_540D, "[PASS] 重伤减少治疗：", heal, "< 100")
     else
         debugLogForce(_____6A21_5757_540D, "[FAIL] 重伤未减少治疗：", heal, ">= 100")

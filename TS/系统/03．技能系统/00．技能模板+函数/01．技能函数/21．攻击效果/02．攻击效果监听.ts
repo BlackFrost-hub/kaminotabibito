@@ -1,20 +1,5 @@
 /** @noSelfInFile */
 
-const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
-  registerDamageCallback: (
-    this: void,
-    cb: (
-      this: void,
-      unit: any,
-      damage: number,
-      damageType: number,
-      fromDotTickBatch?: boolean,
-      source?: any,
-      isNormalAttack?: boolean
-    ) => void,
-    intervalSeconds?: number
-  ) => void;
-};
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (
     this: void,
@@ -62,43 +47,12 @@ export interface 最终伤害攻击效果监听参数 {
 
 const 普攻监听列表: 普攻攻击效果监听参数[] = [];
 const 最终伤害监听列表: 最终伤害攻击效果监听参数[] = [];
-let 普攻监听已注册 = false;
 let 最终伤害监听已注册 = false;
-
-function 确保普攻监听已注册(this: void): void {
-  if (普攻监听已注册) return;
-  普攻监听已注册 = true;
-  registerDamageCallback(on普攻攻击效果伤害事件);
-}
 
 function 确保最终伤害监听已注册(this: void): void {
   if (最终伤害监听已注册) return;
   最终伤害监听已注册 = true;
   registerAppliedFinalDamageListener(on最终伤害攻击效果事件);
-}
-
-function on普攻攻击效果伤害事件(
-  this: void,
-  target: any,
-  damage: number,
-  damageType: number,
-  fromDotTickBatch?: boolean,
-  source?: any,
-  isNormalAttack?: boolean,
-): void {
-  if (target == null || target === 0) return;
-  if (!(damage > 0)) return;
-  if (fromDotTickBatch === true) return;
-
-  const ctx: 普攻攻击效果上下文 = {
-    source: source ?? null,
-    target,
-    damage,
-    damageType,
-    fromDotTickBatch: false,
-    isNormalAttack: isNormalAttack === true,
-  };
-  dispatch普攻攻击效果监听器(ctx);
 }
 
 function on最终伤害攻击效果事件(
@@ -110,6 +64,17 @@ function on最终伤害攻击效果事件(
 ): void {
   if (target == null || target === 0) return;
   if (!(applied > 0)) return;
+
+  const 普攻上下文: 普攻攻击效果上下文 = {
+    source: attacker ?? null,
+    target,
+    damage: applied,
+    damageType: snapshot != null && snapshot.rawDamageType != null ? snapshot.rawDamageType : 0,
+    fromDotTickBatch: false,
+    isNormalAttack: snapshot != null && snapshot.isNormalAttack === true,
+    snapshot,
+  };
+  dispatch普攻攻击效果监听器(普攻上下文);
 
   const ctx: 最终伤害攻击效果上下文 = {
     source: attacker ?? null,
@@ -158,7 +123,7 @@ function dispatch最终伤害监听器(this: void, ctx: 最终伤害攻击效果
 export function 注册普攻攻击效果监听(this: void, 参数: 普攻攻击效果监听参数): void {
   if (参数 == null || !参数.名称 || 参数.命中后 == null) return;
   普攻监听列表.push(参数);
-  确保普攻监听已注册();
+  确保最终伤害监听已注册();
 }
 
 export function 注册最终伤害攻击效果监听(this: void, 参数: 最终伤害攻击效果监听参数): void {

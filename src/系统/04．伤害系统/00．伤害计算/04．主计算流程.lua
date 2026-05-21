@@ -139,11 +139,7 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
                 if cb == nil then
                     goto __continue9
                 end
-                do
-                    pcall(function()
-                        cb(target, attacker, applied, snapshot)
-                    end)
-                end
+                cb(target, attacker, applied, snapshot)
             end
             ::__continue9::
             i = i + 1

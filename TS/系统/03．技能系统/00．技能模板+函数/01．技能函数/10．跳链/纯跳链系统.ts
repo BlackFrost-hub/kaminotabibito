@@ -38,7 +38,7 @@ const { isUnitEnemy, isUnitAlly, isValidUnit } = require("lib.扩展函数.自�
 };
 
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (params: {
+  doHeal: (this: void, params: {
     HealSource: any;
     HealTarget: any;
     HealAmount: number;
@@ -104,9 +104,13 @@ interface 纯跳链内部实例 {
 }
 
 const 默认闪电效果代码 = "CLPB";
+// 约定规则：
+// 跳链层默认闪电持续时间与底层单位绑定闪电保持一致，
+// 默认值使用 0.8 秒；即使外部传入更短时间，底层也会强制提升到 0.8 秒。
 const 活跃跳链映射: Record<number, 纯跳链内部实例 | undefined> = {};
 const 定时器跳链映射: Record<number, number | undefined> = {};
 let 下一个跳链ID = 0;
+
 
 function 取句柄ID(handle: any): number {
   return handle != null && handle !== 0 ? (GetHandleId(handle) || 0) : 0;
@@ -206,14 +210,14 @@ function 执行当前一跳(实例: 纯跳链内部实例): void {
       实例.上一跳目标,
       当前目标,
       实例.参数.闪电效果代码 ?? 默认闪电效果代码,
-      实例.参数.闪电持续时间 != null && 实例.参数.闪电持续时间 > 0 ? 实例.参数.闪电持续时间 : 0.3
+      实例.参数.闪电持续时间 != null && 实例.参数.闪电持续时间 > 0 ? 实例.参数.闪电持续时间 : 0.8
     );
   } else if (实例.参数.来源单位 != null && 实例.参数.来源单位 !== 0) {
     创建跳链闪电(
       实例.参数.来源单位,
       当前目标,
       实例.参数.闪电效果代码 ?? 默认闪电效果代码,
-      实例.参数.闪电持续时间 != null && 实例.参数.闪电持续时间 > 0 ? 实例.参数.闪电持续时间 : 0.3
+      实例.参数.闪电持续时间 != null && 实例.参数.闪电持续时间 > 0 ? 实例.参数.闪电持续时间 : 0.8
     );
   }
 

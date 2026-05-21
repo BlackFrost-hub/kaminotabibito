@@ -75,7 +75,7 @@ function 清理高原魔力灯笼状态(this: void, unit: any): void {
 
 function on高原魔力灯笼周期(this: void, unit: any, currentCount: number): void {
   const manaCost = GetUnitState(unit, UNIT_STATE_MAX_MANA) * 高原魔力灯笼配置.最大魔法消耗比例 * currentCount;
-  减少魔法值(unit, manaCost, false, false);
+  减少魔法值(unit, manaCost, true, false);
   同步夜晚减伤(unit, currentCount);
   if (!是否白天()) return;
   const allies = 获取范围友军(unit, 取单位X(unit), 取单位Y(unit), 高原魔力灯笼配置.白天治疗半径);

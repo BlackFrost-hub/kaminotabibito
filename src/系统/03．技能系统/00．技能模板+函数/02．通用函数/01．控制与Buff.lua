@@ -71,6 +71,20 @@ do
     ____exports["移除单位指定Buff"] = ____00_FF0EBuff_7CFB_7EDF["移除单位指定Buff"]
 end
 do
+    local ____02_FF0Edot_4F24_5BB3 = require("系统.04．伤害系统.02．dot伤害")
+    ____exports.getUnitBurn = ____02_FF0Edot_4F24_5BB3.getUnitBurn
+end
+do
+    local ____04_FF0E_62A4_7532_964D_4F4E = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.04．护甲降低")
+    ____exports["施加单体护甲降低Buff"] = ____04_FF0E_62A4_7532_964D_4F4E["施加单体护甲降低Buff"]
+    ____exports["施加范围护甲降低Buff"] = ____04_FF0E_62A4_7532_964D_4F4E["施加范围护甲降低Buff"]
+end
+do
+    local ____04_FF0E_79FB_901F_63D0_5347 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.04．移速提升")
+    ____exports["施加移速提升Buff"] = ____04_FF0E_79FB_901F_63D0_5347["施加移速提升Buff"]
+    ____exports["清除单位移速提升Buff"] = ____04_FF0E_79FB_901F_63D0_5347["清除单位移速提升Buff"]
+end
+do
     local ____05_FF0EBuff_6E05_9664_51FD_6570 = require("系统.05．Buff系统.05．Buff清除函数")
     ____exports["移除单位指定类型Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位指定类型Buff"]
     ____exports["移除单位增益Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["移除单位增益Buff"]
@@ -114,6 +128,14 @@ end
 --- 清除单位可驱散负面 Buff（只清 Buff 表 `canPurge: true` 的 `Debuff:` 条目）。
 ____exports["清除单位可驱散负面Buff"] = function(_____5355_4F4D)
     return _____79FB_9664_5355_4F4D_8D1F_9762Buff(_____5355_4F4D, true)
+end
+--- 清除单位燃烧 Buff（会同步结束 D002 对应的 DOT）。
+____exports["清除单位燃烧Buff"] = function(_____5355_4F4D)
+    return _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5355_4F4D, "D002") and 1 or 0
+end
+--- 清除单位护甲降低 Buff（会触发 C032 的护甲回滚）。
+____exports["清除单位护甲降低Buff"] = function(_____5355_4F4D)
+    return _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5355_4F4D, "C032") and 1 or 0
 end
 --- 清除单位控制类负面 Buff（Buff 表 type 以 `Debuff:control` 开头）。
 ____exports["清除单位控制类负面Buff"] = function(_____5355_4F4D, _____53EA_6E05_53EF_9A71_6563)

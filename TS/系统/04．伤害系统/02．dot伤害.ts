@@ -25,6 +25,7 @@ import {
   type DotTypeConfig,
 } from "./01．DOT定义/01．DOT配置";
 import { registerBuiltInDotTypes } from "./01．DOT定义/03．DOT类型定义";
+import { 注册燃烧DOT } from "./01．DOT定义/09．单独DOT燃烧/01．燃烧DOT注册";
 import {
   getDotSourceDisplayName,
   getDotState,
@@ -38,7 +39,7 @@ import { syncDotBuff } from "../05．Buff系统/00．Buff系统";
 
 // ========== 虚拟分区：其它依赖 ==========
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 };
 const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as {
   markNextPendingDamageAsDotTickBatch: () => void;
@@ -175,34 +176,40 @@ registerBuiltInDotTypes({
   getUnitMaxHp,
   dotEffectModelFromBuffRow,
 });
+注册燃烧DOT({
+  registerDotType,
+  getBestDotFromUnit,
+});
 
 // ========== 虚拟分区：对外查询/调用 API ==========
 let registered = false;
 
-function getDotStateByTypeId(typeId: string, unit: any): DotState | null {
-  const h = unitHid(unit);
-  if (h === 0) return null;
-  return getDotState(typeId, h);
-}
-
 /** 供治疗等系统读取：单位当前反恢复状态，无则返回 null */
 export function getUnitAntiHeal(unit: any): DotState | null {
-  return getDotStateByTypeId("antiHeal", unit);
+  const h = unitHid(unit);
+  if (h === 0) return null;
+  return getDotState("antiHeal", h);
 }
 
 /** 供 UI 等读取：单位当前燃烧 DOT 状态，无则返回 null */
 export function getUnitBurn(unit: any): DotState | null {
-  return getDotStateByTypeId("burn", unit);
+  const h = unitHid(unit);
+  if (h === 0) return null;
+  return getDotState("burn", h);
 }
 
 /** 供 UI 等读取：单位当前中毒 DOT 状态，无则返回 null */
 export function getUnitPoison(unit: any): DotState | null {
-  return getDotStateByTypeId("poison", unit);
+  const h = unitHid(unit);
+  if (h === 0) return null;
+  return getDotState("poison", h);
 }
 
 /** 供 UI 等读取：D004 巨魔头颅诅咒（`registerDotType` id `trollCurse` 注册后才有状态） */
 export function getUnitTrollCurse(unit: any): DotState | null {
-  return getDotStateByTypeId("trollCurse", unit);
+  const h = unitHid(unit);
+  if (h === 0) return null;
+  return getDotState("trollCurse", h);
 }
 
 /** 造成精神伤害（供外部直接调用，如其他技能）；会标记 target 以免伤害回调再次施加同源 DOT。 */

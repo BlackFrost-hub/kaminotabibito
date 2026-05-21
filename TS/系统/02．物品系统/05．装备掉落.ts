@@ -15,7 +15,7 @@ const g = require("jass.globals") as { [key: string]: any };
 const itemInv = require("lib.扩展函数.BJ函数.index") as { CreateItemLoc: (itemId: number, loc: any) => any };
 const equipExcrete = require("系统.02．物品系统.09．装备排泄") as { setLastCreatedItem: (item: any) => void };
 const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
   isSpecialUnit: (unit: any) => boolean;
 };
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {

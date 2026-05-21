@@ -15,7 +15,7 @@ const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用
 };
 
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  stringToFourCC: (s: string | undefined | null) => number;
+  stringToFourCC: (this: void, s: string | undefined | null) => number;
 };
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
@@ -29,13 +29,18 @@ const 最大生命状态 = jass.UNIT_STATE_MAX_LIFE as number;
 const 机械单位类型 = jass.UNIT_TYPE_MECHANICAL as number;
 const 远古单位类型 = jass.UNIT_TYPE_ANCIENT as number;
 const 当前生命状态 = jass.UNIT_STATE_LIFE as number;
+const 死亡单位类型 = jass.UNIT_TYPE_DEAD as number;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const IsUnitEnemy = jass.IsUnitEnemy as (whichUnit: any, whichPlayer: any) => boolean;
+const GetUnitState = jass.GetUnitState as (whichUnit: any, whichState: any) => number;
 
 function 是否符合持盾召唤条件(this: void, 单位: any, 上下文: 死亡事件上下文, 物品四字码: number): boolean {
   if (单位 == null || 单位 === 0) return false;
-  if (!jass.IsUnitAliveBJ(单位)) return false;
-  if (jass.IsUnitType(单位, 机械单位类型)) return false;
-  if (jass.IsUnitType(单位, 远古单位类型)) return false;
-  if (!jass.IsUnitEnemy(单位, 上下文.死亡单位所有者)) return false;
+  if (IsUnitType(单位, 死亡单位类型)) return false;
+  if (GetUnitState(单位, 当前生命状态) <= 0.405) return false;
+  if (IsUnitType(单位, 机械单位类型)) return false;
+  if (IsUnitType(单位, 远古单位类型)) return false;
+  if (!IsUnitEnemy(单位, 上下文.死亡单位所有者)) return false;
   return itemJudgeFns.UnitHasItemOfTypeBJ(单位, 物品四字码);
 }
 

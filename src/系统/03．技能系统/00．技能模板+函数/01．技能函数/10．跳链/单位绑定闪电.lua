@@ -1,4 +1,5 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- 跳链 - 单位绑定闪电
@@ -11,6 +12,8 @@ local jass = require("jass.common")
 local AddLightningEx = jass.AddLightningEx
 local MoveLightningEx = jass.MoveLightningEx
 local DestroyLightning = jass.DestroyLightning
+local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local DestroyEffect = jass.DestroyEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -24,6 +27,79 @@ local isValidUnit = ____require_result_1.isValidUnit
 local _____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535 = {}
 local _____4E0B_4E00_4E2A_5355_4F4D_7ED1_5B9A_95EA_7535ID = 0
 local _____5355_4F4D_7ED1_5B9A_95EA_7535_56DE_8C03ID = 0
+local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
+local _____7279_6548_9500_6BC1_56DE_8C03ID = 0
+local _____95EA_7535_6700_77ED_6301_7EED_65F6_95F4_79D2 = 0.8
+local _____9ED8_8BA4_547D_4E2D_7279_6548_6301_7EED_65F6_95F4_79D2 = 1
+local function _____83B7_53D6_95EA_7535_547D_4E2D_7279_6548_6A21_578B(_____6548_679C_4EE3_7801)
+    if _____6548_679C_4EE3_7801 == "HWPB" or _____6548_679C_4EE3_7801 == "HWSB" then
+        return "Abilities\\Spells\\Orc\\HealingWave\\HealingWaveTarget.mdl"
+    end
+    if _____6548_679C_4EE3_7801 == "DRAB" or _____6548_679C_4EE3_7801 == "DRAL" or _____6548_679C_4EE3_7801 == "DRAM" then
+        return "Abilities\\Spells\\Other\\Drain\\DrainTarget.mdl"
+    end
+    if _____6548_679C_4EE3_7801 == "LEAS" or _____6548_679C_4EE3_7801 == "ROP" then
+        return "Abilities\\Spells\\Human\\AerialShackles\\AerialShacklesTarget.mdl"
+    end
+    if _____6548_679C_4EE3_7801 == "AFOD" then
+        return "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl"
+    end
+    if _____6548_679C_4EE3_7801 == "SPLK" then
+        return "Abilities\\Spells\\Orc\\SpiritLink\\SpiritLinkZapTarget.mdl"
+    end
+    if _____6548_679C_4EE3_7801 == "CLPB" or _____6548_679C_4EE3_7801 == "CLSB" or _____6548_679C_4EE3_7801 == "FORK" or _____6548_679C_4EE3_7801 == "CHIM" or _____6548_679C_4EE3_7801 == "MFPB" then
+        return "Abilities\\Weapons\\Bolt\\BoltImpact.mdl"
+    end
+    return "Abilities\\Weapons\\Bolt\\BoltImpact.mdl"
+end
+local function _____89C4_8303_95EA_7535_6301_7EED_65F6_95F4(_____6301_7EED_65F6_95F4)
+    return _____6301_7EED_65F6_95F4 >= _____95EA_7535_6700_77ED_6301_7EED_65F6_95F4_79D2 and _____6301_7EED_65F6_95F4 or _____95EA_7535_6700_77ED_6301_7EED_65F6_95F4_79D2
+end
+local function ____on_547D_4E2D_7279_6548_9500_6BC1Tick()
+    local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
+    do
+        local i = #_____5F85_9500_6BC1_7279_6548_5217_8868 - 1
+        while i >= 0 do
+            do
+                local _____8BB0_5F55 = _____5F85_9500_6BC1_7279_6548_5217_8868[i + 1]
+                if _____5F53_524D_65F6_95F4_6BEB_79D2 < _____8BB0_5F55["到期时间毫秒"] then
+                    goto __continue12
+                end
+                DestroyEffect(_____8BB0_5F55["句柄"])
+                __TS__ArraySplice(_____5F85_9500_6BC1_7279_6548_5217_8868, i, 1)
+            end
+            ::__continue12::
+            i = i - 1
+        end
+    end
+    if #_____5F85_9500_6BC1_7279_6548_5217_8868 == 0 and _____7279_6548_9500_6BC1_56DE_8C03ID ~= 0 then
+        removePeriodicCallback(_____7279_6548_9500_6BC1_56DE_8C03ID)
+        _____7279_6548_9500_6BC1_56DE_8C03ID = 0
+    end
+end
+local function _____5B89_6392_547D_4E2D_7279_6548_9500_6BC1(effect, _____6301_7EED_65F6_95F4_79D2)
+    if effect == nil or effect == 0 then
+        return
+    end
+    if _____7279_6548_9500_6BC1_56DE_8C03ID == 0 then
+        _____7279_6548_9500_6BC1_56DE_8C03ID = addPeriodicCallback(100, ____on_547D_4E2D_7279_6548_9500_6BC1Tick)
+    end
+    _____5F85_9500_6BC1_7279_6548_5217_8868[#_____5F85_9500_6BC1_7279_6548_5217_8868 + 1] = {
+        ["句柄"] = effect,
+        ["到期时间毫秒"] = getServerTime() + _____6301_7EED_65F6_95F4_79D2 * 1000
+    }
+end
+local function _____64AD_653E_95EA_7535_547D_4E2D_7279_6548(_____6548_679C_4EE3_7801, _____7EC8_70B9_5355_4F4D)
+    if not isValidUnit(_____7EC8_70B9_5355_4F4D) then
+        return
+    end
+    local _____6A21_578B = _____83B7_53D6_95EA_7535_547D_4E2D_7279_6548_6A21_578B(_____6548_679C_4EE3_7801)
+    if _____6A21_578B == "" then
+        return
+    end
+    local effect = AddSpecialEffectTarget(_____6A21_578B, _____7EC8_70B9_5355_4F4D, "origin")
+    _____5B89_6392_547D_4E2D_7279_6548_9500_6BC1(effect, _____9ED8_8BA4_547D_4E2D_7279_6548_6301_7EED_65F6_95F4_79D2)
+end
 local function _____9500_6BC1_5355_4F4D_7ED1_5B9A_95EA_7535_5B9E_4F8B(_____5B9E_4F8B)
     __TS__Delete(_____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535, _____5B9E_4F8B.id)
     if _____5B9E_4F8B["闪电句柄"] ~= nil and _____5B9E_4F8B["闪电句柄"] ~= 0 then
@@ -66,17 +142,17 @@ local function ____on_5355_4F4D_7ED1_5B9A_95EA_7535Tick()
         do
             local _____5B9E_4F8B = _____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535[_____5B9E_4F8BID_6587_672C]
             if _____5B9E_4F8B == nil then
-                goto __continue11
+                goto __continue30
             end
             if _____5F53_524D_65F6_95F4_6BEB_79D2 >= _____5B9E_4F8B["到期时间毫秒"] then
                 _____9500_6BC1_5355_4F4D_7ED1_5B9A_95EA_7535_5B9E_4F8B(_____5B9E_4F8B)
-                goto __continue11
+                goto __continue30
             end
             if _____66F4_65B0_5355_4F4D_7ED1_5B9A_95EA_7535(_____5B9E_4F8B) then
                 _____4ECD_6709_6D3B_8DC3_5B9E_4F8B = true
             end
         end
-        ::__continue11::
+        ::__continue30::
     end
     if not _____4ECD_6709_6D3B_8DC3_5B9E_4F8B and _____5355_4F4D_7ED1_5B9A_95EA_7535_56DE_8C03ID ~= 0 then
         removePeriodicCallback(_____5355_4F4D_7ED1_5B9A_95EA_7535_56DE_8C03ID)
@@ -105,6 +181,7 @@ ____exports["创建单位绑定闪电"] = function(_____53C2_6570)
     if not isValidUnit(_____53C2_6570["起点单位"]) or not isValidUnit(_____53C2_6570["终点单位"]) then
         return nil
     end
+    local _____6301_7EED_65F6_95F4_79D2 = _____89C4_8303_95EA_7535_6301_7EED_65F6_95F4(_____53C2_6570["持续时间"])
     local _____8D77_70B9_9AD8_5EA6_504F_79FB = _____53C2_6570["起点高度偏移"] or 60
     local _____7EC8_70B9_9AD8_5EA6_504F_79FB = _____53C2_6570["终点高度偏移"] or 60
     local _____95EA_7535_53E5_67C4 = AddLightningEx(
@@ -130,6 +207,7 @@ ____exports["创建单位绑定闪电"] = function(_____53C2_6570)
             _____989C_8272.a
         )
     end
+    _____64AD_653E_95EA_7535_547D_4E2D_7279_6548(_____53C2_6570["效果代码"], _____53C2_6570["终点单位"])
     _____4E0B_4E00_4E2A_5355_4F4D_7ED1_5B9A_95EA_7535ID = _____4E0B_4E00_4E2A_5355_4F4D_7ED1_5B9A_95EA_7535ID + 1
     local _____5B9E_4F8B = {
         id = _____4E0B_4E00_4E2A_5355_4F4D_7ED1_5B9A_95EA_7535ID,
@@ -138,7 +216,7 @@ ____exports["创建单位绑定闪电"] = function(_____53C2_6570)
         ["终点单位"] = _____53C2_6570["终点单位"],
         ["起点高度偏移"] = _____8D77_70B9_9AD8_5EA6_504F_79FB,
         ["终点高度偏移"] = _____7EC8_70B9_9AD8_5EA6_504F_79FB,
-        ["到期时间毫秒"] = getServerTime() + _____53C2_6570["持续时间"] * 1000,
+        ["到期时间毫秒"] = getServerTime() + _____6301_7EED_65F6_95F4_79D2 * 1000,
         ["任一死亡时销毁"] = _____53C2_6570["任一死亡时销毁"] ~= false
     }
     _____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535[_____5B9E_4F8B.id] = _____5B9E_4F8B

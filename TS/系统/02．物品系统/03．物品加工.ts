@@ -22,9 +22,9 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
 };
-const itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemPickup: (callback: (unit: any, item: any) => void) => number;
-  onItemDrop: (callback: (unit: any, item: any) => void) => number;
+const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
+  onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
+  onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   getItemDataEntry: (this: void, item: any) => any | null;
@@ -41,7 +41,7 @@ const CreateFloatTextAtPoint = 漂浮文字模块.CreateFloatTextAtPoint as
   | ((this: void, x: number, y: number, text: string, options?: any) => any)
   | undefined;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排泄") as {
   setLastCreatedItem: (item: any) => void;
@@ -393,11 +393,11 @@ function onCampfireDeath(this: void, dyingUnit: any): void {
 
 export function init物品加工(): void {
   // 使用物品事件中心注册，减少触发器数量
-  itemEventCenter.onItemPickup((unit, item) => {
+  onItemPickup((unit, item) => {
     onAnyPickup();
   });
 
-  itemEventCenter.onItemDrop((unit, item) => {
+  onItemDrop((unit, item) => {
     const itemId = getHandleIdSafe(item);
     if (unit && item && isCampfire(unit) && itemId !== 0 && itemState.has(itemId)) {
       untrackItem(item);

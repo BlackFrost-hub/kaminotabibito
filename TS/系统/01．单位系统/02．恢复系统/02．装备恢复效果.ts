@@ -41,11 +41,16 @@ export const ITEM_REGEN_EFFECTS: Record<string, ItemRegenEffect> = {
 //=============================================================================
 
 const jass = require("jass.common") as any;
+const UnitItemInSlot = jass.UnitItemInSlot as (this: void, unit: any, slot: number) => any;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 
-function 提取内部物体ID(配置键名: string): string {
+function 提取内部物体ID(this: void, 配置键名: string): string {
   const 片段列表 = 配置键名.split("|");
   return 片段列表[片段列表.length - 1] ?? 配置键名;
 }
@@ -53,13 +58,13 @@ function 提取内部物体ID(配置键名: string): string {
 /**
  * 检查单位是否拥有指定物品
  */
-function hasItem(unit: any, 配置键名: string): boolean {
+function hasItem(this: void, unit: any, 配置键名: string): boolean {
   const targetItemId = stringToFourCC(提取内部物体ID(配置键名));
   // 遍历6个物品栏
   for (let i = 0; i < 6; i++) {
-    const item = jass.UnitItemInSlot(unit, i);
+    const item = UnitItemInSlot(unit, i);
     if (item != null) {
-      const itemTypeId = jass.GetItemTypeId(item);
+      const itemTypeId = GetItemTypeId(item);
       if (itemTypeId === targetItemId) {
         return true;
       }
@@ -74,9 +79,9 @@ function hasItem(unit: any, 配置键名: string): boolean {
  * @param unit 目标单位
  * @returns 生命恢复加成值
  */
-export function calcItemLifeRegenBonus(unit: any): number {
+export function calcItemLifeRegenBonus(this: void, unit: any): number {
   let totalBonus = 0;
-  const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
   const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   for (const [itemIdStr, effect] of entries) {
@@ -98,9 +103,9 @@ export function calcItemLifeRegenBonus(unit: any): number {
  * @param unit 目标单位
  * @returns 魔法恢复加成值
  */
-export function calcItemManaRegenBonus(unit: any): number {
+export function calcItemManaRegenBonus(this: void, unit: any): number {
   let totalBonus = 0;
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
   const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   for (const [itemIdStr, effect] of entries) {

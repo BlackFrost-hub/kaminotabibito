@@ -97,6 +97,7 @@ items["I00P"] = {
   hp: 50,
   hpRegen: 50,
   all: 2,
+  magicDmg: 0.5,
   cdReduction: 0.5,
   mpCost: -0.2,
   Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
@@ -216,8 +217,8 @@ items["I058"] = {type: "衣服", name: "高原战衣", goldPrice: 800, score: 29
 items["I04M"] = {type: "衣服", name: "矮人火枪披风", goldPrice: 1800, score: 3062, level: "C-", atkSpeed: 0.4, armor: 20, hp: 1200, dodge: 0.1, abilList: "A03A"};
 items["I05C"] = {type: "灵魂", name: "风鸟之心", goldPrice: 1000, score: 3150, level: "C-", int: 35, mp: 1000, accuracy: 0.05, magicPierce: 0.35};
 items["I037"] = {type: "灵魂", name: "水元素精魂", goldPrice: 1000, score: 3179, level: "C", hp: 1500, mp: 1500, magicDmg: 0.2, waterDmg: 0.2};
-items["I04K"] = {type: "主武器", name: "矮人燧发枪", goldPrice: 5000, score: 3195, level: "C-", dmg: 85};
-items["I04L"] = {type: "主武器", name: "矮人火炮", goldPrice: 5000, score: 3236, level: "C-", dmg: 85};
+items["I04K"] = {type: "主武器", name: "矮人燧发枪", goldPrice: 5000, score: 3195, level: "C-", dmg: 85, atkSpeed: -0.33};
+items["I04L"] = {type: "主武器", name: "矮人火炮", goldPrice: 5000, score: 3236, level: "C-", dmg: 85, atkSpeed: -0.75};
 items["I0AM"] = {type: "道具/戒指/饰品", name: "炽热生物挂坠", goldPrice: 2500, score: 3300, level: "C", armor: 15, hp: 2000};
 items["I0BE"] = {type: "副武器", name: "德鲁伊指引灯笼（魔猎）", goldPrice: 10000, score: 3331, level: "C", int: 25, atkSpeed: 0.85, antMastery: 0.2};
 items["I041"] = {type: "主武器", name: "狂暴沙斧", goldPrice: 5000, score: 3350, level: "C", dmg: 50, str: 20, critRate: 0.25, critDmg: 0.2, dmgBonus: 0.2, dmgReductionPct: -0.2};
@@ -383,7 +384,6 @@ items["I067"] = {type: "头盔", name: "恶魔羽翼", goldPrice: 2500, level: "
 items["I068"] = {type: "道具/戒指/饰品", name: "|cffffcc99比安之戒|r", goldPrice: 1000, level: "C-", dmg: 25, accuracy: 0.05, magicDmg: 0.2, physDmg: 0.2};
 items["I069"] = {type: "神符", name: "治疗神符", goldPrice: 0, hot: "1500hp", abilList: "A0B8"};
 items["I06A"] = {type: "道具/戒指/饰品", name: "|cffff0000熔岩腰带|r", goldPrice: 900, level: "D-", dmg: 30, critRate: 0.1, critDmg: 0.15, magicResist: 0.1, physResist: 0.1};
-items["I06B"] = {type: "鞋子", name: "安恶之鞋", goldPrice: 1000, level: "D-", dmg: 35, armor: 10, hp: 1000, fireResist: 0.2, movespeed2: 75};
 items["I06C"] = {type: "主武器", name: "瑟尔之弓", goldPrice: 2000, dmg: 65, critRate: 0.25, atkSpeed: 0.5};
 items["I06D"] = {type: "主武器", name: "狱炽之刃", goldPrice: 2000, level: "D-", dmg: 100, critRate: 0.25};
 items["I06E"] = {type: "衣服", name: "狱炽之甲", goldPrice: 1250, level: "D", armor: 15, hp: 1500, hpRegen: 15};
@@ -395,7 +395,7 @@ items["I06J"] = {type: "道具/戒指/饰品", name: "|cffcc99ff阴暗之敲钟|
 items["I06K"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火护肩|r", goldPrice: 1500, level: "D", str: 20, armor: 15, hp: 1500};
 items["I06L"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火手套|r", goldPrice: 1000, level: "D", dmg: 30, str: 20, critDmg: 0.35};
 items["I06M"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火卡牌|r|cffff0000（幸运）|r", goldPrice: 1000, level: "D+", critRate: 0.25, hp: 1000, cdReduction: 0.1, accuracy: 0.1, dodge: 0.05};
-items["I06N"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火卡牌|r|cff00ffff（魔法）|r", goldPrice: 1000, level: "D+", hp: 1000, magicPierce: 0.2, magicDmg: 0.2};
+items["I06N"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火卡牌|r|cff00ffff（魔法）|r", goldPrice: 1000, level: "D+", hp: 1000, magicPierce: 0.2, magicDmg: 0.2, fireDmg: 0.25};
 items["I06O"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火卡牌|r|cffffcc99（攻击）|r", goldPrice: 2000, level: "D+", dmg: 50, all: 10, hp: 1000, abilList: "A0EM"};
 items["I06P"] = {type: "道具/戒指/饰品", name: "|cffff6800地狱火卡牌|r|cffcc99ff（能量）|r", goldPrice: 1500, level: "D+", hp: 1500, hpRegen: 50, mpRegen: 25};
 items["I06Q"] = {type: "灵魂", name: "|cffff6600焰混能量体|r", goldPrice: 20000, level: "D", dmg: 40, mpRegen: -10, abilList: "A083"};
@@ -461,7 +461,7 @@ items["I08H"] = {type: "副武器", name: "双翼恶魔之爪牙", goldPrice: 10
 items["I08I"] = {type: "主武器", name: "双翼恶魔之利刃", goldPrice: 1000, dmg: 50, agi: 35, atkSpeed: 1, accuracy: 0.1};
 items["I08J"] = {type: "道具/戒指/饰品", name: "远古铁甲手套", goldPrice: 1000, dmg: 80, armor: 35};
 items["I08K"] = {type: "道具/戒指/饰品", name: "|cffcc99ff黑暗猎人手套|r", goldPrice: 1000, dmg: 30, str: 35};
-items["I08L"] = {type: "道具/戒指/饰品", name: "|cffcc99ff黑暗猎人手套|r", goldPrice: 1000, dmg: 65, magicResist: 0.1, darkDmg: 0.25, abilList: "A09Q"};
+items["I08L"] = {type: "道具/戒指/饰品", name: "|cffcc99ff黑暗猎魔手套|r", goldPrice: 1000, dmg: 65, magicResist: 0.1, darkDmg: 0.25, abilList: "A09Q"};
 items["I08M"] = {type: "鞋子", name: "黑暗猎人护鞋", goldPrice: 1000, str: 35, armor: 15, hp: 1500, movespeed2: 75};
 items["I08N"] = {type: "衣服", name: "虚空板甲", goldPrice: 2500, critDmg: -0.35, armor: 40, hp: 3000, magicDmg: 0.2, critDmgTaken: -0.35};
 items["I08O"] = {type: "衣服", name: "虚空银甲", goldPrice: 2500, armor: 20, hp: 2500, hpRegenPct: 0.02, skillHeal: 0.35, healReceived: 0.35, magicDmg: 0.2};
@@ -566,7 +566,6 @@ items["I0CW"] = {type: "任务", name: "领取技能", goldPrice: 2000};
 items["I0CX"] = {type: "任务", name: "领悟暗之力", goldPrice: 2000};
 items["I0CY"] = {type: "材料", name: "荧光草", goldPrice: 0};
 items["I0D0"] = {type: "任务", name: "接受任务-|cffff0000狩猎食人魔（等级24）|r", goldPrice: 0};
-items["I0D2"] = {type: "道具/戒指/饰品", name: "|cffcc99ff黑暗猎人手套|r", goldPrice: 1000, dmg: 65, magicResist: 0.1, darkDmg: 0.25, abilList: "A09Q"};
 items["I0D3"] = {type: "主武器", name: "|cffffcc99沙烈魔斧|r", goldPrice: 2000, level: "C", dmg: 75, str: 16, agi: 20, int: 20, critDmg: 0.2, accuracy: 0.1, primaryBonus: "力量+16/敏捷+20/智力+20"};
 items["I0D4"] = {type: "道具/戒指/饰品", name: "食人魔头颅", goldPrice: 1000};
 items["I0D5"] = {type: "材料", name: "|cff3366ff魔力源石|r", goldPrice: 50, mpRegenPct: 0.03};

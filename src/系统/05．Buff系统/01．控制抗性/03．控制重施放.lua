@@ -12,7 +12,7 @@ local YDWESetUnitAbilityDataReal = ____require_result_1.YDWESetUnitAbilityDataRe
 local CONTROL_ABILITY_ID = 1093678385
 --- 获取辅助马甲单位类型
 function ____exports.getControlHelperUnitType(self)
-    return stringToFourCC(nil, "e02A")
+    return stringToFourCC("e02A")
 end
 --- 移除原控制技能
 function ____exports.removeOriginalControl(self, unit, abilityId)

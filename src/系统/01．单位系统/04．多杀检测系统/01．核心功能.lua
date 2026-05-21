@@ -56,15 +56,16 @@ local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
 local YDUserDataClear = ____require_result_0.YDUserDataClear
-local ____require_result_1 = require("系统.04．伤害系统.01．伤害事件")
-local registerDamageCallback = ____require_result_1.registerDamageCallback
-local ____require_result_2 = require("lib.扩展函数.封装函数.06．伤害函数.02．伤害事件数据")
-local YDWESetEventDamage = ____require_result_2.YDWESetEventDamage
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_2.registerDamageModifier
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local GroupAddGroup = ____require_result_3.GroupAddGroup
 local groupMonitors = {}
 local groupUnitMap = __TS__New(Map)
-local damageCallbackRegistered = false
+local finalDamageListenerRegistered = false
+local damageModifierRegistered = false
 local ____require_result_4 = require("系统.01．单位系统.04．多杀检测系统.04．成功回调")
 local onMultiKillSuccess = ____require_result_4.onMultiKillSuccess
 local function getGameTime(self)
@@ -114,17 +115,10 @@ local function removeGroupMonitor(self, instance)
         __TS__ArraySplice(groupMonitors, idx, 1)
     end
 end
-local function onUnitDamage(self, targetUnit, damage, damageType, fromDotTickBatch, sourceUnit, isNormalAttack)
-    local instance = groupUnitMap:get(getUnitId(nil, targetUnit))
-    if instance == nil then
-        return
-    end
-    if sourceUnit == nil or sourceUnit == 0 then
-        return
-    end
+local function _____5904_7406_591A_6740_81F4_547D_8BA1_6570(self, instance, targetUnit, damage)
     local isFatal = damage >= jass.GetUnitState(targetUnit, jass.UNIT_STATE_LIFE)
     if not isFatal then
-        return
+        return false
     end
     local now = getGameTime(nil)
     if instance.firstHitTime > 0 then
@@ -136,20 +130,53 @@ local function onUnitDamage(self, targetUnit, damage, damageType, fromDotTickBat
         end
     end
     if instance.lastHitUnit == targetUnit then
-        YDWESetEventDamage(nil, 0)
-        return
+        return false
     end
     if instance.firstHitTime == 0 then
         instance.firstHitTime = now
     end
     instance.hitCount = instance.hitCount + 1
     instance.lastHitUnit = targetUnit
-    if instance.hitCount >= instance.killThreshold then
-        killAllInGroup(nil, instance)
-        removeGroupMonitor(nil, instance)
-    else
-        YDWESetEventDamage(nil, 0)
+    return instance.hitCount >= instance.killThreshold
+end
+local function onMultiKillDamageModifier(context)
+    local targetUnit = context.target
+    local instance = groupUnitMap:get(getUnitId(nil, targetUnit))
+    if instance == nil then
+        return context.currentDamage
     end
+    if context.attacker == nil or context.attacker == 0 then
+        return context.currentDamage
+    end
+    local thresholdReached = _____5904_7406_591A_6740_81F4_547D_8BA1_6570(nil, instance, targetUnit, context.currentDamage)
+    if thresholdReached then
+        instance.pendingFinish = true
+        instance.pendingTarget = targetUnit
+        return context.currentDamage
+    end
+    return 0
+end
+local function onUnitDamage(targetUnit, sourceUnit, damage, _snapshot)
+    local instance = groupUnitMap:get(getUnitId(nil, targetUnit))
+    if instance == nil then
+        return
+    end
+    if sourceUnit == nil or sourceUnit == 0 then
+        return
+    end
+    if not (damage > 0) then
+        return
+    end
+    if instance.pendingFinish ~= true then
+        return
+    end
+    if instance.pendingTarget ~= targetUnit then
+        return
+    end
+    instance.pendingFinish = false
+    instance.pendingTarget = nil
+    killAllInGroup(nil, instance)
+    removeGroupMonitor(nil, instance)
 end
 function ____exports.startMultiKillMonitor(self, config)
     if not MULTI_KILL_SYSTEM_ENABLED then
@@ -203,7 +230,9 @@ function ____exports.startMultiKillMonitor(self, config)
         effectID = ____temp_13,
         healAmount = ____temp_14,
         healTarget = ____config_healTarget_8,
-        healSource = ____config_healSource_9
+        healSource = ____config_healSource_9,
+        pendingFinish = false,
+        pendingTarget = nil
     }
     local tempGroup = jass.CreateGroup()
     GroupAddGroup(nil, instance.killGroup, tempGroup)
@@ -218,9 +247,13 @@ function ____exports.startMultiKillMonitor(self, config)
     end
     jass.DestroyGroup(tempGroup)
     groupMonitors[#groupMonitors + 1] = instance
-    if not damageCallbackRegistered then
-        registerDamageCallback(nil, onUnitDamage)
-        damageCallbackRegistered = true
+    if not finalDamageListenerRegistered then
+        registerAppliedFinalDamageListener(onUnitDamage)
+        finalDamageListenerRegistered = true
+    end
+    if not damageModifierRegistered then
+        registerDamageModifier(onMultiKillDamageModifier, -100000)
+        damageModifierRegistered = true
     end
 end
 ---

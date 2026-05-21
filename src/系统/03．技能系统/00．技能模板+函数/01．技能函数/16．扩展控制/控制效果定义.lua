@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local ____exports = {}
 ____exports["快速控制效果定义表"] = {
     ["击晕"] = {
@@ -152,9 +153,27 @@ ____exports["默认恐惧逃离距离"] = 500
 ____exports["默认恐惧随机半径"] = 450
 ____exports["默认恐惧移动速度"] = 50
 ____exports["魅惑特效模型"] = "Abilities\\Spells\\Other\\SoulBurn\\SoulBurnbuff.mdl"
-____exports["恐惧特效模型"] = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl"
+____exports["恐惧特效模型"] = "BuffIcon\\model\\Grin Curse.mdx"
 ____exports["扩展控制特效挂点"] = "overhead"
 ____exports["获取扩展控制定义"] = function(_____7C7B_578B)
     return ____exports["扩展控制效果定义表"][_____7C7B_578B]
+end
+____exports["获取控制效果定义"] = function(_____7C7B_578B)
+    local _____6269_5C55_5B9A_4E49 = ____exports["扩展控制效果定义表"][_____7C7B_578B]
+    if _____6269_5C55_5B9A_4E49 ~= nil then
+        return _____6269_5C55_5B9A_4E49
+    end
+    local _____5FEB_901F_952E_5217_8868 = __TS__ObjectKeys(____exports["快速控制效果定义表"])
+    do
+        local i = 0
+        while i < #_____5FEB_901F_952E_5217_8868 do
+            local _____5B9A_4E49 = ____exports["快速控制效果定义表"][_____5FEB_901F_952E_5217_8868[i + 1]]
+            if _____5B9A_4E49["类型键"] == _____7C7B_578B then
+                return _____5B9A_4E49
+            end
+            i = i + 1
+        end
+    end
+    return nil
 end
 return ____exports

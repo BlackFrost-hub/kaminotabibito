@@ -96,14 +96,14 @@ function 显示数值(this: void, target: any, amount: number, resourceType: 资
       fireShowDamageEvent(target, amount, 0, 255, 0);
       return;
     }
-    fireShowDamageEvent(target, -amount, 255, 0, 0);
+    fireShowDamageEvent(target, amount, 255, 0, 0);
     return;
   }
   if (amount >= 0) {
     fireShowDamageEvent(target, amount, 0, 100, 255);
     return;
   }
-  fireShowDamageEvent(target, -amount, 150, 50, 255);
+  fireShowDamageEvent(target, amount, 150, 50, 255);
 }
 
 export function 变更资源值(

@@ -154,7 +154,7 @@ local function fourCCText(abilityId)
     if abilityId == 0 then
         return "0"
     end
-    return fourCCToStringRaw(fourCCTools, abilityId)
+    return fourCCToStringRaw(abilityId)
 end
 local function getCooldown(whichHero, abilityId)
     if not isValidHandle(whichHero) or abilityId == 0 then

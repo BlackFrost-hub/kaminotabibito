@@ -8,6 +8,7 @@ export * from "./04．伤害事件";
 export * from "./05．物品使用";
 export * from "./06．获取丢弃";
 export * from "./08．攻击效果";
+export * from "./09．物品升级";
 export * from "./50．武器类型";
 
 import "./99．物品测试/index";

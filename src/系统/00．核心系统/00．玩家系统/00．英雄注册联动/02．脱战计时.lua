@@ -55,12 +55,13 @@ local function _____62E5_6709Buff(unit, buffId)
     end
     return jass.GetUnitAbilityLevel(unit, buffId) > 0
 end
-local _____4F24_5BB3_4E8B_4EF6_6A21_5757 = require("系统.04．伤害系统.01．伤害事件")
-local function _____6CE8_518C_4F24_5BB3_56DE_8C03(cb)
-    _____4F24_5BB3_4E8B_4EF6_6A21_5757:registerDamageCallback(cb)
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
+local function _____6CE8_518C_6700_7EC8_4F24_5BB3_56DE_8C03(cb)
+    registerAppliedFinalDamageListener(cb)
 end
-local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
+local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
 local centerTimer = _G
 local _____8131_6218_5F00_5173 = true
 local _____82F1_96C4_8131_6218_65F6_95F4_79D2 = 18
@@ -146,7 +147,7 @@ local function _____68C0_67E5_79FB_9664_8131_6218Buff(unit, damage)
         )
     end
 end
-local function _____5355_4F4D_53D7_4F24_4E8B_4EF6(unit, damage, _____4F24_5BB3_7C7B_578B, _____6765_81EADOT_6279, _____6765_6E90, _____662F_5426_666E_653B)
+local function _____5355_4F4D_53D7_4F24_4E8B_4EF6(unit, _attacker, damage, _snapshot)
     if jass.IsUnitIllusion(unit) then
         return
     end
@@ -174,6 +175,6 @@ ____exports["初始化脱战系统"] = function()
     if not _____8131_6218_5F00_5173 then
         return
     end
-    _____6CE8_518C_4F24_5BB3_56DE_8C03(_____5355_4F4D_53D7_4F24_4E8B_4EF6)
+    _____6CE8_518C_6700_7EC8_4F24_5BB3_56DE_8C03(_____5355_4F4D_53D7_4F24_4E8B_4EF6)
 end
 return ____exports

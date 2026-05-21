@@ -8,7 +8,7 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
-  按名字反查物品ID: (this: void, name: string) => number;
+  按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
@@ -51,6 +51,9 @@ const { YDWEIsEventDamageType, YDWEIsEventAttackType } = require("lib.扩展函�
   YDWEIsEventDamageType: (this: void, damageType: any) => boolean;
   YDWEIsEventAttackType: (this: void, attackType: any) => boolean;
 };
+const { 装备触发概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
+  装备触发概率通过: (this: void, 原始概率: number, 触发单位: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -73,7 +76,6 @@ const UnitDamageTarget = jass.UnitDamageTarget as (
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
-const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -118,10 +120,16 @@ function 伤害快照是普通攻击类型(this: void, snapshot: any): boolean {
   return YDWEIsEventAttackType(ATTACK_TYPE_NORMAL) === true;
 }
 
+/**
+ * 按装备名反查物品 FourCC（数字）
+ * 注意：按名字反查物品ID 返回的是 string raw id（如"I021"），
+ * 需要经 stringToFourCCSafe 转为数字才能传给 UnitHasItemOfTypeBJ。
+ */
 export function 获取攻击效果装备ID(this: void, 装备名: string): number {
   const cached = 装备ID缓存[装备名];
   if (cached != null) return cached;
-  const id = 按名字反查物品ID(装备名);
+  const rawId = 按名字反查物品ID(装备名);
+  const id = typeof rawId === "string" ? stringToFourCCSafe(rawId) : 0;
   装备ID缓存[装备名] = id;
   return id;
 }
@@ -222,10 +230,9 @@ export function 距离满足限制(this: void, source: any, target: any, minDist
   return true;
 }
 
-export function 命中概率通过(this: void, probability?: number): boolean {
-  if (probability == null || probability >= 1) return true;
-  if (probability <= 0) return false;
-  return GetRandomReal(0, 1) <= probability;
+export function 命中概率通过(this: void, probability?: number, source?: any): boolean {
+  if (probability == null) return true;
+  return 装备触发概率通过(probability, source);
 }
 
 export function 解析攻击效果伤害类型(this: void, 类型?: 攻击效果伤害类型): any {

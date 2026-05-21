@@ -19,20 +19,22 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local registerHealCallback = ____require_result_2.registerHealCallback
-local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_3.registerManualBuff
-local getBuffRuntime = ____require_result_3.getBuffRuntime
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["创建Dz绑定单位特效"]
-local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["销毁Dz绑定单位特效"]
-local _____662F_5426_5DF2_6709Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["是否已有Dz绑定单位特效"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local getBuffRuntime = ____require_result_4.getBuffRuntime
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_5["创建Dz绑定单位特效"]
+local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_5["销毁Dz绑定单位特效"]
+local _____662F_5426_5DF2_6709Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_5["是否已有Dz绑定单位特效"]
 local GetPlayerId = jass.GetPlayerId
 local GetOwningPlayer = jass.GetOwningPlayer
 local _____91CD_4F24_7279_6548_6302_70B9 = "overhead"
 local _____91CD_4F24_7279_6548Key = "buff_wound_c021"
-local ____opt_5 = buffs[_____91CD_4F24BuffID]
-local _____91CD_4F24_7279_6548_6A21_578B = ____opt_5 and ____opt_5.effect or ""
+local ____opt_6 = buffs[_____91CD_4F24BuffID]
+local _____91CD_4F24_7279_6548_6A21_578B = ____opt_6 and ____opt_6.effect or ""
 local function _____8BFB_53D6YD_7528_6237_6570_636E(tableType, tableKey, attr, valueType)
     return YDUserDataGetSafe(tableType, tableKey, attr, valueType)
 end
@@ -111,13 +113,13 @@ ____exports["施加重伤"] = function(unit, _____91CD_4F24_503C, _____6301_7EED
     if _____6700_7EC8_503C <= 0 then
         return
     end
-    local ____temp_7
+    local ____temp_8
     if source ~= nil and source ~= 0 then
-        ____temp_7 = jass.GetUnitName(source)
+        ____temp_8 = jass.GetUnitName(source)
     else
-        ____temp_7 = nil
+        ____temp_8 = nil
     end
-    local sourceName = ____temp_7
+    local sourceName = ____temp_8
     registerManualBuff(
         unit,
         _____91CD_4F24BuffID,
@@ -151,20 +153,13 @@ local function _____8BA1_7B97_91CD_4F24_6CBB_7597_91CF(source, target, amount)
     end
     return amount * (1 - wound)
 end
---- 伤害事件回调：来源有装备重伤时，给目标施加重伤
-local function ____on_4F24_5BB3_4E8B_4EF6(...)
-    local args = {...}
+--- 最终伤害回调：来源有装备重伤时，给目标施加重伤
+local function ____on_4F24_5BB3_4E8B_4EF6(target, source, applied, _snapshot)
     if not _____91CD_4F24_7CFB_7EDF_5F00_5173 then
         return
     end
-    local target
-    local source
-    if #args >= 6 then
-        target = args[2]
-        source = args[6]
-    else
-        target = args[1]
-        source = args[5]
+    if not (applied > 0) then
+        return
     end
     if source == nil or source == 0 then
         return
@@ -184,8 +179,6 @@ function ____exports.initWoundSystem()
         return
     end
     registerHealCallback(_____8BA1_7B97_91CD_4F24_6CBB_7597_91CF)
-    local damageEventModule = require("系统.04．伤害系统.01．伤害事件")
-    local regCb = damageEventModule.registerDamageCallback
-    regCb(damageEventModule, ____on_4F24_5BB3_4E8B_4EF6, 0)
+    registerAppliedFinalDamageListener(____on_4F24_5BB3_4E8B_4EF6)
 end
 return ____exports

@@ -85,7 +85,7 @@ function _____5438_6536_4F7F_8005_9B54_8F6E_4F24_5BB3(_____5B9E_4F8B, _____53D7_
     )
     _____5B9E_4F8B["护盾值"] = _____5B9E_4F8B["护盾值"] - _____4F24_5BB3_503C
 end
-function ____on_4F7F_8005_9B54_8F6E_4F24_5BB3_4E8B_4EF6(_____53D7_4F24_5355_4F4D, _____4F24_5BB3_503C, ______4F24_5BB3_7C7B_578B, _fromDotTickBatch, _source, _isNormalAttack)
+function ____on_4F7F_8005_9B54_8F6E_4F24_5BB3_4E8B_4EF6(_____53D7_4F24_5355_4F4D, ______653B_51FB_8005, _____4F24_5BB3_503C, _snapshot)
     if _____53D7_4F24_5355_4F4D == nil or _____53D7_4F24_5355_4F4D == 0 or not (_____4F24_5BB3_503C > 0) then
         return
     end
@@ -115,8 +115,8 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.04．伤害系统.01．伤害事件")
-local registerDamageCallback = ____require_result_0.registerDamageCallback
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_1.onTick10ms
 offTick10ms = ____require_result_1.offTick10ms
@@ -160,7 +160,7 @@ local function _____786E_4FDD_4F7F_8005_9B54_8F6E_4F24_5BB3_76D1_542C()
         return
     end
     _____5DF2_6CE8_518C_4F7F_8005_9B54_8F6E_4F24_5BB3_76D1_542C = true
-    registerDamageCallback(____on_4F7F_8005_9B54_8F6E_4F24_5BB3_4E8B_4EF6)
+    registerAppliedFinalDamageListener(____on_4F7F_8005_9B54_8F6E_4F24_5BB3_4E8B_4EF6)
 end
 local function _____6CE8_518C_4F7F_8005_9B54_8F6E_9B54_76FE(_____65BD_6CD5_5355_4F4D, x, y, _____62A4_76FE_503C)
     local _____7279_6548 = EC_CreateEffect(

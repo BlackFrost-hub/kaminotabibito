@@ -18,6 +18,7 @@ local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 local ____01_FF0EFourCC_8F6C_6362 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local fourCCToString = ____01_FF0EFourCC_8F6C_6362.fourCCToString
 local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
 function ____exports.resolveRewardDisplayText(self, quest)
     if not quest then
         return "无"
@@ -207,10 +208,7 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     if not unit or not unitName then
         return nil
     end
-    local selectedUnitCode = fourCCToString(
-        nil,
-        jass.GetUnitTypeId(unit)
-    )
+    local selectedUnitCode = fourCCToString(GetUnitTypeId(unit))
     for ____, npc in ipairs(NPC_CONFIGS) do
         do
             if npc.enabled ~= true then

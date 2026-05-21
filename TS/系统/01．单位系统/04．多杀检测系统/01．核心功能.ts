@@ -60,12 +60,23 @@ const {
   YDUserDataClear: (tableType: string, key: any, attr: string, valueType: string) => void;
 };
 
-const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
-  registerDamageCallback: (callback: (unit: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void) => void;
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
-
-const { YDWESetEventDamage } = require("lib.扩展函数.封装函数.06．伤害函数.02．伤害事件数据") as {
-  YDWESetEventDamage: (amount: number) => boolean;
+const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  registerDamageModifier: (this: void, callback: (this: void, context: {
+    target: any;
+    attacker: any;
+    baseDamage: number;
+    currentDamage: number;
+    isPhysicalDamage: boolean;
+    isMagicDamage: boolean;
+    isEnhancedDamage: boolean;
+    isTrueDamage: boolean;
+    isNormalAttack: boolean;
+    isSkillAttack: boolean;
+    isSkillDamage: boolean;
+  }) => number, priority?: number) => number;
 };
 
 const { GroupAddGroup } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
@@ -106,6 +117,8 @@ interface MonitorInstance {
   healAmount: number;
   healTarget: any;
   healSource: any;
+  pendingFinish: boolean;
+  pendingTarget: any;
 }
 
 // ==========================================================================================
@@ -114,7 +127,8 @@ interface MonitorInstance {
 
 let groupMonitors: MonitorInstance[] = [];
 let groupUnitMap: Map<number, MonitorInstance> = new Map();
-let damageCallbackRegistered = false;
+let finalDamageListenerRegistered = false;
+let damageModifierRegistered = false;
 
 // ==========================================================================================
 // 导入成功回调
@@ -180,75 +194,71 @@ function removeGroupMonitor(instance: MonitorInstance): void {
   }
 }
 
-// ==========================================================================================
-// 核心逻辑：伤害处理
-// ==========================================================================================
-
-function onUnitDamage(
-  targetUnit: any,
-  damage: number,
-  damageType: number,
-  fromDotTickBatch?: boolean,
-  sourceUnit?: any,
-  isNormalAttack?: boolean
-): void {
-  // 检查目标单位是否在监控列表中
-  const instance = groupUnitMap.get(getUnitId(targetUnit));
-  if (instance == null) return;
-
-  // 必须有凶手单位（排除自然死亡/系统击杀）
-  if (sourceUnit == null || sourceUnit === 0) {
-    return;
-  }
-
-  // 检查是否是致命伤害（伤害 >= 当前生命值）
+function 处理多杀致命计数(instance: MonitorInstance, targetUnit: any, damage: number): boolean {
   const isFatal = damage >= jass.GetUnitState(targetUnit, jass.UNIT_STATE_LIFE);
-
-  // 非致命伤害：正常通过，不干预
-  if (!isFatal) {
-    return;
-  }
+  if (!isFatal) return false;
 
   const now = getGameTime();
-
-  // 检查时间窗口是否过期
   if (instance.firstHitTime > 0) {
     const timeElapsed = now - instance.firstHitTime;
     if (timeElapsed > instance.killWindow) {
-      // 时间窗口过期，重置计数
       instance.hitCount = 0;
       instance.firstHitTime = now;
       instance.lastHitUnit = null;
     }
   }
 
-  // 检查是否是同一单位的重复致命伤害
-  if (instance.lastHitUnit === targetUnit) {
-    // 同一单位连续受到致命伤害，免疫
-    YDWESetEventDamage(0);
-    return;
-  }
-
-  // 首次受到致命伤害，启动时间窗口
+  if (instance.lastHitUnit === targetUnit) return false;
   if (instance.firstHitTime === 0) {
     instance.firstHitTime = now;
   }
 
-  // 增加致命伤害计数（不同单位）
   instance.hitCount++;
   instance.lastHitUnit = targetUnit;
+  return instance.hitCount >= instance.killThreshold;
+}
 
-  // 检查是否达到阈值
-  if (instance.hitCount >= instance.killThreshold) {
-    // 击杀组内所有单位（killAllInGroup 内部会触发效果事件）
-    killAllInGroup(instance);
-    // 清理监控
-    removeGroupMonitor(instance);
-    // 允许这次致命伤害通过（击杀当前单位）
-  } else {
-    // 未达到阈值，免疫致命伤害
-    YDWESetEventDamage(0);
+function onMultiKillDamageModifier(this: void, context: {
+  target: any;
+  attacker: any;
+  currentDamage: number;
+}): number {
+  const targetUnit = context.target;
+  const instance = groupUnitMap.get(getUnitId(targetUnit));
+  if (instance == null) return context.currentDamage;
+  if (context.attacker == null || context.attacker === 0) return context.currentDamage;
+
+  const thresholdReached = 处理多杀致命计数(instance, targetUnit, context.currentDamage);
+  if (thresholdReached) {
+    instance.pendingFinish = true;
+    instance.pendingTarget = targetUnit;
+    return context.currentDamage;
   }
+  return 0;
+}
+
+// ==========================================================================================
+// 核心逻辑：伤害处理
+// ==========================================================================================
+
+function onUnitDamage(
+  this: void,
+  targetUnit: any,
+  sourceUnit: any,
+  damage: number,
+  _snapshot?: any
+): void {
+  const instance = groupUnitMap.get(getUnitId(targetUnit));
+  if (instance == null) return;
+  if (sourceUnit == null || sourceUnit === 0) return;
+  if (!(damage > 0)) return;
+  if (instance.pendingFinish !== true) return;
+  if (instance.pendingTarget !== targetUnit) return;
+
+  instance.pendingFinish = false;
+  instance.pendingTarget = null;
+  killAllInGroup(instance);
+  removeGroupMonitor(instance);
 }
 
 // ==========================================================================================
@@ -288,6 +298,8 @@ export function startMultiKillMonitor(config: MultiKillConfig): void {
     healAmount: config.healAmount ?? 0,
     healTarget: config.healTarget ?? null,
     healSource: config.healSource ?? null,
+    pendingFinish: false,
+    pendingTarget: null,
   };
 
   // 注册单位到监控映射
@@ -304,9 +316,13 @@ export function startMultiKillMonitor(config: MultiKillConfig): void {
   groupMonitors.push(instance);
 
   // 注册伤害回调（只注册一次）
-  if (!damageCallbackRegistered) {
-    registerDamageCallback(onUnitDamage);
-    damageCallbackRegistered = true;
+  if (!finalDamageListenerRegistered) {
+    registerAppliedFinalDamageListener(onUnitDamage);
+    finalDamageListenerRegistered = true;
+  }
+  if (!damageModifierRegistered) {
+    registerDamageModifier(onMultiKillDamageModifier, -100000);
+    damageModifierRegistered = true;
   }
 }
 

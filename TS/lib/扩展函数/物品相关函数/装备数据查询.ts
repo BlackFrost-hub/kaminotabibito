@@ -1,8 +1,9 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  fourCCToString: (four: number) => string;
+  fourCCToString: (this: void, four: number) => string;
 };
 const itemsData: Record<string, any> = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, any> }).default;
 
@@ -59,7 +60,7 @@ export function findStatKey(raw: string): string {
 
 export function getItemDataEntry(item: any): any | null {
   if (item == null || item === 0) return null;
-  const itemId = jass.GetItemTypeId(item);
+  const itemId = GetItemTypeId(item);
   if (itemId == null || itemId === 0) return null;
   const idStr = fourCCToString(itemId);
   const entry = itemsData[idStr];

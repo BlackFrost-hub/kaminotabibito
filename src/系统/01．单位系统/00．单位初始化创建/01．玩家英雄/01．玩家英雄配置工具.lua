@@ -3,6 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
@@ -17,11 +18,11 @@ ____exports["获取单位英雄Rawcode"] = function(unit)
     if unit == nil or unit == 0 then
         return ""
     end
-    local typeId = jass.GetUnitTypeId(unit) or 0
+    local typeId = GetUnitTypeId(unit) or 0
     if typeId == 0 then
         return ""
     end
-    return fourCCToString(nil, typeId) or ""
+    return fourCCToString(typeId) or ""
 end
 ____exports["获取单位玩家英雄配置"] = function(unit)
     return ____exports["获取玩家英雄配置"](____exports["获取单位英雄Rawcode"](unit))

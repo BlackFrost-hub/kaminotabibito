@@ -20,7 +20,7 @@ local function ____on_90AA_6076_4E4B_5FC3_5468_671F(unit)
     _____51CF_5C11_751F_547D_503C(
         unit,
         amount,
-        false,
+        true,
         true,
         nil,
         1

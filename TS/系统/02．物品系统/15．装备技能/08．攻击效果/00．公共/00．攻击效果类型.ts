@@ -38,14 +38,25 @@ export interface 攻击效果配置项 {
   最小距离?: number;
   最大距离?: number;
   概率?: number;
+  概率计算?: (this: void, 上下文: 攻击效果上下文) => number;
   冷却毫秒?: number;
   范围?: number;
+  范围包含主目标?: boolean;
   固定伤害?: number;
+  护甲降低叠加键?: string;
+  普攻固定伤害?: number;
+  攻击效果固定伤害?: number;
   攻击系数?: number;
   力量系数?: number;
   生命系数?: number;
+  生命系数计算?: (this: void, 上下文: 攻击效果上下文) => number;
   魔法系数?: number;
   伤害倍率?: number;
+  伤害概率?: number;
+  伤害概率计算?: (this: void, 上下文: 攻击效果上下文) => number;
+  治疗概率?: number;
+  治疗概率计算?: (this: void, 上下文: 攻击效果上下文) => number;
+  扩散成功主目标伤害倍率?: number;
   伤害类型?: 攻击效果伤害类型;
   持续时间?: number;
   间隔?: number;
@@ -60,6 +71,7 @@ export interface 攻击效果配置项 {
   特效?: string;
   点特效?: string;
   点特效缩放?: number;
+  自定义执行?: (this: void, 上下文: 攻击效果上下文) => void;
 }
 
 export interface 攻击效果上下文 {

@@ -11,10 +11,10 @@ const RemoveLocation = jass.RemoveLocation as (loc: any) => void;
 const bj_UNIT_FACING = jass.bj_UNIT_FACING ?? 270.0;
 
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  stringToFourCC: (s: string | undefined | null) => number;
+  stringToFourCC: (this: void, s: string | undefined | null) => number;
 };
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
-  fourCCToString: (fourcc: number) => string;
+  fourCCToString: (this: void, fourcc: number) => string;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;

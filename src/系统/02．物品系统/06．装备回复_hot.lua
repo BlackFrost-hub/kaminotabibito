@@ -9,6 +9,7 @@ local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local ____exports = {}
 --- 装备 hot/abilList 解析与单段治疗量计算（供 `06．装备回复` 与 STES 推算共用）
 local jass = require("jass.common")
+local GetItemTypeId = jass.GetItemTypeId
 function ____exports.parseEquipHealSegments(self, hotStr, abilList)
     local segments = __TS__StringSplit(hotStr, "+")
     local abilIds = __TS__ArrayMap(
@@ -99,8 +100,8 @@ function ____exports.sumHealFromItemData(self, unit, item, itemsData, fourCCToSt
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return {hp = 0, mp = 0, ok = false}
     end
-    local itemId = jass.GetItemTypeId(item)
-    local idStr = fourCCToString(nil, itemId)
+    local itemId = GetItemTypeId(item)
+    local idStr = fourCCToString(itemId)
     local entry = itemsData[idStr]
     if not entry or not entry.hot or not entry.abilList then
         return {hp = 0, mp = 0, ok = false}

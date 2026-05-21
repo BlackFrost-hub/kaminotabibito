@@ -47,24 +47,26 @@ function onEquipDebounceTimerExpire()
     safeDestroyTimer(nil, t)
 end
 jass = require("jass.common")
+local GetItemTypeId = jass.GetItemTypeId
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
 safeDestroyTimer = ____require_result_0.safeDestroyTimer
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local round = ____require_result_1.round
-local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local onItemUse = ____require_result_2.onItemUse
 local g = require("jass.globals")
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local AddGoldWithFeedback = ____require_result_2.AddGoldWithFeedback
-local fourCCToString = ____require_result_2.fourCCToString
-local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local AddGoldWithFeedback = ____require_result_3.AddGoldWithFeedback
+local fourCCToString = ____require_result_3.fourCCToString
+local ____require_result_4 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_4.IsUnitIllusionBJ
 local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-applyEquipStatsTS = ____require_result_4.applyEquipStatsTS
-local ____G_5 = _G
-local onSecond = ____G_5.onSecond
-local offSecond = ____G_5.offSecond
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
+local ____G_6 = _G
+local onSecond = ____G_6.onSecond
+local offSecond = ____G_6.offSecond
 local function parsePowerUP(powerUpStr)
     local segments = {}
     local rawSegs = __TS__StringSplit(powerUpStr, "+")
@@ -309,23 +311,23 @@ local function executeSegment(unit, seg)
                     goldFixed[#goldFixed + 1] = {min = mn, max = mx}
                 end
             elseif eff.type == "exp" then
-                local ____eff_isLevelMult_6
-                if eff.isLevelMult then
-                    ____eff_isLevelMult_6 = jass.R2I(getHeroLevel(unit) * eff.value)
-                else
-                    ____eff_isLevelMult_6 = jass.R2I(eff.value)
-                end
-                local amount = ____eff_isLevelMult_6
-                addHeroXP(unit, amount)
-            elseif eff.type == "level" then
-                local cur = getHeroLevel(unit)
                 local ____eff_isLevelMult_7
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass.R2I(cur * eff.value)
+                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(unit) * eff.value)
                 else
                     ____eff_isLevelMult_7 = jass.R2I(eff.value)
                 end
-                local add = ____eff_isLevelMult_7
+                local amount = ____eff_isLevelMult_7
+                addHeroXP(unit, amount)
+            elseif eff.type == "level" then
+                local cur = getHeroLevel(unit)
+                local ____eff_isLevelMult_8
+                if eff.isLevelMult then
+                    ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
+                else
+                    ____eff_isLevelMult_8 = jass.R2I(eff.value)
+                end
+                local add = ____eff_isLevelMult_8
                 if add > 0 then
                     jass.SetHeroLevel(unit, cur + add, true)
                 end
@@ -377,20 +379,20 @@ local function executeSegment(unit, seg)
                 local mx = jass.R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
-                    local ____temp_8
-                    if mn < mx then
-                        ____temp_8 = mn
-                    else
-                        ____temp_8 = mx
-                    end
-                    local a = ____temp_8
                     local ____temp_9
                     if mn < mx then
-                        ____temp_9 = mx
-                    else
                         ____temp_9 = mn
+                    else
+                        ____temp_9 = mx
                     end
-                    local b = ____temp_9
+                    local a = ____temp_9
+                    local ____temp_10
+                    if mn < mx then
+                        ____temp_10 = mx
+                    else
+                        ____temp_10 = mn
+                    end
+                    local b = ____temp_10
                     delta = jass.GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
@@ -437,10 +439,7 @@ local function onUseItem()
         return
     end
     local glob = _G
-    local idStr = fourCCToString(
-        nil,
-        jass.GetItemTypeId(item)
-    )
+    local idStr = fourCCToString(GetItemTypeId(item))
     local key = (("__EquipPowerUP_" .. tostring(unit)) .. "_") .. idStr
     if glob[key] then
         return
@@ -471,7 +470,7 @@ local function init()
         return
     end
     g[INIT_KEY] = true
-    itemEventCenter:onItemUse(function(unit, item)
+    onItemUse(function(unit, item)
         onUseItem()
     end)
 end

@@ -6,6 +6,7 @@ import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．�
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
 const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
 // ========== 虚拟分区：奖励展示文案解析 ==========
 export function resolveRewardDisplayText(quest: Partial<QuestConfig> | null | undefined): string {
@@ -148,7 +149,7 @@ export function findDialogConfig(npcName: string): DialogNPCData | undefined {
 
 export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): NPCData | null {
   if (!unit || !unitName) return null;
-  const selectedUnitCode = fourCCToString((jass as any).GetUnitTypeId(unit) as number);
+  const selectedUnitCode = fourCCToString(GetUnitTypeId(unit) as number);
   for (const npc of NPC_CONFIGS) {
     if (npc.enabled !== true) continue;
     if (npc.unitcode && npc.unitcode !== selectedUnitCode) continue;

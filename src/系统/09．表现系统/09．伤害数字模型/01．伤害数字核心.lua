@@ -155,7 +155,7 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 160, g = 82, b = 45}
     end
     if damageType.isTrueDamage then
-        return {r = 255, g = 240, b = 120}
+        return {r = 255, g = 255, b = 255}
     end
     if damageType.isEnhancedDamage then
         return {r = 255, g = 140, b = 0}
@@ -182,13 +182,13 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 180, g = 130, b = 255}
     end
     if damageType.isPhysicalDamage then
-        return {r = 255, g = 90, b = 90}
+        return {r = 160, g = 82, b = 45}
     end
     if damageType.isMagicDamage then
         return {r = 120, g = 140, b = 255}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_MIND then
-        return {r = 255, g = 240, b = 120}
+        return {r = 255, g = 255, b = 155}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_ENHANCED then
         return {r = 255, g = 140, b = 0}
@@ -230,7 +230,7 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 120, g = 140, b = 255}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_NORMAL then
-        return {r = 255, g = 90, b = 90}
+        return {r = 160, g = 82, b = 45}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_UNIVERSAL then
         return {r = 255, g = 255, b = 255}

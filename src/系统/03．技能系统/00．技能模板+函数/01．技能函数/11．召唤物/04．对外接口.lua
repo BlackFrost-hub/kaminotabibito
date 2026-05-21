@@ -39,7 +39,7 @@ local function _____662F_5426_6709_6548_5355_4F4D_56DB_5B57_7801(rawcode)
     if slkTable == nil then
         return false
     end
-    local id = fourCCToString(nil, rawcode)
+    local id = fourCCToString(rawcode)
     return slkTable[id] ~= nil
 end
 local function _____5C1D_8BD5_7EA0_6B63_5355_4F4D_56DB_5B57_7801(rawcode)
@@ -73,11 +73,11 @@ local function _____5C1D_8BD5_7EA0_6B63_5355_4F4D_56DB_5B57_7801(rawcode)
             "raw=",
             rawcode,
             "rawStr=",
-            fourCCToString(nil, rawcode),
+            fourCCToString(rawcode),
             "fixed=",
             best,
             "fixedStr=",
-            fourCCToString(nil, best)
+            fourCCToString(best)
         )
         return best
     end
@@ -88,7 +88,7 @@ local function _____5F52_4E00_5316_5355_4F4D_7C7B_578B(_____5355_4F4D_7C7B_578B)
         return _____5C1D_8BD5_7EA0_6B63_5355_4F4D_56DB_5B57_7801(_____5355_4F4D_7C7B_578B)
     end
     if type(_____5355_4F4D_7C7B_578B) == "string" and #_____5355_4F4D_7C7B_578B == 4 then
-        return stringToFourCC(nil, _____5355_4F4D_7C7B_578B)
+        return stringToFourCC(_____5355_4F4D_7C7B_578B)
     end
     return nil
 end

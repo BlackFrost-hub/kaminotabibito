@@ -16,11 +16,11 @@ function 拥有Buff(this: void, unit: any, buffId: number): boolean {
   return jass.GetUnitAbilityLevel(unit, buffId) > 0;
 }
 
-const 伤害事件模块 = require("系统.04．伤害系统.01．伤害事件") as {
-  registerDamageCallback: (cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void) => void;
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
-function 注册伤害回调(this: void, cb: (target: any, damage: number, damageType: number, fromDotTickBatch: boolean, source: any, isNormalAttack: boolean) => void): void {
-  伤害事件模块.registerDamageCallback(cb);
+function 注册最终伤害回调(this: void, cb: (target: any, attacker: any, applied: number, snapshot: any) => void): void {
+  registerAppliedFinalDamageListener(cb);
 }
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
@@ -126,11 +126,9 @@ function 检查移除脱战Buff(this: void, unit: any, damage: number): void {
 function 单位受伤事件(
   this: void,
   unit: any,
+  _attacker: any,
   damage: number,
-  伤害类型: number,
-  来自DOT批: boolean,
-  来源: any,
-  是否普攻: boolean
+  _snapshot: any
 ): void {
   if (jass.IsUnitIllusion(unit)) return;
   if (damage < 1.0) return;
@@ -155,7 +153,7 @@ export function 初始化脱战系统(this: void): void {
   if (已初始化) return;
   已初始化 = true;
   if (!脱战开关) return;
-  注册伤害回调(单位受伤事件);
+  注册最终伤害回调(单位受伤事件);
 }
 
 export {};

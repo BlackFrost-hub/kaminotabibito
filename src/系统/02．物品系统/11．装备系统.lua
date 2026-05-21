@@ -8,27 +8,31 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 --- 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true
 local jass = require("jass.common")
-local itemEventCenter = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local GetItemTypeId = jass.GetItemTypeId
+local GetUnitTypeId = jass.GetUnitTypeId
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
+local onItemPickup = ____require_result_0.onItemPickup
+local onItemDrop = ____require_result_0.onItemDrop
 local g = require("jass.globals")
 local equipLimit = require("系统.02．物品系统.10．装备限制")
 local equipShared = equipLimit.equipShared
 local equipMovespeed = require("系统.02．物品系统.08．装备移速")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-local applyEquipStatsTS = ____require_result_0.applyEquipStatsTS
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local fourCCToString = ____require_result_1.fourCCToString
-local isSpecialUnit = ____require_result_1.isSpecialUnit
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+local applyEquipStatsTS = ____require_result_1.applyEquipStatsTS
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local fourCCToString = ____require_result_2.fourCCToString
+local isSpecialUnit = ____require_result_2.isSpecialUnit
 local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.index")
-local getObjectProperty = ____require_result_2.getObjectProperty
-local ObjectType = ____require_result_2.ObjectType
-local ____require_result_3 = require("系统.00．核心系统.01．颜色常量")
-local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_3["装备等级颜色代码"]
-local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_3["是否彩虹装备等级"]
-local _____5F69_8679_989C_8272_6587_672C = ____require_result_3["彩虹颜色文本"]
-local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_3["去除颜色代码"]
-local ____require_result_4 = require("系统.02．物品系统.12．装备次数叠加配置")
-local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_4["是否允许装备次数叠加"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_3.getObjectProperty
+local ObjectType = ____require_result_3.ObjectType
+local ____require_result_4 = require("系统.00．核心系统.01．颜色常量")
+local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_4["装备等级颜色代码"]
+local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_4["是否彩虹装备等级"]
+local _____5F69_8679_989C_8272_6587_672C = ____require_result_4["彩虹颜色文本"]
+local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_4["去除颜色代码"]
+local ____require_result_5 = require("系统.02．物品系统.12．装备次数叠加配置")
+local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_5["是否允许装备次数叠加"]
 local EQUIP_EVENT_PLAYER_IDS = {
     0,
     1,
@@ -150,19 +154,16 @@ local function handleItemEvent(self, unit, item, isPickup)
         equipShared.skipNextDrop = false
         return
     end
-    local idStr = fourCCToString(
-        nil,
-        jass.GetItemTypeId(item)
-    )
+    local idStr = fourCCToString(GetItemTypeId(item))
     local itemData = itemRelatedFns.getItemDataEntry(item)
     if not itemData then
         if isPickup then
-            local ____temp_7 = type(slk) ~= "nil" and slk.item
-            if ____temp_7 then
-                local ____opt_5 = slk.item[idStr]
-                ____temp_7 = ____opt_5 and ____opt_5.name
+            local ____temp_8 = type(slk) ~= "nil" and slk.item
+            if ____temp_8 then
+                local ____opt_6 = slk.item[idStr]
+                ____temp_8 = ____opt_6 and ____opt_6.name
             end
-            local displayName = ____temp_7 or idStr
+            local displayName = ____temp_8 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
             jass.DisplayTimedTextToPlayer(
@@ -180,47 +181,47 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local isConsumable = isDrop and itemData.hot ~= nil
-    if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit:equipLimitWouldAllowPickup(unit, item) then
+    if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit.equipLimitWouldAllowPickup(unit, item) then
         return
     end
     local charges = jass.GetItemCharges(item)
     local itemNamePlain = _____53BB_9664_989C_8272_4EE3_7801(tostring(itemData.name or ""))
-    local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9
+    local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_10
     if _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0(itemNamePlain) then
-        local ____temp_8
+        local ____temp_9
         if charges > 0 then
-            ____temp_8 = charges
+            ____temp_9 = charges
         else
-            ____temp_8 = 1
+            ____temp_9 = 1
         end
-        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9 = ____temp_8
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_10 = ____temp_9
     else
-        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9 = 1
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_10 = 1
     end
-    local mult = _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_9
+    local mult = _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_10
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
     if primaryBonus then
-        local typeId = jass.GetUnitTypeId(unit)
-        local unitId = typeId ~= 0 and fourCCToString(nil, typeId) or ""
+        local typeId = GetUnitTypeId(unit)
+        local unitId = typeId ~= 0 and fourCCToString(typeId) or ""
         local primaryStr = unitId ~= "" and getObjectProperty(nil, ObjectType.UNIT, unitId, "Primary") or ""
         primary = parsePrimaryBonus(nil, primaryBonus, primaryStr)
     end
     local merged = {}
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
-        local ____e_key_11 = e.key
-        local ____itemData_e_key_10 = itemData[e.key]
-        if ____itemData_e_key_10 == nil then
-            ____itemData_e_key_10 = 0
+        local ____e_key_12 = e.key
+        local ____itemData_e_key_11 = itemData[e.key]
+        if ____itemData_e_key_11 == nil then
+            ____itemData_e_key_11 = 0
         end
-        merged[____e_key_11] = ____itemData_e_key_10 + (primary[e.key] or 0)
+        merged[____e_key_12] = ____itemData_e_key_11 + (primary[e.key] or 0)
     end
-    local ____itemData_moveSpeed_12 = itemData.moveSpeed
-    if ____itemData_moveSpeed_12 == nil then
-        ____itemData_moveSpeed_12 = 0
+    local ____itemData_moveSpeed_13 = itemData.moveSpeed
+    if ____itemData_moveSpeed_13 == nil then
+        ____itemData_moveSpeed_13 = 0
     end
-    merged.moveSpeed = ____itemData_moveSpeed_12 + (primary.moveSpeed or 0)
+    merged.moveSpeed = ____itemData_moveSpeed_13 + (primary.moveSpeed or 0)
     local playerStats = {}
     local function addStat(____, val, name)
         if val == nil or val == 0 then
@@ -285,15 +286,15 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_15 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_14 = unit
-        local ____isDrop_13
+        local ____equipMovespeed_getMaxMovespeed2Info_16 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_15 = unit
+        local ____isDrop_14
         if isDrop then
-            ____isDrop_13 = item
+            ____isDrop_14 = item
         else
-            ____isDrop_13 = nil
+            ____isDrop_14 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_15(equipMovespeed, ____unit_14, ____isDrop_13)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_16(equipMovespeed, ____unit_15, ____isDrop_14)
         if ms.value > 0 then
             test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end
@@ -319,10 +320,10 @@ local function handleItemEvent(self, unit, item, isPickup)
 end
 --- 初始化事件：使用物品事件中心统一注册
 local function initEvents(self)
-    itemEventCenter:onItemPickup(function(____, unit, item)
+    onItemPickup(function(unit, item)
         handleItemEvent(nil, unit, item, true)
     end)
-    itemEventCenter:onItemDrop(function(____, unit, item)
+    onItemDrop(function(unit, item)
         handleItemEvent(nil, unit, item, false)
     end)
 end

@@ -6,7 +6,7 @@
 
 const jass = require("jass.common") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (s: string) => number;
+  stringToFourCC: (this: void, s: string) => number;
 };
 const { YDWESetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;

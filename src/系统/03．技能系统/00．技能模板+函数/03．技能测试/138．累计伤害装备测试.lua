@@ -37,7 +37,7 @@ local function _____7ED9_5355_4F4D_53D1_88C5_5907(unit, _____88C5_5907_540D)
         return
     end
     local item = CreateItem(
-        stringToFourCC(nil, _____7269_54C1ID),
+        stringToFourCC(_____7269_54C1ID),
         GetUnitX(unit),
         GetUnitY(unit)
     )

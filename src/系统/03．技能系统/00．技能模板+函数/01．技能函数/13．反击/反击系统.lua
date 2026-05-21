@@ -212,6 +212,15 @@ local function onFinalDamageApplied(target, attacker, applied, snapshot)
     if not _____5B9E_4F8B_5217_8868 or #_____5B9E_4F8B_5217_8868 == 0 then
         return
     end
+    debugLogForce(
+        "反击系统",
+        "伤害回调触发 targetHid=",
+        targetHid,
+        "attackerHid=",
+        attacker and GetHandleId(attacker) or 0,
+        "applied=",
+        applied
+    )
     if attacker then
         local attackerHid = GetHandleId(attacker)
         if _____53CD_51FB_9ED1_540D_5355[attackerHid] == true then
@@ -267,7 +276,7 @@ local function _____521D_59CB_5316_7CFB_7EDF()
         return
     end
     _____7CFB_7EDF_5DF2_521D_59CB_5316 = true
-    registerAppliedFinalDamageListener(nil, onFinalDamageApplied)
+    registerAppliedFinalDamageListener(onFinalDamageApplied)
     debugLogForce("反击系统", "系统已初始化")
 end
 --- 注册反击

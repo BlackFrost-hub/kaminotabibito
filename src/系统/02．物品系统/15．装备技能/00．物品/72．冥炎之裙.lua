@@ -113,15 +113,19 @@ local function ____on_83B7_5F97_51A5_708E_4E4B_88D9(unit, _item, currentCount, p
     if not _____5355_4F4D_662F_82F1_96C4(unit) then
         return
     end
-    _____8C03_6574_51A5_708E_4E4B_88D9_5973_6027_5168_5C5E_6027(unit, currentCount - previousCount)
-    _____540C_6B65_51A5_708E_4E4B_88D9_6301_6709_8868_73B0(unit, currentCount)
+    if previousCount <= 0 and currentCount > 0 then
+        _____8C03_6574_51A5_708E_4E4B_88D9_5973_6027_5168_5C5E_6027(unit, 1)
+    end
+    _____540C_6B65_51A5_708E_4E4B_88D9_6301_6709_8868_73B0(unit, currentCount > 0 and 1 or 0)
 end
 local function ____on_5931_53BB_51A5_708E_4E4B_88D9(unit, _item, currentCount, previousCount)
     if not _____5355_4F4D_662F_82F1_96C4(unit) then
         return
     end
-    _____8C03_6574_51A5_708E_4E4B_88D9_5973_6027_5168_5C5E_6027(unit, currentCount - previousCount)
-    _____540C_6B65_51A5_708E_4E4B_88D9_6301_6709_8868_73B0(unit, currentCount)
+    if currentCount <= 0 and previousCount > 0 then
+        _____8C03_6574_51A5_708E_4E4B_88D9_5973_6027_5168_5C5E_6027(unit, -1)
+    end
+    _____540C_6B65_51A5_708E_4E4B_88D9_6301_6709_8868_73B0(unit, currentCount > 0 and 1 or 0)
 end
 local function ____on_51A5_708E_4E4B_88D9_5468_671F()
     do
@@ -131,20 +135,20 @@ local function ____on_51A5_708E_4E4B_88D9_5468_671F()
                 local unit = _____51A5_708E_4E4B_88D9_6301_6709_8005_5217_8868[i + 1]
                 if not _____5355_4F4D_662F_82F1_96C4(unit) then
                     _____79FB_9664_51A5_708E_4E4B_88D9_6301_6709_8005(unit)
-                    goto __continue26
+                    goto __continue28
                 end
                 local count = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____51A5_708E_4E4B_88D9_7269_54C1ID)
                 if count <= 0 then
                     _____79FB_9664_51A5_708E_4E4B_88D9_6301_6709_8005(unit)
-                    goto __continue26
+                    goto __continue28
                 end
                 if not _____662F_5426_5DF2_6709Dz_7ED1_5B9A_5355_4F4D_7279_6548(unit, _____51A5_708E_4E4B_88D9_914D_7F6E["特效键"]) then
                     _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548(unit, _____51A5_708E_4E4B_88D9_914D_7F6E["特效挂点"], _____51A5_708E_4E4B_88D9_914D_7F6E["特效路径"], _____51A5_708E_4E4B_88D9_914D_7F6E["特效键"])
                 end
                 if not _____5355_4F4D_5B58_6D3B(unit) then
-                    goto __continue26
+                    goto __continue28
                 end
-                local damage = _____51A5_708E_4E4B_88D9_914D_7F6E["每层每秒火焰伤害"] * count
+                local damage = _____51A5_708E_4E4B_88D9_914D_7F6E["每层每秒火焰伤害"]
                 local targets = getUnitsInRange(
                     GetUnitX(unit),
                     GetUnitY(unit),
@@ -156,10 +160,10 @@ local function ____on_51A5_708E_4E4B_88D9_5468_671F()
                         do
                             local target = targets[j + 1]
                             if target == nil or target == 0 or target == unit then
-                                goto __continue32
+                                goto __continue34
                             end
                             if not _____5355_4F4D_5B58_6D3B(target) then
-                                goto __continue32
+                                goto __continue34
                             end
                             UnitDamageTarget(
                                 unit,
@@ -172,12 +176,12 @@ local function ____on_51A5_708E_4E4B_88D9_5468_671F()
                                 WEAPON_TYPE_WHOKNOWS
                             )
                         end
-                        ::__continue32::
+                        ::__continue34::
                         j = j + 1
                     end
                 end
             end
-            ::__continue26::
+            ::__continue28::
             i = i - 1
         end
     end

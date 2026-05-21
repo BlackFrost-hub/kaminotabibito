@@ -30,7 +30,7 @@ ____exports.DEFAULT_HEAL_EFFECT_PATH = "Abilities\\Spells\\Human\\HolyBolt\\Holy
 --- 默认魔法恢复特效路径
 ____exports.DEFAULT_MANA_HEAL_EFFECT_PATH = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl"
 --- 治疗漂浮文字颜色 RGB
-____exports.HEAL_TEXT_COLOR = {red = 20, green = 100, blue = 20}
+____exports.HEAL_TEXT_COLOR = {red = 80, green = 255, blue = 80}
 --- 魔法恢复漂浮文字颜色 RGB
 ____exports.MANA_TEXT_COLOR = {red = 53, green = 80, blue = 92}
 --- 治疗率属性名（治疗别人时生效，如0.2=+20%）
