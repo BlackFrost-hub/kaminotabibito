@@ -28,6 +28,9 @@ export function init(this: void): void {
     Boss战伤害统计.initBossBattleDamageStats();
   }
   require("系统.04．伤害系统.00．伤害计算.05．事件注册");
+  require("系统.04．伤害系统.04．命中系统.index");
+  require("系统.04．伤害系统.05．闪避系统.index");
+  require("系统.04．伤害系统.06．暴击系统.index");
 
   const { init: initHealSystem } = require("系统.04．伤害系统.02．治疗系统.index") as {
     init?: (this: void) => void;

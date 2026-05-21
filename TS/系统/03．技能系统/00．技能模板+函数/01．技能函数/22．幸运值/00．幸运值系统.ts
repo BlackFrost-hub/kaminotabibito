@@ -66,4 +66,28 @@ export function 装备触发概率通过(this: void, 原始概率: number, 触�
   return 单位幸运概率通过(原始概率, 触发单位);
 }
 
+export function 命中概率修正(this: void, 原始概率: number, 攻击者: any): number {
+  return 按单位所属玩家幸运修正概率(原始概率, 攻击者);
+}
+
+export function 命中概率通过(this: void, 原始概率: number, 攻击者: any): boolean {
+  return 单位幸运概率通过(原始概率, 攻击者);
+}
+
+export function 闪避概率修正(this: void, 原始概率: number, 受击者: any): number {
+  return 按单位所属玩家幸运修正概率(原始概率, 受击者);
+}
+
+export function 闪避概率通过(this: void, 原始概率: number, 受击者: any): boolean {
+  return 单位幸运概率通过(原始概率, 受击者);
+}
+
+export function 暴击概率修正(this: void, 原始概率: number, 攻击者: any): number {
+  return 按单位所属玩家幸运修正概率(原始概率, 攻击者);
+}
+
+export function 暴击概率通过(this: void, 原始概率: number, 攻击者: any): boolean {
+  return 单位幸运概率通过(原始概率, 攻击者);
+}
+
 export {};

@@ -10,6 +10,9 @@ const jass = require("jass.common") as any;
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
+const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
+  是玩家英雄组单位: (unit: any) => boolean;
+};
 const { STAT_LIMITS, ENEMY_STAT_LIMITS, BREAKABLE_LIMITS } = require("系统.04．伤害系统.00．伤害计算.00．伤害常量") as {
   STAT_LIMITS: Record<string, { max: number; min: number }>;
   ENEMY_STAT_LIMITS: Record<string, { max: number; min: number }>;
@@ -18,9 +21,8 @@ const { STAT_LIMITS, ENEMY_STAT_LIMITS, BREAKABLE_LIMITS } = require("系统.04�
 const { YDWEGetUnitArmor } = require("lib.扩展函数.YDWE函数.06．护甲获取") as {
   YDWEGetUnitArmor: (unit: any) => number;
 };
-const { isPlayerUnit: isPlayerUnitBase } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  isPlayerUnit: (unit: any) => boolean;
-};
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 
 //=============================================================================
 // 一、玩家判定
@@ -28,10 +30,10 @@ const { isPlayerUnit: isPlayerUnitBase } = require("lib.扩展函数.封装函�
 
 /**
  * 判断单位是否为玩家英雄
- * 玩家0-7为人类玩家，每个玩家只有一个英雄
+ * 以玩家英雄单位组为准；组未就绪时由独立 helper 回退到注册英雄桥接。
  */
 export function isPlayerUnit(unit: any): boolean {
-  return isPlayerUnitBase(unit);
+  return 是玩家英雄组单位(unit);
 }
 
 /**
@@ -39,9 +41,9 @@ export function isPlayerUnit(unit: any): boolean {
  */
 export function getPlayerId(unit: any): number {
   if (unit == null) return -1;
-  const owner = jass.GetOwningPlayer(unit);
+  const owner = GetOwningPlayer(unit);
   if (owner == null) return -1;
-  return jass.GetPlayerId(owner);
+  return GetPlayerId(owner);
 }
 
 //=============================================================================
@@ -77,7 +79,7 @@ export function getUnitAttr(
   }
 
   // 单位没有该属性，尝试读取玩家属性
-  const player = jass.GetOwningPlayer(unit);
+  const player = GetOwningPlayer(unit);
   if (player != null) {
     const playerValue = YDUserDataGet("player", player, attrName, valueType);
     if (valueType === "real" || valueType === "integer") {

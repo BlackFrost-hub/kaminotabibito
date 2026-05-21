@@ -162,6 +162,7 @@ local function captureDamageTypeSnapshot()
         isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
         isTrueDamage = _____4F24_5BB3_51FD_6570.isTrueDamage(),
         isNormalAttack = _____4F24_5BB3_51FD_6570.isNormalAttack(),
+        isRangedAttack = _____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_IS_RANGED) == 1,
         isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
         isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage(),
         isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
@@ -353,6 +354,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             isDarkDamage = snapshot.isDarkDamage,
             rawDamageType = snapshot.rawDamageType,
             isNormalAttack = snapshot.isNormalAttack,
+            isRangedAttack = snapshot.isRangedAttack,
             isSkillAttack = snapshot.isSkillAttack,
             isSkillDamage = snapshot.isSkillDamage
         })

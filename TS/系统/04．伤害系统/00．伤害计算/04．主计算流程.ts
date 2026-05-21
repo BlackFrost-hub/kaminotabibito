@@ -87,6 +87,7 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
     isDarkDamage?: boolean;
     rawDamageType?: any;
     isNormalAttack: boolean;
+    isRangedAttack?: boolean;
     isSkillAttack: boolean;
     isSkillDamage: boolean;
   }) => number;
@@ -134,6 +135,7 @@ export interface DamageTypeSnapshot {
   isEnhancedDamage: boolean;
   isTrueDamage: boolean;
   isNormalAttack: boolean;
+  isRangedAttack: boolean;
   isSkillAttack: boolean;
   isSkillDamage: boolean;
   isMetalDamage: boolean;
@@ -179,6 +181,7 @@ function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
     isEnhancedDamage: 伤害函数.isEnhancedDamage(),
     isTrueDamage: 伤害函数.isTrueDamage(),
     isNormalAttack: 伤害函数.isNormalAttack(),
+    isRangedAttack: 伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_IS_RANGED) === 1,
     isSkillAttack: 伤害函数.isSkillAttack(),
     isSkillDamage: 伤害函数.isSkillDamage(),
     isMetalDamage: 伤害函数.isMetalDamage(),
@@ -550,6 +553,7 @@ export function onDamageEvent(
       isDarkDamage: snapshot.isDarkDamage,
       rawDamageType: snapshot.rawDamageType,
       isNormalAttack: snapshot.isNormalAttack,
+      isRangedAttack: snapshot.isRangedAttack,
       isSkillAttack: snapshot.isSkillAttack,
       isSkillDamage: snapshot.isSkillDamage,
     });

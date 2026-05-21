@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-const 物品测试最大序号 = 126;
+const 物品测试最大序号 = 130;
 
 export const 物品测试序号装备名表: Record<number, string> = {
   1: "回沙之书",
@@ -129,6 +129,10 @@ export const 物品测试序号装备名表: Record<number, string> = {
   124: "地狱火护肩",
   125: "恶荣胸甲",
   126: "狱魔短匕",
+  127: "森魔连弩",
+  128: "精光中鞋",
+  129: "双翼恶魔雕像",
+  130: "|cffff6800地狱火卡牌|r|cffff0000（幸运）|r",
 };
 
 function 取序号装备名(this: void, 序号: number): string {

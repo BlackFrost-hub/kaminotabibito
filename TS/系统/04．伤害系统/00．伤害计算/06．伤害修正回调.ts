@@ -26,6 +26,7 @@ export interface DamageModifierContext {
   isDarkDamage?: boolean;
   rawDamageType?: any;
   isNormalAttack: boolean;
+  isRangedAttack?: boolean;
   isSkillAttack: boolean;
   isSkillDamage: boolean;
 }

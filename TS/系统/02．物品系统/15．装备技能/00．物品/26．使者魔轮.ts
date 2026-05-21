@@ -1,6 +1,10 @@
 ﻿/** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const { Atan2BJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  Atan2BJ: (this: void, y: number, x: number) => number;
+};
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (
     this: void,
@@ -10,12 +14,58 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
     snapshot: any
   ) => void) => void;
 };
+const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  registerDamageModifier: (this: void, callback: (this: void, context: {
+    target: any;
+    attacker: any;
+    baseDamage: number;
+    currentDamage: number;
+    isPhysicalDamage: boolean;
+    isMagicDamage: boolean;
+    isEnhancedDamage: boolean;
+    isTrueDamage: boolean;
+    isMetalDamage?: boolean;
+    isWoodDamage?: boolean;
+    isWaterDamage?: boolean;
+    isFireDamage?: boolean;
+    isThunderDamage?: boolean;
+    isLightDamage?: boolean;
+    isDarkDamage?: boolean;
+    isNormalAttack: boolean;
+    isSkillAttack: boolean;
+    isSkillDamage: boolean;
+  }) => number, priority?: number) => number;
+};
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
   offTick10ms: (this: void, callback: (this: void) => void) => void;
 };
 const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+};
+const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
+  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+};
+const { 减少魔法值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
+  减少魔法值: (
+    this: void,
+    target: any,
+    amount: number,
+    showText?: boolean,
+    showEffect?: boolean,
+    effectPath?: string,
+  ) => number;
+};
+const { 播放魔法吸收护盾特效 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.24．魔法吸收护盾.01．魔法吸收护盾") as {
+  播放魔法吸收护盾特效: (this: void, 参数: {
+    单位: any;
+    是否有特效?: boolean;
+    特效路径?: string;
+    特效挂点?: string;
+    特效绑定单位?: boolean;
+    特效持续时间?: number;
+    特效朝向角度?: number;
+  }) => void;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (whichItem: any) => number;
@@ -26,6 +76,7 @@ const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const IsUnitAlly = jass.IsUnitAlly as (whichUnit: any, whichPlayer: any) => boolean;
 const IsUnitOwnedByPlayer = jass.IsUnitOwnedByPlayer as (whichUnit: any, whichPlayer: any) => boolean;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const SetUnitState = jass.SetUnitState as (whichUnit: any, whichUnitState: any, newVal: number) => void;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -35,31 +86,6 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 使者魔轮物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 使者魔轮配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
-const { 监听指定物品获取丢弃 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听") as {
-  监听指定物品获取丢弃: (
-    this: void,
-    itemTypeId: number,
-    获取回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
-    丢弃回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
-  ) => void;
-};
-const { 开始魔法吸收护盾, 移除单位魔法吸收护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.24．魔法吸收护盾") as {
-  开始魔法吸收护盾: (this: void, 参数: {
-    单位: any;
-    持续时间?: number;
-    伤害吸收比例?: number;
-    每点魔法吸收伤害: number;
-    最低魔法百分比?: number;
-    最低魔法固定值?: number;
-    仅非物理伤害?: boolean;
-    是否有特效?: boolean;
-    特效路径?: string;
-    特效挂点?: string;
-    显示文本?: boolean;
-    标签?: string;
-  }) => number;
-  移除单位魔法吸收护盾: (this: void, 单位: any, 标签: string) => void;
-};
 
 type 使者魔轮魔盾实例 = {
   id: number;
@@ -77,8 +103,7 @@ const 使者魔轮魔盾表: Record<number, 使者魔轮魔盾实例 | undefined
 const 使者魔轮魔盾ID列表: number[] = [];
 let 已注册使者魔轮伤害监听 = false;
 let 已注册使者魔轮中心计时器 = false;
-const 使者魔轮被动标签 = "装备:使者魔轮:魔盾被动";
-const 使者魔轮被动实例表: Record<number, number | undefined> = {};
+let 已注册使者魔轮被动修正 = false;
 
 function 是否为使者魔轮(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
@@ -86,62 +111,81 @@ function 是否为使者魔轮(this: void, 物品: any): boolean {
   return GetItemTypeId(物品) === 使者魔轮物品ID;
 }
 
-function 取单位ID(this: void, 单位: any): number {
-  if (单位 == null || 单位 === 0) return 0;
-  return GetHandleId(单位) || 0;
+function 单位持有使者魔轮(this: void, 单位: any): boolean {
+  if (单位 == null || 单位 === 0 || 使者魔轮物品ID <= 0) return false;
+  return UnitHasItemOfTypeBJ(单位, 使者魔轮物品ID) === true;
 }
 
-function 创建使者魔轮被动(this: void, 单位: any): void {
-  const 单位ID = 取单位ID(单位);
-  if (单位ID === 0) return;
+function 取最小值(this: void, a: number, b: number): number {
+  return a < b ? a : b;
+}
 
-  const 旧护盾ID = 使者魔轮被动实例表[单位ID];
-  if (旧护盾ID != null && 旧护盾ID > 0) {
-    移除单位魔法吸收护盾(单位, 使者魔轮被动标签);
+function 计算使者魔轮受击特效角度(this: void, 受伤单位: any, 伤害来源: any): number {
+  if (受伤单位 == null || 受伤单位 === 0) return 0;
+  if (伤害来源 == null || 伤害来源 === 0) return 0;
+  return Atan2BJ(GetUnitY(伤害来源) - GetUnitY(受伤单位), GetUnitX(伤害来源) - GetUnitX(受伤单位));
+}
+
+function on使者魔轮被动伤害修正(
+  this: void,
+  context: {
+    target: any;
+    attacker: any;
+    baseDamage: number;
+    currentDamage: number;
+    isPhysicalDamage: boolean;
+    isMagicDamage: boolean;
+    isEnhancedDamage: boolean;
+    isTrueDamage: boolean;
+    isMetalDamage?: boolean;
+    isWoodDamage?: boolean;
+    isWaterDamage?: boolean;
+    isFireDamage?: boolean;
+    isThunderDamage?: boolean;
+    isLightDamage?: boolean;
+    isDarkDamage?: boolean;
+    isNormalAttack: boolean;
+    isSkillAttack: boolean;
+    isSkillDamage: boolean;
   }
+): number {
+  const 受伤单位 = context.target;
+  if (受伤单位 == null || 受伤单位 === 0) return context.currentDamage;
+  if (!(context.currentDamage > 0)) return context.currentDamage;
+  if (context.isPhysicalDamage) return context.currentDamage;
+  if (!单位持有使者魔轮(受伤单位)) return context.currentDamage;
 
-  const 护盾ID = 开始魔法吸收护盾({
-    单位,
-    持续时间: 0,
-    伤害吸收比例: 使者魔轮配置.被动魔法吸收比例,
-    每点魔法吸收伤害: 使者魔轮配置.被动每点魔法吸收伤害,
-    最低魔法百分比: 使者魔轮配置.被动最低魔法百分比,
-    最低魔法固定值: 使者魔轮配置.被动最低魔法固定值,
-    仅非物理伤害: true,
+  const 当前魔法 = GetUnitState(受伤单位, UNIT_STATE_MANA);
+  if (!(当前魔法 > 0)) return context.currentDamage;
+  const 最大魔法 = GetUnitStateJapi(受伤单位, UNIT_STATE_MAX_MANA);
+  if (!(最大魔法 > 0)) return context.currentDamage;
+
+  const 触发门槛 = 最大魔法 * 使者魔轮配置.被动最低魔法百分比 + 使者魔轮配置.被动最低魔法固定值;
+  if (!(当前魔法 > 触发门槛)) return context.currentDamage;
+
+  const 比例吸收上限 = context.currentDamage * 使者魔轮配置.被动魔法吸收比例;
+  const 魔法吸收上限 = 当前魔法 * 使者魔轮配置.被动每点魔法吸收伤害;
+  const 吸收量 = 取最小值(比例吸收上限, 魔法吸收上限);
+  if (!(吸收量 > 0)) return context.currentDamage;
+
+  const 消耗魔法 = 吸收量 / 使者魔轮配置.被动每点魔法吸收伤害;
+  减少魔法值(受伤单位, 消耗魔法, true, true);
+  播放魔法吸收护盾特效({
+    单位: 受伤单位,
     是否有特效: 使者魔轮配置.被动是否有特效,
     特效路径: 使者魔轮配置.被动特效路径,
     特效挂点: 使者魔轮配置.被动特效挂点,
-    显示文本: false,
-    标签: 使者魔轮被动标签,
+    特效绑定单位: 使者魔轮配置.被动特效绑定单位,
+    特效持续时间: 使者魔轮配置.被动特效持续时间,
+    特效朝向角度: 计算使者魔轮受击特效角度(受伤单位, context.attacker),
   });
-  if (护盾ID > 0) {
-    使者魔轮被动实例表[单位ID] = 护盾ID;
-  }
-}
-
-function 移除使者魔轮被动(this: void, 单位: any): void {
-  const 单位ID = 取单位ID(单位);
-  if (单位ID === 0) return;
-  const 护盾ID = 使者魔轮被动实例表[单位ID];
-  if (护盾ID != null && 护盾ID > 0) {
-    移除单位魔法吸收护盾(单位, 使者魔轮被动标签);
-  }
-  delete 使者魔轮被动实例表[单位ID];
-}
-
-function on使者魔轮被动获取(this: void, 单位: any, _物品: any, currentCount: number, previousCount: number): void {
-  if (!(currentCount > 0 && previousCount <= 0)) return;
-  创建使者魔轮被动(单位);
-}
-
-function on使者魔轮被动丢弃(this: void, 单位: any, _物品: any, currentCount: number, previousCount: number): void {
-  if (!(currentCount <= 0 && previousCount > 0)) return;
-  移除使者魔轮被动(单位);
+  return context.currentDamage - 吸收量;
 }
 
 function 初始化使者魔轮被动(this: void): void {
-  if (使者魔轮物品ID <= 0) return;
-  监听指定物品获取丢弃(使者魔轮物品ID, on使者魔轮被动获取, on使者魔轮被动丢弃);
+  if (已注册使者魔轮被动修正) return;
+  已注册使者魔轮被动修正 = true;
+  registerDamageModifier(on使者魔轮被动伤害修正, 35);
 }
 
 function 从列表移除魔盾ID(this: void, id: number): void {
@@ -264,14 +308,13 @@ export function 处理使者魔轮使用(this: void, 上下文: 物品技能事�
   const 施法单位 = 上下文.施法单位;
   if (施法单位 == null || 施法单位 === 0) return;
 
-  const 最大魔法 = GetUnitState(施法单位, UNIT_STATE_MAX_MANA);
+  const 最大魔法 = GetUnitStateJapi(施法单位, UNIT_STATE_MAX_MANA);
   const 消耗魔法 = 最大魔法 * 使者魔轮配置.消耗魔法比例;
   if (!(消耗魔法 > 0)) return;
 
   SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - 消耗魔法);
   注册使者魔轮魔盾(施法单位, 上下文.目标X, 上下文.目标Y, 消耗魔法);
 }
-
 初始化使者魔轮被动();
 
 export {};

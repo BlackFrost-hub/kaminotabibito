@@ -46,4 +46,6 @@ export * from "./139．原生弹幕追踪测试";
 export * from "./140．暗影突袭追踪测试";
 export * from "./141．幸运值测试";
 export * from "./142．移速提升Buff测试";
+export * from "./143．使者魔轮被动调试测试";
+export * from "./144．命中闪避暴击系统测试";
 export * from "./1050．反击测试";

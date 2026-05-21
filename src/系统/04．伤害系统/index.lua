@@ -22,6 +22,9 @@ function ____exports.init()
         ____Boss_6218_4F24_5BB3_7EDF_8BA1.initBossBattleDamageStats()
     end
     require("系统.04．伤害系统.00．伤害计算.05．事件注册")
+    require("系统.04．伤害系统.04．命中系统.index")
+    require("系统.04．伤害系统.05．闪避系统.index")
+    require("系统.04．伤害系统.06．暴击系统.index")
     local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.index")
     local initHealSystem = ____require_result_0.init
     local ____require_result_1 = require("系统.04．伤害系统.03．重伤系统.index")
