@@ -34,4 +34,5 @@ Desktop.ini
 
 # local editor / assistant cache
 .vscode/jass-cache/
+.claude/
 .claude/settings.local.json
