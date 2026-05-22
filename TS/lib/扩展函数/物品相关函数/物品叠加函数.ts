@@ -21,6 +21,9 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
         filter?: any
     ) => void;
 };
+const { 物品在叠加白名单 } = require("lib.扩展函数.物品相关函数.物品叠加配置") as {
+    物品在叠加白名单: (this: void, 物品类型ID: number) => boolean;
+};
 
 const ABIL_INVENTORY = 0x41496e76; // 'AInv'
 const DEFAULT_ITEM_PICKUP_RANGE = 500;
@@ -225,9 +228,10 @@ function StarItem_ItemPickUpCond(): boolean {
 function isStackableItemType(item: any): boolean {
     if (item === null) return false;
     const itemType = jass.GetItemType(item);
+    const itemTypeId = jass.GetItemTypeId(item) as number;
     const chargedType = jass.ITEM_TYPE_CHARGED != null ? jass.ITEM_TYPE_CHARGED : jass.ConvertItemType(1);
     const purchasableType = jass.ITEM_TYPE_PURCHASABLE != null ? jass.ITEM_TYPE_PURCHASABLE : jass.ConvertItemType(4);
-    return itemType === chargedType || itemType === purchasableType;
+    return itemType === chargedType || itemType === purchasableType || 物品在叠加白名单(itemTypeId);
 }
 
 function ensureStackEventTriggers(): void {

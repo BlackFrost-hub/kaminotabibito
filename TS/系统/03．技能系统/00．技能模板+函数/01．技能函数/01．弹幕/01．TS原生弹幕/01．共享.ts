@@ -7,7 +7,7 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 export const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-export const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, face: number) => any;
+export const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 export const GetHandleId = jass.GetHandleId as (h: any) => number;
 export const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;

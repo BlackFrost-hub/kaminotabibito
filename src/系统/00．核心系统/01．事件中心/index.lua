@@ -57,6 +57,14 @@ do
     end
 end
 do
+    local ____export = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then

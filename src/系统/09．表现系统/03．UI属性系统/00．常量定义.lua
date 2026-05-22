@@ -79,7 +79,7 @@ ____exports.DETAIL_BOX_Y = 0.34
 --- 属性详情框宽度
 ____exports.DETAIL_BOX_WIDTH = 0.29
 --- 属性详情框高度
-____exports.DETAIL_BOX_HEIGHT = 0.36
+____exports.DETAIL_BOX_HEIGHT = 0.42
 --- 属性行宽度
 ____exports.DETAIL_LINE_WIDTH = 0.082
 --- 属性行高度
@@ -109,13 +109,13 @@ ____exports.DETAIL_SEPARATOR_WIDTH = 0.0022
 --- 分隔符线的高度倍数（相对于行高）
 ____exports.DETAIL_SEPARATOR_HEIGHT_MULT = 1.05
 --- 分隔符Y坐标偏移量（用于对齐文本）
-____exports.DETAIL_SEPARATOR_Y_OFFSET = 0.13
+____exports.DETAIL_SEPARATOR_Y_OFFSET = 0.155
 --- 分隔符X坐标偏移量（用于调整水平位置）
 ____exports.DETAIL_SEPARATOR_X_OFFSET = -0.036
 --- 分隔符起始行（从第几行开始显示）
 ____exports.DETAIL_SEP_START_ROW = 3
 --- 分隔符结束行（到第几行结束）
-____exports.DETAIL_SEP_END_ROW = 21
+____exports.DETAIL_SEP_END_ROW = 24
 --- 属性详情面板的行布局配置
 -- 五列并排：
 -- - 左列：基础属性
@@ -236,8 +236,20 @@ ____exports.DETAIL_LINE_LAYOUTS = {
     {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
     {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
     {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 21},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
     {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
     {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
-    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22}
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 22},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 23},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 23},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 23},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 23},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 23},
+    {x = ____exports.DETAIL_LEFT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 24},
+    {x = ____exports.DETAIL_SEP1_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 24},
+    {x = ____exports.DETAIL_MID_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 24},
+    {x = ____exports.DETAIL_SEP2_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 24},
+    {x = ____exports.DETAIL_RIGHT_X, y = ____exports.DETAIL_START_Y - ____exports.DETAIL_ROW_STEP * 24}
 }
 return ____exports

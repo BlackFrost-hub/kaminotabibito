@@ -131,3 +131,4 @@ export * from "./127．森魔连弩";
 export * from "./128．精光中鞋";
 export * from "./129．双翼恶魔雕像";
 export * from "./130．地狱火卡牌幸运";
+export * from "./131．触手残片";

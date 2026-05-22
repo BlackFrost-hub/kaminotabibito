@@ -112,6 +112,20 @@ local function _____8BFB_53D6_5355_4F4D_5E03_5C14(unit, _____5C5E_6027_540D)
     local value = YDUserDataGetSafe("unit", unit, _____5C5E_6027_540D, "boolean")
     return value == true or value == 1
 end
+local function _____8BFB_53D6_5355_4F4D_5B57_7B26_4E32_5F00_5173(unit, _____5C5E_6027_540D)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local value = YDUserDataGetSafe("unit", unit, _____5C5E_6027_540D, "string")
+    if value == nil then
+        return false
+    end
+    if value == true or value == 1 then
+        return true
+    end
+    local text = string.lower(tostring(value))
+    return text == "true" or text == "1"
+end
 local function _____8BFB_53D6_76EE_6807_57FA_7840_95EA_907F_7387(target)
     local _____5355_4F4D_95EA_907F = _____8BFB_53D6_5355_4F4D_5B9E_6570(target, "闪避率")
     if _____5355_4F4D_95EA_907F > 0.01 then
@@ -147,6 +161,9 @@ ____exports["执行闪避判定"] = function(context)
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end
     if context.isNormalAttack and context.isPhysicalDamage and _____8BFB_53D6_5355_4F4D_5E03_5C14(target, "普攻必中") then
+        return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
+    end
+    if _____8BFB_53D6_5355_4F4D_5B57_7B26_4E32_5F00_5173(attacker, "无视闪避") then
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end
     local _____57FA_7840_95EA_907F_7387 = _____8BFB_53D6_76EE_6807_57FA_7840_95EA_907F_7387(target)

@@ -4,11 +4,18 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 登记单位排泄 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+    登记单位排泄: (this: void, unit: any) => any;
+};
 
 import { YDUserDataGet } from "../YDWE函数/01．YDUserData兼容";
 import { forEachUnitInGroup } from "../封装函数/01．通用工具/04．单位工具";
 
 const BJ_RADTODEG = jglobals.bj_RADTODEG ?? 57.29577951308232;
+const Player = jass.Player as (this: void, playerId: number) => any;
+const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
+const SetUnitScale = jass.SetUnitScale as (this: void, whichUnit: any, scaleX: number, scaleY: number, scaleZ: number) => void;
 
 /**
  * 创建单位并设置尺寸和角度
@@ -46,23 +53,41 @@ export function createUnitWithOptions(
     }
     if (unitTypeId == null) return null;
 
-    const unit = jass.CreateUnit(jass.Player(playerId), unitTypeId, x, y, 0);
+    const unit = CreateUnit(Player(playerId), unitTypeId, x, y, 0);
 
     if (!unit) {
         return null;
     }
 
     if (facing !== undefined) {
-        jass.SetUnitFacing(unit, facing * BJ_RADTODEG);
+        SetUnitFacing(unit, facing * BJ_RADTODEG);
     }
 
     const scaleX = scale ?? 1.0;
     const scaleY2 = scaleY ?? 1.0;
     const scaleZ2 = scaleZ ?? 1.0;
 
-    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2);
+    SetUnitScale(unit, scaleX, scaleY2, scaleZ2);
 
-    return unit;
+    return 登记单位排泄(unit);
+}
+
+export function 创建单位并登记排泄(owner: any, unitTypeId: number, x: number, y: number, facing: number): any {
+    const unit = CreateUnit(owner, unitTypeId, x, y, facing);
+    return 登记单位排泄(unit);
+}
+
+export function createUnitWithOptionsAndRegisterDeathCleanup(
+    playerId: number,
+    unitId: string | number,
+    x: number,
+    y: number,
+    facing?: number,
+    scale?: number,
+    scaleY?: number,
+    scaleZ?: number
+): any {
+    return createUnitWithOptions(playerId, unitId, x, y, facing, scale, scaleY, scaleZ);
 }
 
 /**

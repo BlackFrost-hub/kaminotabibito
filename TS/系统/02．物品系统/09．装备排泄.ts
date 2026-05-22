@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 装备排泄：物品被破坏时 RemoveItem 并销毁对应触发器。
  * 一物一触发 + 闭包保存 item，回调里不依赖"从事件取句柄"。
@@ -7,7 +8,7 @@ const jass = require("jass.common") as Record<string, unknown>;
 let _lastCreatedItem: any = undefined;
 
 /** 模拟 JASS GetLastCreatedItem —— 返回最近一次通过 setLastCreatedItem 登记的物品。 */
-export function GetLastCreatedItem(): any {
+export function GetLastCreatedItem(this: void): any {
   return _lastCreatedItem;
 }
 
@@ -16,7 +17,7 @@ export function GetLastCreatedItem(): any {
  *   1. 记录为 lastCreatedItem
  *   2. 注册死亡清理（RemoveItem + DestroyTrigger）
  */
-export function setLastCreatedItem(item: any): void {
+export function setLastCreatedItem(this: void, item: any): void {
   _lastCreatedItem = item;
   registerItemForCleanup(item);
 }

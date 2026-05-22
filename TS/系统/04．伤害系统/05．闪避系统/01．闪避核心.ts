@@ -127,6 +127,15 @@ function 读取单位布尔(this: void, unit: any, 属性名: string): boolean {
   return value === true || value === 1;
 }
 
+function 读取单位字符串开关(this: void, unit: any, 属性名: string): boolean {
+  if (unit == null || unit === 0) return false;
+  const value = YDUserDataGetSafe("unit", unit, 属性名, "string");
+  if (value == null) return false;
+  if (value === true || value === 1) return true;
+  const text = String(value).toLowerCase();
+  return text === "true" || text === "1";
+}
+
 function 读取目标基础闪避率(this: void, target: any): number {
   const 单位闪避 = 读取单位实数(target, "闪避率");
   if (单位闪避 > 0.01) return 单位闪避;
@@ -159,6 +168,9 @@ export function 执行闪避判定(this: void, context: 闪避判定上下文): 
   }
 
   if (context.isNormalAttack && context.isPhysicalDamage && 读取单位布尔(target, "普攻必中")) {
+    return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
+  }
+  if (读取单位字符串开关(attacker, "无视闪避")) {
     return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
   }
 

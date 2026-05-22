@@ -12,7 +12,7 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
 const summonEvent = require("系统.00．核心系统.01．事件中心.09．单位召唤事件中心") as {
-  registerSummonListener: (this: void, callback: (summonedUnit: any, summoningUnit: any) => void) => void;
+  注册召唤监听: (this: void, callback: (summonedUnit: any, summoningUnit: any) => void) => void;
 };
 
 import {
@@ -68,7 +68,7 @@ function onItemIllusionSummoned(summonedUnit: any, summoningUnit: any): void {
 export function initItemIllusionSummonBridge(this: void): void {
   if (itemIllusionSummonBridgeInited) return;
   itemIllusionSummonBridgeInited = true;
-  summonEvent.registerSummonListener(onItemIllusionSummoned);
+  summonEvent.注册召唤监听(onItemIllusionSummoned);
 }
 
 export function SFB_记录幻象物品上下文(this: void, sourceUnit: any, targetUnit: any, duration: number): void {

@@ -2,39 +2,38 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local dispatchChangeOwnerListeners, onChangeOwner, jass, playerUnitEvent, changeOwnerListeners, initialized
-function dispatchChangeOwnerListeners(list, changingUnit)
+local _____6D3E_53D1_6240_6709_8005_53D8_66F4_4E8B_4EF6, ____on_6240_6709_8005_53D8_66F4, jass, playerUnitEvent, _____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868, _____5DF2_521D_59CB_5316
+function _____6D3E_53D1_6240_6709_8005_53D8_66F4_4E8B_4EF6(_____5217_8868, _____53D8_66F4_5355_4F4D)
     do
         local i = 0
-        while i < #list do
-            local callback = list[i + 1]
-            if callback ~= nil then
-                callback(changingUnit)
+        while i < #_____5217_8868 do
+            local _____56DE_8C03 = _____5217_8868[i + 1]
+            if _____56DE_8C03 ~= nil then
+                _____56DE_8C03(_____53D8_66F4_5355_4F4D)
             end
             i = i + 1
         end
     end
 end
-function onChangeOwner()
-    local changingUnit = jass.GetTriggerUnit()
-    if changingUnit == nil then
+function ____on_6240_6709_8005_53D8_66F4()
+    local _____53D8_66F4_5355_4F4D = jass.GetTriggerUnit()
+    if _____53D8_66F4_5355_4F4D == nil then
         return
     end
-    dispatchChangeOwnerListeners(changeOwnerListeners, changingUnit)
+    _____6D3E_53D1_6240_6709_8005_53D8_66F4_4E8B_4EF6(_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868, _____53D8_66F4_5355_4F4D)
 end
---- 初始化单位所有者变更事件。
-function ____exports.initChangeOwnerEvent()
-    if initialized then
+____exports["初始化所有者变更事件"] = function()
+    if _____5DF2_521D_59CB_5316 then
         return
     end
-    initialized = true
-    local trig = jass.CreateTrigger()
-    playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, ____exports.CHANGE_OWNER_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_CHANGE_OWNER)
-    jass.TriggerAddAction(trig, onChangeOwner)
+    _____5DF2_521D_59CB_5316 = true
+    local _____89E6_53D1_5668 = jass.CreateTrigger()
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(_____89E6_53D1_5668, ____exports["所有者变更玩家ID列表"], jass.EVENT_PLAYER_UNIT_CHANGE_OWNER)
+    jass.TriggerAddAction(_____89E6_53D1_5668, ____on_6240_6709_8005_53D8_66F4)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
-____exports.CHANGE_OWNER_PLAYER_IDS = {
+____exports["所有者变更玩家ID列表"] = {
     0,
     1,
     2,
@@ -52,13 +51,13 @@ ____exports.CHANGE_OWNER_PLAYER_IDS = {
     14,
     15
 }
-changeOwnerListeners = {}
-initialized = false
-local function hasListener(list, callback)
+_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868 = {}
+_____5DF2_521D_59CB_5316 = false
+local function _____662F_5426_5DF2_6CE8_518C_76D1_542C(_____5217_8868, _____56DE_8C03)
     do
         local i = 0
-        while i < #list do
-            if list[i + 1] == callback then
+        while i < #_____5217_8868 do
+            if _____5217_8868[i + 1] == _____56DE_8C03 then
                 return true
             end
             i = i + 1
@@ -66,22 +65,19 @@ local function hasListener(list, callback)
     end
     return false
 end
---- 注册单位所有者变更监听。
--- 第一次使用时会自动初始化事件；同一回调不会重复注册。
-function ____exports.registerChangeOwnerListener(callback)
-    if type(callback) ~= "function" then
+____exports["注册所有者变更监听"] = function(_____56DE_8C03)
+    if type(_____56DE_8C03) ~= "function" then
         return
     end
-    ____exports.initChangeOwnerEvent()
-    if not hasListener(changeOwnerListeners, callback) then
-        changeOwnerListeners[#changeOwnerListeners + 1] = callback
+    ____exports["初始化所有者变更事件"]()
+    if not _____662F_5426_5DF2_6CE8_518C_76D1_542C(_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868, _____56DE_8C03) then
+        _____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868[#_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868 + 1] = _____56DE_8C03
     end
 end
---- 取消单位所有者变更监听。
-function ____exports.unregisterChangeOwnerListener(callback)
-    local index = __TS__ArrayIndexOf(changeOwnerListeners, callback)
+____exports["取消所有者变更监听"] = function(_____56DE_8C03)
+    local index = __TS__ArrayIndexOf(_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868, _____56DE_8C03)
     if index >= 0 then
-        __TS__ArraySplice(changeOwnerListeners, index, 1)
+        __TS__ArraySplice(_____6240_6709_8005_53D8_66F4_76D1_542C_5217_8868, index, 1)
     end
 end
 return ____exports

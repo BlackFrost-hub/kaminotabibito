@@ -47,6 +47,8 @@ local function expose(self, name, fn)
 end
 function ____exports.registerBridge(self)
     expose(nil, "createUnitWithOptions", unitRelated.createUnitWithOptions)
+    expose(nil, "createUnitWithOptionsAndRegisterDeathCleanup", unitRelated.createUnitWithOptionsAndRegisterDeathCleanup)
+    expose(nil, "创建单位并登记排泄", unitRelated["创建单位并登记排泄"])
     expose(nil, "getPlayerFirstHero", unitRelated.getPlayerFirstHero)
     expose(nil, "getUnitsInRangeOfUnit", rangeQuery.getUnitsInRangeOfUnit)
     expose(nil, "getUnitsInRange", rangeQuery.getUnitsInRange)

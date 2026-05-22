@@ -70,7 +70,7 @@ function ____exports.initItemIllusionSummonBridge()
         return
     end
     itemIllusionSummonBridgeInited = true
-    summonEvent.registerSummonListener(onItemIllusionSummoned)
+    summonEvent["注册召唤监听"](onItemIllusionSummoned)
 end
 ____exports["SFB_记录幻象物品上下文"] = function(sourceUnit, targetUnit, duration)
     if targetUnit == nil or targetUnit == 0 or duration <= 0 then

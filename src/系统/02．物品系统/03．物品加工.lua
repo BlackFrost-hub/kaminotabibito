@@ -10,7 +10,7 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local ____exports = {}
-local getHandleIdSafe, onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, setLastCreatedItem, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
+local getHandleIdSafe, onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
 function getHandleIdSafe(handle)
     if not handle then
         return 0
@@ -159,11 +159,7 @@ function createItemAtCampfire(campfire, itemId)
     local ____getUnitXY_result_18 = getUnitXY(campfire)
     local x = ____getUnitXY_result_18.x
     local y = ____getUnitXY_result_18.y
-    local item = jass.CreateItem(itemId, x, y)
-    if item then
-        setLastCreatedItem(nil, item)
-    end
-    return item
+    return _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(itemId, x, y)
 end
 function tryGiveItemToCampfire(campfire, item)
     if not item then
@@ -237,8 +233,8 @@ local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函�
 CreateFloatTextAtPoint = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextAtPoint
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_3.stringToFourCC
-local ____require_result_4 = require("系统.02．物品系统.09．装备排泄")
-setLastCreatedItem = ____require_result_4.setLastCreatedItem
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
+_____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_4["创建物品并注册排泄监听"]
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
 local CAMPFIRE_ID = 1747988547

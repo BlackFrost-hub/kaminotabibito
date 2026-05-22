@@ -305,6 +305,11 @@ function ____exports.buildDetailTexts(player)
         singleLine(
             "|cff96ff9d",
             "生命恢复：",
+            number(player, "基础生命恢复") .. "/秒"
+        ),
+        singleLine(
+            "|cff96ff9d",
+            "装备生命恢复：",
             number(player, "生命恢复") .. "/秒"
         ),
         singleLine(
@@ -320,6 +325,11 @@ function ____exports.buildDetailTexts(player)
         singleLine(
             "|cff8fdfff",
             "魔法恢复：",
+            number(player, "基础魔法恢复") .. "/秒"
+        ),
+        singleLine(
+            "|cff8fdfff",
+            "装备魔法恢复：",
             number(player, "魔法恢复") .. "/秒"
         ),
         singleLine(
@@ -446,6 +456,26 @@ function ____exports.buildDetailTexts(player)
             "|cffd0d9e1",
             "伤害减少%：",
             pct(player, "伤害减少%")
+        ),
+        singleLine(
+            "|cffd0d9e1",
+            "固伤减少：",
+            number(player, "伤害减少")
+        ),
+        singleLine(
+            "|cffd0d9e1",
+            "物理固伤减少：",
+            number(player, "物理固定伤害减少")
+        ),
+        singleLine(
+            "|cffd0d9e1",
+            "魔法固伤减少：",
+            number(player, "魔法固定伤害减少")
+        ),
+        singleLine(
+            "|cffd0d9e1",
+            "技能固伤减少：",
+            number(player, "技能固定伤害减少")
         ),
         singleLine(
             "|cffff8b57",

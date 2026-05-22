@@ -7,11 +7,17 @@ local forEachUnitInGroup = ____04_FF0E_5355_4F4D_5DE5_5177.forEachUnitInGroup
 --- 单位相关扩展函数
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____jglobals_bj_RADTODEG_0 = jglobals.bj_RADTODEG
-if ____jglobals_bj_RADTODEG_0 == nil then
-    ____jglobals_bj_RADTODEG_0 = 57.29577951308232
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____767B_8BB0_5355_4F4D_6392_6CC4 = ____require_result_0["登记单位排泄"]
+local ____jglobals_bj_RADTODEG_1 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_1 == nil then
+    ____jglobals_bj_RADTODEG_1 = 57.29577951308232
 end
-local BJ_RADTODEG = ____jglobals_bj_RADTODEG_0
+local BJ_RADTODEG = ____jglobals_bj_RADTODEG_1
+local Player = jass.Player
+local CreateUnit = jass.CreateUnit
+local SetUnitFacing = jass.SetUnitFacing
+local SetUnitScale = jass.SetUnitScale
 --- 创建单位并设置尺寸和角度
 -- 
 -- @param playerId 玩家ID (0-15)
@@ -39,8 +45,8 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
     if unitTypeId == nil then
         return nil
     end
-    local unit = jass.CreateUnit(
-        jass.Player(playerId),
+    local unit = CreateUnit(
+        Player(playerId),
         unitTypeId,
         x,
         y,
@@ -50,13 +56,36 @@ function ____exports.createUnitWithOptions(self, playerId, unitId, x, y, facing,
         return nil
     end
     if facing ~= nil then
-        jass.SetUnitFacing(unit, facing * BJ_RADTODEG)
+        SetUnitFacing(unit, facing * BJ_RADTODEG)
     end
     local scaleX = scale or 1
     local scaleY2 = scaleY or 1
     local scaleZ2 = scaleZ or 1
-    jass.SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
-    return unit
+    SetUnitScale(unit, scaleX, scaleY2, scaleZ2)
+    return _____767B_8BB0_5355_4F4D_6392_6CC4(unit)
+end
+____exports["创建单位并登记排泄"] = function(self, owner, unitTypeId, x, y, facing)
+    local unit = CreateUnit(
+        owner,
+        unitTypeId,
+        x,
+        y,
+        facing
+    )
+    return _____767B_8BB0_5355_4F4D_6392_6CC4(unit)
+end
+function ____exports.createUnitWithOptionsAndRegisterDeathCleanup(self, playerId, unitId, x, y, facing, scale, scaleY, scaleZ)
+    return ____exports.createUnitWithOptions(
+        nil,
+        playerId,
+        unitId,
+        x,
+        y,
+        facing,
+        scale,
+        scaleY,
+        scaleZ
+    )
 end
 --- 获取玩家的第一个英雄
 -- 

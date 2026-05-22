@@ -14,7 +14,7 @@ local function _____7ED9_4E88_5347_7EA7_88C5_5907(_____5355_4F4D, _____5347_7EA7
     end
     local x = jass.GetUnitX(_____5355_4F4D)
     local y = jass.GetUnitY(_____5355_4F4D)
-    local item = jass.CreateItem(_____5347_7EA7_56DB_5B57_7801, x, y)
+    local item = itemJudgeFns["创建物品并注册排泄监听"](_____5347_7EA7_56DB_5B57_7801, x, y)
     if item == nil or item == 0 then
         return
     end

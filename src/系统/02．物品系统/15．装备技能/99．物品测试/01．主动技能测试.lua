@@ -17,7 +17,8 @@ local ____require_result_2 = require("系统.02．物品系统.13．物品名反
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_2["按名字反查物品ID"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local CreateItem = jass.CreateItem
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
+local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_4["创建物品并注册排泄监听"]
 local IssueTargetOrder = jass.IssueTargetOrder
 local UnitAddItem = jass.UnitAddItem
 local UnitRemoveItem = jass.UnitRemoveItem
@@ -27,15 +28,15 @@ local GetItemTypeId = jass.GetItemTypeId
 local UnitItemInSlot = jass.UnitItemInSlot
 local _____6A21_5757_540D = "物品主动技能测试"
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
-    local ____g_gg_unit_Hamg_0002_4 = g.gg_unit_Hamg_0002
-    if ____g_gg_unit_Hamg_0002_4 == nil then
-        ____g_gg_unit_Hamg_0002_4 = _G.bj_lastCreatedUnit
+    local ____g_gg_unit_Hamg_0002_5 = g.gg_unit_Hamg_0002
+    if ____g_gg_unit_Hamg_0002_5 == nil then
+        ____g_gg_unit_Hamg_0002_5 = _G.bj_lastCreatedUnit
     end
-    local ____g_gg_unit_Hamg_0002_4_5 = ____g_gg_unit_Hamg_0002_4
-    if ____g_gg_unit_Hamg_0002_4_5 == nil then
-        ____g_gg_unit_Hamg_0002_4_5 = nil
+    local ____g_gg_unit_Hamg_0002_5_6 = ____g_gg_unit_Hamg_0002_5
+    if ____g_gg_unit_Hamg_0002_5_6 == nil then
+        ____g_gg_unit_Hamg_0002_5_6 = nil
     end
-    return ____g_gg_unit_Hamg_0002_4_5
+    return ____g_gg_unit_Hamg_0002_5_6
 end
 local SetItemPosition = jass.SetItemPosition
 local function _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
@@ -84,7 +85,7 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
         debugLogForce(_____6A21_5757_540D, "未找到装备ID", _____88C5_5907_540D)
         return
     end
-    local item = CreateItem(
+    local item = _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(
         stringToFourCCSafe(rawId),
         GetUnitX(unit),
         GetUnitY(unit)

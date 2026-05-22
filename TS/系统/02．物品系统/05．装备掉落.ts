@@ -12,8 +12,10 @@
  */
 const jass = require("jass.common") as JassCommon;
 const g = require("jass.globals") as { [key: string]: any };
-const itemInv = require("lib.扩展函数.BJ函数.index") as { CreateItemLoc: (itemId: number, loc: any) => any };
-const equipExcrete = require("系统.02．物品系统.09．装备排泄") as { setLastCreatedItem: (item: any) => void };
+const itemCreateFns = require("lib.扩展函数.物品相关函数.index") as {
+  在点创建物品并注册排泄监听: (this: void, itemId: number, whichLocation: any) => any;
+  创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+};
 const { stringToFourCC, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
   isSpecialUnit: (unit: any) => boolean;
@@ -174,11 +176,11 @@ function createItemAtUnit(unit: any, itemId: string): void {
   const four = stringToFourCC(itemId);
   const loc: any = (jass as any).GetUnitLoc(unit);
   if (loc) {
-    equipExcrete.setLastCreatedItem(itemInv.CreateItemLoc(four, loc));
+    itemCreateFns.在点创建物品并注册排泄监听(four, loc);
   } else if ((jass as any).GetUnitX != null) {
     const x = (jass as any).GetUnitX(unit);
     const y = (jass as any).GetUnitY(unit);
-    equipExcrete.setLastCreatedItem((jass as any).CreateItem(four, x, y));
+    itemCreateFns.创建物品并注册排泄监听(four, x, y);
   }
   if (loc) (jass as any).RemoveLocation(loc);
 }

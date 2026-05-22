@@ -124,7 +124,7 @@ export const DETAIL_BOX_Y = 0.34;
 export const DETAIL_BOX_WIDTH = 0.29;
 
 /** 属性详情框高度 */
-export const DETAIL_BOX_HEIGHT = 0.36;
+export const DETAIL_BOX_HEIGHT = 0.42;
 
 /** 属性行宽度 */
 export const DETAIL_LINE_WIDTH = 0.082;
@@ -169,7 +169,7 @@ export const DETAIL_SEPARATOR_WIDTH = 0.0022;
 export const DETAIL_SEPARATOR_HEIGHT_MULT = 1.05;
 
 /** 分隔符Y坐标偏移量（用于对齐文本） */
-export const DETAIL_SEPARATOR_Y_OFFSET = 0.13;
+export const DETAIL_SEPARATOR_Y_OFFSET = 0.155;
 
 /** 分隔符X坐标偏移量（用于调整水平位置） */
 export const DETAIL_SEPARATOR_X_OFFSET = -0.036;
@@ -178,7 +178,7 @@ export const DETAIL_SEPARATOR_X_OFFSET = -0.036;
 export const DETAIL_SEP_START_ROW = 3;
 
 /** 分隔符结束行（到第几行结束） */
-export const DETAIL_SEP_END_ROW = 21;
+export const DETAIL_SEP_END_ROW = 24;
 
 /**
  * 属性详情面板的行布局配置
@@ -302,7 +302,19 @@ export const DETAIL_LINE_LAYOUTS = [
   { x: DETAIL_MID_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 21 },
   { x: DETAIL_SEP2_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 21 },
   { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 21 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 22 },
+  { x: DETAIL_SEP1_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 22 },
   { x: DETAIL_MID_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 22 },
   { x: DETAIL_SEP2_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 22 },
   { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 22 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 23 },
+  { x: DETAIL_SEP1_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 23 },
+  { x: DETAIL_MID_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 23 },
+  { x: DETAIL_SEP2_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 23 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 23 },
+  { x: DETAIL_LEFT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 24 },
+  { x: DETAIL_SEP1_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 24 },
+  { x: DETAIL_MID_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 24 },
+  { x: DETAIL_SEP2_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 24 },
+  { x: DETAIL_RIGHT_X, y: DETAIL_START_Y - DETAIL_ROW_STEP * 24 },
 ] as const;

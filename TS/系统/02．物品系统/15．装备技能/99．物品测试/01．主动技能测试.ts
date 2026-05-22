@@ -15,6 +15,9 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+  创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+};
 
 import {
   物品主动技能测试发放顺序,
@@ -23,7 +26,6 @@ import {
   物品主动技能测试清理装备列表,
 } from "./00．测试配置";
 
-const CreateItem = jass.CreateItem as (id: number, x: number, y: number) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
@@ -67,7 +69,7 @@ function 发放装备(this: void, unit: any, 装备名: string): void {
     debugLogForce(模块名, "未找到装备ID", 装备名);
     return;
   }
-  const item = CreateItem(stringToFourCCSafe(rawId), GetUnitX(unit), GetUnitY(unit));
+  const item = 创建物品并注册排泄监听(stringToFourCCSafe(rawId), GetUnitX(unit), GetUnitY(unit));
   if (item == null || item === 0) {
     debugLogForce(模块名, "创建装备失败", 装备名, rawId);
     return;

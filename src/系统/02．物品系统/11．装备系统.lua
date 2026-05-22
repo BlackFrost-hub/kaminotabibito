@@ -34,7 +34,7 @@ local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_5["装�
 local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_5["是否彩虹装备等级"]
 local _____5F69_8679_989C_8272_6587_672C = ____require_result_5["彩虹颜色文本"]
 local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_5["去除颜色代码"]
-local ____require_result_6 = require("系统.02．物品系统.12．装备次数叠加配置")
+local ____require_result_6 = require("系统.02．物品系统.16．装备次数叠加配置")
 local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_6["是否允许装备次数叠加"]
 local EQUIP_EVENT_PLAYER_IDS = {
     0,

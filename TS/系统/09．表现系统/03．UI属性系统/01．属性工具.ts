@@ -290,11 +290,13 @@ export function buildDetailTexts(player: any): string[] {
     singleLine("|cffc0ff82", "生命值%：", pct(player, "生命值%")),
     singleLine("|cff8fdfff", "法力值%：", pct(player, "法力值%")),
     // --- 生命恢复组（第7-9行）---
-    singleLine("|cff96ff9d", "生命恢复：", number(player, "生命恢复") + "/秒"),
+    singleLine("|cff96ff9d", "生命恢复：", number(player, "基础生命恢复") + "/秒"),
+    singleLine("|cff96ff9d", "装备生命恢复：", number(player, "生命恢复") + "/秒"),
     singleLine("|cff96ff9d", "生命恢复%：", pct(player, "生命恢复%")),
     singleLine("|cff96ff9d", "总生命恢复：", number(player, "总生命恢复") + "/秒"),
     // --- 魔法恢复组（第10-12行）---
-    singleLine("|cff8fdfff", "魔法恢复：", number(player, "魔法恢复") + "/秒"),
+    singleLine("|cff8fdfff", "魔法恢复：", number(player, "基础魔法恢复") + "/秒"),
+    singleLine("|cff8fdfff", "装备魔法恢复：", number(player, "魔法恢复") + "/秒"),
     singleLine("|cff8fdfff", "魔法恢复%：", pct(player, "魔法恢复%")),
     singleLine("|cff8fdfff", "总魔法恢复：", number(player, "总魔法恢复") + "/秒"),
     // --- 【暴击组】进攻方（第13-14行）与中列被暴击组对齐 ---
@@ -341,6 +343,10 @@ export function buildDetailTexts(player: any): string[] {
     // --- 【伤害组】加成/减少（第15-16行）与右列金属性对齐 ---
     singleLine("|cffff00ff", "伤害%：", pct(player, "伤害%")),
     singleLine("|cffd0d9e1", "伤害减少%：", pct(player, "伤害减少%")),
+    singleLine("|cffd0d9e1", "固伤减少：", number(player, "伤害减少")),
+    singleLine("|cffd0d9e1", "物理固伤减少：", number(player, "物理固定伤害减少")),
+    singleLine("|cffd0d9e1", "魔法固伤减少：", number(player, "魔法固定伤害减少")),
+    singleLine("|cffd0d9e1", "技能固伤减少：", number(player, "技能固定伤害减少")),
     // --- 强化/最终伤害（第17-18行）---
     singleLine("|cffff8b57", "强化伤害：", pctPlus100(player, "强化伤害")),
     singleLine("|cffff00ff", "最终伤害：", pct(player, "最终伤害%")),

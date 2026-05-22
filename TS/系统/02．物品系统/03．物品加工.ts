@@ -43,8 +43,8 @@ const CreateFloatTextAtPoint = 漂浮文字模块.CreateFloatTextAtPoint as
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
-const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排泄") as {
-  setLastCreatedItem: (item: any) => void;
+const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+  创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -284,9 +284,7 @@ function pickResult(results: ResultOpt[]): ResultOpt {
 
 function createItemAtCampfire(campfire: any, itemId: number): any {
   const { x, y } = getUnitXY(campfire);
-  const item = (jass as any).CreateItem(itemId, x, y);
-  if (item) setLastCreatedItem(item);
-  return item;
+  return 创建物品并注册排泄监听(itemId, x, y);
 }
 
 function tryGiveItemToCampfire(campfire: any, item: any): boolean {

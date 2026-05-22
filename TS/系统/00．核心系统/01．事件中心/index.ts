@@ -8,6 +8,7 @@ export * from "./04．物品事件中心";
 export * from "./05．玩家选中单位事件中心";
 export * from "./06．英雄升级事件中心";
 export * from "./07．单位死亡事件中心";
+export * from "./07A．单位排泄";
 export * from "./08．技能事件中心";
 export * from "./09．单位召唤事件中心";
 export * from "./10．单位所有者变更事件中心";

@@ -38,7 +38,7 @@ const { 装备等级颜色代码, 是否彩虹装备等级, 彩虹颜色文本, 
   彩虹颜色文本: (this: void, _?: undefined, text?: string) => string;
   去除颜色代码: (this: void, text: string) => string;
 };
-const { 是否允许装备次数叠加 } = require("系统.02．物品系统.12．装备次数叠加配置") as {
+const { 是否允许装备次数叠加 } = require("系统.02．物品系统.16．装备次数叠加配置") as {
   是否允许装备次数叠加: (this: void, 装备名: string) => boolean;
 };
 
