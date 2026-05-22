@@ -48,6 +48,30 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.01．单位系统.07．异界Boss.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.01．单位系统.08．单位配置表.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.01．单位系统.09．科技配置表.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 --- 初始化单位系统
 -- 各子系统已在各自 index.ts 中自动初始化
 function ____exports.init(self)

@@ -5,6 +5,7 @@
 export * from "./00．技能模板+函数/index";
 export * from "./01．技能冷却/index";
 export * from "./02．技能消耗/index";
+export * from "./05．单位技能/index";
 export * from "./04．快捷键技能/index";
 export * from "./06．AI自动使用技能/index";
 

@@ -16,6 +16,8 @@ local YDUserDataHas = ____require_result_2.YDUserDataHas
 local YDUserDataClear = ____require_result_2.YDUserDataClear
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_4["创建单位并登记排泄"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -25,7 +27,6 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitRace = jass.IsUnitRace
 local IsHeroUnitId = jass.IsHeroUnitId
 local KillUnit = jass.KillUnit
-local CreateUnit = jass.CreateUnit
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local RACE_DEMON = jass.RACE_DEMON
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
@@ -83,7 +84,7 @@ ____exports["处理使者精神魔杖使用"] = function(_____4E0A_4E0B_6587)
     local _____5B58_50A8_5355_4F4D_7C7B_578B = YDUserDataGet("unit", _____65BD_6CD5_5355_4F4D, _____4F7F_8005_7CBE_795E_9B54_6756_914D_7F6E["存储字段"], "unitcode")
     local x = (_____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0) and _____4E0A_4E0B_6587["目标X"] or GetUnitX(_____76EE_6807_5355_4F4D)
     local y = (_____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0) and _____4E0A_4E0B_6587["目标Y"] or GetUnitY(_____76EE_6807_5355_4F4D)
-    local _____53EC_5524_5355_4F4D = CreateUnit(
+    local _____53EC_5524_5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
         GetOwningPlayer(_____65BD_6CD5_5355_4F4D),
         _____5B58_50A8_5355_4F4D_7C7B_578B,
         x,

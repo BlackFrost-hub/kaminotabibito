@@ -15,6 +15,9 @@ const { 施加易伤 } = require("系统.03．技能系统.00．技能模板+函
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
+const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
 
 const 豺狼皮甲 = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲") as { 处理豺狼皮甲受伤: (this: void, ctx: any) => void };
 const 灵石 = require("系统.02．物品系统.15．装备技能.00．物品.28．灵石") as { 处理灵石受伤: (this: void, ctx: any) => void };
@@ -56,7 +59,6 @@ let 已初始化 = false;
 const 暗黑侵蚀复活队列: Array<{ 来源: any; 目标: any }> = [];
 
 const jass = require("jass.common") as any;
-const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: number, face: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
@@ -82,7 +84,7 @@ function 执行暗黑侵蚀复活(this: void): void {
     const 记录 = 暗黑侵蚀复活队列.shift();
     if (记录 == null || 记录.来源 == null || 记录.目标 == null) continue;
     if (暗黑侵蚀复活单位ID === 0 || 暗黑侵蚀复活技能ID === 0) continue;
-    const 马甲 = CreateUnit(GetOwningPlayer(记录.来源), 暗黑侵蚀复活单位ID, GetUnitX(记录.目标), GetUnitY(记录.目标), 0);
+    const 马甲 = 创建单位并登记排泄(GetOwningPlayer(记录.来源), 暗黑侵蚀复活单位ID, GetUnitX(记录.目标), GetUnitY(记录.目标), 0);
     if (马甲 == null || 马甲 === 0) continue;
     UnitAddAbility(马甲, 暗黑侵蚀复活技能ID);
     IssueImmediateOrder(马甲, "animatedead");

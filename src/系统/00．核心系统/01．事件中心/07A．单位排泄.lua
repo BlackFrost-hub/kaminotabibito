@@ -92,6 +92,15 @@ ____exports["登记单位排泄"] = function(unit)
     if handleId == 0 then
         return unit
     end
+    do
+        local i = #_____5F85_6392_6CC4_5355_4F4D_5217_8868 - 1
+        while i >= 0 do
+            if _____5F85_6392_6CC4_5355_4F4D_5217_8868[i + 1].handleId == handleId then
+                __TS__ArraySplice(_____5F85_6392_6CC4_5355_4F4D_5217_8868, i, 1)
+            end
+            i = i - 1
+        end
+    end
     _____5DF2_767B_8BB0_5355_4F4D_8868[handleId] = true
     __TS__Delete(_____5DF2_8FDB_5165_6392_6CC4_961F_5217, handleId)
     return unit

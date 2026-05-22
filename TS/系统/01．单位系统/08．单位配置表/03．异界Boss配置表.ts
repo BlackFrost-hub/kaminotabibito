@@ -1,0 +1,24 @@
+﻿/** @noSelfInFile */
+import { 创建单位名反查器 } from "./00．单位名反查工具";
+/**
+ * 自动生成文件，请勿手改。
+ * 来源：lua生成物遍表格.xlsm / 异界Boss
+ */
+
+export const 异界Boss配置表: Record<string, Record<string, any>> = {
+  "E002": {_parent: "Ewar", Name: "夏娜", dmgplus1: 800, HP: 8000, def: 35.0, cool1: 1.0, Art: "ReplaceableTextures\\CommandButtons\\BTNLament.blp", file: "war3mapImported\\shana.mdl", abilList: "A0GX,AInv", spd: 352, atkType1: "normal", race: "orc", mana0: 1000, manaN: 1000, STR: 1, AGI: 1, INT: 1, STRplus: 0.1, AGIplus: 0.1, INTplus: 0.1, nsight: 1800, regenType: "always", turnRate: 3.0, upgrades: "R000,R003", regenMana: 10.0, ScoreScreenIcon: "ReplaceableTextures\\CommandButtons\\BTNLament.blp", Propernames: "炎发灼眼的讨伐者", acquire: 1000.0, regenHP: 0.0, bountyplus: 3000, lumberbountyplus: 1, unit: "E002"},
+  "E079": {_parent: "Edem", Name: "克洛克达尔", dmgplus1: 1, HP: 7500, def: 45.0, cool1: 1.0, Art: "war3mapImported\\TX-BOSSKLKDR.blp", file: "war3mapImported\\-crocodile-.mdl", abilList: "A0FD,A0FH,A0FE,A0FF,A0FJ,A0FG,A0FI,AInv", level: 12, spd: 362, atkType1: "chaos", race: "orc", mana0: 1000, manaN: 1000, STR: 1, AGI: 1, INT: 1, STRplus: 0.1, AGIplus: 0.1, INTplus: 0.1, nsight: 1800, modelScale: 1.35, dmgpt1: 0.2, regenType: "always", backSw1: 0.4, turnRate: 3.0, upgrades: "R003", regenMana: 10.0, ScoreScreenIcon: "war3mapImported\\TX-BOSSKLKDR.blp", Propernames: "沙沙果实能力者", acquire: 1250.0, regenHP: 0.0, collision: 48.0, bountyplus: 1200, lumberbountyplus: 1, unit: "E079"},
+  "E07E": {_parent: "Edem", Name: "赫萝", dmgplus1: 1, HP: 15000, def: 33.0, cool1: 1.0, Art: "war3mapImported\\TX-BOSSHL.blp", file: "war3mapImported\\horo.mdl", abilList: "A0FO,A0FP,A0FL,A0FM,AInv", level: 25, spd: 360, atkType1: "chaos", race: "orc", mana0: 1000, manaN: 1000, STR: 1, AGI: 1, INT: 1, STRplus: 0.1, AGIplus: 0.1, INTplus: 0.1, green: 185, nsight: 1800, modelScale: 1.5, dmgpt1: 0.2, weapType1: "MetalHeavyBash", regenType: "always", backSw1: 0.4, turnRate: 3.0, upgrades: "R003", regenMana: 10.0, ScoreScreenIcon: "war3mapImported\\TX-BOSSHL.blp", Propernames: "贤狼", acquire: 1250.0, regenHP: 0.0, collision: 42.0, bountyplus: 1200, lumberbountyplus: 1, unit: "E07E"},
+  "E07X": {_parent: "Ewar", Name: "比那名居天子", dmgplus1: 1, HP: 20000, def: 45.0, cool1: 1.0, Art: "war3mapImported\\TX-BOSSTZ.blp", file: "war3mapImported\\563.mdl", abilList: "A0GZ,A0H1,A0H2,A0H0,A0H3,A0H4,A0H5,AInv", spd: 385, atkType1: "normal", race: "orc", mana0: 1000, manaN: 1000, STR: 1, AGI: 1, INT: 1, STRplus: 0.1, AGIplus: 0.1, INTplus: 0.1, nsight: 1800, modelScale: 1.5, regenType: "always", turnRate: 3.0, upgrades: "R003", regenMana: 10.0, ScoreScreenIcon: "war3mapImported\\TX-BOSSTZ.blp", Propernames: "绯想般远离尘世的天人", acquire: 1250.0, regenHP: 0.0, bountyplus: 3000, lumberbountyplus: 1, unit: "E07X"},
+  "O005": {_parent: "Obla", Name: "|cffff6600神罗战士（克隆形态）|r", dmgplus1: 1, HP: 20000, def: 45.0, cool1: 1.0, Art: "war3mapImported\\BTNsafeiluositouxiang.blp", file: "war3mapImported\\CC Sephiroth.mdl", abilList: "A0H7,A0H6,A0H8,A0HB,A0H9,A0HA", level: 55, spd: 385, atkType1: "normal", mana0: 1000, manaN: 1000, movetp: "fly", nsight: 1800, modelScale: 2.0, upgrades: "R000,R003", regenMana: 5.0, rangeN1: 350, ScoreScreenIcon: "war3mapImported\\BTNsafeiluositouxiang.blp", Propernames: "复制体", acquire: 1250.0, run: 400.0, regenHP: 0.0, canFlee: 0, unit: "O005"},
+};
+
+
+export const 异界Boss单位名反查器 = 创建单位名反查器(异界Boss配置表);
+
+export function 按名字反查异界Boss单位ID(this: void, name: string): string | undefined {
+  return 异界Boss单位名反查器(name);
+}
+export default 异界Boss配置表;
+
+

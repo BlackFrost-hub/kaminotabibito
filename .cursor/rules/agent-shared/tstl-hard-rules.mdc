@@ -124,6 +124,21 @@ function 安全销毁特效(this: void, duration: number, effect: any): void {
 const DestroyEffect = jass.DestroyEffect as (e: any) => void;
 ```
 
+- 对 `require("...")` 得到的模块字段函数，如果生成 Lua 出现 `moduleTable, nil, ...` 这类首参污染，
+  不要继续直接写 `module.fn(...)`。
+  先提取局部函数别名，再通过本地 wrapper 调用：
+
+```ts
+const 创建单位并登记排泄: any = unitRelated.创建单位并登记排泄;
+
+export function CreateUnit(this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number): any {
+  return 创建单位并登记排泄(undefined as any, owner, unitTypeId, x, y, facing);
+}
+```
+
+- 这是本仓库已经踩过的实战坑：TS 源看起来只是 `module.fn(nil, ...)`，
+  生成 Lua 仍可能变成 `module["fn"](module, nil, ...)`，导致参数整体右移。
+
 ### 5.5 什么时候不要立刻加 `@noSelfInFile`
 
 - 底层 `lib` 文件被很多地方引用。
@@ -170,6 +185,10 @@ const DestroyEffect = jass.DestroyEffect as (e: any) => void;
 
 - 禁止对 `jass` / `japi` API 使用可选链调用 `?.(...)`。
 - 避免把 `jass.xxx` / `japi.xxx` 先赋给局部变量，再以普通函数形式调用。
+- 避免直接调用 `require("...")` 返回模块表上的函数字段，尤其是“底层导出本身没 no-self、当前文件有 no-self”的混合场景。
+- 如果一个延迟清理系统用 `GetHandleId` 做 key，必须考虑句柄复用：
+  - 重新登记同 handleId 时，要先清掉旧的延迟队列条目。
+  - 否则旧条目可能会把新创建的单位/物品误删。
 - 避免 `Object.keys(luaTable)` 这类 TS 直觉写法；Lua table 遍历优先稳定数组或显式有序 key。
 - 随机下标、Lua 1-based、TS 0-based 混用时，必须在生成 Lua 后核对。
 - `DzTriggerRegisterKeyEvent` 这类键码注册，不要把数字 VK 误写成字符路径。

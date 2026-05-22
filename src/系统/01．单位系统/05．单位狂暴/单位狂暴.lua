@@ -12,6 +12,8 @@ local cameraShakeMod = require("lib.扩展函数.封装函数.07．镜头函数.
 local cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_2.registerDeathListener
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_3["创建单位并登记排泄"]
 local idData = require("系统.02．物品系统.02．装备掉落表").default or ({})
 local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
@@ -49,20 +51,20 @@ local function onDeath(dying, killer)
     local four = stringToFourCC(__TS__StringSubstring(spawnUnitId, 0, 4))
     local owner = jass.GetOwningPlayer(dying)
     local created = nil
-    created = jass.CreateUnit(
+    created = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
         owner,
         four,
         x,
         y,
         facingDeg
     )
-    local ____killer_7
+    local ____killer_8
     if killer then
-        ____killer_7 = jass.GetOwningPlayer(killer)
+        ____killer_8 = jass.GetOwningPlayer(killer)
     else
-        ____killer_7 = nil
+        ____killer_8 = nil
     end
-    local killerPlayer = ____killer_7
+    local killerPlayer = ____killer_8
     if created and killerPlayer then
         EXSetUnitFacing(nil, created, facingDeg)
         if type(cameraShakeForPlayerRaw) == "function" then

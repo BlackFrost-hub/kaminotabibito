@@ -4,7 +4,7 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D, _____79FB_9664_8FDB_5EA6_6761_7279_6548, GetHandleId, RemoveUnit, GetUnitTypeId, _____8FDB_5EA6_6761_6620_5C04, _____5355_4F4D_8FDB_5EA6_6761_6620_5C04
+local _____53D6_53E5_67C4ID, _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D, _____79FB_9664_8FDB_5EA6_6761_7279_6548, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0, GetHandleId, GetUnitTypeId, _____8FDB_5EA6_6761_6620_5C04, _____5355_4F4D_8FDB_5EA6_6761_6620_5C04
 function _____53D6_53E5_67C4ID(h)
     if h == nil or h == 0 then
         return 0
@@ -18,7 +18,7 @@ function _____7ACB_5373_79FB_9664_8FDB_5EA6_6761_5355_4F4D(_____8FDB_5EA6_6761_5
     if GetUnitTypeId(_____8FDB_5EA6_6761_5355_4F4D) == 0 then
         return
     end
-    RemoveUnit(_____8FDB_5EA6_6761_5355_4F4D)
+    _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(_____8FDB_5EA6_6761_5355_4F4D)
 end
 function _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____8FDB_5EA6_6761_5355_4F4D)
     if _____8FDB_5EA6_6761_5355_4F4D == nil or _____8FDB_5EA6_6761_5355_4F4D == 0 then
@@ -39,13 +39,17 @@ end
 -- 2. 不使用 `AddSpecialEffectTarget` / `AddSpecialEffectTargetUnitBJ`
 -- 3. 当前实现改为直接创建物编单位 `e011`（父 id: `ewsp`）
 -- 4. 进度条颜色、动画速度、动画序号都通过单位接口控制
--- 5. 销毁时直接 `RemoveUnit`，不是延迟特效回收
+-- 5. 销毁时走统一单位排泄清理出口，不做特效式延迟回收
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 local offTick10ms = ____require_result_0.offTick10ms
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_1.debugLogForce
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_2["创建单位并登记排泄"]
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+_____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_3["立即移除单位并取消排泄登记"]
 local _____8C03_8BD5_6A21_5757_540D = "进度条特效"
 local PROGRESSBAR_UNIT_ID = 1697657137
 local PROGRESSBAR_OWNER_PLAYER_ID = 4
@@ -56,8 +60,6 @@ local DEFAULT_COLOR_RGBA = {r = 255, g = 255, b = 0, a = 255}
 local UNIT_ALIVE_LIFE = 0.405
 GetHandleId = jass.GetHandleId
 local Player = jass.Player
-local CreateUnit = jass.CreateUnit
-RemoveUnit = jass.RemoveUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -177,7 +179,7 @@ ____exports["创建进度条特效"] = function(_____5355_4F4D, _____9009_9879)
     local x = GetUnitX(_____5355_4F4D)
     local y = GetUnitY(_____5355_4F4D)
     local owner = Player(PROGRESSBAR_OWNER_PLAYER_ID)
-    local _____8FDB_5EA6_6761_5355_4F4D = CreateUnit(
+    local _____8FDB_5EA6_6761_5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
         owner,
         PROGRESSBAR_UNIT_ID,
         x,

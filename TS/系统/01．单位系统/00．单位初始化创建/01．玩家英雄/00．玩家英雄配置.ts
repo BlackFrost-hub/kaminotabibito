@@ -1,4 +1,5 @@
 ﻿/** @noSelfInFile */
+import { 创建单位名反查器 } from "../../08．单位配置表/00．单位名反查工具";
 /**
  * 自动生成文件，请勿手改。
  * 来源：lua生成物遍表格.xlsm / 英雄
@@ -1114,5 +1115,13 @@ export const 玩家英雄配置列表 = [
   玩家英雄配置表["N023"],
 ] as const;
 
+
+export const 玩家英雄单位名反查器 = 创建单位名反查器(玩家英雄配置表);
+
+export function 按名字反查玩家英雄单位ID(this: void, name: string): string | undefined {
+  return 玩家英雄单位名反查器(name);
+}
 export default 玩家英雄配置表;
 export {};
+
+

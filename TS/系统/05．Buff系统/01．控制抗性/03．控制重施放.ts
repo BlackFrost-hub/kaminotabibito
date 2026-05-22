@@ -11,6 +11,9 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 const { YDWESetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;
 };
+const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
 
 //=============================================================================
 // 一、马甲配置
@@ -44,13 +47,10 @@ export function removeOriginalControl(unit: any, abilityId: number): void {
 export function createControlHelper(caster: any, target: any): any {
   const targetLoc = jass.GetUnitLoc(target);
   const helperType = getControlHelperUnitType();
+  const x = jass.GetLocationX(targetLoc);
+  const y = jass.GetLocationY(targetLoc);
 
-  const helper = jass.CreateUnitAtLoc(
-    jass.GetOwningPlayer(caster),
-    helperType,
-    targetLoc,
-    0
-  );
+  const helper = 创建单位并登记排泄(jass.GetOwningPlayer(caster), helperType, x, y, 0);
 
   jass.RemoveLocation(targetLoc);
   return helper;

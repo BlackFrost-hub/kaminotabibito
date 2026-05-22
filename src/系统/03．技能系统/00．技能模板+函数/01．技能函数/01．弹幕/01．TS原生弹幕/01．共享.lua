@@ -3,8 +3,10 @@ local ____exports = {}
 --- TS 原生弹幕 - 共享常量与 JASS/JAPI 别名
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local unitCleanup = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = unitRelated["创建单位并登记排泄"]
 ____exports.AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-____exports.CreateUnit = jass.CreateUnit
 ____exports.DestroyEffect = jass.DestroyEffect
 ____exports.GetHandleId = jass.GetHandleId
 ____exports.GetOwningPlayer = jass.GetOwningPlayer
@@ -18,7 +20,6 @@ ____exports.IsTerrainPathable = jass.IsTerrainPathable
 ____exports.IsUnitPaused = jass.IsUnitPaused
 ____exports.KillUnit = jass.KillUnit
 ____exports.Player = jass.Player
-____exports.RemoveUnit = jass.RemoveUnit
 ____exports.SetUnitFacing = jass.SetUnitFacing
 ____exports.SetUnitFlyHeight = jass.SetUnitFlyHeight
 ____exports.SetUnitPathing = jass.SetUnitPathing
@@ -53,6 +54,20 @@ ____exports.bj_RADTODEG = ____jass_bj_RADTODEG_0
 ____exports["蝗虫技能ID"] = 1097625443
 ____exports["默认弹幕单位类型"] = 1700880737
 ____exports["弹幕Tick间隔"] = 0.01
+local _____7A7ASelf = nil
+function ____exports.CreateUnit(owner, unitTypeId, x, y, facing)
+    return _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
+        _____7A7ASelf,
+        owner,
+        unitTypeId,
+        x,
+        y,
+        facing
+    )
+end
+function ____exports.RemoveUnit(unit)
+    unitCleanup["立即移除单位并取消排泄登记"](unit)
+end
 ____exports["取句柄ID"] = function(handle)
     return handle ~= nil and handle ~= 0 and (____exports.GetHandleId(handle) or 0) or 0
 end

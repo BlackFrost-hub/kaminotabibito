@@ -11,6 +11,9 @@ export * from "./04．多杀检测系统/index";
 // ========== 核心模块导出 ==========
 export * from "./05．单位狂暴/index";
 export * from "./06．仇恨系统/index";
+export * from "./07．异界Boss/index";
+export * from "./08．单位配置表/index";
+export * from "./09．科技配置表/index";
 
 /**
  * 初始化单位系统

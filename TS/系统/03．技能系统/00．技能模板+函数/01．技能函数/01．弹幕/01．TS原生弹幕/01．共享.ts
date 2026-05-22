@@ -5,9 +5,15 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (self: any, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const unitCleanup = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
+const 创建单位并登记排泄: any = unitRelated.创建单位并登记排泄;
 
 export const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-export const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 export const GetHandleId = jass.GetHandleId as (h: any) => number;
 export const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -21,7 +27,6 @@ export const IsTerrainPathable = jass.IsTerrainPathable as (x: number, y: number
 export const IsUnitPaused = jass.IsUnitPaused as (unit: any) => boolean;
 export const KillUnit = jass.KillUnit as (unit: any) => void;
 export const Player = jass.Player as (playerId: number) => any;
-export const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 export const SetUnitFacing = jass.SetUnitFacing as (unit: any, face: number) => void;
 export const SetUnitFlyHeight = jass.SetUnitFlyHeight as (unit: any, height: number, rate: number) => void;
 export const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
@@ -64,6 +69,16 @@ export const bj_RADTODEG = jass.bj_RADTODEG ?? 57.29577951308232;
 export const 蝗虫技能ID = 0x416c6f63; // 'Aloc'
 export const 默认弹幕单位类型 = 1700880737; // 'eaaa'，objediting/units.lua 中的 TS 原生弹幕马甲
 export const 弹幕Tick间隔 = 0.01;
+
+const 空Self = undefined as any;
+
+export function CreateUnit(this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number): any {
+  return 创建单位并登记排泄(空Self, owner, unitTypeId, x, y, facing);
+}
+
+export function RemoveUnit(this: void, unit: any): void {
+  unitCleanup.立即移除单位并取消排泄登记(unit);
+}
 
 export function 取句柄ID(this: void, handle: any): number {
   return handle != null && handle !== 0 ? (GetHandleId(handle) || 0) : 0;

@@ -18,6 +18,12 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
   onTick10ms: (this: void, callback: () => void) => void;
   offTick10ms: (this: void, callback: () => void) => void;
 };
+const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 
 // ==========================================================================================
 // JASS 函数别名
@@ -25,8 +31,6 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const Player = jass.Player as (playerId: number) => any;
-const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, face: number) => any;
-const RemoveUnit = jass.RemoveUnit as (u: any) => void;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (u: any) => number;
@@ -150,7 +154,7 @@ function 设置护盾条比例(数据: 护盾条数据, 比例: number): void {
 function 立即移除护盾条单位(护盾条单位: any): void {
   if (护盾条单位 == null || 护盾条单位 === 0) return;
   if (GetUnitTypeId(护盾条单位) === 0) return;
-  RemoveUnit(护盾条单位);
+  立即移除单位并取消排泄登记(护盾条单位);
 }
 
 function 移除护盾条(单位ID: number): void {
@@ -242,7 +246,7 @@ export function 创建护盾条(单位: any): void {
   const x = GetUnitX(单位);
   const y = GetUnitY(单位);
   const owner = Player(SHIELD_BAR_OWNER_PLAYER_ID);
-  const 护盾条单位 = CreateUnit(owner, SHIELD_BAR_UNIT_ID, x, y, 0);
+  const 护盾条单位 = 创建单位并登记排泄(owner, SHIELD_BAR_UNIT_ID, x, y, 0);
   if (!单位存活(护盾条单位)) return;
 
   SetUnitScale(护盾条单位, 1, 1, 1);

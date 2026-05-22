@@ -20,6 +20,9 @@ const { YDUserDataGet, YDUserDataSet, YDUserDataHas, YDUserDataClear } = require
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -30,7 +33,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitRace = jass.IsUnitRace as (unit: any, race: any) => boolean;
 const IsHeroUnitId = jass.IsHeroUnitId as (unitId: number) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
-const CreateUnit = jass.CreateUnit as (player: any, unitId: number, x: number, y: number, facing: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (unit: any, buffId: number, duration: number) => void;
 const RACE_DEMON = jass.RACE_DEMON as any;
 
@@ -79,7 +81,7 @@ export function 处理使者精神魔杖使用(this: void, 上下文: 物品技�
   const 存储单位类型 = YDUserDataGet("unit", 施法单位, 使者精神魔杖配置.存储字段, "unitcode");
   const x = 目标单位 == null || 目标单位 === 0 ? 上下文.目标X : GetUnitX(目标单位);
   const y = 目标单位 == null || 目标单位 === 0 ? 上下文.目标Y : GetUnitY(目标单位);
-  const 召唤单位 = CreateUnit(GetOwningPlayer(施法单位), 存储单位类型, x, y, GetUnitFacing(施法单位));
+  const 召唤单位 = 创建单位并登记排泄(GetOwningPlayer(施法单位), 存储单位类型, x, y, GetUnitFacing(施法单位));
   if (召唤单位 != null && 召唤单位 !== 0) {
     UnitApplyTimedLife(召唤单位, 限时生命BuffID, 使者精神魔杖配置.召唤持续时间);
   }

@@ -29,6 +29,8 @@ local _____5F00_59CB_51FB_9000 = ____require_result_7["开始击退"]
 local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_8.addPeriodicCallback
 local getServerTime = ____require_result_8.getServerTime
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_9["创建单位并登记排泄"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -51,7 +53,6 @@ local DestroyEffect = jass.DestroyEffect
 local IsPointBlighted = jass.IsPointBlighted
 local SetItemCharges = jass.SetItemCharges
 local GetItemCharges = jass.GetItemCharges
-local CreateUnit = jass.CreateUnit
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local SetUnitScale = jass.SetUnitScale
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
@@ -543,7 +544,7 @@ ____exports["创建火把单位"] = function(_____6765_6E90, x, y, face, _____6A
     if _____706B_628A_5355_4F4D_7C7B_578BID == 0 then
         return
     end
-    local unit = CreateUnit(
+    local unit = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
         GetOwningPlayer(_____6765_6E90),
         _____706B_628A_5355_4F4D_7C7B_578BID,
         x,

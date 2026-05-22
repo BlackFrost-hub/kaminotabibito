@@ -7,7 +7,7 @@
  * 2. 不使用 `AddSpecialEffectTarget` / `AddSpecialEffectTargetUnitBJ`
  * 3. 当前实现改为直接创建物编单位 `e011`（父 id: `ewsp`）
  * 4. 进度条颜色、动画速度、动画序号都通过单位接口控制
- * 5. 销毁时直接 `RemoveUnit`，不是延迟特效回收
+ * 5. 销毁时走统一单位排泄清理出口，不做特效式延迟回收
  */
 
 const jass = require("jass.common") as any;
@@ -19,6 +19,12 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
+  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
 
 const 调试模块名 = "进度条特效";
@@ -32,8 +38,6 @@ const UNIT_ALIVE_LIFE = 0.405;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const Player = jass.Player as (playerId: number) => any;
-const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, face: number) => any;
-const RemoveUnit = jass.RemoveUnit as (u: any) => void;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (u: any) => number;
@@ -104,7 +108,7 @@ function 设置进度条位置(进度条单位: any, 跟随单位: any, 高度�
 function 立即移除进度条单位(进度条单位: any): void {
   if (进度条单位 == null || 进度条单位 === 0) return;
   if (GetUnitTypeId(进度条单位) === 0) return;
-  RemoveUnit(进度条单位);
+  立即移除单位并取消排泄登记(进度条单位);
 }
 
 function 更新所有进度条位置(): void {
@@ -164,7 +168,7 @@ export function 创建进度条特效(单位: any, 选项?: 进度条特效选�
   const x = GetUnitX(单位);
   const y = GetUnitY(单位);
   const owner = Player(PROGRESSBAR_OWNER_PLAYER_ID);
-  const 进度条单位 = CreateUnit(owner, PROGRESSBAR_UNIT_ID, x, y, 0);
+  const 进度条单位 = 创建单位并登记排泄(owner, PROGRESSBAR_UNIT_ID, x, y, 0);
   if (!单位存活(进度条单位)) return null;
 
   SetUnitScale(进度条单位, 缩放, 缩放, 缩放);
