@@ -25,7 +25,7 @@ import {
   type TaskUIScrollContext,
 } from "./09．任务UI滚动与滚轮";
 import { registerTaskUIHotkeys } from "./04．任务UI热键";
-import { questManager } from "../01．任务管理器/index";
+import { questManager } from "../02．任务管理器";
 import { buildTaskEntryIcon } from "./05．任务UI入口图标";
 import { buildTaskMainPanel } from "./07．任务UI主面板与滚动";
 import {

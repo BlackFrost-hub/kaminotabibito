@@ -28,7 +28,7 @@ type NpcDialogData = any;
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
-const { questManager } = require("系统.08．任务系统.01．任务管理器.index") as {
+const { questManager } = require("系统.08．任务系统.02．任务管理器") as {
   questManager: { triggerUIRefresh: (playerId: number, questId?: string) => void };
 };
 

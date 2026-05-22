@@ -8,7 +8,7 @@ const { withTimer } = require("lib.扩展函数.封装函数.01．通用工具.i
   withTimer: (delaySec: number, callback: () => void) => any;
 };
 
-import { questManager } from "../08．任务系统/01．任务管理器/index";
+import { questManager } from "../08．任务系统/02．任务管理器";
 const taskUIManager = require("../08．任务系统/02．任务UI拆分/11．任务UI管理器") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
@@ -59,7 +59,7 @@ export function testQuestAcceptComplete(): void {
     }
   }
 
-  const activeQuests = questManager.getPlayerQuests(playerId, QuestType.MAIN);
+  const activeQuests = questDB.getPlayerActiveQuests(playerId).filter(q => q.type === QuestType.MAIN);
   debugPrint(`玩家 ${playerId} 进行中的主线任务: ${activeQuests.length} 个（期望 17 个，main_04~main_20）`);
 
   debugPrint("任务接受/完成测试完成（完成 01~03，其余进行中）");

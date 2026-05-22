@@ -69,7 +69,7 @@ if (ENABLE_QUEST_CONFIG_TABLE) {
 // ========== 运行时核心（01 + 02） ==========
 if (ENABLE_QUEST_RUNTIME_CORE) {
   require("系统.08．任务系统.01．任务数据");
-  const 任务管理器 = require("系统.08．任务系统.01．任务管理器.index") as { init?: () => void };
+  const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init?: () => void };
   if (typeof 任务管理器.init === "function") 任务管理器.init();
   // 注册20个假主线任务用于测试
   registerDummyMainQuests();
@@ -84,9 +84,8 @@ if (ENABLE_QUEST_UI_MODULE) {
 }
 
 // ========== 主线配置驱动 ==========
-if (ENABLE_QUEST_MAINLINE_DRIVER) {
-  require("系统.08．任务系统.02．主线配置驱动");
-}
+// 已迁到 `系统.11．剧情系统.01．主线任务.01．主线配置驱动`
+// 旧 `02．主线配置驱动.ts` 已删除；这里不再直接 require，避免任务系统和剧情系统双重初始化。
 
 /**
  * 预留：与 `main` 中 `任务系统.init?.()` 对应；当前初始化已在模块加载时完成。

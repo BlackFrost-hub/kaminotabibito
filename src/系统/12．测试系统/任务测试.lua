@@ -1,8 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____index = require("系统.08．任务系统.01．任务管理器.index")
-local questManager = ____index.questManager
+local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
@@ -59,7 +59,10 @@ function ____exports.testQuestAcceptComplete(self)
             )
         end
     end
-    local activeQuests = questManager:getPlayerQuests(playerId, QuestType.MAIN)
+    local activeQuests = __TS__ArrayFilter(
+        questDB:getPlayerActiveQuests(playerId),
+        function(____, q) return q.type == QuestType.MAIN end
+    )
     debugPrint(
         nil,
         ((("玩家 " .. tostring(playerId)) .. " 进行中的主线任务: ") .. tostring(#activeQuests)) .. " 个（期望 17 个，main_04~main_20）"

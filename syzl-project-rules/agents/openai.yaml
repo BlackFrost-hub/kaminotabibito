@@ -1,4 +1,4 @@
 interface:
   display_name: "Syzl Project Rules"
-  short_description: "Route work through .cursor rules, War3 UI boundaries, UTF-8-safe patching, and named-only JASS callbacks."
-  default_prompt: "Use $syzl-project-rules to work inside this repository by reading `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`, `.cursor/rules/README.md`, and the most specific subsystem rules needed for the files being changed."
+  short_description: "Route work through the current .cursor rules, jass/japi runtime truth, TSTL call-shape checks, and UTF-8-safe patching."
+  default_prompt: "Use $syzl-project-rules to work inside this repository by reading `.cursor/rules/README.md` first, then `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`, then the most specific subsystem rules needed for the files being changed."

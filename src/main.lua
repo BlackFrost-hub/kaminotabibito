@@ -72,5 +72,9 @@ local _____5B58_6863_7CFB_7EDF = require("系统.10．存档系统.index")
 if type(_____5B58_6863_7CFB_7EDF.init) == "function" then
     _____5B58_6863_7CFB_7EDF.init()
 end
+local _____5267_60C5_7CFB_7EDF = require("系统.11．剧情系统.index")
+if type(_____5267_60C5_7CFB_7EDF.init) == "function" then
+    _____5267_60C5_7CFB_7EDF.init()
+end
 require("系统.12．测试系统.index")
 return ____exports

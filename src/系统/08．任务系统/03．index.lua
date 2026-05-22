@@ -5,7 +5,6 @@ local ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173 = require("系统.08�
 local ENABLE_QUEST_CONFIG_TABLE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_CONFIG_TABLE
 local ENABLE_QUEST_RUNTIME_CORE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_RUNTIME_CORE
 local ENABLE_QUEST_UI_MODULE = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_UI_MODULE
-local ENABLE_QUEST_MAINLINE_DRIVER = ____00_FF0E_4EFB_52A1_7CFB_7EDF_4E8C_5206_5F00_5173.ENABLE_QUEST_MAINLINE_DRIVER
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestDatabase = ____01_FF0E_4EFB_52A1_6570_636E.QuestDatabase
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
@@ -60,7 +59,7 @@ if ENABLE_QUEST_CONFIG_TABLE then
 end
 if ENABLE_QUEST_RUNTIME_CORE then
     require("系统.08．任务系统.01．任务数据")
-    local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.01．任务管理器.index")
+    local _____4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
     if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
         _____4EFB_52A1_7BA1_7406_5668:init()
     end
@@ -71,9 +70,6 @@ if ENABLE_QUEST_UI_MODULE then
     if type(manager.registerHotkey) == "function" then
         manager:registerHotkey()
     end
-end
-if ENABLE_QUEST_MAINLINE_DRIVER then
-    require("系统.08．任务系统.02．主线配置驱动")
 end
 --- 预留：与 `main` 中 `任务系统.init?.()` 对应；当前初始化已在模块加载时完成。
 function ____exports.init(self)

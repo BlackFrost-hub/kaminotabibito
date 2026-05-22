@@ -1,0 +1,182 @@
+================================================================================
+JAPI 函数列表 - 683 个函数
+================================================================================
+
+■ Dz 前缀 (约 550+)
+├─ DzFrame* (UI框架)
+│   DzFrameSetTextAlignment, DzFrameSetVertexColor, DzFrameSetFont, DzFrameSetScale,
+│   DzFrameSetEnable, DzFrameSetAnimateOffset, DzFrameSetModelPosition,
+│   DzFrameSetModelEnableWideScreen, DzFrameSetUpdateCallbackByCode,
+│   DzFrameGetValue, DzFrameGetEnable, DzFrameGetPointValid, DzFrameGetCommandBarButton,
+│   DzFrameGetTriggerHpBar
+│
+├─ DzSetUnitAbility* (设置单位技能)
+│   DzSetUnitAbilityMissileCount, DzSetUnitAbilitySpellBookAddAbility,
+│   DzSetUnitAbilityMissileArt, DzSetUnitAbilityCool, DzSetUnitAbilityTargs,
+│   DzSetUnitAbilityReqLevel, DzSetUnitAbilityRange, DzSetUnitAbilityDataA,
+│   DzSetUnitAbilityDataD, DzSetUnitAbilityCastTime, DzSetUnitAbilityDuration,
+│   DzSetUnitAbilityMissileSpeed, DzSetUnitAbilityMissileArc, DzSetUnitAbilityArea,
+│   DzSetUnitAbilitySpellBookRemoveAbility, DzSetUnitAbilitySpellBookList,
+│   DzSetUnitAbilityUpdate, DzSetUnitAbilityTip, DzSetUnitAbilityUberTip,
+│   DzSetUnitAbilityTechReach, DzSetUnitAbilityTechReachTip, DzSetUnitAbilityHotkey,
+│   DzSetUnitAbilityDisable, DzSetUnitAbilityEnable, DzSetUnitAbilityEngineeringUpgrade,
+│   DzSetUnitAbilityEngineeringUpgradeCancel, DzSetUnitAbilityHeroDuration,
+│   DzSetUnitAbilityOrderId, DzSetUnitAbilityUnitId, DzSetUnitAbilityDataB,
+│   DzSetUnitAbilityDataC, DzSetUnitAbilityDataE
+│
+├─ DzGetUnitAbility* (获取单位技能)
+│   DzGetUnitAbilityDataC, DzGetUnitAbilityMissileHoming, DzGetUnitAbilityCool,
+│   DzGetUnitAbilityTargs, DzGetUnitAbilityMissileCount, DzGetUnitAbilityMissileArc,
+│   DzGetUnitAbilityRange, DzGetUnitAbilityCost, DzGetUnitAbilityArea,
+│   DzGetUnitAbilityCastTime, DzGetUnitAbilityDuration, DzGetUnitAbilityMaxCool,
+│   DzGetUnitAbilityMissileArt, DzGetUnitNeededXP
+│
+├─ DzUnit* (单位操作)
+│   DzUnitOrdersClear, DzUnitCreateIllusionFromUnit, DzUnitCreateIllusion,
+│   DzSetUnitCollisionSize, DzSetUnitMaxSpeed, DzUnitDisableAttack,
+│   DzUnitDisableInventory, DzUnitFindAbility, DzUnitGetLevel, DzUnitHasAbility,
+│   DzUnitIsShowingHpBar, DzUnitOrdersCount, DzUnitOrdersExec, DzUnitOrdersForceStop,
+│   DzUnitOrdersReverse, DzUnitOverheadOffset, DzUnitSetCanSelect, DzUnitSetMoveType,
+│   DzUnitSetTargetable, DzUnitSilence, DzUnitUIAddLevelArrayInteger,
+│   DzUnitUIClearLevelArrayInteger, DzUnitChangeAlpha, DzUnitCanPlaceAround
+│
+├─ DzSetUnit* (设置单位属性)
+│   DzSetUnitAbilityMissileCount, DzSetUnitAbilitySpellBookAddAbility,
+│   DzSetUnitAbilityMissileArt, DzSetUnitAbilityCool, DzSetUnitAbilityTargs,
+│   DzSetUnitAbilityReqLevel, DzSetUnitAbilityRange, DzSetUnitAbilityDataA,
+│   DzSetUnitAbilityDataD, DzSetUnitAbilityCastTime, DzSetUnitAbilityDuration,
+│   DzSetUnitAbilityMissileSpeed, DzSetUnitAbilityMissileArc, DzSetUnitAbilityArea,
+│   DzSetUnitCollisionSize, DzSetUnitMaxSpeed, DzSetUnitAsAttackTargetType,
+│   DzSetUnitAttack1TargetType, DzSetUnitAttack2TargetType, DzSetUnitAttackTargetCount,
+│   DzSetUnitBackSwing, DzSetUnitCastPoint, DzSetUnitDataCacheInteger,
+│   DzSetUnitDataCacheReal, DzSetUnitDescription, DzSetUnitDisableControlOrder,
+│   DzSetUnitDisableLocalOrder, DzSetUnitHitIgnore, DzSetUnitID, DzSetUnitLifeRegen,
+│   DzSetUnitManaRegen, DzSetUnitMinSpeed, DzSetUnitMissileArc, DzSetUnitMissileHoming,
+│   DzSetUnitMissileModel, DzSetUnitMissileSpeed, DzSetUnitModel, DzSetUnitName,
+│   DzSetUnitPortrait, DzSetUnitPosition, DzSetUnitPreselectUIVisible,
+│   DzSetUnitProperName, DzSetUnitSelectScale, DzSetUnitTexture, DzSetUnitXY
+│
+├─ DzGetUnit* (获取单位属性)
+│   DzGetUnitCollisionSize, DzGetUnitDisableLocalOrder
+│
+├─ DzTrigger* (触发器事件)
+│   DzTriggerRegisterSyncData, DzTriggerRegisterMouseWheelEvent,
+│   DzTriggerRegisterKeyEvent, DzTriggerRegisterKeyEventByCode,
+│   DzTriggerRegisterMouseEvent, DzTriggerRegisterMouseEventByCode,
+│   DzTriggerRegisterMouseMoveEvent, DzTriggerRegisterMouseMoveEventByCode,
+│   DzTriggerRegisterMouseWheelEventByCode, DzTriggerRegisterWindowResizeEvent,
+│   DzTriggerRegisterWindowResizeEventByCode
+│
+├─ DzWindow* (窗口操作)
+│   DzWindowSetSize, DzWindowSetPoint
+│
+├─ DzTextTag* (文本标签)
+│   DzTextTagGetFont, DzTextTagGetShadowColor, DzTextTagGetStartAlpha,
+│   DzTextTagSetFont, DzTextTagSetShadowColor, DzTextTagSetStartAlpha
+│
+├─ DzSimple* (简单UI)
+│   DzSimpleTextureFindByName, DzSimpleFrameFindByName, DzSimpleFrameIsVisible,
+│   DzSimpleFrameRemoveFromRegistry, DzSimpleFrameShow, DzSimpleMessageFrameAddMessage,
+│   DzSimpleMessageFrameClear, DzSimpleFontStringFindByName
+│
+├─ DzString* (字符串操作)
+│   DzStringContains, DzStringFind, DzStringFindFirstNotOf, DzStringFindFirstOf,
+│   DzStringFindLastNotOf, DzStringFindLastOf, DzStringInsert, DzStringReplace,
+│   DzStringReverse, DzStringTrim, DzStringTrimLeft, DzStringTrimRight
+│
+├─ DzSync* (同步)
+│   DzSyncBuffer, DzSyncData, DzSyncDataImmediately
+│
+├─ DzPlayer* (玩家操作)
+│   DzPlayerSendChat
+│
+├─ DzGet* (获取信息)
+│   DzGetFPS, DzGetMouseX, DzGetMouseY, DzGetSystemMetricsWidth, DzGetSystemMetricsHeight,
+│   DzGetGameUI, DzGetLocalChatRecipient, DzGetCacheModelCount, DzGetColor,
+│   DzGetUnitAbilityMissileHoming, DzGetUnitAbilityMissileArc, DzGetUnitAbilityMissileCount,
+│   DzGetUnitAbilityMissileArt, DzGetUnitAbilityRange, DzGetUnitAbilityCost,
+│   DzGetUnitAbilityArea, DzGetUnitAbilityCastTime, DzGetUnitAbilityDuration,
+│   DzGetUnitAbilityMaxCool, DzGetUnitAbilityCool, DzGetUnitAbilityTargs,
+│   DzGetUnitAbilityDataD, DzGetUnitAbilityDataC, DzGetUnitNeededXP
+│
+├─ DzSet* (设置)
+│   DzSetMaxFps, DzSetEffectAnimation, DzSetDoodadsMatRotateZ,
+│   DzSetWar3MapMap, DzSetWidgetSpriteScale
+│
+├─ DzDisable* / DzEnable* (开关)
+│   DzDisableGameUIKeyboard, DzDisableWindowKeyboard, DzEnableHashtableSetNull,
+│   DzForceUiKeyboard
+│
+├─ 其他 Dz*
+│   DzIsWindowMode, DzIsWindowActive, DzCreateCommandButton, DzSendKeyboard,
+│   DzConvertScreenPositionY, DzAPI_Map_HasMallItem, DzUpdateMinimap,
+│   DzWidgetSetMinimapIcon, DzWidgetSetMinimapIconEnable, DzWriteLog,
+│   DzXlsxOpen, DzXlsxClose, DzXlsxWorksheetGetCellBoolean, DzXlsxWorksheetGetCellFloat,
+│   DzXlsxWorksheetGetCellInteger, DzXlsxWorksheetGetCellString, DzXlsxWorksheetGetCellType,
+│   DzXlsxWorksheetGetColumnCount, DzXlsxWorksheetGetRowCount, DzToggleFPS,
+│   DzUnlockBlpSizeLimit, DzUnlockOpCodeLimit, DzFixUnitEventMemoryLeak,
+│   DzItemMatScale, DzItemMatReset
+│
+├─ DzFrameGet* (获取Frame信息)
+│   DzFrameGetValue, DzFrameGetEnable, DzFrameGetPointValid, DzFrameGetCommandBarButton,
+│   DzFrameGetTriggerHpBar
+
+■ EX 前缀 (约 70+)
+├─ EXSet* (设置)
+│   EXSetAbilityAEmeDataA, EXSetAbilityDataInteger, EXSetAbilityDataReal,
+│   EXSetAbilityDataString, EXSetAbilityState, EXSetAbilityString,
+│   EXSetBuffDataString, EXSetEffectSize, EXSetEffectSpeed, EXSetEffectXY,
+│   EXSetEffectZ, EXSetEventDamage, EXSetItemDataString, EXSetUnitArrayString,
+│   EXSetUnitCollisionType, EXSetUnitFacing, EXSetUnitInteger, EXSetUnitMoveType,
+│   EXSetUnitReal, EXSetUnitString
+│
+├─ EXGet* (获取)
+│   EXGetAbilityDataInteger, EXGetAbilityDataReal, EXGetAbilityDataString,
+│   EXGetAbilityId, EXGetAbilityLevel, EXGetAbilityState, EXGetAbilityString,
+│   EXGetBuffDataString, EXGetEffectSize, EXGetEffectX, EXGetEffectY, EXGetEffectZ,
+│   EXGetEventDamageData, EXGetItemDataString, EXGetObject, EXGetUnitAbility,
+│   EXGetUnitAbilityByIndex, EXGetUnitArrayString, EXGetUnitInteger, EXGetUnitReal,
+│   EXGetUnitString, ExGetUnitSpellAbility
+│
+├─ EXEffect* (特效矩阵)
+│   EXEffectMatReset, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ,
+│   EXEffectMatScale
+│
+├─ EXPause* (暂停)
+│   EXPauseUnit
+│
+├─ 其他 EX
+│   EXDisplayChat, EXExecuteScript
+│
+├─ EXDclareButtonIcon (特殊拼写)
+│   EXDclareButtonIcon, EXBlendButtonIcon
+
+■ KK 前缀 (约 20+)
+├─ KKHookCode* (挂钩)
+│   KKHookCodeBoolean, KKHookCodeCode, KKHookCodeHandle, KKHookCodeInteger,
+│   KKHookCodeReal, KKHookCodeString, KKHookCodeVoid, KKHookCodeReal
+│
+├─ KKCommand* (命令按钮)
+│   KKCommandButtonClick, KKCommandButtonGetAbilityId, KKCommandButtonGetOrderId,
+│   KKCommandGetCooldownModel, KKCommandSetCooldownModelSize, KKCommandSetCooldownModelSize2,
+│   KKCommandTargetClick, KKCommandTerrainClick, KKSetCommandUnitAbility
+│
+├─ KKCreate* / KKDestroy* (创建销毁)
+│   KKCreateCommandButton, KKDestroyCommandButton
+│
+├─ KKGet* / KKSet* / KKSimple*
+│   KKSimpleFrameIsVisible
+
+■ RequestExtra* (4个)
+│   RequestExtraBooleanData, RequestExtraIntegerData, RequestExtraRealData,
+│   RequestExtraStringData
+
+■ Set/Get (2个)
+│   SetUnitState, GetUnitState, GetEventDamage
+
+================================================================================
+说明:
+- 总计 683 个 JAPI 函数
+- 按前缀分组，同组内按字母顺序排列
+- 部分函数可能有重复分类（跨越多个类别）
+================================================================================

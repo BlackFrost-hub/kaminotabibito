@@ -67,6 +67,10 @@ if (typeof 表现系统.init === "function") 表现系统.init();
 const 存档系统 = require("系统.10．存档系统.index") as { init?: (this: void) => void };
 if (typeof 存档系统.init === "function") 存档系统.init();
 
+// // ---------- 11．剧情系统 ----------
+const 剧情系统 = require("系统.11．剧情系统.index") as { init?: (this: void) => void };
+if (typeof 剧情系统.init === "function") 剧情系统.init();
+
 // // ---------- 12．测试系统 ----------
 // 通过统一的 index.ts 入口加载测试，在 系统.12．测试系统.index 中配置开关
 require("系统.12．测试系统.index");
