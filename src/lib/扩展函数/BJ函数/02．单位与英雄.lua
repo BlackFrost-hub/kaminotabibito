@@ -29,11 +29,11 @@ local bj_wantDestroyGroup = false
 --- GroupAddGroup 的目标单位组
 local bj_groupAddGroupDest = nil
 --- CountUnitsInGroup 的回调函数
-local function CountUnitsInGroupEnum(self)
+local function CountUnitsInGroupEnum()
     bj_groupCountUnits = bj_groupCountUnits + 1
 end
 --- GroupAddGroup 的回调函数
-local function GroupAddGroupEnum(self)
+local function GroupAddGroupEnum()
     if bj_groupAddGroupDest ~= nil then
         jass.GroupAddUnit(
             bj_groupAddGroupDest,
@@ -61,22 +61,22 @@ end
 ____exports.bj_MODIFYMETHOD_SET = ____jglobals_bj_MODIFYMETHOD_SET_5
 --- 为指定玩家选中单位（本地操作，避免同步问题）
 -- 对应JASS: SelectUnitForPlayerSingle
-function ____exports.SelectUnitForPlayerSingle(self, whichUnit, whichPlayer)
+function ____exports.SelectUnitForPlayerSingle(whichUnit, whichPlayer)
     if jass.GetLocalPlayer() == whichPlayer then
         jass.ClearSelection()
         jass.SelectUnit(whichUnit, true)
     end
 end
-function ____exports.GetUnitCurrentOrder(self, unit)
+function ____exports.GetUnitCurrentOrder(unit)
     return jass.GetUnitCurrentOrder(unit)
 end
-function ____exports.IsUnitDeadBJ(self, whichUnit)
+function ____exports.IsUnitDeadBJ(whichUnit)
     return jass.GetUnitState(whichUnit, jass.UNIT_STATE_LIFE) <= 0
 end
-function ____exports.IsUnitAliveBJ(self, whichUnit)
-    return not ____exports.IsUnitDeadBJ(nil, whichUnit)
+function ____exports.IsUnitAliveBJ(whichUnit)
+    return not ____exports.IsUnitDeadBJ(whichUnit)
 end
-function ____exports.GetHeroStatBJ(self, whichStat, whichHero, includeBonuses)
+function ____exports.GetHeroStatBJ(whichStat, whichHero, includeBonuses)
     if whichStat == jglobals.bj_HEROSTAT_STR then
         return jass.GetHeroStr(whichHero, includeBonuses)
     elseif whichStat == jglobals.bj_HEROSTAT_AGI then
@@ -86,52 +86,52 @@ function ____exports.GetHeroStatBJ(self, whichStat, whichHero, includeBonuses)
     end
     return 0
 end
-function ____exports.ModifyHeroStat(self, whichStat, whichHero, modifyMethod, value)
+function ____exports.ModifyHeroStat(whichStat, whichHero, modifyMethod, value)
     if modifyMethod == jglobals.bj_MODIFYMETHOD_ADD then
         jass.SetHeroStat(
             whichHero,
             whichStat,
-            ____exports.GetHeroStatBJ(nil, whichStat, whichHero, false) + value
+            ____exports.GetHeroStatBJ(whichStat, whichHero, false) + value
         )
     elseif modifyMethod == jglobals.bj_MODIFYMETHOD_SUB then
         jass.SetHeroStat(
             whichHero,
             whichStat,
-            ____exports.GetHeroStatBJ(nil, whichStat, whichHero, false) - value
+            ____exports.GetHeroStatBJ(whichStat, whichHero, false) - value
         )
     elseif modifyMethod == jglobals.bj_MODIFYMETHOD_SET then
         jass.SetHeroStat(whichHero, whichStat, value)
     end
 end
-function ____exports.SetUnitFacingToFaceUnitTimed(self, whichUnit, target, duration)
+function ____exports.SetUnitFacingToFaceUnitTimed(whichUnit, target, duration)
     local angle = jglobals.bj_RADTODEG * jass.Atan2(
         jass.GetUnitY(target) - jass.GetUnitY(whichUnit),
         jass.GetUnitX(target) - jass.GetUnitX(whichUnit)
     )
     jass.SetUnitFacingTimed(whichUnit, angle, duration)
 end
-function ____exports.GetUnitManaPercentBJ(self, whichUnit)
+function ____exports.GetUnitManaPercentBJ(whichUnit)
     local maxMana = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA)
     if maxMana <= 0 then
         return 0
     end
     return jass.GetUnitState(whichUnit, jass.UNIT_STATE_MANA) / maxMana * 100
 end
-function ____exports.SetUnitManaPercentBJ(self, whichUnit, percent)
+function ____exports.SetUnitManaPercentBJ(whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_MANA,
         jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01
     )
 end
-function ____exports.GetUnitLifePercentBJ(self, whichUnit)
+function ____exports.GetUnitLifePercentBJ(whichUnit)
     local maxLife = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE)
     if maxLife <= 0 then
         return 0
     end
     return jass.GetUnitState(whichUnit, jass.UNIT_STATE_LIFE) / maxLife * 100
 end
-function ____exports.SetUnitLifePercentBJ(self, whichUnit, percent)
+function ____exports.SetUnitLifePercentBJ(whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_LIFE,
@@ -139,15 +139,15 @@ function ____exports.SetUnitLifePercentBJ(self, whichUnit, percent)
     )
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API）
-function ____exports.GetUnitLifePercent(self, whichUnit)
-    return ____exports.GetUnitLifePercentBJ(nil, whichUnit)
+function ____exports.GetUnitLifePercent(whichUnit)
+    return ____exports.GetUnitLifePercentBJ(whichUnit)
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitManaPercentBJ` 语义一致
-function ____exports.GetUnitManaPercent(self, whichUnit)
-    return ____exports.GetUnitManaPercentBJ(nil, whichUnit)
+function ____exports.GetUnitManaPercent(whichUnit)
+    return ____exports.GetUnitManaPercentBJ(whichUnit)
 end
 --- 对齐 Blizzard.j：`SetUnitState(LIFE, RMaxBJ(0, value))`（非百分比版）
-function ____exports.SetUnitLifeBJ(self, whichUnit, value)
+function ____exports.SetUnitLifeBJ(whichUnit, value)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_LIFE,
@@ -155,7 +155,7 @@ function ____exports.SetUnitLifeBJ(self, whichUnit, value)
     )
 end
 --- 对齐 Blizzard.j：`SetUnitState(MANA, RMaxBJ(0, value))`
-function ____exports.SetUnitManaBJ(self, whichUnit, value)
+function ____exports.SetUnitManaBJ(whichUnit, value)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_MANA,
@@ -164,7 +164,7 @@ function ____exports.SetUnitManaBJ(self, whichUnit, value)
 end
 --- 设置英雄等级（可选择是否显示升级动画）
 -- 对应JASS: SetHeroLevelBJ
-function ____exports.SetHeroLevelBJ(self, whichHero, level, showEyeCandy)
+function ____exports.SetHeroLevelBJ(whichHero, level, showEyeCandy)
     if whichHero == nil or whichHero == 0 then
         return
     end
@@ -175,7 +175,7 @@ function ____exports.SetHeroLevelBJ(self, whichHero, level, showEyeCandy)
 end
 --- 增加英雄经验值
 -- 对应JASS: AddHeroXPSwapped
-function ____exports.AddHeroXPSwapped(self, amount, whichHero, shareGolden)
+function ____exports.AddHeroXPSwapped(amount, whichHero, shareGolden)
     if whichHero == nil or whichHero == 0 then
         return
     end
@@ -183,7 +183,7 @@ function ____exports.AddHeroXPSwapped(self, amount, whichHero, shareGolden)
 end
 --- 暂停/恢复英雄经验获取
 -- 对应JASS: SuspendHeroXPBJ
-function ____exports.SuspendHeroXPBJ(self, pause, whichHero)
+function ____exports.SuspendHeroXPBJ(pause, whichHero)
     if whichHero == nil or whichHero == 0 then
         return
     end
@@ -191,7 +191,7 @@ function ____exports.SuspendHeroXPBJ(self, pause, whichHero)
 end
 --- 判断英雄经验是否暂停
 -- 对应JASS: IsSuspendedXPBJ
-function ____exports.IsSuspendedXPBJ(self, whichHero)
+function ____exports.IsSuspendedXPBJ(whichHero)
     if whichHero == nil or whichHero == 0 then
         return false
     end
@@ -199,7 +199,7 @@ function ____exports.IsSuspendedXPBJ(self, whichHero)
 end
 --- 修改英雄技能点数
 -- 对应JASS: ModifyHeroSkillPoints
-function ____exports.ModifyHeroSkillPoints(self, whichHero, whichStat, modifyMethod, value)
+function ____exports.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value)
     if whichHero == nil or whichHero == 0 then
         return false
     end
@@ -207,7 +207,7 @@ function ____exports.ModifyHeroSkillPoints(self, whichHero, whichStat, modifyMet
 end
 --- 判断单位是否拥有指定buff
 -- 对应BJ: UnitHasBuffBJ (1.27 没有 UnitHasBuff，用 GetUnitAbilityLevel 实现)
-function ____exports.UnitHasBuffBJ(self, whichUnit, buffId)
+function ____exports.UnitHasBuffBJ(whichUnit, buffId)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
@@ -215,7 +215,7 @@ function ____exports.UnitHasBuffBJ(self, whichUnit, buffId)
 end
 --- 移除单位所有指定类型的buff
 -- 对应JASS: UnitRemoveBuffBJ
-function ____exports.UnitRemoveBuffBJ(self, buffId, whichUnit)
+function ____exports.UnitRemoveBuffBJ(buffId, whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return
     end
@@ -223,12 +223,12 @@ function ____exports.UnitRemoveBuffBJ(self, buffId, whichUnit)
 end
 --- 获取刚学会的技能ID
 -- 对应JASS: GetLearnedSkillBJ
-function ____exports.GetLearnedSkillBJ(self)
+function ____exports.GetLearnedSkillBJ()
     return jass.GetLearnedSkill()
 end
 --- 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
 -- 对应BJ: CountUnitsInGroup
-function ____exports.CountUnitsInGroup(self, g)
+function ____exports.CountUnitsInGroup(g)
     if g == nil or g == 0 then
         return 0
     end
@@ -243,7 +243,7 @@ function ____exports.CountUnitsInGroup(self, g)
 end
 --- 将一个单位组的单位添加到另一个单位组（1.27 没有 GroupAddGroup）
 -- 对应BJ: GroupAddGroup
-function ____exports.GroupAddGroup(self, sourceGroup, destGroup)
+function ____exports.GroupAddGroup(sourceGroup, destGroup)
     if sourceGroup == nil or sourceGroup == 0 or destGroup == nil or destGroup == 0 then
         return
     end

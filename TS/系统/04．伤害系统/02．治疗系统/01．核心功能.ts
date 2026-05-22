@@ -192,6 +192,11 @@ export function registerHealEvent(cb: HealEventListener): void {
   if (typeof cb === "function") healEventListeners.push(cb);
 }
 
+/** 注册最终治疗监听：实际加血完成后触发，业务侧只读使用。 */
+export function registerAppliedFinalHealListener(this: void, cb: HealEventListener): void {
+  registerHealEvent(cb);
+}
+
 // ==========================================================================================
 // 内部函数
 // ==========================================================================================

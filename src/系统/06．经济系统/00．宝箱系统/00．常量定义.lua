@@ -13,7 +13,7 @@ local function stringToFourCC(s)
 end
 ____exports["宝箱系统开关"] = true
 ____exports.CHEST_TYPES = {{
-    destructableType = "LTbs",
+    destructableType = "LTbr",
     openTime = 3,
     name = "盗贼宝箱",
     picks = 1,

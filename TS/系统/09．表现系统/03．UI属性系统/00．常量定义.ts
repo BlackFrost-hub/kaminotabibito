@@ -169,7 +169,7 @@ export const DETAIL_SEPARATOR_WIDTH = 0.0022;
 export const DETAIL_SEPARATOR_HEIGHT_MULT = 1.05;
 
 /** 分隔符Y坐标偏移量（用于对齐文本） */
-export const DETAIL_SEPARATOR_Y_OFFSET = 0.155;
+export const DETAIL_SEPARATOR_Y_OFFSET = 0.152;
 
 /** 分隔符X坐标偏移量（用于调整水平位置） */
 export const DETAIL_SEPARATOR_X_OFFSET = -0.036;

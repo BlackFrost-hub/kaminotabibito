@@ -28,6 +28,7 @@ local registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
 local dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index")
+local heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_3.debugLog
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
@@ -130,6 +131,9 @@ local function registerHeroDependents(whichHero)
         )
         invokeSelectionCenterInit(owner)
         invokeSelectionCenterSeed(owner, whichHero)
+        if type(heroVoiceSystem.onPlayerHeroRegistered) == "function" then
+            heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero)
+        end
         if not uiRegisteredPlayers:has(playerId) then
             local taskUiReady = true
             invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)

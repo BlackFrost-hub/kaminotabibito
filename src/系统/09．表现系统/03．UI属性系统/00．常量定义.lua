@@ -109,7 +109,7 @@ ____exports.DETAIL_SEPARATOR_WIDTH = 0.0022
 --- 分隔符线的高度倍数（相对于行高）
 ____exports.DETAIL_SEPARATOR_HEIGHT_MULT = 1.05
 --- 分隔符Y坐标偏移量（用于对齐文本）
-____exports.DETAIL_SEPARATOR_Y_OFFSET = 0.155
+____exports.DETAIL_SEPARATOR_Y_OFFSET = 0.152
 --- 分隔符X坐标偏移量（用于调整水平位置）
 ____exports.DETAIL_SEPARATOR_X_OFFSET = -0.036
 --- 分隔符起始行（从第几行开始显示）

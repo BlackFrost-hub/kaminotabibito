@@ -5,6 +5,7 @@
 /.w3x/
 *.w3x
 ~$*
+/JASS
 /.codex_tmp_buff_sheet_fix
 node_modules/
 npm-debug.log*

@@ -29,7 +29,7 @@ local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local _____6A21_5757_540D = "使者魔轮被动测试"
 local _____6D4B_8BD5_547D_4EE4_4F4E_84DD = "143"
-local _____6D4B_8BD5_547D_4EE4_4E22_5F03 = "145"
+local _____6D4B_8BD5_547D_4EE4_4E22_5F03 = "144"
 local _____6D4B_8BD5_6807_7B7E = "测试:使者魔轮被动"
 local _____4F4E_84DD_6D4B_8BD5_4F24_5BB3 = 100
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()

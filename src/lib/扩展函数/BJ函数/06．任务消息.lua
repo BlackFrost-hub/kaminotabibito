@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____jglobals_bj_QUESTMESSAGE_DISCOVERED_0 = jglobals.bj_QUESTMESSAGE_DISCOVERED
@@ -172,7 +174,7 @@ if ____jglobals_bj_questWarningSound_33 == nil then
     ____jglobals_bj_questWarningSound_33 = nil
 end
 local bj_questWarningSound = ____jglobals_bj_questWarningSound_33
-function ____exports.QuestMessageBJ(self, f, messageType, message)
+function ____exports.QuestMessageBJ(f, messageType, message)
     if not jass.IsPlayerInForce(
         jass.GetLocalPlayer(),
         f
@@ -180,7 +182,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
         return
     end
     local lp = jass.GetLocalPlayer()
-    local function play(____, s)
+    local function play(s)
         if s ~= nil then
             jass.StartSound(s)
         end
@@ -203,8 +205,8 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_QUEST,
             message
         )
-        play(nil, bj_questDiscoveredSound)
-        flash(nil)
+        play(bj_questDiscoveredSound)
+        flash()
         return
     end
     if messageType == bj_QUESTMESSAGE_UPDATED then
@@ -222,8 +224,8 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_QUESTUPDATE,
             message
         )
-        play(nil, bj_questUpdatedSound)
-        flash(nil)
+        play(bj_questUpdatedSound)
+        flash()
         return
     end
     if messageType == bj_QUESTMESSAGE_COMPLETED then
@@ -241,8 +243,8 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_QUESTDONE,
             message
         )
-        play(nil, bj_questCompletedSound)
-        flash(nil)
+        play(bj_questCompletedSound)
+        flash()
         return
     end
     if messageType == bj_QUESTMESSAGE_FAILED then
@@ -260,8 +262,8 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_QUESTFAILED,
             message
         )
-        play(nil, bj_questFailedSound)
-        flash(nil)
+        play(bj_questFailedSound)
+        flash()
         return
     end
     if messageType == bj_QUESTMESSAGE_REQUIREMENT then
@@ -289,7 +291,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_MISSIONFAILED,
             message
         )
-        play(nil, bj_questFailedSound)
+        play(bj_questFailedSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_HINT then
@@ -307,7 +309,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_HINT,
             message
         )
-        play(nil, bj_questHintSound)
+        play(bj_questHintSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_ALWAYSHINT then
@@ -325,7 +327,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_ALWAYSHINT,
             message
         )
-        play(nil, bj_questHintSound)
+        play(bj_questHintSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_SECRET then
@@ -343,7 +345,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_SECRET,
             message
         )
-        play(nil, bj_questSecretSound)
+        play(bj_questSecretSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_UNITACQUIRED then
@@ -361,7 +363,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_UNITACQUIRED,
             message
         )
-        play(nil, bj_questHintSound)
+        play(bj_questHintSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_UNITAVAILABLE then
@@ -379,7 +381,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_UNITAVAILABLE,
             message
         )
-        play(nil, bj_questHintSound)
+        play(bj_questHintSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_ITEMACQUIRED then
@@ -397,7 +399,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_ITEMACQUIRED,
             message
         )
-        play(nil, bj_questItemAcquiredSound)
+        play(bj_questItemAcquiredSound)
         return
     end
     if messageType == bj_QUESTMESSAGE_WARNING then
@@ -415,7 +417,7 @@ function ____exports.QuestMessageBJ(self, f, messageType, message)
             bj_TEXT_DELAY_WARNING,
             message
         )
-        play(nil, bj_questWarningSound)
+        play(bj_questWarningSound)
     end
 end
 return ____exports

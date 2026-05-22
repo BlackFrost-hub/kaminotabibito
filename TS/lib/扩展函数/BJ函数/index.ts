@@ -1,9 +1,11 @@
+/** @noSelfInFile */
 export * from "./00．BJ全局兜底";
 export * from "./01．触发与事件";
 export * from "./02．单位与英雄";
 export * from "./03．物品与库存";
 export * from "./04．矩形与区域";
 export * from "./05A．电影函数";
+export * from "./14．音效函数";
 export * from "./05B．音效函数";
 export * from "./06．任务消息";
 export * from "./07．杂项";
@@ -18,7 +20,7 @@ import * as unitHero from "./02．单位与英雄";
 import * as itemInv from "./03．物品与库存";
 import * as rectArea from "./04．矩形与区域";
 import * as cine from "./05A．电影函数";
-import * as sound from "./05B．音效函数";
+import * as sound from "./14．音效函数";
 import * as questMsg from "./06．任务消息";
 import * as misc from "./07．杂项";
 import * as unitBjExt from "./08．单位BJ扩展";

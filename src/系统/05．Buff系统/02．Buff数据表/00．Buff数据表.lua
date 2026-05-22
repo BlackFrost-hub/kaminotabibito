@@ -1,0 +1,599 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- 自动生成文件，请勿手改。
+-- 来源：buff数据
+____exports["Buff数据表"] = {
+    B000 = {
+        _parent = "BPSE",
+        Buffubertip = "该单位被时间停止了，因此无法进行任何行为",
+        Bufftip = "时间停止",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000135.blp",
+        EditorSuffix = "(时停)",
+        key = "B000"
+    },
+    B001 = {
+        _parent = "BOae",
+        race = "creeps",
+        Buffubertip = "脱离战斗后增加35%移动速度",
+        Bufftip = "脱战状态",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000132.blp",
+        EditorName = "脱战状态",
+        key = "B001"
+    },
+    B002 = {
+        _parent = "BPSE",
+        Buffubertip = "该单位施放技能中，暂时无法作任何动作",
+        Bufftip = "施法硬直",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp",
+        key = "B002"
+    },
+    B003 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "该单位由于受到了因果之力的影响，攻速和移速被加快了",
+        Bufftip = "因果之力",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000139.blp",
+        key = "B003"
+    },
+    B004 = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "改单位的移动速度被增加了",
+        Bufftip = "轻灵",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000130.blp",
+        key = "B004"
+    },
+    B005 = {
+        _parent = "BOac",
+        race = "human",
+        Buffubertip = "该单位处于豺狼号角的作用之下，因此其攻击力得到了增强。",
+        Bufftip = "豺狼号角",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000102.blp",
+        key = "B005"
+    },
+    B007 = {
+        _parent = "Broa",
+        race = "human",
+        Buffubertip = "该单位收到了一定的作用，因此攻击力会在短时间内得到上升",
+        Bufftip = "攻击力提高",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000143.blp",
+        key = "B007"
+    },
+    B008 = {
+        _parent = "Bpoi",
+        race = "orc",
+        Buffubertip = "该单位被流血了",
+        Bufftip = "螃蟹流血",
+        TargetArt = "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000138.blp",
+        EditorName = "螃蟹流血",
+        key = "B008"
+    },
+    B009 = {
+        _parent = "BEer",
+        race = "orc",
+        Buffubertip = "该单位陷入了沙地，如不进行挣脱会持续受到伤害",
+        Bufftip = "地形下榻",
+        key = "B009"
+    },
+    B00A = {
+        _parent = "Buhf",
+        race = "orc",
+        Buffubertip = "该单位中毒了，会持续性的受到伤害",
+        Bufftip = "毒",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000142.blp",
+        EditorName = "D-极毒能量",
+        key = "B00A"
+    },
+    B00B = {
+        _parent = "Buhf",
+        race = "orc",
+        Buffubertip = "该单位中毒了，会持续性的受到伤害",
+        Bufftip = "毒",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000137.blp",
+        EditorName = "D-毒液爆发",
+        key = "B00B"
+    },
+    B00C = {
+        _parent = "Buhf",
+        race = "orc",
+        Buffubertip = "该单位中毒了，会持续性的受到伤害",
+        Bufftip = "毒",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000142.blp",
+        EditorName = "D-反召唤之毒",
+        key = "B00C"
+    },
+    B00D = {
+        _parent = "BIrg",
+        race = "human",
+        Buffubertip = "受到毒的伤害会直接免疫",
+        Bufftip = "毒防护",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000141.blp",
+        key = "B00D"
+    },
+    B00E = {
+        _parent = "BIcb",
+        Buffubertip = "该单位受到了护甲削弱的攻击，因此其护甲得到了削弱。",
+        Bufftip = "护甲降低",
+        EditorName = "护甲降低",
+        key = "B00E"
+    },
+    B00F = {
+        _parent = "BHad",
+        Buffubertip = "受到的伤害会减少10%，转移到光环拥有者身上",
+        Bufftip = "守护之盾",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000068.blp",
+        key = "B00F"
+    },
+    B00G = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度2",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B00G"
+    },
+    B00H = {
+        _parent = "BHad",
+        Buffubertip = "周围友方英雄越多，造成的伤害越高",
+        Bufftip = "指挥之剑",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000109.blp",
+        key = "B00H"
+    },
+    B00I = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "该单位的攻击速度和移动速度被增加了",
+        Bufftip = "风之加速",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000140.blp",
+        key = "B00I"
+    },
+    B00J = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "改单位的移动速度被增加了",
+        Bufftip = "后腿加速",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNBootsOfSpeed.blp",
+        key = "B00J"
+    },
+    B00K = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "改单位的移动速度被增加了",
+        Bufftip = "普攻加速",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000133.blp",
+        key = "B00K"
+    },
+    B00L = {
+        _parent = "Bakb",
+        race = "creeps",
+        Buffubertip = "该单位攻击力得到了加强。",
+        Bufftip = "攻击力提升",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000136.blp",
+        EditorName = "GJL-UP攻击力提升",
+        key = "B00L"
+    },
+    B00M = {
+        _parent = "BOac",
+        race = "creeps",
+        Buffubertip = "在沙漠的干燥热烈环境中，|cffffcc99因此每秒减少6点魔法值|r",
+        Bufftip = "沙漠环境",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp",
+        key = "B00M"
+    },
+    B00N = {
+        _parent = "BIrg",
+        race = "human",
+        Buffubertip = "在持续时间内受到的伤害减少15%",
+        Bufftip = "熔岩魔力药剂",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000158.blp",
+        key = "B00N"
+    },
+    B00O = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "该单位的移动速度增加20%",
+        Bufftip = "恶魔轻灵",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000167.blp",
+        key = "B00O"
+    },
+    B00P = {
+        _parent = "Bcri",
+        Buffubertip = "|cffcc99ff该单位造成的伤害被降低了！|r",
+        Bufftip = "造成伤害降低",
+        EditorName = "SH-造成伤害降低",
+        key = "B00P"
+    },
+    B00Q = {
+        _parent = "Bblo",
+        Buffubertip = "该单位的|cffff9900攻击力|r和|cffccffff攻击速度|r在短时间内得到了提升",
+        Bufftip = "地狱火攻击",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000190.blp",
+        EditorName = "D-地狱火攻击",
+        key = "B00Q"
+    },
+    B00R = {
+        _parent = "Binf",
+        Buffubertip = "该单位的攻速在短时间内大幅度提升",
+        Bufftip = "混焰",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000179.blp",
+        EditorName = "H-混焰",
+        key = "B00R"
+    },
+    B00S = {
+        _parent = "Bcri",
+        race = "orc",
+        Buffubertip = "该单位受到了流血效果，会在持续时间内减少生命值",
+        Bufftip = "流血",
+        TargetArt = "Objects\\Spawnmodels\\Critters\\Albatross\\CritterBloodAlbatross.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNCannibalize.blp",
+        EditorName = "YG-撕裂爪牙",
+        key = "B00S"
+    },
+    B00T = {
+        _parent = "BEer",
+        race = "creeps",
+        Buffubertip = "该单位受到了缠绕，会在一定时间内无法移动",
+        Bufftip = "缠绕",
+        EditorName = "C缠绕",
+        key = "B00T"
+    },
+    B00U = {
+        _parent = "BIpv",
+        race = "human",
+        Buffubertip = "短时间内提高力量",
+        Bufftip = "嗜狱",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000205.blp",
+        key = "B00U"
+    },
+    B00V = {
+        _parent = "Basl",
+        race = "human",
+        Buffubertip = "该单位受到了|cff800080暗黑侵蚀，|r受到伤害时会额外承受伤害",
+        Bufftip = "WP-统领战盔",
+        TargetArt = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000235.blp",
+        key = "B00V"
+    },
+    B00X = {
+        _parent = "BHab",
+        Buffubertip = "该单位处于使者魔炉的笼罩之下，因此其魔法恢复速度和魔法伤害将提高",
+        Bufftip = "new使者魔炉",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000230.blp",
+        key = "B00X"
+    },
+    B00Z = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "改单位的移动速度被增加了",
+        Bufftip = "new双翼恶魔雕像",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000217.blp",
+        key = "B00Z"
+    },
+    B010 = {
+        _parent = "Buhf",
+        race = "human",
+        Buffubertip = "该单位被侵蚀了，死亡后会为施术者恢复生命",
+        Bufftip = "狱生侵蚀",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000199.blp",
+        EditorName = "Y-狱生面具（强化）",
+        key = "B010"
+    },
+    B011 = {
+        _parent = "Bpoi",
+        race = "human",
+        Buffubertip = "该单位被点燃了",
+        Bufftip = "点燃",
+        TargetArt = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeDamageTarget.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000273.blp",
+        EditorName = "new炽热之弹矢",
+        key = "B011"
+    },
+    B012 = {
+        _parent = "BEer",
+        race = "orc",
+        Buffubertip = "该单位被恶魔束缚了，会持续的受到黑暗伤害",
+        Bufftip = "恶魔之使",
+        TargetArt = "war3mapImported\\hell roots buff.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp",
+        Spelldetail = 2,
+        key = "B012"
+    },
+    B013 = {
+        _parent = "BEsh",
+        race = "orc",
+        Buffubertip = "该单位中毒了，因此会受到持续伤害",
+        Bufftip = "毒",
+        EditorName = "new亡者毒刺",
+        key = "B013"
+    },
+    B014 = {
+        _parent = "BEer",
+        race = "orc",
+        Buffubertip = "该单位被恶魔束缚了，会持续的受到黑暗伤害",
+        Bufftip = "恶魔掌握",
+        TargetArt = "war3mapImported\\EntanglingBonesTarget.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp",
+        Spelldetail = 2,
+        key = "B014"
+    },
+    B015 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "裁决审判",
+        Bufftip = "裁决审判",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNALLT-R2.blp",
+        key = "B015"
+    },
+    B016 = {
+        _parent = "Bslo",
+        race = "creeps",
+        Buffubertip = "该单位被时间减速了，其状态恢复，移动速度和攻击速度都会下降。",
+        Bufftip = "时间减速",
+        key = "B016"
+    },
+    B017 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "攻击力短暂小幅度提高",
+        Bufftip = "攻击力提升",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNInnerFire.blp",
+        EditorName = "阿劳伦特-切换加攻",
+        key = "B017"
+    },
+    B018 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "天堂审判",
+        Bufftip = "天堂审判",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNALLT-R.blp",
+        key = "B018"
+    },
+    B019 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "裁决制裁",
+        Bufftip = "裁决制裁",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNALLT-Q2.blp",
+        key = "B019"
+    },
+    B01A = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "魔力放出",
+        Bufftip = "魔力放出",
+        key = "B01A"
+    },
+    B01B = {_parent = "BPSE", Buffubertip = "该单位被进入了硬直状态，无法进行任何行为", Bufftip = "硬直", key = "B01B"},
+    B01C = {_parent = "Basl", Buffubertip = "矢量移动中，移动速度加快", Bufftip = "减速", key = "B01C"},
+    B01D = {
+        _parent = "Bcri",
+        race = "nightelf",
+        Buffubertip = "|cffcc99ff该单位造成的伤害被降低了！|r",
+        Bufftip = "造成伤害降低",
+        EditorName = "SH-造成伤害降低-一方通行残废",
+        key = "B01D"
+    },
+    B01E = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "该单位的攻击力和攻速获得短暂提高",
+        Bufftip = "祭礼之蛇",
+        key = "B01E"
+    },
+    B01G = {
+        _parent = "Bpoi",
+        race = "orc",
+        Bufftip = "狼人匕首",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000138.blp",
+        EditorName = "狼人匕首",
+        key = "B01G"
+    },
+    B01I = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度1",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B01I"
+    },
+    B01J = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度4",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B01J"
+    },
+    B01K = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度5",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B01K"
+    },
+    B01L = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度6",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B01L"
+    },
+    B01M = {
+        _parent = "Bakb",
+        race = "unknown",
+        Buffubertip = "该单位在该难度下受到了各种加成",
+        Bufftip = "难度3",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNLament.blp",
+        key = "B01M"
+    },
+    B01N = {
+        _parent = "Bfzy",
+        race = "undead",
+        Buffubertip = "暂时增加移速，并且有大概率闪避伤害",
+        Bufftip = "『沙漠化身』",
+        EditorName = "DMBoss-KLKDR",
+        key = "B01N"
+    },
+    B01O = {
+        _parent = "Bpoi",
+        race = "undead",
+        Buffubertip = "每秒损失一定生命值",
+        Bufftip = "歇毒针",
+        EditorName = "DM-KLKDR2",
+        key = "B01O"
+    },
+    B01P = {
+        _parent = "BIpv",
+        race = "human",
+        Buffubertip = "短时间内提高力量",
+        Bufftip = "食人花精粹品",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000331.blp",
+        key = "B01P"
+    },
+    B01Q = {
+        _parent = "BOae",
+        race = "human",
+        Buffubertip = "该单位的移动速度被增加了",
+        Bufftip = "12%移速加成",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNBootsOfSpeed.blp",
+        key = "B01Q"
+    },
+    B01R = {
+        _parent = "Bpoi",
+        race = "human",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000342.blp",
+        EditorName = "LX-巨魔头颅",
+        key = "B01R"
+    },
+    B01S = {
+        _parent = "BOac",
+        race = "human",
+        Buffubertip = "该单位处于精灵号角的作用之下，因此其攻击力和防御力得到了增强。",
+        Bufftip = "精灵号角",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTN000346.blp",
+        key = "B01S"
+    },
+    B01T = {
+        _parent = "Binf",
+        Buffubertip = "短时间内增加吸血量",
+        Bufftip = "|cffff0000嗜血|r",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNPotionOfVampirism.blp",
+        EditorName = "嗜血（嗜血兽人）",
+        key = "B01T"
+    },
+    B01U = {
+        _parent = "BOae",
+        Buffubertip = "该单位移动速度和攻击速度都加快了。",
+        Bufftip = "兽人战鼓",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNJanggo.blp",
+        key = "B01U"
+    },
+    B01V = {_parent = "BHds", Buffubertip = "该单位暂时是无敌的。", Bufftip = "|cffff9900切换|r", key = "B01V"},
+    B01W = {
+        _parent = "Bfzy",
+        race = "nightelf",
+        Buffubertip = "该单位处于积攒中，其攻击力和暴击率都增加了。",
+        Bufftip = "积攒",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNskill6.blp",
+        key = "B01W"
+    },
+    B01X = {
+        _parent = "Bfzy",
+        race = "nightelf",
+        Buffubertip = "提高攻击速度和移动速度。",
+        Bufftip = "无双",
+        TargetArt = "Abilities\\Spells\\Items\\AIlm\\AIlmTarget.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNskill11.blp",
+        key = "B01X"
+    },
+    B01Y = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "受到的伤害暂时减少",
+        Bufftip = "防御",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNskill2.blp",
+        key = "B01Y"
+    },
+    B01Z = {_parent = "Bcrs", Buffubertip = "该单位受到了诅咒的作用，会发生什么呢？", EditorName = "Debuff-食人魔咒", key = "B01Z"},
+    B020 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "魔抗暂时大幅度增加",
+        Bufftip = "|cffffffcc守护屏障|r",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNskill7.blp",
+        key = "B020"
+    },
+    B021 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "使用技能后刷新技能冷却",
+        Bufftip = "圣火神爱尔福林克的祝福",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNskill1.blp",
+        key = "B021"
+    },
+    B022 = {
+        _parent = "BOae",
+        race = "nightelf",
+        Buffubertip = "受到舞者鼓舞，攻速和移速提高了",
+        Bufftip = "舞者",
+        Buffart = "ReplaceableTextures\\CommandButtons\\TX-3_1.blp",
+        key = "B022"
+    },
+    B023 = {
+        _parent = "Brej",
+        Buffubertip = "该单位造成的伤害获得了提高。",
+        Bufftip = "伤害上升",
+        TargetArt = "war3mapImported\\SkullBuff.mdx,war3mapImported\\BloodBuff.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
+        Targetattachcount = 2,
+        Targetattach1 = "chest",
+        key = "B023"
+    },
+    B024 = {
+        _parent = "Bfro",
+        Buffubertip = "该单位会和宿主一起受到伤害",
+        Bufftip = "被精神共享的",
+        TargetArt = "Abilities\\Spells\\Human\\AerialShackles\\AerialShacklesTarget.mdl",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+        Targetattach = "chest,mount",
+        key = "B024"
+    },
+    B025 = {
+        _parent = "BOac",
+        race = "undead",
+        Buffubertip = "每有一个随从存在会增加该单位20%攻击力，|cffff0000没有随从存在时会狂暴！|r",
+        Bufftip = "随从特性（巨魔领袖）",
+        key = "B025"
+    },
+    B026 = {
+        _parent = "BOac",
+        race = "undead",
+        Buffubertip = "|cffffffcc血量为50%以上时，增加其他友方30%攻击力，|n血量为50%以下时，减少其他友方50%攻击力，但是减少剑气斩50%技能的冷却时间|n|r",
+        Bufftip = "领袖光环",
+        Buffart = "ReplaceableTextures\\CommandButtons\\BTNStaffOfPreservation.blp",
+        EditorName = "BS-领袖光环",
+        key = "B026"
+    },
+    BEer = {_parent = "BEer", Buffubertip = "该单位受到了禁锢，因此暂时不能移动。|n|cFFFFFF00【可以被驱散】|r", Bufftip = "111禁锢", key = "BEer"},
+    BHav = {_parent = "BHav", Bufftip = "濒死狂暴", key = "BHav"},
+    BIrg = {_parent = "BIrg", Bufftip = "buff-生命恢复", key = "BIrg"},
+    BIrl = {_parent = "BIrl", Bufftip = "buff-再生物品", key = "BIrl"},
+    BIrm = {_parent = "BIrm", Bufftip = "buff-净化药水", key = "BIrm"},
+    BNab = {_parent = "BNab", TargetArt = "Abilities\\Spells\\Other\\AcidBomb\\BottleImpact.mdl", key = "BNab"},
+    BNpa = {_parent = "BNpa", Buffubertip = "这个单位已被寄生，间隔一定时间就会受到伤害|n|cFFFFFF00【可以被驱散】|r", Bufftip = "1111寄生虫", key = "BNpa"},
+    BNsi = {_parent = "BNsi", Buffubertip = "该单位受到了沉默/缴械效果，或者在进行某些操作，因此暂时不能攻击/施法。", Bufftip = "沉默", key = "BNsi"},
+    BNso = {
+        _parent = "BNso",
+        Buffubertip = "该单位被沉默了",
+        Bufftip = "沉默",
+        EditorName = "沉默-默认灵魂燃烧",
+        key = "BNso"
+    },
+    Bblo = {_parent = "Bblo", EditorName = "嗜血术", key = "Bblo"},
+    Bslo = {_parent = "Bslo", EditorName = "JS-默认减速", key = "Bslo"}
+}
+____exports.default = ____exports["Buff数据表"]
+return ____exports

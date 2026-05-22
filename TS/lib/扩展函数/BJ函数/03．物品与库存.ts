@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 

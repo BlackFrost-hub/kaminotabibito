@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * 物品相关BJ函数
  *

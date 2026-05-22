@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
@@ -9,7 +11,7 @@ if ____jglobals_bj_lastCreatedImage_1 == nil then
     ____jglobals_bj_lastCreatedImage_1 = nil
 end
 ____exports.bj_lastCreatedImage = ____jglobals_bj_lastCreatedImage_1
-function ____exports.CreateImageBJ(self, file, size, where, zOffset, imageType)
+function ____exports.CreateImageBJ(file, size, where, zOffset, imageType)
     if where == nil or where == 0 then
         return nil
     end
@@ -30,13 +32,13 @@ function ____exports.CreateImageBJ(self, file, size, where, zOffset, imageType)
     )
     return ____exports.bj_lastCreatedImage
 end
-function ____exports.ShowImageBJ(self, flag, whichImage)
+function ____exports.ShowImageBJ(flag, whichImage)
     if whichImage == nil or whichImage == 0 then
         return
     end
     jass.ShowImage(whichImage, flag)
 end
-function ____exports.SetImagePositionBJ(self, whichImage, where, zOffset)
+function ____exports.SetImagePositionBJ(whichImage, where, zOffset)
     if whichImage == nil or whichImage == 0 then
         return
     end
@@ -47,7 +49,7 @@ function ____exports.SetImagePositionBJ(self, whichImage, where, zOffset)
     local y = jass.GetLocationY(where)
     jass.SetImagePosition(whichImage, x, y, zOffset)
 end
-function ____exports.SetImageColorBJ(self, whichImage, red, green, blue, alpha)
+function ____exports.SetImageColorBJ(whichImage, red, green, blue, alpha)
     if whichImage == nil or whichImage == 0 then
         return
     end
@@ -59,7 +61,7 @@ function ____exports.SetImageColorBJ(self, whichImage, red, green, blue, alpha)
         PercentTo255(100 - alpha)
     )
 end
-function ____exports.GetLastCreatedImage(self)
+function ____exports.GetLastCreatedImage()
     return ____exports.bj_lastCreatedImage
 end
 return ____exports

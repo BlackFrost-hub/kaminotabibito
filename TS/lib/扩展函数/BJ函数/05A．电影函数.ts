@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 import {
     bj_CINEMODE_GAMESPEED,
     bj_CINEMODE_INTERFACEFADE,

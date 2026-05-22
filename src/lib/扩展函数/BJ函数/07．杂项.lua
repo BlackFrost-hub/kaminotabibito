@@ -1,8 +1,10 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-function ____exports.ModifyGateBJ(self, gateOperation, d)
+function ____exports.ModifyGateBJ(gateOperation, d)
     if not d then
         return
     end
@@ -34,7 +36,7 @@ function ____exports.ModifyGateBJ(self, gateOperation, d)
         jass.SetDestructableAnimation(d, "death")
     end
 end
-function ____exports.GetUnitsInRectMatching(self, r, filter)
+function ____exports.GetUnitsInRectMatching(r, filter)
     local g = jass.CreateGroup()
     if not g then
         return nil
@@ -45,7 +47,7 @@ function ____exports.GetUnitsInRectMatching(self, r, filter)
     end
     return g
 end
-function ____exports.ForGroupBJ(self, whichGroup, callback)
+function ____exports.ForGroupBJ(whichGroup, callback)
     local wantDestroy = not not jglobals.bj_wantDestroyGroup
     jglobals.bj_wantDestroyGroup = false
     jass.ForGroup(whichGroup, callback)
@@ -53,16 +55,16 @@ function ____exports.ForGroupBJ(self, whichGroup, callback)
         jass.DestroyGroup(whichGroup)
     end
 end
-function ____exports.GetPlayersAll(self)
+function ____exports.GetPlayersAll()
     return jglobals.bj_FORCE_ALL_PLAYERS
 end
-function ____exports.GetRandomDirectionDeg(self)
+function ____exports.GetRandomDirectionDeg()
     return jass.GetRandomReal(0, 360)
 end
-function ____exports.GetSpellAbilityId(self)
+function ____exports.GetSpellAbilityId()
     return jass.GetSpellAbilityId()
 end
-function ____exports.OrderIdToString(self, orderId)
+function ____exports.OrderIdToString(orderId)
     local c1 = orderId % 256
     local c2 = jass.R2I(orderId / 256) % 256
     local c3 = jass.R2I(orderId / 256 / 256) % 256
@@ -70,23 +72,23 @@ function ____exports.OrderIdToString(self, orderId)
     return string.char(c1, c2, c3, c4)
 end
 ____exports.lastCreatedEffect = nil
-function ____exports.AddSpecialEffectTargetUnitBJ(self, attachPointName, targetWidget, modelName)
+function ____exports.AddSpecialEffectTargetUnitBJ(attachPointName, targetWidget, modelName)
     ____exports.lastCreatedEffect = jass.AddSpecialEffectTarget(modelName, targetWidget, attachPointName)
     return ____exports.lastCreatedEffect
 end
-function ____exports.OperatorDegreeMultiply(self, a, b)
+function ____exports.OperatorDegreeMultiply(a, b)
     return a * b
 end
-function ____exports.OperatorRealAdd(self, a, b)
+function ____exports.OperatorRealAdd(a, b)
     return a + b
 end
-function ____exports.OperatorRealMultiply(self, a, b)
+function ____exports.OperatorRealMultiply(a, b)
     return a * b
 end
 --- 字符串转命令ID
 -- 对应JASS: String2OrderIdBJ
 -- 先尝试OrderId，若为0再尝试UnitId
-function ____exports.String2OrderIdBJ(self, orderIdString)
+function ____exports.String2OrderIdBJ(orderIdString)
     local orderId = 0
     orderId = jass.OrderId(orderIdString)
     if orderId ~= 0 then

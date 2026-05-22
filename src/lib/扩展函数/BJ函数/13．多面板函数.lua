@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
@@ -15,7 +17,7 @@ if ____jglobals_bj_lastCreatedMultiboardItem_2 == nil then
 end
 ____exports.bj_lastCreatedMultiboardItem = ____jglobals_bj_lastCreatedMultiboardItem_2
 --- 创建多面板 - CreateMultiboardBJ
-function ____exports.CreateMultiboardBJ(self, cols, rows, title)
+function ____exports.CreateMultiboardBJ(cols, rows, title)
     ____exports.bj_lastCreatedMultiboard = jass.CreateMultiboard()
     if ____exports.bj_lastCreatedMultiboard == nil then
         return nil
@@ -27,32 +29,32 @@ function ____exports.CreateMultiboardBJ(self, cols, rows, title)
     return ____exports.bj_lastCreatedMultiboard
 end
 --- 销毁多面板 - DestroyMultiboardBJ
-function ____exports.DestroyMultiboardBJ(self, mb)
+function ____exports.DestroyMultiboardBJ(mb)
     if mb == nil then
         return
     end
     jass.DestroyMultiboard(mb)
 end
 --- 获取最后创建的多面板 - GetLastCreatedMultiboard
-function ____exports.GetLastCreatedMultiboard(self)
+function ____exports.GetLastCreatedMultiboard()
     return ____exports.bj_lastCreatedMultiboard
 end
 --- 显示/隐藏多面板 - MultiboardDisplayBJ
-function ____exports.MultiboardDisplayBJ(self, show, mb)
+function ____exports.MultiboardDisplayBJ(show, mb)
     if mb == nil then
         return
     end
     jass.MultiboardDisplay(mb, show)
 end
 --- 最小化/还原多面板 - MultiboardMinimizeBJ
-function ____exports.MultiboardMinimizeBJ(self, minimize, mb)
+function ____exports.MultiboardMinimizeBJ(minimize, mb)
     if mb == nil then
         return
     end
     jass.MultiboardMinimize(mb, minimize)
 end
 --- 设置多面板标题颜色 - MultiboardSetTitleTextColorBJ
-function ____exports.MultiboardSetTitleTextColorBJ(self, mb, red, green, blue, transparency)
+function ____exports.MultiboardSetTitleTextColorBJ(mb, red, green, blue, transparency)
     if mb == nil then
         return
     end
@@ -65,11 +67,11 @@ function ____exports.MultiboardSetTitleTextColorBJ(self, mb, red, green, blue, t
     )
 end
 --- 允许/禁止多面板显示 - MultiboardAllowDisplayBJ
-function ____exports.MultiboardAllowDisplayBJ(self, flag)
+function ____exports.MultiboardAllowDisplayBJ(flag)
     jass.MultiboardSuppressDisplay(not flag)
 end
 --- 设置多面板项目样式 - MultiboardSetItemStyleBJ
-function ____exports.MultiboardSetItemStyleBJ(self, mb, col, row, showValue, showIcon)
+function ____exports.MultiboardSetItemStyleBJ(mb, col, row, showValue, showIcon)
     if mb == nil then
         return
     end
@@ -106,7 +108,7 @@ function ____exports.MultiboardSetItemStyleBJ(self, mb, col, row, showValue, sho
     end
 end
 --- 设置多面板项目值 - MultiboardSetItemValueBJ
-function ____exports.MultiboardSetItemValueBJ(self, mb, col, row, val)
+function ____exports.MultiboardSetItemValueBJ(mb, col, row, val)
     if mb == nil then
         return
     end
@@ -143,7 +145,7 @@ function ____exports.MultiboardSetItemValueBJ(self, mb, col, row, val)
     end
 end
 --- 设置多面板项目颜色 - MultiboardSetItemColorBJ
-function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, blue, transparency)
+function ____exports.MultiboardSetItemColorBJ(mb, col, row, red, green, blue, transparency)
     if mb == nil then
         return
     end
@@ -186,7 +188,7 @@ function ____exports.MultiboardSetItemColorBJ(self, mb, col, row, red, green, bl
     end
 end
 --- 设置多面板项目宽度 - MultiboardSetItemWidthBJ
-function ____exports.MultiboardSetItemWidthBJ(self, mb, col, row, width)
+function ____exports.MultiboardSetItemWidthBJ(mb, col, row, width)
     if mb == nil then
         return
     end
@@ -223,7 +225,7 @@ function ____exports.MultiboardSetItemWidthBJ(self, mb, col, row, width)
     end
 end
 --- 设置多面板项目图标 - MultiboardSetItemIconBJ
-function ____exports.MultiboardSetItemIconBJ(self, mb, col, row, iconFileName)
+function ____exports.MultiboardSetItemIconBJ(mb, col, row, iconFileName)
     if mb == nil then
         return
     end
@@ -260,7 +262,7 @@ function ____exports.MultiboardSetItemIconBJ(self, mb, col, row, iconFileName)
     end
 end
 --- 获取最后创建的多面板项目 - GetLastCreatedMultiboardItem
-function ____exports.GetLastCreatedMultiboardItem(self)
+function ____exports.GetLastCreatedMultiboardItem()
     return ____exports.bj_lastCreatedMultiboardItem
 end
 return ____exports

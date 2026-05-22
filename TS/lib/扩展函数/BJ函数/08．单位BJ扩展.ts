@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Blizzard.j / YDTrigger `BJOptimization/Unit.h` 等单位相关 BJ 封装（迁入 BJ 库）。
  *

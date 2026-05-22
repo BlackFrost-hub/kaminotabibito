@@ -378,6 +378,10 @@ function ____exports.registerHealEvent(cb)
         healEventListeners[#healEventListeners + 1] = cb
     end
 end
+--- 注册最终治疗监听：实际加血完成后触发，业务侧只读使用。
+function ____exports.registerAppliedFinalHealListener(cb)
+    ____exports.registerHealEvent(cb)
+end
 --- 获取已损失魔法值
 local function getMissingMana(target)
     if target == nil then

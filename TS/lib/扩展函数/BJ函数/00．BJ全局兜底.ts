@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * Blizzard.j 在地图编译产物里通常会注入 `udg_bj_*` / `jass.globals` 字段。
  * 纯 Lua 或精简运行时可能缺失，这里补默认值并写回 `jass.globals`，避免读 undefined。

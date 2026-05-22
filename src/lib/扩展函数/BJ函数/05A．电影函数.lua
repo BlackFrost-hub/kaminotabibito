@@ -25,7 +25,7 @@ local CameraResetSmoothingFactorBJ = ____05B_FF0E_97F3_6548_51FD_6570.CameraRese
 local ____12_FF0E_6570_5B66_51FD_6570 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____12_FF0E_6570_5B66_51FD_6570.RMaxBJ
 local PercentTo255 = ____12_FF0E_6570_5B66_51FD_6570.PercentTo255
-function ____exports.AbortCinematicFadeBJ(self)
+function ____exports.AbortCinematicFadeBJ()
     local t1 = jglobals.bj_cineFadeContinueTimer
     local t2 = jglobals.bj_cineFadeFinishTimer
     if t1 ~= nil then
@@ -37,9 +37,9 @@ function ____exports.AbortCinematicFadeBJ(self)
 end
 jass = require("jass.common")
 jglobals = require("jass.globals")
-function ____exports.SetCinematicSceneBJ(self, soundHandle, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
+function ____exports.SetCinematicSceneBJ(soundHandle, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
     jglobals.bj_cineSceneLastSound = soundHandle
-    PlaySoundBJ(nil, soundHandle)
+    PlaySoundBJ(soundHandle)
     jass.SetCinematicScene(
         portraitUnitId,
         color,
@@ -49,10 +49,9 @@ function ____exports.SetCinematicSceneBJ(self, soundHandle, portraitUnitId, colo
         voiceoverDuration
     )
 end
-function ____exports.DoTransmissionBasicsXYBJ(self, unitId, color, x, y, soundHandle, unitName, message, duration)
+function ____exports.DoTransmissionBasicsXYBJ(unitId, color, x, y, soundHandle, unitName, message, duration)
     local hang = bj_TRANSMISSION_PORT_HANGTIME
     ____exports.SetCinematicSceneBJ(
-        nil,
         soundHandle,
         unitId,
         color,
@@ -65,7 +64,7 @@ function ____exports.DoTransmissionBasicsXYBJ(self, unitId, color, x, y, soundHa
         jass.PingMinimap(x, y, bj_TRANSMISSION_PING_TIME)
     end
 end
-function ____exports.TryInitCinematicBehaviorBJ(self)
+function ____exports.TryInitCinematicBehaviorBJ()
     if jglobals.bj_cineSceneBeingSkipped ~= nil then
         return
     end
@@ -83,11 +82,11 @@ function ____exports.TryInitCinematicBehaviorBJ(self)
     end
     jass.TriggerAddAction(jglobals.bj_cineSceneBeingSkipped, CancelCineSceneBJ)
 end
-function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, unitName, soundHandle, message, timeType, timeVal, wait)
-    ____exports.TryInitCinematicBehaviorBJ(nil)
+function ____exports.TransmissionFromUnitWithNameBJ(toForce, whichUnit, unitName, soundHandle, message, timeType, timeVal, wait)
+    ____exports.TryInitCinematicBehaviorBJ()
     local safeTime = RMaxBJ(timeVal, 0)
     local duration = 0
-    duration = GetTransmissionDuration(nil, soundHandle, timeType, safeTime)
+    duration = GetTransmissionDuration(soundHandle, timeType, safeTime)
     jglobals.bj_lastTransmissionDuration = duration
     jglobals.bj_lastPlayedSound = soundHandle
     if jass.IsPlayerInForce(
@@ -103,7 +102,6 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
             end
             local red = ____temp_0
             ____exports.DoTransmissionBasicsXYBJ(
-                nil,
                 0,
                 red,
                 0,
@@ -120,7 +118,6 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
             local x = jass.GetUnitX(whichUnit)
             local y = jass.GetUnitY(whichUnit)
             ____exports.DoTransmissionBasicsXYBJ(
-                nil,
                 unitTypeId,
                 color,
                 x,
@@ -142,10 +139,10 @@ function ____exports.TransmissionFromUnitWithNameBJ(self, toForce, whichUnit, un
         end
     end
     if wait and duration > 0 then
-        WaitTransmissionDuration(nil, soundHandle, timeType, safeTime)
+        WaitTransmissionDuration(soundHandle, timeType, safeTime)
     end
 end
-function ____exports.CinematicModeExBJ(self, cineMode, forForce, interfaceFadeTime)
+function ____exports.CinematicModeExBJ(cineMode, forForce, interfaceFadeTime)
     if not jglobals.bj_gameStarted then
         interfaceFadeTime = 0
     end
@@ -155,7 +152,7 @@ function ____exports.CinematicModeExBJ(self, cineMode, forForce, interfaceFadeTi
             jglobals.bj_cineModePriorSpeed = jass.GetGameSpeed()
             jglobals.bj_cineModePriorFogSetting = jass.IsFogEnabled()
             jglobals.bj_cineModePriorMaskSetting = jass.IsFogMaskEnabled()
-            jglobals.bj_cineModePriorDawnDusk = IsDawnDuskEnabled(nil)
+            jglobals.bj_cineModePriorDawnDusk = IsDawnDuskEnabled()
             jglobals.bj_cineModeSavedSeed = jass.GetRandomInt(0, 1000000)
         end
         if jass.IsPlayerInForce(
@@ -166,14 +163,14 @@ function ____exports.CinematicModeExBJ(self, cineMode, forForce, interfaceFadeTi
             jass.ShowInterface(false, interfaceFadeTime)
             jass.EnableUserControl(false)
             jass.EnableOcclusion(false)
-            SetCineModeVolumeGroupsBJ(nil)
+            SetCineModeVolumeGroupsBJ()
         end
         jass.SetGameSpeed(bj_CINEMODE_GAMESPEED)
         jass.SetMapFlag(MAP_LOCK_SPEED, true)
         jass.FogMaskEnable(false)
         jass.FogEnable(false)
         jass.EnableWorldFogBoundary(false)
-        EnableDawnDusk(nil, false)
+        EnableDawnDusk(false)
         jass.SetRandomSeed(0)
         return
     end
@@ -187,21 +184,21 @@ function ____exports.CinematicModeExBJ(self, cineMode, forForce, interfaceFadeTi
         jass.EnableOcclusion(true)
         jass.VolumeGroupReset()
         jass.EndThematicMusic()
-        CameraResetSmoothingFactorBJ(nil)
+        CameraResetSmoothingFactorBJ()
     end
     jass.SetMapFlag(MAP_LOCK_SPEED, false)
     jass.SetGameSpeed(jglobals.bj_cineModePriorSpeed)
     jass.FogMaskEnable(jglobals.bj_cineModePriorMaskSetting)
     jass.FogEnable(jglobals.bj_cineModePriorFogSetting)
     jass.EnableWorldFogBoundary(true)
-    EnableDawnDusk(nil, jglobals.bj_cineModePriorDawnDusk)
+    EnableDawnDusk(jglobals.bj_cineModePriorDawnDusk)
     jass.SetRandomSeed(jglobals.bj_cineModeSavedSeed)
 end
-function ____exports.CinematicModeBJ(self, cineMode, forForce)
-    ____exports.CinematicModeExBJ(nil, cineMode, forForce, bj_CINEMODE_INTERFACEFADE)
+function ____exports.CinematicModeBJ(cineMode, forForce)
+    ____exports.CinematicModeExBJ(cineMode, forForce, bj_CINEMODE_INTERFACEFADE)
 end
-function ____exports.CinematicFilterGenericBJ(self, duration, bmode, tex, red0, green0, blue0, trans0, red1, green1, blue1, trans1)
-    ____exports.AbortCinematicFadeBJ(nil)
+function ____exports.CinematicFilterGenericBJ(duration, bmode, tex, red0, green0, blue0, trans0, red1, green1, blue1, trans1)
+    ____exports.AbortCinematicFadeBJ()
     jass.SetCineFilterTexture(tex)
     jass.SetCineFilterBlendMode(bmode)
     jass.SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)

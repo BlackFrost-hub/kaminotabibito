@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____jglobals_bj_MAX_INVENTORY_0 = jglobals.bj_MAX_INVENTORY
@@ -14,10 +16,10 @@ ____exports.bj_STOCK_DEFAULT_MAX = 1
 --- 获取单位物品栏物品（1-based索引）
 -- 对应JASS: UnitItemInSlotBJ
 -- 将0-based转换为1-based索引
-function ____exports.UnitItemInSlotBJ(self, whichUnit, itemSlot)
+function ____exports.UnitItemInSlotBJ(whichUnit, itemSlot)
     return jass.UnitItemInSlot(whichUnit, itemSlot - 1)
 end
-function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
+function ____exports.GetInventoryIndexOfItemTypeBJ(whichUnit, itemId)
     do
         local index = 0
         while index < ____exports.bj_MAX_INVENTORY do
@@ -30,14 +32,14 @@ function ____exports.GetInventoryIndexOfItemTypeBJ(self, whichUnit, itemId)
     end
     return -1
 end
-function ____exports.GetItemOfTypeFromUnitBJ(self, whichUnit, itemId)
-    local index = ____exports.GetInventoryIndexOfItemTypeBJ(nil, whichUnit, itemId)
+function ____exports.GetItemOfTypeFromUnitBJ(whichUnit, itemId)
+    local index = ____exports.GetInventoryIndexOfItemTypeBJ(whichUnit, itemId)
     if index < 0 then
         return nil
     end
     return jass.UnitItemInSlot(whichUnit, index)
 end
-function ____exports.GetItemTypeCountInUnitBJ(self, whichUnit, itemId)
+function ____exports.GetItemTypeCountInUnitBJ(whichUnit, itemId)
     local totalCount = 0
     do
         local index = 0
@@ -58,10 +60,10 @@ function ____exports.GetItemTypeCountInUnitBJ(self, whichUnit, itemId)
     end
     return totalCount
 end
-function ____exports.RemoveItemTypeFromUnitBJ(self, whichUnit, itemId, count)
+function ____exports.RemoveItemTypeFromUnitBJ(whichUnit, itemId, count)
     local removedCount = 0
     while removedCount < count do
-        local item = ____exports.GetItemOfTypeFromUnitBJ(nil, whichUnit, itemId)
+        local item = ____exports.GetItemOfTypeFromUnitBJ(whichUnit, itemId)
         if item == nil then
             break
         end
@@ -87,33 +89,33 @@ end
 -- function RemoveItemFromStockBJ takes integer itemId, unit whichUnit returns nothing
 --     call RemoveItemFromStock(whichUnit, itemId)
 -- endfunction
-function ____exports.RemoveItemFromStockBJ(self, itemId, whichUnit)
+function ____exports.RemoveItemFromStockBJ(itemId, whichUnit)
     jass.RemoveItemFromStock(whichUnit, itemId)
 end
 --- 对齐 Blizzard.j：
 -- function AddItemToStockBJ takes integer itemId, unit whichUnit, integer currentStock, integer stockMax returns nothing
 --     call AddItemToStock(whichUnit, itemId, currentStock, stockMax)
 -- endfunction
-function ____exports.AddItemToStockBJ(self, itemId, whichUnit, currentStock, stockMax)
+function ____exports.AddItemToStockBJ(itemId, whichUnit, currentStock, stockMax)
     jass.AddItemToStock(whichUnit, itemId, currentStock, stockMax)
 end
 --- 对齐 Blizzard.j：
 -- function AddUnitToStockBJ takes integer unitId, unit whichUnit, integer currentStock, integer stockMax returns nothing
 --     call AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
 -- endfunction
-function ____exports.AddUnitToStockBJ(self, unitId, whichUnit, currentStock, stockMax)
+function ____exports.AddUnitToStockBJ(unitId, whichUnit, currentStock, stockMax)
     jass.AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
 end
 --- 对齐 Blizzard.j：
 -- function RemoveUnitFromStockBJ takes integer unitId, unit whichUnit returns nothing
 --     call RemoveUnitFromStock(whichUnit, unitId)
 -- endfunction
-function ____exports.RemoveUnitFromStockBJ(self, unitId, whichUnit)
+function ____exports.RemoveUnitFromStockBJ(unitId, whichUnit)
     jass.RemoveUnitFromStock(whichUnit, unitId)
 end
 --- 获取物品位置（坐标）
 -- 对应JASS: GetItemLoc
-function ____exports.GetItemLoc(self, whichItem)
+function ____exports.GetItemLoc(whichItem)
     if whichItem == nil or whichItem == 0 then
         return nil
     end
@@ -123,7 +125,7 @@ function ____exports.GetItemLoc(self, whichItem)
 end
 --- 在指定位置创建物品
 -- 对应JASS: CreateItemLoc
-function ____exports.CreateItemLoc(self, itemId, loc)
+function ____exports.CreateItemLoc(itemId, loc)
     if loc == nil or loc == 0 then
         return nil
     end
@@ -133,7 +135,7 @@ function ____exports.CreateItemLoc(self, itemId, loc)
 end
 --- 设置物品位置
 -- 对应JASS: SetItemPositionLoc
-function ____exports.SetItemPositionLoc(self, whichItem, loc)
+function ____exports.SetItemPositionLoc(whichItem, loc)
     if whichItem == nil or whichItem == 0 then
         return
     end
@@ -146,7 +148,7 @@ function ____exports.SetItemPositionLoc(self, whichItem, loc)
 end
 --- 单位在指定坐标丢弃物品
 -- 对应JASS: UnitDropItemPointLoc
-function ____exports.UnitDropItemPointLoc(self, whichUnit, whichItem, loc)
+function ____exports.UnitDropItemPointLoc(whichUnit, whichItem, loc)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
@@ -162,7 +164,7 @@ function ____exports.UnitDropItemPointLoc(self, whichUnit, whichItem, loc)
 end
 --- 单位在指定坐标使用物品
 -- 对应JASS: UnitUseItemPointLoc
-function ____exports.UnitUseItemPointLoc(self, whichUnit, whichItem, loc)
+function ____exports.UnitUseItemPointLoc(whichUnit, whichItem, loc)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end

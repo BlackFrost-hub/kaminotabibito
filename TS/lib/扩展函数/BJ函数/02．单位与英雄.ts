@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 import { RMaxBJ } from "./12．数学函数";
 
 const jass = require("jass.common") as any;

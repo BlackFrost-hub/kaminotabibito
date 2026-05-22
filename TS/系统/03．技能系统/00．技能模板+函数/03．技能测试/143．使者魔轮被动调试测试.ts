@@ -60,7 +60,7 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 
 const 模块名 = "使者魔轮被动测试";
 const 测试命令低蓝 = "143";
-const 测试命令丢弃 = "145";
+const 测试命令丢弃 = "144";
 const 测试标签 = "测试:使者魔轮被动";
 
 const 低蓝测试伤害 = 100;

@@ -32,7 +32,7 @@ end
 ____exports.bj_DEGTORAD = ____jglobals_bj_DEGTORAD_2
 --- 将缺失的 Blizzard 全局补到 `jass.globals`。
 -- 已有非 nil 值（含地图里配好的常数）不会覆盖。
-function ____exports.ensureBlizzardJGlobals(self)
+function ____exports.ensureBlizzardJGlobals()
     local g = jglobals
     if g.bj_PI == nil then
         g.bj_PI = ____exports.bj_PI
@@ -50,5 +50,5 @@ function ____exports.ensureBlizzardJGlobals(self)
         g.bj_lastReplacedUnit = nil
     end
 end
-____exports.ensureBlizzardJGlobals(nil)
+____exports.ensureBlizzardJGlobals()
 return ____exports

@@ -12,7 +12,7 @@ ____exports.bj_lastRemovedItem = nil
 -- 
 -- @param whichItem 要移除的物品
 -- @param whichHero 物品所属单位
-function ____exports.UnitRemoveItemSwapped(self, whichItem, whichHero)
+function ____exports.UnitRemoveItemSwapped(whichItem, whichHero)
     if whichItem == nil or whichHero == nil then
         return
     end

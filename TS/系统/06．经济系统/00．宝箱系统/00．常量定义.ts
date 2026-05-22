@@ -64,12 +64,12 @@ export const 宝箱系统开关 = true;
 
 export const CHEST_TYPES: ChestTypeConfig[] = [
   {
-    destructableType: "LTbs",
+    destructableType: "LTbr",
     openTime: 3.0,
     name: "盗贼宝箱",
     picks: 1,
     dropMode: { type: "score", range: { min: 100, max: 500 } },
-    主人配置: { 单位类型: "hfoo", 准备开启搜索半径: 3000, 开启完成搜索半径: 2500 },
+    主人配置: { 单位类型: "hfoo", 准备开启搜索半径: 3000, 开启完成搜索半径: 2500 },//这里单位类型测试用，改成步兵
     高级掉落: { 随机段: [
       { 最小值: 1, 最大值: 30, 动作: [{ type: "创建物品", 物品: "火把" }, { type: "创建物品二选一", 物品1: "盗贼神符（护甲）", 物品2: "盗贼神符（魔抗）" }] },
       { 最小值: 31, 最大值: 55, 动作: [{ type: "创建物品", 物品: "金币" }] },

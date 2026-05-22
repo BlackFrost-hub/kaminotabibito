@@ -96,7 +96,7 @@ local function execRemoveItemFromStock(self, whichUnit, arg, modifiers)
     for ____, code in ipairs(targets) do
         local id = stringToFourCC(code)
         if id ~= 0 then
-            RemoveItemFromStockBJ(nil, id, whichUnit)
+            RemoveItemFromStockBJ(id, whichUnit)
         end
     end
 end
