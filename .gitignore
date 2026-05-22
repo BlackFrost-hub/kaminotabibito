@@ -7,6 +7,11 @@
 ~$*
 /JASS
 /.codex_tmp_buff_sheet_fix
+/_tmp_xlsm
+/.codex_tmp_*/
+/_tmp_*/
+/.opencode
+/%APPDATA%
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -14,6 +19,16 @@ yarn-error.log*
 pnpm-debug.log*
 *.tmp
 *.temp
+*.log
+*.bak
+*.orig
+*.rej
+*.lnk
+*.swp
+*.swo
+.idea/
+.vs/
+.DS_Store
 Thumbs.db
 Desktop.ini
 

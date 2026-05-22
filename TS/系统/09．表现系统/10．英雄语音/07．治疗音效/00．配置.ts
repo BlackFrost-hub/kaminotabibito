@@ -1,8 +1,10 @@
 /** @noSelfInFile */
 
-declare const gg_snd_IzayoiSakuya_help: any;
-declare const gg_snd_IzayoiSakuya_help2: any;
-declare const gg_snd_YakumoYukariHelp: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_IzayoiSakuya_help = jassGlobals.gg_snd_IzayoiSakuya_help;
+const gg_snd_IzayoiSakuya_help2 = jassGlobals.gg_snd_IzayoiSakuya_help2;
+const gg_snd_YakumoYukariHelp = jassGlobals.gg_snd_YakumoYukariHelp;
 
 export interface 英雄治疗音效配置 {
   英雄名: string;
@@ -20,4 +22,3 @@ export const 英雄治疗音效冷却 = 8;
 export const 治疗音效排除来源Rawcode列表: readonly string[] = ["e033"] as const;
 
 export {};
-

@@ -59,7 +59,7 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 模块名 = "命中闪避暴击测试";
-const 测试命令 = "147";
+const 测试命令 = "暴击测试";
 const 敌人类型 = stringToFourCCSafe("hfoo");
 const 单次伤害 = 10;
 const 总次数 = 20;

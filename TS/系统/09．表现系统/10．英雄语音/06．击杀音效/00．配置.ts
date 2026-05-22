@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
-declare const gg_snd_IzayoiSakuya_victory: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_IzayoiSakuya_victory = jassGlobals.gg_snd_IzayoiSakuya_victory;
 
 export interface 英雄击杀音效配置 {
   英雄名: string;
@@ -14,4 +16,3 @@ export const 英雄击杀音效配置列表: readonly 英雄击杀音效配置[]
 export const 英雄击杀音效冷却 = 10;
 
 export {};
-

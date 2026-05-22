@@ -1,19 +1,21 @@
 /** @noSelfInFile */
 
-declare const gg_snd_YakumoYukariMiss1: any;
-declare const gg_snd_YakumoYukariMiss2: any;
-declare const gg_snd_OebkMiss1_1: any;
-declare const gg_snd_OebkMiss2_1: any;
-declare const gg_snd_OflyMiss1_1: any;
-declare const gg_snd_OflyMiss2_1: any;
-declare const gg_snd_PlmljMiss1_1: any;
-declare const gg_snd_PlmljMiss2_1: any;
-declare const gg_snd_SLSMiss1_1: any;
-declare const gg_snd_SLSMiss2_1: any;
-declare const gg_snd_TlsMiss1_1: any;
-declare const gg_snd_TlsMiss2_1: any;
-declare const gg_snd_TlwMiss1_1: any;
-declare const gg_snd_TlwMiss2_1: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_YakumoYukariMiss1 = jassGlobals.gg_snd_YakumoYukariMiss1;
+const gg_snd_YakumoYukariMiss2 = jassGlobals.gg_snd_YakumoYukariMiss2;
+const gg_snd_OebkMiss1_1 = jassGlobals.gg_snd_OebkMiss1_1;
+const gg_snd_OebkMiss2_1 = jassGlobals.gg_snd_OebkMiss2_1;
+const gg_snd_OflyMiss1_1 = jassGlobals.gg_snd_OflyMiss1_1;
+const gg_snd_OflyMiss2_1 = jassGlobals.gg_snd_OflyMiss2_1;
+const gg_snd_PlmljMiss1_1 = jassGlobals.gg_snd_PlmljMiss1_1;
+const gg_snd_PlmljMiss2_1 = jassGlobals.gg_snd_PlmljMiss2_1;
+const gg_snd_SLSMiss1_1 = jassGlobals.gg_snd_SLSMiss1_1;
+const gg_snd_SLSMiss2_1 = jassGlobals.gg_snd_SLSMiss2_1;
+const gg_snd_TlsMiss1_1 = jassGlobals.gg_snd_TlsMiss1_1;
+const gg_snd_TlsMiss2_1 = jassGlobals.gg_snd_TlsMiss2_1;
+const gg_snd_TlwMiss1_1 = jassGlobals.gg_snd_TlwMiss1_1;
+const gg_snd_TlwMiss2_1 = jassGlobals.gg_snd_TlwMiss2_1;
 
 export interface 英雄闪避音效配置 {
   名称: string;
@@ -43,4 +45,3 @@ export function 取英雄闪避音效配置(this: void, 英雄名: string): 英�
   if (英雄名 == null || 英雄名 === "") return null;
   return 英雄闪避音效配置表[英雄名] ?? null;
 }
-

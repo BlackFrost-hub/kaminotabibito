@@ -1,5 +1,22 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
+local jassGlobals = require("jass.globals")
+local gg_snd_YakumoYukariMiss1 = jassGlobals.gg_snd_YakumoYukariMiss1
+local gg_snd_YakumoYukariMiss2 = jassGlobals.gg_snd_YakumoYukariMiss2
+local gg_snd_OebkMiss1_1 = jassGlobals.gg_snd_OebkMiss1_1
+local gg_snd_OebkMiss2_1 = jassGlobals.gg_snd_OebkMiss2_1
+local gg_snd_OflyMiss1_1 = jassGlobals.gg_snd_OflyMiss1_1
+local gg_snd_OflyMiss2_1 = jassGlobals.gg_snd_OflyMiss2_1
+local gg_snd_PlmljMiss1_1 = jassGlobals.gg_snd_PlmljMiss1_1
+local gg_snd_PlmljMiss2_1 = jassGlobals.gg_snd_PlmljMiss2_1
+local gg_snd_SLSMiss1_1 = jassGlobals.gg_snd_SLSMiss1_1
+local gg_snd_SLSMiss2_1 = jassGlobals.gg_snd_SLSMiss2_1
+local gg_snd_TlsMiss1_1 = jassGlobals.gg_snd_TlsMiss1_1
+local gg_snd_TlsMiss2_1 = jassGlobals.gg_snd_TlsMiss2_1
+local gg_snd_TlwMiss1_1 = jassGlobals.gg_snd_TlwMiss1_1
+local gg_snd_TlwMiss2_1 = jassGlobals.gg_snd_TlwMiss2_1
 ____exports["英雄闪避音效配置表"] = {
     ["永远17岁的少女"] = {["名称"] = "永远17岁的少女", ["音效列表"] = {gg_snd_YakumoYukariMiss1, gg_snd_YakumoYukariMiss2}},
     ["妖怪の贤者"] = {["名称"] = "妖怪の贤者", ["音效列表"] = {gg_snd_YakumoYukariMiss1, gg_snd_YakumoYukariMiss2}},

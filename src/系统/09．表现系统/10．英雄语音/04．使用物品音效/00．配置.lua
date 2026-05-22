@@ -1,5 +1,17 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
+local jassGlobals = require("jass.globals")
+local gg_snd_IzayoiSakuya_Use = jassGlobals.gg_snd_IzayoiSakuya_Use
+local gg_snd_IzayoiSakuya_Use2 = jassGlobals.gg_snd_IzayoiSakuya_Use2
+local gg_snd_YakumoYukariUse = jassGlobals.gg_snd_YakumoYukariUse
+local gg_snd_OebkUse_1 = jassGlobals.gg_snd_OebkUse_1
+local gg_snd_OflyUse_1 = jassGlobals.gg_snd_OflyUse_1
+local gg_snd_PlmljUse_1 = jassGlobals.gg_snd_PlmljUse_1
+local gg_snd_SlsUse_1 = jassGlobals.gg_snd_SlsUse_1
+local gg_snd_TlsUse_1 = jassGlobals.gg_snd_TlsUse_1
+local gg_snd_TlwUse_1 = jassGlobals.gg_snd_TlwUse_1
 ____exports["英雄使用物品音效配置列表"] = {
     {["英雄名"] = "十六夜咲夜", ["是否3D"] = false, ["音效列表"] = {gg_snd_IzayoiSakuya_Use, gg_snd_IzayoiSakuya_Use2}},
     {["英雄名"] = "八云紫", ["是否3D"] = false, ["音效列表"] = {gg_snd_YakumoYukariUse}},

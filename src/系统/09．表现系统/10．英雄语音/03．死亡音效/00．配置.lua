@@ -1,5 +1,23 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
+local jassGlobals = require("jass.globals")
+local gg_snd_YakumoYukariDeath1 = jassGlobals.gg_snd_YakumoYukariDeath1
+local gg_snd_YakumoYukariDeath2 = jassGlobals.gg_snd_YakumoYukariDeath2
+local gg_snd_HeroMoonPriestessDeath1 = jassGlobals.gg_snd_HeroMoonPriestessDeath1
+local gg_snd_OebkDeath1 = jassGlobals.gg_snd_OebkDeath1
+local gg_snd_OebkDeath2 = jassGlobals.gg_snd_OebkDeath2
+local gg_snd_OlfyDeath1 = jassGlobals.gg_snd_OlfyDeath1
+local gg_snd_OlfyDeath2 = jassGlobals.gg_snd_OlfyDeath2
+local gg_snd_PlmljDeath1 = jassGlobals.gg_snd_PlmljDeath1
+local gg_snd_PlmljDeath2 = jassGlobals.gg_snd_PlmljDeath2
+local gg_snd_SlsDeath1 = jassGlobals.gg_snd_SlsDeath1
+local gg_snd_SlsDeath2 = jassGlobals.gg_snd_SlsDeath2
+local gg_snd_TlsDeath1 = jassGlobals.gg_snd_TlsDeath1
+local gg_snd_TlsDeath2 = jassGlobals.gg_snd_TlsDeath2
+local gg_snd_TlwDeath1 = jassGlobals.gg_snd_TlwDeath1
+local gg_snd_TlwDeath2 = jassGlobals.gg_snd_TlwDeath2
 ____exports["英雄死亡音效配置表"] = {
     ["女仆"] = {["英雄名"] = "女仆", ["音效列表"] = {gg_snd_HeroMoonPriestessDeath1}},
     ["十六夜咲夜"] = {["英雄名"] = "十六夜咲夜", ["音效列表"] = {gg_snd_HeroMoonPriestessDeath1}},

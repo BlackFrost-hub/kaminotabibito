@@ -1,8 +1,10 @@
 /** @noSelfInFile */
 
-declare const gg_snd_IzayoiSakuya_LevelUp: any;
-declare const gg_snd_YakumoYukariLevelUP: any;
-declare const gg_snd_ReiSenlevelUP: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_IzayoiSakuya_LevelUp = jassGlobals.gg_snd_IzayoiSakuya_LevelUp;
+const gg_snd_YakumoYukariLevelUP = jassGlobals.gg_snd_YakumoYukariLevelUP;
+const gg_snd_ReiSenlevelUP = jassGlobals.gg_snd_ReiSenlevelUP;
 
 export interface 英雄升级音效配置 {
   英雄名: string;

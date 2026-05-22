@@ -17,6 +17,8 @@ local ____07_FF0E_6CBB_7597_97F3_6548 = require("系统.09．表现系统.10．�
 local ____init_82F1_96C4_6CBB_7597_97F3_6548 = ____07_FF0E_6CBB_7597_97F3_6548["init英雄治疗音效"]
 local ____08_FF0E_72B6_6001_97F3_6548 = require("系统.09．表现系统.10．英雄语音.08．状态音效.index")
 local ____init_82F1_96C4_72B6_6001_97F3_6548 = ____08_FF0E_72B6_6001_97F3_6548["init英雄状态音效"]
+local ____09_FF0E_8D2D_7269_97F3_6548 = require("系统.09．表现系统.10．英雄语音.09．购物音效.index")
+local ____init_82F1_96C4_8D2D_7269_97F3_6548 = ____09_FF0E_8D2D_7269_97F3_6548["init英雄购物音效"]
 do
     local ____export = require("系统.09．表现系统.10．英雄语音.01．闪避音效.index")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -81,6 +83,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.09．表现系统.10．英雄语音.09．购物音效.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local _____82F1_96C4_8BED_97F3_7CFB_7EDF_5DF2_521D_59CB_5316 = false
 function ____exports.init()
     if _____82F1_96C4_8BED_97F3_7CFB_7EDF_5DF2_521D_59CB_5316 then
@@ -95,6 +105,7 @@ function ____exports.init()
     ____init_82F1_96C4_51FB_6740_97F3_6548()
     ____init_82F1_96C4_6CBB_7597_97F3_6548()
     ____init_82F1_96C4_72B6_6001_97F3_6548()
+    ____init_82F1_96C4_8D2D_7269_97F3_6548()
 end
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
     ____on_82F1_96C4_6307_4EE4_97F3_6548_82F1_96C4_6CE8_518C(whichPlayer, whichHero)

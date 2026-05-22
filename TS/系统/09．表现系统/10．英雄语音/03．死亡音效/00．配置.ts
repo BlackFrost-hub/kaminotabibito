@@ -1,20 +1,22 @@
 /** @noSelfInFile */
 
-declare const gg_snd_YakumoYukariDeath1: any;
-declare const gg_snd_YakumoYukariDeath2: any;
-declare const gg_snd_HeroMoonPriestessDeath1: any;
-declare const gg_snd_OebkDeath1: any;
-declare const gg_snd_OebkDeath2: any;
-declare const gg_snd_OlfyDeath1: any;
-declare const gg_snd_OlfyDeath2: any;
-declare const gg_snd_PlmljDeath1: any;
-declare const gg_snd_PlmljDeath2: any;
-declare const gg_snd_SlsDeath1: any;
-declare const gg_snd_SlsDeath2: any;
-declare const gg_snd_TlsDeath1: any;
-declare const gg_snd_TlsDeath2: any;
-declare const gg_snd_TlwDeath1: any;
-declare const gg_snd_TlwDeath2: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_YakumoYukariDeath1 = jassGlobals.gg_snd_YakumoYukariDeath1;
+const gg_snd_YakumoYukariDeath2 = jassGlobals.gg_snd_YakumoYukariDeath2;
+const gg_snd_HeroMoonPriestessDeath1 = jassGlobals.gg_snd_HeroMoonPriestessDeath1;
+const gg_snd_OebkDeath1 = jassGlobals.gg_snd_OebkDeath1;
+const gg_snd_OebkDeath2 = jassGlobals.gg_snd_OebkDeath2;
+const gg_snd_OlfyDeath1 = jassGlobals.gg_snd_OlfyDeath1;
+const gg_snd_OlfyDeath2 = jassGlobals.gg_snd_OlfyDeath2;
+const gg_snd_PlmljDeath1 = jassGlobals.gg_snd_PlmljDeath1;
+const gg_snd_PlmljDeath2 = jassGlobals.gg_snd_PlmljDeath2;
+const gg_snd_SlsDeath1 = jassGlobals.gg_snd_SlsDeath1;
+const gg_snd_SlsDeath2 = jassGlobals.gg_snd_SlsDeath2;
+const gg_snd_TlsDeath1 = jassGlobals.gg_snd_TlsDeath1;
+const gg_snd_TlsDeath2 = jassGlobals.gg_snd_TlsDeath2;
+const gg_snd_TlwDeath1 = jassGlobals.gg_snd_TlwDeath1;
+const gg_snd_TlwDeath2 = jassGlobals.gg_snd_TlwDeath2;
 
 export interface 英雄死亡音效配置 {
   英雄名: string;
@@ -50,4 +52,3 @@ export function 取英雄死亡音效配置(this: void, 英雄名: string): 英�
   if (英雄名 == null || 英雄名 === "") return null;
   return 英雄死亡音效配置表[英雄名] ?? null;
 }
-

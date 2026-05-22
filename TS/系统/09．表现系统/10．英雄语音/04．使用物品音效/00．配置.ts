@@ -1,14 +1,16 @@
 /** @noSelfInFile */
 
-declare const gg_snd_IzayoiSakuya_Use: any;
-declare const gg_snd_IzayoiSakuya_Use2: any;
-declare const gg_snd_YakumoYukariUse: any;
-declare const gg_snd_OebkUse_1: any;
-declare const gg_snd_OflyUse_1: any;
-declare const gg_snd_PlmljUse_1: any;
-declare const gg_snd_SlsUse_1: any;
-declare const gg_snd_TlsUse_1: any;
-declare const gg_snd_TlwUse_1: any;
+const jassGlobals = require("jass.globals") as any;
+
+const gg_snd_IzayoiSakuya_Use = jassGlobals.gg_snd_IzayoiSakuya_Use;
+const gg_snd_IzayoiSakuya_Use2 = jassGlobals.gg_snd_IzayoiSakuya_Use2;
+const gg_snd_YakumoYukariUse = jassGlobals.gg_snd_YakumoYukariUse;
+const gg_snd_OebkUse_1 = jassGlobals.gg_snd_OebkUse_1;
+const gg_snd_OflyUse_1 = jassGlobals.gg_snd_OflyUse_1;
+const gg_snd_PlmljUse_1 = jassGlobals.gg_snd_PlmljUse_1;
+const gg_snd_SlsUse_1 = jassGlobals.gg_snd_SlsUse_1;
+const gg_snd_TlsUse_1 = jassGlobals.gg_snd_TlsUse_1;
+const gg_snd_TlwUse_1 = jassGlobals.gg_snd_TlwUse_1;
 
 export interface 英雄使用物品音效配置 {
   英雄名: string;

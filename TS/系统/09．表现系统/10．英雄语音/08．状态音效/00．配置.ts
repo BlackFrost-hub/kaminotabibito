@@ -1,38 +1,40 @@
 /** @noSelfInFile */
 
-declare const gg_snd_IzayoiSakuya_3: any;
-declare const gg_snd_IzayoiSakuya_damage: any;
-declare const gg_snd_IzayoiSakuya_damage2: any;
-declare const gg_snd_IzayoiSakuya_damage3: any;
-declare const gg_snd_IzayoiSakuya_Bed1: any;
-declare const gg_snd_IzayoiSakuya_Bed2: any;
-declare const gg_snd_YakumoYukariDamege2: any;
+const jassGlobals = require("jass.globals") as any;
 
-declare const gg_snd_Oebkdamage1_1: any;
-declare const gg_snd_Oebkdamage2_1: any;
-declare const gg_snd_Oebkdamage3_1: any;
-declare const gg_snd_Oebkdamage4_1: any;
-declare const gg_snd_Oflydamage1_1: any;
-declare const gg_snd_Oflydamage2_1: any;
-declare const gg_snd_oflydamage3_1: any;
-declare const gg_snd_oflydamage4_1: any;
-declare const gg_snd_Plmljdamage1_1: any;
-declare const gg_snd_Plmljdamage2_1: any;
-declare const gg_snd_Plmljdamage3_1: any;
-declare const gg_snd_Plmljdamage4_1: any;
-declare const gg_snd_SLSdamage1_1: any;
-declare const gg_snd_SLSdamage2_1: any;
-declare const gg_snd_SLSdamage3_1: any;
-declare const gg_snd_SLSdamage4_1: any;
-declare const gg_snd_Tlsdamage1_1: any;
-declare const gg_snd_Tlsdamage2_1: any;
-declare const gg_snd_Tlsdamage3_1: any;
-declare const gg_snd_Tlsdamage4_1: any;
-declare const gg_snd_Tlwdamage1_1: any;
-declare const gg_snd_Tlwdamage2_1: any;
-declare const gg_snd_Tlwdamage3_1: any;
-declare const gg_snd_Tlwdamage4_1: any;
-declare const gg_snd_8: any;
+const gg_snd_IzayoiSakuya_3 = jassGlobals.gg_snd_IzayoiSakuya_3;
+const gg_snd_IzayoiSakuya_damage = jassGlobals.gg_snd_IzayoiSakuya_damage;
+const gg_snd_IzayoiSakuya_damage2 = jassGlobals.gg_snd_IzayoiSakuya_damage2;
+const gg_snd_IzayoiSakuya_damage3 = jassGlobals.gg_snd_IzayoiSakuya_damage3;
+const gg_snd_IzayoiSakuya_Bed1 = jassGlobals.gg_snd_IzayoiSakuya_Bed1;
+const gg_snd_IzayoiSakuya_Bed2 = jassGlobals.gg_snd_IzayoiSakuya_Bed2;
+const gg_snd_YakumoYukariDamege2 = jassGlobals.gg_snd_YakumoYukariDamege2;
+
+const gg_snd_Oebkdamage1_1 = jassGlobals.gg_snd_Oebkdamage1_1;
+const gg_snd_Oebkdamage2_1 = jassGlobals.gg_snd_Oebkdamage2_1;
+const gg_snd_Oebkdamage3_1 = jassGlobals.gg_snd_Oebkdamage3_1;
+const gg_snd_Oebkdamage4_1 = jassGlobals.gg_snd_Oebkdamage4_1;
+const gg_snd_Oflydamage1_1 = jassGlobals.gg_snd_Oflydamage1_1;
+const gg_snd_Oflydamage2_1 = jassGlobals.gg_snd_Oflydamage2_1;
+const gg_snd_oflydamage3_1 = jassGlobals.gg_snd_oflydamage3_1;
+const gg_snd_oflydamage4_1 = jassGlobals.gg_snd_oflydamage4_1;
+const gg_snd_Plmljdamage1_1 = jassGlobals.gg_snd_Plmljdamage1_1;
+const gg_snd_Plmljdamage2_1 = jassGlobals.gg_snd_Plmljdamage2_1;
+const gg_snd_Plmljdamage3_1 = jassGlobals.gg_snd_Plmljdamage3_1;
+const gg_snd_Plmljdamage4_1 = jassGlobals.gg_snd_Plmljdamage4_1;
+const gg_snd_SLSdamage1_1 = jassGlobals.gg_snd_SLSdamage1_1;
+const gg_snd_SLSdamage2_1 = jassGlobals.gg_snd_SLSdamage2_1;
+const gg_snd_SLSdamage3_1 = jassGlobals.gg_snd_SLSdamage3_1;
+const gg_snd_SLSdamage4_1 = jassGlobals.gg_snd_SLSdamage4_1;
+const gg_snd_Tlsdamage1_1 = jassGlobals.gg_snd_Tlsdamage1_1;
+const gg_snd_Tlsdamage2_1 = jassGlobals.gg_snd_Tlsdamage2_1;
+const gg_snd_Tlsdamage3_1 = jassGlobals.gg_snd_Tlsdamage3_1;
+const gg_snd_Tlsdamage4_1 = jassGlobals.gg_snd_Tlsdamage4_1;
+const gg_snd_Tlwdamage1_1 = jassGlobals.gg_snd_Tlwdamage1_1;
+const gg_snd_Tlwdamage2_1 = jassGlobals.gg_snd_Tlwdamage2_1;
+const gg_snd_Tlwdamage3_1 = jassGlobals.gg_snd_Tlwdamage3_1;
+const gg_snd_Tlwdamage4_1 = jassGlobals.gg_snd_Tlwdamage4_1;
+const gg_snd_8 = jassGlobals.gg_snd_8;
 
 export interface 状态音效配置项 {
   英雄名: string;
@@ -88,4 +90,3 @@ export const 战况劣势音效配置列表: readonly 战况劣势音效配置�
 ] as const;
 
 export {};
-

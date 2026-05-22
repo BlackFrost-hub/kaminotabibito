@@ -1,7 +1,8 @@
 /** @noSelfInFile */
 
-declare const gg_snd_SecretFound: any;
-
+const jassGlobals = require("jass.globals") as {
+  gg_snd_SecretFound: any;
+};
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
   注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, player: any, command: string) => void) => void;
 };
@@ -16,11 +17,12 @@ const 模块名 = "全局音效句柄测试";
 const 测试命令 = "145";
 
 function on聊天145测试(this: void): void {
-  debugLogForce(模块名, "准备播放 gg_snd_SecretFound", "handle=", gg_snd_SecretFound);
-  PlaySoundBJ(gg_snd_SecretFound);
+  const soundHandle = jassGlobals.gg_snd_SecretFound;
+  debugLogForce(模块名, "准备播放 jass.globals.gg_snd_SecretFound", "handle=", soundHandle);
+  PlaySoundBJ(soundHandle);
 }
 
 注册聊天命令监听(测试命令, on聊天145测试);
-debugLogForce(模块名, "已注册测试：输入", 测试命令, "播放 gg_snd_SecretFound");
+debugLogForce(模块名, "已注册测试：输入", 测试命令, "播放 jass.globals.gg_snd_SecretFound");
 
 export {};
