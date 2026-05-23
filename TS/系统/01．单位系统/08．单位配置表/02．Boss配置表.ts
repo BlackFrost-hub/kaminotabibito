@@ -1,9 +1,10 @@
 ﻿/** @noSelfInFile */
-import { 创建单位名反查器 } from "./00．单位名反查工具";
 /**
  * 自动生成文件，请勿手改。
  * 来源：lua生成物遍表格.xlsm / Boss
  */
+
+import { 创建单位名反查器 } from "./00．单位名反查工具";
 
 export const Boss配置表: Record<string, Record<string, any>> = {
   "N00B": {_parent: "Npbm", Name: "地精剑客", dmgplus1: 150, HP: 3000, def: 35.0, cool1: 2.0, Art: "ReplaceableTextures\\CommandButtons\\BTNGoblinSapper.blp", file: "war3mapImported\\GoblinSamurai.mdl", abilList: "A00K,A00L,AInv", level: 10, spd: 382, atkType1: "normal", race: "demon", manaN: 100, STR: 20, AGI: 20, INT: 20, STRplus: 2.0, AGIplus: 2.0, INTplus: 2.0, nsight: 1400, modelScale: 1.5, weapType1: "MetalHeavySlice", upgrades: "R001,R002", regenMana: 1.0, ScoreScreenIcon: "ReplaceableTextures\\CommandButtons\\BTNGoblinSapper.blp", hostilePal: 1, acquire: 1200.0, regenHP: 2.0, canFlee: 0, bountyplus: 500, lumberbountyplus: 1, unit: "N00B"},
@@ -45,12 +46,6 @@ export const Boss配置表: Record<string, Record<string, any>> = {
   "N03B": {_parent: "Nbrn", Name: "熔岩恶魔", dmgplus1: 4800, HP: 22000, def: 35.0, cool1: 4.0, file: "war3mapImported\\FireTempleKeeperElemental.mdl", abilList: "A0C1,A0C0,A0BG,A0BI,AInv", level: 10, spd: 1, Missileart_1: "Abilities\\Weapons\\LordofFlameMissile\\LordofFlameMissile.mdl", atkType1: "magic", race: "demon", mana0: 1000, manaN: 1000, moveHeight: 500.0, nsight: 1800, modelScale: 2.0, Missilespeed_1: 800, regenType: "always", turnRate: 2.0, upgrades: "R001,R002", regenMana: 10.0, rangeN1: 1200, hostilePal: 1, acquire: 1200.0, regenHP: 150.0, bountyplus: 500, unit: "N03B"},
 };
 
+export const 按名字反查Boss单位ID = 创建单位名反查器(Boss配置表);
 
-export const Boss单位名反查器 = 创建单位名反查器(Boss配置表);
-
-export function 按名字反查Boss单位ID(this: void, name: string): string | undefined {
-  return Boss单位名反查器(name);
-}
 export default Boss配置表;
-
-

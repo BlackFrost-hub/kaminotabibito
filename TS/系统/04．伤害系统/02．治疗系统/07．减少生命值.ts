@@ -2,6 +2,7 @@
 
 const jass = require("jass.common") as any;
 
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitStateJass = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -18,6 +19,12 @@ const { HEAL_SYSTEM_ENABLED } = require("系统.04．伤害系统.02．治疗系
 };
 const { fireShowDamageEvent } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   fireShowDamageEvent: (this: void, target: any, amount: number, red?: number, green?: number, blue?: number) => void;
+};
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
+const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
 
 export type 资源类型 = "life" | "mana";
@@ -40,6 +47,26 @@ const 默认魔法减少特效路径 = "Abilities\\Spells\\Human\\Feedback\\Spel
 
 function 取绝对值(this: void, value: number): number {
   return value < 0 ? -value : value;
+}
+
+function 读取魔法消耗减少(this: void, target: any): number {
+  const owner = GetOwningPlayer(target);
+  if (owner == null || owner === 0) return 0;
+  if (getRegisteredPlayerHero(owner) !== target) return 0;
+
+  const value = YDUserDataGetSafe("player", owner, "魔法消耗", "real");
+  if (typeof value !== "number") return 0;
+  return value < 0 ? -value : value;
+}
+
+function 应用魔法消耗减少(this: void, target: any, amount: number, resourceType: 资源类型): number {
+  if (resourceType !== "mana" || amount >= 0) return amount;
+
+  const reduction = 读取魔法消耗减少(target);
+  if (reduction <= 0) return amount;
+  if (reduction >= 1) return 0;
+
+  return amount * (1 - reduction);
 }
 
 function 获取当前值(this: void, target: any, resourceType: 资源类型): number {
@@ -120,6 +147,9 @@ export function 变更资源值(
   if (target == null || target === 0) return 0;
   if (amount === 0) return 0;
   if (IsUnitType(target, UNIT_TYPE_DEAD) === true) return 0;
+
+  amount = 应用魔法消耗减少(target, amount, resourceType);
+  if (amount === 0) return 0;
 
   const currentValue = 获取当前值(target, resourceType);
   const maxValue = 获取最大值(target, resourceType);

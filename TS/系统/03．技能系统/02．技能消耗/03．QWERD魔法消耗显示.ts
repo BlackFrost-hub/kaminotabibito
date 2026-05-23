@@ -18,10 +18,13 @@ const 功能开关模块 = require("系统.00．核心系统.02．功能开关.0
 const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
-const { calcTotalManaCost, getAbilityManaCost } = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as {
-  calcTotalManaCost: (this: void, unit: any, abilityId: number, level: number) => number;
-  getAbilityManaCost: (this: void, unit: any, abilityId: number, level: number) => number;
+const { 计算最终魔法消耗 } = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as {
+  计算最终魔法消耗: (this: void, unit: any, abilityId: number, level: number) => number;
 };
+const 原生魔法消耗同步模块 = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步") as {
+  获取已同步技能魔法消耗: (this: void, unit: any, abilityId: number) => number;
+};
+const { 获取已同步技能魔法消耗 } = 原生魔法消耗同步模块;
 const commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位") as {
   读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
   获取D技能槽位: (this: void, whichHero: any) => readonly [number, number];
@@ -173,13 +176,7 @@ function formatManaCost(this: void, value: number): string {
 }
 
 function calcDisplayManaCost(this: void, unit: any, abilityId: number, level: number): number {
-  const totalCost = calcTotalManaCost(unit, abilityId, level);
-  if (totalCost > 0) return totalCost;
-
-  const fixedCost = getAbilityManaCost(unit, abilityId, level);
-  if (fixedCost > 0) return fixedCost;
-
-  return -1;
+  return 计算最终魔法消耗(unit, abilityId, level);
 }
 
 function 解析槽位(this: void, whichHero: any, hotkey: 热键位): 按钮槽位 {
@@ -245,7 +242,8 @@ function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, ui: �
     return;
   }
 
-  const manaCost = calcDisplayManaCost(whichHero, abilityId, level);
+  const syncedManaCost = 获取已同步技能魔法消耗(whichHero, abilityId);
+  const manaCost = syncedManaCost >= 0 ? syncedManaCost : calcDisplayManaCost(whichHero, abilityId, level);
   if (!(manaCost > 0)) {
     隐藏单元(ui);
     return;

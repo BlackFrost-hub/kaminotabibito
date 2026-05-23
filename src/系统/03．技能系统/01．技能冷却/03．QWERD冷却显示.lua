@@ -11,8 +11,8 @@ local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSy
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位")
-local ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWEGetUnitAbilityState = ydweAbility.YDWEGetUnitAbilityState
+local platformAbilityApi = require("平台扩展API取值")
+local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = platformAbilityApi["技能_获取技能当前冷却时间"]
 local fourCCTools = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToStringRaw = fourCCTools.fourCCToString
 local DzGetGameUI = japi.DzGetGameUI
@@ -160,7 +160,7 @@ local function getCooldown(whichHero, abilityId)
     if not isValidHandle(whichHero) or abilityId == 0 then
         return 0
     end
-    return YDWEGetUnitAbilityState(nil, whichHero, abilityId, ydweAbility.ABILITY_STATE_COOLDOWN) or 0
+    return _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4(whichHero, abilityId) or 0
 end
 local function formatCooldown(cooldown)
     if not (cooldown > 0.05) then

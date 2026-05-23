@@ -1,56 +1,19 @@
 /** @noSelfInFile */
 /**
- * 魔法消耗返还模块
+ * 魔法消耗计算模块
  *
- * 功能：暗夜精灵族技能施放后返还部分魔法
+ * 功能：读取物编原始消耗，并计算写入单个单位技能实例的最终魔法消耗
  */
 
 const jass = require("jass.common") as any;
-const { YDUserDataGet, YDWEGetUnitAbilityDataInteger, YDWEGetUnitAbilityDataReal, getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
+const { YDUserDataGet, YDWEGetUnitAbilityDataInteger, YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDWEGetUnitAbilityDataInteger: (u: any, abilcode: number, level: number, data_type: number) => number;
   YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
-  getObjectProperty: (objectType: number, objectId: number | string, property: string) => string;
-  ObjectType: { ABILITY: number };
-};
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
 };
 const { PERCENT_COST_THRESHOLD } = require("系统.03．技能系统.02．技能消耗.00．消耗常量") as {
   PERCENT_COST_THRESHOLD: number;
 };
-
-const pendingManaRefundByTimerHid: Record<number, { unit: any; refund: number } | undefined> = {};
-
-function onManaRefundTimerExpire(this: void): void {
-  const timer = jass.GetExpiredTimer();
-  if (!timer) return;
-
-  const timerHid = jass.GetHandleId(timer) as number;
-  const pending = pendingManaRefundByTimerHid[timerHid];
-  delete pendingManaRefundByTimerHid[timerHid];
-  safeDestroyTimer(timer);
-
-  if (!pending || !pending.unit) return;
-
-  const currentMana = jass.GetUnitState(pending.unit, jass.UNIT_STATE_MANA);
-  const maxMana = jass.GetUnitState(pending.unit, jass.UNIT_STATE_MAX_MANA);
-  const manaGap = maxMana - currentMana;
-  const actualRefund = pending.refund < manaGap ? pending.refund : manaGap;
-  if (actualRefund <= 0) return;
-
-  jass.SetUnitState(pending.unit, jass.UNIT_STATE_MANA, currentMana + actualRefund);
-}
-
-/**
- * 检查技能是否可参与返蓝逻辑
- * 默认仅处理 nightelf 技能
- */
-export function isRefundableAbility(this: void, abilityId: number): boolean {
-  const race = getObjectProperty(ObjectType.ABILITY, abilityId, "race");
-  return race === "nightelf";
-}
 
 //=============================================================================
 // 一、技能消耗计算
@@ -104,53 +67,21 @@ export function getManaCostReduction(this: void, unit: any): number {
   return YDUserDataGet("player", player, "魔法消耗", "real");
 }
 
-export function hasEffectiveManaCostReduction(this: void, unit: any): boolean {
-  const reduction = getManaCostReduction(unit);
-  const refundRatio = reduction < 0 ? -reduction : reduction;
-  return refundRatio >= 0.01;
-}
-
 /**
- * 执行魔法返还
+ * 计算写入原生技能实例的最终魔法消耗。
+ * 固定蓝耗读取物编原值；百分比蓝耗按当前最大魔法计算；最后套用技能消耗减少。
  */
-export function applyManaRefund(this: void, unit: any, manaCost: number): void {
+export function 计算最终魔法消耗(this: void, unit: any, abilityId: number, level: number): number {
+  const totalCost = calcTotalManaCost(unit, abilityId, level);
+  const baseCost = totalCost > 0 ? totalCost : getAbilityManaCost(unit, abilityId, level);
+  if (!(baseCost > 0)) return -1;
+
   const reduction = getManaCostReduction(unit);
-  const refundRatio = reduction < 0 ? -reduction : reduction;
-  if (refundRatio < 0.01) return;
+  const reductionRatio = reduction < 0 ? -reduction : reduction;
+  if (reductionRatio >= 1) return 0;
 
-  const refund = manaCost * refundRatio;
-  const timer = jass.CreateTimer();
-  if (!timer) return;
-
-  const timerHid = jass.GetHandleId(timer) as number;
-  pendingManaRefundByTimerHid[timerHid] = { unit, refund };
-  safeTimerStart(timer, 0.0, false, onManaRefundTimerExpire);
-}
-
-//=============================================================================
-// 三、统一处理入口
-//=============================================================================
-
-/**
- * 处理技能消耗返还
- *
- * @param unit 施法单位
- * @param abilityId 技能ID
- * @returns 是否执行了返还
- */
-export function handleManaRefund(this: void, unit: any, abilityId: number): boolean {
-  if (!isRefundableAbility(abilityId)) return false;
-  if (!hasEffectiveManaCostReduction(unit)) return false;
-
-  const level = jass.GetUnitAbilityLevel(unit, abilityId);
-  const manaCost = calcTotalManaCost(unit, abilityId, level);
-
-  // 非通魔面板技能
-  if (manaCost < 0) return false;
-
-  // 执行返还
-  applyManaRefund(unit, manaCost);
-  return true;
+  const finalCost = baseCost * (1 - reductionRatio);
+  return finalCost > 0 ? finalCost : 0;
 }
 
 export {};

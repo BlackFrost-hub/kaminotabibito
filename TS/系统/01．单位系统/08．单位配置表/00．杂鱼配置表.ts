@@ -1,9 +1,10 @@
 ﻿/** @noSelfInFile */
-import { 创建单位名反查器 } from "./00．单位名反查工具";
 /**
  * 自动生成文件，请勿手改。
  * 来源：lua生成物遍表格.xlsm / 杂鱼
  */
+
+import { 创建单位名反查器 } from "./00．单位名反查工具";
 
 export const 杂鱼配置表: Record<string, Record<string, any>> = {
   "n012": {_parent: "nwlt", Name: "森林野猪", dmgplus1: 14, HP: 175, cool1: 1.0, file: "units\\critters\\Felboar\\Felboar.mdl", level: 1, spd: 300, atkType1: "chaos", hideOnMinimap: 1, sight: 1800, nsight: 1400, canSleep: 0, modelScale: 1.25, upgrades: "R001", acquire: 750.0, regenHP: 1.75, canFlee: 0, collision: 24.0, True: false, unit: "n012"},
@@ -61,12 +62,6 @@ export const 杂鱼配置表: Record<string, Record<string, any>> = {
   "h00U": {_parent: "hmtm", Name: "巨魔投掷者", dmgplus1: 3000, HP: 7000, def: 30.0, cool1: 3.0, file: "war3mapImported\\TrollStonehurler.mdl", abilList: "Afsh", level: 25, spd: 200, race: "creeps", hideOnMinimap: 1, Missilespeed_1: 250, upgrades: "R001,R002", rangeN1: 1250, hostilePal: 1, acquire: 1250.0, regenHP: 20.0, canFlee: 0, unit: "h00U"},
 };
 
+export const 按名字反查杂鱼单位ID = 创建单位名反查器(杂鱼配置表);
 
-export const 杂鱼单位名反查器 = 创建单位名反查器(杂鱼配置表);
-
-export function 按名字反查杂鱼单位ID(this: void, name: string): string | undefined {
-  return 杂鱼单位名反查器(name);
-}
 export default 杂鱼配置表;
-
-

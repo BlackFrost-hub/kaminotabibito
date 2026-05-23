@@ -22,11 +22,10 @@ const commandBarAbility = require("系统.03．技能系统.01．技能冷却.04
   读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
   获取D技能槽位: (this: void, whichHero: any) => readonly [number, number];
 };
-const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  ABILITY_STATE_COOLDOWN: number;
-  YDWEGetUnitAbilityState: (u: any, abilcode: number, stateType: number) => number;
+const platformAbilityApi = require("平台扩展API取值") as {
+  技能_获取技能当前冷却时间: (this: void, 单位: any, 技能代码: number) => number;
 };
-const { YDWEGetUnitAbilityState } = ydweAbility;
+const { 技能_获取技能当前冷却时间 } = platformAbilityApi;
 const fourCCTools = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
 };
@@ -149,7 +148,7 @@ function fourCCText(this: void, abilityId: number): string {
 
 function getCooldown(this: void, whichHero: any, abilityId: number): number {
   if (!isValidHandle(whichHero) || abilityId === 0) return 0;
-  return YDWEGetUnitAbilityState(whichHero, abilityId, ydweAbility.ABILITY_STATE_COOLDOWN) || 0;
+  return 技能_获取技能当前冷却时间(whichHero, abilityId) || 0;
 }
 
 function formatCooldown(this: void, cooldown: number): string {

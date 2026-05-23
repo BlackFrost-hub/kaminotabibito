@@ -1,9 +1,10 @@
 ﻿/** @noSelfInFile */
-import { 创建单位名反查器 } from "./00．单位名反查工具";
 /**
  * 自动生成文件，请勿手改。
  * 来源：lua生成物遍表格.xlsm / 精英
  */
+
+import { 创建单位名反查器 } from "./00．单位名反查工具";
 
 export const 精英配置表: Record<string, Record<string, any>> = {
   "n01F": {_parent: "nanb", Name: "狂暴史莱姆", dmgplus1: 35, HP: 600, def: 0.0, cool1: 0.35, file: "war3mapImported\\SlimeBlue.mdl", level: 3, spd: 422, atkType1: "chaos", race: "demon", armor: "Flesh", hideOnMinimap: 1, red: 255, green: 0, blue: 0, sight: 1800, nsight: 1200, modelScale: 1.2, weapTp1: "normal", weapType1: "WoodLightBash", Missilearc_1: 0.0, Missilespeed_1: 0, upgrades: "R001,R002", rangeN1: 50, regenHP: 6.0, canFlee: 0, bountyplus: 100, unit: "n01F"},
@@ -81,12 +82,6 @@ export const 精英配置表: Record<string, Record<string, any>> = {
   "N039": {_parent: "Npbm", Name: "恶魔大统领", dmgplus1: 1500, HP: 12500, def: 22.0, cool1: 1.0, Art: "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp", file: "war3mapImported\\Wrathguard.mdl", abilList: "A0BN", level: 35, spd: 382, atkType1: "magic", race: "demon", mana0: 1000, manaN: 1000, STR: 20, AGI: 20, INT: 20, STRplus: 2.0, AGIplus: 2.0, INTplus: 2.0, green: 0, blue: 0, nsight: 1400, modelScale: 2.5, weapType1: "MetalHeavySlice", upgrades: "R001,R002", regenMana: 10.0, tilesets: "K,*", ScoreScreenIcon: "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp", hostilePal: 1, acquire: 1200.0, regenHP: 125.0, canFlee: 0, bountyplus: 3500, unit: "N039"},
 };
 
+export const 按名字反查精英单位ID = 创建单位名反查器(精英配置表);
 
-export const 精英单位名反查器 = 创建单位名反查器(精英配置表);
-
-export function 按名字反查精英单位ID(this: void, name: string): string | undefined {
-  return 精英单位名反查器(name);
-}
 export default 精英配置表;
-
-

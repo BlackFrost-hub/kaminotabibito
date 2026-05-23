@@ -6,6 +6,7 @@ export type AI目标选择方式 = "最高仇恨" | "自己" | "当前攻击目�
 export type AI施法目标类型 = "自动" | "无目标" | "自己" | "单位" | "点" | "单位或点";
 
 export interface AI技能覆盖配置 {
+  技能ID?: string;
   技能名: string;
   目标选择方式?: AI目标选择方式;
   施法目标类型?: AI施法目标类型;

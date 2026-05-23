@@ -2,8 +2,6 @@
 local ____exports = {}
 local ____00_FF0E_5355_4F4D_540D_53CD_67E5_5DE5_5177 = require("系统.01．单位系统.08．单位配置表.00．单位名反查工具")
 local _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668 = ____00_FF0E_5355_4F4D_540D_53CD_67E5_5DE5_5177["创建单位名反查器"]
---- 自动生成文件，请勿手改。
--- 来源：lua生成物遍表格.xlsm / Boss
 ____exports["Boss配置表"] = {
     N00B = {
         _parent = "Npbm",
@@ -1180,9 +1178,6 @@ ____exports["Boss配置表"] = {
         unit = "N03B"
     }
 }
-____exports["Boss单位名反查器"] = _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668(____exports["Boss配置表"])
-____exports["按名字反查Boss单位ID"] = function(name)
-    return ____exports["Boss单位名反查器"](name)
-end
+____exports["按名字反查Boss单位ID"] = _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668(____exports["Boss配置表"])
 ____exports.default = ____exports["Boss配置表"]
 return ____exports

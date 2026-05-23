@@ -14,7 +14,6 @@ export interface Boss自动技能启动上下文 {
 }
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
-
 const Boss自动技能上下文表: Record<number, Boss自动技能启动上下文 | undefined> = {};
 
 export function 记录Boss自动技能启动(this: void, unit: any, source: Boss自动技能来源): Boss自动技能启动上下文 | undefined {
@@ -38,8 +37,20 @@ export function 是否已登记Boss自动技能(this: void, unit: any): boolean 
   return 读取Boss自动技能启动上下文(unit) != null;
 }
 
+export function 获取所有Boss自动技能启动上下文(this: void): Boss自动技能启动上下文[] {
+  const result: Boss自动技能启动上下文[] = [];
+  const ids = Object.keys(Boss自动技能上下文表);
+  for (let i = 0; i < ids.length; i++) {
+    const context = Boss自动技能上下文表[Number(ids[i]) || 0];
+    if (context != null) {
+      result.push(context);
+    }
+  }
+  result.sort((a, b) => a.注册时间 - b.注册时间);
+  return result;
+}
+
 export function 清理Boss自动技能启动上下文(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
   Boss自动技能上下文表[GetHandleId(unit)] = undefined;
 }
-

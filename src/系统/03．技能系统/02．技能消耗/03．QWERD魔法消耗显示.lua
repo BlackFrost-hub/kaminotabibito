@@ -11,8 +11,9 @@ local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSy
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还")
-local calcTotalManaCost = ____require_result_1.calcTotalManaCost
-local getAbilityManaCost = ____require_result_1.getAbilityManaCost
+local _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017 = ____require_result_1["计算最终魔法消耗"]
+local _____539F_751F_9B54_6CD5_6D88_8017_540C_6B65_6A21_5757 = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步")
+local _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017 = _____539F_751F_9B54_6CD5_6D88_8017_540C_6B65_6A21_5757["获取已同步技能魔法消耗"]
 local commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位")
 local DzGetGameUI = japi.DzGetGameUI
 local DzCreateFrameByTagName = japi.DzCreateFrameByTagName
@@ -186,15 +187,7 @@ local function formatManaCost(value)
     return (tostring(jass.I2S(sec)) .. ".") .. tostring(jass.I2S(decimal))
 end
 local function calcDisplayManaCost(unit, abilityId, level)
-    local totalCost = calcTotalManaCost(unit, abilityId, level)
-    if totalCost > 0 then
-        return totalCost
-    end
-    local fixedCost = getAbilityManaCost(unit, abilityId, level)
-    if fixedCost > 0 then
-        return fixedCost
-    end
-    return -1
+    return _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017(unit, abilityId, level)
 end
 local function _____89E3_6790_69FD_4F4D(whichHero, hotkey)
     if hotkey == "D" then
@@ -273,7 +266,8 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, ui)
         _____9690_85CF_5355_5143(ui)
         return
     end
-    local manaCost = calcDisplayManaCost(whichHero, abilityId, level)
+    local syncedManaCost = _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017(whichHero, abilityId)
+    local manaCost = syncedManaCost >= 0 and syncedManaCost or calcDisplayManaCost(whichHero, abilityId, level)
     if not (manaCost > 0) then
         _____9690_85CF_5355_5143(ui)
         return

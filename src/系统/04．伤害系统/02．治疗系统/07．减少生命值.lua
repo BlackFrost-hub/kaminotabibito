@@ -3,6 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitStateJass = jass.GetUnitState
 local SetUnitStateJass = jass.SetUnitState
 local IsUnitType = jass.IsUnitType
@@ -17,11 +18,42 @@ local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统
 local HEAL_SYSTEM_ENABLED = ____require_result_0.HEAL_SYSTEM_ENABLED
 local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local fireShowDamageEvent = ____require_result_1.fireShowDamageEvent
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
 local _____9ED8_8BA4_751F_547D_51CF_5C11_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl"
 local _____9ED8_8BA4_9B54_6CD5_6062_590D_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl"
 local _____9ED8_8BA4_9B54_6CD5_51CF_5C11_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Human\\Feedback\\SpellBreakerAttack.mdl"
 local function _____53D6_7EDD_5BF9_503C(value)
     return value < 0 and -value or value
+end
+local function _____8BFB_53D6_9B54_6CD5_6D88_8017_51CF_5C11(target)
+    local owner = GetOwningPlayer(target)
+    if owner == nil or owner == 0 then
+        return 0
+    end
+    if getRegisteredPlayerHero(owner) ~= target then
+        return 0
+    end
+    local value = YDUserDataGetSafe("player", owner, "魔法消耗", "real")
+    if type(value) ~= "number" then
+        return 0
+    end
+    return value < 0 and -value or value
+end
+local function _____5E94_7528_9B54_6CD5_6D88_8017_51CF_5C11(target, amount, resourceType)
+    if resourceType ~= "mana" or amount >= 0 then
+        return amount
+    end
+    local reduction = _____8BFB_53D6_9B54_6CD5_6D88_8017_51CF_5C11(target)
+    if reduction <= 0 then
+        return amount
+    end
+    if reduction >= 1 then
+        return 0
+    end
+    return amount * (1 - reduction)
 end
 local function _____83B7_53D6_5F53_524D_503C(target, resourceType)
     if resourceType == "life" then
@@ -123,6 +155,10 @@ ____exports["变更资源值"] = function(target, amount, resourceType, showText
         return 0
     end
     if IsUnitType(target, UNIT_TYPE_DEAD) == true then
+        return 0
+    end
+    amount = _____5E94_7528_9B54_6CD5_6D88_8017_51CF_5C11(target, amount, resourceType)
+    if amount == 0 then
         return 0
     end
     local currentValue = _____83B7_53D6_5F53_524D_503C(target, resourceType)
