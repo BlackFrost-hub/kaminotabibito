@@ -2,6 +2,7 @@
 /.def
 /.JASS
 /imports
+/src/**/*.js
 /.w3x/
 *.w3x
 ~$*
