@@ -24,8 +24,9 @@ const {
   ydlStes_finishChildCleanup: (this: void, self: any) => void;
   ydlStes_readUnit5: (this: void, self: any, name: string) => any;
 };
-const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
@@ -59,11 +60,15 @@ const {
 const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
+const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动") as {
+  启动Boss战运行: (this: void, unit: any) => void;
+};
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
 const LoadInteger = jass.LoadInteger as (table: any, parentKey: number, childKey: number) => number;
 const StringHash = jass.StringHash as (value: string) => number;
+const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 
 let Boss战启动Stes触发器: any | null = null;
 
@@ -72,6 +77,9 @@ const TRIG_KEY = "__syzl_boss_ai_start_trig";
 const ATTEMPT_KEY = "__syzl_boss_ai_start_reg_attempt";
 const MAX_REG_ATTEMPTS = 30;
 const RETRY_DELAY_MS = 100;
+const Boss战箭头特效字段 = "箭头特效";
+const Boss战箭头特效模型 = "war3mapImported\\diwo2.mdx";
+const Boss战箭头特效挂点 = "origin";
 
 const 待补读Boss句柄表: Record<number, true | undefined> = {};
 
@@ -102,6 +110,16 @@ function 读取Boss战YD绑定单位(this: void): any {
   return YDUserDataGetSafe("string", Boss战表名, Boss战绑定单位字段, "unit");
 }
 
+function 确保Boss战箭头特效(this: void, bossUnit: any): void {
+  if (bossUnit == null || bossUnit === 0) return;
+  const existed = YDUserDataGetSafe("unit", bossUnit, Boss战箭头特效字段, "effect");
+  if (existed != null && existed !== 0) return;
+
+  const effect = AddSpecialEffectTarget(Boss战箭头特效模型, bossUnit, Boss战箭头特效挂点);
+  if (effect == null || effect === 0) return;
+  YDUserDataSetSafe("unit", bossUnit, Boss战箭头特效字段, "effect", effect);
+}
+
 function 登记Boss自动技能启动(this: void, bossUnit: any, source: "STES.Boss" | "Boss战.单位" | "Boss战.绑定单位"): void {
   if (bossUnit == null || bossUnit === 0) return;
   if (是否已登记Boss自动技能(bossUnit)) {
@@ -110,6 +128,8 @@ function 登记Boss自动技能启动(this: void, bossUnit: any, source: "STES.B
   }
   记录Boss自动技能启动(bossUnit, source);
   应用Boss战启动属性配置(bossUnit);
+  确保Boss战箭头特效(bossUnit);
+  启动Boss战运行(bossUnit);
   debugLogForce(Boss战启动桥接模块名, "登记Boss自动技能壳子", "source=", source, "name=", GetUnitName(bossUnit));
 }
 

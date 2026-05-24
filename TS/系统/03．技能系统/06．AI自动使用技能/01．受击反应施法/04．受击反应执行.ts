@@ -3,6 +3,7 @@
 import type { 受击反应技能配置 } from "./00．配置类型";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 const { getObjectProperty, ObjectType, YDWEDistanceBetweenUnits } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   getObjectProperty: (this: void, objectType: number, objectId: number | string, property: string) => string;
   ObjectType: { ABILITY: number };
@@ -28,6 +29,7 @@ const IssueNeutralPointOrder = jass.IssueNeutralPointOrder as (forWhichPlayer: a
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
 const IssueNeutralTargetOrder = jass.IssueNeutralTargetOrder as (forWhichPlayer: any, whichUnit: any, unitOrder: string, targetWidget: any) => boolean;
 const Player = jass.Player as (playerId: number) => any;
+const 玩家人数变量T = jglobals.T as number | undefined;
 
 const 中立敌对玩家 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE);
 const 技能命令缓存: Record<string, string> = {};
@@ -79,6 +81,11 @@ export function 受击技能是否满足条件(this: void, skill: 受击反应�
   if (skill.触发概率分子 != null && skill.触发概率分母 != null) {
     if (skill.触发概率分母 <= 0) return false;
     if (GetRandomInt(1, skill.触发概率分母) > skill.触发概率分子) return false;
+  }
+
+  if (skill.最低玩家人数 != null) {
+    const 当前玩家人数 = Number(玩家人数变量T) || 0;
+    if (当前玩家人数 < skill.最低玩家人数) return false;
   }
 
   if (source != null && source !== 0) {

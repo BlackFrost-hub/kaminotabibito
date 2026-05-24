@@ -1,6 +1,8 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local getObjectProperty = ____require_result_0.getObjectProperty
 local ObjectType = ____require_result_0.ObjectType
@@ -22,6 +24,7 @@ local IssueNeutralPointOrder = jass.IssueNeutralPointOrder
 local IssueTargetOrder = jass.IssueTargetOrder
 local IssueNeutralTargetOrder = jass.IssueNeutralTargetOrder
 local Player = jass.Player
+local _____73A9_5BB6_4EBA_6570_53D8_91CFT = jglobals.T
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
 local _____6280_80FD_547D_4EE4_7F13_5B58 = {}
 local _____6280_80FD_6570_503C_7F13_5B58 = {}
@@ -79,6 +82,12 @@ ____exports["受击技能是否满足条件"] = function(skill, unit, source)
             return false
         end
         if GetRandomInt(1, skill["触发概率分母"]) > skill["触发概率分子"] then
+            return false
+        end
+    end
+    if skill["最低玩家人数"] ~= nil then
+        local _____5F53_524D_73A9_5BB6_4EBA_6570 = __TS__Number(_____73A9_5BB6_4EBA_6570_53D8_91CFT) or 0
+        if _____5F53_524D_73A9_5BB6_4EBA_6570 < skill["最低玩家人数"] then
             return false
         end
     end

@@ -57,6 +57,7 @@ function ____exports.registerBridge(self)
     expose(nil, "isValidUnit", conditionCheck.isValidUnit)
     expose(nil, "isUnitEnemy", conditionCheck.isUnitEnemy)
     expose(nil, "isValidEnemyUnit", conditionCheck.isValidEnemyUnit)
+    expose(nil, "isValidCombatEnemyUnit", conditionCheck.isValidCombatEnemyUnit)
     expose(nil, "isNotUsingInventoryItem", conditionCheck.isNotUsingInventoryItem)
 end
 return ____exports

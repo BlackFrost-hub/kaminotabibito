@@ -27,5 +27,6 @@ export function registerBridge(): void {
     expose("isValidUnit", conditionCheck.isValidUnit);
     expose("isUnitEnemy", conditionCheck.isUnitEnemy);
     expose("isValidEnemyUnit", conditionCheck.isValidEnemyUnit);
+    expose("isValidCombatEnemyUnit", conditionCheck.isValidCombatEnemyUnit);
     expose("isNotUsingInventoryItem", conditionCheck.isNotUsingInventoryItem);
 }

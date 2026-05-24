@@ -96,6 +96,14 @@ export function isValidEnemyUnitExcludeInvincible(targetUnit: any, sourceUnit: a
 }
 
 /**
+ * 判断单位是否可作为常规战斗敌方目标
+ * 默认排除：死亡、建筑、机械、古树、无敌，以及非敌对单位
+ */
+export function isValidCombatEnemyUnit(targetUnit: any, sourceUnit: any): boolean {
+    return isValidEnemyUnitExcludeInvincible(targetUnit, sourceUnit);
+}
+
+/**
  * 判断单位是否有效且是敌对单位，并且排除古树单位
  */
 export function isValidEnemyUnitExcludeAncient(targetUnit: any, sourceUnit: any): boolean {
