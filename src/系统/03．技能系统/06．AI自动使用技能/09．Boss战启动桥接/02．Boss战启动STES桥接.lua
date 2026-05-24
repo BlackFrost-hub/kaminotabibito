@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local jassStesHashtable, countOnJassStesTable, _____6253_5370Boss_6218_542F_52A8_8DF3_8FC7, _____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D, _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D, _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8, _____5C1D_8BD5_4ECEYDUserData_8865_8BFBBoss, ____onBoss_6218_542F_52A8_5EF6_8FDF_8865_8BFB, _____5B89_6392_4E00_5E27_540E_8865_8BFBBoss, _____5904_7406Boss_6218_542F_52A8Stes, ____onBoss_6218_542F_52A8Stes_4E8B_4EF6Action, ____onRetryRegisterBoss_6218_542F_52A8Stes, scheduleRetry, ____tryRegisterBoss_6218_542F_52A8Stes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readUnit5, YDUserDataGetSafe, addDelayedCallback, debugLogForce, ____Boss_6218_542F_52A8STES_4E8B_4EF6_540D, ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D, ____Boss_6218_542F_52A8_5EF6_8FDF_6BEB_79D2, _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8, _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD, GetHandleId, GetUnitName, LoadInteger, StringHash, ____Boss_6218_542F_52A8Stes_89E6_53D1_5668, REG_GUARD, TRIG_KEY, ATTEMPT_KEY, MAX_REG_ATTEMPTS, RETRY_DELAY_MS, _____5F85_8865_8BFBBoss_53E5_67C4_8868
+local jassStesHashtable, countOnJassStesTable, _____6253_5370Boss_6218_542F_52A8_8DF3_8FC7, _____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D, _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D, _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8, _____5C1D_8BD5_4ECEYDUserData_8865_8BFBBoss, ____onBoss_6218_542F_52A8_5EF6_8FDF_8865_8BFB, _____5B89_6392_4E00_5E27_540E_8865_8BFBBoss, _____5904_7406Boss_6218_542F_52A8Stes, ____onBoss_6218_542F_52A8Stes_4E8B_4EF6Action, ____onRetryRegisterBoss_6218_542F_52A8Stes, scheduleRetry, ____tryRegisterBoss_6218_542F_52A8Stes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readUnit5, YDUserDataGetSafe, addDelayedCallback, debugLogForce, ____Boss_6218_542F_52A8STES_4E8B_4EF6_540D, ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D, ____Boss_6218_542F_52A8_5EF6_8FDF_6BEB_79D2, _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8, _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD, _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E, GetHandleId, GetUnitName, LoadInteger, StringHash, ____Boss_6218_542F_52A8Stes_89E6_53D1_5668, REG_GUARD, TRIG_KEY, ATTEMPT_KEY, MAX_REG_ATTEMPTS, RETRY_DELAY_MS, _____5F85_8865_8BFBBoss_53E5_67C4_8868
 function jassStesHashtable()
     local cands = {jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT}
     do
@@ -53,6 +53,7 @@ function _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, source)
         return
     end
     _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, source)
+    _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E(bossUnit)
     debugLogForce(
         ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D,
         "登记Boss自动技能壳子",
@@ -188,6 +189,8 @@ ____Boss_6218_542F_52A8_5EF6_8FDF_6BEB_79D2 = ____require_result_5["Boss战启�
 local ____require_result_6 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.01．Boss自动技能注册表")
 _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8 = ____require_result_6["记录Boss自动技能启动"]
 _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD = ____require_result_6["是否已登记Boss自动技能"]
+local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.04．战斗启动属性应用")
+_____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_7["应用Boss战启动属性配置"]
 GetHandleId = jass.GetHandleId
 GetUnitName = jass.GetUnitName
 LoadInteger = jass.LoadInteger

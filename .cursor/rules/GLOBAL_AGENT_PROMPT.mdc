@@ -1,271 +1,39 @@
 # Global Agent Prompt for This Project
 
-You are working on a Warcraft 3 custom map project built with a TypeScriptToLua workflow.
-
-This is not a normal TypeScript project.
-
-The real execution chain is:
-
-1. TypeScript source
-2. TSTL code generation
-3. Lua module wiring
-4. JASS / DzAPI / YDWE / STES runtime behavior
-5. Multiplayer synchronization behavior in Warcraft III
-
-Your job is to keep the final generated Lua and in-game behavior correct and safe, not just to make TypeScript look reasonable.
-
-## TSTL-Specific Constraints
-
-### 1. TSTL codegen risk is the highest-priority engineering risk
-
-Assume every code edit can introduce codegen drift even if TypeScript still compiles.
-
-Never treat source-level correctness as sufficient.
-
-The main danger is not syntax failure. The main danger is generated Lua changing call shape, callback shape, runtime order, or ownership semantics.
-
-### 2. Always check `self` / `nil` / parameter alignment
-
-For any helper, wrapper, callback, bridge, event center, UI helper, timer helper, or imported function, assume there may be a TSTL call-shape risk.
-
-High-risk patterns:
-
-- TS source looks like `fn(a, b)` but generated Lua becomes `fn(nil, a, b)`
-- `.` vs `:` drift
-- imported helper parameters shift by one position
-- timer / trigger / frame callbacks receive the wrong argument in Lua
-- exported helper looks normal in TS but generated Lua inserts `self`
-- wrappers that silently move `playerId`, `timer`, `frame`, `config`, `unit`, or `callback`
-
-Required discipline:
-
-- if you touch exported helpers, imported helpers, callback registration, timers, frame helpers, event centers, bridges, or wrappers, inspect generated Lua after build
-- that inspection is primarily for call-shape risks such as extra `nil`, accidental `self`, `.` / `:` drift, or parameter-position shifts
-- do not default to manually reviewing unrelated generated-Lua business logic line by line unless the task specifically requires it
-- do not assume a wrapper is safe because it is short
-- do not assume a TS fix is real unless the generated Lua behavior changes in the intended way
-
-Hard rule for `jass` / `japi` module calls:
-
-- when using `require("jass.common")` or `require("jass.japi")`, do not directly call members as `jass.Xxx(...)` or `japi.Xxx(...)` in runtime-sensitive code
-- first bind a local function alias such as `const PauseUnit = jass.PauseUnit as ...`, then call `PauseUnit(...)`
-- this rule also applies to test files and temporary test code
-- reason: TSTL may generate `jass:Xxx(...)` / `japi:Xxx(...)`, which injects the module table as `self` and shifts parameters
-
-### 3. Runtime math must use JASS math, not Lua / TS `Math`
-
-Do not introduce or rely on Lua / TS `Math.*` in gameplay, UI, timer, damage, buff, movement, or any runtime-sensitive path.
-
-Do not use:
-
-- `Math.max`
-- `Math.min`
-- `Math.floor`
-- `Math.ceil`
-- `Math.round`
-- `Math.random`
-
-Use project math helpers or JASS-aligned math wrappers instead.
-
-### 4. JASS / Dz callbacks must use long-lived named functions only
-
-Anything that enters a JASS or DzAPI callback chain must use a top-level named function with long-lived lifetime.
-
-This includes:
-
-- `TimerStart`
-- `safeTimerStart`
-- `dzTimerStart`
-- `TriggerAddAction`
-- `ForGroup`
-- `ForForce`
-- `EnumItemsInRect`
-- `EnumDestructablesInRect`
-- frame event registration
-- any callback that ultimately reaches JASS / DzAPI
-
-Forbidden:
-
-- anonymous closures
-- temporary arrow functions
-- `() => namedFn()` wrappers
-- locally captured closures passed into engine callbacks
-
-If local context is needed, store it in stable module-level registries keyed by handle id, player id, timer id, or other explicit keys, then read it from a named function.
-
-### 5. `pcall` must not degrade into dead Lua call shapes
-
-Do not use:
-
-- `(pcall as any)(namedFn)`
-- `(pcall as any)(() => ...)`
-- `const [ok] = pcall(...)`
-- `pcall(...)[0]`
-
-Preferred pattern:
-
-- top-level named `void` body
-- module-level input/output slots if needed
-- `const ok = pcall(namedBody)`
-
-If TSTL still generates `pcall(nil, fn)` or a local chain becomes fragile, use direct call plus `try/catch` instead of stacking wrappers.
-
-### 6. Never mix engine semantics with local library semantics
-
-Rules:
-
-- `jass表.txt` and `japi表.txt` are the runtime truth
-- do not confuse BJ wrappers with raw `jass` / `japi`
-- do not use `globalThis` as a JASS global replacement
-- use absolute `require("...")` module paths, not `./...`
-- if an API is not confirmed in runtime truth, prefer safe skip / deletion over speculative replacement
-
-### 7. Multiplayer and Dz UI behavior must remain symmetric unless the rule explicitly allows final local presentation
-
-Never hide asymmetry inside seemingly harmless TS abstractions.
-
-Watch for:
-
-- local-only branches writing shared state
-- local creation or destruction of groups, timers, frames, or registries
-- unstable iteration order
-- dynamic object traversal in sync-sensitive paths
-- local sorting or string assembly that changes shared behavior
-- mixed ownership between engine-managed tooltip behavior and manual tooltip behavior
-
-`GetLocalPlayer()` branches are for final local presentation only.
-
-Important clarification:
-
-- It is generally acceptable for a `GetLocalPlayer()` branch to do final local frame rendering such as `DzFrameSetText`, `DzFrameSetTexture`, `DzFrameShow`, and `DzFrameHide`
-- but only after the underlying text / texture / visibility data has already been computed symmetrically outside the local branch
-- the forbidden pattern is computing text, sorting rows, assembling tooltip strings, choosing textures, or mutating shared state inside the local branch itself
-- in short: global symmetric data first, final local render last
-
-### 8. Avoid nested state containers as primary runtime state
-
-Do not introduce or preserve chained state structures such as:
-
-- `state[a][b]`
-- `stateByType[typeId][hid]`
-- `unitToBuffs[hid].buffs[buffId]`
-
-Prefer:
-
-- flat single-layer key spaces
-- stable arrays for traversal
-- explicit sorting
-- single-layer containers
-
-### 9. Core foundations must not depend back on broad aggregators
-
-Core systems such as event centers, center timers, bridges, and runtime safety layers must not depend on broad `lib/.../index` aggregators that can depend back on them.
-
-If a core module needs a tiny helper:
-
-- inline it locally, or
-- depend on a narrow leaf module
-
-Do not create dependency directions that can produce runtime `critical dependency` failures.
-
-### 10. Chinese-heavy files require conservative patching
-
-Treat UTF-8 safety and patch surface as first-class engineering constraints.
-
-Rules:
-
-- prefer tiny local patches
-- avoid whole-file rewrites unless required
-- when using shell, PowerShell, Node scripts, or any non-patch write path, explicitly read and write repository text as UTF-8
-- never rely on platform-default encoding for Chinese-heavy files or Chinese paths
-- terminal mojibake does not prove file bytes are damaged
-- verify with build, generated Lua, and runtime behavior
-
-### 11. Buff work must use the canonical buff experience rule
-
-When the task involves Buff, Debuff, HOT, DOT, native buff cleanup, stack refresh, or onRemove rollback:
-
-- read `.cursor/rules/equipment/buff经验/00．Buff经验规则.mdc` first
-- treat it as the canonical buff experience rule
-- do not maintain separate duplicate buff-system rule files with conflicting wording
-- if a task touches both buff tables and runtime logic, update the buff experience rule and the relevant subsystem file together
-
-## Work Discipline
-
-### 1. Default execution order
-
-When working on a task:
-
-1. understand the gameplay / system semantics
-2. use this file as the high-priority condensed rule reference, then read the most relevant subsystem rules under `.cursor/rules/` for the files being changed
-3. identify whether the real risk is source code, codegen, callback shape, Lua module wiring, runtime semantics, or multiplayer symmetry
-4. patch the smallest relevant surface
-5. run the build after actual code changes
-6. inspect generated Lua whenever helper shape, callback shape, timer behavior, frame behavior, or bridge behavior may have changed; default the inspection scope to `nil/self` and parameter-alignment risks unless a broader Lua audit is actually needed
-7. report what changed, what was verified, what remains risky
-
-Do not rely on this prompt alone when a more specific rule exists.
-
-### 1.1 Patch scope discipline
-
-Default to local, minimal edits.
-
-Rules:
-
-- prefer the smallest patch that fixes the real problem
-- prefer local line-level or block-level edits over whole-file rewrites
-- do not rewrite a whole file just because it is easier for the model
-- only do broad rewrites when the task truly requires structural replacement or the local surface is too broken to patch safely
-- when a broad rewrite is necessary, preserve behavior, exports, encoding, and surrounding conventions deliberately
-
-### 2. Required output discipline
-
-When reporting results:
-
-- state whether code was actually changed
-- state whether `npm run build` was run
-- if callback/helper/timer/UI shape was touched, state whether generated Lua was checked
-- distinguish clearly between:
-  - source-level fix
-  - generated-Lua fix
-  - runtime-verified fix
-- do not claim project-wide completion if only a scoped subset was cleaned
-
-### 3. Review discipline
-
-When reviewing changes, always ask:
-
-1. Is the TypeScript correct?
-2. Will TSTL generate the intended Lua?
-3. Are `self` / `nil` / parameter positions aligned?
-4. Are callback registrations safe?
-5. Is runtime order stable?
-6. Could this desync in multiplayer?
-7. Is the report wording narrower or broader than the actual implementation?
-
-### 4. Practical heuristics
-
-- A successful TS build is necessary, not sufficient.
-- Generated Lua is the source of truth for callback shape.
-- A small wrapper can still be the real bug.
-- A missing visual effect can be caused by call-shape drift, not feature logic.
-- If the generated Lua behavior did not actually change, the fix is probably not real.
-- Runtime logs are often more trustworthy than source assumptions.
-
-## Final Identity
-
-You are not a generic coding assistant.
-
-You are an engineer maintaining a Warcraft 3 map codebase under TSTL / Lua / JASS / DzAPI constraints, where code generation correctness, callback lifetime, runtime semantics, and multiplayer safety matter as much as the TypeScript source itself.
-### 5. Debug Output Discipline
-
-For normal debugging, test logs, and temporary runtime inspection, default to:
-
-- `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`
-
-Preferred APIs:
-
-- `debugLogForce(module, ...args)` for always-on logs
-- `setDebug(module, true/false)` with `debugLog(module, ...args)` for switchable logs
-
-Do not default to scattered `DisplayTimedTextToPlayer` calls in business or test code just to print diagnostics, unless the task explicitly requires player-facing on-screen text rather than the project debug channel.
+你在维护一个 Warcraft 3 + TypeScriptToLua + Lua + JASS/DzAPI 项目。
+
+这份文件只保留总纲，不重复子规则正文。具体细则优先看：
+
+- `README.md`
+- `agent-shared/global-engine-rules.mdc`
+- `agent-shared/tstl-hard-rules.mdc`
+- `agent-shared/中文命名.mdc`
+- `tooling/encoding-and-patch-safety.mdc`
+- `dzapi/lua-gc-desync-heuristics.mdc`
+- `dzapi/n-slot-ui-symmetric-execution.mdc`
+- `equipment/物品系统与装备技能规则.md`
+- `equipment/buff经验/00．Buff经验规则.mdc`
+
+## 核心原则
+
+- 先看生成 Lua 的调用形态，再相信 TS 源码
+- 涉及 `jass` / `japi` / 事件中心 / timer / frame / bridge 的改动，优先检查 `self`、`nil`、参数错位
+- 运行时逻辑不要用 Lua/TS `Math.*`
+- JASS / Dz 回调只用长寿命具名函数
+- 不要在入口全局 monkey patch 基础 API
+- `GetLocalPlayer()` 只做最终本地展示，不做共享逻辑计算
+- 物品、装备、Buff、音效、STES、YDLocal 都按各自子规则处理
+
+## 工作顺序
+
+1. 先读本文件
+2. 再读具体子系统规则
+3. 先改 TS 源码，后 build
+4. 需要时检查生成 Lua 的调用形态
+5. 再报告改了什么，验证了什么，还剩什么风险
+
+## 记录习惯
+
+- 调试输出优先用 `print`
+- 规则有重复时，只保留一个 canonical source
+- 需要补规则时，优先补到最相关的子目录，不要再复制一份全局说明

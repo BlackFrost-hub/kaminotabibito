@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-export type 单位AI归类 = "杂鱼" | "精英" | "Boss" | "英雄" | "异界Boss";
+export type 单位AI归类 = "杂鱼" | "精英" | "Boss" | "英雄Boss" | "异界Boss";
 export type 单位AI模式 = "自动扫描通魔" | "固定技能表";
 export type AI目标选择方式 = "最高仇恨" | "自己" | "当前攻击目标" | "最近敌人";
 export type AI施法目标类型 = "自动" | "无目标" | "自己" | "单位" | "点" | "单位或点";
@@ -23,6 +23,7 @@ export interface AI技能覆盖配置 {
 
 export interface 单位AI配置 {
   AI配置ID: string;
+  单位ID?: string;
   单位名: string;
   归类: 单位AI归类;
   AI模式: 单位AI模式;

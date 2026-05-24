@@ -343,6 +343,11 @@ function ____exports.buildDetailTexts(player)
             number(player, "总魔法恢复") .. "/秒"
         ),
         singleLine(
+            "|cff8fdfff",
+            "魔法消耗减少：",
+            pct(player, "魔法消耗")
+        ),
+        singleLine(
             "|cffff6d5b",
             "暴击率：",
             pct(player, "暴击率")

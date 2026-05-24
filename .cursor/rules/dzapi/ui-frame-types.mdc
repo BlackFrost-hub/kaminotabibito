@@ -100,7 +100,7 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 4. **BUTTON 贴图**：`DzFrameSetTexture(frame, "path.blp", 0)` 可设置按钮贴图。需 `DzFrameSetEnable(frame, true)` 启用。
 
-5. **TSTL 编译**：`japi.XXX` 会编译成 `japi:XXX`，需在 fix-lua-for-pack.js 中把 `japi:` 改为 `japi.`，否则多传 japi 当首参导致参数错位。
+5. **TSTL 编译**：`japi.XXX` 在 TSTL 下可能变成 `japi:XXX`，优先在 TS 侧用本地别名或封装规避，不要为了这个去改 `fix-lua-for-pack.js`。
 
 6. **template 参数**：`DzCreateFrameByTagName` 第 4 参用 `"template"` 非 `""`。
 

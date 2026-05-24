@@ -6,6 +6,7 @@ import { 创建单位AI配置 } from "./02．AI配置工具";
 export const 异界BossAI配置表: 单位AI配置[] = [
   创建单位AI配置({
     AI配置ID: "比那名居天子AI",
+    单位ID: "E07X",
     单位名: "比那名居天子",
     归类: "异界Boss",
     AI模式: "固定技能表",
@@ -46,6 +47,7 @@ export const 异界BossAI配置表: 单位AI配置[] = [
   }),
   创建单位AI配置({
     AI配置ID: "神罗战士克隆形态AI",
+    单位ID: "O005",
     单位名: "|cffff6600神罗战士（克隆形态）|r",
     归类: "异界Boss",
     AI模式: "固定技能表",

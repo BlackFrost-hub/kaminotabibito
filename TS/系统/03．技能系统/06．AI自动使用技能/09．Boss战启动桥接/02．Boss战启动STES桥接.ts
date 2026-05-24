@@ -56,6 +56,9 @@ const {
   记录Boss自动技能启动: (this: void, unit: any, source: "STES.Boss" | "Boss战.单位" | "Boss战.绑定单位") => any;
   是否已登记Boss自动技能: (this: void, unit: any) => boolean;
 };
+const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.04．战斗启动属性应用") as {
+  应用Boss战启动属性配置: (this: void, unit: any) => void;
+};
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
@@ -106,6 +109,7 @@ function 登记Boss自动技能启动(this: void, bossUnit: any, source: "STES.B
     return;
   }
   记录Boss自动技能启动(bossUnit, source);
+  应用Boss战启动属性配置(bossUnit);
   debugLogForce(Boss战启动桥接模块名, "登记Boss自动技能壳子", "source=", source, "name=", GetUnitName(bossUnit));
 }
 

@@ -31,3 +31,10 @@ description: JASS 全局数组在 TS 里的最小约定
 
 - JASS 数组互通：`(jass as any).udg_XXX[index]`
 - 伤害上下文：不要再依赖 `udg_TempUnit[5/6]`
+
+## 伤害与 `UnitDamageTarget`
+
+- `GetEventDamageSource()` 只能在同步伤害事件里读
+- `UnitDamageTarget(src, tgt, amount, false, false, ATTACK_TYPE_NORMAL, damageType, WEAPON_TYPE_WHOKNOWS)` 是常见的技能伤害写法
+- 业务观察伤害优先走 `registerAppliedFinalDamageListener(target, attacker, applied, snapshot)`
+- 业务改伤害优先走 `registerDamageModifier(context)`

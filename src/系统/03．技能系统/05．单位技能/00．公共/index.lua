@@ -48,4 +48,12 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.00．公共.06．死亡前置判断")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

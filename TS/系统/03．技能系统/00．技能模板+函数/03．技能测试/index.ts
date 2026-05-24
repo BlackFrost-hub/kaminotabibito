@@ -49,4 +49,5 @@ export * from "./142．移速提升Buff测试";
 export * from "./143．使者魔轮被动调试测试";
 export * from "./144．命中闪避暴击系统测试";
 export * from "./145．全局音效句柄测试";
+export * from "./146．魔法消耗减少扣蓝测试";
 export * from "./1050．反击测试";

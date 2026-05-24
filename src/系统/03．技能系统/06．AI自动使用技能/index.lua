@@ -49,7 +49,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.06．AI自动使用技能.06．英雄AI配置表")
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.06．英雄BossAI配置表")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

@@ -299,6 +299,7 @@ export function buildDetailTexts(player: any): string[] {
     singleLine("|cff8fdfff", "装备魔法恢复：", number(player, "魔法恢复") + "/秒"),
     singleLine("|cff8fdfff", "魔法恢复%：", pct(player, "魔法恢复%")),
     singleLine("|cff8fdfff", "总魔法恢复：", number(player, "总魔法恢复") + "/秒"),
+    singleLine("|cff8fdfff", "魔法消耗减少：", pct(player, "魔法消耗")),
     // --- 【暴击组】进攻方（第13-14行）与中列被暴击组对齐 ---
     singleLine("|cffff6d5b", "暴击率：", pct(player, "暴击率")),
     singleLine("|cffff4b4b", "暴击伤害：", formatPercent((150 + getPlayerAttr(player, "暴击伤害") * 100) / 100)),

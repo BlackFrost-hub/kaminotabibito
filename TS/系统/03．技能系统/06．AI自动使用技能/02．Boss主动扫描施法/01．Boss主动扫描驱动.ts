@@ -1,14 +1,23 @@
 /** @noSelfInFile */
 
 import type { AI技能覆盖配置, AI目标选择方式, AI施法目标类型, 单位AI配置 } from "../01．AI配置类型";
-import { 按单位名获取单位AI配置 } from "../02．AI配置工具";
+import { 解析单位AI配置单位类型ID } from "../02．AI配置工具";
+import { BossAI配置表 } from "../03．BossAI配置表";
+import { 英雄BossAI配置表 } from "../06．英雄BossAI配置表";
 import { 异界BossAI配置表 } from "../07．异界BossAI配置表";
 import { 获取所有Boss自动技能启动上下文, 清理Boss自动技能启动上下文 } from "../09．Boss战启动桥接/01．Boss自动技能注册表";
 
 const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
+const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
+const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: number) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (whichUnit: any, order: string) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (whichUnit: any, order: string, x: number, y: number) => boolean;
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as number;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as number;
+const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as number;
+const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as number;
 const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   getServerTime: (this: void) => number;
@@ -64,6 +73,12 @@ const 技能施法距离缓存: Record<string, number | undefined> = {};
 const 技能施法范围缓存: Record<string, number | undefined> = {};
 
 let Boss主动扫描回调ID = 0;
+
+const Boss主动扫描配置表: 单位AI配置[] = [
+  ...BossAI配置表,
+  ...英雄BossAI配置表,
+  ...异界BossAI配置表,
+];
 
 function 取单位句柄ID(unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -204,6 +219,69 @@ function 选择最近敌人(unit: any, candidates: any[]): any | null {
   return best;
 }
 
+function 读取单位状态百分比(unit: any, currentState: number, maxState: number): number {
+  const max = GetUnitState(unit, maxState);
+  if (max <= 0) return 100;
+  const current = GetUnitState(unit, currentState);
+  return (current / max) * 100;
+}
+
+function 是否满足百分比区间(value: number, min?: number, max?: number): boolean {
+  if (min != null && value < min) return false;
+  if (max != null && value > max) return false;
+  return true;
+}
+
+function 是否满足技能释放条件(
+  unit: any,
+  技能: AI技能覆盖配置,
+  target: any | null
+): boolean {
+  const lifePercent = 读取单位状态百分比(unit, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE);
+  if (!是否满足百分比区间(lifePercent, 技能.最低生命百分比, 技能.最高生命百分比)) {
+    return false;
+  }
+
+  const manaPercent = 读取单位状态百分比(unit, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA);
+  if (!是否满足百分比区间(manaPercent, 技能.最低魔法百分比, 技能.最高魔法百分比)) {
+    return false;
+  }
+
+  if (target != null && target !== 0 && target !== unit) {
+    const distance = YDWEDistanceBetweenUnits(unit, target);
+    if (技能.最小施法距离 != null && distance < 技能.最小施法距离) {
+      return false;
+    }
+    if (技能.最大施法距离 != null && distance > 技能.最大施法距离) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function 按单位获取Boss主动AI配置(unit: any): 单位AI配置 | undefined {
+  const unitTypeId = GetUnitTypeId(unit);
+  if (unitTypeId !== 0) {
+    for (let i = 0; i < Boss主动扫描配置表.length; i++) {
+      const 配置 = Boss主动扫描配置表[i];
+      if (解析单位AI配置单位类型ID(配置) === unitTypeId) {
+        return 配置;
+      }
+    }
+  }
+
+  const unitName = GetUnitName(unit);
+  for (let i = 0; i < Boss主动扫描配置表.length; i++) {
+    const 配置 = Boss主动扫描配置表[i];
+    if (配置.单位名 === unitName) {
+      return 配置;
+    }
+  }
+
+  return undefined;
+}
+
 function 选择主动施法目标(
   unit: any,
   配置: 单位AI配置,
@@ -307,6 +385,8 @@ function 选择可施法技能(
     const area = 读取技能实时施法范围(unit, skillId);
     const target = 选择主动施法目标(unit, 配置, skill, range);
 
+    if (!是否满足技能释放条件(unit, skill, target)) continue;
+
     if ((skill.施法目标类型 ?? "自动") !== "无目标" && (skill.施法目标类型 ?? "自动") !== "自己") {
       if (target == null || target === 0) continue;
     }
@@ -331,8 +411,8 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
     return;
   }
 
-  const 单位名 = jass.GetUnitName(unit);
-  const 配置 = 按单位名获取单位AI配置(异界BossAI配置表, 单位名);
+  const 单位名 = GetUnitName(unit);
+  const 配置 = 按单位获取Boss主动AI配置(unit);
   if (配置 == null) {
     return;
   }

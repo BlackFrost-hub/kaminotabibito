@@ -4,3 +4,4 @@ export * from "./02．全部技能配置索引";
 export * from "./03．暴击被动公共工具";
 export * from "./04．闪避被动公共工具";
 export * from "./05．原生Buff必定暴击修正";
+export * from "./06．死亡前置判断";

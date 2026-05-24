@@ -10,7 +10,7 @@ export * from "./02．AI配置工具";
 export * from "./03．BossAI配置表";
 export * from "./04．杂鱼AI配置表";
 export * from "./05．精英AI配置表";
-export * from "./06．英雄AI配置表";
+export * from "./06．英雄BossAI配置表";
 export * from "./07．异界BossAI配置表";
 export * from "./08．全部AI配置索引";
 export * from "./09．Boss战启动桥接";
