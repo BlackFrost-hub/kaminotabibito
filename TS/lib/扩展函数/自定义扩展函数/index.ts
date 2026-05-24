@@ -2,11 +2,13 @@ export * from "./00．单位相关";
 export * from "./01．选取中心范围";
 export * from "./02．条件判断函数";
 export * from "./03．调试输出";
+export * from "./04．英雄基础属性";
 
 import * as unitRelated from "./00．单位相关";
 import * as rangeQuery from "./01．选取中心范围";
 import * as conditionCheck from "./02．条件判断函数";
 import * as debugOutput from "./03．调试输出";
+import * as heroBaseAttr from "./04．英雄基础属性";
 
 function expose(name: string, fn: any): void {
     if (typeof fn !== "function") return;
@@ -29,4 +31,9 @@ export function registerBridge(): void {
     expose("isValidEnemyUnit", conditionCheck.isValidEnemyUnit);
     expose("isValidCombatEnemyUnit", conditionCheck.isValidCombatEnemyUnit);
     expose("isNotUsingInventoryItem", conditionCheck.isNotUsingInventoryItem);
+    expose("setDebug", debugOutput.setDebug);
+    expose("isDebug", debugOutput.isDebug);
+    expose("debugLog", debugOutput.debugLog);
+    expose("debugLogForce", debugOutput.debugLogForce);
+    expose("增加英雄基础全属性", heroBaseAttr.增加英雄基础全属性);
 }

@@ -75,6 +75,9 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
+    local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_4["发放异界Boss死亡奖励"]
+    _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
     QuestMessageBJ(
         GetPlayersAll(),
         _____83B7_53D6Quest_6D88_606F_5B8C_6210(),

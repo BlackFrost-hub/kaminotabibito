@@ -48,4 +48,5 @@ export interface 战斗启动属性配置 {
   器弱伤害需求生命百分比?: number;
   护盾基础值?: number;
   护盾每层N增量?: number;
+  死亡后所有玩家英雄基础全属性?: number;
 }

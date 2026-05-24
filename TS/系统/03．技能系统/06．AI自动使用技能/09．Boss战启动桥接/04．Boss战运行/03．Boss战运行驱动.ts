@@ -76,6 +76,10 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   清理Boss箭头特效(context.Boss单位);
   登记Boss死亡延迟清理YD数据(context, nowMs);
   结束Boss战区域音频(context, nowMs);
+  const { 发放异界Boss死亡奖励 } = require("./07．异界Boss死亡奖励") as {
+    发放异界Boss死亡奖励: (this: void, bossUnit: any) => boolean;
+  };
+  发放异界Boss死亡奖励(context.Boss单位);
 
   QuestMessageBJ(GetPlayersAll(), 获取Quest消息完成(), 获取Boss战胜利提示文本());
   debugLogForce(Boss战运行模块名, "Boss战结束", "boss=", context.Boss句柄ID, "generation=", context.运行代次);
@@ -84,7 +88,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
 function 推进Boss战启动状态(this: void, context: Boss战运行上下文, nowMs: number): void {
   const 激活前状态 = context.是否已激活;
   if (context.转场提示时间 > 0 && nowMs >= context.转场提示时间) {
-    QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场后提示文本());
+QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场后提示文本());
     context.转场提示时间 = 0;
   }
 
