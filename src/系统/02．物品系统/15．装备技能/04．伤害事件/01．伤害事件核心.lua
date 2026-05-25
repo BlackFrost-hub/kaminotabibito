@@ -14,8 +14,8 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____65BD_52A0_6613_4F24 = ____require_result_3["施加易伤"]
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_5["创建单位并登记排泄"]
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_5["创建单位并登记排泄安全"]
 local _____8C7A_72FC_76AE_7532 = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲")
 local _____7075_77F3 = require("系统.02．物品系统.15．装备技能.00．物品.28．灵石")
 local _____5080_5CA9_6756 = require("系统.02．物品系统.15．装备技能.00．物品.29．傀岩杖")
@@ -85,7 +85,7 @@ local function _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B()
             if _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID == 0 or _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID == 0 then
                 goto __continue10
             end
-            local _____9A6C_7532 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
+            local _____9A6C_7532 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
                 GetOwningPlayer(_____8BB0_5F55["来源"]),
                 _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID,
                 GetUnitX(_____8BB0_5F55["目标"]),

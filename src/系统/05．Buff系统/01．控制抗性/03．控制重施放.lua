@@ -8,8 +8,8 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCC = ____require_result_0.stringToFourCC
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 local YDWESetUnitAbilityDataReal = ____require_result_1.YDWESetUnitAbilityDataReal
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_2["创建单位并登记排泄"]
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
 --- 控制马甲技能ID
 local CONTROL_ABILITY_ID = 1093678385
 --- 获取辅助马甲单位类型
@@ -27,7 +27,7 @@ function ____exports.createControlHelper(self, caster, target)
     local helperType = ____exports.getControlHelperUnitType(nil)
     local x = jass.GetLocationX(targetLoc)
     local y = jass.GetLocationY(targetLoc)
-    local helper = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
+    local helper = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         jass.GetOwningPlayer(caster),
         helperType,
         x,

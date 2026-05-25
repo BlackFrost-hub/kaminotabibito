@@ -11,8 +11,8 @@ local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 local offTick10ms = ____require_result_0.offTick10ms
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4 = ____require_result_1["创建单位并登记排泄"]
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
 local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_2["立即移除单位并取消排泄登记"]
 local GetHandleId = jass.GetHandleId
@@ -216,7 +216,7 @@ ____exports["创建护盾条"] = function(_____5355_4F4D)
     local x = GetUnitX(_____5355_4F4D)
     local y = GetUnitY(_____5355_4F4D)
     local owner = Player(SHIELD_BAR_OWNER_PLAYER_ID)
-    local _____62A4_76FE_6761_5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4(
+    local _____62A4_76FE_6761_5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         owner,
         SHIELD_BAR_UNIT_ID,
         x,

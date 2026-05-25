@@ -10,7 +10,7 @@ const 回村触发教派袭击步骤: 剧情步骤[] = [
       触发进度: 16,
       目标进度: 17,
       移除临时单位: "ZXCS.DW, ZXCS2.DW",
-      停止音乐: "gg_snd_JQBGM03 @ gg_rct________________QY",
+      停止区域音乐: "gg_snd_JQBGM03 @ gg_rct________________QY",
       开始音乐: "gg_snd_JQBGM04 @ gg_rct________________QY",
       族长位置X: -26114.4,
       族长位置Y: -28671.3,
@@ -31,8 +31,8 @@ const 回村触发教派袭击步骤: 剧情步骤[] = [
     名称: "教派袭击演出单位预置",
     动作ID: "JLC精灵村_教派袭击预置",
     参数: {
-      神秘人单位ID: "n05H",
-      精灵护卫单位ID: "nhef, n01H",
+      神秘人单位名: "奇异蒙面人",
+      精灵护卫单位名: "精灵护卫, 精灵村守卫",
       临时树木数量: 21,
       旧JASS功能清单: "CreateUnit / DzDoodadCreate / ForForce镜头与视野",
     },
@@ -79,15 +79,15 @@ const 回村触发教派袭击步骤: 剧情步骤[] = [
   },
 ];
 
-const 教派最终Boss步骤: 剧情步骤[] = [
+const 教派最终Boss启动步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "cult_boss_random_stance",
     名称: "第一章最终Boss随机姿态",
     动作ID: "JLC精灵村_教派Boss随机姿态",
     参数: {
-      剑士姿态单位ID: "N05N",
-      学者姿态单位ID: "N05M",
+      剑士姿态Boss名: "教派剑士",
+      学者姿态Boss名: "教派学者",
       出生X: 26474.5,
       出生Y: 20889.5,
       朝向: 270,
@@ -118,6 +118,9 @@ const 教派最终Boss步骤: 剧情步骤[] = [
     名称: "启动第一章最终Boss战",
     Boss引用: "Boss.蒙面人",
   },
+];
+
+const 教派最终Boss死亡步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "cult_final_boss_death",
@@ -126,10 +129,10 @@ const 教派最终Boss步骤: 剧情步骤[] = [
     参数: {
       触发进度: 17,
       目标进度: 18,
-      死亡单位ID: "N05N 或 N05M",
-      停止剧情音乐: "gg_snd_JQBGM03 @ 精灵村相关区域",
+      死亡单位名: "教派剑士 或 教派学者",
+      停止区域音乐: "gg_snd_JQBGM03 @ 精灵村相关区域",
       恢复环境音乐: "BGM006/BGM007/BGM008/bgm003/BGM016或BGM017",
-      奖励物品: "I0DA",
+      奖励物品名: "|cffffffcc西里尔魔法书|r",
       族长新位置X: 28775.2,
       族长新位置Y: -28660.2,
       旧JASS功能清单: "CinematicModeBJ / Kill机械敌人 / CreateUnit神秘人残影 / EC_CreateEffect / QuestSetDescription / QuestMessageBJ",
@@ -181,12 +184,36 @@ const 教派最终Boss步骤: 剧情步骤[] = [
   },
 ];
 
+export const 护卫试炼后回村剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_return_village_after_guard_duel",
+  名称: "护卫试炼后回村触发教派袭击",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 回村触发教派袭击步骤,
+};
+
+export const 教派最终Boss启动剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_cult_final_boss_start",
+  名称: "第一章最终Boss教派启动",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 教派最终Boss启动步骤,
+};
+
+export const 教派最终Boss死亡剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_cult_final_boss_death",
+  名称: "第一章最终Boss教派死亡",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 教派最终Boss死亡步骤,
+};
+
 export const 回村击败第一章最终Boss教派剧情片段: 剧情片段配置 = {
   片段ID: "jlc_return_village_defeat_chapter_one_cult_boss",
   名称: "回村击败第一章最终Boss教派",
   可Esc整段跳过: true,
   默认倍速: 1,
-  步骤列表: [...回村触发教派袭击步骤, ...教派最终Boss步骤],
+  步骤列表: [...回村触发教派袭击步骤, ...教派最终Boss启动步骤, ...教派最终Boss死亡步骤],
 };
 
 export default 回村击败第一章最终Boss教派剧情片段;

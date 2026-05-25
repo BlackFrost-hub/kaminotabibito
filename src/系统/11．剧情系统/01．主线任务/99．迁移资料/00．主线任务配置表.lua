@@ -3,7 +3,7 @@ local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____06_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.06．主线任务配置表")
+local ____06_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 = require("系统.11．剧情系统.08．任务系统.00．配置表.06．主线任务配置表")
 local MAIN_STORY_QUEST_CONFIGS = ____06_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868.MAIN_STORY_QUEST_CONFIGS
 ____exports["可直接迁移主线任务ID列表"] = {
     300001,
@@ -39,8 +39,8 @@ local _____5F85_4E13_9898_8FC1_79FB_4E3B_7EBF_4EFB_52A1_5907_6CE8_8868 = {
 local function _____67E5_627E_65E7_4E3B_7EBF_914D_7F6E(_____6765_6E90ID)
     do
         local i = 0
-        while i < #MAIN_STORY_QUEST_CONFIGS do
-            local _____914D_7F6E = MAIN_STORY_QUEST_CONFIGS[i + 1]
+        while i < MAIN_STORY_QUEST_CONFIGS.length do
+            local _____914D_7F6E = MAIN_STORY_QUEST_CONFIGS[i]
             if _____914D_7F6E.requireID == _____6765_6E90ID then
                 return _____914D_7F6E
             end

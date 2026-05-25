@@ -33,7 +33,7 @@ const 沙漠入口调查步骤: 剧情步骤[] = [
   },
 ];
 
-const 沙漠居民线索步骤: 剧情步骤[] = [
+const 沙漠年轻佣兵线索步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "desert_young_mercenary",
@@ -62,6 +62,9 @@ const 沙漠居民线索步骤: 剧情步骤[] = [
     文本: "源石？我只知道最近西边常有蛇人出没，连商队都绕着走。真要找线索，去问老一辈的人吧。",
     持续时间: 4,
   },
+];
+
+const 沙漠年长者线索步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "desert_elder_hint",
@@ -94,7 +97,7 @@ const 沙漠居民线索步骤: 剧情步骤[] = [
   },
 ];
 
-const 情报商人与蛇人入口步骤: 剧情步骤[] = [
+const 沙漠情报商人线索步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "desert_intelligence_merchant",
@@ -135,6 +138,41 @@ const 情报商人与蛇人入口步骤: 剧情步骤[] = [
     文本: "往西北走，越过风蚀岩柱，你们会看见蛇人族的边界。记住，别把他们当成普通盗匪。",
     持续时间: 6,
   },
+];
+
+const 沙漠情报商人回收夜光翡翠步骤: 剧情步骤[] = [
+  {
+    type: "runAction",
+    id: "desert_merchant_return_jade_action",
+    名称: "情报商人回收夜光翡翠并交付魔力源石",
+    动作ID: "JLC沙漠_情报商人回收夜光翡翠",
+    参数: {
+      触发进度: 15,
+      目标进度: 16,
+      需要物品: "|cff00ff00夜光翡翠|r",
+      物品名: "|cff3366ff魔力源石|r",
+      传送点单位: "能量波动标记",
+      旧JASS功能清单: "RemoveItem(夜光翡翠) / UnitAddItem(魔力源石) / BlueBalllight / 清理旧精灵护卫 / 创建ZXCS.DW与ZXCS2.DW",
+    },
+  },
+  { type: "dialog", id: "desert_return_jade_player_01", 名称: "玩家交出夜光翡翠", 说话者: "玩家", 文本: "你要的|cff00ff00『夜光翡翠』|r，我已经带来了。", 持续时间: 3 },
+  { type: "dialog", id: "desert_return_jade_merchant_01", 名称: "商人验货", 说话者: "沙漠情报商人", 文本: "让我看看……黑夜中泛出彩虹般的辉光，没错，此物不假。真如传闻一般美丽。各位竟真能从|cffff9900『蛇人族』|r手中换来它。", 持续时间: 6 },
+  { type: "dialog", id: "desert_return_jade_player_02", 名称: "玩家催促交易", 说话者: "玩家", 文本: "来路你不必多问。我们要的|cff3366ff『魔力源石』|r，是否也该拿出来了？", 持续时间: 4 },
+  { type: "dialog", id: "desert_return_jade_merchant_02", 名称: "商人交付源石", 说话者: "沙漠情报商人", 文本: "没问题，没问题。这就是|cff3366ff『魔力源石』|r。你们尽管查验。", 持续时间: 4 },
+  { type: "dialog", id: "desert_return_jade_player_03", 名称: "玩家确认源石", 说话者: "玩家", 文本: "没想到这么贵重的东西你真带在身边，就不怕在聚集地被抢走？……注入魔力后反应稳定，确实是我们要找的源石。", 持续时间: 6 },
+  {
+    type: "runAction",
+    id: "desert_return_jade_quest_update",
+    名称: "魔力源石入手后刷新回村目标",
+    动作ID: "JLC沙漠_源石入手目标刷新",
+    参数: {
+      任务描述: "带着|cff3366ff『魔力源石』|r返回|cffff9900『精灵村』|r，向长老汇报源石与教派线索。",
+      任务更新提示: "|cffffff00『主线目标』：|r返回|cffff9900『精灵村』|r。",
+    },
+  },
+];
+
+const 蛇人族入口步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "snake_territory_entry",
@@ -175,6 +213,9 @@ const 情报商人与蛇人入口步骤: 剧情步骤[] = [
     文本: "既然如此，就去见藏品管家吧。你们若敢乱闯，沙漠会替我们埋葬你们。",
     持续时间: 4,
   },
+];
+
+const 蛇人族藏品管家初见步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "snake_keeper_first_meet",
@@ -185,7 +226,7 @@ const 情报商人与蛇人入口步骤: 剧情步骤[] = [
       目标进度: 9,
       NPC: "主线NPC.蛇人族藏品管家",
       触发范围: 400,
-      商店新增物品: "I0D0",
+      商店新增物品: "接受任务-|cffff0000狩猎食人魔（等级24）|r",
       延迟提示: "|cffffff00『系统提示』：|r下次任务会开启|cffff0000『Boss战』|r，|cffffcc99实力不够则会团灭|r，请准备充分再来！",
       旧JASS功能清单: "AddItemToStockBJ / TimerStart(2秒提示) / QuestMessageBJ",
     },
@@ -218,12 +259,76 @@ const 情报商人与蛇人入口步骤: 剧情步骤[] = [
   },
 ];
 
+export const 沙漠入口调查剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_desert_arrival",
+  名称: "沙漠入口调查",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 沙漠入口调查步骤,
+};
+
+export const 沙漠年轻佣兵线索剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_desert_young_mercenary",
+  名称: "沙漠年轻佣兵线索",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 沙漠年轻佣兵线索步骤,
+};
+
+export const 沙漠年长者线索剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_desert_elder_hint",
+  名称: "沙漠年长者线索",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 沙漠年长者线索步骤,
+};
+
+export const 沙漠情报商人线索剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_desert_intelligence_merchant",
+  名称: "沙漠情报商人线索",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 沙漠情报商人线索步骤,
+};
+
+export const 沙漠情报商人回收夜光翡翠剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_desert_merchant_return_jade",
+  名称: "沙漠情报商人回收夜光翡翠",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 沙漠情报商人回收夜光翡翠步骤,
+};
+
+export const 蛇人族入口剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_snake_territory_entry",
+  名称: "蛇人族入口",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 蛇人族入口步骤,
+};
+
+export const 蛇人族藏品管家初见剧情片段: 剧情片段配置 = {
+  片段ID: "jlc_snake_keeper_first_meet",
+  名称: "蛇人族藏品管家初见",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 蛇人族藏品管家初见步骤,
+};
+
 export const 沙漠到蛇人族剧情片段: 剧情片段配置 = {
   片段ID: "jlc_desert_to_snake_territory",
   名称: "沙漠到蛇人族",
   可Esc整段跳过: true,
   默认倍速: 1,
-  步骤列表: [...沙漠入口调查步骤, ...沙漠居民线索步骤, ...情报商人与蛇人入口步骤],
+  步骤列表: [
+    ...沙漠入口调查步骤,
+    ...沙漠年轻佣兵线索步骤,
+    ...沙漠年长者线索步骤,
+    ...沙漠情报商人线索步骤,
+    ...沙漠情报商人回收夜光翡翠步骤,
+    ...蛇人族入口步骤,
+    ...蛇人族藏品管家初见步骤,
+  ],
 };
 
 export default 沙漠到蛇人族剧情片段;

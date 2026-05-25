@@ -80,6 +80,10 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
     发放异界Boss死亡奖励: (this: void, bossUnit: any) => boolean;
   };
   发放异界Boss死亡奖励(context.Boss单位);
+  const { 尝试播放Boss死亡主线剧情 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引") as {
+    尝试播放Boss死亡主线剧情: (this: void, bossUnit: any) => boolean;
+  };
+  尝试播放Boss死亡主线剧情(context.Boss单位);
 
   QuestMessageBJ(GetPlayersAll(), 获取Quest消息完成(), 获取Boss战胜利提示文本());
   debugLogForce(Boss战运行模块名, "Boss战结束", "boss=", context.Boss句柄ID, "generation=", context.运行代次);

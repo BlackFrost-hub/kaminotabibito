@@ -106,7 +106,8 @@ export interface 剧情特效步骤 extends 剧情步骤基础 {
 export interface 剧情发物品步骤 extends 剧情步骤基础 {
   type: "giveItem";
   目标: string;
-  物品ID: string;
+  物品ID?: string;
+  物品名?: string;
   数量?: number;
 }
 
@@ -119,6 +120,7 @@ export interface 剧情自定义动作步骤 extends 剧情步骤基础 {
 export interface 剧情Boss战步骤 extends 剧情步骤基础 {
   type: "startBossFight";
   Boss单位ID?: string;
+  Boss名?: string;
   Boss引用?: string;
 }
 

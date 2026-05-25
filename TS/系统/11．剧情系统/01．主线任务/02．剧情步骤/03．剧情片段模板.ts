@@ -119,7 +119,7 @@ export const 标准剧情片段模板: 剧情片段配置 = {
       type: "startBossFight",
       id: "boss_start",
       名称: "启动 Boss 战",
-      Boss单位ID: "N000",
+      Boss名: "示例Boss",
     },
   ],
 };

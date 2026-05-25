@@ -59,7 +59,6 @@ const 巨魔首领战前步骤: 剧情步骤[] = [
     参数: {
       触发进度: 26,
       目标进度: 27,
-      Boss: "巨魔首领.Boss",
       触发范围: 400,
       旧JASS功能清单: "PauseUnit(GetTriggerUnit) / Transmission / QuestSetDescription / QuestMessageBJ",
     },
@@ -92,7 +91,7 @@ const 巨魔首领战前步骤: 剧情步骤[] = [
     type: "startBossFight",
     id: "city_troll_leader_boss",
     名称: "启动巨魔首领战",
-    Boss引用: "巨魔首领.Boss",
+    Boss名: "树魔首领",
   },
 ];
 
@@ -105,11 +104,8 @@ const 树魔首领死亡承接步骤: 剧情步骤[] = [
     参数: {
       触发进度: 27,
       目标进度: 28,
-      死亡单位ID: "N05S",
-      选择宝箱: "e070",
-      宝箱物品: "I0C3, I0C5, I0C7",
-      掉落物品: "I0CA",
-      旧JASS功能清单: "QuestSetDescription / QuestMessageBJ / AddItemToStockBJ / CreateItem / YDUserDataClearTable",
+      死亡单位名: "树魔首领",
+      旧JASS功能清单: "QuestSetDescription / QuestMessageBJ / YDUserDataClearTable；死亡宝箱和死亡掉落迁出到后续Boss死亡掉落系统",
     },
   },
   {
@@ -139,6 +135,30 @@ const 树魔首领死亡承接步骤: 剧情步骤[] = [
     },
   },
 ];
+
+export const 猎魂试探剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_hunter_start",
+  名称: "猎魂试探",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 猎魂试探步骤,
+};
+
+export const 巨魔首领战前剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_troll_leader_start",
+  名称: "巨魔首领战前",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 巨魔首领战前步骤,
+};
+
+export const 树魔首领死亡承接剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_treant_leader_death",
+  名称: "树魔首领死亡承接",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 树魔首领死亡承接步骤,
+};
 
 export const 猎魂与树魔首领剧情片段: 剧情片段配置 = {
   片段ID: "elven_city_hunter_to_treant_leader",

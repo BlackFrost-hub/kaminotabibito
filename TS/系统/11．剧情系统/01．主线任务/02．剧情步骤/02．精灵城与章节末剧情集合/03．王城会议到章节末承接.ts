@@ -1,6 +1,6 @@
 import type { 剧情片段配置, 剧情步骤 } from "../00．剧情步骤类型";
 
-const 魔法信件解析步骤: 剧情步骤[] = [
+const 魔法信件汇报步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "city_report_magic_letter",
@@ -40,6 +40,9 @@ const 魔法信件解析步骤: 剧情步骤[] = [
       任务更新提示: "|cffffff00『主线目标』：|r前往术法协会。",
     },
   },
+];
+
+const 赫克提尔解析信件步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "city_hectel_decode",
@@ -87,7 +90,7 @@ const 魔法信件解析步骤: 剧情步骤[] = [
   },
 ];
 
-const 王城会议与章节Boss步骤: 剧情步骤[] = [
+const 王城紧急会议步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "city_emergency_meeting",
@@ -125,6 +128,9 @@ const 王城会议与章节Boss步骤: 剧情步骤[] = [
     文本: "我们一路追查至此，不会在最后关头退缩。请打开通路，我们去阻止他们。",
     持续时间: 5,
   },
+];
+
+const 章节末战后承接步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "city_chapter_boss_death_bridge",
@@ -202,12 +208,58 @@ const 章节末收束步骤: 剧情步骤[] = [
   },
 ];
 
+export const 魔法信件汇报剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_report_magic_letter",
+  名称: "向克林姆德王汇报魔法信件",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 魔法信件汇报步骤,
+};
+
+export const 赫克提尔解析信件剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_hectel_decode",
+  名称: "赫克提尔解析魔法信件",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 赫克提尔解析信件步骤,
+};
+
+export const 王城紧急会议剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_emergency_meeting",
+  名称: "王城紧急会议",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 王城紧急会议步骤,
+};
+
+export const 章节末战后承接剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_chapter_boss_death_bridge",
+  名称: "章节末战后承接",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 章节末战后承接步骤,
+};
+
+export const 章节末最终收束剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_chapter_end",
+  名称: "章节末最终收束",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 章节末收束步骤,
+};
+
 export const 王城会议到章节末承接剧情片段: 剧情片段配置 = {
   片段ID: "elven_city_meeting_to_chapter_end",
   名称: "王城会议到章节末承接",
   可Esc整段跳过: true,
   默认倍速: 1,
-  步骤列表: [...魔法信件解析步骤, ...王城会议与章节Boss步骤, ...章节末收束步骤],
+  步骤列表: [
+    ...魔法信件汇报步骤,
+    ...赫克提尔解析信件步骤,
+    ...王城紧急会议步骤,
+    ...章节末战后承接步骤,
+    ...章节末收束步骤,
+  ],
 };
 
 export default 王城会议到章节末承接剧情片段;

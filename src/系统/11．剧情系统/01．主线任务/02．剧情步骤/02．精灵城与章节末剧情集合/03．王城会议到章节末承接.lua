@@ -3,43 +3,40 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local _____9B54_6CD5_4FE1_4EF6_89E3_6790_6B65_9AA4 = {
-    {
-        type = "runAction",
-        id = "city_report_magic_letter",
-        ["名称"] = "向克林姆德王汇报魔法信件",
-        ["动作ID"] = "JLC精灵城_魔法信件汇报",
-        ["参数"] = {
-            ["触发进度"] = 29,
-            ["目标进度"] = 30,
-            NPC = "ZX.克林姆德王",
-            ["触发范围"] = 400,
-            ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ"
-        }
-    },
-    {
-        type = "dialog",
-        id = "city_letter_player_01",
-        ["名称"] = "玩家呈交信件",
-        ["说话者"] = "玩家",
-        ["文本"] = "我们在巨魔领地发现了这封魔法信件。上面的术式不像巨魔族所有，更像是外人留下的指令。",
-        ["持续时间"] = 5
-    },
-    {
-        type = "dialog",
-        id = "city_letter_king_01",
-        ["名称"] = "国王判断信件",
-        ["说话者"] = "克林姆德王",
-        ["文本"] = "这不是普通密信。请把它交给|cff99ffcc『赫克提尔』|r，他是王城里最擅长古代术式的人。",
-        ["持续时间"] = 5
-    },
-    {
-        type = "runAction",
-        id = "city_letter_to_hectel",
-        ["名称"] = "前往赫克提尔处",
-        ["动作ID"] = "JLC精灵城_前往赫克提尔",
-        ["参数"] = {["任务描述"] = "前往术法协会，请赫克提尔解析魔法信件。", ["任务更新提示"] = "|cffffff00『主线目标』：|r前往术法协会。"}
-    },
+local _____9B54_6CD5_4FE1_4EF6_6C47_62A5_6B65_9AA4 = {{
+    type = "runAction",
+    id = "city_report_magic_letter",
+    ["名称"] = "向克林姆德王汇报魔法信件",
+    ["动作ID"] = "JLC精灵城_魔法信件汇报",
+    ["参数"] = {
+        ["触发进度"] = 29,
+        ["目标进度"] = 30,
+        NPC = "ZX.克林姆德王",
+        ["触发范围"] = 400,
+        ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ"
+    }
+}, {
+    type = "dialog",
+    id = "city_letter_player_01",
+    ["名称"] = "玩家呈交信件",
+    ["说话者"] = "玩家",
+    ["文本"] = "我们在巨魔领地发现了这封魔法信件。上面的术式不像巨魔族所有，更像是外人留下的指令。",
+    ["持续时间"] = 5
+}, {
+    type = "dialog",
+    id = "city_letter_king_01",
+    ["名称"] = "国王判断信件",
+    ["说话者"] = "克林姆德王",
+    ["文本"] = "这不是普通密信。请把它交给|cff99ffcc『赫克提尔』|r，他是王城里最擅长古代术式的人。",
+    ["持续时间"] = 5
+}, {
+    type = "runAction",
+    id = "city_letter_to_hectel",
+    ["名称"] = "前往赫克提尔处",
+    ["动作ID"] = "JLC精灵城_前往赫克提尔",
+    ["参数"] = {["任务描述"] = "前往术法协会，请赫克提尔解析魔法信件。", ["任务更新提示"] = "|cffffff00『主线目标』：|r前往术法协会。"}
+}}
+local _____8D6B_514B_63D0_5C14_89E3_6790_4FE1_4EF6_6B65_9AA4 = {
     {
         type = "runAction",
         id = "city_hectel_decode",
@@ -86,68 +83,61 @@ local _____9B54_6CD5_4FE1_4EF6_89E3_6790_6B65_9AA4 = {
         ["持续时间"] = 5
     }
 }
-local _____738B_57CE_4F1A_8BAE_4E0E_7AE0_8282Boss_6B65_9AA4 = {
-    {
-        type = "runAction",
-        id = "city_emergency_meeting",
-        ["名称"] = "紧急会议触发",
-        ["动作ID"] = "JLC精灵城_紧急会议",
-        ["参数"] = {
-            ["触发进度"] = 31,
-            ["目标进度"] = 32,
-            NPC = "ZX.克林姆德王",
-            ["触发范围"] = 400,
-            ["旧JASS功能清单"] = "TransmissionFromUnitWithNameBJ / QuestSetDescription / QuestMessageBJ"
-        }
-    },
-    {
-        type = "dialog",
-        id = "city_meeting_king_01",
-        ["名称"] = "国王说明突袭",
-        ["说话者"] = "克林姆德王",
-        ["文本"] = "敌袭来得太快。教派真正的目标不是边境，而是王城内部的|cffffcc99『传承密室』|r。",
-        ["持续时间"] = 6
-    },
-    {
-        type = "dialog",
-        id = "city_meeting_hectel_01",
-        ["名称"] = "赫克提尔确认密室风险",
-        ["说话者"] = "赫克提尔",
-        ["文本"] = "密室中封存着王族血脉与旧神契约的记录。若被教派夺走，后果不堪设想。",
-        ["持续时间"] = 6
-    },
-    {
-        type = "dialog",
-        id = "city_meeting_player_01",
-        ["名称"] = "玩家请求出战",
-        ["说话者"] = "玩家",
-        ["文本"] = "我们一路追查至此，不会在最后关头退缩。请打开通路，我们去阻止他们。",
-        ["持续时间"] = 5
-    },
-    {
-        type = "runAction",
-        id = "city_chapter_boss_death_bridge",
-        ["名称"] = "章节末战后长对白承接",
-        ["动作ID"] = "SW01死亡事件_章节末长对白承接",
-        ["参数"] = {["触发进度"] = 32, ["目标进度"] = 33, ["旧JASS功能清单"] = "死亡触发中的章节末长对白 / QuestMessageBJ(WARNING) / QuestSetDescription"}
-    },
-    {
-        type = "dialog",
-        id = "chapter_bridge_01",
-        ["名称"] = "旧神与教派线索",
-        ["说话者"] = "赫克提尔",
-        ["文本"] = "那股气息不会错。教派正在寻找能重启古代契约的钥匙，而王城密室只是其中一环。",
-        ["持续时间"] = 6
-    },
-    {
-        type = "dialog",
-        id = "chapter_bridge_02",
-        ["名称"] = "国王交代后续",
-        ["说话者"] = "克林姆德王",
-        ["文本"] = "诸位，使者身份已经不足以概括你们的处境。从现在起，你们也是这场战争的见证者。",
-        ["持续时间"] = 6
+local _____738B_57CE_7D27_6025_4F1A_8BAE_6B65_9AA4 = {{
+    type = "runAction",
+    id = "city_emergency_meeting",
+    ["名称"] = "紧急会议触发",
+    ["动作ID"] = "JLC精灵城_紧急会议",
+    ["参数"] = {
+        ["触发进度"] = 31,
+        ["目标进度"] = 32,
+        NPC = "ZX.克林姆德王",
+        ["触发范围"] = 400,
+        ["旧JASS功能清单"] = "TransmissionFromUnitWithNameBJ / QuestSetDescription / QuestMessageBJ"
     }
-}
+}, {
+    type = "dialog",
+    id = "city_meeting_king_01",
+    ["名称"] = "国王说明突袭",
+    ["说话者"] = "克林姆德王",
+    ["文本"] = "敌袭来得太快。教派真正的目标不是边境，而是王城内部的|cffffcc99『传承密室』|r。",
+    ["持续时间"] = 6
+}, {
+    type = "dialog",
+    id = "city_meeting_hectel_01",
+    ["名称"] = "赫克提尔确认密室风险",
+    ["说话者"] = "赫克提尔",
+    ["文本"] = "密室中封存着王族血脉与旧神契约的记录。若被教派夺走，后果不堪设想。",
+    ["持续时间"] = 6
+}, {
+    type = "dialog",
+    id = "city_meeting_player_01",
+    ["名称"] = "玩家请求出战",
+    ["说话者"] = "玩家",
+    ["文本"] = "我们一路追查至此，不会在最后关头退缩。请打开通路，我们去阻止他们。",
+    ["持续时间"] = 5
+}}
+local _____7AE0_8282_672B_6218_540E_627F_63A5_6B65_9AA4 = {{
+    type = "runAction",
+    id = "city_chapter_boss_death_bridge",
+    ["名称"] = "章节末战后长对白承接",
+    ["动作ID"] = "SW01死亡事件_章节末长对白承接",
+    ["参数"] = {["触发进度"] = 32, ["目标进度"] = 33, ["旧JASS功能清单"] = "死亡触发中的章节末长对白 / QuestMessageBJ(WARNING) / QuestSetDescription"}
+}, {
+    type = "dialog",
+    id = "chapter_bridge_01",
+    ["名称"] = "旧神与教派线索",
+    ["说话者"] = "赫克提尔",
+    ["文本"] = "那股气息不会错。教派正在寻找能重启古代契约的钥匙，而王城密室只是其中一环。",
+    ["持续时间"] = 6
+}, {
+    type = "dialog",
+    id = "chapter_bridge_02",
+    ["名称"] = "国王交代后续",
+    ["说话者"] = "克林姆德王",
+    ["文本"] = "诸位，使者身份已经不足以概括你们的处境。从现在起，你们也是这场战争的见证者。",
+    ["持续时间"] = 6
+}}
 local _____7AE0_8282_672B_6536_675F_6B65_9AA4 = {
     {
         type = "runAction",
@@ -188,10 +178,53 @@ local _____7AE0_8282_672B_6536_675F_6B65_9AA4 = {
         ["参数"] = {["任务描述"] = "前往旧王国遗址，追查分离教派与古代契约。", ["任务更新提示"] = "|cffffff00『主线目标』：|r前往下一处线索地点。"}
     }
 }
-local ____array_0 = __TS__SparseArrayNew(table.unpack(_____9B54_6CD5_4FE1_4EF6_89E3_6790_6B65_9AA4))
+____exports["魔法信件汇报剧情片段"] = {
+    ["片段ID"] = "elven_city_report_magic_letter",
+    ["名称"] = "向克林姆德王汇报魔法信件",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____9B54_6CD5_4FE1_4EF6_6C47_62A5_6B65_9AA4
+}
+____exports["赫克提尔解析信件剧情片段"] = {
+    ["片段ID"] = "elven_city_hectel_decode",
+    ["名称"] = "赫克提尔解析魔法信件",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____8D6B_514B_63D0_5C14_89E3_6790_4FE1_4EF6_6B65_9AA4
+}
+____exports["王城紧急会议剧情片段"] = {
+    ["片段ID"] = "elven_city_emergency_meeting",
+    ["名称"] = "王城紧急会议",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____738B_57CE_7D27_6025_4F1A_8BAE_6B65_9AA4
+}
+____exports["章节末战后承接剧情片段"] = {
+    ["片段ID"] = "elven_city_chapter_boss_death_bridge",
+    ["名称"] = "章节末战后承接",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____7AE0_8282_672B_6218_540E_627F_63A5_6B65_9AA4
+}
+____exports["章节末最终收束剧情片段"] = {
+    ["片段ID"] = "elven_city_chapter_end",
+    ["名称"] = "章节末最终收束",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____7AE0_8282_672B_6536_675F_6B65_9AA4
+}
+local ____array_0 = __TS__SparseArrayNew(table.unpack(_____9B54_6CD5_4FE1_4EF6_6C47_62A5_6B65_9AA4))
 __TS__SparseArrayPush(
     ____array_0,
-    table.unpack(_____738B_57CE_4F1A_8BAE_4E0E_7AE0_8282Boss_6B65_9AA4)
+    table.unpack(_____8D6B_514B_63D0_5C14_89E3_6790_4FE1_4EF6_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____738B_57CE_7D27_6025_4F1A_8BAE_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____7AE0_8282_672B_6218_540E_627F_63A5_6B65_9AA4)
 )
 __TS__SparseArrayPush(
     ____array_0,

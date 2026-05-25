@@ -7,7 +7,7 @@
 - `00．剧情步骤类型.ts`
   - 步骤类型与片段配置定义。
 - `01．剧情片段配置表.ts`
-  - 所有片段的统一入口。
+  - 所有正式挂表片段的统一入口。
 - `02．剧情步骤播放器.ts`
   - 步骤执行器。
 - `03．剧情片段模板.ts`
@@ -24,26 +24,53 @@
 - 顶层只保留集合入口。
 - 具体剧情按“大集合 -> 章节片段文件 -> 文件内子段步骤”组织。
 - `01．精灵村与蛇人族剧情集合` 当前正式挂表片段：
-  - `01．精灵村入口到长老发布任务.ts`
-  - `02．击败地精到长老说去沙漠来.ts`
-  - `03．沙漠到蛇人族.ts`
-  - `04．蛇人族击败食人魔到护卫对战.ts`
-  - `05．回村击败第一章最终Boss教派.ts`
+  - `jlc_elven_village_gate_release`
+  - `jlc_elven_village_elder_quest`
+  - `jlc_goblin_cave_intro`
+  - `jlc_goblin_boss_intro`
+  - `jlc_goblin_defeated_return_elder`
+  - `jlc_desert_arrival`
+  - `jlc_desert_young_mercenary`
+  - `jlc_desert_elder_hint`
+  - `jlc_desert_intelligence_merchant`
+  - `jlc_snake_territory_entry`
+  - `jlc_snake_keeper_first_meet`
+  - `jlc_snake_ogre_task_accept`
+  - `jlc_desert_ogre_boss_start`
+  - `jlc_desert_ogre_first_death`
+  - `jlc_slaughter_ogre_death`
+  - `jlc_snake_keeper_return_item`
+  - `jlc_snake_guard_duel`
+  - `jlc_return_village_after_guard_duel`
+  - `jlc_cult_final_boss_start`
+  - `jlc_cult_final_boss_death`
 - `02．精灵城与章节末剧情集合` 当前正式挂表片段：
-  - `01．入城到王城委托.ts`
-  - `02．猎魂与树魔首领.ts`
-  - `03．王城会议到章节末承接.ts`
+  - `elven_city_alvin_start`
+  - `elven_city_gate_open`
+  - `elven_city_palace_guard`
+  - `elven_city_side_quest_discover`
+  - `elven_city_king_audience`
+  - `elven_city_hunter_start`
+  - `elven_city_troll_leader_start`
+  - `elven_city_treant_leader_death`
+  - `elven_city_report_magic_letter`
+  - `elven_city_hectel_decode`
+  - `elven_city_emergency_meeting`
+  - `elven_city_chapter_boss_death_bridge`
+  - `elven_city_chapter_end`
 
 ## 迁移原则
 
 - 文件边界先对齐 JASS 真实触发链，不按润色稿随意切。
+- 片段来源优先查 `JASS/世界地图/主线剧情/`：普通范围/矩形入口看 `精灵村.j`、`蛇人族.j`、`精灵城.j`，死亡承接看 `死亡触发.j`，NPC/范围注册看 `主线NPC初始化.j`。
+- 物品拾取/使用这类独立 JASS 触发器不塞进普通对白文件，统一迁到 `01．主线剧情入口/03．主线剧情物品事件初始化.ts`，再播放对应剧情片段。
 - 一个文件可以覆盖一段连续剧情链，文件内部再用局部步骤数组拆子段。
 - 不再把村口、长老、Boss、复命拆成一堆顶层配置文件。
 - 后续主线维护优先使用“紧凑剧情片段”格式：对白用 `对白列表` 按 `序号` 排列，每句必须写 `持续时间`；动作用 `动作时间线` 挂到 `beforeDialog`、`afterDialog` 或 `absoluteTime`，避免不清楚动作是在某句对白前还是后。
 - 对白 `持续时间` 默认按“可见字数 + 标点停顿”估算，再按用户要求微调，不再凭感觉随手写一个常数。
 - `absoluteTime` 表示从片段开始累计秒数；`beforeDialog/afterDialog` 表示绑定到指定 `对白序号` 前后。加速时对白持续时间和可跳过等待都按倍速缩放，绝对时间动作也按片段时间轴等比处理。
 - 旧 `剧情步骤[]` 作为底层执行格式保留；紧凑剧情片段是更适合迁移和人工校对的维护格式，后续可由转换器编译成执行步骤。
-- Boss 死亡剧情不直接塞进 Boss 运行清理层。运行层只做清理、奖励、音乐、YDUserData 等通用逻辑；主线死亡剧情放在剧情片段里，后续如需自动触发，再加一张很薄的 `Boss死亡剧情索引` 按 Boss ID/阶段/剧情进度桥接。
+- Boss 死亡剧情不直接塞进 Boss 运行清理层。运行层只做清理、奖励、音乐、YDUserData 等通用逻辑；主线死亡剧情放在剧情片段里，由 `Boss死亡剧情索引` 按语义名/阶段/剧情进度桥接。
 - JASS 里明显重复或只为编辑器触发器服务的噪声可以安全压缩，但必须保留功能语义：进度推进、任务提示、镜头/电影模式、视野、音乐、特效、物品、单位创建、Boss 启动和死亡承接不能漏。
 
 ## Boss 死亡剧情维护
@@ -52,3 +79,11 @@
 - 索引只写映射关系：Boss 单位 ID、Boss 名、需要剧情进度、设置剧情进度、阶段标记、剧情片段 ID。
 - 具体对白、镜头、特效、物品、任务提示、二阶段 Boss 创建，仍然写在对应剧情片段文件里。
 - Boss 战运行层后续只需要在通用死亡清理后查询索引并触发片段，不要把主线对白直接写进 Boss 运行文件。
+
+## 当前待补
+
+- `地精祭祀` 这类 Boss 预创建范围触发器，现已完成：
+  - `CreateTrigger + TriggerRegisterUnitInRangeSimple`
+  - 写入 `Boss.*` 的 YDUserData 绑定
+  - 写入 `主线剧情入口` 上下文
+  - 可直接接统一剧情播放器执行入口

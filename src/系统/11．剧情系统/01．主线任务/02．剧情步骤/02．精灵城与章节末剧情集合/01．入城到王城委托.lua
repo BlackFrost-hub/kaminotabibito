@@ -60,7 +60,7 @@ local _____738B_57CE_95E8_7981_6B65_9AA4 = {{
         ["门卫单位"] = "gg_unit_n04R_0048",
         ["触发范围"] = 999,
         ["延迟开门秒"] = 2.5,
-        ["开启门"] = "gg_dest_LTe1_11879",
+        ["开门对象"] = "gg_dest_LTe1_11879",
         ["隐藏阻挡"] = "gg_dest_B00K_5466",
         ["解锁视野"] = "gg_rct__________u",
         ["旧JASS功能清单"] = "TimerStart / ModifyGateBJ / ShowDestructable(false) / CreateFogModifierRectBJ"
@@ -86,59 +86,56 @@ local _____738B_57CE_95E8_7981_6B65_9AA4 = {{
     ["动作ID"] = "JLC精灵城_前往王宫外庭",
     ["参数"] = {["任务描述"] = "进入王城外庭，继续前往王宫。", ["任务更新提示"] = "|cffffff00『主线目标』：|r进入王城外庭。", ["小地图X"] = -10900.6, ["小地图Y"] = -10601.8}
 }}
-local _____738B_5BAB_7981_519B_4E0E_56FD_738B_59D4_6258_6B65_9AA4 = {
-    {
-        type = "runAction",
-        id = "elven_city_palace_guard",
-        ["名称"] = "王宫禁军盘查",
-        ["动作ID"] = "JLC精灵城_王宫禁军盘查",
-        ["参数"] = {
-            ["触发进度"] = 22,
-            ["目标进度"] = 23,
-            NPC = "主线NPC.jl禁军门卫",
-            ["触发范围"] = 999,
-            ["解锁视野"] = "gg_rct______________121, gg_rct______________122, gg_rct______________123",
-            ["旧JASS功能清单"] = "CreateFogModifierRectBJ / QuestSetDescription / QuestMessageBJ / PingMinimap"
-        }
-    },
-    {
-        type = "dialog",
-        id = "city_palace_guard_01",
-        ["名称"] = "禁军再次盘查",
-        ["说话者"] = "精灵禁军",
-        ["文本"] = "王宫区域戒严。即便是帝国使者，也必须说明来意。",
-        ["持续时间"] = 4.5
-    },
-    {
-        type = "dialog",
-        id = "city_palace_player_01",
-        ["名称"] = "玩家说明来意",
-        ["说话者"] = "玩家",
-        ["文本"] = "我们带来了与|cffff00ff『分离教派』|r有关的情报，需要立刻面见|cffff99cc『克林姆德王』|r。",
-        ["持续时间"] = 4
-    },
-    {
-        type = "dialog",
-        id = "city_palace_guard_02",
-        ["名称"] = "禁军放行",
-        ["说话者"] = "精灵禁军",
-        ["文本"] = "王上确有命令。诸位请入内，但不要接近封锁区。",
-        ["持续时间"] = 4
-    },
-    {
-        type = "runAction",
-        id = "city_side_quest_discover",
-        ["名称"] = "王宫门卫2支线发现",
-        ["动作ID"] = "JLC精灵城_王宫门卫2支线发现",
-        ["参数"] = {
-            ["触发进度"] = 23,
-            ["目标进度"] = 24,
-            NPC = "主线NPC.jl禁军门卫2",
-            ["触发范围"] = 600,
-            ["支线任务"] = "udg_RW[8]",
-            ["旧JASS功能清单"] = "QuestSetDiscovered / QuestMessageBJ(DISCOVERED)"
-        }
-    },
+local _____738B_5BAB_7981_519B_76D8_67E5_6B65_9AA4 = {{
+    type = "runAction",
+    id = "elven_city_palace_guard",
+    ["名称"] = "王宫禁军盘查",
+    ["动作ID"] = "JLC精灵城_王宫禁军盘查",
+    ["参数"] = {
+        ["触发进度"] = 22,
+        ["目标进度"] = 23,
+        NPC = "主线NPC.jl禁军门卫",
+        ["触发范围"] = 999,
+        ["解锁视野"] = "gg_rct______________121, gg_rct______________122, gg_rct______________123",
+        ["旧JASS功能清单"] = "CreateFogModifierRectBJ / QuestSetDescription / QuestMessageBJ / PingMinimap"
+    }
+}, {
+    type = "dialog",
+    id = "city_palace_guard_01",
+    ["名称"] = "禁军再次盘查",
+    ["说话者"] = "精灵禁军",
+    ["文本"] = "王宫区域戒严。即便是帝国使者，也必须说明来意。",
+    ["持续时间"] = 4.5
+}, {
+    type = "dialog",
+    id = "city_palace_player_01",
+    ["名称"] = "玩家说明来意",
+    ["说话者"] = "玩家",
+    ["文本"] = "我们带来了与|cffff00ff『分离教派』|r有关的情报，需要立刻面见|cffff99cc『克林姆德王』|r。",
+    ["持续时间"] = 4
+}, {
+    type = "dialog",
+    id = "city_palace_guard_02",
+    ["名称"] = "禁军放行",
+    ["说话者"] = "精灵禁军",
+    ["文本"] = "王上确有命令。诸位请入内，但不要接近封锁区。",
+    ["持续时间"] = 4
+}}
+local _____738B_5BAB_95E8_536B_652F_7EBF_53D1_73B0_6B65_9AA4 = {{
+    type = "runAction",
+    id = "city_side_quest_discover",
+    ["名称"] = "王宫门卫2支线发现",
+    ["动作ID"] = "JLC精灵城_王宫门卫2支线发现",
+    ["参数"] = {
+        ["触发进度"] = 23,
+        ["目标进度"] = 24,
+        NPC = "主线NPC.jl禁军门卫2",
+        ["触发范围"] = 600,
+        ["支线任务"] = "udg_RW[8]",
+        ["旧JASS功能清单"] = "QuestSetDiscovered / QuestMessageBJ(DISCOVERED)"
+    }
+}}
+local _____514B_6797_59C6_5FB7_56FD_738B_59D4_6258_6B65_9AA4 = {
     {
         type = "runAction",
         id = "elven_city_king_audience",
@@ -149,9 +146,9 @@ local _____738B_5BAB_7981_519B_4E0E_56FD_738B_59D4_6258_6B65_9AA4 = {
             ["目标进度"] = 25,
             NPC = "ZX.克林姆德王",
             ["触发范围"] = 999,
-            ["会议音乐"] = "gg_snd_JQBGM02 @ gg_rct______________121",
+            ["开始音乐"] = "gg_snd_JQBGM02 @ gg_rct______________121",
             ["发放金币"] = 15000,
-            ["生成猎魂单位ID"] = "ohun",
+            ["生成猎魂单位名"] = "猎魂",
             ["猎魂位置X"] = -2823.1,
             ["猎魂位置Y"] = -14119.8,
             ["移除阻挡"] = "gg_dest_Dofw_5490",
@@ -198,6 +195,41 @@ local _____738B_5BAB_7981_519B_4E0E_56FD_738B_59D4_6258_6B65_9AA4 = {
         ["参数"] = {["任务描述"] = "调查巨魔一族与分离教派的联系。", ["任务更新提示"] = "|cffffff00『主线目标』：|r前往|cffffcc99『巨魔一族领地』|r调查。", ["小地图X"] = -2906.2, ["小地图Y"] = -14099.8}
     }
 }
+____exports["阿尔文接引剧情片段"] = {
+    ["片段ID"] = "elven_city_alvin_start",
+    ["名称"] = "阿尔文接引",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____963F_5C14_6587_63A5_5F15_6B65_9AA4
+}
+____exports["王城门禁剧情片段"] = {
+    ["片段ID"] = "elven_city_gate_open",
+    ["名称"] = "王城门禁开启",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____738B_57CE_95E8_7981_6B65_9AA4
+}
+____exports["王宫禁军盘查剧情片段"] = {
+    ["片段ID"] = "elven_city_palace_guard",
+    ["名称"] = "王宫禁军盘查",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____738B_5BAB_7981_519B_76D8_67E5_6B65_9AA4
+}
+____exports["王宫门卫支线发现剧情片段"] = {
+    ["片段ID"] = "elven_city_side_quest_discover",
+    ["名称"] = "王宫门卫支线发现",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____738B_5BAB_95E8_536B_652F_7EBF_53D1_73B0_6B65_9AA4
+}
+____exports["克林姆德国王委托剧情片段"] = {
+    ["片段ID"] = "elven_city_king_audience",
+    ["名称"] = "克林姆德国王委托",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____514B_6797_59C6_5FB7_56FD_738B_59D4_6258_6B65_9AA4
+}
 local ____array_0 = __TS__SparseArrayNew(table.unpack(_____963F_5C14_6587_63A5_5F15_6B65_9AA4))
 __TS__SparseArrayPush(
     ____array_0,
@@ -205,7 +237,15 @@ __TS__SparseArrayPush(
 )
 __TS__SparseArrayPush(
     ____array_0,
-    table.unpack(_____738B_5BAB_7981_519B_4E0E_56FD_738B_59D4_6258_6B65_9AA4)
+    table.unpack(_____738B_5BAB_7981_519B_76D8_67E5_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____738B_5BAB_95E8_536B_652F_7EBF_53D1_73B0_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____514B_6797_59C6_5FB7_56FD_738B_59D4_6258_6B65_9AA4)
 )
 ____exports["入城到王城委托剧情片段"] = {
     ["片段ID"] = "elven_city_entry_to_king_mission",

@@ -24,6 +24,8 @@ local ydweBase = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDUserDataGetUnsafe = ydweCompat.YDUserDataGet
 local YDUserDataSetUnsafe = ydweCompat.YDUserDataSet
 local YDUserDataClearUnsafe = ydweCompat.YDUserDataClear
+local YDUserDataHasUnsafe = ydweCompat.YDUserDataHas
+local YDUserDataClearTableUnsafe = ydweCompat.YDUserDataClearTable
 local getObjectPropertyUnsafe = ydweBase.getObjectProperty
 local getObjectPropertyRealUnsafe = ydweBase.getObjectPropertyReal
 local getObjectPropertyIntegerUnsafe = ydweBase.getObjectPropertyInteger
@@ -33,6 +35,7 @@ local YDWEGetUnitAbilityDataRealUnsafe = ydweBase.YDWEGetUnitAbilityDataReal
 local YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState
 local YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal
 local YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect
+local YDWEAngleBetweenUnitsUnsafe = ydweBase.YDWEAngleBetweenUnits
 function ____exports.YDUserDataGetSafe(tableType, tableKey, attr, valueType)
     return YDUserDataGetUnsafe(
         nil,
@@ -60,6 +63,18 @@ function ____exports.YDUserDataClearSafe(tableType, tableKey, attr, valueType)
         attr,
         valueType
     )
+end
+function ____exports.YDUserDataHasSafe(tableType, tableKey, attr, valueType)
+    return YDUserDataHasUnsafe(
+        nil,
+        tableType,
+        tableKey,
+        attr,
+        valueType
+    ) == true
+end
+function ____exports.YDUserDataClearTableSafe(tableTypeName, tableKey)
+    YDUserDataClearTableUnsafe(nil, tableTypeName, tableKey)
 end
 function ____exports.getObjectPropertySafe(objectType, objectId, property)
     return getObjectPropertyUnsafe(nil, objectType, objectId, property)
@@ -119,9 +134,14 @@ end
 function ____exports.YDWETimerDestroyEffectSafe(duration, effect)
     YDWETimerDestroyEffectUnsafe(nil, duration, effect)
 end
+function ____exports.YDWEAngleBetweenUnitsSafe(fromUnit, toUnit)
+    return YDWEAngleBetweenUnitsUnsafe(nil, fromUnit, toUnit)
+end
 ____exports["安全YDUserDataGet"] = ____exports.YDUserDataGetSafe
 ____exports["安全YDUserDataSet"] = ____exports.YDUserDataSetSafe
 ____exports["安全YDUserDataClear"] = ____exports.YDUserDataClearSafe
+____exports["安全YDUserDataHas"] = ____exports.YDUserDataHasSafe
+____exports["安全YDUserDataClearTable"] = ____exports.YDUserDataClearTableSafe
 ____exports["安全读取对象属性"] = ____exports.getObjectPropertySafe
 ____exports["安全读取对象实数属性"] = ____exports.getObjectPropertyRealSafe
 ____exports["安全读取对象整数属性"] = ____exports.getObjectPropertyIntegerSafe
@@ -131,4 +151,5 @@ ____exports["安全读取单位技能实数"] = ____exports.YDWEGetUnitAbilityDa
 ____exports["安全设置单位技能状态"] = ____exports.YDWESetUnitAbilityStateSafe
 ____exports["安全设置单位技能实数数据"] = ____exports.YDWESetUnitAbilityDataRealSafe
 ____exports["安全延时销毁特效"] = ____exports.YDWETimerDestroyEffectSafe
+____exports["安全取两单位角度"] = ____exports.YDWEAngleBetweenUnitsSafe
 return ____exports

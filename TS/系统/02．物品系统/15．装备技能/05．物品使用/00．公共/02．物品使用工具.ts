@@ -35,8 +35,8 @@ const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   getServerTime: (this: void) => number;
 };
-const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
-  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (whichItem: any) => number;
@@ -452,7 +452,7 @@ export function 取玩家ID(this: void, 单位: any): number {
 
 export function 创建火把单位(this: void, 来源: any, x: number, y: number, face: number, 模型: string, 持续时间: number): void {
   if (火把单位类型ID === 0) return;
-  const unit = 创建单位并登记排泄(GetOwningPlayer(来源), 火把单位类型ID, x, y, face);
+  const unit = 创建单位并登记排泄安全(GetOwningPlayer(来源), 火把单位类型ID, x, y, face);
   if (unit == null || unit === 0) return;
   DzSetUnitModel(unit, 模型);
   SetUnitScale(unit, 1, 1, 1);

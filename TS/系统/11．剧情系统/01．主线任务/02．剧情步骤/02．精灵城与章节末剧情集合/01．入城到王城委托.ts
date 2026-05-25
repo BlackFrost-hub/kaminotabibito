@@ -64,7 +64,7 @@ const 王城门禁步骤: 剧情步骤[] = [
       门卫单位: "gg_unit_n04R_0048",
       触发范围: 999,
       延迟开门秒: 2.5,
-      开启门: "gg_dest_LTe1_11879",
+      开门对象: "gg_dest_LTe1_11879",
       隐藏阻挡: "gg_dest_B00K_5466",
       解锁视野: "gg_rct__________u",
       旧JASS功能清单: "TimerStart / ModifyGateBJ / ShowDestructable(false) / CreateFogModifierRectBJ",
@@ -100,7 +100,7 @@ const 王城门禁步骤: 剧情步骤[] = [
   },
 ];
 
-const 王宫禁军与国王委托步骤: 剧情步骤[] = [
+const 王宫禁军盘查步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "elven_city_palace_guard",
@@ -139,6 +139,9 @@ const 王宫禁军与国王委托步骤: 剧情步骤[] = [
     文本: "王上确有命令。诸位请入内，但不要接近封锁区。",
     持续时间: 4,
   },
+];
+
+const 王宫门卫支线发现步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "city_side_quest_discover",
@@ -153,6 +156,9 @@ const 王宫禁军与国王委托步骤: 剧情步骤[] = [
       旧JASS功能清单: "QuestSetDiscovered / QuestMessageBJ(DISCOVERED)",
     },
   },
+];
+
+const 克林姆德国王委托步骤: 剧情步骤[] = [
   {
     type: "runAction",
     id: "elven_city_king_audience",
@@ -163,9 +169,9 @@ const 王宫禁军与国王委托步骤: 剧情步骤[] = [
       目标进度: 25,
       NPC: "ZX.克林姆德王",
       触发范围: 999,
-      会议音乐: "gg_snd_JQBGM02 @ gg_rct______________121",
+      开始音乐: "gg_snd_JQBGM02 @ gg_rct______________121",
       发放金币: 15000,
-      生成猎魂单位ID: "ohun",
+      生成猎魂单位名: "猎魂",
       猎魂位置X: -2823.1,
       猎魂位置Y: -14119.8,
       移除阻挡: "gg_dest_Dofw_5490",
@@ -218,12 +224,58 @@ const 王宫禁军与国王委托步骤: 剧情步骤[] = [
   },
 ];
 
+export const 阿尔文接引剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_alvin_start",
+  名称: "阿尔文接引",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 阿尔文接引步骤,
+};
+
+export const 王城门禁剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_gate_open",
+  名称: "王城门禁开启",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 王城门禁步骤,
+};
+
+export const 王宫禁军盘查剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_palace_guard",
+  名称: "王宫禁军盘查",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 王宫禁军盘查步骤,
+};
+
+export const 王宫门卫支线发现剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_side_quest_discover",
+  名称: "王宫门卫支线发现",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 王宫门卫支线发现步骤,
+};
+
+export const 克林姆德国王委托剧情片段: 剧情片段配置 = {
+  片段ID: "elven_city_king_audience",
+  名称: "克林姆德国王委托",
+  可Esc整段跳过: true,
+  默认倍速: 1,
+  步骤列表: 克林姆德国王委托步骤,
+};
+
 export const 入城到王城委托剧情片段: 剧情片段配置 = {
   片段ID: "elven_city_entry_to_king_mission",
   名称: "入城到王城委托",
   可Esc整段跳过: true,
   默认倍速: 1,
-  步骤列表: [...阿尔文接引步骤, ...王城门禁步骤, ...王宫禁军与国王委托步骤],
+  步骤列表: [
+    ...阿尔文接引步骤,
+    ...王城门禁步骤,
+    ...王宫禁军盘查步骤,
+    ...王宫门卫支线发现步骤,
+    ...克林姆德国王委托步骤,
+  ],
 };
 
 export default 入城到王城委托剧情片段;

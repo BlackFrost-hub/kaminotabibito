@@ -21,6 +21,10 @@ export interface 主线剧情入口配置基础 {
   触发方式: 主线剧情入口触发方式;
   剧情片段ID?: string;
   旧JASS触发器?: 旧主线剧情触发器名;
+  需要剧情进度?: number;
+  最低剧情进度?: number;
+  最高剧情进度?: number;
+  需要物品名?: string;
   说明?: string;
 }
 

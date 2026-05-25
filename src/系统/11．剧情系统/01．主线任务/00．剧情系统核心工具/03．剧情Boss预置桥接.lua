@@ -3,6 +3,8 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入当前剧情动作上下文"]
+local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -43,9 +45,11 @@ local function ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1()
     if trigger == nil or trigger == 0 then
         return
     end
-    local _____914D_7F6E = _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868[tostring(GetHandleId(trigger)
-    )]
+    local _____914D_7F6E = _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868[GetHandleId(trigger)]
     if _____914D_7F6E == nil then
+        return
+    end
+    if _____914D_7F6E["需要剧情进度"] ~= nil and _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= _____914D_7F6E["需要剧情进度"] then
         return
     end
     _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587({
@@ -53,8 +57,13 @@ local function ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1()
         ["触发配置名"] = _____914D_7F6E["配置名"],
         ["触发单位"] = GetTriggerUnit()
     })
+    if _____914D_7F6E["剧情片段ID"] ~= nil and _____914D_7F6E["剧情片段ID"] ~= "" then
+        local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.index")
+        local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_4["播放主线剧情片段"]
+        _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____914D_7F6E["剧情片段ID"])
+    end
 end
-____exports["注册剧情Boss范围预置触发器"] = function(bossUnit, _____6CE8_518C_8303_56F4, _____914D_7F6E_540D, _____5267_60C5_7247_6BB5ID, ____Boss_952E)
+____exports["注册剧情Boss范围预置触发器"] = function(bossUnit, _____6CE8_518C_8303_56F4, _____914D_7F6E_540D, _____5267_60C5_7247_6BB5ID, ____Boss_952E, _____9700_8981_5267_60C5_8FDB_5EA6)
     if bossUnit == nil or bossUnit == 0 then
         return nil
     end
@@ -64,8 +73,7 @@ ____exports["注册剧情Boss范围预置触发器"] = function(bossUnit, _____6
     local trigger = CreateTrigger()
     TriggerAddAction(trigger, ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1)
     TriggerRegisterUnitInRangeSimple(trigger, _____6CE8_518C_8303_56F4, bossUnit)
-    _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868[tostring(GetHandleId(trigger)
-    )] = {["配置名"] = _____914D_7F6E_540D, ["剧情片段ID"] = _____5267_60C5_7247_6BB5ID, ["Boss键"] = ____Boss_952E}
+    _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868[GetHandleId(trigger)] = {["配置名"] = _____914D_7F6E_540D, ["剧情片段ID"] = _____5267_60C5_7247_6BB5ID, ["Boss键"] = ____Boss_952E, ["需要剧情进度"] = _____9700_8981_5267_60C5_8FDB_5EA6}
     return trigger
 end
 ____exports["创建并冻结剧情Boss预置"] = function(_____53C2_6570)
@@ -107,7 +115,8 @@ ____exports["创建并冻结剧情Boss预置"] = function(_____53C2_6570)
             _____53C2_6570["注册范围"] or 0,
             _____53C2_6570["范围触发配置名"] or _____53C2_6570["Boss名"] .. "范围预置触发",
             _____53C2_6570["范围触发剧情片段ID"],
-            _____53C2_6570["Boss键"]
+            _____53C2_6570["Boss键"],
+            _____53C2_6570["需要剧情进度"]
         )
     end
     return bossUnit

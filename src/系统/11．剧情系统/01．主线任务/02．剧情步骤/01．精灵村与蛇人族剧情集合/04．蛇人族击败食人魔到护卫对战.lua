@@ -3,38 +3,64 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local _____6C99_6F20_98DF_4EBA_9B54Boss_6B65_9AA4 = {
-    {
-        type = "runAction",
-        id = "desert_ogre_boss_start",
-        ["名称"] = "沙漠食人魔Boss战启动",
-        ["动作ID"] = "SRZ蛇人族_沙漠食人魔Boss启动",
-        ["参数"] = {
-            ["触发进度"] = 10,
-            ["目标进度"] = 11,
-            Boss = "Boss.沙漠食人魔",
-            ["触发范围"] = 1000,
-            ["解锁视野"] = "gg_rct______________047",
-            ["战斗桥接"] = "Boss战.绑定单位 -> gg_trg_Boss____________u",
-            ["旧JASS功能清单"] = "GroupAddUnit / SetUnitOwner / PauseUnit / SetUnitInvulnerable / EC_CreateEffect / PlaySoundBJ"
-        }
-    },
-    {
-        type = "dialog",
-        id = "desert_ogre_player_01",
-        ["名称"] = "玩家发现食人魔",
-        ["说话者"] = "玩家",
-        ["文本"] = "就是它。蛇人族说的失控食人魔，气息比普通魔物强得多。",
-        ["持续时间"] = 3
-    },
-    {
-        type = "dialog",
-        id = "desert_ogre_roar",
-        ["名称"] = "食人魔咆哮",
-        ["说话者"] = "沙漠食人魔",
-        ["文本"] = "吼！闯进沙海的猎物，都要被砸成碎骨！",
-        ["持续时间"] = 3
-    },
+local _____63A5_53D7_98DF_4EBA_9B54_4EFB_52A1_6B65_9AA4 = {{
+    type = "runAction",
+    id = "snake_ogre_task_accept_action",
+    ["名称"] = "拾取狩猎食人魔任务物品后创建沙漠食人魔预置",
+    ["动作ID"] = "SRZ蛇人族_接受食人魔任务",
+    ["参数"] = {
+        ["触发进度"] = 9,
+        ["目标进度"] = 10,
+        ["注册范围"] = 850,
+        ["任务描述"] = "前往沙漠深处击败『沙漠食人魔』，取得蛇人族需要的凭证。",
+        ["任务更新提示"] = "|cffffff00『主线目标』：|r击败|cffff6600『沙漠食人魔』|r。",
+        ["旧JASS功能清单"] = "RemoveItem(I0D0) / CreateUnit(次元裂缝) / QuestSetDescription / QuestMessageBJ / CreateUnit(沙漠食人魔) / PauseUnit / SetUnitInvulnerable / TriggerRegisterUnitInRangeSimple / CreatePermanentCorpseLocBJ"
+    }
+}, {
+    type = "dialog",
+    id = "snake_ogre_task_player_01",
+    ["名称"] = "玩家接受狩猎委托",
+    ["说话者"] = "玩家",
+    ["文本"] = "任务已经接下。沙漠食人魔既然失控到让蛇人族都要借外人之手处理，恐怕不只是普通魔物。",
+    ["持续时间"] = 4
+}, {
+    type = "dialog",
+    id = "snake_ogre_task_system_01",
+    ["名称"] = "系统警告",
+    ["说话者"] = "系统",
+    ["文本"] = "|cffffff00『系统提示』：|r新的|cffff6600『Boss战』|r目标已出现，请准备充分后再接近。Boss 区域已生成尸骨标记与异常裂隙。",
+    ["持续时间"] = 4
+}}
+local _____6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8_6B65_9AA4 = {{
+    type = "runAction",
+    id = "desert_ogre_boss_start",
+    ["名称"] = "沙漠食人魔Boss战启动",
+    ["动作ID"] = "SRZ蛇人族_沙漠食人魔Boss启动",
+    ["参数"] = {
+        ["触发进度"] = 10,
+        ["目标进度"] = 11,
+        ["Boss键"] = "Boss.沙漠食人魔",
+        ["触发范围"] = 1000,
+        ["解锁视野"] = "gg_rct______________047",
+        ["战斗桥接"] = "Boss战.绑定单位 -> gg_trg_Boss____________u",
+        ["旧JASS功能清单"] = "GroupAddUnit / SetUnitOwner / PauseUnit / SetUnitInvulnerable / EC_CreateEffect / PlaySoundBJ"
+    }
+}, {
+    type = "dialog",
+    id = "desert_ogre_player_01",
+    ["名称"] = "玩家发现食人魔",
+    ["说话者"] = "玩家",
+    ["文本"] = "就是它。蛇人族说的失控食人魔，气息比普通魔物强得多。",
+    ["持续时间"] = 3
+}, {
+    type = "dialog",
+    id = "desert_ogre_roar",
+    ["名称"] = "食人魔咆哮",
+    ["说话者"] = "沙漠食人魔",
+    ["文本"] = "吼！闯进沙海的猎物，都要被砸成碎骨！",
+    ["持续时间"] = 3
+}}
+local _____6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1_6B65_9AA4 = {
     {
         type = "runAction",
         id = "desert_ogre_first_death",
@@ -43,10 +69,11 @@ local _____6C99_6F20_98DF_4EBA_9B54Boss_6B65_9AA4 = {
         ["参数"] = {
             ["触发进度"] = 11,
             ["目标进度"] = 12,
-            ["死亡单位ID"] = "N05J",
-            ["裂隙单位ID"] = "e08M",
-            ["蜥蜴人单位ID"] = "h01I",
-            ["二阶段BossID"] = "N05K",
+            ["死亡单位名"] = "沙漠食人魔",
+            ["裂隙单位名"] = "次元裂缝",
+            ["蜥蜴人单位名"] = "神秘蜥蜴人",
+            ["二阶段Boss名"] = "杀戮食人魔",
+            ["Boss键"] = "Boss.杀戮食人魔",
             ["旧JASS功能清单"] = "UnitSuspendDecay / SetStackedSoundBJ(false, shengliBgm) / CreateUnit / PauseUnit / SetUnitInvulnerable / ConditionalTriggerExecute"
         }
     },
@@ -81,71 +108,60 @@ local _____6C99_6F20_98DF_4EBA_9B54Boss_6B65_9AA4 = {
         ["说话者"] = "杀戮食人魔",
         ["文本"] = "血……更多的血！把你们的恐惧，全都献给我！",
         ["持续时间"] = 4
-    },
-    {
-        type = "runAction",
-        id = "desert_slaughter_ogre_death",
-        ["名称"] = "杀戮食人魔死亡与奖励",
-        ["动作ID"] = "SW01死亡事件_杀戮食人魔死亡",
-        ["参数"] = {
-            ["触发进度"] = 12,
-            ["目标进度"] = 13,
-            Boss = "Boss.杀戮食人魔",
-            ["掉落凭证"] = "I0D4",
-            ["选择宝箱"] = "e070",
-            ["宝箱物品"] = "I0D1, I089, I0D3",
-            ["旧JASS功能清单"] = "CreateItem / AddItemToStockBJ / QuestMessageBJ / ForGroupBJ"
-        }
-    },
-    {
-        type = "dialog",
-        id = "desert_ogre_defeated",
-        ["名称"] = "击败杀戮食人魔",
-        ["说话者"] = "玩家",
-        ["文本"] = "这次它彻底没动静了。带上凭证，回蛇人族找藏品管家。",
-        ["持续时间"] = 4
     }
 }
-local _____86C7_4EBA_65CF_62A4_536B_51B2_7A81_6B65_9AA4 = {
-    {
-        type = "runAction",
-        id = "snake_keeper_return_item",
-        ["名称"] = "交还食人魔凭证",
-        ["动作ID"] = "SRZ蛇人族_交还食人魔凭证",
-        ["参数"] = {
-            ["触发进度"] = 13,
-            ["目标进度"] = 14,
-            ["需要物品"] = "I0D4",
-            ["给予物品"] = "I0D6",
-            NPC = "主线NPC.蛇人族藏品管家",
-            ["停止区域音乐"] = "gg_snd_BGM019 @ gg_rct______________107",
-            ["切换剧情音乐"] = "gg_snd_JQBGM02 @ gg_rct______________107",
-            ["旧JASS功能清单"] = "RemoveItem / UnitAddItem / SetStackedSoundBJ / CreateUnit(蛇人族卫队长)"
-        }
-    },
-    {
-        type = "dialog",
-        id = "snake_keeper_return_01",
-        ["名称"] = "管家确认凭证",
-        ["说话者"] = "蛇人族藏品管家",
-        ["文本"] = "很好，这确实是那头食人魔的凭证。看来你们并不是只会夸口的外来者。",
-        ["持续时间"] = 4
-    },
-    {
-        type = "dialog",
-        id = "snake_keeper_return_02",
-        ["名称"] = "交出源石线索",
-        ["说话者"] = "蛇人族藏品管家",
-        ["文本"] = "拿着这枚蛇纹印记。它能证明你们曾为蛇人族办事，也能带你们找到下一条线索。",
-        ["持续时间"] = 4
-    },
+local _____6740_622E_98DF_4EBA_9B54_6B7B_4EA1_6B65_9AA4 = {{
+    type = "runAction",
+    id = "desert_slaughter_ogre_death",
+    ["名称"] = "杀戮食人魔死亡与奖励",
+    ["动作ID"] = "SW01死亡事件_杀戮食人魔死亡",
+    ["参数"] = {["触发进度"] = 12, ["目标进度"] = 13, ["Boss键"] = "Boss.杀戮食人魔", ["旧JASS功能清单"] = "QuestMessageBJ / ForGroupBJ；死亡宝箱和死亡掉落迁出到后续Boss死亡掉落系统"}
+}, {
+    type = "dialog",
+    id = "desert_ogre_defeated",
+    ["名称"] = "击败杀戮食人魔",
+    ["说话者"] = "玩家",
+    ["文本"] = "这次它彻底没动静了。带上凭证，回蛇人族找藏品管家。",
+    ["持续时间"] = 4
+}}
+local _____86C7_4EBA_65CF_4EA4_51ED_8BC1_6B65_9AA4 = {{
+    type = "runAction",
+    id = "snake_keeper_return_item",
+    ["名称"] = "交还食人魔凭证",
+    ["动作ID"] = "SRZ蛇人族_交还食人魔凭证",
+    ["参数"] = {
+        ["触发进度"] = 13,
+        ["目标进度"] = 14,
+        ["需要物品"] = "食人魔头颅",
+        ["物品名"] = "|cff00ff00夜光翡翠|r",
+        NPC = "主线NPC.蛇人族藏品管家",
+        ["停止区域音乐"] = "gg_snd_BGM019 @ gg_rct______________107",
+        ["开始音乐"] = "gg_snd_JQBGM02 @ gg_rct______________107",
+        ["旧JASS功能清单"] = "RemoveItem / UnitAddItem / SetStackedSoundBJ / CreateUnit(蛇人族卫队长)"
+    }
+}, {
+    type = "dialog",
+    id = "snake_keeper_return_01",
+    ["名称"] = "管家确认凭证",
+    ["说话者"] = "蛇人族藏品管家",
+    ["文本"] = "很好，这确实是那头食人魔的凭证。看来你们并不是只会夸口的外来者。",
+    ["持续时间"] = 4
+}, {
+    type = "dialog",
+    id = "snake_keeper_return_02",
+    ["名称"] = "交出源石线索",
+    ["说话者"] = "蛇人族藏品管家",
+    ["文本"] = "拿着这枚蛇纹印记。它能证明你们曾为蛇人族办事，也能带你们找到下一条线索。",
+    ["持续时间"] = 4
+}}
+local _____86C7_4EBA_65CF_536B_961F_957F_8BD5_70BC_6B65_9AA4 = {
     {
         type = "runAction",
         id = "snake_guard_captain_enter",
         ["名称"] = "蛇人族卫队长入场",
         ["动作ID"] = "SRZ蛇人族_卫队长入场",
         ["参数"] = {
-            ["卫队长单位ID"] = "h01D",
+            ["卫队长单位名"] = "利尔·伯特",
             ["出生X"] = -22935.9,
             ["出生Y"] = 3154.3,
             ["目标X"] = -21023.4,
@@ -193,10 +209,68 @@ local _____86C7_4EBA_65CF_62A4_536B_51B2_7A81_6B65_9AA4 = {
         ["参数"] = {["任务描述"] = "完成蛇人族卫队长提出的护卫试炼。", ["任务更新提示"] = "|cffffff00『主线目标』：|r通过|cffffcc99『蛇人族护卫试炼』|r。", ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ"}
     }
 }
-local ____array_0 = __TS__SparseArrayNew(table.unpack(_____6C99_6F20_98DF_4EBA_9B54Boss_6B65_9AA4))
+____exports["沙漠食人魔Boss启动剧情片段"] = {
+    ["片段ID"] = "jlc_desert_ogre_boss_start",
+    ["名称"] = "沙漠食人魔Boss启动",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8_6B65_9AA4
+}
+____exports["蛇人族接受食人魔任务剧情片段"] = {
+    ["片段ID"] = "jlc_snake_ogre_task_accept",
+    ["名称"] = "蛇人族接受狩猎食人魔任务",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____63A5_53D7_98DF_4EBA_9B54_4EFB_52A1_6B65_9AA4
+}
+____exports["沙漠食人魔一阶段死亡剧情片段"] = {
+    ["片段ID"] = "jlc_desert_ogre_first_death",
+    ["名称"] = "沙漠食人魔一阶段死亡",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1_6B65_9AA4
+}
+____exports["杀戮食人魔死亡剧情片段"] = {
+    ["片段ID"] = "jlc_slaughter_ogre_death",
+    ["名称"] = "杀戮食人魔死亡",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____6740_622E_98DF_4EBA_9B54_6B7B_4EA1_6B65_9AA4
+}
+____exports["蛇人族交凭证剧情片段"] = {
+    ["片段ID"] = "jlc_snake_keeper_return_item",
+    ["名称"] = "蛇人族交还食人魔凭证",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____86C7_4EBA_65CF_4EA4_51ED_8BC1_6B65_9AA4
+}
+____exports["蛇人族卫队长试炼剧情片段"] = {
+    ["片段ID"] = "jlc_snake_guard_duel",
+    ["名称"] = "蛇人族卫队长试炼",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____86C7_4EBA_65CF_536B_961F_957F_8BD5_70BC_6B65_9AA4
+}
+local ____array_0 = __TS__SparseArrayNew(table.unpack(_____63A5_53D7_98DF_4EBA_9B54_4EFB_52A1_6B65_9AA4))
 __TS__SparseArrayPush(
     ____array_0,
-    table.unpack(_____86C7_4EBA_65CF_62A4_536B_51B2_7A81_6B65_9AA4)
+    table.unpack(_____6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____6740_622E_98DF_4EBA_9B54_6B7B_4EA1_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____86C7_4EBA_65CF_4EA4_51ED_8BC1_6B65_9AA4)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____86C7_4EBA_65CF_536B_961F_957F_8BD5_70BC_6B65_9AA4)
 )
 ____exports["蛇人族击败食人魔到护卫对战剧情片段"] = {
     ["片段ID"] = "jlc_snake_ogre_defeated_to_guard_duel",

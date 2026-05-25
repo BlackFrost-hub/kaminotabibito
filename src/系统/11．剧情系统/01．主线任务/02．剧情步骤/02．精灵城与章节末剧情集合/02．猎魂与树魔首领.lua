@@ -55,13 +55,7 @@ local _____5DE8_9B54_9996_9886_6218_524D_6B65_9AA4 = {
         id = "elven_city_troll_leader_start",
         ["名称"] = "巨魔首领战前触发",
         ["动作ID"] = "JLC精灵城_巨魔首领战前",
-        ["参数"] = {
-            ["触发进度"] = 26,
-            ["目标进度"] = 27,
-            Boss = "巨魔首领.Boss",
-            ["触发范围"] = 400,
-            ["旧JASS功能清单"] = "PauseUnit(GetTriggerUnit) / Transmission / QuestSetDescription / QuestMessageBJ"
-        }
+        ["参数"] = {["触发进度"] = 26, ["目标进度"] = 27, ["触发范围"] = 400, ["旧JASS功能清单"] = "PauseUnit(GetTriggerUnit) / Transmission / QuestSetDescription / QuestMessageBJ"}
     },
     {
         type = "dialog",
@@ -87,22 +81,14 @@ local _____5DE8_9B54_9996_9886_6218_524D_6B65_9AA4 = {
         ["文本"] = "少废话！踏入领地者，只有死路一条！",
         ["持续时间"] = 3
     },
-    {type = "startBossFight", id = "city_troll_leader_boss", ["名称"] = "启动巨魔首领战", ["Boss引用"] = "巨魔首领.Boss"}
+    {type = "startBossFight", id = "city_troll_leader_boss", ["名称"] = "启动巨魔首领战", ["Boss名"] = "树魔首领"}
 }
 local _____6811_9B54_9996_9886_6B7B_4EA1_627F_63A5_6B65_9AA4 = {{
     type = "runAction",
     id = "treant_leader_death_reward",
     ["名称"] = "树魔首领死亡与奖励",
     ["动作ID"] = "SW01死亡事件_树魔首领死亡",
-    ["参数"] = {
-        ["触发进度"] = 27,
-        ["目标进度"] = 28,
-        ["死亡单位ID"] = "N05S",
-        ["选择宝箱"] = "e070",
-        ["宝箱物品"] = "I0C3, I0C5, I0C7",
-        ["掉落物品"] = "I0CA",
-        ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ / AddItemToStockBJ / CreateItem / YDUserDataClearTable"
-    }
+    ["参数"] = {["触发进度"] = 27, ["目标进度"] = 28, ["死亡单位名"] = "树魔首领", ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ / YDUserDataClearTable；死亡宝箱和死亡掉落迁出到后续Boss死亡掉落系统"}
 }, {
     type = "dialog",
     id = "treant_leader_death_01",
@@ -124,6 +110,27 @@ local _____6811_9B54_9996_9886_6B7B_4EA1_627F_63A5_6B65_9AA4 = {{
     ["动作ID"] = "JLC精灵城_树魔首领死亡后返城",
     ["参数"] = {["任务描述"] = "带着魔法信件返回王城。", ["任务更新提示"] = "|cffffff00『主线目标』：|r返回|cffff99cc『克林姆德王城』|r。"}
 }}
+____exports["猎魂试探剧情片段"] = {
+    ["片段ID"] = "elven_city_hunter_start",
+    ["名称"] = "猎魂试探",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____730E_9B42_8BD5_63A2_6B65_9AA4
+}
+____exports["巨魔首领战前剧情片段"] = {
+    ["片段ID"] = "elven_city_troll_leader_start",
+    ["名称"] = "巨魔首领战前",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____5DE8_9B54_9996_9886_6218_524D_6B65_9AA4
+}
+____exports["树魔首领死亡承接剧情片段"] = {
+    ["片段ID"] = "elven_city_treant_leader_death",
+    ["名称"] = "树魔首领死亡承接",
+    ["可Esc整段跳过"] = true,
+    ["默认倍速"] = 1,
+    ["步骤列表"] = _____6811_9B54_9996_9886_6B7B_4EA1_627F_63A5_6B65_9AA4
+}
 local ____array_0 = __TS__SparseArrayNew(table.unpack(_____730E_9B42_8BD5_63A2_6B65_9AA4))
 __TS__SparseArrayPush(
     ____array_0,

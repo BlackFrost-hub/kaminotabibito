@@ -1,86 +1,117 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
+local _____5199_5165_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入剧情进度"]
+local ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668["播放主线剧情片段"]
+---
+-- @noSelfInFile
+local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
+local GetUnitTypeId = jass.GetUnitTypeId
 ____exports["Boss死亡剧情索引表"] = {
     {
-        ["Boss单位ID"] = "N00C",
-        ["Boss名"] = "地精祭祀",
+        ["Boss单位名"] = "地精祭祀|cffff0000（BossLV12）|r",
         ["需要剧情进度"] = 3,
         ["设置剧情进度"] = 4,
-        ["剧情片段ID"] = "jlc_elven_village_goblin_defeated_to_desert",
-        ["说明"] = "地精祭祀死亡后，接黑影退场、复命长老、前往沙漠。"
+        ["剧情片段ID"] = "jlc_goblin_boss_death",
+        ["说明"] = "地精祭祀死亡后播放残血地精、宝箱、神秘人出现与回村复命引导演出。"
     },
     {
-        ["Boss单位ID"] = "N05J",
-        ["Boss名"] = "沙漠食人魔",
+        ["Boss单位名"] = "沙漠食人魔",
         ["需要剧情进度"] = 11,
         ["设置剧情进度"] = 12,
-        ["剧情片段ID"] = "jlc_snake_ogre_defeated_to_guard_duel",
-        ["说明"] = "沙漠食人魔一阶段死亡后，接裂隙与杀戮食人魔二阶段。"
+        ["剧情片段ID"] = "jlc_desert_ogre_first_death",
+        ["说明"] = "沙漠食人魔一阶段死亡后，接裂隙与杀戮食人魔二阶段演出。"
     },
     {
-        ["Boss单位ID"] = "N05K",
-        ["Boss名"] = "杀戮食人魔",
+        ["Boss单位名"] = "杀戮食人魔",
         ["需要剧情进度"] = 12,
         ["设置剧情进度"] = 13,
         ["阶段标记"] = "沙漠食人魔二阶段",
-        ["剧情片段ID"] = "jlc_snake_ogre_defeated_to_guard_duel",
-        ["说明"] = "杀戮食人魔死亡后，回蛇人族交凭证并接护卫对战。"
+        ["剧情片段ID"] = "jlc_slaughter_ogre_death",
+        ["说明"] = "杀戮食人魔死亡后，引导回蛇人族交任务；死亡掉落迁出到后续 Boss 死亡掉落系统。"
     },
     {
-        ["Boss单位ID"] = "N05N",
-        ["Boss名"] = "蒙面人",
+        ["Boss单位名"] = "教派剑士",
         ["需要剧情进度"] = 17,
         ["设置剧情进度"] = 18,
         ["阶段标记"] = "剑士姿态",
-        ["剧情片段ID"] = "jlc_return_village_defeat_chapter_one_cult_boss",
-        ["说明"] = "第一章最终Boss剑士姿态死亡后，接教派败退与前往王城。"
+        ["剧情片段ID"] = "jlc_cult_final_boss_death",
+        ["说明"] = "第一章最终 Boss 剑士姿态死亡后，接教派败退与前往王城。"
     },
     {
-        ["Boss单位ID"] = "N05M",
-        ["Boss名"] = "蒙面人",
+        ["Boss单位名"] = "教派学者",
         ["需要剧情进度"] = 17,
         ["设置剧情进度"] = 18,
         ["阶段标记"] = "学者姿态",
-        ["剧情片段ID"] = "jlc_return_village_defeat_chapter_one_cult_boss",
-        ["说明"] = "第一章最终Boss学者姿态死亡后，接教派败退与前往王城。"
+        ["剧情片段ID"] = "jlc_cult_final_boss_death",
+        ["说明"] = "第一章最终 Boss 学者姿态死亡后，接教派败退与前往王城。"
     },
     {
-        ["Boss单位ID"] = "N05S",
-        ["Boss名"] = "树魔首领",
+        ["Boss单位名"] = "树魔首领",
         ["需要剧情进度"] = 27,
         ["设置剧情进度"] = 28,
-        ["剧情片段ID"] = "elven_city_hunter_to_treant_leader",
+        ["剧情片段ID"] = "elven_city_treant_leader_death",
         ["说明"] = "树魔首领死亡后，掉落魔法信件并返回王城汇报。"
     }
 }
+local function ____Boss_5355_4F4D_540D_5339_914D(unitTypeId, ____Boss_5355_4F4D_540D)
+    local rawId = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID(____Boss_5355_4F4D_540D)
+    return stringToFourCCSafe(rawId) == unitTypeId
+end
 local function _____5267_60C5_8FDB_5EA6_5339_914D(_____914D_7F6E_8FDB_5EA6, _____5F53_524D_5267_60C5_8FDB_5EA6)
-    return _____914D_7F6E_8FDB_5EA6 == nil or _____5F53_524D_5267_60C5_8FDB_5EA6 == nil or _____914D_7F6E_8FDB_5EA6 == _____5F53_524D_5267_60C5_8FDB_5EA6
+    return _____914D_7F6E_8FDB_5EA6 == nil or _____914D_7F6E_8FDB_5EA6 == _____5F53_524D_5267_60C5_8FDB_5EA6
 end
 local function _____9636_6BB5_5339_914D(_____914D_7F6E_9636_6BB5, _____5F53_524D_9636_6BB5)
     return _____914D_7F6E_9636_6BB5 == nil or _____5F53_524D_9636_6BB5 == nil or _____914D_7F6E_9636_6BB5 == _____5F53_524D_9636_6BB5
 end
-____exports["查找Boss死亡剧情索引"] = function(____Boss_5355_4F4DID, _____5F53_524D_5267_60C5_8FDB_5EA6, _____9636_6BB5_6807_8BB0)
+____exports["查找Boss死亡剧情索引"] = function(____Boss_5355_4F4D_7C7B_578BID, _____5F53_524D_5267_60C5_8FDB_5EA6, _____9636_6BB5_6807_8BB0)
     do
         local i = 0
         while i < #____exports["Boss死亡剧情索引表"] do
             do
                 local _____7D22_5F15_9879 = ____exports["Boss死亡剧情索引表"][i + 1]
-                if _____7D22_5F15_9879["Boss单位ID"] ~= ____Boss_5355_4F4DID then
-                    goto __continue6
+                if not ____Boss_5355_4F4D_540D_5339_914D(____Boss_5355_4F4D_7C7B_578BID, _____7D22_5F15_9879["Boss单位名"]) then
+                    goto __continue7
                 end
                 if not _____5267_60C5_8FDB_5EA6_5339_914D(_____7D22_5F15_9879["需要剧情进度"], _____5F53_524D_5267_60C5_8FDB_5EA6) then
-                    goto __continue6
+                    goto __continue7
                 end
                 if not _____9636_6BB5_5339_914D(_____7D22_5F15_9879["阶段标记"], _____9636_6BB5_6807_8BB0) then
-                    goto __continue6
+                    goto __continue7
                 end
                 return _____7D22_5F15_9879
             end
-            ::__continue6::
+            ::__continue7::
             i = i + 1
         end
     end
     return nil
+end
+____exports["尝试播放Boss死亡主线剧情"] = function(bossUnit, _____9636_6BB5_6807_8BB0)
+    if bossUnit == nil or bossUnit == 0 then
+        return false
+    end
+    local _____7D22_5F15_9879 = ____exports["查找Boss死亡剧情索引"](
+        GetUnitTypeId(bossUnit),
+        _____8BFB_53D6_5267_60C5_8FDB_5EA6(),
+        _____9636_6BB5_6807_8BB0
+    )
+    if _____7D22_5F15_9879 == nil then
+        return false
+    end
+    if _____7D22_5F15_9879["设置剧情进度"] ~= nil then
+        _____5199_5165_5267_60C5_8FDB_5EA6(_____7D22_5F15_9879["设置剧情进度"])
+    end
+    if _____7D22_5F15_9879["剧情片段ID"] == nil or _____7D22_5F15_9879["剧情片段ID"] == "" then
+        return true
+    end
+    return _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7D22_5F15_9879["剧情片段ID"], {["片段ID"] = _____7D22_5F15_9879["剧情片段ID"], ["触发配置名"] = "Boss死亡剧情索引", ["触发单位"] = bossUnit})
 end
 ____exports.default = ____exports["Boss死亡剧情索引表"]
 return ____exports

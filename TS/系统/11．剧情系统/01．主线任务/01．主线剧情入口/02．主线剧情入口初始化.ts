@@ -14,8 +14,20 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
+  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+};
+const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
+  按名字反查物品ID: (this: void, name: string) => string | undefined;
+};
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const { 查找主线剧情片段 } = require("../02．剧情步骤") as {
   查找主线剧情片段: (this: void, 片段ID: string) => any;
+};
+const { 播放主线剧情片段 } = require("../02．剧情步骤") as {
+  播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
 };
 
 import {
@@ -27,6 +39,7 @@ import {
   主线剧情矩形入口配置表,
 } from "./01．主线NPC初始化配置表";
 import type { 主线NPC初始化配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
+import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreateTimer = jass.CreateTimer as (this: void) => any;
@@ -81,21 +94,44 @@ function 记录入口触发器配置(this: void, trigger: any, 配置: 主线剧
   入口配置By触发器ID[tostring(GetHandleId(trigger))] = 配置;
 }
 
+function 剧情进度满足入口配置(this: void, 配置: 主线剧情入口配置): boolean {
+  const 当前剧情进度 = 读取剧情进度();
+  if (配置.需要剧情进度 != null && 当前剧情进度 !== 配置.需要剧情进度) return false;
+  if (配置.最低剧情进度 != null && 当前剧情进度 < 配置.最低剧情进度) return false;
+  if (配置.最高剧情进度 != null && 当前剧情进度 > 配置.最高剧情进度) return false;
+  return true;
+}
+
+function 触发单位满足入口物品配置(this: void, 配置: 主线剧情入口配置, 触发单位: any): boolean {
+  if (配置.需要物品名 == null || 配置.需要物品名 === "") return true;
+  if (触发单位 == null || 触发单位 === 0) return false;
+  const 物品类型ID = stringToFourCCSafe(按名字反查物品ID(配置.需要物品名));
+  if (!(物品类型ID > 0)) return false;
+  return UnitHasItemOfTypeBJ(触发单位, 物品类型ID);
+}
+
 function on主线剧情入口触发(this: void): void {
   const trigger = GetTriggeringTrigger();
   if (trigger == null) return;
   const 配置 = 入口配置By触发器ID[tostring(GetHandleId(trigger))];
   if (配置 == null || 配置.剧情片段ID == null) return;
+  if (!剧情进度满足入口配置(配置)) return;
+  const 触发单位 = GetTriggerUnit();
+  if (!触发单位满足入口物品配置(配置, 触发单位)) return;
 
   const 片段 = 查找主线剧情片段(配置.剧情片段ID);
   if (片段 == null) return;
 
-  const 触发单位 = GetTriggerUnit();
   YDUserDataSetSafe("string", "主线剧情入口", "触发配置", "string", 配置.配置名);
   YDUserDataSetSafe("string", "主线剧情入口", "剧情片段ID", "string", 配置.剧情片段ID);
   if (触发单位 != null) {
     YDUserDataSetSafe("string", "主线剧情入口", "触发单位", "unit", 触发单位);
   }
+  播放主线剧情片段(配置.剧情片段ID, {
+    片段ID: 配置.剧情片段ID,
+    触发配置名: 配置.配置名,
+    触发单位,
+  });
 }
 
 function 创建入口触发器(this: void, 配置: 主线剧情入口配置): any {

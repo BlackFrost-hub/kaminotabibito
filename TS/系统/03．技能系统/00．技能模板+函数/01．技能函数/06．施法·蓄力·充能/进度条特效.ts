@@ -20,8 +20,8 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
-const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
-  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
   立即移除单位并取消排泄登记: (this: void, unit: any) => void;
@@ -168,7 +168,7 @@ export function 创建进度条特效(单位: any, 选项?: 进度条特效选�
   const x = GetUnitX(单位);
   const y = GetUnitY(单位);
   const owner = Player(PROGRESSBAR_OWNER_PLAYER_ID);
-  const 进度条单位 = 创建单位并登记排泄(owner, PROGRESSBAR_UNIT_ID, x, y, 0);
+  const 进度条单位 = 创建单位并登记排泄安全(owner, PROGRESSBAR_UNIT_ID, x, y, 0);
   if (!单位存活(进度条单位)) return null;
 
   SetUnitScale(进度条单位, 缩放, 缩放, 缩放);

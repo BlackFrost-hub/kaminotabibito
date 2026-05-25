@@ -91,7 +91,7 @@ ____exports["标准剧情片段模板"] = {
             ["动作ID"] = "custom_story_action",
             ["参数"] = {["说明"] = "这里挂关门、开门、发奖励、切任务、改状态等特殊动作"}
         },
-        {type = "startBossFight", id = "boss_start", ["名称"] = "启动 Boss 战", ["Boss单位ID"] = "N000"}
+        {type = "startBossFight", id = "boss_start", ["名称"] = "启动 Boss 战", ["Boss名"] = "示例Boss"}
     }
 }
 ____exports.default = ____exports["标准剧情片段模板"]

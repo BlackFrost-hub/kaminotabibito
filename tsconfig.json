@@ -8,6 +8,7 @@
     "skipLibCheck": true
   },
   "include": ["TS/**/*.ts", "TS/**/*.d.ts"],
+  "exclude": ["TS/**/99．迁移资料/**/*.ts"],
   "tstl": {
     "luaTarget": "5.4",
     "noResolvePaths": [

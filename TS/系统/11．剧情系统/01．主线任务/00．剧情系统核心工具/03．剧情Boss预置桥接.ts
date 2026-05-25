@@ -16,6 +16,7 @@ const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.
 };
 
 import { 写入当前剧情动作上下文 } from "./01．剧情动作上下文";
+import { 读取剧情进度 } from "./01．剧情动作上下文";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -32,6 +33,7 @@ interface 剧情Boss范围预置触发配置 {
   配置名: string;
   剧情片段ID?: string;
   Boss键?: string;
+  需要剧情进度?: number;
 }
 
 interface 剧情Boss预置参数 {
@@ -45,9 +47,10 @@ interface 剧情Boss预置参数 {
   预创建后无敌?: boolean;
   范围触发配置名?: string;
   范围触发剧情片段ID?: string;
+  需要剧情进度?: number;
 }
 
-const 范围预置触发配置表: Record<string, 剧情Boss范围预置触发配置> = {};
+const 范围预置触发配置表: Record<number, 剧情Boss范围预置触发配置> = {};
 
 function 解析Boss表键(this: void, boss键: string | undefined): { 表名: string; 键名: string } {
   if (boss键 == null || boss键 === "") return { 表名: "Boss", 键名: "" };
@@ -63,14 +66,21 @@ function on剧情Boss范围预置触发(this: void): void {
   const trigger = GetTriggeringTrigger();
   if (trigger == null || trigger === 0) return;
 
-  const 配置 = 范围预置触发配置表[tostring(GetHandleId(trigger))];
+  const 配置 = 范围预置触发配置表[GetHandleId(trigger)];
   if (配置 == null) return;
+  if (配置.需要剧情进度 != null && 读取剧情进度() !== 配置.需要剧情进度) return;
 
   写入当前剧情动作上下文({
     片段ID: 配置.剧情片段ID,
     触发配置名: 配置.配置名,
     触发单位: GetTriggerUnit(),
   });
+  if (配置.剧情片段ID != null && 配置.剧情片段ID !== "") {
+    const { 播放主线剧情片段 } = require("../02．剧情步骤") as {
+      播放主线剧情片段: (this: void, 片段ID: string) => boolean;
+    };
+    播放主线剧情片段(配置.剧情片段ID);
+  }
 }
 
 export function 注册剧情Boss范围预置触发器(
@@ -80,6 +90,7 @@ export function 注册剧情Boss范围预置触发器(
   配置名: string,
   剧情片段ID?: string,
   Boss键?: string,
+  需要剧情进度?: number,
 ): any {
   if (bossUnit == null || bossUnit === 0) return null;
   if (!(注册范围 > 0)) return null;
@@ -87,10 +98,11 @@ export function 注册剧情Boss范围预置触发器(
   const trigger = CreateTrigger();
   TriggerAddAction(trigger, on剧情Boss范围预置触发);
   TriggerRegisterUnitInRangeSimple(trigger, 注册范围, bossUnit);
-  范围预置触发配置表[tostring(GetHandleId(trigger))] = {
+  范围预置触发配置表[GetHandleId(trigger)] = {
     配置名,
     剧情片段ID,
     Boss键,
+    需要剧情进度,
   };
   return trigger;
 }
@@ -124,6 +136,7 @@ export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss�
       参数.范围触发配置名 ?? `${参数.Boss名}范围预置触发`,
       参数.范围触发剧情片段ID,
       参数.Boss键,
+      参数.需要剧情进度,
     );
   }
 

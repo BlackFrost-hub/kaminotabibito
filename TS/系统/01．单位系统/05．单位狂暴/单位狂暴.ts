@@ -16,8 +16,8 @@ const cameraShakeForPlayerRaw = cameraShakeMod.CameraShakeForPlayer as any;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
-  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 type DropBerserkEntry = { berserkUnit?: string | number; berserk?: string | number };
 const idData =
@@ -53,7 +53,7 @@ function onDeath(this: void, dying: any, killer: any): void {
   const four = stringToFourCC(spawnUnitId.substring(0, 4));
   const owner = (jass as any).GetOwningPlayer(dying);
   let created: any = undefined;
-  created = 创建单位并登记排泄(owner, four, x, y, facingDeg);
+  created = 创建单位并登记排泄安全(owner, four, x, y, facingDeg);
   const killerPlayer = killer ? (jass as any).GetOwningPlayer(killer) : undefined;
   if (created && killerPlayer) {
     EXSetUnitFacing(created, facingDeg);

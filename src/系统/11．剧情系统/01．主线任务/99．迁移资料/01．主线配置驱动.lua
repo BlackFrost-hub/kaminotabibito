@@ -9,7 +9,7 @@ local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____00_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 = require("系统.11．剧情系统.01．主线任务.00．主线任务配置表")
+local ____00_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 = require("系统.11．剧情系统.01．主线任务.99．迁移资料.00．主线任务配置表")
 local _____53EF_76F4_63A5_8FC1_79FB_5267_60C5_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 = ____00_FF0E_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868["可直接迁移剧情主线任务配置表"]
 ---
 -- @noSelfInFile
@@ -491,8 +491,16 @@ local function _____8F93_51FA_4E3B_7EBF_517C_5BB9_8BCA_65AD()
         local i = 0
         while i < #_____53EF_76F4_63A5_8FC1_79FB_5267_60C5_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868 do
             local _____914D_7F6E = _____53EF_76F4_63A5_8FC1_79FB_5267_60C5_4E3B_7EBF_4EFB_52A1_914D_7F6E_8868[i + 1]
-            local _____6761_4EF6_6587_672C = _____914D_7F6E.condition or ""
-            local _____52A8_4F5C_6587_672C = _____914D_7F6E.actionTimeline or ""
+            local ____914D_7F6E_condition_17 = _____914D_7F6E.condition
+            if ____914D_7F6E_condition_17 == nil then
+                ____914D_7F6E_condition_17 = ""
+            end
+            local _____6761_4EF6_6587_672C = ____914D_7F6E_condition_17
+            local ____914D_7F6E_actionTimeline_18 = _____914D_7F6E.actionTimeline
+            if ____914D_7F6E_actionTimeline_18 == nil then
+                ____914D_7F6E_actionTimeline_18 = ""
+            end
+            local _____52A8_4F5C_6587_672C = ____914D_7F6E_actionTimeline_18
             local _____6761_4EF6_51FD_6570 = _____63D0_53D6_7591_4F3C_51FD_6570_540D(_____6761_4EF6_6587_672C)
             do
                 local j = 0

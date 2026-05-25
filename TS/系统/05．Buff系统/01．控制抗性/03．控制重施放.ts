@@ -11,8 +11,8 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 const { YDWESetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDWESetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number, value: number) => boolean;
 };
-const { 创建单位并登记排泄 } = require("lib.扩展函数.自定义扩展函数.00．单位相关") as {
-  创建单位并登记排泄: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 
 //=============================================================================
@@ -50,7 +50,7 @@ export function createControlHelper(caster: any, target: any): any {
   const x = jass.GetLocationX(targetLoc);
   const y = jass.GetLocationY(targetLoc);
 
-  const helper = 创建单位并登记排泄(jass.GetOwningPlayer(caster), helperType, x, y, 0);
+  const helper = 创建单位并登记排泄安全(jass.GetOwningPlayer(caster), helperType, x, y, 0);
 
   jass.RemoveLocation(targetLoc);
   return helper;

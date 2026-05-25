@@ -6,6 +6,7 @@
 export * from "./00．单位初始化创建/index";
 export * from "./01．多面板属性/index";
 export * from "./02．恢复系统/index";
+export * from "./03．怪物刷新系统/index";
 export * from "./04．多杀检测系统/index";
 
 // ========== 核心模块导出 ==========
