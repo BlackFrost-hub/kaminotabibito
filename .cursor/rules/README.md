@@ -11,6 +11,7 @@
 | [`equipment/`](equipment/) | 装备属性、装备 Buff、hot 字段、USE_ITEM 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
 | [`tooling/`](tooling/) | 调试输出、音效与封装约定、编码与补丁安全 |
+| [`story/`](story/) | 剧情任务迁移、紧凑剧情片段维护、对白时长与动作挂点规则 |
 | [`agent-shared/`](agent-shared/) | 跨代理共享规则、全局高优先级规则 |
 
 带 YAML frontmatter 的 `.mdc` 文件可通过 `description`、`globs`、`alwaysApply` 控制注入行为。纯 `.md` 文件为参考文档，不自动注入。

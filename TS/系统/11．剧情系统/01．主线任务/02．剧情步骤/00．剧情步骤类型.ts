@@ -143,3 +143,39 @@ export interface 剧情片段配置 {
   默认倍速?: number;
   步骤列表: 剧情步骤[];
 }
+
+export type 剧情动作挂点 = "beforeDialog" | "afterDialog" | "absoluteTime";
+
+export interface 紧凑剧情对白行 {
+  序号: number;
+  说话者: string;
+  文本: string;
+  持续时间: number;
+  使用原生电影系统?: boolean;
+  原生电影阻塞?: boolean;
+  备注?: string;
+}
+
+export interface 紧凑剧情动作行 {
+  序号: number;
+  动作ID: string;
+  挂点: 剧情动作挂点;
+  对白序号?: number;
+  时间秒?: number;
+  名称?: string;
+  参数?: Record<string, string | number | boolean>;
+  旧JASS?: string;
+  说明?: string;
+}
+
+export interface 紧凑剧情片段配置 {
+  片段ID: string;
+  名称?: string;
+  触发条件?: string;
+  设置剧情进度?: number;
+  可Esc整段跳过?: boolean;
+  默认倍速?: number;
+  默认对白持续时间?: number;
+  对白列表: 紧凑剧情对白行[];
+  动作时间线?: 紧凑剧情动作行[];
+}
