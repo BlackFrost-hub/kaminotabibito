@@ -11,7 +11,7 @@ const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩�
 const { YDWESetUnitAbilityStateSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWESetUnitAbilityStateSafe: (this: void, unit: any, abilityId: number, stateType: number, value: number) => boolean;
 };
-const { 单位满足击杀前置条件 } = require("系统.03．技能系统.05．单位技能.00．公共") as {
+const { 单位满足击杀前置条件 } = require("系统.03．技能系统.05．单位技能.00．公共.06．死亡前置判断") as {
   单位满足击杀前置条件: (this: void, dyingUnit: any) => boolean;
 };
 const { 蕾米莉亚单位技能配置 } = require("系统.03．技能系统.05．单位技能.04．英雄技能.02．蕾米莉亚.00．配置") as {

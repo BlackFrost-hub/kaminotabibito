@@ -21,6 +21,19 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { ModifyGateBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
 };
+const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
+  TransmissionFromUnitWithNameBJ: (
+    this: void,
+    toForce: any,
+    whichUnit: any,
+    unitName: string,
+    soundHandle: any,
+    message: string,
+    timeType: number,
+    timeVal: number,
+    wait: boolean,
+  ) => void;
+};
 const { 按名字反查杂鱼单位ID } = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表") as {
   按名字反查杂鱼单位ID: (this: void, name: string) => string | undefined;
 };
@@ -44,6 +57,7 @@ const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBou
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
+const GetPlayersAll = jass.GetPlayersAll as (this: void) => any;
 const IsUnitType = jass.IsUnitType as (this: void, whichUnit: any, whichType: any) => boolean;
 const IsUnitIllusion = jass["IsUnitIllusion"] as (this: void, whichUnit: any) => boolean;
 const Player = jass.Player as (this: void, number: number) => any;
@@ -51,6 +65,7 @@ const Player = jass.Player as (this: void, number: number) => any;
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const UNIT_TYPE_SUMMONED = jass.UNIT_TYPE_SUMMONED as number;
 const bj_GATEOPERATION_OPEN = jglobals.bj_GATEOPERATION_OPEN as number;
+const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 
 interface 已解析剧情物品掉落动作配置 extends 剧情物品掉落动作配置 {
   物品类型ID?: number;
@@ -147,6 +162,13 @@ function 执行开启大门动作(this: void, 动作: 已解析剧情物品掉�
   }
 }
 
+function 执行电影消息动作(this: void, 动作: 已解析剧情物品掉落动作配置): void {
+  const 发言名 = 动作.消息发言名 ?? "";
+  const 文本 = 动作.消息文本 ?? "";
+  if (文本 === "") return;
+  TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 发言名, null, 文本, bj_TIMETYPE_SET, 动作.持续时间 ?? 10, false);
+}
+
 function 执行动作(this: void, dyingUnit: any, 动作: 已解析剧情物品掉落动作配置): void {
   if (!满足动作前置(动作)) return;
 
@@ -157,6 +179,11 @@ function 执行动作(this: void, dyingUnit: any, 动作: 已解析剧情物品�
 
   if (动作.动作类型 === "开启大门") {
     执行开启大门动作(动作);
+    return;
+  }
+
+  if (动作.动作类型 === "电影消息") {
+    执行电影消息动作(动作);
   }
 }
 

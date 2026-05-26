@@ -5,7 +5,7 @@ const jass = require("jass.common") as any;
 const { SetUnitFacingToFaceUnitTimed } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe, YDUserDataClearSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09－YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe, YDUserDataClearSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
@@ -23,8 +23,14 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
   按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
 };
+const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
+  按名字反查总单位ID: (this: void, name: string) => string | undefined;
+};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
+  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
 const { GS_PolarProjectionBJ } = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影") as {
   GS_PolarProjectionBJ: (this: void, source: any, dist: number, angle: number) => any;
@@ -61,6 +67,7 @@ const CreateFogModifierRect = jass.CreateFogModifierRect as (this: void, whichPl
 const CreateItem = jass.CreateItem as (this: void, itemId: number, x: number, y: number) => any;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const CreateTimer = jass.CreateTimer as (this: void) => any;
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreatePermanentCorpseLocBJ = jass.CreatePermanentCorpseLocBJ as (this: void, style: number, unitid: number, whichPlayer: any, loc: any, facing: number) => void;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const DestroyTimer = jass.DestroyTimer as (this: void, whichTimer: any) => void;
@@ -72,6 +79,7 @@ const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetPlayersAll = jass.GetPlayersAll as (this: void) => any;
 const GetDyingUnit = jass.GetDyingUnit as (this: void) => any;
 const GetKillingUnitBJ = jass.GetKillingUnitBJ as (this: void) => any;
+const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, whichUnit: any) => number;
 const GetFilterUnit = jass.GetFilterUnit as (this: void) => any;
 const GetUnitLoc = jass.GetUnitLoc as (this: void, whichUnit: any) => any;
@@ -81,6 +89,7 @@ const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
+const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const QuestMessageBJ = jass.QuestMessageBJ as (this: void, whichForce: any, messageType: number, message: string) => void;
@@ -114,6 +123,7 @@ const SetTimeOfDay = jass.SetTimeOfDay as (this: void, time: number) => void;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const UnitSuspendDecay = jass.UnitSuspendDecay as (this: void, whichUnit: any, flag: boolean) => void;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
+const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, actionFunc: (this: void) => void) => any;
 const TimerStart = jass.TimerStart as (this: void, timer: any, timeout: number, periodic: boolean, callback: () => void) => void;
 
 const FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE as number;
@@ -126,6 +136,7 @@ const bj_QUESTMESSAGE_UPDATED = (require("jass.globals") as any).bj_QUESTMESSAGE
 
 let 地精死亡演出传送X = 0;
 let 地精死亡演出传送Y = 0;
+let 村口放行玩家面向角度 = 0;
 
 function 读取长老单位(this: void): any {
   return YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
@@ -140,6 +151,13 @@ function on地精死亡演出移动英雄(this: void): void {
 function 是自然守护者(this: void): boolean {
   const unit = GetFilterUnit();
   return unit != null && unit !== 0 && GetUnitTypeId(unit) === stringToFourCCSafe("etrp");
+}
+
+function on村口放行玩家停下并转向(this: void): void {
+  const unit = GetEnumUnit();
+  if (unit == null || unit === 0) return;
+  IssueImmediateOrder(unit, "stop");
+  SetUnitFacing(unit, 村口放行玩家面向角度);
 }
 
 function 分割名称列表(this: void, value: string | undefined): string[] {
@@ -365,17 +383,58 @@ function 清理逗号分隔语义单位(this: void, refs: string): void {
   }
 }
 
+function on动态裂缝回村范围触发(this: void): void {
+  const 当前进度 = Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"));
+  if (当前进度 !== 16) return;
+
+  const 触发单位 = GetTriggerUnit();
+  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
+  if (玩家英雄组 != null && 玩家英雄组 !== 0 && !IsUnitInGroup(触发单位, 玩家英雄组)) return;
+
+  const 片段ID = "jlc_return_village_after_guard_duel";
+  YDUserDataSetSafe("string", "主线剧情入口", "触发配置", "string", "动态裂缝回村入口");
+  YDUserDataSetSafe("string", "主线剧情入口", "剧情片段ID", "string", 片段ID);
+  YDUserDataSetSafe("string", "主线剧情入口", "触发单位", "unit", 触发单位);
+
+  const { 播放主线剧情片段 } = require("../02．剧情步骤") as {
+    播放主线剧情片段: (this: void, id: string, 上下文?: any) => boolean;
+  };
+  播放主线剧情片段(片段ID, {
+    片段ID,
+    触发配置名: "动态裂缝回村入口",
+    触发单位,
+  });
+}
+
+function 注册动态裂缝回村入口(this: void, unit: any): void {
+  if (unit == null || unit === 0) return;
+  const trigger = CreateTrigger();
+  TriggerAddAction(trigger, on动态裂缝回村范围触发);
+  TriggerRegisterUnitInRangeSimple(trigger, 300, unit);
+}
+
 function 执行沙漠情报商人回收夜光翡翠(this: void, 参数: 剧情动作参数表): void {
   const oldGuardRefs = String(参数.移除临时单位 ?? "");
   清理逗号分隔语义单位(oldGuardRefs);
 
-  const riftRawId = stringToFourCCSafe("e06W");
+  const riftRawId = stringToFourCCSafe(按名字反查总单位ID("进入单位范围用"));
   if (riftRawId > 0) {
     const riftA = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), riftRawId, -27182.1, -25485.2, 0);
     const riftB = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), riftRawId, -24123.4, -26338.8, 0);
-    if (riftA != null && riftA !== 0) YDUserDataSetSafe("string", "ZXCS", "DW", "unit", riftA);
-    if (riftB != null && riftB !== 0) YDUserDataSetSafe("string", "ZXCS2", "DW", "unit", riftB);
+    if (riftA != null && riftA !== 0) {
+      YDUserDataSetSafe("string", "ZXCS", "DW", "unit", riftA);
+      注册动态裂缝回村入口(riftA);
+    }
+    if (riftB != null && riftB !== 0) {
+      YDUserDataSetSafe("string", "ZXCS2", "DW", "unit", riftB);
+      注册动态裂缝回村入口(riftB);
+    }
   }
+}
+
+function 执行护卫试炼后回村(this: void, 参数: 剧情动作参数表): void {
+  const refs = String(参数.移除临时单位 ?? "");
+  清理逗号分隔语义单位(refs);
 }
 
 function 执行蛇人族交还食人魔凭证(this: void, 参数: 剧情动作参数表): void {
@@ -458,7 +517,6 @@ function 执行沙漠食人魔一阶段死亡(this: void, 参数: 剧情动作�
 
 function 执行蒙面人死亡(this: void, 参数: 剧情动作参数表): void {
   delete 参数.奖励物品名;
-  delete 参数.停止区域音乐;
   delete 参数.恢复环境音乐;
   const dyingUnit = GetDyingUnit();
   if (dyingUnit == null || dyingUnit === 0) return;
@@ -481,6 +539,9 @@ function 执行蒙面人死亡(this: void, 参数: 剧情动作参数表): void 
 
 function 执行村口放行前置(this: void, 参数: 剧情动作参数表): void {
   const 门禁矩形 = String(参数.门禁矩形 ?? "");
+  const 上下文 = 读取当前剧情动作上下文();
+  const 触发单位 = 上下文.触发单位;
+  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
   if (门禁矩形 !== "") {
     const rectHandle = (require("jass.globals") as any)[门禁矩形];
     const 门卫组 = GetUnitsInRectMatching(rectHandle, Condition(是自然守护者));
@@ -488,6 +549,11 @@ function 执行村口放行前置(this: void, 参数: 剧情动作参数表): vo
       let unit = FirstOfGroup(门卫组);
       while (unit != null && unit !== 0) {
         IssueImmediateOrder(unit, "stop");
+        SetUnitFacing(unit, 210);
+        if (触发单位 != null && 触发单位 !== 0 && 玩家英雄组 != null && 玩家英雄组 !== 0) {
+          村口放行玩家面向角度 = YDWEAngleBetweenUnitsSafe(触发单位, unit);
+          ForGroupBJ(玩家英雄组, on村口放行玩家停下并转向);
+        }
         GroupRemoveUnit(门卫组, unit);
         unit = FirstOfGroup(门卫组);
       }
@@ -616,4 +682,5 @@ Object.assign(主线剧情动作注册表, {
   "JLC精灵城_王宫门卫2支线发现": 执行王宫门卫支线发现,
   "JLC精灵城_猎魂试探": 执行猎魂试探,
   "SW01死亡事件_树魔首领死亡": 执行树魔首领死亡,
+  "JLC精灵村_护卫试炼后回村": 执行护卫试炼后回村,
 });

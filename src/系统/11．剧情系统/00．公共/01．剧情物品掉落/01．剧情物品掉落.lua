@@ -20,27 +20,31 @@ local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
 local ModifyGateBJ = ____require_result_5.ModifyGateBJ
-local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
-local _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_6["按名字反查杂鱼单位ID"]
-local ____require_result_7 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
-local _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_7["按名字反查精英单位ID"]
-local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_8["按名字反查Boss单位ID"]
-local ____require_result_9 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
-local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_9["按名字反查异界Boss单位ID"]
-local ____require_result_10 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
-local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_10["按名字反查玩家英雄单位ID"]
+local ____require_result_6 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_6.TransmissionFromUnitWithNameBJ
+local ____require_result_7 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
+local _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_7["按名字反查杂鱼单位ID"]
+local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
+local _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_8["按名字反查精英单位ID"]
+local ____require_result_9 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_9["按名字反查Boss单位ID"]
+local ____require_result_10 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
+local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_10["按名字反查异界Boss单位ID"]
+local ____require_result_11 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
+local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_11["按名字反查玩家英雄单位ID"]
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomInt = jass.GetRandomInt
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetPlayersAll = jass.GetPlayersAll
 local IsUnitType = jass.IsUnitType
 local IsUnitIllusion = jass.IsUnitIllusion
 local Player = jass.Player
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local UNIT_TYPE_SUMMONED = jass.UNIT_TYPE_SUMMONED
 local bj_GATEOPERATION_OPEN = jglobals.bj_GATEOPERATION_OPEN
+local bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET
 local _____5DF2_89E3_6790_914D_7F6E_8868 = {}
 local _____5DF2_521D_59CB_5316_5267_60C5_7269_54C1_6389_843D = false
 local function _____6309_540D_5B57_53CD_67E5_4EFB_610F_5355_4F4DID(name)
@@ -140,6 +144,23 @@ local function _____6267_884C_5F00_542F_5927_95E8_52A8_4F5C(_____52A8_4F5C)
         end
     end
 end
+local function _____6267_884C_7535_5F71_6D88_606F_52A8_4F5C(_____52A8_4F5C)
+    local _____53D1_8A00_540D = _____52A8_4F5C["消息发言名"] or ""
+    local _____6587_672C = _____52A8_4F5C["消息文本"] or ""
+    if _____6587_672C == "" then
+        return
+    end
+    TransmissionFromUnitWithNameBJ(
+        GetPlayersAll(),
+        nil,
+        _____53D1_8A00_540D,
+        nil,
+        _____6587_672C,
+        bj_TIMETYPE_SET,
+        _____52A8_4F5C["持续时间"] or 10,
+        false
+    )
+end
 local function _____6267_884C_52A8_4F5C(dyingUnit, _____52A8_4F5C)
     if not _____6EE1_8DB3_52A8_4F5C_524D_7F6E(_____52A8_4F5C) then
         return
@@ -150,6 +171,10 @@ local function _____6267_884C_52A8_4F5C(dyingUnit, _____52A8_4F5C)
     end
     if _____52A8_4F5C["动作类型"] == "开启大门" then
         _____6267_884C_5F00_542F_5927_95E8_52A8_4F5C(_____52A8_4F5C)
+        return
+    end
+    if _____52A8_4F5C["动作类型"] == "电影消息" then
+        _____6267_884C_7535_5F71_6D88_606F_52A8_4F5C(_____52A8_4F5C)
     end
 end
 local function _____5904_7406_5267_60C5_7269_54C1_6389_843D(dyingUnit)
@@ -160,7 +185,7 @@ local function _____5904_7406_5267_60C5_7269_54C1_6389_843D(dyingUnit)
             do
                 local _____914D_7F6E = _____5DF2_89E3_6790_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["触发单位类型ID"] ~= dyingTypeId then
-                    goto __continue31
+                    goto __continue34
                 end
                 do
                     local j = 0
@@ -170,7 +195,7 @@ local function _____5904_7406_5267_60C5_7269_54C1_6389_843D(dyingUnit)
                     end
                 end
             end
-            ::__continue31::
+            ::__continue34::
             i = i + 1
         end
     end

@@ -11,7 +11,7 @@ const { 按名字反查玩家英雄单位ID } = require("系统.01．单位系�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { 按名字反查技能ID } = require("系统.03．技能系统.08．技能数据表") as {
+const { 按名字反查技能ID } = require("系统.03．技能系统.08．技能数据表.01．技能名反查") as {
   按名字反查技能ID: (this: void, name: string) => string | undefined;
 };
 

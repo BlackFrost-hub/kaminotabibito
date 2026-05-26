@@ -21,6 +21,9 @@ const { ModifyGateBJ, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂
 const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
   SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
 };
+const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundBJ: (this: void, soundHandle: any) => void;
+};
 const { ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
 };
@@ -47,7 +50,7 @@ import { 读取当前剧情动作上下文, 写入剧情进度 } from "./01．�
 import { 切换剧情大门, 发送剧情任务消息, 发送剧情小地图信号 } from "./02．剧情动作桥接";
 
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
-const AddItemToStockBJ = jass.AddItemToStockBJ as (this: void, whichItemId: number, whichUnit: any, stockMax: number, stockInitial: number) => void;
+const AddItemToStockBJ = jass.AddItemToStockBJ as (this: void, whichItemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
 const CreateFogModifierRect = jass.CreateFogModifierRect as (
   this: void,
   whichPlayer: any,
@@ -543,15 +546,33 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   if (停止区域音乐 !== "") 切换区域音乐表达式(停止区域音乐, false);
   const 开始区域音乐 = 取参数文本(参数, "开始音乐") || 取参数文本(参数, "开启区域音乐");
   if (开始区域音乐 !== "") 切换区域音乐表达式(开始区域音乐, true);
+  const 播放音效 = 取参数文本(参数, "播放音效") || 取参数文本(参数, "播放音效变量名");
+  if (播放音效 !== "") 播放音效表达式(播放音效);
 }
 
 function 切换区域音乐表达式(this: void, expr: string, add: boolean): void {
-  const at = expr.indexOf("@");
-  if (at < 0) return;
-  const soundVarName = expr.substring(0, at).trim();
-  const rectVarName = expr.substring(at + 1).trim();
-  const soundHandle = 读取全局句柄(soundVarName);
-  const rectHandle = 读取全局句柄(rectVarName);
-  if (soundHandle == null || soundHandle === 0 || rectHandle == null || rectHandle === 0) return;
-  SetStackedSoundBJ(add, soundHandle, rectHandle);
+  const list = expr.split(";");
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i].trim();
+    if (item.length === 0) continue;
+    const at = item.indexOf("@");
+    if (at < 0) continue;
+    const soundVarName = item.substring(0, at).trim();
+    const rectVarName = item.substring(at + 1).trim();
+    const soundHandle = 读取全局句柄(soundVarName);
+    const rectHandle = 读取全局句柄(rectVarName);
+    if (soundHandle == null || soundHandle === 0 || rectHandle == null || rectHandle === 0) continue;
+    SetStackedSoundBJ(add, soundHandle, rectHandle);
+  }
+}
+
+function 播放音效表达式(this: void, expr: string): void {
+  const list = expr.split(";");
+  for (let i = 0; i < list.length; i++) {
+    const soundVarName = list[i].trim();
+    if (soundVarName.length === 0) continue;
+    const soundHandle = 读取全局句柄(soundVarName);
+    if (soundHandle == null || soundHandle === 0) continue;
+    PlaySoundBJ(soundHandle);
+  }
 }

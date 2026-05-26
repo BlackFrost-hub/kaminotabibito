@@ -3,6 +3,29 @@
 import type { 剧情片段配置, 剧情步骤, 紧凑剧情动作行, 紧凑剧情片段配置 } from "../02．剧情步骤/00．剧情步骤类型";
 
 export function 编译紧凑动作(this: void, 动作: 紧凑剧情动作行): 剧情步骤 {
+  if (动作.动作ID === "wait") {
+    const 参数 = 动作.参数 ?? {};
+    return {
+      type: "wait",
+      id: 动作.动作ID,
+      名称: 动作.名称,
+      持续时间: ((参数 as any).等待秒数 as number | undefined) ?? 动作.时间秒 ?? 0,
+      允许Esc跳过: true,
+      使用原生电影系统: (参数 as any).使用原生电影系统 as boolean | undefined,
+    } as 剧情步骤;
+  }
+
+  if (动作.动作ID === "startBossFight") {
+    const 参数 = 动作.参数 ?? {};
+    return {
+      type: "startBossFight",
+      id: 动作.动作ID,
+      名称: 动作.名称,
+      Boss引用: (参数 as any).Boss引用 as string | undefined,
+      Boss名: (参数 as any).Boss名 as string | undefined,
+    } as 剧情步骤;
+  }
+
   return {
     type: "runAction",
     id: 动作.动作ID,
@@ -20,6 +43,25 @@ export function 编译紧凑动作(this: void, 动作: 紧凑剧情动作行): �
 export function 编译紧凑剧情片段(this: void, 配置: 紧凑剧情片段配置): 剧情片段配置 {
   const 步骤列表: 剧情步骤[] = [];
   const 动作时间线 = 配置.动作时间线 ?? [];
+
+  if (配置.对白列表.length === 0) {
+    for (let i = 0; i < 动作时间线.length; i++) {
+      const 动作 = 动作时间线[i];
+      步骤列表.push(编译紧凑动作({
+        ...动作,
+        挂点: "beforeDialog",
+        对白序号: 0,
+      }));
+    }
+
+    return {
+      片段ID: 配置.片段ID,
+      名称: 配置.名称,
+      可Esc整段跳过: 配置.可Esc整段跳过,
+      默认倍速: 配置.默认倍速,
+      步骤列表,
+    };
+  }
 
   for (let i = 0; i < 配置.对白列表.length; i++) {
     const 对白 = 配置.对白列表[i];

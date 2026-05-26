@@ -26,7 +26,7 @@ local _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027 = ____06_FF0E_
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local SetUnitFacingToFaceUnitTimed = ____require_result_0.SetUnitFacingToFaceUnitTimed
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09－YDUserData安全版")
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
 local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
@@ -39,26 +39,31 @@ local ____require_result_4 = require("系统.02．物品系统.13．物品名反
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_4["按名字反查物品ID"]
 local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_5["按名字反查Boss单位ID"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
-local ____require_result_7 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
-local GS_PolarProjectionBJ = ____require_result_7.GS_PolarProjectionBJ
-local ____require_result_8 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_8.GetRandomDirectionDeg
-local ForGroupBJ = ____require_result_8.ForGroupBJ
-local ModifyGateBJ = ____require_result_8.ModifyGateBJ
-local ____require_result_9 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_9.SetStackedSoundBJ
-local ____require_result_10 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local SetUnitLifePercentBJ = ____require_result_10.SetUnitLifePercentBJ
-local ____require_result_11 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_11.EC_CreateEffect
-local ____require_result_12 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
-local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_12["启动Boss战运行"]
+local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_6["按名字反查总单位ID"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_8 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterUnitInRangeSimple = ____require_result_8.TriggerRegisterUnitInRangeSimple
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
+local GS_PolarProjectionBJ = ____require_result_9.GS_PolarProjectionBJ
+local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_10.GetRandomDirectionDeg
+local ForGroupBJ = ____require_result_10.ForGroupBJ
+local ModifyGateBJ = ____require_result_10.ModifyGateBJ
+local ____require_result_11 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+local SetStackedSoundBJ = ____require_result_11.SetStackedSoundBJ
+local ____require_result_12 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitLifePercentBJ = ____require_result_12.SetUnitLifePercentBJ
+local ____require_result_13 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_13.EC_CreateEffect
+local ____require_result_14 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
+local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_14["启动Boss战运行"]
 local CreateFogModifierRect = jass.CreateFogModifierRect
 local CreateItem = jass.CreateItem
 local CreateGroup = jass.CreateGroup
 local CreateTimer = jass.CreateTimer
+local CreateTrigger = jass.CreateTrigger
 local CreatePermanentCorpseLocBJ = jass.CreatePermanentCorpseLocBJ
 local CreateUnit = jass.CreateUnit
 local DestroyTimer = jass.DestroyTimer
@@ -70,6 +75,7 @@ local GetExpiredTimer = jass.GetExpiredTimer
 local GetPlayersAll = jass.GetPlayersAll
 local GetDyingUnit = jass.GetDyingUnit
 local GetKillingUnitBJ = jass.GetKillingUnitBJ
+local GetTriggerUnit = jass.GetTriggerUnit
 local GetUnitFacing = jass.GetUnitFacing
 local GetFilterUnit = jass.GetFilterUnit
 local GetUnitLoc = jass.GetUnitLoc
@@ -79,6 +85,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local IssuePointOrder = jass.IssuePointOrder
+local IsUnitInGroup = jass.IsUnitInGroup
 local GetRandomInt = jass.GetRandomInt
 local Player = jass.Player
 local QuestMessageBJ = jass.QuestMessageBJ
@@ -99,6 +106,7 @@ local SetTimeOfDay = jass.SetTimeOfDay
 local PauseUnit = jass.PauseUnit
 local UnitSuspendDecay = jass.UnitSuspendDecay
 local GetEnumUnit = jass.GetEnumUnit
+local TriggerAddAction = jass.TriggerAddAction
 local TimerStart = jass.TimerStart
 local FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
@@ -109,6 +117,7 @@ local bj_QUESTMESSAGE_ITEMACQUIRED = require("jass.globals").bj_QUESTMESSAGE_ITE
 local bj_QUESTMESSAGE_UPDATED = require("jass.globals").bj_QUESTMESSAGE_UPDATED
 local _____5730_7CBE_6B7B_4EA1_6F14_51FA_4F20_9001X = 0
 local _____5730_7CBE_6B7B_4EA1_6F14_51FA_4F20_9001Y = 0
+local _____6751_53E3_653E_884C_73A9_5BB6_9762_5411_89D2_5EA6 = 0
 local function _____8BFB_53D6_957F_8001_5355_4F4D()
     return YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit")
 end
@@ -122,6 +131,14 @@ end
 local function _____662F_81EA_7136_5B88_62A4_8005()
     local unit = GetFilterUnit()
     return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) == stringToFourCCSafe("etrp")
+end
+local function ____on_6751_53E3_653E_884C_73A9_5BB6_505C_4E0B_5E76_8F6C_5411()
+    local unit = GetEnumUnit()
+    if unit == nil or unit == 0 then
+        return
+    end
+    IssueImmediateOrder(unit, "stop")
+    SetUnitFacing(unit, _____6751_53E3_653E_884C_73A9_5BB6_9762_5411_89D2_5EA6)
 end
 local function _____5206_5272_540D_79F0_5217_8868(value)
     if value == nil or value == "" then
@@ -152,11 +169,11 @@ local function _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE(rectV
                     false
                 )
                 if fogModifier == nil or fogModifier == 0 then
-                    goto __continue13
+                    goto __continue15
                 end
                 FogModifierStart(fogModifier)
             end
-            ::__continue13::
+            ::__continue15::
             playerId = playerId + 1
         end
     end
@@ -166,12 +183,12 @@ local function _____6267_884C_957F_8001_4EFB_52A1_7269_54C1_751F_6210(_____53C2_
     if _____957F_8001_5355_4F4D == nil or _____957F_8001_5355_4F4D == 0 then
         return
     end
-    local ____5206_5272_540D_79F0_5217_8868_14 = _____5206_5272_540D_79F0_5217_8868
-    local ____53C2_6570__7269_54C1_540D_5217_8868_13 = _____53C2_6570["物品名列表"]
-    if ____53C2_6570__7269_54C1_540D_5217_8868_13 == nil then
-        ____53C2_6570__7269_54C1_540D_5217_8868_13 = ""
+    local ____5206_5272_540D_79F0_5217_8868_16 = _____5206_5272_540D_79F0_5217_8868
+    local ____53C2_6570__7269_54C1_540D_5217_8868_15 = _____53C2_6570["物品名列表"]
+    if ____53C2_6570__7269_54C1_540D_5217_8868_15 == nil then
+        ____53C2_6570__7269_54C1_540D_5217_8868_15 = ""
     end
-    local _____7269_54C1_540D_5217_8868 = ____5206_5272_540D_79F0_5217_8868_14(tostring(____53C2_6570__7269_54C1_540D_5217_8868_13))
+    local _____7269_54C1_540D_5217_8868 = ____5206_5272_540D_79F0_5217_8868_16(tostring(____53C2_6570__7269_54C1_540D_5217_8868_15))
     local x = GetUnitX(_____957F_8001_5355_4F4D)
     local y = GetUnitY(_____957F_8001_5355_4F4D)
     do
@@ -181,11 +198,11 @@ local function _____6267_884C_957F_8001_4EFB_52A1_7269_54C1_751F_6210(_____53C2_
                 local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_540D_5217_8868[i + 1])
                 local itemTypeId = stringToFourCCSafe(rawId)
                 if not (itemTypeId > 0) then
-                    goto __continue18
+                    goto __continue20
                 end
                 CreateItem(itemTypeId, x, y)
             end
-            ::__continue18::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -196,62 +213,62 @@ local function _____6267_884C_957F_8001_4EFB_52A1_66F4_65B0(_____53C2_6570)
         Y = __TS__Number(_____53C2_6570["小地图Y"]) or 0,
         ["持续时间"] = __TS__Number(_____53C2_6570["小地图持续时间"]) or 0
     })
-    local ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_16 = _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F
-    local ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 = _____53C2_6570["任务更新提示"]
-    if ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 == nil then
-        ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 = ""
+    local ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_18 = _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F
+    local ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_17 = _____53C2_6570["任务更新提示"]
+    if ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_17 == nil then
+        ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_17 = ""
     end
-    ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_16({
+    ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_18({
         ["消息类型"] = bj_QUESTMESSAGE_UPDATED,
-        ["文本"] = tostring(____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15)
+        ["文本"] = tostring(____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_17)
     })
 end
 local function _____6267_884C_5730_7CBE_533A_57DF_663E_89C6_91CE(_____53C2_6570)
-    local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_18 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
-    local ____53C2_6570__53EF_89C1_533A_57DF1_17 = _____53C2_6570["可见区域1"]
-    if ____53C2_6570__53EF_89C1_533A_57DF1_17 == nil then
-        ____53C2_6570__53EF_89C1_533A_57DF1_17 = ""
-    end
-    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_18(tostring(____53C2_6570__53EF_89C1_533A_57DF1_17))
     local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_20 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
-    local ____53C2_6570__53EF_89C1_533A_57DF2_19 = _____53C2_6570["可见区域2"]
-    if ____53C2_6570__53EF_89C1_533A_57DF2_19 == nil then
-        ____53C2_6570__53EF_89C1_533A_57DF2_19 = ""
+    local ____53C2_6570__53EF_89C1_533A_57DF1_19 = _____53C2_6570["可见区域1"]
+    if ____53C2_6570__53EF_89C1_533A_57DF1_19 == nil then
+        ____53C2_6570__53EF_89C1_533A_57DF1_19 = ""
     end
-    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_20(tostring(____53C2_6570__53EF_89C1_533A_57DF2_19))
+    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_20(tostring(____53C2_6570__53EF_89C1_533A_57DF1_19))
+    local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_22 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
+    local ____53C2_6570__53EF_89C1_533A_57DF2_21 = _____53C2_6570["可见区域2"]
+    if ____53C2_6570__53EF_89C1_533A_57DF2_21 == nil then
+        ____53C2_6570__53EF_89C1_533A_57DF2_21 = ""
+    end
+    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_22(tostring(____53C2_6570__53EF_89C1_533A_57DF2_21))
 end
 local function _____6267_884C_5730_7CBE_796D_7940Boss_9884_5907(_____53C2_6570)
-    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_32 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
-    local ____53C2_6570_Boss_952E_21 = _____53C2_6570["Boss键"]
-    if ____53C2_6570_Boss_952E_21 == nil then
-        ____53C2_6570_Boss_952E_21 = ""
+    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_34 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
+    local ____53C2_6570_Boss_952E_23 = _____53C2_6570["Boss键"]
+    if ____53C2_6570_Boss_952E_23 == nil then
+        ____53C2_6570_Boss_952E_23 = ""
     end
-    local ____tostring_result_24 = tostring(____53C2_6570_Boss_952E_21)
-    local ____53C2_6570_Boss_540D_22 = _____53C2_6570["Boss名"]
-    if ____53C2_6570_Boss_540D_22 == nil then
-        ____53C2_6570_Boss_540D_22 = ""
+    local ____tostring_result_26 = tostring(____53C2_6570_Boss_952E_23)
+    local ____53C2_6570_Boss_540D_24 = _____53C2_6570["Boss名"]
+    if ____53C2_6570_Boss_540D_24 == nil then
+        ____53C2_6570_Boss_540D_24 = ""
     end
-    local ____tostring_result_25 = tostring(____53C2_6570_Boss_540D_22)
-    local ____temp_26 = __TS__Number(_____53C2_6570.X) or 0
-    local ____temp_27 = __TS__Number(_____53C2_6570.Y) or 0
-    local ____temp_28 = __TS__Number(_____53C2_6570["朝向"]) or 0
-    local ____temp_29 = __TS__Number(_____53C2_6570["注册范围"]) or 0
-    local ____temp_30 = _____53C2_6570["预创建后暂停"] == true
-    local ____temp_31 = _____53C2_6570["预创建后无敌"] == true
-    local ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_23 = _____53C2_6570["范围触发配置名"]
-    if ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_23 == nil then
-        ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_23 = "地精祭祀范围预置触发"
+    local ____tostring_result_27 = tostring(____53C2_6570_Boss_540D_24)
+    local ____temp_28 = __TS__Number(_____53C2_6570.X) or 0
+    local ____temp_29 = __TS__Number(_____53C2_6570.Y) or 0
+    local ____temp_30 = __TS__Number(_____53C2_6570["朝向"]) or 0
+    local ____temp_31 = __TS__Number(_____53C2_6570["注册范围"]) or 0
+    local ____temp_32 = _____53C2_6570["预创建后暂停"] == true
+    local ____temp_33 = _____53C2_6570["预创建后无敌"] == true
+    local ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_25 = _____53C2_6570["范围触发配置名"]
+    if ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_25 == nil then
+        ____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_25 = "地精祭祀范围预置触发"
     end
-    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_32({
-        ["Boss键"] = ____tostring_result_24,
-        ["Boss名"] = ____tostring_result_25,
-        X = ____temp_26,
-        Y = ____temp_27,
-        ["朝向"] = ____temp_28,
-        ["注册范围"] = ____temp_29,
-        ["预创建后暂停"] = ____temp_30,
-        ["预创建后无敌"] = ____temp_31,
-        ["范围触发配置名"] = tostring(____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_23),
+    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_34({
+        ["Boss键"] = ____tostring_result_26,
+        ["Boss名"] = ____tostring_result_27,
+        X = ____temp_28,
+        Y = ____temp_29,
+        ["朝向"] = ____temp_30,
+        ["注册范围"] = ____temp_31,
+        ["预创建后暂停"] = ____temp_32,
+        ["预创建后无敌"] = ____temp_33,
+        ["范围触发配置名"] = tostring(____53C2_6570__8303_56F4_89E6_53D1_914D_7F6E_540D_25),
         ["范围触发剧情片段ID"] = type(_____53C2_6570["范围触发剧情片段ID"]) == "string" and _____53C2_6570["范围触发剧情片段ID"] or nil
     })
 end
@@ -351,28 +368,28 @@ local function _____6267_884C_5730_7CBE_796D_7940_6B7B_4EA1_6F14_51FA_524D_7F6E(
 end
 local function _____6267_884C_6559_6D3EBoss_968F_673A_59FF_6001(_____53C2_6570)
     local roll = GetRandomInt(1, 2)
-    local ____temp_35
+    local ____temp_37
     if roll == 1 then
-        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_33 = _____53C2_6570["剑士姿态Boss名"]
-        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_33 == nil then
-            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_33 = "教派剑士"
+        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_35 = _____53C2_6570["剑士姿态Boss名"]
+        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_35 == nil then
+            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_35 = "教派剑士"
         end
-        ____temp_35 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_33)
+        ____temp_37 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_35)
     else
-        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_34 = _____53C2_6570["学者姿态Boss名"]
-        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_34 == nil then
-            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_34 = "教派学者"
+        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_36 = _____53C2_6570["学者姿态Boss名"]
+        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_36 == nil then
+            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_36 = "教派学者"
         end
-        ____temp_35 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_34)
+        ____temp_37 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_36)
     end
-    local ____boss_540D = ____temp_35
-    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_37 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
-    local ____53C2_6570_Boss_952E_36 = _____53C2_6570["Boss键"]
-    if ____53C2_6570_Boss_952E_36 == nil then
-        ____53C2_6570_Boss_952E_36 = "Boss.蒙面人"
+    local ____boss_540D = ____temp_37
+    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_39 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
+    local ____53C2_6570_Boss_952E_38 = _____53C2_6570["Boss键"]
+    if ____53C2_6570_Boss_952E_38 == nil then
+        ____53C2_6570_Boss_952E_38 = "Boss.蒙面人"
     end
-    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_37({
-        ["Boss键"] = tostring(____53C2_6570_Boss_952E_36),
+    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_39({
+        ["Boss键"] = tostring(____53C2_6570_Boss_952E_38),
         ["Boss名"] = ____boss_540D,
         X = __TS__Number(_____53C2_6570["出生X"]) or 0,
         Y = __TS__Number(_____53C2_6570["出生Y"]) or 0,
@@ -502,14 +519,14 @@ local function _____6267_884C_957F_8001_5BF9_8BDD_524D_7F6E(_____53C2_6570)
 end
 local function _____6267_884C_8FDC_53E4_6CE2_52A8_5956_52B1(_____53C2_6570)
     local _____5956_52B1_503C = __TS__Number(_____53C2_6570["力量"]) or __TS__Number(_____53C2_6570["全属性"]) or 3
-    local ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_39 = _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027
-    local ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_38 = _____53C2_6570["任务消息模板"]
-    if ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_38 == nil then
-        ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_38 = "{英雄名}受到了远古波动！（|cffff99cc全属性+{value}|r）"
+    local ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_41 = _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027
+    local ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_40 = _____53C2_6570["任务消息模板"]
+    if ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_40 == nil then
+        ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_40 = "{英雄名}受到了远古波动！（|cffff99cc全属性+{value}|r）"
     end
-    ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_39(
+    ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_41(
         _____5956_52B1_503C,
-        tostring(____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_38)
+        tostring(____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_40)
     )
 end
 local function _____79FB_9664_5E76_6E05_7406_8BED_4E49_5355_4F4D_5F15_7528(_____5F15_7528)
@@ -552,14 +569,58 @@ local function _____6E05_7406_9017_53F7_5206_9694_8BED_4E49_5355_4F4D(refs)
         end
     end
 end
-local function _____6267_884C_6C99_6F20_60C5_62A5_5546_4EBA_56DE_6536_591C_5149_7FE1_7FE0(_____53C2_6570)
-    local ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_40 = _____53C2_6570["移除临时单位"]
-    if ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_40 == nil then
-        ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_40 = ""
+local function ____on_52A8_6001_88C2_7F1D_56DE_6751_8303_56F4_89E6_53D1()
+    local _____5F53_524D_8FDB_5EA6 = __TS__Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"))
+    if _____5F53_524D_8FDB_5EA6 ~= 16 then
+        return
     end
-    local oldGuardRefs = tostring(____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_40)
+    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
+    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
+    if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 and not IsUnitInGroup(_____89E6_53D1_5355_4F4D, _____73A9_5BB6_82F1_96C4_7EC4) then
+        return
+    end
+    local _____7247_6BB5ID = "jlc_return_village_after_guard_duel"
+    YDUserDataSetSafe(
+        "string",
+        "主线剧情入口",
+        "触发配置",
+        "string",
+        "动态裂缝回村入口"
+    )
+    YDUserDataSetSafe(
+        "string",
+        "主线剧情入口",
+        "剧情片段ID",
+        "string",
+        _____7247_6BB5ID
+    )
+    YDUserDataSetSafe(
+        "string",
+        "主线剧情入口",
+        "触发单位",
+        "unit",
+        _____89E6_53D1_5355_4F4D
+    )
+    local ____require_result_42 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.index")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_42["播放主线剧情片段"]
+    _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = "动态裂缝回村入口", ["触发单位"] = _____89E6_53D1_5355_4F4D})
+end
+local function _____6CE8_518C_52A8_6001_88C2_7F1D_56DE_6751_5165_53E3(unit)
+    if unit == nil or unit == 0 then
+        return
+    end
+    local trigger = CreateTrigger()
+    TriggerAddAction(trigger, ____on_52A8_6001_88C2_7F1D_56DE_6751_8303_56F4_89E6_53D1)
+    TriggerRegisterUnitInRangeSimple(trigger, 300, unit)
+end
+local function _____6267_884C_6C99_6F20_60C5_62A5_5546_4EBA_56DE_6536_591C_5149_7FE1_7FE0(_____53C2_6570)
+    local ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_43 = _____53C2_6570["移除临时单位"]
+    if ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_43 == nil then
+        ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_43 = ""
+    end
+    local oldGuardRefs = tostring(____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_43)
     _____6E05_7406_9017_53F7_5206_9694_8BED_4E49_5355_4F4D(oldGuardRefs)
-    local riftRawId = stringToFourCCSafe("e06W")
+    local riftRawId = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID("进入单位范围用"))
     if riftRawId > 0 then
         local riftA = CreateUnit(
             Player(PLAYER_NEUTRAL_PASSIVE),
@@ -583,6 +644,7 @@ local function _____6267_884C_6C99_6F20_60C5_62A5_5546_4EBA_56DE_6536_591C_5149_
                 "unit",
                 riftA
             )
+            _____6CE8_518C_52A8_6001_88C2_7F1D_56DE_6751_5165_53E3(riftA)
         end
         if riftB ~= nil and riftB ~= 0 then
             YDUserDataSetSafe(
@@ -592,8 +654,17 @@ local function _____6267_884C_6C99_6F20_60C5_62A5_5546_4EBA_56DE_6536_591C_5149_
                 "unit",
                 riftB
             )
+            _____6CE8_518C_52A8_6001_88C2_7F1D_56DE_6751_5165_53E3(riftB)
         end
     end
+end
+local function _____6267_884C_62A4_536B_8BD5_70BC_540E_56DE_6751(_____53C2_6570)
+    local ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_44 = _____53C2_6570["移除临时单位"]
+    if ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_44 == nil then
+        ____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_44 = ""
+    end
+    local refs = tostring(____53C2_6570__79FB_9664_4E34_65F6_5355_4F4D_44)
+    _____6E05_7406_9017_53F7_5206_9694_8BED_4E49_5355_4F4D(refs)
 end
 local function _____6267_884C_86C7_4EBA_65CF_4EA4_8FD8_98DF_4EBA_9B54_51ED_8BC1(_____53C2_6570)
     local rawId = stringToFourCCSafe("h01D")
@@ -806,7 +877,6 @@ local function _____6267_884C_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1(
 end
 local function _____6267_884C_8499_9762_4EBA_6B7B_4EA1(_____53C2_6570)
     __TS__Delete(_____53C2_6570, "奖励物品名")
-    __TS__Delete(_____53C2_6570, "停止区域音乐")
     __TS__Delete(_____53C2_6570, "恢复环境音乐")
     local dyingUnit = GetDyingUnit()
     if dyingUnit == nil or dyingUnit == 0 then
@@ -837,11 +907,14 @@ local function _____6267_884C_8499_9762_4EBA_6B7B_4EA1(_____53C2_6570)
     end
 end
 local function _____6267_884C_6751_53E3_653E_884C_524D_7F6E(_____53C2_6570)
-    local ____53C2_6570__95E8_7981_77E9_5F62_41 = _____53C2_6570["门禁矩形"]
-    if ____53C2_6570__95E8_7981_77E9_5F62_41 == nil then
-        ____53C2_6570__95E8_7981_77E9_5F62_41 = ""
+    local ____53C2_6570__95E8_7981_77E9_5F62_45 = _____53C2_6570["门禁矩形"]
+    if ____53C2_6570__95E8_7981_77E9_5F62_45 == nil then
+        ____53C2_6570__95E8_7981_77E9_5F62_45 = ""
     end
-    local _____95E8_7981_77E9_5F62 = tostring(____53C2_6570__95E8_7981_77E9_5F62_41)
+    local _____95E8_7981_77E9_5F62 = tostring(____53C2_6570__95E8_7981_77E9_5F62_45)
+    local _____4E0A_4E0B_6587 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()
+    local _____89E6_53D1_5355_4F4D = _____4E0A_4E0B_6587["触发单位"]
+    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
     if _____95E8_7981_77E9_5F62 ~= "" then
         local rectHandle = require("jass.globals")[_____95E8_7981_77E9_5F62]
         local _____95E8_536B_7EC4 = GetUnitsInRectMatching(
@@ -852,6 +925,11 @@ local function _____6267_884C_6751_53E3_653E_884C_524D_7F6E(_____53C2_6570)
             local unit = FirstOfGroup(_____95E8_536B_7EC4)
             while unit ~= nil and unit ~= 0 do
                 IssueImmediateOrder(unit, "stop")
+                SetUnitFacing(unit, 210)
+                if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 and _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
+                    _____6751_53E3_653E_884C_73A9_5BB6_9762_5411_89D2_5EA6 = YDWEAngleBetweenUnitsSafe(_____89E6_53D1_5355_4F4D, unit)
+                    ForGroupBJ(_____73A9_5BB6_82F1_96C4_7EC4, ____on_6751_53E3_653E_884C_73A9_5BB6_505C_4E0B_5E76_8F6C_5411)
+                end
                 GroupRemoveUnit(_____95E8_536B_7EC4, unit)
                 unit = FirstOfGroup(_____95E8_536B_7EC4)
             end
@@ -884,19 +962,19 @@ local function _____6267_884C_5730_7CBE_6D1E_7A9F_6F14_51FA_524D_7F6E(_____53C2_
     )
 end
 local function _____6267_884C_5730_7CBE_796D_7940Boss_6218_6B63_5F0F_6CE8_518C(_____53C2_6570)
-    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_45 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
-    local ____53C2_6570_Boss_952E_42 = _____53C2_6570["Boss键"]
-    if ____53C2_6570_Boss_952E_42 == nil then
-        ____53C2_6570_Boss_952E_42 = ""
+    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_49 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
+    local ____53C2_6570_Boss_952E_46 = _____53C2_6570["Boss键"]
+    if ____53C2_6570_Boss_952E_46 == nil then
+        ____53C2_6570_Boss_952E_46 = ""
     end
-    local ____tostring_result_44 = tostring(____53C2_6570_Boss_952E_42)
-    local ____53C2_6570_Boss_540D_43 = _____53C2_6570["Boss名"]
-    if ____53C2_6570_Boss_540D_43 == nil then
-        ____53C2_6570_Boss_540D_43 = "地精巫师"
+    local ____tostring_result_48 = tostring(____53C2_6570_Boss_952E_46)
+    local ____53C2_6570_Boss_540D_47 = _____53C2_6570["Boss名"]
+    if ____53C2_6570_Boss_540D_47 == nil then
+        ____53C2_6570_Boss_540D_47 = "地精巫师"
     end
-    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_45({
-        ["Boss键"] = ____tostring_result_44,
-        ["Boss名"] = tostring(____53C2_6570_Boss_540D_43),
+    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_49({
+        ["Boss键"] = ____tostring_result_48,
+        ["Boss名"] = tostring(____53C2_6570_Boss_540D_47),
         X = __TS__Number(_____53C2_6570.X) or -26032.4,
         Y = __TS__Number(_____53C2_6570.Y) or -13789.5,
         ["朝向"] = __TS__Number(_____53C2_6570["朝向"]) or 270,
@@ -927,16 +1005,16 @@ local function _____6267_884C_51FB_8D25_5730_7CBE_56DE_6751_524D_7F6E(_____53C2_
 end
 local function _____6267_884C_738B_57CE_95E8_7981_5F00_542F(_____53C2_6570)
     local _____5EF6_8FDF_79D2_6570 = __TS__Number(_____53C2_6570["延迟开门秒"]) or 0
-    local ____53C2_6570__5F00_95E8_5BF9_8C61_46 = _____53C2_6570["开门对象"]
-    if ____53C2_6570__5F00_95E8_5BF9_8C61_46 == nil then
-        ____53C2_6570__5F00_95E8_5BF9_8C61_46 = ""
+    local ____53C2_6570__5F00_95E8_5BF9_8C61_50 = _____53C2_6570["开门对象"]
+    if ____53C2_6570__5F00_95E8_5BF9_8C61_50 == nil then
+        ____53C2_6570__5F00_95E8_5BF9_8C61_50 = ""
     end
-    local _____5F00_95E8_5BF9_8C61 = tostring(____53C2_6570__5F00_95E8_5BF9_8C61_46)
-    local ____53C2_6570__9690_85CF_963B_6321_47 = _____53C2_6570["隐藏阻挡"]
-    if ____53C2_6570__9690_85CF_963B_6321_47 == nil then
-        ____53C2_6570__9690_85CF_963B_6321_47 = ""
+    local _____5F00_95E8_5BF9_8C61 = tostring(____53C2_6570__5F00_95E8_5BF9_8C61_50)
+    local ____53C2_6570__9690_85CF_963B_6321_51 = _____53C2_6570["隐藏阻挡"]
+    if ____53C2_6570__9690_85CF_963B_6321_51 == nil then
+        ____53C2_6570__9690_85CF_963B_6321_51 = ""
     end
-    local _____9690_85CF_963B_6321 = tostring(____53C2_6570__9690_85CF_963B_6321_47)
+    local _____9690_85CF_963B_6321 = tostring(____53C2_6570__9690_85CF_963B_6321_51)
     local function _____6267_884C_5F00_95E8()
         if _____5F00_95E8_5BF9_8C61 ~= "" then
             local destructable = require("jass.globals")[_____5F00_95E8_5BF9_8C61]
@@ -967,11 +1045,11 @@ local function _____6267_884C_738B_57CE_95E8_7981_5F00_542F(_____53C2_6570)
     _____6267_884C_5F00_95E8()
 end
 local function _____6267_884C_738B_5BAB_95E8_536B_652F_7EBF_53D1_73B0()
-    local ____opt_48 = require("jass.globals").udg_RW
-    if ____opt_48 ~= nil then
-        ____opt_48 = ____opt_48[8]
+    local ____opt_52 = require("jass.globals").udg_RW
+    if ____opt_52 ~= nil then
+        ____opt_52 = ____opt_52[8]
     end
-    local quest = ____opt_48
+    local quest = ____opt_52
     if quest ~= nil and quest ~= 0 then
         QuestSetDiscovered(quest, true)
     end
@@ -1030,6 +1108,7 @@ __TS__ObjectAssign(_____4E3B_7EBF_5267_60C5_52A8_4F5C_6CE8_518C_8868, {
     ["JLC精灵城_王城门禁开启"] = _____6267_884C_738B_57CE_95E8_7981_5F00_542F,
     ["JLC精灵城_王宫门卫2支线发现"] = _____6267_884C_738B_5BAB_95E8_536B_652F_7EBF_53D1_73B0,
     ["JLC精灵城_猎魂试探"] = _____6267_884C_730E_9B42_8BD5_63A2,
-    ["SW01死亡事件_树魔首领死亡"] = _____6267_884C_6811_9B54_9996_9886_6B7B_4EA1
+    ["SW01死亡事件_树魔首领死亡"] = _____6267_884C_6811_9B54_9996_9886_6B7B_4EA1,
+    ["JLC精灵村_护卫试炼后回村"] = _____6267_884C_62A4_536B_8BD5_70BC_540E_56DE_6751
 })
 return ____exports
