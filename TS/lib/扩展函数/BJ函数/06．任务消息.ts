@@ -15,6 +15,10 @@ const bj_QUESTMESSAGE_UNITACQUIRED = jglobals.bj_QUESTMESSAGE_UNITACQUIRED ?? 9;
 const bj_QUESTMESSAGE_UNITAVAILABLE = jglobals.bj_QUESTMESSAGE_UNITAVAILABLE ?? 10;
 const bj_QUESTMESSAGE_ITEMACQUIRED = jglobals.bj_QUESTMESSAGE_ITEMACQUIRED ?? 11;
 const bj_QUESTMESSAGE_WARNING = jglobals.bj_QUESTMESSAGE_WARNING ?? 12;
+const bj_QUESTTYPE_REQ_DISCOVERED = jglobals.bj_QUESTTYPE_REQ_DISCOVERED ?? 0;
+const bj_QUESTTYPE_REQ_UNDISCOVERED = jglobals.bj_QUESTTYPE_REQ_UNDISCOVERED ?? 1;
+const bj_QUESTTYPE_OPT_DISCOVERED = jglobals.bj_QUESTTYPE_OPT_DISCOVERED ?? 2;
+const bj_QUESTTYPE_OPT_UNDISCOVERED = jglobals.bj_QUESTTYPE_OPT_UNDISCOVERED ?? 3;
 
 const bj_TEXT_DELAY_QUEST = jglobals.bj_TEXT_DELAY_QUEST ?? 10;
 const bj_TEXT_DELAY_QUESTUPDATE = jglobals.bj_TEXT_DELAY_QUESTUPDATE ?? 10;
@@ -38,6 +42,30 @@ const bj_questHintSound = jglobals.bj_questHintSound ?? null;
 const bj_questSecretSound = jglobals.bj_questSecretSound ?? null;
 const bj_questItemAcquiredSound = jglobals.bj_questItemAcquiredSound ?? null;
 const bj_questWarningSound = jglobals.bj_questWarningSound ?? null;
+
+export function CreateQuestBJ(questType: number, title: string, description: string, icon: string): any {
+    const quest = jass.CreateQuest();
+    jglobals.bj_lastCreatedQuest = quest;
+    if (quest == null) return null;
+
+    jass.QuestSetTitle(quest, title);
+    jass.QuestSetDescription(quest, description);
+    jass.QuestSetIconPath(quest, icon);
+    jass.QuestSetRequired(
+        quest,
+        questType === bj_QUESTTYPE_REQ_DISCOVERED || questType === bj_QUESTTYPE_REQ_UNDISCOVERED
+    );
+    jass.QuestSetDiscovered(
+        quest,
+        questType === bj_QUESTTYPE_REQ_DISCOVERED || questType === bj_QUESTTYPE_OPT_DISCOVERED
+    );
+    jass.QuestSetEnabled(quest, true);
+    return quest;
+}
+
+export function GetLastCreatedQuestBJ(): any {
+    return jglobals.bj_lastCreatedQuest ?? null;
+}
 
 export function QuestMessageBJ(f: any, messageType: number, message: string): void {
     if (!jass.IsPlayerInForce(jass.GetLocalPlayer(), f)) {

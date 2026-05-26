@@ -6,17 +6,16 @@ const japi = require("jass.japi") as any;
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
-const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
-  getSoleSelectedUnitForPlayer: (this: void, playerId: number) => any | null;
+const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
+  初始化本地选中技能快照: (this: void) => void;
+  获取本地选中技能快照: (this: void) => {
+    hero: any | null;
+    skills: Record<热键位, number>;
+    slots: Record<热键位, { x: number; y: number }>;
+  };
 };
-const 获取玩家唯一选中单位 = selectionCenterSystem.getSoleSelectedUnitForPlayer as
-  | ((this: void, playerId: number) => any | null)
-  | undefined;
 const 功能开关模块 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关") as {
   本地玩家是否开启魔法消耗显示: (this: void) => boolean;
-};
-const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
-  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
 const { 计算最终魔法消耗 } = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还") as {
   计算最终魔法消耗: (this: void, unit: any, abilityId: number, level: number) => number;
@@ -25,13 +24,8 @@ const 原生魔法消耗同步模块 = require("系统.03．技能系统.02．�
   获取已同步技能魔法消耗: (this: void, unit: any, abilityId: number) => number;
 };
 const { 获取已同步技能魔法消耗 } = 原生魔法消耗同步模块;
-const commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位") as {
-  读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
-  获取D技能槽位: (this: void, whichHero: any) => readonly [number, number];
-};
 
 type 热键位 = "Q" | "W" | "E" | "R" | "D";
-type 按钮槽位 = { x: number; y: number };
 type 按钮显示单元 = {
   icon: number;
   text: number;
@@ -65,12 +59,6 @@ const TEXT_OFFSET_X = 0.0090;
 const TEXT_OFFSET_Y = -0.0013;
 const SHADOW_OFFSET_X = 0.0006;
 const SHADOW_OFFSET_Y = -0.0006;
-const 固定槽位表: Record<"Q" | "W" | "E" | "R", 按钮槽位> = {
-  Q: { x: 0, y: 2 },
-  W: { x: 1, y: 2 },
-  E: { x: 2, y: 2 },
-  R: { x: 3, y: 2 },
-};
 let initialized = false;
 let 显示缓存: 显示表 | null = null;
 
@@ -98,30 +86,8 @@ function 安全设置锚点(this: void, frame: number, relativeFrame: number, x:
   DzFrameSetPoint(frame, 0, relativeFrame, 0, x, y);
 }
 
-function 读取玩家唯一选中单位(this: void, playerId: number): any | null {
-  if (typeof 获取玩家唯一选中单位 !== "function") return null;
-  return 获取玩家唯一选中单位(playerId);
-}
-
-function getHeroSource(this: void, localPlayer: any): any | null {
-  const playerId = jass.GetPlayerId(localPlayer);
-  const selectedUnit = 读取玩家唯一选中单位(playerId);
-  if (!isValidHandle(selectedUnit)) return null;
-  if (jass.IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) !== true) return null;
-
-  const owner = jass.GetOwningPlayer(selectedUnit);
-  if (!isValidHandle(owner)) return null;
-  const registeredHero = heroBridge.getRegisteredPlayerHero(owner);
-  if (!isValidHandle(registeredHero)) return null;
-  if (registeredHero !== selectedUnit) return null;
-
-  return selectedUnit;
-}
-
 function getLocalHero(this: void): any | null {
-  const localPlayer = jass.GetLocalPlayer();
-  if (!isValidHandle(localPlayer)) return null;
-  return getHeroSource(localPlayer);
+  return selectionSnapshotSystem.获取本地选中技能快照().hero;
 }
 
 function createBackdrop(this: void, name: string): number {
@@ -179,22 +145,13 @@ function calcDisplayManaCost(this: void, unit: any, abilityId: number, level: nu
   return 计算最终魔法消耗(unit, abilityId, level);
 }
 
-function 解析槽位(this: void, whichHero: any, hotkey: 热键位): 按钮槽位 {
-  if (hotkey === "D") {
-    const dSlot = commandBarAbility.获取D技能槽位(whichHero);
-    return { x: dSlot[0], y: dSlot[1] };
-  }
-  return 固定槽位表[hotkey];
-}
-
-function 获取按钮框(this: void, whichHero: any, hotkey: 热键位): number {
-  const slot = 解析槽位(whichHero, hotkey);
+function 获取按钮框(this: void, hotkey: 热键位): number {
+  const slot = selectionSnapshotSystem.获取本地选中技能快照().slots[hotkey];
   return DzFrameGetCommandBarButton(slot.y, slot.x);
 }
 
-function 获取技能Id(this: void, whichHero: any, hotkey: 热键位): number {
-  const slot = 解析槽位(whichHero, hotkey);
-  return commandBarAbility.读取命令卡按钮能力Id(slot.x, slot.y);
+function 获取技能Id(this: void, hotkey: 热键位): number {
+  return selectionSnapshotSystem.获取本地选中技能快照().skills[hotkey];
 }
 
 function 隐藏单元(this: void, ui: 按钮显示单元): void {
@@ -223,14 +180,14 @@ function 确保按钮显示单元(this: void, hotkey: 热键位, ui: 按钮显�
 }
 
 function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, ui: 按钮显示单元): void {
-  const buttonFrame = 获取按钮框(whichHero, hotkey);
+  const buttonFrame = 获取按钮框(hotkey);
   if (!isValidHandle(buttonFrame)) {
     隐藏单元(ui);
     return;
   }
   if (!确保按钮显示单元(hotkey, ui)) return;
 
-  const abilityId = 获取技能Id(whichHero, hotkey);
+  const abilityId = 获取技能Id(hotkey);
   if (abilityId === 0) {
     隐藏单元(ui);
     return;
@@ -299,6 +256,7 @@ function onTick(this: void): void {
 export function 初始化QWERD魔法消耗显示(this: void): void {
   if (initialized) return;
   initialized = true;
+  selectionSnapshotSystem.初始化本地选中技能快照();
   addPeriodicCallback(REFRESH_MS, onTick);
 }
 

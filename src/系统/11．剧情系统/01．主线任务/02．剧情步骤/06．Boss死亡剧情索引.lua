@@ -58,6 +58,13 @@ ____exports["Boss死亡剧情索引表"] = {
         ["设置剧情进度"] = 28,
         ["剧情片段ID"] = "elven_city_treant_leader_death",
         ["说明"] = "树魔首领死亡后，掉落魔法信件并返回王城汇报。"
+    },
+    {
+        ["Boss单位名"] = "里科特王子",
+        ["需要剧情进度"] = 34,
+        ["设置剧情进度"] = 35,
+        ["剧情片段ID"] = "elven_city_chapter_end",
+        ["说明"] = "第二章末战 Boss 死亡后，进入章节末最终收束。"
     }
 }
 local function ____Boss_5355_4F4D_540D_5339_914D(unitTypeId, ____Boss_5355_4F4D_540D)

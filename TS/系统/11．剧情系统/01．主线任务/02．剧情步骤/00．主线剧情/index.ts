@@ -1,0 +1,47 @@
+import { 初始化进度01_精灵村长老发布任务核心 } from "./01．精灵村长老发布任务";
+import { 初始化进度02_地精洞窟进入演出核心 } from "./02．地精洞窟进入演出";
+import { 初始化进度03_地精祭祀Boss前导核心 } from "./03．地精祭祀Boss前导";
+import { 初始化进度04_地精祭祀死亡演出核心 } from "./04．地精祭祀死亡演出";
+import { 初始化进度05_击败地精返回长老核心 } from "./05．击败地精返回长老";
+
+export * from "./01．精灵村长老发布任务";
+export * from "./02．地精洞窟进入演出";
+export * from "./03．地精祭祀Boss前导";
+export * from "./04．地精祭祀死亡演出";
+export * from "./05．击败地精返回长老";
+export * from "./06．沙漠与线索";
+export * from "./07．蛇人族入口";
+export * from "./08．蛇人族藏品管家初见";
+export * from "./09．狩猎食人魔任务接取";
+export * from "./10．沙漠食人魔Boss启动";
+export * from "./11．沙漠食人魔一阶段死亡";
+export * from "./12．杀戮食人魔二阶段死亡";
+export * from "./13．蛇人族交还食人魔凭证";
+export * from "./14．蛇人族卫队长试炼";
+export * from "./15．夜光翡翠回收";
+export * from "./16．第一章最终Boss教派前置";
+export * from "./17．第一章最终Boss教派死亡";
+export * from "./18．精灵城章节承接";
+export * from "./19．精灵森谷传送抵达";
+export * from "./20．阿尔文引导";
+export * from "./21．王城门禁开启";
+export * from "./22．王宫禁军盘查";
+export * from "./23．王宫门卫支线发现";
+export * from "./24．克林姆德王接见";
+export * from "./25．猎魂试探";
+export * from "./26．巨魔首领战前";
+export * from "./27．树魔首领死亡承接";
+export * from "./29．魔法信件汇报";
+export * from "./30．赫克提尔解析";
+export * from "./31．王城紧急会议";
+export * from "./32．第二章王子Boss战过程";
+export * from "./33．第二章王子Boss战后承接";
+export * from "./34．第二章后续承接";
+
+export function 初始化前五个主线剧情核心(this: void): void {
+  初始化进度01_精灵村长老发布任务核心();
+  初始化进度02_地精洞窟进入演出核心();
+  初始化进度03_地精祭祀Boss前导核心();
+  初始化进度04_地精祭祀死亡演出核心();
+  初始化进度05_击败地精返回长老核心();
+}

@@ -13,7 +13,7 @@ ____exports.QUEST_CONFIGS = {
         progressText = "击杀豺狼人N/10",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10002,
@@ -26,7 +26,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "前往史莱姆草原采集3颗荧光草",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10003,
@@ -39,7 +39,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集10份蜘蛛毒液",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10004,
@@ -52,7 +52,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集3分熔岩能量",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 1000,
@@ -81,7 +81,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集5张豺狼皮",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10006,
@@ -95,7 +95,7 @@ ____exports.QUEST_CONFIGS = {
         failText = "|cffffff00『系统提示』：|r时间已到，此任务失败+NPC:哎...看来只能和兄弟们吃这一点烤肉了",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10007,
@@ -108,7 +108,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集20个蝎壳",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10008,
@@ -121,7 +121,7 @@ ____exports.QUEST_CONFIGS = {
         desc = "收集5个有毒杂草",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10009,
@@ -135,7 +135,7 @@ ____exports.QUEST_CONFIGS = {
         NpcCompleteText = "NPC：哇，居然真的是聚灵花，太好了，这下事情有着落了。",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10010,
@@ -151,7 +151,7 @@ ____exports.QUEST_CONFIGS = {
         NpcCompleteText = "Player：请问这封信你认识吗？\nNPC：....没错，一眼就认出来了，这确实是我朋友的信，多谢。\nNPC：这是信封上写的报酬，我就替我朋友交付了。\nPlayer：好的。",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10011,
@@ -159,12 +159,12 @@ ____exports.QUEST_CONFIGS = {
         type = "给予",
         startNpc = "守望者",
         requireItem = "装备等级:D+,C-,C,C+",
-        reward = "装备等级<D+:null\n装备等级>D+&<C:所有玩家+3000金币;1能量碎片\n装备等级=C+:所有玩家+6000金币;2能量碎片\nI067|I08G:所有玩家+3能量碎片",
+        reward = "外部：\n给予它品质较好的道具或饰品，NPC会给予报酬\n内部：\ntype=道具/戒指/饰品的装备\n装备等级<D+:null\n装备等级>D+&<C:所有玩家+3000金币;1能量碎片\n装备等级=C+:所有玩家+6000金币;2能量碎片\nI067|I08G:所有玩家+3能量碎片",
         NpcStartText = "NPC：可以给我一件较好的道具或者饰品吗？不过希望能是我喜欢的，我会给你不错的报酬",
         NpcCompleteText = "这个也太一搬了...还给你，我不需要\n多谢，这是说好的报酬\n此物相当不错，非常好，这是说的好的报酬，另外多送你些\n这就是我想要的，真是太好了！",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10012,
@@ -172,11 +172,11 @@ ____exports.QUEST_CONFIGS = {
         type = "给予",
         startNpc = "精灵弓箭手",
         requireItem = "I083|I08B",
-        reward = "英雄等级＞30:所有玩家+10000经验\n英雄等级≤30:1等级",
+        reward = "英雄等级＞30:所有玩家+10000经验\n英雄等级≤30:所有玩家+1等级",
         NpcStartText = "NPC：你好我是精灵村的守望者，但是我近几十年来视力越来越不如以前，如果有能提高视力的道具就好了",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10013,
@@ -184,12 +184,12 @@ ____exports.QUEST_CONFIGS = {
         type = "给予",
         startNpc = "冒险者阿利亚",
         requireItem = "afac",
-        reward = "完成任务的玩家+r18000金币;1能量碎片;12attack",
+        reward = "完成任务的玩家+18000金币;1能量碎片;12攻击力",
         NpcStartText = "NPC：奇怪..我的|cffff6600笛子|r去哪里了..好像是经过|cffff6600飓风沙漠|r后就发现找不到了..",
         QuestAcceptedMsg = "NPC：多谢帮忙..我会在此地等候的",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10014,
@@ -198,13 +198,13 @@ ____exports.QUEST_CONFIGS = {
         startNpc = "德鲁伊学者-卢伊",
         requireItem = "I0CQ",
         requireCount = 1,
-        reward = "完成任务的玩家+r25000金币;1能量碎片;魔法伤害+2%",
+        reward = "完成任务的玩家+25000金币;1能量碎片;2%魔法伤害",
         NpcStartText = "NPC：这本|cffffcc99『精灵族远古历史』|r写到上古时期精灵族曾经有族人异端化，但是更为详细资料没有了,如果有更详细的资料就好了",
         QuestAcceptedMsg = "NPC：多谢帮忙..我会在此地等候的",
         NpcCompleteText = "NPC：居然真的被你找到了暗狱之书，这是说好的报酬！多谢！\nNPC：....原来是这样，但上面的一些内容还是有些模糊，好像是和帝国相关..",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10015,
@@ -218,7 +218,7 @@ ____exports.QUEST_CONFIGS = {
         AcceptFailedText = "NPC：我已经调查完成了，多谢你的好意",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10016,
@@ -233,7 +233,7 @@ ____exports.QUEST_CONFIGS = {
         QuestAcceptedMsg = "NPC：老朽先提前谢过了",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10017,
@@ -247,25 +247,25 @@ ____exports.QUEST_CONFIGS = {
         QuestAcceptedMsg = "NPC：年轻人，这是给你的报酬！",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10018,
         name = "补充生命力",
         type = "给予",
         startNpc = "知识古树",
-        requiredResources = "wood",
+        requiredResources = "能量碎片",
         requireCount = 6,
-        reward = "完成任务的玩家+r(英雄等级*0.6)智力;1智力成长",
+        reward = "完成任务的玩家+(英雄等级*0.6)智力;1智力成长",
         NpcStartText = "Player：这颗知识古树似乎没有多少寿命了....可以尝试帮助它补充生命力",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     },
     {
         requireID = 10019,
         name = "|cffff0000失踪的精灵村民（Boss战任务）|r",
-        type = "战斗击杀",
+        type = "目标击杀",
         startNpc = "精灵族长-斯韦尔",
         reward = "英雄等级≤17:所有玩家+10000金币;暴击伤害+1%;暴击率+1%\n英雄等级＞17:所有玩家+5000金币;暴击伤害+1%",
         desc = "调查精灵人员为何失踪\n|cffffff00『系统提示』：|r|cffff0000此任务难度特别高，推荐等级：17|r",
@@ -273,7 +273,7 @@ ____exports.QUEST_CONFIGS = {
         QuestAcceptedMsg = "NPC：感谢你们，有你们的帮助这件事我想一定会有眉目。\nPlayer：长老，可以介绍下具体情况吗\nNPC：嗯..就是精灵村最近1个月开始陆陆续续有村民失踪\nNPC：根据哨手来报，精灵村的空气中混杂着一丝血液，很明显，这件事是人为，不是自然发生的。\nPlayer：居然是血案..\nNPC：来着恐怕不凡，估计是针对我们精灵族而来，目前的踪迹全部指向精灵初始森\nNPC：去哪里调查一下吧，我想会有线索的..\nPlayer：好的，精灵族也是我的朋友..这件事我会当做自己的事情处理..",
         afterCompleteDialog = "默认",
         repeatable = false,
-        enabled = false
+        enabled = true
     }
 }
 ____exports.default = ____exports.QUEST_CONFIGS

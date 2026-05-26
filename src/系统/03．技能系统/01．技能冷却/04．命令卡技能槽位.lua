@@ -18,7 +18,7 @@ ____exports["命令卡热键槽位表"] = {
     {3, 2, "R"},
     {0, 1, "D"}
 }
-____exports["D技能候选槽位表"] = {{0, 1}, {2, 1}}
+____exports["第二排技能槽位表"] = {{0, 1}, {1, 1}, {2, 1}, {3, 1}}
 ____exports["解析脚本返回整数"] = function(raw)
     if raw == nil or raw == "" then
         return 0
@@ -95,14 +95,17 @@ local function _____8BFB_53D6_6309_94AE_6280_80FD_70ED_952E(whichHero, x, y)
     return _____5F52_4E00_5316_70ED_952E(rawHotkey)
 end
 ____exports["获取D技能槽位"] = function(whichHero)
-    local _____9ED8_8BA4_69FD_4F4D = ____exports["D技能候选槽位表"][1]
-    local _____4E3B_69FD_4F4D_70ED_952E = _____8BFB_53D6_6309_94AE_6280_80FD_70ED_952E(whichHero, ____exports["D技能候选槽位表"][1][1], ____exports["D技能候选槽位表"][1][2])
-    if _____4E3B_69FD_4F4D_70ED_952E == "D" then
-        return _____9ED8_8BA4_69FD_4F4D
-    end
-    local _____5907_7528_69FD_4F4D_70ED_952E = _____8BFB_53D6_6309_94AE_6280_80FD_70ED_952E(whichHero, ____exports["D技能候选槽位表"][2][1], ____exports["D技能候选槽位表"][2][2])
-    if _____5907_7528_69FD_4F4D_70ED_952E == "D" then
-        return ____exports["D技能候选槽位表"][2]
+    local _____9ED8_8BA4_69FD_4F4D = ____exports["第二排技能槽位表"][4]
+    do
+        local i = 0
+        while i < #____exports["第二排技能槽位表"] do
+            local x, y = table.unpack(____exports["第二排技能槽位表"][i + 1], 1, 2)
+            local _____70ED_952E = _____8BFB_53D6_6309_94AE_6280_80FD_70ED_952E(whichHero, x, y)
+            if _____70ED_952E == "D" then
+                return ____exports["第二排技能槽位表"][i + 1]
+            end
+            i = i + 1
+        end
     end
     return _____9ED8_8BA4_69FD_4F4D
 end

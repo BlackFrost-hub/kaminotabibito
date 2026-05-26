@@ -1,7 +1,3 @@
-export * from "./00．公共";
-export * from "./01．主线任务";
-export * from "./02．支线任务";
-
 import { init as init公共 } from "./00．公共";
 import { init as init主线任务 } from "./01．主线任务";
 

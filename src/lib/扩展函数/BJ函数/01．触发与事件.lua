@@ -70,4 +70,9 @@ end
 function ____exports.GetAttackedUnitBJ()
     return jass.GetTriggerUnit()
 end
+function ____exports.TriggerRegisterEnterRectSimple(trig, r)
+    local rectRegion = jass.CreateRegion()
+    jass.RegionAddRect(rectRegion, r)
+    return jass.TriggerRegisterEnterRegion(trig, rectRegion, nil)
+end
 return ____exports

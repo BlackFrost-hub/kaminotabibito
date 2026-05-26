@@ -6,11 +6,8 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
-local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSystem.getSoleSelectedUnitForPlayer
+local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
-local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位")
 local platformAbilityApi = require("平台扩展API取值")
 local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = platformAbilityApi["技能_获取技能当前冷却时间"]
 local fourCCTools = require("lib.扩展函数.封装函数.01．通用工具.index")
@@ -35,7 +32,6 @@ local FONT_FILE = "UI\\uizt.ttf"
 local FONT_SIZE = 0.02
 local TEXT_W = 0.042
 local TEXT_H = 0.02
-local _____56FA_5B9A_69FD_4F4D_8868 = {Q = {x = 0, y = 2}, W = {x = 1, y = 2}, E = {x = 2, y = 2}, R = {x = 3, y = 2}}
 local initialized = false
 local _____6587_672C_6846_7F13_5B58 = nil
 local function isValidHandle(handle)
@@ -66,40 +62,8 @@ local function _____5B89_5168_8BBE_7F6E_951A_70B9(frame, relativeFrame, x, y)
         y
     )
 end
-local function _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
-    if type(_____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D) ~= "function" then
-        return nil
-    end
-    return _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
-end
-local function getHeroSource(localPlayer)
-    local playerId = jass.GetPlayerId(localPlayer)
-    local selectedUnit = _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D(playerId)
-    if not isValidHandle(selectedUnit) then
-        return nil
-    end
-    if jass.IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
-        return nil
-    end
-    local owner = jass.GetOwningPlayer(selectedUnit)
-    if not isValidHandle(owner) then
-        return nil
-    end
-    local registeredHero = heroBridge.getRegisteredPlayerHero(owner)
-    if not isValidHandle(registeredHero) then
-        return nil
-    end
-    if registeredHero ~= selectedUnit then
-        return nil
-    end
-    return selectedUnit
-end
 local function getLocalHero()
-    local localPlayer = jass.GetLocalPlayer()
-    if not isValidHandle(localPlayer) then
-        return nil
-    end
-    return getHeroSource(localPlayer)
+    return selectionSnapshotSystem["获取本地选中技能快照"]().hero
 end
 local function createTextFrame(name, r, g, b, a)
     local gameUI = DzGetGameUI()
@@ -193,23 +157,15 @@ local function _____6784_5EFA_663E_793A_6587_672C(hotkey, abilityId, cooldown)
     end
     return ""
 end
-local function _____89E3_6790_69FD_4F4D(whichHero, hotkey)
-    if hotkey == "D" then
-        local dSlot = commandBarAbility["获取D技能槽位"](whichHero)
-        return {x = dSlot[1], y = dSlot[2]}
-    end
-    return _____56FA_5B9A_69FD_4F4D_8868[hotkey]
-end
-local function _____83B7_53D6_6309_94AE_6846(whichHero, hotkey)
-    local slot = _____89E3_6790_69FD_4F4D(whichHero, hotkey)
+local function _____83B7_53D6_6309_94AE_6846(hotkey)
+    local slot = selectionSnapshotSystem["获取本地选中技能快照"]().slots[hotkey]
     return DzFrameGetCommandBarButton(slot.y, slot.x)
 end
-local function _____83B7_53D6_6280_80FDId(whichHero, hotkey)
-    local slot = _____89E3_6790_69FD_4F4D(whichHero, hotkey)
-    return commandBarAbility["读取命令卡按钮能力Id"](slot.x, slot.y)
+local function _____83B7_53D6_6280_80FDId(hotkey)
+    return selectionSnapshotSystem["获取本地选中技能快照"]().skills[hotkey]
 end
 local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, textFrame, shadowFrame)
-    local buttonFrame = _____83B7_53D6_6309_94AE_6846(whichHero, hotkey)
+    local buttonFrame = _____83B7_53D6_6309_94AE_6846(hotkey)
     if not isValidHandle(buttonFrame) then
         _____5B89_5168_8BBE_7F6E_6587_672C(textFrame, "")
         _____5B89_5168_663E_793A_6846_4F53(textFrame, false)
@@ -251,7 +207,7 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, textFrame, 
     end
     _____5B89_5168_8BBE_7F6E_951A_70B9(currentShadowFrame, buttonFrame, OFFSET_X + SHADOW_OFFSET_X, OFFSET_Y + SHADOW_OFFSET_Y)
     _____5B89_5168_8BBE_7F6E_951A_70B9(currentTextFrame, buttonFrame, OFFSET_X, OFFSET_Y)
-    local abilityId = _____83B7_53D6_6280_80FDId(whichHero, hotkey)
+    local abilityId = _____83B7_53D6_6280_80FDId(hotkey)
     if abilityId == 0 then
         _____5B89_5168_8BBE_7F6E_6587_672C(currentTextFrame, "")
         _____5B89_5168_663E_793A_6846_4F53(currentTextFrame, false)
@@ -322,11 +278,11 @@ ____exports["获取QWERD冷却调试快照"] = function()
     if not isValidHandle(hero) then
         return "NO_HERO"
     end
-    local qId = _____83B7_53D6_6280_80FDId(hero, "Q")
-    local wId = _____83B7_53D6_6280_80FDId(hero, "W")
-    local eId = _____83B7_53D6_6280_80FDId(hero, "E")
-    local rId = _____83B7_53D6_6280_80FDId(hero, "R")
-    local dId = _____83B7_53D6_6280_80FDId(hero, "D")
+    local qId = _____83B7_53D6_6280_80FDId("Q")
+    local wId = _____83B7_53D6_6280_80FDId("W")
+    local eId = _____83B7_53D6_6280_80FDId("E")
+    local rId = _____83B7_53D6_6280_80FDId("R")
+    local dId = _____83B7_53D6_6280_80FDId("D")
     local qCd = getCooldown(hero, qId)
     local wCd = getCooldown(hero, wId)
     local eCd = getCooldown(hero, eId)
@@ -349,6 +305,7 @@ ____exports["初始化QWERD冷却显示"] = function()
         return
     end
     initialized = true
+    selectionSnapshotSystem["初始化本地选中技能快照"]()
     addPeriodicCallback(REFRESH_MS, onTick)
 end
 return ____exports

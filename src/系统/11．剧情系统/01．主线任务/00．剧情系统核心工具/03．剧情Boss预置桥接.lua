@@ -58,7 +58,7 @@ local function ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1()
         ["触发单位"] = GetTriggerUnit()
     })
     if _____914D_7F6E["剧情片段ID"] ~= nil and _____914D_7F6E["剧情片段ID"] ~= "" then
-        local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.index")
+        local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
         local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_4["播放主线剧情片段"]
         _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____914D_7F6E["剧情片段ID"])
     end

@@ -18,6 +18,9 @@ const { ModifyGateBJ, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
   ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
 };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
 const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
   SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
 };
@@ -26,6 +29,19 @@ const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") a
 };
 const { ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
+};
+const {
+  AddItemToStockBJ,
+  GetItemOfTypeFromUnitBJ,
+} = require("lib.扩展函数.BJ函数.03．物品与库存") as {
+  AddItemToStockBJ: (this: void, whichItemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
+  GetItemOfTypeFromUnitBJ: (this: void, whichUnit: any, itemId: number) => any;
+};
+const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
+  QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
+};
+const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
+  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
@@ -50,7 +66,6 @@ import { 读取当前剧情动作上下文, 写入剧情进度 } from "./01．�
 import { 切换剧情大门, 发送剧情任务消息, 发送剧情小地图信号 } from "./02．剧情动作桥接";
 
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
-const AddItemToStockBJ = jass.AddItemToStockBJ as (this: void, whichItemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
 const CreateFogModifierRect = jass.CreateFogModifierRect as (
   this: void,
   whichPlayer: any,
@@ -67,8 +82,6 @@ const FogModifierStart = jass.FogModifierStart as (this: void, whichFog: any) =>
 const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
-const GetPlayersAll = jass.GetPlayersAll as (this: void) => any;
-const GetItemOfTypeFromUnitBJ = jass.GetItemOfTypeFromUnitBJ as (this: void, whichUnit: any, itemId: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
@@ -77,7 +90,6 @@ const GetUnitFacing = jass.GetUnitFacing as (this: void, whichUnit: any) => numb
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const QuestMessageBJ = jass.QuestMessageBJ as (this: void, whichForce: any, messageType: number, message: string) => void;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const RemoveItem = jass.RemoveItem as (this: void, whichItem: any) => void;
 const SetTimeOfDay = jass.SetTimeOfDay as (this: void, time: number) => void;
@@ -86,7 +98,6 @@ const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: 
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const UnitAddItem = jass.UnitAddItem as (this: void, whichUnit: any, whichItem: any) => boolean;
-const UnitHasItemOfTypeBJ = jass.UnitHasItemOfTypeBJ as (this: void, whichUnit: any, itemId: number) => boolean;
 const ShowDestructable = jass.ShowDestructable as (this: void, whichDestructable: any, flag: boolean) => void;
 
 const FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE as number;
@@ -179,7 +190,7 @@ function 读取全局句柄(this: void, 变量名: string): any {
   return jglobals[变量名] ?? null;
 }
 
-function 读取语义单位引用(this: void, 引用: string): any {
+export function 读取语义单位引用(this: void, 引用: string): any {
   if (引用 === "") return null;
   const splitIndex = 引用.indexOf(".");
   if (splitIndex >= 0) {
@@ -201,7 +212,7 @@ function 读取语义单位引用(this: void, 引用: string): any {
   return null;
 }
 
-function 读取触发单位(this: void): any {
+export function 读取触发单位(this: void): any {
   const 上下文 = 读取当前剧情动作上下文();
   return 上下文.触发单位;
 }
@@ -254,6 +265,12 @@ export function 设置触发单位控制状态(this: void, 暂停: boolean, 无�
   if (unit == null || unit === 0) return;
   PauseUnit(unit, 暂停);
   SetUnitInvulnerable(unit, 无敌);
+}
+
+export function 停止触发单位(this: void): void {
+  const unit = 读取触发单位();
+  if (unit == null || unit === 0) return;
+  IssueImmediateOrder(unit, "stop");
 }
 
 export function 给全部玩家添加区域视野(this: void, rectVarName: string): void {

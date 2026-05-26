@@ -22,9 +22,11 @@ export const 命令卡热键槽位表: ReadonlyArray<readonly [number, number, �
   [0, 1, "D"],
 ] as const;
 
-export const D技能候选槽位表: ReadonlyArray<readonly [number, number]> = [
+export const 第二排技能槽位表: ReadonlyArray<readonly [number, number]> = [
   [0, 1],
+  [1, 1],
   [2, 1],
+  [3, 1],
 ] as const;
 
 export function 解析脚本返回整数(this: void, raw: any): number {
@@ -71,13 +73,12 @@ function 读取按钮技能热键(this: void, whichHero: any, x: number, y: numb
 }
 
 export function 获取D技能槽位(this: void, whichHero: any): readonly [number, number] {
-  const 默认槽位 = D技能候选槽位表[0];
-  const 主槽位热键 = 读取按钮技能热键(whichHero, D技能候选槽位表[0][0], D技能候选槽位表[0][1]);
-  if (主槽位热键 === "D") return 默认槽位;
-
-  const 备用槽位热键 = 读取按钮技能热键(whichHero, D技能候选槽位表[1][0], D技能候选槽位表[1][1]);
-  if (备用槽位热键 === "D") return D技能候选槽位表[1];
-
+  const 默认槽位 = 第二排技能槽位表[3];
+  for (let i = 0; i < 第二排技能槽位表.length; i++) {
+    const [x, y] = 第二排技能槽位表[i];
+    const 热键 = 读取按钮技能热键(whichHero, x, y);
+    if (热键 === "D") return 第二排技能槽位表[i];
+  }
   return 默认槽位;
 }
 

@@ -5,3 +5,4 @@ export * from "./03．剧情Boss预置桥接";
 export * from "./04．主线剧情动作注册表";
 export * from "./05．紧凑剧情片段编译";
 export * from "./06．剧情通用执行工具";
+export * from "./07．剧情技能事件辅助";

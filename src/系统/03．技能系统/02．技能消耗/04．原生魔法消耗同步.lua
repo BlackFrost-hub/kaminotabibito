@@ -9,6 +9,7 @@ local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local R2I = jass.R2I
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.01．魔法消耗返还")
 local _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017 = ____require_result_1["计算最终魔法消耗"]
@@ -42,6 +43,10 @@ local function _____89E3_6790_69FD_4F4D(whichHero, hotkey)
     return _____56FA_5B9A_69FD_4F4D_8868[hotkey]
 end
 local function _____83B7_53D6_6280_80FDId(whichHero, hotkey)
+    local _____5F53_524D_5FEB_7167 = selectionSnapshotSystem["获取本地选中技能快照"]()
+    if _____5F53_524D_5FEB_7167.hero == whichHero then
+        return _____5F53_524D_5FEB_7167.skills[hotkey]
+    end
     local slot = _____89E3_6790_69FD_4F4D(whichHero, hotkey)
     return commandBarAbility["读取命令卡按钮能力Id"](slot.x, slot.y)
 end
@@ -98,6 +103,7 @@ ____exports["初始化原生魔法消耗同步"] = function()
         return
     end
     initialized = true
+    selectionSnapshotSystem["初始化本地选中技能快照"]()
     addPeriodicCallback(REFRESH_MS, onSyncTick)
 end
 return ____exports

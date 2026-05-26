@@ -194,8 +194,8 @@ export function handleQuestSubmit(params: {
       || (rewardStr.indexOf("完成任务的玩家") === -1 && rewardStr.indexOf("Player") === -1);
     const targetLabel = isAll ? "|cffffcc00所有玩家|r" : `|cff00ccff${playerName}|r`;
     const TARGET_PREFIXES = ["所有玩家", "完成任务的玩家", "Player"];
-    const cleanReward = rewardStr.split(";").map(seg => {
-      let s = seg.trim();
+    const cleanReward = rewardStr.split(";").map((seg: string) => {
+      let s: string = seg.trim();
       for (const prefix of TARGET_PREFIXES) {
         if (s.startsWith(prefix)) {
           s = s.substring(prefix.length);
@@ -205,7 +205,7 @@ export function handleQuestSubmit(params: {
         }
       }
       return s;
-    }).filter(s => s.length > 0).join("、");
+    }).filter((s: string) => s.length > 0).join("、");
     const msg =
       `|cffffff00『系统提示』：|r` +
       `|cff00ff66${playerName}|r` +

@@ -21,6 +21,9 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { ModifyGateBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
 };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
 const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
   TransmissionFromUnitWithNameBJ: (
     this: void,
@@ -57,7 +60,6 @@ const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBou
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
-const GetPlayersAll = jass.GetPlayersAll as (this: void) => any;
 const IsUnitType = jass.IsUnitType as (this: void, whichUnit: any, whichType: any) => boolean;
 const IsUnitIllusion = jass["IsUnitIllusion"] as (this: void, whichUnit: any) => boolean;
 const Player = jass.Player as (this: void, number: number) => any;

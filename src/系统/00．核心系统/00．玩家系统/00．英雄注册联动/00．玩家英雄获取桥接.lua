@@ -2,20 +2,154 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
--- 
--- JASS 侧：
--- - 传参：YDLocal5Set(unit, "英雄", someHero)
--- - 触发：STES_Fire("玩家英雄注册")
--- 
--- Lua 侧职责：
--- - 从传入单位中筛选玩家 1-5 操作的英雄
--- - 写入 YDUserData("player", whichPlayer, "英雄", "unit")
--- - 在拿到英雄时，把英雄注册到各个依赖它的联动模块
-local jass = require("jass.common")
+local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, heroVoiceSystem, debugLog, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, taskUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
+function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
+    local mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
+    local cb = mod.onPlayerHeroRegistered
+    if type(cb) ~= "function" then
+        return
+    end
+    cb(whichPlayer, whichHero)
+end
+function invokeSelectionCenterInit(whichPlayer)
+    if type(initPlayerSelectionCenter) ~= "function" then
+        return
+    end
+    initPlayerSelectionCenter(whichPlayer)
+end
+function invokeSelectionCenterSeed(whichPlayer, whichUnit)
+    if type(seedSoleSelectedUnitForPlayer) ~= "function" then
+        return
+    end
+    seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
+end
+function _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217()
+    if _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID == nil then
+        return
+    end
+    centerTimer.removeDelayedCallback(_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID)
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID = nil
+end
+function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4EFB_52A1)
+    local owner = _____4EFB_52A1.owner
+    local whichHero = _____4EFB_52A1.hero
+    if owner == nil or owner == 0 or whichHero == nil or whichHero == 0 then
+        return true
+    end
+    local playerId = jass.GetPlayerId(owner)
+    repeat
+        local ____switch25 = _____4EFB_52A1.stage
+        local ____cond25 = ____switch25 == 0
+        if ____cond25 then
+            if type(registerMoveSpeedTornadoHero) == "function" then
+                registerMoveSpeedTornadoHero(whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 1
+        if ____cond25 then
+            if type(petItemHandoff["注册宠物移交英雄"]) == "function" then
+                petItemHandoff["注册宠物移交英雄"](whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 2
+        if ____cond25 then
+            if type(chestSystem.registerChestSystemHero) == "function" then
+                chestSystem.registerChestSystemHero(whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 3
+        if ____cond25 then
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 4
+        if ____cond25 then
+            debugLog(
+                nil,
+                "Bridge",
+                (("registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
+            )
+            invokeSelectionCenterInit(owner)
+            invokeSelectionCenterSeed(owner, whichHero)
+            if type(heroVoiceSystem.onPlayerHeroRegistered) == "function" then
+                heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 5
+        if ____cond25 then
+            if not uiRegisteredPlayers:has(playerId) then
+                invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 6
+        if ____cond25 then
+            if not uiRegisteredPlayers:has(playerId) and type(dialogSystem.onPlayerHeroRegistered) == "function" then
+                dialogSystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 7
+        if ____cond25 then
+            if not uiRegisteredPlayers:has(playerId) and type(buffUISystem.onPlayerHeroRegistered) == "function" then
+                buffUISystem.onPlayerHeroRegistered(owner, whichHero)
+            end
+            break
+        end
+        ____cond25 = ____cond25 or ____switch25 == 8
+        if ____cond25 then
+            if not uiRegisteredPlayers:has(playerId) then
+                local taskUiReady = true
+                if type(taskUISystem.onPlayerHeroRegistered) == "function" then
+                    taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) == true
+                end
+                if type(threatPanelSystem.onPlayerHeroRegistered) == "function" then
+                    threatPanelSystem.onPlayerHeroRegistered(owner, whichHero)
+                end
+                if taskUiReady then
+                    uiRegisteredPlayers:add(playerId)
+                end
+            end
+            return true
+        end
+        do
+            return true
+        end
+    until true
+    _____4EFB_52A1.stage = _____4EFB_52A1.stage + 1
+    return false
+end
+function ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick()
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID = nil
+    if #_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217 <= 0 then
+        _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217()
+        return
+    end
+    local _____5F53_524D_4EFB_52A1 = _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217[1]
+    local _____5DF2_5B8C_6210 = _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____5F53_524D_4EFB_52A1)
+    if _____5DF2_5B8C_6210 then
+        table.remove(_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, 1)
+    end
+    if #_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217 <= 0 then
+        _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217()
+        return
+    end
+    _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2)
+end
+function _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(_____5EF6_8FDF_6BEB_79D2)
+    if _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID ~= nil then
+        return
+    end
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID = centerTimer.addDelayedCallback(_____5EF6_8FDF_6BEB_79D2, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick)
+end
+jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local createDelayedCall = ____require_result_0.createDelayedCall
+centerTimer = require("系统.00．核心系统.05．中心计时器")
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____require_result_1.YDUserDataGet
@@ -24,18 +158,19 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal�
 local YDLocal5Get = ____require_result_2.YDLocal5Get
 local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
-local registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
-local petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
-local chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
-local dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index")
-local heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
+registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
+petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
+chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
+heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_3.debugLog
+debugLog = ____require_result_3.debugLog
 local REG_GUARD = "__syzl_playerHeroRegister_registered"
 local TRIG_KEY = "__syzl_playerHeroRegister_trig"
 local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
 local MAX_REG_ATTEMPTS = 30
 local RETRY_SEC = 0.1
+_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2 = 150
+local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2 = 800
 local function jassStesHashtable()
     local candidates = {jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT}
     do
@@ -80,79 +215,38 @@ local function isPlayableHero(whichUnit)
     local playerId = jass.GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
-local function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
-    local mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
-    local cb = mod.onPlayerHeroRegistered
-    if type(cb) ~= "function" then
-        return
-    end
-    cb(whichPlayer, whichHero)
-end
-local uiRegisteredPlayers = __TS__New(Set)
-local dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心")
-local buffUISystem = require("系统.05．Buff系统.02．BuffUI")
-local taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
-local threatPanelSystem = require("系统.09．表现系统.05．仇恨面板.index")
+uiRegisteredPlayers = __TS__New(Set)
+_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217 = {}
+local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID
+dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心")
+buffUISystem = require("系统.05．Buff系统.02．BuffUI")
+taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
+threatPanelSystem = require("系统.09．表现系统.05．仇恨面板.index")
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
-local initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter
-local seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnitForPlayer
-local function invokeSelectionCenterInit(whichPlayer)
-    if type(initPlayerSelectionCenter) ~= "function" then
+initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter
+seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnitForPlayer
+local function _____6E05_7406_82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF()
+    if _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID == nil then
         return
     end
-    initPlayerSelectionCenter(whichPlayer)
+    centerTimer.removeDelayedCallback(_____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID)
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID = nil
 end
-local function invokeSelectionCenterSeed(whichPlayer, whichUnit)
-    if type(seedSoleSelectedUnitForPlayer) ~= "function" then
+local function ____on_542F_52A8_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217()
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID = nil
+    if #_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217 <= 0 then
         return
     end
-    seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
+    _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(0)
 end
 local function registerHeroDependents(whichHero)
-    if type(registerMoveSpeedTornadoHero) == "function" then
-        registerMoveSpeedTornadoHero(whichHero)
-    end
-    if type(petItemHandoff["注册宠物移交英雄"]) == "function" then
-        petItemHandoff["注册宠物移交英雄"](whichHero)
-    end
-    if type(chestSystem.registerChestSystemHero) == "function" then
-        chestSystem.registerChestSystemHero(whichHero)
-    end
-    if type(dynamicSkillText.registerDynamicSkillTextHero) == "function" then
-        dynamicSkillText.registerDynamicSkillTextHero(whichHero)
-    end
     local owner = jass.GetOwningPlayer(whichHero)
-    if owner ~= nil and owner ~= 0 then
-        local playerId = jass.GetPlayerId(owner)
-        debugLog(
-            nil,
-            "Bridge",
-            (("registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
-        )
-        invokeSelectionCenterInit(owner)
-        invokeSelectionCenterSeed(owner, whichHero)
-        if type(heroVoiceSystem.onPlayerHeroRegistered) == "function" then
-            heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero)
-        end
-        if not uiRegisteredPlayers:has(playerId) then
-            local taskUiReady = true
-            invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
-            if type(dialogSystem.onPlayerHeroRegistered) == "function" then
-                dialogSystem.onPlayerHeroRegistered(owner, whichHero)
-            end
-            if type(buffUISystem.onPlayerHeroRegistered) == "function" then
-                buffUISystem.onPlayerHeroRegistered(owner, whichHero)
-            end
-            if type(taskUISystem.onPlayerHeroRegistered) == "function" then
-                taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) == true
-            end
-            if type(threatPanelSystem.onPlayerHeroRegistered) == "function" then
-                threatPanelSystem.onPlayerHeroRegistered(owner, whichHero)
-            end
-            if taskUiReady then
-                uiRegisteredPlayers:add(playerId)
-            end
-        end
+    if owner == nil or owner == 0 then
+        return
+    end
+    _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217[#_____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217 + 1] = {owner = owner, hero = whichHero, stage = 0}
+    if _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID == nil then
+        _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID = centerTimer.addDelayedCallback(_____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2, ____on_542F_52A8_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217)
     end
 end
 local function registerPlayerHero(whichPlayer, whichHero)
@@ -241,6 +335,7 @@ local function initOutOfCombatSystem()
     end
 end
 function ____exports.initPlayerHeroGetBridge()
+    _____6E05_7406_82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF()
     initOutOfCombatSystem()
     tryRegisterPlayerHeroStes()
 end

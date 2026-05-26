@@ -9,6 +9,13 @@ const R2I = jass.R2I as (value: number) => number;
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
+const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
+  初始化本地选中技能快照: (this: void) => void;
+  获取本地选中技能快照: (this: void) => {
+    hero: any | null;
+    skills: Record<热键位, number>;
+  };
+};
 const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
@@ -62,6 +69,8 @@ function 解析槽位(this: void, whichHero: any, hotkey: 热键位): 按钮槽�
 }
 
 function 获取技能Id(this: void, whichHero: any, hotkey: 热键位): number {
+  const 当前快照 = selectionSnapshotSystem.获取本地选中技能快照();
+  if (当前快照.hero === whichHero) return 当前快照.skills[hotkey];
   const slot = 解析槽位(whichHero, hotkey);
   return commandBarAbility.读取命令卡按钮能力Id(slot.x, slot.y);
 }
@@ -113,5 +122,6 @@ export function 获取已同步技能魔法消耗(this: void, unit: any, ability
 export function 初始化原生魔法消耗同步(this: void): void {
   if (initialized) return;
   initialized = true;
+  selectionSnapshotSystem.初始化本地选中技能快照();
   addPeriodicCallback(REFRESH_MS, onSyncTick);
 }

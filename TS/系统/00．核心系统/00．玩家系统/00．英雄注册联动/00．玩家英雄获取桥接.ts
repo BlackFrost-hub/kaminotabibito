@@ -17,6 +17,10 @@ const jglobals = require("jass.globals") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
+const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
+};
 
 const C = require("系统.00．核心系统.00．玩家系统.00．常量") as typeof import("../00．常量");
 
@@ -49,9 +53,6 @@ const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事
   registerChestSystemHero: (this: void, whichHero: any) => void;
 };
 
-const dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.index") as {
-  registerDynamicSkillTextHero: (this: void, whichHero: any) => void;
-};
 const heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
@@ -65,6 +66,14 @@ const TRIG_KEY = "__syzl_playerHeroRegister_trig";
 const ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt";
 const MAX_REG_ATTEMPTS = 30;
 const RETRY_SEC = 0.1;
+const 英雄依赖注册队列间隔毫秒 = 150;
+const 英雄依赖注册启动延迟毫秒 = 800;
+
+interface 英雄依赖注册任务 {
+  owner: any;
+  hero: any;
+  stage: number;
+}
 
 function jassStesHashtable(): any {
   const candidates = [jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT];
@@ -108,6 +117,9 @@ function invokeUiAttrOnPlayerHeroRegistered(whichPlayer: any, whichHero: any): v
 }
 
 const uiRegisteredPlayers = new Set<number>();
+const 英雄依赖注册队列: 英雄依赖注册任务[] = [];
+let 英雄依赖注册队列下一步延迟ID: number | undefined;
+let 英雄依赖注册启动延迟ID: number | undefined;
 
 const dialogSystem = require("系统.09．表现系统.02．对话框系统.00．对话框渲染核心") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
@@ -145,56 +157,125 @@ function invokeSelectionCenterSeed(whichPlayer: any, whichUnit: any): void {
   seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit);
 }
 
-function registerHeroDependents(whichHero: any): void {
-  if (typeof registerMoveSpeedTornadoHero === "function") {
-    registerMoveSpeedTornadoHero(whichHero);
-  }
-  if (typeof petItemHandoff.注册宠物移交英雄 === "function") {
-    petItemHandoff.注册宠物移交英雄(whichHero);
-  }
-  if (typeof chestSystem.registerChestSystemHero === "function") {
-    chestSystem.registerChestSystemHero(whichHero);
-  }
-  if (typeof dynamicSkillText.registerDynamicSkillTextHero === "function") {
-    dynamicSkillText.registerDynamicSkillTextHero(whichHero);
-  }
-  const owner = jass.GetOwningPlayer(whichHero);
-  if (owner != null && owner !== 0) {
-    const playerId = jass.GetPlayerId(owner);
-    debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
+function 停止英雄依赖注册队列(this: void): void {
+  if (英雄依赖注册队列下一步延迟ID == null) return;
+  centerTimer.removeDelayedCallback(英雄依赖注册队列下一步延迟ID);
+  英雄依赖注册队列下一步延迟ID = undefined;
+}
 
-    invokeSelectionCenterInit(owner);
-    invokeSelectionCenterSeed(owner, whichHero);
+function 清理英雄依赖注册启动延迟(this: void): void {
+  if (英雄依赖注册启动延迟ID == null) return;
+  centerTimer.removeDelayedCallback(英雄依赖注册启动延迟ID);
+  英雄依赖注册启动延迟ID = undefined;
+}
 
-    if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
-      heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
-    }
+function 处理英雄依赖注册任务一步(this: void, 任务: 英雄依赖注册任务): boolean {
+  const owner = 任务.owner;
+  const whichHero = 任务.hero;
+  if (owner == null || owner === 0 || whichHero == null || whichHero === 0) return true;
 
-    if (!uiRegisteredPlayers.has(playerId)) {
-      let taskUiReady = true;
-
-      invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
-
-      if (typeof dialogSystem.onPlayerHeroRegistered === "function") {
+  const playerId = jass.GetPlayerId(owner);
+  switch (任务.stage) {
+    case 0:
+      if (typeof registerMoveSpeedTornadoHero === "function") {
+        registerMoveSpeedTornadoHero(whichHero);
+      }
+      break;
+    case 1:
+      if (typeof petItemHandoff.注册宠物移交英雄 === "function") {
+        petItemHandoff.注册宠物移交英雄(whichHero);
+      }
+      break;
+    case 2:
+      if (typeof chestSystem.registerChestSystemHero === "function") {
+        chestSystem.registerChestSystemHero(whichHero);
+      }
+      break;
+    case 3:
+      break;
+    case 4:
+      debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
+      invokeSelectionCenterInit(owner);
+      invokeSelectionCenterSeed(owner, whichHero);
+      if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
+        heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
+      }
+      break;
+    case 5:
+      if (!uiRegisteredPlayers.has(playerId)) {
+        invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
+      }
+      break;
+    case 6:
+      if (!uiRegisteredPlayers.has(playerId) && typeof dialogSystem.onPlayerHeroRegistered === "function") {
         dialogSystem.onPlayerHeroRegistered(owner, whichHero);
       }
-
-      if (typeof buffUISystem.onPlayerHeroRegistered === "function") {
+      break;
+    case 7:
+      if (!uiRegisteredPlayers.has(playerId) && typeof buffUISystem.onPlayerHeroRegistered === "function") {
         buffUISystem.onPlayerHeroRegistered(owner, whichHero);
       }
-
-      if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
-        taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
+      break;
+    case 8:
+      if (!uiRegisteredPlayers.has(playerId)) {
+        let taskUiReady = true;
+        if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
+          taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
+        }
+        if (typeof threatPanelSystem.onPlayerHeroRegistered === "function") {
+          threatPanelSystem.onPlayerHeroRegistered(owner, whichHero);
+        }
+        if (taskUiReady) {
+          uiRegisteredPlayers.add(playerId);
+        }
       }
+      return true;
+    default:
+      return true;
+  }
+  任务.stage++;
+  return false;
+}
 
-      if (typeof threatPanelSystem.onPlayerHeroRegistered === "function") {
-        threatPanelSystem.onPlayerHeroRegistered(owner, whichHero);
-      }
+function on英雄依赖注册队列Tick(this: void): void {
+  英雄依赖注册队列下一步延迟ID = undefined;
+  if (英雄依赖注册队列.length <= 0) {
+    停止英雄依赖注册队列();
+    return;
+  }
+  const 当前任务 = 英雄依赖注册队列[0];
+  const 已完成 = 处理英雄依赖注册任务一步(当前任务);
+  if (已完成) {
+    英雄依赖注册队列.shift();
+  }
+  if (英雄依赖注册队列.length <= 0) {
+    停止英雄依赖注册队列();
+    return;
+  }
+  调度英雄依赖注册队列下一步(英雄依赖注册队列间隔毫秒);
+}
 
-      if (taskUiReady) {
-        uiRegisteredPlayers.add(playerId);
-      }
-    }
+function 调度英雄依赖注册队列下一步(this: void, 延迟毫秒: number): void {
+  if (英雄依赖注册队列下一步延迟ID != null) return;
+  英雄依赖注册队列下一步延迟ID = centerTimer.addDelayedCallback(延迟毫秒, on英雄依赖注册队列Tick);
+}
+
+function on启动英雄依赖注册队列(this: void): void {
+  英雄依赖注册启动延迟ID = undefined;
+  if (英雄依赖注册队列.length <= 0) return;
+  调度英雄依赖注册队列下一步(0);
+}
+
+function registerHeroDependents(whichHero: any): void {
+  const owner = jass.GetOwningPlayer(whichHero);
+  if (owner == null || owner === 0) return;
+  英雄依赖注册队列.push({
+    owner,
+    hero: whichHero,
+    stage: 0,
+  });
+  if (英雄依赖注册启动延迟ID == null) {
+    英雄依赖注册启动延迟ID = centerTimer.addDelayedCallback(英雄依赖注册启动延迟毫秒, on启动英雄依赖注册队列);
   }
 }
 
@@ -271,6 +352,7 @@ function initOutOfCombatSystem(this: void): void {
 }
 
 export function initPlayerHeroGetBridge(): void {
+  清理英雄依赖注册启动延迟();
   initOutOfCombatSystem();
   tryRegisterPlayerHeroStes();
 }

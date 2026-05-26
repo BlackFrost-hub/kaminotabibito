@@ -95,6 +95,8 @@ export function registerBridge(): void {
   expose("EnableDawnDusk", sound.EnableDawnDusk);
   expose("IsDawnDuskEnabled", sound.IsDawnDuskEnabled);
   expose("QuestMessageBJ", questMsg.QuestMessageBJ);
+  expose("CreateQuestBJ", questMsg.CreateQuestBJ);
+  expose("GetLastCreatedQuestBJ", questMsg.GetLastCreatedQuestBJ);
   expose("ModifyGateBJ", misc.ModifyGateBJ);
   expose("GetUnitsInRectMatching", misc.GetUnitsInRectMatching);
   expose("ForGroupBJ", misc.ForGroupBJ);

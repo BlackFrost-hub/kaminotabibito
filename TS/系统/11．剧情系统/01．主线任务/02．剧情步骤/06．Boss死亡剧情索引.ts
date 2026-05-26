@@ -68,6 +68,13 @@ export const Boss死亡剧情索引表: Boss死亡剧情索引项[] = [
     剧情片段ID: "elven_city_treant_leader_death",
     说明: "树魔首领死亡后，掉落魔法信件并返回王城汇报。",
   },
+  {
+    Boss单位名: "里科特王子",
+    需要剧情进度: 34,
+    设置剧情进度: 35,
+    剧情片段ID: "elven_city_chapter_end",
+    说明: "第二章末战 Boss 死亡后，进入章节末最终收束。",
+  },
 ];
 
 function Boss单位名匹配(this: void, unitTypeId: number, Boss单位名: string): boolean {

@@ -21,6 +21,12 @@ const { TransmissionFromUnitWithNameBJ, CinematicModeBJ } = require("lib.扩展�
   ) => void;
   CinematicModeBJ: (this: void, cineMode: boolean, forForce: any) => void;
 };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
+const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
+  QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
+};
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -36,8 +42,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 };
 
 import 主线剧情片段配置表 from "./01．剧情片段配置表";
-import type { 剧情动作执行上下文 } from "../00．剧情系统核心工具/00．剧情动作类型";
-import { 执行主线剧情动作 } from "../00．剧情系统核心工具/04．主线剧情动作注册表";
+import type { 剧情动作参数表, 剧情动作执行上下文 } from "../00．剧情系统核心工具/00．剧情动作类型";
 import { 写入当前剧情动作上下文 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 按名字给触发单位物品, 执行通用剧情动作 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
 import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型";
@@ -46,11 +51,9 @@ const CreateTimer = jass.CreateTimer as (this: void) => any;
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetPlayersAll = jass.GetPlayersAll as (this: void) => any;
 const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const QuestMessageBJ = jass.QuestMessageBJ as (this: void, whichForce: any, messageType: number, message: string) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (
@@ -98,6 +101,7 @@ const 剧情播放器运行时状态: 剧情播放器运行时 = { ...默认剧�
 let 当前片段: 剧情片段配置 | undefined;
 let 已初始化剧情步骤播放器 = false;
 const 绝对时间动作上下文表: Record<number, 剧情绝对时间动作上下文 | undefined> = {};
+let 执行主线剧情动作函数: ((动作ID: string, 参数: 剧情动作参数表) => void) | undefined;
 
 export function 创建剧情播放器运行时(this: void): 剧情播放器运行时 {
   return { ...默认剧情播放器运行时 };
@@ -160,6 +164,16 @@ function 安排绝对时间动作(this: void, 步骤: 剧情步骤): void {
   safeTimerStart(timer, 计算步骤持续时间(时间秒), false, on剧情绝对时间动作到期);
 }
 
+function 获取执行主线剧情动作函数(this: void): (动作ID: string, 参数: 剧情动作参数表) => void {
+  if (执行主线剧情动作函数 == null) {
+    const 模块 = require("../00．剧情系统核心工具/04．主线剧情动作注册表") as {
+      执行主线剧情动作: (动作ID: string, 参数: 剧情动作参数表) => void;
+    };
+    执行主线剧情动作函数 = 模块.执行主线剧情动作;
+  }
+  return 执行主线剧情动作函数;
+}
+
 function on剧情绝对时间动作到期(this: void): void {
   const timer = GetExpiredTimer();
   const handleId = GetHandleId(timer);
@@ -171,7 +185,7 @@ function on剧情绝对时间动作到期(this: void): void {
   if (!剧情播放器运行时状态.是否正在播放) return;
   if (上下文.播放世代 !== 剧情播放器运行时状态.播放世代) return;
   if (剧情播放器运行时状态.是否请求跳过) return;
-  执行主线剧情动作(上下文.动作ID, 上下文.参数);
+  获取执行主线剧情动作函数()(上下文.动作ID, 上下文.参数);
 }
 
 function 安排片段绝对时间动作(this: void, 片段: 剧情片段配置): void {
@@ -204,7 +218,7 @@ function 执行自定义动作步骤(this: void, 步骤: 剧情步骤): void {
     执行当前剧情步骤();
     return;
   }
-  执行主线剧情动作(步骤.动作ID, 参数);
+      获取执行主线剧情动作函数()(步骤.动作ID, 参数);
   剧情播放器运行时状态.当前步骤索引++;
   执行当前剧情步骤();
 }

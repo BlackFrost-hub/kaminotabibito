@@ -10,7 +10,7 @@ ____exports.NPC_CONFIGS = {
         X = -327.9,
         Y = -88.9,
         Facing = 270,
-        modelFIle = "units\\human\\Peasant\\Peasant.mdl",
+        modelFIle = "units\\human\\Peasant\\Peasant",
         enabled = true
     },
     {
@@ -19,8 +19,8 @@ ____exports.NPC_CONFIGS = {
         NpcNameID = "人类猎人",
         unitcode = "hmil",
         requireType = "对话",
-        X = 0,
-        Y = 0,
+        X = -26819.3,
+        Y = -8344.6,
         Facing = 220,
         enabled = true
     },
@@ -33,20 +33,20 @@ ____exports.NPC_CONFIGS = {
         X = -27392.3,
         Y = -28285.2,
         Facing = 200,
-        modelFIle = "units\\critters\\HighElfPeasant\\HighElfPeasant.mdl",
-        enabled = false
+        modelFIle = "units\\critters\\HighElfPeasant\\HighElfPeasant",
+        enabled = true
     },
     {
         NPCrequireName = "精灵村村民",
         requireID = 1003,
-        NpcNameID = "精灵村NPC001",
+        NpcNameID = "精灵",
         unitcode = "nhef",
         requireType = "对话",
         X = -26657.5,
         Y = -28275.3,
         Facing = 165,
         modelFIle = "war3mapImported\\ElfVillagerWomanV2.02.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "沙漠神秘刺客",
@@ -57,9 +57,9 @@ ____exports.NPC_CONFIGS = {
         X = -15871.9,
         Y = -20945.1,
         Facing = 270,
-        modelFIle = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower.mdx",
+        modelFIle = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower",
         initAction = "RemoveItemFromStockBJ:itemId(I0AG|I0AH|I0AI);random1",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "沙漠战斗商人",
@@ -71,7 +71,7 @@ ____exports.NPC_CONFIGS = {
         Y = -22781,
         Facing = 62.82,
         modelFIle = "units\\creeps\\Bandit\\Bandit.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵村弓箭手",
@@ -82,8 +82,8 @@ ____exports.NPC_CONFIGS = {
         X = -25549.1,
         Y = -26008.7,
         Facing = 120,
-        modelFIle = "units\\creeps\\HighElfArcher\\HighElfArcher.mdx",
-        enabled = false
+        modelFIle = "units\\creeps\\HighElfArcher\\HighElfArcher",
+        enabled = true
     },
     {
         NPCrequireName = "精灵村民",
@@ -95,7 +95,7 @@ ____exports.NPC_CONFIGS = {
         Y = -27726.2,
         Facing = 220,
         modelFIle = "war3mapImported\\ElfVillagerWomanV2.02.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "黑暗巫师",
@@ -106,8 +106,8 @@ ____exports.NPC_CONFIGS = {
         X = -18313.7,
         Y = -25518.5,
         Facing = 0,
-        modelFIle = "units\\creeps\\BanditMage\\BanditMage.mdx",
-        enabled = false
+        modelFIle = "units\\creeps\\BanditMage\\BanditMage",
+        enabled = true
     },
     {
         NPCrequireName = "亡灵法师-安格斯",
@@ -116,7 +116,7 @@ ____exports.NPC_CONFIGS = {
         unitcode = "n040",
         requireType = "任务",
         modelFIle = "units\\undead\\Necromancer\\Necromancer.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵村民",
@@ -128,7 +128,7 @@ ____exports.NPC_CONFIGS = {
         Y = -26978,
         Facing = 138,
         modelFIle = "war3mapImported\\ElfVillagerWomanV2.02.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "布里强",
@@ -139,8 +139,8 @@ ____exports.NPC_CONFIGS = {
         X = -5460.2,
         Y = -24955.4,
         Facing = 90,
-        modelFIle = "units\\creeps\\Bandit\\Bandit.mdx",
-        enabled = false
+        modelFIle = "units\\creeps\\Bandit\\Bandit",
+        enabled = true
     },
     {
         NPCrequireName = "树魔",
@@ -152,7 +152,7 @@ ____exports.NPC_CONFIGS = {
         Y = -21191.5,
         Facing = 270,
         modelFIle = "war3mapImported\\ForestTrollShadowPriest.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵猎手",
@@ -164,7 +164,7 @@ ____exports.NPC_CONFIGS = {
         Y = -29293.1,
         Facing = 270,
         modelFIle = "war3mapImported\\Watcher.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵村民",
@@ -176,7 +176,7 @@ ____exports.NPC_CONFIGS = {
         Y = -26556.9,
         Facing = 45,
         modelFIle = "war3mapImported\\ElfVillagerWomanV2.02.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "熔岩术士",
@@ -187,8 +187,8 @@ ____exports.NPC_CONFIGS = {
         X = 6903.8,
         Y = -25005.3,
         Facing = 10,
-        modelFIle = "units\\creeps\\OrcWarlock\\OrcWarlock.mdx",
-        enabled = false
+        modelFIle = "units\\creeps\\OrcWarlock\\OrcWarlock",
+        enabled = true
     },
     {
         NPCrequireName = "守望者",
@@ -199,8 +199,8 @@ ____exports.NPC_CONFIGS = {
         X = 8864.6,
         Y = -22209.2,
         Facing = 255.96,
-        modelFIle = "units\\creeps\\assassin\\assassin.mdx",
-        enabled = false
+        modelFIle = "units\\creeps\\assassin\\assassin",
+        enabled = true
     },
     {
         NPCrequireName = "精灵弓箭手",
@@ -212,7 +212,7 @@ ____exports.NPC_CONFIGS = {
         Y = -26851.8,
         Facing = 45,
         modelFIle = "war3mapImported\\maleelfarcher.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "冒险者阿利亚",
@@ -223,8 +223,8 @@ ____exports.NPC_CONFIGS = {
         X = -27974.4,
         Y = -7209.5,
         Facing = 270,
-        modelFIle = "units\\critters\\VillagerMan\\VillagerMan.mdx",
-        enabled = false
+        modelFIle = "units\\critters\\VillagerMan\\VillagerMan",
+        enabled = true
     },
     {
         NPCrequireName = "德鲁伊学者-卢伊",
@@ -236,7 +236,7 @@ ____exports.NPC_CONFIGS = {
         Y = -27943.2,
         Facing = 270,
         modelFIle = "war3mapImported\\Hero Druid.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "下级异端审查官-卢修斯",
@@ -247,8 +247,8 @@ ____exports.NPC_CONFIGS = {
         X = -22800.6,
         Y = -29084.3,
         Facing = 90,
-        modelFIle = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief.mdx",
-        enabled = false
+        modelFIle = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief",
+        enabled = true
     },
     {
         NPCrequireName = "德鲁伊指引者-阿莫斯",
@@ -260,7 +260,7 @@ ____exports.NPC_CONFIGS = {
         Y = -14275.9,
         Facing = 235,
         modelFIle = "war3mapImported\\DruidGuide.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "德鲁伊看守者-阿尔文",
@@ -269,7 +269,7 @@ ____exports.NPC_CONFIGS = {
         unitcode = "n04O",
         requireType = "任务",
         modelFIle = "war3mapImported\\Annurion.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "知识古树",
@@ -281,7 +281,7 @@ ____exports.NPC_CONFIGS = {
         Y = -14412.4,
         Facing = 270,
         modelFIle = "war3mapImported\\druidtreeform.mdl",
-        enabled = false
+        enabled = true
     },
     {
         NPCrequireName = "精灵族长-斯韦尔",
@@ -289,8 +289,8 @@ ____exports.NPC_CONFIGS = {
         NpcNameID = "|cffff0000失踪的精灵村民（Boss战任务）|r",
         unitcode = "edot",
         requireType = "任务",
-        modelFIle = "units\\nightelf\\DruidoftheTalon\\DruidoftheTalon.mdx",
-        enabled = false
+        modelFIle = "units\\nightelf\\DruidoftheTalon\\DruidoftheTalon",
+        enabled = true
     }
 }
 ____exports.default = ____exports.NPC_CONFIGS

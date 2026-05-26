@@ -1,5 +1,5 @@
 /**
- * 通用工具 - 统一导出入口
+ * 通用工具统一导出入口
  */
 
 export * from "./01．FourCC转换";
@@ -12,3 +12,4 @@ export * from "./07．数学运算";
 export * from "./08．Map安全遍历";
 export * from "./09．整数池";
 export * from "./10．字符串池";
+export * from "./12．JASS原生别名";

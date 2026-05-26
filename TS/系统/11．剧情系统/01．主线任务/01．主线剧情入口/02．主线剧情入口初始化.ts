@@ -17,17 +17,23 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
+const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
+  TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
+};
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { 查找主线剧情片段 } = require("../02．剧情步骤") as {
+const { 查找主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
   查找主线剧情片段: (this: void, 片段ID: string) => any;
 };
-const { 播放主线剧情片段 } = require("../02．剧情步骤") as {
+const { 播放主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
   播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
+};
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 import {
@@ -40,6 +46,11 @@ import {
 } from "./01．主线NPC初始化配置表";
 import type { 主线NPC初始化配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
 import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
+import { 初始化进度01_精灵村长老发布任务核心 } from "../02．剧情步骤/00．主线剧情/01．精灵村长老发布任务";
+import { 初始化进度02_地精洞窟进入演出核心 } from "../02．剧情步骤/00．主线剧情/02．地精洞窟进入演出";
+import { 初始化进度03_地精祭祀Boss前导核心 } from "../02．剧情步骤/00．主线剧情/03．地精祭祀Boss前导";
+import { 初始化进度04_地精祭祀死亡演出核心 } from "../02．剧情步骤/00．主线剧情/04．地精祭祀死亡演出";
+import { 初始化进度05_击败地精返回长老核心 } from "../02．剧情步骤/00．主线剧情/05．击败地精返回长老";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreateTimer = jass.CreateTimer as (this: void) => any;
@@ -51,8 +62,8 @@ const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
-const TriggerRegisterEnterRectSimple = jass.TriggerRegisterEnterRectSimple as (this: void, trig: any, r: any) => any;
 const TriggerRegisterUnitInRange = jass.TriggerRegisterUnitInRange as (this: void, trig: any, whichUnit: any, range: number, filter: any) => any;
+const 主线入口调试模块 = "11．剧情系统_主线入口";
 
 const 中立被动玩家ID = 15;
 let 已请求初始化主线剧情入口 = false;
@@ -67,7 +78,8 @@ function 获取全局句柄(this: void, 变量名: string): any {
 
 function 读取已绑定NPC(this: void, 配置: 主线NPC初始化配置): any {
   if (配置.YD表 == null || 配置.YD键 == null || 配置.YD字段 == null) return undefined;
-  return YDUserDataGetSafe("string", 配置.YD表, 配置.YD键, 配置.YD类型 ?? "unit");
+  const unit = YDUserDataGetSafe("string", 配置.YD表, 配置.YD键, 配置.YD类型 ?? "unit");
+  return unit == null || unit === 0 ? undefined : unit;
 }
 
 function 写入NPC绑定(this: void, 配置: 主线NPC初始化配置, unit: any): void {
@@ -76,17 +88,20 @@ function 写入NPC绑定(this: void, 配置: 主线NPC初始化配置, unit: any
 }
 
 function 记录NPC运行时(this: void, 配置: 主线NPC初始化配置, unit: any): void {
-  if (unit == null) return;
+  if (unit == null || unit === 0) return;
   NPC运行时表[配置.配置名] = unit;
 }
 
 function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void {
   let unit = 读取已绑定NPC(配置);
+  debugLogForce(主线入口调试模块, "初始化NPC", 配置.配置名, "bound=", unit == null ? "nil" : GetHandleId(unit), "unitId=", 配置.单位ID, "x=", 配置.X, "y=", 配置.Y);
   if (unit == null) {
     unit = CreateUnit(Player(配置.玩家ID ?? 中立被动玩家ID), stringToFourCC(配置.单位ID), 配置.X, 配置.Y, 配置.朝向);
     写入NPC绑定(配置, unit);
+    debugLogForce(主线入口调试模块, "创建NPC", 配置.配置名, "created=", unit == null || unit === 0 ? "nil" : GetHandleId(unit));
   }
   记录NPC运行时(配置, unit);
+  debugLogForce(主线入口调试模块, "记录NPC", 配置.配置名, "runtime=", unit == null || unit === 0 ? "nil" : GetHandleId(unit));
 }
 
 function 记录入口触发器配置(this: void, trigger: any, 配置: 主线剧情入口配置): void {
@@ -115,8 +130,10 @@ function on主线剧情入口触发(this: void): void {
   if (trigger == null) return;
   const 配置 = 入口配置By触发器ID[tostring(GetHandleId(trigger))];
   if (配置 == null || 配置.剧情片段ID == null) return;
+  debugLogForce(主线入口调试模块, "入口触发", 配置.配置名, "fragment=", 配置.剧情片段ID, "progress=", 读取剧情进度());
   if (!剧情进度满足入口配置(配置)) return;
   const 触发单位 = GetTriggerUnit();
+  debugLogForce(主线入口调试模块, "入口触发单位", 配置.配置名, "unit=", 触发单位 == null ? "nil" : GetHandleId(触发单位));
   if (!触发单位满足入口物品配置(配置, 触发单位)) return;
 
   const 片段 = 查找主线剧情片段(配置.剧情片段ID);
@@ -180,14 +197,25 @@ function 初始化可破坏物(this: void): void {
 function on主线剧情入口延迟初始化(this: void): void {
   if (已执行初始化主线剧情入口) return;
   已执行初始化主线剧情入口 = true;
+  debugLogForce(主线入口调试模块, "开始延迟初始化主线剧情入口", "npcCount=", 主线NPC初始化配置表.length);
 
   for (let i = 0; i < 主线NPC初始化配置表.length; i++) {
     初始化单个NPC(主线NPC初始化配置表[i]);
   }
+  debugLogForce(
+    主线入口调试模块,
+    "自然守护者运行时",
+    NPC运行时表["自然守护者"] == null ? "nil" : GetHandleId(NPC运行时表["自然守护者"]),
+  );
   初始化单位范围入口();
   初始化矩形入口();
   初始化全局单位入口();
   初始化可破坏物();
+  初始化进度01_精灵村长老发布任务核心();
+  初始化进度02_地精洞窟进入演出核心();
+  初始化进度03_地精祭祀Boss前导核心();
+  初始化进度04_地精祭祀死亡演出核心();
+  初始化进度05_击败地精返回长老核心();
 }
 
 function on主线剧情入口延迟初始化并销毁计时器(this: void): void {

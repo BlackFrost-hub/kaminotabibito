@@ -38,7 +38,7 @@ export const 区域传送配置: Record<string, RegionConfig> = {
     bottom: -6592,
     right: -27264,
     top: -6304,
-    teleportX: -29740.7,
+    teleportX: -29630.7,
     teleportY: -28601.9,
     cameraTime: 0.1,
     text: "|cffffff00『系统提示』|r：现在的场景为：|cff00ff00『精灵村』|r",

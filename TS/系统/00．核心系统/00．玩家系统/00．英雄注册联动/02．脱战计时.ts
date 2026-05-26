@@ -2,6 +2,12 @@
 
 const jass = require("jass.common") as any;
 const g = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
+const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
+  QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
+};
 
 function 设置生命百分比(this: void, unit: any, pct: number): void {
   const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
@@ -102,8 +108,8 @@ function Boss脱战完成(this: void): void {
   设置魔法百分比(boss, 100);
 
   const bossName = jass.GetUnitName(boss);
-  jass.QuestMessageBJ(
-    jass.GetPlayersAll(),
+  QuestMessageBJ(
+    GetPlayersAll(),
     jass.bj_QUESTMESSAGE_WARNING,
     "|cffffff00『系统消息』|r：|cffff0000Boss|r|cffff6600『" + bossName + "』|r由于太久没受到玩家伤害脱战回血了。"
   );

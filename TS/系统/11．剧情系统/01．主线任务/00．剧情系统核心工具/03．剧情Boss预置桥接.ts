@@ -76,7 +76,7 @@ function on剧情Boss范围预置触发(this: void): void {
     触发单位: GetTriggerUnit(),
   });
   if (配置.剧情片段ID != null && 配置.剧情片段ID !== "") {
-    const { 播放主线剧情片段 } = require("../02．剧情步骤") as {
+    const { 播放主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
       播放主线剧情片段: (this: void, 片段ID: string) => boolean;
     };
     播放主线剧情片段(配置.剧情片段ID);

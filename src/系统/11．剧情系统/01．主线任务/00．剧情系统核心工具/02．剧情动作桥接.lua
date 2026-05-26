@@ -8,15 +8,17 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.07．杂项")
 local ModifyGateBJ = ____require_result_0.ModifyGateBJ
-local ____require_result_1 = require("lib.扩展函数.物品相关函数.创建物品函数")
-local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_1["创建物品并注册排泄监听"]
-local ____require_result_2 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_2["广播单位提示"]
-local GetPlayersAll = jass.GetPlayersAll
+local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_1.GetPlayersAll
+local ____require_result_2 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_2.QuestMessageBJ
+local ____require_result_3 = require("lib.扩展函数.物品相关函数.创建物品函数")
+local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local PingMinimap = jass.PingMinimap
-local QuestMessageBJ = jass.QuestMessageBJ
 local bj_GATEOPERATION_CLOSE = jglobals.bj_GATEOPERATION_CLOSE
 local bj_GATEOPERATION_OPEN = jglobals.bj_GATEOPERATION_OPEN
 ____exports["发送剧情任务消息"] = function(_____53C2_6570)
@@ -50,11 +52,11 @@ ____exports["在触发单位脚下创建剧情物品"] = function(itemTypeId)
 end
 ____exports["发送剧情广播"] = function(_____53C2_6570)
     local _____4E0A_4E0B_6587 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()
-    local ____53C2_6570__6765_6E90_5355_4F4D_3 = _____53C2_6570["来源单位"]
-    if ____53C2_6570__6765_6E90_5355_4F4D_3 == nil then
-        ____53C2_6570__6765_6E90_5355_4F4D_3 = _____4E0A_4E0B_6587["触发单位"]
+    local ____53C2_6570__6765_6E90_5355_4F4D_5 = _____53C2_6570["来源单位"]
+    if ____53C2_6570__6765_6E90_5355_4F4D_5 == nil then
+        ____53C2_6570__6765_6E90_5355_4F4D_5 = _____4E0A_4E0B_6587["触发单位"]
     end
-    local _____6765_6E90_5355_4F4D = ____53C2_6570__6765_6E90_5355_4F4D_3
+    local _____6765_6E90_5355_4F4D = ____53C2_6570__6765_6E90_5355_4F4D_5
     if _____6765_6E90_5355_4F4D == nil or _____6765_6E90_5355_4F4D == 0 then
         return
     end

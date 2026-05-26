@@ -15,7 +15,7 @@ const slk = require("jass.slk") as Record<string, Record<string, Record<string, 
     str += tostring(args[i]);
     if (i < args.length - 1) str += "\t";
   }
-  jassConsole.write(str + "\n");
+   jassConsole.write(str + "\n");
 };
 
 

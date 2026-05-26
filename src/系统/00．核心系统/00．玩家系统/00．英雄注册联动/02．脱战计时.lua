@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BBE_7F6E_751F_547D_767E_5206_6BD4, _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4, _____82F1_96C4_8131_6218_5B8C_6210, ____Boss_8131_6218_5B8C_6210, jass, g, getRegisteredPlayerHero, _____8131_6218_79FB_901F_6280_80FDID
+local _____8BBE_7F6E_751F_547D_767E_5206_6BD4, _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4, _____82F1_96C4_8131_6218_5B8C_6210, ____Boss_8131_6218_5B8C_6210, jass, g, GetPlayersAll, QuestMessageBJ, getRegisteredPlayerHero, _____8131_6218_79FB_901F_6280_80FDID
 function _____8BBE_7F6E_751F_547D_767E_5206_6BD4(unit, pct)
     local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
     jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 and pct or 0) * 0.01)
@@ -41,27 +41,31 @@ function ____Boss_8131_6218_5B8C_6210()
     _____8BBE_7F6E_751F_547D_767E_5206_6BD4(boss, 100)
     _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4(boss, 100)
     local bossName = jass.GetUnitName(boss)
-    jass.QuestMessageBJ(
-        jass.GetPlayersAll(),
+    QuestMessageBJ(
+        GetPlayersAll(),
         jass.bj_QUESTMESSAGE_WARNING,
         ("|cffffff00『系统消息』|r：|cffff0000Boss|r|cffff6600『" .. tostring(bossName)) .. "』|r由于太久没受到玩家伤害脱战回血了。"
     )
 end
 jass = require("jass.common")
 g = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.07．杂项")
+GetPlayersAll = ____require_result_0.GetPlayersAll
+local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
+QuestMessageBJ = ____require_result_1.QuestMessageBJ
 local function _____62E5_6709Buff(unit, buffId)
     if unit == nil or unit == 0 then
         return false
     end
     return jass.GetUnitAbilityLevel(unit, buffId) > 0
 end
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
 local function _____6CE8_518C_6700_7EC8_4F24_5BB3_56DE_8C03(cb)
     registerAppliedFinalDamageListener(cb)
 end
-local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
 local centerTimer = _G
 local _____8131_6218_5F00_5173 = true
 local _____82F1_96C4_8131_6218_65F6_95F4_79D2 = 18

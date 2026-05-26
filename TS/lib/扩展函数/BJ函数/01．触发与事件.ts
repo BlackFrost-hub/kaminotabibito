@@ -80,4 +80,10 @@ export function GetAttackedUnitBJ(): any {
     return jass.GetTriggerUnit();
 }
 
+export function TriggerRegisterEnterRectSimple(trig: any, r: any): any {
+    const rectRegion = jass.CreateRegion();
+    jass.RegionAddRect(rectRegion, r);
+    return jass.TriggerRegisterEnterRegion(trig, rectRegion, null);
+}
+
 export {};

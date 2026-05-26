@@ -12,6 +12,8 @@
 /.codex_tmp_*/
 /_tmp_*/
 /.opencode
+/map
+/map01
 /%APPDATA%
 node_modules/
 npm-debug.log*
