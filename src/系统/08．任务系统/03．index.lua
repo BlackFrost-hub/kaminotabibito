@@ -63,12 +63,14 @@ if ENABLE_QUEST_RUNTIME_CORE then
     if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
         _____4EFB_52A1_7BA1_7406_5668:init()
     end
-    registerDummyMainQuests(nil)
 end
 if ENABLE_QUEST_UI_MODULE then
     local manager = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")
     if type(manager.registerHotkey) == "function" then
         manager:registerHotkey()
+    end
+    if type(manager.initTaskUIForActivePlayers) == "function" then
+        manager:initTaskUIForActivePlayers()
     end
 end
 --- 预留：与 `main` 中 `任务系统.init?.()` 对应；当前初始化已在模块加载时完成。

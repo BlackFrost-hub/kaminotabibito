@@ -34,22 +34,22 @@ function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
             do
                 local item = __TS__StringTrim(list[i + 1])
                 if #item == 0 then
-                    goto __continue135
+                    goto __continue139
                 end
                 local at = (string.find(item, "@", nil, true) or 0) - 1
                 if at < 0 then
-                    goto __continue135
+                    goto __continue139
                 end
                 local soundVarName = __TS__StringTrim(__TS__StringSubstring(item, 0, at))
                 local rectVarName = __TS__StringTrim(__TS__StringSubstring(item, at + 1))
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
                 if soundHandle == nil or soundHandle == 0 or rectHandle == nil or rectHandle == 0 then
-                    goto __continue135
+                    goto __continue139
                 end
                 SetStackedSoundBJ(add, soundHandle, rectHandle)
             end
-            ::__continue135::
+            ::__continue139::
             i = i + 1
         end
     end
@@ -62,15 +62,15 @@ function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
             do
                 local soundVarName = __TS__StringTrim(list[i + 1])
                 if #soundVarName == 0 then
-                    goto __continue141
+                    goto __continue145
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 if soundHandle == nil or soundHandle == 0 then
-                    goto __continue141
+                    goto __continue145
                 end
                 PlaySoundBJ(soundHandle)
             end
-            ::__continue141::
+            ::__continue145::
             i = i + 1
         end
     end
@@ -90,6 +90,7 @@ local AdjustPlayerStateBJ = ____require_result_2.AdjustPlayerStateBJ
 local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
 local ModifyGateBJ = ____require_result_3.ModifyGateBJ
 local ForGroupBJ = ____require_result_3.ForGroupBJ
+local SetTimeOfDay = ____require_result_3.SetTimeOfDay
 local ____require_result_4 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_4.GetPlayersAll
 local ____require_result_5 = require("lib.扩展函数.BJ函数.04．矩形与区域")
@@ -141,7 +142,6 @@ local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local RemoveDestructable = jass.RemoveDestructable
 local RemoveItem = jass.RemoveItem
-local SetTimeOfDay = jass.SetTimeOfDay
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
@@ -158,6 +158,7 @@ local bj_MODIFYMETHOD_ADD = jglobals.bj_MODIFYMETHOD_ADD
 local bj_QUESTMESSAGE_ITEMACQUIRED = jglobals.bj_QUESTMESSAGE_ITEMACQUIRED
 local bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED
 local bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT
+local bj_QUESTMESSAGE_WARNING = jglobals.bj_QUESTMESSAGE_WARNING
 local PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD
 local _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID = "main_story_runtime"
 local _____5F53_524D_73A9_5BB6_82F1_96C4_63A7_5236_6682_505C = false
@@ -177,11 +178,18 @@ local function ____on_5EF6_8FDF_6267_884C_5230_65F6()
         return
     end
     if _____8BB0_5F55["类型"] == "消息" and _____8BB0_5F55["文本"] then
-        QuestMessageBJ(
-            GetPlayersAll(),
-            _____8BB0_5F55["消息类型"] or bj_QUESTMESSAGE_HINT,
-            _____8BB0_5F55["文本"]
-        )
+        local _____91CD_590D_6B21_6570 = math.max(1, _____8BB0_5F55["重复次数"] or 1)
+        do
+            local i = 0
+            while i < _____91CD_590D_6B21_6570 do
+                QuestMessageBJ(
+                    GetPlayersAll(),
+                    _____8BB0_5F55["消息类型"] or bj_QUESTMESSAGE_HINT,
+                    _____8BB0_5F55["文本"]
+                )
+                i = i + 1
+            end
+        end
         return
     end
     if _____8BB0_5F55["类型"] == "开门" then
@@ -202,11 +210,18 @@ end
 local function _____5B89_6392_5EF6_8FDF_6267_884C(_____79D2_6570, _____8BB0_5F55)
     if not (_____79D2_6570 > 0) then
         if _____8BB0_5F55["类型"] == "消息" and _____8BB0_5F55["文本"] then
-            QuestMessageBJ(
-                GetPlayersAll(),
-                _____8BB0_5F55["消息类型"] or bj_QUESTMESSAGE_HINT,
-                _____8BB0_5F55["文本"]
-            )
+            local _____91CD_590D_6B21_6570 = math.max(1, _____8BB0_5F55["重复次数"] or 1)
+            do
+                local i = 0
+                while i < _____91CD_590D_6B21_6570 do
+                    QuestMessageBJ(
+                        GetPlayersAll(),
+                        _____8BB0_5F55["消息类型"] or bj_QUESTMESSAGE_HINT,
+                        _____8BB0_5F55["文本"]
+                    )
+                    i = i + 1
+                end
+            end
         else
             ____on_5EF6_8FDF_6267_884C_5230_65F6()
         end
@@ -334,11 +349,11 @@ local function _____5411_5546_5E97_6DFB_52A0_7269_54C1(unit, _____7269_54C1_540D
                 local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(items[i + 1])
                 local itemTypeId = stringToFourCCSafe(rawId)
                 if not (itemTypeId > 0) then
-                    goto __continue47
+                    goto __continue51
                 end
                 AddItemToStockBJ(itemTypeId, unit, 1, 1)
             end
-            ::__continue47::
+            ::__continue51::
             i = i + 1
         end
     end
@@ -391,7 +406,7 @@ ____exports["给全部玩家添加区域视野"] = function(rectVarName)
             do
                 local key = (rectVarName .. "#") .. tostring(playerId)
                 if _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] then
-                    goto __continue61
+                    goto __continue65
                 end
                 local fogModifier = CreateFogModifierRect(
                     Player(playerId),
@@ -401,12 +416,12 @@ ____exports["给全部玩家添加区域视野"] = function(rectVarName)
                     false
                 )
                 if fogModifier == nil or fogModifier == 0 then
-                    goto __continue61
+                    goto __continue65
                 end
                 FogModifierStart(fogModifier)
                 _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] = true
             end
-            ::__continue61::
+            ::__continue65::
             playerId = playerId + 1
         end
     end
@@ -667,10 +682,17 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
     if _____53D1_653E_91D1_5E01 ~= 0 then
         _____8C03_6574_5168_90E8_73A9_5BB6_91D1_5E01(_____53D1_653E_91D1_5E01)
     end
-    local _____5EF6_8FDF_79D2_6570 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟秒数") or _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟开门秒")
-    local _____5EF6_8FDF_63D0_793A = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟提示") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息")
+    local _____9884_8B66_6587_672C = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "预警文本")
+    local _____5EF6_8FDF_79D2_6570 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟秒数") or _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟开门秒") or (_____9884_8B66_6587_672C ~= "" and 4 or 0)
+    local _____5EF6_8FDF_63D0_793A = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟提示") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息") or _____9884_8B66_6587_672C
     if _____5EF6_8FDF_63D0_793A ~= "" then
-        _____5B89_6392_5EF6_8FDF_6267_884C(_____5EF6_8FDF_79D2_6570, {["类型"] = "消息", ["文本"] = _____5EF6_8FDF_63D0_793A, ["消息类型"] = bj_QUESTMESSAGE_HINT})
+        local _____5EF6_8FDF_6D88_606F_7C7B_578B_6807_8BB0 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息类型")
+        local _____6D88_606F_7C7B_578B = (_____5EF6_8FDF_6D88_606F_7C7B_578B_6807_8BB0 == "WARNING" or _____9884_8B66_6587_672C ~= "") and bj_QUESTMESSAGE_WARNING or bj_QUESTMESSAGE_HINT
+        local _____91CD_590D_6B21_6570 = math.max(
+            1,
+            _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟消息重复次数") or (_____9884_8B66_6587_672C ~= "" and 2 or 1)
+        )
+        _____5B89_6392_5EF6_8FDF_6267_884C(_____5EF6_8FDF_79D2_6570, {["类型"] = "消息", ["文本"] = _____5EF6_8FDF_63D0_793A, ["消息类型"] = _____6D88_606F_7C7B_578B, ["重复次数"] = _____91CD_590D_6B21_6570})
     end
     if _____5F00_95E8_5BF9_8C61 ~= "" and _____5EF6_8FDF_79D2_6570 > 0 then
         _____5B89_6392_5EF6_8FDF_6267_884C(_____5EF6_8FDF_79D2_6570, {["类型"] = "开门", ["开门对象"] = _____5F00_95E8_5BF9_8C61, ["隐藏阻挡"] = _____9690_85CF_963B_6321})

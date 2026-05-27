@@ -5,6 +5,7 @@ local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_
 local _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["每玩家广播提示槽数"]
 local _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15 = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽索引"]
 local _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY = ____00_FF0E_5E38_91CF_5B9A_4E49["取广播提示槽位Y"]
+local _____5E7F_64AD_63D0_793A_9AD8_5EA6 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示高度"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__9690_85CF = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_隐藏"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__6ED1_5165 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_滑入"]
 local _____5E7F_64AD_63D0_793A_72B6_6001__505C_7559 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示状态_停留"]
@@ -92,18 +93,37 @@ local function _____63A8_8FDB_69FD_4F4D_72B6_6001(_____72B6_6001)
         _____63A8_8FDB_6DE1_51FA(_____72B6_6001)
     end
 end
-local function _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, _____672C_673A_73A9_5BB6ID)
+local function _____8BA1_7B97_73A9_5BB6_69FD_4F4D_663E_793AY_8868(_____73A9_5BB6ID)
+    local _____7ED3_679C = {}
+    local _____989D_5916_4E0B_79FB = 0
+    do
+        local _____69FD_4F4DID = 0
+        while _____69FD_4F4DID < _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 do
+            do
+                _____7ED3_679C[_____69FD_4F4DID + 1] = _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY(_____69FD_4F4DID) - _____989D_5916_4E0B_79FB
+                local _____5E8F_53F7 = _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15(_____73A9_5BB6ID, _____69FD_4F4DID)
+                local _____72B6_6001 = _____5E7F_64AD_63D0_793A_69FD_72B6_6001_8868[_____5E8F_53F7 + 1]
+                if _____72B6_6001 == nil or not _____72B6_6001.active then
+                    goto __continue20
+                end
+                local _____589E_91CF = _____72B6_6001.rootHeight - _____5E7F_64AD_63D0_793A_9AD8_5EA6
+                if _____589E_91CF > 0 then
+                    _____989D_5916_4E0B_79FB = _____989D_5916_4E0B_79FB + _____589E_91CF
+                end
+            end
+            ::__continue20::
+            _____69FD_4F4DID = _____69FD_4F4DID + 1
+        end
+    end
+    return _____7ED3_679C
+end
+local function _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, _____672C_673A_73A9_5BB6ID, _____663E_793AY)
     local _____5E27_7EC4 = _____5E7F_64AD_63D0_793A_69FD_5E27_8868[_____5E8F_53F7 + 1]
     if _____5E27_7EC4 == nil then
         return
     end
     local _____53EF_89C1 = _____72B6_6001.active and _____672C_673A_73A9_5BB6ID == _____72B6_6001.playerId
-    DzFrameSetAbsolutePoint(
-        _____5E27_7EC4.root,
-        _____5E27_70B9_5DE6,
-        _____72B6_6001.x,
-        _____53D6_5E7F_64AD_63D0_793A_69FD_4F4DY(_____72B6_6001.slotId)
-    )
+    DzFrameSetAbsolutePoint(_____5E27_7EC4.root, _____5E27_70B9_5DE6, _____72B6_6001.x, _____663E_793AY)
     DzFrameSetAlpha(
         _____5E27_7EC4.root,
         R2I(_____72B6_6001.alpha)
@@ -115,6 +135,7 @@ ____exports["on广播提示消息Tick"] = function()
     do
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
+            local _____69FD_4F4D_663E_793AY_8868 = _____8BA1_7B97_73A9_5BB6_69FD_4F4D_663E_793AY_8868(_____73A9_5BB6ID)
             do
                 local _____69FD_4F4DID = 0
                 while _____69FD_4F4DID < _____6BCF_73A9_5BB6_5E7F_64AD_63D0_793A_69FD_6570 do
@@ -122,12 +143,12 @@ ____exports["on广播提示消息Tick"] = function()
                         local _____5E8F_53F7 = _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15(_____73A9_5BB6ID, _____69FD_4F4DID)
                         local _____72B6_6001 = _____5E7F_64AD_63D0_793A_69FD_72B6_6001_8868[_____5E8F_53F7 + 1]
                         if _____72B6_6001 == nil then
-                            goto __continue24
+                            goto __continue29
                         end
                         _____63A8_8FDB_69FD_4F4D_72B6_6001(_____72B6_6001)
-                        _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, _____672C_673A_73A9_5BB6ID)
+                        _____5E94_7528_69FD_4F4D_5E27(_____5E8F_53F7, _____72B6_6001, _____672C_673A_73A9_5BB6ID, _____69FD_4F4D_663E_793AY_8868[_____69FD_4F4DID + 1])
                     end
-                    ::__continue24::
+                    ::__continue29::
                     _____69FD_4F4DID = _____69FD_4F4DID + 1
                 end
             end

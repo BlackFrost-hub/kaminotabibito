@@ -86,21 +86,34 @@ function ____exports.GetHeroStatBJ(whichStat, whichHero, includeBonuses)
     end
     return 0
 end
+local function SetHeroStatBJ(whichHero, whichStat, value)
+    if whichStat == jglobals.bj_HEROSTAT_STR then
+        jass.SetHeroStr(whichHero, value, true)
+        return
+    end
+    if whichStat == jglobals.bj_HEROSTAT_AGI then
+        jass.SetHeroAgi(whichHero, value, true)
+        return
+    end
+    if whichStat == jglobals.bj_HEROSTAT_INT then
+        jass.SetHeroInt(whichHero, value, true)
+    end
+end
 function ____exports.ModifyHeroStat(whichStat, whichHero, modifyMethod, value)
     if modifyMethod == jglobals.bj_MODIFYMETHOD_ADD then
-        jass.SetHeroStat(
+        SetHeroStatBJ(
             whichHero,
             whichStat,
             ____exports.GetHeroStatBJ(whichStat, whichHero, false) + value
         )
     elseif modifyMethod == jglobals.bj_MODIFYMETHOD_SUB then
-        jass.SetHeroStat(
+        SetHeroStatBJ(
             whichHero,
             whichStat,
             ____exports.GetHeroStatBJ(whichStat, whichHero, false) - value
         )
     elseif modifyMethod == jglobals.bj_MODIFYMETHOD_SET then
-        jass.SetHeroStat(whichHero, whichStat, value)
+        SetHeroStatBJ(whichHero, whichStat, value)
     end
 end
 function ____exports.SetUnitFacingToFaceUnitTimed(whichUnit, target, duration)

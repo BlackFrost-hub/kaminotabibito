@@ -509,15 +509,33 @@ function taskUIHotkeySwitchCategory(this: void, player: any, type: QuestType): v
  * 所有客户端对称执行（全局创建），异步显隐。
  */
 export function onPlayerHeroRegistered(this: void, whichPlayer: any, _whichHero: any): boolean {
-  if (!ENABLE_TASK_UI_CLIENT) return false;
+  return initTaskUIForPlayer(whichPlayer);
+}
+
+function isHumanPlayingPlayer(this: void, whichPlayer: any): boolean {
   if (whichPlayer == null || whichPlayer === 0) return false;
   const pid = jass.GetPlayerId(whichPlayer);
   if (typeof pid !== "number" || pid < 0 || pid >= MAX_PLAYERS) return false;
+  if (jass.GetPlayerController(whichPlayer) === jass.MAP_CONTROL_COMPUTER) return false;
+  return jass.GetPlayerSlotState(whichPlayer) === jass.PLAYER_SLOT_STATE_PLAYING;
+}
+
+export function initTaskUIForPlayer(this: void, whichPlayer: any): boolean {
+  if (!ENABLE_TASK_UI_CLIENT) return false;
+  if (!isHumanPlayingPlayer(whichPlayer)) return false;
+
+  const pid = jass.GetPlayerId(whichPlayer);
   if (taskUIs[pid]?.uiInitialized === true) return true;
 
   const ui = new TaskUI(pid);
-  const ok = ui.init(pid);
-  return ok;
+  return ui.init(pid);
+}
+
+export function initTaskUIForActivePlayers(this: void): void {
+  if (!ENABLE_TASK_UI_CLIENT) return;
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    initTaskUIForPlayer(jass.Player(i));
+  }
 }
 
 /** 热键注册：全局只注册一次 */

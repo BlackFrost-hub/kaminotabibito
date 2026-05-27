@@ -106,7 +106,7 @@ export interface 主线剧情区域音乐切换配置 {
 export interface 主线剧情支线任务发现配置 {
   任务数组索引: number;
   任务名: string;
-  任务描述: string;
+  任务描述?: string;
   图标路径: string;
   发现提示: string;
 }
@@ -134,7 +134,7 @@ export interface 主线剧情最终伤害事件配置 {
   清理Boss语义键?: string;
   清理目标YD表?: boolean;
   移除目标单位?: boolean;
-  任务描述: string;
+  任务描述?: string;
   任务提示: string;
   小地图X: number;
   小地图Y: number;

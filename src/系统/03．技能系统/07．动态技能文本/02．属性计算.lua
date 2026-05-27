@@ -7,15 +7,12 @@ local ____exports = {}
 -- 这里只保留当前动态文本白名单实际会用到的属性读取。
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local _____8C03_8BD5_8F93_51FA_6A21_5757 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = _____8C03_8BD5_8F93_51FA_6A21_5757.debugLogForce
 local GetHeroStr = jass.GetHeroStr
 local GetHeroAgi = jass.GetHeroAgi
 local GetHeroInt = jass.GetHeroInt
 local GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
 local ConvertUnitState = jass.ConvertUnitState
-local MODULE_NAME = "动态技能文本"
 --- 根据属性类型获取英雄属性值。
 ____exports["获取属性值"] = function(unit, _____5C5E_6027)
     repeat
@@ -39,6 +36,10 @@ ____exports["获取属性值"] = function(unit, _____5C5E_6027)
                 ConvertUnitState(21)
             )
         end
+        ____cond3 = ____cond3 or ____switch3 == "当前生命值"
+        if ____cond3 then
+            return GetUnitState(unit, jass.UNIT_STATE_LIFE)
+        end
         ____cond3 = ____cond3 or ____switch3 == "生命值"
         if ____cond3 then
             return GetUnitState(unit, jass.UNIT_STATE_LIFE)
@@ -46,6 +47,10 @@ ____exports["获取属性值"] = function(unit, _____5C5E_6027)
         ____cond3 = ____cond3 or ____switch3 == "最大生命值"
         if ____cond3 then
             return GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "当前魔法值"
+        if ____cond3 then
+            return GetUnitState(unit, jass.UNIT_STATE_MANA)
         end
         ____cond3 = ____cond3 or ____switch3 == "魔法值"
         if ____cond3 then
@@ -72,22 +77,6 @@ end
 ____exports["计算公式伤害"] = function(unit, _____5C5E_6027, _____500D_7387_5B57_7B26_4E32)
     local _____5C5E_6027_503C = ____exports["获取属性值"](unit, _____5C5E_6027)
     local _____500D_7387 = ____exports["解析倍率"](_____500D_7387_5B57_7B26_4E32)
-    local _____7ED3_679C = _____5C5E_6027_503C * _____500D_7387
-    if _____5C5E_6027 == "最大生命值" or _____5C5E_6027 == "最大魔法值" then
-        debugLogForce(
-            nil,
-            MODULE_NAME,
-            "公式计算",
-            "属性=",
-            _____5C5E_6027,
-            "倍率=",
-            _____500D_7387_5B57_7B26_4E32,
-            "属性值=",
-            _____5C5E_6027_503C,
-            "结果=",
-            _____7ED3_679C
-        )
-    end
-    return _____7ED3_679C
+    return _____5C5E_6027_503C * _____500D_7387
 end
 return ____exports

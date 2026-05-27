@@ -29,16 +29,25 @@ const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 
-export function 执行树魔首领死亡(this: void, 参数: 剧情动作参数表): void {
+let pendingTreantDeathUnit: any = undefined;
+let pendingTreantDeathX: number | undefined;
+let pendingTreantDeathY: number | undefined;
+
+export function 执行树魔首领死亡前置(this: void, 参数: 剧情动作参数表): void {
   const dyingUnit = GetDyingUnit();
   if (dyingUnit == null || dyingUnit === 0) return;
 
   写入剧情进度(Number(参数.设置剧情进度) || Number(参数.目标进度) || 28);
-  YDUserDataClearSafe("string", "Boss", "树魔首领", "unit");
-  YDUserDataClearTable("unit", dyingUnit);
+  pendingTreantDeathUnit = dyingUnit;
+  pendingTreantDeathX = GetUnitX(dyingUnit);
+  pendingTreantDeathY = GetUnitY(dyingUnit);
+}
 
-  const x = GetUnitX(dyingUnit);
-  const y = GetUnitY(dyingUnit);
+export function 执行树魔首领死亡奖励(this: void): void {
+  const x = pendingTreantDeathX;
+  const y = pendingTreantDeathY;
+  if (x == null || y == null) return;
+
   const 宝箱类型ID = stringToFourCCSafe("e070");
   if (宝箱类型ID > 0) {
     const 宝箱 = CreateUnit(Player(jass.PLAYER_NEUTRAL_PASSIVE as number), 宝箱类型ID, x, y, 0);
@@ -56,11 +65,21 @@ export function 执行树魔首领死亡(this: void, 参数: 剧情动作参数�
   if (魔法信件类型ID > 0) {
     CreateItem(魔法信件类型ID, x, y);
   }
+
+  YDUserDataClearSafe("string", "Boss", "树魔首领", "unit");
+  if (pendingTreantDeathUnit != null && pendingTreantDeathUnit !== 0) {
+    YDUserDataClearTable("unit", pendingTreantDeathUnit);
+  }
+
+  pendingTreantDeathUnit = undefined;
+  pendingTreantDeathX = undefined;
+  pendingTreantDeathY = undefined;
 }
 
 function 执行树魔首领死亡后返城(this: void): void {}
 
 export const 树魔首领死亡承接剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "SW01死亡事件_树魔首领死亡": 执行树魔首领死亡,
+  "SW01死亡事件_树魔首领死亡前置": 执行树魔首领死亡前置,
+  "SW01死亡事件_树魔首领死亡奖励": 执行树魔首领死亡奖励,
   "JLC精灵城_树魔首领死亡后返城": 执行树魔首领死亡后返城,
 };

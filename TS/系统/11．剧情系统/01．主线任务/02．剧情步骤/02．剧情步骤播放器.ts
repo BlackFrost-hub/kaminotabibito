@@ -27,6 +27,11 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
 };
+const { 发送头像提示给玩家, 发送单位提示给玩家, 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
+  发送头像提示给玩家: (this: void, targetPlayer: any, iconPath: string, text: string, duration?: number) => void;
+  发送单位提示给玩家: (this: void, targetPlayer: any, sourceUnit: any, text: string, duration?: number) => void;
+  广播单位提示: (this: void, sourceUnit: any, text: string, duration?: number) => void;
+};
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -73,6 +78,7 @@ const 剧情播放器模块名 = "11．剧情系统-剧情步骤播放器";
 const Boss战表名 = "Boss战";
 const Boss战绑定单位字段 = "绑定单位";
 const Boss战触发玩家字段 = "触发玩家";
+const 默认广播头像路径 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
 
 export interface 剧情播放器运行时 {
   当前片段ID?: string;
@@ -184,7 +190,6 @@ function on剧情绝对时间动作到期(this: void): void {
   if (上下文 == null) return;
   if (!剧情播放器运行时状态.是否正在播放) return;
   if (上下文.播放世代 !== 剧情播放器运行时状态.播放世代) return;
-  if (剧情播放器运行时状态.是否请求跳过) return;
   获取执行主线剧情动作函数()(上下文.动作ID, 上下文.参数);
 }
 
@@ -195,11 +200,90 @@ function 安排片段绝对时间动作(this: void, 片段: 剧情片段配置):
 }
 
 function 执行对白步骤(this: void, 步骤: 剧情步骤): void {
-  if (步骤.type !== "dialog" && 步骤.type !== "broadcast") return;
+  if (步骤.type !== "dialog") return;
+  const 持续时间 = 步骤.持续时间 ?? 3;
+  if (步骤.使用原生电影系统 === true) {
+    const 说话者 = 步骤.说话者 ?? "系统";
+    const 文本 = 步骤.文本;
+    TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 文本, bj_TIMETYPE_SET, 计算步骤持续时间(持续时间), false);
+    剧情播放器运行时状态.当前步骤索引++;
+    安排下一步(持续时间);
+    return;
+  }
+  执行UIDialog步骤(步骤);
+}
+
+function 读取当前剧情触发单位(this: void): any {
+  return YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
+}
+
+function 读取说话者单位(this: void, 说话者: string | undefined, 说话者引用: string | undefined): any {
+  const 引用单位 = 读取YD单位引用(说话者引用);
+  if (引用单位 != null && 引用单位 !== 0) return 引用单位;
+  if (说话者 === "玩家") {
+    const 触发单位 = 读取当前剧情触发单位();
+    if (触发单位 != null && 触发单位 !== 0) return 触发单位;
+  }
+  if (说话者 != null && 说话者 !== "") {
+    const 主线NPC单位 = YDUserDataGetSafe("string", "主线NPC", 说话者, "unit");
+    if (主线NPC单位 != null && 主线NPC单位 !== 0) return 主线NPC单位;
+    const Boss单位 = YDUserDataGetSafe("string", "Boss", 说话者, "unit");
+    if (Boss单位 != null && Boss单位 !== 0) return Boss单位;
+  }
+  return null;
+}
+
+function 执行UIDialog步骤(this: void, 步骤: 剧情步骤): void {
+  if (步骤.type !== "dialog") return;
   const 说话者 = 步骤.说话者 ?? "系统";
   const 文本 = 步骤.文本;
   const 持续时间 = 步骤.持续时间 ?? 3;
-  TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 文本, bj_TIMETYPE_SET, 计算步骤持续时间(持续时间), false);
+  const 持续时间毫秒 = 持续时间 * 1000;
+  const 说话者单位 = 读取说话者单位(说话者, 步骤.说话者引用);
+  if (说话者单位 != null && 说话者单位 !== 0) {
+    for (let i = 0; i < 4; i++) {
+      发送单位提示给玩家(Player(i), 说话者单位, 文本, 持续时间毫秒);
+    }
+  } else {
+    for (let i = 0; i < 4; i++) {
+      发送头像提示给玩家(Player(i), 默认广播头像路径, `${说话者}：${文本}`, 持续时间毫秒);
+    }
+  }
+  剧情播放器运行时状态.当前步骤索引++;
+  安排下一步(持续时间);
+}
+
+function 执行UI广播步骤(this: void, 步骤: 剧情步骤): void {
+  if (步骤.type !== "broadcast") return;
+  const 文本 = 步骤.文本;
+  const 持续时间毫秒 = (步骤.持续时间 ?? 3) * 1000;
+  const 来源单位 = 读取YD单位引用(步骤.来源单位引用);
+  if (来源单位 != null && 来源单位 !== 0) {
+    广播单位提示(来源单位, 文本, 持续时间毫秒);
+    return;
+  }
+  const 头像路径 = 步骤.头像路径 ?? 默认广播头像路径;
+  for (let i = 0; i < 4; i++) {
+    发送头像提示给玩家(Player(i), 头像路径, 文本, 持续时间毫秒);
+  }
+}
+
+function 广播剧情跳过提示(this: void): void {
+  const 文本 = "|cffffff00『系统提示』：|r按下 |cffffcc00~|r 键可跳过当前剧情。";
+  for (let i = 0; i < 4; i++) {
+    发送头像提示给玩家(Player(i), 默认广播头像路径, 文本, 3200);
+  }
+}
+
+function 执行广播步骤(this: void, 步骤: 剧情步骤): void {
+  if (步骤.type !== "broadcast") return;
+  const 持续时间 = 步骤.持续时间 ?? 3;
+  if (步骤.广播渠道 === "ui") {
+    执行UI广播步骤(步骤);
+  } else {
+    const 说话者 = 步骤.说话者 ?? "系统";
+    TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 步骤.文本, bj_TIMETYPE_SET, 计算步骤持续时间(持续时间), false);
+  }
   剧情播放器运行时状态.当前步骤索引++;
   安排下一步(持续时间);
 }
@@ -259,6 +343,48 @@ function 执行给物品步骤(this: void, 步骤: 剧情步骤): void {
   执行当前剧情步骤();
 }
 
+function 执行跳过模式步骤逻辑(this: void, 步骤: 剧情步骤): void {
+  switch (步骤.type) {
+    case "dialog":
+    case "broadcast":
+    case "wait":
+      return;
+    case "runAction":
+      获取执行主线剧情动作函数()(步骤.动作ID, 步骤.参数 ?? {});
+      return;
+    case "startBossFight": {
+      const bossUnit = 读取YD单位引用(步骤.Boss引用) ?? 读取YD单位引用((步骤 as any).Boss名 ? `Boss.${(步骤 as any).Boss名}` : undefined);
+      if (bossUnit != null && bossUnit !== 0) {
+        应用Boss战启动属性配置(bossUnit);
+        YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", bossUnit);
+        const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
+        if (触发单位 != null && 触发单位 !== 0) {
+          YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
+        }
+        PauseUnit(bossUnit, false);
+        SetUnitInvulnerable(bossUnit, false);
+        启动Boss战运行(bossUnit);
+      }
+      return;
+    }
+    case "giveItem": {
+      const itemName = (步骤 as any).物品名 as string | undefined;
+      if (itemName != null && itemName !== "") 按名字给触发单位物品(itemName);
+      return;
+    }
+    default:
+      执行通用剧情动作((步骤 as any).参数 ?? {});
+      return;
+  }
+}
+
+function 快进执行当前片段剩余逻辑(this: void): void {
+  if (当前片段 == null) return;
+  for (let i = 剧情播放器运行时状态.当前步骤索引; i < 当前片段.步骤列表.length; i++) {
+    执行跳过模式步骤逻辑(当前片段.步骤列表[i]);
+  }
+}
+
 function 执行当前剧情步骤(this: void): void {
   if (!剧情播放器运行时状态.是否正在播放 || 当前片段 == null) return;
   if (剧情播放器运行时状态.是否请求跳过) {
@@ -274,8 +400,10 @@ function 执行当前剧情步骤(this: void): void {
   const 步骤 = 当前片段.步骤列表[剧情播放器运行时状态.当前步骤索引];
   switch (步骤.type) {
     case "dialog":
-    case "broadcast":
       执行对白步骤(步骤);
+      return;
+    case "broadcast":
+      执行广播步骤(步骤);
       return;
     case "wait":
       执行等待步骤(步骤);
@@ -316,6 +444,9 @@ export function 播放主线剧情片段(this: void, 片段ID: string, 上下文
   剧情播放器运行时状态.当前倍速 = 片段.默认倍速 ?? 1;
   剧情播放器运行时状态.是否正在播放 = true;
   剧情播放器运行时状态.是否请求跳过 = false;
+  if (片段.可Esc整段跳过 === true) {
+    广播剧情跳过提示();
+  }
   安排片段绝对时间动作(片段);
   debugLogForce(剧情播放器模块名, "播放剧情片段", 片段ID, "steps=", 片段.步骤列表.length);
   执行当前剧情步骤();
@@ -327,6 +458,8 @@ function on剧情ESC跳过(this: void): void {
   if (当前片段.可Esc整段跳过 !== true) return;
   剧情播放器运行时状态.是否请求跳过 = true;
   QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_HINT, "|cffffff00『系统提示』：|r已跳过当前剧情。");
+  快进执行当前片段剩余逻辑();
+  结束当前剧情片段();
 }
 
 function on剧情二倍速命令(this: void): void {

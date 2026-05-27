@@ -54,6 +54,10 @@ export function GetPlayersAll(): any {
     return jglobals.bj_FORCE_ALL_PLAYERS;
 }
 
+export function SetTimeOfDay(whatTime: number): void {
+    jass.SetFloatGameState(jglobals.GAME_STATE_TIME_OF_DAY, whatTime);
+}
+
 export function GetRandomDirectionDeg(): number {
     return jass.GetRandomReal(0, 360);
 }

@@ -85,13 +85,27 @@ export function GetHeroStatBJ(whichStat: number, whichHero: any, includeBonuses:
     return 0;
 }
 
+function SetHeroStatBJ(whichHero: any, whichStat: number, value: number): void {
+    if (whichStat === jglobals.bj_HEROSTAT_STR) {
+        jass.SetHeroStr(whichHero, value, true);
+        return;
+    }
+    if (whichStat === jglobals.bj_HEROSTAT_AGI) {
+        jass.SetHeroAgi(whichHero, value, true);
+        return;
+    }
+    if (whichStat === jglobals.bj_HEROSTAT_INT) {
+        jass.SetHeroInt(whichHero, value, true);
+    }
+}
+
 export function ModifyHeroStat(whichStat: number, whichHero: any, modifyMethod: number, value: number): void {
     if (modifyMethod === jglobals.bj_MODIFYMETHOD_ADD) {
-        jass.SetHeroStat(whichHero, whichStat, GetHeroStatBJ(whichStat, whichHero, false) + value);
+        SetHeroStatBJ(whichHero, whichStat, GetHeroStatBJ(whichStat, whichHero, false) + value);
     } else if (modifyMethod === jglobals.bj_MODIFYMETHOD_SUB) {
-        jass.SetHeroStat(whichHero, whichStat, GetHeroStatBJ(whichStat, whichHero, false) - value);
+        SetHeroStatBJ(whichHero, whichStat, GetHeroStatBJ(whichStat, whichHero, false) - value);
     } else if (modifyMethod === jglobals.bj_MODIFYMETHOD_SET) {
-        jass.SetHeroStat(whichHero, whichStat, value);
+        SetHeroStatBJ(whichHero, whichStat, value);
     }
 }
 

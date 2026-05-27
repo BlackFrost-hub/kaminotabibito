@@ -4,6 +4,7 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
 local YDWEAngleBetweenUnitsSafe = ____require_result_0.YDWEAngleBetweenUnitsSafe
 local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
@@ -25,14 +26,19 @@ local IssuePointOrder = jass.IssuePointOrder
 local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
+local IssueTargetOrder = jass.IssueTargetOrder
 local UnitSuspendDecay = jass.UnitSuspendDecay
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
-____exports["执行沙漠食人魔一阶段死亡"] = function(_____53C2_6570)
+local _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54 = nil
+local _____5F85_5F00_6218_76EE_6807_5355_4F4D = nil
+local _____5F85_5904_7406_4E00_9636_6BB5_6B7B_4EA1_5355_4F4D = nil
+____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6570)
     local dyingUnit = GetDyingUnit()
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
+    _____5F85_5904_7406_4E00_9636_6BB5_6B7B_4EA1_5355_4F4D = dyingUnit
     UnitSuspendDecay(dyingUnit, true)
     local x = GetUnitX(dyingUnit)
     local y = GetUnitY(dyingUnit)
@@ -94,6 +100,20 @@ ____exports["执行沙漠食人魔一阶段死亡"] = function(_____53C2_6570)
         "unit",
         bossUnit
     )
+    PauseUnit(bossUnit, true)
+    SetUnitInvulnerable(bossUnit, true)
+    _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54 = bossUnit
+    _____5F85_5F00_6218_76EE_6807_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
+end
+____exports["执行沙漠食人魔二阶段开战"] = function()
+    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
+    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 == nil then
+        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
+    end
+    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6
+    if bossUnit == nil or bossUnit == 0 then
+        return
+    end
     YDUserDataSetSafe(
         "string",
         "Boss战",
@@ -101,9 +121,15 @@ ____exports["执行沙漠食人魔一阶段死亡"] = function(_____53C2_6570)
         "unit",
         bossUnit
     )
-    PauseUnit(bossUnit, true)
-    SetUnitInvulnerable(bossUnit, true)
+    if _____5F85_5F00_6218_76EE_6807_5355_4F4D ~= nil and _____5F85_5F00_6218_76EE_6807_5355_4F4D ~= 0 then
+        IssueTargetOrder(bossUnit, "attack", _____5F85_5F00_6218_76EE_6807_5355_4F4D)
+    end
+    SetUnitInvulnerable(bossUnit, false)
+    PauseUnit(bossUnit, false)
     _____542F_52A8Boss_6218_8FD0_884C(bossUnit)
+    _____5F85_5904_7406_4E00_9636_6BB5_6B7B_4EA1_5355_4F4D = nil
+    _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54 = nil
+    _____5F85_5F00_6218_76EE_6807_5355_4F4D = nil
 end
-____exports["沙漠食人魔一阶段死亡剧情动作注册表"] = {["SW01死亡事件_沙漠食人魔一阶段死亡"] = ____exports["执行沙漠食人魔一阶段死亡"]}
+____exports["沙漠食人魔一阶段死亡剧情动作注册表"] = {["SW01死亡事件_沙漠食人魔一阶段死亡前置"] = ____exports["执行沙漠食人魔一阶段死亡前置"], ["SW01死亡事件_沙漠食人魔二阶段开战"] = ____exports["执行沙漠食人魔二阶段开战"]}
 return ____exports

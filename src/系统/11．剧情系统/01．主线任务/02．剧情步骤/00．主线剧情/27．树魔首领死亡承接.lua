@@ -26,16 +26,25 @@ local GetDyingUnit = jass.GetDyingUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local Player = jass.Player
-____exports["执行树魔首领死亡"] = function(_____53C2_6570)
+local pendingTreantDeathUnit = nil
+local pendingTreantDeathX
+local pendingTreantDeathY
+____exports["执行树魔首领死亡前置"] = function(_____53C2_6570)
     local dyingUnit = GetDyingUnit()
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
     _____5199_5165_5267_60C5_8FDB_5EA6(__TS__Number(_____53C2_6570["设置剧情进度"]) or __TS__Number(_____53C2_6570["目标进度"]) or 28)
-    YDUserDataClearSafe("string", "Boss", "树魔首领", "unit")
-    YDUserDataClearTable("unit", dyingUnit)
-    local x = GetUnitX(dyingUnit)
-    local y = GetUnitY(dyingUnit)
+    pendingTreantDeathUnit = dyingUnit
+    pendingTreantDeathX = GetUnitX(dyingUnit)
+    pendingTreantDeathY = GetUnitY(dyingUnit)
+end
+____exports["执行树魔首领死亡奖励"] = function()
+    local x = pendingTreantDeathX
+    local y = pendingTreantDeathY
+    if x == nil or y == nil then
+        return
+    end
     local _____5B9D_7BB1_7C7B_578BID = stringToFourCCSafe("e070")
     if _____5B9D_7BB1_7C7B_578BID > 0 then
         local _____5B9D_7BB1 = CreateUnit(
@@ -64,8 +73,15 @@ ____exports["执行树魔首领死亡"] = function(_____53C2_6570)
     if _____9B54_6CD5_4FE1_4EF6_7C7B_578BID > 0 then
         CreateItem(_____9B54_6CD5_4FE1_4EF6_7C7B_578BID, x, y)
     end
+    YDUserDataClearSafe("string", "Boss", "树魔首领", "unit")
+    if pendingTreantDeathUnit ~= nil and pendingTreantDeathUnit ~= 0 then
+        YDUserDataClearTable("unit", pendingTreantDeathUnit)
+    end
+    pendingTreantDeathUnit = nil
+    pendingTreantDeathX = nil
+    pendingTreantDeathY = nil
 end
 local function _____6267_884C_6811_9B54_9996_9886_6B7B_4EA1_540E_8FD4_57CE()
 end
-____exports["树魔首领死亡承接剧情动作注册表"] = {["SW01死亡事件_树魔首领死亡"] = ____exports["执行树魔首领死亡"], ["JLC精灵城_树魔首领死亡后返城"] = _____6267_884C_6811_9B54_9996_9886_6B7B_4EA1_540E_8FD4_57CE}
+____exports["树魔首领死亡承接剧情动作注册表"] = {["SW01死亡事件_树魔首领死亡前置"] = ____exports["执行树魔首领死亡前置"], ["SW01死亡事件_树魔首领死亡奖励"] = ____exports["执行树魔首领死亡奖励"], ["JLC精灵城_树魔首领死亡后返城"] = _____6267_884C_6811_9B54_9996_9886_6B7B_4EA1_540E_8FD4_57CE}
 return ____exports

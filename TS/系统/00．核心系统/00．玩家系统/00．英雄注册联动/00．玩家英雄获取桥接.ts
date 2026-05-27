@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+﻿/** @noSelfInFile */
 /**
  * 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
  *
@@ -129,9 +129,6 @@ const buffUISystem = require("系统.05．Buff系统.02．BuffUI") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
 
-const taskUISystem = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器") as {
-  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => boolean;
-};
 const threatPanelSystem = require("系统.09．表现系统.05．仇恨面板.index") as {
   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 };
@@ -218,16 +215,10 @@ function 处理英雄依赖注册任务一步(this: void, 任务: 英雄依赖�
       break;
     case 8:
       if (!uiRegisteredPlayers.has(playerId)) {
-        let taskUiReady = true;
-        if (typeof taskUISystem.onPlayerHeroRegistered === "function") {
-          taskUiReady = taskUISystem.onPlayerHeroRegistered(owner, whichHero) === true;
-        }
         if (typeof threatPanelSystem.onPlayerHeroRegistered === "function") {
           threatPanelSystem.onPlayerHeroRegistered(owner, whichHero);
         }
-        if (taskUiReady) {
-          uiRegisteredPlayers.add(playerId);
-        }
+        uiRegisteredPlayers.add(playerId);
       }
       return true;
     default:

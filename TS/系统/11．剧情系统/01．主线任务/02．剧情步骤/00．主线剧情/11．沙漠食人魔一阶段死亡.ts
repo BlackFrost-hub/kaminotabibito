@@ -2,7 +2,8 @@
 
 const jass = require("jass.common") as any;
 
-const { YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
@@ -28,14 +29,20 @@ const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, ord
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
+const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, targetWidget: any) => boolean;
 const UnitSuspendDecay = jass.UnitSuspendDecay as (this: void, whichUnit: any, flag: boolean) => void;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 
-export function 执行沙漠食人魔一阶段死亡(this: void, 参数: 剧情动作参数表): void {
+let 待开战杀戮食人魔: any = null;
+let 待开战目标单位: any = null;
+let 待处理一阶段死亡单位: any = null;
+
+export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: 剧情动作参数表): void {
   const dyingUnit = GetDyingUnit();
   if (dyingUnit == null || dyingUnit === 0) return;
+  待处理一阶段死亡单位 = dyingUnit;
   UnitSuspendDecay(dyingUnit, true);
 
   const x = GetUnitX(dyingUnit);
@@ -63,12 +70,28 @@ export function 执行沙漠食人魔一阶段死亡(this: void, 参数: 剧情�
   const bossUnit = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), bossTypeId, x, y, 270);
   if (bossUnit == null || bossUnit === 0) return;
   YDUserDataSetSafe("string", "Boss", "杀戮食人魔", "unit", bossUnit);
-  YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
   PauseUnit(bossUnit, true);
   SetUnitInvulnerable(bossUnit, true);
+  待开战杀戮食人魔 = bossUnit;
+  待开战目标单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
+}
+
+export function 执行沙漠食人魔二阶段开战(this: void): void {
+  const bossUnit = 待开战杀戮食人魔 ?? YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit");
+  if (bossUnit == null || bossUnit === 0) return;
+  YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
+  if (待开战目标单位 != null && 待开战目标单位 !== 0) {
+    IssueTargetOrder(bossUnit, "attack", 待开战目标单位);
+  }
+  SetUnitInvulnerable(bossUnit, false);
+  PauseUnit(bossUnit, false);
   启动Boss战运行(bossUnit);
+  待处理一阶段死亡单位 = null;
+  待开战杀戮食人魔 = null;
+  待开战目标单位 = null;
 }
 
 export const 沙漠食人魔一阶段死亡剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "SW01死亡事件_沙漠食人魔一阶段死亡": 执行沙漠食人魔一阶段死亡,
+  "SW01死亡事件_沙漠食人魔一阶段死亡前置": 执行沙漠食人魔一阶段死亡前置,
+  "SW01死亡事件_沙漠食人魔二阶段开战": 执行沙漠食人魔二阶段开战,
 };

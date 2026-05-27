@@ -1,11 +1,6 @@
 /** @noSelfInFile */
 
 const jglobals = require("jass.globals") as any;
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-const 精灵村01调试模块 = "11．剧情系统_精灵村01";
-
 const { SetUnitFacingToFaceUnitTimed, ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
@@ -290,23 +285,9 @@ function 触发单位在村口放行矩形内(this: void, unit: any): boolean {
 function on精灵村村口放行触发(this: void): void {
   if (已触发村口放行) return;
   const 触发单位 = GetTriggerUnit();
-  const 自然守护者 = YDUserDataGetSafe("string", "主线NPC", "自然守护者", "unit");
-  debugLogForce(
-    精灵村01调试模块,
-    "村口放行触发",
-    "unit=",
-    触发单位 == null ? "nil" : tostring(触发单位),
-    "progress=",
-    读取剧情进度(),
-    "guardian=",
-    自然守护者 == null ? "nil" : tostring(自然守护者),
-  );
   if (!触发单位是玩家英雄(触发单位)) return;
   if (读取剧情进度() > 0) return;
-  if (!触发单位在村口放行矩形内(触发单位)) {
-    debugLogForce(精灵村01调试模块, "村口放行拦截", "reason=", "not_in_rect077");
-    return;
-  }
+  if (!触发单位在村口放行矩形内(触发单位)) return;
   if (写入并播放剧情("jlc_elven_village_gate_release", "精灵村村口放行核心", 触发单位)) {
     已触发村口放行 = true;
   }

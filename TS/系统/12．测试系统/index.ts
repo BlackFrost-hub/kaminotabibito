@@ -10,6 +10,7 @@ const ENABLE_QUEST_TEST = false;
 const ENABLE_TEST_233 = true;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_GOLD_BURST_TEST = true;
+const ENABLE_BROADCAST_HINT_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -34,6 +35,10 @@ function loadTests(): void {
 
   if (ENABLE_GOLD_BURST_TEST) {
     require("系统.12．测试系统.01．金币爆发测试");
+  }
+
+  if (ENABLE_BROADCAST_HINT_TEST) {
+    require("系统.12．测试系统.04．广播提示消息测试");
   }
 
 }

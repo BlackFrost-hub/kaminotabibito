@@ -23,6 +23,7 @@ export interface 剧情步骤基础 {
 export interface 剧情对白步骤 extends 剧情步骤基础 {
   type: "dialog";
   说话者: string;
+  说话者引用?: string;
   文本: string;
   持续时间: number;
   使用原生电影系统?: boolean;
@@ -34,6 +35,9 @@ export interface 剧情广播步骤 extends 剧情步骤基础 {
   说话者?: string;
   文本: string;
   持续时间?: number;
+  广播渠道?: "cinematic" | "ui";
+  来源单位引用?: string;
+  头像路径?: string;
 }
 
 export interface 剧情等待步骤 extends 剧情步骤基础 {
@@ -151,6 +155,7 @@ export type 剧情动作挂点 = "beforeDialog" | "afterDialog" | "absoluteTime"
 export interface 紧凑剧情对白行 {
   序号: number;
   说话者: string;
+  说话者引用?: string;
   文本: string;
   持续时间: number;
   使用原生电影系统?: boolean;

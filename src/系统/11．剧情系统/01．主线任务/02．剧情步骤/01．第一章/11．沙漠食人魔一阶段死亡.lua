@@ -14,8 +14,8 @@ ____exports["沙漠食人魔一阶段死亡紧凑剧情片段"] = {
         ["序号"] = 1,
         ["挂点"] = "beforeDialog",
         ["对白序号"] = 1,
-        ["动作ID"] = "SW01死亡事件_沙漠食人魔一阶段死亡",
-        ["名称"] = "沙漠食人魔死亡裂隙演出",
+        ["动作ID"] = "SW01死亡事件_沙漠食人魔一阶段死亡前置",
+        ["名称"] = "沙漠食人魔死亡裂隙演出前置",
         ["参数"] = {
             ["触发进度"] = 11,
             ["目标进度"] = 12,
@@ -26,8 +26,15 @@ ____exports["沙漠食人魔一阶段死亡紧凑剧情片段"] = {
             ["Boss键"] = "Boss.杀戮食人魔",
             ["停止区域音乐"] = "gg_snd_shengliBgm @ gg_rct______________047",
             ["播放音效"] = "gg_snd_GWSY07",
-            ["旧JASS功能清单"] = "UnitSuspendDecay / SetStackedSoundBJ(false, shengliBgm) / CreateUnit / PauseUnit / SetUnitInvulnerable / ConditionalTriggerExecute"
+            ["旧JASS功能清单"] = "UnitSuspendDecay / SetStackedSoundBJ(false, shengliBgm) / CreateUnit裂隙与蜥蜴人 / CreateUnit二阶段Boss并暂停无敌"
         }
+    }, {
+        ["序号"] = 2,
+        ["挂点"] = "afterDialog",
+        ["对白序号"] = 4,
+        ["动作ID"] = "SW01死亡事件_沙漠食人魔二阶段开战",
+        ["名称"] = "沙漠食人魔二阶段正式开战",
+        ["参数"] = {["Boss键"] = "Boss.杀戮食人魔", ["旧JASS功能清单"] = "QuestMessageBJ(WARNING) / IssueTargetOrder / PauseUnit(false) / SetUnitInvulnerable(false) / ConditionalTriggerExecute"}
     }}
 }
 ____exports["沙漠食人魔一阶段死亡剧情片段"] = _____7F16_8BD1_7D27_51D1_5267_60C5_7247_6BB5(____exports["沙漠食人魔一阶段死亡紧凑剧情片段"])

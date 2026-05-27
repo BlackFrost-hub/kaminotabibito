@@ -54,7 +54,6 @@ export const 蛇人族交凭证紧凑剧情片段: 紧凑剧情片段配置 = {
       序号: 3, 挂点: "afterDialog", 对白序号: 13,
       动作ID: "SRZ蛇人族_护卫对战目标刷新", 名称: "护卫对战目标刷新",
       参数: {
-        任务描述: "完成蛇人族卫队长提出的护卫试炼。",
         任务更新提示: "|cffffff00『主线目标』：|r通过|cffffcc99『蛇人族护卫试炼』|r。",
         旧JASS功能清单: "QuestSetDescription / QuestMessageBJ",
       },

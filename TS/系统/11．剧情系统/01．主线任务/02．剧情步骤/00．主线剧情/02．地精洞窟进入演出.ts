@@ -23,8 +23,9 @@ const { CinematicModeBJ, CinematicFilterGenericBJ } = require("lib.扩展函数.
     trans1: number,
   ) => void;
 };
-const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+const { GetPlayersAll, SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
+  SetTimeOfDay: (this: void, whatTime: number) => void;
 };
 const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
@@ -37,7 +38,6 @@ import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
-const SetTimeOfDay = jass.SetTimeOfDay as (this: void, time: number) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 
 let 已初始化进度02核心 = false;

@@ -38,6 +38,9 @@ const DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate as (unit: any, abilit
 
 const MODULE_NAME = "动态技能文本";
 const 单属性最大替换次数 = 8;
+const 动态数值标记前缀 = "__DYN_NUM_";
+const 动态数值标记后缀 = "__";
+const ALT提示尾注 = "|n|cff99ccff（按下Alt显示详细信息）|r";
 const 原始提示缓存: Record<string, string | undefined> = {};
 const 已处理技能缓存: Record<string, number[] | undefined> = {};
 
@@ -50,6 +53,11 @@ type 公式匹配结果 = {
 type 属性匹配项 = {
   文本名: string;
   计算属性名: 属性类型;
+};
+
+type 保护片段 = {
+  标记: string;
+  原文: string;
 };
 
 const 排序属性匹配项列表: 属性匹配项[] = 属性名称列表
@@ -125,6 +133,160 @@ function 获取增减类显示文本(this: void, 属性匹配项: 属性匹配�
   const 显示名 = 增减类属性显示名表[属性匹配项.计算属性名];
   if (显示名 != null) return 数值文本 + 显示名;
   return 数值文本 + "点" + 属性匹配项.文本名;
+}
+
+function 尝试匹配属性文本(this: void, text: string, 起始位置: number): string | null {
+  for (let i = 0; i < 排序属性匹配项列表.length; i++) {
+    const 属性文本名 = 排序属性匹配项列表[i].文本名;
+    if (text.substring(起始位置, 起始位置 + 属性文本名.length) === 属性文本名) {
+      return 属性文本名;
+    }
+  }
+  return null;
+}
+
+function 保护目标前缀公式(this: void, text: string, 前缀: string, 保护片段表: 保护片段[]): string {
+  let result = text;
+  let 搜索起点 = 0;
+
+  while (true) {
+    const 前缀位置 = result.indexOf(前缀, 搜索起点);
+    if (前缀位置 < 0) break;
+
+    let 当前位置 = 前缀位置 + 前缀.length;
+    const 倍率 = 提取倍率(result, 当前位置);
+    if (倍率 == null) {
+      搜索起点 = 前缀位置 + 前缀.length;
+      continue;
+    }
+    当前位置 += 倍率.length;
+
+    let 命中属性 = false;
+    while (true) {
+      const 属性文本名 = 尝试匹配属性文本(result, 当前位置);
+      if (属性文本名 == null) break;
+      命中属性 = true;
+      当前位置 += 属性文本名.length;
+    }
+
+    if (!命中属性) {
+      搜索起点 = 前缀位置 + 前缀.length;
+      continue;
+    }
+
+    const 原文 = result.substring(前缀位置, 当前位置);
+    const 标记 = "__DYN_SKIP_" + 保护片段表.length.toString() + "__";
+    保护片段表.push({ 标记, 原文 });
+    result = result.substring(0, 前缀位置) + 标记 + result.substring(当前位置);
+    搜索起点 = 前缀位置 + 标记.length;
+  }
+
+  return result;
+}
+
+function 保护目标类公式(this: void, text: string): [string, 保护片段[]] {
+  const 保护片段表: 保护片段[] = [];
+  let result = text;
+  result = 保护目标前缀公式(result, "目标已损失", 保护片段表);
+  result = 保护目标前缀公式(result, "目标", 保护片段表);
+  result = 保护目标前缀公式(result, "主目标", 保护片段表);
+  result = 保护目标前缀公式(result, "副目标", 保护片段表);
+  return [result, 保护片段表];
+}
+
+function 恢复保护片段(this: void, text: string, 保护片段表: 保护片段[]): string {
+  let result = text;
+  for (let i = 0; i < 保护片段表.length; i++) {
+    const 保护片段 = 保护片段表[i];
+    result = result.replace(保护片段.标记, 保护片段.原文);
+  }
+  return result;
+}
+
+function 消除造成自身数值前缀(this: void, text: string): string {
+  let result = text;
+  const 目标前缀 = "造成自身";
+  let 位置 = result.indexOf(目标前缀);
+  while (位置 >= 0) {
+    const 数字开始 = 位置 + 目标前缀.length;
+    const 下一个字符位置 = 数字开始;
+    const 字符 = 下一个字符位置 < result.length ? result.charAt(下一个字符位置) : "";
+    if ((字符 >= "0" && 字符 <= "9") || 字符 === ".") {
+      result = result.substring(0, 位置) + "造成" + result.substring(数字开始);
+      位置 = result.indexOf(目标前缀, 位置 + 2);
+    } else {
+      位置 = result.indexOf(目标前缀, 位置 + 2);
+    }
+  }
+  return result;
+}
+
+function 追加Alt提示尾注(this: void, text: string): string {
+  if (text.indexOf(ALT提示尾注) >= 0) return text;
+  return text + ALT提示尾注;
+}
+
+function 包装动态数值(this: void, 数值文本: string): string {
+  return 动态数值标记前缀 + 数值文本 + 动态数值标记后缀;
+}
+
+type 动态数值标记解析结果 = {
+  结束位置: number;
+  数值文本: string;
+  数值: number;
+};
+
+function 解析动态数值标记(this: void, text: string, 起始位置: number): 动态数值标记解析结果 | null {
+  if (text.substring(起始位置, 起始位置 + 动态数值标记前缀.length) !== 动态数值标记前缀) return null;
+
+  const 数值开始 = 起始位置 + 动态数值标记前缀.length;
+  const 标记结束 = text.indexOf(动态数值标记后缀, 数值开始);
+  if (标记结束 < 0) return null;
+
+  const 数值文本 = text.substring(数值开始, 标记结束);
+  const 数值 = parseFloat(数值文本);
+  if (数值 !== 数值) return null;
+
+  return {
+    结束位置: 标记结束 + 动态数值标记后缀.length,
+    数值文本,
+    数值,
+  };
+}
+
+function 合并动态数值加法(this: void, text: string): string {
+  let result = "";
+  let 位置 = 0;
+
+  while (位置 < text.length) {
+    const 第一个标记 = 解析动态数值标记(text, 位置);
+    if (第一个标记 == null) {
+      result += text.charAt(位置);
+      位置++;
+      continue;
+    }
+
+    let 求和 = 第一个标记.数值;
+    let 当前结束 = 第一个标记.结束位置;
+    let 是否发生合并 = false;
+
+    while (当前结束 < text.length && text.charAt(当前结束) === "+") {
+      const 下一个标记 = 解析动态数值标记(text, 当前结束 + 1);
+      if (下一个标记 == null) break;
+      求和 += 下一个标记.数值;
+      当前结束 = 下一个标记.结束位置;
+      是否发生合并 = true;
+    }
+
+    if (是否发生合并) {
+      result += 求和.toString();
+    } else {
+      result += 第一个标记.数值文本;
+    }
+    位置 = 当前结束;
+  }
+
+  return result;
 }
 
 function 获取快照技能列表(this: void, hero: any): number[] {
@@ -301,9 +463,9 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
  * 例如：智力×3 -> 150（假设英雄智力50）
  */
 function 替换公式(this: void, unit: any, tip: string): string {
-  if (是否命中跳过片段(tip)) return tip;
-
-  let result = tip;
+  const 保护结果 = 保护目标类公式(tip);
+  let result = 保护结果[0];
+  const 保护片段表 = 保护结果[1];
 
   for (let i = 0; i < 排序属性匹配项列表.length; i++) {
     const 属性匹配项 = 排序属性匹配项列表[i];
@@ -322,7 +484,17 @@ function 替换公式(this: void, unit: any, tip: string): string {
         完整匹配文本 = "自身" + 完整匹配文本;
       }
 
-      if ((完整匹配文本.indexOf("目标") >= 0 || 匹配前窗口.indexOf("目标") >= 0) && 完整匹配文本.indexOf("自身") < 0 && 匹配前窗口.indexOf("自身") < 0) {
+      if (
+        (完整匹配文本.indexOf("目标") >= 0 || 匹配前窗口.indexOf("目标") >= 0 || 匹配前窗口.indexOf("目标已损失") >= 0) &&
+        完整匹配文本.indexOf("自身") < 0 &&
+        匹配前窗口.indexOf("自身") < 0
+      ) {
+        搜索起点 = 匹配开始 + 完整匹配文本.length;
+        匹配结果 = 提取公式匹配(result, 属性匹配项.文本名, 搜索起点);
+        continue;
+      }
+
+      if (是否命中跳过片段(完整匹配文本) || 是否命中跳过片段(匹配前窗口 + 完整匹配文本)) {
         搜索起点 = 匹配开始 + 完整匹配文本.length;
         匹配结果 = 提取公式匹配(result, 属性匹配项.文本名, 搜索起点);
         continue;
@@ -341,7 +513,7 @@ function 替换公式(this: void, unit: any, tip: string): string {
       }
 
       const 伤害 = 计算公式伤害(unit, 属性匹配项.计算属性名, 匹配结果.倍率);
-      const 替换值 = 伤害.toString();
+      const 替换值 = 包装动态数值(伤害.toString());
       result = result.substring(0, 匹配开始) + 替换值 + result.substring(匹配开始 + 完整匹配文本.length);
       替换次数++;
       if (替换次数 >= 单属性最大替换次数) {
@@ -353,6 +525,10 @@ function 替换公式(this: void, unit: any, tip: string): string {
     }
   }
 
+  result = 恢复保护片段(result, 保护片段表);
+  result = 合并动态数值加法(result);
+  result = 消除造成自身数值前缀(result);
+  result = 追加Alt提示尾注(result);
   return result;
 }
 
@@ -415,4 +591,15 @@ export function 恢复英雄技能原始文本(this: void, hero: any): void {
     恢复单个技能原始文本(hero, abilityIds[i]);
   }
   delete 已处理技能缓存[生成英雄缓存键(hero)];
+}
+
+export function 恢复单个英雄技能原始文本(this: void, hero: any, abilityId: number): void {
+  if (!isValidHandle(hero) || abilityId === 0) return;
+  恢复单个技能原始文本(hero, abilityId);
+}
+
+export function 刷新单个英雄技能动态文本(this: void, hero: any, abilityId: number): void {
+  if (!isValidHandle(hero) || abilityId === 0) return;
+  if (GetUnitAbilityLevel(hero, abilityId) <= 0) return;
+  处理技能提示(hero, abilityId);
 }

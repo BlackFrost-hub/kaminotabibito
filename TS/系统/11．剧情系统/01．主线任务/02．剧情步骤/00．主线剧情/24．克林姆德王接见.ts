@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { YDUserDataClearSafe, YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
@@ -12,6 +13,7 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
+import { 发送剧情任务消息 } from "../../00．剧情系统核心工具/02．剧情动作桥接";
 export { 克林姆德国王委托剧情片段 } from "../02．第二章/24．克林姆德王接见";
 
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -19,6 +21,8 @@ const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) 
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
+
+const bj_QUESTMESSAGE_ITEMACQUIRED = jglobals.bj_QUESTMESSAGE_ITEMACQUIRED as number;
 
 export function 执行克林姆德王接见(this: void, 参数: 剧情动作参数表): void {
   YDUserDataClearSafe("string", "主线NPC", "jl禁军门卫", "unit");
@@ -50,7 +54,15 @@ export function 执行克林姆德王接见(this: void, 参数: 剧情动作参�
 
 function 执行发布巨魔线任务(this: void): void {}
 
+export function 执行接见金币提示(this: void, 参数: 剧情动作参数表): void {
+  发送剧情任务消息({
+    消息类型: bj_QUESTMESSAGE_ITEMACQUIRED,
+    文本: String(参数.提示文本 ?? "|cffffff00『系统提示』：|r所有英雄收到了|cffffff0015000金币！|r"),
+  });
+}
+
 export const 克林姆德王接见剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵城_克林姆德王接见": 执行克林姆德王接见,
+  "JLC精灵城_接见金币提示": 执行接见金币提示,
   "JLC精灵城_发布巨魔线任务": 执行发布巨魔线任务,
 };

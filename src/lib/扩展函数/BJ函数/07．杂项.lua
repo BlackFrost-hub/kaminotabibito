@@ -58,6 +58,9 @@ end
 function ____exports.GetPlayersAll()
     return jglobals.bj_FORCE_ALL_PLAYERS
 end
+function ____exports.SetTimeOfDay(whatTime)
+    jass.SetFloatGameState(jglobals.GAME_STATE_TIME_OF_DAY, whatTime)
+end
 function ____exports.GetRandomDirectionDeg()
     return jass.GetRandomReal(0, 360)
 end

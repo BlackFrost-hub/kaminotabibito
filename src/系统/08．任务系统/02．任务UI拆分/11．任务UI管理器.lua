@@ -3,7 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local getTaskUIByPlayerId, taskUIInitPcallBody, taskUITogglePanelPcallBody, taskUIHotkeyTogglePanel, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, pcallInitTarget, __togglePanelTriggerPlayer
+local getTaskUIByPlayerId, taskUIInitPcallBody, taskUITogglePanelPcallBody, taskUIHotkeyTogglePanel, isHumanPlayingPlayer, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, TaskUI, pcallInitTarget, __togglePanelTriggerPlayer
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____08_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.02．任务UI拆分.08．任务UI列表控制")
@@ -90,6 +90,34 @@ function taskUIHotkeyTogglePanel(player)
     __togglePanelTriggerPlayer = player
     pcall(taskUITogglePanelPcallBody)
 end
+function isHumanPlayingPlayer(whichPlayer)
+    if whichPlayer == nil or whichPlayer == 0 then
+        return false
+    end
+    local pid = jass.GetPlayerId(whichPlayer)
+    if type(pid) ~= "number" or pid < 0 or pid >= MAX_PLAYERS then
+        return false
+    end
+    if jass.GetPlayerController(whichPlayer) == jass.MAP_CONTROL_COMPUTER then
+        return false
+    end
+    return jass.GetPlayerSlotState(whichPlayer) == jass.PLAYER_SLOT_STATE_PLAYING
+end
+function ____exports.initTaskUIForPlayer(whichPlayer)
+    if not ENABLE_TASK_UI_CLIENT then
+        return false
+    end
+    if not isHumanPlayingPlayer(whichPlayer) then
+        return false
+    end
+    local pid = jass.GetPlayerId(whichPlayer)
+    local ____opt_12 = taskUIs[pid]
+    if (____opt_12 and ____opt_12.uiInitialized) == true then
+        return true
+    end
+    local ui = __TS__New(TaskUI, pid)
+    return ui:init(pid)
+end
 function onQuestManagerUiRefresh(self, _playerId, _questId)
     do
         local i = 0
@@ -97,14 +125,14 @@ function onQuestManagerUiRefresh(self, _playerId, _questId)
             do
                 local ui = taskUIs[i]
                 if ui == nil or not ui.uiInitialized then
-                    goto __continue115
+                    goto __continue123
                 end
                 ui.pagesDirty = true
                 if ui.isVisible then
                     ui:rebuildPages()
                 end
             end
-            ::__continue115::
+            ::__continue123::
             i = i + 1
         end
     end
@@ -190,7 +218,7 @@ end
 local function taskUIEntryClick()
     taskUIHotkeyTogglePanel(getTriggerPlayerOrLocal())
 end
-local TaskUI = __TS__Class()
+TaskUI = __TS__Class()
 TaskUI.name = "TaskUI"
 function TaskUI.prototype.____constructor(self, slotId)
     self.entryFrame = nil
@@ -674,23 +702,19 @@ end
 --- 由 `00．玩家英雄获取桥接` 调用。
 -- 所有客户端对称执行（全局创建），异步显隐。
 function ____exports.onPlayerHeroRegistered(whichPlayer, _whichHero)
+    return ____exports.initTaskUIForPlayer(whichPlayer)
+end
+function ____exports.initTaskUIForActivePlayers()
     if not ENABLE_TASK_UI_CLIENT then
-        return false
+        return
     end
-    if whichPlayer == nil or whichPlayer == 0 then
-        return false
+    do
+        local i = 0
+        while i < MAX_PLAYERS do
+            ____exports.initTaskUIForPlayer(jass.Player(i))
+            i = i + 1
+        end
     end
-    local pid = jass.GetPlayerId(whichPlayer)
-    if type(pid) ~= "number" or pid < 0 or pid >= MAX_PLAYERS then
-        return false
-    end
-    local ____opt_12 = taskUIs[pid]
-    if (____opt_12 and ____opt_12.uiInitialized) == true then
-        return true
-    end
-    local ui = __TS__New(TaskUI, pid)
-    local ok = ui:init(pid)
-    return ok
 end
 --- 热键注册：全局只注册一次
 function ____exports.registerHotkey(self)

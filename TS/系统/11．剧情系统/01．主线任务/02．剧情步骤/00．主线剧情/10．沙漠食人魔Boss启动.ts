@@ -7,6 +7,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
+};
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
 };
@@ -25,13 +28,14 @@ const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUni
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
+const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 
-export function 执行沙漠食人魔Boss启动(this: void, 参数: 剧情动作参数表): void {
+export function 执行沙漠食人魔Boss前置(this: void): void {
   const bossUnit = YDUserDataGetSafe("string", "Boss", "沙漠食人魔", "unit");
   if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return;
   if (GetOwningPlayer(bossUnit) !== Player(PLAYER_NEUTRAL_PASSIVE)) return;
@@ -42,9 +46,18 @@ export function 执行沙漠食人魔Boss启动(this: void, 参数: 剧情动作
   }
 
   SetUnitOwner(bossUnit, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
-  PauseUnit(bossUnit, false);
-  SetUnitInvulnerable(bossUnit, false);
+  PauseUnit(bossUnit, true);
+  SetUnitInvulnerable(bossUnit, true);
 
+  const 上下文 = 读取当前剧情动作上下文();
+  if (上下文.触发单位 != null && 上下文.触发单位 !== 0) {
+    SetUnitFacing(bossUnit, YDWEAngleBetweenUnitsSafe(bossUnit, 上下文.触发单位));
+  }
+}
+
+export function 执行沙漠食人魔Boss开战(this: void, 参数: 剧情动作参数表): void {
+  const bossUnit = YDUserDataGetSafe("string", "Boss", "沙漠食人魔", "unit");
+  if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return;
   const 上下文 = 读取当前剧情动作上下文();
   YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
   if (上下文.触发单位 != null && 上下文.触发单位 !== 0) {
@@ -59,9 +72,12 @@ export function 执行沙漠食人魔Boss启动(this: void, 参数: 剧情动作
     }
   }
 
+  SetUnitInvulnerable(bossUnit, false);
+  PauseUnit(bossUnit, false);
   启动Boss战运行(bossUnit);
 }
 
 export const 沙漠食人魔Boss启动剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "SRZ蛇人族_沙漠食人魔Boss启动": 执行沙漠食人魔Boss启动,
+  "SRZ蛇人族_沙漠食人魔Boss前置": 执行沙漠食人魔Boss前置,
+  "SRZ蛇人族_沙漠食人魔Boss开战": 执行沙漠食人魔Boss开战,
 };

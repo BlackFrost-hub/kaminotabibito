@@ -2,8 +2,12 @@
 
 const jass = require("jass.common") as any;
 
-const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+const { YDUserDataClearTable } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
+  YDUserDataClearTable: (this: void, tableTypeName: string, tableKey: any) => void;
 };
 const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
   按名字反查总单位ID: (this: void, name: string) => string | undefined;
@@ -11,12 +15,15 @@ const { 按名字反查总单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
+const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC特效") as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+};
+const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
+  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取当前剧情动作上下文, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 export { 沙漠情报商人回收夜光翡翠剧情片段 } from "../01．第一章/15．夜光翡翠回收";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
@@ -29,49 +36,40 @@ const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, actionFunc: (this: void) => void) => any;
 
-const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
-};
-
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
+const 回村剧情片段ID = "jlc_return_village_after_guard_duel";
 
 function 清理语义单位(this: void, 表: string, 键: string): void {
-  const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-    YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  };
-  const { YDUserDataClearTable } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-    YDUserDataClearTable: (this: void, tableTypeName: string, tableKey: any) => void;
-  };
   const unit = YDUserDataGetSafe("string", 表, 键, "unit");
   if (unit != null && unit !== 0) RemoveUnit(unit);
   YDUserDataClearTable("string", 表);
 }
 
-function on动态裂缝回村范围触发(this: void): void {
-  const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-    YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-    YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
-  };
+function 触发裂缝回村(this: void): void {
   const 当前进度 = Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"));
   if (当前进度 !== 16) return;
+
   const 触发单位 = GetTriggerUnit();
   const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
   if (玩家英雄组 != null && 玩家英雄组 !== 0 && !IsUnitInGroup(触发单位, 玩家英雄组)) return;
-  const 片段ID = "jlc_return_village_after_guard_duel";
-  YDUserDataSetSafe("string", "主线剧情入口", "触发配置", "string", "动态裂缝回村入口");
-  YDUserDataSetSafe("string", "主线剧情入口", "剧情片段ID", "string", 片段ID);
-  YDUserDataSetSafe("string", "主线剧情入口", "触发单位", "unit", 触发单位);
+
+  const 上下文 = {
+    片段ID: 回村剧情片段ID,
+    触发配置名: "裂缝回村入口",
+    触发单位,
+  };
+  写入当前剧情动作上下文(上下文);
   const { 播放主线剧情片段 } = require("../02．剧情步骤播放器") as {
     播放主线剧情片段: (this: void, id: string, 上下文?: any) => boolean;
   };
-  播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "动态裂缝回村入口", 触发单位 });
+  播放主线剧情片段(回村剧情片段ID, 上下文);
 }
 
-function 注册动态裂缝回村入口(this: void, unit: any): void {
+function 注册裂缝回村入口(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
   const trigger = CreateTrigger();
   TriggerRegisterUnitInRangeSimple(trigger, 300, unit);
-  TriggerAddAction(trigger, on动态裂缝回村范围触发);
+  TriggerAddAction(trigger, 触发裂缝回村);
 }
 
 export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情动作参数表): void {
@@ -83,17 +81,19 @@ export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情�
     EC_CreateEffect("war3mapImported\\BlueBalllight.mdl", GetUnitX(触发单位), GetUnitY(触发单位), 0, 270, 5, 1, 1.25);
   }
 
-  const riftTypeId = stringToFourCCSafe(按名字反查总单位ID("进入单位范围用"));
-  if (!(riftTypeId > 0)) return;
-  const riftA = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), riftTypeId, -27182.1, -25485.2, 0);
-  const riftB = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), riftTypeId, -24123.4, -26338.8, 0);
-  if (riftA != null && riftA !== 0) {
-    YDUserDataSetSafe("string", "ZXCS", "DW", "unit", riftA);
-    注册动态裂缝回村入口(riftA);
+  const 裂缝类型ID = stringToFourCCSafe(按名字反查总单位ID("进入单位范围用"));
+  if (!(裂缝类型ID > 0)) return;
+
+  const 裂缝A = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 裂缝类型ID, -27182.1, -25485.2, 0);
+  const 裂缝B = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 裂缝类型ID, -24123.4, -26338.8, 0);
+
+  if (裂缝A != null && 裂缝A !== 0) {
+    YDUserDataSetSafe("string", "ZXCS", "DW", "unit", 裂缝A);
+    注册裂缝回村入口(裂缝A);
   }
-  if (riftB != null && riftB !== 0) {
-    YDUserDataSetSafe("string", "ZXCS2", "DW", "unit", riftB);
-    注册动态裂缝回村入口(riftB);
+  if (裂缝B != null && 裂缝B !== 0) {
+    YDUserDataSetSafe("string", "ZXCS2", "DW", "unit", 裂缝B);
+    注册裂缝回村入口(裂缝B);
   }
 }
 

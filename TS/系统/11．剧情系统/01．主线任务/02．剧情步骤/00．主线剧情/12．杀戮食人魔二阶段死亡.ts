@@ -33,6 +33,10 @@ const Player = jass.Player as (this: void, whichPlayer: number) => any;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 
+let 待处理杀戮食人魔尸体: any = null;
+let 待处理杀戮食人魔X = 0;
+let 待处理杀戮食人魔Y = 0;
+
 function 创建食人魔头颅(this: void, x: number, y: number): void {
   const itemTypeId = stringToFourCCSafe(按名字反查物品ID("食人魔头颅")) || stringToFourCCSafe("I0D4");
   if (itemTypeId > 0) {
@@ -50,18 +54,30 @@ function 创建选择宝箱(this: void, x: number, y: number): void {
   AddItemToStockBJ(stringToFourCCSafe("I0D3"), chest, 1, 1);
 }
 
-export function 执行杀戮食人魔死亡(this: void, 参数: 剧情动作参数表): void {
+export function 执行杀戮食人魔死亡前置(this: void): void {
   const dyingUnit = GetDyingUnit();
   if (dyingUnit == null || dyingUnit === 0) return;
-  const x = GetUnitX(dyingUnit);
-  const y = GetUnitY(dyingUnit);
+  待处理杀戮食人魔尸体 = dyingUnit;
+  待处理杀戮食人魔X = GetUnitX(dyingUnit);
+  待处理杀戮食人魔Y = GetUnitY(dyingUnit);
+}
+
+export function 执行杀戮食人魔死亡奖励(this: void): void {
+  const dyingUnit = 待处理杀戮食人魔尸体;
+  if (dyingUnit == null || dyingUnit === 0) return;
+  const x = 待处理杀戮食人魔X;
+  const y = 待处理杀戮食人魔Y;
 
   YDUserDataClearSafe("string", "Boss", "杀戮食人魔", "unit");
   YDUserDataClearTable("unit", dyingUnit);
   创建食人魔头颅(x, y);
   创建选择宝箱(x, y);
+  待处理杀戮食人魔尸体 = null;
+  待处理杀戮食人魔X = 0;
+  待处理杀戮食人魔Y = 0;
 }
 
 export const 杀戮食人魔二阶段死亡剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "SW01死亡事件_杀戮食人魔死亡": 执行杀戮食人魔死亡,
+  "SW01死亡事件_杀戮食人魔死亡前置": 执行杀戮食人魔死亡前置,
+  "SW01死亡事件_杀戮食人魔死亡奖励": 执行杀戮食人魔死亡奖励,
 };

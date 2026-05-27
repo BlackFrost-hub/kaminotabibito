@@ -8,6 +8,7 @@ import {
   每玩家广播提示槽数,
   取广播提示槽索引,
   取广播提示槽位Y,
+  广播提示高度,
   广播提示状态_隐藏,
   广播提示状态_滑入,
   广播提示状态_停留,
@@ -91,12 +92,28 @@ function 推进槽位状态(this: void, 状态: 广播提示槽状态): void {
   }
 }
 
-function 应用槽位帧(this: void, 序号: number, 状态: 广播提示槽状态, 本机玩家ID: number): void {
+function 计算玩家槽位显示Y表(this: void, 玩家ID: number): number[] {
+  const 结果: number[] = [];
+  let 额外下移 = 0;
+  for (let 槽位ID = 0; 槽位ID < 每玩家广播提示槽数; 槽位ID++) {
+    结果[槽位ID] = 取广播提示槽位Y(槽位ID) - 额外下移;
+    const 序号 = 取广播提示槽索引(玩家ID, 槽位ID);
+    const 状态 = 广播提示槽状态表[序号];
+    if (状态 == null || !状态.active) continue;
+    const 增量 = 状态.rootHeight - 广播提示高度;
+    if (增量 > 0) {
+      额外下移 += 增量;
+    }
+  }
+  return 结果;
+}
+
+function 应用槽位帧(this: void, 序号: number, 状态: 广播提示槽状态, 本机玩家ID: number, 显示Y: number): void {
   const 帧组 = 广播提示槽帧表[序号];
   if (帧组 == null) return;
 
   const 可见 = 状态.active && 本机玩家ID === 状态.playerId;
-  DzFrameSetAbsolutePoint(帧组.root, 帧点左, 状态.x, 取广播提示槽位Y(状态.slotId));
+  DzFrameSetAbsolutePoint(帧组.root, 帧点左, 状态.x, 显示Y);
   DzFrameSetAlpha(帧组.root, R2I(状态.alpha));
   DzFrameShow(帧组.root, 可见);
 }
@@ -104,12 +121,13 @@ function 应用槽位帧(this: void, 序号: number, 状态: 广播提示槽状�
 export function on广播提示消息Tick(this: void): void {
   const 本机玩家ID = 取本机玩家ID();
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
+    const 槽位显示Y表 = 计算玩家槽位显示Y表(玩家ID);
     for (let 槽位ID = 0; 槽位ID < 每玩家广播提示槽数; 槽位ID++) {
       const 序号 = 取广播提示槽索引(玩家ID, 槽位ID);
       const 状态 = 广播提示槽状态表[序号];
       if (状态 == null) continue;
       推进槽位状态(状态);
-      应用槽位帧(序号, 状态, 本机玩家ID);
+      应用槽位帧(序号, 状态, 本机玩家ID, 槽位显示Y表[槽位ID]);
     }
   }
 }

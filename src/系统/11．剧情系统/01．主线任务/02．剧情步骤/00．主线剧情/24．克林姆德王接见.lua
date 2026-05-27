@@ -1,9 +1,12 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+local ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.02．剧情动作桥接")
+local _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["发送剧情任务消息"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataClearSafe = ____require_result_0.YDUserDataClearSafe
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
@@ -19,6 +22,7 @@ local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
+local bj_QUESTMESSAGE_ITEMACQUIRED = jglobals.bj_QUESTMESSAGE_ITEMACQUIRED
 ____exports["执行克林姆德王接见"] = function(_____53C2_6570)
     YDUserDataClearSafe("string", "主线NPC", "jl禁军门卫", "unit")
     YDUserDataClearSafe("string", "主线NPC", "jl禁军门卫2", "unit")
@@ -59,5 +63,16 @@ ____exports["执行克林姆德王接见"] = function(_____53C2_6570)
 end
 local function _____6267_884C_53D1_5E03_5DE8_9B54_7EBF_4EFB_52A1()
 end
-____exports["克林姆德王接见剧情动作注册表"] = {["JLC精灵城_克林姆德王接见"] = ____exports["执行克林姆德王接见"], ["JLC精灵城_发布巨魔线任务"] = _____6267_884C_53D1_5E03_5DE8_9B54_7EBF_4EFB_52A1}
+____exports["执行接见金币提示"] = function(_____53C2_6570)
+    local ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_3 = _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F
+    local ____53C2_6570__63D0_793A_6587_672C_2 = _____53C2_6570["提示文本"]
+    if ____53C2_6570__63D0_793A_6587_672C_2 == nil then
+        ____53C2_6570__63D0_793A_6587_672C_2 = "|cffffff00『系统提示』：|r所有英雄收到了|cffffff0015000金币！|r"
+    end
+    ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_3({
+        ["消息类型"] = bj_QUESTMESSAGE_ITEMACQUIRED,
+        ["文本"] = tostring(____53C2_6570__63D0_793A_6587_672C_2)
+    })
+end
+____exports["克林姆德王接见剧情动作注册表"] = {["JLC精灵城_克林姆德王接见"] = ____exports["执行克林姆德王接见"], ["JLC精灵城_接见金币提示"] = ____exports["执行接见金币提示"], ["JLC精灵城_发布巨魔线任务"] = _____6267_884C_53D1_5E03_5DE8_9B54_7EBF_4EFB_52A1}
 return ____exports

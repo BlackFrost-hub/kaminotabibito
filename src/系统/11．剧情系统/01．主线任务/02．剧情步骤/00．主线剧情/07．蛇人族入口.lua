@@ -11,11 +11,13 @@ do
     ____exports["蛇人族入口剧情片段"] = ____07_FF0E_86C7_4EBA_65CF_5165_53E3["蛇人族入口剧情片段"]
 end
 local IssueImmediateOrder = jass.IssueImmediateOrder
+local PauseUnit = jass.PauseUnit
 local RemoveRect = jass.RemoveRect
 ____exports["执行蛇人族领地入口"] = function(_____53C2_6570)
     local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
     if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
         IssueImmediateOrder(_____89E6_53D1_5355_4F4D, "stop")
+        PauseUnit(_____89E6_53D1_5355_4F4D, true)
     end
     local ____53C2_6570__89E6_53D1_533A_57DF_1 = _____53C2_6570["触发区域"]
     if ____53C2_6570__89E6_53D1_533A_57DF_1 == nil then
@@ -30,5 +32,11 @@ ____exports["执行蛇人族领地入口"] = function(_____53C2_6570)
         RemoveRect(rectHandle)
     end
 end
-____exports["蛇人族入口剧情动作注册表"] = {["SRZ蛇人族_领地入口"] = ____exports["执行蛇人族领地入口"]}
+____exports["执行蛇人族领地放行收尾"] = function()
+    local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
+    if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
+        PauseUnit(_____89E6_53D1_5355_4F4D, false)
+    end
+end
+____exports["蛇人族入口剧情动作注册表"] = {["SRZ蛇人族_领地入口"] = ____exports["执行蛇人族领地入口"], ["SRZ蛇人族_领地放行收尾"] = ____exports["执行蛇人族领地放行收尾"]}
 return ____exports

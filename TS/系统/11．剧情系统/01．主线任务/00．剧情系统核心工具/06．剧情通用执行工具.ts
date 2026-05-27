@@ -14,9 +14,10 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AdjustPlayerStateBJ: (this: void, delta: number, whichPlayer: any, whichPlayerState: any) => void;
 };
-const { ModifyGateBJ, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
+const { ModifyGateBJ, ForGroupBJ, SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
   ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
+  SetTimeOfDay: (this: void, whatTime: number) => void;
 };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
@@ -92,7 +93,6 @@ const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) 
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const RemoveItem = jass.RemoveItem as (this: void, whichItem: any) => void;
-const SetTimeOfDay = jass.SetTimeOfDay as (this: void, time: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -110,13 +110,14 @@ const bj_MODIFYMETHOD_ADD = jglobals.bj_MODIFYMETHOD_ADD as number;
 const bj_QUESTMESSAGE_ITEMACQUIRED = jglobals.bj_QUESTMESSAGE_ITEMACQUIRED as number;
 const bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED as number;
 const bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT as number;
+const bj_QUESTMESSAGE_WARNING = jglobals.bj_QUESTMESSAGE_WARNING as number;
 const PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD as number;
 
 const 主线运行时任务ID = "main_story_runtime";
 let 当前玩家英雄控制暂停 = false;
 let 当前玩家英雄无敌 = false;
 const 已创建视野修整器: Record<string, true | undefined> = {};
-const 延迟执行缓存: Record<number, { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 开门对象?: string; 隐藏阻挡?: string }> = {};
+const 延迟执行缓存: Record<number, { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 重复次数?: number; 开门对象?: string; 隐藏阻挡?: string }> = {};
 
 function on延迟执行到时(this: void): void {
   const timer = GetExpiredTimer();
@@ -128,7 +129,10 @@ function on延迟执行到时(this: void): void {
   if (记录 == null) return;
 
   if (记录.类型 === "消息" && 记录.文本) {
-    QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
+    const 重复次数 = Math.max(1, 记录.重复次数 ?? 1);
+    for (let i = 0; i < 重复次数; i++) {
+      QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
+    }
     return;
   }
 
@@ -148,10 +152,13 @@ function on延迟执行到时(this: void): void {
   }
 }
 
-function 安排延迟执行(this: void, 秒数: number, 记录: { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 开门对象?: string; 隐藏阻挡?: string }): void {
+function 安排延迟执行(this: void, 秒数: number, 记录: { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 重复次数?: number; 开门对象?: string; 隐藏阻挡?: string }): void {
   if (!(秒数 > 0)) {
     if (记录.类型 === "消息" && 记录.文本) {
-      QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
+      const 重复次数 = Math.max(1, 记录.重复次数 ?? 1);
+      for (let i = 0; i < 重复次数; i++) {
+        QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
+      }
     } else {
       on延迟执行到时();
     }
@@ -471,13 +478,22 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
     调整全部玩家金币(发放金币);
   }
 
-  const 延迟秒数 = 取参数数字(参数, "延迟秒数") || 取参数数字(参数, "延迟开门秒");
-  const 延迟提示 = 取参数文本(参数, "延迟提示") || 取参数文本(参数, "延迟消息");
+  const 预警文本 = 取参数文本(参数, "预警文本");
+  const 延迟秒数 = 取参数数字(参数, "延迟秒数")
+    || 取参数数字(参数, "延迟开门秒")
+    || (预警文本 !== "" ? 4 : 0);
+  const 延迟提示 = 取参数文本(参数, "延迟提示") || 取参数文本(参数, "延迟消息") || 预警文本;
   if (延迟提示 !== "") {
+    const 延迟消息类型标记 = 取参数文本(参数, "延迟消息类型");
+    const 消息类型 = 延迟消息类型标记 === "WARNING" || 预警文本 !== ""
+      ? bj_QUESTMESSAGE_WARNING
+      : bj_QUESTMESSAGE_HINT;
+    const 重复次数 = Math.max(1, 取参数数字(参数, "延迟消息重复次数") || (预警文本 !== "" ? 2 : 1));
     安排延迟执行(延迟秒数, {
       类型: "消息",
       文本: 延迟提示,
-      消息类型: bj_QUESTMESSAGE_HINT,
+      消息类型,
+      重复次数,
     });
   }
   if (开门对象 !== "" && 延迟秒数 > 0) {

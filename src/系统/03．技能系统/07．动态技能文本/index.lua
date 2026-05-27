@@ -1,5 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_516C_5F0F_914D_7F6E = require("系统.03．技能系统.07．动态技能文本.01．公式配置")
+local _____52A8_6001_6587_672C_767D_540D_5355 = ____01_FF0E_516C_5F0F_914D_7F6E["动态文本白名单"]
+local ____02_FF0E_5C5E_6027_8BA1_7B97 = require("系统.03．技能系统.07．动态技能文本.02．属性计算")
+local _____83B7_53D6_5C5E_6027_503C = ____02_FF0E_5C5E_6027_8BA1_7B97["获取属性值"]
 local ____03_FF0E_6838_5FC3_903B_8F91 = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
 local _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C = ____03_FF0E_6838_5FC3_903B_8F91["恢复英雄技能原始文本"]
 local _____68C0_67E5_82F1_96C4_6280_80FD = ____03_FF0E_6838_5FC3_903B_8F91["检查英雄技能"]
@@ -11,15 +15,20 @@ local _____68C0_67E5_82F1_96C4_6280_80FD = ____03_FF0E_6838_5FC3_903B_8F91["检�
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local isKeyDown = ____require_result_1.isKeyDown
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_1.debugLog
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_2.debugLog
 local MODULE_NAME = "动态技能文本"
 local REFRESH_MS = 300
+local ALT_KEY_CODE = 18
 local initialized = false
 local _____5F53_524D_751F_6548_82F1_96C4 = nil
 local _____5F53_524D_5FEB_7167_7B7E_540D = ""
+local ____Alt_662F_5426_6309_4E0B = false
+local ____Alt_539F_6587_82F1_96C4 = nil
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -45,14 +54,23 @@ local function _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(hero)
         while i < #_____6280_80FD_70ED_952E_5217_8868 do
             local _____70ED_952E = _____6280_80FD_70ED_952E_5217_8868[i + 1]
             local abilityId = _____547D_4EE4_5361_5FEB_7167.skills[_____70ED_952E] or 0
-            local ____temp_2
+            local ____temp_3
             if abilityId ~= 0 then
-                ____temp_2 = jass.GetUnitAbilityLevel(hero, abilityId)
+                ____temp_3 = jass.GetUnitAbilityLevel(hero, abilityId)
             else
-                ____temp_2 = 0
+                ____temp_3 = 0
             end
-            local level = ____temp_2
+            local level = ____temp_3
             _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = (((_____70ED_952E .. "=") .. tostring(abilityId)) .. ":") .. tostring(level)
+            i = i + 1
+        end
+    end
+    do
+        local i = 0
+        while i < #_____52A8_6001_6587_672C_767D_540D_5355 do
+            local _____5C5E_6027_540D = _____52A8_6001_6587_672C_767D_540D_5355[i + 1]
+            local _____5C5E_6027_503C = _____83B7_53D6_5C5E_6027_503C(hero, _____5C5E_6027_540D)
+            _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = (("attr:" .. _____5C5E_6027_540D) .. "=") .. tostring(_____5C5E_6027_503C)
             i = i + 1
         end
     end
@@ -68,34 +86,63 @@ local function _____6062_590D_5F53_524D_751F_6548_82F1_96C4()
     _____5F53_524D_751F_6548_82F1_96C4 = nil
     _____5F53_524D_5FEB_7167_7B7E_540D = ""
 end
-local function onTick()
-    local _____5DF2_5F00_542F = _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启动态技能文本"]()
-    local _____5DF2_5F00_542F_3
-    if _____5DF2_5F00_542F then
-        _____5DF2_5F00_542F_3 = _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
-    else
-        _____5DF2_5F00_542F_3 = nil
+local function _____5E94_7528Alt_539F_6587_6A21_5F0F()
+    if not ____Alt_662F_5426_6309_4E0B or not isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
+        ____Alt_539F_6587_82F1_96C4 = nil
+        return
     end
-    local localHero = _____5DF2_5F00_542F_3
+    if ____Alt_539F_6587_82F1_96C4 == _____5F53_524D_751F_6548_82F1_96C4 then
+        return
+    end
+    _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C(_____5F53_524D_751F_6548_82F1_96C4)
+    ____Alt_539F_6587_82F1_96C4 = _____5F53_524D_751F_6548_82F1_96C4
+end
+local function _____5237_65B0Alt_6309_952E_72B6_6001()
+    local _____5F53_524D_662F_5426_6309_4E0B = isKeyDown(nil, ALT_KEY_CODE) == true
+    if _____5F53_524D_662F_5426_6309_4E0B == ____Alt_662F_5426_6309_4E0B then
+        return
+    end
+    ____Alt_662F_5426_6309_4E0B = _____5F53_524D_662F_5426_6309_4E0B
+    if ____Alt_662F_5426_6309_4E0B then
+        _____5E94_7528Alt_539F_6587_6A21_5F0F()
+        return
+    end
+    if isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
+        _____68C0_67E5_82F1_96C4_6280_80FD(_____5F53_524D_751F_6548_82F1_96C4)
+    end
+    ____Alt_539F_6587_82F1_96C4 = nil
+end
+local function onTick()
+    _____5237_65B0Alt_6309_952E_72B6_6001()
+    local _____5DF2_5F00_542F = _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启动态技能文本"]()
+    local _____5DF2_5F00_542F_4
+    if _____5DF2_5F00_542F then
+        _____5DF2_5F00_542F_4 = _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
+    else
+        _____5DF2_5F00_542F_4 = nil
+    end
+    local localHero = _____5DF2_5F00_542F_4
     if _____5F53_524D_751F_6548_82F1_96C4 ~= localHero then
         if isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
             _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C(_____5F53_524D_751F_6548_82F1_96C4)
         end
         _____5F53_524D_751F_6548_82F1_96C4 = localHero
         _____5F53_524D_5FEB_7167_7B7E_540D = ""
+        ____Alt_539F_6587_82F1_96C4 = nil
     end
     if not isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
         return
     end
     if not _____5DF2_5F00_542F then
+        ____Alt_539F_6587_82F1_96C4 = nil
         return
     end
     local nextSignature = _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(_____5F53_524D_751F_6548_82F1_96C4)
-    if nextSignature == _____5F53_524D_5FEB_7167_7B7E_540D then
-        return
+    if nextSignature ~= _____5F53_524D_5FEB_7167_7B7E_540D then
+        _____5F53_524D_5FEB_7167_7B7E_540D = nextSignature
+        _____68C0_67E5_82F1_96C4_6280_80FD(_____5F53_524D_751F_6548_82F1_96C4)
     end
-    _____5F53_524D_5FEB_7167_7B7E_540D = nextSignature
-    _____68C0_67E5_82F1_96C4_6280_80FD(_____5F53_524D_751F_6548_82F1_96C4)
+    _____5E94_7528Alt_539F_6587_6A21_5F0F()
 end
 function ____exports.registerDynamicSkillTextHero(whichHero)
     if not isValidHandle(whichHero) then

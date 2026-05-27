@@ -209,14 +209,7 @@ function ____exports.seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
         return
     end
     local playerId = jass.GetPlayerId(whichPlayer)
-    jass.DisplayTextToPlayer(
-        whichPlayer,
-        0,
-        0,
-        "SEL_SEED_PID_" .. tostring(playerId)
-    )
     if not isRealUnit(whichUnit) then
-        jass.DisplayTextToPlayer(whichPlayer, 0, 0, "SEL_SEED_UNIT_INVALID")
         selectedCount[playerId] = 0
         selectedUnit[playerId] = nil
         __TS__Delete(selectedUnitsByPlayer, playerId)
@@ -225,12 +218,6 @@ function ____exports.seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
     selectedUnitsByPlayer[playerId] = {whichUnit}
     selectedCount[playerId] = 1
     selectedUnit[playerId] = whichUnit
-    jass.DisplayTextToPlayer(
-        whichPlayer,
-        0,
-        0,
-        "SEL_SEED_UNIT_" .. tostring(getUnitHandleId(whichUnit))
-    )
 end
 --- 返回指定玩家当前选中缓存的摘要，便于调试事件中心是否成功记录状态。
 function ____exports.getSelectionDebugForPlayer(playerId)

@@ -43,8 +43,6 @@ local ____require_result_7 = require("系统.11．剧情系统.01．主线任务
 local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_7["查找主线剧情片段"]
 local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_8["播放主线剧情片段"]
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_9.debugLogForce
 local CreateTrigger = jass.CreateTrigger
 local CreateTimer = jass.CreateTimer
 local CreateUnit = jass.CreateUnit
@@ -56,7 +54,6 @@ local Player = jass.Player
 local SetDestructableInvulnerable = jass.SetDestructableInvulnerable
 local TriggerAddAction = jass.TriggerAddAction
 local TriggerRegisterUnitInRange = jass.TriggerRegisterUnitInRange
-local _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757 = "11．剧情系统_主线入口"
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local _____5DF2_6267_884C_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
@@ -70,13 +67,13 @@ local function _____8BFB_53D6_5DF2_7ED1_5B9ANPC(_____914D_7F6E)
         return nil
     end
     local unit = YDUserDataGetSafe("string", _____914D_7F6E["YD表"], _____914D_7F6E["YD键"], _____914D_7F6E["YD类型"] or "unit")
-    local ____temp_10
+    local ____temp_9
     if unit == nil or unit == 0 then
-        ____temp_10 = nil
+        ____temp_9 = nil
     else
-        ____temp_10 = unit
+        ____temp_9 = unit
     end
-    return ____temp_10
+    return ____temp_9
 end
 local function _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
     if _____914D_7F6E["YD表"] == nil or _____914D_7F6E["YD键"] == nil or _____914D_7F6E["YD字段"] == nil then
@@ -98,19 +95,6 @@ local function _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
 end
 local function _____521D_59CB_5316_5355_4E2ANPC(_____914D_7F6E)
     local unit = _____8BFB_53D6_5DF2_7ED1_5B9ANPC(_____914D_7F6E)
-    debugLogForce(
-        _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-        "初始化NPC",
-        _____914D_7F6E["配置名"],
-        "bound=",
-        unit == nil and "nil" or GetHandleId(unit),
-        "unitId=",
-        _____914D_7F6E["单位ID"],
-        "x=",
-        _____914D_7F6E.X,
-        "y=",
-        _____914D_7F6E.Y
-    )
     if unit == nil then
         unit = CreateUnit(
             Player(_____914D_7F6E["玩家ID"] or _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID),
@@ -120,22 +104,8 @@ local function _____521D_59CB_5316_5355_4E2ANPC(_____914D_7F6E)
             _____914D_7F6E["朝向"]
         )
         _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
-        debugLogForce(
-            _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-            "创建NPC",
-            _____914D_7F6E["配置名"],
-            "created=",
-            (unit == nil or unit == 0) and "nil" or GetHandleId(unit)
-        )
     end
     _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
-    debugLogForce(
-        _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-        "记录NPC",
-        _____914D_7F6E["配置名"],
-        "runtime=",
-        (unit == nil or unit == 0) and "nil" or GetHandleId(unit)
-    )
 end
 local function _____8BB0_5F55_5165_53E3_89E6_53D1_5668_914D_7F6E(trigger, _____914D_7F6E)
     if trigger == nil then
@@ -180,26 +150,10 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
     if _____914D_7F6E == nil or _____914D_7F6E["剧情片段ID"] == nil then
         return
     end
-    debugLogForce(
-        _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-        "入口触发",
-        _____914D_7F6E["配置名"],
-        "fragment=",
-        _____914D_7F6E["剧情片段ID"],
-        "progress=",
-        _____8BFB_53D6_5267_60C5_8FDB_5EA6()
-    )
     if not _____5267_60C5_8FDB_5EA6_6EE1_8DB3_5165_53E3_914D_7F6E(_____914D_7F6E) then
         return
     end
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    debugLogForce(
-        _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-        "入口触发单位",
-        _____914D_7F6E["配置名"],
-        "unit=",
-        _____89E6_53D1_5355_4F4D == nil and "nil" or GetHandleId(_____89E6_53D1_5355_4F4D)
-    )
     if not _____89E6_53D1_5355_4F4D_6EE1_8DB3_5165_53E3_7269_54C1_914D_7F6E(_____914D_7F6E, _____89E6_53D1_5355_4F4D) then
         return
     end
@@ -324,7 +278,6 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316()
         return
     end
     _____5DF2_6267_884C_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = true
-    debugLogForce(_____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757, "开始延迟初始化主线剧情入口", "npcCount=", #_____4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868)
     do
         local i = 0
         while i < #_____4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868 do
@@ -332,11 +285,6 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316()
             i = i + 1
         end
     end
-    debugLogForce(
-        _____4E3B_7EBF_5165_53E3_8C03_8BD5_6A21_5757,
-        "自然守护者运行时",
-        ____NPC_8FD0_884C_65F6_8868["自然守护者"] == nil and "nil" or GetHandleId(____NPC_8FD0_884C_65F6_8868["自然守护者"])
-    )
     _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
     _____521D_59CB_5316_77E9_5F62_5165_53E3()
     _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()

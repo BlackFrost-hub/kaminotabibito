@@ -190,9 +190,7 @@ export function seedSoleSelectedUnitForPlayer(whichPlayer: any, whichUnit: any):
   if (!isValidPlayer(whichPlayer)) return;
 
   const playerId = jass.GetPlayerId(whichPlayer);
-  jass.DisplayTextToPlayer(whichPlayer, 0, 0, `SEL_SEED_PID_${playerId}`);
   if (!isRealUnit(whichUnit)) {
-    jass.DisplayTextToPlayer(whichPlayer, 0, 0, "SEL_SEED_UNIT_INVALID");
     selectedCount[playerId] = 0;
     selectedUnit[playerId] = null;
     delete selectedUnitsByPlayer[playerId];
@@ -202,7 +200,6 @@ export function seedSoleSelectedUnitForPlayer(whichPlayer: any, whichUnit: any):
   selectedUnitsByPlayer[playerId] = [whichUnit];
   selectedCount[playerId] = 1;
   selectedUnit[playerId] = whichUnit;
-  jass.DisplayTextToPlayer(whichPlayer, 0, 0, `SEL_SEED_UNIT_${getUnitHandleId(whichUnit)}`);
 }
 
 /**

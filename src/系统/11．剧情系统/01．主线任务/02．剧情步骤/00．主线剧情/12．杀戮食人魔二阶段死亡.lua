@@ -26,6 +26,9 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local Player = jass.Player
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
+local _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54_5C38_4F53 = nil
+local _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54X = 0
+local _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54Y = 0
 local function _____521B_5EFA_98DF_4EBA_9B54_5934_9885(x, y)
     local itemTypeId = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID("食人魔头颅")) or stringToFourCCSafe("I0D4")
     if itemTypeId > 0 then
@@ -66,17 +69,29 @@ local function _____521B_5EFA_9009_62E9_5B9D_7BB1(x, y)
         1
     )
 end
-____exports["执行杀戮食人魔死亡"] = function(_____53C2_6570)
+____exports["执行杀戮食人魔死亡前置"] = function()
     local dyingUnit = GetDyingUnit()
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
-    local x = GetUnitX(dyingUnit)
-    local y = GetUnitY(dyingUnit)
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54_5C38_4F53 = dyingUnit
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54X = GetUnitX(dyingUnit)
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54Y = GetUnitY(dyingUnit)
+end
+____exports["执行杀戮食人魔死亡奖励"] = function()
+    local dyingUnit = _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54_5C38_4F53
+    if dyingUnit == nil or dyingUnit == 0 then
+        return
+    end
+    local x = _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54X
+    local y = _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54Y
     YDUserDataClearSafe("string", "Boss", "杀戮食人魔", "unit")
     YDUserDataClearTable("unit", dyingUnit)
     _____521B_5EFA_98DF_4EBA_9B54_5934_9885(x, y)
     _____521B_5EFA_9009_62E9_5B9D_7BB1(x, y)
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54_5C38_4F53 = nil
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54X = 0
+    _____5F85_5904_7406_6740_622E_98DF_4EBA_9B54Y = 0
 end
-____exports["杀戮食人魔二阶段死亡剧情动作注册表"] = {["SW01死亡事件_杀戮食人魔死亡"] = ____exports["执行杀戮食人魔死亡"]}
+____exports["杀戮食人魔二阶段死亡剧情动作注册表"] = {["SW01死亡事件_杀戮食人魔死亡前置"] = ____exports["执行杀戮食人魔死亡前置"], ["SW01死亡事件_杀戮食人魔死亡奖励"] = ____exports["执行杀戮食人魔死亡奖励"]}
 return ____exports

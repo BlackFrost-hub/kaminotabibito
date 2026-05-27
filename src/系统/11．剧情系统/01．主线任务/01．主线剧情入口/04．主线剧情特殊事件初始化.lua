@@ -116,7 +116,7 @@ local function _____6267_884C_652F_7EBF_4EFB_52A1_53D1_73B0(_____914D_7F6E)
     if _____652F_7EBF_4EFB_52A1_6570_7EC4[_____914D_7F6E["任务数组索引"]] ~= nil and _____652F_7EBF_4EFB_52A1_6570_7EC4[_____914D_7F6E["任务数组索引"]] ~= 0 then
         return
     end
-    CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, _____914D_7F6E["任务名"], _____914D_7F6E["任务描述"], _____914D_7F6E["图标路径"])
+    CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, _____914D_7F6E["任务名"], _____914D_7F6E["任务描述"] or "", _____914D_7F6E["图标路径"])
     _____652F_7EBF_4EFB_52A1_6570_7EC4[_____914D_7F6E["任务数组索引"]] = GetLastCreatedQuestBJ()
 end
 local function _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_7F6E, attacker)
@@ -246,7 +246,7 @@ local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_
         YDUserDataClearTableSafe("unit", target)
     end
     PingMinimap(_____914D_7F6E["小地图X"], _____914D_7F6E["小地图Y"], _____914D_7F6E["小地图持续时间"])
-    _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI(_____914D_7F6E["任务描述"], _____914D_7F6E["任务提示"])
+    _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI(_____914D_7F6E["任务描述"] or "", _____914D_7F6E["任务提示"])
     if _____914D_7F6E["支线任务发现"] ~= nil then
         _____6267_884C_652F_7EBF_4EFB_52A1_53D1_73B0(_____914D_7F6E["支线任务发现"])
     end

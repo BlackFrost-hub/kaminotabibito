@@ -124,7 +124,7 @@ function 执行支线任务发现(this: void, 配置: 主线剧情支线任务�
   if (支线任务数组 == null) return;
   if (支线任务数组[配置.任务数组索引] != null && 支线任务数组[配置.任务数组索引] !== 0) return;
 
-  CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, 配置.任务名, 配置.任务描述, 配置.图标路径);
+  CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, 配置.任务名, 配置.任务描述 ?? "", 配置.图标路径);
   支线任务数组[配置.任务数组索引] = GetLastCreatedQuestBJ();
 }
 
@@ -223,7 +223,7 @@ function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终�
   }
 
   PingMinimap(配置.小地图X, 配置.小地图Y, 配置.小地图持续时间);
-  更新主线任务UI(配置.任务描述, 配置.任务提示);
+  更新主线任务UI(配置.任务描述 ?? "", 配置.任务提示);
 
   if (配置.支线任务发现 != null) {
     执行支线任务发现(配置.支线任务发现);
