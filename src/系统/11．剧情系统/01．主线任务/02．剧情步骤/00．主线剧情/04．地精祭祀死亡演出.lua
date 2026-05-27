@@ -15,21 +15,21 @@ local ____require_result_0 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_0.registerDeathListener
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
-local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
 local YDWEAngleBetweenUnitsSafe = ____require_result_1.YDWEAngleBetweenUnitsSafe
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataClearTable = ____require_result_2.YDUserDataClearTable
-local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
-local ModifyGateBJ = ____require_result_3.ModifyGateBJ
-local ForGroupBJ = ____require_result_3.ForGroupBJ
-local ____require_result_4 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local SetUnitLifePercentBJ = ____require_result_4.SetUnitLifePercentBJ
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_5.EC_CreateEffect
-local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_6["按名字反查Boss单位ID"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+local ModifyGateBJ = ____require_result_2.ModifyGateBJ
+local ForGroupBJ = ____require_result_2.ForGroupBJ
+local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitLifePercentBJ = ____require_result_3.SetUnitLifePercentBJ
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_4.EC_CreateEffect
+local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_5["按名字反查Boss单位ID"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算")
+local _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E = ____require_result_7["按结算键获取Boss死亡结算配置"]
+local _____6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_7["执行Boss死亡结算"]
 local CreateUnit = jass.CreateUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -138,9 +138,9 @@ ____exports["执行地精祭祀死亡演出前置"] = function(_____53C2_6570)
     end
     local _____6B8B_8840_5730_7CBE = _____521B_5EFA_6B8B_8840_5730_7CBE_5DEB_5E08()
     local bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
-    YDUserDataClearSafe("string", "Boss", "地精巫师", "unit")
-    if bossUnit ~= nil and bossUnit ~= 0 then
-        YDUserDataClearTable("unit", bossUnit)
+    local _____7ED3_7B97_914D_7F6E = _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E("主线_地精祭祀")
+    if _____7ED3_7B97_914D_7F6E ~= nil then
+        _____6267_884CBoss_6B7B_4EA1_7ED3_7B97(_____7ED3_7B97_914D_7F6E, bossUnit)
     end
     _____521B_5EFA_5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_6F14_51FA(_____6B8B_8840_5730_7CBE)
 end

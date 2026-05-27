@@ -13,6 +13,10 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算") as {
+  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
+  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
+};
 const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动") as {
   启动Boss战运行: (this: void, bossUnit: any) => void;
 };
@@ -44,6 +48,10 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
   if (dyingUnit == null || dyingUnit === 0) return;
   待处理一阶段死亡单位 = dyingUnit;
   UnitSuspendDecay(dyingUnit, true);
+  const 结算配置 = 按结算键获取Boss死亡结算配置("沙漠食人魔");
+  if (结算配置 != null) {
+    执行Boss死亡结算(结算配置, dyingUnit);
+  }
 
   const x = GetUnitX(dyingUnit);
   const y = GetUnitY(dyingUnit);

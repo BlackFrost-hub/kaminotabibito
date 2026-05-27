@@ -11,8 +11,11 @@ local ____require_result_1 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
-local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
-local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_3["启动Boss战运行"]
+local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算")
+local _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E = ____require_result_3["按结算键获取Boss死亡结算配置"]
+local _____6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_3["执行Boss死亡结算"]
+local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
+local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_4["启动Boss战运行"]
 do
     local ____11_FF0E_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.11．沙漠食人魔一阶段死亡")
     ____exports["沙漠食人魔一阶段死亡剧情片段"] = ____11_FF0E_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1["沙漠食人魔一阶段死亡剧情片段"]
@@ -40,6 +43,10 @@ ____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6
     end
     _____5F85_5904_7406_4E00_9636_6BB5_6B7B_4EA1_5355_4F4D = dyingUnit
     UnitSuspendDecay(dyingUnit, true)
+    local _____7ED3_7B97_914D_7F6E = _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E("沙漠食人魔")
+    if _____7ED3_7B97_914D_7F6E ~= nil then
+        _____6267_884CBoss_6B7B_4EA1_7ED3_7B97(_____7ED3_7B97_914D_7F6E, dyingUnit)
+    end
     local x = GetUnitX(dyingUnit)
     local y = GetUnitY(dyingUnit)
     local riftTypeId = stringToFourCCSafe("e08M")
@@ -73,12 +80,12 @@ ____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6
             IssueImmediateOrder(lizardUnit, "holdposition")
         end
     end
-    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_5 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
-    local ____53C2_6570__4E8C_9636_6BB5Boss_540D_4 = _____53C2_6570["二阶段Boss名"]
-    if ____53C2_6570__4E8C_9636_6BB5Boss_540D_4 == nil then
-        ____53C2_6570__4E8C_9636_6BB5Boss_540D_4 = "杀戮食人魔"
+    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_6 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
+    local ____53C2_6570__4E8C_9636_6BB5Boss_540D_5 = _____53C2_6570["二阶段Boss名"]
+    if ____53C2_6570__4E8C_9636_6BB5Boss_540D_5 == nil then
+        ____53C2_6570__4E8C_9636_6BB5Boss_540D_5 = "杀戮食人魔"
     end
-    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_5(tostring(____53C2_6570__4E8C_9636_6BB5Boss_540D_4))
+    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_6(tostring(____53C2_6570__4E8C_9636_6BB5Boss_540D_5))
     local bossTypeId = stringToFourCCSafe(bossRawId)
     if not (bossTypeId > 0) then
         return
@@ -106,11 +113,11 @@ ____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6
     _____5F85_5F00_6218_76EE_6807_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
 end
 ____exports["执行沙漠食人魔二阶段开战"] = function()
-    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
-    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 == nil then
-        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
+    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_7 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
+    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_7 == nil then
+        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_7 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
     end
-    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_6
+    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_7
     if bossUnit == nil or bossUnit == 0 then
         return
     end

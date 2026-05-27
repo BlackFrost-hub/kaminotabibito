@@ -1,0 +1,56 @@
+/** @noSelfInFile */
+
+export type Boss死亡结算来源 = "旧JASS_Boss死亡" | "主线剧情";
+
+export type Boss死亡结算提示类型 =
+  | "UNITACQUIRED"
+  | "ITEMACQUIRED"
+  | "COMPLETED"
+  | "ALWAYSHINT"
+  | "WARNING"
+  | "UPDATED";
+
+export interface Boss死亡清理项 {
+  表名: string;
+  键名?: string;
+  字段名?: string;
+  值类型名?: string;
+  清理整表?: boolean;
+}
+
+export interface Boss死亡全员奖励 {
+  经验?: number;
+  基础全属性?: number;
+  力量?: number;
+  敏捷?: number;
+  智力?: number;
+  攻击力?: number;
+  金币?: number;
+  魔法恢复?: number;
+  条件说明?: string;
+}
+
+export interface Boss死亡击杀者奖励 {
+  金币?: number;
+  物品名列表?: string[];
+  条件说明?: string;
+}
+
+export interface Boss死亡结算配置 {
+  键: string;
+  Boss单位名?: string;
+  Boss单位名列表?: string[];
+  Boss引用键?: string;
+  清理列表?: Boss死亡清理项[];
+  固定掉落物品名列表?: string[];
+  宝箱单位ID?: string;
+  宝箱库存物品名列表?: string[];
+  全员奖励?: Boss死亡全员奖励;
+  击杀者奖励?: Boss死亡击杀者奖励;
+  提示文本键?: string;
+  提示类型?: Boss死亡结算提示类型;
+  延迟提示秒数?: number;
+  特殊逻辑标签?: string[];
+  保留原剧情执行?: boolean;
+  备注?: string;
+}

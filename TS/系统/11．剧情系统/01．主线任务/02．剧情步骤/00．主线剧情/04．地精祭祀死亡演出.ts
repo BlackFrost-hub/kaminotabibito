@@ -5,13 +5,9 @@ const jglobals = require("jass.globals") as any;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { YDUserDataGetSafe, YDUserDataClearSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
-};
-const { YDUserDataClearTable } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-  YDUserDataClearTable: (this: void, tableTypeName: string, tableKey: any) => void;
 };
 const { ModifyGateBJ, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
@@ -28,6 +24,10 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算") as {
+  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
+  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
@@ -99,9 +99,9 @@ export function 执行地精祭祀死亡演出前置(this: void, 参数: 剧情�
 
   const 残血地精 = 创建残血地精巫师();
   const bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
-  YDUserDataClearSafe("string", "Boss", "地精巫师", "unit");
-  if (bossUnit != null && bossUnit !== 0) {
-    YDUserDataClearTable("unit", bossUnit);
+  const 结算配置 = 按结算键获取Boss死亡结算配置("主线_地精祭祀");
+  if (结算配置 != null) {
+    执行Boss死亡结算(结算配置, bossUnit);
   }
   创建地精死亡神秘人演出(残血地精);
 }

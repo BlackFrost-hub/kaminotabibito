@@ -2,14 +2,12 @@
 
 const jass = require("jass.common") as any;
 
-const { YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
-};
-const { YDUserDataClearTable } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-  YDUserDataClearTable: (this: void, tableTypeName: string, tableKey: any) => void;
-};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算") as {
+  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
+  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
@@ -29,8 +27,10 @@ export function 执行蒙面人死亡(this: void, 参数: 剧情动作参数表)
 
   写入剧情进度(Number(参数.设置剧情进度) || Number(参数.目标进度) || 18);
   UnitSuspendDecay(dyingUnit, true);
-  YDUserDataClearSafe("string", "Boss", dyingTypeId === stringToFourCCSafe("N05M") ? "教派学者" : "教派剑士", "unit");
-  YDUserDataClearTable("unit", dyingUnit);
+  const 结算配置 = 按结算键获取Boss死亡结算配置("蒙面人");
+  if (结算配置 != null) {
+    执行Boss死亡结算(结算配置, dyingUnit);
+  }
 
   const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
     YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
