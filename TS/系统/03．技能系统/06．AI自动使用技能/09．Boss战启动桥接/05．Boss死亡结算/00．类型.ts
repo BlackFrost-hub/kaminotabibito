@@ -27,6 +27,7 @@ export interface Boss死亡全员奖励 {
   攻击力?: number;
   金币?: number;
   魔法恢复?: number;
+  击杀者最高等级限制?: number;
   条件说明?: string;
 }
 
@@ -43,6 +44,10 @@ export interface Boss死亡结算配置 {
   Boss引用键?: string;
   清理列表?: Boss死亡清理项[];
   固定掉落物品名列表?: string[];
+  额外批量掉落物品名?: string;
+  额外批量掉落最小数量?: number;
+  额外批量掉落最大数量?: number;
+  额外随机掉落物品名列表?: string[];
   宝箱单位ID?: string;
   宝箱库存物品名列表?: string[];
   全员奖励?: Boss死亡全员奖励;

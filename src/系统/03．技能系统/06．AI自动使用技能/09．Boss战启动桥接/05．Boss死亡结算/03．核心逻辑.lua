@@ -1,6 +1,5 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 local ____02_FF0EBoss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡结算配置表")
@@ -64,7 +63,6 @@ local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local ____BJ_4FEE_6539_589E_52A0 = 0
-local _____6C99_6F20_5B9D_85CF_989D_5916_6389_843D_5019_9009 = {"炽热生物挂坠", "远古毒咒护符", "远古巫术项链", "远古血巫项链"}
 local _____5F53_524D_5168_5458_5956_52B1
 local _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 = 0
 local function _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
@@ -295,6 +293,12 @@ local function ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, 
     local _____5217_8868 = _____914D_7F6E["特殊逻辑标签"]
     return _____5217_8868 ~= nil and __TS__ArrayIndexOf(_____5217_8868, _____6807_7B7E) >= 0
 end
+local function _____5168_5458_5956_52B1_6EE1_8DB3_51FB_6740_8005_7B49_7EA7_9650_5236(_____5956_52B1, _____51FB_6740_8005)
+    if _____5956_52B1 == nil or _____5956_52B1["击杀者最高等级限制"] == nil then
+        return true
+    end
+    return _____51FB_6740_8005 ~= nil and _____51FB_6740_8005 ~= 0 and IsUnitType(_____51FB_6740_8005, UNIT_TYPE_HERO) == true and GetHeroLevel(_____51FB_6740_8005) <= _____5956_52B1["击杀者最高等级限制"]
+end
 local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____914D_7F6E, _____51FB_6740_8005)
     if ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E["豺狼异变累计"]) then
         _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 = _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 + 1
@@ -311,11 +315,6 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____9
             return false
         end
     end
-    if ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E["嗜血兽人低等级击杀奖励"]) then
-        if _____51FB_6740_8005 == nil or _____51FB_6740_8005 == 0 or IsUnitType(_____51FB_6740_8005, UNIT_TYPE_HERO) ~= true or GetHeroLevel(_____51FB_6740_8005) > 17 then
-            _____914D_7F6E = __TS__ObjectAssign({}, _____914D_7F6E, {["全员奖励"] = nil})
-        end
-    end
     return true
 end
 local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
@@ -323,8 +322,13 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
         return
     end
     local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    local _____91D1_5E01_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID("金币+600"))
-    local _____6389_843D_6B21_6570 = GetRandomInt(15, 25)
+    if _____914D_7F6E["额外批量掉落物品名"] == nil or _____914D_7F6E["额外批量掉落物品名"] == "" then
+        return
+    end
+    local _____91D1_5E01_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____914D_7F6E["额外批量掉落物品名"]))
+    local _____6389_843D_6B21_6570_6700_5C0F_503C = _____914D_7F6E["额外批量掉落最小数量"] or 15
+    local _____6389_843D_6B21_6570_6700_5927_503C = _____914D_7F6E["额外批量掉落最大数量"] or 25
+    local _____6389_843D_6B21_6570 = GetRandomInt(_____6389_843D_6B21_6570_6700_5C0F_503C, _____6389_843D_6B21_6570_6700_5927_503C)
     do
         local i = 0
         while i < _____6389_843D_6B21_6570 do
@@ -334,7 +338,11 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
             i = i + 1
         end
     end
-    local _____5019_9009 = _____6C99_6F20_5B9D_85CF_989D_5916_6389_843D_5019_9009[GetRandomInt(0, #_____6C99_6F20_5B9D_85CF_989D_5916_6389_843D_5019_9009 - 1) + 1]
+    local _____989D_5916_5019_9009_5217_8868 = _____914D_7F6E["额外随机掉落物品名列表"]
+    if _____989D_5916_5019_9009_5217_8868 == nil or #_____989D_5916_5019_9009_5217_8868 <= 0 then
+        return
+    end
+    local _____5019_9009 = _____989D_5916_5019_9009_5217_8868[GetRandomInt(0, #_____989D_5916_5019_9009_5217_8868 - 1) + 1]
     local _____989D_5916_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____5019_9009))
     if _____989D_5916_7269_54C1ID > 0 then
         CreateItem(_____989D_5916_7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
@@ -348,10 +356,8 @@ local function _____5EF6_8FDF_6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_
 end
 local function _____6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_____914D_7F6E, _____51FB_6740_8005)
     local _____5168_5458_5956_52B1 = _____914D_7F6E["全员奖励"]
-    if ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E["嗜血兽人低等级击杀奖励"]) then
-        if _____51FB_6740_8005 == nil or _____51FB_6740_8005 == 0 or IsUnitType(_____51FB_6740_8005, UNIT_TYPE_HERO) ~= true or GetHeroLevel(_____51FB_6740_8005) > 17 then
-            _____5168_5458_5956_52B1 = nil
-        end
+    if not _____5168_5458_5956_52B1_6EE1_8DB3_51FB_6740_8005_7B49_7EA7_9650_5236(_____5168_5458_5956_52B1, _____51FB_6740_8005) then
+        _____5168_5458_5956_52B1 = nil
     end
     if _____914D_7F6E["延迟提示秒数"] ~= nil and _____914D_7F6E["延迟提示秒数"] > 0 then
         addDelayedCallback(

@@ -77,8 +77,6 @@ const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 攻击力属性ID = 1;
 const BJ修改增加 = 0;
 
-const 沙漠宝藏额外掉落候选 = ["炽热生物挂坠", "远古毒咒护符", "远古巫术项链", "远古血巫项链"] as const;
-
 let 当前全员奖励: Boss死亡全员奖励 | undefined;
 let 豺狼异变累计次数 = 0;
 
@@ -216,6 +214,11 @@ function Boss死亡结算命中标签(this: void, 配置: Boss死亡结算配置
   return 列表 != null && 列表.indexOf(标签) >= 0;
 }
 
+function 全员奖励满足击杀者等级限制(this: void, 奖励: Boss死亡全员奖励 | undefined, 击杀者: any): boolean {
+  if (奖励 == null || 奖励.击杀者最高等级限制 == null) return true;
+  return 击杀者 != null && 击杀者 !== 0 && IsUnitType(击杀者, UNIT_TYPE_HERO) === true && GetHeroLevel(击杀者) <= 奖励.击杀者最高等级限制;
+}
+
 function 处理Boss死亡特殊逻辑前置(this: void, 配置: Boss死亡结算配置, 击杀者: any): boolean {
   if (Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.豺狼异变累计)) {
     豺狼异变累计次数 += 1;
@@ -228,12 +231,6 @@ function 处理Boss死亡特殊逻辑前置(this: void, 配置: Boss死亡结算
     if (击杀者玩家 === Player(PLAYER_NEUTRAL_AGGRESSIVE)) return false;
   }
 
-  if (Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.嗜血兽人低等级击杀奖励)) {
-    if (击杀者 == null || 击杀者 === 0 || IsUnitType(击杀者, UNIT_TYPE_HERO) !== true || GetHeroLevel(击杀者) > 17) {
-      配置 = { ...配置, 全员奖励: undefined };
-    }
-  }
-
   return true;
 }
 
@@ -241,13 +238,18 @@ function 处理Boss死亡特殊逻辑掉落(this: void, 配置: Boss死亡结算
   if (!Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.沙漠宝藏击杀者非中立)) return;
 
   const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  const 金币物品ID = stringToFourCCSafe(按名字反查物品ID("金币+600"));
-  const 掉落次数 = GetRandomInt(15, 25);
+  if (配置.额外批量掉落物品名 == null || 配置.额外批量掉落物品名 === "") return;
+  const 金币物品ID = stringToFourCCSafe(按名字反查物品ID(配置.额外批量掉落物品名));
+  const 掉落次数最小值 = 配置.额外批量掉落最小数量 ?? 15;
+  const 掉落次数最大值 = 配置.额外批量掉落最大数量 ?? 25;
+  const 掉落次数 = GetRandomInt(掉落次数最小值, 掉落次数最大值);
   for (let i = 0; i < 掉落次数; i++) {
     if (金币物品ID > 0) CreateItem(金币物品ID, 位置.x, 位置.y);
   }
 
-  const 候选 = 沙漠宝藏额外掉落候选[GetRandomInt(0, 沙漠宝藏额外掉落候选.length - 1)];
+  const 额外候选列表 = 配置.额外随机掉落物品名列表;
+  if (额外候选列表 == null || 额外候选列表.length <= 0) return;
+  const 候选 = 额外候选列表[GetRandomInt(0, 额外候选列表.length - 1)];
   const 额外物品ID = stringToFourCCSafe(按名字反查物品ID(候选));
   if (额外物品ID > 0) CreateItem(额外物品ID, 位置.x, 位置.y);
 }
@@ -260,11 +262,7 @@ function 延迟执行Boss死亡奖励与提示(this: void, 配置: Boss死亡结
 function 执行Boss死亡奖励与提示(this: void, 配置: Boss死亡结算配置, 击杀者: any): void {
   let 全员奖励 = 配置.全员奖励;
 
-  if (Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.嗜血兽人低等级击杀奖励)) {
-    if (击杀者 == null || 击杀者 === 0 || IsUnitType(击杀者, UNIT_TYPE_HERO) !== true || GetHeroLevel(击杀者) > 17) {
-      全员奖励 = undefined;
-    }
-  }
+  if (!全员奖励满足击杀者等级限制(全员奖励, 击杀者)) 全员奖励 = undefined;
 
   if (配置.延迟提示秒数 != null && 配置.延迟提示秒数 > 0) {
     addDelayedCallback(配置.延迟提示秒数 * 1000, function onBoss死亡结算延迟回调(): void {
