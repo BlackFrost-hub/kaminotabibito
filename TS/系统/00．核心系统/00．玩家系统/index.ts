@@ -7,6 +7,8 @@
 
 export * from "./00．常量";
 export * from "./01．玩家单位管理器";
+export * from "./00．英雄注册联动/index";
+export * from "./01．英雄选择/index";
 
 const manager = require("系统.00．核心系统.00．玩家系统.01．玩家单位管理器") as {
   initPlayerUnitManager: () => void;

@@ -16,9 +16,12 @@ export * from "./07．异界Boss/index";
 export * from "./08．单位配置表/index";
 export * from "./09．科技配置表/index";
 
+const 单位初始化创建系统 = require("系统.01．单位系统.00．单位初始化创建.index") as { init?: () => void };
+
 /**
  * 初始化单位系统
  * 各子系统已在各自 index.ts 中自动初始化
  */
 export function init(): void {
+  if (typeof 单位初始化创建系统.init === "function") 单位初始化创建系统.init();
 }

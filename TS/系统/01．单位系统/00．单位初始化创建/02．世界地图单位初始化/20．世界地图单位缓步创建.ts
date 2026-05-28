@@ -12,7 +12,8 @@ const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定�
 const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetRandomDirectionDeg: (this: void) => number;
 };
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
@@ -45,6 +46,7 @@ const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 };
 
 import type {
+  世界地图Boss初始注册配置,
   世界地图单位出生配置,
   世界地图单位缓步创建状态,
   世界地图单位缓步创建选项,
@@ -60,6 +62,11 @@ import type { 世界地图植物单位配置, 世界地图植物随机物品配�
 import { 世界地图植物单位配置表, 世界地图植物随机物品配置表 } from "./06．植物配置表";
 import type { 异界描述石配置 } from "./07．异界描述石配置表";
 import { 世界地图异界描述石配置表 } from "./07．异界描述石配置表";
+import {
+  世界地图Boss初始注册延迟秒,
+  世界地图Boss初始注册配置表,
+  世界地图Boss初始额外单位配置表,
+} from "./08．Boss初始注册配置表";
 
 const Player = jass.Player as (this: void, playerId: number) => any;
 const GetRandomReal = jass.GetRandomReal as (this: void, lowBound: number, highBound: number) => number;
@@ -67,6 +74,7 @@ const GetRectMinX = jass.GetRectMinX as (this: void, whichRect: any) => number;
 const GetRectMaxX = jass.GetRectMaxX as (this: void, whichRect: any) => number;
 const GetRectMinY = jass.GetRectMinY as (this: void, whichRect: any) => number;
 const GetRectMaxY = jass.GetRectMaxY as (this: void, whichRect: any) => number;
+const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
 const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 中立被动玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const 世界地图随机单位默认玩家ID = 中立被动玩家ID;
@@ -146,14 +154,18 @@ function 解析世界地图物品ID(this: void, 物品名: string): string | und
   return undefined;
 }
 
-function 执行单条世界地图单位创建(this: void, 配置: 世界地图单位出生配置): boolean {
+function 创建世界地图单位实例(this: void, 配置: 世界地图单位出生配置): any {
   const 单位ID = 解析世界地图单位ID(配置);
-  if (单位ID == null) return false;
+  if (单位ID == null) return undefined;
 
   const 单位类型ID = stringToFourCC(单位ID);
   const 面向角度 = 解析世界地图单位朝向(配置);
   const 玩家 = 解析世界地图单位玩家(配置);
-  const 单位 = 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
+  return 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
+}
+
+function 执行单条世界地图单位创建(this: void, 配置: 世界地图单位出生配置): boolean {
+  const 单位 = 创建世界地图单位实例(配置);
   return 单位 != null;
 }
 
@@ -310,6 +322,44 @@ export function 停止世界地图单位缓步创建(this: void): void {
 
 export function 立即创建世界地图单位(this: void, 配置: 世界地图单位出生配置): boolean {
   return 执行单条世界地图单位创建(配置);
+}
+
+function 执行单条世界地图Boss初始注册(this: void, 配置: 世界地图Boss初始注册配置): any {
+  const 单位 = 创建世界地图单位实例(配置);
+  if (单位 == null) return undefined;
+
+  if (配置.记录到Boss表键名 != null && 配置.记录到Boss表键名 !== "") {
+    YDUserDataSetSafe("string", "Boss", 配置.记录到Boss表键名, "unit", 单位);
+  }
+
+  if (配置.初始隐藏 === true) {
+    ShowUnit(单位, false);
+  }
+
+  return 单位;
+}
+
+function 执行世界地图Boss初始注册配置表(this: void, 配置表: 世界地图Boss初始注册配置[]): number {
+  let 已创建数量 = 0;
+  for (const 配置 of 配置表) {
+    if (执行单条世界地图Boss初始注册(配置) != null) {
+      已创建数量++;
+    }
+  }
+  return 已创建数量;
+}
+
+function on世界地图Boss初始注册延迟回调(this: void): void {
+  初始化世界地图Boss初始注册();
+}
+
+export function 初始化世界地图Boss初始注册(this: void): number {
+  return 执行世界地图Boss初始注册配置表(世界地图Boss初始注册配置表)
+    + 执行世界地图Boss初始注册配置表(世界地图Boss初始额外单位配置表);
+}
+
+export function 延迟初始化世界地图Boss初始注册(this: void): void {
+  addDelayedCallback(世界地图Boss初始注册延迟秒 * 1000, on世界地图Boss初始注册延迟回调);
 }
 
 function 解析区域随机创建单位ID(this: void, 单位名: string): string | undefined {

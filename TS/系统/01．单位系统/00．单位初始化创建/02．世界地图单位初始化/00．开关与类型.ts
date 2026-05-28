@@ -14,6 +14,11 @@ export interface 世界地图单位出生配置 {
   玩家ID?: number;
 }
 
+export interface 世界地图Boss初始注册配置 extends 世界地图单位出生配置 {
+  记录到Boss表键名?: string;
+  初始隐藏?: boolean;
+}
+
 export interface 世界地图单位缓步创建选项 {
   每批创建数量?: number;
   批次间隔秒?: number;

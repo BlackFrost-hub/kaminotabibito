@@ -4,6 +4,7 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ObjectValues = ____lualib.__TS__ObjectValues
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local _____5F52_7C7B_53CD_67E5_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6, _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B, _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C, _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868, stringToFourCC, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, GetRandomDirectionDeg, _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID, _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID, YDUserDataSetSafe, Player, ShowUnit, _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID
 local ____00_FF0E_5F00_5173_4E0E_7C7B_578B = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.00．开关与类型")
 local _____4E16_754C_5730_56FE_5355_4F4D_9ED8_8BA4_6279_6B21_95F4_9694_79D2 = ____00_FF0E_5F00_5173_4E0E_7C7B_578B["世界地图单位默认批次间隔秒"]
 local _____4E16_754C_5730_56FE_5355_4F4D_9ED8_8BA4_6BCF_6279_521B_5EFA_6570_91CF = ____00_FF0E_5F00_5173_4E0E_7C7B_578B["世界地图单位默认每批创建数量"]
@@ -14,53 +15,11 @@ local _____4E16_754C_5730_56FE_690D_7269_5355_4F4D_914D_7F6E_8868 = ____06_FF0E_
 local _____4E16_754C_5730_56FE_690D_7269_968F_673A_7269_54C1_914D_7F6E_8868 = ____06_FF0E_690D_7269_914D_7F6E_8868["世界地图植物随机物品配置表"]
 local ____07_FF0E_5F02_754C_63CF_8FF0_77F3_914D_7F6E_8868 = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.07．异界描述石配置表")
 local _____4E16_754C_5730_56FE_5F02_754C_63CF_8FF0_77F3_914D_7F6E_8868 = ____07_FF0E_5F02_754C_63CF_8FF0_77F3_914D_7F6E_8868["世界地图异界描述石配置表"]
----
--- @noSelfInFile
-local jass = require("jass.common")
-local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_2.GetRandomDirectionDeg
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_3.addPeriodicCallback
-local removePeriodicCallback = ____require_result_3.removePeriodicCallback
-local ____require_result_4 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
-local _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_4["按名字反查杂鱼单位ID"]
-local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
-local _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_5["按名字反查精英单位ID"]
-local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_6["按名字反查Boss单位ID"]
-local ____require_result_7 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
-local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_7["按名字反查异界Boss单位ID"]
-local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_8["按名字反查总单位ID"]
-local ____require_result_9 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_9["按名字反查物品ID"]
-local ____require_result_10 = require("lib.扩展函数.物品相关函数.创建物品函数")
-local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_10["创建物品并注册排泄监听"]
-local ____require_result_11 = require("lib.扩展函数.BJ函数.03．物品与库存")
-local AddItemToStockBJ = ____require_result_11.AddItemToStockBJ
-local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_12.YDUserDataSetSafe
-local Player = jass.Player
-local GetRandomReal = jass.GetRandomReal
-local GetRectMinX = jass.GetRectMinX
-local GetRectMaxX = jass.GetRectMaxX
-local GetRectMinY = jass.GetRectMinY
-local GetRectMaxY = jass.GetRectMaxY
-local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
-local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = jass.PLAYER_NEUTRAL_PASSIVE
-local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_73A9_5BB6ID = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID
-local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_671D_5411 = 0
-local _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2 = 10
-local _____5F53_524D_9ED8_8BA4_4EFB_52A1ID
-local _____4E0B_4E00_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1ID = 1
-local _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_56DE_8C03ID
-local _____7F13_6B65_521B_5EFA_4EFB_52A1_8868 = {}
-local function _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____654C_4EBA_5F52_7C7B, _____5355_4F4D_540D)
+local ____08_FF0EBoss_521D_59CB_6CE8_518C_914D_7F6E_8868 = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.08．Boss初始注册配置表")
+local _____4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_5EF6_8FDF_79D2 = ____08_FF0EBoss_521D_59CB_6CE8_518C_914D_7F6E_8868["世界地图Boss初始注册延迟秒"]
+local _____4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868 = ____08_FF0EBoss_521D_59CB_6CE8_518C_914D_7F6E_8868["世界地图Boss初始注册配置表"]
+local _____4E16_754C_5730_56FEBoss_521D_59CB_989D_5916_5355_4F4D_914D_7F6E_8868 = ____08_FF0EBoss_521D_59CB_6CE8_518C_914D_7F6E_8868["世界地图Boss初始额外单位配置表"]
+function _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____654C_4EBA_5F52_7C7B, _____5355_4F4D_540D)
     if _____654C_4EBA_5F52_7C7B == "杂鱼" then
         return _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID(_____5355_4F4D_540D)
     end
@@ -78,7 +37,7 @@ local function _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____654C_4EBA_5F52_7C7B, __
     end
     return nil
 end
-local function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
+function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     local _____53CD_67E5_7ED3_679C = _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____914D_7F6E["敌人归类"], _____914D_7F6E["单位名"])
     if _____53CD_67E5_7ED3_679C ~= nil and _____53CD_67E5_7ED3_679C ~= "" then
         return _____53CD_67E5_7ED3_679C
@@ -94,16 +53,111 @@ local function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     end
     return nil
 end
-local function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411(_____914D_7F6E)
+function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411(_____914D_7F6E)
     if _____914D_7F6E["朝向"] == "随机" then
         return GetRandomDirectionDeg()
     end
     return _____914D_7F6E["朝向"]
 end
-local function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6(_____914D_7F6E)
+function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6(_____914D_7F6E)
     local _____73A9_5BB6ID = _____914D_7F6E["玩家ID"] or _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID
     return Player(_____73A9_5BB6ID)
 end
+function _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
+    local _____5355_4F4DID = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
+    if _____5355_4F4DID == nil then
+        return nil
+    end
+    local _____5355_4F4D_7C7B_578BID = stringToFourCC(_____5355_4F4DID)
+    local _____9762_5411_89D2_5EA6 = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411(_____914D_7F6E)
+    local _____73A9_5BB6 = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6(_____914D_7F6E)
+    return _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
+        _____73A9_5BB6,
+        _____5355_4F4D_7C7B_578BID,
+        _____914D_7F6E.X,
+        _____914D_7F6E.Y,
+        _____9762_5411_89D2_5EA6
+    )
+end
+function _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C(_____914D_7F6E)
+    local _____5355_4F4D = _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
+    if _____5355_4F4D == nil then
+        return nil
+    end
+    if _____914D_7F6E["记录到Boss表键名"] ~= nil and _____914D_7F6E["记录到Boss表键名"] ~= "" then
+        YDUserDataSetSafe(
+            "string",
+            "Boss",
+            _____914D_7F6E["记录到Boss表键名"],
+            "unit",
+            _____5355_4F4D
+        )
+    end
+    if _____914D_7F6E["初始隐藏"] == true then
+        ShowUnit(_____5355_4F4D, false)
+    end
+    return _____5355_4F4D
+end
+function _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868(_____914D_7F6E_8868)
+    local _____5DF2_521B_5EFA_6570_91CF = 0
+    for ____, _____914D_7F6E in ipairs(_____914D_7F6E_8868) do
+        if _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C(_____914D_7F6E) ~= nil then
+            _____5DF2_521B_5EFA_6570_91CF = _____5DF2_521B_5EFA_6570_91CF + 1
+        end
+    end
+    return _____5DF2_521B_5EFA_6570_91CF
+end
+____exports["初始化世界地图Boss初始注册"] = function()
+    return _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868(_____4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868) + _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868(_____4E16_754C_5730_56FEBoss_521D_59CB_989D_5916_5355_4F4D_914D_7F6E_8868)
+end
+---
+-- @noSelfInFile
+local jass = require("jass.common")
+local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+stringToFourCC = ____require_result_0.stringToFourCC
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+_____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+GetRandomDirectionDeg = ____require_result_2.GetRandomDirectionDeg
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
+local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+local removePeriodicCallback = ____require_result_3.removePeriodicCallback
+local ____require_result_4 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
+_____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_4["按名字反查杂鱼单位ID"]
+local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
+_____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_5["按名字反查精英单位ID"]
+local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+_____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_6["按名字反查Boss单位ID"]
+local ____require_result_7 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
+_____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_7["按名字反查异界Boss单位ID"]
+local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_8["按名字反查总单位ID"]
+local ____require_result_9 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_9["按名字反查物品ID"]
+local ____require_result_10 = require("lib.扩展函数.物品相关函数.创建物品函数")
+local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_10["创建物品并注册排泄监听"]
+local ____require_result_11 = require("lib.扩展函数.BJ函数.03．物品与库存")
+local AddItemToStockBJ = ____require_result_11.AddItemToStockBJ
+local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataSetSafe = ____require_result_12.YDUserDataSetSafe
+Player = jass.Player
+local GetRandomReal = jass.GetRandomReal
+local GetRectMinX = jass.GetRectMinX
+local GetRectMaxX = jass.GetRectMaxX
+local GetRectMinY = jass.GetRectMinY
+local GetRectMaxY = jass.GetRectMaxY
+ShowUnit = jass.ShowUnit
+_____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
+local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = jass.PLAYER_NEUTRAL_PASSIVE
+local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_73A9_5BB6ID = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID
+local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_671D_5411 = 0
+local _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2 = 10
+local _____5F53_524D_9ED8_8BA4_4EFB_52A1ID
+local _____4E0B_4E00_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1ID = 1
+local _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_56DE_8C03ID
+local _____7F13_6B65_521B_5EFA_4EFB_52A1_8868 = {}
 local function _____83B7_53D6_968F_673A_77E9_5F62X(rect)
     return GetRandomReal(
         GetRectMinX(rect),
@@ -124,20 +178,7 @@ local function _____89E3_6790_4E16_754C_5730_56FE_7269_54C1ID(_____7269_54C1_540
     return nil
 end
 local function _____6267_884C_5355_6761_4E16_754C_5730_56FE_5355_4F4D_521B_5EFA(_____914D_7F6E)
-    local _____5355_4F4DID = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
-    if _____5355_4F4DID == nil then
-        return false
-    end
-    local _____5355_4F4D_7C7B_578BID = stringToFourCC(_____5355_4F4DID)
-    local _____9762_5411_89D2_5EA6 = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411(_____914D_7F6E)
-    local _____73A9_5BB6 = _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6(_____914D_7F6E)
-    local _____5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        _____73A9_5BB6,
-        _____5355_4F4D_7C7B_578BID,
-        _____914D_7F6E.X,
-        _____914D_7F6E.Y,
-        _____9762_5411_89D2_5EA6
-    )
+    local _____5355_4F4D = _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
     return _____5355_4F4D ~= nil
 end
 local function _____83B7_53D6_7F13_6B65_521B_5EFA_4EFB_52A1(_____4EFB_52A1ID)
@@ -210,16 +251,16 @@ local function _____5904_7406_5168_90E8_7F13_6B65_521B_5EFA_4EFB_52A1()
     for ____, _____4EFB_52A1 in ipairs(__TS__ObjectValues(_____7F13_6B65_521B_5EFA_4EFB_52A1_8868)) do
         do
             if _____4EFB_52A1 == nil then
-                goto __continue43
+                goto __continue44
             end
             _____4EFB_52A1["已累计毫秒"] = _____4EFB_52A1["已累计毫秒"] + _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2
             if _____4EFB_52A1["已累计毫秒"] < _____4EFB_52A1["批次间隔毫秒"] then
-                goto __continue43
+                goto __continue44
             end
             _____4EFB_52A1["已累计毫秒"] = 0
             _____6267_884C_5355_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1_4E00_6279(_____4EFB_52A1)
         end
-        ::__continue43::
+        ::__continue44::
     end
     _____5982_65E0_4EFB_52A1_5219_505C_6B62_7F13_6B65_521B_5EFA_8C03_5EA6_5668()
 end
@@ -273,6 +314,12 @@ ____exports["停止世界地图单位缓步创建"] = function()
 end
 ____exports["立即创建世界地图单位"] = function(_____914D_7F6E)
     return _____6267_884C_5355_6761_4E16_754C_5730_56FE_5355_4F4D_521B_5EFA(_____914D_7F6E)
+end
+local function ____on_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_5EF6_8FDF_56DE_8C03()
+    ____exports["初始化世界地图Boss初始注册"]()
+end
+____exports["延迟初始化世界地图Boss初始注册"] = function()
+    addDelayedCallback(_____4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_5EF6_8FDF_79D2 * 1000, ____on_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_5EF6_8FDF_56DE_8C03)
 end
 local function _____89E3_6790_533A_57DF_968F_673A_521B_5EFA_5355_4F4DID(_____5355_4F4D_540D)
     local _____603B_8868_53CD_67E5_7ED3_679C = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)

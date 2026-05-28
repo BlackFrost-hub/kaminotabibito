@@ -2,21 +2,17 @@
 /**
  * 玩家系统 - 英雄注册联动 - 玩家英雄获取桥接
  *
- * JASS 侧：
- * - 传参：YDLocal5Set(unit, "英雄", someHero)
- * - 触发：STES_Fire("玩家英雄注册")
- *
  * Lua 侧职责：
  * - 从传入单位中筛选玩家 1-5 操作的英雄
  * - 写入 YDUserData("player", whichPlayer, "英雄", "unit")
  * - 在拿到英雄时，把英雄注册到各个依赖它的联动模块
+ *
+ * 现状：
+ * - 英雄选择系统已改为直接调用 `directRegisterPlayerHero`
+ * - 这里不再注册旧 STES「玩家英雄注册」桥接，只保留直连能力
  */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
-const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
-};
 const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -27,17 +23,6 @@ const C = require("系统.00．核心系统.00．玩家系统.00．常量") as t
 const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
   YDUserDataGet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
   YDUserDataSet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
-};
-
-const { YDLocal5Get } = require("lib.扩展函数.YDWE函数.02．YDLocal兼容") as {
-  YDLocal5Get: (ty: string, name: string) => any;
-};
-
-const helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具") as {
-  ydlStes_syncTriggerStep: (_self: any) => void;
-  ydlStes_finishChildCleanup: (_self: any) => void;
-  ydlStes_skeyIndex: (_self: any) => number;
-  ydlStes_registerAfterGetTable: (_self: any, trig: any, eventName: string) => void;
 };
 
 const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效") as {
@@ -61,11 +46,6 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as 
   debugLog: (module: string, ...args: any[]) => void;
 };
 
-const REG_GUARD = "__syzl_playerHeroRegister_registered";
-const TRIG_KEY = "__syzl_playerHeroRegister_trig";
-const ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt";
-const MAX_REG_ATTEMPTS = 30;
-const RETRY_SEC = 0.1;
 const 英雄依赖注册队列间隔毫秒 = 150;
 const 英雄依赖注册启动延迟毫秒 = 800;
 
@@ -73,21 +53,6 @@ interface 英雄依赖注册任务 {
   owner: any;
   hero: any;
   stage: number;
-}
-
-function jassStesHashtable(): any {
-  const candidates = [jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT];
-  for (let i = 0; i < candidates.length; i++) {
-    const table = candidates[i];
-    if (table != null && table !== 0) return table;
-  }
-  return null;
-}
-
-function countOnJassStesTable(eventName: string): number {
-  const ht = jassStesHashtable();
-  if (ht == null || ht === 0) return -1;
-  return jass.LoadInteger(ht, jass.StringHash(eventName), helper.ydlStes_skeyIndex(undefined));
 }
 
 /**
@@ -276,6 +241,10 @@ function registerPlayerHero(whichPlayer: any, whichHero: any): void {
   registerHeroDependents(whichHero);
 }
 
+export function directRegisterPlayerHero(this: void, whichPlayer: any, whichHero: any): void {
+  registerPlayerHero(whichPlayer, whichHero);
+}
+
 export function getRegisteredPlayerHero(this: void, whichPlayer: any): any {
   if (whichPlayer == null || whichPlayer === 0) return null;
   return YDUserDataGet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit");
@@ -289,47 +258,8 @@ function registerSingleHero(whichHero: any): void {
   registerPlayerHero(owner, whichHero);
 }
 
-function runRegisterPlayerHero(): void {
-  helper.ydlStes_syncTriggerStep(undefined);
-  try {
-    registerSingleHero(YDLocal5Get("unit", C.STES_PARAM_HERO_UNIT));
-  } finally {
-    helper.ydlStes_finishChildCleanup(undefined);
-  }
-}
-
-function runRegisterPlayerHeroTriggerAction(): void {
-  runRegisterPlayerHero();
-}
-
-function scheduleRetry(fn: () => void): void {
-  createDelayedCall(RETRY_SEC, fn);
-}
-
-function tryRegisterPlayerHeroStes(): void {
-  const g = globalThis as any;
-  if (g[REG_GUARD]) return;
-
-  if (g[TRIG_KEY] == null) {
-    const trig = jass.CreateTrigger();
-    jass.TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction);
-    g[TRIG_KEY] = trig;
-  }
-
-  helper.ydlStes_registerAfterGetTable(undefined, g[TRIG_KEY], C.STES_EVENT_REGISTER_PLAYER_HERO);
-
-  const count = countOnJassStesTable(C.STES_EVENT_REGISTER_PLAYER_HERO);
-  const attempt = ((g[ATTEMPT_KEY] as number) || 0) + 1;
-  g[ATTEMPT_KEY] = attempt;
-
-  if (count >= 1 || attempt >= MAX_REG_ATTEMPTS) {
-    g[REG_GUARD] = true;
-    return;
-  }
-
-  scheduleRetry(() => {
-    tryRegisterPlayerHeroStes();
-  });
+export function directRegisterPlayableHero(this: void, whichHero: any): void {
+  registerSingleHero(whichHero);
 }
 
 function initOutOfCombatSystem(this: void): void {
@@ -345,7 +275,6 @@ function initOutOfCombatSystem(this: void): void {
 export function initPlayerHeroGetBridge(): void {
   清理英雄依赖注册启动延迟();
   initOutOfCombatSystem();
-  tryRegisterPlayerHeroStes();
 }
 
 export {};

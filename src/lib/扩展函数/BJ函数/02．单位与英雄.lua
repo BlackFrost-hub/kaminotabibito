@@ -211,12 +211,12 @@ function ____exports.IsSuspendedXPBJ(whichHero)
     return jass.IsSuspendedXP(whichHero)
 end
 --- 修改英雄技能点数
--- 对应JASS: ModifyHeroSkillPoints
-function ____exports.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value)
+-- 对应BJ: ModifyHeroSkillPoints
+function ____exports.ModifyHeroSkillPoints(whichHero, modifyMethod, value)
     if whichHero == nil or whichHero == 0 then
         return false
     end
-    return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value)
+    return jass.ModifyHeroSkillPoints(whichHero, modifyMethod, value)
 end
 --- 判断单位是否拥有指定buff
 -- 对应BJ: UnitHasBuffBJ (1.27 没有 UnitHasBuff，用 GetUnitAbilityLevel 实现)

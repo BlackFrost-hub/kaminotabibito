@@ -80,8 +80,12 @@ do
         end
     end
 end
+local _____5355_4F4D_521D_59CB_5316_521B_5EFA_7CFB_7EDF = require("系统.01．单位系统.00．单位初始化创建.index")
 --- 初始化单位系统
 -- 各子系统已在各自 index.ts 中自动初始化
 function ____exports.init(self)
+    if type(_____5355_4F4D_521D_59CB_5316_521B_5EFA_7CFB_7EDF.init) == "function" then
+        _____5355_4F4D_521D_59CB_5316_521B_5EFA_7CFB_7EDF:init()
+    end
 end
 return ____exports

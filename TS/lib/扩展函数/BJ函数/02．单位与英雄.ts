@@ -196,11 +196,11 @@ export function IsSuspendedXPBJ(whichHero: any): boolean {
 
 /**
  * 修改英雄技能点数
- * 对应JASS: ModifyHeroSkillPoints
+ * 对应BJ: ModifyHeroSkillPoints
  */
-export function ModifyHeroSkillPoints(whichHero: any, whichStat: number, modifyMethod: number, value: number): boolean {
+export function ModifyHeroSkillPoints(whichHero: any, modifyMethod: number, value: number): boolean {
     if (whichHero == null || whichHero === 0) return false;
-    return jass.ModifyHeroSkillPoints(whichHero, whichStat, modifyMethod, value);
+    return jass.ModifyHeroSkillPoints(whichHero, modifyMethod, value);
 }
 
 /**

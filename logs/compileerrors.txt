@@ -1,0 +1,4 @@
+logs\currentmapscript.j
+JASSHelper - Step 2 (structs)
+Line 48352: Syntax Error, unexpected: "("?
+1

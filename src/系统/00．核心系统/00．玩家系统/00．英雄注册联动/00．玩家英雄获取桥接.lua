@@ -38,34 +38,34 @@ function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4
     end
     local playerId = jass.GetPlayerId(owner)
     repeat
-        local ____switch25 = _____4EFB_52A1.stage
-        local ____cond25 = ____switch25 == 0
-        if ____cond25 then
+        local ____switch19 = _____4EFB_52A1.stage
+        local ____cond19 = ____switch19 == 0
+        if ____cond19 then
             if type(registerMoveSpeedTornadoHero) == "function" then
                 registerMoveSpeedTornadoHero(whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 1
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 1
+        if ____cond19 then
             if type(petItemHandoff["注册宠物移交英雄"]) == "function" then
                 petItemHandoff["注册宠物移交英雄"](whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 2
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 2
+        if ____cond19 then
             if type(chestSystem.registerChestSystemHero) == "function" then
                 chestSystem.registerChestSystemHero(whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 3
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 3
+        if ____cond19 then
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 4
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 4
+        if ____cond19 then
             debugLog(
                 nil,
                 "Bridge",
@@ -78,29 +78,29 @@ function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 5
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 5
+        if ____cond19 then
             if not uiRegisteredPlayers:has(playerId) then
                 invokeUiAttrOnPlayerHeroRegistered(owner, whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 6
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 6
+        if ____cond19 then
             if not uiRegisteredPlayers:has(playerId) and type(dialogSystem.onPlayerHeroRegistered) == "function" then
                 dialogSystem.onPlayerHeroRegistered(owner, whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 7
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 7
+        if ____cond19 then
             if not uiRegisteredPlayers:has(playerId) and type(buffUISystem.onPlayerHeroRegistered) == "function" then
                 buffUISystem.onPlayerHeroRegistered(owner, whichHero)
             end
             break
         end
-        ____cond25 = ____cond25 or ____switch25 == 8
-        if ____cond25 then
+        ____cond19 = ____cond19 or ____switch19 == 8
+        if ____cond19 then
             if not uiRegisteredPlayers:has(playerId) then
                 if type(threatPanelSystem.onPlayerHeroRegistered) == "function" then
                     threatPanelSystem.onPlayerHeroRegistered(owner, whichHero)
@@ -140,56 +140,20 @@ function _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(_
     _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID = centerTimer.addDelayedCallback(_____5EF6_8FDF_6BEB_79D2, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick)
 end
 jass = require("jass.common")
-local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local createDelayedCall = ____require_result_0.createDelayedCall
 centerTimer = require("系统.00．核心系统.05．中心计时器")
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataGet = ____require_result_1.YDUserDataGet
-local YDUserDataSet = ____require_result_1.YDUserDataSet
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-local YDLocal5Get = ____require_result_2.YDLocal5Get
-local helper = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataGet = ____require_result_0.YDUserDataGet
+local YDUserDataSet = ____require_result_0.YDUserDataSet
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
 registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
 heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
-debugLog = ____require_result_3.debugLog
-local REG_GUARD = "__syzl_playerHeroRegister_registered"
-local TRIG_KEY = "__syzl_playerHeroRegister_trig"
-local ATTEMPT_KEY = "__syzl_playerHeroRegister_attempt"
-local MAX_REG_ATTEMPTS = 30
-local RETRY_SEC = 0.1
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
+debugLog = ____require_result_1.debugLog
 _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2 = 150
 local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2 = 800
-local function jassStesHashtable()
-    local candidates = {jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT}
-    do
-        local i = 0
-        while i < #candidates do
-            local ____table = candidates[i + 1]
-            if ____table ~= nil and ____table ~= 0 then
-                return ____table
-            end
-            i = i + 1
-        end
-    end
-    return nil
-end
-local function countOnJassStesTable(eventName)
-    local ht = jassStesHashtable()
-    if ht == nil or ht == 0 then
-        return -1
-    end
-    return jass.LoadInteger(
-        ht,
-        jass.StringHash(eventName),
-        helper:ydlStes_skeyIndex(nil)
-    )
-end
 --- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
 -- 这里是整条"英雄注册联动"链路的第一层筛选。
 local function isPlayableHero(whichUnit)
@@ -256,6 +220,9 @@ local function registerPlayerHero(whichPlayer, whichHero)
     )
     registerHeroDependents(whichHero)
 end
+function ____exports.directRegisterPlayerHero(whichPlayer, whichHero)
+    registerPlayerHero(whichPlayer, whichHero)
+end
 function ____exports.getRegisteredPlayerHero(whichPlayer)
     if whichPlayer == nil or whichPlayer == 0 then
         return nil
@@ -278,47 +245,8 @@ local function registerSingleHero(whichHero)
     end
     registerPlayerHero(owner, whichHero)
 end
-local function runRegisterPlayerHero()
-    helper:ydlStes_syncTriggerStep(nil)
-    do
-        local ____try, ____error = pcall(function()
-            registerSingleHero(YDLocal5Get(nil, "unit", C.STES_PARAM_HERO_UNIT))
-        end)
-        do
-            helper:ydlStes_finishChildCleanup(nil)
-        end
-        if not ____try then
-            error(____error, 0)
-        end
-    end
-end
-local function runRegisterPlayerHeroTriggerAction()
-    runRegisterPlayerHero()
-end
-local function scheduleRetry(fn)
-    createDelayedCall(RETRY_SEC, fn)
-end
-local function tryRegisterPlayerHeroStes()
-    local g = _G
-    if g[REG_GUARD] then
-        return
-    end
-    if g[TRIG_KEY] == nil then
-        local trig = jass.CreateTrigger()
-        jass.TriggerAddAction(trig, runRegisterPlayerHeroTriggerAction)
-        g[TRIG_KEY] = trig
-    end
-    helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], C.STES_EVENT_REGISTER_PLAYER_HERO)
-    local count = countOnJassStesTable(C.STES_EVENT_REGISTER_PLAYER_HERO)
-    local attempt = (g[ATTEMPT_KEY] or 0) + 1
-    g[ATTEMPT_KEY] = attempt
-    if count >= 1 or attempt >= MAX_REG_ATTEMPTS then
-        g[REG_GUARD] = true
-        return
-    end
-    scheduleRetry(function()
-        tryRegisterPlayerHeroStes()
-    end)
+function ____exports.directRegisterPlayableHero(whichHero)
+    registerSingleHero(whichHero)
 end
 local function initOutOfCombatSystem()
     local outOfCombat = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.02．脱战计时")
@@ -330,6 +258,5 @@ end
 function ____exports.initPlayerHeroGetBridge()
     _____6E05_7406_82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF()
     initOutOfCombatSystem()
-    tryRegisterPlayerHeroStes()
 end
 return ____exports
