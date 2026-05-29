@@ -2,7 +2,7 @@
 
 const jass = require("jass.common") as any;
 
-const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算") as {
+const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.03．核心逻辑") as {
   按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
   执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
 };
