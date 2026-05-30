@@ -39,3 +39,7 @@ Desktop.ini
 .vscode/jass-cache/
 .claude/
 .claude/settings.local.json
+
+# build artifacts
+/backups/
+/logs/
