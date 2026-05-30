@@ -22,42 +22,21 @@ local function onCameraShakeTimerExpire()
     local ctx = cameraShakeCtxByTimerHid[hid]
     __TS__Delete(cameraShakeCtxByTimerHid, hid)
     if ctx ~= nil then
-        CameraClearNoiseForPlayer(nil, ctx.whichPlayer)
+        CameraClearNoiseForPlayer(ctx.whichPlayer)
         cameraTimers:delete(ctx.playerId)
     end
-    safeDestroyTimer(nil, t)
+    safeDestroyTimer(t)
 end
-function ____exports.CameraShakeForPlayer(whichPlayerOrSelf, magnitudeOrPlayer, durationOrMagnitude, maybeDuration)
-    local ____temp_1
-    if maybeDuration ~= nil then
-        ____temp_1 = magnitudeOrPlayer
-    else
-        ____temp_1 = whichPlayerOrSelf
-    end
-    local whichPlayer = ____temp_1
-    local ____temp_2
-    if maybeDuration ~= nil then
-        ____temp_2 = durationOrMagnitude
-    else
-        ____temp_2 = magnitudeOrPlayer
-    end
-    local magnitude = ____temp_2
-    local duration = maybeDuration ~= nil and maybeDuration or durationOrMagnitude
-    CameraSetEQNoiseForPlayer(nil, whichPlayer, magnitude)
+function ____exports.CameraShakeForPlayer(whichPlayer, magnitude, duration)
+    CameraSetEQNoiseForPlayer(whichPlayer, magnitude)
     local playerId = jass.GetPlayerId(whichPlayer)
     local existing = cameraTimers:get(playerId)
     if existing then
-        safeDestroyTimer(nil, existing)
+        safeDestroyTimer(existing)
     end
     local t = jass.CreateTimer()
     cameraTimers:set(playerId, t)
     cameraShakeCtxByTimerHid[jass.GetHandleId(t)] = {whichPlayer = whichPlayer, playerId = playerId}
-    safeTimerStart(
-        nil,
-        t,
-        duration,
-        false,
-        onCameraShakeTimerExpire
-    )
+    safeTimerStart(t, duration, false, onCameraShakeTimerExpire)
 end
 return ____exports

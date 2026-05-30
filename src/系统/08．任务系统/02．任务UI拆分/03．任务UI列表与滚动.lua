@@ -99,7 +99,7 @@ function ____exports.isDescendantOf(self, japi, frame, ancestor)
     return false
 end
 function ____exports.isWheelTargetForTaskList(self, japi, getMouseFocus, listContainer, scrollBarFrame, scrollThumbFrame, scrollThumbHitBtn)
-    local f = type(getMouseFocus) == "function" and getMouseFocus(nil) or 0
+    local f = type(getMouseFocus) == "function" and getMouseFocus() or 0
     if not f or f == 0 then
         return false
     end
@@ -119,7 +119,7 @@ function ____exports.isWheelTargetForTaskList(self, japi, getMouseFocus, listCon
 end
 --- 分页滑块 thumb / 透明命中键（及子帧）：供全局鼠标拖拽判定（不含整条轨道）
 function ____exports.isTaskScrollThumbDragHit(self, japi, getMouseFocus, scrollThumbFrame, scrollThumbHitBtn)
-    local f = type(getMouseFocus) == "function" and getMouseFocus(nil) or 0
+    local f = type(getMouseFocus) == "function" and getMouseFocus() or 0
     if not f or f == 0 then
         return false
     end
@@ -132,7 +132,7 @@ function ____exports.isTaskScrollThumbDragHit(self, japi, getMouseFocus, scrollT
     return false
 end
 function ____exports.isTaskScrollBarTrackHit(self, japi, getMouseFocus, scrollBarFrame, scrollThumbFrame, scrollThumbHitBtn)
-    local f = type(getMouseFocus) == "function" and getMouseFocus(nil) or 0
+    local f = type(getMouseFocus) == "function" and getMouseFocus() or 0
     if not f or f == 0 then
         return false
     end

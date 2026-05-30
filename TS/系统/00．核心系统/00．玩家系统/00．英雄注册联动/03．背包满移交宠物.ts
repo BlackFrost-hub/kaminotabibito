@@ -9,8 +9,8 @@ const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as
   String2OrderIdBJ: (orderIdString: string) => number;
 };
 const { SoHeroHatm, GS_news } = require("lib.扩展函数.Star扩展函数.GS扩展库.index") as {
-  SoHeroHatm: (whichUnit: any) => number;
-  GS_news: (whichPlayer: any, message: string) => void;
+  SoHeroHatm: (this: void, whichUnit: any) => number;
+  GS_news: (this: void, whichPlayer: any, message: string) => void;
 };
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;

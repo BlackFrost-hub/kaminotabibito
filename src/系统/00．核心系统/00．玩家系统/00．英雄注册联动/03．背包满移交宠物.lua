@@ -23,7 +23,7 @@ function _____5BA0_7269_79FB_4EA4_5904_7406_5668()
         return
     end
     local _____82F1_96C4 = jass.GetTriggerUnit()
-    if not _____662F_5426_6709_6548(_____82F1_96C4) or SoHeroHatm(nil, _____82F1_96C4) < 6 then
+    if not _____662F_5426_6709_6548(_____82F1_96C4) or SoHeroHatm(_____82F1_96C4) < 6 then
         return
     end
     local _____4E3B_4EBA = jass.GetOwningPlayer(_____82F1_96C4)
@@ -40,12 +40,12 @@ function _____5BA0_7269_79FB_4EA4_5904_7406_5668()
     if not _____662F_5426_6709_6548(_____5BA0_7269) then
         return
     end
-    if SoHeroHatm(nil, _____5BA0_7269) >= 6 then
-        GS_news(nil, _____4E3B_4EBA, _____6D88_606F__4E24_8005_6EE1)
+    if SoHeroHatm(_____5BA0_7269) >= 6 then
+        GS_news(_____4E3B_4EBA, _____6D88_606F__4E24_8005_6EE1)
         return
     end
     jass.UnitAddItem(_____5BA0_7269, _____76EE_6807_7269_54C1)
-    GS_news(nil, _____4E3B_4EBA, _____6D88_606F__79FB_4EA4_5BA0_7269)
+    GS_news(_____4E3B_4EBA, _____6D88_606F__79FB_4EA4_5BA0_7269)
 end
 jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")

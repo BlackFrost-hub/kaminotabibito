@@ -27,7 +27,7 @@ const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通�
 };
 
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-  Sound3DII_Mp3PlayReuse: (path: string, player?: any) => void;
+  Sound3DII_Mp3PlayReuse: (this: void, path: string, player?: any) => void;
 };
 
 const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {

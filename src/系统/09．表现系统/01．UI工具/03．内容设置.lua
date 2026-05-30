@@ -21,13 +21,7 @@ function ____exports.setFrameClickEvent(self, frame, callback, sync)
     if frame == 0 or frame == nil then
         return false
     end
-    frameSetScriptByCode(
-        nil,
-        frame,
-        EventType.MOUSE_CLICK,
-        callback,
-        sync
-    )
+    frameSetScriptByCode(frame, EventType.MOUSE_CLICK, callback, sync)
     return true
 end
 function ____exports.setFrameHoverEvents(self, frame, onEnter, onLeave, sync)
@@ -37,20 +31,8 @@ function ____exports.setFrameHoverEvents(self, frame, onEnter, onLeave, sync)
     if frame == 0 or frame == nil then
         return false
     end
-    frameSetScriptByCode(
-        nil,
-        frame,
-        EventType.MOUSE_ENTER,
-        onEnter,
-        sync
-    )
-    frameSetScriptByCode(
-        nil,
-        frame,
-        EventType.MOUSE_LEAVE,
-        onLeave,
-        sync
-    )
+    frameSetScriptByCode(frame, EventType.MOUSE_ENTER, onEnter, sync)
+    frameSetScriptByCode(frame, EventType.MOUSE_LEAVE, onLeave, sync)
     return true
 end
 function ____exports.setButtonText(self, frame, text)

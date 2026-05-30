@@ -12,6 +12,30 @@ const fs = require("fs");
 const path = require("path");
 
 const SRC_DIR = path.join(__dirname, "..", "src");
+const RETRYABLE_WRITE_ERROR_CODES = new Set(["UNKNOWN", "EBUSY", "EPERM", "EACCES"]);
+const WRITE_RETRY_DELAYS_MS = [20, 50, 100, 200, 400, 800];
+
+function sleepSync(ms) {
+  const marker = new Int32Array(new SharedArrayBuffer(4));
+  Atomics.wait(marker, 0, 0, ms);
+}
+
+function writeFileUtf8WithRetry(filePath, content) {
+  let lastError = null;
+  for (let attempt = 0; attempt <= WRITE_RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      fs.writeFileSync(filePath, content, "utf8");
+      return;
+    } catch (err) {
+      lastError = err;
+      if (!err || !RETRYABLE_WRITE_ERROR_CODES.has(err.code) || attempt >= WRITE_RETRY_DELAYS_MS.length) {
+        throw err;
+      }
+      sleepSync(WRITE_RETRY_DELAYS_MS[attempt]);
+    }
+  }
+  throw lastError;
+}
 
 /** 对同一内容串行应用 [RegExp, string | function] */
 function applyPairs(content, pairs) {
@@ -198,7 +222,7 @@ function fixFile(filePath) {
   const rel = path.relative(SRC_DIR, filePath).split(path.sep).join("/");
   const next = applyRules(original, rel);
   if (next !== original) {
-    fs.writeFileSync(filePath, next, "utf8");
+    writeFileUtf8WithRetry(filePath, next);
     return true;
   }
   return false;

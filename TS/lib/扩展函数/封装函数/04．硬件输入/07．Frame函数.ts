@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 硬件输入 - Frame函数
@@ -26,7 +28,7 @@ export function getMouseFocus(): number {
 }
 
 /** UI 回调：eventId 参考 DzAPI.j（1点击/2进入/3离开/4释放/6滚轮/12双击...），参数顺序与原生一致 */
-export function frameSetScriptByCode(frame: number, eventId: number, action: () => void, sync: boolean, playerId?: number): void {
+export function frameSetScriptByCode(frame: number, eventId: number, action: any, sync: boolean, playerId?: number): void {
   if (sync) {
     japi.DzFrameSetScriptByCode(frame, eventId, action, true);
     return;

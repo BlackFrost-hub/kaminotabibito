@@ -45,13 +45,7 @@ local function _____6CE8_518C_672C_5730_5E27_4E8B_4EF6(frame, eventId, action)
     if type(frameSetScriptByCode) ~= "function" then
         return
     end
-    frameSetScriptByCode(
-        nil,
-        frame,
-        eventId,
-        action,
-        false
-    )
+    frameSetScriptByCode(frame, eventId, action, false)
 end
 local function _____89C4_8303_9875_7801(pageIndex)
     if #_____6E38_620F_8BF4_660E_9875_9762 <= 0 then
@@ -136,7 +130,6 @@ local function onNextClick()
         DzFrameShow(_____624B_518CUI.hintText, false)
     end
     Sound3DII_Mp3PlayReuse(
-        nil,
         _____7FFB_9875_97F3_6548_8DEF_5F84,
         _____83B7_53D6_672C_5730_73A9_5BB6()
     )

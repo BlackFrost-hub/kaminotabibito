@@ -69,6 +69,10 @@ local function scheduleDestroySoundIfNeeded(sound)
 end
 --- 播放MP3音效（可指定玩家）
 -- 
+-- 注意：此入口每次调用都会 CreateSound，并在播放后 KillSoundWhenDone。
+-- 高频/同路径重复音效请优先使用 Sound3DII_Mp3PlayReuse，避免大量短时间创建音效句柄。
+-- 只有确实需要多实例叠放、不能被 StopSound 打断上一声时，再使用本函数。
+-- 
 -- @param path 音效路径
 -- @param player 指定玩家（为null时所有玩家都能听到）
 -- @param model 声音模型（可选）

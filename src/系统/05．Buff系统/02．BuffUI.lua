@@ -429,7 +429,7 @@ local function initSelectionCentersForBuffUi()
     end
 end
 local function createUi()
-    local parent = getGameUI(nil)
+    local parent = getGameUI()
     debugLog(
         nil,
         "BuffUI",

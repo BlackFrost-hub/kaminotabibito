@@ -3,6 +3,8 @@ import { RMaxBJ } from "./12．数学函数";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const UnitModifySkillPoints = jass.UnitModifySkillPoints as (whichHero: any, delta: number) => boolean;
+const GetHeroSkillPoints = jass.GetHeroSkillPoints as (whichHero: any) => number;
 
 //=============================================================================
 // BJ 全局变量（Blizzard.j）
@@ -200,7 +202,16 @@ export function IsSuspendedXPBJ(whichHero: any): boolean {
  */
 export function ModifyHeroSkillPoints(whichHero: any, modifyMethod: number, value: number): boolean {
     if (whichHero == null || whichHero === 0) return false;
-    return jass.ModifyHeroSkillPoints(whichHero, modifyMethod, value);
+    if (modifyMethod === jglobals.bj_MODIFYMETHOD_ADD) {
+        return UnitModifySkillPoints(whichHero, value);
+    }
+    if (modifyMethod === jglobals.bj_MODIFYMETHOD_SUB) {
+        return UnitModifySkillPoints(whichHero, -value);
+    }
+    if (modifyMethod === jglobals.bj_MODIFYMETHOD_SET) {
+        return UnitModifySkillPoints(whichHero, value - GetHeroSkillPoints(whichHero));
+    }
+    return false;
 }
 
 /**

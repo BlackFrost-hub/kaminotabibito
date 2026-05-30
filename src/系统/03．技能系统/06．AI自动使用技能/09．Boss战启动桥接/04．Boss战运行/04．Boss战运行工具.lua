@@ -249,7 +249,7 @@ local YDUserDataClearTable = ____require_result_6.YDUserDataClearTable
 local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 getEnemyThreats = ____require_result_7.getEnemyThreats
 local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.index")
-local Sound3DII_Mp3Play = ____require_result_8.Sound3DII_Mp3Play
+local Sound3DII_Mp3PlayReuse = ____require_result_8.Sound3DII_Mp3PlayReuse
 local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
 local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_9.StarOther_PanCameraToTimedUnitForPlayer
 local ____require_result_10 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
@@ -412,7 +412,7 @@ ____exports["确保Boss战区域视野"] = function(rectHandle)
     end
 end
 ____exports["执行Boss战转场动画"] = function()
-    Sound3DII_Mp3Play("XT\\YX-battle.mp3")
+    Sound3DII_Mp3PlayReuse("XT\\YX-battle.mp3")
     CinematicFilterGenericBJ(
         0.5,
         BLEND_MODE_BLEND,

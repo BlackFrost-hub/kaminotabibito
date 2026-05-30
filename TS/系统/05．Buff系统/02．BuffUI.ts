@@ -25,7 +25,7 @@ const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
   FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number; BOTTOMLEFT: number };
 };
 const ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index");
-const getGameUI = ____hwMod.getGameUI as () => number;
+const getGameUI = ____hwMod.getGameUI as (this: void) => number;
 const ____safeUtils = require("系统.00．核心系统.07．联机安全工具");
 const safeTimerStart = ____safeUtils.safeTimerStart as (timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
 const safeDestroyTimer = ____safeUtils.safeDestroyTimer as (timer: any) => void;

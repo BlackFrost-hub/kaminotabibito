@@ -49,7 +49,7 @@ do
 end
 function ____exports.initSound3DII(self)
     setDefaultSoundModel(SoundModel:create())
-    prewarmUiClickSound(nil, DEFAULT_UI_CLICK_SOUND)
+    prewarmUiClickSound(DEFAULT_UI_CLICK_SOUND)
 end
 ____exports.initSound3DII(nil)
 return ____exports

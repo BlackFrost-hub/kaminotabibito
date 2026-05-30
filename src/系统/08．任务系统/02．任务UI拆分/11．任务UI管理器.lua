@@ -344,7 +344,7 @@ function TaskUI.prototype.init(self, playerId)
     return true
 end
 function TaskUI.prototype.runInitBodyInPcall(self)
-    local gameUI = getGameUI(nil)
+    local gameUI = getGameUI()
     if not gameUI then
         return
     end
@@ -440,7 +440,7 @@ function TaskUI.prototype.resetToDefault(self)
     self.expandedQuestId = nil
 end
 function TaskUI.prototype.playLocalClickSound(self)
-    SoundUI_ClickPlay(nil, nil, self.localPlayer)
+    SoundUI_ClickPlay(nil, self.localPlayer)
 end
 function TaskUI.prototype.toggleExpandForRow(self, questId)
     self:toggleExpand(questId)

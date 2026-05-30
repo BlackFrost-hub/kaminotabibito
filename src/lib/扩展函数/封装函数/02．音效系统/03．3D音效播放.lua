@@ -21,7 +21,7 @@ ____exports.lastPlayedSound = nil
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
 -- @returns 播放的音效句柄
-function ____exports.Sound3DII_CooPlay(self, path, x, y, z, cutoff, model)
+function ____exports.Sound3DII_CooPlay(path, x, y, z, cutoff, model)
     if model == nil then
         model = getDefaultSoundModel()
     end
@@ -74,12 +74,11 @@ end
 -- @param unit 目标单位
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
-function ____exports.Sound3DII_UnitPlay(self, path, unit, cutoff, model)
+function ____exports.Sound3DII_UnitPlay(path, unit, cutoff, model)
     local x = jass.GetUnitX(unit)
     local y = jass.GetUnitY(unit)
     local z = jass.GetUnitFlyHeight(unit)
     return ____exports.Sound3DII_CooPlay(
-        nil,
         path,
         x,
         y,
@@ -94,12 +93,11 @@ end
 -- @param loc 位置
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
-function ____exports.Sound3DII_LocPlay(self, path, loc, cutoff, model)
+function ____exports.Sound3DII_LocPlay(path, loc, cutoff, model)
     local x = jass.GetLocationX(loc)
     local y = jass.GetLocationY(loc)
     local z = jass.GetLocationZ(loc)
     return ____exports.Sound3DII_CooPlay(
-        nil,
         path,
         x,
         y,

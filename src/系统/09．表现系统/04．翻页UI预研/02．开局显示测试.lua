@@ -347,27 +347,9 @@ local function bindPageHotspotEvents(self, frame)
     if type(frameSetScriptByCode) ~= "function" then
         return
     end
-    frameSetScriptByCode(
-        nil,
-        frame,
-        PAGE_EVENT_MOUSE_ENTER,
-        onPageHotspotEnter,
-        false
-    )
-    frameSetScriptByCode(
-        nil,
-        frame,
-        PAGE_EVENT_MOUSE_LEAVE,
-        onPageHotspotLeave,
-        false
-    )
-    frameSetScriptByCode(
-        nil,
-        frame,
-        PAGE_EVENT_MOUSE_CLICK,
-        onPageHotspotClick,
-        false
-    )
+    frameSetScriptByCode(frame, PAGE_EVENT_MOUSE_ENTER, onPageHotspotEnter, false)
+    frameSetScriptByCode(frame, PAGE_EVENT_MOUSE_LEAVE, onPageHotspotLeave, false)
+    frameSetScriptByCode(frame, PAGE_EVENT_MOUSE_CLICK, onPageHotspotClick, false)
 end
 function ____exports.initPageFlipUiResearchTest(self)
     if pageTestInitDone then

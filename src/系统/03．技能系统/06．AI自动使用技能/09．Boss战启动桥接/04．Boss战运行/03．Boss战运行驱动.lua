@@ -46,6 +46,9 @@ local ____06_FF0EBoss_6218_62A4_536B = require("系统.03．技能系统.06．AI
 local _____5904_7406Boss_6218_62A4_536B_542F_52A8 = ____06_FF0EBoss_6218_62A4_536B["处理Boss战护卫启动"]
 local _____5904_7406Boss_6218_62A4_536BTick = ____06_FF0EBoss_6218_62A4_536B["处理Boss战护卫Tick"]
 local _____5904_7406Boss_6218_62A4_536B_7ED3_675F = ____06_FF0EBoss_6218_62A4_536B["处理Boss战护卫结束"]
+local ____index = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.06．Boss血条弱点韧性.index")
+local _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027 = ____index["启动Boss血条弱点韧性"]
+local _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027 = ____index["结束Boss血条弱点韧性"]
 ____exports["停止Boss战运行驱动"] = function()
     if ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID == 0 then
         return
@@ -68,6 +71,7 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
         return
     end
     context["是否已结束"] = true
+    _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027(context)
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
     _____6E05_7406Boss_6218_8FD0_884C_4E0A_4E0B_6587(context["Boss单位"])
@@ -117,6 +121,7 @@ local function _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
     end
     _____5B8C_6210Boss_6218_542F_52A8(context)
     if not _____6FC0_6D3B_524D_72B6_6001 and context["是否已激活"] then
+        _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
         _____542F_52A8_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
         _____5904_7406Boss_6218_62A4_536B_542F_52A8(context)
     end
@@ -218,6 +223,9 @@ ____exports["启动Boss战运行"] = function(bossUnit)
         _____6267_884CBoss_6218_8F6C_573A_52A8_753B()
     else
         _____5B8C_6210Boss_6218_542F_52A8(context)
+        if context["是否已激活"] then
+            _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
+        end
     end
     debugLogForce(
         ____Boss_6218_8FD0_884C_6A21_5757_540D,

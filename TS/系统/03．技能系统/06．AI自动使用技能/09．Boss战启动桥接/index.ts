@@ -4,3 +4,4 @@ export * from "./02．Boss战启动STES桥接";
 export * from "./03．战斗启动属性";
 export * from "./04．Boss战运行";
 export * from "./05．Boss死亡结算/index";
+export * from "./06．Boss血条弱点韧性/index";

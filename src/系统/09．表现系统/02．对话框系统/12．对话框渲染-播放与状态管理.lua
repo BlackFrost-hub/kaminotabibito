@@ -309,7 +309,6 @@ function ____exports.playEntry(self, state)
     ____exports.showDialogFrames(nil, state, true)
     if isFirstOpen then
         Sound3DII_Mp3PlayReuse(
-            nil,
             DIALOG_OPEN_SOUND,
             dzPlayer(nil, state.playerId)
         )

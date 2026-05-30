@@ -25,7 +25,7 @@ local syncDotBuff = ____00_FF0EBuff_7CFB_7EDF.syncDotBuff
 -- 
 -- 设计说明（给后续维护或 AI 参考）：
 -- - 每种 DOT 通过 registerDotType(config) 注册，配置里包含：解析装备 Buff、取“最强”参数、算每秒伤害、伤害类型、特效模型等。
--- - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，经 `registerDamageCallback` 第 6 参传入；装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
+-- - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
 -- - **非普攻伤害**（技能等）：仍用「同解析 time → 刷新」或「新乘积更大 → 换条」；DOT 秒跳自伤靠 ignoredTargetByType 整轮跳过，batch 仅挡无普攻位的回调。
 -- - **剩余秒数**：由 `05．Buff系统.00．Buff系统` 的 Buff 池以 `BUFF_POOL_TICK`（0.1s）递减；本模块每 tick 末 `syncDotRemainingFromBuffPool` 把池内 remaining/effect 写回 `stateByType`。**单位被 `PauseUnit` 暂停时** Buff 池不扣秒、DOT 秒跳不结算（`IsUnitPausedBJ`，与 `06．DOT执行器` 一致）。
 -- - **dotTimer**：每 1 秒按条目的 amount 造成伤害并播特效；到期以池为准移除条目；effectRecycleTimer 统一回收特效。
@@ -40,12 +40,14 @@ local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local damageEventModule = require("系统.04．伤害系统.01．伤害事件")
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
 local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
-local ____leakCore_LeakWatcher_1 = leakCore.LeakWatcher
-if ____leakCore_LeakWatcher_1 == nil then
-    ____leakCore_LeakWatcher_1 = leakCore
+local ____leakCore_LeakWatcher_2 = leakCore.LeakWatcher
+if ____leakCore_LeakWatcher_2 == nil then
+    ____leakCore_LeakWatcher_2 = leakCore
 end
-local LeakWatcher = ____leakCore_LeakWatcher_1
+local LeakWatcher = ____leakCore_LeakWatcher_2
 local dotTypes = {}
 --- 注册一种 DOT，后续伤害回调会按配置解析装备并施加/覆盖
 function ____exports.registerDotType(self, config)
@@ -120,14 +122,14 @@ end
 function ____exports.notifyDotTickBatchDamageDisplayed(self)
     dotExecutor:notifyDotTickBatchDamageDisplayed()
 end
-local function onDamage(self, target, damage, damageType, fromDotTickBatch, source, isNormalAttackHit)
+local function onAppliedFinalDamage(target, attacker, applied, snapshot)
     dotApplyStrategy:onDamage(
         target,
-        damage,
-        damageType,
-        fromDotTickBatch,
-        source,
-        isNormalAttackHit
+        applied,
+        0,
+        false,
+        attacker,
+        snapshot ~= nil and snapshot.isNormalAttack == true
     )
 end
 local getBestDotFromUnit = dotBaseUtils.getBestDotFromUnit
@@ -184,9 +186,6 @@ function ____exports.dealBurnDamage(self, source, target, amount)
 end
 if not registered then
     registered = true
-    local registerCb = damageEventModule.registerDamageCallback
-    if registerCb ~= nil then
-        registerCb(nil, onDamage)
-    end
+    registerAppliedFinalDamageListener(onAppliedFinalDamage)
 end
 return ____exports

@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /**
  * UI音效
  * 按钮点击、键盘等UI音效
@@ -39,6 +41,14 @@ function getOrCreateReuseSound(path: string): any {
  * 地图加载时预创建默认 UI 点击句柄
  */
 export function prewarmUiClickSound(path: string = DEFAULT_UI_CLICK_SOUND): void {
+  prewarmReusableSound(path);
+}
+
+/**
+ * 预创建复用音效句柄，避免 MP3/WAV 首次触发时冷启动吞首声。
+ */
+export function prewarmReusableSound(path: string): void {
+  if (path === "") return;
   getOrCreateReuseSound(path);
 }
 

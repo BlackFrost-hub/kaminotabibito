@@ -38,9 +38,9 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
 
   AdjustPlayerStateBJ(delta, p, (jass as any).PLAYER_STATE_RESOURCE_GOLD);
 
-  const { Sound3DII_Mp3Play, Sound3DII_UnitPlay } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-    Sound3DII_Mp3Play: (path: string, player?: any) => any;
-    Sound3DII_UnitPlay: (path: string, unit: any, cutoff: number, model?: any) => any;
+  const { Sound3DII_Mp3PlayReuse, Sound3DII_UnitPlay } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+    Sound3DII_Mp3PlayReuse: (this: void, path: string, player?: any) => void;
+    Sound3DII_UnitPlay: (this: void, path: string, unit: any, cutoff: number, model?: any) => any;
   };
   const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
     CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
@@ -59,7 +59,7 @@ export function AddGoldWithFeedback(params: { delta: number; player?: any; unit?
     Sound3DII_UnitPlay(SOUND_GOLD, unit, 1500);
   } else {
     // 玩家专属 UI 音效
-    Sound3DII_Mp3Play(SOUND_GOLD, p);
+    Sound3DII_Mp3PlayReuse(SOUND_GOLD, p);
   }
 }
 

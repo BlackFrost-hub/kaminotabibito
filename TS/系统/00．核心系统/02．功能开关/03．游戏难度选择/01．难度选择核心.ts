@@ -13,6 +13,9 @@ const jglobals = require("jass.globals") as any;
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
 };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -63,7 +66,6 @@ const 难度使者创建Y = 6.1;
 const 难度使者朝向 = 0;
 const 队伍复活表名 = "团队复活";
 const 队伍复活次数键 = "次数";
-const 获取所有玩家 = (globalThis as any).GetPlayersAll as (() => any) | undefined;
 
 const AddPlayerTechResearched = jass.AddPlayerTechResearched as (whichPlayer: any, techid: number, levels: number) => void;
 const CreateTrigger = jass.CreateTrigger as () => any;
@@ -103,8 +105,7 @@ function 获取游戏难度配置映射(this: void, 按钮: any): 游戏难度�
 }
 
 function 获取所有玩家句柄(this: void): any {
-  if (typeof 获取所有玩家 === "function") return 获取所有玩家();
-  return undefined;
+  return GetPlayersAll();
 }
 
 function 解析单位类型ID(this: void, 单位名: string | undefined): number {

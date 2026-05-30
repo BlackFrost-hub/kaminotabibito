@@ -4,6 +4,8 @@ local ____12_FF0E_6570_5B66_51FD_6570 = require("lib.扩展函数.BJ函数.12．
 local RMaxBJ = ____12_FF0E_6570_5B66_51FD_6570.RMaxBJ
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local UnitModifySkillPoints = jass.UnitModifySkillPoints
+local GetHeroSkillPoints = jass.GetHeroSkillPoints
 local ____jglobals_bj_HEROSTAT_STR_0 = jglobals.bj_HEROSTAT_STR
 if ____jglobals_bj_HEROSTAT_STR_0 == nil then
     ____jglobals_bj_HEROSTAT_STR_0 = 0
@@ -216,7 +218,19 @@ function ____exports.ModifyHeroSkillPoints(whichHero, modifyMethod, value)
     if whichHero == nil or whichHero == 0 then
         return false
     end
-    return jass.ModifyHeroSkillPoints(whichHero, modifyMethod, value)
+    if modifyMethod == jglobals.bj_MODIFYMETHOD_ADD then
+        return UnitModifySkillPoints(whichHero, value)
+    end
+    if modifyMethod == jglobals.bj_MODIFYMETHOD_SUB then
+        return UnitModifySkillPoints(whichHero, -value)
+    end
+    if modifyMethod == jglobals.bj_MODIFYMETHOD_SET then
+        return UnitModifySkillPoints(
+            whichHero,
+            value - GetHeroSkillPoints(whichHero)
+        )
+    end
+    return false
 end
 --- 判断单位是否拥有指定buff
 -- 对应BJ: UnitHasBuffBJ (1.27 没有 UnitHasBuff，用 GetUnitAbilityLevel 实现)

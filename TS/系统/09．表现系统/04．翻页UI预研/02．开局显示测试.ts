@@ -1,7 +1,7 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const Frame工具 = require("lib.扩展函数.封装函数.04．硬件输入.index") as {
-  frameSetScriptByCode: (frame: number, eventId: number, action: () => void, sync: boolean, playerId?: number) => void;
+  frameSetScriptByCode: (this: void, frame: number, eventId: number, action: any, sync: boolean, playerId?: number) => void;
 };
 
 import {

@@ -31,6 +31,9 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { ModifyHeroSkillPoints } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   ModifyHeroSkillPoints: (this: void, whichHero: any, modifyMethod: number, value: number) => boolean;
 };
+const { RectContainsUnit: RectContainsUnitBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
+  RectContainsUnit: (this: void, whichRect: any, whichUnit: any) => boolean;
+};
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
@@ -52,7 +55,6 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.03．调试
 
 import 英雄选择配置表, { 英雄选择配置 } from "./00．英雄选择配置表";
 
-const RectContainsUnit = jass.RectContainsUnit as (whichRect: any, whichUnit: any) => boolean;
 const GroupAddUnit = jass.GroupAddUnit as (whichGroup: any, whichUnit: any) => void;
 const GetRectCenterX = jass.GetRectCenterX as (whichRect: any) => number;
 const GetRectCenterY = jass.GetRectCenterY as (whichRect: any) => number;
@@ -233,7 +235,7 @@ function 获取配置矩形(this: void, 全局名: string): any {
 function 是英雄选择区域内单位(this: void, 单位: any): boolean {
   const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域全局名);
   if (选择区域 == null || 选择区域 === 0) return false;
-  return RectContainsUnit(选择区域, 单位) === true;
+  return RectContainsUnitBJ(选择区域, 单位) === true;
 }
 
 function 玩家是否已选择英雄(this: void, 玩家: any): boolean {

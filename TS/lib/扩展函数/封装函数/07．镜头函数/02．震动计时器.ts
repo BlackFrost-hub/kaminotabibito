@@ -5,8 +5,8 @@
 
 const jass = require("jass.common") as any;
 const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
+  safeDestroyTimer: (this: void, timer: any) => void;
 };
 import { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } from "./01．镜头震动";
 
@@ -28,14 +28,10 @@ function onCameraShakeTimerExpire(this: void): void {
 }
 
 export function CameraShakeForPlayer(
-  whichPlayerOrSelf: any,
-  magnitudeOrPlayer: any,
-  durationOrMagnitude: any,
-  maybeDuration?: number
+  whichPlayer: any,
+  magnitude: number,
+  duration: number
 ): void {
-  const whichPlayer = maybeDuration !== undefined ? magnitudeOrPlayer : whichPlayerOrSelf;
-  const magnitude = maybeDuration !== undefined ? durationOrMagnitude : magnitudeOrPlayer;
-  const duration = maybeDuration !== undefined ? maybeDuration : durationOrMagnitude;
   CameraSetEQNoiseForPlayer(whichPlayer, magnitude);
   const playerId = (jass as any).GetPlayerId(whichPlayer);
   const existing = cameraTimers.get(playerId);

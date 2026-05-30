@@ -21,7 +21,7 @@ function playGoldBurstStep(ctx, p0)
         return
     end
     AdjustPlayerStateBJ(nil, 1000, p0, jass.PLAYER_STATE_RESOURCE_GOLD)
-    Sound3DII_Mp3PlayReuse(nil, SOUND_GOLD, p0)
+    Sound3DII_Mp3PlayReuse(SOUND_GOLD, p0)
     spawnGoldFloatPlus1000(nil)
     ctx.count = ctx.count + 1
     if ctx.count >= ctx.times then

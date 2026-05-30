@@ -38,7 +38,7 @@ function ____exports.AddGoldWithFeedback(self, params)
     end
     ____exports.AdjustPlayerStateBJ(nil, delta, p, jass.PLAYER_STATE_RESOURCE_GOLD)
     local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.index")
-    local Sound3DII_Mp3Play = ____require_result_3.Sound3DII_Mp3Play
+    local Sound3DII_Mp3PlayReuse = ____require_result_3.Sound3DII_Mp3PlayReuse
     local Sound3DII_UnitPlay = ____require_result_3.Sound3DII_UnitPlay
     local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
     local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
@@ -47,9 +47,9 @@ function ____exports.AddGoldWithFeedback(self, params)
         if type(CreateFloatTextOnUnit) == "function" then
             CreateFloatTextOnUnit(unit, txt, {red = 255, green = 215, blue = 0, alpha = 0})
         end
-        Sound3DII_UnitPlay(nil, SOUND_GOLD, unit, 1500)
+        Sound3DII_UnitPlay(SOUND_GOLD, unit, 1500)
     else
-        Sound3DII_Mp3Play(nil, SOUND_GOLD, p)
+        Sound3DII_Mp3PlayReuse(SOUND_GOLD, p)
     end
 end
 --- 向指定玩家显示屏幕消息（仅该玩家可见）

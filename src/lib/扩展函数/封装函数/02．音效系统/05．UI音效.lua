@@ -1,18 +1,11 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local getOrCreateReuseSound, jass, soundReuseByPath
 local ____02_FF0E_97F3_6548_6C60 = require("lib.扩展函数.封装函数.02．音效系统.02．音效池")
 local getDefaultSoundModel = ____02_FF0E_97F3_6548_6C60.getDefaultSoundModel
 local ____03_FF0E3D_97F3_6548_64AD_653E = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local lastPlayedSound = ____03_FF0E3D_97F3_6548_64AD_653E.lastPlayedSound
---- UI音效
--- 按钮点击、键盘等UI音效
-local jass = require("jass.common")
-____exports.DEFAULT_UI_CLICK_SOUND = "Sound\\Interface\\BigButtonClick.wav"
---- 每 path 一个常驻句柄
-local soundReuseByPath = {}
---- 该 path 是否已成功 StartSound 过
-local soundReuseHadStartedByPath = {}
-local function getOrCreateReuseSound(self, path)
+function getOrCreateReuseSound(path)
     local cache = soundReuseByPath
     local hit = cache[path]
     if hit then
@@ -33,15 +26,27 @@ local function getOrCreateReuseSound(self, path)
     end
     return s
 end
+--- 预创建复用音效句柄，避免 MP3/WAV 首次触发时冷启动吞首声。
+function ____exports.prewarmReusableSound(path)
+    if path == "" then
+        return
+    end
+    getOrCreateReuseSound(path)
+end
+jass = require("jass.common")
+____exports.DEFAULT_UI_CLICK_SOUND = "Sound\\Interface\\BigButtonClick.wav"
+soundReuseByPath = {}
+--- 该 path 是否已成功 StartSound 过
+local soundReuseHadStartedByPath = {}
 --- 地图加载时预创建默认 UI 点击句柄
-function ____exports.prewarmUiClickSound(self, path)
+function ____exports.prewarmUiClickSound(path)
     if path == nil then
         path = ____exports.DEFAULT_UI_CLICK_SOUND
     end
-    getOrCreateReuseSound(nil, path)
+    ____exports.prewarmReusableSound(path)
 end
 --- 同一路径重复播放（UI 点击、1 秒内多连同一 wav）
-function ____exports.Sound3DII_Mp3PlayReuse(self, path, player, model)
+function ____exports.Sound3DII_Mp3PlayReuse(path, player, model)
     if model == nil then
         model = getDefaultSoundModel()
     end
@@ -52,7 +57,7 @@ function ____exports.Sound3DII_Mp3PlayReuse(self, path, player, model)
         ____temp_0 = player
     end
     local p = ____temp_0
-    local s = getOrCreateReuseSound(nil, path)
+    local s = getOrCreateReuseSound(path)
     if not s then
         return
     end
@@ -72,7 +77,7 @@ function ____exports.Sound3DII_Mp3PlayReuse(self, path, player, model)
     lastPlayedSound = s
 end
 --- UI 键盘/点击的统一音效入口
-function ____exports.SoundUI_ClickPlay(self, soundPath, whichPlayer)
+function ____exports.SoundUI_ClickPlay(soundPath, whichPlayer)
     if soundPath == nil then
         soundPath = ____exports.DEFAULT_UI_CLICK_SOUND
     end
@@ -83,6 +88,6 @@ function ____exports.SoundUI_ClickPlay(self, soundPath, whichPlayer)
         ____temp_1 = whichPlayer
     end
     local p = ____temp_1
-    ____exports.Sound3DII_Mp3PlayReuse(nil, soundPath, p)
+    ____exports.Sound3DII_Mp3PlayReuse(soundPath, p)
 end
 return ____exports

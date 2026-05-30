@@ -19,19 +19,20 @@ local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_1.GetPlayersAll
 local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local ModifyHeroSkillPoints = ____require_result_2.ModifyHeroSkillPoints
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_3["创建单位并登记排泄安全"]
-local ____require_result_4 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_4["按名字反查总单位ID"]
-local ____require_result_5 = require("系统.03．技能系统.08．技能数据表.01．技能名反查")
-local _____6309_540D_5B57_53CD_67E5_6280_80FDID = ____require_result_5["按名字反查技能ID"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
-local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedForPlayer = ____require_result_7.StarOther_PanCameraToTimedForPlayer
-local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLog = ____require_result_8.debugLog
-local RectContainsUnit = jass.RectContainsUnit
+local ____require_result_3 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+local RectContainsUnitBJ = ____require_result_3.RectContainsUnit
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_4["创建单位并登记排泄安全"]
+local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_5["按名字反查总单位ID"]
+local ____require_result_6 = require("系统.03．技能系统.08．技能数据表.01．技能名反查")
+local _____6309_540D_5B57_53CD_67E5_6280_80FDID = ____require_result_6["按名字反查技能ID"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_8.StarOther_PanCameraToTimedForPlayer
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLog = ____require_result_9.debugLog
 local GroupAddUnit = jass.GroupAddUnit
 local GetRectCenterX = jass.GetRectCenterX
 local GetRectCenterY = jass.GetRectCenterY
@@ -208,32 +209,32 @@ local function _____662F_82F1_96C4_9009_62E9_533A_57DF_5185_5355_4F4D(_____5355_
     if _____9009_62E9_533A_57DF == nil or _____9009_62E9_533A_57DF == 0 then
         return false
     end
-    return RectContainsUnit(_____9009_62E9_533A_57DF, _____5355_4F4D) == true
+    return RectContainsUnitBJ(_____9009_62E9_533A_57DF, _____5355_4F4D) == true
 end
 local function _____73A9_5BB6_662F_5426_5DF2_9009_62E9_82F1_96C4(_____73A9_5BB6)
     return ydSafe.YDUserDataGetSafe("player", _____73A9_5BB6, _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄已选择标记键"], "boolean") == true
 end
 local function _____89E3_6790_6280_80FD_7C7B_578BID(_____6280_80FD_540D)
-    local ____temp_9
+    local ____temp_10
     if _____6280_80FD_540D == nil then
-        ____temp_9 = nil
+        ____temp_10 = nil
     else
-        ____temp_9 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
+        ____temp_10 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
     end
-    local _____539F_59CBID = ____temp_9
+    local _____539F_59CBID = ____temp_10
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end
     return stringToFourCCSafe(_____9ED8_8BA4_82F1_96C4_7981_7528_6280_80FD_539F_59CBID)
 end
 local function _____89E3_6790_5355_4F4D_7C7B_578BID(_____5355_4F4D_540D)
-    local ____temp_10
+    local ____temp_11
     if _____5355_4F4D_540D == nil then
-        ____temp_10 = nil
+        ____temp_11 = nil
     else
-        ____temp_10 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
+        ____temp_11 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
     end
-    local _____539F_59CBID = ____temp_10
+    local _____539F_59CBID = ____temp_11
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end

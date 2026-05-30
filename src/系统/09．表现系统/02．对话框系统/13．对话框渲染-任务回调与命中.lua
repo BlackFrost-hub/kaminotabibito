@@ -475,55 +475,13 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
             return
         end
     until true
-    frameSetScriptByCode(
-        nil,
-        state.frames[7],
-        1,
-        acceptCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[9],
-        1,
-        rejectCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[5],
-        1,
-        panelCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[4],
-        1,
-        panelCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[3],
-        1,
-        panelCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[12],
-        1,
-        panelCallback,
-        true
-    )
-    frameSetScriptByCode(
-        nil,
-        state.frames[13],
-        1,
-        panelCallback,
-        true
-    )
+    frameSetScriptByCode(state.frames[7], 1, acceptCallback, true)
+    frameSetScriptByCode(state.frames[9], 1, rejectCallback, true)
+    frameSetScriptByCode(state.frames[5], 1, panelCallback, true)
+    frameSetScriptByCode(state.frames[4], 1, panelCallback, true)
+    frameSetScriptByCode(state.frames[3], 1, panelCallback, true)
+    frameSetScriptByCode(state.frames[12], 1, panelCallback, true)
+    frameSetScriptByCode(state.frames[13], 1, panelCallback, true)
     state.questSyncHandlersBound = true
 end
 setDialogPanelHitBinder(nil, ____exports.bindDialogPanelHitFrame)

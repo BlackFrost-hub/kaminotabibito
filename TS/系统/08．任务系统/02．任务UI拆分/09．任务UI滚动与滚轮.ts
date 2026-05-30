@@ -45,7 +45,7 @@ export interface TaskUIScrollContext {
   FramePoint: any;
   setFramePointRelative: any;
   taskListWheelRegistered: boolean;
-  getMouseFocus?: () => number;
+  getMouseFocus?: (this: void) => number;
   getWheelDelta?: () => number;
   /** `this: void`：避免 TSTL 编成 `ctx:registerMouseWheel` 把上下文表塞进 `sync` 位 */
   registerMouseWheel(this: void, sync: boolean, cb: () => void, playerId?: number): unknown;

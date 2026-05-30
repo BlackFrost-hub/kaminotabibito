@@ -8,7 +8,7 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
 const { frameSetScriptByCode } = require("lib.扩展函数.封装函数.04．硬件输入.index") as {
-  frameSetScriptByCode: (frame: number, eventId: number, action: () => void, sync: boolean, playerId?: number) => void;
+  frameSetScriptByCode: (this: void, frame: number, eventId: number, action: any, sync: boolean, playerId?: number) => void;
 };
 
 const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量定义") as {

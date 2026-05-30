@@ -1,5 +1,5 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
-import { getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
+import { clearIgnoredTarget, getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
 import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
 
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
@@ -95,6 +95,9 @@ export function createDotExecutor(deps: {
       cfg.damageType,
       jass.WEAPON_TYPE_WHOKNOWS
     );
+    for (let ci = 0; ci < dotTypes.length; ci++) {
+      clearIgnoredTarget(dotTypes[ci].id, dh);
+    }
   }
 
   // ========== 虚拟分区：每秒 tick 执行 ==========

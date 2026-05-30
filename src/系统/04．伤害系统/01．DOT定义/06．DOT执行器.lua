@@ -3,6 +3,7 @@ local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____04_FF0EDOT_5DE5_5177 = require("系统.04．伤害系统.01．DOT定义.04．DOT工具")
+local clearIgnoredTarget = ____04_FF0EDOT_5DE5_5177.clearIgnoredTarget
 local getDotState = ____04_FF0EDOT_5DE5_5177.getDotState
 local setIgnoredTarget = ____04_FF0EDOT_5DE5_5177.setIgnoredTarget
 local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
@@ -87,6 +88,13 @@ function ____exports.createDotExecutor(self, deps)
             cfg.damageType,
             jass.WEAPON_TYPE_WHOKNOWS
         )
+        do
+            local ci = 0
+            while ci < #dotTypes do
+                clearIgnoredTarget(nil, dotTypes[ci + 1].id, dh)
+                ci = ci + 1
+            end
+        end
     end
     local function dotTickRun(self)
         do

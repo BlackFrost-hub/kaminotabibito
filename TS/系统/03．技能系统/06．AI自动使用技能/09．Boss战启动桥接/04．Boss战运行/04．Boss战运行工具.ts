@@ -77,8 +77,8 @@ const { YDUserDataClearTable } = require("lib.扩展函数.YDWE函数.01．YDUse
 const { getEnemyThreats } = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储") as {
   getEnemyThreats: (this: void, enemy: any) => Array<{ targetHid: number; targetRef: any; threat: number }>;
 };
-const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-  Sound3DII_Mp3Play: (this: void, path: string, player?: any) => any;
+const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_Mp3PlayReuse: (this: void, path: string, player?: any) => void;
 };
 const { StarOther_PanCameraToTimedUnitForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数") as {
   StarOther_PanCameraToTimedUnitForPlayer: (this: void, whichPlayer: any, unit: any, duration: number) => void;
@@ -365,7 +365,7 @@ export function 确保Boss战区域视野(this: void, rectHandle: any): void {
 }
 
 export function 执行Boss战转场动画(this: void): void {
-  Sound3DII_Mp3Play("XT\\YX-battle.mp3");
+  Sound3DII_Mp3PlayReuse("XT\\YX-battle.mp3");
   CinematicFilterGenericBJ(0.5, BLEND_MODE_BLEND, "ReplaceableTextures\\CameraMasks\\Black_mask.blp", 15, 15, 15, 15, 0, 0, 0, 0);
   TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, "", null, "", bj_TIMETYPE_SET, 2.0, true);
 }

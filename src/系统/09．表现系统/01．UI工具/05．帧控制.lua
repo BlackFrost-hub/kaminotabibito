@@ -25,6 +25,6 @@ function ____exports.showFrame(self, frame)
     return true
 end
 function ____exports.getGameUIFrame(self)
-    return getGameUI(nil)
+    return getGameUI()
 end
 return ____exports

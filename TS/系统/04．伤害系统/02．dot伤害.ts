@@ -3,7 +3,7 @@
  *
  * 设计说明（给后续维护或 AI 参考）：
  * - 每种 DOT 通过 registerDotType(config) 注册，配置里包含：解析装备 Buff、取“最强”参数、算每秒伤害、伤害类型、特效模型等。
- * - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，经 `registerDamageCallback` 第 6 参传入；装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
+ * - **普攻命中**：`01．伤害事件.ts` 在同步阶段快照 `isNormalAttack`，装备普攻类 DOT（`Buff:attack:`）由 `tryApplyHeroAttackGearDots` 等路径处理。视为玩家主动叠 debuff；只要装备仍能提供本类 `best`，则**有条必刷新满额 time**（与乘积、字段漂移无关）。无条则新建。
  * - **非普攻伤害**（技能等）：仍用「同解析 time → 刷新」或「新乘积更大 → 换条」；DOT 秒跳自伤靠 ignoredTargetByType 整轮跳过，batch 仅挡无普攻位的回调。
  * - **剩余秒数**：由 `05．Buff系统.00．Buff系统` 的 Buff 池以 `BUFF_POOL_TICK`（0.1s）递减；本模块每 tick 末 `syncDotRemainingFromBuffPool` 把池内 remaining/effect 写回 `stateByType`。**单位被 `PauseUnit` 暂停时** Buff 池不扣秒、DOT 秒跳不结算（`IsUnitPausedBJ`，与 `06．DOT执行器` 一致）。
  * - **dotTimer**：每 1 秒按条目的 amount 造成伤害并播特效；到期以池为准移除条目；effectRecycleTimer 统一回收特效。
@@ -43,10 +43,9 @@ const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工
 };
 const damageEventModule = require("系统.04．伤害系统.01．伤害事件") as {
   markNextPendingDamageAsDotTickBatch: () => void;
-  registerDamageCallback: (
-    cb: (unit: any, d: number, t: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void,
-    interval?: number
-  ) => void;
+};
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
@@ -158,9 +157,9 @@ export function notifyDotTickBatchDamageDisplayed(): void {
   dotExecutor.notifyDotTickBatchDamageDisplayed();
 }
 
-// ========== 虚拟分区：伤害回调入口（委托策略模块） ==========
-function onDamage(target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttackHit?: boolean): void {
-  dotApplyStrategy.onDamage(target, damage, damageType, fromDotTickBatch, source, isNormalAttackHit);
+// ========== 虚拟分区：最终伤害回调入口（委托策略模块） ==========
+function onAppliedFinalDamage(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
+  dotApplyStrategy.onDamage(target, applied, 0, false, attacker, snapshot != null && snapshot.isNormalAttack === true);
 }
 
 // ========== 虚拟分区：基础工具桥接（供 DOT 类型定义 / 策略） ==========
@@ -225,9 +224,5 @@ export function dealBurnDamage(source: any, target: any, amount: number): void {
 // ========== 虚拟分区：伤害回调注册 ==========
 if (!registered) {
   registered = true;
-  // 先取出再调用，避免 TSTL 生成 damageEventModule:registerDamageCallback（模块表当 self 传入）
-  const registerCb = damageEventModule.registerDamageCallback;
-  if (registerCb != null) {
-    registerCb(onDamage);
-  }
+  registerAppliedFinalDamageListener(onAppliedFinalDamage);
 }

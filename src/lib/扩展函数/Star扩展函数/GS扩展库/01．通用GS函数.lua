@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+---
+-- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
@@ -11,10 +13,10 @@ end
 local BJ_RADTODEG = ____jglobals_bj_RADTODEG_1
 local ____require_result_2 = require("lib.扩展函数.BJ函数.06．任务消息")
 local QuestMessageBJ = ____require_result_2.QuestMessageBJ
-local function abs(self, value)
-    return RAbsBJ(nil, value)
+local function abs(value)
+    return RAbsBJ(value)
 end
-function ____exports.SoHeroHatm(self, c)
+function ____exports.SoHeroHatm(c)
     if c == nil or c == 0 then
         return 0
     end
@@ -34,7 +36,7 @@ function ____exports.SoHeroHatm(self, c)
     end
     return n
 end
-function ____exports.GS_news(self, P, S)
+function ____exports.GS_news(P, S)
     if P == nil or P == 0 or S == nil then
         return
     end
@@ -48,10 +50,10 @@ function ____exports.GS_news(self, P, S)
     if ____jglobals_bj_QUESTMESSAGE_UPDATED_3 == nil then
         ____jglobals_bj_QUESTMESSAGE_UPDATED_3 = 1
     end
-    ____QuestMessageBJ_4(nil, F, ____jglobals_bj_QUESTMESSAGE_UPDATED_3, S)
+    ____QuestMessageBJ_4(F, ____jglobals_bj_QUESTMESSAGE_UPDATED_3, S)
     jass.DestroyForce(F)
 end
-function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
+function ____exports.GS_DisplayTimedTextToForcetakes(ply, r, str)
     if ply == nil or ply == 0 or str == nil then
         return
     end
@@ -63,15 +65,7 @@ function ____exports.GS_DisplayTimedTextToForcetakes(self, ply, r, str)
         str
     )
 end
-function ____exports.GS_UnitSector(self, u1OrU2, u2OrR, rMaybe)
-    local u1 = u1OrU2
-    local u2 = u2OrR
-    local r = rMaybe
-    if r == nil and type(u2OrR) == "number" then
-        u1 = self
-        u2 = u1OrU2
-        r = u2OrR
-    end
+function ____exports.GS_UnitSector(u1, u2, r)
     if r == nil or r == false or r == "" then
         r = 0
     end
@@ -82,27 +76,15 @@ function ____exports.GS_UnitSector(self, u1OrU2, u2OrR, rMaybe)
     local dy = (jass.GetUnitY(u1) or 0) - (jass.GetUnitY(u2) or 0)
     local dx = (jass.GetUnitX(u1) or 0) - (jass.GetUnitX(u2) or 0)
     local angle2 = BJ_RADTODEG * jass.Atan2(dy, dx)
-    return abs(
-        nil,
-        abs(nil, angle1 - angle2 - 180) - 180
-    ) > r
+    return abs(abs(angle1 - angle2 - 180) - 180) > r
 end
-function ____exports.GS_Sector(self, angle1Or2, angle2Maybe)
-    local angle1 = angle1Or2
-    local angle2 = angle2Maybe
-    if angle2 == nil and type(self) == "number" and type(angle1Or2) == "number" then
-        angle1 = self
-        angle2 = angle1Or2
-    end
+function ____exports.GS_Sector(angle1, angle2)
     if angle1 == nil or angle1 == false or angle1 == "" then
         angle1 = 0
     end
     if angle2 == nil or angle2 == false or angle2 == "" then
         angle2 = 0
     end
-    return abs(
-        nil,
-        abs(nil, angle1 - angle2 - 180) - 180
-    )
+    return abs(abs(angle1 - angle2 - 180) - 180)
 end
 return ____exports

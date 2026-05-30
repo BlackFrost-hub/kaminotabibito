@@ -2,7 +2,7 @@
 local ____exports = {}
 --- 镜头震动函数
 local jass = require("jass.common")
-function ____exports.CameraSetEQNoiseForPlayer(self, whichPlayer, magnitude)
+function ____exports.CameraSetEQNoiseForPlayer(whichPlayer, magnitude)
     local richter = magnitude
     if richter > 5 then
         richter = 5
@@ -17,7 +17,7 @@ function ____exports.CameraSetEQNoiseForPlayer(self, whichPlayer, magnitude)
         jass.CameraSetSourceNoiseEx(magnitude * 2, magnitude * pow10richter, true)
     end
 end
-function ____exports.CameraClearNoiseForPlayer(self, whichPlayer)
+function ____exports.CameraClearNoiseForPlayer(whichPlayer)
     local localPlayer = jass.GetLocalPlayer()
     if localPlayer == whichPlayer then
         jass.CameraSetSourceNoise(0, 0)

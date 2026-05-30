@@ -48,6 +48,10 @@ import {
   处理Boss战护卫Tick,
   处理Boss战护卫结束,
 } from "./06．Boss战护卫";
+import {
+  启动Boss血条弱点韧性,
+  结束Boss血条弱点韧性,
+} from "../06．Boss血条弱点韧性/index";
 
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, forceHandle: any, messageType: number, message: string) => void;
@@ -69,6 +73,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   if (context.是否已结束) return;
 
   context.是否已结束 = true;
+  结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);
   清理Boss战运行上下文(context.Boss单位);
@@ -106,6 +111,7 @@ QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场�
 
   完成Boss战启动(context);
   if (!激活前状态 && context.是否已激活) {
+    启动Boss血条弱点韧性(context);
     启动赫萝昼夜被动(context.Boss单位);
     处理Boss战护卫启动(context);
   }
@@ -193,6 +199,9 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
     执行Boss战转场动画();
   } else {
     完成Boss战启动(context);
+    if (context.是否已激活) {
+      启动Boss血条弱点韧性(context);
+    }
   }
 
   debugLogForce(Boss战运行模块名, "启动Boss战运行", "boss=", context.Boss句柄ID, "rect=", context.地点句柄ID);

@@ -78,7 +78,7 @@ local function giveGoldToPlayer(unit, player, baseGold, isShared)
     end
     local finalGold = params.finalGold or baseGold
     AdjustPlayerStateBJ(nil, finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD)
-    Sound3DII_Mp3PlayReuse(nil, SOUND_GOLD, player)
+    Sound3DII_Mp3PlayReuse(SOUND_GOLD, player)
     local text = "+" .. tostring(finalGold)
     if type(CreateFloatTextOnUnit) == "function" then
         CreateFloatTextOnUnit(unit, text, {

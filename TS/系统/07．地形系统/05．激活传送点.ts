@@ -16,8 +16,8 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeDestroyTimer: (timer: any) => void;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
-const { Sound3DII_Mp3Play } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-  Sound3DII_Mp3Play: (path: string, player?: any) => void;
+const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_Mp3PlayReuse: (this: void, path: string, player?: any) => void;
 };
 const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
@@ -221,7 +221,7 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
   const localPlayer = (jass as any).GetLocalPlayer();
   for (let i = 0; i < 4; i++) {
     if (localPlayer === (jass as any).Player(i)) {
-      Sound3DII_Mp3Play(ACTIVATION_SOUND);
+      Sound3DII_Mp3PlayReuse(ACTIVATION_SOUND);
       break;
     }
   }

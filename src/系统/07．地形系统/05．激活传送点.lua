@@ -5,7 +5,7 @@ local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local neutralPassivePlayer, dbg, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, stringToFourCC, Sound3DII_Mp3Play, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
+local neutralPassivePlayer, dbg, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, stringToFourCC, Sound3DII_Mp3PlayReuse, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
 local ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E = require("系统.07．地形系统.04．激活传送点配置")
 local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E.default
 function neutralPassivePlayer()
@@ -131,7 +131,7 @@ function runActivationEffects(cfg, watchUnit)
         local i = 0
         while i < 4 do
             if localPlayer == jass.Player(i) then
-                Sound3DII_Mp3Play(nil, ACTIVATION_SOUND)
+                Sound3DII_Mp3PlayReuse(ACTIVATION_SOUND)
                 break
             end
             i = i + 1
@@ -222,7 +222,7 @@ local ____require_result_1 = require("系统.00．核心系统.07．联机安全
 local safeTimerStart = ____require_result_1.safeTimerStart
 local safeDestroyTimer = ____require_result_1.safeDestroyTimer
 local ____require_result_2 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_Mp3Play = ____require_result_2.Sound3DII_Mp3Play
+Sound3DII_Mp3PlayReuse = ____require_result_2.Sound3DII_Mp3PlayReuse
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_3.debugLog
 local setDebug = ____require_result_3.setDebug

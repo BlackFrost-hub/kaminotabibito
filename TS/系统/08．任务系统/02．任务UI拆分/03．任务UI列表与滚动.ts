@@ -84,7 +84,7 @@ export function isDescendantOf(japi: any, frame: number, ancestor: number): bool
 
 export function isWheelTargetForTaskList(
   japi: any,
-  getMouseFocus: (() => number) | undefined,
+  getMouseFocus: ((this: void) => number) | undefined,
   listContainer: number | null,
   scrollBarFrame: number | null,
   scrollThumbFrame: number | null,
@@ -102,7 +102,7 @@ export function isWheelTargetForTaskList(
 /** 分页滑块 thumb / 透明命中键（及子帧）：供全局鼠标拖拽判定（不含整条轨道） */
 export function isTaskScrollThumbDragHit(
   japi: any,
-  getMouseFocus: (() => number) | undefined,
+  getMouseFocus: ((this: void) => number) | undefined,
   scrollThumbFrame: number | null,
   scrollThumbHitBtn: number | null
 ): boolean {
@@ -115,7 +115,7 @@ export function isTaskScrollThumbDragHit(
 
 export function isTaskScrollBarTrackHit(
   japi: any,
-  getMouseFocus: (() => number) | undefined,
+  getMouseFocus: ((this: void) => number) | undefined,
   scrollBarFrame: number | null,
   scrollThumbFrame: number | null,
   scrollThumbHitBtn: number | null
