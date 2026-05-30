@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__TypeOf = ____lualib.__TS__TypeOf
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 --- 装备提取 — STES「装备提取事件」子触发：YDLocal5(ScoreMin/Max) → YDLocal7Set(integer, "ItemType", …)
 -- 
@@ -120,6 +121,7 @@ local function collectAllIdsInScoreInterval(lo, hi)
         end
         ::__continue14::
     end
+    __TS__ArraySort(out)
     return out
 end
 local function pickFromScorePool(ids)

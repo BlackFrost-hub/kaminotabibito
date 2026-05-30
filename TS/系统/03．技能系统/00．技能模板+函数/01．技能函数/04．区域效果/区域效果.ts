@@ -114,6 +114,18 @@ function 获取单位集合有序单位数组(单位集合: Record<number, any>)
   return result;
 }
 
+function 获取单位集合有序单位ID数组(单位集合: Record<number, any>): number[] {
+  const 单位ID列表: number[] = [];
+  for (const key in 单位集合) {
+    const 单位ID = parseInt(key, 10);
+    if (!isNaN(单位ID)) {
+      单位ID列表.push(单位ID);
+    }
+  }
+  单位ID列表.sort(数字升序排序);
+  return 单位ID列表;
+}
+
 class 区域效果实现 implements 区域效果实例 {
   readonly 参数: 区域效果参数;
   readonly 实例ID: number;
@@ -226,7 +238,9 @@ class 区域效果实现 implements 区域效果实例 {
       }
     }
 
-    for (const hid in this.当前单位集合) {
+    const 当前单位ID列表 = 获取单位集合有序单位ID数组(this.当前单位集合);
+    for (let i = 0; i < 当前单位ID列表.length; i++) {
+      const hid = 当前单位ID列表[i];
       if (!新集合[hid]) {
         const 上次进入 = this.单位最后进入时间[hid];
         if (上次进入 == null || 当前时间 - 上次进入 >= 防抖毫秒) {
@@ -318,7 +332,9 @@ class 区域效果实现 implements 区域效果实例 {
     }
     const 当前时间 = getServerTime();
     const 防抖毫秒 = this.防抖间隔毫秒值;
-    for (const hid in this.当前单位集合) {
+    const 当前单位ID列表 = 获取单位集合有序单位ID数组(this.当前单位集合);
+    for (let i = 0; i < 当前单位ID列表.length; i++) {
+      const hid = 当前单位ID列表[i];
       const 上次进入 = this.单位最后进入时间[hid];
       if (上次进入 == null || 当前时间 - 上次进入 >= 防抖毫秒) {
         this.参数.on离开?.(this.当前单位集合[hid], this.参数.回调上下文ID);

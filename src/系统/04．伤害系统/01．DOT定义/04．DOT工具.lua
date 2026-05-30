@@ -3,8 +3,8 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ParseInt = ____lualib.__TS__ParseInt
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ArraySort = ____lualib.__TS__ArraySort
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 local jass = require("jass.common")
 --- Lua 下单位作表键时，伤害回调的 target 与选中枚举的 sole 可能不是同一 userdata；统一用 GetHandleId 作键。
@@ -62,6 +62,10 @@ function ____exports.collectHidsInTab(self, tab)
         end
         ::__continue12::
     end
+    __TS__ArraySort(
+        out,
+        function(____, a, b) return a - b end
+    )
     return out
 end
 --- stateByType 槽位应为 DotState 表；若被污染为数字等则剔除，避免 cur.remaining 报错

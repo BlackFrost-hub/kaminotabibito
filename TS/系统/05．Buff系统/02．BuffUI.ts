@@ -66,6 +66,7 @@ let buffUiInitialized = false;
 let refreshTimer: any = null;
 let pendingInitDelayTimer: any = null;
 const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> } | undefined> = {};
+// DzFrame 返回数字 frame id，不是 JASS handle；这里直接用 frame id 做本地 hover 反查 key。
 const hoverSlotIndexByFrameId: Record<number, number | undefined> = {};
 
 function uiCreateFrame(this: void, options: any): number | null {

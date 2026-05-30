@@ -300,6 +300,20 @@ function 取句柄ID(h: any): number {
   return GetHandleId(h) || 0;
 }
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取有序地面路径实例ID列表(this: void): number[] {
+  const ids: number[] = [];
+  for (const 实例ID文本 in 活跃地面路径持续区域实例) {
+    const 实例ID = Number(实例ID文本);
+    if (!isNaN(实例ID)) ids.push(实例ID);
+  }
+  ids.sort(数字升序排序);
+  return ids;
+}
+
 function 生成路径段列表(参数: 地面路径持续区域参数): 路径段信息[] {
   const 结果: 路径段信息[] = [];
   const 路径长度 = 参数.路径长度 > 0 ? 参数.路径长度 : 0;
@@ -343,8 +357,10 @@ function on地面路径整体伤害系统Tick(): void {
   const 当前时间毫秒 = getServerTime();
   let 仍有整体矩形实例 = false;
 
-  for (const 实例ID文本 in 活跃地面路径持续区域实例) {
-    const 实例 = 活跃地面路径持续区域实例[实例ID文本 as unknown as number];
+  const 实例ID列表 = 获取有序地面路径实例ID列表();
+  for (let i = 0; i < 实例ID列表.length; i++) {
+    const 实例ID = 实例ID列表[i];
+    const 实例 = 活跃地面路径持续区域实例[实例ID];
     if (实例 == null) {
       continue;
     }

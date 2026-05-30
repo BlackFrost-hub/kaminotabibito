@@ -1,11 +1,20 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____76EE_6807_5B58_6D3B, _____5C1D_8BD5_505C_6B62_72EC_7ACB_71C3_70E7_9A71_52A8, ____on_72EC_7ACB_71C3_70E7Tick, removePeriodicCallback, getBuffRuntime, dealBurnDamage, GetUnitState, UNIT_STATE_LIFE, _____72EC_7ACB_71C3_70E7_8868, _____72EC_7ACB_71C3_70E7_56DE_8C03ID
+local _____76EE_6807_5B58_6D3B, _____83B7_53D6_72EC_7ACB_71C3_70E7BuffID_5217_8868, _____5C1D_8BD5_505C_6B62_72EC_7ACB_71C3_70E7_9A71_52A8, ____on_72EC_7ACB_71C3_70E7Tick, removePeriodicCallback, getBuffRuntime, dealBurnDamage, GetUnitState, UNIT_STATE_LIFE, _____72EC_7ACB_71C3_70E7_8868, _____72EC_7ACB_71C3_70E7_56DE_8C03ID
 function _____76EE_6807_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
+function _____83B7_53D6_72EC_7ACB_71C3_70E7BuffID_5217_8868()
+    local ids = {}
+    for buffID in pairs(_____72EC_7ACB_71C3_70E7_8868) do
+        ids[#ids + 1] = buffID
+    end
+    __TS__ArraySort(ids)
+    return ids
 end
 function _____5C1D_8BD5_505C_6B62_72EC_7ACB_71C3_70E7_9A71_52A8()
     for key in pairs(_____72EC_7ACB_71C3_70E7_8868) do
@@ -20,24 +29,30 @@ function _____5C1D_8BD5_505C_6B62_72EC_7ACB_71C3_70E7_9A71_52A8()
 end
 function ____on_72EC_7ACB_71C3_70E7Tick()
     local active = 0
-    for buffID in pairs(_____72EC_7ACB_71C3_70E7_8868) do
-        do
-            local record = _____72EC_7ACB_71C3_70E7_8868[buffID]
-            if record == nil then
-                goto __continue20
+    local ____buffID_5217_8868 = _____83B7_53D6_72EC_7ACB_71C3_70E7BuffID_5217_8868()
+    do
+        local i = 0
+        while i < #____buffID_5217_8868 do
+            do
+                local buffID = ____buffID_5217_8868[i + 1]
+                local record = _____72EC_7ACB_71C3_70E7_8868[buffID]
+                if record == nil then
+                    goto __continue24
+                end
+                active = active + 1
+                local runtime = getBuffRuntime(record.target, record.buffID)
+                if runtime == nil or runtime.remaining <= 0 then
+                    __TS__Delete(_____72EC_7ACB_71C3_70E7_8868, buffID)
+                    goto __continue24
+                end
+                if not _____76EE_6807_5B58_6D3B(record.target) then
+                    goto __continue24
+                end
+                dealBurnDamage(record.source, record.target, record.damagePerSecond)
             end
-            active = active + 1
-            local runtime = getBuffRuntime(record.target, record.buffID)
-            if runtime == nil or runtime.remaining <= 0 then
-                __TS__Delete(_____72EC_7ACB_71C3_70E7_8868, buffID)
-                goto __continue20
-            end
-            if not _____76EE_6807_5B58_6D3B(record.target) then
-                goto __continue20
-            end
-            dealBurnDamage(record.source, record.target, record.damagePerSecond)
+            ::__continue24::
+            i = i + 1
         end
-        ::__continue20::
     end
     if active == 0 then
         _____5C1D_8BD5_505C_6B62_72EC_7ACB_71C3_70E7_9A71_52A8()

@@ -17,10 +17,14 @@ import {
   GetLocalPlayer,
   GetPlayerId,
   Player,
-  玩家面板显示状态表,
 } from "./01．共享";
 import { 加载仇恨面板Toc, 创建全部玩家面板 } from "./02．面板创建";
-import { on仇恨面板刷新Tick } from "./04．驱动";
+import {
+  on仇恨面板刷新Tick,
+  initLocalThreatPanelVisibilityState,
+  toggleLocalThreatPanelVisibility,
+  showLocalThreatPanel,
+} from "./04．驱动";
 import { addPeriodicCallback } from "../../00．核心系统/05．中心计时器";
 import { KEY, KEY_STATE, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 
@@ -39,19 +43,11 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 
 const 已自动展开提示玩家表: Record<number, boolean | undefined> = {};
 
-function 初始化玩家显示状态(): void {
-  for (let playerId = 0; playerId < THREAT_PANEL_PLAYER_SLOTS; playerId++) {
-    if (玩家面板显示状态表[playerId] == null) {
-      玩家面板显示状态表[playerId] = false;
-    }
-  }
-}
-
 function on仇恨面板V键抬起(this: void, whichPlayer: any, _key: number): void {
   if (whichPlayer == null || whichPlayer === 0) return;
   const playerId = GetPlayerId(whichPlayer);
   if (playerId < 0 || playerId >= THREAT_PANEL_PLAYER_SLOTS) return;
-  玩家面板显示状态表[playerId] = 玩家面板显示状态表[playerId] !== true;
+  toggleLocalThreatPanelVisibility(playerId);
   on仇恨面板刷新Tick();
 }
 
@@ -73,7 +69,7 @@ export function initThreatPanel(): void {
   const gameUI = DzGetGameUI();
   if (gameUI === 0) return;
   加载仇恨面板Toc();
-  初始化玩家显示状态();
+  initLocalThreatPanelVisibilityState();
   创建全部玩家面板(gameUI);
   on仇恨面板刷新Tick();
   if (刷新回调ID === 0) {
@@ -86,7 +82,7 @@ export function 自动展开仇恨面板一次(this: void, playerId: number): vo
   if (已自动展开提示玩家表[playerId] === true) return;
 
   已自动展开提示玩家表[playerId] = true;
-  玩家面板显示状态表[playerId] = true;
+  showLocalThreatPanel(playerId);
   on仇恨面板刷新Tick();
 
   const 本地玩家 = GetLocalPlayer();

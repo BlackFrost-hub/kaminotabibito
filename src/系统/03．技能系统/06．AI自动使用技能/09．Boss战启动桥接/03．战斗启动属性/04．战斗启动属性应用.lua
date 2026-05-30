@@ -2,7 +2,6 @@ local ____lualib = require("lualib_bundle")
 local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
-local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.01．Boss战斗启动属性配置表")
 local ____Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["Boss战斗启动属性配置表"]
@@ -14,11 +13,8 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
-local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local R2I = jass.R2I
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
 local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
@@ -43,9 +39,6 @@ __TS__SparseArrayPush(
     table.unpack(_____5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868)
 )
 local _____5168_90E8_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_6)}
-local function _____5F53_524DN_503C()
-    return __TS__Number(jglobals.udg_N) or 0
-end
 local function _____89E3_6790_914D_7F6E_5355_4F4D_7C7B_578BID(_____914D_7F6E)
     if _____914D_7F6E["单位ID"] ~= nil and _____914D_7F6E["单位ID"] ~= "" then
         return stringToFourCCSafe(_____914D_7F6E["单位ID"])
@@ -78,18 +71,6 @@ local function _____6309_5355_4F4D_67E5_627E_6218_6597_542F_52A8_5C5E_6027_914D_
     end
     return nil
 end
-local function _____5199_5165_6574_6570_5C5E_6027(unit, _____5C5E_6027_540D, _____503C)
-    if _____503C == nil then
-        return
-    end
-    YDUserDataSetSafe(
-        "unit",
-        unit,
-        _____5C5E_6027_540D,
-        "integer",
-        _____503C
-    )
-end
 local function _____5199_5165_5B9E_6570_5C5E_6027(unit, _____5C5E_6027_540D, _____503C)
     if _____503C == nil then
         return
@@ -99,18 +80,6 @@ local function _____5199_5165_5B9E_6570_5C5E_6027(unit, _____5C5E_6027_540D, ___
         unit,
         _____5C5E_6027_540D,
         "real",
-        _____503C
-    )
-end
-local function _____5199_5165_5E03_5C14_5C5E_6027(unit, _____5C5E_6027_540D, _____503C)
-    if _____503C == nil then
-        return
-    end
-    YDUserDataSetSafe(
-        "unit",
-        unit,
-        _____5C5E_6027_540D,
-        "boolean",
         _____503C
     )
 end
@@ -182,11 +151,6 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
     if _____914D_7F6E == nil then
         return
     end
-    local n = _____5F53_524DN_503C()
-    local _____5F31_70B9_6570_91CF = (_____914D_7F6E["弱点数量基础值"] or 0) + (_____914D_7F6E["弱点数量每层N增量"] or 0) * n
-    local _____62A4_76FE_503C = (_____914D_7F6E["护盾基础值"] or 0) + (_____914D_7F6E["护盾每层N增量"] or 0) * n
-    local _____6700_5927_751F_547D_503C = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
-    local _____5668_5F31_4F24_5BB3_9700_6C42 = (_____914D_7F6E["器弱伤害需求生命百分比"] or 0) * _____6700_5927_751F_547D_503C
     _____5199_5165Boss_6218_97F3_9891("战斗音乐", _____914D_7F6E["战斗音乐变量名"])
     _____5199_5165Boss_6218_97F3_9891("胜利音乐", _____914D_7F6E["胜利音乐变量名"])
     _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点变量名"])
@@ -213,33 +177,6 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
     _____5199_5165_5B9E_6570_5C5E_6027(unit, "魔法伤害吸血", _____914D_7F6E["魔法伤害吸血"])
     _____5199_5165_5B9E_6570_5C5E_6027(unit, "普攻伤害吸血", _____914D_7F6E["普攻伤害吸血"])
     _____5199_5165_5B9E_6570_5C5E_6027(unit, "魔法穿透", _____914D_7F6E["魔法穿透"])
-    _____5199_5165_6574_6570_5C5E_6027(unit, "弱点数量", _____5F31_70B9_6570_91CF)
-    _____5199_5165_6574_6570_5C5E_6027(unit, "天生弱点数", _____914D_7F6E["天生弱点数"])
-    _____5199_5165_6574_6570_5C5E_6027(unit, "武器弱点数", _____914D_7F6E["武器弱点数"])
-    _____5199_5165_6574_6570_5C5E_6027(unit, "属性弱点数", _____914D_7F6E["属性弱点数"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "弓弱", _____914D_7F6E["弓弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "斧弱", _____914D_7F6E["斧弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "枪弱", _____914D_7F6E["枪弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "剑弱", _____914D_7F6E["剑弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "短剑弱", _____914D_7F6E["短剑弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "杖弱", _____914D_7F6E["杖弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "暗弱", _____914D_7F6E["暗弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "冰弱", _____914D_7F6E["冰弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "火弱", _____914D_7F6E["火弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "风弱", _____914D_7F6E["风弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "雷弱", _____914D_7F6E["雷弱"])
-    _____5199_5165_5E03_5C14_5C5E_6027(unit, "光弱", _____914D_7F6E["光弱"])
-    _____5199_5165_5B9E_6570_5C5E_6027(unit, "器弱伤害需求", _____5668_5F31_4F24_5BB3_9700_6C42)
-    _____5199_5165_6574_6570_5C5E_6027(
-        unit,
-        "护盾值",
-        R2I(_____62A4_76FE_503C)
-    )
-    _____5199_5165_6574_6570_5C5E_6027(
-        unit,
-        "原始护盾值",
-        R2I(_____62A4_76FE_503C)
-    )
     _____5DF2_5E94_7528_5C5E_6027_5355_4F4D_8868[handleId] = true
     debugLogForce(
         _____6A21_5757_540D,
@@ -247,13 +184,7 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
         "unitTypeId=",
         GetUnitTypeId(unit),
         "分类=",
-        _____914D_7F6E["归类"],
-        "weakCount=",
-        _____5F31_70B9_6570_91CF,
-        "shield=",
-        _____62A4_76FE_503C,
-        "N=",
-        n
+        _____914D_7F6E["归类"]
     )
 end
 return ____exports

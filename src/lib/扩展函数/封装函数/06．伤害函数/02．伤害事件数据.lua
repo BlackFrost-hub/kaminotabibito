@@ -42,24 +42,36 @@ end
 local function isFiniteNumber(n)
     return type(n) == "number" and not __TS__NumberIsNaN(n)
 end
+local ______pcall_8BFB_53D6_4F24_5BB3_503C = 0
+local ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = false
+local function ______pcall_8BFB_53D6Japi_4E8B_4EF6_4F24_5BB3(self)
+    local value = japi.GetEventDamage()
+    if isFiniteNumber(value) then
+        ______pcall_8BFB_53D6_4F24_5BB3_503C = value
+        ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = true
+    end
+end
+local function ______pcall_8BFB_53D6Ex_4E8B_4EF6_4F24_5BB3(self)
+    local value = japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
+    if isFiniteNumber(value) then
+        ______pcall_8BFB_53D6_4F24_5BB3_503C = value
+        ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = true
+    end
+end
 --- 在 `EVENT_UNIT_DAMAGED` 同步回调内、`EXSetEventDamage` 之后读取「当前事件伤害」。
 -- 1.27：`japi.GetEventDamage`（若存在）→ `EXGetEventDamageData(DAMAGE_AMOUNT)` → `jass.GetEventDamage`（常为改写前）。
 function ____exports.readEventDamageAfterModify()
-    local fromJapiFn
-    pcall(function ()
-            fromJapiFn = japi.GetEventDamage()
-        end
-    )
-    if fromJapiFn ~= nil and isFiniteNumber(fromJapiFn) then
-        return fromJapiFn
+    ______pcall_8BFB_53D6_4F24_5BB3_503C = 0
+    ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = false
+    pcall(______pcall_8BFB_53D6Japi_4E8B_4EF6_4F24_5BB3)
+    if ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 then
+        return ______pcall_8BFB_53D6_4F24_5BB3_503C
     end
-    local fromExData
-    pcall(function ()
-            fromExData = japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
-        end
-    )
-    if fromExData ~= nil and isFiniteNumber(fromExData) then
-        return fromExData
+    ______pcall_8BFB_53D6_4F24_5BB3_503C = 0
+    ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = false
+    pcall(______pcall_8BFB_53D6Ex_4E8B_4EF6_4F24_5BB3)
+    if ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 then
+        return ______pcall_8BFB_53D6_4F24_5BB3_503C
     end
     return jass.GetEventDamage()
 end

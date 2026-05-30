@@ -99,6 +99,17 @@ local function _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(
     end
     return result
 end
+local function _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(_____5355_4F4D_96C6_5408)
+    local _____5355_4F4DID_5217_8868 = {}
+    for key in pairs(_____5355_4F4D_96C6_5408) do
+        local _____5355_4F4DID = __TS__ParseInt(key, 10)
+        if not __TS__NumberIsNaN(__TS__Number(_____5355_4F4DID)) then
+            _____5355_4F4DID_5217_8868[#_____5355_4F4DID_5217_8868 + 1] = _____5355_4F4DID
+        end
+    end
+    __TS__ArraySort(_____5355_4F4DID_5217_8868, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return _____5355_4F4DID_5217_8868
+end
 local _____533A_57DF_6548_679C_5B9E_73B0 = __TS__Class()
 _____533A_57DF_6548_679C_5B9E_73B0.name = "区域效果实现"
 function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
@@ -172,7 +183,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue23
+                goto __continue27
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
@@ -186,18 +197,24 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue23::
+        ::__continue27::
     end
-    for hid in pairs(self["当前单位集合"]) do
-        if not _____65B0_96C6_5408[hid] then
-            local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
-            if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                local ____opt_6 = self["参数"]["on离开"]
-                if ____opt_6 ~= nil then
-                    ____opt_6(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+    local _____5F53_524D_5355_4F4DID_5217_8868 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(self["当前单位集合"])
+    do
+        local i = 0
+        while i < #_____5F53_524D_5355_4F4DID_5217_8868 do
+            local hid = _____5F53_524D_5355_4F4DID_5217_8868[i + 1]
+            if not _____65B0_96C6_5408[hid] then
+                local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
+                if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
+                    local ____opt_6 = self["参数"]["on离开"]
+                    if ____opt_6 ~= nil then
+                        ____opt_6(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                    end
                 end
+                self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
             end
-            self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
+            i = i + 1
         end
     end
     self["当前单位集合"] = _____65B0_96C6_5408
@@ -213,7 +230,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     local _____53BB_91CDKey = ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
                     local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey]
                     if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
-                        goto __continue33
+                        goto __continue37
                     end
                     _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
@@ -232,7 +249,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     nil
                 )
             end
-            ::__continue33::
+            ::__continue37::
         end
     end
     local ____opt_9 = self["参数"]["on周期"]
@@ -294,15 +311,21 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
     end
     local _____5F53_524D_65F6_95F4 = getServerTime()
     local _____9632_6296_6BEB_79D2 = self["防抖间隔毫秒值"]
-    for hid in pairs(self["当前单位集合"]) do
-        local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
-        if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-            local ____opt_13 = self["参数"]["on离开"]
-            if ____opt_13 ~= nil then
-                ____opt_13(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+    local _____5F53_524D_5355_4F4DID_5217_8868 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(self["当前单位集合"])
+    do
+        local i = 0
+        while i < #_____5F53_524D_5355_4F4DID_5217_8868 do
+            local hid = _____5F53_524D_5355_4F4DID_5217_8868[i + 1]
+            local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
+            if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
+                local ____opt_13 = self["参数"]["on离开"]
+                if ____opt_13 ~= nil then
+                    ____opt_13(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                end
             end
+            self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
+            i = i + 1
         end
-        self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
     end
     self["当前单位集合"] = {}
 end

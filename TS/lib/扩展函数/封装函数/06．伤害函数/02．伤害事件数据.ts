@@ -57,25 +57,42 @@ function isFiniteNumber(n: number): boolean {
   return typeof n === "number" && !Number.isNaN(n);
 }
 
+let __pcall读取伤害值 = 0;
+let __pcall读取伤害值有效 = false;
+
+function __pcall读取Japi事件伤害(this: any): void {
+  const value = (japi as any).GetEventDamage();
+  if (isFiniteNumber(value)) {
+    __pcall读取伤害值 = value;
+    __pcall读取伤害值有效 = true;
+  }
+}
+
+function __pcall读取Ex事件伤害(this: any): void {
+  const value = (japi as any).EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT);
+  if (isFiniteNumber(value)) {
+    __pcall读取伤害值 = value;
+    __pcall读取伤害值有效 = true;
+  }
+}
+
 /**
  * 在 `EVENT_UNIT_DAMAGED` 同步回调内、`EXSetEventDamage` 之后读取「当前事件伤害」。
  * 1.27：`japi.GetEventDamage`（若存在）→ `EXGetEventDamageData(DAMAGE_AMOUNT)` → `jass.GetEventDamage`（常为改写前）。
  */
 export function readEventDamageAfterModify(): number {
-  let fromJapiFn: number | undefined;
-  (pcall as any)(() => {
-    fromJapiFn = (japi as any).GetEventDamage();
-  });
-  if (fromJapiFn !== undefined && isFiniteNumber(fromJapiFn)) {
-    return fromJapiFn;
+  __pcall读取伤害值 = 0;
+  __pcall读取伤害值有效 = false;
+  pcall(__pcall读取Japi事件伤害);
+  if (__pcall读取伤害值有效) {
+    return __pcall读取伤害值;
   }
 
-  let fromExData: number | undefined;
-  (pcall as any)(() => {
-    fromExData = (japi as any).EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT);
-  });
-  if (fromExData !== undefined && isFiniteNumber(fromExData)) {
-    return fromExData;
+  __pcall读取伤害值 = 0;
+  __pcall读取伤害值有效 = false;
+  pcall(__pcall读取Ex事件伤害);
+  if (__pcall读取伤害值有效) {
+    return __pcall读取伤害值;
   }
 
   return (jass as any).GetEventDamage();

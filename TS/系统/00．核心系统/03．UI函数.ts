@@ -145,6 +145,49 @@ export const DEFAULT_UI_FONT_FLAG = 0;
 /** 列表/入口等默认字号（`DzFrameSetFont` 第三参） */
 export const DEFAULT_UI_FONT_SCALE = 0.016;
 
+// ── Dz 调用 pcall：仅用模块顶层具名体 + 参数槽，避免 `(pcall as any)(匿名)` 生成 `pcall(nil, fn)` ──
+let __pcallDzFrameA = 0;
+let __pcallDzFrameB = 0;
+
+function __pcallDzFrameClearAllPoints(this: any): void {
+  (japi as any).DzFrameClearAllPoints(__pcallDzFrameA);
+}
+
+function __pcallDzFrameSetAllPoints(this: any): void {
+  (japi as any).DzFrameSetAllPoints(__pcallDzFrameA, __pcallDzFrameB);
+}
+
+function __pcallDzFrameSetParent(this: any): void {
+  (japi as any).DzFrameSetParent(__pcallDzFrameA, __pcallDzFrameB);
+}
+
+function __pcallDzFrameSetAlpha(this: any): void {
+  (japi as any).DzFrameSetAlpha(__pcallDzFrameA, __pcallDzFrameB);
+}
+
+function pcallDzFrameClearAllPoints(this: void, frame: number): void {
+  __pcallDzFrameA = frame;
+  pcall(__pcallDzFrameClearAllPoints);
+}
+
+function pcallDzFrameSetAllPoints(this: void, frame: number, relative: number): void {
+  __pcallDzFrameA = frame;
+  __pcallDzFrameB = relative;
+  pcall(__pcallDzFrameSetAllPoints);
+}
+
+function pcallDzFrameSetParent(this: void, frame: number, parent: number): void {
+  __pcallDzFrameA = frame;
+  __pcallDzFrameB = parent;
+  pcall(__pcallDzFrameSetParent);
+}
+
+function pcallDzFrameSetAlpha(this: void, frame: number, alpha: number): void {
+  __pcallDzFrameA = frame;
+  __pcallDzFrameB = alpha;
+  pcall(__pcallDzFrameSetAlpha);
+}
+
 /**
  * 设置字体与文本对齐；`fontScale` 省略则用 `DEFAULT_UI_FONT_SCALE`。
  */
@@ -185,8 +228,8 @@ export function createTextFrameFillBackdrop(backdrop: number, name: string, text
     visible: true,
   });
   if (!tf || tf === 0) return null;
-  (pcall as any)(() => (japi as any).DzFrameClearAllPoints(tf));
-  (pcall as any)(() => (japi as any).DzFrameSetAllPoints(tf, backdrop));
+  pcallDzFrameClearAllPoints(tf);
+  pcallDzFrameSetAllPoints(tf, backdrop);
   (japi as any).DzFrameSetText(tf, text);
   return tf;
 }
@@ -213,9 +256,9 @@ export function createTabLabelTextOnBackdrop(
  */
 export function layoutGlueTextButtonOverBackdrop(backdrop: number, button: number): void {
   if (!backdrop || backdrop === 0 || !button || button === 0) return;
-  (pcall as any)(() => (japi as any).DzFrameSetParent(button, backdrop));
-  (pcall as any)(() => (japi as any).DzFrameClearAllPoints(button));
-  (pcall as any)(() => (japi as any).DzFrameSetAllPoints(button, backdrop));
+  pcallDzFrameSetParent(button, backdrop);
+  pcallDzFrameClearAllPoints(button);
+  pcallDzFrameSetAllPoints(button, backdrop);
 }
 
 /**
@@ -224,5 +267,5 @@ export function layoutGlueTextButtonOverBackdrop(backdrop: number, button: numbe
 export function setupTransparentGlueHitLayer(backdrop: number, button: number): void {
   layoutGlueTextButtonOverBackdrop(backdrop, button);
   setButtonText(button, "");
-  (pcall as any)(() => (japi as any).DzFrameSetAlpha(button, 0));
+  pcallDzFrameSetAlpha(button, 0);
 }

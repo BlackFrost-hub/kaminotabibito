@@ -112,6 +112,15 @@ function 生成独立燃烧BuffID(this: void, target: any): string {
   return `burn-instance-${GetHandleId(target)}-${独立燃烧序号}`;
 }
 
+function 获取独立燃烧BuffID列表(this: void): string[] {
+  const ids: string[] = [];
+  for (const buffID in 独立燃烧表) {
+    ids.push(buffID);
+  }
+  ids.sort();
+  return ids;
+}
+
 function 确保独立燃烧驱动(this: void): void {
   if (独立燃烧回调ID !== 0) return;
   独立燃烧回调ID = addPeriodicCallback(1000, on独立燃烧Tick);
@@ -134,7 +143,9 @@ function on独立燃烧移除(this: void, _unit: any, buffID: string): void {
 
 function on独立燃烧Tick(this: void): void {
   let active = 0;
-  for (const buffID in 独立燃烧表) {
+  const buffID列表 = 获取独立燃烧BuffID列表();
+  for (let i = 0; i < buffID列表.length; i++) {
+    const buffID = buffID列表[i];
     const record = 独立燃烧表[buffID];
     if (record == null) continue;
     active += 1;

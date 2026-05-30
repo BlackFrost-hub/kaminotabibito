@@ -83,6 +83,27 @@ export type GoldGainCallback = (params: GoldGainParams) => GoldGainParams | void
 /** 金币获取回调列表 */
 const goldGainCallbacks: GoldGainCallback[] = [];
 
+let __pcall金币回调: GoldGainCallback | undefined;
+let __pcall金币参数: GoldGainParams | undefined;
+let __pcall金币结果: GoldGainParams | void;
+
+function __pcall执行金币回调(this: any): void {
+  if (__pcall金币回调 == null || __pcall金币参数 == null) return;
+  __pcall金币结果 = __pcall金币回调(__pcall金币参数);
+}
+
+function 执行金币回调安全(this: void, cb: GoldGainCallback, params: GoldGainParams): GoldGainParams | void {
+  __pcall金币回调 = cb;
+  __pcall金币参数 = params;
+  __pcall金币结果 = undefined;
+  pcall(__pcall执行金币回调);
+  const result = __pcall金币结果;
+  __pcall金币回调 = undefined;
+  __pcall金币参数 = undefined;
+  __pcall金币结果 = undefined;
+  return result;
+}
+
 // ==========================================================================================
 // 工具函数
 // ==========================================================================================
@@ -123,10 +144,8 @@ function giveGoldToPlayer(this: void, unit: any, player: any, baseGold: number, 
 
   // 通知回调，让回调决定最终金币
   for (const cb of goldGainCallbacks) {
-    const pcallResult = (pcall as any)(cb, params);
-    const success = pcallResult[0];
-    const result = pcallResult[1];
-    if (success && result != null) {
+    const result = 执行金币回调安全(cb, params);
+    if (result != null) {
       params = result;
     }
   }

@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
+local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -18,6 +20,20 @@ local function _____83B7_53D6_5355_4F4DID(unit)
         return 0
     end
     return GetHandleId(unit) or 0
+end
+local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+local function _____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____72B6_6001_8868)
+    local ids = {}
+    for unitKey in pairs(_____72B6_6001_8868) do
+        local unitId = __TS__Number(unitKey)
+        if not __TS__NumberIsNaN(__TS__Number(unitId)) then
+            ids[#ids + 1] = unitId
+        end
+    end
+    __TS__ArraySort(ids, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return ids
 end
 local function _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
     if _____72B6_6001["数量"] <= 0 then
@@ -98,34 +114,39 @@ local function ____on_6761_4EF6_5F00_5173_6548_679CTick()
             do
                 local _____914D_7F6E = _____6761_4EF6_5F00_5173_5B9E_4F8B_8868[i + 1]
                 if now < _____914D_7F6E["下次触发时间"] then
-                    goto __continue19
+                    goto __continue24
                 end
                 _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["检查间隔毫秒"]
                 local _____5F85_6E05_7406 = {}
-                for unitKey in pairs(_____914D_7F6E["单位状态"]) do
-                    do
-                        local unitId = __TS__Number(unitKey)
-                        local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
-                        if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
-                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
-                            goto __continue21
-                        end
-                        local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
-                        if currentCount <= 0 then
-                            if _____72B6_6001["已开启"] then
-                                _____72B6_6001["已开启"] = false
-                                local ____opt_10 = _____914D_7F6E["关闭回调"]
-                                if ____opt_10 ~= nil then
-                                    ____opt_10(_____72B6_6001["单位"], _____72B6_6001["数量"])
-                                end
+                local _____5355_4F4DID_5217_8868 = _____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____914D_7F6E["单位状态"])
+                do
+                    local unitIndex = 0
+                    while unitIndex < #_____5355_4F4DID_5217_8868 do
+                        do
+                            local unitId = _____5355_4F4DID_5217_8868[unitIndex + 1]
+                            local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+                            if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
+                                _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                                goto __continue27
                             end
-                            _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
-                            goto __continue21
+                            local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
+                            if currentCount <= 0 then
+                                if _____72B6_6001["已开启"] then
+                                    _____72B6_6001["已开启"] = false
+                                    local ____opt_10 = _____914D_7F6E["关闭回调"]
+                                    if ____opt_10 ~= nil then
+                                        ____opt_10(_____72B6_6001["单位"], _____72B6_6001["数量"])
+                                    end
+                                end
+                                _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
+                                goto __continue27
+                            end
+                            _____72B6_6001["数量"] = currentCount
+                            _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
                         end
-                        _____72B6_6001["数量"] = currentCount
-                        _____5207_6362_6761_4EF6_72B6_6001(_____914D_7F6E, _____72B6_6001)
+                        ::__continue27::
+                        unitIndex = unitIndex + 1
                     end
-                    ::__continue21::
                 end
                 do
                     local j = 0
@@ -135,7 +156,7 @@ local function ____on_6761_4EF6_5F00_5173_6548_679CTick()
                     end
                 end
             end
-            ::__continue19::
+            ::__continue24::
             i = i + 1
         end
     end

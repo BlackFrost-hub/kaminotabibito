@@ -1,9 +1,7 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Number = ____lualib.__TS__Number
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.06．Boss血条弱点韧性.01．常量定义")
 local ____Boss_8840_6761UI_5E38_91CF = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss血条UI常量"]
-local ____Boss_5F31_70B9YD_5B57_6BB5 = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss弱点YD字段"]
 local ____05_FF0EBoss_5F31_70B9_8FD0_884C_72B6_6001 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.06．Boss血条弱点韧性.05．Boss弱点运行状态")
 local _____83B7_53D6_5168_90E8Boss_8840_6761_5F31_70B9_97E7_6027_8FD0_884C_72B6_6001 = ____05_FF0EBoss_5F31_70B9_8FD0_884C_72B6_6001["获取全部Boss血条弱点韧性运行状态"]
 local japi = require("jass.japi")
@@ -15,7 +13,6 @@ local ____require_result_1 = require("lib.扩展函数.BJ函数.02．单位与�
 local GetUnitLifePercentBJ = ____require_result_1.GetUnitLifePercentBJ
 local IsUnitAliveBJ = ____require_result_1.IsUnitAliveBJ
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
 local getObjectPropertySafe = ____require_result_2.getObjectPropertySafe
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local ObjectType = ____require_result_3.ObjectType
@@ -44,10 +41,6 @@ local function _____9650_5236_6BD4_4F8B(value)
         return 1
     end
     return value
-end
-local function _____8BFB_53D6Boss_62A4_76FE_6574_6570(bossUnit, attr)
-    local value = __TS__Number(YDUserDataGetSafe("unit", bossUnit, attr, "integer")) or 0
-    return value > 0 and value or 0
 end
 local function _____53D6Boss_5934_50CF_8DEF_5F84(bossUnit)
     if bossUnit == nil or bossUnit == 0 then
@@ -96,8 +89,8 @@ local function _____5237_65B0Boss_8840_6761UI(state)
     end
     local hpPercent = GetUnitLifePercentBJ(state["Boss单位"])
     local hpRatio = _____9650_5236_6BD4_4F8B(hpPercent / 100)
-    local shieldValue = _____8BFB_53D6Boss_62A4_76FE_6574_6570(state["Boss单位"], ____Boss_5F31_70B9YD_5B57_6BB5["护盾值"])
-    local shieldMax = _____8BFB_53D6Boss_62A4_76FE_6574_6570(state["Boss单位"], ____Boss_5F31_70B9YD_5B57_6BB5["原始护盾值"])
+    local shieldValue = state["当前护盾值"]
+    local shieldMax = state["最大护盾值"]
     if state["血量文本Frame"] ~= 0 then
         DzFrameSetText(
             state["血量文本Frame"],

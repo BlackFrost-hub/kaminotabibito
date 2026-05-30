@@ -40,7 +40,6 @@ ____exports.EMPTY_ROW = "|cff9f9f9f-|r"
 ____exports["玩家面板表"] = {}
 ____exports["玩家视图模型表"] = {}
 ____exports["玩家上次有效敌方目标表"] = {}
-____exports["玩家面板显示状态表"] = {}
 ____exports["单位是有效怪物单位"] = function(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return false

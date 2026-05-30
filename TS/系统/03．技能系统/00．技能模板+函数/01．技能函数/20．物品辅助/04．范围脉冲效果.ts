@@ -54,6 +54,20 @@ function 获取单位ID(this: void, unit: any): number {
   return GetHandleId(unit) || 0;
 }
 
+function 数字升序排序(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 获取有序单位状态ID列表(this: void, 状态表: Record<number, 范围脉冲状态 | undefined>): number[] {
+  const ids: number[] = [];
+  for (const unitKey in 状态表) {
+    const unitId = Number(unitKey);
+    if (!isNaN(unitId)) ids.push(unitId);
+  }
+  ids.sort(数字升序排序);
+  return ids;
+}
+
 function 处理获得(this: void, 配置: 范围脉冲实例, unit: any, _item: any, currentCount: number, previousCount: number): void {
   const unitId = 获取单位ID(unit);
   if (unitId === 0) return;
@@ -86,8 +100,9 @@ function on范围脉冲效果Tick(this: void): void {
     配置.下次触发时间 = now + 配置.间隔毫秒;
 
     const 待清理: number[] = [];
-    for (const unitKey in 配置.单位状态) {
-      const unitId = Number(unitKey);
+    const 单位ID列表 = 获取有序单位状态ID列表(配置.单位状态);
+    for (let unitIndex = 0; unitIndex < 单位ID列表.length; unitIndex++) {
+      const unitId = 单位ID列表[unitIndex];
       const 状态 = 配置.单位状态[unitId];
       if (状态 == null || 状态.单位 == null || 状态.单位 === 0) {
         待清理.push(unitId);
@@ -153,4 +168,3 @@ export function 注册范围脉冲效果(this: void, 参数: 范围脉冲效果�
 }
 
 export {};
-

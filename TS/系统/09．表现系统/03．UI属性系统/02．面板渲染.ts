@@ -81,6 +81,7 @@ let damagePanelCreated = false;
 const damageRows: { icon: number; values: number[]; player: any }[] = [];
 const detailSlots: { player: any; hero: any; functionKey: number; icon: number; box: number; lines: number[]; separators: number[] }[] = [];
 const registeredPlayers: Set<number> = new Set();
+// DzFrame 返回数字 frame id，不是 JASS handle；这里直接用 frame id 做本地详情 hover 反查 key。
 const detailHoverSlotByFrameId: Record<number, number> = {};
 
 function createFrame(tagName: string, name: string, parent: number): number {

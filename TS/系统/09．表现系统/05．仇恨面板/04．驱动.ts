@@ -15,10 +15,29 @@ import {
   GetPlayerId,
   EMPTY_ROW,
   玩家面板表,
-  玩家面板显示状态表,
   玩家视图模型表,
 } from "./01．共享";
 import { 重建全部视图模型 } from "./03．视图模型";
+
+const 本地玩家面板显示状态表: Record<number, boolean | undefined> = {};
+
+export function initLocalThreatPanelVisibilityState(this: void): void {
+  for (let playerId = 0; playerId < THREAT_PANEL_PLAYER_SLOTS; playerId++) {
+    if (本地玩家面板显示状态表[playerId] == null) {
+      本地玩家面板显示状态表[playerId] = false;
+    }
+  }
+}
+
+export function toggleLocalThreatPanelVisibility(this: void, playerId: number): void {
+  if (playerId < 0 || playerId >= THREAT_PANEL_PLAYER_SLOTS) return;
+  本地玩家面板显示状态表[playerId] = 本地玩家面板显示状态表[playerId] !== true;
+}
+
+export function showLocalThreatPanel(this: void, playerId: number): void {
+  if (playerId < 0 || playerId >= THREAT_PANEL_PLAYER_SLOTS) return;
+  本地玩家面板显示状态表[playerId] = true;
+}
 
 function 对称写入全部面板文本(): void {
   for (let playerId = 0; playerId < THREAT_PANEL_PLAYER_SLOTS; playerId++) {
@@ -45,7 +64,7 @@ function 应用本地可见性(): void {
   for (let playerId = 0; playerId < THREAT_PANEL_PLAYER_SLOTS; playerId++) {
     const panel = 玩家面板表[playerId];
     if (panel == null) continue;
-    const visible = playerId === 本机玩家ID && 玩家面板显示状态表[playerId] === true;
+    const visible = playerId === 本机玩家ID && 本地玩家面板显示状态表[playerId] === true;
     DzFrameShow(panel.root, visible);
     if (panel.inner !== 0) DzFrameShow(panel.inner, visible);
     if (panel.title !== 0) DzFrameShow(panel.title, visible);

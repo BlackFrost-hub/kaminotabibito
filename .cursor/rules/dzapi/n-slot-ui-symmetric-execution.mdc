@@ -11,11 +11,13 @@ alwaysApply: false
 相关：`loadtoc-ui.mdc`、`fdf-crash.mdc`。  
 **UI 闭包 / `pcall` / JASS 回调具名函数规则**：统一以 `lua-gc-desync-heuristics.mdc` 为准；本文件不再重复正文，只讨论联机 UI 的执行次数与分层。
 
+涉及同步/本机异步/桥接上下文判断、`pairs()` 顺序、异步报错中断、`math.random` / `math.randomseed` 风险时，先读 `lua-gc-desync-heuristics.mdc` 的「先判断上下文」；随机数细则再读 `war3-tstl/math-randomseed.md`。
+
 ---
 
 ## 1. 方案 B（N 槽）：设计结论
 
-- 默认优先 **方案 B（N 槽）**：每个客户端都创建同样数量、同样结构的 UI 壳；本地差异只放在显隐等表现层。设置UI文本/贴图等全局同步
+- 默认优先 **方案 B（N 槽）**：每个客户端都创建同样数量、同样结构的 UI 壳；文本、贴图、布局等内容更新走对称执行，本地差异只放在显隐等表现层。
 - 设计目标不是“所有人画面一致”，而是 **所有客户端执行形态一致**。魔兽里的 desync 根因通常是 **全局状态读写的顺序、次数、分支不一致**，不是“不同槽位是否画出同一帧文本”。
 - **方案 A（每端仅 1 套本地 UI）维护成本高**：只要后续迭代里让“面板是否存在/是否打开”影响到计时器、注册次数、同步回调链或共享状态读写，就更容易把 UI 问题升级成 desync。
 - 方案 B 的价值是把 **创建、注册回调、滚轮、刷新入口** 固定成 **每个客户端永远跑同一套 N 槽流程**；最后才用 **`GetLocalPlayer()` + 可见性/可交互性** 区分谁看见、谁可操作。
@@ -92,11 +94,9 @@ function startRefreshTimer(): void {
 
 若某 API 的 `sync=true`：其回调里**改全局/共享状态**必须在本地判断**外**且全端一致；**仅本地表现**在判断**内**。二者**不可混在同一分支语义里**。
 
-### 3.3 事件 vs 定时器（简单版）
+本机玩家/宿主 API 只适合过滤本地请求、更新本地 UI、镜头、声音、文字、请求发送或诊断；`GetLocalPlayer()` 这类分支不能创建、销毁、移动、奖励或修改同步对象。如果本机操作要影响所有人，先发出或推导出同步事件，再由同步结果推进共享状态。
 
-- 可用短周期定时器轮询 + `GetLocalPlayer()` 内更新 UI（与 BuffUI 思路一致）。
-
-### 3.4 物编 `EXExecuteScript` 与头像（联机实测）
+### 3.3 物编 `EXExecuteScript` 与头像（联机实测）
 
 - `getObjectProperty` / `EXExecuteScript` 是同步调用，但**忌**在全房高频 tick 里反复物编读（易掉线/不同步）。
 - 头像 `DzFrameSetTexture`：**建帧时设一次**；周期回调只刷文字等，周期里**不再** `getHeroIcon` / `getObjectProperty`。
@@ -166,7 +166,7 @@ function startRefreshTimer(): void {
 | 滚动条滑块位置 | ❌ 严禁 | 修改帧状态，不同客户端滚动位置不同会分叉 |
 | 读取变量 | ❌ 不需要（安全） | 纯读取，不修改任何状态，放哪里都安全 |
 
-**原则**：4个槽位在所有客户端都存在，只是**显示/隐藏**不同。修改槽位的**内容**（贴图、文本、滑块位置）需要所有客户端同步知道，只有**显示/隐藏**、**音效**、**文本消息**需要本地隔离。
+**原则**：槽位在所有客户端都存在，只是**显示/隐藏**不同。内容状态要对称执行；本地隔离只留给显隐、音效、文本消息这类最终表现。
 
 ### 4.3 本仓库参考（任务面板）
 
@@ -219,19 +219,71 @@ function startRefreshTimer(): void {
 
 #### 何时仍然需要同步
 
-如果某个操作会改：
+如果某个操作会改共享可见状态、共享分类/展开态，或任何**后续还会被其他客户端逻辑读取**的字段，它就不再是“纯本地 UI”，必须回到 **`sync=true` 回调里“状态同步、显示本地”分层** 处理。
 
-- 共享可见状态
-- 共享分类/展开态
-- 会被其他客户端后续逻辑读取的字段
+#### 4.4.1 反模式：本地输入写共享状态，再被全端逻辑消费
 
-那它仍然要按 **`sync=true` 回调里“状态同步、显示本地”分层** 处理。
+这是本仓库后续要**重点规避**的危险模式，也是最容易把“本地 UI 问题”放大成 desync 的链条：
 
-反过来说：
+1. `sync=false` / 本地按键 / 本地鼠标 / 本地 frame 回调里写了一份“共享表 / 模块级状态 / 槽位状态”
+2. 这份状态随后被全端 `timer`、`sync=true` 回调、对称刷新 tick、共享视图模型或其他客户端都会跑的逻辑继续读取
+3. 结果未必“立刻必炸”，但常见后果是：
+   - 某些机器只是本地显示异常
+   - 某些机器在高频输入后状态分叉
+   - 某些机器延迟数秒后才掉线或 desync
 
-- 如果 `sync=false` 路径里写了共享字段，但这些字段**不会**再被全端逻辑消费，可能“暂时不炸”
-- 这种写法仍然不是首选，只能说明**当前样本尚未把风险放大出来**
-- 工程上仍应优先收敛为：`false` 只写严格本地态，或把共享字段改回同步入口统一写入
+一句话判断：
+
+> **本地输入可以改本地显示；本地输入不能偷偷改“随后还会被全端继续读”的状态。**
+
+错误示意：
+
+```ts
+registerKeyEventByCode(KEY.V, KEY_STATE.UP, false, onLocalToggle);
+
+function onLocalToggle(this: void): void {
+  sharedVisibleState[playerId] = !sharedVisibleState[playerId]; // ❌ 本地输入写共享态
+}
+
+function onRefreshTick(this: void): void {
+  const visible = sharedVisibleState[playerId] === true; // ❌ 全端 tick 继续消费
+  DzFrameShow(panel.root, visible);
+}
+```
+
+正确收敛：
+
+```ts
+registerKeyEventByCode(KEY.V, KEY_STATE.UP, false, onLocalToggle);
+
+function onLocalToggle(this: void): void {
+  localVisibleState[playerId] = localVisibleState[playerId] !== true; // ✅ 只写本地态
+}
+
+function onRefreshTick(this: void): void {
+  const visible = playerId === localPlayerId && localVisibleState[playerId] === true;
+  DzFrameShow(panel.root, visible); // ✅ 本地显示只消费本地态
+}
+```
+
+如果某次输入**真的要**推进共享状态：
+
+- 要么改成 `sync=true` 回调，在本地判断外统一写共享态
+- 要么先经由 `Sync` / 业务事件 / 已确认的同步消息，再由同步结果推进共享态
+
+不要折中成“先本地写一份，反正别的地方稍后也会读到”。
+
+#### 4.4.2 UI 同步风险审查清单
+
+遇到 Dz 面板、热键、滚轮、拖拽、分页、开关状态时，至少逐条过一遍：
+
+1. 这条输入链是 `sync=true` 还是 `sync=false`？
+2. 写入的是本地态，还是共享态？
+3. 这份状态后面会不会被全端 `timer` / 刷新 tick / `sync=true` 回调继续读？
+4. `GetLocalPlayer()` 内做的是最终显示，还是已经把共享状态写进去？
+5. 是否出现“单套壳 + 本地切内容”的趋势，应该改回 N 槽或对称壳？
+6. 是否把高频 UI 交互误接到了 `sync=true`、`DzSyncData`、`DzSyncDataImmediately`？
+7. 是否用父帧显隐就能收口，而不是再维护一套额外 visible/page/variant 状态机？
 
 #### 一句话分流
 
@@ -242,7 +294,7 @@ function startRefreshTimer(): void {
 
 #### 4.5.1 本地 `DzFrameSetText` 不是首选，但也不等于“必炸”
 
-样本经验：
+这段与上文 4.2、4.4 并不矛盾，补充的只是**排障判断**：
 
 - 某些可行版 JASS 会在 `GetLocalPlayer()` 内直接 `DzFrameSetText`
 - 这类写法**不推荐作为长期工程方案**

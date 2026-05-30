@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import type { Boss血条弱点韧性运行状态 } from "./00．类型";
-import { Boss血条UI常量, Boss弱点YD字段 } from "./01．常量定义";
+import { Boss血条UI常量 } from "./01．常量定义";
 import { 获取全部Boss血条弱点韧性运行状态 } from "./05．Boss弱点运行状态";
 
 const japi = require("jass.japi") as any;
@@ -14,8 +14,7 @@ const { GetUnitLifePercentBJ, IsUnitAliveBJ } = require("lib.扩展函数.BJ函�
   GetUnitLifePercentBJ: (this: void, whichUnit: any) => number;
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { YDUserDataGetSafe, getObjectPropertySafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataGetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
+const { getObjectPropertySafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   getObjectPropertySafe: (this: void, objectType: number, objectId: number | string, property: string) => string;
 };
 const { ObjectType } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
@@ -60,11 +59,6 @@ function 限制比例(this: void, value: number): number {
   return value;
 }
 
-function 读取Boss护盾整数(this: void, bossUnit: any, attr: string): number {
-  const value = Number(YDUserDataGetSafe("unit", bossUnit, attr, "integer")) || 0;
-  return value > 0 ? value : 0;
-}
-
 function 取Boss头像路径(this: void, bossUnit: any): string {
   if (bossUnit == null || bossUnit === 0) return "";
   const unitTypeId = GetUnitTypeId(bossUnit);
@@ -96,8 +90,8 @@ function 刷新Boss血条UI(this: void, state: Boss血条弱点韧性运行状�
 
   const hpPercent = GetUnitLifePercentBJ(state.Boss单位);
   const hpRatio = 限制比例(hpPercent / 100);
-  const shieldValue = 读取Boss护盾整数(state.Boss单位, Boss弱点YD字段.护盾值);
-  const shieldMax = 读取Boss护盾整数(state.Boss单位, Boss弱点YD字段.原始护盾值);
+  const shieldValue = state.当前护盾值;
+  const shieldMax = state.最大护盾值;
 
   if (state.血量文本Frame !== 0) {
     DzFrameSetText(state.血量文本Frame, " [HP] ：" + R2I(hpPercent).toString() + "%");

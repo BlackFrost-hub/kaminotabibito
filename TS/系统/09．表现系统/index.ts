@@ -36,6 +36,7 @@ export function init(this: void): void {
   英雄语音系统.init();
   require("系统.09．表现系统.02．对话框系统.index");
   require("系统.09．表现系统.08．吟唱条.index");
+  require("系统.09．表现系统.11．背景框.index");
   广播提示消息系统.初始化广播提示消息系统();
   游戏说明手册.init();
 }

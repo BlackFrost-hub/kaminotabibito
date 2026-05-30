@@ -84,7 +84,6 @@ export interface ThreatPanelViewModel {
 export const 玩家面板表: Record<number, ThreatPanelFrames | undefined> = {};
 export const 玩家视图模型表: Record<number, ThreatPanelViewModel | undefined> = {};
 export const 玩家上次有效敌方目标表: Record<number, any | undefined> = {};
-export const 玩家面板显示状态表: Record<number, boolean | undefined> = {};
 
 export function 单位是有效怪物单位(单位: any): boolean {
   if (单位 == null || 单位 === 0) return false;

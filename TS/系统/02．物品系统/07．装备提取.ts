@@ -114,6 +114,7 @@ function collectAllIdsInScoreInterval(this: void, lo: number, hi: number): strin
     if (sc === undefined) continue;
     if (sc >= a && sc <= b) out.push(id);
   }
+  out.sort();
   return out;
 }
 

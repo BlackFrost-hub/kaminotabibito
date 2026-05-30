@@ -4,12 +4,36 @@ import type { Boss战运行上下文 } from "../04．Boss战运行/01．Boss战�
 import type { Boss血条弱点韧性运行状态, Boss弱点韧性配置 } from "./00．类型";
 
 const Boss弱点韧性运行状态表: Record<number, Boss血条弱点韧性运行状态 | undefined> = {};
+const Boss弱点韧性运行句柄列表: number[] = [];
+
+function 数字升序比较(this: void, a: number, b: number): number {
+  return a - b;
+}
+
+function 记录Boss弱点韧性运行句柄(this: void, bossHandleId: number): void {
+  if (bossHandleId === 0) return;
+  for (let i = 0; i < Boss弱点韧性运行句柄列表.length; i++) {
+    if (Boss弱点韧性运行句柄列表[i] === bossHandleId) return;
+  }
+  Boss弱点韧性运行句柄列表.push(bossHandleId);
+  Boss弱点韧性运行句柄列表.sort(数字升序比较);
+}
+
+function 移除Boss弱点韧性运行句柄(this: void, bossHandleId: number): void {
+  if (bossHandleId === 0) return;
+  for (let i = Boss弱点韧性运行句柄列表.length - 1; i >= 0; i--) {
+    if (Boss弱点韧性运行句柄列表[i] === bossHandleId) {
+      Boss弱点韧性运行句柄列表.splice(i, 1);
+    }
+  }
+}
 
 export function 创建Boss血条弱点韧性运行状态(
   this: void,
   context: Boss战运行上下文,
   config: Boss弱点韧性配置 | undefined,
 ): Boss血条弱点韧性运行状态 {
+  const 初始护盾值 = config?.初始护盾值 != null && config.初始护盾值 > 0 ? config.初始护盾值 : 0;
   const state: Boss血条弱点韧性运行状态 = {
     Boss句柄ID: context.Boss句柄ID,
     Boss单位: context.Boss单位,
@@ -35,6 +59,8 @@ export function 创建Boss血条弱点韧性运行状态(
     弱点命中表现截止毫秒列表: [],
     武器弱点伤害累计: 0,
     待处理弱点命中索引: -1,
+    当前护盾值: 初始护盾值,
+    最大护盾值: 初始护盾值,
     是否护盾破碎中: false,
     护盾破碎切灰截止毫秒: 0,
     护盾恢复截止毫秒: 0,
@@ -47,6 +73,7 @@ export function 创建Boss血条弱点韧性运行状态(
     护盾提示文本Frame: 0,
   };
   Boss弱点韧性运行状态表[context.Boss句柄ID] = state;
+  记录Boss弱点韧性运行句柄(context.Boss句柄ID);
   return state;
 }
 
@@ -58,25 +85,13 @@ export function 读取Boss血条弱点韧性运行状态(this: void, bossHandleI
 export function 清理Boss血条弱点韧性运行状态(this: void, bossHandleId: number): void {
   if (bossHandleId === 0) return;
   Boss弱点韧性运行状态表[bossHandleId] = undefined;
-}
-
-function 数字升序比较(this: void, a: number, b: number): number {
-  return a - b;
+  移除Boss弱点韧性运行句柄(bossHandleId);
 }
 
 export function 获取全部Boss血条弱点韧性运行状态(this: void): Boss血条弱点韧性运行状态[] {
   const result: Boss血条弱点韧性运行状态[] = [];
-  const keys = Object.keys(Boss弱点韧性运行状态表);
-  const handleIds: number[] = [];
-  for (let i = 0; i < keys.length; i++) {
-    const handleId = Number(keys[i]) || 0;
-    if (handleId > 0 && Boss弱点韧性运行状态表[handleId] != null) {
-      handleIds.push(handleId);
-    }
-  }
-  handleIds.sort(数字升序比较);
-  for (let i = 0; i < handleIds.length; i++) {
-    const state = Boss弱点韧性运行状态表[handleIds[i]];
+  for (let i = 0; i < Boss弱点韧性运行句柄列表.length; i++) {
+    const state = Boss弱点韧性运行状态表[Boss弱点韧性运行句柄列表[i]];
     if (state != null) {
       result.push(state);
     }

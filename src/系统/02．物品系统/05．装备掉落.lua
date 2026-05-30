@@ -9,6 +9,7 @@ local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local ____exports = {}
 local getItemsByScoreRange, itemsData
 function getItemsByScoreRange(minScore, maxScore)
@@ -29,6 +30,7 @@ function getItemsByScoreRange(minScore, maxScore)
         end
         ::__continue78::
     end
+    __TS__ArraySort(result)
     return result
 end
 --- 装备掉落表格式说明：

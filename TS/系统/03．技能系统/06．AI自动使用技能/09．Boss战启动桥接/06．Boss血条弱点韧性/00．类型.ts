@@ -60,6 +60,8 @@ export interface Boss血条弱点韧性运行状态 {
   弱点命中表现截止毫秒列表: number[];
   武器弱点伤害累计: number;
   待处理弱点命中索引: number;
+  当前护盾值: number;
+  最大护盾值: number;
   是否护盾破碎中: boolean;
   护盾破碎切灰截止毫秒: number;
   护盾恢复截止毫秒: number;

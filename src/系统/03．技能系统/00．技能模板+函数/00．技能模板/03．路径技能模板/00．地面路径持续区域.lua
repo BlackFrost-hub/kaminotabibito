@@ -1,10 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
+local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____751F_6210_8DEF_5F84_6BB5_5217_8868, ____on_5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDFTick, ____on_5730_9762_8DEF_5F84_94FA_8BBE_5B9A_65F6_5668_5230_65F6, GetExpiredTimer, GetHandleId, CosBJ, SinBJ, removePeriodicCallback, getServerTime, _____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B, _____94FA_8BBE_5B9A_65F6_5668_5B9E_4F8B_6620_5C04, _____5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDF_56DE_8C03ID
+local _____53D6_53E5_67C4ID, _____6570_5B57_5347_5E8F_6392_5E8F, _____83B7_53D6_6709_5E8F_5730_9762_8DEF_5F84_5B9E_4F8BID_5217_8868, _____751F_6210_8DEF_5F84_6BB5_5217_8868, ____on_5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDFTick, ____on_5730_9762_8DEF_5F84_94FA_8BBE_5B9A_65F6_5668_5230_65F6, GetExpiredTimer, GetHandleId, CosBJ, SinBJ, removePeriodicCallback, getServerTime, _____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B, _____94FA_8BBE_5B9A_65F6_5668_5B9E_4F8B_6620_5C04, _____5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDF_56DE_8C03ID
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.04．区域效果.index")
 local _____521B_5EFA_533A_57DF_6548_679C = ____index["创建区域效果"]
 local _____6E05_7406_533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_7EC4 = ____index["清理区域效果周期伤害去重组"]
@@ -15,6 +18,20 @@ function _____53D6_53E5_67C4ID(h)
         return 0
     end
     return GetHandleId(h) or 0
+end
+function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
+    return a - b
+end
+function _____83B7_53D6_6709_5E8F_5730_9762_8DEF_5F84_5B9E_4F8BID_5217_8868()
+    local ids = {}
+    for _____5B9E_4F8BID_6587_672C in pairs(_____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B) do
+        local _____5B9E_4F8BID = __TS__Number(_____5B9E_4F8BID_6587_672C)
+        if not __TS__NumberIsNaN(__TS__Number(_____5B9E_4F8BID)) then
+            ids[#ids + 1] = _____5B9E_4F8BID
+        end
+    end
+    __TS__ArraySort(ids, _____6570_5B57_5347_5E8F_6392_5E8F)
+    return ids
 end
 function _____751F_6210_8DEF_5F84_6BB5_5217_8868(_____53C2_6570)
     local _____7ED3_679C = {}
@@ -44,18 +61,24 @@ end
 function ____on_5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDFTick()
     local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
     local _____4ECD_6709_6574_4F53_77E9_5F62_5B9E_4F8B = false
-    for _____5B9E_4F8BID_6587_672C in pairs(_____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B) do
-        do
-            local _____5B9E_4F8B = _____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B[_____5B9E_4F8BID_6587_672C]
-            if _____5B9E_4F8B == nil then
-                goto __continue45
+    local _____5B9E_4F8BID_5217_8868 = _____83B7_53D6_6709_5E8F_5730_9762_8DEF_5F84_5B9E_4F8BID_5217_8868()
+    do
+        local i = 0
+        while i < #_____5B9E_4F8BID_5217_8868 do
+            do
+                local _____5B9E_4F8BID = _____5B9E_4F8BID_5217_8868[i + 1]
+                local _____5B9E_4F8B = _____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B[_____5B9E_4F8BID]
+                if _____5B9E_4F8B == nil then
+                    goto __continue51
+                end
+                if _____5B9E_4F8B["参数"]["伤害模式"] == "整体矩形" then
+                    _____4ECD_6709_6574_4F53_77E9_5F62_5B9E_4F8B = true
+                    _____5B9E_4F8B["整体伤害系统Tick"](_____5B9E_4F8B, _____5F53_524D_65F6_95F4_6BEB_79D2)
+                end
             end
-            if _____5B9E_4F8B["参数"]["伤害模式"] == "整体矩形" then
-                _____4ECD_6709_6574_4F53_77E9_5F62_5B9E_4F8B = true
-                _____5B9E_4F8B["整体伤害系统Tick"](_____5B9E_4F8B, _____5F53_524D_65F6_95F4_6BEB_79D2)
-            end
+            ::__continue51::
+            i = i + 1
         end
-        ::__continue45::
     end
     if not _____4ECD_6709_6574_4F53_77E9_5F62_5B9E_4F8B and _____5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDF_56DE_8C03ID ~= 0 then
         removePeriodicCallback(_____5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDF_56DE_8C03ID)

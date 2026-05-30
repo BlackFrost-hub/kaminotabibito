@@ -1,15 +1,11 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Number = ____lualib.__TS__Number
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.06．Boss血条弱点韧性.01．常量定义")
 local ____Boss_5F31_70B9UI_5E38_91CF = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss弱点UI常量"]
-local ____Boss_5F31_70B9YD_5B57_6BB5 = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss弱点YD字段"]
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.index")
-local frameSetScriptByCode = ____require_result_1.frameSetScriptByCode
+local ____require_result_0 = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local frameSetScriptByCode = ____require_result_0.frameSetScriptByCode
 local DzCreateFrameByTagName = japi.DzCreateFrameByTagName
 local DzFrameSetTexture = japi.DzFrameSetTexture
 local DzFrameSetAbsolutePoint = japi.DzFrameSetAbsolutePoint
@@ -24,16 +20,12 @@ local DzFrameSetPriority = japi.DzFrameSetPriority
 local FRAME_EVENT_MOUSE_ENTER = 2
 local FRAME_EVENT_MOUSE_LEAVE = 3
 local _____62A4_76FE_63D0_793A_6846By_6309_94AE = {}
-local function _____8BFB_53D6_62A4_76FE_539F_59CB_503C(bossUnit)
-    local value = __TS__Number(YDUserDataGetSafe("unit", bossUnit, ____Boss_5F31_70B9YD_5B57_6BB5["原始护盾值"], "integer")) or 0
-    return value > 0 and value or 0
-end
 local function _____8BB0_5F55_5F31_70B9UIFrame(state, frame)
     if frame == 0 then
         return
     end
-    local ____state__5F31_70B9UIFrame_5217_8868_2 = state["弱点UIFrame列表"]
-    ____state__5F31_70B9UIFrame_5217_8868_2[#____state__5F31_70B9UIFrame_5217_8868_2 + 1] = frame
+    local ____state__5F31_70B9UIFrame_5217_8868_1 = state["弱点UIFrame列表"]
+    ____state__5F31_70B9UIFrame_5217_8868_1[#____state__5F31_70B9UIFrame_5217_8868_1 + 1] = frame
 end
 local function _____79FB_9664_5F31_70B9UIFrame_8BB0_5F55(state, frame)
     if frame == 0 then
@@ -90,28 +82,27 @@ local function _____521B_5EFABoss_5F31_70B9_95EE_53F7UI(state)
             DzFrameSetAbsolutePoint(frame, ____Boss_5F31_70B9UI_5E38_91CF["锚点中心"], x, ____Boss_5F31_70B9UI_5E38_91CF["弱点Y"])
             DzFrameSetTexture(frame, ____Boss_5F31_70B9UI_5E38_91CF["问号图标"], 0)
             DzFrameShow(frame, true)
-            local ____state__5F31_70B9_95EE_53F7Frame_5217_8868_3 = state["弱点问号Frame列表"]
-            ____state__5F31_70B9_95EE_53F7Frame_5217_8868_3[#____state__5F31_70B9_95EE_53F7Frame_5217_8868_3 + 1] = frame
-            local ____state__5F31_70B9_56FE_6807Frame_5217_8868_4 = state["弱点图标Frame列表"]
-            ____state__5F31_70B9_56FE_6807Frame_5217_8868_4[#____state__5F31_70B9_56FE_6807Frame_5217_8868_4 + 1] = 0
-            local ____state__5F31_70B9X_8F74_5217_8868_5 = state["弱点X轴列表"]
-            ____state__5F31_70B9X_8F74_5217_8868_5[#____state__5F31_70B9X_8F74_5217_8868_5 + 1] = x
-            local ____state__5F31_70B9_5DF2_66B4_9732_5217_8868_6 = state["弱点已暴露列表"]
-            ____state__5F31_70B9_5DF2_66B4_9732_5217_8868_6[#____state__5F31_70B9_5DF2_66B4_9732_5217_8868_6 + 1] = false
-            local ____state__5F31_70B9_4FDD_62A4_5217_8868_7 = state["弱点保护列表"]
-            ____state__5F31_70B9_4FDD_62A4_5217_8868_7[#____state__5F31_70B9_4FDD_62A4_5217_8868_7 + 1] = false
-            local ____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_8 = state["弱点保护截止毫秒列表"]
-            ____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_8[#____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_8 + 1] = 0
-            local ____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_9 = state["弱点命中表现截止毫秒列表"]
-            ____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_9[#____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_9 + 1] = 0
+            local ____state__5F31_70B9_95EE_53F7Frame_5217_8868_2 = state["弱点问号Frame列表"]
+            ____state__5F31_70B9_95EE_53F7Frame_5217_8868_2[#____state__5F31_70B9_95EE_53F7Frame_5217_8868_2 + 1] = frame
+            local ____state__5F31_70B9_56FE_6807Frame_5217_8868_3 = state["弱点图标Frame列表"]
+            ____state__5F31_70B9_56FE_6807Frame_5217_8868_3[#____state__5F31_70B9_56FE_6807Frame_5217_8868_3 + 1] = 0
+            local ____state__5F31_70B9X_8F74_5217_8868_4 = state["弱点X轴列表"]
+            ____state__5F31_70B9X_8F74_5217_8868_4[#____state__5F31_70B9X_8F74_5217_8868_4 + 1] = x
+            local ____state__5F31_70B9_5DF2_66B4_9732_5217_8868_5 = state["弱点已暴露列表"]
+            ____state__5F31_70B9_5DF2_66B4_9732_5217_8868_5[#____state__5F31_70B9_5DF2_66B4_9732_5217_8868_5 + 1] = false
+            local ____state__5F31_70B9_4FDD_62A4_5217_8868_6 = state["弱点保护列表"]
+            ____state__5F31_70B9_4FDD_62A4_5217_8868_6[#____state__5F31_70B9_4FDD_62A4_5217_8868_6 + 1] = false
+            local ____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_7 = state["弱点保护截止毫秒列表"]
+            ____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_7[#____state__5F31_70B9_4FDD_62A4_622A_6B62_6BEB_79D2_5217_8868_7 + 1] = 0
+            local ____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_8 = state["弱点命中表现截止毫秒列表"]
+            ____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_8[#____state__5F31_70B9_547D_4E2D_8868_73B0_622A_6B62_6BEB_79D2_5217_8868_8 + 1] = 0
             _____8BB0_5F55_5F31_70B9UIFrame(state, frame)
             i = i + 1
         end
     end
 end
 local function _____521B_5EFABoss_62A4_76FE_8BF4_660EUI(state)
-    local ____opt_10 = state["配置"]
-    local shieldMax = ____opt_10 and ____opt_10["初始护盾值"] or _____8BFB_53D6_62A4_76FE_539F_59CB_503C(state["Boss单位"])
+    local shieldMax = state["最大护盾值"]
     state["护盾图标Frame"] = DzCreateFrameByTagName(
         "BACKDROP",
         "BossWeakShieldIcon",

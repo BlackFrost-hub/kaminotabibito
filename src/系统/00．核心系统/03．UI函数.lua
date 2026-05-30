@@ -111,6 +111,39 @@ ____exports.DEFAULT_UI_FONT_FILE = "UI\\uizt.ttf"
 ____exports.DEFAULT_UI_FONT_FLAG = 0
 --- 列表/入口等默认字号（`DzFrameSetFont` 第三参）
 ____exports.DEFAULT_UI_FONT_SCALE = 0.016
+local __pcallDzFrameA = 0
+local __pcallDzFrameB = 0
+local function __pcallDzFrameClearAllPoints(self)
+    japi.DzFrameClearAllPoints(__pcallDzFrameA)
+end
+local function __pcallDzFrameSetAllPoints(self)
+    japi.DzFrameSetAllPoints(__pcallDzFrameA, __pcallDzFrameB)
+end
+local function __pcallDzFrameSetParent(self)
+    japi.DzFrameSetParent(__pcallDzFrameA, __pcallDzFrameB)
+end
+local function __pcallDzFrameSetAlpha(self)
+    japi.DzFrameSetAlpha(__pcallDzFrameA, __pcallDzFrameB)
+end
+local function pcallDzFrameClearAllPoints(frame)
+    __pcallDzFrameA = frame
+    pcall(__pcallDzFrameClearAllPoints)
+end
+local function pcallDzFrameSetAllPoints(frame, relative)
+    __pcallDzFrameA = frame
+    __pcallDzFrameB = relative
+    pcall(__pcallDzFrameSetAllPoints)
+end
+local function pcallDzFrameSetParent(frame, parent)
+    __pcallDzFrameA = frame
+    __pcallDzFrameB = parent
+    pcall(__pcallDzFrameSetParent)
+end
+local function pcallDzFrameSetAlpha(frame, alpha)
+    __pcallDzFrameA = frame
+    __pcallDzFrameB = alpha
+    pcall(__pcallDzFrameSetAlpha)
+end
 --- 设置字体与文本对齐；`fontScale` 省略则用 `DEFAULT_UI_FONT_SCALE`。
 function ____exports.applyDzTextFontAndAlignment(self, frame, textAlignment, fontScale, fontFile, fontFlag)
     if fontFile == nil then
@@ -158,10 +191,8 @@ function ____exports.createTextFrameFillBackdrop(self, backdrop, name, text)
     if not tf or tf == 0 then
         return nil
     end
-    pcall(function () return japi.DzFrameClearAllPoints(tf) end
-    )
-    pcall(function () return japi.DzFrameSetAllPoints(tf, backdrop) end
-    )
+    pcallDzFrameClearAllPoints(tf)
+    pcallDzFrameSetAllPoints(tf, backdrop)
     japi.DzFrameSetText(tf, text)
     return tf
 end
@@ -192,18 +223,14 @@ function ____exports.layoutGlueTextButtonOverBackdrop(self, backdrop, button)
     if not backdrop or backdrop == 0 or not button or button == 0 then
         return
     end
-    pcall(function () return japi.DzFrameSetParent(button, backdrop) end
-    )
-    pcall(function () return japi.DzFrameClearAllPoints(button) end
-    )
-    pcall(function () return japi.DzFrameSetAllPoints(button, backdrop) end
-    )
+    pcallDzFrameSetParent(button, backdrop)
+    pcallDzFrameClearAllPoints(button)
+    pcallDzFrameSetAllPoints(button, backdrop)
 end
 --- 透明命中层：铺满背景后清空按钮字并 `alpha=0`（文案由同背景的 `TEXT` 负责）。
 function ____exports.setupTransparentGlueHitLayer(self, backdrop, button)
     ____exports.layoutGlueTextButtonOverBackdrop(nil, backdrop, button)
     setButtonText(nil, button, "")
-    pcall(function () return japi.DzFrameSetAlpha(button, 0) end
-    )
+    pcallDzFrameSetAlpha(button, 0)
 end
 return ____exports

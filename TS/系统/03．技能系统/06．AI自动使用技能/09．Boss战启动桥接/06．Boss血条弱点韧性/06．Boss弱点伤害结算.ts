@@ -6,7 +6,6 @@ import {
   Boss弱点提示文本,
   Boss弱点消息类型默认值,
   Boss弱点运行常量,
-  Boss弱点YD字段,
 } from "./01．常量定义";
 import {
   显示Boss弱点真实图标,
@@ -30,10 +29,6 @@ const { getServerTime, addPeriodicCallback, removePeriodicCallback } = require("
   getServerTime: (this: void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
-};
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataGetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
-  YDUserDataSetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
 };
 const { 获取单位最终武器类型 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.07．武器类型") as {
   获取单位最终武器类型: (this: void, unit: any) => string;
@@ -65,18 +60,16 @@ let 是否已注册Boss弱点伤害修正 = false;
 let 是否已注册Boss破盾伤害修正 = false;
 let 弱点表现刷新回调ID = 0;
 
-function 读取护盾值(this: void, bossUnit: any): number {
-  const value = Number(YDUserDataGetSafe("unit", bossUnit, Boss弱点YD字段.护盾值, "integer")) || 0;
-  return value > 0 ? value : 0;
+function 读取护盾值(this: void, state: Boss血条弱点韧性运行状态): number {
+  return state.当前护盾值 > 0 ? state.当前护盾值 : 0;
 }
 
-function 读取护盾最大值(this: void, bossUnit: any): number {
-  const value = Number(YDUserDataGetSafe("unit", bossUnit, Boss弱点YD字段.原始护盾值, "integer")) || 0;
-  return value > 0 ? value : 0;
+function 读取护盾最大值(this: void, state: Boss血条弱点韧性运行状态): number {
+  return state.最大护盾值 > 0 ? state.最大护盾值 : 0;
 }
 
-function 写入护盾值(this: void, bossUnit: any, value: number): void {
-  YDUserDataSetSafe("unit", bossUnit, Boss弱点YD字段.护盾值, "integer", value > 0 ? value : 0);
+function 写入护盾值(this: void, state: Boss血条弱点韧性运行状态, value: number): void {
+  state.当前护盾值 = value > 0 ? value : 0;
 }
 
 function 取正数配置(this: void, value: number | undefined, fallback: number): number {
@@ -199,14 +192,14 @@ function 取弱点冷却毫秒(this: void, state: Boss血条弱点韧性运行�
 }
 
 function 扣除Boss护盾(this: void, state: Boss血条弱点韧性运行状态): number {
-  const shieldValue = 读取护盾值(state.Boss单位);
+  const shieldValue = 读取护盾值(state);
   if (shieldValue <= 0) {
     刷新Boss护盾文本(state, 0);
     return 0;
   }
   const reduceValue = 取正数配置(state.配置?.护盾命中削减值, Boss弱点反馈默认配置.护盾命中削减值);
   const nextValue = shieldValue - reduceValue;
-  写入护盾值(state.Boss单位, nextValue);
+  写入护盾值(state, nextValue);
   刷新Boss护盾文本(state, nextValue > 0 ? nextValue : 0);
   return nextValue > 0 ? nextValue : 0;
 }
@@ -214,7 +207,7 @@ function 扣除Boss护盾(this: void, state: Boss血条弱点韧性运行状态)
 function 触发Boss护盾破碎(this: void, state: Boss血条弱点韧性运行状态, attacker: any): void {
   if (state.是否护盾破碎中) return;
   state.是否护盾破碎中 = true;
-  写入护盾值(state.Boss单位, 0);
+  写入护盾值(state, 0);
   刷新Boss护盾文本(state, 0);
   设置Boss护盾破碎显示(state);
   播放全员本地音效(state.配置?.护盾破碎音效路径 ?? Boss弱点反馈默认配置.护盾破碎音效路径);
@@ -300,8 +293,8 @@ function 处理护盾破碎计时(this: void, state: Boss血条弱点韧性运�
     设置Boss护盾灰色显示(state);
   }
   if (state.护盾恢复截止毫秒 > 0 && now >= state.护盾恢复截止毫秒) {
-    const maxShield = 读取护盾最大值(state.Boss单位);
-    写入护盾值(state.Boss单位, maxShield);
+    const maxShield = 读取护盾最大值(state);
+    写入护盾值(state, maxShield);
     刷新Boss护盾文本(state, maxShield);
     设置Boss护盾完整显示(state);
     state.是否护盾破碎中 = false;
@@ -355,16 +348,7 @@ function onBoss破盾伤害修正(this: void, context: any): number {
   if (state == null || state.配置 == null) return context.currentDamage;
   if (!state.是否护盾破碎中) return context.currentDamage;
   const multiplier = 取有效倍率配置(state.配置.破盾伤害倍率, Boss弱点反馈默认配置.破盾伤害倍率);
-  const returnDamage = context.currentDamage * multiplier;
-  debugLogForce(
-    Boss血条弱点韧性模块名,
-    "[破盾伤害修正]",
-    "base=", context.baseDamage,
-    "current=", context.currentDamage,
-    "return=", returnDamage,
-    "multiplier=", multiplier,
-  );
-  return returnDamage;
+  return context.currentDamage * multiplier;
 }
 
 function 确保Boss破盾伤害修正(this: void): void {
@@ -382,7 +366,6 @@ export function 注册Boss弱点伤害结算(this: void, state: Boss血条弱点
   if (state.是否已结束 || state.是否伤害结算已注册) return;
   if (!state.是否弱点已注册) return;
   预热Boss弱点反馈音效(state);
-  debugLogForce(Boss血条弱点韧性模块名, "[注册伤害结算]", "boss=", state.Boss句柄ID, "weakCount=", state.配置?.弱点列表.length ?? 0);
   确保Boss弱点伤害修正();
   确保Boss破盾伤害修正();
   确保Boss弱点最终伤害监听();

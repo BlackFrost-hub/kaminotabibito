@@ -32,6 +32,26 @@ local GOLD_B = 0
 local GOLD_FLOAT_DURATION_SEC = 1.25
 --- 金币获取回调列表
 local goldGainCallbacks = {}
+local ______pcall_91D1_5E01_56DE_8C03
+local ______pcall_91D1_5E01_53C2_6570
+local ______pcall_91D1_5E01_7ED3_679C
+local function ______pcall_6267_884C_91D1_5E01_56DE_8C03(self)
+    if ______pcall_91D1_5E01_56DE_8C03 == nil or ______pcall_91D1_5E01_53C2_6570 == nil then
+        return
+    end
+    ______pcall_91D1_5E01_7ED3_679C = ______pcall_91D1_5E01_56DE_8C03(______pcall_91D1_5E01_53C2_6570)
+end
+local function _____6267_884C_91D1_5E01_56DE_8C03_5B89_5168(cb, params)
+    ______pcall_91D1_5E01_56DE_8C03 = cb
+    ______pcall_91D1_5E01_53C2_6570 = params
+    ______pcall_91D1_5E01_7ED3_679C = nil
+    pcall(______pcall_6267_884C_91D1_5E01_56DE_8C03)
+    local result = ______pcall_91D1_5E01_7ED3_679C
+    ______pcall_91D1_5E01_56DE_8C03 = nil
+    ______pcall_91D1_5E01_53C2_6570 = nil
+    ______pcall_91D1_5E01_7ED3_679C = nil
+    return result
+end
 --- 获取单位赏金
 local function getUnitBounty(unitType)
     return getObjectPropertyInteger(nil, 2, unitType, "bountyplus")
@@ -69,10 +89,8 @@ end
 local function giveGoldToPlayer(unit, player, baseGold, isShared)
     local params = {unit = unit, player = player, baseGold = baseGold, isShared = isShared}
     for ____, cb in ipairs(goldGainCallbacks) do
-        local pcallResult = pcall(nil, cb, params)
-        local success = pcallResult[0]
-        local result = pcallResult[1]
-        if success and result ~= nil then
+        local result = _____6267_884C_91D1_5E01_56DE_8C03_5B89_5168(cb, params)
+        if result ~= nil then
             params = result
         end
     end
@@ -143,13 +161,13 @@ local function onUnitDeathHandler(dyingUnit, killer)
             do
                 local hero = jass.BlzGroupUnitAt(heroGroup, i)
                 if not hero then
-                    goto __continue22
+                    goto __continue25
                 end
                 if hero == killer then
-                    goto __continue22
+                    goto __continue25
                 end
                 if jass.IsUnitAlly(hero, killerPlayer) ~= true then
-                    goto __continue22
+                    goto __continue25
                 end
                 local ____temp_10 = jass.GetUnitX(hero)
                 if ____temp_10 == nil then
@@ -165,15 +183,15 @@ local function onUnitDeathHandler(dyingUnit, killer)
                 local dy = heroY - dyingY
                 local dist = jass.SquareRoot(dx * dx + dy * dy)
                 if dist > SHARE_RANGE then
-                    goto __continue22
+                    goto __continue25
                 end
                 local heroPlayer = jass.GetOwningPlayer(hero)
                 if heroPlayer == nil then
-                    goto __continue22
+                    goto __continue25
                 end
                 giveGoldToPlayer(hero, heroPlayer, shareGold, true)
             end
-            ::__continue22::
+            ::__continue25::
             i = i + 1
         end
     end

@@ -241,6 +241,7 @@ function getItemsByScoreRange(minScore: number, maxScore: number): string[] {
     if (typeof score !== "number") continue;
     if (score >= minScore && score <= maxScore) result.push(id);
   }
+  result.sort();
   return result;
 }
 

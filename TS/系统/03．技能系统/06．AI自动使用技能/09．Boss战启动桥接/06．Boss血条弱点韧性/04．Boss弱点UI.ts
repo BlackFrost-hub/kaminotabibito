@@ -1,12 +1,9 @@
 /** @noSelfInFile */
 
 import type { Boss血条弱点韧性运行状态 } from "./00．类型";
-import { Boss弱点UI常量, Boss弱点YD字段 } from "./01．常量定义";
+import { Boss弱点UI常量 } from "./01．常量定义";
 
 const japi = require("jass.japi") as any;
-const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataGetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
-};
 const { frameSetScriptByCode } = require("lib.扩展函数.封装函数.04．硬件输入.index") as {
   frameSetScriptByCode: (
     this: void,
@@ -45,12 +42,8 @@ const DzFrameSetPriority = japi.DzFrameSetPriority as (frame: number, priority: 
 
 const FRAME_EVENT_MOUSE_ENTER = 2;
 const FRAME_EVENT_MOUSE_LEAVE = 3;
+// DzFrame 返回数字 frame id，不是 JASS handle；这里直接用按钮 frame id 反查本地提示框。
 const 护盾提示框By按钮: Record<number, number | undefined> = {};
-
-function 读取护盾原始值(this: void, bossUnit: any): number {
-  const value = Number(YDUserDataGetSafe("unit", bossUnit, Boss弱点YD字段.原始护盾值, "integer")) || 0;
-  return value > 0 ? value : 0;
-}
 
 function 记录弱点UIFrame(this: void, state: Boss血条弱点韧性运行状态, frame: number): void {
   if (frame === 0) return;
@@ -104,7 +97,7 @@ function 创建Boss弱点问号UI(this: void, state: Boss血条弱点韧性运�
 }
 
 function 创建Boss护盾说明UI(this: void, state: Boss血条弱点韧性运行状态): void {
-  const shieldMax = state.配置?.初始护盾值 || 读取护盾原始值(state.Boss单位);
+  const shieldMax = state.最大护盾值;
 
   state.护盾图标Frame = DzCreateFrameByTagName("BACKDROP", "BossWeakShieldIcon", state.血条Frame, "template", 13);
   DzFrameSetAbsolutePoint(

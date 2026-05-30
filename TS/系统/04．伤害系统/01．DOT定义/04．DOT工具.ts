@@ -40,6 +40,7 @@ export function collectHidsInTab(tab: Record<any, any>): number[] {
     seen[kn] = true;
     out.push(kn);
   }
+  out.sort((a, b) => a - b);
   return out;
 }
 

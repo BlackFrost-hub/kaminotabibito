@@ -1,8 +1,49 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
+local getEventUnitDamaged, ______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90, ______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90, ______pcall_68C0_67E5_89E6_53D1_5668_542F_7528, ______pcall_8BC4_4F30_89E6_53D1_5668, ______pcall_6267_884C_89E6_53D1_5668, ______pcall_68C0_67E5_666E_901A_653B_51FB, ______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot, ______pcall_901A_77E5Dot_6279_6B21_4F24_5BB3_663E_793A, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, ______pcall_4F24_5BB3_6765_6E90, ______pcall_89E6_53D1_5668, ______pcall_5E03_5C14_7ED3_679C, ______pcall_4F24_5BB3Entry, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
 function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
+end
+function ______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90(self)
+    ______pcall_4F24_5BB3_6765_6E90 = jass.GetEventDamageSource()
+end
+function ______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90(self)
+    ______pcall_4F24_5BB3_6765_6E90 = GetEventDamageSource()
+end
+function ______pcall_68C0_67E5_89E6_53D1_5668_542F_7528(self)
+    ______pcall_5E03_5C14_7ED3_679C = jass.IsTriggerEnabled(______pcall_89E6_53D1_5668) == true
+end
+function ______pcall_8BC4_4F30_89E6_53D1_5668(self)
+    ______pcall_5E03_5C14_7ED3_679C = jass.TriggerEvaluate(______pcall_89E6_53D1_5668) == true
+end
+function ______pcall_6267_884C_89E6_53D1_5668(self)
+    jass.TriggerExecute(______pcall_89E6_53D1_5668)
+end
+function ______pcall_68C0_67E5_666E_901A_653B_51FB(self)
+    ______pcall_5E03_5C14_7ED3_679C = _____4F24_5BB3_51FD_6570.isNormalAttack() == true
+end
+function ______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot(self)
+    local entry = ______pcall_4F24_5BB3Entry
+    if entry == nil then
+        return
+    end
+    local dm = require("系统.04．伤害系统.02．dot伤害")
+    if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
+        local ____dm_tryApplyHeroAttackGearDots_3 = dm.tryApplyHeroAttackGearDots
+        local ____temp_2
+        if entry.source ~= nil then
+            ____temp_2 = entry.source
+        else
+            ____temp_2 = nil
+        end
+        ____dm_tryApplyHeroAttackGearDots_3(dm, ____temp_2, entry.unit, entry.damage)
+    end
+end
+function ______pcall_901A_77E5Dot_6279_6B21_4F24_5BB3_663E_793A(self)
+    local m = require("系统.04．伤害系统.02．dot伤害")
+    if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
+        m:notifyDotTickBatchDamageDisplayed()
+    end
 end
 function onUnitDeathForDamage(dyingUnit)
     if not UnitGroup or not dyingUnit then
@@ -22,32 +63,30 @@ function onAnyUnitDamagedAction()
         return
     end
     local savedSource = nil
-    pcall(function ()
-            savedSource = jass.GetEventDamageSource()
-        end
-    )
+    ______pcall_4F24_5BB3_6765_6E90 = nil
+    pcall(______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90)
+    savedSource = ______pcall_4F24_5BB3_6765_6E90
     if savedSource == nil then
-        pcall(function ()
-                savedSource = GetEventDamageSource()
-            end
-        )
+        ______pcall_4F24_5BB3_6765_6E90 = nil
+        pcall(______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90)
+        savedSource = ______pcall_4F24_5BB3_6765_6E90
     end
-    local ____temp_3
+    local ____temp_5
     if #dotBatchMarkQueue > 0 then
-        ____temp_3 = table.remove(dotBatchMarkQueue, 1) == true
+        ____temp_5 = table.remove(dotBatchMarkQueue, 1) == true
     else
-        ____temp_3 = false
+        ____temp_5 = false
     end
-    local fromDotTickBatchForEvent = ____temp_3
+    local fromDotTickBatchForEvent = ____temp_5
     if not fromDotTickBatchForEvent and savedUnit ~= nil and savedDamage > 0.1 then
         local dmgCalc = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-        local ____temp_4
+        local ____temp_6
         if dmgCalc ~= nil then
-            ____temp_4 = dmgCalc.onDamageEvent
+            ____temp_6 = dmgCalc.onDamageEvent
         else
-            ____temp_4 = nil
+            ____temp_6 = nil
         end
-        local onDamageEvent = ____temp_4
+        local onDamageEvent = ____temp_6
         if onDamageEvent ~= nil then
             onDamageEvent(savedUnit, savedSource, savedDamage)
         end
@@ -56,39 +95,27 @@ function onAnyUnitDamagedAction()
     while i < DamageEventNumber do
         local trg = DamageEventQueue[i + 1]
         if trg ~= nil then
-            local enabled = false
-            local evaluated = false
-            pcall(function ()
-                    if jass.IsTriggerEnabled(trg) then
-                        enabled = true
-                    end
-                end
-            )
+            ______pcall_89E6_53D1_5668 = trg
+            ______pcall_5E03_5C14_7ED3_679C = false
+            pcall(______pcall_68C0_67E5_89E6_53D1_5668_542F_7528)
+            local enabled = ______pcall_5E03_5C14_7ED3_679C
             if enabled then
-                pcall(function ()
-                        if jass.TriggerEvaluate(trg) then
-                            evaluated = true
-                        end
-                    end
-                )
+                ______pcall_5E03_5C14_7ED3_679C = false
+                pcall(______pcall_8BC4_4F30_89E6_53D1_5668)
+                local evaluated = ______pcall_5E03_5C14_7ED3_679C
                 if evaluated then
-                    pcall(function ()
-                            jass.TriggerExecute(trg)
-                        end
-                    )
+                    pcall(______pcall_6267_884C_89E6_53D1_5668)
                 end
             end
+            ______pcall_89E6_53D1_5668 = nil
         end
         i = i + 1
     end
     local isNormalAttackSnap = false
     if not fromDotTickBatchForEvent then
-        pcall(function ()
-                if _____4F24_5BB3_51FD_6570.isNormalAttack() == true then
-                    isNormalAttackSnap = true
-                end
-            end
-        )
+        ______pcall_5E03_5C14_7ED3_679C = false
+        pcall(______pcall_68C0_67E5_666E_901A_653B_51FB)
+        isNormalAttackSnap = ______pcall_5E03_5C14_7ED3_679C
     end
     local entry = {
         unit = savedUnit,
@@ -104,20 +131,9 @@ function processDamageEntry(self, entry)
     local sd = entry.damage
     local isDotTickDamage = entry.fromDotTickBatch == true
     if entry.isNormalAttack == true and not isDotTickDamage then
-        pcall(function ()
-                local dm = require("系统.04．伤害系统.02．dot伤害")
-                if dm ~= nil and type(dm.tryApplyHeroAttackGearDots) == "function" then
-                    local ____dm_tryApplyHeroAttackGearDots_6 = dm.tryApplyHeroAttackGearDots
-                    local ____temp_5
-                    if entry.source ~= nil then
-                        ____temp_5 = entry.source
-                    else
-                        ____temp_5 = nil
-                    end
-                    ____dm_tryApplyHeroAttackGearDots_6(dm, ____temp_5, su, sd)
-                end
-            end
-        )
+        ______pcall_4F24_5BB3Entry = entry
+        pcall(______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot)
+        ______pcall_4F24_5BB3Entry = nil
     end
     local _____4F24_5BB3_8BA1_7B97_56DE_8C03 = _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03(nil)
     do
@@ -145,13 +161,7 @@ function processDamageEntry(self, entry)
         end
     end
     if isDotTickDamage then
-        pcall(function ()
-                local m = require("系统.04．伤害系统.02．dot伤害")
-                if m ~= nil and type(m.notifyDotTickBatchDamageDisplayed) == "function" then
-                    m:notifyDotTickBatchDamageDisplayed()
-                end
-            end
-        )
+        pcall(______pcall_901A_77E5Dot_6279_6B21_4F24_5BB3_663E_793A)
     end
 end
 function anyUnitDamagedFilter()
@@ -282,6 +292,10 @@ UnitGroup = nil
 DamageEventInitialized = false
 DamageTriggerByUnitHid = {}
 DamageTriggerActionByUnitHid = {}
+______pcall_4F24_5BB3_6765_6E90 = nil
+______pcall_89E6_53D1_5668 = nil
+______pcall_5E03_5C14_7ED3_679C = false
+______pcall_4F24_5BB3Entry = nil
 --- 伤害事件队列
 local damagePendingQueue = {}
 dotBatchMarkQueue = {}
@@ -301,11 +315,11 @@ TriggerRegisterEnterRegion = jass.TriggerRegisterEnterRegion
 GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 --- 与 JASS `IsUnitType(u, UNIT_TYPE_HERO)` 一致
 local function getUnitTypeHero(self)
-    local ____jass_UNIT_TYPE_HERO_2 = jass.UNIT_TYPE_HERO
-    if ____jass_UNIT_TYPE_HERO_2 == nil then
-        ____jass_UNIT_TYPE_HERO_2 = jass.ConvertUnitType(2)
+    local ____jass_UNIT_TYPE_HERO_4 = jass.UNIT_TYPE_HERO
+    if ____jass_UNIT_TYPE_HERO_4 == nil then
+        ____jass_UNIT_TYPE_HERO_4 = jass.ConvertUnitType(2)
     end
-    return ____jass_UNIT_TYPE_HERO_2
+    return ____jass_UNIT_TYPE_HERO_4
 end
 --- 注册一个触发器：当任意单位受到伤害时，若该触发器启用且条件通过则执行。
 -- 

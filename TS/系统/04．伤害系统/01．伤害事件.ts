@@ -51,6 +51,52 @@ let DamageEventInitialized = false;
 const DamageTriggerByUnitHid: Record<string, any> = {};
 const DamageTriggerActionByUnitHid: Record<string, any> = {};
 
+// ── pcall 槽位：仅用模块顶层具名体，避免 `(pcall as any)(匿名)` 生成 `pcall(nil, fn)` ──
+let __pcall伤害来源: any = null;
+let __pcall触发器: any = null;
+let __pcall布尔结果 = false;
+let __pcall伤害Entry: any = null;
+
+function __pcall读取Jass伤害来源(this: any): void {
+  __pcall伤害来源 = (jass as any).GetEventDamageSource();
+}
+
+function __pcall读取全局伤害来源(this: any): void {
+  __pcall伤害来源 = GetEventDamageSource();
+}
+
+function __pcall检查触发器启用(this: any): void {
+  __pcall布尔结果 = (jass as any).IsTriggerEnabled(__pcall触发器) === true;
+}
+
+function __pcall评估触发器(this: any): void {
+  __pcall布尔结果 = (jass as any).TriggerEvaluate(__pcall触发器) === true;
+}
+
+function __pcall执行触发器(this: any): void {
+  (jass as any).TriggerExecute(__pcall触发器);
+}
+
+function __pcall检查普通攻击(this: any): void {
+  __pcall布尔结果 = 伤害函数.isNormalAttack() === true;
+}
+
+function __pcall应用英雄普攻装备Dot(this: any): void {
+  const entry = __pcall伤害Entry;
+  if (entry == null) return;
+  const dm = require("系统.04．伤害系统.02．dot伤害") as {
+    tryApplyHeroAttackGearDots?: (src: any, tgt: any, dmg: number) => void;
+  };
+  if (dm != null && typeof dm.tryApplyHeroAttackGearDots === "function") {
+    dm.tryApplyHeroAttackGearDots(entry.source != null ? entry.source : null, entry.unit, entry.damage);
+  }
+}
+
+function __pcall通知Dot批次伤害显示(this: any): void {
+  const m = require("系统.04．伤害系统.02．dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
+  if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
+}
+
 /** 伤害事件队列 */
 const damagePendingQueue: {
   unit: any;
@@ -102,9 +148,13 @@ function onAnyUnitDamagedAction(this: void): void {
   if (savedDamage <= 0) return;
   let savedSource: any = null;
   /** 直接调用 jass.GetEventDamageSource()，不能赋局部变量再调用（TSTL/Lua 坑2：会编成 jass:xxx() 加 self 参数） */
-  (pcall as any)(() => { savedSource = (jass as any).GetEventDamageSource(); });
+  __pcall伤害来源 = null;
+  pcall(__pcall读取Jass伤害来源);
+  savedSource = __pcall伤害来源;
   if (savedSource == null) {
-    (pcall as any)(() => { savedSource = GetEventDamageSource(); });
+    __pcall伤害来源 = null;
+    pcall(__pcall读取全局伤害来源);
+    savedSource = __pcall伤害来源;
   }
 
   // 在TriggerExecute之前先执行伤害计算（确保YDWESetEventDamage在同步阶段生效）
@@ -123,28 +173,28 @@ function onAnyUnitDamagedAction(this: void): void {
   while (i < DamageEventNumber) {
     const trg = DamageEventQueue[i];
     if (trg != null) {
-      let enabled = false;
-      let evaluated = false;
-      (pcall as any)(() => {
-        if ((jass as any).IsTriggerEnabled(trg)) enabled = true;
-      });
+      __pcall触发器 = trg;
+      __pcall布尔结果 = false;
+      pcall(__pcall检查触发器启用);
+      const enabled = __pcall布尔结果;
       if (enabled) {
-        (pcall as any)(() => {
-          if ((jass as any).TriggerEvaluate(trg)) evaluated = true;
-        });
+        __pcall布尔结果 = false;
+        pcall(__pcall评估触发器);
+        const evaluated = __pcall布尔结果;
         if (evaluated) {
-          (pcall as any)(() => {
-            (jass as any).TriggerExecute(trg);
-          });
+          pcall(__pcall执行触发器);
         }
       }
+      __pcall触发器 = null;
     }
     i = i + 1;
   }
 
   let isNormalAttackSnap = false;
   if (!fromDotTickBatchForEvent) {
-    (pcall as any)(() => { if (伤害函数.isNormalAttack() === true) isNormalAttackSnap = true; });
+    __pcall布尔结果 = false;
+    pcall(__pcall检查普通攻击);
+    isNormalAttackSnap = __pcall布尔结果;
   }
 
   const entry = {
@@ -164,14 +214,9 @@ function processDamageEntry(entry: any): void {
   const isDotTickDamage = entry.fromDotTickBatch === true;
 
   if (entry.isNormalAttack === true && !isDotTickDamage) {
-    (pcall as any)(() => {
-      const dm = require("系统.04．伤害系统.02．dot伤害") as {
-        tryApplyHeroAttackGearDots?: (src: any, tgt: any, dmg: number) => void;
-      };
-      if (dm != null && typeof dm.tryApplyHeroAttackGearDots === "function") {
-        dm.tryApplyHeroAttackGearDots(entry.source != null ? entry.source : null, su, sd);
-      }
-    });
+    __pcall伤害Entry = entry;
+    pcall(__pcall应用英雄普攻装备Dot);
+    __pcall伤害Entry = null;
   }
 
   // 注意：伤害计算已经在TriggerExecute之前通过onDamageEvent执行过了
@@ -187,10 +232,7 @@ function processDamageEntry(entry: any): void {
   }
 
   if (isDotTickDamage) {
-    (pcall as any)(() => {
-      const m = require("系统.04．伤害系统.02．dot伤害") as { notifyDotTickBatchDamageDisplayed?: () => void };
-      if (m != null && typeof m.notifyDotTickBatchDamageDisplayed === "function") m.notifyDotTickBatchDamageDisplayed();
-    });
+    pcall(__pcall通知Dot批次伤害显示);
   }
 }
 
