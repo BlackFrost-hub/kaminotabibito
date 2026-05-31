@@ -1,10 +1,9 @@
 /** @noSelfInFile */
 /**
- * 计时器封装函数
- * 自动创建/销毁计时器
+ * 计时器与延迟任务封装函数
  *
  * - createDelayedCall：走中心计时器的一次性延迟，优先用于“纯延迟后执行”的逻辑。
- * - withTimer：内部 CreateTimer，适合「只要延迟、不需要先登记句柄」的场景。
+ * - withTimer：内部 CreateTimer，仅用于确实需要真实 timer 句柄或独立周期生命周期的场景。
  * - runTimerOnce：调用方已 CreateTimer（并可能先写入哈希表），再一次性 TimerStart + 结束后销毁。
  *   与中心计时器无关：变长间隔、每实例独立结束时间（如音效时长）仍应用独立 timer。
  */

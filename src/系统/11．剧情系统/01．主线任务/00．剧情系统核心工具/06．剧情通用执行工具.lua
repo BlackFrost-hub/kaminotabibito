@@ -1,5 +1,4 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__Number = ____lualib.__TS__Number
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSplit = ____lualib.__TS__StringSplit
@@ -34,22 +33,22 @@ function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
             do
                 local item = __TS__StringTrim(list[i + 1])
                 if #item == 0 then
-                    goto __continue139
+                    goto __continue142
                 end
                 local at = (string.find(item, "@", nil, true) or 0) - 1
                 if at < 0 then
-                    goto __continue139
+                    goto __continue142
                 end
                 local soundVarName = __TS__StringTrim(__TS__StringSubstring(item, 0, at))
                 local rectVarName = __TS__StringTrim(__TS__StringSubstring(item, at + 1))
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
                 if soundHandle == nil or soundHandle == 0 or rectHandle == nil or rectHandle == 0 then
-                    goto __continue139
+                    goto __continue142
                 end
                 SetStackedSoundBJ(add, soundHandle, rectHandle)
             end
-            ::__continue139::
+            ::__continue142::
             i = i + 1
         end
     end
@@ -62,15 +61,15 @@ function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
             do
                 local soundVarName = __TS__StringTrim(list[i + 1])
                 if #soundVarName == 0 then
-                    goto __continue145
+                    goto __continue148
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 if soundHandle == nil or soundHandle == 0 then
-                    goto __continue145
+                    goto __continue148
                 end
                 PlaySoundBJ(soundHandle)
             end
-            ::__continue145::
+            ::__continue148::
             i = i + 1
         end
     end
@@ -79,9 +78,10 @@ end
 -- @noSelfInFile
 local jass = require("jass.common")
 jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
@@ -125,12 +125,9 @@ local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_17["启动Boss战�
 local AddSpecialEffect = jass.AddSpecialEffect
 local CreateFogModifierRect = jass.CreateFogModifierRect
 local CreateItem = jass.CreateItem
-local CreateTimer = jass.CreateTimer
 local CreateUnit = jass.CreateUnit
 local DisplayCineFilter = jass.DisplayCineFilter
 local FogModifierStart = jass.FogModifierStart
-local GetExpiredTimer = jass.GetExpiredTimer
-local GetHandleId = jass.GetHandleId
 local GetEnumUnit = jass.GetEnumUnit
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitName = jass.GetUnitName
@@ -164,21 +161,14 @@ local _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID = "main_story_runtime"
 local _____5F53_524D_73A9_5BB6_82F1_96C4_63A7_5236_6682_505C = false
 local _____5F53_524D_73A9_5BB6_82F1_96C4_65E0_654C = false
 local _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668 = {}
-local _____5EF6_8FDF_6267_884C_7F13_5B58 = {}
-local function ____on_5EF6_8FDF_6267_884C_5230_65F6()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local key = GetHandleId(timer)
-    local _____8BB0_5F55 = _____5EF6_8FDF_6267_884C_7F13_5B58[key]
-    __TS__Delete(_____5EF6_8FDF_6267_884C_7F13_5B58, key)
-    safeDestroyTimer(nil, timer)
-    if _____8BB0_5F55 == nil then
-        return
-    end
+local _____5EF6_8FDF_6267_884C_4EFB_52A1 = {}
+local _____5EF6_8FDF_6267_884C_626B_63CFID = 0
+local function maxNum(a, b)
+    return a > b and a or b
+end
+local function _____6267_884C_5EF6_8FDF_8BB0_5F55(_____8BB0_5F55)
     if _____8BB0_5F55["类型"] == "消息" and _____8BB0_5F55["文本"] then
-        local _____91CD_590D_6B21_6570 = math.max(1, _____8BB0_5F55["重复次数"] or 1)
+        local _____91CD_590D_6B21_6570 = maxNum(1, _____8BB0_5F55["重复次数"] or 1)
         do
             local i = 0
             while i < _____91CD_590D_6B21_6570 do
@@ -207,35 +197,49 @@ local function ____on_5EF6_8FDF_6267_884C_5230_65F6()
         end
     end
 end
+local function ____on_5EF6_8FDF_6267_884C_626B_63CF()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____5EF6_8FDF_6267_884C_4EFB_52A1 do
+            do
+                local task = _____5EF6_8FDF_6267_884C_4EFB_52A1[i + 1]
+                if now >= task.dueTime then
+                    _____6267_884C_5EF6_8FDF_8BB0_5F55(task["记录"])
+                    goto __continue14
+                end
+                _____5EF6_8FDF_6267_884C_4EFB_52A1[writeIndex + 1] = task
+                writeIndex = writeIndex + 1
+            end
+            ::__continue14::
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____5EF6_8FDF_6267_884C_4EFB_52A1 - 1
+        while i >= writeIndex do
+            table.remove(_____5EF6_8FDF_6267_884C_4EFB_52A1)
+            i = i - 1
+        end
+    end
+    if #_____5EF6_8FDF_6267_884C_4EFB_52A1 == 0 and _____5EF6_8FDF_6267_884C_626B_63CFID ~= 0 then
+        removePeriodicCallback(_____5EF6_8FDF_6267_884C_626B_63CFID)
+        _____5EF6_8FDF_6267_884C_626B_63CFID = 0
+    end
+end
 local function _____5B89_6392_5EF6_8FDF_6267_884C(_____79D2_6570, _____8BB0_5F55)
     if not (_____79D2_6570 > 0) then
-        if _____8BB0_5F55["类型"] == "消息" and _____8BB0_5F55["文本"] then
-            local _____91CD_590D_6B21_6570 = math.max(1, _____8BB0_5F55["重复次数"] or 1)
-            do
-                local i = 0
-                while i < _____91CD_590D_6B21_6570 do
-                    QuestMessageBJ(
-                        GetPlayersAll(),
-                        _____8BB0_5F55["消息类型"] or bj_QUESTMESSAGE_HINT,
-                        _____8BB0_5F55["文本"]
-                    )
-                    i = i + 1
-                end
-            end
-        else
-            ____on_5EF6_8FDF_6267_884C_5230_65F6()
-        end
+        _____6267_884C_5EF6_8FDF_8BB0_5F55(_____8BB0_5F55)
         return
     end
-    local timer = CreateTimer()
-    _____5EF6_8FDF_6267_884C_7F13_5B58[GetHandleId(timer)] = _____8BB0_5F55
-    safeTimerStart(
-        nil,
-        timer,
-        _____79D2_6570,
-        false,
-        ____on_5EF6_8FDF_6267_884C_5230_65F6
-    )
+    _____5EF6_8FDF_6267_884C_4EFB_52A1[#_____5EF6_8FDF_6267_884C_4EFB_52A1 + 1] = {
+        dueTime = getServerTime() + _____79D2_6570 * 1000,
+        ["记录"] = _____8BB0_5F55
+    }
+    if _____5EF6_8FDF_6267_884C_626B_63CFID == 0 then
+        _____5EF6_8FDF_6267_884C_626B_63CFID = addPeriodicCallback(10, ____on_5EF6_8FDF_6267_884C_626B_63CF)
+    end
 end
 local function _____53D6_53C2_6570_6587_672C(_____53C2_6570, key)
     local value = _____53C2_6570[key]
@@ -349,11 +353,11 @@ local function _____5411_5546_5E97_6DFB_52A0_7269_54C1(unit, _____7269_54C1_540D
                 local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(items[i + 1])
                 local itemTypeId = stringToFourCCSafe(rawId)
                 if not (itemTypeId > 0) then
-                    goto __continue51
+                    goto __continue54
                 end
                 AddItemToStockBJ(itemTypeId, unit, 1, 1)
             end
-            ::__continue51::
+            ::__continue54::
             i = i + 1
         end
     end
@@ -406,7 +410,7 @@ ____exports["给全部玩家添加区域视野"] = function(rectVarName)
             do
                 local key = (rectVarName .. "#") .. tostring(playerId)
                 if _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] then
-                    goto __continue65
+                    goto __continue68
                 end
                 local fogModifier = CreateFogModifierRect(
                     Player(playerId),
@@ -416,12 +420,12 @@ ____exports["给全部玩家添加区域视野"] = function(rectVarName)
                     false
                 )
                 if fogModifier == nil or fogModifier == 0 then
-                    goto __continue65
+                    goto __continue68
                 end
                 FogModifierStart(fogModifier)
                 _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] = true
             end
-            ::__continue65::
+            ::__continue68::
             playerId = playerId + 1
         end
     end
@@ -688,7 +692,7 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
     if _____5EF6_8FDF_63D0_793A ~= "" then
         local _____5EF6_8FDF_6D88_606F_7C7B_578B_6807_8BB0 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息类型")
         local _____6D88_606F_7C7B_578B = (_____5EF6_8FDF_6D88_606F_7C7B_578B_6807_8BB0 == "WARNING" or _____9884_8B66_6587_672C ~= "") and bj_QUESTMESSAGE_WARNING or bj_QUESTMESSAGE_HINT
-        local _____91CD_590D_6B21_6570 = math.max(
+        local _____91CD_590D_6B21_6570 = maxNum(
             1,
             _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟消息重复次数") or (_____9884_8B66_6587_672C ~= "" and 2 or 1)
         )

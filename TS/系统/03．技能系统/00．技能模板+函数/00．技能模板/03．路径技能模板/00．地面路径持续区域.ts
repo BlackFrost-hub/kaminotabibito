@@ -10,18 +10,6 @@
 
 const jass = require("jass.common") as any;
 
-const CreateTimer = jass.CreateTimer as () => any;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-
-const {
-  safeTimerStart,
-  safeDestroyTimer,
-} = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
-};
-
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
   SinBJ: (this: void, degrees: number) => number;
@@ -93,7 +81,8 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
   readonly 参数: 地面路径持续区域参数;
   private readonly 路径段列表: 路径段信息[];
   private readonly 区域实例列表: 区域效果实例[] = [];
-  private 铺设定时器: any = null;
+  private 铺设间隔毫秒 = 0;
+  private 下次铺设时间毫秒 = 0;
   private 下一个段索引 = 0;
   private 已销毁 = false;
   private 已全部铺设 = false;
@@ -124,19 +113,9 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
       ? this.参数.铺设间隔
       : 0.06;
 
-    this.铺设定时器 = CreateTimer();
-    if (this.铺设定时器 == null || this.铺设定时器 === 0) {
-      while (this.下一个段索引 < this.路径段列表.length) {
-        this.创建下一段区域();
-      }
-      return;
-    }
-
-    const 定时器ID = 取句柄ID(this.铺设定时器);
-    if (定时器ID > 0) {
-      铺设定时器实例映射[定时器ID] = this.实例ID;
-    }
-    safeTimerStart(this.铺设定时器, 铺设间隔, true, on地面路径铺设定时器到时);
+    this.铺设间隔毫秒 = 铺设间隔 * 1000;
+    this.下次铺设时间毫秒 = getServerTime() + this.铺设间隔毫秒;
+    确保地面路径铺设系统已启动();
   }
 
   创建下一段区域(): void {
@@ -147,7 +126,7 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
     const 段索引 = this.下一个段索引;
     const 路径段 = this.路径段列表[段索引];
     if (路径段 == null) {
-      this.停止铺设定时器();
+      this.停止铺设任务();
       this.处理全部铺设完成();
       return;
     }
@@ -172,7 +151,7 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
     this.参数.on单段创建?.(段索引 + 1, 路径段.X, 路径段.Y);
 
     if (this.下一个段索引 >= this.路径段列表.length) {
-      this.停止铺设定时器();
+      this.停止铺设任务();
       this.处理全部铺设完成();
     }
   }
@@ -182,7 +161,7 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
       return;
     }
     this.已销毁 = true;
-    this.停止铺设定时器();
+    this.停止铺设任务();
     for (const 区域实例 of this.区域实例列表) {
       区域实例.销毁();
     }
@@ -250,6 +229,20 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
     }
   }
 
+  铺设系统Tick(当前时间毫秒: number): void {
+    if (!this.仍有待铺设段() || 当前时间毫秒 < this.下次铺设时间毫秒) {
+      return;
+    }
+    this.创建下一段区域();
+    if (this.仍有待铺设段()) {
+      this.下次铺设时间毫秒 += this.铺设间隔毫秒;
+    }
+  }
+
+  仍有待铺设段(): boolean {
+    return !this.已销毁 && !this.已全部铺设 && this.下一个段索引 < this.路径段列表.length;
+  }
+
   private 整体伤害单位筛选 = (单位: any): boolean => {
     const 影响目标 = this.参数.影响目标 ?? "敌方";
     const 所有者 = this.参数.所有者;
@@ -265,16 +258,9 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
     return isUnitAlly(单位, 所有者);
   };
 
-  private 停止铺设定时器(): void {
-    if (this.铺设定时器 == null || this.铺设定时器 === 0) {
-      return;
-    }
-    const 定时器ID = 取句柄ID(this.铺设定时器);
-    if (定时器ID > 0) {
-      delete 铺设定时器实例映射[定时器ID];
-    }
-    safeDestroyTimer(this.铺设定时器);
-    this.铺设定时器 = null;
+  private 停止铺设任务(): void {
+    this.铺设间隔毫秒 = 0;
+    this.下次铺设时间毫秒 = 0;
   }
 
   private 处理全部铺设完成(): void {
@@ -289,16 +275,9 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
 const 默认火焰路径特效 = "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdl";
 
 const 活跃地面路径持续区域实例: Record<number, 地面路径持续区域实现 | undefined> = {};
-const 铺设定时器实例映射: Record<number, number | undefined> = {};
 let 下一个地面路径持续区域实例ID = 0;
 let 地面路径整体伤害系统回调ID = 0;
-
-function 取句柄ID(h: any): number {
-  if (h == null || h === 0) {
-    return 0;
-  }
-  return GetHandleId(h) || 0;
-}
+let 地面路径铺设系统回调ID = 0;
 
 function 数字升序排序(this: void, a: number, b: number): number {
   return a - b;
@@ -353,6 +332,35 @@ function 确保地面路径整体伤害系统已启动(): void {
   地面路径整体伤害系统回调ID = addPeriodicCallback(20, on地面路径整体伤害系统Tick);
 }
 
+function 确保地面路径铺设系统已启动(): void {
+  if (地面路径铺设系统回调ID !== 0) {
+    return;
+  }
+  地面路径铺设系统回调ID = addPeriodicCallback(10, on地面路径铺设系统Tick);
+}
+
+function on地面路径铺设系统Tick(): void {
+  const 当前时间毫秒 = getServerTime();
+  let 仍有待铺设实例 = false;
+
+  const 实例ID列表 = 获取有序地面路径实例ID列表();
+  for (let i = 0; i < 实例ID列表.length; i++) {
+    const 实例 = 活跃地面路径持续区域实例[实例ID列表[i]];
+    if (实例 == null) {
+      continue;
+    }
+    实例.铺设系统Tick(当前时间毫秒);
+    if (实例.仍有待铺设段()) {
+      仍有待铺设实例 = true;
+    }
+  }
+
+  if (!仍有待铺设实例 && 地面路径铺设系统回调ID !== 0) {
+    removePeriodicCallback(地面路径铺设系统回调ID);
+    地面路径铺设系统回调ID = 0;
+  }
+}
+
 function on地面路径整体伤害系统Tick(): void {
   const 当前时间毫秒 = getServerTime();
   let 仍有整体矩形实例 = false;
@@ -374,23 +382,6 @@ function on地面路径整体伤害系统Tick(): void {
     removePeriodicCallback(地面路径整体伤害系统回调ID);
     地面路径整体伤害系统回调ID = 0;
   }
-}
-
-function on地面路径铺设定时器到时(): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) {
-    return;
-  }
-  const 定时器ID = 取句柄ID(timer);
-  const 实例ID = 铺设定时器实例映射[定时器ID];
-  if (实例ID == null || 实例ID <= 0) {
-    return;
-  }
-  const 实例 = 活跃地面路径持续区域实例[实例ID];
-  if (实例 == null) {
-    return;
-  }
-  实例.创建下一段区域();
 }
 
 export function 创建地面路径持续区域(参数: 地面路径持续区域参数): 地面路径持续区域实例 {

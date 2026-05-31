@@ -6,9 +6,8 @@
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
@@ -160,6 +159,51 @@ function runRegionRule(rule: string, unit: any, owner: any): void {
   }
 }
 
+function onRegionEnter(this: void): void {
+  const unit = (jass as any).GetTriggerUnit();
+  const region = (jass as any).GetTriggeringRegion();
+  // dbg("单位进入区域，region=" + (region != null ? "(handle)" : "null"));
+  if (unit == null || region == null) return;
+  // 前置条件：不处理中立敌对单位
+  const owner = (jass as any).GetOwningPlayer(unit);
+  if (
+    owner != null &&
+    (jass as any).PLAYER_NEUTRAL_AGGRESSIVE != null
+  ) {
+    const neutralAgg = (jass as any).Player(
+      (jass as any).PLAYER_NEUTRAL_AGGRESSIVE
+    );
+    if (owner === neutralAgg) return;
+  }
+  const cfg = regionMap.get((jass as any).GetHandleId(region));
+  // dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
+  if (cfg == null) return;
+  // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
+  if (!checkRegionCondition(cfg.condition, unit)) return;
+
+  // 若 teleportX/Y 都为 0 且存在 rule，则走自定义 rule 流程，否则走普通固定传送
+  const useRule = cfg.teleportX === 0 && cfg.teleportY === 0 && typeof cfg.rule === "string" && cfg.rule.length > 0;
+  if (useRule) {
+    runRegionRule(cfg.rule as string, unit, owner);
+    return;
+  }
+  // dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
+  (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
+  (jass as any).IssueImmediateOrder(unit, "stop");
+  // dbg("传送完成");
+  const player = owner;
+  if (player != null) {
+    StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
+    (jass as any).DisplayTimedTextToPlayer(
+      player,
+      0,
+      0,
+      8,
+      cfg.text
+    );
+  }
+}
+
 // 实际初始化逻辑：创建所有启用的 Region 并注册同一个进入触发
 function initRegionTeleport(): void {
   const trig = (jass as any).CreateTrigger();
@@ -192,62 +236,14 @@ function initRegionTeleport(): void {
     regionMap.set((jass as any).GetHandleId(region), cfg);
   }
 
-  const onEnter = (): void => {
-    const unit = (jass as any).GetTriggerUnit();
-    const region = (jass as any).GetTriggeringRegion();
-    // dbg("单位进入区域，region=" + (region != null ? "(handle)" : "null"));
-    if (unit == null || region == null) return;
-    // 前置条件：不处理中立敌对单位
-    const owner = (jass as any).GetOwningPlayer(unit);
-    if (
-      owner != null &&
-      (jass as any).PLAYER_NEUTRAL_AGGRESSIVE != null
-    ) {
-      const neutralAgg = (jass as any).Player(
-        (jass as any).PLAYER_NEUTRAL_AGGRESSIVE
-      );
-      if (owner === neutralAgg) return;
-    }
-    const cfg = regionMap.get((jass as any).GetHandleId(region));
-    // dbg("从 Map 读取配置: " + (cfg != null ? "成功 区域ID=" + cfg.id : "失败"));
-    if (cfg == null) return;
-    // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
-    if (!checkRegionCondition(cfg.condition, unit)) return;
-
-    // 若 teleportX/Y 都为 0 且存在 rule，则走自定义 rule 流程，否则走普通固定传送
-    const useRule = cfg.teleportX === 0 && cfg.teleportY === 0 && typeof cfg.rule === "string" && cfg.rule.length > 0;
-    if (useRule) {
-      runRegionRule(cfg.rule as string, unit, owner);
-      return;
-    }
-    // dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
-    (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
-    (jass as any).IssueImmediateOrder(unit, "stop");
-    // dbg("传送完成");
-    const player = owner;
-    if (player != null) {
-      StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
-      (jass as any).DisplayTimedTextToPlayer(
-        player,
-        0,
-        0,
-        8,
-        cfg.text
-      );
-    }
-  };
-
-  (jass as any).TriggerAddAction(trig, onEnter);
+  (jass as any).TriggerAddAction(trig, onRegionEnter);
 }
 
-function onInitRegionTeleportTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
+function onInitRegionTeleportDelayed(this: void): void {
   initRegionTeleport();
-  safeDestroyTimer(t);
 }
 
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */
 export function init区域传送(): void {
-  const t = (jass as any).CreateTimer();
-  if (t) safeTimerStart(t, 0.00, false, onInitRegionTeleportTimerExpire);
+  addDelayedCallback(0, onInitRegionTeleportDelayed);
 }

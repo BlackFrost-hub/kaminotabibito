@@ -14,9 +14,8 @@ local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
 -- - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
@@ -206,6 +205,45 @@ local function runRegionRule(rule, unit, owner)
         end
     end
 end
+local function onRegionEnter()
+    local unit = jass.GetTriggerUnit()
+    local region = jass.GetTriggeringRegion()
+    if unit == nil or region == nil then
+        return
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    if owner ~= nil and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
+        local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+        if owner == neutralAgg then
+            return
+        end
+    end
+    local cfg = regionMap:get(jass.GetHandleId(region))
+    if cfg == nil then
+        return
+    end
+    if not checkRegionCondition(cfg.condition, unit) then
+        return
+    end
+    local useRule = cfg.teleportX == 0 and cfg.teleportY == 0 and type(cfg.rule) == "string" and #cfg.rule > 0
+    if useRule then
+        runRegionRule(cfg.rule, unit, owner)
+        return
+    end
+    jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
+    jass.IssueImmediateOrder(unit, "stop")
+    local player = owner
+    if player ~= nil then
+        StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime)
+        jass.DisplayTimedTextToPlayer(
+            player,
+            0,
+            0,
+            8,
+            cfg.text
+        )
+    end
+end
 local function initRegionTeleport()
     local trig = jass.CreateTrigger()
     local total = 0
@@ -222,7 +260,7 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue52
+                goto __continue60
             end
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -234,65 +272,15 @@ local function initRegionTeleport()
                 cfg
             )
         end
-        ::__continue52::
+        ::__continue60::
     end
-    local function onEnter()
-        local unit = jass.GetTriggerUnit()
-        local region = jass.GetTriggeringRegion()
-        if unit == nil or region == nil then
-            return
-        end
-        local owner = jass.GetOwningPlayer(unit)
-        if owner ~= nil and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
-            local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
-            if owner == neutralAgg then
-                return
-            end
-        end
-        local cfg = regionMap:get(jass.GetHandleId(region))
-        if cfg == nil then
-            return
-        end
-        if not checkRegionCondition(cfg.condition, unit) then
-            return
-        end
-        local useRule = cfg.teleportX == 0 and cfg.teleportY == 0 and type(cfg.rule) == "string" and #cfg.rule > 0
-        if useRule then
-            runRegionRule(cfg.rule, unit, owner)
-            return
-        end
-        jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
-        jass.IssueImmediateOrder(unit, "stop")
-        local player = owner
-        if player ~= nil then
-            StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime)
-            jass.DisplayTimedTextToPlayer(
-                player,
-                0,
-                0,
-                8,
-                cfg.text
-            )
-        end
-    end
-    jass.TriggerAddAction(trig, onEnter)
+    jass.TriggerAddAction(trig, onRegionEnter)
 end
-local function onInitRegionTeleportTimerExpire()
-    local t = jass.GetExpiredTimer()
+local function onInitRegionTeleportDelayed()
     initRegionTeleport()
-    safeDestroyTimer(nil, t)
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function()
-    local t = jass.CreateTimer()
-    if t then
-        safeTimerStart(
-            nil,
-            t,
-            0,
-            false,
-            onInitRegionTeleportTimerExpire
-        )
-    end
+    addDelayedCallback(0, onInitRegionTeleportDelayed)
 end
 return ____exports

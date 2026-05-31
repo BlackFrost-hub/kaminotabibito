@@ -3,7 +3,7 @@
  * Star扩展库 - 硬直/暂停系统
  *
  * 来源于 SUSPEND.j，提供单位暂停控制功能。
- * 通过 EXPauseUnit(japi) 暂停单位，计时器到期后自动恢复。
+ * 通过 EXPauseUnit(japi) 暂停单位，中心计时器驱动到期后自动恢复。
  * 支持暂停时间累加、减少、取最大值等操作。
  *
  * 公开接口：
@@ -17,9 +17,9 @@ const jass = require("jass.common") as any;
 const { RMaxBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   RMaxBJ: (this: void, a: number, b: number) => number;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  getServerTime: (this: void) => number;
 };
 let japi: any = null;
 try {
@@ -28,20 +28,22 @@ try {
   japi = null;
 }
 
-const HS_S = jass.InitHashtable();
 const PauseUnit = jass.PauseUnit as (u: any, flag: boolean) => void;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const EXPauseUnit = japi != null && typeof japi.EXPauseUnit === "function"
+  ? japi.EXPauseUnit as (u: any, flag: boolean) => void
+  : undefined;
 const 单位暂停占用总表: Record<number, number | undefined> = {};
 const 单位暂停占用来源表: Record<string, number | undefined> = {};
 
 function hid(h: any): number {
-  return (jass.GetHandleId(h) as number) || 0;
+  return GetHandleId(h) || 0;
 }
 
 function 设置底层暂停状态(u: any, 是否暂停: boolean): void {
   if (u == null || u === 0) return;
 
-  if (japi != null && typeof japi.EXPauseUnit === "function") {
-    const EXPauseUnit = japi.EXPauseUnit as (u: any, flag: boolean) => void;
+  if (EXPauseUnit != null) {
     EXPauseUnit(u, 是否暂停);
     return;
   }
@@ -123,20 +125,45 @@ export function 单位是否存在其他暂停占用(u: any, 自身来源: strin
   return 总计数 > 自身来源计数;
 }
 
-function onHardStraightTimerExpire(this: void): void {
-  const expiredTimer = jass.GetExpiredTimer();
-  const tid = hid(expiredTimer);
-  const savedUnit = jass.LoadUnitHandle(HS_S, tid, 1);
+interface 硬直到期任务 {
+  单位: any;
+  单位ID: number;
+  到期时间毫秒: number;
+}
 
-  if (savedUnit != null && savedUnit !== 0) {
-    释放单位暂停占用(savedUnit, "GS_Suspend");
-  }
+const 硬直到期任务列表: 硬直到期任务[] = [];
+let 硬直到期驱动已注册 = false;
 
-  jass.FlushChildHashtable(HS_S, tid);
-  if (savedUnit != null && savedUnit !== 0) {
-    jass.FlushChildHashtable(HS_S, hid(savedUnit));
+function 查找硬直到期任务索引(单位ID: number): number {
+  for (let i = 0; i < 硬直到期任务列表.length; i++) {
+    if (硬直到期任务列表[i].单位ID === 单位ID) return i;
   }
-  safeDestroyTimer(expiredTimer);
+  return -1;
+}
+
+function on硬直到期驱动(this: void): void {
+  if (硬直到期任务列表.length === 0) return;
+
+  const 当前时间毫秒 = getServerTime();
+  let 写入位置 = 0;
+  for (let i = 0; i < 硬直到期任务列表.length; i++) {
+    const 任务 = 硬直到期任务列表[i];
+    if (当前时间毫秒 >= 任务.到期时间毫秒) {
+      释放单位暂停占用(任务.单位, "GS_Suspend");
+    } else {
+      硬直到期任务列表[写入位置] = 任务;
+      写入位置++;
+    }
+  }
+  while (硬直到期任务列表.length > 写入位置) {
+    硬直到期任务列表.pop();
+  }
+}
+
+function 确保硬直到期驱动(): void {
+  if (硬直到期驱动已注册) return;
+  硬直到期驱动已注册 = true;
+  addPeriodicCallback(10, on硬直到期驱动);
 }
 
 /**
@@ -149,20 +176,18 @@ export function GS_Suspend(u: any, time: number): void {
   if (u == null || u === 0) return;
 
   const uid = hid(u);
-  let T: any = jass.LoadTimerHandle(HS_S, uid, 1);
-
-  const remaining = T != null ? jass.TimerGetRemaining(T) : 0;
-
-  if (T == null || remaining === 0) {
-    T = jass.CreateTimer();
-    if (T == null) return;
-
+  if (uid === 0) return;
+  const 到期时间毫秒 = getServerTime() + RMaxBJ(0, time) * 1000;
+  const 任务索引 = 查找硬直到期任务索引(uid);
+  if (任务索引 < 0) {
     申请单位暂停占用(u, "GS_Suspend");
-    jass.SaveUnitHandle(HS_S, hid(T), 1, u);
-    jass.SaveTimerHandle(HS_S, uid, 1, T);
+    硬直到期任务列表.push({ 单位: u, 单位ID: uid, 到期时间毫秒 });
+  } else {
+    const 任务 = 硬直到期任务列表[任务索引];
+    任务.单位 = u;
+    任务.到期时间毫秒 = 到期时间毫秒;
   }
-
-  safeTimerStart(T, time, false, onHardStraightTimerExpire);
+  确保硬直到期驱动();
 }
 
 /**
@@ -173,26 +198,18 @@ export function GS_Suspend(u: any, time: number): void {
 export function GS_IsUnitSuspending(u: any): boolean {
   if (u == null || u === 0) return false;
 
-  const T = jass.LoadTimerHandle(HS_S, hid(u), 1);
-  if (T == null) return false;
-
-  const remaining = jass.TimerGetRemaining(T);
-  return remaining !== 0;
+  return GS_LoadSuspend(u) > 0;
 }
 
-/**
- * 获取单位剩余暂停时间
- * @param u 目标单位
- * @returns 剩余暂停时间（秒）
- */
+/** 获取单位剩余暂停时间（秒）。 */
 export function GS_LoadSuspend(u: any): number {
   if (u == null || u === 0) return 0;
 
-  const T = jass.LoadTimerHandle(HS_S, hid(u), 1);
-  if (T == null) return 0;
-
-  const remaining = jass.TimerGetRemaining(T);
-  return remaining || 0;
+  const uid = hid(u);
+  if (uid === 0) return 0;
+  const 任务索引 = 查找硬直到期任务索引(uid);
+  if (任务索引 < 0) return 0;
+  return RMaxBJ(0, 硬直到期任务列表[任务索引].到期时间毫秒 - getServerTime()) * 0.001;
 }
 
 /**

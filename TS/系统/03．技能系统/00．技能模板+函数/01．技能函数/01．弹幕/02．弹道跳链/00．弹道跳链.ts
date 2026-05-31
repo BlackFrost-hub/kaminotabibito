@@ -17,15 +17,14 @@ const { isUnitEnemy, isSameUnit } = require("lib.扩展函数.自定义扩展函
 };
 
 const GetHandleId = jass.GetHandleId as (this: void, h: any) => number;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, u: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, u: any) => number;
 const SquareRoot = jass.SquareRoot as (this: void, value: number) => number;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 export interface 弹道跳链参数 {
@@ -57,13 +56,15 @@ interface 弹道跳链状态 {
 }
 
 interface 弹道跳链延迟发射上下文 {
+  到期时间毫秒: number;
   状态: 弹道跳链状态;
   起点单位: any;
   目标单位: any;
   弹幕ID?: number;
 }
 
-const 延迟发射映射: Record<number, 弹道跳链延迟发射上下文 | undefined> = {};
+const 延迟发射任务列表: 弹道跳链延迟发射上下文[] = [];
+let 延迟发射扫描回调ID = 0;
 
 function 取句柄ID(this: void, h: any): number {
   return h != null && h !== 0 ? (GetHandleId(h) || 0) : 0;
@@ -130,6 +131,13 @@ function 继续复用弹幕到目标(this: void, 状态: 弹道跳链状态, 弹
   实例.当前速度 = 状态.参数.弹幕速度;
 }
 
+function 添加弹道跳链延迟发射任务(this: void, 上下文: 弹道跳链延迟发射上下文): void {
+  延迟发射任务列表.push(上下文);
+  if (延迟发射扫描回调ID === 0) {
+    延迟发射扫描回调ID = addPeriodicCallback(10, on弹道跳链延迟发射扫描);
+  }
+}
+
 function 安排发射到目标(this: void, 状态: 弹道跳链状态, 起点单位: any, 目标单位: any): void {
   if (状态.已结束) return;
   const 延迟 = 状态.参数.每跳延迟 ?? 0;
@@ -138,21 +146,12 @@ function 安排发射到目标(this: void, 状态: 弹道跳链状态, 起点单
     return;
   }
 
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) {
-    发射到目标(状态, 起点单位, 目标单位);
-    return;
-  }
-
-  const timerID = 取句柄ID(timer);
-  if (timerID <= 0) {
-    safeDestroyTimer(timer);
-    发射到目标(状态, 起点单位, 目标单位);
-    return;
-  }
-
-  延迟发射映射[timerID] = { 状态, 起点单位, 目标单位 };
-  safeTimerStart(timer, 延迟, false, on弹道跳链延迟发射到时);
+  添加弹道跳链延迟发射任务({
+    到期时间毫秒: getServerTime() + 延迟 * 1000,
+    状态,
+    起点单位,
+    目标单位,
+  });
 }
 
 function 安排复用弹幕到目标(this: void, 状态: 弹道跳链状态, 弹幕ID: number, 目标单位: any): void {
@@ -169,39 +168,42 @@ function 安排复用弹幕到目标(this: void, 状态: 弹道跳链状态, 弹
     状态.当前目标 = null;
   }
 
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) {
-    继续复用弹幕到目标(状态, 弹幕ID, 目标单位);
-    return;
-  }
-
-  const timerID = 取句柄ID(timer);
-  if (timerID <= 0) {
-    safeDestroyTimer(timer);
-    继续复用弹幕到目标(状态, 弹幕ID, 目标单位);
-    return;
-  }
-
-  延迟发射映射[timerID] = { 状态, 起点单位: null, 目标单位, 弹幕ID };
-  safeTimerStart(timer, 延迟, false, on弹道跳链延迟发射到时);
+  添加弹道跳链延迟发射任务({
+    到期时间毫秒: getServerTime() + 延迟 * 1000,
+    状态,
+    起点单位: null,
+    目标单位,
+    弹幕ID,
+  });
 }
 
-function on弹道跳链延迟发射到时(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-
-  const timerID = 取句柄ID(timer);
-  const 上下文 = 延迟发射映射[timerID];
-  delete 延迟发射映射[timerID];
-  safeDestroyTimer(timer);
-
-  if (上下文 == null) return;
+function 执行弹道跳链延迟发射任务(this: void, 上下文: 弹道跳链延迟发射上下文): void {
   if (上下文.状态.已结束) return;
   if (上下文.弹幕ID != null) {
     继续复用弹幕到目标(上下文.状态, 上下文.弹幕ID, 上下文.目标单位);
     return;
   }
   发射到目标(上下文.状态, 上下文.起点单位, 上下文.目标单位);
+}
+
+function on弹道跳链延迟发射扫描(this: void): void {
+  const 当前时间毫秒 = getServerTime();
+  const 到期任务: 弹道跳链延迟发射上下文[] = [];
+  for (let i = 延迟发射任务列表.length - 1; i >= 0; i--) {
+    const 上下文 = 延迟发射任务列表[i];
+    if (当前时间毫秒 < 上下文.到期时间毫秒) {
+      continue;
+    }
+    延迟发射任务列表.splice(i, 1);
+    到期任务.unshift(上下文);
+  }
+  for (let i = 0; i < 到期任务.length; i++) {
+    执行弹道跳链延迟发射任务(到期任务[i]);
+  }
+  if (延迟发射任务列表.length === 0 && 延迟发射扫描回调ID !== 0) {
+    removePeriodicCallback(延迟发射扫描回调ID);
+    延迟发射扫描回调ID = 0;
+  }
 }
 
 function 发射到目标(this: void, 状态: 弹道跳链状态, 起点单位: any, 目标单位: any): void {

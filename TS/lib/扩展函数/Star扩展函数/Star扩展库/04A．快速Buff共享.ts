@@ -16,6 +16,11 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
 };
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, callbackId: number) => void;
+  getServerTime: (this: void) => number;
+};
 
 import { YDWESetUnitAbilityDataReal, EXSetUnitFacing } from "../../YDWE函数/00．YDWE函数";
 import { GS_Suspend } from "./03．硬直暂停系统";
@@ -312,18 +317,49 @@ function SFB_确保马甲技能(this: void, abilityId: number): boolean {
   return true;
 }
 
-function onSfbPauseTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  jass.PauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
-  jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-  safeDestroyTimer(t);
+interface SfbPauseRestoreTask {
+  unit: any;
+  useExPause: boolean;
+  dueTime: number;
 }
 
-function onSfbExpauseTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  japi.EXPauseUnit(jass.LoadUnitHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位")), false);
-  jass.RemoveSavedHandle(YDHT, jass.GetHandleId(t), jass.StringHash("单位"));
-  safeDestroyTimer(t);
+const SFB_暂停恢复任务: SfbPauseRestoreTask[] = [];
+let SFB_暂停恢复扫描ID = 0;
+
+function onSfbPauseRestoreTick(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < SFB_暂停恢复任务.length; i++) {
+    const task = SFB_暂停恢复任务[i];
+    if (now >= task.dueTime) {
+      if (task.useExPause) {
+        japi.EXPauseUnit(task.unit, false);
+      } else {
+        jass.PauseUnit(task.unit, false);
+      }
+      continue;
+    }
+    SFB_暂停恢复任务[writeIndex] = task;
+    writeIndex++;
+  }
+  for (let i = SFB_暂停恢复任务.length - 1; i >= writeIndex; i--) {
+    SFB_暂停恢复任务.pop();
+  }
+  if (SFB_暂停恢复任务.length === 0 && SFB_暂停恢复扫描ID !== 0) {
+    removePeriodicCallback(SFB_暂停恢复扫描ID);
+    SFB_暂停恢复扫描ID = 0;
+  }
+}
+
+function scheduleSfbPauseRestore(this: void, unit: any, time: number, useExPause: boolean): void {
+  SFB_暂停恢复任务.push({
+    unit,
+    useExPause,
+    dueTime: getServerTime() + time * 1000,
+  });
+  if (SFB_暂停恢复扫描ID === 0) {
+    SFB_暂停恢复扫描ID = addPeriodicCallback(10, onSfbPauseRestoreTick);
+  }
 }
 
 export function SFB_施加原生目标Buff(this: void, sourceUnit: any, u: any, id: number, time: number, abilityId: number, orderStr: string): void {
@@ -381,15 +417,11 @@ export function SFB_施加暂停类Buff(this: void, sourceUnit: any, u: any, id:
   if (id === 21) {
     GS_Suspend(u, time);
   } else if (id === 22) {
-    const tempTimer = jass.CreateTimer();
-    jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
     jass.PauseUnit(u, true);
-    safeTimerStart(tempTimer, time, false, onSfbPauseTimerExpire);
+    scheduleSfbPauseRestore(u, time, false);
   } else if (id === 23) {
-    const tempTimer = jass.CreateTimer();
-    jass.SaveUnitHandle(YDHT, jass.GetHandleId(tempTimer), jass.StringHash("单位"), u);
     japi.EXPauseUnit(u, true);
-    safeTimerStart(tempTimer, time, false, onSfbExpauseTimerExpire);
+    scheduleSfbPauseRestore(u, time, true);
   }
 }
 

@@ -3,9 +3,10 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, callbackId: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -76,12 +77,9 @@ const CreateFogModifierRect = jass.CreateFogModifierRect as (
   afterUnits: boolean,
 ) => any;
 const CreateItem = jass.CreateItem as (this: void, itemId: number, x: number, y: number) => any;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const DisplayCineFilter = jass.DisplayCineFilter as (this: void, flag: boolean) => void;
 const FogModifierStart = jass.FogModifierStart as (this: void, whichFog: any) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
@@ -117,19 +115,25 @@ const 主线运行时任务ID = "main_story_runtime";
 let 当前玩家英雄控制暂停 = false;
 let 当前玩家英雄无敌 = false;
 const 已创建视野修整器: Record<string, true | undefined> = {};
-const 延迟执行缓存: Record<number, { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 重复次数?: number; 开门对象?: string; 隐藏阻挡?: string }> = {};
+interface 延迟执行记录 {
+  类型: "消息" | "开门";
+  文本?: string;
+  消息类型?: number;
+  重复次数?: number;
+  开门对象?: string;
+  隐藏阻挡?: string;
+}
 
-function on延迟执行到时(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const key = GetHandleId(timer);
-  const 记录 = 延迟执行缓存[key];
-  delete 延迟执行缓存[key];
-  safeDestroyTimer(timer);
-  if (记录 == null) return;
+const 延迟执行任务: Array<{ dueTime: number; 记录: 延迟执行记录 }> = [];
+let 延迟执行扫描ID = 0;
 
+function maxNum(this: void, a: number, b: number): number {
+  return a > b ? a : b;
+}
+
+function 执行延迟记录(this: void, 记录: 延迟执行记录): void {
   if (记录.类型 === "消息" && 记录.文本) {
-    const 重复次数 = Math.max(1, 记录.重复次数 ?? 1);
+    const 重复次数 = maxNum(1, 记录.重复次数 ?? 1);
     for (let i = 0; i < 重复次数; i++) {
       QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
     }
@@ -152,21 +156,36 @@ function on延迟执行到时(this: void): void {
   }
 }
 
-function 安排延迟执行(this: void, 秒数: number, 记录: { 类型: "消息" | "开门"; 文本?: string; 消息类型?: number; 重复次数?: number; 开门对象?: string; 隐藏阻挡?: string }): void {
-  if (!(秒数 > 0)) {
-    if (记录.类型 === "消息" && 记录.文本) {
-      const 重复次数 = Math.max(1, 记录.重复次数 ?? 1);
-      for (let i = 0; i < 重复次数; i++) {
-        QuestMessageBJ(GetPlayersAll(), 记录.消息类型 ?? bj_QUESTMESSAGE_HINT, 记录.文本);
-      }
-    } else {
-      on延迟执行到时();
+function on延迟执行扫描(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 延迟执行任务.length; i++) {
+    const task = 延迟执行任务[i];
+    if (now >= task.dueTime) {
+      执行延迟记录(task.记录);
+      continue;
     }
+    延迟执行任务[writeIndex] = task;
+    writeIndex++;
+  }
+  for (let i = 延迟执行任务.length - 1; i >= writeIndex; i--) {
+    延迟执行任务.pop();
+  }
+  if (延迟执行任务.length === 0 && 延迟执行扫描ID !== 0) {
+    removePeriodicCallback(延迟执行扫描ID);
+    延迟执行扫描ID = 0;
+  }
+}
+
+function 安排延迟执行(this: void, 秒数: number, 记录: 延迟执行记录): void {
+  if (!(秒数 > 0)) {
+    执行延迟记录(记录);
     return;
   }
-  const timer = CreateTimer();
-  延迟执行缓存[GetHandleId(timer)] = 记录;
-  safeTimerStart(timer, 秒数, false, on延迟执行到时);
+  延迟执行任务.push({ dueTime: getServerTime() + 秒数 * 1000, 记录 });
+  if (延迟执行扫描ID === 0) {
+    延迟执行扫描ID = addPeriodicCallback(10, on延迟执行扫描);
+  }
 }
 
 function 取参数文本(this: void, 参数: 剧情动作参数表, key: string): string {
@@ -488,7 +507,7 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
     const 消息类型 = 延迟消息类型标记 === "WARNING" || 预警文本 !== ""
       ? bj_QUESTMESSAGE_WARNING
       : bj_QUESTMESSAGE_HINT;
-    const 重复次数 = Math.max(1, 取参数数字(参数, "延迟消息重复次数") || (预警文本 !== "" ? 2 : 1));
+    const 重复次数 = maxNum(1, 取参数数字(参数, "延迟消息重复次数") || (预警文本 !== "" ? 2 : 1));
     安排延迟执行(延迟秒数, {
       类型: "消息",
       文本: 延迟提示,

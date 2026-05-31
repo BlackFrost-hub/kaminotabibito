@@ -12,9 +12,10 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
 const { YDWESetEventDamage } = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   YDWESetEventDamage: (this: void, amount: number) => boolean;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, callbackId: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { YDUserDataClearSafe, YDUserDataClearTableSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
@@ -63,9 +64,6 @@ import { 读取剧情进度, 写入剧情进度 } from "../00．剧情系统核�
 import { 更新主线任务UI, 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 处理技能推进主线剧情 } from "../00．剧情系统核心工具/07．剧情技能事件辅助";
 
-const CreateTimer = jass.CreateTimer as (this: void) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitState = jass.GetUnitState as (this: void, whichUnit: any, whichState: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
@@ -88,7 +86,8 @@ const bj_QUESTTYPE_OPT_UNDISCOVERED = jglobals.bj_QUESTTYPE_OPT_UNDISCOVERED as 
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 
 let 已初始化主线剧情特殊事件 = false;
-const 延迟显示配置By计时器ID: Record<string, 主线剧情最终伤害事件配置> = {};
+const 延迟显示任务: Array<{ dueTime: number; 配置: 主线剧情最终伤害事件配置 }> = [];
+let 延迟显示扫描ID = 0;
 
 function 获取全局句柄(this: void, 变量名: string): any {
   return jglobals[变量名];
@@ -137,13 +136,7 @@ function 播放最终伤害对白列表(this: void, 配置: 主线剧情最终�
   }
 }
 
-function on主线剧情延迟显示到时(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-
-  const 配置 = 延迟显示配置By计时器ID[tostring(GetHandleId(timer))];
-  delete 延迟显示配置By计时器ID[tostring(GetHandleId(timer))];
-  safeDestroyTimer(timer);
+function 执行主线剧情延迟显示(this: void, 配置: 主线剧情最终伤害事件配置): void {
   if (配置 == null || 配置.延迟显示 == null) return;
 
   const 单位 = 读取语义单位引用(配置.延迟显示.语义单位名);
@@ -157,12 +150,36 @@ function on主线剧情延迟显示到时(this: void): void {
   }
 }
 
+function on主线剧情延迟显示扫描(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 延迟显示任务.length; i++) {
+    const task = 延迟显示任务[i];
+    if (now >= task.dueTime) {
+      执行主线剧情延迟显示(task.配置);
+      continue;
+    }
+    延迟显示任务[writeIndex] = task;
+    writeIndex++;
+  }
+  for (let i = 延迟显示任务.length - 1; i >= writeIndex; i--) {
+    延迟显示任务.pop();
+  }
+  if (延迟显示任务.length === 0 && 延迟显示扫描ID !== 0) {
+    removePeriodicCallback(延迟显示扫描ID);
+    延迟显示扫描ID = 0;
+  }
+}
+
 function 启动延迟显示(this: void, 配置: 主线剧情最终伤害事件配置): void {
   if (配置.延迟显示 == null) return;
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  延迟显示配置By计时器ID[tostring(GetHandleId(timer))] = 配置;
-  safeTimerStart(timer, 配置.延迟显示.延迟秒数, false, on主线剧情延迟显示到时);
+  延迟显示任务.push({
+    dueTime: getServerTime() + 配置.延迟显示.延迟秒数 * 1000,
+    配置,
+  });
+  if (延迟显示扫描ID === 0) {
+    延迟显示扫描ID = addPeriodicCallback(10, on主线剧情延迟显示扫描);
+  }
 }
 
 function 命中技能通道事件配置(this: void, 配置: 主线剧情技能通道事件配置, castingUnit: any, spellAbilityId: number): boolean {

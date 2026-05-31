@@ -157,17 +157,6 @@ function boot(this: void): void {
 
     log("[STES事件测试] 无延迟立即执行 STES 测试");
     runAfterDelay();
-
-    // const timer = jass.CreateTimer();
-    // jass.TimerStart(timer, ENTRY_DELAY_SEC, false, onEntryDelayTimerExpire);
-    //     runAfterDelay();
-    //     if (typeof jass.PauseTimer === "function") {
-    //         jass.PauseTimer(timer);
-    //     }
-    //     if (typeof jass.DestroyTimer === "function") {
-    //         jass.DestroyTimer(timer);
-    //     }
-    // });
 }
 
 boot();

@@ -1,13 +1,11 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 控制抗性系统初始化
 -- 
 -- 通过统一技能事件系统监听控制技能
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.05．Buff系统.01．控制抗性.01．控制检测")
 local isExcludedFromControlResist = ____require_result_1.isExcludedFromControlResist
 local isControlAbility = ____require_result_1.isControlAbility
@@ -27,16 +25,9 @@ local ALLOWED_PLAYERS = {
     7,
     jass.PLAYER_NEUTRAL_AGGRESSIVE
 }
-local controlResistCtxByTimerHid = {}
-local function onControlResistTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
-        return
-    end
-    local hid = jass.GetHandleId(t)
-    local ctx = controlResistCtxByTimerHid[hid]
-    __TS__Delete(controlResistCtxByTimerHid, hid)
-    safeDestroyTimer(nil, t)
+local controlResistQueue = {}
+local function onControlResistDelayed()
+    local ctx = table.remove(controlResistQueue, 1)
     if not ctx then
         return
     end
@@ -81,17 +72,8 @@ local function onSpellChannel(caster, abilityId)
         return
     end
     local duration = calcReducedControlTime(target, abilityId)
-    local t = jass.CreateTimer()
-    if t then
-        controlResistCtxByTimerHid[jass.GetHandleId(t)] = {caster = caster, target = target, abilityId = abilityId, duration = duration}
-        safeTimerStart(
-            nil,
-            t,
-            0,
-            false,
-            onControlResistTimerExpire
-        )
-    end
+    controlResistQueue[#controlResistQueue + 1] = {caster = caster, target = target, abilityId = abilityId, duration = duration}
+    addDelayedCallback(0, onControlResistDelayed)
 end
 local _initialized = false
 function ____exports.initControlResist()

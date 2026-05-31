@@ -6,9 +6,8 @@ const jglobals = require("jass.globals") as any;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -50,9 +49,7 @@ import { 初始化进度04_地精祭祀死亡演出核心 } from "../02．剧情
 import { 初始化进度05_击败地精返回长老核心 } from "../02．剧情步骤/00．主线剧情/05．击败地精返回长老";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
@@ -202,17 +199,15 @@ function on主线剧情入口延迟初始化(this: void): void {
   初始化进度05_击败地精返回长老核心();
 }
 
-function on主线剧情入口延迟初始化并销毁计时器(this: void): void {
+function on主线剧情入口延迟初始化到时(this: void): void {
   on主线剧情入口延迟初始化();
-  safeDestroyTimer(GetExpiredTimer());
 }
 
 export function 初始化主线剧情入口(this: void): void {
   if (已请求初始化主线剧情入口) return;
   已请求初始化主线剧情入口 = true;
 
-  const timer = CreateTimer();
-  safeTimerStart(timer, 主线NPC初始化延迟秒, false, on主线剧情入口延迟初始化并销毁计时器);
+  addDelayedCallback(主线NPC初始化延迟秒 * 1000, on主线剧情入口延迟初始化到时);
 }
 
 export function 立即初始化主线剧情入口_兼容旧JASS数据(this: void): void {

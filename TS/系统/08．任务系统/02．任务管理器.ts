@@ -1,17 +1,17 @@
 /** @noSelfInFile */
 /**
  * 任务管理器（单文件入口）
- *
  * 职责概览：
  * - 与 `questDB` 打交道：接取、完成、失败、放弃、目标进度、查询
  * - 维护 `uiRefreshCallbacks`：任务状态变化时通知自定义 UI（如任务面板）
- * - 可选限时：`timeLimit` > 0 时挂一次性计时器，到期调用 `onQuestFailed`
+ * - 可选限时：`timeLimit` > 0 时挂中心调度任务，到期调用 `onQuestFailed`
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, callbackId: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 import { questDB } from "./01．任务数据";
@@ -44,15 +44,14 @@ class QuestManager {
     const quest = (questDB as any).globalData?.quests.get(questId);
     if (!quest || !quest.timeLimit || quest.timeLimit <= 0) return;
 
-    const timer = jass.CreateTimer();
-    if (!timer) return;
-
-    const timerData =
-      (globalThis as any).__questTimers ||
-      ((globalThis as any).__questTimers = new Map<number, { playerId: number; questId: string }>());
-    timerData.set(timer, { playerId, questId });
-
-    safeTimerStart(timer, quest.timeLimit, false, onQuestTimeLimitTimerExpire);
+    questTimeLimitTasks.push({
+      dueTime: getServerTime() + quest.timeLimit * 1000,
+      playerId,
+      questId,
+    });
+    if (questTimeLimitScanId === 0) {
+      questTimeLimitScanId = addPeriodicCallback(10, onQuestTimeLimitTick);
+    }
   }
 
   public onQuestFailed(playerId: number, questId: string): boolean {
@@ -131,15 +130,34 @@ class QuestManager {
   }
 }
 
-function onQuestTimeLimitTimerExpire(this: void): void {
-  const expired = jass.GetExpiredTimer();
-  const data = (globalThis as any).__questTimers?.get(expired);
-  if (data) {
-    questManager.onQuestFailed(data.playerId, data.questId);
-    (globalThis as any).__questTimers.delete(expired);
+interface QuestTimeLimitTask {
+  dueTime: number;
+  playerId: number;
+  questId: string;
+}
+
+const questTimeLimitTasks: QuestTimeLimitTask[] = [];
+let questTimeLimitScanId = 0;
+
+function onQuestTimeLimitTick(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < questTimeLimitTasks.length; i++) {
+    const task = questTimeLimitTasks[i];
+    if (now >= task.dueTime) {
+      questManager.onQuestFailed(task.playerId, task.questId);
+      continue;
+    }
+    questTimeLimitTasks[writeIndex] = task;
+    writeIndex++;
   }
-  jass.PauseTimer(expired);
-  safeDestroyTimer(expired);
+  for (let i = questTimeLimitTasks.length - 1; i >= writeIndex; i--) {
+    questTimeLimitTasks.pop();
+  }
+  if (questTimeLimitTasks.length === 0 && questTimeLimitScanId !== 0) {
+    removePeriodicCallback(questTimeLimitScanId);
+    questTimeLimitScanId = 0;
+  }
 }
 
 export const questManager = QuestManager.getInstance();

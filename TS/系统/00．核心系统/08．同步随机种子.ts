@@ -7,7 +7,8 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-
+//保留独立 timer 更合理。
+//原因在于 08．同步随机种子.ts (line 75) 是启动引导逻辑，而 index.ts (line 11) 会先加载随机种子，再加载中心计时器。它需要尽早执行：
 const CreateTimer = jass.CreateTimer as (this: void) => any;
 const DestroyTimer = jass.DestroyTimer as (this: void, whichTimer: any) => void;
 const TimerStart = jass.TimerStart as (this: void, whichTimer: any, timeout: number, periodic: boolean, handlerFunc: () => void) => void;
@@ -21,7 +22,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 
 const 调试模块 = "同步随机种子";
 const 最大种子 = 2147483647;
-const 最多等待日志次数 = 6;
+const 最多等待日志次数 = 5;
 
 let 已设置 = false;
 let 重试计时器: any = null;

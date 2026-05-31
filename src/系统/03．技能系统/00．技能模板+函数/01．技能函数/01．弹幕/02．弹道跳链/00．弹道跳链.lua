@@ -1,7 +1,8 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ArrayUnshift = ____lualib.__TS__ArrayUnshift
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____8BA1_7B97_8DDD_79BB, _____76EE_6807_5DF2_547D_4E2D, _____6807_8BB0_76EE_6807_547D_4E2D, _____7ED3_675F_5F39_9053_8DF3_94FE, _____9009_62E9_4E0B_4E00_8DF3_76EE_6807, _____5F53_524D_7B5B_9009_76EE_6807, _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807, _____5B89_6392_53D1_5C04_5230_76EE_6807, _____5B89_6392_590D_7528_5F39_5E55_5230_76EE_6807, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_5230_65F6, _____53D1_5C04_5230_76EE_6807, getUnitsInRange, isUnitEnemy, isSameUnit, GetHandleId, CreateTimer, GetExpiredTimer, GetUnitX, GetUnitY, SquareRoot, safeTimerStart, safeDestroyTimer, _____5EF6_8FDF_53D1_5C04_6620_5C04
+local _____53D6_53E5_67C4ID, _____8BA1_7B97_8DDD_79BB, _____76EE_6807_5DF2_547D_4E2D, _____6807_8BB0_76EE_6807_547D_4E2D, _____7ED3_675F_5F39_9053_8DF3_94FE, _____9009_62E9_4E0B_4E00_8DF3_76EE_6807, _____5F53_524D_7B5B_9009_76EE_6807, _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807, _____6DFB_52A0_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1, _____5B89_6392_53D1_5C04_5230_76EE_6807, _____5B89_6392_590D_7528_5F39_5E55_5230_76EE_6807, _____6267_884C_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_626B_63CF, _____53D1_5C04_5230_76EE_6807, getUnitsInRange, isUnitEnemy, isSameUnit, GetHandleId, GetUnitX, GetUnitY, SquareRoot, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868, _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID
 local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["创建原生弹幕"]
 local _____9500_6BC1_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["销毁原生弹幕"]
@@ -87,6 +88,12 @@ function _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807(_____72B6_6001, _____
     end
     _____5B9E_4F8B["当前速度"] = _____72B6_6001["参数"]["弹幕速度"]
 end
+function _____6DFB_52A0_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1(_____4E0A_4E0B_6587)
+    _____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868[#_____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868 + 1] = _____4E0A_4E0B_6587
+    if _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID == 0 then
+        _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID = addPeriodicCallback(10, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_626B_63CF)
+    end
+end
 function _____5B89_6392_53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D, _____76EE_6807_5355_4F4D)
     if _____72B6_6001["已结束"] then
         return
@@ -96,19 +103,12 @@ function _____5B89_6392_53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_
         _____53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D, _____76EE_6807_5355_4F4D)
         return
     end
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        _____53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D, _____76EE_6807_5355_4F4D)
-        return
-    end
-    local timerID = _____53D6_53E5_67C4ID(timer)
-    if timerID <= 0 then
-        safeDestroyTimer(timer)
-        _____53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D, _____76EE_6807_5355_4F4D)
-        return
-    end
-    _____5EF6_8FDF_53D1_5C04_6620_5C04[timerID] = {["状态"] = _____72B6_6001, ["起点单位"] = _____8D77_70B9_5355_4F4D, ["目标单位"] = _____76EE_6807_5355_4F4D}
-    safeTimerStart(timer, _____5EF6_8FDF, false, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_5230_65F6)
+    _____6DFB_52A0_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1({
+        ["到期时间毫秒"] = getServerTime() + _____5EF6_8FDF * 1000,
+        ["状态"] = _____72B6_6001,
+        ["起点单位"] = _____8D77_70B9_5355_4F4D,
+        ["目标单位"] = _____76EE_6807_5355_4F4D
+    })
 end
 function _____5B89_6392_590D_7528_5F39_5E55_5230_76EE_6807(_____72B6_6001, _____5F39_5E55ID, _____76EE_6807_5355_4F4D)
     if _____72B6_6001["已结束"] then
@@ -124,32 +124,15 @@ function _____5B89_6392_590D_7528_5F39_5E55_5230_76EE_6807(_____72B6_6001, _____
         _____5B9E_4F8B["当前速度"] = 0
         _____72B6_6001["当前目标"] = nil
     end
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807(_____72B6_6001, _____5F39_5E55ID, _____76EE_6807_5355_4F4D)
-        return
-    end
-    local timerID = _____53D6_53E5_67C4ID(timer)
-    if timerID <= 0 then
-        safeDestroyTimer(timer)
-        _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807(_____72B6_6001, _____5F39_5E55ID, _____76EE_6807_5355_4F4D)
-        return
-    end
-    _____5EF6_8FDF_53D1_5C04_6620_5C04[timerID] = {["状态"] = _____72B6_6001, ["起点单位"] = nil, ["目标单位"] = _____76EE_6807_5355_4F4D, ["弹幕ID"] = _____5F39_5E55ID}
-    safeTimerStart(timer, _____5EF6_8FDF, false, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_5230_65F6)
+    _____6DFB_52A0_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1({
+        ["到期时间毫秒"] = getServerTime() + _____5EF6_8FDF * 1000,
+        ["状态"] = _____72B6_6001,
+        ["起点单位"] = nil,
+        ["目标单位"] = _____76EE_6807_5355_4F4D,
+        ["弹幕ID"] = _____5F39_5E55ID
+    })
 end
-function ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_5230_65F6()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local timerID = _____53D6_53E5_67C4ID(timer)
-    local _____4E0A_4E0B_6587 = _____5EF6_8FDF_53D1_5C04_6620_5C04[timerID]
-    __TS__Delete(_____5EF6_8FDF_53D1_5C04_6620_5C04, timerID)
-    safeDestroyTimer(timer)
-    if _____4E0A_4E0B_6587 == nil then
-        return
-    end
+function _____6267_884C_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1(_____4E0A_4E0B_6587)
     if _____4E0A_4E0B_6587["状态"]["已结束"] then
         return
     end
@@ -158,6 +141,36 @@ function ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_5230_65F6()
         return
     end
     _____53D1_5C04_5230_76EE_6807(_____4E0A_4E0B_6587["状态"], _____4E0A_4E0B_6587["起点单位"], _____4E0A_4E0B_6587["目标单位"])
+end
+function ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_626B_63CF()
+    local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
+    local _____5230_671F_4EFB_52A1 = {}
+    do
+        local i = #_____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868 - 1
+        while i >= 0 do
+            do
+                local _____4E0A_4E0B_6587 = _____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868[i + 1]
+                if _____5F53_524D_65F6_95F4_6BEB_79D2 < _____4E0A_4E0B_6587["到期时间毫秒"] then
+                    goto __continue36
+                end
+                __TS__ArraySplice(_____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868, i, 1)
+                __TS__ArrayUnshift(_____5230_671F_4EFB_52A1, _____4E0A_4E0B_6587)
+            end
+            ::__continue36::
+            i = i - 1
+        end
+    end
+    do
+        local i = 0
+        while i < #_____5230_671F_4EFB_52A1 do
+            _____6267_884C_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1(_____5230_671F_4EFB_52A1[i + 1])
+            i = i + 1
+        end
+    end
+    if #_____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868 == 0 and _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID ~= 0 then
+        removePeriodicCallback(_____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID)
+        _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID = 0
+    end
 end
 function _____53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D, _____76EE_6807_5355_4F4D)
     if _____72B6_6001["已结束"] then
@@ -221,15 +234,15 @@ local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02�
 isUnitEnemy = ____require_result_1.isUnitEnemy
 isSameUnit = ____require_result_1.isSameUnit
 GetHandleId = jass.GetHandleId
-CreateTimer = jass.CreateTimer
-GetExpiredTimer = jass.GetExpiredTimer
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 SquareRoot = jass.SquareRoot
-local ____require_result_2 = require("系统.00．核心系统.07．联机安全工具")
-safeTimerStart = ____require_result_2.safeTimerStart
-safeDestroyTimer = ____require_result_2.safeDestroyTimer
-_____5EF6_8FDF_53D1_5C04_6620_5C04 = {}
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_2.addPeriodicCallback
+removePeriodicCallback = ____require_result_2.removePeriodicCallback
+getServerTime = ____require_result_2.getServerTime
+_____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868 = {}
+_____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID = 0
 ____exports["开始弹道跳链"] = function(_____53C2_6570)
     if _____53C2_6570["施法者"] == nil or _____53C2_6570["施法者"] == 0 then
         return

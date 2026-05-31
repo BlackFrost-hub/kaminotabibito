@@ -26,9 +26,9 @@ const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
 };
 const ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index");
 const getGameUI = ____hwMod.getGameUI as (this: void) => number;
-const ____safeUtils = require("系统.00．核心系统.07．联机安全工具");
-const safeTimerStart = ____safeUtils.safeTimerStart as (timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-const safeDestroyTimer = ____safeUtils.safeDestroyTimer as (timer: any) => void;
+const ____centerTimer = require("系统.00．核心系统.05．中心计时器");
+const addPeriodicCallback = ____centerTimer.addPeriodicCallback as (this: void, intervalMs: number, callback: (this: void) => void) => number;
+const addDelayedCallback = ____centerTimer.addDelayedCallback as (this: void, delayMs: number, callback: (this: void) => void) => number;
 const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
   setDebug: (module: string, on: boolean) => void;
@@ -63,8 +63,8 @@ interface SlotFrames {
 
 const slots: SlotFrames[] = [];
 let buffUiInitialized = false;
-let refreshTimer: any = null;
-let pendingInitDelayTimer: any = null;
+let refreshCallbackId = 0;
+let pendingInitDelayCallbackId = 0;
 const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> } | undefined> = {};
 // DzFrame 返回数字 frame id，不是 JASS handle；这里直接用 frame id 做本地 hover 反查 key。
 const hoverSlotIndexByFrameId: Record<number, number | undefined> = {};
@@ -378,9 +378,8 @@ function createUi(this: void): void {
 }
 
 function startRefreshTimer(this: void): void {
-  if (refreshTimer !== null) return;
-  refreshTimer = jass.CreateTimer();
-  jass.TimerStart(refreshTimer, 0.1, true, onBuffUiRefreshTick);
+  if (refreshCallbackId !== 0) return;
+  refreshCallbackId = addPeriodicCallback(100, onBuffUiRefreshTick);
 }
 
 function onBuffUiRefreshTick(this: void): void {
@@ -390,18 +389,14 @@ function onBuffUiRefreshTick(this: void): void {
 function onBuffUiInitDelayTimer(this: void): void {
   createUi();
   startRefreshTimer();
-  if (pendingInitDelayTimer !== null) {
-    jass.DestroyTimer(pendingInitDelayTimer);
-    pendingInitDelayTimer = null;
-  }
+  pendingInitDelayCallbackId = 0;
 }
 
 function startBuffUiSystem(this: void): void {
   initSelectionCentersForBuffUi();
   if (buffUiInitialized) return;
   buffUiInitialized = true;
-  pendingInitDelayTimer = jass.CreateTimer();
-  jass.TimerStart(pendingInitDelayTimer, 1.0, false, onBuffUiInitDelayTimer);
+  pendingInitDelayCallbackId = addDelayedCallback(1000, onBuffUiInitDelayTimer);
 }
 
 export function init(this: void): void {

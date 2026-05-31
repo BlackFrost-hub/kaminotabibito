@@ -25,9 +25,8 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_1.safeTimerStart
-local safeDestroyTimer = ____require_result_1.safeDestroyTimer
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
@@ -44,9 +43,7 @@ local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_7["查�
 local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_8["播放主线剧情片段"]
 local CreateTrigger = jass.CreateTrigger
-local CreateTimer = jass.CreateTimer
 local CreateUnit = jass.CreateUnit
-local GetExpiredTimer = jass.GetExpiredTimer
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
@@ -295,17 +292,15 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316()
     _____521D_59CB_5316_8FDB_5EA604__5730_7CBE_796D_7940_6B7B_4EA1_6F14_51FA_6838_5FC3()
     _____521D_59CB_5316_8FDB_5EA605__51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_6838_5FC3()
 end
-local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316_5E76_9500_6BC1_8BA1_65F6_5668()
+local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316_5230_65F6()
     ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316()
-    safeDestroyTimer(GetExpiredTimer())
 end
 ____exports["初始化主线剧情入口"] = function()
     if _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 then
         return
     end
     _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = true
-    local timer = CreateTimer()
-    safeTimerStart(timer, _____4E3B_7EBFNPC_521D_59CB_5316_5EF6_8FDF_79D2, false, ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316_5E76_9500_6BC1_8BA1_65F6_5668)
+    addDelayedCallback(_____4E3B_7EBFNPC_521D_59CB_5316_5EF6_8FDF_79D2 * 1000, ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316_5230_65F6)
 end
 ____exports["立即初始化主线剧情入口_兼容旧JASS数据"] = function()
     ____on_4E3B_7EBF_5267_60C5_5165_53E3_5EF6_8FDF_521D_59CB_5316()

@@ -6,9 +6,8 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
 const { isExcludedFromControlResist, isControlAbility, isUnitControlled } = require("系统.05．Buff系统.01．控制抗性.01．控制检测") as {
@@ -28,15 +27,10 @@ const { registerSpellChannelListener } = require("系统.00．核心系统.01．
 
 const ALLOWED_PLAYERS: number[] = [0, 1, 2, 3, 6, 7, jass.PLAYER_NEUTRAL_AGGRESSIVE];
 
-const controlResistCtxByTimerHid: Record<number, { caster: any; target: any; abilityId: number; duration: number }> = {};
+const controlResistQueue: Array<{ caster: any; target: any; abilityId: number; duration: number }> = [];
 
-function onControlResistTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const ctx = controlResistCtxByTimerHid[hid];
-  delete controlResistCtxByTimerHid[hid];
-  safeDestroyTimer(t);
+function onControlResistDelayed(this: void): void {
+  const ctx = controlResistQueue.shift();
   if (!ctx) return;
   if (isUnitControlled(ctx.target)) {
     recastControlAbility(ctx.caster, ctx.target, ctx.abilityId, ctx.duration);
@@ -65,11 +59,8 @@ function onSpellChannel(caster: any, abilityId: number): void {
 
   const duration = calcReducedControlTime(target, abilityId);
 
-  const t = jass.CreateTimer();
-  if (t) {
-    controlResistCtxByTimerHid[jass.GetHandleId(t) as number] = { caster, target, abilityId, duration };
-    safeTimerStart(t, 0, false, onControlResistTimerExpire);
-  }
+  controlResistQueue.push({ caster, target, abilityId, duration });
+  addDelayedCallback(0, onControlResistDelayed);
 }
 
 let _initialized = false;

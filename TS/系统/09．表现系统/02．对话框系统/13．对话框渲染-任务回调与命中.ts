@@ -1,4 +1,6 @@
-const jass = require("jass.common") as any;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+};
 
 import { frameSetScriptByCode, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { KEY_STATE } from "../../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
@@ -28,7 +30,6 @@ import {
   MAX_PLAYERS,
 } from "./10．对话框渲染-Dz与状态";
 import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./12．对话框渲染-播放与状态管理";
-import { safeTimerStart, safeDestroyTimer } from "../../../系统/00．核心系统/07．联机安全工具";
 
 // ========== 虚拟分区：队列索引/当前页查找辅助 ==========
 
@@ -222,20 +223,14 @@ export function bindDialogPanelHitFrame(_hitFrame: Frame): void {
   return;
 }
 
-// ========== 虚拟分区：~ 键跳过冷却 timer ==========
+// ========== 虚拟分区：~ 键跳过冷却 ==========
 
 const SKIP_KEY_COOLDOWN_SECONDS = 0.12;
 const g_skipKeyCooldown: boolean[] = [];
-const g_skipKeyCooldownTimers: any[] = [];
 
 function finishSkipKeyCooldownForPlayer(pid: number): void {
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   g_skipKeyCooldown[pid] = false;
-  const t = g_skipKeyCooldownTimers[pid];
-  g_skipKeyCooldownTimers[pid] = undefined;
-  if (!t) return;
-  jass.PauseTimer(t);
-  safeDestroyTimer(t);
 }
 
 function skipKeyCooldownCallbackP0(): void { finishSkipKeyCooldownForPlayer(0); }
@@ -246,25 +241,20 @@ function skipKeyCooldownCallbackP3(): void { finishSkipKeyCooldownForPlayer(3); 
 function startSkipKeyCooldown(pid: number): void {
   if (pid < 0 || pid >= MAX_PLAYERS) return;
   g_skipKeyCooldown[pid] = true;
-  const t = jass.CreateTimer();
-  g_skipKeyCooldownTimers[pid] = t;
   switch (pid) {
     case 0:
-      safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0);
+      addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP0);
       return;
     case 1:
-      safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1);
+      addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP1);
       return;
     case 2:
-      safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2);
+      addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP2);
       return;
     case 3:
-      safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3);
+      addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP3);
       return;
     default:
-      jass.PauseTimer(t);
-      safeDestroyTimer(t);
-      g_skipKeyCooldownTimers[pid] = undefined;
       g_skipKeyCooldown[pid] = false;
       return;
   }

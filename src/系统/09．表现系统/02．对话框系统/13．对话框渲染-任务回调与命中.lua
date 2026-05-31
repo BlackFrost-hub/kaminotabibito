@@ -45,10 +45,8 @@ local advanceDialog = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B
 local showDialogFrames = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.showDialogFrames
 local skipTyping = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.skipTyping
 local playEntry = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.playEntry
-local ____07_FF0E_8054_673A_5B89_5168_5DE5_5177 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeTimerStart
-local safeDestroyTimer = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeDestroyTimer
-local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local function getCurrentEntry(self, state)
     return state.queue[state.currentIndex + 1]
 end
@@ -294,19 +292,11 @@ function ____exports.bindDialogPanelHitFrame(self, _hitFrame)
 end
 local SKIP_KEY_COOLDOWN_SECONDS = 0.12
 local g_skipKeyCooldown = {}
-local g_skipKeyCooldownTimers = {}
 local function finishSkipKeyCooldownForPlayer(self, pid)
     if pid < 0 or pid >= MAX_PLAYERS then
         return
     end
     g_skipKeyCooldown[pid + 1] = false
-    local t = g_skipKeyCooldownTimers[pid + 1]
-    g_skipKeyCooldownTimers[pid + 1] = nil
-    if not t then
-        return
-    end
-    jass.PauseTimer(t)
-    safeDestroyTimer(t)
 end
 local function skipKeyCooldownCallbackP0(self)
     finishSkipKeyCooldownForPlayer(nil, 0)
@@ -325,34 +315,29 @@ local function startSkipKeyCooldown(self, pid)
         return
     end
     g_skipKeyCooldown[pid + 1] = true
-    local t = jass.CreateTimer()
-    g_skipKeyCooldownTimers[pid + 1] = t
     repeat
-        local ____switch62 = pid
-        local ____cond62 = ____switch62 == 0
-        if ____cond62 then
-            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP0)
+        local ____switch61 = pid
+        local ____cond61 = ____switch61 == 0
+        if ____cond61 then
+            addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP0)
             return
         end
-        ____cond62 = ____cond62 or ____switch62 == 1
-        if ____cond62 then
-            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP1)
+        ____cond61 = ____cond61 or ____switch61 == 1
+        if ____cond61 then
+            addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP1)
             return
         end
-        ____cond62 = ____cond62 or ____switch62 == 2
-        if ____cond62 then
-            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP2)
+        ____cond61 = ____cond61 or ____switch61 == 2
+        if ____cond61 then
+            addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP2)
             return
         end
-        ____cond62 = ____cond62 or ____switch62 == 3
-        if ____cond62 then
-            safeTimerStart(t, SKIP_KEY_COOLDOWN_SECONDS, false, skipKeyCooldownCallbackP3)
+        ____cond61 = ____cond61 or ____switch61 == 3
+        if ____cond61 then
+            addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP3)
             return
         end
         do
-            jass.PauseTimer(t)
-            safeDestroyTimer(t)
-            g_skipKeyCooldownTimers[pid + 1] = nil
             g_skipKeyCooldown[pid + 1] = false
             return
         end
@@ -442,30 +427,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch77 = state.playerId
-        local ____cond77 = ____switch77 == 0
-        if ____cond77 then
+        local ____switch76 = state.playerId
+        local ____cond76 = ____switch76 == 0
+        if ____cond76 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 1
-        if ____cond77 then
+        ____cond76 = ____cond76 or ____switch76 == 1
+        if ____cond76 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 2
-        if ____cond77 then
+        ____cond76 = ____cond76 or ____switch76 == 2
+        if ____cond76 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 3
-        if ____cond77 then
+        ____cond76 = ____cond76 or ____switch76 == 3
+        if ____cond76 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

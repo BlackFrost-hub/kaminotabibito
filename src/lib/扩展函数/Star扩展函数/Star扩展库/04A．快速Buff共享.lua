@@ -22,16 +22,20 @@ local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
 local safeTimerStart = ____require_result_0.safeTimerStart
 local safeDestroyTimer = ____require_result_0.safeDestroyTimer
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
 local ydweObject = require("lib.扩展函数.YDWE函数.index")
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
 local miscBj = require("lib.扩展函数.BJ函数.07．杂项")
 local fourCcUtil = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local ____require_result_3 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
-local calcReducedControlDuration = ____require_result_3.calcReducedControlDuration
+local ____require_result_4 = require("系统.05．Buff系统.01．控制抗性.02．控制时间计算")
+local calcReducedControlDuration = ____require_result_4.calcReducedControlDuration
 local unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位相关")
 local _____83B7_53D6_5BF9_8C61_5C5E_6027 = ydweObject.getObjectProperty
 local _____7269_4F53_7C7B_578B = ydweObject.ObjectType
@@ -41,46 +45,46 @@ local _____83B7_53D6_73A9_5BB6_9996_4E2A_82F1_96C4 = unitRelated.getPlayerFirstH
 local YDUserDataGet = YDUserDataGetSafe
 local YDUserDataSet = YDUserDataSetSafe
 local function sym(name)
-    local ____G_name_5 = _G[name]
-    if ____G_name_5 == nil then
-        local ____jglobals_4
+    local ____G_name_6 = _G[name]
+    if ____G_name_6 == nil then
+        local ____jglobals_5
         if jglobals then
-            ____jglobals_4 = jglobals[name]
+            ____jglobals_5 = jglobals[name]
         else
-            ____jglobals_4 = nil
+            ____jglobals_5 = nil
         end
-        ____G_name_5 = ____jglobals_4
+        ____G_name_6 = ____jglobals_5
     end
-    local ____G_name_5_7 = ____G_name_5
-    if ____G_name_5_7 == nil then
-        local ____jass_6
+    local ____G_name_6_8 = ____G_name_6
+    if ____G_name_6_8 == nil then
+        local ____jass_7
         if jass then
-            ____jass_6 = jass[name]
+            ____jass_7 = jass[name]
         else
-            ____jass_6 = nil
+            ____jass_7 = nil
         end
-        ____G_name_5_7 = ____jass_6
+        ____G_name_6_8 = ____jass_7
     end
-    return ____G_name_5_7
+    return ____G_name_6_8
 end
 local function getYDHT()
-    local ____sym_result_8 = sym("StarBaseHT")
-    if ____sym_result_8 == nil then
-        ____sym_result_8 = sym("YDHASH_HANDLE")
+    local ____sym_result_9 = sym("StarBaseHT")
+    if ____sym_result_9 == nil then
+        ____sym_result_9 = sym("YDHASH_HANDLE")
     end
-    local ____sym_result_8_9 = ____sym_result_8
-    if ____sym_result_8_9 == nil then
-        ____sym_result_8_9 = sym("YDHT")
+    local ____sym_result_9_10 = ____sym_result_9
+    if ____sym_result_9_10 == nil then
+        ____sym_result_9_10 = sym("YDHT")
     end
-    local ____sym_result_8_9_10 = ____sym_result_8_9
-    if ____sym_result_8_9_10 == nil then
-        ____sym_result_8_9_10 = sym("udg_YDHASH_HANDLE")
+    local ____sym_result_9_10_11 = ____sym_result_9_10
+    if ____sym_result_9_10_11 == nil then
+        ____sym_result_9_10_11 = sym("udg_YDHASH_HANDLE")
     end
-    local ____sym_result_8_9_10_11 = ____sym_result_8_9_10
-    if ____sym_result_8_9_10_11 == nil then
-        ____sym_result_8_9_10_11 = sym("udg_YDHT")
+    local ____sym_result_9_10_11_12 = ____sym_result_9_10_11
+    if ____sym_result_9_10_11_12 == nil then
+        ____sym_result_9_10_11_12 = sym("udg_YDHT")
     end
-    return ____sym_result_8_9_10_11
+    return ____sym_result_9_10_11_12
 end
 ____exports.YDHT = getYDHT()
 ____exports.SFB_Unit = nil
@@ -335,39 +339,52 @@ local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
     ____SFB__5DF2_6DFB_52A0_6280_80FD[abilityId] = true
     return true
 end
-local function onSfbPauseTimerExpire()
-    local t = jass.GetExpiredTimer()
-    jass.PauseUnit(
-        jass.LoadUnitHandle(
-            ____exports.YDHT,
-            jass.GetHandleId(t),
-            jass.StringHash("单位")
-        ),
-        false
-    )
-    jass.RemoveSavedHandle(
-        ____exports.YDHT,
-        jass.GetHandleId(t),
-        jass.StringHash("单位")
-    )
-    safeDestroyTimer(nil, t)
+local ____SFB__6682_505C_6062_590D_4EFB_52A1 = {}
+local ____SFB__6682_505C_6062_590D_626B_63CFID = 0
+local function onSfbPauseRestoreTick()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #____SFB__6682_505C_6062_590D_4EFB_52A1 do
+            do
+                local task = ____SFB__6682_505C_6062_590D_4EFB_52A1[i + 1]
+                if now >= task.dueTime then
+                    if task.useExPause then
+                        japi.EXPauseUnit(task.unit, false)
+                    else
+                        jass.PauseUnit(task.unit, false)
+                    end
+                    goto __continue34
+                end
+                ____SFB__6682_505C_6062_590D_4EFB_52A1[writeIndex + 1] = task
+                writeIndex = writeIndex + 1
+            end
+            ::__continue34::
+            i = i + 1
+        end
+    end
+    do
+        local i = #____SFB__6682_505C_6062_590D_4EFB_52A1 - 1
+        while i >= writeIndex do
+            table.remove(____SFB__6682_505C_6062_590D_4EFB_52A1)
+            i = i - 1
+        end
+    end
+    if #____SFB__6682_505C_6062_590D_4EFB_52A1 == 0 and ____SFB__6682_505C_6062_590D_626B_63CFID ~= 0 then
+        removePeriodicCallback(____SFB__6682_505C_6062_590D_626B_63CFID)
+        ____SFB__6682_505C_6062_590D_626B_63CFID = 0
+    end
 end
-local function onSfbExpauseTimerExpire()
-    local t = jass.GetExpiredTimer()
-    japi.EXPauseUnit(
-        jass.LoadUnitHandle(
-            ____exports.YDHT,
-            jass.GetHandleId(t),
-            jass.StringHash("单位")
-        ),
-        false
-    )
-    jass.RemoveSavedHandle(
-        ____exports.YDHT,
-        jass.GetHandleId(t),
-        jass.StringHash("单位")
-    )
-    safeDestroyTimer(nil, t)
+local function scheduleSfbPauseRestore(unit, time, useExPause)
+    ____SFB__6682_505C_6062_590D_4EFB_52A1[#____SFB__6682_505C_6062_590D_4EFB_52A1 + 1] = {
+        unit = unit,
+        useExPause = useExPause,
+        dueTime = getServerTime() + time * 1000
+    }
+    if ____SFB__6682_505C_6062_590D_626B_63CFID == 0 then
+        ____SFB__6682_505C_6062_590D_626B_63CFID = addPeriodicCallback(10, onSfbPauseRestoreTick)
+    end
 end
 ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, abilityId, orderStr)
     if not SUC_IsValidUnit(u) or time <= 0 then
@@ -485,13 +502,13 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     if orderId ~= 0 then
         return ____exports.IssueTargetOrderById(caster, orderId, u) == true
     end
-    local ____temp_12
+    local ____temp_13
     if type(orderStr) == "string" then
-        ____temp_12 = ____exports.IssueTargetOrder(caster, orderStr, u) == true
+        ____temp_13 = ____exports.IssueTargetOrder(caster, orderStr, u) == true
     else
-        ____temp_12 = false
+        ____temp_13 = false
     end
-    return ____temp_12
+    return ____temp_13
 end
 ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
     ____exports.registerSfbManualBuff(
@@ -504,37 +521,11 @@ ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
     if id == 21 then
         GS_Suspend(u, time)
     elseif id == 22 then
-        local tempTimer = jass.CreateTimer()
-        jass.SaveUnitHandle(
-            ____exports.YDHT,
-            jass.GetHandleId(tempTimer),
-            jass.StringHash("单位"),
-            u
-        )
         jass.PauseUnit(u, true)
-        safeTimerStart(
-            nil,
-            tempTimer,
-            time,
-            false,
-            onSfbPauseTimerExpire
-        )
+        scheduleSfbPauseRestore(u, time, false)
     elseif id == 23 then
-        local tempTimer = jass.CreateTimer()
-        jass.SaveUnitHandle(
-            ____exports.YDHT,
-            jass.GetHandleId(tempTimer),
-            jass.StringHash("单位"),
-            u
-        )
         japi.EXPauseUnit(u, true)
-        safeTimerStart(
-            nil,
-            tempTimer,
-            time,
-            false,
-            onSfbExpauseTimerExpire
-        )
+        scheduleSfbPauseRestore(u, time, true)
     end
 end
 ____exports.SFB_Init()

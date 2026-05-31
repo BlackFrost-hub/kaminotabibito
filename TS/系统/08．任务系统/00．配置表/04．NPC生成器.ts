@@ -7,9 +7,8 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const BJ_DEGTORAD = 0.017453292519943295;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
 import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
@@ -53,26 +52,22 @@ function registerCreatedNpcUnit(npcConfig: NPCData, unit: any): void {
   }
 }
 
-const npcQuestMarkerCtxByTimerHid: Record<number, { unit: any; npcConfig: NPCData }> = {};
-const npcSetModelCtxByTimerHid: Record<number, { unit: any; modelPath: string; npcLabel: string }> = {};
+const npcQuestMarkerNoModelQueue: Array<{ unit: any; npcConfig: NPCData }> = [];
+const npcQuestMarkerAfterModelQueue: Array<{ unit: any; npcConfig: NPCData }> = [];
+const npcSetModelQueue: Array<{ unit: any; modelPath: string; npcLabel: string }> = [];
 
-function onNpcQuestMarkerTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const ctx = npcQuestMarkerCtxByTimerHid[hid];
-  delete npcQuestMarkerCtxByTimerHid[hid];
-  safeDestroyTimer(t);
+function onNpcQuestMarkerNoModelDelayed(this: void): void {
+  const ctx = npcQuestMarkerNoModelQueue.shift();
   if (ctx !== undefined) tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig);
 }
 
-function onNpcSetModelTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const ctx = npcSetModelCtxByTimerHid[hid];
-  delete npcSetModelCtxByTimerHid[hid];
-  safeDestroyTimer(t);
+function onNpcQuestMarkerAfterModelDelayed(this: void): void {
+  const ctx = npcQuestMarkerAfterModelQueue.shift();
+  if (ctx !== undefined) tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig);
+}
+
+function onNpcSetModelDelayed(this: void): void {
+  const ctx = npcSetModelQueue.shift();
   if (!ctx) return;
   __pcallModelUnit = ctx.unit;
   __pcallModelPath = ctx.modelPath;
@@ -83,20 +78,18 @@ function onNpcSetModelTimerExpire(this: void): void {
 }
 
 function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
-  const delaySec = npcConfig.modelFIle ? DELAY_QUEST_MARKER_AFTER_SET_MODEL : DELAY_QUEST_MARKER_NO_CUSTOM_MODEL;
-  const t = jass.CreateTimer();
-  if (t) {
-    npcQuestMarkerCtxByTimerHid[jass.GetHandleId(t) as number] = { unit, npcConfig };
-    safeTimerStart(t, delaySec, false, onNpcQuestMarkerTimerExpire);
+  if (npcConfig.modelFIle) {
+    npcQuestMarkerAfterModelQueue.push({ unit, npcConfig });
+    addDelayedCallback(DELAY_QUEST_MARKER_AFTER_SET_MODEL * 1000, onNpcQuestMarkerAfterModelDelayed);
+  } else {
+    npcQuestMarkerNoModelQueue.push({ unit, npcConfig });
+    addDelayedCallback(DELAY_QUEST_MARKER_NO_CUSTOM_MODEL * 1000, onNpcQuestMarkerNoModelDelayed);
   }
 }
 
 function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): void {
-  const t = jass.CreateTimer();
-  if (t) {
-    npcSetModelCtxByTimerHid[jass.GetHandleId(t) as number] = { unit, modelPath, npcLabel };
-    safeTimerStart(t, 0.01, false, onNpcSetModelTimerExpire);
-  }
+  npcSetModelQueue.push({ unit, modelPath, npcLabel });
+  addDelayedCallback(10, onNpcSetModelDelayed);
 }
 
 function createSingleNPC(npcConfig: NPCData): any {

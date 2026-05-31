@@ -205,12 +205,12 @@ function initActivationPointsInternal()
         do
             local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
             if not cfg or cfg.enabled == false then
-                goto __continue53
+                goto __continue51
             end
             registerOnePoint(cfg, key)
             count = count + 1
         end
-        ::__continue53::
+        ::__continue51::
     end
     dbg("已注册激活传送点(接近检测): " .. tostring(count))
 end
@@ -218,9 +218,8 @@ jass = require("jass.common")
 g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_1.safeTimerStart
-local safeDestroyTimer = ____require_result_1.safeDestroyTimer
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("lib.扩展函数.封装函数.02．音效系统.index")
 Sound3DII_Mp3PlayReuse = ____require_result_2.Sound3DII_Mp3PlayReuse
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
@@ -250,8 +249,7 @@ local function formatGgUnitProbe(u)
     end
     return "ok" .. tail
 end
-local function onDebugSnapshot0sTimerExpire()
-    local t = jass.GetExpiredTimer()
+local function onDebugSnapshot0sDelayed()
     local gAny = g
     local jc = jass
     local G = _G
@@ -274,10 +272,8 @@ local function onDebugSnapshot0sTimerExpire()
         end
     end
     debugLog(nil, "激活传送点", msg)
-    safeDestroyTimer(nil, t)
 end
-local function onDebugSnapshot1sTimerExpire()
-    local t = jass.GetExpiredTimer()
+local function onDebugSnapshot1sDelayed()
     local gAny = g
     local jc = jass
     local G = _G
@@ -300,51 +296,21 @@ local function onDebugSnapshot1sTimerExpire()
         end
     end
     debugLog(nil, "激活传送点", msg)
-    safeDestroyTimer(nil, t)
 end
-local function onInitActivationPointsTimerExpire()
-    local t = jass.GetExpiredTimer()
+local function onInitActivationPointsDelayed()
     initActivationPointsInternal()
-    safeDestroyTimer(nil, t)
 end
 --- 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil）
 local function scheduleDebugGgUnitHtow0030()
     if not DEBUG_GG_UNIT_HTOW_0030 then
         return
     end
-    local t0 = jass.CreateTimer()
-    if t0 then
-        safeTimerStart(
-            nil,
-            t0,
-            0,
-            false,
-            onDebugSnapshot0sTimerExpire
-        )
-    end
-    local t1 = jass.CreateTimer()
-    if t1 then
-        safeTimerStart(
-            nil,
-            t1,
-            1,
-            false,
-            onDebugSnapshot1sTimerExpire
-        )
-    end
+    addDelayedCallback(0, onDebugSnapshot0sDelayed)
+    addDelayedCallback(1000, onDebugSnapshot1sDelayed)
 end
 --- 在地图初始化时调用（建议用 0.00 秒计时器）
 ____exports["init激活传送点"] = function()
     scheduleDebugGgUnitHtow0030()
-    local t = jass.CreateTimer()
-    if t then
-        safeTimerStart(
-            nil,
-            t,
-            0,
-            false,
-            onInitActivationPointsTimerExpire
-        )
-    end
+    addDelayedCallback(0, onInitActivationPointsDelayed)
 end
 return ____exports

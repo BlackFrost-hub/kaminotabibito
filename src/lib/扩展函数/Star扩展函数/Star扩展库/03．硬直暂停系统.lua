@@ -1,10 +1,44 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local hid, _____67E5_627E_786C_76F4_5230_671F_4EFB_52A1_7D22_5F15, RMaxBJ, getServerTime, GetHandleId, _____786C_76F4_5230_671F_4EFB_52A1_5217_8868
+function hid(h)
+    return GetHandleId(h) or 0
+end
+function _____67E5_627E_786C_76F4_5230_671F_4EFB_52A1_7D22_5F15(_____5355_4F4DID)
+    do
+        local i = 0
+        while i < #_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 do
+            if _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[i + 1]["单位ID"] == _____5355_4F4DID then
+                return i
+            end
+            i = i + 1
+        end
+    end
+    return -1
+end
+--- 获取单位剩余暂停时间（秒）。
+function ____exports.GS_LoadSuspend(u)
+    if u == nil or u == 0 then
+        return 0
+    end
+    local uid = hid(u)
+    if uid == 0 then
+        return 0
+    end
+    local _____4EFB_52A1_7D22_5F15 = _____67E5_627E_786C_76F4_5230_671F_4EFB_52A1_7D22_5F15(uid)
+    if _____4EFB_52A1_7D22_5F15 < 0 then
+        return 0
+    end
+    return RMaxBJ(
+        0,
+        _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[_____4EFB_52A1_7D22_5F15 + 1]["到期时间毫秒"] - getServerTime()
+    ) * 0.001
+end
 --- Star扩展库 - 硬直/暂停系统
 -- 
 -- 来源于 SUSPEND.j，提供单位暂停控制功能。
--- 通过 EXPauseUnit(japi) 暂停单位，计时器到期后自动恢复。
+-- 通过 EXPauseUnit(japi) 暂停单位，中心计时器驱动到期后自动恢复。
 -- 支持暂停时间累加、减少、取最大值等操作。
 -- 
 -- 公开接口：
@@ -14,10 +48,10 @@ local ____exports = {}
 --   GS_UnitSuspend(u, i, r)      - 修改暂停时间（0=增加，1=减少，2=取最大值）
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
-local RMaxBJ = ____require_result_0.RMaxBJ
-local ____require_result_1 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_1.safeTimerStart
-local safeDestroyTimer = ____require_result_1.safeDestroyTimer
+RMaxBJ = ____require_result_0.RMaxBJ
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+getServerTime = ____require_result_1.getServerTime
 local japi = nil
 do
     local function ____catch(_e)
@@ -30,19 +64,16 @@ do
         ____catch(____hasReturned)
     end
 end
-local HS_S = jass.InitHashtable()
 local PauseUnit = jass.PauseUnit
+GetHandleId = jass.GetHandleId
+local EXPauseUnit = japi ~= nil and type(japi.EXPauseUnit) == "function" and japi.EXPauseUnit or nil
 local _____5355_4F4D_6682_505C_5360_7528_603B_8868 = {}
 local _____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868 = {}
-local function hid(h)
-    return jass.GetHandleId(h) or 0
-end
 local function _____8BBE_7F6E_5E95_5C42_6682_505C_72B6_6001(u, _____662F_5426_6682_505C)
     if u == nil or u == 0 then
         return
     end
-    if japi ~= nil and type(japi.EXPauseUnit) == "function" then
-        local EXPauseUnit = japi.EXPauseUnit
+    if EXPauseUnit ~= nil then
         EXPauseUnit(u, _____662F_5426_6682_505C)
         return
     end
@@ -124,21 +155,37 @@ ____exports["单位是否存在其他暂停占用"] = function(u, _____81EA_8EAB
     local _____81EA_8EAB_6765_6E90_8BA1_6570 = _____81EA_8EAB_6765_6E90 ~= nil and _____81EA_8EAB_6765_6E90 ~= "" and (_____5355_4F4D_6682_505C_5360_7528_6765_6E90_8868[_____751F_6210_6682_505C_6765_6E90_952E(_____5355_4F4DID, _____81EA_8EAB_6765_6E90)] or 0) or 0
     return _____603B_8BA1_6570 > _____81EA_8EAB_6765_6E90_8BA1_6570
 end
-local function onHardStraightTimerExpire()
-    local expiredTimer = jass.GetExpiredTimer()
-    local tid = hid(expiredTimer)
-    local savedUnit = jass.LoadUnitHandle(HS_S, tid, 1)
-    if savedUnit ~= nil and savedUnit ~= 0 then
-        ____exports["释放单位暂停占用"](savedUnit, "GS_Suspend")
+_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 = {}
+local _____786C_76F4_5230_671F_9A71_52A8_5DF2_6CE8_518C = false
+local function ____on_786C_76F4_5230_671F_9A71_52A8()
+    if #_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 == 0 then
+        return
     end
-    jass.FlushChildHashtable(HS_S, tid)
-    if savedUnit ~= nil and savedUnit ~= 0 then
-        jass.FlushChildHashtable(
-            HS_S,
-            hid(savedUnit)
-        )
+    local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
+    local _____5199_5165_4F4D_7F6E = 0
+    do
+        local i = 0
+        while i < #_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 do
+            local _____4EFB_52A1 = _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[i + 1]
+            if _____5F53_524D_65F6_95F4_6BEB_79D2 >= _____4EFB_52A1["到期时间毫秒"] then
+                ____exports["释放单位暂停占用"](_____4EFB_52A1["单位"], "GS_Suspend")
+            else
+                _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[_____5199_5165_4F4D_7F6E + 1] = _____4EFB_52A1
+                _____5199_5165_4F4D_7F6E = _____5199_5165_4F4D_7F6E + 1
+            end
+            i = i + 1
+        end
     end
-    safeDestroyTimer(nil, expiredTimer)
+    while #_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 > _____5199_5165_4F4D_7F6E do
+        table.remove(_____786C_76F4_5230_671F_4EFB_52A1_5217_8868)
+    end
+end
+local function _____786E_4FDD_786C_76F4_5230_671F_9A71_52A8()
+    if _____786C_76F4_5230_671F_9A71_52A8_5DF2_6CE8_518C then
+        return
+    end
+    _____786C_76F4_5230_671F_9A71_52A8_5DF2_6CE8_518C = true
+    addPeriodicCallback(10, ____on_786C_76F4_5230_671F_9A71_52A8)
 end
 --- 暂停单位一段时间
 -- 若单位已在暂停中，会重置暂停时间
@@ -150,35 +197,20 @@ function ____exports.GS_Suspend(u, time)
         return
     end
     local uid = hid(u)
-    local T = jass.LoadTimerHandle(HS_S, uid, 1)
-    local ____temp_2
-    if T ~= nil then
-        ____temp_2 = jass.TimerGetRemaining(T)
-    else
-        ____temp_2 = 0
+    if uid == 0 then
+        return
     end
-    local remaining = ____temp_2
-    if T == nil or remaining == 0 then
-        T = jass.CreateTimer()
-        if T == nil then
-            return
-        end
+    local _____5230_671F_65F6_95F4_6BEB_79D2 = getServerTime() + RMaxBJ(0, time) * 1000
+    local _____4EFB_52A1_7D22_5F15 = _____67E5_627E_786C_76F4_5230_671F_4EFB_52A1_7D22_5F15(uid)
+    if _____4EFB_52A1_7D22_5F15 < 0 then
         ____exports["申请单位暂停占用"](u, "GS_Suspend")
-        jass.SaveUnitHandle(
-            HS_S,
-            hid(T),
-            1,
-            u
-        )
-        jass.SaveTimerHandle(HS_S, uid, 1, T)
+        _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[#_____786C_76F4_5230_671F_4EFB_52A1_5217_8868 + 1] = {["单位"] = u, ["单位ID"] = uid, ["到期时间毫秒"] = _____5230_671F_65F6_95F4_6BEB_79D2}
+    else
+        local _____4EFB_52A1 = _____786C_76F4_5230_671F_4EFB_52A1_5217_8868[_____4EFB_52A1_7D22_5F15 + 1]
+        _____4EFB_52A1["单位"] = u
+        _____4EFB_52A1["到期时间毫秒"] = _____5230_671F_65F6_95F4_6BEB_79D2
     end
-    safeTimerStart(
-        nil,
-        T,
-        time,
-        false,
-        onHardStraightTimerExpire
-    )
+    _____786E_4FDD_786C_76F4_5230_671F_9A71_52A8()
 end
 --- 检查单位是否处于暂停状态
 -- 
@@ -188,35 +220,7 @@ function ____exports.GS_IsUnitSuspending(u)
     if u == nil or u == 0 then
         return false
     end
-    local T = jass.LoadTimerHandle(
-        HS_S,
-        hid(u),
-        1
-    )
-    if T == nil then
-        return false
-    end
-    local remaining = jass.TimerGetRemaining(T)
-    return remaining ~= 0
-end
---- 获取单位剩余暂停时间
--- 
--- @param u 目标单位
--- @returns 剩余暂停时间（秒）
-function ____exports.GS_LoadSuspend(u)
-    if u == nil or u == 0 then
-        return 0
-    end
-    local T = jass.LoadTimerHandle(
-        HS_S,
-        hid(u),
-        1
-    )
-    if T == nil then
-        return 0
-    end
-    local remaining = jass.TimerGetRemaining(T)
-    return remaining or 0
+    return ____exports.GS_LoadSuspend(u) > 0
 end
 --- 修改单位暂停时间
 -- 

@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
@@ -18,9 +17,8 @@ local tryAttachQuestMarkerForConfigNpc = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local BJ_DEGTORAD = 0.017453292519943295
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local __pcallModelUnit = 0
 local __pcallModelPath = ""
 local function __pcallSetUnitModelBody(self)
@@ -50,30 +48,23 @@ local function registerCreatedNpcUnit(npcConfig, unit)
         g_npcUnitByDisplayName:set(npcConfig.NPCrequireName, unit)
     end
 end
-local npcQuestMarkerCtxByTimerHid = {}
-local npcSetModelCtxByTimerHid = {}
-local function onNpcQuestMarkerTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
-        return
-    end
-    local hid = jass.GetHandleId(t)
-    local ctx = npcQuestMarkerCtxByTimerHid[hid]
-    __TS__Delete(npcQuestMarkerCtxByTimerHid, hid)
-    safeDestroyTimer(nil, t)
+local npcQuestMarkerNoModelQueue = {}
+local npcQuestMarkerAfterModelQueue = {}
+local npcSetModelQueue = {}
+local function onNpcQuestMarkerNoModelDelayed()
+    local ctx = table.remove(npcQuestMarkerNoModelQueue, 1)
     if ctx ~= nil then
         tryAttachQuestMarkerForConfigNpc(nil, ctx.unit, ctx.npcConfig)
     end
 end
-local function onNpcSetModelTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
-        return
+local function onNpcQuestMarkerAfterModelDelayed()
+    local ctx = table.remove(npcQuestMarkerAfterModelQueue, 1)
+    if ctx ~= nil then
+        tryAttachQuestMarkerForConfigNpc(nil, ctx.unit, ctx.npcConfig)
     end
-    local hid = jass.GetHandleId(t)
-    local ctx = npcSetModelCtxByTimerHid[hid]
-    __TS__Delete(npcSetModelCtxByTimerHid, hid)
-    safeDestroyTimer(nil, t)
+end
+local function onNpcSetModelDelayed()
+    local ctx = table.remove(npcSetModelQueue, 1)
     if not ctx then
         return
     end
@@ -91,31 +82,17 @@ local function onNpcSetModelTimerExpire()
     end
 end
 local function scheduleTryAttachQuestMarker(unit, npcConfig)
-    local delaySec = npcConfig.modelFIle and DELAY_QUEST_MARKER_AFTER_SET_MODEL or DELAY_QUEST_MARKER_NO_CUSTOM_MODEL
-    local t = jass.CreateTimer()
-    if t then
-        npcQuestMarkerCtxByTimerHid[jass.GetHandleId(t)] = {unit = unit, npcConfig = npcConfig}
-        safeTimerStart(
-            nil,
-            t,
-            delaySec,
-            false,
-            onNpcQuestMarkerTimerExpire
-        )
+    if npcConfig.modelFIle then
+        npcQuestMarkerAfterModelQueue[#npcQuestMarkerAfterModelQueue + 1] = {unit = unit, npcConfig = npcConfig}
+        addDelayedCallback(DELAY_QUEST_MARKER_AFTER_SET_MODEL * 1000, onNpcQuestMarkerAfterModelDelayed)
+    else
+        npcQuestMarkerNoModelQueue[#npcQuestMarkerNoModelQueue + 1] = {unit = unit, npcConfig = npcConfig}
+        addDelayedCallback(DELAY_QUEST_MARKER_NO_CUSTOM_MODEL * 1000, onNpcQuestMarkerNoModelDelayed)
     end
 end
 local function scheduleSetUnitModel(unit, modelPath, npcLabel)
-    local t = jass.CreateTimer()
-    if t then
-        npcSetModelCtxByTimerHid[jass.GetHandleId(t)] = {unit = unit, modelPath = modelPath, npcLabel = npcLabel}
-        safeTimerStart(
-            nil,
-            t,
-            0.01,
-            false,
-            onNpcSetModelTimerExpire
-        )
-    end
+    npcSetModelQueue[#npcSetModelQueue + 1] = {unit = unit, modelPath = modelPath, npcLabel = npcLabel}
+    addDelayedCallback(10, onNpcSetModelDelayed)
 end
 local function createSingleNPC(npcConfig)
     if not npcConfig.unitcode or npcConfig.X == nil or npcConfig.Y == nil then

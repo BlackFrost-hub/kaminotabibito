@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____05_FF0E_4E3B_7EBF_5267_60C5_4E8B_4EF6_914D_7F6E_8868 = require("系统.11．剧情系统.01．主线任务.01．主线剧情入口.05．主线剧情事件配置表")
 local _____4E3B_7EBF_5267_60C5_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E_8868 = ____05_FF0E_4E3B_7EBF_5267_60C5_4E8B_4EF6_914D_7F6E_8868["主线剧情技能通道事件配置表"]
@@ -23,9 +22,10 @@ local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算
 local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
 local ____require_result_2 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local YDWESetEventDamage = ____require_result_2.YDWESetEventDamage
-local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_3.safeTimerStart
-local safeDestroyTimer = ____require_result_3.safeDestroyTimer
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+local removePeriodicCallback = ____require_result_3.removePeriodicCallback
+local getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataClearSafe = ____require_result_4.YDUserDataClearSafe
 local YDUserDataClearTableSafe = ____require_result_4.YDUserDataClearTableSafe
@@ -41,9 +41,6 @@ local GetLastCreatedQuestBJ = ____require_result_8.GetLastCreatedQuestBJ
 local QuestMessageBJ = ____require_result_8.QuestMessageBJ
 local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
-local CreateTimer = jass.CreateTimer
-local GetExpiredTimer = jass.GetExpiredTimer
-local GetHandleId = jass.GetHandleId
 local GetUnitName = jass.GetUnitName
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -63,7 +60,8 @@ local bj_QUESTMESSAGE_ALWAYSHINT = jglobals.bj_QUESTMESSAGE_ALWAYSHINT
 local bj_QUESTTYPE_OPT_UNDISCOVERED = jglobals.bj_QUESTTYPE_OPT_UNDISCOVERED
 local bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET
 local _____5DF2_521D_59CB_5316_4E3B_7EBF_5267_60C5_7279_6B8A_4E8B_4EF6 = false
-local _____5EF6_8FDF_663E_793A_914D_7F6EBy_8BA1_65F6_5668ID = {}
+local _____5EF6_8FDF_663E_793A_4EFB_52A1 = {}
+local _____5EF6_8FDF_663E_793A_626B_63CFID = 0
 local function _____83B7_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     return jglobals[_____53D8_91CF_540D]
 end
@@ -140,19 +138,7 @@ local function _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_
         end
     end
 end
-local function ____on_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A_5230_65F6()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local _____914D_7F6E = _____5EF6_8FDF_663E_793A_914D_7F6EBy_8BA1_65F6_5668ID[tostring(GetHandleId(timer)
-    )]
-    __TS__Delete(
-        _____5EF6_8FDF_663E_793A_914D_7F6EBy_8BA1_65F6_5668ID,
-        tostring(GetHandleId(timer)
-        )
-    )
-    safeDestroyTimer(timer)
+local function _____6267_884C_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A(_____914D_7F6E)
     if _____914D_7F6E == nil or _____914D_7F6E["延迟显示"] == nil then
         return
     end
@@ -171,17 +157,48 @@ local function ____on_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A_5230_65F6()
         )
     end
 end
+local function ____on_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A_626B_63CF()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____5EF6_8FDF_663E_793A_4EFB_52A1 do
+            do
+                local task = _____5EF6_8FDF_663E_793A_4EFB_52A1[i + 1]
+                if now >= task.dueTime then
+                    _____6267_884C_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A(task["配置"])
+                    goto __continue26
+                end
+                _____5EF6_8FDF_663E_793A_4EFB_52A1[writeIndex + 1] = task
+                writeIndex = writeIndex + 1
+            end
+            ::__continue26::
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____5EF6_8FDF_663E_793A_4EFB_52A1 - 1
+        while i >= writeIndex do
+            table.remove(_____5EF6_8FDF_663E_793A_4EFB_52A1)
+            i = i - 1
+        end
+    end
+    if #_____5EF6_8FDF_663E_793A_4EFB_52A1 == 0 and _____5EF6_8FDF_663E_793A_626B_63CFID ~= 0 then
+        removePeriodicCallback(_____5EF6_8FDF_663E_793A_626B_63CFID)
+        _____5EF6_8FDF_663E_793A_626B_63CFID = 0
+    end
+end
 local function _____542F_52A8_5EF6_8FDF_663E_793A(_____914D_7F6E)
     if _____914D_7F6E["延迟显示"] == nil then
         return
     end
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        return
+    _____5EF6_8FDF_663E_793A_4EFB_52A1[#_____5EF6_8FDF_663E_793A_4EFB_52A1 + 1] = {
+        dueTime = getServerTime() + _____914D_7F6E["延迟显示"]["延迟秒数"] * 1000,
+        ["配置"] = _____914D_7F6E
+    }
+    if _____5EF6_8FDF_663E_793A_626B_63CFID == 0 then
+        _____5EF6_8FDF_663E_793A_626B_63CFID = addPeriodicCallback(10, ____on_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A_626B_63CF)
     end
-    _____5EF6_8FDF_663E_793A_914D_7F6EBy_8BA1_65F6_5668ID[tostring(GetHandleId(timer)
-    )] = _____914D_7F6E
-    safeTimerStart(timer, _____914D_7F6E["延迟显示"]["延迟秒数"], false, ____on_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A_5230_65F6)
 end
 local function _____547D_4E2D_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E(_____914D_7F6E, castingUnit, spellAbilityId)
     if castingUnit == nil or castingUnit == 0 then
@@ -259,12 +276,12 @@ local function ____on_4E3B_7EBF_6280_80FD_901A_9053_63A8_8FDB(castingUnit, spell
             do
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E_8868[i + 1]
                 if not _____547D_4E2D_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E(_____914D_7F6E, castingUnit, spellAbilityId) then
-                    goto __continue48
+                    goto __continue54
                 end
                 _____6267_884C_6280_80FD_63A8_8FDB_5267_60C5(_____914D_7F6E, castingUnit)
                 return
             end
-            ::__continue48::
+            ::__continue54::
             i = i + 1
         end
     end

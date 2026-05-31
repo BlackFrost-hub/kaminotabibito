@@ -3,7 +3,7 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local ____exports = {}
-local cancelBubbleEffectSchedule, jass, MAX_PLAYERS, BUBBLE_EFFECT_PATH, NPC_BUBBLE_EFFECT_KEY, g_bubbleEffects, g_bubbleScheduleTimers, g_npcUnits
+local cancelBubbleEffectSchedule, removeDelayedCallback, MAX_PLAYERS, BUBBLE_EFFECT_PATH, NPC_BUBBLE_EFFECT_KEY, g_bubbleEffects, g_bubbleScheduleTaskIds, g_npcUnits, g_bubbleScheduleNpcUnit
 local ____01_FF0E_5BF9_8BDD_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.01．对话配置表")
 local DIALOG_NPC_CONFIGS = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868.DIALOG_NPC_CONFIGS
 local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.02．任务配置表")
@@ -15,12 +15,12 @@ function cancelBubbleEffectSchedule(self, playerId)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return
     end
-    local t = g_bubbleScheduleTimers[playerId + 1]
-    if t then
-        jass.PauseTimer(t)
-        jass.DestroyTimer(t)
-        g_bubbleScheduleTimers[playerId + 1] = nil
+    local taskId = g_bubbleScheduleTaskIds[playerId + 1]
+    if taskId ~= nil then
+        removeDelayedCallback(taskId)
+        g_bubbleScheduleTaskIds[playerId + 1] = nil
     end
+    g_bubbleScheduleNpcUnit[playerId + 1] = nil
 end
 function ____exports.createBubbleEffect(self, playerId, npcUnit)
     cancelBubbleEffectSchedule(nil, playerId)
@@ -47,8 +47,13 @@ function ____exports.destroyBubbleEffect(self, playerId)
     end
     g_bubbleEffects[playerId + 1] = nil
 end
-jass = require("jass.common")
+--- NPC 头顶叹号/问号 + qipao 气泡
+-- 对话期间会在问号/叹号和气泡之间切换
+local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+removeDelayedCallback = ____require_result_0.removeDelayedCallback
 MAX_PLAYERS = 4
 BUBBLE_EFFECT_PATH = "resource\\models\\qipao.mdx"
 local NPC_OVERHEAD_BLUE_EXCL = "resource\\models\\exclamation\\bluetanhao.mdx"
@@ -57,12 +62,10 @@ local NPC_OVERHEAD_GRAY_QUESTION = "resource\\models\\exclamation\\huisewenhao.m
 local NPC_PROMPT_EFFECT_KEY = "npc_prompt"
 NPC_BUBBLE_EFFECT_KEY = "npc_bubble"
 g_bubbleEffects = {}
-g_bubbleScheduleTimers = {}
+g_bubbleScheduleTaskIds = {}
 g_npcUnits = {}
 local g_npcOccupiedBy = __TS__New(Map)
 local g_npcPromptEffectByHandle = __TS__New(Map)
-local g_pendingGrayMarkerTimerByHandle = __TS__New(Map)
-local g_pendingYellowMarkerTimerByHandle = __TS__New(Map)
 local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
@@ -83,40 +86,9 @@ end
 local function dzGetPlayerId(self, p)
     return jass.GetPlayerId(p)
 end
-local function cancelTimerHandle(self, t)
-    if not t then
-        return
-    end
-    jass.PauseTimer(t)
-    jass.DestroyTimer(t)
-end
-local function cancelPendingGrayMarkerTimerForHandle(self, key)
-    if key == 0 then
-        return
-    end
-    local t = g_pendingGrayMarkerTimerByHandle:get(key)
-    if t then
-        cancelTimerHandle(nil, t)
-        g_pendingGrayMarkerTimerByHandle:delete(key)
-    end
-end
-local function cancelPendingYellowMarkerTimerForHandle(self, key)
-    if key == 0 then
-        return
-    end
-    local t = g_pendingYellowMarkerTimerByHandle:get(key)
-    if t then
-        cancelTimerHandle(nil, t)
-        g_pendingYellowMarkerTimerByHandle:delete(key)
-    end
-end
-function ____exports.cancelPendingNpcMarkerSchedules(self, npcUnit)
-    local key = npcPromptHandleKey(nil, npcUnit)
-    if key == 0 then
-        return
-    end
-    cancelPendingGrayMarkerTimerForHandle(nil, key)
-    cancelPendingYellowMarkerTimerForHandle(nil, key)
+--- 兼容旧调用点：标记切换已改为即时执行，目前没有待取消的任务。
+function ____exports.cancelPendingNpcMarkerSchedules(self, _npcUnit)
+    return
 end
 local function destroyNpcPromptEffectInternal(self, unit)
     local key = npcPromptHandleKey(nil, unit)
@@ -176,19 +148,9 @@ function ____exports.tryAttachQuestMarkerForConfigNpc(self, unit, npcConfig)
     end
 end
 function ____exports.attachQuestMarkerToUnit(self, unit)
-    local key = npcPromptHandleKey(nil, unit)
-    if key ~= 0 then
-        cancelPendingGrayMarkerTimerForHandle(nil, key)
-        cancelPendingYellowMarkerTimerForHandle(nil, key)
-    end
     attachNpcPromptEffect(nil, unit, NPC_OVERHEAD_YELLOW_EXCL)
 end
 function ____exports.setNpcQuestPromptAcceptedState(self, npcUnit)
-    local key = npcPromptHandleKey(nil, npcUnit)
-    if key ~= 0 then
-        cancelPendingGrayMarkerTimerForHandle(nil, key)
-        cancelPendingYellowMarkerTimerForHandle(nil, key)
-    end
     attachNpcPromptEffect(nil, npcUnit, NPC_OVERHEAD_GRAY_QUESTION)
 end
 ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY = 0.85
@@ -200,7 +162,6 @@ function ____exports.scheduleGrayQuestMarkerAfterBubbleFade(self, npcUnit)
     if key == 0 then
         return
     end
-    cancelPendingGrayMarkerTimerForHandle(nil, key)
     ____exports.setNpcQuestPromptAcceptedState(nil, npcUnit)
 end
 function ____exports.scheduleYellowQuestMarkerAfterBubbleFade(self, npcUnit)
@@ -211,7 +172,6 @@ function ____exports.scheduleYellowQuestMarkerAfterBubbleFade(self, npcUnit)
     if key == 0 then
         return
     end
-    cancelPendingYellowMarkerTimerForHandle(nil, key)
     ____exports.attachQuestMarkerToUnit(nil, npcUnit)
 end
 function ____exports.removeQuestMarkerAfterNpcTriggered(self, npcUnit)
@@ -242,25 +202,20 @@ function ____exports.shouldSkipNewBubbleSchedule(self, playerId, npcUnit)
     if g_bubbleEffects[playerId + 1] then
         return true
     end
-    if g_bubbleScheduleTimers[playerId + 1] then
+    if g_bubbleScheduleTaskIds[playerId + 1] ~= nil then
         return true
     end
     return false
 end
 --- 延迟气泡回调的 npcUnit 快照（避免闭包捕获 handle）
-local g_bubbleScheduleNpcUnit = {}
+g_bubbleScheduleNpcUnit = {}
 local function runBubbleScheduleForPlayer(self, playerId)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return
     end
     local npcUnit = g_bubbleScheduleNpcUnit[playerId + 1]
     g_bubbleScheduleNpcUnit[playerId + 1] = nil
-    local t = g_bubbleScheduleTimers[playerId + 1]
-    g_bubbleScheduleTimers[playerId + 1] = nil
-    if t then
-        jass.PauseTimer(t)
-        jass.DestroyTimer(t)
-    end
+    g_bubbleScheduleTaskIds[playerId + 1] = nil
     local uNow = g_npcUnits[playerId + 1]
     if not npcUnitsSameForBubble(nil, uNow, npcUnit) then
         return
@@ -282,34 +237,30 @@ end
 local function bubbleScheduleCallbackP3(self)
     runBubbleScheduleForPlayer(nil, 3)
 end
-local function startBubbleScheduleTimer(self, playerId, delay)
-    local t = jass.CreateTimer()
-    g_bubbleScheduleTimers[playerId + 1] = t
+local function startBubbleScheduleTask(self, playerId, delay)
     repeat
-        local ____switch66 = playerId
-        local ____cond66 = ____switch66 == 0
-        if ____cond66 then
-            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0)
+        local ____switch54 = playerId
+        local ____cond54 = ____switch54 == 0
+        if ____cond54 then
+            g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP0)
             return
         end
-        ____cond66 = ____cond66 or ____switch66 == 1
-        if ____cond66 then
-            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1)
+        ____cond54 = ____cond54 or ____switch54 == 1
+        if ____cond54 then
+            g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP1)
             return
         end
-        ____cond66 = ____cond66 or ____switch66 == 2
-        if ____cond66 then
-            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2)
+        ____cond54 = ____cond54 or ____switch54 == 2
+        if ____cond54 then
+            g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP2)
             return
         end
-        ____cond66 = ____cond66 or ____switch66 == 3
-        if ____cond66 then
-            jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3)
+        ____cond54 = ____cond54 or ____switch54 == 3
+        if ____cond54 then
+            g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP3)
             return
         end
         do
-            jass.PauseTimer(t)
-            jass.DestroyTimer(t)
             return
         end
     until true
@@ -324,7 +275,7 @@ function ____exports.scheduleBubbleEffectAfterOverheadClear(self, playerId, npcU
         return
     end
     g_bubbleScheduleNpcUnit[playerId + 1] = npcUnit
-    startBubbleScheduleTimer(nil, playerId, ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY)
+    startBubbleScheduleTask(nil, playerId, ____exports.BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY)
 end
 function ____exports.releaseNpcOccupation(self, playerId)
     local npcUnit = g_npcUnits[playerId + 1]

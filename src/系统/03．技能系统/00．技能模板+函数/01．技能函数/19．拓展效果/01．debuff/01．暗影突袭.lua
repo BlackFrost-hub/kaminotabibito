@@ -24,15 +24,15 @@ local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitName = jass.GetUnitName
 local UnitDamageTarget = jass.UnitDamageTarget
-local CreateTimer = jass.CreateTimer
-local DestroyTimer = jass.DestroyTimer
-local GetExpiredTimer = jass.GetExpiredTimer
-local TimerStart = jass.TimerStart
 local R2I = jass.R2I
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_7.addPeriodicCallback
+local removePeriodicCallback = ____require_result_7.removePeriodicCallback
+local getServerTime = ____require_result_7.getServerTime
 local _____6697_5F71_7A81_88ADBuffID = "C025"
 local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl"
 local function _____8BFB_53D6Buff_56FE_6807(BuffID)
@@ -44,7 +44,10 @@ local function _____8BFB_53D6Buff_7279_6548(BuffID)
     return meta ~= nil and meta.effect ~= nil and meta.effect ~= "" and meta.effect or nil
 end
 local _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868 = {}
+local _____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868 = {}
 local _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868 = {}
+local _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID = 0
+local _____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID = 0
 local function _____6697_5F71_7A81_88AD_5411_4E0A_53D6_6574_79D2_6570(duration)
     local _____6574_79D2 = R2I(duration)
     if duration > _____6574_79D2 then
@@ -52,26 +55,20 @@ local function _____6697_5F71_7A81_88AD_5411_4E0A_53D6_6574_79D2_6570(duration)
     end
     return _____6574_79D2 > 0 and _____6574_79D2 or 1
 end
-local function _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
-    local timer = GetExpiredTimer()
-    local timerId = GetHandleId(timer)
-    __TS__Delete(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868, timerId)
-    DestroyTimer(timer)
+local function _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F(_____6BD2_7D20ID)
+    __TS__Delete(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868, _____6BD2_7D20ID)
 end
-local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
-    local timer = GetExpiredTimer()
-    local timerId = GetHandleId(timer)
-    local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId]
+local function _____6697_5F71_7A81_88AD_6BD2_7D20tick(_____6BD2_7D20ID)
+    local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[_____6BD2_7D20ID]
     if state == nil then
-        DestroyTimer(timer)
         return
     end
     if getBuffRuntime(state.target, state.buffID) == nil then
-        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
+        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F(_____6BD2_7D20ID)
         return
     end
     if state.remainingTicks <= 0 then
-        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
+        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F(_____6BD2_7D20ID)
         return
     end
     state.remainingTicks = state.remainingTicks - 1
@@ -109,8 +106,52 @@ local function _____6697_5F71_7A81_88AD_6BD2_7D20tick()
         end
     end
     if state.remainingTicks <= 0 then
-        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F()
+        _____6697_5F71_7A81_88AD_6BD2_7D20_7ED3_675F(_____6BD2_7D20ID)
+        return
     end
+    state["下次伤害时间毫秒"] = state["下次伤害时间毫秒"] + 1000
+end
+local function ____on_6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF()
+    local _____5F53_524D_65F6_95F4_6BEB_79D2 = getServerTime()
+    local _____5199_5165_7D22_5F15 = 0
+    do
+        local i = 0
+        while i < #_____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868 do
+            do
+                local _____6BD2_7D20ID = _____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868[i + 1]
+                local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[_____6BD2_7D20ID]
+                if state == nil then
+                    goto __continue17
+                end
+                if _____5F53_524D_65F6_95F4_6BEB_79D2 >= state["下次伤害时间毫秒"] then
+                    _____6697_5F71_7A81_88AD_6BD2_7D20tick(_____6BD2_7D20ID)
+                end
+                if _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[_____6BD2_7D20ID] ~= nil then
+                    _____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868[_____5199_5165_7D22_5F15 + 1] = _____6BD2_7D20ID
+                    _____5199_5165_7D22_5F15 = _____5199_5165_7D22_5F15 + 1
+                end
+            end
+            ::__continue17::
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868 - 1
+        while i >= _____5199_5165_7D22_5F15 do
+            table.remove(_____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868)
+            i = i - 1
+        end
+    end
+    if #_____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868 == 0 and _____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID ~= 0 then
+        removePeriodicCallback(_____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID)
+        _____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID = 0
+    end
+end
+local function _____786E_4FDD_6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_5DF2_542F_52A8()
+    if _____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID ~= 0 then
+        return
+    end
+    _____6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_56DE_8C03ID = addPeriodicCallback(10, ____on_6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF)
 end
 local function ____on_6697_5F71_7A81_88ADBuff_79FB_9664(unit, buffID, _row)
     if unit == nil or unit == 0 or buffID == "" then
@@ -120,14 +161,14 @@ local function ____on_6697_5F71_7A81_88ADBuff_79FB_9664(unit, buffID, _row)
         do
             local state = _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[key]
             if state == nil then
-                goto __continue17
+                goto __continue28
             end
             if state.target ~= unit or state.buffID ~= buffID then
-                goto __continue17
+                goto __continue28
             end
             __TS__Delete(_____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868, key)
         end
-        ::__continue17::
+        ::__continue28::
     end
 end
 ____exports["是否为暗影突袭毒素伤害"] = function(unit)
@@ -204,16 +245,19 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         slowMove,
         duration
     )
-    local timer = CreateTimer()
-    local timerId = GetHandleId(timer)
-    _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[timerId] = {
+    _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID = _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID + 1
+    local _____6BD2_7D20ID = _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID
+    _____6697_5F71_7A81_88AD_6BD2_7D20_8BA1_65F6_8868[_____6BD2_7D20ID] = {
+        ["毒素ID"] = _____6BD2_7D20ID,
         source = source,
         target = target,
         buffID = buffID,
         remainingTicks = _____6697_5F71_7A81_88AD_5411_4E0A_53D6_6574_79D2_6570(duration),
-        damagePerTick = damagePerSecond
+        damagePerTick = damagePerSecond,
+        ["下次伤害时间毫秒"] = getServerTime() + 1000
     }
-    TimerStart(timer, 1, true, _____6697_5F71_7A81_88AD_6BD2_7D20tick)
+    _____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868[#_____6697_5F71_7A81_88AD_6BD2_7D20ID_5217_8868 + 1] = _____6BD2_7D20ID
+    _____786E_4FDD_6697_5F71_7A81_88AD_6BD2_7D20_626B_63CF_5DF2_542F_52A8()
 end
 ____exports["创建暗影突袭追踪"] = function(source, target, _____53C2_6570)
     if _____53C2_6570 == nil then

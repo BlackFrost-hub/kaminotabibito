@@ -141,9 +141,9 @@ japi = require("jass.japi")
 local ____UI_5DE5_5177 = require("系统.09．表现系统.01．UI工具.index")
 local ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local getGameUI = ____hwMod.getGameUI
-local ____safeUtils = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____safeUtils.safeTimerStart
-local safeDestroyTimer = ____safeUtils.safeDestroyTimer
+local ____centerTimer = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____centerTimer.addPeriodicCallback
+local addDelayedCallback = ____centerTimer.addDelayedCallback
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
 debugLog = ____require_result_0.debugLog
 local setDebug = ____require_result_0.setDebug
@@ -165,8 +165,8 @@ local BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip"
 local BUFF_TOOLTIP_TOC_PATHS = {"UI\\BuffTestTooltip.toc"}
 slots = {}
 local buffUiInitialized = false
-local refreshTimer = nil
-local pendingInitDelayTimer = nil
+local refreshCallbackId = 0
+local pendingInitDelayCallbackId = 0
 buffBarViewModelByPlayerId = {}
 local hoverSlotIndexByFrameId = {}
 local function uiCreateFrame(options)
@@ -450,19 +450,15 @@ local function createUi()
     end
 end
 local function startRefreshTimer()
-    if refreshTimer ~= nil then
+    if refreshCallbackId ~= 0 then
         return
     end
-    refreshTimer = jass.CreateTimer()
-    jass.TimerStart(refreshTimer, 0.1, true, onBuffUiRefreshTick)
+    refreshCallbackId = addPeriodicCallback(100, onBuffUiRefreshTick)
 end
 local function onBuffUiInitDelayTimer()
     createUi()
     startRefreshTimer()
-    if pendingInitDelayTimer ~= nil then
-        jass.DestroyTimer(pendingInitDelayTimer)
-        pendingInitDelayTimer = nil
-    end
+    pendingInitDelayCallbackId = 0
 end
 local function startBuffUiSystem()
     initSelectionCentersForBuffUi()
@@ -470,8 +466,7 @@ local function startBuffUiSystem()
         return
     end
     buffUiInitialized = true
-    pendingInitDelayTimer = jass.CreateTimer()
-    jass.TimerStart(pendingInitDelayTimer, 1, false, onBuffUiInitDelayTimer)
+    pendingInitDelayCallbackId = addDelayedCallback(1000, onBuffUiInitDelayTimer)
 end
 function ____exports.init()
     startBuffUiSystem()

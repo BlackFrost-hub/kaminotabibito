@@ -5,6 +5,10 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
+};
 
 import { DIALOG_NPC_CONFIGS } from "../../08．任务系统/00．配置表/01．对话配置表";
 import { QUEST_CONFIGS } from "../../08．任务系统/00．配置表/02．任务配置表";
@@ -22,12 +26,10 @@ const NPC_PROMPT_EFFECT_KEY = "npc_prompt";
 const NPC_BUBBLE_EFFECT_KEY = "npc_bubble";
 
 const g_bubbleEffects: any[] = [];
-const g_bubbleScheduleTimers: any[] = [];
+const g_bubbleScheduleTaskIds: Array<number | undefined> = [];
 const g_npcUnits: any[] = [];
 const g_npcOccupiedBy: Map<number, number> = new Map();
 const g_npcPromptEffectByHandle = new Map<number, boolean>();
-const g_pendingGrayMarkerTimerByHandle = new Map<number, any>();
-const g_pendingYellowMarkerTimerByHandle = new Map<number, any>();
 
 type Player = any;
 
@@ -48,35 +50,9 @@ function dzGetPlayerId(p: Player): number {
   return jass.GetPlayerId(p) as number;
 }
 
-function cancelTimerHandle(t: any): void {
-  if (!t) return;
-  jass.PauseTimer(t);
-  jass.DestroyTimer(t);
-}
-
-function cancelPendingGrayMarkerTimerForHandle(key: number): void {
-  if (key === 0) return;
-  const t = g_pendingGrayMarkerTimerByHandle.get(key);
-  if (t) {
-    cancelTimerHandle(t);
-    g_pendingGrayMarkerTimerByHandle.delete(key);
-  }
-}
-
-function cancelPendingYellowMarkerTimerForHandle(key: number): void {
-  if (key === 0) return;
-  const t = g_pendingYellowMarkerTimerByHandle.get(key);
-  if (t) {
-    cancelTimerHandle(t);
-    g_pendingYellowMarkerTimerByHandle.delete(key);
-  }
-}
-
-export function cancelPendingNpcMarkerSchedules(npcUnit: any): void {
-  const key = npcPromptHandleKey(npcUnit);
-  if (key === 0) return;
-  cancelPendingGrayMarkerTimerForHandle(key);
-  cancelPendingYellowMarkerTimerForHandle(key);
+/** 兼容旧调用点：标记切换已改为即时执行，目前没有待取消的任务。 */
+export function cancelPendingNpcMarkerSchedules(_npcUnit: any): void {
+  return;
 }
 
 // ========== 虚拟分区：NPC 头顶叹号/问号特效 ==========
@@ -119,20 +95,10 @@ export function tryAttachQuestMarkerForConfigNpc(unit: any, npcConfig: NPCData):
 }
 
 export function attachQuestMarkerToUnit(unit: any): void {
-  const key = npcPromptHandleKey(unit);
-  if (key !== 0) {
-    cancelPendingGrayMarkerTimerForHandle(key);
-    cancelPendingYellowMarkerTimerForHandle(key);
-  }
   attachNpcPromptEffect(unit, NPC_OVERHEAD_YELLOW_EXCL);
 }
 
 export function setNpcQuestPromptAcceptedState(npcUnit: any): void {
-  const key = npcPromptHandleKey(npcUnit);
-  if (key !== 0) {
-    cancelPendingGrayMarkerTimerForHandle(key);
-    cancelPendingYellowMarkerTimerForHandle(key);
-  }
   attachNpcPromptEffect(npcUnit, NPC_OVERHEAD_GRAY_QUESTION);
 }
 
@@ -142,7 +108,6 @@ export function scheduleGrayQuestMarkerAfterBubbleFade(npcUnit: any): void {
   if (!npcUnit) return;
   const key = npcPromptHandleKey(npcUnit);
   if (key === 0) return;
-  cancelPendingGrayMarkerTimerForHandle(key);
   setNpcQuestPromptAcceptedState(npcUnit);
 }
 
@@ -150,7 +115,6 @@ export function scheduleYellowQuestMarkerAfterBubbleFade(npcUnit: any): void {
   if (!npcUnit) return;
   const key = npcPromptHandleKey(npcUnit);
   if (key === 0) return;
-  cancelPendingYellowMarkerTimerForHandle(key);
   attachQuestMarkerToUnit(npcUnit);
 }
 
@@ -161,12 +125,12 @@ export function removeQuestMarkerAfterNpcTriggered(npcUnit: any): boolean {
 
 function cancelBubbleEffectSchedule(playerId: number): void {
   if (playerId < 0 || playerId >= MAX_PLAYERS) return;
-  const t = g_bubbleScheduleTimers[playerId];
-  if (t) {
-    jass.PauseTimer(t);
-    jass.DestroyTimer(t);
-    g_bubbleScheduleTimers[playerId] = undefined;
+  const taskId = g_bubbleScheduleTaskIds[playerId];
+  if (taskId != null) {
+    removeDelayedCallback(taskId);
+    g_bubbleScheduleTaskIds[playerId] = undefined;
   }
+  g_bubbleScheduleNpcUnit[playerId] = undefined;
 }
 
 function npcUnitsSameForBubble(a: any, b: any): boolean {
@@ -182,7 +146,7 @@ export function shouldSkipNewBubbleSchedule(playerId: number, npcUnit: any): boo
   if (playerId < 0 || playerId >= MAX_PLAYERS || !npcUnit) return false;
   if (!npcUnitsSameForBubble(g_npcUnits[playerId], npcUnit)) return false;
   if (g_bubbleEffects[playerId]) return true;
-  if (g_bubbleScheduleTimers[playerId]) return true;
+  if (g_bubbleScheduleTaskIds[playerId] != null) return true;
   return false;
 }
 
@@ -193,12 +157,7 @@ function runBubbleScheduleForPlayer(playerId: number): void {
   if (playerId < 0 || playerId >= MAX_PLAYERS) return;
   const npcUnit = g_bubbleScheduleNpcUnit[playerId];
   g_bubbleScheduleNpcUnit[playerId] = undefined;
-  const t = g_bubbleScheduleTimers[playerId];
-  g_bubbleScheduleTimers[playerId] = undefined;
-  if (t) {
-    jass.PauseTimer(t);
-    jass.DestroyTimer(t);
-  }
+  g_bubbleScheduleTaskIds[playerId] = undefined;
   const uNow = g_npcUnits[playerId];
   if (!npcUnitsSameForBubble(uNow, npcUnit)) return;
   if (!uNow || g_npcOccupiedBy.get(npcOccupationKey(uNow)) !== playerId) return;
@@ -210,15 +169,13 @@ function bubbleScheduleCallbackP1(): void { runBubbleScheduleForPlayer(1); }
 function bubbleScheduleCallbackP2(): void { runBubbleScheduleForPlayer(2); }
 function bubbleScheduleCallbackP3(): void { runBubbleScheduleForPlayer(3); }
 
-function startBubbleScheduleTimer(playerId: number, delay: number): void {
-  const t = jass.CreateTimer();
-  g_bubbleScheduleTimers[playerId] = t;
+function startBubbleScheduleTask(playerId: number, delay: number): void {
   switch (playerId) {
-    case 0: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP0); return;
-    case 1: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP1); return;
-    case 2: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP2); return;
-    case 3: jass.TimerStart(t, delay, false, bubbleScheduleCallbackP3); return;
-    default: jass.PauseTimer(t); jass.DestroyTimer(t); return;
+    case 0: g_bubbleScheduleTaskIds[playerId] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP0); return;
+    case 1: g_bubbleScheduleTaskIds[playerId] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP1); return;
+    case 2: g_bubbleScheduleTaskIds[playerId] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP2); return;
+    case 3: g_bubbleScheduleTaskIds[playerId] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP3); return;
+    default: return;
   }
 }
 
@@ -230,7 +187,7 @@ export function scheduleBubbleEffectAfterOverheadClear(playerId: number, npcUnit
     return;
   }
   g_bubbleScheduleNpcUnit[playerId] = npcUnit;
-  startBubbleScheduleTimer(playerId, BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY);
+  startBubbleScheduleTask(playerId, BUBBLE_CREATE_AFTER_OVERHEAD_CLEAR_DELAY);
 }
 
 export function createBubbleEffect(playerId: number, npcUnit: any): void {

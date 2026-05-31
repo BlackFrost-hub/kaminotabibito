@@ -11,9 +11,8 @@ const g = require("jass.globals") as Record<string, unknown>;
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
@@ -84,8 +83,7 @@ function formatGgUnitProbe(u: any): string {
   return "ok" + tail;
 }
 
-function onDebugSnapshot0sTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
+function onDebugSnapshot0sDelayed(this: void): void {
   const gAny = g as any;
   const jc = jass as any;
   const G = globalThis as any;
@@ -108,11 +106,9 @@ function onDebugSnapshot0sTimerExpire(this: void): void {
     (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
   }
   debugLog("激活传送点", msg);
-  safeDestroyTimer(t);
 }
 
-function onDebugSnapshot1sTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
+function onDebugSnapshot1sDelayed(this: void): void {
   const gAny = g as any;
   const jc = jass as any;
   const G = globalThis as any;
@@ -135,22 +131,17 @@ function onDebugSnapshot1sTimerExpire(this: void): void {
     (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
   }
   debugLog("激活传送点", msg);
-  safeDestroyTimer(t);
 }
 
-function onInitActivationPointsTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
+function onInitActivationPointsDelayed(this: void): void {
   initActivationPointsInternal();
-  safeDestroyTimer(t);
 }
 
 /** 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil） */
 function scheduleDebugGgUnitHtow0030(): void {
   if (!DEBUG_GG_UNIT_HTOW_0030) return;
-  const t0 = (jass as any).CreateTimer();
-  if (t0) safeTimerStart(t0, 0.0, false, onDebugSnapshot0sTimerExpire);
-  const t1 = (jass as any).CreateTimer();
-  if (t1) safeTimerStart(t1, 1.0, false, onDebugSnapshot1sTimerExpire);
+  addDelayedCallback(0, onDebugSnapshot0sDelayed);
+  addDelayedCallback(1000, onDebugSnapshot1sDelayed);
 }
 
 function parseCoord(v: string | number | undefined): number | null {
@@ -292,6 +283,5 @@ function initActivationPointsInternal(): void {
 /** 在地图初始化时调用（建议用 0.00 秒计时器） */
 export function init激活传送点(): void {
   scheduleDebugGgUnitHtow0030();
-  const t = (jass as any).CreateTimer();
-  if (t) safeTimerStart(t, 0.0, false, onInitActivationPointsTimerExpire);
+  addDelayedCallback(0, onInitActivationPointsDelayed);
 }

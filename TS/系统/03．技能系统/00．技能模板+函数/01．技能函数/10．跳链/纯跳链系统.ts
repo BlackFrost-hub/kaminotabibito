@@ -10,8 +10,6 @@
 
 const jass = require("jass.common") as any;
 
-const CreateTimer = jass.CreateTimer as () => any;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -24,9 +22,10 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 import { 创建单位绑定闪电 } from "./单位绑定闪电";
@@ -98,7 +97,7 @@ interface 纯跳链内部实例 {
   当前数值: number;
   已完成跳数: number;
   已命中单位: Record<number, true | undefined>;
-  下一跳定时器?: any;
+  下一跳任务ID?: number;
   待执行下一目标?: any;
   已结束: boolean;
 }
@@ -108,8 +107,15 @@ const 默认闪电效果代码 = "CLPB";
 // 跳链层默认闪电持续时间与底层单位绑定闪电保持一致，
 // 默认值使用 0.8 秒；即使外部传入更短时间，底层也会强制提升到 0.8 秒。
 const 活跃跳链映射: Record<number, 纯跳链内部实例 | undefined> = {};
-const 定时器跳链映射: Record<number, number | undefined> = {};
+interface 纯跳链下一跳任务 {
+  任务ID: number;
+  跳链ID: number;
+  到期时间毫秒: number;
+}
+const 下一跳任务列表: 纯跳链下一跳任务[] = [];
 let 下一个跳链ID = 0;
+let 下一个下一跳任务ID = 0;
+let 下一跳任务扫描回调ID = 0;
 
 
 function 取句柄ID(handle: any): number {
@@ -181,19 +187,48 @@ function 结束跳链实例(实例: 纯跳链内部实例, 原因: 跳链结束�
   if (实例.已结束) return;
   实例.已结束 = true;
 
-  if (实例.下一跳定时器 != null && 实例.下一跳定时器 !== 0) {
-    const 定时器ID = 取句柄ID(实例.下一跳定时器);
-    if (定时器ID > 0) {
-      delete 定时器跳链映射[定时器ID];
-    }
-    safeDestroyTimer(实例.下一跳定时器);
-    实例.下一跳定时器 = undefined;
-  }
+  取消纯跳链下一跳任务(实例);
 
   delete 活跃跳链映射[实例.id];
   const 结束回调 = 实例.参数.结束回调;
   if (结束回调 != null) {
     结束回调(原因, 实例.已完成跳数, 实例.id);
+  }
+}
+
+function 尝试停止纯跳链下一跳扫描(this: void): void {
+  if (下一跳任务列表.length > 0 || 下一跳任务扫描回调ID === 0) {
+    return;
+  }
+  removePeriodicCallback(下一跳任务扫描回调ID);
+  下一跳任务扫描回调ID = 0;
+}
+
+function 取消纯跳链下一跳任务(this: void, 实例: 纯跳链内部实例): void {
+  const 任务ID = 实例.下一跳任务ID;
+  if (任务ID == null || 任务ID <= 0) {
+    return;
+  }
+  实例.下一跳任务ID = undefined;
+  for (let i = 下一跳任务列表.length - 1; i >= 0; i--) {
+    if (下一跳任务列表[i].任务ID === 任务ID) {
+      下一跳任务列表.splice(i, 1);
+      break;
+    }
+  }
+  尝试停止纯跳链下一跳扫描();
+}
+
+function 添加纯跳链下一跳任务(this: void, 实例: 纯跳链内部实例, 跳跃间隔: number): void {
+  const 任务ID = ++下一个下一跳任务ID;
+  实例.下一跳任务ID = 任务ID;
+  下一跳任务列表.push({
+    任务ID,
+    跳链ID: 实例.id,
+    到期时间毫秒: getServerTime() + 跳跃间隔 * 1000,
+  });
+  if (下一跳任务扫描回调ID === 0) {
+    下一跳任务扫描回调ID = addPeriodicCallback(10, on纯跳链下一跳扫描);
   }
 }
 
@@ -281,35 +316,32 @@ function 执行当前一跳(实例: 纯跳链内部实例): void {
     return;
   }
 
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) {
-    执行当前一跳(实例);
-    return;
-  }
-  const 定时器ID = 取句柄ID(timer);
-  if (定时器ID <= 0) {
-    safeDestroyTimer(timer);
-    执行当前一跳(实例);
-    return;
-  }
-  实例.下一跳定时器 = timer;
-  定时器跳链映射[定时器ID] = 实例.id;
-  safeTimerStart(timer, 跳跃间隔, false, on纯跳链下一跳到时);
+  添加纯跳链下一跳任务(实例, 跳跃间隔);
 }
 
-function on纯跳链下一跳到时(): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const 定时器ID = 取句柄ID(timer);
-  const 跳链ID = 定时器跳链映射[定时器ID];
-  delete 定时器跳链映射[定时器ID];
-  safeDestroyTimer(timer);
-
-  if (跳链ID == null || 跳链ID <= 0) return;
-  const 实例 = 活跃跳链映射[跳链ID];
+function 执行纯跳链下一跳任务(this: void, 任务: 纯跳链下一跳任务): void {
+  const 实例 = 活跃跳链映射[任务.跳链ID];
   if (实例 == null || 实例.已结束) return;
-  实例.下一跳定时器 = undefined;
+  if (实例.下一跳任务ID !== 任务.任务ID) return;
+  实例.下一跳任务ID = undefined;
   执行当前一跳(实例);
+}
+
+function on纯跳链下一跳扫描(this: void): void {
+  const 当前时间毫秒 = getServerTime();
+  const 到期任务: 纯跳链下一跳任务[] = [];
+  for (let i = 下一跳任务列表.length - 1; i >= 0; i--) {
+    const 任务 = 下一跳任务列表[i];
+    if (当前时间毫秒 < 任务.到期时间毫秒) {
+      continue;
+    }
+    下一跳任务列表.splice(i, 1);
+    到期任务.unshift(任务);
+  }
+  for (let i = 0; i < 到期任务.length; i++) {
+    执行纯跳链下一跳任务(到期任务[i]);
+  }
+  尝试停止纯跳链下一跳扫描();
 }
 
 class 纯跳链实例实现 implements 纯跳链实例 {
@@ -352,7 +384,7 @@ export function 开始纯跳链(参数: 纯跳链参数): 纯跳链实例 | null
     当前数值: 参数.初始数值,
     已完成跳数: 0,
     已命中单位: {},
-    下一跳定时器: undefined,
+    下一跳任务ID: undefined,
     待执行下一目标: undefined,
     已结束: false,
   };

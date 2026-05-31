@@ -1,30 +1,52 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local Map = ____lualib.Map
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local onQuestTimeLimitTimerExpire, jass, safeDestroyTimer
+local onQuestTimeLimitTick, removePeriodicCallback, getServerTime, questTimeLimitTasks, questTimeLimitScanId
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
-function onQuestTimeLimitTimerExpire()
-    local expired = jass.GetExpiredTimer()
-    local ____opt_13 = _G.__questTimers
-    if ____opt_13 ~= nil then
-        ____opt_13 = ____opt_13:get(expired)
+function onQuestTimeLimitTick()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #questTimeLimitTasks do
+            do
+                local task = questTimeLimitTasks[i + 1]
+                if now >= task.dueTime then
+                    ____exports.questManager:onQuestFailed(task.playerId, task.questId)
+                    goto __continue35
+                end
+                questTimeLimitTasks[writeIndex + 1] = task
+                writeIndex = writeIndex + 1
+            end
+            ::__continue35::
+            i = i + 1
+        end
     end
-    local data = ____opt_13
-    if data then
-        ____exports.questManager:onQuestFailed(data.playerId, data.questId)
-        _G.__questTimers:delete(expired)
+    do
+        local i = #questTimeLimitTasks - 1
+        while i >= writeIndex do
+            table.remove(questTimeLimitTasks)
+            i = i - 1
+        end
     end
-    jass.PauseTimer(expired)
-    safeDestroyTimer(nil, expired)
+    if #questTimeLimitTasks == 0 and questTimeLimitScanId ~= 0 then
+        removePeriodicCallback(questTimeLimitScanId)
+        questTimeLimitScanId = 0
+    end
 end
-jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-safeDestroyTimer = ____require_result_0.safeDestroyTimer
+--- 任务管理器（单文件入口）
+-- 职责概览：
+-- - 与 `questDB` 打交道：接取、完成、失败、放弃、目标进度、查询
+-- - 维护 `uiRefreshCallbacks`：任务状态变化时通知自定义 UI（如任务面板）
+-- - 可选限时：`timeLimit` > 0 时挂中心调度任务，到期调用 `onQuestFailed`
+local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local QuestManager = __TS__Class()
 QuestManager.name = "QuestManager"
 function QuestManager.prototype.____constructor(self)
@@ -59,25 +81,14 @@ function QuestManager.prototype.setupTimeLimit(self, playerId, questId)
     if not quest or not quest.timeLimit or quest.timeLimit <= 0 then
         return
     end
-    local timer = jass.CreateTimer()
-    if not timer then
-        return
+    questTimeLimitTasks[#questTimeLimitTasks + 1] = {
+        dueTime = getServerTime() + quest.timeLimit * 1000,
+        playerId = playerId,
+        questId = questId
+    }
+    if questTimeLimitScanId == 0 then
+        questTimeLimitScanId = addPeriodicCallback(10, onQuestTimeLimitTick)
     end
-    local ____G___questTimers_4 = _G.__questTimers
-    if not ____G___questTimers_4 then
-        local ____TS__New_result_3 = __TS__New(Map)
-        _G.__questTimers = ____TS__New_result_3
-        ____G___questTimers_4 = ____TS__New_result_3
-    end
-    local timerData = ____G___questTimers_4
-    timerData:set(timer, {playerId = playerId, questId = questId})
-    safeTimerStart(
-        nil,
-        timer,
-        quest.timeLimit,
-        false,
-        onQuestTimeLimitTimerExpire
-    )
 end
 function QuestManager.prototype.onQuestFailed(self, playerId, questId)
     local success = questDB:failQuest(playerId, questId)
@@ -87,15 +98,15 @@ function QuestManager.prototype.onQuestFailed(self, playerId, questId)
     return success
 end
 function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
-    local ____opt_7 = questDB.globalData
-    if ____opt_7 ~= nil then
-        ____opt_7 = ____opt_7.quests:get(questId)
+    local ____opt_5 = questDB.globalData
+    if ____opt_5 ~= nil then
+        ____opt_5 = ____opt_5.quests:get(questId)
     end
-    local ____opt_result_9
-    if ____opt_7 ~= nil then
-        ____opt_result_9 = ____opt_7.nativeHandle
+    local ____opt_result_7
+    if ____opt_5 ~= nil then
+        ____opt_result_7 = ____opt_5.nativeHandle
     end
-    local nativeHandle = ____opt_result_9
+    local nativeHandle = ____opt_result_7
     local success = questDB:abandonQuest(playerId, questId)
     if success then
         if nativeHandle then
@@ -106,8 +117,8 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     return success
 end
 function QuestManager.prototype.registerUIRefreshCallback(self, callback)
-    local ____self_uiRefreshCallbacks_10 = self.uiRefreshCallbacks
-    ____self_uiRefreshCallbacks_10[#____self_uiRefreshCallbacks_10 + 1] = callback
+    local ____self_uiRefreshCallbacks_8 = self.uiRefreshCallbacks
+    ____self_uiRefreshCallbacks_8[#____self_uiRefreshCallbacks_8 + 1] = callback
 end
 function QuestManager.prototype.triggerUIRefresh(self, playerId, questId)
     for ____, callback in ipairs(self.uiRefreshCallbacks) do
@@ -137,11 +148,11 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
     local success = questDB:updateObjective(playerId, questId, objectiveId, progress)
     if success then
         self:triggerUIRefresh(playerId, questId)
-        local ____opt_11 = questDB.globalData
-        if ____opt_11 ~= nil then
-            ____opt_11 = ____opt_11.quests:get(questId)
+        local ____opt_9 = questDB.globalData
+        if ____opt_9 ~= nil then
+            ____opt_9 = ____opt_9.quests:get(questId)
         end
-        local quest = ____opt_11
+        local quest = ____opt_9
         if quest and quest.objectives then
             local allCompleted = true
             for ____, obj in __TS__Iterator(quest.objectives) do
@@ -157,6 +168,8 @@ function QuestManager.prototype.updateQuestObjective(self, playerId, questId, ob
     end
     return success
 end
+questTimeLimitTasks = {}
+questTimeLimitScanId = 0
 ____exports.questManager = QuestManager:getInstance()
 function ____exports.init()
     ____exports.questManager:initialize()

@@ -3,9 +3,10 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { TransmissionFromUnitWithNameBJ, CinematicModeBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
   TransmissionFromUnitWithNameBJ: (
@@ -52,10 +53,7 @@ import { 写入当前剧情动作上下文 } from "../00．剧情系统核心工
 import { 按名字给触发单位物品, 执行通用剧情动作 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
 import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型";
 
-const CreateTimer = jass.CreateTimer as (this: void) => any;
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
@@ -89,10 +87,12 @@ export interface 剧情播放器运行时 {
   播放世代: number;
 }
 
-interface 剧情绝对时间动作上下文 {
+interface 剧情延迟任务 {
+  到期时间毫秒: number;
   播放世代: number;
-  动作ID: string;
-  参数: Record<string, string | number | boolean>;
+  类型: "下一步" | "绝对时间动作";
+  动作ID?: string;
+  参数?: Record<string, string | number | boolean>;
 }
 
 const 默认剧情播放器运行时: 剧情播放器运行时 = {
@@ -106,7 +106,8 @@ const 默认剧情播放器运行时: 剧情播放器运行时 = {
 const 剧情播放器运行时状态: 剧情播放器运行时 = { ...默认剧情播放器运行时 };
 let 当前片段: 剧情片段配置 | undefined;
 let 已初始化剧情步骤播放器 = false;
-const 绝对时间动作上下文表: Record<number, 剧情绝对时间动作上下文 | undefined> = {};
+const 剧情延迟任务列表: 剧情延迟任务[] = [];
+let 剧情延迟任务扫描回调ID = 0;
 let 执行主线剧情动作函数: ((动作ID: string, 参数: 剧情动作参数表) => void) | undefined;
 
 export function 创建剧情播放器运行时(this: void): 剧情播放器运行时 {
@@ -130,26 +131,24 @@ function 计算步骤持续时间(this: void, seconds: number): number {
 
 function 安排下一步(this: void, delaySeconds: number): void {
   if (!剧情播放器运行时状态.是否正在播放) return;
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-  safeTimerStart(timer, 计算步骤持续时间(delaySeconds), false, on剧情下一步计时器到期);
+  添加剧情延迟任务({
+    到期时间毫秒: getServerTime() + 计算步骤持续时间(delaySeconds) * 1000,
+    播放世代: 剧情播放器运行时状态.播放世代,
+    类型: "下一步",
+  });
 }
 
 function 结束当前剧情片段(this: void): void {
   const 片段ID = 剧情播放器运行时状态.当前片段ID ?? "";
+  const 播放世代 = 剧情播放器运行时状态.播放世代;
   剧情播放器运行时状态.是否正在播放 = false;
   剧情播放器运行时状态.是否请求跳过 = false;
   剧情播放器运行时状态.当前步骤索引 = 0;
   剧情播放器运行时状态.当前片段ID = undefined;
   当前片段 = undefined;
+  清理剧情延迟任务(播放世代);
   CinematicModeBJ(false, GetPlayersAll());
   if (片段ID !== "") debugLogForce(剧情播放器模块名, "剧情片段结束", 片段ID);
-}
-
-function on剧情下一步计时器到期(this: void): void {
-  const timer = GetExpiredTimer();
-  safeDestroyTimer(timer);
-  执行当前剧情步骤();
 }
 
 function 安排绝对时间动作(this: void, 步骤: 剧情步骤): void {
@@ -158,16 +157,13 @@ function 安排绝对时间动作(this: void, 步骤: 剧情步骤): void {
   if (参数.挂点 !== "absoluteTime") return;
 
   const 时间秒 = typeof 参数.时间秒 === "number" ? 参数.时间秒 : Number(参数.时间秒) || 0;
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-
-  const handleId = GetHandleId(timer);
-  绝对时间动作上下文表[handleId] = {
+  添加剧情延迟任务({
+    到期时间毫秒: getServerTime() + 计算步骤持续时间(时间秒) * 1000,
     播放世代: 剧情播放器运行时状态.播放世代,
+    类型: "绝对时间动作",
     动作ID: 步骤.动作ID,
     参数,
-  };
-  safeTimerStart(timer, 计算步骤持续时间(时间秒), false, on剧情绝对时间动作到期);
+  });
 }
 
 function 获取执行主线剧情动作函数(this: void): (动作ID: string, 参数: 剧情动作参数表) => void {
@@ -180,17 +176,64 @@ function 获取执行主线剧情动作函数(this: void): (动作ID: string, �
   return 执行主线剧情动作函数;
 }
 
-function on剧情绝对时间动作到期(this: void): void {
-  const timer = GetExpiredTimer();
-  const handleId = GetHandleId(timer);
-  const 上下文 = 绝对时间动作上下文表[handleId];
-  delete 绝对时间动作上下文表[handleId];
-  safeDestroyTimer(timer);
-
-  if (上下文 == null) return;
+function 执行剧情延迟任务(this: void, 上下文: 剧情延迟任务): void {
   if (!剧情播放器运行时状态.是否正在播放) return;
   if (上下文.播放世代 !== 剧情播放器运行时状态.播放世代) return;
+  if (上下文.类型 === "下一步") {
+    执行当前剧情步骤();
+    return;
+  }
+  if (上下文.动作ID == null || 上下文.参数 == null) return;
   获取执行主线剧情动作函数()(上下文.动作ID, 上下文.参数);
+}
+
+function 尝试停止剧情延迟任务扫描(this: void): void {
+  if (剧情延迟任务列表.length > 0 || 剧情延迟任务扫描回调ID === 0) return;
+  removePeriodicCallback(剧情延迟任务扫描回调ID);
+  剧情延迟任务扫描回调ID = 0;
+}
+
+function 清理剧情延迟任务(this: void, 播放世代: number): void {
+  let 写入索引 = 0;
+  for (let i = 0; i < 剧情延迟任务列表.length; i++) {
+    const 任务 = 剧情延迟任务列表[i];
+    if (任务.播放世代 === 播放世代) continue;
+    剧情延迟任务列表[写入索引] = 任务;
+    写入索引 += 1;
+  }
+  for (let i = 剧情延迟任务列表.length - 1; i >= 写入索引; i--) {
+    剧情延迟任务列表.pop();
+  }
+  尝试停止剧情延迟任务扫描();
+}
+
+function on剧情延迟任务扫描(this: void): void {
+  const 当前时间毫秒 = getServerTime();
+  const 到期任务: 剧情延迟任务[] = [];
+  let 写入索引 = 0;
+  for (let i = 0; i < 剧情延迟任务列表.length; i++) {
+    const 任务 = 剧情延迟任务列表[i];
+    if (当前时间毫秒 >= 任务.到期时间毫秒) {
+      到期任务.push(任务);
+      continue;
+    }
+    剧情延迟任务列表[写入索引] = 任务;
+    写入索引 += 1;
+  }
+  for (let i = 剧情延迟任务列表.length - 1; i >= 写入索引; i--) {
+    剧情延迟任务列表.pop();
+  }
+  for (let i = 0; i < 到期任务.length; i++) {
+    执行剧情延迟任务(到期任务[i]);
+  }
+  尝试停止剧情延迟任务扫描();
+}
+
+function 添加剧情延迟任务(this: void, 任务: 剧情延迟任务): void {
+  剧情延迟任务列表.push(任务);
+  if (剧情延迟任务扫描回调ID === 0) {
+    剧情延迟任务扫描回调ID = addPeriodicCallback(10, on剧情延迟任务扫描);
+  }
 }
 
 function 安排片段绝对时间动作(this: void, 片段: 剧情片段配置): void {

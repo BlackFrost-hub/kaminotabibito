@@ -8,7 +8,7 @@
  * - 英雄头像悬浮显示属性框
  *
  * 初始化：延迟INIT_DELAY_SECONDS秒启动
- * 刷新：每 REFRESH_INTERVAL_SECONDS 无条件刷新（与 `属性查看.j` 一致：两处 CreateTimer 3.00 周期也是全局一直跑；本 TS 间隔见常量，非按 Tab 门控）
+ * 刷新：每 REFRESH_INTERVAL_SECONDS 无条件刷新（与 `属性查看.j` 一致：两处 TimerStar 3.00 周期也是全局一直跑；本 TS 间隔见常量，非按 Tab 门控）
  *
  * 联机：键盘走 `sync=true`，全端对称进回调；**仅** Tab 控制的伤害面板显隐在回调内用
  * `getTriggerKeyPlayer() === GetLocalPlayer()` 隔离。F2–F6、中心计时器刷新等为同步路径（镜头平移仍只在触发键玩家本机生效，见 Star 镜头封装）。

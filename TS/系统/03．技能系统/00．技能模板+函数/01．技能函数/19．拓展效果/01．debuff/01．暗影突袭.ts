@@ -39,15 +39,17 @@ const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
 const GetUnitName = jass.GetUnitName as (u: any) => string;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
-const CreateTimer = jass.CreateTimer as () => any;
-const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const TimerStart = jass.TimerStart as (timer: any, timeout: number, periodic: boolean, callback: (this: void) => void) => void;
 const R2I = jass.R2I as (value: number) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
+};
 
 const 暗影突袭BuffID = "C025";
 const 暗影突袭弹幕模型 = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl";
@@ -84,15 +86,20 @@ export interface 暗影突袭追踪参数 {
 }
 
 interface 暗影突袭毒素状态 {
+  毒素ID: number;
   source: any;
   target: any;
   buffID: string;
   remainingTicks: number;
   damagePerTick: number;
+  下次伤害时间毫秒: number;
 }
 
 const 暗影突袭毒素计时表: Record<number, 暗影突袭毒素状态 | undefined> = {};
+const 暗影突袭毒素ID列表: number[] = [];
 const 暗影突袭毒素标记表: Record<number, number | undefined> = {};
+let 下一个暗影突袭毒素ID = 0;
+let 暗影突袭毒素扫描回调ID = 0;
 
 function 暗影突袭向上取整秒数(this: void, duration: number): number {
   const 整秒 = R2I(duration);
@@ -100,27 +107,19 @@ function 暗影突袭向上取整秒数(this: void, duration: number): number {
   return 整秒 > 0 ? 整秒 : 1;
 }
 
-function 暗影突袭毒素结束(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerId = GetHandleId(timer);
-  delete 暗影突袭毒素计时表[timerId];
-  DestroyTimer(timer);
+function 暗影突袭毒素结束(this: void, 毒素ID: number): void {
+  delete 暗影突袭毒素计时表[毒素ID];
 }
 
-function 暗影突袭毒素tick(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerId = GetHandleId(timer);
-  const state = 暗影突袭毒素计时表[timerId];
-  if (state == null) {
-    DestroyTimer(timer);
-    return;
-  }
+function 暗影突袭毒素tick(this: void, 毒素ID: number): void {
+  const state = 暗影突袭毒素计时表[毒素ID];
+  if (state == null) return;
   if (getBuffRuntime(state.target, state.buffID) == null) {
-    暗影突袭毒素结束();
+    暗影突袭毒素结束(毒素ID);
     return;
   }
   if (state.remainingTicks <= 0) {
-    暗影突袭毒素结束();
+    暗影突袭毒素结束(毒素ID);
     return;
   }
   state.remainingTicks -= 1;
@@ -138,8 +137,41 @@ function 暗影突袭毒素tick(this: void): void {
     }
   }
   if (state.remainingTicks <= 0) {
-    暗影突袭毒素结束();
+    暗影突袭毒素结束(毒素ID);
+    return;
   }
+  state.下次伤害时间毫秒 += 1000;
+}
+
+function on暗影突袭毒素扫描(this: void): void {
+  const 当前时间毫秒 = getServerTime();
+  let 写入索引 = 0;
+  for (let i = 0; i < 暗影突袭毒素ID列表.length; i++) {
+    const 毒素ID = 暗影突袭毒素ID列表[i];
+    const state = 暗影突袭毒素计时表[毒素ID];
+    if (state == null) {
+      continue;
+    }
+    if (当前时间毫秒 >= state.下次伤害时间毫秒) {
+      暗影突袭毒素tick(毒素ID);
+    }
+    if (暗影突袭毒素计时表[毒素ID] != null) {
+      暗影突袭毒素ID列表[写入索引] = 毒素ID;
+      写入索引 += 1;
+    }
+  }
+  for (let i = 暗影突袭毒素ID列表.length - 1; i >= 写入索引; i--) {
+    暗影突袭毒素ID列表.pop();
+  }
+  if (暗影突袭毒素ID列表.length === 0 && 暗影突袭毒素扫描回调ID !== 0) {
+    removePeriodicCallback(暗影突袭毒素扫描回调ID);
+    暗影突袭毒素扫描回调ID = 0;
+  }
+}
+
+function 确保暗影突袭毒素扫描已启动(this: void): void {
+  if (暗影突袭毒素扫描回调ID !== 0) return;
+  暗影突袭毒素扫描回调ID = addPeriodicCallback(10, on暗影突袭毒素扫描);
 }
 
 function on暗影突袭Buff移除(this: void, unit: any, buffID: string, _row: any): void {
@@ -193,16 +225,18 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   });
   SFB_setSlow(source, target, slowAttack, slowMove, duration);
 
-  const timer = CreateTimer();
-  const timerId = GetHandleId(timer);
-  暗影突袭毒素计时表[timerId] = {
+  const 毒素ID = ++下一个暗影突袭毒素ID;
+  暗影突袭毒素计时表[毒素ID] = {
+    毒素ID,
     source,
     target,
     buffID,
     remainingTicks: 暗影突袭向上取整秒数(duration),
     damagePerTick: damagePerSecond,
+    下次伤害时间毫秒: getServerTime() + 1000,
   };
-  TimerStart(timer, 1.0, true, 暗影突袭毒素tick);
+  暗影突袭毒素ID列表.push(毒素ID);
+  确保暗影突袭毒素扫描已启动();
 }
 
 export function 创建暗影突袭追踪(this: void, source: any, target: any, 参数: 暗影突袭追踪参数 = {}): void {

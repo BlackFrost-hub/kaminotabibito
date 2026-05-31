@@ -9,10 +9,14 @@ const jass = require("jass.common") as any;
 const { EXSetUnitFacing } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   EXSetUnitFacing: (this: void, u: any, angle: number) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  getServerTime: (this: void) => number;
 };
+const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animationName: string) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, animationIndex: number) => void;
+const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
+const DEGREES_TO_RADIANS = jass.bj_DEGTORAD as number;
 
 type VoidCallback = () => void;
 
@@ -24,49 +28,86 @@ interface 动画等待上下文 {
   恢复待机?: boolean;
 }
 
-const 动画等待上下文表: Record<number, 动画等待上下文 | undefined> = {};
+interface 动画等待任务 {
+  ID: number;
+  到期时间毫秒: number;
+  上下文: 动画等待上下文;
+}
+
+const 动画等待任务列表: 动画等待任务[] = [];
+let 动画等待任务ID序号 = 0;
+let 动画等待驱动已注册 = false;
 
 function 重置单位待机动画(this: void, 单位: any): void {
   if (单位 == null || 单位 === 0) return;
-  jass.SetUnitAnimation(单位, "stand");
+  SetUnitAnimation(单位, "stand");
 }
 
 function 播放上下文动画(ctx: 动画等待上下文): void {
   if (ctx.单位 == null || ctx.单位 === 0) return;
   if (typeof ctx.动画序号 === "number") {
-    jass.SetUnitAnimationByIndex(ctx.单位, ctx.动画序号);
+    SetUnitAnimationByIndex(ctx.单位, ctx.动画序号);
     return;
   }
   if (typeof ctx.动画名 === "string" && ctx.动画名 !== "") {
-    jass.SetUnitAnimation(ctx.单位, ctx.动画名);
+    SetUnitAnimation(ctx.单位, ctx.动画名);
     return;
   }
   重置单位待机动画(ctx.单位);
 }
 
-function on单位动画等待到期(): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const ctx = 动画等待上下文表[hid];
-  delete 动画等待上下文表[hid];
-  safeDestroyTimer(t);
-  if (!ctx) return;
+function 执行动画等待上下文(ctx: 动画等待上下文): void {
   播放上下文动画(ctx);
   if (ctx.恢复待机 === true && ctx.单位 != null && ctx.单位 !== 0) {
-    jass.SetUnitAnimationByIndex(ctx.单位, 0);
+    SetUnitAnimationByIndex(ctx.单位, 0);
   }
-  if (typeof ctx.下一步 === "function") {
+  if (ctx.下一步 != null) {
     ctx.下一步();
   }
 }
 
-function 创建动画等待计时器(ctx: 动画等待上下文, 等待秒数: number): any {
-  const t = jass.CreateTimer();
-  if (!t) return null;
-  动画等待上下文表[jass.GetHandleId(t) as number] = ctx;
-  safeTimerStart(t, 等待秒数, false, on单位动画等待到期);
-  return t;
+function on动画等待驱动(this: void): void {
+  if (动画等待任务列表.length === 0) return;
+
+  const 当前时间毫秒 = getServerTime();
+  const 原任务数量 = 动画等待任务列表.length;
+  let 写入位置 = 0;
+
+  for (let i = 0; i < 原任务数量; i++) {
+    const 任务 = 动画等待任务列表[i];
+    if (当前时间毫秒 >= 任务.到期时间毫秒) {
+      执行动画等待上下文(任务.上下文);
+    } else {
+      动画等待任务列表[写入位置] = 任务;
+      写入位置++;
+    }
+  }
+
+  // 回调内可能登记新任务；保留本轮扫描期间追加的任务，下一 tick 再处理。
+  for (let i = 原任务数量; i < 动画等待任务列表.length; i++) {
+    动画等待任务列表[写入位置] = 动画等待任务列表[i];
+    写入位置++;
+  }
+  while (动画等待任务列表.length > 写入位置) {
+    动画等待任务列表.pop();
+  }
+}
+
+function 确保动画等待驱动(): void {
+  if (动画等待驱动已注册) return;
+  动画等待驱动已注册 = true;
+  addPeriodicCallback(10, on动画等待驱动);
+}
+
+function 创建动画等待任务(ctx: 动画等待上下文, 等待秒数: number): number {
+  const ID = ++动画等待任务ID序号;
+  动画等待任务列表.push({
+    ID,
+    到期时间毫秒: getServerTime() + 等待秒数 * 1000,
+    上下文: ctx,
+  });
+  确保动画等待驱动();
+  return ID;
 }
 
 export function 播放单位动画并等待(
@@ -77,8 +118,8 @@ export function 播放单位动画并等待(
 ): any {
   if (单位 == null || 单位 === 0) return null;
   if (等待秒数 < 0) 等待秒数 = 0;
-  jass.SetUnitAnimationByIndex(单位, 动画序号);
-  return 创建动画等待计时器({ 单位, 下一步 }, 等待秒数);
+  SetUnitAnimationByIndex(单位, 动画序号);
+  return 创建动画等待任务({ 单位, 下一步 }, 等待秒数);
 }
 
 export function 播放单位动作并等待(
@@ -90,8 +131,8 @@ export function 播放单位动作并等待(
   if (单位 == null || 单位 === 0) return null;
   if (!动画名 || 动画名 === "") return null;
   if (等待秒数 < 0) 等待秒数 = 0;
-  jass.SetUnitAnimation(单位, 动画名);
-  return 创建动画等待计时器({ 单位, 下一步 }, 等待秒数);
+  SetUnitAnimation(单位, 动画名);
+  return 创建动画等待任务({ 单位, 下一步 }, 等待秒数);
 }
 
 export function 播放单位动画并等待后恢复待机(
@@ -102,8 +143,8 @@ export function 播放单位动画并等待后恢复待机(
 ): any {
   if (单位 == null || 单位 === 0) return null;
   if (等待秒数 < 0) 等待秒数 = 0;
-  jass.SetUnitAnimationByIndex(单位, 动画序号);
-  return 创建动画等待计时器({
+  SetUnitAnimationByIndex(单位, 动画序号);
+  return 创建动画等待任务({
     单位,
     恢复待机: true,
     下一步,
@@ -118,7 +159,7 @@ export function 延迟播放单位动画(
 ): any {
   if (单位 == null || 单位 === 0) return null;
   if (延迟秒数 < 0) 延迟秒数 = 0;
-  return 创建动画等待计时器({
+  return 创建动画等待任务({
     单位,
     动画序号,
     下一步,
@@ -134,7 +175,7 @@ export function 延迟播放单位动作(
   if (单位 == null || 单位 === 0) return null;
   if (!动画名 || 动画名 === "") return null;
   if (延迟秒数 < 0) 延迟秒数 = 0;
-  return 创建动画等待计时器({
+  return 创建动画等待任务({
     单位,
     动画名,
     下一步,
@@ -162,7 +203,7 @@ export function 零秒后重置单位动画(
   下一步?: VoidCallback
 ): any {
   if (单位 == null || 单位 === 0) return null;
-  return 创建动画等待计时器({
+  return 创建动画等待任务({
     单位,
     下一步,
   }, 0.0);
@@ -180,8 +221,8 @@ export function 立即设置单位朝向(
   朝向角度: number
 ): void {
   if (单位 == null || 单位 === 0) return;
-  jass.SetUnitFacing(单位, 朝向角度);
-  EXSetUnitFacing(单位, 朝向角度 * jass.bj_DEGTORAD);
+  SetUnitFacing(单位, 朝向角度);
+  EXSetUnitFacing(单位, 朝向角度 * DEGREES_TO_RADIANS);
 }
 
 export function 技能延迟执行(
@@ -189,7 +230,7 @@ export function 技能延迟执行(
   下一步?: VoidCallback
 ): any {
   if (延迟秒数 < 0) 延迟秒数 = 0;
-  return 创建动画等待计时器({
+  return 创建动画等待任务({
     下一步,
   }, 延迟秒数);
 }
