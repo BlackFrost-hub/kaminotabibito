@@ -18,6 +18,9 @@ const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star�
 const { 读取语义单位引用 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具") as {
   读取语义单位引用: (this: void, 引用: string) => any;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
 
 import { 帧 } from "./02．主线引导框架";
 import { 获取进度配置 } from "./01．主线引导配置表";
@@ -29,11 +32,6 @@ const DzFrameShow = japi.DzFrameShow as (this: void, frame: number, show: boolea
 const DzFrameSetText = japi.DzFrameSetText as (this: void, frame: number, text: string) => void;
 const DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer as (this: void) => any;
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
-const TimerStart = jass.TimerStart as (this: void, timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-const DestroyTimer = jass.DestroyTimer as (this: void, timer: any) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -41,7 +39,8 @@ const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 // ========== 模块级状态 ==========
 
 const 玩家展开状态表: Record<number, boolean | undefined> = {};
-const 计时器玩家表: Record<number, any> = {};
+const 放大效果隐藏延迟毫秒 = 250;
+const 放大效果隐藏玩家队列: any[] = [];
 
 // ========== 辅助函数 ==========
 
@@ -69,15 +68,11 @@ function 获取镜头目标(this: void, 配置: 进度配置): { x: number; y: n
  * 全端执行，本地显隐
  */
 function on隐藏放大效果(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const key = GetHandleId(timer);
-  const player = 计时器玩家表[key];
-  delete 计时器玩家表[key];
+  const player = 放大效果隐藏玩家队列.shift();
+  if (player == null || player === 0) return;
   if (GetLocalPlayer() === player) {
     DzFrameShow(帧.放大效果, false);
   }
-  DestroyTimer(timer);
 }
 
 /**
@@ -100,9 +95,8 @@ export function on主线引导按钮点击(this: void): void {
     }
 
     // 延时隐藏放大效果（全端执行，本地显隐）
-    const timer = CreateTimer();
-    计时器玩家表[GetHandleId(timer)] = 触发玩家;
-    TimerStart(timer, 0.25, false, on隐藏放大效果);
+    放大效果隐藏玩家队列.push(触发玩家);
+    addDelayedCallback(放大效果隐藏延迟毫秒, on隐藏放大效果);
   } else {
     玩家展开状态表[玩家ID] = false;
     DzFrameShow(帧.放大效果, false);

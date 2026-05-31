@@ -16,16 +16,13 @@ local ____require_result_2 = require("系统.01．单位系统.00．单位初始
 local _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____require_result_2["单位是否匹配玩家英雄名称"]
 local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
 local PlaySoundBJ = ____require_result_3.PlaySoundBJ
-local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_4.safeTimerStart
-local safeDestroyTimer = ____require_result_4.safeDestroyTimer
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
 local GetLocalPlayer = jass.GetLocalPlayer
 local IsUnitType = jass.IsUnitType
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local IsUnitInRange = jass.IsUnitInRange
 local GetRandomInt = jass.GetRandomInt
-local CreateTimer = jass.CreateTimer
-local GetExpiredTimer = jass.GetExpiredTimer
 local _____82F1_96C4_8D2D_7269_97F3_6548_5DF2_521D_59CB_5316 = false
 local _____8D2D_7269_97F3_6548_51B7_5374_4E2D = false
 local function _____662F_8D2D_7269_5546_5E97(unit)
@@ -62,15 +59,10 @@ local function _____53D6_968F_673A_8D2D_7269_97F3_6548(soundList)
 end
 local function _____8D2D_7269_97F3_6548_51B7_5374_7ED3_675F()
     _____8D2D_7269_97F3_6548_51B7_5374_4E2D = false
-    local timer = GetExpiredTimer()
-    if timer ~= nil and timer ~= 0 then
-        safeDestroyTimer(timer)
-    end
 end
 local function _____5F00_59CB_8D2D_7269_97F3_6548_51B7_5374()
     _____8D2D_7269_97F3_6548_51B7_5374_4E2D = true
-    local timer = CreateTimer()
-    safeTimerStart(timer, _____82F1_96C4_8D2D_7269_97F3_6548_51B7_5374, false, _____8D2D_7269_97F3_6548_51B7_5374_7ED3_675F)
+    addDelayedCallback(_____82F1_96C4_8D2D_7269_97F3_6548_51B7_5374 * 1000, _____8D2D_7269_97F3_6548_51B7_5374_7ED3_675F)
 end
 local function _____672C_5730_64AD_653E_8D2D_7269_97F3_6548(whichPlayer, soundHandle)
     if soundHandle == nil or soundHandle == 0 then

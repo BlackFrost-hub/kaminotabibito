@@ -6,8 +6,6 @@
 
 const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
-const ENABLE_QUEST_TEST = false;
-const ENABLE_TEST_233 = true;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_GOLD_BURST_TEST = true;
 const ENABLE_BROADCAST_HINT_TEST = true;
@@ -19,14 +17,6 @@ function loadTests(): void {
 
   if (ENABLE_YDLOCAL_TEST) {
     require("系统.12．测试系统.YDLocal返回值测试");
-  }
-
-  if (ENABLE_QUEST_TEST) {
-    require("系统.12．测试系统.任务测试");
-  }
-
-  if (ENABLE_TEST_233) {
-    require("系统.12．测试系统.02．平台API测试");
   }
 
   if (ENABLE_TEST_EVENT) {

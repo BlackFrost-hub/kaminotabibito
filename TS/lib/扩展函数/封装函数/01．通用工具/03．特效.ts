@@ -6,12 +6,12 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
-const effectDestroyCtxByTimerHid: Record<number, any> = {};
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -20,13 +20,13 @@ const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, eff
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
-function onTimedEffectTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  const eff = effectDestroyCtxByTimerHid[jass.GetHandleId(t)];
-  delete effectDestroyCtxByTimerHid[jass.GetHandleId(t)];
-  if (eff) jass.DestroyEffect(eff);
-  safeDestroyTimer(t);
-}
+const 特效销毁检查间隔毫秒 = 10;
+const 定时销毁特效列表: any[] = [];
+const 定时销毁特效到期毫秒列表: number[] = [];
+const 绑定特效销毁键列表: string[] = [];
+const 绑定特效销毁特效列表: any[] = [];
+const 绑定特效销毁到期毫秒列表: number[] = [];
+let 特效销毁检查回调ID = 0;
 
 /**
  * 创建特效并在指定时间后自动销毁
@@ -51,11 +51,7 @@ export function createTimedEffect(
     japi.EXSetEffectZ(eff, z);
   }
 
-  const t = jass.CreateTimer();
-  if (t) {
-    effectDestroyCtxByTimerHid[jass.GetHandleId(t)] = eff;
-    safeTimerStart(t, duration, false, onTimedEffectTimerExpire);
-  }
+  安排定时销毁特效(eff, duration);
   return eff;
 }
 
@@ -77,19 +73,80 @@ function destroyBoundEffect(effect: any): void {
   jass.DestroyEffect(effect);
 }
 
-const boundEffectCtxByTimerHid: Record<number, { key: string; effect: any }> = {};
+function 停止特效销毁检查(this: void): void {
+  if (特效销毁检查回调ID <= 0) return;
+  removePeriodicCallback(特效销毁检查回调ID);
+  特效销毁检查回调ID = 0;
+}
 
-function onBoundEffectTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  const ctx = boundEffectCtxByTimerHid[jass.GetHandleId(t)];
-  delete boundEffectCtxByTimerHid[jass.GetHandleId(t)];
-  if (!ctx) return;
-  const currentEffect = unitEffectMap.get(ctx.key);
-  if (currentEffect === ctx.effect) {
-    destroyBoundEffect(ctx.effect);
-    unitEffectMap.delete(ctx.key);
+function 确保特效销毁检查(this: void): void {
+  if (特效销毁检查回调ID > 0) return;
+  特效销毁检查回调ID = addPeriodicCallback(特效销毁检查间隔毫秒, on特效销毁检查);
+}
+
+function 安排定时销毁特效(this: void, effect: any, duration: number): void {
+  定时销毁特效列表.push(effect);
+  定时销毁特效到期毫秒列表.push(getServerTime() + duration * 1000);
+  确保特效销毁检查();
+}
+
+function 安排绑定特效销毁检查(this: void, key: string, effect: any, duration: number): void {
+  绑定特效销毁键列表.push(key);
+  绑定特效销毁特效列表.push(effect);
+  绑定特效销毁到期毫秒列表.push(getServerTime() + duration * 1000);
+  确保特效销毁检查();
+}
+
+function 处理定时特效销毁(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 定时销毁特效列表.length; i++) {
+    const effect = 定时销毁特效列表[i];
+    if (now >= 定时销毁特效到期毫秒列表[i]) {
+      if (effect) jass.DestroyEffect(effect);
+    } else {
+      定时销毁特效列表[writeIndex] = effect;
+      定时销毁特效到期毫秒列表[writeIndex] = 定时销毁特效到期毫秒列表[i];
+      writeIndex += 1;
+    }
   }
-  safeDestroyTimer(t);
+  for (let i = 定时销毁特效列表.length - 1; i >= writeIndex; i--) {
+    定时销毁特效列表.pop();
+    定时销毁特效到期毫秒列表.pop();
+  }
+}
+
+function 处理绑定特效销毁(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 绑定特效销毁键列表.length; i++) {
+    const key = 绑定特效销毁键列表[i];
+    const effect = 绑定特效销毁特效列表[i];
+    if (now >= 绑定特效销毁到期毫秒列表[i]) {
+      const currentEffect = unitEffectMap.get(key);
+      if (currentEffect === effect) {
+        destroyBoundEffect(effect);
+        unitEffectMap.delete(key);
+      }
+    } else {
+      绑定特效销毁键列表[writeIndex] = key;
+      绑定特效销毁特效列表[writeIndex] = effect;
+      绑定特效销毁到期毫秒列表[writeIndex] = 绑定特效销毁到期毫秒列表[i];
+      writeIndex += 1;
+    }
+  }
+  for (let i = 绑定特效销毁键列表.length - 1; i >= writeIndex; i--) {
+    绑定特效销毁键列表.pop();
+    绑定特效销毁特效列表.pop();
+    绑定特效销毁到期毫秒列表.pop();
+  }
+}
+
+function on特效销毁检查(this: void): void {
+  const now = getServerTime();
+  处理定时特效销毁(now);
+  处理绑定特效销毁(now);
+  if (定时销毁特效列表.length <= 0 && 绑定特效销毁键列表.length <= 0) {
+    停止特效销毁检查();
+  }
 }
 
 /**
@@ -115,11 +172,7 @@ export function createUnitEffect(unit: any, attachPoint: string, modelPath: stri
   unitEffectMap.set(key, effect);
 
   if (duration != null && duration > 0) {
-    const t = jass.CreateTimer();
-    if (t) {
-      boundEffectCtxByTimerHid[jass.GetHandleId(t)] = { key, effect };
-      safeTimerStart(t, duration, false, onBoundEffectTimerExpire);
-    }
+    安排绑定特效销毁检查(key, effect, duration);
   }
 
   return effect;

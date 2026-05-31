@@ -3,9 +3,9 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -23,9 +23,7 @@ import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/
 import { 读取剧情进度, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
 
-const CreateTimer = jass.CreateTimer as (this: void) => any;
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
@@ -39,6 +37,7 @@ const EVENT_UNIT_SPELL_EFFECT = jass.EVENT_UNIT_SPELL_EFFECT as any;
 
 let 已初始化进度03核心 = false;
 let 已注册地精祭祀Boss范围 = false;
+let 地精祭祀Boss范围轮询ID = 0;
 
 function 读取地精巫师Boss(this: void): any {
   return YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
@@ -116,7 +115,10 @@ function on检查并注册地精祭祀Boss范围(this: void): void {
   const bossUnit = 读取地精巫师Boss();
   if (bossUnit != null && bossUnit !== 0) {
     注册地精祭祀Boss范围(bossUnit);
-    safeDestroyTimer(GetExpiredTimer());
+    if (地精祭祀Boss范围轮询ID !== 0) {
+      removePeriodicCallback(地精祭祀Boss范围轮询ID);
+      地精祭祀Boss范围轮询ID = 0;
+    }
   }
 }
 
@@ -135,6 +137,7 @@ export function 初始化进度03_地精祭祀Boss前导核心(this: void): void
     return;
   }
 
-  const timer = CreateTimer();
-  safeTimerStart(timer, 0.5, true, on检查并注册地精祭祀Boss范围);
+  if (地精祭祀Boss范围轮询ID === 0) {
+    地精祭祀Boss范围轮询ID = addPeriodicCallback(500, on检查并注册地精祭祀Boss范围);
+  }
 }

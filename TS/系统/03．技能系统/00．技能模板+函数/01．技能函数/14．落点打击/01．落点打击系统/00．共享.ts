@@ -6,10 +6,7 @@
 const jass = require("jass.common") as any;
 
 export const AddSpecialEffect = jass.AddSpecialEffect as (path: string, x: number, y: number) => any;
-export const CreateTimer = jass.CreateTimer as () => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
-export const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-export const GetHandleId = jass.GetHandleId as (handle: any) => number;
 export const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 export const UnitDamageTarget = jass.UnitDamageTarget as (
   source: any, target: any, amount: number,
@@ -34,11 +31,6 @@ export interface 落点打击内部实例 {
   落点列表: 落点信息[];
   剩余落点数: number;
   命中规则状态: any;
-}
-
-export interface 落点打击定时器上下文 {
-  实例ID: number;
-  落点序号: number;
 }
 
 export interface 落点打击参数 {
@@ -72,17 +64,11 @@ export interface 落点打击参数 {
 }
 
 export const 落点打击实例表: Record<number, 落点打击内部实例 | undefined> = {};
-export const 落点打击定时器上下文表: Record<number, 落点打击定时器上下文 | undefined> = {};
 export let 下一个落点打击ID = 0;
 
 export function 推进下一个落点打击ID(this: void): number {
   下一个落点打击ID += 1;
   return 下一个落点打击ID;
-}
-
-export function 取句柄ID(h: any): number {
-  if (h == null || h === 0) return 0;
-  return GetHandleId(h) || 0;
 }
 
 export function 单位是否受影响(目标单位: any, 参数: 落点打击参数): boolean {

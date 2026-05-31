@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____02_FF0E_4E3B_7EBF_5F15_5BFC_6846_67B6 = require("系统.11．剧情系统.01．主线任务.03．主线引导UI.02．主线引导框架")
 local _____5E27 = ____02_FF0E_4E3B_7EBF_5F15_5BFC_6846_67B6["帧"]
@@ -18,20 +17,18 @@ local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩�
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local ____require_result_2 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____require_result_2["读取语义单位引用"]
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
 local DzFrameShow = japi.DzFrameShow
 local DzFrameSetText = japi.DzFrameSetText
 local DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
-local CreateTimer = jass.CreateTimer
-local TimerStart = jass.TimerStart
-local DestroyTimer = jass.DestroyTimer
-local GetExpiredTimer = jass.GetExpiredTimer
-local GetHandleId = jass.GetHandleId
 local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local _____73A9_5BB6_5C55_5F00_72B6_6001_8868 = {}
-local _____8BA1_65F6_5668_73A9_5BB6_8868 = {}
+local _____653E_5927_6548_679C_9690_85CF_5EF6_8FDF_6BEB_79D2 = 250
+local _____653E_5927_6548_679C_9690_85CF_73A9_5BB6_961F_5217 = {}
 --- 获取镜头目标坐标
 -- 优先跟随单位，其次固定坐标
 local function _____83B7_53D6_955C_5934_76EE_6807(_____914D_7F6E)
@@ -52,17 +49,13 @@ end
 --- 延时隐藏放大效果
 -- 全端执行，本地显隐
 local function ____on_9690_85CF_653E_5927_6548_679C()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
+    local player = table.remove(_____653E_5927_6548_679C_9690_85CF_73A9_5BB6_961F_5217, 1)
+    if player == nil or player == 0 then
         return
     end
-    local key = GetHandleId(timer)
-    local player = _____8BA1_65F6_5668_73A9_5BB6_8868[key]
-    __TS__Delete(_____8BA1_65F6_5668_73A9_5BB6_8868, key)
     if GetLocalPlayer() == player then
         DzFrameShow(_____5E27["放大效果"], false)
     end
-    DestroyTimer(timer)
 end
 --- 主线引导按钮点击回调
 -- sync=true，全端执行
@@ -78,9 +71,8 @@ ____exports["on主线引导按钮点击"] = function()
         if GetLocalPlayer() == _____89E6_53D1_73A9_5BB6 then
             DzFrameShow(_____5E27["放大效果"], true)
         end
-        local timer = CreateTimer()
-        _____8BA1_65F6_5668_73A9_5BB6_8868[GetHandleId(timer)] = _____89E6_53D1_73A9_5BB6
-        TimerStart(timer, 0.25, false, ____on_9690_85CF_653E_5927_6548_679C)
+        _____653E_5927_6548_679C_9690_85CF_73A9_5BB6_961F_5217[#_____653E_5927_6548_679C_9690_85CF_73A9_5BB6_961F_5217 + 1] = _____89E6_53D1_73A9_5BB6
+        addDelayedCallback(_____653E_5927_6548_679C_9690_85CF_5EF6_8FDF_6BEB_79D2, ____on_9690_85CF_653E_5927_6548_679C)
     else
         _____73A9_5BB6_5C55_5F00_72B6_6001_8868[_____73A9_5BB6ID] = false
         DzFrameShow(_____5E27["放大效果"], false)

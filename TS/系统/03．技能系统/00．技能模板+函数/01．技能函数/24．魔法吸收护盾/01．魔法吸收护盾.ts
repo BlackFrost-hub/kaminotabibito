@@ -24,12 +24,10 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
     isSkillDamage: boolean;
   }) => number, priority?: number) => number;
 };
-const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-};
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: (this: void) => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { 减少魔法值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
   减少魔法值: (
@@ -46,7 +44,6 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
-const CreateTimer = jass.CreateTimer as () => any;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
@@ -94,11 +91,16 @@ const 魔法吸收护盾ID列表: number[] = [];
 const 魔法吸收护盾标签表: Record<string, number | undefined> = {};
 let 已注册魔法吸收护盾伤害监听 = false;
 let 已注册魔法吸收护盾中心计时器 = false;
+let 魔法吸收护盾中心计时器回调ID = 0;
 let 下一个魔法吸收护盾ID = 1;
 
 const 默认魔法吸收特效路径 = "war3mapImported\\Energy Shield.mdl";
 const 默认魔法吸收特效挂点 = "origin";
-const 魔法吸收护盾特效销毁上下文: Record<number, { 特效: any; 绑定单位: boolean } | undefined> = {};
+const 魔法吸收护盾特效销毁检查间隔毫秒 = 10;
+const 待销毁魔法吸收护盾特效列表: any[] = [];
+const 待销毁魔法吸收护盾特效绑定单位列表: boolean[] = [];
+const 待销毁魔法吸收护盾特效到期毫秒列表: number[] = [];
+let 魔法吸收护盾特效销毁检查回调ID = 0;
 
 function 取单位ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -125,6 +127,10 @@ function 从列表移除(this: void, id: number): void {
 function 尝试关闭中心计时器(this: void): void {
   if (!已注册魔法吸收护盾中心计时器) return;
   if (魔法吸收护盾ID列表.length > 0) return;
+  if (魔法吸收护盾中心计时器回调ID > 0) {
+    removePeriodicCallback(魔法吸收护盾中心计时器回调ID);
+    魔法吸收护盾中心计时器回调ID = 0;
+  }
   已注册魔法吸收护盾中心计时器 = false;
 }
 
@@ -142,16 +148,42 @@ function 隐藏并销毁魔法吸收特效(this: void, 特效: any, 绑定单位
   DestroyEffect(特效);
 }
 
-function on魔法吸收护盾特效销毁到时(this: void): void {
-  const timer = jass.GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const hid = GetHandleId(timer);
-  const 上下文 = 魔法吸收护盾特效销毁上下文[hid];
-  delete 魔法吸收护盾特效销毁上下文[hid];
-  if (上下文 != null) {
-    隐藏并销毁魔法吸收特效(上下文.特效, 上下文.绑定单位);
+function 停止魔法吸收护盾特效销毁检查(this: void): void {
+  if (魔法吸收护盾特效销毁检查回调ID <= 0) return;
+  removePeriodicCallback(魔法吸收护盾特效销毁检查回调ID);
+  魔法吸收护盾特效销毁检查回调ID = 0;
+}
+
+function on魔法吸收护盾特效销毁检查(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 待销毁魔法吸收护盾特效列表.length; i++) {
+    const 特效 = 待销毁魔法吸收护盾特效列表[i];
+    const 绑定单位 = 待销毁魔法吸收护盾特效绑定单位列表[i];
+    if (now >= 待销毁魔法吸收护盾特效到期毫秒列表[i]) {
+      隐藏并销毁魔法吸收特效(特效, 绑定单位);
+    } else {
+      待销毁魔法吸收护盾特效列表[writeIndex] = 特效;
+      待销毁魔法吸收护盾特效绑定单位列表[writeIndex] = 绑定单位;
+      待销毁魔法吸收护盾特效到期毫秒列表[writeIndex] = 待销毁魔法吸收护盾特效到期毫秒列表[i];
+      writeIndex += 1;
+    }
   }
-  safeDestroyTimer(timer);
+
+  for (let i = 待销毁魔法吸收护盾特效列表.length - 1; i >= writeIndex; i--) {
+    待销毁魔法吸收护盾特效列表.pop();
+    待销毁魔法吸收护盾特效绑定单位列表.pop();
+    待销毁魔法吸收护盾特效到期毫秒列表.pop();
+  }
+
+  if (待销毁魔法吸收护盾特效列表.length <= 0) {
+    停止魔法吸收护盾特效销毁检查();
+  }
+}
+
+function 确保魔法吸收护盾特效销毁检查(this: void): void {
+  if (魔法吸收护盾特效销毁检查回调ID > 0) return;
+  魔法吸收护盾特效销毁检查回调ID = addPeriodicCallback(魔法吸收护盾特效销毁检查间隔毫秒, on魔法吸收护盾特效销毁检查);
 }
 
 function 销毁魔法吸收护盾(this: void, id: number): void {
@@ -166,7 +198,7 @@ function 销毁魔法吸收护盾(this: void, id: number): void {
 function 确保中心计时器(this: void): void {
   if (已注册魔法吸收护盾中心计时器) return;
   已注册魔法吸收护盾中心计时器 = true;
-  addPeriodicCallback(100, on魔法吸收护盾中心计时器Tick);
+  魔法吸收护盾中心计时器回调ID = addPeriodicCallback(100, on魔法吸收护盾中心计时器Tick);
 }
 
 function on魔法吸收护盾中心计时器Tick(this: void): void {
@@ -230,13 +262,10 @@ export function 播放魔法吸收护盾特效(this: void, 参数: 魔法吸收�
     EXEffectMatRotateZ(effect, 参数.特效朝向角度 ?? GetUnitFacing(单位));
   }
 
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) {
-    隐藏并销毁魔法吸收特效(effect, 是否绑定单位);
-    return;
-  }
-  魔法吸收护盾特效销毁上下文[GetHandleId(timer)] = { 特效: effect, 绑定单位: 是否绑定单位 };
-  safeTimerStart(timer, 持续时间, false, on魔法吸收护盾特效销毁到时);
+  待销毁魔法吸收护盾特效列表.push(effect);
+  待销毁魔法吸收护盾特效绑定单位列表.push(是否绑定单位);
+  待销毁魔法吸收护盾特效到期毫秒列表.push(getServerTime() + 持续时间 * 1000);
+  确保魔法吸收护盾特效销毁检查();
 }
 
 function 计算吸收伤害(this: void, 实例: 魔法吸收护盾实例, 受击单位: any, 伤害值: number): number {

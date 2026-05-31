@@ -5,8 +5,6 @@ local ____exports = {}
 -- 通过开关控制是否加载各个测试模块。
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
-local ENABLE_QUEST_TEST = false
-local ENABLE_TEST_233 = true
 local ENABLE_TEST_EVENT = false
 local ENABLE_GOLD_BURST_TEST = true
 local ENABLE_BROADCAST_HINT_TEST = true
@@ -16,12 +14,6 @@ local function loadTests(self)
     end
     if ENABLE_YDLOCAL_TEST then
         require("系统.12．测试系统.YDLocal返回值测试")
-    end
-    if ENABLE_QUEST_TEST then
-        require("系统.12．测试系统.任务测试")
-    end
-    if ENABLE_TEST_233 then
-        require("系统.12．测试系统.02．平台API测试")
     end
     if ENABLE_TEST_EVENT then
         require("系统.12．测试系统.03．伤害事件测试")

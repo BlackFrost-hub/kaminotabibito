@@ -5,9 +5,10 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 import { SoundModel } from "./01．声音模型";
@@ -22,19 +23,41 @@ setDebug("Sound3DII", false);
 // 导入最后播放的音效变量
 import { lastPlayedSound } from "./03．3D音效播放";
 
-const soundDestroyFallbackByTimerHid: Record<number, any> = {};
+const soundDestroyFallbackIntervalMs = 10;
+const soundDestroyFallbackSounds: any[] = [];
+const soundDestroyFallbackDueMs: number[] = [];
+let soundDestroyFallbackCallbackId = 0;
 
-function onSoundDestroyFallbackTimerExpire(this: void): void {
-  const expired = (jass as any).GetExpiredTimer();
-  const hid = (jass as any).GetHandleId(expired) as number;
-  const sound = soundDestroyFallbackByTimerHid[hid];
-  delete soundDestroyFallbackByTimerHid[hid];
-  (jass as any).DestroySound(sound);
-  const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
-  if (Leak && Leak.LeakWatcher && typeof Leak.LeakWatcher.destroyTimer === "function") {
-    Leak.LeakWatcher.destroyTimer(expired);
-  } else {
-    safeDestroyTimer(expired);
+function stopSoundDestroyFallbackCheck(this: void): void {
+  if (soundDestroyFallbackCallbackId <= 0) return;
+  removePeriodicCallback(soundDestroyFallbackCallbackId);
+  soundDestroyFallbackCallbackId = 0;
+}
+
+function ensureSoundDestroyFallbackCheck(this: void): void {
+  if (soundDestroyFallbackCallbackId > 0) return;
+  soundDestroyFallbackCallbackId = addPeriodicCallback(soundDestroyFallbackIntervalMs, onSoundDestroyFallbackCheck);
+}
+
+function onSoundDestroyFallbackCheck(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < soundDestroyFallbackSounds.length; i++) {
+    const sound = soundDestroyFallbackSounds[i];
+    if (now >= soundDestroyFallbackDueMs[i]) {
+      (jass as any).DestroySound(sound);
+    } else {
+      soundDestroyFallbackSounds[writeIndex] = sound;
+      soundDestroyFallbackDueMs[writeIndex] = soundDestroyFallbackDueMs[i];
+      writeIndex += 1;
+    }
+  }
+  for (let i = soundDestroyFallbackSounds.length - 1; i >= writeIndex; i--) {
+    soundDestroyFallbackSounds.pop();
+    soundDestroyFallbackDueMs.pop();
+  }
+  if (soundDestroyFallbackSounds.length <= 0) {
+    stopSoundDestroyFallbackCheck();
   }
 }
 
@@ -43,15 +66,9 @@ function onSoundDestroyFallbackTimerExpire(this: void): void {
  */
 function scheduleDestroySoundIfNeeded(sound: any): void {
   if (!sound) return;
-  const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
-  const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
-  const t =
-    LW && typeof LW.createTimer === "function"
-      ? LW.createTimer("sound_ui_fallback_destroy")
-      : (jass as any).CreateTimer();
-  if (!t) return;
-  soundDestroyFallbackByTimerHid[(jass as any).GetHandleId(t) as number] = sound;
-  safeTimerStart(t, 0.55, false, onSoundDestroyFallbackTimerExpire);
+  soundDestroyFallbackSounds.push(sound);
+  soundDestroyFallbackDueMs.push(getServerTime() + 550);
+  ensureSoundDestroyFallbackCheck();
 }
 
 /**

@@ -5,6 +5,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -21,6 +24,7 @@ const PlaySoundBJ = jass.PlaySoundBJ as (this: void, soundHandle: any) => void;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 
 let 英雄死亡音效已初始化 = false;
+const 死亡音效冷却结束单位队列: any[] = [];
 
 function 允许播放(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
@@ -40,12 +44,10 @@ function 取死亡音效(this: void, unit: any): any {
 }
 
 function 死亡音效冷却结束(this: void): void {
-  const timer = jass.GetExpiredTimer();
-  const target = YDUserDataGetSafe("timer", timer, "英雄死亡音效单位", "unit");
+  const target = 死亡音效冷却结束单位队列.shift();
   if (target != null && target !== 0) {
     YDUserDataSetSafe("unit", target, "死亡音效", "boolean", false);
   }
-  jass.DestroyTimer(timer);
 }
 
 function 处理死亡语音(this: void, target: any): void {
@@ -55,9 +57,8 @@ function 处理死亡语音(this: void, target: any): void {
   if (soundHandle == null) return;
   YDUserDataSetSafe("unit", target, "死亡音效", "boolean", true);
   PlaySoundBJ(soundHandle);
-  const timer = jass.CreateTimer();
-  YDUserDataSetSafe("timer", timer, "英雄死亡音效单位", "unit", target);
-  jass.TimerStart(timer, 英雄死亡音效冷却, false, 死亡音效冷却结束);
+  死亡音效冷却结束单位队列.push(target);
+  addDelayedCallback(英雄死亡音效冷却 * 1000, 死亡音效冷却结束);
 }
 
 function 死亡回调(this: void, dyingUnit: any, _killer: any): void {

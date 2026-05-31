@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, removeEntry, jass, safeDestroyTimer, X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, _tickCounter
+local hid, getUnitX, getUnitY, getUnitFacing, getUnitMoveSpeed, removeSpeedEffect, doEvent, stopSpeedBreakTempTask, cancelSpeedBreakTempTask, finishSpeedBreakTempTask, onSpeedBreakTempTaskTick, removeEntry, jass, removePeriodicCallback, getServerTime, X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY, ORDER_MOVE, ORDER_SMART, TIMER_INTERVAL, ENGINE_SPEED_LIMIT, BJ_DEGTORAD, entryMap, entryList, triggerUnitSpeedEntryUidByTriggerHid, speedBreakTempTaskIds, speedBreakTempTaskUids, speedBreakTempTaskDueMs, speedBreakTempTaskCallbackId, _tickCounter
 function hid(h)
     return jass.GetHandleId(h) or 0
 end
@@ -116,18 +116,89 @@ function doEvent(entry)
     end
     entry.lf = f
 end
+function stopSpeedBreakTempTask()
+    if speedBreakTempTaskCallbackId <= 0 then
+        return
+    end
+    removePeriodicCallback(speedBreakTempTaskCallbackId)
+    speedBreakTempTaskCallbackId = 0
+end
+function cancelSpeedBreakTempTask(taskId)
+    if not (taskId > 0) then
+        return
+    end
+    do
+        local i = 0
+        while i < #speedBreakTempTaskIds do
+            if speedBreakTempTaskIds[i + 1] == taskId then
+                speedBreakTempTaskIds[i + 1] = 0
+                return
+            end
+            i = i + 1
+        end
+    end
+end
+function finishSpeedBreakTempTask(uid, taskId)
+    local e = entryMap[uid]
+    if e == nil or e.tempTimer ~= taskId then
+        return
+    end
+    e.tempTimer = 0
+    if e.originalSpeed > ENGINE_SPEED_LIMIT then
+        e.speed = e.originalSpeed
+    else
+        removeEntry(uid)
+    end
+end
+function onSpeedBreakTempTaskTick()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #speedBreakTempTaskIds do
+            do
+                local taskId = speedBreakTempTaskIds[i + 1]
+                if not (taskId > 0) then
+                    goto __continue54
+                end
+                if now >= speedBreakTempTaskDueMs[i + 1] then
+                    finishSpeedBreakTempTask(speedBreakTempTaskUids[i + 1], taskId)
+                else
+                    speedBreakTempTaskIds[writeIndex + 1] = taskId
+                    speedBreakTempTaskUids[writeIndex + 1] = speedBreakTempTaskUids[i + 1]
+                    speedBreakTempTaskDueMs[writeIndex + 1] = speedBreakTempTaskDueMs[i + 1]
+                    writeIndex = writeIndex + 1
+                end
+            end
+            ::__continue54::
+            i = i + 1
+        end
+    end
+    do
+        local i = #speedBreakTempTaskIds - 1
+        while i >= writeIndex do
+            table.remove(speedBreakTempTaskIds)
+            table.remove(speedBreakTempTaskUids)
+            table.remove(speedBreakTempTaskDueMs)
+            i = i - 1
+        end
+    end
+    if #speedBreakTempTaskIds <= 0 then
+        stopSpeedBreakTempTask()
+    end
+end
 function removeEntry(uid)
     local entry = entryMap[uid]
     if entry == nil then
         return
     end
-    if entry.effect then
+    if entry.effect ~= nil and entry.effect ~= 0 then
         removeSpeedEffect(entry.effect)
         entry.effect = nil
     end
-    if entry.tempTimer then
-        safeDestroyTimer(nil, entry.tempTimer)
-        entry.tempTimer = nil
+    if entry.tempTimer > 0 then
+        cancelSpeedBreakTempTask(entry.tempTimer)
+        entry.tempTimer = 0
     end
     if entry.t then
         __TS__Delete(
@@ -150,9 +221,10 @@ function removeEntry(uid)
 end
 jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 X_GDBC = ____require_result_1.X_GDBC
 X_GAFC = ____require_result_1.X_GAFC
@@ -190,26 +262,11 @@ entryList = {}
 local systemTimer = nil
 local isRunning = false
 triggerUnitSpeedEntryUidByTriggerHid = {}
-local speedBreakTempTimerCtxByHid = {}
-local function onSpeedBreakTempTimerExpire()
-    local t = jass.GetExpiredTimer()
-    local uid = speedBreakTempTimerCtxByHid[hid(t)]
-    __TS__Delete(
-        speedBreakTempTimerCtxByHid,
-        hid(t)
-    )
-    local e = entryMap[uid]
-    if e == nil or e.tempTimer ~= t then
-        return
-    end
-    e.tempTimer = nil
-    if e.originalSpeed > ENGINE_SPEED_LIMIT then
-        e.speed = e.originalSpeed
-    else
-        removeEntry(uid)
-    end
-    safeDestroyTimer(nil, t)
-end
+speedBreakTempTaskIds = {}
+speedBreakTempTaskUids = {}
+speedBreakTempTaskDueMs = {}
+local speedBreakTempTaskSeq = 0
+speedBreakTempTaskCallbackId = 0
 local function onMoveSpeedBreakTick()
     if not isRunning then
         return
@@ -257,6 +314,20 @@ local function startTimer()
 end
 local function stopTimer()
     isRunning = false
+end
+local function ensureSpeedBreakTempTask()
+    if speedBreakTempTaskCallbackId > 0 then
+        return
+    end
+    speedBreakTempTaskCallbackId = addPeriodicCallback(10, onSpeedBreakTempTaskTick)
+end
+local function scheduleSpeedBreakTempTask(uid, duration)
+    speedBreakTempTaskSeq = speedBreakTempTaskSeq + 1
+    speedBreakTempTaskIds[#speedBreakTempTaskIds + 1] = speedBreakTempTaskSeq
+    speedBreakTempTaskUids[#speedBreakTempTaskUids + 1] = uid
+    speedBreakTempTaskDueMs[#speedBreakTempTaskDueMs + 1] = getServerTime() + duration * 1000
+    ensureSpeedBreakTempTask()
+    return speedBreakTempTaskSeq
 end
 --- 同步「突破位移」用的目标点：仅监听点指令时，右键单位/物品不会刷新 tx/ty，
 -- 仍朝上次地面点硬拉，会与引擎寻路冲突导致原地踏步。
@@ -324,13 +395,13 @@ function ____exports.SOS_SetUnitSpeed(u, speed)
     end
     local existing = entryMap[uid]
     if existing ~= nil then
-        if existing.tempTimer then
-            safeDestroyTimer(nil, existing.tempTimer)
-            existing.tempTimer = nil
+        if existing.tempTimer > 0 then
+            cancelSpeedBreakTempTask(existing.tempTimer)
+            existing.tempTimer = 0
         end
         existing.speed = speed
         existing.originalSpeed = speed
-        if not existing.effect then
+        if existing.effect == nil or existing.effect == 0 then
             existing.effect = addSpeedEffect(u)
         end
         return
@@ -346,7 +417,7 @@ function ____exports.SOS_SetUnitSpeed(u, speed)
         lx = getUnitX(u),
         ly = getUnitY(u),
         lf = getUnitFacing(u),
-        tempTimer = nil,
+        tempTimer = 0,
         listIndex = #entryList,
         effect = addSpeedEffect(u)
     }
@@ -378,13 +449,13 @@ function ____exports.SOS_SetUnitSpeedTemp(u, speed, duration)
     end
     local savedOriginal = existing ~= nil and existing.originalSpeed or 0
     if existing ~= nil then
-        if existing.tempTimer then
-            jass.DestroyTimer(existing.tempTimer)
-            existing.tempTimer = nil
+        if existing.tempTimer > 0 then
+            cancelSpeedBreakTempTask(existing.tempTimer)
+            existing.tempTimer = 0
         end
         existing.speed = speed
         existing.originalSpeed = savedOriginal
-        if not existing.effect then
+        if existing.effect == nil or existing.effect == 0 then
             existing.effect = addSpeedEffect(u)
         end
     else
@@ -399,7 +470,7 @@ function ____exports.SOS_SetUnitSpeedTemp(u, speed, duration)
             lx = getUnitX(u),
             ly = getUnitY(u),
             lf = getUnitFacing(u),
-            tempTimer = nil,
+            tempTimer = 0,
             listIndex = #entryList,
             effect = addSpeedEffect(u)
         }
@@ -412,18 +483,7 @@ function ____exports.SOS_SetUnitSpeedTemp(u, speed, duration)
     if current == nil then
         return
     end
-    local tempT = jass.CreateTimer()
-    current.tempTimer = tempT
-    if tempT then
-        speedBreakTempTimerCtxByHid[hid(tempT)] = uid
-        safeTimerStart(
-            nil,
-            tempT,
-            duration,
-            false,
-            onSpeedBreakTempTimerExpire
-        )
-    end
+    current.tempTimer = scheduleSpeedBreakTempTask(uid, duration)
 end
 --- 获取单位当前突破移动速度
 -- 若单位不在系统中，返回引擎当前移动速度

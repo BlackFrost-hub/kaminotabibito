@@ -18,9 +18,10 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
@@ -29,9 +30,7 @@ const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事�
 const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   getItemDataEntry: (this: void, item: any) => any | null;
 };
-const { withTimer, stopTimer, createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  withTimer: (delaySec: number, callback: () => void) => any;
-  stopTimer: (t: any) => void;
+const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createTimedEffect: (modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
@@ -68,39 +67,32 @@ type ItemState = {
 const itemState = new Map<number, ItemState>();       // itemHandleId -> state
 const campfireItems = new Map<number, Set<number>>(); // campfireHandleId -> itemHandleId 集合
 
-const burnTimerCtxByHid: Record<number, { item: any; campfire: any }> = {};
-const cookTimerCtxByHid: Record<number, { item: any; campfire: any; timeoutSec: number; results: ResultOpt[] }> = {};
+const 物品加工计时检查间隔毫秒 = 10;
+const 物品加工任务ID列表: number[] = [];
+const 物品加工任务类型列表: ("burn" | "cook")[] = [];
+const 物品加工任务物品列表: any[] = [];
+const 物品加工任务篝火列表: any[] = [];
+const 物品加工任务超时秒列表: number[] = [];
+const 物品加工任务结果列表: ResultOpt[][] = [];
+const 物品加工任务到期毫秒列表: number[] = [];
+let 物品加工计时检查回调ID = 0;
+let 下一个物品加工任务ID = 0;
 
 function getHandleIdSafe(handle: any): number {
   if (!handle) return 0;
   return ((jass as any).GetHandleId(handle) as number) || 0;
 }
 
-function onBurnTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
-  if (!t) return;
-  const hid = (jass as any).GetHandleId(t) as number;
-  const ctx = burnTimerCtxByHid[hid];
-  delete burnTimerCtxByHid[hid];
-  if (!ctx) return;
-  const { item, campfire } = ctx;
+function 处理烤焦到期(this: void, item: any, campfire: any): void {
   const itemId = getHandleIdSafe(item);
   if (itemId === 0 || !itemState.has(itemId)) return;
   const name = getItemNameSafe(item);
   floatBurnText(campfire, name);
   (jass as any).RemoveItem(item);
   untrackItem(item);
-  safeDestroyTimer(t);
 }
 
-function onCookTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
-  if (!t) return;
-  const hid = (jass as any).GetHandleId(t) as number;
-  const ctx = cookTimerCtxByHid[hid];
-  delete cookTimerCtxByHid[hid];
-  if (!ctx) return;
-  const { item, campfire, timeoutSec, results } = ctx;
+function 处理加工到期(this: void, item: any, campfire: any, timeoutSec: number, results: ResultOpt[]): void {
   const itemId = getHandleIdSafe(item);
   if (itemId === 0 || !itemState.has(itemId)) return;
   // 加工完成：替换物品
@@ -292,10 +284,97 @@ function tryGiveItemToCampfire(campfire: any, item: any): boolean {
   return !!(jass as any).UnitAddItem(campfire, item);
 }
 
-function stopAndDestroyTimer(t: any): void {
+function 停止物品加工计时检查(this: void): void {
+  if (物品加工计时检查回调ID <= 0) return;
+  removePeriodicCallback(物品加工计时检查回调ID);
+  物品加工计时检查回调ID = 0;
+}
+
+function 确保物品加工计时检查(this: void): void {
+  if (物品加工计时检查回调ID > 0) return;
+  物品加工计时检查回调ID = addPeriodicCallback(物品加工计时检查间隔毫秒, on物品加工计时检查);
+}
+
+function 取消物品加工任务(this: void, taskId: number): void {
+  if (!(taskId > 0)) return;
+  for (let i = 0; i < 物品加工任务ID列表.length; i++) {
+    if (物品加工任务ID列表[i] === taskId) {
+      物品加工任务ID列表[i] = 0;
+      return;
+    }
+  }
+}
+
+function 取消物品加工任务引用(t: any): void {
   if (!t) return;
-  stopTimer(t);
-  (jass as any).DestroyTimer(t);
+  取消物品加工任务(t as number);
+}
+
+function 安排物品加工任务(
+  this: void,
+  类型: "burn" | "cook",
+  item: any,
+  campfire: any,
+  delaySec: number,
+  timeoutSec: number,
+  results: ResultOpt[],
+): number {
+  下一个物品加工任务ID += 1;
+  物品加工任务ID列表.push(下一个物品加工任务ID);
+  物品加工任务类型列表.push(类型);
+  物品加工任务物品列表.push(item);
+  物品加工任务篝火列表.push(campfire);
+  物品加工任务超时秒列表.push(timeoutSec);
+  物品加工任务结果列表.push(results);
+  物品加工任务到期毫秒列表.push(getServerTime() + delaySec * 1000);
+  确保物品加工计时检查();
+  return 下一个物品加工任务ID;
+}
+
+function on物品加工计时检查(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 物品加工任务ID列表.length; i++) {
+    const taskId = 物品加工任务ID列表[i];
+    if (!(taskId > 0)) {
+      continue;
+    }
+    if (now >= 物品加工任务到期毫秒列表[i]) {
+      if (物品加工任务类型列表[i] === "burn") {
+        处理烤焦到期(物品加工任务物品列表[i], 物品加工任务篝火列表[i]);
+      } else {
+        处理加工到期(
+          物品加工任务物品列表[i],
+          物品加工任务篝火列表[i],
+          物品加工任务超时秒列表[i],
+          物品加工任务结果列表[i],
+        );
+      }
+    } else {
+      物品加工任务ID列表[writeIndex] = taskId;
+      物品加工任务类型列表[writeIndex] = 物品加工任务类型列表[i];
+      物品加工任务物品列表[writeIndex] = 物品加工任务物品列表[i];
+      物品加工任务篝火列表[writeIndex] = 物品加工任务篝火列表[i];
+      物品加工任务超时秒列表[writeIndex] = 物品加工任务超时秒列表[i];
+      物品加工任务结果列表[writeIndex] = 物品加工任务结果列表[i];
+      物品加工任务到期毫秒列表[writeIndex] = 物品加工任务到期毫秒列表[i];
+      writeIndex += 1;
+    }
+  }
+
+  for (let i = 物品加工任务ID列表.length - 1; i >= writeIndex; i--) {
+    物品加工任务ID列表.pop();
+    物品加工任务类型列表.pop();
+    物品加工任务物品列表.pop();
+    物品加工任务篝火列表.pop();
+    物品加工任务超时秒列表.pop();
+    物品加工任务结果列表.pop();
+    物品加工任务到期毫秒列表.pop();
+  }
+
+  if (物品加工任务ID列表.length <= 0) {
+    停止物品加工计时检查();
+  }
 }
 
 function untrackItem(item: any): void {
@@ -303,8 +382,8 @@ function untrackItem(item: any): void {
   if (itemId === 0) return;
   const st = itemState.get(itemId);
   if (!st) return;
-  if (st.cookTimer) stopAndDestroyTimer(st.cookTimer);
-  if (st.burnTimer) stopAndDestroyTimer(st.burnTimer);
+  if (st.cookTimer) 取消物品加工任务引用(st.cookTimer);
+  if (st.burnTimer) 取消物品加工任务引用(st.burnTimer);
   itemState.delete(itemId);
 
   const campfireId = getHandleIdSafe(st.campfire);
@@ -317,25 +396,14 @@ function untrackItem(item: any): void {
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
   const st = itemState.get(getHandleIdSafe(item));
-  const t = (jass as any).CreateTimer();
-  if (!t) return;
-  burnTimerCtxByHid[(jass as any).GetHandleId(t) as number] = { item, campfire };
-  safeTimerStart(t, sec, false, onBurnTimerExpire);
-  if (st) st.burnTimer = t;
+  const taskId = 安排物品加工任务("burn", item, campfire, sec, 0, []);
+  if (st) st.burnTimer = taskId;
 }
 
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
-  const t = (jass as any).CreateTimer();
-  if (!t) return;
   const st = itemState.get(getHandleIdSafe(item));
-  if (st) st.cookTimer = t;
-  cookTimerCtxByHid[(jass as any).GetHandleId(t) as number] = {
-    item,
-    campfire,
-    timeoutSec: recipe.timeoutSec,
-    results: recipe.results,
-  };
-  safeTimerStart(t, recipe.cookSec, false, onCookTimerExpire);
+  const taskId = 安排物品加工任务("cook", item, campfire, recipe.cookSec, recipe.timeoutSec, recipe.results);
+  if (st) st.cookTimer = taskId;
 }
 
 function onAnyPickup(): void {

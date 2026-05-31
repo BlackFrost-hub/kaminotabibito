@@ -17,9 +17,10 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
@@ -35,19 +36,15 @@ import {
   英雄目标点指令音效单位字段,
   英雄被选择音效单位字段,
   英雄正在语音单位字段,
-  英雄指令音效定时器字段,
-  英雄指令音效定时器键字段,
 } from "./00．配置";
 
 type 取注册英雄函数 = (this: void, whichPlayer: any) => any | null;
 
 const GetTriggerUnit = jass.GetTriggerUnit as () => any;
 const GetTriggerPlayer = jass.GetTriggerPlayer as () => any;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: number) => boolean;
-const CreateTimer = jass.CreateTimer as () => any;
 
 const EventUnitSelected = jass.EVENT_UNIT_SELECTED as number;
 const EventUnitIssuedPointOrder = jass.EVENT_UNIT_ISSUED_POINT_ORDER as number;
@@ -56,6 +53,11 @@ const EventUnitTargetInRange = jass.EVENT_UNIT_TARGET_IN_RANGE as number;
 let 英雄指令音效系统已初始化 = false;
 let 取注册英雄缓存: 取注册英雄函数 | null = null;
 const 已注册英雄单位ID = new Set<number>();
+const 指令音效冷却检查间隔毫秒 = 100;
+let 指令音效冷却检查回调ID = 0;
+const 指令音效冷却单位列表: any[] = [];
+const 指令音效冷却字段列表: string[] = [];
+const 指令音效冷却到期毫秒列表: number[] = [];
 
 function 取注册英雄(this: void, whichPlayer: any): any | null {
   if (取注册英雄缓存 == null) {
@@ -121,22 +123,45 @@ function 本地播放(this: void, soundHandle: any): void {
 }
 
 function 冷却结束(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const unit = YDUserDataGetSafe("timer", timer, 英雄指令音效定时器字段, "unit");
-  const key = YDUserDataGetSafe("timer", timer, 英雄指令音效定时器键字段, "string");
-  if (unit != null && unit !== 0 && key !== "") {
-    YDUserDataSetSafe("unit", unit, String(key), "boolean", false);
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 指令音效冷却单位列表.length; i++) {
+    const unit = 指令音效冷却单位列表[i];
+    const key = 指令音效冷却字段列表[i];
+    const dueMs = 指令音效冷却到期毫秒列表[i];
+    if (now >= dueMs) {
+      if (unit != null && unit !== 0 && key !== "") {
+        YDUserDataSetSafe("unit", unit, key, "boolean", false);
+      }
+    } else {
+      指令音效冷却单位列表[writeIndex] = unit;
+      指令音效冷却字段列表[writeIndex] = key;
+      指令音效冷却到期毫秒列表[writeIndex] = dueMs;
+      writeIndex++;
+    }
   }
-  safeDestroyTimer(timer);
+  for (let i = 指令音效冷却单位列表.length - 1; i >= writeIndex; i--) {
+    指令音效冷却单位列表.pop();
+    指令音效冷却字段列表.pop();
+    指令音效冷却到期毫秒列表.pop();
+  }
+  if (指令音效冷却单位列表.length === 0 && 指令音效冷却检查回调ID !== 0) {
+    removePeriodicCallback(指令音效冷却检查回调ID);
+    指令音效冷却检查回调ID = 0;
+  }
+}
+
+function 启动指令音效冷却检查(this: void): void {
+  if (指令音效冷却检查回调ID !== 0) return;
+  指令音效冷却检查回调ID = addPeriodicCallback(指令音效冷却检查间隔毫秒, 冷却结束);
 }
 
 function 记录并开始冷却(this: void, unit: any, key: string, timeout: number): void {
   YDUserDataSetSafe("unit", unit, key, "boolean", true);
-  const timer = CreateTimer();
-  YDUserDataSetSafe("timer", timer, 英雄指令音效定时器字段, "unit", unit);
-  YDUserDataSetSafe("timer", timer, 英雄指令音效定时器键字段, "string", key);
-  safeTimerStart(timer, timeout, false, 冷却结束);
+  指令音效冷却单位列表.push(unit);
+  指令音效冷却字段列表.push(key);
+  指令音效冷却到期毫秒列表.push(getServerTime() + timeout * 1000);
+  启动指令音效冷却检查();
 }
 
 function 取事件冷却(this: void, eventId: number): number {

@@ -14,16 +14,13 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitCurrentOrder = jass.GetUnitCurrentOrder as (unit: any) => number;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const CreateTimer = jass.CreateTimer as () => any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const PlaySoundBJ = jass.PlaySoundBJ as (soundHandle: any) => void;
 const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (soundHandle: any, volumePercent: number, whichUnit: any) => void;
@@ -41,9 +38,9 @@ const {
 };
 
 const 冷却单位字段 = "使用物品语音";
-const 冷却计时器字段 = "物品使用音效单位";
 
 let 英雄使用物品音效已初始化 = false;
+const 物品使用音效冷却结束单位队列: any[] = [];
 
 function isUseItemOrder(orderId: number): boolean {
   return orderId >= 英雄使用物品命令最小 && orderId <= 英雄使用物品命令最大;
@@ -65,13 +62,10 @@ function 取播放音效(soundList: any[]): any {
 }
 
 function 物品使用音效冷却结束(): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const unit = YDUserDataGetSafe("timer", timer, 冷却计时器字段, "unit");
+  const unit = 物品使用音效冷却结束单位队列.shift();
   if (unit != null && unit !== 0) {
     YDUserDataSetSafe("unit", unit, 冷却单位字段, "boolean", false);
   }
-  safeDestroyTimer(timer);
 }
 
 function 播放物品使用音效(unit: any, config: { 英雄名: string; 是否3D: boolean; 音效列表: any[] }): void {
@@ -100,9 +94,8 @@ function 处理物品使用音效(unit: any, item: any): void {
   播放物品使用音效(unit, config);
   YDUserDataSetSafe("unit", unit, 冷却单位字段, "boolean", true);
 
-  const timer = CreateTimer();
-  YDUserDataSetSafe("timer", timer, 冷却计时器字段, "unit", unit);
-  safeTimerStart(timer, 英雄使用物品音效冷却, false, 物品使用音效冷却结束);
+  物品使用音效冷却结束单位队列.push(unit);
+  addDelayedCallback(英雄使用物品音效冷却 * 1000, 物品使用音效冷却结束);
 }
 
 export function init英雄使用物品音效(this: void): void {

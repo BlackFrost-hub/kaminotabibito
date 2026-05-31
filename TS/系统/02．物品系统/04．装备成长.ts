@@ -7,9 +7,10 @@
  */
 const jass = require("jass.common") as JassCommon;
 const GetItemTypeId = (jass as any).GetItemTypeId as (this: void, item: any) => number;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { round } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   round: (this: void, value: number) => number;
@@ -287,12 +288,7 @@ function executeSegment(unit: any, seg: Segment): void {
     if (seg.timeSec > 0) {
       const capturedStats: { name: string; key: string; value: number }[] = statEffects;
       const capturedUnit = unit;
-      const dt = (jass as any).CreateTimer();
-      if (dt) {
-        const t = dt;
-        equipStatReverseByTimerHid[(jass as any).GetHandleId(t) as number] = { unit: capturedUnit, stats: capturedStats };
-        safeTimerStart(t, seg.timeSec, false, onEquipStatReverseTimerExpire);
-      }
+      安排装备成长属性回退(capturedUnit, capturedStats, seg.timeSec);
     }
   }
 }
@@ -311,12 +307,7 @@ function onUseItem(): void {
   const key = "__EquipPowerUP_" + tostring(unit) + "_" + idStr;
   if (glob[key]) return;
   glob[key] = true;
-  const ct = (jass as any).CreateTimer();
-  if (ct) {
-    const t = ct;
-    equipDebounceKeyByTimerHid[(jass as any).GetHandleId(t) as number] = key;
-    safeTimerStart(t, 0.5, false, onEquipDebounceTimerExpire);
-  }
+  安排装备成长防抖清理(key, 0.5);
 
   const segments = parsePowerUP(entry.PowerUP);
   for (const seg of segments) {
@@ -326,32 +317,86 @@ function onUseItem(): void {
 
 const INIT_KEY = "__EquipPowerUPInited";
 
-const equipStatReverseByTimerHid: Record<number, { unit: any; stats: { name: string; key: string; value: number }[] }> = {};
+const 装备成长计时检查间隔毫秒 = 10;
+const 装备成长回退单位列表: any[] = [];
+const 装备成长回退属性列表: { name: string; key: string; value: number }[][] = [];
+const 装备成长回退到期毫秒列表: number[] = [];
+const 装备成长防抖键列表: string[] = [];
+const 装备成长防抖到期毫秒列表: number[] = [];
+let 装备成长计时检查回调ID = 0;
 
-function onEquipStatReverseTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
-  if (!t) return;
-  const hid = (jass as any).GetHandleId(t) as number;
-  const ctx = equipStatReverseByTimerHid[hid];
-  delete equipStatReverseByTimerHid[hid];
-  if (ctx !== undefined) {
-    applyStats(ctx.unit, ctx.stats, false);
-  }
-  safeDestroyTimer(t);
+function 停止装备成长计时检查(this: void): void {
+  if (装备成长计时检查回调ID <= 0) return;
+  removePeriodicCallback(装备成长计时检查回调ID);
+  装备成长计时检查回调ID = 0;
 }
 
-const equipDebounceKeyByTimerHid: Record<number, string> = {};
+function 确保装备成长计时检查(this: void): void {
+  if (装备成长计时检查回调ID > 0) return;
+  装备成长计时检查回调ID = addPeriodicCallback(装备成长计时检查间隔毫秒, on装备成长计时检查);
+}
 
-function onEquipDebounceTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
-  if (!t) return;
-  const hid = (jass as any).GetHandleId(t) as number;
-  const key = equipDebounceKeyByTimerHid[hid];
-  delete equipDebounceKeyByTimerHid[hid];
-  if (key !== undefined) {
-    (globalThis as any)[key] = undefined;
+function 安排装备成长属性回退(
+  this: void,
+  unit: any,
+  stats: { name: string; key: string; value: number }[],
+  delaySec: number,
+): void {
+  装备成长回退单位列表.push(unit);
+  装备成长回退属性列表.push(stats);
+  装备成长回退到期毫秒列表.push(getServerTime() + delaySec * 1000);
+  确保装备成长计时检查();
+}
+
+function 安排装备成长防抖清理(this: void, key: string, delaySec: number): void {
+  装备成长防抖键列表.push(key);
+  装备成长防抖到期毫秒列表.push(getServerTime() + delaySec * 1000);
+  确保装备成长计时检查();
+}
+
+function 处理装备成长属性回退到期(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 装备成长回退单位列表.length; i++) {
+    if (now >= 装备成长回退到期毫秒列表[i]) {
+      applyStats(装备成长回退单位列表[i], 装备成长回退属性列表[i], false);
+    } else {
+      装备成长回退单位列表[writeIndex] = 装备成长回退单位列表[i];
+      装备成长回退属性列表[writeIndex] = 装备成长回退属性列表[i];
+      装备成长回退到期毫秒列表[writeIndex] = 装备成长回退到期毫秒列表[i];
+      writeIndex += 1;
+    }
   }
-  safeDestroyTimer(t);
+  for (let i = 装备成长回退单位列表.length - 1; i >= writeIndex; i--) {
+    装备成长回退单位列表.pop();
+    装备成长回退属性列表.pop();
+    装备成长回退到期毫秒列表.pop();
+  }
+}
+
+function 处理装备成长防抖到期(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 装备成长防抖键列表.length; i++) {
+    if (now >= 装备成长防抖到期毫秒列表[i]) {
+      (globalThis as any)[装备成长防抖键列表[i]] = undefined;
+    } else {
+      装备成长防抖键列表[writeIndex] = 装备成长防抖键列表[i];
+      装备成长防抖到期毫秒列表[writeIndex] = 装备成长防抖到期毫秒列表[i];
+      writeIndex += 1;
+    }
+  }
+  for (let i = 装备成长防抖键列表.length - 1; i >= writeIndex; i--) {
+    装备成长防抖键列表.pop();
+    装备成长防抖到期毫秒列表.pop();
+  }
+}
+
+function on装备成长计时检查(this: void): void {
+  const now = getServerTime();
+  处理装备成长属性回退到期(now);
+  处理装备成长防抖到期(now);
+  if (装备成长回退单位列表.length <= 0 && 装备成长防抖键列表.length <= 0) {
+    停止装备成长计时检查();
+  }
 }
 
 function init(): void {

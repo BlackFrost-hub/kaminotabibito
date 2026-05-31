@@ -1,16 +1,105 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- 特效封装函数
--- 创建和管理特效
-local jass = require("jass.common")
+local destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, unitEffectMap
+function destroyBoundEffect(effect)
+    if not effect then
+        return
+    end
+    jass.DestroyEffect(effect)
+end
+function _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5()
+    if _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
+        return
+    end
+    removePeriodicCallback(_____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID)
+    _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
+end
+function _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5()
+    if _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID > 0 then
+        return
+    end
+    _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, ____on_7279_6548_9500_6BC1_68C0_67E5)
+end
+function _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(effect, duration)
+    _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[#_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868 + 1] = effect
+    _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[#_____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + duration * 1000
+    _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5()
+end
+function _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1(now)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868 do
+            local effect = _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[i + 1]
+            if now >= _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                if effect then
+                    jass.DestroyEffect(effect)
+                end
+            else
+                _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[writeIndex + 1] = effect
+                _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868)
+            table.remove(_____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+end
+function _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1(now)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868 do
+            local key = _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868[i + 1]
+            local effect = _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868[i + 1]
+            if now >= _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                local currentEffect = unitEffectMap:get(key)
+                if currentEffect == effect then
+                    destroyBoundEffect(effect)
+                    unitEffectMap:delete(key)
+                end
+            else
+                _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868[writeIndex + 1] = key
+                _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868[writeIndex + 1] = effect
+                _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868)
+            table.remove(_____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868)
+            table.remove(_____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+end
+function ____on_7279_6548_9500_6BC1_68C0_67E5()
+    local now = getServerTime()
+    _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1(now)
+    _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1(now)
+    if #_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868 <= 0 and #_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868 <= 0 then
+        _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5()
+    end
+end
+jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
-local effectDestroyCtxByTimerHid = {}
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -18,18 +107,13 @@ local DestroyEffect = jass.DestroyEffect
 local DzBindEffect = japi.DzBindEffect
 local DzUnbindEffect = japi.DzUnbindEffect
 local EXSetEffectSize = japi.EXSetEffectSize
-local function onTimedEffectTimerExpire()
-    local t = jass.GetExpiredTimer()
-    local eff = effectDestroyCtxByTimerHid[jass.GetHandleId(t)]
-    __TS__Delete(
-        effectDestroyCtxByTimerHid,
-        jass.GetHandleId(t)
-    )
-    if eff then
-        jass.DestroyEffect(eff)
-    end
-    safeDestroyTimer(nil, t)
-end
+_____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+_____5B9A_65F6_9500_6BC1_7279_6548_5217_8868 = {}
+_____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868 = {}
+_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868 = {}
+_____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868 = {}
+_____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868 = {}
+_____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
 --- 创建特效并在指定时间后自动销毁
 -- 
 -- @param modelPath 特效模型路径
@@ -52,20 +136,10 @@ function ____exports.createTimedEffect(modelPath, x, y, z, duration)
     if z ~= 0 then
         japi.EXSetEffectZ(eff, z)
     end
-    local t = jass.CreateTimer()
-    if t then
-        effectDestroyCtxByTimerHid[jass.GetHandleId(t)] = eff
-        safeTimerStart(
-            nil,
-            t,
-            duration,
-            false,
-            onTimedEffectTimerExpire
-        )
-    end
+    _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(eff, duration)
     return eff
 end
-local unitEffectMap = __TS__New(Map)
+unitEffectMap = __TS__New(Map)
 local function getUnitEffectHandleId(unit)
     if not unit then
         return 0
@@ -79,29 +153,11 @@ local function getUnitEffectKey(unit, effectKey)
     end
     return (tostring(handleId) .. ":") .. effectKey
 end
-local function destroyBoundEffect(effect)
-    if not effect then
-        return
-    end
-    jass.DestroyEffect(effect)
-end
-local boundEffectCtxByTimerHid = {}
-local function onBoundEffectTimerExpire()
-    local t = jass.GetExpiredTimer()
-    local ctx = boundEffectCtxByTimerHid[jass.GetHandleId(t)]
-    __TS__Delete(
-        boundEffectCtxByTimerHid,
-        jass.GetHandleId(t)
-    )
-    if not ctx then
-        return
-    end
-    local currentEffect = unitEffectMap:get(ctx.key)
-    if currentEffect == ctx.effect then
-        destroyBoundEffect(ctx.effect)
-        unitEffectMap:delete(ctx.key)
-    end
-    safeDestroyTimer(nil, t)
+local function _____5B89_6392_7ED1_5B9A_7279_6548_9500_6BC1_68C0_67E5(key, effect, duration)
+    _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868[#_____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868 + 1] = key
+    _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868[#_____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868 + 1] = effect
+    _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868[#_____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + duration * 1000
+    _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5()
 end
 --- 在单位上创建绑定特效
 -- 
@@ -131,17 +187,7 @@ function ____exports.createUnitEffect(unit, attachPoint, modelPath, duration, ef
     end
     unitEffectMap:set(key, effect)
     if duration ~= nil and duration > 0 then
-        local t = jass.CreateTimer()
-        if t then
-            boundEffectCtxByTimerHid[jass.GetHandleId(t)] = {key = key, effect = effect}
-            safeTimerStart(
-                nil,
-                t,
-                duration,
-                false,
-                onBoundEffectTimerExpire
-            )
-        end
+        _____5B89_6392_7ED1_5B9A_7279_6548_9500_6BC1_68C0_67E5(key, effect, duration)
     end
     return effect
 end

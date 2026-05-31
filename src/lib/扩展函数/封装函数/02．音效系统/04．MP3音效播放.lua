@@ -1,6 +1,6 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local stopSoundDestroyFallbackCheck, onSoundDestroyFallbackCheck, jass, removePeriodicCallback, getServerTime, soundDestroyFallbackSounds, soundDestroyFallbackDueMs, soundDestroyFallbackCallbackId
 local ____02_FF0E_97F3_6548_6C60 = require("lib.扩展函数.封装函数.02．音效系统.02．音效池")
 local createSoundInternal = ____02_FF0E_97F3_6548_6C60.createSoundInternal
 local getSoundInternal = ____02_FF0E_97F3_6548_6C60.getSoundInternal
@@ -11,61 +11,69 @@ local POOL_MAX = ____02_FF0E_97F3_6548_6C60.POOL_MAX
 local hash = ____02_FF0E_97F3_6548_6C60.hash
 local ____03_FF0E3D_97F3_6548_64AD_653E = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local lastPlayedSound = ____03_FF0E3D_97F3_6548_64AD_653E.lastPlayedSound
---- MP3音效播放
--- 播放MP3音效（可指定玩家）
-local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+function stopSoundDestroyFallbackCheck()
+    if soundDestroyFallbackCallbackId <= 0 then
+        return
+    end
+    removePeriodicCallback(soundDestroyFallbackCallbackId)
+    soundDestroyFallbackCallbackId = 0
+end
+function onSoundDestroyFallbackCheck()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #soundDestroyFallbackSounds do
+            local sound = soundDestroyFallbackSounds[i + 1]
+            if now >= soundDestroyFallbackDueMs[i + 1] then
+                jass.DestroySound(sound)
+            else
+                soundDestroyFallbackSounds[writeIndex + 1] = sound
+                soundDestroyFallbackDueMs[writeIndex + 1] = soundDestroyFallbackDueMs[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #soundDestroyFallbackSounds - 1
+        while i >= writeIndex do
+            table.remove(soundDestroyFallbackSounds)
+            table.remove(soundDestroyFallbackDueMs)
+            i = i - 1
+        end
+    end
+    if #soundDestroyFallbackSounds <= 0 then
+        stopSoundDestroyFallbackCheck()
+    end
+end
+jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_1.debugLog
 local setDebug = ____require_result_1.setDebug
 setDebug(nil, "Sound3DII", false)
-local soundDestroyFallbackByTimerHid = {}
-local function onSoundDestroyFallbackTimerExpire()
-    local expired = jass.GetExpiredTimer()
-    local hid = jass.GetHandleId(expired)
-    local sound = soundDestroyFallbackByTimerHid[hid]
-    __TS__Delete(soundDestroyFallbackByTimerHid, hid)
-    jass.DestroySound(sound)
-    local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-    if Leak and Leak.LeakWatcher and type(Leak.LeakWatcher.destroyTimer) == "function" then
-        Leak.LeakWatcher:destroyTimer(expired)
-    else
-        safeDestroyTimer(nil, expired)
+local soundDestroyFallbackIntervalMs = 10
+soundDestroyFallbackSounds = {}
+soundDestroyFallbackDueMs = {}
+soundDestroyFallbackCallbackId = 0
+local function ensureSoundDestroyFallbackCheck()
+    if soundDestroyFallbackCallbackId > 0 then
+        return
     end
+    soundDestroyFallbackCallbackId = addPeriodicCallback(soundDestroyFallbackIntervalMs, onSoundDestroyFallbackCheck)
 end
 --- 无 KillSoundWhenDone 时的兜底：定时 DestroySound，避免 CreateSound 句柄堆积
 local function scheduleDestroySoundIfNeeded(sound)
     if not sound then
         return
     end
-    local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-    local ____temp_2
-    if Leak and Leak.LeakWatcher then
-        ____temp_2 = Leak.LeakWatcher
-    else
-        ____temp_2 = nil
-    end
-    local LW = ____temp_2
-    local ____temp_3
-    if LW and type(LW.createTimer) == "function" then
-        ____temp_3 = LW:createTimer("sound_ui_fallback_destroy")
-    else
-        ____temp_3 = jass.CreateTimer()
-    end
-    local t = ____temp_3
-    if not t then
-        return
-    end
-    soundDestroyFallbackByTimerHid[jass.GetHandleId(t)] = sound
-    safeTimerStart(
-        nil,
-        t,
-        0.55,
-        false,
-        onSoundDestroyFallbackTimerExpire
-    )
+    soundDestroyFallbackSounds[#soundDestroyFallbackSounds + 1] = sound
+    soundDestroyFallbackDueMs[#soundDestroyFallbackDueMs + 1] = getServerTime() + 550
+    ensureSoundDestroyFallbackCheck()
 end
 --- 播放MP3音效（可指定玩家）
 -- 
@@ -82,13 +90,13 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
     end
     do
         local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-        local ____temp_4
+        local ____temp_2
         if Leak and Leak.LeakWatcher then
-            ____temp_4 = Leak.LeakWatcher
+            ____temp_2 = Leak.LeakWatcher
         else
-            ____temp_4 = nil
+            ____temp_2 = nil
         end
-        local LW = ____temp_4
+        local LW = ____temp_2
         local trackedByLeak = false
         local s = nil
         if LW and type(LW.createSound) == "function" then

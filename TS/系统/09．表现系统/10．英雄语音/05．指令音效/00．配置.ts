@@ -195,5 +195,3 @@ export const 英雄指令音效单位字段 = "指令语音";
 export const 英雄目标点指令音效单位字段 = "目标点指令语音";
 export const 英雄被选择音效单位字段 = "被选择语音";
 export const 英雄正在语音单位字段 = "正在语音";
-export const 英雄指令音效定时器字段 = "英雄指令音效单位";
-export const 英雄指令音效定时器键字段 = "英雄指令音效键";

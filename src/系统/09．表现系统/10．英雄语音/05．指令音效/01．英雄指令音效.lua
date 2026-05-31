@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____53D6_6CE8_518C_82F1_96C4, _____662F_6CE8_518C_73A9_5BB6_82F1_96C4_5355_4F4D, _____53D6_82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E, _____53D6_968F_673A_97F3_6548, _____53D6_5F53_524D_4E8B_4EF6_97F3_6548, _____672C_5730_64AD_653E, _____51B7_5374_7ED3_675F, _____8BB0_5F55_5E76_5F00_59CB_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374_5B57_6BB5, _____5904_7406_6307_5B9A_4E8B_4EF6_6307_4EE4_97F3_6548, jass, _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0, YDUserDataGetSafe, YDUserDataSetSafe, safeTimerStart, safeDestroyTimer, PlaySoundBJ, GetTriggerPlayer, GetExpiredTimer, GetOwningPlayer, GetRandomInt, IsUnitType, CreateTimer, EventUnitSelected, EventUnitIssuedPointOrder, EventUnitTargetInRange, _____53D6_6CE8_518C_82F1_96C4_7F13_5B58
+local _____53D6_6CE8_518C_82F1_96C4, _____662F_6CE8_518C_73A9_5BB6_82F1_96C4_5355_4F4D, _____53D6_82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E, _____53D6_968F_673A_97F3_6548, _____53D6_5F53_524D_4E8B_4EF6_97F3_6548, _____672C_5730_64AD_653E, _____51B7_5374_7ED3_675F, _____542F_52A8_6307_4EE4_97F3_6548_51B7_5374_68C0_67E5, _____8BB0_5F55_5E76_5F00_59CB_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374_5B57_6BB5, _____5904_7406_6307_5B9A_4E8B_4EF6_6307_4EE4_97F3_6548, jass, _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0, YDUserDataGetSafe, YDUserDataSetSafe, addPeriodicCallback, removePeriodicCallback, getServerTime, PlaySoundBJ, GetTriggerPlayer, GetOwningPlayer, GetRandomInt, IsUnitType, EventUnitSelected, EventUnitIssuedPointOrder, EventUnitTargetInRange, _____53D6_6CE8_518C_82F1_96C4_7F13_5B58, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_95F4_9694_6BEB_79D2, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID, _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868
 local ____00_FF0E_914D_7F6E = require("系统.09．表现系统.10．英雄语音.05．指令音效.00．配置")
 local _____82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E_5217_8868 = ____00_FF0E_914D_7F6E["英雄指令音效配置列表"]
 local _____82F1_96C4_6307_4EE4_97F3_6548_653B_51FB_51B7_5374 = ____00_FF0E_914D_7F6E["英雄指令音效攻击冷却"]
@@ -13,8 +13,6 @@ local _____82F1_96C4_6307_4EE4_97F3_6548_5355_4F4D_5B57_6BB5 = ____00_FF0E_914D_
 local _____82F1_96C4_76EE_6807_70B9_6307_4EE4_97F3_6548_5355_4F4D_5B57_6BB5 = ____00_FF0E_914D_7F6E["英雄目标点指令音效单位字段"]
 local _____82F1_96C4_88AB_9009_62E9_97F3_6548_5355_4F4D_5B57_6BB5 = ____00_FF0E_914D_7F6E["英雄被选择音效单位字段"]
 local _____82F1_96C4_6B63_5728_8BED_97F3_5355_4F4D_5B57_6BB5 = ____00_FF0E_914D_7F6E["英雄正在语音单位字段"]
-local _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_5B57_6BB5 = ____00_FF0E_914D_7F6E["英雄指令音效定时器字段"]
-local _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_952E_5B57_6BB5 = ____00_FF0E_914D_7F6E["英雄指令音效定时器键字段"]
 function _____53D6_6CE8_518C_82F1_96C4(whichPlayer)
     if _____53D6_6CE8_518C_82F1_96C4_7F13_5B58 == nil then
         local bridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
@@ -100,22 +98,52 @@ function _____672C_5730_64AD_653E(soundHandle)
     PlaySoundBJ(soundHandle)
 end
 function _____51B7_5374_7ED3_675F()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868 do
+            local unit = _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868[i + 1]
+            local key = _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868[i + 1]
+            local dueMs = _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868[i + 1]
+            if now >= dueMs then
+                if unit ~= nil and unit ~= 0 and key ~= "" then
+                    YDUserDataSetSafe(
+                        "unit",
+                        unit,
+                        key,
+                        "boolean",
+                        false
+                    )
+                end
+            else
+                _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868[writeIndex + 1] = unit
+                _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868[writeIndex + 1] = key
+                _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = dueMs
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868)
+            table.remove(_____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868)
+            table.remove(_____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+    if #_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868 == 0 and _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID ~= 0 then
+        removePeriodicCallback(_____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID)
+        _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID = 0
+    end
+end
+function _____542F_52A8_6307_4EE4_97F3_6548_51B7_5374_68C0_67E5()
+    if _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID ~= 0 then
         return
     end
-    local unit = YDUserDataGetSafe("timer", timer, _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_5B57_6BB5, "unit")
-    local key = YDUserDataGetSafe("timer", timer, _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_952E_5B57_6BB5, "string")
-    if unit ~= nil and unit ~= 0 and key ~= "" then
-        YDUserDataSetSafe(
-            "unit",
-            unit,
-            tostring(key),
-            "boolean",
-            false
-        )
-    end
-    safeDestroyTimer(timer)
+    _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_95F4_9694_6BEB_79D2, _____51B7_5374_7ED3_675F)
 end
 function _____8BB0_5F55_5E76_5F00_59CB_51B7_5374(unit, key, timeout)
     YDUserDataSetSafe(
@@ -125,22 +153,10 @@ function _____8BB0_5F55_5E76_5F00_59CB_51B7_5374(unit, key, timeout)
         "boolean",
         true
     )
-    local timer = CreateTimer()
-    YDUserDataSetSafe(
-        "timer",
-        timer,
-        _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_5B57_6BB5,
-        "unit",
-        unit
-    )
-    YDUserDataSetSafe(
-        "timer",
-        timer,
-        _____82F1_96C4_6307_4EE4_97F3_6548_5B9A_65F6_5668_952E_5B57_6BB5,
-        "string",
-        key
-    )
-    safeTimerStart(timer, timeout, false, _____51B7_5374_7ED3_675F)
+    _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868[#_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868 + 1] = unit
+    _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868[#_____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868 + 1] = key
+    _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868[#_____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + timeout * 1000
+    _____542F_52A8_6307_4EE4_97F3_6548_51B7_5374_68C0_67E5()
 end
 function _____53D6_4E8B_4EF6_51B7_5374(eventId)
     if eventId == EventUnitTargetInRange then
@@ -201,24 +217,28 @@ _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____require_r
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
-local ____require_result_5 = require("系统.00．核心系统.07．联机安全工具")
-safeTimerStart = ____require_result_5.safeTimerStart
-safeDestroyTimer = ____require_result_5.safeDestroyTimer
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_5.addPeriodicCallback
+removePeriodicCallback = ____require_result_5.removePeriodicCallback
+getServerTime = ____require_result_5.getServerTime
 local ____require_result_6 = require("lib.扩展函数.BJ函数.14．音效函数")
 PlaySoundBJ = ____require_result_6.PlaySoundBJ
 local GetTriggerUnit = jass.GetTriggerUnit
 GetTriggerPlayer = jass.GetTriggerPlayer
-GetExpiredTimer = jass.GetExpiredTimer
 GetOwningPlayer = jass.GetOwningPlayer
 GetRandomInt = jass.GetRandomInt
 IsUnitType = jass.IsUnitType
-CreateTimer = jass.CreateTimer
 EventUnitSelected = jass.EVENT_UNIT_SELECTED
 EventUnitIssuedPointOrder = jass.EVENT_UNIT_ISSUED_POINT_ORDER
 EventUnitTargetInRange = jass.EVENT_UNIT_TARGET_IN_RANGE
 local _____82F1_96C4_6307_4EE4_97F3_6548_7CFB_7EDF_5DF2_521D_59CB_5316 = false
 _____53D6_6CE8_518C_82F1_96C4_7F13_5B58 = nil
 local _____5DF2_6CE8_518C_82F1_96C4_5355_4F4DID = __TS__New(Set)
+_____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_95F4_9694_6BEB_79D2 = 100
+_____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID = 0
+_____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868 = {}
+_____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868 = {}
+_____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868 = {}
 local function _____83B7_53D6_5355_4F4D_54C8_5E0C(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -265,15 +285,15 @@ local function _____626B_63CF_5DF2_6CE8_518C_82F1_96C4()
             do
                 local player = jass.Player(i)
                 if player == nil or player == 0 then
-                    goto __continue57
+                    goto __continue65
                 end
                 local hero = _____53D6_6CE8_518C_82F1_96C4(player)
                 if hero == nil or hero == 0 then
-                    goto __continue57
+                    goto __continue65
                 end
                 _____6CE8_518C_82F1_96C4_6307_4EE4_4E8B_4EF6(hero)
             end
-            ::__continue57::
+            ::__continue65::
             i = i + 1
         end
     end

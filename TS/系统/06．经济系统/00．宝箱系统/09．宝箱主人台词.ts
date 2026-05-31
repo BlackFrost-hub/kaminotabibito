@@ -2,10 +2,6 @@
 
 const jass = require("jass.common") as any;
 
-const CreateTimer = jass.CreateTimer as () => any;
-const DestroyTimer = jass.DestroyTimer as (whichTimer: any) => void;
-const TimerStart = jass.TimerStart as (whichTimer: any, timeout: number, periodic: boolean, handlerFunc: () => void) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
 const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
@@ -24,6 +20,11 @@ const { 广播宝箱主人提示, 广播单位类型提示 } = require("系统.0
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
+};
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 type 阶段 = "prepare" | "complete";
@@ -51,7 +52,10 @@ const 宝箱台词配置 = new Map<string, 台词配置>([
 ]);
 
 const 冷却表 = new Map<string, boolean>();
-const 计时器键表 = new Map<number, string>();
+const 冷却检查间隔毫秒 = 100;
+let 冷却检查回调ID = 0;
+const 冷却键列表: string[] = [];
+const 冷却到期毫秒列表: number[] = [];
 
 function 构造冷却键(this: void, 阶段名: 阶段, 开启者: any, 主人单位: any, 宝箱配置: any): string {
   const openerId = 开启者 ? GetHandleId(开启者) : 0;
@@ -77,14 +81,39 @@ function 替换台词变量(this: void, 模板: string, 开启者: any): string 
 }
 
 function 冷却结束回调(this: void): void {
-  const timer = GetExpiredTimer();
-  const timerId = GetHandleId(timer);
-  const key = 计时器键表.get(timerId);
-  if (key != null) {
-    冷却表.delete(key);
-    计时器键表.delete(timerId);
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 冷却键列表.length; i++) {
+    const key = 冷却键列表[i];
+    const dueMs = 冷却到期毫秒列表[i];
+    if (now >= dueMs) {
+      冷却表.delete(key);
+    } else {
+      冷却键列表[writeIndex] = key;
+      冷却到期毫秒列表[writeIndex] = dueMs;
+      writeIndex++;
+    }
   }
-  DestroyTimer(timer);
+  for (let i = 冷却键列表.length - 1; i >= writeIndex; i--) {
+    冷却键列表.pop();
+    冷却到期毫秒列表.pop();
+  }
+  if (冷却键列表.length === 0 && 冷却检查回调ID !== 0) {
+    removePeriodicCallback(冷却检查回调ID);
+    冷却检查回调ID = 0;
+  }
+}
+
+function 启动冷却检查(this: void): void {
+  if (冷却检查回调ID !== 0) return;
+  冷却检查回调ID = addPeriodicCallback(冷却检查间隔毫秒, 冷却结束回调);
+}
+
+function 记录冷却(this: void, key: string, cooldownSeconds: number): void {
+  冷却表.set(key, true);
+  冷却键列表.push(key);
+  冷却到期毫秒列表.push(getServerTime() + cooldownSeconds * 1000);
+  启动冷却检查();
 }
 
 function 尝试广播主人台词(this: void, 阶段名: 阶段, 开启者: any, 宝箱配置: any, 主人单位?: any): void {
@@ -117,11 +146,7 @@ function 尝试广播主人台词(this: void, 阶段名: 阶段, 开启者: any,
     return;
   }
 
-  冷却表.set(key, true);
-  const timer = CreateTimer();
-  const timerId = GetHandleId(timer);
-  计时器键表.set(timerId, key);
-  TimerStart(timer, 配置.冷却秒数, false, 冷却结束回调);
+  记录冷却(key, 配置.冷却秒数);
 }
 
 function onChestPrepare(this: void, unit: any, _target: any, _progressBar: any, _openTime: number, chestConfig: any, ownerUnit?: any): void {

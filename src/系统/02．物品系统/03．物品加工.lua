@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
-local __TS__Delete = ____lualib.__TS__Delete
 local Set = ____lualib.Set
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
@@ -10,26 +9,14 @@ local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
 local ____exports = {}
-local getHandleIdSafe, onBurnTimerExpire, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, stopAndDestroyTimer, untrackItem, startBurnTimer, jass, safeTimerStart, safeDestroyTimer, stopTimer, createTimedEffect, CreateFloatTextAtPoint, _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C, EFFECT_FIREBOMB, itemState, campfireItems, burnTimerCtxByHid
+local getHandleIdSafe, _____5904_7406_70E4_7126_5230_671F, _____5904_7406_52A0_5DE5_5230_671F, getItemNameSafe, getItemChargesSafe, setItemChargesSafe, getUnitXY, floatBurnText, playFinishEffect, pickResult, createItemAtCampfire, tryGiveItemToCampfire, _____505C_6B62_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5, _____786E_4FDD_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5, _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1, _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1_5F15_7528, _____5B89_6392_7269_54C1_52A0_5DE5_4EFB_52A1, ____on_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5, untrackItem, startBurnTimer, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, createTimedEffect, CreateFloatTextAtPoint, _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C, EFFECT_FIREBOMB, itemState, campfireItems, _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2, _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868, _____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868, _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID, _____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID
 function getHandleIdSafe(handle)
     if not handle then
         return 0
     end
     return jass.GetHandleId(handle) or 0
 end
-function onBurnTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
-        return
-    end
-    local hid = jass.GetHandleId(t)
-    local ctx = burnTimerCtxByHid[hid]
-    __TS__Delete(burnTimerCtxByHid, hid)
-    if not ctx then
-        return
-    end
-    local item = ctx.item
-    local campfire = ctx.campfire
+function _____5904_7406_70E4_7126_5230_671F(item, campfire)
     local itemId = getHandleIdSafe(item)
     if itemId == 0 or not itemState:has(itemId) then
         return
@@ -38,7 +25,49 @@ function onBurnTimerExpire()
     floatBurnText(campfire, name)
     jass.RemoveItem(item)
     untrackItem(item)
-    safeDestroyTimer(nil, t)
+end
+function _____5904_7406_52A0_5DE5_5230_671F(item, campfire, timeoutSec, results)
+    local itemId = getHandleIdSafe(item)
+    if itemId == 0 or not itemState:has(itemId) then
+        return
+    end
+    playFinishEffect(campfire)
+    local chosen = pickResult(results)
+    local inputCharges = getItemChargesSafe(item)
+    jass.RemoveItem(item)
+    untrackItem(item)
+    local timeout = timeoutSec > 0 and timeoutSec or 0
+    local remaining = chosen.qty * inputCharges
+    while remaining > 0 do
+        local it = createItemAtCampfire(campfire, chosen.itemId)
+        if not it then
+            break
+        end
+        setItemChargesSafe(it, remaining)
+        local ok = tryGiveItemToCampfire(campfire, it)
+        if not ok then
+            local roll = jass.GetRandomInt(1, 100)
+            if roll > 20 then
+                jass.RemoveItem(it)
+            end
+        else
+            local itemId = getHandleIdSafe(it)
+            local campfireId = getHandleIdSafe(campfire)
+            if itemId ~= 0 and campfireId ~= 0 then
+                itemState:set(itemId, {item = it, campfire = campfire, stage = "done"})
+                local set = campfireItems:get(campfireId)
+                if not set then
+                    set = __TS__New(Set)
+                    campfireItems:set(campfireId, set)
+                end
+                set:add(itemId)
+            end
+            if timeout > 0 then
+                startBurnTimer(it, campfire, timeout)
+            end
+        end
+        remaining = 0
+    end
 end
 function getItemNameSafe(item)
     return jass.GetItemName(item)
@@ -167,12 +196,100 @@ function tryGiveItemToCampfire(campfire, item)
     end
     return not not jass.UnitAddItem(campfire, item)
 end
-function stopAndDestroyTimer(t)
+function _____505C_6B62_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5()
+    if _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID <= 0 then
+        return
+    end
+    removePeriodicCallback(_____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID)
+    _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID = 0
+end
+function _____786E_4FDD_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5()
+    if _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID > 0 then
+        return
+    end
+    _____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2, ____on_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5)
+end
+function _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1(taskId)
+    if not (taskId > 0) then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 do
+            if _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868[i + 1] == taskId then
+                _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868[i + 1] = 0
+                return
+            end
+            i = i + 1
+        end
+    end
+end
+function _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1_5F15_7528(t)
     if not t then
         return
     end
-    stopTimer(nil, t)
-    jass.DestroyTimer(t)
+    _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1(t)
+end
+function _____5B89_6392_7269_54C1_52A0_5DE5_4EFB_52A1(_____7C7B_578B, item, campfire, delaySec, timeoutSec, results)
+    _____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID = _____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID + 1
+    _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 + 1] = _____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868 + 1] = _____7C7B_578B
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868 + 1] = item
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868 + 1] = campfire
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868 + 1] = timeoutSec
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868 + 1] = results
+    _____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868[#_____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + delaySec * 1000
+    _____786E_4FDD_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5()
+    return _____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID
+end
+function ____on_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 do
+            do
+                local taskId = _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868[i + 1]
+                if not (taskId > 0) then
+                    goto __continue72
+                end
+                if now >= _____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                    if _____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868[i + 1] == "burn" then
+                        _____5904_7406_70E4_7126_5230_671F(_____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868[i + 1], _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868[i + 1])
+                    else
+                        _____5904_7406_52A0_5DE5_5230_671F(_____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868[i + 1], _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868[i + 1], _____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868[i + 1], _____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868[i + 1])
+                    end
+                else
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868[writeIndex + 1] = taskId
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868[i + 1]
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868[i + 1]
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868[i + 1]
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868[i + 1]
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868[i + 1]
+                    _____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                    writeIndex = writeIndex + 1
+                end
+            end
+            ::__continue72::
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868)
+            table.remove(_____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+    if #_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 <= 0 then
+        _____505C_6B62_7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5()
+    end
 end
 function untrackItem(item)
     local itemId = getHandleIdSafe(item)
@@ -184,10 +301,10 @@ function untrackItem(item)
         return
     end
     if st.cookTimer then
-        stopAndDestroyTimer(st.cookTimer)
+        _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1_5F15_7528(st.cookTimer)
     end
     if st.burnTimer then
-        stopAndDestroyTimer(st.burnTimer)
+        _____53D6_6D88_7269_54C1_52A0_5DE5_4EFB_52A1_5F15_7528(st.burnTimer)
     end
     itemState:delete(itemId)
     local campfireId = getHandleIdSafe(st.campfire)
@@ -201,33 +318,28 @@ function untrackItem(item)
 end
 function startBurnTimer(item, campfire, sec)
     local st = itemState:get(getHandleIdSafe(item))
-    local t = jass.CreateTimer()
-    if not t then
-        return
-    end
-    burnTimerCtxByHid[jass.GetHandleId(t)] = {item = item, campfire = campfire}
-    safeTimerStart(
-        nil,
-        t,
+    local taskId = _____5B89_6392_7269_54C1_52A0_5DE5_4EFB_52A1(
+        "burn",
+        item,
+        campfire,
         sec,
-        false,
-        onBurnTimerExpire
+        0,
+        {}
     )
     if st then
-        st.burnTimer = t
+        st.burnTimer = taskId
     end
 end
 jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-safeTimerStart = ____require_result_0.safeTimerStart
-safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_1.onItemPickup
 local onItemDrop = ____require_result_1.onItemDrop
 local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local withTimer = ____require_result_2.withTimer
-stopTimer = ____require_result_2.stopTimer
 createTimedEffect = ____require_result_2.createTimedEffect
 local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
 CreateFloatTextAtPoint = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextAtPoint
@@ -242,65 +354,16 @@ EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl"
 local CAMPFIRE_EVENT_PLAYER_IDS = {0, 1, 2, 3}
 itemState = __TS__New(Map)
 campfireItems = __TS__New(Map)
-burnTimerCtxByHid = {}
-local cookTimerCtxByHid = {}
-local function onCookTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
-        return
-    end
-    local hid = jass.GetHandleId(t)
-    local ctx = cookTimerCtxByHid[hid]
-    __TS__Delete(cookTimerCtxByHid, hid)
-    if not ctx then
-        return
-    end
-    local item = ctx.item
-    local campfire = ctx.campfire
-    local timeoutSec = ctx.timeoutSec
-    local results = ctx.results
-    local itemId = getHandleIdSafe(item)
-    if itemId == 0 or not itemState:has(itemId) then
-        return
-    end
-    playFinishEffect(campfire)
-    local chosen = pickResult(results)
-    local inputCharges = getItemChargesSafe(item)
-    jass.RemoveItem(item)
-    untrackItem(item)
-    local timeout = timeoutSec > 0 and timeoutSec or 0
-    local remaining = chosen.qty * inputCharges
-    while remaining > 0 do
-        local it = createItemAtCampfire(campfire, chosen.itemId)
-        if not it then
-            break
-        end
-        setItemChargesSafe(it, remaining)
-        local ok = tryGiveItemToCampfire(campfire, it)
-        if not ok then
-            local roll = jass.GetRandomInt(1, 100)
-            if roll > 20 then
-                jass.RemoveItem(it)
-            end
-        else
-            local itemId = getHandleIdSafe(it)
-            local campfireId = getHandleIdSafe(campfire)
-            if itemId ~= 0 and campfireId ~= 0 then
-                itemState:set(itemId, {item = it, campfire = campfire, stage = "done"})
-                local set = campfireItems:get(campfireId)
-                if not set then
-                    set = __TS__New(Set)
-                    campfireItems:set(campfireId, set)
-                end
-                set:add(itemId)
-            end
-            if timeout > 0 then
-                startBurnTimer(it, campfire, timeout)
-            end
-        end
-        remaining = 0
-    end
-end
+_____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+_____7269_54C1_52A0_5DE5_4EFB_52A1ID_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_7C7B_578B_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_7269_54C1_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_7BDD_706B_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_8D85_65F6_79D2_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_7ED3_679C_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_4EFB_52A1_5230_671F_6BEB_79D2_5217_8868 = {}
+_____7269_54C1_52A0_5DE5_8BA1_65F6_68C0_67E5_56DE_8C03ID = 0
+_____4E0B_4E00_4E2A_7269_54C1_52A0_5DE5_4EFB_52A1ID = 0
 local function isCampfire(u)
     return jass.GetUnitTypeId(u) == CAMPFIRE_ID
 end
@@ -391,22 +454,18 @@ local function getRecipeForItem(item)
     return {cookSec = cookSec, timeoutSec = timeoutSec, results = opts}
 end
 local function startCookTimer(item, campfire, recipe)
-    local t = jass.CreateTimer()
-    if not t then
-        return
-    end
     local st = itemState:get(getHandleIdSafe(item))
-    if st then
-        st.cookTimer = t
-    end
-    cookTimerCtxByHid[jass.GetHandleId(t)] = {item = item, campfire = campfire, timeoutSec = recipe.timeoutSec, results = recipe.results}
-    safeTimerStart(
-        nil,
-        t,
+    local taskId = _____5B89_6392_7269_54C1_52A0_5DE5_4EFB_52A1(
+        "cook",
+        item,
+        campfire,
         recipe.cookSec,
-        false,
-        onCookTimerExpire
+        recipe.timeoutSec,
+        recipe.results
     )
+    if st then
+        st.cookTimer = taskId
+    end
 end
 local function onAnyPickup()
     local u = jass.GetTriggerUnit()

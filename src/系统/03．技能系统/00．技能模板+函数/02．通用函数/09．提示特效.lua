@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE2X, MODEL_SQUARE3X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272
 function _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, color)
@@ -113,19 +112,17 @@ end
 -- - 支持传入 speed 参数自定义动画速率
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____require_result_1.RMaxBJ
 local RMinBJ = ____require_result_1.RMinBJ
 CosBJ = ____require_result_1.CosBJ
 SinBJ = ____require_result_1.SinBJ
 AddSpecialEffect = jass.AddSpecialEffect
-local CreateTimer = jass.CreateTimer
 DestroyEffect = jass.DestroyEffect
-local GetExpiredTimer = jass.GetExpiredTimer
-local GetHandleId = jass.GetHandleId
 GetOwningPlayer = jass.GetOwningPlayer
 GetPlayerId = jass.GetPlayerId
 local Player = jass.Player
@@ -158,19 +155,53 @@ local MODEL_RING_B = MODEL_DIR .. "Tip_ring_B.mdx"
 local MODEL_RING_C = MODEL_DIR .. "Tip_ring_C.mdx"
 _____63D0_793A_5708_53CB_65B9_8272 = 4282449728
 _____63D0_793A_5708_654C_65B9_8272 = 4294909984
-local _____63D0_793A_7279_6548_9500_6BC1_4E0A_4E0B_6587 = {}
-local function ____on_63D0_793A_7279_6548_5EF6_65F6_9500_6BC1_5230_65F6()
-    local t = GetExpiredTimer()
-    if not t then
+local _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+local _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 = {}
+local _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868 = {}
+local _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
+local function _____505C_6B62_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
+    if _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
         return
     end
-    local _____5B9A_65F6_5668ID = GetHandleId(t)
-    local e = _____63D0_793A_7279_6548_9500_6BC1_4E0A_4E0B_6587[_____5B9A_65F6_5668ID]
-    __TS__Delete(_____63D0_793A_7279_6548_9500_6BC1_4E0A_4E0B_6587, _____5B9A_65F6_5668ID)
-    if e then
-        ____exports["立即隐藏并销毁提示特效"](e)
+    removePeriodicCallback(_____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID)
+    _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
+end
+local function ____on_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 do
+            local e = _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868[i + 1]
+            if now >= _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                if e then
+                    ____exports["立即隐藏并销毁提示特效"](e)
+                end
+            else
+                _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868[writeIndex + 1] = e
+                _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
     end
-    safeDestroyTimer(t)
+    do
+        local i = #_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868)
+            table.remove(_____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+    if #_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 <= 0 then
+        _____505C_6B62_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
+    end
+end
+local function _____786E_4FDD_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
+    if _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID > 0 then
+        return
+    end
+    _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, ____on_63D0_793A_7279_6548_9500_6BC1_68C0_67E5)
 end
 local function _____5B89_5168_9500_6BC1_7279_6548(duration, effect)
     if not effect then
@@ -180,13 +211,9 @@ local function _____5B89_5168_9500_6BC1_7279_6548(duration, effect)
         ____exports["立即隐藏并销毁提示特效"](effect)
         return
     end
-    local t = CreateTimer()
-    if not t then
-        ____exports["立即隐藏并销毁提示特效"](effect)
-        return
-    end
-    _____63D0_793A_7279_6548_9500_6BC1_4E0A_4E0B_6587[GetHandleId(t)] = effect
-    safeTimerStart(t, duration, false, ____on_63D0_793A_7279_6548_5EF6_65F6_9500_6BC1_5230_65F6)
+    _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868[#_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 + 1] = effect
+    _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868[#_____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + duration * 1000
+    _____786E_4FDD_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
 end
 --- /严格且仅支持宽长比 1:1, 1:2, 1:3, 1:4, 1:5, 1:6不支持1:7及以上，否则会出现视觉错误（菱形），因为模型是固定的。
 -- 如宽sw=300, 那么长sl=1800

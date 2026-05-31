@@ -4,27 +4,76 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 import { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } from "./01．镜头震动";
 
 // 震动时长封装（内部使用计时器）
-const cameraTimers: Map<number, any> = new Map();
-const cameraShakeCtxByTimerHid: Record<number, { whichPlayer: any; playerId: number }> = {};
+const cameraTimers: Map<number, number> = new Map();
+const cameraShakeTaskIds: number[] = [];
+const cameraShakePlayers: any[] = [];
+const cameraShakePlayerIds: number[] = [];
+const cameraShakeDueMs: number[] = [];
+let cameraShakeTaskSeq = 0;
+let cameraShakeCallbackId = 0;
 
-function onCameraShakeTimerExpire(this: void): void {
-  const t = (jass as any).GetExpiredTimer();
-  if (!t) return;
-  const hid = (jass as any).GetHandleId(t) as number;
-  const ctx = cameraShakeCtxByTimerHid[hid];
-  delete cameraShakeCtxByTimerHid[hid];
-  if (ctx !== undefined) {
-    CameraClearNoiseForPlayer(ctx.whichPlayer);
-    cameraTimers.delete(ctx.playerId);
+function stopCameraShakeCheck(this: void): void {
+  if (cameraShakeCallbackId <= 0) return;
+  removePeriodicCallback(cameraShakeCallbackId);
+  cameraShakeCallbackId = 0;
+}
+
+function ensureCameraShakeCheck(this: void): void {
+  if (cameraShakeCallbackId > 0) return;
+  cameraShakeCallbackId = addPeriodicCallback(10, onCameraShakeCheck);
+}
+
+function cancelCameraShakeTask(this: void, taskId: number): void {
+  if (!(taskId > 0)) return;
+  for (let i = 0; i < cameraShakeTaskIds.length; i++) {
+    if (cameraShakeTaskIds[i] === taskId) {
+      cameraShakeTaskIds[i] = 0;
+      return;
+    }
   }
-  safeDestroyTimer(t);
+}
+
+function onCameraShakeCheck(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < cameraShakeTaskIds.length; i++) {
+    const taskId = cameraShakeTaskIds[i];
+    if (!(taskId > 0)) {
+      continue;
+    }
+    if (now >= cameraShakeDueMs[i]) {
+      const playerId = cameraShakePlayerIds[i];
+      if (cameraTimers.get(playerId) === taskId) {
+        CameraClearNoiseForPlayer(cameraShakePlayers[i]);
+        cameraTimers.delete(playerId);
+      }
+    } else {
+      cameraShakeTaskIds[writeIndex] = taskId;
+      cameraShakePlayers[writeIndex] = cameraShakePlayers[i];
+      cameraShakePlayerIds[writeIndex] = cameraShakePlayerIds[i];
+      cameraShakeDueMs[writeIndex] = cameraShakeDueMs[i];
+      writeIndex += 1;
+    }
+  }
+
+  for (let i = cameraShakeTaskIds.length - 1; i >= writeIndex; i--) {
+    cameraShakeTaskIds.pop();
+    cameraShakePlayers.pop();
+    cameraShakePlayerIds.pop();
+    cameraShakeDueMs.pop();
+  }
+
+  if (cameraShakeTaskIds.length <= 0) {
+    stopCameraShakeCheck();
+  }
 }
 
 export function CameraShakeForPlayer(
@@ -36,10 +85,13 @@ export function CameraShakeForPlayer(
   const playerId = (jass as any).GetPlayerId(whichPlayer);
   const existing = cameraTimers.get(playerId);
   if (existing) {
-    safeDestroyTimer(existing);
+    cancelCameraShakeTask(existing);
   }
-  const t = (jass as any).CreateTimer();
-  cameraTimers.set(playerId, t);
-  cameraShakeCtxByTimerHid[(jass as any).GetHandleId(t) as number] = { whichPlayer, playerId };
-  safeTimerStart(t, duration, false, onCameraShakeTimerExpire);
+  cameraShakeTaskSeq += 1;
+  cameraShakeTaskIds.push(cameraShakeTaskSeq);
+  cameraShakePlayers.push(whichPlayer);
+  cameraShakePlayerIds.push(playerId);
+  cameraShakeDueMs.push(getServerTime() + duration * 1000);
+  cameraTimers.set(playerId, cameraShakeTaskSeq);
+  ensureCameraShakeCheck();
 }

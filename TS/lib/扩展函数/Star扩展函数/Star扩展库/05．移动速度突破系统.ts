@@ -15,9 +15,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { X_GDBC, X_GAFC, X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GDBC: (x1: number, y1: number, x2: number, y2: number) => number;
@@ -81,7 +82,7 @@ interface SpeedEntry {
   lx: number;
   ly: number;
   lf: number;
-  tempTimer: any;
+  tempTimer: number;
   listIndex: number;
   effect: any;  // 特效句柄
 }
@@ -91,22 +92,11 @@ const entryList: SpeedEntry[] = [];
 let systemTimer: any = null;
 let isRunning = false;
 const triggerUnitSpeedEntryUidByTriggerHid: Record<number, number> = {};
-const speedBreakTempTimerCtxByHid: Record<number, number> = {};
-
-function onSpeedBreakTempTimerExpire(): void {
-  const t = jass.GetExpiredTimer();
-  const uid = speedBreakTempTimerCtxByHid[hid(t)];
-  delete speedBreakTempTimerCtxByHid[hid(t)];
-  const e = entryMap[uid];
-  if (e == null || e.tempTimer !== t) return;
-  e.tempTimer = null;
-  if (e.originalSpeed > ENGINE_SPEED_LIMIT) {
-    e.speed = e.originalSpeed;
-  } else {
-    removeEntry(uid);
-  }
-  safeDestroyTimer(t);
-}
+const speedBreakTempTaskIds: number[] = [];
+const speedBreakTempTaskUids: number[] = [];
+const speedBreakTempTaskDueMs: number[] = [];
+let speedBreakTempTaskSeq = 0;
+let speedBreakTempTaskCallbackId = 0;
 
 function onMoveSpeedBreakTick(): void {
   if (!isRunning) return;
@@ -249,19 +239,89 @@ function stopTimer(): void {
   isRunning = false;
 }
 
+function stopSpeedBreakTempTask(): void {
+  if (speedBreakTempTaskCallbackId <= 0) return;
+  removePeriodicCallback(speedBreakTempTaskCallbackId);
+  speedBreakTempTaskCallbackId = 0;
+}
+
+function ensureSpeedBreakTempTask(): void {
+  if (speedBreakTempTaskCallbackId > 0) return;
+  speedBreakTempTaskCallbackId = addPeriodicCallback(10, onSpeedBreakTempTaskTick);
+}
+
+function cancelSpeedBreakTempTask(taskId: number): void {
+  if (!(taskId > 0)) return;
+  for (let i = 0; i < speedBreakTempTaskIds.length; i++) {
+    if (speedBreakTempTaskIds[i] === taskId) {
+      speedBreakTempTaskIds[i] = 0;
+      return;
+    }
+  }
+}
+
+function finishSpeedBreakTempTask(uid: number, taskId: number): void {
+  const e = entryMap[uid];
+  if (e == null || e.tempTimer !== taskId) return;
+  e.tempTimer = 0;
+  if (e.originalSpeed > ENGINE_SPEED_LIMIT) {
+    e.speed = e.originalSpeed;
+  } else {
+    removeEntry(uid);
+  }
+}
+
+function onSpeedBreakTempTaskTick(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < speedBreakTempTaskIds.length; i++) {
+    const taskId = speedBreakTempTaskIds[i];
+    if (!(taskId > 0)) {
+      continue;
+    }
+    if (now >= speedBreakTempTaskDueMs[i]) {
+      finishSpeedBreakTempTask(speedBreakTempTaskUids[i], taskId);
+    } else {
+      speedBreakTempTaskIds[writeIndex] = taskId;
+      speedBreakTempTaskUids[writeIndex] = speedBreakTempTaskUids[i];
+      speedBreakTempTaskDueMs[writeIndex] = speedBreakTempTaskDueMs[i];
+      writeIndex += 1;
+    }
+  }
+
+  for (let i = speedBreakTempTaskIds.length - 1; i >= writeIndex; i--) {
+    speedBreakTempTaskIds.pop();
+    speedBreakTempTaskUids.pop();
+    speedBreakTempTaskDueMs.pop();
+  }
+
+  if (speedBreakTempTaskIds.length <= 0) {
+    stopSpeedBreakTempTask();
+  }
+}
+
+function scheduleSpeedBreakTempTask(uid: number, duration: number): number {
+  speedBreakTempTaskSeq += 1;
+  speedBreakTempTaskIds.push(speedBreakTempTaskSeq);
+  speedBreakTempTaskUids.push(uid);
+  speedBreakTempTaskDueMs.push(getServerTime() + duration * 1000);
+  ensureSpeedBreakTempTask();
+  return speedBreakTempTaskSeq;
+}
+
 function removeEntry(uid: number): void {
   const entry = entryMap[uid];
   if (entry == null) return;
 
   // 删除特效
-  if (entry.effect) {
+  if (entry.effect != null && entry.effect !== 0) {
     removeSpeedEffect(entry.effect);
     entry.effect = null;
   }
 
-  if (entry.tempTimer) {
-    safeDestroyTimer(entry.tempTimer);
-    entry.tempTimer = null;
+  if (entry.tempTimer > 0) {
+    cancelSpeedBreakTempTask(entry.tempTimer);
+    entry.tempTimer = 0;
   }
   if (entry.t) {
     delete triggerUnitSpeedEntryUidByTriggerHid[hid(entry.t)];
@@ -353,14 +413,14 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
   const existing = entryMap[uid];
   if (existing != null) {
     // 已存在，更新速度，取消临时计时器
-    if (existing.tempTimer) {
-      safeDestroyTimer(existing.tempTimer);
-      existing.tempTimer = null;
+    if (existing.tempTimer > 0) {
+      cancelSpeedBreakTempTask(existing.tempTimer);
+      existing.tempTimer = 0;
     }
     existing.speed = speed;
     existing.originalSpeed = speed;
     // 确保特效存在
-    if (!existing.effect) {
+    if (existing.effect == null || existing.effect === 0) {
       existing.effect = addSpeedEffect(u);
     }
     return;
@@ -378,7 +438,7 @@ export function SOS_SetUnitSpeed(u: any, speed: number): void {
     lx: getUnitX(u),
     ly: getUnitY(u),
     lf: getUnitFacing(u),
-    tempTimer: null,
+    tempTimer: 0,
     listIndex: entryList.length,
     effect: addSpeedEffect(u),  // 添加特效
   };
@@ -419,14 +479,14 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
 
   if (existing != null) {
     // 已存在，更新速度，取消之前的临时计时器
-    if (existing.tempTimer) {
-      jass.DestroyTimer(existing.tempTimer);
-      existing.tempTimer = null;
+    if (existing.tempTimer > 0) {
+      cancelSpeedBreakTempTask(existing.tempTimer);
+      existing.tempTimer = 0;
     }
     existing.speed = speed;
     existing.originalSpeed = savedOriginal;
     // 确保特效存在
-    if (!existing.effect) {
+    if (existing.effect == null || existing.effect === 0) {
       existing.effect = addSpeedEffect(u);
     }
   } else {
@@ -442,7 +502,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
       lx: getUnitX(u),
       ly: getUnitY(u),
       lf: getUnitFacing(u),
-      tempTimer: null,
+      tempTimer: 0,
       listIndex: entryList.length,
       effect: addSpeedEffect(u),  // 添加特效
     };
@@ -457,13 +517,7 @@ export function SOS_SetUnitSpeedTemp(u: any, speed: number, duration: number): v
   const current = entryMap[uid];
   if (current == null) return;
 
-  const tempT = jass.CreateTimer();
-  current.tempTimer = tempT;
-
-  if (tempT) {
-    speedBreakTempTimerCtxByHid[hid(tempT)] = uid;
-    safeTimerStart(tempT, duration, false, onSpeedBreakTempTimerExpire);
-  }
+  current.tempTimer = scheduleSpeedBreakTempTask(uid, duration);
 }
 
 /**

@@ -18,12 +18,15 @@ local registerDodgeAppliedFinalDamageListener = ____require_result_3.registerDod
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_5.addDelayedCallback
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitType = jass.IsUnitType
 local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
 local GetRandomInt = jass.GetRandomInt
 local _____5DF2_521D_59CB_5316_82F1_96C4_95EA_907F_8BED_97F3 = false
+local _____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 = {}
 local function _____53D6_82F1_96C4_540D(unit)
     local _____5168_90E8_540D_79F0 = _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0(unit)
     if #_____5168_90E8_540D_79F0 > 0 then
@@ -33,19 +36,19 @@ local function _____53D6_82F1_96C4_540D(unit)
     if config == nil then
         return ""
     end
-    local ____config_Name_5 = config.Name
-    if ____config_Name_5 == nil then
-        ____config_Name_5 = ""
+    local ____config_Name_6 = config.Name
+    if ____config_Name_6 == nil then
+        ____config_Name_6 = ""
     end
-    local _____540D_79F0 = __TS__StringTrim(tostring(____config_Name_5))
+    local _____540D_79F0 = __TS__StringTrim(tostring(____config_Name_6))
     if _____540D_79F0 ~= "" then
         return _____540D_79F0
     end
-    local ____config_Propernames_6 = config.Propernames
-    if ____config_Propernames_6 == nil then
-        ____config_Propernames_6 = ""
+    local ____config_Propernames_7 = config.Propernames
+    if ____config_Propernames_7 == nil then
+        ____config_Propernames_7 = ""
     end
-    return __TS__StringTrim(tostring(____config_Propernames_6))
+    return __TS__StringTrim(tostring(____config_Propernames_7))
 end
 local function _____53D6_95EA_907F_97F3_6548(unit)
     local _____540D_79F0_5217_8868 = _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0(unit)
@@ -56,11 +59,11 @@ local function _____53D6_95EA_907F_97F3_6548(unit)
             return nil
         end
         local _____7D22_5F15 = GetRandomInt(1, #_____914D_7F6E["音效列表"]) - 1
-        local ____914D_7F6E__97F3_6548_5217_8868_index_7 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
-        if ____914D_7F6E__97F3_6548_5217_8868_index_7 == nil then
-            ____914D_7F6E__97F3_6548_5217_8868_index_7 = nil
+        local ____914D_7F6E__97F3_6548_5217_8868_index_8 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
+        if ____914D_7F6E__97F3_6548_5217_8868_index_8 == nil then
+            ____914D_7F6E__97F3_6548_5217_8868_index_8 = nil
         end
-        return ____914D_7F6E__97F3_6548_5217_8868_index_7
+        return ____914D_7F6E__97F3_6548_5217_8868_index_8
     end
     do
         local i = 0
@@ -71,11 +74,11 @@ local function _____53D6_95EA_907F_97F3_6548(unit)
                     goto __continue10
                 end
                 local _____7D22_5F15 = GetRandomInt(1, #_____914D_7F6E["音效列表"]) - 1
-                local ____914D_7F6E__97F3_6548_5217_8868_index_8 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
-                if ____914D_7F6E__97F3_6548_5217_8868_index_8 == nil then
-                    ____914D_7F6E__97F3_6548_5217_8868_index_8 = nil
+                local ____914D_7F6E__97F3_6548_5217_8868_index_9 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
+                if ____914D_7F6E__97F3_6548_5217_8868_index_9 == nil then
+                    ____914D_7F6E__97F3_6548_5217_8868_index_9 = nil
                 end
-                return ____914D_7F6E__97F3_6548_5217_8868_index_8
+                return ____914D_7F6E__97F3_6548_5217_8868_index_9
             end
             ::__continue10::
             i = i + 1
@@ -112,8 +115,7 @@ local function _____672C_5730_73A9_5BB6_64AD_653E(unit, soundHandle)
     PlaySoundOnUnitBJ(soundHandle, 100, unit)
 end
 local function _____82F1_96C4_95EA_907F_8BED_97F3_51B7_5374_7ED3_675F()
-    local timer = jass.GetExpiredTimer()
-    local target = YDUserDataGetSafe("timer", timer, "英雄闪避语音单位", "unit")
+    local target = table.remove(_____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217, 1)
     if target ~= nil and target ~= 0 then
         YDUserDataSetSafe(
             "unit",
@@ -123,7 +125,6 @@ local function _____82F1_96C4_95EA_907F_8BED_97F3_51B7_5374_7ED3_675F()
             false
         )
     end
-    jass.DestroyTimer(timer)
 end
 local function _____5904_7406_95EA_907F_8BED_97F3(_source, target)
     if not _____5141_8BB8_64AD_653E(target) then
@@ -144,15 +145,8 @@ local function _____5904_7406_95EA_907F_8BED_97F3(_source, target)
         true
     )
     _____672C_5730_73A9_5BB6_64AD_653E(target, soundHandle)
-    local timer = jass.CreateTimer()
-    YDUserDataSetSafe(
-        "timer",
-        timer,
-        "英雄闪避语音单位",
-        "unit",
-        target
-    )
-    jass.TimerStart(timer, _____82F1_96C4_95EA_907F_97F3_6548_51B7_5374, false, _____82F1_96C4_95EA_907F_8BED_97F3_51B7_5374_7ED3_675F)
+    _____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217[#_____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 + 1] = target
+    addDelayedCallback(_____82F1_96C4_95EA_907F_97F3_6548_51B7_5374 * 1000, _____82F1_96C4_95EA_907F_8BED_97F3_51B7_5374_7ED3_675F)
 end
 local function _____95EA_907F_6210_529F_56DE_8C03(source, target, _damage)
     _____5904_7406_95EA_907F_8BED_97F3(source, target)

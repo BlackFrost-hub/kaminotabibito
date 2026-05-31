@@ -49,9 +49,8 @@ const {
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetRandomDirectionDeg: (this: void) => number;
@@ -87,9 +86,7 @@ const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUni
 const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, whichGroup: any, whichUnit: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (this: void, whichGroup: any) => any;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
 const DestroyGroup = jass.DestroyGroup as (this: void, whichGroup: any) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (this: void, whichGroup: any, r: any, filter: any) => void;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -105,7 +102,7 @@ const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
 
 const 刷怪区域 = (jglobals as any)[刷怪区域全局名] as any;
 const 刷怪记录表 = new Map<number, 刷怪记录>();
-const 延迟刷新上下文表 = new Map<number, 刷怪延迟上下文>();
+const 延迟刷新上下文队列: 刷怪延迟上下文[] = [];
 const 固定属性单位ID缓存 = new Map<string, number>();
 
 let 已初始化怪物刷新系统 = false;
@@ -271,14 +268,7 @@ function 应用属性快照到新单位(this: void, unit: any, 属性快照: 怪
 }
 
 function on怪物刷新计时器到期(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-
-  const timerId = GetHandleId(timer);
-  const ctx = 延迟刷新上下文表.get(timerId);
-  延迟刷新上下文表.delete(timerId);
-  safeDestroyTimer(timer);
-
+  const ctx = 延迟刷新上下文队列.shift();
   if (ctx == null) return;
 
   const owner = Player(ctx.所有者玩家ID);
@@ -300,11 +290,7 @@ function on怪物刷新计时器到期(this: void): void {
 }
 
 function 安排怪物延迟刷新(this: void, dyingUnit: any, record: 刷怪记录): void {
-  const timer = CreateTimer();
-  if (timer == null || timer === 0) return;
-
-  const timerId = GetHandleId(timer);
-  延迟刷新上下文表.set(timerId, {
+  延迟刷新上下文队列.push({
     死亡单位: dyingUnit,
     单位类型ID: record.单位类型ID,
     所有者玩家ID: record.所有者玩家ID,
@@ -312,7 +298,7 @@ function 安排怪物延迟刷新(this: void, dyingUnit: any, record: 刷怪记�
     出生Y: record.出生Y,
     属性快照: 快照死亡怪物属性(dyingUnit),
   });
-  safeTimerStart(timer, 刷怪延迟秒, false, on怪物刷新计时器到期);
+  addDelayedCallback(刷怪延迟秒 * 1000, on怪物刷新计时器到期);
 }
 
 function on刷怪单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {

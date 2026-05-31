@@ -65,9 +65,10 @@ const { YDLocalExecuteTrigger, YDTriggerExecuteTrigger, saveParentIndex } = requ
   saveParentIndex: (trg: any) => void;
 };
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
@@ -222,27 +223,85 @@ function executeSegment(
   fireItemHealEvent(unit, item, hp, mp, seg.abilId);
 }
 
-const equipHealDebounceKeyByTimerHid: Record<number, string> = {};
-const equipHealDelayCtxByTimerHid: Record<number, { unit: any; item: any; seg: { tokens: string[]; abilId: string; waitSec: number } }> = {};
+const 装备回复计时检查间隔毫秒 = 10;
+const 装备回复防抖键列表: string[] = [];
+const 装备回复防抖到期毫秒列表: number[] = [];
+const 装备回复延迟单位列表: any[] = [];
+const 装备回复延迟物品列表: any[] = [];
+const 装备回复延迟段列表: { tokens: string[]; abilId: string; waitSec: number }[] = [];
+const 装备回复延迟到期毫秒列表: number[] = [];
+let 装备回复计时检查回调ID = 0;
 
-function onEquipHealDebounceTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const key = equipHealDebounceKeyByTimerHid[hid];
-  delete equipHealDebounceKeyByTimerHid[hid];
-  if (key !== undefined) (globalThis as any).__EquipHealExecutedKey = undefined;
-  safeDestroyTimer(t);
+function 停止装备回复计时检查(this: void): void {
+  if (装备回复计时检查回调ID <= 0) return;
+  removePeriodicCallback(装备回复计时检查回调ID);
+  装备回复计时检查回调ID = 0;
 }
 
-function onEquipHealDelayTimerExpire(this: void): void {
-  const t = jass.GetExpiredTimer();
-  if (!t) return;
-  const hid = jass.GetHandleId(t) as number;
-  const ctx = equipHealDelayCtxByTimerHid[hid];
-  delete equipHealDelayCtxByTimerHid[hid];
-  if (ctx !== undefined) executeSegment(ctx.unit, ctx.item, ctx.seg);
-  safeDestroyTimer(t);
+function 确保装备回复计时检查(this: void): void {
+  if (装备回复计时检查回调ID > 0) return;
+  装备回复计时检查回调ID = addPeriodicCallback(装备回复计时检查间隔毫秒, on装备回复计时检查);
+}
+
+function 安排装备回复防抖清理(this: void, key: string, delaySec: number): void {
+  装备回复防抖键列表.push(key);
+  装备回复防抖到期毫秒列表.push(getServerTime() + delaySec * 1000);
+  确保装备回复计时检查();
+}
+
+function 安排装备回复延迟段(this: void, unit: any, item: any, seg: { tokens: string[]; abilId: string; waitSec: number }): void {
+  装备回复延迟单位列表.push(unit);
+  装备回复延迟物品列表.push(item);
+  装备回复延迟段列表.push(seg);
+  装备回复延迟到期毫秒列表.push(getServerTime() + seg.waitSec * 1000);
+  确保装备回复计时检查();
+}
+
+function 处理装备回复防抖到期(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 装备回复防抖键列表.length; i++) {
+    if (now >= 装备回复防抖到期毫秒列表[i]) {
+      (globalThis as any).__EquipHealExecutedKey = undefined;
+    } else {
+      装备回复防抖键列表[writeIndex] = 装备回复防抖键列表[i];
+      装备回复防抖到期毫秒列表[writeIndex] = 装备回复防抖到期毫秒列表[i];
+      writeIndex += 1;
+    }
+  }
+  for (let i = 装备回复防抖键列表.length - 1; i >= writeIndex; i--) {
+    装备回复防抖键列表.pop();
+    装备回复防抖到期毫秒列表.pop();
+  }
+}
+
+function 处理装备回复延迟段到期(this: void, now: number): void {
+  let writeIndex = 0;
+  for (let i = 0; i < 装备回复延迟单位列表.length; i++) {
+    if (now >= 装备回复延迟到期毫秒列表[i]) {
+      executeSegment(装备回复延迟单位列表[i], 装备回复延迟物品列表[i], 装备回复延迟段列表[i]);
+    } else {
+      装备回复延迟单位列表[writeIndex] = 装备回复延迟单位列表[i];
+      装备回复延迟物品列表[writeIndex] = 装备回复延迟物品列表[i];
+      装备回复延迟段列表[writeIndex] = 装备回复延迟段列表[i];
+      装备回复延迟到期毫秒列表[writeIndex] = 装备回复延迟到期毫秒列表[i];
+      writeIndex += 1;
+    }
+  }
+  for (let i = 装备回复延迟单位列表.length - 1; i >= writeIndex; i--) {
+    装备回复延迟单位列表.pop();
+    装备回复延迟物品列表.pop();
+    装备回复延迟段列表.pop();
+    装备回复延迟到期毫秒列表.pop();
+  }
+}
+
+function on装备回复计时检查(this: void): void {
+  const now = getServerTime();
+  处理装备回复防抖到期(now);
+  处理装备回复延迟段到期(now);
+  if (装备回复防抖键列表.length <= 0 && 装备回复延迟单位列表.length <= 0) {
+    停止装备回复计时检查();
+  }
 }
 
 function onUseItem(this: void): void {
@@ -260,11 +319,7 @@ function onUseItem(this: void): void {
   const key = tostring(unit) + "_" + idStr;
   if (glob.__EquipHealExecutedKey === key) return;
   glob.__EquipHealExecutedKey = key;
-  const debounceTimer = jass.CreateTimer();
-  if (debounceTimer) {
-    equipHealDebounceKeyByTimerHid[jass.GetHandleId(debounceTimer) as number] = key;
-    safeTimerStart(debounceTimer, 0.5, false, onEquipHealDebounceTimerExpire);
-  }
+  安排装备回复防抖清理(key, 0.5);
 
   const segments = parseEquipHealSegments(entry.hot, entry.abilList);
   for (const seg of segments) {
@@ -272,11 +327,7 @@ function onUseItem(this: void): void {
     if (seg.waitSec <= 0) {
       executeSegment(unit, item, seg);
     } else {
-      const delayTimer = jass.CreateTimer();
-      if (delayTimer) {
-        equipHealDelayCtxByTimerHid[jass.GetHandleId(delayTimer) as number] = { unit, item, seg };
-        safeTimerStart(delayTimer, seg.waitSec, false, onEquipHealDelayTimerExpire);
-      }
+      安排装备回复延迟段(unit, item, seg);
     }
   }
 }

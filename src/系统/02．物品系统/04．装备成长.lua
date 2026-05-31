@@ -7,9 +7,8 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local applyStats, onEquipStatReverseTimerExpire, onEquipDebounceTimerExpire, jass, safeDestroyTimer, applyEquipStatsTS, equipStatReverseByTimerHid, equipDebounceKeyByTimerHid
+local applyStats, _____505C_6B62_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5, _____786E_4FDD_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5, _____5B89_6392_88C5_5907_6210_957F_5C5E_6027_56DE_9000, _____5B89_6392_88C5_5907_6210_957F_9632_6296_6E05_7406, _____5904_7406_88C5_5907_6210_957F_5C5E_6027_56DE_9000_5230_671F, _____5904_7406_88C5_5907_6210_957F_9632_6296_5230_671F, ____on_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5, addPeriodicCallback, removePeriodicCallback, getServerTime, applyEquipStatsTS, _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2, _____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868, _____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868, _____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_6210_957F_9632_6296_952E_5217_8868, _____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID
 function applyStats(unit, statEffects, isAdd)
     if #statEffects == 0 then
         return
@@ -20,37 +19,98 @@ function applyStats(unit, statEffects, isAdd)
     )
     applyEquipStatsTS(unit, payload)
 end
-function onEquipStatReverseTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
+function _____505C_6B62_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+    if _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID <= 0 then
         return
     end
-    local hid = jass.GetHandleId(t)
-    local ctx = equipStatReverseByTimerHid[hid]
-    __TS__Delete(equipStatReverseByTimerHid, hid)
-    if ctx ~= nil then
-        applyStats(ctx.unit, ctx.stats, false)
-    end
-    safeDestroyTimer(nil, t)
+    removePeriodicCallback(_____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID)
+    _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID = 0
 end
-function onEquipDebounceTimerExpire()
-    local t = jass.GetExpiredTimer()
-    if not t then
+function _____786E_4FDD_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+    if _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID > 0 then
         return
     end
-    local hid = jass.GetHandleId(t)
-    local key = equipDebounceKeyByTimerHid[hid]
-    __TS__Delete(equipDebounceKeyByTimerHid, hid)
-    if key ~= nil then
-        _G[key] = nil
-    end
-    safeDestroyTimer(nil, t)
+    _____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2, ____on_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5)
 end
-jass = require("jass.common")
+function _____5B89_6392_88C5_5907_6210_957F_5C5E_6027_56DE_9000(unit, stats, delaySec)
+    _____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868[#_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868 + 1] = unit
+    _____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868[#_____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868 + 1] = stats
+    _____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868[#_____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + delaySec * 1000
+    _____786E_4FDD_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+end
+function _____5B89_6392_88C5_5907_6210_957F_9632_6296_6E05_7406(key, delaySec)
+    _____88C5_5907_6210_957F_9632_6296_952E_5217_8868[#_____88C5_5907_6210_957F_9632_6296_952E_5217_8868 + 1] = key
+    _____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868[#_____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + delaySec * 1000
+    _____786E_4FDD_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+end
+function _____5904_7406_88C5_5907_6210_957F_5C5E_6027_56DE_9000_5230_671F(now)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868 do
+            if now >= _____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                applyStats(_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868[i + 1], _____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868[i + 1], false)
+            else
+                _____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868[writeIndex + 1] = _____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868[i + 1]
+                _____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868[writeIndex + 1] = _____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868[i + 1]
+                _____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868)
+            table.remove(_____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868)
+            table.remove(_____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+end
+function _____5904_7406_88C5_5907_6210_957F_9632_6296_5230_671F(now)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____88C5_5907_6210_957F_9632_6296_952E_5217_8868 do
+            if now >= _____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                _G[_____88C5_5907_6210_957F_9632_6296_952E_5217_8868[i + 1]] = nil
+            else
+                _____88C5_5907_6210_957F_9632_6296_952E_5217_8868[writeIndex + 1] = _____88C5_5907_6210_957F_9632_6296_952E_5217_8868[i + 1]
+                _____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #_____88C5_5907_6210_957F_9632_6296_952E_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____88C5_5907_6210_957F_9632_6296_952E_5217_8868)
+            table.remove(_____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+end
+function ____on_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+    local now = getServerTime()
+    _____5904_7406_88C5_5907_6210_957F_5C5E_6027_56DE_9000_5230_671F(now)
+    _____5904_7406_88C5_5907_6210_957F_9632_6296_5230_671F(now)
+    if #_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868 <= 0 and #_____88C5_5907_6210_957F_9632_6296_952E_5217_8868 <= 0 then
+        _____505C_6B62_88C5_5907_6210_957F_8BA1_65F6_68C0_67E5()
+    end
+end
+--- 装备成长：单位使用物品时，若装备数据有 PowerUP 字段，执行属性成长。
+-- 格式：  段1+段2+...，段内用 ; 分隔效果；time>0 表示临时（N秒后撤销），time0/无time=永久
+-- 效果类型：Nstat / N%stat / Nexp / Nlevel / (level*N)stat / (level*N)exp
+-- 规则详见 `.cursor/rules/equipment/heal-hot-format.md`
+local jass = require("jass.common")
 local GetItemTypeId = jass.GetItemTypeId
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local round = ____require_result_1.round
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
@@ -407,18 +467,7 @@ local function executeSegment(unit, seg)
         if seg.timeSec > 0 then
             local capturedStats = statEffects
             local capturedUnit = unit
-            local dt = jass.CreateTimer()
-            if dt then
-                local t = dt
-                equipStatReverseByTimerHid[jass.GetHandleId(t)] = {unit = capturedUnit, stats = capturedStats}
-                safeTimerStart(
-                    nil,
-                    t,
-                    seg.timeSec,
-                    false,
-                    onEquipStatReverseTimerExpire
-                )
-            end
+            _____5B89_6392_88C5_5907_6210_957F_5C5E_6027_56DE_9000(capturedUnit, capturedStats, seg.timeSec)
         end
     end
 end
@@ -445,26 +494,20 @@ local function onUseItem()
         return
     end
     glob[key] = true
-    local ct = jass.CreateTimer()
-    if ct then
-        local t = ct
-        equipDebounceKeyByTimerHid[jass.GetHandleId(t)] = key
-        safeTimerStart(
-            nil,
-            t,
-            0.5,
-            false,
-            onEquipDebounceTimerExpire
-        )
-    end
+    _____5B89_6392_88C5_5907_6210_957F_9632_6296_6E05_7406(key, 0.5)
     local segments = parsePowerUP(entry.PowerUP)
     for ____, seg in ipairs(segments) do
         executeSegment(unit, seg)
     end
 end
 local INIT_KEY = "__EquipPowerUPInited"
-equipStatReverseByTimerHid = {}
-equipDebounceKeyByTimerHid = {}
+_____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+_____88C5_5907_6210_957F_56DE_9000_5355_4F4D_5217_8868 = {}
+_____88C5_5907_6210_957F_56DE_9000_5C5E_6027_5217_8868 = {}
+_____88C5_5907_6210_957F_56DE_9000_5230_671F_6BEB_79D2_5217_8868 = {}
+_____88C5_5907_6210_957F_9632_6296_952E_5217_8868 = {}
+_____88C5_5907_6210_957F_9632_6296_5230_671F_6BEB_79D2_5217_8868 = {}
+_____88C5_5907_6210_957F_8BA1_65F6_68C0_67E5_56DE_8C03ID = 0
 local function init()
     if g[INIT_KEY] then
         return

@@ -17,9 +17,8 @@ const { 单位是否匹配玩家英雄名称 } = require("系统.01．单位系�
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
 import {
@@ -34,8 +33,6 @@ const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => 
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const IsUnitInRange = jass.IsUnitInRange as (this: void, unit: any, otherUnit: any, distance: number) => boolean;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
-const CreateTimer = jass.CreateTimer as (this: void) => any;
-const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 
 let 英雄购物音效已初始化 = false;
 let 购物音效冷却中 = false;
@@ -63,16 +60,11 @@ function 取随机购物音效(this: void, soundList: any[]): any {
 
 function 购物音效冷却结束(this: void): void {
   购物音效冷却中 = false;
-  const timer = GetExpiredTimer();
-  if (timer != null && timer !== 0) {
-    safeDestroyTimer(timer);
-  }
 }
 
 function 开始购物音效冷却(this: void): void {
   购物音效冷却中 = true;
-  const timer = CreateTimer();
-  safeTimerStart(timer, 英雄购物音效冷却, false, 购物音效冷却结束);
+  addDelayedCallback(英雄购物音效冷却 * 1000, 购物音效冷却结束);
 }
 
 function 本地播放购物音效(this: void, whichPlayer: any, soundHandle: any): void {

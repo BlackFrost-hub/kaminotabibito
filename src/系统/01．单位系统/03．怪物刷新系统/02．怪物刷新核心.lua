@@ -50,9 +50,8 @@ local YDUserDataHasSafe = ____require_result_6.YDUserDataHasSafe
 local YDUserDataClearTableSafe = ____require_result_6.YDUserDataClearTableSafe
 local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_7.registerDeathListener
-local ____require_result_8 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_8.safeTimerStart
-local safeDestroyTimer = ____require_result_8.safeDestroyTimer
+local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_8.addDelayedCallback
 local ____require_result_9 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetRandomDirectionDeg = ____require_result_9.GetRandomDirectionDeg
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.index")
@@ -61,9 +60,7 @@ local GroupAddUnit = jass.GroupAddUnit
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local FirstOfGroup = jass.FirstOfGroup
 local CreateGroup = jass.CreateGroup
-local CreateTimer = jass.CreateTimer
 local DestroyGroup = jass.DestroyGroup
-local GetExpiredTimer = jass.GetExpiredTimer
 local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -78,7 +75,7 @@ local Player = jass.Player
 local RemoveUnit = jass.RemoveUnit
 local _____5237_602A_533A_57DF = jglobals[_____5237_602A_533A_57DF_5168_5C40_540D]
 local _____5237_602A_8BB0_5F55_8868 = __TS__New(Map)
-local _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_8868 = __TS__New(Map)
+local _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217 = {}
 local _____56FA_5B9A_5C5E_6027_5355_4F4DID_7F13_5B58 = __TS__New(Map)
 local _____5DF2_521D_59CB_5316_602A_7269_5237_65B0_7CFB_7EDF = false
 local function _____7EDD_5BF9_503C(value)
@@ -273,14 +270,7 @@ local function _____5E94_7528_5C5E_6027_5FEB_7167_5230_65B0_5355_4F4D(unit, ____
     end
 end
 local function ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local timerId = GetHandleId(timer)
-    local ctx = _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_8868:get(timerId)
-    _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_8868:delete(timerId)
-    safeDestroyTimer(timer)
+    local ctx = table.remove(_____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217, 1)
     if ctx == nil then
         return
     end
@@ -315,23 +305,15 @@ local function ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F()
     RemoveUnit(ctx["死亡单位"])
 end
 local function _____5B89_6392_602A_7269_5EF6_8FDF_5237_65B0(dyingUnit, record)
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local timerId = GetHandleId(timer)
-    _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_8868:set(
-        timerId,
-        {
-            ["死亡单位"] = dyingUnit,
-            ["单位类型ID"] = record["单位类型ID"],
-            ["所有者玩家ID"] = record["所有者玩家ID"],
-            ["出生X"] = record["出生X"],
-            ["出生Y"] = record["出生Y"],
-            ["属性快照"] = _____5FEB_7167_6B7B_4EA1_602A_7269_5C5E_6027(dyingUnit)
-        }
-    )
-    safeTimerStart(timer, _____5237_602A_5EF6_8FDF_79D2, false, ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F)
+    _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217[#_____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217 + 1] = {
+        ["死亡单位"] = dyingUnit,
+        ["单位类型ID"] = record["单位类型ID"],
+        ["所有者玩家ID"] = record["所有者玩家ID"],
+        ["出生X"] = record["出生X"],
+        ["出生Y"] = record["出生Y"],
+        ["属性快照"] = _____5FEB_7167_6B7B_4EA1_602A_7269_5C5E_6027(dyingUnit)
+    }
+    addDelayedCallback(_____5237_602A_5EF6_8FDF_79D2 * 1000, ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F)
 end
 local function ____on_5237_602A_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
     local _____5237_602A_5355_4F4D_7EC4 = _____83B7_53D6_5237_602A_5355_4F4D_7EC4()

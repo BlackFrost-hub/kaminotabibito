@@ -15,9 +15,10 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 
 // ==========================================================================================
@@ -32,10 +33,7 @@ const { RMaxBJ, RMinBJ, CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12�
 };
 
 const AddSpecialEffect = jass.AddSpecialEffect as (path: string, x: number, y: number) => any;
-const CreateTimer = jass.CreateTimer as () => any;
 const DestroyEffect = jass.DestroyEffect as (e: any) => void;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
-const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (u: any) => any;
 const GetPlayerId = jass.GetPlayerId as (p: any) => number;
 const Player = jass.Player as (playerId: number) => any;
@@ -79,23 +77,46 @@ const 提示圈敌方色 = 0xFFFF2020;
 // 提示特效销毁
 // ==========================================================================================
 
-const 提示特效销毁上下文: Record<number, any> = {};
+const 提示特效销毁检查间隔毫秒 = 10;
+const 待销毁提示特效列表: any[] = [];
+const 待销毁提示特效到期毫秒列表: number[] = [];
+let 提示特效销毁检查回调ID = 0;
 
-function on提示特效延时销毁到时(this: void): void {
-  const t = GetExpiredTimer();
-  if (!t) {
-    return;
+function 停止提示特效销毁检查(): void {
+  if (提示特效销毁检查回调ID <= 0) return;
+  removePeriodicCallback(提示特效销毁检查回调ID);
+  提示特效销毁检查回调ID = 0;
+}
+
+function on提示特效销毁检查(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < 待销毁提示特效列表.length; i++) {
+    const e = 待销毁提示特效列表[i];
+    if (now >= 待销毁提示特效到期毫秒列表[i]) {
+      if (e) {
+        立即隐藏并销毁提示特效(e);
+      }
+    } else {
+      待销毁提示特效列表[writeIndex] = e;
+      待销毁提示特效到期毫秒列表[writeIndex] = 待销毁提示特效到期毫秒列表[i];
+      writeIndex += 1;
+    }
   }
 
-  const 定时器ID = GetHandleId(t);
-  const e = 提示特效销毁上下文[定时器ID];
-  delete 提示特效销毁上下文[定时器ID];
-
-  if (e) {
-    立即隐藏并销毁提示特效(e);
+  for (let i = 待销毁提示特效列表.length - 1; i >= writeIndex; i--) {
+    待销毁提示特效列表.pop();
+    待销毁提示特效到期毫秒列表.pop();
   }
 
-  safeDestroyTimer(t);
+  if (待销毁提示特效列表.length <= 0) {
+    停止提示特效销毁检查();
+  }
+}
+
+function 确保提示特效销毁检查(): void {
+  if (提示特效销毁检查回调ID > 0) return;
+  提示特效销毁检查回调ID = addPeriodicCallback(提示特效销毁检查间隔毫秒, on提示特效销毁检查);
 }
 
 function 安全销毁特效(duration: number, effect: any): void {
@@ -106,14 +127,9 @@ function 安全销毁特效(duration: number, effect: any): void {
     return;
   }
 
-  const t = CreateTimer();
-  if (!t) {
-    立即隐藏并销毁提示特效(effect);
-    return;
-  }
-
-  提示特效销毁上下文[GetHandleId(t)] = effect;
-  safeTimerStart(t, duration, false, on提示特效延时销毁到时);
+  待销毁提示特效列表.push(effect);
+  待销毁提示特效到期毫秒列表.push(getServerTime() + duration * 1000);
+  确保提示特效销毁检查();
 }
 
 function 设置提示特效顶点颜色(e: any, color: number): void {

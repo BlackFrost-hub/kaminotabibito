@@ -3,7 +3,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local _____53D6_6700_5C0F_503C, _____751F_6210_6807_7B7E_952E, _____4ECE_5217_8868_79FB_9664, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____6E05_7406_6807_7B7E, _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548, ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_5230_65F6, _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE, ____on_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668Tick, _____662F_5426_6EE1_8DB3_9B54_6CD5_95E8_69DB, _____662F_5426_53EF_5438_6536, _____8BA1_7B97_5438_6536_4F24_5BB3, _____5438_6536_9B54_6CD5_62A4_76FE_4F24_5BB3, ____on_9B54_6CD5_5438_6536_62A4_76FE_4F24_5BB3_4FEE_6B63, jass, safeTimerStart, safeDestroyTimer, _____51CF_5C11_9B54_6CD5_503C, AddSpecialEffect, GetHandleId, GetUnitX, GetUnitY, GetUnitFacing, CreateTimer, GetUnitState, GetUnitStateJapi, DestroyEffect, DzBindEffect, DzUnbindEffect, EXEffectMatRotateZ, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, _____9B54_6CD5_5438_6536_62A4_76FE_8868, _____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868, _____9B54_6CD5_5438_6536_62A4_76FE_6807_7B7E_8868, _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668, _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_8DEF_5F84, _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_6302_70B9, _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_4E0A_4E0B_6587
+local _____53D6_6700_5C0F_503C, _____751F_6210_6807_7B7E_952E, _____4ECE_5217_8868_79FB_9664, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____6E05_7406_6807_7B7E, _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548, _____505C_6B62_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5, ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5, _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE, ____on_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668Tick, _____662F_5426_6EE1_8DB3_9B54_6CD5_95E8_69DB, _____662F_5426_53EF_5438_6536, _____8BA1_7B97_5438_6536_4F24_5BB3, _____5438_6536_9B54_6CD5_62A4_76FE_4F24_5BB3, ____on_9B54_6CD5_5438_6536_62A4_76FE_4F24_5BB3_4FEE_6B63, addPeriodicCallback, removePeriodicCallback, getServerTime, _____51CF_5C11_9B54_6CD5_503C, AddSpecialEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitState, GetUnitStateJapi, DestroyEffect, DzBindEffect, DzUnbindEffect, EXEffectMatRotateZ, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, _____9B54_6CD5_5438_6536_62A4_76FE_8868, _____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868, _____9B54_6CD5_5438_6536_62A4_76FE_6807_7B7E_8868, _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668, _____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID, _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_8DEF_5F84, _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_6302_70B9, _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868, _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868, _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID
 function _____53D6_6700_5C0F_503C(a, b)
     return a < b and a or b
 end
@@ -29,6 +29,10 @@ function _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668()
     if #_____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868 > 0 then
         return
     end
+    if _____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID > 0 then
+        removePeriodicCallback(_____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID)
+        _____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID = 0
+    end
     _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668 = false
 end
 function _____6E05_7406_6807_7B7E(_____5B9E_4F8B)
@@ -49,18 +53,50 @@ function _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548(_____7279_6
     end
     DestroyEffect(_____7279_6548)
 end
-function ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_5230_65F6()
-    local timer = jass.GetExpiredTimer()
-    if timer == nil or timer == 0 then
+function _____505C_6B62_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5()
+    if _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
         return
     end
-    local hid = GetHandleId(timer)
-    local _____4E0A_4E0B_6587 = _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_4E0A_4E0B_6587[hid]
-    __TS__Delete(_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_4E0A_4E0B_6587, hid)
-    if _____4E0A_4E0B_6587 ~= nil then
-        _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548(_____4E0A_4E0B_6587["特效"], _____4E0A_4E0B_6587["绑定单位"])
+    removePeriodicCallback(_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID)
+    _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
+end
+function ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5()
+    local now = getServerTime()
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868 do
+            local _____7279_6548 = _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868[i + 1]
+            local _____7ED1_5B9A_5355_4F4D = _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868[i + 1]
+            if now >= _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1] then
+                _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548(_____7279_6548, _____7ED1_5B9A_5355_4F4D)
+            else
+                _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868[writeIndex + 1] = _____7279_6548
+                _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868[writeIndex + 1] = _____7ED1_5B9A_5355_4F4D
+                _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1]
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
     end
-    safeDestroyTimer(timer)
+    do
+        local i = #_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868 - 1
+        while i >= writeIndex do
+            table.remove(_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868)
+            table.remove(_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868)
+            table.remove(_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868)
+            i = i - 1
+        end
+    end
+    if #_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868 <= 0 then
+        _____505C_6B62_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5()
+    end
+end
+function _____786E_4FDD_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5()
+    if _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID > 0 then
+        return
+    end
+    _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5)
 end
 function _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE(id)
     local _____5B9E_4F8B = _____9B54_6CD5_5438_6536_62A4_76FE_8868[id]
@@ -81,17 +117,17 @@ function ____on_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668Tick()
                 local _____5B9E_4F8B = _____9B54_6CD5_5438_6536_62A4_76FE_8868[id]
                 if _____5B9E_4F8B == nil or _____5B9E_4F8B["单位"] == nil or _____5B9E_4F8B["单位"] == 0 then
                     _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE(id)
-                    goto __continue28
+                    goto __continue38
                 end
                 if not (_____5B9E_4F8B["剩余时间"] > 0) then
-                    goto __continue28
+                    goto __continue38
                 end
                 _____5B9E_4F8B["剩余时间"] = _____5B9E_4F8B["剩余时间"] - 0.1
                 if _____5B9E_4F8B["剩余时间"] <= 0 then
                     _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE(id)
                 end
             end
-            ::__continue28::
+            ::__continue38::
             i = i - 1
         end
     end
@@ -161,13 +197,10 @@ ____exports["播放魔法吸收护盾特效"] = function(_____53C2_6570)
             _____53C2_6570["特效朝向角度"] or GetUnitFacing(_____5355_4F4D)
         )
     end
-    local timer = CreateTimer()
-    if timer == nil or timer == 0 then
-        _____9690_85CF_5E76_9500_6BC1_9B54_6CD5_5438_6536_7279_6548(effect, _____662F_5426_7ED1_5B9A_5355_4F4D)
-        return
-    end
-    _____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_4E0A_4E0B_6587[GetHandleId(timer)] = {["特效"] = effect, ["绑定单位"] = _____662F_5426_7ED1_5B9A_5355_4F4D}
-    safeTimerStart(timer, _____6301_7EED_65F6_95F4, false, ____on_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_5230_65F6)
+    _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868[#_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868 + 1] = effect
+    _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868[#_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868 + 1] = _____662F_5426_7ED1_5B9A_5355_4F4D
+    _____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868[#_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + _____6301_7EED_65F6_95F4 * 1000
+    _____786E_4FDD_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5()
 end
 function _____8BA1_7B97_5438_6536_4F24_5BB3(_____5B9E_4F8B, _____53D7_51FB_5355_4F4D, _____4F24_5BB3_503C)
     if not (_____4F24_5BB3_503C > 0) then
@@ -211,43 +244,43 @@ function ____on_9B54_6CD5_5438_6536_62A4_76FE_4F24_5BB3_4FEE_6B63(context)
                 local _____5B9E_4F8B = _____9B54_6CD5_5438_6536_62A4_76FE_8868[id]
                 if _____5B9E_4F8B == nil or _____5B9E_4F8B["单位"] == nil or _____5B9E_4F8B["单位"] == 0 then
                     _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE(id)
-                    goto __continue59
+                    goto __continue68
                 end
                 if not _____662F_5426_53EF_5438_6536(_____5B9E_4F8B, _____53D7_51FB_5355_4F4D, context) then
-                    goto __continue59
+                    goto __continue68
                 end
                 local _____5438_6536_91CF = _____5438_6536_9B54_6CD5_62A4_76FE_4F24_5BB3(_____5B9E_4F8B, _____53D7_51FB_5355_4F4D, context.currentDamage)
                 if not (_____5438_6536_91CF > 0) then
-                    goto __continue59
+                    goto __continue68
                 end
                 context.currentDamage = context.currentDamage - _____5438_6536_91CF
                 if not (context.currentDamage > 0) then
                     return 0
                 end
             end
-            ::__continue59::
+            ::__continue68::
             i = i - 1
         end
     end
     return context.currentDamage
 end
-jass = require("jass.common")
+---
+-- @noSelfInFile
+local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_0.registerDamageModifier
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local ____require_result_2 = require("系统.00．核心系统.07．联机安全工具")
-safeTimerStart = ____require_result_2.safeTimerStart
-safeDestroyTimer = ____require_result_2.safeDestroyTimer
-local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
-_____51CF_5C11_9B54_6CD5_503C = ____require_result_3["减少魔法值"]
+addPeriodicCallback = ____require_result_1.addPeriodicCallback
+removePeriodicCallback = ____require_result_1.removePeriodicCallback
+getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+_____51CF_5C11_9B54_6CD5_503C = ____require_result_2["减少魔法值"]
 AddSpecialEffect = jass.AddSpecialEffect
-GetHandleId = jass.GetHandleId
+local GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitFacing = jass.GetUnitFacing
-CreateTimer = jass.CreateTimer
 GetUnitState = jass.GetUnitState
 GetUnitStateJapi = japi.GetUnitState
 DestroyEffect = jass.DestroyEffect
@@ -261,10 +294,15 @@ _____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868 = {}
 _____9B54_6CD5_5438_6536_62A4_76FE_6807_7B7E_8868 = {}
 local _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4F24_5BB3_76D1_542C = false
 _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668 = false
+_____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID = 0
 local _____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID = 1
 _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_8DEF_5F84 = "war3mapImported\\Energy Shield.mdl"
 _____9ED8_8BA4_9B54_6CD5_5438_6536_7279_6548_6302_70B9 = "origin"
-_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_4E0A_4E0B_6587 = {}
+_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5217_8868 = {}
+_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_7ED1_5B9A_5355_4F4D_5217_8868 = {}
+_____5F85_9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE_7279_6548_5230_671F_6BEB_79D2_5217_8868 = {}
+_____9B54_6CD5_5438_6536_62A4_76FE_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
 local function _____53D6_5355_4F4DID(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -276,7 +314,7 @@ local function _____786E_4FDD_4E2D_5FC3_8BA1_65F6_5668()
         return
     end
     _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668 = true
-    addPeriodicCallback(100, ____on_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668Tick)
+    _____9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668_56DE_8C03ID = addPeriodicCallback(100, ____on_9B54_6CD5_5438_6536_62A4_76FE_4E2D_5FC3_8BA1_65F6_5668Tick)
 end
 local function _____786E_4FDD_4F24_5BB3_76D1_542C()
     if _____5DF2_6CE8_518C_9B54_6CD5_5438_6536_62A4_76FE_4F24_5BB3_76D1_542C then
@@ -301,9 +339,9 @@ ____exports["开始魔法吸收护盾"] = function(_____53C2_6570)
             _____9500_6BC1_9B54_6CD5_5438_6536_62A4_76FE(_____5DF2_6709ID)
         end
     end
-    local ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_4 = _____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID
-    _____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID = ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_4 + 1
-    local id = ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_4
+    local ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_3 = _____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID
+    _____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID = ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_3 + 1
+    local id = ____4E0B_4E00_4E2A_9B54_6CD5_5438_6536_62A4_76FEID_3
     local _____5B9E_4F8B = __TS__ObjectAssign({}, _____53C2_6570, {id = id, ["单位"] = _____5355_4F4D, ["单位ID"] = _____5355_4F4DID, ["剩余时间"] = _____53C2_6570["持续时间"] or 0})
     _____9B54_6CD5_5438_6536_62A4_76FE_8868[id] = _____5B9E_4F8B
     _____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868[#_____9B54_6CD5_5438_6536_62A4_76FEID_5217_8868 + 1] = id

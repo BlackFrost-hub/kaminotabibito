@@ -51,4 +51,5 @@ export * from "./144．命中闪避暴击系统测试";
 export * from "./145．全局音效句柄测试";
 export * from "./146．魔法消耗减少扣蓝测试";
 export * from "./147．Boss血条弱点韧性测试";
+export * from "./148．异界背景框测试";
 export * from "./1050．反击测试";

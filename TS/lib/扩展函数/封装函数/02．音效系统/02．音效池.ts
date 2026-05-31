@@ -5,17 +5,16 @@
  */
 
 const jass = require("jass.common") as any;
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (timer: any) => void;
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const hash = (jass as any).InitHashtable();
 
 // 哈希表键值常量
 const KEY_COUNT = 1000;
 const KEY_INDEX = 1001;
-const KEY_TIMER = 1002;
-const KEY_SOUND = 1003;
 const KEY_PATH = 1004;
 const KEY_ENABLED = 1005;
 const KEY_ENABLED_SLOT_BASE = 2000;
@@ -24,16 +23,85 @@ const POOL_MAX = 4;
 
 import { SoundModel } from "./01．声音模型";
 
-function onSoundPoolTimerExpire(this: void): void {
-  const expiredTimer = (jass as any).GetExpiredTimer();
-  const s = (jass as any).LoadSoundHandle(hash, (jass as any).GetHandleId(expiredTimer), KEY_SOUND);
-  if (s) {
-    const idx = (jass as any).LoadInteger(hash, (jass as any).GetHandleId(s), KEY_INDEX);
-    const p = (jass as any).LoadStr(hash, (jass as any).GetHandleId(s), KEY_PATH);
-    const ph = (jass as any).StringHash(p);
-    (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
+const soundPoolReleaseTaskIds: number[] = [];
+const soundPoolReleaseSounds: any[] = [];
+const soundPoolReleaseDueMs: number[] = [];
+const soundPoolReleaseTaskBySoundHid: Record<number, number> = {};
+let soundPoolReleaseTaskSeq = 0;
+let soundPoolReleaseCallbackId = 0;
+
+function stopSoundPoolReleaseCheck(this: void): void {
+  if (soundPoolReleaseCallbackId <= 0) return;
+  removePeriodicCallback(soundPoolReleaseCallbackId);
+  soundPoolReleaseCallbackId = 0;
+}
+
+function ensureSoundPoolReleaseCheck(this: void): void {
+  if (soundPoolReleaseCallbackId > 0) return;
+  soundPoolReleaseCallbackId = addPeriodicCallback(10, onSoundPoolReleaseCheck);
+}
+
+function cancelSoundPoolReleaseTask(this: void, taskId: number): void {
+  if (!(taskId > 0)) return;
+  for (let i = 0; i < soundPoolReleaseTaskIds.length; i++) {
+    if (soundPoolReleaseTaskIds[i] === taskId) {
+      soundPoolReleaseTaskIds[i] = 0;
+      return;
+    }
   }
-  safeDestroyTimer(expiredTimer);
+}
+
+function releaseSoundPoolSlot(this: void, sound: any, taskId: number): void {
+  if (!sound) return;
+  const soundHid = (jass as any).GetHandleId(sound);
+  if (soundPoolReleaseTaskBySoundHid[soundHid] !== taskId) return;
+  delete soundPoolReleaseTaskBySoundHid[soundHid];
+  const idx = (jass as any).LoadInteger(hash, soundHid, KEY_INDEX);
+  const p = (jass as any).LoadStr(hash, soundHid, KEY_PATH);
+  const ph = (jass as any).StringHash(p);
+  (jass as any).SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true);
+}
+
+function onSoundPoolReleaseCheck(this: void): void {
+  const now = getServerTime();
+  let writeIndex = 0;
+  for (let i = 0; i < soundPoolReleaseTaskIds.length; i++) {
+    const taskId = soundPoolReleaseTaskIds[i];
+    if (!(taskId > 0)) {
+      continue;
+    }
+    if (now >= soundPoolReleaseDueMs[i]) {
+      releaseSoundPoolSlot(soundPoolReleaseSounds[i], taskId);
+    } else {
+      soundPoolReleaseTaskIds[writeIndex] = taskId;
+      soundPoolReleaseSounds[writeIndex] = soundPoolReleaseSounds[i];
+      soundPoolReleaseDueMs[writeIndex] = soundPoolReleaseDueMs[i];
+      writeIndex += 1;
+    }
+  }
+
+  for (let i = soundPoolReleaseTaskIds.length - 1; i >= writeIndex; i--) {
+    soundPoolReleaseTaskIds.pop();
+    soundPoolReleaseSounds.pop();
+    soundPoolReleaseDueMs.pop();
+  }
+
+  if (soundPoolReleaseTaskIds.length <= 0) {
+    stopSoundPoolReleaseCheck();
+  }
+}
+
+function scheduleSoundPoolRelease(this: void, sound: any, duration: number): void {
+  if (!sound) return;
+  const soundHid = (jass as any).GetHandleId(sound);
+  const oldTaskId = soundPoolReleaseTaskBySoundHid[soundHid] ?? 0;
+  if (oldTaskId > 0) cancelSoundPoolReleaseTask(oldTaskId);
+  soundPoolReleaseTaskSeq += 1;
+  soundPoolReleaseTaskBySoundHid[soundHid] = soundPoolReleaseTaskSeq;
+  soundPoolReleaseTaskIds.push(soundPoolReleaseTaskSeq);
+  soundPoolReleaseSounds.push(sound);
+  soundPoolReleaseDueMs.push(getServerTime() + duration * 1000);
+  ensureSoundPoolReleaseCheck();
 }
 
 // 默认音效模型
@@ -60,7 +128,6 @@ export function createSoundInternal(
   is3d: boolean,
   model: SoundModel = defaultSoundModel
 ): any {
-  const timer = (jass as any).CreateTimer();
   const sound = (jass as any).CreateSound(
     path,
     false,
@@ -77,15 +144,13 @@ export function createSoundInternal(
 
   const pathHash = (jass as any).StringHash(path);
   (jass as any).SaveSoundHandle(hash, pathHash, index, sound);
-  (jass as any).SaveTimerHandle(hash, (jass as any).GetHandleId(sound), KEY_TIMER, timer);
-  (jass as any).SaveSoundHandle(hash, (jass as any).GetHandleId(timer), KEY_SOUND, sound);
   (jass as any).SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false);
   (jass as any).SaveInteger(hash, (jass as any).GetHandleId(sound), KEY_INDEX, index);
   (jass as any).SaveStr(hash, (jass as any).GetHandleId(sound), KEY_PATH, path);
 
   let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
   if (duration <= 0 || duration > 3600) duration = 1;
-  safeTimerStart(timer, duration, false, onSoundPoolTimerExpire);
+  scheduleSoundPoolRelease(sound, duration);
 
   return sound;
 }
@@ -107,20 +172,11 @@ export function getSoundInternal(
 
   if (!sound) return null;
 
-  const timer = (jass as any).LoadTimerHandle(hash, (jass as any).GetHandleId(sound), KEY_TIMER);
-
   model.applyToSound(sound, x, y, z, cutoff);
 
-  if (timer) {
-    safeDestroyTimer(timer);
-    const newTimer = (jass as any).CreateTimer();
-    (jass as any).SaveTimerHandle(hash, (jass as any).GetHandleId(sound), KEY_TIMER, newTimer);
-    (jass as any).SaveSoundHandle(hash, (jass as any).GetHandleId(newTimer), KEY_SOUND, sound);
-
-    let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
-    if (duration <= 0 || duration > 3600) duration = 1;
-    safeTimerStart(newTimer, duration, false, onSoundPoolTimerExpire);
-  }
+  let duration = (jass as any).GetSoundFileDuration(path) * 0.001;
+  if (duration <= 0 || duration > 3600) duration = 1;
+  scheduleSoundPoolRelease(sound, duration);
 
   (jass as any).SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false);
 

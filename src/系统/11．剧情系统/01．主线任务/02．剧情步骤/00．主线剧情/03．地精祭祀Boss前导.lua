@@ -10,9 +10,9 @@ local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____02_FF0E_5267_60C5_6B65_
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_0.safeTimerStart
-local safeDestroyTimer = ____require_result_0.safeDestroyTimer
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
@@ -20,9 +20,7 @@ local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与�
 local IsUnitAliveBJ = ____require_result_2.IsUnitAliveBJ
 local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
 local TriggerRegisterUnitInRangeSimple = ____require_result_3.TriggerRegisterUnitInRangeSimple
-local CreateTimer = jass.CreateTimer
 local CreateTrigger = jass.CreateTrigger
-local GetExpiredTimer = jass.GetExpiredTimer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetTriggerUnit = jass.GetTriggerUnit
 local IsUnitInGroup = jass.IsUnitInGroup
@@ -34,6 +32,7 @@ local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local EVENT_UNIT_SPELL_EFFECT = jass.EVENT_UNIT_SPELL_EFFECT
 local _____5DF2_521D_59CB_5316_8FDB_5EA603_6838_5FC3 = false
 local _____5DF2_6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4 = false
+local _____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID = 0
 local function _____8BFB_53D6_5730_7CBE_5DEB_5E08Boss()
     return YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
 end
@@ -145,7 +144,10 @@ local function ____on_68C0_67E5_5E76_6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4
     local bossUnit = _____8BFB_53D6_5730_7CBE_5DEB_5E08Boss()
     if bossUnit ~= nil and bossUnit ~= 0 then
         _____6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4(bossUnit)
-        safeDestroyTimer(GetExpiredTimer())
+        if _____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID ~= 0 then
+            removePeriodicCallback(_____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID)
+            _____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID = 0
+        end
     end
 end
 ____exports["地精祭祀Boss前导剧情动作注册表"] = {["JLC精灵村_创建地精祭祀Boss预备"] = ____exports["执行地精祭祀Boss前导激活"], ["JLC精灵村_地精祭祀Boss战正式注册"] = ____exports["执行地精祭祀Boss战正式注册"]}
@@ -159,7 +161,8 @@ ____exports["初始化进度03_地精祭祀Boss前导核心"] = function()
         _____6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4(bossUnit)
         return
     end
-    local timer = CreateTimer()
-    safeTimerStart(timer, 0.5, true, ____on_68C0_67E5_5E76_6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4)
+    if _____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID == 0 then
+        _____5730_7CBE_796D_7940Boss_8303_56F4_8F6E_8BE2ID = addPeriodicCallback(500, ____on_68C0_67E5_5E76_6CE8_518C_5730_7CBE_796D_7940Boss_8303_56F4)
+    end
 end
 return ____exports

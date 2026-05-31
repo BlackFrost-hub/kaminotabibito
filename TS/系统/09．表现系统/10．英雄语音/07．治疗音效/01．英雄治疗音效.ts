@@ -15,9 +15,8 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTimerStart: (this: void, timer: any, timeout: number, periodic: boolean, action: () => void) => void;
-  safeDestroyTimer: (this: void, timer: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string | undefined | null) => number;
@@ -28,15 +27,13 @@ import { 英雄治疗音效配置列表, 英雄治疗音效冷却, 治疗音效�
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const IsUnitAlly = jass.IsUnitAlly as (unit: any, whichPlayer: any) => boolean;
-const CreateTimer = jass.CreateTimer as () => any;
-const GetExpiredTimer = jass.GetExpiredTimer as () => any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (soundHandle: any, volumePercent: number, whichUnit: any) => void;
 
 const 冷却字段 = "受到帮助语音";
-const 冷却计时器字段 = "治疗音效单位";
 
 let 英雄治疗音效已初始化 = false;
+const 治疗音效冷却结束单位队列: any[] = [];
 
 function 是注册玩家英雄(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
@@ -70,20 +67,16 @@ function 取播放音效(this: void, soundList: any[]): any {
 }
 
 function 治疗音效冷却结束(this: void): void {
-  const timer = GetExpiredTimer();
-  if (timer == null || timer === 0) return;
-  const unit = YDUserDataGetSafe("timer", timer, 冷却计时器字段, "unit");
+  const unit = 治疗音效冷却结束单位队列.shift();
   if (unit != null && unit !== 0) {
     YDUserDataSetSafe("unit", unit, 冷却字段, "boolean", false);
   }
-  safeDestroyTimer(timer);
 }
 
 function 进入治疗音效冷却(this: void, unit: any): void {
   YDUserDataSetSafe("unit", unit, 冷却字段, "boolean", true);
-  const timer = CreateTimer();
-  YDUserDataSetSafe("timer", timer, 冷却计时器字段, "unit", unit);
-  safeTimerStart(timer, 英雄治疗音效冷却, false, 治疗音效冷却结束);
+  治疗音效冷却结束单位队列.push(unit);
+  addDelayedCallback(英雄治疗音效冷却 * 1000, 治疗音效冷却结束);
 }
 
 function 满足治疗音效关系(this: void, source: any, target: any): boolean {

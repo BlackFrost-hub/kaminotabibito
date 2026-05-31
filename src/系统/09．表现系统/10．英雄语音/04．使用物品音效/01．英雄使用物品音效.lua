@@ -12,14 +12,11 @@ local _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____req
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
-local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_4.safeTimerStart
-local safeDestroyTimer = ____require_result_4.safeDestroyTimer
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitCurrentOrder = jass.GetUnitCurrentOrder
-local GetExpiredTimer = jass.GetExpiredTimer
-local CreateTimer = jass.CreateTimer
 local GetRandomInt = jass.GetRandomInt
 local PlaySoundBJ = jass.PlaySoundBJ
 local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
@@ -29,8 +26,8 @@ local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_51B7_5374 = ____require_resul
 local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5C0F = ____require_result_5["英雄使用物品命令最小"]
 local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5927 = ____require_result_5["英雄使用物品命令最大"]
 local _____51B7_5374_5355_4F4D_5B57_6BB5 = "使用物品语音"
-local _____51B7_5374_8BA1_65F6_5668_5B57_6BB5 = "物品使用音效单位"
 local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_5DF2_521D_59CB_5316 = false
+local _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 = {}
 local function isUseItemOrder(orderId)
     return orderId >= _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5C0F and orderId <= _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5927
 end
@@ -58,11 +55,7 @@ local function _____53D6_64AD_653E_97F3_6548(soundList)
     return soundList[index + 1]
 end
 local function _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local unit = YDUserDataGetSafe("timer", timer, _____51B7_5374_8BA1_65F6_5668_5B57_6BB5, "unit")
+    local unit = table.remove(_____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217, 1)
     if unit ~= nil and unit ~= 0 then
         YDUserDataSetSafe(
             "unit",
@@ -72,7 +65,6 @@ local function _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F()
             false
         )
     end
-    safeDestroyTimer(timer)
 end
 local function _____64AD_653E_7269_54C1_4F7F_7528_97F3_6548(unit, config)
     local soundHandle = _____53D6_64AD_653E_97F3_6548(config["音效列表"])
@@ -112,15 +104,8 @@ local function _____5904_7406_7269_54C1_4F7F_7528_97F3_6548(unit, item)
         "boolean",
         true
     )
-    local timer = CreateTimer()
-    YDUserDataSetSafe(
-        "timer",
-        timer,
-        _____51B7_5374_8BA1_65F6_5668_5B57_6BB5,
-        "unit",
-        unit
-    )
-    safeTimerStart(timer, _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_51B7_5374, false, _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F)
+    _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217[#_____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 + 1] = unit
+    addDelayedCallback(_____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_51B7_5374 * 1000, _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F)
 end
 ____exports["init英雄使用物品音效"] = function()
     if _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_5DF2_521D_59CB_5316 then

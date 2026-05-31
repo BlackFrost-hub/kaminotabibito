@@ -13,17 +13,14 @@ local _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____req
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
-local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____require_result_3.safeTimerStart
-local safeDestroyTimer = ____require_result_3.safeDestroyTimer
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
 local IsUnitType = jass.IsUnitType
-local CreateTimer = jass.CreateTimer
-local GetExpiredTimer = jass.GetExpiredTimer
 local GetRandomInt = jass.GetRandomInt
 local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
 local _____51B7_5374_5B57_6BB5 = "战斗胜利语音"
-local _____51B7_5374_8BA1_65F6_5668_5B57_6BB5 = "击杀音效单位"
 local _____82F1_96C4_51FB_6740_97F3_6548_5DF2_521D_59CB_5316 = false
+local _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 = {}
 local function _____6B7B_4EA1_5355_4F4D_6EE1_8DB3_51FB_6740_97F3_6548_524D_7F6E(unit)
     if unit == nil or unit == 0 then
         return false
@@ -63,11 +60,7 @@ local function _____53D6_64AD_653E_97F3_6548(soundList)
     return soundList[index + 1]
 end
 local function _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F()
-    local timer = GetExpiredTimer()
-    if timer == nil or timer == 0 then
-        return
-    end
-    local unit = YDUserDataGetSafe("timer", timer, _____51B7_5374_8BA1_65F6_5668_5B57_6BB5, "unit")
+    local unit = table.remove(_____51FB_6740_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217, 1)
     if unit ~= nil and unit ~= 0 then
         YDUserDataSetSafe(
             "unit",
@@ -77,7 +70,6 @@ local function _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F()
             false
         )
     end
-    safeDestroyTimer(timer)
 end
 local function _____8FDB_5165_51FB_6740_97F3_6548_51B7_5374(unit)
     YDUserDataSetSafe(
@@ -87,15 +79,8 @@ local function _____8FDB_5165_51FB_6740_97F3_6548_51B7_5374(unit)
         "boolean",
         true
     )
-    local timer = CreateTimer()
-    YDUserDataSetSafe(
-        "timer",
-        timer,
-        _____51B7_5374_8BA1_65F6_5668_5B57_6BB5,
-        "unit",
-        unit
-    )
-    safeTimerStart(timer, _____82F1_96C4_51FB_6740_97F3_6548_51B7_5374, false, _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F)
+    _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217[#_____51FB_6740_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 + 1] = unit
+    addDelayedCallback(_____82F1_96C4_51FB_6740_97F3_6548_51B7_5374 * 1000, _____51FB_6740_97F3_6548_51B7_5374_7ED3_675F)
 end
 local function _____5904_7406_82F1_96C4_51FB_6740_97F3_6548(dyingUnit, killingUnit)
     if not _____6B7B_4EA1_5355_4F4D_6EE1_8DB3_51FB_6740_97F3_6548_524D_7F6E(dyingUnit) then

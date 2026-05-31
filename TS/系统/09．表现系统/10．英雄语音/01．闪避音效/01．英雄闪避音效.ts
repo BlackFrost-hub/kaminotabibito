@@ -19,6 +19,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
 
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -27,6 +30,7 @@ const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (this: void, soundHandle: an
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 
 let 已初始化英雄闪避语音 = false;
+const 闪避语音冷却结束单位队列: any[] = [];
 
 function 取英雄名(this: void, unit: any): string {
   const 全部名称 = 获取单位玩家英雄全部名称(unit);
@@ -73,12 +77,10 @@ function 本地玩家播放(this: void, unit: any, soundHandle: any): void {
 }
 
 function 英雄闪避语音冷却结束(this: void): void {
-  const timer = jass.GetExpiredTimer();
-  const target = YDUserDataGetSafe("timer", timer, "英雄闪避语音单位", "unit");
+  const target = 闪避语音冷却结束单位队列.shift();
   if (target != null && target !== 0) {
     YDUserDataSetSafe("unit", target, "闪避语音", "boolean", false);
   }
-  jass.DestroyTimer(timer);
 }
 
 function 处理闪避语音(this: void, _source: any, target: any): void {
@@ -88,9 +90,8 @@ function 处理闪避语音(this: void, _source: any, target: any): void {
   if (soundHandle == null) return;
   YDUserDataSetSafe("unit", target, "闪避语音", "boolean", true);
   本地玩家播放(target, soundHandle);
-  const timer = jass.CreateTimer();
-  YDUserDataSetSafe("timer", timer, "英雄闪避语音单位", "unit", target);
-  jass.TimerStart(timer, 英雄闪避音效冷却, false, 英雄闪避语音冷却结束);
+  闪避语音冷却结束单位队列.push(target);
+  addDelayedCallback(英雄闪避音效冷却 * 1000, 英雄闪避语音冷却结束);
 }
 
 function 闪避成功回调(this: void, source: any, target: any, _damage: number): void {
