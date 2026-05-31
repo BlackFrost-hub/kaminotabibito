@@ -1,7 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____07_FF0E_8054_673A_5B89_5168_5DE5_5177 = require("系统.00．核心系统.07．联机安全工具")
-local safeTimerStart = ____07_FF0E_8054_673A_5B89_5168_5DE5_5177.safeTimerStart
 --- 从当前页往后找第一个任务行。
 -- 不再从 queue 头开始，避免 ~ 跳回前面已经看过的任务页。
 function ____exports.findFirstQuestEntryIndex(self, state)
@@ -118,19 +116,6 @@ function ____exports.dzGetPlayerId(self, p)
 end
 function ____exports.dzPlayer(self, index)
     return jass.Player(index)
-end
-function ____exports.dzTimerCreate(self)
-    return jass.CreateTimer()
-end
-function ____exports.dzTimerStart(self, t, timeout, periodic, cb)
-    if t then
-        safeTimerStart(t, timeout, periodic, cb)
-    end
-end
-function ____exports.dzTimerPause(self, t)
-    if t then
-        jass.PauseTimer(t)
-    end
 end
 function ____exports.dzLoadToc(self)
     japi.DzLoadToc(____exports.TOC_PATH)

@@ -21,7 +21,6 @@ import {
   dzSetText,
   dzSetTexture,
   dzShow,
-  dzTimerPause,
   findFirstQuestEntryIndex,
   g_questCallbacksByPlayer,
   g_states,
@@ -29,7 +28,7 @@ import {
   KEY_SKIP_DIALOG,
   MAX_PLAYERS,
 } from "./10．对话框渲染-Dz与状态";
-import { advanceDialog, showDialogFrames, skipTyping, playEntry } from "./12．对话框渲染-播放与状态管理";
+import { advanceDialog, showDialogFrames, skipTyping, playEntry, stopTyping } from "./12．对话框渲染-播放与状态管理";
 
 // ========== 虚拟分区：队列索引/当前页查找辅助 ==========
 
@@ -67,7 +66,7 @@ function renderCurrentEntry(state: PlayerDialogState, revealFullText: boolean): 
 
 /** 统一收尾：清空 queue/索引/活跃标记 → finish → 隐藏 UI */
 function finishDialogAndCleanup(state: PlayerDialogState): void {
-  dzTimerPause(state.tickTimer);
+  stopTyping(state);
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue = [];
@@ -96,7 +95,7 @@ function runQuestAcceptForPlayer(playerId: number): void {
   if (!ctx) return;
   const { state, questIdx, onAccept } = ctx;
   const hadRemainingEntries = state.queue.length > questIdx + 1;
-  dzTimerPause(state.tickTimer);
+  stopTyping(state);
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue.splice(0, questIdx + 1);
@@ -125,7 +124,7 @@ function runQuestRejectForPlayer(playerId: number): void {
   if (!ctx) return;
   const { state, questIdx, onReject } = ctx;
   const hadRemainingEntries = state.queue.length > questIdx + 1;
-  dzTimerPause(state.tickTimer);
+  stopTyping(state);
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue.splice(0, questIdx + 1);
@@ -273,7 +272,7 @@ function skipDialogLocal(): void {
   if (!state || state.queue.length === 0) return;
 
   startSkipKeyCooldown(triggerPid);
-  dzTimerPause(state.tickTimer);
+  stopTyping(state);
 
   const questIdx = findFirstQuestEntryIndex(state); // 从 currentIndex 往后找
   const currentEntry = state.queue[state.currentIndex];

@@ -1,8 +1,7 @@
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
-import { safeTimerStart } from "../../../系统/00．核心系统/07．联机安全工具";
 
-import type { Frame, Player, PlayerDialogState, Timer } from "./02．对话框业务逻辑";
+import type { Frame, Player, PlayerDialogState } from "./02．对话框业务逻辑";
 
 export const DIALOG_OPEN_SOUND = "Sound\\Interface\\SecretFound.wav";
 /** 对话框系统固定为 4 个玩家槽位：P1~P4。 */
@@ -60,9 +59,6 @@ export function dzCreate(template: string, tag: number): Frame {
 export function dzGetLocalPlayer(): Player { return jass.GetLocalPlayer(); }
 export function dzGetPlayerId(p: Player): number { return jass.GetPlayerId(p) as number; }
 export function dzPlayer(index: number): Player { return jass.Player(index); }
-export function dzTimerCreate(): Timer { return jass.CreateTimer(); }
-export function dzTimerStart(t: Timer, timeout: number, periodic: boolean, cb: () => void): void { if (t) safeTimerStart(t, timeout, periodic, cb); }
-export function dzTimerPause(t: Timer): void { if (t) jass.PauseTimer(t); }
 export function dzLoadToc(): void { japi.DzLoadToc(TOC_PATH); }
 let g_tocLoaded = false;
 export function dzLoadTocOnce(): void { if (g_tocLoaded) return; g_tocLoaded = true; dzLoadToc(); }

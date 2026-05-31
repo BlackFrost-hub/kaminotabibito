@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local showContinueHint, runTypingTickForPlayer, typingTickCallbackP0, typingTickCallbackP1, typingTickCallbackP2, typingTickCallbackP3, startTyping, onTypingTick, jass
+local showContinueHint, startTyping, onTypingTick, jass
 local ____index = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_Mp3PlayReuse = ____index.Sound3DII_Mp3PlayReuse
 local ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001 = require("系统.09．表现系统.02．对话框系统.10．对话框渲染-Dz与状态")
@@ -24,12 +24,10 @@ local dzSetFont = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSet
 local dzSetText = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetText
 local dzSetTexture = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetTexture
 local dzShow = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzShow
-local dzTimerCreate = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerCreate
-local dzTimerPause = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerPause
-local dzTimerStart = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerStart
 local dzLoadTocOnce = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzLoadTocOnce
 local g_questCallbacksByPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
 local g_states = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
+local MAX_PLAYERS = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.MAX_PLAYERS
 local syncQuestCallbacksTableFromQueueHead = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.syncQuestCallbacksTableFromQueueHead
 function ____exports.nextTypingProgress(self, current, step)
     if step == nil then
@@ -48,92 +46,30 @@ function showContinueHint(self, state, visible)
     end
     dzShow(nil, state.frames[12], visible)
 end
-function runTypingTickForPlayer(self, playerId)
-    local state = g_states[playerId + 1]
-    if not state then
+function startTyping(self, state)
+    if state.playerId < 0 or state.playerId >= MAX_PLAYERS then
         return
     end
-    onTypingTick(nil, state)
+    state.typingActive = true
 end
-function typingTickCallbackP0(self)
-    runTypingTickForPlayer(nil, 0)
-end
-function typingTickCallbackP1(self)
-    runTypingTickForPlayer(nil, 1)
-end
-function typingTickCallbackP2(self)
-    runTypingTickForPlayer(nil, 2)
-end
-function typingTickCallbackP3(self)
-    runTypingTickForPlayer(nil, 3)
-end
-function startTyping(self, state)
-    repeat
-        local ____switch56 = state.playerId
-        local ____cond56 = ____switch56 == 0
-        if ____cond56 then
-            dzTimerStart(
-                nil,
-                state.tickTimer,
-                ____exports.TICK,
-                true,
-                typingTickCallbackP0
-            )
-            return
-        end
-        ____cond56 = ____cond56 or ____switch56 == 1
-        if ____cond56 then
-            dzTimerStart(
-                nil,
-                state.tickTimer,
-                ____exports.TICK,
-                true,
-                typingTickCallbackP1
-            )
-            return
-        end
-        ____cond56 = ____cond56 or ____switch56 == 2
-        if ____cond56 then
-            dzTimerStart(
-                nil,
-                state.tickTimer,
-                ____exports.TICK,
-                true,
-                typingTickCallbackP2
-            )
-            return
-        end
-        ____cond56 = ____cond56 or ____switch56 == 3
-        if ____cond56 then
-            dzTimerStart(
-                nil,
-                state.tickTimer,
-                ____exports.TICK,
-                true,
-                typingTickCallbackP3
-            )
-            return
-        end
-        do
-            return
-        end
-    until true
+function ____exports.stopTyping(self, state)
+    state.typingActive = false
 end
 function onTypingTick(self, state)
     if #state.queue == 0 then
-        dzTimerPause(nil, state.tickTimer)
+        ____exports.stopTyping(nil, state)
         return
     end
     state.strNow = ____exports.nextTypingProgress(nil, state.strNow, ____exports.STEP_LEN)
     state.clickCooldown = false
     local entry = state.queue[state.currentIndex + 1]
     if not entry then
-        dzTimerPause(nil, state.tickTimer)
+        ____exports.stopTyping(nil, state)
         return
     end
     if state.strNow >= state.strLen then
         dzSetText(nil, state.frames[4], entry.text)
-        dzTimerPause(nil, state.tickTimer)
+        ____exports.stopTyping(nil, state)
         if entry.isQuest then
             syncQuestCallbacksTableFromQueueHead(nil, state)
             showQuestButtons(
@@ -158,6 +94,8 @@ function onTypingTick(self, state)
     end
 end
 jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 ____exports.STEP_LEN = 2
 ____exports.TICK = 0.03
 function ____exports.stringLengthCompat(self, text)
@@ -217,7 +155,7 @@ function ____exports.ensureState(self, playerId)
         playerId = playerId,
         queue = {},
         currentIndex = 0,
-        tickTimer = dzTimerCreate(nil),
+        typingActive = false,
         frames = {},
         strNow = 0,
         strLen = 0,
@@ -284,7 +222,7 @@ function ____exports.showDialogFrames(self, state, visible)
     end
 end
 function ____exports.clearState(self, state)
-    dzTimerPause(nil, state.tickTimer)
+    ____exports.stopTyping(nil, state)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     state.queue = {}
@@ -343,7 +281,7 @@ function ____exports.skipTyping(self, state)
     end
     local entry = state.queue[state.currentIndex + 1]
     if state.strNow < state.strLen then
-        dzTimerPause(nil, state.tickTimer)
+        ____exports.stopTyping(nil, state)
         state.strNow = state.strLen
         dzSetText(nil, state.frames[4], entry.text)
     end
@@ -364,6 +302,23 @@ function ____exports.skipTyping(self, state)
     end
     state.clickCooldown = false
 end
+local function onTypingDriver()
+    do
+        local playerId = 0
+        while playerId < MAX_PLAYERS do
+            do
+                local state = g_states[playerId + 1]
+                if not state or not state.typingActive then
+                    goto __continue54
+                end
+                onTypingTick(nil, state)
+            end
+            ::__continue54::
+            playerId = playerId + 1
+        end
+    end
+end
+addPeriodicCallback(____exports.TICK * 1000, onTypingDriver)
 function ____exports.advanceDialog(self, state)
     showQuestButtons(
         nil,
@@ -385,8 +340,8 @@ function ____exports.advanceDialog(self, state)
 end
 function ____exports.enqueue(self, state, entry)
     local wasEmpty = #state.queue == 0
-    local ____state_queue_0 = state.queue
-    ____state_queue_0[#____state_queue_0 + 1] = entry
+    local ____state_queue_1 = state.queue
+    ____state_queue_1[#____state_queue_1 + 1] = entry
     if wasEmpty then
         state.currentIndex = 0
         ____exports.playEntry(nil, state)

@@ -4,6 +4,9 @@ import { resolveQuestButtonTexts, setQuestButtonTexts, showQuestButtons } from "
 import { DialogEntry, Frame, onDialogFinished, PlayerDialogState } from "./02．对话框业务逻辑";
 
 const jass = require("jass.common") as any;
+const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+};
 
 // ========== 虚拟分区：打字机步进长度与刷新间隔常量 ==========
 export const STEP_LEN = 2;
@@ -69,12 +72,10 @@ import {
   dzSetText,
   dzSetTexture,
   dzShow,
-  dzTimerCreate,
-  dzTimerPause,
-  dzTimerStart,
   dzLoadTocOnce,
   g_questCallbacksByPlayer,
   g_states,
+  MAX_PLAYERS,
   syncQuestCallbacksTableFromQueueHead,
 } from "./10．对话框渲染-Dz与状态";
 
@@ -101,7 +102,7 @@ export function ensureState(playerId: number): PlayerDialogState {
     playerId,
     queue: [],
     currentIndex: 0,
-    tickTimer: dzTimerCreate(),
+    typingActive: false,
     frames: [],
     strNow: 0,
     strLen: 0,
@@ -144,7 +145,7 @@ export function showDialogFrames(state: PlayerDialogState, visible: boolean): vo
 }
 
 export function clearState(state: PlayerDialogState): void {
-  dzTimerPause(state.tickTimer);
+  stopTyping(state);
   resetActivePlayerIdIfMatch(state.playerId);
   g_questCallbacksByPlayer[state.playerId] = undefined;
   state.queue = [];
@@ -195,7 +196,7 @@ export function skipTyping(state: PlayerDialogState): void {
   const entry = state.queue[state.currentIndex];
 
   if (state.strNow < state.strLen) {
-    dzTimerPause(state.tickTimer);
+    stopTyping(state);
     state.strNow = state.strLen;
     dzSetText(state.frames[3], entry.text);
   }
@@ -211,51 +212,38 @@ export function skipTyping(state: PlayerDialogState): void {
   state.clickCooldown = false;
 }
 
-function runTypingTickForPlayer(playerId: number): void {
-  const state = g_states[playerId];
-  if (!state) return;
-  onTypingTick(state);
+function startTyping(state: PlayerDialogState): void {
+  if (state.playerId < 0 || state.playerId >= MAX_PLAYERS) return;
+  state.typingActive = true;
 }
 
-function typingTickCallbackP0(): void { runTypingTickForPlayer(0); }
-function typingTickCallbackP1(): void { runTypingTickForPlayer(1); }
-function typingTickCallbackP2(): void { runTypingTickForPlayer(2); }
-function typingTickCallbackP3(): void { runTypingTickForPlayer(3); }
+export function stopTyping(state: PlayerDialogState): void {
+  state.typingActive = false;
+}
 
-function startTyping(state: PlayerDialogState): void {
-  switch (state.playerId) {
-    case 0:
-      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP0);
-      return;
-    case 1:
-      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP1);
-      return;
-    case 2:
-      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP2);
-      return;
-    case 3:
-      dzTimerStart(state.tickTimer, TICK, true, typingTickCallbackP3);
-      return;
-    default:
-      return;
+function onTypingDriver(this: void): void {
+  for (let playerId = 0; playerId < MAX_PLAYERS; playerId++) {
+    const state = g_states[playerId];
+    if (!state || !state.typingActive) continue;
+    onTypingTick(state);
   }
 }
 
 function onTypingTick(state: PlayerDialogState): void {
   if (state.queue.length === 0) {
-    dzTimerPause(state.tickTimer);
+    stopTyping(state);
     return;
   }
   state.strNow = nextTypingProgress(state.strNow, STEP_LEN);
   state.clickCooldown = false;
   const entry = state.queue[state.currentIndex];
   if (!entry) {
-    dzTimerPause(state.tickTimer);
+    stopTyping(state);
     return;
   }
   if (state.strNow >= state.strLen) {
     dzSetText(state.frames[3], entry.text);
-    dzTimerPause(state.tickTimer);
+    stopTyping(state);
     if (entry.isQuest) {
       syncQuestCallbacksTableFromQueueHead(state);
       showQuestButtons(state, true, dzGetLocalPlayer, dzPlayer, dzShow);
@@ -268,6 +256,8 @@ function onTypingTick(state: PlayerDialogState): void {
     dzSetText(state.frames[3], substringCompat(entry.text, 0, state.strNow));
   }
 }
+
+addPeriodicCallback(TICK * 1000, onTypingDriver);
 
 export function advanceDialog(state: PlayerDialogState): void {
   showQuestButtons(state, false, dzGetLocalPlayer, dzPlayer, dzShow);

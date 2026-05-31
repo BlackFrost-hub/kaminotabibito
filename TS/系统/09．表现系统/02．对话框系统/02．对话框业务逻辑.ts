@@ -2,7 +2,6 @@ import type { QuestCallbacks } from "./01．任务对话框";
 
 // ========== 虚拟分区：基础类型 ==========
 export type Player = any;
-export type Timer = any;
 export type Frame = number;
 
 // ========== 虚拟分区：基础类型别名与数据接口 ==========
@@ -25,7 +24,7 @@ export interface PlayerDialogState {
   playerId: number;
   queue: DialogEntry[];
   currentIndex: number;
-  tickTimer: Timer;
+  typingActive: boolean;
   frames: Frame[];
   strNow: number;
   strLen: number;
@@ -83,12 +82,14 @@ export function createQuestDialogEntry(
  */
 export function resetDialogActiveFlagsKeepOnFinish(state: PlayerDialogState): void {
   state.isActive = false;
+  state.typingActive = false;
   state.waitingClick = false;
   state.clickCooldown = false;
 }
 
 export function onDialogFinished(state: PlayerDialogState): void {
   state.isActive = false;
+  state.typingActive = false;
   state.waitingClick = false;
   state.clickCooldown = false;
   const cb = state.onFinish;

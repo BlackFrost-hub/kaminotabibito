@@ -33,7 +33,6 @@ local dzSetFont = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSet
 local dzSetText = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetText
 local dzSetTexture = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzSetTexture
 local dzShow = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzShow
-local dzTimerPause = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.dzTimerPause
 local findFirstQuestEntryIndex = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.findFirstQuestEntryIndex
 local g_questCallbacksByPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
 local g_states = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
@@ -45,6 +44,7 @@ local advanceDialog = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B
 local showDialogFrames = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.showDialogFrames
 local skipTyping = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.skipTyping
 local playEntry = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.playEntry
+local stopTyping = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.stopTyping
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local function getCurrentEntry(self, state)
@@ -92,7 +92,7 @@ local function renderCurrentEntry(self, state, revealFullText)
 end
 --- 统一收尾：清空 queue/索引/活跃标记 → finish → 隐藏 UI
 local function finishDialogAndCleanup(self, state)
-    dzTimerPause(nil, state.tickTimer)
+    stopTyping(nil, state)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     state.queue = {}
@@ -127,7 +127,7 @@ local function runQuestAcceptForPlayer(self, playerId)
     local questIdx = ctx.questIdx
     local onAccept = ctx.onAccept
     local hadRemainingEntries = #state.queue > questIdx + 1
-    dzTimerPause(nil, state.tickTimer)
+    stopTyping(nil, state)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     __TS__ArraySplice(state.queue, 0, questIdx + 1)
@@ -168,7 +168,7 @@ local function runQuestRejectForPlayer(self, playerId)
     local questIdx = ctx.questIdx
     local onReject = ctx.onReject
     local hadRemainingEntries = #state.queue > questIdx + 1
-    dzTimerPause(nil, state.tickTimer)
+    stopTyping(nil, state)
     resetActivePlayerIdIfMatch(nil, state.playerId)
     g_questCallbacksByPlayer[state.playerId + 1] = nil
     __TS__ArraySplice(state.queue, 0, questIdx + 1)
@@ -360,7 +360,7 @@ local function skipDialogLocal(self)
         return
     end
     startSkipKeyCooldown(nil, triggerPid)
-    dzTimerPause(nil, state.tickTimer)
+    stopTyping(nil, state)
     local questIdx = findFirstQuestEntryIndex(nil, state)
     local currentEntry = state.queue[state.currentIndex + 1]
     if state.strNow < state.strLen then

@@ -32,11 +32,13 @@ end
 --- 仅清「进行中」标志，**不**触发 onFinish（用于任务接受/拒绝后立刻链式 openNpcDialog，避免先 onFinish 销毁 qipao）。
 function ____exports.resetDialogActiveFlagsKeepOnFinish(self, state)
     state.isActive = false
+    state.typingActive = false
     state.waitingClick = false
     state.clickCooldown = false
 end
 function ____exports.onDialogFinished(self, state)
     state.isActive = false
+    state.typingActive = false
     state.waitingClick = false
     state.clickCooldown = false
     local cb = state.onFinish
