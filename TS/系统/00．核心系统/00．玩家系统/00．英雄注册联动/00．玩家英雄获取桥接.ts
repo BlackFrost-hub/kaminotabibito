@@ -109,6 +109,11 @@ const seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnit
   | ((this: void, whichPlayer: any, whichUnit: any) => void)
   | undefined;
 
+const playerCountSystem = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数") as {
+  初始化玩家人数监听: (this: void) => void;
+};
+const 初始化玩家人数监听 = playerCountSystem.初始化玩家人数监听;
+
 function invokeSelectionCenterInit(whichPlayer: any): void {
   if (typeof initPlayerSelectionCenter !== "function") return;
   initPlayerSelectionCenter(whichPlayer);
@@ -274,6 +279,7 @@ function initOutOfCombatSystem(this: void): void {
 
 export function initPlayerHeroGetBridge(): void {
   清理英雄依赖注册启动延迟();
+  初始化玩家人数监听();
   initOutOfCombatSystem();
 }
 

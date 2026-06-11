@@ -24,7 +24,6 @@ local IssueNeutralPointOrder = jass.IssueNeutralPointOrder
 local IssueTargetOrder = jass.IssueTargetOrder
 local IssueNeutralTargetOrder = jass.IssueNeutralTargetOrder
 local Player = jass.Player
-local _____73A9_5BB6_4EBA_6570_53D8_91CFT = jglobals.T
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
 local _____6280_80FD_547D_4EE4_7F13_5B58 = {}
 local _____6280_80FD_6570_503C_7F13_5B58 = {}
@@ -52,6 +51,16 @@ local function _____83B7_53D6Buff_6570_503CID(rawcode)
     local value = stringToFourCC(rawcode)
     ____Buff_6570_503C_7F13_5B58[rawcode] = value
     return value
+end
+local function _____83B7_53D6_5F53_524D_73A9_5BB6_4EBA_6570()
+    local ____temp_3
+    if jglobals.udg_T ~= nil then
+        ____temp_3 = jglobals.udg_T
+    else
+        ____temp_3 = jglobals.T
+    end
+    local _____73A9_5BB6_4EBA_6570 = ____temp_3
+    return __TS__Number(_____73A9_5BB6_4EBA_6570) or 0
 end
 ____exports["获取技能命令字串"] = function(skill)
     if type(skill["命令字串"]) == "string" and skill["命令字串"] ~= "" then
@@ -86,7 +95,7 @@ ____exports["受击技能是否满足条件"] = function(skill, unit, source)
         end
     end
     if skill["最低玩家人数"] ~= nil then
-        local _____5F53_524D_73A9_5BB6_4EBA_6570 = __TS__Number(_____73A9_5BB6_4EBA_6570_53D8_91CFT) or 0
+        local _____5F53_524D_73A9_5BB6_4EBA_6570 = _____83B7_53D6_5F53_524D_73A9_5BB6_4EBA_6570()
         if _____5F53_524D_73A9_5BB6_4EBA_6570 < skill["最低玩家人数"] then
             return false
         end

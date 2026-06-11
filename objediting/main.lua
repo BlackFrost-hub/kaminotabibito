@@ -12,3 +12,5 @@ ObjEditing notes:
   -- 真实 setter 是 `setIconGameInterface(...)`。
 dofile('abilities.lua')
 dofile('units.lua')
+dofile('Equipment/Equipment.lua')
+dofile('Boss/Boss.lua')

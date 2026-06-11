@@ -30,7 +30,18 @@ alwaysApply: false
 
 ## 2. Buff 表新增时必须写清楚
 
-`Buff表.ts` 新条目至少要明确这些字段：
+新增 Buff 优先写入分类表目录 `TS/系统/05．Buff系统/03．Buff表/`，不要继续把新条目直接堆进大文件 `01．Buff表.ts`。
+
+- 通用 Buff 放 `03．Buff表/01．通用.ts`。
+- DOT / HOT / 周期效果放 `03．Buff表/02．DOT.ts`。
+- 控制类 Buff 放 `03．Buff表/03．控制.ts`。
+- 属性类 Buff 放 `03．Buff表/04．属性.ts`。
+- 光环类 Buff 放 `03．Buff表/05．光环.ts`。
+- Boss 专属 Buff 放 `03．Buff表/01．Boss/` 下的单 Boss 文件，例如 `01．瑟兰迪尔.ts`。
+- 英雄专属 Buff 放 `03．Buff表/02．英雄/` 下的单英雄文件，并在该目录 `index.ts` 聚合。
+- `01．Buff表.ts` 是对外兼容入口，会合并旧表与 `03．Buff表/` 分类表；业务代码仍通过 `系统.05．Buff系统.01．Buff表` 读取。
+
+Buff 新条目至少要明确这些字段：
 
 - `buffID`
 - `buffName`

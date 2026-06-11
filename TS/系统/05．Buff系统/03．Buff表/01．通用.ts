@@ -1,0 +1,131 @@
+/** @noSelfInFile */
+
+import type { BuffData } from "../01．Buff表";
+
+// 通用 Buff：多个系统都可能复用的非 DOT、非控制、非属性类 Buff。
+export const 通用Buff表: Record<string, BuffData> = {
+  "C005": {
+      buffID: "C005",
+      buffName: "隐身",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNInvisibility.blp",
+      effect: "",
+      type: "Buff:utility",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 0,
+      priority: 4,
+      canPurge: false,
+      tooltip: "获得了『隐身』，身形会在time秒内隐去，不易被敌人察觉。"
+    },
+  "C011": {
+      buffID: "C011",
+      buffName: "心灵之火",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNInnerFire.blp",
+      effect: "",
+      type: "Buff:magic:combat",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 5,
+      canPurge: true,
+      tooltip: "获得了『心灵之火』，内在斗志被点燃，在time秒内攻击与护甲提高。"
+    },
+  "C012": {
+      buffID: "C012",
+      buffName: "嗜血术",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNBloodLust.blp",
+      effect: "",
+      type: "Buff:magic:combat",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 5,
+      canPurge: true,
+      tooltip: "获得了『嗜血术』，战意被彻底激发，在time秒内攻击速度与移动速度提高。"
+    },
+  "C013": {
+      buffID: "C013",
+      buffName: "残废",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNCripple.blp",
+      effect: "",
+      type: "Debuff:magic:strong",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 7,
+      canPurge: true,
+      tooltip: "受到了『残废』，四肢仿佛被压制，在time秒内攻击、攻击速度与移动速度都会降低。"
+    },
+  "C014": {
+      buffID: "C014",
+      buffName: "精灵之火",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNFaerieFire.blp",
+      effect: "",
+      type: "Debuff:magic:soft",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 6,
+      canPurge: true,
+      tooltip: "受到了『精灵之火』，护甲被削弱，身形也会在time秒内暴露无遗。"
+    },
+  "C015": {
+      buffID: "C015",
+      buffName: "诅咒",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNCurse.blp",
+      effect: "",
+      type: "Debuff:magic:soft",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 6,
+      canPurge: true,
+      tooltip: "受到了『诅咒』，运势变差，在time秒内攻击时有概率落空。"
+    },
+  "C019": {
+      buffID: "C019",
+      buffName: "幻象物品",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNWand.blp",
+      effect: "",
+      type: "Buff:utility",
+      interval: 0,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 0,
+      priority: 3,
+      canPurge: false,
+      tooltip: "获得了『幻象物品』，在time秒内会以幻象之身存在。"
+    },
+  "C027": {
+      buffID: "C027",
+      buffName: "生命魔法恢复",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp",
+      effect: "Abilities\\Spells\\NightElf\\Rejuvenation\\RejuvenationTarget.mdl",
+      effectMode: 'attach',
+      effectAttachPoint: "origin",
+      type: "Buff:magic:heal",
+      interval: 1,
+      maxStack: 1,
+      stackRule: 'highest',
+      stackRefresh: true,
+      dispelLevel: 1,
+      priority: 4,
+      canPurge: true,
+      tooltip: "受到「生命魔法恢复」，在time秒内持续恢复data1生命值和data2魔法值。"
+    },
+};
+
+export default 通用Buff表;

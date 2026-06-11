@@ -182,6 +182,8 @@ threatPanelSystem = require("系统.09．表现系统.05．仇恨面板.index")
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 initPlayerSelectionCenter = selectionCenterSystem.initPlayerSelectionCenter
 seedSoleSelectedUnitForPlayer = selectionCenterSystem.seedSoleSelectedUnitForPlayer
+local playerCountSystem = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+local _____521D_59CB_5316_73A9_5BB6_4EBA_6570_76D1_542C = playerCountSystem["初始化玩家人数监听"]
 local function _____6E05_7406_82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF()
     if _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID == nil then
         return
@@ -257,6 +259,7 @@ local function initOutOfCombatSystem()
 end
 function ____exports.initPlayerHeroGetBridge()
     _____6E05_7406_82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF()
+    _____521D_59CB_5316_73A9_5BB6_4EBA_6570_76D1_542C()
     initOutOfCombatSystem()
 end
 return ____exports

@@ -29,7 +29,6 @@ const IssueNeutralPointOrder = jass.IssueNeutralPointOrder as (forWhichPlayer: a
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
 const IssueNeutralTargetOrder = jass.IssueNeutralTargetOrder as (forWhichPlayer: any, whichUnit: any, unitOrder: string, targetWidget: any) => boolean;
 const Player = jass.Player as (playerId: number) => any;
-const 玩家人数变量T = jglobals.T as number | undefined;
 
 const 中立敌对玩家 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE);
 const 技能命令缓存: Record<string, string> = {};
@@ -52,6 +51,11 @@ function 获取Buff数值ID(this: void, rawcode: string | undefined): number {
   const value = stringToFourCC(rawcode);
   Buff数值缓存[rawcode] = value;
   return value;
+}
+
+function 获取当前玩家人数(this: void): number {
+  const 玩家人数 = jglobals.udg_T != null ? jglobals.udg_T : jglobals.T;
+  return Number(玩家人数) || 0;
 }
 
 export function 获取技能命令字串(this: void, skill: 受击反应技能配置): string {
@@ -84,7 +88,7 @@ export function 受击技能是否满足条件(this: void, skill: 受击反应�
   }
 
   if (skill.最低玩家人数 != null) {
-    const 当前玩家人数 = Number(玩家人数变量T) || 0;
+    const 当前玩家人数 = 获取当前玩家人数();
     if (当前玩家人数 < skill.最低玩家人数) return false;
   }
 
