@@ -132,3 +132,8 @@ export * from "./128．精光中鞋";
 export * from "./129．双翼恶魔雕像";
 export * from "./130．地狱火卡牌幸运";
 export * from "./131．触手残片";
+export * from "./132．执法者徽记";
+export * from "./133．月光锁链护腕";
+export * from "./134．审判之锋长剑";
+export * from "./135．精灵执法披风";
+export * from "./136．瑟兰迪尔的决心";

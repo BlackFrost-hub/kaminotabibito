@@ -9,6 +9,7 @@ const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_GOLD_BURST_TEST = true;
 const ENABLE_BROADCAST_HINT_TEST = true;
+const ENABLE_BOSS_REWARD_SELECTION_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -29,6 +30,10 @@ function loadTests(): void {
 
   if (ENABLE_BROADCAST_HINT_TEST) {
     require("系统.12．测试系统.04．广播提示消息测试");
+  }
+
+  if (ENABLE_BOSS_REWARD_SELECTION_TEST) {
+    require("系统.12．测试系统.05．首领奖励选择测试");
   }
 
 }

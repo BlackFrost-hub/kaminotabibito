@@ -66,6 +66,7 @@ const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．�
 const 盗贼神符魔抗 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗") as { 处理盗贼神符魔抗使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 火把 = require("系统.02．物品系统.15．装备技能.00．物品.71．火把") as { 处理火把使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 抗毒药水 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水") as { 处理抗毒药水使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 瑟兰迪尔的决心 = require("系统.02．物品系统.15．装备技能.00．物品.136．瑟兰迪尔的决心") as { 处理瑟兰迪尔的决心使用: (this: void, ctx: 物品技能事件上下文) => void };
 
 let 已初始化 = false;
 
@@ -100,6 +101,7 @@ function on物品使用链路(this: void, ctx: 物品技能事件上下文): voi
   盗贼神符魔抗.处理盗贼神符魔抗使用(ctx);
   火把.处理火把使用(ctx);
   抗毒药水.处理抗毒药水使用(ctx);
+  瑟兰迪尔的决心.处理瑟兰迪尔的决心使用(ctx);
 }
 
 function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any): void {

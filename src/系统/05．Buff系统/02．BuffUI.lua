@@ -10,7 +10,6 @@ local buildBuffBarViewModelImported = ____04_FF0EBuffUIViewModel.buildBuffBarVie
 local getMaxSlotsImported = ____04_FF0EBuffUIViewModel.getMaxSlots
 local ____01_FF0E_5E27_521B_5EFA = require("系统.09．表现系统.01．UI工具.01．帧创建")
 local createFrameImported = ____01_FF0E_5E27_521B_5EFA.createFrame
-local tryCreateFromFdfSafeImported = ____01_FF0E_5E27_521B_5EFA.tryCreateFromFdfSafe
 local ____02_FF0E_4F4D_7F6E_5C3A_5BF8 = require("系统.09．表现系统.01．UI工具.02．位置尺寸")
 local setFramePointRelativeImported = ____02_FF0E_4F4D_7F6E_5C3A_5BF8.setFramePointRelative
 local setFramePositionImported = ____02_FF0E_4F4D_7F6E_5C3A_5BF8.setFramePosition
@@ -70,7 +69,7 @@ function renderBuffBarLocal(vm)
                 local slotVM = vm.slots[i + 1]
                 local slot = slots[i + 1]
                 if not slot then
-                    goto __continue50
+                    goto __continue48
                 end
                 if slotVM.visible then
                     if slot.root ~= 0 then
@@ -93,7 +92,7 @@ function renderBuffBarLocal(vm)
                     hideSlot(i)
                 end
             end
-            ::__continue50::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -161,8 +160,6 @@ local TIP_PAD_X = 0.009
 local TIP_PAD_TOP = 0.007
 local TIP_PAD_BOTTOM = 0.006
 local TIP_OFFSET_Y_FROM_ICON_TOP = 0.07
-local BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip"
-local BUFF_TOOLTIP_TOC_PATHS = {"UI\\BuffTestTooltip.toc"}
 slots = {}
 local buffUiInitialized = false
 local refreshCallbackId = 0
@@ -206,15 +203,6 @@ local function uiCreateTextLabel(name, parent, text, position, size)
         text,
         position,
         size
-    )
-end
-local function uiTryCreateFromFdfSafe(frameName, parent, fallback, contextId)
-    return tryCreateFromFdfSafeImported(
-        nil,
-        frameName,
-        parent,
-        fallback,
-        {tocLoadKey = BUFF_TOOLTIP_TOC_KEY, tocPaths = BUFF_TOOLTIP_TOC_PATHS, debugPrefix = "BuffUI", contextId = contextId}
     )
 end
 local function getTriggerUiEventFrame()
@@ -327,24 +315,16 @@ local function createOneSlot(index, parent)
     end
     local boxW = TIP_W
     local boxH = TIP_H
-    local tipBox = uiTryCreateFromFdfSafe(
-        "BuffTestTooltipPanel",
-        parent,
-        function()
-            local fallbackFrame = uiCreateFrame({
-                type = ____UI_5DE5_5177.FrameType.BACKDROP,
-                name = "BuffUIBarTip" .. tostring(index),
-                parent = parent,
-                template = "template",
-                visible = false
-            })
-            if fallbackFrame and fallbackFrame ~= 0 then
-                uiSetFrameTexture(fallbackFrame, TIP_BOX_TEX)
-            end
-            return fallbackFrame
-        end,
-        index + 1
-    ) or 0
+    local tipBox = uiCreateFrame({
+        type = ____UI_5DE5_5177.FrameType.BACKDROP,
+        name = "BuffUIBarTip" .. tostring(index),
+        parent = parent,
+        template = "template",
+        visible = false
+    }) or 0
+    if tipBox and tipBox ~= 0 then
+        uiSetFrameTexture(tipBox, TIP_BOX_TEX)
+    end
     if tipBox and tipBox ~= 0 then
         uiSetFramePointRelative(
             tipBox,

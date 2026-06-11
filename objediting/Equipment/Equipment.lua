@@ -1,4 +1,5 @@
 dofile('Equipment/EquipmentItemTemplates.lua')
+dofile('Equipment/EquipmentAbilityTemplates.lua')
 
 dofile('Equipment/Item/Item.lua')
 dofile('Equipment/Clothes/Clothes.lua')
@@ -9,4 +10,3 @@ dofile('Equipment/Pants/Pants.lua')
 dofile('Equipment/Helmet/Helmet.lua')
 dofile('Equipment/Soul/Soul.lua')
 dofile('Equipment/TwoHandedWeapon/TwoHandedWeapon.lua')
-

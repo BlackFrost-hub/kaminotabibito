@@ -8,6 +8,7 @@ import { 属性Buff表 } from "./04．属性";
 import { 光环Buff表 } from "./05．光环";
 import { BossBuff表 } from "./01．Boss";
 import { 英雄Buff表 } from "./02．英雄";
+import { 装备Buff表 } from "./03．装备";
 
 export const 分类Buff表: Record<string, BuffData> = {
   ...通用Buff表,
@@ -17,6 +18,7 @@ export const 分类Buff表: Record<string, BuffData> = {
   ...光环Buff表,
   ...BossBuff表,
   ...英雄Buff表,
+  ...装备Buff表,
 };
 
 export default 分类Buff表;

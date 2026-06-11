@@ -7,7 +7,6 @@ import {
 import { buildBuffBarViewModel as buildBuffBarViewModelImported, getMaxSlots as getMaxSlotsImported } from "./04．BuffUIViewModel";
 import {
   createFrame as createFrameImported,
-  tryCreateFromFdfSafe as tryCreateFromFdfSafeImported,
 } from "../09．表现系统/01．UI工具/01．帧创建";
 import {
   setFramePointRelative as setFramePointRelativeImported,
@@ -49,8 +48,6 @@ const TIP_PAD_X = 0.009;
 const TIP_PAD_TOP = 0.007;
 const TIP_PAD_BOTTOM = 0.006;
 const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
-const BUFF_TOOLTIP_TOC_KEY = "BuffTestTooltip";
-const BUFF_TOOLTIP_TOC_PATHS = ["UI\\BuffTestTooltip.toc"];
 
 interface SlotFrames {
   root: number;
@@ -102,15 +99,6 @@ function uiSetFramePointRelative(this: void,
 
 function uiCreateTextLabel(this: void, name: string, parent: number, text: string, position: any, size: any): number | null {
   return createTextLabelImported(name, parent, text, position, size);
-}
-
-function uiTryCreateFromFdfSafe(this: void, frameName: string, parent: number, fallback: () => number | null, contextId: number): number | null {
-  return tryCreateFromFdfSafeImported(frameName, parent, fallback, {
-    tocLoadKey: BUFF_TOOLTIP_TOC_KEY,
-    tocPaths: BUFF_TOOLTIP_TOC_PATHS,
-    debugPrefix: "BuffUI",
-    contextId,
-  });
 }
 
 function uiHideFrame(this: void, frame: number): boolean {
@@ -222,24 +210,16 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
   const boxW = TIP_W;
   const boxH = TIP_H;
   const tipBox =
-    uiTryCreateFromFdfSafe(
-      "BuffTestTooltipPanel",
+    uiCreateFrame({
+      type: UI工具.FrameType.BACKDROP,
+      name: "BuffUIBarTip" + index,
       parent,
-      () => {
-        const fallbackFrame = uiCreateFrame({
-          type: UI工具.FrameType.BACKDROP,
-          name: "BuffUIBarTip" + index,
-          parent,
-          template: "template",
-          visible: false,
-        });
-        if (fallbackFrame && fallbackFrame !== 0) {
-          uiSetFrameTexture(fallbackFrame, TIP_BOX_TEX);
-        }
-        return fallbackFrame;
-      },
-      index + 1
-    ) || 0;
+      template: "template",
+      visible: false,
+    }) || 0;
+  if (tipBox && tipBox !== 0) {
+    uiSetFrameTexture(tipBox, TIP_BOX_TEX);
+  }
   if (tipBox && tipBox !== 0) {
     uiSetFramePointRelative(
       tipBox,

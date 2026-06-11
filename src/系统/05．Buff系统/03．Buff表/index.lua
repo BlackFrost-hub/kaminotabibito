@@ -15,6 +15,8 @@ local ____01_FF0EBoss = require("系统.05．Buff系统.03．Buff表.01．Boss.i
 local ____BossBuff_8868 = ____01_FF0EBoss["BossBuff表"]
 local ____02_FF0E_82F1_96C4 = require("系统.05．Buff系统.03．Buff表.02．英雄.index")
 local _____82F1_96C4Buff_8868 = ____02_FF0E_82F1_96C4["英雄Buff表"]
+local ____03_FF0E_88C5_5907 = require("系统.05．Buff系统.03．Buff表.03．装备.index")
+local _____88C5_5907Buff_8868 = ____03_FF0E_88C5_5907["装备Buff表"]
 ____exports["分类Buff表"] = __TS__ObjectAssign(
     {},
     _____901A_7528Buff_8868,
@@ -23,7 +25,8 @@ ____exports["分类Buff表"] = __TS__ObjectAssign(
     _____5C5E_6027Buff_8868,
     _____5149_73AFBuff_8868,
     ____BossBuff_8868,
-    _____82F1_96C4Buff_8868
+    _____82F1_96C4Buff_8868,
+    _____88C5_5907Buff_8868
 )
 ____exports.default = ____exports["分类Buff表"]
 return ____exports

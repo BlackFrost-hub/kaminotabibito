@@ -23,6 +23,7 @@ export * from "./09．装备排泄";
 export * from "./10．装备限制";
 export * from "./11．装备系统";
 export * from "./15．装备技能/index";
+export * from "./18．首领奖励选择/index";
 
 // 12．装备技能.ts 当前为空文件，暂不导出
 // export * from "./12．装备技能";
@@ -39,6 +40,7 @@ require("系统.02．物品系统.09．装备排泄");
 require("系统.02．物品系统.10．装备限制");
 require("系统.02．物品系统.11．装备系统");
 require("系统.02．物品系统.15．装备技能.index");
+require("系统.02．物品系统.18．首领奖励选择.index");
 
 /**
  * 初始化物品系统

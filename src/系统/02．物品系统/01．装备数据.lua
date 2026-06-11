@@ -3577,6 +3577,56 @@ ____exports.items.I0DN = {
     PowerUP = "1level",
     abilList = "A0LH"
 }
+____exports.items.I0E0 = {
+    type = "道具/戒指/饰品",
+    name = "执法者徽记",
+    goldPrice = 1000,
+    score = 6400,
+    level = "B-",
+    all = 32,
+    armor = 15,
+    cdReduction = 0.1
+}
+____exports.items.I0E1 = {
+    type = "道具/戒指/饰品",
+    name = "月光锁链护腕",
+    goldPrice = 1000,
+    score = 6200,
+    level = "B-",
+    agi = 45,
+    atkSpeed = 0.5,
+    hp = 600
+}
+____exports.items.I0E2 = {
+    type = "主武器",
+    name = "审判之锋长剑",
+    goldPrice = 1000,
+    score = 6500,
+    level = "B-",
+    dmg = 175,
+    str = 25,
+    armorPierce = 0.25,
+    weaponType = "剑"
+}
+____exports.items.I0E3 = {
+    type = "衣服",
+    name = "精灵执法披风",
+    goldPrice = 1000,
+    score = 6450,
+    level = "B-",
+    hp = 3200,
+    armor = 35,
+    magicResist = 0.2,
+    movespeed2 = 0.08
+}
+____exports.items.I0E4 = {
+    type = "灵魂",
+    name = "瑟兰迪尔的决心",
+    goldPrice = 1000,
+    score = 6100,
+    level = "B-",
+    all = 15
+}
 ____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}
 ____exports.items.ches = {
     type = "药剂/食品",

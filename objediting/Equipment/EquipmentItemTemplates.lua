@@ -16,13 +16,13 @@ function createEquipmentItem(id, name, options)
   item:setClassification(options.classification or 'Permanent')
   item:setLevel(options.level or 1)
   item:setLevelUnclassified(options.unclassifiedLevel or options.level or 1)
-  item:setGoldCost(options.goldCost or 0)
+  item:setGoldCost(options.goldCost or 1000)
   item:setLumberCost(options.lumberCost or 0)
   item:setHitPoints(options.hitPoints or 75)
-  item:setPriority(options.priority or 0)
+  item:setPriority(options.priority or 1000)
   item:setScalingValue(options.scale or 1.0)
   item:setCanBeDropped(options.canBeDropped ~= false)
-  item:setDroppedWhenCarrierDies(options.dropWhenCarrierDies ~= false)
+  item:setDroppedWhenCarrierDies(options.dropWhenCarrierDies == true)
   item:setCanBeSoldByMerchants(options.canBeSoldByMerchants or false)
   item:setCanBeSoldToMerchants(options.canBeSoldToMerchants or false)
   item:setActivelyUsed(options.activelyUsed or false)
@@ -54,4 +54,3 @@ function createEquipmentItem(id, name, options)
 
   return item
 end
-

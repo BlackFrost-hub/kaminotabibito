@@ -39,6 +39,7 @@ export const 史诗远古魔刃物品ID = 取装备物品ID(主动技能装备�
 export const 焰虚宝珠物品ID = 取装备物品ID(主动技能装备名称.焰虚宝珠);
 export const 先祖之狱杖物品ID = 取装备物品ID(主动技能装备名称.先祖之狱杖);
 export const 咆哮之心物品ID = 取装备物品ID(主动技能装备名称.咆哮之心);
+export const 瑟兰迪尔的决心物品ID = 取装备物品ID(主动技能装备名称.瑟兰迪尔的决心);
 
 export function 取主动技能物品ID(this: void, 装备名称: string): number {
   return 取装备物品ID(装备名称);
