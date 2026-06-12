@@ -17,8 +17,6 @@ local ____05_FF0E_5E27_63A7_5236 = require("系统.09．表现系统.01．UI工�
 local _____83B7_53D6_6E38_620FUI_5E27 = ____05_FF0E_5E27_63A7_5236.getGameUIFrame
 local _____9690_85CF_5E27 = ____05_FF0E_5E27_63A7_5236.hideFrame
 local _____663E_793A_5E27 = ____05_FF0E_5E27_63A7_5236.showFrame
-local ____00_FF0E_82F1_96C4_9009_62E9_914D_7F6E_8868 = require("系统.00．核心系统.00．玩家系统.01．英雄选择.00．英雄选择配置表")
-local _____82F1_96C4_9009_62E9_914D_7F6E_8868 = ____00_FF0E_82F1_96C4_9009_62E9_914D_7F6E_8868.default
 local ____01_FF0E_5956_52B1_914D_7F6E_8868 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表")
 local _____67E5_627E_9996_9886_5956_52B1_6C60 = ____01_FF0E_5956_52B1_914D_7F6E_8868["查找首领奖励池"]
 local ____03_FF0E_5956_52B1_53D1_653E = require("系统.02．物品系统.18．首领奖励选择.03．奖励发放")
@@ -55,6 +53,7 @@ local _____989C_8272_6B63_6587 = "|cff000000"
 local _____989C_8272_5C0F_6807_9898 = "|cffffcc5c"
 local _____989C_8272_6309_94AE = "|cffffffff"
 local _____989C_8272_7ED3_675F = "|r"
+local _____9996_9886_5956_52B1UI_73A9_5BB6ID_5217_8868 = {0, 1, 2, 3}
 local _____69FD_4F4D_4E2D_5FC3X = {
     -0.216,
     -0.144,
@@ -158,7 +157,7 @@ local function _____83B7_53D6_89E6_53D1UI_73A9_5BB6()
     if japi.DzGetTriggerUIEventPlayer ~= nil then
         return japi.DzGetTriggerUIEventPlayer()
     end
-    return GetLocalPlayer()
+    return nil
 end
 local function _____83B7_53D6_89E6_53D1_73A9_5BB6ID()
     local _____73A9_5BB6 = _____83B7_53D6_89E6_53D1UI_73A9_5BB6()
@@ -949,7 +948,7 @@ ____exports["初始化首领奖励选择界面"] = function()
         return
     end
     _____9996_9886_5956_52B1_754C_9762_5DF2_521D_59CB_5316 = true
-    for ____, _____73A9_5BB6ID in ipairs(_____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"]) do
+    for ____, _____73A9_5BB6ID in ipairs(_____9996_9886_5956_52B1UI_73A9_5BB6ID_5217_8868) do
         _____521D_59CB_5316_9996_9886_5956_52B1_69FD_4F4D(_____73A9_5BB6ID)
     end
 end
@@ -1009,7 +1008,6 @@ ____exports["切换首领奖励选择界面"] = function(_____5956_52B1_6C60ID, 
 end
 ____exports["获取首领奖励面板帧"] = function()
     ____exports["初始化首领奖励选择界面"]()
-    local _____72B6_6001 = _____83B7_53D6_69FD_4F4D_72B6_6001(_____83B7_53D6_672C_5730_73A9_5BB6ID())
-    return _____72B6_6001 ~= nil and _____72B6_6001["面板帧"] or _____9996_9886_5956_52B1_9996_4E2A_9762_677F_5E27
+    return _____9996_9886_5956_52B1_9996_4E2A_9762_677F_5E27
 end
 return ____exports

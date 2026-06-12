@@ -6,8 +6,11 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 import { SUC_IsUnitAlive, SUC_IsUnitInvincible, SUC_IsValidUnit } from "./08．单位判定与筛选函数";
+
+const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichState: number, newVal: number) => void;
 
 export const TIMED_LIFE_NONE = 0;
 export const TIMED_LIFE_RAISE_DEAD = 1;
@@ -75,7 +78,7 @@ export function UnitAddHp(u: any, value: number, b: boolean): void {
   const percent = maxLife > 0 ? life / maxLife : 1;
   const addValue = b ? maxLife * value : value;
 
-  jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue);
+  SetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue);
   jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent);
 }
 

@@ -3,6 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
 local _____83B7_53D6_5355_4F4D_82F1_96C4Rawcode = ____require_result_0["获取单位英雄Rawcode"]
 local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.02．英雄升级系统.01．升级配置表")
@@ -12,6 +13,7 @@ local UNIT_STATE_ATTACK1_BASE = 18
 local UNIT_STATE_MANA_REGEN = 32
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
+local SetUnitStateJapi = japi.SetUnitState
 local function _____5339_914D_989D_5916_5C5E_6027_89C4_5219(unit, rule)
     if rule.onlyMelee == true and jass.IsUnitType(unit, jass.UNIT_TYPE_MELEE_ATTACKER) ~= true then
         return false
@@ -23,7 +25,7 @@ local function _____5339_914D_989D_5916_5C5E_6027_89C4_5219(unit, rule)
 end
 local function _____589E_52A0_5355_4F4D_72B6_6001(unit, state, delta)
     local current = jass.GetUnitState(unit, state) or 0
-    jass.SetUnitState(unit, state, current + delta)
+    SetUnitStateJapi(unit, state, current + delta)
 end
 local function _____5E94_7528_5355_6761_989D_5916_5C5E_6027_89C4_5219(unit, level, rule)
     if rule.repeatEveryLevel == true then

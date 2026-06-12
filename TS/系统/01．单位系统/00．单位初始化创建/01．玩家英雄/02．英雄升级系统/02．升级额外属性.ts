@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const { 获取单位英雄Rawcode } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位英雄Rawcode: (this: void, unit: any) => string;
 };
@@ -14,6 +15,7 @@ const UNIT_STATE_ATTACK1_BASE = 0x12;
 const UNIT_STATE_MANA_REGEN = 0x20;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as number;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as number;
+const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichState: number, newVal: number) => void;
 
 function 匹配额外属性规则(this: void, unit: any, rule: import("./00．类型定义").升级额外属性配置): boolean {
   if (rule.onlyMelee === true && jass.IsUnitType(unit, jass.UNIT_TYPE_MELEE_ATTACKER) !== true) return false;
@@ -23,7 +25,7 @@ function 匹配额外属性规则(this: void, unit: any, rule: import("./00．�
 
 function 增加单位状态(this: void, unit: any, state: any, delta: number): void {
   const current = (jass.GetUnitState(unit, state) as number) || 0;
-  jass.SetUnitState(unit, state, current + delta);
+  SetUnitStateJapi(unit, state, current + delta);
 }
 
 function 应用单条额外属性规则(this: void, unit: any, level: number, rule: import("./00．类型定义").升级额外属性配置): void {

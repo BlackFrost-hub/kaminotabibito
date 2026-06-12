@@ -11,6 +11,7 @@ import {
 import { getServerTime } from "../../../../00．核心系统/05．中心计时器";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;
@@ -33,6 +34,7 @@ const Player = jass.Player as (playerId: number) => any;
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const SetUnitState = jass.SetUnitState as (whichUnit: any, whichState: number, newVal: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichState: number, newVal: number) => void;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichState: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: number) => boolean;
@@ -104,7 +106,7 @@ function 记录护卫实例(this: void, 运行上下文: Boss战护卫运行上�
 function 应用护卫额外属性(this: void, unit: any, 配置: Boss战斗启动护卫单位配置): void {
   if (配置.额外最大生命 != null && 配置.额外最大生命 !== 0) {
     const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
-    SetUnitState(unit, UNIT_STATE_MAX_LIFE, maxLife + 配置.额外最大生命);
+    SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, maxLife + 配置.额外最大生命);
     SetUnitState(unit, UNIT_STATE_LIFE, GetUnitState(unit, UNIT_STATE_MAX_LIFE));
   }
   if (配置.暴击率 != null) {

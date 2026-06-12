@@ -16,9 +16,15 @@ local stringToFourCC = ____require_result_3.stringToFourCC
 local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_4.debugLogForce
 local SetUnitState = jass.SetUnitState
+local SetUnitStateJapi = japi.SetUnitState
 local SetUnitVertexColor = jass.SetUnitVertexColor
+local SetUnitAcquireRange = jass.SetUnitAcquireRange
 local ConvertUnitState = jass.ConvertUnitState
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
+local DzSetUnitMissileModel = japi.DzSetUnitMissileModel
+local DzSetUnitMissileArc = japi.DzSetUnitMissileArc
+local DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed
+local DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming
 local CreateUnit = _____5171_4EAB.CreateUnit
 local GetHandleId = _____5171_4EAB.GetHandleId
 local GetOwningPlayer = _____5171_4EAB.GetOwningPlayer
@@ -33,6 +39,7 @@ local UNIT_STATE_LIFE = _____5171_4EAB.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local AMRF = 1097691750
 local ATTACK_POWER_STATE = 18
+local ATTACK_RANGE_STATE = 22
 local ARMOR_STATE = 32
 local ATTACK_INTERVAL_STATE = 37
 local DEFAULT_FLY_HEIGHT = 50
@@ -142,7 +149,7 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
     end
     if _____53C2_6570["生命值"] ~= nil and _____53C2_6570["生命值"] > 0 then
         local scaledHp = _____53C2_6570["生命值"] * _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387()
-        SetUnitState(unit, UNIT_STATE_MAX_LIFE, scaledHp)
+        SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp)
         SetUnitState(unit, UNIT_STATE_LIFE, scaledHp)
     end
     if _____53C2_6570["生命恢复"] ~= nil then
@@ -156,21 +163,43 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
         )
     end
     if _____53C2_6570["攻击力"] ~= nil and _____53C2_6570["攻击力"] > 0 then
-        SetUnitState(
+        SetUnitStateJapi(
             unit,
             ConvertUnitState(ATTACK_POWER_STATE),
             _____53C2_6570["攻击力"]
         )
     end
     if _____53C2_6570["攻击间隔"] ~= nil and _____53C2_6570["攻击间隔"] > 0 then
-        SetUnitState(
+        SetUnitStateJapi(
             unit,
             ConvertUnitState(ATTACK_INTERVAL_STATE),
             _____53C2_6570["攻击间隔"]
         )
     end
+    if _____53C2_6570["攻击范围"] ~= nil and _____53C2_6570["攻击范围"] > 0 then
+        SetUnitStateJapi(
+            unit,
+            ConvertUnitState(ATTACK_RANGE_STATE),
+            _____53C2_6570["攻击范围"]
+        )
+    end
+    if _____53C2_6570["普攻弹道模型"] ~= nil and _____53C2_6570["普攻弹道模型"] ~= "" and DzSetUnitMissileModel ~= nil then
+        DzSetUnitMissileModel(unit, _____53C2_6570["普攻弹道模型"])
+    end
+    if _____53C2_6570["普攻弹道弧度"] ~= nil and DzSetUnitMissileArc ~= nil then
+        DzSetUnitMissileArc(unit, _____53C2_6570["普攻弹道弧度"])
+    end
+    if _____53C2_6570["普攻弹道速度"] ~= nil and _____53C2_6570["普攻弹道速度"] > 0 and DzSetUnitMissileSpeed ~= nil then
+        DzSetUnitMissileSpeed(unit, _____53C2_6570["普攻弹道速度"])
+    end
+    if _____53C2_6570["普攻弹道自导"] ~= nil and DzSetUnitMissileHoming ~= nil then
+        DzSetUnitMissileHoming(unit, _____53C2_6570["普攻弹道自导"])
+    end
+    if _____53C2_6570["索敌范围"] ~= nil and _____53C2_6570["索敌范围"] > 0 then
+        SetUnitAcquireRange(unit, _____53C2_6570["索敌范围"])
+    end
     if _____53C2_6570["护甲"] ~= nil then
-        SetUnitState(
+        SetUnitStateJapi(
             unit,
             ConvertUnitState(ARMOR_STATE),
             _____53C2_6570["护甲"]

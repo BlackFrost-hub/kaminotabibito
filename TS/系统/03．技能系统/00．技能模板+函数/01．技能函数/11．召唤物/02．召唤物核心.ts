@@ -39,9 +39,15 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 import type { 规范化召唤物参数 } from "./01．类型";
 
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
+const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, acquireRange: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (i: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (unit: any, buffId: number, duration: number) => void;
+const DzSetUnitMissileModel = japi.DzSetUnitMissileModel as ((unit: any, model: string) => void) | undefined;
+const DzSetUnitMissileArc = japi.DzSetUnitMissileArc as ((unit: any, arc: number) => void) | undefined;
+const DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed as ((unit: any, speed: number) => void) | undefined;
+const DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming as ((unit: any, homing: boolean) => void) | undefined;
 
 const CreateUnit = 共享.CreateUnit;
 const GetHandleId = 共享.GetHandleId;
@@ -58,6 +64,7 @@ const UNIT_STATE_LIFE = 共享.UNIT_STATE_LIFE;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE;
 const AMRF = 0x416d7266;
 const ATTACK_POWER_STATE = 0x12;
+const ATTACK_RANGE_STATE = 0x16;
 const ARMOR_STATE = 0x20;
 const ATTACK_INTERVAL_STATE = 0x25;
 const DEFAULT_FLY_HEIGHT = 50.0;
@@ -151,7 +158,7 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
 
   if (参数.生命值 != null && 参数.生命值 > 0) {
     const scaledHp = 参数.生命值 * 读取小怪生命倍率();
-    SetUnitState(unit, UNIT_STATE_MAX_LIFE, scaledHp);
+    SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp);
     SetUnitState(unit, UNIT_STATE_LIFE, scaledHp);
   }
 
@@ -160,15 +167,39 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
   }
 
   if (参数.攻击力 != null && 参数.攻击力 > 0) {
-    SetUnitState(unit, ConvertUnitState(ATTACK_POWER_STATE), 参数.攻击力);
+    SetUnitStateJapi(unit, ConvertUnitState(ATTACK_POWER_STATE), 参数.攻击力);
   }
 
   if (参数.攻击间隔 != null && 参数.攻击间隔 > 0) {
-    SetUnitState(unit, ConvertUnitState(ATTACK_INTERVAL_STATE), 参数.攻击间隔);
+    SetUnitStateJapi(unit, ConvertUnitState(ATTACK_INTERVAL_STATE), 参数.攻击间隔);
+  }
+
+  if (参数.攻击范围 != null && 参数.攻击范围 > 0) {
+    SetUnitStateJapi(unit, ConvertUnitState(ATTACK_RANGE_STATE), 参数.攻击范围);
+  }
+
+  if (参数.普攻弹道模型 != null && 参数.普攻弹道模型 !== "" && DzSetUnitMissileModel != null) {
+    DzSetUnitMissileModel(unit, 参数.普攻弹道模型);
+  }
+
+  if (参数.普攻弹道弧度 != null && DzSetUnitMissileArc != null) {
+    DzSetUnitMissileArc(unit, 参数.普攻弹道弧度);
+  }
+
+  if (参数.普攻弹道速度 != null && 参数.普攻弹道速度 > 0 && DzSetUnitMissileSpeed != null) {
+    DzSetUnitMissileSpeed(unit, 参数.普攻弹道速度);
+  }
+
+  if (参数.普攻弹道自导 != null && DzSetUnitMissileHoming != null) {
+    DzSetUnitMissileHoming(unit, 参数.普攻弹道自导);
+  }
+
+  if (参数.索敌范围 != null && 参数.索敌范围 > 0) {
+    SetUnitAcquireRange(unit, 参数.索敌范围);
   }
 
   if (参数.护甲 != null) {
-    SetUnitState(unit, ConvertUnitState(ARMOR_STATE), 参数.护甲);
+    SetUnitStateJapi(unit, ConvertUnitState(ARMOR_STATE), 参数.护甲);
   }
 
   if (参数.缩放 != null && 参数.缩放 > 0) {

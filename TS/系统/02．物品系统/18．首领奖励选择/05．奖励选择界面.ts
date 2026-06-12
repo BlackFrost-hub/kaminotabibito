@@ -8,7 +8,6 @@ import { FramePoint, FrameType } from "../../09．表现系统/01．UI工具/00�
 import { setFramePosition as 设置帧位置, setFramePointRelative as 设置帧相对位置, setFrameSize as 设置帧尺寸 } from "../../09．表现系统/01．UI工具/02．位置尺寸";
 import { setButtonText as 设置按钮文本, setFrameClickEvent as 设置帧点击事件, setFrameTexture as 设置帧贴图 } from "../../09．表现系统/01．UI工具/03．内容设置";
 import { getGameUIFrame as 获取游戏UI帧, hideFrame as 隐藏帧, showFrame as 显示帧 } from "../../09．表现系统/01．UI工具/05．帧控制";
-import 英雄选择配置表 from "../../00．核心系统/00．玩家系统/01．英雄选择/00．英雄选择配置表";
 import { 首领奖励池配置 } from "./00．类型定义";
 import { 查找首领奖励池 } from "./01．奖励配置表";
 import { 领取首领奖励选择 } from "./03．奖励发放";
@@ -32,6 +31,7 @@ const 颜色正文 = "|cff000000";
 const 颜色小标题 = "|cffffcc5c";
 const 颜色按钮 = "|cffffffff";
 const 颜色结束 = "|r";
+const 首领奖励UI玩家ID列表 = [0, 1, 2, 3] as const;
 const 槽位中心X: number[] = [-0.216, -0.144, -0.073, 0.000, 0.071, 0.143, 0.215];
 const 槽位图标Y = 0.076;
 const 槽位按钮Y = 0.053;
@@ -164,7 +164,7 @@ function 获取触发UI帧(this: void): number {
 function 获取触发UI玩家(this: void): any {
   if ((japi as any).DzGetTriggerKeyPlayer != null) return (japi as any).DzGetTriggerKeyPlayer();
   if ((japi as any).DzGetTriggerUIEventPlayer != null) return (japi as any).DzGetTriggerUIEventPlayer();
-  return GetLocalPlayer();
+  return null;
 }
 
 function 获取触发玩家ID(this: void): number {
@@ -556,7 +556,7 @@ function 初始化首领奖励槽位(this: void, 玩家ID: number): void {
 export function 初始化首领奖励选择界面(this: void): void {
   if (首领奖励界面已初始化) return;
   首领奖励界面已初始化 = true;
-  for (const 玩家ID of 英雄选择配置表.可选玩家ID列表) {
+  for (const 玩家ID of 首领奖励UI玩家ID列表) {
     初始化首领奖励槽位(玩家ID);
   }
 }
@@ -610,6 +610,5 @@ export function 切换首领奖励选择界面(this: void, 奖励池ID: string, 
 
 export function 获取首领奖励面板帧(this: void): number {
   初始化首领奖励选择界面();
-  const 状态 = 获取槽位状态(获取本地玩家ID());
-  return 状态 != null ? 状态.面板帧 : 首领奖励首个面板帧;
+  return 首领奖励首个面板帧;
 }

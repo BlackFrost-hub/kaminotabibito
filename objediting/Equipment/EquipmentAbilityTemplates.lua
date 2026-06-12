@@ -62,6 +62,12 @@ local function createEquipmentItemChannelAbility(id, name, options)
   ability:setFollowThroughTime(1, 0)
   ability:setTargetType(1, options.targetType or 1)
   ability:setOptions(1, options.channelOptions or 0)
+  if options.buttonX ~= nil then
+    ability:setButtonPositionNormalX(options.buttonX)
+  end
+  if options.buttonY ~= nil then
+    ability:setButtonPositionNormalY(options.buttonY)
+  end
   ability:setArtDuration(1, 0)
   ability:setDisableOtherAbilities(1, false)
   ability:setBaseOrderID(1, options.orderId or 'channel')
@@ -77,11 +83,14 @@ local function registerEquipmentItemAbilitySlot(groupName, slot)
   group[#group + 1] = slot
 end
 
-local function createEquipmentItemAbilitySlot(groupName, id, name, targetType, orderId, castRange, targetsAllowed)
+local function createEquipmentItemAbilitySlot(groupName, slotIndex, id, name, targetType, orderId, castRange, targetsAllowed)
   createEquipmentItemChannelAbility(id, name, {
     targetType = targetType,
     orderId = orderId,
     castRange = castRange,
+    channelOptions = targetType == 2 and 3 or 1,
+    buttonX = slotIndex % 4,
+    buttonY = targetType == 0 and 1 or 2,
     targetsAllowed = targetsAllowed,
   })
 
@@ -97,17 +106,17 @@ end
 for index = 0, 14 do
   local id = string.format('IU%02d', index)
   local name = '[系统]装备通用单位目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('unitTarget', id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
+  createEquipmentItemAbilitySlot('unitTarget', index, id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
 end
 
 for index = 0, 14 do
   local id = string.format('IP%02d', index)
   local name = '[系统]装备通用点目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('pointTarget', id, name, 2, equipmentItemAbilityOrderIds.pointTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
+  createEquipmentItemAbilitySlot('pointTarget', index, id, name, 2, equipmentItemAbilityOrderIds.pointTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
 end
 
 for index = 0, 14 do
   local id = string.format('IN%02d', index)
   local name = '[系统]装备通用无目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('noTarget', id, name, 0, equipmentItemAbilityOrderIds.noTarget[index + 1], 0, '')
+  createEquipmentItemAbilitySlot('noTarget', index, id, name, 0, equipmentItemAbilityOrderIds.noTarget[index + 1], 0, '')
 end

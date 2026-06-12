@@ -1,6 +1,7 @@
 dofile('Equipment/EquipmentItemTemplates.lua')
 dofile('Equipment/EquipmentAbilityTemplates.lua')
 
+dofile('Equipment/Consumable/Consumable.lua')
 dofile('Equipment/Item/Item.lua')
 dofile('Equipment/Clothes/Clothes.lua')
 dofile('Equipment/MainWeapon/MainWeapon.lua')

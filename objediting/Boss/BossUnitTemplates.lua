@@ -102,7 +102,7 @@ function createMeleeBossHeroUnit(id, name, options)
   options = options or {}
   options.baseId = options.baseId or 'Npbm'
   options.attackRange = options.attackRange or 128
-  options.weaponType = options.weaponType or WeaponType.Normal
+  options.weaponType = options.weaponType or WeaponType.Instant
   options.projectileSpeed = options.projectileSpeed or 0
   options.projectileArt = options.projectileArt or ''
   return createBossHeroUnit(id, name, options)

@@ -8,6 +8,8 @@ local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570
 -- 
 -- 提供单位基础操作、存活状态、生命读写，以及生命周期类型判断。
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local SetUnitStateJapi = japi.SetUnitState
 ____exports.TIMED_LIFE_NONE = 0
 ____exports.TIMED_LIFE_RAISE_DEAD = 1
 ____exports.TIMED_LIFE_DISEASE_CLOUD = 2
@@ -64,7 +66,7 @@ function ____exports.UnitAddHp(u, value, b)
     local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
     local percent = maxLife > 0 and life / maxLife or 1
     local addValue = b and maxLife * value or value
-    jass.SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
+    SetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
     jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
 end
 function ____exports.SU_IsUnitDie(u)

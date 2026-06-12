@@ -37,7 +37,7 @@ local function applyCommonDummyUnit(u, options)
   if options.animationWalkSpeed ~= nil then
     u:setAnimationWalkSpeed(options.animationWalkSpeed)
   end
-  u:setMovementType(MovementType.Fly)
+  u:setMovementType(options.movementType or MovementType.Foot)
   u:setMovementHeightMinimum(options.minHeight or 0.0)
   u:setMovementHeight(options.height or 0.0)
   u:setSpeedBase(options.speedBase or 1)
@@ -141,6 +141,57 @@ applyCommonDummyUnit(scir, {
   height = 100.0,
   selectionScale = 0.0,
 })
+
+-- Common summon shell unit.
+-- Ground pathing only: use height / runtime SetUnitFlyHeight for visual floating,
+-- never MovementType.Fly.
+local summonShell = UnitDefinition:new('e08P', 'ewsp')
+applyCommonDummyUnit(summonShell, {
+  name = '[系统]通用召唤物壳子',
+  tooltipBasic = '[系统]通用召唤物壳子',
+  tooltipExtended = '代码侧通用召唤物壳子单位。',
+  description = '代码侧通用召唤物壳子单位。',
+  modelFile = '.mdl',
+  modelFileExtraVersions = 0,
+  icon = 'ReplaceableTextures\\CommandButtons\\BTNSentryWard.blp',
+  abilities = '',
+  movementType = MovementType.Foot,
+  minHeight = 0.0,
+  height = 10.0,
+  speedBase = 300,
+  speedMinimum = 0,
+  speedMaximum = 522,
+  classification = '',
+  hp = 100,
+  hpRegen = 0.0,
+  sightDay = 1400,
+  sightNight = 1400,
+  collision = 16.0,
+  turnRate = 1.0,
+  propulsionWindow = 60.0,
+  selectionScale = 1.0,
+})
+applyNoCostNoBounty(summonShell)
+summonShell:setLevel(5)
+summonShell:setAcquisitionRange(600.0)
+summonShell:setAttacksEnabled(AttacksEnabled.AttackOneOnly)
+summonShell:setAttack1AttackType(AttackType.Pierce)
+summonShell:setAttack1DamageBase(1)
+summonShell:setAttack1DamageNumberofDice(1)
+summonShell:setAttack1DamageSidesperDie(1)
+summonShell:setAttack1CooldownTime(1.0)
+summonShell:setAttack1Range(128)
+summonShell:setAttack1TargetsAllowed('ground,air,enemy,neutral')
+summonShell:setAttack1WeaponType(WeaponType.Missile)
+summonShell:setAttack1ProjectileSpeed(900)
+summonShell:setAttack1WeaponSound(WeaponSound.Nothing)
+summonShell:setDefenseBase(0)
+summonShell:setDefenseUpgradeBonus(0)
+summonShell:setArmorType(ArmorType.Normal)
+summonShell:setPointValue(0)
+summonShell:setPriority(0)
+summonShell:setFormationRank(0)
+summonShell:setCanFlee(false)
 
 -- TS 原生弹幕默认马甲单位
 -- 分类约定：

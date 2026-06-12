@@ -8,6 +8,7 @@
 |------|------|
 | [`war3-tstl/`](war3-tstl/) | War3 + TSTL 编译坑：jass/japi 调用、回调注册、随机数、全局数组、伤害事件等 |
 | [`dzapi/`](dzapi/) | DzAPI UI Frame 类型、联机 desync / 对称执行 / N 槽、Lua GC 安全、运行时安全代码 |
+| [`dzapi/unit-state-jass-japi-boundary.mdc`](dzapi/unit-state-jass-japi-boundary.mdc) | UnitState 写入时区分 JASS / JAPI `SetUnitState` |
 | [`equipment/`](equipment/) | 装备属性、装备 Buff、hot 字段、USE_ITEM 双触发等约定 |
 | [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
 | [`tooling/`](tooling/) | 调试输出、音效与封装约定、编码与补丁安全 |

@@ -5,6 +5,8 @@
 -- 锁定单位、点地面技能，都用单位目标通魔。
 -- 对自身周围造成伤害、以自身为中心 AOE、对自己使用的技能，都用无目标通魔。
 
+local BOSS_CHANNEL_ABILITY_ICON = 'ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp'
+
 function createBossChannelAbility(id, name, options)
   options = options or {}
 
@@ -32,10 +34,16 @@ function createBossChannelAbility(id, name, options)
 
   ability:setFollowThroughTime(1, options.followThroughTime or 0)
   ability:setTargetType(1, options.targetType or 1)
-  ability:setOptions(1, options.channelOptions or 0)
+  local channelOptions = options.channelOptions
+  if channelOptions == nil then
+    channelOptions = 1
+  end
+  ability:setOptions(1, channelOptions)
   ability:setArtDuration(1, options.artDuration or 0)
   ability:setDisableOtherAbilities(1, options.disableOtherAbilities or false)
   ability:setBaseOrderID(1, options.orderId or 'channel')
+  ability:setButtonPositionNormalX(options.buttonX or 0)
+  ability:setButtonPositionNormalY(options.buttonY or 2)
 
   if options.tooltip ~= nil then
     ability:setTooltipNormal(1, options.tooltip)
@@ -43,9 +51,7 @@ function createBossChannelAbility(id, name, options)
   if options.tooltipExtended ~= nil then
     ability:setTooltipNormalExtended(1, options.tooltipExtended)
   end
-  if options.icon ~= nil then
-    ability:setIconNormal(options.icon)
-  end
+  ability:setIconNormal(options.icon or BOSS_CHANNEL_ABILITY_ICON)
   if options.hotkey ~= nil then
     ability:setHotkeyNormal(options.hotkey)
   end
@@ -129,6 +135,8 @@ for _, group in ipairs(unitTargetChannelGroups) do
     createBossUnitTargetChannelAbility(id, name, {
       castRange = castRange,
       orderId = group.orderIds[index],
+      buttonX = (index - 1) % 4,
+      buttonY = 2,
       tooltip = name,
       tooltipExtended = name,
     })
@@ -148,6 +156,8 @@ for index, id in ipairs(noTargetChannelIds) do
 
   createBossNoTargetChannelAbility(id, name, {
     orderId = noTargetChannelOrderIds[index],
+    buttonX = (index - 1) % 4,
+    buttonY = 1,
     tooltip = name,
     tooltipExtended = name,
   })

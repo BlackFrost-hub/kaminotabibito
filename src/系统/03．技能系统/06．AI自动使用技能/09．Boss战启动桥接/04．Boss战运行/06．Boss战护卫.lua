@@ -29,6 +29,7 @@ function _____83B7_53D6_62A4_536B_5BF9_767D_6765_6E90_5355_4F4D(context, _____8F
     return nil
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_0["广播单位提示"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -44,6 +45,7 @@ local Player = jass.Player
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local SetUnitState = jass.SetUnitState
+local SetUnitStateJapi = japi.SetUnitState
 local GetUnitState = jass.GetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 IsUnitType = jass.IsUnitType
@@ -89,7 +91,7 @@ end
 local function _____5E94_7528_62A4_536B_989D_5916_5C5E_6027(unit, _____914D_7F6E)
     if _____914D_7F6E["额外最大生命"] ~= nil and _____914D_7F6E["额外最大生命"] ~= 0 then
         local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
-        SetUnitState(unit, UNIT_STATE_MAX_LIFE, maxLife + _____914D_7F6E["额外最大生命"])
+        SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, maxLife + _____914D_7F6E["额外最大生命"])
         SetUnitState(
             unit,
             UNIT_STATE_LIFE,

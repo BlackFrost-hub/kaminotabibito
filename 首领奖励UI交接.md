@@ -76,8 +76,6 @@ UI 资源目录：
 - `reward_selected_border.png`：选中边框 PNG 预览/源图。
 - `reward_check_badge.tga`：选中装备后的右下角勾选标记。
 - `reward_check_badge.png`：勾选标记 PNG 预览/源图。
-- `BossReward.fdf`
-- `BossReward.toc`
 
 注意：
 
@@ -272,4 +270,3 @@ npm run build
 可以直接对新窗口说：
 
 > 先读 `首领奖励UI交接.md`，继续优化 `imports\UI\BossReward` 的属性/特效小图标、选中边框和勾选标记。不要大改 TS 布局，先重画资源，跑 `npm run build`，让我进图 `brtest` 看效果。
-

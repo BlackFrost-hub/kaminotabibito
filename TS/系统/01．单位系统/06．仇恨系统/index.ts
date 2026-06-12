@@ -3,6 +3,7 @@ export * from "./01．仇恨计算";
 export * from "./02．目标选择";
 export * from "./03．仇恨驱动";
 export * from "./04．仇恨显示";
+export * from "./05．技能目标选择";
 
 const {
   注册伤害仇恨回调,

@@ -7,6 +7,7 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.05．昼夜状态")
 local _____662F_5426_9ED1_5929 = ____require_result_1["是否黑天"]
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
@@ -16,7 +17,7 @@ local _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_3["赫�
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local IsUnitType = jass.IsUnitType
-local SetUnitState = jass.SetUnitState
+local SetUnitStateJapi = japi.SetUnitState
 local SetUnitMoveSpeed = jass.SetUnitMoveSpeed
 local ConvertUnitState = jass.ConvertUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -40,14 +41,14 @@ local function _____5E94_7528_8D6B_841D_663C_591C_72B6_6001(unit)
         return
     end
     if _____662F_5426_9ED1_5929() then
-        SetUnitState(
+        SetUnitStateJapi(
             unit,
             ConvertUnitState(37),
             _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E["黑夜单位状态值"]
         )
         SetUnitMoveSpeed(unit, _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E["黑夜移速"])
     else
-        SetUnitState(
+        SetUnitStateJapi(
             unit,
             ConvertUnitState(37),
             _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E["白天单位状态值"]

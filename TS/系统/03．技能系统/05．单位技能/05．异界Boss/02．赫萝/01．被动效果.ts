@@ -5,6 +5,7 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   removePeriodicCallback: (this: void, callbackId: number) => void;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const { 是否黑天 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.05．昼夜状态") as {
   是否黑天: (this: void) => boolean;
 };
@@ -25,7 +26,7 @@ const { 赫萝单位技能配置 } = require("系统.03．技能系统.05．单�
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: number) => boolean;
-const SetUnitState = jass.SetUnitState as (whichUnit: any, whichUnitState: number, value: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichUnitState: number, value: number) => void;
 const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (whichUnit: any, newSpeed: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (state: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as number;
@@ -45,10 +46,10 @@ function 应用赫萝昼夜状态(this: void, unit: any): void {
   if (GetUnitTypeId(unit) !== 赫萝单位类型ID) return;
 
   if (是否黑天()) {
-    SetUnitState(unit, ConvertUnitState(0x25), 赫萝单位技能配置.黑夜单位状态值);
+    SetUnitStateJapi(unit, ConvertUnitState(0x25), 赫萝单位技能配置.黑夜单位状态值);
     SetUnitMoveSpeed(unit, 赫萝单位技能配置.黑夜移速);
   } else {
-    SetUnitState(unit, ConvertUnitState(0x25), 赫萝单位技能配置.白天单位状态值);
+    SetUnitStateJapi(unit, ConvertUnitState(0x25), 赫萝单位技能配置.白天单位状态值);
     SetUnitMoveSpeed(unit, 赫萝单位技能配置.白天移速);
   }
 }
