@@ -7,6 +7,9 @@ export interface 首领奖励选项配置 {
   /** 装备数据里的 name，运行时再走物品名反查，不手写 raw id。 */
   装备名: string;
   排序: number;
+  图标: string;
+  描述: string;
+  特效: string;
 }
 
 export interface 首领奖励池配置 {

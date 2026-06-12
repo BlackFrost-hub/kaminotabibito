@@ -3,7 +3,6 @@ local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 --- 为 true 时在屏幕显示装备限制与 DROP 跳过调试；排查完可设为 true
@@ -99,73 +98,6 @@ local function parsePrimaryBonus(self, s, primaryStr)
     end
     return out
 end
-local percentNames = {
-    "暴击率",
-    "暴击伤害",
-    "命中率",
-    "护甲穿透",
-    "魔法穿透",
-    "技能伤害",
-    "闪避率",
-    "魔抗",
-    "冷却缩减",
-    "伤害吸血",
-    "魔法伤害吸血",
-    "普攻伤害吸血",
-    "攻速",
-    "生命恢复%",
-    "魔法恢复%",
-    "技能治疗率",
-    "受到的治疗率",
-    "魔法消耗",
-    "重伤",
-    "技能抗性",
-    "魔法伤害",
-    "物理伤害",
-    "物理抗性",
-    "强化伤害",
-    "普攻伤害",
-    "普攻抗性",
-    "光属性伤害",
-    "光属性抗性",
-    "暗属性伤害",
-    "暗属性抗性",
-    "木属性伤害",
-    "木属性抗性",
-    "火属性伤害",
-    "火属性抗性",
-    "雷属性伤害",
-    "雷属性抗性",
-    "水属性伤害",
-    "水属性抗性",
-    "金属性抗性",
-    "召唤物伤害",
-    "召唤物抗性",
-    "伤害减少%",
-    "被暴击率",
-    "被暴击伤害",
-    "眩晕抗性",
-    "魔法普攻伤害",
-    "蝼蚁专精",
-    "伤害%",
-    "最终伤害%",
-    "经验获取率",
-    "最大生命值%",
-    "最大法力值%",
-    "基础生命值%",
-    "基础攻击力%",
-    "基础护甲%",
-    "生命值%",
-    "法力值%",
-    "攻击力%",
-    "护甲%",
-    "提高对Boss伤害%",
-    "受到Boss伤害减少%",
-    "提高对精英伤害%",
-    "受到精英伤害减少%",
-    "提高对恶魔族伤害%",
-    "受到恶魔族伤害减少%"
-}
 --- 处理物品拾取/丢弃的核心逻辑
 local function handleItemEvent(self, unit, item, isPickup)
     if unit == nil or unit == 0 or item == nil or item == 0 then
@@ -275,7 +207,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         local msg = ((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. coloredLevel) .. "级装备『") .. coloredName) .. "』"
         for ____, stat in ipairs(playerStats) do
             local sign = stat.value > 0 and "+" or ""
-            local isPct = __TS__ArrayIndexOf(percentNames, stat.name) >= 0
+            local isPct = itemRelatedFns["是否百分比装备属性名"](stat.name)
             local v = isPct and stat.value * 100 or stat.value
             local nearZero = v > -0.000001 and v < 0.000001
             local vStr = nearZero and "0" or tostring(v)
@@ -308,7 +240,7 @@ local function handleItemEvent(self, unit, item, isPickup)
                 end
                 local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
                 local num = __TS__Number(val)
-                local isPct = __TS__ArrayIndexOf(percentNames, statName) >= 0
+                local isPct = itemRelatedFns["是否百分比装备属性名"](statName)
                 local nearZero = num > -0.000001 and num < 0.000001
                 local valStr = isPct and (nearZero and "0%" or tostring(jass.R2I(num * 1000 + 0.5) / 10
                 ) .. "%") or (nearZero and "0" or tostring(num))

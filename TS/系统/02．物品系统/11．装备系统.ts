@@ -26,6 +26,7 @@ const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数
 const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   STAT_CONFIG: { name: string; key: string }[];
   NAME_TO_KEY: Record<string, string>;
+  是否百分比装备属性名: (this: void, name: string) => boolean;
   getItemDataEntry: (this: void, item: any) => any | null;
 };
 const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
@@ -85,22 +86,6 @@ function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number
   }
   return out;
 }
-
-const percentNames = [
-  "暴击率", "暴击伤害", "命中率", "护甲穿透", "魔法穿透", "技能伤害",
-  "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
-  "攻速",
-  "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗", "重伤",
-  "技能抗性", "魔法伤害", "物理伤害", "物理抗性", "强化伤害", "普攻伤害", "普攻抗性",
-  "光属性伤害", "光属性抗性", "暗属性伤害", "暗属性抗性", "木属性伤害", "木属性抗性",
-  "火属性伤害", "火属性抗性", "雷属性伤害", "雷属性抗性", "水属性伤害", "水属性抗性",
-  "金属性抗性", "召唤物伤害", "召唤物抗性", "伤害减少%", "被暴击率", "被暴击伤害",
-  "眩晕抗性", "魔法普攻伤害", "蝼蚁专精", "伤害%", "最终伤害%", "经验获取率",
-  "最大生命值%", "最大法力值%", "基础生命值%", "基础攻击力%", "基础护甲%",
-  "生命值%", "法力值%", "攻击力%", "护甲%",
-  "提高对Boss伤害%", "受到Boss伤害减少%", "提高对精英伤害%", "受到精英伤害减少%",
-  "提高对恶魔族伤害%", "受到恶魔族伤害减少%"
-];
 
 /**
  * 处理物品拾取/丢弃的核心逻辑
@@ -179,7 +164,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
         for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
-      const isPct = percentNames.indexOf(stat.name) >= 0;
+      const isPct = itemRelatedFns.是否百分比装备属性名(stat.name);
       const v = isPct ? stat.value * 100 : stat.value;
       const nearZero = v > -1e-6 && v < 1e-6;
       const vStr = nearZero ? "0" : tostring(v);
@@ -198,7 +183,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     if (statName === "移动速度") continue; // 移速由下方从装备移速取数并显示
     const val = tempReadMap[statName] != null ? tempReadMap[statName] : 0;
     const num = Number(val);
-    const isPct = percentNames.indexOf(statName) >= 0;
+    const isPct = itemRelatedFns.是否百分比装备属性名(statName);
     const nearZero = num > -1e-6 && num < 1e-6;
       const valStr = isPct ? (nearZero ? "0%" : tostring(jass.R2I(num * 1000 + 0.5) / 10) + "%") : (nearZero ? "0" : tostring(num));
     test5Parts.push(statName + "为：" + valStr);

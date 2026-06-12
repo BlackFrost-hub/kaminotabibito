@@ -53,6 +53,53 @@ for (const e of STAT_CONFIG) {
 }
 if (!NAME_TO_KEY["移速"]) NAME_TO_KEY["移速"] = "moveSpeed";
 
+export const PERCENT_STAT_NAMES = [
+  "暴击率", "暴击伤害", "命中率", "护甲穿透", "魔法穿透", "技能伤害",
+  "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
+  "攻速",
+  "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗", "重伤",
+  "技能抗性", "魔法伤害", "物理伤害", "物理抗性", "强化伤害", "普攻伤害", "普攻抗性",
+  "光属性伤害", "光属性抗性", "暗属性伤害", "暗属性抗性", "木属性伤害", "木属性抗性",
+  "火属性伤害", "火属性抗性", "雷属性伤害", "雷属性抗性", "水属性伤害", "水属性抗性",
+  "金属性抗性", "召唤物伤害", "召唤物抗性", "伤害减少%", "被暴击率", "被暴击伤害",
+  "眩晕抗性", "魔法普攻伤害", "蝼蚁专精", "伤害%", "最终伤害%", "经验获取率",
+  "最大生命值%", "最大法力值%", "基础生命值%", "基础攻击力%", "基础护甲%",
+  "生命值%", "法力值%", "攻击力%", "护甲%",
+  "提高对Boss伤害%", "受到Boss伤害减少%", "提高对精英伤害%", "受到精英伤害减少%",
+  "提高对恶魔族伤害%", "受到恶魔族伤害减少%"
+];
+
+const PERCENT_STAT_NAME_MAP: Record<string, boolean> = {};
+for (const name of PERCENT_STAT_NAMES) {
+  PERCENT_STAT_NAME_MAP[name] = true;
+}
+
+export function 是否百分比装备属性名(name: string): boolean {
+  return PERCENT_STAT_NAME_MAP[name] === true;
+}
+
+export function 是否百分比装备属性(key: string): boolean {
+  const name = KEY_TO_NAME[key];
+  return name !== undefined && 是否百分比装备属性名(name);
+}
+
+export function 格式化装备属性数值(key: string, value: number): string {
+  const isPercent = 是否百分比装备属性(key);
+  const displayValue = isPercent && value > -1 && value < 1 ? value * 100 : value;
+  return (displayValue >= 0 ? "+" : "") + displayValue + (isPercent ? "%" : "");
+}
+
+export function 生成装备属性文本(data: Record<string, any>): string {
+  let text = "";
+  for (const stat of STAT_CONFIG) {
+    const value = data[stat.key];
+    if (typeof value !== "number" || value === 0) continue;
+    if (text !== "") text = text + "\n";
+    text = text + stat.name + " " + 格式化装备属性数值(stat.key, value);
+  }
+  return text;
+}
+
 export function findStatKey(raw: string): string {
   if (KEY_TO_NAME[raw] !== undefined) return raw;
   const rl = raw.toLowerCase();

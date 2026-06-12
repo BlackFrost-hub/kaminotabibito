@@ -102,6 +102,106 @@ end
 if not ____exports.NAME_TO_KEY["移速"] then
     ____exports.NAME_TO_KEY["移速"] = "moveSpeed"
 end
+____exports.PERCENT_STAT_NAMES = {
+    "暴击率",
+    "暴击伤害",
+    "命中率",
+    "护甲穿透",
+    "魔法穿透",
+    "技能伤害",
+    "闪避率",
+    "魔抗",
+    "冷却缩减",
+    "伤害吸血",
+    "魔法伤害吸血",
+    "普攻伤害吸血",
+    "攻速",
+    "生命恢复%",
+    "魔法恢复%",
+    "技能治疗率",
+    "受到的治疗率",
+    "魔法消耗",
+    "重伤",
+    "技能抗性",
+    "魔法伤害",
+    "物理伤害",
+    "物理抗性",
+    "强化伤害",
+    "普攻伤害",
+    "普攻抗性",
+    "光属性伤害",
+    "光属性抗性",
+    "暗属性伤害",
+    "暗属性抗性",
+    "木属性伤害",
+    "木属性抗性",
+    "火属性伤害",
+    "火属性抗性",
+    "雷属性伤害",
+    "雷属性抗性",
+    "水属性伤害",
+    "水属性抗性",
+    "金属性抗性",
+    "召唤物伤害",
+    "召唤物抗性",
+    "伤害减少%",
+    "被暴击率",
+    "被暴击伤害",
+    "眩晕抗性",
+    "魔法普攻伤害",
+    "蝼蚁专精",
+    "伤害%",
+    "最终伤害%",
+    "经验获取率",
+    "最大生命值%",
+    "最大法力值%",
+    "基础生命值%",
+    "基础攻击力%",
+    "基础护甲%",
+    "生命值%",
+    "法力值%",
+    "攻击力%",
+    "护甲%",
+    "提高对Boss伤害%",
+    "受到Boss伤害减少%",
+    "提高对精英伤害%",
+    "受到精英伤害减少%",
+    "提高对恶魔族伤害%",
+    "受到恶魔族伤害减少%"
+}
+local PERCENT_STAT_NAME_MAP = {}
+for ____, name in ipairs(____exports.PERCENT_STAT_NAMES) do
+    PERCENT_STAT_NAME_MAP[name] = true
+end
+____exports["是否百分比装备属性名"] = function(name)
+    return PERCENT_STAT_NAME_MAP[name] == true
+end
+____exports["是否百分比装备属性"] = function(key)
+    local name = ____exports.KEY_TO_NAME[key]
+    return name ~= nil and ____exports["是否百分比装备属性名"](name)
+end
+____exports["格式化装备属性数值"] = function(key, value)
+    local isPercent = ____exports["是否百分比装备属性"](key)
+    local displayValue = isPercent and value > -1 and value < 1 and value * 100 or value
+    return ((displayValue >= 0 and "+" or "") .. tostring(displayValue)) .. (isPercent and "%" or "")
+end
+____exports["生成装备属性文本"] = function(data)
+    local text = ""
+    for ____, stat in ipairs(____exports.STAT_CONFIG) do
+        do
+            local value = data[stat.key]
+            if type(value) ~= "number" or value == 0 then
+                goto __continue11
+            end
+            if text ~= "" then
+                text = text .. "\n"
+            end
+            text = ((text .. stat.name) .. " ") .. ____exports["格式化装备属性数值"](stat.key, value)
+        end
+        ::__continue11::
+    end
+    return text
+end
 function ____exports.findStatKey(raw)
     if ____exports.KEY_TO_NAME[raw] ~= nil then
         return raw
