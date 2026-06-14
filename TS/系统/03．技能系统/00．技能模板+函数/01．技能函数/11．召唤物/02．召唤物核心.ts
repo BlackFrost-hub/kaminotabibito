@@ -48,6 +48,7 @@ const DzSetUnitMissileModel = japi.DzSetUnitMissileModel as ((unit: any, model: 
 const DzSetUnitMissileArc = japi.DzSetUnitMissileArc as ((unit: any, arc: number) => void) | undefined;
 const DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed as ((unit: any, speed: number) => void) | undefined;
 const DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming as ((unit: any, homing: boolean) => void) | undefined;
+const DzSetUnitName = japi.DzSetUnitName as ((unit: any, name: string) => void) | undefined;
 
 const CreateUnit = 共享.CreateUnit;
 const GetHandleId = 共享.GetHandleId;
@@ -142,6 +143,10 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
     SetUnitFacing(unit, 参数.朝向);
   }
 
+  if (参数.单位名称 != null && 参数.单位名称 !== "" && DzSetUnitName != null) {
+    DzSetUnitName(unit, 参数.单位名称);
+  }
+
   if (参数.飞行高度 != null) {
     设置单位飞行高度(unit, 参数.飞行高度);
   }
@@ -157,7 +162,7 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
   }
 
   if (参数.生命值 != null && 参数.生命值 > 0) {
-    const scaledHp = 参数.生命值 * 读取小怪生命倍率();
+    const scaledHp = 参数.生命值 * (参数.生命值受小怪倍率 === false ? 1 : 读取小怪生命倍率());
     SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp);
     SetUnitState(unit, UNIT_STATE_LIFE, scaledHp);
   }

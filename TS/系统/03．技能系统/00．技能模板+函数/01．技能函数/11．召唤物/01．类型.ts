@@ -14,6 +14,12 @@ export interface 召唤物输入参数 {
   召唤物单位?: any;
   Summon?: any;
 
+  单位名称?: string;
+  名称?: string;
+  名字?: string;
+  name?: string;
+  unitName?: string;
+
   X?: number;
   Y?: number;
   x?: number;
@@ -39,6 +45,8 @@ export interface 召唤物输入参数 {
 
   生命值?: number;
   HP?: number;
+  生命值受小怪倍率?: boolean;
+  hpScaleWithCreep?: boolean;
   生命恢复?: number;
   regenHP?: number;
   攻击力?: number;
@@ -89,6 +97,7 @@ export interface 规范化召唤物参数 {
   所属玩家?: any;
   单位类型?: number;
   召唤物单位?: any;
+  单位名称?: string;
 
   X: number;
   Y: number;
@@ -99,6 +108,7 @@ export interface 规范化召唤物参数 {
 
   模型文件?: string;
   生命值?: number;
+  生命值受小怪倍率?: boolean;
   生命恢复?: number;
   攻击力?: number;
   攻击间隔?: number;

@@ -23,10 +23,19 @@ const {
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 
 const 当前目标表: Record<number, { targetHid: number } | undefined> = {};
+const 强制目标表: Record<number, { targetHid: number; targetRef: any; enemyRef: any; expireMs: number } | undefined> = {};
+let _nowMs: (() => number) | null = null;
 
 function 取单位ID(u: any): number {
   if (u == null || u === 0) return 0;
   return GetHandleId(u) || 0;
+}
+
+function nowMs(): number {
+  if (_nowMs == null) {
+    _nowMs = require("系统.00．核心系统.05．中心计时器").getServerTime as () => number;
+  }
+  return _nowMs();
 }
 
 function 数字升序排序(this: void, a: number, b: number): number {
@@ -50,12 +59,17 @@ function 清除当前目标(敌人ID: number, 目标ID: number): void {
   if (目标ID === 0) {
     // 全清：clearAllThreat / clearAllThreatById 触发
     delete 当前目标表[敌人ID];
+    delete 强制目标表[敌人ID];
     return;
   }
   // 精确清除：removeTarget 触发，仅当被移除目标是当前目标
   const 记录 = 当前目标表[敌人ID];
   if (记录 != null && 记录.targetHid === 目标ID) {
     delete 当前目标表[敌人ID];
+  }
+  const 强制记录 = 强制目标表[敌人ID];
+  if (强制记录 != null && 强制记录.targetHid === 目标ID) {
+    delete 强制目标表[敌人ID];
   }
 }
 
@@ -70,6 +84,64 @@ export function 获取当前目标ID(敌人: any): number {
   return 记录 == null ? 0 : 记录.targetHid;
 }
 
+export function 设置强制攻击目标(this: void, 敌人: any, 目标: any, 持续毫秒: number): void {
+  const 敌人ID = 取单位ID(敌人);
+  const 目标ID = 取单位ID(目标);
+  if (敌人ID === 0 || 目标ID === 0 || 持续毫秒 <= 0) return;
+  强制目标表[敌人ID] = {
+    targetHid: 目标ID,
+    targetRef: 目标,
+    enemyRef: 敌人,
+    expireMs: nowMs() + 持续毫秒,
+  };
+}
+
+export function 获取强制攻击目标(
+  this: void,
+  敌人: any,
+  filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean
+): { targetHid: number; targetRef: any; threat: number } | null {
+  const 敌人ID = 取单位ID(敌人);
+  if (敌人ID === 0) return null;
+  const 记录 = 强制目标表[敌人ID];
+  if (记录 == null) return null;
+  if (nowMs() >= 记录.expireMs) {
+    delete 强制目标表[敌人ID];
+    return null;
+  }
+  const entry = { targetHid: 记录.targetHid, targetRef: 记录.targetRef, threat: 999999 };
+  if (filter != null && !filter(entry)) return null;
+  return entry;
+}
+
+export function 获取所有强制目标敌人ID(this: void): number[] {
+  const result: number[] = [];
+  const now = nowMs();
+  for (const key in 强制目标表) {
+    const id = parseInt(key, 10);
+    if (isNaN(id)) continue;
+    const 记录 = 强制目标表[id];
+    if (记录 == null || now >= 记录.expireMs) {
+      delete 强制目标表[id];
+      continue;
+    }
+    result.push(id);
+  }
+  result.sort(数字升序排序);
+  return result;
+}
+
+export function 获取强制目标敌人引用(this: void, 敌人ID: number): any | null {
+  if (敌人ID === 0) return null;
+  const 记录 = 强制目标表[敌人ID];
+  if (记录 == null) return null;
+  if (nowMs() >= 记录.expireMs) {
+    delete 强制目标表[敌人ID];
+    return null;
+  }
+  return 记录.enemyRef;
+}
+
 /**
  * 根据仇恨表和粘性规则选出应攻击目标。
  * @param filter 由驱动层传入，过滤死亡/超距目标（filter 接收 ThreatEntry，含 targetRef）
@@ -80,6 +152,9 @@ export function 获取应攻击目标(
 ): { targetHid: number; targetRef: any; threat: number } | null {
   const 敌人ID = 取单位ID(敌人);
   if (敌人ID === 0) return null;
+
+  const 强制目标 = 获取强制攻击目标(敌人, filter);
+  if (强制目标 != null) return 强制目标;
 
   const best = getHighestThreat(敌人, filter);
   if (best == null) return null;
@@ -113,6 +188,10 @@ export function 清除所有当前目标(): void {
   const 敌人ID列表 = 获取有序当前目标敌人ID列表();
   for (let i = 0; i < 敌人ID列表.length; i++) {
     delete 当前目标表[敌人ID列表[i]];
+  }
+  const 强制敌人ID列表 = 获取所有强制目标敌人ID();
+  for (let i = 0; i < 强制敌人ID列表.length; i++) {
+    delete 强制目标表[强制敌人ID列表[i]];
   }
 }
 

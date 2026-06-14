@@ -21,6 +21,7 @@ export interface BuffSlotViewModel {
   visible: boolean;
   iconPath: string;
   remainText: string;
+  stackText: string;
   tooltipBodyText: string;
   tooltipSourceText: string;
 }
@@ -97,6 +98,7 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
       visible: false,
       iconPath: "",
       remainText: "",
+      stackText: "",
       tooltipBodyText: "",
       tooltipSourceText: "",
     });
@@ -130,6 +132,7 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         state: {
           effect: rt.effect,
           effect2: rt.effect2 ?? 0,
+          stack: rt.stack ?? 1,
           remaining: rt.remaining,
           iconRemaining: buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
           sourceName: rt.sourceName,
@@ -190,11 +193,14 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
 
     const remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
     const remainText = "|cffffffff" + remainStr + "|r";
+    const stack = typeof row.state.stack === "number" && row.state.stack > 1 ? row.state.stack : 0;
+    const stackText = stack > 0 ? "|cfffff2d9" + tostringCompat(stack) + "|r" : "";
 
     slots[i] = {
       visible: true,
       iconPath,
       remainText,
+      stackText,
       tooltipBodyText,
       tooltipSourceText,
     };

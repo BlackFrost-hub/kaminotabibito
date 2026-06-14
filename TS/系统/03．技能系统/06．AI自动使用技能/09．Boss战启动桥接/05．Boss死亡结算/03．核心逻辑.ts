@@ -4,7 +4,7 @@ const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
 import type { Boss死亡全员奖励, Boss死亡击杀者奖励, Boss死亡结算配置, Boss死亡清理项, Boss死亡结算提示类型 } from "./00．类型";
-import { Boss死亡结算配置表, Boss死亡结算提示文本表 } from "./02．Boss死亡结算配置表";
+import { Boss死亡奖励与清理配置表, Boss死亡结算提示文本表 } from "./02．Boss死亡奖励与清理配置表";
 import { Boss死亡结算特殊逻辑标签 } from "./01．常量定义";
 
 const { YDUserDataGetSafe, YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
@@ -25,9 +25,6 @@ const { 按名字反查总单位ID } = require("系统.01．单位系统.08．�
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
-};
-const { AddItemToStockBJ } = require("lib.扩展函数.BJ函数.03．物品与库存") as {
-  AddItemToStockBJ: (this: void, whichItemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
 };
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
@@ -57,13 +54,15 @@ const { 调整玩家属性 } = require("系统.02．物品系统.15．装备技�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
+const { 创建首领奖励宝箱 } = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱") as {
+  创建首领奖励宝箱: (this: void, 奖励池ID: string, x: number, y: number, 打开范围?: "开启者" | "所有玩家英雄") => any;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const CreateItem = jass.CreateItem as (itemid: number, x: number, y: number) => any;
-const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: number, face: number) => any;
 const Player = jass.Player as (number: number) => any;
 const ForGroup = jass.ForGroup as (whichGroup: any, callback: () => void) => void;
 const GetEnumUnit = jass.GetEnumUnit as () => any;
@@ -71,7 +70,6 @@ const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) 
 const GetHeroLevel = jass.GetHeroLevel as (whichHero: any) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: number) => boolean;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as number;
-const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 
 const 攻击力属性ID = 1;
@@ -142,11 +140,12 @@ function 发放Boss死亡击杀者奖励(this: void, 奖励: Boss死亡击杀者
     AdjustPlayerStateBJ(奖励.金币, GetOwningPlayer(击杀者), jass.PLAYER_STATE_RESOURCE_GOLD as any);
   }
 
-  if (奖励.物品名列表 == null || 奖励.物品名列表.length <= 0) return;
+  const 物品列表 = 奖励.物品名列表;
+  if (物品列表 == null || 物品列表.length <= 0) return;
   const x = GetUnitX(击杀者);
   const y = GetUnitY(击杀者);
-  for (let i = 0; i < 奖励.物品名列表.length; i++) {
-    const 物品ID = stringToFourCCSafe(按名字反查物品ID(奖励.物品名列表[i]));
+  for (let i = 0; i < 物品列表.length; i++) {
+    const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
     if (物品ID > 0) CreateItem(物品ID, x, y);
   }
 }
@@ -182,33 +181,6 @@ function 取Boss死亡位置(this: void, Boss单位: any, 击杀者: any): { x: 
   return { x: 0, y: 0 };
 }
 
-function 掉落固定物品(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
-  const 物品列表 = 配置.固定掉落物品名列表;
-  if (物品列表 == null || 物品列表.length <= 0) return;
-  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  for (let i = 0; i < 物品列表.length; i++) {
-    const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
-    if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
-  }
-}
-
-function 创建Boss死亡宝箱(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): any {
-  if (配置.宝箱单位ID == null || 配置.宝箱单位ID === "") return null;
-  const 宝箱单位类型ID = stringToFourCCSafe(配置.宝箱单位ID);
-  if (宝箱单位类型ID <= 0) return null;
-  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  const 宝箱 = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 宝箱单位类型ID, 位置.x, 位置.y, 0);
-  if (宝箱 == null || 宝箱 === 0) return null;
-
-  const 库存列表 = 配置.宝箱库存物品名列表;
-  if (库存列表 == null || 库存列表.length <= 0) return 宝箱;
-  for (let i = 0; i < 库存列表.length; i++) {
-    const 物品ID = stringToFourCCSafe(按名字反查物品ID(库存列表[i]));
-    if (物品ID > 0) AddItemToStockBJ(物品ID, 宝箱, 1, 1);
-  }
-  return 宝箱;
-}
-
 function Boss死亡结算命中标签(this: void, 配置: Boss死亡结算配置, 标签: string): boolean {
   const 列表 = 配置.特殊逻辑标签;
   return 列表 != null && 列表.indexOf(标签) >= 0;
@@ -238,20 +210,30 @@ function 处理Boss死亡特殊逻辑掉落(this: void, 配置: Boss死亡结算
   if (!Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.沙漠宝藏击杀者非中立)) return;
 
   const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  if (配置.额外批量掉落物品名 == null || 配置.额外批量掉落物品名 === "") return;
-  const 金币物品ID = stringToFourCCSafe(按名字反查物品ID(配置.额外批量掉落物品名));
-  const 掉落次数最小值 = 配置.额外批量掉落最小数量 ?? 15;
-  const 掉落次数最大值 = 配置.额外批量掉落最大数量 ?? 25;
+  if (配置.非装备批量掉落物品名 == null || 配置.非装备批量掉落物品名 === "") return;
+  const 金币物品ID = stringToFourCCSafe(按名字反查物品ID(配置.非装备批量掉落物品名));
+  const 掉落次数最小值 = 配置.非装备批量掉落最小数量 ?? 15;
+  const 掉落次数最大值 = 配置.非装备批量掉落最大数量 ?? 25;
   const 掉落次数 = GetRandomInt(掉落次数最小值, 掉落次数最大值);
   for (let i = 0; i < 掉落次数; i++) {
     if (金币物品ID > 0) CreateItem(金币物品ID, 位置.x, 位置.y);
   }
+}
 
-  const 额外候选列表 = 配置.额外随机掉落物品名列表;
-  if (额外候选列表 == null || 额外候选列表.length <= 0) return;
-  const 候选 = 额外候选列表[GetRandomInt(0, 额外候选列表.length - 1)];
-  const 额外物品ID = stringToFourCCSafe(按名字反查物品ID(候选));
-  if (额外物品ID > 0) CreateItem(额外物品ID, 位置.x, 位置.y);
+function 掉落Boss死亡直接物品(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
+  const 物品列表 = 配置.直接掉落物品名列表;
+  if (物品列表 == null || 物品列表.length <= 0) return;
+  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
+  for (let i = 0; i < 物品列表.length; i++) {
+    const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
+    if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+  }
+}
+
+function 创建Boss死亡首领奖励宝箱(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
+  if (配置.首领奖励池ID == null || 配置.首领奖励池ID === "") return;
+  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
+  创建首领奖励宝箱(配置.首领奖励池ID, 位置.x, 位置.y, "所有玩家英雄");
 }
 
 function 延迟执行Boss死亡奖励与提示(this: void, 配置: Boss死亡结算配置, 全员奖励: Boss死亡全员奖励 | undefined): void {
@@ -317,16 +299,16 @@ function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, Boss
 
 export function 获取Boss死亡结算配置(this: void, Boss单位: any): Boss死亡结算配置 | undefined {
   if (Boss单位 == null || Boss单位 === 0) return undefined;
-  for (let i = 0; i < Boss死亡结算配置表.length; i++) {
-    const 配置 = Boss死亡结算配置表[i];
+  for (let i = 0; i < Boss死亡奖励与清理配置表.length; i++) {
+    const 配置 = Boss死亡奖励与清理配置表[i];
     if (Boss单位匹配配置(配置, Boss单位)) return 配置;
   }
   return undefined;
 }
 
 export function 按结算键获取Boss死亡结算配置(this: void, 结算键: string): Boss死亡结算配置 | undefined {
-  for (let i = 0; i < Boss死亡结算配置表.length; i++) {
-    if (Boss死亡结算配置表[i].键 === 结算键) return Boss死亡结算配置表[i];
+  for (let i = 0; i < Boss死亡奖励与清理配置表.length; i++) {
+    if (Boss死亡奖励与清理配置表[i].键 === 结算键) return Boss死亡奖励与清理配置表[i];
   }
   return undefined;
 }
@@ -335,9 +317,9 @@ export function 执行Boss死亡结算(this: void, 配置: Boss死亡结算配�
   const 运行Boss单位 = 解析Boss单位(配置, Boss单位);
   if (!处理Boss死亡特殊逻辑前置(配置, 击杀者)) return false;
 
-  掉落固定物品(配置, 运行Boss单位, 击杀者);
+  创建Boss死亡首领奖励宝箱(配置, 运行Boss单位, 击杀者);
+  掉落Boss死亡直接物品(配置, 运行Boss单位, 击杀者);
   处理Boss死亡特殊逻辑掉落(配置, 运行Boss单位, 击杀者);
-  创建Boss死亡宝箱(配置, 运行Boss单位, 击杀者);
   执行Boss死亡清理(配置, 运行Boss单位);
   发放Boss死亡击杀者奖励(配置.击杀者奖励, 击杀者);
   执行Boss死亡奖励与提示(配置, 击杀者);

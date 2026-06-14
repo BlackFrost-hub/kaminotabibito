@@ -40,6 +40,7 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jassGlobals = require("jass.globals")
+local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local NORMAL_MON_DAYS = {
     0,
     31,
@@ -200,7 +201,7 @@ local function runPeriodicCallbacks()
     for ____, p in ipairs(_periodicCallbacks) do
         if now - p.lastRunTime >= p.intervalMs then
             p.lastRunTime = now
-            p:callback()
+            _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-周期回调", p.callback)
         end
     end
 end
@@ -217,7 +218,7 @@ local function runDelayedCallbacks()
                 end
                 if now >= d.dueTime then
                     d.active = false
-                    d:callback()
+                    _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-延迟回调", d.callback)
                 else
                     _delayedCallbacks[writeIndex + 1] = d
                     writeIndex = writeIndex + 1
@@ -242,7 +243,7 @@ local function onTick()
         jassGlobals.udg_Elapsed = _gameElapsedTime
     end
     for ____, cb in ipairs(_tickCallbacks) do
-        cb()
+        _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-10ms回调", cb)
     end
     runPeriodicCallbacks()
     runDelayedCallbacks()
@@ -268,7 +269,7 @@ local function onTick()
         jt[2] = _gameTimeHMS[3]
     end
     for ____, cb in ipairs(_secondCallbacks) do
-        cb()
+        _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-秒回调", cb)
     end
 end
 function ____exports.getServerTime()

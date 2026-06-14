@@ -3,4 +3,4 @@
 
 dofile('Boss/BossAbilityTemplates.lua')
 dofile('Boss/BossUnitTemplates.lua')
-dofile('Boss/Thranduil.lua')
+dofile('Boss/HeroBoss/HeroBoss.lua')

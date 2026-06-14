@@ -62,10 +62,41 @@ local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_1.GetPlayersAll
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_2.debugLogForce
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.05．异界Boss.02．赫萝.index")
-local _____542F_52A8_8D6B_841D_663C_591C_88AB_52A8 = ____require_result_3["启动赫萝昼夜被动"]
-local _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8 = ____require_result_3["停止赫萝昼夜被动"]
+local jass = require("jass.common")
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.05．异界Boss.02．赫萝.index")
+local _____542F_52A8_8D6B_841D_663C_591C_88AB_52A8 = ____require_result_4["启动赫萝昼夜被动"]
+local _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8 = ____require_result_4["停止赫萝昼夜被动"]
+local ____require_result_5 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.00．配置")
+local _____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_5["瑟兰迪尔单位技能配置"]
+local ____require_result_6 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
+local _____83B7_53D6_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_6["获取瑟兰迪尔上下文"]
+local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_6["获取或创建瑟兰迪尔上下文"]
+local _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_6["清理瑟兰迪尔上下文"]
+local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____require_result_6["播放瑟兰迪尔台词"]
+local GetUnitTypeId = jass.GetUnitTypeId
 ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID = 0
+local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
+local function _____662F_745F_5170_8FEA_5C14Boss(bossUnit)
+    return bossUnit ~= nil and bossUnit ~= 0 and GetUnitTypeId(bossUnit) == _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID
+end
+local function _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(bossUnit)
+    if not _____662F_745F_5170_8FEA_5C14Boss(bossUnit) then
+        return
+    end
+    local existed = _____83B7_53D6_745F_5170_8FEA_5C14_4E0A_4E0B_6587(bossUnit)
+    local context = _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587(bossUnit)
+    if context ~= nil and existed == nil then
+        _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD(bossUnit, "开战")
+    end
+end
+local function _____505C_6B62_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(bossUnit)
+    if not _____662F_745F_5170_8FEA_5C14Boss(bossUnit) then
+        return
+    end
+    _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587(bossUnit)
+end
 local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     if context["是否已结束"] then
         return
@@ -74,16 +105,17 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027(context)
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
+    _____505C_6B62_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
     _____6E05_7406Boss_6218_8FD0_884C_4E0A_4E0B_6587(context["Boss单位"])
     _____6E05_7406Boss_6218_5355_4F4D_5B57_6BB5(context["Boss单位"])
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
-    local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.07．异界Boss死亡奖励")
-    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_4["发放异界Boss死亡奖励"]
+    local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_7["发放异界Boss死亡奖励"]
     _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
-    local ____require_result_5 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
-    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_5["尝试播放Boss死亡主线剧情"]
+    local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
+    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_8["尝试播放Boss死亡主线剧情"]
     _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
     QuestMessageBJ(
         GetPlayersAll(),
@@ -123,6 +155,7 @@ local function _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
     if not _____6FC0_6D3B_524D_72B6_6001 and context["是否已激活"] then
         _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
         _____542F_52A8_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
+        _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
         _____5904_7406Boss_6218_62A4_536B_542F_52A8(context)
     end
 end
@@ -158,22 +191,22 @@ local function ____onBoss_6218_8FD0_884CTick()
             do
                 local context = activeContexts[i + 1]
                 if context == nil or context["是否已结束"] then
-                    goto __continue19
+                    goto __continue25
                 end
                 _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
                 if not context["是否已激活"] then
-                    goto __continue19
+                    goto __continue25
                 end
                 if _____5355_4F4D_662F_5426_6B7B_4EA1(context["Boss单位"]) then
                     _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
-                    goto __continue19
+                    goto __continue25
                 end
                 _____7EA0_504FBoss_4F4D_7F6E(context)
                 _____7EA0_504F_73A9_5BB6_82F1_96C4_4F4D_7F6E_5230Boss(context)
                 _____5904_7406Boss_6218_62A4_536BTick(context, nowMs)
                 _____5C1D_8BD5_515C_5E95_641C_654C_5E76_4E0B_4EE4(context, nowMs)
             end
-            ::__continue19::
+            ::__continue25::
             i = i + 1
         end
     end
@@ -225,6 +258,7 @@ ____exports["启动Boss战运行"] = function(bossUnit)
         _____5B8C_6210Boss_6218_542F_52A8(context)
         if context["是否已激活"] then
             _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
+            _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
         end
     end
     debugLogForce(

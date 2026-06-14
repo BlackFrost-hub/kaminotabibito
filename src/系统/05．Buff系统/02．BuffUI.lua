@@ -45,6 +45,9 @@ function hideSlot(i)
     if s.tipBox ~= 0 then
         uiHideFrame(s.tipBox)
     end
+    if s.stackText ~= 0 then
+        uiHideFrame(s.stackText)
+    end
     if s.hit ~= 0 then
         uiHideFrame(s.hit)
     end
@@ -69,7 +72,7 @@ function renderBuffBarLocal(vm)
                 local slotVM = vm.slots[i + 1]
                 local slot = slots[i + 1]
                 if not slot then
-                    goto __continue48
+                    goto __continue50
                 end
                 if slotVM.visible then
                     if slot.root ~= 0 then
@@ -78,6 +81,14 @@ function renderBuffBarLocal(vm)
                     end
                     if slot.remainText ~= 0 then
                         japi.DzFrameSetText(slot.remainText, slotVM.remainText)
+                    end
+                    if slot.stackText ~= 0 then
+                        japi.DzFrameSetText(slot.stackText, slotVM.stackText)
+                        if slotVM.stackText ~= "" then
+                            uiShowFrame(slot.stackText)
+                        else
+                            uiHideFrame(slot.stackText)
+                        end
                     end
                     if slot.tipBodyText ~= 0 then
                         japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText)
@@ -92,7 +103,7 @@ function renderBuffBarLocal(vm)
                     hideSlot(i)
                 end
             end
-            ::__continue48::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -298,6 +309,23 @@ local function createOneSlot(index, parent)
         japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
         setFrameLevelSafe(remainText, 182)
     end
+    local stackText = uiCreateTextLabel(
+        "BuffUIBarStack" .. tostring(index),
+        bd,
+        "",
+        {
+            relativeTo = bd,
+            point = ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT,
+            relativePoint = ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT,
+            x = -0.001,
+            y = 0.002
+        },
+        {width = ICON_W * 0.62, height = 0.014}
+    ) or 0
+    if stackText and stackText ~= 0 then
+        japi.DzFrameSetTextAlignment(stackText, ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT)
+        setFrameLevelSafe(stackText, 183)
+    end
     local hit = uiCreateFrame({
         type = ____UI_5DE5_5177.FrameType.GLUETEXTBUTTON,
         name = "BuffUIBarHit" .. tostring(index),
@@ -392,6 +420,7 @@ local function createOneSlot(index, parent)
     return {
         root = bd,
         remainText = remainText or 0,
+        stackText = stackText or 0,
         hit = hit or 0,
         tipBox = tipBox or 0,
         tipBodyText = tipBodyText or 0,

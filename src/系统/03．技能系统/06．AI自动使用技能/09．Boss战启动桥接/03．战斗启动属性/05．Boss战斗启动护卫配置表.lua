@@ -1,80 +1,22 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-____exports["Boss战斗启动护卫配置表"] = {{["Boss单位ID"] = "o000", ["Boss单位名"] = "蛇之遗迹看守者-奢隆", ["初始护卫批次"] = {["广播说话者"] = "Boss", ["广播文案池"] = {"上！阻止任何想进入神殿的入侵者"}, ["单位列表"] = {{
-    ["单位ID"] = "nbds",
-    ["单位名"] = "蛇之看守者(精英)",
-    X = 27930.9,
-    Y = 13411.4,
-    ["面向"] = 270,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1.5,
-    ["主Boss死亡时立刻死亡"] = true
-}, {
-    ["单位ID"] = "nbds",
-    ["单位名"] = "蛇之看守者(精英)",
-    X = 28982.1,
-    Y = 13233.3,
-    ["面向"] = 270,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1.5,
-    ["主Boss死亡时立刻死亡"] = true
-}}}}, {["Boss单位ID"] = "nbdo", ["Boss单位名"] = "蛇之领主-奢恩", ["初始护卫批次"] = {["单位列表"] = {{
-    ["单位ID"] = "nbdw",
-    ["单位名"] = "蛇之护卫",
-    X = 27930.9,
-    Y = 13411.4,
-    ["面向"] = 270,
-    ["额外最大生命"] = 2000,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1,
-    ["主Boss死亡时立刻死亡"] = true
-}, {
-    ["单位ID"] = "nbdw",
-    ["单位名"] = "蛇之护卫",
-    X = 28982.1,
-    Y = 13233.3,
-    ["面向"] = 270,
-    ["额外最大生命"] = 2000,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1,
-    ["主Boss死亡时立刻死亡"] = true
-}}}, ["周期护卫批次"] = {["间隔毫秒"] = 42500, ["广播说话者"] = "护卫", ["广播文案池"] = {"进攻！粉碎入侵者", "奢恩大人，我们来帮助你赶跑入侵者"}, ["单位列表"] = {{
-    ["单位ID"] = "nbdw",
-    ["单位名"] = "蛇之护卫",
-    X = 27930.9,
-    Y = 13411.4,
-    ["面向"] = 270,
-    ["额外最大生命"] = 2000,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1,
-    ["主Boss死亡时立刻死亡"] = true
-}, {
-    ["单位ID"] = "nbds",
-    ["单位名"] = "蛇之看守者(精英)",
-    X = 28982.1,
-    Y = 13233.3,
-    ["面向"] = 270,
-    ["额外最大生命"] = 2000,
-    ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
-    ["出生特效持续秒"] = 1,
-    ["主Boss死亡时立刻死亡"] = true
-}}}}, {["Boss单位ID"] = "N03O", ["Boss单位名"] = "恶魔领袖", ["初始护卫批次"] = {["广播说话者"] = "护卫", ["广播文案池"] = {"大人，我们来助您一臂之力。", "大人，这里的麻烦交给我们处理。", "大人，察觉您这边有变，我们立刻赶回来了。"}, ["后续对白"] = {{["延迟毫秒"] = 3000, ["说话者"] = "Boss", ["文案池"] = {"很好，你们来得正是时候。此战若胜，少不了你们的奖赏。"}}, {["延迟毫秒"] = 5000, ["说话者"] = "护卫", ["文案池"] = {"愿为大人效死力。"}}}, ["单位列表"] = {{
-    ["单位ID"] = "n03N",
-    ["单位名"] = "恶魔队长",
-    X = 26803,
-    Y = 20921.8,
-    ["面向"] = 270,
-    ["暴击率"] = 0.4,
-    ["普攻伤害吸血"] = 0.75,
-    ["主Boss死亡时立刻死亡"] = false
-}, {
-    ["单位ID"] = "n03N",
-    ["单位名"] = "恶魔队长",
-    X = 26203,
-    Y = 20921.8,
-    ["面向"] = 270,
-    ["暴击率"] = 0.4,
-    ["普攻伤害吸血"] = 0.75,
-    ["主Boss死亡时立刻死亡"] = false
-}}}}}
+local ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.01．Boss战斗启动属性配置表.index")
+local ____Boss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868 = ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["Boss分类战斗启动护卫配置表"]
+local ____02_FF0E_82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.index")
+local _____82F1_96C4Boss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868 = ____02_FF0E_82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["英雄Boss分类战斗启动护卫配置表"]
+local ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.03．异界Boss战斗启动属性配置表.index")
+local _____5F02_754CBoss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868 = ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["异界Boss分类战斗启动护卫配置表"]
+local ____array_0 = __TS__SparseArrayNew(table.unpack(____Boss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868))
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____82F1_96C4Boss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868)
+)
+__TS__SparseArrayPush(
+    ____array_0,
+    table.unpack(_____5F02_754CBoss_5206_7C7B_6218_6597_542F_52A8_62A4_536B_914D_7F6E_8868)
+)
+____exports["Boss战斗启动护卫配置表"] = {__TS__SparseArraySpread(____array_0)}
 return ____exports

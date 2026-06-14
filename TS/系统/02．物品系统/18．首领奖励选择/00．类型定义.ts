@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-export const 首领奖励最少选项数 = 3;
+export const 首领奖励最少选项数 = 1;
 export const 首领奖励最多选项数 = 7;
 
 export interface 首领奖励选项配置 {

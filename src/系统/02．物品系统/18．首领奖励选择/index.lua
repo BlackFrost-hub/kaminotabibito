@@ -11,7 +11,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表")
+    local ____export = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

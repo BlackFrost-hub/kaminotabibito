@@ -22,10 +22,15 @@ const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const buffEffectTools = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string) => any;
+  销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
+  销毁Dz绑定特效句柄: (this: void, effect: any) => void;
+};
 const AddSpecialEffect = jass["AddSpecialEffect"] as (modelName: string, x: number, y: number) => any;
-const AddSpecialEffectTarget = jass["AddSpecialEffectTarget"] as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
 const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
+const R2I = jass["R2I"] as (r: number) => number;
 
 const DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID: Record<string, number[]> = {
   C001: [1112560453], // 'BPSE'
@@ -63,6 +68,8 @@ export interface BuffRuntime {
   remaining: number;
   effect: number;
   effect2: number;
+  /** UI/机制层数。未设置时按 1 层处理。 */
+  stack: number;
   source: "dot" | "manual";
   /** 来源单位名称 */
   sourceName?: string;
@@ -71,6 +78,10 @@ export interface BuffRuntime {
   iconOverride?: string;
   /** 预留：与桥接传入的特效路径一致（可用于后续挂点逻辑） */
   effectModelOverride?: string;
+  /** 手动 Buff 附着表现特效句柄。 */
+  visualEffect?: any;
+  /** DzBindEffect 绑定特效的键，用于 Buff 到期/刷新时精确销毁。 */
+  visualEffectKey?: string;
   /** Buff 池到期时一并移除的原生魔法效果 rawId，用于清理单位状态栏图标/效果。 */
   nativeBuffAbilityIds?: number[];
   /** Buff 被移除或到期时触发的纯 TS 清理回调。 */
@@ -198,6 +209,12 @@ function toHid(u: any): number {
   return (jass as any).GetHandleId(u) as number;
 }
 
+function normalizeBuffStack(stack: number | undefined): number {
+  if (stack == null || typeof stack !== "number" || !isFinite(stack)) return 1;
+  const value = R2I(stack);
+  return value > 1 ? value : 1;
+}
+
 function notifyDotBuffExpiredFromPool(buffID: string, hid: number): void {
   __pcallExpiredBuffId = buffID;
   __pcallExpiredHid = hid;
@@ -233,6 +250,7 @@ export function syncDotBuff(
     remaining: state.remaining,
     effect: state.effect,
     effect2: 0,
+    stack: 1,
     source: "dot",
     sourceName: state.sourceName,
     _dotParsedDuration: state._dotParsedDuration,
@@ -248,6 +266,7 @@ export interface RegisterManualBuffExtras {
   iconOverride?: string;
   effectModelOverride?: string;
   effectValue2?: number;
+  stack?: number;
   nativeBuffAbilityIds?: number[];
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
 }
@@ -261,11 +280,16 @@ function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, dur
   let effect: any = null;
   if (meta?.effectMode === "point") {
     effect = AddSpecialEffect(modelPath, GetUnitX(target), GetUnitY(target));
+    if (effect != null && effect !== 0) {
+      YDWETimerDestroyEffectSafe(durationSec, effect);
+    }
   } else {
-    effect = AddSpecialEffectTarget(modelPath, target, meta?.effectAttachPoint ?? "overhead");
-  }
-  if (effect != null && effect !== 0) {
-    YDWETimerDestroyEffectSafe(durationSec, effect);
+    const effectKey = "manual-buff:" + buffID;
+    effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey);
+    if (effect != null && effect !== 0) {
+      row.visualEffect = effect;
+      row.visualEffectKey = effectKey;
+    }
   }
 }
 
@@ -279,11 +303,16 @@ export function registerManualBuff(
   if (target == null || target === 0 || !buffID || durationSec <= 0) return;
   const hid = toHid(target);
   if (hid === 0) return;
+  const oldRow = getBuffFromFlat(hid, buffID);
+  if (oldRow != null) {
+    removeBuffRuntimeByKey(hid, buffID, oldRow, typeof target !== "number" ? target : unitRefByHid[hid]);
+  }
   const row: BuffRuntime = {
     buffID,
     remaining: durationSec,
     effect: effectValue,
     effect2: extras?.effectValue2 ?? 0,
+    stack: normalizeBuffStack(extras?.stack),
     source: "manual",
   };
   if (extras != null) {
@@ -292,6 +321,7 @@ export function registerManualBuff(
     if (extras.effectModelOverride !== undefined && extras.effectModelOverride !== "")
       row.effectModelOverride = extras.effectModelOverride;
     if (extras.effectValue2 !== undefined) row.effect2 = extras.effectValue2;
+    if (extras.stack !== undefined) row.stack = normalizeBuffStack(extras.stack);
     if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
       row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
     if (extras.onRemove !== undefined) row.onRemove = extras.onRemove;
@@ -335,6 +365,18 @@ export function getBuffRuntime(unit: any, buffID: string): BuffRuntime | null {
 export function getBuffRuntimeByHid(hid: number, buffID: string): BuffRuntime | null {
   if (hid === 0) return null;
   return getBuffFromFlat(hid, buffID);
+}
+
+export function 获取单位Buff层数(unit: any, buffID: string): number {
+  const row = getBuffRuntime(unit, buffID);
+  return row != null ? normalizeBuffStack(row.stack) : 0;
+}
+
+export function 设置单位Buff层数(unit: any, buffID: string, stack: number): boolean {
+  const row = getBuffRuntime(unit, buffID);
+  if (row == null) return false;
+  row.stack = normalizeBuffStack(stack);
+  return true;
 }
 
 /** 图标底部剩余秒数：与池内 `remaining` 一致（无假层） */
@@ -411,8 +453,20 @@ function cleanupBuffOnRemove(unitRef: any, hid: number, buffID: string, row: Buf
   onRemove(unitOrHid, buffID, row);
 }
 
+function cleanupBuffVisualEffect(unitRef: any, row: BuffRuntime): void {
+  if (row.visualEffect == null || row.visualEffect === 0) return;
+  if (unitRef != null && unitRef !== 0 && row.visualEffectKey != null && row.visualEffectKey !== "") {
+    buffEffectTools.销毁Dz绑定单位特效(unitRef, row.visualEffectKey);
+  } else {
+    buffEffectTools.销毁Dz绑定特效句柄(row.visualEffect);
+  }
+  row.visualEffect = null;
+  row.visualEffectKey = undefined;
+}
+
 function removeBuffRuntimeByKey(hid: number, buffID: string, row: BuffRuntime, unitRef: any): void {
   if (row.source === "dot") notifyDotBuffExpiredFromPool(buffID, hid);
+  cleanupBuffVisualEffect(unitRef, row);
   cleanupBuffOnRemove(unitRef, hid, buffID, row);
   cleanupExpiredNativeBuffs(unitRef, row);
   removeBuffFromFlat(hid, buffID);

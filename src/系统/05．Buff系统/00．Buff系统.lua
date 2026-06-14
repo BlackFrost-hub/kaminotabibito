@@ -7,7 +7,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, cleanupBuffOnRemove, removeBuffRuntimeByKey, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, UnitRemoveAbility, DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
+local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, cleanupBuffOnRemove, cleanupBuffVisualEffect, removeBuffRuntimeByKey, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, UnitRemoveAbility, buffEffectTools, DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
 function makeBuffKey(hid, buffID)
     return (tostring(hid) .. "|") .. buffID
 end
@@ -146,10 +146,10 @@ function tickBuffPool()
     do
         local i = 0
         while i < #____pairs do
-            local ____pairs_index_10 = ____pairs[i + 1]
-            local hid = ____pairs_index_10.hid
-            local buffID = ____pairs_index_10.buffID
-            local row = ____pairs_index_10.row
+            local ____pairs_index_15 = ____pairs[i + 1]
+            local hid = ____pairs_index_15.hid
+            local buffID = ____pairs_index_15.buffID
+            local row = ____pairs_index_15.row
             if hid ~= currentHid then
                 if currentHid > 0 and #currentBuffs > 0 then
                     processBuffsForUnit(currentHid, currentBuffs)
@@ -179,9 +179,9 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #buffs do
-            local ____buffs_index_11 = buffs[i + 1]
-            local buffID = ____buffs_index_11.buffID
-            local row = ____buffs_index_11.row
+            local ____buffs_index_16 = buffs[i + 1]
+            local buffID = ____buffs_index_16.buffID
+            local row = ____buffs_index_16.row
             row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
             if row.remaining <= 0 then
                 expired[#expired + 1] = {buffID = buffID, row = row}
@@ -192,9 +192,9 @@ function processBuffsForUnit(hid, buffs)
     do
         local i = 0
         while i < #expired do
-            local ____expired_index_12 = expired[i + 1]
-            local buffID = ____expired_index_12.buffID
-            local row = ____expired_index_12.row
+            local ____expired_index_17 = expired[i + 1]
+            local buffID = ____expired_index_17.buffID
+            local row = ____expired_index_17.row
             removeBuffRuntimeByKey(hid, buffID, row, unitRef)
             i = i + 1
         end
@@ -230,10 +230,23 @@ function cleanupBuffOnRemove(unitRef, hid, buffID, row)
     local unitOrHid = (unitRef == nil or unitRef == 0) and hid or unitRef
     onRemove(unitOrHid, buffID, row)
 end
+function cleanupBuffVisualEffect(unitRef, row)
+    if row.visualEffect == nil or row.visualEffect == 0 then
+        return
+    end
+    if unitRef ~= nil and unitRef ~= 0 and row.visualEffectKey ~= nil and row.visualEffectKey ~= "" then
+        buffEffectTools["销毁Dz绑定单位特效"](unitRef, row.visualEffectKey)
+    else
+        buffEffectTools["销毁Dz绑定特效句柄"](row.visualEffect)
+    end
+    row.visualEffect = nil
+    row.visualEffectKey = nil
+end
 function removeBuffRuntimeByKey(hid, buffID, row, unitRef)
     if row.source == "dot" then
         notifyDotBuffExpiredFromPool(buffID, hid)
     end
+    cleanupBuffVisualEffect(unitRef, row)
     cleanupBuffOnRemove(unitRef, hid, buffID, row)
     cleanupExpiredNativeBuffs(unitRef, row)
     removeBuffFromFlat(hid, buffID)
@@ -250,8 +263,8 @@ function ensureSyncTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_14 = _G
-    local onTick10ms = ____G_14.onTick10ms
+    local ____G_19 = _G
+    local onTick10ms = ____G_19.onTick10ms
     onTick10ms(onBuffPoolCenterTimerTick)
 end
 function maybeStopSyncTimer()
@@ -277,10 +290,11 @@ UnitRemoveAbility = jass.UnitRemoveAbility
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_1.YDWETimerDestroyEffectSafe
+buffEffectTools = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local AddSpecialEffect = jass.AddSpecialEffect
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local R2I = jass.R2I
 DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID = {
     C001 = {1112560453},
     C002 = {1114010234},
@@ -326,6 +340,13 @@ local function toHid(u)
     end
     return jass.GetHandleId(u)
 end
+local function normalizeBuffStack(stack)
+    if stack == nil or type(stack) ~= "number" or not __TS__NumberIsFinite(__TS__Number(stack)) then
+        return 1
+    end
+    local value = R2I(stack)
+    return value > 1 and value or 1
+end
 --- 由 dot伤害 调用：施加、覆盖或到期清除。
 -- target 可为单位或 **GetHandleId**。
 -- state 为 null 表示该 DOT 类型在该单位上已结束。
@@ -349,6 +370,7 @@ function ____exports.syncDotBuff(typeId, target, state)
         remaining = state.remaining,
         effect = state.effect,
         effect2 = 0,
+        stack = 1,
         source = "dot",
         sourceName = state.sourceName,
         _dotParsedDuration = state._dotParsedDuration
@@ -375,11 +397,16 @@ local function playManualBuffEffect(target, buffID, row, durationSec)
             GetUnitX(target),
             GetUnitY(target)
         )
+        if effect ~= nil and effect ~= 0 then
+            YDWETimerDestroyEffectSafe(durationSec, effect)
+        end
     else
-        effect = AddSpecialEffectTarget(modelPath, target, meta and meta.effectAttachPoint or "overhead")
-    end
-    if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(durationSec, effect)
+        local effectKey = "manual-buff:" .. buffID
+        effect = buffEffectTools["创建Dz绑定单位特效"](target, meta and meta.effectAttachPoint or "overhead", modelPath, effectKey)
+        if effect ~= nil and effect ~= 0 then
+            row.visualEffect = effect
+            row.visualEffectKey = effectKey
+        end
     end
 end
 function ____exports.registerManualBuff(target, buffID, durationSec, effectValue, extras)
@@ -390,11 +417,24 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
     if hid == 0 then
         return
     end
+    local oldRow = getBuffFromFlat(hid, buffID)
+    if oldRow ~= nil then
+        local ____removeBuffRuntimeByKey_10 = removeBuffRuntimeByKey
+        local ____buffID_9 = buffID
+        local ____temp_8
+        if type(target) ~= "number" then
+            ____temp_8 = target
+        else
+            ____temp_8 = unitRefByHid[hid]
+        end
+        ____removeBuffRuntimeByKey_10(hid, ____buffID_9, oldRow, ____temp_8)
+    end
     local row = {
         buffID = buffID,
         remaining = durationSec,
         effect = effectValue,
         effect2 = extras and extras.effectValue2 or 0,
+        stack = normalizeBuffStack(extras and extras.stack),
         source = "manual"
     }
     if extras ~= nil then
@@ -409,6 +449,9 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
         end
         if extras.effectValue2 ~= nil then
             row.effect2 = extras.effectValue2
+        end
+        if extras.stack ~= nil then
+            row.stack = normalizeBuffStack(extras.stack)
         end
         if extras.nativeBuffAbilityIds ~= nil and #extras.nativeBuffAbilityIds > 0 then
             row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds
@@ -464,6 +507,18 @@ function ____exports.getBuffRuntime(unit, buffID)
     local hid = toHid(unit)
     return ____exports.getBuffRuntimeByHid(hid, buffID)
 end
+____exports["获取单位Buff层数"] = function(unit, buffID)
+    local row = ____exports.getBuffRuntime(unit, buffID)
+    return row ~= nil and normalizeBuffStack(row.stack) or 0
+end
+____exports["设置单位Buff层数"] = function(unit, buffID, stack)
+    local row = ____exports.getBuffRuntime(unit, buffID)
+    if row == nil then
+        return false
+    end
+    row.stack = normalizeBuffStack(stack)
+    return true
+end
 --- 图标底部剩余秒数：与池内 `remaining` 一致（无假层）
 function ____exports.getDotIconDisplayRemaining(_unit, _buffID, realRemaining)
     return type(realRemaining) == "number" and __TS__NumberIsFinite(__TS__Number(realRemaining)) and realRemaining or 0
@@ -478,13 +533,13 @@ ____exports["移除单位指定Buff"] = function(unit, buffID)
     if row == nil then
         return false
     end
-    local ____temp_13
+    local ____temp_18
     if type(unit) ~= "number" then
-        ____temp_13 = unit
+        ____temp_18 = unit
     else
-        ____temp_13 = unitRefByHid[hid]
+        ____temp_18 = unitRefByHid[hid]
     end
-    local unitRef = ____temp_13
+    local unitRef = ____temp_18
     removeBuffRuntimeByKey(hid, buffID, row, unitRef)
     if not hasAnyBuffOnHid(hid) then
         __TS__Delete(unitRefByHid, hid)

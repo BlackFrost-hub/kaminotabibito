@@ -21,7 +21,7 @@ import { createTextLabel as createTextLabelImported } from "../09．表现系统
 import { hideFrame as hideFrameImported, showFrame as showFrameImported } from "../09．表现系统/01．UI工具/05．帧控制";
 const UI工具 = require("系统.09．表现系统.01．UI工具.index") as {
   FrameType: { BACKDROP: number; GLUETEXTBUTTON: number };
-  FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number; BOTTOMLEFT: number };
+  FramePoint: { TOPLEFT: number; TOPRIGHT: number; CENTER: number; BOTTOM: number; BOTTOMLEFT: number; BOTTOMRIGHT: number };
 };
 const ____hwMod = require("lib.扩展函数.封装函数.04．硬件输入.index");
 const getGameUI = ____hwMod.getGameUI as (this: void) => number;
@@ -52,6 +52,7 @@ const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
 interface SlotFrames {
   root: number;
   remainText: number;
+  stackText: number;
   hit: number;
   tipBox: number;
   tipBodyText: number;
@@ -62,7 +63,7 @@ const slots: SlotFrames[] = [];
 let buffUiInitialized = false;
 let refreshCallbackId = 0;
 let pendingInitDelayCallbackId = 0;
-const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> } | undefined> = {};
+const buffBarViewModelByPlayerId: Record<number, { slots: Array<{ visible: boolean; iconPath: string; remainText: string; stackText: string; tooltipBodyText: string; tooltipSourceText: string }> } | undefined> = {};
 // DzFrame 返回数字 frame id，不是 JASS handle；这里直接用 frame id 做本地 hover 反查 key。
 const hoverSlotIndexByFrameId: Record<number, number | undefined> = {};
 
@@ -190,6 +191,25 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
     setFrameLevelSafe(remainText, 182);
   }
 
+  const stackText =
+    uiCreateTextLabel(
+      "BuffUIBarStack" + index,
+      bd,
+      "",
+      {
+        relativeTo: bd,
+        point: UI工具.FramePoint.BOTTOMRIGHT,
+        relativePoint: UI工具.FramePoint.BOTTOMRIGHT,
+        x: -0.001,
+        y: 0.002,
+      },
+      { width: ICON_W * 0.62, height: 0.014 }
+    ) || 0;
+  if (stackText && stackText !== 0) {
+    japi.DzFrameSetTextAlignment(stackText, UI工具.FramePoint.BOTTOMRIGHT);
+    setFrameLevelSafe(stackText, 183);
+  }
+
   const hit =
     uiCreateFrame({
       type: UI工具.FrameType.GLUETEXTBUTTON,
@@ -272,6 +292,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
   return {
     root: bd,
     remainText: remainText || 0,
+    stackText: stackText || 0,
     hit: hit || 0,
     tipBox: tipBox || 0,
     tipBodyText: tipBodyText || 0,
@@ -285,6 +306,7 @@ function hideSlot(this: void, i: number): void {
   if (s.tipBodyText !== 0) uiHideFrame(s.tipBodyText);
   if (s.tipSourceText !== 0) uiHideFrame(s.tipSourceText);
   if (s.tipBox !== 0) uiHideFrame(s.tipBox);
+  if (s.stackText !== 0) uiHideFrame(s.stackText);
   if (s.hit !== 0) uiHideFrame(s.hit);
   if (s.root !== 0) uiHideFrame(s.root);
 }
@@ -293,7 +315,7 @@ function hideAllSlots(this: void): void {
   for (let i = 0; i < MAX_SLOTS; i++) hideSlot(i);
 }
 
-function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; iconPath: string; remainText: string; tooltipBodyText: string; tooltipSourceText: string }> }): void {
+function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; iconPath: string; remainText: string; stackText: string; tooltipBodyText: string; tooltipSourceText: string }> }): void {
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slotVM = vm.slots[i];
     const slot = slots[i];
@@ -305,6 +327,11 @@ function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; i
       }
       if (slot.remainText !== 0) {
         japi.DzFrameSetText(slot.remainText, slotVM.remainText);
+      }
+      if (slot.stackText !== 0) {
+        japi.DzFrameSetText(slot.stackText, slotVM.stackText);
+        if (slotVM.stackText !== "") uiShowFrame(slot.stackText);
+        else uiHideFrame(slot.stackText);
       }
       if (slot.tipBodyText !== 0) {
         japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText);

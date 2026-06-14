@@ -2,9 +2,9 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
-local ____02_FF0EBoss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡结算配置表")
-local ____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868 = ____02_FF0EBoss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868["Boss死亡结算配置表"]
-local ____Boss_6B7B_4EA1_7ED3_7B97_63D0_793A_6587_672C_8868 = ____02_FF0EBoss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868["Boss死亡结算提示文本表"]
+local ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡奖励与清理配置表")
+local ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 = ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡奖励与清理配置表"]
+local ____Boss_6B7B_4EA1_7ED3_7B97_63D0_793A_6587_672C_8868 = ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡结算提示文本表"]
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.01．常量定义")
 local ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss死亡结算特殊逻辑标签"]
 ---
@@ -24,34 +24,33 @@ local ____require_result_4 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_4["按名字反查总单位ID"]
 local ____require_result_5 = require("系统.02．物品系统.13．物品名反查")
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_5["按名字反查物品ID"]
-local ____require_result_6 = require("lib.扩展函数.BJ函数.03．物品与库存")
-local AddItemToStockBJ = ____require_result_6.AddItemToStockBJ
-local ____require_result_7 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_7.QuestMessageBJ
-local ____require_result_8 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_8.GetPlayersAll
-local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local ModifyHeroStat = ____require_result_9.ModifyHeroStat
-local AddHeroXPSwapped = ____require_result_9.AddHeroXPSwapped
-local bj_HEROSTAT_STR = ____require_result_9.bj_HEROSTAT_STR
-local bj_HEROSTAT_AGI = ____require_result_9.bj_HEROSTAT_AGI
-local bj_HEROSTAT_INT = ____require_result_9.bj_HEROSTAT_INT
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.index")
-local _____589E_52A0_82F1_96C4_57FA_7840_5168_5C5E_6027 = ____require_result_10["增加英雄基础全属性"]
-local ____require_result_11 = require("lib.扩展函数.Star扩展函数.00．SGSS")
-local SGSS_SetState = ____require_result_11.SGSS_SetState
-local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local AdjustPlayerStateBJ = ____require_result_12.AdjustPlayerStateBJ
-local ____require_result_13 = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.02．物品使用工具")
-local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_13["调整玩家属性"]
-local ____require_result_14 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_14.addDelayedCallback
+local ____require_result_6 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_6.QuestMessageBJ
+local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_7.GetPlayersAll
+local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local ModifyHeroStat = ____require_result_8.ModifyHeroStat
+local AddHeroXPSwapped = ____require_result_8.AddHeroXPSwapped
+local bj_HEROSTAT_STR = ____require_result_8.bj_HEROSTAT_STR
+local bj_HEROSTAT_AGI = ____require_result_8.bj_HEROSTAT_AGI
+local bj_HEROSTAT_INT = ____require_result_8.bj_HEROSTAT_INT
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.index")
+local _____589E_52A0_82F1_96C4_57FA_7840_5168_5C5E_6027 = ____require_result_9["增加英雄基础全属性"]
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.00．SGSS")
+local SGSS_SetState = ____require_result_10.SGSS_SetState
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local AdjustPlayerStateBJ = ____require_result_11.AdjustPlayerStateBJ
+local ____require_result_12 = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.02．物品使用工具")
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_12["调整玩家属性"]
+local ____require_result_13 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_13.addDelayedCallback
+local ____require_result_14 = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱")
+local _____521B_5EFA_9996_9886_5956_52B1_5B9D_7BB1 = ____require_result_14["创建首领奖励宝箱"]
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local CreateItem = jass.CreateItem
-local CreateUnit = jass.CreateUnit
 local Player = jass.Player
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
@@ -59,7 +58,6 @@ local GetRandomInt = jass.GetRandomInt
 local GetHeroLevel = jass.GetHeroLevel
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
-local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local ____BJ_4FEE_6539_589E_52A0 = 0
@@ -171,15 +169,16 @@ local function _____53D1_653EBoss_6B7B_4EA1_51FB_6740_8005_5956_52B1(_____5956_5
             jass.PLAYER_STATE_RESOURCE_GOLD
         )
     end
-    if _____5956_52B1["物品名列表"] == nil or #_____5956_52B1["物品名列表"] <= 0 then
+    local _____7269_54C1_5217_8868 = _____5956_52B1["物品名列表"]
+    if _____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0 then
         return
     end
     local x = GetUnitX(_____51FB_6740_8005)
     local y = GetUnitY(_____51FB_6740_8005)
     do
         local i = 0
-        while i < #_____5956_52B1["物品名列表"] do
-            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____5956_52B1["物品名列表"][i + 1]))
+        while i < #_____7269_54C1_5217_8868 do
+            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
             if _____7269_54C1ID > 0 then
                 CreateItem(_____7269_54C1ID, x, y)
             end
@@ -237,58 +236,6 @@ local function _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6
     end
     return {x = 0, y = 0}
 end
-local function _____6389_843D_56FA_5B9A_7269_54C1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
-    local _____7269_54C1_5217_8868 = _____914D_7F6E["固定掉落物品名列表"]
-    if _____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0 then
-        return
-    end
-    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    do
-        local i = 0
-        while i < #_____7269_54C1_5217_8868 do
-            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
-            if _____7269_54C1ID > 0 then
-                CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
-            end
-            i = i + 1
-        end
-    end
-end
-local function _____521B_5EFABoss_6B7B_4EA1_5B9D_7BB1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
-    if _____914D_7F6E["宝箱单位ID"] == nil or _____914D_7F6E["宝箱单位ID"] == "" then
-        return nil
-    end
-    local _____5B9D_7BB1_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E["宝箱单位ID"])
-    if _____5B9D_7BB1_5355_4F4D_7C7B_578BID <= 0 then
-        return nil
-    end
-    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    local _____5B9D_7BB1 = CreateUnit(
-        Player(PLAYER_NEUTRAL_PASSIVE),
-        _____5B9D_7BB1_5355_4F4D_7C7B_578BID,
-        _____4F4D_7F6E.x,
-        _____4F4D_7F6E.y,
-        0
-    )
-    if _____5B9D_7BB1 == nil or _____5B9D_7BB1 == 0 then
-        return nil
-    end
-    local _____5E93_5B58_5217_8868 = _____914D_7F6E["宝箱库存物品名列表"]
-    if _____5E93_5B58_5217_8868 == nil or #_____5E93_5B58_5217_8868 <= 0 then
-        return _____5B9D_7BB1
-    end
-    do
-        local i = 0
-        while i < #_____5E93_5B58_5217_8868 do
-            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____5E93_5B58_5217_8868[i + 1]))
-            if _____7269_54C1ID > 0 then
-                AddItemToStockBJ(_____7269_54C1ID, _____5B9D_7BB1, 1, 1)
-            end
-            i = i + 1
-        end
-    end
-    return _____5B9D_7BB1
-end
 local function ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, _____6807_7B7E)
     local _____5217_8868 = _____914D_7F6E["特殊逻辑标签"]
     return _____5217_8868 ~= nil and __TS__ArrayIndexOf(_____5217_8868, _____6807_7B7E) >= 0
@@ -322,12 +269,12 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
         return
     end
     local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    if _____914D_7F6E["额外批量掉落物品名"] == nil or _____914D_7F6E["额外批量掉落物品名"] == "" then
+    if _____914D_7F6E["非装备批量掉落物品名"] == nil or _____914D_7F6E["非装备批量掉落物品名"] == "" then
         return
     end
-    local _____91D1_5E01_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____914D_7F6E["额外批量掉落物品名"]))
-    local _____6389_843D_6B21_6570_6700_5C0F_503C = _____914D_7F6E["额外批量掉落最小数量"] or 15
-    local _____6389_843D_6B21_6570_6700_5927_503C = _____914D_7F6E["额外批量掉落最大数量"] or 25
+    local _____91D1_5E01_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____914D_7F6E["非装备批量掉落物品名"]))
+    local _____6389_843D_6B21_6570_6700_5C0F_503C = _____914D_7F6E["非装备批量掉落最小数量"] or 15
+    local _____6389_843D_6B21_6570_6700_5927_503C = _____914D_7F6E["非装备批量掉落最大数量"] or 25
     local _____6389_843D_6B21_6570 = GetRandomInt(_____6389_843D_6B21_6570_6700_5C0F_503C, _____6389_843D_6B21_6570_6700_5927_503C)
     do
         local i = 0
@@ -338,15 +285,30 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
             i = i + 1
         end
     end
-    local _____989D_5916_5019_9009_5217_8868 = _____914D_7F6E["额外随机掉落物品名列表"]
-    if _____989D_5916_5019_9009_5217_8868 == nil or #_____989D_5916_5019_9009_5217_8868 <= 0 then
+end
+local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
+    local _____7269_54C1_5217_8868 = _____914D_7F6E["直接掉落物品名列表"]
+    if _____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0 then
         return
     end
-    local _____5019_9009 = _____989D_5916_5019_9009_5217_8868[GetRandomInt(0, #_____989D_5916_5019_9009_5217_8868 - 1) + 1]
-    local _____989D_5916_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____5019_9009))
-    if _____989D_5916_7269_54C1ID > 0 then
-        CreateItem(_____989D_5916_7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
+    do
+        local i = 0
+        while i < #_____7269_54C1_5217_8868 do
+            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
+            if _____7269_54C1ID > 0 then
+                CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+            end
+            i = i + 1
+        end
     end
+end
+local function _____521B_5EFABoss_6B7B_4EA1_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
+    if _____914D_7F6E["首领奖励池ID"] == nil or _____914D_7F6E["首领奖励池ID"] == "" then
+        return
+    end
+    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
+    _____521B_5EFA_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E["首领奖励池ID"], _____4F4D_7F6E.x, _____4F4D_7F6E.y, "所有玩家英雄")
 end
 local function _____5EF6_8FDF_6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_____914D_7F6E, _____5168_5458_5956_52B1)
     if _____5168_5458_5956_52B1 ~= nil then
@@ -434,8 +396,8 @@ ____exports["获取Boss死亡结算配置"] = function(____Boss_5355_4F4D)
     end
     do
         local i = 0
-        while i < #____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868 do
-            local _____914D_7F6E = ____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868[i + 1]
+        while i < #____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 do
+            local _____914D_7F6E = ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             if ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D) then
                 return _____914D_7F6E
             end
@@ -447,9 +409,9 @@ end
 ____exports["按结算键获取Boss死亡结算配置"] = function(_____7ED3_7B97_952E)
     do
         local i = 0
-        while i < #____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868 do
-            if ____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868[i + 1]["键"] == _____7ED3_7B97_952E then
-                return ____Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E_8868[i + 1]
+        while i < #____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 do
+            if ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]["键"] == _____7ED3_7B97_952E then
+                return ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             end
             i = i + 1
         end
@@ -461,9 +423,9 @@ ____exports["执行Boss死亡结算"] = function(_____914D_7F6E, ____Boss_5355_4
     if not _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____914D_7F6E, _____51FB_6740_8005) then
         return false
     end
-    _____6389_843D_56FA_5B9A_7269_54C1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
+    _____521B_5EFABoss_6B7B_4EA1_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
+    _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
-    _____521B_5EFABoss_6B7B_4EA1_5B9D_7BB1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____6267_884CBoss_6B7B_4EA1_6E05_7406(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D)
     _____53D1_653EBoss_6B7B_4EA1_51FB_6740_8005_5956_52B1(_____914D_7F6E["击杀者奖励"], _____51FB_6740_8005)
     _____6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_____914D_7F6E, _____51FB_6740_8005)

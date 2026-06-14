@@ -13,3 +13,4 @@ export * from "./11．月光灌注";
 export * from "./12．终末审判";
 export * from "./13．技能入口";
 export * from "./14．月光碎片";
+export * from "./15．台词播放";

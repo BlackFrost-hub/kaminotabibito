@@ -37,6 +37,9 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jassGlobals = require("jass.globals") as any;
+const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  safeExecute: (this: void, module: string, callback: (this: void) => void) => boolean;
+};
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const BASE_TIMESTAMP = 1451606400;
@@ -62,8 +65,8 @@ let _timeCache = {
   weekday: 0,
 };
 
-const _secondCallbacks: Array<() => void> = [];
-const _tickCallbacks: Array<() => void> = [];
+const _secondCallbacks: Array<(this: void) => void> = [];
+const _tickCallbacks: Array<(this: void) => void> = [];
 
 /** 当前逻辑毫秒（与 getServerTime 一致） */
 function nowMs(): number {
@@ -142,7 +145,7 @@ function calcDate(now: number): void {
 
 const TIME_GET_KEYS = ["year", "month", "day", "hour", "minute", "second", "weekday", "millisecond"] as const;
 
-function removeFnFromArray(arr: Array<() => void>, fn: () => void): void {
+function removeFnFromArray(arr: Array<(this: void) => void>, fn: (this: void) => void): void {
   const i = arr.indexOf(fn);
   if (i > -1) arr.splice(i, 1);
 }
@@ -160,14 +163,14 @@ interface PeriodicCallback {
   id: number;
   intervalMs: number;
   lastRunTime: number;
-  callback: () => void;
+  callback: (this: void) => void;
 }
 
 interface DelayedCallback {
   id: number;
   dueTime: number;
   active: boolean;
-  callback: () => void;
+  callback: (this: void) => void;
 }
 
 let _periodicCallbackIdCounter = 0;
@@ -180,7 +183,7 @@ function runPeriodicCallbacks(): void {
   for (const p of _periodicCallbacks) {
     if (now - p.lastRunTime >= p.intervalMs) {
       p.lastRunTime = now;
-      p.callback();
+      调试输出.safeExecute("中心计时器-周期回调", p.callback);
     }
   }
 }
@@ -193,7 +196,7 @@ function runDelayedCallbacks(): void {
     if (!d.active) continue;
     if (now >= d.dueTime) {
       d.active = false;
-      d.callback();
+      调试输出.safeExecute("中心计时器-延迟回调", d.callback);
     } else {
       _delayedCallbacks[writeIndex] = d;
       writeIndex++;
@@ -212,7 +215,9 @@ function onTick(): void {
     jassGlobals.udg_Elapsed = _gameElapsedTime;
   }
 
-  for (const cb of _tickCallbacks) cb();
+  for (const cb of _tickCallbacks) {
+    调试输出.safeExecute("中心计时器-10ms回调", cb);
+  }
   runPeriodicCallbacks();
   runDelayedCallbacks();
 
@@ -239,7 +244,9 @@ function onTick(): void {
     jt[2] = _gameTimeHMS[2];
   }
 
-  for (const cb of _secondCallbacks) cb();
+  for (const cb of _secondCallbacks) {
+    调试输出.safeExecute("中心计时器-秒回调", cb);
+  }
 }
 
 export function getServerTime(): number {

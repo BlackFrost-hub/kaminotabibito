@@ -62,12 +62,51 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
 };
+const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const { 启动赫萝昼夜被动, 停止赫萝昼夜被动 } = require("../../../05．单位技能/05．异界Boss/02．赫萝/index") as {
   启动赫萝昼夜被动: (this: void, unit: any) => void;
   停止赫萝昼夜被动: (this: void, unit: any) => void;
 };
+const { 瑟兰迪尔单位技能配置 } = require("../../../05．单位技能/03．Boss技能/03．瑟兰迪尔/00．配置") as {
+  瑟兰迪尔单位技能配置: { 单位ID: string };
+};
+const {
+  获取瑟兰迪尔上下文,
+  获取或创建瑟兰迪尔上下文,
+  清理瑟兰迪尔上下文,
+  播放瑟兰迪尔台词,
+} = require("../../../05．单位技能/03．Boss技能/03．瑟兰迪尔/03．运行时上下文") as {
+  获取瑟兰迪尔上下文: (this: void, boss: any) => any;
+  获取或创建瑟兰迪尔上下文: (this: void, boss: any) => any;
+  清理瑟兰迪尔上下文: (this: void, boss: any) => void;
+  播放瑟兰迪尔台词: (this: void, boss: any, 类型: string, index?: number) => void;
+};
+
+const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 
 let Boss战运行周期回调ID = 0;
+const 瑟兰迪尔单位类型ID = stringToFourCCSafe(瑟兰迪尔单位技能配置.单位ID);
+
+function 是瑟兰迪尔Boss(this: void, bossUnit: any): boolean {
+  return bossUnit != null && bossUnit !== 0 && GetUnitTypeId(bossUnit) === 瑟兰迪尔单位类型ID;
+}
+
+function 启动瑟兰迪尔Boss运行时(this: void, bossUnit: any): void {
+  if (!是瑟兰迪尔Boss(bossUnit)) return;
+  const existed = 获取瑟兰迪尔上下文(bossUnit);
+  const context = 获取或创建瑟兰迪尔上下文(bossUnit);
+  if (context != null && existed == null) {
+    播放瑟兰迪尔台词(bossUnit, "开战");
+  }
+}
+
+function 停止瑟兰迪尔Boss运行时(this: void, bossUnit: any): void {
+  if (!是瑟兰迪尔Boss(bossUnit)) return;
+  清理瑟兰迪尔上下文(bossUnit);
+}
 
 function 结束Boss战运行上下文(this: void, context: Boss战运行上下文, nowMs: number): void {
   if (context.是否已结束) return;
@@ -76,6 +115,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);
+  停止瑟兰迪尔Boss运行时(context.Boss单位);
   清理Boss战运行上下文(context.Boss单位);
   清理Boss战单位字段(context.Boss单位);
   清理Boss箭头特效(context.Boss单位);
@@ -113,6 +153,7 @@ QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场�
   if (!激活前状态 && context.是否已激活) {
     启动Boss血条弱点韧性(context);
     启动赫萝昼夜被动(context.Boss单位);
+    启动瑟兰迪尔Boss运行时(context.Boss单位);
     处理Boss战护卫启动(context);
   }
 }
@@ -201,6 +242,7 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
     完成Boss战启动(context);
     if (context.是否已激活) {
       启动Boss血条弱点韧性(context);
+      启动瑟兰迪尔Boss运行时(context.Boss单位);
     }
   }
 

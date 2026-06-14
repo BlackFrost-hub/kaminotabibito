@@ -4,6 +4,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("系统.04．伤害系统.06．暴击系统.01．暴击核心")
 local registerCritRateModifier = ____require_result_0.registerCritRateModifier
 local registerCritAppliedFinalDamageListener = ____require_result_0.registerCritAppliedFinalDamageListener
@@ -22,7 +23,7 @@ local ____require_result_6 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_6.EC_CreateEffect
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
-local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local ConvertUnitState = jass.ConvertUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -78,7 +79,7 @@ ____exports["读取单位攻击力"] = function(unit)
     if unit == nil or unit == 0 then
         return 0
     end
-    return __TS__Number(GetUnitState(unit, _____653B_51FB_529B_72B6_6001)) or 0
+    return __TS__Number(GetUnitStateJapi(unit, _____653B_51FB_529B_72B6_6001)) or 0
 end
 ____exports["读取单位护甲"] = function(unit)
     if unit == nil or unit == 0 then

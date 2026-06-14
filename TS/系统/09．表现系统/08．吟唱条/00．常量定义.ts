@@ -21,8 +21,19 @@ export const 模块名 = "吟唱条";
 export const 吟唱条步进秒 = 0.01;
 
 export const UI坐标X = 0.549;
-export const UI坐标Y = 0.2;
+export const 常规技能UI坐标Y = 0.18;
+export const 大招UI坐标Y = 0.210;
+export const 场地常驻AOEUI坐标Y = 0.235;
+export const 致命惩罚UI坐标Y = 0.260;
+export const 场地AOEUI坐标Y = 大招UI坐标Y;
+export const UI坐标Y = 常规技能UI坐标Y;
 export const 锚点CENTER = 4;
+
+export const 吟唱条通道_常规技能 = "常规技能";
+export const 吟唱条通道_大招 = "大招";
+export const 吟唱条通道_场地常驻AOE = "场地常驻AOE";
+export const 吟唱条通道_致命惩罚 = "致命惩罚";
+export const 吟唱条通道_场地AOE = 吟唱条通道_大招;
 
 export const 框架名_前景 = "吟唱条前景";
 export const 框架名_背景 = "吟唱条背景";
@@ -65,4 +76,18 @@ export function 获取前景模型(颜色ID: number): string {
 
 export function 获取背景模型(颜色ID: number): string {
   return 颜色ID到背景模型[颜色ID] || 颜色ID到背景模型[默认颜色ID];
+}
+
+export function 获取通道Y坐标(通道: string): number {
+  if (通道 === 吟唱条通道_致命惩罚) return 致命惩罚UI坐标Y;
+  if (通道 === 吟唱条通道_场地常驻AOE) return 场地常驻AOEUI坐标Y;
+  if (通道 === 吟唱条通道_大招 || 通道 === 吟唱条通道_场地AOE) return 大招UI坐标Y;
+  return 常规技能UI坐标Y;
+}
+
+export function 获取通道框架名(基础名: string, 通道: string): string {
+  if (通道 === 吟唱条通道_致命惩罚) return `${基础名}_致命惩罚`;
+  if (通道 === 吟唱条通道_场地常驻AOE) return `${基础名}_场地常驻AOE`;
+  if (通道 === 吟唱条通道_大招 || 通道 === 吟唱条通道_场地AOE) return `${基础名}_大招`;
+  return `${基础名}_常规技能`;
 }

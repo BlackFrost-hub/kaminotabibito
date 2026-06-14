@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, DzUnitDisableAttack, GetRandomInt, forEachSorted, BJ_RADTODEG, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_HEIGHT_OFFSET, isChestType, getChestConfig, _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_4E2D_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03, _____521B_5EFA_8FDB_5EA6_6761_7279_6548, _____9500_6BC1_8FDB_5EA6_6761_7279_6548, dropItemsFromChestConfig, _____67E5_627E_5B9D_7BB1_4E3B_4EBA, debugLogForce, CreateFloatTextOnUnit, _____8C03_8BD5_6A21_5757, ORDER_MOVE, ORDER_SMART, ORDER_ATTACK, ORDER_STOP, ORDER_HOLD_POSITION, openingMap, movingMap, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
+local angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, DzUnitDisableAttack, GetRandomInt, forEachSorted, BJ_RADTODEG, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_HEIGHT_OFFSET, isChestType, getChestConfig, _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_4E2D_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03, _____521B_5EFA_8FDB_5EA6_6761_7279_6548, _____9500_6BC1_8FDB_5EA6_6761_7279_6548, dropItemsFromChestConfig, _____67E5_627E_5B9D_7BB1_4E3B_4EBA, _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1, debugLogForce, CreateFloatTextOnUnit, _____8C03_8BD5_6A21_5757, ORDER_MOVE, ORDER_SMART, ORDER_ATTACK, ORDER_STOP, ORDER_HOLD_POSITION, openingMap, movingMap, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 function angleBetweenPoints(x1, y1, x2, y2)
     return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
@@ -96,7 +96,7 @@ function startOpening(unit, target, openTime)
         jass.GetHandleId(progressBar)
     )
     DzUnitDisableAttack(unit, true)
-    debugLogForce(_____8C03_8BD5_6A21_5757, "开启瞬间禁攻已恢复")
+    debugLogForce(_____8C03_8BD5_6A21_5757, "开启瞬间禁攻已启用")
     local targetX = jass.GetDestructableX(target)
     local targetY = jass.GetDestructableY(target)
     debugLogForce(
@@ -124,13 +124,13 @@ function startOpening(unit, target, openTime)
             highRoll
         )
     end
-    local ____config_17
+    local ____config_18
     if config then
-        ____config_17 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(config, target, "准备开启")
+        ____config_18 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(config, target, "准备开启")
     else
-        ____config_17 = nil
+        ____config_18 = nil
     end
-    local ownerUnit = ____config_17
+    local ownerUnit = ____config_18
     debugLogForce(
         _____8C03_8BD5_6A21_5757,
         "准备开启主人",
@@ -201,27 +201,27 @@ function updateAllOpening()
             end
             if completed or interrupted then
                 if completed then
-                    local ____data_chestConfig_20 = data.chestConfig
-                    if ____data_chestConfig_20 == nil then
-                        ____data_chestConfig_20 = getChestConfig(jass.GetDestructableTypeId(data.target))
+                    local ____data_chestConfig_21 = data.chestConfig
+                    if ____data_chestConfig_21 == nil then
+                        ____data_chestConfig_21 = getChestConfig(jass.GetDestructableTypeId(data.target))
                     end
-                    local cfg = ____data_chestConfig_20
-                    local ____cfg_21
+                    local cfg = ____data_chestConfig_21
+                    local ____cfg_22
                     if cfg then
-                        ____cfg_21 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(cfg, data.target, "开启完成")
+                        ____cfg_22 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(cfg, data.target, "开启完成")
                     else
-                        ____cfg_21 = nil
+                        ____cfg_22 = nil
                     end
-                    local ownerUnit = ____cfg_21
-                    local ____opt_result_24
+                    local ownerUnit = ____cfg_22
+                    local ____opt_result_25
                     if cfg ~= nil then
-                        ____opt_result_24 = cfg.name
+                        ____opt_result_25 = cfg.name
                     end
-                    local ____opt_result_24_25 = ____opt_result_24
-                    if ____opt_result_24_25 == nil then
-                        ____opt_result_24_25 = "宝箱"
+                    local ____opt_result_25_26 = ____opt_result_25
+                    if ____opt_result_25_26 == nil then
+                        ____opt_result_25_26 = "宝箱"
                     end
-                    local chestName = ____opt_result_24_25
+                    local chestName = ____opt_result_25_26
                     showTextTag(
                         data.unit,
                         "宝箱被打开了...",
@@ -229,26 +229,26 @@ function updateAllOpening()
                         100,
                         0
                     )
-                    local ____debugLogForce_32 = debugLogForce
-                    local ____unitId_30 = unitId
-                    local ____temp_31 = jass.GetHandleId(data.target)
-                    local ____opt_result_28
+                    local ____debugLogForce_33 = debugLogForce
+                    local ____unitId_31 = unitId
+                    local ____temp_32 = jass.GetHandleId(data.target)
+                    local ____opt_result_29
                     if cfg ~= nil then
-                        ____opt_result_28 = cfg.destructableType
+                        ____opt_result_29 = cfg.destructableType
                     end
-                    local ____opt_result_28_29 = ____opt_result_28
-                    if ____opt_result_28_29 == nil then
-                        ____opt_result_28_29 = "unknown"
+                    local ____opt_result_29_30 = ____opt_result_29
+                    if ____opt_result_29_30 == nil then
+                        ____opt_result_29_30 = "unknown"
                     end
-                    ____debugLogForce_32(
+                    ____debugLogForce_33(
                         _____8C03_8BD5_6A21_5757,
                         "开启完成",
                         "unit=",
-                        ____unitId_30,
+                        ____unitId_31,
                         "target=",
-                        ____temp_31,
+                        ____temp_32,
                         "destructableType=",
-                        ____opt_result_28_29
+                        ____opt_result_29_30
                     )
                     debugLogForce(
                         _____8C03_8BD5_6A21_5757,
@@ -270,27 +270,49 @@ function updateAllOpening()
                     if cfg then
                         local dropX = jass.GetDestructableX(data.target)
                         local dropY = jass.GetDestructableY(data.target)
-                        debugLogForce(
-                            _____8C03_8BD5_6A21_5757,
-                            "掉落前",
-                            "type=",
-                            cfg.destructableType,
-                            "x=",
-                            dropX,
-                            "y=",
-                            dropY,
-                            "preRoll=",
-                            data.highRoll or "nil"
-                        )
-                        dropItemsFromChestConfig(
-                            cfg,
-                            dropX,
-                            dropY,
-                            data.unit,
-                            ownerUnit,
-                            data.highRoll
-                        )
-                        debugLogForce(_____8C03_8BD5_6A21_5757, "掉落后")
+                        local _____9996_9886_5956_52B1_5DF2_63A5_7BA1 = _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1(cfg, data.unit, data.target)
+                        if _____9996_9886_5956_52B1_5DF2_63A5_7BA1 then
+                            local ____debugLogForce_36 = debugLogForce
+                            local ____cfg_destructableType_35 = cfg.destructableType
+                            local ____cfg__9996_9886_5956_52B1_6C60ID_34 = cfg["首领奖励池ID"]
+                            if ____cfg__9996_9886_5956_52B1_6C60ID_34 == nil then
+                                ____cfg__9996_9886_5956_52B1_6C60ID_34 = ""
+                            end
+                            ____debugLogForce_36(
+                                _____8C03_8BD5_6A21_5757,
+                                "首领奖励宝箱已触发",
+                                "type=",
+                                ____cfg_destructableType_35,
+                                "x=",
+                                dropX,
+                                "y=",
+                                dropY,
+                                "rewardPool=",
+                                ____cfg__9996_9886_5956_52B1_6C60ID_34
+                            )
+                        else
+                            debugLogForce(
+                                _____8C03_8BD5_6A21_5757,
+                                "掉落前",
+                                "type=",
+                                cfg.destructableType,
+                                "x=",
+                                dropX,
+                                "y=",
+                                dropY,
+                                "preRoll=",
+                                data.highRoll or "nil"
+                            )
+                            dropItemsFromChestConfig(
+                                cfg,
+                                dropX,
+                                dropY,
+                                data.unit,
+                                ownerUnit,
+                                data.highRoll
+                            )
+                            debugLogForce(_____8C03_8BD5_6A21_5757, "掉落后")
+                        end
                     end
                     if data.target then
                         debugLogForce(_____8C03_8BD5_6A21_5757, "KillDestructable前")
@@ -380,8 +402,8 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_33 = _G
-    local onTick10ms = ____G_33.onTick10ms
+    local ____G_37 = _G
+    local onTick10ms = ____G_37.onTick10ms
     onTick10ms(onChestCenterTimerTick)
 end
 --- 中断单位开启
@@ -390,13 +412,13 @@ function ____exports.interruptOpening(unit)
         return
     end
     local unitId = getUnitId(unit)
-    local ____temp_35
+    local ____temp_39
     if unitId ~= 0 then
-        ____temp_35 = openingMap:get(unitId)
+        ____temp_39 = openingMap:get(unitId)
     else
-        ____temp_35 = nil
+        ____temp_39 = nil
     end
-    local data = ____temp_35
+    local data = ____temp_39
     if data ~= nil then
         cleanupOpening(data, true)
     end
@@ -454,8 +476,10 @@ local ____require_result_10 = require("系统.06．经济系统.00．宝箱系�
 dropItemsFromChestConfig = ____require_result_10.dropItemsFromChestConfig
 local ____require_result_11 = require("系统.06．经济系统.00．宝箱系统.08．宝箱主人")
 _____67E5_627E_5B9D_7BB1_4E3B_4EBA = ____require_result_11["查找宝箱主人"]
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_12.debugLogForce
+local ____require_result_12 = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱")
+_____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1 = ____require_result_12["触发宝箱首领奖励"]
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_13.debugLogForce
 local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
 CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
 _____8C03_8BD5_6A21_5757 = "宝箱系统-核心"
@@ -648,13 +672,13 @@ function ____exports.isUnitOpening(unit)
         return false
     end
     local unitId = getUnitId(unit)
-    local ____temp_34
+    local ____temp_38
     if unitId ~= 0 then
-        ____temp_34 = openingMap:has(unitId)
+        ____temp_38 = openingMap:has(unitId)
     else
-        ____temp_34 = false
+        ____temp_38 = false
     end
-    return ____temp_34
+    return ____temp_38
 end
 ____exports.onUnitTargetChest = ____exports.onUnitTargetInteractable
 ____exports.isUnitOpeningChest = ____exports.isUnitOpening

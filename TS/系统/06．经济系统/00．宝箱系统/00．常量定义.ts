@@ -50,12 +50,18 @@ export interface 宝箱高级掉落配置 {
   随机段: 宝箱高级掉落段[];
 }
 
+export type 宝箱首领奖励打开范围 = "开启者" | "所有玩家英雄";
+
 export interface ChestTypeConfig {
   destructableType: string;
   openTime: number;
   name: string;
-  picks: number;
-  dropMode: DropMode;
+  picks?: number;
+  dropMode?: DropMode;
+  /** 配置后，宝箱开启完成不直接掉装备，而是打开首领奖励选择 UI。 */
+  首领奖励池ID?: string;
+  /** 默认只给开启者打开；Boss 死亡奖励宝箱可配置成所有玩家英雄。 */
+  首领奖励打开范围?: 宝箱首领奖励打开范围;
   主人配置?: ChestOwnerConfig;
   高级掉落?: 宝箱高级掉落配置;
 }
@@ -79,6 +85,7 @@ export const CHEST_TYPES: ChestTypeConfig[] = [
     ] },
   },
   { destructableType: "B003", openTime: 3.0, name: "普通宝箱", picks: 1, dropMode: { type: "score", range: { min: 100, max: 500 } } },
+  { destructableType: "BR01", openTime: 3.0, name: "首领奖励宝箱" },
   { destructableType: "LTbx", openTime: 3.0, name: "木桶", picks: 1, dropMode: { type: "pool", items: "初心戒指:1.5;初始生命药水:1;初始魔法药水:2", always: "精灵铁剑" } },
 ];
 

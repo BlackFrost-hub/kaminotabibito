@@ -537,17 +537,21 @@ local function _____6267_884C_9AD8_7EA7_6389_843D(config, _____4E0A_4E0B_6587)
     return {}
 end
 ____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
-    debugLogForce(
+    local ____debugLogForce_28 = debugLogForce
+    local ____config_destructableType_26 = config.destructableType
+    local ____config_name_27 = config.name
+    local ____opt_24 = config.dropMode
+    ____debugLogForce_28(
         "宝箱掉落配置",
         "executeChestDrop",
         "type=",
-        config.destructableType,
+        ____config_destructableType_26,
         "name=",
-        config.name,
+        ____config_name_27,
         "mode=",
-        config.dropMode.type,
+        ____opt_24 and ____opt_24.type or "none",
         "picks=",
-        config.picks
+        config.picks or 0
     )
     if config["高级掉落"] then
         return _____6267_884C_9AD8_7EA7_6389_843D(config, {
@@ -559,7 +563,10 @@ ____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____630
             ["指定主随机"] = _____6307_5B9A_4E3B_968F_673A
         })
     end
-    return _____6309_6389_843D_6A21_5F0F_6267_884C(config.dropMode, config.picks)
+    if config.dropMode == nil then
+        return {}
+    end
+    return _____6309_6389_843D_6A21_5F0F_6267_884C(config.dropMode, config.picks or 0)
 end
 ____exports["按可破坏物掉落"] = function(destructableType, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
     local config = getChestConfigByString(destructableType)

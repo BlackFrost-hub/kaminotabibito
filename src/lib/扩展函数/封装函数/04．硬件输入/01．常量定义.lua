@@ -4,6 +4,8 @@ local ____exports = {}
 ____exports.KEY_STATE = {DOWN = 1, UP = 0}
 --- 鼠标按键（BzAPI：1=左，2=右，3=中）
 ____exports.MOUSE_BUTTON = {LEFT = 1, RIGHT = 2, MIDDLE = 3}
+--- 鼠标按键状态（DzTriggerRegisterMouseEventTrg：1=按下，0=抬起）
+____exports.MOUSE_STATE = {DOWN = 1, UP = 0}
 --- A-Z
 ____exports.KEY = {
     A = 65,

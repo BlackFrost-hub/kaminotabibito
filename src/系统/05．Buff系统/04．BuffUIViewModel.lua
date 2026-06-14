@@ -104,6 +104,7 @@ function ____exports.buildBuffBarViewModel(unit)
                 visible = false,
                 iconPath = "",
                 remainText = "",
+                stackText = "",
                 tooltipBodyText = "",
                 tooltipSourceText = ""
             }
@@ -151,6 +152,7 @@ function ____exports.buildBuffBarViewModel(unit)
                     state = {
                         effect = rt.effect,
                         effect2 = rt.effect2 or 0,
+                        stack = rt.stack or 1,
                         remaining = rt.remaining,
                         iconRemaining = buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
                         sourceName = rt.sourceName,
@@ -227,10 +229,19 @@ function ____exports.buildBuffBarViewModel(unit)
                 end
                 local remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining)
                 local remainText = ("|cffffffff" .. remainStr) .. "|r"
+                local ____temp_16
+                if type(row.state.stack) == "number" and row.state.stack > 1 then
+                    ____temp_16 = row.state.stack
+                else
+                    ____temp_16 = 0
+                end
+                local stack = ____temp_16
+                local stackText = stack > 0 and ("|cfffff2d9" .. tostringCompat(stack)) .. "|r" or ""
                 slots[i + 1] = {
                     visible = true,
                     iconPath = iconPath,
                     remainText = remainText,
+                    stackText = stackText,
                     tooltipBodyText = tooltipBodyText,
                     tooltipSourceText = tooltipSourceText
                 }

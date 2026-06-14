@@ -1,0 +1,41 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____00_FF0E_914D_7F6E_7C7B_578B = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.00．配置类型")
+local _____9ED8_8BA4Boss_5F31_70B9_6570_91CF_57FA_7840_503C = ____00_FF0E_914D_7F6E_7C7B_578B["默认Boss弱点数量基础值"]
+local ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.03．异界Boss战斗启动属性配置表.00．异界Boss共享配置")
+local _____5F02_754CBoss_9ED8_8BA4_6B7B_4EA1_5956_52B1_57FA_7840_5168_5C5E_6027 = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss默认死亡奖励基础全属性"]
+local _____5F02_754CBoss_7EDF_4E00_8F6C_6362_573A_666F = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一转换场景"]
+local _____5F02_754CBoss_7EDF_4E00_80DC_5229_97F3_4E50_53D8_91CF_540D = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一胜利音乐变量名"]
+local _____5F02_754CBoss_7EDF_4E00_5730_70B9_53D8_91CF_540D = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一地点变量名"]
+local _____5F02_754CBoss_7EDF_4E00BS_79FB_52A8X_8F74 = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一BS移动X轴"]
+local _____5F02_754CBoss_7EDF_4E00BS_79FB_52A8Y_8F74 = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一BS移动Y轴"]
+local _____5F02_754CBoss_7EDF_4E00_73A9_5BB6_79FB_52A8X_8F74 = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一玩家移动X轴"]
+local _____5F02_754CBoss_7EDF_4E00_73A9_5BB6_79FB_52A8Y_8F74 = ____00_FF0E_5F02_754CBoss_5171_4EAB_914D_7F6E["异界Boss统一玩家移动Y轴"]
+____exports["单位E07E战斗启动属性配置"] = {
+    ["归类"] = "异界Boss",
+    ["单位ID"] = "E07E",
+    ["单位名"] = "赫萝",
+    ["转换场景"] = _____5F02_754CBoss_7EDF_4E00_8F6C_6362_573A_666F,
+    ["胜利音乐变量名"] = _____5F02_754CBoss_7EDF_4E00_80DC_5229_97F3_4E50_53D8_91CF_540D,
+    ["地点变量名"] = _____5F02_754CBoss_7EDF_4E00_5730_70B9_53D8_91CF_540D,
+    ["BS移动X轴"] = _____5F02_754CBoss_7EDF_4E00BS_79FB_52A8X_8F74,
+    ["BS移动Y轴"] = _____5F02_754CBoss_7EDF_4E00BS_79FB_52A8Y_8F74,
+    ["玩家移动X轴"] = _____5F02_754CBoss_7EDF_4E00_73A9_5BB6_79FB_52A8X_8F74,
+    ["玩家移动Y轴"] = _____5F02_754CBoss_7EDF_4E00_73A9_5BB6_79FB_52A8Y_8F74,
+    ["战斗音乐变量名"] = "gg_snd_battleBoss001",
+    ["护甲穿透"] = 0.35,
+    ["暴击率"] = 0.35,
+    ["魔抗"] = 0.3,
+    ["眩晕抗性"] = 0.3,
+    ["命中率"] = 0.05,
+    ["闪避率"] = 0.15,
+    ["弱点数量基础值"] = _____9ED8_8BA4Boss_5F31_70B9_6570_91CF_57FA_7840_503C,
+    ["弱点数量每层N增量"] = 0,
+    ["天生弱点数"] = 1,
+    ["弓弱"] = true,
+    ["器弱伤害需求生命百分比"] = 0.03,
+    ["护盾基础值"] = 7,
+    ["护盾每层N增量"] = 2,
+    ["死亡后所有玩家英雄基础全属性"] = _____5F02_754CBoss_9ED8_8BA4_6B7B_4EA1_5956_52B1_57FA_7840_5168_5C5E_6027
+}
+return ____exports

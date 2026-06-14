@@ -9,6 +9,7 @@
  * 输入 134：测试连续两次启动覆盖
  * 输入 135：测试到时自动关闭
  * 输入 136：测试手动关闭
+ * 输入 137：测试常规技能与场地AOE双吟唱条同时显示
  */
 
 const jass = require("jass.common") as any;
@@ -35,6 +36,7 @@ const 自定义文本命令 = "133";
 const 连续覆盖命令 = "134";
 const 到时关闭命令 = "135";
 const 手动关闭命令 = "136";
+const 双通道命令 = "137";
 
 let 测试启动时间 = 0;
 
@@ -111,6 +113,24 @@ function 测试手动关闭(this: void): void {
   });
 }
 
+function 测试双通道同时显示(this: void): void {
+  显示吟唱条({
+    通道: "常规技能",
+    总时长: 5.0,
+    颜色ID: 2,
+    标题文本: "技能蓄力",
+    提示文本: "常规技能：准备释放",
+  });
+  显示吟唱条({
+    通道: "场地AOE",
+    总时长: 7.0,
+    颜色ID: 4,
+    标题文本: "场地预警",
+    提示文本: "场地AOE：立即走位",
+  });
+  debugLogForce(模块名, "显示双通道吟唱条", "常规技能=5秒", "场地AOE=7秒");
+}
+
 function on聊天命令回调(this: void, player: any, command: string): void {
   if (command === 默认测试命令) {
     测试显示默认吟唱条();
@@ -124,6 +144,8 @@ function on聊天命令回调(this: void, player: any, command: string): void {
     测试到时自动关闭();
   } else if (command === 手动关闭命令) {
     测试手动关闭();
+  } else if (command === 双通道命令) {
+    测试双通道同时显示();
   } else {
     debugLogForce(模块名, "未知命令", command);
   }
@@ -136,8 +158,9 @@ export function 初始化吟唱条测试(this: void): void {
   注册聊天命令监听(连续覆盖命令, on聊天命令回调);
   注册聊天命令监听(到时关闭命令, on聊天命令回调);
   注册聊天命令监听(手动关闭命令, on聊天命令回调);
+  注册聊天命令监听(双通道命令, on聊天命令回调);
 
-  debugLogForce(模块名, "初始化完成", "输入 131-136 测试");
+  debugLogForce(模块名, "初始化完成", "输入 131-137 测试");
 }
 
 初始化吟唱条测试();

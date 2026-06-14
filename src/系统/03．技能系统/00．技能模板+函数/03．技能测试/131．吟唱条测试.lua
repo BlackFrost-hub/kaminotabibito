@@ -9,6 +9,7 @@ local ____exports = {}
 -- 输入 134：测试连续两次启动覆盖
 -- 输入 135：测试到时自动关闭
 -- 输入 136：测试手动关闭
+-- 输入 137：测试常规技能与场地AOE双吟唱条同时显示
 local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
@@ -27,6 +28,7 @@ local _____81EA_5B9A_4E49_6587_672C_547D_4EE4 = "133"
 local _____8FDE_7EED_8986_76D6_547D_4EE4 = "134"
 local _____5230_65F6_5173_95ED_547D_4EE4 = "135"
 local _____624B_52A8_5173_95ED_547D_4EE4 = "136"
+local _____53CC_901A_9053_547D_4EE4 = "137"
 local _____6D4B_8BD5_542F_52A8_65F6_95F4 = 0
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
     local ____g_gg_unit_Hamg_0002_4 = g.gg_unit_Hamg_0002
@@ -77,6 +79,23 @@ local function _____6D4B_8BD5_624B_52A8_5173_95ED()
         end
     )
 end
+local function _____6D4B_8BD5_53CC_901A_9053_540C_65F6_663E_793A()
+    _____663E_793A_541F_5531_6761({
+        ["通道"] = "常规技能",
+        ["总时长"] = 5,
+        ["颜色ID"] = 2,
+        ["标题文本"] = "技能蓄力",
+        ["提示文本"] = "常规技能：准备释放"
+    })
+    _____663E_793A_541F_5531_6761({
+        ["通道"] = "场地AOE",
+        ["总时长"] = 7,
+        ["颜色ID"] = 4,
+        ["标题文本"] = "场地预警",
+        ["提示文本"] = "场地AOE：立即走位"
+    })
+    debugLogForce(_____6A21_5757_540D, "显示双通道吟唱条", "常规技能=5秒", "场地AOE=7秒")
+end
 local function ____on_804A_5929_547D_4EE4_56DE_8C03(player, command)
     if command == _____9ED8_8BA4_6D4B_8BD5_547D_4EE4 then
         _____6D4B_8BD5_663E_793A_9ED8_8BA4_541F_5531_6761()
@@ -90,6 +109,8 @@ local function ____on_804A_5929_547D_4EE4_56DE_8C03(player, command)
         _____6D4B_8BD5_5230_65F6_81EA_52A8_5173_95ED()
     elseif command == _____624B_52A8_5173_95ED_547D_4EE4 then
         _____6D4B_8BD5_624B_52A8_5173_95ED()
+    elseif command == _____53CC_901A_9053_547D_4EE4 then
+        _____6D4B_8BD5_53CC_901A_9053_540C_65F6_663E_793A()
     else
         debugLogForce(_____6A21_5757_540D, "未知命令", command)
     end
@@ -101,7 +122,8 @@ ____exports["初始化吟唱条测试"] = function()
     _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____8FDE_7EED_8986_76D6_547D_4EE4, ____on_804A_5929_547D_4EE4_56DE_8C03)
     _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____5230_65F6_5173_95ED_547D_4EE4, ____on_804A_5929_547D_4EE4_56DE_8C03)
     _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____624B_52A8_5173_95ED_547D_4EE4, ____on_804A_5929_547D_4EE4_56DE_8C03)
-    debugLogForce(_____6A21_5757_540D, "初始化完成", "输入 131-136 测试")
+    _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____53CC_901A_9053_547D_4EE4, ____on_804A_5929_547D_4EE4_56DE_8C03)
+    debugLogForce(_____6A21_5757_540D, "初始化完成", "输入 131-137 测试")
 end
 ____exports["初始化吟唱条测试"]()
 return ____exports

@@ -12,6 +12,15 @@ const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const CreateSound = jass.CreateSound as (
+  fileName: string,
+  looping: boolean,
+  is3D: boolean,
+  stopWhenOutOfRange: boolean,
+  fadeInRate: number,
+  fadeOutRate: number,
+  eaxSetting: string
+) => any;
 
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -34,6 +43,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 
 const 模块名 = "Boss战启动属性应用";
 const 已应用属性单位表: Record<number, true | undefined> = {};
+const Boss战路径音乐缓存: Record<string, any | undefined> = {};
 const 全部战斗启动属性配置表: 战斗启动属性配置[] = [
   ...Boss战斗启动属性配置表,
   ...英雄Boss战斗启动属性配置表,
@@ -87,10 +97,28 @@ function 写入Boss战单位布尔(this: void, unit: any, 属性名: string, 值
   YDUserDataSetSafe("unit", unit, 属性名, "boolean", 值);
 }
 
-function 写入Boss战音频(this: void, 属性名: string, 变量名?: string): void {
+function 获取或创建Boss战路径音乐(this: void, 路径?: string): any {
+  if (路径 == null || 路径 === "") return null;
+  const 已缓存 = Boss战路径音乐缓存[路径];
+  if (已缓存 != null && 已缓存 !== 0) return 已缓存;
+
+  const 音频句柄 = CreateSound(路径, true, true, true, 10, 10, "DefaultEAXON");
+  if (音频句柄 == null || 音频句柄 === 0) return null;
+  Boss战路径音乐缓存[路径] = 音频句柄;
+  debugLogForce(模块名, "创建路径音乐缓存", "path=", 路径);
+  return 音频句柄;
+}
+
+function 读取变量音频(this: void, 变量名?: string): any {
   if (变量名 == null || 变量名 === "") return;
   const 音频句柄 = jglobals[变量名];
-  if (音频句柄 == null) return;
+  if (音频句柄 == null) return null;
+  return 音频句柄;
+}
+
+function 写入Boss战音频(this: void, 属性名: string, 路径?: string, 变量名?: string): void {
+  const 音频句柄 = 获取或创建Boss战路径音乐(路径) ?? 读取变量音频(变量名);
+  if (音频句柄 == null || 音频句柄 === 0) return;
   YDUserDataSetSafe("string", "Boss战", 属性名, "sound", 音频句柄);
 }
 
@@ -110,8 +138,8 @@ export function 应用Boss战启动属性配置(this: void, unit: any): void {
   const 配置 = 按单位查找战斗启动属性配置(unit);
   if (配置 == null) return;
 
-  写入Boss战音频("战斗音乐", 配置.战斗音乐变量名);
-  写入Boss战音频("胜利音乐", 配置.胜利音乐变量名);
+  写入Boss战音频("战斗音乐", 配置.战斗音乐路径, 配置.战斗音乐变量名);
+  写入Boss战音频("胜利音乐", 配置.胜利音乐路径, 配置.胜利音乐变量名);
   写入Boss战矩形("地点", 配置.地点变量名);
   写入Boss战单位布尔(unit, "转换场景", 配置.转换场景);
   写入Boss战字符串表实数("BS移动X轴", 配置.BS移动X轴 ?? GetUnitX(unit));

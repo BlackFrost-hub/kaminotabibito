@@ -1,8 +1,10 @@
 local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
+local _____505C_6B62_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8, _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868_662F_5426_4E3A_7A7A, ____on_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406Tick, removePeriodicCallback, getServerTime, _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868, _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID
 local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
 local GS_IsUnitSuspending = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_IsUnitSuspending
@@ -29,6 +31,35 @@ local ____01_FF0E_6838_5FC3_529F_80FD = require("系统.04．伤害系统.03．�
 local _____83B7_53D6_5355_4F4D_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["获取单位重伤"]
 local _____65BD_52A0_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["施加重伤"]
 local _____79FB_9664_5355_4F4D_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["移除单位重伤"]
+function _____505C_6B62_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8()
+    if _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID == 0 then
+        return
+    end
+    removePeriodicCallback(_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID)
+    _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID = 0
+end
+function _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868_662F_5426_4E3A_7A7A()
+    for key in pairs(_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868) do
+        if _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868[key] ~= nil then
+            return false
+        end
+    end
+    return true
+end
+function ____on_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406Tick()
+    local now = getServerTime()
+    for key in pairs(_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868) do
+        local hid = key
+        local _____5230_671F_65F6_95F4 = _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868[hid] or 0
+        if _____5230_671F_65F6_95F4 > 0 and now >= _____5230_671F_65F6_95F4 then
+            __TS__Delete(_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868, hid)
+            _____79FB_9664_5355_4F4D_6307_5B9ABuff(hid, ____exports["施法硬直显示BuffID"])
+        end
+    end
+    if _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868_662F_5426_4E3A_7A7A() then
+        _____505C_6B62_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8()
+    end
+end
 --- 通用函数 - 控制与 Buff 便捷入口
 -- 
 -- 说明：
@@ -49,6 +80,13 @@ local _____79FB_9664_5355_4F4D_91CD_4F24 = ____01_FF0E_6838_5FC3_529F_80FD["移�
 -- - 这些 Buff 命中后，通常应视为会打断蓄力、引导、持续施法。
 local jass = require("jass.common")
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+local GetHandleId = jass.GetHandleId
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
 do
     local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
     ____exports.GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
@@ -97,10 +135,49 @@ do
     ____exports["一级驱散单位Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["一级驱散单位Buff"]
     ____exports["二级驱散单位Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["二级驱散单位Buff"]
 end
-____exports["开始硬直"] = GS_Suspend
+____exports["施法硬直显示BuffID"] = "C037"
+____exports["施法硬直显示Buff图标"] = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp"
+_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868 = {}
+_____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID = 0
+local function _____542F_52A8_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8()
+    if _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID ~= 0 then
+        return
+    end
+    _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8ID = addPeriodicCallback(50, ____on_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406Tick)
+end
+local function _____5237_65B0_65BD_6CD5_786C_76F4_663E_793ABuff(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 or not (_____6301_7EED_65F6_95F4 > 0) then
+        return
+    end
+    local hid = GetHandleId(_____5355_4F4D) or 0
+    if hid == 0 then
+        return
+    end
+    _____65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_8868[hid] = getServerTime() + _____6301_7EED_65F6_95F4 * 1000
+    registerManualBuff(
+        _____5355_4F4D,
+        ____exports["施法硬直显示BuffID"],
+        _____6301_7EED_65F6_95F4 + 0.2,
+        0,
+        {sourceName = "施法硬直", iconOverride = ____exports["施法硬直显示Buff图标"]}
+    )
+    _____542F_52A8_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8()
+end
+____exports["开始硬直"] = function(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+    GS_Suspend(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+    _____5237_65B0_65BD_6CD5_786C_76F4_663E_793ABuff(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+end
 ____exports["单位是否硬直中"] = GS_IsUnitSuspending
 ____exports["获取单位硬直剩余时间"] = GS_LoadSuspend
-____exports["调整单位硬直时间"] = GS_UnitSuspend
+____exports["调整单位硬直时间"] = function(_____5355_4F4D, _____64CD_4F5C_7C7B_578B, _____65F6_95F4_503C)
+    GS_UnitSuspend(_____5355_4F4D, _____64CD_4F5C_7C7B_578B, _____65F6_95F4_503C)
+    local _____5269_4F59_65F6_95F4 = GS_LoadSuspend(_____5355_4F4D)
+    if _____5269_4F59_65F6_95F4 > 0 then
+        _____5237_65B0_65BD_6CD5_786C_76F4_663E_793ABuff(_____5355_4F4D, _____5269_4F59_65F6_95F4)
+    else
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5355_4F4D, ____exports["施法硬直显示BuffID"])
+    end
+end
 ____exports["初始化快速Buff系统"] = SFB_Init
 ____exports["施加快速Buff"] = ____SFB__65BD_52A0_901A_7528Buff
 ____exports["施加快速控制Buff"] = SFB_setBuff
@@ -215,22 +292,22 @@ local _____786C_63A7_5236Buff_5408_96C6 = {
 local _____8F6F_63A7_5236Buff_5408_96C6 = {_____8F6F_63A7_5236Buff__51CF_901F, _____8F6F_63A7_5236Buff__6B8B_5E9F, _____8F6F_63A7_5236Buff__8BC5_5492}
 local _____524A_5F31Buff_5408_96C6 = {_____524A_5F31Buff__6B8B_5E9F, _____524A_5F31Buff__7CBE_7075_4E4B_706B, _____524A_5F31Buff__8BC5_5492}
 local _____6301_7EED_4F24_5BB3Buff_5408_96C6 = {_____6301_7EED_4F24_5BB3Buff__5BC4_751F}
-local ____array_0 = __TS__SparseArrayNew(table.unpack(_____786C_63A7_5236Buff_5408_96C6))
+local ____array_2 = __TS__SparseArrayNew(table.unpack(_____786C_63A7_5236Buff_5408_96C6))
 __TS__SparseArrayPush(
-    ____array_0,
+    ____array_2,
     table.unpack(_____8F6F_63A7_5236Buff_5408_96C6)
 )
-local _____8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_0)}
-local ____array_1 = __TS__SparseArrayNew(table.unpack(_____8D1F_9762Buff_5408_96C6))
+local _____8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_2)}
+local ____array_3 = __TS__SparseArrayNew(table.unpack(_____8D1F_9762Buff_5408_96C6))
 __TS__SparseArrayPush(
-    ____array_1,
+    ____array_3,
     table.unpack(_____524A_5F31Buff_5408_96C6)
 )
 __TS__SparseArrayPush(
-    ____array_1,
+    ____array_3,
     table.unpack(_____6301_7EED_4F24_5BB3Buff_5408_96C6)
 )
-local _____5168_90E8_8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_1)}
+local _____5168_90E8_8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_3)}
 local function _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, BuffID)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or BuffID == nil or BuffID == 0 then
         return false

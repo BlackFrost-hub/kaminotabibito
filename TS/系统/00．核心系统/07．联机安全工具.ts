@@ -20,8 +20,9 @@
  */
 
 const jass = require("jass.common") as any;
-const runtime = require("jass.runtime") as any;
-const xpcallFn = (globalThis as any).xpcall as undefined | ((fn: VoidCallback, err: (msg: string) => void) => void);
+const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  safeExecute: (this: void, module: string, callback: VoidCallback) => boolean;
+};
 
 type VoidCallback = () => void;
 
@@ -71,19 +72,9 @@ function normalizeEnumArgs(
   return { rect: rectOrSelf, filter: filterOrRect, action: actionOrFilter };
 }
 
-function getErrorHandler(): ((msg: string) => void) | undefined {
-  const handler = runtime?.error_handle;
-  return typeof handler === "function" ? handler : undefined;
-}
-
 function runSafely(callback: VoidCallback | undefined): void {
   if (typeof callback !== "function") return;
-  const handler = getErrorHandler();
-  if (handler && typeof xpcallFn === "function") {
-    xpcallFn(callback, handler);
-    return;
-  }
-  callback();
+  调试输出.safeExecute("联机安全回调", callback);
 }
 
 const forForceStack: VoidCallback[] = [];

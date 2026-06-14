@@ -3,11 +3,11 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.01．Boss战斗启动属性配置表")
+local ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.01．Boss战斗启动属性配置表.index")
 local ____Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____01_FF0EBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["Boss战斗启动属性配置表"]
-local ____02_FF0E_82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表")
+local ____02_FF0E_82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.index")
 local _____82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____02_FF0E_82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["英雄Boss战斗启动属性配置表"]
-local ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.03．异界Boss战斗启动属性配置表")
+local ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.03．异界Boss战斗启动属性配置表.index")
 local _____5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["异界Boss战斗启动属性配置表"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
@@ -15,6 +15,7 @@ local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local CreateSound = jass.CreateSound
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
 local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
@@ -29,6 +30,7 @@ local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03�
 local debugLogForce = ____require_result_5.debugLogForce
 local _____6A21_5757_540D = "Boss战启动属性应用"
 local _____5DF2_5E94_7528_5C5E_6027_5355_4F4D_8868 = {}
+local ____Boss_6218_8DEF_5F84_97F3_4E50_7F13_5B58 = {}
 local ____array_6 = __TS__SparseArrayNew(table.unpack(____Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868))
 __TS__SparseArrayPush(
     ____array_6,
@@ -107,12 +109,47 @@ local function _____5199_5165Boss_6218_5355_4F4D_5E03_5C14(unit, _____5C5E_6027_
         _____503C
     )
 end
-local function _____5199_5165Boss_6218_97F3_9891(_____5C5E_6027_540D, _____53D8_91CF_540D)
+local function _____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50(_____8DEF_5F84)
+    if _____8DEF_5F84 == nil or _____8DEF_5F84 == "" then
+        return nil
+    end
+    local _____5DF2_7F13_5B58 = ____Boss_6218_8DEF_5F84_97F3_4E50_7F13_5B58[_____8DEF_5F84]
+    if _____5DF2_7F13_5B58 ~= nil and _____5DF2_7F13_5B58 ~= 0 then
+        return _____5DF2_7F13_5B58
+    end
+    local _____97F3_9891_53E5_67C4 = CreateSound(
+        _____8DEF_5F84,
+        true,
+        true,
+        true,
+        10,
+        10,
+        "DefaultEAXON"
+    )
+    if _____97F3_9891_53E5_67C4 == nil or _____97F3_9891_53E5_67C4 == 0 then
+        return nil
+    end
+    ____Boss_6218_8DEF_5F84_97F3_4E50_7F13_5B58[_____8DEF_5F84] = _____97F3_9891_53E5_67C4
+    debugLogForce(_____6A21_5757_540D, "创建路径音乐缓存", "path=", _____8DEF_5F84)
+    return _____97F3_9891_53E5_67C4
+end
+local function _____8BFB_53D6_53D8_91CF_97F3_9891(_____53D8_91CF_540D)
     if _____53D8_91CF_540D == nil or _____53D8_91CF_540D == "" then
         return
     end
     local _____97F3_9891_53E5_67C4 = jglobals[_____53D8_91CF_540D]
     if _____97F3_9891_53E5_67C4 == nil then
+        return nil
+    end
+    return _____97F3_9891_53E5_67C4
+end
+local function _____5199_5165Boss_6218_97F3_9891(_____5C5E_6027_540D, _____8DEF_5F84, _____53D8_91CF_540D)
+    local ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 = _____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50(_____8DEF_5F84)
+    if ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 == nil then
+        ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 = _____8BFB_53D6_53D8_91CF_97F3_9891(_____53D8_91CF_540D)
+    end
+    local _____97F3_9891_53E5_67C4 = ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7
+    if _____97F3_9891_53E5_67C4 == nil or _____97F3_9891_53E5_67C4 == 0 then
         return
     end
     YDUserDataSetSafe(
@@ -151,8 +188,8 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
     if _____914D_7F6E == nil then
         return
     end
-    _____5199_5165Boss_6218_97F3_9891("战斗音乐", _____914D_7F6E["战斗音乐变量名"])
-    _____5199_5165Boss_6218_97F3_9891("胜利音乐", _____914D_7F6E["胜利音乐变量名"])
+    _____5199_5165Boss_6218_97F3_9891("战斗音乐", _____914D_7F6E["战斗音乐路径"], _____914D_7F6E["战斗音乐变量名"])
+    _____5199_5165Boss_6218_97F3_9891("胜利音乐", _____914D_7F6E["胜利音乐路径"], _____914D_7F6E["胜利音乐变量名"])
     _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点变量名"])
     _____5199_5165Boss_6218_5355_4F4D_5E03_5C14(unit, "转换场景", _____914D_7F6E["转换场景"])
     _____5199_5165Boss_6218_5B57_7B26_4E32_8868_5B9E_6570(

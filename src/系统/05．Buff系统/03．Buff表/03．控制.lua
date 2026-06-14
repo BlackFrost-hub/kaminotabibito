@@ -136,6 +136,21 @@ ____exports["控制Buff表"] = {
         canPurge = false,
         tooltip = "受到了『EX暂停』，被更强的力量彻底定住，在time秒内无法行动，而且无法被普通净化驱散。"
     },
+    C037 = {
+        buffID = "C037",
+        buffName = "施法硬直",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp",
+        effect = "",
+        type = "Debuff:control:cast",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 0,
+        priority = 10,
+        canPurge = false,
+        tooltip = "正在施法硬直中，time秒内暂时无法行动。"
+    },
     C016 = {
         buffID = "C016",
         buffName = "睡眠",

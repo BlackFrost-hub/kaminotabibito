@@ -4,15 +4,7 @@
  * 当前目录先补齐 AI 配置层骨架，运行时主动施法与受击反应后续按规划接入。
  */
 
-export * from "./00．常量定义";
-export * from "./01．AI配置类型";
-export * from "./02．AI配置工具";
-export * from "./03．BossAI配置表";
-export * from "./04．杂鱼AI配置表";
-export * from "./05．精英AI配置表";
-export * from "./06．英雄BossAI配置表";
-export * from "./07．异界BossAI配置表";
-export * from "./08．全部AI配置索引";
+export * from "./00．AI配置";
 export * from "./09．Boss战启动桥接";
 export * from "./01．受击反应施法";
 export * from "./02．Boss主动扫描施法";

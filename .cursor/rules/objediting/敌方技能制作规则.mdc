@@ -26,8 +26,10 @@ alwaysApply: false
 - ObjEditing 阶段优先复用通用通魔技能模板 ID，例如 `AT00`、`AT01`、`AN00`。
 - 具体 Boss 文件通常只把通用技能 ID 挂到单位技能列表，不为每个 Boss 新建专属通魔物编技能。
 - 后续具体技能行为、数值、语义，可在运行时代码或配置层绑定到这些通用技能 ID。
+- 同一个 Boss 的多个主动技能必须使用不同通魔槽位；不能因为“都是无目标”就共用 `AN00` 再在 TS 里路由，否则 AI 冷却、施法事件、命令 ID 和调试语义都会混在一起。
 - 单位目标通魔按槽位组复用：`ATxx`、`BTxx`、`CTxx` 分别是一组 400~2000 施法距离模板。
 - 同一个 Boss 如果需要多个相同施法距离的单位目标技能，使用不同槽位组，例如 3 个 1000 距离技能用 `AT06,BT06,CT06`。
+- 同一个 Boss 如果需要多个无目标主动技能，按顺序使用不同无目标槽位，例如 `AN00,AN01,AN02,AN03`；物编槽位够用时不要做共享 raw id 的运行时路由。
 - 新建具体 Boss 结构时，默认同步创建该 Boss 的专属 Buff 表文件；即使暂时没有 Buff，也保留空表并接入 Buff 聚合入口，避免后续制作技能时漏建。
 
 ## Boss 英雄母单位
@@ -70,11 +72,13 @@ alwaysApply: false
   - `imports\Common\Model`
   - `imports\Common\Sound`
 - 生成或整理图标资源时，默认尺寸约定：
-  - Buff / 技能图标默认输出 `80x80`。
+  - Buff / 技能图标默认输出 `64x64`。
   - 单位头像、Boss 头像默认输出 `64x64`；如需保留高清源图，单独保存为源图，不作为默认导入头像尺寸。
 - Buff / 技能图标、单位头像、Boss 头像默认带 Warcraft / BTN 风格边框；除非用户明确要求无边框，不要输出纯裸图。
-- 图标可先生成 PNG 源图，再按需要转成 `.tga` 或 `.blp`；如果用户没有指定格式，优先保留可编辑 PNG 源图并同步准备最终引用路径。
-- Boss 专属 Buff 图标优先放 `imports\BuffIcon\Boss\<Boss英文名>\`，TS/物编引用路径去掉 `imports\` 前缀，例如 `BuffIcon\Boss\Thranduil\yueguangguanzhu.tga`。
+- 图标可先生成 PNG 作为中间产物，但最终导入资源默认转换为 `.blp`；项目资源目录内只保留最终 `.blp`，删除 PNG 中间文件，避免打包进地图增加体积。
+- 转换 BLP 优先复用本机 VSCode 插件 `war3-texture-preview` 的转换能力；可直接调用插件内 `out/conversion/textureConvert.js` 的编码/解码函数，转换后用同插件解码回读确认尺寸和显示正常。
+- Boss / Buff / 技能图标风格默认使用 Warcraft / BTN 风格边框：暗色金属或黑色厚边、左上角高光、右下角暗角，主体高对比居中，64x64 下仍可辨认。
+- Boss 专属 Buff 图标优先放 `imports\BuffIcon\Boss\<Boss英文名>\`，TS/物编引用路径去掉 `imports\` 前缀，例如 `BuffIcon\Boss\Thranduil\yueguangguanzhu.blp`。
 
 ## ObjEditing Lua 命名
 

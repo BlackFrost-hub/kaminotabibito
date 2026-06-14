@@ -65,6 +65,9 @@ const { dropItemsFromChestConfig } = require("系统.06．经济系统.00．宝�
 const { 查找宝箱主人 } = require("系统.06．经济系统.00．宝箱系统.08．宝箱主人") as {
   查找宝箱主人: (this: void, 配置: any, 参考单位: any, 阶段: "准备开启" | "开启完成") => any | undefined;
 };
+const { 触发宝箱首领奖励 } = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱") as {
+  触发宝箱首领奖励: (this: void, cfg: any, 开启者: any, 宝箱?: any) => boolean;
+};
 
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -258,7 +261,7 @@ function startOpening(this: void, unit: any, target: any, openTime: number): voi
   debugLogForce(调试模块, "进度条创建后", "unit=", getUnitId(unit), "progressBar=", jass.GetHandleId(progressBar));
 
   DzUnitDisableAttack(unit, true);
-  debugLogForce(调试模块, "开启瞬间禁攻已恢复");
+  debugLogForce(调试模块, "开启瞬间禁攻已启用");
 
   const targetX = jass.GetDestructableX(target);
   const targetY = jass.GetDestructableY(target);
@@ -339,9 +342,14 @@ function updateAllOpening(this: void): void {
         if (cfg) {
           const dropX = jass.GetDestructableX(data.target);
           const dropY = jass.GetDestructableY(data.target);
-          debugLogForce(调试模块, "掉落前", "type=", cfg.destructableType, "x=", dropX, "y=", dropY, "preRoll=", data.highRoll ?? "nil");
-          dropItemsFromChestConfig(cfg, dropX, dropY, data.unit, ownerUnit, data.highRoll);
-          debugLogForce(调试模块, "掉落后");
+          const 首领奖励已接管 = 触发宝箱首领奖励(cfg, data.unit, data.target);
+          if (首领奖励已接管) {
+            debugLogForce(调试模块, "首领奖励宝箱已触发", "type=", cfg.destructableType, "x=", dropX, "y=", dropY, "rewardPool=", cfg.首领奖励池ID ?? "");
+          } else {
+            debugLogForce(调试模块, "掉落前", "type=", cfg.destructableType, "x=", dropX, "y=", dropY, "preRoll=", data.highRoll ?? "nil");
+            dropItemsFromChestConfig(cfg, dropX, dropY, data.unit, ownerUnit, data.highRoll);
+            debugLogForce(调试模块, "掉落后");
+          }
         }
 
         // 开启成功后处理宝箱（杀死可破坏物）

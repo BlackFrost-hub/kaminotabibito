@@ -389,7 +389,7 @@ function 执行高级掉落(this: void, config: ChestTypeConfig, 上下文: 高�
 }
 
 export function 执行宝箱掉落(config: ChestTypeConfig, opener?: any, ownerUnit?: any, 指定主随机?: number): string[] {
-  debugLogForce("宝箱掉落配置", "executeChestDrop", "type=", config.destructableType, "name=", config.name, "mode=", config.dropMode.type, "picks=", config.picks);
+  debugLogForce("宝箱掉落配置", "executeChestDrop", "type=", config.destructableType, "name=", config.name, "mode=", config.dropMode?.type ?? "none", "picks=", config.picks ?? 0);
   if (config.高级掉落) {
     return 执行高级掉落(config, {
       开启者: opener,
@@ -400,7 +400,8 @@ export function 执行宝箱掉落(config: ChestTypeConfig, opener?: any, ownerU
       指定主随机,
     });
   }
-  return 按掉落模式执行(config.dropMode, config.picks);
+  if (config.dropMode == null) return [];
+  return 按掉落模式执行(config.dropMode, config.picks ?? 0);
 }
 
 export function 按可破坏物掉落(destructableType: string, opener?: any, ownerUnit?: any, 指定主随机?: number): string[] {

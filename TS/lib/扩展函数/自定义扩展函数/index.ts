@@ -35,5 +35,7 @@ export function registerBridge(): void {
     expose("isDebug", debugOutput.isDebug);
     expose("debugLog", debugOutput.debugLog);
     expose("debugLogForce", debugOutput.debugLogForce);
+    expose("reportRuntimeError", debugOutput.reportRuntimeError);
+    expose("safeExecute", debugOutput.safeExecute);
     expose("增加英雄基础全属性", heroBaseAttr.增加英雄基础全属性);
 }

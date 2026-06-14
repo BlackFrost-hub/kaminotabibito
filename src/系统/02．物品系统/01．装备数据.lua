@@ -3627,6 +3627,62 @@ ____exports.items.I0E4 = {
     level = "B-",
     all = 15
 }
+____exports.items.I0EA = {
+    type = "道具/戒指/饰品",
+    name = "腐化猫爪手套",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    dmg = 155,
+    agi = 38,
+    critRate = 0.18,
+    atkSpeed = 0.35
+}
+____exports.items.I0EB = {
+    type = "道具/戒指/饰品",
+    name = "纯净水源吊坠",
+    goldPrice = 1000,
+    score = 6800,
+    level = "B",
+    hp = 2600,
+    magicResist = 0.25,
+    skillHeal = 0.2,
+    hpRegen = 120
+}
+____exports.items.I0EC = {
+    type = "鞋子",
+    name = "灵猫步伐之靴",
+    goldPrice = 1000,
+    score = 6950,
+    level = "B",
+    movespeed2 = 0.12,
+    agi = 32,
+    dodge = 0.12,
+    hp = 1200
+}
+____exports.items.I0ED = {
+    type = "主武器",
+    name = "腐化核心法杖",
+    goldPrice = 1000,
+    score = 7100,
+    level = "B",
+    dmg = 190,
+    int = 45,
+    magicDmg = 0.18,
+    magicPierce = 0.28,
+    weaponType = "法杖"
+}
+____exports.items.I0EE = {
+    type = "灵魂",
+    name = "米亚的项圈",
+    goldPrice = 1000,
+    score = 7050,
+    level = "B",
+    all = 28,
+    hp = 1600,
+    cdReduction = 0.08,
+    movespeed2 = 0.08
+}
 ____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}
 ____exports.items.ches = {
     type = "药剂/食品",

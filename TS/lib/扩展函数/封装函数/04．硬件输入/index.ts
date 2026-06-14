@@ -16,6 +16,6 @@ export * from "./04．键盘函数";
 export * from "./05．滚轮函数";
 export * from "./06．窗口函数";
 export * from "./07．Frame函数";
+export * from "./08．同步硬件输入中心";
 
 // 测试按键模块会自动初始化
-

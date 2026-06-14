@@ -3,6 +3,9 @@
  */
 
 export interface 吟唱条输入参数 {
+  通道?: string;
+  类型?: string;
+
   总时长?: number;
   sj?: number;
   time?: number;
@@ -19,6 +22,7 @@ export interface 吟唱条输入参数 {
 }
 
 export interface 规范化吟唱条参数 {
+  通道: string;
   总时长: number;
   颜色ID: number;
   标题文本: string;
@@ -26,6 +30,7 @@ export interface 规范化吟唱条参数 {
 }
 
 export interface 吟唱条状态 {
+  通道: string;
   活跃: boolean;
   总时长: number;
   已过时间: number;

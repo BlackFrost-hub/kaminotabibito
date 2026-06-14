@@ -25,6 +25,7 @@ local DzSetUnitMissileModel = japi.DzSetUnitMissileModel
 local DzSetUnitMissileArc = japi.DzSetUnitMissileArc
 local DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed
 local DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming
+local DzSetUnitName = japi.DzSetUnitName
 local CreateUnit = _____5171_4EAB.CreateUnit
 local GetHandleId = _____5171_4EAB.GetHandleId
 local GetOwningPlayer = _____5171_4EAB.GetOwningPlayer
@@ -130,6 +131,9 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
     if _____53C2_6570["朝向"] ~= nil then
         SetUnitFacing(unit, _____53C2_6570["朝向"])
     end
+    if _____53C2_6570["单位名称"] ~= nil and _____53C2_6570["单位名称"] ~= "" and DzSetUnitName ~= nil then
+        DzSetUnitName(unit, _____53C2_6570["单位名称"])
+    end
     if _____53C2_6570["飞行高度"] ~= nil then
         _____8BBE_7F6E_5355_4F4D_98DE_884C_9AD8_5EA6(unit, _____53C2_6570["飞行高度"])
     end
@@ -148,7 +152,7 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
         )
     end
     if _____53C2_6570["生命值"] ~= nil and _____53C2_6570["生命值"] > 0 then
-        local scaledHp = _____53C2_6570["生命值"] * _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387()
+        local scaledHp = _____53C2_6570["生命值"] * (_____53C2_6570["生命值受小怪倍率"] == false and 1 or _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387())
         SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp)
         SetUnitState(unit, UNIT_STATE_LIFE, scaledHp)
     end

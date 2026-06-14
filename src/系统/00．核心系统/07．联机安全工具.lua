@@ -21,8 +21,7 @@ local ____exports = {}
 -- - 不替换全局运行时
 -- - 不试图“万能防异步”
 local jass = require("jass.common")
-local runtime = require("jass.runtime")
-local xpcallFn = _G.xpcall
+local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local function normalizeUnaryHandleArg(handleOrSelf, maybeHandle)
     local ____temp_0
     if maybeHandle ~= nil then
@@ -50,30 +49,11 @@ local function normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybe
     end
     return {rect = rectOrSelf, filter = filterOrRect, action = actionOrFilter}
 end
-local function getErrorHandler()
-    local ____opt_result_3
-    if runtime ~= nil then
-        ____opt_result_3 = runtime.error_handle
-    end
-    local handler = ____opt_result_3
-    local ____temp_4
-    if type(handler) == "function" then
-        ____temp_4 = handler
-    else
-        ____temp_4 = nil
-    end
-    return ____temp_4
-end
 local function runSafely(callback)
     if type(callback) ~= "function" then
         return
     end
-    local handler = getErrorHandler()
-    if handler and type(xpcallFn) == "function" then
-        xpcallFn(callback, handler)
-        return
-    end
-    callback()
+    _____8C03_8BD5_8F93_51FA.safeExecute("联机安全回调", callback)
 end
 local forForceStack = {}
 local enumItemsStack = {}
@@ -96,9 +76,9 @@ end
 -- - 但避免高频匿名闭包直接作为 JASS 回调进入引擎
 -- - 支持同步嵌套调用（用栈而不是单槽）
 function ____exports.safeForForce(forceOrSelf, actionOrForce, maybeAction)
-    local ____normalizeForForceArgs_result_5 = normalizeForForceArgs(forceOrSelf, actionOrForce, maybeAction)
-    local force = ____normalizeForForceArgs_result_5.force
-    local action = ____normalizeForForceArgs_result_5.action
+    local ____normalizeForForceArgs_result_1 = normalizeForForceArgs(forceOrSelf, actionOrForce, maybeAction)
+    local force = ____normalizeForForceArgs_result_1.force
+    local action = ____normalizeForForceArgs_result_1.action
     if not force or type(action) ~= "function" then
         return
     end
@@ -118,23 +98,23 @@ end
 --- 安全枚举矩形内物品。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
 function ____exports.safeEnumItemsInRect(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
-    local ____normalizeEnumArgs_result_6 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
-    local rect = ____normalizeEnumArgs_result_6.rect
-    local filter = ____normalizeEnumArgs_result_6.filter
-    local action = ____normalizeEnumArgs_result_6.action
+    local ____normalizeEnumArgs_result_2 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local rect = ____normalizeEnumArgs_result_2.rect
+    local filter = ____normalizeEnumArgs_result_2.filter
+    local action = ____normalizeEnumArgs_result_2.action
     if not rect or type(action) ~= "function" then
         return
     end
     enumItemsStack[#enumItemsStack + 1] = action
     do
         local ____try, ____error = pcall(function()
-            local ____jass_EnumItemsInRect_9 = jass.EnumItemsInRect
-            local ____rect_8 = rect
-            local ____filter_7 = filter
-            if ____filter_7 == nil then
-                ____filter_7 = nil
+            local ____jass_EnumItemsInRect_5 = jass.EnumItemsInRect
+            local ____rect_4 = rect
+            local ____filter_3 = filter
+            if ____filter_3 == nil then
+                ____filter_3 = nil
             end
-            ____jass_EnumItemsInRect_9(jass, ____rect_8, ____filter_7, enumItemsTrampoline)
+            ____jass_EnumItemsInRect_5(jass, ____rect_4, ____filter_3, enumItemsTrampoline)
         end)
         do
             table.remove(enumItemsStack)
@@ -147,23 +127,23 @@ end
 --- 安全枚举矩形内可破坏物。
 -- 过滤器仍由调用方决定；这里只替换 action 回调进入 JASS 的方式。
 function ____exports.safeEnumDestructablesInRect(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
-    local ____normalizeEnumArgs_result_10 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
-    local rect = ____normalizeEnumArgs_result_10.rect
-    local filter = ____normalizeEnumArgs_result_10.filter
-    local action = ____normalizeEnumArgs_result_10.action
+    local ____normalizeEnumArgs_result_6 = normalizeEnumArgs(rectOrSelf, filterOrRect, actionOrFilter, maybeAction)
+    local rect = ____normalizeEnumArgs_result_6.rect
+    local filter = ____normalizeEnumArgs_result_6.filter
+    local action = ____normalizeEnumArgs_result_6.action
     if not rect or type(action) ~= "function" then
         return
     end
     enumDestructablesStack[#enumDestructablesStack + 1] = action
     do
         local ____try, ____error = pcall(function()
-            local ____jass_EnumDestructablesInRect_13 = jass.EnumDestructablesInRect
-            local ____rect_12 = rect
-            local ____filter_11 = filter
-            if ____filter_11 == nil then
-                ____filter_11 = nil
+            local ____jass_EnumDestructablesInRect_9 = jass.EnumDestructablesInRect
+            local ____rect_8 = rect
+            local ____filter_7 = filter
+            if ____filter_7 == nil then
+                ____filter_7 = nil
             end
-            ____jass_EnumDestructablesInRect_13(jass, ____rect_12, ____filter_11, enumDestructablesTrampoline)
+            ____jass_EnumDestructablesInRect_9(jass, ____rect_8, ____filter_7, enumDestructablesTrampoline)
         end)
         do
             table.remove(enumDestructablesStack)
@@ -187,17 +167,17 @@ local function timerTrampoline()
     runSafely(timerActionByHandleId[hid])
 end
 function ____exports.safeTimerStart(timerOrSelf, timeoutOrTimer, periodicOrTimeout, actionOrPeriodic, maybeAction)
-    local ____normalizeTimerArgs_result_14 = normalizeTimerArgs(
+    local ____normalizeTimerArgs_result_10 = normalizeTimerArgs(
         timerOrSelf,
         timeoutOrTimer,
         periodicOrTimeout,
         actionOrPeriodic,
         maybeAction
     )
-    local timer = ____normalizeTimerArgs_result_14.timer
-    local timeout = ____normalizeTimerArgs_result_14.timeout
-    local periodic = ____normalizeTimerArgs_result_14.periodic
-    local action = ____normalizeTimerArgs_result_14.action
+    local timer = ____normalizeTimerArgs_result_10.timer
+    local timeout = ____normalizeTimerArgs_result_10.timeout
+    local periodic = ____normalizeTimerArgs_result_10.periodic
+    local action = ____normalizeTimerArgs_result_10.action
     if not timer or type(action) ~= "function" then
         return
     end
@@ -252,13 +232,13 @@ local function getOrCreateSafeTriggerRegistry(trigger)
     return registry
 end
 function ____exports.safeTriggerAddAction(triggerOrSelf, callbackOrTrigger, maybeCallback)
-    local ____temp_15
+    local ____temp_11
     if maybeCallback ~= nil then
-        ____temp_15 = callbackOrTrigger
+        ____temp_11 = callbackOrTrigger
     else
-        ____temp_15 = triggerOrSelf
+        ____temp_11 = triggerOrSelf
     end
-    local trigger = ____temp_15
+    local trigger = ____temp_11
     local callback = maybeCallback ~= nil and maybeCallback or callbackOrTrigger
     if not trigger or type(callback) ~= "function" then
         return nil
@@ -269,25 +249,25 @@ function ____exports.safeTriggerAddAction(triggerOrSelf, callbackOrTrigger, mayb
     end
     safeTriggerActionIdCounter = safeTriggerActionIdCounter + 1
     local handle = {id = safeTriggerActionIdCounter}
-    local ____registry_actions_16 = registry.actions
-    ____registry_actions_16[#____registry_actions_16 + 1] = {id = handle.id, callback = callback}
+    local ____registry_actions_12 = registry.actions
+    ____registry_actions_12[#____registry_actions_12 + 1] = {id = handle.id, callback = callback}
     return handle
 end
 function ____exports.safeTriggerRemoveAction(triggerOrSelf, actionOrTrigger, maybeAction)
-    local ____temp_17
+    local ____temp_13
     if maybeAction ~= nil then
-        ____temp_17 = actionOrTrigger
+        ____temp_13 = actionOrTrigger
     else
-        ____temp_17 = triggerOrSelf
+        ____temp_13 = triggerOrSelf
     end
-    local trigger = ____temp_17
-    local ____temp_18
+    local trigger = ____temp_13
+    local ____temp_14
     if maybeAction ~= nil then
-        ____temp_18 = maybeAction
+        ____temp_14 = maybeAction
     else
-        ____temp_18 = actionOrTrigger
+        ____temp_14 = actionOrTrigger
     end
-    local action = ____temp_18
+    local action = ____temp_14
     if not trigger or not action then
         return
     end

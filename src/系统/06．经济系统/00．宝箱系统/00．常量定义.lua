@@ -40,7 +40,7 @@ ____exports.CHEST_TYPES = {{
     name = "普通宝箱",
     picks = 1,
     dropMode = {type = "score", range = {min = 100, max = 500}}
-}, {
+}, {destructableType = "BR01", openTime = 3, name = "首领奖励宝箱"}, {
     destructableType = "LTbx",
     openTime = 3,
     name = "木桶",

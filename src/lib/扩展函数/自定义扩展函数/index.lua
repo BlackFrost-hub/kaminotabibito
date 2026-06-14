@@ -73,6 +73,8 @@ function ____exports.registerBridge(self)
     expose(nil, "isDebug", debugOutput.isDebug)
     expose(nil, "debugLog", debugOutput.debugLog)
     expose(nil, "debugLogForce", debugOutput.debugLogForce)
+    expose(nil, "reportRuntimeError", debugOutput.reportRuntimeError)
+    expose(nil, "safeExecute", debugOutput.safeExecute)
     expose(nil, "增加英雄基础全属性", heroBaseAttr["增加英雄基础全属性"])
 end
 return ____exports

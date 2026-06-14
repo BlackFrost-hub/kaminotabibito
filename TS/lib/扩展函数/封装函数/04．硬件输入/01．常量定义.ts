@@ -9,6 +9,9 @@ export const KEY_STATE = { DOWN: 1, UP: 0 } as const;
 /** 鼠标按键（BzAPI：1=左，2=右，3=中） */
 export const MOUSE_BUTTON = { LEFT: 1, RIGHT: 2, MIDDLE: 3 } as const;
 
+/** 鼠标按键状态（DzTriggerRegisterMouseEventTrg：1=按下，0=抬起） */
+export const MOUSE_STATE = { DOWN: 1, UP: 0 } as const;
+
 /** A-Z */
 export const KEY = {
   A: 65, B: 66, C: 67, D: 68, E: 69, F: 70,

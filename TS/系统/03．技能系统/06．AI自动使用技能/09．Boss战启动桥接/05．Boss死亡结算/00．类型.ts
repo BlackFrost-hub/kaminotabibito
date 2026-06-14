@@ -43,13 +43,13 @@ export interface Boss死亡结算配置 {
   Boss单位名列表?: string[];
   Boss引用键?: string;
   清理列表?: Boss死亡清理项[];
-  固定掉落物品名列表?: string[];
-  额外批量掉落物品名?: string;
-  额外批量掉落最小数量?: number;
-  额外批量掉落最大数量?: number;
-  额外随机掉落物品名列表?: string[];
-  宝箱单位ID?: string;
-  宝箱库存物品名列表?: string[];
+  /** 多件候选装备 pick 1 的奖励池放在首领奖励选择系统；这里仅保存触发关系。 */
+  首领奖励池ID?: string;
+  /** 旧固定掉落语义：Boss 死亡后把列表里的物品全部直接掉出来。 */
+  直接掉落物品名列表?: string[];
+  非装备批量掉落物品名?: string;
+  非装备批量掉落最小数量?: number;
+  非装备批量掉落最大数量?: number;
   全员奖励?: Boss死亡全员奖励;
   击杀者奖励?: Boss死亡击杀者奖励;
   提示文本键?: string;

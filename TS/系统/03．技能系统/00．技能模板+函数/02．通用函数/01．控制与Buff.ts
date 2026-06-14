@@ -22,6 +22,17 @@
 
 const jass = require("jass.common") as any;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilcode: number) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
+
+const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
+};
+
+const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
 
 export {
   GS_Suspend,
@@ -105,10 +116,73 @@ import {
   移除单位重伤,
 } from "../../../04．伤害系统/03．重伤系统/01．核心功能";
 
-export const 开始硬直 = GS_Suspend;
+export const 施法硬直显示BuffID = "C037";
+export const 施法硬直显示Buff图标 = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp";
+
+const 施法硬直显示Buff清理表: Record<number, number | undefined> = {};
+let 施法硬直显示Buff清理驱动ID = 0;
+
+function 启动施法硬直显示Buff清理驱动(this: void): void {
+  if (施法硬直显示Buff清理驱动ID !== 0) return;
+  施法硬直显示Buff清理驱动ID = addPeriodicCallback(50, on施法硬直显示Buff清理Tick);
+}
+
+function 停止施法硬直显示Buff清理驱动(this: void): void {
+  if (施法硬直显示Buff清理驱动ID === 0) return;
+  removePeriodicCallback(施法硬直显示Buff清理驱动ID);
+  施法硬直显示Buff清理驱动ID = 0;
+}
+
+function 施法硬直显示Buff清理表是否为空(this: void): boolean {
+  for (const key in 施法硬直显示Buff清理表) {
+    if (施法硬直显示Buff清理表[key] !== undefined) return false;
+  }
+  return true;
+}
+
+function on施法硬直显示Buff清理Tick(this: void): void {
+  const now = getServerTime();
+  for (const key in 施法硬直显示Buff清理表) {
+    const hid = key as any as number;
+    const 到期时间 = 施法硬直显示Buff清理表[hid] ?? 0;
+    if (到期时间 > 0 && now >= 到期时间) {
+      delete 施法硬直显示Buff清理表[hid];
+      移除单位指定Buff(hid, 施法硬直显示BuffID);
+    }
+  }
+  if (施法硬直显示Buff清理表是否为空()) 停止施法硬直显示Buff清理驱动();
+}
+
+function 刷新施法硬直显示Buff(this: void, 单位: any, 持续时间: number): void {
+  if (单位 == null || 单位 === 0 || !(持续时间 > 0)) return;
+  const hid = GetHandleId(单位) || 0;
+  if (hid === 0) return;
+
+  施法硬直显示Buff清理表[hid] = getServerTime() + 持续时间 * 1000;
+  registerManualBuff(单位, 施法硬直显示BuffID, 持续时间 + 0.2, 0, {
+    sourceName: "施法硬直",
+    iconOverride: 施法硬直显示Buff图标,
+  });
+  启动施法硬直显示Buff清理驱动();
+}
+
+export function 开始硬直(this: void, 单位: any, 持续时间: number): void {
+  GS_Suspend(单位, 持续时间);
+  刷新施法硬直显示Buff(单位, 持续时间);
+}
+
 export const 单位是否硬直中 = GS_IsUnitSuspending;
 export const 获取单位硬直剩余时间 = GS_LoadSuspend;
-export const 调整单位硬直时间 = GS_UnitSuspend;
+
+export function 调整单位硬直时间(this: void, 单位: any, 操作类型: number, 时间值: number): void {
+  GS_UnitSuspend(单位, 操作类型, 时间值);
+  const 剩余时间 = GS_LoadSuspend(单位);
+  if (剩余时间 > 0) {
+    刷新施法硬直显示Buff(单位, 剩余时间);
+  } else {
+    移除单位指定Buff(单位, 施法硬直显示BuffID);
+  }
+}
 
 export const 初始化快速Buff系统 = SFB_Init;
 export const 施加快速Buff = SFB_施加通用Buff;

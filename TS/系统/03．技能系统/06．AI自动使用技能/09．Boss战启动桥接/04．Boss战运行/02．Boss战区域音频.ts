@@ -40,6 +40,13 @@ function 矩形移除音频(this: void, rectHandle: any, soundHandle: any): void
   SetStackedSoundBJ(false, soundHandle, rectHandle);
 }
 
+function 移除上下文区域音频(this: void, context: Boss战运行上下文 | undefined): void {
+  if (context == null) return;
+  if (context.地点矩形 == null || context.地点矩形 === 0) return;
+  矩形移除音频(context.地点矩形, context.战斗音乐);
+  矩形移除音频(context.地点矩形, context.胜利音乐);
+}
+
 export function 清理矩形Boss战候选音频(this: void, rectHandle: any): void {
   if (rectHandle == null || rectHandle === 0) return;
 
@@ -60,6 +67,7 @@ export function 接管Boss战区域音频(this: void, context: Boss战运行上�
   const 旧上下文 = 读取矩形当前Boss战上下文(context.地点句柄ID);
   if (旧上下文 != null && 旧上下文.运行代次 !== context.运行代次) {
     旧上下文.胜利音乐移除时间 = 0;
+    移除上下文区域音频(旧上下文);
   }
 
   清理矩形Boss战候选音频(context.地点矩形);

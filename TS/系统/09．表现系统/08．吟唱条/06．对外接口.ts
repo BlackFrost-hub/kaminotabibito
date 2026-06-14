@@ -3,6 +3,8 @@
  */
 
 interface 吟唱条输入参数 {
+  通道?: string;
+  类型?: string;
   总时长?: number;
   sj?: number;
   // 旧兼容字段，测试完成后不再建议新增调用使用
@@ -18,6 +20,7 @@ interface 吟唱条输入参数 {
 }
 
 interface 规范化吟唱条参数 {
+  通道: string;
   总时长: number;
   颜色ID: number;
   标题文本: string;
@@ -26,14 +29,32 @@ interface 规范化吟唱条参数 {
 
 const { 启动吟唱条: 核心启动吟唱条, 关闭吟唱条: 核心关闭吟唱条 } = require("./03．吟唱条核心") as {
   启动吟唱条: (this: void, 参数: 规范化吟唱条参数) => void;
-  关闭吟唱条: (this: void) => void;
+  关闭吟唱条: (this: void, 通道?: string) => void;
 };
 
 const 常量 = require("./00．常量定义") as {
   默认颜色ID: number;
   默认标题文本: string;
   默认提示文本: string;
+  吟唱条通道_常规技能: string;
+  吟唱条通道_大招: string;
+  吟唱条通道_场地常驻AOE: string;
+  吟唱条通道_致命惩罚: string;
+  吟唱条通道_场地AOE: string;
 };
+
+function 规范化通道(this: void, 输入?: string): string {
+  if (输入 === 常量.吟唱条通道_致命惩罚 || 输入 === "秒杀惩罚" || 输入 === "惩罚" || 输入 === "wipe" || 输入 === "Wipe") {
+    return 常量.吟唱条通道_致命惩罚;
+  }
+  if (输入 === 常量.吟唱条通道_场地常驻AOE || 输入 === "场地常驻AOE" || 输入 === "常驻AOE" || 输入 === "场地常驻") {
+    return 常量.吟唱条通道_场地常驻AOE;
+  }
+  if (输入 === 常量.吟唱条通道_大招 || 输入 === 常量.吟唱条通道_场地AOE || 输入 === "场地" || 输入 === "AOE" || 输入 === "大型AOE") {
+    return 常量.吟唱条通道_大招;
+  }
+  return 常量.吟唱条通道_常规技能;
+}
 
 function 规范化参数(输入: 吟唱条输入参数): 规范化吟唱条参数 {
   if (输入 == null) {
@@ -75,6 +96,7 @@ function 规范化参数(输入: 吟唱条输入参数): 规范化吟唱条参�
   }
 
   return {
+    通道: 规范化通道(输入.通道 || 输入.类型),
     总时长: 总时长 || 0,
     颜色ID,
     标题文本,
@@ -97,6 +119,38 @@ export function 显示吟唱条(this: any, 第一参数?: any, 第二参数?: �
   核心启动吟唱条(参数);
 }
 
-export function 关闭吟唱条(this: any, _第一参数?: any): void {
-  核心关闭吟唱条();
+export function 关闭吟唱条(this: any, 第一参数?: any): void {
+  let 通道 = 第一参数 as string | undefined;
+  if (通道 == null) {
+    if (typeof this === "string") {
+      通道 = this;
+    } else if (this != null && typeof this === "object") {
+      通道 = (this as 吟唱条输入参数).通道 || (this as 吟唱条输入参数).类型;
+    }
+  }
+  核心关闭吟唱条(规范化通道(通道));
+}
+
+export function 显示常规技能吟唱条(this: void, 参数: 吟唱条输入参数): void {
+  参数.通道 = 常量.吟唱条通道_常规技能;
+  显示吟唱条(参数);
+}
+
+export function 显示大招吟唱条(this: void, 参数: 吟唱条输入参数): void {
+  参数.通道 = 常量.吟唱条通道_大招;
+  显示吟唱条(参数);
+}
+
+export function 显示场地常驻AOE吟唱条(this: void, 参数: 吟唱条输入参数): void {
+  参数.通道 = 常量.吟唱条通道_场地常驻AOE;
+  显示吟唱条(参数);
+}
+
+export function 显示致命惩罚吟唱条(this: void, 参数: 吟唱条输入参数): void {
+  参数.通道 = 常量.吟唱条通道_致命惩罚;
+  显示吟唱条(参数);
+}
+
+export function 显示场地AOE吟唱条(this: void, 参数: 吟唱条输入参数): void {
+  显示大招吟唱条(参数);
 }

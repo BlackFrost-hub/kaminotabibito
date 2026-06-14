@@ -4,8 +4,8 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local _____5168_5C40_53D8_91CF = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local ____require_result_1 = require("系统.02．物品系统.13．物品名反查")
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_1["按名字反查物品ID"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -16,7 +16,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local UnitAddItem = jass.UnitAddItem
 ____exports["获取首领奖励接收英雄"] = function(_____73A9_5BB6)
-    local _____6CE8_518C_82F1_96C4 = getRegisteredPlayerHero(_____73A9_5BB6)
+    local _____6CE8_518C_82F1_96C4 = YDUserDataGetSafe("player", _____73A9_5BB6, "英雄", "unit")
     if _____6CE8_518C_82F1_96C4 ~= nil and _____6CE8_518C_82F1_96C4 ~= 0 then
         return _____6CE8_518C_82F1_96C4
     end

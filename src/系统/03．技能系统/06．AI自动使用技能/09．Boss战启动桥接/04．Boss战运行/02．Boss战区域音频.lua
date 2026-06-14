@@ -38,6 +38,16 @@ local function _____77E9_5F62_79FB_9664_97F3_9891(rectHandle, soundHandle)
     end
     SetStackedSoundBJ(false, soundHandle, rectHandle)
 end
+local function _____79FB_9664_4E0A_4E0B_6587_533A_57DF_97F3_9891(context)
+    if context == nil then
+        return
+    end
+    if context["地点矩形"] == nil or context["地点矩形"] == 0 then
+        return
+    end
+    _____77E9_5F62_79FB_9664_97F3_9891(context["地点矩形"], context["战斗音乐"])
+    _____77E9_5F62_79FB_9664_97F3_9891(context["地点矩形"], context["胜利音乐"])
+end
 ____exports["清理矩形Boss战候选音频"] = function(rectHandle)
     if rectHandle == nil or rectHandle == 0 then
         return
@@ -51,12 +61,12 @@ ____exports["清理矩形Boss战候选音频"] = function(rectHandle)
                 local _____97F3_9891_53E5_67C4 = jglobals[_____53D8_91CF_540D]
                 local _____97F3_9891_53E5_67C4ID = _____83B7_53D6_53E5_67C4ID(_____97F3_9891_53E5_67C4)
                 if _____97F3_9891_53E5_67C4ID == 0 or _____5DF2_5904_7406_97F3_9891_8868[_____97F3_9891_53E5_67C4ID] then
-                    goto __continue13
+                    goto __continue16
                 end
                 _____5DF2_5904_7406_97F3_9891_8868[_____97F3_9891_53E5_67C4ID] = true
                 _____77E9_5F62_79FB_9664_97F3_9891(rectHandle, _____97F3_9891_53E5_67C4)
             end
-            ::__continue13::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -68,6 +78,7 @@ ____exports["接管Boss战区域音频"] = function(context)
     local _____65E7_4E0A_4E0B_6587 = _____8BFB_53D6_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587(context["地点句柄ID"])
     if _____65E7_4E0A_4E0B_6587 ~= nil and _____65E7_4E0A_4E0B_6587["运行代次"] ~= context["运行代次"] then
         _____65E7_4E0A_4E0B_6587["胜利音乐移除时间"] = 0
+        _____79FB_9664_4E0A_4E0B_6587_533A_57DF_97F3_9891(_____65E7_4E0A_4E0B_6587)
     end
     ____exports["清理矩形Boss战候选音频"](context["地点矩形"])
     _____77E9_5F62_6DFB_52A0_97F3_9891(context["地点矩形"], context["战斗音乐"])

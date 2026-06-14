@@ -1,10 +1,10 @@
 /** @noSelfInFile */
 
-import type { AI技能覆盖配置, AI目标选择方式, AI施法目标类型, 单位AI配置 } from "../01．AI配置类型";
-import { 解析单位AI配置单位类型ID } from "../02．AI配置工具";
-import { BossAI配置表 } from "../03．BossAI配置表";
-import { 英雄BossAI配置表 } from "../06．英雄BossAI配置表";
-import { 异界BossAI配置表 } from "../07．异界BossAI配置表";
+import type { AI技能覆盖配置, AI目标选择方式, AI施法目标类型, 单位AI配置 } from "../00．AI配置/01．AI配置类型";
+import { 解析单位AI配置单位类型ID } from "../00．AI配置/02．AI配置工具";
+import { BossAI配置表 } from "../00．AI配置/01．BossAI配置表";
+import { 英雄BossAI配置表 } from "../00．AI配置/04．英雄BossAI配置表";
+import { 异界BossAI配置表 } from "../00．AI配置/05．异界BossAI配置表";
 import { 获取所有Boss自动技能启动上下文, 清理Boss自动技能启动上下文 } from "../09．Boss战启动桥接/01．Boss自动技能注册表";
 
 const jass = require("jass.common") as any;

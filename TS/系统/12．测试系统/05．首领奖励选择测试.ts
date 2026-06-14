@@ -5,7 +5,7 @@ const jass = require("jass.common") as any;
 const 聊天命令事件中心 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
   注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, 玩家: any, 命令: string) => void) => void;
 };
-const 首领奖励配置 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表") as {
+const 首领奖励配置 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   瑟兰迪尔奖励池ID: string;
 };
 const 首领奖励界面 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {

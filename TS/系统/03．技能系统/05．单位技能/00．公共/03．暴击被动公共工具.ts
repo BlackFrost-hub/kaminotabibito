@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { registerCritRateModifier, registerCritAppliedFinalDamageListener } = require("系统.04．伤害系统.06．暴击系统.01．暴击核心") as {
   registerCritRateModifier: (this: void, callback: (this: void, context: any) => number) => void;
@@ -28,7 +29,7 @@ const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC�
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const ConvertUnitState = jass.ConvertUnitState as (value: number) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -85,7 +86,7 @@ export function 写入单位累计实数(this: void, unit: any, key: string, val
 
 export function 读取单位攻击力(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
-  return Number(GetUnitState(unit, 攻击力状态)) || 0;
+  return Number(GetUnitStateJapi(unit, 攻击力状态)) || 0;
 }
 
 export function 读取单位护甲(this: void, unit: any): number {

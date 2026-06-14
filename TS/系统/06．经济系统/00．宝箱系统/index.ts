@@ -5,6 +5,7 @@ import "./09．宝箱主人台词";
 export {
   ScoreRange,
   DropMode,
+  宝箱首领奖励打开范围,
   ChestTypeConfig,
   CHEST_TYPES,
   DEFAULT_OPEN_TIME,
@@ -70,3 +71,11 @@ export {
   dropItemsFromChestConfig,
   宝箱配置掉落,
 } from "./01．宝箱掉落配置";
+
+export {
+  通用首领奖励宝箱可破坏物ID,
+  通用首领奖励宝箱生命值,
+  绑定宝箱首领奖励池,
+  创建首领奖励宝箱,
+  触发宝箱首领奖励,
+} from "./10．首领奖励宝箱";
