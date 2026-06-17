@@ -22,6 +22,9 @@ const {
   单位是否处于硬控制效果合集: (this: void, 单位: any) => boolean;
   单位是否拥有指定Buff: (this: void, 单位: any, BuffID: string) => boolean;
 };
+const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+};
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -34,9 +37,7 @@ const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animation: string)
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const QueueUnitAnimation = jass.QueueUnitAnimation as ((unit: any, animation: string) => void) | undefined;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (unit: any, speed: number) => void;
 const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, acquireRange: number) => void;
-const SetUnitPropWindow = jass.SetUnitPropWindow as (unit: any, window: number) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const IsUnitPaused = jass.IsUnitPaused as (unit: any) => boolean;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -180,9 +181,8 @@ export function 单位是否可以站桩弹幕射击(this: void, unit: any): boo
 
 export function 禁用单位原生攻击并固定站桩(this: void, unit: any): void {
   if (!单位有效且存活(unit)) return;
-  SetUnitMoveSpeed(unit, 0);
   SetUnitAcquireRange(unit, 0);
-  SetUnitPropWindow(unit, 0);
+  X_FixUnitStandingSafe(unit);
   SetUnitStateJapi(unit, ConvertUnitState(攻击力状态), 0);
   SetUnitStateJapi(unit, ConvertUnitState(攻击范围状态), 0);
   SetUnitStateJapi(unit, ConvertUnitState(攻击间隔状态), 99);
@@ -196,9 +196,8 @@ export function 禁用单位原生攻击并固定站桩(this: void, unit: any): 
 function 维持站桩状态(this: void, 状态: 站桩弹幕射击状态): void {
   const unit = 状态.参数.射手单位;
   if (!单位有效且存活(unit)) return;
-  SetUnitMoveSpeed(unit, 0);
   SetUnitAcquireRange(unit, 0);
-  SetUnitPropWindow(unit, 0);
+  X_FixUnitStandingSafe(unit);
   if (DzUnitDisableAttack != null) DzUnitDisableAttack(unit, true);
 
   const dx = GetUnitX(unit) - 状态.固定X;

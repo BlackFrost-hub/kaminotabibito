@@ -2,6 +2,51 @@ local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C, _____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5, _____786E_4FDD_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5, registerAppliedFinalDamageListener, _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868, _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868, _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5
+function _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
+    do
+        local i = 0
+        while i < #_____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 do
+            do
+                local callback = _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
+                if callback == nil then
+                    goto __continue26
+                end
+                callback(record, applied, snapshot)
+            end
+            ::__continue26::
+            i = i + 1
+        end
+    end
+end
+function _____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5(target, attacker, applied, snapshot)
+    do
+        local i = 0
+        while i < #_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868 do
+            do
+                local record = _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868[i + 1]
+                if record == nil then
+                    goto __continue30
+                end
+                if record.target ~= target or record.attacker ~= attacker then
+                    goto __continue30
+                end
+                __TS__ArraySplice(_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868, i, 1)
+                _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
+                return
+            end
+            ::__continue30::
+            i = i + 1
+        end
+    end
+end
+function _____786E_4FDD_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5()
+    if _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 then
+        return
+    end
+    _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 = true
+    registerAppliedFinalDamageListener(_____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5)
+end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -13,24 +58,21 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____66B4_51FB_6982_7387_901A_8FC7 = ____require_result_2["暴击概率通过"]
 local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
-local ____require_result_4 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
-local CreateFloatTextOnUnit = ____require_result_4.CreateFloatTextOnUnit
-local ____require_result_5 = require("系统.04．伤害系统.06．暴击系统.00．暴击配置")
-local _____66B4_51FB_7CFB_7EDF_914D_7F6E = ____require_result_5["暴击系统配置"]
-local ____require_result_6 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_6.registerAppliedFinalDamageListener
+local ____require_result_4 = require("系统.04．伤害系统.06．暴击系统.00．暴击配置")
+local _____66B4_51FB_7CFB_7EDF_914D_7F6E = ____require_result_4["暴击系统配置"]
+local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
-local R2S = jass.R2S
 local function _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(unit)
     return _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(unit) == true
 end
 local _____66B4_51FB_7387_4FEE_6B63_5668_5217_8868 = {}
-local _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868 = {}
-local _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 = {}
-local _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 = false
+_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868 = {}
+_____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 = {}
+_____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 = false
 local function _____8BFB_53D6_5355_4F4D_5B9E_6570(unit, _____5C5E_6027_540D)
     if unit == nil or unit == 0 then
         return 0
@@ -92,6 +134,7 @@ function ____exports.registerCritAppliedFinalDamageListener(callback)
     if callback == nil then
         return
     end
+    _____786E_4FDD_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5()
     do
         local i = 0
         while i < #_____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 do
@@ -102,52 +145,6 @@ function ____exports.registerCritAppliedFinalDamageListener(callback)
         end
     end
     _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[#_____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 + 1] = callback
-end
---- 暴击伤害数值在修正器内计算；暴击后的装备业务效果必须等最终伤害应用后触发。
--- 这里用“暴击成功记录 + 最终伤害监听”桥接，避免在伤害修正阶段嵌套追加伤害/治疗。
-local function _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
-    do
-        local i = 0
-        while i < #_____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 do
-            do
-                local callback = _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
-                if callback == nil then
-                    goto __continue26
-                end
-                callback(record, applied, snapshot)
-            end
-            ::__continue26::
-            i = i + 1
-        end
-    end
-end
-local function _____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5(target, attacker, applied, snapshot)
-    do
-        local i = 0
-        while i < #_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868 do
-            do
-                local record = _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868[i + 1]
-                if record == nil then
-                    goto __continue30
-                end
-                if record.target ~= target or record.attacker ~= attacker then
-                    goto __continue30
-                end
-                __TS__ArraySplice(_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868, i, 1)
-                _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
-                return
-            end
-            ::__continue30::
-            i = i + 1
-        end
-    end
-end
-local function _____786E_4FDD_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5()
-    if _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 then
-        return
-    end
-    _____5DF2_6CE8_518C_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5 = true
-    registerAppliedFinalDamageListener(_____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5)
 end
 local function _____8BB0_5F55_66B4_51FB_6210_529F(record)
     _____786E_4FDD_66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5()
@@ -172,13 +169,13 @@ local function _____83B7_53D6_66B4_51FB_5F52_5C5E_5355_4F4D(attacker, target)
         return attacker
     end
     local hero = getRegisteredPlayerHero(owner)
-    local ____temp_7
+    local ____temp_6
     if hero ~= nil and hero ~= 0 then
-        ____temp_7 = hero
+        ____temp_6 = hero
     else
-        ____temp_7 = attacker
+        ____temp_6 = attacker
     end
-    return ____temp_7
+    return ____temp_6
 end
 local function _____8BFB_53D6_653B_51FB_8005_66B4_51FB_5C5E_6027(attacker)
     if _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(attacker) then
@@ -242,13 +239,6 @@ local function _____662F_5426_53EF_66B4_51FB_4F24_5BB3(context)
     end
     return context.isPhysicalDamage or context.isEnhancedDamage or context.isSkillAttack
 end
-local function _____663E_793A_66B4_51FB(attacker, multiplier)
-    CreateFloatTextOnUnit(
-        attacker,
-        ("！！（×" .. R2S(multiplier)) .. "）",
-        _____66B4_51FB_7CFB_7EDF_914D_7F6E["漂浮文字"]
-    )
-end
 ____exports["执行暴击判定"] = function(context)
     local attacker = context.attacker
     local target = context.target
@@ -292,7 +282,6 @@ ____exports["执行暴击判定"] = function(context)
         _____66B4_51FB_500D_7387 = _____66B4_51FB_7CFB_7EDF_914D_7F6E["最低输出倍率"]
     end
     local _____66B4_51FB_540E_4F24_5BB3 = currentDamage * _____66B4_51FB_500D_7387
-    _____663E_793A_66B4_51FB(_____66B4_51FB_5F52_5C5E_5355_4F4D, _____66B4_51FB_500D_7387)
     _____8BB0_5F55_66B4_51FB_6210_529F({
         attacker = attacker,
         target = target,

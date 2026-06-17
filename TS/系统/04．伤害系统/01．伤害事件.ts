@@ -10,7 +10,7 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 };
 const { isHeroUnit, forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   isHeroUnit: (unit: any) => boolean;
-  forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
+  forEachUnitInGroup: (group: any, action: (this: any, unit: any) => void) => void;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (callback: (dyingUnit: any, killingUnit: any) => void) => void;
@@ -37,6 +37,7 @@ function getEventUnitDamaged(): any {
 
 const DamageEventQueue: any[] = [];
 const DamageCallbacks: ((
+  this: void,
   unit: any,
   damage: number,
   damageType: number,
@@ -227,7 +228,7 @@ function processDamageEntry(entry: any): void {
     if (cb != null) {
       // 跳过伤害计算回调（已经在前面同步执行过了）
       if (伤害计算回调 != null && cb === 伤害计算回调) continue;
-      (cb as any)(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
+      cb(su, sd, 0, isDotTickDamage, entry.source, entry.isNormalAttack);
     }
   }
 
@@ -248,6 +249,13 @@ function anyUnitDamagedFilter(this: void): boolean {
 /** 用于 GroupEnumUnitsInRect：枚举时无条件收集单位，必须是模块级具名函数，不能传匿名闭包进 JASS Condition。 */
 function alwaysCollectUnitFilter(this: void): boolean {
   return true;
+}
+
+function 枚举已有伤害单位(this: any, u: any): void {
+  if (!u) return;
+  const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
+  if (lvl > 0) return;
+  registerDamageUnit(u);
 }
 
 function unitHidKey(unit: any): string {
@@ -300,12 +308,7 @@ function initEnumUnit(): void {
   TriggerRegisterEnterRegion(t, r, Condition(anyUnitDamagedFilter));
   GroupEnumUnitsInRect(grp, bounds, Condition(alwaysCollectUnitFilter));
   if (UnitGroup) {
-        forEachUnitInGroup(grp, (u: any) => {
-          if (!u) return;
-          const lvl = (jass as any).GetUnitAbilityLevel(u, ALOC);
-          if (lvl > 0) return;
-      registerDamageUnit(u);
-    });
+    forEachUnitInGroup(grp, 枚举已有伤害单位);
   }
 
   if (grp) (jass as any).DestroyGroup(grp);
@@ -338,8 +341,9 @@ function initDamageEventOnce(intervalSeconds?: number): void {
 }
 
 /** 注册 Lua 回调：单位受伤时直接调用，不依赖 TriggerExecute（引擎可能不执行 Lua 动作） */
-export function registerDamageCallback(
+export function registerDamageCallback(this: void,
   cb: (
+    this: void,
     unit: any,
     damage: number,
     damageType: number,

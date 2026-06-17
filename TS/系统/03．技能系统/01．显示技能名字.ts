@@ -21,16 +21,17 @@ const registerSpellChannelListener = 技能事件模块.registerSpellChannelList
   | ((this: void, cb: (this: void, castingUnit: any, spellAbilityId: number) => void) => void)
   | undefined;
 
-const ABILITY_DATA_TIP = 215;
-
 const ITEM_USE_ORDER_IDS = new Set([
   852008, 852009, 852010, 852011, 852012, 852013, 852622,
 ]);
 
 function getAbilityName(this: void, unit: any, abilityId: number, level: number): string {
+  if (typeof japi.DzGetUnitAbilityTip === "function") {
+    return japi.DzGetUnitAbilityTip(unit, abilityId) || "";
+  }
   const abil = japi.EXGetUnitAbility(unit, abilityId);
   if (!abil) return "";
-  return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) || "";
+  return japi.EXGetAbilityDataString(abil, level, 215) || "";
 }
 
 function onSpellChannel(this: void, castingUnit: any, spellAbilityId: number): void {

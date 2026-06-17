@@ -19,6 +19,9 @@ const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityI
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
   buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string }>;
 };
+const negativeEffectImmunity = require("系统.05．Buff系统.06．负面效果免疫状态") as {
+  单位是否免疫负面效果BuffID: (this: void, unit: any, buffID: string) => boolean;
+};
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
@@ -31,6 +34,7 @@ const AddSpecialEffect = jass["AddSpecialEffect"] as (modelName: string, x: numb
 const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
 const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
 const R2I = jass["R2I"] as (r: number) => number;
+const 单位是否免疫负面效果BuffID = negativeEffectImmunity.单位是否免疫负面效果BuffID;
 
 const DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID: Record<string, number[]> = {
   C001: [1112560453], // 'BPSE'
@@ -245,6 +249,8 @@ export function syncDotBuff(
     maybeStopSyncTimer();
     return;
   }
+  const targetUnit = typeof target !== "number" ? target : unitRefByHid[hid];
+  if (targetUnit != null && 单位是否免疫负面效果BuffID(targetUnit, buffID)) return;
   const row: BuffRuntime = {
     buffID,
     remaining: state.remaining,
@@ -303,6 +309,8 @@ export function registerManualBuff(
   if (target == null || target === 0 || !buffID || durationSec <= 0) return;
   const hid = toHid(target);
   if (hid === 0) return;
+  const targetUnit = typeof target !== "number" ? target : unitRefByHid[hid];
+  if (targetUnit != null && 单位是否免疫负面效果BuffID(targetUnit, buffID)) return;
   const oldRow = getBuffFromFlat(hid, buffID);
   if (oldRow != null) {
     removeBuffRuntimeByKey(hid, buffID, oldRow, typeof target !== "number" ? target : unitRefByHid[hid]);

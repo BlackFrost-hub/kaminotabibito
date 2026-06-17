@@ -14,6 +14,8 @@ local ____06_FF0E_6559_6D3E_5B66_8005AI = require("系统.03．技能系统.06�
 local _____6559_6D3E_5B66_8005AI_914D_7F6E = ____06_FF0E_6559_6D3E_5B66_8005AI["教派学者AI配置"]
 local ____07_FF0E_745F_5170_8FEA_5C14AI = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.04．英雄BossAI配置表.07．瑟兰迪尔AI")
 local _____745F_5170_8FEA_5C14AI_914D_7F6E = ____07_FF0E_745F_5170_8FEA_5C14AI["瑟兰迪尔AI配置"]
+local ____08_FF0E_6C61_67D3_4E4B_732B_7C73_4E9AAI = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.04．英雄BossAI配置表.08．污染之猫米亚AI")
+local _____7C73_4E9AAI_914D_7F6E = ____08_FF0E_6C61_67D3_4E4B_732B_7C73_4E9AAI["米亚AI配置"]
 ____exports["英雄BossAI配置表"] = {
     _____7075_529B_610F_8BC6_4F53AI_914D_7F6E,
     _____6C99_6F20_98DF_4EBA_9B54AI_914D_7F6E,
@@ -21,6 +23,7 @@ ____exports["英雄BossAI配置表"] = {
     _____5229_5C14_4F2F_7279AI_914D_7F6E,
     _____6559_6D3E_5251_58EBAI_914D_7F6E,
     _____6559_6D3E_5B66_8005AI_914D_7F6E,
-    _____745F_5170_8FEA_5C14AI_914D_7F6E
+    _____745F_5170_8FEA_5C14AI_914D_7F6E,
+    _____7C73_4E9AAI_914D_7F6E
 }
 return ____exports

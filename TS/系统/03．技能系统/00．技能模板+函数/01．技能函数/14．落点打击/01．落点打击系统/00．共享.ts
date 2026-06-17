@@ -4,6 +4,7 @@
  */
 
 const jass = require("jass.common") as any;
+import type { 技能提示圈配置 } from "../../../02．通用函数/16．技能提示圈工厂";
 
 export const AddSpecialEffect = jass.AddSpecialEffect as (path: string, x: number, y: number) => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
@@ -53,6 +54,7 @@ export interface 落点打击参数 {
   随机取点最大尝试次数?: number;
   每单位最大命中次数?: number;
   提示特效启用?: boolean;
+  提示圈?: 技能提示圈配置 | false;
   提示特效动画速度?: number;
   落点特效模型?: string;
   攻击类型?: any;

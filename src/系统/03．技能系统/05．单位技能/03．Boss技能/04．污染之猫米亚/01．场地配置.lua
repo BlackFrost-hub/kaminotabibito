@@ -1,31 +1,34 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
----
--- @noSelfInFile
-local jass = require("jass.common")
-local Rect = jass.Rect
-local RemoveRect = jass.RemoveRect
-local ____require_result_0 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local RectContainsUnit = ____require_result_0.RectContainsUnit
+local ____02_FF0E_6218_6597_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.index")
+local _____521B_5EFA_52A8_6001_77E9_5F62_533A_57DF_7EC4 = ____02_FF0E_6218_6597_533A_57DF["创建动态矩形区域组"]
+local _____5355_4F4D_6240_5728_52A8_6001_77E9_5F62_533A_57DF = ____02_FF0E_6218_6597_533A_57DF["单位所在动态矩形区域"]
+local _____5355_4F4D_662F_5426_5728_52A8_6001_77E9_5F62_533A_57DF_7EC4_5185 = ____02_FF0E_6218_6597_533A_57DF["单位是否在动态矩形区域组内"]
+local _____70B9_662F_5426_5728_52A8_6001_77E9_5F62_914D_7F6E_5185 = ____02_FF0E_6218_6597_533A_57DF["点是否在动态矩形配置内"]
+local _____9500_6BC1_52A8_6001_77E9_5F62_533A_57DF_7EC4 = ____02_FF0E_6218_6597_533A_57DF["销毁动态矩形区域组"]
 ____exports["米亚安全域配置表"] = {{
+    ID = "safe-1",
     ["名称"] = "安全域1",
     ["左"] = 12672,
     ["右"] = 13056,
     ["下"] = -7104,
     ["上"] = -6720
 }, {
+    ID = "safe-2",
     ["名称"] = "安全域2",
     ["左"] = 12096,
     ["右"] = 12480,
     ["下"] = -8064,
     ["上"] = -7680
 }, {
+    ID = "safe-3",
     ["名称"] = "安全域3",
     ["左"] = 12928,
     ["右"] = 13312,
     ["下"] = -8704,
     ["上"] = -8320
 }, {
+    ID = "safe-4",
     ["名称"] = "安全域4",
     ["左"] = 13824,
     ["右"] = 14208,
@@ -33,6 +36,7 @@ ____exports["米亚安全域配置表"] = {{
     ["上"] = -6848
 }}
 ____exports["米亚平台中心配置"] = {
+    ID = "platform-center",
     ["名称"] = "平台中心",
     ["左"] = 12736,
     ["右"] = 13408,
@@ -42,71 +46,18 @@ ____exports["米亚平台中心配置"] = {
 ____exports["米亚平台中心X"] = (____exports["米亚平台中心配置"]["左"] + ____exports["米亚平台中心配置"]["右"]) / 2
 ____exports["米亚平台中心Y"] = (____exports["米亚平台中心配置"]["下"] + ____exports["米亚平台中心配置"]["上"]) / 2
 ____exports["创建米亚安全域矩形组"] = function()
-    local result = {}
-    do
-        local i = 0
-        while i < #____exports["米亚安全域配置表"] do
-            local config = ____exports["米亚安全域配置表"][i + 1]
-            result[#result + 1] = {
-                ["配置"] = config,
-                ["矩形"] = Rect(config["左"], config["下"], config["右"], config["上"]),
-                ["中心X"] = (config["左"] + config["右"]) / 2,
-                ["中心Y"] = (config["下"] + config["上"]) / 2
-            }
-            i = i + 1
-        end
-    end
-    return result
+    return _____521B_5EFA_52A8_6001_77E9_5F62_533A_57DF_7EC4("米亚安全域", ____exports["米亚安全域配置表"])
 end
-____exports["清理米亚安全域矩形组"] = function(rects)
-    if rects == nil then
-        return
-    end
-    do
-        local i = 0
-        while i < #rects do
-            local rect = rects[i + 1]["矩形"]
-            if rect ~= nil and rect ~= 0 then
-                RemoveRect(rect)
-                rects[i + 1]["矩形"] = nil
-            end
-            i = i + 1
-        end
-    end
+____exports["清理米亚安全域矩形组"] = function(_____533A_57DF_7EC4)
+    _____9500_6BC1_52A8_6001_77E9_5F62_533A_57DF_7EC4(_____533A_57DF_7EC4)
 end
 ____exports["米亚点在矩形配置内"] = function(x, y, rect)
-    return x >= rect["左"] and x <= rect["右"] and y >= rect["下"] and y <= rect["上"]
+    return _____70B9_662F_5426_5728_52A8_6001_77E9_5F62_914D_7F6E_5185(x, y, rect)
 end
-____exports["米亚单位在安全域内"] = function(unit, rects)
-    if unit == nil or unit == 0 then
-        return false
-    end
-    do
-        local i = 0
-        while i < #rects do
-            local rect = rects[i + 1]["矩形"]
-            if rect ~= nil and rect ~= 0 and RectContainsUnit(rect, unit) then
-                return true
-            end
-            i = i + 1
-        end
-    end
-    return false
+____exports["米亚单位在安全域内"] = function(unit, _____533A_57DF_7EC4)
+    return _____5355_4F4D_662F_5426_5728_52A8_6001_77E9_5F62_533A_57DF_7EC4_5185(unit, _____533A_57DF_7EC4)
 end
-____exports["取米亚单位所在安全域"] = function(unit, rects)
-    if unit == nil or unit == 0 then
-        return nil
-    end
-    do
-        local i = 0
-        while i < #rects do
-            local rect = rects[i + 1]["矩形"]
-            if rect ~= nil and rect ~= 0 and RectContainsUnit(rect, unit) then
-                return rects[i + 1]
-            end
-            i = i + 1
-        end
-    end
-    return nil
+____exports["取米亚单位所在安全域"] = function(unit, _____533A_57DF_7EC4)
+    return _____5355_4F4D_6240_5728_52A8_6001_77E9_5F62_533A_57DF(unit, _____533A_57DF_7EC4)
 end
 return ____exports

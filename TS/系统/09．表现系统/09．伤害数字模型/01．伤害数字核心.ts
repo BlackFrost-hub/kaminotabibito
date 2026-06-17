@@ -17,6 +17,15 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, damageType: 伤害类型快照) => void) => void;
 };
+const { registerCritAppliedFinalDamageListener } = require("系统.04．伤害系统.06．暴击系统.01．暴击核心") as {
+  registerCritAppliedFinalDamageListener: (this: void, cb: (this: void, record: any, applied: number, snapshot: 伤害类型快照) => void) => void;
+};
+const { registerDodgeAppliedFinalDamageListener } = require("系统.04．伤害系统.05．闪避系统.01．闪避核心") as {
+  registerDodgeAppliedFinalDamageListener: (this: void, cb: (this: void, record: any, applied: number, snapshot: 伤害类型快照) => void) => void;
+};
+const { registerMissAppliedFinalDamageListener } = require("系统.04．伤害系统.04．命中系统.01．命中核心") as {
+  registerMissAppliedFinalDamageListener: (this: void, cb: (this: void, record: any, applied: number, snapshot: 伤害类型快照) => void) => void;
+};
 
 const AddSpecialEffect = (jass as any)["AddSpecialEffect"] as (modelPath: string, x: number, y: number) => any;
 const DestroyEffect = (jass as any)["DestroyEffect"] as (eff: any) => void;
@@ -38,6 +47,8 @@ const DzSetEffectVisible = (japi as any)["DzSetEffectVisible"] as ((eff: any, en
 interface 单位数字特效 {
   effect: any;
   xOffset: number;
+  scale: number;
+  popScale: boolean;
 }
 
 interface 伤害数字实例 {
@@ -82,7 +93,12 @@ const 最小显示伤害 = 1;
 const 上浮持续时间 = 0.35;
 const 上浮高度 = 80;
 const 数字间距 = 24;
+const 前缀模型间距 = 34;
+const 前缀模型缩放 = 1.15;
 const 基础Z偏移 = 110;
+const 暴击前缀模型 = "UI\\DamageNumbers\\DmgPfxC.mdx";
+const 闪避前缀模型 = "UI\\DamageNumbers\\DmgPfxD.mdx";
+const 未命中前缀模型 = "UI\\DamageNumbers\\DmgPfxM.mdx";
 
 let 已初始化 = false;
 let 已注册Tick = false;
@@ -90,6 +106,14 @@ let 下一个实例ID = 0;
 
 const 实例表: Record<number, 伤害数字实例 | undefined> = {};
 const 实例ID列表: number[] = [];
+
+interface 特殊数字跳过记录 {
+  target: any;
+  attacker: any;
+  value: number;
+}
+
+const 特殊数字跳过列表: 特殊数字跳过记录[] = [];
 
 function 限制颜色字节(this: void, value: number): number {
   if (value <= 0) return 0;
@@ -101,6 +125,23 @@ function 转为显示整数伤害(this: void, applied: number): number {
   if (!(applied > 0)) return 0;
   // 不用 Math，走 JASS R2I
   return R2I(applied + 0.5);
+}
+
+function 标记跳过普通数字(this: void, target: any, attacker: any, applied: number): void {
+  const value = 转为显示整数伤害(applied);
+  if (value < 最小显示伤害) return;
+  特殊数字跳过列表.push({ target, attacker, value });
+}
+
+function 消耗普通数字跳过标记(this: void, target: any, attacker: any, value: number): boolean {
+  for (let i = 0; i < 特殊数字跳过列表.length; i++) {
+    const record = 特殊数字跳过列表[i];
+    if (record == null) continue;
+    if (record.target !== target || record.attacker !== attacker || record.value !== value) continue;
+    特殊数字跳过列表.splice(i, 1);
+    return true;
+  }
+  return false;
 }
 
 function 单位存活(this: void, unit: any): boolean {
@@ -171,8 +212,7 @@ function 尝试停止计时器(this: void): void {
   offTick10ms(驱动伤害数字);
 }
 
-function 创建数字特效(this: void, digit: number, x: number, y: number, z: number, color: { r: number; g: number; b: number }): 单位数字特效 | null {
-  const modelPath = 模型基础路径 + tostring(digit) + 模型扩展名;
+function 创建模型特效(this: void, modelPath: string, x: number, y: number, z: number, color: { r: number; g: number; b: number } | null, scale: number, popScale: boolean): 单位数字特效 | null {
   const effect = AddSpecialEffect(modelPath, x, y);
   if (effect == null || effect === 0) {
     return null;
@@ -185,12 +225,12 @@ function 创建数字特效(this: void, digit: number, x: number, y: number, z: 
     DzSetEffectVisible(effect, true);
   }
   if (typeof DzSetEffectScale === "function") {
-    DzSetEffectScale(effect, 模型缩放);
+    DzSetEffectScale(effect, popScale ? scale * 0.7 : scale);
   }
   if (typeof DzSetEffectAnimation === "function") {
     DzSetEffectAnimation(effect, 模型动画索引, 0);
   }
-  if (typeof DzGetColor === "function" && typeof DzSetEffectVertexColor === "function") {
+  if (color != null && typeof DzGetColor === "function" && typeof DzSetEffectVertexColor === "function") {
     const colorValue = DzGetColor(
       255,
       限制颜色字节(color.r),
@@ -200,14 +240,19 @@ function 创建数字特效(this: void, digit: number, x: number, y: number, z: 
     DzSetEffectVertexColor(effect, colorValue);
   }
 
-  return { effect, xOffset: 0 };
+  return { effect, xOffset: 0, scale, popScale };
 }
 
-function 创建伤害数字(this: void, target: any, amount: number, source: any, damageType: 伤害类型快照): void {
-  const text = tostring(amount);
-  const len = text.length;
-  if (len <= 0) return;
+function 创建数字特效(this: void, digit: number, x: number, y: number, z: number, color: { r: number; g: number; b: number }): 单位数字特效 | null {
+  const modelPath = 模型基础路径 + tostring(digit) + 模型扩展名;
+  return 创建模型特效(modelPath, x, y, z, color, 模型缩放, false);
+}
 
+function 创建伤害数字组(this: void, target: any, amount: number, source: any, damageType: 伤害类型快照, prefixModel: string | null): void {
+  const hasAmount = amount >= 最小显示伤害;
+  const text = hasAmount ? tostring(amount) : "";
+  const len = text.length;
+  if (!hasAmount && prefixModel == null) return;
   const startX = GetUnitX(target);
   const startY = GetUnitY(target);
   const startZ = GetUnitFlyHeight(target) + 基础Z偏移;
@@ -215,6 +260,14 @@ function 创建伤害数字(this: void, target: any, amount: number, source: any
 
   const effects: 单位数字特效[] = [];
   let left = -((len - 1) * 数字间距) / 2;
+  if (prefixModel != null) {
+    const prefixOffset = hasAmount ? left - 前缀模型间距 : 0;
+    const prefix = 创建模型特效(prefixModel, startX + prefixOffset, startY, startZ, null, 前缀模型缩放, true);
+    if (prefix != null) {
+      prefix.xOffset = prefixOffset;
+      effects.push(prefix);
+    }
+  }
   for (let i = 0; i < len; i++) {
     const ch = text.charAt(i);
     const digit = ch.charCodeAt(0) - 48;
@@ -247,6 +300,10 @@ function 创建伤害数字(this: void, target: any, amount: number, source: any
   };
   实例ID列表.push(id);
   确保计时器();
+}
+
+function 创建伤害数字(this: void, target: any, amount: number, source: any, damageType: 伤害类型快照): void {
+  创建伤害数字组(target, amount, source, damageType, null);
 }
 
 function 驱动伤害数字(this: void): void {
@@ -284,6 +341,11 @@ function 驱动伤害数字(this: void): void {
       if (typeof EXSetEffectZ === "function") {
         EXSetEffectZ(d.effect, z);
       }
+      if (d.popScale && typeof DzSetEffectScale === "function") {
+        let scaleFactor = 1;
+        if (t < 0.12) scaleFactor = 0.7 + t * 2.5;
+        DzSetEffectScale(d.effect, d.scale * scaleFactor);
+      }
     }
     i++;
   }
@@ -296,12 +358,44 @@ function 应用最终伤害时(this: void, target: any, attacker: any, applied: 
 
   const value = 转为显示整数伤害(applied);
   if (value < 最小显示伤害) return;
+  if (消耗普通数字跳过标记(target, attacker, value)) return;
   创建伤害数字(target, value, attacker, damageType);
+}
+
+function 暴击最终伤害显示(this: void, record: any, applied: number, snapshot: 伤害类型快照): void {
+  if (!已启用) return;
+  const target = record != null ? record.target : null;
+  const attacker = record != null ? record.attacker : null;
+  if (!单位存活(target)) return;
+  const value = 转为显示整数伤害(applied);
+  if (value < 最小显示伤害) return;
+  标记跳过普通数字(target, attacker, applied);
+  创建伤害数字组(target, value, attacker, snapshot, 暴击前缀模型);
+}
+
+function 闪避最终伤害显示(this: void, record: any, applied: number, snapshot: 伤害类型快照): void {
+  if (!已启用) return;
+  const target = record != null ? record.target : null;
+  const attacker = record != null ? record.attacker : null;
+  if (!单位存活(target)) return;
+  if (转为显示整数伤害(applied) >= 最小显示伤害) 标记跳过普通数字(target, attacker, applied);
+  创建伤害数字组(target, 0, attacker, snapshot, 闪避前缀模型);
+}
+
+function 未命中最终伤害显示(this: void, record: any, _applied: number, snapshot: 伤害类型快照): void {
+  if (!已启用) return;
+  const attacker = record != null ? record.attacker : null;
+  const target = record != null ? record.target : null;
+  if (!单位存活(attacker)) return;
+  创建伤害数字组(attacker, 0, target, snapshot, 未命中前缀模型);
 }
 
 export function 初始化伤害数字模型显示(this: void): void {
   if (已初始化) return;
   已初始化 = true;
+  registerCritAppliedFinalDamageListener(暴击最终伤害显示);
+  registerDodgeAppliedFinalDamageListener(闪避最终伤害显示);
+  registerMissAppliedFinalDamageListener(未命中最终伤害显示);
   registerAppliedFinalDamageListener(应用最终伤害时);
 }
 

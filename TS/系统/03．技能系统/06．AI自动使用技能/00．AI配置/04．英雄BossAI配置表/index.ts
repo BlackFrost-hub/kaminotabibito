@@ -8,6 +8,7 @@ import { 利尔伯特AI配置 } from "./04．利尔伯特AI";
 import { 教派剑士AI配置 } from "./05．教派剑士AI";
 import { 教派学者AI配置 } from "./06．教派学者AI";
 import { 瑟兰迪尔AI配置 } from "./07．瑟兰迪尔AI";
+import { 米亚AI配置 } from "./08．污染之猫米亚AI";
 
 
 export const 英雄BossAI配置表: 单位AI配置[] = [
@@ -18,4 +19,5 @@ export const 英雄BossAI配置表: 单位AI配置[] = [
   教派剑士AI配置,
   教派学者AI配置,
   瑟兰迪尔AI配置,
+  米亚AI配置,
 ];

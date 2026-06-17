@@ -11,6 +11,7 @@ const ENABLE_GOLD_BURST_TEST = true;
 const ENABLE_BROADCAST_HINT_TEST = true;
 const ENABLE_BOSS_REWARD_SELECTION_TEST = true;
 const ENABLE_THRANDUIL_BOSS_SKILL_TEST = true;
+const ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -39,6 +40,10 @@ function loadTests(): void {
 
   if (ENABLE_THRANDUIL_BOSS_SKILL_TEST) {
     require("系统.12．测试系统.06．瑟兰迪尔Boss技能测试");
+  }
+
+  if (ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST) {
+    require("系统.12．测试系统.07．伤害数字前缀模型测试");
   }
 
 }

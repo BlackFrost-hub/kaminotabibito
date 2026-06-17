@@ -6,7 +6,7 @@ local starEvent = require("lib.扩展函数.Star扩展函数.Star扩展库.02．
 local suspend = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local fastBuff = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
 local overSpeed = require("lib.扩展函数.Star扩展函数.Star扩展库.05．移动速度突破系统")
-local xLib = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
+local xLibSafe = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
 local effectGroup = require("lib.扩展函数.Star扩展函数.Star扩展库.07．特效组系统")
 local unitCondition = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
 local unitBase = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
@@ -63,6 +63,14 @@ do
 end
 do
     local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -151,18 +159,32 @@ function ____exports.registerBridge(self)
     expose(nil, "SOS_SetUnitSpeedTemp", overSpeed.SOS_SetUnitSpeedTemp)
     expose(nil, "SOS_GetUnitSpeed", overSpeed.SOS_GetUnitSpeed)
     expose(nil, "SOS_UnSetUnitSpeed", overSpeed.SOS_UnSetUnitSpeed)
-    expose(nil, "X_IsTerrainWalkable", xLib.X_IsTerrainWalkable)
-    expose(nil, "X_IsUnitTerrainWalkable", xLib.X_IsUnitTerrainWalkable)
-    expose(nil, "X_GetAbleX", xLib.X_GetAbleX)
-    expose(nil, "X_GetAbleY", xLib.X_GetAbleY)
-    expose(nil, "X_IsTerrainDeepWater", xLib.X_IsTerrainDeepWater)
-    expose(nil, "X_IsTerrainShallowWater", xLib.X_IsTerrainShallowWater)
-    expose(nil, "X_IsTerrainLand", xLib.X_IsTerrainLand)
-    expose(nil, "X_IsTerrainPlatform", xLib.X_IsTerrainPlatform)
-    expose(nil, "X_SetUnitMovable", xLib.X_SetUnitMovable)
-    expose(nil, "X_GDBC", xLib.X_GDBC)
-    expose(nil, "X_GAFC", xLib.X_GAFC)
-    expose(nil, "X_R2I2", xLib.X_R2I2)
+    expose(nil, "X_IsTerrainWalkable", xLibSafe.X_IsTerrainWalkableSafe)
+    expose(nil, "X_IsTerrainWalkableSafe", xLibSafe.X_IsTerrainWalkableSafe)
+    expose(nil, "X_IsUnitTerrainWalkable", xLibSafe.X_IsUnitTerrainWalkableSafe)
+    expose(nil, "X_IsUnitTerrainWalkableSafe", xLibSafe.X_IsUnitTerrainWalkableSafe)
+    expose(nil, "X_GetAbleX", xLibSafe.X_GetAbleXSafe)
+    expose(nil, "X_GetAbleXSafe", xLibSafe.X_GetAbleXSafe)
+    expose(nil, "X_GetAbleY", xLibSafe.X_GetAbleYSafe)
+    expose(nil, "X_GetAbleYSafe", xLibSafe.X_GetAbleYSafe)
+    expose(nil, "X_IsTerrainDeepWater", xLibSafe.X_IsTerrainDeepWaterSafe)
+    expose(nil, "X_IsTerrainDeepWaterSafe", xLibSafe.X_IsTerrainDeepWaterSafe)
+    expose(nil, "X_IsTerrainShallowWater", xLibSafe.X_IsTerrainShallowWaterSafe)
+    expose(nil, "X_IsTerrainShallowWaterSafe", xLibSafe.X_IsTerrainShallowWaterSafe)
+    expose(nil, "X_IsTerrainLand", xLibSafe.X_IsTerrainLandSafe)
+    expose(nil, "X_IsTerrainLandSafe", xLibSafe.X_IsTerrainLandSafe)
+    expose(nil, "X_IsTerrainPlatform", xLibSafe.X_IsTerrainPlatformSafe)
+    expose(nil, "X_IsTerrainPlatformSafe", xLibSafe.X_IsTerrainPlatformSafe)
+    expose(nil, "X_SetUnitMovable", xLibSafe.X_SetUnitMovableSafe)
+    expose(nil, "X_SetUnitMovableSafe", xLibSafe.X_SetUnitMovableSafe)
+    expose(nil, "X_FixUnitStandingSafe", xLibSafe.X_FixUnitStandingSafe)
+    expose(nil, "X_RestoreUnitStandingSafe", xLibSafe.X_RestoreUnitStandingSafe)
+    expose(nil, "X_GDBC", xLibSafe.X_GDBCSafe)
+    expose(nil, "X_GDBCSafe", xLibSafe.X_GDBCSafe)
+    expose(nil, "X_GAFC", xLibSafe.X_GAFCSafe)
+    expose(nil, "X_GAFCSafe", xLibSafe.X_GAFCSafe)
+    expose(nil, "X_R2I2", xLibSafe.X_R2I2Safe)
+    expose(nil, "X_R2I2Safe", xLibSafe.X_R2I2Safe)
     expose(nil, "EG_CreateEffectGroup", effectGroup.EG_CreateEffectGroup)
     expose(nil, "EG_RemoveGroup", effectGroup.EG_RemoveGroup)
     expose(nil, "EG_ClearGroup", effectGroup.EG_ClearGroup)

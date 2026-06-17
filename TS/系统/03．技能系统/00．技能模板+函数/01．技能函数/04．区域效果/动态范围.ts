@@ -45,6 +45,10 @@ const { 创建薄圆形提示圈特效, 立即销毁提示圈特效 } = require(
   创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
   立即销毁提示圈特效: (this: void, e: any) => void;
 };
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: 技能提示圈配置) => any;
+};
+import type { 技能提示圈配置 } from "../../02．通用函数/16．技能提示圈工厂";
 
 export interface 动态范围参数 {
   X: number;
@@ -58,6 +62,7 @@ export interface 动态范围参数 {
   伤害值?: number;
   模型路径?: string;
   特效高度?: number;
+  提示圈?: 技能提示圈配置 | false;
   on周期?: (this: void, 当前半径内单位: any[], 当前半径: number) => void;
   on销毁?: (this: void) => void;
 }
@@ -220,6 +225,9 @@ class 动态范围实现 implements 动态范围实例 {
   }
 
   private 创建当前段提示特效(当前时间毫秒: number): void {
+    if (this.参数.提示圈 === false) {
+      return;
+    }
     if (this.参数.变化时间 <= 0) {
       return;
     }
@@ -235,6 +243,19 @@ class 动态范围实现 implements 动态范围实例 {
     }
 
     const 剩余持续时间秒 = 剩余持续时间毫秒 / 1000;
+    if (this.参数.提示圈 != null) {
+      const 提示圈配置 = this.参数.提示圈;
+      创建技能提示圈({
+        ...提示圈配置,
+        类型: 提示圈配置.类型 ?? "圆形",
+        X: 提示圈配置.X ?? this.当前X,
+        Y: 提示圈配置.Y ?? this.当前Y,
+        半径: 提示圈配置.半径 ?? 当前段目标半径,
+        持续时间: 提示圈配置.持续时间 ?? 剩余持续时间秒,
+        来源单位: 提示圈配置.来源单位 ?? this.参数.所有者,
+      });
+      return;
+    }
     this.提示圈特效 = 创建薄圆形提示圈特效(
       this.当前X,
       this.当前Y,

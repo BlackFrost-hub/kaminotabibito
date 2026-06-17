@@ -13,7 +13,7 @@ local isInitialized = false
 --- 伤害计算系统是否启用
 local isEnabled = true
 --- 伤害事件回调函数
-local function damageCallback(self, target, damage, damageType, fromDotTickBatch, source, isNormalAttack)
+local function damageCallback(target, damage, damageType, fromDotTickBatch, source, isNormalAttack)
     if not isEnabled then
         return
     end
@@ -33,7 +33,7 @@ function ____exports.initDamageCalculation(self, intervalSeconds)
     if isInitialized then
         return
     end
-    registerDamageCallback(nil, damageCallback, intervalSeconds)
+    registerDamageCallback(damageCallback, intervalSeconds)
     isInitialized = true
 end
 --- 启用伤害计算系统

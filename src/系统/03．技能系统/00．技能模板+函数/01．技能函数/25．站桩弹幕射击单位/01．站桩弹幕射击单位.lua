@@ -5,7 +5,7 @@ local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_6709_6548_4E14_5B58_6D3B, _____53D6_5355_4F4DID, _____79FB_9664_72B6_6001ID, _____5C1D_8BD5_505C_6B62_9A71_52A8, _____5355_4F4D_6709_963B_6B62_653B_51FBBuff, _____7EF4_6301_7AD9_6869_72B6_6001, _____53D6_9762_5411_76EE_6807_89D2_5EA6, _____7ACB_5373_9762_5411_76EE_6807, _____64AD_653E_653B_51FB_52A8_4F5C, _____76EE_6807_4ECD_662F_5F85_51FA_624B_76EE_6807, _____53D1_5C04_7AD9_6869_76F4_7EBF_5F39_5E55, _____5F00_59CB_4E00_6B21_6A21_62DF_653B_51FB, _____4E2D_65AD_5F85_51FA_624B, _____66F4_65B0_5355_4E2A_5C04_51FB_72B6_6001, _____6E05_7406_72B6_6001, ____on_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4DTick, removePeriodicCallback, getServerTime, _____521B_5EFA_539F_751F_5F39_5E55, _____5355_4F4D_662F_5426_786C_76F4_4E2D, _____5355_4F4D_662F_5426_5904_4E8E_65BD_6CD5_786C_76F4_6548_679C, _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6, _____5355_4F4D_662F_5426_62E5_6709_6307_5B9ABuff, GetHandleId, GetUnitX, GetUnitY, SetUnitX, SetUnitY, SetUnitFacing, SetUnitAnimation, SetUnitAnimationByIndex, QueueUnitAnimation, SetUnitTimeScale, SetUnitMoveSpeed, SetUnitAcquireRange, SetUnitPropWindow, IsUnitPaused, IsUnitType, UnitDamageTarget, Atan2, Cos, Sin, UNIT_TYPE_DEAD, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, DzUnitDisableAttack, EXSetUnitFacing, BJ_RADTODEG, BJ_DEGTORAD, _____963B_6B62_653B_51FB_7684_63A7_5236Buff_5217_8868, _____5C04_51FB_72B6_6001_8868, _____5C04_51FB_72B6_6001ID_5217_8868, _____9A71_52A8ID
+local _____5355_4F4D_6709_6548_4E14_5B58_6D3B, _____53D6_5355_4F4DID, _____79FB_9664_72B6_6001ID, _____5C1D_8BD5_505C_6B62_9A71_52A8, _____5355_4F4D_6709_963B_6B62_653B_51FBBuff, _____7EF4_6301_7AD9_6869_72B6_6001, _____53D6_9762_5411_76EE_6807_89D2_5EA6, _____7ACB_5373_9762_5411_76EE_6807, _____64AD_653E_653B_51FB_52A8_4F5C, _____76EE_6807_4ECD_662F_5F85_51FA_624B_76EE_6807, _____53D1_5C04_7AD9_6869_76F4_7EBF_5F39_5E55, _____5F00_59CB_4E00_6B21_6A21_62DF_653B_51FB, _____4E2D_65AD_5F85_51FA_624B, _____66F4_65B0_5355_4E2A_5C04_51FB_72B6_6001, _____6E05_7406_72B6_6001, ____on_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4DTick, removePeriodicCallback, getServerTime, _____521B_5EFA_539F_751F_5F39_5E55, _____5355_4F4D_662F_5426_786C_76F4_4E2D, _____5355_4F4D_662F_5426_5904_4E8E_65BD_6CD5_786C_76F4_6548_679C, _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6, _____5355_4F4D_662F_5426_62E5_6709_6307_5B9ABuff, X_FixUnitStandingSafe, GetHandleId, GetUnitX, GetUnitY, SetUnitX, SetUnitY, SetUnitFacing, SetUnitAnimation, SetUnitAnimationByIndex, QueueUnitAnimation, SetUnitTimeScale, SetUnitAcquireRange, IsUnitPaused, IsUnitType, UnitDamageTarget, Atan2, Cos, Sin, UNIT_TYPE_DEAD, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, DzUnitDisableAttack, EXSetUnitFacing, BJ_RADTODEG, BJ_DEGTORAD, _____963B_6B62_653B_51FB_7684_63A7_5236Buff_5217_8868, _____5C04_51FB_72B6_6001_8868, _____5C04_51FB_72B6_6001ID_5217_8868, _____9A71_52A8ID
 function _____5355_4F4D_6709_6548_4E14_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -72,9 +72,8 @@ function _____7EF4_6301_7AD9_6869_72B6_6001(_____72B6_6001)
     if not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(unit) then
         return
     end
-    SetUnitMoveSpeed(unit, 0)
     SetUnitAcquireRange(unit, 0)
-    SetUnitPropWindow(unit, 0)
+    X_FixUnitStandingSafe(unit)
     if DzUnitDisableAttack ~= nil then
         DzUnitDisableAttack(unit, true)
     end
@@ -137,74 +136,74 @@ function _____53D1_5C04_7AD9_6869_76F4_7EBF_5F39_5E55(_____72B6_6001)
         if not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(_____53C2_6570["来源单位"]) or not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(_____76EE_6807_5355_4F4D) or not (_____53C2_6570["伤害值"] > 0) then
             return
         end
-        local ____array_6 = __TS__SparseArrayNew(
+        local ____array_7 = __TS__SparseArrayNew(
             _____53C2_6570["来源单位"],
             _____76EE_6807_5355_4F4D,
             _____53C2_6570["伤害值"],
             false,
             false
         )
-        local ____53C2_6570__653B_51FB_7C7B_578B_3 = _____53C2_6570["攻击类型"]
-        if ____53C2_6570__653B_51FB_7C7B_578B_3 == nil then
-            ____53C2_6570__653B_51FB_7C7B_578B_3 = ATTACK_TYPE_NORMAL
+        local ____53C2_6570__653B_51FB_7C7B_578B_4 = _____53C2_6570["攻击类型"]
+        if ____53C2_6570__653B_51FB_7C7B_578B_4 == nil then
+            ____53C2_6570__653B_51FB_7C7B_578B_4 = ATTACK_TYPE_NORMAL
         end
-        __TS__SparseArrayPush(____array_6, ____53C2_6570__653B_51FB_7C7B_578B_3)
-        local ____53C2_6570__4F24_5BB3_7C7B_578B_4 = _____53C2_6570["伤害类型"]
-        if ____53C2_6570__4F24_5BB3_7C7B_578B_4 == nil then
-            ____53C2_6570__4F24_5BB3_7C7B_578B_4 = DAMAGE_TYPE_NORMAL
+        __TS__SparseArrayPush(____array_7, ____53C2_6570__653B_51FB_7C7B_578B_4)
+        local ____53C2_6570__4F24_5BB3_7C7B_578B_5 = _____53C2_6570["伤害类型"]
+        if ____53C2_6570__4F24_5BB3_7C7B_578B_5 == nil then
+            ____53C2_6570__4F24_5BB3_7C7B_578B_5 = DAMAGE_TYPE_NORMAL
         end
-        __TS__SparseArrayPush(____array_6, ____53C2_6570__4F24_5BB3_7C7B_578B_4)
-        local ____53C2_6570__6B66_5668_7C7B_578B_5 = _____53C2_6570["武器类型"]
-        if ____53C2_6570__6B66_5668_7C7B_578B_5 == nil then
-            ____53C2_6570__6B66_5668_7C7B_578B_5 = WEAPON_TYPE_WHOKNOWS
+        __TS__SparseArrayPush(____array_7, ____53C2_6570__4F24_5BB3_7C7B_578B_5)
+        local ____53C2_6570__6B66_5668_7C7B_578B_6 = _____53C2_6570["武器类型"]
+        if ____53C2_6570__6B66_5668_7C7B_578B_6 == nil then
+            ____53C2_6570__6B66_5668_7C7B_578B_6 = WEAPON_TYPE_WHOKNOWS
         end
-        __TS__SparseArrayPush(____array_6, ____53C2_6570__6B66_5668_7C7B_578B_5)
-        UnitDamageTarget(__TS__SparseArraySpread(____array_6))
+        __TS__SparseArrayPush(____array_7, ____53C2_6570__6B66_5668_7C7B_578B_6)
+        UnitDamageTarget(__TS__SparseArraySpread(____array_7))
     end
-    local ____521B_5EFA_539F_751F_5F39_5E55_19 = _____521B_5EFA_539F_751F_5F39_5E55
-    local ____53C2_6570__6765_6E90_5355_4F4D_10 = _____53C2_6570["来源单位"]
-    local ____temp_11 = GetUnitX(_____5C04_624B) + Cos(angleRad) * offset
-    local ____temp_12 = GetUnitY(_____5C04_624B) + Sin(angleRad) * offset
-    local ____53C2_6570__5F39_9053_901F_5EA6_13 = _____53C2_6570["弹道速度"]
-    local ____53C2_6570__547D_4E2D_534A_5F84_14 = _____53C2_6570["命中半径"]
-    local ____53C2_6570__6700_5927_98DE_884C_8DDD_79BB_15 = _____53C2_6570["最大飞行距离"]
-    local ____53C2_6570__5F39_9053_6A21_578B_16 = _____53C2_6570["弹道模型"]
-    local ____temp_17 = _____53C2_6570["飞行高度"] or 80
-    local ____temp_18 = _____53C2_6570["弹道缩放"] or 1
-    local ____53C2_6570__653B_51FB_7C7B_578B_7 = _____53C2_6570["攻击类型"]
-    if ____53C2_6570__653B_51FB_7C7B_578B_7 == nil then
-        ____53C2_6570__653B_51FB_7C7B_578B_7 = ATTACK_TYPE_NORMAL
+    local ____521B_5EFA_539F_751F_5F39_5E55_20 = _____521B_5EFA_539F_751F_5F39_5E55
+    local ____53C2_6570__6765_6E90_5355_4F4D_11 = _____53C2_6570["来源单位"]
+    local ____temp_12 = GetUnitX(_____5C04_624B) + Cos(angleRad) * offset
+    local ____temp_13 = GetUnitY(_____5C04_624B) + Sin(angleRad) * offset
+    local ____53C2_6570__5F39_9053_901F_5EA6_14 = _____53C2_6570["弹道速度"]
+    local ____53C2_6570__547D_4E2D_534A_5F84_15 = _____53C2_6570["命中半径"]
+    local ____53C2_6570__6700_5927_98DE_884C_8DDD_79BB_16 = _____53C2_6570["最大飞行距离"]
+    local ____53C2_6570__5F39_9053_6A21_578B_17 = _____53C2_6570["弹道模型"]
+    local ____temp_18 = _____53C2_6570["飞行高度"] or 80
+    local ____temp_19 = _____53C2_6570["弹道缩放"] or 1
+    local ____53C2_6570__653B_51FB_7C7B_578B_8 = _____53C2_6570["攻击类型"]
+    if ____53C2_6570__653B_51FB_7C7B_578B_8 == nil then
+        ____53C2_6570__653B_51FB_7C7B_578B_8 = ATTACK_TYPE_NORMAL
     end
-    local ____53C2_6570__4F24_5BB3_7C7B_578B_8 = _____53C2_6570["伤害类型"]
-    if ____53C2_6570__4F24_5BB3_7C7B_578B_8 == nil then
-        ____53C2_6570__4F24_5BB3_7C7B_578B_8 = DAMAGE_TYPE_NORMAL
+    local ____53C2_6570__4F24_5BB3_7C7B_578B_9 = _____53C2_6570["伤害类型"]
+    if ____53C2_6570__4F24_5BB3_7C7B_578B_9 == nil then
+        ____53C2_6570__4F24_5BB3_7C7B_578B_9 = DAMAGE_TYPE_NORMAL
     end
-    local ____53C2_6570__6B66_5668_7C7B_578B_9 = _____53C2_6570["武器类型"]
-    if ____53C2_6570__6B66_5668_7C7B_578B_9 == nil then
-        ____53C2_6570__6B66_5668_7C7B_578B_9 = WEAPON_TYPE_WHOKNOWS
+    local ____53C2_6570__6B66_5668_7C7B_578B_10 = _____53C2_6570["武器类型"]
+    if ____53C2_6570__6B66_5668_7C7B_578B_10 == nil then
+        ____53C2_6570__6B66_5668_7C7B_578B_10 = WEAPON_TYPE_WHOKNOWS
     end
-    ____521B_5EFA_539F_751F_5F39_5E55_19({
-        ["所有者"] = ____53C2_6570__6765_6E90_5355_4F4D_10,
-        X = ____temp_11,
-        Y = ____temp_12,
+    ____521B_5EFA_539F_751F_5F39_5E55_20({
+        ["所有者"] = ____53C2_6570__6765_6E90_5355_4F4D_11,
+        X = ____temp_12,
+        Y = ____temp_13,
         ["方向角"] = angle,
         ["轨迹类型"] = "直线",
         ["显式改向后锁定方向"] = true,
-        ["速度"] = ____53C2_6570__5F39_9053_901F_5EA6_13,
-        ["命中半径"] = ____53C2_6570__547D_4E2D_534A_5F84_14,
-        ["最大距离"] = ____53C2_6570__6700_5927_98DE_884C_8DDD_79BB_15,
+        ["速度"] = ____53C2_6570__5F39_9053_901F_5EA6_14,
+        ["命中半径"] = ____53C2_6570__547D_4E2D_534A_5F84_15,
+        ["最大距离"] = ____53C2_6570__6700_5927_98DE_884C_8DDD_79BB_16,
         ["生命周期"] = 4,
         ["碰撞消失"] = true,
         ["最大总命中次数"] = 1,
         ["每单位最大命中次数"] = 1,
-        ["模型"] = ____53C2_6570__5F39_9053_6A21_578B_16,
-        ["飞行高度"] = ____temp_17,
-        ["缩放"] = ____temp_18,
+        ["模型"] = ____53C2_6570__5F39_9053_6A21_578B_17,
+        ["飞行高度"] = ____temp_18,
+        ["缩放"] = ____temp_19,
         ["影响目标"] = "敌方",
         ["伤害值"] = 0,
-        ["攻击类型"] = ____53C2_6570__653B_51FB_7C7B_578B_7,
-        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_8,
-        ["武器类型"] = ____53C2_6570__6B66_5668_7C7B_578B_9,
+        ["攻击类型"] = ____53C2_6570__653B_51FB_7C7B_578B_8,
+        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_9,
+        ["武器类型"] = ____53C2_6570__6B66_5668_7C7B_578B_10,
         ["on命中单位"] = _____7AD9_6869_76F4_7EBF_5F39_5E55_547D_4E2D_4F24_5BB3
     })
 end
@@ -302,6 +301,8 @@ _____5355_4F4D_662F_5426_786C_76F4_4E2D = ____require_result_2["单位是否硬�
 _____5355_4F4D_662F_5426_5904_4E8E_65BD_6CD5_786C_76F4_6548_679C = ____require_result_2["单位是否处于施法硬直效果"]
 _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6 = ____require_result_2["单位是否处于硬控制效果合集"]
 _____5355_4F4D_662F_5426_62E5_6709_6307_5B9ABuff = ____require_result_2["单位是否拥有指定Buff"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+X_FixUnitStandingSafe = ____require_result_3.X_FixUnitStandingSafe
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -313,9 +314,7 @@ SetUnitAnimation = jass.SetUnitAnimation
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 QueueUnitAnimation = jass.QueueUnitAnimation
 SetUnitTimeScale = jass.SetUnitTimeScale
-SetUnitMoveSpeed = jass.SetUnitMoveSpeed
 SetUnitAcquireRange = jass.SetUnitAcquireRange
-SetUnitPropWindow = jass.SetUnitPropWindow
 local IssueImmediateOrder = jass.IssueImmediateOrder
 IsUnitPaused = jass.IsUnitPaused
 IsUnitType = jass.IsUnitType
@@ -377,9 +376,8 @@ ____exports["禁用单位原生攻击并固定站桩"] = function(unit)
     if not _____5355_4F4D_6709_6548_4E14_5B58_6D3B(unit) then
         return
     end
-    SetUnitMoveSpeed(unit, 0)
     SetUnitAcquireRange(unit, 0)
-    SetUnitPropWindow(unit, 0)
+    X_FixUnitStandingSafe(unit)
     SetUnitStateJapi(
         unit,
         ConvertUnitState(_____653B_51FB_529B_72B6_6001),

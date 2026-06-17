@@ -10,6 +10,7 @@ local ENABLE_GOLD_BURST_TEST = true
 local ENABLE_BROADCAST_HINT_TEST = true
 local ENABLE_BOSS_REWARD_SELECTION_TEST = true
 local ENABLE_THRANDUIL_BOSS_SKILL_TEST = true
+local ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true
 local function loadTests(self)
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -31,6 +32,9 @@ local function loadTests(self)
     end
     if ENABLE_THRANDUIL_BOSS_SKILL_TEST then
         require("系统.12．测试系统.06．瑟兰迪尔Boss技能测试")
+    end
+    if ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST then
+        require("系统.12．测试系统.07．伤害数字前缀模型测试")
     end
 end
 loadTests(nil)

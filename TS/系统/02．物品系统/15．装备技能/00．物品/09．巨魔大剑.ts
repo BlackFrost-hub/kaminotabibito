@@ -25,7 +25,7 @@ const { 扩散伤害 } = require("系统.03．技能系统.00．技能模板+函
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
-const { 获取同类伤害类型 } = require("系统.03．技能系统.00．技能模板+函数.04．辅助函数.01．同类伤害类型") as {
+const { 获取同类伤害类型 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.08．同类伤害类型") as {
   获取同类伤害类型: (this: void, snapshot: any) => { 攻击类型: any; 伤害类型: any; 武器类型: any };
 };
 

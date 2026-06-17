@@ -28,7 +28,7 @@ local function applyCommonBuffAbility(ability, options)
   ability:setDurationNormal(1, options.durationNormal or 1)
   ability:setDurationHero(1, options.durationHero or 1)
   ability:setRequirements(options.requirements or '')
-  ability:setTargetsAllowed(1, options.targetsAllowed or 'ground,air')
+  ability:setTargetsAllowed(1, options.targetsAllowed or 'ground,air,nonsapper')
 end
 
 local asg1 = createNamedAbility(AbilityDefinitionAttackBonusPlus1, 'ASG1', '[系统]攻击力增加')
@@ -110,7 +110,7 @@ asb8:setAreaofEffect(1, 1)
 
 local asbi = createNamedAbility(AbilityDefinitionInnerFire, 'ASBI', '[Buff系统]心灵之火')
 applyCommonBuffAbility(asbi, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbi:setDamageIncrease(1, 0.1)
 asbi:setDefenseIncrease(1, 5)
@@ -118,7 +118,7 @@ asbi:setLifeRegenRate(1, 0)
 
 local asbl = createNamedAbility(AbilityDefinitionBloodlust, 'ASBL', '[Buff系统]嗜血术')
 applyCommonBuffAbility(asbl, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbl:setAttackSpeedIncrease(1, 0.4)
 asbl:setMovementSpeedIncrease(1, 0.25)
@@ -126,7 +126,7 @@ asbl:setScalingFactor(1, 1.0)
 
 local asbc = createNamedAbility(AbilityDefinitionCripple, 'ASBC', '[Buff系统]残废')
 applyCommonBuffAbility(asbc, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbc:setMovementSpeedReduction(1, 0.5)
 asbc:setAttackSpeedReduction(1, 0.5)
@@ -134,39 +134,39 @@ asbc:setDamageReduction(1, 0.5)
 
 local asbf = createNamedAbility(AbilityDefinitionFaerieFire, 'ASBF', '[Buff系统]精灵之火')
 applyCommonBuffAbility(asbf, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbf:setDefenseReduction(1, 5)
 asbf:setAlwaysAutocast(1, false)
 
 local asbr = createNamedAbility(AbilityDefinitionCursecreep, 'ASBR', '[Buff系统]诅咒')
 applyCommonBuffAbility(asbr, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 -- Curse 的 setChancetoMiss 在当前 ObjEditing 定义里会写出 3 字节字段 Crs，导致 w3a 读入断言。
 
 local asbs = createNamedAbility(AbilityDefinitionSleepcreep, 'ASBS', '[Buff系统]睡眠')
 applyCommonBuffAbility(asbs, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbs:setStunDuration(1, 0)
 
 local asbt = createNamedAbilityFromBase('ASBT', 'Aenr', '[Buff系统]纠缠根须')
 -- Aenr 本身是中立敌对非英雄纠缠；这里不要再写 heroAbility 字段，否则 ObjEditing 读对象会断言失败。
 applyCommonBuffAbility(asbt, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 
 -- ASBH 飓风：Cyclonecreep 生成母技能 ACcy 会导致地图加载闪退，改测普通 Cyclone(Acyc)。
 local asbh = createNamedAbility(AbilityDefinitionCyclone, 'ASBH', '[Buff系统]飓风')
 applyCommonBuffAbility(asbh, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
 asbh:setCanBeDispelled(1, true)
 
 local asbp = createNamedAbility(AbilityDefinitionParasite, 'ASBP', '[Buff系统]寄生')
 applyCommonBuffAbility(asbp, {
-  targetsAllowed = 'ground,air,enemy,friend,self,neutral',
+  targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
   cooldown = 0.10,
   manaCost = 0,
   castRange = 999999,

@@ -55,6 +55,12 @@ const GOLD_G = 215;
 const GOLD_B = 0;
 const GOLD_FLOAT_DURATION_SEC = 1.25;
 
+let 平分死亡X = 0;
+let 平分死亡Y = 0;
+let 平分击杀玩家: any = null;
+let 平分击杀者: any = null;
+let 平分金币值 = 0;
+
 // ==========================================================================================
 // 类型定义
 // ==========================================================================================
@@ -172,6 +178,43 @@ function giveGoldToPlayer(this: void, unit: any, player: any, baseGold: number, 
   }
 }
 
+function 处理平分英雄(this: void, hero: any): void {
+  if (!hero) return;
+  if (hero === 平分击杀者) return;
+  if (jass.IsUnitAlly(hero, 平分击杀玩家) !== true) return;
+
+  const heroX = jass.GetUnitX(hero) ?? 0;
+  const heroY = jass.GetUnitY(hero) ?? 0;
+  const dx = heroX - 平分死亡X;
+  const dy = heroY - 平分死亡Y;
+  const dist = jass.SquareRoot(dx * dx + dy * dy);
+  if (dist > SHARE_RANGE) return;
+
+  const heroPlayer = jass.GetOwningPlayer(hero);
+  if (heroPlayer == null) return;
+
+  giveGoldToPlayer(hero, heroPlayer, 平分金币值, true);
+}
+
+function 遍历单位组并恢复(this: void, group: any): void {
+  if (group == null || group === 0) return;
+  const scratch = jass.CreateGroup();
+  while (true) {
+    const unit = jass.FirstOfGroup(group);
+    if (!unit || unit === 0) break;
+    jass.GroupRemoveUnit(group, unit);
+    jass.GroupAddUnit(scratch, unit);
+    处理平分英雄(unit);
+  }
+  while (true) {
+    const unit = jass.FirstOfGroup(scratch);
+    if (!unit || unit === 0) break;
+    jass.GroupRemoveUnit(scratch, unit);
+    jass.GroupAddUnit(group, unit);
+  }
+  jass.DestroyGroup(scratch);
+}
+
 // ==========================================================================================
 // 核心逻辑
 // ==========================================================================================
@@ -213,32 +256,15 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
 
   if (killerPlayer == null || heroGroup == null) return;
 
-  // 遍历玩家英雄
-  const heroCount = jass.BlzGroupGetSize(heroGroup) ?? 0;
-  for (let i = 0; i < heroCount; i++) {
-    const hero = jass.BlzGroupUnitAt(heroGroup, i);
-    if (!hero) continue;
-
-    // 跳过击杀者自己
-    if (hero === killer) continue;
-
-    // 检查是否为友方
-    if (jass.IsUnitAlly(hero, killerPlayer) !== true) continue;
-
-    // 检查是否在范围内
-    const heroX = jass.GetUnitX(hero) ?? 0;
-    const heroY = jass.GetUnitY(hero) ?? 0;
-    const dx = heroX - dyingX;
-    const dy = heroY - dyingY;
-    const dist = jass.SquareRoot(dx * dx + dy * dy);
-    if (dist > SHARE_RANGE) continue;
-
-    // 给予平分金币
-    const heroPlayer = jass.GetOwningPlayer(hero);
-    if (heroPlayer == null) continue;
-
-    giveGoldToPlayer(hero, heroPlayer, shareGold, true);
-  }
+  平分死亡X = dyingX;
+  平分死亡Y = dyingY;
+  平分击杀玩家 = killerPlayer;
+  平分击杀者 = killer;
+  平分金币值 = shareGold;
+  遍历单位组并恢复(heroGroup);
+  平分击杀玩家 = null;
+  平分击杀者 = null;
+  平分金币值 = 0;
 }
 
 // ==========================================================================================

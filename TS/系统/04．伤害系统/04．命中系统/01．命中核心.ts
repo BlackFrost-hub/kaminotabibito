@@ -11,9 +11,6 @@ const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤�
 const { 命中概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
   命中概率通过: (this: void, 原始概率: number, 攻击者: any) => boolean;
 };
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
-  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
-};
 const { 命中系统配置 } = require("系统.04．伤害系统.04．命中系统.00．命中配置") as {
   命中系统配置: {
     生效最低伤害: number;
@@ -21,6 +18,9 @@ const { 命中系统配置 } = require("系统.04．伤害系统.04．命中系�
     未命中文本: string;
     漂浮文字: any;
   };
+};
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -35,10 +35,62 @@ export interface 命中判定结果 {
   命中概率: number;
 }
 
+export interface 未命中记录 {
+  attacker: any;
+  target: any;
+  未命中前伤害: number;
+  命中概率: number;
+}
+
+export type 未命中最终伤害监听 = (this: void, record: 未命中记录, applied: number, snapshot: any) => void;
+
+const 未命中记录列表: 未命中记录[] = [];
+const 未命中最终伤害监听列表: 未命中最终伤害监听[] = [];
+let 已注册未命中最终伤害桥接 = false;
+
 function 限制概率(this: void, value: number): number {
   if (value <= 0) return 0;
   if (value >= 1) return 1;
   return value;
+}
+
+export function registerMissAppliedFinalDamageListener(this: void, callback: 未命中最终伤害监听): void {
+  if (callback == null) return;
+  确保未命中最终伤害桥接();
+  for (let i = 0; i < 未命中最终伤害监听列表.length; i++) {
+    if (未命中最终伤害监听列表[i] === callback) return;
+  }
+  未命中最终伤害监听列表.push(callback);
+}
+
+function 通知未命中最终伤害监听(this: void, record: 未命中记录, applied: number, snapshot: any): void {
+  for (let i = 0; i < 未命中最终伤害监听列表.length; i++) {
+    const callback = 未命中最终伤害监听列表[i];
+    if (callback == null) continue;
+    callback(record, applied, snapshot);
+  }
+}
+
+function 未命中最终伤害桥接(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
+  for (let i = 0; i < 未命中记录列表.length; i++) {
+    const record = 未命中记录列表[i];
+    if (record == null) continue;
+    if (record.target !== target || record.attacker !== attacker) continue;
+    未命中记录列表.splice(i, 1);
+    通知未命中最终伤害监听(record, applied, snapshot);
+    return;
+  }
+}
+
+function 确保未命中最终伤害桥接(this: void): void {
+  if (已注册未命中最终伤害桥接) return;
+  已注册未命中最终伤害桥接 = true;
+  registerAppliedFinalDamageListener(未命中最终伤害桥接);
+}
+
+function 记录未命中(this: void, record: 未命中记录): void {
+  确保未命中最终伤害桥接();
+  未命中记录列表.push(record);
 }
 
 function 读取单位实数(this: void, unit: any, 属性名: string): number {
@@ -83,10 +135,6 @@ function 读取负向命中率偏移(this: void, unit: any): number {
   return 0;
 }
 
-function 显示未命中(this: void, target: any): void {
-  CreateFloatTextOnUnit(target, 命中系统配置.未命中文本, 命中系统配置.漂浮文字);
-}
-
 export function 执行命中判定(this: void, attacker: any, target: any, currentDamage: number): 命中判定结果 {
   if (attacker == null || attacker === 0 || target == null || target === 0) {
     return { 结束链路: false, 伤害: currentDamage, 命中概率: 命中系统配置.默认命中概率 };
@@ -106,7 +154,12 @@ export function 执行命中判定(this: void, attacker: any, target: any, curre
     return { 结束链路: false, 伤害: currentDamage, 命中概率: 基础命中概率 };
   }
 
-  显示未命中(target);
+  记录未命中({
+    attacker,
+    target,
+    未命中前伤害: currentDamage,
+    命中概率: 基础命中概率,
+  });
   return { 结束链路: true, 伤害: 0, 命中概率: 基础命中概率 };
 }
 

@@ -49,7 +49,7 @@ local function createEquipmentItemChannelAbility(id, name, options)
   ability:setAreaofEffect(1, options.area or 0)
   ability:setDurationNormal(1, 0)
   ability:setDurationHero(1, 0)
-  ability:setTargetsAllowed(1, options.targetsAllowed or 'ground,air,enemy,neutral,friend,self')
+  ability:setTargetsAllowed(1, options.targetsAllowed or 'ground,air,enemy,neutral,friend,self,nonsapper')
   ability:setRequirements('')
   ability:setAnimationNames('')
   ability:setArtEffect('')
@@ -106,7 +106,7 @@ end
 for index = 0, 14 do
   local id = string.format('IU%02d', index)
   local name = '[系统]装备通用单位目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('unitTarget', index, id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
+  createEquipmentItemAbilitySlot('unitTarget', index, id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self,nonsapper')
 end
 
 for index = 0, 14 do

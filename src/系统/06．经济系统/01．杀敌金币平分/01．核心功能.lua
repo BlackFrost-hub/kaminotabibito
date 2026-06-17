@@ -30,6 +30,11 @@ local GOLD_R = 255
 local GOLD_G = 215
 local GOLD_B = 0
 local GOLD_FLOAT_DURATION_SEC = 1.25
+local _____5E73_5206_6B7B_4EA1X = 0
+local _____5E73_5206_6B7B_4EA1Y = 0
+local _____5E73_5206_51FB_6740_73A9_5BB6 = nil
+local _____5E73_5206_51FB_6740_8005 = nil
+local _____5E73_5206_91D1_5E01_503C = 0
 --- 金币获取回调列表
 local goldGainCallbacks = {}
 local ______pcall_91D1_5E01_56DE_8C03
@@ -109,6 +114,62 @@ local function giveGoldToPlayer(unit, player, baseGold, isShared)
         })
     end
 end
+local function _____5904_7406_5E73_5206_82F1_96C4(hero)
+    if not hero then
+        return
+    end
+    if hero == _____5E73_5206_51FB_6740_8005 then
+        return
+    end
+    if jass.IsUnitAlly(hero, _____5E73_5206_51FB_6740_73A9_5BB6) ~= true then
+        return
+    end
+    local ____temp_7 = jass.GetUnitX(hero)
+    if ____temp_7 == nil then
+        ____temp_7 = 0
+    end
+    local heroX = ____temp_7
+    local ____temp_8 = jass.GetUnitY(hero)
+    if ____temp_8 == nil then
+        ____temp_8 = 0
+    end
+    local heroY = ____temp_8
+    local dx = heroX - _____5E73_5206_6B7B_4EA1X
+    local dy = heroY - _____5E73_5206_6B7B_4EA1Y
+    local dist = jass.SquareRoot(dx * dx + dy * dy)
+    if dist > SHARE_RANGE then
+        return
+    end
+    local heroPlayer = jass.GetOwningPlayer(hero)
+    if heroPlayer == nil then
+        return
+    end
+    giveGoldToPlayer(hero, heroPlayer, _____5E73_5206_91D1_5E01_503C, true)
+end
+local function _____904D_5386_5355_4F4D_7EC4_5E76_6062_590D(group)
+    if group == nil or group == 0 then
+        return
+    end
+    local scratch = jass.CreateGroup()
+    while true do
+        local unit = jass.FirstOfGroup(group)
+        if not unit or unit == 0 then
+            break
+        end
+        jass.GroupRemoveUnit(group, unit)
+        jass.GroupAddUnit(scratch, unit)
+        _____5904_7406_5E73_5206_82F1_96C4(unit)
+    end
+    while true do
+        local unit = jass.FirstOfGroup(scratch)
+        if not unit or unit == 0 then
+            break
+        end
+        jass.GroupRemoveUnit(scratch, unit)
+        jass.GroupAddUnit(group, unit)
+    end
+    jass.DestroyGroup(scratch)
+end
 --- 处理单位死亡事件
 local function onUnitDeathHandler(dyingUnit, killer)
     if not isValidDyingUnit(dyingUnit) then
@@ -135,66 +196,30 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if shareGold <= 0 then
         return
     end
-    local ____temp_7 = jass.GetUnitX(dyingUnit)
-    if ____temp_7 == nil then
-        ____temp_7 = 0
+    local ____temp_9 = jass.GetUnitX(dyingUnit)
+    if ____temp_9 == nil then
+        ____temp_9 = 0
     end
-    local dyingX = ____temp_7
-    local ____temp_8 = jass.GetUnitY(dyingUnit)
-    if ____temp_8 == nil then
-        ____temp_8 = 0
+    local dyingX = ____temp_9
+    local ____temp_10 = jass.GetUnitY(dyingUnit)
+    if ____temp_10 == nil then
+        ____temp_10 = 0
     end
-    local dyingY = ____temp_8
+    local dyingY = ____temp_10
     local killerPlayer = jass.GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
     if killerPlayer == nil or heroGroup == nil then
         return
     end
-    local ____temp_9 = jass.BlzGroupGetSize(heroGroup)
-    if ____temp_9 == nil then
-        ____temp_9 = 0
-    end
-    local heroCount = ____temp_9
-    do
-        local i = 0
-        while i < heroCount do
-            do
-                local hero = jass.BlzGroupUnitAt(heroGroup, i)
-                if not hero then
-                    goto __continue25
-                end
-                if hero == killer then
-                    goto __continue25
-                end
-                if jass.IsUnitAlly(hero, killerPlayer) ~= true then
-                    goto __continue25
-                end
-                local ____temp_10 = jass.GetUnitX(hero)
-                if ____temp_10 == nil then
-                    ____temp_10 = 0
-                end
-                local heroX = ____temp_10
-                local ____temp_11 = jass.GetUnitY(hero)
-                if ____temp_11 == nil then
-                    ____temp_11 = 0
-                end
-                local heroY = ____temp_11
-                local dx = heroX - dyingX
-                local dy = heroY - dyingY
-                local dist = jass.SquareRoot(dx * dx + dy * dy)
-                if dist > SHARE_RANGE then
-                    goto __continue25
-                end
-                local heroPlayer = jass.GetOwningPlayer(hero)
-                if heroPlayer == nil then
-                    goto __continue25
-                end
-                giveGoldToPlayer(hero, heroPlayer, shareGold, true)
-            end
-            ::__continue25::
-            i = i + 1
-        end
-    end
+    _____5E73_5206_6B7B_4EA1X = dyingX
+    _____5E73_5206_6B7B_4EA1Y = dyingY
+    _____5E73_5206_51FB_6740_73A9_5BB6 = killerPlayer
+    _____5E73_5206_51FB_6740_8005 = killer
+    _____5E73_5206_91D1_5E01_503C = shareGold
+    _____904D_5386_5355_4F4D_7EC4_5E76_6062_590D(heroGroup)
+    _____5E73_5206_51FB_6740_73A9_5BB6 = nil
+    _____5E73_5206_51FB_6740_8005 = nil
+    _____5E73_5206_91D1_5E01_503C = 0
 end
 --- 注册金币获取回调
 -- 回调可以返回更新后的params传递给下一个回调

@@ -14,9 +14,6 @@ const { 闪避概率通过 } = require("系统.03．技能系统.00．技能模�
 const { 读取正向命中率偏移 } = require("系统.04．伤害系统.04．命中系统.01．命中核心") as {
   读取正向命中率偏移: (this: void, unit: any) => number;
 };
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
-  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
-};
 const { 闪避系统配置 } = require("系统.04．伤害系统.05．闪避系统.00．闪避配置") as {
   闪避系统配置: {
     生效最低伤害: number;
@@ -76,6 +73,7 @@ function 读取单位实数(this: void, unit: any, 属性名: string): number {
 
 export function registerDodgeAppliedFinalDamageListener(this: void, callback: 闪避最终伤害监听): void {
   if (callback == null) return;
+  确保闪避最终伤害桥接();
   for (let i = 0; i < 闪避最终伤害监听列表.length; i++) {
     if (闪避最终伤害监听列表[i] === callback) return;
   }
@@ -147,10 +145,6 @@ function 读取目标基础闪避率(this: void, target: any): number {
   return 玩家闪避;
 }
 
-function 显示闪避(this: void, target: any): void {
-  CreateFloatTextOnUnit(target, 闪避系统配置.闪避文本, 闪避系统配置.漂浮文字);
-}
-
 export function 执行闪避判定(this: void, context: 闪避判定上下文): 闪避判定结果 {
   const attacker = context.attacker;
   const target = context.target;
@@ -191,7 +185,6 @@ export function 执行闪避判定(this: void, context: 闪避判定上下文): 
   }
 
   // 玩家单位闪避成功为 0 伤害；非玩家单位保留配置中的闪避后承伤比例。
-  显示闪避(target);
   let 闪避后伤害 = currentDamage * 闪避系统配置.敌人闪避后承伤比例;
   if (调用玩家英雄判定(target)) {
     闪避后伤害 = 0;

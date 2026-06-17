@@ -80,6 +80,7 @@ end
 -- - 这些 Buff 命中后，通常应视为会打断蓄力、引导、持续施法。
 local jass = require("jass.common")
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+local UnitRemoveAbility = jass.UnitRemoveAbility
 local GetHandleId = jass.GetHandleId
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -134,6 +135,15 @@ do
     ____exports["按驱散等级移除单位Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["按驱散等级移除单位Buff"]
     ____exports["一级驱散单位Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["一级驱散单位Buff"]
     ____exports["二级驱散单位Buff"] = ____05_FF0EBuff_6E05_9664_51FD_6570["二级驱散单位Buff"]
+end
+do
+    local ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001 = require("系统.05．Buff系统.06．负面效果免疫状态")
+    ____exports["施加单位负面效果免疫"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["施加单位负面效果免疫"]
+    ____exports["施加单位控制负面效果免疫"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["施加单位控制负面效果免疫"]
+    ____exports["施加单位魔法负面效果免疫"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["施加单位魔法负面效果免疫"]
+    ____exports["清除单位负面效果免疫"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["清除单位负面效果免疫"]
+    ____exports["单位是否免疫负面效果类型"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["单位是否免疫负面效果类型"]
+    ____exports["单位是否免疫负面效果BuffID"] = ____06_FF0E_8D1F_9762_6548_679C_514D_75AB_72B6_6001["单位是否免疫负面效果BuffID"]
 end
 ____exports["施法硬直显示BuffID"] = "C037"
 ____exports["施法硬直显示Buff图标"] = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp"
@@ -327,6 +337,21 @@ local function _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5
     end
     return false
 end
+local function _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, ____Buff_5217_8868)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return 0
+    end
+    local removed = 0
+    local index = 0
+    while index < #____Buff_5217_8868 do
+        local BuffID = ____Buff_5217_8868[index + 1]
+        if _____5355_4F4D_62E5_6709Buff_6548_679C(_____5355_4F4D, BuffID) and UnitRemoveAbility(_____5355_4F4D, BuffID) then
+            removed = removed + 1
+        end
+        index = index + 1
+    end
+    return removed
+end
 --- 施法硬直效果
 -- 
 -- 对应旧 JASS：
@@ -358,5 +383,23 @@ ____exports["单位是否处于负面Buff合集"] = function(_____5355_4F4D)
 end
 ____exports["单位是否处于全部负面Buff合集"] = function(_____5355_4F4D)
     return _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, _____5168_90E8_8D1F_9762Buff_5408_96C6)
+end
+____exports["清除单位硬控制Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____786C_63A7_5236Buff_5408_96C6)
+end
+____exports["清除单位软控制Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____8F6F_63A7_5236Buff_5408_96C6)
+end
+____exports["清除单位削弱Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____524A_5F31Buff_5408_96C6)
+end
+____exports["清除单位持续伤害Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____6301_7EED_4F24_5BB3Buff_5408_96C6)
+end
+____exports["清除单位负面Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____8D1F_9762Buff_5408_96C6)
+end
+____exports["清除单位全部负面Buff合集"] = function(_____5355_4F4D)
+    return _____6E05_9664_5355_4F4DBuff_6548_679C_5408_96C6(_____5355_4F4D, _____5168_90E8_8D1F_9762Buff_5408_96C6)
 end
 return ____exports

@@ -5,4 +5,5 @@ createMeleeBossHeroUnit('N057', '精灵执法队长·瑟兰迪尔', {
   damageBase = 1000,
   attackCooldown = 2.0,
   abilities = 'AInv,AT05,AT06,AN00,AN01',
+  upgrades = 'R001,R002',
 })

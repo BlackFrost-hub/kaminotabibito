@@ -11,8 +11,8 @@ import {
   单位是否受影响,
 } from "./00．共享";
 
-const { 创建渐变圆形提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建渐变圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
 };
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
@@ -25,7 +25,7 @@ const { 单位是否还能命中, 记录单位命中 } = require("系统.03．�
 };
 
 export function 创建落点提示特效(参数: any, 落点: { X: number; Y: number; 触发延迟: number }): void {
-  if (参数.提示特效启用 === false) {
+  if (参数.提示圈 === false || 参数.提示特效启用 === false) {
     return;
   }
 
@@ -34,13 +34,17 @@ export function 创建落点提示特效(参数: any, 落点: { X: number; Y: nu
     return;
   }
 
-  创建渐变圆形提示圈(
-    落点.X,
-    落点.Y,
-    提示半径,
-    落点.触发延迟,
-    参数.提示特效动画速度
-  );
+  const 自定义提示圈 = 参数.提示圈 != null ? 参数.提示圈 : {};
+  创建技能提示圈({
+    ...自定义提示圈,
+    类型: 自定义提示圈.类型 ?? "渐变圆形",
+    X: 自定义提示圈.X ?? 落点.X,
+    Y: 自定义提示圈.Y ?? 落点.Y,
+    半径: 自定义提示圈.半径 ?? 提示半径,
+    持续时间: 自定义提示圈.持续时间 ?? 落点.触发延迟,
+    动画速度: 自定义提示圈.动画速度 ?? 参数.提示特效动画速度,
+    来源单位: 自定义提示圈.来源单位 ?? 参数.所有者,
+  });
 }
 
 function 创建落点命中特效(参数: any, X: number, Y: number): void {

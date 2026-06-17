@@ -3683,6 +3683,139 @@ ____exports.items.I0EE = {
     cdReduction = 0.08,
     movespeed2 = 0.08
 }
+____exports.items.I0EF = {
+    type = "道具/戒指/饰品",
+    name = "地核熔炉之心",
+    goldPrice = 1000,
+    score = 9300,
+    level = "B+",
+    str = 45,
+    int = 45,
+    hp = 1800,
+    fireDmg = 0.22
+}
+____exports.items.I0EG = {
+    type = "头盔",
+    name = "巴尔扎罗斯的角冠",
+    goldPrice = 1000,
+    score = 9000,
+    level = "B+",
+    str = 55,
+    armor = 30,
+    hp = 2600,
+    summonDmg = 0.2
+}
+____exports.items.I0EH = {
+    type = "鞋子",
+    name = "熔岩行者胫甲",
+    goldPrice = 1000,
+    score = 8500,
+    level = "B+",
+    movespeed2 = 0.12,
+    armor = 18,
+    hp = 1600,
+    fireResist = 0.2
+}
+____exports.items.I0EI = {
+    type = "道具/戒指/饰品",
+    name = "锻造者手套",
+    goldPrice = 1000,
+    score = 8700,
+    level = "B+",
+    dmg = 170,
+    str = 35,
+    armorPierce = 0.18,
+    atkSpeed = 0.25
+}
+____exports.items.I0EJ = {
+    type = "道具/戒指/饰品",
+    name = "冰焰宝珠",
+    goldPrice = 1000,
+    score = 8900,
+    level = "B+",
+    int = 55,
+    magicDmg = 0.18,
+    fireDmg = 0.18,
+    waterDmg = 0.18
+}
+____exports.items.I0EK = {
+    type = "道具/戒指/饰品",
+    name = "双卫之誓",
+    goldPrice = 1000,
+    score = 9500,
+    level = "B++",
+    all = 38,
+    armor = 22,
+    magicResist = 0.2,
+    hp = 2200
+}
+____exports.items.I0EL = {
+    type = "材料",
+    name = "炽凰尾羽",
+    goldPrice = 1000,
+    score = 9000,
+    level = "B+",
+    agi = 45,
+    atkSpeed = 0.35,
+    fireDmg = 0.2
+}
+____exports.items.I0EM = {
+    type = "道具/戒指/饰品",
+    name = "熔岩结晶护符",
+    goldPrice = 1000,
+    score = 9200,
+    level = "B+",
+    hp = 3000,
+    armor = 28,
+    fireResist = 0.25,
+    hpRegen = 100
+}
+____exports.items.I0EN = {
+    type = "材料",
+    name = "怨火核心碎片",
+    goldPrice = 1000,
+    score = 9600,
+    level = "B++",
+    int = 60,
+    magicDmg = 0.22,
+    darkDmg = 0.2,
+    magicPierce = 0.18
+}
+____exports.items.I0EO = {
+    type = "衣服",
+    name = "骸骨烈焰之翼",
+    goldPrice = 1000,
+    score = 9800,
+    level = "B++",
+    agi = 42,
+    hp = 2200,
+    dodge = 0.12,
+    movespeed2 = 0.1,
+    fireDmg = 0.15
+}
+____exports.items.I0EP = {
+    type = "主武器",
+    name = "永恒轮回法典",
+    goldPrice = 1000,
+    score = 10500,
+    level = "B++",
+    dmg = 230,
+    int = 70,
+    magicDmg = 0.25,
+    cdReduction = 0.12,
+    weaponType = "法杖"
+}
+____exports.items.I0EQ = {
+    type = "道具/戒指/饰品",
+    name = "菲尼克斯尔的宠物蛋",
+    goldPrice = 1000,
+    score = 10000,
+    level = "B++",
+    all = 45,
+    hp = 1800,
+    fireDmg = 0.18,
+    summonDmg = 0.25
+}
 ____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}
 ____exports.items.ches = {
     type = "药剂/食品",

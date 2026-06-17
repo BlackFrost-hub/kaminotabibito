@@ -35,5 +35,6 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
   collision = 64.0,
   soundSet = 'DruidOfTheClaw',
   classification = 'undead',
-  abilities = 'AInv,AT06,AN00,AN01,AN02,AN03',
+  abilities = 'AInv,AT14,AN00',
+  upgrades = 'R001,R002',
 })

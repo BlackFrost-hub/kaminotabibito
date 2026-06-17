@@ -22,6 +22,7 @@
 
 const jass = require("jass.common") as any;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilcode: number) => number;
+const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -79,6 +80,15 @@ export {
   一级驱散单位Buff,
   二级驱散单位Buff,
 } from "../../../05．Buff系统/05．Buff清除函数";
+
+export {
+  施加单位负面效果免疫,
+  施加单位控制负面效果免疫,
+  施加单位魔法负面效果免疫,
+  清除单位负面效果免疫,
+  单位是否免疫负面效果类型,
+  单位是否免疫负面效果BuffID,
+} from "../../../05．Buff系统/06．负面效果免疫状态";
 
 import {
   GS_Suspend,
@@ -343,6 +353,20 @@ function 单位拥有任意Buff效果合集(单位: any, Buff列表: number[]): 
   return false;
 }
 
+function 清除单位Buff效果合集(单位: any, Buff列表: number[]): number {
+  if (单位 == null || 单位 === 0) return 0;
+  let removed = 0;
+  let index = 0;
+  while (index < Buff列表.length) {
+    const BuffID = Buff列表[index];
+    if (单位拥有Buff效果(单位, BuffID) && UnitRemoveAbility(单位, BuffID)) {
+      removed++;
+    }
+    index++;
+  }
+  return removed;
+}
+
 /**
  * 施法硬直效果
  *
@@ -380,4 +404,28 @@ export function 单位是否处于负面Buff合集(单位: any): boolean {
 
 export function 单位是否处于全部负面Buff合集(单位: any): boolean {
   return 单位拥有任意Buff效果合集(单位, 全部负面Buff合集);
+}
+
+export function 清除单位硬控制Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 硬控制Buff合集);
+}
+
+export function 清除单位软控制Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 软控制Buff合集);
+}
+
+export function 清除单位削弱Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 削弱Buff合集);
+}
+
+export function 清除单位持续伤害Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 持续伤害Buff合集);
+}
+
+export function 清除单位负面Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 负面Buff合集);
+}
+
+export function 清除单位全部负面Buff合集(单位: any): number {
+  return 清除单位Buff效果合集(单位, 全部负面Buff合集);
 }

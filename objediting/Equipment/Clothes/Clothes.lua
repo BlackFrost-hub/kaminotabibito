@@ -11,3 +11,15 @@ createEquipmentItem('I0E3', '精灵执法披风', {
   tooltipExtended = '|cffccffff[衣服]-生存/光环|r|n|cffffcc99等级：B-|n评分：6450|r|n|cffffffcc[基础属性]|r|n生命值+3200|n护甲+35|n魔抗+20%|n移动速度+8%|n|cffffffcc[特效]|r|n秩序领域：周围300范围内敌方单位攻击速度降低15%。|n|cFF808080披风曾覆在精灵执法者肩上，边缘仍刻着维系秩序的古老纹章。|r',
   description = '|cffccffff[衣服]-生存/光环|r|n|cffffcc99等级：B-|n评分：6450|r|n|cffffffcc[基础属性]|r|n生命值+3200|n护甲+35|n魔抗+20%|n移动速度+8%|n|cffffffcc[特效]|r|n秩序领域：周围300范围内敌方单位攻击速度降低15%。|n|cFF808080披风曾覆在精灵执法者肩上，边缘仍刻着维系秩序的古老纹章。|r',
 })
+
+createEquipmentItem('I0EO', '骸骨烈焰之翼', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\skeletal_flame_wings.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 7,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n敏捷+42|n生命值+2200|n闪避+12%|n移动速度+10%|n火属性伤害+15%|n|cFF808080骸骨凤凰残翼被重新缝合，羽骨间仍有暗红色火星明灭。|r',
+  description = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n敏捷+42|n生命值+2200|n闪避+12%|n移动速度+10%|n火属性伤害+15%|n|cFF808080骸骨凤凰残翼被重新缝合，羽骨间仍有暗红色火星明灭。|r',
+})

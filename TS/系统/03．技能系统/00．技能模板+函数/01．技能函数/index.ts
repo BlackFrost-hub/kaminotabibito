@@ -4,6 +4,7 @@
  * 技能函数 - 统一导出入口
  */
 
+export * from "./26．无视控制输入/index";
 export * from "./01．弹幕/index";
 export * from "./02．冲锋·击退/index";
 export * from "./03．跳跃·击飞/index";

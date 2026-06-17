@@ -12,7 +12,6 @@ local _____6D6E_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂
 local _____6280_80FD_4E8B_4EF6_6A21_5757 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local CreateFloatTextOnUnit = _____6D6E_5B57_6A21_5757.CreateFloatTextOnUnit
 local registerSpellChannelListener = _____6280_80FD_4E8B_4EF6_6A21_5757.registerSpellChannelListener
-local ABILITY_DATA_TIP = 215
 local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852008,
     852009,
@@ -23,11 +22,14 @@ local ITEM_USE_ORDER_IDS = __TS__New(Set, {
     852622
 })
 local function getAbilityName(unit, abilityId, level)
+    if type(japi.DzGetUnitAbilityTip) == "function" then
+        return japi.DzGetUnitAbilityTip(unit, abilityId) or ""
+    end
     local abil = japi.EXGetUnitAbility(unit, abilityId)
     if not abil then
         return ""
     end
-    return japi.EXGetAbilityDataString(abil, level, ABILITY_DATA_TIP) or ""
+    return japi.EXGetAbilityDataString(abil, level, 215) or ""
 end
 local function onSpellChannel(castingUnit, spellAbilityId)
     if type(CreateFloatTextOnUnit) ~= "function" then

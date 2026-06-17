@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getEventUnitDamaged, ______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90, ______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90, ______pcall_68C0_67E5_89E6_53D1_5668_542F_7528, ______pcall_8BC4_4F30_89E6_53D1_5668, ______pcall_6267_884C_89E6_53D1_5668, ______pcall_68C0_67E5_666E_901A_653B_51FB, ______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot, ______pcall_901A_77E5Dot_6279_6B21_4F24_5BB3_663E_793A, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, ______pcall_4F24_5BB3_6765_6E90, ______pcall_89E6_53D1_5668, ______pcall_5E03_5C14_7ED3_679C, ______pcall_4F24_5BB3Entry, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
+local getEventUnitDamaged, ______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90, ______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90, ______pcall_68C0_67E5_89E6_53D1_5668_542F_7528, ______pcall_8BC4_4F30_89E6_53D1_5668, ______pcall_6267_884C_89E6_53D1_5668, ______pcall_68C0_67E5_666E_901A_653B_51FB, ______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot, ______pcall_901A_77E5Dot_6279_6B21_4F24_5BB3_663E_793A, onUnitDeathForDamage, onAnyUnitDamagedAction, processDamageEntry, anyUnitDamagedFilter, alwaysCollectUnitFilter, _____679A_4E3E_5DF2_6709_4F24_5BB3_5355_4F4D, unitHidKey, registerDamageUnit, unregisterDamageUnit, initEnumUnit, initDamageEventOnce, jass, _____4F24_5BB3_51FD_6570, isHeroUnit, forEachUnitInGroup, registerDeathListener, _____83B7_53D6_4F24_5BB3_8BA1_7B97_56DE_8C03, ALOC, DamageEventQueue, DamageCallbacks, DamageEventNumber, UnitGroup, DamageEventInitialized, DamageTriggerByUnitHid, DamageTriggerActionByUnitHid, ______pcall_4F24_5BB3_6765_6E90, ______pcall_89E6_53D1_5668, ______pcall_5E03_5C14_7ED3_679C, ______pcall_4F24_5BB3Entry, dotBatchMarkQueue, GetFilterUnit, GetUnitAbilityLevel, CreateTrigger, CreateRegion, CreateGroup, GetWorldBounds, RegionAddRect, Condition, TriggerRegisterEnterRegion, GroupEnumUnitsInRect
 function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
 end
@@ -146,7 +146,6 @@ function processDamageEntry(self, entry)
                         goto __continue33
                     end
                     cb(
-                        nil,
                         su,
                         sd,
                         0,
@@ -178,6 +177,16 @@ function anyUnitDamagedFilter()
 end
 function alwaysCollectUnitFilter()
     return true
+end
+function _____679A_4E3E_5DF2_6709_4F24_5BB3_5355_4F4D(self, u)
+    if not u then
+        return
+    end
+    local lvl = jass.GetUnitAbilityLevel(u, ALOC)
+    if lvl > 0 then
+        return
+    end
+    registerDamageUnit(nil, u)
 end
 function unitHidKey(self, unit)
     return tostring(jass.GetHandleId(unit)
@@ -243,20 +252,7 @@ function initEnumUnit(self)
         Condition(alwaysCollectUnitFilter)
     )
     if UnitGroup then
-        forEachUnitInGroup(
-            nil,
-            grp,
-            function(____, u)
-                if not u then
-                    return
-                end
-                local lvl = jass.GetUnitAbilityLevel(u, ALOC)
-                if lvl > 0 then
-                    return
-                end
-                registerDamageUnit(nil, u)
-            end
-        )
+        forEachUnitInGroup(nil, grp, _____679A_4E3E_5DF2_6709_4F24_5BB3_5355_4F4D)
     end
     if grp then
         jass.DestroyGroup(grp)
@@ -334,7 +330,7 @@ function ____exports.MNAnyUnitDamaged(self, trg, intervalSeconds)
     DamageEventNumber = DamageEventNumber + 1
 end
 --- 注册 Lua 回调：单位受伤时直接调用，不依赖 TriggerExecute（引擎可能不执行 Lua 动作）
-function ____exports.registerDamageCallback(self, cb, intervalSeconds)
+function ____exports.registerDamageCallback(cb, intervalSeconds)
     if cb == nil then
         return
     end

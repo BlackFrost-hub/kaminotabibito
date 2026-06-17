@@ -14,9 +14,6 @@ const { 暴击概率通过 } = require("系统.03．技能系统.00．技能模�
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
-const { CreateFloatTextOnUnit } = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字") as {
-  CreateFloatTextOnUnit: (this: void, unit: any, text: string, options?: any) => any;
-};
 const { 暴击系统配置 } = require("系统.04．伤害系统.06．暴击系统.00．暴击配置") as {
   暴击系统配置: {
     生效最低伤害: number;
@@ -36,7 +33,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
-const R2S = jass.R2S as (value: number) => string;
 
 function 调用玩家英雄判定(this: void, unit: any): boolean {
   return 是玩家英雄组单位(unit) === true;
@@ -141,6 +137,7 @@ function 应用暴击率修正(this: void, context: 暴击率修正上下文): n
 
 export function registerCritAppliedFinalDamageListener(this: void, callback: 暴击最终伤害监听): void {
   if (callback == null) return;
+  确保暴击最终伤害桥接();
   for (let i = 0; i < 暴击最终伤害监听列表.length; i++) {
     if (暴击最终伤害监听列表[i] === callback) return;
   }
@@ -243,10 +240,6 @@ function 是否可暴击伤害(this: void, context: 暴击判定上下文): bool
   return context.isPhysicalDamage || context.isEnhancedDamage || context.isSkillAttack;
 }
 
-function 显示暴击(this: void, attacker: any, multiplier: number): void {
-  CreateFloatTextOnUnit(attacker, "！！（×" + R2S(multiplier) + "）", 暴击系统配置.漂浮文字);
-}
-
 export function 执行暴击判定(this: void, context: 暴击判定上下文): 暴击判定结果 {
   const attacker = context.attacker;
   const target = context.target;
@@ -293,7 +286,6 @@ export function 执行暴击判定(this: void, context: 暴击判定上下文): 
   if (暴击倍率 < 暴击系统配置.最低输出倍率) 暴击倍率 = 暴击系统配置.最低输出倍率;
 
   const 暴击后伤害 = currentDamage * 暴击倍率;
-  显示暴击(暴击归属单位, 暴击倍率);
   记录暴击成功({
     attacker,
     target,

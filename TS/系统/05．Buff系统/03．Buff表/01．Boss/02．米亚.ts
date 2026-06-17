@@ -25,6 +25,7 @@ export const 米亚Buff表: Record<string, BuffData> = {
     buffName: "污染标记",
     icon: "BuffIcon\\Boss\\Mia\\pollution_mark.blp",
     effect: "",
+    effectAttachPoint: "origin",
     type: "Debuff:mark",
     interval: 0,
     maxStack: 1,

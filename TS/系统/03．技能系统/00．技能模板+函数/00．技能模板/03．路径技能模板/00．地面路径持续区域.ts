@@ -36,6 +36,7 @@ const {
 
 import { 创建区域效果, 清理区域效果周期伤害去重组, type 区域效果实例 } from "../../01．技能函数/04．区域效果/index";
 import { 获取矩形区域单位 } from "../../01．技能函数/09．形状区域/矩形区域";
+import type { 技能提示圈配置 } from "../../02．通用函数/16．技能提示圈工厂";
 
 const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
@@ -61,6 +62,7 @@ export interface 地面路径持续区域参数 {
   模型路径?: string;
   特效高度?: number;
   显示提示圈?: boolean;
+  提示圈?: 技能提示圈配置 | false;
   on单段创建?: (this: void, 段序号: number, X: number, Y: number) => void;
   on全部铺设完成?: (this: void, 实例ID: number) => void;
   on销毁?: (this: void, 实例ID: number) => void;
@@ -142,6 +144,7 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
       模型路径: this.参数.模型路径,
       特效高度: this.参数.特效高度,
       显示提示圈: this.参数.显示提示圈,
+      提示圈: this.参数.提示圈,
       周期伤害: this.参数.伤害模式 === "整体矩形" ? 0 : this.参数.周期伤害,
       周期伤害去重组: this.实例ID,
       周期伤害去重间隔: this.参数.检测间隔,
