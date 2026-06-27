@@ -61,6 +61,11 @@ function 造成伤害(this: void, boss: any, target: any, amount: number, damage
   UnitDamageTarget(boss, target, amount, false, false, jass.ATTACK_TYPE_NORMAL, damageType, jass.WEAPON_TYPE_WHOKNOWS);
 }
 
+function 按攻击和最大生命计算伤害(this: void, boss: any, target: any, 攻击力比例: number, 最大生命比例: number): number {
+  const config = 瑟兰迪尔数值与表现配置.审判之环;
+  return (读取单位攻击力(boss) * 攻击力比例 + GetUnitState(target, UNIT_STATE_MAX_LIFE) * 最大生命比例) * config.伤害总倍率;
+}
+
 function 取象限名称(this: void, color: number): string {
   if (color === 1) return "红";
   if (color === 2) return "蓝";
@@ -168,12 +173,16 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
     const y = GetUnitY(target);
     if (color === 1) {
       播放点特效(config.红特效, x, y, 1);
-      造成伤害(boss, target, config.红伤害, jass.DAMAGE_TYPE_FIRE);
+      造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.红伤害Boss攻击力比例, config.红伤害目标最大生命比例), jass.DAMAGE_TYPE_FIRE);
     } else if (color === 3) {
       播放点特效(config.绿特效, x, y, 1);
       const life = GetUnitState(target, UNIT_STATE_LIFE);
       const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
-      造成伤害(boss, target, maxLife > 0 && life / maxLife > 0.75 ? config.绿高血伤害 : config.绿低血伤害, jass.DAMAGE_TYPE_LIGHTNING);
+      if (maxLife > 0 && life / maxLife > 0.75) {
+        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿高血伤害Boss攻击力比例, config.绿高血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING);
+      } else {
+        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿低血伤害Boss攻击力比例, config.绿低血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING);
+      }
     } else {
       播放点特效(config.金特效, x, y, 1);
       const mana = GetUnitState(target, UNIT_STATE_MANA);

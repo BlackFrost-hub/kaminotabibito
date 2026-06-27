@@ -26,6 +26,9 @@ const { 显示大招吟唱条, 关闭吟唱条 } = require("系统.09．表现�
 const { 创建白色圆形提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
   创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
 };
+const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+  读取单位攻击力: (this: void, unit: any) => number;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -35,8 +38,10 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const R2I = jass.R2I as (value: number) => number;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0;
@@ -156,7 +161,9 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
         const target = targets[i];
         if (!单位有效(target)) continue;
         if (距离平方(GetUnitX(target), GetUnitY(target), bossX, bossY) > safeRadius2) {
-          UnitDamageTarget(boss, target, config.爆炸伤害, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_MAGIC, jass.WEAPON_TYPE_WHOKNOWS);
+          const damage = (读取单位攻击力(boss) * config.爆炸伤害Boss攻击力比例
+            + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.爆炸伤害目标最大生命比例) * config.爆炸伤害总倍率;
+          UnitDamageTarget(boss, target, damage, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_MAGIC, jass.WEAPON_TYPE_WHOKNOWS);
         }
       }
     });

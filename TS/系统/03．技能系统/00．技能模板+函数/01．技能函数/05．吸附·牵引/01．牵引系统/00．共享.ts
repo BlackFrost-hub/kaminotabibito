@@ -5,6 +5,7 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+import { 闪电效果代码, 默认闪电效果代码 } from "../../../02．通用函数/17．闪电效果代码";
 
 export const GetHandleId = jass["GetHandleId"] as (h: any) => number;
 export const GetUnitX = jass["GetUnitX"] as (u: any) => number;
@@ -50,22 +51,27 @@ export const MAX_SUB_STEP = 31.0;
 export const WALKABLE_TOLERANCE = 8.0;
 export const UNIT_ALIVE_LIFE = 0.405;
 
-export const 闪电效果代码_闪电链主闪电 = "CLPB";
-export const 闪电效果代码_闪电链次闪电 = "CLSB";
-export const 闪电效果代码_生命汲取 = "DRAB";
-export const 闪电效果代码_生命汲取生命 = "DRAL";
-export const 闪电效果代码_魔力汲取 = "DRAM";
-export const 闪电效果代码_叉状闪电 = "FORK";
-export const 闪电效果代码_治疗波主闪电 = "HWPB";
-export const 闪电效果代码_治疗波次闪电 = "HWSB";
-export const 闪电效果代码_闪电攻击 = "CHIM";
-export const 闪电效果代码_魔法束缚 = "LEAS";
-export const 闪电效果代码_灵魂锁链 = "SPLK";
-export const 闪电效果代码_牵引绳子 = "ROP";
-export const 闪电效果代码_魔力之焰 = "MFPB";
-export const 闪电效果代码_死亡之指 = "AFOD";
+export const 闪电效果代码_闪电链主闪电 = 闪电效果代码.闪电链主闪电;
+export const 闪电效果代码_闪电链次闪电 = 闪电效果代码.闪电链次闪电;
+export const 闪电效果代码_生命汲取 = 闪电效果代码.生命汲取;
+export const 闪电效果代码_生命汲取生命 = 闪电效果代码.生命汲取生命;
+export const 闪电效果代码_魔力汲取 = 闪电效果代码.魔力汲取;
+export const 闪电效果代码_叉状闪电 = 闪电效果代码.叉状闪电;
+export const 闪电效果代码_治疗波主闪电 = 闪电效果代码.治疗波主闪电;
+export const 闪电效果代码_治疗波次闪电 = 闪电效果代码.治疗波次闪电;
+export const 闪电效果代码_闪电攻击 = 闪电效果代码.闪电攻击;
+export const 闪电效果代码_魔法束缚 = 闪电效果代码.魔法束缚;
+export const 闪电效果代码_灵魂锁链 = 闪电效果代码.灵魂锁链;
+export const 闪电效果代码_牵引绳子 = 闪电效果代码.牵引绳子;
+export const 闪电效果代码_魔力之焰 = 闪电效果代码.魔力之焰;
+export const 闪电效果代码_魔力燃烧 = 闪电效果代码.魔力燃烧;
+export const 闪电效果代码_死亡之指 = 闪电效果代码.死亡之指;
+export const 闪电效果代码_蓝色细束 = 闪电效果代码.蓝色细束;
+export const 闪电效果代码_蓝色光束 = 闪电效果代码.蓝色光束;
+export const 闪电效果代码_蓝色粒子束 = 闪电效果代码.蓝色粒子束;
+export const 闪电效果代码_蓝色链条 = 闪电效果代码.蓝色链条;
 
-export const DEFAULT_LIGHTNING_CODE = 闪电效果代码_闪电链主闪电;
+export const DEFAULT_LIGHTNING_CODE = 默认闪电效果代码;
 
 export type 牵引结束原因 = "完成" | "中断" | "死亡" | "阻挡" | "中心失效" | "主单位死亡" | "超距断开";
 export type 牵引结束回调 = (单位: any, 原因: 牵引结束原因, 牵引ID: number) => void;

@@ -36,12 +36,34 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local GetRandomInt = jass.GetRandomInt
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local UnitDamageTarget = jass.UnitDamageTarget
+local ConvertUnitState = jass.ConvertUnitState
 local EXSetEffectSize = japi.EXSetEffectSize
+local GetUnitStateJapi = japi.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
+end
+local function _____53D6_5355_4F4D_653B_51FB_529B(unit)
+    if not _____5355_4F4D_6709_6548(unit) or type(GetUnitStateJapi) ~= "function" then
+        return 1000
+    end
+    local value = GetUnitStateJapi(
+        unit,
+        ConvertUnitState(21)
+    )
+    return value > 0 and value or 1000
+end
+local function _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target)
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
+    return (_____53D6_5355_4F4D_653B_51FB_529B(boss) * config["爆发伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["爆发伤害目标最大生命比例"]) * config["爆发伤害总倍率"]
+end
+local function _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(boss, target)
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
+    return (_____53D6_5355_4F4D_653B_51FB_529B(boss) * config["水坑每秒伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["水坑每秒伤害目标最大生命比例"]) * config["水坑每秒伤害总倍率"]
 end
 local function _____8DDD_79BB_5E73_65B9(x1, y1, x2, y2)
     local dx = x2 - x1
@@ -111,14 +133,14 @@ local function _____64AD_653E_6C61_6C34_67F1_7206_53D1_8868_73B0(point)
             do
                 local effect = AddSpecialEffect(effects[i + 1], point.x, point.y)
                 if effect == nil or effect == 0 then
-                    goto __continue14
+                    goto __continue18
                 end
                 if type(EXSetEffectSize) == "function" then
                     EXSetEffectSize(effect, 1)
                 end
                 YDWETimerDestroyEffectSafe(2, effect)
             end
-            ::__continue14::
+            ::__continue18::
             i = i + 1
         end
     end
@@ -143,12 +165,12 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
                     do
                         local target = _____533A_57DF_5185_5355_4F4D[i + 1]
                         if not _____5355_4F4D_6709_6548(target) then
-                            goto __continue20
+                            goto __continue24
                         end
                         UnitDamageTarget(
                             context["Boss单位"],
                             target,
-                            config["水坑每秒伤害"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                            _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(context["Boss单位"], target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
                             false,
                             false,
                             jass.ATTACK_TYPE_CHAOS,
@@ -157,7 +179,7 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
                         )
                         _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["水坑每秒腐化层数"], "污水柱残留水坑")
                     end
-                    ::__continue20::
+                    ::__continue24::
                     i = i + 1
                 end
             end
@@ -180,7 +202,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue25
+                    goto __continue29
                 end
                 if _____8DDD_79BB_5E73_65B9(
                     point.x,
@@ -188,12 +210,12 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then
-                    goto __continue25
+                    goto __continue29
                 end
                 UnitDamageTarget(
                     boss,
                     target,
-                    config["爆发伤害"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                    _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
                     false,
                     false,
                     jass.ATTACK_TYPE_CHAOS,
@@ -211,7 +233,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
                     ["主单位"] = boss
                 })
             end
-            ::__continue25::
+            ::__continue29::
             i = i + 1
         end
     end

@@ -45,6 +45,9 @@ const { 创建瑟兰迪尔月光碎片 } = require("系统.03．技能系统.05�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+  读取单位攻击力: (this: void, unit: any) => number;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
@@ -60,6 +63,7 @@ const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, inde
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UnitDamageTarget = jass.UnitDamageTarget as (
   whichUnit: any,
   target: any,
@@ -77,6 +81,7 @@ let 月光枷锁已注册 = false;
 const BJ_RADTODEG = 57.29577951308232;
 const 月光枷锁根须BuffID = "C017";
 const 月光枷锁原生根须Buff = 1111844210; // 'BEer'
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 interface 月光枷锁绑定记录 {
   来源单位: any;
@@ -178,10 +183,12 @@ function 结算月光枷锁Tick伤害(this: void, caster: any, target: any, tick
   addDelayedCallback(R2I(config.Tick间隔秒 * tickIndex * 1000), function 月光枷锁Tick伤害回调(this: void): void {
     if (!单位有效(caster) || !单位有效(target)) return;
     if (月光枷锁绑定表[targetId] == null) return;
+    const damage = (读取单位攻击力(caster) * config.Tick伤害Boss攻击力比例
+      + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.Tick伤害目标最大生命比例) * config.Tick伤害总倍率;
     UnitDamageTarget(
       caster,
       target,
-      config.Tick伤害,
+      damage,
       false,
       false,
       jass.ATTACK_TYPE_NORMAL,

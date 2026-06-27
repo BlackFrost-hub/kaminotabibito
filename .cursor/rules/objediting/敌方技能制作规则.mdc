@@ -63,10 +63,10 @@ alwaysApply: false
   - `imports\Common\Effect\Form\RiseFall`
   - `imports\Common\Effect\Form\Rotate`
   - `imports\Common\Effect\Form\Explosion`
-- 每个特效分类目录下可建 `Texture` 子目录，放该分类特效专属贴图，例如 `imports\Common\Effect\Element\Light\Texture`。
+- 每个特效分类目录下统一使用 `Texture` 子目录存放该分类特效专属贴图，例如 `imports\Common\Effect\Element\Light\Texture`。
 - 用户给出模型、图标、特效、贴图路径时，默认主动规范为物编/TS 可用路径：去掉开头的 `imports\`，保留后续英文目录。
 - 如果用户给出 `imports\Common\Effect\Element\Light\Texture\Mark_Checkable.blp`，物编/TS 中应写 `Common\Effect\Element\Light\Texture\Mark_Checkable.blp`。
-- 添加或整理 `.mdx` / `.mdl` 模型资源时，应同时检查模型内部引用的贴图路径；如果自定义贴图散落在模型同级目录，默认移动到对应分类的 `Texture` 子目录，再把模型内部贴图引用同步改成实际导入路径，例如 `Common\Effect\Element\Light\Texture\Mark_Checkable.blp`。
+- 添加或整理 `.mdx` / `.mdl` 模型资源时，应同时检查模型内部引用的贴图路径；自定义贴图默认统一放到对应分类的 `Texture` 子目录，不要继续散落在模型同级目录或 `war3mapImported` 子目录。若发现旧资源散落，默认移动到对应分类的 `Texture` 子目录，再把模型内部贴图引用同步改成实际导入路径，例如 `Common\Effect\Element\Light\Texture\Mark_Checkable.blp`。
 - 模型贴图引用中确认是 Warcraft 自带路径的不要修改，例如 `Textures\...`、`ReplaceableTextures\...`、`UI\...`、`Units\...`、`Abilities\...`。
 - 如果只是讨论技能需求，用户没有特别声明“不要改路径”，后续默认自动完成上述资源路径规范。
 - 通用图标、模型、音效分别放：

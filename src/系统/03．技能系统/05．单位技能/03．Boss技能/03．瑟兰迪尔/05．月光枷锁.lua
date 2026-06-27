@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, UnitDamageTarget, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local stringToFourCC, _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, UnitDamageTarget, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.00．配置")
@@ -105,10 +105,11 @@ function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIn
             if _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] == nil then
                 return
             end
+            local damage = (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * config["Tick伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["Tick伤害目标最大生命比例"]) * config["Tick伤害总倍率"]
             UnitDamageTarget(
                 caster,
                 target,
-                config["Tick伤害"],
+                damage,
                 false,
                 false,
                 jass.ATTACK_TYPE_NORMAL,
@@ -207,6 +208,8 @@ local ____require_result_9 = require("系统.03．技能系统.05．单位技能
 local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_9["创建瑟兰迪尔月光碎片"]
 local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDWETimerDestroyEffectSafe = ____require_result_10.YDWETimerDestroyEffectSafe
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitName = jass.GetUnitName
@@ -221,6 +224,7 @@ SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale
 AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 UnitRemoveAbility = jass.UnitRemoveAbility
+GetUnitState = jass.GetUnitState
 UnitDamageTarget = jass.UnitDamageTarget
 local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6708_5149_67B7_9501_6280_80FDID = stringToFourCC(_____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]["技能槽位"])
@@ -228,6 +232,7 @@ local _____6708_5149_67B7_9501_5DF2_6CE8_518C = false
 BJ_RADTODEG = 57.29577951308232
 _____6708_5149_67B7_9501_6839_987BBuffID = "C017"
 _____6708_5149_67B7_9501_539F_751F_6839_987BBuff = 1111844210
+UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 _____6708_5149_67B7_9501_7ED1_5B9A_8868 = {}
 local function _____6253_65AD_6708_5149_67B7_9501_5E76_6389_843D_788E_7247(target)
     if not _____5355_4F4D_6709_6548(target) then

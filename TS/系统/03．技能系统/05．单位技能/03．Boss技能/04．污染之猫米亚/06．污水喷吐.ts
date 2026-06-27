@@ -33,15 +33,19 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
+const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const BlzSetSpecialEffectYaw = jass.BlzSetSpecialEffectYaw as ((effect: any, yaw: number) => void) | undefined;
+const GetUnitStateJapi = japi.GetUnitState as ((unit: any, state: any) => number) | undefined;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const BJ_DEGTORAD = 0.017453292519943295;
 const BJ_RADTODEG = 57.29577951308232;
@@ -55,6 +59,18 @@ function stringToFourCC(this: void, s: string): number {
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0;
+}
+
+function 取单位攻击力(this: void, unit: any): number {
+  if (!单位有效(unit) || typeof GetUnitStateJapi !== "function") return 1000;
+  const value = GetUnitStateJapi(unit, ConvertUnitState(0x15));
+  return value > 0 ? value : 1000;
+}
+
+function 计算污水喷吐直接伤害(this: void, boss: any, target: any): number {
+  const config = 米亚技能数值配置.污水喷吐;
+  return (取单位攻击力(boss) * config.直接伤害Boss攻击力比例
+    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.直接伤害目标最大生命比例) * config.直接伤害总倍率;
 }
 
 function 点在前方扇形内(this: void, boss: any, target: any, range: number, halfAngle: number): boolean {
@@ -131,7 +147,7 @@ export function 释放米亚污水喷吐(this: void, context: 米亚运行时上
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (!单位有效(target) || !点在前方扇形内(boss, target, config.喷吐距离, config.喷吐半角)) continue;
-    UnitDamageTarget(boss, target, config.直接伤害 * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+    UnitDamageTarget(boss, target, 计算污水喷吐直接伤害(boss, target) * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
     添加米亚腐化感染(context, target, config.直接腐化层数, "污水喷吐");
   }
 }

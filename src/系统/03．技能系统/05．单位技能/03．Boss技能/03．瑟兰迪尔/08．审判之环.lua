@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____64AD_653E_70B9_7279_6548, _____9020_6210_4F24_5BB3, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_541F_5531_6761_989C_8272, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____542F_52A8_745F_5170_8FEA_5C14_5BA1_5224_4E4B_73AF_8F6E_6B21, _____7ED3_7B97_745F_5170_8FEA_5C14_5BA1_5224_4E4B_73AF_8C61_9650, getServerTime, addDelayedCallback, _____65BD_52A0_5355_4F53_653B_51FB_529B_964D_4F4EBuff, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_6700_8FDC_654C_5BF9_82F1_96C4, YDWETimerDestroyEffectSafe, _____521B_5EFA_5FAA_73AF_70B9_7279_6548, _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761, _____5173_95ED_541F_5531_6761, jass, GetRandomInt, GetUnitX, GetUnitY, GetUnitState, AddSpecialEffect, UnitDamageTarget, R2I, EXSetEffectSize, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA
+local _____5355_4F4D_6709_6548, _____64AD_653E_70B9_7279_6548, _____9020_6210_4F24_5BB3, _____6309_653B_51FB_548C_6700_5927_751F_547D_8BA1_7B97_4F24_5BB3, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_541F_5531_6761_989C_8272, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____542F_52A8_745F_5170_8FEA_5C14_5BA1_5224_4E4B_73AF_8F6E_6B21, _____7ED3_7B97_745F_5170_8FEA_5C14_5BA1_5224_4E4B_73AF_8C61_9650, getServerTime, addDelayedCallback, _____65BD_52A0_5355_4F53_653B_51FB_529B_964D_4F4EBuff, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_6700_8FDC_654C_5BF9_82F1_96C4, YDWETimerDestroyEffectSafe, _____521B_5EFA_5FAA_73AF_70B9_7279_6548, _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761, _____5173_95ED_541F_5531_6761, jass, GetRandomInt, GetUnitX, GetUnitY, GetUnitState, AddSpecialEffect, UnitDamageTarget, R2I, EXSetEffectSize, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
@@ -37,6 +37,10 @@ function _____9020_6210_4F24_5BB3(boss, target, amount, damageType)
         damageType,
         jass.WEAPON_TYPE_WHOKNOWS
     )
+end
+function _____6309_653B_51FB_548C_6700_5927_751F_547D_8BA1_7B97_4F24_5BB3(boss, target, _____653B_51FB_529B_6BD4_4F8B, _____6700_5927_751F_547D_6BD4_4F8B)
+    local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["审判之环"]
+    return (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * _____653B_51FB_529B_6BD4_4F8B + GetUnitState(target, UNIT_STATE_MAX_LIFE) * _____6700_5927_751F_547D_6BD4_4F8B) * config["伤害总倍率"]
 end
 function _____53D6_8C61_9650_540D_79F0(color)
     if color == 1 then
@@ -164,12 +168,31 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_5BA1_5224_4E4B_73AF_8C61_9650(boss, 
             local y = GetUnitY(target)
             if color == 1 then
                 _____64AD_653E_70B9_7279_6548(config["红特效"], x, y, 1)
-                _____9020_6210_4F24_5BB3(boss, target, config["红伤害"], jass.DAMAGE_TYPE_FIRE)
+                _____9020_6210_4F24_5BB3(
+                    boss,
+                    target,
+                    _____6309_653B_51FB_548C_6700_5927_751F_547D_8BA1_7B97_4F24_5BB3(boss, target, config["红伤害Boss攻击力比例"], config["红伤害目标最大生命比例"]),
+                    jass.DAMAGE_TYPE_FIRE
+                )
             elseif color == 3 then
                 _____64AD_653E_70B9_7279_6548(config["绿特效"], x, y, 1)
                 local life = GetUnitState(target, UNIT_STATE_LIFE)
                 local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
-                _____9020_6210_4F24_5BB3(boss, target, maxLife > 0 and life / maxLife > 0.75 and config["绿高血伤害"] or config["绿低血伤害"], jass.DAMAGE_TYPE_LIGHTNING)
+                if maxLife > 0 and life / maxLife > 0.75 then
+                    _____9020_6210_4F24_5BB3(
+                        boss,
+                        target,
+                        _____6309_653B_51FB_548C_6700_5927_751F_547D_8BA1_7B97_4F24_5BB3(boss, target, config["绿高血伤害Boss攻击力比例"], config["绿高血伤害目标最大生命比例"]),
+                        jass.DAMAGE_TYPE_LIGHTNING
+                    )
+                else
+                    _____9020_6210_4F24_5BB3(
+                        boss,
+                        target,
+                        _____6309_653B_51FB_548C_6700_5927_751F_547D_8BA1_7B97_4F24_5BB3(boss, target, config["绿低血伤害Boss攻击力比例"], config["绿低血伤害目标最大生命比例"]),
+                        jass.DAMAGE_TYPE_LIGHTNING
+                    )
+                end
             else
                 _____64AD_653E_70B9_7279_6548(config["金特效"], x, y, 1)
                 local mana = GetUnitState(target, UNIT_STATE_MANA)

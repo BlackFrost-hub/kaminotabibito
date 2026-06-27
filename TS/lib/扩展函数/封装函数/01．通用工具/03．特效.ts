@@ -410,7 +410,7 @@ const Dz绑定单位特效表: Map<string, any> = new Map();
 const 单位坐标跟随特效表: Record<string, any | undefined> = {};
 let 单位坐标跟随特效数量 = 0;
 let 单位坐标跟随特效回调ID = 0;
-const 单位坐标跟随特效间隔毫秒 = 40;
+const 单位坐标跟随特效间隔毫秒 = 30;
 const 单位坐标跟随特效默认高度 = 50;
 
 function 解绑后归零尺寸并销毁Dz绑定特效(effect: any): void {
